@@ -39,7 +39,7 @@ class PathTimeNeighborhood {
       const ReferenceLine& reference_line,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
-  std::vector<PathTimeObstacle> GetPathTimeObstacles() const;
+  const std::vector<PathTimeObstacle>& GetPathTimeObstacles() const;
 
   bool GetPathTimeObstacle(const std::string& obstacle_id,
                            PathTimeObstacle* path_time_obstacle);
@@ -67,7 +67,9 @@ class PathTimeNeighborhood {
 
   std::unordered_map<std::string, prediction::Trajectory> prediction_traj_map_;
 
-  std::vector<apollo::common::PathPoint> discretized_ref_points_;
+  std::vector<common::PathPoint> discretized_ref_points_;
+
+  std::vector<PathTimeObstacle> path_time_obstacles_;
 };
 
 }  // namespace planning

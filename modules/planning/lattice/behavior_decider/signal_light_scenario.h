@@ -26,10 +26,7 @@ class SignalLightScenario : public Scenario {
 
   virtual int ComputeScenarioDecision(
       Frame* frame, ReferenceLineInfo* const reference_line_info,
-      const common::TrajectoryPoint& init_planning_point,
-      const std::array<double, 3>& lon_init_state,
-      const std::vector<common::PathPoint>& discretized_reference_line,
-      PlanningTarget* const decision);
+      PlanningTarget* planning_target);
 
  private:
   bool exist_ = false;

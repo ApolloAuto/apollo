@@ -25,9 +25,6 @@ class AdcMasterScenario : public Scenario {
 
   virtual int ComputeScenarioDecision(
       Frame* frame, ReferenceLineInfo* const reference_line_info,
-      const common::TrajectoryPoint& init_planning_point,
-      const std::array<double, 3>& lon_init_state,
-      const std::vector<common::PathPoint>& discretized_reference_line,
       PlanningTarget* const decision);
 
  private:

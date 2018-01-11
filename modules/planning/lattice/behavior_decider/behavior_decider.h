@@ -32,6 +32,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 
 namespace apollo {
 namespace planning {
@@ -51,24 +52,7 @@ class BehaviorDecider {
       const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line);
 
- private:
-  /**
-  bool StopDecisionNearDestination(
-      Frame* frame, const std::array<double, 3>& lon_init_state,
-      const std::vector<common::PathPoint>& discretized_reference_line,
-      PlanningTarget* planning_target);
-      **/
-
-  // Given a reference line, compute the nearest forward state and
-  // backward state. Here state includes obstacles and necessary
-  // traffic signals.
-  /**
-  void GetNearbyObstacles(
-      const common::TrajectoryPoint& init_planning_point, const Frame* frame,
-      const std::vector<common::PathPoint>& discretized_reference_line,
-      std::array<double, 3>* forward_state,
-      std::array<double, 3>* backward_state);
-      **/
+  std::shared_ptr<PathTimeNeighborhood> get_ptr_path_time_neighborhood() const;
 
  private:
   std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_;
