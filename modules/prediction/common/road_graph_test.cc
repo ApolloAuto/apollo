@@ -30,16 +30,10 @@
 namespace apollo {
 namespace prediction {
 
-class RoadGraphTest : public KMLMapBasedTest {
- public:
-  virtual void SetUp() { map_ = PredictionMap::instance(); }
-
- protected:
-  PredictionMap *map_;
-};
+class RoadGraphTest : public KMLMapBasedTest {};
 
 TEST_F(RoadGraphTest, General) {
-  auto lane = map_->LaneById("l9");
+  auto lane = PredictionMap::LaneById("l9");
   EXPECT_TRUE(lane != nullptr);
 
   double start_s = 99.0;
@@ -54,10 +48,14 @@ TEST_F(RoadGraphTest, General) {
   EXPECT_EQ("l18", lane_graph.lane_sequence(0).lane_segment(1).lane_id());
   EXPECT_EQ("l21", lane_graph.lane_sequence(0).lane_segment(2).lane_id());
 
-  EXPECT_TRUE(road_graph.IsOnLaneGraph(map_->LaneById("l9"), lane_graph));
-  EXPECT_TRUE(road_graph.IsOnLaneGraph(map_->LaneById("l18"), lane_graph));
-  EXPECT_TRUE(road_graph.IsOnLaneGraph(map_->LaneById("l21"), lane_graph));
-  EXPECT_FALSE(road_graph.IsOnLaneGraph(map_->LaneById("l30"), lane_graph));
+  EXPECT_TRUE(
+      road_graph.IsOnLaneGraph(PredictionMap::LaneById("l9"), lane_graph));
+  EXPECT_TRUE(
+      road_graph.IsOnLaneGraph(PredictionMap::LaneById("l18"), lane_graph));
+  EXPECT_TRUE(
+      road_graph.IsOnLaneGraph(PredictionMap::LaneById("l21"), lane_graph));
+  EXPECT_FALSE(
+      road_graph.IsOnLaneGraph(PredictionMap::LaneById("l30"), lane_graph));
 
   for (const auto &lane_sequence : lane_graph.lane_sequence()) {
     double total_length = 0.0;
@@ -69,7 +67,7 @@ TEST_F(RoadGraphTest, General) {
 }
 
 TEST_F(RoadGraphTest, NegativeStartS) {
-  auto lane = map_->LaneById("l9");
+  auto lane = PredictionMap::LaneById("l9");
   EXPECT_TRUE(lane != nullptr);
 
   double start_s = -10.0;
@@ -92,7 +90,7 @@ TEST_F(RoadGraphTest, NegativeStartS) {
 }
 
 TEST_F(RoadGraphTest, LengthLongerThanEnd) {
-  auto lane = map_->LaneById("l22");
+  auto lane = PredictionMap::LaneById("l22");
   EXPECT_TRUE(lane != nullptr);
 
   double start_s = 200.0;
@@ -117,7 +115,7 @@ TEST_F(RoadGraphTest, LengthLongerThanEnd) {
 }
 
 TEST_F(RoadGraphTest, MultipleLaneSequence) {
-  auto lane = map_->LaneById("l20");
+  auto lane = PredictionMap::LaneById("l20");
   EXPECT_TRUE(lane != nullptr);
 
   double start_s = 200.0;

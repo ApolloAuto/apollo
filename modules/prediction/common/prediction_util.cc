@@ -158,7 +158,6 @@ void GenerateLaneSequenceTrajectoryPoints(
     Eigen::Matrix<double, 4, 1>* state, Eigen::Matrix<double, 4, 4>* transition,
     const LaneSequence& sequence, const size_t num, const double period,
     std::vector<TrajectoryPoint>* points) {
-  PredictionMap* map = PredictionMap::instance();
   double lane_s = (*state)(0, 0);
   double lane_l = (*state)(1, 0);
   double lane_speed = (*state)(2, 0);
@@ -169,7 +168,8 @@ void GenerateLaneSequenceTrajectoryPoints(
   for (size_t i = 0; i < num; ++i) {
     Eigen::Vector2d point;
     double theta = M_PI;
-    if (!map->SmoothPointFromLane(lane_id, lane_s, lane_l, &point, &theta)) {
+    if (!PredictionMap::SmoothPointFromLane(lane_id, lane_s, lane_l, &point,
+                                            &theta)) {
       AERROR << "Unable to get smooth point from lane [" << lane_id
              << "] with s [" << lane_s << "] and l [" << lane_l << "]";
       break;
@@ -217,10 +217,10 @@ void GenerateLaneSequenceTrajectoryPoints(
     lane_acc = (*state)(3, 0);
 
     // find next lane id
-    while (lane_s > map->LaneById(lane_id)->total_length() &&
+    while (lane_s > PredictionMap::LaneById(lane_id)->total_length() &&
            lane_segment_index + 1 < sequence.lane_segment_size()) {
       lane_segment_index += 1;
-      lane_s = lane_s - map->LaneById(lane_id)->total_length();
+      lane_s = lane_s - PredictionMap::LaneById(lane_id)->total_length();
       (*state)(0, 0) = lane_s;
       lane_id = sequence.lane_segment(lane_segment_index).lane_id();
     }
