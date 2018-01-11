@@ -71,20 +71,9 @@ PlanningTarget BehaviorDecider::Analyze(
         ->CopyFrom(reference_point);
   }
 
-//<<<<<<< HEAD
-//  ConditionFilter condition_filter(frame, lon_init_state, speed_limit,
-//                                   reference_line_info->reference_line(),
-//                                   discretized_reference_line,
-//                                   path_time_neighborhood_);
-//=======
-  std::shared_ptr<PathTimeNeighborhood> ptr_path_time_neighborhood(
-      new PathTimeNeighborhood(frame, lon_init_state[0], reference_line_info->reference_line(),
-                               discretized_reference_line));
-
   CHECK(FLAGS_default_cruise_speed <= speed_limit);
   ConditionFilter condition_filter(lon_init_state, speed_limit,
-                                   ptr_path_time_neighborhood);
-//>>>>>>> planning: changed module interfaces for lattice planner
+      path_time_neighborhood_);
 
   std::vector<SampleBound> sample_bounds = condition_filter.QuerySampleBounds();
 
@@ -121,13 +110,6 @@ PlanningTarget BehaviorDecider::Analyze(
   return ret;
 }
 
-//<<<<<<< HEAD
-//=======
-//std::shared_ptr<PathTimeNeighborhood> BehaviorDecider::get_ptr_path_time_neighborhood() const {
-//  return ptr_path_time_neighborhood_;
-//}
-//
-//>>>>>>> planning: changed module interfaces for lattice planner
 }  // namespace planning
 }  // namespace apollo
 

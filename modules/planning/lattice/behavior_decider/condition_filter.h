@@ -34,9 +34,8 @@ namespace planning {
 class ConditionFilter {
  public:
   ConditionFilter(
-    const Frame* frame, const std::array<double, 3>& init_s,
-    const double speed_limit, const ReferenceLine& reference_line,
-    const std::vector<common::PathPoint>& discretized_ref_points,
+    const std::array<double, 3>& init_s,
+    const double speed_limit,
     std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood);
 
   std::vector<SampleBound> QuerySampleBounds(const double t) const;
@@ -54,7 +53,6 @@ class ConditionFilter {
   bool WithinObstacleSt(double s, double t);
 
  private:
-  void Init();
 
   // Return true only if t is within the range of time slot,
   // but will output block interval anyway(maybe be extension)
@@ -68,13 +66,8 @@ class ConditionFilter {
 
  private:
   FeasibleRegion feasible_region_;
-<<<<<<< HEAD
-  std::vector<PathTimeObstacle> path_time_obstacles_;
-  std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_;
-=======
 
   std::shared_ptr<PathTimeNeighborhood> ptr_path_time_neighborhood_;
->>>>>>> planning: changed module interfaces for lattice planner
 };
 
 }  // namespace planning

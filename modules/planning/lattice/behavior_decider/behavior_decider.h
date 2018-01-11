@@ -40,8 +40,9 @@ namespace planning {
 class BehaviorDecider {
  public:
   BehaviorDecider();
-  BehaviorDecider(
-    std::shared_ptr<PathTimeNeighborhood> p);
+
+  BehaviorDecider(std::shared_ptr<PathTimeNeighborhood> p);
+
   void UpdatePathTimeNeighborhood(std::shared_ptr<PathTimeNeighborhood> p);
 
   virtual ~BehaviorDecider() = default;
@@ -51,8 +52,6 @@ class BehaviorDecider {
       const common::TrajectoryPoint& init_planning_point,
       const std::array<double, 3>& lon_init_state,
       const std::vector<common::PathPoint>& discretized_reference_line);
-
-  std::shared_ptr<PathTimeNeighborhood> get_ptr_path_time_neighborhood() const;
 
  private:
   std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_;
