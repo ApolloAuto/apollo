@@ -31,21 +31,11 @@ namespace planning {
 using PathTimePointPair = std::pair<PathTimePoint, PathTimePoint>;
 
 ConditionFilter::ConditionFilter(
-    const Frame* frame, const std::array<double, 3>& init_s,
-    const double speed_limit, const ReferenceLine& reference_line,
-    const std::vector<common::PathPoint>& discretized_ref_points,
+    const std::array<double, 3>& init_s,
+    const double speed_limit,
     std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood)
     : feasible_region_(init_s, speed_limit),
-      path_time_neighborhood_(path_time_neighborhood) {
-  Init();
-}
-//=======
-//    const std::array<double, 3>& init_s,
-//    const double speed_limit,
-//    std::shared_ptr<PathTimeNeighborhood> ptr_path_time_neighborhood)
-//    : feasible_region_(init_s, speed_limit),
-//      ptr_path_time_neighborhood_(ptr_path_time_neighborhood) {}
-//>>>>>>> planning: changed module interfaces for lattice planner
+      ptr_path_time_neighborhood_(path_time_neighborhood) {}
 
 std::vector<SampleBound> ConditionFilter::QuerySampleBounds() const {
   // std::set<double> timestamps = CriticalTimeStamps();
@@ -229,13 +219,8 @@ bool ConditionFilter::GenerateLatticeStPixels(
   int num_cols = 160;
   double s_step = 100.0 / (double) num_rows;
   double t_step = 8.0 / (double) num_cols;
-//<<<<<<< HEAD
-//  std::vector<PathTimeObstacle> path_time_obstacles =
-//    path_time_neighborhood_->GetPathTimeObstacles();
-//  if (0 == path_time_obstacles.size()) {
-//=======
+
   if (ptr_path_time_neighborhood_->GetPathTimeObstacles().empty()) {
-//>>>>>>> planning: changed module interfaces for lattice planner
     AINFO << "No_Path_Time_Neighborhood_Obstacle_in_this_frame";
     return false;
   }
@@ -280,7 +265,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
 
 bool ConditionFilter::WithinObstacleSt(double s, double t) {
   const auto& path_time_obstacles =
-    path_time_neighborhood_->GetPathTimeObstacles();
+    ptr_path_time_neighborhood_->GetPathTimeObstacles();
 
   for (const PathTimeObstacle& path_time_obstacle : path_time_obstacles) {
      if (t < path_time_obstacle.upper_left().t() ||

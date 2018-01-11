@@ -244,13 +244,6 @@ PathTimePoint PathTimeNeighborhood::SetPathTimePoint(
 
 const std::vector<PathTimeObstacle>& PathTimeNeighborhood::GetPathTimeObstacles()
     const {
-  /**
-  std::vector<PathTimeObstacle> path_time_obstacles;
-  for (const auto& path_time_obstacle_element : path_time_obstacle_map_) {
-    path_time_obstacles.push_back(path_time_obstacle_element.second);
-  }
-  return path_time_obstacles;
-  **/
   return path_time_obstacles_;
 }
 
