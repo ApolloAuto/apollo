@@ -267,7 +267,7 @@ bool PathTimeNeighborhood::GetPathTimeObstacle(
 std::vector<std::pair<double, double>>
 PathTimeNeighborhood::GetPathBlockingIntervals(const double t) const {
   // TODO: implement this!
-  CHECK(false);
+  CHECK(time_range_.first <= t && t <= time_range_.second);
   std::vector<std::pair<double, double>> intervals;
   return intervals;
 }
