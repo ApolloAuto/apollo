@@ -199,7 +199,8 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
         combined_trajectory.trajectory_points();
     num_lattice_traj += 1;
     reference_line_info->SetTrajectory(combined_trajectory);
-
+    reference_line_info->SetCost(reference_line_info->PriorityCost() +
+      trajectory_pair_cost);
 
     // Auto Tuning
     // 1. Get future trajectory from localization

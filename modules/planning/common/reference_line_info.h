@@ -75,6 +75,7 @@ class ReferenceLineInfo {
   double Cost() const { return cost_; }
   void AddCost(double cost) { cost_ += cost; }
   void SetCost(double cost) { cost_ = cost; }
+  double PriorityCost() const { return priority_cost_; }
   void SetPriorityCost(double cost) { priority_cost_ = cost; }
 
   /**
