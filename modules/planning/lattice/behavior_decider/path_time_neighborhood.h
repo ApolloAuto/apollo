@@ -47,6 +47,13 @@ class PathTimeNeighborhood {
   double SpeedAtT(
       const std::string& obstacle_id, const double s, const double t) const;
 
+  std::vector<std::pair<double, double>>
+  GetPathBlockingIntervals(const double t) const;
+
+  std::pair<double, double> get_path_range() const;
+
+  std::pair<double, double> get_time_range() const;
+
  private:
   void SetupObstacles(
       const Frame* frame, const ReferenceLine& reference_line,
@@ -60,7 +67,10 @@ class PathTimeNeighborhood {
                                  const ReferenceLine& reference_line);
 
  private:
-  double ego_s_;
+
+  std::pair<double, double> time_range_;
+
+  std::pair<double, double> path_range_;
 
   // obstacle_id -> critical conditions
   std::unordered_map<std::string, PathTimeObstacle> path_time_obstacle_map_;

@@ -89,6 +89,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
     frame, init_s[0],
     reference_line_info->reference_line(),
     discretized_reference_line));
+
   decider_.UpdatePathTimeNeighborhood(path_time_neighborhood_ptr);
   PlanningTarget planning_target =
       decider_.Analyze(frame, reference_line_info, planning_init_point, init_s,
