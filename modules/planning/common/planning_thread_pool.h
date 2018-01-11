@@ -41,6 +41,11 @@ class PlanningThreadPool {
   common::util::ThreadPool* mutable_thread_pool() {
     return thread_pool_.get();
   }
+  void Stop() {
+    if (thread_pool_) {
+      thread_pool_->Stop(false);
+    }
+  }
 
  private:
   std::unique_ptr<common::util::ThreadPool> thread_pool_;
