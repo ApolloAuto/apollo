@@ -133,8 +133,6 @@ void SequencePredictor::FilterLaneSequences(
 
 SequencePredictor::LaneChangeType SequencePredictor::GetLaneChangeType(
     const std::string& lane_id, const LaneSequence& lane_sequence) {
-  PredictionMap* map = PredictionMap::instance();
-
   if (lane_id.empty()) {
     return LaneChangeType::ONTO_LANE;
   }
@@ -143,11 +141,13 @@ SequencePredictor::LaneChangeType SequencePredictor::GetLaneChangeType(
   if (lane_id == lane_change_id) {
     return LaneChangeType::STRAIGHT;
   } else {
-    if (map->IsLeftNeighborLane(map->LaneById(lane_change_id),
-                                map->LaneById(lane_id))) {
+    if (PredictionMap::IsLeftNeighborLane(
+            PredictionMap::LaneById(lane_change_id),
+            PredictionMap::LaneById(lane_id))) {
       return LaneChangeType::LEFT;
-    } else if (map->IsRightNeighborLane(map->LaneById(lane_change_id),
-                                        map->LaneById(lane_id))) {
+    } else if (PredictionMap::IsRightNeighborLane(
+                   PredictionMap::LaneById(lane_change_id),
+                   PredictionMap::LaneById(lane_id))) {
       return LaneChangeType::RIGHT;
     }
   }
@@ -175,13 +175,13 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
     adc_position[0] = pose_container->ToPerceptionObstacle()->position().x();
     adc_position[1] = pose_container->ToPerceptionObstacle()->position().y();
 
-    PredictionMap* map = PredictionMap::instance();
     std::string obstacle_lane_id = lane_sequence.lane_segment(0).lane_id();
     double obstacle_lane_s = lane_sequence.lane_segment(0).start_s();
     double lane_s = 0.0;
     double lane_l = 0.0;
-    if (map->GetProjection(adc_position, map->LaneById(obstacle_lane_id),
-                           &lane_s, &lane_l)) {
+    if (PredictionMap::GetProjection(adc_position,
+                                     PredictionMap::LaneById(obstacle_lane_id),
+                                     &lane_s, &lane_l)) {
       ADEBUG << "Distance with ADC is " << std::fabs(lane_s - obstacle_lane_s);
       return std::fabs(lane_s - obstacle_lane_s);
     }
