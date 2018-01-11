@@ -75,6 +75,7 @@ class ReferenceLineInfo {
   double Cost() const { return cost_; }
   void AddCost(double cost) { cost_ += cost; }
   void SetCost(double cost) { cost_ = cost; }
+  void SetPriorityCost(double cost) { priority_cost_ = cost; }
 
   /**
    * @brief check if current reference line is started from another reference
@@ -177,6 +178,8 @@ class ReferenceLineInfo {
   ADCTrajectory::RightOfWayStatus status_ = ADCTrajectory::UNPROTECTED;
 
   double offset_to_other_reference_line_ = 0.0;
+
+  double priority_cost_ = std::numeric_limits<double>::infinity();
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };
