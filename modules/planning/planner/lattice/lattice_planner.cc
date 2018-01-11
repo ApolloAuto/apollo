@@ -85,6 +85,11 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
   current_time = Clock::NowInSeconds();
 
   // 4. parse the decision and get the planning target.
+  std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_ptr(new PathTimeNeighborhood(
+    frame, init_s[0],
+    reference_line_info->reference_line(),
+    discretized_reference_line));
+  decider_.UpdatePathTimeNeighborhood(path_time_neighborhood_ptr);
   PlanningTarget planning_target =
       decider_.Analyze(frame, reference_line_info, planning_init_point, init_s,
                        discretized_reference_line);
@@ -108,7 +113,8 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
   //   second, evaluate the feasible longitudinal and lateral trajectory pairs
   //   and sort them according to the cost.
   TrajectoryEvaluator trajectory_evaluator(
-      planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle, false);
+      planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle,
+      false, path_time_neighborhood_ptr);
 
   AINFO << "Trajectory_Evaluator_Construction_Time="
         << (Clock::NowInSeconds() - current_time) * 1000;

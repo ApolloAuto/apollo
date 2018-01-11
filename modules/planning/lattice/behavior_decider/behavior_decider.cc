@@ -27,7 +27,6 @@
 #include "modules/planning/lattice/behavior_decider/scenario_manager.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/util/lattice_params.h"
-#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/lattice/behavior_decider/condition_filter.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
 #include "modules/planning/lattice/util/lattice_util.h"
@@ -41,6 +40,16 @@ using apollo::common::PointENU;
 using apollo::common::PathPoint;
 
 BehaviorDecider::BehaviorDecider() {}
+
+BehaviorDecider::BehaviorDecider(
+  std::shared_ptr<PathTimeNeighborhood> p) {
+  path_time_neighborhood_ = p;
+}
+
+void BehaviorDecider::UpdatePathTimeNeighborhood(
+  std::shared_ptr<PathTimeNeighborhood> p) {
+  path_time_neighborhood_ = p;
+}
 
 PlanningTarget BehaviorDecider::Analyze(
     Frame* frame, ReferenceLineInfo* const reference_line_info,
@@ -66,7 +75,8 @@ PlanningTarget BehaviorDecider::Analyze(
 
   ConditionFilter condition_filter(frame, lon_init_state, speed_limit,
                                    reference_line_info->reference_line(),
-                                   discretized_reference_line);
+                                   discretized_reference_line,
+                                   path_time_neighborhood_);
 
   std::vector<SampleBound> sample_bounds = condition_filter.QuerySampleBounds();
 
@@ -102,53 +112,6 @@ PlanningTarget BehaviorDecider::Analyze(
   }
   return ret;
 }
-
-/**
-// Deprecated
-bool BehaviorDecider::StopDecisionNearDestination(
-    Frame* frame, const std::array<double, 3>& lon_init_state,
-    const std::vector<common::PathPoint>& discretized_reference_line,
-    PlanningTarget* planning_target) {
-  PointENU routing_end = frame->GetRoutingDestination();
-  PathPoint routing_end_matched_point =
-      ReferenceLineMatcher::MatchToReferenceLine(
-          discretized_reference_line, routing_end.x(), routing_end.y());
-
-  double dist_x = routing_end.x() - routing_end_matched_point.x();
-  double dist_y = routing_end.y() - routing_end_matched_point.y();
-  double dist = std::hypot(dist_x, dist_y);
-  if (dist > dist_thred_omit_routing_end) {
-    return false;
-  }
-
-  double res_s = routing_end_matched_point.s() - lon_init_state[0];
-  if (res_s <= stop_margin) {
-    AINFO << "Setting PlanningTarget into STOP as res_s <= stop_margin";
-    return true;
-  } else {
-    double v = lon_init_state[1];
-    double required_stop_deceleration = (v * v) / (2.0 * res_s);
-
-    if (required_stop_deceleration > stop_acc_thred) {
-      AINFO << "Setting PlanningTarget into STOP as required_stop_deceleration >
-stop_acc_thred";
-      return true;
-    } else {
-      AINFO << "required_stop_deceleration requirement not satisfied";
-    }
-  }
-  return false;
-}
-
-void BehaviorDecider::GetNearbyObstacles(
-    const common::TrajectoryPoint& init_planning_point, const Frame* frame,
-    const std::vector<common::PathPoint>& discretized_reference_line,
-    std::array<double, 3>* forward_state,
-    std::array<double, 3>* backward_state) {
-  // TODO(kechxu) implement
-}
-
-**/
 
 }  // namespace planning
 }  // namespace apollo

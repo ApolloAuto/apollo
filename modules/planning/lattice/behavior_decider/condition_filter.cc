@@ -33,10 +33,10 @@ using PathTimePointPair = std::pair<PathTimePoint, PathTimePoint>;
 ConditionFilter::ConditionFilter(
     const Frame* frame, const std::array<double, 3>& init_s,
     const double speed_limit, const ReferenceLine& reference_line,
-    const std::vector<common::PathPoint>& discretized_ref_points)
+    const std::vector<common::PathPoint>& discretized_ref_points,
+    std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood)
     : feasible_region_(init_s, speed_limit),
-      path_time_neighborhood_(frame, init_s[0], reference_line,
-                              discretized_ref_points) {
+      path_time_neighborhood_(path_time_neighborhood) {
   Init();
 }
 
@@ -147,7 +147,7 @@ PathTimePointPair ConditionFilter::QueryPathTimeObstacleIntervals(
                                  path_time_obstacle.bottom_right().t(), t);
 
   const std::string& obstacle_id = path_time_obstacle.obstacle_id();
-  double v = path_time_neighborhood_.SpeedAtT(obstacle_id, s_lower, t);
+  double v = path_time_neighborhood_->SpeedAtT(obstacle_id, s_lower, t);
 
   block_interval.first.set_t(t);
   block_interval.first.set_s(s_lower);
@@ -185,7 +185,7 @@ std::vector<PathTimePointPair> ConditionFilter::QueryPathTimeObstacleIntervals(
 }
 
 void ConditionFilter::Init() {
-  path_time_obstacles_ = path_time_neighborhood_.GetPathTimeObstacles();
+  path_time_obstacles_ = path_time_neighborhood_->GetPathTimeObstacles();
 }
 
 std::set<double> ConditionFilter::CriticalTimeStamps() const {
@@ -227,7 +227,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
   double s_step = 100.0 / (double) num_rows;
   double t_step = 8.0 / (double) num_cols;
   std::vector<PathTimeObstacle> path_time_obstacles =
-    path_time_neighborhood_.GetPathTimeObstacles();
+    path_time_neighborhood_->GetPathTimeObstacles();
   if (0 == path_time_obstacles.size()) {
     AINFO << "No_Path_Time_Neighborhood_Obstacle_in_this_frame";
     return false;
@@ -273,7 +273,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
 
 bool ConditionFilter::WithinObstacleSt(double s, double t) {
   std::vector<PathTimeObstacle> path_time_obstacles =
-    path_time_neighborhood_.GetPathTimeObstacles();
+    path_time_neighborhood_->GetPathTimeObstacles();
 
   for (const PathTimeObstacle& path_time_obstacle : path_time_obstacles) {
      if (t < path_time_obstacle.upper_left().t() ||
