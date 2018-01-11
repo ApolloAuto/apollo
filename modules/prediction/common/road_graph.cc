@@ -83,12 +83,12 @@ void RoadGraph::ComputeLaneSequence(
     AERROR << "Invalid lane.";
     return;
   }
-  PredictionMap* map = PredictionMap::instance();
 
   LaneSegment lane_segment;
   lane_segment.set_lane_id(lane_info_ptr->id().id());
   lane_segment.set_start_s(start_s);
-  lane_segment.set_lane_turn_type(map->LaneTurnType(lane_info_ptr->id().id()));
+  lane_segment.set_lane_turn_type(
+      PredictionMap::LaneTurnType(lane_info_ptr->id().id()));
   if (accumulated_s + lane_info_ptr->total_length() - start_s >= length_) {
     lane_segment.set_end_s(length_ - accumulated_s + start_s);
   } else {
@@ -107,7 +107,7 @@ void RoadGraph::ComputeLaneSequence(
     const double successor_accumulated_s =
         accumulated_s + lane_info_ptr->total_length() - start_s;
     for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
-      auto successor_lane = map->LaneById(successor_lane_id.id());
+      auto successor_lane = PredictionMap::LaneById(successor_lane_id.id());
       ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lane,
                           lane_segments, lane_graph_ptr);
     }
