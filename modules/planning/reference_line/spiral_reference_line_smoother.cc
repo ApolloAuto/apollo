@@ -282,8 +282,10 @@ std::vector<common::PathPoint> SpiralReferenceLineSmoother::Interpolate(
 
   std::vector<common::PathPoint> path_points;
 
-  QuinticSpiralPath spiral_curve(theta0, kappa0, dkappa0, theta1, kappa1,
-                                 dkappa1, delta_s);
+  const auto angle_diff = common::math::AngleDiff(theta0, theta1);
+
+  QuinticSpiralPath spiral_curve(theta0, kappa0, dkappa0, theta0 + angle_diff,
+                                 kappa1, dkappa1, delta_s);
   std::size_t num_of_points = std::ceil(delta_s / resolution) + 1;
   for (std::size_t i = 1; i <= num_of_points; ++i) {
     const double inter_s = delta_s / num_of_points * i;
