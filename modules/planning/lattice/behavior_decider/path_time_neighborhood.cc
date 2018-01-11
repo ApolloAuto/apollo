@@ -67,13 +67,15 @@ PathTimeNeighborhood::PathTimeNeighborhood(
     const Frame* frame, const double ego_s,
     const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_ref_points) {
-  ego_s_ = ego_s;
+
+  path_range_.first = ego_s;
+  path_range_.second = ego_s + decision_horizon;
+
+  time_range_.first = 0.0;
+  time_range_.second = planned_trajectory_time;
+
   discretized_ref_points_ = discretized_ref_points;
   SetupObstacles(frame, reference_line, discretized_ref_points);
-
-  for (const auto& path_time_obstacle_element : path_time_obstacle_map_) {
-    path_time_obstacles_.push_back(path_time_obstacle_element.second);
-  }
 }
 
 void PathTimeNeighborhood::SetupObstacles(
@@ -95,7 +97,7 @@ void PathTimeNeighborhood::SetupObstacles(
     }
 
     double relative_time = 0.0;
-    while (relative_time < planned_trajectory_time) {
+    while (relative_time + time_range_.first < time_range_.second) {
       TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       Box2d box = obstacle->GetBoundingBox(point);
 
@@ -103,8 +105,8 @@ void PathTimeNeighborhood::SetupObstacles(
       reference_line.GetSLBoundary(box, &sl_boundary);
 
       // the obstacle is not shown on the region to be considered.
-      if (sl_boundary.end_s() < 0.0 ||
-          sl_boundary.start_s() > ego_s_ +  decision_horizon ||
+      if (sl_boundary.end_s() < path_range_.first ||
+          sl_boundary.start_s() > path_range_.second  ||
           (std::abs(sl_boundary.start_l()) > lateral_enter_lane_thred &&
            std::abs(sl_boundary.end_l()) > lateral_enter_lane_thred)) {
         if (path_time_obstacle_map_.find(obstacle->Id()) !=
@@ -161,6 +163,11 @@ void PathTimeNeighborhood::SetupObstacles(
     path_time_obstacle.second.set_time_lower(t_lower);
 
     path_time_obstacle.second.set_time_upper(t_upper);
+  }
+
+  // store the path_time_obstacles for later access.
+  for (const auto& path_time_obstacle_element : path_time_obstacle_map_) {
+    path_time_obstacles_.push_back(path_time_obstacle_element.second);
   }
 }
 
@@ -256,6 +263,23 @@ bool PathTimeNeighborhood::GetPathTimeObstacle(
   *path_time_obstacle = path_time_obstacle_map_[obstacle_id];
   return true;
 }
+
+std::vector<std::pair<double, double>>
+PathTimeNeighborhood::GetPathBlockingIntervals(const double t) const {
+  // TODO: implement this!
+  CHECK(false);
+  std::vector<std::pair<double, double>> intervals;
+  return intervals;
+}
+
+std::pair<double, double> PathTimeNeighborhood::get_path_range() const {
+  return path_range_;
+}
+
+std::pair<double, double> PathTimeNeighborhood::get_time_range() const {
+  return time_range_;
+}
+
 
 }  // namespace planning
 }  // namespace apollo
