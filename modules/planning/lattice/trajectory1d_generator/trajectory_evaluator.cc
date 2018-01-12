@@ -125,7 +125,7 @@ double TrajectoryEvaluator::evaluate(
 
   double weight_lon_travel = 1000.0;
   double weight_lon_jerk = 1.0;
-  double weight_lon_obstacle = 1.0;
+  double weight_lon_obstacle = 100.0;
   double weight_lat_offset = 1.0;
 
   double t = 0.0;
@@ -223,7 +223,28 @@ double TrajectoryEvaluator::compute_lon_objective_cost(
 // while constructing trajectory evaluator
 double TrajectoryEvaluator::compute_lon_obstacle_cost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory) const {
-  return 0.0;
+
+  double start_time = 0.0;
+  double end_time = planned_trajectory_time;
+  const auto& pt_intervals = pathtime_neighborhood_->GetPathBlockingIntervals(
+      start_time, end_time, trajectory_time_resolution);
+
+  double obstacle_cost = 0.0;
+  for (std::size_t i = 0; i < pt_intervals.size(); ++i) {
+    const auto& pt_interval = pt_intervals[i];
+    if (pt_interval.empty()) {
+      continue;
+    }
+
+    double t = start_time + i * trajectory_time_resolution;
+    double traj_s = lon_trajectory->Evaluate(0, t);
+
+    for (const auto& m : pt_interval) {
+      double mid_s = (m.first + m.second) * 0.5;
+      obstacle_cost += 1.0 / std::exp(std::abs(traj_s - mid_s));
+    }
+  }
+  return obstacle_cost;
 }
 
 }  // namespace planning
