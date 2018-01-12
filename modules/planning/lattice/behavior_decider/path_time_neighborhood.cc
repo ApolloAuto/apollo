@@ -266,9 +266,37 @@ bool PathTimeNeighborhood::GetPathTimeObstacle(
 
 std::vector<std::pair<double, double>>
 PathTimeNeighborhood::GetPathBlockingIntervals(const double t) const {
-  // TODO: implement this!
   CHECK(time_range_.first <= t && t <= time_range_.second);
   std::vector<std::pair<double, double>> intervals;
+  for (const auto& pt_obstacle : path_time_obstacles_) {
+    if (t > pt_obstacle.time_upper() || t < pt_obstacle.time_lower()) {
+      continue;
+    }
+    double s_upper = common::math::lerp(
+        pt_obstacle.upper_left().s(),
+        pt_obstacle.upper_left().t(),
+        pt_obstacle.upper_right().s(),
+        pt_obstacle.upper_right().t(), t);
+
+    double s_lower = common::math::lerp(
+        pt_obstacle.bottom_left().s(),
+        pt_obstacle.bottom_left().t(),
+        pt_obstacle.bottom_right().s(),
+        pt_obstacle.bottom_right().t(), t);
+
+    intervals.emplace_back(s_lower, s_upper);
+  }
+  return intervals;
+}
+
+std::vector<std::vector<std::pair<double, double>>>
+PathTimeNeighborhood::GetPathBlockingIntervals(const double t_start, const double t_end,
+    const double t_resolution) {
+
+  std::vector<std::vector<std::pair<double, double>>> intervals;
+  for (double t = t_start; t <= t_end; t += t_resolution) {
+    intervals.push_back(GetPathBlockingIntervals(t));
+  }
   return intervals;
 }
 
