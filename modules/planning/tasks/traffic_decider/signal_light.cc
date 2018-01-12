@@ -123,7 +123,7 @@ void SignalLight::MakeDecisions(Frame* frame,
           reference_line_info->IsRightTurnPath()) {
         SetCreepForwardSignalDecision(reference_line_info, &signal_light);
       }
-      if (CreateStopObstacle(frame, reference_line_info, &signal_light)) {
+      if (BuildStopDecision(frame, reference_line_info, &signal_light)) {
         has_stop = true;
         signal_debug->set_is_stop_wall_created(true);
       }
@@ -203,55 +203,62 @@ double SignalLight::GetStopDeceleration(
   return (adc_speed * adc_speed) / (2 * stop_distance);
 }
 
-bool SignalLight::CreateStopObstacle(
-    Frame* frame, ReferenceLineInfo* const reference_line_info,
+bool SignalLight::BuildStopDecision(
+    Frame* frame,
+    ReferenceLineInfo* const reference_line_info,
     const hdmap::PathOverlap* signal_light) {
+  // check
   const auto& reference_line = reference_line_info->reference_line();
-  const double stop_s =
-      signal_light->start_s - FLAGS_stop_distance_traffic_light;
-  const double box_center_s =
-      signal_light->start_s + FLAGS_virtual_stop_wall_length / 2.0;
-  if (!WithinBound(0.0, reference_line.Length(), stop_s) ||
-      !WithinBound(0.0, reference_line.Length(), box_center_s)) {
-    ADEBUG << "signal " << signal_light->object_id
+  if (!WithinBound(0.0, reference_line.Length(), signal_light->start_s)) {
+    ADEBUG << "signal_light " << signal_light->object_id
            << " is not on reference line";
+    return true;
+  }
+
+  // create virtual stop wall
+  std::string virtual_object_id =
+      FLAGS_signal_light_virtual_object_id_prefix + signal_light->object_id;
+  auto* obstacle = frame->AddVirtualStopObstacle(
+      reference_line_info,
+      virtual_object_id,
+      signal_light->start_s);
+  if (!obstacle) {
+    AERROR << "Failed to create obstacle " << virtual_object_id << " in frame";
     return false;
   }
-  double heading = reference_line.GetReferencePoint(stop_s).heading();
-  double left_lane_width = 0.0;
-  double right_lane_width = 0.0;
-  reference_line.GetLaneWidth(signal_light->start_s, &left_lane_width,
-                              &right_lane_width);
+  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  if (!stop_wall) {
+    AERROR << "Failed to create path_obstacle for " << virtual_object_id;
+    return false;
+  }
 
-  auto box_center = reference_line.GetReferencePoint(box_center_s);
-  common::math::Box2d stop_box{box_center, heading,
-                               FLAGS_virtual_stop_wall_length,
-                               left_lane_width + right_lane_width};
-
-  PathObstacle* stop_wall =
-      reference_line_info->AddObstacle(frame->AddStaticVirtualObstacle(
-          FLAGS_signal_light_virtual_object_id_prefix + signal_light->object_id,
-          stop_box));
-  auto* path_decision = reference_line_info->path_decision();
+  // build stop decision
+  const double stop_s =
+      signal_light->start_s - FLAGS_stop_distance_traffic_light;
   auto stop_point = reference_line.GetReferencePoint(stop_s);
+  double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
+
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
   stop_decision->set_reason_code(StopReasonCode::STOP_REASON_SIGNAL);
   stop_decision->set_distance_s(-FLAGS_stop_distance_traffic_light);
-  stop_decision->set_stop_heading(heading);
+  stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
   stop_decision->mutable_stop_point()->set_y(stop_point.y());
   stop_decision->mutable_stop_point()->set_z(0.0);
 
+  auto* path_decision = reference_line_info->path_decision();
   if (!path_decision->MergeWithMainStop(stop.stop(), stop_wall->Id(),
                                         reference_line_info->reference_line(),
                                         reference_line_info->AdcSlBoundary())) {
     ADEBUG << "signal " << signal_light->object_id
-           << " is not the cloest stop.";
+           << " is not the closest stop.";
     return false;
   }
+
   path_decision->AddLongitudinalDecision(
       RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+
   return true;
 }
 
