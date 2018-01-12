@@ -48,9 +48,9 @@ class SignalLight : public TrafficRule {
                      ReferenceLineInfo* const reference_line_info);
   double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
                              const hdmap::PathOverlap* signal_light);
-  bool CreateStopObstacle(Frame* frame,
-                          ReferenceLineInfo* const reference_line_info,
-                          const hdmap::PathOverlap* signal_light);
+  bool BuildStopDecision(Frame* frame,
+                         ReferenceLineInfo* const reference_line_info,
+                         const hdmap::PathOverlap* signal_light);
   void SetCreepForwardSignalDecision(
       const ReferenceLineInfo* reference_line_info,
       hdmap::PathOverlap* const signal_light) const;
