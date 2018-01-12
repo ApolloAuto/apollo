@@ -197,7 +197,7 @@ accelerationGraph:
                 labelString: 't (second)'
             y:
                 min: -4.0
-                max: 3.0
+                max: 3.5
                 labelString: 'acceleration (m/s^2)'
     properties:
         lines:
