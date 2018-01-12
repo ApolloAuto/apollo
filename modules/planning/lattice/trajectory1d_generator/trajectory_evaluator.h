@@ -68,6 +68,11 @@ class TrajectoryEvaluator {
 
   std::vector<double> top_trajectory_pair_component_cost() const;
 
+  std::vector<double> evaluate_per_lonlat_trajectory(
+    const PlanningTarget& planning_target,
+    const std::vector<apollo::common::SpeedPoint> st_points,
+    const std::vector<apollo::common::FrenetFramePoint> sl_points);
+
  private:
   double evaluate(const PlanningTarget& planning_target,
                   const std::shared_ptr<Curve1d>& lon_trajectory,

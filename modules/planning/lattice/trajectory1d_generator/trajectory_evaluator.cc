@@ -247,5 +247,14 @@ double TrajectoryEvaluator::compute_lon_obstacle_cost(
   return obstacle_cost;
 }
 
+std::vector<double> TrajectoryEvaluator::evaluate_per_lonlat_trajectory(
+    const PlanningTarget& planning_target,
+    const std::vector<apollo::common::SpeedPoint> st_points,
+    const std::vector<apollo::common::FrenetFramePoint> sl_points) {
+  std::vector<double> ret;
+  return ret;
+}
+
+
 }  // namespace planning
 }  // namespace apollo

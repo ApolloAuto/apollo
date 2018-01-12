@@ -22,6 +22,7 @@
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/common/time/time.h"
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 #include "modules/planning/lattice/util/lattice_params.h"
@@ -37,6 +38,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::adapter::AdapterManager;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
@@ -187,7 +189,6 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
       continue;
     }
 
-
     // check collision with other obstacles
     if (collision_checker.InCollision(combined_trajectory)) {
       ++collision_failure_count;
@@ -204,14 +205,31 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
     reference_line_info->SetDrivable(true);
 
     // Auto Tuning
-    // 1. Get future trajectory from localization
 
-    // 2. Map future trajectory to lon-lat trajectory pair
+    bool tuning_success = true;
+    if (AdapterManager::GetLocalization() == nullptr) {
+      AINFO << "Auto tuning failed since no localization avaiable";
+      tuning_success = false;
+    } else if (FLAGS_enable_auto_tuning) {
+      // 1. Get future trajectory from localization
+      DiscretizedTrajectory future_trajectory = GetFutureTrajectory();
+      // 2. Map future trajectory to lon-lat trajectory pair
+      std::vector<apollo::common::SpeedPoint> lon_future_trajectory;
+      std::vector<apollo::common::FrenetFramePoint> lat_future_trajectory;
+      if (not MapFutureTrajectoryToSL(future_trajectory,
+        &lon_future_trajectory, &lat_future_trajectory,
+        reference_line_info)) {
+        AINFO << "Auto tuning failed since no mapping from future trajectory to lon-lat";
+        tuning_success = false;
+      }
+      // 3. evalutate cost
+      std::vector<double> future_trajectory_component_cost =
+        trajectory_evaluator.evaluate_per_lonlat_trajectory(
+          planning_target,lon_future_trajectory, lat_future_trajectory);
 
-    // 3. evaluate cost
-
-    // 4. emit
-    ///////////////////////
+      // 4. emit
+      ///////////////////////
+    }
 
     // Print the chosen end condition and start condition
     AINFO << "   --- Starting Pose: s=" << init_s[0] << " ds=" << init_s[1]
@@ -353,6 +371,27 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
   }
   return combined_trajectory;
 }
+
+DiscretizedTrajectory LatticePlanner::GetFutureTrajectory() const {
+  // localization
+  const auto& localization =
+      AdapterManager::GetLocalization()->GetLatestObserved();
+  ADEBUG << "Get localization:" << localization.DebugString();
+  std::vector<common::TrajectoryPoint> traj_pts;
+  for (const auto& traj_pt : localization.trajectory_point()) {
+    traj_pts.emplace_back(traj_pt);
+  }
+  DiscretizedTrajectory ret(traj_pts);
+  return ret;
+}
+
+bool LatticePlanner::MapFutureTrajectoryToSL(const DiscretizedTrajectory& future_trajectory,
+  std::vector<apollo::common::SpeedPoint>* st_points,
+  std::vector<apollo::common::FrenetFramePoint>* sl_points,
+  ReferenceLineInfo* reference_line_info) {
+  return false;
+}
+
 
 }  // namespace planning
 }  // namespace apollo
