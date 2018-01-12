@@ -208,7 +208,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
 
     // 2. Map future trajectory to lon-lat trajectory pair
 
-    // 3. evalutate cost
+    // 3. evaluate cost
 
     // 4. emit
     ///////////////////////
