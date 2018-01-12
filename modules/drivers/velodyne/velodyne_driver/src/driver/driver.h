@@ -29,6 +29,8 @@ namespace velodyne {
 
 // configuration parameters
 struct Config {
+  Config()
+      : npackets(0), rpm(0.0), firing_data_port(0), positioning_data_port(0) {}
   std::string frame_id;  ///< tf frame ID
   std::string model;     ///< device model name
   std::string topic;
@@ -41,7 +43,7 @@ struct Config {
 class VelodyneDriver {
  public:
   VelodyneDriver();
-  ~VelodyneDriver() {}
+  virtual ~VelodyneDriver() {}
 
   virtual bool poll(void) = 0;
   virtual void init(ros::NodeHandle &node) = 0;
@@ -63,8 +65,8 @@ class VelodyneDriver {
 
 class Velodyne64Driver : public VelodyneDriver {
  public:
-  Velodyne64Driver(Config config);
-  ~Velodyne64Driver() {}
+  explicit Velodyne64Driver(const Config &config);
+  virtual ~Velodyne64Driver() {}
 
   void init(ros::NodeHandle &node);
   bool poll(void);
@@ -74,8 +76,8 @@ class Velodyne64Driver : public VelodyneDriver {
 
 class Velodyne16Driver : public VelodyneDriver {
  public:
-  Velodyne16Driver(Config config);
-  ~Velodyne16Driver() {}
+  explicit Velodyne16Driver(const Config &config);
+  virtual ~Velodyne16Driver() {}
 
   void init(ros::NodeHandle &node);
   bool poll(void);
@@ -84,6 +86,7 @@ class Velodyne16Driver : public VelodyneDriver {
  private:
   boost::shared_ptr<Input> positioning_input_;
 };
+
 class VelodyneDriverFactory {
  public:
   static VelodyneDriver *create_driver(ros::NodeHandle private_nh);

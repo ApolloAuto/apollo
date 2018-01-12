@@ -87,7 +87,7 @@ Status Prediction::Init() {
   // Set planning callback function
   AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
 
-  if (!PredictionMap::instance()->Ready()) {
+  if (!PredictionMap::Ready()) {
     return OnError("Map cannot be loaded.");
   }
 

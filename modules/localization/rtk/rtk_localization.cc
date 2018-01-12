@@ -251,8 +251,8 @@ void RTKLocalization::PrepareLocalizationMsg(
   }
 
   if (imu_valid &&
-      fabs(gps_msg.header().timestamp_sec() - imu_msg.header().timestamp_sec() >
-           FLAGS_gps_imu_timestamp_sec_diff_tolerance)) {
+      fabs(gps_msg.header().timestamp_sec() - imu_msg.header().timestamp_sec())
+          > FLAGS_gps_imu_timestamp_sec_diff_tolerance) {
     // not the same time stamp, 20ms threshold
     AERROR << "[PrepareLocalizationMsg]: time stamp of GPS["
            << gps_msg.header().timestamp_sec()

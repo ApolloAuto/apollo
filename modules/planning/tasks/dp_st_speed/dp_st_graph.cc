@@ -28,8 +28,8 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/util/ctpl_stl.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_thread_pool.h"
 
 namespace apollo {
 namespace planning {
@@ -160,15 +160,17 @@ Status DpStGraph::CalculateTotalCost() {
     uint32_t highest_row = 0;
     uint32_t lowest_row = cost_table_.back().size() - 1;
 
-    common::util::ThreadPool pool(FLAGS_num_thread_dp_st_graph);
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
       if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-        pool.push(std::bind(&DpStGraph::CalculateCostAt, this, c, r));
+        PlanningThreadPool::instance()->mutable_thread_pool()->Push(
+            std::bind(&DpStGraph::CalculateCostAt, this, c, r));
       } else {
         CalculateCostAt(c, r);
       }
     }
-    pool.stop(true);
+    if (FLAGS_enable_multi_thread_in_dp_st_graph) {
+      PlanningThreadPool::instance()->mutable_thread_pool()->JoinAll();
+    }
 
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
       const auto& cost_cr = cost_table_[c][r];
@@ -261,7 +263,7 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
   if (c == 2) {
     for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
       const double acc =
-          (static_cast<int>(r - 2 * r_pre)) * unit_s_ / (unit_t_ * unit_t_);
+          (r * unit_s_ - 2 * r_pre * unit_s_) / (unit_t_ * unit_t_);
       if (acc < dp_st_speed_config_.max_deceleration() ||
           acc > dp_st_speed_config_.max_acceleration()) {
         continue;
@@ -289,10 +291,10 @@ void DpStGraph::CalculateCostAt(const uint32_t c, const uint32_t r) {
       continue;
     }
 
-    const double curr_a =
-        (cost_cr.index_s() + pre_col[r_pre].pre_point()->index_s() -
-         2 * pre_col[r_pre].index_s()) *
-        unit_s_ / (unit_t_ * unit_t_);
+    const double curr_a = (cost_cr.index_s() * unit_s_ +
+                           pre_col[r_pre].pre_point()->index_s() * unit_s_ -
+                           2 * pre_col[r_pre].index_s() * unit_s_) /
+                          (unit_t_ * unit_t_);
     if (curr_a > vehicle_param_.max_acceleration() ||
         curr_a < vehicle_param_.max_deceleration()) {
       continue;

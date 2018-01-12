@@ -149,7 +149,7 @@ void VelodyneParser::compute_coords(const union RawDistance &raw_distance,
       sin_rot_table_[rotation] * corrections.cos_rot_correction -
       cos_rot_table_[rotation] * corrections.sin_rot_correction;
 
-  double vert_offset = corrections.vert_offset_correction;
+  // double vert_offset = corrections.vert_offset_correction;
 
   // Compute the distance in the xy plane (w/o accounting for rotation)
   double xy_distance = distance * corrections.cos_vert_correction;

@@ -205,8 +205,6 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
-  //  app->Options()->SetStringValue("jacobian_approximation",
-  //  "finite-difference-values");
   app->Options()->SetStringValue("hessian_approximation", "limited-memory");
   //  app->Options()->SetStringValue("derivative_test", "first-order");
   //  app->Options()->SetNumericValue("derivative_test_perturbation", 1.0e-7);
@@ -214,13 +212,9 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
   app->Options()->SetIntegerValue("print_level", 0);
   int num_iterations = FLAGS_spiral_smoother_num_iteration;
   app->Options()->SetIntegerValue("max_iter", num_iterations);
-
-  //  app->Options()->SetNumericValue("acceptable_tol", 0.5);
-  //  app->Options()->SetNumericValue("acceptable_obj_change_tol", 0.5);
-  //  app->Options()->SetNumericValue("constr_viol_tol", 0.01);
-  //  app->Options()->SetIntegerValue("acceptable_iter", 10);
-  //  app->Options()->SetIntegerValue("print_level", 0);
-  //  app->Options()->SetStringValue("fast_step_computation", "yes");
+  app->Options()->SetIntegerValue("acceptable_iter", 5);
+  app->Options()->SetNumericValue("tol", 1.0e-4);
+  app->Options()->SetNumericValue("acceptable_tol", 1.0e-5);
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
@@ -285,8 +279,10 @@ std::vector<common::PathPoint> SpiralReferenceLineSmoother::Interpolate(
     const double delta_s, const double resolution) const {
   std::vector<common::PathPoint> path_points;
 
-  QuinticSpiralPath spiral_curve(theta0, kappa0, dkappa0, theta1, kappa1,
-                                 dkappa1, delta_s);
+  const auto angle_diff = common::math::AngleDiff(theta0, theta1);
+
+  QuinticSpiralPath spiral_curve(theta0, kappa0, dkappa0, theta0 + angle_diff,
+                                 kappa1, dkappa1, delta_s);
   std::size_t num_of_points = std::ceil(delta_s / resolution) + 1;
   for (std::size_t i = 1; i <= num_of_points; ++i) {
     const double inter_s = delta_s / num_of_points * i;
