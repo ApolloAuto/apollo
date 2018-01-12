@@ -115,7 +115,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
   //   and sort them according to the cost.
   TrajectoryEvaluator trajectory_evaluator(
       planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle,
-      false, path_time_neighborhood_ptr);
+      true, path_time_neighborhood_ptr);
 
   AINFO << "Trajectory_Evaluator_Construction_Time="
         << (Clock::NowInSeconds() - current_time) * 1000;
@@ -164,8 +164,8 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
     double trajectory_pair_cost = 0.0;
     trajectory_pair_cost = trajectory_evaluator.top_trajectory_pair_cost();
     // For auto tuning
-    //std::vector<double> trajectory_pair_cost_components =
-    //  trajectory_evaluator.top_trajectory_pair_component_cost();
+    std::vector<double> trajectory_pair_cost_components =
+      trajectory_evaluator.top_trajectory_pair_component_cost();
 
     auto trajectory_pair = trajectory_evaluator.next_top_trajectory_pair();
 
@@ -226,18 +226,23 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
           << " ds=" << lattice_traj_ptr->target_velocity()
           << " t=" << lattice_traj_ptr->target_time();
 
-    AINFO << "Begin : DEBUGING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
     AINFO << "   --- InputPose";
     AINFO << "          XY: " << planning_init_point.ShortDebugString();
     AINFO << "           S: (" << init_s[0] << " " << init_s[1] << ","
           << init_s[2] << ")";
     AINFO << "           L: (" << init_d[0] << " " << init_d[1] << ","
           << init_d[2] << ")";
-    AINFO << "   --- OutputTrajectory";
+    AINFO << "   --- TrajectoryPairComponentCost";
+    AINFO << "       travel_cost = " << trajectory_pair_cost_components[0];
+    AINFO << "       jerk_cost = " << trajectory_pair_cost_components[1];
+    AINFO << "       obstacle_cost = " << trajectory_pair_cost_components[2];
+    AINFO << "       lateral_cost = " << trajectory_pair_cost_components[3];
+    AINFO << "       reference_line_priority_cost = " << reference_line_info->PriorityCost();
+    AINFO << "   --- Total_Trajectory_Cost = " << trajectory_pair_cost;
+    ADEBUG << "   --- OutputTrajectory";
     for (uint i = 0; i < 10; ++i) {
-      AINFO << combined_trajectory_points[i].ShortDebugString();
+      ADEBUG << combined_trajectory_points[i].ShortDebugString();
     }
-    AINFO << "End : DEBUGING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
 
     break;
     /*

@@ -123,10 +123,10 @@ double TrajectoryEvaluator::evaluate(
   // 2. the cost of time to achieve the objective
   // 3. the cost of failure to achieve the planning objective.
 
-  double weight_lon_travel = 10.0;
+  double weight_lon_travel = 1000.0;
   double weight_lon_jerk = 1.0;
-  double weight_lat_offset = 1.0;
   double weight_lon_obstacle = 1.0;
+  double weight_lat_offset = 1.0;
 
   double t = 0.0;
   double t_max = lon_trajectory->ParamLength();
