@@ -41,8 +41,6 @@ class BehaviorDecider {
  public:
   BehaviorDecider();
 
-  BehaviorDecider(std::shared_ptr<PathTimeNeighborhood> p);
-
   void UpdatePathTimeNeighborhood(std::shared_ptr<PathTimeNeighborhood> p);
 
   virtual ~BehaviorDecider() = default;

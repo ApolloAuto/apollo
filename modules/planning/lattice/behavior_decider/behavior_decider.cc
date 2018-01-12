@@ -41,11 +41,6 @@ using apollo::common::PathPoint;
 
 BehaviorDecider::BehaviorDecider() {}
 
-BehaviorDecider::BehaviorDecider(
-  std::shared_ptr<PathTimeNeighborhood> p) {
-  path_time_neighborhood_ = p;
-}
-
 void BehaviorDecider::UpdatePathTimeNeighborhood(
   std::shared_ptr<PathTimeNeighborhood> p) {
   path_time_neighborhood_ = p;

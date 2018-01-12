@@ -111,7 +111,7 @@ class TrajectoryEvaluator {
 
   bool is_auto_tuning_ = false;
 
-  std::shared_ptr<PathTimeNeighborhood> pathtime_neighorhood_;
+  std::shared_ptr<PathTimeNeighborhood> pathtime_neighborhood_;
 };
 
 }  // namespace planning

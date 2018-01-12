@@ -50,6 +50,10 @@ class PathTimeNeighborhood {
   std::vector<std::pair<double, double>>
   GetPathBlockingIntervals(const double t) const;
 
+  std::vector<std::vector<std::pair<double, double>>>
+  GetPathBlockingIntervals(const double t_start, const double t_end,
+      const double t_resolution);
+
   std::pair<double, double> get_path_range() const;
 
   std::pair<double, double> get_time_range() const;
