@@ -70,6 +70,19 @@ PathPoint ReferenceLineMatcher::MatchToReferenceLine(
                              reference_line[index_end], x, y);
 }
 
+std::pair<double, double> ReferenceLineMatcher::GetReferenceLineCoordinate(
+    const std::vector<common::PathPoint>& reference_line, const double x,
+    const double y) {
+  auto matched_path_point = MatchToReferenceLine(reference_line, x, y);
+
+  std::pair<double, double> relative_coordinate;
+  relative_coordinate.first = matched_path_point.s();
+  relative_coordinate.second =
+      std::hypot(matched_path_point.x() - x, matched_path_point.y() - y);
+  return relative_coordinate;
+}
+
+
 PathPoint ReferenceLineMatcher::MatchToReferenceLine(
     const std::vector<PathPoint>& reference_line, const double s) {
   auto comp =
@@ -92,31 +105,6 @@ PathPoint ReferenceLineMatcher::FindProjectionPoint(const PathPoint& p0,
                                                     const PathPoint& p1,
                                                     const double x,
                                                     const double y) {
-  /**
-  double heading_geodesic =
-      common::math::NormalizeAngle(p1.theta() - p0.theta());
-  HermiteSpline<double, 5> spline_geodesic(
-      {0.0, p0.kappa(), p0.dkappa()},
-      {heading_geodesic, p1.kappa(), p1.dkappa()}, p0.s(), p1.s());
-
-  auto func_dist_square = [&spline_geodesic, &p0, &x, &y](const double s) {
-    auto func_cos_theta = [&spline_geodesic, &p0](const double s) {
-      return std::cos(spline_geodesic.Evaluate(0, s) + p0.theta());
-    };
-    auto func_sin_theta = [&spline_geodesic, &p0](const double s) {
-      return std::sin(spline_geodesic.Evaluate(0, s) + p0.theta());
-    };
-    double px = p0.x() + IntegrateByGaussLegendre<5>(func_cos_theta, p0.s(), s);
-    double py = p0.y() + IntegrateByGaussLegendre<5>(func_sin_theta, p0.s(), s);
-
-    double dx = px - x;
-    double dy = py - y;
-    return dx * dx + dy * dy;
-  };
-
-  double s = GoldenSectionSearch(func_dist_square, p0.s(), p1.s());
-  return InterpolateUsingLinearApproximation(p0, p1, s);
-  **/
   double v0x = x - p0.x();
   double v0y = y - p0.y();
 
