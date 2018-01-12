@@ -40,6 +40,7 @@ using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::common::util::Dropbox;
+using apollo::common::util::WithinBound;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::StopSignInfoConstPtr;
@@ -124,7 +125,7 @@ void StopSign::MakeDecisions(
       double stop_deceleration =
           GetStopDeceleration(reference_line_info, next_stop_sign_overlap_);
       if (stop_deceleration < FLAGS_stop_max_deceleration) {
-        CreateStopObstacle(frame, reference_line_info, next_stop_sign_overlap_);
+        BuildStopDecision(frame, reference_line_info, next_stop_sign_overlap_);
       }
     }
   }
@@ -515,40 +516,55 @@ double StopSign::GetStopDeceleration(
   return (adc_speed * adc_speed) / (2 * stop_distance);
 }
 
-void StopSign::CreateStopObstacle(
-    Frame* frame, ReferenceLineInfo* const reference_line_info,
-    const PathOverlap* stop_sign_overlap) {
-  common::SLPoint sl_point;
-  sl_point.set_s(stop_sign_overlap->start_s);
-  sl_point.set_l(0);
-  Vec2d vec2d;
-  if (reference_line_info->reference_line().SLToXY(sl_point, &vec2d)) {
-    AERROR << "Fail to create stop obstacle because SL to XY failed.";
-    return;
+bool StopSign::BuildStopDecision(
+    Frame* frame,
+    ReferenceLineInfo* const reference_line_info,
+    const hdmap::PathOverlap* stop_sign_overlap) {
+  // check
+  const auto& reference_line = reference_line_info->reference_line();
+  if (!WithinBound(0.0, reference_line.Length(), stop_sign_overlap->start_s)) {
+    ADEBUG << "stop_sign " << stop_sign_overlap->object_id
+           << " is not on reference line";
+    return true;
   }
 
-  double heading = reference_line_info->reference_line()
-                       .GetReferencePoint(stop_sign_overlap->start_s)
-                       .heading();
-  double left_width = 0.0;
-  double right_width = 0.0;
-  reference_line_info->reference_line().GetLaneWidth(stop_sign_overlap->start_s,
-                                                     &left_width, &right_width);
-  Box2d stop_wall_box{{vec2d.x(), vec2d.y()},
-                      heading,
-                      FLAGS_virtual_stop_wall_length,
-                      left_width + right_width};
-
+  // create virtual stop wall
   std::string virtual_object_id =
       FLAGS_stop_sign_virtual_object_id_prefix + stop_sign_overlap->object_id;
-  PathObstacle* stop_wall = reference_line_info->AddObstacle(
-      frame->AddStaticVirtualObstacle(virtual_object_id, stop_wall_box));
+  auto* obstacle = frame->AddVirtualStopObstacle(
+      reference_line_info,
+      virtual_object_id,
+      stop_sign_overlap->start_s);
+  if (!obstacle) {
+    AERROR << "Failed to create obstacle " << virtual_object_id << " in frame";
+    return false;
+  }
+  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  if (!stop_wall) {
+    AERROR << "Failed to create path_obstacle for " << virtual_object_id;
+    return false;
+  }
+
+  // build stop decision
+  const double stop_s =
+      stop_sign_overlap->start_s - FLAGS_stop_distance_crosswalk;
+  auto stop_point = reference_line.GetReferencePoint(stop_s);
+  double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
+
+  ObjectDecisionType stop;
+  auto stop_decision = stop.mutable_stop();
+  stop_decision->set_reason_code(StopReasonCode::STOP_REASON_STOP_SIGN);
+  stop_decision->set_distance_s(-FLAGS_stop_distance_stop_sign);
+  stop_decision->set_stop_heading(stop_heading);
+  stop_decision->mutable_stop_point()->set_x(stop_point.x());
+  stop_decision->mutable_stop_point()->set_y(stop_point.y());
+  stop_decision->mutable_stop_point()->set_z(0.0);
 
   auto* path_decision = reference_line_info->path_decision();
-  ObjectDecisionType stop;
-  stop.mutable_stop();
   path_decision->AddLongitudinalDecision(
       RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+
+  return true;
 }
 
 void StopSign::ClearDropbox(const std::string& stop_sign_id) {
