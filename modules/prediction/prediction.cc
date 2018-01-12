@@ -87,7 +87,7 @@ Status Prediction::Init() {
   // Set planning callback function
   AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
 
-  if (!PredictionMap::instance()->Ready()) {
+  if (!PredictionMap::Ready()) {
     return OnError("Map cannot be loaded.");
   }
 
@@ -107,15 +107,7 @@ void Prediction::OnLocalization(const LocalizationEstimate& localization) {
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::instance()->GetContainer(AdapterConfig::LOCALIZATION));
   CHECK_NOTNULL(pose_container);
-
   pose_container->Insert(localization);
-  PerceptionObstacle* pose_ptr = pose_container->ToPerceptionObstacle();
-  if (pose_ptr != nullptr) {
-    obstacles_container->InsertPerceptionObstacle(
-        *(pose_ptr), pose_container->GetTimestamp());
-  } else {
-    ADEBUG << "Invalid pose found.";
-  }
 
   ADEBUG << "Received a localization message ["
          << localization.ShortDebugString() << "].";
@@ -161,9 +153,11 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   CHECK_NOTNULL(pose_container);
   CHECK_NOTNULL(adc_container);
 
-  if (pose_container->ToPerceptionObstacle() != nullptr) {
-    double x = pose_container->ToPerceptionObstacle()->position().x();
-    double y = pose_container->ToPerceptionObstacle()->position().y();
+  PerceptionObstacle* adc = pose_container->ToPerceptionObstacle();
+  if (adc != nullptr) {
+    obstacles_container->InsertPerceptionObstacle(*adc, adc->timestamp());
+    double x = adc->position().x();
+    double y = adc->position().y();
     ADEBUG << "Get ADC position [" << std::fixed << std::setprecision(6) << x
            << ", " << std::fixed << std::setprecision(6) << y << "].";
     Vec2d adc_position(x, y);

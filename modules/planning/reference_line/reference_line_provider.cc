@@ -58,7 +58,6 @@ void ReferenceLineProvider::Init(
     const hdmap::HDMap *base_map,
     const QpSplineReferenceLineSmootherConfig &smoother_config) {
   pnc_map_.reset(new hdmap::PncMap(base_map));
-  segment_history_.clear();
   if (FLAGS_enable_spiral_reference_line) {
     smoother_.reset(
         new SpiralReferenceLineSmoother(FLAGS_spiral_smoother_max_deviation));
@@ -72,68 +71,18 @@ void ReferenceLineProvider::Init(
   is_initialized_ = true;
 }
 
-bool ReferenceLineProvider::IsAllowChangeLane(
-    const common::math::Vec2d &point,
-    const std::list<RouteSegments> &route_segments) {
-  if (FLAGS_reckless_change_lane) {
-    ADEBUG << "reckless change lane is enabled";
-    return true;
-  }
-  auto forward_segment = route_segments.begin();
-  while (forward_segment != route_segments.end() &&
-         !forward_segment->IsOnSegment()) {
-    ++forward_segment;
-  }
-  if (forward_segment == route_segments.end()) {
-    return true;
-  }
-  common::SLPoint sl;
-  LaneWaypoint waypoint;
-  if (!forward_segment->GetProjection(point, &sl, &waypoint)) {
-    AERROR << "Failed to project to forward segment from point: "
-           << point.DebugString();
-    return false;
-  }
-
-  std::lock_guard<std::mutex> lock(segment_history_mutex_);
-  auto history_iter = segment_history_.find(forward_segment->Id());
-  if (history_iter == segment_history_.end()) {
-    auto &inserter = segment_history_[forward_segment->Id()];
-    inserter.min_l = std::fabs(sl.l());
-    inserter.last_point = point;
-    inserter.accumulate_s = 0.0;
-    segment_history_id_.push_back(forward_segment->Id());
-    constexpr int kMaxSegmentHistoryIdNum = 20;
-    if (segment_history_id_.size() > kMaxSegmentHistoryIdNum) {
-      auto front_iter = segment_history_.find(segment_history_id_.front());
-      segment_history_.erase(front_iter);
-      segment_history_id_.pop_front();
-    }
-    return false;
-  } else {
-    history_iter->second.min_l =
-        std::min(history_iter->second.min_l, std::fabs(sl.l()));
-    double dist =
-        common::util::DistanceXY(history_iter->second.last_point, point);
-    history_iter->second.last_point = point;
-    history_iter->second.accumulate_s += dist;
-    constexpr double kChangeLaneMinL = 0.30;
-    constexpr double kChangeLaneMinLengthFactor = 0.3;
-
-    if (history_iter->second.min_l < kChangeLaneMinL &&
-        std::fmax(waypoint.s, history_iter->second.accumulate_s) >=
-            kChangeLaneMinLengthFactor * FLAGS_min_length_for_lane_change) {
-      return true;
-    }
-  }
-  return false;
-}
-
 bool ReferenceLineProvider::UpdateRoutingResponse(
     const routing::RoutingResponse &routing) {
-  std::lock_guard<std::mutex> lock(routing_mutex_);
-  routing_ = routing;
-  has_routing_ = true;
+  std::unique_lock<std::mutex> routing_lock(routing_mutex_, std::defer_lock);
+  std::unique_lock<std::mutex> reference_line_lock(reference_lines_mutex_,
+                                                   std::defer_lock);
+  std::lock(routing_lock, reference_line_lock);
+  if (hdmap::PncMap::IsNewRouting(routing_, routing)) {
+    routing_ = routing;
+    has_routing_ = true;
+    reference_lines_.clear();
+    route_segments_.clear();
+  }
   return true;
 }
 
@@ -332,10 +281,6 @@ bool ReferenceLineProvider::CreateReferenceLine(
         AERROR << "Failed to update routing in pnc map";
         return false;
       }
-
-      std::lock_guard<std::mutex> lock(segment_history_mutex_);
-      segment_history_.clear();
-      segment_history_id_.clear();
     }
   }
 

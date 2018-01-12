@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_TASKS_DP_POLY_PATH_DP_ROAD_GRAPH_H_
 
 #include <limits>
+#include <list>
 #include <string>
 #include <utility>
 #include <vector>
@@ -104,6 +105,18 @@ class DPRoadGraph {
   bool CalculateFrenetPoint(const common::TrajectoryPoint &traj_point,
                             common::FrenetFramePoint *const frenet_frame_point);
   bool IsSafeForLaneChange();
+
+  bool IsValidCurve(const QuinticPolynomialCurve1d &curve) const;
+
+  void GetCurveCost(TrajectoryCost trajectory_cost,
+                    const QuinticPolynomialCurve1d &curve, const double start_s,
+                    const double end_s, const uint32_t curr_level,
+                    const uint32_t total_level, ComparableCost *cost);
+
+  void UpdateNode(const std::list<DPRoadGraphNode> &prev_nodes,
+                  const uint32_t level, const uint32_t total_level,
+                  TrajectoryCost *trajectory_cost, DPRoadGraphNode *front,
+                  DPRoadGraphNode *cur_node);
 
  private:
   DpPolyPathConfig config_;

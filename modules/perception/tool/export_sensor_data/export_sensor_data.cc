@@ -30,6 +30,7 @@
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
 #include "modules/perception/onboard/transform_input.h"
+#include "modules/perception/obstacle/common/pose_util.h"
 
 DEFINE_string(lidar_path,
   "modules/perception/tool/export_sensor_data/lidar/", "lidar path");
@@ -61,6 +62,29 @@ Status ExportSensorData::Init() {
   AdapterManager::AddLocalizationCallback(
     &ExportSensorData::OnLocalization, this);
   localization_buffer_.set_capacity(FLAGS_localization_buffer_size);
+
+  /// load radar-camera extrinsic
+  std::string radar_extrinsic_path = FLAGS_radar_extrinsic_file;
+  Eigen::Affine3d radar_extrinsic;
+  if (!LoadExtrinsic(radar_extrinsic_path, &radar_extrinsic)) {
+    AERROR << "Failed to load extrinsic from file " << radar_extrinsic_path;
+    return Status(ErrorCode::PERCEPTION_ERROR_TF, "Failed to load extrinsic");
+  }
+  AINFO << "get radar extrinsic succ. pose: \n" << radar_extrinsic.matrix();
+  /// load camera-velodyne extrinsic
+  std::string short_camera_extrinsic_path = FLAGS_short_camera_extrinsic_file;
+  Eigen::Affine3d short_camera_extrinsic;
+  if (!LoadExtrinsic(short_camera_extrinsic_path, &short_camera_extrinsic)) {
+    AERROR << "Failed to load extrinsic from file "
+           << short_camera_extrinsic_path;
+    return Status(ErrorCode::PERCEPTION_ERROR_TF, "Failed to load extrinsic");
+  }
+  AINFO << "get short camera  extrinsic succ. pose: \n"
+    << short_camera_extrinsic.matrix();
+  /// get radar-velodyne extrinsic
+  radar2velodyne_extrinsic_ = short_camera_extrinsic.matrix()
+                              * radar_extrinsic.matrix();
+
   return Status::OK();
 }
 
@@ -199,13 +223,16 @@ void ExportSensorData::OnRadar(const ContiRadar &radar_obs) {
   ADEBUG << "recv radar msg: [timestamp: " << GLOG_TIMESTAMP(timestamp)
          << " num_raw_obstacles: " << radar_obs_proto.contiobs_size() << "]";
 
-  std::shared_ptr<Eigen::Matrix4d> radar2world_pose =
+  std::shared_ptr<Eigen::Matrix4d> velo2world_pose =
     std::make_shared<Eigen::Matrix4d>();
-  if (!GetRadarTrans(timestamp, radar2world_pose.get())) {
+  if (!GetVelodyneTrans(timestamp, velo2world_pose.get())) {
     AERROR << "Failed to get radar trans at timestamp: "
            << GLOG_TIMESTAMP(timestamp);
     return;
   }
+  std::shared_ptr<Eigen::Matrix4d> radar2world_pose
+                                   = std::make_shared<Eigen::Matrix4d>();
+  *radar2world_pose = *velo2world_pose * radar2velodyne_extrinsic_;
   AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
 
   Eigen::Vector3f car_linear_speed;

@@ -26,7 +26,9 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-Velodyne16Driver::Velodyne16Driver(Config config) : config_(config) {}
+Velodyne16Driver::Velodyne16Driver(const Config &config) {
+  config_ = config;
+}
 
 void Velodyne16Driver::init(ros::NodeHandle &node) {
   double packet_rate = 754;                 // packet frequency (Hz)

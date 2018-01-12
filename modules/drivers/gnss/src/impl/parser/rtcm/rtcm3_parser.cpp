@@ -41,7 +41,7 @@ constexpr bool is_zero(T value) {
 
 class Rtcm3Parser : public Parser {
  public:
-  Rtcm3Parser(bool is_base_satation);
+  explicit Rtcm3Parser(bool is_base_satation);
   virtual MessageType get_message(MessagePtr &message_ptr);
 
  private:
@@ -168,9 +168,8 @@ void Rtcm3Parser::fill_glonass_orbit(
   // orbit.set_tk(eph.tof.time + eph.tof.sec);
 
   int week = 0;
-  double second = 0.0;
 
-  second = time2gpst(eph.toe, &week);
+  double second = time2gpst(eph.toe, &week);
   orbit.set_week_num(week);
   orbit.set_week_second_s(second);
   orbit.set_toe(second);
@@ -187,10 +186,7 @@ void Rtcm3Parser::fill_glonass_orbit(
 
 void Rtcm3Parser::set_observation_time() {
   int week = 0;
-  double second = 0.0;
-
-  second = time2gpst(_rtcm.time, &week);
-
+  double second = time2gpst(_rtcm.time, &week);
   _observation.set_gnss_time_type(apollo::drivers::gnss::GPS_TIME);
   _observation.set_gnss_week(week);
   _observation.set_gnss_second_s(second);
@@ -201,9 +197,8 @@ Parser::MessageType Rtcm3Parser::get_message(MessagePtr &message_ptr) {
     return MessageType::NONE;
   }
 
-  int status = 0;
   while (_data < _data_end) {
-    status = input_rtcm3(&_rtcm, *_data++);  // parse data use rtklib
+    const int status = input_rtcm3(&_rtcm, *_data++);  // parse data use rtklib
 
     switch (status) {
       case 1:  // observation data

@@ -48,6 +48,7 @@ planning_pb = None
 heading = None
 line_ew = None
 line_we = None
+line_revloop = None
 
 projector = pyproj.Proj(proj='utm', zone=10, ellps='WGS84')
 
@@ -176,10 +177,12 @@ def decode_polyline(polyline_str):
 
 
 def load_drive_data():
-    global line_ew, line_we
+    global line_ew, line_we, line_revloop
     dir_path = os.path.dirname(os.path.realpath(__file__))
     hanada_ew_file = dir_path + "/" + "hanada_ew"
     hanada_we_file = dir_path + "/" + "hanada_we"
+    rev_loop_file = dir_path + "/" + "rev_loop"
+
     ew = []
     try:
         f = open(hanada_ew_file, 'r')
@@ -210,6 +213,21 @@ def load_drive_data():
     except:
         line_ew = None
 
+    revloop = []
+    try:
+        f = open(rev_loop_file, 'r')
+        for line in f:
+            line = line.replace('\n', '')
+            vals = line.split(',')
+            if len(vals) != 2:
+                continue
+            x = float(vals[0])
+            y = float(vals[1])
+            revloop.append((x, y))
+        line_revloop = LineString(revloop)
+    except:
+        line_revloop = None
+
 
 def match_drive_data(p_start, p_end):
     ps = Point(p_start)
@@ -231,6 +249,16 @@ def match_drive_data(p_start, p_end):
         if ds < 4 and de < 50:
             if ss < se:
                 return line_ew
+
+    if line_revloop is not None:
+        ds = line_revloop.distance(ps)
+        de = line_revloop.distance(pe)
+        ss = line_revloop.project(ps)
+        se = line_revloop.project(pe)
+        if ds < 6 and de < 50:
+            if ss < se:
+                return line_revloop
+
     return None
 
 
