@@ -162,14 +162,14 @@ Status DpStGraph::CalculateTotalCost() {
 
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
       if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-        PlanningThreadPool::instance()->mutable_thread_pool()->Push(
+        PlanningThreadPool::instance()->Push(
             std::bind(&DpStGraph::CalculateCostAt, this, c, r));
       } else {
         CalculateCostAt(c, r);
       }
     }
     if (FLAGS_enable_multi_thread_in_dp_st_graph) {
-      PlanningThreadPool::instance()->mutable_thread_pool()->JoinAll();
+      PlanningThreadPool::instance()->Synchronize();
     }
 
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
