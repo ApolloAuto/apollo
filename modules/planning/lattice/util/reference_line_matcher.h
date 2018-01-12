@@ -37,6 +37,10 @@ class ReferenceLineMatcher {
       const std::vector<common::PathPoint>& reference_line, const double x,
       const double y);
 
+  static std::pair<double, double> GetReferenceLineCoordinate(
+      const std::vector<common::PathPoint>& reference_line, const double x,
+      const double y);
+
   static common::PathPoint MatchToReferenceLine(
       const std::vector<common::PathPoint>& reference_line, const double s);
 
