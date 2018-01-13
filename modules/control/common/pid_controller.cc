@@ -100,7 +100,7 @@ bool PIDController::IntegratorHold() const {
   return integrator_hold_;
 }
 
-void SetIntegratorHold(bool hold){
+void PIDController::SetIntegratorHold(bool hold){
   integrator_hold_ = hold;
 }
 
