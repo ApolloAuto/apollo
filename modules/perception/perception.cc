@@ -15,6 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/perception.h"
+
+#include "ros/include/ros/ros.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -26,8 +29,6 @@
 #include "modules/perception/obstacle/onboard/radar_process_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_preprocessor_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_proc_subnode.h"
-#include "ros/include/ros/ros.h"
-#include "sensor_msgs/PointCloud2.h"
 
 namespace apollo {
 namespace perception {
