@@ -169,7 +169,7 @@ class TaskCalculator(object):
         new_pos = msg.pose.position
 
         # Update mileage and position.
-        if self.last_pos and self.current_driving_mode:
+        if self.last_pos and (self.current_driving_mode is not None):
             self.mileage[self.current_driving_mode] += \
                 coord_calculator.utm_distance(self.last_pos, new_pos)
         self.last_pos = new_pos
