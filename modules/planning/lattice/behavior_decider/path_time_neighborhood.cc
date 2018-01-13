@@ -64,7 +64,8 @@ int LastIndexBefore(const prediction::Trajectory& trajectory, const double t) {
 }  // namespace
 
 PathTimeNeighborhood::PathTimeNeighborhood(
-    const Frame* frame, const double ego_s,
+    const std::vector<const Obstacle*>& obstacles,
+    const double ego_s,
     const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_ref_points) {
 
@@ -75,13 +76,13 @@ PathTimeNeighborhood::PathTimeNeighborhood(
   time_range_.second = planned_trajectory_time;
 
   discretized_ref_points_ = discretized_ref_points;
-  SetupObstacles(frame, reference_line, discretized_ref_points);
+  SetupObstacles(obstacles, reference_line, discretized_ref_points);
 }
 
 void PathTimeNeighborhood::SetupObstacles(
-    const Frame* frame, const ReferenceLine& reference_line,
+    const std::vector<const Obstacle*>& obstacles,
+    const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_ref_points) {
-  const auto& obstacles = frame->obstacles();
 
   for (const Obstacle* obstacle : obstacles) {
     if (prediction_traj_map_.find(obstacle->Id()) ==

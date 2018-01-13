@@ -35,7 +35,8 @@ namespace planning {
 class PathTimeNeighborhood {
  public:
   PathTimeNeighborhood(
-      const Frame* frame, const double ego_s,
+      const std::vector<const Obstacle*>& obstacles,
+      const double ego_s,
       const ReferenceLine& reference_line,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
@@ -60,7 +61,8 @@ class PathTimeNeighborhood {
 
  private:
   void SetupObstacles(
-      const Frame* frame, const ReferenceLine& reference_line,
+      const std::vector<const Obstacle*>& obstacles,
+      const ReferenceLine& reference_line,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   PathTimePoint SetPathTimePoint(const std::string& obstacle_id,
