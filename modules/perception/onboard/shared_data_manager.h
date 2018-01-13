@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_
-#define MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_
+#define MODULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_
 
 #include <map>
 #include <memory>
@@ -53,4 +53,4 @@ class SharedDataManager {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_TOOL_EXPORT_SENSOR_DATA_EXPORT_SENSOR_DATA_H_
-#define MODEULES_PERCEPTION_TOOL_EXPORT_SENSOR_DATA_EXPORT_SENSOR_DATA_H_
+#ifndef MODULES_PERCEPTION_TOOL_EXPORT_SENSOR_DATA_EXPORT_SENSOR_DATA_H_
+#define MODULES_PERCEPTION_TOOL_EXPORT_SENSOR_DATA_EXPORT_SENSOR_DATA_H_
 
 #include <boost/circular_buffer.hpp>
 #include <memory>
@@ -75,5 +75,5 @@ class ExportSensorData{
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_TOOL_EXPORT_SENSOR_DATA_EXPORT_SENSOR_DATA_H_
+#endif  // MODULES_PERCEPTION_TOOL_EXPORT_SENSOR_DATA_EXPORT_SENSOR_DATA_H_
 

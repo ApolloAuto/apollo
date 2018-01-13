@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_H_
-#define MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_SHARED_DATA_H_
+#define MODULES_PERCEPTION_ONBOARD_SHARED_DATA_H_
 
 #include <string>
 
@@ -55,4 +55,4 @@ REGISTER_REGISTERER(SharedData);
 
 }  // namespace perception
 }  // namespace apollo
-#endif  // MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_SHARED_DATA_H_
