@@ -110,9 +110,9 @@ Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
                             decision.stop().distance_s();
       // this is a rough estimation based on reference line s, so that a large
       // buffer is used.
-      constexpr double stop_buff = 1.0;
+      constexpr double stop_buff = 3.0;
       if (stop_s + stop_buff < adc_sl_boundary_.end_s()) {
-        AERROR << "Invalid stop decision. not stop at behind of current "
+        AERROR << "Invalid stop decision. Should not stop at behind of current "
                   "position. stop_s : "
                << stop_s << ", and current adc_s is; "
                << adc_sl_boundary_.end_s();

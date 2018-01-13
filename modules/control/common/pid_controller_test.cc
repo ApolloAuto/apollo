@@ -32,8 +32,7 @@ class PidControllerTest : public ::testing::Test {
   virtual void SetUp() {
     std::string control_conf_file =
         "modules/control/testdata/conf/lincoln.pb.txt";
-    CHECK(common::util::GetProtoFromFile(control_conf_file,
-                                                   &control_conf_));
+    CHECK(common::util::GetProtoFromFile(control_conf_file, &control_conf_));
     lon_controller_conf_ = control_conf_.lon_controller_conf();
   }
 
@@ -56,7 +55,6 @@ TEST_F(PidControllerTest, StationPidController) {
   EXPECT_NEAR(control_value, -0.01, 1e-6);
   dt = 0.0;
   EXPECT_EQ(pid_controller.Control(100, dt), control_value);
-  EXPECT_EQ(pid_controller.IntegratorHold(), false);
 }
 
 TEST_F(PidControllerTest, SpeedPidController) {

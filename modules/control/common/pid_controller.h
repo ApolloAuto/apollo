@@ -71,12 +71,6 @@ class PIDController {
    */
   int IntegratorSaturationStatus() const;
 
-  /**
-   * @brief get status that if integrator is hold
-   * @return if integrator is hold return true
-   */
-  bool IntegratorHold() const;
-
  protected:
   double kp_ = 0.0;
   double ki_ = 0.0;
@@ -89,7 +83,6 @@ class PIDController {
   double integrator_saturation_low_ = 0.0;
   bool first_hit_ = false;
   bool integrator_enabled_ = false;
-  bool integrator_hold_ = false;
   int integrator_saturation_status_ = 0;
   // Only used for pid_BC_controller and pid_IC_controller
   double output_saturation_high_ = 0.0;

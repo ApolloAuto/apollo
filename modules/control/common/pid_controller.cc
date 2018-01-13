@@ -39,7 +39,7 @@ double PIDController::Control(const double error, const double dt) {
   // integral hold
   if (!integrator_enabled_) {
     integral_ = 0;
-  } else if (!integrator_hold_) {
+  } else {
     integral_ += error * dt * ki_;
     // apply Ki before integrating to avoid steps when change Ki at steady state
     if (integral_ > integrator_saturation_high_) {
@@ -78,7 +78,6 @@ void PIDController::Init(const PidConf &pid_conf) {
   integrator_saturation_low_ =
       -std::fabs(pid_conf.integrator_saturation_level());
   integrator_saturation_status_ = 0;
-  integrator_hold_ = false;
   output_saturation_high_ = std::fabs(pid_conf.output_saturation_level());
   output_saturation_low_ = -std::fabs(pid_conf.output_saturation_level());
   output_saturation_status_ = 0;
@@ -94,10 +93,6 @@ void PIDController::SetPID(const PidConf &pid_conf) {
 
 int PIDController::IntegratorSaturationStatus() const {
   return integrator_saturation_status_;
-}
-
-bool PIDController::IntegratorHold() const {
-  return integrator_hold_;
 }
 
 }  // namespace control
