@@ -7,7 +7,6 @@ cc_library(
     srcs = ["perception.cc"],
     hdrs = [
         "perception.h",
-        "perception_interface.h",
     ],
     deps = [
         "//modules/common:apollo_app",

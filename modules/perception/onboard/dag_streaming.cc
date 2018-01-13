@@ -17,13 +17,7 @@
 #include "modules/perception/onboard/dag_streaming.h"
 
 #include <unistd.h>
-#include <map>
-#include <string>
 #include <utility>
-#include <vector>
-
-#include "gflags/gflags.h"
-#include "google/protobuf/text_format.h"
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
