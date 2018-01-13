@@ -89,7 +89,6 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
   // 4. parse the decision and get the planning target.
   std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_ptr(new PathTimeNeighborhood(
     frame->obstacles(), init_s[0],
-    reference_line_info->reference_line(),
     discretized_reference_line));
 
   decider_.UpdatePathTimeNeighborhood(path_time_neighborhood_ptr);
