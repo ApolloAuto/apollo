@@ -197,7 +197,7 @@ DECLARE_double(spiral_downsample_curvature_thred);
 DECLARE_bool(enable_sample_bound_planning);
 DECLARE_bool(enable_lattice_st_image_dump);
 DECLARE_bool(enable_lattice_change_lane_decider);
-
+DECLARE_bool(enable_auto_tuning);
 DECLARE_double(trajectory_time_resolution);
 
 /// thread pool

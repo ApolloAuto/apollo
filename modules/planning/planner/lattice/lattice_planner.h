@@ -47,6 +47,13 @@ class LatticePlanner : public Planner {
       const Curve1d& lon_trajectory, const Curve1d& lat_trajectory,
       const double init_relative_time = 0.0) const;
 
+  DiscretizedTrajectory GetFutureTrajectory() const;
+
+  bool MapFutureTrajectoryToSL(const DiscretizedTrajectory& future_trajectory,
+    std::vector<apollo::common::SpeedPoint>* st_points,
+    std::vector<apollo::common::FrenetFramePoint>* sl_points,
+    ReferenceLineInfo* reference_line_info);
+
   BehaviorDecider decider_;
 };
 
