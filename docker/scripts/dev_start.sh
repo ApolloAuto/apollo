@@ -19,7 +19,7 @@
 INCHINA="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-v2.0.0"
+VERSION_X86_64="dev-x86_64-20180103_1300"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 
@@ -158,7 +158,7 @@ function main(){
         --add-host in_dev_docker:127.0.0.1 \
         --add-host ${LOCAL_HOST}:127.0.0.1 \
         --hostname in_dev_docker \
-        --shm-size 512M \
+        --shm-size 2G \
         $IMG \
         /bin/bash
 

@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/control/filters/mean_filter.h"
+#include "modules/common/filters/mean_filter.h"
 
 #include "gtest/gtest.h"
 
 namespace apollo {
-namespace control {
+namespace common {
 
 class MeanFilterTest : public ::testing::Test {
  public:
@@ -151,5 +151,5 @@ TEST_F(MeanFilterTest, GoodMinRemoval) {
   EXPECT_DOUBLE_EQ(mean_filter.Update(2.0), 2.5);
 }
 
-}  // namespace control
+}  // namespace common
 }  // namespace apollo

@@ -67,9 +67,9 @@ class StopSign : public TrafficRule {
                          StopSignLaneVehicles* watch_vehicles);
   double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
                              const PathOverlap* stop_sign_overlap);
-  void CreateStopObstacle(Frame* frame,
-                          ReferenceLineInfo* const reference_line_info,
-                          const PathOverlap* stop_sign_overlap);
+  bool BuildStopDecision(Frame* frame,
+                         ReferenceLineInfo* const reference_line_info,
+                         const hdmap::PathOverlap* stop_sign_overlap);
   void ClearDropbox(const std::string& stop_sign_id);
 
  private:

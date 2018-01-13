@@ -39,12 +39,12 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::PathPoint;
-using apollo::common::Point3D;
-using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::KalmanFilter;
-using apollo::hdmap::LaneInfo;
+using ::apollo::common::PathPoint;
+using ::apollo::common::Point3D;
+using ::apollo::common::TrajectoryPoint;
+using ::apollo::common::adapter::AdapterConfig;
+using ::apollo::common::math::KalmanFilter;
+using ::apollo::hdmap::LaneInfo;
 
 void MoveSequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
@@ -140,11 +140,10 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
   std::string lane_id =
       lane_sequence.lane_segment(lane_segment_index).lane_id();
 
-  PredictionMap* map = PredictionMap::instance();
-  std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane_id);
+  std::shared_ptr<const LaneInfo> lane_info = PredictionMap::LaneById(lane_id);
   double lane_s = 0.0;
   double lane_l = 0.0;
-  if (!map->GetProjection(position, lane_info, &lane_s, &lane_l)) {
+  if (!PredictionMap::GetProjection(position, lane_info, &lane_s, &lane_l)) {
     AERROR << "Failed in getting lane s and lane l";
     return;
   }
@@ -171,7 +170,8 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     if (curr_s + FLAGS_double_precision < prev_s) {
       lane_l = prev_lane_l;
     }
-    if (!map->SmoothPointFromLane(lane_id, lane_s, lane_l, &point, &theta)) {
+    if (!PredictionMap::SmoothPointFromLane(lane_id, lane_s, lane_l, &point,
+                                            &theta)) {
       AERROR << "Unable to get smooth point from lane [" << lane_id
              << "] with s [" << lane_s << "] and l [" << lane_l << "]";
       break;
@@ -196,10 +196,10 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     trajectory_point.set_relative_time(relative_time);
     points->emplace_back(std::move(trajectory_point));
 
-    while (lane_s > map->LaneById(lane_id)->total_length() &&
+    while (lane_s > PredictionMap::LaneById(lane_id)->total_length() &&
            lane_segment_index + 1 < lane_sequence.lane_segment_size()) {
       lane_segment_index += 1;
-      lane_s = lane_s - map->LaneById(lane_id)->total_length();
+      lane_s = lane_s - PredictionMap::LaneById(lane_id)->total_length();
       lane_id = lane_sequence.lane_segment(lane_segment_index).lane_id();
     }
   }

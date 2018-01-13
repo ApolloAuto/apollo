@@ -399,7 +399,6 @@ bool ResultGenerator::GeneratePassageRegion(
   } else {
     GetNodesOfWaysBasedOnVirtual(nodes, &nodes_of_ways);
   }
-  std::vector<std::string> road_id_of_ways;
   for (const auto& way : nodes_of_ways) {
     std::vector<std::vector<NodeWithRange>> nodes_of_passages;
     if (way.empty()) {

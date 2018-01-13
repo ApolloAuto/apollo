@@ -110,12 +110,15 @@ DECLARE_double(min_stop_distance_obstacle);
 DECLARE_double(max_stop_distance_obstacle);
 DECLARE_double(stop_distance_destination);
 DECLARE_double(stop_distance_traffic_light);
+DECLARE_double(stop_distance_crosswalk);
+DECLARE_double(stop_distance_stop_sign);
 DECLARE_double(destination_check_distance);
 DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);
 DECLARE_double(yield_min_distance);
 DECLARE_double(follow_time_buffer);
 DECLARE_double(follow_min_time_sec);
+DECLARE_double(within_lane_bound);
 
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(virtual_stop_wall_length);
@@ -172,5 +175,10 @@ DECLARE_string(stop_sign_virtual_object_id_prefix);
 DECLARE_double(stop_duration_for_stop_sign);
 
 DECLARE_bool(enable_sqp_solver);
+
+/// thread pool
+DECLARE_int32(num_thread_planning_thread_pool);
+DECLARE_bool(enable_multi_thread_in_dp_poly_path);
+DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H

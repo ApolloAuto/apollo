@@ -142,7 +142,6 @@ class LincolnController final : public VehicleController {
   Gear66 *gear_66_ = nullptr;
   Turnsignal68 *turnsignal_68_ = nullptr;
 
-  CanSender<::apollo::canbus::ChassisDetail> *can_sender_ = nullptr;
   Chassis chassis_;
   std::unique_ptr<std::thread> thread_;
   bool is_chassis_error_ = false;

@@ -110,7 +110,7 @@ DEFINE_bool(enable_side_vehicle_st_boundary, false,
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 
-DEFINE_double(max_collision_distance, 0.1,
+DEFINE_double(max_collision_distance, 0.0,
               "considered as collision if distance (meters) is smaller than or "
               "equal to this (meters)");
 
@@ -186,7 +186,7 @@ DEFINE_bool(enable_nudge_slowdown, true,
 
 DEFINE_bool(try_history_decision, false, "try history decision first");
 
-DEFINE_double(static_decision_nudge_l_buffer, 0.3, "l buffer for nudge");
+DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");
@@ -198,10 +198,14 @@ DEFINE_double(stop_distance_destination, 0.5,
               "stop distance from destination line");
 DEFINE_double(stop_distance_traffic_light, 3.0,
               "stop distance from traffic light line");
+DEFINE_double(stop_distance_crosswalk, 3.0,
+              "stop distance from stop line of crosswalk");
+DEFINE_double(stop_distance_stop_sign, 3.0,
+              "stop distance from stop line of stop sign");
 DEFINE_double(destination_check_distance, 5.0,
               "if the distance between destination and ADC is less than this,"
               " it is considered to reach destination");
-DEFINE_double(nudge_distance_obstacle, 0.3,
+DEFINE_double(nudge_distance_obstacle, 0.5,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
@@ -213,6 +217,8 @@ DEFINE_double(
 DEFINE_double(
     follow_min_time_sec, 0.1,
     "min following time in st region before considering a valid follow");
+DEFINE_double(within_lane_bound, 4.0,
+              "distance to be considered within current lane");
 
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
@@ -328,3 +334,13 @@ DEFINE_bool(enable_follow_accel_constraint, true,
 
 // SQP solver
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
+
+/// thread pool
+
+DEFINE_int32(num_thread_planning_thread_pool, 5,
+             "num of thread used in planning thread pool.");
+DEFINE_bool(
+    enable_multi_thread_in_dp_poly_path, false,
+    "Enable multiple thread to calculation curve cost in dp_poly_path.");
+DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
+            "Enable multiple thread to calculation curve cost in dp_st_graph.");

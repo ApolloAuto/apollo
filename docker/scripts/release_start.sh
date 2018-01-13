@@ -106,7 +106,7 @@ function main() {
         --add-host in_release_docker:127.0.0.1 \
         --add-host ${LOCAL_HOST}:127.0.0.1 \
         --hostname in_release_docker \
-        --shm-size 512M \
+        --shm-size 2G \
         $IMG
     if [ "${USER}" != "root" ]; then
       docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"

@@ -100,11 +100,10 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
   Eigen::Matrix<double, 4, 1> state(kf.GetStateEstimate());
 
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
-  PredictionMap* map = PredictionMap::instance();
-  std::shared_ptr<const LaneInfo> lane_info = map->LaneById(lane_id);
+  std::shared_ptr<const LaneInfo> lane_info = PredictionMap::LaneById(lane_id);
   double lane_s = 0.0;
   double lane_l = 0.0;
-  if (map->GetProjection(position, lane_info, &lane_s, &lane_l)) {
+  if (PredictionMap::GetProjection(position, lane_info, &lane_s, &lane_l)) {
     state(0, 0) = lane_s;
     state(1, 0) = lane_l;
     state(2, 0) = feature.speed();

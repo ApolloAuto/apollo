@@ -19,18 +19,18 @@
  * @brief Defines the DigitalFilter class.
  */
 
-#ifndef MODULES_CONTROL_FILTERS_DIGITAL_FILTER_H_
-#define MODULES_CONTROL_FILTERS_DIGITAL_FILTER_H_
+#ifndef MODULES_COMMON_FILTERS_DIGITAL_FILTER_H_
+#define MODULES_COMMON_FILTERS_DIGITAL_FILTER_H_
 
 #include <deque>
 #include <vector>
 
 /**
- * @namespace apollo::control
- * @brief apollo::control
+ * @namespace apollo::common
+ * @brief apollo::common
  */
 namespace apollo {
-namespace control {
+namespace common {
 
 /**
  * @class DigitalFilter
@@ -149,7 +149,7 @@ class DigitalFilter {
   double last_ = 0.0;
 };
 
-}  // namespace control
+}  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_CONTROL_FILTERS_DIGITAL_FILTER_H_ */
+#endif /* MODULES_COMMON_FILTERS_DIGITAL_FILTER_H_ */

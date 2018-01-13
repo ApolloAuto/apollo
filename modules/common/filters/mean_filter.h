@@ -19,8 +19,8 @@
  * @brief Defines the MeanFilter class.
  */
 
-#ifndef MODULES_CONTROL_FILTERS_MEAN_FILTER_H_
-#define MODULES_CONTROL_FILTERS_MEAN_FILTER_H_
+#ifndef MODULES_COMMON_FILTERS_MEAN_FILTER_H_
+#define MODULES_COMMON_FILTERS_MEAN_FILTER_H_
 
 #include <cstdint>
 #include <deque>
@@ -28,11 +28,11 @@
 #include <vector>
 
 /**
- * @namespace apollo::control
- * @brief The apollo::control namespace contains the code of the control module.
+ * @namespace apollo::common
+ * @brief The apollo::common namespace contains the code of the common module.
  */
 namespace apollo {
-namespace control {
+namespace common {
 
 /**
  * @class MeanFilter
@@ -83,7 +83,7 @@ class MeanFilter {
   bool initialized_ = false;
 };
 
-}  // namespace control
+}  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_CONTROL_FILTERS_MEAN_FILTER_H_
+#endif  // MODULES_COMMON_FILTERS_MEAN_FILTER_H_

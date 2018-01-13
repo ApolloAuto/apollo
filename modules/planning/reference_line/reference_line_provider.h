@@ -101,8 +101,6 @@ class ReferenceLineProvider {
   void GenerateThread();
   void IsValidReferenceLine();
   void PrioritzeChangeLane(std::list<hdmap::RouteSegments>* route_segments);
-  bool IsAllowChangeLane(const common::math::Vec2d& point,
-                         const std::list<hdmap::RouteSegments>& route_segments);
 
   bool CreateRouteSegments(const common::VehicleState& vehicle_state,
                            const double look_forward_distance,
@@ -155,16 +153,6 @@ class ReferenceLineProvider {
   std::mutex routing_mutex_;
   routing::RoutingResponse routing_;
   bool has_routing_ = false;
-
-  struct SegmentHistory {
-    double min_l = 0.0;
-    double accumulate_s = 0.0;
-    common::math::Vec2d last_point;
-  };
-
-  std::mutex segment_history_mutex_;
-  std::unordered_map<std::string, SegmentHistory> segment_history_;
-  std::list<std::string> segment_history_id_;
 
   std::mutex reference_lines_mutex_;
   std::list<ReferenceLine> reference_lines_;

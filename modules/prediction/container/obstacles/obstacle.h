@@ -31,6 +31,7 @@
 #include "Eigen/Dense"
 
 #include "modules/common/proto/error_code.pb.h"
+#include "modules/common/filters/digital_filter.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/feature.pb.h"
 
@@ -53,7 +54,7 @@ class Obstacle {
   /**
    * @brief Constructor
    */
-  Obstacle() = default;
+  Obstacle();
 
   /**
    * @brief Destructor
@@ -249,6 +250,7 @@ class Obstacle {
   std::deque<Feature> feature_history_;
   common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
   common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
+  common::DigitalFilter heading_filter_;
   std::unordered_map<std::string, common::math::KalmanFilter<double, 4, 2, 0>>
       kf_lane_trackers_;
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
