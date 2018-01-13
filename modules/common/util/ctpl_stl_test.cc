@@ -38,20 +38,29 @@ void simple_minus() {
 
 TEST(ThreadPool, simple) {
   ThreadPool p(5);
+  std::vector<std::future<void>> k;
   for (int i = 0; i < 1000; ++i) {
     auto f1 = std::bind(simple_add);
-    p.Push(f1);
+    k.push_back(std::move(p.Push(f1)));
   }
-  p.JoinAll();
+  for (auto& task : k) {
+    task.wait();
+  }
   EXPECT_EQ(n.load(), 1000);
+
+  k.clear();
 
   for (int i = 0; i < 500; ++i) {
     auto f1 = std::bind(simple_add);
     auto f2 = std::bind(simple_minus);
-    p.Push(f1);
-    p.Push(f2);
+    auto t1 = p.Push(f1);
+    auto t2 = p.Push(f2);
+    k.push_back(std::move(t1));
+    k.push_back(std::move(t2));
   }
-  p.JoinAll();
+  for (auto& task : k) {
+    task.wait();
+  }
   EXPECT_EQ(n.load(), 1000);
 }
 

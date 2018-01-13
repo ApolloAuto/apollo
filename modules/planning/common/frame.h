@@ -86,6 +86,11 @@ class Frame {
   const Obstacle *AddStaticVirtualObstacle(const std::string &id,
                                            const common::math::Box2d &box);
 
+  const Obstacle *AddVirtualStopObstacle(
+      ReferenceLineInfo* const reference_line_info,
+      const std::string &object_id,
+      const double object_s);
+
   bool Rerouting();
 
   const common::VehicleState &vehicle_state() const;
