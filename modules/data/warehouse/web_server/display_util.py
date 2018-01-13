@@ -75,16 +75,17 @@ def draw_path_on_gmap(map_path, canvas_id):
     if not map_path:
         return ''
     # Get center and zoom.
-    min_lat = min_lng = sys.float_info.max
-    max_lat = max_lng = -sys.float_info.max
+    min_lat, max_lat = sys.float_info.max, -sys.float_info.max
+    min_lng, max_lng = sys.float_info.max, -sys.float_info.max
+
     for point in map_path:
         if point.latitude > max_lat:
             max_lat = point.latitude
-        elif point.latitude < min_lat:
+        if point.latitude < min_lat:
             min_lat = point.latitude
         if point.longitude > max_lng:
             max_lng = point.longitude
-        elif point.longitude < min_lng:
+        if point.longitude < min_lng:
             min_lng = point.longitude
     center_lat = (min_lat + max_lat) / 2.0
     center_lng = (min_lng + max_lng) / 2.0
