@@ -65,17 +65,17 @@
           {{ task | draw_disengagements_on_gmap }}
         </script>
       </div>
-    {% endif %}
 
-    <table class="table text_center">
-      <tbody>
-        <tr>
-          <td><span class="glyphicon glyphicon-record green"></span> Start Point</td>
-          <td><span class="glyphicon glyphicon-record red"></span> Stop Point</td>
-          <td><span class="glyphicon glyphicon-map-marker red"></span> Disengagement</td>
-        </tr>
-      </tbody>
-    </table>
+      <table class="table text_center">
+        <tbody>
+          <tr>
+            <td><span class="glyphicon glyphicon-record green"></span> Start Point</td>
+            <td><span class="glyphicon glyphicon-record red"></span> Stop Point</td>
+            <td><span class="glyphicon glyphicon-map-marker red"></span> Disengagement</td>
+          </tr>
+        </tbody>
+      </table>
+    {% endif %}
   </div>
 </div>
 
