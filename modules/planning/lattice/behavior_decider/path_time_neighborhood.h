@@ -37,7 +37,6 @@ class PathTimeNeighborhood {
   PathTimeNeighborhood(
       const std::vector<const Obstacle*>& obstacles,
       const double ego_s,
-      const ReferenceLine& reference_line,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   const std::vector<PathTimeObstacle>& GetPathTimeObstacles() const;
@@ -62,15 +61,17 @@ class PathTimeNeighborhood {
  private:
   void SetupObstacles(
       const std::vector<const Obstacle*>& obstacles,
-      const ReferenceLine& reference_line,
       const std::vector<common::PathPoint>& discretized_ref_points);
+
+  SLBoundary ComputeObstacleBoundary(const common::math::Box2d& box,
+      const std::vector<common::PathPoint>& discretized_ref_points) const;
 
   PathTimePoint SetPathTimePoint(const std::string& obstacle_id,
                                  const double s,
                                  const double t) const;
 
   void SetStaticPathTimeObstacle(const Obstacle* obstacle,
-                                 const ReferenceLine& reference_line);
+      const std::vector<common::PathPoint>& discretized_ref_points);
 
  private:
 

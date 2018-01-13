@@ -66,7 +66,6 @@ int LastIndexBefore(const prediction::Trajectory& trajectory, const double t) {
 PathTimeNeighborhood::PathTimeNeighborhood(
     const std::vector<const Obstacle*>& obstacles,
     const double ego_s,
-    const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_ref_points) {
 
   path_range_.first = ego_s;
@@ -76,12 +75,40 @@ PathTimeNeighborhood::PathTimeNeighborhood(
   time_range_.second = planned_trajectory_time;
 
   discretized_ref_points_ = discretized_ref_points;
-  SetupObstacles(obstacles, reference_line, discretized_ref_points);
+  SetupObstacles(obstacles, discretized_ref_points);
+}
+
+SLBoundary PathTimeNeighborhood::ComputeObstacleBoundary(
+    const Box2d& box,
+    const std::vector<common::PathPoint>& discretized_ref_points) const {
+
+  double start_s(std::numeric_limits<double>::max());
+  double end_s(std::numeric_limits<double>::lowest());
+  double start_l(std::numeric_limits<double>::max());
+  double end_l(std::numeric_limits<double>::lowest());
+  std::vector<common::math::Vec2d> corners;
+  box.GetAllCorners(&corners);
+
+  for (const auto& point : corners) {
+    auto sl_point = ReferenceLineMatcher::GetReferenceLineCoordinate(
+            discretized_ref_points, point.x(), point.y());
+    start_s = std::fmin(start_s, sl_point.first);
+    end_s = std::fmax(end_s, sl_point.first);
+    start_l = std::fmin(start_l, sl_point.second);
+    end_l = std::fmax(end_l, sl_point.second);
+  }
+
+  SLBoundary sl_boundary;
+  sl_boundary.set_start_s(start_s);
+  sl_boundary.set_end_s(end_s);
+  sl_boundary.set_start_l(start_l);
+  sl_boundary.set_end_l(end_l);
+
+  return sl_boundary;
 }
 
 void PathTimeNeighborhood::SetupObstacles(
     const std::vector<const Obstacle*>& obstacles,
-    const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& discretized_ref_points) {
 
   for (const Obstacle* obstacle : obstacles) {
@@ -93,7 +120,7 @@ void PathTimeNeighborhood::SetupObstacles(
     }
 
     if (!obstacle->HasTrajectory()) {
-       SetStaticPathTimeObstacle(obstacle, reference_line);
+       SetStaticPathTimeObstacle(obstacle, discretized_ref_points);
        continue;
     }
 
@@ -101,9 +128,8 @@ void PathTimeNeighborhood::SetupObstacles(
     while (relative_time + time_range_.first < time_range_.second) {
       TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       Box2d box = obstacle->GetBoundingBox(point);
-
-      SLBoundary sl_boundary;
-      reference_line.GetSLBoundary(box, &sl_boundary);
+      SLBoundary sl_boundary = ComputeObstacleBoundary(box,
+          discretized_ref_points);
 
       // the obstacle is not shown on the region to be considered.
       if (sl_boundary.end_s() < path_range_.first ||
@@ -174,13 +200,13 @@ void PathTimeNeighborhood::SetupObstacles(
 
 void PathTimeNeighborhood::SetStaticPathTimeObstacle(
     const Obstacle* obstacle,
-    const ReferenceLine& reference_line) {
+    const std::vector<common::PathPoint>& discretized_ref_points) {
   TrajectoryPoint start_point = obstacle->GetPointAtTime(0.0);
   Box2d box = obstacle->GetBoundingBox(start_point);
 
   std::string obstacle_id = obstacle->Id();
-  SLBoundary sl_boundary;
-  reference_line.GetSLBoundary(box, &sl_boundary);
+  SLBoundary sl_boundary = ComputeObstacleBoundary(box, discretized_ref_points);
+
   path_time_obstacle_map_[obstacle_id].set_obstacle_id(obstacle_id);
   path_time_obstacle_map_[obstacle_id].mutable_bottom_left()
       ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.start_s(), 0.0));
