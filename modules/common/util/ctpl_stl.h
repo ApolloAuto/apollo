@@ -162,14 +162,6 @@ class ThreadPool {
     return f;
   }
 
-  // wait for all computing threads to finish and join all threads
-  void JoinAll() {
-    std::unique_lock<std::mutex> lock(job_mutex_);
-    while (n_jobs_to_do_ != 0) {
-      job_cv_.wait(lock);
-    }
-  }
-
   // wait for all computing threads to finish and stop all threads
   // may be called asynchronously to not pause the calling thread while waiting
   // if is_wait == true, all the functions in the queue are run, otherwise the
@@ -214,7 +206,6 @@ class ThreadPool {
                       std::forward<Rest>(rest)...));
     auto _f = new std::function<void(int id)>([pck](int id) { (*pck)(id); });
     q_.push(_f);
-    ++n_jobs_to_do_;
     std::unique_lock<std::mutex> lock(mutex_);
     cv_.notify_one();
     return pck->get_future();
@@ -230,7 +221,6 @@ class ThreadPool {
         std::forward<F>(f));
     auto _f = new std::function<void(int id)>([pck](int id) { (*pck)(id); });
     q_.push(_f);
-    ++n_jobs_to_do_;
     std::unique_lock<std::mutex> lock(mutex_);
     cv_.notify_one();
     return pck->get_future();
@@ -256,8 +246,6 @@ class ThreadPool {
               _f);  // at return, delete the function even if an exception
                     // occurred
           (*_f)(i);
-          --n_jobs_to_do_;
-          job_cv_.notify_one();
           if (_flag) {
             // the thread is wanted to stop, return even if the queue is not
             // empty yet
@@ -289,7 +277,6 @@ class ThreadPool {
     is_stop_ = false;
     is_done_ = false;
     n_waiting_ = 0;
-    n_jobs_to_do_ = 0;
   }
 
   std::vector<std::unique_ptr<std::thread>> threads_;
@@ -298,10 +285,6 @@ class ThreadPool {
   std::atomic<bool> is_done_;
   std::atomic<bool> is_stop_;
   std::atomic<int> n_waiting_;  // how many threads are waiting
-
-  std::mutex job_mutex_;
-  std::condition_variable job_cv_;
-  std::atomic<int> n_jobs_to_do_;  // how many jobs are NOT finished.
 
   std::mutex mutex_;
   std::condition_variable cv_;

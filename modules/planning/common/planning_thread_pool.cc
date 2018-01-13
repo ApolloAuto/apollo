@@ -36,5 +36,12 @@ void PlanningThreadPool::Init() {
   is_initialized = true;
 }
 
+void PlanningThreadPool::Synchronize() {
+  for (auto& f : func_) {
+    f.wait();
+  }
+  func_.clear();
+}
+
 }  // namespace planning
 }  // namespace apollo
