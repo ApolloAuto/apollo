@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
-#define MODEULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
+#define MODULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
 
 #include <boost/format.hpp>
 #include <map>
@@ -279,4 +279,4 @@ bool CommonSharedData<M>::Pop(const CommonSharedDataKey &key,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_

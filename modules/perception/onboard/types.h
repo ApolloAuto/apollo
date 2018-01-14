@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_ONBOARD_TYPES_H_
-#define MODEULES_PERCEPTION_ONBOARD_TYPES_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_TYPES_H_
+#define MODULES_PERCEPTION_ONBOARD_TYPES_H_
 
 #include <sstream>
 #include <string>
@@ -80,4 +80,4 @@ enum IoStreamType {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_ONBOARD_TYPES_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_TYPES_H_
