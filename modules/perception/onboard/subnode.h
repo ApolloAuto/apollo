@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_ONBOARD_SUBNODE_H_
-#define MODEULES_PERCEPTION_ONBOARD_SUBNODE_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_SUBNODE_H_
+#define MODULES_PERCEPTION_ONBOARD_SUBNODE_H_
 
 #include <stdio.h>
 #include <unistd.h>
@@ -174,4 +174,4 @@ class CommonSubnode : public Subnode {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_ONBOARD_SUBNODE_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_SUBNODE_H_

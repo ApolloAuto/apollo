@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_ONBOARD_EVENT_MANAGER_H_
-#define MODEULES_PERCEPTION_ONBOARD_EVENT_MANAGER_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_EVENT_MANAGER_H_
+#define MODULES_PERCEPTION_ONBOARD_EVENT_MANAGER_H_
 
 #include <memory>
 #include <sstream>
@@ -91,4 +91,4 @@ class EventManager {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_ONBOARD_EVENT_MANAGER_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_EVENT_MANAGER_H_
