@@ -186,6 +186,9 @@ class RouteSegments : public std::vector<LaneSegment> {
   static bool WithinLaneSegment(const LaneSegment &lane_segment,
                                 const LaneWaypoint &waypoint);
 
+  static bool WithinLaneSegment(const LaneSegment &lane_segment,
+                                const routing::LaneWaypoint &waypoint);
+
   static bool WithinLaneSegment(const routing::LaneSegment &lane_segment,
                                 const LaneWaypoint &waypoint);
 
