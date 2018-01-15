@@ -22,6 +22,8 @@
 #define MODULES_PLANNING_COMMON_PLANNING_THREAD_POOL_H_
 
 #include <memory>
+#include <utility>
+#include <vector>
 
 #include "modules/common/macro.h"
 #include "modules/common/util/ctpl_stl.h"
@@ -38,13 +40,28 @@ namespace planning {
 class PlanningThreadPool {
  public:
   void Init();
-  common::util::ThreadPool* mutable_thread_pool() {
-    return thread_pool_.get();
+  void Stop() {
+    if (thread_pool_) {
+      thread_pool_->Stop(false);
+    }
   }
+  template <typename F, typename... Rest>
+  void Push(F &&f, Rest &&... rest) {
+    func_.push_back(std::move(thread_pool_->Push(f, rest...)));
+  }
+
+  template <typename F>
+  void Push(F &&f) {
+    func_.push_back(std::move(thread_pool_->Push(f)));
+  }
+
+  void Synchronize();
 
  private:
   std::unique_ptr<common::util::ThreadPool> thread_pool_;
   bool is_initialized = false;
+
+  std::vector<std::future<void>> func_;
 
   DECLARE_SINGLETON(PlanningThreadPool);
 };

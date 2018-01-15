@@ -112,6 +112,8 @@ DECLARE_double(min_stop_distance_obstacle);
 DECLARE_double(max_stop_distance_obstacle);
 DECLARE_double(stop_distance_destination);
 DECLARE_double(stop_distance_traffic_light);
+DECLARE_double(stop_distance_crosswalk);
+DECLARE_double(stop_distance_stop_sign);
 DECLARE_double(destination_check_distance);
 DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);

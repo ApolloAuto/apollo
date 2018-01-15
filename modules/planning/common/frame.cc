@@ -189,6 +189,34 @@ bool Frame::CreateReferenceLineInfo() {
   return true;
 }
 
+/**
+ * @brief: create static virtual object with lane width,
+ *         mainly used for virtual stop wall
+ */
+const Obstacle *Frame::AddVirtualStopObstacle(
+    ReferenceLineInfo* const reference_line_info,
+    const std::string &object_id,
+    const double object_s) {
+  if (reference_line_info == nullptr) {
+    AERROR << "reference_line_info nullptr";
+    return nullptr;
+  }
+
+  const auto& reference_line = reference_line_info->reference_line();
+  const double box_center_s = object_s + FLAGS_virtual_stop_wall_length / 2.0;
+  auto box_center = reference_line.GetReferencePoint(box_center_s);
+  double heading = reference_line.GetReferencePoint(object_s).heading();
+  double lane_left_width = 0.0;
+  double lane_right_width = 0.0;
+  reference_line.GetLaneWidth(object_s, &lane_left_width, &lane_right_width);
+  Box2d stop_wall_box{box_center,
+                      heading,
+                      FLAGS_virtual_stop_wall_height,
+                      lane_left_width + lane_right_width};
+
+  return AddStaticVirtualObstacle(object_id, stop_wall_box);
+}
+
 const Obstacle *Frame::AddStaticVirtualObstacle(const std::string &id,
                                                 const Box2d &box) {
   const auto *object = obstacles_.Find(id);

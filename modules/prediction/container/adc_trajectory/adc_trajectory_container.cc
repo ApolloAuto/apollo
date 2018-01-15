@@ -63,14 +63,13 @@ bool ADCTrajectoryContainer::IsPointInJunction(const PathPoint& point) const {
   }
   bool in_polygon = adc_junction_polygon_.IsPointIn({point.x(), point.y()});
 
-  PredictionMap* map = PredictionMap::instance();
   bool on_virtual_lane = false;
   if (point.has_lane_id()) {
-    on_virtual_lane = map->IsVirtualLane(point.lane_id());
+    on_virtual_lane = PredictionMap::IsVirtualLane(point.lane_id());
   }
   if (!on_virtual_lane) {
-    on_virtual_lane =
-        map->OnVirtualLane({point.x(), point.y()}, FLAGS_virtual_lane_radius);
+    on_virtual_lane = PredictionMap::OnVirtualLane({point.x(), point.y()},
+                                                   FLAGS_virtual_lane_radius);
   }
   return in_polygon && on_virtual_lane;
 }
@@ -97,8 +96,7 @@ void ADCTrajectoryContainer::SetJunctionPolygon() {
     double x = adc_trajectory_.trajectory_point(i).path_point().x();
     double y = adc_trajectory_.trajectory_point(i).path_point().y();
     std::vector<std::shared_ptr<const JunctionInfo>> junctions =
-        PredictionMap::instance()->GetJunctions({x, y},
-                                                FLAGS_junction_search_radius);
+        PredictionMap::GetJunctions({x, y}, FLAGS_junction_search_radius);
     if (!junctions.empty() && junctions.front() != nullptr) {
       junction_info = junctions.front();
     }
@@ -165,7 +163,7 @@ bool ADCTrajectoryContainer::HasOverlap(const LaneSequence& lane_sequence) {
 
 void ADCTrajectoryContainer::SetPosition(const Vec2d& position) {
   for (auto it = adc_lane_seq_.begin(); it != adc_lane_seq_.end(); ++it) {
-    auto lane_info = PredictionMap::instance()->LaneById(*it);
+    auto lane_info = PredictionMap::LaneById(*it);
     if (lane_info != nullptr && lane_info->IsOnLane(position)) {
       adc_lane_ids_.clear();
       adc_lane_ids_.insert(it, adc_lane_seq_.end());

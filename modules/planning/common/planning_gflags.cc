@@ -202,6 +202,10 @@ DEFINE_double(stop_distance_destination, 0.5,
               "stop distance from destination line");
 DEFINE_double(stop_distance_traffic_light, 3.0,
               "stop distance from traffic light line");
+DEFINE_double(stop_distance_crosswalk, 3.0,
+              "stop distance from stop line of crosswalk");
+DEFINE_double(stop_distance_stop_sign, 3.0,
+              "stop distance from stop line of stop sign");
 DEFINE_double(destination_check_distance, 5.0,
               "if the distance between destination and ADC is less than this,"
               " it is considered to reach destination");

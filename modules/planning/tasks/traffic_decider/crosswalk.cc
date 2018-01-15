@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-
+#include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -37,6 +37,7 @@ namespace planning {
 using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
+using apollo::common::util::WithinBound;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::PerceptionObstacle;
 
@@ -167,7 +168,7 @@ void Crosswalk::MakeDecisions(Frame* frame,
       double stop_deceleration =
           GetStopDeceleration(reference_line_info, crosswalk_overlap);
       if (stop_deceleration < FLAGS_stop_max_deceleration) {
-        CreateStopObstacle(frame, reference_line_info, crosswalk_overlap);
+        BuildStopDecision(frame, reference_line_info, crosswalk_overlap);
       }
     }
   }
@@ -206,40 +207,55 @@ double Crosswalk::GetStopDeceleration(
   return (adc_speed * adc_speed) / (2 * stop_distance);
 }
 
-void Crosswalk::CreateStopObstacle(
-    Frame* frame, ReferenceLineInfo* const reference_line_info,
+bool Crosswalk::BuildStopDecision(
+    Frame* frame,
+    ReferenceLineInfo* const reference_line_info,
     const hdmap::PathOverlap* crosswalk_overlap) {
-  common::SLPoint sl_point;
-  sl_point.set_s(crosswalk_overlap->start_s);
-  sl_point.set_l(0);
-  Vec2d vec2d;
-  if (reference_line_info->reference_line().SLToXY(sl_point, &vec2d)) {
-    AERROR << "Fail to create stop obstacle because SL to XY failed.";
-    return;
+  // check
+  const auto& reference_line = reference_line_info->reference_line();
+  if (!WithinBound(0.0, reference_line.Length(), crosswalk_overlap->start_s)) {
+    ADEBUG << "crosswalk " << crosswalk_overlap->object_id
+           << " is not on reference line";
+    return true;
   }
 
-  double heading = reference_line_info->reference_line()
-                       .GetReferencePoint(crosswalk_overlap->start_s)
-                       .heading();
-  double left_width = 0.0;
-  double right_width = 0.0;
-  reference_line_info->reference_line().GetLaneWidth(crosswalk_overlap->start_s,
-                                                     &left_width, &right_width);
-  Box2d stop_wall_box{{vec2d.x(), vec2d.y()},
-                      heading,
-                      FLAGS_virtual_stop_wall_length,
-                      left_width + right_width};
-
+  // create virtual stop wall
   std::string virtual_object_id =
       FLAGS_crosswalk_virtual_object_id_prefix + crosswalk_overlap->object_id;
-  PathObstacle* stop_wall = reference_line_info->AddObstacle(
-      frame->AddStaticVirtualObstacle(virtual_object_id, stop_wall_box));
+  auto* obstacle = frame->AddVirtualStopObstacle(
+      reference_line_info,
+      virtual_object_id,
+      crosswalk_overlap->start_s);
+  if (!obstacle) {
+    AERROR << "Failed to create obstacle " << virtual_object_id << " in frame";
+    return false;
+  }
+  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  if (!stop_wall) {
+    AERROR << "Failed to create path_obstacle for " << virtual_object_id;
+    return false;
+  }
+
+  // build stop decision
+  const double stop_s =
+      crosswalk_overlap->start_s - FLAGS_stop_distance_crosswalk;
+  auto stop_point = reference_line.GetReferencePoint(stop_s);
+  double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
+
+  ObjectDecisionType stop;
+  auto stop_decision = stop.mutable_stop();
+  stop_decision->set_reason_code(StopReasonCode::STOP_REASON_CROSSWALK);
+  stop_decision->set_distance_s(-FLAGS_stop_distance_crosswalk);
+  stop_decision->set_stop_heading(stop_heading);
+  stop_decision->mutable_stop_point()->set_x(stop_point.x());
+  stop_decision->mutable_stop_point()->set_y(stop_point.y());
+  stop_decision->mutable_stop_point()->set_z(0.0);
 
   auto* path_decision = reference_line_info->path_decision();
-  ObjectDecisionType stop;
-  stop.mutable_stop();
   path_decision->AddLongitudinalDecision(
       RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+
+  return true;
 }
 
 }  // namespace planning

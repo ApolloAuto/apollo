@@ -82,17 +82,8 @@ function addLaneMesh(laneType, points) {
 function addLane(lane, coordinates, scene) {
     const drewObjects = [];
 
-    const centralLine = lane.centralCurve.segment;
-    centralLine.forEach(segment => {
-        const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
-        const centerLine = drawSegmentsFromPoints(
-            points, colorMapping.GREEN, 1, 1, false);
-        scene.add(centerLine);
-        drewObjects.push(centerLine);
-    });
-
-    // TODO: this is a temp. fix for repeated boundary types.
     if(!lane.rightBoundary.virtual) {
+        // TODO: this is a temp. fix for repeated boundary types.
         const rightLaneType = lane.rightBoundary.boundaryType[0].types[0];
         lane.rightBoundary.curve.segment.forEach((segment, index) => {
             const points = coordinates.applyOffsetToArray(segment.lineSegment.point);

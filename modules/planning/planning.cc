@@ -339,6 +339,7 @@ void Planning::RunOnce() {
 
 void Planning::Stop() {
   AERROR << "Planning Stop is called";
+  PlanningThreadPool::instance()->Stop();
   ReferenceLineProvider::instance()->Stop();
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
