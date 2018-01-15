@@ -679,6 +679,56 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
   return 0;
 }
 
+/**
+* @brief get all lanes that may be associated with the same stop sign 
+* @param id id of stop sign
+* @param lanes all lanes match conditions
+* @return 0:success, otherwise failed
+*/
+int HDMapImpl::GetStopSignMaybeAssociateLanes(
+             const Id& id,
+             std::vector<LaneInfoConstPtr>* lanes) const {
+    CHECK_NOTNULL(lanes);
+
+    const auto& stop_sign = GetStopSignById(id);
+    if (stop_sign == nullptr) {
+      return -1;
+    }
+
+    std::vector<Id> maybe_associate_stop_sign_ids;
+    const auto junction_ids = stop_sign->OverlapJunctionIds();
+    for (const auto& junction_id : junction_ids) {
+      const auto& junction = GetJunctionById(junction_id);
+      if (junction == nullptr) {
+        continue;
+      }
+      const auto stop_sign_ids = junction->OverlapStopSignIds();
+      std::copy(stop_sign_ids.begin(), stop_sign_ids.end(),
+        std::back_inserter(maybe_associate_stop_sign_ids));
+    }
+
+    std::vector<Id> maybe_associate_lane_ids;
+    for (const auto& stop_sign_id : maybe_associate_stop_sign_ids) {
+      const auto& stop_sign = GetStopSignById(stop_sign_id);
+      if (stop_sign == nullptr) {
+        continue;
+      }
+      const auto lane_ids = stop_sign->OverlapLaneIds();
+      std::copy(lane_ids.begin(), lane_ids.end(),
+        std::back_inserter(maybe_associate_lane_ids));
+    }
+
+    for (const auto lane_id : maybe_associate_lane_ids) {
+      const auto& lane = GetLaneById(lane_id);
+      if (lane == nullptr) {
+        continue;
+      }
+      lanes->push_back(lane);
+    }
+
+    return 0;
+}
+
 template <class Table, class BoxTable, class KDTree>
 void HDMapImpl::BuildSegmentKDTree(const Table& table,
                                    const AABoxKDTreeParams& params,
