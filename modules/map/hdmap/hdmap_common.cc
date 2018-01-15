@@ -50,13 +50,13 @@ const double kMaxYCoordinate = 10000000;
 const double kMinYCoordinate = 0;
 
 bool IsPointValid(const PointENU& point) {
-  if (point.x() > kMaxXCoordinate || point.x() < kMinXCoordinate) {
+  /* if (point.x() > kMaxXCoordinate || point.x() < kMinXCoordinate) {
     return false;
   }
 
   if (point.y() > kMaxYCoordinate || point.y() < kMinYCoordinate) {
     return false;
-  }
+  } */
 
   return true;
 }
@@ -491,6 +491,34 @@ JunctionInfo::JunctionInfo(const Junction &junction) : junction_(junction) {
 void JunctionInfo::Init() {
   polygon_ = ConvertToPolygon2d(junction_.polygon());
   CHECK_GT(polygon_.num_points(), 2);
+
+  for (const auto &overlap_id : junction_.overlap_id()) {
+    overlap_ids_.emplace_back(overlap_id);
+  }
+}
+
+void JunctionInfo::PostProcess(const HDMapImpl &map_instance) {
+  UpdateOverlaps(map_instance);
+}
+
+void JunctionInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
+  for (const auto &overlap_id : overlap_ids_) {
+    const auto &overlap_ptr = map_instance.GetOverlapById(overlap_id);
+    if (overlap_ptr == nullptr) {
+      continue;
+    }
+
+    for (const auto &object : overlap_ptr->overlap().object()) {
+      const auto &object_id = object.id().id();
+      if (object_id == id().id()) {
+        continue;
+      }
+
+      if (object.has_stop_sign_overlap_info()) {
+        overlap_stop_sign_ids_.push_back(object.id());
+      }
+    }
+  }
 }
 
 SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) { Init(); }
@@ -527,6 +555,36 @@ void StopSignInfo::init() {
     SegmentsFromCurve(stop_line, &segments_);
   }
   CHECK(!segments_.empty());
+
+  for (const auto &overlap_id : stop_sign_.overlap_id()) {
+    overlap_ids_.emplace_back(overlap_id);
+  }
+}
+
+void StopSignInfo::PostProcess(const HDMapImpl &map_instance) {
+  UpdateOverlaps(map_instance);
+}
+
+void StopSignInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
+  for (const auto &overlap_id : overlap_ids_) {
+    const auto &overlap_ptr = map_instance.GetOverlapById(overlap_id);
+    if (overlap_ptr == nullptr) {
+      continue;
+    }
+
+    for (const auto &object : overlap_ptr->overlap().object()) {
+      const auto &object_id = object.id().id();
+      if (object_id == id().id()) {
+        continue;
+      }
+
+      if (object.has_junction_overlap_info()) {
+          overlap_junction_ids_.push_back(object.id());
+      } else if (object.has_lane_overlap_info()) {
+          overlap_lane_ids_.push_back(object.id());
+      }
+    }
+  }
 }
 
 YieldSignInfo::YieldSignInfo(const YieldSign &yield_sign)
@@ -566,7 +624,7 @@ void SpeedBumpInfo::Init() {
 
 OverlapInfo::OverlapInfo(const Overlap &overlap) : overlap_(overlap) {}
 
-const ObjectOverlapInfo *OverlapInfo::get_object_overlap_info(
+const ObjectOverlapInfo *OverlapInfo::GetObjectOverlapInfo(
     const Id &id) const {
   for (const auto &object : overlap_.object()) {
     if (object.id().id() == id.id()) {
