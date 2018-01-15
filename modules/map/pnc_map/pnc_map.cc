@@ -101,9 +101,23 @@ LaneWaypoint PncMap::ToLaneWaypoint(
   }
 }
 
-void PncMap::UpdateNextRoutingWaypointIndex(const std::vector<int> &cur_index) {
-  if (cur_index.size() != 3) {
+LaneSegment PncMap::ToLaneSegment(const routing::LaneSegment &segment) const {
+  auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(segment.id()));
+  if (lane) {
+    return LaneSegment(lane, segment.start_s(), segment.end_s());
+  } else {
+    AERROR << "Invalid waypoint lane id: " << segment.id();
+    return LaneSegment();
+  }
+}
+
+void PncMap::UpdateNextRoutingWaypointIndex(int cur_index) {
+  if (cur_index < 0) {
     next_routing_waypoint_index_ = 0;
+    return;
+  }
+  if (cur_index >= static_cast<int>(route_indices_.size())) {
+    next_routing_waypoint_index_ = routing_waypoint_index_.size() - 1;
     return;
   }
   // search backwards when the car is driven backward on the route.
@@ -135,7 +149,7 @@ void PncMap::UpdateNextRoutingWaypointIndex(const std::vector<int> &cur_index) {
     ++next_routing_waypoint_index_;
   }
   if (next_routing_waypoint_index_ >= routing_waypoint_index_.size()) {
-    next_routing_waypoint_index_ = 0;
+    next_routing_waypoint_index_ = routing_waypoint_index_.size() - 1;
   }
 }
 
@@ -156,7 +170,7 @@ bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
               FLAGS_replan_longitudinal_distance_threshold) {
     // position is reset, but not replan
     next_routing_waypoint_index_ = 0;
-    route_index_.clear();
+    adc_route_index_ = -1;
     stop_for_destination_ = false;
   }
 
@@ -167,20 +181,21 @@ bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
            << vehicle_state.z() << ")";
     return false;
   }
-  auto route_index = GetWaypointIndex(adc_waypoint_);
-  if (route_index.size() != 3) {
+  int route_index = GetWaypointIndex(adc_waypoint_);
+  if (route_index < 0 ||
+      route_index >= static_cast<int>(route_indices_.size())) {
     AERROR << "Could not find waypoint " << adc_waypoint_.DebugString();
     return false;
   }
 
   // track how many routing request waypoints the adc have passed.
   UpdateNextRoutingWaypointIndex(route_index);
-  route_index_ = route_index;
+  adc_route_index_ = route_index;
 
-  auto last_indices = GetWaypointIndex(routing_waypoint_index_.back().waypoint);
+  int last_index = GetWaypointIndex(routing_waypoint_index_.back().waypoint);
   if (next_routing_waypoint_index_ == routing_waypoint_index_.size() - 1 ||
       (!stop_for_destination_ &&
-       last_indices == routing_waypoint_index_.back().index)) {
+       last_index == routing_waypoint_index_.back().index)) {
     stop_for_destination_ = true;
   }
   return true;
@@ -212,16 +227,7 @@ bool PncMap::IsNewRouting(const routing::RoutingResponse &prev,
 
 bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
   routing_lane_ids_.clear();
-  for (const auto &road : routing.road()) {
-    for (const auto &passage : road.passage()) {
-      for (const auto &lane : passage.segment()) {
-        routing_lane_ids_.insert(lane.id());
-      }
-    }
-  }
-  routing_waypoint_index_.clear();
-  int i = 0;
-  const auto &request_waypoints = routing.routing_request().waypoint();
+  route_indices_.clear();
   for (int road_index = 0; road_index < routing.road_size(); ++road_index) {
     const auto &road_segment = routing.road(road_index);
     for (int passage_index = 0; passage_index < road_segment.passage_size();
@@ -229,29 +235,32 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       const auto &passage = road_segment.passage(passage_index);
       for (int lane_index = 0; lane_index < passage.segment_size();
            ++lane_index) {
-        while (i < request_waypoints.size() &&
-               RouteSegments::WithinLaneSegment(passage.segment(lane_index),
-                                                request_waypoints.Get(i))) {
-          routing_waypoint_index_.emplace_back(
-              ToLaneWaypoint(request_waypoints.Get(i)),
-              std::vector<int>{road_index, passage_index, lane_index});
-          if (!routing_waypoint_index_.back().waypoint.lane) {
-            routing_lane_ids_.clear();
-            routing_waypoint_index_.clear();
-            AERROR << "Invalid waypoint in routing request: "
-                   << request_waypoints.Get(i).ShortDebugString();
-            return false;
-          }
-          ++i;
-        }
+        routing_lane_ids_.insert(passage.segment(lane_index).id());
+        route_indices_.emplace_back();
+        route_indices_.back().segment =
+            ToLaneSegment(passage.segment(lane_index));
+        route_indices_.back().index = {road_index, passage_index, lane_index};
       }
     }
   }
 
+  routing_waypoint_index_.clear();
+  int i = 0;
+  const auto &request_waypoints = routing.routing_request().waypoint();
+  for (std::size_t j = 0; j < route_indices_.size(); ++j) {
+    while (i < request_waypoints.size() &&
+           RouteSegments::WithinLaneSegment(route_indices_[j].segment,
+                                            request_waypoints.Get(i))) {
+      routing_waypoint_index_.emplace_back(
+          LaneWaypoint(route_indices_[j].segment.lane,
+                       request_waypoints.Get(i).s()),
+          j);
+      ++i;
+    }
+  }
   next_routing_waypoint_index_ = 0;
-
   routing_ = routing;
-  route_index_.clear();
+  adc_route_index_ = -1;
   adc_waypoint_ = LaneWaypoint();
   stop_for_destination_ = false;
   return true;
@@ -281,119 +290,58 @@ bool PncMap::ValidateRouting(const RoutingResponse &routing) {
   return true;
 }
 
-std::vector<int> PncMap::SearchForwardWaypointIndex(
-    const std::vector<int> &start, const LaneWaypoint &waypoint) const {
-  if (start.size() != 3) {
-    AERROR << "the provided start index is empty";
-    return std::vector<int>();
+int PncMap::SearchForwardWaypointIndex(int start,
+                                       const LaneWaypoint &waypoint) const {
+  int i = std::max(start, 0);
+  while (
+      i < static_cast<int>(route_indices_.size()) &&
+      !RouteSegments::WithinLaneSegment(route_indices_[i].segment, waypoint)) {
+    ++i;
   }
-  for (int road_index = start[0]; road_index < routing_.road_size();
-       ++road_index) {
-    const auto &road_segment = routing_.road(road_index);
-    for (int passage_index = (road_index == start[0] ? start[1] : 0);
-         passage_index < road_segment.passage_size(); ++passage_index) {
-      const auto &passage = road_segment.passage(passage_index);
-      for (int lane_index =
-               (road_index == start[0] && passage_index == start[1] ? start[2]
-                                                                    : 0);
-           lane_index < passage.segment_size(); ++lane_index) {
-        if (RouteSegments::WithinLaneSegment(passage.segment(lane_index),
-                                             waypoint)) {
-          return {road_index, passage_index, lane_index};
-        }
-      }
-    }
-  }
-  return std::vector<int>();
+  return i;
 }
 
-std::vector<int> PncMap::SearchBackwardWaypointIndex(
-    const std::vector<int> &start, const LaneWaypoint &waypoint) const {
-  if (start.size() != 3) {
-    AERROR << "the provided start index is empty";
-    return std::vector<int>();
+int PncMap::SearchBackwardWaypointIndex(int start,
+                                        const LaneWaypoint &waypoint) const {
+  int i = std::min(static_cast<int>(route_indices_.size() - 1), start);
+  while (
+      i >= 0 &&
+      !RouteSegments::WithinLaneSegment(route_indices_[i].segment, waypoint)) {
+    --i;
   }
-  for (int road_index = start[0]; road_index >= 0; --road_index) {
-    const auto &road_segment = routing_.road(road_index);
-    for (int passage_index =
-             (road_index == start[0] ? start[1]
-                                     : road_segment.passage_size() - 1);
-         passage_index >= 0; --passage_index) {
-      const auto &passage = road_segment.passage(passage_index);
-      for (int lane_index = (road_index == start[0] && passage_index == start[1]
-                                 ? start[2]
-                                 : passage.segment_size() - 1);
-           lane_index >= 0; --lane_index) {
-        if (RouteSegments::WithinLaneSegment(passage.segment(lane_index),
-                                             waypoint)) {
-          return {road_index, passage_index, lane_index};
-        }
-      }
-    }
-  }
-  return std::vector<int>();
+  return i;
 }
 
-std::vector<int> PncMap::NextWaypointIndex(
-    const std::vector<int> &index) const {
-  if (index.size() != 3) {
-    AERROR << "Invalid index";
-    return index;
-  }
-  std::vector<int> last{
-      routing_.road_size() - 1, routing_.road().rbegin()->passage_size() - 1,
-      routing_.road().rbegin()->passage().rbegin()->segment_size() - 1};
-  if (index >= last) {
-    return last;
-  }
-  std::vector<int> first{0, 0, 0};
-  if (index < first) {
-    return first;
-  }
-  int road = index[0];
-  int passage = index[1];
-  int lane = index[2];
-  if (lane + 1 < routing_.road(road).passage(passage).segment_size()) {
-    return {road, passage, lane + 1};
+int PncMap::NextWaypointIndex(int index) const {
+  if (index >= static_cast<int>(route_indices_.size() - 1)) {
+    return route_indices_.size() - 1;
+  } else if (index < 0) {
+    return 0;
   } else {
-    lane = 0;
-    if (passage + 1 < routing_.road(road).passage_size()) {
-      return {road, passage + 1, 0};
-    } else {
-      return {road + 1, 0, 0};
-    }
+    return index + 1;
   }
 }
 
-std::vector<int> PncMap::GetWaypointIndex(const LaneWaypoint &waypoint) const {
-  if (route_index_.size() == 3) {
-    // search forward
-    std::vector<int> forward_index =
-        SearchForwardWaypointIndex(route_index_, waypoint);
-    if (forward_index.size() != 3) {
-      return SearchBackwardWaypointIndex(route_index_, waypoint);
-    } else {
-      if (forward_index == route_index_) {
-        return forward_index;
-      }
-      auto backward_index = SearchBackwardWaypointIndex(route_index_, waypoint);
-      if (backward_index.size() != 3) {
-        return forward_index;
-      }
-      // find forward index is closer or backward index is closer
-      if (NextWaypointIndex(route_index_) == forward_index) {
-        return forward_index;
-      } else if (NextWaypointIndex(backward_index) == route_index_) {
-        return backward_index;
-      } else {
-        return forward_index;
-      }
-    }
+int PncMap::GetWaypointIndex(const LaneWaypoint &waypoint) const {
+  int forward_index = SearchForwardWaypointIndex(adc_route_index_, waypoint);
+  if (forward_index >= static_cast<int>(route_indices_.size())) {
+    return SearchBackwardWaypointIndex(adc_route_index_, waypoint);
   } else {
-    // if not found following history route_index_, search forward
-    return SearchForwardWaypointIndex({0, 0, 0}, waypoint);
+    if (forward_index == adc_route_index_ ||
+        forward_index == adc_route_index_ + 1) {
+      return forward_index;
+    }
+    auto backward_index =
+        SearchBackwardWaypointIndex(adc_route_index_, waypoint);
+    if (backward_index < 0) {
+      return forward_index;
+    }
+    if (backward_index + 1 == adc_route_index_) {
+      return backward_index;
+    } else {
+      return forward_index;
+    }
   }
-  return std::vector<int>();
 }
 
 bool PncMap::PassageToSegments(routing::Passage passage,
@@ -479,12 +427,14 @@ bool PncMap::GetRouteSegments(const VehicleState &vehicle_state,
   }
   // vehicle has to be this close to lane center before considering change
   // lane
-  if (!adc_waypoint_.lane || route_index_.size() != 3) {
+  if (!adc_waypoint_.lane || adc_route_index_ < 0 ||
+      adc_route_index_ >= static_cast<int>(route_indices_.size())) {
     AERROR << "Invalid vehicle state in pnc_map, update vehicle state first";
     return false;
   }
-  const int road_index = route_index_[0];
-  const int passage_index = route_index_[1];
+  const auto &route_index = route_indices_[adc_route_index_].index;
+  const int road_index = route_index[0];
+  const int passage_index = route_index[1];
   const auto &road = routing_.road(road_index);
   // raw filter to find all neighboring passages
   auto drive_passages = GetNeighborPassages(road, passage_index);
