@@ -59,4 +59,20 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "sunnyvale_big_loop_test",
+    size = "small",
+    srcs = [
+        "sunnyvale_big_loop_test.cc",
+    ],
+    data = [
+        "//modules/common/configs:config_gflags",
+        "//modules/map:map_data",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":planning_test_base",
+    ],
+)
+
 cpplint()
