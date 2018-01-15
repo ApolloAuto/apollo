@@ -42,7 +42,7 @@ namespace {
 
 const double kSampleDistance = 0.25;
 
-bool find_lane_segment(const MapPathPoint& p1, const MapPathPoint& p2,
+bool FindLaneSegment(const MapPathPoint& p1, const MapPathPoint& p2,
                        LaneSegment* const lane_segment) {
   for (const auto& wp1 : p1.lane_waypoints()) {
     for (const auto& wp2 : p2.lane_waypoints()) {
@@ -265,7 +265,7 @@ void Path::InitLaneSegments() {
     lane_segments_.reserve(num_points_);
     for (int i = 0; i + 1 < num_points_; ++i) {
       LaneSegment lane_segment;
-      if (find_lane_segment(path_points_[i], path_points_[i + 1],
+      if (FindLaneSegment(path_points_[i], path_points_[i + 1],
                             &lane_segment)) {
         lane_segments_.push_back(lane_segment);
       }
@@ -276,7 +276,7 @@ void Path::InitLaneSegments() {
   lane_segments_to_next_point_.reserve(num_points_);
   for (int i = 0; i + 1 < num_points_; ++i) {
     LaneSegment lane_segment;
-    if (find_lane_segment(path_points_[i], path_points_[i + 1],
+    if (FindLaneSegment(path_points_[i], path_points_[i + 1],
                           &lane_segment)) {
       lane_segments_to_next_point_.push_back(lane_segment);
     } else {
@@ -330,7 +330,7 @@ void Path::InitPointIndex() {
   CHECK_EQ(last_point_index_.size(), num_sample_points_);
 }
 
-void Path::GetAllOverlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
+void Path::GetAllOverlaps(GetOverlapFromLaneFunc GetOverlaps_from_lane,
                           std::vector<PathOverlap>* const overlaps) const {
   if (overlaps == nullptr) {
     return;
@@ -343,7 +343,7 @@ void Path::GetAllOverlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
     if (lane_segment.lane == nullptr) {
       continue;
     }
-    for (const auto& overlap : get_overlaps_from_lane(*(lane_segment.lane))) {
+    for (const auto& overlap : GetOverlaps_from_lane(*(lane_segment.lane))) {
       const auto& overlap_info =
           overlap->GetObjectOverlapInfo(lane_segment.lane->id());
       if (overlap_info == nullptr) {
