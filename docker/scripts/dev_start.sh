@@ -17,6 +17,7 @@
 ###############################################################################
 
 INCHINA="no"
+LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
 VERSION_X86_64="dev-x86_64-20180103_1300"
@@ -31,6 +32,7 @@ OPTIONS:
     -C  pull docker image from China mirror
     -h, --help   display this help and exit
     -image <version>    specify which version of a docker image to pull
+    -l   use local docker image
 EOF
 exit 0
 }
@@ -57,6 +59,9 @@ do
         ;;
     -h|--help)
         show_usage
+        ;;
+    -l|--local)
+        LOCAL_IMAGE="yes"
         ;;
     *)
         echo -e "\033[93mWarning\033[0m: Unknown option: $1"
@@ -98,11 +103,15 @@ source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
 function main(){
 
-    info "Start pulling docker image $IMG ..."
-    docker pull $IMG
-    if [ $? -ne 0 ];then
-        error "Failed to pull docker image."
-        exit 1
+    if [ "$LOCAL_IMAGE" = "yes" ];then
+        info "Start docker container based on local image : $IMG"
+    else
+        info "Start pulling docker image $IMG ..."
+        docker pull $IMG
+        if [ $? -ne 0 ];then
+            error "Failed to pull docker image."
+            exit 1
+        fi
     fi
 
     docker ps -a --format "{{.Names}}" | grep 'apollo_dev' 1>/dev/null
