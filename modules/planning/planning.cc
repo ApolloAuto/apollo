@@ -376,7 +376,7 @@ Status Planning::Plan(const double current_time_stamp,
         stitching_trajectory.back());
   }
   auto status = Status::OK();
-  if (not FLAGS_enable_lattice_change_lane_decider) {
+  if (!FLAGS_enable_lattice_change_lane_decider) {
     bool has_plan = false;
     auto it = std::find_if(
         frame_->reference_line_info().begin(),
@@ -411,7 +411,7 @@ Status Planning::Plan(const double current_time_stamp,
       it->SetPriorityCost(position_cost);
       position_cost += 100.0;
       auto status_per_line = planner_->Plan(stitching_trajectory.back(),
-        frame_.get(), &(*it)); // Set Cost in Lattice Planner
+        frame_.get(), &(*it));  // Set Cost in Lattice Planner
     }
   }
 
