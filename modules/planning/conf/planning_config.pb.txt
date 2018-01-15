@@ -205,3 +205,9 @@ rule_config : {
 rule_config : {
     rule_id: CHANGE_LANE
 }
+rule_config : {
+    rule_id: CROSSWALK
+}
+rule_config : {
+    rule_id: STOP_SIGN
+}

@@ -95,14 +95,15 @@ void StopSign::MakeDecisions(
     }
 
     if (stop_status_ == StopSignStopStatus::TO_STOP) {
-      // add to watch_vehicles if adc is still procedding
+      // add to watch_vehicles if adc is still proceeding to stop sign
       AddWatchVehicle(*path_obstacle, &watch_vehicles);
     } else if (stop_status_ == StopSignStopStatus::STOPPING ||
         stop_status_ == StopSignStopStatus::STOP_DONE) {
-      // remove from watch_vehicles if adc is waiting at stop sign
+      // remove from watch_vehicles if adc is stopping/waiting at stop sign
       RemoveWatchVehicle(*path_obstacle, &watch_vehicles);
     }
   }
+
 
   std::string stop_sign_id = next_stop_sign_->id().id();
   if (stop_status_ == StopSignStopStatus::STOP_DONE &&
@@ -520,6 +521,7 @@ bool StopSign::BuildStopDecision(
     Frame* frame,
     ReferenceLineInfo* const reference_line_info,
     const hdmap::PathOverlap* stop_sign_overlap) {
+
   // check
   const auto& reference_line = reference_line_info->reference_line();
   if (!WithinBound(0.0, reference_line.Length(), stop_sign_overlap->start_s)) {
@@ -547,7 +549,7 @@ bool StopSign::BuildStopDecision(
 
   // build stop decision
   const double stop_s =
-      stop_sign_overlap->start_s - FLAGS_stop_distance_crosswalk;
+      stop_sign_overlap->start_s - FLAGS_stop_distance_stop_sign;
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
