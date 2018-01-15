@@ -345,7 +345,7 @@ void Path::GetAllOverlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
     }
     for (const auto& overlap : get_overlaps_from_lane(*(lane_segment.lane))) {
       const auto& overlap_info =
-          overlap->get_object_overlap_info(lane_segment.lane->id());
+          overlap->GetObjectOverlapInfo(lane_segment.lane->id());
       if (overlap_info == nullptr) {
         continue;
       }

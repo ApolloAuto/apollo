@@ -154,5 +154,12 @@ int HDMap::GetForwardNearestSignalsOnLane(
   return impl_.GetForwardNearestSignalsOnLane(point, distance, signals);
 }
 
+int HDMap::GetStopSignMaybeAssociateLanes(
+             const Id& id,
+             std::vector<LaneInfoConstPtr>* lanes) const {
+  return impl_.GetStopSignMaybeAssociateLanes(id, lanes);
+}
+
+
 }  // namespace hdmap
 }  // namespace apollo

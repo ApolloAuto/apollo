@@ -239,6 +239,16 @@ class HDMapImpl {
              const double distance,
              std::vector<SignalInfoConstPtr>* signals) const;
 
+  /**
+   * @brief get all lanes that may be associated with the same stop sign 
+   * @param id id of stop sign
+   * @param lanes all lanes match conditions
+   * @return 0:success, otherwise failed
+   */
+  int GetStopSignMaybeAssociateLanes(
+             const Id& id,
+             std::vector<LaneInfoConstPtr>* lanes) const;
+
  private:
   int GetLanes(const apollo::common::math::Vec2d& point, double distance,
                std::vector<LaneInfoConstPtr>* lanes) const;
