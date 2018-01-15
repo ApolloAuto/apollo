@@ -34,7 +34,7 @@ cc_library(
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/lattice/util:lattice_trajectory1d",
-        "//modules/planning/lattice/trajectory1d_generator:end_condition_sampler",
+        "//modules/planning/lattice/trajectory_generator:end_condition_sampler",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/proto:lattice_structure_proto",
     ],

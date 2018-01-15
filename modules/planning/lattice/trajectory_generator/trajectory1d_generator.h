@@ -18,14 +18,14 @@
  * @file trajectory1d_generator.h
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY1D_GENERATOR_TRAJECTORY1D_GENERATOR_H_
-#define MODULES_PLANNING_LATTICE_TRAJECTORY1D_GENERATOR_TRAJECTORY1D_GENERATOR_H_
+#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_TRAJECTORY1D_GENERATOR_H_
+#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_TRAJECTORY1D_GENERATOR_H_
 
 #include <memory>
 #include <vector>
 
 #include "modules/planning/math/curve1d/curve1d.h"
-#include "modules/planning/lattice/trajectory1d_generator/end_condition_sampler.h"
+#include "modules/planning/lattice/trajectory_generator/end_condition_sampler.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 
 namespace apollo {
@@ -55,14 +55,13 @@ class Trajectory1dGenerator {
   void GenerateLateralTrajectoryBundle(
       std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) const;
 
+ private:
   EndConditionSampler* end_condition_sampler_;
-
   std::array<double, 3> init_lon_state_;
-
   std::array<double, 3> init_lat_state_;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_TRAJECTORY1D_GENERATOR_TRAJECTORY1D_GENERATOR_H_
+#endif  // PLANNING_LATTICE_TRAJECTORY_GENERATOR_TRAJECTORY1D_GENERATOR_H_
