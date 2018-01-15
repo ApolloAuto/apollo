@@ -18,6 +18,7 @@
 #define MODULES_PLANNING_LATTICE_UTIL_LATTICE_TRAJECTORY1D_H_
 
 #include <memory>
+#include <string>
 
 #include "modules/planning/math/curve1d/curve1d.h"
 
@@ -26,7 +27,7 @@ namespace planning {
 
 class LatticeTrajectory1d : public Curve1d {
  public:
-  LatticeTrajectory1d(std::shared_ptr<Curve1d> ptr_trajectory1d);
+  explicit LatticeTrajectory1d(std::shared_ptr<Curve1d> ptr_trajectory1d);
 
   virtual ~LatticeTrajectory1d() = default;
 

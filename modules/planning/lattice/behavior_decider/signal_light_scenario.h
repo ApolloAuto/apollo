@@ -10,6 +10,10 @@
 #ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SIGNAL_LIGHT_SCENARIO_H_
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SIGNAL_LIGHT_SCENARIO_H_
 
+#include <unordered_map>
+#include <string>
+#include <vector>
+
 #include "modules/planning/lattice/behavior_decider/scenario.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 
@@ -18,11 +22,11 @@ namespace planning {
 
 class SignalLightScenario : public Scenario {
  public:
-  virtual void Reset() override;
+  void Reset() override;
 
-  virtual bool Init() override;
+  bool Init() override;
 
-  virtual bool ScenarioExist() const override { return exist_; }
+  bool ScenarioExist() const override { return exist_; }
 
   virtual int ComputeScenarioDecision(
       Frame* frame, ReferenceLineInfo* const reference_line_info,

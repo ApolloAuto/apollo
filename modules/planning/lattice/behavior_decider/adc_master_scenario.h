@@ -17,11 +17,11 @@ namespace planning {
 
 class AdcMasterScenario : public Scenario {
  public:
-  virtual void Reset() override;
+  void Reset() override;
 
-  virtual bool Init() override;
+  bool Init() override;
 
-  virtual bool ScenarioExist() const override { return exist_; }
+  bool ScenarioExist() const override { return exist_; }
 
   virtual int ComputeScenarioDecision(
       Frame* frame, ReferenceLineInfo* const reference_line_info,

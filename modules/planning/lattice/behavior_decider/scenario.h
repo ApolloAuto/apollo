@@ -32,7 +32,7 @@
 
 #define DECLARE_SCENARIO(WORLD)                        \
  public:                                               \
-  WORLD() : Scenario(#WORLD){};                        \
+  WORLD() : Scenario(#WORLD) {}                        \
   static std::string ScenarioName() { return #WORLD; } \
                                                        \
  private:                                              \

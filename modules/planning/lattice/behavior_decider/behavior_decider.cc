@@ -23,6 +23,8 @@
 
 #include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 
+#include <string>
+
 #include "gflags/gflags.h"
 #include "modules/planning/lattice/behavior_decider/scenario_manager.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -42,7 +44,7 @@ using apollo::common::PathPoint;
 BehaviorDecider::BehaviorDecider() {}
 
 void BehaviorDecider::UpdatePathTimeNeighborhood(
-  std::shared_ptr<PathTimeNeighborhood> p) {
+    std::shared_ptr<PathTimeNeighborhood> p) {
   path_time_neighborhood_ = p;
 }
 
@@ -68,7 +70,7 @@ PlanningTarget BehaviorDecider::Analyze(
 
   CHECK(FLAGS_default_cruise_speed <= speed_limit);
   ConditionFilter condition_filter(lon_init_state, speed_limit,
-      path_time_neighborhood_);
+                                   path_time_neighborhood_);
 
   std::vector<SampleBound> sample_bounds = condition_filter.QuerySampleBounds();
 
@@ -76,15 +78,18 @@ PlanningTarget BehaviorDecider::Analyze(
   if (FLAGS_enable_lattice_st_image_dump) {
     apollo::planning_internal::LatticeStTraining st_data;
     double timestamp = init_planning_point.relative_time();
-    std::string st_img_name =
-      "DecisionCycle_" + std::to_string(decision_cycles) + "_" + std::to_string(timestamp);
-    if (condition_filter.GenerateLatticeStPixels(&st_data,
-      timestamp, st_img_name)) {
-      AINFO << "  Created_lattice_st_image_named=" << st_img_name <<
-               "_for_timestamp=" << timestamp <<
-               " num_colored_pixels=" << st_data.pixel_size();
-      planning_internal::Debug* ptr_debug = reference_line_info->mutable_debug();
-      ptr_debug->mutable_planning_data()->mutable_lattice_st_image()->CopyFrom(st_data);
+    std::string st_img_name = "DecisionCycle_" +
+                              std::to_string(decision_cycles) + "_" +
+                              std::to_string(timestamp);
+    if (condition_filter.GenerateLatticeStPixels(&st_data, timestamp,
+                                                 st_img_name)) {
+      AINFO << "  Created_lattice_st_image_named=" << st_img_name
+            << "_for_timestamp=" << timestamp
+            << " num_colored_pixels=" << st_data.pixel_size();
+      planning_internal::Debug* ptr_debug =
+          reference_line_info->mutable_debug();
+      ptr_debug->mutable_planning_data()->mutable_lattice_st_image()->CopyFrom(
+          st_data);
     }
   }
   decision_cycles += 1;
@@ -108,4 +113,4 @@ PlanningTarget BehaviorDecider::Analyze(
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_DECISION_ANALYZER_H */
+#endif  // MODULES_PLANNING_DECISION_ANALYZER_H

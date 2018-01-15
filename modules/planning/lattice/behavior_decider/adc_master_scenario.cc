@@ -42,5 +42,6 @@ int AdcMasterScenario::ComputeScenarioDecision(
 
   return 0;
 }
-}
-}
+
+}  // namespace planning
+}  // namespace apollo

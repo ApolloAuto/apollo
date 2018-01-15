@@ -44,8 +44,7 @@ class TrajectoryEvaluator {
   // auto tuning
   typedef std::pair<
       std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>,
-      std::pair<std::vector<double>,double>>
-      PairCostWithComponents;
+      std::pair<std::vector<double>, double>> PairCostWithComponents;
 
  public:
   explicit TrajectoryEvaluator(
@@ -69,9 +68,9 @@ class TrajectoryEvaluator {
   std::vector<double> top_trajectory_pair_component_cost() const;
 
   std::vector<double> evaluate_per_lonlat_trajectory(
-    const PlanningTarget& planning_target,
-    const std::vector<apollo::common::SpeedPoint> st_points,
-    const std::vector<apollo::common::FrenetFramePoint> sl_points);
+      const PlanningTarget& planning_target,
+      const std::vector<apollo::common::SpeedPoint> st_points,
+      const std::vector<apollo::common::FrenetFramePoint> sl_points);
 
  private:
   double evaluate(const PlanningTarget& planning_target,
@@ -79,9 +78,8 @@ class TrajectoryEvaluator {
                   const std::shared_ptr<Curve1d>& lat_trajectory,
                   std::vector<double>* cost_components) const;
 
-  double compute_lat_offset_cost(
-      const std::shared_ptr<Curve1d>& lat_trajectory,
-      const std::vector<double>& s_values) const;
+  double compute_lat_offset_cost(const std::shared_ptr<Curve1d>& lat_trajectory,
+                                 const std::vector<double>& s_values) const;
 
   double compute_lon_comfort_cost(
       const std::shared_ptr<Curve1d>& lon_trajectory) const;
@@ -101,8 +99,10 @@ class TrajectoryEvaluator {
   };
 
   struct CostComponentComparator
-      : public std::binary_function<const PairCostWithComponents&, const PairCostWithComponents&, bool> {
-    bool operator()(const PairCostWithComponents& left, const PairCostWithComponents& right) const {
+      : public std::binary_function<const PairCostWithComponents&,
+                                    const PairCostWithComponents&, bool> {
+    bool operator()(const PairCostWithComponents& left,
+                    const PairCostWithComponents& right) const {
       return left.second.second > right.second.second;
     }
   };
@@ -110,9 +110,9 @@ class TrajectoryEvaluator {
   std::priority_queue<PairCost, std::vector<PairCost>, CostComparator>
       cost_queue_;
 
-  std::priority_queue<PairCostWithComponents, std::vector<PairCostWithComponents>,
-    CostComponentComparator>
-      cost_queue_with_components_;
+  std::priority_queue<PairCostWithComponents,
+                      std::vector<PairCostWithComponents>,
+                      CostComponentComparator> cost_queue_with_components_;
 
   bool is_auto_tuning_ = false;
 
@@ -122,4 +122,4 @@ class TrajectoryEvaluator {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_TRAJECTORY1D_GENERATOR_TRAJECTORY_EVALUATOR_H_
+#endif  // PLANNING_LATTICE_TRAJECTORY1D_GENERATOR_TRAJECTORY_EVALUATOR_H_

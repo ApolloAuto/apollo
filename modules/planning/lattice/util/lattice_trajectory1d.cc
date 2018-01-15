@@ -33,8 +33,8 @@ double LatticeTrajectory1d::Evaluate(const std::uint32_t order,
     return ptr_trajectory1d_->Evaluate(order, param);
   }
 
-  // do constant acceleration extrapolation; to align all the trajectories with
-  // time.
+  // do constant acceleration extrapolation;
+  // to align all the trajectories with time.
   double p = ptr_trajectory1d_->Evaluate(0, param_length);
   double v = ptr_trajectory1d_->Evaluate(1, param_length);
   double a = ptr_trajectory1d_->Evaluate(2, param_length);
@@ -101,5 +101,5 @@ void LatticeTrajectory1d::set_target_time(double target_time) {
   has_target_time_ = true;
 }
 
-} // namespace planning
-} // namespace apollo
+}  // namespace planning
+}  // namespace apollo

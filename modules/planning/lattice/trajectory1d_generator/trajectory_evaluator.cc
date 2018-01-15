@@ -36,10 +36,9 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     const std::vector<std::shared_ptr<Trajectory1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Trajectory1d>>& lat_trajectories,
     bool is_auto_tuning,
-    std::shared_ptr<PathTimeNeighborhood> pathtime_neighborhood) :
-        is_auto_tuning_(is_auto_tuning),
-        pathtime_neighborhood_(pathtime_neighborhood) {
-
+    std::shared_ptr<PathTimeNeighborhood> pathtime_neighborhood)
+    : is_auto_tuning_(is_auto_tuning),
+      pathtime_neighborhood_(pathtime_neighborhood) {
   for (const auto lon_trajectory : lon_trajectories) {
     if (!LatticeConstraintChecker::IsValidLongitudinalTrajectory(
             *lon_trajectory)) {
@@ -50,28 +49,29 @@ TrajectoryEvaluator::TrajectoryEvaluator(
               *lat_trajectory, *lon_trajectory)) {
         continue;
       }
-      if (not is_auto_tuning_) {
-        double cost = evaluate(planning_target, lon_trajectory, lat_trajectory, nullptr);
+      if (!is_auto_tuning_) {
+        double cost =
+            evaluate(planning_target, lon_trajectory, lat_trajectory, nullptr);
         cost_queue_.push(PairCost({lon_trajectory, lat_trajectory}, cost));
       } else {
         std::vector<double> cost_components;
         double cost = evaluate(planning_target, lon_trajectory, lat_trajectory,
-          &cost_components);
-        cost_queue_with_components_.push(
-          PairCostWithComponents({lon_trajectory, lat_trajectory}, {cost_components, cost}));
+                               &cost_components);
+        cost_queue_with_components_.push(PairCostWithComponents(
+            {lon_trajectory, lat_trajectory}, {cost_components, cost}));
       }
     }
   }
-  if (not is_auto_tuning_) {
+  if (!is_auto_tuning_) {
     AINFO << "Number of valid 1d trajectory pairs:\t" << cost_queue_.size();
   } else {
-    AINFO << "Number of valid 1d trajectory pairs:\t" << cost_queue_with_components_.size();
+    AINFO << "Number of valid 1d trajectory pairs:\t"
+          << cost_queue_with_components_.size();
   }
-
 }
 
 bool TrajectoryEvaluator::has_more_trajectory_pairs() const {
-  if (not is_auto_tuning_) {
+  if (!is_auto_tuning_) {
     return !cost_queue_.empty();
   } else {
     return !cost_queue_with_components_.empty();
@@ -79,7 +79,7 @@ bool TrajectoryEvaluator::has_more_trajectory_pairs() const {
 }
 
 std::size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
-  if (not is_auto_tuning_) {
+  if (!is_auto_tuning_) {
     return cost_queue_.size();
   } else {
     return cost_queue_with_components_.empty();
@@ -89,7 +89,7 @@ std::size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
 std::pair<std::shared_ptr<Trajectory1d>, std::shared_ptr<Trajectory1d>>
 TrajectoryEvaluator::next_top_trajectory_pair() {
   CHECK(has_more_trajectory_pairs() == true);
-    if (not is_auto_tuning_) {
+  if (!is_auto_tuning_) {
     auto top = cost_queue_.top();
     cost_queue_.pop();
     return top.first;
@@ -101,14 +101,15 @@ TrajectoryEvaluator::next_top_trajectory_pair() {
 }
 
 double TrajectoryEvaluator::top_trajectory_pair_cost() const {
-  if (not is_auto_tuning_) {
+  if (!is_auto_tuning_) {
     return cost_queue_.top().second;
   } else {
     return cost_queue_with_components_.top().second.second;
   }
 }
 
-std::vector<double> TrajectoryEvaluator::top_trajectory_pair_component_cost() const {
+std::vector<double> TrajectoryEvaluator::top_trajectory_pair_component_cost()
+    const {
   CHECK(is_auto_tuning_);
   return cost_queue_with_components_.top().second.first;
 }
@@ -145,11 +146,9 @@ double TrajectoryEvaluator::evaluate(
     s_values.push_back(s);
     s += trajectory_space_resolution;
   }
-  double lat_offset_cost =
-      compute_lat_offset_cost(lat_trajectory, s_values);
+  double lat_offset_cost = compute_lat_offset_cost(lat_trajectory, s_values);
 
-  double lon_obstacle_cost =
-      compute_lon_obstacle_cost(lon_trajectory);
+  double lon_obstacle_cost = compute_lon_obstacle_cost(lon_trajectory);
 
   if (cost_components) {
     cost_components->push_back(lon_travel_cost);
@@ -158,7 +157,8 @@ double TrajectoryEvaluator::evaluate(
     cost_components->push_back(lat_offset_cost);
   }
   return lon_travel_cost * weight_lon_travel + lon_jerk_cost * weight_lon_jerk +
-         lat_offset_cost * weight_lat_offset + lon_obstacle_cost * weight_lon_obstacle;
+         lat_offset_cost * weight_lat_offset +
+         lon_obstacle_cost * weight_lon_obstacle;
 }
 
 double TrajectoryEvaluator::compute_lat_offset_cost(
@@ -200,12 +200,12 @@ double TrajectoryEvaluator::compute_lon_comfort_cost(
 double TrajectoryEvaluator::compute_lon_objective_cost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory,
     const PlanningTarget& planning_target) const {
-
   double weight_dist_travelled = 10.0;
   double weight_on_reference_speed = 1.0;
   double t_max = lon_trajectory->ParamLength();
 
-  double dist_s = lon_trajectory->Evaluate(0, t_max) - lon_trajectory->Evaluate(0, 0.0);
+  double dist_s =
+      lon_trajectory->Evaluate(0, t_max) - lon_trajectory->Evaluate(0, 0.0);
 
   double cost = 0.0;
   double t = 0.0;
@@ -223,7 +223,6 @@ double TrajectoryEvaluator::compute_lon_objective_cost(
 // while constructing trajectory evaluator
 double TrajectoryEvaluator::compute_lon_obstacle_cost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory) const {
-
   double start_time = 0.0;
   double end_time = planned_trajectory_time;
   const auto& pt_intervals = pathtime_neighborhood_->GetPathBlockingIntervals(
@@ -254,7 +253,6 @@ std::vector<double> TrajectoryEvaluator::evaluate_per_lonlat_trajectory(
   std::vector<double> ret;
   return ret;
 }
-
 
 }  // namespace planning
 }  // namespace apollo

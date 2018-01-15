@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <string>
 
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/util/lattice_params.h"
@@ -78,7 +79,7 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
     }
 
     // a new interval
-    //@TODO(liyun): implement reference_v to be
+    // @TODO(liyun): implement reference_v to be
     // (1) front obstacle speed if front obstacle exists
     // (2) rear obstacle speed if no front obstacle exists and only rear
     // obstacle exists
@@ -162,7 +163,8 @@ PathTimePointPair ConditionFilter::QueryPathTimeObstacleIntervals(
 std::vector<PathTimePointPair> ConditionFilter::QueryPathTimeObstacleIntervals(
     const double t) const {
   std::vector<PathTimePointPair> path_intervals;
-  for (const auto& path_time_obstacle : ptr_path_time_neighborhood_->GetPathTimeObstacles()) {
+  for (const auto& path_time_obstacle :
+       ptr_path_time_neighborhood_->GetPathTimeObstacles()) {
     if (path_time_obstacle.time_lower() > t ||
         path_time_obstacle.time_upper() < t) {
       continue;
@@ -183,7 +185,8 @@ std::vector<PathTimePointPair> ConditionFilter::QueryPathTimeObstacleIntervals(
 
 std::set<double> ConditionFilter::CriticalTimeStamps() const {
   std::set<double> critical_timestamps;
-  for (const auto& path_time_obstacle : ptr_path_time_neighborhood_->GetPathTimeObstacles()) {
+  for (const auto& path_time_obstacle :
+       ptr_path_time_neighborhood_->GetPathTimeObstacles()) {
     double t_start = path_time_obstacle.bottom_left().t();
     double t_end = path_time_obstacle.upper_right().t();
     critical_timestamps.insert(t_start);
@@ -194,15 +197,17 @@ std::set<double> ConditionFilter::CriticalTimeStamps() const {
 
 std::vector<double> ConditionFilter::UniformTimeStamps(
     const std::size_t num_of_time_segments) const {
-  CHECK(num_of_time_segments > 0);
+  CHECK_GT(num_of_time_segments, 0);
 
   double finish_trajectory_length = 0.01;
-  CHECK(finish_trajectory_length < (1.0 / (double)FLAGS_planning_loop_rate));
+  CHECK_LT(finish_trajectory_length,
+           1.0 / static_cast<double>(FLAGS_planning_loop_rate));
 
   std::vector<double> timestamps;
   timestamps.push_back(finish_trajectory_length);
 
-  double time_interval = planned_trajectory_time / (double)num_of_time_segments;
+  double time_interval =
+      planned_trajectory_time / static_cast<double>(num_of_time_segments);
   for (std::size_t i = 1; i <= num_of_time_segments; ++i) {
     timestamps.push_back(i * time_interval);
   }
@@ -217,8 +222,8 @@ bool ConditionFilter::GenerateLatticeStPixels(
   std::string st_img_name) {
   int num_rows = 250;
   int num_cols = 160;
-  double s_step = 100.0 / (double) num_rows;
-  double t_step = 8.0 / (double) num_cols;
+  double s_step = 100.0 / static_cast<double>(num_rows);
+  double t_step = 8.0 / static_cast<double>(num_cols);
 
   if (ptr_path_time_neighborhood_->GetPathTimeObstacles().empty()) {
     AINFO << "No_Path_Time_Neighborhood_Obstacle_in_this_frame";
@@ -241,7 +246,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
         pixel->set_b(128);
         continue;
       }
-      if (WithinObstacleSt(s,t)) {
+      if (WithinObstacleSt(s, t)) {
         // Dye blue
         apollo::planning_internal::LatticeStPixel* pixel =
           st_data->add_pixel();
