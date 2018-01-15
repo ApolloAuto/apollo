@@ -20,15 +20,15 @@
 #ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
 
-#include "modules/planning/lattice/behavior_decider/scenario.h"
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/common/frame.h"
-
 #include <unordered_map>
 #include <string>
 #include <utility>
 #include <memory>
 #include <vector>
+
+#include "modules/planning/lattice/behavior_decider/scenario.h"
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/common/frame.h"
 
 namespace apollo {
 namespace planning {

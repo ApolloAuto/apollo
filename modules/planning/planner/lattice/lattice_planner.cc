@@ -87,9 +87,9 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
   current_time = Clock::NowInSeconds();
 
   // 4. parse the decision and get the planning target.
-  std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_ptr(new PathTimeNeighborhood(
-    frame->obstacles(), init_s[0],
-    discretized_reference_line));
+  std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_ptr(
+      new PathTimeNeighborhood(frame->obstacles(), init_s[0],
+                               discretized_reference_line));
 
   decider_.UpdatePathTimeNeighborhood(path_time_neighborhood_ptr);
   PlanningTarget planning_target =
@@ -182,7 +182,8 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
         discretized_reference_line, *trajectory_pair.first,
         *trajectory_pair.second, planning_init_point.relative_time());
 
-    // check longitudinal and lateral acceleration considering trajectory curvatures
+    // check longitudinal and lateral acceleration
+    // considering trajectory curvatures
     if (!LatticeConstraintChecker::IsValidTrajectory(combined_trajectory)) {
       ++combined_constraint_failure_count;
       continue;
@@ -215,16 +216,17 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
       // 2. Map future trajectory to lon-lat trajectory pair
       std::vector<apollo::common::SpeedPoint> lon_future_trajectory;
       std::vector<apollo::common::FrenetFramePoint> lat_future_trajectory;
-      if (not MapFutureTrajectoryToSL(future_trajectory,
-        &lon_future_trajectory, &lat_future_trajectory,
-        reference_line_info)) {
-        AINFO << "Auto tuning failed since no mapping from future trajectory to lon-lat";
+      if (!MapFutureTrajectoryToSL(future_trajectory,
+               &lon_future_trajectory, &lat_future_trajectory,
+               reference_line_info)) {
+        AINFO << "Auto tuning failed since no mapping "
+              << "from future trajectory to lon-lat";
         tuning_success = false;
       }
       // 3. evalutate cost
       std::vector<double> future_trajectory_component_cost =
         trajectory_evaluator.evaluate_per_lonlat_trajectory(
-          planning_target,lon_future_trajectory, lat_future_trajectory);
+          planning_target, lon_future_trajectory, lat_future_trajectory);
 
       // 4. emit
       ///////////////////////
@@ -254,7 +256,8 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
     AINFO << "       jerk_cost = " << trajectory_pair_cost_components[1];
     AINFO << "       obstacle_cost = " << trajectory_pair_cost_components[2];
     AINFO << "       lateral_cost = " << trajectory_pair_cost_components[3];
-    AINFO << "       reference_line_priority_cost = " << reference_line_info->PriorityCost();
+    AINFO << "       reference_line_priority_cost = "
+          << reference_line_info->PriorityCost();
     AINFO << "   --- Total_Trajectory_Cost = " << trajectory_pair_cost;
     ADEBUG << "   --- OutputTrajectory";
     for (uint i = 0; i < 10; ++i) {
@@ -315,9 +318,8 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
 
   double t_param = 0.0;
   while (t_param < planned_trajectory_time) {
-
     // linear extrapolation is handled internally in LatticeTrajectory1d;
-    // do not need to worry about t_param > lon_trajectory.ParamLength() situation
+    // no worry about t_param > lon_trajectory.ParamLength() situation
     double s = lon_trajectory.Evaluate(0, t_param);
     double s_dot = lon_trajectory.Evaluate(1, t_param);
     double s_ddot = lon_trajectory.Evaluate(2, t_param);
@@ -327,7 +329,7 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
 
     double s_param = s - s0;
     // linear extrapolation is handled internally in LatticeTrajectory1d;
-    // do not need to worry about s_param > lat_trajectory.ParamLength() situation
+    // no worry about s_param > lat_trajectory.ParamLength() situation
     double d = lat_trajectory.Evaluate(0, s_param);
     double d_prime = lat_trajectory.Evaluate(1, s_param);
     double d_pprime = lat_trajectory.Evaluate(2, s_param);
@@ -352,8 +354,8 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
     std::array<double, 3> s_conditions = {rs, s_dot, s_ddot};
     std::array<double, 3> d_conditions = {d, d_prime, d_pprime};
     CartesianFrenetConverter::frenet_to_cartesian(
-        rs, rx, ry, rtheta, rkappa, rdkappa, s_conditions, d_conditions, &x, &y,
-        &theta, &kappa, &v, &a);
+        rs, rx, ry, rtheta, rkappa, rdkappa, s_conditions, d_conditions,
+        &x, &y, &theta, &kappa, &v, &a);
 
     TrajectoryPoint trajectory_point;
     trajectory_point.mutable_path_point()->set_x(x);
@@ -384,10 +386,11 @@ DiscretizedTrajectory LatticePlanner::GetFutureTrajectory() const {
   return ret;
 }
 
-bool LatticePlanner::MapFutureTrajectoryToSL(const DiscretizedTrajectory& future_trajectory,
-  std::vector<apollo::common::SpeedPoint>* st_points,
-  std::vector<apollo::common::FrenetFramePoint>* sl_points,
-  ReferenceLineInfo* reference_line_info) {
+bool LatticePlanner::MapFutureTrajectoryToSL(
+    const DiscretizedTrajectory& future_trajectory,
+    std::vector<apollo::common::SpeedPoint>* st_points,
+    std::vector<apollo::common::FrenetFramePoint>* sl_points,
+    ReferenceLineInfo* reference_line_info) {
   return false;
 }
 

@@ -24,7 +24,6 @@
 #include <vector>
 #include <memory>
 
-#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/frame.h"

@@ -21,12 +21,11 @@
 #ifndef MODULES_PLANNING_LATTICE_TRAJECTORY1D_GENERATOR_END_CONDITION_SAMPLER_H_
 #define MODULES_PLANNING_LATTICE_TRAJECTORY1D_GENERATOR_END_CONDITION_SAMPLER_H_
 
-#include "modules/planning/proto/lattice_structure.pb.h"
-
 #include <array>
 #include <utility>
 #include <vector>
 
+#include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/lattice/behavior_decider/feasible_region.h"
 
 namespace apollo {
@@ -65,4 +64,4 @@ class EndConditionSampler {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_TRAJECTORY1D_GENERATOR_END_CONDITION_SAMPLER_H_
+#endif  // PLANNING_LATTICE_TRAJECTORY1D_GENERATOR_END_CONDITION_SAMPLER_H_

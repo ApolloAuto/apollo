@@ -19,6 +19,8 @@
 #include <utility>
 #include <vector>
 #include <cmath>
+#include <limits>
+#include <algorithm>
 
 #include "modules/planning/proto/sl_boundary.pb.h"
 #include "modules/planning/common/obstacle.h"
@@ -238,8 +240,9 @@ double PathTimeNeighborhood::SpeedAtT(
 
   int curr_index = LastIndexBefore(trajectory, t);
   int next_index = curr_index + 1;
-  double heading = trajectory.trajectory_point(curr_index).path_point().theta();
-  
+  double heading =
+      trajectory.trajectory_point(curr_index).path_point().theta();
+
   if (curr_index == num_traj_point - 1) {
     curr_index = num_traj_point - 2;
     next_index = num_traj_point - 1;
@@ -276,8 +279,8 @@ PathTimePoint PathTimeNeighborhood::SetPathTimePoint(
   return path_time_point;
 }
 
-const std::vector<PathTimeObstacle>& PathTimeNeighborhood::GetPathTimeObstacles()
-    const {
+const std::vector<PathTimeObstacle>&
+PathTimeNeighborhood::GetPathTimeObstacles() const {
   return path_time_obstacles_;
 }
 
@@ -317,9 +320,8 @@ PathTimeNeighborhood::GetPathBlockingIntervals(const double t) const {
 }
 
 std::vector<std::vector<std::pair<double, double>>>
-PathTimeNeighborhood::GetPathBlockingIntervals(const double t_start, const double t_end,
-    const double t_resolution) {
-
+PathTimeNeighborhood::GetPathBlockingIntervals(
+    const double t_start, const double t_end, const double t_resolution) {
   std::vector<std::vector<std::pair<double, double>>> intervals;
   for (double t = t_start; t <= t_end; t += t_resolution) {
     intervals.push_back(GetPathBlockingIntervals(t));

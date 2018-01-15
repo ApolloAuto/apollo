@@ -22,6 +22,7 @@
 #define MODULES_PLANNING_LATTIC_UTIL_REFERENCE_LINE_MATCHER_H_
 
 #include <vector>
+#include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/reference_line/reference_point.h"

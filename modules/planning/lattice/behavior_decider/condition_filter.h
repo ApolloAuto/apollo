@@ -22,6 +22,7 @@
 #include <set>
 #include <utility>
 #include <vector>
+#include <string>
 
 #include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/lattice/behavior_decider/feasible_region.h"
@@ -53,7 +54,6 @@ class ConditionFilter {
   bool WithinObstacleSt(double s, double t);
 
  private:
-
   // Return true only if t is within the range of time slot,
   // but will output block interval anyway(maybe be extension)
   std::pair<PathTimePoint, PathTimePoint> QueryPathTimeObstacleIntervals(

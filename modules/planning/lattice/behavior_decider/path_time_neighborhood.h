@@ -22,6 +22,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <string>
+#include <utility>
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
@@ -74,7 +75,6 @@ class PathTimeNeighborhood {
       const std::vector<common::PathPoint>& discretized_ref_points);
 
  private:
-
   std::pair<double, double> time_range_;
 
   std::pair<double, double> path_range_;

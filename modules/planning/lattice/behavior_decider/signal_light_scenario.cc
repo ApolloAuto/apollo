@@ -8,11 +8,14 @@
  **/
 
 #include "modules/planning/lattice/behavior_decider/signal_light_scenario.h"
+
+#include <vector>
+#include <string>
+#include <limits>
+
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/common/log.h"
-
 #include "gflags/gflags.h"
-
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/common/util/map_util.h"
@@ -172,5 +175,6 @@ void SignalLightScenario::CreateStopObstacle(
           FLAGS_signal_light_virtual_object_id_prefix + signal_light->object_id,
           stop_box));
 }
-}
-}
+
+}  // namespace planning
+}  // namespace apollo
