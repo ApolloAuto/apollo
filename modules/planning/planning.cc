@@ -376,7 +376,7 @@ Status Planning::Plan(const double current_time_stamp,
         stitching_trajectory.back());
   }
   auto status = Status::OK();
-  if (!FLAGS_enable_lattice_change_lane_decider) {
+  if (config_.planner_type() != PlanningConfig::LATTICE) {
     bool has_plan = false;
     auto it = std::find_if(
         frame_->reference_line_info().begin(),
