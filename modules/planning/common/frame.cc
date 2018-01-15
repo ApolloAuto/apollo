@@ -426,7 +426,8 @@ const std::vector<const Obstacle *> Frame::obstacles() const {
 }
 
 apollo::common::PointENU Frame::GetRoutingDestination() {
-  const auto &routing =  AdapterManager::GetRoutingResponse()->GetLatestObserved();;
+  const auto &routing =
+      AdapterManager::GetRoutingResponse()->GetLatestObserved();
   const auto &routing_end = *routing.routing_request().waypoint().rbegin();
   return routing_end.pose();
 }
