@@ -113,7 +113,7 @@
         $('.search_form').submit();
       }
     </script>
-    {% for page_idx in range(1, response.total_count // request.count + 2) %}
+    {% for page_idx in range(1, (response.total_count - 1) // request.count + 2) %}
     <a class="btn btn-default page_button" role="button"
       {% if page_idx != (request.offset / request.count + 1) %}
         onclick="goto_page({{ page_idx }})"
