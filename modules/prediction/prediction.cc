@@ -189,11 +189,6 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   }
 
   Publish(&prediction_obstacles);
-
-  ADEBUG << "Received a perception message ["
-         << perception_obstacles.ShortDebugString() << "].";
-  ADEBUG << "Published a prediction message ["
-         << prediction_obstacles.ShortDebugString() << "].";
 }
 
 Status Prediction::OnError(const std::string& error_msg) {
