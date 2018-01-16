@@ -54,7 +54,7 @@ bool MultiCamerasProjection::Init() {
   std::map<std::string, CameraCoeffient> camera_coeffients;
   for (size_t i = 0; i < camera_names.size(); ++i) {
     const auto &camera_model_name = camera_names[i];
-    const ModelConfig *camera_model_config = NULL;
+    const ModelConfig *camera_model_config = nullptr;
     if (!config_manager->GetModelConfig(camera_model_name,
                                         &camera_model_config)) {
       AERROR << "not found camera model: " << camera_model_name;
