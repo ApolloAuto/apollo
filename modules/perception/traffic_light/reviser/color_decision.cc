@@ -23,15 +23,17 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-std::string ColorReviser::name() const { return "ColorReviser"; }
+std::string ColorReviser::name() const {
+  return "ColorReviser";
+}
 bool ColorReviser::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
-  if (config_manager == NULL) {
+  if (config_manager == nullptr) {
     AERROR << "failed to get ConfigManager instance.";
     return false;
   }
 
-  const ModelConfig *model_config = NULL;
+  const ModelConfig *model_config = nullptr;
   if (!config_manager->GetModelConfig(name(), &model_config)) {
     AERROR << "not found model config: " << name();
     return false;

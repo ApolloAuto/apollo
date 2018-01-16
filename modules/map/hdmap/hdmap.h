@@ -217,12 +217,12 @@ class HDMap {
              std::vector<SignalInfoConstPtr>* signals) const;
 
   /**
-   * @brief get all lanes that may be associated with the same stop sign 
+   * @brief get all lanes that associate with the same stop sign 
    * @param id id of stop sign
    * @param lanes all lanes match conditions
    * @return 0:success, otherwise failed
    */
-  int GetStopSignMaybeAssociateLanes(
+  int GetStopSignAssociateLanes(
              const Id& id,
              std::vector<LaneInfoConstPtr>* lanes) const;
 
