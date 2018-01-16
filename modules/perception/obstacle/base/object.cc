@@ -44,8 +44,7 @@ void Object::clone(const Object& rhs) {
   pcl::copyPointCloud<pcl_util::Point, pcl_util::Point>(*(rhs.cloud), *cloud);
   radar_supplement = nullptr;
   if (rhs.radar_supplement != nullptr) {
-    radar_supplement.reset(new RadarSupplement());
-    radar_supplement->clone(*(rhs.radar_supplement));
+    radar_supplement.reset(new RadarSupplement(*rhs.radar_supplement));
   }
 }
 
@@ -84,7 +83,7 @@ std::string Object::ToString() const {
 }
 
 void Object::Serialize(PerceptionObstacle* pb_obj) const {
-  CHECK(pb_obj != NULL);
+  CHECK(pb_obj != nullptr);
   pb_obj->set_id(track_id);
   pb_obj->set_theta(theta);
 
