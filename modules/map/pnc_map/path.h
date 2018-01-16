@@ -308,7 +308,7 @@ class Path {
 
   using GetOverlapFromLaneFunc =
       std::function<const std::vector<OverlapInfoConstPtr>&(const LaneInfo&)>;
-  void GetAllOverlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
+  void GetAllOverlaps(GetOverlapFromLaneFunc GetOverlaps_from_lane,
                       std::vector<PathOverlap>* const overlaps) const;
 
  protected:
