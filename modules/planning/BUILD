@@ -24,6 +24,7 @@ cc_library(
         "//modules/planning/common:planning_thread_pool",
         "//modules/planning/common/trajectory:trajectory_stitcher",
         "//modules/planning/planner/em:em_planner",
+        "//modules/planning/planner/lattice:lattice_planner",
         "//modules/planning/planner/rtk:rtk_planner",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line:reference_line_provider",
