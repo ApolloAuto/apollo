@@ -302,6 +302,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
     AINFO << "Planning failed";
     AINFO << "[END]-------------------------------------------------";
     AINFO << "";
+    reference_line_info->SetCost(std::numeric_limits<double>::infinity());
     return Status(ErrorCode::PLANNING_ERROR, "No feasible trajectories");
   }
 }
