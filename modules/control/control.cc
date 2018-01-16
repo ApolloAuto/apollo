@@ -89,7 +89,7 @@ Status Control::Start() {
   // need to sleep, because advertised channel is not ready immediately
   // simple test shows a short delay of 80 ms or so
   AINFO << "Control resetting vehicle state, sleeping for 1000 ms ...";
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   // should init_vehicle first, let car enter work status, then use status msg
   // trigger control
