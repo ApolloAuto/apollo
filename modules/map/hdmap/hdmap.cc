@@ -154,10 +154,10 @@ int HDMap::GetForwardNearestSignalsOnLane(
   return impl_.GetForwardNearestSignalsOnLane(point, distance, signals);
 }
 
-int HDMap::GetStopSignMaybeAssociateLanes(
+int HDMap::GetStopSignAssociateLanes(
              const Id& id,
              std::vector<LaneInfoConstPtr>* lanes) const {
-  return impl_.GetStopSignMaybeAssociateLanes(id, lanes);
+  return impl_.GetStopSignAssociateLanes(id, lanes);
 }
 
 
