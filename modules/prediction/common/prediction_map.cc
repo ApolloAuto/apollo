@@ -131,9 +131,14 @@ void PredictionMap::OnLane(
   common::PointENU hdmap_point;
   hdmap_point.set_x(point[0]);
   hdmap_point.set_y(point[1]);
-  if (HDMapUtil::BaseMap().GetLanesWithHeading(hdmap_point, radius, heading,
-                                               M_PI, &candidate_lanes) != 0) {
+  if (HDMapUtil::BaseMap().GetLanesWithHeading(
+          hdmap_point, radius, heading, FLAGS_max_lane_angle_diff,
+          &candidate_lanes) != 0) {
     return;
+  }
+  int max_num_lane = FLAGS_max_num_current_lane;
+  if (!on_lane) {
+    max_num_lane = FLAGS_max_num_nearby_lane;
   }
 
   const common::math::Vec2d vec_point(point[0], point[1]);
@@ -169,8 +174,14 @@ void PredictionMap::OnLane(
                const std::pair<std::shared_ptr<const LaneInfo>, double>& p2) {
               return p1.second < p2.second;
             });
+
+  int count = 0;
   for (const auto& lane_pair : lane_pairs) {
     lanes->push_back(lane_pair.first);
+    ++count;
+    if (count >= max_num_lane) {
+      break;
+    }
   }
 }
 
