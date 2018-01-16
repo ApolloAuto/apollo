@@ -30,7 +30,7 @@
 namespace apollo {
 namespace planning {
 
-using apollo::hdmap::LaneInfo;
+using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::PathOverlap;
 using apollo::hdmap::StopSignInfo;
 using apollo::perception::PerceptionObstacle;
@@ -83,7 +83,7 @@ class StopSign : public TrafficRule {
   PathOverlap* next_stop_sign_overlap_ = nullptr;
   StopSignInfo* next_stop_sign_ = nullptr;
   StopSignStopStatus stop_status_;
-  std::vector<const LaneInfo*> associate_lanes_;
+  std::vector<LaneInfoConstPtr> associate_lanes_;
 };
 
 }  // namespace planning

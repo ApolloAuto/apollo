@@ -172,8 +172,18 @@ bool StopSign::FindNextStopSign(
  */
 int StopSign::GetAssociateLanes(const StopSignInfo& stop_sign_info) {
   associate_lanes_.clear();
+  HDMapUtil::BaseMap().GetStopSignAssociateLanes(
+      stop_sign_info.id(),
+      &associate_lanes_);
 
-  // TODO(all): wait for hdmap
+  ADEBUG << "stop_sign: " << stop_sign_info.id().id()
+      << "; associate_lanes_: ["
+      << accumulate(associate_lanes_.begin(),
+                    associate_lanes_.end(),
+                    std::string{},
+                    [](std::string &s, const LaneInfoConstPtr lane) {
+                      return s += lane.get()->id().id(); })
+      << "]; size[" << associate_lanes_.size() << "]";
 
   return 0;
 }
@@ -286,7 +296,8 @@ int StopSign::GetWatchVehicles(
   watch_vehicles->clear();
 
   // get watch vehicles for associate_lanes
-  for (const LaneInfo* associate_lane_info : associate_lanes_) {
+  for (const LaneInfoConstPtr associate_lane_info_ptr : associate_lanes_) {
+    const LaneInfo* associate_lane_info = associate_lane_info_ptr.get();
     std::string associate_lane_id = associate_lane_info->id().id();
 
     if (stop_status_ == StopSignStopStatus::TO_STOP) {
@@ -368,8 +379,8 @@ int StopSign::AddWatchVehicle(
   auto it = std::find_if(
       associate_lanes_.begin(),
       associate_lanes_.end(),
-      [&obstable_lane_id](const LaneInfo* lane) {
-          return lane->id().id() == obstable_lane_id; });
+      [&obstable_lane_id](const LaneInfoConstPtr lane) {
+          return lane.get()->id().id() == obstable_lane_id; });
   if (it == associate_lanes_.end()) {
     ADEBUG << "obstacle_id[" << obstacle_id
         << "] type[" << obstacle_type_name
@@ -447,8 +458,8 @@ int StopSign::RemoveWatchVehicle(
   auto it = std::find_if(
       associate_lanes_.begin(),
       associate_lanes_.end(),
-      [&obstable_lane_id](const LaneInfo* lane) {
-          return lane->id().id() == obstable_lane_id; });
+      [&obstable_lane_id](const LaneInfoConstPtr lane) {
+          return lane.get()->id().id() == obstable_lane_id; });
   if (it == associate_lanes_.end()) {
     ADEBUG << "obstacle_id[" << obstacle_id
         << "] type[" << obstacle_type_name
@@ -583,7 +594,8 @@ void StopSign::ClearDropbox(const std::string& stop_sign_id) {
   ADEBUG << "remove dropbox item: " << db_key_stop_starttime;
 
   // clear watch vehicles from dropbox
-  for (const LaneInfo* associate_lane_info : associate_lanes_) {
+  for (const LaneInfoConstPtr associate_lane_info_ptr : associate_lanes_) {
+    const LaneInfo* associate_lane_info = associate_lane_info_ptr.get();
     std::string associate_lane_id = associate_lane_info->id().id();
     std::string db_key_watch_vehicle
              = db_key_stop_sign_watch_vehicle_prefix_ + associate_lane_id;
