@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <iomanip>
+#include <limits>
 #include <utility>
 
 #include "IpIpoptApplication.hpp"
@@ -115,13 +116,14 @@ bool SpiralReferenceLineSmoother::Smooth(
         }
       }
 
+      const auto& start_anchor_point = anchor_points_[start_index - 1];
       fixed_start_point_ = true;
-      fixed_start_x_ = anchor_points_[start_index - 1].path_point.x();
-      fixed_start_y_ = anchor_points_[start_index - 1].path_point.y();
+      fixed_start_x_ = start_anchor_point.path_point.x();
+      fixed_start_y_ = start_anchor_point.path_point.y();
       fixed_start_theta_ = common::math::NormalizeAngle(
-          anchor_points_[start_index - 1].path_point.theta());
-      fixed_start_kappa_ = anchor_points_[start_index - 1].path_point.kappa();
-      fixed_start_dkappa_ = anchor_points_[start_index - 1].path_point.dkappa();
+          start_anchor_point.path_point.theta());
+      fixed_start_kappa_ = start_anchor_point.path_point.kappa();
+      fixed_start_dkappa_ = start_anchor_point.path_point.dkappa();
 
       Smooth(raw_point2d, &opt_theta, &opt_kappa, &opt_dkappa, &opt_s, &opt_x,
              &opt_y);
@@ -194,6 +196,7 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
   CHECK_GT(point2d.size(), 1);
 
   SpiralProblemInterface* ptop = new SpiralProblemInterface(point2d);
+
   ptop->set_default_max_point_deviation(default_max_point_deviation_);
   if (fixed_start_point_) {
     ptop->set_start_point(fixed_start_x_, fixed_start_y_, fixed_start_theta_,
@@ -277,6 +280,7 @@ std::vector<common::PathPoint> SpiralReferenceLineSmoother::Interpolate(
     const double theta0, const double kappa0, const double dkappa0,
     const double theta1, const double kappa1, const double dkappa1,
     const double delta_s, const double resolution) const {
+
   std::vector<common::PathPoint> path_points;
 
   const auto angle_diff = common::math::AngleDiff(theta0, theta1);
@@ -329,6 +333,51 @@ void SpiralReferenceLineSmoother::SetAnchorPoints(
         p.path_point.set_x(curr_x - zero_x_);
         p.path_point.set_y(curr_y - zero_y_);});
 }
+
+int SpiralReferenceLineSmoother::DownSampleRawReferenceLine(
+    const std::vector<Eigen::Vector2d>& raw_point2d,
+    std::vector<Eigen::Vector2d>* down_sampled_raw_point2d) {
+  CHECK(down_sampled_raw_point2d != nullptr);
+  if (raw_point2d.size() == 0 || raw_point2d.size() <= 2) {
+    AERROR<< "DownSampleRawReferenceLine error";
+    return 1;
+  }
+  std::vector<double> thetas;
+  std::vector<double> kappas;
+  for (uint i = 0; i < raw_point2d.size() - 1; ++i) {
+    thetas.push_back(
+        common::math::NormalizeAngle(
+            std::atan2(raw_point2d[i + 1].y() - raw_point2d[i].y(),
+                raw_point2d[i + 1].x() - raw_point2d[i].x())));
+  }
+  for (uint i = 0; i < thetas.size() - 1; ++i) {
+    double diff_y = raw_point2d[i + 1].y() - raw_point2d[i].y();
+    double diff_x = raw_point2d[i + 1].x() - raw_point2d[i].x();
+    double ds = std::sqrt(diff_y * diff_y + diff_x * diff_x);
+    double dtheta = common::math::NormalizeAngle(thetas[i + 1] - thetas[i]);
+    if (ds <= std::numeric_limits<double>::epsilon()) {
+      AWARN<< "Distance too close for raw point [" << i << "] (" <<
+      raw_point2d[i].x() << "," << raw_point2d[i].y() << ") [" << i+1 <<
+      "] (" << raw_point2d[i+1].x() << "," << raw_point2d[i+1].y() << ")";
+      kappas.push_back(std::numeric_limits<double>::max());
+    } else {
+      kappas.push_back(dtheta/ds);
+    }
+  }
+  down_sampled_raw_point2d->push_back(
+      Eigen::Vector2d(raw_point2d[0].x(), raw_point2d[0].y()));
+  for (uint i = 0; i < kappas.size(); ++i) {
+    if (kappas[i] > FLAGS_spiral_downsample_curvature_thred) {
+      down_sampled_raw_point2d->push_back(
+          Eigen::Vector2d(raw_point2d[i + 1].x(), raw_point2d[i + 1].y()));
+    }
+  }
+  down_sampled_raw_point2d->push_back(
+      Eigen::Vector2d(raw_point2d[raw_point2d.size() - 1].x(),
+          raw_point2d[raw_point2d.size() - 1].y()));
+  return 0;
+}
+
 
 }  // namespace planning
 }  // namespace apollo

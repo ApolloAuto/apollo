@@ -181,4 +181,14 @@ DECLARE_int32(num_thread_planning_thread_pool);
 DECLARE_bool(enable_multi_thread_in_dp_poly_path);
 DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 
+// lattice planner
+DECLARE_int32(num_lattice_traj_to_plot);
+DECLARE_double(default_cruise_speed);
+DECLARE_double(spiral_downsample_curvature_thred);
+DECLARE_bool(enable_sample_bound_planning);
+DECLARE_bool(enable_lattice_st_image_dump);
+DECLARE_bool(enable_auto_tuning);
+DECLARE_double(trajectory_time_resolution);
+DECLARE_double(lateral_acceleration_bound);
+
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H
