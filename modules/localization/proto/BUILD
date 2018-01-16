@@ -80,6 +80,7 @@ proto_library(
         ":pose_proto_lib",
         "//modules/common/proto:common_proto_lib",
         "//modules/common/proto:header_proto_lib",
+        "//modules/common/proto:pnc_point_proto_lib",
     ],
 )
 
