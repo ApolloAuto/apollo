@@ -56,7 +56,7 @@ DEFINE_double(look_forward_time_sec, 8.0,
               "when creating reference line from routing");
 DEFINE_bool(enable_reference_line_stitching, true,
             "Enable stitching reference line, which can reducing computing "
-            "time and improve stabilty");
+            "time and improve stability");
 DEFINE_double(look_forward_extend_distance, 50,
               "The step size when extending reference line.");
 DEFINE_double(reference_line_stitch_overlap_distance, 20,
@@ -90,8 +90,8 @@ DEFINE_bool(prioritize_change_lane, false,
             "change lane strategy has higher priority, always use a valid "
             "change lane path if such path exists");
 DEFINE_bool(reckless_change_lane, false,
-            "Alway allow the vehicle change lane. The vehicle may contineous "
-            "change lane. This is mainly test purpose");
+            "Always allow the vehicle change lane. The vehicle may continue "
+            "changing lane. This is mainly test purpose");
 DEFINE_double(change_lane_fail_freeze_time, 3.0,
               "seconds. Not allowed to change lane this amount of time "
               "if it just finished change lane or failed to change lane");
@@ -157,20 +157,21 @@ DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
               "The lowest longitudinal acceleration allowed.");
 DEFINE_double(longitudinal_acceleration_upper_bound, 4.0,
               "The highest longitudinal acceleration allowed.");
-
-DEFINE_double(lateral_jerk_bound, 4.0,
-              "Bound of lateral jerk; symmetric for left and right");
+DEFINE_double(lateral_acceleration_bound, 4.0,
+              "Bound of lateral acceleration; symmetric for left and right");
 
 DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
               "The lower bound of longitudinal jerk.");
 DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
               "The upper bound of longitudinal jerk.");
+DEFINE_double(lateral_jerk_bound, 4.0,
+              "Bound of lateral jerk; symmetric for left and right");
 
 DEFINE_double(dl_bound, 0.10,
               "The bound for derivative l in s-l coordinate system.");
-DEFINE_double(kappa_bound, 0.20, "The bound for vehicle curvature");
+DEFINE_double(kappa_bound, 0.20, "The bound for trajectory curvature");
 DEFINE_double(dkappa_bound, 0.02,
-              "The bound for vehicle curvature change rate");
+              "The bound for trajectory curvature change rate");
 
 // ST Boundary
 DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
@@ -309,17 +310,17 @@ DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
 
 DEFINE_bool(enable_lag_prediction, true,
             "Enable lagged prediction, which is more tolerant to obstacles "
-            "that appear and disappear dequeickly");
+            "that appear and disappear quickly");
 DEFINE_int32(lag_prediction_min_appear_num, 5,
              "The minimum of appearance of the obstacle for lagged prediction");
 DEFINE_double(lag_prediction_max_disappear_num, 3,
-              "In lagged prediction, ingnore obstacle disappeared for more "
+              "In lagged prediction, ignore obstacle disappeared for more "
               "than this value");
 DEFINE_double(lag_prediction_protection_distance, 30,
               "Within this distance, we do not use lagged prediction");
 
 DEFINE_double(perception_confidence_threshold, 0.4,
-              "Skip the obstacle if its confiderence is lower than "
+              "Skip the obstacle if its confidence is lower than "
               "this threshold.");
 
 DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
@@ -344,9 +345,6 @@ DEFINE_bool(
     "Enable multiple thread to calculation curve cost in dp_poly_path.");
 DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
             "Enable multiple thread to calculation curve cost in dp_st_graph.");
-
-DEFINE_double(lateral_acceleration_bound, 4.0,
-              "Bound of lateral acceleration; symmetric for left and right");
 
 ///////////////////////////////////////////////////////////
 // Lattice Planner
