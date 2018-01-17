@@ -24,7 +24,6 @@
 
 #include "glog/logging.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/lattice/util/lattice_params.h"
 
 namespace apollo {
 namespace planning {

@@ -18,7 +18,6 @@ cc_library(
         "//modules/planning/lattice/behavior_decider:path_time_neighborhood",
         "//modules/planning/lattice/behavior_decider:condition_filter",
         "//modules/planning/proto:lattice_sampling_config_proto",
-        "//modules/planning/lattice/util:lattice_util",
         "//modules/planning/lattice/behavior_decider:scenario_manager",
         "//modules/planning/reference_line",
         "//modules/planning/proto:planning_proto",
@@ -83,7 +82,6 @@ cc_library(
     ],
     deps = [
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/lattice/util:lattice_params",
         "//modules/common/proto:pnc_point_proto",
     ],
 )
@@ -104,8 +102,6 @@ cc_library(
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
-        "//modules/planning/lattice/util:util",
-        "//modules/planning/lattice/util:lattice_params",
         "//modules/planning/lattice/util:reference_line_matcher",
         "//modules/common/math:linear_interpolation",
         "@glog//:glog",
@@ -126,7 +122,6 @@ cc_library(
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/common/math:linear_interpolation",
-        "//modules/planning/lattice/util:lattice_params",
     ],
 )
 

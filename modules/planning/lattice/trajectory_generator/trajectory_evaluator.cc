@@ -28,7 +28,6 @@
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker1d.h"
-#include "modules/planning/lattice/util/lattice_params.h"
 
 namespace apollo {
 namespace planning {
@@ -140,7 +139,7 @@ double TrajectoryEvaluator::evaluate(
   // for evaluating lateral trajectories
   std::vector<double> s_values;
   double s = 0.0;
-  while (s < decision_horizon) {
+  while (s < FLAGS_decision_horizon) {
     s_values.push_back(s);
     s += FLAGS_trajectory_space_resolution;
   }
