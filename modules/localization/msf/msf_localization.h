@@ -31,7 +31,6 @@
 
 #include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
-#include "tf2_ros/transform_broadcaster.h"
 
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/localization/proto/gps.pb.h"
@@ -83,8 +82,6 @@ class MSFLocalization : public LocalizationBase {
   void OnGnssRtkEph(const GnssEphemeris &gnss_orbit_msg);
   void OnGnssBestPose(const GnssBestPose &bestgnsspos_msg);
 
-  void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
-
  private:
   bool LoadGnssAntennaExtrinsic(const std::string &file_path,
                                 double *offset_x, double *offset_y,
@@ -95,7 +92,6 @@ class MSFLocalization : public LocalizationBase {
   apollo::common::monitor::MonitorLogger monitor_logger_;
   LocalizationInteg localization_integ_;
   LocalizationIntegParam localizaiton_param_;
-  std::unique_ptr<tf2_ros::TransformBroadcaster> tf2_broadcaster_;
   LocalizationMeasureState localization_state_;
   uint64_t pcd_msg_index_;
 
