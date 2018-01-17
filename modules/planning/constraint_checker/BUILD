@@ -37,4 +37,23 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "collision_checker",
+    srcs = [
+        "collision_checker.cc",
+    ],
+    hdrs = [
+        "collision_checker.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/math:box2d",
+        "//modules/planning/common:frame",
+        "//modules/planning/common:obstacle",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/prediction/proto:prediction_proto",
+        "//modules/common/configs:vehicle_config_helper",
+    ],
+)
+
 cpplint()

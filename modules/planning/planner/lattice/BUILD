@@ -15,6 +15,7 @@ cc_library(
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/common/adapters:adapter_manager",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/constraint_checker:collision_checker",
         "//modules/planning/constraint_checker:constraint_checker",
         "//modules/planning/planner:planner",
         "//modules/planning/proto:planning_proto",
