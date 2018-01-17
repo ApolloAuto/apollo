@@ -25,12 +25,8 @@ namespace apollo {
 namespace planning {
 
 // TODO(all) move the fake FLAG variable to planning_gflags
-static const double speed_limit = 15.0;
 static const double decision_horizon = 200.0;
 static const double lateral_enter_lane_thred = 2.0;
-static const double max_acceleration = 4.0;
-static const double min_acceleration = -4.0;
-static const double max_deceleration = -min_acceleration;
 
 }  // namespace planning
 }  // namespace apollo
