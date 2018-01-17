@@ -24,23 +24,6 @@ cc_library(
 )
 
 cc_library(
-    name = "lattice_constraint_checker",
-    srcs = [
-        "lattice_constraint_checker.cc",
-    ],
-    hdrs = [
-        "lattice_constraint_checker.h",
-    ],
-    deps = [
-        "//modules/planning/math/curve1d:curve1d",
-        "//modules/planning/common:planning_gflags",
-        "//modules/common:log",
-        "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/planning/common:frame",
-    ],
-)
-
-cc_library(
     name = "reference_line_matcher",
     hdrs = [
         "reference_line_matcher.h",
@@ -95,8 +78,7 @@ cc_library(
 cc_library(
     name = "lattice_util",
     deps = [
-        ":collision_checker", 
-        ":lattice_constraint_checker", 
+        ":collision_checker",
         ":reference_line_matcher",
         ":util",
         ":lattice_params",

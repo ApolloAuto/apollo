@@ -35,6 +35,7 @@ bool WithinRange(const T v, const T lower, const T upper) {
 
 bool ConstraintChecker::ValidTrajectory(
     const DiscretizedTrajectory& trajectory) {
+  // TODO(all): this is wrong; must be set to trajectory time range;
   const double kMaxCheckRelativeTime = 2.0;
   for (const auto& p : trajectory.trajectory_points()) {
     double t = p.relative_time();
@@ -93,6 +94,8 @@ bool ConstraintChecker::ValidTrajectory(
 
     double d_lat_a = p1.v() * p1.v() * p1.path_point().kappa() -
                      p0.v() * p0.v() * p0.path_point().kappa();
+
+    // TODO(all): add lateral acceleration check
     double lat_jerk = d_lat_a / dt;
     if (!WithinRange(lat_jerk, -FLAGS_lateral_jerk_bound,
                      FLAGS_lateral_jerk_bound)) {
