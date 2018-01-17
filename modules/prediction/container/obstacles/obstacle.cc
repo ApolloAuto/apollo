@@ -130,7 +130,8 @@ bool Obstacle::IsNearJunction() {
 }
 
 void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
-                      const double timestamp) {
+                      const double timestamp,
+                      ObstacleClusters* const obstacle_clusters) {
   if (feature_history_.size() > 0 &&
       timestamp <= feature_history_.front().timestamp()) {
     AERROR << "Obstacle [" << id_ << "] received an older frame ["
@@ -171,7 +172,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   // Set obstacle lane features
   SetCurrentLanes(&feature);
   SetNearbyLanes(&feature);
-  SetLaneGraphFeature(&feature);
+  SetLaneGraphFeature(&feature, obstacle_clusters);
   UpdateKFLaneTrackers(&feature);
 
   // Insert obstacle feature to history
@@ -941,7 +942,8 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   }
 }
 
-void Obstacle::SetLaneGraphFeature(Feature* feature) {
+void Obstacle::SetLaneGraphFeature(Feature* feature,
+    ObstacleClusters* const obstacle_clusters) {
   double speed = feature->speed();
   double acc = feature->acc();
   double road_graph_distance =
@@ -952,9 +954,8 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
   for (auto& lane : feature->lane().current_lane_feature()) {
     std::shared_ptr<const LaneInfo> lane_info =
         PredictionMap::LaneById(lane.lane_id());
-    RoadGraph road_graph(lane.lane_s(), road_graph_distance, lane_info);
-    LaneGraph lane_graph;
-    road_graph.BuildLaneGraph(&lane_graph);
+    const LaneGraph& lane_graph = obstacle_clusters->GetLaneGraph(
+        lane.lane_s(), road_graph_distance, lane_info);
     if (lane_graph.lane_sequence_size() > 0) {
       ++curr_lane_count;
     }
@@ -982,9 +983,8 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
   for (auto& lane : feature->lane().nearby_lane_feature()) {
     std::shared_ptr<const LaneInfo> lane_info =
         PredictionMap::LaneById(lane.lane_id());
-    RoadGraph road_graph(lane.lane_s(), road_graph_distance, lane_info);
-    LaneGraph lane_graph;
-    road_graph.BuildLaneGraph(&lane_graph);
+    const LaneGraph& lane_graph = obstacle_clusters->GetLaneGraph(
+        lane.lane_s(), road_graph_distance, lane_info);
     if (lane_graph.lane_sequence_size() > 0) {
       ++nearby_lane_count;
     }
