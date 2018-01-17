@@ -237,4 +237,4 @@ class ConvexHull2DXY : public pcl::ConvexHull<PointInT> {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_COMMON_CONVEX_HULLXY_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_COMMON_CONVEX_HULLXY_H_

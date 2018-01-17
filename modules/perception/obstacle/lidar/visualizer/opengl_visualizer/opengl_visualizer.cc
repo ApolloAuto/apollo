@@ -122,14 +122,14 @@ void OpenglVisualizer::SetMainCarPoints() {
 void OpenglVisualizer::UpdateCameraSystem(FrameContent *content) {
   Eigen::Matrix4d pose_v2w = content->GetPoseV2w();
 
-  TransformPoint<pcl_util::Point>(camera_center_velodyne_,
-                                  &camera_center_world_, pose_v2w);
+  TransformPoint<pcl_util::Point>(camera_center_velodyne_, pose_v2w,
+                                  &camera_center_world_);
 
-  TransformPoint<pcl_util::Point>(view_point_velodyne_, &view_point_world_,
-                                  pose_v2w);
+  TransformPoint<pcl_util::Point>(view_point_velodyne_, pose_v2w,
+                                  &view_point_world_);
 
-  TransformPointCloud<pcl_util::Point>(main_car_points_velodyne_,
-                                       &main_car_points_world_, pose_v2w);
+  TransformPointCloud<pcl_util::Point>(main_car_points_velodyne_, pose_v2w,
+                                       &main_car_points_world_);
 
   Eigen::Vector4d up_w(up_velodyne_.x, up_velodyne_.y, up_velodyne_.z, 0);
 
