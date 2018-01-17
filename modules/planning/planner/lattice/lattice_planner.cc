@@ -170,9 +170,10 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
     double trajectory_pair_cost = 0.0;
     trajectory_pair_cost = trajectory_evaluator.top_trajectory_pair_cost();
     // For auto tuning
-    std::vector<double> trajectory_pair_cost_components =
-      trajectory_evaluator.top_trajectory_pair_component_cost();
-
+    if (FLAGS_enable_auto_tuning) {
+      std::vector<double> trajectory_pair_cost_components =
+          trajectory_evaluator.top_trajectory_pair_component_cost();
+    }
     auto trajectory_pair = trajectory_evaluator.next_top_trajectory_pair();
 
     // check the validity of 1d trajectories
@@ -257,10 +258,10 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
     AINFO << "           L: (" << init_d[0] << " " << init_d[1] << ","
           << init_d[2] << ")";
     AINFO << "   --- TrajectoryPairComponentCost";
-    AINFO << "       travel_cost = " << trajectory_pair_cost_components[0];
-    AINFO << "       jerk_cost = " << trajectory_pair_cost_components[1];
-    AINFO << "       obstacle_cost = " << trajectory_pair_cost_components[2];
-    AINFO << "       lateral_cost = " << trajectory_pair_cost_components[3];
+    // AINFO << "       travel_cost = " << trajectory_pair_cost_components[0];
+    // AINFO << "       jerk_cost = " << trajectory_pair_cost_components[1];
+    // AINFO << "       obstacle_cost = " << trajectory_pair_cost_components[2];
+    // AINFO << "       lateral_cost = " << trajectory_pair_cost_components[3];
     AINFO << "       reference_line_priority_cost = "
           << reference_line_info->PriorityCost();
     AINFO << "   --- Total_Trajectory_Cost = " << trajectory_pair_cost;
