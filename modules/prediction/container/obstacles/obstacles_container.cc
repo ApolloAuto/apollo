@@ -51,6 +51,7 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
 
   timestamp_ = timestamp;
   ADEBUG << "Current timestamp is [" << timestamp_ << "]";
+  clusters_.Init();
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
     ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "] "
@@ -83,10 +84,10 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   }
   Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
   if (obstacle_ptr != nullptr) {
-    obstacle_ptr->Insert(perception_obstacle, timestamp);
+    obstacle_ptr->Insert(perception_obstacle, timestamp, &clusters_);
   } else {
     Obstacle obstacle;
-    obstacle.Insert(perception_obstacle, timestamp);
+    obstacle.Insert(perception_obstacle, timestamp, &clusters_);
     obstacles_.Put(id, std::move(obstacle));
   }
 }
