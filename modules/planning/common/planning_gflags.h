@@ -192,5 +192,6 @@ DECLARE_double(trajectory_time_resolution);
 DECLARE_double(trajectory_space_resolution);
 DECLARE_double(lateral_acceleration_bound);
 DECLARE_double(collision_buffer_expansion_ratio);
+DECLARE_double(lateral_enter_lane_thred);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H
