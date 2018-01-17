@@ -35,8 +35,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_HUNGARIAN_BIGRAPH_MATCHER_H_
 #define MODULES_PERCEPTION_OBSTACLE_COMMON_HUNGARIAN_BIGRAPH_MATCHER_H_
 
-#include <algorithm>
 #include <cstdio>
+
+#include <algorithm>
 #include <limits>
 #include <vector>
 

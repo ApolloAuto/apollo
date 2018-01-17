@@ -17,12 +17,14 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_GEOMETRY_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_COMMON_GEOMETRY_UTIL_H_
 
-#include <algorithm>
 #include <cfloat>
+
+#include <algorithm>
 #include <vector>
 
 #include "Eigen/Core"
 
+#include "modules/common/log.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 
 namespace apollo {
@@ -44,13 +46,13 @@ void TransformPointCloud(const Eigen::Matrix4d& trans_mat,
 template <typename PointT>
 void TransformPointCloud(const Eigen::Matrix4d& trans_mat,
                          typename pcl::PointCloud<PointT>::Ptr cloud_in_out) {
-  assert(cloud_in_out.get() != nullptr);
+  CHECK_NOTNULL(cloud_in_out.get());
   return TransformPointCloud(trans_mat, cloud_in_out.get());
 }
 
 template <typename PointType>
-void TransformPoint(const PointType& point_in, PointType* point_out,
-                    const Eigen::Matrix4d& trans_mat) {
+void TransformPoint(const PointType& point_in, const Eigen::Matrix4d& trans_mat,
+                    PointType* point_out) {
   Eigen::Vector4d v(point_in.x, point_in.y, point_in.z, 1);
   v = trans_mat * v;
   *point_out = point_in;
@@ -61,8 +63,8 @@ void TransformPoint(const PointType& point_in, PointType* point_out,
 
 template <typename PointType>
 void TransformPointCloud(const pcl::PointCloud<PointType>& cloud_in,
-                         pcl::PointCloud<PointType>* cloud_out,
-                         const Eigen::Matrix4d& trans_mat) {
+                         const Eigen::Matrix4d& trans_mat,
+                         pcl::PointCloud<PointType>* cloud_out) {
   if (cloud_out->points.size() < cloud_in.points.size()) {
     cloud_out->points.resize(cloud_in.points.size());
   }

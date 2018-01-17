@@ -25,28 +25,28 @@ namespace perception {
 class DisjointSetTest : public testing::Test {
  protected:
   DisjointSetTest() {
-    _node1 = new Node();
-    _node2 = new Node();
-    _node3 = new Node();
+    node1_ = new Node();
+    node2_ = new Node();
+    node3_ = new Node();
   }
   virtual ~DisjointSetTest() {
-    if (_node1 != nullptr) {
-      delete _node1;
-      _node1 = nullptr;
+    if (node1_ != nullptr) {
+      delete node1_;
+      node1_ = nullptr;
     }
-    if (_node2 != nullptr) {
-      delete _node2;
-      _node2 = nullptr;
+    if (node2_ != nullptr) {
+      delete node2_;
+      node2_ = nullptr;
     }
-    if (_node3 != nullptr) {
-      delete _node3;
-      _node3 = nullptr;
+    if (node3_ != nullptr) {
+      delete node3_;
+      node3_ = nullptr;
     }
   }
   void SetUp() {
-    DisjointSetMakeSet(_node1);
-    _node2->parent = _node1;
-    _node3->parent = _node2;
+    DisjointSetMakeSet(node1_);
+    node2_->parent = node1_;
+    node3_->parent = node2_;
   }
   void TearDown() {}
   struct Node {
@@ -58,9 +58,9 @@ class DisjointSetTest : public testing::Test {
       node_rank = 0;
     }
   };
-  Node* _node1;
-  Node* _node2;
-  Node* _node3;
+  Node* node1_;
+  Node* node2_;
+  Node* node3_;
 };
 
 TEST_F(DisjointSetTest, DisjointSetMakeSet) {
@@ -75,27 +75,27 @@ TEST_F(DisjointSetTest, DisjointSetMakeSet) {
 }
 
 TEST_F(DisjointSetTest, DisjointSetFindRecursive) {
-  Node* root_node2 = DisjointSetFindRecursive<Node>(_node2);
-  EXPECT_EQ(_node1, root_node2);
-  Node* root_node3 = DisjointSetFindRecursive<Node>(_node3);
-  EXPECT_EQ(_node1, root_node3);
+  Node* root_node2 = DisjointSetFindRecursive<Node>(node2_);
+  EXPECT_EQ(node1_, root_node2);
+  Node* root_node3 = DisjointSetFindRecursive<Node>(node3_);
+  EXPECT_EQ(node1_, root_node3);
 }
 
 TEST_F(DisjointSetTest, DisjointSetFind) {
-  Node* root_node2 = DisjointSetFind<Node>(_node2);
-  EXPECT_EQ(_node1, root_node2);
-  Node* root_node3 = DisjointSetFind<Node>(_node3);
-  EXPECT_EQ(_node1, root_node3);
-  EXPECT_EQ(_node1, root_node3->parent);
+  Node* root_node2 = DisjointSetFind<Node>(node2_);
+  EXPECT_EQ(node1_, root_node2);
+  Node* root_node3 = DisjointSetFind<Node>(node3_);
+  EXPECT_EQ(node1_, root_node3);
+  EXPECT_EQ(node1_, root_node3->parent);
 }
 
 TEST_F(DisjointSetTest, DisjointSetMerge) {
-  DisjointSetMerge<Node>(_node1, _node2);
+  DisjointSetMerge<Node>(node1_, node2_);
 }
 
 TEST_F(DisjointSetTest, DisjointSetUnion) {
-  DisjointSetUnion<Node>(_node1, _node2);
-  EXPECT_EQ(_node1->parent, _node2->parent);
+  DisjointSetUnion<Node>(node1_, node2_);
+  EXPECT_EQ(node1_->parent, node2_->parent);
 }
 
 }  // namespace perception
