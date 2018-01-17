@@ -307,7 +307,6 @@ Chassis LincolnController::chassis() {
 
   // give engage_advice based on error_code and canbus feedback
   if (!chassis_error_mask_ && !chassis_.parking_brake() &&
-      (chassis_.steering_percentage() != 0.0) &&
       (chassis_.throttle_percentage() != 0.0) &&
       (chassis_.brake_percentage() != 0.0)) {
     chassis_.mutable_engage_advice()->set_advice(
