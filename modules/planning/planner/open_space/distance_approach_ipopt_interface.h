@@ -32,15 +32,20 @@ namespace planning {
 
 class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
  public:
-  explicit DistanceApproachIPOPTInterface(std::size_t horizon, float ts,
-                                          float wheelbase_length,
-                                          Eigen::MatrixXd x0,
-                                          Eigen::MatrixXd xF,
-                                          Eigen::MatrixXd XYbounds);
+  explicit DistanceApproachIPOPTInterface(
+      const int num_of_variables, const int num_of_constraints,
+      std::size_t horizon, float ts, float wheelbase_length, Eigen::MatrixXd x0,
+      Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds);
 
   virtual ~DistanceApproachIPOPTInterface() = default;
 
-  void get_optimization_results() const;
+  void get_optimization_results(std::vector<double>* x1_result,
+                                std::vector<double>* x2_result,
+                                std::vector<double>* x3_result,
+                                std::vector<double>* x4_result,
+                                std::vector<double>* u1_result,
+                                std::vector<double>* u2_result,
+                                std::vector<double>* t_result) const;
 
   /** Method to return some info about the nlp */
   bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
@@ -89,6 +94,22 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
 
  private:
+  int num_of_variables_;
+  int num_of_constraints_;
+  std::size_t horizon_;
+  float ts_;
+  float wheelbase_length_;
+  Eigen::MatrixXd x0_;
+  Eigen::MatrixXd xf_;
+  Eigen::MatrixXd XYbounds_;
+
+  std::vector<double> x1_result_;
+  std::vector<double> x2_result_;
+  std::vector<double> x3_result_;
+  std::vector<double> x4_result_;
+  std::vector<double> u1_result_;
+  std::vector<double> u2_result_;
+  std::vector<double> t_result_;
 };
 
 }  // namespace planning

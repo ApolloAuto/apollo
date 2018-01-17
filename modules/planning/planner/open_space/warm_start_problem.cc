@@ -96,7 +96,7 @@ bool WarmStartProblem::Solve(std::vector<double>* x1_result,
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
-    ADEBUG << "*** Error during initialization!";
+    ADEBUG << "*** Wart start problem error during initialization!";
     return static_cast<int>(status);
   }
 

@@ -91,8 +91,8 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
       ]
 */
 
+  // TODO(QiL) : more efficient way of initialize lOb in open space planner
   std::vector<std::vector<Eigen::MatrixXd>> lOb;
-  // Eigen::MatrixXd lOb(4, 1);
   Eigen::MatrixXd ob1(4, 1), ob2(4, 1), ob3(4, 1);
   ob1 << -1.3, 5, 20, 5;
   ob2 << 20, 5, -1.3, 5;
@@ -123,20 +123,40 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   if (ret_status) {
     ADEBUG << "Warm start problem solved successfully!";
   } else {
-    AERROR << "Warm start problem failed to solve";
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "Warm start problem failed to solve");
   }
   // TODO(QiL) : Step 7 : Formualte H representation of obstacles
 
-  Eigen::MatrixXd A_all = Eigen::MatrixXd::Zero(vOb.sum(), 2);
-  Eigen::MatrixXd b_all = Eigen::MatrixXd::Zero(vOb.sum(), 1);
+  Eigen::MatrixXd AOb = Eigen::MatrixXd::Zero(vOb.sum(), 2);
+  Eigen::MatrixXd bOb = Eigen::MatrixXd::Zero(vOb.sum(), 1);
 
-  Status ret = ObsHRep(nOb, vOb, lOb, &A_all, &b_all);
+  Status ret = ObsHRep(nOb, vOb, lOb, &AOb, &bOb);
 
   // TODO(QiL): Step 8 : Formulate distance approach problem
   // solution from distance approach
   Eigen::MatrixXd xp1 = Eigen::MatrixXd::Zero(4, horizon + 1);
   Eigen::MatrixXd up1 = Eigen::MatrixXd::Zero(2, horizon);
   Eigen::MatrixXd scaleTime1 = Eigen::MatrixXd::Zero(1, horizon + 1);
+
+  // TODO(QiL) : update the I/O to make the warm start problem and distance
+  // approach problem connect
+  distance_approach_.reset(new DistanceApproachProblem(
+      x0, xF, horizon, ts, wheelbase_length, ego, xWS, uWS, timeWS, XYbounds,
+      nOb, vOb, AOb, bOb));
+
+  // result for distance approach problem
+  std::vector<double> x1_result_2, x2_result_2, x3_result_2, x4_result_2,
+      u1_result_2, u2_result_2, t_result_2;
+  bool status = distance_approach_->Solve(
+      &x1_result_2, &x2_result_2, &x3_result_2, &x4_result_2, &u1_result_2,
+      &u2_result_2, &t_result_2);
+  if (status) {
+    ADEBUG << "Distance approach problem solved successfully!";
+  } else {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "Distance approach problem failed to solve");
+  }
 
   // TODO(QiL): Step 9 : Publish trajectoryPoint in planning trajectory
   return Status::OK();

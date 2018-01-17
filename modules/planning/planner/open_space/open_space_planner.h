@@ -23,6 +23,7 @@
 
 #include "Eigen/Eigen"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/planner/open_space/distance_approach_problem.h"
 #include "modules/planning/planner/open_space/warm_start_problem.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -73,6 +74,8 @@ class OpenSpacePlanner : public Planner {
 
  private:
   std::unique_ptr<::apollo::planning::WarmStartProblem> warm_start_;
+  std::unique_ptr<::apollo::planning::DistanceApproachProblem>
+      distance_approach_;
 };
 
 }  // namespace planning
