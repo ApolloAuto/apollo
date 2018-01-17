@@ -68,8 +68,9 @@ PlanningTarget BehaviorDecider::Analyze(
         ->CopyFrom(reference_point);
   }
 
-  CHECK(FLAGS_default_cruise_speed <= speed_limit);
-  ConditionFilter condition_filter(lon_init_state, speed_limit,
+  CHECK(FLAGS_default_cruise_speed <= FLAGS_planning_upper_speed_limit);
+  ConditionFilter condition_filter(lon_init_state,
+                                   FLAGS_planning_upper_speed_limit,
                                    path_time_neighborhood_);
 
   std::vector<SampleBound> sample_bounds = condition_filter.QuerySampleBounds();
