@@ -33,16 +33,26 @@ namespace planning {
 
 class DistanceApproachProblem {
  public:
-  explicit DistanceApproachProblem(std::size_t horizon, float ts,
-                                   float wheelbase_length, Eigen::MatrixXd x0,
-                                   Eigen::MatrixXd xF,
-                                   Eigen::MatrixXd XYbounds);
+  explicit DistanceApproachProblem(
+      Eigen::MatrixXd x0, Eigen::MatrixXd xF, std::size_t horizon, float ts,
+      float wheelbase_length, Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
+      Eigen::MatrixXd uWS, Eigen::MatrixXd timeWS, Eigen::MatrixXd XYbounds,
+      int nOb, Eigen::MatrixXd vOb, Eigen::MatrixXd AOb, Eigen::MatrixXd bOb);
 
   virtual ~DistanceApproachProblem() = default;
 
-  bool Solve() const;
+  bool Solve(std::vector<double>* x1_result, std::vector<double>* x2_result,
+             std::vector<double>* x3_result, std::vector<double>* x4_result,
+             std::vector<double>* u1_result, std::vector<double>* u2_result,
+             std::vector<double>* t_result);
 
  private:
+  // start point
+  Eigen::MatrixXd x0_;
+
+  // end point
+  Eigen::MatrixXd xF_;
+
   // time horizon
   std::size_t horizon_;
 
@@ -52,14 +62,32 @@ class DistanceApproachProblem {
   // wheelbase_length
   float wheelbase_length_;
 
-  // start point
-  Eigen::MatrixXd x0_;
+  // ego car dimension
+  Eigen::MatrixXd ego_;
 
-  // end point
-  Eigen::MatrixXd xF_;
+  // xWs from warm start problem
+  Eigen::MatrixXd xWS_;
+
+  // uWs from warm start problem
+  Eigen::MatrixXd uWS_;
+
+  // timeWS from warm start problem
+  Eigen::MatrixXd timeWS_;
 
   // XY bounds
   Eigen::MatrixXd XYbounds_;
+
+  // number of obstacles
+  int nOb_;
+
+  // vOb
+  Eigen::MatrixXd vOb_;
+
+  // AOb
+  Eigen::MatrixXd AOb_;
+
+  // bOb
+  Eigen::MatrixXd bOb_;
 };
 
 }  // namespace planning

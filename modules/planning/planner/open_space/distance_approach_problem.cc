@@ -35,23 +35,47 @@ namespace planning {
 
 using apollo::common::time::Clock;
 
-DistanceApproachProblem::DistanceApproachProblem(std::size_t horizon, float ts,
-                                                 float wheelbase_length,
-                                                 Eigen::MatrixXd x0,
-                                                 Eigen::MatrixXd xF,
-                                                 Eigen::MatrixXd XYbounds)
-    : horizon_(horizon), ts_(ts), x0_(x0), xF_(xF), XYbounds_(XYbounds) {}
+DistanceApproachProblem::DistanceApproachProblem(
+    Eigen::MatrixXd x0, Eigen::MatrixXd xF, std::size_t horizon, float ts,
+    float wheelbase_length, Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
+    Eigen::MatrixXd uWS, Eigen::MatrixXd timeWS, Eigen::MatrixXd XYbounds,
+    int nOb, Eigen::MatrixXd vOb, Eigen::MatrixXd AOb, Eigen::MatrixXd bOb)
+    : x0_(x0),
+      xF_(xF),
+      horizon_(horizon),
+      ts_(ts),
+      wheelbase_length_(wheelbase_length),
+      ego_(ego),
+      xWS_(xWS),
+      uWS_(uWS),
+      timeWS_(timeWS),
+      XYbounds_(XYbounds),
+      nOb_(nOb),
+      vOb_(vOb),
+      AOb_(AOb),
+      bOb_(bOb) {}
 
-bool DistanceApproachProblem::Solve() const {
+bool DistanceApproachProblem::Solve(std::vector<double>* x1_result,
+                                    std::vector<double>* x2_result,
+                                    std::vector<double>* x3_result,
+                                    std::vector<double>* x4_result,
+                                    std::vector<double>* u1_result,
+                                    std::vector<double>* u2_result,
+                                    std::vector<double>* t_result) {
   // TODO(QiL) : set up number of variables and number of constaints, and rego
   // so constants do not get set repeatedly
 
   // n1 : states variables
   int n1 = 4 * (horizon_ + 1);
+
   // n2 : control inputs variables
   int n2 = 2 * horizon_;
+
   // n3 : sampling time variables
   int n3 = horizon_ + 1;
+
+  // n4 : dual multiplier associated with obstacleShape
+  int n4 = vOb_.sum() * (horizon_ + 1);
 
   // m1 : state equality constatins
   int m1 = 4 * horizon_;
@@ -68,12 +92,13 @@ bool DistanceApproachProblem::Solve() const {
   // m5 : sampling time inequality constraints
   int m5 = horizon_;
 
-  int num_of_variables = n1 + n2 + n3;
+  int num_of_variables = n1 + n2 + n3 + n4;
   int num_of_constraints = m1 + m2 + m3 + m4 + m5;
 
   // TODO(QiL) : evaluate whether need to new it everytime
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
-      num_of_variables, num_of_constraints, horizon_, x0_, xF_, XYbounds_);
+      num_of_variables, num_of_constraints, horizon_, ts_, wheelbase_length_,
+      x0_, xF_, XYbounds_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
@@ -95,7 +120,7 @@ bool DistanceApproachProblem::Solve() const {
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
-    ADEBUG << "*** Error during initialization!";
+    AERROR << "*** Distiance Approach problem error during initialization!";
     return static_cast<int>(status);
   }
 
@@ -114,7 +139,8 @@ bool DistanceApproachProblem::Solve() const {
     ADEBUG << "Return status: " << int(status);
   }
 
-  ptop->get_optimization_results();
+  ptop->get_optimization_results(x1_result, x2_result, x3_result, x4_result,
+                                 u1_result, u2_result, t_result);
 
   return status == Ipopt::Solve_Succeeded ||
          status == Ipopt::Solved_To_Acceptable_Level;
