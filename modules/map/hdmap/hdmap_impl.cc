@@ -105,6 +105,12 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   for (const auto& lane_ptr_pair : lane_table_) {
     lane_ptr_pair.second->PostProcess(*this);
   }
+  for (const auto& junction_ptr_pair : junction_table_) {
+    junction_ptr_pair.second->PostProcess(*this);
+  }
+  for (const auto& stop_sign_ptr_pair : stop_sign_table_) {
+    stop_sign_ptr_pair.second->PostProcess(*this);
+  }
 
   BuildLaneSegmentKDTree();
   BuildJunctionPolygonKDTree();

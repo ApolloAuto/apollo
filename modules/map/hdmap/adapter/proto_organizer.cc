@@ -283,7 +283,7 @@ void ProtoOrganizer::GetLaneLaneOverlapElements(
 void ProtoOrganizer::GetJunctionObjectOverlapElements(
     const std::vector<JunctionInternal>& junctions) {
   for (auto& junction_internal : junctions) {
-    std::string junction_id = junction_internal.junction.id().id();
+    const auto& junction_id = junction_internal.junction.id().id();
     for (auto& overlap_junction : junction_internal.overlap_with_junctions) {
       PbOverlap overlap;
       std::string overlap_id = CreateOverlapId();
@@ -292,6 +292,7 @@ void ProtoOrganizer::GetJunctionObjectOverlapElements(
       overlap.mutable_id()->set_id(overlap_id);
       PbObjectOverlapInfo* object_overlap = overlap.add_object();
       object_overlap->mutable_id()->set_id(junction_id);
+      object_overlap->mutable_junction_overlap_info();
       std::string object_id = overlap_junction.object_id;
       object_overlap = overlap.add_object();
       object_overlap->mutable_id()->set_id(object_id);
@@ -302,6 +303,10 @@ void ProtoOrganizer::GetJunctionObjectOverlapElements(
       } else if (proto_data_.pb_clear_areas.count(object_id) > 0) {
         object_overlap->mutable_clear_area_overlap_info();
         proto_data_.pb_clear_areas[object_id].add_overlap_id()->set_id(
+            overlap_id);
+      } else if (proto_data_.pb_stop_signs.count(object_id) > 0) {
+        object_overlap->mutable_stop_sign_overlap_info();
+        proto_data_.pb_stop_signs[object_id].add_overlap_id()->set_id(
             overlap_id);
       } else {
         continue;
