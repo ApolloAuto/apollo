@@ -19,7 +19,7 @@ cc_library(
         "//modules/planning/constraint_checker:constraint_checker",
         "//modules/planning/planner:planner",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/lattice/util:lattice_util",
+        "//modules/planning/lattice/util:lattice_trajectory1d",
         "//modules/planning/lattice/trajectory_generator:trajectory1d_generator",
         "//modules/planning/lattice/trajectory_generator:trajectory_evaluator",
         "//modules/planning/lattice/behavior_decider:behavior_decider",

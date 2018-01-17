@@ -33,34 +33,4 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "util",
-    hdrs = [
-        "lattice_util.h",
-    ],
-    srcs = [
-        "lattice_util.cc",
-    ],
-    deps = [
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/reference_line:reference_line",
-        "//modules/planning/math/frame_conversion:cartesian_frenet_conversion",
-    ],
-)
-
-cc_library(
-    name = "lattice_params",
-    hdrs = ["lattice_params.h"],
-    deps = [],
-)
-
-cc_library(
-    name = "lattice_util",
-    deps = [
-        ":reference_line_matcher",
-        ":util",
-        ":lattice_params",
-    ],
-)
-
 cpplint()
