@@ -159,6 +159,23 @@ std::vector<routing::LaneWaypoint> PncMap::FutureRouteWaypoints() const {
       waypoints.begin() + next_routing_waypoint_index_, waypoints.end());
 }
 
+void PncMap::UpdateRoutingRange(int adc_index) {
+  // track routing range.
+  while (range_start_ + 1 < adc_index) {
+    range_lane_ids_.erase(route_indices_[range_start_].segment.lane->id().id());
+    ++range_start_;
+  }
+  while (range_end_ < static_cast<int>(route_indices_.size())) {
+    const auto &lane_id = route_indices_[range_end_].segment.lane->id().id();
+    if (range_lane_ids_.count(lane_id) == 0) {
+      range_lane_ids_.insert(lane_id);
+    } else {
+      break;
+    }
+    ++range_end_;
+  }
+}
+
 bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
   if (!ValidateRouting(routing_)) {
     AERROR << "The routing is invalid when updatting vehicle state";
@@ -191,6 +208,7 @@ bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
   // track how many routing request waypoints the adc have passed.
   UpdateNextRoutingWaypointIndex(route_index);
   adc_route_index_ = route_index;
+  UpdateRoutingRange(adc_route_index_);
 
   int last_index = GetWaypointIndex(routing_waypoint_index_.back().waypoint);
   if (next_routing_waypoint_index_ == routing_waypoint_index_.size() - 1 ||
@@ -226,8 +244,9 @@ bool PncMap::IsNewRouting(const routing::RoutingResponse &prev,
 }
 
 bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
-  routing_lane_ids_.clear();
+  range_lane_ids_.clear();
   route_indices_.clear();
+  all_lane_ids_.clear();
   for (int road_index = 0; road_index < routing.road_size(); ++road_index) {
     const auto &road_segment = routing.road(road_index);
     for (int passage_index = 0; passage_index < road_segment.passage_size();
@@ -235,7 +254,7 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       const auto &passage = road_segment.passage(passage_index);
       for (int lane_index = 0; lane_index < passage.segment_size();
            ++lane_index) {
-        routing_lane_ids_.insert(passage.segment(lane_index).id());
+        all_lane_ids_.insert(passage.segment(lane_index).id());
         route_indices_.emplace_back();
         route_indices_.back().segment =
             ToLaneSegment(passage.segment(lane_index));
@@ -243,6 +262,12 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       }
     }
   }
+
+  range_start_ = 0;
+  range_end_ = 0;
+  adc_route_index_ = -1;
+  next_routing_waypoint_index_ = 0;
+  UpdateRoutingRange(adc_route_index_);
 
   routing_waypoint_index_.clear();
   int i = 0;
@@ -258,9 +283,7 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
       ++i;
     }
   }
-  next_routing_waypoint_index_ = 0;
   routing_ = routing;
-  adc_route_index_ = -1;
   adc_waypoint_ = LaneWaypoint();
   stop_for_destination_ = false;
   return true;
@@ -511,10 +534,22 @@ bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
            << " meters with heading " << state.heading();
     return false;
   }
+  std::vector<LaneInfoConstPtr> valid_lanes;
+  std::copy_if(lanes.begin(), lanes.end(), std::back_inserter(valid_lanes),
+               [&](LaneInfoConstPtr ptr) {
+                 return range_lane_ids_.count(ptr->lane().id().id()) > 0;
+               });
+  if (valid_lanes.empty()) {
+    std::copy_if(lanes.begin(), lanes.end(), std::back_inserter(valid_lanes),
+                 [&](LaneInfoConstPtr ptr) {
+                   return all_lane_ids_.count(ptr->lane().id().id()) > 0;
+                 });
+  }
+
   // get nearest_wayponints for current position
   double min_distance = std::numeric_limits<double>::infinity();
-  for (const auto &lane : lanes) {
-    if (routing_lane_ids_.count(lane->id().id()) == 0) {
+  for (const auto &lane : valid_lanes) {
+    if (range_lane_ids_.count(lane->id().id()) == 0) {
       continue;
     }
     {
@@ -556,7 +591,7 @@ LaneInfoConstPtr PncMap::GetRouteSuccessor(LaneInfoConstPtr lane) const {
   }
   hdmap::Id preferred_id = lane->lane().successor_id(0);
   for (const auto &lane_id : lane->lane().successor_id()) {
-    if (routing_lane_ids_.count(lane_id.id()) != 0) {
+    if (range_lane_ids_.count(lane_id.id()) != 0) {
       preferred_id = lane_id;
       break;
     }
@@ -570,7 +605,7 @@ LaneInfoConstPtr PncMap::GetRoutePredecessor(LaneInfoConstPtr lane) const {
   }
   hdmap::Id preferred_id = lane->lane().predecessor_id(0);
   for (const auto &lane_id : lane->lane().predecessor_id()) {
-    if (routing_lane_ids_.count(lane_id.id()) != 0) {
+    if (range_lane_ids_.count(lane_id.id()) != 0) {
       preferred_id = lane_id;
       break;
     }
