@@ -93,7 +93,7 @@ TEST_F(GeometryUtilTest, TransformPointCloud2) {
   point_in.x = 1.0;
   point_in.y = 1.0;
   point_in.z = 1.0;
-  TransformPoint(point_in, &point_out, _trans_matrix);
+  TransformPoint(point_in, _trans_matrix, &point_out);
   EXPECT_NEAR(-0.985772, point_out.x, EPSILON);
   EXPECT_NEAR(2.010278, point_out.y, EPSILON);
   EXPECT_NEAR(2.027878, point_out.z, EPSILON);
@@ -106,7 +106,7 @@ TEST_F(GeometryUtilTest, TransformPointCloud2) {
   EXPECT_NEAR(1.715922, in_out_cloud->at(0).z, EPSILON);
 
   pcl_util::PointCloudPtr out_cloud(new pcl_util::PointCloud);
-  TransformPointCloud(*_clouds[0], out_cloud.get(), _trans_matrix);
+  TransformPointCloud(*_clouds[0], _trans_matrix, out_cloud.get());
   EXPECT_NEAR(64.184380, out_cloud->at(0).x, EPSILON);
   EXPECT_NEAR(13.708398, out_cloud->at(0).y, EPSILON);
   EXPECT_NEAR(1.715922, out_cloud->at(0).z, EPSILON);
