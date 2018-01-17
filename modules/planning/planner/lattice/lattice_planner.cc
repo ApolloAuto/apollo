@@ -29,6 +29,7 @@
 #include "modules/common/time/time.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/constraint_checker/constraint_checker.h"
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 #include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
@@ -37,7 +38,6 @@
 #include "modules/planning/lattice/trajectory_generator/trajectory_evaluator.h"
 #include "modules/planning/lattice/util/lattice_trajectory1d.h"
 #include "modules/planning/lattice/util/collision_checker.h"
-#include "modules/planning/lattice/util/lattice_constraint_checker.h"
 #include "modules/planning/lattice/util/lattice_util.h"
 
 namespace apollo {
@@ -148,23 +148,6 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
 
   planning_internal::Debug* ptr_debug = reference_line_info->mutable_debug();
 
-  /*
-  // put obstacles into debug data
-  // Note : create prediction_obstacles since there is no longer original
-  // data exposed. WTF
-  // Hence, there might be obstacles with same id but different trajectory
-
-  for (uint i = 0; i < obstacles.size(); ++i) {
-    const Obstacle* obstacle_ptr = obstacles[i];
-    apollo::prediction::PredictionObstacle* prediction_obstacle =
-        ptr_debug->mutable_planning_data()->add_prediction_obstacle();
-    prediction_obstacle->mutable_perception_obstacle()->CopyFrom(
-        obstacle_ptr->Perception());
-    prediction_obstacle->add_trajectory()->CopyFrom(obstacle_ptr->Trajectory());
-  }
-
-  AINFO << "Step Debug Succeeded";
-  */
   int num_lattice_traj = 0;
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
     double trajectory_pair_cost = 0.0;
@@ -176,13 +159,6 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
     }
     auto trajectory_pair = trajectory_evaluator.next_top_trajectory_pair();
 
-    // check the validity of 1d trajectories
-    if (!LatticeConstraintChecker::IsValidTrajectoryPair(
-            *trajectory_pair.second, *trajectory_pair.first)) {
-      ++constraint_failure_count;
-      continue;
-    }
-
     // combine two 1d trajectories to one 2d trajectory
     auto combined_trajectory = CombineTrajectory(
         discretized_reference_line, *trajectory_pair.first,
@@ -190,7 +166,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
 
     // check longitudinal and lateral acceleration
     // considering trajectory curvatures
-    if (!LatticeConstraintChecker::IsValidTrajectory(combined_trajectory)) {
+    if (!ConstraintChecker::ValidTrajectory(combined_trajectory)) {
       ++combined_constraint_failure_count;
       continue;
     }
