@@ -169,22 +169,19 @@ void SignalLightScenario::CreateStopObstacle(
            << " is not on reference line";
     return;
   }
-  // double heading = reference_line.GetReferencePoint(stop_s).heading();
+  double heading = reference_line.GetReferencePoint(stop_s).heading();
   double left_lane_width = 0.0;
   double right_lane_width = 0.0;
   reference_line.GetLaneWidth(signal_light->start_s, &left_lane_width,
                               &right_lane_width);
 
-  /*
   auto box_center = reference_line.GetReferencePoint(box_center_s);
   common::math::Box2d stop_box{box_center, heading,
                                FLAGS_virtual_stop_wall_length,
                                left_lane_width + right_lane_width};
-  PathObstacle* stop_wall =
-      reference_line_info->AddObstacle(frame->AddStaticVirtualObstacle(
-          FLAGS_signal_light_virtual_object_id_prefix + signal_light->object_id,
-          stop_box));
-  */
+  reference_line_info->AddObstacle(frame->AddStaticVirtualObstacle(
+      FLAGS_signal_light_virtual_object_id_prefix + signal_light->object_id,
+      stop_box));
 }
 
 }  // namespace planning
