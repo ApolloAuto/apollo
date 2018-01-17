@@ -151,6 +151,8 @@ class PncMap {
   int SearchBackwardWaypointIndex(int start,
                                   const LaneWaypoint &waypoint) const;
 
+  void UpdateRoutingRange(int adc_index);
+
  private:
   routing::RoutingResponse routing_;
   struct RouteIndex {
@@ -158,8 +160,11 @@ class PncMap {
     std::array<int, 3> index;
   };
   std::vector<RouteIndex> route_indices_;
-
-  std::unordered_set<std::string> routing_lane_ids_;
+  int range_start_ = 0;
+  int range_end_ = 0;
+  // routing ids in range
+  std::unordered_set<std::string> range_lane_ids_;
+  std::unordered_set<std::string> all_lane_ids_;
 
   /**
    * The routing request waypoints
