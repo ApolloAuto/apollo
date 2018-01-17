@@ -28,7 +28,7 @@
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/util/lattice_params.h"
-#include "modules/planning/lattice/util/lattice_constraint_checker.h"
+#include "modules/planning/constraint_checker/constraint_checker1d.h"
 
 namespace apollo {
 namespace planning {
@@ -44,12 +44,12 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     : is_auto_tuning_(is_auto_tuning),
       pathtime_neighborhood_(pathtime_neighborhood) {
   for (const auto lon_trajectory : lon_trajectories) {
-    if (!LatticeConstraintChecker::IsValidLongitudinalTrajectory(
+    if (!ConstraintChecker1d::IsValidLongitudinalTrajectory(
             *lon_trajectory)) {
       continue;
     }
     for (const auto lat_trajectory : lat_trajectories) {
-      if (!LatticeConstraintChecker::IsValidLateralTrajectory(
+      if (!ConstraintChecker1d::IsValidLateralTrajectory(
               *lat_trajectory, *lon_trajectory)) {
         continue;
       }

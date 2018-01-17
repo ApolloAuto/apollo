@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_LATTICE_CONSTRAINT_CHECKER_H
-#define MODULES_PLANNING_LATTICE_LATTICE_CONSTRAINT_CHECKER_H
+#ifndef MODULES_PLANNING_CONSTRAINT_CHECKER_CONSTRAINT_CHECKER1D_H_
+#define MODULES_PLANNING_CONSTRAINT_CHECKER_CONSTRAINT_CHECKER1D_H_
 
 #include <vector>
 
@@ -29,22 +29,17 @@
 namespace apollo {
 namespace planning {
 
-class LatticeConstraintChecker {
+class ConstraintChecker1d {
  public:
-  LatticeConstraintChecker() = delete;
-
-  static bool IsValidTrajectoryPair(const Curve1d& lat_trajectory,
-                                    const Curve1d& lon_trajectory);
+    ConstraintChecker1d() = delete;
 
   static bool IsValidLongitudinalTrajectory(const Curve1d& lon_trajectory);
 
   static bool IsValidLateralTrajectory(const Curve1d& lat_trajectory,
                                        const Curve1d& lon_trajectory);
-
-  static bool IsValidTrajectory(const DiscretizedTrajectory& trajectory);
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_LATTICE_LATTICE_CONSTRAINT_CHECKER_H */
+#endif  // MODULES_PLANNING_CONSTRAINT_CHECKER_CONSTRAINT_CHECKER1D_H_

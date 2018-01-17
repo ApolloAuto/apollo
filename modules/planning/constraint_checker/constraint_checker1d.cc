@@ -18,9 +18,7 @@
  * @file lattice_constraint_checker.h
  **/
 
-#include "modules/planning/lattice/util/lattice_constraint_checker.h"
-
-#include <iostream>
+#include "modules/planning/constraint_checker/constraint_checker1d.h"
 
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/common/log.h"
@@ -39,13 +37,7 @@ bool fuzzy_within(const double v, const double lower, const double upper,
 }
 }
 
-bool LatticeConstraintChecker::IsValidTrajectoryPair(
-    const Curve1d& lat_trajectory, const Curve1d& lon_trajectory) {
-  return IsValidLateralTrajectory(lat_trajectory, lon_trajectory) &&
-         IsValidLongitudinalTrajectory(lon_trajectory);
-}
-
-bool LatticeConstraintChecker::IsValidLongitudinalTrajectory(
+bool ConstraintChecker1d::IsValidLongitudinalTrajectory(
     const Curve1d& lon_trajectory) {
   double t = 0.0;
   while (t < lon_trajectory.ParamLength()) {
@@ -70,7 +62,7 @@ bool LatticeConstraintChecker::IsValidLongitudinalTrajectory(
   return true;
 }
 
-bool LatticeConstraintChecker::IsValidLateralTrajectory(
+bool ConstraintChecker1d::IsValidLateralTrajectory(
     const Curve1d& lat_trajectory, const Curve1d& lon_trajectory) {
   double t = 0.0;
   while (t < lon_trajectory.ParamLength()) {
@@ -101,48 +93,6 @@ bool LatticeConstraintChecker::IsValidLateralTrajectory(
       return false;
     }
     t += FLAGS_trajectory_time_resolution;
-  }
-  return true;
-}
-
-bool LatticeConstraintChecker::IsValidTrajectory(
-    const DiscretizedTrajectory& trajectory) {
-  if (trajectory.NumOfPoints() < 2) {
-    return false;
-  }
-
-  const auto& points = trajectory.trajectory_points();
-  for (std::size_t i = 0; i < points.size(); ++i) {
-    double lon_a = points[i].a();
-    if (lon_a < FLAGS_longitudinal_acceleration_lower_bound ||
-        lon_a > FLAGS_longitudinal_acceleration_upper_bound) {
-      ADEBUG << "LatticeConstraintChecker::IsValidTrajectory:\t";
-      ADEBUG << "\tlon acc. exceeds boundary; lon_a = " << lon_a;
-      return false;
-    }
-
-    double lat_a = std::abs(points[i].v() * points[i].v() *
-                            points[i].path_point().kappa());
-    if (lat_a > FLAGS_lateral_acceleration_bound) {
-      ADEBUG << "LatticeConstraintChecker::IsValidTrajectory:\t";
-      ADEBUG << "\tlat acc. exceeds boundary; lat_a = " << lat_a;
-      return false;
-    }
-
-    if (i > 1) {
-      double dt = points[i].relative_time() - points[i - 1].relative_time();
-      if (dt <= 0.0) {
-        return false;
-      }
-      double last_lon_a = points[i - 1].a();
-      double j = (lon_a - last_lon_a) / dt;
-      if (j < FLAGS_longitudinal_jerk_lower_bound ||
-          j > FLAGS_longitudinal_jerk_upper_bound) {
-        ADEBUG << "LatticeConstraintChecker::IsValidTrajectory:\t";
-        ADEBUG << "\tjerk exceeds boundary; j = " << j;
-        return false;
-      }
-    }
   }
   return true;
 }
