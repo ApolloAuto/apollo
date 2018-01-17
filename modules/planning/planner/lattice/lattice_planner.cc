@@ -20,6 +20,7 @@
 
 #include "modules/planning/planner/lattice/lattice_planner.h"
 
+#include <algorithm>
 #include <limits>
 #include <memory>
 #include <vector>
@@ -205,7 +206,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
               << "from future trajectory to lon-lat";
         // tuning_success = false;
       }
-      // 3. evalutate cost
+      // 3. evaluate cost
       std::vector<double> future_trajectory_component_cost =
           trajectory_evaluator.evaluate_per_lonlat_trajectory(
               planning_target, lon_future_trajectory, lat_future_trajectory);
@@ -301,7 +302,7 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
     // linear extrapolation is handled internally in LatticeTrajectory1d;
     // no worry about t_param > lon_trajectory.ParamLength() situation
     double s = lon_trajectory.Evaluate(0, t_param);
-    double s_dot = lon_trajectory.Evaluate(1, t_param);
+    double s_dot = std::max(0.0, lon_trajectory.Evaluate(1, t_param));
     double s_ddot = lon_trajectory.Evaluate(2, t_param);
     if (s > s_ref_max) {
       break;
