@@ -34,6 +34,7 @@
 #include "modules/common/filters/digital_filter.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/feature.pb.h"
+#include "modules/prediction/container/obstacles/obstacle_clusters.h"
 
 #include "modules/common/math/kalman_filter.h"
 #include "modules/map/hdmap/hdmap_common.h"
@@ -67,7 +68,8 @@ class Obstacle {
    * @param timestamp The timestamp when the perception obstacle was detected.
    */
   void Insert(const perception::PerceptionObstacle& perception_obstacle,
-              const double timestamp);
+              const double timestamp,
+              ObstacleClusters* const obstacle_clusters);
 
   /**
    * @brief Get the type of perception obstacle's type.
@@ -229,7 +231,8 @@ class Obstacle {
 
   void SetNearbyLanes(Feature* feature);
 
-  void SetLaneGraphFeature(Feature* feature);
+  void SetLaneGraphFeature(Feature* feature,
+                           ObstacleClusters* const obstacle_clusters);
 
   void SetLanePoints(Feature* feature);
 
