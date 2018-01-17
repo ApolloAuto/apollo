@@ -709,6 +709,10 @@ int HDMapImpl::GetStopSignAssociateLanes(
 
     std::vector<Id> associate_lane_ids;
     for (const auto& stop_sign_id : associate_stop_sign_ids) {
+      if (stop_sign_id.id() == id.id()) {
+        // exclude current stop sign
+        continue;
+      }
       const auto& stop_sign = GetStopSignById(stop_sign_id);
       if (stop_sign == nullptr) {
         continue;
