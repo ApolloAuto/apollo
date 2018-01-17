@@ -142,7 +142,7 @@ double TrajectoryEvaluator::evaluate(
   double s = 0.0;
   while (s < decision_horizon) {
     s_values.push_back(s);
-    s += trajectory_space_resolution;
+    s += FLAGS_trajectory_space_resolution;
   }
   double lat_offset_cost = compute_lat_offset_cost(lat_trajectory, s_values);
 
@@ -184,10 +184,10 @@ double TrajectoryEvaluator::compute_lon_comfort_cost(
   double cost = 0.0;
   double t = 0.0;
 
-  while (t < planned_trajectory_time) {
+  while (t < FLAGS_trajectory_time_length) {
     double c = lon_trajectory->Evaluate(3, t);
     cost += c * c;
-    t = t + trajectory_time_resolution;
+    t = t + FLAGS_trajectory_time_resolution;
   }
   return cost;
 }
@@ -204,10 +204,10 @@ double TrajectoryEvaluator::compute_lon_objective_cost(
 
   double cost = 0.0;
   double t = 0.0;
-  while (t < planned_trajectory_time) {
+  while (t < FLAGS_trajectory_time_length) {
     double c = planning_target.cruise_speed() - lon_trajectory->Evaluate(1, t);
     cost += std::fabs(c);
-    t += trajectory_time_resolution;
+    t += FLAGS_trajectory_time_resolution;
   }
   cost *= weight_on_reference_speed;
   cost += weight_dist_travelled * 1.0 / (1.0 + dist_s);
@@ -219,9 +219,9 @@ double TrajectoryEvaluator::compute_lon_objective_cost(
 double TrajectoryEvaluator::compute_lon_obstacle_cost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory) const {
   double start_time = 0.0;
-  double end_time = planned_trajectory_time;
+  double end_time = FLAGS_trajectory_time_length;
   const auto& pt_intervals = pathtime_neighborhood_->GetPathBlockingIntervals(
-      start_time, end_time, trajectory_time_resolution);
+      start_time, end_time, FLAGS_trajectory_time_resolution);
 
   double obstacle_cost = 0.0;
   for (std::size_t i = 0; i < pt_intervals.size(); ++i) {
@@ -230,7 +230,7 @@ double TrajectoryEvaluator::compute_lon_obstacle_cost(
       continue;
     }
 
-    double t = start_time + i * trajectory_time_resolution;
+    double t = start_time + i * FLAGS_trajectory_time_resolution;
     double traj_s = lon_trajectory->Evaluate(0, t);
 
     for (const auto& m : pt_interval) {

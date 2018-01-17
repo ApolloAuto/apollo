@@ -27,6 +27,7 @@
 #include <algorithm>
 
 #include "modules/planning/proto/sl_boundary.pb.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
@@ -78,7 +79,7 @@ PathTimeNeighborhood::PathTimeNeighborhood(
   path_range_.second = ego_s + decision_horizon;
 
   time_range_.first = 0.0;
-  time_range_.second = planned_trajectory_time;
+  time_range_.second = FLAGS_trajectory_time_length;
 
   discretized_ref_points_ = discretized_ref_points;
   SetupObstacles(obstacles, discretized_ref_points);
@@ -146,7 +147,7 @@ void PathTimeNeighborhood::SetupObstacles(
             path_time_obstacle_map_.end()) {
           break;
         } else {
-          relative_time += trajectory_time_resolution;
+          relative_time += FLAGS_trajectory_time_resolution;
           continue;
         }
       }
@@ -172,7 +173,7 @@ void PathTimeNeighborhood::SetupObstacles(
           ->CopyFrom(SetPathTimePoint(obstacle->Id(),
                          sl_boundary.end_s(), relative_time));
 
-      relative_time += trajectory_time_resolution;
+      relative_time += FLAGS_trajectory_time_resolution;
     }
   }
 
@@ -218,12 +219,12 @@ void PathTimeNeighborhood::SetStaticPathTimeObstacle(
       ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.start_s(), 0.0));
   path_time_obstacle_map_[obstacle_id].mutable_bottom_right()
       ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.start_s(),
-                                  planned_trajectory_time));
+                                  FLAGS_trajectory_time_length));
   path_time_obstacle_map_[obstacle_id].mutable_upper_left()
       ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.end_s(), 0.0));
   path_time_obstacle_map_[obstacle_id].mutable_upper_right()
       ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.end_s(),
-                                  planned_trajectory_time));
+                                  FLAGS_trajectory_time_length));
 }
 
 double PathTimeNeighborhood::SpeedAtT(

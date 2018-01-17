@@ -61,7 +61,7 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
   constexpr std::size_t num_time_section = 9;
   std::array<double, num_time_section> time_sections;
   for (std::size_t i = 0; i + 1 < num_time_section; ++i) {
-    time_sections[i] = planned_trajectory_time - i;
+    time_sections[i] = FLAGS_trajectory_time_length - i;
   }
   time_sections[num_time_section - 1] = 0.01;
 

@@ -29,11 +29,11 @@
 #include "modules/common/macro.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
 #include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_evaluator.h"
-#include "modules/planning/lattice/util/collision_checker.h"
 #include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/planning/lattice/util/lattice_trajectory1d.h"
 #include "modules/planning/lattice/util/lattice_util.h"
@@ -297,7 +297,7 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
   double s_ref_max = reference_line.back().s();
 
   double t_param = 0.0;
-  while (t_param < planned_trajectory_time) {
+  while (t_param < FLAGS_trajectory_time_length) {
     // linear extrapolation is handled internally in LatticeTrajectory1d;
     // no worry about t_param > lon_trajectory.ParamLength() situation
     double s = lon_trajectory.Evaluate(0, t_param);
@@ -348,7 +348,7 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
 
     combined_trajectory.AppendTrajectoryPoint(trajectory_point);
 
-    t_param = t_param + trajectory_time_resolution;
+    t_param = t_param + FLAGS_trajectory_time_resolution;
   }
   return combined_trajectory;
 }
