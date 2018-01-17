@@ -27,8 +27,8 @@
 
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/planning/constraint_checker/constraint_checker1d.h"
+#include "modules/planning/lattice/util/lattice_params.h"
 
 namespace apollo {
 namespace planning {
@@ -44,13 +44,12 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     : is_auto_tuning_(is_auto_tuning),
       pathtime_neighborhood_(pathtime_neighborhood) {
   for (const auto lon_trajectory : lon_trajectories) {
-    if (!ConstraintChecker1d::IsValidLongitudinalTrajectory(
-            *lon_trajectory)) {
+    if (!ConstraintChecker1d::IsValidLongitudinalTrajectory(*lon_trajectory)) {
       continue;
     }
     for (const auto lat_trajectory : lat_trajectories) {
-      if (!ConstraintChecker1d::IsValidLateralTrajectory(
-              *lat_trajectory, *lon_trajectory)) {
+      if (!ConstraintChecker1d::IsValidLateralTrajectory(*lat_trajectory,
+                                                         *lon_trajectory)) {
         continue;
       }
       if (!is_auto_tuning_) {
@@ -133,11 +132,6 @@ double TrajectoryEvaluator::evaluate(
   double weight_lon_obstacle = 100.0;
   double weight_lat_offset = 1.0;
 
-  double t = 0.0;
-  double t_max = lon_trajectory->ParamLength();
-  double s_max = lon_trajectory->Evaluate(0, t_max);
-  double v_end = lon_trajectory->Evaluate(1, t_max);
-
   double lon_travel_cost =
       compute_lon_objective_cost(lon_trajectory, planning_target);
 
@@ -168,10 +162,7 @@ double TrajectoryEvaluator::evaluate(
 double TrajectoryEvaluator::compute_lat_offset_cost(
     const std::shared_ptr<Trajectory1d>& lat_trajectory,
     const std::vector<double>& s_values) const {
-  double lat_s_max = lat_trajectory->ParamLength();
-  double lat_offset_end = lat_trajectory->Evaluate(0, lat_s_max);
   double lat_offset_start = lat_trajectory->Evaluate(0, 0.0);
-
   double weight_same_side_offset = 1.0;
   double weight_opposite_side_offset = 10.0;
 

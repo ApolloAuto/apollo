@@ -29,7 +29,6 @@ using apollo::common::util::Print;
 using apollo::common::util::StrCat;
 
 Object::Object() {
-  direction = Vector3d(1, 0, 0);
   center = Vector3d::Zero();
   velocity = Vector3d::Zero();
   cloud.reset(new pcl_util::PointCloud);

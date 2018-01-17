@@ -65,7 +65,7 @@ void TransformPointCloud(pcl_util::PointCloudPtr cloud,
 
 /*
  * Vector & Matrix related methods
- * */
+ */
 void TransAffineToMatrix4(const Eigen::Vector3d& translation,
                           const Eigen::Vector4d& rotation,
                           Eigen::Matrix4d* trans_matrix) {
