@@ -82,18 +82,9 @@ function addLaneMesh(laneType, points) {
 function addLane(lane, coordinates, scene) {
     const drewObjects = [];
 
-    const centralLine = lane.centralCurve.segment;
-    centralLine.forEach(segment => {
-        const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
-        const centerLine = drawSegmentsFromPoints(
-            points, colorMapping.GREEN, 1, 1, false);
-        scene.add(centerLine);
-        drewObjects.push(centerLine);
-    });
-
-    // TODO: this is a temp. fix for repeated boundary types.
-    if(!lane.rightBoundary.virtual) {
-        const rightLaneType = lane.rightBoundary.boundaryType[0].types[0];
+    const rightLaneType = lane.rightBoundary.boundaryType[0].types[0];
+    if(!lane.rightBoundary.virtual || rightLaneType !== "DOTTED_WHITE") {
+        // TODO: this is a temp. fix for repeated boundary types.
         lane.rightBoundary.curve.segment.forEach((segment, index) => {
             const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
             const boundary = addLaneMesh(rightLaneType, points);
@@ -102,8 +93,8 @@ function addLane(lane, coordinates, scene) {
         });
     }
 
-    if(!lane.leftBoundary.virtual) {
-        const leftLaneType = lane.leftBoundary.boundaryType[0].types[0];
+    const leftLaneType = lane.leftBoundary.boundaryType[0].types[0];
+    if(!lane.leftBoundary.virtual || leftLaneType !== "DOTTED_WHITE") {
         lane.leftBoundary.curve.segment.forEach((segment, index) => {
             const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
             const boundary = addLaneMesh(leftLaneType, points);

@@ -29,7 +29,6 @@ using apollo::common::util::Print;
 using apollo::common::util::StrCat;
 
 Object::Object() {
-  direction = Vector3d(1, 0, 0);
   center = Vector3d::Zero();
   velocity = Vector3d::Zero();
   cloud.reset(new pcl_util::PointCloud);
@@ -44,8 +43,7 @@ void Object::clone(const Object& rhs) {
   pcl::copyPointCloud<pcl_util::Point, pcl_util::Point>(*(rhs.cloud), *cloud);
   radar_supplement = nullptr;
   if (rhs.radar_supplement != nullptr) {
-    radar_supplement.reset(new RadarSupplement());
-    radar_supplement->clone(*(rhs.radar_supplement));
+    radar_supplement.reset(new RadarSupplement(*rhs.radar_supplement));
   }
 }
 
@@ -84,7 +82,7 @@ std::string Object::ToString() const {
 }
 
 void Object::Serialize(PerceptionObstacle* pb_obj) const {
-  CHECK(pb_obj != NULL);
+  CHECK(pb_obj != nullptr);
   pb_obj->set_id(track_id);
   pb_obj->set_theta(theta);
 
@@ -119,7 +117,7 @@ void Object::Serialize(PerceptionObstacle* pb_obj) const {
 
   pb_obj->set_confidence(score);
   pb_obj->set_confidence_type(
-    static_cast<PerceptionObstacle::ConfidenceType>(score_type));
+      static_cast<PerceptionObstacle::ConfidenceType>(score_type));
   pb_obj->set_tracking_time(tracking_time);
   pb_obj->set_type(static_cast<PerceptionObstacle::Type>(type));
   pb_obj->set_timestamp(latest_tracked_time);  // in seconds.

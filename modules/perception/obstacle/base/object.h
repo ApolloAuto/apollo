@@ -24,11 +24,12 @@
 #include "Eigen/Core"
 
 #include "modules/common/proto/error_code.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "modules/perception/lib/base/time_util.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/base/types.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -51,7 +52,7 @@ struct alignas(16) Object {
 
   // oriented boundingbox information
   // main direction
-  Eigen::Vector3d direction;
+  Eigen::Vector3d direction = Eigen::Vector3d(1, 0, 0);
   // the yaw angle, theta = 0.0 <=> direction = (1, 0, 0)
   double theta = 0.0;
   // ground center of the object (cx, cy, z_min)

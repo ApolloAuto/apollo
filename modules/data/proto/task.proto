@@ -1,0 +1,61 @@
+syntax = "proto2";
+
+package apollo.data;
+
+import "modules/data/proto/static_info.proto";
+
+
+message MapPoint {
+  optional double latitude = 1;
+  optional double longitude = 2;
+}
+
+message Rosbag {
+  optional string name = 1;
+  optional uint64 size = 2;
+  optional int32 version = 3;
+
+  optional double start_time = 4;
+  optional double end_time = 5;
+  optional int32 msg_count = 6;
+
+  message Topic {
+    optional string msg_type = 1;
+    optional int32 msg_count = 2;
+    optional double frequency = 3;
+  }
+  map<string, Topic> topics = 7;
+}
+
+message Disengagement {
+  optional double time = 1;
+  optional MapPoint location = 2;
+  optional string desc = 3;
+}
+
+message Task {
+  // Generally it should be <vehicle_name>/<start_time>, such as
+  // "mkz9/2018-01-05-09-14-33".
+  optional string id = 1;
+  // Generally it is bags[0].start_time and bags[-1].end_time.
+  optional double start_time = 2;
+  optional double end_time = 3;
+
+  enum LoopType {
+    UNKNOWN = 0;
+    OPEN_LOOP = 1;
+    CLOSE_LOOP = 2;
+  }
+  optional LoopType loop_type = 4;
+
+  optional StaticInfo info = 5;
+  repeated Rosbag bags = 6;
+
+  // Statistical information.
+  repeated string topics = 7;
+  repeated Disengagement disengagements = 8;
+  repeated MapPoint map_path = 9;
+  // Driving mode to mileage.
+  // Key should be an Enum name of apollo.canbus.Chassis.DrivingMode.
+  map<string, double> mileage = 10;
+}

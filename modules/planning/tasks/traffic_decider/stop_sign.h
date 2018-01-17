@@ -30,7 +30,7 @@
 namespace apollo {
 namespace planning {
 
-using apollo::hdmap::LaneInfo;
+using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::PathOverlap;
 using apollo::hdmap::StopSignInfo;
 using apollo::perception::PerceptionObstacle;
@@ -67,9 +67,9 @@ class StopSign : public TrafficRule {
                          StopSignLaneVehicles* watch_vehicles);
   double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
                              const PathOverlap* stop_sign_overlap);
-  void CreateStopObstacle(Frame* frame,
-                          ReferenceLineInfo* const reference_line_info,
-                          const PathOverlap* stop_sign_overlap);
+  bool BuildStopDecision(Frame* frame,
+                         ReferenceLineInfo* const reference_line_info,
+                         const hdmap::PathOverlap* stop_sign_overlap);
   void ClearDropbox(const std::string& stop_sign_id);
 
  private:
@@ -83,7 +83,7 @@ class StopSign : public TrafficRule {
   PathOverlap* next_stop_sign_overlap_ = nullptr;
   StopSignInfo* next_stop_sign_ = nullptr;
   StopSignStopStatus stop_status_;
-  std::vector<const LaneInfo*> associate_lanes_;
+  std::vector<LaneInfoConstPtr> associate_lanes_;
 };
 
 }  // namespace planning

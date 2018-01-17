@@ -198,6 +198,10 @@ DEFINE_double(stop_distance_destination, 0.5,
               "stop distance from destination line");
 DEFINE_double(stop_distance_traffic_light, 3.0,
               "stop distance from traffic light line");
+DEFINE_double(stop_distance_crosswalk, 1.0,
+              "stop distance from stop line of crosswalk");
+DEFINE_double(stop_distance_stop_sign, 1.0,
+              "stop distance from stop line of stop sign");
 DEFINE_double(destination_check_distance, 5.0,
               "if the distance between destination and ADC is less than this,"
               " it is considered to reach destination");
@@ -340,3 +344,23 @@ DEFINE_bool(
     "Enable multiple thread to calculation curve cost in dp_poly_path.");
 DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
             "Enable multiple thread to calculation curve cost in dp_st_graph.");
+
+DEFINE_double(lateral_acceleration_bound, 4.0,
+              "Bound of lateral acceleration; symmetric for left and right");
+
+///////////////////////////////////////////////////////////
+// Lattice Planner
+DEFINE_int32(num_lattice_traj_to_plot, 5,
+             "Number of lattice trajs to plot");
+DEFINE_double(default_cruise_speed, 5.0,
+             "default cruise speed");
+DEFINE_double(spiral_downsample_curvature_thred, 0.02,
+              "curvature threshold for downsampling reference line points");
+DEFINE_bool(enable_sample_bound_planning, true,
+              "enable SampleBound based motion planning");
+DEFINE_bool(enable_lattice_st_image_dump, false,
+              "enable sending the lattice st image");
+DEFINE_bool(enable_auto_tuning, false,
+              "enable auto tuning data emission");
+DEFINE_double(trajectory_time_resolution, 0.1,
+              "Trajectory time resolution in planning");

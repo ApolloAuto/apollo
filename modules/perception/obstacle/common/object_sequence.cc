@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <utility>
 #include "modules/perception/obstacle/common/object_sequence.h"
+
+#include <utility>
+
 #include "modules/common/log.h"
 
 namespace apollo {

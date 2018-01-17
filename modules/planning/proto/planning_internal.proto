@@ -147,4 +147,23 @@ message PlanningData {
   repeated ObstacleDebug obstacle = 18;
   repeated ReferenceLineDebug reference_line = 19;
   optional DpPolyGraphDebug dp_poly_graph = 20;
+  optional LatticeStTraining lattice_st_image = 21;
+}
+
+message LatticeStPixel {
+  optional int32 s = 1;
+  optional int32 t = 2;
+  optional uint32 r = 3;
+  optional uint32 g = 4;
+  optional uint32 b = 5;
+}
+
+message LatticeStTraining {
+  repeated LatticeStPixel pixel = 1;
+  optional double timestamp = 2;
+  optional string annotation = 3;
+  optional uint32 num_s_grids = 4;
+  optional uint32 num_t_grids = 5;
+  optional double s_resolution = 6;
+  optional double t_resolution = 7;
 }

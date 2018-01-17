@@ -71,4 +71,4 @@ DECLARE_double(p_matrix_amplifier);
 DECLARE_double(a_matrix_covariance_coeffcient_1);
 DECLARE_double(a_matrix_covariance_coeffcient_2);
 
-#endif /* MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_ */
+#endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_

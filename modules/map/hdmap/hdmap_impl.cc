@@ -105,6 +105,12 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   for (const auto& lane_ptr_pair : lane_table_) {
     lane_ptr_pair.second->PostProcess(*this);
   }
+  for (const auto& junction_ptr_pair : junction_table_) {
+    junction_ptr_pair.second->PostProcess(*this);
+  }
+  for (const auto& stop_sign_ptr_pair : stop_sign_table_) {
+    stop_sign_ptr_pair.second->PostProcess(*this);
+  }
 
   BuildLaneSegmentKDTree();
   BuildJunctionPolygonKDTree();
@@ -677,6 +683,50 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
     s_start = 0;
   }
   return 0;
+}
+
+int HDMapImpl::GetStopSignAssociateLanes(
+             const Id& id,
+             std::vector<LaneInfoConstPtr>* lanes) const {
+    CHECK_NOTNULL(lanes);
+
+    const auto& stop_sign = GetStopSignById(id);
+    if (stop_sign == nullptr) {
+      return -1;
+    }
+
+    std::vector<Id> associate_stop_sign_ids;
+    const auto junction_ids = stop_sign->OverlapJunctionIds();
+    for (const auto& junction_id : junction_ids) {
+      const auto& junction = GetJunctionById(junction_id);
+      if (junction == nullptr) {
+        continue;
+      }
+      const auto stop_sign_ids = junction->OverlapStopSignIds();
+      std::copy(stop_sign_ids.begin(), stop_sign_ids.end(),
+        std::back_inserter(associate_stop_sign_ids));
+    }
+
+    std::vector<Id> associate_lane_ids;
+    for (const auto& stop_sign_id : associate_stop_sign_ids) {
+      const auto& stop_sign = GetStopSignById(stop_sign_id);
+      if (stop_sign == nullptr) {
+        continue;
+      }
+      const auto lane_ids = stop_sign->OverlapLaneIds();
+      std::copy(lane_ids.begin(), lane_ids.end(),
+        std::back_inserter(associate_lane_ids));
+    }
+
+    for (const auto lane_id : associate_lane_ids) {
+      const auto& lane = GetLaneById(lane_id);
+      if (lane == nullptr) {
+        continue;
+      }
+      lanes->push_back(lane);
+    }
+
+    return 0;
 }
 
 template <class Table, class BoxTable, class KDTree>

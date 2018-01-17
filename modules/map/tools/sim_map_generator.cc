@@ -1,18 +1,18 @@
 /******************************************************************************
-  * Copyright 2017 The Apollo Authors. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *****************************************************************************/
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include <string>
 #include <vector>
@@ -40,13 +40,13 @@ DEFINE_int32(downsample_distance, 5, "downsample rate for a normal path");
 DEFINE_int32(steep_turn_downsample_distance, 1,
              "downsample rate for a steep turn path");
 
+using apollo::common::PointENU;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::DownsampleByDistance;
 using apollo::common::util::GetProtoFromFile;
-using apollo::common::PointENU;
-using apollo::hdmap::adapter::OpendriveAdapter;
 using apollo::hdmap::Curve;
 using apollo::hdmap::Map;
+using apollo::hdmap::adapter::OpendriveAdapter;
 
 void DownsampleCurve(Curve* curve) {
   auto* line_segment = curve->mutable_segment(0)->mutable_line_segment();
@@ -64,9 +64,9 @@ void DownsampleCurve(Curve* curve) {
     downsampled_points.push_back(points[index]);
   }
 
-  sampled_indices = DownsampleByDistance(downsampled_points,
-                                         FLAGS_downsample_distance,
-                                         FLAGS_steep_turn_downsample_distance);
+  sampled_indices =
+      DownsampleByDistance(downsampled_points, FLAGS_downsample_distance,
+                           FLAGS_steep_turn_downsample_distance);
 
   for (int index : sampled_indices) {
     *line_segment->add_point() = downsampled_points[index];
