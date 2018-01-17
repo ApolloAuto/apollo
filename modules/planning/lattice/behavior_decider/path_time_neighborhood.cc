@@ -29,9 +29,7 @@
 #include "modules/planning/proto/sl_boundary.pb.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/obstacle.h"
-#include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
-#include "modules/planning/lattice/util/lattice_util.h"
 #include "modules/common/math/linear_interpolation.h"
 
 namespace apollo {
@@ -76,7 +74,7 @@ PathTimeNeighborhood::PathTimeNeighborhood(
     const std::vector<common::PathPoint>& discretized_ref_points) {
 
   path_range_.first = ego_s;
-  path_range_.second = ego_s + decision_horizon;
+  path_range_.second = ego_s + FLAGS_decision_horizon;
 
   time_range_.first = 0.0;
   time_range_.second = FLAGS_trajectory_time_length;
@@ -141,8 +139,8 @@ void PathTimeNeighborhood::SetupObstacles(
       // the obstacle is not shown on the region to be considered.
       if (sl_boundary.end_s() < path_range_.first ||
           sl_boundary.start_s() > path_range_.second  ||
-          (sl_boundary.start_l() > FLAGS_lateral_enter_lane_thred &&
-           sl_boundary.end_l() < -FLAGS_lateral_enter_lane_thred)) {
+          (sl_boundary.start_l() > FLAGS_lateral_obstacle_ignore_thred &&
+           sl_boundary.end_l() < -FLAGS_lateral_obstacle_ignore_thred)) {
         if (path_time_obstacle_map_.find(obstacle->Id()) !=
             path_time_obstacle_map_.end()) {
           break;
