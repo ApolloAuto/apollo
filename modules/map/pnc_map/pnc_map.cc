@@ -416,27 +416,28 @@ std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
                                              int start_passage) const {
   CHECK_GE(start_passage, 0);
   CHECK_LE(start_passage, road.passage_size());
+
   std::vector<int> result;
   const auto &source_passage = road.passage(start_passage);
   result.emplace_back(start_passage);
-  if (source_passage.change_lane_type() == routing::FORWARD) {
-    return result;
-  }
-  if (source_passage.can_exit()) {  // no need to change lane
-    return result;
-  }
+  //if (source_passage.change_lane_type() == routing::FORWARD) {
+  //  return result;
+  //}
+  //if (source_passage.can_exit()) {  // no need to change lane
+  //  return result;
+  //}
   RouteSegments source_segments;
   if (!PassageToSegments(source_passage, &source_segments)) {
-    AERROR << "failed to convert passage to segments";
+    ADEBUG << "Failed to convert passage to segments";
     return result;
   }
-  if (next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
-      source_segments.IsWaypointOnSegment(
-          routing_waypoint_index_[next_routing_waypoint_index_].waypoint)) {
-    ADEBUG << "need to pass next waypoint[" << next_routing_waypoint_index_
-           << "] before change lane";
-    return result;
-  }
+  //if (next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
+  //    source_segments.IsWaypointOnSegment(
+  //        routing_waypoint_index_[next_routing_waypoint_index_].waypoint)) {
+  //  ADEBUG << "need to pass next waypoint[" << next_routing_waypoint_index_
+  //         << "] before change lane";
+  //  return result;
+  //}
   std::unordered_set<std::string> neighbor_lanes;
   if (source_passage.change_lane_type() == routing::LEFT) {
     for (const auto &segment : source_segments) {
@@ -456,7 +457,8 @@ std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
 
   for (int i = 0; i < road.passage_size(); ++i) {
     if (i == start_passage) {
-      continue;
+      ADEBUG << "i==start_passage=" << i;
+      //continue;
     }
     const auto &target_passage = road.passage(i);
     for (const auto &segment : target_passage.segment()) {
@@ -484,7 +486,7 @@ bool PncMap::GetRouteSegments(const VehicleState &vehicle_state,
     return false;
   }
   const int road_index = route_index_[0];
-  const int passage_index = route_index_[1];
+  const int passage_index = route_index_[0];//hack
   const auto &road = routing_.road(road_index);
   // raw filter to find all neighboring passages
   auto drive_passages = GetNeighborPassages(road, passage_index);
@@ -492,7 +494,7 @@ bool PncMap::GetRouteSegments(const VehicleState &vehicle_state,
     const auto &passage = road.passage(index);
     RouteSegments segments;
     if (!PassageToSegments(passage, &segments)) {
-      ADEBUG << "Failed to convert passage to lane segments.";
+      AERROR << "Failed to convert passage to lane segments.";
       continue;
     }
     PointENU nearest_point =
@@ -503,7 +505,7 @@ bool PncMap::GetRouteSegments(const VehicleState &vehicle_state,
     common::SLPoint sl;
     LaneWaypoint segment_waypoint;
     if (!segments.GetProjection(nearest_point, &sl, &segment_waypoint)) {
-      ADEBUG << "Failed to get projection from point: "
+      AERROR << "Failed to get projection from point: "
              << nearest_point.ShortDebugString();
       continue;
     }

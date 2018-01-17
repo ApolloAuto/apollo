@@ -409,7 +409,7 @@ Status Planning::Plan(const double current_time_stamp,
     for (auto it = frame_->reference_line_info().begin();
       it != frame_->reference_line_info().end(); ++it) {
       it->SetPriorityCost(position_cost);
-      position_cost += 100.0;
+      position_cost += 800.0;
       auto status_per_line = planner_->Plan(stitching_trajectory.back(),
         frame_.get(), &(*it));  // Set Cost in Lattice Planner
     }

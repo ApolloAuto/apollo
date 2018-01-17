@@ -124,9 +124,9 @@ double TrajectoryEvaluator::evaluate(
   // 2. the cost of time to achieve the objective
   // 3. the cost of failure to achieve the planning objective.
 
-  double weight_lon_travel = 1000.0;
+  double weight_lon_travel = 28000.0;
   double weight_lon_jerk = 1.0;
-  double weight_lon_obstacle = 100.0;
+  double weight_lon_obstacle = 8.0;
   double weight_lat_offset = 1.0;
 
   double t = 0.0;
@@ -200,22 +200,20 @@ double TrajectoryEvaluator::compute_lon_comfort_cost(
 double TrajectoryEvaluator::compute_lon_objective_cost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory,
     const PlanningTarget& planning_target) const {
-  double weight_dist_travelled = 10.0;
-  double weight_on_reference_speed = 1.0;
   double t_max = lon_trajectory->ParamLength();
 
   double dist_s =
       lon_trajectory->Evaluate(0, t_max) - lon_trajectory->Evaluate(0, 0.0);
 
   double cost = 0.0;
-  double t = 0.0;
-  while (t < planned_trajectory_time) {
-    double c = planning_target.cruise_speed() - lon_trajectory->Evaluate(1, t);
-    cost += std::fabs(c);
-    t += trajectory_time_resolution;
-  }
-  cost *= weight_on_reference_speed;
-  cost += weight_dist_travelled * 1.0 / (1.0 + dist_s);
+  //double t = 0.0;
+  //while (t < planned_trajectory_time) {
+  //  double c = planning_target.cruise_speed() - lon_trajectory->Evaluate(1, t);
+  //  cost += std::fabs(c);
+  //  t += trajectory_time_resolution;
+  //}
+  //cost *= weight_on_reference_speed;
+  cost += 1.0 / (1.0 + dist_s);
   return cost;
 }
 
