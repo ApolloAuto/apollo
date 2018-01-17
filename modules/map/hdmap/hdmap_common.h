@@ -222,6 +222,7 @@ class JunctionInfo {
   }
 
  private:
+  friend class HDMapImpl;
   void Init();
   void PostProcess(const HDMapImpl &map_instance);
   void UpdateOverlaps(const HDMapImpl &map_instance);
@@ -294,6 +295,7 @@ class StopSignInfo {
     return overlap_junction_ids_; }
 
  private:
+  friend class HDMapImpl;
   void init();
   void PostProcess(const HDMapImpl &map_instance);
   void UpdateOverlaps(const HDMapImpl &map_instance);
