@@ -7,6 +7,17 @@ cc_library(
     hdrs = [
         "localization_base.h",
     ],
+    srcs = [
+        "localization_base.cc",
+    ],
+    deps = [
+        "//modules/common",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/status",
+        "//modules/localization/common:localization_common",
+        "//modules/localization/proto:localization_proto",
+        "@ros//:ros_common",
+    ],
 )
 
 cc_library(

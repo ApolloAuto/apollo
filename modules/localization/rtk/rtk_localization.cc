@@ -36,11 +36,8 @@ RTKLocalization::RTKLocalization()
       map_offset_{FLAGS_map_offset_x, FLAGS_map_offset_y, FLAGS_map_offset_z} {}
 
 RTKLocalization::~RTKLocalization() {
-  if (tf2_broadcaster_) {
-    delete tf2_broadcaster_;
-    tf2_broadcaster_ = nullptr;
-  }
 }
+
 Status RTKLocalization::Start() {
   AdapterManager::Init(FLAGS_rtk_adapter_config_file);
 
@@ -61,7 +58,7 @@ Status RTKLocalization::Start() {
     return Status(common::LOCALIZATION_ERROR, "no IMU adapter");
   }
 
-  tf2_broadcaster_ = new tf2_ros::TransformBroadcaster;
+  tf2_broadcaster_.reset(new tf2_ros::TransformBroadcaster);
 
   return Status::OK();
 }
@@ -382,27 +379,6 @@ void RTKLocalization::PublishLocalization() {
   AdapterManager::PublishLocalization(localization);
   PublishPoseBroadcastTF(localization);
   ADEBUG << "[OnTimer]: Localization message publish success!";
-}
-
-void RTKLocalization::PublishPoseBroadcastTF(
-    const LocalizationEstimate &localization) {
-  // broadcast tf message
-  geometry_msgs::TransformStamped tf2_msg;
-  tf2_msg.header.stamp = ros::Time(localization.measurement_time());
-  tf2_msg.header.frame_id = FLAGS_localization_tf2_frame_id;
-  tf2_msg.child_frame_id = FLAGS_localization_tf2_child_frame_id;
-
-  tf2_msg.transform.translation.x = localization.pose().position().x();
-  tf2_msg.transform.translation.y = localization.pose().position().y();
-  tf2_msg.transform.translation.z = localization.pose().position().z();
-
-  tf2_msg.transform.rotation.x = localization.pose().orientation().qx();
-  tf2_msg.transform.rotation.y = localization.pose().orientation().qy();
-  tf2_msg.transform.rotation.z = localization.pose().orientation().qz();
-  tf2_msg.transform.rotation.w = localization.pose().orientation().qw();
-
-  tf2_broadcaster_->sendTransform(tf2_msg);
-  return;
 }
 
 void RTKLocalization::RunWatchDog() {
