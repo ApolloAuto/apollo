@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <limits>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -35,9 +36,7 @@
 #include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_evaluator.h"
-#include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/planning/lattice/util/lattice_trajectory1d.h"
-#include "modules/planning/lattice/util/lattice_util.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
@@ -51,13 +50,55 @@ using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::time::Clock;
 
+namespace {
+
+std::vector<PathPoint> ToDiscretizedReferenceLine(
+    const std::vector<ReferencePoint>& ref_points) {
+  double s = 0.0;
+  std::vector<PathPoint> path_points;
+  for (const auto& ref_point : ref_points) {
+    PathPoint path_point;
+    path_point.set_x(ref_point.x());
+    path_point.set_y(ref_point.y());
+    path_point.set_theta(ref_point.heading());
+    path_point.set_kappa(ref_point.kappa());
+    path_point.set_dkappa(ref_point.dkappa());
+
+    double dx = 0.0;
+    double dy = 0.0;
+    if (!path_points.empty()) {
+      dx = path_point.x() - path_points.back().x();
+      dy = path_point.y() - path_points.back().y();
+      s += std::sqrt(dx * dx + dy * dy);
+    }
+    path_point.set_s(s);
+    path_points.push_back(std::move(path_point));
+  }
+  return path_points;
+}
+
+void ComputeInitFrenetState(const PathPoint& matched_point,
+                            const TrajectoryPoint& cartesian_state,
+                            std::array<double, 3>* ptr_s,
+                            std::array<double, 3>* ptr_d) {
+  CartesianFrenetConverter::cartesian_to_frenet(
+      matched_point.s(), matched_point.x(), matched_point.y(),
+      matched_point.theta(), matched_point.kappa(), matched_point.dkappa(),
+      cartesian_state.path_point().x(), cartesian_state.path_point().y(),
+      cartesian_state.v(), cartesian_state.a(),
+      cartesian_state.path_point().theta(),
+      cartesian_state.path_point().kappa(), ptr_s, ptr_d);
+}
+
+}  // namespace
+
 LatticePlanner::LatticePlanner() {}
 
 Status LatticePlanner::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
+Status LatticePlanner::Plan(const TrajectoryPoint& planning_init_point,
                             Frame* frame,
                             ReferenceLineInfo* reference_line_info) {
   static std::size_t num_planning_cycles = 0;
@@ -179,7 +220,7 @@ Status LatticePlanner::Plan(const common::TrajectoryPoint& planning_init_point,
     }
 
     // put combine trajectory into debug data
-    const std::vector<common::TrajectoryPoint>& combined_trajectory_points =
+    const std::vector<TrajectoryPoint>& combined_trajectory_points =
         combined_trajectory.trajectory_points();
     num_lattice_traj += 1;
     reference_line_info->SetTrajectory(combined_trajectory);
@@ -359,7 +400,7 @@ DiscretizedTrajectory LatticePlanner::GetFutureTrajectory() const {
   const auto& localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
   ADEBUG << "Get localization:" << localization.DebugString();
-  std::vector<common::TrajectoryPoint> traj_pts;
+  std::vector<TrajectoryPoint> traj_pts;
   for (const auto& traj_pt : localization.trajectory_point()) {
     traj_pts.emplace_back(traj_pt);
   }

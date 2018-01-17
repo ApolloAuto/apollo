@@ -366,5 +366,8 @@ DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
 DEFINE_double(collision_buffer_expansion_ratio, 0.2,
     "The ratio w.r.t. the vehicle dimension to expand in collision checking");
-DEFINE_double(lateral_enter_lane_thred, 2.0,
-              "Lateral threshold for entering the lane.");
+DEFINE_double(decision_horizon, 200.0,
+              "Longitudinal horizon for decision making");
+
+DEFINE_double(lateral_obstacle_ignore_thred, 2.0, "Lateral threshold for "
+              "obstacles to be considered in path-time graph");

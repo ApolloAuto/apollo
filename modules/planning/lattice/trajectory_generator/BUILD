@@ -13,7 +13,6 @@ cc_library(
     deps = [
         "//modules/common:common",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/lattice/util:lattice_util",
         "//modules/planning/lattice/behavior_decider:feasible_region",
         "//modules/planning/proto:lattice_structure_proto",
     ],
