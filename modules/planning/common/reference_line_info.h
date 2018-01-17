@@ -180,7 +180,7 @@ class ReferenceLineInfo {
 
   double offset_to_other_reference_line_ = 0.0;
 
-  double priority_cost_ = std::numeric_limits<double>::infinity();
+  double priority_cost_ = 0.0;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

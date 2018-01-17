@@ -47,4 +47,4 @@ class AdcMasterScenario : public Scenario {
 }  // namespace planning
 }  // namespace apollo
 
-#endif // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_ADC_MASTER_SCENARIO_H_
+#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_ADC_MASTER_SCENARIO_H_
