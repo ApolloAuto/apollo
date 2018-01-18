@@ -53,7 +53,7 @@ int SignalLightScenario::ComputeScenarioDecision(
   CHECK(frame != nullptr);
 
   if (!FindValidSignalLight(reference_line_info)) {
-    AINFO << "No valid signal light along reference line";
+    ADEBUG << "No valid signal light along reference line";
     return 0;
   }
   ReadSignals();
@@ -85,7 +85,7 @@ bool SignalLightScenario::FindValidSignalLight(
     ADEBUG << "No signal lights from reference line.";
     return false;
   } else {
-    AINFO << "Found signal_lights size=" << signal_lights.size();
+    ADEBUG << "Found signal_lights size=" << signal_lights.size();
   }
   signal_lights_along_reference_line_.clear();
   for (const hdmap::PathOverlap& signal_light : signal_lights) {

@@ -47,30 +47,30 @@ int ScenarioManager::ComputeWorldDecision(
     PlanningTarget* planning_target) {
 
   RegisterScenarios();
-  AINFO << "Register Scenarios Success";
+  ADEBUG << "Register Scenarios Success";
 
   for (auto& level_scenario : scenarios_) {
     for (auto scenario : level_scenario) {
       scenario->Reset();
 
       if (!scenario->Init()) {
-        AINFO << "scenario[" << scenario->Name() << "] init failed";
+        AERROR << "scenario[" << scenario->Name() << "] init failed";
       } else {
-        AINFO << "scenario[" << scenario->Name() << "] init success";
+        ADEBUG << "scenario[" << scenario->Name() << "] init success";
       }
 
       // check if exists
       if (!scenario->ScenarioExist()) {
-        AINFO << "scenario[" << scenario->Name() << "] not exists";
+        AERROR << "scenario[" << scenario->Name() << "] not exists";
       } else {
-        AINFO << "scenario[" << scenario->Name() << "] does exists";
+        ADEBUG << "scenario[" << scenario->Name() << "] does exists";
       }
       // compute decision
       if (0 ==
           scenario->ComputeScenarioDecision(
               frame, reference_line_info, planning_target)) {
-        AINFO << "scenario[" << scenario->Name()
-              << "] Success in computing decision";
+        ADEBUG << "scenario[" << scenario->Name()
+               << "] Success in computing decision";
       } else {
         AERROR << "scenario[" << scenario->Name()
                << "] Failed in computing decision";
