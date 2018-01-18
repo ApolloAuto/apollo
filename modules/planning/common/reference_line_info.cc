@@ -97,7 +97,9 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   return true;
 }
 
-bool ReferenceLineInfo::IsInited() const { return is_inited_; }
+bool ReferenceLineInfo::IsInited() const {
+  return is_inited_;
+}
 
 bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
   constexpr double kEpsilon = 1e-2;
@@ -141,7 +143,9 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
   return ADCTrajectory::UNPROTECTED;
 }
 
-const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }
+const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const {
+  return lanes_;
+}
 
 const std::list<hdmap::Id> ReferenceLineInfo::TargetLaneId() const {
   std::list<hdmap::Id> lane_ids;
@@ -155,7 +159,9 @@ const SLBoundary& ReferenceLineInfo::AdcSlBoundary() const {
   return adc_sl_boundary_;
 }
 
-PathDecision* ReferenceLineInfo::path_decision() { return &path_decision_; }
+PathDecision* ReferenceLineInfo::path_decision() {
+  return &path_decision_;
+}
 
 const PathDecision& ReferenceLineInfo::path_decision() const {
   return path_decision_;
@@ -198,14 +204,17 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
                                       ignore);
     path_decision_.AddLongitudinalDecision("reference_line_filter",
                                            obstacle->Id(), ignore);
-    ADEBUG << "NO build sl boundary. id:" << obstacle->Id();
+    ADEBUG << "NO build reference line st boundary. id:" << obstacle->Id();
   } else {
-    ADEBUG << "build sl boundary. id:" << obstacle->Id();
-    path_obstacle->BuildStBoundary(reference_line_, adc_sl_boundary_.start_s());
-    ADEBUG << "st boundary: " << path_obstacle->st_boundary().min_t() << ", "
-           << path_obstacle->st_boundary().max_t()
-           << ", s_max: " << path_obstacle->st_boundary().max_s()
-           << ", s_min: " << path_obstacle->st_boundary().min_s();
+    ADEBUG << "build reference line st boundary. id:" << obstacle->Id();
+    path_obstacle->BuildReferenceLineStBoundary(reference_line_,
+                                                adc_sl_boundary_.start_s());
+    ADEBUG << "reference line st boundary: "
+           << path_obstacle->reference_line_st_boundary().min_t() << ", "
+           << path_obstacle->reference_line_st_boundary().max_t()
+           << ", s_max: " << path_obstacle->reference_line_st_boundary().max_s()
+           << ", s_min: "
+           << path_obstacle->reference_line_st_boundary().min_s();
   }
   return path_obstacle;
 }
@@ -261,13 +270,21 @@ bool ReferenceLineInfo::IsStartFrom(
   return previous_reference_line_info.reference_line_.IsOnRoad(sl_point);
 }
 
-const PathData& ReferenceLineInfo::path_data() const { return path_data_; }
+const PathData& ReferenceLineInfo::path_data() const {
+  return path_data_;
+}
 
-const SpeedData& ReferenceLineInfo::speed_data() const { return speed_data_; }
+const SpeedData& ReferenceLineInfo::speed_data() const {
+  return speed_data_;
+}
 
-PathData* ReferenceLineInfo::mutable_path_data() { return &path_data_; }
+PathData* ReferenceLineInfo::mutable_path_data() {
+  return &path_data_;
+}
 
-SpeedData* ReferenceLineInfo::mutable_speed_data() { return &speed_data_; }
+SpeedData* ReferenceLineInfo::mutable_speed_data() {
+  return &speed_data_;
+}
 
 bool ReferenceLineInfo::CombinePathAndSpeedProfile(
     const double relative_time, const double start_s,
@@ -312,9 +329,13 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
   return true;
 }
 
-void ReferenceLineInfo::SetDrivable(bool drivable) { is_drivable_ = drivable; }
+void ReferenceLineInfo::SetDrivable(bool drivable) {
+  is_drivable_ = drivable;
+}
 
-bool ReferenceLineInfo::IsDrivable() const { return is_drivable_; }
+bool ReferenceLineInfo::IsDrivable() const {
+  return is_drivable_;
+}
 
 bool ReferenceLineInfo::IsChangeLanePath() const {
   return !Lanes().IsOnSegment();

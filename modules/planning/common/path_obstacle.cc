@@ -57,7 +57,9 @@ const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
     PathObstacle::s_lateral_decision_safety_sorter_ = {
         {ObjectDecisionType::kIgnore, 0}, {ObjectDecisionType::kNudge, 100}};
 
-const std::string& PathObstacle::Id() const { return id_; }
+const std::string& PathObstacle::Id() const {
+  return id_;
+}
 
 PathObstacle::PathObstacle(const Obstacle* obstacle) : obstacle_(obstacle) {
   CHECK_NOTNULL(obstacle);
@@ -68,8 +70,8 @@ void PathObstacle::SetPerceptionSlBoundary(const SLBoundary& sl_boundary) {
   perception_sl_boundary_ = sl_boundary;
 }
 
-void PathObstacle::BuildStBoundary(const ReferenceLine& reference_line,
-                                   const double adc_start_s) {
+void PathObstacle::BuildReferenceLineStBoundary(
+    const ReferenceLine& reference_line, const double adc_start_s) {
   const auto& adc_param =
       VehicleConfigHelper::instance()->GetConfig().vehicle_param();
   const double adc_width = adc_param.width();
@@ -89,14 +91,15 @@ void PathObstacle::BuildStBoundary(const ReferenceLine& reference_line,
                              STPoint(end_s - adc_start_s, 0.0));
     point_pairs.emplace_back(STPoint(start_s - adc_start_s, FLAGS_st_max_t),
                              STPoint(end_s - adc_start_s, FLAGS_st_max_t));
-    st_boundary_ = StBoundary(point_pairs);
+    reference_line_st_boundary_ = StBoundary(point_pairs);
   } else {
-    if (BuildTrajectoryStBoundary(reference_line, adc_start_s, &st_boundary_)) {
+    if (BuildTrajectoryStBoundary(reference_line, adc_start_s,
+                                  &reference_line_st_boundary_)) {
       ADEBUG << "Found st_boundary for obstacle " << id_;
-      ADEBUG << "st_boundary: min_t = " << st_boundary_.min_t()
-             << ", max_t = " << st_boundary_.max_t()
-             << ", min_s = " << st_boundary_.min_s()
-             << ", max_s = " << st_boundary_.max_s();
+      ADEBUG << "st_boundary: min_t = " << reference_line_st_boundary_.min_t()
+             << ", max_t = " << reference_line_st_boundary_.max_t()
+             << ", min_s = " << reference_line_st_boundary_.min_s()
+             << ", max_s = " << reference_line_st_boundary_.max_s();
     } else {
       ADEBUG << "No st_boundary for obstacle " << id_;
     }
@@ -267,7 +270,13 @@ bool PathObstacle::BuildTrajectoryStBoundary(
   return true;
 }
 
-const StBoundary& PathObstacle::st_boundary() const { return st_boundary_; }
+const StBoundary& PathObstacle::reference_line_st_boundary() const {
+  return reference_line_st_boundary_;
+}
+
+const StBoundary& PathObstacle::st_boundary() const {
+  return st_boundary_;
+}
 
 const std::vector<std::string>& PathObstacle::decider_tags() const {
   return decider_tags_;
@@ -390,7 +399,9 @@ bool PathObstacle::HasNonIgnoreDecision() const {
          (HasLongitudinalDecision() && !IsLongitudinalIgnore());
 }
 
-const Obstacle* PathObstacle::obstacle() const { return obstacle_; }
+const Obstacle* PathObstacle::obstacle() const {
+  return obstacle_;
+}
 
 void PathObstacle::AddLongitudinalDecision(const std::string& decider_tag,
                                            const ObjectDecisionType& decision) {
@@ -440,8 +451,6 @@ const std::string PathObstacle::DebugString() const {
   return ss.str();
 }
 
-void PathObstacle::EraseStBoundary() { st_boundary_ = StBoundary(); }
-
 const SLBoundary& PathObstacle::PerceptionSLBoundary() const {
   return perception_sl_boundary_;
 }
@@ -452,6 +461,23 @@ void PathObstacle::SetStBoundary(const StBoundary& boundary) {
 
 void PathObstacle::SetStBoundaryType(const StBoundary::BoundaryType type) {
   st_boundary_.SetBoundaryType(type);
+}
+
+void PathObstacle::EraseStBoundary() {
+  st_boundary_ = StBoundary();
+}
+
+void PathObstacle::SetReferenceLineStBoundary(const StBoundary& boundary) {
+  reference_line_st_boundary_ = boundary;
+}
+
+void PathObstacle::SetReferenceLineStBoundaryType(
+    const StBoundary::BoundaryType type) {
+  reference_line_st_boundary_.SetBoundaryType(type);
+}
+
+void PathObstacle::EraseReferenceLineStBoundary() {
+  reference_line_st_boundary_ = StBoundary();
 }
 
 bool PathObstacle::IsValidObstacle(
