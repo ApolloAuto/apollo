@@ -3,8 +3,7 @@ syntax = "proto2";
 package apollo.dreamview;
 
 import "modules/common/monitor_log/proto/monitor_log.proto";
-import "modules/planning/proto/decision.proto";
-import "modules/planning/proto/planning.proto";
+import "modules/planning/proto/planning_internal.proto";
 
 // Next-id: 4
 message PolygonPoint {
@@ -102,10 +101,6 @@ message Object {
 
   // Decision Info
   repeated Decision decision = 20;
-  // ADC decision results
-  optional .apollo.planning.DecisionResult adc_decision_result = 29;
-  // ADC planning trajectory
-  optional .apollo.planning.ADCTrajectory adc_trajectory = 31 [deprecated = true];
 
   // Chassis Info
   // For ADC
@@ -158,10 +153,20 @@ message Latency { // ms
   optional double planning = 1;
 }
 
+message MapElementIds {
+  repeated string lane = 1;
+  repeated string crosswalk = 2;
+  repeated string junction = 3;
+  repeated string signal = 4;
+  repeated string stop_sign = 5;
+  repeated string yield = 6;
+  repeated string overlap = 7;
+}
+
 // Next-id: 17
 message SimulationWorld {
-  // Time
-  optional double timestamp_sec = 1;
+  // Timestamp in milliseconds
+  optional double timestamp = 1;
 
   // Sequence number
   optional uint32 sequence_num = 2;
@@ -173,29 +178,36 @@ message SimulationWorld {
   optional Object auto_driving_car = 4;
 
   // Traffic light status
-  optional Object traffic_signal = 6;
+  optional Object traffic_signal = 5;
 
   // Routing paths
-  repeated RoutePath route_path = 7;
+  repeated RoutePath route_path = 6;
   // Timestamp of latest routing
-  optional double routing_time = 8;
+  optional double routing_time = 7;
 
   // Planned trajectory
-  repeated Object planning_trajectory = 9;
+  repeated Object planning_trajectory = 8;
 
   // Main stop
-  optional Object main_stop = 10;
+  optional Object main_stop = 9;
 
   // Speed limit
-  optional double speed_limit = 11;
+  optional double speed_limit = 10;
 
-  optional DelaysInMs delay = 12;
+  optional DelaysInMs delay = 11;
 
-  optional apollo.common.monitor.MonitorMessage monitor = 13;
-
-  // Module latency
-  optional Latency latency = 15;
+  optional apollo.common.monitor.MonitorMessage monitor = 12;
 
   // Engage advice from planning
-  optional string engage_advice = 16;
+  optional string engage_advice = 13;
+
+  // Module latency
+  optional Latency latency = 14;
+
+  optional MapElementIds map_element_ids = 15;
+  optional uint64 map_hash = 16;
+  optional double map_radius = 17;
+
+  // Planning debugging data
+  optional apollo.planning_internal.PlanningData planning_data = 18;
 }

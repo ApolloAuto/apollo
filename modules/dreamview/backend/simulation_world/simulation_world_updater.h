@@ -128,9 +128,9 @@ class SimulationWorldUpdater {
   // End point for requesting default route
   apollo::routing::POI poi_;
 
-  // The json string to be pushed to frontend, which is updated by timer.
-  std::string simulation_world_json_;
-  std::string simulation_world_with_planning_json_;
+  // The simulation_world in wire format to be pushed to frontend, which is
+  // updated by timer.
+  std::string simulation_world_;
 
   // Mutex to protect concurrent access to simulation_world_json_.
   // NOTE: Use boost until we have std version of rwlock support.

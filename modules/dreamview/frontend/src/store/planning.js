@@ -232,12 +232,13 @@ export default class Planning {
     }
   }
 
-  update(world, planningData) {
+  update(world) {
     this.updateSequenceNum(world.sequenceNum);
     this.data = this.initData();
 
+    const planningData = world.planningData;
     if (planningData) {
-      if (planningData.slFrame) {
+      if (planningData.slFrame && planningData.slFrame.length >= 2) {
         this.updateSLFrame(planningData.slFrame);
       }
 
