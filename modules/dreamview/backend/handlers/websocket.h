@@ -113,7 +113,10 @@ class WebSocketHandler : public CivetWebSocketHandler {
    * being sent to this connection.
    */
   bool SendData(Connection *conn, const std::string &data,
-                bool skippable = false);
+                bool skippable = false, int op_code = WEBSOCKET_OPCODE_TEXT);
+
+  bool SendBinaryData(Connection *conn, const std::string &data,
+                      bool skippable = false);
 
   /**
    * @brief Add a new message handler for a message type.
