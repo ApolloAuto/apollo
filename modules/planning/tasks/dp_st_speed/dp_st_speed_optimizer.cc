@@ -71,11 +71,12 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
       if (obstacle->obstacle()->IsVirtual()) {
         continue;
       }
-      if (path_decision_.Find(id)->st_boundary().IsEmpty()) {
+      if (path_decision->Find(id)->reference_line_st_boundary().IsEmpty()) {
         continue;
       }
       ADEBUG << "obstacle " << id << " is NOT blocking.";
-      auto st_boundary_copy = path_decision_.Find(id)->st_boundary();
+      auto st_boundary_copy =
+          path_decision->Find(id)->reference_line_st_boundary();
       auto st_boundary = st_boundary_copy.CutOffByT(3.5);
       if (!st_boundary.IsEmpty()) {
         auto decision = obstacle->LongitudinalDecision();
@@ -169,7 +170,6 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   init_point_ = init_point;
   adc_sl_boundary_ = adc_sl_boundary;
   reference_line_ = &reference_line;
-  path_decision_ = *path_decision;
 
   if (path_data.discretized_path().NumOfPoints() == 0) {
     std::string msg("Empty path data");
