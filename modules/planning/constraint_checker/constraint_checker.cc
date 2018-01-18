@@ -35,8 +35,7 @@ bool WithinRange(const T v, const T lower, const T upper) {
 
 bool ConstraintChecker::ValidTrajectory(
     const DiscretizedTrajectory& trajectory) {
-  // TODO(all): this is wrong; must be set to trajectory time range;
-  const double kMaxCheckRelativeTime = 2.0;
+  const double kMaxCheckRelativeTime = FLAGS_trajectory_time_length;
   for (const auto& p : trajectory.trajectory_points()) {
     double t = p.relative_time();
     if (t > kMaxCheckRelativeTime) {
