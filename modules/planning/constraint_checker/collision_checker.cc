@@ -69,9 +69,8 @@ void CollisionChecker::BuildPredictedEnv(
   while (relative_time < FLAGS_trajectory_time_length) {
     std::vector<common::math::Box2d> predicted_env;
     for (const Obstacle* obstacle : obstacles) {
-      // TODO(yajia):
-      // temp. fix, figure out why some obstacle's predicted trajectory
-      // has zero points.
+      // If an obstacle has no trajectory, it is considered as static.
+      // Obstacle::GetPointAtTime has handled this case.
       common::TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       common::math::Box2d box = obstacle->GetBoundingBox(point);
       predicted_env.push_back(std::move(box));
