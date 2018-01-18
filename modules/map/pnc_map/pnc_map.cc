@@ -226,21 +226,10 @@ bool PncMap::IsNewRouting(const routing::RoutingResponse &routing) const {
 bool PncMap::IsNewRouting(const routing::RoutingResponse &prev,
                           const routing::RoutingResponse &routing) {
   if (!ValidateRouting(routing)) {
-    AERROR << "The provided routing is invalid";
+    ADEBUG << "The provided routing is invalid";
     return false;
   }
-  if (!prev.has_header()) {
-    AERROR << "Current routing is empty, use new routing";
-    return true;
-  }
-  if (prev.has_header() && routing.has_header() &&
-      prev.header().sequence_num() == routing.header().sequence_num() &&
-      (std::fabs(prev.header().timestamp_sec() -
-                 routing.header().timestamp_sec()) < 0.1)) {
-    ADEBUG << "Same routing, skip update routing";
-    return false;
-  }
-  return true;
+  return !common::util::IsProtoEqual(prev, routing);
 }
 
 bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
