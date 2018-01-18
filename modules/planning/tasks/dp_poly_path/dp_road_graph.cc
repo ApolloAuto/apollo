@@ -329,7 +329,7 @@ bool DPRoadGraph::SamplePathWaypoints(
     }
     std::vector<common::SLPoint> level_points;
     planning_internal::SampleLayerDebug sample_layer_debug;
-    for (uint8_t j = 0; j < sample_l.size(); ++j) {
+    for (size_t j = 0; j < sample_l.size(); ++j) {
       const double l = sample_l[j];
       constexpr double kResonateDistance = 1e-3;
       common::SLPoint sl;
