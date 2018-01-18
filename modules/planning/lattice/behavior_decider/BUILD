@@ -50,11 +50,11 @@ cc_library(
     name = "scenarios",
     hdrs = [
         "scenario.h",
-        "adc_master_scenario.h",
+        "ego_vehicle_scenario.h",
         "signal_light_scenario.h",
     ],
     srcs = [
-        "adc_master_scenario.cc",
+        "ego_vehicle_scenario.cc",
         "signal_light_scenario.cc",
     ],
     deps = [
