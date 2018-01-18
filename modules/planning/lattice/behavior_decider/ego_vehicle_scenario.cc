@@ -18,23 +18,22 @@
  * @file
  **/
 
-#include "modules/planning/lattice/behavior_decider/adc_master_scenario.h"
+#include "modules/planning/lattice/behavior_decider/ego_vehicle_scenario.h"
+
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/common/log.h"
-
-#include "gflags/gflags.h"
 
 namespace apollo {
 namespace planning {
 
-void AdcMasterScenario::Reset() {}
+void EgoVehicleScenario::Reset() {}
 
-bool AdcMasterScenario::Init() {
+bool EgoVehicleScenario::Init() {
   exist_ = true;
   return exist_;
 }
 
-int AdcMasterScenario::ComputeScenarioDecision(
+int EgoVehicleScenario::ComputeScenarioDecision(
     Frame* frame, ReferenceLineInfo* const reference_line_info,
     PlanningTarget* const decision) {
   CHECK(frame != nullptr);

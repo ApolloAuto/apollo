@@ -160,7 +160,7 @@ DECLARE_double(max_valid_stop_distance);
 
 /// Clear Zone
 DECLARE_string(clear_zone_virtual_object_id_prefix);
-/// triffic light
+/// traffic light
 DECLARE_string(signal_light_virtual_object_id_prefix);
 DECLARE_double(max_deacceleration_for_yellow_light_stop);
 /// crosswalk
@@ -182,6 +182,7 @@ DECLARE_bool(enable_multi_thread_in_dp_poly_path);
 DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 
 // lattice planner
+DECLARE_double(lattice_epsilon);
 DECLARE_int32(num_lattice_traj_to_plot);
 DECLARE_double(default_cruise_speed);
 DECLARE_double(spiral_downsample_curvature_thred);
@@ -189,6 +190,10 @@ DECLARE_bool(enable_sample_bound_planning);
 DECLARE_bool(enable_lattice_st_image_dump);
 DECLARE_bool(enable_auto_tuning);
 DECLARE_double(trajectory_time_resolution);
+DECLARE_double(trajectory_space_resolution);
 DECLARE_double(lateral_acceleration_bound);
+DECLARE_double(collision_buffer_expansion_ratio);
+DECLARE_double(decision_horizon);
+DECLARE_double(lateral_obstacle_ignore_thred);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H

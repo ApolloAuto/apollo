@@ -25,7 +25,6 @@
 #include <string>
 
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/lattice/util/lattice_params.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/util.h"
 #include "modules/common/log.h"
@@ -211,7 +210,7 @@ std::vector<double> ConditionFilter::UniformTimeStamps(
   timestamps.push_back(finish_trajectory_length);
 
   double time_interval =
-      planned_trajectory_time / static_cast<double>(num_of_time_segments);
+      FLAGS_trajectory_time_length / static_cast<double>(num_of_time_segments);
   for (std::size_t i = 1; i <= num_of_time_segments; ++i) {
     timestamps.push_back(i * time_interval);
   }

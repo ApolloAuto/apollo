@@ -18,31 +18,33 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_COLLISION_CHECKER_H
-#define MODULES_PLANNING_LATTICE_COLLISION_CHECKER_H
+#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_EGO_VEHICLE_SCENARIO_H_
+#define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_EGO_VEHICLE_SCENARIO_H_
 
-#include <vector>
-
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/common/obstacle.h"
-#include "modules/common/math/box2d.h"
+#include "modules/planning/lattice/behavior_decider/scenario.h"
 
 namespace apollo {
 namespace planning {
 
-class CollisionChecker {
+class EgoVehicleScenario : public Scenario {
  public:
-  explicit CollisionChecker(const std::vector<const Obstacle*>& obstacles);
+  void Reset() override;
 
-  bool InCollision(const DiscretizedTrajectory& discretized_trajectory);
+  bool Init() override;
+
+  bool ScenarioExist() const override { return exist_; }
+
+  virtual int ComputeScenarioDecision(
+      Frame* frame, ReferenceLineInfo* const reference_line_info,
+      PlanningTarget* const decision);
 
  private:
-  void BuildPredictedEnv(const std::vector<const Obstacle*>& obstacles);
+  bool exist_ = false;
 
-  std::vector<std::vector<common::math::Box2d>> predicted_envs_;
+  DECLARE_SCENARIO(EgoVehicleScenario);
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_LATTICE_COLLISION_CHECKER_H */
+#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_EGO_VEHICLE_SCENARIO_H_

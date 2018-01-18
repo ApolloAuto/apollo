@@ -22,17 +22,17 @@
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_PATH_TIME_NEIGHBORHOOD_H_
 
 #include <array>
-#include <vector>
+#include <string>
 #include <unordered_set>
 #include <unordered_map>
-#include <string>
 #include <utility>
+#include <vector>
 
 #include "modules/common/proto/geometry.pb.h"
-#include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/common/obstacle.h"
+#include "modules/planning/proto/lattice_structure.pb.h"
+#include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {

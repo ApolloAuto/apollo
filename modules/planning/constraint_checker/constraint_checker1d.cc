@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file lattice_constraint_checker.h
+ * @file
  **/
 
 #include "modules/planning/constraint_checker/constraint_checker1d.h"

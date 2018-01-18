@@ -24,7 +24,6 @@
 
 #include "glog/logging.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/lattice/util/lattice_params.h"
 
 namespace apollo {
 namespace planning {
@@ -42,15 +41,17 @@ void FeasibleRegion::Setup(const std::array<double, 3>& init_s,
   double v = init_s[1];
   CHECK(v >= 0.0);
 
+  const double max_deceleration = -FLAGS_longitudinal_acceleration_lower_bound;
   t_at_zero_speed_ = v / max_deceleration;
   s_at_zero_speed_ = init_s[0] + v * v / (2.0 * max_deceleration);
 
   double delta_v = std::abs(v - speed_limit);
   if (v < speed_limit) {
-    t_at_speed_limit_ = delta_v / max_acceleration;
+    t_at_speed_limit_ = delta_v / FLAGS_longitudinal_acceleration_upper_bound;
     s_at_speed_limit_ =
         init_s_[0] + v * t_at_speed_limit_ +
-        0.5 * max_acceleration * t_at_speed_limit_ * t_at_speed_limit_;
+        0.5 * FLAGS_longitudinal_acceleration_upper_bound
+        * t_at_speed_limit_ * t_at_speed_limit_;
   } else {
     t_at_speed_limit_ = 0.0;
     s_at_speed_limit_ = init_s_[0];
@@ -62,7 +63,8 @@ double FeasibleRegion::SUpper(const double t) const {
 
   if (init_s_[1] < speed_limit_) {
     if (t < t_at_speed_limit_) {
-      return init_s_[0] + init_s_[1] * t + 0.5 * max_acceleration * t * t;
+      return init_s_[0] + init_s_[1] * t +
+          0.5 * FLAGS_longitudinal_acceleration_upper_bound * t * t;
     } else {
       return s_at_speed_limit_ + speed_limit_ * (t - t_at_speed_limit_);
     }
@@ -73,18 +75,22 @@ double FeasibleRegion::SUpper(const double t) const {
 
 double FeasibleRegion::SLower(const double t) const {
   if (t < t_at_zero_speed_) {
-    return init_s_[0] + init_s_[1] * t - 0.5 * max_deceleration * t * t;
+    return init_s_[0] + init_s_[1] * t +
+        0.5 * FLAGS_longitudinal_acceleration_lower_bound * t * t;
   }
   return s_at_zero_speed_;
 }
 
 double FeasibleRegion::VUpper(const double t) const {
   return std::max(init_s_[1],
-                  std::min(init_s_[1] + max_acceleration * t, speed_limit_));
+                  std::min(init_s_[1] +
+                      FLAGS_longitudinal_acceleration_upper_bound * t,
+                      speed_limit_));
 }
 
 double FeasibleRegion::VLower(const double t) const {
-  return t < t_at_zero_speed_ ? init_s_[1] - max_deceleration * t : 0.0;
+  return t < t_at_zero_speed_ ? init_s_[1] +
+      FLAGS_longitudinal_acceleration_lower_bound * t : 0.0;
 }
 
 double FeasibleRegion::TLower(const double s) const {
@@ -93,8 +99,10 @@ double FeasibleRegion::TLower(const double s) const {
   if (init_s_[1] < speed_limit_) {
     if (s < s_at_speed_limit_) {
       double delta =
-          init_s_[1] * init_s_[1] - 2.0 * max_acceleration * (init_s_[0] - s);
-      return (std::sqrt(delta) - init_s_[1]) / max_acceleration;
+          init_s_[1] * init_s_[1] -
+          2.0 * FLAGS_longitudinal_acceleration_upper_bound * (init_s_[0] - s);
+      return (std::sqrt(delta) - init_s_[1]) /
+          FLAGS_longitudinal_acceleration_upper_bound;
     } else {
       return t_at_speed_limit_ + (s - s_at_speed_limit_) / speed_limit_;
     }
