@@ -92,10 +92,19 @@ bool ConstraintChecker::ValidTrajectory(
       return false;
     }
 
+    double lat_a = p1.v() * p1.v() * p1.path_point().kappa();
+    if (!WithinRange(lat_a, -FLAGS_lateral_acceleration_bound,
+                     FLAGS_lateral_acceleration_bound)) {
+      ADEBUG << "Lateral acceleration at relative time " << t
+             << " exceeds bound, value: " << lat_a << ", bound ["
+             << -FLAGS_lateral_acceleration_bound << ", "
+             << FLAGS_lateral_acceleration_bound << "].";
+      return false;
+    }
+
     double d_lat_a = p1.v() * p1.v() * p1.path_point().kappa() -
                      p0.v() * p0.v() * p0.path_point().kappa();
 
-    // TODO(all): add lateral acceleration check
     double lat_jerk = d_lat_a / dt;
     if (!WithinRange(lat_jerk, -FLAGS_lateral_jerk_bound,
                      FLAGS_lateral_jerk_bound)) {
