@@ -255,6 +255,7 @@ void SimulationWorldService::Update() {
   UpdateDelays();
 
   world_.set_sequence_num(world_.sequence_num() + 1);
+  world_.set_timestamp(apollo::common::time::AsInt64<millis>(Clock::Now()));
 }
 
 void SimulationWorldService::UpdateDelays() {
@@ -271,11 +272,24 @@ void SimulationWorldService::UpdateDelays() {
       SecToMs(AdapterManager::GetTrafficLightDetection()->GetDelaySec()));
 }
 
+std::string SimulationWorldService::GetWireFormatString(
+    double radius, bool enable_pnc_monitor) {
+  PopulateMapInfo(radius);
+  if (!enable_pnc_monitor) {
+    world_.clear_planning_data();
+  }
+
+  std::string bin;
+  world_.SerializeToString(&bin);
+
+  return bin;
+}
+
 Json SimulationWorldService::GetUpdateAsJson(double radius) const {
   std::string sim_world_json_string;
   MessageToJsonString(world_, &sim_world_json_string);
 
-  Json update = GetMapElements(radius);
+  Json update;
   update["type"] = "SimWorldUpdate";
   update["timestamp"] = apollo::common::time::AsInt64<millis>(Clock::Now());
   update["world"] = sim_world_json_string;
@@ -283,30 +297,21 @@ Json SimulationWorldService::GetUpdateAsJson(double radius) const {
   return update;
 }
 
-Json SimulationWorldService::GetPlanningData() const {
-  std::string planning_data_json;
-  MessageToJsonString(planning_data_, &planning_data_json);
-
-  return Json::parse(planning_data_json);
-}
-
-Json SimulationWorldService::GetMapElements(double radius) const {
+void SimulationWorldService::GetMapElementIds(double radius,
+                                              MapElementIds *ids) {
   // Gather required map element ids based on current location.
   apollo::common::PointENU point;
-  point.set_x(
-      world_.auto_driving_car().position_x() + map_service_->GetXOffset());
-  point.set_y(
-      world_.auto_driving_car().position_y() + map_service_->GetYOffset());
+  const auto &adc = world_.auto_driving_car();
+  point.set_x(adc.position_x() + map_service_->GetXOffset());
+  point.set_y(adc.position_y() + map_service_->GetYOffset());
+  map_service_->CollectMapElementIds(point, radius, ids);
+}
 
-  MapElementIds map_element_ids =
-      map_service_->CollectMapElementIds(point, radius);
-
-  Json map;
-  map["mapElementIds"] = map_element_ids.Json();
-  map["mapHash"] = map_element_ids.Hash();
-  map["mapRadius"] = radius;
-
-  return map;
+void SimulationWorldService::PopulateMapInfo(double radius) {
+  world_.clear_map_element_ids();
+  GetMapElementIds(radius, world_.mutable_map_element_ids());
+  world_.set_map_hash(map_service_->CalculateMapHash(world_.map_element_ids()));
+  world_.set_map_radius(radius);
 }
 
 template <>
@@ -325,8 +330,7 @@ void SimulationWorldService::UpdateSimulationWorld(
   // the max number of total messages has been hit.
   auto history = world_.monitor().item();
   const int history_size = std::min(
-      history.size(),
-      SimulationWorldService::kMaxMonitorItems - updated_size);
+      history.size(), SimulationWorldService::kMaxMonitorItems - updated_size);
   if (history_size > 0) {
     std::copy(history.begin(), history.begin() + history_size,
               std::back_inserter(updated));
@@ -345,10 +349,10 @@ void SimulationWorldService::UpdateSimulationWorld(
   const auto &pose = localization.pose();
 
   // Updates position with the input localization message.
-  auto_driving_car->set_position_x(
-      pose.position().x() + map_service_->GetXOffset());
-  auto_driving_car->set_position_y(
-      pose.position().y() + map_service_->GetYOffset());
+  auto_driving_car->set_position_x(pose.position().x() +
+                                   map_service_->GetXOffset());
+  auto_driving_car->set_position_y(pose.position().y() +
+                                   map_service_->GetYOffset());
   auto_driving_car->set_heading(pose.heading());
 
   // Updates acceleration with the input localization message.
@@ -359,8 +363,6 @@ void SimulationWorldService::UpdateSimulationWorld(
   // message header. It is done on both the SimulationWorld object
   // itself and its auto_driving_car() field.
   auto_driving_car->set_timestamp_sec(localization.header().timestamp_sec());
-  world_.set_timestamp_sec(
-      std::max(world_.timestamp_sec(), localization.header().timestamp_sec()));
 }
 
 template <>
@@ -381,9 +383,6 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   UpdateTurnSignal(chassis.signal(), auto_driving_car);
 
   auto_driving_car->set_disengage_type(DeduceDisengageType(chassis));
-
-  // Updates the timestamp with the timestamp inside the chassis message header.
-  world_.set_timestamp_sec(chassis.header().timestamp_sec());
 }
 
 Object &SimulationWorldService::CreateWorldObjectIfAbsent(
@@ -407,10 +406,10 @@ void SimulationWorldService::SetObstacleInfo(const PerceptionObstacle &obstacle,
   }
 
   world_object->set_id(std::to_string(obstacle.id()));
-  world_object->set_position_x(
-      obstacle.position().x() + map_service_->GetXOffset());
-  world_object->set_position_y(
-      obstacle.position().y() + map_service_->GetYOffset());
+  world_object->set_position_x(obstacle.position().x() +
+                               map_service_->GetXOffset());
+  world_object->set_position_y(obstacle.position().y() +
+                               map_service_->GetYOffset());
   world_object->set_heading(obstacle.theta());
   world_object->set_length(obstacle.length());
   world_object->set_width(obstacle.width());
@@ -450,8 +449,6 @@ void SimulationWorldService::UpdateSimulationWorld(
   for (const auto &obstacle : obstacles.perception_obstacle()) {
     CreateWorldObjectIfAbsent(obstacle);
   }
-  world_.set_timestamp_sec(
-      std::max(world_.timestamp_sec(), obstacles.header().timestamp_sec()));
 }
 
 template <>
@@ -653,18 +650,20 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
 }
 
 void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
+  auto *planning_data = world_.mutable_planning_data();
+
   size_t max_interval = 10;
 
   // Update SL Frame
-  planning_data_.mutable_sl_frame()->CopyFrom(data.sl_frame());
+  planning_data->mutable_sl_frame()->CopyFrom(data.sl_frame());
 
   // Update DP path
-  planning_data_.mutable_dp_poly_graph()->CopyFrom(data.dp_poly_graph());
+  planning_data->mutable_dp_poly_graph()->CopyFrom(data.dp_poly_graph());
 
   // Update ST Graph
-  planning_data_.clear_st_graph();
+  planning_data->clear_st_graph();
   for (auto &graph : data.st_graph()) {
-    auto *st_graph = planning_data_.add_st_graph();
+    auto *st_graph = planning_data->add_st_graph();
     st_graph->set_name(graph.name());
     st_graph->mutable_boundary()->CopyFrom(graph.boundary());
     if (graph.has_kernel_cruise_ref()) {
@@ -700,10 +699,10 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   }
 
   // Update Speed Plan
-  planning_data_.clear_speed_plan();
+  planning_data->clear_speed_plan();
   for (auto &plan : data.speed_plan()) {
     if (plan.speed_point_size() > 0) {
-      auto *downsampled_plan = planning_data_.add_speed_plan();
+      auto *downsampled_plan = planning_data->add_speed_plan();
       downsampled_plan->set_name(plan.name());
 
       // Downsample the speed plan for frontend display.
@@ -716,7 +715,7 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   }
 
   // Update path
-  planning_data_.clear_path();
+  planning_data->clear_path();
   for (auto &path : data.path()) {
     // Downsample the path points for frontend display.
     // Angle threshold is about 5.72 degree.
@@ -724,7 +723,7 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
     std::vector<int> sampled_indices =
         DownsampleByAngle(path.path_point(), angle_threshold);
 
-    auto *downsampled_path = planning_data_.add_path();
+    auto *downsampled_path = planning_data->add_path();
     downsampled_path->set_name(path.name());
     for (int index : sampled_indices) {
       const auto &path_point = path.path_point()[index];
@@ -773,9 +772,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   world_.mutable_latency()->set_planning(
       trajectory.latency_stats().total_time_ms());
-  world_.set_timestamp_sec(std::max(world_.timestamp_sec(), header_time));
 }
-
 
 void SimulationWorldService::CreatePredictionTrajectory(
     Object *world_object, const PredictionObstacle &obstacle) {
@@ -807,8 +804,6 @@ void SimulationWorldService::UpdateSimulationWorld(
     world_obj.set_timestamp_sec(
         std::max(obstacle.timestamp(), world_obj.timestamp_sec()));
   }
-  world_.set_timestamp_sec(
-      std::max(world_.timestamp_sec(), obstacles.header().timestamp_sec()));
 }
 
 template <>
@@ -839,8 +834,6 @@ void SimulationWorldService::UpdateSimulationWorld(
       route_point->set_y(path_point.y() + map_service_->GetYOffset());
     }
   }
-
-  world_.set_timestamp_sec(std::max(world_.timestamp_sec(), header_time));
 }
 
 void SimulationWorldService::ReadRoutingFromFile(

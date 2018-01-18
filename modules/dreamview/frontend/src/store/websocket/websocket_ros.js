@@ -1,6 +1,10 @@
 import STORE from "store";
 import RENDERER from "renderer";
 
+const protobuf = require("protobufjs/light");
+const root = protobuf.Root.fromJSON(require("../../../proto_bundle/proto_bundle.json"));
+const SimWorldMessage = root.lookupType("apollo.dreamview.SimulationWorld");
+
 export default class RosWebSocketEndpoint {
     constructor(serverAddr) {
         this.serverAddr = serverAddr;
@@ -16,6 +20,7 @@ export default class RosWebSocketEndpoint {
         this.counter = 0;
         try {
             this.websocket = new WebSocket(this.serverAddr);
+            this.websocket.binaryType = "arraybuffer";
         } catch (error) {
             console.error("Failed to establish a connection: " + error);
             setTimeout(() => {
@@ -24,7 +29,15 @@ export default class RosWebSocketEndpoint {
             return;
         }
         this.websocket.onmessage = event => {
-            const message = JSON.parse(event.data);
+            let message = null;
+            if (typeof event.data === "string") {
+                message = JSON.parse(event.data);
+            } else {
+                message = SimWorldMessage.toObject(
+                        SimWorldMessage.decode(new Uint8Array(event.data)),
+                        {enums: String});
+                message.type = "SimWorldUpdate";
+            }
 
             switch (message.type) {
                 case "HMIConfig":
@@ -34,22 +47,20 @@ export default class RosWebSocketEndpoint {
                     STORE.hmi.updateStatus(message.data);
                     break;
                 case "SimWorldUpdate":
-                    const world = JSON.parse(message.world);
-                    this.checkMessage(message, world);
+                    this.checkMessage(message);
 
                     STORE.updateTimestamp(message.timestamp);
-                    STORE.updateWorldTimestamp(world.timestampSec);
-                    STORE.updateModuleDelay(world);
+                    STORE.updateModuleDelay(message);
                     RENDERER.maybeInitializeOffest(
-                        world.autoDrivingCar.positionX,
-                        world.autoDrivingCar.positionY);
-                    RENDERER.updateWorld(world, message.planningData);
-                    STORE.meters.update(world);
-                    STORE.monitor.update(world);
-                    STORE.trafficSignal.update(world);
-                    STORE.hmi.update(world);
+                        message.autoDrivingCar.positionX,
+                        message.autoDrivingCar.positionY);
+                    RENDERER.updateWorld(message);
+                    STORE.meters.update(message);
+                    STORE.monitor.update(message);
+                    STORE.trafficSignal.update(message);
+                    STORE.hmi.update(message);
                     if (STORE.options.showPNCMonitor) {
-                        STORE.planning.update(world, message.planningData);
+                        STORE.planning.update(message);
                     }
                     if (message.mapHash && (this.counter % 10 === 0)) {
                         // NOTE: This is a hack to limit the rate of map updates.
@@ -60,7 +71,7 @@ export default class RosWebSocketEndpoint {
                     }
                     this.counter += 1;
                     break;
-                case "MapElements":
+                case "MapElementIds":
                     RENDERER.updateMapIndex(message.mapHash,
                             message.mapElementIds, message.mapRadius);
                     break;
@@ -97,13 +108,13 @@ export default class RosWebSocketEndpoint {
         }, 100);
     }
 
-    checkMessage(message, world) {
+    checkMessage(world) {
         if (this.lastUpdateTimestamp !== 0
-            && message.timestamp - this.lastUpdateTimestamp > 150) {
+            && world.timestamp - this.lastUpdateTimestamp > 150) {
             console.log("Last sim_world_update took " +
-                (message.timestamp - this.lastUpdateTimestamp) + "ms");
+                (world.timestamp - this.lastUpdateTimestamp) + "ms");
         }
-        this.lastUpdateTimestamp = message.timestamp;
+        this.lastUpdateTimestamp = world.timestamp;
         if (this.lastSeqNum !== -1
             && world.sequenceNum > this.lastSeqNum + 1) {
             console.debug("Last seq: " + this.lastSeqNum +
@@ -119,9 +130,9 @@ export default class RosWebSocketEndpoint {
         }));
     }
 
-    requestMapElementsByRadius(radius) {
+    requestMapElementIdsByRadius(radius) {
         this.websocket.send(JSON.stringify({
-            type: "RetrieveMapElementsByRadius",
+            type: "RetrieveMapElementIdsByRadius",
             radius: radius,
         }));
     }
