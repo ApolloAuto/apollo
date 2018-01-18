@@ -135,7 +135,6 @@ export default class OfflinePlaybackWebSocketEndpoint {
                         ? JSON.parse(message.world): message.world;
         if (STORE.playback.shouldProcessFrame(world)) {
             STORE.updateTimestamp(message.timestamp);
-            STORE.updateWorldTimestamp(world.timestampSec);
             RENDERER.maybeInitializeOffest(
                 world.autoDrivingCar.positionX,
                 world.autoDrivingCar.positionY);
