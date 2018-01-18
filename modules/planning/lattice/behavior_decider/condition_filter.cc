@@ -229,7 +229,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
   double t_step = 8.0 / static_cast<double>(num_cols);
 
   if (ptr_path_time_neighborhood_->GetPathTimeObstacles().empty()) {
-    AINFO << "No_Path_Time_Neighborhood_Obstacle_in_this_frame";
+    ADEBUG << "No_Path_Time_Neighborhood_Obstacle_in_this_frame";
     return false;
   }
   for (int j = 0; j < num_cols; ++j) {

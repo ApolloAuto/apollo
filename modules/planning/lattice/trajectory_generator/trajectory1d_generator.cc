@@ -64,7 +64,7 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
 void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
     const double target_speed,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
-  AINFO << "cruise speed is  " << target_speed;
+  ADEBUG << "cruise speed is  " << target_speed;
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
       end_condition_sampler_->SampleLonEndConditionsForCruising(target_speed);
 
