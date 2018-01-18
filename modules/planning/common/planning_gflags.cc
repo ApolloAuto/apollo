@@ -348,6 +348,7 @@ DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
 
 ///////////////////////////////////////////////////////////
 // Lattice Planner
+DEFINE_double(lattice_epsilon, 1e-6, "Epsilon in lattice planner.");
 DEFINE_int32(num_lattice_traj_to_plot, 5,
              "Number of lattice trajectories to plot");
 DEFINE_double(default_cruise_speed, 5.0,
@@ -368,6 +369,5 @@ DEFINE_double(collision_buffer_expansion_ratio, 0.2,
     "The ratio w.r.t. the vehicle dimension to expand in collision checking");
 DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
-
 DEFINE_double(lateral_obstacle_ignore_thred, 2.0, "Lateral threshold for "
               "obstacles to be considered in path-time graph");
