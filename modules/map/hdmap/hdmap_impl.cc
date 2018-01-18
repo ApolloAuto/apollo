@@ -685,52 +685,90 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
   return 0;
 }
 
-int HDMapImpl::GetStopSignAssociateLanes(
-             const Id& id,
-             std::vector<LaneInfoConstPtr>* lanes) const {
-    CHECK_NOTNULL(lanes);
+int HDMapImpl::GetStopSignAssociatedStopSigns(
+    const Id& id,
+    std::vector<StopSignInfoConstPtr>* stop_signs) const {
+  CHECK_NOTNULL(stop_signs);
 
-    const auto& stop_sign = GetStopSignById(id);
+  const auto& stop_sign = GetStopSignById(id);
+  if (stop_sign == nullptr) {
+    return -1;
+  }
+
+  std::vector<Id> associate_stop_sign_ids;
+  const auto junction_ids = stop_sign->OverlapJunctionIds();
+  for (const auto& junction_id : junction_ids) {
+    const auto& junction = GetJunctionById(junction_id);
+    if (junction == nullptr) {
+      continue;
+    }
+    const auto stop_sign_ids = junction->OverlapStopSignIds();
+    std::copy(stop_sign_ids.begin(), stop_sign_ids.end(),
+              std::back_inserter(associate_stop_sign_ids));
+  }
+
+  std::vector<Id> associate_lane_ids;
+  for (const auto& stop_sign_id : associate_stop_sign_ids) {
+    if (stop_sign_id.id() == id.id()) {
+      // exclude current stop sign
+      continue;
+    }
+    const auto& stop_sign = GetStopSignById(stop_sign_id);
     if (stop_sign == nullptr) {
-      return -1;
+      continue;
     }
+    stop_signs->push_back(stop_sign);
+  }
 
-    std::vector<Id> associate_stop_sign_ids;
-    const auto junction_ids = stop_sign->OverlapJunctionIds();
-    for (const auto& junction_id : junction_ids) {
-      const auto& junction = GetJunctionById(junction_id);
-      if (junction == nullptr) {
-        continue;
-      }
-      const auto stop_sign_ids = junction->OverlapStopSignIds();
-      std::copy(stop_sign_ids.begin(), stop_sign_ids.end(),
-        std::back_inserter(associate_stop_sign_ids));
+  return 0;
+}
+
+int HDMapImpl::GetStopSignAssociatedLanes(
+    const Id& id,
+    std::vector<LaneInfoConstPtr>* lanes) const {
+  CHECK_NOTNULL(lanes);
+
+  const auto& stop_sign = GetStopSignById(id);
+  if (stop_sign == nullptr) {
+    return -1;
+  }
+
+  std::vector<Id> associate_stop_sign_ids;
+  const auto junction_ids = stop_sign->OverlapJunctionIds();
+  for (const auto& junction_id : junction_ids) {
+    const auto& junction = GetJunctionById(junction_id);
+    if (junction == nullptr) {
+      continue;
     }
+    const auto stop_sign_ids = junction->OverlapStopSignIds();
+    std::copy(stop_sign_ids.begin(), stop_sign_ids.end(),
+              std::back_inserter(associate_stop_sign_ids));
+  }
 
-    std::vector<Id> associate_lane_ids;
-    for (const auto& stop_sign_id : associate_stop_sign_ids) {
-      if (stop_sign_id.id() == id.id()) {
-        // exclude current stop sign
-        continue;
-      }
-      const auto& stop_sign = GetStopSignById(stop_sign_id);
-      if (stop_sign == nullptr) {
-        continue;
-      }
-      const auto lane_ids = stop_sign->OverlapLaneIds();
-      std::copy(lane_ids.begin(), lane_ids.end(),
-        std::back_inserter(associate_lane_ids));
+  std::vector<Id> associate_lane_ids;
+  for (const auto& stop_sign_id : associate_stop_sign_ids) {
+    if (stop_sign_id.id() == id.id()) {
+      // exclude current stop sign
+      continue;
     }
-
-    for (const auto lane_id : associate_lane_ids) {
-      const auto& lane = GetLaneById(lane_id);
-      if (lane == nullptr) {
-        continue;
-      }
-      lanes->push_back(lane);
+    const auto& stop_sign = GetStopSignById(stop_sign_id);
+    if (stop_sign == nullptr) {
+      continue;
     }
+    const auto lane_ids = stop_sign->OverlapLaneIds();
+    std::copy(lane_ids.begin(), lane_ids.end(),
+              std::back_inserter(associate_lane_ids));
+  }
 
-    return 0;
+  for (const auto lane_id : associate_lane_ids) {
+    const auto& lane = GetLaneById(lane_id);
+    if (lane == nullptr) {
+      continue;
+    }
+    lanes->push_back(lane);
+  }
+
+  return 0;
 }
 
 template <class Table, class BoxTable, class KDTree>

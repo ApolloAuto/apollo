@@ -23,6 +23,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
@@ -31,6 +32,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::hdmap::LaneInfoConstPtr;
+using apollo::hdmap::StopSignInfoConstPtr;
 using apollo::hdmap::PathOverlap;
 using apollo::hdmap::StopSignInfo;
 using apollo::perception::PerceptionObstacle;
@@ -54,7 +56,7 @@ class StopSign : public TrafficRule {
   void MakeDecisions(Frame* frame,
                      ReferenceLineInfo* const reference_line_info);
   bool FindNextStopSign(ReferenceLineInfo* const reference_line_info);
-  int GetAssociateLanes(const StopSignInfo& stop_sign_info);
+  int GetAssociatedLanes(const StopSignInfo& stop_sign_info);
   int ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
                         const StopSignInfo& stop_sign_info);
   bool ChecADCkStop(ReferenceLineInfo* const reference_line_info);
@@ -83,7 +85,8 @@ class StopSign : public TrafficRule {
   PathOverlap* next_stop_sign_overlap_ = nullptr;
   StopSignInfo* next_stop_sign_ = nullptr;
   StopSignStopStatus stop_status_;
-  std::vector<LaneInfoConstPtr> associate_lanes_;
+  std::vector<std::pair<LaneInfoConstPtr,
+      StopSignInfoConstPtr>> associated_lanes_;
 };
 
 }  // namespace planning
