@@ -65,10 +65,10 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     }
   }
   if (!is_auto_tuning_) {
-    AINFO << "Number of valid 1d trajectory pairs:\t" << cost_queue_.size();
+    ADEBUG << "Number of valid 1d trajectory pairs: " << cost_queue_.size();
   } else {
-    AINFO << "Number of valid 1d trajectory pairs:\t"
-          << cost_queue_with_components_.size();
+    ADEBUG << "Number of valid 1d trajectory pairs: "
+           << cost_queue_with_components_.size();
   }
 }
 

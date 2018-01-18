@@ -14,13 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
-
-#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHAVIOR_DECIDER_H
-#define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHAVIOR_DECIDER_H
-
 #include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 
 #include <string>
@@ -82,9 +75,9 @@ PlanningTarget BehaviorDecider::Analyze(
                               std::to_string(timestamp);
     if (condition_filter.GenerateLatticeStPixels(&st_data, timestamp,
                                                  st_img_name)) {
-      AINFO << "  Created_lattice_st_image_named=" << st_img_name
-            << "_for_timestamp=" << timestamp
-            << " num_colored_pixels=" << st_data.pixel_size();
+      ADEBUG << "Created_lattice_st_image_named = " << st_img_name
+             << "_for_timestamp = " << timestamp
+             << " num_colored_pixels = " << st_data.pixel_size();
       planning_internal::Debug* ptr_debug =
           reference_line_info->mutable_debug();
       ptr_debug->mutable_planning_data()->mutable_lattice_st_image()->CopyFrom(
@@ -94,12 +87,11 @@ PlanningTarget BehaviorDecider::Analyze(
   decision_cycles += 1;
 
   // Debug SampleBound
-  AINFO << "[Printing SampleBound]";
   if (sample_bounds.empty()) {
-    AINFO << " ------ sample_bounds empty";
+    ADEBUG << "Sample_bounds empty";
   } else {
     for (const SampleBound& sample_bound : sample_bounds) {
-      AINFO << " ------ sample_bound: " << sample_bound.ShortDebugString();
+      ADEBUG << "Sample_bound: " << sample_bound.ShortDebugString();
     }
   }
 
@@ -111,5 +103,3 @@ PlanningTarget BehaviorDecider::Analyze(
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_DECISION_ANALYZER_H
