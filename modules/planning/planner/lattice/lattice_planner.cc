@@ -343,7 +343,8 @@ DiscretizedTrajectory LatticePlanner::CombineTrajectory(
     // linear extrapolation is handled internally in LatticeTrajectory1d;
     // no worry about t_param > lon_trajectory.ParamLength() situation
     double s = lon_trajectory.Evaluate(0, t_param);
-    double s_dot = std::max(0.0, lon_trajectory.Evaluate(1, t_param));
+    double s_dot = std::max(FLAGS_lattice_epsilon,
+                            lon_trajectory.Evaluate(1, t_param));
     double s_ddot = lon_trajectory.Evaluate(2, t_param);
     if (s > s_ref_max) {
       break;
