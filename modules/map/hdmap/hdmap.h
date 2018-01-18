@@ -204,7 +204,7 @@ class HDMap {
                         std::vector<JunctionBoundaryPtr>* junctions) const;
   /**
    * @brief get forward nearest signals within certain range on the lane
-   *        if there are two signals related to one stop line, 
+   *        if there are two signals related to one stop line,
    *        return both signals.
    * @param point the target position
    * @param distance the forward search distance
@@ -212,19 +212,30 @@ class HDMap {
    * @return 0:success, otherwise failed
    */
   int GetForwardNearestSignalsOnLane(
-             const apollo::common::PointENU& point,
-             const double distance,
-             std::vector<SignalInfoConstPtr>* signals) const;
+      const apollo::common::PointENU& point,
+      const double distance,
+      std::vector<SignalInfoConstPtr>* signals) const;
 
   /**
-   * @brief get all lanes that associate with the same stop sign 
+   * @brief get all other stop signs associated with a stop sign
+   *        in the same junction
+   * @param id id of stop sign
+   * @param stop_signs stop signs associated
+   * @return 0:success, otherwise failed
+   */
+  int GetStopSignAssociatedStopSigns(
+      const Id& id,
+      std::vector<StopSignInfoConstPtr>* stop_signs) const;
+
+  /**
+   * @brief get all lanes associated with a stop sign in the same junction
    * @param id id of stop sign
    * @param lanes all lanes match conditions
    * @return 0:success, otherwise failed
    */
-  int GetStopSignAssociateLanes(
-             const Id& id,
-             std::vector<LaneInfoConstPtr>* lanes) const;
+  int GetStopSignAssociatedLanes(
+      const Id& id,
+      std::vector<LaneInfoConstPtr>* lanes) const;
 
  private:
   HDMapImpl impl_;
