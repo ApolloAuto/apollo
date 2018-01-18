@@ -21,23 +21,18 @@
 #include "modules/planning/lattice/util/reference_line_matcher.h"
 
 #include <algorithm>
-#include <vector>
 #include <cmath>
+#include <vector>
 
-#include "modules/planning/math/hermite_spline.h"
-#include "modules/planning/common/planning_util.h"
-#include "modules/common/math/integral.h"
-#include "modules/common/math/search.h"
+#include "glog/logging.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::PathPoint;
-using apollo::common::math::IntegrateByGaussLegendre;
 using apollo::planning::util::InterpolateUsingLinearApproximation;
-using apollo::planning::util::interpolate;
-using apollo::common::math::GoldenSectionSearch;
 
 PathPoint ReferenceLineMatcher::MatchToReferenceLine(
     const std::vector<PathPoint>& reference_line, const double x,
@@ -75,7 +70,7 @@ PathPoint ReferenceLineMatcher::MatchToReferenceLine(
 }
 
 std::pair<double, double> ReferenceLineMatcher::GetReferenceLineCoordinate(
-    const std::vector<common::PathPoint>& reference_line, const double x,
+    const std::vector<PathPoint>& reference_line, const double x,
     const double y) {
   auto matched_path_point = MatchToReferenceLine(reference_line, x, y);
 

@@ -20,11 +20,11 @@
 
 #include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 
-#include <utility>
-#include <vector>
+#include <algorithm>
 #include <cmath>
 #include <limits>
-#include <algorithm>
+#include <utility>
+#include <vector>
 
 #include "modules/planning/proto/sl_boundary.pb.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -71,7 +71,7 @@ int LastIndexBefore(const prediction::Trajectory& trajectory, const double t) {
 PathTimeNeighborhood::PathTimeNeighborhood(
     const std::vector<const Obstacle*>& obstacles,
     const double ego_s,
-    const std::vector<common::PathPoint>& discretized_ref_points) {
+    const std::vector<PathPoint>& discretized_ref_points) {
 
   path_range_.first = ego_s;
   path_range_.second = ego_s + FLAGS_decision_horizon;
@@ -85,7 +85,7 @@ PathTimeNeighborhood::PathTimeNeighborhood(
 
 SLBoundary PathTimeNeighborhood::ComputeObstacleBoundary(
     const Box2d& box,
-    const std::vector<common::PathPoint>& discretized_ref_points) const {
+    const std::vector<PathPoint>& discretized_ref_points) const {
 
   double start_s(std::numeric_limits<double>::max());
   double end_s(std::numeric_limits<double>::lowest());
@@ -114,7 +114,7 @@ SLBoundary PathTimeNeighborhood::ComputeObstacleBoundary(
 
 void PathTimeNeighborhood::SetupObstacles(
     const std::vector<const Obstacle*>& obstacles,
-    const std::vector<common::PathPoint>& discretized_ref_points) {
+    const std::vector<PathPoint>& discretized_ref_points) {
 
   for (const Obstacle* obstacle : obstacles) {
     if (prediction_traj_map_.find(obstacle->Id()) ==
@@ -205,7 +205,7 @@ void PathTimeNeighborhood::SetupObstacles(
 
 void PathTimeNeighborhood::SetStaticPathTimeObstacle(
     const Obstacle* obstacle,
-    const std::vector<common::PathPoint>& discretized_ref_points) {
+    const std::vector<PathPoint>& discretized_ref_points) {
   TrajectoryPoint start_point = obstacle->GetPointAtTime(0.0);
   Box2d box = obstacle->GetBoundingBox(start_point);
 

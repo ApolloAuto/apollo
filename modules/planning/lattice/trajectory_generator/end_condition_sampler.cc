@@ -18,10 +18,10 @@
  * @file
  **/
 
+#include "modules/planning/lattice/trajectory_generator/end_condition_sampler.h"
+
 #include <algorithm>
 #include <utility>
-
-#include "modules/planning/lattice/trajectory_generator/end_condition_sampler.h"
 
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
