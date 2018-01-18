@@ -112,7 +112,8 @@ void Crosswalk::MakeDecisions(Frame* frame,
           path_obstacle->obstacle()->PerceptionBoundingBox();
       bool is_on_road =
           reference_line_info->reference_line().HasOverlap(obstacle_box);
-      bool is_path_cross = path_obstacle->st_boundary().IsEmpty();
+      bool is_path_cross =
+          path_obstacle->reference_line_st_boundary().IsEmpty();
 
       ADEBUG << "obstacle_id[" << obstacle_id << "]; type["
              << obstacle_type_name << "]; crosswalk_id[" << crosswalk_id
@@ -207,10 +208,9 @@ double Crosswalk::GetStopDeceleration(
   return (adc_speed * adc_speed) / (2 * stop_distance);
 }
 
-bool Crosswalk::BuildStopDecision(
-    Frame* frame,
-    ReferenceLineInfo* const reference_line_info,
-    const hdmap::PathOverlap* crosswalk_overlap) {
+bool Crosswalk::BuildStopDecision(Frame* frame,
+                                  ReferenceLineInfo* const reference_line_info,
+                                  const hdmap::PathOverlap* crosswalk_overlap) {
   // check
   const auto& reference_line = reference_line_info->reference_line();
   if (!WithinBound(0.0, reference_line.Length(), crosswalk_overlap->start_s)) {
@@ -223,9 +223,7 @@ bool Crosswalk::BuildStopDecision(
   std::string virtual_object_id =
       FLAGS_crosswalk_virtual_object_id_prefix + crosswalk_overlap->object_id;
   auto* obstacle = frame->AddVirtualStopObstacle(
-      reference_line_info,
-      virtual_object_id,
-      crosswalk_overlap->start_s);
+      reference_line_info, virtual_object_id, crosswalk_overlap->start_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle " << virtual_object_id << " in frame";
     return false;
