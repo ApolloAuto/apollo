@@ -56,7 +56,7 @@ struct alignas(16) Object {
   // the yaw angle, theta = 0.0 <=> direction = (1, 0, 0)
   double theta = 0.0;
   // ground center of the object (cx, cy, z_min)
-  Eigen::Vector3d center;
+  Eigen::Vector3d center = Eigen::Vector3d::Zero();
   // size of the oriented bbox, length is the size in the main direction
   double length = 0.0;
   double width = 0.0;
@@ -70,7 +70,7 @@ struct alignas(16) Object {
   ScoreType score_type = SCORE_CNN;
 
   // Object classification type.
-  ObjectType type;
+  ObjectType type = UNKNOWN;
   // Probability of each type, used for track type.
   std::vector<float> type_probs;
 
@@ -79,7 +79,7 @@ struct alignas(16) Object {
 
   // tracking information
   int track_id = 0;
-  Eigen::Vector3d velocity;
+  Eigen::Vector3d velocity = Eigen::Vector3d::Zero();
   // age of the tracked object
   double tracking_time = 0.0;
   double latest_tracked_time = 0.0;
