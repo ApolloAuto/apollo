@@ -94,4 +94,4 @@ modules/drivers/gnss/conf/conf_us
 modules/calibration/data/mkz056
 
 # Data bag
-docs/demo_guide/demo_1.5.np.bag
+docs/demo_guide/*.bag
