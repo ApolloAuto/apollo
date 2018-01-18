@@ -25,13 +25,13 @@
 #include <limits>
 #include <utility>
 
+#include "modules/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
 #include "modules/planning/lattice/util/lattice_trajectory1d.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
