@@ -182,6 +182,7 @@ DECLARE_bool(enable_multi_thread_in_dp_poly_path);
 DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 
 // lattice planner
+DECLARE_double(lattice_epsilon);
 DECLARE_int32(num_lattice_traj_to_plot);
 DECLARE_double(default_cruise_speed);
 DECLARE_double(spiral_downsample_curvature_thred);
