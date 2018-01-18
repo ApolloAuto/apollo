@@ -18,31 +18,33 @@
  * @file
  **/
 
-#include "modules/planning/lattice/behavior_decider/adc_master_scenario.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/common/log.h"
+#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_EGO_VEHICLE_SCENARIO_H_
+#define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_EGO_VEHICLE_SCENARIO_H_
 
-#include "gflags/gflags.h"
+#include "modules/planning/lattice/behavior_decider/scenario.h"
 
 namespace apollo {
 namespace planning {
 
-void AdcMasterScenario::Reset() {}
+class EgoVehicleScenario : public Scenario {
+ public:
+  void Reset() override;
 
-bool AdcMasterScenario::Init() {
-  exist_ = true;
-  return exist_;
-}
+  bool Init() override;
 
-int AdcMasterScenario::ComputeScenarioDecision(
-    Frame* frame, ReferenceLineInfo* const reference_line_info,
-    PlanningTarget* const decision) {
-  CHECK(frame != nullptr);
+  bool ScenarioExist() const override { return exist_; }
 
-  decision->set_cruise_speed(FLAGS_default_cruise_speed);
+  virtual int ComputeScenarioDecision(
+      Frame* frame, ReferenceLineInfo* const reference_line_info,
+      PlanningTarget* const decision);
 
-  return 0;
-}
+ private:
+  bool exist_ = false;
+
+  DECLARE_SCENARIO(EgoVehicleScenario);
+};
 
 }  // namespace planning
 }  // namespace apollo
+
+#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_EGO_VEHICLE_SCENARIO_H_

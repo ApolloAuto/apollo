@@ -19,10 +19,10 @@
  **/
 
 #include "modules/planning/lattice/behavior_decider/scenario_manager.h"
-#include "modules/planning/lattice/behavior_decider/adc_master_scenario.h"
-#include "modules/planning/lattice/behavior_decider/signal_light_scenario.h"
 
 #include "modules/common/log.h"
+#include "modules/planning/lattice/behavior_decider/ego_vehicle_scenario.h"
+#include "modules/planning/lattice/behavior_decider/signal_light_scenario.h"
 
 namespace apollo {
 namespace planning {
@@ -33,7 +33,7 @@ void ScenarioManager::RegisterScenarios() {
   scenarios_.clear();
   scenarios_.resize(NUM_LEVELS);
   // level 0 features
-  RegisterScenario<AdcMasterScenario>(LEVEL0);
+  RegisterScenario<EgoVehicleScenario>(LEVEL0);
   RegisterScenario<SignalLightScenario>(LEVEL0);
 }
 
