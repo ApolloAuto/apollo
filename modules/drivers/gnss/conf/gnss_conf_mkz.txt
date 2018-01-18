@@ -9,11 +9,11 @@ data {
 rtk_from {
     format: RTCM_V3
     ntrip {
-        #address:
-        #port:
-        #mount_point:
-        #user:
-        #password:
+        #address: "111.111.111.11"
+        #port: 0000
+        #mount_point: "yourport"
+        #user: "username"
+        #password: "password"
         timeout_s: 5
     }
     push_location: true
