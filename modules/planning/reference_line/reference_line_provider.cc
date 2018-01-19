@@ -73,16 +73,9 @@ void ReferenceLineProvider::Init(
 
 bool ReferenceLineProvider::UpdateRoutingResponse(
     const routing::RoutingResponse &routing) {
-  std::unique_lock<std::mutex> routing_lock(routing_mutex_, std::defer_lock);
-  std::unique_lock<std::mutex> reference_line_lock(reference_lines_mutex_,
-                                                   std::defer_lock);
-  std::lock(routing_lock, reference_line_lock);
-  if (hdmap::PncMap::IsNewRouting(routing_, routing)) {
-    routing_ = routing;
-    has_routing_ = true;
-    reference_lines_.clear();
-    route_segments_.clear();
-  }
+  std::lock_guard<std::mutex> routing_lock(routing_mutex_);
+  routing_ = routing;
+  has_routing_ = true;
   return true;
 }
 
@@ -274,9 +267,11 @@ bool ReferenceLineProvider::CreateReferenceLine(
     std::lock_guard<std::mutex> lock(routing_mutex_);
     routing = routing_;
   }
+  bool is_new_routing = false;
   {
     // Update routing in pnc_map
     if (pnc_map_->IsNewRouting(routing)) {
+      is_new_routing = true;
       if (!pnc_map_->UpdateRoutingResponse(routing)) {
         AERROR << "Failed to update routing in pnc map";
         return false;
@@ -291,7 +286,7 @@ bool ReferenceLineProvider::CreateReferenceLine(
     AERROR << "Failed to create reference line from routing";
     return false;
   }
-  if (!FLAGS_enable_reference_line_stitching) {
+  if (is_new_routing || !FLAGS_enable_reference_line_stitching) {
     for (auto iter = segments->begin(); iter != segments->end();) {
       reference_lines->emplace_back();
       if (!SmoothRouteSegment(*iter, &reference_lines->back())) {
