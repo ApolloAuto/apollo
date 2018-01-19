@@ -157,7 +157,7 @@ ComparableCost TrajectoryCost::CalculatePathCost(
     constexpr double kBuff = 0.2;
     if (!is_change_lane_path_ && (l + width / 2.0 + kBuff > left_width ||
                                   l - width / 2.0 - kBuff < -right_width)) {
-      cost.out_of_boundary = true;
+      cost.cost_items[ComparableCost::OUT_OF_BOUNDARY] = true;
     }
 
     const double dl = std::fabs(curve.Evaluate(1, path_s));
@@ -257,7 +257,7 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
                           obs_sl_boundary.end_l()));  // lateral
 
   if (!no_overlap) {
-    obstacle_cost.has_collision = true;
+    obstacle_cost.cost_items[ComparableCost::HAS_COLLISION] = true;
   }
 
   const double delta_l = std::fabs(
