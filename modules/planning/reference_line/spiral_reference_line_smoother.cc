@@ -125,6 +125,10 @@ bool SpiralReferenceLineSmoother::Smooth(
       fixed_start_kappa_ = start_anchor_point.path_point.kappa();
       fixed_start_dkappa_ = start_anchor_point.path_point.dkappa();
 
+      const auto& end_anchor_point = anchor_points_.back();
+      fixed_end_x_ = end_anchor_point.path_point.x();
+      fixed_end_y_ = end_anchor_point.path_point.y();
+
       Smooth(raw_point2d, &opt_theta, &opt_kappa, &opt_dkappa, &opt_s, &opt_x,
              &opt_y);
 
@@ -202,6 +206,8 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
     ptop->set_start_point(fixed_start_x_, fixed_start_y_, fixed_start_theta_,
                           fixed_start_kappa_, fixed_start_dkappa_);
   }
+
+  ptop->set_end_point_position(fixed_end_x_, fixed_end_y_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
