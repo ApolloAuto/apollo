@@ -142,13 +142,24 @@ bool SpiralProblemInterface::get_bounds_info(int n, double* x_l, double* x_u,
       x_upper = end_x_;
       y_lower = end_y_;
       y_upper = end_y_;
-    } else {
-      theta_lower = relative_theta_[i] - M_PI * 0.5;
-      theta_upper = relative_theta_[i] + M_PI * 0.5;
+    } else if (i + 1 == num_of_points_ && has_fixed_end_point_position_) {
+      theta_lower = relative_theta_[i] - M_PI * 0.2;
+      theta_upper = relative_theta_[i] + M_PI * 0.2;
       kappa_lower = -0.25;
       kappa_upper = 0.25;
-      dkappa_lower = -0.25;
-      dkappa_upper = 0.25;
+      dkappa_lower = -0.02;
+      dkappa_upper = 0.02;
+      x_lower = end_x_;
+      x_upper = end_x_;
+      y_lower = end_y_;
+      y_upper = end_y_;
+    } else {
+      theta_lower = relative_theta_[i] - M_PI * 0.2;
+      theta_upper = relative_theta_[i] + M_PI * 0.2;
+      kappa_lower = -0.25;
+      kappa_upper = 0.25;
+      dkappa_lower = -0.02;
+      dkappa_upper = 0.02;
       x_lower = init_points_[i].x() - default_max_point_deviation_;
       x_upper = init_points_[i].x() + default_max_point_deviation_;
       y_lower = init_points_[i].y() - default_max_point_deviation_;
@@ -778,6 +789,13 @@ void SpiralProblemInterface::set_end_point(const double x, const double y,
   end_theta_ = theta;
   end_kappa_ = kappa;
   end_dkappa_ = dkappa;
+}
+
+void SpiralProblemInterface::set_end_point_position(
+    const double x, const double y) {
+  has_fixed_end_point_position_ = true;
+  end_x_ = x;
+  end_y_ = y;
 }
 
 }  // namespace planning
