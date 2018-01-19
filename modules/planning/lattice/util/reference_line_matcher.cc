@@ -27,6 +27,7 @@
 #include "glog/logging.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/common/planning_util.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -73,11 +74,20 @@ std::pair<double, double> ReferenceLineMatcher::GetReferenceLineCoordinate(
     const std::vector<PathPoint>& reference_line, const double x,
     const double y) {
   auto matched_path_point = MatchToReferenceLine(reference_line, x, y);
-
+  double lane_heading = matched_path_point.theta();
+  double lane_x = matched_path_point.x();
+  double lane_y = matched_path_point.y();
+  double delta_x = x - lane_x;
+  double delta_y = y - lane_y;
+  double side = std::cos(lane_heading) * delta_y -
+                std::sin(lane_heading) * delta_x;
   std::pair<double, double> relative_coordinate;
   relative_coordinate.first = matched_path_point.s();
-  relative_coordinate.second =
-      std::hypot(matched_path_point.x() - x, matched_path_point.y() - y);
+  if (side > FLAGS_lattice_epsilon) {
+    relative_coordinate.second = std::hypot(delta_x, delta_y);
+  } else {
+    relative_coordinate.second = -std::hypot(delta_x, delta_y);
+  }
   return relative_coordinate;
 }
 

@@ -129,8 +129,8 @@ void PathTimeNeighborhood::SetupObstacles(
        continue;
     }
 
-    double relative_time = 0.0;
-    while (relative_time + time_range_.first < time_range_.second) {
+    double relative_time = time_range_.first;
+    while (relative_time < time_range_.second) {
       TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       Box2d box = obstacle->GetBoundingBox(point);
       SLBoundary sl_boundary = ComputeObstacleBoundary(box,
