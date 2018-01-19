@@ -54,11 +54,13 @@ FrameHistory::FrameHistory()
 
 Frame::Frame(uint32_t sequence_num,
              const common::TrajectoryPoint &planning_start_point,
-             const double start_time, const common::VehicleState &vehicle_state)
+             const double start_time, const common::VehicleState &vehicle_state,
+             ReferenceLineProvider *reference_line_provider)
     : sequence_num_(sequence_num),
       planning_start_point_(planning_start_point),
       start_time_(start_time),
-      vehicle_state_(vehicle_state) {
+      vehicle_state_(vehicle_state),
+      reference_line_provider_(reference_line_provider) {
   if (FLAGS_enable_lag_prediction) {
     lag_predictor_.reset(
         new LagPrediction(FLAGS_lag_prediction_min_appear_num,
@@ -102,7 +104,7 @@ bool Frame::Rerouting() {
   start_point->set_s(s);
   start_point->mutable_pose()->CopyFrom(point);
   for (const auto &waypoint :
-       ReferenceLineProvider::instance()->FutureRouteWaypoints()) {
+       reference_line_provider_->FutureRouteWaypoints()) {
     request.add_waypoint()->CopyFrom(waypoint);
   }
   if (request.waypoint_size() <= 1) {
@@ -120,8 +122,8 @@ std::list<ReferenceLineInfo> &Frame::reference_line_info() {
 bool Frame::CreateReferenceLineInfo() {
   std::list<ReferenceLine> reference_lines;
   std::list<hdmap::RouteSegments> segments;
-  if (!ReferenceLineProvider::instance()->GetReferenceLines(&reference_lines,
-                                                            &segments)) {
+  if (!reference_line_provider_->GetReferenceLines(&reference_lines,
+                                                   &segments)) {
     AERROR << "Failed to create reference line";
     return false;
   }
@@ -194,24 +196,21 @@ bool Frame::CreateReferenceLineInfo() {
  *         mainly used for virtual stop wall
  */
 const Obstacle *Frame::AddVirtualStopObstacle(
-    ReferenceLineInfo* const reference_line_info,
-    const std::string &object_id,
+    ReferenceLineInfo *const reference_line_info, const std::string &object_id,
     const double object_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
     return nullptr;
   }
 
-  const auto& reference_line = reference_line_info->reference_line();
+  const auto &reference_line = reference_line_info->reference_line();
   const double box_center_s = object_s + FLAGS_virtual_stop_wall_length / 2.0;
   auto box_center = reference_line.GetReferencePoint(box_center_s);
   double heading = reference_line.GetReferencePoint(object_s).heading();
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
   reference_line.GetLaneWidth(object_s, &lane_left_width, &lane_right_width);
-  Box2d stop_wall_box{box_center,
-                      heading,
-                      FLAGS_virtual_stop_wall_height,
+  Box2d stop_wall_box{box_center, heading, FLAGS_virtual_stop_wall_height,
                       lane_left_width + lane_right_width};
 
   return AddStaticVirtualObstacle(object_id, stop_wall_box);

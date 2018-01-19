@@ -122,6 +122,8 @@ class Planning : public PlanningInterface {
 
   std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
 
+  std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
+
   ros::Timer timer_;
 };
 
