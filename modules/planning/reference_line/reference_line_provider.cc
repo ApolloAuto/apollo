@@ -46,15 +46,13 @@ using apollo::common::time::Clock;
 using apollo::hdmap::LaneWaypoint;
 using apollo::hdmap::RouteSegments;
 
-ReferenceLineProvider::ReferenceLineProvider() {}
-
 ReferenceLineProvider::~ReferenceLineProvider() {
   if (thread_ && thread_->joinable()) {
     thread_->join();
   }
 }
 
-void ReferenceLineProvider::Init(
+ReferenceLineProvider::ReferenceLineProvider(
     const hdmap::HDMap *base_map,
     const QpSplineReferenceLineSmootherConfig &smoother_config) {
   pnc_map_.reset(new hdmap::PncMap(base_map));
