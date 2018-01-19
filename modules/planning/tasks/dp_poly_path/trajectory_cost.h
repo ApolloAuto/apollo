@@ -39,42 +39,56 @@ namespace planning {
 class ComparableCost {
  public:
   ComparableCost() = default;
-  ComparableCost(const bool has_collision_, const bool out_of_boundary_,
-                 const double safety_cost_, const double smoothness_cost_)
-      : has_collision(has_collision_),
-        out_of_boundary(out_of_boundary_),
-        safety_cost(safety_cost_),
-        smoothness_cost(smoothness_cost_) {}
+  ComparableCost(const bool has_collision, const bool out_of_boundary,
+                 const bool out_of_lane, const double safety_cost,
+                 const double smoothness_cost_)
+      : smoothness_cost(smoothness_cost_) {
+    cost_items[0] = has_collision;
+    cost_items[1] = out_of_boundary;
+    cost_items[2] = out_of_lane;
+  }
   ComparableCost(const ComparableCost &) = default;
 
   int CompareTo(const ComparableCost &other) const {
+    for (size_t i = 0; i < cost_items.size(); ++i) {
+      if (cost_items[i]) {
+        if (other.cost_items[i]) {
+          continue;
+        } else {
+          return 1;
+        }
+      } else {
+        if (other.cost_items[i]) {
+          return -1;
+        } else {
+          continue;
+        }
+      }
+    }
+
     constexpr double kEpsilon = 1e-12;
-    if ((has_collision || out_of_boundary) &&
-        !(other.has_collision || other.out_of_boundary)) {
-      return 1;
-    } else if (!(has_collision || out_of_boundary) &&
-               (other.has_collision || other.out_of_boundary)) {
-      return -1;
-    } else if (std::fabs(safety_cost + smoothness_cost - other.safety_cost -
-                         other.smoothness_cost) < kEpsilon) {
+    const double diff = safety_cost + smoothness_cost - other.safety_cost -
+                        other.smoothness_cost;
+    if (std::fabs(diff) < kEpsilon) {
       return 0;
-    } else if (safety_cost + smoothness_cost >
-               other.safety_cost + other.smoothness_cost) {
+    } else if (diff > 0) {
       return 1;
     } else {
       return -1;
     }
   }
   ComparableCost &operator+(const ComparableCost &other) {
-    has_collision = has_collision || other.has_collision;
-    out_of_boundary = out_of_boundary || other.out_of_boundary;
+    for (size_t i = 0; i < cost_items.size(); ++i) {
+      cost_items[i] = (cost_items[i] || other.cost_items[i]);
+    }
     safety_cost += other.safety_cost;
     smoothness_cost += other.smoothness_cost;
     return *this;
   }
   ComparableCost &operator+=(const ComparableCost &other) {
-    has_collision = has_collision || other.has_collision;
-    out_of_boundary = out_of_boundary || other.out_of_boundary;
+    for (size_t i = 0; i < cost_items.size(); ++i) {
+      cost_items[i] = (cost_items[i] || other.cost_items[i]);
+    }
     safety_cost += other.safety_cost;
     smoothness_cost += other.smoothness_cost;
     return *this;
@@ -91,9 +105,19 @@ class ComparableCost {
   bool operator<=(const ComparableCost &other) const {
     return this->CompareTo(other) <= 0;
   }
-
-  bool has_collision = false;
-  bool out_of_boundary = false;
+  /*
+   * cost_items represents an array of factors that affect the cost,
+   * The level is from most critical to less critical.
+   * It includes:
+   * (0) has_collision or out_of_boundary
+   * (1) out_of_lane
+   *
+   * NOTICE: Items could have same critical levels
+   */
+  static const size_t HAS_COLLISION = 0;
+  static const size_t OUT_OF_BOUNDARY = 1;
+  static const size_t OUT_OF_LANE = 2;
+  std::array<bool, 3> cost_items = {{false, false, false}};
 
   // cost from distance to obstacles or boundaries
   double safety_cost = 0.0;
