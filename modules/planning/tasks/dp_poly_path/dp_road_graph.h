@@ -89,7 +89,7 @@ class DPRoadGraph {
 
     common::SLPoint sl_point;
     const DPRoadGraphNode *min_cost_prev_node = nullptr;
-    ComparableCost min_cost = {true, true,
+    ComparableCost min_cost = {true, true, true,
                                std::numeric_limits<double>::infinity(),
                                std::numeric_limits<double>::infinity()};
     QuinticPolynomialCurve1d min_cost_curve;
