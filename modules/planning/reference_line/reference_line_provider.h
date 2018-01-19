@@ -60,8 +60,9 @@ class ReferenceLineProvider {
    */
   ~ReferenceLineProvider();
 
-  void Init(const hdmap::HDMap* base_map,
-            const QpSplineReferenceLineSmootherConfig& smoother_config);
+  ReferenceLineProvider(
+      const hdmap::HDMap* base_map,
+      const QpSplineReferenceLineSmootherConfig& smoother_config);
 
   bool UpdateRoutingResponse(const routing::RoutingResponse& routing);
 
@@ -135,8 +136,6 @@ class ReferenceLineProvider {
                              double s) const;
 
  private:
-  DECLARE_SINGLETON(ReferenceLineProvider);
-
   bool is_initialized_ = false;
   bool is_stop_ = false;
   std::unique_ptr<std::thread> thread_;
