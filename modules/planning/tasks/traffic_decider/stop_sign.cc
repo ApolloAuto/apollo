@@ -190,10 +190,17 @@ int StopSign::GetAssociatedLanes(const StopSignInfo& stop_sign_info) {
       if (lane == nullptr) {
           continue;
       }
-      associated_lanes_.push_back(std::make_pair(lane, stop_sign));
-      ADEBUG << "stop_sign: " << stop_sign_info.id().id()
-          << "; associated_lane: " << lane_id.id()
-          << "; associated_stop_sign: " << stop_sign.get()->id().id();
+      auto stop_sign_overlaps = lane->stop_signs();
+      for (auto stop_sign_overlap : stop_sign_overlaps) {
+        auto over_lap_info = stop_sign_overlap->GetObjectOverlapInfo(
+            stop_sign.get()->id());
+        if (over_lap_info != nullptr) {
+          associated_lanes_.push_back(std::make_pair(lane, stop_sign_overlap));
+          ADEBUG << "stop_sign: " << stop_sign_info.id().id()
+              << "; associated_lane: " << lane_id.id()
+              << "; associated_stop_sign: " << stop_sign.get()->id().id();
+        }
+      }
     }
   }
 
@@ -392,7 +399,7 @@ int StopSign::AddWatchVehicle(
       associated_lanes_.begin(),
       associated_lanes_.end(),
       [&obstable_lane_id](std::pair<LaneInfoConstPtr,
-                          StopSignInfoConstPtr>& assc_lane) {
+                          OverlapInfoConstPtr>& assc_lane) {
         return assc_lane.first.get()->id().id() == obstable_lane_id; });
   if (assoc_lane_it == associated_lanes_.end()) {
     ADEBUG << "obstacle_id[" << obstacle_id
@@ -412,9 +419,14 @@ int StopSign::AddWatchVehicle(
     return -1;
   }
 
-  // check stop close enough to stop line of the stop_sign
-  // TODO(all): find stop_line_s of associated stop sign
-  double stop_line_s = 0;
+  // check a valid stop for stop line of the stop_sign
+  auto over_lap_info = assoc_lane_it->second.get()->GetObjectOverlapInfo(
+      obstacle_lane.get()->id());
+  if (over_lap_info == nullptr) {
+    AERROR << "can't find over_lap_info for id: " << obstable_lane_id;
+    return -1;
+  }
+  double stop_line_s = over_lap_info->lane_overlap_info().start_s();
   double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
   double distance_to_stop_line = stop_line_s - obstacle_end_s;
   if (distance_to_stop_line > FLAGS_max_valid_stop_distance) {
@@ -471,7 +483,7 @@ int StopSign::RemoveWatchVehicle(
       associated_lanes_.begin(),
       associated_lanes_.end(),
       [&obstable_lane_id](std::pair<LaneInfoConstPtr,
-                          StopSignInfoConstPtr>& assc_lane) {
+                          OverlapInfoConstPtr>& assc_lane) {
         return assc_lane.first.get()->id().id() == obstable_lane_id; });
   if (assoc_lane_it == associated_lanes_.end()) {
     ADEBUG << "obstacle_id[" << obstacle_id
