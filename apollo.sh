@@ -156,7 +156,7 @@ function cibuild() {
   //modules/prediction
   //modules/routing
   "
-  bazel build $DEFINES -c dbg $@ $BUILD_TARGETS
+  bazel build $DEFINES $@ $BUILD_TARGETS
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
@@ -380,7 +380,7 @@ function citest() {
   //modules/prediction/container/obstacles:obstacle_test
   //modules/dreamview/backend/simulation_world:simulation_world_service_test
   "
-  bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
+  bazel test $DEFINES --config=unit_test --test_verbose_timeout_warnings $@ $BUILD_TARGETS
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
