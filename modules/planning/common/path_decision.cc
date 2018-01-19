@@ -31,6 +31,7 @@ namespace planning {
 using IndexedPathObstacles = IndexedList<std::string, PathObstacle>;
 
 PathObstacle *PathDecision::AddPathObstacle(const PathObstacle &path_obstacle) {
+  std::lock_guard<std::mutex> lock(obstacle_mutex_);
   return path_obstacles_.Add(path_obstacle.Id(), path_obstacle);
 }
 
