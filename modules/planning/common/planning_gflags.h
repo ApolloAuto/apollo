@@ -178,6 +178,7 @@ DECLARE_bool(enable_sqp_solver);
 
 /// thread pool
 DECLARE_int32(num_thread_planning_thread_pool);
+DECLARE_bool(use_multi_thread_to_add_obstacles);
 DECLARE_bool(enable_multi_thread_in_dp_poly_path);
 DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 
