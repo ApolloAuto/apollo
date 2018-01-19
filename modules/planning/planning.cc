@@ -44,9 +44,7 @@ using apollo::common::VehicleState;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-std::string Planning::Name() const {
-  return "planning";
-}
+std::string Planning::Name() const { return "planning"; }
 
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
@@ -61,8 +59,8 @@ Status Planning::InitFrame(const uint32_t sequence_num,
                            const TrajectoryPoint& planning_start_point,
                            const double start_time,
                            const VehicleState& vehicle_state) {
-  frame_.reset(
-      new Frame(sequence_num, planning_start_point, start_time, vehicle_state));
+  frame_.reset(new Frame(sequence_num, planning_start_point, start_time,
+                         vehicle_state, reference_line_provider_.get()));
   auto status = frame_->Init();
   if (!status.ok()) {
     AERROR << "failed to init frame";
@@ -116,8 +114,9 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  ReferenceLineProvider::instance()->Init(
-      hdmap_, config_.qp_spline_reference_line_smoother_config());
+  reference_line_provider_ =
+      std::unique_ptr<ReferenceLineProvider>(new ReferenceLineProvider(
+          hdmap_, config_.qp_spline_reference_line_smoother_config()));
 
   RegisterPlanners();
   planner_ = planner_factory_.CreateObject(config_.planner_type());
@@ -144,7 +143,7 @@ bool Planning::IsVehicleStateValid(const VehicleState& vehicle_state) {
 Status Planning::Start() {
   timer_ = AdapterManager::CreateTimer(
       ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
-  ReferenceLineProvider::instance()->Start();
+  reference_line_provider_->Start();
   start_time_ = Clock::NowInSeconds();
   AINFO << "Planning started";
   return Status::OK();
@@ -244,7 +243,7 @@ void Planning::RunOnce() {
     return;
   }
 
-  if (!ReferenceLineProvider::instance()->UpdateRoutingResponse(
+  if (!reference_line_provider_->UpdateRoutingResponse(
           AdapterManager::GetRoutingResponse()->GetLatestObserved())) {
     std::string msg("Failed to update routing in reference line provider");
     AERROR << msg;
@@ -259,7 +258,7 @@ void Planning::RunOnce() {
   }
 
   // Update reference line provider
-  ReferenceLineProvider::instance()->UpdateVehicleState(vehicle_state);
+  reference_line_provider_->UpdateVehicleState(vehicle_state);
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
   bool is_replan = false;
@@ -316,8 +315,8 @@ void Planning::RunOnce() {
 
   auto* ref_line_task =
       trajectory_pb->mutable_latency_stats()->add_task_stats();
-  ref_line_task->set_time_ms(
-      ReferenceLineProvider::instance()->LastTimeDelay() * 1000.0);
+  ref_line_task->set_time_ms(reference_line_provider_->LastTimeDelay() *
+                             1000.0);
   ref_line_task->set_name("ReferenceLineProvider");
 
   if (!status.ok()) {
@@ -340,7 +339,9 @@ void Planning::RunOnce() {
 void Planning::Stop() {
   AERROR << "Planning Stop is called";
   PlanningThreadPool::instance()->Stop();
-  ReferenceLineProvider::instance()->Stop();
+  if (reference_line_provider_) {
+    reference_line_provider_->Stop();
+  }
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
