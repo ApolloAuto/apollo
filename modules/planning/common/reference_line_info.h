@@ -59,6 +59,7 @@ class ReferenceLineInfo {
 
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
+  void AddObstacleHelper(const Obstacle* obstacle, int* ret);
 
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
@@ -72,11 +73,21 @@ class ReferenceLineInfo {
   const DiscretizedTrajectory& trajectory() const;
   double TrajectoryLength() const;
 
-  double Cost() const { return cost_; }
-  void AddCost(double cost) { cost_ += cost; }
-  void SetCost(double cost) { cost_ = cost; }
-  double PriorityCost() const { return priority_cost_; }
-  void SetPriorityCost(double cost) { priority_cost_ = cost; }
+  double Cost() const {
+    return cost_;
+  }
+  void AddCost(double cost) {
+    cost_ += cost;
+  }
+  void SetCost(double cost) {
+    cost_ = cost;
+  }
+  double PriorityCost() const {
+    return priority_cost_;
+  }
+  void SetPriorityCost(double cost) {
+    priority_cost_ = cost;
+  }
 
   /**
    * @brief check if current reference line is started from another reference
@@ -87,10 +98,18 @@ class ReferenceLineInfo {
    **/
   bool IsStartFrom(const ReferenceLineInfo& previous_reference_line_info) const;
 
-  planning_internal::Debug* mutable_debug() { return &debug_; }
-  const planning_internal::Debug& debug() const { return debug_; }
-  LatencyStats* mutable_latency_stats() { return &latency_stats_; }
-  const LatencyStats& latency_stats() const { return latency_stats_; }
+  planning_internal::Debug* mutable_debug() {
+    return &debug_;
+  }
+  const planning_internal::Debug& debug() const {
+    return debug_;
+  }
+  LatencyStats* mutable_latency_stats() {
+    return &latency_stats_;
+  }
+  const LatencyStats& latency_stats() const {
+    return latency_stats_;
+  }
 
   const PathData& path_data() const;
   const SpeedData& speed_data() const;

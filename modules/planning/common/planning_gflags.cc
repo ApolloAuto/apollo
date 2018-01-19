@@ -337,37 +337,37 @@ DEFINE_bool(enable_follow_accel_constraint, true,
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 
 /// thread pool
-
 DEFINE_int32(num_thread_planning_thread_pool, 5,
              "num of thread used in planning thread pool.");
+DEFINE_bool(use_multi_thread_to_add_obstacles, false,
+            "use multiple thread to add obstacles.");
 DEFINE_bool(
     enable_multi_thread_in_dp_poly_path, false,
     "Enable multiple thread to calculation curve cost in dp_poly_path.");
 DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
             "Enable multiple thread to calculation curve cost in dp_st_graph.");
 
-///////////////////////////////////////////////////////////
-// Lattice Planner
+/// Lattice Planner
 DEFINE_double(lattice_epsilon, 1e-6, "Epsilon in lattice planner.");
 DEFINE_int32(num_lattice_traj_to_plot, 5,
              "Number of lattice trajectories to plot");
-DEFINE_double(default_cruise_speed, 5.0,
-             "default cruise speed");
+DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
 DEFINE_double(spiral_downsample_curvature_thred, 0.02,
               "curvature threshold for down sampling reference line points");
 DEFINE_bool(enable_sample_bound_planning, true,
-              "enable SampleBound based motion planning");
+            "enable SampleBound based motion planning");
 DEFINE_bool(enable_lattice_st_image_dump, false,
-              "enable sending the lattice st image");
-DEFINE_bool(enable_auto_tuning, false,
-              "enable auto tuning data emission");
+            "enable sending the lattice st image");
+DEFINE_bool(enable_auto_tuning, false, "enable auto tuning data emission");
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
-DEFINE_double(collision_buffer_expansion_ratio, 0.2,
+DEFINE_double(
+    collision_buffer_expansion_ratio, 0.2,
     "The ratio w.r.t. the vehicle dimension to expand in collision checking");
 DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
-DEFINE_double(lateral_obstacle_ignore_thred, 2.0, "Lateral threshold for "
+DEFINE_double(lateral_obstacle_ignore_thred, 2.0,
+              "Lateral threshold for "
               "obstacles to be considered in path-time graph");

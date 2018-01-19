@@ -21,8 +21,6 @@
 #include "modules/planning/common/reference_line_info.h"
 
 #include <functional>
-#include <memory>
-#include <unordered_set>
 #include <utility>
 
 #include "modules/planning/proto/sl_boundary.pb.h"
@@ -34,6 +32,7 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_thread_pool.h"
 
 namespace apollo {
 namespace planning {
@@ -178,6 +177,12 @@ void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
   discretized_trajectory_ = trajectory;
 }
 
+void ReferenceLineInfo::AddObstacleHelper(const Obstacle* obstacle, int* ret) {
+  auto* path_obstacle = AddObstacle(obstacle);
+  *ret = path_obstacle == nullptr ? 0 : 1;
+}
+
+// AddObstacle is thread safe
 PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
   if (!obstacle) {
     AERROR << "The provided obstacle is empty";
@@ -209,6 +214,7 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     ADEBUG << "build reference line st boundary. id:" << obstacle->Id();
     path_obstacle->BuildReferenceLineStBoundary(reference_line_,
                                                 adc_sl_boundary_.start_s());
+
     ADEBUG << "reference line st boundary: "
            << path_obstacle->reference_line_st_boundary().min_t() << ", "
            << path_obstacle->reference_line_st_boundary().max_t()
@@ -221,10 +227,23 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
 
 bool ReferenceLineInfo::AddObstacles(
     const std::vector<const Obstacle*>& obstacles) {
-  for (const auto* obstacle : obstacles) {
-    if (!AddObstacle(obstacle)) {
-      AERROR << "Failed to add obstacle " << obstacle->Id();
+  if (FLAGS_use_multi_thread_to_add_obstacles) {
+    std::vector<int> ret(obstacles.size(), 0);
+    for (size_t i = 0; i < obstacles.size(); ++i) {
+      const auto* obstacle = obstacles.at(i);
+      PlanningThreadPool::instance()->Push(std::bind(
+          &ReferenceLineInfo::AddObstacleHelper, this, obstacle, &(ret[i])));
+    }
+    PlanningThreadPool::instance()->Synchronize();
+    if (std::find(ret.begin(), ret.end(), 0) != ret.end()) {
       return false;
+    }
+  } else {
+    for (const auto* obstacle : obstacles) {
+      if (!AddObstacle(obstacle)) {
+        AERROR << "Failed to add obstacle " << obstacle->Id();
+        return false;
+      }
     }
   }
   return true;
