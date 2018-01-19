@@ -34,7 +34,7 @@ The perception module outputs are:
 - [ ] 1. Set up the general settings in the configuration file `modules/perception/conf/perception.conf`.
 - [ ] 2. Run the command  `./scripts/bootstrap.sh` to launch the web GUI.
 - [ ] 3. Select the vehicle model and HD map in the web GUI.
-- [ ] 4. Launch the perception module using the command `./scripts/perception.sh start` or by enabling the perception button on the *Module Controller* page of the web GUI. The command for stopping perception is `./scripts/perception.sh stop`. Note: please do not try to use GUI to enable perception and use script to stop it, vice versa. 
+- [ ] 4. Launch the perception module using the command `./scripts/perception.sh start` or by enabling the perception button on the *Module Controller* page of the web GUI. The command for stopping perception is `./scripts/perception.sh stop`. Note: please do not try to use GUI to enable perception but use script to stop it, vice versa. 
 
 
 - [ ] 5. Download the demo data from the Apollo [Open Data Platform](https://console.bce.baidu.com/apollo/task/download).
