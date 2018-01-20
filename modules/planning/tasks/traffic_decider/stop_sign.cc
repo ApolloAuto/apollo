@@ -105,12 +105,15 @@ void StopSign::MakeDecisions(
     }
   }
 
-
   std::string stop_sign_id = next_stop_sign_->id().id();
   if (stop_status_ == StopSignStopStatus::STOP_DONE &&
       watch_vehicles.empty()) {
     // stop done and no vehicles to wait for
-    ClearDropbox(stop_sign_id);
+    /* TODO
+    if (left_stop_sign) {
+      ClearDropbox(stop_sign_id);
+    }
+    */
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] done";
   } else {
     // skip stop_sign if master vehicle body already passes the stop line
@@ -226,7 +229,7 @@ int StopSign::ProcessStopStatus(
   StopSignStopStatus* status = Dropbox<StopSignStopStatus>::Open()->Get(
       db_key_stop_status);
   stop_status_ = (status == nullptr) ?
-      StopSignStopStatus::TO_STOP : *status;
+      StopSignStopStatus::UNKNOWN : *status;
   ADEBUG << "get stop_status_: "
       << static_cast<typename std::underlying_type<StopSignStopStatus>::type>(
           stop_status_);
@@ -239,30 +242,40 @@ int StopSign::ProcessStopStatus(
   double stop_start_time =  (start_time == nullptr) ?
       Clock::NowInSeconds() + 1 : *start_time;
   double wait_time = Clock::NowInSeconds() - stop_start_time;
-  ADEBUG << "stop_start_time: " << stop_start_time
+  ADEBUG << "db_key_stop_starttime: " << db_key_stop_starttime
+      << "; stop_start_time: " << stop_start_time
       << "; wait_time: " << wait_time;
 
   // check & update stop status
   switch (stop_status_) {
+    case StopSignStopStatus::UNKNOWN:
     case StopSignStopStatus::TO_STOP:
-      if (ChecADCkStop(reference_line_info)) {
+      if (!CheckADCkStop(reference_line_info)) {
+        stop_status_ = StopSignStopStatus::TO_STOP;
+      } else {
         stop_start_time = Clock::NowInSeconds();
         stop_status_ = StopSignStopStatus::STOPPING;
       }
       break;
     case StopSignStopStatus::STOPPING:
-      if (wait_time > FLAGS_stop_duration_for_stop_sign) {
-        stop_status_ = StopSignStopStatus::STOP_DONE;
+      if (!CheckADCkStop(reference_line_info)) {
+        stop_status_ = StopSignStopStatus::TO_STOP;
+      } else {
+        if (wait_time > FLAGS_stop_duration_for_stop_sign) {
+          stop_status_ = StopSignStopStatus::STOP_DONE;
+        }
       }
       break;
     case StopSignStopStatus::STOP_DONE:
+      break;
+    default:
       break;
   }
 
   // update dropbox: stop status
   Dropbox<StopSignStopStatus>::Open()->Set(db_key_stop_status,
                                            stop_status_);
-  ADEBUG<< "update dropbox: [" << db_key_stop_status << "] = "
+  ADEBUG << "update dropbox: [" << db_key_stop_status << "] = "
       << static_cast<typename std::underlying_type<StopSignStopStatus>::type>(
           stop_status_);
 
@@ -278,7 +291,7 @@ int StopSign::ProcessStopStatus(
 /**
  * @brief: check valid stop_sign stop
  */
-bool StopSign::ChecADCkStop(
+bool StopSign::CheckADCkStop(
     ReferenceLineInfo* const reference_line_info) {
   double adc_speed = reference_line_info->AdcPlanningPoint().v();
   if (adc_speed > FLAGS_stop_min_speed) {
@@ -519,10 +532,16 @@ int StopSign::RemoveWatchVehicle(
 
   if (erase) {
     for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
-        it != watch_vehicles->end(); ++it) {
+        it != watch_vehicles->end(); /*no increment*/) {
       std::vector<std::string> vehicles = it->second;
       vehicles.erase(std::remove(vehicles.begin(), vehicles.end(),
-                                 obstacle_id));
+                                 obstacle_id), vehicles.end());
+
+      if (vehicles.empty()) {
+        watch_vehicles->erase(it++);
+      } else {
+        ++it;
+      }
     }
   }
 

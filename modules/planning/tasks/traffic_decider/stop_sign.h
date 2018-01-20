@@ -46,20 +46,21 @@ class StopSign : public TrafficRule {
 
   bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
 
- private:
   enum class StopSignStopStatus {
-    TO_STOP = 0,
-    STOPPING = 1,
-    STOP_DONE = 2,
+    UNKNOWN = 0,
+    TO_STOP = 1,
+    STOPPING = 2,
+    STOP_DONE = 3,
   };
 
+ private:
   void MakeDecisions(Frame* frame,
                      ReferenceLineInfo* const reference_line_info);
   bool FindNextStopSign(ReferenceLineInfo* const reference_line_info);
   int GetAssociatedLanes(const StopSignInfo& stop_sign_info);
   int ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
                         const StopSignInfo& stop_sign_info);
-  bool ChecADCkStop(ReferenceLineInfo* const reference_line_info);
+  bool CheckADCkStop(ReferenceLineInfo* const reference_line_info);
   int GetWatchVehicles(const StopSignInfo& stop_sign_info,
                        StopSignLaneVehicles* watch_vehicles);
   int UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles);
