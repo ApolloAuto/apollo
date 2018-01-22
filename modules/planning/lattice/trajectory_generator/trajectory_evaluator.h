@@ -73,21 +73,23 @@ class TrajectoryEvaluator {
       const std::vector<apollo::common::FrenetFramePoint> sl_points);
 
  private:
-  double evaluate(const PlanningTarget& planning_target,
-                  const std::shared_ptr<Curve1d>& lon_trajectory,
-                  const std::shared_ptr<Curve1d>& lat_trajectory,
-                  std::vector<double>* cost_components) const;
+  double Evaluate(
+      const PlanningTarget& planning_target,
+      const std::shared_ptr<Curve1d>& lon_trajectory,
+      const std::shared_ptr<Curve1d>& lat_trajectory,
+      std::vector<double>* cost_components) const;
 
-  double compute_lat_offset_cost(const std::shared_ptr<Curve1d>& lat_trajectory,
-                                 const std::vector<double>& s_values) const;
+  double LatOffsetCost(
+      const std::shared_ptr<Curve1d>& lat_trajectory,
+      const std::vector<double>& s_values) const;
 
-  double compute_lon_comfort_cost(
+  double LonComfortCost(
       const std::shared_ptr<Curve1d>& lon_trajectory) const;
 
-  double compute_lon_obstacle_cost(
+  double LonCollisionCost(
       const std::shared_ptr<Curve1d>& lon_trajectory) const;
 
-  double compute_lon_objective_cost(
+  double LonObjectiveCost(
       const std::shared_ptr<Curve1d>& lon_trajectory,
       const PlanningTarget& planning_target) const;
 
