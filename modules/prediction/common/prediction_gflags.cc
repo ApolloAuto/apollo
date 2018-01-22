@@ -33,6 +33,8 @@ DEFINE_double(
     "The runtime duration in test mode (in seconds). Negative value will not "
     "restrict the runtime duration.");
 
+DEFINE_bool(prediction_offline_mode, false, "Prediction offline mode");
+
 DEFINE_double(prediction_duration, 5.0, "Prediction duration (in seconds)");
 DEFINE_double(prediction_period, 0.1, "Prediction period (in seconds");
 DEFINE_double(double_precision, 1e-6, "precision of double");
@@ -92,8 +94,7 @@ DEFINE_double(valid_position_diff_threshold, 0.5,
               "threshold of valid position difference");
 DEFINE_double(valid_position_diff_rate_threshold, 0.075,
               "threshold of valid position difference rate");
-DEFINE_double(split_rate, 0.5,
-              "obstacle split rate for adjusting velocity");
+DEFINE_double(split_rate, 0.5, "obstacle split rate for adjusting velocity");
 DEFINE_double(rnn_min_lane_relatice_s, 5.0,
               "Minimal relative s for RNN model.");
 DEFINE_bool(enable_adjust_velocity_heading, false,
