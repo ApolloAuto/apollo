@@ -25,6 +25,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -34,25 +35,26 @@ constexpr double dmin = 0.05;
 
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     const int num_of_variables, const int num_of_constraints,
-    std::size_t horizon, float ts, float wheelbase_length, Eigen::MatrixXd x0,
-    Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds)
+    std::size_t horizon, float ts, float wheelbase_length, Eigen::MatrixXd ego,
+    Eigen::MatrixXd x0, Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
       horizon_(horizon),
       ts_(ts),
       wheelbase_length_(wheelbase_length),
+      ego_(ego),
       x0_(x0),
       xf_(xf),
-      XYbounds_(XYbounds) {}
+      XYbounds_(XYbounds) {
+  w_ev_ = ego_(0, 1) + ego_(0, 3);
+  l_ev_ = ego_(0, 0) + ego_(0, 2);
+  g_ = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
+  offset_ = (ego_(0, 0) + ego_(0, 2)) / 2 - ego_(0, 2);
+}
 
 /*
   num_of_variables, num_of_constraints, horizon_, x0_, xF_, XYbounds_
   */
-void DistanceApproachIPOPTInterface::get_optimization_results(
-    std::vector<double>* x1_result, std::vector<double>* x2_result,
-    std::vector<double>* x3_result, std::vector<double>* x4_result,
-    std::vector<double>* u1_result, std::vector<double>* u2_result,
-    std::vector<double>* t_result) const {}
 
 bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
                                                   int& nnz_jac_g,
@@ -124,8 +126,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
     x_u[variable_index + i] = xf_(i, 0);
   }
   variable_index += 4;
-  ADEBUG << "variable_index after adding state constraints : "
-         << variable_index;
+  ADEBUG << "variable_index after adding state variables : " << variable_index;
 
   // 2. control varialbles
   for (std::size_t i = 1; i < horizon_; ++i) {
@@ -139,7 +140,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
     variable_index += 2;
   }
-  ADEBUG << "variable_index after adding input constraints : "
+  ADEBUG << "variable_index after adding control variables : "
          << variable_index;
 
   // 3. sampling time variables
@@ -150,16 +151,202 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
     ++variable_index;
   }
 
+  ADEBUG << "variable_index after adding sample time : " << variable_index;
+
+  // 4. lagrange constraint l
+  for (std::size_t i = 1; i < horizon_ + 1; ++i) {
+    x_l[variable_index] = 0.0;
+    // TODO:(QiL) refine this variables limits
+    x_u[variable_index] = 100.0;
+
+    ++variable_index;
+  }
+
+  // 4. lagrange constraint m
+  for (std::size_t i = 1; i < horizon_ + 1; ++i) {
+    x_l[variable_index] = 0.0;
+    // TODO:(QiL) refine this variables limits
+    x_u[variable_index] = 100.0;
+
+    ++variable_index;
+  }
+
   ADEBUG << "variable_index : " << variable_index;
 
   // Constraints: includes state, u, sample time and lagrange multipliers
   // constraints
+
+  // 1. state constraints
+  // start point pose
+  std::size_t constraint_index = 0;
+  for (std::size_t i = 0; i < 4; ++i) {
+    g_l[i] = x0_(i, 0);
+    g_u[i] = x0_(i, 0);
+  }
+  constraint_index += 4;
+
+  // During horizons
+  for (std::size_t i = 1; i < horizon_ - 1; ++i) {
+    // x
+    g_l[constraint_index] = XYbounds_(0, 0);
+    g_u[constraint_index] = XYbounds_(1, 0);
+
+    // y
+    g_l[constraint_index + 1] = XYbounds_(2, 0);
+    g_u[constraint_index + 1] = XYbounds_(3, 0);
+
+    // phi
+    // TODO(QiL): Change this to configs
+    g_l[constraint_index + 2] = -7;
+    g_u[constraint_index + 2] = 7;
+
+    // v
+    // TODO(QiL) : Change this to configs
+    g_l[constraint_index + 3] = -1;
+    g_u[constraint_index + 3] = 2;
+
+    constraint_index += 4;
+  }
+
+  // end point pose
+  for (std::size_t i = 0; i < 4; ++i) {
+    g_l[constraint_index + i] = xf_(i, 0);
+    g_u[constraint_index + i] = xf_(i, 0);
+  }
+  constraint_index += 4;
+  ADEBUG << "constraint_index after adding state constraints : "
+         << constraint_index;
+
+  // 2. input constraints
+  for (std::size_t i = 1; i < horizon_; ++i) {
+    // u1
+    g_l[constraint_index] = -0.6;
+    g_u[constraint_index] = 0.6;
+
+    // u2
+    g_l[constraint_index + 1] = -1;
+    g_u[constraint_index + 1] = 1;
+
+    constraint_index += 2;
+  }
+  ADEBUG << "constraint_index after adding input constraints : "
+         << constraint_index;
+
+  // 3. sampling time constraints
+  for (std::size_t i = 1; i < horizon_; ++i) {
+    g_l[constraint_index] = -0.6;
+    g_u[constraint_index] = 0.6;
+
+    ++constraint_index;
+  }
+  ADEBUG << "constraint_index after adding sampling time constraints : "
+         << constraint_index;
+
+  // 3. lagrangian constraints l
+  for (std::size_t i = 1; i < horizon_ + 1; ++i) {
+    g_l[constraint_index] = 0.0;
+    // TODO(QiL) : Check constraint index 100 after running senarios.
+    g_u[constraint_index] = 100.0;
+
+    ++constraint_index;
+  }
+  ADEBUG << "constraint_index after adding lagrangian constraint l: "
+         << constraint_index;
+
+  // 4. lagrangian constraints n
+  for (std::size_t i = 1; i < horizon_ + 1; ++i) {
+    g_l[constraint_index] = 0.0;
+    // TODO(QiL) : Check constraint index 100 back after running the senarios.
+    g_u[constraint_index] = 100.0;
+
+    ++constraint_index;
+  }
+  ADEBUG << "constraint_index after adding lagrangian constraints n : "
+         << constraint_index;
 
   return true;
 }
 
 bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
                                             int m, double* g) {
+  // state start index.
+  std::size_t state_start_index = 0;
+
+  // control start index.
+  std::size_t control_start_index = 4 * (horizon_ + 1);
+
+  // sampling time start index.
+  std::size_t time_start_index = 4 * (horizon_ + 1) + 2 * horizon_;
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    // x1
+    // TODO(QiL) : change to sin table
+    g[state_start_index + 4] =
+        g[state_start_index] + g[time_start_index] * ts_ *
+                                   g[state_start_index + 3] *
+                                   std::cos(g[state_start_index + 2]);
+    // x2
+    g[state_start_index + 5] =
+        g[state_start_index + 1] + g[time_start_index] * ts_ *
+                                       g[state_start_index + 3] *
+                                       std::sin(g[state_start_index + 2]);
+    // x3
+    g[state_start_index + 6] =
+        g[state_start_index + 2] +
+        g[time_start_index] * ts_ * g[state_start_index + 3] *
+            std::tan(g[control_start_index] / wheelbase_length_);
+
+    // x4
+    g[state_start_index + 7] =
+        g[state_start_index + 3] +
+        g[time_start_index] * ts_ * g[control_start_index + 1];
+
+    // sampling time
+    g[time_start_index + 1] = g[time_start_index];
+
+    state_start_index += 4;
+    control_start_index += 2;
+    ++time_start_index;
+  }
+
+  // Next evaluate and iterate over time steps & obstacles
+  // TODO(QiL) : two iterative loops
+
+  return true;
+}
+
+bool DistanceApproachIPOPTInterface::get_starting_point(
+    int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
+    bool init_lambda, double* lambda) {
+  CHECK(n == num_of_variables_) << "No. of variables wrong. n : " << n;
+  CHECK(init_x == true) << "Warm start init_x setting failed";
+  CHECK(init_z == false) << "Warm start init_z setting failed";
+  CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
+
+  // 1. state variables linspace initialization
+
+  std::vector<std::vector<double>> x_guess(4, std::vector<double>(horizon_));
+
+  for (std::size_t i = 0; i < 4; ++i) {
+    ::apollo::common::util::uniform_slice(x0_(i, 0), xf_(i, 0), horizon_,
+                                          &x_guess[i]);
+  }
+
+  for (std::size_t i = 0; i <= horizon_; ++i) {
+    for (std::size_t j = 0; j < 4; ++j) {
+      x[i * 4 + j] = x_guess[j][i];
+    }
+  }
+
+  // 2. input initialization
+  for (std::size_t i = 0; i <= 2 * horizon_; ++i) {
+    x[i] = 0.6;
+  }
+
+  // 3. sampling time constraints
+  for (std::size_t i = 0; i <= horizon_; ++i) {
+    x[i] = 0.5;
+  }
+
   return true;
 }
 
@@ -179,5 +366,58 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
   return true;
 }
 
+bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
+                                            double& obj_value) {
+  // first (horizon_ + 1) * 4 is state, then next horizon_ * 2 is control input,
+  // then last horizon_ + 1 is sampling time
+  std::size_t start_index = (horizon_ + 1) * 4;
+  std::size_t time_start_index = start_index + horizon_ * 2;
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    obj_value += 0.1 * x[start_index + i] * x[start_index + i] +
+                 x[start_index + i] * x[start_index + i + 1] +
+                 0.5 * x[time_start_index + i] +
+                 x[time_start_index + i] * x[time_start_index + i];
+  }
+  obj_value += 0.5 * x[time_start_index + horizon_] +
+               x[time_start_index + horizon_] * x[time_start_index + horizon_];
+  return true;
+}
+
+void DistanceApproachIPOPTInterface::finalize_solution(
+    Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
+    const double* z_U, int m, const double* g, const double* lambda,
+    double obj_value, const Ipopt::IpoptData* ip_data,
+    Ipopt::IpoptCalculatedQuantities* ip_cq) {
+  x1_result_.reserve(horizon_ + 1);
+  x2_result_.reserve(horizon_ + 1);
+  x3_result_.reserve(horizon_ + 1);
+  x4_result_.reserve(horizon_ + 1);
+
+  u1_result_.reserve(horizon_);
+  u2_result_.reserve(horizon_);
+
+  t_result_.reserve(horizon_);
+
+  std::size_t state_start_index = 0;
+  std::size_t input_start_index = (horizon_ + 1) * 4;
+  std::size_t time_start_index = input_start_index + horizon_ * 2;
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    x1_result_.push_back(state_start_index);
+    x2_result_.push_back(state_start_index + 1);
+    x3_result_.push_back(state_start_index + 2);
+    x4_result_.push_back(state_start_index + 3);
+
+    u1_result_.push_back(input_start_index);
+    u2_result_.push_back(input_start_index + 1);
+
+    t_result_.push_back(time_start_index);
+  }
+}
+
+void DistanceApproachIPOPTInterface::get_optimization_results(
+    std::vector<double>* x1_result, std::vector<double>* x2_result,
+    std::vector<double>* x3_result, std::vector<double>* x4_result,
+    std::vector<double>* u1_result, std::vector<double>* u2_result,
+    std::vector<double>* t_result) const {}
 }  // namespace planning
 }  // namespace apollo

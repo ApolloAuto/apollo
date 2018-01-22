@@ -82,6 +82,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/math",
+        "//modules/common/util",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planning_proto",
         "@eigen//:eigen",
