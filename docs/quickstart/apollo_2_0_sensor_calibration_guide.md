@@ -155,10 +155,10 @@ rostopic echo /apollo/sensor/gnss/ins_stat
 
 ```bash
 cd /apollo/scripts
-bash sensor_calibration.sh lidar_camera
+bash sensor_calibration.sh camera_camera
 ```
 
-2. Run the Camera-to-Camera Calibration Tool using these commands:
+2. Follow these guidelines to collect data:
 
   * Because the two cameras have different timestamps, they cannot be completely synchronized, so it is important to drive the vehicle very slowly when recording the data. The slow speed of the vehicle can effectively alleviate the image mismatch that is caused by the different timestamps.
 
