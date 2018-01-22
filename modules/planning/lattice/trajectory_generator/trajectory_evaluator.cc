@@ -110,8 +110,8 @@ double TrajectoryEvaluator::top_trajectory_pair_cost() const {
   }
 }
 
-std::vector<double> TrajectoryEvaluator::top_trajectory_pair_component_cost()
-    const {
+std::vector<double>
+TrajectoryEvaluator::top_trajectory_pair_component_cost() const {
   CHECK(is_auto_tuning_);
   return cost_queue_with_components_.top().second.first;
 }
@@ -126,9 +126,9 @@ double TrajectoryEvaluator::evaluate(
   // 2. the cost of time to achieve the objective
   // 3. the cost of failure to achieve the planning objective.
 
-  double weight_lon_travel = 1000.0;
+  double weight_lon_travel = 5.0;
   double weight_lon_jerk = 1.0;
-  double weight_lon_obstacle = 100.0;
+  double weight_lon_obstacle = 1.0;
   double weight_lat_offset = 1.0;
 
   double lon_travel_cost =
@@ -153,7 +153,8 @@ double TrajectoryEvaluator::evaluate(
     cost_components->push_back(lon_obstacle_cost);
     cost_components->push_back(lat_offset_cost);
   }
-  return lon_travel_cost * weight_lon_travel + lon_jerk_cost * weight_lon_jerk +
+  return lon_travel_cost * weight_lon_travel +
+         lon_jerk_cost * weight_lon_jerk +
          lat_offset_cost * weight_lat_offset +
          lon_obstacle_cost * weight_lon_obstacle;
 }
@@ -164,31 +165,38 @@ double TrajectoryEvaluator::compute_lat_offset_cost(
   double lat_offset_start = lat_trajectory->Evaluate(0, 0.0);
   double weight_same_side_offset = 1.0;
   double weight_opposite_side_offset = 10.0;
+  double lat_offset_bound = 3.0;
 
-  double cost = 0.0;
+  double cost_sqr_sum = 0.0;
+  double cost_abs_sum = 0.0;
   for (const auto& s : s_values) {
-    double c = lat_trajectory->Evaluate(0, s);
-    if (c * lat_offset_start < 0.0) {
-      c = c * c * weight_opposite_side_offset;
+    double lat_offset = lat_trajectory->Evaluate(0, s);
+    double cost = lat_offset / lat_offset_bound;
+    if (lat_offset * lat_offset_start < 0.0) {
+      cost_sqr_sum += cost * cost * weight_opposite_side_offset;
+      cost_abs_sum += std::abs(cost) * weight_opposite_side_offset;
     } else {
-      c = c * c * weight_same_side_offset;
+      cost_sqr_sum += cost * cost * weight_same_side_offset;
+      cost_abs_sum += std::abs(cost) * weight_same_side_offset;
     }
-    cost += c;
   }
-  return cost;
+  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
 }
 
 double TrajectoryEvaluator::compute_lon_comfort_cost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory) const {
-  double cost = 0.0;
-  double t = 0.0;
-
-  while (t < FLAGS_trajectory_time_length) {
-    double c = lon_trajectory->Evaluate(3, t);
-    cost += c * c;
-    t = t + FLAGS_trajectory_time_resolution;
+  double cost_sqr_sum = 0.0;
+  double cost_abs_sum = 0.0;
+  // TODO(all) need a new gflag for jerk_bound?
+  double jerk_bound = FLAGS_longitudinal_jerk_upper_bound;
+  for (double t = 0.0; t < FLAGS_trajectory_time_length;
+       t += FLAGS_trajectory_time_resolution) {
+    double jerk = lon_trajectory->Evaluate(3, t);
+    double cost = jerk / jerk_bound;
+    cost_sqr_sum += cost * cost;
+    cost_abs_sum += std::abs(cost);
   }
-  return cost;
+  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
 }
 
 double TrajectoryEvaluator::compute_lon_objective_cost(
@@ -201,16 +209,21 @@ double TrajectoryEvaluator::compute_lon_objective_cost(
   double dist_s =
       lon_trajectory->Evaluate(0, t_max) - lon_trajectory->Evaluate(0, 0.0);
 
-  double cost = 0.0;
-  double t = 0.0;
-  while (t < FLAGS_trajectory_time_length) {
-    double c = planning_target.cruise_speed() - lon_trajectory->Evaluate(1, t);
-    cost += std::fabs(c);
-    t += FLAGS_trajectory_time_resolution;
+  double speed_cost_sqr_sum = 0.0;
+  double speed_cost_abs_sum = 0.0;
+  for (double t = 0.0; t < FLAGS_trajectory_time_length;
+       t += FLAGS_trajectory_time_resolution) {
+    double cost = planning_target.cruise_speed() -
+                  lon_trajectory->Evaluate(1, t);
+    speed_cost_sqr_sum += cost * cost;
+    speed_cost_abs_sum += std::abs(cost);
   }
-  cost *= weight_on_reference_speed;
-  cost += weight_dist_travelled * 1.0 / (1.0 + dist_s);
-  return cost;
+  double speed_cost = speed_cost_sqr_sum /
+                      (speed_cost_abs_sum + FLAGS_lattice_epsilon);
+  double dist_travelled_cost = 1.0 / (1.0 + dist_s);
+  return (weight_on_reference_speed * speed_cost +
+            weight_dist_travelled * dist_travelled_cost) /
+         (weight_on_reference_speed + weight_dist_travelled);
 }
 
 // TODO(@all): consider putting pointer of reference_line_info and frame
@@ -221,8 +234,11 @@ double TrajectoryEvaluator::compute_lon_obstacle_cost(
   double end_time = FLAGS_trajectory_time_length;
   const auto& pt_intervals = pathtime_neighborhood_->GetPathBlockingIntervals(
       start_time, end_time, FLAGS_trajectory_time_resolution);
-
-  double obstacle_cost = 0.0;
+  // TODO(all) move buffer and sigma to gflags
+  double buffer = 1.0;
+  double sigma = 0.5;
+  double cost_sqr_sum = 0.0;
+  double cost_abs_sum = 0.0;
   for (std::size_t i = 0; i < pt_intervals.size(); ++i) {
     const auto& pt_interval = pt_intervals[i];
     if (pt_interval.empty()) {
@@ -233,11 +249,21 @@ double TrajectoryEvaluator::compute_lon_obstacle_cost(
     double traj_s = lon_trajectory->Evaluate(0, t);
 
     for (const auto& m : pt_interval) {
-      double mid_s = (m.first + m.second) * 0.5;
-      obstacle_cost += 1.0 / std::exp(std::abs(traj_s - mid_s));
+      double cost = 0.0;
+      if (traj_s > m.first - buffer && traj_s < m.second + buffer) {
+        cost = 1.0;
+      } else if (traj_s < m.first) {
+        double dist = traj_s - m.first + buffer;
+        cost = std::exp(-dist * dist / (2.0 * sigma * sigma));
+      } else if (traj_s > m.second) {
+        double dist = m.second + buffer - traj_s;
+        cost = std::exp(-dist * dist / (2.0 * sigma * sigma));
+      }
+      cost_sqr_sum += cost * cost;
+      cost_abs_sum += std::abs(cost);
     }
   }
-  return obstacle_cost;
+  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
 }
 
 std::vector<double> TrajectoryEvaluator::evaluate_per_lonlat_trajectory(
