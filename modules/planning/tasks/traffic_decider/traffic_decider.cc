@@ -28,6 +28,7 @@
 #include "modules/planning/tasks/traffic_decider/destination.h"
 #include "modules/planning/tasks/traffic_decider/reference_line_end.h"
 #include "modules/planning/tasks/traffic_decider/rerouting.h"
+#include "modules/planning/tasks/traffic_decider/sidepass_vehicle.h"
 #include "modules/planning/tasks/traffic_decider/signal_light.h"
 #include "modules/planning/tasks/traffic_decider/stop_sign.h"
 

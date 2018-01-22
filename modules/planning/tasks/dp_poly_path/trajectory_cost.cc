@@ -35,9 +35,9 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::common::TrajectoryPoint;
 
 TrajectoryCost::TrajectoryCost(
     const DpPolyPathConfig &config, const ReferenceLine &reference_line,
@@ -99,13 +99,17 @@ TrajectoryCost::TrajectoryCost(
       double right_driving_width = right_width + sl_boundary.start_l() -
                                    FLAGS_static_decision_nudge_l_buffer;
 
-      if (left_driving_width < adc_width && right_driving_width < adc_width) {
+      // should check hard boundary here
+      if (ptr_path_obstacle->LateralDecision().has_sidepass() &&
+          left_driving_width < adc_width && right_driving_width < adc_width) {
         // lane blocking obstacle
         continue;
       }
 
-      if (sl_boundary.start_l() <= 0.0 && sl_boundary.end_l() >= 0.0) {
-        // if obstacle stays at the center of the lane, do not pass
+      if (sl_boundary.start_l() <= 0.0 && sl_boundary.end_l() >= 0.0 &&
+          sl_boundary.start_l() > -right_width &&
+          sl_boundary.end_l() < left_width) {
+        // Do NOT pass if obstacle stays on the road (covers lane center)
         continue;
       }
 
@@ -244,10 +248,10 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
     return obstacle_cost;
   }
 
-  std::function<double(const double, const double)> softmax = [](
-      const double x, const double x0) {
-    return std::exp(-(x - x0)) / (1.0 + std::exp(-(x - x0)));
-  };
+  std::function<double(const double, const double)> softmax =
+      [](const double x, const double x0) {
+        return std::exp(-(x - x0)) / (1.0 + std::exp(-(x - x0)));
+      };
 
   bool no_overlap = ((adc_front_s < obs_sl_boundary.start_s() ||
                       adc_end_s > obs_sl_boundary.end_s()) ||  // longitudinal
@@ -285,10 +289,10 @@ ComparableCost TrajectoryCost::GetCostBetweenObsBoxes(
     return obstacle_cost;
   }
 
-  std::function<double(const double, const double)> softmax = [](
-      const double x, const double x0) {
-    return std::exp(-(x - x0)) / (1.0 + std::exp(-(x - x0)));
-  };
+  std::function<double(const double, const double)> softmax =
+      [](const double x, const double x0) {
+        return std::exp(-(x - x0)) / (1.0 + std::exp(-(x - x0)));
+      };
 
   obstacle_cost.safety_cost +=
       config_.obstacle_collision_cost() *
