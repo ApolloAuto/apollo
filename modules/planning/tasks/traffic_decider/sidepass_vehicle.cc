@@ -32,7 +32,7 @@ void SidepassVehicle::MakeSidepassObstacleDecision(
     const SLBoundary& adc_sl_boundary,
     const common::TrajectoryPoint& adc_planning_point,
     PathDecision* path_decision) {
-  constexpr double kAdcSpeedThreshold = 3.0;  // unit: m/s
+  constexpr double kAdcSpeedThreshold = 11.2;  // unit: m/s (25mph)
   if (adc_planning_point.v() > kAdcSpeedThreshold) {
     return;
   }
@@ -47,6 +47,13 @@ void SidepassVehicle::MakeSidepassObstacleDecision(
         adc_sl_boundary.end_s()) {  // such vehicles are behind the adc.
       continue;
     }
+    constexpr double kAdcDistanceThreshold = 15.0;  // unit: m
+    if (path_obstacle->PerceptionSLBoundary().start_s() >
+        adc_sl_boundary.end_s() +
+            kAdcDistanceThreshold) {  // vehicles are far away
+      continue;
+    }
+
     if (path_obstacle->PerceptionSLBoundary().start_l() < 0 &&
         path_obstacle->PerceptionSLBoundary().end_l() > 0) {
       ObjectDecisionType sidepass;
