@@ -85,7 +85,76 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
       << "num_of_constraints_ mismatch, n: " << n
       << ", num_of_constraints_: " << num_of_constraints_;
 
-  // Variables: includes u and sample time
+  // Variables: includes state, u, sample time and lagrange multipliers
+  // 1. state variables
+  // start point pose
+  std::size_t variable_index = 0;
+  for (std::size_t i = 0; i < 4; ++i) {
+    x_l[i] = x0_(i, 0);
+    x_u[i] = x0_(i, 0);
+  }
+  variable_index += 4;
+
+  // During horizons
+  for (std::size_t i = 1; i < horizon_ - 1; ++i) {
+    // x
+    x_l[variable_index] = XYbounds_(0, 0);
+    x_u[variable_index] = XYbounds_(1, 0);
+
+    // y
+    x_l[variable_index + 1] = XYbounds_(2, 0);
+    x_u[variable_index + 1] = XYbounds_(3, 0);
+
+    // phi
+    // TODO(QiL): Change this to configs
+    x_l[variable_index + 2] = -7;
+    x_u[variable_index + 2] = 7;
+
+    // v
+    // TODO(QiL) : Change this to configs
+    x_l[variable_index + 3] = -1;
+    x_u[variable_index + 3] = 2;
+
+    variable_index += 4;
+  }
+
+  // end point pose
+  for (std::size_t i = 0; i < 4; ++i) {
+    x_l[variable_index + i] = xf_(i, 0);
+    x_u[variable_index + i] = xf_(i, 0);
+  }
+  variable_index += 4;
+  ADEBUG << "variable_index after adding state constraints : "
+         << variable_index;
+
+  // 2. control varialbles
+  for (std::size_t i = 1; i < horizon_; ++i) {
+    // u1
+    x_l[variable_index] = -0.6;
+    x_u[variable_index] = 0.6;
+
+    // u2
+    x_l[variable_index + 1] = -1;
+    x_u[variable_index + 1] = 1;
+
+    variable_index += 2;
+  }
+  ADEBUG << "variable_index after adding input constraints : "
+         << variable_index;
+
+  // 3. sampling time variables
+  for (std::size_t i = 1; i < horizon_; ++i) {
+    x_l[variable_index] = -0.6;
+    x_u[variable_index] = 0.6;
+
+    ++variable_index;
+  }
+
+  ADEBUG << "variable_index : " << variable_index;
+
+  // Constraints: includes state, u, sample time and lagrange multipliers
+  // constraints
+
   return true;
 }
 
