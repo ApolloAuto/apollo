@@ -78,7 +78,7 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
       << "num_of_constraints_ mismatch, n: " << n
       << ", num_of_constraints_: " << num_of_constraints_;
 
-  // Variables: includes u and sample time
+  // Variables: includes state, u and sample time
 
   // 1. state variables
   // start point pose
@@ -121,7 +121,7 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
   ADEBUG << "variable_index after adding state constraints : "
          << variable_index;
 
-  // 2. input constraints
+  // 2. control varialbles
   for (std::size_t i = 1; i < horizon_; ++i) {
     // u1
     x_l[variable_index] = -0.6;
@@ -136,7 +136,7 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
   ADEBUG << "variable_index after adding input constraints : "
          << variable_index;
 
-  // 3. sampling time constraints
+  // 3. sampling time variables
   for (std::size_t i = 1; i < horizon_; ++i) {
     x_l[variable_index] = -0.6;
     x_u[variable_index] = 0.6;
