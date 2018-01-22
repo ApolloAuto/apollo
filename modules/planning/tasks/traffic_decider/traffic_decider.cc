@@ -72,6 +72,10 @@ void TrafficDecider::RegisterRules() {
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new ChangeLane(config);
                          });
+  rule_factory_.Register(RuleConfig::SIDEPASS_VEHICLE,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new ChangeLane(config);
+                         });
 }
 
 bool TrafficDecider::Init(const PlanningConfig &config) {

@@ -34,14 +34,14 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::util::FindOrDie;
 using apollo::common::VehicleConfigHelper;
+using apollo::common::util::FindOrDie;
 
 namespace {
 const double kStBoundaryDeltaS = 0.2;        // meters
 const double kStBoundarySparseDeltaS = 1.0;  // meters
 const double kStBoundaryDeltaT = 0.05;       // seconds
-}
+}  // namespace
 
 const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
                          PathObstacle::ObjectTagCaseHash>
@@ -55,7 +55,9 @@ const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
 const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
                          PathObstacle::ObjectTagCaseHash>
     PathObstacle::s_lateral_decision_safety_sorter_ = {
-        {ObjectDecisionType::kIgnore, 0}, {ObjectDecisionType::kNudge, 100}};
+        {ObjectDecisionType::kIgnore, 0},
+        {ObjectDecisionType::kNudge, 100},
+        {ObjectDecisionType::kSidepass, 200}};
 
 const std::string& PathObstacle::Id() const {
   return id_;
@@ -287,7 +289,8 @@ const std::vector<ObjectDecisionType>& PathObstacle::decisions() const {
 }
 
 bool PathObstacle::IsLateralDecision(const ObjectDecisionType& decision) {
-  return decision.has_ignore() || decision.has_nudge();
+  return decision.has_ignore() || decision.has_nudge() ||
+         decision.has_sidepass();
 }
 
 bool PathObstacle::IsLongitudinalDecision(const ObjectDecisionType& decision) {
@@ -367,7 +370,7 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
   } else if (lhs_val > rhs_val) {
     return lhs;
   } else {
-    if (lhs.has_ignore()) {
+    if (lhs.has_ignore() || lhs.has_sidepass()) {
       return rhs;
     } else if (lhs.has_nudge()) {
       DCHECK(lhs.nudge().type() == rhs.nudge().type())
