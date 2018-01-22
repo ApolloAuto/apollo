@@ -21,6 +21,7 @@ enum TaskType {
 };
 
 message RuleConfig {
+  // next id = 10
   enum RuleId {
     BACKSIDE_VEHICLE = 1;
     SIGNAL_LIGHT = 2;
@@ -31,6 +32,7 @@ message RuleConfig {
     DESTINATION = 7;
     STOP_SIGN = 8;
     CHANGE_LANE = 9;
+    SIDEPASS_VEHICLE = 10;
   }
   optional RuleId rule_id = 1;
 }
