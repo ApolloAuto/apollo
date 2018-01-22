@@ -92,6 +92,14 @@ class MLPEvaluator : public Evaluator {
    */
   double ComputeProbability(const std::vector<double>& feature_values);
 
+  /**
+   * @brief Save offline feature values in proto
+   * @param Lane sequence
+   * @param Vector of feature values
+   */
+  void SaveOfflineFeatures(LaneSequence* sequence,
+                           const std::vector<double>& feature_values);
+
  private:
   std::unordered_map<int, std::vector<double>> obstacle_feature_values_map_;
   static const size_t OBSTACLE_FEATURE_SIZE = 22;

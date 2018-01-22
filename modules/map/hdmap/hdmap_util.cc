@@ -34,8 +34,7 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
     }
   }
   AERROR << "No existing file found in " << dir << "/" << files
-         << ". "
-            "Fallback to first candidate as default result.";
+         << ". Fallback to first candidate as default result.";
   CHECK(!candidates.empty()) << "Please specify at least one map.";
   return apollo::common::util::StrCat(FLAGS_map_dir, "/", candidates[0]);
 }
@@ -83,9 +82,7 @@ const HDMap* HDMapUtil::BaseMapPtr() {
   return base_map_.get();
 }
 
-const HDMap& HDMapUtil::BaseMap() {
-  return *CHECK_NOTNULL(BaseMapPtr());
-}
+const HDMap& HDMapUtil::BaseMap() { return *CHECK_NOTNULL(BaseMapPtr()); }
 
 const HDMap* HDMapUtil::SimMapPtr() {
   if (sim_map_ == nullptr) {
@@ -97,9 +94,7 @@ const HDMap* HDMapUtil::SimMapPtr() {
   return sim_map_.get();
 }
 
-const HDMap& HDMapUtil::SimMap() {
-  return *CHECK_NOTNULL(SimMapPtr());
-}
+const HDMap& HDMapUtil::SimMap() { return *CHECK_NOTNULL(SimMapPtr()); }
 
 bool HDMapUtil::ReloadMaps() {
   {
