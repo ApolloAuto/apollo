@@ -76,14 +76,14 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "features_proto",
+    name = "offline_features_proto",
     deps = [
-        ":features_proto_lib",
+        ":offline_features_proto_lib",
     ],
 )
 
 proto_library(
-    name = "features_proto_lib",
+    name = "offline_features_proto_lib",
     srcs = [
         "offline_features.proto",
     ],
