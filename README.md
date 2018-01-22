@@ -31,7 +31,7 @@ More instructions are below
 
 ### The docker environment can be set by the commands below.
 
-Running a docker container from a linux system is done with this sequence. At the end, the `dev_into.sh` 
+Running a docker container from a linux system is done with this sequence. At the end, the `dev_into.sh`
 script will get you into the container
 
 ```
@@ -46,8 +46,8 @@ bash docker/scripts/dev_into.sh
 ```
 
 ### To build from source
-Now you will need to build from the source. If you want to run the entire system, make sure you have an 
-nVidia GPU and that you have installed the Linux nVidia drivers. 
+First check and make sure you are in development docker container before you proceed. Now you will need to build from the source. If you want to run the entire system, make sure you have an
+nVidia GPU and that you have installed the Linux nVidia drivers.
 
 ```
 # To get a list of build commands
@@ -58,25 +58,25 @@ nVidia GPU and that you have installed the Linux nVidia drivers.
 bash apollo.sh build
 ```
 
-If you do not have an nVidia GPU, the system will run but with the CUDA-based perception and other modules. You must 
+If you do not have an nVidia GPU, the system will run but with the CUDA-based perception and other modules. You must
 specify either `dbg` for debug mode or `opt` for optimized code
 
 ```
 ./apollo.sh build_no_perception dbg
 ```
 
-If you make modifications to the Dreamview frontend, then you must run `./apollo.sh build_fe`  before you run the 
+If you make modifications to the Dreamview frontend, then you must run `./apollo.sh build_fe`  before you run the
 full build.
 
 
 ## Run Apollo
 
-Follow the steps below to launch Apollo. Note that you must build the system first before you run it. Note that the 
+Follow the steps below to launch Apollo. Note that you must build the system first before you run it. Note that the
 bootstrap.sh will actually succeed but the user interface will not come up if you skip the build step.
 
 ### Start Apollo
 
-Running Apollo will start the ROS core and then startup a web user interface called Dreamview, this is handled by 
+Running Apollo will start the ROS core and then startup a web user interface called Dreamview, this is handled by
 the bootstrap script, so from within the docker container, you should run:
 
 ```
