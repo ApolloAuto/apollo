@@ -71,6 +71,24 @@ proto_library(
     deps = [
         "//modules/common/proto:common_proto_lib",
         "//modules/prediction/proto:lane_graph_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "features_proto",
+    deps = [
+        ":features_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "features_proto_lib",
+    srcs = [
+        "offline_features.proto",
+    ],
+    deps = [
+        "//modules/prediction/proto:feature_proto_lib",
     ],
 )
 
