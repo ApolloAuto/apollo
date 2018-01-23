@@ -326,6 +326,11 @@ bool DPRoadGraph::SamplePathWaypoints(
       common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                   config_.sample_points_num_each_level() - 1,
                                   &sample_l);
+      if (HasSidepass()) {
+        // currently only left nudge is supported. Need road hard boundary for
+        // both sides
+        sample_l.push_back(eff_left_width + 0.5);
+      }
     }
     std::vector<common::SLPoint> level_points;
     planning_internal::SampleLayerDebug sample_layer_debug;
@@ -449,6 +454,16 @@ void DPRoadGraph::GetCurveCost(TrajectoryCost trajectory_cost,
                                ComparableCost *cost) {
   *cost =
       trajectory_cost.Calculate(curve, start_s, end_s, curr_level, total_level);
+}
+
+bool DPRoadGraph::HasSidepass() {
+  const auto &path_decision = reference_line_info_.path_decision();
+  for (const auto &obstacle : path_decision.path_obstacles().Items()) {
+    if (obstacle->LateralDecision().has_sidepass()) {
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace planning
