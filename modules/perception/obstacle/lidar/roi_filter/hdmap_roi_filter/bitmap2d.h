@@ -18,6 +18,7 @@
 
 #include <limits>
 #include <vector>
+
 #include "Eigen/Core"
 
 #include "modules/common/log.h"
@@ -40,8 +41,6 @@ class Bitmap2D {
   enum DirectionMajor { XMAJOR = 0, YMAJOR = 1 };
   Bitmap2D(const Eigen::Vector2d& min_p, const Eigen::Vector2d& max_p,
            const Eigen::Vector2d& grid_size, DirectionMajor dir_major);
-
-  typedef Eigen::Matrix<size_t, 2, 1> Vec2ui;
 
   static inline DirectionMajor opposite_direction(DirectionMajor dir_major) {
     return static_cast<DirectionMajor>(dir_major ^ 1);
