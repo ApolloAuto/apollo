@@ -117,6 +117,7 @@ class DPRoadGraph {
                   const uint32_t level, const uint32_t total_level,
                   TrajectoryCost *trajectory_cost, DPRoadGraphNode *front,
                   DPRoadGraphNode *cur_node);
+  bool HasSidepass();
 
  private:
   DpPolyPathConfig config_;
