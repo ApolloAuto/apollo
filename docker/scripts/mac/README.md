@@ -12,7 +12,7 @@ brew install docker docker-machine
 brew cask install virtualbox
 ```
 
-2. Start a Linux based docker machine.
+1. Start a Linux based docker machine.
 
 ```bash
 docker-machine create --driver virtualbox --virtualbox-memory 4096 apollo
@@ -55,7 +55,7 @@ MacOS. You should bring it up again:
 docker-machine restart apollo
 ```
 
-2. Your docker machine is generally running behind a NAT. You can get the
+1. Your docker machine is generally running behind a NAT. You can get the
 address with:
 
 ```bash
@@ -64,3 +64,13 @@ docker-machine ip apollo
 
 Remember to use it to access Apollo infras such as Dreamview, while not
 "localhost" or "127.0.0.1".
+
+1. Your cert to the docker machine might expire as time goes by. If you see
+something like:
+```text
+You can attempt to regenerate them using 'docker-machine regenerate-certs [name]'.
+```
+Just follow that instruction and run
+```bash
+docker-machine regenerate-certs apollo
+```

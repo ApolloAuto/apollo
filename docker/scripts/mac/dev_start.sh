@@ -39,7 +39,7 @@ fi
 
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20171228_1319"
+VERSION_X86_64="dev-x86_64-20180103_1300"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 if [[ $# == 1 ]]; then
     VERSION=$1
@@ -57,7 +57,7 @@ if [ -z "${DOCKER_REPO}" ]; then
 fi
 
 IMG=${DOCKER_REPO}:$VERSION
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../.." && pwd )"
 
 if [ ! -e /apollo ]; then
     sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
