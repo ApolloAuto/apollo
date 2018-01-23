@@ -128,7 +128,7 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
 void MLPEvaluator::SaveOfflineFeatures(
     LaneSequence* sequence, const std::vector<double>& feature_values) {
   for (double feature_value : feature_values) {
-    sequence->add_mlp_features(feature_value);
+    sequence->mutable_features()->add_mlp_features(feature_value);
   }
 }
 
