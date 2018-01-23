@@ -83,11 +83,13 @@ The Lincoln MKZ, enhanced by Autonomous Stuff, 为用户提供了一个无障碍
 运行以下命令：
 ```
 cd $APOLLO_HOME
-bash docker/scripts/release_start.sh local_release
+bash docker/scripts/dev_start.sh
+bash docker/scripts/dev_into.sh
+bash apollo.sh build # or bash apollo.sh build_opt_gpu
 ```
 当Docker启动时，它创建一个端口映射，将Docker内部端口8887映射到主机端口8887.然后，您可以在主机浏览器中访问HMI Web服务：
 
-打开Chrome浏览器并启动阿波罗人机界面，转到 **192.168.10.6:8887**.
+打开Chrome浏览器并启动阿波罗人机界面，转到 **192.168.10.6:8888**.
  ![](images/start_hmi.png)
 
 ## 记录驾驶轨迹

@@ -19,7 +19,7 @@ Apollo已经开始为汽车和自主驾驶行业的合作伙伴提供开放，�
     ```
     git clone git@github.com:ApolloAuto/apollo.git
     cd apollo
-    git checkout [release_branch_name]
+    git checkout [branch_name]
     ```
 
 2. 参考以下命令设置环境变量 `APOLLO_HOME`:
@@ -53,22 +53,24 @@ Docker容器是设置Apollo构建环境的最简单方法。
     DOCKER_OPTS = "-s overlay"
     ```
 
-## 使用你的Release Container
+## 使用你的 Docker Development Container
 
 1. 通过运行以下命令下载并启动Apollo 发布的 Docker映像：
 
     ```
     cd $APOLLO_HOME
-    bash docker/scripts/release_start.sh
+    bash docker/scripts/dev_start.sh
+    bash docker/scripts/dev_into.sh
+
+
+2. 在Docker 内编译 Apollo
+    ```
+    bash apollo.sh build  # build apollo
+    # or use the following command for better performance
+    bash apollo.sh build_opt_gpu
     ```
 
-2. （可选）如果你需要定制化你的Docker映像，通过运行以下命令登录你已下载的 Docker映像：
-
-    ```
-    bash docker/scripts/release_into.sh
-    ```
-
-3. （该步骤只用于车上设置。如果是在docker release container里线下实验，请跳过此布）通过修改文件中的以下行来设置全球导航卫星系统（GNSS）驱动程序的区域编号 `./ros/share/gnss_driver/launch/gnss_driver.launch`.
+3. （该步骤只用于车上设置。如果是在docker container里线下实验，请跳过此布）通过修改文件中的以下行来设置全球导航卫星系统（GNSS）驱动程序的区域编号 `./ros/share/gnss_driver/launch/gnss_driver.launch`.
 
     ```
     <arg name="proj4_text" default="+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs " />
@@ -76,7 +78,7 @@ Docker容器是设置Apollo构建环境的最简单方法。
 
     你只需修改上面一行的`+zone=10`的值即可。请参考[Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) 找到您当地的区号。例如，如果你在北京，中国，你必须设置`+zone=50`。
 
-5. （该步骤只用于车上设置。如果是在docker release container里线下实验，请跳过此布）通过修改以下文件，为GNSS驱动程序设置实时运动（RTK）基站：
+4. （该步骤只用于车上设置。如果是在docker container里线下实验，请跳过此布）通过修改以下文件，为GNSS驱动程序设置实时运动（RTK）基站：
    `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
 
    有关典型的RTK设置，请参阅以下示例：
@@ -106,16 +108,16 @@ Docker容器是设置Apollo构建环境的最简单方法。
 
     `rtk_to` 用于将RTK差分数据发送到接收器。
 
-6. （该步骤只用于车上设置。如果是在docker release container里线下实验，请跳过此布）添加ESD CAN支持
+5. （该步骤只用于车上设置。如果是在docker container里线下实验，请跳过此布）添加ESD CAN支持
 
     请参考 [ESD CAN README](https://github.com/ApolloAuto/apollo/blob/master/third_party/can_card_library/esd_can/README.md)来设置ESD CAN库。
 
-7.  （如果你没有修改过本地的Docker release container里的配置，可跳过此布）按照以下步骤保存你的本地环境：
+6.  （如果你没有修改过本地的Docker container里的配置，可跳过此布）按照以下步骤保存你的本地环境：
 
     ```
     # EXIT OUT OF DOCKER ENV
     # commit your docker local changes to local docker image.
     exit # exit from docker environment
     cd $APOLLO_HOME
-    bash docker/scripts/release_commit.sh
+    bash docker/scripts/dev_commit.sh
     ```
