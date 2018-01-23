@@ -1,6 +1,6 @@
 # How to Run Perception Module on Your Local Computer
 
-The perception module requires Nvidia GPU and CUDA installed to run the perception algorithms with Caffe. We have already installed the CUDA and Caffe libraries in the released docker. However, the Nvidia GPU driver is not installed in the released dev docker image. To run the perception module with CUDA acceleration, we suggest to install the exactly same version of Nvidia driver in the docker as the one installed in your host machine, and build Apollo with GPU option.
+The perception module requires Nvidia GPU and CUDA installed to run the perception algorithms with Caffe. However, the Nvidia GPU driver is not installed in the dev docker image. To run the perception module with CUDA acceleration, we suggest to install the exactly same version of Nvidia driver in the docker as the one installed in your host machine, and build Apollo with GPU option.
 
 We provide a step-by-step instruction on running perception module with Nvidia GPU as below:
 
@@ -10,9 +10,9 @@ We provide a step-by-step instruction on running perception module with Nvidia G
 -v /lib/modules:/lib/modules
 ```
 
-2. Start the released docker image and get into docker with root authority: 
+2. Start the docker image and get into docker with root authority: 
 ``` 
-./docker/scripts/dev_start.sh
+bash docker/scripts/dev_start.sh
 docker exec -it apollo_dev /bin/bash
 ```
 

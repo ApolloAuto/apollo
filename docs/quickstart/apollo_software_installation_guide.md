@@ -19,7 +19,7 @@ Before getting started, please make sure you have installed the Ubuntu Linux 14.
     ```
     git clone git@github.com:ApolloAuto/apollo.git
     cd apollo
-    git checkout [release_branch_name]
+    git checkout [branch_name]
     ```
 
 2. Set up environment variable `APOLLO_HOME` by the following command:
@@ -55,22 +55,25 @@ For more information, see the detailed Docker tutorial [here](https://docs.docke
     DOCKER_OPTS = "-s overlay"
     ```
 
-## Use Your Release Container
+## Use Your Docker Development Container
 
-1. Download and start the Apollo Release docker image by running the following commands:
+1. Download and start the Apollo docker image by running the following commands:
 
     ```
     cd $APOLLO_HOME
-    bash docker/scripts/release_start.sh
+    bash docker/scripts/dev_start.sh
     ```
 
-2. (Optional) If you want to customize your release container, login into the Apollo Release docker image by running the following commands:
+2. Compile Apollo inside docker.
 
     ```
-    bash docker/scripts/release_into.sh
+    bash apollo.sh build  # build apollo
+    # or use the following command for better performance
+    bash apollo.sh build_opt_gpu
     ```
 
-3. (Skip this if you only want to do the offline simulation in release docker container) Set up the zone number for the Global Navigation Satellite System (GNSS) Driver by modifying the following line in file `./ros/share/gnss_driver/launch/gnss_driver.launch`.
+
+3. (Skip this if you only want to do the offline simulation in docker container) Set up the zone number for the Global Navigation Satellite System (GNSS) Driver by modifying the following line in file `./ros/share/gnss_driver/launch/gnss_driver.launch`.
 
     ```
     <arg name="proj4_text" default="+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs " />
@@ -78,7 +81,7 @@ For more information, see the detailed Docker tutorial [here](https://docs.docke
 
     You only have to modify the value `+zone=10` in the above line. Please refer to the [Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) to find your local zone number. For example, if you are in Beijing, China, you have to set `+zone=50`.
 
-4. (Skip this if you only want to do the offline simulation in release docker container) Set up the Real Time Kinematic (RTK) Base Station for the GNSS Driver by modifying the file: `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
+4. (Skip this if you only want to do the offline simulation in docker container) Set up the Real Time Kinematic (RTK) Base Station for the GNSS Driver by modifying the file: `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
 
     Refer to the following example for a typical RTK setup:
 
@@ -105,18 +108,18 @@ For more information, see the detailed Docker tutorial [here](https://docs.docke
 
     The `rtk_from` is  used for RTK base station information. The `rtk_to` is used to send the RTK differential data to the receiver.
 
-5. (Skip this if you only want to do the offline simulation in release docker container) Add ESD CAN Support
+5. (Skip this if you only want to do the offline simulation in docker container) Add ESD CAN Support
 
     Please refer to [ESD CAN README](https://github.com/ApolloAuto/apollo/blob/master/third_party/can_card_library/esd_can/README.md) to install the ESD CAN library.
 
-6. (Skip this if you have NOT customized your release docker container) Follow these steps to persist your local changes:
+6. (Skip this if you have NOT customized your docker container) Follow these steps to persist your local changes:
 
     ```
     # EXIT DOCKER ENV
     # commit your docker local changes to local docker image.
     exit # exit from docker environment
     cd $APOLLO_HOME
-    bash docker/scripts/release_commit.sh
+    bash docker/scripts/dev_commit.sh
     ```
 
 7. Start your favorite browser (i.e. Chrome) and with URL: http://localhost:8888

@@ -9,7 +9,6 @@
 * [Access the Apollo Dev Container](#access-the-apollo-dev-container)
 * [Build the Apollo ROS](#build-the-apollo-ros)
 * [Build Apollo](#build-apollo)
-* [Release](#release)
 
 
 
@@ -34,7 +33,7 @@ The following table lists the conventions that are used in this document:
 
 # Introduction
 
-It is assumed that you have read and performed the instructions in the companion guide, the *Apollo 1.0 Quick Start Guide*, to set up the basic environment. Use this guide to build your own version of the Apollo Kernel, the ROS, and Apollo. There are also instructions on how to release your own Apollo container to others who might want to build on what you have developed.  It is strongly recommended that you build all of the components (Apollo Kernel, ROS, and Apollo) in the Apollo pre-specified dev Docker container.
+It is assumed that you have read and performed the instructions in the companion guide, the *Apollo 1.0 Quick Start Guide*, to set up the basic environment. Use this guide to build your own version of the Apollo Kernel, the ROS, and Apollo. There are also instructions on how to build your own Apollo container to others who might want to build on what you have developed.  It is strongly recommended that you build all of the components (Apollo Kernel, ROS, and Apollo) in the Apollo pre-specified dev Docker container.
 
 # Build the Apollo Kernel
 
@@ -44,12 +43,12 @@ The Apollo runtime in the vehicle requires the [Apollo Kernel](https://github.co
 
 You get access and install the pre-built kernel with the following commands.
 
-1. Download the release packages from the release section on github
+1. Download the packages from the release section on github
 ```
 https://github.com/ApolloAuto/apollo-kernel/releases
 ```
 2. Install the kernel
-After having the release package downloaded:
+After having the package downloaded:
 ```
 tar zxvf linux-4.4.32-apollo-1.0.0.tar.gz
 cd install
@@ -114,44 +113,3 @@ Run the following command:
 cd $APOLLO_HOME
 bash apollo.sh build
 ```
-
-# Release
-
-Apollo uses Docker images to release packages. **For advanced developers**: you can generate a new Docker image to test in an actual vehicle. Apollo has set up a base Docker image environment to test the Apollo build.
-
-The image is called: `run-env-latest`.
-
-1. Run the following command:
-
-```
-bash apollo.sh release
-```
-
-The release command generates a release directory, which contains:
-
-- ROS environment
-- Running scripts
-- Binaries
-- Dependent shared libraries (`.so` files)
-
-2. Open a new terminal and run the following command in an Apollo source directory outside of Docker:
-
-
-```
-cd $APOLLO_HOME
-bash apollo_docker.sh gen
-```
-
-The command creates a new Docker image using the release directory.
-
-The release image tag will be named:`release-yyyymmdd_hhmm`. The existing release image tag, `release-latest`, is always pointing to the most current release.
-
-3. Push your release image online using your own Docker registry set up from outside of the container:
-
-
-```
-cd $APOLLO_HOME
-bash apollo_docker.sh push
-```
-
-The command pushes the newly built Docker image to the release Docker registry. To set up a new Docker registry, see [this page](https://docs.docker.com/registry).

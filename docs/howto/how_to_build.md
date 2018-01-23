@@ -1,8 +1,8 @@
-Build and Release
+Build
 ==========================
 
 * [1. Install Docker](#docker)
-* [2. Build and Release](#build_release)
+* [2. Build](#build)
 * [3. Test](#test)
 
 ## <span id="docker">Install Docker</span>
@@ -10,7 +10,7 @@ The system requirement for building Apollo is Ubuntu 14.04. Docker container is 
 ```bash
 sudo docker/scripts/install_docker.sh
 ```
-## <span id="build_release">Build and Release</span>
+## <span id="build">Build in Docker </span>
 ### Start container
 We provide a build image named *dev-latest*. Container will mount your local apollo repo to */apollo*.
 ```bash
@@ -23,34 +23,6 @@ bash docker/scripts/dev_into.sh
 ### Build modules
 ```bash
 bash apollo.sh build
-```
-### Release binaries
-```bash
-bash apollo.sh release
-```
-This will generate a release directory, which contains ROS environment, running scripts, binaries and dependent shared libraries (.so files).
-
-To create a release excluding proprietary software (such as ESD CAN library), do:
-```bash
-bash apollo.sh release_noproprietary
-```
-### Generate release image
-```bash
-bash apollo_docker.sh gen
-```
-This will create a new docker image with the release directory. The release image will be named as *release-yyyymmdd_hhmm*. Meanwhile, your most recent built image will be tagged as *release-latest*. **The docker_release needed to be executed outside of container.**
-### Push docker images
-```bash
-bash apollo_docker.sh push
-```
-The command will push your most recent release docker image to the docker hub.
-## <span id="test">Test</span>
-```bash
-bash docker/scripts/release_start.sh [release tag]
-```
-The *HMI* will automatically start and you can control each apollo module through any web browser by inputting IP address and port number, such as *localhost:8887*. You can get into the release container if quick fix needed.
-```bash
-bash docker/scripts/release_into.sh
 ```
 
 ## Legal Disclaimer

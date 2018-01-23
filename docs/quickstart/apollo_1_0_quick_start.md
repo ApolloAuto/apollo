@@ -7,7 +7,7 @@
 * [Hardware Installation](#hardware-installation)
 * [Apollo Software Installation](#apollo-software-installation)
 * [Run the Demo on Vehicle](#run-the-demo-on-vehicle)
-    * [Launch the Local Release Docker Image](#launch-the-local-release-env-docker-image)
+    * [Launch the Docker Image](#launch-the-docker-image)
     * [Record the Driving Trajectory](#record-driving-trajectory)
     * [Perform Autonomous Driving](#perform-autonomous-driving)
     * [Shut Down](#shut-down)
@@ -78,16 +78,20 @@ This section provides the instructions to run the Apollo 1.0 Demo on Vehicle.
 
    ![warning](images/warning_icon.png)**Warning:** Make sure that you are not starting HMI from two Docker containers concurrently.
 
-## Launch the Local release env Docker Image
+## Launch the Local Development Docker Image
 
 Run the following commands:
 ```
 cd $APOLLO_HOME
-bash docker/scripts/release_start.sh local_release
+bash docker/scripts/dev_start.sh
+bash docker/scripts/dev_into.sh
+bash apollo.sh build #build apollo
+# or use the following command to build for better performance
+build apollo.sh build_opt_gpu
 ```
-When Docker starts, it creates a port mapping, which maps the Docker internal port 8887 to the host port 8887. You can then visit the HMI web service in your host machine browser:
+When Docker starts, it creates a port mapping, which maps the Docker internal port 8888 to the host port 8888. You can then visit the HMI web service in your host machine browser:
 
-Open the Chrome browser and start the Apollo HMI by going to **192.168.10.6:8887**.
+Open the Chrome browser and start the Apollo HMI by going to **192.168.10.6:8888**.
  ![](images/start_hmi.png)
 
 ## Record the Driving Trajectory

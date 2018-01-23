@@ -9,7 +9,7 @@ e.g.
 
 ```
 # docker save -o <save image to path> <image name>
-docker save -o apollo_img.tar apolloauto/apollo:release-latest
+docker save -o apollo_img.tar apolloauto/apollo:dev-latest
 ```
 
 ## Load Docker Image
