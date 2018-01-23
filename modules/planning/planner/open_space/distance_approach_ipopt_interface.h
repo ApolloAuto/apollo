@@ -119,6 +119,7 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   double offset_;
   Eigen::MatrixXd vOb_;
   std::size_t nOb_;
+  std::size_t vObsum_;
 };
 
 }  // namespace planning
