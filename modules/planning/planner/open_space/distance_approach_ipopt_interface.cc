@@ -36,7 +36,8 @@ constexpr double dmin = 0.05;
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     const int num_of_variables, const int num_of_constraints,
     std::size_t horizon, float ts, float wheelbase_length, Eigen::MatrixXd ego,
-    Eigen::MatrixXd x0, Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds)
+    Eigen::MatrixXd x0, Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds,
+    Eigen::MatrixXd vOb, std::size_t nOb)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
       horizon_(horizon),
@@ -45,7 +46,9 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
       ego_(ego),
       x0_(x0),
       xf_(xf),
-      XYbounds_(XYbounds) {
+      XYbounds_(XYbounds),
+      vOb_(vOb),
+      nOb_(nOb) {
   w_ev_ = ego_(0, 1) + ego_(0, 3);
   l_ev_ = ego_(0, 0) + ego_(0, 2);
   g_ = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
@@ -88,7 +91,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
       << ", num_of_constraints_: " << num_of_constraints_;
 
   // Variables: includes state, u, sample time and lagrange multipliers
-  // 1. state variables
+  // 1. state variables, 4 * (N+1)
   // start point pose
   std::size_t variable_index = 0;
   for (std::size_t i = 0; i < 4; ++i) {
@@ -97,8 +100,8 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   }
   variable_index += 4;
 
-  // During horizons
-  for (std::size_t i = 1; i < horizon_ - 1; ++i) {
+  // During horizons, 2 ~ N-1
+  for (std::size_t i = 2; i <= horizon_ - 1; ++i) {
     // x
     x_l[variable_index] = XYbounds_(0, 0);
     x_u[variable_index] = XYbounds_(1, 0);
@@ -128,7 +131,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   variable_index += 4;
   ADEBUG << "variable_index after adding state variables : " << variable_index;
 
-  // 2. control varialbles
+  // 2. control varialbles, 2 * (1 ~ N)
   for (std::size_t i = 1; i < horizon_; ++i) {
     // u1
     x_l[variable_index] = -0.6;
@@ -143,8 +146,8 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   ADEBUG << "variable_index after adding control variables : "
          << variable_index;
 
-  // 3. sampling time variables
-  for (std::size_t i = 1; i < horizon_; ++i) {
+  // 3. sampling time variables, 1 ~ N + 1
+  for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
     x_l[variable_index] = -0.6;
     x_u[variable_index] = 0.6;
 
@@ -153,16 +156,16 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   ADEBUG << "variable_index after adding sample time : " << variable_index;
 
-  // 4. lagrange constraint l
+  // 4. lagrange constraint l, sum(oVb) * (N+1)
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
-    x_l[variable_index] = 0.0;
+    for (std::size_t j = 1; j <=) x_l[variable_index] = 0.0;
     // TODO:(QiL) refine this variables limits
     x_u[variable_index] = 100.0;
 
     ++variable_index;
   }
 
-  // 4. lagrange constraint m
+  // 4. lagrange constraint m, 4*nOb * (horizon_+1)
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
     x_l[variable_index] = 0.0;
     // TODO:(QiL) refine this variables limits
@@ -369,9 +372,24 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
 bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
                                             double& obj_value) {
   // first (horizon_ + 1) * 4 is state, then next horizon_ * 2 is control input,
-  // then last horizon_ + 1 is sampling time
+  // next horizon_ + 1 is sampling time, next horizon_ + 1 is lagrangian l, next
+  // horizon_ +1 is lagrangian n
+
+  // TODO(QiL) : Change the weight to configs
   std::size_t start_index = (horizon_ + 1) * 4;
   std::size_t time_start_index = start_index + horizon_ * 2;
+  std::size_t lagrangian_l_start_index = time_start_index + horizon_ + 1;
+  std::size_t lagrangian_n_start_index =
+      lagrangian_l_start_index + (horizon_ + 1) * vOb_.sum();
+
+  /*
+      Min,sum(0.1*u[1,i]^2 + 1*u[2,i]^2 for i = 1:N) +
+                             sum(0.5*timeScale[i] + 1*timeScale[i]^2 for i =
+     1:N+1)+ sum(sum(reg*n[j,i]^2 for i = 1:N+1)  for j = 1:4) +
+                                                 sum(sum(reg*l[j,i]^2 for i =
+     1:N+1)  for j = 1:sum(vOb))
+  */
+
   for (std::size_t i = 0; i < horizon_; ++i) {
     obj_value += 0.1 * x[start_index + i] * x[start_index + i] +
                  x[start_index + i] * x[start_index + i + 1] +
@@ -380,6 +398,24 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   }
   obj_value += 0.5 * x[time_start_index + horizon_] +
                x[time_start_index + horizon_] * x[time_start_index + horizon_];
+
+  // Add l , sum(vOb) * (N+1)
+  constexpr double reg = 1e-4;
+  for (std::size_t i = 1; i < horizon_ + 1; ++i) {
+    for (std::size_t j = 1; j <= vOb_.sum(); ++j) {
+      obj_value += reg * x[lagrangian_l_start_index + i * (horizon_ + 1) + j] *
+                   x[lagrangian_l_start_index + i * (horizon_ + 1) + j];
+    }
+  }
+
+  // Add n, 4 * nOb * (N+1)
+  for (std::size_t i = 1; i < horizon_ + 1; ++i) {
+    // TODO(QiL) : Double check the dimensions here !!!!!!!!!
+    for (std::size_t j = 1; j <= 4 * nOb_; ++j) {
+      obj_value += reg * x[lagrangian_n_start_index + i * (horizon_ + 1) + j] *
+                   x[lagrangian_n_start_index + i * (horizon_ + 1) + j];
+    }
+  }
   return true;
 }
 

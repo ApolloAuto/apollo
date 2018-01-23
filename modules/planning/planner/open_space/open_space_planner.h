@@ -68,7 +68,7 @@ class OpenSpacePlanner : public Planner {
       ReferenceLineInfo* reference_line_info) override;
 
   apollo::common::Status ObsHRep(
-      const int& nOb, const Eigen::MatrixXd& vOb,
+      const std::size_t& nOb, const Eigen::MatrixXd& vOb,
       const std::vector<std::vector<Eigen::MatrixXd>>& lOb,
       Eigen::MatrixXd* A_all, Eigen::MatrixXd* b_all);
 
