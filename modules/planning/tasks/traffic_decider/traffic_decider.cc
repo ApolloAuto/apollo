@@ -28,6 +28,7 @@
 #include "modules/planning/tasks/traffic_decider/destination.h"
 #include "modules/planning/tasks/traffic_decider/reference_line_end.h"
 #include "modules/planning/tasks/traffic_decider/rerouting.h"
+#include "modules/planning/tasks/traffic_decider/sidepass_vehicle.h"
 #include "modules/planning/tasks/traffic_decider/signal_light.h"
 #include "modules/planning/tasks/traffic_decider/stop_sign.h"
 
@@ -68,6 +69,10 @@ void TrafficDecider::RegisterRules() {
                            return new StopSign(config);
                          });
   rule_factory_.Register(RuleConfig::CHANGE_LANE,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new ChangeLane(config);
+                         });
+  rule_factory_.Register(RuleConfig::SIDEPASS_VEHICLE,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new ChangeLane(config);
                          });

@@ -145,7 +145,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   if (SetId(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
     return;
   }
-  if (SetType(perception_obstacle) == ErrorCode::PREDICTION_ERROR) {
+  if (SetType(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
     return;
   }
 
@@ -290,10 +290,12 @@ ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
   return ErrorCode::OK;
 }
 
-ErrorCode Obstacle::SetType(const PerceptionObstacle& perception_obstacle) {
+ErrorCode Obstacle::SetType(const PerceptionObstacle& perception_obstacle,
+                            Feature* feature) {
   if (perception_obstacle.has_type()) {
     type_ = perception_obstacle.type();
     ADEBUG << "Obstacle [" << id_ << "] has type [" << type_ << "].";
+    feature->set_type(type_);
   } else {
     AERROR << "Obstacle [" << id_ << "] has no type.";
     return ErrorCode::PREDICTION_ERROR;
@@ -943,7 +945,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 }
 
 void Obstacle::SetLaneGraphFeature(Feature* feature,
-    ObstacleClusters* const obstacle_clusters) {
+                                   ObstacleClusters* const obstacle_clusters) {
   double speed = feature->speed();
   double acc = feature->acc();
   double road_graph_distance =

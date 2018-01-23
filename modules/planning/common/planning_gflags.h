@@ -197,4 +197,17 @@ DECLARE_double(collision_buffer_expansion_ratio);
 DECLARE_double(decision_horizon);
 DECLARE_double(lateral_obstacle_ignore_thred);
 
+// Lattice Evaluate Parameters
+DECLARE_double(weight_lon_travel);
+DECLARE_double(weight_lon_jerk);
+DECLARE_double(weight_lon_collision);
+DECLARE_double(weight_lat_offset);
+DECLARE_double(weight_same_side_offset);
+DECLARE_double(weight_opposite_side_offset);
+DECLARE_double(weight_dist_travelled);
+DECLARE_double(weight_target_speed);
+DECLARE_double(lat_offset_bound);
+DECLARE_double(lon_collision_buffer);
+DECLARE_double(lon_collision_cost_std);
+
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H

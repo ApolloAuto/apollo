@@ -211,3 +211,6 @@ rule_config : {
 rule_config : {
     rule_id: STOP_SIGN
 }
+rule_config : {
+    rule_id: SIDEPASS_VEHICLE
+}
