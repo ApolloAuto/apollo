@@ -37,6 +37,7 @@ namespace planning {
 
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
+using apollo::common::math::Sigmoid;
 using apollo::common::math::Vec2d;
 
 TrajectoryCost::TrajectoryCost(
@@ -62,13 +63,11 @@ TrajectoryCost::TrajectoryCost(
       continue;
     }
     auto sl_boundary = ptr_path_obstacle->PerceptionSLBoundary();
-    const auto &vehicle_param =
-        common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
     const double adc_left_l =
-        init_sl_point_.l() + vehicle_param.left_edge_to_center();
+        init_sl_point_.l() + vehicle_param_.left_edge_to_center();
     const double adc_right_l =
-        init_sl_point_.l() - vehicle_param.right_edge_to_center();
+        init_sl_point_.l() - vehicle_param_.right_edge_to_center();
 
     if (adc_left_l + FLAGS_lateral_ignore_buffer < sl_boundary.start_l() ||
         adc_right_l - FLAGS_lateral_ignore_buffer > sl_boundary.end_l()) {
@@ -76,7 +75,7 @@ TrajectoryCost::TrajectoryCost(
     }
 
     const auto ptr_obstacle = ptr_path_obstacle->obstacle();
-    bool is_bycycle_or_pedestrain =
+    bool is_bycycle_or_pedestrian =
         (ptr_obstacle->Perception().type() ==
              perception::PerceptionObstacle::BICYCLE ||
          ptr_obstacle->Perception().type() ==
@@ -86,13 +85,13 @@ TrajectoryCost::TrajectoryCost(
       // Virtual obstacle
       continue;
     } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception()) ||
-               is_bycycle_or_pedestrain) {
+               is_bycycle_or_pedestrian) {
       double left_width = 0.0;
       double right_width = 0.0;
       reference_line_->GetLaneWidth(sl_boundary.start_s(), &left_width,
                                     &right_width);
 
-      const double adc_width = vehicle_param.width();
+      const double adc_width = vehicle_param_.width();
 
       double left_driving_width = left_width - sl_boundary.end_l() -
                                   FLAGS_static_decision_nudge_l_buffer;
@@ -137,26 +136,26 @@ ComparableCost TrajectoryCost::CalculatePathCost(
     const double end_s, const uint32_t curr_level, const uint32_t total_level) {
   ComparableCost cost;
   double path_cost = 0.0;
-  for (double path_s = 0.0; path_s < (end_s - start_s);
-       path_s += config_.path_resolution()) {
-    const double l = curve.Evaluate(0, path_s);
+  std::function<double(const double)> quasi_softmax = [this](const double x) {
+    const double l0 = this->config_.path_l_cost_param_l0();
+    const double b = this->config_.path_l_cost_param_b();
+    const double k = this->config_.path_l_cost_param_k();
+    return (b + std::exp(-k * (x - l0))) / (1.0 + std::exp(-k * (x - l0)));
+  };
 
-    std::function<double(const double)> quasi_softmax = [this](const double x) {
-      const double l0 = this->config_.path_l_cost_param_l0();
-      const double b = this->config_.path_l_cost_param_b();
-      const double k = this->config_.path_l_cost_param_k();
-      return (b + std::exp(-k * (x - l0))) / (1.0 + std::exp(-k * (x - l0)));
-    };
+  const auto &vehicle_config =
+      common::VehicleConfigHelper::instance()->GetConfig();
+  const double width = vehicle_config.vehicle_param().width();
+
+  for (double curve_s = 0.0; curve_s < (end_s - start_s);
+       curve_s += config_.path_resolution()) {
+    const double l = curve.Evaluate(0, curve_s);
 
     path_cost += l * l * config_.path_l_cost() * quasi_softmax(std::fabs(l));
 
     double left_width = 0.0;
     double right_width = 0.0;
-    reference_line_->GetLaneWidth(path_s, &left_width, &right_width);
-
-    const auto &vehicle_config =
-        common::VehicleConfigHelper::instance()->GetConfig();
-    const double width = vehicle_config.vehicle_param().width();
+    reference_line_->GetLaneWidth(curve_s, &left_width, &right_width);
 
     constexpr double kBuff = 0.2;
     if (!is_change_lane_path_ && (l + width / 2.0 + kBuff > left_width ||
@@ -164,10 +163,10 @@ ComparableCost TrajectoryCost::CalculatePathCost(
       cost.cost_items[ComparableCost::OUT_OF_BOUNDARY] = true;
     }
 
-    const double dl = std::fabs(curve.Evaluate(1, path_s));
+    const double dl = std::fabs(curve.Evaluate(1, curve_s));
     path_cost += dl * dl * config_.path_dl_cost();
 
-    const double ddl = std::fabs(curve.Evaluate(2, path_s));
+    const double ddl = std::fabs(curve.Evaluate(2, curve_s));
     path_cost += ddl * ddl * config_.path_ddl_cost();
   }
   path_cost *= config_.path_resolution();
@@ -205,20 +204,19 @@ ComparableCost TrajectoryCost::CalculateDynamicObstacleCost(
        ++index, time_stamp += config_.eval_time_interval()) {
     common::SpeedPoint speed_point;
     heuristic_speed_data_.EvaluateByTime(time_stamp, &speed_point);
-    if (speed_point.s() < start_s - init_sl_point_.s()) {
+    double ref_s = speed_point.s() + init_sl_point_.s();
+    if (ref_s < start_s) {
       continue;
     }
-    if (speed_point.s() > end_s - init_sl_point_.s()) {
+    if (ref_s > end_s) {
       break;
     }
 
-    const double s =
-        init_sl_point_.s() + speed_point.s() - start_s;  // s on spline curve
+    const double s = ref_s - start_s;  // s on spline curve
     const double l = curve.Evaluate(0, s);
     const double dl = curve.Evaluate(1, s);
 
-    const common::SLPoint sl =
-        common::util::MakeSLPoint(init_sl_point_.s() + speed_point.s(), l);
+    const common::SLPoint sl = common::util::MakeSLPoint(ref_s, l);
     const Box2d ego_box = GetBoxFromSLPoint(sl, dl);
     for (const auto &obstacle_trajectory : dynamic_obstacle_boxes_) {
       obstacle_cost +=
@@ -248,11 +246,6 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
     return obstacle_cost;
   }
 
-  std::function<double(const double, const double)> softmax =
-      [](const double x, const double x0) {
-        return std::exp(-(x - x0)) / (1.0 + std::exp(-(x - x0)));
-      };
-
   bool no_overlap = ((adc_front_s < obs_sl_boundary.start_s() ||
                       adc_end_s > obs_sl_boundary.end_s()) ||  // longitudinal
                      (adc_left_l + FLAGS_static_decision_nudge_l_buffer <
@@ -269,13 +262,13 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
 
   obstacle_cost.safety_cost +=
       config_.obstacle_collision_cost() *
-      softmax(delta_l, config_.obstacle_collision_distance());
+      Sigmoid(config_.obstacle_collision_distance() - delta_l);
 
   const double delta_s = std::fabs(
       adc_s - (obs_sl_boundary.start_s() + obs_sl_boundary.end_s()) / 2.0);
   obstacle_cost.safety_cost +=
       config_.obstacle_collision_cost() *
-      softmax(delta_s, config_.obstacle_collision_distance());
+      Sigmoid(config_.obstacle_collision_distance() - delta_s);
   return obstacle_cost;
 }
 
@@ -289,16 +282,12 @@ ComparableCost TrajectoryCost::GetCostBetweenObsBoxes(
     return obstacle_cost;
   }
 
-  std::function<double(const double, const double)> softmax =
-      [](const double x, const double x0) {
-        return std::exp(-(x - x0)) / (1.0 + std::exp(-(x - x0)));
-      };
-
   obstacle_cost.safety_cost +=
       config_.obstacle_collision_cost() *
-      softmax(distance, config_.obstacle_collision_distance());
+      Sigmoid(config_.obstacle_collision_cost() - distance);
+  Sigmoid(config_.obstacle_collision_distance() - distance);
   obstacle_cost.safety_cost +=
-      20.0 * softmax(distance, config_.obstacle_risk_distance());
+      20.0 * Sigmoid(config_.obstacle_risk_distance() - distance);
   return obstacle_cost;
 }
 
