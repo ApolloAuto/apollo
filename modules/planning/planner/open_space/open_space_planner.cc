@@ -162,7 +162,7 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   return Status::OK();
 }
 
-Status ObsHRep(const std::sizet_t& nOb, const Eigen::MatrixXd& vOb,
+Status ObsHRep(const std::size_t& nOb, const Eigen::MatrixXd& vOb,
                const std::vector<std::vector<Eigen::MatrixXd>>& lOb,
                Eigen::MatrixXd* A_all, Eigen::MatrixXd* b_all) {
   // TODO(QiL) : Code replacement : find alternative ways for H presentation

@@ -53,6 +53,8 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   l_ev_ = ego_(0, 0) + ego_(0, 2);
   g_ = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
   offset_ = (ego_(0, 0) + ego_(0, 2)) / 2 - ego_(0, 2);
+  CHECK(vOb_.sum() >= 0) << "vOb sum negative!";
+  vObsum_ = std::size_t(vOb_.sum());
 }
 
 /*
@@ -157,24 +159,30 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   ADEBUG << "variable_index after adding sample time : " << variable_index;
 
   // 4. lagrange constraint l, sum(oVb) * (N+1)
-  for (std::size_t i = 1; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 1; j <=) x_l[variable_index] = 0.0;
-    // TODO:(QiL) refine this variables limits
-    x_u[variable_index] = 100.0;
+  for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
+    for (std::size_t j = 1; j <= vObsum_; ++j) {
+      x_l[i * vObsum_ + j] = 0.0;
+      // TODO:(QiL) refine this variables limits
+      x_u[i * vObsum_ + j] = 100.0;
 
-    ++variable_index;
+      ++variable_index;
+    }
   }
+
+  ADEBUG << "variable_index after adding lagrange l : " << variable_index;
 
   // 4. lagrange constraint m, 4*nOb * (horizon_+1)
-  for (std::size_t i = 1; i < horizon_ + 1; ++i) {
-    x_l[variable_index] = 0.0;
-    // TODO:(QiL) refine this variables limits
-    x_u[variable_index] = 100.0;
+  for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
+    for (std::size_t j = 1; j <= 4 * nOb_; ++j) {
+      x_l[i * 4 * nOb_ + j] = 0.0;
+      // TODO:(QiL) refine this variables limits
+      x_u[i * 4 * nOb_ + j] = 100.0;
 
-    ++variable_index;
+      ++variable_index;
+    }
   }
 
-  ADEBUG << "variable_index : " << variable_index;
+  ADEBUG << "variable_index after adding lagrange m : " << variable_index;
 
   // Constraints: includes state, u, sample time and lagrange multipliers
   // constraints
@@ -247,23 +255,30 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   // 3. lagrangian constraints l
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
-    g_l[constraint_index] = 0.0;
-    // TODO(QiL) : Check constraint index 100 after running senarios.
-    g_u[constraint_index] = 100.0;
+    for (std::size_t j = 1; j <= vObsum_; ++j) {
+      g_l[i * vObsum_ + j] = 0.0;
+      // TODO(QiL) : Check constraint index 100 after running senarios.
+      g_u[i * vObsum_ + j] = 100.0;
 
-    ++constraint_index;
+      ++constraint_index;
+    }
   }
+
   ADEBUG << "constraint_index after adding lagrangian constraint l: "
          << constraint_index;
 
   // 4. lagrangian constraints n
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
-    g_l[constraint_index] = 0.0;
-    // TODO(QiL) : Check constraint index 100 back after running the senarios.
-    g_u[constraint_index] = 100.0;
+    for (std::size_t j = 1; j <= 4 * nOb_; ++j) {
+      g_l[i * 4 * nOb_ + j] = 0.0;
+      // TODO(QiL) : Check constraint index 100 back after running the
+      // senarios.
+      g_u[i * 4 * nOb_ + j] = 100.0;
 
-    ++constraint_index;
+      ++constraint_index;
+    }
   }
+
   ADEBUG << "constraint_index after adding lagrangian constraints n : "
          << constraint_index;
 
@@ -371,23 +386,23 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
 
 bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
                                             double& obj_value) {
-  // first (horizon_ + 1) * 4 is state, then next horizon_ * 2 is control input,
-  // next horizon_ + 1 is sampling time, next horizon_ + 1 is lagrangian l, next
-  // horizon_ +1 is lagrangian n
+  // first (horizon_ + 1) * 4 is state, then next horizon_ * 2 is control
+  // input, next horizon_ + 1 is sampling time, next horizon_ + 1 is
+  // lagrangian l, next horizon_ +1 is lagrangian n
 
   // TODO(QiL) : Change the weight to configs
   std::size_t start_index = (horizon_ + 1) * 4;
   std::size_t time_start_index = start_index + horizon_ * 2;
   std::size_t lagrangian_l_start_index = time_start_index + horizon_ + 1;
   std::size_t lagrangian_n_start_index =
-      lagrangian_l_start_index + (horizon_ + 1) * vOb_.sum();
+      lagrangian_l_start_index + (horizon_ + 1) * vObsum_;
 
   /*
       Min,sum(0.1*u[1,i]^2 + 1*u[2,i]^2 for i = 1:N) +
                              sum(0.5*timeScale[i] + 1*timeScale[i]^2 for i =
      1:N+1)+ sum(sum(reg*n[j,i]^2 for i = 1:N+1)  for j = 1:4) +
-                                                 sum(sum(reg*l[j,i]^2 for i =
-     1:N+1)  for j = 1:sum(vOb))
+                                                 sum(sum(reg*l[j,i]^2 for i
+     = 1:N+1)  for j = 1:sum(vOb))
   */
 
   for (std::size_t i = 0; i < horizon_; ++i) {
@@ -402,7 +417,7 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   // Add l , sum(vOb) * (N+1)
   constexpr double reg = 1e-4;
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 1; j <= vOb_.sum(); ++j) {
+    for (std::size_t j = 1; j <= vObsum_; ++j) {
       obj_value += reg * x[lagrangian_l_start_index + i * (horizon_ + 1) + j] *
                    x[lagrangian_l_start_index + i * (horizon_ + 1) + j];
     }
@@ -412,8 +427,8 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   for (std::size_t i = 1; i < horizon_ + 1; ++i) {
     // TODO(QiL) : Double check the dimensions here !!!!!!!!!
     for (std::size_t j = 1; j <= 4 * nOb_; ++j) {
-      obj_value += reg * x[lagrangian_n_start_index + i * (horizon_ + 1) + j] *
-                   x[lagrangian_n_start_index + i * (horizon_ + 1) + j];
+      obj_value += reg * x[lagrangian_n_start_index + i * 4 * nOb_ + j] *
+                   x[lagrangian_n_start_index + i * 4 * nOb_ + j];
     }
   }
   return true;
