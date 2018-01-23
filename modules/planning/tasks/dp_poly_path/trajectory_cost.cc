@@ -155,7 +155,8 @@ ComparableCost TrajectoryCost::CalculatePathCost(
 
     double left_width = 0.0;
     double right_width = 0.0;
-    reference_line_->GetLaneWidth(curve_s + start_s, &left_width, &right_width);
+    reference_line_->GetLaneWidth(curve_s + start_s, &left_width,
+                                  &right_width);
 
     constexpr double kBuff = 0.2;
     if (!is_change_lane_path_ && (l + width / 2.0 + kBuff > left_width ||
