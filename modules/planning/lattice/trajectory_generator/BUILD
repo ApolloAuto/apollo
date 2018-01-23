@@ -57,4 +57,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "backup_trajectory",
+    hdrs = [
+        "backup_trajectory.h",
+    ],
+    srcs = [
+        "backup_trajectory.cc",
+    ],
+    deps = [
+        "//modules/common:common",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+    ],
+)
+
 cpplint()
