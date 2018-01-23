@@ -21,6 +21,8 @@ You have several options:
 
 5. Allocate more than 1GB of memory, at the recommended minimum, for your computer.
 
+6. If roscore cannot start in apollo docker, you may need to tune the master start timeout value in ROS. You may want to check a related user-reported [issue](https://github.com/ApolloAuto/apollo/issues/2500) for more details.
+
 ## If I cannot solve my build problems, what is the most effective way to ask for help?
 Many build problems are related to the environment settings. 
 

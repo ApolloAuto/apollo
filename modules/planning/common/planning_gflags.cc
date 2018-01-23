@@ -363,11 +363,35 @@ DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
-DEFINE_double(
-    collision_buffer_expansion_ratio, 0.2,
-    "The ratio w.r.t. the vehicle dimension to expand in collision checking");
+DEFINE_double(collision_buffer_expansion_ratio, 0.2,
+              "The ratio w.r.t. the vehicle dimension "
+              "to expand in collision checking");
 DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
 DEFINE_double(lateral_obstacle_ignore_thred, 2.0,
               "Lateral threshold for "
               "obstacles to be considered in path-time graph");
+
+// Lattice Evaluate Parameters
+DEFINE_double(weight_lon_travel, 6.0,
+              "Weight of longitudinal travel cost");
+DEFINE_double(weight_lon_jerk, 1.0,
+              "Weight of longitudinal jerk cost");
+DEFINE_double(weight_lon_collision, 2.0,
+              "Weight of logitudinal collision cost");
+DEFINE_double(weight_lat_offset, 2.0,
+              "Weight of lateral offset cost");
+DEFINE_double(weight_same_side_offset, 1.0,
+              "Weight of same side lateral offset cost");
+DEFINE_double(weight_opposite_side_offset, 10.0,
+              "Weight of opposite side lateral offset cost");
+DEFINE_double(weight_dist_travelled, 10.0,
+              "Weight of travelled distance cost");
+DEFINE_double(weight_target_speed, 1.0,
+               "Weight of target speed cost");
+DEFINE_double(lat_offset_bound, 3.0,
+              "The bound of lateral offset");
+DEFINE_double(lon_collision_buffer, 1.0,
+              "Longitudinal collision buffer");
+DEFINE_double(lon_collision_cost_std, 0.5,
+              "The standard deviation of logitudinal collision cost function");

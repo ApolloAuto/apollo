@@ -25,6 +25,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
+        "//modules/prediction/common:feature_output",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",

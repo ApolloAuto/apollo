@@ -4,6 +4,7 @@ package apollo.prediction;
 
 import "modules/prediction/proto/lane_graph.proto";
 import "modules/common/proto/geometry.proto";
+import "modules/perception/proto/perception_obstacle.proto";
 
 message Lane {
     // Features of all possible current lanes
@@ -62,4 +63,5 @@ message Feature {
     optional double t_acc = 21 [deprecated = true];
 
     optional bool is_still = 22 [default = false];
+    optional apollo.perception.PerceptionObstacle.Type type = 23;
 }

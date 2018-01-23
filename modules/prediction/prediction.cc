@@ -22,6 +22,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/container/container_manager.h"
@@ -91,12 +92,22 @@ Status Prediction::Init() {
     return OnError("Map cannot be loaded.");
   }
 
+  if (FLAGS_prediction_offline_mode) {
+    if (!FeatureOutput::Ready()) {
+      return OnError("Feature output is not ready.");
+    }
+  }
+
   return Status::OK();
 }
 
 Status Prediction::Start() { return Status::OK(); }
 
-void Prediction::Stop() {}
+void Prediction::Stop() {
+  if (FLAGS_prediction_offline_mode) {
+    FeatureOutput::Close();
+  }
+}
 
 void Prediction::OnLocalization(const LocalizationEstimate& localization) {
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
@@ -166,6 +177,12 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
 
   // Make predictions
   EvaluatorManager::instance()->Run(perception_obstacles);
+
+  // No prediction for offline mode
+  if (FLAGS_prediction_offline_mode) {
+    return;
+  }
+
   PredictorManager::instance()->Run(perception_obstacles);
 
   auto prediction_obstacles =
