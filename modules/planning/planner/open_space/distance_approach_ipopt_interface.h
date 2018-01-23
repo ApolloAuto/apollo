@@ -36,7 +36,7 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
       const int num_of_variables, const int num_of_constraints,
       std::size_t horizon, float ts, float wheelbase_length,
       Eigen::MatrixXd ego, Eigen::MatrixXd x0, Eigen::MatrixXd xf,
-      Eigen::MatrixXd XYbounds);
+      Eigen::MatrixXd XYbounds, Eigen::MatrixXd vOb, std::size_t nOb);
 
   virtual ~DistanceApproachIPOPTInterface() = default;
 
@@ -117,6 +117,8 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   double l_ev_;
   std::vector<double> g_;
   double offset_;
+  Eigen::MatrixXd vOb_;
+  std::size_t nOb_;
 };
 
 }  // namespace planning

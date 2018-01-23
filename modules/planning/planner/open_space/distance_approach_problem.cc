@@ -39,7 +39,8 @@ DistanceApproachProblem::DistanceApproachProblem(
     Eigen::MatrixXd x0, Eigen::MatrixXd xF, std::size_t horizon, float ts,
     float wheelbase_length, Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
     Eigen::MatrixXd uWS, Eigen::MatrixXd timeWS, Eigen::MatrixXd XYbounds,
-    int nOb, Eigen::MatrixXd vOb, Eigen::MatrixXd AOb, Eigen::MatrixXd bOb)
+    std::size_t nOb, Eigen::MatrixXd vOb, Eigen::MatrixXd AOb,
+    Eigen::MatrixXd bOb)
     : x0_(x0),
       xF_(xF),
       horizon_(horizon),
@@ -98,7 +99,7 @@ bool DistanceApproachProblem::Solve(std::vector<double>* x1_result,
   // TODO(QiL) : evaluate whether need to new it everytime
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
       num_of_variables, num_of_constraints, horizon_, ts_, wheelbase_length_,
-      ego_, x0_, xF_, XYbounds_);
+      ego_, x0_, xF_, XYbounds_, vOb_, nOb_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
