@@ -75,7 +75,7 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
 
   // TODO(QiL): Step 3 : Get obstacles from map/perception convex sets from
   // vetices using H-represetntation
-  int nOb = 3;  // number of obstacles
+  std::size_t nOb = 3;  // number of obstacles
   Eigen::MatrixXd vOb(3, 1);
   vOb << 4, 4, 4;
 
@@ -162,7 +162,7 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   return Status::OK();
 }
 
-Status ObsHRep(const int& nOb, const Eigen::MatrixXd& vOb,
+Status ObsHRep(const std::sizet_t& nOb, const Eigen::MatrixXd& vOb,
                const std::vector<std::vector<Eigen::MatrixXd>>& lOb,
                Eigen::MatrixXd* A_all, Eigen::MatrixXd* b_all) {
   // TODO(QiL) : Code replacement : find alternative ways for H presentation
@@ -178,7 +178,7 @@ Status ObsHRep(const int& nOb, const Eigen::MatrixXd& vOb,
 
   // start building H representation
   // TODO(QiL) : Add basic sanity check for H representation.
-  for (int i = 1; i != nOb; ++i) {
+  for (std::size_t i = 1; i != nOb; ++i) {
     Eigen::MatrixXd A_i(int(vOb(i - 1, 0)), 2);
     Eigen::MatrixXd b_i(int(vOb(i - 1, 0)), 1);
 

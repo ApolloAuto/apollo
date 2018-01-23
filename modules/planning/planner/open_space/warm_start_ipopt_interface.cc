@@ -80,7 +80,7 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
 
   // Variables: includes state, u and sample time
 
-  // 1. state variables
+  // 1. state variables, 4 * (N +1)
   // start point pose
   std::size_t variable_index = 0;
   for (std::size_t i = 0; i < 4; ++i) {
@@ -89,8 +89,8 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
   }
   variable_index += 4;
 
-  // During horizons
-  for (std::size_t i = 1; i < horizon_ - 1; ++i) {
+  // During horizons, 2 ~ N -1
+  for (std::size_t i = 2; i <= horizon_ - 1; ++i) {
     // x
     x_l[variable_index] = XYbounds_(0, 0);
     x_u[variable_index] = XYbounds_(1, 0);
@@ -112,7 +112,7 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
     variable_index += 4;
   }
 
-  // end point pose
+  // end point pose, 4 * (N+1)
   for (std::size_t i = 0; i < 4; ++i) {
     x_l[variable_index + i] = xf_(i, 0);
     x_u[variable_index + i] = xf_(i, 0);
@@ -121,8 +121,8 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
   ADEBUG << "variable_index after adding state constraints : "
          << variable_index;
 
-  // 2. control varialbles
-  for (std::size_t i = 1; i < horizon_; ++i) {
+  // 2. control varialbles, 2 * 1~N
+  for (std::size_t i = 1; i <= horizon_ - 1; ++i) {
     // u1
     x_l[variable_index] = -0.6;
     x_u[variable_index] = 0.6;
@@ -136,8 +136,8 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
   ADEBUG << "variable_index after adding input constraints : "
          << variable_index;
 
-  // 3. sampling time variables
-  for (std::size_t i = 1; i < horizon_; ++i) {
+  // 3. sampling time variables, N+1
+  for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
     x_l[variable_index] = -0.6;
     x_u[variable_index] = 0.6;
 
@@ -157,8 +157,8 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
   }
   constraint_index += 4;
 
-  // During horizons
-  for (std::size_t i = 1; i < horizon_ - 1; ++i) {
+  // During horizons, 2 ~ N-1
+  for (std::size_t i = 1; i <= horizon_ - 1; ++i) {
     // x
     g_l[constraint_index] = XYbounds_(0, 0);
     g_u[constraint_index] = XYbounds_(1, 0);
@@ -180,7 +180,7 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
     constraint_index += 4;
   }
 
-  // end point pose
+  // end point pose, 4 * (N+1)
   for (std::size_t i = 0; i < 4; ++i) {
     g_l[constraint_index + i] = xf_(i, 0);
     g_u[constraint_index + i] = xf_(i, 0);
@@ -189,8 +189,8 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
   ADEBUG << "constraint_index after adding state constraints : "
          << constraint_index;
 
-  // 2. input constraints
-  for (std::size_t i = 1; i < horizon_; ++i) {
+  // 2. input constraints, 2 * N
+  for (std::size_t i = 1; i <= horizon_; ++i) {
     // u1
     g_l[constraint_index] = -0.6;
     g_u[constraint_index] = 0.6;
@@ -204,8 +204,8 @@ bool WarmStartIPOPTInterface::get_bounds_info(int n, double* x_l, double* x_u,
   ADEBUG << "constraint_index after adding input constraints : "
          << constraint_index;
 
-  // 3. sampling time constraints
-  for (std::size_t i = 1; i < horizon_; ++i) {
+  // 3. sampling time constraints, N+1
+  for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
     g_l[constraint_index] = -0.6;
     g_u[constraint_index] = 0.6;
 
@@ -316,6 +316,8 @@ bool WarmStartIPOPTInterface::eval_f(int n, const double* x, bool new_x,
                                      double& obj_value) {
   // first (horizon_ + 1) * 4 is state, then next horizon_ * 2 is control input,
   // then last horizon_ + 1 is sampling time
+
+  // TODO(QiL) : change the weight to configs
   std::size_t start_index = (horizon_ + 1) * 4;
   std::size_t time_start_index = start_index + horizon_ * 2;
   for (std::size_t i = 0; i < horizon_; ++i) {
