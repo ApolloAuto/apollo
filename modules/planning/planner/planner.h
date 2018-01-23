@@ -50,14 +50,22 @@ class Planner {
   virtual apollo::common::Status Init(const PlanningConfig& config) = 0;
 
   /**
+   * @brief Compute trajectories for execution.
+   * @param planning_init_point The trajectory point where planning starts.
+   * @param frame Current planning frame.
+   * @return OK if planning succeeds; error otherwise.
+   */
+  virtual apollo::common::Status Plan(
+      const common::TrajectoryPoint& planning_init_point, Frame* frame) = 0;
+
+  /**
    * @brief Compute a trajectory for execution.
    * @param planning_init_point The trajectory point where planning starts.
    * @param frame Current planning frame.
    * @param reference_line_info The computed reference line.
    * @return OK if planning succeeds; error otherwise.
    */
-
-  virtual apollo::common::Status Plan(
+  virtual apollo::common::Status PlanOnReferenceLine(
       const common::TrajectoryPoint& planning_init_point, Frame* frame,
       ReferenceLineInfo* reference_line_info) = 0;
 };

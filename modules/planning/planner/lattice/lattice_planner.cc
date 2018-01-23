@@ -98,9 +98,42 @@ Status LatticePlanner::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-Status LatticePlanner::Plan(const TrajectoryPoint& planning_init_point,
-                            Frame* frame,
-                            ReferenceLineInfo* reference_line_info) {
+Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
+                            Frame* frame) {
+  auto status = Status::OK();
+  bool has_plan = false;
+  auto it = std::find_if(
+      frame->reference_line_info().begin(),
+      frame->reference_line_info().end(),
+      [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
+  if (it != frame->reference_line_info().end()) {
+    status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
+    has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
+                it->TrajectoryLength() > FLAGS_change_lane_min_length);
+    if (!has_plan) {
+      AERROR << "Fail to plan for lane change.";
+    }
+  }
+
+  if (!has_plan || !FLAGS_prioritize_change_lane) {
+    for (auto& reference_line_info : frame->reference_line_info()) {
+      if (reference_line_info.IsChangeLanePath()) {
+        continue;
+      }
+      status = PlanOnReferenceLine(planning_start_point, frame,
+                                   &reference_line_info);
+      if (status != Status::OK()) {
+        AERROR << "planner failed to make a driving plan for: "
+               << reference_line_info.Lanes().Id();
+      }
+    }
+  }
+  return status;
+}
+
+Status LatticePlanner::PlanOnReferenceLine(
+    const TrajectoryPoint& planning_init_point,
+    Frame* frame, ReferenceLineInfo* reference_line_info) {
   static std::size_t num_planning_cycles = 0;
   static std::size_t num_planning_succeeded_cycles = 0;
 
