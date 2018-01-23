@@ -329,7 +329,7 @@ bool DPRoadGraph::SamplePathWaypoints(
       if (HasSidepass()) {
         // currently only left nudge is supported. Need road hard boundary for
         // both sides
-        sample_l.push_back(eff_left_width + 0.5);
+        sample_l.push_back(eff_left_width + config_.sidepass_distance());
       }
     }
     std::vector<common::SLPoint> level_points;
