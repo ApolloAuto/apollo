@@ -78,9 +78,11 @@ bool Bitmap2D::IsExist(const Eigen::Vector2d& p) const {
 }
 
 bool Bitmap2D::Check(const Eigen::Vector2d& p) const {
-  Vec2ui grid_pt = ((p - min_p_).array() / grid_size_.array()).cast<size_t>();
+  Eigen::Matrix<size_t, 2, 1> grid_pt =
+      ((p - min_p_).array() / grid_size_.array()).cast<size_t>();
 
-  Vec2ui major_grid_pt(grid_pt[dir_major_], grid_pt[op_dir_major_]);
+  Eigen::Matrix<size_t, 2, 1> major_grid_pt(grid_pt[dir_major_],
+                                            grid_pt[op_dir_major_]);
 
   size_t x_id = major_grid_pt.x();
   size_t block_id = major_grid_pt.y() >> 6;  // major_grid_pt.y() / 64
@@ -103,7 +105,8 @@ Bitmap2D::Bitmap2D(const Eigen::Vector2d& min_p, const Eigen::Vector2d& max_p,
 }
 
 void Bitmap2D::BuildMap() {
-  Vec2ui dims = ((max_p_ - min_p_).array() / grid_size_.array()).cast<size_t>();
+  Eigen::Matrix<size_t, 2, 1> dims =
+      ((max_p_ - min_p_).array() / grid_size_.array()).cast<size_t>();
   size_t rows = dims[dir_major_];
   size_t cols = (dims[op_dir_major_] >> 6) + 1;
 

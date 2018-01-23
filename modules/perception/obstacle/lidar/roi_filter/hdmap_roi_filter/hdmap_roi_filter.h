@@ -118,13 +118,13 @@ class HdmapROIFilter : public BaseROIFilter {
 
   // We only filter point with local coordinates x, y in [-range, range] in
   // meters
-  double range_;
+  double range_ = 0.0;
 
   // Hight and width of grid in bitmap
-  double cell_size_;
+  double cell_size_ = 0.0;
 
   // The distance extended away from the ROI boundary
-  double extend_dist_;
+  double extend_dist_ = 0.0;
 };
 
 REGISTER_ROIFILTER(HdmapROIFilter);
