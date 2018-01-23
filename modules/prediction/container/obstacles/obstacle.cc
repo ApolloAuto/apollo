@@ -1001,6 +1001,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature,
           ->mutable_lane_graph()
           ->mutable_lane_sequence(seq_id)
           ->set_lane_sequence_id(seq_id);
+      ++seq_id;
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
     }
