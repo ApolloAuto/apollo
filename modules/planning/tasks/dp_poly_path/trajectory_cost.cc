@@ -100,7 +100,7 @@ TrajectoryCost::TrajectoryCost(
                                    FLAGS_static_decision_nudge_l_buffer;
 
       // should check hard boundary here
-      if (ptr_path_obstacle->LateralDecision().has_sidepass() &&
+      if (!ptr_path_obstacle->LateralDecision().has_sidepass() &&
           left_driving_width < adc_width && right_driving_width < adc_width) {
         // lane blocking obstacle
         continue;
