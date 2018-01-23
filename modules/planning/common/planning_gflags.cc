@@ -373,13 +373,13 @@ DEFINE_double(lateral_obstacle_ignore_thred, 2.0,
               "obstacles to be considered in path-time graph");
 
 // Lattice Evaluate Parameters
-DEFINE_double(weight_lon_travel, 5.0,
+DEFINE_double(weight_lon_travel, 6.0,
               "Weight of longitudinal travel cost");
 DEFINE_double(weight_lon_jerk, 1.0,
               "Weight of longitudinal jerk cost");
-DEFINE_double(weight_lon_collision, 1.0,
+DEFINE_double(weight_lon_collision, 2.0,
               "Weight of logitudinal collision cost");
-DEFINE_double(weight_lat_offset, 1.0,
+DEFINE_double(weight_lat_offset, 2.0,
               "Weight of lateral offset cost");
 DEFINE_double(weight_same_side_offset, 1.0,
               "Weight of same side lateral offset cost");
