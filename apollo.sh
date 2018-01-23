@@ -257,10 +257,6 @@ function release() {
   # tools
   cp -r modules/tools $MODULES_DIR
 
-  # ros
-  cp -Lr bazel-apollo/external/ros ${APOLLO_DIR}/
-  rm -f ${APOLLO_DIR}/ros/*.tar.gz
-
   # scripts
   cp -r scripts ${APOLLO_DIR}
 
