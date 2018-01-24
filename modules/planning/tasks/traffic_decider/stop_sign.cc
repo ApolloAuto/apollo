@@ -241,14 +241,13 @@ int StopSign::ProcessStopStatus(
   double* start_time = Dropbox<double>::Open()->Get(
       db_key_stop_starttime);
   double stop_start_time =  (start_time == nullptr) ?
-      Clock::NowInSeconds() + 100 : *start_time;
+      Clock::NowInSeconds() + 1000 : *start_time;
   double wait_time = Clock::NowInSeconds() - stop_start_time;
   ADEBUG << "db_key_stop_starttime: " << db_key_stop_starttime
       << "; stop_start_time: " << stop_start_time
       << "; wait_time: " << wait_time;
 
   // check & update stop status
-  bool stop_start_time_set = false;
   switch (stop_status_) {
     case StopSignStopStatus::UNKNOWN:
     case StopSignStopStatus::TO_STOP:
@@ -256,7 +255,6 @@ int StopSign::ProcessStopStatus(
         stop_status_ = StopSignStopStatus::TO_STOP;
       } else {
         stop_start_time = Clock::NowInSeconds();
-        stop_start_time_set = true;
         stop_status_ = StopSignStopStatus::STOPPING;
       }
       break;
@@ -283,14 +281,10 @@ int StopSign::ProcessStopStatus(
           stop_status_);
 
   // update dropbox: stop start time
-  if (stop_start_time_set) {
-    Dropbox<double>::Open()->Set(db_key_stop_starttime,
-                                 stop_start_time);
-    ADEBUG << "update dropbox: [" << db_key_stop_starttime
-        << "] = " << stop_start_time;
-  } else {
-    Dropbox<double>::Open()->Remove(db_key_stop_starttime);
-  }
+  Dropbox<double>::Open()->Set(db_key_stop_starttime,
+                               stop_start_time);
+  ADEBUG << "update dropbox: [" << db_key_stop_starttime
+      << "] = " << stop_start_time;
 
   return 0;
 }
