@@ -64,8 +64,8 @@ class OpenSpacePlanner : public Planner {
    * @return OK if planning succeeds; error otherwise.
    */
   apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame,
-      ReferenceLineInfo* reference_line_info) override;
+      const common::TrajectoryPoint& planning_init_point,
+      Frame* frame) override;
 
   apollo::common::Status ObsHRep(
       const std::size_t& nOb, const Eigen::MatrixXd& vOb,
