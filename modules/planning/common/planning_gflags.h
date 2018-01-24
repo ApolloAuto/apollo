@@ -206,6 +206,7 @@ DECLARE_double(decision_horizon);
 DECLARE_double(lateral_obstacle_ignore_thred);
 DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);
+DECLARE_double(stepwise_reference_line_position_cost);
 
 // Lattice Evaluate Parameters
 DECLARE_double(weight_lon_travel);

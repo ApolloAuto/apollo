@@ -395,6 +395,8 @@ DEFINE_bool(enable_backup_trajectory, false,
             "If generate backup trajectory when planning fail");
 DEFINE_double(backup_trajectory_cost, 1000.0,
               "Default cost of backup trajectory");
+DEFINE_double(stepwise_reference_line_position_cost, 10.0,
+              "Additive cost per reference line");
 
 // Lattice Evaluate Parameters
 DEFINE_double(weight_lon_travel, 6.0, "Weight of longitudinal travel cost");

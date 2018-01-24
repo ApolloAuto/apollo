@@ -102,34 +102,32 @@ Status LatticePlanner::Init(const PlanningConfig& config) {
 
 Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
                             Frame* frame) {
-  auto status = Status::OK();
   bool has_plan = false;
-  auto it = std::find_if(
-      frame->reference_line_info().begin(), frame->reference_line_info().end(),
-      [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
-  if (it != frame->reference_line_info().end()) {
-    status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
-    has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
-                it->TrajectoryLength() > FLAGS_change_lane_min_length);
-    if (!has_plan) {
-      AERROR << "Fail to plan for lane change.";
+  int cnt = 0;
+  // Deleted the bullshit of complicated logic of
+  // IsChangeLane and PrioritizeChangeLane
+  // Now let us uniformly plan on each reference line.
+  double position_cost = 0.0;
+  for (auto it = frame->reference_line_info().begin();
+    it != frame->reference_line_info().end(); ++it) {
+    it->SetPriorityCost(position_cost);
+    position_cost += FLAGS_stepwise_reference_line_position_cost;
+    cnt += 1;
+    auto status_per_line = PlanOnReferenceLine(planning_start_point,
+      frame, &(*it)); // Set Cost in Lattice Planner
+    if (Status::OK() != status_per_line) {
+      AWARN << "[LatticePlanner] planning on reference_line-" << cnt
+            << " failed";
+    } else {
+      has_plan = true;
     }
   }
-
-  if (!has_plan || !FLAGS_prioritize_change_lane) {
-    for (auto& reference_line_info : frame->reference_line_info()) {
-      if (reference_line_info.IsChangeLanePath()) {
-        continue;
-      }
-      status = PlanOnReferenceLine(planning_start_point, frame,
-                                   &reference_line_info);
-      if (status != Status::OK()) {
-        AERROR << "planner failed to make a driving plan for: "
-               << reference_line_info.Lanes().Id();
-      }
-    }
+  if (has_plan) {
+    return Status::OK();
+  } else {
+    return Status(ErrorCode::PLANNING_ERROR,
+      "Planning failed on each of the reference_line in this frame");
   }
-  return status;
 }
 
 Status LatticePlanner::PlanOnReferenceLine(
