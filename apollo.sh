@@ -156,7 +156,7 @@ function cibuild() {
   //modules/prediction
   //modules/routing
   "
-  bazel build $DEFINES -c dbg $@ $BUILD_TARGETS
+  bazel build $DEFINES $@ $BUILD_TARGETS
   if [ $? -eq 0 ]; then
     success 'Build passed!'
   else
@@ -179,6 +179,7 @@ function build_py_proto() {
   mkdir py_proto
   PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
   find modules/ -name "*.proto" \
+      | grep -v node_modules \
       | grep -v modules/drivers/gnss \
       | xargs ${PROTOC} --python_out=py_proto
   find py_proto/* -type d -exec touch "{}/__init__.py" \;
@@ -255,10 +256,6 @@ function release() {
 
   # tools
   cp -r modules/tools $MODULES_DIR
-
-  # ros
-  cp -Lr bazel-apollo/external/ros ${APOLLO_DIR}/
-  rm -f ${APOLLO_DIR}/ros/*.tar.gz
 
   # scripts
   cp -r scripts ${APOLLO_DIR}
@@ -380,7 +377,7 @@ function citest() {
   //modules/prediction/container/obstacles:obstacle_test
   //modules/dreamview/backend/simulation_world:simulation_world_service_test
   "
-  bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
+  bazel test $DEFINES --config=unit_test --test_verbose_timeout_warnings $@ $BUILD_TARGETS
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0

@@ -27,6 +27,7 @@
 #include "glog/logging.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/common/planning_util.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -73,14 +74,19 @@ std::pair<double, double> ReferenceLineMatcher::GetReferenceLineCoordinate(
     const std::vector<PathPoint>& reference_line, const double x,
     const double y) {
   auto matched_path_point = MatchToReferenceLine(reference_line, x, y);
-
+  double rtheta = matched_path_point.theta();
+  double rx = matched_path_point.x();
+  double ry = matched_path_point.y();
+  double delta_x = x - rx;
+  double delta_y = y - ry;
+  double side = std::cos(rtheta) * delta_y -
+                std::sin(rtheta) * delta_x;
   std::pair<double, double> relative_coordinate;
   relative_coordinate.first = matched_path_point.s();
-  relative_coordinate.second =
-      std::hypot(matched_path_point.x() - x, matched_path_point.y() - y);
+  relative_coordinate.second = std::copysign(std::hypot(delta_x, delta_y),
+                                             side);
   return relative_coordinate;
 }
-
 
 PathPoint ReferenceLineMatcher::MatchToReferenceLine(
     const std::vector<PathPoint>& reference_line, const double s) {

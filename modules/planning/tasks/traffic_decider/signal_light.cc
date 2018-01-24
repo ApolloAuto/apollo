@@ -152,7 +152,7 @@ void SignalLight::SetCreepForwardSignalDecision(
   constexpr double kCreepBuff = 3.0;
   const auto& path_decision = reference_line_info->path_decision();
   for (const auto& path_obstacle : path_decision.path_obstacles().Items()) {
-    const auto& st_boundary = path_obstacle->st_boundary();
+    const auto& st_boundary = path_obstacle->reference_line_st_boundary();
     const double stop_s =
         signal_light->start_s - FLAGS_stop_distance_traffic_light;
     if (reference_line_info->AdcSlBoundary().end_s() + st_boundary.min_s() <
@@ -204,8 +204,7 @@ double SignalLight::GetStopDeceleration(
 }
 
 bool SignalLight::BuildStopDecision(
-    Frame* frame,
-    ReferenceLineInfo* const reference_line_info,
+    Frame* frame, ReferenceLineInfo* const reference_line_info,
     const hdmap::PathOverlap* signal_light) {
   // check
   const auto& reference_line = reference_line_info->reference_line();
@@ -219,9 +218,7 @@ bool SignalLight::BuildStopDecision(
   std::string virtual_object_id =
       FLAGS_signal_light_virtual_object_id_prefix + signal_light->object_id;
   auto* obstacle = frame->AddVirtualStopObstacle(
-      reference_line_info,
-      virtual_object_id,
-      signal_light->start_s);
+      reference_line_info, virtual_object_id, signal_light->start_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle " << virtual_object_id << " in frame";
     return false;

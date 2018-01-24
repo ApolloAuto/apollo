@@ -131,7 +131,8 @@ class CanClient {
    */
   virtual apollo::common::ErrorCode SendSingleFrame(
       const std::vector<CanFrame> &frames) {
-    CHECK_EQ(frames.size(), 1);
+    CHECK_EQ(frames.size(), 1)
+        << "frames size not equal to 1, actual frame size :" << frames.size();
     int32_t n = 1;
     return Send(frames, &n);
   }

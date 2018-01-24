@@ -103,10 +103,12 @@ module.exports = {
                     }, {
                         loader: "image-webpack-loader",
                         options: {
-                            progressive: true,
                             pngquant: {
                                 quality: "65-90",
                                 speed: 4,
+                            },
+                            mozjpeg: {
+                                progressive: true,
                             }
                         }
                     }
@@ -170,7 +172,7 @@ module.exports = {
         // use the IgnorePlugin to stop any locale being bundled with moment:
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
-        // Configure global constant at "compile" time 
+        // Configure global constant at "compile" time
         // to allow different behavior between offline or realtime
         new webpack.DefinePlugin({
             OFFLINE_PLAYBACK: JSON.stringify(true),

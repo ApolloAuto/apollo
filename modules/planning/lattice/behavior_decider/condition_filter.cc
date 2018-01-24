@@ -82,10 +82,6 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
     }
 
     // a new interval
-    // @TODO(liyun): implement reference_v to be
-    // (1) front obstacle speed if front obstacle exists
-    // (2) rear obstacle speed if no front obstacle exists and only rear
-    // obstacle exists
     if (s_max_reached < path_interval.first.s()) {
       if (path_interval.first.s() <= feasible_s_upper) {
         SampleBound sample_bound;
@@ -229,7 +225,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
   double t_step = 8.0 / static_cast<double>(num_cols);
 
   if (ptr_path_time_neighborhood_->GetPathTimeObstacles().empty()) {
-    AINFO << "No_Path_Time_Neighborhood_Obstacle_in_this_frame";
+    ADEBUG << "No_Path_Time_Neighborhood_Obstacle_in_this_frame";
     return false;
   }
   for (int j = 0; j < num_cols; ++j) {

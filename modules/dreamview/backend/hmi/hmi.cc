@@ -48,12 +48,16 @@ DEFINE_string(ota_service_url, "http://180.76.145.202:5000/query",
 DEFINE_string(ota_vehicle_info_file, "modules/tools/ota/vehicle_info.pb.txt",
               "Vehicle info to request OTA.");
 
+DEFINE_double(system_status_lifetime_seconds, 30,
+              "Lifetime of a valid SystemStatus message.");
+
 namespace apollo {
 namespace dreamview {
 namespace {
 
 using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
+using apollo::common::time::Clock;
 using apollo::common::util::FindOrNull;
 using apollo::common::util::GetProtoFromASCIIFile;
 using apollo::common::util::JsonUtil;
@@ -282,8 +286,11 @@ void HMI::RegisterMessageHandlers() {
   // Received new system status, broadcast to clients.
   AdapterManager::AddSystemStatusCallback(
       [this](const monitor::SystemStatus &system_status) {
-        *status_.mutable_system_status() = system_status;
-        BroadcastHMIStatus();
+        if (Clock::NowInSeconds() - system_status.header().timestamp_sec() <
+            FLAGS_system_status_lifetime_seconds) {
+          *status_.mutable_system_status() = system_status;
+          BroadcastHMIStatus();
+        }
       });
 }
 

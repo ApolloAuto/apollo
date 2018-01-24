@@ -1,11 +1,11 @@
 # Perception
 
 ## Introduction
-The perception module incorporates the capability of recognizing obstacles and traffic lights. The obstacle submodule detects, segments, classifies and tracks obstacles in the ROI that is defined by the high-resolution (HD) map. The submodule also predicts obstacle motion and position information (e.g., heading and velocity). Also, the traffic light submodule detects traffic lights and recognizes their status in the images. 
+The perception module incorporates the capability of recognizing obstacles and traffic lights. The obstacle submodule detects, segments, classifies and tracks obstacles in the ROI that is defined by the high-resolution (HD) map. The submodule also predicts obstacle motion and position information (e.g., heading and velocity). Also, the traffic light submodule detects traffic lights and recognizes their status in the images.
 
 See Also:
 
- [3D obstacles perception](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/3d_obstacle_perception.md). 
+ [3D obstacles perception](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/3d_obstacle_perception.md).
 
  [Traffic light perception](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/traffic_light.md).
 
@@ -34,7 +34,7 @@ The perception module outputs are:
 - [ ] 1. Set up the general settings in the configuration file `modules/perception/conf/perception.conf`.
 - [ ] 2. Run the command  `./scripts/bootstrap.sh` to launch the web GUI.
 - [ ] 3. Select the vehicle model and HD map in the web GUI.
-- [ ] 4. Launch the perception module using the command `./scripts/perception.sh start` or by enabling the perception button on the *Module Controller* page of the web GUI. The command for stopping perception is `./scripts/perception.sh stop`.
+- [ ] 4. Launch the perception module using the command `./scripts/perception.sh start` or by enabling the perception button on the *Module Controller* page of the web GUI. The command for stopping perception is `./scripts/perception.sh stop`. Note: please do not try to use GUI to enable perception but use script to stop it, vice versa. 
 
 
 - [ ] 5. Download the demo data from the Apollo [Open Data Platform](https://console.bce.baidu.com/apollo/task/download).
@@ -44,11 +44,11 @@ The perception framework is a directed acyclic graph (DAG). There are three comp
 
 A typical DAG configuration for a perception module is shown in the example below.  The example DAG configuration features the following:  
 
-- Default obstacle perception that consists of "LidarProcessSubnode", "RadarProcessSubnode" and "FusionSubnode", as shown in *subnode_config*. 
-- The "LidarProcessSubnode" and "RadarProcessSubnode" that receive sensor data and output obstacle data independently, i.e., the "LidarObjectData" and "RadarObjectData" in *data_config*. 
-- The "FusionSubnode" that both subscribes the obstacle data and publishes the final results. 
-- Traffic light perception that is composed of "TLPreprocessorSubnode" and "TLProcSubnode". 
-- The edge and data configuration that define the links. 
+- Default obstacle perception that consists of "LidarProcessSubnode", "RadarProcessSubnode" and "FusionSubnode", as shown in *subnode_config*.
+- The "LidarProcessSubnode" and "RadarProcessSubnode" that receive sensor data and output obstacle data independently, i.e., the "LidarObjectData" and "RadarObjectData" in *data_config*.
+- The "FusionSubnode" that both subscribes the obstacle data and publishes the final results.
+- Traffic light perception that is composed of "TLPreprocessorSubnode" and "TLProcSubnode".
+- The edge and data configuration that define the links.
 - Each function can be disabled by removing the corresponding sub-node, edge, and shared data configuration. However you must ensure that all the input and output configurations are correct.
 
 ``` protobuf
@@ -84,7 +84,7 @@ A typical DAG configuration for a perception module is shown in the example belo
           name: "TLPreprocessorSubnode"
           type: SUBNODE_IN
       }
-      
+
       # TrafficLight process node.
       subnodes {
           id: 42
@@ -117,7 +117,7 @@ A typical DAG configuration for a perception module is shown in the example belo
               name: "radar_fusion"
           }
       }
-      
+
       # TLPreprocessorSubnode -> TLProcSubnode
       edges {
           id: 201
@@ -148,8 +148,8 @@ A typical DAG configuration for a perception module is shown in the example belo
   }
 ```
 
-**Note**: Nvidia GPU and CUDA are required to run the perception module with Caffe. Apollo provides the CUDA and Caffe libraries in the released docker. However, the Nvidia GPU driver is not installed in the released dev docker image. 
+**Note**: Nvidia GPU and CUDA are required to run the perception module with Caffe. Apollo provides the CUDA and Caffe libraries in the released docker. However, the Nvidia GPU driver is not installed in the released dev docker image.
 
-To run the perception module with CUDA acceleration, install the exact same version of the Nvidia driver in the docker that is installed in your host machine, and then build Apollo with the GPU option (i.e., using `./apollo.sh build_gpu` or `./apollo.sh build_opt_gpu`). 
+To run the perception module with CUDA acceleration, install the exact same version of the Nvidia driver in the docker that is installed in your host machine, and then build Apollo with the GPU option (i.e., using `./apollo.sh build_gpu` or `./apollo.sh build_opt_gpu`).
 
 See [How to Run Perception Module on Your Local Computer](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_perception_module_on_your_local_computer.md).

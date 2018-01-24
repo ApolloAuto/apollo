@@ -83,6 +83,8 @@ class PathObstacle {
 
   const SLBoundary& PerceptionSLBoundary() const;
 
+  const StBoundary& reference_line_st_boundary() const;
+
   const StBoundary& st_boundary() const;
 
   const std::vector<std::string>& decider_tags() const;
@@ -102,6 +104,12 @@ class PathObstacle {
 
   void EraseStBoundary();
 
+  void SetReferenceLineStBoundary(const StBoundary& boundary);
+
+  void SetReferenceLineStBoundaryType(const StBoundary::BoundaryType type);
+
+  void EraseReferenceLineStBoundary();
+
   bool HasLongitudinalDecision() const;
 
   bool HasNonIgnoreDecision() const;
@@ -116,8 +124,8 @@ class PathObstacle {
   bool IsLongitudinalIgnore() const;
   bool IsLateralIgnore() const;
 
-  void BuildStBoundary(const ReferenceLine& reference_line,
-                       const double adc_start_s);
+  void BuildReferenceLineStBoundary(const ReferenceLine& reference_line,
+                                    const double adc_start_s);
 
   void SetPerceptionSlBoundary(const SLBoundary& sl_boundary);
 
@@ -131,8 +139,12 @@ class PathObstacle {
    **/
   static bool IsLateralDecision(const ObjectDecisionType& decision);
 
-  void SetBlockingObstacle(bool blocking) { is_blocking_obstacle_ = blocking; }
-  bool IsBlockingObstacle() const { return is_blocking_obstacle_; }
+  void SetBlockingObstacle(bool blocking) {
+    is_blocking_obstacle_ = blocking;
+  }
+  bool IsBlockingObstacle() const {
+    return is_blocking_obstacle_;
+  }
 
  private:
   FRIEND_TEST(MergeLongitudinalDecision, AllDecisions);
@@ -153,6 +165,7 @@ class PathObstacle {
   std::vector<std::string> decider_tags_;
   SLBoundary perception_sl_boundary_;
 
+  StBoundary reference_line_st_boundary_;
   StBoundary st_boundary_;
 
   ObjectDecisionType lateral_decision_;

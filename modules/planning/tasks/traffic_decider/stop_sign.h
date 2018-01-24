@@ -23,6 +23,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
@@ -31,6 +32,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::hdmap::LaneInfoConstPtr;
+using apollo::hdmap::OverlapInfoConstPtr;
 using apollo::hdmap::PathOverlap;
 using apollo::hdmap::StopSignInfo;
 using apollo::perception::PerceptionObstacle;
@@ -44,20 +46,21 @@ class StopSign : public TrafficRule {
 
   bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
 
- private:
   enum class StopSignStopStatus {
-    TO_STOP = 0,
-    STOPPING = 1,
-    STOP_DONE = 2,
+    UNKNOWN = 0,
+    TO_STOP = 1,
+    STOPPING = 2,
+    STOP_DONE = 3,
   };
 
+ private:
   void MakeDecisions(Frame* frame,
                      ReferenceLineInfo* const reference_line_info);
   bool FindNextStopSign(ReferenceLineInfo* const reference_line_info);
-  int GetAssociateLanes(const StopSignInfo& stop_sign_info);
+  int GetAssociatedLanes(const StopSignInfo& stop_sign_info);
   int ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
                         const StopSignInfo& stop_sign_info);
-  bool ChecADCkStop(ReferenceLineInfo* const reference_line_info);
+  bool CheckADCkStop(ReferenceLineInfo* const reference_line_info);
   int GetWatchVehicles(const StopSignInfo& stop_sign_info,
                        StopSignLaneVehicles* watch_vehicles);
   int UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles);
@@ -83,7 +86,8 @@ class StopSign : public TrafficRule {
   PathOverlap* next_stop_sign_overlap_ = nullptr;
   StopSignInfo* next_stop_sign_ = nullptr;
   StopSignStopStatus stop_status_;
-  std::vector<LaneInfoConstPtr> associate_lanes_;
+  std::vector<std::pair<LaneInfoConstPtr,
+      OverlapInfoConstPtr>> associated_lanes_;
 };
 
 }  // namespace planning

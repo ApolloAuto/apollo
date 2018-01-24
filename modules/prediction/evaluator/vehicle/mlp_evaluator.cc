@@ -119,6 +119,17 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
                          obstacle_feature_values.end());
   feature_values->insert(feature_values->end(), lane_feature_values.begin(),
                          lane_feature_values.end());
+
+  if (FLAGS_prediction_offline_mode) {
+    SaveOfflineFeatures(lane_sequence_ptr, *feature_values);
+  }
+}
+
+void MLPEvaluator::SaveOfflineFeatures(
+    LaneSequence* sequence, const std::vector<double>& feature_values) {
+  for (double feature_value : feature_values) {
+    sequence->mutable_features()->add_mlp_features(feature_value);
+  }
 }
 
 void MLPEvaluator::SetObstacleFeatureValues(

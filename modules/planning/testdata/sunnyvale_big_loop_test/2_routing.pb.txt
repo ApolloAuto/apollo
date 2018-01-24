@@ -1,0 +1,463 @@
+header {
+  timestamp_sec: 1515787855.7631638
+  module_name: "routing"
+  sequence_num: 5
+}
+road {
+  id: "1422-1416-1415-160-2414-42-1770-3143-3142-22a-68-69-2193-1837-1838-1844-695-1848-1853-1850-1854-1855-1842-1851-138a-1859-2971-812-494-2332-515-379-2964-775-1856-773-774-380-2955-519-597-52-1847-1852-1862-2960-57-9760-2959-302a-2974-2146-2147-378-1771-449-868-458-455-457-343-451-1270-204-452-2975-1872-475-67a-1861-476-2956-698-368-2965-2972-1871-1263-210a-687-518-1860-682-53"
+  passage {
+    segment {
+      id: "302a_1_-1"
+      start_s: 4.7953580764580543
+      end_s: 30.3965
+    }
+    segment {
+      id: "773_1_-1"
+      start_s: 0
+      end_s: 78.6525
+    }
+    segment {
+      id: "775_1_-1"
+      start_s: 0
+      end_s: 14.3568
+    }
+    segment {
+      id: "774_1_-1"
+      start_s: 0
+      end_s: 8.68002
+    }
+    segment {
+      id: "2955_1_-1"
+      start_s: 0
+      end_s: 10.6996
+    }
+    segment {
+      id: "2956_1_-1"
+      start_s: 0
+      end_s: 45.0378
+    }
+    segment {
+      id: "2959_1_-1"
+      start_s: 0
+      end_s: 11.5759
+    }
+    segment {
+      id: "2960_1_-1"
+      start_s: 0
+      end_s: 34.7844
+    }
+    segment {
+      id: "343_1_-1"
+      start_s: 0
+      end_s: 24.944
+    }
+    segment {
+      id: "378_1_-1"
+      start_s: 0
+      end_s: 58.8707
+    }
+    segment {
+      id: "2964_1_-1"
+      start_s: 0
+      end_s: 15.5177
+    }
+    segment {
+      id: "379_1_-1"
+      start_s: 0
+      end_s: 6.06045
+    }
+    segment {
+      id: "2965_1_-1"
+      start_s: 0
+      end_s: 38.4422
+    }
+    segment {
+      id: "380_1_-1"
+      start_s: 0
+      end_s: 99.1375
+    }
+    segment {
+      id: "2971_1_-1"
+      start_s: 0
+      end_s: 10.5341
+    }
+    segment {
+      id: "2972_1_-1"
+      start_s: 0
+      end_s: 86.7733
+    }
+    segment {
+      id: "2974_1_-1"
+      start_s: 0
+      end_s: 10.4853
+    }
+    segment {
+      id: "2975_1_-1"
+      start_s: 0
+      end_s: 16.631
+    }
+    segment {
+      id: "812_1_-1"
+      start_s: 0
+      end_s: 26.8009
+    }
+    segment {
+      id: "204_1_-1"
+      start_s: 0
+      end_s: 18.3654
+    }
+    segment {
+      id: "138a_1_-1"
+      start_s: 0
+      end_s: 20.7064
+    }
+    segment {
+      id: "368_1_-1"
+      start_s: 0
+      end_s: 15.2844
+    }
+    segment {
+      id: "449_1_-1"
+      start_s: 0
+      end_s: 230.728
+    }
+    segment {
+      id: "868_1_-1"
+      start_s: 0
+      end_s: 36.4701
+    }
+    segment {
+      id: "458_1_-1"
+      start_s: 0
+      end_s: 57.836
+    }
+    segment {
+      id: "457_1_-1"
+      start_s: 0
+      end_s: 117.537
+    }
+    segment {
+      id: "455_1_-1"
+      start_s: 0
+      end_s: 62.4772
+    }
+    segment {
+      id: "451_1_-1"
+      start_s: 0
+      end_s: 317.813
+    }
+    segment {
+      id: "494_1_-1"
+      start_s: 0
+      end_s: 33.7078
+    }
+    segment {
+      id: "452_1_-1"
+      start_s: 0
+      end_s: 164.511
+    }
+    segment {
+      id: "475_1_-1"
+      start_s: 0
+      end_s: 30.7505
+    }
+    segment {
+      id: "476_1_-1"
+      start_s: 0
+      end_s: 24.6543
+    }
+    segment {
+      id: "698_1_-1"
+      start_s: 0
+      end_s: 13.9724
+    }
+    segment {
+      id: "1263_1_-1"
+      start_s: 0
+      end_s: 15.0457
+    }
+    segment {
+      id: "210a_1_-1"
+      start_s: 0
+      end_s: 29.0363
+    }
+    segment {
+      id: "518_1_-1"
+      start_s: 0
+      end_s: 47.6247
+    }
+    segment {
+      id: "1872_1_-1"
+      start_s: 0
+      end_s: 15.8705
+    }
+    segment {
+      id: "1871_1_-1"
+      start_s: 0
+      end_s: 10.6939
+    }
+    segment {
+      id: "597_1_-1"
+      start_s: 0
+      end_s: 16.9234
+    }
+    segment {
+      id: "519_1_-2"
+      start_s: 0
+      end_s: 3.37796
+    }
+    segment {
+      id: "2332_1_-2"
+      start_s: 0
+      end_s: 22.2108
+    }
+    segment {
+      id: "515_1_-2"
+      start_s: 0
+      end_s: 24.8906
+    }
+    segment {
+      id: "682_1_-1"
+      start_s: 0
+      end_s: 54.2269
+    }
+    segment {
+      id: "52_1_-1"
+      start_s: 0
+      end_s: 5.90927
+    }
+    segment {
+      id: "53_1_-1"
+      start_s: 0
+      end_s: 23.1426
+    }
+    segment {
+      id: "57_1_-1"
+      start_s: 0
+      end_s: 3.72415
+    }
+    segment {
+      id: "2147_1_-1"
+      start_s: 0
+      end_s: 11.9317
+    }
+    segment {
+      id: "2146_1_-1"
+      start_s: 0
+      end_s: 25.9902
+    }
+    segment {
+      id: "1851_1_-1"
+      start_s: 0
+      end_s: 91.4233
+    }
+    segment {
+      id: "1862_1_-1"
+      start_s: 0
+      end_s: 11.5187
+    }
+    segment {
+      id: "1861_1_-1"
+      start_s: 0
+      end_s: 28.9878
+    }
+    segment {
+      id: "1860_1_-1"
+      start_s: 0
+      end_s: 11.0053
+    }
+    segment {
+      id: "1859_1_-1"
+      start_s: 0
+      end_s: 75.3014
+    }
+    segment {
+      id: "1856_1_-1"
+      start_s: 0
+      end_s: 31.8025
+    }
+    segment {
+      id: "1855_1_-1"
+      start_s: 0
+      end_s: 68.3164
+    }
+    segment {
+      id: "1854_1_-1"
+      start_s: 0
+      end_s: 40.0975
+    }
+    segment {
+      id: "1853_1_-1"
+      start_s: 0
+      end_s: 9.95527
+    }
+    segment {
+      id: "1852_1_-1"
+      start_s: 0
+      end_s: 29.6546
+    }
+    segment {
+      id: "1850_1_-1"
+      start_s: 0
+      end_s: 40.4792
+    }
+    segment {
+      id: "1270_1_-1"
+      start_s: 0
+      end_s: 16.9229
+    }
+    segment {
+      id: "1848_1_-1"
+      start_s: 0
+      end_s: 9.61716
+    }
+    segment {
+      id: "1847_1_-1"
+      start_s: 0
+      end_s: 18.8422
+    }
+    segment {
+      id: "695_1_-1"
+      start_s: 0
+      end_s: 11.7727
+    }
+    segment {
+      id: "1844_1_-1"
+      start_s: 0
+      end_s: 17.847
+    }
+    segment {
+      id: "1842_1_-1"
+      start_s: 0
+      end_s: 14.6566
+    }
+    segment {
+      id: "687_1_-1"
+      start_s: 0
+      end_s: 75.8955
+    }
+    segment {
+      id: "1838_1_-1"
+      start_s: 0
+      end_s: 9.7439
+    }
+    segment {
+      id: "1837_1_-1"
+      start_s: 0
+      end_s: 11.0469
+    }
+    segment {
+      id: "2193_1_-1"
+      start_s: 0
+      end_s: 11.6358
+    }
+    segment {
+      id: "69_1_-1"
+      start_s: 0
+      end_s: 39.0273
+    }
+    segment {
+      id: "68_1_-1"
+      start_s: 0
+      end_s: 16.5147
+    }
+    segment {
+      id: "22a_1_-1"
+      start_s: 0
+      end_s: 40.4478
+    }
+    segment {
+      id: "3142_1_-1"
+      start_s: 0
+      end_s: 5.06111
+    }
+    segment {
+      id: "3143_1_-1"
+      start_s: 0
+      end_s: 592.354
+    }
+    segment {
+      id: "1770_1_-1"
+      start_s: 0
+      end_s: 30.9261
+    }
+    segment {
+      id: "42_1_-1"
+      start_s: 0
+      end_s: 16.1103
+    }
+    segment {
+      id: "2414_1_-1"
+      start_s: 0
+      end_s: 11.3162
+    }
+    segment {
+      id: "67a_1_-1"
+      start_s: 0
+      end_s: 25.078
+    }
+    segment {
+      id: "160_1_-3"
+      start_s: 0
+      end_s: 6.08098
+    }
+    segment {
+      id: "9760_1_-3"
+      start_s: 0
+      end_s: 4.31703
+    }
+    segment {
+      id: "1771_1_-3"
+      start_s: 0
+      end_s: 45.6667
+    }
+    segment {
+      id: "1415_1_-3"
+      start_s: 0
+      end_s: 12.6104
+    }
+    segment {
+      id: "1416_1_-3"
+      start_s: 0
+      end_s: 37.2856
+    }
+    segment {
+      id: "1422_1_-3"
+      start_s: 0
+      end_s: 5.5451479272423931
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+measurement {
+  distance: 3603.8614898507849
+}
+routing_request {
+  header {
+    timestamp_sec: 1515787855.7624836
+    module_name: "dreamview"
+    sequence_num: 5
+  }
+  waypoint {
+    id: "302a_1_-1"
+    s: 4.7953580764580543
+    pose {
+      x: 586426.57203504466
+      y: 4140773.1189641636
+    }
+  }
+  waypoint {
+    id: "1422_1_-3"
+    s: 5.5451479272423931
+    pose {
+      x: 587169.10245
+      y: 4141539.780228
+    }
+  }
+}
+map_version: "1.000000"
+status {
+  error_code: OK
+  msg: "Success!"
+}

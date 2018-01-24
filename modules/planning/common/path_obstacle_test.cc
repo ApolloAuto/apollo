@@ -60,7 +60,7 @@ TEST(IsLateralDecision, AllDecisions) {
 
   ObjectDecisionType decision_sidepass;
   decision_sidepass.mutable_sidepass();
-  EXPECT_FALSE(PathObstacle::IsLateralDecision(decision_sidepass));
+  EXPECT_TRUE(PathObstacle::IsLateralDecision(decision_sidepass));
 }
 
 TEST(IsLongitudinalDecision, AllDecisions) {

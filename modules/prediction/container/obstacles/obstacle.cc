@@ -145,7 +145,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   if (SetId(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
     return;
   }
-  if (SetType(perception_obstacle) == ErrorCode::PREDICTION_ERROR) {
+  if (SetType(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
     return;
   }
 
@@ -290,10 +290,12 @@ ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
   return ErrorCode::OK;
 }
 
-ErrorCode Obstacle::SetType(const PerceptionObstacle& perception_obstacle) {
+ErrorCode Obstacle::SetType(const PerceptionObstacle& perception_obstacle,
+                            Feature* feature) {
   if (perception_obstacle.has_type()) {
     type_ = perception_obstacle.type();
     ADEBUG << "Obstacle [" << id_ << "] has type [" << type_ << "].";
+    feature->set_type(type_);
   } else {
     AERROR << "Obstacle [" << id_ << "] has no type.";
     return ErrorCode::PREDICTION_ERROR;
@@ -943,13 +945,15 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 }
 
 void Obstacle::SetLaneGraphFeature(Feature* feature,
-    ObstacleClusters* const obstacle_clusters) {
+                                   ObstacleClusters* const obstacle_clusters) {
   double speed = feature->speed();
   double acc = feature->acc();
   double road_graph_distance =
       speed * FLAGS_prediction_duration +
       0.5 * acc * FLAGS_prediction_duration * FLAGS_prediction_duration +
       FLAGS_min_prediction_length;
+
+  int seq_id = 0;
   int curr_lane_count = 0;
   for (auto& lane : feature->lane().current_lane_feature()) {
     std::shared_ptr<const LaneInfo> lane_info =
@@ -959,18 +963,13 @@ void Obstacle::SetLaneGraphFeature(Feature* feature,
     if (lane_graph.lane_sequence_size() > 0) {
       ++curr_lane_count;
     }
-    int seq_id =
-        feature->mutable_lane()->mutable_lane_graph()->lane_sequence_size();
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
+      LaneSequence seq(lane_seq);
+      seq.set_lane_sequence_id(seq_id++);
       feature->mutable_lane()
           ->mutable_lane_graph()
           ->add_lane_sequence()
-          ->CopyFrom(lane_seq);
-      feature->mutable_lane()
-          ->mutable_lane_graph()
-          ->mutable_lane_sequence(seq_id)
-          ->set_lane_sequence_id(seq_id);
-      ++seq_id;
+          ->CopyFrom(seq);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
     }
@@ -988,17 +987,13 @@ void Obstacle::SetLaneGraphFeature(Feature* feature,
     if (lane_graph.lane_sequence_size() > 0) {
       ++nearby_lane_count;
     }
-    int seq_id =
-        feature->mutable_lane()->mutable_lane_graph()->lane_sequence_size();
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
+      LaneSequence seq(lane_seq);
+      seq.set_lane_sequence_id(seq_id++);
       feature->mutable_lane()
           ->mutable_lane_graph()
           ->add_lane_sequence()
-          ->CopyFrom(lane_seq);
-      feature->mutable_lane()
-          ->mutable_lane_graph()
-          ->mutable_lane_sequence(seq_id)
-          ->set_lane_sequence_id(seq_id);
+          ->CopyFrom(seq);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
     }

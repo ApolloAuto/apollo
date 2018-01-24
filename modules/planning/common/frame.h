@@ -43,6 +43,7 @@
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/reference_line/reference_line_provider.h"
 
 namespace apollo {
 namespace planning {
@@ -58,7 +59,8 @@ class Frame {
   explicit Frame(uint32_t sequence_num,
                  const common::TrajectoryPoint &planning_start_point,
                  const double start_time,
-                 const common::VehicleState &vehicle_state);
+                 const common::VehicleState &vehicle_state,
+                 ReferenceLineProvider *reference_line_provider);
 
   const common::TrajectoryPoint &PlanningStartPoint() const;
   common::Status Init();
@@ -87,9 +89,8 @@ class Frame {
                                            const common::math::Box2d &box);
 
   const Obstacle *AddVirtualStopObstacle(
-      ReferenceLineInfo* const reference_line_info,
-      const std::string &object_id,
-      const double object_s);
+      ReferenceLineInfo *const reference_line_info,
+      const std::string &object_id, const double object_s);
 
   bool Rerouting();
 
@@ -146,6 +147,8 @@ class Frame {
   ADCTrajectory trajectory_;  // last published trajectory
 
   std::unique_ptr<LagPrediction> lag_predictor_;
+
+  ReferenceLineProvider *reference_line_provider_ = nullptr;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {

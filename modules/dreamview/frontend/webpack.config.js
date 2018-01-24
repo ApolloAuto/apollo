@@ -102,10 +102,12 @@ module.exports = {
                     }, {
                         loader: "image-webpack-loader",
                         options: {
-                            progressive: true,
                             pngquant: {
                                 quality: "65-90",
                                 speed: 4,
+                            },
+                            mozjpeg: {
+                                progressive: true,
                             }
                         }
                     }

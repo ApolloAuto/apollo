@@ -87,7 +87,6 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     DCHECK(path_obstacle->HasLongitudinalDecision());
   }
   // step 1 get boundaries
-  auto path_decision_copy = *path_decision;
   path_decision->EraseStBoundaries();
   if (boundary_mapper.CreateStBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
@@ -102,8 +101,8 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     if (!obstacle->st_boundary().IsEmpty()) {
       mutable_obstacle->SetBlockingObstacle(true);
     } else {
-      path_decision->SetStBoundary(id,
-                                   path_decision_copy.Find(id)->st_boundary());
+      path_decision->SetStBoundary(
+          id, path_decision->Find(id)->reference_line_st_boundary());
     }
   }
 
