@@ -63,11 +63,6 @@ class LatticePlanner : public Planner {
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  private:
-  DiscretizedTrajectory CombineTrajectory(
-      const std::vector<common::PathPoint>& reference_line,
-      const Curve1d& lon_trajectory, const Curve1d& lat_trajectory,
-      const double init_relative_time = 0.0) const;
-
   DiscretizedTrajectory GetFutureTrajectory() const;
 
   bool MapFutureTrajectoryToSL(const DiscretizedTrajectory& future_trajectory,

@@ -371,6 +371,10 @@ DEFINE_double(decision_horizon, 200.0,
 DEFINE_double(lateral_obstacle_ignore_thred, 2.0,
               "Lateral threshold for "
               "obstacles to be considered in path-time graph");
+DEFINE_bool(enable_backup_trajectory, false,
+            "If generate backup trajectory when planning fail");
+DEFINE_double(backup_trajectory_cost, 1000.0,
+              "Default cost of backup trajectory");
 
 // Lattice Evaluate Parameters
 DEFINE_double(weight_lon_travel, 6.0,
