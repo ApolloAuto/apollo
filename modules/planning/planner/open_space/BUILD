@@ -16,8 +16,6 @@ cc_library(
         "//external:gflags",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/common/util",
-        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_common",
         "//modules/planning/planner",
         "//modules/planning/proto:planning_proto",
@@ -35,7 +33,6 @@ cc_library(
         "warm_start_problem.h",
     ],
     deps = [
-        "//modules/common/util",
         "warm_start_ipopt_interface",
     ],
 )
@@ -51,6 +48,7 @@ cc_library(
     deps = [
         "//modules/common/math",
         "//modules/common/util",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planning_proto",
         "@eigen//:eigen",
@@ -85,6 +83,7 @@ cc_library(
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planning_proto",
+        "//modules/common/configs:vehicle_config_helper",
         "@eigen//:eigen",
         "@ipopt//:ipopt",
     ],
