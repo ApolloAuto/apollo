@@ -3,6 +3,8 @@
 ## Introduction
   The goal of multi-sensor localization is to provide a robust method which can achieve high localization accuracy and resilience in challenging scenes, such as urban downtown, highways, and tunnels. It adaptively uses information from complementary sensors such as GNSS, LiDAR and IMU. If you want to know more details, please refer to our paper [Robust and Precise Vehicle Localization based on Multi-sensor Fusion in Diverse City Scenes] (https://arxiv.org/abs/1711.05805).
 
+  Currently this localization method only works for x86_64 platform
+
 ## Input
   * Point cloud data from LiDAR sensor (ROS topic `/apollo/sensor/velodyne64/compensator/PointCloud2`)
   * Gnss observation and ephemeris data from Gnss sensor (ROS topic `/apollo/sensor/gnss/rtk_obs` and `/apollo/sensor/gnss/rtk_eph`)
