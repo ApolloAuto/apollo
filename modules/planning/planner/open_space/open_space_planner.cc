@@ -82,17 +82,13 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
   // TODO(QiL) : Clean up, represent lOb with better format
   // vetices cw presentation
 
-  /*
-  lOb =
-      [
-        [ [-20; 5], [-1.3; 5], [-1.3; - 5], [-20; - 5], [-20; 5] ],
-        [ [1.3; 5], [20; 5], [20; - 5], [1.3; - 5], [1.3; 5] ],
-        [ [-20; 15], [20; 15], [20; 11], [ -20, 11 ], [-20; 15] ]
-      ]
-*/
-
+  // std::vector<std::vector<Eigen::MatrixXd>> lOb = {{[-20; 5]}};
+  std::vector<std::vector<std::vector<double>>> lOb = {
+      {{-20, 5}, {-1.3, 5}, {-1.3, -5}, {-20, -5}, {-20, 5}},
+      {{1.3, 5}, {20, 5}, {20, -5}, {1.3, -5}, {1.3, 5}},
+      {{-20, 15}, {20, 15}, {20, 11}, {-20, 11}, {-20, 15}}};
   // TODO(QiL) : more efficient way of initialize lOb in open space planner
-  std::vector<std::vector<Eigen::MatrixXd>> lOb;
+  //  std::vector<std::vector<Eigen::MatrixXd>> lOb;
   Eigen::MatrixXd ob1(4, 1), ob2(4, 1), ob3(4, 1);
   ob1 << -1.3, 5, 20, 5;
   ob2 << 20, 5, -1.3, 5;
@@ -163,7 +159,7 @@ Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
 }
 
 Status ObsHRep(const std::size_t& nOb, const Eigen::MatrixXd& vOb,
-               const std::vector<std::vector<Eigen::MatrixXd>>& lOb,
+               const std::vector<std::vector<std::vector<double>>>& lOb,
                Eigen::MatrixXd* A_all, Eigen::MatrixXd* b_all) {
   // TODO(QiL) : Code replacement : find alternative ways for H presentation
   // caculation
@@ -184,37 +180,37 @@ Status ObsHRep(const std::size_t& nOb, const Eigen::MatrixXd& vOb,
 
     // take two subsequent vertices, and computer hyperplane
     for (int j = 1; j != vOb(i, 1); ++j) {
-      Eigen::MatrixXd v1 = lOb[i - 1][j - 1];
-      Eigen::MatrixXd v2 = lOb[i - 1][j];
+      std::vector<double> v1 = lOb[i - 1][j - 1];
+      std::vector<double> v2 = lOb[i - 1][j];
 
       Eigen::MatrixXd A_tmp(2, 1), b_tmp(2, 1), ab(2, 2);
       // find hyperplane passing through v1 and v2
-      if (v1(0, 0) == v2(0, 0)) {
-        if (v2(1, 0) < v1(1, 0)) {
+      if (v1[0] == v2[0]) {
+        if (v2[1] < v1[1]) {
           A_tmp << 1, 0;
-          b_tmp << v1(0, 0);
+          b_tmp << v1[0];
         } else {
           A_tmp << -1, 0;
-          b_tmp << v1(1, 0);
+          b_tmp << v1[1];
         }
-      } else if (v1(1, 0) == v2(1, 0)) {
-        if (v1(1, 0) < v2(1, 0)) {
+      } else if (v1[1] == v2[1]) {
+        if (v1[1] < v2[1]) {
           A_tmp << 0, 1;
-          b_tmp << v1(1, 0);
+          b_tmp << v1[1];
         } else {
           A_tmp << 0, -1;
-          b_tmp << -v1(1, 0);
+          b_tmp << -v1[1];
         }
       } else {
         Eigen::MatrixXd tmp1(2, 2);
-        tmp1 << v1(0, 0), 1, v2(0, 0), 1;
+        tmp1 << v1[0], 1, v2[0], 1;
         Eigen::MatrixXd tmp2(2, 1);
-        tmp2 << v1(1, 0), v2(1, 0);
+        tmp2 << v1[1], v2[1];
         ab = tmp2 * tmp1.inverse();
         double a = ab(0, 0);
         double b = ab(1, 0);
 
-        if (v1(0, 0) < v2(0, 0)) {
+        if (v1[0] < v2[0]) {
           A_tmp << -a, 1;
           b_tmp << b;
         } else {
@@ -233,7 +229,9 @@ Status ObsHRep(const std::size_t& nOb, const Eigen::MatrixXd& vOb,
     A_all->block(counter, 0, vOb(i, 0) - 1, 1) = A_i;
     b_all->block(counter, 0, vOb(i, 0) - 1, 1) = b_i;
   }
+
   return Status::OK();
 }
+
 }  // namespace planning
 }  // namespace apollo

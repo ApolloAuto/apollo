@@ -438,32 +438,7 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
-    Ipopt::IpoptCalculatedQuantities* ip_cq) {
-  x1_result_.reserve(horizon_ + 1);
-  x2_result_.reserve(horizon_ + 1);
-  x3_result_.reserve(horizon_ + 1);
-  x4_result_.reserve(horizon_ + 1);
-
-  u1_result_.reserve(horizon_);
-  u2_result_.reserve(horizon_);
-
-  t_result_.reserve(horizon_);
-
-  std::size_t state_start_index = 0;
-  std::size_t input_start_index = (horizon_ + 1) * 4;
-  std::size_t time_start_index = input_start_index + horizon_ * 2;
-  for (std::size_t i = 0; i < horizon_; ++i) {
-    x1_result_.push_back(state_start_index);
-    x2_result_.push_back(state_start_index + 1);
-    x3_result_.push_back(state_start_index + 2);
-    x4_result_.push_back(state_start_index + 3);
-
-    u1_result_.push_back(input_start_index);
-    u2_result_.push_back(input_start_index + 1);
-
-    t_result_.push_back(time_start_index);
-  }
-}
+    Ipopt::IpoptCalculatedQuantities* ip_cq) {}
 
 void DistanceApproachIPOPTInterface::get_optimization_results(
     std::vector<double>* x1_result, std::vector<double>* x2_result,
