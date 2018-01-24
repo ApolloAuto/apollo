@@ -281,7 +281,7 @@ DEFINE_double(crosswalk_strick_l_distance, 4.0,
 DEFINE_double(crosswalk_loose_l_distance, 5.0,
               "loose stop rule beyond this l_distance");
 /// stop_sign
-DEFINE_bool(enable_stop_sign, false, "enable stop_sign");
+DEFINE_bool(enable_stop_sign, true, "enable stop_sign");
 DEFINE_string(stop_sign_virtual_object_id_prefix, "SS_",
               "prefix for converting stop_sign id to virtual object id");
 DEFINE_double(stop_duration_for_stop_sign, 3,
