@@ -138,7 +138,9 @@ bool GuaranteeDrivingMode(const Chassis::DrivingMode target_mode,
 }  // namespace
 
 HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
-    : websocket_(websocket), map_service_(map_service) {
+    : websocket_(websocket),
+      map_service_(map_service),
+      logger_(apollo::common::monitor::MonitorMessageItem::HMI) {
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
   // If the module path doesn't exist, remove it from list.
@@ -294,11 +296,20 @@ void HMI::RegisterMessageHandlers() {
       });
 }
 
-void HMI::BroadcastHMIStatus() const {
+void HMI::BroadcastHMIStatus() {
   // In unit tests, we may leave websocket_ as NULL and skip broadcasting.
   if (websocket_) {
     websocket_->BroadcastData(
         JsonUtil::ProtoToTypedJson("HMIStatus", status_).dump());
+  }
+
+  // Broadcast messages.
+  apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
+  if (status_.current_map().empty()) {
+    log_buffer.WARN("You haven't select map yet!");
+  }
+  if (status_.current_vehicle().empty()) {
+    log_buffer.WARN("You haven't select vehicle yet!");
   }
 }
 
