@@ -69,7 +69,6 @@ bool StopSign::ApplyRule(Frame* frame,
 void StopSign::MakeDecisions(
     Frame* frame,
     ReferenceLineInfo* const reference_line_info) {
-
   // check & update stop status
   ProcessStopStatus(reference_line_info, *next_stop_sign_);
 
@@ -104,6 +103,8 @@ void StopSign::MakeDecisions(
       RemoveWatchVehicle(*path_obstacle, &watch_vehicles);
     }
   }
+
+  ClearWatchVehicle(&watch_vehicles);
 
   std::string stop_sign_id = next_stop_sign_->id().id();
   if (stop_status_ == StopSignStopStatus::STOP_DONE &&
@@ -240,13 +241,14 @@ int StopSign::ProcessStopStatus(
   double* start_time = Dropbox<double>::Open()->Get(
       db_key_stop_starttime);
   double stop_start_time =  (start_time == nullptr) ?
-      Clock::NowInSeconds() + 1 : *start_time;
+      Clock::NowInSeconds() + 100 : *start_time;
   double wait_time = Clock::NowInSeconds() - stop_start_time;
   ADEBUG << "db_key_stop_starttime: " << db_key_stop_starttime
       << "; stop_start_time: " << stop_start_time
       << "; wait_time: " << wait_time;
 
   // check & update stop status
+  bool stop_start_time_set = false;
   switch (stop_status_) {
     case StopSignStopStatus::UNKNOWN:
     case StopSignStopStatus::TO_STOP:
@@ -254,6 +256,7 @@ int StopSign::ProcessStopStatus(
         stop_status_ = StopSignStopStatus::TO_STOP;
       } else {
         stop_start_time = Clock::NowInSeconds();
+        stop_start_time_set = true;
         stop_status_ = StopSignStopStatus::STOPPING;
       }
       break;
@@ -261,7 +264,7 @@ int StopSign::ProcessStopStatus(
       if (!CheckADCkStop(reference_line_info)) {
         stop_status_ = StopSignStopStatus::TO_STOP;
       } else {
-        if (wait_time > FLAGS_stop_duration_for_stop_sign) {
+        if (wait_time >= FLAGS_stop_duration_for_stop_sign) {
           stop_status_ = StopSignStopStatus::STOP_DONE;
         }
       }
@@ -280,10 +283,14 @@ int StopSign::ProcessStopStatus(
           stop_status_);
 
   // update dropbox: stop start time
-  Dropbox<double>::Open()->Set(db_key_stop_starttime,
-                               stop_start_time);
-  ADEBUG << "update dropbox: [" << db_key_stop_starttime
-      << "] = " << stop_start_time;
+  if (stop_start_time_set) {
+    Dropbox<double>::Open()->Set(db_key_stop_starttime,
+                                 stop_start_time);
+    ADEBUG << "update dropbox: [" << db_key_stop_starttime
+        << "] = " << stop_start_time;
+  } else {
+    Dropbox<double>::Open()->Remove(db_key_stop_starttime);
+  }
 
   return 0;
 }
@@ -532,19 +539,26 @@ int StopSign::RemoveWatchVehicle(
 
   if (erase) {
     for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
-        it != watch_vehicles->end(); /*no increment*/) {
+        it != watch_vehicles->end(); it++) {
       std::vector<std::string> vehicles = it->second;
       vehicles.erase(std::remove(vehicles.begin(), vehicles.end(),
                                  obstacle_id), vehicles.end());
-
-      if (vehicles.empty()) {
-        watch_vehicles->erase(it++);
-      } else {
-        ++it;
-      }
     }
   }
 
+  return 0;
+}
+
+int StopSign::ClearWatchVehicle(StopSignLaneVehicles* watch_vehicles) {
+  for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
+      it != watch_vehicles->end(); /*no increment*/) {
+    std::vector<std::string> vehicles = it->second;
+    if (vehicles.empty()) {
+      watch_vehicles->erase(it++);
+    } else {
+      ++it;
+    }
+  }
   return 0;
 }
 
