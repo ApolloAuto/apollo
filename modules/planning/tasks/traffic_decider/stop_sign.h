@@ -68,6 +68,7 @@ class StopSign : public TrafficRule {
                       StopSignLaneVehicles* watch_vehicles);
   int RemoveWatchVehicle(const PathObstacle& obstacle,
                          StopSignLaneVehicles* watch_vehicles);
+  int ClearWatchVehicle(StopSignLaneVehicles* watch_vehicles);
   double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
                              const PathOverlap* stop_sign_overlap);
   bool BuildStopDecision(Frame* frame,
