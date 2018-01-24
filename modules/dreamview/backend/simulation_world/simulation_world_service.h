@@ -70,22 +70,24 @@ class SimulationWorldService {
    * @brief Get a read-only view of the SimulationWorld.
    * @return Constant reference to the SimulationWorld object.
    */
-  inline const SimulationWorld &world() const {
-    return world_;
-  }
+  inline const SimulationWorld &world() const { return world_; }
 
   /**
    * @brief Returns the json representation of the SimulationWorld object.
+   *        This is a public API used by offline dreamview.
    * @param radius the search distance from the current car location
    * @return Json object equivalence of the SimulationWorld object.
    */
   nlohmann::json GetUpdateAsJson(double radius) const;
 
   /**
-   * @brief Returns the json representation of the planning debug data.
-   * @return Json object equivalence of the PlanningData object.
+   * @brief Returns the binary representation of the SimulationWorld object.
+   * @param radius the search distance from the current car location
+   * @param enable_pnc_monitor whether the planning debugging data should be
+   * included.
+   * @return wire format string of SimulationWorld proto.
    */
-  nlohmann::json GetPlanningData() const;
+  std::string GetWireFormatString(double radius, bool enable_pnc_monitor);
 
   /**
    * @brief Returns the json representation of the map element Ids and hash
@@ -105,9 +107,7 @@ class SimulationWorldService {
   /**
    * @brief Sets the flag to clear the owned simulation world object.
    */
-  void SetToClear() {
-    to_clear_ = true;
-  }
+  void SetToClear() { to_clear_ = true; }
 
   /**
    * @brief Check whether the SimulationWorld object has enough information.
@@ -132,6 +132,8 @@ class SimulationWorldService {
     apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.AddMonitorMsgItem(log_level, msg);
   }
+
+  void GetMapElementIds(double radius, MapElementIds *ids);
 
  private:
   /**
@@ -163,6 +165,8 @@ class SimulationWorldService {
       const apollo::prediction::PredictionObstacle &obstacle);
   void UpdatePlanningData(const apollo::planning_internal::PlanningData &data);
 
+  void PopulateMapInfo(double radius);
+
   /**
    * @brief Get the latest observed data from the adapter manager to update the
    * SimulationWorld object when triggered by refresh timer.
@@ -193,10 +197,6 @@ class SimulationWorldService {
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
   SimulationWorld world_;
-
-  // The downsampled planning debugging data, owned by the
-  // SimulationWorldService instance.
-  apollo::planning_internal::PlanningData planning_data_;
 
   // The handle of MapService, not owned by SimulationWorldService.
   const MapService *map_service_;

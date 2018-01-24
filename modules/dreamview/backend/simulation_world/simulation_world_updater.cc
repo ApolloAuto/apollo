@@ -16,6 +16,7 @@
 
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 
+#include "google/protobuf/util/json_util.h"
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
@@ -32,6 +33,8 @@ using apollo::common::util::JsonUtil;
 using apollo::hdmap::EndWayPointFile;
 using apollo::routing::RoutingRequest;
 using Json = nlohmann::json;
+using google::protobuf::util::JsonStringToMessage;
+using google::protobuf::util::MessageToJsonString;
 
 SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
                                                SimControl *sim_control,
@@ -41,21 +44,24 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
       map_service_(map_service),
       websocket_(websocket),
       sim_control_(sim_control) {
-
   websocket_->RegisterMessageHandler(
       "RetrieveMapData",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         auto iter = json.find("elements");
         if (iter != json.end()) {
-          MapElementIds map_element_ids(*iter);
-          auto retrieved = map_service_->RetrieveMapElements(map_element_ids);
-          websocket_->SendData(
-              conn, JsonUtil::ProtoToTypedJson("MapData", retrieved).dump());
+          MapElementIds map_element_ids;
+          if (JsonStringToMessage(iter->dump(), &map_element_ids).ok()) {
+            auto retrieved = map_service_->RetrieveMapElements(map_element_ids);
+            websocket_->SendData(
+                conn, JsonUtil::ProtoToTypedJson("MapData", retrieved).dump());
+          } else {
+            AERROR << "Failed to parse MapElementIds from json";
+          }
         }
       });
 
   websocket_->RegisterMessageHandler(
-      "RetrieveMapElementsByRadius",
+      "RetrieveMapElementIdsByRadius",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         auto radius = json.find("radius");
         if (radius == json.end()) {
@@ -69,8 +75,16 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           return;
         }
 
-        Json response = sim_world_service_.GetMapElements(*radius);
-        response["type"] = "MapElements";
+        Json response;
+        response["type"] = "MapElementIds";
+        response["mapRadius"] = *radius;
+
+        MapElementIds ids;
+        sim_world_service_.GetMapElementIds(*radius, &ids);
+        std::string elementIds;
+        MessageToJsonString(ids, &elementIds);
+        response["mapElementIds"] = Json::parse(elementIds);
+
         websocket_->SendData(conn, response.dump());
       });
 
@@ -114,15 +128,14 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           // Pay the price to copy the data instead of sending data over the
           // wire while holding the lock.
           boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
-          to_send = enable_pnc_monitor_ ? simulation_world_with_planning_json_
-                                        : simulation_world_json_;
+          to_send = simulation_world_;
         }
         if (FLAGS_enable_update_size_check && !enable_pnc_monitor_ &&
             to_send.size() > FLAGS_max_update_size) {
           AWARN << "update size is too big:" << to_send.size();
           return;
         }
-        websocket_->SendData(conn, to_send, true);
+        websocket_->SendBinaryData(conn, to_send, true);
       });
 
   websocket_->RegisterMessageHandler(
@@ -147,9 +160,11 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
             poi_list.push_back(place);
           }
         } else {
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::ERROR, "Failed to load default POI. "
-              "Please make sure the file exists at " + EndWayPointFile());
+          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::ERROR,
+                                                   "Failed to load default "
+                                                   "POI. Please make sure the "
+                                                   "file exists at " +
+                                                       EndWayPointFile());
         }
         response["poi"] = poi_list;
         websocket_->SendData(conn, response.dump());
@@ -258,14 +273,8 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
 
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    Json simulation_world =
-        sim_world_service_.GetUpdateAsJson(FLAGS_sim_map_radius);
-    simulation_world_json_ = simulation_world.dump();
-
-    if (enable_pnc_monitor_) {
-      simulation_world["planningData"] = sim_world_service_.GetPlanningData();
-      simulation_world_with_planning_json_ = simulation_world.dump();
-    }
+    simulation_world_ = sim_world_service_.GetWireFormatString(
+        FLAGS_sim_map_radius, enable_pnc_monitor_);
   }
 }
 

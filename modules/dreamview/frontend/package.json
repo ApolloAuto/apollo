@@ -6,8 +6,8 @@
     "author": "adusim",
     "license": "MIT",
     "scripts": {
-        "build": "node_modules/.bin/webpack -p --progress",
-        "start": "node_modules/.bin/webpack-dev-server --watch-poll",
+        "build": "./gen_pbjs.sh; node_modules/.bin/webpack -p --progress",
+        "start": "./gen_pbjs.sh; node_modules/.bin/webpack-dev-server --watch-poll",
         "build_offline": "node_modules/.bin/webpack -p --progress --config webpack.offline.config.js",
         "start_offline": "node_modules/.bin/webpack-dev-server --watch-poll --config webpack.offline.config.js"
     },
@@ -26,7 +26,8 @@
         "react-split-pane": "^0.1.66",
         "stats.js": "^0.17.0",
         "three": "~0.84.0",
-        "three-line-2d": "^1.1.6"
+        "three-line-2d": "^1.1.6",
+        "protobufjs": "^6.8.4"
     },
     "devDependencies": {
         "babel-core": "^6.24.1",

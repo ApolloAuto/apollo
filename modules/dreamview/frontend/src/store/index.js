@@ -57,10 +57,6 @@ class DreamviewStore {
         this.timestamp = newTimestamp;
     }
 
-    @action updateWorldTimestamp(newTimestamp) {
-        this.worldTimestamp = newTimestamp;
-    }
-
     @action updateWidthInPercentage(newRatio) {
         this.sceneDimension.widthRatio = newRatio;
     }

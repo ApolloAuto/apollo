@@ -27,7 +27,7 @@ export default class RoutingEditor {
         camera.far = PARAMETERS.camera[pov].far;
 
         camera.updateProjectionMatrix();
-        WS.requestMapElementsByRadius(this.EDITING_MAP_RADIUS);
+        WS.requestMapElementIdsByRadius(this.EDITING_MAP_RADIUS);
     }
 
     disableEditingMode(scene) {
