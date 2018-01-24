@@ -29,6 +29,7 @@ cc_library(
         ":vehicle_manager",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/kv_db",
+        "//modules/common/monitor_log",
         "//modules/common/util:http_client",
         "//modules/common/util:json_util",
         "//modules/common/util:map_util",
