@@ -97,6 +97,8 @@ TEST_F(GarageTest, out_of_map) {
  * test stop passed stop line
  */
 TEST_F(GarageTest, stop_over_line) {
+  FLAGS_enable_stop_sign = false;
+
   std::string seq_num = "1";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
