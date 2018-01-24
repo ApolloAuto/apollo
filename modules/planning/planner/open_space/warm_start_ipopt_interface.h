@@ -27,6 +27,9 @@
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
 
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common/configs/vehicle_config_helper.h"
+
 namespace apollo {
 namespace planning {
 
@@ -34,8 +37,7 @@ class WarmStartIPOPTInterface : public Ipopt::TNLP {
  public:
   explicit WarmStartIPOPTInterface(int num_of_variables, int num_of_constraints,
                                    std::size_t horizon, float ts,
-                                   float wheelbase_length, Eigen::MatrixXd x0,
-                                   Eigen::MatrixXd xf,
+                                   Eigen::MatrixXd x0, Eigen::MatrixXd xf,
                                    Eigen::MatrixXd XYbounds);
 
   virtual ~WarmStartIPOPTInterface() = default;
@@ -99,7 +101,6 @@ class WarmStartIPOPTInterface : public Ipopt::TNLP {
   int num_of_constraints_;
   std::size_t horizon_;
   float ts_;
-  float wheelbase_length_;
   Eigen::MatrixXd x0_;
   Eigen::MatrixXd xf_;
   Eigen::MatrixXd XYbounds_;
@@ -111,6 +112,8 @@ class WarmStartIPOPTInterface : public Ipopt::TNLP {
   std::vector<double> u1_result_;
   std::vector<double> u2_result_;
   std::vector<double> t_result_;
+
+  double wheelbase_;
 };
 
 }  // namespace planning

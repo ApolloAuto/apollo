@@ -27,6 +27,8 @@
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
 
+#include "modules/common/configs/vehicle_config_helper.h"
+
 namespace apollo {
 namespace planning {
 
@@ -34,9 +36,9 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
  public:
   explicit DistanceApproachIPOPTInterface(
       const int num_of_variables, const int num_of_constraints,
-      std::size_t horizon, float ts, float wheelbase_length,
-      Eigen::MatrixXd ego, Eigen::MatrixXd x0, Eigen::MatrixXd xf,
-      Eigen::MatrixXd XYbounds, Eigen::MatrixXd vOb, std::size_t nOb);
+      std::size_t horizon, float ts, Eigen::MatrixXd ego, Eigen::MatrixXd x0,
+      Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds, Eigen::MatrixXd vOb,
+      std::size_t nOb);
 
   virtual ~DistanceApproachIPOPTInterface() = default;
 
@@ -99,7 +101,6 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   int num_of_constraints_;
   std::size_t horizon_;
   float ts_;
-  float wheelbase_length_;
   Eigen::MatrixXd ego_;
   Eigen::MatrixXd x0_;
   Eigen::MatrixXd xf_;
@@ -120,6 +121,7 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   Eigen::MatrixXd vOb_;
   std::size_t nOb_;
   std::size_t vObsum_;
+  double wheelbase_;
 };
 
 }  // namespace planning

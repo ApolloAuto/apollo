@@ -36,8 +36,8 @@ Status OpenSpacePlanner::Init(const PlanningConfig&) {
   return Status::OK();
 }
 
-Status OpenSpacePlanner::Plan(const TrajectoryPoint& planning_init_point,
-                              Frame*, ReferenceLineInfo* reference_line_info) {
+apollo::common::Status OpenSpacePlanner::Plan(
+    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   // Problem setup
 
   // TODO(QiL) : cleaning up : load control configs from VehicleParam at

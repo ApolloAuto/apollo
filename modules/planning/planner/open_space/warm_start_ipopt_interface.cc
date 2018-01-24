@@ -23,6 +23,7 @@
 #include <math.h>
 #include <utility>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/util.h"
@@ -35,16 +36,19 @@ constexpr std::size_t N = 80;
 
 WarmStartIPOPTInterface::WarmStartIPOPTInterface(
     int num_of_variables, int num_of_constraints, std::size_t horizon, float ts,
-    float wheelbase_length, Eigen::MatrixXd x0, Eigen::MatrixXd xf,
-    Eigen::MatrixXd XYbounds)
+    Eigen::MatrixXd x0, Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
       horizon_(horizon),
       ts_(ts),
-      wheelbase_length_(wheelbase_length),
       x0_(x0),
       xf_(xf),
-      XYbounds_(XYbounds) {}
+      XYbounds_(XYbounds) {
+  const auto& wheelbase_ = common::VehicleConfigHelper::instance()
+                               ->GetConfig()
+                               .vehicle_param()
+                               .wheel_base();
+}
 
 bool WarmStartIPOPTInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
                                            int& nnz_h_lag,
@@ -243,7 +247,7 @@ bool WarmStartIPOPTInterface::eval_g(int n, const double* x, bool new_x, int m,
     g[state_start_index + 6] =
         g[state_start_index + 2] +
         g[time_start_index] * ts_ * g[state_start_index + 3] *
-            std::tan(g[control_start_index] / wheelbase_length_);
+            std::tan(g[control_start_index] / wheelbase_);
 
     // x4
     g[state_start_index + 7] =

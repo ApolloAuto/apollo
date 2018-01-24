@@ -35,14 +35,13 @@ constexpr double dmin = 0.05;
 
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     const int num_of_variables, const int num_of_constraints,
-    std::size_t horizon, float ts, float wheelbase_length, Eigen::MatrixXd ego,
-    Eigen::MatrixXd x0, Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds,
-    Eigen::MatrixXd vOb, std::size_t nOb)
+    std::size_t horizon, float ts, Eigen::MatrixXd ego, Eigen::MatrixXd x0,
+    Eigen::MatrixXd xf, Eigen::MatrixXd XYbounds, Eigen::MatrixXd vOb,
+    std::size_t nOb)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
       horizon_(horizon),
       ts_(ts),
-      wheelbase_length_(wheelbase_length),
       ego_(ego),
       x0_(x0),
       xf_(xf),
@@ -311,7 +310,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
     g[state_start_index + 6] =
         g[state_start_index + 2] +
         g[time_start_index] * ts_ * g[state_start_index + 3] *
-            std::tan(g[control_start_index] / wheelbase_length_);
+            std::tan(g[control_start_index] / wheelbase_);
 
     // x4
     g[state_start_index + 7] =

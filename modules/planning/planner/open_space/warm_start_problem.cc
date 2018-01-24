@@ -73,8 +73,7 @@ bool WarmStartProblem::Solve(std::vector<double>* x1_result,
 
   // TODO(QiL) : evaluate whether need to new it everytime
   WarmStartIPOPTInterface* ptop = new WarmStartIPOPTInterface(
-      num_of_variables, num_of_constraints, horizon_, ts_, wheelbase_length_,
-      x0_, xF_, XYbounds_);
+      num_of_variables, num_of_constraints, horizon_, ts_, x0_, xF_, XYbounds_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
