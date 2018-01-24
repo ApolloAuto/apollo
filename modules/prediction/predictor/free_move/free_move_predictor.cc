@@ -30,9 +30,10 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::PathPoint;
-using apollo::common::TrajectoryPoint;
-using apollo::common::math::KalmanFilter;
+using ::apollo::common::PathPoint;
+using ::apollo::common::TrajectoryPoint;
+using ::apollo::common::math::KalmanFilter;
+using ::apollo::perception::PerceptionObstacle;
 
 void FreeMovePredictor::Predict(Obstacle* obstacle) {
   Clear();
@@ -59,9 +60,13 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   double theta = feature.velocity_heading();
 
   std::vector<TrajectoryPoint> points(0);
+  double prediction_total_time = FLAGS_prediction_duration;
+  if (obstacle->type() == PerceptionObstacle::PEDESTRIAN) {
+    prediction_total_time = FLAGS_prediction_pedestrian_total_time;
+  }
   DrawFreeMoveTrajectoryPoints(
       position, velocity, acc, theta, obstacle->kf_motion_tracker(),
-      FLAGS_prediction_duration, FLAGS_prediction_period, &points);
+      prediction_total_time, FLAGS_prediction_period, &points);
 
   Trajectory trajectory = GenerateTrajectory(points);
   int start_index = 0;
