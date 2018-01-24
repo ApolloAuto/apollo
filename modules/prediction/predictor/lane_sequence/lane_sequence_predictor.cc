@@ -79,10 +79,9 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
 
     std::string curr_lane_id = sequence.lane_segment(0).lane_id();
     std::vector<TrajectoryPoint> points;
-    double prediction_total_time = FLAGS_prediction_pedestrian_total_time;
     DrawLaneSequenceTrajectoryPoints(
         feature, curr_lane_id, obstacle->kf_lane_tracker(curr_lane_id),
-        sequence, prediction_total_time, FLAGS_prediction_period, &points);
+        sequence, FLAGS_prediction_duration, FLAGS_prediction_period, &points);
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());
