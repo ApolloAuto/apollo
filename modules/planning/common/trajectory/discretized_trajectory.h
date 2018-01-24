@@ -49,6 +49,10 @@ class DiscretizedTrajectory : public Trajectory {
 
   common::TrajectoryPoint StartPoint() const override;
 
+  double GetTemporalLength() const override;
+
+  double GetSpatialLength() const override;
+
   virtual common::TrajectoryPoint EvaluateUsingLinearApproximation(
       const double relative_time) const;
 
