@@ -18,43 +18,28 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_BACKUP_TRAJECTORY_H_
-#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_BACKUP_TRAJECTORY_H_
+#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_TRAJECTORY_COMBINER_H_
+#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_TRAJECTORY_COMBINER_H_
 
 #include <vector>
-#include <array>
-#include <memory>
 
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/curve1d.h"
-#include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
 
 namespace apollo {
 namespace planning {
 
-class BackupTrajectory {
+class TrajectoryCombiner {
  public:
-  BackupTrajectory(const std::array<double, 3>& init_s,
-                   const std::array<double, 3>& init_d,
-                   const double init_relative_time);
-
-  DiscretizedTrajectory GenerateTrajectory(
-      const std::vector<apollo::common::PathPoint>& discretized_ref_points);
-
- private:
-  void SetLonTrajectories();
-
-  void SetLatTrajectories();
-
- private:
-  std::vector<std::unique_ptr<Curve1d>> lon_trajectories_;
-  std::vector<std::unique_ptr<Curve1d>> lat_trajectories_;
-  std::array<double, 3> init_s_;
-  std::array<double, 3> init_d_;
-  double init_relative_time_;
+  static DiscretizedTrajectory Combine(
+      const std::vector<apollo::common::PathPoint>& reference_line,
+      const Curve1d& lon_trajectory,
+      const Curve1d& lat_trajectory,
+      const double init_relative_time);
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_BACKUP_TRAJECTORY_H_
+#endif  // MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_TRAJECTORY_COMBINER_H_
