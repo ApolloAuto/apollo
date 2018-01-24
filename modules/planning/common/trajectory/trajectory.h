@@ -36,6 +36,10 @@ class Trajectory {
       const double relative_time) const = 0;
 
   virtual common::TrajectoryPoint StartPoint() const = 0;
+
+  virtual double GetTemporalLength() const = 0;
+
+  virtual double GetSpatialLength() const = 0;
 };
 
 }  // namespace planning
