@@ -69,7 +69,7 @@ class OpenSpacePlanner : public Planner {
 
   apollo::common::Status ObsHRep(
       const std::size_t& nOb, const Eigen::MatrixXd& vOb,
-      const std::vector<std::vector<Eigen::MatrixXd>>& lOb,
+      const std::vector<std::vector<std::vector<double>>>& lOb,
       Eigen::MatrixXd* A_all, Eigen::MatrixXd* b_all);
 
  private:
