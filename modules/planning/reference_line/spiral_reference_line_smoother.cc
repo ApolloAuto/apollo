@@ -39,9 +39,9 @@ namespace planning {
 using apollo::common::time::Clock;
 
 SpiralReferenceLineSmoother::SpiralReferenceLineSmoother(
-    const double max_point_deviation)
-    : default_max_point_deviation_(max_point_deviation) {
-  CHECK(max_point_deviation >= 0.0);
+    const ReferenceLineSmootherConfig& config)
+    : ReferenceLineSmoother(config) {
+  default_max_point_deviation_ = FLAGS_spiral_smoother_max_deviation;
 }
 
 bool SpiralReferenceLineSmoother::Smooth(

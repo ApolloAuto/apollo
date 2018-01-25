@@ -37,7 +37,7 @@ namespace planning {
 class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
  public:
   explicit SpiralReferenceLineSmoother(
-      const double max_point_deviation_distance);
+      const ReferenceLineSmootherConfig& config);
 
   virtual ~SpiralReferenceLineSmoother() = default;
 
