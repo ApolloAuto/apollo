@@ -87,6 +87,8 @@ void SidepassVehicle::UpdateSidepassStatus(
   }
 }
 
+// a blocking obstacle is an obstacle blocks the road when it is not blocked (by
+// other obstacles or traffic rules)
 bool SidepassVehicle::HasBlockingObstacle(const SLBoundary& adc_sl_boundary,
                                           const PathDecision& path_decision) {
   for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
@@ -106,9 +108,26 @@ bool SidepassVehicle::HasBlockingObstacle(const SLBoundary& adc_sl_boundary,
             kAdcDistanceThreshold) {  // vehicles are far away
       continue;
     }
+    if (path_obstacle->PerceptionSLBoundary().start_l() > 0 ||
+        path_obstacle->PerceptionSLBoundary().end_l() < 0) {
+      continue;
+    }
 
-    if (path_obstacle->PerceptionSLBoundary().start_l() < 0 &&
-        path_obstacle->PerceptionSLBoundary().end_l() > 0) {
+    bool is_blocked_by_others = false;
+    for (const auto* other_obstacle : path_decision.path_obstacles().Items()) {
+      if (other_obstacle->Id() == path_obstacle->Id()) {
+        continue;
+      }
+      double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
+                       path_obstacle->PerceptionSLBoundary().start_s();
+      if (delta_s < 0.0 || delta_s > kAdcDistanceThreshold) {
+        continue;
+      } else {
+        is_blocked_by_others = true;
+        break;
+      }
+    }
+    if (!is_blocked_by_others) {
       blocking_obstacle_id_ = path_obstacle->Id();
       return true;
     }
