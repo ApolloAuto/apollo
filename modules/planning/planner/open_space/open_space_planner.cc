@@ -46,11 +46,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
   std::size_t horizon = 80;
   // nominal sampling time
   float ts = 0.3;
-  // wheelbase
-  float wheelbase_length = 2.7;
 
-  // TODO(QiL): cleaning up : load ego car matrix from VehicleParam at
-  // initialization
   Eigen::MatrixXd ego(4, 1);
   ego << 3.7, 1, 1, 1;
 
@@ -65,8 +61,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
   // final state
 
-  // TODO(QiL): Step 2 ： Take final state from decision / or em planner when
-  // enabled.
+  // TODO(QiL): Step 2 ： Take final state from decision / or decision level
+  // when enabled.
 
   Eigen::MatrixXd xF(4, 1);
   xF << 0, 1.2, M_PI / 2, 0;
@@ -76,6 +72,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
   // TODO(QiL): Step 3 : Get obstacles from map/perception convex sets from
   // vetices using H-represetntation
   std::size_t nOb = 3;  // number of obstacles
+  // vetices of each obstacles
   Eigen::MatrixXd vOb(3, 1);
   vOb << 4, 4, 4;
 
@@ -107,8 +104,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
   Eigen::MatrixXd uWS = Eigen::MatrixXd::Zero(2, horizon);
   Eigen::MatrixXd timeWS = Eigen::MatrixXd::Zero(1, horizon + 1);
 
-  warm_start_.reset(
-      new WarmStartProblem(horizon, ts, wheelbase_length, x0, xF, XYbounds));
+  warm_start_.reset(new WarmStartProblem(horizon, ts, x0, xF, XYbounds));
 
   std::vector<double> x1_result, x2_result, x3_result, x4_result, u1_result,
       u2_result, t_result;
@@ -137,9 +133,9 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
   // TODO(QiL) : update the I/O to make the warm start problem and distance
   // approach problem connect
-  distance_approach_.reset(new DistanceApproachProblem(
-      x0, xF, horizon, ts, wheelbase_length, ego, xWS, uWS, timeWS, XYbounds,
-      nOb, vOb, AOb, bOb));
+  distance_approach_.reset(
+      new DistanceApproachProblem(x0, xF, horizon, ts, ego, xWS, uWS, timeWS,
+                                  XYbounds, nOb, vOb, AOb, bOb));
 
   // result for distance approach problem
   std::vector<double> x1_result_2, x2_result_2, x3_result_2, x4_result_2,
