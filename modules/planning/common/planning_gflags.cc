@@ -28,6 +28,10 @@ DEFINE_string(planning_adapter_config_filename,
               "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
 
+DEFINE_string(smoother_config_file,
+              "modules/planning/conf/smoother_config.pb.txt",
+              "The configuration file for qp sline smoother");
+
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
               "Loop rate for planning node");
 
@@ -76,8 +80,6 @@ DEFINE_double(rerouting_cooldown_time, 0.6,
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
 
-DEFINE_bool(enable_spiral_reference_line, false,
-            "enable new spiral based reference line");
 DEFINE_double(spiral_smoother_max_deviation, 0.1,
               "The max deviation of spiral reference line smoother.");
 DEFINE_int32(spiral_smoother_num_iteration, 1000,
