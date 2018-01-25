@@ -143,6 +143,11 @@ HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
       logger_(apollo::common::monitor::MonitorMessageItem::HMI) {
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
+
+  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
+    config_.set_docker_image(docker_image);
+  }
+
   // If the module path doesn't exist, remove it from list.
   auto *modules = config_.mutable_modules();
   for (auto iter = modules->begin(); iter != modules->end();) {
