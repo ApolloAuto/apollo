@@ -61,6 +61,7 @@ third_party/ros_x86_64/
 modules/ros/third_party/fast-rtps
 
 # Data
+data/prediction
 data/log
 data/core
 data/bag
