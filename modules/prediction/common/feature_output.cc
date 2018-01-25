@@ -16,24 +16,41 @@
 
 #include "modules/prediction/common/feature_output.h"
 
+#include <string>
+
 #include "modules/common/log.h"
+#include "modules/common/util/file.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
 FeatureOutput::FeatureOutput() {}
 
-FeatureOutput::~FeatureOutput() {}
-
 bool FeatureOutput::Open() { return true; }
 
-void FeatureOutput::Close() { ADEBUG << "Close feature output"; }
+FeatureOutput::~FeatureOutput() {
+  count_ = 0;
+}
+
+void FeatureOutput::Close() {
+  ADEBUG << "Close feature output";
+  Write();
+}
 
 bool FeatureOutput::Ready() { return Open(); }
 
-void FeatureOutput::Insert(const Feature& feature) {}
+void FeatureOutput::Insert(const Feature& feature) {
+  features_.add_feature()->CopyFrom(feature);
+}
 
-void FeatureOutput::Write() {}
+void FeatureOutput::Write() {
+  std::string file_name = FLAGS_prediction_data_file_prefix +
+                          std::to_string(count_) + ".bin";
+  apollo::common::util::SetProtoToBinaryFile(features_, file_name);
+  features_.Clear();
+  ++count_;
+}
 
 }  // namespace prediction
 }  // namespace apollo
