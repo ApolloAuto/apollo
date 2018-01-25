@@ -43,6 +43,11 @@ class FeatureOutput {
   void Close();
 
   /**
+   * @brief Clear
+   */
+  void Clear();
+
+  /**
    * @brief Check if output is ready
    * @return True if output is ready
    */

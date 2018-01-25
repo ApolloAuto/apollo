@@ -27,15 +27,23 @@ namespace prediction {
 
 FeatureOutput::FeatureOutput() {}
 
-bool FeatureOutput::Open() { return true; }
-
 FeatureOutput::~FeatureOutput() {
-  count_ = 0;
+  Clear();
+}
+
+bool FeatureOutput::Open() {
+  return true;
 }
 
 void FeatureOutput::Close() {
   ADEBUG << "Close feature output";
   Write();
+  Clear();
+}
+
+void FeatureOutput::Clear() {
+  count_ = 0;
+  features_.Clear();
 }
 
 bool FeatureOutput::Ready() { return Open(); }
@@ -45,6 +53,10 @@ void FeatureOutput::Insert(const Feature& feature) {
 }
 
 void FeatureOutput::Write() {
+  if (features_.feature_size() <= 0) {
+    ADEBUG << "Skip writing empty feature.";
+    return;
+  }
   std::string file_name = FLAGS_prediction_data_file_prefix +
                           std::to_string(count_) + ".bin";
   apollo::common::util::SetProtoToBinaryFile(features_, file_name);
