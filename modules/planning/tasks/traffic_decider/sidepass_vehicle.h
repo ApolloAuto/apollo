@@ -21,8 +21,6 @@
 #ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_SIDEPASS_VEHICE_H_
 #define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_SIDEPASS_VEHICE_H_
 
-#include <string>
-
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
 namespace apollo {
@@ -44,6 +42,9 @@ class SidepassVehicle : public TrafficRule {
       const SLBoundary& adc_sl_boundary,
       const common::TrajectoryPoint& adc_planning_point,
       PathDecision* path_decision);
+
+  constexpr static char const* const db_key_sidepass_adc_wait_start_time =
+      "DROPBOX_KEY_SIDEPASS_OBSTACLE_ADC_WAIT_TIME";
 };
 
 }  // namespace planning
