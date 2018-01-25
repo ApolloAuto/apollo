@@ -103,7 +103,7 @@ source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
 function main(){
 
-    if [ "$LOCAL_IMAGE" = "yes" ];then
+    if [ "$LOCAL_IMAGE" == "yes" ];then
         info "Start docker container based on local image : $IMG"
     else
         info "Start pulling docker image $IMG ..."
