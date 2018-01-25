@@ -32,18 +32,12 @@ class FeatureOutput {
   ~FeatureOutput();
 
   /**
-   * @brief Open the output stream
-   * @return True if the output stream is open
-   */
-  bool Open();
-
-  /**
    * @brief Close the output stream
    */
   void Close();
 
   /**
-   * @brief Clear
+   * @brief Reset
    */
   void Clear();
 
