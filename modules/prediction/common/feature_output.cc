@@ -21,15 +21,15 @@
 namespace apollo {
 namespace prediction {
 
-FeatureOutput::FeatureOutput() {
-}
+FeatureOutput::FeatureOutput() {}
 
-FeatureOutput::~FeatureOutput() {
-}
+FeatureOutput::~FeatureOutput() {}
+
+bool FeatureOutput::Open() { return true; }
 
 void FeatureOutput::Close() { ADEBUG << "Close feature output"; }
 
-bool FeatureOutput::Ready() { return true; }
+bool FeatureOutput::Ready() { return Open(); }
 
 void FeatureOutput::Insert(const Feature& feature) {}
 
