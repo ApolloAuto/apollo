@@ -32,6 +32,12 @@ class FeatureOutput {
   ~FeatureOutput();
 
   /**
+   * @brief Open the output stream
+   * @return True if the output stream is open
+   */
+  bool Open();
+
+  /**
    * @brief Close the output stream
    */
   void Close();
@@ -44,6 +50,7 @@ class FeatureOutput {
 
   /**
    * @brief Insert a feature
+   * @param A feature in proto
    */
   void Insert(const Feature& feature);
 
