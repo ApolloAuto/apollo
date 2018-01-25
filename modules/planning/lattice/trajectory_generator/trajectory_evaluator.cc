@@ -174,6 +174,30 @@ double TrajectoryEvaluator::LatOffsetCost(
   return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
 }
 
+// AutoTuning LatOffSetCost from discretized trajectory
+double TrajectoryEvaluator::LatOffsetCost(
+  const std::vector<apollo::common::FrenetFramePoint> sl_points) const {
+  CHECK(sl_points.size() > 0);
+  if (sl_points.size() == 0) {
+    return std::numeric_limits<double>::infinity();
+  }
+  double lat_offset_start = sl_points[0].l();
+  double cost_sqr_sum = 0.0;
+  double cost_abs_sum = 0.0;
+  for (const apollo::common::FrenetFramePoint& sl_point : sl_points) {
+    double lat_offset = sl_point.l();
+    double cost = lat_offset / FLAGS_lat_offset_bound;
+    if (lat_offset * lat_offset_start < 0.0) {
+      cost_sqr_sum += cost * cost * FLAGS_weight_opposite_side_offset;
+      cost_abs_sum += std::abs(cost) * FLAGS_weight_opposite_side_offset;
+    } else {
+      cost_sqr_sum += cost * cost * FLAGS_weight_same_side_offset;
+      cost_abs_sum += std::abs(cost) * FLAGS_weight_same_side_offset;
+    }
+  }
+  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
+}
+
 double TrajectoryEvaluator::LonComfortCost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory) const {
   double cost_sqr_sum = 0.0;
@@ -181,6 +205,28 @@ double TrajectoryEvaluator::LonComfortCost(
   for (double t = 0.0; t < FLAGS_trajectory_time_length;
        t += FLAGS_trajectory_time_resolution) {
     double jerk = lon_trajectory->Evaluate(3, t);
+    double cost = jerk / FLAGS_longitudinal_jerk_upper_bound;
+    cost_sqr_sum += cost * cost;
+    cost_abs_sum += std::abs(cost);
+  }
+  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
+}
+
+// AutoTuning LonComfortCost from discretized trajectory
+double TrajectoryEvaluator::LonComfortCost(
+  const std::vector<apollo::common::SpeedPoint> st_points) const {
+  CHECK_GT(st_points.size(), 1);
+  double cost_sqr_sum = 0.0;
+  double cost_abs_sum = 0.0;
+  for (size_t i = 0; i < st_points.size()-1; ++i) {
+    double dds1 = st_points[i].a();
+    double dds2 = st_points[i+1].a();
+    double t1 = st_points[i].t();
+    double t2 = st_points[i].t();
+    if (std::abs(t1 - t2) <= FLAGS_lattice_epsilon) {
+      continue;
+    }
+    double jerk =  (dds2 - dds1) / (t2 - t1);
     double cost = jerk / FLAGS_longitudinal_jerk_upper_bound;
     cost_sqr_sum += cost * cost;
     cost_abs_sum += std::abs(cost);
@@ -212,6 +258,28 @@ double TrajectoryEvaluator::LonObjectiveCost(
          (FLAGS_weight_target_speed + FLAGS_weight_dist_travelled);
 }
 
+// AutoTuning LonObjectiveCost from discretized trajectory
+double TrajectoryEvaluator::LonObjectiveCost(
+  const std::vector<apollo::common::SpeedPoint> st_points,
+  const PlanningTarget& planning_target) const {
+  CHECK_GT(st_points.size(), 1);
+  double dist_s = st_points[st_points.size()-1].s() -
+                  st_points[0].s();
+  double speed_cost_sqr_sum = 0.0;
+  double speed_cost_abs_sum = 0.0;
+  for (const apollo::common::SpeedPoint& st_point : st_points) {
+    double cost =  planning_target.cruise_speed() - st_point.v();
+    speed_cost_sqr_sum += cost * cost;
+    speed_cost_abs_sum += std::abs(cost);
+  }
+  double speed_cost = speed_cost_sqr_sum /
+                      (speed_cost_abs_sum + FLAGS_lattice_epsilon);
+  double dist_travelled_cost = 1.0 / (1.0 + dist_s);
+  return (speed_cost * FLAGS_weight_target_speed +
+            dist_travelled_cost * FLAGS_weight_dist_travelled) /
+         (FLAGS_weight_target_speed + FLAGS_weight_dist_travelled);
+}
+
 // TODO(all): consider putting pointer of reference_line_info and frame
 // while constructing trajectory evaluator
 double TrajectoryEvaluator::LonCollisionCost(
@@ -227,7 +295,6 @@ double TrajectoryEvaluator::LonCollisionCost(
     if (pt_interval.empty()) {
       continue;
     }
-
     double t = start_time + i * FLAGS_trajectory_time_resolution;
     double traj_s = lon_trajectory->Evaluate(0, t);
     double sigma = FLAGS_lon_collision_cost_std;

@@ -82,12 +82,24 @@ class TrajectoryEvaluator {
   double LatOffsetCost(const std::shared_ptr<Curve1d>& lat_trajectory,
                        const std::vector<double>& s_values) const;
 
-  double LonComfortCost(const std::shared_ptr<Curve1d>& lon_trajectory) const;
+  double LatOffsetCost(
+  const std::vector<apollo::common::FrenetFramePoint> sl_points) const;
 
-  double LonCollisionCost(const std::shared_ptr<Curve1d>& lon_trajectory) const;
+  double LonComfortCost(
+      const std::shared_ptr<Curve1d>& lon_trajectory) const;
+
+  double LonComfortCost(
+      const std::vector<apollo::common::SpeedPoint> st_points) const;
+
+  double LonCollisionCost(
+      const std::shared_ptr<Curve1d>& lon_trajectory) const;
 
   double LonObjectiveCost(const std::shared_ptr<Curve1d>& lon_trajectory,
                           const PlanningTarget& planning_target) const;
+
+  double LonObjectiveCost(
+      const std::vector<apollo::common::SpeedPoint> st_points,
+      const PlanningTarget& planning_target) const;
 
   struct CostComparator
       : public std::binary_function<const PairCost&, const PairCost&, bool> {
