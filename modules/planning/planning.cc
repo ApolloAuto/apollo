@@ -44,7 +44,9 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-std::string Planning::Name() const { return "planning"; }
+std::string Planning::Name() const {
+  return "planning";
+}
 
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
@@ -114,9 +116,8 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  reference_line_provider_ =
-      std::unique_ptr<ReferenceLineProvider>(new ReferenceLineProvider(
-          hdmap_, config_.qp_spline_reference_line_smoother_config()));
+  reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
+      new ReferenceLineProvider(hdmap_, config_.smoother_type()));
 
   RegisterPlanners();
   planner_ = planner_factory_.CreateObject(config_.planner_type());

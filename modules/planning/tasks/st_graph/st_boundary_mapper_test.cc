@@ -40,7 +40,7 @@ class StBoundaryMapperTest : public ::testing::Test {
       AERROR << "failed to find lane " << lane_id << " from map " << map_file;
       return;
     }
-    QpSplineReferenceLineSmootherConfig config;
+    ReferenceLineSmootherConfig config;
 
     std::vector<ReferencePoint> ref_points;
     const auto& points = lane_info_ptr->points();
