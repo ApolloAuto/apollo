@@ -35,9 +35,8 @@ class DistanceApproachProblem {
  public:
   explicit DistanceApproachProblem(Eigen::MatrixXd x0, Eigen::MatrixXd xF,
                                    std::size_t horizon, float ts,
-                                   float wheelbase_length, Eigen::MatrixXd ego,
-                                   Eigen::MatrixXd xWS, Eigen::MatrixXd uWS,
-                                   Eigen::MatrixXd timeWS,
+                                   Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
+                                   Eigen::MatrixXd uWS, Eigen::MatrixXd timeWS,
                                    Eigen::MatrixXd XYbounds, std::size_t nOb,
                                    Eigen::MatrixXd vOb, Eigen::MatrixXd AOb,
                                    Eigen::MatrixXd bOb);
@@ -61,9 +60,6 @@ class DistanceApproachProblem {
 
   // time interval
   float ts_;
-
-  // wheelbase_length
-  float wheelbase_length_;
 
   // ego car dimension
   Eigen::MatrixXd ego_;

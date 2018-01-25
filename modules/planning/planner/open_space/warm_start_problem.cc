@@ -36,8 +36,8 @@ namespace planning {
 using apollo::common::time::Clock;
 
 WarmStartProblem::WarmStartProblem(std::size_t horizon, float ts,
-                                   float wheelbase_length, Eigen::MatrixXd x0,
-                                   Eigen::MatrixXd xF, Eigen::MatrixXd XYbounds)
+                                   Eigen::MatrixXd x0, Eigen::MatrixXd xF,
+                                   Eigen::MatrixXd XYbounds)
     : horizon_(horizon), ts_(ts), x0_(x0), xF_(xF), XYbounds_(XYbounds) {}
 
 bool WarmStartProblem::Solve(std::vector<double>* x1_result,

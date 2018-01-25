@@ -37,15 +37,13 @@ using apollo::common::time::Clock;
 
 DistanceApproachProblem::DistanceApproachProblem(
     Eigen::MatrixXd x0, Eigen::MatrixXd xF, std::size_t horizon, float ts,
-    float wheelbase_length, Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
-    Eigen::MatrixXd uWS, Eigen::MatrixXd timeWS, Eigen::MatrixXd XYbounds,
-    std::size_t nOb, Eigen::MatrixXd vOb, Eigen::MatrixXd AOb,
-    Eigen::MatrixXd bOb)
+    Eigen::MatrixXd ego, Eigen::MatrixXd xWS, Eigen::MatrixXd uWS,
+    Eigen::MatrixXd timeWS, Eigen::MatrixXd XYbounds, std::size_t nOb,
+    Eigen::MatrixXd vOb, Eigen::MatrixXd AOb, Eigen::MatrixXd bOb)
     : x0_(x0),
       xF_(xF),
       horizon_(horizon),
       ts_(ts),
-      wheelbase_length_(wheelbase_length),
       ego_(ego),
       xWS_(xWS),
       uWS_(uWS),
