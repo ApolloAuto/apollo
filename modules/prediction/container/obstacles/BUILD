@@ -10,6 +10,7 @@ cc_library(
         "//modules/common/math:math_utils",
         "//modules/common/util:lru_cache",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:feature_output",
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/container/obstacles:obstacle",
