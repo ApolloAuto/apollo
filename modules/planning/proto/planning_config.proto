@@ -7,7 +7,6 @@ import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/qp_spline_path_config.proto";
 import "modules/planning/proto/qp_st_speed_config.proto";
 import "modules/planning/proto/poly_st_speed_config.proto";
-import "modules/planning/proto/qp_spline_reference_line_smoother_config.proto";
 
 enum TaskType {
   DP_POLY_PATH_OPTIMIZER = 0;
@@ -54,7 +53,12 @@ message PlanningConfig {
   };
   optional PlannerType planner_type = 1 [default = EM];
 
+  enum ReferenceLineSmootherType {
+      SPIRAL_SMOOTHER = 1; // generate by spiral path
+      QP_SPLINE_SMOOTHER = 2; // generate by quadratic programming
+      TRACE_SMOOTHER = 3; // leverage human driving trace
+  }
   optional EMPlannerConfig em_planner_config = 2;
-  optional apollo.planning.QpSplineReferenceLineSmootherConfig qp_spline_reference_line_smoother_config = 3;
+  optional ReferenceLineSmootherType smoother_type = 3 [default=QP_SPLINE_SMOOTHER];
   repeated RuleConfig rule_config = 4;
 }
