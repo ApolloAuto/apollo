@@ -84,9 +84,6 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     double probability = ComputeProbability(feature_values);
     lane_sequence_ptr->set_probability(probability);
   }
-  if (FLAGS_prediction_offline_mode) {
-    FeatureOutput::instance()->Write();
-  }
 }
 
 void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
