@@ -5,5 +5,5 @@ package apollo.prediction;
 import "modules/prediction/proto/feature.proto";
 
 message Features {
-	repeated Feature features = 1;
+	repeated Feature feature = 1;
 }

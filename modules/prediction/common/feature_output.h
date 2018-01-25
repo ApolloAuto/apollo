@@ -61,7 +61,7 @@ class FeatureOutput {
 
  private:
   Features features_;
-  size_t count = 0;
+  size_t count_ = 0;
   DECLARE_SINGLETON(FeatureOutput);
 };
 
