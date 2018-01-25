@@ -75,6 +75,7 @@ cc_library(
         "//modules/prediction/proto:feature_proto",
         "//modules/prediction/proto:offline_features_proto",
         "//modules/common:log",
+        "//modules/common:macro",
     ]
 )
 
