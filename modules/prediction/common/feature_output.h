@@ -17,6 +17,7 @@
 #ifndef MODULES_PREDICTION_COMMON_FEATURE_OUTPUT_H_
 #define MODULES_PREDICTION_COMMON_FEATURE_OUTPUT_H_
 
+#include "modules/common/macro.h"
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/offline_features.pb.h"
 
@@ -28,26 +29,45 @@ class FeatureOutput {
   /**
    * @brief Destructor
    */
-  ~FeatureOutput() = default;
+  ~FeatureOutput();
+
+  /**
+   * @brief Open the output stream
+   * @return True if the output stream is open
+   */
+  bool Open();
 
   /**
    * @brief Close the output stream
    */
-  static void Close();
+  void Close();
+
+  /**
+   * @brief Clear
+   */
+  void Clear();
 
   /**
    * @brief Check if output is ready
    * @return True if output is ready
    */
-  static bool Ready();
+  bool Ready();
 
   /**
-   * @brief Write a proto to file
+   * @brief Insert a feature
+   * @param A feature in proto
    */
-  static void Write(const Feature& feature);
+  void Insert(const Feature& feature);
+
+  /**
+   * @brief Write features to a file
+   */
+  void Write();
 
  private:
-  FeatureOutput() = delete;
+  Features features_;
+  size_t count_ = 0;
+  DECLARE_SINGLETON(FeatureOutput);
 };
 
 }  // namespace prediction
