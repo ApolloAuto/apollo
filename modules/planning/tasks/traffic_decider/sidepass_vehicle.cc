@@ -20,10 +20,15 @@
 
 #include "modules/planning/tasks/traffic_decider/sidepass_vehicle.h"
 
+#include "modules/common/time/time.h"
+#include "modules/common/util/dropbox.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
+
+using apollo::common::time::Clock;
+using apollo::common::util::Dropbox;
 
 SidepassVehicle::SidepassVehicle(const RuleConfig& config)
     : TrafficRule(config) {}
@@ -36,6 +41,8 @@ void SidepassVehicle::MakeSidepassObstacleDecision(
   if (adc_planning_point.v() > kAdcSpeedThreshold) {
     return;
   }
+
+  bool need_sidepass = false;
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     if (path_obstacle->obstacle()->IsVirtual() ||
         !path_obstacle->obstacle()->IsStatic()) {
@@ -56,11 +63,43 @@ void SidepassVehicle::MakeSidepassObstacleDecision(
 
     if (path_obstacle->PerceptionSLBoundary().start_l() < 0 &&
         path_obstacle->PerceptionSLBoundary().end_l() > 0) {
-      ObjectDecisionType sidepass;
-      sidepass.mutable_sidepass();
-      path_decision->AddLateralDecision("sidepass_vehicle", path_obstacle->Id(),
-                                        sidepass);
+      // need sidepass, check wait_time
+      bool is_waited_long_enough = false;
+
+      double duration = 0.0;
+      auto* wait_start_time =
+          Dropbox<double>::Open()->Get(db_key_sidepass_adc_wait_start_time);
+      if (wait_start_time != nullptr) {
+        duration =
+            Clock::NowInSeconds() - *(Dropbox<double>::Open()->Get(
+                                        db_key_sidepass_adc_wait_start_time));
+      }
+      constexpr double kWaitDuration = 5.0;
+      if (duration > kWaitDuration) {
+        is_waited_long_enough = true;
+      }
+
+      constexpr double kAdcStopSpeedThreshold = 0.1;  // unit: m/s (25mph)
+      if (adc_planning_point.v() < kAdcStopSpeedThreshold) {
+        if (duration < kWaitDuration) {
+          // only set new start time when vehicle is stopped.
+          Dropbox<double>::Open()->Set(db_key_sidepass_adc_wait_start_time,
+                                       Clock::NowInSeconds());
+        }
+      }
+
+      if (is_waited_long_enough) {
+        ObjectDecisionType sidepass;
+        sidepass.mutable_sidepass();
+        path_decision->AddLateralDecision("sidepass_vehicle",
+                                          path_obstacle->Id(), sidepass);
+        need_sidepass = true;
+      }
     }
+  }
+  if (!need_sidepass) {
+    // update start time
+    Dropbox<double>::Open()->Remove(db_key_sidepass_adc_wait_start_time);
   }
 }
 
