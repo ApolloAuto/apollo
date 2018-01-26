@@ -52,7 +52,7 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
 /*
  * stop_sign: adc proceed
  *   adc status: null => TO_STOP
- *   decision: stop
+ *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   FLAGS_enable_stop_sign = true;
@@ -62,7 +62,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 
   // check dropbox value
   StopSign::StopSignStopStatus* status
@@ -76,7 +76,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
 /*
  * stop_sign: adc stopped (speed and distance to stop_line)
  *   adc status: TO_STOP => STOPPING
- *   decision: stop
+ *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   FLAGS_enable_stop_sign = true;
@@ -92,7 +92,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 
   // check dropbox value
   StopSign::StopSignStopStatus* status
@@ -106,7 +106,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 /*
  * stop_sign: adc stopped + wait_time < 3sec
  *   adc status: STOPPING => STOPPING
- *   decision: stop
+ *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   FLAGS_enable_stop_sign = true;
@@ -124,7 +124,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 
   // check dropbox value
   StopSign::StopSignStopStatus* status
@@ -138,7 +138,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 /*
  * stop_sign: adc stopped + wait time > 3
  *   adc status: STOPPING => STOP_DONE
- *   decision: stop
+ *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   FLAGS_enable_stop_sign = true;
@@ -156,7 +156,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 
   // check dropbox value
   StopSign::StopSignStopStatus* status
@@ -166,6 +166,39 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
       StopSign::StopSignStopStatus::UNKNOWN : *status;
   EXPECT_EQ(StopSign::StopSignStopStatus::STOP_DONE, stop_status);
 }
+
+/*
+ * stop_sign:
+ * step 1:
+ *   adc decision: STOP
+ * step 2: wait_time =4, other vehicles at other stop sign later than adc
+ *   adc status: STOPPING => STOP_DONE
+ *   decision: CRUISE
+ */
+TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
+  FLAGS_enable_stop_sign = true;
+
+  std::string seq_num = "3";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(0);
+
+  // set dropbox
+  double stop_start_time = Clock::NowInSeconds() - 4;
+  Dropbox<double>::Open()->Set("kStopSignStopStarttime_9762",
+                               stop_start_time);
+
+  seq_num = "4";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(1);
+}
+
 
 }  // namespace planning
 }  // namespace apollo
