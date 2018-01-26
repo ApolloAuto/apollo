@@ -199,7 +199,7 @@ DEFINE_double(min_stop_distance_obstacle, 6.0,
               "min stop distance from in-lane obstacle (meters)");
 DEFINE_double(stop_distance_destination, 0.5,
               "stop distance from destination line");
-DEFINE_double(stop_distance_traffic_light, 3.0,
+DEFINE_double(stop_distance_traffic_light, 1.0,
               "stop distance from traffic light line");
 DEFINE_double(stop_distance_crosswalk, 1.0,
               "stop distance from stop line of crosswalk");
