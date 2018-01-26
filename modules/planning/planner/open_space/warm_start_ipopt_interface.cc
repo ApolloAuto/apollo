@@ -48,6 +48,9 @@ WarmStartIPOPTInterface::WarmStartIPOPTInterface(
                                ->GetConfig()
                                .vehicle_param()
                                .wheel_base();
+  state_result_(horizon_ + 1, 4);
+  control_result_(horizon_ + 1, 2);
+  time_result_(horizon_ + 1, 1);
 }
 
 bool WarmStartIPOPTInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
@@ -340,44 +343,58 @@ void WarmStartIPOPTInterface::finalize_solution(
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
-  x1_result_.reserve(horizon_ + 1);
-  x2_result_.reserve(horizon_ + 1);
-  x3_result_.reserve(horizon_ + 1);
-  x4_result_.reserve(horizon_ + 1);
+  /*
+    u1_result_.clear();
+    u2_result_.clear();
 
-  u1_result_.reserve(horizon_);
-  u2_result_.reserve(horizon_);
-
-  t_result_.reserve(horizon_);
-
+    t_result_.clear();
+  */
   std::size_t state_start_index = 0;
   std::size_t input_start_index = (horizon_ + 1) * 4;
   std::size_t time_start_index = input_start_index + horizon_ * 2;
   for (std::size_t i = 0; i < horizon_; ++i) {
-    x1_result_.push_back(state_start_index);
-    x2_result_.push_back(state_start_index + 1);
-    x3_result_.push_back(state_start_index + 2);
-    x4_result_.push_back(state_start_index + 3);
+    std::size_t state_index = i * 4;
+    /*
+    x1_result_.push_back(x[state_index]);
+    x2_result_.push_back(x[state_index] + 1);
+    x3_result_.push_back(x[state_index] + 2);
+    x4_result_.push_back(x[state_index] + 3);
+*/
+    state_result_(i, 0) = x[state_index];
+    state_result_(i, 1) = x[state_index + 1];
+    state_result_(i, 2) = x[state_index + 2];
+    state_result_(i, 3) = x[state_index + 3];
 
-    u1_result_.push_back(input_start_index);
-    u2_result_.push_back(input_start_index + 1);
+    /*
+        std::size_t control_index = (horizon_ + 1) * 4 + i * 2;
+        u1_result_.push_back(x[control_index]);
+        u2_result_.push_back(x[control_index] + 1);
 
-    t_result_.push_back(time_start_index);
+        std::size_t time_index = (horizon_ + 1) * 4 + horizon_ * 2 + i;
+        t_result_.push_back(x[time_index]);
+
   }
+*/
+    std::size_t control_index = (horizon_ + 1) * 4 + i * 2;
+    control_result_(i, 0) = x[control_index];
+    control_result_(i, 1) = x[control_index + 1];
+
+    std::size_t time_index = (horizon_ + 1) * 4 + horizon_ * 2 + i;
+    time_result_(i, 0) = x[time_index];
+  }
+  // push back state for N+1
+  state_result_(4 * horizon_, 0) = x[4 * horizon_];
+  state_result_(4 * horizon_, 1) = x[4 * horizon_ + 1];
+  state_result_(4 * horizon_, 2) = x[4 * horizon_ + 2];
+  state_result_(4 * horizon_, 3) = x[4 * horizon_ + 3];
 }
 
 void WarmStartIPOPTInterface::get_optimization_results(
-    std::vector<double>* x1_result, std::vector<double>* x2_result,
-    std::vector<double>* x3_result, std::vector<double>* x4_result,
-    std::vector<double>* u1_result, std::vector<double>* u2_result,
-    std::vector<double>* t_result) const {
-  *x1_result = x1_result_;
-  *x2_result = x2_result_;
-  *x3_result = x3_result_;
-  *x4_result = x4_result_;
-  *u1_result = u1_result_;
-  *u2_result = u2_result_;
-  *t_result = t_result_;
+    Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
+    Eigen::MatrixXd* time_result) const {
+  *state_result = state_result_;
+  *control_result = control_result_;
+  *time_result = time_result_;
 }
 }  // namespace planning
 }  // namespace apollo

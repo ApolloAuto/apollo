@@ -40,13 +40,9 @@ WarmStartProblem::WarmStartProblem(std::size_t horizon, float ts,
                                    Eigen::MatrixXd XYbounds)
     : horizon_(horizon), ts_(ts), x0_(x0), xF_(xF), XYbounds_(XYbounds) {}
 
-bool WarmStartProblem::Solve(std::vector<double>* x1_result,
-                             std::vector<double>* x2_result,
-                             std::vector<double>* x3_result,
-                             std::vector<double>* x4_result,
-                             std::vector<double>* u1_result,
-                             std::vector<double>* u2_result,
-                             std::vector<double>* t_result) {
+bool WarmStartProblem::Solve(Eigen::MatrixXd* state_result,
+                             Eigen::MatrixXd* control_result,
+                             Eigen::MatrixXd* time_result) {
   // TODO(QiL) : set up number of variables and number of constaints, and rego
   // so constants do not get set repeatedly
 
@@ -114,8 +110,7 @@ bool WarmStartProblem::Solve(std::vector<double>* x1_result,
     ADEBUG << "Return status: " << int(status);
   }
 
-  ptop->get_optimization_results(x1_result, x2_result, x3_result, x4_result,
-                                 u1_result, u2_result, t_result);
+  ptop->get_optimization_results(state_result, control_result, time_result);
 
   return status == Ipopt::Solve_Succeeded ||
          status == Ipopt::Solved_To_Acceptable_Level;
