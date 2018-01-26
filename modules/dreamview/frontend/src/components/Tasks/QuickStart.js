@@ -67,6 +67,12 @@ export default class QuickStarter extends React.Component {
                 WS.changeDrivingMode("COMPLETE_AUTO_DRIVE");
             },
         };
+        this.version = {
+            "Version": () => {
+                // TODO(all): change to nice UI.
+                alert(this.props.store.hmi.dockerImage);
+            },
+        };
     }
 
     render() {
@@ -79,6 +85,7 @@ export default class QuickStarter extends React.Component {
                 <div className="card-content-column">
                     <CommandGroup disabled={isPanelLocked} commands={this.setup} />
                     <CommandGroup disabled={isPanelLocked} commands={this.reset} />
+                    <CommandGroup disabled={isPanelLocked} commands={this.version} />
                     <CommandGroup disabled={!hmi.enableStartAuto} commands={this.auto}
                                   extraButtonClass="start-auto-button"
                                   extraCommandClass="start-auto-command" />
