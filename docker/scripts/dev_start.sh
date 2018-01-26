@@ -142,11 +142,19 @@ function main(){
         mkdir "$HOME/.cache"
     fi
 
+    LOCALIZATION_VOLUME=apollo_localization_volume
+    docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
+
+    LOCALIZATION_VOLUME_IMAGE=apolloauto/apollo:localization_volume-${ARCH}-latest
+    docker pull ${LOCALIZATION_VOLUME_IMAGE}
+    docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
+
     info "Starting docker container \"apollo_dev\" ..."
     docker run -it \
         -d \
         --privileged \
         --name apollo_dev \
+        --volumes-from ${LOCALIZATION_VOLUME} \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
         -e USER=$USER \
