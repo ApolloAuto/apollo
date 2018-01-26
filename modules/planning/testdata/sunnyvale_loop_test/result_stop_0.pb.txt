@@ -1855,13 +1855,13 @@ decision {
       object_decision {
         stop {
           reason_code: STOP_REASON_SIGNAL
-          distance_s: -3
+          distance_s: -1
           stop_point {
-            x: 587049.89961283
-            y: 4141556.5205516969
+            x: 587050.98527786427
+            y: 4141558.1996725076
             z: 0
           }
-          stop_heading: 1.0431651617390183
+          stop_heading: 0.96878626716418581
         }
       }
     }
