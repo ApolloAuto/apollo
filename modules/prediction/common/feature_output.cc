@@ -16,16 +16,51 @@
 
 #include "modules/prediction/common/feature_output.h"
 
+#include <string>
+
 #include "modules/common/log.h"
+#include "modules/common/util/file.h"
+#include "modules/common/util/string_util.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
-void FeatureOutput::Close() { ADEBUG << "Close feature output"; }
+FeatureOutput::FeatureOutput() {}
 
-bool FeatureOutput::Ready() { return true; }
+FeatureOutput::~FeatureOutput() { Clear(); }
 
-void FeatureOutput::Write(const Feature& feature) {}
+void FeatureOutput::Close() {
+  ADEBUG << "Close feature output";
+  Write();
+  Clear();
+}
+
+void FeatureOutput::Clear() {
+  count_ = 0;
+  features_.Clear();
+}
+
+bool FeatureOutput::Ready() {
+  Clear();
+  return true;
+}
+
+void FeatureOutput::Insert(const Feature& feature) {
+  features_.add_feature()->CopyFrom(feature);
+}
+
+void FeatureOutput::Write() {
+  if (features_.feature_size() <= 0) {
+    ADEBUG << "Skip writing empty feature.";
+    return;
+  }
+  std::string file_name = ::apollo::common::util::StrCat(
+      FLAGS_prediction_data_file_prefix, ".", std::to_string(count_), ".bin");
+  ::apollo::common::util::SetProtoToBinaryFile(features_, file_name);
+  features_.Clear();
+  ++count_;
+}
 
 }  // namespace prediction
 }  // namespace apollo
