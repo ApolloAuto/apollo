@@ -139,11 +139,13 @@ apollo::common::Status OpenSpacePlanner::Plan(
                                   XYbounds, nOb, vOb, AOb, bOb));
 
   // result for distance approach problem
-  std::vector<double> x1_result_2, x2_result_2, x3_result_2, x4_result_2,
-      u1_result_2, u2_result_2, t_result_2;
-  bool status = distance_approach_->Solve(
-      &x1_result_2, &x2_result_2, &x3_result_2, &x4_result_2, &u1_result_2,
-      &u2_result_2, &t_result_2);
+  Eigen::MatrixXd state_result_ds;
+  Eigen::MatrixXd control_result_ds;
+  Eigen::MatrixXd time_result_ds;
+
+  bool status = distance_approach_->Solve(&state_result_ds, &control_result_ds,
+                                          &time_result_ds);
+
   if (status) {
     ADEBUG << "Distance approach problem solved successfully!";
   } else {
