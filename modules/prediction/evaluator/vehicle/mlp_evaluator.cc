@@ -86,7 +86,7 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
 
   if (FLAGS_prediction_offline_mode) {
-    FeatureOutput::instance()->Insert(*latest_feature_ptr);
+    FeatureOutput::Insert(*latest_feature_ptr);
   }
 }
 

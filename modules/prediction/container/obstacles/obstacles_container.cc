@@ -19,8 +19,8 @@
 #include <utility>
 
 #include "modules/common/math/math_utils.h"
-#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/feature_output.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
@@ -43,7 +43,7 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   }
   if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap) {
     if (FLAGS_prediction_offline_mode) {
-      FeatureOutput::instance()->Write();
+      FeatureOutput::Write();
     }
     obstacles_.Clear();
     ADEBUG << "Replay mode is enabled.";
