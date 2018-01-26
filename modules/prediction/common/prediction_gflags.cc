@@ -71,6 +71,8 @@ DEFINE_double(still_pedestrian_speed_threshold, 0.5,
               "Speed threshold for still pedestrians");
 DEFINE_double(still_obstacle_position_std, 1.0,
               "Position standard deviation for still obstacles");
+DEFINE_double(still_pedestrian_position_std, 0.5,
+              "Position standard deviation for still obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
 DEFINE_int32(max_num_current_lane, 1, "Max number to search current lanes");
