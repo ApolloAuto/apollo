@@ -20,8 +20,8 @@
 
 #include "modules/planning/lattice/behavior_decider/ego_vehicle_scenario.h"
 
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

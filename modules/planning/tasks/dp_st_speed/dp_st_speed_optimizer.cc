@@ -37,8 +37,8 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning_internal::STGraphDebug;

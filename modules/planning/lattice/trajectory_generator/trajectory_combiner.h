@@ -34,8 +34,7 @@ class TrajectoryCombiner {
  public:
   static DiscretizedTrajectory Combine(
       const std::vector<apollo::common::PathPoint>& reference_line,
-      const Curve1d& lon_trajectory,
-      const Curve1d& lat_trajectory,
+      const Curve1d& lon_trajectory, const Curve1d& lat_trajectory,
       const double init_relative_time);
 };
 

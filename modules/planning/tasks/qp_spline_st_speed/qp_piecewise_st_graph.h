@@ -55,10 +55,10 @@ class QpPiecewiseStGraph {
   void Init();
 
   // Add st graph constraint
-  common::Status AddConstraint(
-      const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-      const std::vector<const StBoundary*>& boundaries,
-      const std::pair<double, double>& accel_bound);
+  common::Status AddConstraint(const common::TrajectoryPoint& init_point,
+                               const SpeedLimit& speed_limit,
+                               const std::vector<const StBoundary*>& boundaries,
+                               const std::pair<double, double>& accel_bound);
 
   // Add objective function
   common::Status AddKernel(const std::vector<const StBoundary*>& boundaries,

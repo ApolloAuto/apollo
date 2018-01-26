@@ -55,7 +55,7 @@ using apollo::common::util::StrCat;
 namespace {
 constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
-}
+}  // namespace
 
 StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
                                    const StBoundaryConfig& config,

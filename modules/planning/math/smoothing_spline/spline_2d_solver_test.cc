@@ -39,7 +39,7 @@ TEST(constraint_test, test_suit_one) {
 
   std::vector<double> et{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5};
   std::vector<double> bound(11, 0.2);
-  std::vector<std::vector<double> > constraint_data{
+  std::vector<std::vector<double>> constraint_data{
       {-1.211566924, 434592.7844, 4437011.568},
       {-1.211572116, 434594.6884, 4437006.498},
       {-1.21157766, 434596.5923, 4437001.428},

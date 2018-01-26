@@ -110,8 +110,8 @@ double TrajectoryEvaluator::top_trajectory_pair_cost() const {
   }
 }
 
-std::vector<double>
-TrajectoryEvaluator::top_trajectory_pair_component_cost() const {
+std::vector<double> TrajectoryEvaluator::top_trajectory_pair_component_cost()
+    const {
   CHECK(is_auto_tuning_);
   return cost_queue_with_components_.top().second.first;
 }
@@ -192,23 +192,23 @@ double TrajectoryEvaluator::LonObjectiveCost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory,
     const PlanningTarget& planning_target) const {
   double t_max = lon_trajectory->ParamLength();
-  double dist_s = lon_trajectory->Evaluate(0, t_max) -
-                  lon_trajectory->Evaluate(0, 0.0);
+  double dist_s =
+      lon_trajectory->Evaluate(0, t_max) - lon_trajectory->Evaluate(0, 0.0);
 
   double speed_cost_sqr_sum = 0.0;
   double speed_cost_abs_sum = 0.0;
   for (double t = 0.0; t < FLAGS_trajectory_time_length;
        t += FLAGS_trajectory_time_resolution) {
-    double cost = planning_target.cruise_speed() -
-                  lon_trajectory->Evaluate(1, t);
+    double cost =
+        planning_target.cruise_speed() - lon_trajectory->Evaluate(1, t);
     speed_cost_sqr_sum += cost * cost;
     speed_cost_abs_sum += std::abs(cost);
   }
-  double speed_cost = speed_cost_sqr_sum /
-                      (speed_cost_abs_sum + FLAGS_lattice_epsilon);
+  double speed_cost =
+      speed_cost_sqr_sum / (speed_cost_abs_sum + FLAGS_lattice_epsilon);
   double dist_travelled_cost = 1.0 / (1.0 + dist_s);
   return (speed_cost * FLAGS_weight_target_speed +
-            dist_travelled_cost * FLAGS_weight_dist_travelled) /
+          dist_travelled_cost * FLAGS_weight_dist_travelled) /
          (FLAGS_weight_target_speed + FLAGS_weight_dist_travelled);
 }
 

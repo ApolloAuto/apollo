@@ -82,8 +82,8 @@ class StopSign : public TrafficRule {
   hdmap::PathOverlap* next_stop_sign_overlap_ = nullptr;
   hdmap::StopSignInfo* next_stop_sign_ = nullptr;
   StopSignStopStatus stop_status_;
-  std::vector<std::pair<hdmap::LaneInfoConstPtr,
-      hdmap::OverlapInfoConstPtr>> associated_lanes_;
+  std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
+      associated_lanes_;
 };
 
 }  // namespace planning

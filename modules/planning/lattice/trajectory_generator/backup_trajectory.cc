@@ -21,12 +21,12 @@ namespace planning {
 
 using apollo::common::PathPoint;
 
-BackupTrajectory::BackupTrajectory(
-    const std::array<double, 3>& init_s,
-    const std::array<double, 3>& init_d,
-    const double init_relative_time) :
-    init_s_(init_s), init_d_(init_d),
-    init_relative_time_(init_relative_time) {
+BackupTrajectory::BackupTrajectory(const std::array<double, 3>& init_s,
+                                   const std::array<double, 3>& init_d,
+                                   const double init_relative_time)
+    : init_s_(init_s),
+      init_d_(init_d),
+      init_relative_time_(init_relative_time) {
   SetLonTrajectories();
   SetLatTrajectories();
 }
@@ -36,21 +36,21 @@ void BackupTrajectory::SetLonTrajectories() {
   std::vector<double> accelerations{-1.0, -2.0, -3.0, -4.0};
   for (double acc : accelerations) {
     lon_trajectories_.emplace_back(std::unique_ptr<Curve1d>(
-      new ConstantDecelerationTrajectory1d(init_s_[0], init_s_[1], acc)));
+        new ConstantDecelerationTrajectory1d(init_s_[0], init_s_[1], acc)));
   }
 }
 
 void BackupTrajectory::SetLatTrajectories() {
   lat_trajectories_.clear();
   lat_trajectories_.emplace_back(std::unique_ptr<Curve1d>(
-    new ConstantDecelerationTrajectory1d(init_d_[0], 0.0, 0.0)));
+      new ConstantDecelerationTrajectory1d(init_d_[0], 0.0, 0.0)));
 }
 
 DiscretizedTrajectory BackupTrajectory::GenerateTrajectory(
     const std::vector<PathPoint>& discretized_ref_points) {
-  return TrajectoryCombiner::Combine(discretized_ref_points,
-             *lon_trajectories_.front(), *lat_trajectories_.front(),
-             init_relative_time_);
+  return TrajectoryCombiner::Combine(
+      discretized_ref_points, *lon_trajectories_.front(),
+      *lat_trajectories_.front(), init_relative_time_);
 }
 
 }  // namespace planning

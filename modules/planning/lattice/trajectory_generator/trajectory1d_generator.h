@@ -24,8 +24,8 @@
 #include <memory>
 #include <vector>
 
-#include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/lattice/trajectory_generator/end_condition_sampler.h"
+#include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 
 namespace apollo {
