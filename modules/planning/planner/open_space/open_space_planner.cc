@@ -106,12 +106,13 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
   warm_start_.reset(new WarmStartProblem(horizon, ts, x0, xF, XYbounds));
 
-  std::vector<double> x1_result, x2_result, x3_result, x4_result, u1_result,
-      u2_result, t_result;
+  Eigen::MatrixXd state_result;
+  Eigen::MatrixXd control_result;
+  Eigen::MatrixXd time_result;
 
   bool ret_status =
-      warm_start_->Solve(&x1_result, &x2_result, &x3_result, &x4_result,
-                         &u1_result, &u2_result, &t_result);
+      warm_start_->Solve(&state_result, &control_result, &time_result);
+
   if (ret_status) {
     ADEBUG << "Warm start problem solved successfully!";
   } else {

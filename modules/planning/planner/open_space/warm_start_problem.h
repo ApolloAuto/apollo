@@ -38,10 +38,8 @@ class WarmStartProblem {
 
   virtual ~WarmStartProblem() = default;
 
-  bool Solve(std::vector<double>* x1_result, std::vector<double>* x2_result,
-             std::vector<double>* x3_result, std::vector<double>* x4_result,
-             std::vector<double>* u1_result, std::vector<double>* u2_result,
-             std::vector<double>* t_result);
+  bool Solve(Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
+             Eigen::MatrixXd* time_result);
 
  private:
   // time horizon
