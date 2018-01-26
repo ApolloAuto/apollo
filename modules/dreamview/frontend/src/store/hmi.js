@@ -19,7 +19,12 @@ export default class HMI {
 
     displayName = {};
 
+    @observable dockerImage = ''
+
     @action initialize(config) {
+        if (config.dockerImage) {
+            this.dockerImage = config.dockerImage;
+        }
         if (config.modes) {
             this.modes = config.modes;
         }
