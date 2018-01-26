@@ -32,10 +32,10 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-using common::adapter::AdapterManager;
 using common::PathPoint;
 using common::SpeedPoint;
 using common::TrajectoryPoint;
+using common::adapter::AdapterManager;
 
 PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
                       const double s) {

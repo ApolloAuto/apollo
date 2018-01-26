@@ -33,10 +33,10 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
+using apollo::common::SpeedPoint;
 using apollo::common::Status;
 using apollo::common::VehicleParam;
 using apollo::planning_internal::STGraphDebug;
-using apollo::common::SpeedPoint;
 
 QpSplineStGraph::QpSplineStGraph(Spline1dGenerator* spline_generator,
                                  const QpStSpeedConfig& qp_st_speed_config,

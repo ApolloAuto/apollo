@@ -24,11 +24,11 @@
 #include <vector>
 
 #include "modules/planning/common/frame.h"
-#include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 #include "modules/planning/common/reference_line_info.h"
+#include "modules/planning/lattice/behavior_decider/behavior_decider.h"
+#include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {
 namespace planning {
@@ -59,16 +59,17 @@ class LatticePlanner : public Planner {
    * @return OK if planning succeeds; error otherwise.
    */
   common::Status PlanOnReferenceLine(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame, ReferenceLineInfo* reference_line_info) override;
+      const common::TrajectoryPoint& planning_init_point, Frame* frame,
+      ReferenceLineInfo* reference_line_info) override;
 
  private:
   DiscretizedTrajectory GetFutureTrajectory() const;
 
-  bool MapFutureTrajectoryToSL(const DiscretizedTrajectory& future_trajectory,
-    std::vector<apollo::common::SpeedPoint>* st_points,
-    std::vector<apollo::common::FrenetFramePoint>* sl_points,
-    ReferenceLineInfo* reference_line_info);
+  bool MapFutureTrajectoryToSL(
+      const DiscretizedTrajectory& future_trajectory,
+      std::vector<apollo::common::SpeedPoint>* st_points,
+      std::vector<apollo::common::FrenetFramePoint>* sl_points,
+      ReferenceLineInfo* reference_line_info);
 
   BehaviorDecider decider_;
 };

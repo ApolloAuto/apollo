@@ -72,8 +72,8 @@ class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
                                   const double dkappa) const;
 
   int DownSampleRawReferenceLine(
-    const std::vector<Eigen::Vector2d>& raw_point2d,
-    std::vector<Eigen::Vector2d>* down_sampled_raw_point2d);
+      const std::vector<Eigen::Vector2d>& raw_point2d,
+      std::vector<Eigen::Vector2d>* down_sampled_raw_point2d);
 
   double default_max_point_deviation_ = 0.0;
 

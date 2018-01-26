@@ -43,10 +43,10 @@ class Spline2dConstraint {
 
   // preset method
   /**
-  *   @brief: inequality boundary constraints
-  *   if no boundary, do specify either by std::infinity or let vector.size() =
-  *0
-  **/
+   *   @brief: inequality boundary constraints
+   *   if no boundary, do specify either by std::infinity or let vector.size() =
+   *0
+   **/
   bool Add2dBoundary(const std::vector<double>& t_coord,
                      const std::vector<double>& angle,
                      const std::vector<apollo::common::math::Vec2d>& ref_point,
@@ -90,8 +90,8 @@ class Spline2dConstraint {
   bool AddThirdDerivativeSmoothConstraint();
 
   /**
-  *   @brief: output interface inequality constraint
-  **/
+   *   @brief: output interface inequality constraint
+   **/
   const AffineConstraint& inequality_constraint() const;
   const AffineConstraint& equality_constraint() const;
 

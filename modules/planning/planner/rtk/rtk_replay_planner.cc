@@ -27,10 +27,10 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleStateProvider;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleStateProvider;
 
 RTKReplayPlanner::RTKReplayPlanner() {
   ReadTrajectoryFile(FLAGS_rtk_trajectory_filename);
@@ -43,8 +43,7 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_start_point,
   auto status = Status::OK();
   bool has_plan = false;
   auto it = std::find_if(
-      frame->reference_line_info().begin(),
-      frame->reference_line_info().end(),
+      frame->reference_line_info().begin(), frame->reference_line_info().end(),
       [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
   if (it != frame->reference_line_info().end()) {
     status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
@@ -72,8 +71,8 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_start_point,
 }
 
 Status RTKReplayPlanner::PlanOnReferenceLine(
-    const TrajectoryPoint& planning_init_point,
-    Frame*, ReferenceLineInfo* reference_line_info) {
+    const TrajectoryPoint& planning_init_point, Frame*,
+    ReferenceLineInfo* reference_line_info) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
     std::string msg(
         "RTKReplayPlanner doesn't have a recorded trajectory or "

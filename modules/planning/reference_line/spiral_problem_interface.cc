@@ -791,8 +791,8 @@ void SpiralProblemInterface::set_end_point(const double x, const double y,
   end_dkappa_ = dkappa;
 }
 
-void SpiralProblemInterface::set_end_point_position(
-    const double x, const double y) {
+void SpiralProblemInterface::set_end_point_position(const double x,
+                                                    const double y) {
   has_fixed_end_point_position_ = true;
   end_x_ = x;
   end_y_ = y;
