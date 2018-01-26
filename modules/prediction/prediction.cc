@@ -93,7 +93,7 @@ Status Prediction::Init() {
   }
 
   if (FLAGS_prediction_offline_mode) {
-    if (!FeatureOutput::instance()->Ready()) {
+    if (!FeatureOutput::Ready()) {
       return OnError("Feature output is not ready.");
     }
   }
@@ -105,7 +105,7 @@ Status Prediction::Start() { return Status::OK(); }
 
 void Prediction::Stop() {
   if (FLAGS_prediction_offline_mode) {
-    FeatureOutput::instance()->Close();
+    FeatureOutput::Close();
   }
 }
 
