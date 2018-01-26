@@ -329,6 +329,7 @@ bool DPRoadGraph::SamplePathWaypoints(
       if (HasSidepass()) {
         // currently only left nudge is supported. Need road hard boundary for
         // both sides
+        sample_l.clear();
         sample_l.push_back(eff_left_width + config_.sidepass_distance());
       }
     }
@@ -348,7 +349,7 @@ bool DPRoadGraph::SamplePathWaypoints(
       sample_layer_debug.add_sl_point()->CopyFrom(sl);
       level_points.push_back(std::move(sl));
     }
-    if (!reference_line_info_.IsChangeLanePath()) {
+    if (!reference_line_info_.IsChangeLanePath() && !HasSidepass()) {
       auto sl_zero = common::util::MakeSLPoint(s, 0.0);
       sample_layer_debug.add_sl_point()->CopyFrom(sl_zero);
       level_points.push_back(sl_zero);
