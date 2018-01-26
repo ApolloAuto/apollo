@@ -42,13 +42,9 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 
   virtual ~DistanceApproachIPOPTInterface() = default;
 
-  void get_optimization_results(std::vector<double>* x1_result,
-                                std::vector<double>* x2_result,
-                                std::vector<double>* x3_result,
-                                std::vector<double>* x4_result,
-                                std::vector<double>* u1_result,
-                                std::vector<double>* u2_result,
-                                std::vector<double>* t_result) const;
+  void get_optimization_results(Eigen::MatrixXd* state_result,
+                                Eigen::MatrixXd* control_result,
+                                Eigen::MatrixXd* time_result) const;
 
   /** Method to return some info about the nlp */
   bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
@@ -106,14 +102,6 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   Eigen::MatrixXd xf_;
   Eigen::MatrixXd XYbounds_;
 
-  std::vector<double> x1_result_;
-  std::vector<double> x2_result_;
-  std::vector<double> x3_result_;
-  std::vector<double> x4_result_;
-  std::vector<double> u1_result_;
-  std::vector<double> u2_result_;
-  std::vector<double> t_result_;
-
   double w_ev_;
   double l_ev_;
   std::vector<double> g_;
@@ -122,6 +110,10 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   std::size_t nOb_;
   std::size_t vObsum_;
   double wheelbase_;
+
+  Eigen::MatrixXd state_result_;
+  Eigen::MatrixXd control_result_;
+  Eigen::MatrixXd time_result_;
 };
 
 }  // namespace planning

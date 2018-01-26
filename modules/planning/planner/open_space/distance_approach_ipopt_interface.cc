@@ -54,6 +54,9 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   offset_ = (ego_(0, 0) + ego_(0, 2)) / 2 - ego_(0, 2);
   CHECK(vOb_.sum() >= 0) << "vOb sum negative!";
   vObsum_ = std::size_t(vOb_.sum());
+  state_result_(horizon_ + 1, 4);
+  control_result_(horizon_ + 1, 2);
+  time_result_(horizon_ + 1, 1);
 }
 
 /*
@@ -437,12 +440,38 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
-    Ipopt::IpoptCalculatedQuantities* ip_cq) {}
+    Ipopt::IpoptCalculatedQuantities* ip_cq) {
+  std::size_t state_start_index = 0;
+  std::size_t input_start_index = (horizon_ + 1) * 4;
+  std::size_t time_start_index = input_start_index + horizon_ * 2;
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    std::size_t state_index = i * 4;
+
+    state_result_(i, 0) = x[state_index];
+    state_result_(i, 1) = x[state_index + 1];
+    state_result_(i, 2) = x[state_index + 2];
+    state_result_(i, 3) = x[state_index + 3];
+
+    std::size_t control_index = (horizon_ + 1) * 4 + i * 2;
+    control_result_(i, 0) = x[control_index];
+    control_result_(i, 1) = x[control_index + 1];
+
+    std::size_t time_index = (horizon_ + 1) * 4 + horizon_ * 2 + i;
+    time_result_(i, 0) = x[time_index];
+  }
+  // push back state for N+1
+  state_result_(4 * horizon_, 0) = x[4 * horizon_];
+  state_result_(4 * horizon_, 1) = x[4 * horizon_ + 1];
+  state_result_(4 * horizon_, 2) = x[4 * horizon_ + 2];
+  state_result_(4 * horizon_, 3) = x[4 * horizon_ + 3];
+}
 
 void DistanceApproachIPOPTInterface::get_optimization_results(
-    std::vector<double>* x1_result, std::vector<double>* x2_result,
-    std::vector<double>* x3_result, std::vector<double>* x4_result,
-    std::vector<double>* u1_result, std::vector<double>* u2_result,
-    std::vector<double>* t_result) const {}
+    Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
+    Eigen::MatrixXd* time_result) const {
+  *state_result = state_result_;
+  *control_result = control_result_;
+  *time_result = time_result_;
+}
 }  // namespace planning
 }  // namespace apollo
