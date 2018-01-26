@@ -65,8 +65,8 @@ class SidepassVehicle : public TrafficRule {
       "DROPBOX_KEY_SIDEPASS_STATUS";
   constexpr static char const* const db_key_sidepass_adc_wait_start_time =
       "DROPBOX_KEY_SIDEPASS_OBSTACLE_ADC_WAIT_TIME";
-
-  std::string blocking_obstacle_id_;
+  constexpr static char const* const db_key_sidepass_obstacle_id =
+      "DROPBOX_KEY_SIDEPASS_OBSTACLE_ID";
 };
 
 }  // namespace planning
