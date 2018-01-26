@@ -59,11 +59,13 @@ class StopSign : public TrafficRule {
   int GetWatchVehicles(const hdmap::StopSignInfo& stop_sign_info,
                        StopSignLaneVehicles* watch_vehicles);
   int UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles);
-  int AddWatchVehicle(const PathObstacle& obstacle,
+  int AddWatchVehicle(const PathObstacle& path_obstacle,
                       StopSignLaneVehicles* watch_vehicles);
-  int RemoveWatchVehicle(const PathObstacle& obstacle,
+  int RemoveWatchVehicle(const PathObstacle& path_obstacle,
                          StopSignLaneVehicles* watch_vehicles);
-  int ClearWatchVehicle(StopSignLaneVehicles* watch_vehicles);
+  int ClearWatchVehicle(
+      ReferenceLineInfo* const reference_line_info,
+      StopSignLaneVehicles* watch_vehicles);
   double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
                              const hdmap::PathOverlap* stop_sign_overlap);
   bool BuildStopDecision(Frame* frame,
