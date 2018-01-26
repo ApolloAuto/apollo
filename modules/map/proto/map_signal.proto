@@ -44,4 +44,3 @@ message Signal {
   // stop line
   repeated Curve stop_line = 6;
 }
-
