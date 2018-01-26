@@ -26,9 +26,8 @@
 namespace apollo {
 namespace prediction {
 
-FeatureOutput::FeatureOutput() {}
-
-FeatureOutput::~FeatureOutput() { Clear(); }
+Features FeatureOutput::features_;
+size_t FeatureOutput::index_ = 0;
 
 void FeatureOutput::Close() {
   ADEBUG << "Close feature output";
@@ -37,7 +36,7 @@ void FeatureOutput::Close() {
 }
 
 void FeatureOutput::Clear() {
-  count_ = 0;
+  index_ = 0;
   features_.Clear();
 }
 
@@ -56,10 +55,10 @@ void FeatureOutput::Write() {
     return;
   }
   std::string file_name = ::apollo::common::util::StrCat(
-      FLAGS_prediction_data_file_prefix, ".", std::to_string(count_), ".bin");
+      FLAGS_prediction_data_file_prefix, ".", std::to_string(index_), ".bin");
   ::apollo::common::util::SetProtoToBinaryFile(features_, file_name);
   features_.Clear();
-  ++count_;
+  ++index_;
 }
 
 }  // namespace prediction
