@@ -59,11 +59,22 @@ void ExtractIds(const std::vector<MapElementInfoConstPtr> &items,
   std::sort(ids->begin(), ids->end());
 }
 
-template <typename MapElementInfoConstPtr>
-void ExtractOverlapIds(const std::vector<MapElementInfoConstPtr> &items,
+void ExtractOverlapIds(const std::vector<SignalInfoConstPtr> &items,
                        RepeatedPtrField<std::string> *ids) {
   for (const auto &item : items) {
     for (auto &overlap_id : item->signal().overlap_id()) {
+      ids->Add()->assign(overlap_id.id());
+    }
+  }
+  // The output is sorted so that the calculated hash will be
+  // invariant to the order of elements.
+  std::sort(ids->begin(), ids->end());
+}
+
+void ExtractOverlapIds(const std::vector<StopSignInfoConstPtr> &items,
+                       RepeatedPtrField<std::string> *ids) {
+  for (const auto &item : items) {
+    for (auto &overlap_id : item->stop_sign().overlap_id()) {
       ids->Add()->assign(overlap_id.id());
     }
   }
@@ -182,6 +193,7 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
     AERROR << "Failed to get stop signs from sim_map.";
   }
   ExtractIds(stop_signs, ids->mutable_stop_sign());
+  ExtractOverlapIds(stop_signs, ids->mutable_overlap());
 
   std::vector<YieldSignInfoConstPtr> yield_signs;
   if (sim_map_->GetYieldSigns(point, radius, &yield_signs) != 0) {

@@ -1140,7 +1140,8 @@
                         "SIMULATOR": 8,
                         "HWSYS": 9,
                         "ROUTING": 10,
-                        "MONITOR": 11
+                        "MONITOR": 11,
+                        "HMI": 12
                       }
                     },
                     "LogLevel": {
@@ -2538,6 +2539,77 @@
                 "tResolution": {
                   "type": "double",
                   "id": 7
+                }
+              }
+            },
+            "CloudReferenceLineRequest": {
+              "fields": {
+                "laneSegment": {
+                  "rule": "repeated",
+                  "type": "apollo.routing.LaneSegment",
+                  "id": 1
+                }
+              }
+            },
+            "CloudReferenceLineRoutingRequest": {
+              "fields": {
+                "routing": {
+                  "type": "apollo.routing.RoutingResponse",
+                  "id": 1
+                }
+              }
+            },
+            "CloudReferenceLinePoint": {
+              "fields": {
+                "x": {
+                  "type": "double",
+                  "id": 1
+                },
+                "y": {
+                  "type": "double",
+                  "id": 2
+                },
+                "z": {
+                  "type": "double",
+                  "id": 3
+                },
+                "theta": {
+                  "type": "double",
+                  "id": 4
+                },
+                "kappa": {
+                  "type": "double",
+                  "id": 5
+                },
+                "laneS": {
+                  "type": "double",
+                  "id": 6
+                },
+                "dkappa": {
+                  "type": "double",
+                  "id": 7
+                }
+              }
+            },
+            "CloudReferenceLineSegment": {
+              "fields": {
+                "laneId": {
+                  "type": "string",
+                  "id": 1
+                },
+                "point": {
+                  "rule": "repeated",
+                  "type": "CloudReferenceLinePoint",
+                  "id": 2
+                }
+              }
+            },
+            "CloudReferenceLineResponse": {
+              "fields": {
+                "segment": {
+                  "rule": "repeated",
+                  "type": "CloudReferenceLineSegment",
+                  "id": 1
                 }
               }
             }
