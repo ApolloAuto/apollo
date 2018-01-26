@@ -24,12 +24,12 @@
 #include <array>
 #include <memory>
 #include <set>
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
 
-#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/lattice/behavior_decider/feasible_region.h"
+#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 
@@ -38,10 +38,8 @@ namespace planning {
 
 class ConditionFilter {
  public:
-  ConditionFilter(
-    const std::array<double, 3>& init_s,
-    const double speed_limit,
-    std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood);
+  ConditionFilter(const std::array<double, 3>& init_s, const double speed_limit,
+                  std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood);
 
   std::vector<SampleBound> QuerySampleBounds(const double t) const;
 
@@ -51,9 +49,8 @@ class ConditionFilter {
   QueryPathTimeObstacleIntervals(const double t) const;
 
   bool GenerateLatticeStPixels(
-    apollo::planning_internal::LatticeStTraining* st_data,
-    double timestamp,
-    std::string st_img_name);
+      apollo::planning_internal::LatticeStTraining* st_data, double timestamp,
+      std::string st_img_name);
 
   bool WithinObstacleSt(double s, double t);
 

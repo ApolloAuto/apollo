@@ -21,8 +21,8 @@
 #ifndef MODULES_PLANNING_LATTICE_PIECEWISE_ACCELERATION_TRAJECTORY1D_H_
 #define MODULES_PLANNING_LATTICE_PIECEWISE_ACCELERATION_TRAJECTORY1D_H_
 
-#include <string>
 #include <array>
+#include <string>
 #include <vector>
 
 #include "modules/planning/math/curve1d/curve1d.h"

@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 /**
-  * @file
-  **/
+ * @file
+ **/
 
 #include "modules/planning/common/speed/st_boundary.h"
 
@@ -29,8 +29,8 @@
 namespace apollo {
 namespace planning {
 
-using common::math::Vec2d;
 using common::math::LineSegment2d;
+using common::math::Vec2d;
 
 StBoundary::StBoundary(
     const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {

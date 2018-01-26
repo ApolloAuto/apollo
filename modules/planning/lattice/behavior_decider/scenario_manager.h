@@ -46,9 +46,9 @@ class ScenarioManager {
 
  public:
   void Reset();
-  int ComputeWorldDecision(
-      Frame* frame, ReferenceLineInfo* const reference_line_info,
-      PlanningTarget* planning_target);
+  int ComputeWorldDecision(Frame* frame,
+                           ReferenceLineInfo* const reference_line_info,
+                           PlanningTarget* planning_target);
 
   template <class T>
   void RegisterScenario(FeatureLevel level) {

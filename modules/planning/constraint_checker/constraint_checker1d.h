@@ -31,7 +31,7 @@ namespace planning {
 
 class ConstraintChecker1d {
  public:
-    ConstraintChecker1d() = delete;
+  ConstraintChecker1d() = delete;
 
   static bool IsValidLongitudinalTrajectory(const Curve1d& lon_trajectory);
 

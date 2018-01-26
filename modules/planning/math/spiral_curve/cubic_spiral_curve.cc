@@ -180,8 +180,8 @@ bool CubicSpiralCurve::CalculatePath() {
   return diff < spiral_config().newton_raphson_tol() && ResultSanityCheck();
 }
 
-Status CubicSpiralCurve::GetPathVec(
-    const std::uint32_t n, std::vector<PathPoint>* path_points) const {
+Status CubicSpiralCurve::GetPathVec(const std::uint32_t n,
+                                    std::vector<PathPoint>* path_points) const {
   CHECK_NOTNULL(path_points);
 
   // initialization

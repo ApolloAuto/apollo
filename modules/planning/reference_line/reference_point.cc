@@ -34,7 +34,7 @@ using apollo::common::util::StrCat;
 namespace {
 // Minimum distance to remove duplicated points.
 const double kDuplicatedPointsEpsilon = 1e-7;
-}
+}  // namespace
 
 ReferencePoint::ReferencePoint(const MapPathPoint& map_path_point,
                                const double kappa, const double dkappa,
@@ -69,14 +69,23 @@ double ReferencePoint::upper_bound() const { return upper_bound_; }
 
 std::string ReferencePoint::DebugString() const {
   // StrCat supports 9 arguments at most.
-  return StrCat(
-      StrCat("{x: ", x(), ", "
-             "y: ", y(), ", "
-             "theta: ", heading(), ", "
-             "kappa: ", kappa(), ", "),
-      StrCat("dkappa: ", dkappa(), ", "
-             "upper_bound: ", upper_bound(), ", "
-             "lower_bound: ", lower_bound(), "}"));
+  return StrCat(StrCat("{x: ", x(),
+                       ", "
+                       "y: ",
+                       y(),
+                       ", "
+                       "theta: ",
+                       heading(),
+                       ", "
+                       "kappa: ",
+                       kappa(), ", "),
+                StrCat("dkappa: ", dkappa(),
+                       ", "
+                       "upper_bound: ",
+                       upper_bound(),
+                       ", "
+                       "lower_bound: ",
+                       lower_bound(), "}"));
 }
 
 void ReferencePoint::RemoveDuplicates(std::vector<ReferencePoint>* points) {

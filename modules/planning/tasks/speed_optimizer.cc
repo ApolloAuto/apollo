@@ -18,16 +18,16 @@
  * @file speed_optimizer.cc
  **/
 
+#include "modules/planning/tasks/speed_optimizer.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/tasks/speed_optimizer.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
-using apollo::common::Status;
 
 namespace {
 constexpr double kSpeedOptimizationFallbackClost = 2e4;

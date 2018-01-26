@@ -34,10 +34,10 @@
 #include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
 #include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
-#include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
-#include "modules/planning/lattice/trajectory_generator/trajectory_evaluator.h"
-#include "modules/planning/lattice/trajectory_generator/trajectory_combiner.h"
 #include "modules/planning/lattice/trajectory_generator/backup_trajectory.h"
+#include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
+#include "modules/planning/lattice/trajectory_generator/trajectory_combiner.h"
+#include "modules/planning/lattice/trajectory_generator/trajectory_evaluator.h"
 #include "modules/planning/lattice/util/lattice_trajectory1d.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
 #include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
@@ -45,11 +45,11 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::adapter::AdapterManager;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
+using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
 namespace {
@@ -105,8 +105,7 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
   auto status = Status::OK();
   bool has_plan = false;
   auto it = std::find_if(
-      frame->reference_line_info().begin(),
-      frame->reference_line_info().end(),
+      frame->reference_line_info().begin(), frame->reference_line_info().end(),
       [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
   if (it != frame->reference_line_info().end()) {
     status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
@@ -134,8 +133,8 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
 }
 
 Status LatticePlanner::PlanOnReferenceLine(
-    const TrajectoryPoint& planning_init_point,
-    Frame* frame, ReferenceLineInfo* reference_line_info) {
+    const TrajectoryPoint& planning_init_point, Frame* frame,
+    ReferenceLineInfo* reference_line_info) {
   static std::size_t num_planning_cycles = 0;
   static std::size_t num_planning_succeeded_cycles = 0;
 
@@ -175,8 +174,7 @@ Status LatticePlanner::PlanOnReferenceLine(
       decider_.Analyze(frame, reference_line_info, planning_init_point, init_s,
                        discretized_reference_line);
 
-  ADEBUG << "Decision_Time = "
-         << (Clock::NowInSeconds() - current_time) * 1000;
+  ADEBUG << "Decision_Time = " << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
   // 5. generate 1d trajectory bundle for longitudinal and lateral respectively.
@@ -291,8 +289,7 @@ Status LatticePlanner::PlanOnReferenceLine(
     }
 
     // Print the chosen end condition and start condition
-    ADEBUG << "Starting Pose: s = " << init_s[0]
-           << " ds = " << init_s[1]
+    ADEBUG << "Starting Pose: s = " << init_s[0] << " ds = " << init_s[1]
            << " dds = " << init_s[2];
     // cast
     auto lattice_traj_ptr =
@@ -306,12 +303,10 @@ Status LatticePlanner::PlanOnReferenceLine(
 
     ADEBUG << "InputPose";
     ADEBUG << "XY: " << planning_init_point.ShortDebugString();
-    ADEBUG << "S: (" << init_s[0] << ", "
-           << init_s[1] << ","
-           << init_s[2] << ")";
-    ADEBUG << "L: (" << init_d[0] << ", "
-           << init_d[1] << ","
-           << init_d[2] << ")";
+    ADEBUG << "S: (" << init_s[0] << ", " << init_s[1] << "," << init_s[2]
+           << ")";
+    ADEBUG << "L: (" << init_d[0] << ", " << init_d[1] << "," << init_d[2]
+           << ")";
 
     ADEBUG << "Reference_line_priority_cost = "
            << reference_line_info->PriorityCost();
@@ -358,7 +353,7 @@ Status LatticePlanner::PlanOnReferenceLine(
     if (FLAGS_enable_backup_trajectory) {
       AERROR << "Use backup trajectory";
       BackupTrajectory backup_trajectory(init_s, init_d,
-          planning_init_point.relative_time());
+                                         planning_init_point.relative_time());
       DiscretizedTrajectory trajectory =
           backup_trajectory.GenerateTrajectory(discretized_reference_line);
       reference_line_info->SetCost(FLAGS_backup_trajectory_cost);

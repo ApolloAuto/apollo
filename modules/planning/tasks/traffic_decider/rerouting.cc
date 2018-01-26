@@ -32,8 +32,8 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::adapter::AdapterManager;
-using apollo::common::util::Dropbox;
 using apollo::common::time::Clock;
+using apollo::common::util::Dropbox;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 

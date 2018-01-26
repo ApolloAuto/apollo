@@ -21,13 +21,13 @@
 #ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_BACKUP_TRAJECTORY_H_
 #define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_BACKUP_TRAJECTORY_H_
 
-#include <vector>
 #include <array>
 #include <memory>
+#include <vector>
 
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
+#include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {
 namespace planning {

@@ -143,13 +143,13 @@ TrajectoryPoint DiscretizedTrajectory::StartPoint() const {
 double DiscretizedTrajectory::GetTemporalLength() const {
   CHECK(!trajectory_points_.empty());
   return trajectory_points_.back().relative_time() -
-      trajectory_points_.front().relative_time();
+         trajectory_points_.front().relative_time();
 }
 
 double DiscretizedTrajectory::GetSpatialLength() const {
   CHECK(!trajectory_points_.empty());
   return trajectory_points_.back().path_point().s() -
-      trajectory_points_.front().path_point().s();
+         trajectory_points_.front().path_point().s();
 }
 
 std::uint32_t DiscretizedTrajectory::NumOfPoints() const {

@@ -23,9 +23,9 @@
 
 #include <vector>
 
+#include "Eigen/Dense"
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
-#include "Eigen/Dense"
 #include "modules/planning/math/curve1d/quintic_spiral_path.h"
 
 namespace apollo {

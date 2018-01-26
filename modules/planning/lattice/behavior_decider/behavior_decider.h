@@ -21,17 +21,17 @@
 #ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHAVIOR_DECIDER_H_
 #define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHAVIOR_DECIDER_H_
 
-#include <vector>
 #include <memory>
+#include <vector>
 
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/common/math/box2d.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 
 namespace apollo {
 namespace planning {

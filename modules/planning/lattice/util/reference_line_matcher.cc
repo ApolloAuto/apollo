@@ -26,8 +26,8 @@
 
 #include "glog/logging.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
@@ -40,8 +40,8 @@ PathPoint ReferenceLineMatcher::MatchToReferenceLine(
     const double y) {
   CHECK_GT(reference_line.size(), 0);
 
-  auto func_distance_square =
-      [](const PathPoint& point, const double x, const double y) {
+  auto func_distance_square = [](const PathPoint& point, const double x,
+                                 const double y) {
     double dx = point.x() - x;
     double dy = point.y() - y;
     return dx * dx + dy * dy;
@@ -79,19 +79,19 @@ std::pair<double, double> ReferenceLineMatcher::GetReferenceLineCoordinate(
   double ry = matched_path_point.y();
   double delta_x = x - rx;
   double delta_y = y - ry;
-  double side = std::cos(rtheta) * delta_y -
-                std::sin(rtheta) * delta_x;
+  double side = std::cos(rtheta) * delta_y - std::sin(rtheta) * delta_x;
   std::pair<double, double> relative_coordinate;
   relative_coordinate.first = matched_path_point.s();
-  relative_coordinate.second = std::copysign(std::hypot(delta_x, delta_y),
-                                             side);
+  relative_coordinate.second =
+      std::copysign(std::hypot(delta_x, delta_y), side);
   return relative_coordinate;
 }
 
 PathPoint ReferenceLineMatcher::MatchToReferenceLine(
     const std::vector<PathPoint>& reference_line, const double s) {
-  auto comp =
-      [](const PathPoint& point, const double s) { return point.s() < s; };
+  auto comp = [](const PathPoint& point, const double s) {
+    return point.s() < s;
+  };
 
   auto it_lower =
       std::lower_bound(reference_line.begin(), reference_line.end(), s, comp);
