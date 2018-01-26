@@ -23,9 +23,9 @@
 
 #include <vector>
 
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/common/obstacle.h"
 #include "modules/common/math/box2d.h"
+#include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
 
 namespace apollo {
 namespace planning {

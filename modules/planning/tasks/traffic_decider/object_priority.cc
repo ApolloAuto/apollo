@@ -28,7 +28,7 @@ ObjectPriority::ObjectPriority(const RuleConfig& config)
     : TrafficRule(config) {}
 
 bool ObjectPriority::ApplyRule(Frame* frame,
-                                ReferenceLineInfo* const reference_line_info) {
+                               ReferenceLineInfo* const reference_line_info) {
   return true;
 }
 

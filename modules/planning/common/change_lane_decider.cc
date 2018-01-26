@@ -26,9 +26,9 @@
 namespace apollo {
 namespace planning {
 
+using common::time::Clock;
 using common::util::Dropbox;
 using planning_internal::ChangeLaneState;
-using common::time::Clock;
 
 ChangeLaneDecider::ChangeLaneDecider() : state_key_("kChangeLaneStatus") {
   dropbox_ = Dropbox<ChangeLaneState>::Open();

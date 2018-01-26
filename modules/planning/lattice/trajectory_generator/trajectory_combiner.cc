@@ -29,10 +29,8 @@ using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 
 DiscretizedTrajectory TrajectoryCombiner::Combine(
-    const std::vector<PathPoint>& reference_line,
-    const Curve1d& lon_trajectory,
-    const Curve1d& lat_trajectory,
-    const double init_relative_time) {
+    const std::vector<PathPoint>& reference_line, const Curve1d& lon_trajectory,
+    const Curve1d& lat_trajectory, const double init_relative_time) {
   DiscretizedTrajectory combined_trajectory;
 
   double s0 = lon_trajectory.Evaluate(0, 0.0);
@@ -43,8 +41,8 @@ DiscretizedTrajectory TrajectoryCombiner::Combine(
     // linear extrapolation is handled internally in LatticeTrajectory1d;
     // no worry about t_param > lon_trajectory.ParamLength() situation
     double s = lon_trajectory.Evaluate(0, t_param);
-    double s_dot = std::max(FLAGS_lattice_epsilon,
-                            lon_trajectory.Evaluate(1, t_param));
+    double s_dot =
+        std::max(FLAGS_lattice_epsilon, lon_trajectory.Evaluate(1, t_param));
     double s_ddot = lon_trajectory.Evaluate(2, t_param);
     if (s > s_ref_max) {
       break;

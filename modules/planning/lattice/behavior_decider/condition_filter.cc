@@ -24,10 +24,10 @@
 #include <cmath>
 #include <string>
 
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/common/log.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/util.h"
-#include "modules/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -35,8 +35,7 @@ namespace planning {
 using PathTimePointPair = std::pair<PathTimePoint, PathTimePoint>;
 
 ConditionFilter::ConditionFilter(
-    const std::array<double, 3>& init_s,
-    const double speed_limit,
+    const std::array<double, 3>& init_s, const double speed_limit,
     std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood)
     : feasible_region_(init_s, speed_limit),
       ptr_path_time_neighborhood_(path_time_neighborhood) {}
@@ -216,9 +215,8 @@ std::vector<double> ConditionFilter::UniformTimeStamps(
 
 // Compute pixel img for lattice st
 bool ConditionFilter::GenerateLatticeStPixels(
-  apollo::planning_internal::LatticeStTraining* st_data,
-  double timestamp,
-  std::string st_img_name) {
+    apollo::planning_internal::LatticeStTraining* st_data, double timestamp,
+    std::string st_img_name) {
   int num_rows = 250;
   int num_cols = 160;
   double s_step = 100.0 / static_cast<double>(num_rows);
@@ -236,8 +234,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
       double s = s_step * (num_rows - i + 1);
       if (s <= feasible_s_lower || s >= feasible_s_upper) {
         // Dye gray
-        apollo::planning_internal::LatticeStPixel* pixel =
-          st_data->add_pixel();
+        apollo::planning_internal::LatticeStPixel* pixel = st_data->add_pixel();
         pixel->set_s(i);
         pixel->set_t(j);
         pixel->set_r(128);
@@ -247,8 +244,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
       }
       if (WithinObstacleSt(s, t)) {
         // Dye blue
-        apollo::planning_internal::LatticeStPixel* pixel =
-          st_data->add_pixel();
+        apollo::planning_internal::LatticeStPixel* pixel = st_data->add_pixel();
         pixel->set_s(i);
         pixel->set_t(j);
         pixel->set_r(0);
@@ -269,24 +265,24 @@ bool ConditionFilter::GenerateLatticeStPixels(
 
 bool ConditionFilter::WithinObstacleSt(double s, double t) {
   const auto& path_time_obstacles =
-    ptr_path_time_neighborhood_->GetPathTimeObstacles();
+      ptr_path_time_neighborhood_->GetPathTimeObstacles();
 
   for (const PathTimeObstacle& path_time_obstacle : path_time_obstacles) {
-     if (t < path_time_obstacle.upper_left().t() ||
-         t > path_time_obstacle.upper_right().t()) {
+    if (t < path_time_obstacle.upper_left().t() ||
+        t > path_time_obstacle.upper_right().t()) {
       continue;
-     }
+    }
 
-    double s_upper = apollo::common::math::lerp(
-      path_time_obstacle.upper_left().s(),
-      path_time_obstacle.upper_left().t(),
-      path_time_obstacle.upper_right().s(),
-      path_time_obstacle.upper_right().t(), t);
-    double s_lower = apollo::common::math::lerp(
-      path_time_obstacle.bottom_left().s(),
-      path_time_obstacle.bottom_left().t(),
-      path_time_obstacle.bottom_right().s(),
-      path_time_obstacle.bottom_right().t(), t);
+    double s_upper =
+        apollo::common::math::lerp(path_time_obstacle.upper_left().s(),
+                                   path_time_obstacle.upper_left().t(),
+                                   path_time_obstacle.upper_right().s(),
+                                   path_time_obstacle.upper_right().t(), t);
+    double s_lower =
+        apollo::common::math::lerp(path_time_obstacle.bottom_left().s(),
+                                   path_time_obstacle.bottom_left().t(),
+                                   path_time_obstacle.bottom_right().s(),
+                                   path_time_obstacle.bottom_right().t(), t);
 
     if (s <= s_upper && s >= s_lower) {
       return true;

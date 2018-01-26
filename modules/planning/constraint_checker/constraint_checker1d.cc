@@ -20,8 +20,8 @@
 
 #include "modules/planning/constraint_checker/constraint_checker1d.h"
 
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -35,7 +35,7 @@ bool fuzzy_within(const double v, const double lower, const double upper,
   }
   return true;
 }
-}
+}  // namespace
 
 bool ConstraintChecker1d::IsValidLongitudinalTrajectory(
     const Curve1d& lon_trajectory) {

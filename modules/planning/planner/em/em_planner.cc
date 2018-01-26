@@ -45,14 +45,14 @@
 namespace apollo {
 namespace planning {
 
-using common::Status;
-using common::adapter::AdapterManager;
-using common::time::Clock;
 using common::ErrorCode;
-using common::SpeedPoint;
 using common::SLPoint;
+using common::SpeedPoint;
+using common::Status;
 using common::TrajectoryPoint;
+using common::adapter::AdapterManager;
 using common::math::Vec2d;
+using common::time::Clock;
 
 void EMPlanner::RegisterTasks() {
   task_factory_.Register(TRAFFIC_DECIDER,
@@ -143,8 +143,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
   auto status = Status::OK();
   bool has_plan = false;
   auto it = std::find_if(
-      frame->reference_line_info().begin(),
-      frame->reference_line_info().end(),
+      frame->reference_line_info().begin(), frame->reference_line_info().end(),
       [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
   if (it != frame->reference_line_info().end()) {
     status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
@@ -172,8 +171,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
 }
 
 Status EMPlanner::PlanOnReferenceLine(
-    const TrajectoryPoint& planning_start_point,
-    Frame* frame, ReferenceLineInfo* reference_line_info) {
+    const TrajectoryPoint& planning_start_point, Frame* frame,
+    ReferenceLineInfo* reference_line_info) {
   if (!reference_line_info->IsInited()) {
     if (!reference_line_info->Init(frame->obstacles())) {
       AERROR << "Failed to init reference line";

@@ -59,9 +59,7 @@ const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
         {ObjectDecisionType::kNudge, 100},
         {ObjectDecisionType::kSidepass, 200}};
 
-const std::string& PathObstacle::Id() const {
-  return id_;
-}
+const std::string& PathObstacle::Id() const { return id_; }
 
 PathObstacle::PathObstacle(const Obstacle* obstacle) : obstacle_(obstacle) {
   CHECK_NOTNULL(obstacle);
@@ -276,9 +274,7 @@ const StBoundary& PathObstacle::reference_line_st_boundary() const {
   return reference_line_st_boundary_;
 }
 
-const StBoundary& PathObstacle::st_boundary() const {
-  return st_boundary_;
-}
+const StBoundary& PathObstacle::st_boundary() const { return st_boundary_; }
 
 const std::vector<std::string>& PathObstacle::decider_tags() const {
   return decider_tags_;
@@ -402,9 +398,7 @@ bool PathObstacle::HasNonIgnoreDecision() const {
          (HasLongitudinalDecision() && !IsLongitudinalIgnore());
 }
 
-const Obstacle* PathObstacle::obstacle() const {
-  return obstacle_;
-}
+const Obstacle* PathObstacle::obstacle() const { return obstacle_; }
 
 void PathObstacle::AddLongitudinalDecision(const std::string& decider_tag,
                                            const ObjectDecisionType& decision) {
@@ -466,9 +460,7 @@ void PathObstacle::SetStBoundaryType(const StBoundary::BoundaryType type) {
   st_boundary_.SetBoundaryType(type);
 }
 
-void PathObstacle::EraseStBoundary() {
-  st_boundary_ = StBoundary();
-}
+void PathObstacle::EraseStBoundary() { st_boundary_ = StBoundary(); }
 
 void PathObstacle::SetReferenceLineStBoundary(const StBoundary& boundary) {
   reference_line_st_boundary_ = boundary;

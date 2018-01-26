@@ -40,9 +40,7 @@ void SpiralCurve::SetSpiralConfig(const SpiralCurveConfig& spiral_config) {
 }
 
 // output params
-const PathPoint& SpiralCurve::start_point() const {
-  return *start_point_;
-}
+const PathPoint& SpiralCurve::start_point() const { return *start_point_; }
 
 const PathPoint& SpiralCurve::end_point() const { return *end_point_; }
 

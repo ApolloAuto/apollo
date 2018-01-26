@@ -149,7 +149,7 @@ new_local_repository(
 new_local_repository(
     name = "local_integ",
     build_file = "third_party/local_integ.BUILD",
-    path = "/usr/local/apollo/local_integ",
+    path = "/usr/local/local_integ",
 )
 
 # Proj.4
