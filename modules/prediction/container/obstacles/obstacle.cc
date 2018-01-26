@@ -1104,17 +1104,18 @@ void Obstacle::SetMotionStatus() {
     ++feature_riter;
   }
 
-  double delta_ts = feature_history_.front().timestamp() -
-                    feature_history_.back().timestamp();
   double std = FLAGS_still_obstacle_position_std;
-  double speed_sensibility =
-      std::sqrt(2 * history_size) * 4 * std / ((history_size + 1) * delta_ts);
-  double speed = feature_history_.front().speed();
   double speed_threshold = FLAGS_still_obstacle_speed_threshold;
   if (type_ == PerceptionObstacle::PEDESTRIAN ||
       type_ == PerceptionObstacle::BICYCLE) {
     speed_threshold = FLAGS_still_pedestrian_speed_threshold;
+    std = FLAGS_still_pedestrian_position_std;
   }
+  double delta_ts = feature_history_.front().timestamp() -
+                    feature_history_.back().timestamp();
+  double speed_sensibility =
+      std::sqrt(2 * history_size) * 4 * std / ((history_size + 1) * delta_ts);
+  double speed = feature_history_.front().speed();
   if (speed < speed_threshold) {
     ADEBUG << "Obstacle [" << id_ << "] has a small speed [" << speed
            << "] and is considered stationary.";
