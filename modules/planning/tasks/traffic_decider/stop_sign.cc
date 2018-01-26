@@ -96,7 +96,7 @@ void StopSign::MakeDecisions(Frame* frame,
     }
   }
 
-  ClearWatchVehicle(&watch_vehicles);
+  ClearWatchVehicle(reference_line_info, &watch_vehicles);
 
   UpdateWatchVehicles(&watch_vehicles);
 
@@ -110,7 +110,7 @@ void StopSign::MakeDecisions(Frame* frame,
         adc_front_edge_s) {
       ClearDropbox(stop_sign_id);
     }
-    ADEBUG << "stop_sign_id[" << stop_sign_id << "] done";
+    ADEBUG << "stop_sign_id[" << stop_sign_id << "] DONE";
   } else {
     // skip stop_sign if master vehicle body already passes the stop line
     if (stop_line_start_s + FLAGS_stop_max_distance_buffer <=
@@ -120,7 +120,7 @@ void StopSign::MakeDecisions(Frame* frame,
              << stop_line_start_s << "]; adc_front_edge_s[" << adc_front_edge_s
              << "]";
     } else {
-      ADEBUG << "STOP decision";
+      ADEBUG << "stop_sign_id[" << stop_sign_id << "] STOP";
       // stop decision
       double stop_deceleration =
           GetStopDeceleration(reference_line_info, next_stop_sign_overlap_);
@@ -220,10 +220,9 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
   StopSignStopStatus* status =
       Dropbox<StopSignStopStatus>::Open()->Get(db_key_stop_status);
   stop_status_ = (status == nullptr) ? StopSignStopStatus::UNKNOWN : *status;
-  ADEBUG
-      << "get stop_status_: "
+  ADEBUG << "get stop_status_: "
       << static_cast<typename std::underlying_type<StopSignStopStatus>::type>(
-             stop_status_);
+          stop_status_);
 
   // get stop start time from dropbox
   std::string db_key_stop_starttime =
@@ -269,8 +268,7 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
 
   // update dropbox: stop status
   Dropbox<StopSignStopStatus>::Open()->Set(db_key_stop_status, stop_status_);
-  ADEBUG
-      << "update dropbox: [" << db_key_stop_status << "] = "
+  ADEBUG << "update dropbox: [" << db_key_stop_status << "] = "
       << static_cast<typename std::underlying_type<StopSignStopStatus>::type>(
              stop_status_);
 
@@ -329,14 +327,15 @@ int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
       watch_vehicle_ids = *value;
     }
 
-    ADEBUG << "watch_vehicle: lane_id[" << associated_lane_id << "] vehicle["
-           << accumulate(watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
-                         std::string(","))
-           << "]; size[" << watch_vehicle_ids.size() << "]";
+    std::string s;
+    std::for_each(watch_vehicle_ids.begin(),
+                  watch_vehicle_ids.end(),
+                  [&](std::string &id) { s = s.empty() ? id : s + "," + id; });
+    ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id
+        << "] vehicle[" << s << "]; size[" <<watch_vehicle_ids.size() << "]";
 
     if (!watch_vehicle_ids.empty()) {
-      std::copy(watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
-                std::back_inserter((*watch_vehicles)[associated_lane_id]));
+      (*watch_vehicles)[associated_lane_id] = watch_vehicle_ids;
     }
   }
 
@@ -362,11 +361,11 @@ int StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
 /**
  * @brief: add a watch vehicle which arrives at stop sign ahead of adc
  */
-int StopSign::AddWatchVehicle(const PathObstacle& obstacle,
+int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
                               StopSignLaneVehicles* watch_vehicles) {
-  const std::string& obstacle_id = obstacle.Id();
   const PerceptionObstacle& perception_obstacle =
-      obstacle.obstacle()->Perception();
+      path_obstacle.obstacle()->Perception();
+  const std::string& obstacle_id = std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
 
@@ -440,8 +439,10 @@ int StopSign::AddWatchVehicle(const PathObstacle& obstacle,
   // use a vector since motocycles/bicycles can be more than one
   std::vector<std::string> vehicles =
       (*watch_vehicles)[obstacle_lane->id().id()];
-  if (std::find(vehicles.begin(), vehicles.end(), obstacle_id) ==
-      vehicles.end()) {
+  if (std::find(vehicles.begin(), vehicles.end(),
+                obstacle_id) == vehicles.end()) {
+    ADEBUG << "AddWatchVehicle: lane[" << obstacle_lane->id().id()
+        << "] obstacle_id[" << obstacle_id << "]";
     (*watch_vehicles)[obstacle_lane->id().id()].push_back(obstacle_id);
   }
 
@@ -451,11 +452,11 @@ int StopSign::AddWatchVehicle(const PathObstacle& obstacle,
 /**
  * @brief: remove a watch vehicle which not stopping at stop sign any more
  */
-int StopSign::RemoveWatchVehicle(const PathObstacle& obstacle,
+int StopSign::RemoveWatchVehicle(const PathObstacle& path_obstacle,
                                  StopSignLaneVehicles* watch_vehicles) {
-  const std::string& obstacle_id = obstacle.Id();
   const PerceptionObstacle& perception_obstacle =
-      obstacle.obstacle()->Perception();
+      path_obstacle.obstacle()->Perception();
+  const std::string& obstacle_id = std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
 
@@ -529,11 +530,12 @@ int StopSign::RemoveWatchVehicle(const PathObstacle& obstacle,
       double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
       double distance_pass_stop_line = obstacle_end_s - stop_line_s;
       if (distance_pass_stop_line > FLAGS_max_valid_stop_distance) {
-        ADEBUG << "obstacle_id[" << obstacle_id << "] type["
-               << obstacle_type_name << "] distance_pass_stop_line["
-               << distance_pass_stop_line << "]; stop_line_s[" << stop_line_s
-               << "]; obstacle_end_s[" << obstacle_end_s
-               << "] passed stop line.  erase from watch_vehicles";
+        ADEBUG << "obstacle_id[" << obstacle_id
+            << "] type[" << obstacle_type_name
+            << "] distance_pass_stop_line[" << distance_pass_stop_line
+            << "]; stop_line_s[" << stop_line_s
+            << "]; obstacle_end_s[" << obstacle_end_s
+            << "] passed stop line. erase from watch_vehicles";
         erase = true;
       }
     }
@@ -545,23 +547,63 @@ int StopSign::RemoveWatchVehicle(const PathObstacle& obstacle,
       std::vector<std::string> vehicles = it->second;
       vehicles.erase(std::remove(vehicles.begin(), vehicles.end(), obstacle_id),
                      vehicles.end());
+      it->second = vehicles;
     }
   }
 
   return 0;
 }
 
-int StopSign::ClearWatchVehicle(StopSignLaneVehicles* watch_vehicles) {
+int StopSign::ClearWatchVehicle(
+    ReferenceLineInfo* const reference_line_info,
+    StopSignLaneVehicles* watch_vehicles) {
+  auto path_obstacles = reference_line_info->path_decision()
+      ->path_obstacles().Items();
+  std::vector<std::string> obstacle_ids;
+  std::transform(
+      path_obstacles.begin(),
+      path_obstacles.end(),
+      std::back_inserter(obstacle_ids),
+      [](const PathObstacle* path_obstacle) {
+        return std::to_string(path_obstacle->obstacle()->Perception().id());
+      });
+
   for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
-       it != watch_vehicles->end();
-       /*no increment*/) {
+       it != watch_vehicles->end(); /*no increment*/) {
     std::vector<std::string> vehicles = it->second;
+    // clean obstacles not in current perception
+    for (auto obstacle_it = vehicles.begin(); obstacle_it != vehicles.end();
+        /*no increment*/) {
+      if (std::find(obstacle_ids.begin(), obstacle_ids.end(),
+                    *obstacle_it) == obstacle_ids.end()) {
+        ADEBUG << "lane[" << it->first
+            << "] obstacle[" << *obstacle_it << "] not exist any more. erase.";
+        obstacle_it = vehicles.erase(obstacle_it);
+      } else {
+        obstacle_it++;
+      }
+    }
+    it->second = vehicles;
+
     if (vehicles.empty()) {
       watch_vehicles->erase(it++);
     } else {
       ++it;
     }
   }
+
+  /*
+  for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
+       it != watch_vehicles->end(); it++) {
+    std::string s;
+    std::for_each(it->second.begin(),
+                  it->second.end(),
+                  [&](std::string &id) { s = s.empty() ? id : s + "," + id; });
+    ADEBUG << "ClearWatchVehicle: lane_id[" << it->first << "] vehicle["
+        << s << "]; size[" << it->second.size() << "]";
+  }
+  */
+
   return 0;
 }
 
