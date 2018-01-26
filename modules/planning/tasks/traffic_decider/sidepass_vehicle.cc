@@ -33,7 +33,7 @@ using apollo::common::util::Dropbox;
 SidepassVehicle::SidepassVehicle(const RuleConfig& config)
     : TrafficRule(config) {
   Dropbox<SidepassStatus>::Open()->Set(db_key_sidepass_status,
-                                       SidepassStatus::DRIVING);
+                                       SidepassStatus::UNKNOWN);
 }
 
 void SidepassVehicle::UpdateSidepassStatus(
@@ -48,18 +48,23 @@ void SidepassVehicle::UpdateSidepassStatus(
   CHECK_NOTNULL(status);
 
   switch (*status) {
-    case SidepassStatus::DRIVING:
-      if (has_blocking_obstacle) {
-        constexpr double kAdcStopSpeedThreshold = 0.1;  // unit: m/s
-        if (adc_planning_point.v() < kAdcStopSpeedThreshold) {
-          Dropbox<SidepassStatus>::Open()->Set(db_key_sidepass_status,
-                                               SidepassStatus::WAIT);
-          Dropbox<double>::Open()->Set(db_key_sidepass_adc_wait_start_time,
-                                       Clock::NowInSeconds());
-        }
+    case SidepassStatus::UNKNOWN: {
+      Dropbox<SidepassStatus>::Open()->Set(db_key_sidepass_status,
+                                           SidepassStatus::DRIVING);
+      break;
+    }
+    case SidepassStatus::DRIVING: {
+      constexpr double kAdcStopSpeedThreshold = 0.1;  // unit: m/s
+      if (has_blocking_obstacle &&
+          adc_planning_point.v() < kAdcStopSpeedThreshold) {
+        Dropbox<SidepassStatus>::Open()->Set(db_key_sidepass_status,
+                                             SidepassStatus::WAIT);
+        Dropbox<double>::Open()->Set(db_key_sidepass_adc_wait_start_time,
+                                     Clock::NowInSeconds());
       }
       break;
-    case SidepassStatus::WAIT:
+    }
+    case SidepassStatus::WAIT: {
       if (has_blocking_obstacle) {
         double* wait_start_time =
             Dropbox<double>::Open()->Get(db_key_sidepass_adc_wait_start_time);
@@ -76,12 +81,14 @@ void SidepassVehicle::UpdateSidepassStatus(
         Dropbox<double>::Open()->Remove(db_key_sidepass_adc_wait_start_time);
       }
       break;
-    case SidepassStatus::SIDEPASS:
+    }
+    case SidepassStatus::SIDEPASS: {
       if (!has_blocking_obstacle) {
         Dropbox<SidepassStatus>::Open()->Set(db_key_sidepass_status,
                                              SidepassStatus::DRIVING);
       }
       break;
+    }
     default:
       break;
   }
@@ -118,8 +125,16 @@ bool SidepassVehicle::HasBlockingObstacle(const SLBoundary& adc_sl_boundary,
       if (other_obstacle->Id() == path_obstacle->Id()) {
         continue;
       }
+      if (other_obstacle->PerceptionSLBoundary().start_l() >
+              path_obstacle->PerceptionSLBoundary().end_l() ||
+          other_obstacle->PerceptionSLBoundary().end_l() <
+              path_obstacle->PerceptionSLBoundary().start_l()) {
+        // not blocking the backside vehicle
+        continue;
+      }
+
       double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
-                       path_obstacle->PerceptionSLBoundary().start_s();
+                       path_obstacle->PerceptionSLBoundary().end_s();
       if (delta_s < 0.0 || delta_s > kAdcDistanceThreshold) {
         continue;
       } else {
