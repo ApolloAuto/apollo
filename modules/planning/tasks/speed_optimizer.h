@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file speed_optimizer.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_TASKS_SPEED_OPTIMIZER_H_
