@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file speed_optimizer.cc
+ * @file
  **/
 
 #include "modules/planning/tasks/speed_optimizer.h"
