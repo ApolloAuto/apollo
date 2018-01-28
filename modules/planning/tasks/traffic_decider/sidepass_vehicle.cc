@@ -20,8 +20,11 @@
 
 #include "modules/planning/tasks/traffic_decider/sidepass_vehicle.h"
 
+#include <vector>
+
 #include "modules/common/time/time.h"
 #include "modules/common/util/dropbox.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -31,9 +34,9 @@ using apollo::common::time::Clock;
 using apollo::common::util::Dropbox;
 
 SidepassVehicle::SidepassVehicle(const RuleConfig& config)
-    : TrafficRule(config) {}
+    : TrafficRule(config), hdmap_(apollo::hdmap::HDMapUtil::BaseMapPtr()) {}
 
-void SidepassVehicle::UpdateSidepassStatus(
+bool SidepassVehicle::UpdateSidepassStatus(
     const SLBoundary& adc_sl_boundary,
     const common::TrajectoryPoint& adc_planning_point,
     PathDecision* path_decision) {
@@ -72,9 +75,55 @@ void SidepassVehicle::UpdateSidepassStatus(
         DCHECK_NOTNULL(wait_start_time);
         constexpr double kWaitDuration = 2.0;
         if (Clock::NowInSeconds() - *wait_start_time > kWaitDuration) {
-          Dropbox<SidepassStatus>::Open()->Set(db_key_sidepass_status,
-                                               SidepassStatus::SIDEPASS);
-          Dropbox<double>::Open()->Remove(db_key_sidepass_adc_wait_start_time);
+          // calculate if the left/right lane exist
+          double x = common::VehicleStateProvider::instance()->x();
+          double y = common::VehicleStateProvider::instance()->y();
+          double z = common::VehicleStateProvider::instance()->z();
+          auto point = common::util::MakePointENU(x, y, z);
+          double heading = common::VehicleStateProvider::instance()->heading();
+
+          std::vector<hdmap::LaneInfoConstPtr> lanes;
+          const int status = hdmap_->GetLanesWithHeading(point, 0.0, heading,
+                                                         M_PI / 2.0, &lanes);
+          if (status < 0) {
+            AERROR << "failed to get lane from point "
+                   << point.ShortDebugString();
+            return false;
+          }
+          if (lanes.empty()) {
+            AERROR << "No valid lane found within " << 0.0
+                   << " meters with heading " << heading;
+            return false;
+          }
+          bool enter_sidepass_mode = false;
+          int side = 0;  // 1 for left, -1 for right
+          if (lanes.size() >= 2) {
+            // currently do not sidepass when lanes > 2 (usually at junctions).
+          } else {
+            auto& lane = lanes.front()->lane();
+            if (lane.left_neighbor_forward_lane_id_size() > 0) {
+              enter_sidepass_mode = true;
+              side = 1;
+            } else if (lane.right_neighbor_forward_lane_id_size() > 0) {
+              enter_sidepass_mode = true;
+              side = -1;
+            } else if (lane.left_neighbor_reverse_lane_id_size() > 0) {
+              enter_sidepass_mode = true;
+              side = 1;
+            } else if (lane.right_neighbor_reverse_lane_id_size() > 0) {
+              enter_sidepass_mode = true;
+              side = -1;
+            } else {
+              // do not sidepass when no lanes at left or right
+            }
+          }
+          if (enter_sidepass_mode) {
+            Dropbox<SidepassStatus>::Open()->Set(db_key_sidepass_status,
+                                                 SidepassStatus::SIDEPASS);
+            Dropbox<double>::Open()->Remove(
+                db_key_sidepass_adc_wait_start_time);
+            Dropbox<int>::Open()->Set(db_key_sidepass_side, side);
+          }
         }
       } else {
         Dropbox<SidepassStatus>::Open()->Set(db_key_sidepass_status,
@@ -93,6 +142,7 @@ void SidepassVehicle::UpdateSidepassStatus(
     default:
       break;
   }
+  return true;
 }
 
 // a blocking obstacle is an obstacle blocks the road when it is not blocked (by
@@ -153,11 +203,14 @@ bool SidepassVehicle::HasBlockingObstacle(const SLBoundary& adc_sl_boundary,
   return false;
 }
 
-void SidepassVehicle::MakeSidepassObstacleDecision(
+bool SidepassVehicle::MakeSidepassObstacleDecision(
     const SLBoundary& adc_sl_boundary,
     const common::TrajectoryPoint& adc_planning_point,
     PathDecision* path_decision) {
-  UpdateSidepassStatus(adc_sl_boundary, adc_planning_point, path_decision);
+  if (!UpdateSidepassStatus(adc_sl_boundary, adc_planning_point,
+                            path_decision)) {
+    return false;
+  }
 
   auto* status = Dropbox<SidepassStatus>::Open()->Get(db_key_sidepass_status);
   DCHECK_NOTNULL(status);
@@ -182,12 +235,18 @@ void SidepassVehicle::MakeSidepassObstacleDecision(
   if (*status == SidepassStatus::SIDEPASS) {
     ObjectDecisionType sidepass;
     sidepass.mutable_sidepass();
+    int* side = Dropbox<int>::Open()->Get(db_key_sidepass_side);
+    DCHECK_NOTNULL(side);
+
+    sidepass.mutable_sidepass()->set_type(
+        (*side == 1 ? ObjectSidePass::LEFT : ObjectSidePass::RIGHT));
     std::string* id =
         Dropbox<std::string>::Open()->Get(db_key_sidepass_obstacle_id);
 
     DCHECK_NOTNULL(id);
     path_decision->AddLateralDecision("sidepass_vehicle", *id, sidepass);
   }
+  return true;
 }
 
 bool SidepassVehicle::ApplyRule(Frame*,
@@ -197,8 +256,10 @@ bool SidepassVehicle::ApplyRule(Frame*,
   const auto& adc_planning_point = reference_line_info->AdcPlanningPoint();
   if (reference_line_info->Lanes()
           .IsOnSegment()) {  // The lane keeping reference line.
-    MakeSidepassObstacleDecision(adc_sl_boundary, adc_planning_point,
-                                 path_decision);
+    if (!MakeSidepassObstacleDecision(adc_sl_boundary, adc_planning_point,
+                                      path_decision)) {
+      return false;
+    }
   }
   return true;
 }

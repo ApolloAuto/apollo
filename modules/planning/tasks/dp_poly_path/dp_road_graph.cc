@@ -33,6 +33,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_thread_pool.h"
@@ -330,7 +331,18 @@ bool DPRoadGraph::SamplePathWaypoints(
         // currently only left nudge is supported. Need road hard boundary for
         // both sides
         sample_l.clear();
-        sample_l.push_back(eff_left_width + config_.sidepass_distance());
+        switch (sidepass_.type()) {
+          case ObjectSidePass::LEFT: {
+            sample_l.push_back(eff_left_width + config_.sidepass_distance());
+            break;
+          }
+          case ObjectSidePass::RIGHT: {
+            sample_l.push_back(-eff_right_width - config_.sidepass_distance());
+            break;
+          }
+          default:
+            break;
+        }
       }
     }
     std::vector<common::SLPoint> level_points;
@@ -461,6 +473,7 @@ bool DPRoadGraph::HasSidepass() {
   const auto &path_decision = reference_line_info_.path_decision();
   for (const auto &obstacle : path_decision.path_obstacles().Items()) {
     if (obstacle->LateralDecision().has_sidepass()) {
+      sidepass_ = obstacle->LateralDecision().sidepass();
       return true;
     }
   }
