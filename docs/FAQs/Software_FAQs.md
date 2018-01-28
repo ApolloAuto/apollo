@@ -16,4 +16,7 @@ The majority of bugs can be found through logging (using AERROR, AINFO, ADEBUG).
 
 Refer to the How-To guide located [here](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_offline_perception_visualizer.md).
 
+## Ubuntu 14.04 login loop problem after installing the pre-built Apollo Kernel.
+
+
 **More Software FAQs to follow.**
