@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Chart from "chart.js";
-import ChartZoom from "chartjs-plugin-zoom";
 
 Chart.plugins.register({
     afterDatasetsDraw: function(chart, easing) {
@@ -38,14 +37,6 @@ export default class ScatterGraph extends React.Component {
             },
             legend: {
                 display: options.legend.display,
-            },
-            pan: {
-                enabled: true,
-                mode: 'xy'
-            },
-            zoom: {
-                enabled: false,
-                mode: 'xy',
             },
             tooltips: {
                 enable: true,
