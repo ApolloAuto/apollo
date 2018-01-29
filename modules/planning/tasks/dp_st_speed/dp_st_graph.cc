@@ -37,8 +37,8 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::SpeedPoint;
 using apollo::common::Status;
-using apollo::common::math::Vec2d;
 using apollo::common::VehicleParam;
+using apollo::common::math::Vec2d;
 
 namespace {
 constexpr double kInf = std::numeric_limits<double>::infinity();

@@ -47,12 +47,8 @@ struct Obstacle {
   MetaType meta_type;
   std::vector<float> meta_type_probs;
 
-  Obstacle() {
-    grids.clear();
+  Obstacle() : score(0.0), height(-5.0), meta_type(META_UNKNOWN) {
     cloud.reset(new apollo::perception::pcl_util::PointCloud);
-    score = 0.0;
-    height = -5.0;
-    meta_type = META_UNKNOWN;
     meta_type_probs.assign(MAX_META_TYPE, 0.0);
   }
 };
@@ -116,11 +112,11 @@ class Cluster2D {
     }
 
     // construct graph with center offset prediction and objectness
-    for (int row = 0; row < rows_; row++) {
-      for (int col = 0; col < cols_; col++) {
+    for (int row = 0; row < rows_; ++row) {
+      for (int col = 0; col < cols_; ++col) {
         int grid = RowCol2Grid(row, col);
         Node* node = &nodes[row][col];
-        apollo::perception::DisjointSetMakeSet(node);
+        DisjointSetMakeSet(node);
         node->is_object =
             (use_all_grids_for_clustering || nodes[row][col].point_num > 0) &&
             (*(category_pt_data + grid) >= objectness_thresh);
@@ -133,22 +129,22 @@ class Cluster2D {
     }
 
     // traverse nodes
-    for (int row = 0; row < rows_; row++) {
-      for (int col = 0; col < cols_; col++) {
+    for (int row = 0; row < rows_; ++row) {
+      for (int col = 0; col < cols_; ++col) {
         Node* node = &nodes[row][col];
         if (node->is_object && node->traversed == 0) {
           Traverse(node);
         }
       }
     }
-    for (int row = 0; row < rows_; row++) {
-      for (int col = 0; col < cols_; col++) {
+    for (int row = 0; row < rows_; ++row) {
+      for (int col = 0; col < cols_; ++col) {
         Node* node = &nodes[row][col];
         if (!node->is_center) {
           continue;
         }
-        for (int row2 = row - 1; row2 <= row + 1; row2++) {
-          for (int col2 = col - 1; col2 <= col + 1; col2++) {
+        for (int row2 = row - 1; row2 <= row + 1; ++row2) {
+          for (int col2 = col - 1; col2 <= col + 1; ++col2) {
             if ((row2 == row || col2 == col) && IsValidRowCol(row2, col2)) {
               Node* node2 = &nodes[row2][col2];
               if (node2->is_center) {
@@ -163,8 +159,8 @@ class Cluster2D {
     int count_obstacles = 0;
     obstacles_.clear();
     id_img_.assign(grids_, -1);
-    for (int row = 0; row < rows_; row++) {
-      for (int col = 0; col < cols_; col++) {
+    for (int row = 0; row < rows_; ++row) {
+      for (int col = 0; col < cols_; ++col) {
         Node* node = &nodes[row][col];
         if (!node->is_object) {
           continue;
@@ -181,7 +177,7 @@ class Cluster2D {
         obstacles_[root->obstacle_id].grids.push_back(grid);
       }
     }
-    CHECK_EQ(static_cast<int>(count_obstacles), obstacles_.size());
+    CHECK_EQ(static_cast<size_t>(count_obstacles), obstacles_.size());
   }
 
   void Filter(const caffe::Blob<float>& confidence_pt_blob,

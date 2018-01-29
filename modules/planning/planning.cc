@@ -39,12 +39,14 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleStateProvider;
 using apollo::common::VehicleState;
+using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-std::string Planning::Name() const { return "planning"; }
+std::string Planning::Name() const {
+  return "planning";
+}
 
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
@@ -114,9 +116,8 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  reference_line_provider_ =
-      std::unique_ptr<ReferenceLineProvider>(new ReferenceLineProvider(
-          hdmap_, config_.qp_spline_reference_line_smoother_config()));
+  reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
+      new ReferenceLineProvider(hdmap_, config_.smoother_type()));
 
   RegisterPlanners();
   planner_ = planner_factory_.CreateObject(config_.planner_type());
@@ -376,34 +377,8 @@ Status Planning::Plan(const double current_time_stamp,
     ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
         stitching_trajectory.back());
   }
-  auto status = Status::OK();
-  bool has_plan = false;
-  auto it = std::find_if(
-      frame_->reference_line_info().begin(),
-      frame_->reference_line_info().end(),
-      [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
-  if (it != frame_->reference_line_info().end()) {
-    status = planner_->Plan(stitching_trajectory.back(), frame_.get(), &(*it));
-    has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
-                it->TrajectoryLength() > FLAGS_change_lane_min_length);
-    if (!has_plan) {
-      AERROR << "Fail to plan for lane change.";
-    }
-  }
 
-  if (!has_plan || !FLAGS_prioritize_change_lane) {
-    for (auto& reference_line_info : frame_->reference_line_info()) {
-      if (reference_line_info.IsChangeLanePath()) {
-        continue;
-      }
-      status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
-                              &reference_line_info);
-      if (status != Status::OK()) {
-        AERROR << "planner failed to make a driving plan for: "
-               << reference_line_info.Lanes().Id();
-      }
-    }
-  }
+  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
 
   ExportReferenceLineDebug(ptr_debug);
 

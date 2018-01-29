@@ -117,6 +117,7 @@ class DPRoadGraph {
                   const uint32_t level, const uint32_t total_level,
                   TrajectoryCost *trajectory_cost, DPRoadGraphNode *front,
                   DPRoadGraphNode *cur_node);
+  bool HasSidepass();
 
  private:
   DpPolyPathConfig config_;
@@ -127,6 +128,8 @@ class DPRoadGraph {
   common::SLPoint init_sl_point_;
   common::FrenetFramePoint init_frenet_frame_point_;
   apollo::planning_internal::Debug *planning_debug_ = nullptr;
+
+  ObjectSidePass sidepass_;
 };
 
 }  // namespace planning

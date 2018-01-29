@@ -37,6 +37,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::canbus::Chassis;
 using apollo::common::EngageAdvice;
 using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
@@ -44,7 +45,6 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::canbus::Chassis;
 using apollo::common::util::Dropbox;
 
 ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
@@ -60,7 +60,7 @@ namespace {
 std::string junction_dropbox_id(const std::string& junction_id) {
   return "junction_protection_" + junction_id;
 }
-}
+}  // namespace
 
 bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
@@ -96,9 +96,7 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   return true;
 }
 
-bool ReferenceLineInfo::IsInited() const {
-  return is_inited_;
-}
+bool ReferenceLineInfo::IsInited() const { return is_inited_; }
 
 bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
   constexpr double kEpsilon = 1e-2;
@@ -142,9 +140,7 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
   return ADCTrajectory::UNPROTECTED;
 }
 
-const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const {
-  return lanes_;
-}
+const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }
 
 const std::list<hdmap::Id> ReferenceLineInfo::TargetLaneId() const {
   std::list<hdmap::Id> lane_ids;
@@ -158,9 +154,7 @@ const SLBoundary& ReferenceLineInfo::AdcSlBoundary() const {
   return adc_sl_boundary_;
 }
 
-PathDecision* ReferenceLineInfo::path_decision() {
-  return &path_decision_;
-}
+PathDecision* ReferenceLineInfo::path_decision() { return &path_decision_; }
 
 const PathDecision& ReferenceLineInfo::path_decision() const {
   return path_decision_;
@@ -289,21 +283,13 @@ bool ReferenceLineInfo::IsStartFrom(
   return previous_reference_line_info.reference_line_.IsOnRoad(sl_point);
 }
 
-const PathData& ReferenceLineInfo::path_data() const {
-  return path_data_;
-}
+const PathData& ReferenceLineInfo::path_data() const { return path_data_; }
 
-const SpeedData& ReferenceLineInfo::speed_data() const {
-  return speed_data_;
-}
+const SpeedData& ReferenceLineInfo::speed_data() const { return speed_data_; }
 
-PathData* ReferenceLineInfo::mutable_path_data() {
-  return &path_data_;
-}
+PathData* ReferenceLineInfo::mutable_path_data() { return &path_data_; }
 
-SpeedData* ReferenceLineInfo::mutable_speed_data() {
-  return &speed_data_;
-}
+SpeedData* ReferenceLineInfo::mutable_speed_data() { return &speed_data_; }
 
 bool ReferenceLineInfo::CombinePathAndSpeedProfile(
     const double relative_time, const double start_s,
@@ -348,13 +334,9 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
   return true;
 }
 
-void ReferenceLineInfo::SetDrivable(bool drivable) {
-  is_drivable_ = drivable;
-}
+void ReferenceLineInfo::SetDrivable(bool drivable) { is_drivable_ = drivable; }
 
-bool ReferenceLineInfo::IsDrivable() const {
-  return is_drivable_;
-}
+bool ReferenceLineInfo::IsDrivable() const { return is_drivable_; }
 
 bool ReferenceLineInfo::IsChangeLanePath() const {
   return !Lanes().IsOnSegment();

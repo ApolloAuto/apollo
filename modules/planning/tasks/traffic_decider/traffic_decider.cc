@@ -74,7 +74,7 @@ void TrafficDecider::RegisterRules() {
                          });
   rule_factory_.Register(RuleConfig::SIDEPASS_VEHICLE,
                          [](const RuleConfig &config) -> TrafficRule * {
-                           return new ChangeLane(config);
+                           return new SidepassVehicle(config);
                          });
 }
 

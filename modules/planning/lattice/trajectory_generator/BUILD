@@ -57,4 +57,40 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "backup_trajectory",
+    hdrs = [
+        "backup_trajectory.h",
+    ],
+    srcs = [
+        "backup_trajectory.cc",
+    ],
+    deps = [
+        "//modules/common:common",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/math/curve1d:curve1d",
+        "//modules/planning/lattice/trajectory1d:constant_deceleration_trajectory1d",
+        "//modules/planning/lattice/trajectory_generator:trajectory_combiner",
+    ],
+)
+
+cc_library(
+    name = "trajectory_combiner",
+    hdrs = [
+        "trajectory_combiner.h",
+    ],
+    srcs = [
+        "trajectory_combiner.cc",
+    ],
+    deps = [
+        "//modules/common:common",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/math/curve1d:curve1d",
+        "//modules/planning/lattice/util:reference_line_matcher",
+        "//modules/planning/math/frame_conversion:cartesian_frenet_conversion"
+    ],
+)
+
 cpplint()

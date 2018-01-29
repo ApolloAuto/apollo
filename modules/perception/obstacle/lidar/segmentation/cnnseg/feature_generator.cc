@@ -24,9 +24,6 @@ namespace apollo {
 namespace perception {
 namespace cnnseg {
 
-#define CV_PI 3.1415926535897932384626433832795
-#define EPS 1e-6
-
 template <typename Dtype>
 bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
                                    caffe::Blob<Dtype>* out_blob) {
@@ -81,8 +78,9 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
       // * row <-> x, column <-> y
       float center_x = Pixel2Pc(row, height_, range_);
       float center_y = Pixel2Pc(col, width_, range_);
+      constexpr double K_CV_PI = 3.1415926535897932384626433832795;
       direction_data[idx] =
-          static_cast<Dtype>(std::atan2(center_y, center_x) / (2.0 * CV_PI));
+          static_cast<Dtype>(std::atan2(center_y, center_x) / (2.0 * K_CV_PI));
       distance_data[idx] =
           static_cast<Dtype>(std::hypot(center_x, center_y) / 60.0 - 0.5);
     }
@@ -145,6 +143,7 @@ void FeatureGenerator<Dtype>::Generate(
   }
 
   for (int i = 0; i < siz; ++i) {
+    constexpr double EPS = 1e-6;
     if (count_data_[i] < EPS) {
       max_height_data_[i] = Dtype(0);
     } else {

@@ -31,8 +31,7 @@ cc_library(
         "reference_line_smoother.h",
     ],
     deps = [
-        ":qp_spline_reference_line_smoother",
-        ":spiral_reference_line_smoother",
+        "//modules/planning/proto:reference_line_smoother_config_proto",
     ],
 )
 
@@ -43,15 +42,15 @@ cc_library(
     ],
     hdrs = [
         "qp_spline_reference_line_smoother.h",
-        "reference_line_smoother.h",
     ],
     deps = [
         ":reference_line",
+        ":reference_line_smoother",
         "//modules/planning/math:curve_math",
         "//modules/planning/math:polynomial_xd",
         "//modules/planning/math/smoothing_spline:spline_2d_solver",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/proto:qp_spline_reference_line_smoother_config_proto",
+        "//modules/planning/proto:reference_line_smoother_config_proto",
         "@eigen//:eigen",
     ],
 )
@@ -59,7 +58,6 @@ cc_library(
 cc_library(
     name = "spiral_reference_line_smoother",
     srcs = [
-        "reference_line_smoother.h",
         "spiral_problem_interface.cc",
         "spiral_reference_line_smoother.cc",
     ],
@@ -69,6 +67,7 @@ cc_library(
     ],
     deps = [
         ":reference_line",
+        ":reference_line_smoother",
         "//modules/common/math",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math/curve1d:quintic_spiral_path",
@@ -85,7 +84,10 @@ cc_test(
     srcs = [
         "qp_spline_reference_line_smoother_test.cc",
     ],
-    data = ["//modules/planning:planning_testdata"],
+    data = [
+        "//modules/planning:planning_conf",
+        "//modules/planning:planning_testdata",
+    ],
     deps = [
         ":qp_spline_reference_line_smoother",
         "//modules/map/hdmap",
@@ -106,7 +108,9 @@ cc_library(
         ":reference_line",
         ":spiral_reference_line_smoother",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/util:factory",
         "//modules/map/pnc_map",
+        "//modules/planning/proto:planning_config_proto",
     ],
 )
 

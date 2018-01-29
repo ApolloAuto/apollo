@@ -28,8 +28,8 @@ limitations under the License.
 namespace apollo {
 namespace hdmap {
 namespace {
-using apollo::common::math::Vec2d;
 using apollo::common::PointENU;
+using apollo::common::math::Vec2d;
 
 // Minimum error in lane segmentation.
 const double kSegmentationEpsilon = 0.2;
@@ -49,7 +49,7 @@ const double kMaxYCoordinate = 10000000;
 // Minimum y-coordinate of utm
 const double kMinYCoordinate = 0;
 
-bool IsPointValid(const PointENU& point) {
+bool IsPointValid(const PointENU &point) {
   /* if (point.x() > kMaxXCoordinate || point.x() < kMinXCoordinate) {
     return false;
   }
@@ -81,8 +81,8 @@ void PointsFromCurve(const Curve &input_curve, std::vector<Vec2d> *points) {
   for (const auto &curve : input_curve.segment()) {
     if (curve.has_line_segment()) {
       for (const auto &point : curve.line_segment().point()) {
-        CHECK(IsPointValid(point)) << "invalid map point: "
-            << point.DebugString();
+        CHECK(IsPointValid(point))
+            << "invalid map point: " << point.DebugString();
         points->emplace_back(point.x(), point.y());
       }
     } else {
@@ -96,14 +96,12 @@ apollo::common::math::Polygon2d ConvertToPolygon2d(const Polygon &polygon) {
   std::vector<Vec2d> points;
   points.reserve(polygon.point_size());
   for (const auto &point : polygon.point()) {
-    CHECK(IsPointValid(point)) << "invalid map point:"
-        << point.DebugString();
+    CHECK(IsPointValid(point)) << "invalid map point:" << point.DebugString();
     points.emplace_back(point.x(), point.y());
   }
   RemoveDuplicates(&points);
-  while (points.size() >= 2 &&
-         points[0].DistanceTo(points.back()) <=
-             apollo::common::math::kMathEpsilon) {
+  while (points.size() >= 2 && points[0].DistanceTo(points.back()) <=
+                                   apollo::common::math::kMathEpsilon) {
     points.pop_back();
   }
   return apollo::common::math::Polygon2d(points);
@@ -128,11 +126,11 @@ PointENU PointFromVec2d(const Vec2d &point) {
   return pt;
 }
 
-Vec2d Vec2dFromPoint(const PointENU &point) { return {point.x(), point.y()}; }
-
 }  // namespace
 
-LaneInfo::LaneInfo(const Lane &lane) : lane_(lane) { Init(); }
+LaneInfo::LaneInfo(const Lane &lane) : lane_(lane) {
+  Init();
+}
 
 void LaneInfo::Init() {
   PointsFromCurve(lane_.central_curve(), &points_);
@@ -282,7 +280,7 @@ bool LaneInfo::IsOnLane(const Vec2d &point) const {
   }
 
   if (accumulate_s > (total_length() + kEpsilon) ||
-              (accumulate_s + kEpsilon) < 0.0) {
+      (accumulate_s + kEpsilon) < 0.0) {
     return false;
   }
 
@@ -521,7 +519,9 @@ void JunctionInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
   }
 }
 
-SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) { Init(); }
+SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) {
+  Init();
+}
 
 void SignalInfo::Init() {
   for (const auto &stop_line : signal_.stop_line()) {
@@ -579,15 +579,14 @@ void StopSignInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
       }
 
       if (object.has_junction_overlap_info()) {
-          overlap_junction_ids_.push_back(object.id());
+        overlap_junction_ids_.push_back(object.id());
       } else if (object.has_lane_overlap_info()) {
-          overlap_lane_ids_.push_back(object.id());
+        overlap_lane_ids_.push_back(object.id());
       }
     }
   }
   if (overlap_junction_ids_.size() <= 0) {
-    AWARN << "stop sign " << id().id()
-          << "has no overlap with any junction.";
+    AWARN << "stop sign " << id().id() << "has no overlap with any junction.";
   }
 }
 
@@ -628,8 +627,7 @@ void SpeedBumpInfo::Init() {
 
 OverlapInfo::OverlapInfo(const Overlap &overlap) : overlap_(overlap) {}
 
-const ObjectOverlapInfo *OverlapInfo::GetObjectOverlapInfo(
-    const Id &id) const {
+const ObjectOverlapInfo *OverlapInfo::GetObjectOverlapInfo(const Id &id) const {
   for (const auto &object : overlap_.object()) {
     if (object.id().id() == id.id()) {
       return &object;

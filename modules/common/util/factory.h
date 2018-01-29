@@ -79,6 +79,10 @@ class Factory {
     return producers_.erase(id) == 1;
   }
 
+  bool Empty() const {
+    return producers_.empty();
+  }
+
   /**
    * @brief Creates and transfers membership of an object of type matching id.
    * Need to register id before CreateObject is called. May return NULL

@@ -31,7 +31,7 @@ template <typename T>
 bool WithinRange(const T v, const T lower, const T upper) {
   return lower <= v && v <= upper;
 }
-}
+}  // namespace
 
 bool ConstraintChecker::ValidTrajectory(
     const DiscretizedTrajectory& trajectory) {

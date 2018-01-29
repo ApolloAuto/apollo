@@ -24,11 +24,11 @@
 #include <vector>
 
 #include "modules/planning/common/frame.h"
-#include "modules/planning/lattice/behavior_decider/behavior_decider.h"
 #include "modules/planning/common/reference_line_info.h"
+#include "modules/planning/lattice/behavior_decider/behavior_decider.h"
+#include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {
 namespace planning {
@@ -41,22 +41,35 @@ class LatticePlanner : public Planner {
 
   common::Status Init(const PlanningConfig& config) override;
 
-  common::Status Plan(const common::TrajectoryPoint& planning_init_point,
-                      Frame* frame,
-                      ReferenceLineInfo* reference_line_info) override;
+  /**
+   * @brief Override function Plan in parent class Planner.
+   * @param planning_init_point The trajectory point where planning starts.
+   * @param frame Current planning frame.
+   * @return OK if planning succeeds; error otherwise.
+   */
+  apollo::common::Status Plan(
+      const common::TrajectoryPoint& planning_init_point,
+      Frame* frame) override;
+
+  /**
+   * @brief Override function Plan in parent class Planner.
+   * @param planning_init_point The trajectory point where planning starts.
+   * @param frame Current planning frame.
+   * @param reference_line_info The computed reference line.
+   * @return OK if planning succeeds; error otherwise.
+   */
+  common::Status PlanOnReferenceLine(
+      const common::TrajectoryPoint& planning_init_point, Frame* frame,
+      ReferenceLineInfo* reference_line_info) override;
 
  private:
-  DiscretizedTrajectory CombineTrajectory(
-      const std::vector<common::PathPoint>& reference_line,
-      const Curve1d& lon_trajectory, const Curve1d& lat_trajectory,
-      const double init_relative_time = 0.0) const;
-
   DiscretizedTrajectory GetFutureTrajectory() const;
 
-  bool MapFutureTrajectoryToSL(const DiscretizedTrajectory& future_trajectory,
-    std::vector<apollo::common::SpeedPoint>* st_points,
-    std::vector<apollo::common::FrenetFramePoint>* sl_points,
-    ReferenceLineInfo* reference_line_info);
+  bool MapFutureTrajectoryToSL(
+      const DiscretizedTrajectory& future_trajectory,
+      std::vector<apollo::common::SpeedPoint>* st_points,
+      std::vector<apollo::common::FrenetFramePoint>* sl_points,
+      ReferenceLineInfo* reference_line_info);
 
   BehaviorDecider decider_;
 };

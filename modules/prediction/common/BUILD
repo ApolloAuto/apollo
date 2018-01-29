@@ -74,7 +74,9 @@ cc_library(
     deps = [
         "//modules/prediction/proto:feature_proto",
         "//modules/prediction/proto:offline_features_proto",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/common:log",
+        "//modules/common/util:util",
     ]
 )
 

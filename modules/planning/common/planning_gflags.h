@@ -24,6 +24,7 @@ DECLARE_double(test_duration);
 
 DECLARE_string(planning_config_file);
 DECLARE_string(planning_adapter_config_filename);
+DECLARE_string(smoother_config_file);
 DECLARE_int32(planning_loop_rate);
 DECLARE_string(rtk_trajectory_filename);
 DECLARE_uint64(rtk_trajectory_forward);
@@ -40,7 +41,6 @@ DECLARE_double(prepare_rerouting_time);
 DECLARE_double(rerouting_cooldown_time);
 
 DECLARE_bool(enable_smooth_reference_line);
-DECLARE_bool(enable_spiral_reference_line);
 DECLARE_double(spiral_smoother_max_deviation);
 DECLARE_int32(spiral_smoother_num_iteration);
 DECLARE_double(spiral_smoother_piecewise_length);
@@ -196,6 +196,8 @@ DECLARE_double(lateral_acceleration_bound);
 DECLARE_double(collision_buffer_expansion_ratio);
 DECLARE_double(decision_horizon);
 DECLARE_double(lateral_obstacle_ignore_thred);
+DECLARE_bool(enable_backup_trajectory);
+DECLARE_double(backup_trajectory_cost);
 
 // Lattice Evaluate Parameters
 DECLARE_double(weight_lon_travel);

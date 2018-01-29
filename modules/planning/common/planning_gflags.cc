@@ -28,6 +28,10 @@ DEFINE_string(planning_adapter_config_filename,
               "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
 
+DEFINE_string(smoother_config_file,
+              "modules/planning/conf/smoother_config.pb.txt",
+              "The configuration file for qp sline smoother");
+
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
               "Loop rate for planning node");
 
@@ -76,8 +80,6 @@ DEFINE_double(rerouting_cooldown_time, 0.6,
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
 
-DEFINE_bool(enable_spiral_reference_line, false,
-            "enable new spiral based reference line");
 DEFINE_double(spiral_smoother_max_deviation, 0.1,
               "The max deviation of spiral reference line smoother.");
 DEFINE_int32(spiral_smoother_num_iteration, 1000,
@@ -197,7 +199,7 @@ DEFINE_double(min_stop_distance_obstacle, 6.0,
               "min stop distance from in-lane obstacle (meters)");
 DEFINE_double(stop_distance_destination, 0.5,
               "stop distance from destination line");
-DEFINE_double(stop_distance_traffic_light, 3.0,
+DEFINE_double(stop_distance_traffic_light, 1.0,
               "stop distance from traffic light line");
 DEFINE_double(stop_distance_crosswalk, 1.0,
               "stop distance from stop line of crosswalk");
@@ -281,10 +283,10 @@ DEFINE_double(crosswalk_strick_l_distance, 4.0,
 DEFINE_double(crosswalk_loose_l_distance, 5.0,
               "loose stop rule beyond this l_distance");
 /// stop_sign
-DEFINE_bool(enable_stop_sign, false, "enable stop_sign");
+DEFINE_bool(enable_stop_sign, true, "enable stop_sign");
 DEFINE_string(stop_sign_virtual_object_id_prefix, "SS_",
               "prefix for converting stop_sign id to virtual object id");
-DEFINE_double(stop_duration_for_stop_sign, 3,
+DEFINE_double(stop_duration_for_stop_sign, 3.0,
               "min time(second) to stop at stop sign");
 
 // according to DMV's rule, turn signal should be on within 200 ft from
@@ -371,27 +373,24 @@ DEFINE_double(decision_horizon, 200.0,
 DEFINE_double(lateral_obstacle_ignore_thred, 2.0,
               "Lateral threshold for "
               "obstacles to be considered in path-time graph");
+DEFINE_bool(enable_backup_trajectory, false,
+            "If generate backup trajectory when planning fail");
+DEFINE_double(backup_trajectory_cost, 1000.0,
+              "Default cost of backup trajectory");
 
 // Lattice Evaluate Parameters
-DEFINE_double(weight_lon_travel, 6.0,
-              "Weight of longitudinal travel cost");
-DEFINE_double(weight_lon_jerk, 1.0,
-              "Weight of longitudinal jerk cost");
+DEFINE_double(weight_lon_travel, 6.0, "Weight of longitudinal travel cost");
+DEFINE_double(weight_lon_jerk, 1.0, "Weight of longitudinal jerk cost");
 DEFINE_double(weight_lon_collision, 2.0,
               "Weight of logitudinal collision cost");
-DEFINE_double(weight_lat_offset, 2.0,
-              "Weight of lateral offset cost");
+DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
 DEFINE_double(weight_same_side_offset, 1.0,
               "Weight of same side lateral offset cost");
 DEFINE_double(weight_opposite_side_offset, 10.0,
               "Weight of opposite side lateral offset cost");
-DEFINE_double(weight_dist_travelled, 10.0,
-              "Weight of travelled distance cost");
-DEFINE_double(weight_target_speed, 1.0,
-               "Weight of target speed cost");
-DEFINE_double(lat_offset_bound, 3.0,
-              "The bound of lateral offset");
-DEFINE_double(lon_collision_buffer, 1.0,
-              "Longitudinal collision buffer");
+DEFINE_double(weight_dist_travelled, 10.0, "Weight of travelled distance cost");
+DEFINE_double(weight_target_speed, 1.0, "Weight of target speed cost");
+DEFINE_double(lat_offset_bound, 3.0, "The bound of lateral offset");
+DEFINE_double(lon_collision_buffer, 1.0, "Longitudinal collision buffer");
 DEFINE_double(lon_collision_cost_std, 0.5,
               "The standard deviation of logitudinal collision cost function");

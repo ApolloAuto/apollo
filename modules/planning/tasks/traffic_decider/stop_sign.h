@@ -31,15 +31,10 @@
 namespace apollo {
 namespace planning {
 
-using apollo::hdmap::LaneInfoConstPtr;
-using apollo::hdmap::OverlapInfoConstPtr;
-using apollo::hdmap::PathOverlap;
-using apollo::hdmap::StopSignInfo;
-using apollo::perception::PerceptionObstacle;
-using StopSignLaneVehicles =
-    std::unordered_map<std::string, std::vector<std::string>>;
-
 class StopSign : public TrafficRule {
+  typedef std::unordered_map<std::string, std::vector<std::string>>
+      StopSignLaneVehicles;
+
  public:
   explicit StopSign(const RuleConfig& config);
   virtual ~StopSign() = default;
@@ -57,19 +52,22 @@ class StopSign : public TrafficRule {
   void MakeDecisions(Frame* frame,
                      ReferenceLineInfo* const reference_line_info);
   bool FindNextStopSign(ReferenceLineInfo* const reference_line_info);
-  int GetAssociatedLanes(const StopSignInfo& stop_sign_info);
+  int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
   int ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
-                        const StopSignInfo& stop_sign_info);
+                        const hdmap::StopSignInfo& stop_sign_info);
   bool CheckADCkStop(ReferenceLineInfo* const reference_line_info);
-  int GetWatchVehicles(const StopSignInfo& stop_sign_info,
+  int GetWatchVehicles(const hdmap::StopSignInfo& stop_sign_info,
                        StopSignLaneVehicles* watch_vehicles);
   int UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles);
-  int AddWatchVehicle(const PathObstacle& obstacle,
+  int AddWatchVehicle(const PathObstacle& path_obstacle,
                       StopSignLaneVehicles* watch_vehicles);
-  int RemoveWatchVehicle(const PathObstacle& obstacle,
+  int RemoveWatchVehicle(const PathObstacle& path_obstacle,
                          StopSignLaneVehicles* watch_vehicles);
+  int ClearWatchVehicle(
+      ReferenceLineInfo* const reference_line_info,
+      StopSignLaneVehicles* watch_vehicles);
   double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
-                             const PathOverlap* stop_sign_overlap);
+                             const hdmap::PathOverlap* stop_sign_overlap);
   bool BuildStopDecision(Frame* frame,
                          ReferenceLineInfo* const reference_line_info,
                          const hdmap::PathOverlap* stop_sign_overlap);
@@ -83,11 +81,11 @@ class StopSign : public TrafficRule {
   constexpr static char const* const db_key_stop_sign_watch_vehicle_prefix_ =
       "kStopSignWatchVehicle_";
 
-  PathOverlap* next_stop_sign_overlap_ = nullptr;
-  StopSignInfo* next_stop_sign_ = nullptr;
+  hdmap::PathOverlap* next_stop_sign_overlap_ = nullptr;
+  hdmap::StopSignInfo* next_stop_sign_ = nullptr;
   StopSignStopStatus stop_status_;
-  std::vector<std::pair<LaneInfoConstPtr,
-      OverlapInfoConstPtr>> associated_lanes_;
+  std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
+      associated_lanes_;
 };
 
 }  // namespace planning

@@ -82,8 +82,13 @@ bool WebSocketHandler::BroadcastData(const std::string &data, bool skippable) {
   return all_success;
 }
 
+bool WebSocketHandler::SendBinaryData(Connection *conn, const std::string &data,
+                                      bool skippable) {
+  return SendData(conn, data, skippable, WEBSOCKET_OPCODE_BINARY);
+}
+
 bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
-                                bool skippable) {
+                                bool skippable, int op_code) {
   std::shared_ptr<std::mutex> connection_lock;
   {
     std::unique_lock<std::mutex> lock(mutex_);
@@ -116,8 +121,7 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
   int ret;
   PERF_BLOCK(StrCat("Writing ", data.size(), " bytes via websocket took"),
              0.1) {
-    ret = mg_websocket_write(conn, WEBSOCKET_OPCODE_TEXT, data.c_str(),
-                             data.size());
+    ret = mg_websocket_write(conn, op_code, data.c_str(), data.size());
   }
   connection_lock->unlock();
 

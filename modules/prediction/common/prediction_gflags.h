@@ -23,6 +23,7 @@
 DECLARE_string(prediction_module_name);
 DECLARE_string(prediction_conf_file);
 DECLARE_string(prediction_adapter_config_filename);
+DECLARE_string(prediction_data_file_prefix);
 
 DECLARE_bool(prediction_test_mode);
 DECLARE_double(prediction_test_duration);
@@ -55,6 +56,7 @@ DECLARE_int32(still_obstacle_history_length);
 DECLARE_double(still_obstacle_speed_threshold);
 DECLARE_double(still_pedestrian_speed_threshold);
 DECLARE_double(still_obstacle_position_std);
+DECLARE_double(still_pedestrian_position_std);
 DECLARE_double(max_history_time);
 DECLARE_double(target_lane_gap);
 DECLARE_int32(max_num_current_lane);

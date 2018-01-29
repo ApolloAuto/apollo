@@ -20,6 +20,7 @@
 #include <string>
 
 #include "gtest/gtest_prod.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/dreamview/backend/handlers/websocket.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
@@ -38,7 +39,7 @@ class HMI {
 
  private:
   // Broadcast HMIStatus to all clients.
-  void BroadcastHMIStatus() const;
+  void BroadcastHMIStatus();
 
   void RegisterMessageHandlers();
 
@@ -66,6 +67,8 @@ class HMI {
   // No ownership.
   WebSocketHandler *websocket_;
   MapService *map_service_;
+
+  apollo::common::monitor::MonitorLogger logger_;
 
   FRIEND_TEST(HMITest, RunComponentCommand);
 };

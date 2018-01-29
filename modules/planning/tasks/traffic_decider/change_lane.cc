@@ -37,7 +37,7 @@ constexpr double kMinGuardVehicleSpeed = 1.0;
 constexpr double kGuardDistance = 100.0;
 constexpr double kMinOvertakeDistance = 10.0;
 constexpr double kOvertakeTimeBuffer = 2.0;
-}
+}  // namespace
 
 ChangeLane::ChangeLane(const RuleConfig& config) : TrafficRule(config) {}
 

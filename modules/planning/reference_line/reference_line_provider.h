@@ -31,12 +31,13 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
-
 #include "modules/common/proto/vehicle_state.pb.h"
 
+#include "modules/common/util/factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
@@ -62,7 +63,7 @@ class ReferenceLineProvider {
 
   ReferenceLineProvider(
       const hdmap::HDMap* base_map,
-      const QpSplineReferenceLineSmootherConfig& smoother_config);
+      PlanningConfig::ReferenceLineSmootherType smoother_type);
 
   bool UpdateRoutingResponse(const routing::RoutingResponse& routing);
 
@@ -135,13 +136,15 @@ class ReferenceLineProvider {
   AnchorPoint GetAnchorPoint(const ReferenceLine& reference_line,
                              double s) const;
 
+  static void RegisterSmoothers();
+
  private:
   bool is_initialized_ = false;
   bool is_stop_ = false;
   std::unique_ptr<std::thread> thread_;
+
   std::unique_ptr<ReferenceLineSmoother> smoother_;
-  std::unique_ptr<Spline2dSolver> spline_solver_;
-  QpSplineReferenceLineSmootherConfig smoother_config_;
+  ReferenceLineSmootherConfig smoother_config_;
 
   std::mutex pnc_map_mutex_;
   std::unique_ptr<hdmap::PncMap> pnc_map_;
@@ -157,6 +160,11 @@ class ReferenceLineProvider {
   std::list<ReferenceLine> reference_lines_;
   std::list<hdmap::RouteSegments> route_segments_;
   double last_calculation_time_ = 0.0;
+
+  static apollo::common::util::Factory<
+      PlanningConfig::ReferenceLineSmootherType, ReferenceLineSmoother,
+      ReferenceLineSmoother* (*)(const ReferenceLineSmootherConfig& config)>
+      s_smoother_factory_;
 };
 
 }  // namespace planning

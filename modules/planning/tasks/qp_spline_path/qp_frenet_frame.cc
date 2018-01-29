@@ -41,7 +41,7 @@ namespace {
 
 constexpr double kEpsilonTol = 1e-6;
 const auto inf = std::numeric_limits<double>::infinity();
-}
+}  // namespace
 
 QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
                              const SpeedData& speed_data,

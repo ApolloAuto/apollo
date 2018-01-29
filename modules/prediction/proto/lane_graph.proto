@@ -30,7 +30,12 @@ message LaneSequence {
     optional int32 lane_sequence_id = 1;
     repeated LaneSegment lane_segment = 2;
     repeated NearbyObstacle nearby_obstacle = 3;
-    repeated double mlp_features = 4;
+
+    message Features {
+        repeated double mlp_features = 1;
+    }
+
+    optional Features features = 4;
     optional int32 label = 5 [default = 0];
     optional double probability = 6 [default = 0.0];
     optional double acceleration = 7 [default = 0.0];

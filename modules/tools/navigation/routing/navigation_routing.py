@@ -110,7 +110,7 @@ def get_latlon_and_utm_path(steps):
             loc = steps[0]['start_location']
             x, y = projector(loc['lng'], loc['lat'])
             p_start = (x, y)
-            loc = steps[0]['end_location']
+            loc = steps[-1]['end_location']
             x, y = projector(loc['lng'], loc['lat'])
             p_end = (x, y)
             line = match_drive_data(p_start, p_end)

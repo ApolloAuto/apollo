@@ -99,6 +99,10 @@ function generate_build_targets() {
   if ! $USE_ESD_CAN; then
      BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "esd")
   fi
+  #skip msf for non x86_64 platforms
+  if [ ${MACHINE_ARCH} == "x86_64" ]; then
+     BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "msf")
+  fi
 }
 
 #=================================================
@@ -179,6 +183,7 @@ function build_py_proto() {
   mkdir py_proto
   PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
   find modules/ -name "*.proto" \
+      | grep -v node_modules \
       | grep -v modules/drivers/gnss \
       | xargs ${PROTOC} --python_out=py_proto
   find py_proto/* -type d -exec touch "{}/__init__.py" \;
@@ -255,10 +260,6 @@ function release() {
 
   # tools
   cp -r modules/tools $MODULES_DIR
-
-  # ros
-  cp -Lr bazel-apollo/external/ros ${APOLLO_DIR}/
-  rm -f ${APOLLO_DIR}/ros/*.tar.gz
 
   # scripts
   cp -r scripts ${APOLLO_DIR}

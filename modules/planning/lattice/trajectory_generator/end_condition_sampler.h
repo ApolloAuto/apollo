@@ -25,8 +25,8 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/lattice/behavior_decider/feasible_region.h"
+#include "modules/planning/proto/lattice_structure.pb.h"
 
 namespace apollo {
 namespace planning {

@@ -26,6 +26,11 @@ namespace prediction {
 class FeatureOutput {
  public:
   /**
+   * @brief Constructor
+   */
+  FeatureOutput() = default;
+
+  /**
    * @brief Destructor
    */
   ~FeatureOutput() = default;
@@ -36,18 +41,30 @@ class FeatureOutput {
   static void Close();
 
   /**
+   * @brief Reset
+   */
+  static void Clear();
+
+  /**
    * @brief Check if output is ready
    * @return True if output is ready
    */
   static bool Ready();
 
   /**
-   * @brief Write a proto to file
+   * @brief Insert a feature
+   * @param A feature in proto
    */
-  static void Write(const Feature& feature);
+  static void Insert(const Feature& feature);
+
+  /**
+   * @brief Write features to a file
+   */
+  static void Write();
 
  private:
-  FeatureOutput() = delete;
+  static Features features_;
+  static size_t index_;
 };
 
 }  // namespace prediction

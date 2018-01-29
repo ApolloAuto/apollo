@@ -19,8 +19,8 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/util/dropbox.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/dropbox.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
@@ -30,8 +30,8 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::util::Dropbox;
 using apollo::common::time::Clock;
+using apollo::common::util::Dropbox;
 using apollo::planning::StopSign;
 
 /**
@@ -52,7 +52,7 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
 /*
  * stop_sign: adc proceed
  *   adc status: null => TO_STOP
- *   decision: stop
+ *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   FLAGS_enable_stop_sign = true;
@@ -62,29 +62,28 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 
   // check dropbox value
-  StopSign::StopSignStopStatus* status
-      = Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
+  StopSign::StopSignStopStatus* status =
+      Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
           "kStopSignStopStatus_1017");
-  StopSign::StopSignStopStatus stop_status = (status == nullptr) ?
-      StopSign::StopSignStopStatus::UNKNOWN : *status;
+  StopSign::StopSignStopStatus stop_status =
+      (status == nullptr) ? StopSign::StopSignStopStatus::UNKNOWN : *status;
   EXPECT_EQ(StopSign::StopSignStopStatus::TO_STOP, stop_status);
 }
 
 /*
  * stop_sign: adc stopped (speed and distance to stop_line)
  *   adc status: TO_STOP => STOPPING
- *   decision: stop
+ *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   FLAGS_enable_stop_sign = true;
 
   // set dropbox
   Dropbox<StopSign::StopSignStopStatus>::Open()->Set(
-      "kStopSignStopStatus_1017",
-      StopSign::StopSignStopStatus::TO_STOP);
+      "kStopSignStopStatus_1017", StopSign::StopSignStopStatus::TO_STOP);
 
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -92,79 +91,106 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 
   // check dropbox value
-  StopSign::StopSignStopStatus* status
-      = Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
+  StopSign::StopSignStopStatus* status =
+      Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
           "kStopSignStopStatus_1017");
-  StopSign::StopSignStopStatus stop_status = (status == nullptr) ?
-      StopSign::StopSignStopStatus::UNKNOWN : *status;
+  StopSign::StopSignStopStatus stop_status =
+      (status == nullptr) ? StopSign::StopSignStopStatus::UNKNOWN : *status;
   EXPECT_EQ(StopSign::StopSignStopStatus::STOPPING, stop_status);
 }
 
 /*
  * stop_sign: adc stopped + wait_time < 3sec
  *   adc status: STOPPING => STOPPING
- *   decision: stop
+ *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   FLAGS_enable_stop_sign = true;
 
   // set dropbox
   Dropbox<StopSign::StopSignStopStatus>::Open()->Set(
-      "kStopSignStopStatus_1017",
-      StopSign::StopSignStopStatus::STOPPING);
+      "kStopSignStopStatus_1017", StopSign::StopSignStopStatus::STOPPING);
   double stop_start_time = Clock::NowInSeconds() - 2;
-  Dropbox<double>::Open()->Set("kStopSignStopStarttime_1017",
-                               stop_start_time);
+  Dropbox<double>::Open()->Set("kStopSignStopStarttime_1017", stop_start_time);
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 
   // check dropbox value
-  StopSign::StopSignStopStatus* status
-      = Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
+  StopSign::StopSignStopStatus* status =
+      Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
           "kStopSignStopStatus_1017");
-  StopSign::StopSignStopStatus stop_status = (status == nullptr) ?
-      StopSign::StopSignStopStatus::UNKNOWN : *status;
+  StopSign::StopSignStopStatus stop_status =
+      (status == nullptr) ? StopSign::StopSignStopStatus::UNKNOWN : *status;
   EXPECT_EQ(StopSign::StopSignStopStatus::STOPPING, stop_status);
 }
 
 /*
  * stop_sign: adc stopped + wait time > 3
  *   adc status: STOPPING => STOP_DONE
- *   decision: stop
+ *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   FLAGS_enable_stop_sign = true;
 
   // set dropbox
   Dropbox<StopSign::StopSignStopStatus>::Open()->Set(
-      "kStopSignStopStatus_1017",
-      StopSign::StopSignStopStatus::STOPPING);
+      "kStopSignStopStatus_1017", StopSign::StopSignStopStatus::STOPPING);
   double stop_start_time = Clock::NowInSeconds() - 4;
-  Dropbox<double>::Open()->Set("kStopSignStopStarttime_1017",
-                               stop_start_time);
+  Dropbox<double>::Open()->Set("kStopSignStopStarttime_1017", stop_start_time);
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 
   // check dropbox value
-  StopSign::StopSignStopStatus* status
-      = Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
+  StopSign::StopSignStopStatus* status =
+      Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
           "kStopSignStopStatus_1017");
-  StopSign::StopSignStopStatus stop_status = (status == nullptr) ?
-      StopSign::StopSignStopStatus::UNKNOWN : *status;
+  StopSign::StopSignStopStatus stop_status =
+      (status == nullptr) ? StopSign::StopSignStopStatus::UNKNOWN : *status;
   EXPECT_EQ(StopSign::StopSignStopStatus::STOP_DONE, stop_status);
+}
+
+/*
+ * stop_sign:
+ * step 1:
+ *   adc decision: STOP
+ * step 2: wait_time =4, other vehicles at other stop sign later than adc
+ *   adc status: STOPPING => STOP_DONE
+ *   decision: CRUISE
+ */
+TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
+  FLAGS_enable_stop_sign = true;
+
+  std::string seq_num = "3";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(0);
+
+  // set dropbox
+  double stop_start_time = Clock::NowInSeconds() - 4;
+  Dropbox<double>::Open()->Set("kStopSignStopStarttime_9762", stop_start_time);
+
+  seq_num = "4";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(1);
 }
 
 }  // namespace planning

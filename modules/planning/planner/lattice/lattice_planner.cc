@@ -34,7 +34,9 @@
 #include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
 #include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
+#include "modules/planning/lattice/trajectory_generator/backup_trajectory.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
+#include "modules/planning/lattice/trajectory_generator/trajectory_combiner.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_evaluator.h"
 #include "modules/planning/lattice/util/lattice_trajectory1d.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
@@ -43,11 +45,11 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::adapter::AdapterManager;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
+using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
 namespace {
@@ -98,9 +100,41 @@ Status LatticePlanner::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-Status LatticePlanner::Plan(const TrajectoryPoint& planning_init_point,
-                            Frame* frame,
-                            ReferenceLineInfo* reference_line_info) {
+Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
+                            Frame* frame) {
+  auto status = Status::OK();
+  bool has_plan = false;
+  auto it = std::find_if(
+      frame->reference_line_info().begin(), frame->reference_line_info().end(),
+      [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
+  if (it != frame->reference_line_info().end()) {
+    status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
+    has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
+                it->TrajectoryLength() > FLAGS_change_lane_min_length);
+    if (!has_plan) {
+      AERROR << "Fail to plan for lane change.";
+    }
+  }
+
+  if (!has_plan || !FLAGS_prioritize_change_lane) {
+    for (auto& reference_line_info : frame->reference_line_info()) {
+      if (reference_line_info.IsChangeLanePath()) {
+        continue;
+      }
+      status = PlanOnReferenceLine(planning_start_point, frame,
+                                   &reference_line_info);
+      if (status != Status::OK()) {
+        AERROR << "planner failed to make a driving plan for: "
+               << reference_line_info.Lanes().Id();
+      }
+    }
+  }
+  return status;
+}
+
+Status LatticePlanner::PlanOnReferenceLine(
+    const TrajectoryPoint& planning_init_point, Frame* frame,
+    ReferenceLineInfo* reference_line_info) {
   static std::size_t num_planning_cycles = 0;
   static std::size_t num_planning_succeeded_cycles = 0;
 
@@ -140,8 +174,7 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_init_point,
       decider_.Analyze(frame, reference_line_info, planning_init_point, init_s,
                        discretized_reference_line);
 
-  ADEBUG << "Decision_Time = "
-         << (Clock::NowInSeconds() - current_time) * 1000;
+  ADEBUG << "Decision_Time = " << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
   // 5. generate 1d trajectory bundle for longitudinal and lateral respectively.
@@ -202,7 +235,7 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_init_point,
     auto trajectory_pair = trajectory_evaluator.next_top_trajectory_pair();
 
     // combine two 1d trajectories to one 2d trajectory
-    auto combined_trajectory = CombineTrajectory(
+    auto combined_trajectory = TrajectoryCombiner::Combine(
         discretized_reference_line, *trajectory_pair.first,
         *trajectory_pair.second, planning_init_point.relative_time());
 
@@ -256,8 +289,7 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_init_point,
     }
 
     // Print the chosen end condition and start condition
-    ADEBUG << "Starting Pose: s = " << init_s[0]
-           << " ds = " << init_s[1]
+    ADEBUG << "Starting Pose: s = " << init_s[0] << " ds = " << init_s[1]
            << " dds = " << init_s[2];
     // cast
     auto lattice_traj_ptr =
@@ -271,12 +303,10 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_init_point,
 
     ADEBUG << "InputPose";
     ADEBUG << "XY: " << planning_init_point.ShortDebugString();
-    ADEBUG << "S: (" << init_s[0] << ", "
-           << init_s[1] << ","
-           << init_s[2] << ")";
-    ADEBUG << "L: (" << init_d[0] << ", "
-           << init_d[1] << ","
-           << init_d[2] << ")";
+    ADEBUG << "S: (" << init_s[0] << ", " << init_s[1] << "," << init_s[2]
+           << ")";
+    ADEBUG << "L: (" << init_d[0] << ", " << init_d[1] << "," << init_d[2]
+           << ")";
 
     ADEBUG << "Reference_line_priority_cost = "
            << reference_line_info->PriorityCost();
@@ -320,75 +350,18 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_init_point,
     return Status::OK();
   } else {
     AERROR << "Planning failed";
-    reference_line_info->SetCost(std::numeric_limits<double>::infinity());
+    if (FLAGS_enable_backup_trajectory) {
+      AERROR << "Use backup trajectory";
+      BackupTrajectory backup_trajectory(init_s, init_d,
+                                         planning_init_point.relative_time());
+      DiscretizedTrajectory trajectory =
+          backup_trajectory.GenerateTrajectory(discretized_reference_line);
+      reference_line_info->SetCost(FLAGS_backup_trajectory_cost);
+    } else {
+      reference_line_info->SetCost(std::numeric_limits<double>::infinity());
+    }
     return Status(ErrorCode::PLANNING_ERROR, "No feasible trajectories");
   }
-}
-
-DiscretizedTrajectory LatticePlanner::CombineTrajectory(
-    const std::vector<PathPoint>& reference_line, const Curve1d& lon_trajectory,
-    const Curve1d& lat_trajectory, const double init_relative_time) const {
-  DiscretizedTrajectory combined_trajectory;
-
-  double s0 = lon_trajectory.Evaluate(0, 0.0);
-  double s_ref_max = reference_line.back().s();
-
-  double t_param = 0.0;
-  while (t_param < FLAGS_trajectory_time_length) {
-    // linear extrapolation is handled internally in LatticeTrajectory1d;
-    // no worry about t_param > lon_trajectory.ParamLength() situation
-    double s = lon_trajectory.Evaluate(0, t_param);
-    double s_dot = std::max(FLAGS_lattice_epsilon,
-                            lon_trajectory.Evaluate(1, t_param));
-    double s_ddot = lon_trajectory.Evaluate(2, t_param);
-    if (s > s_ref_max) {
-      break;
-    }
-
-    double s_param = s - s0;
-    // linear extrapolation is handled internally in LatticeTrajectory1d;
-    // no worry about s_param > lat_trajectory.ParamLength() situation
-    double d = lat_trajectory.Evaluate(0, s_param);
-    double d_prime = lat_trajectory.Evaluate(1, s_param);
-    double d_pprime = lat_trajectory.Evaluate(2, s_param);
-
-    PathPoint matched_ref_point =
-        ReferenceLineMatcher::MatchToReferenceLine(reference_line, s);
-
-    double x = 0.0;
-    double y = 0.0;
-    double theta = 0.0;
-    double kappa = 0.0;
-    double v = 0.0;
-    double a = 0.0;
-
-    const double rs = matched_ref_point.s();
-    const double rx = matched_ref_point.x();
-    const double ry = matched_ref_point.y();
-    const double rtheta = matched_ref_point.theta();
-    const double rkappa = matched_ref_point.kappa();
-    const double rdkappa = matched_ref_point.dkappa();
-
-    std::array<double, 3> s_conditions = {rs, s_dot, s_ddot};
-    std::array<double, 3> d_conditions = {d, d_prime, d_pprime};
-    CartesianFrenetConverter::frenet_to_cartesian(
-        rs, rx, ry, rtheta, rkappa, rdkappa, s_conditions, d_conditions, &x, &y,
-        &theta, &kappa, &v, &a);
-
-    TrajectoryPoint trajectory_point;
-    trajectory_point.mutable_path_point()->set_x(x);
-    trajectory_point.mutable_path_point()->set_y(y);
-    trajectory_point.mutable_path_point()->set_theta(theta);
-    trajectory_point.mutable_path_point()->set_kappa(kappa);
-    trajectory_point.set_v(v);
-    trajectory_point.set_a(a);
-    trajectory_point.set_relative_time(t_param + init_relative_time);
-
-    combined_trajectory.AppendTrajectoryPoint(trajectory_point);
-
-    t_param = t_param + FLAGS_trajectory_time_resolution;
-  }
-  return combined_trajectory;
 }
 
 DiscretizedTrajectory LatticePlanner::GetFutureTrajectory() const {

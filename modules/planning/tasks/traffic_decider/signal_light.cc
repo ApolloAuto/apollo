@@ -36,9 +36,9 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::adapter::AdapterManager;
+using apollo::common::util::WithinBound;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
-using apollo::common::util::WithinBound;
 
 SignalLight::SignalLight(const RuleConfig& config) : TrafficRule(config) {}
 
