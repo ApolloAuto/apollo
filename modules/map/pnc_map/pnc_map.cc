@@ -150,6 +150,11 @@ std::vector<routing::LaneWaypoint> PncMap::FutureRouteWaypoints() const {
 
 void PncMap::UpdateRoutingRange(int adc_index) {
   // track routing range.
+  if (range_start_ > adc_index || range_end_ < adc_index) {
+    range_lane_ids_.clear();
+    range_start_ = std::max(0, adc_index - 1);
+    range_end_ = range_start_;
+  }
   while (range_start_ + 1 < adc_index) {
     range_lane_ids_.erase(route_indices_[range_start_].segment.lane->id().id());
     ++range_start_;
