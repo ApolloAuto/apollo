@@ -1,10 +1,11 @@
 import { observable, computed, action, autorun } from "mobx";
 
 import HMI from "store/hmi";
+import ControlData from "store/control_data";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
-import Planning from "store/planning";
+import Planning from "store/planning_data";
 import Playback from "store/playback";
 import RouteEditingManager from "store/route_editing_manager";
 import TrafficSignal from "store/traffic_signal";
@@ -32,6 +33,8 @@ class DreamviewStore {
     @observable hmi = new HMI();
 
     @observable planning = new Planning();
+
+    @observable controlData = new ControlData();
 
     @observable playback = OFFLINE_PLAYBACK ? new Playback() : null;
 

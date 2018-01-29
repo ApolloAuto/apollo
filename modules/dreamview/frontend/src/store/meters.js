@@ -58,10 +58,9 @@ export default class Meters {
             }
 
             if (world.autoDrivingCar.steeringAngle !== undefined) {
-                this.steeringPercentage = world.autoDrivingCar.steeringAngle;
-
-                // TODO(siyangy): Avoid magic number here.
-                this.steeringAngle = -Math.round(world.autoDrivingCar.steeringAngle * 4.7);
+                this.steeringPercentage = Math.round(world.autoDrivingCar.steeringPercentage);
+                this.steeringAngle = -Math.round(
+                    world.autoDrivingCar.steeringAngle * 180.0 / Math.PI);
             }
 
             if (world.autoDrivingCar.disengageType !== undefined) {

@@ -167,7 +167,7 @@ TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
   EXPECT_DOUBLE_EQ(25.0, car.speed());
   EXPECT_DOUBLE_EQ(50.0, car.throttle_percentage());
   EXPECT_DOUBLE_EQ(10.0, car.brake_percentage());
-  EXPECT_DOUBLE_EQ(25.0, car.steering_angle());
+  EXPECT_DOUBLE_EQ(25.0, car.steering_percentage());
   EXPECT_EQ("RIGHT", car.current_signal());
 }
 

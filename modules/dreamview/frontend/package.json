@@ -1,10 +1,10 @@
 {
     "name": "dreamview",
-    "version": "0.7.0",
+    "version": "2.0.0",
     "description": "Visiualization of the Apollo simulator.",
     "main": "app.js",
-    "author": "adusim",
-    "license": "MIT",
+    "author": "adu-sim",
+    "license": "Apache 2.0",
     "scripts": {
         "build": "./gen_pbjs.sh; node_modules/.bin/webpack -p --progress",
         "start": "./gen_pbjs.sh; node_modules/.bin/webpack-dev-server --watch-poll",
@@ -13,7 +13,6 @@
     },
     "dependencies": {
         "chart.js": "^2.7.0",
-        "chartjs-plugin-zoom": "^0.5.0",
         "classnames": "^2.2.5",
         "font-awesome": "^4.7.0",
         "imports-loader": "0.6.5",
