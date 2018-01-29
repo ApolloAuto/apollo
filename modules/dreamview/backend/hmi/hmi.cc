@@ -31,6 +31,7 @@
 #include "modules/common/util/util.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/data/proto/static_info.pb.h"
+#include "modules/data/util/info_collector.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 #include "modules/monitor/proto/system_status.pb.h"
@@ -143,10 +144,7 @@ HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
       logger_(apollo::common::monitor::MonitorMessageItem::HMI) {
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
-
-  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
-    config_.set_docker_image(docker_image);
-  }
+  config_.set_docker_image(apollo::data::InfoCollector::GetDockerImage());
 
   // If the module path doesn't exist, remove it from list.
   auto *modules = config_.mutable_modules();
@@ -433,7 +431,7 @@ void HMI::CheckOTAUpdates() {
       VehicleInfo::Brand_Name(vehicle_info.brand()),
       ".", VehicleInfo::Model_Name(vehicle_info.model()));
   ota_request["vin"] = vehicle_info.license().vin();
-  ota_request["tag"] = std::getenv("DOCKER_IMG");
+  ota_request["tag"] = apollo::data::InfoCollector::GetDockerImage();
 
   Json ota_response;
   const auto status = apollo::common::util::HttpClient::Post(

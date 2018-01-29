@@ -16,6 +16,8 @@
 
 #include "modules/data/util/info_collector.h"
 
+#include <yaml-cpp/yaml.h>
+
 #include <string>
 
 #include "gflags/gflags.h"
@@ -25,6 +27,9 @@
 DEFINE_string(static_info_conf_file,
               "modules/data/conf/static_info_conf.pb.txt",
               "Path of the StaticInfo config file.");
+
+DEFINE_string(container_meta_ini, "/apollo/meta.ini",
+              "Container meta info file.");
 
 namespace apollo {
 namespace data {
@@ -102,9 +107,7 @@ const HardwareInfo &InfoCollector::GetHardwareInfo() {
 
 const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
   SoftwareInfo *software = instance()->static_info_.mutable_software();
-  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
-    software->set_docker_image(docker_image);
-  }
+  software->set_docker_image(GetDockerImage());
 
   const std::string commit_id = KVDB::Get("apollo:data:commit_id");
   if (!commit_id.empty()) {
@@ -123,6 +126,20 @@ const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
 
 const UserInfo &InfoCollector::GetUserInfo() {
   return instance()->static_info_.user();
+}
+
+std::string InfoCollector::GetDockerImage() {
+  // In release docker container, the actual image name is in meta.ini.
+  if (apollo::common::util::PathExists(FLAGS_container_meta_ini)) {
+    YAML::Node meta = YAML::LoadFile(FLAGS_container_meta_ini);
+    if (meta["tag"]) {
+      return meta["tag"].as<std::string>();
+    }
+  }
+  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
+    return docker_image;
+  }
+  return "";
 }
 
 }  // namespace data
