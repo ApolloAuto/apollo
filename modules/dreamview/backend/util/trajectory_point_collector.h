@@ -61,8 +61,9 @@ class TrajectoryPointCollector {
    * @brief The Collect method creates a trajectory segment between the input
    * point and the previous point.
    * @param point The trajectory point to be added.
+   * @param base_time The timestampe of the first trajectory point
    */
-  void Collect(const common::TrajectoryPoint &point);
+  void Collect(const common::TrajectoryPoint &point, const double base_time);
 
  private:
   // Does not own the SimulationWorld instance. This is stored as the

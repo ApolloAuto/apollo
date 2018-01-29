@@ -211,6 +211,7 @@ SimulationWorldService::SimulationWorldService(const MapService *map_service,
   auto_driving_car->set_height(vehicle_param.height());
   auto_driving_car->set_width(vehicle_param.width());
   auto_driving_car->set_length(vehicle_param.length());
+  auto_driving_car->set_steering_ratio(vehicle_param.steer_ratio());
 }
 
 void SimulationWorldService::Update() {
@@ -367,6 +368,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 
 template <>
 void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
+  const auto &vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
   Object *auto_driving_car = world_.mutable_auto_driving_car();
 
   auto_driving_car->set_speed(chassis.speed_mps());
@@ -374,11 +376,19 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   auto_driving_car->set_brake_percentage(chassis.brake_percentage());
 
   // In case of out-of-range percentages, reduces it to zero.
-  int angle_percentage = chassis.steering_percentage();
+  double angle_percentage = chassis.steering_percentage();
   if (angle_percentage > 100 || angle_percentage < -100) {
     angle_percentage = 0;
   }
-  auto_driving_car->set_steering_angle(angle_percentage);
+  auto_driving_car->set_steering_percentage(angle_percentage);
+
+  double steering_angle =
+      angle_percentage / 100.0 * vehicle_param.max_steer_angle();
+  auto_driving_car->set_steering_angle(steering_angle);
+
+  double kappa = std::tan(steering_angle / vehicle_param.steer_ratio()) /
+                 vehicle_param.length();
+  auto_driving_car->set_kappa(kappa);
 
   UpdateTurnSignal(chassis.signal(), auto_driving_car);
 
@@ -469,6 +479,8 @@ void SimulationWorldService::UpdatePlanningTrajectory(
   const double cutoff_time = world_.auto_driving_car().timestamp_sec();
   const double header_time = trajectory.header().timestamp_sec();
 
+  world_.set_planning_time(header_time);
+
   // Collect trajectory
   util::TrajectoryPointCollector collector(&world_);
 
@@ -480,7 +492,7 @@ void SimulationWorldService::UpdatePlanningTrajectory(
     if (collecting_started ||
         point.relative_time() + header_time >= cutoff_time) {
       collecting_started = true;
-      collector.Collect(point);
+      collector.Collect(point, header_time);
     }
   }
   for (int i = 0; i < world_.planning_trajectory_size(); ++i) {

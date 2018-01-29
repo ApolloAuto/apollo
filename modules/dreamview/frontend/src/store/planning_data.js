@@ -48,13 +48,13 @@ export default class Planning {
     return (l > 10 || l < -10) ? (100 * l / Math.abs(l)) : l;
   }
 
-  extractDataPoints(data, xField, yField, loopBack = false) {
+  extractDataPoints(data, xField, yField, loopBack = false, xOffset = 0) {
     if (!data) {
       return [];
     }
 
     const points = data.map((point) => {
-      return {x: point[xField], y: point[yField]};
+      return {x: point[xField] + xOffset, y: point[yField]};
     });
 
     if (loopBack && data.length) {
@@ -162,16 +162,16 @@ export default class Planning {
     }
 
     if (trajectory) {
-      graph.finalSpeed =
-          this.extractDataPoints(trajectory, 'timestampSec', 'speed');
+      graph.finalSpeed = this.extractDataPoints(
+        trajectory, 'timestampSec', 'speed', false /* loop back */, -this.planningTime);
     }
   }
 
   updateAccelerationGraph(trajectory) {
     const graph = this.data.accelerationGraph;
     if (trajectory) {
-      graph.acceleration =
-          this.extractDataPoints(trajectory, 'timestampSec', 'speedAcceleration');
+      graph.acceleration = this.extractDataPoints(
+        trajectory, 'timestampSec', 'speedAcceleration', false /* loop back */, -this.planningTime);
     }
   }
 
@@ -235,6 +235,7 @@ export default class Planning {
   update(world) {
     this.updateSequenceNum(world.sequenceNum);
     this.data = this.initData();
+    this.planningTime = world.planningTime;
 
     const planningData = world.planningData;
     if (planningData) {
