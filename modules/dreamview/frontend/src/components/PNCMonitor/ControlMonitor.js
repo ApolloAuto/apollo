@@ -23,7 +23,6 @@ export default class ControlMonitor extends React.Component {
 
     render() {
         const { sequenceNum, data } = this.props.store.controlData;
-        const { dimension } = this.props.store;
 
         if (!sequenceNum) {
             return null;

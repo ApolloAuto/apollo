@@ -19,14 +19,15 @@
         "jDataView": "^2.3.0",
         "mobx": "^3.1.10",
         "mobx-react": "^4.1.8",
+        "protobufjs": "^6.8.4",
         "react": "^16.0.0",
         "react-dom": "^16.0.0",
         "react-rangeslider": "^2.2.0",
         "react-split-pane": "^0.1.66",
+        "react-tabs": "^2.2.1",
         "stats.js": "^0.17.0",
         "three": "~0.84.0",
-        "three-line-2d": "^1.1.6",
-        "protobufjs": "^6.8.4"
+        "three-line-2d": "^1.1.6"
     },
     "devDependencies": {
         "babel-core": "^6.24.1",
