@@ -177,7 +177,7 @@ double TrajectoryEvaluator::LatOffsetCost(
 // AutoTuning LatOffSetCost from discretized trajectory
 double TrajectoryEvaluator::LatOffsetCost(
   const std::vector<apollo::common::FrenetFramePoint> sl_points) const {
-  CHECK(sl_points.size() > 0);
+  CHECK_GT(sl_points.size(), 0);
   if (sl_points.size() == 0) {
     return std::numeric_limits<double>::infinity();
   }
@@ -315,6 +315,64 @@ double TrajectoryEvaluator::LonCollisionCost(
     }
   }
   return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
+}
+
+// AutoTuning LonCollisionCost
+double TrajectoryEvaluator::LonCollisionCost(
+    const std::vector<apollo::common::SpeedPoint> st_points) const {
+  double start_time = 0.0;
+  double end_time = FLAGS_trajectory_time_length;
+  const auto& pt_intervals = pathtime_neighborhood_->GetPathBlockingIntervals(
+      start_time, end_time, FLAGS_trajectory_time_resolution);
+  double cost_sqr_sum = 0.0;
+  double cost_abs_sum = 0.0;
+  for (std::size_t i = 0; i < pt_intervals.size(); ++i) {
+    const auto& pt_interval = pt_intervals[i];
+    if (pt_interval.empty()) {
+      continue;
+    }
+    double t = start_time + i * FLAGS_trajectory_time_resolution;
+    double traj_s = std::numeric_limits<double>::infinity();
+    if (!InterpolateDenseStPoints(st_points, t, &traj_s)) {
+      AERROR << "AutoTuning LonCollisionCost InterpolateDenseStPoints Error";
+      return traj_s;
+    }
+    double sigma = FLAGS_lon_collision_cost_std;
+    for (const auto& m : pt_interval) {
+      double cost = 0.0;
+      if (traj_s > m.first - FLAGS_lon_collision_buffer &&
+          traj_s < m.second + FLAGS_lon_collision_buffer) {
+        cost = 1.0;
+      } else if (traj_s < m.first) {
+        double dist = traj_s - m.first + FLAGS_lon_collision_buffer;
+        cost = std::exp(-dist * dist / (2.0 * sigma * sigma));
+      } else if (traj_s > m.second) {
+        double dist = m.second + FLAGS_lon_collision_buffer - traj_s;
+        cost = std::exp(-dist * dist / (2.0 * sigma * sigma));
+      }
+      cost_sqr_sum += cost * cost;
+      cost_abs_sum += std::abs(cost);
+    }
+  }
+  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
+}
+
+bool TrajectoryEvaluator::InterpolateDenseStPoints(
+  const std::vector<apollo::common::SpeedPoint> st_points,
+  double t, double *traj_s) const {
+  CHECK_GT(st_points.size(), 1);
+  if (t < st_points[0].t() || t > st_points[st_points.size()-1].t()) {
+    AERROR << "AutoTuning InterpolateDenseStPoints Error";
+    return false;
+  }
+  int ret = 0;
+  for (uint i = 1; i < st_points.size(); ++i) {
+    if (t >= st_points[i].t()) {
+      ret = i;
+      *traj_s = st_points[i].t();
+    }
+  }
+  return true;
 }
 
 std::vector<double> TrajectoryEvaluator::evaluate_per_lonlat_trajectory(
