@@ -51,7 +51,7 @@ TEST_F(TrajectoryPointCollectorTest, ThreePoints) {
     const Object &point = world.planning_trajectory(0);
     EXPECT_DOUBLE_EQ(0.0, point.position_x());
     EXPECT_DOUBLE_EQ(100.0, point.position_y());
-    EXPECT_DOUBLE_EQ(2000.0, point.timestamp_sec());
+    EXPECT_DOUBLE_EQ(1000.0, point.timestamp_sec());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
   }
 
@@ -59,7 +59,7 @@ TEST_F(TrajectoryPointCollectorTest, ThreePoints) {
     const Object &point = world.planning_trajectory(1);
     EXPECT_DOUBLE_EQ(100.0, point.position_x());
     EXPECT_DOUBLE_EQ(200.0, point.position_y());
-    EXPECT_DOUBLE_EQ(3000.0, point.timestamp_sec());
+    EXPECT_DOUBLE_EQ(2000.0, point.timestamp_sec());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
   }
 
@@ -67,7 +67,7 @@ TEST_F(TrajectoryPointCollectorTest, ThreePoints) {
     const Object &point = world.planning_trajectory(2);
     EXPECT_DOUBLE_EQ(200.0, point.position_x());
     EXPECT_DOUBLE_EQ(300.0, point.position_y());
-    EXPECT_DOUBLE_EQ(4000.0, point.timestamp_sec());
+    EXPECT_DOUBLE_EQ(3000.0, point.timestamp_sec());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
   }
 }
