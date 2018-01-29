@@ -298,10 +298,9 @@ function release() {
 
   # release info
   META="${APOLLO_DIR}/meta.ini"
-  echo "[Release]" > $META
   echo "git_commit: $(git rev-parse HEAD)" >> $META
-  echo "car_type : LINCOLN.MKZ" >> $META
-  echo "arch : ${MACHINE_ARCH}" >> $META
+  echo "car_type: LINCOLN.MKZ" >> $META
+  echo "arch: ${MACHINE_ARCH}" >> $META
 }
 
 function gen_coverage() {

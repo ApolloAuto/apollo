@@ -34,6 +34,7 @@ cc_library(
         "//modules/common/util:json_util",
         "//modules/common/util:map_util",
         "//modules/data/proto:static_info_proto",
+        "//modules/data/util:info_collector",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket",
         "//modules/dreamview/backend/map:map_service",
