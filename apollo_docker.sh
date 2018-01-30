@@ -53,7 +53,7 @@ function start_build_docker() {
 }
 
 function gen_docker() {
-  IMG="apolloauto/apollo:run-${MACHINE_ARCH}-20180123_1329"
+  IMG="apolloauto/apollo:run-${MACHINE_ARCH}-20180130_1338"
   RELEASE_DIR=${HOME}/.cache/apollo_release
   APOLLO_DIR="${RELEASE_DIR}/apollo"
 
