@@ -256,6 +256,10 @@ class MPCController : public Controller {
   double steer_angle_feedforwardterm_ = 0.0;
 
   double steer_angle_feedforwardterm_updated_ = 0.0;
+
+  double max_acceleration_ = 0.0;
+
+  double max_deceleration_ = 0.0;
 };
 
 }  // namespace control
