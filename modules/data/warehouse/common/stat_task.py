@@ -37,8 +37,8 @@ from modules.data.proto.task_pb2 import Task
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 import coord_calculator
 
-gflags.DEFINE_string('pos_sample_duration', 2, 'In seconds.')
-gflags.DEFINE_string('pos_sample_min_distance', 3, 'In meters.')
+gflags.DEFINE_float('pos_sample_duration', 2, 'In seconds.')
+gflags.DEFINE_float('pos_sample_min_distance', 3, 'In meters.')
 
 
 class TaskCalculator(object):
