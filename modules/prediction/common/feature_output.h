@@ -62,6 +62,12 @@ class FeatureOutput {
    */
   static void Write();
 
+  /**
+   * @brief Get feature size
+   * @return Feature size
+   */
+  static int Size();
+
  private:
   static Features features_;
   static size_t index_;
