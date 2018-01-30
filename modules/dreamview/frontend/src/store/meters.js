@@ -57,8 +57,11 @@ export default class Meters {
                 this.speed = world.autoDrivingCar.speed;
             }
 
-            if (world.autoDrivingCar.steeringAngle !== undefined) {
+            if (world.autoDrivingCar.steeringPercentage !== undefined) {
                 this.steeringPercentage = Math.round(world.autoDrivingCar.steeringPercentage);
+            }
+
+            if (world.autoDrivingCar.steeringAngle !== undefined) {
                 this.steeringAngle = -Math.round(
                     world.autoDrivingCar.steeringAngle * 180.0 / Math.PI);
             }
