@@ -109,33 +109,30 @@ void StopSign::MakeDecisions(Frame* frame,
   UpdateWatchVehicles(&watch_vehicles);
 
   std::string stop_sign_id = next_stop_sign_->id().id();
-  double stop_line_start_s = next_stop_sign_overlap_->start_s;
+  double stop_line_end_s = next_stop_sign_overlap_->end_s;
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+
+  if (adc_front_edge_s - stop_line_end_s >
+      FLAGS_valid_pass_stop_sign_distance) {
+    ClearDropbox(stop_sign_id);
+    ADEBUG << "skip stop_sign_id[" << stop_sign_id
+        << "]; stop_line_end_s[" << stop_line_end_s
+        << "]; adc_front_edge_s[" << adc_front_edge_s
+        << "]. adc_front_edge passes stop_line_end_s + buffer.";
+    return;
+  }
 
   if (stop_status_ == StopSignStopStatus::STOP_DONE && watch_vehicles.empty()) {
     // stop done and no vehicles to wait for
-    if (stop_line_start_s + FLAGS_stop_max_distance_buffer <=
-        adc_front_edge_s) {
-      ClearDropbox(stop_sign_id);
-    }
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] DONE";
   } else {
-    // skip stop_sign if master vehicle body already passes the stop line
-    if (stop_line_start_s + FLAGS_stop_max_distance_buffer <=
-        adc_front_edge_s) {
-      ADEBUG << "skip: adc_front_edge passes stop_line+buffer. "
-             << "stop_sign_id[" << stop_sign_id << "]; stop_line_start_s["
-             << stop_line_start_s << "]; adc_front_edge_s[" << adc_front_edge_s
-             << "]";
-    } else {
-      ADEBUG << "stop_sign_id[" << stop_sign_id << "] STOP";
-      // stop decision
-      double stop_deceleration =
-          GetStopDeceleration(reference_line_info, next_stop_sign_overlap_);
-      if (stop_deceleration < FLAGS_stop_max_deceleration) {
-        BuildStopDecision(frame, reference_line_info, next_stop_sign_overlap_);
-      }
+    // stop decision
+    double stop_deceleration =
+        GetStopDeceleration(reference_line_info, next_stop_sign_overlap_);
+    if (stop_deceleration < FLAGS_stop_max_deceleration) {
+      BuildStopDecision(frame, reference_line_info, next_stop_sign_overlap_);
     }
+    ADEBUG << "stop_sign_id[" << stop_sign_id << "] STOP";
   }
 }
 
@@ -546,14 +543,14 @@ int StopSign::RemoveWatchVehicle(
     if (over_lap_info == nullptr) {
       AERROR << "can't find over_lap_info for id: " << obstable_lane_id;
     } else {
-      double stop_line_s = over_lap_info->lane_overlap_info().start_s();
+      double stop_line_end_s = over_lap_info->lane_overlap_info().end_s();
       double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
-      double distance_pass_stop_line = obstacle_end_s - stop_line_s;
+      double distance_pass_stop_line = obstacle_end_s - stop_line_end_s;
       if (distance_pass_stop_line > FLAGS_valid_pass_stop_sign_distance) {
         ADEBUG << "obstacle_id[" << obstacle_id
             << "] type[" << obstacle_type_name
             << "] distance_pass_stop_line[" << distance_pass_stop_line
-            << "]; stop_line_s[" << stop_line_s
+            << "]; stop_line_end_s[" << stop_line_end_s
             << "]; obstacle_end_s[" << obstacle_end_s
             << "] passed stop line. erase from watch_vehicles";
         erase = true;
