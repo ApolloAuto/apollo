@@ -5,7 +5,7 @@ import ControlData from "store/control_data";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
-import Planning from "store/planning_data";
+import PlanningData from "store/planning_data";
 import Playback from "store/playback";
 import RouteEditingManager from "store/route_editing_manager";
 import TrafficSignal from "store/traffic_signal";
@@ -32,7 +32,7 @@ class DreamviewStore {
 
     @observable hmi = new HMI();
 
-    @observable planning = new Planning();
+    @observable planningData = new PlanningData();
 
     @observable controlData = new ControlData();
 

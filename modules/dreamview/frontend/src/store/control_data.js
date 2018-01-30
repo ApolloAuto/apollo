@@ -3,13 +3,13 @@ import { LinearInterpolant, EllipseCurve } from 'three';
 
 const MAX_HISTORY_POINTS = 80;
 
-export default class ControlDetails {
-    @observable sequenceNum = 0;
+export default class ControlData {
+    @observable lastUpdatedTime = null;
 
     data = this.initData();
 
-    @action updateSequenceNum(newSequenceNum) {
-        this.sequenceNum = newSequenceNum;
+    @action updateTime(newTime) {
+        this.lastUpdatedTime = newTime;
     }
 
     initData() {
@@ -149,8 +149,6 @@ export default class ControlDetails {
     }
 
     update(world) {
-        this.updateSequenceNum(world.sequenceNum);
-
         const trajectory = world.planningTrajectory;
         const adc = world.autoDrivingCar;
         if (trajectory && adc) {
@@ -166,6 +164,8 @@ export default class ControlDetails {
             this.updateSteerCurve(this.data.trajectoryGraph, adc);
             this.data.trajectoryGraph.pose[0].x = adc.positionX;
             this.data.trajectoryGraph.pose[0].y = adc.positionY;
+
+            this.updateTime(world.planningTime);
         }
     }
 }
