@@ -168,26 +168,33 @@ void PrintLane(const apollo::hdmap::MapUtil &map_util,
             << lane.left_neighbor_forward_lane_id() << "] right_forward["
             << lane.right_neighbor_forward_lane_id() << "] left_reverse["
             << lane.left_neighbor_reverse_lane_id() << "] right_reverse["
-            << lane.right_neighbor_reverse_lane_id() << "]"
-            << "Left Boundary: [ virtual?:"
-            << (lane.left_boundary().virtual_() ? "Y," : "N,") << "Type: ";
+            << lane.right_neighbor_reverse_lane_id() << "], "
+            << "Left Boundary: [ virtual?:" << std::boolalpha
+            << lane.left_boundary().virtual_() << ", Type: [";
   for (const auto &boundary_type : lane.left_boundary().boundary_type()) {
-    std::cout << boundary_type.s() << ": ";
+    std::cout << "s: " << boundary_type.s() << "->";
     for (const auto t : boundary_type.types()) {
-      std::cout << t << ", ";
+      std::cout << LaneBoundaryType::Type_Name(
+                       static_cast<LaneBoundaryType::Type>(t))
+                << ", ";
     }
   }
 
-  std::cout << "Right Boundary: [ virtual?:"
-            << (lane.right_boundary().virtual_() ? "Y," : "N,") << "Type: ";
+  std::cout << "]; Right Boundary: [ virtual?:" << std::boolalpha
+            << lane.right_boundary().virtual_() << ", Type: ";
   for (const auto &boundary_type : lane.left_boundary().boundary_type()) {
-    std::cout << boundary_type.s() << ": ";
+    std::cout << "s: " << boundary_type.s() << "->";
     for (const auto t : boundary_type.types()) {
-      std::cout << t << ", ";
+      std::cout << LaneBoundaryType::Type_Name(
+                       static_cast<LaneBoundaryType::Type>(t))
+                << ", ";
     }
   }
-  std::cout << "] overlap[" << lane.overlap_id() << "] stop_sign num:["
-            << lane_ptr->stop_signs().size() << "]"
+  std::cout << "] overlap[" << lane.overlap_id() << "]; stop_sign overlap_id [";
+  for (const auto stop_sign : lane_ptr->stop_signs()) {
+    std::cout << stop_sign->id().id() << ", ";
+  }
+  std::cout << "];"
             << " start point(x,y,heading):" << start_point.x() << ","
             << start_point.y() << "," << start_heading
             << " end point(x,y,heading):" << end_point.x() << ","
