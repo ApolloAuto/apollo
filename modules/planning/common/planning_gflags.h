@@ -153,7 +153,7 @@ DECLARE_bool(enable_follow_accel_constraint);
 // traffic decision
 /// common
 DECLARE_double(stop_max_distance_buffer);
-DECLARE_double(stop_min_speed);
+DECLARE_double(stop_max_speed);
 DECLARE_double(stop_max_deceleration);
 DECLARE_double(signal_expire_time_sec);
 DECLARE_double(max_valid_stop_distance);
@@ -173,7 +173,7 @@ DECLARE_double(crosswalk_loose_l_distance);
 DECLARE_bool(enable_stop_sign);
 DECLARE_string(stop_sign_virtual_object_id_prefix);
 DECLARE_double(stop_duration_for_stop_sign);
-DECLARE_double(valid_pass_stop_sign_distance);
+DECLARE_double(min_pass_stop_sign_distance);
 
 DECLARE_bool(enable_sqp_solver);
 

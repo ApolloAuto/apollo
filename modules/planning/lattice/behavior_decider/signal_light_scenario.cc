@@ -136,7 +136,7 @@ double SignalLightScenario::GetStopDeceleration(
     const hdmap::PathOverlap* signal_light) {
   double adc_speed =
       common::VehicleStateProvider::instance()->linear_velocity();
-  if (adc_speed < FLAGS_stop_min_speed) {
+  if (adc_speed < FLAGS_stop_max_speed) {
     return 0.0;
   }
   double stop_distance = 0.0;
