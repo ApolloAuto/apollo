@@ -61,5 +61,7 @@ void FeatureOutput::Write() {
   ++index_;
 }
 
+int FeatureOutput::Size() { return features_.feature_size(); }
+
 }  // namespace prediction
 }  // namespace apollo
