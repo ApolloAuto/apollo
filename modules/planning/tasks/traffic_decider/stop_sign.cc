@@ -90,9 +90,17 @@ void StopSign::MakeDecisions(Frame* frame,
   } else if (!watch_vehicles.empty() &&
              (stop_status_ == StopSignStopStatus::STOPPING ||
               stop_status_ == StopSignStopStatus::STOP_DONE)) {
+    // get all vehicles currently watched
+    std::vector<std::string> watch_vehicle_ids;
+    for (StopSignLaneVehicles::iterator it = watch_vehicles.begin();
+         it != watch_vehicles.end(); it++) {
+      std::copy(it->second.begin(), it->second.end(),
+                std::back_inserter(watch_vehicle_ids));
+    }
+
     for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
       // remove from watch_vehicles if adc is stopping/waiting at stop sign
-      RemoveWatchVehicle(*path_obstacle, &watch_vehicles);
+      RemoveWatchVehicle(*path_obstacle, watch_vehicle_ids, &watch_vehicles);
     }
   }
 
@@ -346,6 +354,8 @@ int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
  * @brief: update drop box with watch vehicles
  */
 int StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
+  ClearDropboxWatchvehicles();
+
   for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
        it != watch_vehicles->end(); ++it) {
     std::string associated_lane_id = it->first;
@@ -452,13 +462,23 @@ int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
 /**
  * @brief: remove a watch vehicle which not stopping at stop sign any more
  */
-int StopSign::RemoveWatchVehicle(const PathObstacle& path_obstacle,
-                                 StopSignLaneVehicles* watch_vehicles) {
+int StopSign::RemoveWatchVehicle(
+    const PathObstacle& path_obstacle,
+    const std::vector<std::string>& watch_vehicle_ids,
+    StopSignLaneVehicles* watch_vehicles) {
   const PerceptionObstacle& perception_obstacle =
       path_obstacle.obstacle()->Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
+
+  // check if being watched
+  if (std::find(watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
+                obstacle_id) == watch_vehicle_ids.end()) {
+    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+           << "] not being watched. skip";
+    return 0;
+  }
 
   // check type
   if (obstacle_type != PerceptionObstacle::UNKNOWN &&
@@ -529,7 +549,7 @@ int StopSign::RemoveWatchVehicle(const PathObstacle& path_obstacle,
       double stop_line_s = over_lap_info->lane_overlap_info().start_s();
       double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
       double distance_pass_stop_line = obstacle_end_s - stop_line_s;
-      if (distance_pass_stop_line > FLAGS_max_valid_stop_distance) {
+      if (distance_pass_stop_line > FLAGS_valid_pass_stop_sign_distance) {
         ADEBUG << "obstacle_id[" << obstacle_id
             << "] type[" << obstacle_type_name
             << "] distance_pass_stop_line[" << distance_pass_stop_line
@@ -592,7 +612,7 @@ int StopSign::ClearWatchVehicle(
     }
   }
 
-  /*
+  /* debug
   for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
        it != watch_vehicles->end(); it++) {
     std::string s;
@@ -692,6 +712,11 @@ void StopSign::ClearDropbox(const std::string& stop_sign_id) {
   ADEBUG << "remove dropbox item: " << db_key_stop_starttime;
 
   // clear watch vehicles from dropbox
+  ClearDropboxWatchvehicles();
+}
+
+void StopSign::ClearDropboxWatchvehicles() {
+  // clear watch vehicles from dropbox
   for (auto associated_lane : associated_lanes_) {
     const LaneInfo* associated_lane_info = associated_lane.first.get();
     std::string associated_lane_id = associated_lane_info->id().id();
@@ -701,6 +726,7 @@ void StopSign::ClearDropbox(const std::string& stop_sign_id) {
     ADEBUG << "remove dropbox item: " << db_key_watch_vehicle;
   }
 }
+
 
 }  // namespace planning
 }  // namespace apollo
