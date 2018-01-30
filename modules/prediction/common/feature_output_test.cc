@@ -23,8 +23,32 @@ namespace prediction {
 
 class FeatureOutputTest : public ::testing::Test {
  public:
-  void SetUp() override {}
+  void SetUp() override { FeatureOutput::Ready(); }
 };
+
+TEST_F(FeatureOutputTest, get_ready) {
+  EXPECT_TRUE(FeatureOutput::Ready());
+  EXPECT_EQ(0, FeatureOutput::Size());
+}
+
+TEST_F(FeatureOutputTest, insertion) {
+  Feature feature;
+  for (int i = 0; i < 3; ++i) {
+    Feature feature;
+    FeatureOutput::Insert(feature);
+  }
+  EXPECT_EQ(3, FeatureOutput::Size());
+}
+
+TEST_F(FeatureOutputTest, clear) {
+  Feature feature;
+  for (int i = 0; i < 3; ++i) {
+    Feature feature;
+    FeatureOutput::Insert(feature);
+  }
+  FeatureOutput::Clear();
+  EXPECT_EQ(0, FeatureOutput::Size());
+}
 
 }  // namespace prediction
 }  // namespace apollo
