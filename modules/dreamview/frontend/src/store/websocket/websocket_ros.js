@@ -60,7 +60,7 @@ export default class RosWebSocketEndpoint {
                     STORE.hmi.update(message);
                     RENDERER.updateWorld(message);
                     if (STORE.options.showPNCMonitor) {
-                        STORE.planning.update(message);
+                        STORE.planningData.update(message);
                         STORE.controlData.update(message);
                     }
                     if (message.mapHash && (this.counter % 10 === 0)) {
