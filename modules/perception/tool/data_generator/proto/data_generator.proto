@@ -32,6 +32,11 @@ message DataGeneratorObstacle {
   optional Type type = 10;  // obstacle type
 }
 
+message ROI {
+  repeated apollo.common.Point3D polygon_point = 1;
+}
+
 message DataGeneratorObstacles{
   repeated DataGeneratorObstacle obstacle = 1;  // An array of obstacles
+  optional ROI roi = 2;
 }
