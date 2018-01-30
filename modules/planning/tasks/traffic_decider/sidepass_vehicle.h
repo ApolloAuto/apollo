@@ -71,6 +71,7 @@ class SidepassVehicle : public TrafficRule {
       "DROPBOX_KEY_SIDEPASS_SIDE";
 
   const hdmap::HDMap* hdmap_ = nullptr;
+  const ReferenceLine* reference_line_ = nullptr;
 };
 
 }  // namespace planning

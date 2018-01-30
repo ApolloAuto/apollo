@@ -83,7 +83,9 @@ struct LaneSegment {
   LaneInfoConstPtr lane = nullptr;
   double start_s = 0.0;
   double end_s = 0.0;
-  double Length() const { return end_s - start_s; }
+  double Length() const {
+    return end_s - start_s;
+  }
 
   std::string DebugString() const;
 };
@@ -116,8 +118,12 @@ class MapPathPoint : public common::math::Vec2d {
         heading_(heading),
         lane_waypoints_(std::move(lane_waypoints)) {}
 
-  double heading() const { return heading_; }
-  void set_heading(const double heading) { heading_ = heading; }
+  double heading() const {
+    return heading_;
+  }
+  void set_heading(const double heading) {
+    heading_ = heading;
+  }
 
   const std::vector<LaneWaypoint>& lane_waypoints() const {
     return lane_waypoints_;
@@ -131,7 +137,9 @@ class MapPathPoint : public common::math::Vec2d {
                            lane_waypoints.end());
   }
 
-  void clear_lane_waypoints() { lane_waypoints_.clear(); }
+  void clear_lane_waypoints() {
+    lane_waypoints_.clear();
+  }
 
   std::string DebugString() const;
 
@@ -149,8 +157,12 @@ class PathApproximation {
       : max_error_(max_error), max_sqr_error_(max_error * max_error) {
     Init(path);
   }
-  double max_error() const { return max_error_; }
-  const std::vector<int>& original_ids() const { return original_ids_; }
+  double max_error() const {
+    return max_error_;
+  }
+  const std::vector<int>& original_ids() const {
+    return original_ids_;
+  }
   const std::vector<common::math::LineSegment2d>& segments() const {
     return segments_;
   }
@@ -240,9 +252,15 @@ class Path {
   bool GetHeadingAlongPath(const common::math::Vec2d& point,
                            double* heading) const;
 
-  int num_points() const { return num_points_; }
-  int num_segments() const { return num_segments_; }
-  const std::vector<MapPathPoint>& path_points() const { return path_points_; }
+  int num_points() const {
+    return num_points_;
+  }
+  int num_segments() const {
+    return num_segments_;
+  }
+  const std::vector<MapPathPoint>& path_points() const {
+    return path_points_;
+  }
   const std::vector<LaneSegment>& lane_segments() const {
     return lane_segments_;
   }
@@ -252,12 +270,18 @@ class Path {
   const std::vector<common::math::Vec2d>& unit_directions() const {
     return unit_directions_;
   }
-  const std::vector<double>& accumulated_s() const { return accumulated_s_; }
+  const std::vector<double>& accumulated_s() const {
+    return accumulated_s_;
+  }
   const std::vector<common::math::LineSegment2d>& segments() const {
     return segments_;
   }
-  const PathApproximation* approximation() const { return &approximation_; }
-  double length() const { return length_; }
+  const PathApproximation* approximation() const {
+    return &approximation_;
+  }
+  double length() const {
+    return length_;
+  }
 
   const std::vector<PathOverlap>& lane_overlaps() const {
     return lane_overlaps_;

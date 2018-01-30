@@ -76,23 +76,14 @@ bool SidepassVehicle::UpdateSidepassStatus(
         constexpr double kWaitDuration = 2.0;
         if (Clock::NowInSeconds() - *wait_start_time > kWaitDuration) {
           // calculate if the left/right lane exist
-          double x = common::VehicleStateProvider::instance()->x();
-          double y = common::VehicleStateProvider::instance()->y();
-          double z = common::VehicleStateProvider::instance()->z();
-          auto point = common::util::MakePointENU(x, y, z);
-          double heading = common::VehicleStateProvider::instance()->heading();
-
           std::vector<hdmap::LaneInfoConstPtr> lanes;
-          const int status = hdmap_->GetLanesWithHeading(point, 0.0, heading,
-                                                         M_PI / 2.0, &lanes);
-          if (status < 0) {
-            AERROR << "failed to get lane from point "
-                   << point.ShortDebugString();
-            return false;
-          }
+          reference_line_->GetLaneFromS(
+              (adc_sl_boundary.start_s() + adc_sl_boundary.end_s()) / 2.0,
+              &lanes);
           if (lanes.empty()) {
-            AERROR << "No valid lane found within " << 0.0
-                   << " meters with heading " << heading;
+            AERROR << "No valid lane found at s = "
+                   << (adc_sl_boundary.start_s() + adc_sl_boundary.end_s()) /
+                          2.0;
             return false;
           }
           bool enter_sidepass_mode = false;
@@ -101,20 +92,45 @@ bool SidepassVehicle::UpdateSidepassStatus(
             // currently do not sidepass when lanes > 2 (usually at junctions).
           } else {
             auto& lane = lanes.front()->lane();
+
+            ADEBUG << "current lane id: " << lane.id().id();
+            ADEBUG << "left forward lanes size = "
+                   << lane.left_neighbor_forward_lane_id_size();
+            ADEBUG << "right forward lanes size = "
+                   << lane.right_neighbor_forward_lane_id_size();
+            ADEBUG << "left reverse lanes size = "
+                   << lane.left_neighbor_reverse_lane_id_size();
+            ADEBUG << "right reverse lanes size = "
+                   << lane.right_neighbor_reverse_lane_id_size();
+
             if (lane.left_neighbor_forward_lane_id_size() > 0) {
               enter_sidepass_mode = true;
               side = 1;
-            } else if (lane.right_neighbor_forward_lane_id_size() > 0) {
-              enter_sidepass_mode = true;
-              side = -1;
-            } else if (lane.left_neighbor_reverse_lane_id_size() > 0) {
+            }
+            if (!enter_sidepass_mode &&
+                lane.right_neighbor_forward_lane_id_size() > 0) {
+              bool has_city_driving = false;
+              for (auto& id : lane.right_neighbor_forward_lane_id()) {
+                if (hdmap_->GetLaneById(id)->lane().type() ==
+                    hdmap::Lane::CITY_DRIVING) {
+                  has_city_driving = true;
+                  break;
+                }
+              }
+              if (has_city_driving) {
+                enter_sidepass_mode = true;
+                side = -1;
+              }
+            }
+            if (!enter_sidepass_mode &&
+                lane.left_neighbor_reverse_lane_id_size() > 0) {
               enter_sidepass_mode = true;
               side = 1;
-            } else if (lane.right_neighbor_reverse_lane_id_size() > 0) {
+            }
+            if (!enter_sidepass_mode &&
+                lane.right_neighbor_reverse_lane_id_size() > 0) {
               enter_sidepass_mode = true;
               side = -1;
-            } else {
-              // do not sidepass when no lanes at left or right
             }
           }
           if (enter_sidepass_mode) {
@@ -251,6 +267,7 @@ bool SidepassVehicle::MakeSidepassObstacleDecision(
 
 bool SidepassVehicle::ApplyRule(Frame*,
                                 ReferenceLineInfo* const reference_line_info) {
+  reference_line_ = &(reference_line_info->reference_line());
   auto* path_decision = reference_line_info->path_decision();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   const auto& adc_planning_point = reference_line_info->AdcPlanningPoint();
