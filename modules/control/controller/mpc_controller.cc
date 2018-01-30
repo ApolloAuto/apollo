@@ -343,6 +343,9 @@ Status MPCController::ComputeControlCommand(
          << (mpc_end_timestamp - mpc_start_timestamp) * 1000 << " ms.";
 
   // TODO(QiL): evaluate whether need to add spline smoothing after the result
+
+  debug->set_acceleration_cmd_closeloop(control[0](1, 0));
+
   double steer_angle_feedback = control[0](0, 0) * 180 / M_PI *
                                 steer_transmission_ratio_ /
                                 steer_single_direction_max_degree_ * 100;
@@ -383,6 +386,8 @@ Status MPCController::ComputeControlCommand(
     debug->set_is_full_stop(true);
   }
 
+  debug->set_acceleration_cmd(acceleration_cmd);
+
   double calibration_value = 0.0;
   if (FLAGS_use_preview_speed_for_table) {
     calibration_value = control_interpolation_->Interpolate(
@@ -391,6 +396,8 @@ Status MPCController::ComputeControlCommand(
     calibration_value = control_interpolation_->Interpolate(std::make_pair(
         VehicleStateProvider::instance()->linear_velocity(), acceleration_cmd));
   }
+
+  debug->set_calibration_value(calibration_value);
 
   double throttle_cmd = 0.0;
   double brake_cmd = 0.0;
