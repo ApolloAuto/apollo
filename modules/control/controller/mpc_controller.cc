@@ -43,6 +43,7 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
 using apollo::common::time::Clock;
 using Matrix = Eigen::MatrixXd;
+using apollo::common::VehicleConfigHelper;
 
 namespace {
 
@@ -77,18 +78,20 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
     AERROR << "[MPCController] control_conf == nullptr";
     return false;
   }
-  const auto &vehicle_param_ =
-      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  const auto &vehicle_param =
+      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->mpc_controller_conf().ts();
   CHECK_GT(ts_, 0.0) << "[MPCController] Invalid control update interval.";
   cf_ = control_conf->mpc_controller_conf().cf();
   cr_ = control_conf->mpc_controller_conf().cr();
-  wheelbase_ = vehicle_param_.wheel_base();
-  steer_transmission_ratio_ = vehicle_param_.steer_ratio();
+  wheelbase_ = vehicle_param.wheel_base();
+  steer_transmission_ratio_ = vehicle_param.steer_ratio();
   steer_single_direction_max_degree_ =
-      vehicle_param_.max_steer_angle() / M_PI * 180;
+      vehicle_param.max_steer_angle() / M_PI * 180;
   max_lat_acc_ = control_conf->mpc_controller_conf().max_lateral_acceleration();
+  max_acceleration_ = vehicle_param.max_acceleration();
+  max_deceleration_ = vehicle_param.max_deceleration();
 
   const double mass_fl = control_conf->mpc_controller_conf().mass_fl();
   const double mass_fr = control_conf->mpc_controller_conf().mass_fr();
@@ -320,12 +323,10 @@ Status MPCController::ComputeControlCommand(
   std::vector<Eigen::MatrixXd> reference(horizon_, reference_state);
 
   Eigen::MatrixXd lower_bound(controls_, 1);
-  lower_bound << -steer_single_direction_max_degree_,
-      vehicle_param_.max_deceleration();
+  lower_bound << -steer_single_direction_max_degree_, max_deceleration_;
 
   Eigen::MatrixXd upper_bound(controls_, 1);
-  upper_bound << steer_single_direction_max_degree_,
-      vehicle_param_.max_acceleration();
+  upper_bound << steer_single_direction_max_degree_, max_acceleration_;
 
   std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
 
@@ -335,6 +336,8 @@ Status MPCController::ComputeControlCommand(
           matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
           mpc_eps_, mpc_max_iteration_, &control) != true) {
     AERROR << "MPC solver failed";
+  } else {
+    AINFO << "MPC problem solved! ";
   }
 
   double mpc_end_timestamp = Clock::NowInSeconds();
@@ -343,8 +346,6 @@ Status MPCController::ComputeControlCommand(
          << (mpc_end_timestamp - mpc_start_timestamp) * 1000 << " ms.";
 
   // TODO(QiL): evaluate whether need to add spline smoothing after the result
-
-  debug->set_acceleration_cmd_closeloop(control[0](1, 0));
 
   double steer_angle_feedback = control[0](0, 0) * 180 / M_PI *
                                 steer_transmission_ratio_ /
@@ -373,6 +374,8 @@ Status MPCController::ComputeControlCommand(
     steer_angle = digital_filter_.Filter(steer_angle);
     cmd->set_steering_target(steer_angle);
   }
+
+  debug->set_acceleration_cmd_closeloop(control[0](1, 0));
 
   double acceleration_cmd = control[0](1, 0) + debug->acceleration_reference();
   // TODO(QiL): add pitch angle feedforward to accomendate for 3D control
