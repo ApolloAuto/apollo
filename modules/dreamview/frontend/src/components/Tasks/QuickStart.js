@@ -35,36 +35,50 @@ export default class QuickStarter extends React.Component {
         this.rtKRecord = {
             "Start": () => {
                 WS.executeToolCommand("rtk_record_replay", "start_recorder");
+                const msg = new SpeechSynthesisUtterance('Start RTK recorder');
+                window.speechSynthesis.speak(msg);
             },
             "Stop": () => {
                 WS.executeToolCommand("rtk_record_replay", "stop_recorder");
+                const msg = new SpeechSynthesisUtterance('Stop RTK recorder');
+                window.speechSynthesis.speak(msg);
             },
         };
 
         this.rtkReplay = {
             "Start": () => {
                 WS.executeToolCommand("rtk_record_replay", "start_player");
+                const msg = new SpeechSynthesisUtterance('Start RTK replay');
+                window.speechSynthesis.speak(msg);
             },
             "Stop": () => {
-                WS.executeToolCommand("rtk_record_replay", "start_player");
+                WS.executeToolCommand("rtk_record_replay", "stop_player");
+                const msg = new SpeechSynthesisUtterance('Stop RTK replay');
+                window.speechSynthesis.speak(msg);
             },
         };
 
         this.setup = {
             "Setup": () => {
                 WS.executeModeCommand("start");
+                const msg = new SpeechSynthesisUtterance('Setup');
+                window.speechSynthesis.speak(msg);
             },
         };
 
         this.reset = {
             "Reset All": () => {
                 WS.executeModeCommand("stop");
+                const msg = new SpeechSynthesisUtterance('Reset All');
+                window.speechSynthesis.speak(msg);
             },
         };
 
         this.auto = {
             "Start Auto": () => {
                 WS.changeDrivingMode("COMPLETE_AUTO_DRIVE");
+                const msg = new SpeechSynthesisUtterance('Start Auto');
+                window.speechSynthesis.speak(msg);
             },
         };
         this.version = {
