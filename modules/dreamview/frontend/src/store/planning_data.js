@@ -1,8 +1,8 @@
 import {action, computed, observable, runInAction} from 'mobx';
 import {LinearInterpolant} from 'three';
 
-export default class Planning {
-  @observable sequenceNum = 0;
+export default class PlanningData {
+  @observable planningTime = null;
 
   data = this.initData();
 
@@ -10,8 +10,8 @@ export default class Planning {
       planning: []
   };
 
-  @action updateSequenceNum(newSequenceNum) {
-    this.sequenceNum = newSequenceNum;
+  @action updatePlanningTime(newTime) {
+    this.planningTime = newTime;
   }
 
   initData() {
@@ -233,12 +233,14 @@ export default class Planning {
   }
 
   update(world) {
-    this.updateSequenceNum(world.sequenceNum);
-    this.data = this.initData();
-    this.planningTime = world.planningTime;
-
     const planningData = world.planningData;
     if (planningData) {
+      if (this.planningTime === world.planningTime) {
+        return;
+      }
+
+      this.data = this.initData();
+
       if (planningData.slFrame && planningData.slFrame.length >= 2) {
         this.updateSLFrame(planningData.slFrame);
       }
@@ -264,10 +266,12 @@ export default class Planning {
       if (planningData.dpPolyGraph) {
         this.updateDpPolyGraph(planningData.dpPolyGraph);
       }
-    }
 
-    if (world.latency) {
-      this.updadteLatencyGraph(world.timestampSec, world.latency);
+      if (world.latency) {
+        this.updadteLatencyGraph(world.planningTime, world.latency);
+      }
+
+      this.updatePlanningTime(world.planningTime);
     }
   }
 }
