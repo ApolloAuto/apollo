@@ -46,8 +46,15 @@ class DataGenerator : public apollo::common::ApolloApp {
   void Stop() override;
 
  private:
-  // Upon receiving point cloud data
-  void OnPointCloud(const sensor_msgs::PointCloud2& message);
+  void RunOnce();
+  void Process(const sensor_msgs::PointCloud2& message);
+  void OnTimer(const ros::TimerEvent&);
+
+  void TransPointCloudMsgToPCL(const sensor_msgs::PointCloud2& cloud_msg,
+                               pcl_util::PointCloudPtr* cloud_pcl);
+
+  ros::Timer timer_;
+  int i = 0;
 };
 
 }  // namespace data_generator
