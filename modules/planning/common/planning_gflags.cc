@@ -288,7 +288,7 @@ DEFINE_string(stop_sign_virtual_object_id_prefix, "SS_",
               "prefix for converting stop_sign id to virtual object id");
 DEFINE_double(stop_duration_for_stop_sign, 3.0,
               "min time(second) to stop at stop sign");
-DEFINE_double(valid_pass_stop_sign_distance, 2.0,
+DEFINE_double(valid_pass_stop_sign_distance, 3.0,
               "valid distance(m) for watch vehicles to be considered as "
               "have passed stop sign");
 
