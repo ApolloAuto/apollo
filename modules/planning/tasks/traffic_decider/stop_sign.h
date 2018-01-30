@@ -62,6 +62,7 @@ class StopSign : public TrafficRule {
   int AddWatchVehicle(const PathObstacle& path_obstacle,
                       StopSignLaneVehicles* watch_vehicles);
   int RemoveWatchVehicle(const PathObstacle& path_obstacle,
+                         const std::vector<std::string>& watch_vehicle_ids,
                          StopSignLaneVehicles* watch_vehicles);
   int ClearWatchVehicle(
       ReferenceLineInfo* const reference_line_info,
@@ -72,6 +73,7 @@ class StopSign : public TrafficRule {
                          ReferenceLineInfo* const reference_line_info,
                          const hdmap::PathOverlap* stop_sign_overlap);
   void ClearDropbox(const std::string& stop_sign_id);
+  void ClearDropboxWatchvehicles();
 
  private:
   constexpr static char const* const db_key_stop_sign_stop_status_prefix_ =

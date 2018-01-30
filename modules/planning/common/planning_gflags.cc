@@ -257,7 +257,7 @@ DEFINE_double(stop_max_distance_buffer, 4.0,
               "distance buffer of passing stop line");
 DEFINE_double(stop_min_speed, 0.2, "min speed(m/s) for computing stop");
 DEFINE_double(stop_max_deceleration, 6.0, "max deceleration");
-DEFINE_double(max_valid_stop_distance, 2.0,
+DEFINE_double(max_valid_stop_distance, 3.0,
               "max distance(m) to the stop line to be "
               "considered as a valid stop");
 
@@ -288,6 +288,9 @@ DEFINE_string(stop_sign_virtual_object_id_prefix, "SS_",
               "prefix for converting stop_sign id to virtual object id");
 DEFINE_double(stop_duration_for_stop_sign, 3.0,
               "min time(second) to stop at stop sign");
+DEFINE_double(valid_pass_stop_sign_distance, 2.0,
+              "valid distance(m) for watch vehicles to be considered as "
+              "have passed stop sign");
 
 // according to DMV's rule, turn signal should be on within 200 ft from
 // intersection.
