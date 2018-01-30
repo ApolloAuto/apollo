@@ -41,9 +41,9 @@ export default class PlanningMonitor extends React.Component {
     }
 
     render() {
-        const { sequenceNum, data, latencyGraph } = this.props.store.planning;
+        const { planningTime, data, latencyGraph } = this.props.store.planningData;
 
-        if (!sequenceNum) {
+        if (!planningTime) {
             return null;
         }
 
