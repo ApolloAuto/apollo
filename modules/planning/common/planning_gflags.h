@@ -169,11 +169,12 @@ DECLARE_string(crosswalk_virtual_object_id_prefix);
 DECLARE_double(crosswalk_expand_distance);
 DECLARE_double(crosswalk_strick_l_distance);
 DECLARE_double(crosswalk_loose_l_distance);
+DECLARE_double(crosswalk_min_pass_distance);
 /// stop_sign
 DECLARE_bool(enable_stop_sign);
 DECLARE_string(stop_sign_virtual_object_id_prefix);
-DECLARE_double(stop_duration_for_stop_sign);
-DECLARE_double(min_pass_stop_sign_distance);
+DECLARE_double(stop_sign_stop_duration);
+DECLARE_double(stop_sign_min_pass_distance);
 
 DECLARE_bool(enable_sqp_solver);
 

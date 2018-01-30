@@ -60,6 +60,8 @@ bool Crosswalk::ApplyRule(Frame* frame,
 void Crosswalk::MakeDecisions(Frame* frame,
                               ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
+  double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     const PerceptionObstacle& perception_obstacle =
         path_obstacle->obstacle()->Perception();
@@ -84,6 +86,17 @@ void Crosswalk::MakeDecisions(Frame* frame,
       auto crosswalk_info = crosswalk_ptr.get();
       std::string crosswalk_id = crosswalk_info->id().id();
 
+      // skip crosswalk if master vehicle body already passes the stop line
+      double stop_line_end_s = crosswalk_overlap->end_s;
+      if (adc_front_edge_s - stop_line_end_s >
+          FLAGS_crosswalk_min_pass_distance) {
+        ADEBUG << "skip: crosswalk_id[" << crosswalk_id
+            << "]; stop_line_end_s[" << stop_line_end_s
+            << "]; adc_front_edge_s[" << adc_front_edge_s
+            << "]. adc_front_edge passes stop_line_end_s + buffer.";
+        continue;
+      }
+
       // expand crosswalk polygon
       // note: crosswalk expanded area will include sideway area
       Vec2d point(perception_obstacle.position().x(),
@@ -96,8 +109,8 @@ void Crosswalk::MakeDecisions(Frame* frame,
 
       if (!in_expanded_crosswalk) {
         ADEBUG << "skip: not in crosswalk expanded area. "
-               << "obstacle_id[" << obstacle_id << "]; crosswalk_id["
-               << crosswalk_id << "]";
+               << "obstacle_id[" << obstacle_id
+               << "]; crosswalk_id[" << crosswalk_id << "]";
         continue;
       }
 
@@ -151,18 +164,6 @@ void Crosswalk::MakeDecisions(Frame* frame,
       if (!stop) {
         ADEBUG << "skip: obstacle_id[" << obstacle_id << "]; crosswalk_id["
                << crosswalk_id << "]";
-        continue;
-      }
-
-      // skip crosswalk if master vehicle body already passes the stop line
-      double stop_line_start_s = crosswalk_overlap->start_s;
-      double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
-      if (stop_line_start_s + FLAGS_stop_max_distance_buffer <=
-          adc_front_edge_s) {
-        ADEBUG << "skip: adc_front_edge passes stop_line+buffer. "
-               << "obstacle_id[" << obstacle_id << "]; crosswalk_id["
-               << crosswalk_id << "]; crosswalk_start_s[" << stop_line_start_s
-               << "]; adc_front_edge_s[" << adc_front_edge_s << "]";
         continue;
       }
 
