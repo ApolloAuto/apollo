@@ -277,6 +277,16 @@ Status LatticePlanner::PlanOnReferenceLine(
                << "from future trajectory to lon-lat";
         // tuning_success = false;
       }
+
+      // 3. evaluate cost
+      std::vector<double> future_traj_component_cost;
+      double total_future_traj_component_cost =
+        trajectory_evaluator.evaluate_per_lonlat_trajectory(
+          planning_target, lon_future_trajectory, lat_future_trajectory,
+          &future_traj_component_cost);
+
+
+      // 4. emit
     }
 
     // Print the chosen end condition and start condition

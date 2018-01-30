@@ -365,22 +365,46 @@ bool TrajectoryEvaluator::InterpolateDenseStPoints(
     AERROR << "AutoTuning InterpolateDenseStPoints Error";
     return false;
   }
-  int ret = 0;
   for (uint i = 1; i < st_points.size(); ++i) {
-    if (t >= st_points[i].t()) {
-      ret = i;
+    if (t <= st_points[i].t()) {
       *traj_s = st_points[i].t();
+      return true;
     }
   }
-  return true;
+  return false;
 }
 
-std::vector<double> TrajectoryEvaluator::evaluate_per_lonlat_trajectory(
+double TrajectoryEvaluator::evaluate_per_lonlat_trajectory(
     const PlanningTarget& planning_target,
     const std::vector<apollo::common::SpeedPoint> st_points,
-    const std::vector<apollo::common::FrenetFramePoint> sl_points) {
-  std::vector<double> ret;
-  return ret;
+    const std::vector<apollo::common::FrenetFramePoint> sl_points,
+    std::vector<double>* cost_components) {
+
+  // Costs:
+  // 1. Cost to achieve the objective
+  // 2. Cost of logitudinal jerk
+  // 3. Cost of logitudinal collision
+  // 4. Cost of lateral offsets
+
+  // Longitudinal costs
+  double lon_travel_cost = LonObjectiveCost(st_points, planning_target);
+  double lon_jerk_cost = LonComfortCost(st_points);
+  double lon_collision_cost = LonCollisionCost(st_points);
+
+  // Lateral costs
+  double lat_offset_cost = LatOffsetCost(sl_points);
+
+  if (cost_components) {
+    cost_components->push_back(lon_travel_cost);
+    cost_components->push_back(lon_jerk_cost);
+    cost_components->push_back(lon_collision_cost);
+    cost_components->push_back(lat_offset_cost);
+  }
+
+  return lon_travel_cost * FLAGS_weight_lon_travel +
+         lon_jerk_cost * FLAGS_weight_lon_jerk +
+         lon_collision_cost * FLAGS_weight_lon_collision +
+         lat_offset_cost * FLAGS_weight_lat_offset;
 }
 
 }  // namespace planning
