@@ -282,13 +282,16 @@ DEFINE_double(crosswalk_strick_l_distance, 4.0,
               "strick stop rule within this l_distance");
 DEFINE_double(crosswalk_loose_l_distance, 5.0,
               "loose stop rule beyond this l_distance");
+DEFINE_double(crosswalk_min_pass_distance, 1.0,
+              "valid min distance(m) for vehicles to be considered as "
+              "have passed crosswalk (stop_line_end_s)");
 /// stop_sign
 DEFINE_bool(enable_stop_sign, true, "enable stop_sign");
 DEFINE_string(stop_sign_virtual_object_id_prefix, "SS_",
               "prefix for converting stop_sign id to virtual object id");
-DEFINE_double(stop_duration_for_stop_sign, 3.0,
+DEFINE_double(stop_sign_stop_duration, 3.0,
               "min time(second) to stop at stop sign");
-DEFINE_double(min_pass_stop_sign_distance, 3.0,
+DEFINE_double(stop_sign_min_pass_distance, 3.0,
               "valid min distance(m) for vehicles to be considered as "
               "have passed stop sign (stop_line_end_s)");
 
