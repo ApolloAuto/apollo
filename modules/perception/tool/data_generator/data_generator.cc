@@ -32,10 +32,11 @@ using apollo::common::Status;
 using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
+using apollo::perception::pcl_util::PointCloudPtr;
 using apollo::perception::pcl_util::PointXYZIT;
 
 std::string DataGenerator::Name() const {
-  return "Perception Data Generator.";
+  return "data_generator";
 }
 
 Status DataGenerator::Init() {
@@ -47,41 +48,95 @@ Status DataGenerator::Init() {
   CHECK(AdapterManager::GetLocalization())
       << "Localization is not initialized.";
 
-  AdapterManager::AddPointCloudCallback(&DataGenerator::OnPointCloud, this);
-
   return Status::OK();
 }
 
-void DataGenerator::OnPointCloud(const sensor_msgs::PointCloud2& message) {
-  pcl::PointCloud<PointXYZIT> cld;
-  pcl::fromROSMsg(message, cld);
+void DataGenerator::OnTimer(const ros::TimerEvent&) {
+  RunOnce();
+}
 
-  AINFO << "PointCloud size = " << cld.points.size();
+void DataGenerator::RunOnce() {
+  AdapterManager::Observe();
 
+  // point cloud
+  if (AdapterManager::GetPointCloud()->Empty()) {
+    AERROR << "PointCloud is NOT ready.";
+    return;
+  }
   // localization
+  if (AdapterManager::GetLocalization()->Empty()) {
+    AERROR << "Localization is NOT ready.";
+    return;
+  }
+  // chassis
+  if (AdapterManager::GetChassis()->Empty()) {
+    AERROR << "Chassis is NOT ready.";
+    return;
+  }
+
+  const auto& point_cloud_msg =
+      AdapterManager::GetPointCloud()->GetLatestObserved();
+  ADEBUG << "PointCloud: " << point_cloud_msg.header;
+
   const auto& localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
-  ADEBUG << "Get localization:" << localization.DebugString();
+  ADEBUG << "Localization: " << localization.DebugString();
 
-  // chassis
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
-  ADEBUG << "Get chassis:" << chassis.DebugString();
+  ADEBUG << "Chassis: " << chassis.DebugString();
 
-  Status status =
-      VehicleStateProvider::instance()->Update(localization, chassis);
-  VehicleState vehicle_state =
-      VehicleStateProvider::instance()->vehicle_state();
-
+  VehicleStateProvider::instance()->Update(localization, chassis);
   AINFO << "VehicleState updated.";
+
+  Process(point_cloud_msg);
+}
+
+void DataGenerator::Process(const sensor_msgs::PointCloud2& message) {
+  PointCloudPtr cld;
+  TransPointCloudMsgToPCL(message, &cld);
+  AINFO << "PointCloud size = " << cld->points.size();
 
   // TODO(All): label point cloud and generate data automatically below
 }
 
 Status DataGenerator::Start() {
+  constexpr double kDataGeneratorCycleDuration = 0.1;  // in seconds
+  timer_ =
+      AdapterManager::CreateTimer(ros::Duration(kDataGeneratorCycleDuration),
+                                  &DataGenerator::OnTimer, this);
+  AINFO << "DataGenerator started";
   return Status::OK();
 }
 
 void DataGenerator::Stop() {}
+
+void DataGenerator::TransPointCloudMsgToPCL(
+    const sensor_msgs::PointCloud2& cloud_msg, PointCloudPtr* cloud_pcl) {
+  // transform from ros to pcl
+  pcl::PointCloud<pcl_util::PointXYZIT> in_cloud;
+  pcl::fromROSMsg(cloud_msg, in_cloud);
+  // transform from xyzit to xyzi
+  PointCloudPtr& cloud = *cloud_pcl;
+  cloud->header = in_cloud.header;
+  cloud->width = in_cloud.width;
+  cloud->height = in_cloud.height;
+  cloud->is_dense = in_cloud.is_dense;
+  cloud->sensor_origin_ = in_cloud.sensor_origin_;
+  cloud->sensor_orientation_ = in_cloud.sensor_orientation_;
+  cloud->points.resize(in_cloud.points.size());
+  size_t points_num = 0;
+  for (size_t idx = 0; idx < in_cloud.size(); ++idx) {
+    pcl_util::PointXYZIT& pt = in_cloud.points[idx];
+    if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z) && !isnan(pt.intensity)) {
+      cloud->points[points_num].x = pt.x;
+      cloud->points[points_num].y = pt.y;
+      cloud->points[points_num].z = pt.z;
+      cloud->points[points_num].intensity = pt.intensity;
+      ++points_num;
+    }
+  }
+  cloud->points.resize(points_num);
+}
 
 }  // namespace data_generator
 }  // namespace perception
