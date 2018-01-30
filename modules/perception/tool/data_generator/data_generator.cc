@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 
 #include "modules/perception/tool/data_generator/data_generator.h"
 
+#include "eigen_conversions/eigen_msg.h"
 #include "pcl_conversions/pcl_conversions.h"
 #include "ros/include/ros/ros.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/perception/tool/data_generator/common/data_generator_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -34,15 +36,15 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::perception::pcl_util::PointCloudPtr;
 using apollo::perception::pcl_util::PointXYZIT;
+using Eigen::Affine3d;
+using Eigen::Matrix4d;
 
 std::string DataGenerator::Name() const {
   return "data_generator";
 }
 
 Status DataGenerator::Init() {
-  const std::string config_file =
-      "/apollo/modules/perception/tool/data_generator/conf/adapter.conf";
-  AdapterManager::Init(config_file);
+  AdapterManager::Init(FLAGS_data_generator_adapter_config_filename);
 
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
   CHECK(AdapterManager::GetLocalization())
@@ -136,6 +138,39 @@ void DataGenerator::TransPointCloudMsgToPCL(
     }
   }
   cloud->points.resize(points_num);
+}
+
+bool DataGenerator::GetTrans(const std::string from_coordinate,
+                             const std::string to_coordinate,
+                             const double query_time, Matrix4d* trans) {
+  CHECK_NOTNULL(trans);
+  ros::Time query_stamp(query_time);
+  const auto& tf2_buffer = AdapterManager::Tf2Buffer();
+  const double kTf2BuffSize = 10 / 1000.0;  // buff size
+  std::string err_msg;
+  if (!tf2_buffer.canTransform(from_coordinate, to_coordinate, query_stamp,
+                               ros::Duration(kTf2BuffSize), &err_msg)) {
+    AERROR << "Cannot transform frame from " << from_coordinate << " to frame "
+           << to_coordinate << " , err: " << err_msg
+           << ". Frames: " << tf2_buffer.allFramesAsString();
+    return false;
+  }
+
+  geometry_msgs::TransformStamped transform_stamped;
+  try {
+    transform_stamped =
+        tf2_buffer.lookupTransform(from_coordinate, to_coordinate, query_stamp);
+  } catch (tf2::TransformException& ex) {
+    AERROR << "Exception: " << ex.what();
+    return false;
+  }
+
+  Affine3d affine_3d;
+  tf::transformMsgToEigen(transform_stamped.transform, affine_3d);
+  *trans = affine_3d.matrix();
+  ADEBUG << from_coordinate << " to " << to_coordinate
+         << ",  trans = " << *trans;
+  return true;
 }
 
 }  // namespace data_generator
