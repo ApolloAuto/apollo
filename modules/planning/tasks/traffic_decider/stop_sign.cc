@@ -113,7 +113,7 @@ void StopSign::MakeDecisions(Frame* frame,
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
 
   if (adc_front_edge_s - stop_line_end_s >
-      FLAGS_min_pass_stop_sign_distance) {
+      FLAGS_stop_sign_min_pass_distance) {
     ClearDropbox(stop_sign_id);
     ADEBUG << "skip stop_sign_id[" << stop_sign_id
         << "]; stop_line_end_s[" << stop_line_end_s
@@ -260,7 +260,7 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
       if (!CheckADCkStop(reference_line_info)) {
         stop_status_ = StopSignStopStatus::TO_STOP;
       } else {
-        if (wait_time >= FLAGS_stop_duration_for_stop_sign) {
+        if (wait_time >= FLAGS_stop_sign_stop_duration) {
           stop_status_ = StopSignStopStatus::STOP_DONE;
         }
       }
@@ -546,7 +546,7 @@ int StopSign::RemoveWatchVehicle(
       double stop_line_end_s = over_lap_info->lane_overlap_info().end_s();
       double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
       double distance_pass_stop_line = obstacle_end_s - stop_line_end_s;
-      if (distance_pass_stop_line > FLAGS_min_pass_stop_sign_distance) {
+      if (distance_pass_stop_line > FLAGS_stop_sign_min_pass_distance) {
         ADEBUG << "obstacle_id[" << obstacle_id
             << "] type[" << obstacle_type_name
             << "] distance_pass_stop_line[" << distance_pass_stop_line
