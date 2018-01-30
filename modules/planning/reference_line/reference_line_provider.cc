@@ -460,15 +460,38 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   const auto adc_half_width =
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
   auto ref_point = reference_line.GetReferencePoint(s);
+  const Vec2d left_vec =
+      Vec2d::CreateUnitVec2d(ref_point.heading() + M_PI / 2.0);
+  const Vec2d right_vec =
+      Vec2d::CreateUnitVec2d(ref_point.heading() - M_PI / 2.0);
+
+  Vec2d all_shifts(0.0, 0.0);
+
+  // shift to center
   double left_width = 0.0;
   double right_width = 0.0;
   reference_line.GetLaneWidth(s, &left_width, &right_width);
-  auto shift = (left_width - right_width) / 2.0 *
-               Vec2d::CreateUnitVec2d(ref_point.heading() + M_PI / 2.0);
-  ref_point += shift;
+  auto shift_to_center = (left_width - right_width) / 2.0 * left_vec;
+  all_shifts += shift_to_center;
+
+  // avoid curb boundary
+  if (!ref_point.lane_waypoints().empty()) {
+    const LaneWaypoint &waypoint = ref_point.lane_waypoints()[0];
+    auto left_type = hdmap::LeftBoundaryType(waypoint);
+    if (left_type == hdmap::LaneBoundaryType::CURB) {
+      all_shifts += smoother_config_.curb_shift() * right_vec;
+    }
+    auto right_type = hdmap::RightBoundaryType(waypoint);
+    if (right_type == hdmap::LaneBoundaryType::CURB) {
+      all_shifts += smoother_config_.curb_shift() * left_vec;
+    }
+  }
+
+  ref_point += all_shifts;
   anchor.path_point = ref_point.ToPathPoint(s);
   double effective_width = (left_width + right_width) / 2.0 - adc_half_width -
-                           FLAGS_reference_line_lateral_buffer;
+                           FLAGS_reference_line_lateral_buffer -
+                           all_shifts.Length();
   anchor.lateral_bound =
       std::max(smoother_config_.lateral_boundary_bound(), effective_width);
   return anchor;
