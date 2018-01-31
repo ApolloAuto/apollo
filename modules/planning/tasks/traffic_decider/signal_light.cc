@@ -31,6 +31,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/tasks/traffic_decider/util.h"
 
 namespace apollo {
 namespace planning {
@@ -103,8 +104,8 @@ void SignalLight::MakeDecisions(Frame* frame,
   bool has_stop = false;
   for (auto& signal_light : signal_lights_from_path_) {
     const TrafficLight signal = GetSignal(signal_light.object_id);
-    double stop_deceleration =
-        GetStopDeceleration(reference_line_info, &signal_light);
+    double stop_deceleration = util::GetADCStopDeceleration(
+        reference_line_info, signal_light.start_s);
 
     planning_internal::SignalLightDebug::SignalDebug* signal_debug =
         signal_light_debug->add_signal();
@@ -178,29 +179,6 @@ TrafficLight SignalLight::GetSignal(const std::string& signal_id) {
     return traffic_light;
   }
   return *result;
-}
-
-double SignalLight::GetStopDeceleration(
-    ReferenceLineInfo* const reference_line_info,
-    const hdmap::PathOverlap* signal_light) {
-  double adc_speed =
-      common::VehicleStateProvider::instance()->linear_velocity();
-  if (adc_speed < FLAGS_stop_max_speed) {
-    return 0.0;
-  }
-  double stop_distance = 0;
-  double adc_front_s = reference_line_info->AdcSlBoundary().end_s();
-  double stop_line_s = signal_light->start_s;
-
-  if (stop_line_s > adc_front_s) {
-    stop_distance = stop_line_s - adc_front_s;
-  } else {
-    stop_distance = stop_line_s + FLAGS_stop_max_distance_buffer - adc_front_s;
-  }
-  if (stop_distance < 1e-5) {
-    return std::numeric_limits<double>::max();
-  }
-  return (adc_speed * adc_speed) / (2 * stop_distance);
 }
 
 bool SignalLight::BuildStopDecision(
