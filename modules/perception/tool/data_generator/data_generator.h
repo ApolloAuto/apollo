@@ -21,6 +21,7 @@
 #ifndef MODEULES_PERCEPTION_TOOL_DATE_GENERATOR_DATA_GENERATOR_
 #define MODEULES_PERCEPTION_TOOL_DATE_GENERATOR_DATA_GENERATOR_
 
+#include <memory>
 #include <string>
 
 #include "sensor_msgs/PointCloud2.h"
@@ -56,10 +57,13 @@ class DataGenerator : public apollo::common::ApolloApp {
                                pcl_util::PointCloudPtr* cloud_pcl);
   bool GetTrans(const std::string& to_frame, const std::string& from_frame,
                 const double query_time, Eigen::Matrix4d* trans);
-  bool TransformPointCloudToWorld(const Eigen::Matrix4d& velodyne_trans,
-                                  pcl_util::PointCloudPtr* cld);
+  bool TransformPointCloudToWorld(
+      std::shared_ptr<Eigen::Matrix4d> velodyne_trans,
+      pcl_util::PointCloudPtr* cld);
   ros::Timer timer_;
-  int i = 0;
+
+  std::ofstream* data_file_ = nullptr;
+  int num_data_frame_ = 0;
 };
 
 }  // namespace data_generator
