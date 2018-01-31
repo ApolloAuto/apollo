@@ -664,12 +664,12 @@ bool StopSign::BuildStopDecision(Frame* frame,
   auto* obstacle = frame->AddVirtualStopObstacle(
       reference_line_info, virtual_object_id, stop_sign_overlap->start_s);
   if (!obstacle) {
-    AERROR << "Failed to create obstacle " << virtual_object_id << " in frame";
+    AERROR << "Failed to create obstacle [" << virtual_object_id << "]";
     return false;
   }
   PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for " << virtual_object_id;
+    AERROR << "Failed to create path_obstacle for: " << virtual_object_id;
     return false;
   }
 

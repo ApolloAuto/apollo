@@ -42,6 +42,7 @@ class SunnyvaleLoopTest : public PlanningTestBase {
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
     FLAGS_use_multi_thread_to_add_obstacles = false;
+    FLAGS_enable_crosswalk = false;
   }
 };
 
