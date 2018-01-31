@@ -21,6 +21,8 @@
 
 // file names
 DECLARE_string(data_generator_adapter_config_filename);
+DECLARE_string(data_file_prefix);
+DECLARE_string(data_file_name);
 
 // frame names
 DECLARE_string(novatel_frame_name);
