@@ -130,7 +130,7 @@ void Crosswalk::MakeDecisions(Frame* frame,
       bool is_on_road =
           reference_line_info->reference_line().HasOverlap(obstacle_box);
       bool is_path_cross =
-          path_obstacle->reference_line_st_boundary().IsEmpty();
+          !path_obstacle->reference_line_st_boundary().IsEmpty();
 
       ADEBUG << "obstacle_id[" << obstacle_id
           << "] type[" << obstacle_type_name
