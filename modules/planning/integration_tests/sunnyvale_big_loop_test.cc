@@ -266,6 +266,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
  */
 TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
   FLAGS_enable_crosswalk = true;
+  FLAGS_enable_traffic_light = false;
 
   std::string seq_num = "8";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
