@@ -34,6 +34,7 @@ using apollo::common::Status;
 using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
+using apollo::perception::pcl_util::PointCloud;
 using apollo::perception::pcl_util::PointCloudPtr;
 using apollo::perception::pcl_util::PointD;
 using apollo::perception::pcl_util::PointXYZIT;
@@ -50,6 +51,11 @@ Status DataGenerator::Init() {
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
   CHECK(AdapterManager::GetLocalization())
       << "Localization is not initialized.";
+
+  const std::string file_name = FLAGS_data_file_prefix + FLAGS_data_file_name +
+                                "_" + std::to_string(num_data_frame_);
+  data_file_ = new std::ofstream(file_name);
+  CHECK(data_file_->is_open()) << file_name;
 
   return Status::OK();
 }
@@ -95,13 +101,15 @@ void DataGenerator::RunOnce() {
 }
 
 bool DataGenerator::Process(const sensor_msgs::PointCloud2& message) {
-  PointCloudPtr cld;
+  PointCloudPtr cld(new PointCloud);
   TransPointCloudMsgToPCL(message, &cld);
   AINFO << "PointCloud size = " << cld->points.size();
 
-  Matrix4d velodyne_to_novatel_trans;
+  std::shared_ptr<Matrix4d> velodyne_to_novatel_trans =
+      std::make_shared<Matrix4d>();
   if (!GetTrans(FLAGS_novatel_frame_name, FLAGS_velodyne64_frame_name,
-                message.header.stamp.toSec(), &velodyne_to_novatel_trans)) {
+                message.header.stamp.toSec(),
+                velodyne_to_novatel_trans.get())) {
     AERROR << "Fail to transform velodyne64 to novatel at time: "
            << message.header.stamp.toSec();
     return false;
@@ -111,7 +119,14 @@ bool DataGenerator::Process(const sensor_msgs::PointCloud2& message) {
     AERROR << "Fail to transform point cloud to world.";
     return false;
   }
-  // TODO(All): output point cloud data
+
+  // TODO(All): output labeled obstacle config data
+  for (size_t i = 0; i < cld->points.size(); ++i) {
+    auto& point = cld->points[i];
+    (*data_file_) << point.x << " " << point.y << " " << point.x << " "
+                  << point.intensity << ", ";
+  }
+  (*data_file_) << "\n";
   return true;
 }
 
@@ -124,7 +139,10 @@ Status DataGenerator::Start() {
   return Status::OK();
 }
 
-void DataGenerator::Stop() {}
+void DataGenerator::Stop() {
+  data_file_->close();
+  delete data_file_;
+}
 
 void DataGenerator::TransPointCloudMsgToPCL(
     const sensor_msgs::PointCloud2& cloud_msg, PointCloudPtr* cloud_pcl) {
@@ -141,8 +159,8 @@ void DataGenerator::TransPointCloudMsgToPCL(
   cloud->sensor_orientation_ = in_cloud.sensor_orientation_;
   cloud->points.resize(in_cloud.points.size());
   size_t points_num = 0;
-  for (size_t idx = 0; idx < in_cloud.size(); ++idx) {
-    pcl_util::PointXYZIT& pt = in_cloud.points[idx];
+  for (size_t i = 0; i < in_cloud.size(); ++i) {
+    pcl_util::PointXYZIT& pt = in_cloud.points[i];
     if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z) && !isnan(pt.intensity)) {
       cloud->points[points_num].x = pt.x;
       cloud->points[points_num].y = pt.y;
@@ -186,9 +204,9 @@ bool DataGenerator::GetTrans(const std::string& to_frame,
   return true;
 }
 
-bool DataGenerator::TransformPointCloudToWorld(const Matrix4d& velodyne_trans,
-                                               PointCloudPtr* cld) {
-  Affine3d affine_3d_trans(velodyne_trans);
+bool DataGenerator::TransformPointCloudToWorld(
+    std::shared_ptr<Matrix4d> velodyne_trans, PointCloudPtr* cld) {
+  Affine3d affine_3d_trans(*velodyne_trans);
   for (size_t i = 0; i < (*cld)->points.size(); ++i) {
     auto& pt = (*cld)->points[i];
     PointD point = {pt.x, pt.y, pt.z, 0};
