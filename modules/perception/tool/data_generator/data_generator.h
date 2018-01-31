@@ -49,15 +49,15 @@ class DataGenerator : public apollo::common::ApolloApp {
 
  private:
   void RunOnce();
-  void Process(const sensor_msgs::PointCloud2& message);
+  bool Process(const sensor_msgs::PointCloud2& message);
   void OnTimer(const ros::TimerEvent&);
 
   void TransPointCloudMsgToPCL(const sensor_msgs::PointCloud2& cloud_msg,
                                pcl_util::PointCloudPtr* cloud_pcl);
-  bool GetTrans(const std::string from_coordinate,
-                const std::string to_coordinate, const double query_time,
-                Eigen::Matrix4d* trans);
-
+  bool GetTrans(const std::string& to_frame, const std::string& from_frame,
+                const double query_time, Eigen::Matrix4d* trans);
+  bool TransformPointCloudToWorld(const Eigen::Matrix4d& velodyne_trans,
+                                  pcl_util::PointCloudPtr* cld);
   ros::Timer timer_;
   int i = 0;
 };
