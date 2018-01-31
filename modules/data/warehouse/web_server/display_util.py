@@ -20,18 +20,22 @@
 import datetime
 import math
 import os
+import pytz
 import sys
+
+import gflags
 
 from modules.canbus.proto.chassis_pb2 import Chassis
 from modules.data.proto.task_pb2 import Task
 
-EPOCH = datetime.datetime(1970, 1, 1)
+gflags.DEFINE_string('timezone', 'America/Los_Angeles', 'Timezone.')
 
 
 def timestamp_to_time(timestamp):
     """Convert Unix epoch timestamp to readable time."""
-    dt = EPOCH + datetime.timedelta(seconds = int(timestamp))
-    return dt.strftime('%Y-%m-%d %H:%M:%S')
+    dt = datetime.datetime.fromtimestamp(timestamp, pytz.utc)
+    local_tz = pytz.timezone(gflags.FLAGS.timezone)
+    return dt.astimezone(local_tz).strftime('%Y-%m-%d %H:%M:%S')
 
 
 def task_id_to_path(task_id):
