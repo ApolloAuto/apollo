@@ -32,18 +32,20 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::time::Clock;
 
-void ControllerAgent::RegisterControllers() {
-  if (!FLAGS_use_mpc) {
+void ControllerAgent::RegisterControllers(const ControlConf *control_conf) {
+  AINFO << "Only support MPC controller or Lat + Lon controllers as of now";
+  if (control_conf->active_controllers().size() == 1 &&
+      control_conf->active_controllers(0) == ControlConf::MPC_CONTROLLER) {
+    controller_factory_.Register(
+        ControlConf::MPC_CONTROLLER,
+        []() -> Controller * { return new MPCController(); });
+  } else {
     controller_factory_.Register(
         ControlConf::LAT_CONTROLLER,
         []() -> Controller * { return new LatController(); });
     controller_factory_.Register(
         ControlConf::LON_CONTROLLER,
         []() -> Controller * { return new LonController(); });
-  } else {
-    controller_factory_.Register(
-        ControlConf::MPC_CONTROLLER,
-        []() -> Controller * { return new MPCController(); });
   }
 }
 
@@ -68,7 +70,7 @@ Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {
 }
 
 Status ControllerAgent::Init(const ControlConf *control_conf) {
-  RegisterControllers();
+  RegisterControllers(control_conf);
   CHECK(InitializeConf(control_conf).ok()) << "Fail to initialize config.";
   for (auto &controller : controller_list_) {
     if (controller == NULL || !controller->Init(control_conf_).ok()) {
