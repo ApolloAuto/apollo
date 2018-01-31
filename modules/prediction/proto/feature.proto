@@ -64,4 +64,5 @@ message Feature {
 
     optional bool is_still = 22 [default = false];
     optional apollo.perception.PerceptionObstacle.Type type = 23;
+    optional double label_update_time_delta = 24;
 }
