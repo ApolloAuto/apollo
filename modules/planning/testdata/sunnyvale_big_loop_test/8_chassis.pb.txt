@@ -3,43 +3,43 @@ engine_rpm: 0
 speed_mps: 0
 odometer_m: 0
 fuel_range_m: 0
-throttle_percentage: 15.239185
-brake_percentage: 22.894636
-steering_percentage: 0.021276595
-steering_torque_nm: 0
+throttle_percentage: 15.275806
+brake_percentage: 26.094454
+steering_percentage: 0.65957445
+steering_torque_nm: -0.0625
 parking_brake: false
-driving_mode: COMPLETE_AUTO_DRIVE
+driving_mode: EMERGENCY_MODE
 error_code: NO_ERROR
 gear_location: GEAR_DRIVE
 header {
-  timestamp_sec: 1517275961.8623116
+  timestamp_sec: 1517275942.8579326
   module_name: "chassis"
-  sequence_num: 201283
+  sequence_num: 199385
 }
 signal {
   turn_signal: TURN_LEFT
   horn: false
 }
 chassis_gps {
-  latitude: 37.41456
-  longitude: -122.02524799999999
+  latitude: 37.414565333333329
+  longitude: -122.02523733333332
   gps_valid: true
   year: 18
   month: 1
   day: 30
   hours: 1
   minutes: 32
-  seconds: 40
+  seconds: 21
   compass_direction: 180
-  pdop: 1.2000000000000002
+  pdop: 1
   is_gps_fault: false
   is_inferred: false
   altitude: 6
-  heading: 195.86
+  heading: 195.74
   hdop: 0.60000000000000009
-  vdop: 1
+  vdop: 0.8
   quality: FIX_3D
-  num_satellites: 17
+  num_satellites: 18
   gps_speed: 0
 }
 engage_advice {
