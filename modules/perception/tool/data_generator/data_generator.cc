@@ -35,6 +35,7 @@ using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::perception::pcl_util::PointCloudPtr;
+using apollo::perception::pcl_util::PointD;
 using apollo::perception::pcl_util::PointXYZIT;
 using Eigen::Affine3d;
 using Eigen::Matrix4d;
@@ -93,12 +94,25 @@ void DataGenerator::RunOnce() {
   Process(point_cloud_msg);
 }
 
-void DataGenerator::Process(const sensor_msgs::PointCloud2& message) {
+bool DataGenerator::Process(const sensor_msgs::PointCloud2& message) {
   PointCloudPtr cld;
   TransPointCloudMsgToPCL(message, &cld);
   AINFO << "PointCloud size = " << cld->points.size();
 
-  // TODO(All): label point cloud and generate data automatically below
+  Matrix4d velodyne_to_novatel_trans;
+  if (!GetTrans(FLAGS_novatel_frame_name, FLAGS_velodyne64_frame_name,
+                message.header.stamp.toSec(), &velodyne_to_novatel_trans)) {
+    AERROR << "Fail to transform velodyne64 to novatel at time: "
+           << message.header.stamp.toSec();
+    return false;
+  }
+
+  if (!TransformPointCloudToWorld(velodyne_to_novatel_trans, &cld)) {
+    AERROR << "Fail to transform point cloud to world.";
+    return false;
+  }
+  // TODO(All): output point cloud data
+  return true;
 }
 
 Status DataGenerator::Start() {
@@ -140,18 +154,18 @@ void DataGenerator::TransPointCloudMsgToPCL(
   cloud->points.resize(points_num);
 }
 
-bool DataGenerator::GetTrans(const std::string from_coordinate,
-                             const std::string to_coordinate,
+bool DataGenerator::GetTrans(const std::string& to_frame,
+                             const std::string& from_frame,
                              const double query_time, Matrix4d* trans) {
   CHECK_NOTNULL(trans);
   ros::Time query_stamp(query_time);
   const auto& tf2_buffer = AdapterManager::Tf2Buffer();
   const double kTf2BuffSize = 10 / 1000.0;  // buff size
   std::string err_msg;
-  if (!tf2_buffer.canTransform(from_coordinate, to_coordinate, query_stamp,
+  if (!tf2_buffer.canTransform(to_frame, from_frame, query_stamp,
                                ros::Duration(kTf2BuffSize), &err_msg)) {
-    AERROR << "Cannot transform frame from " << from_coordinate << " to frame "
-           << to_coordinate << " , err: " << err_msg
+    AERROR << "Cannot transform frame from " << from_frame << " to frame "
+           << to_frame << " , err: " << err_msg
            << ". Frames: " << tf2_buffer.allFramesAsString();
     return false;
   }
@@ -159,7 +173,7 @@ bool DataGenerator::GetTrans(const std::string from_coordinate,
   geometry_msgs::TransformStamped transform_stamped;
   try {
     transform_stamped =
-        tf2_buffer.lookupTransform(from_coordinate, to_coordinate, query_stamp);
+        tf2_buffer.lookupTransform(to_frame, from_frame, query_stamp);
   } catch (tf2::TransformException& ex) {
     AERROR << "Exception: " << ex.what();
     return false;
@@ -168,8 +182,21 @@ bool DataGenerator::GetTrans(const std::string from_coordinate,
   Affine3d affine_3d;
   tf::transformMsgToEigen(transform_stamped.transform, affine_3d);
   *trans = affine_3d.matrix();
-  ADEBUG << from_coordinate << " to " << to_coordinate
-         << ",  trans = " << *trans;
+  ADEBUG << from_frame << " to " << to_frame << ",  trans = " << *trans;
+  return true;
+}
+
+bool DataGenerator::TransformPointCloudToWorld(const Matrix4d& velodyne_trans,
+                                               PointCloudPtr* cld) {
+  Affine3d affine_3d_trans(velodyne_trans);
+  for (size_t i = 0; i < (*cld)->points.size(); ++i) {
+    auto& pt = (*cld)->points[i];
+    PointD point = {pt.x, pt.y, pt.z, 0};
+    PointD point_world = pcl::transformPoint(point, affine_3d_trans);
+    pt.x = point_world.x;
+    pt.y = point_world.y;
+    pt.z = point_world.z;
+  }
   return true;
 }
 
