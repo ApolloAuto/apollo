@@ -82,7 +82,7 @@
       <thead>
         <tr>
           <th>Vehicle</th>
-          <th>Time (UTC)</th>
+          <th>Time</th>
           <th>Duration</th>
           <th>Map</th>
           <th>Type</th>
