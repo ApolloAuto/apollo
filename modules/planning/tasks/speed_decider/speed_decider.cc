@@ -181,7 +181,6 @@ Status SpeedDecider::MakeObjectDecision(
           ObjectDecisionType ignore;
           ignore.mutable_ignore();
           path_obstacle->AddLongitudinalDecision("dp_st_graph", ignore);
-
         } else {
           // OVERTAKE decision
           ObjectDecisionType overtake_decision;
