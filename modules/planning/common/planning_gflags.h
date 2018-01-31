@@ -159,7 +159,7 @@ DECLARE_double(signal_expire_time_sec);
 DECLARE_double(max_valid_stop_distance);
 
 /// Clear Zone
-DECLARE_string(clear_zone_virtual_object_id_prefix);
+DECLARE_string(keep_clear_virtual_object_id_prefix);
 /// traffic light
 DECLARE_string(signal_light_virtual_object_id_prefix);
 DECLARE_double(max_deacceleration_for_yellow_light_stop);
