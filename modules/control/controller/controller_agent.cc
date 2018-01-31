@@ -34,18 +34,26 @@ using apollo::common::time::Clock;
 
 void ControllerAgent::RegisterControllers(const ControlConf *control_conf) {
   AINFO << "Only support MPC controller or Lat + Lon controllers as of now";
-  if (control_conf->active_controllers().size() == 1 &&
-      control_conf->active_controllers(0) == ControlConf::MPC_CONTROLLER) {
-    controller_factory_.Register(
-        ControlConf::MPC_CONTROLLER,
-        []() -> Controller * { return new MPCController(); });
-  } else {
-    controller_factory_.Register(
-        ControlConf::LAT_CONTROLLER,
-        []() -> Controller * { return new LatController(); });
-    controller_factory_.Register(
-        ControlConf::LON_CONTROLLER,
-        []() -> Controller * { return new LonController(); });
+  for (auto active_controller : control_conf->active_controllers()) {
+    switch (active_controller) {
+      case ControlConf::MPC_CONTROLLER:
+        controller_factory_.Register(
+            ControlConf::MPC_CONTROLLER,
+            []() -> Controller * { return new MPCController(); });
+        break;
+      case ControlConf::LAT_CONTROLLER:
+        controller_factory_.Register(
+            ControlConf::LAT_CONTROLLER,
+            []() -> Controller * { return new LatController(); });
+        break;
+      case ControlConf::LON_CONTROLLER:
+        controller_factory_.Register(
+            ControlConf::LON_CONTROLLER,
+            []() -> Controller * { return new LonController(); });
+        break;
+      default:
+        AERROR << "Unknown active controller type:" << active_controller;
+    }
   }
 }
 
