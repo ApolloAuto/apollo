@@ -148,6 +148,7 @@ message PlanningData {
   repeated ReferenceLineDebug reference_line = 19;
   optional DpPolyGraphDebug dp_poly_graph = 20;
   optional LatticeStTraining lattice_st_image = 21;
+  optional AutoTuningTrainingData auto_tuning_training_data = 22;
 }
 
 message LatticeStPixel {
@@ -166,6 +167,15 @@ message LatticeStTraining {
   optional uint32 num_t_grids = 5;
   optional double s_resolution = 6;
   optional double t_resolution = 7;
+}
+
+message CostComponents {
+  repeated double cost_component = 1;
+}
+
+message AutoTuningTrainingData {
+  optional CostComponents teacher_component = 1;
+  optional CostComponents student_component = 2;
 }
 
 message CloudReferenceLineRequest {

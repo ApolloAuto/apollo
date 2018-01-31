@@ -214,15 +214,14 @@ Status LatticePlanner::PlanOnReferenceLine(
   std::size_t collision_failure_count = 0;
   std::size_t combined_constraint_failure_count = 0;
 
-  // planning_internal::Debug* ptr_debug = reference_line_info->mutable_debug();
-
   int num_lattice_traj = 0;
+  std::vector<double>  trajectory_pair_cost_components;
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
     double trajectory_pair_cost =
         trajectory_evaluator.top_trajectory_pair_cost();
     // For auto tuning
     if (FLAGS_enable_auto_tuning) {
-      std::vector<double> trajectory_pair_cost_components =
+      trajectory_pair_cost_components =
           trajectory_evaluator.top_trajectory_pair_component_cost();
       ADEBUG << "TrajectoryPairComponentCost";
       ADEBUG << "travel_cost = " << trajectory_pair_cost_components[0];
@@ -285,8 +284,24 @@ Status LatticePlanner::PlanOnReferenceLine(
           planning_target, lon_future_trajectory, lat_future_trajectory,
           &future_traj_component_cost);
 
-
       // 4. emit
+      planning_internal::PlanningData* ptr_debug =
+        reference_line_info->mutable_debug()->mutable_planning_data();
+
+      apollo::planning_internal::AutoTuningTrainingData auto_tuning_data;
+
+      for (double student_cost_component : trajectory_pair_cost_components) {
+        auto_tuning_data.mutable_student_component()
+          ->add_cost_component(student_cost_component);
+      }
+
+      for (double teacher_cost_component : future_traj_component_cost) {
+        auto_tuning_data.mutable_teacher_component()
+          ->add_cost_component(teacher_cost_component);
+      }
+
+      ptr_debug->mutable_auto_tuning_training_data()
+        ->CopyFrom(auto_tuning_data);
     }
 
     // Print the chosen end condition and start condition
