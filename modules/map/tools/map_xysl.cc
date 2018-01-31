@@ -323,6 +323,8 @@ int main(int argc, char *argv[]) {
       !FLAGS_lane_to_lane && FLAGS_lane.empty() && FLAGS_dump_txt_map.empty() &&
       FLAGS_dump_bin_map.empty() && FLAGS_signal_info.empty() &&
       FLAGS_overlap.empty()) {
+    std::cout << "usage: --map_dir map/file/directory/" << std::endl;
+    std::cout << "usage: --base_map_filename map_file_name" << std::endl;
     std::cout << "usage: --dump_txt_map text_map_file" << std::endl;
     std::cout << "usage: --dump_bin_map bin_map_file" << std::endl;
     std::cout << "usage: --xy_to_sl --x x --y y" << std::endl;
