@@ -45,8 +45,8 @@ em_planner_config {
         jerk_weight: 10.0
         obstacle_weight: 1.0
         reference_weight: 0.0
-        go_down_buffer: 5.0
-        go_up_buffer: 5.0
+        go_down_buffer: 2.0
+        go_up_buffer: 2.0
 
         default_obstacle_cost: 1e3
 
