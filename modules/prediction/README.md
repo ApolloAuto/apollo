@@ -17,7 +17,7 @@
   * Container
 
       Container stores input data from subscribed channels. Current supported
-      inputs are **_perception obstacles_** and **_vehicle localization_**.
+      inputs are **_perception obstacles_**, **_vehicle localization_** and **_vehicle planning_**.
 
   * Evaluator
 
@@ -30,6 +30,7 @@
       Predictor generates predicted trajectories for obstacles. Currently
       supported predictor includes:
 
-      * Lane sequence: obstacle moves following the lanes
+      * Lane sequence: obstacle moves along the lanes
+      * Move sequence: obstacle moves along the lanes by following its kinetic pattern
       * Free movement: obstacle moves freely
       * Regional movement: obstacle moves in a possible region
