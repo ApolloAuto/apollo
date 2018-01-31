@@ -43,10 +43,10 @@ class Renderer {
         this.map = new Map();
 
         // The main autonomous driving car.
-        this.adc = new AutoDrivingCar();
-        // The mesh this.adc.mesh is not added to the scene because it
-        // takes time to load. It will be added later on.
-        this.adcMeshAddedToScene = false;
+        this.adc = new AutoDrivingCar('adc', this.scene);
+
+        // The car that projects the starting point of the planning trajectory
+        this.planningAdc = OFFLINE_PLAYBACK ? null : new AutoDrivingCar('plannigAdc', this.scene);
 
         // The planning tranjectory.
         this.planningTrajectory = new PlanningTrajectory();
@@ -298,14 +298,6 @@ class Renderer {
             return;
         }
 
-        // Upon the first time in render() it sees car mesh loaded,
-        // added it to the scene.
-        if (!this.adcMeshAddedToScene) {
-            this.adcMeshAddedToScene = true;
-            this.adc.mesh.name = "adc";
-            this.scene.add(this.adc.mesh);
-        }
-
         // Upon the first time in render() it sees ground mesh loaded,
         // added it to the scene.
         if (this.ground.type === "default" && !this.ground.initialized) {
@@ -330,13 +322,18 @@ class Renderer {
     }
 
     updateWorld(world) {
-        this.adc.update(world, this.coordinates);
+        this.adc.update(this.coordinates, world.autoDrivingCar);
         this.ground.update(world, this.coordinates, this.scene);
         this.planningTrajectory.update(world, world.planningData, this.coordinates, this.scene);
         this.perceptionObstacles.update(world, this.coordinates, this.scene);
         this.decision.update(world, this.coordinates, this.scene);
         this.prediction.update(world, this.coordinates, this.scene);
         this.routing.update(world, this.coordinates, this.scene);
+
+        if (this.planningAdc &&
+            world.planningTrajectory && world.planningTrajectory.length) {
+            this.planningAdc.update(this.coordinates, world.planningTrajectory[0]);
+        }
     }
 
     updateGroundMetadata(serverUrl, mapInfo) {
