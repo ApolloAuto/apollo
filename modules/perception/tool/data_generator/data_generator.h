@@ -21,6 +21,7 @@
 #ifndef MODEULES_PERCEPTION_TOOL_DATE_GENERATOR_DATA_GENERATOR_
 #define MODEULES_PERCEPTION_TOOL_DATE_GENERATOR_DATA_GENERATOR_
 
+#include <memory>
 #include <string>
 
 #include "sensor_msgs/PointCloud2.h"
