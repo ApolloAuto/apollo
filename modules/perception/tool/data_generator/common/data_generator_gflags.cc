@@ -21,6 +21,11 @@ DEFINE_string(
     "/apollo/modules/perception/tool/data_generator/conf/adapter.conf",
     "The data generator adapter config filename");
 
+DEFINE_string(data_file_prefix,
+              "/apollo/modules/perception/tool/data_generator/data/",
+              "The collected data file location.");
+DEFINE_string(data_file_name, "sensor_data", "The data file name.");
+
 DEFINE_string(novatel_frame_name, "novatel", "The frame name for novatel.");
 DEFINE_string(velodyne64_frame_name, "velodyne64",
               "The frame name for velodyne64.");
