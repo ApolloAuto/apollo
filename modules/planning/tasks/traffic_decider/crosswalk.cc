@@ -62,6 +62,8 @@ void Crosswalk::MakeDecisions(Frame* frame,
   auto* path_decision = reference_line_info->path_decision();
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
 
+  std::vector<const hdmap::PathOverlap*> crosswalks_to_stop;
+
   for (auto crosswalk_overlap : crosswalk_overlaps_) {
     auto crosswalk_ptr = HDMapUtil::BaseMap().GetCrosswalkById(
         hdmap::MakeMapId(crosswalk_overlap->object_id));
@@ -73,8 +75,8 @@ void Crosswalk::MakeDecisions(Frame* frame,
     if (adc_front_edge_s - stop_line_end_s >
         FLAGS_crosswalk_min_pass_distance) {
       ADEBUG << "skip: crosswalk_id[" << crosswalk_id
-          << "]; stop_line_end_s[" << stop_line_end_s
-          << "]; adc_front_edge_s[" << adc_front_edge_s
+          << "] stop_line_end_s[" << stop_line_end_s
+          << "] adc_front_edge_s[" << adc_front_edge_s
           << "]. adc_front_edge passes stop_line_end_s + buffer.";
       continue;
     }
@@ -109,8 +111,9 @@ void Crosswalk::MakeDecisions(Frame* frame,
 
       if (!in_expanded_crosswalk) {
         ADEBUG << "skip: obstacle_id[" << obstacle_id
-               << "]; crosswalk_id[" << crosswalk_id
-               << "]: not in crosswalk expanded area";
+            << "] type[" << obstacle_type_name
+            << "] crosswalk_id[" << crosswalk_id
+            << "]: not in crosswalk expanded area";
         continue;
       }
 
@@ -128,12 +131,14 @@ void Crosswalk::MakeDecisions(Frame* frame,
       bool is_path_cross =
           path_obstacle->reference_line_st_boundary().IsEmpty();
 
-      ADEBUG << "obstacle_id[" << obstacle_id << "]; type["
-             << obstacle_type_name << "]; crosswalk_id[" << crosswalk_id
-             << "]; obstacle_l[" << obstacle_l << "]; within_crosswalk_area["
-             << in_crosswalk << "]; within_expanded_crosswalk_area["
-             << in_expanded_crosswalk << "]; is_on_road[" << is_on_road
-             << "]; is_path_cross[" << is_path_cross << "]";
+      ADEBUG << "obstacle_id[" << obstacle_id
+          << "] type[" << obstacle_type_name
+          << "] crosswalk_id[" << crosswalk_id
+          << "] obstacle_l[" << obstacle_l
+          << "] within_crosswalk_area[" << in_crosswalk
+          << "] within_expanded_crosswalk_area[" << in_expanded_crosswalk
+          << "] is_on_road[" << is_on_road
+          << "] is_path_cross[" << is_path_cross << "]";
 
       bool stop = false;
       if (obstacle_l >= FLAGS_crosswalk_loose_l_distance) {
@@ -142,7 +147,8 @@ void Crosswalk::MakeDecisions(Frame* frame,
         if (is_path_cross) {
           stop = true;
           ADEBUG << "need_stop(>=l2): obstacle_id[" << obstacle_id
-                 << "]; crosswalk_id[" << crosswalk_id << "]";
+              << "] type[" << obstacle_type_name
+              << "] crosswalk_id[" << crosswalk_id << "]";
         }
       } else if (obstacle_l <= FLAGS_crosswalk_strick_l_distance) {
         // (2) when l_distance <= strick_l_distance + on_road(not on sideway),
@@ -152,7 +158,8 @@ void Crosswalk::MakeDecisions(Frame* frame,
         if (is_on_road || is_path_cross) {
           stop = true;
           ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id
-                 << "]; crosswalk_id[" << crosswalk_id << "]";
+              << "] type[" << obstacle_type_name
+              << "] crosswalk_id[" << crosswalk_id << "]";
         }
       } else {
         // TODO(all)
@@ -162,8 +169,9 @@ void Crosswalk::MakeDecisions(Frame* frame,
       }
 
       if (!stop) {
-        ADEBUG << "skip: obstacle_id[" << obstacle_id << "]; crosswalk_id["
-               << crosswalk_id << "]";
+        ADEBUG << "skip: obstacle_id[" << obstacle_id
+            << "] type[" << obstacle_type_name
+            << "] crosswalk_id[" << crosswalk_id << "]";
         continue;
       }
 
@@ -171,10 +179,14 @@ void Crosswalk::MakeDecisions(Frame* frame,
       double stop_deceleration =
           GetStopDeceleration(reference_line_info, crosswalk_overlap);
       if (stop_deceleration < FLAGS_stop_max_deceleration) {
-        BuildStopDecision(frame, reference_line_info, crosswalk_overlap);
+        crosswalks_to_stop.push_back(crosswalk_overlap);
+        ADEBUG << "crosswalk_id[" << crosswalk_id << "] STOP";
       }
-      ADEBUG << "crosswalk_id[" << crosswalk_id << "] STOP";
     }
+  }
+
+  for (auto crosswalk_to_stop : crosswalks_to_stop) {
+    BuildStopDecision(frame, reference_line_info, crosswalk_to_stop);
   }
 }
 
