@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/tasks/traffic_decider/clear_zone.h"
+#include "modules/planning/tasks/traffic_decider/keep_clear.h"
 
 #include <limits>
 #include <vector>
@@ -36,32 +36,32 @@ using apollo::common::adapter::AdapterManager;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 
-ClearZone::ClearZone(const RuleConfig& config) : TrafficRule(config) {}
+KeepClear::KeepClear(const RuleConfig& config) : TrafficRule(config) {}
 
-bool ClearZone::ApplyRule(Frame* frame,
+bool KeepClear::ApplyRule(Frame* frame,
                           ReferenceLineInfo* const reference_line_info) {
   frame_ = frame;
   reference_line_info_ = reference_line_info;
   const auto& map_path = reference_line_info_->reference_line().map_path();
-  for (const auto& clear_zone : map_path.clear_area_overlaps()) {
-    if (!BuildClearZoneObstacle(clear_zone)) {
-      AERROR << "Failed to build clear zone : " << clear_zone.object_id;
+  for (const auto& keep_clear : map_path.clear_area_overlaps()) {
+    if (!BuildKeepClearObstacle(keep_clear)) {
+      AERROR << "Failed to build clear zone : " << keep_clear.object_id;
       return false;
     }
   }
   return true;
 }
 
-bool ClearZone::BuildClearZoneObstacle(
-    const hdmap::PathOverlap& clear_zone_overlap) {
+bool KeepClear::BuildKeepClearObstacle(
+    const hdmap::PathOverlap& keep_clear_overlap) {
   const double front_edge_s = reference_line_info_->AdcSlBoundary().end_s();
-  if (clear_zone_overlap.start_s < front_edge_s) {
+  if (keep_clear_overlap.start_s < front_edge_s) {
     ADEBUG << "adc is already inside clear zone "
-           << clear_zone_overlap.object_id << ", skip this clear zone";
+           << keep_clear_overlap.object_id << ", skip this clear zone";
     return true;
   }
   common::SLPoint sl_point;
-  sl_point.set_s(clear_zone_overlap.start_s);
+  sl_point.set_s(keep_clear_overlap.start_s);
   sl_point.set_l(0.0);
   common::math::Vec2d start_xy;
   const auto& reference_line = reference_line_info_->reference_line();
@@ -71,24 +71,24 @@ bool ClearZone::BuildClearZoneObstacle(
   }
   double left_lane_width = 0.0;
   double right_lane_width = 0.0;
-  if (!reference_line.GetLaneWidth(clear_zone_overlap.start_s, &left_lane_width,
+  if (!reference_line.GetLaneWidth(keep_clear_overlap.start_s, &left_lane_width,
                                    &right_lane_width)) {
-    AERROR << "Failed to get lane width at s = " << clear_zone_overlap.start_s;
+    AERROR << "Failed to get lane width at s = " << keep_clear_overlap.start_s;
     return false;
   }
   common::math::Vec2d end_xy;
-  sl_point.set_s(clear_zone_overlap.end_s);
+  sl_point.set_s(keep_clear_overlap.end_s);
   if (!reference_line_info_->reference_line().SLToXY(sl_point, &end_xy)) {
     AERROR << "Failed to get xy from sl: " << sl_point.DebugString();
     return false;
   }
-  common::math::Box2d clear_zone_box{
+  common::math::Box2d keep_clear_box{
       common::math::LineSegment2d(start_xy, end_xy),
       left_lane_width + right_lane_width};
   const auto obstacle_id =
-      FLAGS_clear_zone_virtual_object_id_prefix + clear_zone_overlap.object_id;
+      FLAGS_keep_clear_virtual_object_id_prefix + keep_clear_overlap.object_id;
   auto* obstacle =
-      frame_->AddStaticVirtualObstacle(obstacle_id, clear_zone_box);
+      frame_->AddStaticVirtualObstacle(obstacle_id, keep_clear_box);
   if (!obstacle) {
     AERROR << "Failed to create obstacle " << obstacle_id << " in frame";
     return false;

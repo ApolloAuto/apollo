@@ -262,8 +262,8 @@ DEFINE_double(max_valid_stop_distance, 3.0,
               "considered as a valid stop");
 
 /// Clear Zone
-DEFINE_string(clear_zone_virtual_object_id_prefix, "CZ_",
-              "prefix for converting clear zone id to virtual object id");
+DEFINE_string(keep_clear_virtual_object_id_prefix, "KC_",
+              "prefix for converting keep-clear id to virtual object id");
 /// traffic light
 DEFINE_string(signal_light_virtual_object_id_prefix, "SL_",
               "prefix for converting signal id to virtual object id");
