@@ -128,8 +128,9 @@ Status SpeedDecider::MakeObjectDecision(
   for (const auto* obstacle : path_decision->path_obstacles().Items()) {
     auto* path_obstacle = path_decision->Find(obstacle->Id());
     const auto& boundary = path_obstacle->st_boundary();
+    const double kMaxDecisionTimeRange = 8.0;
     if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
-        boundary.max_t() < 0.0) {
+        boundary.max_t() < 0.0 || boundary.min_t() > kMaxDecisionTimeRange) {
       AppendIgnoreDecision(path_obstacle);
       continue;
     }
