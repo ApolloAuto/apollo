@@ -259,6 +259,23 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   RUN_GOLDEN_TEST(2);
 }
 
+/*
+ * crosswalk: pedestrian on crosswalk
+ * bag: 2018-01-29-17-22-46/2018-01-29-17-31-47_9.bag
+ * decision: STOP
+ */
+TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
+  FLAGS_enable_crosswalk = true;
+
+  std::string seq_num = "8";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(0);
+}
+
 }  // namespace planning
 }  // namespace apollo
 
