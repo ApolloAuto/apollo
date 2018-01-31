@@ -30,6 +30,7 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/tasks/traffic_decider/util.h"
 
 namespace apollo {
 namespace planning {
@@ -176,8 +177,8 @@ void Crosswalk::MakeDecisions(Frame* frame,
       }
 
       // stop decision
-      double stop_deceleration =
-          GetStopDeceleration(reference_line_info, crosswalk_overlap);
+      double stop_deceleration = util::GetADCStopDeceleration(
+          reference_line_info, crosswalk_overlap->start_s);
       if (stop_deceleration < FLAGS_stop_max_deceleration) {
         crosswalks_to_stop.push_back(crosswalk_overlap);
         ADEBUG << "crosswalk_id[" << crosswalk_id << "] STOP";
@@ -198,29 +199,6 @@ bool Crosswalk::FindCrosswalks(ReferenceLineInfo* const reference_line_info) {
     crosswalk_overlaps_.push_back(&crosswalk_overlap);
   }
   return crosswalk_overlaps_.size() > 0;
-}
-
-double Crosswalk::GetStopDeceleration(
-    ReferenceLineInfo* const reference_line_info,
-    const hdmap::PathOverlap* crosswalk_overlap) {
-  double adc_speed =
-      common::VehicleStateProvider::instance()->linear_velocity();
-  if (adc_speed < FLAGS_stop_max_speed) {
-    return 0.0;
-  }
-  double stop_distance = 0;
-  double adc_front_s = reference_line_info->AdcSlBoundary().end_s();
-  double stop_line_s = crosswalk_overlap->start_s;
-
-  if (stop_line_s > adc_front_s) {
-    stop_distance = stop_line_s - adc_front_s;
-  } else {
-    stop_distance = stop_line_s + FLAGS_stop_max_distance_buffer - adc_front_s;
-  }
-  if (stop_distance < 1e-5) {
-    return std::numeric_limits<double>::max();
-  }
-  return (adc_speed * adc_speed) / (2 * stop_distance);
 }
 
 bool Crosswalk::BuildStopDecision(
