@@ -30,12 +30,12 @@
 namespace apollo {
 namespace hdmap {
 
-using common::math::LineSegment2d;
-using common::math::Polygon2d;
-using common::math::Vec2d;
 using common::math::Box2d;
 using common::math::kMathEpsilon;
+using common::math::LineSegment2d;
+using common::math::Polygon2d;
 using common::math::Sqr;
+using common::math::Vec2d;
 using std::placeholders::_1;
 
 namespace {
@@ -43,7 +43,7 @@ namespace {
 const double kSampleDistance = 0.25;
 
 bool FindLaneSegment(const MapPathPoint& p1, const MapPathPoint& p2,
-                       LaneSegment* const lane_segment) {
+                     LaneSegment* const lane_segment) {
   for (const auto& wp1 : p1.lane_waypoints()) {
     for (const auto& wp2 : p2.lane_waypoints()) {
       if (wp1.lane->id().id() == wp2.lane->id().id() && wp1.s < wp2.s) {
@@ -124,6 +124,25 @@ LaneWaypoint LeftNeighborWaypoint(const LaneWaypoint& waypoint) {
     }
   }
   return neighbor;
+}
+
+void LaneSegment::Join(std::vector<LaneSegment>* segments) {
+  std::size_t k = 0;
+  std::size_t i = 0;
+  while (i < segments->size()) {
+    std::size_t j = i;
+    while (j + 1 < segments->size() &&
+           segments->at(i).lane->id().id() ==
+               segments->at(j + 1).lane->id().id()) {
+      ++j;
+    }
+    segments->at(k).lane = segments->at(i).lane;
+    segments->at(k).start_s = segments->at(i).start_s;
+    segments->at(k).end_s = segments->at(j).end_s;
+    i = j + 1;
+    ++k;
+  }
+  segments->resize(k);
 }
 
 LaneWaypoint RightNeighborWaypoint(const LaneWaypoint& waypoint) {
@@ -262,22 +281,21 @@ void Path::InitPoints() {
 
 void Path::InitLaneSegments() {
   if (lane_segments_.empty()) {
-    lane_segments_.reserve(num_points_);
     for (int i = 0; i + 1 < num_points_; ++i) {
       LaneSegment lane_segment;
       if (FindLaneSegment(path_points_[i], path_points_[i + 1],
-                            &lane_segment)) {
+                          &lane_segment)) {
         lane_segments_.push_back(lane_segment);
       }
     }
   }
+  LaneSegment::Join(&lane_segments_);
 
   lane_segments_to_next_point_.clear();
   lane_segments_to_next_point_.reserve(num_points_);
   for (int i = 0; i + 1 < num_points_; ++i) {
     LaneSegment lane_segment;
-    if (FindLaneSegment(path_points_[i], path_points_[i + 1],
-                          &lane_segment)) {
+    if (FindLaneSegment(path_points_[i], path_points_[i + 1], &lane_segment)) {
       lane_segments_to_next_point_.push_back(lane_segment);
     } else {
       lane_segments_to_next_point_.push_back(LaneSegment());
