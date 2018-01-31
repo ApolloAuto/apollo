@@ -272,7 +272,7 @@ DEFINE_double(max_deacceleration_for_yellow_light_stop, 3.0,
               " in m/s^2) is less than this threshold; otherwise treated"
               " as green light");
 /// crosswalk
-DEFINE_bool(enable_crosswalk, false, "enable crosswalk");
+DEFINE_bool(enable_crosswalk, true, "enable crosswalk");
 DEFINE_string(crosswalk_virtual_object_id_prefix, "CW_",
               "prefix for converting crosswalk id to virtual object id");
 DEFINE_double(crosswalk_expand_distance, 2.0,

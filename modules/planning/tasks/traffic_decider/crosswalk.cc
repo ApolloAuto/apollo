@@ -62,38 +62,38 @@ void Crosswalk::MakeDecisions(Frame* frame,
   auto* path_decision = reference_line_info->path_decision();
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
 
-  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    const PerceptionObstacle& perception_obstacle =
-        path_obstacle->obstacle()->Perception();
-    const std::string& obstacle_id = path_obstacle->Id();
-    PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
-    std::string obstacle_type_name =
-        PerceptionObstacle_Type_Name(obstacle_type);
+  for (auto crosswalk_overlap : crosswalk_overlaps_) {
+    auto crosswalk_ptr = HDMapUtil::BaseMap().GetCrosswalkById(
+        hdmap::MakeMapId(crosswalk_overlap->object_id));
+    auto crosswalk_info = crosswalk_ptr.get();
+    std::string crosswalk_id = crosswalk_info->id().id();
 
-    // check type
-    if (obstacle_type != PerceptionObstacle::PEDESTRIAN &&
-        obstacle_type != PerceptionObstacle::BICYCLE &&
-        obstacle_type != PerceptionObstacle::UNKNOWN_MOVABLE &&
-        obstacle_type != PerceptionObstacle::UNKNOWN) {
-      ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-             << "]. skip";
+    // skip crosswalk if master vehicle body already passes the stop line
+    double stop_line_end_s = crosswalk_overlap->end_s;
+    if (adc_front_edge_s - stop_line_end_s >
+        FLAGS_crosswalk_min_pass_distance) {
+      ADEBUG << "skip: crosswalk_id[" << crosswalk_id
+          << "]; stop_line_end_s[" << stop_line_end_s
+          << "]; adc_front_edge_s[" << adc_front_edge_s
+          << "]. adc_front_edge passes stop_line_end_s + buffer.";
       continue;
     }
 
-    for (auto crosswalk_overlap : crosswalk_overlaps_) {
-      auto crosswalk_ptr = HDMapUtil::BaseMap().GetCrosswalkById(
-          hdmap::MakeMapId(crosswalk_overlap->object_id));
-      auto crosswalk_info = crosswalk_ptr.get();
-      std::string crosswalk_id = crosswalk_info->id().id();
+    for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
+      const PerceptionObstacle& perception_obstacle =
+          path_obstacle->obstacle()->Perception();
+      const std::string& obstacle_id = path_obstacle->Id();
+      PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
+      std::string obstacle_type_name =
+          PerceptionObstacle_Type_Name(obstacle_type);
 
-      // skip crosswalk if master vehicle body already passes the stop line
-      double stop_line_end_s = crosswalk_overlap->end_s;
-      if (adc_front_edge_s - stop_line_end_s >
-          FLAGS_crosswalk_min_pass_distance) {
-        ADEBUG << "skip: crosswalk_id[" << crosswalk_id
-            << "]; stop_line_end_s[" << stop_line_end_s
-            << "]; adc_front_edge_s[" << adc_front_edge_s
-            << "]. adc_front_edge passes stop_line_end_s + buffer.";
+      // check type
+      if (obstacle_type != PerceptionObstacle::PEDESTRIAN &&
+          obstacle_type != PerceptionObstacle::BICYCLE &&
+          obstacle_type != PerceptionObstacle::UNKNOWN_MOVABLE &&
+          obstacle_type != PerceptionObstacle::UNKNOWN) {
+        ADEBUG << "obstacle_id[" << obstacle_id
+            << "] type[" << obstacle_type_name << "]. skip";
         continue;
       }
 
@@ -108,9 +108,9 @@ void Crosswalk::MakeDecisions(Frame* frame,
       bool in_expanded_crosswalk = crosswalk_exp_poly.IsPointIn(point);
 
       if (!in_expanded_crosswalk) {
-        ADEBUG << "skip: not in crosswalk expanded area. "
-               << "obstacle_id[" << obstacle_id
-               << "]; crosswalk_id[" << crosswalk_id << "]";
+        ADEBUG << "skip: obstacle_id[" << obstacle_id
+               << "]; crosswalk_id[" << crosswalk_id
+               << "]: not in crosswalk expanded area";
         continue;
       }
 
@@ -167,11 +167,13 @@ void Crosswalk::MakeDecisions(Frame* frame,
         continue;
       }
 
+      // stop decision
       double stop_deceleration =
           GetStopDeceleration(reference_line_info, crosswalk_overlap);
       if (stop_deceleration < FLAGS_stop_max_deceleration) {
         BuildStopDecision(frame, reference_line_info, crosswalk_overlap);
       }
+      ADEBUG << "crosswalk_id[" << crosswalk_id << "] STOP";
     }
   }
 }
@@ -209,14 +211,15 @@ double Crosswalk::GetStopDeceleration(
   return (adc_speed * adc_speed) / (2 * stop_distance);
 }
 
-bool Crosswalk::BuildStopDecision(Frame* frame,
-                                  ReferenceLineInfo* const reference_line_info,
-                                  const hdmap::PathOverlap* crosswalk_overlap) {
+bool Crosswalk::BuildStopDecision(
+    Frame* frame,
+    ReferenceLineInfo* const reference_line_info,
+    const hdmap::PathOverlap* crosswalk_overlap) {
   // check
   const auto& reference_line = reference_line_info->reference_line();
   if (!WithinBound(0.0, reference_line.Length(), crosswalk_overlap->start_s)) {
-    ADEBUG << "crosswalk " << crosswalk_overlap->object_id
-           << " is not on reference line";
+    ADEBUG << "crosswalk [" << crosswalk_overlap->object_id
+           << "] is not on reference line";
     return true;
   }
 
@@ -226,12 +229,12 @@ bool Crosswalk::BuildStopDecision(Frame* frame,
   auto* obstacle = frame->AddVirtualStopObstacle(
       reference_line_info, virtual_object_id, crosswalk_overlap->start_s);
   if (!obstacle) {
-    AERROR << "Failed to create obstacle " << virtual_object_id << " in frame";
+    AERROR << "Failed to create obstacle[" << virtual_object_id << "]";
     return false;
   }
   PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for " << virtual_object_id;
+    AERROR << "Failed to create path_obstacle for: " << virtual_object_id;
     return false;
   }
 
