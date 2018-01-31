@@ -37,8 +37,9 @@ const MenuIdOptionMapping = {
         routing: 'showRouting',
         decisionMain: 'showDecisionMain',
         decisionObstacle: 'showDecisionObstacle',
+        planningCar: 'showPlanningCar',
         planningReference: 'showPlanningReference',
-        planingDpOptimizer: 'showPlaningDpOptimizer',
+        planningDpOptimizer: 'showPlanningDpOptimizer',
         planningQpOptimizer: 'showPlanningQpOptimizer',
         planningLine: 'showPlanning'
 };
@@ -73,7 +74,7 @@ class SubMenu extends React.Component {
             entries = Object.keys(data)
                 .map(key => {
                     const item = data[key];
-                    if (options.hideOptions[key]) {
+                    if (options.hideOptionToggle[key]) {
                         return null;
                     }
                     return (
@@ -85,7 +86,7 @@ class SubMenu extends React.Component {
             entries = Object.keys(data)
                 .map(key => {
                     const item = data[key];
-                    if (options.hideOptions[key]) {
+                    if (options.hideOptionToggle[key]) {
                         return null;
                     }
                     return (
