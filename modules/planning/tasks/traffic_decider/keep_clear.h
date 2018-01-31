@@ -31,15 +31,15 @@ namespace planning {
 /**
  * This class creates a virtual obstacle for each keep clear region.
  */
-class ClearZone : public TrafficRule {
+class KeepClear : public TrafficRule {
  public:
-  explicit ClearZone(const RuleConfig& config);
-  virtual ~ClearZone() = default;
+  explicit KeepClear(const RuleConfig& config);
+  virtual ~KeepClear() = default;
 
   bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  bool BuildClearZoneObstacle(const hdmap::PathOverlap& clear_zone_overlap);
+  bool BuildKeepClearObstacle(const hdmap::PathOverlap& keep_clear_overlap);
   ReferenceLineInfo* reference_line_info_ = nullptr;
   Frame* frame_ = nullptr;
 };

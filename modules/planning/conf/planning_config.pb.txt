@@ -53,6 +53,7 @@ em_planner_config {
         default_speed_cost: 1.0e3
         exceed_speed_penalty: 10.0
         low_speed_penalty: 10.0
+        keep_clear_low_speed_penalty: 10.0
 
         accel_penalty: 1.0
         decel_penalty: 1.0
@@ -204,4 +205,7 @@ rule_config : {
 }
 rule_config : {
     rule_id: SIDEPASS_VEHICLE
+}
+rule_config : {
+    rule_id: KEEP_CLEAR
 }
