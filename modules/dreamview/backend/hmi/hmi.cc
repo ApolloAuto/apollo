@@ -288,6 +288,22 @@ void HMI::RegisterMessageHandlers() {
         }
       });
 
+  // HMI client asks for adding new DriveEvent.
+  websocket_->RegisterMessageHandler(
+      "SubmitDriveEvent",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // json should contain event_time_ms and event_msg.
+        uint64_t event_time_ms;
+        std::string event_msg;
+        if (JsonUtil::GetNumberFromJson(json, "event_time_ms", &event_time_ms)
+            && JsonUtil::GetStringFromJson(json, "event_msg", &event_msg)) {
+          SubmitDriveEvent(event_time_ms, event_msg);
+        } else {
+          AERROR << "Truncated SubmitDriveEvent request.";
+        }
+      });
+
+
   // Received new system status, broadcast to clients.
   AdapterManager::AddSystemStatusCallback(
       [this](const monitor::SystemStatus &system_status) {
@@ -441,6 +457,15 @@ void HMI::CheckOTAUpdates() {
                                       status_.mutable_ota_update()));
     AINFO << "Found available OTA update: " << status_.ota_update();
   }
+}
+
+void HMI::SubmitDriveEvent(const uint64_t event_time_ms,
+                           const std::string &event_msg) const {
+  apollo::common::DriveEvent drive_event;
+  AdapterManager::FillDriveEventHeader("HMI", &drive_event);
+  drive_event.mutable_header()->set_timestamp_sec(event_time_ms / 1000.0);
+  drive_event.set_event(event_msg);
+  AdapterManager::PublishDriveEvent(drive_event);
 }
 
 }  // namespace dreamview

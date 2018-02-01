@@ -147,7 +147,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableImageLong(FLAGS_image_long_topic, config);
         break;
       case AdapterConfig::DRIVE_EVENT:
-        EnableImageLong(FLAGS_drive_event_topic, config);
+        EnableDriveEvent(FLAGS_drive_event_topic, config);
         break;
       case AdapterConfig::GNSS_RTK_OBS:
         EnableGnssRtkObs(FLAGS_gnss_rtk_obs_topic, config);
