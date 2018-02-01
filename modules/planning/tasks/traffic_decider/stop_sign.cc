@@ -58,6 +58,9 @@ StopSign::StopSign(const RuleConfig& config) : TrafficRule(config) {}
 
 bool StopSign::ApplyRule(Frame* frame,
                          ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
   if (!FLAGS_enable_stop_sign) {
     return true;
   }
@@ -77,6 +80,9 @@ bool StopSign::ApplyRule(Frame* frame,
  */
 void StopSign::MakeDecisions(Frame* frame,
                              ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
   // check & update stop status
   ProcessStopStatus(reference_line_info, *next_stop_sign_);
 
@@ -126,19 +132,21 @@ void StopSign::MakeDecisions(Frame* frame,
     // stop done and no vehicles to wait for
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] DONE";
   } else if (stop_status_ == StopSignStopStatus::CREEPING) {
-    constexpr double kCreepStopBuffer = 0.5;
     auto* next_overlap =
         reference_line_info_->reference_line().map_path().NextLaneOverlap(
             reference_line_info_->AdcSlBoundary().end_s());
-    BuildStopDecision(kCreepStopBuffer, frame, reference_line_info,
-                      next_overlap);
+    BuildStopDecision(frame, reference_line_info,
+                      const_cast<hdmap::PathOverlap*>(next_overlap),
+                      FLAGS_creep_stop_distance);
   } else {
     // stop decision
     double stop_deceleration = util::GetADCStopDeceleration(
         reference_line_info, next_stop_sign_overlap_->start_s);
-    if (stop_deceleration < FLAGS_stop_max_deceleration) {
-      BuildStopDecision(FLAGS_stop_sign_stop_distance, frame,
-                        reference_line_info, next_stop_sign_overlap_);
+    if (stop_deceleration < FLAGS_max_stop_deceleration) {
+      BuildStopDecision(
+          frame, reference_line_info,
+          const_cast<hdmap::PathOverlap*>(next_stop_sign_overlap_),
+          FLAGS_stop_sign_stop_distance);
     }
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] STOP";
   }
@@ -147,7 +155,10 @@ void StopSign::MakeDecisions(Frame* frame,
 /**
  * @brief: fine next stop sign ahead of adc along reference line
  */
-bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
+bool StopSign::FindNextStopSign(
+    ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(reference_line_info);
+
   next_stop_sign_overlap_ = nullptr;
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info->reference_line().map_path().stop_sign_overlaps();
@@ -218,12 +229,10 @@ int StopSign::GetAssociatedLanes(const StopSignInfo& stop_sign_info) {
 /**
  * @brief: process & update stop status
  */
-int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
-                                const StopSignInfo& stop_sign_info) {
-  if (reference_line_info == nullptr) {
-    AWARN << "reference_line_info is nullptr. skip";
-    return 0;
-  }
+int StopSign::ProcessStopStatus(
+    ReferenceLineInfo* const reference_line_info,
+    const StopSignInfo& stop_sign_info) {
+  CHECK_NOTNULL(reference_line_info);
 
   // get stop status from dropbox
   std::string stop_sign_id = stop_sign_info.id().id();
@@ -323,9 +332,12 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
 /**
  * @brief: check valid stop_sign stop
  */
-bool StopSign::CheckADCkStop(ReferenceLineInfo* const reference_line_info) {
+bool StopSign::CheckADCkStop(
+    ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(reference_line_info);
+
   double adc_speed = reference_line_info->AdcPlanningPoint().v();
-  if (adc_speed > FLAGS_stop_max_speed) {
+  if (adc_speed > FLAGS_max_stop_speed) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;
   }
@@ -353,8 +365,11 @@ bool StopSign::CheckADCkStop(ReferenceLineInfo* const reference_line_info) {
 /**
  * @brief: read watch vehicles from drop box
  */
-int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
-                               StopSignLaneVehicles* watch_vehicles) {
+int StopSign::GetWatchVehicles(
+    const StopSignInfo& stop_sign_info,
+    StopSignLaneVehicles* watch_vehicles) {
+  CHECK_NOTNULL(watch_vehicles);
+
   watch_vehicles->clear();
 
   // get watch vehicles for associated_lanes
@@ -390,6 +405,8 @@ int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
  * @brief: update drop box with watch vehicles
  */
 int StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
+  CHECK_NOTNULL(watch_vehicles);
+
   ClearDropboxWatchvehicles();
 
   for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
@@ -409,6 +426,8 @@ int StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
  */
 int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
                               StopSignLaneVehicles* watch_vehicles) {
+  CHECK_NOTNULL(watch_vehicles);
+
   const PerceptionObstacle& perception_obstacle =
       path_obstacle.obstacle()->Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
@@ -458,7 +477,7 @@ int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
 
   auto speed = std::hypot(perception_obstacle.velocity().x(),
                           perception_obstacle.velocity().y());
-  if (speed > FLAGS_stop_max_speed) {
+  if (speed > FLAGS_max_watch_vehicle_stop_speed) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
            << "] velocity[" << speed << "] not stopped. skip";
     return -1;
@@ -502,6 +521,8 @@ int StopSign::RemoveWatchVehicle(
     const PathObstacle& path_obstacle,
     const std::vector<std::string>& watch_vehicle_ids,
     StopSignLaneVehicles* watch_vehicles) {
+  CHECK_NOTNULL(watch_vehicles);
+
   const PerceptionObstacle& perception_obstacle =
       path_obstacle.obstacle()->Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
@@ -565,7 +586,7 @@ int StopSign::RemoveWatchVehicle(
   if (!erase) {
     auto speed = std::hypot(perception_obstacle.velocity().x(),
                             perception_obstacle.velocity().y());
-    if (speed > FLAGS_stop_max_speed) {
+    if (speed > FLAGS_max_watch_vehicle_stop_speed) {
       ADEBUG << "obstacle_id[" << obstacle_id
           << "] type[" << obstacle_type_name
           << "] velocity[" << speed
@@ -611,6 +632,9 @@ int StopSign::RemoveWatchVehicle(
 
 int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
                                 StopSignLaneVehicles* watch_vehicles) {
+  CHECK_NOTNULL(reference_line_info);
+  CHECK_NOTNULL(watch_vehicles);
+
   auto path_obstacles =
       reference_line_info->path_decision()->path_obstacles().Items();
   std::vector<std::string> obstacle_ids;
@@ -660,9 +684,15 @@ int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
   return 0;
 }
 
-bool StopSign::BuildStopDecision(const double stop_buffer, Frame* frame,
-                                 ReferenceLineInfo* const reference_line_info,
-                                 const hdmap::PathOverlap* overlap) {
+bool StopSign::BuildStopDecision(
+    Frame* frame,
+    ReferenceLineInfo* const reference_line_info,
+    hdmap::PathOverlap* const overlap,
+    const double stop_buffer) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+  CHECK_NOTNULL(overlap);
+
   // check
   const auto& reference_line = reference_line_info->reference_line();
   if (!WithinBound(0.0, reference_line.Length(), overlap->start_s)) {

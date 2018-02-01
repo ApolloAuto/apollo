@@ -37,7 +37,8 @@ class ChangeLane : public TrafficRule {
   explicit ChangeLane(const RuleConfig& config);
   virtual ~ChangeLane() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 
  private:
   /**

@@ -33,7 +33,7 @@ double GetADCStopDeceleration(
     const double stop_line_s) {
   double adc_speed =
       common::VehicleStateProvider::instance()->linear_velocity();
-  if (adc_speed < FLAGS_stop_max_speed) {
+  if (adc_speed < FLAGS_max_stop_speed) {
     return 0.0;
   }
 
@@ -44,7 +44,7 @@ double GetADCStopDeceleration(
     stop_distance = stop_line_s - adc_front_edge_s;
   } else {
     stop_distance = stop_line_s +
-        FLAGS_stop_max_distance_buffer - adc_front_edge_s;
+        FLAGS_max_stop_distance_buffer - adc_front_edge_s;
   }
   if (stop_distance < 1e-5) {
     return std::numeric_limits<double>::max();
