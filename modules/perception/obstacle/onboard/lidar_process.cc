@@ -38,14 +38,14 @@ namespace apollo {
 namespace perception {
 
 using apollo::common::adapter::AdapterManager;
+using Eigen::Affine3d;
+using Eigen::Matrix4d;
 using pcl_util::Point;
-using pcl_util::PointD;
 using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
+using pcl_util::PointD;
 using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
-using Eigen::Matrix4d;
-using Eigen::Affine3d;
 
 bool LidarProcess::Init() {
   if (inited_) {

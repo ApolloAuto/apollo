@@ -39,8 +39,6 @@ gflags.DEFINE_integer('workers', 5, 'Web host workers.')
 gflags.DEFINE_boolean('debug', False, 'Enable debug mode.')
 gflags.DEFINE_integer('page_size', 20, 'Search results per page.')
 
-gflags.DEFINE_string('gmap_api_key', '', 'Google map API key.')
-
 app = flask.Flask(__name__)
 app.secret_key = str(datetime.datetime.now())
 app.jinja_env.filters.update(display_util.utils)
@@ -50,7 +48,6 @@ class Config(object):
     """Global config."""
 
     conf = {
-        'gmap_api_key': None,
         'vehicles': None,
         'topics': None,
     }
@@ -74,7 +71,6 @@ class Config(object):
             cls.conf = {
                 'vehicles': sorted(vehicles),
                 'topics': sorted(topics),
-                'gmap_api_key': gflags.FLAGS.gmap_api_key,
             }
             with open(CONF_FILE, 'wb') as pickle_out:
                 pickle.dump(cls.conf, pickle_out)
@@ -112,7 +108,7 @@ def search_hdl(page_idx=1):
 @app.route('/task/<path:task_id>')
 def task_hdl(task_id):
     """Handler of the task detail page."""
-    return flask.render_template('task.tpl', conf=Config.conf,
+    return flask.render_template('task.tpl',
                                  task=WarehouseQuery.get_task(task_id))
 
 

@@ -15,6 +15,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/perception/lib/pcl_util",
+        "//modules/perception/tool/data_generator/common:data_generator_gflags",
     ],
 )
 

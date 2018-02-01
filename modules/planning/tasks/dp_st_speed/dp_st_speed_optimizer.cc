@@ -62,15 +62,16 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
   for (auto* obstacle : path_decision->path_obstacles().Items()) {
     auto id = obstacle->Id();
     if (!obstacle->st_boundary().IsEmpty()) {
-      path_decision->Find(id)->SetBlockingObstacle(true);
+      if (obstacle->st_boundary().boundary_type() ==
+          StBoundary::BoundaryType::KEEP_CLEAR) {
+        path_decision->Find(id)->SetBlockingObstacle(false);
+      } else {
+        path_decision->Find(id)->SetBlockingObstacle(true);
+      }
       boundaries.push_back(&obstacle->st_boundary());
-      ADEBUG << "obstacle " << id << " is blocking.";
     } else if (FLAGS_enable_side_vehicle_st_boundary &&
                (adc_sl_boundary_.start_l() > 2.0 ||
                 adc_sl_boundary_.end_l() < -2.0)) {
-      if (obstacle->obstacle()->IsVirtual()) {
-        continue;
-      }
       if (path_decision->Find(id)->reference_line_st_boundary().IsEmpty()) {
         continue;
       }

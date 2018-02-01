@@ -21,6 +21,10 @@
 
 DECLARE_string(dreamview_module_name);
 
+DECLARE_bool(dreamview_test_mode);
+
+DECLARE_double(dreamview_test_duration);
+
 DECLARE_string(dreamview_adapter_config_filename);
 
 DECLARE_string(hmi_config_filename);

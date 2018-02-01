@@ -60,6 +60,8 @@ class HMI {
 
   // Check if there is available updates.
   void CheckOTAUpdates();
+  void SubmitDriveEvent(const uint64_t event_time_ms,
+                        const std::string &event_msg) const;
 
   HMIConfig config_;
   HMIStatus status_;

@@ -17,6 +17,8 @@
 #ifndef MODULES_DATA_UTIL_INFO_COLLECTOR_H_
 #define MODULES_DATA_UTIL_INFO_COLLECTOR_H_
 
+#include <string>
+
 #include "modules/common/macro.h"
 #include "modules/data/proto/static_info.pb.h"
 
@@ -39,6 +41,9 @@ class InfoCollector {
   static const HardwareInfo &GetHardwareInfo();
   static const SoftwareInfo &GetSoftwareInfo();
   static const UserInfo &GetUserInfo();
+
+  // Utils.
+  static std::string GetDockerImage();
 
  private:
   StaticInfo static_info_;

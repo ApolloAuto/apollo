@@ -26,6 +26,7 @@
 #include "modules/planning/tasks/traffic_decider/change_lane.h"
 #include "modules/planning/tasks/traffic_decider/crosswalk.h"
 #include "modules/planning/tasks/traffic_decider/destination.h"
+#include "modules/planning/tasks/traffic_decider/keep_clear.h"
 #include "modules/planning/tasks/traffic_decider/reference_line_end.h"
 #include "modules/planning/tasks/traffic_decider/rerouting.h"
 #include "modules/planning/tasks/traffic_decider/sidepass_vehicle.h"
@@ -75,6 +76,10 @@ void TrafficDecider::RegisterRules() {
   rule_factory_.Register(RuleConfig::SIDEPASS_VEHICLE,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new SidepassVehicle(config);
+                         });
+  rule_factory_.Register(RuleConfig::KEEP_CLEAR,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new KeepClear(config);
                          });
 }
 

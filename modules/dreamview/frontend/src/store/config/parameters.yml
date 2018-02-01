@@ -41,6 +41,7 @@ options:
     showRouteEditingBar: false
     showTasks: true
     showVideo: false
+    showPlanningCar: false
     showPlanningReference: false
     showPlaningDpOptimizer: false
     showPlanningQpOptimizer: false

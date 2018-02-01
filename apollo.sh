@@ -260,6 +260,8 @@ function release() {
 
   # tools
   cp -r modules/tools $MODULES_DIR
+  mkdir -p $MODULES_DIR/data/tools
+  cp -r modules/data/tools/recorder $MODULES_DIR/data/tools/
 
   # scripts
   cp -r scripts ${APOLLO_DIR}
@@ -298,10 +300,9 @@ function release() {
 
   # release info
   META="${APOLLO_DIR}/meta.ini"
-  echo "[Release]" > $META
   echo "git_commit: $(git rev-parse HEAD)" >> $META
-  echo "car_type : LINCOLN.MKZ" >> $META
-  echo "arch : ${MACHINE_ARCH}" >> $META
+  echo "car_type: LINCOLN.MKZ" >> $META
+  echo "arch: ${MACHINE_ARCH}" >> $META
 }
 
 function gen_coverage() {

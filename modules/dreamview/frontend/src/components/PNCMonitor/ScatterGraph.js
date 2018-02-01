@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Chart from "chart.js";
-import ChartZoom from "chartjs-plugin-zoom";
 
 Chart.plugins.register({
     afterDatasetsDraw: function(chart, easing) {
@@ -38,14 +37,6 @@ export default class ScatterGraph extends React.Component {
             },
             legend: {
                 display: options.legend.display,
-            },
-            pan: {
-                enabled: true,
-                mode: 'xy'
-            },
-            zoom: {
-                enabled: false,
-                mode: 'xy',
             },
             tooltips: {
                 enable: true,
@@ -108,33 +99,24 @@ export default class ScatterGraph extends React.Component {
         }
     }
 
-    componentDidMount() {
-        const { title, options } = this.props;
-        this.initializeCanvas(title, options);
-    }
-
-    componentWillUnmount() {
-        this.chart.destroy();
-    }
-
-    componentWillReceiveProps(nextProps) {
+    updateChart(props) {
         // Draw lines
-        for (const name in nextProps.properties.lines) {
+        for (const name in props.properties.lines) {
             if (this.name2idx[name] === undefined) {
                 this.name2idx[name] = this.chart.data.datasets.length;
             }
             const idx = this.name2idx[name];
-            const properties = nextProps.properties.lines[name];
-            const data = nextProps.data ? nextProps.data[name] : [];
+            const properties = props.properties.lines[name];
+            const data = props.data ? props.data[name] : [];
             this.updateData(idx, name, properties, data);
         };
 
         // Draw boxes
         let idx = Object.keys(this.name2idx).length;
-        if (nextProps.boxes) {
-            for (const name in nextProps.boxes) {
-                const data = nextProps.boxes[name];
-                this.updateData(idx, name, nextProps.properties.box, data);
+        if (props.boxes) {
+            for (const name in props.boxes) {
+                const data = props.boxes[name];
+                this.updateData(idx, name, props.properties.box, data);
                 idx++;
             }
         }
@@ -146,10 +128,22 @@ export default class ScatterGraph extends React.Component {
         this.chart.update(0);
     }
 
+    componentDidMount() {
+        const { title, options } = this.props;
+        this.initializeCanvas(title, options);
+        this.updateChart(this.props);
+    }
+
+    componentWillUnmount() {
+        this.chart.destroy();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.updateChart(nextProps);
+    }
 
     render() {
         const { data, properties, options, boxes } = this.props;
-
         return (
             <div className="scatter-graph">
                 <canvas ref = {(input) => {

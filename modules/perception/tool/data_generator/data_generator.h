@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,17 @@
 #ifndef MODEULES_PERCEPTION_TOOL_DATE_GENERATOR_DATA_GENERATOR_
 #define MODEULES_PERCEPTION_TOOL_DATE_GENERATOR_DATA_GENERATOR_
 
+#include <memory>
 #include <string>
 
 #include "sensor_msgs/PointCloud2.h"
 
+#include "Eigen/Core"
+#include "ros/include/ros/ros.h"
+
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
-#include "ros/include/ros/ros.h"
 
 /**
  * @namespace apollo::calibration
@@ -46,8 +49,21 @@ class DataGenerator : public apollo::common::ApolloApp {
   void Stop() override;
 
  private:
-  // Upon receiving point cloud data
-  void OnPointCloud(const sensor_msgs::PointCloud2& message);
+  void RunOnce();
+  bool Process(const sensor_msgs::PointCloud2& message);
+  void OnTimer(const ros::TimerEvent&);
+
+  void TransPointCloudMsgToPCL(const sensor_msgs::PointCloud2& cloud_msg,
+                               pcl_util::PointCloudPtr* cloud_pcl);
+  bool GetTrans(const std::string& to_frame, const std::string& from_frame,
+                const double query_time, Eigen::Matrix4d* trans);
+  bool TransformPointCloudToWorld(
+      std::shared_ptr<Eigen::Matrix4d> velodyne_trans,
+      pcl_util::PointCloudPtr* cld);
+  ros::Timer timer_;
+
+  std::ofstream* data_file_ = nullptr;
+  int num_data_frame_ = 0;
 };
 
 }  // namespace data_generator

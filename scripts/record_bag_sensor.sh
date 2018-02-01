@@ -62,6 +62,7 @@ function start() {
         /apollo/sensor/gnss/corrected_imu \
         /apollo/sensor/gnss/gnss_status \
         /apollo/sensor/gnss/imu \
+        /apollo/sensor/gnss/raw_data \
         /apollo/sensor/gnss/ins_stat \
         /apollo/sensor/gnss/odometry \
         /apollo/sensor/gnss/rtk_eph \

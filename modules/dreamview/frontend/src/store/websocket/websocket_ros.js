@@ -54,13 +54,14 @@ export default class RosWebSocketEndpoint {
                     RENDERER.maybeInitializeOffest(
                         message.autoDrivingCar.positionX,
                         message.autoDrivingCar.positionY);
-                    RENDERER.updateWorld(message);
                     STORE.meters.update(message);
                     STORE.monitor.update(message);
                     STORE.trafficSignal.update(message);
                     STORE.hmi.update(message);
+                    RENDERER.updateWorld(message);
                     if (STORE.options.showPNCMonitor) {
-                        STORE.planning.update(message);
+                        STORE.planningData.update(message);
+                        STORE.controlData.update(message);
                     }
                     if (message.mapHash && (this.counter % 10 === 0)) {
                         // NOTE: This is a hack to limit the rate of map updates.

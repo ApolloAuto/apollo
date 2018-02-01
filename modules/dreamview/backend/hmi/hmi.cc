@@ -31,6 +31,7 @@
 #include "modules/common/util/util.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/data/proto/static_info.pb.h"
+#include "modules/data/util/info_collector.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 #include "modules/monitor/proto/system_status.pb.h"
@@ -143,10 +144,7 @@ HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
       logger_(apollo::common::monitor::MonitorMessageItem::HMI) {
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
-
-  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
-    config_.set_docker_image(docker_image);
-  }
+  config_.set_docker_image(apollo::data::InfoCollector::GetDockerImage());
 
   // If the module path doesn't exist, remove it from list.
   auto *modules = config_.mutable_modules();
@@ -289,6 +287,22 @@ void HMI::RegisterMessageHandlers() {
           AERROR << "Truncated ChangeMode request.";
         }
       });
+
+  // HMI client asks for adding new DriveEvent.
+  websocket_->RegisterMessageHandler(
+      "SubmitDriveEvent",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // json should contain event_time_ms and event_msg.
+        uint64_t event_time_ms;
+        std::string event_msg;
+        if (JsonUtil::GetNumberFromJson(json, "event_time_ms", &event_time_ms)
+            && JsonUtil::GetStringFromJson(json, "event_msg", &event_msg)) {
+          SubmitDriveEvent(event_time_ms, event_msg);
+        } else {
+          AERROR << "Truncated SubmitDriveEvent request.";
+        }
+      });
+
 
   // Received new system status, broadcast to clients.
   AdapterManager::AddSystemStatusCallback(
@@ -433,7 +447,7 @@ void HMI::CheckOTAUpdates() {
       VehicleInfo::Brand_Name(vehicle_info.brand()),
       ".", VehicleInfo::Model_Name(vehicle_info.model()));
   ota_request["vin"] = vehicle_info.license().vin();
-  ota_request["tag"] = std::getenv("DOCKER_IMG");
+  ota_request["tag"] = apollo::data::InfoCollector::GetDockerImage();
 
   Json ota_response;
   const auto status = apollo::common::util::HttpClient::Post(
@@ -443,6 +457,15 @@ void HMI::CheckOTAUpdates() {
                                       status_.mutable_ota_update()));
     AINFO << "Found available OTA update: " << status_.ota_update();
   }
+}
+
+void HMI::SubmitDriveEvent(const uint64_t event_time_ms,
+                           const std::string &event_msg) const {
+  apollo::common::DriveEvent drive_event;
+  AdapterManager::FillDriveEventHeader("HMI", &drive_event);
+  drive_event.mutable_header()->set_timestamp_sec(event_time_ms / 1000.0);
+  drive_event.set_event(event_msg);
+  AdapterManager::PublishDriveEvent(drive_event);
 }
 
 }  // namespace dreamview

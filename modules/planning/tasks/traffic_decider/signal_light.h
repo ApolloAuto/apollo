@@ -46,8 +46,6 @@ class SignalLight : public TrafficRule {
   apollo::perception::TrafficLight GetSignal(const std::string& signal_id);
   void MakeDecisions(Frame* frame,
                      ReferenceLineInfo* const reference_line_info);
-  double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
-                             const hdmap::PathOverlap* signal_light);
   bool BuildStopDecision(Frame* frame,
                          ReferenceLineInfo* const reference_line_info,
                          const hdmap::PathOverlap* signal_light);

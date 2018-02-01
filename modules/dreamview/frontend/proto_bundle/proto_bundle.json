@@ -203,54 +203,66 @@
                 },
                 "speedHeading": {
                   "type": "double",
-                  "id": 30
+                  "id": 17
+                },
+                "kappa": {
+                  "type": "double",
+                  "id": 18
                 },
                 "signalSet": {
                   "rule": "repeated",
                   "type": "string",
-                  "id": 17
+                  "id": 19
                 },
                 "currentSignal": {
                   "type": "string",
-                  "id": 18
+                  "id": 20
                 },
                 "timestampSec": {
                   "type": "double",
-                  "id": 19
+                  "id": 21
                 },
                 "decision": {
                   "rule": "repeated",
                   "type": "Decision",
-                  "id": 20
+                  "id": 22
                 },
                 "throttlePercentage": {
                   "type": "double",
-                  "id": 21
+                  "id": 23
                 },
                 "brakePercentage": {
                   "type": "double",
-                  "id": 22
+                  "id": 24
+                },
+                "steeringPercentage": {
+                  "type": "double",
+                  "id": 25
                 },
                 "steeringAngle": {
                   "type": "double",
-                  "id": 23
+                  "id": 26
+                },
+                "steeringRatio": {
+                  "type": "double",
+                  "id": 27
                 },
                 "disengageType": {
                   "type": "DisengageType",
-                  "id": 24
+                  "id": 28
                 },
                 "type": {
                   "type": "Type",
-                  "id": 25
+                  "id": 29
                 },
                 "prediction": {
                   "rule": "repeated",
                   "type": "Prediction",
-                  "id": 26
+                  "id": 30
                 },
                 "confidence": {
                   "type": "double",
-                  "id": 27,
+                  "id": 31,
                   "options": {
                     "default": 1
                   }
@@ -438,9 +450,13 @@
                   "type": "double",
                   "id": 17
                 },
+                "planningTime": {
+                  "type": "double",
+                  "id": 18
+                },
                 "planningData": {
                   "type": "apollo.planning_internal.PlanningData",
-                  "id": 18
+                  "id": 19
                 }
               }
             }
@@ -1737,7 +1753,20 @@
               }
             },
             "ObjectSidePass": {
-              "fields": {}
+              "fields": {
+                "type": {
+                  "type": "Type",
+                  "id": 1
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "LEFT": 1,
+                    "RIGHT": 2
+                  }
+                }
+              }
             },
             "ObjectAvoid": {
               "fields": {}

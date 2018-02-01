@@ -98,6 +98,9 @@ class ReferenceLine {
 
   bool GetLaneWidth(const double s, double* const left_width,
                     double* const right_width) const;
+  void GetLaneFromS(const double s,
+                    std::vector<hdmap::LaneInfoConstPtr>* lanes) const;
+
   bool IsOnRoad(const common::SLPoint& sl_point) const;
   bool IsOnRoad(const common::math::Vec2d& vec2d_point) const;
   template <class XYPoint>
@@ -121,7 +124,9 @@ class ReferenceLine {
    */
   bool HasOverlap(const common::math::Box2d& box) const;
 
-  double Length() const { return map_path_.length(); }
+  double Length() const {
+    return map_path_.length();
+  }
 
   std::string DebugString() const;
 
