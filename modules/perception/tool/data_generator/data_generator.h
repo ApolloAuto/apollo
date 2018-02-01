@@ -29,9 +29,13 @@
 #include "Eigen/Core"
 #include "ros/include/ros/ros.h"
 
+#include "modules/perception/tool/data_generator/proto/config.pb.h"
+
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
+#include "modules/common/util/factory.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/tool/data_generator/sensor.h"
 
 /**
  * @namespace apollo::calibration
@@ -60,10 +64,18 @@ class DataGenerator : public apollo::common::ApolloApp {
   bool TransformPointCloudToWorld(
       std::shared_ptr<Eigen::Matrix4d> velodyne_trans,
       pcl_util::PointCloudPtr* cld);
+
+  void RegisterSensors();
+
   ros::Timer timer_;
 
   std::ofstream* data_file_ = nullptr;
   int num_data_frame_ = 0;
+
+  common::util::Factory<SensorConfig::SensorId, Sensor,
+                        Sensor* (*)(const SensorConfig& config)>
+      sensor_factory_;
+  google::protobuf::RepeatedPtrField<SensorConfig> sensor_configs_;
 };
 
 }  // namespace data_generator
