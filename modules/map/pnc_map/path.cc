@@ -408,6 +408,17 @@ void Path::GetAllOverlaps(GetOverlapFromLaneFunc GetOverlaps_from_lane,
             });
 }
 
+const PathOverlap* Path::NextLaneOverlap(double s) const {
+  auto next = std::upper_bound(
+      lane_overlaps_.begin(), lane_overlaps_.end(), s,
+      [](double s, const PathOverlap& o) { return s < o.start_s; });
+  if (next == lane_overlaps_.end()) {
+    return nullptr;
+  } else {
+    return &(*next);
+  }
+}
+
 void Path::InitOverlaps() {
   GetAllOverlaps(std::bind(&LaneInfo::cross_lanes, _1), &lane_overlaps_);
   GetAllOverlaps(std::bind(&LaneInfo::signals, _1), &signal_overlaps_);

@@ -369,9 +369,7 @@ const std::vector<ReferencePoint>& ReferenceLine::reference_points() const {
   return reference_points_;
 }
 
-const MapPath& ReferenceLine::map_path() const {
-  return map_path_;
-}
+const MapPath& ReferenceLine::map_path() const { return map_path_; }
 
 bool ReferenceLine::GetLaneWidth(const double s, double* const left_width,
                                  double* const right_width) const {
