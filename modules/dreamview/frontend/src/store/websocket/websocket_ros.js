@@ -190,7 +190,7 @@ export default class RosWebSocketEndpoint {
     executeModeCommand(command) {
         this.websocket.send(JSON.stringify({
             type: "ExecuteModeCommand",
-            command, command,
+            command: command,
         }));
     }
 
@@ -198,7 +198,7 @@ export default class RosWebSocketEndpoint {
         this.websocket.send(JSON.stringify({
             type: "ExecuteModuleCommand",
             module: module,
-            command, command,
+            command: command,
         }));
     }
 
@@ -206,7 +206,7 @@ export default class RosWebSocketEndpoint {
         this.websocket.send(JSON.stringify({
             type: "ExecuteToolCommand",
             tool: tool,
-            command, command,
+            command: command,
         }));
     }
 
