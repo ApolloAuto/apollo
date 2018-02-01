@@ -45,7 +45,8 @@ class StopSign : public TrafficRule {
     UNKNOWN = 0,
     TO_STOP = 1,
     STOPPING = 2,
-    STOP_DONE = 3,
+    CREEPING = 3,
+    STOP_DONE = 4,
   };
 
  private:
@@ -64,12 +65,11 @@ class StopSign : public TrafficRule {
   int RemoveWatchVehicle(const PathObstacle& path_obstacle,
                          const std::vector<std::string>& watch_vehicle_ids,
                          StopSignLaneVehicles* watch_vehicles);
-  int ClearWatchVehicle(
-      ReferenceLineInfo* const reference_line_info,
-      StopSignLaneVehicles* watch_vehicles);
-  bool BuildStopDecision(Frame* frame,
+  int ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
+                        StopSignLaneVehicles* watch_vehicles);
+  bool BuildStopDecision(const double stop_buffer, Frame* frame,
                          ReferenceLineInfo* const reference_line_info,
-                         const hdmap::PathOverlap* stop_sign_overlap);
+                         const hdmap::PathOverlap* overlap);
   void ClearDropbox(const std::string& stop_sign_id);
   void ClearDropboxWatchvehicles();
 
@@ -86,6 +86,8 @@ class StopSign : public TrafficRule {
   StopSignStopStatus stop_status_;
   std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
       associated_lanes_;
+
+  const ReferenceLineInfo* reference_line_info_ = nullptr;
 };
 
 }  // namespace planning
