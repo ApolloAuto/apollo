@@ -264,6 +264,8 @@ class Path {
   const PathApproximation* approximation() const { return &approximation_; }
   double length() const { return length_; }
 
+  const PathOverlap* NextLaneOverlap(double s) const;
+
   const std::vector<PathOverlap>& lane_overlaps() const {
     return lane_overlaps_;
   }
