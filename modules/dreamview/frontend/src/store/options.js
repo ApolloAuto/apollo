@@ -9,12 +9,13 @@ export default class Options {
     @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
     @observable showRouteEditingBar = PARAMETERS.options.defaults.showRouteEditingBar;
     @observable showPOI = PARAMETERS.options.defaults.showPOI;
+    @observable showDataRecorder = PARAMETERS.options.defaults.showDataRecorder;
     @observable showVideo = PARAMETERS.options.defaults.showVideo;
     @observable showTasks =
         OFFLINE_PLAYBACK ? false : PARAMETERS.options.defaults.showTasks;
 
     mutuallyExclusiveOptions = ['showTasks', 'showModuleController',
-        'showMenu', 'showRouteEditingBar'];
+        'showMenu', 'showRouteEditingBar', 'showDataRecorder'];
 
     // Layer Menu options
     @observable showDecisionMain = PARAMETERS.options.defaults.showDecisionMain;
@@ -58,7 +59,8 @@ export default class Options {
         return this.showTasks ||
                this.showModuleController ||
                this.showMenu ||
-               this.showPOI;
+               this.showPOI ||
+               this.showDataRecorder;
     }
 
     @computed get showGeo() {
