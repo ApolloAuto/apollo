@@ -28,7 +28,11 @@ export default class SideBar extends React.Component {
                              onRouteEditingBar={() => {
                                     this.props.store.handleSideBarClick('showRouteEditingBar');
                                  }}
-                             showRouteEditingBar={options.showRouteEditingBar} />
+                             showRouteEditingBar={options.showRouteEditingBar}
+                             onDataRecorder={() => {
+                                    this.props.store.handleSideBarClick('showDataRecorder');
+                                 }}
+                             showDataRecorder={options.showDataRecorder} />
                 <SubButtonPanel enablePOI={
                                     !enableHMIButtonsOnly && !options.showRouteEditingBar
                                 }
