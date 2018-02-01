@@ -260,6 +260,8 @@ function release() {
 
   # tools
   cp -r modules/tools $MODULES_DIR
+  mkdir -p $MODULES_DIR/data/tools
+  cp -r modules/data/tools/recorder $MODULES_DIR/data/tools/
 
   # scripts
   cp -r scripts ${APOLLO_DIR}
