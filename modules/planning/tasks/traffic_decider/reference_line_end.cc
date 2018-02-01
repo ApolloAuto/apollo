@@ -46,7 +46,7 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
                                     3.0);
   const double stop_s = velocity * velocity / (2.0 * stop_acc) +
                         FLAGS_virtual_stop_wall_length +
-                        FLAGS_stop_distance_destination;
+                        FLAGS_destination_stop_distance;
   constexpr double kMinReferenceLineRemainLength = 10.0;
   if (stop_s < remain_s && remain_s > kMinReferenceLineRemainLength) {
     ADEBUG << "have enough reference line to drive on";
@@ -74,10 +74,11 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
   auto* path_obstacle = reference_line_info->AddObstacle(obstacle);
   auto* path_decision = reference_line_info->path_decision();
   auto stop_point = reference_line.GetReferencePoint(
-      obstacle_start_s - FLAGS_stop_distance_destination);
+      obstacle_start_s - FLAGS_destination_stop_distance);
+
   ObjectDecisionType stop;
   stop.mutable_stop();
-  stop.mutable_stop()->set_distance_s(-FLAGS_stop_distance_destination);
+  stop.mutable_stop()->set_distance_s(-FLAGS_destination_stop_distance);
   stop.mutable_stop()->set_stop_heading(stop_point.heading());
   stop.mutable_stop()->mutable_stop_point()->set_x(stop_point.x());
   stop.mutable_stop()->mutable_stop_point()->set_y(stop_point.y());

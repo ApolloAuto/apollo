@@ -71,6 +71,11 @@ class DpStCost {
   double GetAccelCost(const double accel);
   double JerkCost(const double jerk);
 
+  void AddToKeepClearRange(const std::vector<const PathObstacle*>& obstacles);
+  static void SortAndMergeRange(
+      std::vector<std::pair<double, double>>* keep_clear_range_);
+  bool InKeepClearRange(double s) const;
+
   const DpStSpeedConfig& config_;
   const std::vector<const PathObstacle*>& obstacles_;
   const common::TrajectoryPoint& init_point_;
@@ -79,6 +84,8 @@ class DpStCost {
 
   std::unordered_map<std::string, int> boundary_map_;
   std::vector<std::vector<std::pair<double, double>>> boundary_cost_;
+
+  std::vector<std::pair<double, double>> keep_clear_range_;
 
   std::array<double, 200> accel_cost_;
   std::array<double, 400> jerk_cost_;

@@ -160,7 +160,7 @@ void SignalLightScenario::CreateStopObstacle(
     const hdmap::PathOverlap* signal_light) {
   const auto& reference_line = reference_line_info->reference_line();
   const double stop_s =
-      signal_light->start_s - FLAGS_stop_distance_traffic_light;
+      signal_light->start_s - FLAGS_traffic_light_stop_distance;
   const double box_center_s =
       signal_light->start_s + FLAGS_virtual_stop_wall_length / 2.0;
   if (!WithinBound(0.0, reference_line.Length(), stop_s) ||
