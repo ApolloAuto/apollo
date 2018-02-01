@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/dp_st_speed/dp_st_cost.h"
 
+#include <algorithm>
 #include <limits>
 
 #include "modules/planning/common/speed/st_point.h"
