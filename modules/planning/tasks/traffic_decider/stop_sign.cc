@@ -113,8 +113,7 @@ void StopSign::MakeDecisions(Frame* frame,
   double stop_line_end_s = next_stop_sign_overlap_->end_s;
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
 
-  if (adc_front_edge_s - stop_line_end_s >
-      FLAGS_stop_sign_min_pass_distance) {
+  if (adc_front_edge_s - stop_line_end_s > FLAGS_stop_sign_min_pass_distance) {
     ClearDropbox(stop_sign_id);
     ADEBUG << "skip stop_sign_id[" << stop_sign_id
         << "]; stop_line_end_s[" << stop_line_end_s
@@ -148,8 +147,7 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   double min_start_s = std::numeric_limits<double>::max();
   for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
-    if (stop_sign_overlap.start_s + FLAGS_stop_max_distance_buffer >
-            adc_front_edge_s &&
+    if (stop_sign_overlap.start_s > adc_front_edge_s &&
         stop_sign_overlap.start_s < min_start_s) {
       min_start_s = stop_sign_overlap.start_s;
       next_stop_sign_overlap_ = const_cast<PathOverlap*>(&stop_sign_overlap);
@@ -653,14 +651,14 @@ bool StopSign::BuildStopDecision(Frame* frame,
 
   // build stop decision
   const double stop_s =
-      stop_sign_overlap->start_s - FLAGS_stop_distance_stop_sign;
+      stop_sign_overlap->start_s - FLAGS_stop_sign_stop_distance;
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
   stop_decision->set_reason_code(StopReasonCode::STOP_REASON_STOP_SIGN);
-  stop_decision->set_distance_s(-FLAGS_stop_distance_stop_sign);
+  stop_decision->set_distance_s(-FLAGS_stop_sign_stop_distance);
   stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
   stop_decision->mutable_stop_point()->set_y(stop_point.y());

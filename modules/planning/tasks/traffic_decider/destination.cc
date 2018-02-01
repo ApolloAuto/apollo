@@ -45,10 +45,10 @@ bool Destination::ApplyRule(Frame*,
 
   auto stop_point = reference_line_info->reference_line().GetReferencePoint(
       destination->PerceptionSLBoundary().start_s() -
-      FLAGS_stop_distance_destination);
+      FLAGS_destination_stop_distance);
   ObjectDecisionType stop;
   stop.mutable_stop();
-  stop.mutable_stop()->set_distance_s(-FLAGS_stop_distance_destination);
+  stop.mutable_stop()->set_distance_s(-FLAGS_destination_stop_distance);
   stop.mutable_stop()->set_reason_code(StopReasonCode::STOP_REASON_DESTINATION);
   stop.mutable_stop()->set_stop_heading(stop_point.heading());
   stop.mutable_stop()->mutable_stop_point()->set_x(stop_point.x());

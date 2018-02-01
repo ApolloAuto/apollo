@@ -144,7 +144,7 @@ Status SpeedDecider::MakeObjectDecision(
         if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
           ObjectDecisionType stop_decision;
           if (CreateStopDecision(*path_obstacle, &stop_decision,
-                                 -FLAGS_stop_distance_traffic_light)) {
+                                 -FLAGS_traffic_light_stop_distance)) {
             path_obstacle->AddLongitudinalDecision("dp_st_graph/keep_clear",
                                                    stop_decision);
           }
