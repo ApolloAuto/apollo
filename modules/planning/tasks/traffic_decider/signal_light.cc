@@ -155,7 +155,7 @@ void SignalLight::SetCreepForwardSignalDecision(
   for (const auto& path_obstacle : path_decision.path_obstacles().Items()) {
     const auto& st_boundary = path_obstacle->reference_line_st_boundary();
     const double stop_s =
-        signal_light->start_s - FLAGS_stop_distance_traffic_light;
+        signal_light->start_s - FLAGS_traffic_light_stop_distance;
     if (reference_line_info->AdcSlBoundary().end_s() + st_boundary.min_s() <
         stop_s + kCreepBuff) {
       AERROR << "Do not creep forward because obstacles are close.";
@@ -163,7 +163,7 @@ void SignalLight::SetCreepForwardSignalDecision(
     }
   }
   signal_light->start_s = reference_line_info->AdcSlBoundary().end_s() +
-                          FLAGS_stop_distance_traffic_light + kCreepBuff;
+                          FLAGS_traffic_light_stop_distance + kCreepBuff;
   ADEBUG << "Creep forward s = " << signal_light->start_s;
 }
 
@@ -209,14 +209,14 @@ bool SignalLight::BuildStopDecision(
 
   // build stop decision
   const double stop_s =
-      signal_light->start_s - FLAGS_stop_distance_traffic_light;
+      signal_light->start_s - FLAGS_traffic_light_stop_distance;
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
   stop_decision->set_reason_code(StopReasonCode::STOP_REASON_SIGNAL);
-  stop_decision->set_distance_s(-FLAGS_stop_distance_traffic_light);
+  stop_decision->set_distance_s(-FLAGS_traffic_light_stop_distance);
   stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
   stop_decision->mutable_stop_point()->set_y(stop_point.y());

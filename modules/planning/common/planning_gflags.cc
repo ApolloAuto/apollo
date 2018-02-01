@@ -197,17 +197,6 @@ DEFINE_double(max_stop_distance_obstacle, 10.0,
               "max stop distance from in-lane obstacle (meters)");
 DEFINE_double(min_stop_distance_obstacle, 6.0,
               "min stop distance from in-lane obstacle (meters)");
-DEFINE_double(stop_distance_destination, 0.5,
-              "stop distance from destination line");
-DEFINE_double(stop_distance_traffic_light, 1.0,
-              "stop distance from traffic light line");
-DEFINE_double(stop_distance_crosswalk, 1.0,
-              "stop distance from stop line of crosswalk");
-DEFINE_double(stop_distance_stop_sign, 1.0,
-              "stop distance from stop line of stop sign");
-DEFINE_double(destination_check_distance, 5.0,
-              "if the distance between destination and ADC is less than this,"
-              " it is considered to reach destination");
 DEFINE_double(nudge_distance_obstacle, 0.5,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 3.0,
@@ -223,8 +212,6 @@ DEFINE_double(
 DEFINE_double(within_lane_bound, 4.0,
               "distance to be considered within current lane");
 
-DEFINE_string(destination_obstacle_id, "DEST",
-              "obstacle id for converting destination to an obstacle");
 DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
 DEFINE_double(virtual_stop_wall_height, 2.0,
@@ -265,12 +252,15 @@ DEFINE_double(max_valid_stop_distance, 3.0,
 DEFINE_string(keep_clear_virtual_object_id_prefix, "KC_",
               "prefix for converting keep-clear id to virtual object id");
 /// traffic light
+DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 DEFINE_string(signal_light_virtual_object_id_prefix, "SL_",
               "prefix for converting signal id to virtual object id");
 DEFINE_double(max_deacceleration_for_yellow_light_stop, 3.0,
               "treat yellow light as red when deceleration (abstract value"
               " in m/s^2) is less than this threshold; otherwise treated"
               " as green light");
+DEFINE_double(traffic_light_stop_distance, 1.0,
+              "stop distance from traffic light line");
 /// crosswalk
 DEFINE_bool(enable_crosswalk, true, "enable crosswalk");
 DEFINE_string(crosswalk_virtual_object_id_prefix, "CW_",
@@ -285,6 +275,8 @@ DEFINE_double(crosswalk_loose_l_distance, 5.0,
 DEFINE_double(crosswalk_min_pass_distance, 1.0,
               "valid min distance(m) for vehicles to be considered as "
               "have passed crosswalk (stop_line_end_s)");
+DEFINE_double(crosswalk_stop_distance, 1.0,
+              "stop distance from stop line of crosswalk");
 /// stop_sign
 DEFINE_bool(enable_stop_sign, true, "enable stop_sign");
 DEFINE_string(stop_sign_virtual_object_id_prefix, "SS_",
@@ -294,6 +286,16 @@ DEFINE_double(stop_sign_stop_duration, 3.0,
 DEFINE_double(stop_sign_min_pass_distance, 3.0,
               "valid min distance(m) for vehicles to be considered as "
               "have passed stop sign (stop_line_end_s)");
+DEFINE_double(stop_sign_stop_distance, 1.0,
+              "stop distance from stop line of stop sign");
+/// destination
+DEFINE_string(destination_obstacle_id, "DEST",
+              "obstacle id for converting destination to an obstacle");
+DEFINE_double(destination_check_distance, 5.0,
+              "if the distance between destination and ADC is less than this,"
+              " it is considered to reach destination");
+DEFINE_double(destination_stop_distance, 0.5,
+              "stop distance from destination line");
 
 // according to DMV's rule, turn signal should be on within 200 ft from
 // intersection.
@@ -330,8 +332,6 @@ DEFINE_double(lag_prediction_protection_distance, 30,
 DEFINE_double(perception_confidence_threshold, 0.4,
               "Skip the obstacle if its confidence is lower than "
               "this threshold.");
-
-DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 
 // QpSt optimizer
 DEFINE_bool(enable_slowdown_profile_generator, true,
