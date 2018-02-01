@@ -38,7 +38,7 @@ using apollo::perception::TrafficLightDetection;
 
 KeepClear::KeepClear(const RuleConfig& config) : TrafficRule(config) {}
 
-bool KeepClear::ApplyRule(Frame* frame,
+bool KeepClear::ApplyRule(Frame* const frame,
                           ReferenceLineInfo* const reference_line_info) {
   frame_ = frame;
   reference_line_info_ = reference_line_info;

@@ -265,7 +265,7 @@ bool SidepassVehicle::MakeSidepassObstacleDecision(
   return true;
 }
 
-bool SidepassVehicle::ApplyRule(Frame*,
+bool SidepassVehicle::ApplyRule(Frame* const,
                                 ReferenceLineInfo* const reference_line_info) {
   reference_line_ = &(reference_line_info->reference_line());
   auto* path_decision = reference_line_info->path_decision();
