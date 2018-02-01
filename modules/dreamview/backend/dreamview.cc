@@ -39,21 +39,25 @@ using apollo::hdmap::BaseMapFile;
 
 std::string Dreamview::Name() const { return FLAGS_dreamview_module_name; }
 
-void Dreamview::TerminateTestMode(const ros::TimerEvent& event) {
+void Dreamview::TerminateProfilingMode(const ros::TimerEvent& event) {
   Stop();
   ros::shutdown();
-  AERROR << "Called shutdown";
+  AWARN << "Profiling timer called shutdown!";
 }
 
 Status Dreamview::Init() {
   AdapterManager::Init(FLAGS_dreamview_adapter_config_filename);
   VehicleConfigHelper::Init();
 
-  if (FLAGS_dreamview_test_mode && FLAGS_dreamview_test_duration > 0.0) {
+  if (FLAGS_dreamview_profiling_mode &&
+      FLAGS_dreamview_profiling_duration > 0.0) {
     exit_timer_ = AdapterManager::CreateTimer(
-        ros::Duration(FLAGS_dreamview_test_duration),
-        &Dreamview::TerminateTestMode, this, true, true);
-    AERROR << "Created profiling timer";
+        ros::Duration(FLAGS_dreamview_profiling_duration),
+        &Dreamview::TerminateProfilingMode, this, true, true);
+    AWARN << "============================================================";
+    AWARN << "| Dreamview running in profiling mode, exit in "
+          << FLAGS_dreamview_profiling_duration << " seconds |";
+    AWARN << "============================================================";
   }
 
   // Check the expected adapters are initialized.
