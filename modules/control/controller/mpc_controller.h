@@ -103,7 +103,7 @@ class MPCController : public Controller {
  protected:
   void UpdateStateAnalyticalMatching(SimpleMPCDebug *debug);
 
-  void UpdateMatrix();
+  void UpdateMatrix(SimpleMPCDebug *debug);
 
   void FeedforwardUpdate(SimpleMPCDebug *debug);
 
@@ -234,8 +234,6 @@ class MPCController : public Controller {
 
   double brake_deadzone_ = 0.0;
 
-  double heading_error_rate_ = 0.0;
-
   double steer_angle_feedforwardterm_ = 0.0;
 
   double steer_angle_feedforwardterm_updated_ = 0.0;
@@ -243,6 +241,12 @@ class MPCController : public Controller {
   double max_acceleration_ = 0.0;
 
   double max_deceleration_ = 0.0;
+
+  // MeanFilter heading_error_filter_;
+  common::MeanFilter lateral_error_filter_;
+
+  // MeanFilter lateral_error_filter;
+  common::MeanFilter heading_error_filter_;
 };
 
 }  // namespace control

@@ -136,6 +136,10 @@ void MPCController::InitializeFilters(const ControlConf *control_conf) {
   common::LpfCoefficients(
       ts_, control_conf->mpc_controller_conf().cutoff_freq(), &den, &num);
   digital_filter_.set_coefficients(den, num);
+  lateral_error_filter_ = common::MeanFilter(
+      control_conf->mpc_controller_conf().mean_filter_window_size());
+  heading_error_filter_ = common::MeanFilter(
+      control_conf->mpc_controller_conf().mean_filter_window_size());
 }
 
 Status MPCController::Init(const ControlConf *control_conf) {
@@ -286,7 +290,7 @@ Status MPCController::ComputeControlCommand(
   // Update state
   UpdateStateAnalyticalMatching(debug);
 
-  UpdateMatrix();
+  UpdateMatrix(debug);
 
   FeedforwardUpdate(debug);
 
@@ -478,7 +482,7 @@ void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
   matrix_state_(5, 0) = debug->speed_error();
 }
 
-void MPCController::UpdateMatrix() {
+void MPCController::UpdateMatrix(SimpleMPCDebug *debug) {
   const double v = VehicleStateProvider::instance()->linear_velocity();
   matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
   matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
@@ -491,7 +495,7 @@ void MPCController::UpdateMatrix() {
 
   matrix_c_(1, 0) = (lr_ * cr_ - lf_ * cf_) / mass_ / v - v;
   matrix_c_(3, 0) = -(lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_ / v;
-  matrix_cd_ = matrix_c_ * heading_error_rate_ * ts_;
+  matrix_cd_ = matrix_c_ * debug->heading_error_rate() * ts_;
 }
 
 /*
@@ -549,7 +553,7 @@ void MPCController::ComputeLateralErrors(
   // matched_point.v();
   debug->set_heading_error_rate(angular_v - matched_point.path_point().kappa() *
                                                 matched_point.v());
-  heading_error_rate_ = debug->heading_error_rate();
+
   // matched_theta = matched_point.path_point().theta();
   debug->set_ref_heading(matched_point.path_point().theta());
   // matched_kappa = matched_point.path_point().kappa();
