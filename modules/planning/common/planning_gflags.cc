@@ -279,6 +279,9 @@ DEFINE_double(crosswalk_stop_distance, 1.0,
               "stop distance from stop line of crosswalk");
 /// stop_sign
 DEFINE_bool(enable_stop_sign, true, "enable stop_sign");
+DEFINE_bool(
+    enable_stop_sign_creeping, false,
+    "enable stop_sign creeping forward at one way or two way stop signs.");
 DEFINE_string(stop_sign_virtual_object_id_prefix, "SS_",
               "prefix for converting stop_sign id to virtual object id");
 DEFINE_double(stop_sign_stop_duration, 3.0,
