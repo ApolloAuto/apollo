@@ -273,17 +273,15 @@ void SimulationWorldService::UpdateDelays() {
       SecToMs(AdapterManager::GetTrafficLightDetection()->GetDelaySec()));
 }
 
-std::string SimulationWorldService::GetWireFormatString(
-    double radius, bool enable_pnc_monitor) {
+void SimulationWorldService::GetWireFormatString(
+    double radius, std::string *sim_world,
+    std::string *sim_world_with_planning_data) {
   PopulateMapInfo(radius);
-  if (!enable_pnc_monitor) {
-    world_.clear_planning_data();
-  }
 
-  std::string bin;
-  world_.SerializeToString(&bin);
+  world_.SerializeToString(sim_world_with_planning_data);
 
-  return bin;
+  world_.clear_planning_data();
+  world_.SerializeToString(sim_world);
 }
 
 Json SimulationWorldService::GetUpdateAsJson(double radius) const {
