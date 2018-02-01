@@ -168,6 +168,7 @@ DECLARE_double(crosswalk_min_pass_distance);
 DECLARE_double(crosswalk_stop_distance);
 /// stop_sign
 DECLARE_bool(enable_stop_sign);
+DECLARE_bool(enable_stop_sign_creeping);
 DECLARE_string(stop_sign_virtual_object_id_prefix);
 DECLARE_double(stop_sign_stop_duration);
 DECLARE_double(stop_sign_min_pass_distance);
