@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file crosswalk.cc
  **/
 
 #include "modules/planning/tasks/traffic_decider/crosswalk.h"
@@ -230,14 +230,14 @@ bool Crosswalk::BuildStopDecision(
 
   // build stop decision
   const double stop_s =
-      crosswalk_overlap->start_s - FLAGS_stop_distance_crosswalk;
+      crosswalk_overlap->start_s - FLAGS_crosswalk_stop_distance;
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
   stop_decision->set_reason_code(StopReasonCode::STOP_REASON_CROSSWALK);
-  stop_decision->set_distance_s(-FLAGS_stop_distance_crosswalk);
+  stop_decision->set_distance_s(-FLAGS_crosswalk_stop_distance);
   stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
   stop_decision->mutable_stop_point()->set_y(stop_point.y());
