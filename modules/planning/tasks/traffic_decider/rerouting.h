@@ -37,7 +37,8 @@ class Rerouting : public TrafficRule {
   explicit Rerouting(const RuleConfig& config);
   virtual ~Rerouting() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 
  private:
   bool ChangeLaneFailRerouting();

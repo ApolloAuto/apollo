@@ -36,7 +36,8 @@ class KeepClear : public TrafficRule {
   explicit KeepClear(const RuleConfig& config);
   virtual ~KeepClear() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 
  private:
   bool BuildKeepClearObstacle(const hdmap::PathOverlap& keep_clear_overlap);

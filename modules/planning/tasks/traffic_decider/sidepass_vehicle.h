@@ -33,7 +33,8 @@ class SidepassVehicle : public TrafficRule {
   explicit SidepassVehicle(const RuleConfig& config);
   virtual ~SidepassVehicle() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 
   // a sidepass sequence includes:
   // driving -> wait -> sidepass -> driving
