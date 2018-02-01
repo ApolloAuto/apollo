@@ -55,8 +55,8 @@ using Duration = std::chrono::nanoseconds;
  */
 using Timestamp = std::chrono::time_point<std::chrono::system_clock, Duration>;
 
-static_assert(std::is_same<int64_t, Duration::rep>::value,
-              "The underlying type of the microseconds should be int64.");
+static_assert(sizeof(std::chrono::nanoseconds) >= sizeof(int64_t),
+              "The underlying type of the nanoseconds should be at least 64 bits.");
 
 using nanos = std::chrono::nanoseconds;
 using micros = std::chrono::microseconds;
