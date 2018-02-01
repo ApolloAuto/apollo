@@ -248,7 +248,7 @@ int Frame::CreateDestinationObstacle() {
 
   double dest_lane_s =
       std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
-                        FLAGS_stop_distance_destination);
+                        FLAGS_destination_stop_distance);
   auto dest_point = lane->GetSmoothPoint(dest_lane_s);
   double left_width = 0.0;
   double right_width = 0.0;
