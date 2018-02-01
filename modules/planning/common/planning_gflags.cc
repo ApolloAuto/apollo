@@ -240,14 +240,16 @@ DEFINE_bool(enable_rule_layer, true,
 
 // Traffic decision
 /// common
-DEFINE_double(stop_max_distance_buffer, 4.0,
+DEFINE_double(max_stop_distance_buffer, 4.0,
               "distance buffer of passing stop line");
-DEFINE_double(stop_max_speed, 0.2, "min speed(m/s) for computing stop");
-DEFINE_double(stop_max_deceleration, 6.0, "max deceleration");
+DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
+DEFINE_double(max_stop_deceleration, 6.0, "max deceleration");
 DEFINE_double(max_valid_stop_distance, 3.0,
               "max distance(m) to the stop line to be "
               "considered as a valid stop");
-
+DEFINE_double(creep_stop_distance, 0.5,
+              "stop distance(m) to the stop line of next lane overlap "
+              "while creeping ");
 /// Clear Zone
 DEFINE_string(keep_clear_virtual_object_id_prefix, "KC_",
               "prefix for converting keep-clear id to virtual object id");
@@ -255,7 +257,7 @@ DEFINE_string(keep_clear_virtual_object_id_prefix, "KC_",
 DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 DEFINE_string(signal_light_virtual_object_id_prefix, "SL_",
               "prefix for converting signal id to virtual object id");
-DEFINE_double(max_deacceleration_for_yellow_light_stop, 3.0,
+DEFINE_double(max_stop_deacceleration_for_yellow_light, 3.0,
               "treat yellow light as red when deceleration (abstract value"
               " in m/s^2) is less than this threshold; otherwise treated"
               " as green light");
@@ -279,9 +281,9 @@ DEFINE_double(crosswalk_stop_distance, 1.0,
               "stop distance from stop line of crosswalk");
 /// stop_sign
 DEFINE_bool(enable_stop_sign, true, "enable stop_sign");
-DEFINE_bool(
-    enable_stop_sign_creeping, false,
-    "enable stop_sign creeping forward at one way or two way stop signs.");
+DEFINE_bool(enable_stop_sign_creeping, false,
+            "enable stop_sign creeping forward at one way "
+            "or two way stop signs.");
 DEFINE_string(stop_sign_virtual_object_id_prefix, "SS_",
               "prefix for converting stop_sign id to virtual object id");
 DEFINE_double(stop_sign_stop_duration, 3.0,
@@ -291,6 +293,9 @@ DEFINE_double(stop_sign_min_pass_distance, 3.0,
               "have passed stop sign (stop_line_end_s)");
 DEFINE_double(stop_sign_stop_distance, 1.0,
               "stop distance from stop line of stop sign");
+DEFINE_double(max_watch_vehicle_stop_speed, 0.5,
+              "max speed(m/s) for watch vehicles to be considered as a stop."
+              "(this check is looser than adc)");
 /// destination
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");

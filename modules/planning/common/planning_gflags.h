@@ -145,18 +145,18 @@ DECLARE_bool(enable_follow_accel_constraint);
 
 // traffic decision
 /// common
-DECLARE_double(stop_max_distance_buffer);
-DECLARE_double(stop_max_speed);
-DECLARE_double(stop_max_deceleration);
+DECLARE_double(max_stop_distance_buffer);
+DECLARE_double(max_stop_speed);
+DECLARE_double(max_stop_deceleration);
 DECLARE_double(signal_expire_time_sec);
 DECLARE_double(max_valid_stop_distance);
-
+DECLARE_double(creep_stop_distance);
 /// Clear Zone
 DECLARE_string(keep_clear_virtual_object_id_prefix);
 /// traffic light
 DECLARE_bool(enable_traffic_light);
 DECLARE_string(signal_light_virtual_object_id_prefix);
-DECLARE_double(max_deacceleration_for_yellow_light_stop);
+DECLARE_double(max_stop_deacceleration_for_yellow_light);
 DECLARE_double(traffic_light_stop_distance);
 /// crosswalk
 DECLARE_bool(enable_crosswalk);
@@ -173,6 +173,8 @@ DECLARE_string(stop_sign_virtual_object_id_prefix);
 DECLARE_double(stop_sign_stop_duration);
 DECLARE_double(stop_sign_min_pass_distance);
 DECLARE_double(stop_sign_stop_distance);
+DECLARE_double(max_watch_vehicle_stop_speed);
+DECLARE_double(stop_sign_creep_buffer);
 /// destination
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(destination_check_distance);
