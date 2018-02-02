@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,30 +18,35 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_REFERENCE_LINE_END_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_REFERENCE_LINE_END_H_
+#ifndef MODULES_PERCEPTION_DATA_GENERATOR_SENSOR_H_
+#define MODULES_PERCEPTION_DATA_GENERATOR_SENSOR_H_
 
 #include <string>
 
-#include "modules/planning/tasks/traffic_decider/traffic_rule.h"
+#include "modules/perception/tool/data_generator/proto/config.pb.h"
 
 namespace apollo {
-namespace planning {
+namespace perception {
+namespace data_generator {
 
-/**
- * This class decides whether we should send rerouting request based on traffic
- * situation.
- */
-class ReferenceLineEnd : public TrafficRule {
+class Sensor {
  public:
-  explicit ReferenceLineEnd(const RuleConfig& config);
-  virtual ~ReferenceLineEnd() = default;
+  explicit Sensor(const SensorConfig& config) : config_(config) {}
+  virtual ~Sensor() = default;
+  virtual SensorConfig::SensorId Id() const {
+    return config_.id();
+  }
+  virtual const std::string& SensorFrameName() const {
+    return config_.sensor_frame_name();
+  }
+  virtual bool Process() = 0;
 
-  bool ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+ protected:
+  SensorConfig config_;
 };
 
-}  // namespace planning
+}  // namespace data_generator
+}  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_REFERENCE_LINE_END_H_
+#endif  // MODULES_PERCEPTION_DATA_GENERATOR_SENSOR_H_

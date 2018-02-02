@@ -1146,6 +1146,25 @@ body {
     }
 }
 
+.data-recorder {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+
+    flex: 1 auto;
+
+    z-index: 10;
+    margin-right: 3px;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    .drive-event-card {
+        .drive-event-msg {
+            width: 500px;
+        }
+    }
+}
+
 .loader {
     flex: 0 0 auto;
 

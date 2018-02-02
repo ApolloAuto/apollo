@@ -84,12 +84,9 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
   }
 }
 
-void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
+void Trajectory1dGenerator::GenerateSpeedProfilesForPathTimeBound(
     const PlanningTarget& planning_target,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
-  // cruising trajectories are planned regardlessly.
-  GenerateSpeedProfilesForCruising(planning_target.cruise_speed(),
-                                   ptr_lon_trajectory_bundle);
 
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
       end_condition_sampler_->SampleLonEndConditionsForPathTimeBounds(
@@ -106,6 +103,18 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
     lattice_traj_ptr->set_target_time(end_condition.second);
     ptr_lon_trajectory_bundle->push_back(lattice_traj_ptr);
   }
+}
+
+void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
+    const PlanningTarget& planning_target,
+    std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
+  // cruising trajectories are planned regardlessly.
+  GenerateSpeedProfilesForCruising(planning_target.cruise_speed(),
+                                   ptr_lon_trajectory_bundle);
+
+  //
+  GenerateSpeedProfilesForPathTimeBound(planning_target,
+                                        ptr_lon_trajectory_bundle);
 }
 
 void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(

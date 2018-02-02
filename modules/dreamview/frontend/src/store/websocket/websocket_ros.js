@@ -190,7 +190,7 @@ export default class RosWebSocketEndpoint {
     executeModeCommand(command) {
         this.websocket.send(JSON.stringify({
             type: "ExecuteModeCommand",
-            command, command,
+            command: command,
         }));
     }
 
@@ -198,22 +198,30 @@ export default class RosWebSocketEndpoint {
         this.websocket.send(JSON.stringify({
             type: "ExecuteModuleCommand",
             module: module,
-            command, command,
+            command: command,
         }));
     }
 
     executeToolCommand(tool, command) {
-         this.websocket.send(JSON.stringify({
+        this.websocket.send(JSON.stringify({
             type: "ExecuteToolCommand",
             tool: tool,
-            command, command,
+            command: command,
         }));
     }
 
     changeDrivingMode(mode) {
-         this.websocket.send(JSON.stringify({
+        this.websocket.send(JSON.stringify({
             type: "ChangeDrivingMode",
             new_mode: mode,
+        }));
+    }
+
+    submitDriveEvent(event_time_ms, event_msg) {
+    	this.websocket.send(JSON.stringify({
+            type: "SubmitDriveEvent",
+            event_time_ms: event_time_ms,
+            event_msg: event_msg,
         }));
     }
 }

@@ -47,9 +47,8 @@ class LatticePlanner : public Planner {
    * @param frame Current planning frame.
    * @return OK if planning succeeds; error otherwise.
    */
-  apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame) override;
+  common::Status Plan(const common::TrajectoryPoint& planning_init_point,
+                      Frame* frame) override;
 
   /**
    * @brief Override function Plan in parent class Planner.
@@ -65,11 +64,10 @@ class LatticePlanner : public Planner {
  private:
   DiscretizedTrajectory GetFutureTrajectory() const;
 
-  bool MapFutureTrajectoryToSL(
-      const DiscretizedTrajectory& future_trajectory,
-      std::vector<apollo::common::SpeedPoint>* st_points,
-      std::vector<apollo::common::FrenetFramePoint>* sl_points,
-      ReferenceLineInfo* reference_line_info);
+  bool MapFutureTrajectoryToSL(const DiscretizedTrajectory& future_trajectory,
+                               std::vector<common::SpeedPoint>* st_points,
+                               std::vector<common::FrenetFramePoint>* sl_points,
+                               ReferenceLineInfo* reference_line_info);
 
   BehaviorDecider decider_;
 };

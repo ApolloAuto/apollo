@@ -35,6 +35,8 @@ DiscretizedTrajectory TrajectoryCombiner::Combine(
 
   double s0 = lon_trajectory.Evaluate(0, 0.0);
   double s_ref_max = reference_line.back().s();
+  double accumulated_trajectory_s = 0.0;
+  PathPoint prev_trajectory_point;
 
   double t_param = 0.0;
   while (t_param < FLAGS_trajectory_time_length) {
@@ -78,9 +80,17 @@ DiscretizedTrajectory TrajectoryCombiner::Combine(
         rs, rx, ry, rtheta, rkappa, rdkappa, s_conditions, d_conditions, &x, &y,
         &theta, &kappa, &v, &a);
 
+    if (prev_trajectory_point.has_x() && prev_trajectory_point.has_y()) {
+      double delta_x = x - prev_trajectory_point.x();
+      double delta_y = y - prev_trajectory_point.y();
+      double delta_s = std::hypot(delta_x, delta_y);
+      accumulated_trajectory_s += delta_s;
+    }
+
     TrajectoryPoint trajectory_point;
     trajectory_point.mutable_path_point()->set_x(x);
     trajectory_point.mutable_path_point()->set_y(y);
+    trajectory_point.mutable_path_point()->set_s(accumulated_trajectory_s);
     trajectory_point.mutable_path_point()->set_theta(theta);
     trajectory_point.mutable_path_point()->set_kappa(kappa);
     trajectory_point.set_v(v);
@@ -90,6 +100,8 @@ DiscretizedTrajectory TrajectoryCombiner::Combine(
     combined_trajectory.AppendTrajectoryPoint(trajectory_point);
 
     t_param = t_param + FLAGS_trajectory_time_resolution;
+
+    prev_trajectory_point = trajectory_point.path_point();
   }
   return combined_trajectory;
 }

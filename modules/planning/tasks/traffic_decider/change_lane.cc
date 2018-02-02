@@ -136,7 +136,7 @@ bool ChangeLane::CreateGuardObstacle(
   return true;
 }
 
-bool ChangeLane::ApplyRule(Frame* frame,
+bool ChangeLane::ApplyRule(Frame* const frame,
                            ReferenceLineInfo* const reference_line_info) {
   // The reference line is not a change lane reference line, skip
   if (reference_line_info->Lanes().IsOnSegment()) {
