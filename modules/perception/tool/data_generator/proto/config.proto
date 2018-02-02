@@ -36,7 +36,6 @@ message ROI {
   repeated apollo.common.Point3D polygon_point = 1;
 }
 
-
 message SensorConfig {
   enum SensorId {
     VELODYNE64 = 1;

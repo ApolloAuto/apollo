@@ -46,6 +46,9 @@ namespace data_generator {
 
 class DataGenerator : public apollo::common::ApolloApp {
  public:
+  DataGenerator() = default;
+  ~DataGenerator() = default;
+
   std::string Name() const override;
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
@@ -58,6 +61,8 @@ class DataGenerator : public apollo::common::ApolloApp {
 
   void RegisterSensors();
 
+  bool Process();
+
   ros::Timer timer_;
 
   std::ofstream* data_file_ = nullptr;
@@ -67,6 +72,8 @@ class DataGenerator : public apollo::common::ApolloApp {
                         Sensor* (*)(const SensorConfig& config)>
       sensor_factory_;
   google::protobuf::RepeatedPtrField<SensorConfig> sensor_configs_;
+
+  DataGeneratorInfo data_generator_info_;
 };
 
 }  // namespace data_generator
