@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file crosswalk.cc
+ * @file
  **/
 
 #include "modules/planning/tasks/traffic_decider/crosswalk.h"
