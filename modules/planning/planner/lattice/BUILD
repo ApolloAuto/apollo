@@ -23,7 +23,7 @@ cc_library(
         "//modules/planning/lattice/trajectory_generator:trajectory1d_generator",
         "//modules/planning/lattice/trajectory_generator:trajectory_evaluator",
         "//modules/planning/lattice/trajectory_generator:trajectory_combiner",
-        "//modules/planning/lattice/trajectory_generator:backup_trajectory",
+        "//modules/planning/lattice/trajectory_generator:backup_trajectory_generator",
         "//modules/planning/lattice/behavior_decider:behavior_decider",
         "//modules/planning/lattice/behavior_decider:path_time_neighborhood",
     ],
