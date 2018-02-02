@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file crosswalk.cc
+ * @file
  **/
 
 #include "modules/planning/tasks/traffic_decider/crosswalk.h"
@@ -46,6 +46,9 @@ Crosswalk::Crosswalk(const RuleConfig& config) : TrafficRule(config) {}
 
 bool Crosswalk::ApplyRule(Frame* frame,
                           ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
   if (!FLAGS_enable_crosswalk) {
     return true;
   }
@@ -58,8 +61,11 @@ bool Crosswalk::ApplyRule(Frame* frame,
   return true;
 }
 
-void Crosswalk::MakeDecisions(Frame* frame,
+void Crosswalk::MakeDecisions(Frame* const frame,
                               ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
   auto* path_decision = reference_line_info->path_decision();
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
 
@@ -179,7 +185,7 @@ void Crosswalk::MakeDecisions(Frame* frame,
       // stop decision
       double stop_deceleration = util::GetADCStopDeceleration(
           reference_line_info, crosswalk_overlap->start_s);
-      if (stop_deceleration < FLAGS_stop_max_deceleration) {
+      if (stop_deceleration < FLAGS_max_stop_deceleration) {
         crosswalks_to_stop.push_back(crosswalk_overlap);
         ADEBUG << "crosswalk_id[" << crosswalk_id << "] STOP";
       }
@@ -187,11 +193,14 @@ void Crosswalk::MakeDecisions(Frame* frame,
   }
 
   for (auto crosswalk_to_stop : crosswalks_to_stop) {
-    BuildStopDecision(frame, reference_line_info, crosswalk_to_stop);
+    BuildStopDecision(frame, reference_line_info,
+                      const_cast<hdmap::PathOverlap*>(crosswalk_to_stop));
   }
 }
 
 bool Crosswalk::FindCrosswalks(ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(reference_line_info);
+
   crosswalk_overlaps_.clear();
   const std::vector<hdmap::PathOverlap>& crosswalk_overlaps =
       reference_line_info->reference_line().map_path().crosswalk_overlaps();
@@ -202,9 +211,13 @@ bool Crosswalk::FindCrosswalks(ReferenceLineInfo* const reference_line_info) {
 }
 
 bool Crosswalk::BuildStopDecision(
-    Frame* frame,
+    Frame* const frame,
     ReferenceLineInfo* const reference_line_info,
-    const hdmap::PathOverlap* crosswalk_overlap) {
+    hdmap::PathOverlap* const crosswalk_overlap) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+  CHECK_NOTNULL(crosswalk_overlap);
+
   // check
   const auto& reference_line = reference_line_info->reference_line();
   if (!WithinBound(0.0, reference_line.Length(), crosswalk_overlap->start_s)) {

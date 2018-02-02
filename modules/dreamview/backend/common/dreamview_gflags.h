@@ -21,9 +21,9 @@
 
 DECLARE_string(dreamview_module_name);
 
-DECLARE_bool(dreamview_test_mode);
+DECLARE_bool(dreamview_profiling_mode);
 
-DECLARE_double(dreamview_test_duration);
+DECLARE_double(dreamview_profiling_duration);
 
 DECLARE_string(dreamview_adapter_config_filename);
 

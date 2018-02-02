@@ -36,7 +36,20 @@ message ROI {
   repeated apollo.common.Point3D polygon_point = 1;
 }
 
-message DataGeneratorObstacles{
-  repeated DataGeneratorObstacle obstacle = 1;  // An array of obstacles
-  optional ROI roi = 2;
+
+message SensorConfig {
+  enum SensorId {
+    VELODYNE64 = 1;
+    VELODYNE16 = 2;
+    CONTI_RADAR = 3;
+  }
+  optional SensorId id = 1;
+  optional string sensor_frame_name = 2;
 }
+
+message DataGeneratorInfo {
+  optional ROI roi = 1;
+  repeated DataGeneratorObstacle obstacle = 2;  // an array of obstacles
+  repeated SensorConfig config = 3; // an array of sensors
+}
+

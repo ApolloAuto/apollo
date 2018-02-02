@@ -169,7 +169,7 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
   if (speed < 0) {
     return kInf;
   }
-  if (speed < FLAGS_stop_max_speed && InKeepClearRange(second.s())) {
+  if (speed < FLAGS_max_stop_speed && InKeepClearRange(second.s())) {
     // first.s in range
     cost += config_.keep_clear_low_speed_penalty() * unit_t_ *
             config_.default_speed_cost();

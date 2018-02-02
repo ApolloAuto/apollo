@@ -73,7 +73,7 @@ void BacksideVehicle::MakeLaneKeepingObstacleDecision(
   }
 }
 
-bool BacksideVehicle::ApplyRule(Frame*,
+bool BacksideVehicle::ApplyRule(Frame* const,
                                 ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
