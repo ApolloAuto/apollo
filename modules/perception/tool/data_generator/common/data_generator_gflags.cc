@@ -19,7 +19,12 @@
 DEFINE_string(
     data_generator_adapter_config_filename,
     "/apollo/modules/perception/tool/data_generator/conf/adapter.conf",
-    "The data generator adapter config filename");
+    "The data generator adapter config filename.");
+
+DEFINE_string(
+    data_generator_config_file,
+    "/apollo/modules/perception/tool/data_generator/conf/config.pb.txt",
+    "The data generator config file.");
 
 DEFINE_string(data_file_prefix,
               "/apollo/modules/perception/tool/data_generator/data/",
