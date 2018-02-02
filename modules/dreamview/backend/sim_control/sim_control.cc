@@ -123,6 +123,10 @@ void SimControl::ClearPlanning() {
   planning_count_ = 0;
 }
 
+void SimControl::Reset() {
+  ClearPlanning();
+}
+
 void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
   CHECK_LE(2, routing.routing_request().waypoint_size());
   const auto& start_pose = routing.routing_request().waypoint(0).pose();

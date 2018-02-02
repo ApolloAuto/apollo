@@ -27,6 +27,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/backend/sim_control/sim_control_interface.h"
 
 /**
  * @namespace apollo::dreamview
@@ -41,7 +42,7 @@ namespace dreamview {
  * an ideal world where the car can be perfectly placed wherever the planning
  * asks it to be, with the expected speed, acceleration, etc.
  */
-class SimControl {
+class SimControl : SimControlInterface {
  public:
   /**
    * @brief Constructor of SimControl.
@@ -54,28 +55,28 @@ class SimControl {
    * @param set_start_point initialize localization.
    */
   void Init(bool set_start_point, double start_velocity = 0.0,
-            double start_acceleration = 0.0);
+            double start_acceleration = 0.0) override;
 
   /**
    * @brief Starts the timer to publish simulated localization and chassis
    * messages.
    */
-  void Start();
+  void Start() override;
 
   /**
    * @brief Stops the timer.
    */
-  void Stop();
+  void Stop() override;
 
   /**
-   * @brief Clears the current received planning data.
+   * @brief Resets the internal state.
    */
-  void ClearPlanning();
+  void Reset() override;
 
   /**
    * @brief Publish simulated localization and chassis.
    */
-  void RunOnce();
+  void RunOnce() override;
 
  private:
   void OnPlanning(const apollo::planning::ADCTrajectory &trajectory);
@@ -94,6 +95,8 @@ class SimControl {
 
   void PublishChassis(double lambda);
   void PublishLocalization(double lambda);
+
+  void ClearPlanning();
 
   template <typename T>
   T Interpolate(T prev, T next, double lambda) {

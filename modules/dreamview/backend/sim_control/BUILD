@@ -9,6 +9,7 @@ cc_library(
     ],
     hdrs = [
         "sim_control.h",
+        "sim_control_interface.h",
     ],
     deps = [
         "//modules/common/adapters:adapter_manager",
