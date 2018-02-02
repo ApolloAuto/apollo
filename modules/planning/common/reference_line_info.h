@@ -137,6 +137,8 @@ class ReferenceLineInfo {
     offset_to_other_reference_line_ = offset;
   }
 
+  void set_is_on_reference_line() { is_on_reference_line_ = true; }
+
  private:
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
