@@ -4,8 +4,15 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "data_generator_lib",
-    srcs = ["data_generator.cc"],
-    hdrs = ["data_generator.h", "sensor.h"],
+    srcs = [
+        "data_generator.cc",
+        "velodyne64.cc",
+    ],
+    hdrs = [
+        "data_generator.h",
+        "sensor.h",
+        "velodyne64.h",
+    ],
     copts = [
         "-Wno-deprecated",
     ],
