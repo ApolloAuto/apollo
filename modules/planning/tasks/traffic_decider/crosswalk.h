@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file crosswalk.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CROSSWALK_H_
