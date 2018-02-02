@@ -48,7 +48,7 @@ int LastIndexBefore(const prediction::Trajectory& trajectory, const double t) {
     return -1;
   }
   if (trajectory.trajectory_point(0).relative_time() > t) {
-    return -1;
+    return 0;
   }
   int start = 0;
   int end = num_traj_point - 1;
