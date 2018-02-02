@@ -18,14 +18,13 @@
  * @file
  **/
 
-#include "modules/planning/tasks/traffic_decider/keep_clear.h"
-
 #include <limits>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/tasks/traffic_decider/keep_clear.h"
 
 namespace apollo {
 namespace planning {
@@ -39,68 +38,73 @@ bool KeepClear::ApplyRule(Frame* const frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (!FLAGS_enable_clear_area) {
+  if (!FLAGS_enable_keep_clear) {
     return true;
   }
 
-  const std::vector<PathOverlap>& clear_area_overlaps =
+  const std::vector<PathOverlap>& keep_clear_overlaps =
       reference_line_info->reference_line().map_path().clear_area_overlaps();
-  for (const auto& clear_area_overlap : clear_area_overlaps) {
-    BuildClearAreaObstacle(frame, reference_line_info,
-                           const_cast<PathOverlap*>(&clear_area_overlap));
-    ADEBUG << "clear_area[" << clear_area_overlap.object_id << "] BUILD";
+  for (const auto& keep_clear_overlap : keep_clear_overlaps) {
+    BuildKeepClearObstacle(frame, reference_line_info,
+                           const_cast<PathOverlap*>(&keep_clear_overlap));
+    ADEBUG << "keep_clear[" << keep_clear_overlap.object_id << "] BUILD";
   }
 
   return true;
 }
 
-bool KeepClear::BuildClearAreaObstacle(
+bool KeepClear::BuildKeepClearObstacle(
     Frame* const frame,
     ReferenceLineInfo* const reference_line_info,
-    PathOverlap* const clear_area_overlap) {
+    PathOverlap* const keep_clear_overlap) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
-  CHECK_NOTNULL(clear_area_overlap);
+  CHECK_NOTNULL(keep_clear_overlap);
 
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
-  if (clear_area_overlap->start_s < adc_front_edge_s) {
+  if (keep_clear_overlap->start_s < adc_front_edge_s) {
     ADEBUG << "adc is already inside clear area["
-           << clear_area_overlap->object_id << "]. skip this clear area";
+           << keep_clear_overlap->object_id << "]. skip this clear area";
     return true;
   }
 
+  // start_xy
   common::SLPoint sl_point;
-  sl_point.set_s(clear_area_overlap->start_s);
+  sl_point.set_s(keep_clear_overlap->start_s);
   sl_point.set_l(0.0);
   common::math::Vec2d start_xy;
   const auto& reference_line = reference_line_info->reference_line();
   if (!reference_line.SLToXY(sl_point, &start_xy)) {
-    AERROR << "Failed to get xy from sl: " << sl_point.DebugString();
+    AERROR << "Failed to get start_xy from sl: " << sl_point.DebugString();
+    return false;
+  }
+
+  // end_xy
+  sl_point.set_s(keep_clear_overlap->end_s);
+  sl_point.set_l(0.0);
+  common::math::Vec2d end_xy;
+  if (!reference_line_info->reference_line().SLToXY(sl_point, &end_xy)) {
+    AERROR << "Failed to get end_xy from sl: " << sl_point.DebugString();
     return false;
   }
 
   double left_lane_width = 0.0;
   double right_lane_width = 0.0;
-  if (!reference_line.GetLaneWidth(clear_area_overlap->start_s,
+  if (!reference_line.GetLaneWidth(keep_clear_overlap->start_s,
                                    &left_lane_width,
                                    &right_lane_width)) {
     AERROR << "Failed to get lane width at s["
-        << clear_area_overlap->start_s << "]";
+        << keep_clear_overlap->start_s << "]";
     return false;
   }
-  common::math::Vec2d end_xy;
-  sl_point.set_s(clear_area_overlap->end_s);
-  if (!reference_line_info->reference_line().SLToXY(sl_point, &end_xy)) {
-    AERROR << "Failed to get xy from sl: " << sl_point.DebugString();
-    return false;
-  }
-  common::math::Box2d clear_area_box{
+
+  common::math::Box2d keep_clear_box{
       common::math::LineSegment2d(start_xy, end_xy),
       left_lane_width + right_lane_width};
   const auto obstacle_id =
-      FLAGS_clear_area_virtual_object_id_prefix + clear_area_overlap->object_id;
+      FLAGS_keep_clear_virtual_object_id_prefix + keep_clear_overlap->object_id;
   auto* obstacle =
-      frame->AddStaticVirtualObstacle(obstacle_id, clear_area_box);
+      frame->AddStaticVirtualObstacle(obstacle_id, keep_clear_box);
   if (!obstacle) {
     AERROR << "Failed to create obstacle " << obstacle_id << " in frame";
     return false;
