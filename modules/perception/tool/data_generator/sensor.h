@@ -21,6 +21,7 @@
 #ifndef MODULES_PERCEPTION_DATA_GENERATOR_SENSOR_H_
 #define MODULES_PERCEPTION_DATA_GENERATOR_SENSOR_H_
 
+#include <sstream>
 #include <string>
 
 #include "modules/perception/tool/data_generator/proto/config.pb.h"
@@ -40,9 +41,14 @@ class Sensor {
     return config_.sensor_frame_name();
   }
   virtual bool Process() = 0;
+  virtual const std::string& data() const {
+    return data_;
+  }
 
  protected:
   SensorConfig config_;
+  std::stringstream ss_;
+  std::string data_;
 };
 
 }  // namespace data_generator
