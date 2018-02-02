@@ -24,6 +24,7 @@
 #include "modules/common/log.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/perception/tool/data_generator/common/data_generator_gflags.h"
+#include "modules/perception/tool/data_generator/velodyne64.h"
 
 namespace apollo {
 namespace perception {
@@ -46,7 +47,14 @@ std::string DataGenerator::Name() const {
 }
 
 Status DataGenerator::Init() {
+  RegisterSensors();
   AdapterManager::Init(FLAGS_data_generator_adapter_config_filename);
+
+  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_data_generator_config_file,
+                                               &data_generator_info_))
+      << "failed to load data generator config file "
+      << FLAGS_data_generator_config_file;
+  sensor_configs_ = data_generator_info_.config();
 
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
   CHECK(AdapterManager::GetLocalization())
@@ -58,6 +66,13 @@ Status DataGenerator::Init() {
   CHECK(data_file_->is_open()) << file_name;
 
   return Status::OK();
+}
+
+void DataGenerator::RegisterSensors() {
+  sensor_factory_.Register(SensorConfig::VELODYNE64,
+                           [](const SensorConfig& config) -> Sensor* {
+                             return new Velodyne64(config);
+                           });
 }
 
 void DataGenerator::OnTimer(const ros::TimerEvent&) {
@@ -93,6 +108,21 @@ void DataGenerator::RunOnce() {
   AINFO << "VehicleState updated.";
 
   // TODO(Liangliang): register more sensors and use factory to manager.
+}
+
+bool DataGenerator::Process() {
+  for (const auto& sensor_config : sensor_configs_) {
+    auto sensor =
+        sensor_factory_.CreateObject(sensor_config.id(), sensor_config);
+    if (!sensor) {
+      AERROR << "Could not find sensor " << sensor_config.DebugString();
+      continue;
+    }
+    sensor->Process();
+    ADEBUG << "Processed sensor "
+           << SensorConfig::SensorId_Name(sensor_config.id());
+  }
+  return true;
 }
 
 Status DataGenerator::Start() {

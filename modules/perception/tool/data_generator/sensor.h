@@ -37,9 +37,6 @@ class Sensor {
   virtual SensorConfig::SensorId Id() const {
     return config_.id();
   }
-  virtual const std::string& SensorFrameName() const {
-    return config_.sensor_frame_name();
-  }
   virtual bool Process() = 0;
   virtual const std::string& data() const {
     return data_;
