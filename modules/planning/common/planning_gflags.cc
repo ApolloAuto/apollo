@@ -250,9 +250,10 @@ DEFINE_double(max_valid_stop_distance, 3.0,
 DEFINE_double(creep_stop_distance, 0.5,
               "stop distance(m) to the stop line of next lane overlap "
               "while creeping ");
-/// Clear Zone
-DEFINE_string(keep_clear_virtual_object_id_prefix, "KC_",
-              "prefix for converting keep-clear id to virtual object id");
+/// clear_area
+DEFINE_bool(enable_clear_area, true, "enable clear_area");
+DEFINE_string(clear_area_virtual_object_id_prefix, "CA_",
+              "prefix for converting clear_area id to virtual object id");
 /// traffic light
 DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 DEFINE_string(signal_light_virtual_object_id_prefix, "SL_",
@@ -293,7 +294,7 @@ DEFINE_double(stop_sign_min_pass_distance, 3.0,
               "have passed stop sign (stop_line_end_s)");
 DEFINE_double(stop_sign_stop_distance, 1.0,
               "stop distance from stop line of stop sign");
-DEFINE_double(max_watch_vehicle_stop_speed, 0.5,
+DEFINE_double(stop_sign_max_watch_vehicle_stop_speed, 0.5,
               "max speed(m/s) for watch vehicles to be considered as a stop."
               "(this check is looser than adc)");
 /// destination
