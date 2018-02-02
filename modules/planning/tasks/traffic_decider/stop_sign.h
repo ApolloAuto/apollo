@@ -50,7 +50,7 @@ class StopSign : public TrafficRule {
   };
 
  private:
-  void MakeDecisions(Frame* frame,
+  void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
   bool FindNextStopSign(ReferenceLineInfo* const reference_line_info);
   int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
@@ -67,9 +67,10 @@ class StopSign : public TrafficRule {
                          StopSignLaneVehicles* watch_vehicles);
   int ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
                         StopSignLaneVehicles* watch_vehicles);
-  bool BuildStopDecision(const double stop_buffer, Frame* frame,
+  bool BuildStopDecision(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info,
-                         const hdmap::PathOverlap* overlap);
+                         hdmap::PathOverlap* const overlap,
+                         const double stop_buffer);
   void ClearDropbox(const std::string& stop_sign_id);
   void ClearDropboxWatchvehicles();
 

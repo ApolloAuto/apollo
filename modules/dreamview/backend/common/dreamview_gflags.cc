@@ -18,11 +18,12 @@
 
 DEFINE_string(dreamview_module_name, "dreamview", "dreamview module name");
 
-DEFINE_bool(dreamview_test_mode, false, "Run dreamview in test mode");
+DEFINE_bool(dreamview_profiling_mode, false, "Run dreamview in profiling mode");
 
-DEFINE_double(dreamview_test_duration, -1.0,
-              "Dreamview test duration. Negative value will not restrict the "
-              "testing time");
+DEFINE_double(
+    dreamview_profiling_duration, -1.0,
+    "Dreamview profiling duration. Negative value will not restrict the "
+    "profiling time");
 
 DEFINE_string(dreamview_adapter_config_filename,
               "modules/dreamview/conf/adapter.conf", "The adapter config file");
@@ -71,4 +72,4 @@ DEFINE_int32(dreamview_worker_num, 3, "number of dreamview thread workers");
 DEFINE_bool(enable_update_size_check, true,
             "True to check if the update byte number is less than threshold");
 DEFINE_uint32(max_update_size, 1000000,
-             "number of max update bytes allowed to push to dreamview FE");
+              "number of max update bytes allowed to push to dreamview FE");

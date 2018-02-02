@@ -47,7 +47,7 @@ class Dreamview : public apollo::common::ApolloApp {
   virtual ~Dreamview() = default;
 
  private:
-  void TerminateTestMode(const ros::TimerEvent& event);
+  void TerminateProfilingMode(const ros::TimerEvent& event);
   ros::Timer exit_timer_;
 
   std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;

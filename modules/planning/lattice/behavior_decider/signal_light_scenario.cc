@@ -65,11 +65,11 @@ int SignalLightScenario::ComputeScenarioDecision(
         GetStopDeceleration(reference_line_info, signal_light);
 
     if ((signal.color() == TrafficLight::RED &&
-         stop_deceleration < FLAGS_stop_max_deceleration) ||
+         stop_deceleration < FLAGS_max_stop_deceleration) ||
         (signal.color() == TrafficLight::UNKNOWN &&
-         stop_deceleration < FLAGS_stop_max_deceleration) ||
+         stop_deceleration < FLAGS_max_stop_deceleration) ||
         (signal.color() == TrafficLight::YELLOW &&
-         stop_deceleration < FLAGS_max_deacceleration_for_yellow_light_stop)) {
+         stop_deceleration < FLAGS_max_stop_deacceleration_for_yellow_light)) {
       CreateStopObstacle(frame, reference_line_info, signal_light);
     }
   }
@@ -89,7 +89,7 @@ bool SignalLightScenario::FindValidSignalLight(
   }
   signal_lights_along_reference_line_.clear();
   for (const hdmap::PathOverlap& signal_light : signal_lights) {
-    if (signal_light.start_s + FLAGS_stop_max_distance_buffer >
+    if (signal_light.start_s + FLAGS_max_stop_distance_buffer >
         reference_line_info->AdcSlBoundary().end_s()) {
       signal_lights_along_reference_line_.push_back(&signal_light);
     }
@@ -136,7 +136,7 @@ double SignalLightScenario::GetStopDeceleration(
     const hdmap::PathOverlap* signal_light) {
   double adc_speed =
       common::VehicleStateProvider::instance()->linear_velocity();
-  if (adc_speed < FLAGS_stop_max_speed) {
+  if (adc_speed < FLAGS_max_stop_speed) {
     return 0.0;
   }
   double stop_distance = 0.0;
@@ -146,7 +146,7 @@ double SignalLightScenario::GetStopDeceleration(
   if (stop_line_s > adc_front_s) {
     stop_distance = stop_line_s - adc_front_s;
   } else {
-    stop_distance = stop_line_s + FLAGS_stop_max_distance_buffer - adc_front_s;
+    stop_distance = stop_line_s + FLAGS_max_stop_distance_buffer - adc_front_s;
   }
   if (stop_distance < 1e-5) {
     // longitudinal_acceleration_lower_bound is a negative value.
