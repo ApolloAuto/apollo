@@ -145,6 +145,7 @@ Status LatticePlanner::PlanOnReferenceLine(
          << num_planning_succeeded_cycles;
   ++num_planning_cycles;
 
+  reference_line_info->set_is_on_reference_line();
   // 1. obtain a reference line and transform it to the PathPoint format.
   auto discretized_reference_line = ToDiscretizedReferenceLine(
       reference_line_info->reference_line().reference_points());
@@ -355,6 +356,10 @@ Status LatticePlanner::PlanOnReferenceLine(
           backup_trajectory_generator.GenerateTrajectory(
               discretized_reference_line);
       reference_line_info->SetCost(FLAGS_backup_trajectory_cost);
+
+      reference_line_info->SetDrivable(true);
+      return Status::OK();
+
     } else {
       reference_line_info->SetCost(std::numeric_limits<double>::infinity());
     }
