@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file stop_sign.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_STOP_SIGN_H_
@@ -87,8 +87,6 @@ class StopSign : public TrafficRule {
   StopSignStopStatus stop_status_;
   std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
       associated_lanes_;
-
-  const ReferenceLineInfo* reference_line_info_ = nullptr;
 };
 
 }  // namespace planning

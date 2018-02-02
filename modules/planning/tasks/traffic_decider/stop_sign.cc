@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file stop_sign.cc
+ * @file
  **/
 
 #include "modules/planning/tasks/traffic_decider/stop_sign.h"
@@ -64,7 +64,6 @@ bool StopSign::ApplyRule(Frame* frame,
   if (!FLAGS_enable_stop_sign) {
     return true;
   }
-  reference_line_info_ = reference_line_info_;
 
   if (!FindNextStopSign(reference_line_info)) {
     return true;
@@ -133,10 +132,10 @@ void StopSign::MakeDecisions(Frame* frame,
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] DONE";
   } else if (stop_status_ == StopSignStopStatus::CREEPING) {
     auto* next_overlap =
-        reference_line_info_->reference_line().map_path().NextLaneOverlap(
-            reference_line_info_->AdcSlBoundary().end_s());
+        reference_line_info->reference_line().map_path().NextLaneOverlap(
+            reference_line_info->AdcSlBoundary().end_s());
     BuildStopDecision(frame, reference_line_info,
-                      const_cast<hdmap::PathOverlap*>(next_overlap),
+                      const_cast<PathOverlap*>(next_overlap),
                       FLAGS_creep_stop_distance);
   } else {
     // stop decision
@@ -145,7 +144,7 @@ void StopSign::MakeDecisions(Frame* frame,
     if (stop_deceleration < FLAGS_max_stop_deceleration) {
       BuildStopDecision(
           frame, reference_line_info,
-          const_cast<hdmap::PathOverlap*>(next_stop_sign_overlap_),
+          const_cast<PathOverlap*>(next_stop_sign_overlap_),
           FLAGS_stop_sign_stop_distance);
     }
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] STOP";
@@ -291,17 +290,17 @@ int StopSign::ProcessStopStatus(
     case StopSignStopStatus::CREEPING: {
       constexpr double kDeltaS = 0.5;
       auto* path_overlap =
-          reference_line_info_->reference_line().map_path().NextLaneOverlap(
-              reference_line_info_->AdcSlBoundary().end_s());
+          reference_line_info->reference_line().map_path().NextLaneOverlap(
+              reference_line_info->AdcSlBoundary().end_s());
       if (path_overlap->start_s -
-              reference_line_info_->AdcSlBoundary().end_s() >
+              reference_line_info->AdcSlBoundary().end_s() >
           kDeltaS) {
         // keep in CREEPING status
       } else {
         bool all_far_away = true;
         const double kBoundaryMinT = 6.0;
         for (auto* obstacle :
-             reference_line_info_->path_decision().path_obstacles().Items()) {
+             reference_line_info->path_decision()->path_obstacles().Items()) {
           if (obstacle->reference_line_st_boundary().min_t() < kBoundaryMinT) {
             all_far_away = false;
             break;
@@ -477,7 +476,7 @@ int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
 
   auto speed = std::hypot(perception_obstacle.velocity().x(),
                           perception_obstacle.velocity().y());
-  if (speed > FLAGS_max_watch_vehicle_stop_speed) {
+  if (speed > FLAGS_stop_sign_max_watch_vehicle_stop_speed) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
            << "] velocity[" << speed << "] not stopped. skip";
     return -1;
@@ -586,7 +585,7 @@ int StopSign::RemoveWatchVehicle(
   if (!erase) {
     auto speed = std::hypot(perception_obstacle.velocity().x(),
                             perception_obstacle.velocity().y());
-    if (speed > FLAGS_max_watch_vehicle_stop_speed) {
+    if (speed > FLAGS_stop_sign_max_watch_vehicle_stop_speed) {
       ADEBUG << "obstacle_id[" << obstacle_id
           << "] type[" << obstacle_type_name
           << "] velocity[" << speed
@@ -687,7 +686,7 @@ int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
 bool StopSign::BuildStopDecision(
     Frame* frame,
     ReferenceLineInfo* const reference_line_info,
-    hdmap::PathOverlap* const overlap,
+    PathOverlap* const overlap,
     const double stop_buffer) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
