@@ -126,8 +126,9 @@ class SimControl : SimControlInterface {
 
   bool re_routing_triggered_;
 
-  // Whether the sim control is enabled.
+  // Whether the sim control is enabled / initialized.
   bool enabled_;
+  bool inited_;
 
   // The header of the routing planning is following.
   apollo::common::Header current_routing_header_;
