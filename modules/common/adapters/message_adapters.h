@@ -23,7 +23,7 @@
 #include "modules/common/adapters/adapter.h"
 #include "modules/common/monitor_log/proto/monitor_log.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
-#include "modules/drivers/proto/gnss_status.pb.h"
+#include "modules/drivers/gnss/proto/gnss_status.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/data/proto/static_info.pb.h"
@@ -80,8 +80,8 @@ using RoutingResponseAdapter = Adapter<routing::RoutingResponse>;
 using RelativeOdometryAdapter =
     Adapter<calibration::republish_msg::RelativeOdometry>;
 using InsStatAdapter = Adapter<drivers::gnss::InsStat>;
-using InsStatusAdapter = Adapter<gnss_status::InsStatus>;
-using GnssStatusAdapter = Adapter<gnss_status::GnssStatus>;
+using InsStatusAdapter = Adapter<drivers::gnss_status::InsStatus>;
+using GnssStatusAdapter = Adapter<drivers::gnss_status::GnssStatus>;
 using SystemStatusAdapter = Adapter<apollo::monitor::SystemStatus>;
 using StaticInfoAdapter = Adapter<apollo::data::StaticInfo>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
