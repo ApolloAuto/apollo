@@ -23,15 +23,15 @@
 #include "proto/ins.pb.h"
 
 void ins_status_callback(
-    const apollo::common::gnss_status::InsStatus &ins_status) {
+    const apollo::drivers::gnss_status::InsStatus &ins_status) {
   switch (ins_status.type()) {
-    case apollo::common::gnss_status::InsStatus::GOOD:
+    case apollo::drivers::gnss_status::InsStatus::GOOD:
       fprintf(stdout, "INS status is GOOD.\r\n");
       break;
-    case apollo::common::gnss_status::InsStatus::CONVERGING:
+    case apollo::drivers::gnss_status::InsStatus::CONVERGING:
       fprintf(stdout, "INS status is CONVERGING.\r\n");
       break;
-    case apollo::common::gnss_status::InsStatus::INVALID:
+    case apollo::drivers::gnss_status::InsStatus::INVALID:
     default:
       fprintf(stdout, "INS status is INVALID.\r\n");
       break;
@@ -43,37 +43,37 @@ void ins_stat_callback(const ::apollo::drivers::gnss::InsStat &ins_stat) {
 }
 
 void stream_status_callback(
-    const apollo::common::gnss_status::StreamStatus &stream_status) {
+    const apollo::drivers::gnss_status::StreamStatus &stream_status) {
   switch (stream_status.ins_stream_type()) {
-    case apollo::common::gnss_status::StreamStatus::CONNECTED:
+    case apollo::drivers::gnss_status::StreamStatus::CONNECTED:
       fprintf(stdout, "INS stream is CONNECTED.\r\n");
       break;
-    case apollo::common::gnss_status::StreamStatus::DISCONNECTED:
+    case apollo::drivers::gnss_status::StreamStatus::DISCONNECTED:
       fprintf(stdout, "INS stream is DISCONNECTED.\r\n");
       break;
   }
 
   switch (stream_status.rtk_stream_in_type()) {
-    case apollo::common::gnss_status::StreamStatus::CONNECTED:
+    case apollo::drivers::gnss_status::StreamStatus::CONNECTED:
       fprintf(stdout, "rtk stream in is CONNECTED.\r\n");
       break;
-    case apollo::common::gnss_status::StreamStatus::DISCONNECTED:
+    case apollo::drivers::gnss_status::StreamStatus::DISCONNECTED:
       fprintf(stdout, "rtk stream in is DISCONNECTED.\r\n");
       break;
   }
 
   switch (stream_status.rtk_stream_out_type()) {
-    case apollo::common::gnss_status::StreamStatus::CONNECTED:
+    case apollo::drivers::gnss_status::StreamStatus::CONNECTED:
       fprintf(stdout, "rtk stream out CONNECTED.\r\n");
       break;
-    case apollo::common::gnss_status::StreamStatus::DISCONNECTED:
+    case apollo::drivers::gnss_status::StreamStatus::DISCONNECTED:
       fprintf(stdout, "rtk stream out DISCONNECTED.\r\n");
       break;
   }
 }
 
 void gnss_status_callback(
-    const apollo::common::gnss_status::GnssStatus &gnss_status) {
+    const apollo::drivers::gnss_status::GnssStatus &gnss_status) {
   std::cout << "GNSS status: " << gnss_status.DebugString() << std::endl;
 }
 
