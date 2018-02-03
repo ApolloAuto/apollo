@@ -46,6 +46,7 @@ export default class Options {
     @observable showObstaclesId =
         PARAMETERS.options.defaults.showObstaclesId;
     @observable cameraAngle = PARAMETERS.options.defaults.cameraAngle;
+    @observable simControlEnabled = false;
 
     @observable hideOptionToggle = {
         'planningCar': true,
