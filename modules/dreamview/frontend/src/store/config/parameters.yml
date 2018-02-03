@@ -19,14 +19,22 @@ camera:
   laneWidth: 4.5 # original 3.32
   laneWidthToViewDistanceRatio: 5
 ground:
-  mpp: 400
-  xres: 8192
-  yres: 8192
-  xorigin: 4096
-  yorigin: 4096
-  xyoffset: 0
-  type: default # default or tile
-  tileRange: 4
+  defaults:
+    mpp: 0.125
+    xres: 8192
+    yres: 8192
+    xorigin: 4096
+    yorigin: 4096
+    type: default # default or tile
+    tileRange: 4
+  sunnyvale_big_loop:
+    mpp: 0.125
+    xres: 24576
+    yres: 16384
+    xorigin: 587392
+    yorigin: 4140800
+    type: default # default or tile
+    tileRange: 4
 planning:
   # The minimum interval between two consecutive
   minInterval: 0.1

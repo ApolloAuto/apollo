@@ -23,20 +23,62 @@ export default class Ground {
             return false;
         }
 
-        const { xres, yres, mpp } = PARAMETERS.ground;
-
-        this.mesh.scale.set(xres * mpp / 1000, yres * mpp / 1000, 1);
-        // NOTE: Setting the position to (0, 0) makes the center of
-        // the ground image to overlap with the offset point, which
-        // in this case is the car position on the first received frame.
-        this.mesh.position.set(0, 0, 0);
-        this.mesh.overdraw = false;
+        if (!this.render(coordinates)) {
+            return false;
+        }
 
         this.initialized = true;
         return true;
     }
 
     update(world, coordinates, scene) {
-        // Do nothing in the default ground
+    }
+
+    updateImage(coordinates, mapName) {
+        if (!this.mesh) {
+            return;
+        }
+        const dir = this.titleCaseToSnakeCase(mapName);
+        const server = 'http://' + window.location.hostname + ':8888';
+        const imgUrl = server + '/assets/map_data/' + dir + '/background.jpg';
+        loadTexture(imgUrl, texture => {
+            console.log("updating ground image with " + dir);
+            this.mesh.material.map = texture;
+            this.render(coordinates, dir);
+        }, err => {
+            console.log("using grid as ground image...");
+            loadTexture(gridGround, texture => {
+                this.mesh.material.map = texture;
+                this.render(coordinates);
+            });
+        });
+    }
+
+    render(coordinates, mapName = 'defaults') {
+        console.log("rendering ground image...");
+        const { xres, yres, mpp, xorigin, yorigin } = PARAMETERS.ground[mapName];
+
+        let position = coordinates.applyOffset({x: xorigin, y: yorigin});
+        if (position === null) {
+            console.warn("Cannot find position for ground mesh!");
+            return false;
+        }
+        // NOTE: Setting the position to (0, 0) makes the center of
+        // the ground image to overlap with the offset point, which
+        // is the car position on the first received frame.
+        if (mapName === 'defaults') {
+            position = {x: 0, y: 0};
+        }
+
+        this.mesh.position.set(position.x, position.y, 0);
+        this.mesh.scale.set(xres * mpp, yres * mpp, 1);
+        this.mesh.material.needsUpdate = true;
+        this.mesh.overdraw = false;
+
+        return true;
+    }
+
+    titleCaseToSnakeCase(str) {
+        return str.replace(/\s/g, '_').toLowerCase();
     }
 }
