@@ -40,10 +40,6 @@ DEFINE_string(server_ports, "8888",
               "a letter s must be appended, for example, 80,443s will open "
               "port 80 and port 443.");
 
-DEFINE_bool(enable_sim_control, false,
-            "Whether to enable SimControl to publish localization and chassis "
-            "message.");
-
 DEFINE_bool(routing_from_file, false,
             "Whether Dreamview reads initial routing response from file.");
 

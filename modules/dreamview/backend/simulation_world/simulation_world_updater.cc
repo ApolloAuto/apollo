@@ -190,6 +190,19 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         DumpMessage(AdapterManager::GetLocalization(), "Localization");
         DumpMessage(AdapterManager::GetPlanning(), "Planning");
       });
+
+  websocket_->RegisterMessageHandler(
+      "ToggleSimControl",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        auto enable = json.find("enable");
+        if (enable != json.end() && enable->is_boolean()) {
+          if (*enable) {
+            sim_control_->Start();
+          } else {
+            sim_control_->Stop();
+          }
+        }
+      });
 }
 
 bool SimulationWorldUpdater::ConstructRoutingRequest(
