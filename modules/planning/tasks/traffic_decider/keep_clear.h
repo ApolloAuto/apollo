@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_AREA_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_AREA_H_
+#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_KEEP_CLEAR_H_
+#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_KEEP_CLEAR_H_
 
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
@@ -38,13 +38,13 @@ class KeepClear : public TrafficRule {
                  ReferenceLineInfo* const reference_line_info);
 
  private:
-  bool BuildClearAreaObstacle(
+  bool BuildKeepClearObstacle(
       Frame* const frame,
       ReferenceLineInfo* const reference_line_info,
-      hdmap::PathOverlap* const clear_area_overlap);
+      hdmap::PathOverlap* const keep_clear_overlap);
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_AREA_H_
+#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_KEEP_CLEAR_H_

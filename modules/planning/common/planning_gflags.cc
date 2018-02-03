@@ -250,10 +250,10 @@ DEFINE_double(max_valid_stop_distance, 3.0,
 DEFINE_double(creep_stop_distance, 0.5,
               "stop distance(m) to the stop line of next lane overlap "
               "while creeping ");
-/// clear_area
-DEFINE_bool(enable_clear_area, true, "enable clear_area");
-DEFINE_string(clear_area_virtual_object_id_prefix, "CA_",
-              "prefix for converting clear_area id to virtual object id");
+/// keep_clear
+DEFINE_bool(enable_keep_clear, true, "enable keep clear zone");
+DEFINE_string(keep_clear_virtual_object_id_prefix, "KC_",
+              "prefix for converting keep_clear id to virtual object id");
 /// traffic light
 DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 DEFINE_string(signal_light_virtual_object_id_prefix, "SL_",

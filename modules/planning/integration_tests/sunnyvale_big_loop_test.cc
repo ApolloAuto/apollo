@@ -277,6 +277,23 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
   RUN_GOLDEN_TEST(0);
 }
 
+/*
+ * kee_clear: not blocking, KEEP_CLEAR static obstacle built
+ * bag: 2018-01-29-17-22-46/2018-01-29-17-33-47_11.bag
+ * decision: CRUISE
+ */
+TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
+  FLAGS_enable_keep_clear = true;
+
+  std::string seq_num = "9";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(0);
+}
+
 }  // namespace planning
 }  // namespace apollo
 
