@@ -64,24 +64,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "gnss_status_proto",
-    deps = [
-        ":gnss_status_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "gnss_status_proto_lib",
-    srcs = [
-        "gnss_status.proto",
-    ],
-    deps = [
-        ":error_code_proto_lib",
-        ":header_proto_lib",
-    ],
-)
-
-cc_proto_library(
     name = "pnc_point_proto",
     deps = [
         ":pnc_point_proto_lib",
