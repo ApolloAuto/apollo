@@ -76,8 +76,8 @@ class DataParser {
   const ros::Publisher _ephemeris_publisher;
   const ros::Publisher _observation_publisher;
 
-  boost::shared_ptr<apollo::common::gnss_status::GnssStatus> _gnss_status;
-  boost::shared_ptr<apollo::common::gnss_status::InsStatus> _ins_status;
+  boost::shared_ptr<apollo::drivers::gnss_status::GnssStatus> _gnss_status;
+  boost::shared_ptr<apollo::drivers::gnss_status::InsStatus> _ins_status;
   uint32_t _ins_status_record = static_cast<uint32_t>(0);
   projPJ _wgs84pj_source;
   projPJ _utm_target;

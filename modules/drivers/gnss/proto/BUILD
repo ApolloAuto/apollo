@@ -83,3 +83,23 @@ proto_library(
         "//modules/common/proto:header_proto_lib",
     ],
 )
+
+
+cc_proto_library(
+    name = "gnss_status_proto",
+    deps = [
+        ":gnss_status_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "gnss_status_proto_lib",
+    srcs = [
+        "gnss_status.proto",
+    ],
+    deps = [
+    "//modules/common/proto:common_proto_lib",
+    "//modules/common/proto:error_code_proto_lib",
+    "//modules/common/proto:header_proto_lib",
+    ],
+)
