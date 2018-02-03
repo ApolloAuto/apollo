@@ -66,7 +66,8 @@ SimControl::SimControl(const MapService* map_service)
       received_planning_(false),
       planning_count_(-1),
       re_routing_triggered_(false),
-      enabled_(FLAGS_enable_sim_control) {}
+      enabled_(false),
+      inited_(false) {}
 
 void SimControl::Init(bool set_start_point, double start_velocity,
                       double start_acceleration) {
@@ -74,7 +75,6 @@ void SimControl::Init(bool set_start_point, double start_velocity,
   AdapterManager::AddPlanningCallback(&SimControl::OnPlanning, this);
   AdapterManager::AddRoutingResponseCallback(&SimControl::OnRoutingResponse,
                                              this);
-
   // Start timer to publish localization and chassis messages.
   sim_control_timer_ = AdapterManager::CreateTimer(
       ros::Duration(kSimControlInterval), &SimControl::TimerCallback, this);
@@ -113,21 +113,27 @@ void SimControl::SetStartPoint(const double x, const double y) {
 
   prev_point_index_ = next_point_index_ = 0;
   received_planning_ = false;
-
-  Start();
 }
 
 void SimControl::ClearPlanning() {
   current_trajectory_.Clear();
   received_planning_ = false;
-  planning_count_ = 0;
+  if (planning_count_ > 0) {
+    planning_count_ = 0;
+  }
 }
 
 void SimControl::Reset() {
+  current_routing_header_.Clear();
+  re_routing_triggered_ = false;
   ClearPlanning();
 }
 
 void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
+  if (!enabled_) {
+    return;
+  }
+
   CHECK_LE(2, routing.routing_request().waypoint_size());
   const auto& start_pose = routing.routing_request().waypoint(0).pose();
 
@@ -143,14 +149,29 @@ void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
 }
 
 void SimControl::Start() {
-  if (enabled_) {
+  if (!enabled_) {
+    if (!inited_) {
+      // Only place the car when there is not a localization.
+      Init(AdapterManager::GetLocalization()->Empty());
+    }
+    Reset();
     sim_control_timer_.start();
+    enabled_ = true;
   }
 }
 
-void SimControl::Stop() { sim_control_timer_.stop(); }
+void SimControl::Stop() {
+  if (enabled_) {
+    sim_control_timer_.stop();
+    enabled_ = false;
+  }
+}
 
 void SimControl::OnPlanning(const apollo::planning::ADCTrajectory& trajectory) {
+  if (!enabled_) {
+    return;
+  }
+
   // Reset current trajectory and the indices upon receiving a new trajectory.
   // The routing SimControl owns must match with the one Planning has.
   if (re_routing_triggered_ ||
@@ -197,8 +218,8 @@ void SimControl::RunOnce() {
     prev_point_ = next_point_;
   } else {
     if (current_trajectory_.estop().is_estop() || !NextPointWithinRange()) {
-      // Freeze the car when there's an estop or the current trajectory has been
-      // exhausted.
+      // Freeze the car when there's an estop or the current trajectory has
+      // been exhausted.
       Freeze();
     } else {
       // Determine the status of the car based on received planning message.

@@ -224,4 +224,11 @@ export default class RosWebSocketEndpoint {
             event_msg: event_msg,
         }));
     }
+
+    toggleSimControl(enable) {
+        this.websocket.send(JSON.stringify({
+            type: "ToggleSimControl",
+            enable: enable,
+        }));
+    }
 }

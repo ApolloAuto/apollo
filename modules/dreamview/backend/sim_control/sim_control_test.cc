@@ -41,7 +41,6 @@ namespace dreamview {
 class SimControlTest : public ::testing::Test {
  public:
   SimControlTest() {
-    FLAGS_enable_sim_control = false;
     FLAGS_map_dir = "modules/dreamview/backend/testdata";
     FLAGS_base_map_filename = "garage.bin";
 
@@ -82,6 +81,8 @@ class SimControlTest : public ::testing::Test {
     }
 
     AdapterManager::Init(config);
+
+    sim_control_->Start();
   }
 
  protected:
@@ -121,16 +122,13 @@ TEST_F(SimControlTest, Test) {
   adc_trajectory.mutable_header()->set_timestamp_sec(timestamp);
 
   sim_control_->SetStartPoint(1.0, 1.0);
-
-  AdapterManager::AddPlanningCallback(&SimControl::OnPlanning,
-                                      sim_control_.get());
-  AdapterManager::GetPlanning()->OnReceive(adc_trajectory);
+  AdapterManager::PublishPlanning(adc_trajectory);
 
   {
     Clock::SetMode(Clock::MOCK);
     const auto timestamp = apollo::common::time::From(100.01);
     Clock::SetNow(timestamp.time_since_epoch());
-    sim_control_->TimerCallback(ros::TimerEvent());
+    sim_control_->RunOnce();
 
     const Chassis *chassis = AdapterManager::GetChassis()->GetLatestPublished();
     const LocalizationEstimate *localization =
