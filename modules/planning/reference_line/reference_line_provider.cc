@@ -16,7 +16,6 @@
 
 /**
  * @file
- *
  * @brief Implementation of the class ReferenceLineProvider.
  */
 

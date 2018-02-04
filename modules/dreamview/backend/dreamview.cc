@@ -39,9 +39,26 @@ using apollo::hdmap::BaseMapFile;
 
 std::string Dreamview::Name() const { return FLAGS_dreamview_module_name; }
 
+void Dreamview::TerminateProfilingMode(const ros::TimerEvent& event) {
+  Stop();
+  ros::shutdown();
+  AWARN << "Profiling timer called shutdown!";
+}
+
 Status Dreamview::Init() {
   AdapterManager::Init(FLAGS_dreamview_adapter_config_filename);
   VehicleConfigHelper::Init();
+
+  if (FLAGS_dreamview_profiling_mode &&
+      FLAGS_dreamview_profiling_duration > 0.0) {
+    exit_timer_ = AdapterManager::CreateTimer(
+        ros::Duration(FLAGS_dreamview_profiling_duration),
+        &Dreamview::TerminateProfilingMode, this, true, true);
+    AWARN << "============================================================";
+    AWARN << "| Dreamview running in profiling mode, exit in "
+          << FLAGS_dreamview_profiling_duration << " seconds |";
+    AWARN << "============================================================";
+  }
 
   // Check the expected adapters are initialized.
   CHECK(AdapterManager::GetChassis()) << "ChassisAdapter is not initialized.";
@@ -99,9 +116,6 @@ Status Dreamview::Init() {
 
 Status Dreamview::Start() {
   sim_world_updater_->Start();
-  if (FLAGS_enable_sim_control) {
-    sim_control_->Init(true);
-  }
   return Status::OK();
 }
 

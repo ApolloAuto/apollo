@@ -24,14 +24,17 @@
 #include <memory>
 #include <string>
 
-#include "sensor_msgs/PointCloud2.h"
-
 #include "Eigen/Core"
 #include "ros/include/ros/ros.h"
+#include "sensor_msgs/PointCloud2.h"
+
+#include "modules/perception/tool/data_generator/proto/config.pb.h"
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
+#include "modules/common/util/factory.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/tool/data_generator/sensor.h"
 
 /**
  * @namespace apollo::calibration
@@ -43,6 +46,9 @@ namespace data_generator {
 
 class DataGenerator : public apollo::common::ApolloApp {
  public:
+  DataGenerator() = default;
+  ~DataGenerator() = default;
+
   std::string Name() const override;
   apollo::common::Status Init() override;
   apollo::common::Status Start() override;
@@ -50,20 +56,24 @@ class DataGenerator : public apollo::common::ApolloApp {
 
  private:
   void RunOnce();
-  bool Process(const sensor_msgs::PointCloud2& message);
+
   void OnTimer(const ros::TimerEvent&);
 
-  void TransPointCloudMsgToPCL(const sensor_msgs::PointCloud2& cloud_msg,
-                               pcl_util::PointCloudPtr* cloud_pcl);
-  bool GetTrans(const std::string& to_frame, const std::string& from_frame,
-                const double query_time, Eigen::Matrix4d* trans);
-  bool TransformPointCloudToWorld(
-      std::shared_ptr<Eigen::Matrix4d> velodyne_trans,
-      pcl_util::PointCloudPtr* cld);
+  void RegisterSensors();
+
+  bool Process();
+
   ros::Timer timer_;
 
   std::ofstream* data_file_ = nullptr;
   int num_data_frame_ = 0;
+
+  common::util::Factory<SensorConfig::SensorId, Sensor,
+                        Sensor* (*)(const SensorConfig& config)>
+      sensor_factory_;
+  google::protobuf::RepeatedPtrField<SensorConfig> sensor_configs_;
+
+  DataGeneratorInfo data_generator_info_;
 };
 
 }  // namespace data_generator

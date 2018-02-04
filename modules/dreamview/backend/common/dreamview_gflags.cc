@@ -18,6 +18,13 @@
 
 DEFINE_string(dreamview_module_name, "dreamview", "dreamview module name");
 
+DEFINE_bool(dreamview_profiling_mode, false, "Run dreamview in profiling mode");
+
+DEFINE_double(
+    dreamview_profiling_duration, -1.0,
+    "Dreamview profiling duration. Negative value will not restrict the "
+    "profiling time");
+
 DEFINE_string(dreamview_adapter_config_filename,
               "modules/dreamview/conf/adapter.conf", "The adapter config file");
 
@@ -32,10 +39,6 @@ DEFINE_string(server_ports, "8888",
               "Comma-separated list of ports to listen on. If the port is SSL, "
               "a letter s must be appended, for example, 80,443s will open "
               "port 80 and port 443.");
-
-DEFINE_bool(enable_sim_control, false,
-            "Whether to enable SimControl to publish localization and chassis "
-            "message.");
 
 DEFINE_bool(routing_from_file, false,
             "Whether Dreamview reads initial routing response from file.");
@@ -65,4 +68,4 @@ DEFINE_int32(dreamview_worker_num, 3, "number of dreamview thread workers");
 DEFINE_bool(enable_update_size_check, true,
             "True to check if the update byte number is less than threshold");
 DEFINE_uint32(max_update_size, 1000000,
-             "number of max update bytes allowed to push to dreamview FE");
+              "number of max update bytes allowed to push to dreamview FE");

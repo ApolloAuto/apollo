@@ -37,7 +37,8 @@ class ReferenceLineEnd : public TrafficRule {
   explicit ReferenceLineEnd(const RuleConfig& config);
   virtual ~ReferenceLineEnd() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 };
 
 }  // namespace planning

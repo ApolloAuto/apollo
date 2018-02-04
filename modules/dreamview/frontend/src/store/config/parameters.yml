@@ -39,6 +39,7 @@ options:
     showPOI: false
     showPNCMonitor: false
     showRouteEditingBar: false
+    showDataRecorder: false
     showTasks: true
     showVideo: false
     showPlanningCar: false

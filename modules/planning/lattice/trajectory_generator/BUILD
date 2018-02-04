@@ -58,12 +58,12 @@ cc_library(
 )
 
 cc_library(
-    name = "backup_trajectory",
+    name = "backup_trajectory_generator",
     hdrs = [
-        "backup_trajectory.h",
+        "backup_trajectory_generator.h",
     ],
     srcs = [
-        "backup_trajectory.cc",
+        "backup_trajectory_generator.cc",
     ],
     deps = [
         "//modules/common:common",
@@ -72,6 +72,7 @@ cc_library(
         "//modules/planning/math/curve1d:curve1d",
         "//modules/planning/lattice/trajectory1d:constant_deceleration_trajectory1d",
         "//modules/planning/lattice/trajectory_generator:trajectory_combiner",
+        "//modules/planning/lattice/trajectory_generator:trajectory1d_generator",
     ],
 )
 

@@ -30,7 +30,7 @@ namespace planning {
 
 Destination::Destination(const RuleConfig& config) : TrafficRule(config) {}
 
-bool Destination::ApplyRule(Frame*,
+bool Destination::ApplyRule(Frame* const,
                             ReferenceLineInfo* const reference_line_info) {
   const auto& path_decision = reference_line_info->path_decision();
   auto* destination = path_decision->Find(FLAGS_destination_obstacle_id);

@@ -105,7 +105,7 @@ bool Rerouting::ChangeLaneFailRerouting() {
   return true;
 }
 
-bool Rerouting::ApplyRule(Frame* frame,
+bool Rerouting::ApplyRule(Frame* const frame,
                           ReferenceLineInfo* const reference_line_info) {
   frame_ = frame;
   reference_line_info_ = reference_line_info;

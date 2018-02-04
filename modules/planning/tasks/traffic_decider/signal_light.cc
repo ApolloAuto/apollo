@@ -43,7 +43,7 @@ using apollo::perception::TrafficLightDetection;
 
 SignalLight::SignalLight(const RuleConfig& config) : TrafficRule(config) {}
 
-bool SignalLight::ApplyRule(Frame* frame,
+bool SignalLight::ApplyRule(Frame* const frame,
                             ReferenceLineInfo* const reference_line_info) {
   if (!FindValidSignalLight(reference_line_info)) {
     return true;
@@ -82,7 +82,7 @@ bool SignalLight::FindValidSignalLight(
   }
   signal_lights_from_path_.clear();
   for (const hdmap::PathOverlap& signal_light : signal_lights) {
-    if (signal_light.start_s + FLAGS_stop_max_distance_buffer >
+    if (signal_light.start_s + FLAGS_max_stop_distance_buffer >
         reference_line_info->AdcSlBoundary().end_s()) {
       signal_lights_from_path_.push_back(signal_light);
     }
@@ -90,7 +90,7 @@ bool SignalLight::FindValidSignalLight(
   return signal_lights_from_path_.size() > 0;
 }
 
-void SignalLight::MakeDecisions(Frame* frame,
+void SignalLight::MakeDecisions(Frame* const frame,
                                 ReferenceLineInfo* const reference_line_info) {
   planning_internal::SignalLightDebug* signal_light_debug =
       reference_line_info->mutable_debug()
@@ -115,11 +115,11 @@ void SignalLight::MakeDecisions(Frame* frame,
     signal_debug->set_light_stop_s(signal_light.start_s);
 
     if ((signal.color() == TrafficLight::RED &&
-         stop_deceleration < FLAGS_stop_max_deceleration) ||
+         stop_deceleration < FLAGS_max_stop_deceleration) ||
         (signal.color() == TrafficLight::UNKNOWN &&
-         stop_deceleration < FLAGS_stop_max_deceleration) ||
+         stop_deceleration < FLAGS_max_stop_deceleration) ||
         (signal.color() == TrafficLight::YELLOW &&
-         stop_deceleration < FLAGS_max_deacceleration_for_yellow_light_stop)) {
+         stop_deceleration < FLAGS_max_stop_deacceleration_for_yellow_light)) {
       if (FLAGS_right_turn_creep_forward &&
           reference_line_info->IsRightTurnPath()) {
         SetCreepForwardSignalDecision(reference_line_info, &signal_light);
@@ -140,7 +140,7 @@ void SignalLight::MakeDecisions(Frame* frame,
 }
 
 void SignalLight::SetCreepForwardSignalDecision(
-    const ReferenceLineInfo* reference_line_info,
+    ReferenceLineInfo* const reference_line_info,
     hdmap::PathOverlap* const signal_light) const {
   CHECK_NOTNULL(signal_light);
 
@@ -152,7 +152,7 @@ void SignalLight::SetCreepForwardSignalDecision(
 
   constexpr double kCreepBuff = 3.0;
   const auto& path_decision = reference_line_info->path_decision();
-  for (const auto& path_obstacle : path_decision.path_obstacles().Items()) {
+  for (const auto& path_obstacle : path_decision->path_obstacles().Items()) {
     const auto& st_boundary = path_obstacle->reference_line_st_boundary();
     const double stop_s =
         signal_light->start_s - FLAGS_traffic_light_stop_distance;
@@ -182,8 +182,8 @@ TrafficLight SignalLight::GetSignal(const std::string& signal_id) {
 }
 
 bool SignalLight::BuildStopDecision(
-    Frame* frame, ReferenceLineInfo* const reference_line_info,
-    const hdmap::PathOverlap* signal_light) {
+    Frame* const frame, ReferenceLineInfo* const reference_line_info,
+    hdmap::PathOverlap* const signal_light) {
   // check
   const auto& reference_line = reference_line_info->reference_line();
   if (!WithinBound(0.0, reference_line.Length(), signal_light->start_s)) {

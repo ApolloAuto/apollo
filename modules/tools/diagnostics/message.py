@@ -43,6 +43,7 @@ from modules.routing.proto import routing_pb2
 from modules.drivers.proto import mobileye_pb2
 from modules.drivers.proto import delphi_esr_pb2
 from modules.drivers.proto import conti_radar_pb2
+from modules.monitor.proto import system_status_pb2
 
 Refreshrate = 16
 
@@ -233,10 +234,14 @@ class Field(object):
         if self.descriptor.containing_type is not None and \
             self.descriptor.label == self.descriptor.LABEL_REPEATED:
             if self.index is not None:
+                if 'keys' in dir(self.item):
+                    # For map field.
+                    key = sorted(self.item.keys())[self.index]
+                else:
+                    key = self.index
                 self.window.addstr(
-                    0, 0, self.descriptor.name + ": " + str(self.index),
-                    curses.A_BOLD)
-                self.print_out(self.item[self.index], self.descriptor, 1, 2)
+                    0, 0, self.descriptor.name + ": " + str(key), curses.A_BOLD)
+                self.print_out(self.item[key], self.descriptor, 1, 2)
             else:
                 self.window.addstr(0, 0, self.descriptor.name + ": Empty",
                                    curses.A_BOLD)

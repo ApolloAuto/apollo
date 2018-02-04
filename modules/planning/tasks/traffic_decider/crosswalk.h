@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file crosswalk.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CROSSWALK_H_
@@ -37,12 +37,12 @@ class Crosswalk : public TrafficRule {
   bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
 
  private:
-  void MakeDecisions(Frame* frame,
+  void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
   bool FindCrosswalks(ReferenceLineInfo* const reference_line_info);
   bool BuildStopDecision(Frame* frame,
                          ReferenceLineInfo* const reference_line_info,
-                         const hdmap::PathOverlap* crosswalk_overlap);
+                         hdmap::PathOverlap* const crosswalk_overlap);
 
  private:
   std::vector<const hdmap::PathOverlap*> crosswalk_overlaps_;

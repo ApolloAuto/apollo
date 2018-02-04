@@ -82,12 +82,13 @@ class SimulationWorldService {
 
   /**
    * @brief Returns the binary representation of the SimulationWorld object.
-   * @param radius the search distance from the current car location
-   * @param enable_pnc_monitor whether the planning debugging data should be
-   * included.
-   * @return wire format string of SimulationWorld proto.
+   * @param radius the search distance from the current car location.
+   * @param sim_world output of binary format sim_world string.
+   * @param sim_world_with_planning_data output of binary format sim_world
+   * string with planning_data.
    */
-  std::string GetWireFormatString(double radius, bool enable_pnc_monitor);
+  void GetWireFormatString(double radius, std::string *sim_world,
+                           std::string *sim_world_with_planning_data);
 
   /**
    * @brief Returns the json representation of the map element Ids and hash

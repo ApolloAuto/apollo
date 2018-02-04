@@ -18,10 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_ZONE_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_ZONE_H_
-
-#include "modules/perception/proto/traffic_light_detection.pb.h"
+#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_KEEP_CLEAR_H_
+#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_KEEP_CLEAR_H_
 
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
@@ -29,22 +27,24 @@ namespace apollo {
 namespace planning {
 
 /**
- * This class creates a virtual obstacle for each keep clear region.
+ * This class creates a virtual obstacle for each clear area region.
  */
 class KeepClear : public TrafficRule {
  public:
   explicit KeepClear(const RuleConfig& config);
   virtual ~KeepClear() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 
  private:
-  bool BuildKeepClearObstacle(const hdmap::PathOverlap& keep_clear_overlap);
-  ReferenceLineInfo* reference_line_info_ = nullptr;
-  Frame* frame_ = nullptr;
+  bool BuildKeepClearObstacle(
+      Frame* const frame,
+      ReferenceLineInfo* const reference_line_info,
+      hdmap::PathOverlap* const keep_clear_overlap);
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CLEAR_ZONE_H_
+#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_KEEP_CLEAR_H_
