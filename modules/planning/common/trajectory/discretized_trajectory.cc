@@ -46,9 +46,9 @@ DiscretizedTrajectory::DiscretizedTrajectory(const ADCTrajectory& trajectory) {
 
 TrajectoryPoint DiscretizedTrajectory::Evaluate(
     const double relative_time) const {
-  CHECK(!trajectory_points_.empty());
+  CHECK_GE(trajectory_points_.size(), 2);
   CHECK(trajectory_points_.front().relative_time() <= relative_time &&
-        trajectory_points_.back().relative_time() <= relative_time)
+        trajectory_points_.back().relative_time() >= relative_time)
       << "Invalid relative time input!";
 
   auto comp = [](const TrajectoryPoint& p, const double relative_time) {
