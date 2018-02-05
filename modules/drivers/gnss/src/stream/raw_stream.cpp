@@ -28,21 +28,21 @@
 namespace {
 void switch_stream_status(
     const apollo::drivers::gnss::Stream::Status &status,
-    apollo::common::gnss_status::StreamStatus_Type &report_status_type) {
+    apollo::drivers::gnss_status::StreamStatus_Type &report_status_type) {
   switch (status) {
     case apollo::drivers::gnss::Stream::Status::CONNECTED:
-      report_status_type = apollo::common::gnss_status::StreamStatus::CONNECTED;
+      report_status_type = apollo::drivers::gnss_status::StreamStatus::CONNECTED;
       break;
 
     case apollo::drivers::gnss::Stream::Status::DISCONNECTED:
       report_status_type =
-          apollo::common::gnss_status::StreamStatus::DISCONNECTED;
+          apollo::drivers::gnss_status::StreamStatus::DISCONNECTED;
       break;
 
     case apollo::drivers::gnss::Stream::Status::ERROR:
     default:
       report_status_type =
-          apollo::common::gnss_status::StreamStatus::DISCONNECTED;
+          apollo::drivers::gnss_status::StreamStatus::DISCONNECTED;
       break;
   }
 }
@@ -129,9 +129,9 @@ RawStream::RawStream(ros::NodeHandle &nh, const std::string &name,
       _rtk_data_publisher(
           nh.advertise<std_msgs::String>(_rtcm_data_topic, 256)),
       _stream_status_publisher(
-          nh.advertise<apollo::common::gnss_status::StreamStatus>(
+          nh.advertise<apollo::drivers::gnss_status::StreamStatus>(
               stream_status_topic, 256, true)) {
-  _stream_status.reset(new apollo::common::gnss_status::StreamStatus());
+  _stream_status.reset(new apollo::drivers::gnss_status::StreamStatus());
 }
 
 RawStream::~RawStream() {
@@ -146,11 +146,11 @@ bool RawStream::init(const std::string &cfg_file) {
   }
   _stream_status->mutable_header()->set_timestamp_sec(ros::Time::now().toSec());
   _stream_status->set_ins_stream_type(
-      apollo::common::gnss_status::StreamStatus::DISCONNECTED);
+      apollo::drivers::gnss_status::StreamStatus::DISCONNECTED);
   _stream_status->set_rtk_stream_in_type(
-      apollo::common::gnss_status::StreamStatus::DISCONNECTED);
+      apollo::drivers::gnss_status::StreamStatus::DISCONNECTED);
   _stream_status->set_rtk_stream_out_type(
-      apollo::common::gnss_status::StreamStatus::DISCONNECTED);
+      apollo::drivers::gnss_status::StreamStatus::DISCONNECTED);
   _stream_status_publisher.publish(_stream_status);
   if (!parse_config_text(cfg_file, &_config)) {
     ROS_INFO("Parse config context failed.");
@@ -277,7 +277,7 @@ bool RawStream::connect() {
       }
       _data_stream_status->status = Stream::Status::CONNECTED;
       _stream_status->set_ins_stream_type(
-          apollo::common::gnss_status::StreamStatus::CONNECTED);
+          apollo::drivers::gnss_status::StreamStatus::CONNECTED);
     }
   }
 
@@ -298,12 +298,12 @@ bool RawStream::connect() {
       } else {
         _in_rtk_stream_status->status = Stream::Status::CONNECTED;
         _stream_status->set_rtk_stream_in_type(
-            apollo::common::gnss_status::StreamStatus::CONNECTED);
+            apollo::drivers::gnss_status::StreamStatus::CONNECTED);
       }
     }
   } else {
     _stream_status->set_rtk_stream_in_type(
-        apollo::common::gnss_status::StreamStatus::CONNECTED);
+        apollo::drivers::gnss_status::StreamStatus::CONNECTED);
   }
 
   if (_out_rtk_stream) {
@@ -313,12 +313,12 @@ bool RawStream::connect() {
       } else {
         _out_rtk_stream_status->status = Stream::Status::CONNECTED;
         _stream_status->set_rtk_stream_out_type(
-            apollo::common::gnss_status::StreamStatus::CONNECTED);
+            apollo::drivers::gnss_status::StreamStatus::CONNECTED);
       }
     }
   } else {
     _stream_status->set_rtk_stream_out_type(
-        apollo::common::gnss_status::StreamStatus::CONNECTED);
+        apollo::drivers::gnss_status::StreamStatus::CONNECTED);
   }
   return true;
 }
@@ -384,7 +384,7 @@ bool RawStream::logout() {
 
 void RawStream::stream_status_check() {
   bool status_report = false;
-  apollo::common::gnss_status::StreamStatus_Type report_stream_status;
+  apollo::drivers::gnss_status::StreamStatus_Type report_stream_status;
 
   if (_data_stream &&
       (_data_stream->get_status() != _data_stream_status->status)) {

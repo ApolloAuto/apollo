@@ -20,7 +20,7 @@ export default class ControlData {
                 real: [],
                 autoModeZone: [],
                 steerCurve: [],
-                pose: [{ x: null, y: null }],
+                pose: [{ x: null, y: null, rotation: null }],
             },
             speedGraph: {
                 plan: [],
@@ -164,6 +164,7 @@ export default class ControlData {
             this.updateSteerCurve(this.data.trajectoryGraph, adc);
             this.data.trajectoryGraph.pose[0].x = adc.positionX;
             this.data.trajectoryGraph.pose[0].y = adc.positionY;
+            this.data.trajectoryGraph.pose[0].rotation = adc.heading;
 
             this.updateTime(world.planningTime);
         }

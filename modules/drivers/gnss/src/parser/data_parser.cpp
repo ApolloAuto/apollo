@@ -94,10 +94,10 @@ DataParser::DataParser(
       _nav_odometry_publisher(
           nh.advertise<apollo::localization::Gps>(odometry_topic, 64)),
       _gnss_status_publisher(
-          nh.advertise<apollo::common::gnss_status::GnssStatus>(
+          nh.advertise<apollo::drivers::gnss_status::GnssStatus>(
               gnss_status_topic, 64, true)),
       _ins_status_publisher(
-          nh.advertise<apollo::common::gnss_status::InsStatus>(ins_status_topic,
+          nh.advertise<apollo::drivers::gnss_status::InsStatus>(ins_status_topic,
                                                                64, true)),
       _bestpos_publisher(nh.advertise<apollo::drivers::gnss::GnssBestPose>(
           bestpos_topic, 64, true)),
@@ -110,8 +110,8 @@ DataParser::DataParser(
 
   _wgs84pj_source = pj_init_plus(WGS84_TEXT.c_str());
   _utm_target = pj_init_plus(utm_target_param.c_str());
-  _gnss_status.reset(new apollo::common::gnss_status::GnssStatus());
-  _ins_status.reset(new apollo::common::gnss_status::InsStatus());
+  _gnss_status.reset(new apollo::drivers::gnss_status::GnssStatus());
+  _ins_status.reset(new apollo::drivers::gnss_status::InsStatus());
   if (_gnss_status) {
     _gnss_status->set_solution_status(0);
     _gnss_status->set_num_sats(0);
@@ -120,7 +120,7 @@ DataParser::DataParser(
   }
 
   if (_ins_status) {
-    _ins_status->set_type(apollo::common::gnss_status::InsStatus::INVALID);
+    _ins_status->set_type(apollo::drivers::gnss_status::InsStatus::INVALID);
   }
 }
 
@@ -171,17 +171,17 @@ void DataParser::check_ins_status(::apollo::drivers::gnss::Ins *ins) {
     _ins_status_record = static_cast<uint32_t>(ins->type());
     switch (ins->type()) {
       case apollo::drivers::gnss::Ins::GOOD:
-        _ins_status->set_type(apollo::common::gnss_status::InsStatus::GOOD);
+        _ins_status->set_type(apollo::drivers::gnss_status::InsStatus::GOOD);
         break;
 
       case apollo::drivers::gnss::Ins::CONVERGING:
         _ins_status->set_type(
-            apollo::common::gnss_status::InsStatus::CONVERGING);
+            apollo::drivers::gnss_status::InsStatus::CONVERGING);
         break;
 
       case apollo::drivers::gnss::Ins::INVALID:
       default:
-        _ins_status->set_type(apollo::common::gnss_status::InsStatus::INVALID);
+        _ins_status->set_type(apollo::drivers::gnss_status::InsStatus::INVALID);
         break;
     }
     _ins_status->mutable_header()->set_timestamp_sec(ros::Time::now().toSec());

@@ -29,20 +29,28 @@ export default class Others extends React.Component {
                                   isChecked={options.showVideo}
                                   disabled={disablePanel}
                                   onClick={() => {
-                                        options.toggleSideBar("showVideo");
+                                      options.toggleSideBar("showVideo");
                                   }}/>
                     <CheckboxItem id={"showPNCMonitor"}
                                   title={"PNC Monitor"}
                                   isChecked={options.showPNCMonitor}
                                   disabled={disablePanel}
                                   onClick={() => {
-                                        this.props.store.handleSideBarClick('showPNCMonitor');
+                                      this.props.store.handleSideBarClick('showPNCMonitor');
                                   }}/>
                     <CheckboxItem id={"panelLock"}
                                   title={"Lock Task Panel"}
                                   isChecked={isPanelLocked}
                                   disabled={false}
                                   onClick={toggleLock}/>
+                    <CheckboxItem id={"toggleSimControl"}
+                                  title={"SimControl"}
+                                  isChecked={options.simControlEnabled}
+                                  disabled={false}
+                                  onClick={() => {
+                                      WS.toggleSimControl(!options.simControlEnabled);
+                                      options.toggleSideBar("simControlEnabled");
+                                  }}/>
                 </div>
             </div>
         );

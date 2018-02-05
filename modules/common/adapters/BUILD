@@ -81,7 +81,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/monitor_log/proto:monitor_log_proto",
         "//modules/common/proto:drive_event_proto",
-        "//modules/common/proto:gnss_status_proto",
+        "//modules/drivers/gnss/proto:gnss_status_proto",
         "//modules/control/proto:control_proto",
         "//modules/data/proto:static_info_proto",
         "//modules/drivers/gnss/proto:ins_proto",
