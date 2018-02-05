@@ -21,6 +21,22 @@ cc_library(
 )
 
 cc_library(
+    name = "reference_line_frame_converter",
+    hdrs = [
+        "reference_line_frame_converter.h",
+    ],
+    srcs = [
+        "reference_line_frame_converter.cc",
+    ],
+    deps = [
+        "//modules/planning/lattice/util:reference_line_matcher",
+        "//modules/planning/math/frame_conversion:cartesian_frenet_conversion",
+        "//modules/common:common",
+        "//modules/common/proto:pnc_point_proto",
+    ],
+)
+
+cc_library(
     name = "lattice_trajectory1d",
     hdrs = [
         "lattice_trajectory1d.h",
