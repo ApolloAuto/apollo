@@ -100,7 +100,7 @@ function generate_build_targets() {
      BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "esd")
   fi
   #skip msf for non x86_64 platforms
-  if [ ${MACHINE_ARCH} == "x86_64" ]; then
+  if [ ${MACHINE_ARCH} != "x86_64" ]; then
      BUILD_TARGETS=$(echo $BUILD_TARGETS |tr ' ' '\n' | grep -v "msf")
   fi
 }
