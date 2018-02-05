@@ -374,6 +374,11 @@
                   "rule": "repeated",
                   "type": "string",
                   "id": 7
+                },
+                "road": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 8
                 }
               }
             },
