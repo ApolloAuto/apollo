@@ -48,6 +48,6 @@ export function loadObject(materialFile, objectFile, scale, callback) {
     }
 }
 
-export function loadTexture(textureFile, callback) {
-    textureLoader.load(textureFile, callback);
+export function loadTexture(textureFile, onLoadCallback, onErrorCallback) {
+    textureLoader.load(textureFile, onLoadCallback, undefined, onErrorCallback);
 }
