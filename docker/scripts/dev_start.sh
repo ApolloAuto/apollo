@@ -29,10 +29,10 @@ function show_usage()
 cat <<EOF
 Usage: $(basename $0) [options] ...
 OPTIONS:
-    -C  pull docker image from China mirror
-    -h, --help   display this help and exit
-    -image <version>    specify which version of a docker image to pull
-    -l   use local docker image
+    -C                     Pull docker image from China mirror.
+    -h, --help             Display this help and exit.
+    -t, --tag <version>    Specify which version of a docker image to pull.
+    -l, --local            Use local docker image.
 EOF
 exit 0
 }
@@ -44,18 +44,22 @@ do
         INCHINA="yes"
         ;;
     -image)
+        echo -e "\033[093mWarning\033[0m: This option has been replaced by \"-t\" and \"--tag\", please use the new one.\n"
+        show_usage
+        ;;
+    -t|--tag)
         VAR=$1
-        [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option -image with $VERSION_OPT, only the last one will take effect.\n "
+        [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option $VAR with $VERSION_OPT, only the last one will take effect.\n"
         shift
         VERSION_OPT=$1
         [ -z ${VERSION_OPT// /} ] && echo -e "Missing parameter for $VAR" && exit 2
         [[ $VERSION_OPT =~ ^-.* ]] && echo -e "Missing parameter for $VAR" && exit 2
         ;;
     dev-*) # keep backward compatibility, should be removed from further version.
-        [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option $1 with -image, only the last one will take effect.\n "
+        [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option $1 with -t/--tag, only the last one will take effect.\n"
         VERSION_OPT=$1
         echo -e "\033[93mWarning\033[0m: You are using an old style command line option which may be removed from"
-        echo -e "further versoin, please use -image <version> instead.\n"
+        echo -e "further versoin, please use -t <version> instead.\n"
         ;;
     -h|--help)
         show_usage

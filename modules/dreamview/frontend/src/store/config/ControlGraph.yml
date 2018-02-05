@@ -13,10 +13,8 @@ trajectoryGraph:
             pose:
                 color: 'rgba(0, 255, 0, 1)' # green
                 borderWidth: 0
-                pointRadius: 4
-                pointStyle: 'triangle'
-                fill: false
-                showLine: false
+                pointRadius: 0
+                specialMarker: 'car'
             real:
                 color: 'rgba(0, 106, 255, 1)' # blue
                 borderWidth: 2

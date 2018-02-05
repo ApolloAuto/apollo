@@ -151,9 +151,9 @@ DECLARE_double(max_stop_deceleration);
 DECLARE_double(signal_expire_time_sec);
 DECLARE_double(max_valid_stop_distance);
 DECLARE_double(creep_stop_distance);
-/// clear_area
-DECLARE_bool(enable_clear_area);
-DECLARE_string(clear_area_virtual_object_id_prefix);
+/// keep_clear
+DECLARE_bool(enable_keep_clear);
+DECLARE_string(keep_clear_virtual_object_id_prefix);
 /// traffic light
 DECLARE_bool(enable_traffic_light);
 DECLARE_string(signal_light_virtual_object_id_prefix);

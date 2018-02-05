@@ -33,8 +33,6 @@ DECLARE_string(static_file_dir);
 
 DECLARE_string(server_ports);
 
-DECLARE_bool(enable_sim_control);
-
 DECLARE_bool(routing_from_file);
 
 DECLARE_string(routing_response_file);
