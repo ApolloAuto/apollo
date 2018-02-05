@@ -241,6 +241,10 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
         route_indices_.emplace_back();
         route_indices_.back().segment =
             ToLaneSegment(passage.segment(lane_index));
+        if (route_indices_.back().segment.lane == nullptr) {
+          AERROR << "Fail to get lane segment from passage.";
+          return false;
+        }
         route_indices_.back().index = {road_index, passage_index, lane_index};
       }
     }
