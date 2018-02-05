@@ -7,6 +7,8 @@ import PARAMETERS from "store/config/parameters.yml";
 export default class Ground {
     constructor() {
         this.type = "default";
+        this.loaded_map = null;
+        this.update_map = null;
         this.mesh = null;
         this.geometry = null;
         this.initialized = false;
@@ -23,7 +25,7 @@ export default class Ground {
             return false;
         }
 
-        if (!this.render(coordinates)) {
+        if (this.loaded_map === this.update_map && !this.render(coordinates)) {
             return false;
         }
 
@@ -32,26 +34,27 @@ export default class Ground {
     }
 
     update(world, coordinates, scene) {
+        if (this.initialized === true && this.loaded_map !== this.update_map) {
+            const dir = this.titleCaseToSnakeCase(this.update_map);
+            const server = 'http://' + window.location.hostname + ':8888';
+            const imgUrl = server + '/assets/map_data/' + dir + '/background.jpg';
+            loadTexture(imgUrl, texture => {
+                console.log("updating ground image with " + dir);
+                this.mesh.material.map = texture;
+                this.render(coordinates, dir);
+            }, err => {
+                console.log("using grid as ground image...");
+                loadTexture(gridGround, texture => {
+                    this.mesh.material.map = texture;
+                    this.render(coordinates);
+                });
+            });
+            this.loaded_map = this.update_map;
+        }
     }
 
-    updateImage(coordinates, mapName) {
-        if (!this.mesh) {
-            return;
-        }
-        const dir = this.titleCaseToSnakeCase(mapName);
-        const server = 'http://' + window.location.hostname + ':8888';
-        const imgUrl = server + '/assets/map_data/' + dir + '/background.jpg';
-        loadTexture(imgUrl, texture => {
-            console.log("updating ground image with " + dir);
-            this.mesh.material.map = texture;
-            this.render(coordinates, dir);
-        }, err => {
-            console.log("using grid as ground image...");
-            loadTexture(gridGround, texture => {
-                this.mesh.material.map = texture;
-                this.render(coordinates);
-            });
-        });
+    updateImage(mapName) {
+        this.update_map = mapName;
     }
 
     render(coordinates, mapName = 'defaults') {
