@@ -287,6 +287,8 @@ Status LanesXmlParser::ParseLane(const tinyxml2::XMLElement& xml_node,
   RETURN_IF_ERROR(ParseSpeed(xml_node, lane));
   // sample association
   RETURN_IF_ERROR(ParseSampleAssociates(xml_node, lane));
+  // road sample association
+  RETURN_IF_ERROR(ParseRoadSampleAssociates(xml_node, lane));
 
   // overlap object
   ParseObjectOverlapGroup(xml_node, &lane_internal->overlap_objects);
@@ -393,6 +395,46 @@ Status LanesXmlParser::ParseSampleAssociates(
     right_sample->set_width(right_width);
 
     sub_node = sub_node->NextSiblingElement("sampleAssociate");
+  }
+
+  return Status::OK();
+}
+
+Status LanesXmlParser::ParseRoadSampleAssociates(
+    const tinyxml2::XMLElement& xml_node, PbLane* lane) {
+  CHECK_NOTNULL(lane);
+  auto sub_node = xml_node.FirstChildElement("roadSampleAssociations");
+  if (sub_node == nullptr) {
+    std::string err_msg = "Error parse road sample associations";
+    return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+  }
+  sub_node = sub_node->FirstChildElement("sampleAssociation");
+  if (sub_node == nullptr) {
+    std::string err_msg = "Error parse road sample association";
+    return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+  }
+
+  while (sub_node) {
+    double left_width = 0.0;
+    double right_width = 0.0;
+    double s = 0.0;
+    int checker = sub_node->QueryDoubleAttribute("sOffset", &s);
+    checker += sub_node->QueryDoubleAttribute("leftWidth", &left_width);
+    checker += sub_node->QueryDoubleAttribute("rightWidth", &right_width);
+    if (checker != tinyxml2::XML_SUCCESS) {
+      std::string err_msg = "Error parse road sample association attribute";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+
+    auto left_road_sample = lane->add_left_road_sample();
+    left_road_sample->set_s(s);
+    left_road_sample->set_width(left_width);
+
+    auto right_road_sample = lane->add_right_road_sample();
+    right_road_sample->set_s(s);
+    right_road_sample->set_width(right_width);
+
+    sub_node = sub_node->NextSiblingElement("sampleAssociation");
   }
 
   return Status::OK();
