@@ -75,6 +75,22 @@ void CartesianFrenetConverter::cartesian_to_frenet(
   return;
 }
 
+void CartesianFrenetConverter::cartesian_to_frenet(
+    const double rs, const double rx, const double ry, const double rtheta,
+    const double x, const double y, double* ptr_s, double* ptr_d) {
+
+  const double dx = x - rx;
+  const double dy = y - ry;
+
+  const double cos_theta_r = std::cos(rtheta);
+  const double sin_theta_r = std::sin(rtheta);
+
+  const double cross_rd_nd = cos_theta_r * dy - sin_theta_r * dx;
+  *ptr_d = std::copysign(std::sqrt(dx * dx + dy * dy), cross_rd_nd);
+  *ptr_s = rs;
+  return;
+}
+
 void CartesianFrenetConverter::frenet_to_cartesian(
     const double rs, const double rx, const double ry, const double rtheta,
     const double rkappa, const double rdkappa,

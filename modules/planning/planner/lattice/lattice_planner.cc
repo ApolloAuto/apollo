@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include "../../lattice/trajectory_generator/backup_trajectory_generator.h"
+#include "modules/planning/lattice/trajectory_generator/backup_trajectory_generator.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
