@@ -51,6 +51,7 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/lattice/util:reference_line_frame_converter",
         "//modules/prediction/proto:prediction_proto",
         "//modules/common/configs:vehicle_config_helper",
     ],
