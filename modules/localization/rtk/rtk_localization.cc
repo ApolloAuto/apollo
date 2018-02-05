@@ -130,7 +130,7 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
   }
   auto *imu_adapter = AdapterManager::GetImu();
   if (imu_adapter->Empty()) {
-    AERROR << "[FindMatchingIMU]: Cannot find Matching IMU. "
+    AERROR << "Cannot find Matching IMU. "
            << "IMU message Queue is empty! GPS timestamp[" << gps_timestamp_sec
            << "]";
     return false;
@@ -148,7 +148,7 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
 
   if (imu_it != imu_adapter->end()) {  // found one
     if (imu_it == imu_adapter->begin()) {
-      AERROR << "[FindMatchingIMU]: IMU queue too short or request too old. "
+      AERROR << "IMU queue too short or request too old. "
              << "Oldest timestamp["
              << imu_adapter->GetOldestObserved().header().timestamp_sec()
              << "], Newest timestamp["
@@ -163,7 +163,10 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
         AERROR << "imu1 and imu_it_1 must both have header.";
         return false;
       }
-      InterpolateIMU(**imu_it_1, **imu_it, gps_timestamp_sec, imu_msg);
+      if (!InterpolateIMU(**imu_it_1, **imu_it, gps_timestamp_sec, imu_msg)) {
+        AERROR << "failed to interpolate IMU";
+        return false;
+      }
     }
   } else {
     // give the newest imu, without extrapolation
@@ -181,7 +184,7 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
     if (fabs(imu_msg->header().timestamp_sec() - gps_timestamp_sec) >
         FLAGS_report_gps_imu_time_diff_threshold) {
       // 20ms threshold to report error
-      AERROR << "[FindMatchingIMU]: Cannot find Matching IMU. "
+      AERROR << "Cannot find Matching IMU. "
              << "IMU messages too old"
              << "Newest timestamp["
              << imu_adapter->GetLatestObserved().header().timestamp_sec()
@@ -191,9 +194,14 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
   return true;
 }
 
-void RTKLocalization::InterpolateIMU(const Imu &imu1, const Imu &imu2,
+bool RTKLocalization::InterpolateIMU(const Imu &imu1, const Imu &imu2,
                                      const double timestamp_sec, Imu *imu_msg) {
   DCHECK_NOTNULL(imu_msg);
+  if (!(imu1.has_header() && imu1.header().has_timestamp_sec() &&
+        imu2.has_header() && imu2.header().has_timestamp_sec())) {
+    AERROR << "imu1 and imu2 has no header or no timestamp_sec in header";
+    return false;
+  }
   if (timestamp_sec - imu1.header().timestamp_sec() <
       FLAGS_timestamp_sec_tolerance) {
     AERROR << "[InterpolateIMU]: the given time stamp[" << timestamp_sec
@@ -210,37 +218,35 @@ void RTKLocalization::InterpolateIMU(const Imu &imu1, const Imu &imu2,
     *imu_msg = imu1;
     imu_msg->mutable_header()->set_timestamp_sec(timestamp_sec);
 
-    if (imu1.has_header() && imu1.header().has_timestamp_sec() &&
-        imu2.has_header() && imu2.header().has_timestamp_sec()) {
-      double time_diff =
-          imu2.header().timestamp_sec() - imu1.header().timestamp_sec();
-      if (fabs(time_diff) >= 0.001) {
-        double frac1 =
-            (timestamp_sec - imu1.header().timestamp_sec()) / time_diff;
+    double time_diff =
+        imu2.header().timestamp_sec() - imu1.header().timestamp_sec();
+    if (fabs(time_diff) >= 0.001) {
+      double frac1 =
+          (timestamp_sec - imu1.header().timestamp_sec()) / time_diff;
 
-        if (imu1.has_imu() && imu1.imu().has_angular_velocity() &&
-            imu2.has_imu() && imu2.imu().has_angular_velocity()) {
-          auto val = InterpolateXYZ(imu1.imu().angular_velocity(),
-                                    imu2.imu().angular_velocity(), frac1);
-          imu_msg->mutable_imu()->mutable_angular_velocity()->CopyFrom(val);
-        }
+      if (imu1.has_imu() && imu1.imu().has_angular_velocity() &&
+          imu2.has_imu() && imu2.imu().has_angular_velocity()) {
+        auto val = InterpolateXYZ(imu1.imu().angular_velocity(),
+                                  imu2.imu().angular_velocity(), frac1);
+        imu_msg->mutable_imu()->mutable_angular_velocity()->CopyFrom(val);
+      }
 
-        if (imu1.has_imu() && imu1.imu().has_linear_acceleration() &&
-            imu2.has_imu() && imu2.imu().has_linear_acceleration()) {
-          auto val = InterpolateXYZ(imu1.imu().linear_acceleration(),
-                                    imu2.imu().linear_acceleration(), frac1);
-          imu_msg->mutable_imu()->mutable_linear_acceleration()->CopyFrom(val);
-        }
+      if (imu1.has_imu() && imu1.imu().has_linear_acceleration() &&
+          imu2.has_imu() && imu2.imu().has_linear_acceleration()) {
+        auto val = InterpolateXYZ(imu1.imu().linear_acceleration(),
+                                  imu2.imu().linear_acceleration(), frac1);
+        imu_msg->mutable_imu()->mutable_linear_acceleration()->CopyFrom(val);
+      }
 
-        if (imu1.has_imu() && imu1.imu().has_euler_angles() && imu2.has_imu() &&
-            imu2.imu().has_euler_angles()) {
-          auto val = InterpolateXYZ(imu1.imu().euler_angles(),
-                                    imu2.imu().euler_angles(), frac1);
-          imu_msg->mutable_imu()->mutable_euler_angles()->CopyFrom(val);
-        }
+      if (imu1.has_imu() && imu1.imu().has_euler_angles() && imu2.has_imu() &&
+          imu2.imu().has_euler_angles()) {
+        auto val = InterpolateXYZ(imu1.imu().euler_angles(),
+                                  imu2.imu().euler_angles(), frac1);
+        imu_msg->mutable_imu()->mutable_euler_angles()->CopyFrom(val);
       }
     }
   }
+  return true;
 }
 
 void RTKLocalization::PrepareLocalizationMsg(
