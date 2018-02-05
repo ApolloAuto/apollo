@@ -81,10 +81,9 @@ void Crosswalk::MakeDecisions(Frame* const frame,
     double stop_line_end_s = crosswalk_overlap->end_s;
     if (adc_front_edge_s - stop_line_end_s >
         FLAGS_crosswalk_min_pass_distance) {
-      ADEBUG << "skip: crosswalk_id[" << crosswalk_id
-          << "] stop_line_end_s[" << stop_line_end_s
-          << "] adc_front_edge_s[" << adc_front_edge_s
-          << "]. adc_front_edge passes stop_line_end_s + buffer.";
+      ADEBUG << "skip: crosswalk_id[" << crosswalk_id << "] stop_line_end_s["
+             << stop_line_end_s << "] adc_front_edge_s[" << adc_front_edge_s
+             << "]. adc_front_edge passes stop_line_end_s + buffer.";
       continue;
     }
 
@@ -101,8 +100,8 @@ void Crosswalk::MakeDecisions(Frame* const frame,
           obstacle_type != PerceptionObstacle::BICYCLE &&
           obstacle_type != PerceptionObstacle::UNKNOWN_MOVABLE &&
           obstacle_type != PerceptionObstacle::UNKNOWN) {
-        ADEBUG << "obstacle_id[" << obstacle_id
-            << "] type[" << obstacle_type_name << "]. skip";
+        ADEBUG << "obstacle_id[" << obstacle_id << "] type["
+               << obstacle_type_name << "]. skip";
         continue;
       }
 
@@ -117,10 +116,9 @@ void Crosswalk::MakeDecisions(Frame* const frame,
       bool in_expanded_crosswalk = crosswalk_exp_poly.IsPointIn(point);
 
       if (!in_expanded_crosswalk) {
-        ADEBUG << "skip: obstacle_id[" << obstacle_id
-            << "] type[" << obstacle_type_name
-            << "] crosswalk_id[" << crosswalk_id
-            << "]: not in crosswalk expanded area";
+        ADEBUG << "skip: obstacle_id[" << obstacle_id << "] type["
+               << obstacle_type_name << "] crosswalk_id[" << crosswalk_id
+               << "]: not in crosswalk expanded area";
         continue;
       }
 
@@ -129,7 +127,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
           {perception_obstacle.position().x(),
            perception_obstacle.position().y()},
           &obstacle_sl_point);
-      double obstacle_l = obstacle_sl_point.l();
+      double obstacle_l = std::fabs(obstacle_sl_point.l());
 
       const Box2d obstacle_box =
           path_obstacle->obstacle()->PerceptionBoundingBox();
@@ -138,14 +136,12 @@ void Crosswalk::MakeDecisions(Frame* const frame,
       bool is_path_cross =
           !path_obstacle->reference_line_st_boundary().IsEmpty();
 
-      ADEBUG << "obstacle_id[" << obstacle_id
-          << "] type[" << obstacle_type_name
-          << "] crosswalk_id[" << crosswalk_id
-          << "] obstacle_l[" << obstacle_l
-          << "] within_crosswalk_area[" << in_crosswalk
-          << "] within_expanded_crosswalk_area[" << in_expanded_crosswalk
-          << "] is_on_road[" << is_on_road
-          << "] is_path_cross[" << is_path_cross << "]";
+      ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+             << "] crosswalk_id[" << crosswalk_id << "] obstacle_l["
+             << obstacle_l << "] within_crosswalk_area[" << in_crosswalk
+             << "] within_expanded_crosswalk_area[" << in_expanded_crosswalk
+             << "] is_on_road[" << is_on_road << "] is_path_cross["
+             << is_path_cross << "]";
 
       bool stop = false;
       if (obstacle_l >= FLAGS_crosswalk_loose_l_distance) {
@@ -153,9 +149,9 @@ void Crosswalk::MakeDecisions(Frame* const frame,
         //     STOP only if path crosses
         if (is_path_cross) {
           stop = true;
-          ADEBUG << "need_stop(>=l2): obstacle_id[" << obstacle_id
-              << "] type[" << obstacle_type_name
-              << "] crosswalk_id[" << crosswalk_id << "]";
+          ADEBUG << "need_stop(>=l2): obstacle_id[" << obstacle_id << "] type["
+                 << obstacle_type_name << "] crosswalk_id[" << crosswalk_id
+                 << "]";
         }
       } else if (obstacle_l <= FLAGS_crosswalk_strick_l_distance) {
         // (2) when l_distance <= strick_l_distance + on_road(not on sideway),
@@ -164,9 +160,9 @@ void Crosswalk::MakeDecisions(Frame* const frame,
         //     STOP only if path crosses
         if (is_on_road || is_path_cross) {
           stop = true;
-          ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id
-              << "] type[" << obstacle_type_name
-              << "] crosswalk_id[" << crosswalk_id << "]";
+          ADEBUG << "need_stop(<=11): obstacle_id[" << obstacle_id << "] type["
+                 << obstacle_type_name << "] crosswalk_id[" << crosswalk_id
+                 << "]";
         }
       } else {
         // TODO(all)
@@ -176,9 +172,9 @@ void Crosswalk::MakeDecisions(Frame* const frame,
       }
 
       if (!stop) {
-        ADEBUG << "skip: obstacle_id[" << obstacle_id
-            << "] type[" << obstacle_type_name
-            << "] crosswalk_id[" << crosswalk_id << "]";
+        ADEBUG << "skip: obstacle_id[" << obstacle_id << "] type["
+               << obstacle_type_name << "] crosswalk_id[" << crosswalk_id
+               << "]";
         continue;
       }
 
@@ -210,10 +206,9 @@ bool Crosswalk::FindCrosswalks(ReferenceLineInfo* const reference_line_info) {
   return crosswalk_overlaps_.size() > 0;
 }
 
-bool Crosswalk::BuildStopDecision(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info,
-    hdmap::PathOverlap* const crosswalk_overlap) {
+bool Crosswalk::BuildStopDecision(Frame* const frame,
+                                  ReferenceLineInfo* const reference_line_info,
+                                  hdmap::PathOverlap* const crosswalk_overlap) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
   CHECK_NOTNULL(crosswalk_overlap);
