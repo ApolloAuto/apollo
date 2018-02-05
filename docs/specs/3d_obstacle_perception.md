@@ -195,7 +195,7 @@ The table below explains the parameter usage and default values for CNN Segmenta
 | feature_param {height}       | The number of cells in Y (row) axis of the 2D grid. | 512        |
 | feature_param {range}        | The range of the 2D grid with respect to the origin (the LiDAR sensor). | 60 meters  |
 
-
+**Note: the provided model is a sample for experiment purpose only.**
 
 ### MinBox Builder
 
