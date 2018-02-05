@@ -337,7 +337,7 @@ class Renderer {
     }
 
     updateGroundImage(mapName) {
-        this.ground.updateImage(this.coordinates, mapName);
+        this.ground.updateImage(mapName);
     }
 
     updateGroundMetadata(serverUrl, mapInfo) {
