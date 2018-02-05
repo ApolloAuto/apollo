@@ -70,6 +70,10 @@ void PbfSensorManager::AddSensorMeasurements(const SensorObjects &objects) {
     AWARN << "Cannot find sensor " << sensor_id
           << " and create one in SensorManager";
     sensor = new PbfSensor(type, sensor_id);
+    if (sensor == nullptr) {
+      AERROR << "Fail to create PbfSensor. sensor_id = " << sensor_id;
+      return;
+    }
     sensors_[sensor_id] = sensor;
   } else {
     sensor = it->second;
