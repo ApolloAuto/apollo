@@ -33,6 +33,7 @@ using apollo::hdmap::Id;
 using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::CrosswalkInfoConstPtr;
 using apollo::hdmap::JunctionInfoConstPtr;
+using apollo::hdmap::RoadInfoConstPtr;
 using apollo::hdmap::SignalInfoConstPtr;
 using apollo::hdmap::StopSignInfoConstPtr;
 using apollo::hdmap::YieldSignInfoConstPtr;
@@ -200,6 +201,12 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
     AERROR << "Failed to get yield signs from sim_map.";
   }
   ExtractIds(yield_signs, ids->mutable_yield());
+
+  std::vector<RoadInfoConstPtr> roads;
+  if (sim_map_->GetRoads(point, radius, &roads) != 0) {
+    AERROR << "Failed to get roads from sim_map.";
+  }
+  ExtractIds(roads, ids->mutable_road());
 }
 
 Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
@@ -256,6 +263,14 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     auto element = sim_map_->GetYieldSignById(map_id);
     if (element) {
       *result.add_yield() = element->yield_sign();
+    }
+  }
+
+  for (const auto &id : ids.road()) {
+    map_id.set_id(id);
+    auto element = sim_map_->GetRoadById(map_id);
+    if (element) {
+      *result.add_road() = element->road();
     }
   }
 
