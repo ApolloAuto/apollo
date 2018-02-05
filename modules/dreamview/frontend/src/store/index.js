@@ -78,7 +78,6 @@ class DreamviewStore {
 
     @action enablePNCMonitor() {
         this.updateWidthInPercentage(0.7);
-        this.options.showPlanningCar = true;
         this.options.showPlanningReference = true;
         this.options.showPlanningDpOptimizer = true;
         this.options.showPlanningQpOptimizer = true;

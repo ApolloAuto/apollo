@@ -179,7 +179,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
         sim_world_service_.SetToClear();
-        sim_control_->ClearPlanning();
+        sim_control_->Reset();
       });
 
   websocket_->RegisterMessageHandler(
@@ -189,6 +189,19 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         DumpMessage(AdapterManager::GetRoutingResponse(), "RoutingResponse");
         DumpMessage(AdapterManager::GetLocalization(), "Localization");
         DumpMessage(AdapterManager::GetPlanning(), "Planning");
+      });
+
+  websocket_->RegisterMessageHandler(
+      "ToggleSimControl",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        auto enable = json.find("enable");
+        if (enable != json.end() && enable->is_boolean()) {
+          if (*enable) {
+            sim_control_->Start();
+          } else {
+            sim_control_->Stop();
+          }
+        }
       });
 }
 

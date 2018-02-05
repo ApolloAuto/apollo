@@ -9,8 +9,7 @@ In the first release of Apollo software, ESD PCIe CAN is supported out of the bo
   * Copy ntcan.h to include/
   * Copy 64-bit libntcan.so.4.0.1 to lib/
   * Do the following to add the necessary symbolic links:
-        ```
+
         cd ./lib/;
         ln -s libntcan.so.4.0.1 libntcan.so.4;
         ln -s libntcan.so.4.0.1 libntcan.so.4.0
-        ```
