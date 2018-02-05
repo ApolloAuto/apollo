@@ -152,6 +152,7 @@ Status DpStGraph::InitCostTable() {
 }
 
 Status DpStGraph::CalculateTotalCost() {
+  // col and row are for STGraph
   // t corresponding to col
   // s corresponding to row
   uint32_t next_highest_row = 0;
@@ -175,9 +176,9 @@ Status DpStGraph::CalculateTotalCost() {
 
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
       const auto& cost_cr = cost_table_[c][r];
-      uint32_t h_r = 0;
-      uint32_t l_r = 0;
       if (cost_cr.total_cost() < std::numeric_limits<double>::infinity()) {
+        uint32_t h_r = 0;
+        uint32_t l_r = 0;
         GetRowRange(cost_cr, &h_r, &l_r);
         highest_row = std::max(highest_row, h_r);
         lowest_row = std::min(lowest_row, l_r);
