@@ -56,6 +56,11 @@ class CartesianFrenetConverter {
                                   const double theta, const double kappa,
                                   std::array<double, 3>* const ptr_s_condition,
                                   std::array<double, 3>* const ptr_d_condition);
+
+  static void cartesian_to_frenet(const double rs, const double rx,
+      const double ry, const double rtheta, const double x, const double y,
+      double* ptr_s, double* ptr_d);
+
   /**
    * Convert a vehicle state in Frenet frame to Cartesian frame.
    * Combine two independent 1d movement w.r.t. reference line to a 2d movement.
