@@ -71,7 +71,7 @@ class SpeedDecider : public Task {
   /**
    * @brief create yield decision based on the boundary
    **/
-  bool CreateYieldDecision(const StBoundary& boundary,
+  bool CreateYieldDecision(const PathObstacle& path_obstacle,
                            ObjectDecisionType* const yield_decision) const;
 
   /**
