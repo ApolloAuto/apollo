@@ -141,6 +141,23 @@ export default class Map {
         return drewObjects;
     }
 
+    addRoad(road, coordinates, scene) {
+        const drewObjects = [];
+
+        road.section.forEach(section => {
+            section.boundary.outerPolygon.edge.forEach(edge => {
+                edge.curve.segment.forEach((segment, index) => {
+                    const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
+                    const boundary = this.addLaneMesh("CURB", points);
+                    scene.add(boundary);
+                    drewObjects.push(boundary);
+                });
+            });
+        });
+
+        return drewObjects;
+    }
+
     addCrossWalk(crosswalk, coordinates, scene) {
         const drewObjects = [];
 
@@ -402,6 +419,12 @@ export default class Map {
                         this.data[kind].push(Object.assign(newData[kind][i], {
                             drewObjects: this.addStopSign(
                                 newData[kind][i], coordinates, scene)
+                        }));
+                        break;
+                    case "road":
+                        const road = newData[kind][i];
+                        this.data[kind].push(Object.assign(newData[kind][i], {
+                            drewObjects: this.addRoad(road, coordinates, scene)
                         }));
                         break;
                     default:
