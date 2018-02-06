@@ -301,7 +301,7 @@ class Renderer {
         // Upon the first time in render() it sees ground mesh loaded,
         // added it to the scene.
         if (this.ground.type === "default" && !this.ground.initialized) {
-            this.ground.initialize(this.coordinates);
+            this.ground.initialize(this.coordinates, this.isMobileDevice() !== null);
             this.ground.mesh.name = "ground";
             this.scene.add(this.ground.mesh);
         }
