@@ -379,6 +379,11 @@
                   "rule": "repeated",
                   "type": "string",
                   "id": 8
+                },
+                "clearArea": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 9
                 }
               }
             },
