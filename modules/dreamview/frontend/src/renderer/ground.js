@@ -7,7 +7,6 @@ import PARAMETERS from "store/config/parameters.yml";
 export default class Ground {
     constructor() {
         this.type = "default";
-        this.gridOnly = false;
         this.loadedMap = null;
         this.updateMap = null;
         this.mesh = null;
@@ -21,14 +20,12 @@ export default class Ground {
         });
     }
 
-    initialize(coordinates, isMobileDevice) {
-        this.gridOnly = isMobileDevice;
+    initialize(coordinates) {
         if (!this.mesh) {
             return false;
         }
 
-        if ((this.loadedMap === this.updateMap || this.gridOnly === true)
-            && !this.render(coordinates)) {
+        if (this.loadedMap === this.updateMap && !this.render(coordinates)) {
             return false;
         }
 
@@ -37,8 +34,7 @@ export default class Ground {
     }
 
     update(world, coordinates, scene) {
-        if (this.initialized === true && this.gridOnly === false
-            && this.loadedMap !== this.updateMap) {
+        if (this.initialized === true && this.loadedMap !== this.updateMap) {
             const dir = this.titleCaseToSnakeCase(this.updateMap);
             const server = 'http://' + window.location.hostname + ':8888';
             const imgUrl = server + '/assets/map_data/' + dir + '/background.jpg';
