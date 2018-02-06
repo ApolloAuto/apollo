@@ -211,7 +211,9 @@ int HDMapImpl::GetRoads(const Vec2d& point, double distance,
   }
   std::unordered_set<std::string> road_ids;
   for (auto& lane : lanes) {
-    road_ids.insert(lane->road_id().id());
+    if (!lane->road_id().id().empty()) {
+      road_ids.insert(lane->road_id().id());
+    }
   }
 
   for (auto& road_id : road_ids) {
