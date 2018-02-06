@@ -165,6 +165,7 @@ message MapElementIds {
   repeated string yield = 6;
   repeated string overlap = 7;
   repeated string road = 8;
+  repeated string clear_area = 9;
 }
 
 // Next-id: 17
