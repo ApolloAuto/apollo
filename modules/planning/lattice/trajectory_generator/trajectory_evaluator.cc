@@ -84,7 +84,7 @@ std::size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
   if (!is_auto_tuning_) {
     return cost_queue_.size();
   } else {
-    return cost_queue_with_components_.empty();
+    return cost_queue_with_components_.size();
   }
 }
 
