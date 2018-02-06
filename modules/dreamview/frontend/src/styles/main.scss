@@ -1159,8 +1159,17 @@ body {
     overflow-y: hidden;
 
     .drive-event-card {
+        table {
+            width: 100%;
+            text-align: center;
+        }
         .drive-event-msg {
-            width: 500px;
+            width: 100%;
+        }
+        .toolbar {
+            button {
+                width: 200px;
+            }
         }
     }
 }
