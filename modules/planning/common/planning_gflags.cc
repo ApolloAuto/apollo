@@ -201,8 +201,11 @@ DEFINE_double(nudge_distance_obstacle, 0.5,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
-DEFINE_double(yield_min_distance, 3.0,
-              "min yield distance for vehicles/bicycles/moving objects");
+DEFINE_double(yield_distance, 3.0,
+              "min yield distance for vehicles/moving objects "
+              "other than pedestrians/bicycles");
+DEFINE_double(yield_distance_pedestrian_bycicle, 5.0,
+              "min yield distance for pedestrians/bicycles");
 DEFINE_double(
     follow_time_buffer, 2.5,
     "follow time buffer (in second) to calculate the following distance.");
@@ -406,6 +409,9 @@ DEFINE_double(weight_opposite_side_offset, 10.0,
 DEFINE_double(weight_dist_travelled, 10.0, "Weight of travelled distance cost");
 DEFINE_double(weight_target_speed, 1.0, "Weight of target speed cost");
 DEFINE_double(lat_offset_bound, 3.0, "The bound of lateral offset");
-DEFINE_double(lon_collision_buffer, 1.0, "Longitudinal collision buffer");
+DEFINE_double(lon_collision_yield_buffer, 1.0,
+              "Longitudinal collision buffer for yield");
+DEFINE_double(lon_collision_overtake_buffer, 5.0,
+              "Longitudinal collision buffer for overtake");
 DEFINE_double(lon_collision_cost_std, 0.5,
               "The standard deviation of logitudinal collision cost function");

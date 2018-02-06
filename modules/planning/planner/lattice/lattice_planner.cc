@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include "../../lattice/trajectory_generator/backup_trajectory_generator.h"
+#include "modules/planning/lattice/trajectory_generator/backup_trajectory_generator.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
@@ -194,8 +194,8 @@ Status LatticePlanner::PlanOnReferenceLine(
   //   second, evaluate the feasible longitudinal and lateral trajectory pairs
   //   and sort them according to the cost.
   TrajectoryEvaluator trajectory_evaluator(
-      planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle, true,
-      path_time_neighborhood_ptr);
+      planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle,
+      FLAGS_enable_auto_tuning, path_time_neighborhood_ptr);
 
   ADEBUG << "Trajectory_Evaluator_Construction_Time = "
          << (Clock::NowInSeconds() - current_time) * 1000;
@@ -207,7 +207,8 @@ Status LatticePlanner::PlanOnReferenceLine(
          << "  number_lat_traj = " << lat_trajectory1d_bundle.size();
 
   // Get instance of collision checker and constraint checker
-  CollisionChecker collision_checker(frame->obstacles());
+  CollisionChecker collision_checker(frame->obstacles(), init_s, init_d,
+                                     discretized_reference_line);
 
   // 7. always get the best pair of trajectories to combine; return the first
   // collision-free trajectory.

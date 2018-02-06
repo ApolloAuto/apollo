@@ -114,7 +114,7 @@ void SignalLight::MakeDecisions(Frame* const frame,
     signal_debug->set_light_id(signal_light.object_id);
     signal_debug->set_light_stop_s(signal_light.start_s);
 
-    if ((signal.color() == TrafficLight::RED ||
+    if ((signal.color() == TrafficLight::RED &&
          stop_deceleration < FLAGS_max_stop_deceleration) ||
         (signal.color() == TrafficLight::UNKNOWN &&
          stop_deceleration < FLAGS_max_stop_deceleration) ||

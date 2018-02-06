@@ -110,7 +110,8 @@ DECLARE_double(min_stop_distance_obstacle);
 DECLARE_double(max_stop_distance_obstacle);
 DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);
-DECLARE_double(yield_min_distance);
+DECLARE_double(yield_distance);
+DECLARE_double(yield_distance_pedestrian_bycicle);
 DECLARE_double(follow_time_buffer);
 DECLARE_double(follow_min_time_sec);
 DECLARE_double(within_lane_bound);
@@ -216,7 +217,8 @@ DECLARE_double(weight_opposite_side_offset);
 DECLARE_double(weight_dist_travelled);
 DECLARE_double(weight_target_speed);
 DECLARE_double(lat_offset_bound);
-DECLARE_double(lon_collision_buffer);
+DECLARE_double(lon_collision_yield_buffer);
+DECLARE_double(lon_collision_overtake_buffer);
 DECLARE_double(lon_collision_cost_std);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H

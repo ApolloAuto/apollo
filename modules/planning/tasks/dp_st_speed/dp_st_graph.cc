@@ -69,6 +69,10 @@ DpStGraph::DpStGraph(const StGraphData& st_graph_data,
   dp_st_speed_config_.set_total_path_length(
       std::fmin(dp_st_speed_config_.total_path_length(),
                 st_graph_data_.path_data_length()));
+  unit_s_ = dp_st_speed_config_.total_path_length() /
+            dp_st_speed_config_.matrix_dimension_s();
+  unit_t_ = dp_st_speed_config_.total_time() /
+            dp_st_speed_config_.matrix_dimension_t();
 }
 
 Status DpStGraph::Search(SpeedData* const speed_data) {
@@ -131,9 +135,6 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
 Status DpStGraph::InitCostTable() {
   uint32_t dim_s = dp_st_speed_config_.matrix_dimension_s();
   uint32_t dim_t = dp_st_speed_config_.matrix_dimension_t();
-  unit_s_ = dp_st_speed_config_.total_path_length() / dim_s;
-  unit_t_ = dp_st_speed_config_.total_time() /
-            dp_st_speed_config_.matrix_dimension_t();
   DCHECK_GT(dim_s, 2);
   DCHECK_GT(dim_t, 2);
   cost_table_ = std::vector<std::vector<StGraphPoint>>(
@@ -151,6 +152,7 @@ Status DpStGraph::InitCostTable() {
 }
 
 Status DpStGraph::CalculateTotalCost() {
+  // col and row are for STGraph
   // t corresponding to col
   // s corresponding to row
   uint32_t next_highest_row = 0;
@@ -174,9 +176,9 @@ Status DpStGraph::CalculateTotalCost() {
 
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
       const auto& cost_cr = cost_table_[c][r];
-      uint32_t h_r = 0;
-      uint32_t l_r = 0;
       if (cost_cr.total_cost() < std::numeric_limits<double>::infinity()) {
+        uint32_t h_r = 0;
+        uint32_t l_r = 0;
         GetRowRange(cost_cr, &h_r, &l_r);
         highest_row = std::max(highest_row, h_r);
         lowest_row = std::min(lowest_row, l_r);

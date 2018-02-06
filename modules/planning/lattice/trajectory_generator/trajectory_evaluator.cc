@@ -84,7 +84,7 @@ std::size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
   if (!is_auto_tuning_) {
     return cost_queue_.size();
   } else {
-    return cost_queue_with_components_.empty();
+    return cost_queue_with_components_.size();
   }
 }
 
@@ -233,14 +233,14 @@ double TrajectoryEvaluator::LonCollisionCost(
     double sigma = FLAGS_lon_collision_cost_std;
     for (const auto& m : pt_interval) {
       double cost = 0.0;
-      if (traj_s > m.first - FLAGS_lon_collision_buffer &&
-          traj_s < m.second + FLAGS_lon_collision_buffer) {
+      if (traj_s > m.first - FLAGS_lon_collision_yield_buffer &&
+          traj_s < m.second + FLAGS_lon_collision_overtake_buffer) {
         cost = 1.0;
       } else if (traj_s < m.first) {
-        double dist = traj_s - m.first + FLAGS_lon_collision_buffer;
+        double dist = (m.first - FLAGS_lon_collision_yield_buffer) - traj_s;
         cost = std::exp(-dist * dist / (2.0 * sigma * sigma));
       } else if (traj_s > m.second) {
-        double dist = m.second + FLAGS_lon_collision_buffer - traj_s;
+        double dist = traj_s - (m.second + FLAGS_lon_collision_overtake_buffer);
         cost = std::exp(-dist * dist / (2.0 * sigma * sigma));
       }
       cost_sqr_sum += cost * cost;

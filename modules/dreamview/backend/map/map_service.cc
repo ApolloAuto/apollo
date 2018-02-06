@@ -28,21 +28,23 @@ namespace dreamview {
 
 using apollo::common::PointENU;
 using apollo::common::util::JsonUtil;
-using apollo::hdmap::Map;
-using apollo::hdmap::Id;
-using apollo::hdmap::LaneInfoConstPtr;
+using apollo::hdmap::ClearAreaInfoConstPtr;
 using apollo::hdmap::CrosswalkInfoConstPtr;
-using apollo::hdmap::JunctionInfoConstPtr;
-using apollo::hdmap::SignalInfoConstPtr;
-using apollo::hdmap::StopSignInfoConstPtr;
-using apollo::hdmap::YieldSignInfoConstPtr;
 using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::Id;
+using apollo::hdmap::JunctionInfoConstPtr;
+using apollo::hdmap::LaneInfoConstPtr;
+using apollo::hdmap::Map;
 using apollo::hdmap::Path;
 using apollo::hdmap::PncMap;
+using apollo::hdmap::RoadInfoConstPtr;
 using apollo::hdmap::RouteSegments;
+using apollo::hdmap::SignalInfoConstPtr;
 using apollo::hdmap::SimMapFile;
-using apollo::routing::RoutingResponse;
+using apollo::hdmap::StopSignInfoConstPtr;
+using apollo::hdmap::YieldSignInfoConstPtr;
 using apollo::routing::RoutingRequest;
+using apollo::routing::RoutingResponse;
 using google::protobuf::RepeatedPtrField;
 
 namespace {
@@ -168,6 +170,12 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
   }
   ExtractIds(lanes, ids->mutable_lane());
 
+  std::vector<ClearAreaInfoConstPtr> clear_areas;
+  if (sim_map_->GetClearAreas(point, radius, &clear_areas) != 0) {
+    AERROR << "Fail to get clear areas from sim_map.";
+  }
+  ExtractIds(clear_areas, ids->mutable_clear_area());
+
   std::vector<CrosswalkInfoConstPtr> crosswalks;
   if (sim_map_->GetCrosswalks(point, radius, &crosswalks) != 0) {
     AERROR << "Fail to get crosswalks from sim_map.";
@@ -200,6 +208,12 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
     AERROR << "Failed to get yield signs from sim_map.";
   }
   ExtractIds(yield_signs, ids->mutable_yield());
+
+  std::vector<RoadInfoConstPtr> roads;
+  if (sim_map_->GetRoads(point, radius, &roads) != 0) {
+    AERROR << "Failed to get roads from sim_map.";
+  }
+  ExtractIds(roads, ids->mutable_road());
 }
 
 Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
@@ -216,6 +230,14 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     auto element = sim_map_->GetLaneById(map_id);
     if (element) {
       *result.add_lane() = element->lane();
+    }
+  }
+
+  for (const auto &id : ids.clear_area()) {
+    map_id.set_id(id);
+    auto element = sim_map_->GetClearAreaById(map_id);
+    if (element) {
+      *result.add_clear_area() = element->clear_area();
     }
   }
 
@@ -256,6 +278,14 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     auto element = sim_map_->GetYieldSignById(map_id);
     if (element) {
       *result.add_yield() = element->yield_sign();
+    }
+  }
+
+  for (const auto &id : ids.road()) {
+    map_id.set_id(id);
+    auto element = sim_map_->GetRoadById(map_id);
+    if (element) {
+      *result.add_road() = element->road();
     }
   }
 
