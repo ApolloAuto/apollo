@@ -71,7 +71,7 @@ export default class Options {
                this.cameraAngle === 'Monitor';
     }
 
-    @action toggleSideBar(option) {
+    @action toggle(option) {
         this[option] = !this[option];
 
         // Disable other mutually exclusive options
@@ -88,10 +88,6 @@ export default class Options {
                 this.hideOptionToggle[toggle] = !this[option];
             });
         }
-    }
-
-    @action toggle(option) {
-        this[option] = !this[option];
     }
 
     @action selectCamera(option) {
