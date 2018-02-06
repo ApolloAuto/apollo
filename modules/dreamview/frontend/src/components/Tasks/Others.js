@@ -29,14 +29,14 @@ export default class Others extends React.Component {
                                   isChecked={options.showVideo}
                                   disabled={disablePanel}
                                   onClick={() => {
-                                      options.toggleSideBar("showVideo");
+                                      this.props.store.handleOptionToggle('showVideo');
                                   }}/>
                     <CheckboxItem id={"showPNCMonitor"}
                                   title={"PNC Monitor"}
                                   isChecked={options.showPNCMonitor}
                                   disabled={disablePanel}
                                   onClick={() => {
-                                      this.props.store.handleSideBarClick('showPNCMonitor');
+                                      this.props.store.handleOptionToggle('showPNCMonitor');
                                   }}/>
                     <CheckboxItem id={"panelLock"}
                                   title={"Lock Task Panel"}
@@ -49,7 +49,7 @@ export default class Others extends React.Component {
                                   disabled={false}
                                   onClick={() => {
                                       WS.toggleSimControl(!options.simControlEnabled);
-                                      options.toggleSideBar("simControlEnabled");
+                                      this.props.store.handleOptionToggle('simControlEnabled');
                                   }}/>
                 </div>
             </div>

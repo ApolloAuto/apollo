@@ -108,11 +108,11 @@ class DreamviewStore {
         }
     }
 
-    handleSideBarClick(option) {
+    handleOptionToggle(option) {
         const oldShowPNCMonitor = this.options.showPNCMonitor;
         const oldShowRouteEditingBar = this.options.showRouteEditingBar;
 
-        this.options.toggleSideBar(option);
+        this.options.toggle(option);
 
         // disable tools turned off after toggling
         if (oldShowPNCMonitor && !this.options.showPNCMonitor) {
