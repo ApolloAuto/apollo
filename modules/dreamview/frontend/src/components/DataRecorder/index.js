@@ -3,7 +3,7 @@ import { inject, observer } from "mobx-react";
 
 import WS from "store/websocket";
 
-class NewDriveEvent extends React.Component {
+class DriveEventEditor extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -19,13 +19,14 @@ class NewDriveEvent extends React.Component {
     }
 
     handleSubmit() {
-        const {event_time_ms, on_drive_event_submited} = this.props;
+        const {event_time_ms, hide_func} = this.props;
         WS.submitDriveEvent(event_time_ms, this.state.event_msg);
-        on_drive_event_submited();
+        hide_func();
     }
 
     render() {
-        const {event_time_ms} = this.props;
+        const {event_time_ms, hide_func} = this.props;
+
         return (
             <div className="card drive-event-card">
                 <div className="card-header"><span>Adding New DriveEvent</span></div>
@@ -41,7 +42,10 @@ class NewDriveEvent extends React.Component {
                             </td>
                         </tr>
                     </tbody></table>
-                    <button onClick={this.handleSubmit}>Submit</button>
+                    <table className="toolbar"><tbody><tr>
+                        <td><button onClick={hide_func}>Cancel</button></td>
+                        <td><button onClick={this.handleSubmit}>Submit</button></td>
+                    </tr></tbody></table>
                 </div>
             </div>);
     }
@@ -57,7 +61,7 @@ export default class DataRecorder extends React.Component {
             showDriveEvent: false,
         };
         this.handleNewDriveEvent = this.handleNewDriveEvent.bind(this);
-        this.onDriveEventSubmited = this.onDriveEventSubmited.bind(this);
+        this.hideDriveEventEditor = this.hideDriveEventEditor.bind(this);
     }
 
     handleNewDriveEvent() {
@@ -67,7 +71,7 @@ export default class DataRecorder extends React.Component {
         });
     }
 
-    onDriveEventSubmited() {
+    hideDriveEventEditor() {
         this.setState({
             showDriveEvent: false,
         });
@@ -83,8 +87,9 @@ export default class DataRecorder extends React.Component {
                 </div>
               </div>
               {this.state.showDriveEvent &&
-                <NewDriveEvent event_time_ms={this.state.newDriveEventTimeMs}
-                     on_drive_event_submited={this.onDriveEventSubmited}/>}
+                <DriveEventEditor
+                     event_time_ms={this.state.newDriveEventTimeMs}
+                     hide_func={this.hideDriveEventEditor}/>}
             </div>);
     }
 }
