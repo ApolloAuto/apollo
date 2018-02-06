@@ -1,6 +1,4 @@
 import React from "react";
-import { observer } from "mobx-react";
-import classNames from "classnames";
 
 const ColorCodeMapping = {
     'GREEN': 'rgba(79, 198, 105, 0.8)',
@@ -11,9 +9,12 @@ const ColorCodeMapping = {
     '': null,
 };
 
-class TrafficLight extends React.Component {
+export default class TrafficLightIndicator extends React.PureComponent {
     render() {
-        const { color, text } = this.props;
+        const { colorName } = this.props;
+
+        const color = ColorCodeMapping[colorName];
+        const text = colorName || "NO SIGNAL";
 
         return (
             <div className="traffic-light" >
@@ -23,27 +24,6 @@ class TrafficLight extends React.Component {
                     </svg>
                 }
                 <div className="text">{text}</div>
-            </div>
-        );
-    }
-}
-
-@observer
-export default class TrafficLightIndicator extends React.Component {
-    render() {
-        const { trafficLightColor, drivingMode, isAutoMode } = this.props;
-
-        const trafficLightText = (trafficLightColor === '') ? "NO SIGNAL" : trafficLightColor;
-
-        return (
-            <div className="traffic-light-indicator">
-                <TrafficLight color={ColorCodeMapping[trafficLightColor]}
-                              text={trafficLightText}/>
-                <div className={classNames({
-                            "driving-mode": true,
-                            "auto-mode": isAutoMode,
-                            "manual-mode": !isAutoMode,
-                        })}><span className="text">{drivingMode}</span></div>
             </div>
         );
     }
