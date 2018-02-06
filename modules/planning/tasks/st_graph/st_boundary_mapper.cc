@@ -75,6 +75,7 @@ StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
 
 Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
   const auto& path_obstacles = path_decision->path_obstacles();
+
   if (planning_time_ < 0.0) {
     const std::string msg = "Fail to get params since planning_time_ < 0.";
     AERROR << msg;
@@ -309,9 +310,13 @@ Status StBoundaryMapper::MapWithoutDecision(PathObstacle* path_obstacle) const {
                       .ExpandByT(boundary_t_buffer);
   boundary.SetId(path_obstacle->Id());
   const auto& prev_st_boundary = path_obstacle->st_boundary();
+  const auto& ref_line_st_boundary = path_obstacle->reference_line_st_boundary();
   if (!prev_st_boundary.IsEmpty()) {
     boundary.SetBoundaryType(prev_st_boundary.boundary_type());
+  } else if (!ref_line_st_boundary.IsEmpty()) {
+    boundary.SetBoundaryType(ref_line_st_boundary.boundary_type());
   }
+
   path_obstacle->SetStBoundary(boundary);
   return Status::OK();
 }
@@ -500,6 +505,7 @@ Status StBoundaryMapper::MapWithDecision(
   boundary.SetId(path_obstacle->obstacle()->Id());
   boundary.SetCharacteristicLength(characteristic_length);
   path_obstacle->SetStBoundary(boundary);
+
   return Status::OK();
 }
 

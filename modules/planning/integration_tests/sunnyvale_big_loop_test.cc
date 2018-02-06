@@ -46,6 +46,10 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     FLAGS_test_base_map_filename = "base_map.bin";
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_big_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
+
+    FLAGS_enable_stop_sign = false;
+    FLAGS_enable_crosswalk = false;
+    FLAGS_enable_keep_clear = false;
   }
 };
 
@@ -283,6 +287,7 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
  * bag: 2018-01-29-17-22-46/2018-01-29-17-33-47_11.bag
  * decision: CRUISE
  */
+/*
 TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
   FLAGS_enable_keep_clear = true;
 
@@ -294,6 +299,7 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }
+*/
 
 TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   std::string seq_num = "10";
