@@ -44,6 +44,7 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
+#ifdef __USE_AVX__
 template <bool align>
 SIMD_INLINE void YuvSeperateAvx2(uint8_t *y, __m256i *y0, __m256i *y1,
                                  __m256i *u0, __m256i *v0) {
@@ -121,7 +122,7 @@ void Yuv2rgbAvx2(uint8_t *yuv, uint8_t *rgb) {
                      rgb + 3 * sizeof(__m256i));
 }
 
-void Yuyv2rgbAvx(unsigned char *YUV, unsigned char *RGB, int NumPixels) {
+void Yuyv2rgb(unsigned char *YUV, unsigned char *RGB, int NumPixels) {
   assert(NumPixels == (1920 * 1080));
   bool align = Aligned(YUV) & Aligned(RGB);
   uint8_t *yuv_offset = YUV;
@@ -140,6 +141,56 @@ void Yuyv2rgbAvx(unsigned char *YUV, unsigned char *RGB, int NumPixels) {
     }
   }
 }
+#else
+unsigned char CLIPVALUE(int val)
+{
+  // Old method (if)
+  val = val < 0 ? 0 : val;
+  return val > 255 ? 255 : val;
+
+  // New method (array)
+  //return uchar_clipping_table[val + clipping_table_offset];
+}
+
+void YUV2RGB(const unsigned char y, const unsigned char u, const unsigned char v, unsigned char* r,
+             unsigned char* g, unsigned char* b)
+{
+  const int y2 = (int)y;
+  const int u2 = (int)u - 128;
+  const int v2 = (int)v - 128;
+
+  double r2 = y2 + (1.4065 * v2);
+  double g2 = y2 - (0.3455 * u2) - (0.7169 * v2);
+  double b2 = y2 + (2.041  * u2);
+
+
+  *r = CLIPVALUE(r2);
+  *g = CLIPVALUE(g2);
+  *b = CLIPVALUE(b2);
+
+}
+void Yuyv2rgb(unsigned char *YUV, unsigned char *RGB, int NumPixels){
+  int i, j;
+  unsigned char y0, y1, u, v;
+  unsigned char r, g, b;
+  for (i = 0, j = 0; i < (NumPixels << 1); i += 4, j += 6)
+  {
+    u = (unsigned char)YUV[i + 0];
+    y0 = (unsigned char)YUV[i + 1];
+    v = (unsigned char)YUV[i + 2];
+    y1 = (unsigned char)YUV[i + 3];
+    YUV2RGB(y0, u, v, &r, &g, &b);
+    RGB[j + 0] = r;
+    RGB[j + 1] = g;
+    RGB[j + 2] = b;
+    YUV2RGB(y1, u, v, &r, &g, &b);
+    RGB[j + 3] = r;
+    RGB[j + 4] = g;
+    RGB[j + 5] = b;
+  }
+}
+
+#endif
 
 }  // namespace traffic_light
 }  // namespace perception
