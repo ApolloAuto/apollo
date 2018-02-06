@@ -179,7 +179,7 @@ cc_library(
 )
 
 cc_test(
-    name = "perception_obstacle_hdmap_input_test",
+    name = "hdmap_input_test",
     size = "small",
     srcs = [
         "hdmap_input_test.cc",
