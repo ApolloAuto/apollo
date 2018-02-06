@@ -142,22 +142,21 @@ void Yuyv2rgb(unsigned char *YUV, unsigned char *RGB, int NumPixels) {
   }
 }
 #else
-unsigned char CLIPVALUE(int val)
-{
+unsigned char CLIPVALUE(int val) {
   // Old method (if)
   val = val < 0 ? 0 : val;
   return val > 255 ? 255 : val;
 
   // New method (array)
-  //return uchar_clipping_table[val + clipping_table_offset];
+  // return uchar_clipping_table[val + clipping_table_offset];
 }
 
-void YUV2RGB(const unsigned char y, const unsigned char u, const unsigned char v, unsigned char* r,
-             unsigned char* g, unsigned char* b)
-{
-  const int y2 = (int)y;
-  const int u2 = (int)u - 128;
-  const int v2 = (int)v - 128;
+void YUV2RGB(const unsigned char y, const unsigned char u,
+             const unsigned char v, unsigned char* r,
+             unsigned char* g, unsigned char* b)  {
+  const int y2 = static_cast<int>(y);
+  const int u2 = static_cast<int>(u) - 128;
+  const int v2 = static_cast<int>(v) - 128;
 
   double r2 = y2 + (1.4065 * v2);
   double g2 = y2 - (0.3455 * u2) - (0.7169 * v2);
@@ -167,14 +166,13 @@ void YUV2RGB(const unsigned char y, const unsigned char u, const unsigned char v
   *r = CLIPVALUE(r2);
   *g = CLIPVALUE(g2);
   *b = CLIPVALUE(b2);
-
 }
-void Yuyv2rgb(unsigned char *YUV, unsigned char *RGB, int NumPixels){
+
+void Yuyv2rgb(unsigned char *YUV, unsigned char *RGB, int NumPixels) {
   int i, j;
   unsigned char y0, y1, u, v;
   unsigned char r, g, b;
-  for (i = 0, j = 0; i < (NumPixels << 1); i += 4, j += 6)
-  {
+  for (i = 0, j = 0; i < (NumPixels << 1); i += 4, j += 6) {
     u = (unsigned char)YUV[i + 0];
     y0 = (unsigned char)YUV[i + 1];
     v = (unsigned char)YUV[i + 2];
