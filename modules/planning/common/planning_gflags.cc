@@ -254,9 +254,12 @@ DEFINE_double(creep_stop_distance, 0.5,
               "stop distance(m) to the stop line of next lane overlap "
               "while creeping ");
 /// keep_clear
-DEFINE_bool(enable_keep_clear, true, "enable keep clear zone");
+DEFINE_bool(enable_keep_clear, false, "enable keep clear zone");
 DEFINE_string(keep_clear_virtual_object_id_prefix, "KC_",
               "prefix for converting keep_clear id to virtual object id");
+DEFINE_double(keep_clear_min_pass_distance, 2.0,
+              "valid min distance(m) for vehicles to be considered as "
+              "have passed keep_clear zone (stop_line_end_s)");
 /// traffic light
 DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 DEFINE_string(signal_light_virtual_object_id_prefix, "SL_",
