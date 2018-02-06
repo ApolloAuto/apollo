@@ -67,7 +67,7 @@ function check_machine_arch() {
   fi
 
   #setup vtk folder name for different systems.
-  VTK_VERSION=$(find /usr/include/ -type d  -name "vtk-*" | cut -d '-' -f 2)
+  VTK_VERSION=$(find /usr/include/ -type d  -name "vtk-*" | tail -n1 | cut -d '-' -f 2)
   sed -i "s/VTK_VERSION/${VTK_VERSION}/g" WORKSPACE
 }
 
