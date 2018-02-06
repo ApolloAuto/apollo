@@ -8,9 +8,8 @@ import WS from "store/websocket";
 export default class Others extends React.Component {
     render() {
         const { options, enableHMIButtonsOnly } = this.props.store;
-        const { isPanelLocked, toggleLock } = this.props;
 
-        const disablePanel = enableHMIButtonsOnly || isPanelLocked;
+        const disablePanel = enableHMIButtonsOnly || options.tasksPanelLocked;
 
         return (
             <div className="others card">
@@ -24,13 +23,6 @@ export default class Others extends React.Component {
                             onClick={() => {
                                 WS.dumpMessages();
                             }}>Dump Message</button>
-                    <CheckboxItem id={"showVideo"}
-                                  title={"Camera Sensor"}
-                                  isChecked={options.showVideo}
-                                  disabled={disablePanel}
-                                  onClick={() => {
-                                      this.props.store.handleOptionToggle('showVideo');
-                                  }}/>
                     <CheckboxItem id={"showPNCMonitor"}
                                   title={"PNC Monitor"}
                                   isChecked={options.showPNCMonitor}
@@ -38,11 +30,6 @@ export default class Others extends React.Component {
                                   onClick={() => {
                                       this.props.store.handleOptionToggle('showPNCMonitor');
                                   }}/>
-                    <CheckboxItem id={"panelLock"}
-                                  title={"Lock Task Panel"}
-                                  isChecked={isPanelLocked}
-                                  disabled={false}
-                                  onClick={toggleLock}/>
                     <CheckboxItem id={"toggleSimControl"}
                                   title={"SimControl"}
                                   isChecked={options.simControlEnabled}
@@ -50,6 +37,20 @@ export default class Others extends React.Component {
                                   onClick={() => {
                                       WS.toggleSimControl(!options.simControlEnabled);
                                       this.props.store.handleOptionToggle('simControlEnabled');
+                                  }}/>
+                    <CheckboxItem id={"showVideo"}
+                                  title={"Camera Sensor"}
+                                  isChecked={options.showVideo}
+                                  disabled={disablePanel}
+                                  onClick={() => {
+                                      this.props.store.handleOptionToggle('showVideo');
+                                  }}/>
+                    <CheckboxItem id={"panelLock"}
+                                  title={"Lock Task Panel"}
+                                  isChecked={options.tasksPanelLocked}
+                                  disabled={false}
+                                  onClick={() => {
+                                    this.props.store.handleOptionToggle('tasksPanelLocked');
                                   }}/>
                 </div>
             </div>
