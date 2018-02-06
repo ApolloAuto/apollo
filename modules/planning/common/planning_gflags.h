@@ -217,7 +217,8 @@ DECLARE_double(weight_opposite_side_offset);
 DECLARE_double(weight_dist_travelled);
 DECLARE_double(weight_target_speed);
 DECLARE_double(lat_offset_bound);
-DECLARE_double(lon_collision_buffer);
+DECLARE_double(lon_collision_yield_buffer);
+DECLARE_double(lon_collision_overtake_buffer);
 DECLARE_double(lon_collision_cost_std);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H

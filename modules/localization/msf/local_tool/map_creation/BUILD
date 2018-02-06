@@ -45,4 +45,21 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "poses_interpolator",
+    srcs = [
+        "poses_interpolator.cc",
+    ],
+    linkopts = [
+        "-lboost_filesystem",
+        "-lboost_system",
+        "-lboost_program_options",
+    ],
+    linkstatic = 0,
+    deps = [
+        "//modules/localization/msf/local_tool/map_creation/poses_interpolation:poses_interpolation_lib",
+        "@eigen//:eigen",
+    ],
+)
+
 cpplint()
