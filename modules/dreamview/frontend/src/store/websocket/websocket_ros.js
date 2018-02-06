@@ -14,7 +14,6 @@ export default class RosWebSocketEndpoint {
         this.lastSeqNum = -1;
         this.currMapRadius = null;
         this.updatePOI = true;
-        this.updateGround = true;
     }
 
     initialize() {
@@ -46,10 +45,7 @@ export default class RosWebSocketEndpoint {
                     break;
                 case "HMIStatus":
                     STORE.hmi.updateStatus(message.data);
-                    if (this.updateGround) {
-                        RENDERER.updateGroundImage(STORE.hmi.currentMap);
-                        this.updateGround = false;
-                    }
+                    RENDERER.updateGroundImage(STORE.hmi.currentMap);
                     break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
@@ -183,7 +179,6 @@ export default class RosWebSocketEndpoint {
             new_map: map,
         }));
         this.updatePOI = true;
-        this.updateGround = true;
     }
 
     changeVehicle(vehcile) {
