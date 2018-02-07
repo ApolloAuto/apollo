@@ -37,7 +37,7 @@ The perception module outputs are:
 - [ ] 4. Launch the perception module using the command `./scripts/perception.sh start` or by enabling the perception button on the *Module Controller* page of the web GUI. The command for stopping perception is `./scripts/perception.sh stop`. Note: please do not try to use GUI to enable perception but use script to stop it, vice versa. 
 
 
-- [ ] 5. Download the demo data from the Apollo [Open Data Platform](https://console.bce.baidu.com/apollo/task/download).
+- [ ] 5. Download the demo data from the Apollo [Open Data Platform](http://data.apollo.auto).
 
 ## Function enable/disable
 The perception framework is a directed acyclic graph (DAG). There are three components in DAG configuration, including sub-nodes, edges and shared data. Each function is implemented as a sub-node in DAG. The sub-nodes that share data have an edge from producer to customer.
