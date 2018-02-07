@@ -145,7 +145,7 @@ Deployed on NVIDIA Drive PX2 (PDK 4.1.4.0).
 
 * Test data path:
 
-  [testdata.zip](http://console.bce.baidu.com/apollo/task/download?locale=zh-cn&_=1506053321431#/apollo/home)
+  [testdata.zip](http://data.apollo.auto)
 
   unzip testdata in /data folder.
 
