@@ -87,7 +87,7 @@ class MSFLocalization : public LocalizationBase {
                                 double *offset_x, double *offset_y,
                                 double *offset_z, double *uncertainty_x,
                                 double *uncertainty_y, double *uncertainty_z);
-  bool LoadZoneIdFromFile(const std::string &folder_path, 
+  bool LoadZoneIdFromFile(const std::string &folder_path,
                           const std::string &file_path, int *zone_id);
 
  private:
