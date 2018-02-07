@@ -52,6 +52,7 @@ DECLARE_bool(enable_gps_timestamp);
 
 // lidar module
 DECLARE_string(local_map_name);
+DECLARE_string(local_map_config_file);
 DECLARE_string(lidar_extrinsics_file);
 DECLARE_string(lidar_height_file);
 DECLARE_double(lidar_height_default);
@@ -90,6 +91,7 @@ DECLARE_double(imu_to_ant_offset_uz);
 
 // common
 DECLARE_double(imu_rate);
+DECLARE_bool(if_utm_zone_id_from_file);
 DECLARE_int32(local_utm_zone_id);
 DECLARE_bool(trans_gpstime_to_utctime);
 DECLARE_int32(gnss_mode);
