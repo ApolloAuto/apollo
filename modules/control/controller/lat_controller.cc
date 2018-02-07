@@ -510,7 +510,7 @@ void LatController::ComputeLateralErrors(
   const double dy = y - target_point.path_point().y();
 
   ADEBUG << "x point: " << x << " y point: " << y;
-  ADEBUG << "math point x: " << target_point.path_point().x()
+  ADEBUG << "match point x: " << target_point.path_point().x()
          << " y point: " << target_point.path_point().y();
 
   const double cos_matched_theta = std::cos(target_point.path_point().theta());
