@@ -37,7 +37,7 @@ docker commit CONTAINER_ID apolloauto/apollo:NEW_DOCKER_IMAGE_TAG
 
 6. Start the new docker image (in host) and get into docker:
 ```
-./docker/scripts/dev_start.sh NEW_DOCKER_IMAGE_TAG
+./docker/scripts/dev_start.sh -image NEW_DOCKER_IMAGE_TAG
 ./docker/scripts/dev_into.sh
 ```
 
