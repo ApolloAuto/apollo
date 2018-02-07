@@ -49,6 +49,7 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::ChassisAdapter;
+using apollo::common::adapter::GpsAdapter;
 using apollo::common::adapter::LocalizationAdapter;
 using apollo::common::adapter::MonitorAdapter;
 using apollo::common::adapter::PerceptionObstaclesAdapter;
@@ -61,6 +62,7 @@ using apollo::common::time::millis;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::GetProtoFromFile;
 using apollo::hdmap::Path;
+using apollo::localization::Gps;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
@@ -190,7 +192,9 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
   }
 }
 
-inline double SecToMs(const double sec) { return sec * 1000.0; }
+inline double SecToMs(const double sec) {
+  return sec * 1000.0;
+}
 
 }  // namespace
 
@@ -218,6 +222,7 @@ void SimulationWorldService::Update() {
   if (to_clear_) {
     // Clears received data.
     AdapterManager::GetChassis()->ClearData();
+    AdapterManager::GetGps()->ClearData();
     AdapterManager::GetLocalization()->ClearData();
     AdapterManager::GetPerceptionObstacles()->ClearData();
     AdapterManager::GetPlanning()->ClearData();
@@ -234,6 +239,7 @@ void SimulationWorldService::Update() {
 
   AdapterManager::Observe();
   UpdateWithLatestObserved("Chassis", AdapterManager::GetChassis());
+  UpdateWithLatestObserved("Gps", AdapterManager::GetGps());
   UpdateWithLatestObserved("Localization", AdapterManager::GetLocalization());
 
   // Clear objects received from last frame and populate with the new objects.
@@ -362,6 +368,23 @@ void SimulationWorldService::UpdateSimulationWorld(
   // message header. It is done on both the SimulationWorld object
   // itself and its auto_driving_car() field.
   auto_driving_car->set_timestamp_sec(localization.header().timestamp_sec());
+}
+
+template <>
+void SimulationWorldService::UpdateSimulationWorld(const Gps &gps) {
+  Object *gps_position = world_.mutable_gps();
+  gps_position->set_timestamp_sec(gps.header().timestamp_sec());
+
+  const auto &pose = gps.localization();
+  gps_position->set_position_x(pose.position().x() +
+                               map_service_->GetXOffset());
+  gps_position->set_position_y(pose.position().y() +
+                               map_service_->GetYOffset());
+
+  double heading = apollo::common::math::QuaternionToHeading(
+      pose.orientation().qw(), pose.orientation().qx(), pose.orientation().qy(),
+      pose.orientation().qz());
+  gps_position->set_heading(heading);
 }
 
 template <>

@@ -467,6 +467,10 @@
                 "planningData": {
                   "type": "apollo.planning_internal.PlanningData",
                   "id": 19
+                },
+                "gps": {
+                  "type": "Object",
+                  "id": 20
                 }
               }
             }
