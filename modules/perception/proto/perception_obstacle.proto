@@ -52,8 +52,40 @@ message PerceptionObstacle {
   optional ConfidenceType confidence_type = 14 [default = CONFIDENCE_CNN];
 }
 
+message CIPVInfo {
+  optional int32 cipv_id = 1;
+  repeated int32 potential_cipv_id = 2;
+}
+
+message LaneMarker {
+  enum LaneType {
+    LANE_TYPE_UNKNOWN = 0;
+    LANE_TYPE_DASHED = 1;
+    LANE_TYPE_SOLID = 2;
+    LANE_TYPE_ROAD_EDGE = 3;
+  }
+  optional LaneType lane_type = 1;
+  optional int32 quality = 2;
+  optional int32 model_degree = 3;
+  // equation X = c3 * Z^3 + c2 * Z^2 + c1 * Z + c0
+  optional double c0_position = 4;
+  optional double c1_heading_angle = 5;
+  optional double c2_curvature = 6;
+  optional double c3_curvature_derivative = 7;
+  optional double view_range = 8;
+}
+
+message LaneMarkers {
+  optional LaneMarker left_lane_marker = 1;
+  optional LaneMarker right_lane_marker = 2;
+  repeated LaneMarker next_left_lane_marker = 3;
+  repeated LaneMarker next_right_lane_marker = 4;
+}
+
 message PerceptionObstacles {
   repeated PerceptionObstacle perception_obstacle = 1;  // An array of obstacles
   optional apollo.common.Header header = 2;  // Header
   optional apollo.common.ErrorCode error_code = 3 [default = OK];
+  optional LaneMarkers lane_marker = 4;
+  optional CIPVInfo cipv_info = 5; // closest in path vehicle
 }
