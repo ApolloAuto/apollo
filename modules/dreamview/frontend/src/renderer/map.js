@@ -21,6 +21,7 @@ const colorMapping = {
     CORAL: 0xFF7F50,
     RED: 0xFF6666,
     GREEN: 0x006400,
+    BLUE: 0x30A5FF,
     PURE_WHITE: 0xFFFFFF,
     DEFAULT: 0xC0C0C0
 };
@@ -156,6 +157,20 @@ export default class Map {
                 });
             });
         });
+
+        return drewObjects;
+    }
+
+    addBorder(borderPolygon, color, coordinates, scene) {
+        const drewObjects = [];
+
+        const border = coordinates.applyOffsetToArray(borderPolygon.polygon.point);
+        border.push(border[0]);
+
+        const mesh = drawSegmentsFromPoints(
+            border, color, 2, 0, true, false, 1.0);
+        scene.add(mesh);
+        drewObjects.push(mesh);
 
         return drewObjects;
     }
@@ -412,6 +427,12 @@ export default class Map {
                         this.data[kind].push(Object.assign(newData[kind][i], {
                             drewObjects: this.addZone(
                                 newData[kind][i], colorMapping.PURE_WHITE, coordinates, scene)
+                        }));
+                        break;
+                    case "junction":
+                        this.data[kind].push(Object.assign(newData[kind][i], {
+                            drewObjects: this.addBorder(
+                                newData[kind][i], colorMapping.BLUE, coordinates, scene)
                         }));
                         break;
                     case "overlap":
