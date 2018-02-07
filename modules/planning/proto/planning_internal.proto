@@ -194,3 +194,13 @@ message CloudReferenceLineSegment {
 message CloudReferenceLineResponse {
   repeated CloudReferenceLineSegment segment = 1;
 }
+
+message NavigationPath {
+  repeated apollo.common.PathPoint path_point = 1;
+  optional uint32 path_priority = 2; // highest = 0 which can directly reach destination
+}
+
+message NavigationInfo {
+  optional apollo.common.Header header = 1;
+  repeated NavigationPath navigation_path = 2;
+}
