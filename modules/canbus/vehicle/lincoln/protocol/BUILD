@@ -27,6 +27,7 @@ cc_library(
         "turnsignal_68.cc",
         "version_7f.cc",
         "wheelspeed_6a.cc",
+        "surround_73.cc",
     ],
     hdrs = [
         "accel_6b.h",
@@ -51,6 +52,7 @@ cc_library(
         "turnsignal_68.h",
         "version_7f.h",
         "wheelspeed_6a.h",
+        "surround_73.h",
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -304,6 +306,18 @@ cc_test(
     size = "small",
     srcs = [
         "wheelspeed_6a_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "surround_73_test",
+    size = "small",
+    srcs = [
+        "surround_73_test.cc",
     ],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
