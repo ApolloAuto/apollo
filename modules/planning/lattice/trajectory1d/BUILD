@@ -40,6 +40,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:common",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/math/curve1d:curve1d",
     ],
 )
