@@ -6,7 +6,7 @@ import { loadObject } from "utils/models";
 
 const CAR_PROPERTIES = {
     'adc': {
-        menuOptionName: null,
+        menuOptionName: 'showPositionLocalization',
         carMaterial: carMaterial,
     },
     'plannigAdc': {
@@ -32,8 +32,7 @@ export default class AutoDrivingCar {
             x: 1, y: 1, z: 1}, object => {
                 this.mesh = object;
                 this.mesh.rotation.x = Math.PI / 2;
-                this.mesh.visible = properties.menuOptionName === null ||
-                                    STORE.options[properties.menuOptionName];
+                this.mesh.visible = STORE.options[properties.menuOptionName];
                 scene.add(this.mesh);
             });
     }
@@ -44,7 +43,7 @@ export default class AutoDrivingCar {
         }
 
         const optionName = CAR_PROPERTIES[this.name].menuOptionName;
-        this.mesh.visible = optionName === null || STORE.options[optionName];
+        this.mesh.visible = STORE.options[optionName];
 
         const position = coordinates.applyOffset({x: pose.positionX, y: pose.positionY});
         if (position === null) {
