@@ -310,7 +310,8 @@ Status StBoundaryMapper::MapWithoutDecision(PathObstacle* path_obstacle) const {
                       .ExpandByT(boundary_t_buffer);
   boundary.SetId(path_obstacle->Id());
   const auto& prev_st_boundary = path_obstacle->st_boundary();
-  const auto& ref_line_st_boundary = path_obstacle->reference_line_st_boundary();
+  const auto& ref_line_st_boundary =
+      path_obstacle->reference_line_st_boundary();
   if (!prev_st_boundary.IsEmpty()) {
     boundary.SetBoundaryType(prev_st_boundary.boundary_type());
   } else if (!ref_line_st_boundary.IsEmpty()) {
