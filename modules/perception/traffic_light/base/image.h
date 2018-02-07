@@ -67,7 +67,7 @@ class Image {
    * @param [in] raw ros image data
    */
   bool Init(const double &ts, const CameraId &device_id,
-            std::shared_ptr<const sensor_msgs::Image> image_data);
+            boost::shared_ptr<const sensor_msgs::Image> image_data);
 
   /**
    * @brief return image's timestamp
@@ -124,7 +124,7 @@ class Image {
   double timestamp_ = 0.0;                  // Image's timestamp
   CameraId camera_id_ = CameraId::UNKNOWN;  // camera's id
   cv::Mat mat_;                             // Image's data
-  std::shared_ptr<const sensor_msgs::Image> image_data_;
+  boost::shared_ptr<const sensor_msgs::Image> image_data_;
   friend std::ostream &operator<<(std::ostream &os, const Image &image);
 };
 
