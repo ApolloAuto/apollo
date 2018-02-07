@@ -196,9 +196,9 @@ void SubDebugCallback(const TrafficLightDetection &tl_result) {
 }
 void SubImage(CameraId camera_id,
               const sensor_msgs::ImagePtr &msg) {
-  std::shared_ptr<sensor_msgs::Image> img(new sensor_msgs::Image);
+  boost::shared_ptr<sensor_msgs::Image> img(new sensor_msgs::Image);
   *img = *msg;
-  std::shared_ptr<const sensor_msgs::Image> img_msg(img);
+  boost::shared_ptr<const sensor_msgs::Image> img_msg(img);
   std::shared_ptr<Image> image(new Image);
   if (!image->Init(img_msg->header.stamp.toSec(), camera_id, img_msg)) {
     std::cerr << "tl_visualizer load image failed.";

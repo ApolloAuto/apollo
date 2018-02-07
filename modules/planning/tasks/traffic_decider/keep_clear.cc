@@ -46,13 +46,12 @@ bool KeepClear::ApplyRule(Frame* const frame,
   const std::vector<PathOverlap>& keep_clear_overlaps =
       reference_line_info->reference_line().map_path().clear_area_overlaps();
   for (const auto& keep_clear_overlap : keep_clear_overlaps) {
-    if (BuildKeepClearObstacle(
-        frame, reference_line_info,
-        const_cast<PathOverlap*>(&keep_clear_overlap))) {
+    if (BuildKeepClearObstacle(frame, reference_line_info,
+                               const_cast<PathOverlap*>(&keep_clear_overlap))) {
       ADEBUG << "KEEP_CLAER for keep_clear_zone["
-          << keep_clear_overlap.object_id
-          << "] s[" << keep_clear_overlap.start_s
-          << ", " << keep_clear_overlap.end_s << "] BUILD";
+             << keep_clear_overlap.object_id << "] s["
+             << keep_clear_overlap.start_s << ", " << keep_clear_overlap.end_s
+             << "] BUILD";
     }
   }
 
@@ -60,12 +59,11 @@ bool KeepClear::ApplyRule(Frame* const frame,
   const std::vector<PathOverlap>& junction_overlaps =
       reference_line_info->reference_line().map_path().junction_overlaps();
   for (const auto& junction_overlap : junction_overlaps) {
-    if (BuildKeepClearObstacle(
-        frame, reference_line_info,
-        const_cast<PathOverlap*>(&junction_overlap))) {
+    if (BuildKeepClearObstacle(frame, reference_line_info,
+                               const_cast<PathOverlap*>(&junction_overlap))) {
       ADEBUG << "KEEP_CLAER for junction[" << junction_overlap.object_id
-          << "] s[" << junction_overlap.start_s
-          << ", " << junction_overlap.end_s << "] BUILD";
+             << "] s[" << junction_overlap.start_s << ", "
+             << junction_overlap.end_s << "] BUILD";
     }
   }
 
@@ -73,8 +71,7 @@ bool KeepClear::ApplyRule(Frame* const frame,
 }
 
 bool KeepClear::BuildKeepClearObstacle(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info,
+    Frame* const frame, ReferenceLineInfo* const reference_line_info,
     PathOverlap* const keep_clear_overlap) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -84,10 +81,9 @@ bool KeepClear::BuildKeepClearObstacle(
   if (adc_front_edge_s - keep_clear_overlap->start_s >
       FLAGS_keep_clear_min_pass_distance) {
     ADEBUG << "adc inside keep_clear zone[" << keep_clear_overlap->object_id
-           << "] s[" << keep_clear_overlap->start_s
-           << ", " << keep_clear_overlap->end_s
-           << "] adc_front_edge_s[" << adc_front_edge_s
-           << "]. skip this keep clear zone";
+           << "] s[" << keep_clear_overlap->start_s << ", "
+           << keep_clear_overlap->end_s << "] adc_front_edge_s["
+           << adc_front_edge_s << "]. skip this keep clear zone";
     return false;
   }
 
@@ -114,10 +110,9 @@ bool KeepClear::BuildKeepClearObstacle(
   double left_lane_width = 0.0;
   double right_lane_width = 0.0;
   if (!reference_line.GetLaneWidth(keep_clear_overlap->start_s,
-                                   &left_lane_width,
-                                   &right_lane_width)) {
-    AERROR << "Failed to get lane width at s["
-        << keep_clear_overlap->start_s << "]";
+                                   &left_lane_width, &right_lane_width)) {
+    AERROR << "Failed to get lane width at s[" << keep_clear_overlap->start_s
+           << "]";
     return false;
   }
 
@@ -126,8 +121,7 @@ bool KeepClear::BuildKeepClearObstacle(
       left_lane_width + right_lane_width};
   const auto obstacle_id =
       FLAGS_keep_clear_virtual_object_id_prefix + keep_clear_overlap->object_id;
-  auto* obstacle =
-      frame->AddStaticVirtualObstacle(obstacle_id, keep_clear_box);
+  auto* obstacle = frame->AddStaticVirtualObstacle(obstacle_id, keep_clear_box);
   if (!obstacle) {
     AERROR << "Failed to create obstacle " << obstacle_id << " in frame";
     return false;
@@ -137,7 +131,8 @@ bool KeepClear::BuildKeepClearObstacle(
     AERROR << "Failed to create path_obstacle for " << obstacle_id;
     return false;
   }
-  path_obstacle->SetReferenceLineStBoundaryType(StBoundary::BoundaryType::KEEP_CLEAR);
+  path_obstacle->SetReferenceLineStBoundaryType(
+      StBoundary::BoundaryType::KEEP_CLEAR);
 
   return true;
 }
