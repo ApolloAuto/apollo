@@ -41,7 +41,9 @@ const MenuIdOptionMapping = {
         planningReference: 'showPlanningReference',
         planningDpOptimizer: 'showPlanningDpOptimizer',
         planningQpOptimizer: 'showPlanningQpOptimizer',
-        planningLine: 'showPlanning'
+        planningLine: 'showPlanning',
+        positionLocalization: 'showPositionLocalization',
+        positionGps: 'showPositionGps',
 };
 
 @observer
