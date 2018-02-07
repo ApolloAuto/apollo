@@ -21,6 +21,7 @@
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
 #include <cmath>
 #include "modules/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -28,7 +29,10 @@ namespace planning {
 ConstantDecelerationTrajectory1d::ConstantDecelerationTrajectory1d(
     const double init_s, const double init_v, const double a)
     : init_s_(init_s), init_v_(init_v), deceleration_(-a) {
-  CHECK(init_v_ > 0.0);
+  if (init_v_ < -FLAGS_lattice_epsilon) {
+    AERROR << "negative init v = " << init_v_;
+  }
+  init_v_ = std::abs(init_v_);
   CHECK(deceleration_ > 0.0);
   end_t_ = init_v_ / deceleration_;
   end_s_ = init_v_ * init_v_ / (2.0 * deceleration_) + init_s_;
