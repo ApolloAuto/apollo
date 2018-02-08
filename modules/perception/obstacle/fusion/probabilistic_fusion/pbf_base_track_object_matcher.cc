@@ -18,6 +18,7 @@
 
 #include <map>
 #include <string>
+#include <numeric>
 
 namespace apollo {
 namespace perception {
