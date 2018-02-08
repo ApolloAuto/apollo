@@ -65,7 +65,12 @@ DEFINE_double(sim_map_radius, 300.0,
               "elements around the car.");
 
 DEFINE_int32(dreamview_worker_num, 3, "number of dreamview thread workers");
+
 DEFINE_bool(enable_update_size_check, true,
             "True to check if the update byte number is less than threshold");
+
 DEFINE_uint32(max_update_size, 1000000,
-              "number of max update bytes allowed to push to dreamview FE");
+              "Number of max update bytes allowed to push to dreamview FE");
+
+DEFINE_bool(sim_world_with_routing_path, false,
+            "Whether the routing_path is included in sim_world proto.");
