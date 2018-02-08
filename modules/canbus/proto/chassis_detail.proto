@@ -24,6 +24,7 @@ message ChassisDetail {
   optional Battery battery = 14;            // Battery info
   optional CheckResponseSignal check_response = 15;
   optional License license = 16;            // License info
+  optional Surround surround = 17;          // Surround information
 }
 
 // CheckResponseSignal
@@ -446,7 +447,7 @@ message BasicInfo {
     START = 3;
     INVALID = 4;
   }
-  
+
   optional bool is_auto_mode = 1;
   optional Type power_state = 2;
   optional bool is_air_bag_deployed = 3;
@@ -499,4 +500,29 @@ message BasicInfo {
 
 message License {
   optional string vin = 1;
+}
+
+message Surround {
+  optional bool cross_traffic_alert_left = 1;
+  optional bool cross_traffic_alert_left_enabled = 2;
+  optional bool blind_spot_left_alert = 3;
+  optional bool blind_spot_left_alert_enabled = 4;
+  optional bool cross_traffic_alert_right = 5;
+  optional bool cross_traffic_alert_right_enabled = 6;
+  optional bool blind_spot_right_alert = 7;
+  optional bool blind_spot_right_alert_enabled = 8;
+  optional double sonar00 = 9;
+  optional double sonar01 = 10;
+  optional double sonar02 = 11;
+  optional double sonar03 = 12;
+  optional double sonar04 = 13;
+  optional double sonar05 = 14;
+  optional double sonar06 = 15;
+  optional double sonar07 = 16;
+  optional double sonar08 = 17;
+  optional double sonar09 = 18;
+  optional double sonar10 = 19;
+  optional double sonar11 = 20;
+  optional bool sonar_enabled = 21;
+  optional bool sonar_fault = 22;
 }

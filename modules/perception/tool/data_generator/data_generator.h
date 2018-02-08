@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "Eigen/Core"
 #include "ros/include/ros/ros.h"
@@ -72,6 +73,8 @@ class DataGenerator : public apollo::common::ApolloApp {
                         Sensor* (*)(const SensorConfig& config)>
       sensor_factory_;
   google::protobuf::RepeatedPtrField<SensorConfig> sensor_configs_;
+
+  std::vector<Sensor*> sensors_;
 
   DataGeneratorInfo data_generator_info_;
 };

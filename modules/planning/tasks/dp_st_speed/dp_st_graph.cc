@@ -47,6 +47,9 @@ bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
   const common::math::LineSegment2d seg(p1.point(), p2.point());
   for (const auto* boundary : boundaries) {
+    if (boundary->boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+      continue;
+    }
     if (boundary->HasOverlap(seg)) {
       return true;
     }
@@ -78,6 +81,9 @@ DpStGraph::DpStGraph(const StGraphData& st_graph_data,
 Status DpStGraph::Search(SpeedData* const speed_data) {
   constexpr double kBounadryEpsilon = 1e-2;
   for (const auto& boundary : st_graph_data_.st_boundaries()) {
+    if (boundary->boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+      continue;
+    }
     if (boundary->IsPointInBoundary({0.0, 0.0}) ||
         (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
          std::fabs(boundary->min_s()) < kBounadryEpsilon)) {

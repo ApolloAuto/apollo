@@ -257,6 +257,9 @@ DEFINE_double(creep_stop_distance, 0.5,
 DEFINE_bool(enable_keep_clear, false, "enable keep clear zone");
 DEFINE_string(keep_clear_virtual_object_id_prefix, "KC_",
               "prefix for converting keep_clear id to virtual object id");
+DEFINE_string(keep_clear_junction_virtual_object_id_prefix, "KC_JC_",
+              "prefix for converting keep_clear(junction) id "
+              "to virtual object id");
 DEFINE_double(keep_clear_min_pass_distance, 2.0,
               "valid min distance(m) for vehicles to be considered as "
               "have passed keep_clear zone (stop_line_end_s)");
@@ -405,6 +408,9 @@ DEFINE_double(weight_lon_jerk, 1.0, "Weight of longitudinal jerk cost");
 DEFINE_double(weight_lon_collision, 2.0,
               "Weight of logitudinal collision cost");
 DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
+DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");
+DEFINE_double(priority_cost_gap, 5.0,
+              "Gap to increase the priority cost of reference line.");
 DEFINE_double(weight_same_side_offset, 1.0,
               "Weight of same side lateral offset cost");
 DEFINE_double(weight_opposite_side_offset, 10.0,

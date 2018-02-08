@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#define private public
 #include "modules/localization/msf/common/util/timer.h"
-#include <gtest/gtest.h>
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace localization {

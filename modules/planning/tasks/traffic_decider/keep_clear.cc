@@ -46,8 +46,12 @@ bool KeepClear::ApplyRule(Frame* const frame,
   const std::vector<PathOverlap>& keep_clear_overlaps =
       reference_line_info->reference_line().map_path().clear_area_overlaps();
   for (const auto& keep_clear_overlap : keep_clear_overlaps) {
-    if (BuildKeepClearObstacle(frame, reference_line_info,
-                               const_cast<PathOverlap*>(&keep_clear_overlap))) {
+    const auto obstacle_id = FLAGS_keep_clear_virtual_object_id_prefix +
+        keep_clear_overlap.object_id;
+    if (BuildKeepClearObstacle(
+        frame, reference_line_info,
+        const_cast<PathOverlap*>(&keep_clear_overlap),
+        obstacle_id)) {
       ADEBUG << "KEEP_CLAER for keep_clear_zone["
              << keep_clear_overlap.object_id << "] s["
              << keep_clear_overlap.start_s << ", " << keep_clear_overlap.end_s
@@ -59,8 +63,13 @@ bool KeepClear::ApplyRule(Frame* const frame,
   const std::vector<PathOverlap>& junction_overlaps =
       reference_line_info->reference_line().map_path().junction_overlaps();
   for (const auto& junction_overlap : junction_overlaps) {
-    if (BuildKeepClearObstacle(frame, reference_line_info,
-                               const_cast<PathOverlap*>(&junction_overlap))) {
+    const auto obstacle_id =
+        FLAGS_keep_clear_junction_virtual_object_id_prefix +
+        junction_overlap.object_id;
+    if (BuildKeepClearObstacle(
+        frame, reference_line_info,
+        const_cast<PathOverlap*>(&junction_overlap),
+        obstacle_id)) {
       ADEBUG << "KEEP_CLAER for junction[" << junction_overlap.object_id
              << "] s[" << junction_overlap.start_s << ", "
              << junction_overlap.end_s << "] BUILD";
@@ -71,8 +80,10 @@ bool KeepClear::ApplyRule(Frame* const frame,
 }
 
 bool KeepClear::BuildKeepClearObstacle(
-    Frame* const frame, ReferenceLineInfo* const reference_line_info,
-    PathOverlap* const keep_clear_overlap) {
+    Frame* const frame,
+    ReferenceLineInfo* const reference_line_info,
+    PathOverlap* const keep_clear_overlap,
+    const std::string& virtual_obstacle_id) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
   CHECK_NOTNULL(keep_clear_overlap);
@@ -119,16 +130,15 @@ bool KeepClear::BuildKeepClearObstacle(
   common::math::Box2d keep_clear_box{
       common::math::LineSegment2d(start_xy, end_xy),
       left_lane_width + right_lane_width};
-  const auto obstacle_id =
-      FLAGS_keep_clear_virtual_object_id_prefix + keep_clear_overlap->object_id;
-  auto* obstacle = frame->AddStaticVirtualObstacle(obstacle_id, keep_clear_box);
+  auto* obstacle =
+      frame->AddStaticVirtualObstacle(virtual_obstacle_id, keep_clear_box);
   if (!obstacle) {
-    AERROR << "Failed to create obstacle " << obstacle_id << " in frame";
+    AERROR << "Failed to create obstacle: " << virtual_obstacle_id;
     return false;
   }
   auto* path_obstacle = reference_line_info->AddObstacle(obstacle);
   if (!path_obstacle) {
-    AERROR << "Failed to create path_obstacle for " << obstacle_id;
+    AERROR << "Failed to create path_obstacle: " << virtual_obstacle_id;
     return false;
   }
   path_obstacle->SetReferenceLineStBoundaryType(

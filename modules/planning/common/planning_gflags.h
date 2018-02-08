@@ -155,6 +155,7 @@ DECLARE_double(creep_stop_distance);
 /// keep_clear
 DECLARE_bool(enable_keep_clear);
 DECLARE_string(keep_clear_virtual_object_id_prefix);
+DECLARE_string(keep_clear_junction_virtual_object_id_prefix);
 DECLARE_double(keep_clear_min_pass_distance);
 /// traffic light
 DECLARE_bool(enable_traffic_light);
@@ -213,6 +214,8 @@ DECLARE_double(weight_lon_travel);
 DECLARE_double(weight_lon_jerk);
 DECLARE_double(weight_lon_collision);
 DECLARE_double(weight_lat_offset);
+DECLARE_double(weight_lat_comfort);
+DECLARE_double(priority_cost_gap);
 DECLARE_double(weight_same_side_offset);
 DECLARE_double(weight_opposite_side_offset);
 DECLARE_double(weight_dist_travelled);
