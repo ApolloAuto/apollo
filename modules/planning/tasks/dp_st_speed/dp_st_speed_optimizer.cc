@@ -63,8 +63,6 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
     auto id = obstacle->Id();
     if (!obstacle->st_boundary().IsEmpty()) {
       if (obstacle->st_boundary().boundary_type() ==
-              StBoundary::BoundaryType::KEEP_CLEAR ||
-          obstacle->reference_line_st_boundary().boundary_type() ==
               StBoundary::BoundaryType::KEEP_CLEAR) {
         path_decision->Find(id)->SetBlockingObstacle(false);
       } else {
