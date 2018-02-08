@@ -2,7 +2,7 @@ import STORE from "store";
 import RENDERER from "renderer";
 
 const protobuf = require("protobufjs/light");
-const root = protobuf.Root.fromJSON(require("../../../proto_bundle/proto_bundle.json"));
+const root = protobuf.Root.fromJSON(require("../../../proto_bundle/sim_world_proto_bundle.json"));
 const SimWorldMessage = root.lookupType("apollo.dreamview.SimulationWorld");
 
 export default class RosWebSocketEndpoint {
@@ -77,10 +77,6 @@ export default class RosWebSocketEndpoint {
                     RENDERER.updateMapIndex(message.mapHash,
                             message.mapElementIds, message.mapRadius);
                     break;
-                case "MapData":
-                    RENDERER.updateMap(message.data);
-                    STORE.setInitializationStatus(true);
-                    break;
                 case "DefaultEndPoint":
                     STORE.routeEditingManager.updateDefaultRoutingEndPoint(message);
                     break;
@@ -123,13 +119,6 @@ export default class RosWebSocketEndpoint {
                 ". New seq: " + world.sequenceNum + ".");
         }
         this.lastSeqNum = world.sequenceNum;
-    }
-
-    requestMapData(elements) {
-        this.websocket.send(JSON.stringify({
-            type: "RetrieveMapData",
-            elements: elements,
-        }));
     }
 
     requestMapElementIdsByRadius(radius) {

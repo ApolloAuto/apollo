@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import WS from "store/websocket";
+import {MAP_WS} from "store/websocket";
 
 import {
     drawSegmentsFromPoints,
@@ -469,7 +469,7 @@ export default class Map {
             this.hash = hash;
             const diff = this.diffMapElements(elementIds, this.data);
             if (!_.isEmpty(diff) || !this.initialized) {
-                WS.requestMapData(diff);
+                MAP_WS.requestMapData(diff);
                 this.initialized = true;
             }
         }
