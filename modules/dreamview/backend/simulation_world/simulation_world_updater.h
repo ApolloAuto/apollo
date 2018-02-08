@@ -58,8 +58,8 @@ class SimulationWorldUpdater {
    * of hdmap.
    * @param routing_from_file whether to read initial routing from file.
    */
-  SimulationWorldUpdater(WebSocketHandler *websocket, SimControl *sim_control,
-                         const MapService *map_service,
+  SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
+                         SimControl *sim_control, const MapService *map_service,
                          bool routing_from_file = false);
 
   /**
@@ -125,6 +125,7 @@ class SimulationWorldUpdater {
   SimulationWorldService sim_world_service_;
   const MapService *map_service_;
   WebSocketHandler *websocket_;
+  WebSocketHandler *map_ws_;
   SimControl *sim_control_;
 
   // End point for requesting default route

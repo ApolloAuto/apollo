@@ -37,18 +37,20 @@ using google::protobuf::util::JsonStringToMessage;
 using google::protobuf::util::MessageToJsonString;
 
 SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
+                                               WebSocketHandler *map_ws,
                                                SimControl *sim_control,
                                                const MapService *map_service,
                                                bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
+      map_ws_(map_ws),
       websocket_(websocket),
       sim_control_(sim_control) {
   RegisterMessageHandlers();
 }
 
 void SimulationWorldUpdater::RegisterMessageHandlers() {
-  websocket_->RegisterMessageHandler(
+  map_ws_->RegisterMessageHandler(
       "RetrieveMapData",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         auto iter = json.find("elements");
@@ -56,8 +58,11 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           MapElementIds map_element_ids;
           if (JsonStringToMessage(iter->dump(), &map_element_ids).ok()) {
             auto retrieved = map_service_->RetrieveMapElements(map_element_ids);
-            websocket_->SendData(
-                conn, JsonUtil::ProtoToTypedJson("MapData", retrieved).dump());
+
+            std::string retrieved_map_string;
+            retrieved.SerializeToString(&retrieved_map_string);
+
+            map_ws_->SendBinaryData(conn, retrieved_map_string, true);
           } else {
             AERROR << "Failed to parse MapElementIds from json";
           }
