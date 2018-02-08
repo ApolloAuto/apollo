@@ -404,7 +404,6 @@ bool MSFLocalization::LoadZoneIdFromFile(
   }
 
   auto folder_list = common::util::ListSubDirectories(map_zone_id_folder);
-
   for (auto itr = folder_list.begin(); itr != folder_list.end(); ++itr) {
     *zone_id = std::stoi(*itr);
     return true;
