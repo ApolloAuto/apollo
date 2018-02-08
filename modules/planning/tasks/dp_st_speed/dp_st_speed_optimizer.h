@@ -53,10 +53,6 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
                                  PathDecision* const path_decision,
                                  SpeedData* const speed_data) override;
 
-  bool CreateStBoundaryWithHistoryDecision(
-      const StBoundaryMapper& boundary_mapper, const PathData& path_data,
-      SpeedData* speed_data, PathDecision* path_decision);
-
   bool SearchStGraph(const StBoundaryMapper& boundary_mapper,
                      const PathData& path_data, SpeedData* speed_data,
                      PathDecision* path_decision,
