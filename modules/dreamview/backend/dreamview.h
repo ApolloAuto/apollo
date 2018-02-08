@@ -28,6 +28,7 @@
 #include "modules/dreamview/backend/handlers/websocket.h"
 #include "modules/dreamview/backend/hmi/hmi.h"
 #include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 
@@ -51,9 +52,11 @@ class Dreamview : public apollo::common::ApolloApp {
   ros::Timer exit_timer_;
 
   std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;
+  std::unique_ptr<PointCloudUpdater> point_cloud_updater_;
   std::unique_ptr<CivetServer> server_;
   std::unique_ptr<SimControl> sim_control_;
   std::unique_ptr<WebSocketHandler> websocket_;
+  std::unique_ptr<WebSocketHandler> point_cloud_ws_;
   std::unique_ptr<ImageHandler> image_;
   std::unique_ptr<MapService> map_service_;
   std::unique_ptr<HMI> hmi_;
