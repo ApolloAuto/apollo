@@ -65,7 +65,7 @@ message LaneMarker {
     LANE_TYPE_ROAD_EDGE = 3;
   }
   optional LaneType lane_type = 1;
-  optional int32 quality = 2;
+  optional double quality = 2; // range = [0,1]; 1 = the best quality
   optional int32 model_degree = 3;
   // equation X = c3 * Z^3 + c2 * Z^2 + c1 * Z + c0
   optional double c0_position = 4;

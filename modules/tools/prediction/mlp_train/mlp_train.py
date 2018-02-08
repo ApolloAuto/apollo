@@ -81,6 +81,36 @@ def load_data(filename):
     return samples['data']
 
 
+def down_sample(data):
+    cutin_false_drate = 0.9
+    go_false_drate = 0.9
+    go_true_drate = 0.7
+    cutin_true_drate = 0.0
+
+    label = data[:, -1]
+    size = np.shape(label)[0]
+
+    cutin_false_index = (label == -1)
+    go_false_index = (label == 0)
+    go_true_index = (label == 1)
+    cutin_true_index = (label == 2)
+
+    rand = np.random.random((size))
+
+    cutin_false_select = np.logical_and(cutin_false_index, rand > cutin_false_drate)
+    cutin_true_select = np.logical_and(cutin_true_index, rand > cutin_true_drate)
+    go_false_select = np.logical_and(go_false_index, rand > go_false_drate)
+    go_true_select = np.logical_and(go_true_index, rand > go_true_drate)
+
+    all_select = np.logical_or(cutin_false_select, cutin_true_select)
+    all_select = np.logical_or(all_select, go_false_select)
+    all_select = np.logical_or(all_select, go_true_select)
+
+    data_downsampled = data[all_select, :]
+
+    return data_downsampled
+
+
 def get_param_norm(feature):
     """
     Normalize the samples and save normalized parameters
@@ -105,12 +135,12 @@ def setup_model():
     model.add(Dense(dim_hidden_2,
         init = 'he_normal',
         activation = 'relu',
-        W_regularizer = l2(0.005)))
+        W_regularizer = l2(0.01)))
 
     model.add(Dense(dim_output,
         init='he_normal',
         activation = 'sigmoid',
-        W_regularizer = l2(0.001)))
+        W_regularizer = l2(0.01)))
 
     model.compile(loss = 'binary_crossentropy',
                   optimizer = 'rmsprop',
@@ -228,10 +258,13 @@ if __name__ == "__main__":
     file = args.filename
 
     data = load_data(file)
+    data = down_sample(data)
     print "Data load success."
     print "data size =", data.shape
 
     train_data, test_data = train_test_split(data, train_data_rate)
+
+    print "training size =", train_data.shape
 
     X_train = train_data[:, 0 : dim_input]
     Y_train = train_data[:, -1]
@@ -245,11 +278,13 @@ if __name__ == "__main__":
 
     X_train = (X_train - param_norm[0]) / param_norm[1]
 
+    X_test = (X_test - param_norm[0]) / param_norm[1]
+
     model = setup_model()
 
     model.fit(X_train, Y_trainc,
         shuffle = True,
-        nb_epoch = 30,
+        nb_epoch = 20,
         batch_size = 32)
     print "Model trained success."
 

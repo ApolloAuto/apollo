@@ -62,6 +62,7 @@ Status Dreamview::Init() {
 
   // Check the expected adapters are initialized.
   CHECK(AdapterManager::GetChassis()) << "ChassisAdapter is not initialized.";
+  CHECK(AdapterManager::GetGps()) << "GpsAdapter is not initialized.";
   CHECK(AdapterManager::GetPlanning()) << "PlanningAdapter is not initialized.";
   CHECK(AdapterManager::GetLocalization())
       << "LocalizationAdapter is not initialized.";

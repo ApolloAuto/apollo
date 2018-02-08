@@ -59,5 +59,13 @@ export default [
             planningDpOptimizer: 'Dp Optimizer Line',
             planningReference: 'Reference Line',
         }
+    }, {
+        id: 'position',
+        title: 'Position',
+        type: 'checkbox',
+        data: {
+            positionLocalization: 'Localization',
+            positionGps: 'GPS',
+        }
     },
 ];
