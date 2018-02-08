@@ -16,6 +16,8 @@
 
 #include "modules/localization/msf/msf_localization.h"
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include <yaml-cpp/yaml.h>
 #include <list>
 
@@ -168,8 +170,19 @@ void MSFLocalization::InitParams() {
   AERROR << "lidar_extrin: " << localizaiton_param_.lidar_extrinsic_file;
   AERROR << "lidar_height: " << localizaiton_param_.lidar_height_file;
 
-  // common
   localizaiton_param_.utm_zone_id = FLAGS_local_utm_zone_id;
+  // try load zone id from config file in local_map folder
+  if (FLAGS_if_utm_zone_id_from_file) {
+    bool success = LoadZoneIdFromFile(localizaiton_param_.map_path,
+                                      FLAGS_local_map_config_file,
+                                      &localizaiton_param_.utm_zone_id);
+    if (!success) {
+      AERROR << "Can't load utm zone id from config file, use default value.";
+    }
+  }
+  AERROR << "utm zone id: " << localizaiton_param_.utm_zone_id;
+
+  // common
   localizaiton_param_.imu_rate = FLAGS_imu_rate;
   localizaiton_param_.enable_lidar_localization =
       FLAGS_enable_lidar_localization;
@@ -378,6 +391,20 @@ bool MSFLocalization::LoadGnssAntennaExtrinsic(
       }
       return true;
     }
+  }
+  return false;
+}
+
+bool MSFLocalization::LoadZoneIdFromFile(
+    const std::string &folder_path,
+    const std::string &file_path, int *zone_id) {
+  std::string map_config_file = folder_path + "/" + file_path;
+  if (common::util::DirectoryExists(folder_path)
+      && common::util::PathExists(map_config_file)) {
+    boost::property_tree::ptree config;
+    boost::property_tree::read_xml(map_config_file, config);
+    *zone_id = config.get<int>("local_map.map_config.zone_id");
+    return true;
   }
   return false;
 }

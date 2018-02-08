@@ -65,6 +65,9 @@ DEFINE_bool(enable_gps_timestamp, false,
 
 // msf parame
 DEFINE_string(local_map_name, "local_map", "The path of localization map.");
+DEFINE_string(local_map_config_file,
+              "local_map_config.xml",
+              "The config file of all localization map.");
 DEFINE_string(lidar_extrinsics_file,
               "modules/localization/msf/params/velodyne_params/"
               "velodyne64_novatel_extrinsics_example.yaml",
@@ -119,6 +122,8 @@ DEFINE_double(imu_to_ant_offset_uz, 0.0, "Imu ant offset z uncertainty");
 
 // common
 DEFINE_double(imu_rate, 1.0, "");
+DEFINE_bool(if_utm_zone_id_from_file, true,
+            "load utm zone id from config file in local map");
 DEFINE_int32(local_utm_zone_id, 50, "UTM zone id");
 DEFINE_bool(trans_gpstime_to_utctime, true, "");
 DEFINE_int32(gnss_mode, 0, "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");
