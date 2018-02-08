@@ -24,6 +24,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/backside_vehicle.h"
 #include "modules/planning/tasks/traffic_decider/change_lane.h"
+#include "modules/planning/tasks/traffic_decider/creeper.h"
 #include "modules/planning/tasks/traffic_decider/crosswalk.h"
 #include "modules/planning/tasks/traffic_decider/destination.h"
 #include "modules/planning/tasks/traffic_decider/keep_clear.h"
@@ -92,6 +93,9 @@ bool TrafficDecider::Init(const PlanningConfig &config) {
 
 Status TrafficDecider::Execute(Frame *frame,
                                ReferenceLineInfo *reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
   Task::Execute(frame, reference_line_info);
 
   for (const auto &rule_config : rule_configs_) {
@@ -108,6 +112,9 @@ Status TrafficDecider::Execute(Frame *frame,
     rule->ApplyRule(frame, reference_line_info);
     ADEBUG << "Applied rule " << RuleConfig::RuleId_Name(rule_config.rule_id());
   }
+
+  Creeper::instance()->Run(frame, reference_line_info);
+
   return Status::OK();
 }
 

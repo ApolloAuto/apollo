@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/keep_clear.h"
@@ -47,11 +48,10 @@ bool KeepClear::ApplyRule(Frame* const frame,
       reference_line_info->reference_line().map_path().clear_area_overlaps();
   for (const auto& keep_clear_overlap : keep_clear_overlaps) {
     const auto obstacle_id = FLAGS_keep_clear_virtual_object_id_prefix +
-        keep_clear_overlap.object_id;
-    if (BuildKeepClearObstacle(
-        frame, reference_line_info,
-        const_cast<PathOverlap*>(&keep_clear_overlap),
-        obstacle_id)) {
+                             keep_clear_overlap.object_id;
+    if (BuildKeepClearObstacle(frame, reference_line_info,
+                               const_cast<PathOverlap*>(&keep_clear_overlap),
+                               obstacle_id)) {
       ADEBUG << "KEEP_CLAER for keep_clear_zone["
              << keep_clear_overlap.object_id << "] s["
              << keep_clear_overlap.start_s << ", " << keep_clear_overlap.end_s
@@ -66,10 +66,9 @@ bool KeepClear::ApplyRule(Frame* const frame,
     const auto obstacle_id =
         FLAGS_keep_clear_junction_virtual_object_id_prefix +
         junction_overlap.object_id;
-    if (BuildKeepClearObstacle(
-        frame, reference_line_info,
-        const_cast<PathOverlap*>(&junction_overlap),
-        obstacle_id)) {
+    if (BuildKeepClearObstacle(frame, reference_line_info,
+                               const_cast<PathOverlap*>(&junction_overlap),
+                               obstacle_id)) {
       ADEBUG << "KEEP_CLAER for junction[" << junction_overlap.object_id
              << "] s[" << junction_overlap.start_s << ", "
              << junction_overlap.end_s << "] BUILD";
@@ -80,8 +79,7 @@ bool KeepClear::ApplyRule(Frame* const frame,
 }
 
 bool KeepClear::BuildKeepClearObstacle(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info,
+    Frame* const frame, ReferenceLineInfo* const reference_line_info,
     PathOverlap* const keep_clear_overlap,
     const std::string& virtual_obstacle_id) {
   CHECK_NOTNULL(frame);
