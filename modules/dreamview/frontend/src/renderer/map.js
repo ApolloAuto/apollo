@@ -338,7 +338,7 @@ export default class Map {
 
             return { "pos": position, "heading": heading };
         } else {
-            console.error('Error loading traffic light. Unable to determine heading.');
+            console.error('Error loading stop sign. Unable to determine heading.');
             return null;
         }
     }

@@ -12,16 +12,16 @@ export default class Routing {
         this.lastRoutingTime = -1;
     }
 
-    update(world, coordinates, scene) {
+    update(routingTime, routePath, coordinates, scene) {
         this.routePaths.forEach(path => {
             path.visible = STORE.options.showRouting;
         });
         // There has not been a new routing published since last time.
-        if (this.lastRoutingTime === world.routingTime) {
+        if (this.lastRoutingTime === routingTime || routePath === undefined) {
             return;
         }
 
-        this.lastRoutingTime = world.routingTime;
+        this.lastRoutingTime = routingTime;
 
         // Clear the old route paths
         this.routePaths.forEach(path => {
@@ -30,11 +30,7 @@ export default class Routing {
             path.geometry.dispose();
         });
 
-        if (world.routePath === undefined) {
-            return;
-        }
-
-        world.routePath.forEach(path => {
+        routePath.forEach(path => {
             const points = coordinates.applyOffsetToArray(path.point);
             const pathMesh = drawThickBandFromPoints(points, 0.3 /* width */,
                 0xFF0000 /* red */, 0.6, 5 /* z offset */);
