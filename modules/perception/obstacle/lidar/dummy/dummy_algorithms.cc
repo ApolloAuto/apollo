@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+#include <numeric>
+
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 
 #include "modules/perception/obstacle/common/geometry_util.h"
