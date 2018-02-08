@@ -2554,6 +2554,32 @@
                   "id": 1
                 }
               }
+            },
+            "NavigationPath": {
+              "fields": {
+                "pathPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.PathPoint",
+                  "id": 1
+                },
+                "pathPriority": {
+                  "type": "uint32",
+                  "id": 2
+                }
+              }
+            },
+            "NavigationInfo": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "navigationPath": {
+                  "rule": "repeated",
+                  "type": "NavigationPath",
+                  "id": 2
+                }
+              }
             }
           }
         },

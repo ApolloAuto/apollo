@@ -1,1 +1,2 @@
-websocketServer: "0.0.0.0:8888/websocket"
+simWorldWebsocketServer: "0.0.0.0:8888/websocket"
+mapWebsocketServer: "0.0.0.0:8888/map"
