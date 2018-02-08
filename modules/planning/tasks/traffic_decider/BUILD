@@ -17,6 +17,7 @@ cc_library(
         "signal_light.cc",
         "stop_sign.cc",
         "util.cc",
+        "creeper.cc",
     ],
     hdrs = [
         "backside_vehicle.h",
@@ -32,6 +33,7 @@ cc_library(
         "stop_sign.h",
         "traffic_rule.h",
         "util.h",
+        "creeper.h",
     ],
     deps = [
         "//modules/common/adapters:adapter_manager",
