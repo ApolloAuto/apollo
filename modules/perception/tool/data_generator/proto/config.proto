@@ -6,7 +6,7 @@ import "modules/common/proto/geometry.proto";
 
 // Ground Truth obstacle information
 message DataGeneratorObstacle {
-  optional int32 id = 1;  // obstacle ID.
+  optional string id = 1;  // obstacle ID.
   optional apollo.common.Point2D position = 2;  // obstacle position in the world coordinate
                                   // system.
   optional double theta = 3;  // heading in the world coordinate system.
