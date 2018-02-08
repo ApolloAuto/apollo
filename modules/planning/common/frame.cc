@@ -210,7 +210,7 @@ const Obstacle *Frame::AddVirtualStopObstacle(
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
   reference_line.GetLaneWidth(object_s, &lane_left_width, &lane_right_width);
-  Box2d stop_wall_box{box_center, heading, FLAGS_virtual_stop_wall_height,
+  Box2d stop_wall_box{box_center, heading, FLAGS_virtual_stop_wall_length,
                       lane_left_width + lane_right_width};
 
   return AddStaticVirtualObstacle(object_id, stop_wall_box);

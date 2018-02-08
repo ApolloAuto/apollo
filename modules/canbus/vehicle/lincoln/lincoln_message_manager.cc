@@ -31,6 +31,7 @@
 #include "modules/canbus/vehicle/lincoln/protocol/misc_69.h"
 #include "modules/canbus/vehicle/lincoln/protocol/steering_64.h"
 #include "modules/canbus/vehicle/lincoln/protocol/steering_65.h"
+#include "modules/canbus/vehicle/lincoln/protocol/surround_73.h"
 #include "modules/canbus/vehicle/lincoln/protocol/throttle_62.h"
 #include "modules/canbus/vehicle/lincoln/protocol/throttle_63.h"
 #include "modules/canbus/vehicle/lincoln/protocol/throttleinfo_75.h"
@@ -64,6 +65,7 @@ LincolnMessageManager::LincolnMessageManager() {
   AddRecvProtocolData<Gps6f, true>();
   AddRecvProtocolData<Tirepressure71, true>();
   AddRecvProtocolData<Fuellevel72, true>();
+  AddRecvProtocolData<Surround73, true>();
   AddRecvProtocolData<Brakeinfo74, true>();
   AddRecvProtocolData<Throttleinfo75, true>();
   AddRecvProtocolData<Version7f, true>();
