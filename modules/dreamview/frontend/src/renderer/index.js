@@ -332,13 +332,17 @@ class Renderer {
         this.perceptionObstacles.update(world, this.coordinates, this.scene);
         this.decision.update(world, this.coordinates, this.scene);
         this.prediction.update(world, this.coordinates, this.scene);
-        this.routing.update(world, this.coordinates, this.scene);
+        this.updateRouting(world.routingTime, world.routePath);
         this.gnss.update(world, this.coordinates, this.scene);
 
         if (this.planningAdc &&
             world.planningTrajectory && world.planningTrajectory.length) {
             this.planningAdc.update(this.coordinates, world.planningTrajectory[0]);
         }
+    }
+
+    updateRouting(routingTime, routePath) {
+        this.routing.update(routingTime, routePath, this.coordinates, this.scene);
     }
 
     updateGroundImage(mapName) {

@@ -192,9 +192,7 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
   }
 }
 
-inline double SecToMs(const double sec) {
-  return sec * 1000.0;
-}
+inline double SecToMs(const double sec) { return sec * 1000.0; }
 
 }  // namespace
 
@@ -234,6 +232,9 @@ void SimulationWorldService::Update() {
     auto car = world_.auto_driving_car();
     world_.Clear();
     *world_.mutable_auto_driving_car() = car;
+
+    route_paths_.clear();
+
     to_clear_ = false;
   }
 
@@ -303,7 +304,7 @@ Json SimulationWorldService::GetUpdateAsJson(double radius) const {
 }
 
 void SimulationWorldService::GetMapElementIds(double radius,
-                                              MapElementIds *ids) {
+                                              MapElementIds *ids) const {
   // Gather required map element ids based on current location.
   apollo::common::PointENU point;
   const auto &adc = world_.auto_driving_car();
@@ -850,6 +851,7 @@ void SimulationWorldService::UpdateSimulationWorld(
   }
 
   world_.clear_route_path();
+  route_paths_.clear();
   world_.set_routing_time(header_time);
 
   for (const Path &path : paths) {
@@ -859,14 +861,38 @@ void SimulationWorldService::UpdateSimulationWorld(
     std::vector<int> sampled_indices =
         DownsampleByAngle(path.path_points(), angle_threshold);
 
-    RoutePath *route_path = world_.add_route_path();
+    route_paths_.emplace_back();
+    RoutePath *route_path = &route_paths_.back();
     for (int index : sampled_indices) {
       const auto &path_point = path.path_points()[index];
       PolygonPoint *route_point = route_path->add_point();
       route_point->set_x(path_point.x() + map_service_->GetXOffset());
       route_point->set_y(path_point.y() + map_service_->GetYOffset());
     }
+
+    // Populate route path
+    if (FLAGS_sim_world_with_routing_path) {
+      auto *new_path = world_.add_route_path();
+      *new_path = *route_path;
+    }
   }
+}
+
+Json SimulationWorldService::GetRoutePathAsJson() const {
+  Json response;
+  response["routingTime"] = world_.routing_time();
+  response["routePath"] = Json::array();
+  for (const auto &route_path : route_paths_) {
+    Json path;
+    path["point"] = Json::array();
+    for (const auto &route_point : route_path.point()) {
+      path["point"].push_back({{"x", route_point.x()},
+                               {"y", route_point.y()},
+                               {"z", route_point.z()}});
+    }
+    response["routePath"].push_back(path);
+  }
+  return response;
 }
 
 void SimulationWorldService::ReadRoutingFromFile(
