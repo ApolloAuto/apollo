@@ -81,6 +81,9 @@ DpStGraph::DpStGraph(const StGraphData& st_graph_data,
 Status DpStGraph::Search(SpeedData* const speed_data) {
   constexpr double kBounadryEpsilon = 1e-2;
   for (const auto& boundary : st_graph_data_.st_boundaries()) {
+    if (boundary->boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+      continue;
+    }
     if (boundary->IsPointInBoundary({0.0, 0.0}) ||
         (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
          std::fabs(boundary->min_s()) < kBounadryEpsilon)) {

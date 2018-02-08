@@ -108,6 +108,23 @@ void DataGenerator::RunOnce() {
   AINFO << "VehicleState updated.";
 
   // TODO(Liangliang): register more sensors and use factory to manager.
+  Process();
+
+  std::string str;
+  for (auto& obs : data_generator_info_.obstacle()) {
+    str += obs.id() + "|, ";
+    for (int i = 0; i < obs.polygon_point_size(); ++i) {
+      str += std::to_string(obs.polygon_point(i).x()) + ", " +
+             std::to_string(obs.polygon_point(i).y());
+      if (i + 1 != obs.polygon_point_size()) {
+        str += "| ";
+      }
+    }
+  }
+  (*data_file_) << str << "; ";
+  for (auto& sensor : sensors_) {
+    (*data_file_) << sensor->data() << "; ";
+  }
 }
 
 bool DataGenerator::Process() {
