@@ -111,12 +111,12 @@ bool BaseMapNode::Save() {
   if (!EnsureDirectory(path)) {
     return false;
   }
-  snprintf(buf, sizeof(buf), "/%08u", abs(index_.m_));
+  snprintf(buf, sizeof(buf), "/%08u", index_.m_);
   path = path + buf;
   if (!EnsureDirectory(path)) {
     return false;
   }
-  snprintf(buf, sizeof(buf), "/%08u", abs(index_.n_));
+  snprintf(buf, sizeof(buf), "/%08u", index_.n_);
   path = path + buf;
 
   AINFO << "Save node: " << path;
@@ -161,12 +161,12 @@ bool BaseMapNode::Load() {
   if (!DirectoryExists(path)) {
     return false;
   }
-  snprintf(buf, sizeof(buf), "/%08u", abs(index_.m_));
+  snprintf(buf, sizeof(buf), "/%08u", index_.m_);
   path = path + buf;
   if (!DirectoryExists(path)) {
     return false;
   }
-  snprintf(buf, sizeof(buf), "/%08u", abs(index_.n_));
+  snprintf(buf, sizeof(buf), "/%08u", index_.n_);
   path = path + buf;
 
   return Load(path.c_str());
@@ -453,12 +453,12 @@ bool BaseMapNode::SaveIntensityImage() const {
   if (!EnsureDirectory(path)) {
     return false;
   }
-  snprintf(buf, sizeof(buf), "/%08u", abs(index_.m_));
+  snprintf(buf, sizeof(buf), "/%08u", index_.m_);
   path = path + buf;
   if (!EnsureDirectory(path)) {
     return false;
   }
-  snprintf(buf, sizeof(buf), "/%08u.png", abs(index_.n_));
+  snprintf(buf, sizeof(buf), "/%08u.png", index_.n_);
   path = path + buf;
   bool success0 = SaveIntensityImage(path);
   return success0;

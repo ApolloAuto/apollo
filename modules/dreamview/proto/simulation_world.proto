@@ -216,4 +216,7 @@ message SimulationWorld {
   // Planning data
   optional double planning_time = 18;
   optional apollo.planning_internal.PlanningData planning_data = 19;
+
+  // GPS
+  optional Object gps = 20;
 }

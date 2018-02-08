@@ -14,6 +14,7 @@ import Decision from "renderer/decision.js";
 import Prediction from "renderer/prediction.js";
 import Routing from "renderer/routing.js";
 import RoutingEditor from "renderer/routing_editor.js";
+import Gnss from "renderer/gnss.js";
 
 const _ = require('lodash');
 
@@ -65,6 +66,9 @@ class Renderer {
 
         // The route editor
         this.routingEditor = new RoutingEditor();
+
+        // The GNSS/GPS
+        this.gnss = new Gnss();
 
         // The Performance Monitor
         this.stats = null;
@@ -329,6 +333,7 @@ class Renderer {
         this.decision.update(world, this.coordinates, this.scene);
         this.prediction.update(world, this.coordinates, this.scene);
         this.routing.update(world, this.coordinates, this.scene);
+        this.gnss.update(world, this.coordinates, this.scene);
 
         if (this.planningAdc &&
             world.planningTrajectory && world.planningTrajectory.length) {

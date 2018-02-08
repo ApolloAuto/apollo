@@ -18,6 +18,7 @@
 #define MODULES_LOCALIZATION_MSF_COMMON_TIMER_H_
 
 #include "boost/date_time/posix_time/posix_time.hpp"
+#include "gtest/gtest_prod.h"
 
 namespace apollo {
 namespace localization {
@@ -41,6 +42,8 @@ class Timer {
  private:
   boost::posix_time::ptime start_time_;
   boost::posix_time::ptime end_time_;
+
+  FRIEND_TEST(TimerTestSuite, TimerTest);
 };
 
 class TimeAccumulator {
@@ -62,6 +65,8 @@ class TimeAccumulator {
  private:
   boost::posix_time::ptime start_time_;
   boost::posix_time::time_duration duration_;
+
+  FRIEND_TEST(TimerTestSuite, TimeAccumulatorTest);
 };
 
 }  // namespace msf

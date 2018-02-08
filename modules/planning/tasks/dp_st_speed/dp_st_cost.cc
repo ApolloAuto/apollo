@@ -64,6 +64,7 @@ void DpStCost::AddToKeepClearRange(
         StBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
     }
+
     double start_s = obstacle->st_boundary().min_s();
     double end_s = obstacle->st_boundary().max_s();
     keep_clear_range_.emplace_back(start_s, end_s);
@@ -110,6 +111,10 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
 
   double cost = 0.0;
   for (const auto* obstacle : obstacles_) {
+    if (!obstacle->IsBlockingObstacle()) {
+      continue;
+    }
+
     auto boundary = obstacle->st_boundary();
     const double kIgnoreDistance = 200.0;
     if (boundary.min_s() > kIgnoreDistance) {
@@ -169,11 +174,13 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
   if (speed < 0) {
     return kInf;
   }
+
   if (speed < FLAGS_max_stop_speed && InKeepClearRange(second.s())) {
     // first.s in range
     cost += config_.keep_clear_low_speed_penalty() * unit_t_ *
             config_.default_speed_cost();
   }
+
   double det_speed = (speed - speed_limit) / speed_limit;
   if (det_speed > 0) {
     cost += config_.exceed_speed_penalty() * config_.default_speed_cost() *

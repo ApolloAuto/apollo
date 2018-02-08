@@ -168,8 +168,18 @@ void MSFLocalization::InitParams() {
   AERROR << "lidar_extrin: " << localizaiton_param_.lidar_extrinsic_file;
   AERROR << "lidar_height: " << localizaiton_param_.lidar_height_file;
 
-  // common
   localizaiton_param_.utm_zone_id = FLAGS_local_utm_zone_id;
+  // try load zone id from config file in local_map folder
+  if (FLAGS_if_utm_zone_id_from_folder) {
+    bool success = LoadZoneIdFromFile(localizaiton_param_.map_path,
+                                      &localizaiton_param_.utm_zone_id);
+    if (!success) {
+      AWARN << "Can't load utm zone id from config file, use default value.";
+    }
+  }
+  AINFO << "utm zone id: " << localizaiton_param_.utm_zone_id;
+
+  // common
   localizaiton_param_.imu_rate = FLAGS_imu_rate;
   localizaiton_param_.enable_lidar_localization =
       FLAGS_enable_lidar_localization;
@@ -378,6 +388,25 @@ bool MSFLocalization::LoadGnssAntennaExtrinsic(
       }
       return true;
     }
+  }
+  return false;
+}
+
+bool MSFLocalization::LoadZoneIdFromFile(
+    const std::string &folder_path, int *zone_id) {
+  std::string map_zone_id_folder;
+  if (common::util::DirectoryExists(folder_path + "/map/000/north")) {
+    map_zone_id_folder = folder_path + "/map/000/north";
+  } else if (common::util::DirectoryExists(folder_path + "/map/000/south")) {
+    map_zone_id_folder = folder_path + "/map/000/south";
+  } else {
+    return false;
+  }
+
+  auto folder_list = common::util::ListSubDirectories(map_zone_id_folder);
+  for (auto itr = folder_list.begin(); itr != folder_list.end(); ++itr) {
+    *zone_id = std::stoi(*itr);
+    return true;
   }
   return false;
 }
