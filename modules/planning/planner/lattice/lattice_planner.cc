@@ -103,30 +103,24 @@ Status LatticePlanner::Init(const PlanningConfig& config) {
 Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
                             Frame* frame) {
   auto status = Status::OK();
-  bool has_plan = false;
-  auto it = std::find_if(
-      frame->reference_line_info().begin(), frame->reference_line_info().end(),
-      [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
-  if (it != frame->reference_line_info().end()) {
-    status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
-    has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
-                it->TrajectoryLength() > FLAGS_change_lane_min_length);
-    if (!has_plan) {
-      AERROR << "Fail to plan for lane change.";
-    }
-  }
-
-  if (!has_plan || !FLAGS_prioritize_change_lane) {
-    for (auto& reference_line_info : frame->reference_line_info()) {
+  double priority_cost = 0.0;
+  bool first_reference_line = true;
+  for (auto& reference_line_info : frame->reference_line_info()) {
+    reference_line_info.SetPriorityCost(priority_cost);
+    status = PlanOnReferenceLine(planning_start_point, frame,
+                                 &reference_line_info);
+    if (status != Status::OK()) {
       if (reference_line_info.IsChangeLanePath()) {
-        continue;
-      }
-      status = PlanOnReferenceLine(planning_start_point, frame,
-                                   &reference_line_info);
-      if (status != Status::OK()) {
-        AERROR << "planner failed to make a driving plan for: "
+        AERROR << "Planner failed to change lane to "
+               << reference_line_info.Lanes().Id();
+      } else {
+        AERROR << "Planner failed to "
                << reference_line_info.Lanes().Id();
       }
+    }
+    if (first_reference_line) {
+      priority_cost += FLAGS_priority_cost_gap;
+      first_reference_line = false;
     }
   }
   return status;
