@@ -126,6 +126,7 @@ double TrajectoryEvaluator::Evaluate(
   // 2. Cost of logitudinal jerk
   // 3. Cost of logitudinal collision
   // 4. Cost of lateral offsets
+  // 5. Cost of lateral comfort
 
   // Longitudinal costs
   double lon_travel_cost = LonObjectiveCost(lon_trajectory, planning_target);
@@ -140,6 +141,7 @@ double TrajectoryEvaluator::Evaluate(
 
   // Lateral costs
   double lat_offset_cost = LatOffsetCost(lat_trajectory, s_values);
+  double lat_comfort_cost = LatComfortCost(lon_trajectory, lat_trajectory);
 
   if (cost_components) {
     cost_components->push_back(lon_travel_cost);
@@ -151,7 +153,8 @@ double TrajectoryEvaluator::Evaluate(
   return lon_travel_cost * FLAGS_weight_lon_travel +
          lon_jerk_cost * FLAGS_weight_lon_jerk +
          lon_collision_cost * FLAGS_weight_lon_collision +
-         lat_offset_cost * FLAGS_weight_lat_offset;
+         lat_offset_cost * FLAGS_weight_lat_offset +
+         lat_comfort_cost * FLAGS_weight_lat_comfort;
 }
 
 double TrajectoryEvaluator::LatOffsetCost(
@@ -170,6 +173,23 @@ double TrajectoryEvaluator::LatOffsetCost(
       cost_sqr_sum += cost * cost * FLAGS_weight_same_side_offset;
       cost_abs_sum += std::abs(cost) * FLAGS_weight_same_side_offset;
     }
+  }
+  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
+}
+
+double TrajectoryEvaluator::LatComfortCost(
+    const std::shared_ptr<Trajectory1d>& lon_trajectory,
+    const std::shared_ptr<Trajectory1d>& lat_trajectory) const {
+  double cost_sqr_sum = 0.0;
+  double cost_abs_sum = 0.0;
+  for (double t = 0.0; t < FLAGS_trajectory_time_length;
+       t += FLAGS_trajectory_time_resolution) {
+    double s = lon_trajectory->Evaluate(0, t);
+    double cost = lat_trajectory->Evaluate(1, s) *
+                  lon_trajectory->Evaluate(1, t) /
+                  FLAGS_default_cruise_speed;
+    cost_sqr_sum += cost * cost;
+    cost_abs_sum += std::abs(cost);
   }
   return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
 }
