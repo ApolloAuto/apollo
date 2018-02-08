@@ -47,6 +47,9 @@ bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
   const common::math::LineSegment2d seg(p1.point(), p2.point());
   for (const auto* boundary : boundaries) {
+    if (boundary->boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+      continue;
+    }
     if (boundary->HasOverlap(seg)) {
       return true;
     }

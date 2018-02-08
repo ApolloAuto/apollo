@@ -190,6 +190,7 @@ Status StBoundaryMapper::CreateStBoundaryWithHistory(
     } else {
       decision = iter->second;
     }
+
     if (!path_obstacle->HasLongitudinalDecision()) {
       if (!MapWithoutDecision(path_obstacle).ok()) {
         std::string msg = StrCat("Fail to map obstacle ", path_obstacle->Id(),
@@ -352,10 +353,19 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
 
       if (CheckOverlap(curr_point_on_path, obs_box,
                        st_boundary_config_.boundary_buffer())) {
-        lower_points->emplace_back(curr_point_on_path.s(), 0.0);
-        lower_points->emplace_back(curr_point_on_path.s(), planning_time_);
-        upper_points->emplace_back(planning_distance_, 0.0);
-        upper_points->emplace_back(planning_distance_, planning_time_);
+        const double backward_distance =
+            -vehicle_param_.front_edge_to_center();
+        const double forward_distance =
+            vehicle_param_.length() + vehicle_param_.width() +
+            obs_box.length() + obs_box.width();
+        double low_s =  std::fmax(0.0,
+                                  curr_point_on_path.s() + backward_distance);
+        double high_s = std::fmin(planning_distance_,
+                                  curr_point_on_path.s() + forward_distance);
+        lower_points->emplace_back(low_s, 0.0);
+        lower_points->emplace_back(low_s, planning_time_);
+        upper_points->emplace_back(high_s, 0.0);
+        upper_points->emplace_back(high_s, planning_time_);
         break;
       }
     }
