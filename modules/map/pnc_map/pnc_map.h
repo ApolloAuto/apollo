@@ -31,6 +31,7 @@
 #include <vector>
 
 #include "gflags/gflags.h"
+#include "gtest/gtest_prod.h"
 
 #include "modules/common/proto/vehicle_state.pb.h"
 #include "modules/routing/proto/routing.pb.h"
@@ -210,6 +211,14 @@ class PncMap {
    * for the last time.
    */
   bool stop_for_destination_ = false;
+
+  FRIEND_TEST(PncMapTest, UpdateRouting);
+  FRIEND_TEST(PncMapTest, GetNearestPointFromRouting);
+  FRIEND_TEST(PncMapTest, UpdateWaypointIndex);
+  FRIEND_TEST(PncMapTest, UpdateNextRoutingWaypointIndex);
+  FRIEND_TEST(PncMapTest, GetNeighborPassages);
+  FRIEND_TEST(PncMapTest, NextWaypointIndex);
+  FRIEND_TEST(PncMapTest, SearchForwardIndex_SearchBackwardIndex);
 };
 
 }  // namespace hdmap
