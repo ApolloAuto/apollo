@@ -82,6 +82,9 @@ class TrajectoryEvaluator {
   double LatOffsetCost(const std::shared_ptr<Curve1d>& lat_trajectory,
                        const std::vector<double>& s_values) const;
 
+  double LatComfortCost(const std::shared_ptr<Curve1d>& lon_trajectory,
+                        const std::shared_ptr<Curve1d>& lat_trajectory) const;
+
   double LonComfortCost(const std::shared_ptr<Curve1d>& lon_trajectory) const;
 
   double LonCollisionCost(const std::shared_ptr<Curve1d>& lon_trajectory) const;

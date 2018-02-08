@@ -408,6 +408,7 @@ DEFINE_double(weight_lon_jerk, 1.0, "Weight of longitudinal jerk cost");
 DEFINE_double(weight_lon_collision, 2.0,
               "Weight of logitudinal collision cost");
 DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
+DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");
 DEFINE_double(weight_same_side_offset, 1.0,
               "Weight of same side lateral offset cost");
 DEFINE_double(weight_opposite_side_offset, 10.0,
