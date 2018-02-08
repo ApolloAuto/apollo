@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <map>
+#include <numeric>
 
 #include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
