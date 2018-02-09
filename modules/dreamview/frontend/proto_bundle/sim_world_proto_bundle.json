@@ -1565,7 +1565,8 @@
                 "STOP_REASON_STOP_SIGN": 101,
                 "STOP_REASON_YIELD_SIGN": 102,
                 "STOP_REASON_CLEAR_ZONE": 103,
-                "STOP_REASON_CROSSWALK": 104
+                "STOP_REASON_CROSSWALK": 104,
+                "STOP_REASON_CREEPER": 105
               }
             },
             "ObjectStop": {
