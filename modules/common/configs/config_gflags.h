@@ -35,5 +35,6 @@ DECLARE_bool(use_ros_time);
 
 DECLARE_string(localization_tf2_frame_id);
 DECLARE_string(localization_tf2_child_frame_id);
+DECLARE_bool(use_relative_position);
 
 #endif  // MODULES_COMMON_CONFIGS_GFLAGS_H_
