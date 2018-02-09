@@ -18,6 +18,7 @@ message MonitorMessageItem {
     ROUTING = 10;
     MONITOR = 11;
     HMI = 12;
+    RELATIVE_MAP=13;
   }
 
   optional MessageSource source = 1 [ default = UNKNOWN ];

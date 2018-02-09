@@ -44,6 +44,7 @@ message AdapterConfig {
     RAW_IMU = 37;
     LOCALIZATION_MSF_STATUS = 38;
     STATIC_INFO = 39;
+    RELATIVE_MAP = 40;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

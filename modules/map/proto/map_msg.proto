@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/common/proto/header.proto";
+import "modules/map/proto/map.proto";
+
+// The map message in transmission format.
+message MapMsg {
+  optional apollo.common.Header header = 1;
+  optional apollo.hdmap.Map map = 3;
+}

@@ -88,3 +88,4 @@ DEFINE_string(localization_sins_pva_topic, "/apollo/localization/msf_sins_pva",
               "Localization sins pva topic name");
 DEFINE_string(localization_msf_status, "/apollo/localization/msf_status",
               "msf localization status");
+DEFINE_string(relative_map_topic, "/apollo/relative_map", "relative map");
