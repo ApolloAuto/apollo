@@ -404,10 +404,18 @@ export default class Map {
     // side. This also means that the server should maintain a state of
     // (possibly) visible elements, presummably in the global store.
     appendMapData(newData, coordinates, scene) {
-        for (const kind in newData) {
+        // Note: drawing order matter since "stopSign" and "signal" are dependent on "overlap"
+        const kinds = ["overlap", "lane", "junction", "road",
+                       "clearArea", "signal", "stopSign", "crosswalk"];
+        for (const kind of kinds) {
+            if (!newData[kind]) {
+                return;
+            }
+
             if (!this.data[kind]) {
                 this.data[kind] = [];
             }
+
             for (let i = 0; i < newData[kind].length; ++i) {
                 switch (kind) {
                     case "lane":
