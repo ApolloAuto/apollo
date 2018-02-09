@@ -1,14 +1,689 @@
 header {
-  timestamp_sec: 1517597755.1360021
+  timestamp_sec: 1517275342.8809607
   module_name: "routing"
-  sequence_num: 4
+  sequence_num: 5
 }
 road {
-  id: "787-305a-339-2947-200-2946-2940-2466-199-169a-205-2818-2811-201-382-2726-250-938-295a-307a-426-2106-2944-2774-178-778-794-2107-2039-2752-179-2813-2775-195-1594-2019-2018-2952-206-2462-1593-40a-2951-300-177-2870-2016-2805-2817-2017-1605-2769-2040-2939-387-1600-2943-1604-796-795-2755-188-2754-2751-2772-2771-2802-194a-2801-2798-773-293-2804-818-241"
+  id: "2628-2623-2622-2421-9735-541-630-3072-1423-503-1416-1415-610-516-492-3065-9783-1830-201a-613-3122-3116-530-3100-3101-456-2017-3102-633-427-489-538-2039-155-600-1456-1563-603-1455-2774-40a-3108-1445-3114-203-647-645-823-558-615-683-1461-161-3127-2787-1425-2107-1430-450-830-2462-3109-9820-1523-164-1431-1422-561-37-1395-9781-825-822-1450-2019-9789-3117-9782-2016-59-1511-2430-1781-1460-160-504-9760-3137-39-60-722-521-1470-3126-2807-425-488-2427-1465-1831-1466-918-9788-66-107-642-662-2786-177-1451-453-179-1446-1510-1522-1441-828-495-1426-315a-824-9944-2435-406-1825-525-2985-2986-2989-2990-2422-1559-2996-211a-1436-2997-3001-1391-631-3017-2782-3019-1516-178-3020-3016-407-2018-771-454-3023-684-3058-1564-3022-772-685-1827-194-426-1568-2040-1406-539-2106-1440-2775-387-1471-395-330-202-49-1575-2778-2777-2784-1410-248-527-2808-1505-1558-811-183-836-1569-1574-1390-3057-1396-1400-1401-1405-1411-51-50-3071-9776-2409-1771-50a"
   passage {
     segment {
+      id: "1416_1_-3"
+      start_s: 9.35518444790213
+      end_s: 37.2856
+    }
+    segment {
+      id: "1422_1_-3"
+      start_s: 0
+      end_s: 11.7449
+    }
+    segment {
+      id: "1423_1_-3"
+      start_s: 0
+      end_s: 7.71293
+    }
+    segment {
+      id: "1425_1_-3"
+      start_s: 0
+      end_s: 11.7655
+    }
+    segment {
+      id: "1426_1_-3"
+      start_s: 0
+      end_s: 54.4931
+    }
+    segment {
+      id: "1430_1_-3"
+      start_s: 0
+      end_s: 14.2715
+    }
+    segment {
+      id: "1431_1_-3"
+      start_s: 0
+      end_s: 35.883
+    }
+    segment {
+      id: "1436_1_-3"
+      start_s: 0
+      end_s: 10.9945
+    }
+    segment {
+      id: "1781_1_-3"
+      start_s: 0
+      end_s: 6.07775
+    }
+    segment {
+      id: "822_1_-3"
+      start_s: 0
+      end_s: 7.23053
+    }
+    segment {
+      id: "1441_1_-3"
+      start_s: 0
+      end_s: 10.7866
+    }
+    segment {
+      id: "1440_1_-3"
+      start_s: 0
+      end_s: 39.7135
+    }
+    segment {
+      id: "164_1_-3"
+      start_s: 0
+      end_s: 55.438
+    }
+    segment {
+      id: "161_1_-3"
+      start_s: 0
+      end_s: 8.67243
+    }
+    segment {
+      id: "2422_1_-3"
+      start_s: 0
+      end_s: 73.8863
+    }
+    segment {
+      id: "1445_1_-3"
+      start_s: 0
+      end_s: 15.5531
+    }
+    segment {
+      id: "1446_1_-3"
+      start_s: 0
+      end_s: 45.1151
+    }
+    segment {
+      id: "1450_1_-3"
+      start_s: 0
+      end_s: 11.2953
+    }
+    segment {
+      id: "1451_1_-3"
+      start_s: 0
+      end_s: 45.7046
+    }
+    segment {
+      id: "1455_1_-3"
+      start_s: 0
+      end_s: 11.5029
+    }
+    segment {
+      id: "1456_1_-3"
+      start_s: 0
+      end_s: 10.3644
+    }
+    segment {
+      id: "39_1_-3"
+      start_s: 0
+      end_s: 33.1203
+    }
+    segment {
+      id: "37_1_-4"
+      start_s: 0
+      end_s: 21.9968
+    }
+    segment {
+      id: "2427_1_-4"
+      start_s: 0
+      end_s: 7.23787
+    }
+    segment {
+      id: "155_1_-3"
+      start_s: 0
+      end_s: 41.6236
+    }
+    segment {
+      id: "59_1_-3"
+      start_s: 0
+      end_s: 11.4406
+    }
+    segment {
+      id: "2430_1_-3"
+      start_s: 0
+      end_s: 59.3032
+    }
+    segment {
+      id: "1460_1_-3"
+      start_s: 0
+      end_s: 10.5217
+    }
+    segment {
+      id: "1461_1_-3"
+      start_s: 0
+      end_s: 30.3223
+    }
+    segment {
+      id: "60_1_-3"
+      start_s: 0
+      end_s: 44.3331
+    }
+    segment {
+      id: "1465_1_-3"
+      start_s: 0
+      end_s: 13.3224
+    }
+    segment {
+      id: "1466_1_-3"
+      start_s: 0
+      end_s: 95.8158
+    }
+    segment {
+      id: "1470_1_-3"
+      start_s: 0
+      end_s: 18.5291
+    }
+    segment {
+      id: "1471_1_-3"
+      start_s: 0
+      end_s: 165.959
+    }
+    segment {
+      id: "66_1_-3"
+      start_s: 0
+      end_s: 84.1061
+    }
+    segment {
+      id: "823_1_-4"
+      start_s: 0
+      end_s: 36.7246
+    }
+    segment {
+      id: "824_1_-4"
+      start_s: 0
+      end_s: 18.811
+    }
+    segment {
+      id: "825_1_-4"
+      start_s: 0
+      end_s: 15.1217
+    }
+    segment {
+      id: "918_1_-3"
+      start_s: 0
+      end_s: 34.8046
+    }
+    segment {
+      id: "538_1_-3"
+      start_s: 0
+      end_s: 14.0887
+    }
+    segment {
+      id: "2435_1_-3"
+      start_s: 0
+      end_s: 84.4735
+    }
+    segment {
+      id: "539_1_-3"
+      start_s: 0
+      end_s: 17.4091
+    }
+    segment {
+      id: "558_1_-3"
+      start_s: 0
+      end_s: 43.6145
+    }
+    segment {
+      id: "561_1_-1"
+      start_s: 0
+      end_s: 17.3228
+    }
+    segment {
+      id: "9820_1_-1"
+      start_s: 0
+      end_s: 15.2454
+    }
+    segment {
+      id: "645_1_-1"
+      start_s: 0
+      end_s: 5.48902
+    }
+    segment {
+      id: "541_1_-1"
+      start_s: 0
+      end_s: 24.4529
+    }
+    segment {
+      id: "642_1_-1"
+      start_s: 0
+      end_s: 21.5961
+    }
+    segment {
+      id: "630_1_-1"
+      start_s: 0
+      end_s: 15.6596
+    }
+    segment {
+      id: "633_1_-1"
+      start_s: 0
+      end_s: 28.68
+    }
+    segment {
+      id: "631_1_-2"
+      start_s: 0
+      end_s: 33.2662
+    }
+    segment {
+      id: "647_1_-1"
+      start_s: 0
+      end_s: 25.869
+    }
+    segment {
+      id: "521_1_-1"
+      start_s: 0
+      end_s: 59.7032
+    }
+    segment {
+      id: "3101_1_-1"
+      start_s: 0
+      end_s: 1.10829
+    }
+    segment {
+      id: "3102_1_-1"
+      start_s: 0
+      end_s: 12.9999
+    }
+    segment {
+      id: "3100_1_-1"
+      start_s: 0
+      end_s: 52.9712
+    }
+    segment {
+      id: "530_1_-1"
+      start_s: 0
+      end_s: 38.3842
+    }
+    segment {
+      id: "525_1_-1"
+      start_s: 0
+      end_s: 54.1706
+    }
+    segment {
+      id: "3109_1_-1"
+      start_s: 0
+      end_s: 10.7721
+    }
+    segment {
+      id: "3108_1_-1"
+      start_s: 0
+      end_s: 14.6678
+    }
+    segment {
+      id: "3114_1_-1"
+      start_s: 0
+      end_s: 62.4234
+    }
+    segment {
+      id: "3116_1_-1"
+      start_s: 0
+      end_s: 11.5468
+    }
+    segment {
+      id: "3117_1_-1"
+      start_s: 0
+      end_s: 35.2993
+    }
+    segment {
+      id: "3122_1_-1"
+      start_s: 0
+      end_s: 9.5913
+    }
+    segment {
+      id: "527_1_-1"
+      start_s: 0
+      end_s: 105.379
+    }
+    segment {
+      id: "3127_1_-1"
+      start_s: 0
+      end_s: 11.6722
+    }
+    segment {
+      id: "3126_1_-1"
+      start_s: 0
+      end_s: 48.1959
+    }
+    segment {
+      id: "613_1_-1"
+      start_s: 0
+      end_s: 8.09189
+    }
+    segment {
+      id: "610_1_-2"
+      start_s: 0
+      end_s: 15.1233
+    }
+    segment {
+      id: "615_1_-1"
+      start_s: 0
+      end_s: 10.2599
+    }
+    segment {
+      id: "201a_1_-1"
+      start_s: 0
+      end_s: 35.4258
+    }
+    segment {
+      id: "503_1_-1"
+      start_s: 0
+      end_s: 202.354
+    }
+    segment {
+      id: "504_1_-1"
+      start_s: 0
+      end_s: 28.4581
+    }
+    segment {
+      id: "603_1_-1"
+      start_s: 0
+      end_s: 28.9399
+    }
+    segment {
+      id: "722_1_-1"
+      start_s: 0
+      end_s: 28.5864
+    }
+    segment {
+      id: "9776_1_-1"
+      start_s: 0
+      end_s: 89.0585
+    }
+    segment {
+      id: "9789_1_-1"
+      start_s: 0
+      end_s: 12.9196
+    }
+    segment {
+      id: "9788_1_-1"
+      start_s: 0
+      end_s: 84.682
+    }
+    segment {
+      id: "9782_1_-1"
+      start_s: 0
+      end_s: 13.2496
+    }
+    segment {
+      id: "9783_1_-1"
+      start_s: 0
+      end_s: 2.23228
+    }
+    segment {
+      id: "9781_1_-1"
+      start_s: 0
+      end_s: 19.4333
+    }
+    segment {
+      id: "600_1_-1"
+      start_s: 0
+      end_s: 27.8701
+    }
+    segment {
+      id: "516_1_-2"
+      start_s: 0
+      end_s: 29.9214
+    }
+    segment {
+      id: "662_1_-1"
+      start_s: 0
+      end_s: 28.0115
+    }
+    segment {
+      id: "454_1_-1"
+      start_s: 0
+      end_s: 16.7278
+    }
+    segment {
+      id: "453_1_-1"
+      start_s: 0
+      end_s: 121.075
+    }
+    segment {
+      id: "830_1_-1"
+      start_s: 0
+      end_s: 13.9338
+    }
+    segment {
+      id: "1505_1_-1"
+      start_s: 0
+      end_s: 75.0396
+    }
+    segment {
+      id: "492_1_-1"
+      start_s: 0
+      end_s: 22.0048
+    }
+    segment {
+      id: "495_1_-1"
+      start_s: 0
+      end_s: 33.0585
+    }
+    segment {
+      id: "456_1_-1"
+      start_s: 0
+      end_s: 18.2485
+    }
+    segment {
+      id: "3071_1_-1"
+      start_s: 0
+      end_s: 5.81826
+    }
+    segment {
+      id: "3072_1_-1"
+      start_s: 0
+      end_s: 9.55313
+    }
+    segment {
+      id: "3137_1_-1"
+      start_s: 0
+      end_s: 25.5084
+    }
+    segment {
+      id: "3065_1_-1"
+      start_s: 0
+      end_s: 17.6262
+    }
+    segment {
+      id: "9735_1_-1"
+      start_s: 0
+      end_s: 6.99568
+    }
+    segment {
+      id: "1511_1_-1"
+      start_s: 0
+      end_s: 11.5822
+    }
+    segment {
+      id: "1510_1_-1"
+      start_s: 0
+      end_s: 43.2883
+    }
+    segment {
+      id: "1516_1_-1"
+      start_s: 0
+      end_s: 25.5707
+    }
+    segment {
+      id: "450_1_-1"
+      start_s: 0
+      end_s: 80.2345
+    }
+    segment {
+      id: "1523_1_-1"
+      start_s: 0
+      end_s: 16.6733
+    }
+    segment {
+      id: "1522_1_-1"
+      start_s: 0
+      end_s: 44.5102
+    }
+    segment {
+      id: "828_1_-1"
+      start_s: 0
+      end_s: 188.836
+    }
+    segment {
+      id: "315a_1_-1"
+      start_s: 0
+      end_s: 45.8215
+    }
+    segment {
+      id: "9944_1_-1"
+      start_s: 0
+      end_s: 14.4416
+    }
+    segment {
+      id: "406_1_-1"
+      start_s: 0
+      end_s: 7.40403
+    }
+    segment {
+      id: "2985_1_-1"
+      start_s: 0
+      end_s: 12.3288
+    }
+    segment {
+      id: "2986_1_-1"
+      start_s: 0
+      end_s: 77.5478
+    }
+    segment {
+      id: "2989_1_-1"
+      start_s: 0
+      end_s: 6.2281
+    }
+    segment {
+      id: "2990_1_-1"
+      start_s: 0
+      end_s: 49.2428
+    }
+    segment {
+      id: "2996_1_-1"
+      start_s: 0
+      end_s: 10.1259
+    }
+    segment {
+      id: "2997_1_-1"
+      start_s: 0
+      end_s: 16.1971
+    }
+    segment {
+      id: "3001_1_-1"
+      start_s: 0
+      end_s: 58.9623
+    }
+    segment {
+      id: "3016_1_-1"
+      start_s: 0
+      end_s: 33.2133
+    }
+    segment {
+      id: "3017_1_-1"
+      start_s: 0
+      end_s: 24.0767
+    }
+    segment {
+      id: "3019_1_-1"
+      start_s: 0
+      end_s: 10.5034
+    }
+    segment {
+      id: "3020_1_-1"
+      start_s: 0
+      end_s: 2.41471
+    }
+    segment {
+      id: "407_1_-1"
+      start_s: 0
+      end_s: 32.7223
+    }
+    segment {
+      id: "489_1_-1"
+      start_s: 0
+      end_s: 41.6593
+    }
+    segment {
+      id: "771_1_-1"
+      start_s: 0
+      end_s: 49.4647
+    }
+    segment {
+      id: "3058_1_-1"
+      start_s: 0
+      end_s: 3.99048
+    }
+    segment {
+      id: "3057_1_-1"
+      start_s: 0
+      end_s: 47.2603
+    }
+    segment {
+      id: "3022_1_-1"
+      start_s: 0
+      end_s: 27.7554
+    }
+    segment {
+      id: "772_1_-1"
+      start_s: 0
+      end_s: 3.57032
+    }
+    segment {
+      id: "3023_1_-1"
+      start_s: 0
+      end_s: 5.10993
+    }
+    segment {
+      id: "685_1_-1"
+      start_s: 0
+      end_s: 7.56306
+    }
+    segment {
+      id: "1830_1_-1"
+      start_s: 0
+      end_s: 16.086
+    }
+    segment {
+      id: "1831_1_-1"
+      start_s: 0
+      end_s: 13.4011
+    }
+    segment {
+      id: "683_1_-1"
+      start_s: 0
+      end_s: 4.06928
+    }
+    segment {
+      id: "684_1_-1"
+      start_s: 0
+      end_s: 10.8477
+    }
+    segment {
+      id: "1827_1_-1"
+      start_s: 0
+      end_s: 15.4364
+    }
+    segment {
+      id: "1825_1_-1"
+      start_s: 0
+      end_s: 14.2478
+    }
+    segment {
+      id: "425_1_-1"
+      start_s: 0
+      end_s: 32.4384
+    }
+    segment {
+      id: "488_1_-1"
+      start_s: 0
+      end_s: 30.8909
+    }
+    segment {
+      id: "427_1_-1"
+      start_s: 0
+      end_s: 44.322
+    }
+    segment {
       id: "426_1_-1"
-      start_s: 5.2130155315985132
+      start_s: 0
       end_s: 12.0466
     }
     segment {
@@ -91,6 +766,71 @@ road {
       start_s: 0
       end_s: 21.5858
     }
+    segment {
+      id: "395_1_-1"
+      start_s: 0
+      end_s: 40.8741
+    }
+    segment {
+      id: "330_1_-1"
+      start_s: 0
+      end_s: 20.0695
+    }
+    segment {
+      id: "202_1_-1"
+      start_s: 0
+      end_s: 57.0049
+    }
+    segment {
+      id: "2778_1_-1"
+      start_s: 0
+      end_s: 13.9245
+    }
+    segment {
+      id: "2777_1_-1"
+      start_s: 0
+      end_s: 15.0832
+    }
+    segment {
+      id: "2784_1_-1"
+      start_s: 0
+      end_s: 11.0559
+    }
+    segment {
+      id: "2782_1_-1"
+      start_s: 0
+      end_s: 10.0952
+    }
+    segment {
+      id: "2787_1_-1"
+      start_s: 0
+      end_s: 11.3923
+    }
+    segment {
+      id: "2786_1_-1"
+      start_s: 0
+      end_s: 14.9633
+    }
+    segment {
+      id: "248_1_-1"
+      start_s: 0
+      end_s: 39.6309
+    }
+    segment {
+      id: "203_1_-2"
+      start_s: 0
+      end_s: 18.0171
+    }
+    segment {
+      id: "2808_1_-2"
+      start_s: 0
+      end_s: 8.58452
+    }
+    segment {
+      id: "2807_1_-2"
+      start_s: 0
+      end_s: 3.7176218806667278
+    }
     change_lane_type: RIGHT
   }
   passage {
@@ -170,365 +910,382 @@ road {
       end_s: 21.4199
     }
     segment {
-      id: "295a_1_-1"
+      id: "395_1_-2"
       start_s: 0
-      end_s: 27.5234
+      end_s: 40.0474
     }
     segment {
-      id: "206_1_-1"
+      id: "330_1_-2"
       start_s: 0
-      end_s: 34.0265
+      end_s: 20.3265
     }
     segment {
-      id: "1604_1_-1"
+      id: "202_1_-2"
       start_s: 0
-      end_s: 11.01
+      end_s: 56.5444
     }
     segment {
-      id: "1605_1_-1"
+      id: "2778_1_-2"
       start_s: 0
-      end_s: 9.94201
+      end_s: 14.035
     }
     segment {
-      id: "794_1_-1"
+      id: "2777_1_-2"
       start_s: 0
-      end_s: 11.7989
+      end_s: 15.9877
     }
     segment {
-      id: "1600_1_-1"
+      id: "2784_1_-2"
       start_s: 0
-      end_s: 10.83
+      end_s: 10.5677
     }
     segment {
-      id: "795_1_-1"
+      id: "2782_1_-2"
       start_s: 0
-      end_s: 67.2815
+      end_s: 10.9561
     }
     segment {
-      id: "2755_1_-1"
+      id: "2787_1_-2"
       start_s: 0
-      end_s: 11.727
+      end_s: 10.7836
     }
     segment {
-      id: "2754_1_-1"
+      id: "2786_1_-2"
       start_s: 0
-      end_s: 7.31495
+      end_s: 14.9547
     }
     segment {
-      id: "2752_1_-1"
+      id: "248_1_-2"
       start_s: 0
-      end_s: 11.39
+      end_s: 40.412
     }
     segment {
-      id: "2751_1_-1"
+      id: "203_1_-3"
       start_s: 0
-      end_s: 28.0836
+      end_s: 18.0987
     }
     segment {
-      id: "2870_1_-1"
+      id: "2808_1_-3"
       start_s: 0
-      end_s: 10.7338
+      end_s: 8.6941
     }
     segment {
-      id: "2769_1_-1"
+      id: "2807_1_-3"
       start_s: 0
-      end_s: 28.3538
+      end_s: 61.9167
     }
     segment {
-      id: "2772_1_-1"
+      id: "211a_1_-1"
       start_s: 0
-      end_s: 13.7323
+      end_s: 26.8112
     }
     segment {
-      id: "2771_1_-1"
+      id: "194_1_-3"
       start_s: 0
-      end_s: 37.7666
+      end_s: 35.1204
     }
     segment {
-      id: "2805_1_-1"
+      id: "1558_1_-3"
       start_s: 0
-      end_s: 16.4046
+      end_s: 12.1626
     }
     segment {
-      id: "2804_1_-1"
+      id: "1559_1_-3"
       start_s: 0
-      end_s: 24.1641
+      end_s: 11.8558
     }
     segment {
-      id: "2802_1_-1"
+      id: "811_1_-3"
       start_s: 0
-      end_s: 19.0288
+      end_s: 32.3475
     }
     segment {
-      id: "1593_1_-1"
+      id: "183_1_-5"
       start_s: 0
-      end_s: 9.22893
+      end_s: 20.9393
     }
     segment {
-      id: "1594_1_-1"
+      id: "1563_1_-5"
       start_s: 0
-      end_s: 12.8589
+      end_s: 13.3783
     }
     segment {
-      id: "2801_1_-1"
+      id: "1564_1_-5"
       start_s: 0
-      end_s: 61.6489
+      end_s: 37.042
     }
     segment {
-      id: "2798_1_-1"
+      id: "836_1_-3"
       start_s: 0
-      end_s: 9.85767
+      end_s: 48.8924
     }
     segment {
-      id: "796_1_-1"
+      id: "49_1_-3"
       start_s: 0
-      end_s: 26.7229
+      end_s: 61.5922
     }
     segment {
-      id: "293_1_-1"
+      id: "1568_1_-3"
       start_s: 0
-      end_s: 35.908
+      end_s: 12.5372
     }
     segment {
-      id: "818_1_-1"
+      id: "1569_1_-3"
       start_s: 0
-      end_s: 22.6246
+      end_s: 27.5611
     }
     segment {
-      id: "938_1_-1"
+      id: "1574_1_-3"
       start_s: 0
-      end_s: 9.84604
+      end_s: 17.7864
     }
     segment {
-      id: "194a_1_-1"
+      id: "1575_1_-3"
       start_s: 0
-      end_s: 45.6015
+      end_s: 212.758
     }
     segment {
-      id: "195_1_-1"
+      id: "1390_1_-3"
       start_s: 0
-      end_s: 71.2213
+      end_s: 12.8194
     }
     segment {
-      id: "241_1_-1"
+      id: "1391_1_-3"
       start_s: 0
-      end_s: 33.1361
+      end_s: 69.3461
     }
     segment {
-      id: "188_1_-1"
+      id: "1395_1_-3"
       start_s: 0
-      end_s: 6.34716
+      end_s: 17.8925
     }
     segment {
-      id: "2726_1_-1"
+      id: "1396_1_-3"
       start_s: 0
-      end_s: 48.709
+      end_s: 64.4783
     }
     segment {
-      id: "382_1_-1"
+      id: "1400_1_-3"
       start_s: 0
-      end_s: 3.64167
+      end_s: 18.4773
     }
     segment {
-      id: "307a_1_-1"
+      id: "1401_1_-3"
       start_s: 0
-      end_s: 44.9295
+      end_s: 7.53282
     }
     segment {
-      id: "300_1_-1"
+      id: "1405_1_-3"
       start_s: 0
-      end_s: 24.7345
+      end_s: 16.4102
     }
     segment {
-      id: "201_1_-1"
+      id: "1406_1_-3"
       start_s: 0
-      end_s: 46.144
+      end_s: 199.26
     }
     segment {
-      id: "2811_1_-1"
+      id: "1410_1_-3"
       start_s: 0
-      end_s: 29.2229
+      end_s: 15.4347
     }
     segment {
-      id: "2813_1_-1"
+      id: "1411_1_-3"
       start_s: 0
-      end_s: 78.0073
+      end_s: 54.9689
     }
     segment {
-      id: "2817_1_-1"
+      id: "51_1_-3"
       start_s: 0
-      end_s: 30.0907
+      end_s: 32.3774
     }
     segment {
-      id: "2818_1_-1"
+      id: "50_1_-4"
       start_s: 0
-      end_s: 14.9679
+      end_s: 17.8365
     }
     segment {
-      id: "250_1_-1"
+      id: "2409_1_-4"
       start_s: 0
-      end_s: 25.6026
+      end_s: 10.4914
     }
     segment {
-      id: "205_1_-2"
+      id: "107_1_-3"
       start_s: 0
-      end_s: 30.22
+      end_s: 31.4443
     }
-    change_lane_type: RIGHT
-  }
-  passage {
     segment {
-      id: "300_1_-2"
+      id: "160_1_-3"
       start_s: 0
-      end_s: 25.9976
+      end_s: 6.08098
     }
     segment {
-      id: "201_1_-2"
+      id: "9760_1_-3"
       start_s: 0
-      end_s: 45.9588
+      end_s: 4.31703
     }
     segment {
-      id: "2811_1_-2"
+      id: "1771_1_-3"
       start_s: 0
-      end_s: 28.5658
+      end_s: 45.6667
     }
     segment {
-      id: "2813_1_-2"
+      id: "1415_1_-3"
       start_s: 0
-      end_s: 77.053
+      end_s: 12.6104
     }
     segment {
-      id: "2817_1_-2"
+      id: "1416_1_-3"
       start_s: 0
-      end_s: 29.7719
+      end_s: 37.2856
     }
     segment {
-      id: "2818_1_-2"
+      id: "1422_1_-3"
       start_s: 0
-      end_s: 14.849
+      end_s: 11.7449
     }
     segment {
-      id: "250_1_-2"
+      id: "1423_1_-3"
       start_s: 0
-      end_s: 25.8951
+      end_s: 7.71293
     }
     segment {
-      id: "205_1_-3"
+      id: "1425_1_-3"
       start_s: 0
-      end_s: 30.423
+      end_s: 11.7655
     }
     segment {
-      id: "169a_1_-1"
+      id: "1426_1_-3"
       start_s: 0
-      end_s: 33.2599
+      end_s: 54.4931
     }
     segment {
-      id: "199_1_-1"
+      id: "1430_1_-3"
       start_s: 0
-      end_s: 3.93764
+      end_s: 14.2715
     }
     segment {
-      id: "2466_1_-1"
+      id: "1431_1_-3"
       start_s: 0
-      end_s: 88.6649
+      end_s: 35.883
     }
     segment {
-      id: "2939_1_-1"
+      id: "1436_1_-3"
       start_s: 0
-      end_s: 11.333
+      end_s: 10.9945
     }
     segment {
-      id: "2940_1_-1"
+      id: "1781_1_-3"
       start_s: 0
-      end_s: 70.7009
+      end_s: 6.07775
     }
     segment {
-      id: "2943_1_-1"
+      id: "822_1_-3"
       start_s: 0
-      end_s: 39.3133
+      end_s: 7.23053
     }
     segment {
-      id: "2944_1_-1"
+      id: "1441_1_-3"
       start_s: 0
-      end_s: 22.659
+      end_s: 10.7866
     }
     segment {
-      id: "2946_1_-1"
+      id: "1440_1_-3"
       start_s: 0
-      end_s: 4.32111
+      end_s: 39.7135
     }
     segment {
-      id: "200_1_-1"
+      id: "50a_1_-1"
       start_s: 0
-      end_s: 2.10099
+      end_s: 41.1822
     }
     segment {
-      id: "2947_1_-1"
+      id: "2421_1_-1"
       start_s: 0
-      end_s: 36.9931
+      end_s: 1.62432
     }
     segment {
-      id: "2951_1_-1"
+      id: "2622_1_-1"
       start_s: 0
-      end_s: 4.61469
+      end_s: 8.51337
     }
     segment {
-      id: "2952_1_-1"
+      id: "2623_1_-1"
       start_s: 0
-      end_s: 15.9321
+      end_s: 60.4448
     }
     segment {
-      id: "339_1_-1"
+      id: "2628_1_-1"
       start_s: 0
-      end_s: 47.8634
-    }
-    segment {
-      id: "773_1_-1"
-      start_s: 0
-      end_s: 78.6525
-    }
-    segment {
-      id: "305a_1_-1"
-      start_s: 0
-      end_s: 8.23735
-    }
-    segment {
-      id: "787_1_-1"
-      start_s: 0
-      end_s: 16.9328
-    }
-    segment {
-      id: "778_1_-1"
-      start_s: 0
-      end_s: 9.7458933834058961
+      end_s: 0.67288113619522483
     }
     can_exit: true
     change_lane_type: FORWARD
   }
 }
 measurement {
-  distance: 1994.8375178518074
+  distance: 6592.159681347367
 }
 routing_request {
   header {
-    timestamp_sec: 1517275721.6775188
+    timestamp_sec: 1517275342.8781533
     module_name: "dreamview"
-    sequence_num: 7
+    sequence_num: 5
   }
   waypoint {
-    id: "426_1_-1"
-    s: 5.2130155315985132
+    id: "1416_1_-3"
+    s: 9.35518444790213
     pose {
-      x: 586892.37475622736
-      y: 4140962.6269300487
+      x: 587136.63
+      y: 4141547.93
     }
   }
   waypoint {
-    id: "778_1_-1"
-    s: 9.7458933834058961
+    id: "2435_1_-3"
+    s: 61.806953956366108
     pose {
-      x: 586384.291903
-      y: 4140676.936743
+      x: 588380.7
+      y: 4141174.39
+    }
+  }
+  waypoint {
+    id: "503_1_-1"
+    s: 49.204530014776623
+    pose {
+      x: 588001.6
+      y: 4140600.87
+    }
+  }
+  waypoint {
+    id: "828_1_-1"
+    s: 125.72834661085349
+    pose {
+      x: 586801.67
+      y: 4140245.2
+    }
+  }
+  waypoint {
+    id: "2462_1_-1"
+    s: 17.564129003430267
+    pose {
+      x: 586852.66
+      y: 4141015.4
+    }
+  }
+  waypoint {
+    id: "2807_1_-3"
+    s: 14.662711782090165
+    pose {
+      x: 586333.39
+      y: 4141271.72
+    }
+  }
+  waypoint {
+    id: "2628_1_-1"
+    s: 0.67288113619522483
+    pose {
+      x: 587376.33
+      y: 4141406.76
     }
   }
 }
