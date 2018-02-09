@@ -278,7 +278,7 @@ Status Control::CheckInput() {
   }
 
   // Add tempprary flag for test
-  if (FLAGS_use_relative_position) {
+  if (FLAGS_use_navigation_mode) {
     localization_.mutable_pose()->mutable_position()->set_x(0.0);
     localization_.mutable_pose()->mutable_position()->set_y(0.0);
     localization_.mutable_pose()->set_heading(0.0);
