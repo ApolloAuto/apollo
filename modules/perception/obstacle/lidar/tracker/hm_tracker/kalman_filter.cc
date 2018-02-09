@@ -99,7 +99,7 @@ KalmanFilter::KalmanFilter() {
   age_ = 0;
   measurement_cached_history_size_ = s_measurement_cached_history_size_minimum_;
   s_measurement_cached_history_size_maximum_ =
-    s_measurement_cached_history_size_minimum_;
+      s_measurement_cached_history_size_minimum_;
   velocity_covariance_ =
       s_initial_velocity_noise_ * Eigen::Matrix3d::Identity();
   // states
@@ -459,7 +459,7 @@ float KalmanFilter::ComputeUpdateQualityAccordingPointNumChange(
     return 0;
   }
   float update_quality =
-      1 - fabs(new_pt_num - old_pt_num) / std::max(new_pt_num, old_pt_num);
+      1 - std::abs(new_pt_num - old_pt_num) / std::max(new_pt_num, old_pt_num);
   return update_quality;
 }
 

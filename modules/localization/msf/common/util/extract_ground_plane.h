@@ -17,13 +17,15 @@
 #ifndef MODULES_LOCALIZATION_MSF_EXTRACT_GROUND_PLANE_H_
 #define MODULES_LOCALIZATION_MSF_EXTRACT_GROUND_PLANE_H_
 
-#include <pcl/sample_consensus/ransac.h>
-#include <pcl/sample_consensus/sac_model_plane.h>
-#include <pcl/sample_consensus/impl/ransac.hpp>
-#include <pcl/sample_consensus/impl/sac_model_plane.hpp>
 #include <cmath>
 #include <map>
 #include <vector>
+
+#include "pcl/sample_consensus/impl/ransac.hpp"
+#include "pcl/sample_consensus/impl/sac_model_plane.hpp"
+#include "pcl/sample_consensus/ransac.h"
+#include "pcl/sample_consensus/sac_model_plane.h"
+
 #include "modules/localization/msf/common/util/voxel_grid_covariance_hdmap.h"
 
 namespace apollo {
@@ -205,7 +207,6 @@ class FeatureXYPlane {
   // parameters
   double min_grid_size_;
   double max_grid_size_;
-  double plane_inlier_percent_;
   double plane_inlier_distance_;
   int min_planepoints_number_;
   double plane_type_degree_;

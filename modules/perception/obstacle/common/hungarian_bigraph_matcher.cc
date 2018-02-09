@@ -32,8 +32,6 @@ HungarianOptimizer::HungarianOptimizer(
       stars_in_col_(),
       preimage_(),
       image_(),
-      zero_col_(0),
-      zero_row_(0),
       width_(0),
       height_(0),
       state_(NULL) {
