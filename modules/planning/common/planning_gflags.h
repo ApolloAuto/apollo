@@ -198,7 +198,6 @@ DECLARE_double(lattice_epsilon);
 DECLARE_int32(num_lattice_traj_to_plot);
 DECLARE_double(default_cruise_speed);
 DECLARE_double(spiral_downsample_curvature_thred);
-DECLARE_bool(enable_sample_bound_planning);
 DECLARE_bool(enable_lattice_st_image_dump);
 DECLARE_bool(enable_auto_tuning);
 DECLARE_double(trajectory_time_resolution);
@@ -206,7 +205,6 @@ DECLARE_double(trajectory_space_resolution);
 DECLARE_double(lateral_acceleration_bound);
 DECLARE_double(collision_buffer_expansion_ratio);
 DECLARE_double(decision_horizon);
-DECLARE_double(lateral_obstacle_ignore_thred);
 DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);
 
