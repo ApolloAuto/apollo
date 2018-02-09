@@ -3,7 +3,7 @@ import PARAMETERS from "store/config/parameters.yml";
 
 import OfflinePlaybackWebSocketEndpoint from "store/websocket/websocket_offline";
 import RealtimeWebSocketEndpoint from "store/websocket/websocket_realtime";
-import MapWebSocketEndpoint from "store/websocket/websocket_map";
+import MapDataWebSocketEndpoint from "store/websocket/websocket_map";
 
 // Returns the websocket server address based on the web server address.
 // Follows the convention that the websocket is served on the same host
@@ -43,4 +43,4 @@ const mapServerAddr =
   process.env.NODE_ENV === "production"
     ? deduceWebsocketServerAddr("map")
     : `ws://${devConfig.mapWebsocketServer}`;
-export const MAP_WS = new MapWebSocketEndpoint(mapServerAddr);
+export const MAP_WS = new MapDataWebSocketEndpoint(mapServerAddr);
