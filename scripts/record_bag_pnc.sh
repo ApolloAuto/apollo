@@ -69,6 +69,7 @@ function start() {
         /apollo/canbus/chassis_detail \
         /apollo/control \
         /apollo/control/pad \
+        /apollo/navigation \
         /apollo/perception/obstacles \
         /apollo/perception/traffic_light \
         /apollo/planning \
