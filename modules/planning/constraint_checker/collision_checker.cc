@@ -106,23 +106,20 @@ void CollisionChecker::BuildPredictedEnv(
 
 bool CollisionChecker::IgnoreObstaclesBehind(
     const std::array<double, 3>& adc_init_d) {
-  bool ignore = false;
-  if (std::abs(adc_init_d[0]) < FLAGS_lateral_obstacle_ignore_thred) {
-    ignore = true;
-  }
-  return ignore;
+  return std::abs(adc_init_d[0]) < FLAGS_default_reference_line_width * 0.5;
 }
 
 bool CollisionChecker::IsBehind(
     const Obstacle* obstacle,
     const std::array<double, 3>& adc_init_s,
     const std::vector<PathPoint>& discretized_reference_line) {
+  double half_lane_width = FLAGS_default_reference_line_width * 0.5;
   TrajectoryPoint point = obstacle->GetPointAtTime(0.0);
   std::pair<double, double> sl_point =
       ReferenceLineFrameConverter::CartesianToFrenet(discretized_reference_line,
           point.path_point().x(), point.path_point().y());
   if (sl_point.first < adc_init_s[0] &&
-      std::abs(sl_point.second) < FLAGS_lateral_obstacle_ignore_thred) {
+      std::abs(sl_point.second) < half_lane_width) {
     ADEBUG << "Ignore obstacle [" << obstacle->Id() << "]";
     return true;
   }

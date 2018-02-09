@@ -381,11 +381,10 @@ DEFINE_int32(num_lattice_traj_to_plot, 5,
 DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
 DEFINE_double(spiral_downsample_curvature_thred, 0.02,
               "curvature threshold for down sampling reference line points");
-DEFINE_bool(enable_sample_bound_planning, true,
-            "enable SampleBound based motion planning");
 DEFINE_bool(enable_lattice_st_image_dump, false,
             "enable sending the lattice st image");
 DEFINE_bool(enable_auto_tuning, false, "enable auto tuning data emission");
+
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
@@ -395,9 +394,6 @@ DEFINE_double(collision_buffer_expansion_ratio, 0.2,
               "to expand in collision checking");
 DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
-DEFINE_double(lateral_obstacle_ignore_thred, 2.0,
-              "Lateral threshold for "
-              "obstacles to be considered in path-time graph");
 DEFINE_bool(enable_backup_trajectory, false,
             "If generate backup trajectory when planning fail");
 DEFINE_double(backup_trajectory_cost, 1000.0,
