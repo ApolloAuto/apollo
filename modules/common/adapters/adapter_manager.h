@@ -271,6 +271,7 @@ class AdapterManager {
   REGISTER_ADAPTER(LocalizationMsfSinsPva);
   REGISTER_ADAPTER(LocalizationMsfStatus);
   REGISTER_ADAPTER(DriveEvent);
+  REGISTER_ADAPTER(RelativeMap);
 
   DECLARE_SINGLETON(AdapterManager);
 };
