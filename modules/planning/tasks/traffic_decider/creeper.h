@@ -36,7 +36,7 @@ class Creeper {
   bool Run(Frame* frame, ReferenceLineInfo* reference_line_info);
 
  private:
-  bool AddStopDecision(const hdmap::PathOverlap& overlap,
+  bool BuildStopDecision(const hdmap::PathOverlap& overlap,
                        const double stop_buffer,
                        const double max_creeping_target_distance, Frame* frame,
                        ReferenceLineInfo* reference_line_info);
