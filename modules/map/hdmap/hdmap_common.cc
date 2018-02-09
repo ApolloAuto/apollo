@@ -32,7 +32,7 @@ using apollo::common::PointENU;
 using apollo::common::math::Vec2d;
 
 // Minimum error in lane segmentation.
-const double kSegmentationEpsilon = 0.2;
+// const double kSegmentationEpsilon = 0.2;
 
 // Minimum distance to remove duplicated points.
 const double kDuplicatedPointsEpsilon = 1e-7;
@@ -41,7 +41,7 @@ const double kDuplicatedPointsEpsilon = 1e-7;
 const double kEpsilon = 0.1;
 
 // Maximum x-coordinate of utm
-const double kMaxXCoordinate = 834000;
+// const double kMaxXCoordinate = 834000;
 // Minimum x-coordinate of utm
 const double kMinXCoordinate = 166000;
 // Maximum y-coordinate of utm
@@ -255,7 +255,7 @@ double LaneInfo::GetEffectiveWidth(const double s) const {
 }
 
 void LaneInfo::GetRoadWidth(const double s, double *left_width,
-                        double *right_width) const {
+                            double *right_width) const {
   if (left_width != nullptr) {
     *left_width = GetWidthFromSample(sampled_left_road_width_, s);
   }

@@ -35,7 +35,7 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-class ImageLights;
+struct ImageLights;
 class TLPreprocessingData;
 class TLProcData;
 
