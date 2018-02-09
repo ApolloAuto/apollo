@@ -75,6 +75,7 @@ class SimulationWorldServiceTest : public ::testing::Test {
   SimulationWorldServiceTest() {
     FLAGS_map_dir = "modules/dreamview/backend/testdata";
     FLAGS_base_map_filename = "garage.bin";
+    FLAGS_sim_world_with_routing_path = true;
     map_service_.reset(new MapService(false));
   }
 

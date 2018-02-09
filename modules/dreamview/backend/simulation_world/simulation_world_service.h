@@ -25,6 +25,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "gtest/gtest_prod.h"
 
