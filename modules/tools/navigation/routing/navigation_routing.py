@@ -32,6 +32,7 @@ from shapely.geometry import LineString, Point
 from numpy.polynomial.polynomial import polyval
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
+from modules.planning.proto import planning_internal_pb2
 from modules.drivers.proto import mobileye_pb2
 
 # pip install -U flask-cors
@@ -56,8 +57,44 @@ projector = pyproj.Proj(proj='utm', zone=10, ellps='WGS84')
 def add_listener():
     global routing_pub
     rospy.init_node("navigation_map_routing", anonymous=True)
-    routing_pub = rospy.Publisher('/apollo/navigation/routing',
+    routing_pub = rospy.Publisher('/apollo/navigation',
                                   String, queue_size=1)
+
+
+@app.route('/routing', methods=["POST", "GET"])
+def navigation():
+    request_json = request.json
+    if "start_lat" not in request_json:
+        return jsonify([])
+    if "start_lon" not in request_json:
+        return jsonify([])
+    if "end_lat" not in request_json:
+        return jsonify([])
+    if "end_lon" not in request_json:
+        return jsonify([])
+    start_latlon = str(request_json["start_lat"]) + "," + \
+                   str(request_json["start_lon"])
+    end_latlon = str(request_json["end_lat"]) + "," + \
+                 str(request_json["end_lon"])
+    url = "http://navi-env.axty8vi3ic.us-west-2." \
+          "elasticbeanstalk.com/dreamview/navigation?origin=" + \
+          start_latlon + "&destination=" + end_latlon + "&heading=0"
+
+    res = requests.get(url)
+    if res.status_code != 200:
+        return jsonify([])
+    # send to ros
+    routing_pub.publish(res.content)
+    navigation_info = planning_internal_pb2.NavigationInfo()
+    navigation_info.ParseFromString(res.content)
+    # send to browser
+    latlon_path = []
+    for path in navigation_info.navigation_path:
+        for point in path.path_point:
+            lons, lats = projector(point.x, point.y, inverse=True)
+            latlon_path.append({'lat': lats, 'lng': lons})
+    latlon_path[0]['human'] = True
+    return jsonify(latlon_path)
 
 
 def request_routing(request_json):
@@ -86,20 +123,6 @@ def request_routing(request_json):
         return None
     steps = response['routes'][0]['legs'][0]['steps']
     return steps
-
-
-@app.route('/routing', methods=["POST", "GET"])
-def routing():
-    request_json = request.json
-    steps = request_routing(request_json)
-    if steps is None:
-        routing_pub.publish(json.dumps([]))
-        return jsonify([])
-
-    latlon_path, utm_steps = get_latlon_and_utm_path(steps)
-
-    routing_pub.publish(json.dumps(utm_steps))
-    return jsonify(latlon_path)
 
 
 def get_latlon_and_utm_path(steps):
@@ -260,6 +283,29 @@ def match_drive_data(p_start, p_end):
                 return line_revloop
 
     return None
+
+
+@app.route('/routing/deprecated', methods=["POST", "GET"])
+def routing():
+    request_json = request.json
+    if "start_lat" not in request_json:
+        return jsonify([])
+    if "start_lon" not in request_json:
+        return jsonify([])
+    if "end_lat" not in request_json:
+        return jsonify([])
+    if "end_lon" not in request_json:
+        return jsonify([])
+
+    steps = request_routing(request_json)
+    if steps is None:
+        routing_pub.publish(json.dumps([]))
+        return jsonify([])
+
+    latlon_path, utm_steps = get_latlon_and_utm_path(steps)
+
+    routing_pub.publish(json.dumps(utm_steps))
+    return jsonify(latlon_path)
 
 
 def run_flask():
