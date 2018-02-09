@@ -700,17 +700,17 @@ bool StopSign::BuildStopDecision(
   }
 
   // create virtual stop wall
-  std::string virtual_object_id =
-      FLAGS_stop_sign_virtual_object_id_prefix + overlap->object_id;
-  auto* obstacle = frame->AddVirtualStopObstacle(
-      reference_line_info, virtual_object_id, overlap->start_s);
+  std::string virtual_obstacle_id =
+      FLAGS_stop_sign_virtual_obstacle_id_prefix + overlap->object_id;
+  auto* obstacle = frame->CreateVirtualStopObstacle(
+      reference_line_info, virtual_obstacle_id, overlap->start_s);
   if (!obstacle) {
-    AERROR << "Failed to create obstacle [" << virtual_object_id << "]";
+    AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
     return false;
   }
   PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for: " << virtual_object_id;
+    AERROR << "Failed to create path_obstacle for: " << virtual_obstacle_id;
     return false;
   }
 

@@ -47,11 +47,12 @@ bool KeepClear::ApplyRule(Frame* const frame,
   const std::vector<PathOverlap>& keep_clear_overlaps =
       reference_line_info->reference_line().map_path().clear_area_overlaps();
   for (const auto& keep_clear_overlap : keep_clear_overlaps) {
-    const auto obstacle_id = FLAGS_keep_clear_virtual_object_id_prefix +
-                             keep_clear_overlap.object_id;
-    if (BuildKeepClearObstacle(frame, reference_line_info,
-                               const_cast<PathOverlap*>(&keep_clear_overlap),
-                               obstacle_id)) {
+    const auto obstacle_id = FLAGS_keep_clear_virtual_obstacle_id_prefix +
+        keep_clear_overlap.object_id;
+    if (BuildKeepClearObstacle(
+        frame, reference_line_info,
+        const_cast<PathOverlap*>(&keep_clear_overlap),
+        obstacle_id)) {
       ADEBUG << "KEEP_CLAER for keep_clear_zone["
              << keep_clear_overlap.object_id << "] s["
              << keep_clear_overlap.start_s << ", " << keep_clear_overlap.end_s
@@ -64,7 +65,7 @@ bool KeepClear::ApplyRule(Frame* const frame,
       reference_line_info->reference_line().map_path().junction_overlaps();
   for (const auto& junction_overlap : junction_overlaps) {
     const auto obstacle_id =
-        FLAGS_keep_clear_junction_virtual_object_id_prefix +
+        FLAGS_keep_clear_junction_virtual_obstacle_id_prefix +
         junction_overlap.object_id;
     if (BuildKeepClearObstacle(frame, reference_line_info,
                                const_cast<PathOverlap*>(&junction_overlap),
@@ -86,6 +87,7 @@ bool KeepClear::BuildKeepClearObstacle(
   CHECK_NOTNULL(reference_line_info);
   CHECK_NOTNULL(keep_clear_overlap);
 
+  // check
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   if (adc_front_edge_s - keep_clear_overlap->start_s >
       FLAGS_keep_clear_min_pass_distance) {
@@ -96,42 +98,13 @@ bool KeepClear::BuildKeepClearObstacle(
     return false;
   }
 
-  // start_xy
-  common::SLPoint sl_point;
-  sl_point.set_s(keep_clear_overlap->start_s);
-  sl_point.set_l(0.0);
-  common::math::Vec2d start_xy;
-  const auto& reference_line = reference_line_info->reference_line();
-  if (!reference_line.SLToXY(sl_point, &start_xy)) {
-    AERROR << "Failed to get start_xy from sl: " << sl_point.DebugString();
-    return false;
-  }
-
-  // end_xy
-  sl_point.set_s(keep_clear_overlap->end_s);
-  sl_point.set_l(0.0);
-  common::math::Vec2d end_xy;
-  if (!reference_line.SLToXY(sl_point, &end_xy)) {
-    AERROR << "Failed to get end_xy from sl: " << sl_point.DebugString();
-    return false;
-  }
-
-  double left_lane_width = 0.0;
-  double right_lane_width = 0.0;
-  if (!reference_line.GetLaneWidth(keep_clear_overlap->start_s,
-                                   &left_lane_width, &right_lane_width)) {
-    AERROR << "Failed to get lane width at s[" << keep_clear_overlap->start_s
-           << "]";
-    return false;
-  }
-
-  common::math::Box2d keep_clear_box{
-      common::math::LineSegment2d(start_xy, end_xy),
-      left_lane_width + right_lane_width};
-  auto* obstacle =
-      frame->AddStaticVirtualObstacle(virtual_obstacle_id, keep_clear_box);
+  // create virtual static obstacle
+  auto* obstacle = frame->CreateStaticObstacle(
+      reference_line_info, virtual_obstacle_id,
+      keep_clear_overlap->start_s,
+      keep_clear_overlap->end_s);
   if (!obstacle) {
-    AERROR << "Failed to create obstacle: " << virtual_obstacle_id;
+    AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
     return false;
   }
   auto* path_obstacle = reference_line_info->AddObstacle(obstacle);
