@@ -43,8 +43,8 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
                                                bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
-      map_ws_(map_ws),
       websocket_(websocket),
+      map_ws_(map_ws),
       sim_control_(sim_control) {
   RegisterMessageHandlers();
 }
