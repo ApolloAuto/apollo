@@ -41,3 +41,6 @@ DEFINE_bool(use_ros_time, false,
 DEFINE_string(localization_tf2_frame_id, "world", "the tf2 transform frame id");
 DEFINE_string(localization_tf2_child_frame_id, "localization",
               "the tf2 transform child frame id");
+
+DEFINE_bool(use_navigation_mode, false,
+            "Use relative position in navigation mode");
