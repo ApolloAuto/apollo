@@ -60,7 +60,7 @@ DEFINE_string(ssl_certificate, "",
               "be in PEM format, and it must have both, private key and "
               "certificate");
 
-DEFINE_double(sim_map_radius, 300.0,
+DEFINE_double(sim_map_radius, 200.0,
               "The radius within which Dreamview will find all the map "
               "elements around the car.");
 

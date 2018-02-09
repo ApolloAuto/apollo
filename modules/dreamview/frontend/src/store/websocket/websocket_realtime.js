@@ -14,7 +14,7 @@ export default class RosWebSocketEndpoint {
         this.lastSeqNum = -1;
         this.currMapRadius = null;
         this.updatePOI = true;
-        this.routingTime = -1;
+        this.routingTime = undefined;
     }
 
     initialize() {
