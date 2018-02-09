@@ -40,11 +40,10 @@ class KeepClear : public TrafficRule {
                  ReferenceLineInfo* const reference_line_info);
 
  private:
-  bool BuildKeepClearObstacle(
-      Frame* const frame,
-      ReferenceLineInfo* const reference_line_info,
-      hdmap::PathOverlap* const keep_clear_overlap,
-      const std::string& virtual_obstacle_id);
+  bool BuildKeepClearObstacle(Frame* const frame,
+                              ReferenceLineInfo* const reference_line_info,
+                              hdmap::PathOverlap* const keep_clear_overlap,
+                              const std::string& virtual_obstacle_id);
 };
 
 }  // namespace planning

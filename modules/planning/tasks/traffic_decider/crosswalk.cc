@@ -127,7 +127,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
           {perception_obstacle.position().x(),
            perception_obstacle.position().y()},
           &obstacle_sl_point);
-      double obstacle_l = std::fabs(obstacle_sl_point.l());
+      double obstacle_l_distance = std::fabs(obstacle_sl_point.l());
 
       const Box2d obstacle_box =
           path_obstacle->obstacle()->PerceptionBoundingBox();
@@ -137,15 +137,16 @@ void Crosswalk::MakeDecisions(Frame* const frame,
           !path_obstacle->reference_line_st_boundary().IsEmpty();
 
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-             << "] crosswalk_id[" << crosswalk_id << "] obstacle_l["
-             << obstacle_l << "] within_crosswalk_area[" << in_crosswalk
+             << "] crosswalk_id[" << crosswalk_id
+             << "] obstacle_l[" << obstacle_sl_point.l()
+             << "] within_crosswalk_area[" << in_crosswalk
              << "] within_expanded_crosswalk_area[" << in_expanded_crosswalk
              << "] is_on_road[" << is_on_road << "] is_path_cross["
              << is_path_cross << "]";
 
       bool stop = false;
-      if (obstacle_l >= FLAGS_crosswalk_loose_l_distance) {
-        // (1) when obstacle_l is big enough(>= loose_l_distance),
+      if (obstacle_l_distance >= FLAGS_crosswalk_loose_l_distance) {
+        // (1) when obstacle_l_distance is big enough(>= loose_l_distance),
         //     STOP only if path crosses
         if (is_path_cross) {
           stop = true;
@@ -153,7 +154,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
                  << obstacle_type_name << "] crosswalk_id[" << crosswalk_id
                  << "]";
         }
-      } else if (obstacle_l <= FLAGS_crosswalk_strick_l_distance) {
+      } else if (obstacle_l_distance <= FLAGS_crosswalk_strick_l_distance) {
         // (2) when l_distance <= strick_l_distance + on_road(not on sideway),
         //     always STOP
         // (3) when l_distance <= strick_l_distance + not on_road(on sideway),
@@ -222,17 +223,17 @@ bool Crosswalk::BuildStopDecision(Frame* const frame,
   }
 
   // create virtual stop wall
-  std::string virtual_object_id =
-      FLAGS_crosswalk_virtual_object_id_prefix + crosswalk_overlap->object_id;
-  auto* obstacle = frame->AddVirtualStopObstacle(
-      reference_line_info, virtual_object_id, crosswalk_overlap->start_s);
+  std::string virtual_obstacle_id =
+      FLAGS_crosswalk_virtual_obstacle_id_prefix + crosswalk_overlap->object_id;
+  auto* obstacle = frame->CreateVirtualStopObstacle(
+      reference_line_info, virtual_obstacle_id, crosswalk_overlap->start_s);
   if (!obstacle) {
-    AERROR << "Failed to create obstacle[" << virtual_object_id << "]";
+    AERROR << "Failed to create obstacle[" << virtual_obstacle_id << "]";
     return false;
   }
   PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for: " << virtual_object_id;
+    AERROR << "Failed to create path_obstacle for: " << virtual_obstacle_id;
     return false;
   }
 
