@@ -123,10 +123,10 @@ class SimulationWorldUpdater {
 
   ros::Timer timer_;
   SimulationWorldService sim_world_service_;
-  const MapService *map_service_;
-  WebSocketHandler *websocket_;
-  WebSocketHandler *map_ws_;
-  SimControl *sim_control_;
+  const MapService *map_service_ = nullptr;
+  WebSocketHandler *websocket_ = nullptr;
+  WebSocketHandler *map_ws_ = nullptr;
+  SimControl *sim_control_ = nullptr;
 
   // End point for requesting default route
   apollo::routing::POI poi_;

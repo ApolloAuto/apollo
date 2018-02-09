@@ -16,10 +16,10 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track_object_distance.h"
 
-#include <limits>
-#include <utility>
-#include <map>
 #include <algorithm>
+#include <limits>
+#include <map>
+#include <utility>
 #include "Eigen/StdVector"
 #include "boost/format.hpp"
 #include "modules/common/log.h"
@@ -198,7 +198,7 @@ bool PbfTrackObjectDistance::ComputePolygonCenter(
   nu = std::min(nu, size);
   int count = 0;
   std::map<double, int>::iterator it = distance2idx.begin();
-  for (; it != distance2idx.end(), count < nu; ++it, ++count) {
+  for (; it != distance2idx.end() && count < nu; ++it, ++count) {
     polygon_part.push_back(polygon[it->second]);
   }
   bool state = ComputePolygonCenter(polygon_part, center);

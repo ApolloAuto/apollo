@@ -197,8 +197,7 @@ bool Frame::CreateReferenceLineInfo() {
  */
 const Obstacle *Frame::CreateVirtualStopObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id,
-    const double obstacle_s) {
+    const std::string &obstacle_id, const double obstacle_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
     return nullptr;
@@ -222,8 +221,7 @@ const Obstacle *Frame::CreateVirtualStopObstacle(
  */
 const Obstacle *Frame::CreateStaticObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id,
-    const double obstacle_start_s,
+    const std::string &obstacle_id, const double obstacle_start_s,
     const double obstacle_end_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
@@ -239,7 +237,7 @@ const Obstacle *Frame::CreateStaticObstacle(
   common::math::Vec2d obstacle_start_xy;
   if (!reference_line.SLToXY(sl_point, &obstacle_start_xy)) {
     AERROR << "Failed to get start_xy from sl: " << sl_point.DebugString();
-    return false;
+    return nullptr;
   }
 
   // end_xy
@@ -248,15 +246,15 @@ const Obstacle *Frame::CreateStaticObstacle(
   common::math::Vec2d obstacle_end_xy;
   if (!reference_line.SLToXY(sl_point, &obstacle_end_xy)) {
     AERROR << "Failed to get end_xy from sl: " << sl_point.DebugString();
-    return false;
+    return nullptr;
   }
 
   double left_lane_width = 0.0;
   double right_lane_width = 0.0;
-  if (!reference_line.GetLaneWidth(obstacle_start_s,
-                                   &left_lane_width, &right_lane_width)) {
+  if (!reference_line.GetLaneWidth(obstacle_start_s, &left_lane_width,
+                                   &right_lane_width)) {
     AERROR << "Failed to get lane width at s[" << obstacle_start_s << "]";
-    return false;
+    return nullptr;
   }
 
   common::math::Box2d obstacle_box{
@@ -266,9 +264,8 @@ const Obstacle *Frame::CreateStaticObstacle(
   return CreateStaticVirtualObstacle(obstacle_id, obstacle_box);
 }
 
-const Obstacle *Frame::CreateStaticVirtualObstacle(
-    const std::string &id,
-    const Box2d &box) {
+const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
+                                                   const Box2d &box) {
   const auto *object = obstacles_.Find(id);
   if (object) {
     AWARN << "obstacle " << id << " already exist.";
@@ -392,7 +389,9 @@ const Obstacle *Frame::FindCollisionObstacle() const {
   return nullptr;
 }
 
-uint32_t Frame::SequenceNum() const { return sequence_num_; }
+uint32_t Frame::SequenceNum() const {
+  return sequence_num_;
+}
 
 std::string Frame::DebugString() const {
   return "Frame: " + std::to_string(sequence_num_);
@@ -448,7 +447,9 @@ void Frame::AlignPredictionTime(const double planning_start_time,
   }
 }
 
-Obstacle *Frame::Find(const std::string &id) { return obstacles_.Find(id); }
+Obstacle *Frame::Find(const std::string &id) {
+  return obstacles_.Find(id);
+}
 
 void Frame::AddObstacle(const Obstacle &obstacle) {
   obstacles_.Add(obstacle.Id(), obstacle);
