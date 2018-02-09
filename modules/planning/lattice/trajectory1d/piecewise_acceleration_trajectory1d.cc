@@ -157,7 +157,7 @@ std::array<double, 4> ConstantAccelerationTrajectory1d::Evaluate(
   double a = a_[index - 1];
   double j = 0.0;
 
-  return {s, v, a, j};
+  return {{s, v, a, j}};
 }
 
 }  // namespace planning
