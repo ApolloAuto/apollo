@@ -85,6 +85,24 @@ void ExtractOverlapIds(const std::vector<StopSignInfoConstPtr> &items,
   std::sort(ids->begin(), ids->end());
 }
 
+void ExtractRoadAndLaneIds(const std::vector<LaneInfoConstPtr> &lanes,
+                           RepeatedPtrField<std::string> *lane_ids,
+                           RepeatedPtrField<std::string> *road_ids) {
+  lane_ids->Reserve(lanes.size());
+  road_ids->Reserve(lanes.size());
+
+  for (const auto &lane : lanes) {
+    lane_ids->Add()->assign(lane->id().id());
+    if (!lane->road_id().id().empty()) {
+      road_ids->Add()->assign(lane->road_id().id());
+    }
+  }
+  // The output is sorted so that the calculated hash will be
+  // invariant to the order of elements.
+  std::sort(lane_ids->begin(), lane_ids->end());
+  std::sort(road_ids->begin(), road_ids->end());
+}
+
 }  // namespace
 
 MapService::MapService(bool use_sim_map) : use_sim_map_(use_sim_map) {
@@ -168,7 +186,7 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
   if (sim_map_->GetLanes(point, radius, &lanes) != 0) {
     AERROR << "Fail to get lanes from sim_map.";
   }
-  ExtractIds(lanes, ids->mutable_lane());
+  ExtractRoadAndLaneIds(lanes, ids->mutable_lane(), ids->mutable_road());
 
   std::vector<ClearAreaInfoConstPtr> clear_areas;
   if (sim_map_->GetClearAreas(point, radius, &clear_areas) != 0) {
@@ -208,12 +226,6 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
     AERROR << "Failed to get yield signs from sim_map.";
   }
   ExtractIds(yield_signs, ids->mutable_yield());
-
-  std::vector<RoadInfoConstPtr> roads;
-  if (sim_map_->GetRoads(point, radius, &roads) != 0) {
-    AERROR << "Failed to get roads from sim_map.";
-  }
-  ExtractIds(roads, ids->mutable_road());
 }
 
 Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
