@@ -843,8 +843,6 @@ void SimulationWorldService::UpdateSimulationWorld(
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const RoutingResponse &routing_response) {
-  auto header_time = routing_response.header().timestamp_sec();
-
   std::vector<Path> paths;
   if (!map_service_->GetPathsFromRouting(routing_response, &paths)) {
     return;
@@ -852,7 +850,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   world_.clear_route_path();
   route_paths_.clear();
-  world_.set_routing_time(header_time);
+  world_.set_routing_time(routing_response.header().timestamp_sec());
 
   for (const Path &path : paths) {
     // Downsample the path points for frontend display.
