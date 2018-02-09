@@ -27,6 +27,7 @@ cc_library(
         "//modules/common:macro",
         "//modules/common:log",
         "@eigen//:eigen",
+        "@gtest//:gtest",
     ],
 )
 
