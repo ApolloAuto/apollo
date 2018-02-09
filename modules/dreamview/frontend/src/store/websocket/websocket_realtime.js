@@ -14,6 +14,7 @@ export default class RosWebSocketEndpoint {
         this.lastSeqNum = -1;
         this.currMapRadius = null;
         this.updatePOI = true;
+        this.routingTime = undefined;
     }
 
     initialize() {
@@ -71,6 +72,11 @@ export default class RosWebSocketEndpoint {
                         RENDERER.updateMapIndex(message.mapHash,
                             message.mapElementIds, message.mapRadius);
                     }
+                    if (this.routingTime !== message.routingTime) {
+                        // A new routing needs to be fetched from backend.
+                        this.requestRoutePath();
+                        this.routingTime = message.routingTime;
+                    }
                     this.counter += 1;
                     break;
                 case "MapElementIds":
@@ -79,6 +85,9 @@ export default class RosWebSocketEndpoint {
                     break;
                 case "DefaultEndPoint":
                     STORE.routeEditingManager.updateDefaultRoutingEndPoint(message);
+                    break;
+                case "RoutePath":
+                    RENDERER.updateRouting(message.routingTime, message.routePath);
                     break;
             }
         };
@@ -219,6 +228,12 @@ export default class RosWebSocketEndpoint {
         this.websocket.send(JSON.stringify({
             type: "ToggleSimControl",
             enable: enable,
+        }));
+    }
+
+    requestRoutePath() {
+        this.websocket.send(JSON.stringify({
+            type: "RequestRoutePath",
         }));
     }
 }

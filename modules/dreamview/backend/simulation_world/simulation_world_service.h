@@ -25,6 +25,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "gtest/gtest_prod.h"
 
@@ -134,7 +135,9 @@ class SimulationWorldService {
     buffer.AddMonitorMsgItem(log_level, msg);
   }
 
-  void GetMapElementIds(double radius, MapElementIds *ids);
+  void GetMapElementIds(double radius, MapElementIds *ids) const;
+
+  nlohmann::json GetRoutePathAsJson() const;
 
  private:
   /**
@@ -198,6 +201,9 @@ class SimulationWorldService {
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
   SimulationWorld world_;
+
+  // Downsampled route paths to be rendered in frontend.
+  std::vector<RoutePath> route_paths_;
 
   // The handle of MapService, not owned by SimulationWorldService.
   const MapService *map_service_;

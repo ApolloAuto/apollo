@@ -873,9 +873,12 @@ int HDMapImpl::SearchObjects(const Vec2d& center, const double radius,
   }
   auto objects = kdtree.GetObjects(center, radius);
   std::unordered_set<std::string> result_ids;
+  result_ids.reserve(objects.size());
   for (const auto* object_ptr : objects) {
     result_ids.insert(object_ptr->object()->id().id());
   }
+
+  results->reserve(result_ids.size());
   results->assign(result_ids.begin(), result_ids.end());
   return 0;
 }
