@@ -1,9 +1,7 @@
 import STORE from "store";
 import RENDERER from "renderer";
 
-const protobuf = require("protobufjs/light");
-const root = protobuf.Root.fromJSON(require("../../../proto_bundle/sim_world_proto_bundle.json"));
-const SimWorldMessage = root.lookupType("apollo.dreamview.SimulationWorld");
+const Worker = require('worker-loader!utils/webworker.js');
 
 export default class RosWebSocketEndpoint {
     constructor(serverAddr) {
@@ -15,6 +13,7 @@ export default class RosWebSocketEndpoint {
         this.currMapRadius = null;
         this.updatePOI = true;
         this.routingTime = undefined;
+        this.worker = new Worker();
     }
 
     initialize() {
@@ -30,16 +29,13 @@ export default class RosWebSocketEndpoint {
             return;
         }
         this.websocket.onmessage = event => {
-            let message = null;
-            if (typeof event.data === "string") {
-                message = JSON.parse(event.data);
-            } else {
-                message = SimWorldMessage.toObject(
-                        SimWorldMessage.decode(new Uint8Array(event.data)),
-                        {enums: String});
-                message.type = "SimWorldUpdate";
-            }
-
+            this.worker.postMessage({
+                source: 'realtime',
+                data: event.data,
+            });
+        };
+        this.worker.onmessage = event => {
+            const message = event.data;
             switch (message.type) {
                 case "HMIConfig":
                     STORE.hmi.initialize(message.data);
