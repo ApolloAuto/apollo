@@ -77,7 +77,7 @@ class TrajectoryEvaluator {
   double Evaluate(const PlanningTarget& planning_target,
                   const std::shared_ptr<Curve1d>& lon_trajectory,
                   const std::shared_ptr<Curve1d>& lat_trajectory,
-                  std::vector<double>* cost_components) const;
+                  std::vector<double>* cost_components = nullptr) const;
 
   double LatOffsetCost(const std::shared_ptr<Curve1d>& lat_trajectory,
                        const std::vector<double>& s_values) const;
@@ -119,6 +119,8 @@ class TrajectoryEvaluator {
   bool is_auto_tuning_ = false;
 
   std::shared_ptr<PathTimeNeighborhood> pathtime_neighborhood_;
+
+  std::vector<std::vector<std::pair<double, double>>> path_time_intervals_;
 };
 
 }  // namespace planning

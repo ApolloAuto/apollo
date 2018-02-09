@@ -42,6 +42,12 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     std::shared_ptr<PathTimeNeighborhood> pathtime_neighborhood)
     : is_auto_tuning_(is_auto_tuning),
       pathtime_neighborhood_(pathtime_neighborhood) {
+
+  double start_time = 0.0;
+  double end_time = FLAGS_trajectory_time_length;
+  path_time_intervals_ = pathtime_neighborhood_->GetPathBlockingIntervals(
+      start_time, end_time, FLAGS_trajectory_time_resolution);
+
   for (const auto lon_trajectory : lon_trajectories) {
     if (!ConstraintChecker1d::IsValidLongitudinalTrajectory(*lon_trajectory)) {
       continue;
@@ -53,7 +59,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(
       }
       if (!is_auto_tuning_) {
         double cost =
-            Evaluate(planning_target, lon_trajectory, lat_trajectory, nullptr);
+            Evaluate(planning_target, lon_trajectory, lat_trajectory);
         cost_queue_.push(PairCost({lon_trajectory, lat_trajectory}, cost));
       } else {
         std::vector<double> cost_components;
@@ -143,7 +149,7 @@ double TrajectoryEvaluator::Evaluate(
   double lat_offset_cost = LatOffsetCost(lat_trajectory, s_values);
   double lat_comfort_cost = LatComfortCost(lon_trajectory, lat_trajectory);
 
-  if (cost_components) {
+  if (cost_components != nullptr) {
     cost_components->push_back(lon_travel_cost);
     cost_components->push_back(lon_jerk_cost);
     cost_components->push_back(lon_collision_cost);
@@ -236,35 +242,27 @@ double TrajectoryEvaluator::LonObjectiveCost(
 // while constructing trajectory evaluator
 double TrajectoryEvaluator::LonCollisionCost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory) const {
-  double start_time = 0.0;
-  double end_time = FLAGS_trajectory_time_length;
-  const auto& pt_intervals = pathtime_neighborhood_->GetPathBlockingIntervals(
-      start_time, end_time, FLAGS_trajectory_time_resolution);
   double cost_sqr_sum = 0.0;
   double cost_abs_sum = 0.0;
-  for (std::size_t i = 0; i < pt_intervals.size(); ++i) {
-    const auto& pt_interval = pt_intervals[i];
+  for (std::size_t i = 0; i < path_time_intervals_.size(); ++i) {
+    const auto& pt_interval = path_time_intervals_[i];
     if (pt_interval.empty()) {
       continue;
     }
-
-    double t = start_time + i * FLAGS_trajectory_time_resolution;
+    double t = i * FLAGS_trajectory_time_resolution;
     double traj_s = lon_trajectory->Evaluate(0, t);
     double sigma = FLAGS_lon_collision_cost_std;
     for (const auto& m : pt_interval) {
-      double cost = 0.0;
-      if (traj_s > m.first - FLAGS_lon_collision_yield_buffer &&
-          traj_s < m.second + FLAGS_lon_collision_overtake_buffer) {
-        cost = 1.0;
-      } else if (traj_s < m.first) {
-        double dist = (m.first - FLAGS_lon_collision_yield_buffer) - traj_s;
-        cost = std::exp(-dist * dist / (2.0 * sigma * sigma));
-      } else if (traj_s > m.second) {
-        double dist = traj_s - (m.second + FLAGS_lon_collision_overtake_buffer);
-        cost = std::exp(-dist * dist / (2.0 * sigma * sigma));
+      double dist = 0.0;
+      if (traj_s < m.first - FLAGS_lon_collision_yield_buffer) {
+        dist = m.first - FLAGS_lon_collision_yield_buffer - traj_s;
+      } else if (traj_s > m.second + FLAGS_lon_collision_overtake_buffer) {
+        dist = traj_s - m.second - FLAGS_lon_collision_overtake_buffer;
       }
+      double cost = std::exp(-dist * dist / (2.0 * sigma * sigma));
+
       cost_sqr_sum += cost * cost;
-      cost_abs_sum += std::abs(cost);
+      cost_abs_sum += cost;
     }
   }
   return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
