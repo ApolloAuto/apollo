@@ -155,18 +155,19 @@ void TLPreprocessorSubnode::SubLongFocusCamera(const sensor_msgs::Image &msg) {
   AdapterManager::Observe();
   SubCameraImage(AdapterManager::GetImageLong()->GetLatestObservedPtr(),
                  LONG_FOCUS);
+  PERF_FUNCTION("SubLongFocusCamera");
 }
 
 void TLPreprocessorSubnode::SubShortFocusCamera(const sensor_msgs::Image &msg) {
   AdapterManager::Observe();
   SubCameraImage(AdapterManager::GetImageShort()->GetLatestObservedPtr(),
                  SHORT_FOCUS);
+  PERF_FUNCTION("SubShortFocusCamera");
 }
 
 void TLPreprocessorSubnode::SubCameraImage(
     boost::shared_ptr<const sensor_msgs::Image> msg, CameraId camera_id) {
   const double sub_camera_image_start_ts = TimeUtil::GetCurrentTime();
-  PERF_FUNCTION();
   std::shared_ptr<Image> image(new Image);
   cv::Mat cv_mat;
   double timestamp = msg->header.stamp.toSec();

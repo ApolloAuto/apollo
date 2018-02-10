@@ -90,7 +90,7 @@ bool TLProcSubnode::InitInternal() {
 
 bool TLProcSubnode::ProcEvent(const Event &event) {
   const double proc_subnode_handle_event_start_ts = TimeUtil::GetCurrentTime();
-  PERF_FUNCTION();
+  PERF_FUNCTION("TLProcSubnode");
   // get up-stream data
   const double timestamp = event.timestamp;
   const std::string device_id = event.reserve;
