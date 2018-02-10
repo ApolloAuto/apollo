@@ -409,7 +409,7 @@ export default class Map {
                        "clearArea", "signal", "stopSign", "crosswalk"];
         for (const kind of kinds) {
             if (!newData[kind]) {
-                return;
+                continue;
             }
 
             if (!this.data[kind]) {
