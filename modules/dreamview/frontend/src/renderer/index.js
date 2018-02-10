@@ -15,6 +15,7 @@ import Prediction from "renderer/prediction.js";
 import Routing from "renderer/routing.js";
 import RoutingEditor from "renderer/routing_editor.js";
 import Gnss from "renderer/gnss.js";
+import PointCloud from "renderer/point_cloud.js";
 
 const _ = require('lodash');
 
@@ -69,6 +70,8 @@ class Renderer {
 
         // The GNSS/GPS
         this.gnss = new Gnss();
+
+        this.pointCloud = new PointCloud();
 
         // The Performance Monitor
         this.stats = null;
@@ -310,6 +313,11 @@ class Renderer {
             this.scene.add(this.ground.mesh);
         }
 
+        if (this.pointCloud.initialized === false) {
+            this.pointCloud.initialize();
+            this.scene.add(this.pointCloud.points);
+        }
+
         this.adjustCamera(this.adc.mesh, this.options.cameraAngle);
         this.renderer.render(this.scene, this.camera);
     }
@@ -355,6 +363,13 @@ class Renderer {
 
     updateMap(newData) {
         this.map.appendMapData(newData, this.coordinates, this.scene);
+    }
+
+    updatePointCloud(pointCloud) {
+        if (!this.coordinates.isInitialized() || !this.adc.mesh) {
+            return;
+        }
+        this.pointCloud.update(pointCloud, this.adc.mesh);
     }
 
     updateMapIndex(hash, elementIds, radius) {

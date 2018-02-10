@@ -29,6 +29,7 @@
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/handlers/websocket.h"
+#include "modules/dreamview/proto/point_cloud.pb.h"
 #include "sensor_msgs/PointCloud2.h"
 
 /**
@@ -58,18 +59,25 @@ class PointCloudUpdater {
   void Start();
 
  private:
+  static constexpr int kDownsampleRate = 12;
+
   void RegisterMessageHandlers();
 
   void UpdatePointCloud(const sensor_msgs::PointCloud2 &point_cloud);
 
   WebSocketHandler *websocket_;
 
+  bool enabled_ = false;
+
   // The PointCloud to be pushed to frontend.
   std::string point_cloud_str_;
+  PointCloud point_cloud_;
 
   // Mutex to protect concurrent access to point_cloud_str_.
   // NOTE: Use boost until we have std version of rwlock support.
   boost::shared_mutex mutex_;
+
+  double last_receive_time_ = 0.0;
 };
 
 }  // namespace dreamview
