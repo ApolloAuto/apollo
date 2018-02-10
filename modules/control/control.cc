@@ -40,9 +40,7 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-std::string Control::Name() const {
-  return FLAGS_control_node_name;
-}
+std::string Control::Name() const { return FLAGS_control_node_name; }
 
 Status Control::Init() {
   init_time_ = Clock::NowInSeconds();
@@ -74,6 +72,8 @@ Status Control::Init() {
   CHECK(AdapterManager::GetPlanning()) << "Planning is not initialized.";
 
   CHECK(AdapterManager::GetPad()) << "Pad is not initialized.";
+
+  CHECK(AdapterManager::GetMonitor()) << "Monitor is not initialized.";
 
   CHECK(AdapterManager::GetControlCommand())
       << "ControlCommand publisher is not initialized.";
