@@ -16,6 +16,7 @@
 
 #include "modules/perception/obstacle/common/geometry_util.h"
 
+#include <boost/algorithm/string.hpp>
 #include <cfloat>
 #include <fstream>
 #include <string>
@@ -42,16 +43,23 @@ static bool ConstructPointCloud(std::vector<pcl_util::PointCloudPtr>* clouds) {
   std::string point_buf;
   while (cluster_ifs.good()) {
     getline(cluster_ifs, point_buf);
+    std::vector<std::string> point_strs;
+    boost::algorithm::split(point_strs, point_buf,
+                            boost::algorithm::is_any_of(" "));
+    if (point_strs.size() <= 1 || (point_strs.size() - 1) % 4 != 0) {
+      continue;
+    }
     std::stringstream ss;
     ss << point_buf;
     int point_num = 0;
     ss >> point_num;
-    if (point_num <= 0) {
+    int exact_point_num = (point_strs.size() - 1) / 4;
+    if (point_num != exact_point_num) {
       continue;
     }
     uint64_t intensity;
     pcl_util::PointCloudPtr cluster_cloud(new pcl_util::PointCloud);
-    for (int i = 0; i < point_num; ++i) {
+    for (int i = 0; i < exact_point_num; ++i) {
       pcl_util::Point p;
       ss >> p.x >> p.y >> p.z >> intensity;
       p.intensity = static_cast<uint8_t>(intensity);
@@ -68,6 +76,7 @@ class GeometryUtilTest : public testing::Test {
   virtual ~GeometryUtilTest() {}
   void SetUp() {
     ConstructPointCloud(&_clouds);
+    ASSERT_EQ(5, _clouds.size());
     Eigen::Vector3d translation(-0.0189, 1.0061, 1);
     Eigen::Vector4d rotation(0.0099, -0.0029, 0.6989, 0.7151);
     TransAffineToMatrix4(translation, rotation, &_trans_matrix);
