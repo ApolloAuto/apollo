@@ -77,4 +77,5 @@ debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false
   performanceMonitor: false
-
+server:
+  port: 8888
