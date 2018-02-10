@@ -16,6 +16,7 @@
 
 #include "modules/perception/obstacle/common/convex_hullxy.h"
 
+#include <boost/algorithm/string.hpp>
 #include <fstream>
 
 #include "gtest/gtest.h"
@@ -38,16 +39,23 @@ static bool ConstructPointCloud(std::vector<pcl_util::PointCloudPtr>* clouds) {
   std::string point_buf;
   while (cluster_ifs.good()) {
     getline(cluster_ifs, point_buf);
+    std::vector<std::string> point_strs;
+    boost::algorithm::split(point_strs, point_buf,
+                            boost::algorithm::is_any_of(" "));
+    if (point_strs.size() <= 1 || (point_strs.size() - 1) % 4 != 0) {
+      continue;
+    }
     std::stringstream ss;
     ss << point_buf;
     int point_num = 0;
     ss >> point_num;
-    if (point_num <= 0) {
+    int exact_point_num = (point_strs.size() - 1) / 4;
+    if (point_num != exact_point_num) {
       continue;
     }
     uint64_t intensity;
     pcl_util::PointCloudPtr cluster_cloud(new pcl_util::PointCloud);
-    for (int i = 0; i < point_num; ++i) {
+    for (int i = 0; i < exact_point_num; ++i) {
       pcl_util::Point p;
       ss >> p.x >> p.y >> p.z >> intensity;
       p.intensity = static_cast<uint8_t>(intensity);
@@ -61,7 +69,7 @@ static bool ConstructPointCloud(std::vector<pcl_util::PointCloudPtr>* clouds) {
 TEST(ConvexHull2DXYTest, Reconstruct2dxy) {
   std::vector<pcl_util::PointCloudPtr> clouds;
   ConstructPointCloud(&clouds);
-  EXPECT_EQ(5, clouds.size());
+  ASSERT_EQ(5, clouds.size());
   ConvexHull2DXY<pcl_util::Point> convex_hull;
   EXPECT_EQ(convex_hull.getClassName(), "ConvexHull2DXY");
   std::vector<pcl::Vertices> poly_vt;
