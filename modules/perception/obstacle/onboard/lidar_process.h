@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "Eigen/Core"
+#include "gtest/gtest_prod.h"
 #include "sensor_msgs/PointCloud2.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
