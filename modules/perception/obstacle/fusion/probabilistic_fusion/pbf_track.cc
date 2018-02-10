@@ -37,8 +37,8 @@ double PbfTrack::s_min_radar_confident_distance_ = 40;
 // TODO(Perception):
 // static and global variable are NOT allowed to be of class types. See
 // https://google.github.io/styleguide/cppguide.html#Static_and_Global_Variables
-std::string PbfTrack::s_motion_fusion_method_ =  // NOLINT
-    "PbfKalmanMotionFusion";                     // NOLINT
+char *PbfTrack::s_motion_fusion_method_ =
+    const_cast<char *>("PbfKalmanMotionFusion");
 
 bool PbfTrack::s_publish_if_has_lidar_ = true;
 bool PbfTrack::s_publish_if_has_radar_ = true;
@@ -84,7 +84,7 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
 
 void PbfTrack::SetMotionFusionMethod(const std::string motion_fusion_method) {
   if (motion_fusion_method == "PbfKalmanMotionFusion") {
-    s_motion_fusion_method_ = motion_fusion_method;
+    s_motion_fusion_method_ = const_cast<char *>(motion_fusion_method.c_str());
   } else {
     AERROR << "unsupported motion fusion method : " << motion_fusion_method
            << ", use default method : " << s_motion_fusion_method_;

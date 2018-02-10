@@ -9,16 +9,19 @@ cc_library(
         "perception.h",
     ],
     deps = [
+        "//modules/common",
         "//modules/common:apollo_app",
-        "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
-        "//modules/perception/lib/base:base",
         "//modules/perception/common:perception_common",
-        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/lib/base",
+        "//modules/perception/obstacle/onboard:perception_obstacle_fusion_subnode",
         "//modules/perception/obstacle/onboard:perception_obstacle_lidar_subnode",
         "//modules/perception/obstacle/onboard:perception_obstacle_radar_subnode",
-        "//modules/perception/obstacle/onboard:perception_obstacle_fusion_subnode",
+        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/proto:perception_proto",
         "//modules/perception/traffic_light/onboard:perception_traffic_light_onboard",
+        "@com_google_protobuf//:protobuf",
+        "@ros//:ros_common",
     ],
 )
 
@@ -31,10 +34,6 @@ cc_binary(
     deps = [
         ":perception_lib",
         "//external:gflags",
-        "//modules/common:log",
-        "//modules/perception/common:perception_common",
-        "//modules/perception/proto:perception_proto",
-        "@ros//:ros_common",
     ],
 )
 
