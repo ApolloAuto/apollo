@@ -17,7 +17,6 @@ cc_library(
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "@eigen",
-        "@gtest",
     ],
 )
 
@@ -27,14 +26,8 @@ cc_library(
     hdrs = ["lidar_process.h"],
     deps = [
         ":perception_obstacle_hdmapinput",
-        "//modules/common",
-        "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
-        "//modules/perception/common:perception_common",
-        "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/lidar/dummy:perception_obstacle_lidar_dummy",
         "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
         "//modules/perception/obstacle/lidar/object_builder/min_box:perception_obstacle_lidar_object_builder_min_box",
@@ -44,8 +37,6 @@ cc_library(
         "//modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser:perception_obstacle_lidar_type_fuser_sequence_type_fuser",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
         "//modules/perception/obstacle/radar/dummy:perception_obstacle_radar_dummy",
-        "@eigen",
-        "@gtest",
         "@ros//:ros_common",
     ],
 )
@@ -61,15 +52,8 @@ cc_library(
     ],
     deps = [
         ":perception_obstacle_hdmapinput",
-        "//modules/common",
-        "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/configs:config_gflags",
-        "//modules/perception/common:perception_common",
-        "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/lidar/dummy:perception_obstacle_lidar_dummy",
         "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
         "//modules/perception/obstacle/lidar/object_builder/min_box:perception_obstacle_lidar_object_builder_min_box",
@@ -79,8 +63,6 @@ cc_library(
         "//modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser:perception_obstacle_lidar_type_fuser_sequence_type_fuser",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
         "//modules/perception/onboard:perception_onboard",
-        "@eigen",
-        "@gtest",
         "@ros//:ros_common",
     ],
 )
@@ -111,7 +93,6 @@ cc_library(
         "//modules/perception/obstacle/radar/modest:perception_obstacle_radar_modest_modest_detector",
         "//modules/perception/onboard:perception_onboard",
         "@eigen",
-        "@gtest",
         "@ros//:ros_common",
     ],
 )
@@ -127,21 +108,12 @@ cc_library(
     ],
     deps = [
         ":perception_obstacle_hdmapinput",
-        "//modules/common",
-        "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/configs:config_gflags",
-        "//modules/perception/common:perception_common",
-        "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/fusion/probabilistic_fusion",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
         "//modules/perception/onboard:perception_onboard",
-        "@eigen",
-        "@gtest",
         "@ros//:ros_common",
     ],
 )
@@ -157,23 +129,14 @@ cc_library(
     ],
     deps = [
         ":perception_obstacle_hdmapinput",
-        "//modules/common",
-        "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/configs:config_gflags",
-        "//modules/perception/common:perception_common",
-        "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/fusion/probabilistic_fusion",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
         "//modules/perception/obstacle/onboard:perception_obstacle_lidar_process",
         "//modules/perception/obstacle/radar/modest:perception_obstacle_radar_modest_modest_detector",
         "//modules/perception/onboard:perception_onboard",
-        "@eigen",
-        "@gtest",
         "@ros//:ros_common",
     ],
 )
@@ -191,7 +154,6 @@ cc_test(
     deps = [
         ":perception_obstacle_hdmapinput",
         "//modules/common/configs:config_gflags",
-        "//modules/perception/common:perception_common",
         "@gtest//:main",
     ],
 )
@@ -207,9 +169,7 @@ cc_test(
         "//modules/perception:perception_data",
     ],
     deps = [
-        ":perception_obstacle_hdmapinput",
         ":perception_obstacle_lidar_process",
-        "//modules/perception/common:perception_common",
         "@gtest//:main",
     ],
 )
