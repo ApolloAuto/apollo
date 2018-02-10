@@ -74,11 +74,18 @@ class HDMapImpl {
 
  public:
   /**
-  * @brief load map from local file
-  * @param map_filename path of map data file
-  * @return 0:success, otherwise failed
-  */
+   * @brief load map from local file
+   * @param map_filename path of map data file
+   * @return 0:success, otherwise failed
+   */
   int LoadMapFromFile(const std::string& map_filename);
+
+  /**
+   * @brief load map from a protobuf message
+   * @param map_proto map data in protobuf format
+   * @return 0:success, otherwise failed
+   */
+  int LoadMapFromProto(const Map& map_proto);
 
   LaneInfoConstPtr GetLaneById(const Id& id) const;
   JunctionInfoConstPtr GetJunctionById(const Id& id) const;
@@ -318,7 +325,6 @@ class HDMapImpl {
 
  private:
   Map map_;
-
   LaneTable lane_table_;
   JunctionTable junction_table_;
   CrosswalkTable crosswalk_table_;
