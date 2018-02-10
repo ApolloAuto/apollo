@@ -18,6 +18,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/common/time/time.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "pcl_conversions/pcl_conversions.h"
 #include "pcl/point_cloud.h"
@@ -28,8 +29,11 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
+using apollo::common::time::Clock;
 using sensor_msgs::PointCloud2;
 using Json = nlohmann::json;
+
+constexpr int PointCloudUpdater::kDownsampleRate;
 
 PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
     : websocket_(websocket) {
@@ -37,17 +41,49 @@ PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
 }
 
 void PointCloudUpdater::RegisterMessageHandlers() {
+  // Send current point_cloud status to the new client.
+  websocket_->RegisterConnectionReadyHandler(
+      [this](WebSocketHandler::Connection *conn) {
+        Json response;
+        response["type"] = "PointCloudStatus";
+        response["enabled"] = enabled_;
+        websocket_->SendData(conn, response.dump());
+      });
   websocket_->RegisterMessageHandler(
       "RequestPointCloud",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         std::string to_send;
+        // If there is no point_cloud data for more than 2 seconds, reset.
+        if ((point_cloud_.num_size() > 0) &&
+            (Clock::NowInSeconds() - last_receive_time_ > 2.0)) {
+          point_cloud_.clear_num();
+          boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+          point_cloud_.SerializeToString(&point_cloud_str_);
+        }
         {
-          // Pay the price to copy the data instead of sending data over the
-          // wire while holding the lock.
-          boost::shared_lock<boost::shared_mutex> lock(mutex_);
+          boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
           to_send = point_cloud_str_;
         }
-        websocket_->SendData(conn, to_send, true);
+        websocket_->SendBinaryData(conn, to_send, true);;
+      });
+  websocket_->RegisterMessageHandler(
+      "TogglePointCloud",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        auto enable = json.find("enable");
+        if (enable != json.end() && enable->is_boolean()) {
+          if (*enable) {
+            enabled_ = true;
+          } else {
+            enabled_ = false;
+          }
+          if (websocket_) {
+            Json response;
+            response["type"] = "PointCloudStatus";
+            response["enabled"] = enabled_;
+            // Sync the point_cloud status across all the clients.
+            websocket_->BroadcastData(response.dump());
+          }
+        }
       });
 }
 
@@ -57,42 +93,30 @@ void PointCloudUpdater::Start() {
 }
 
 void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
-  // transform from ros to pcl
-  pcl::PointCloud < pcl::PointXYZ > pcl_data;
-  pcl::fromROSMsg(point_cloud, pcl_data);
-
-  if (pcl_data.size() == 0) {
-    point_cloud_str_ = "[]";
+  if (!enabled_) {
     return;
   }
 
-  std::stringstream stream;
-  std::string data("[");
-  for (size_t idx = 0; idx < pcl_data.size(); idx += 2) {
+  last_receive_time_ = Clock::NowInSeconds();
+  // transform from ros to pcl
+  pcl::PointCloud<pcl::PointXYZ> pcl_data;
+  pcl::fromROSMsg(point_cloud, pcl_data);
+
+  point_cloud_.Clear();
+  for (size_t idx = 0; idx < pcl_data.size(); idx += kDownsampleRate) {
     pcl::PointXYZ& pt = pcl_data.points[idx];
     if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z)) {
-      data.append("[");
-      stream.str(std::string());
-      stream << std::fixed << std::setprecision(4) << pt.x;
-      data.append(stream.str());
-      data.append(",");
-      stream.str(std::string());
-      stream << std::fixed << std::setprecision(4) << pt.y;
-      data.append(stream.str());
-      data.append(",");
-      stream.str(std::string());
-      stream << std::fixed << std::setprecision(4) << pt.z;
-      data.append(stream.str());
-      data.append("]");
-      if ((idx + 1) == pcl_data.size()) {
-        data.append("]");
-      } else {
-        data.append(",");
-      }
+      point_cloud_.add_num(pt.x);
+      point_cloud_.add_num(pt.y);
+      // TODO(unacao): velodyne height should be updated by hmi store
+      // upon vehicle change.
+      point_cloud_.add_num(pt.z + 1.91);
     }
   }
-  boost::shared_lock<boost::shared_mutex> lock(mutex_);
-  point_cloud_str_ = data;
+  {
+    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    point_cloud_.SerializeToString(&point_cloud_str_);
+  }
 }
 
 }  // namespace dreamview

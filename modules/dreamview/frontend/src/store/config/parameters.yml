@@ -71,6 +71,7 @@ options:
     showObstaclesVelocity: true
     showObstaclesHeading: true
     showObstaclesId: true
+    showPointCloud: true
     showPositionGps: false
     showPositionLocalization: true
     cameraAngle: Default

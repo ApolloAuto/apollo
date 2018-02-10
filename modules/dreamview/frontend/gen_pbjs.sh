@@ -38,3 +38,6 @@ node_modules/protobufjs/bin/pbjs -t json $MAP_PROTOS \
     ../../common/proto/header.proto \
     ../../common/proto/error_code.proto \
     -o proto_bundle/map_proto_bundle.json
+
+node_modules/protobufjs/bin/pbjs -t json ../proto/point_cloud.proto \
+    -o proto_bundle/point_cloud_proto_bundle.json
