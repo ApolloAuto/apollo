@@ -2466,83 +2466,12 @@
                 }
               }
             },
-            "CloudReferenceLinePoint": {
-              "fields": {
-                "x": {
-                  "type": "double",
-                  "id": 1
-                },
-                "y": {
-                  "type": "double",
-                  "id": 2
-                },
-                "z": {
-                  "type": "double",
-                  "id": 3
-                },
-                "theta": {
-                  "type": "double",
-                  "id": 4
-                },
-                "kappa": {
-                  "type": "double",
-                  "id": 5
-                },
-                "laneS": {
-                  "type": "double",
-                  "id": 6
-                },
-                "dkappa": {
-                  "type": "double",
-                  "id": 7
-                }
-              }
-            },
-            "CloudReferenceLineSegment": {
-              "fields": {
-                "laneId": {
-                  "type": "string",
-                  "id": 1
-                },
-                "point": {
-                  "rule": "repeated",
-                  "type": "CloudReferenceLinePoint",
-                  "id": 2
-                }
-              }
-            },
             "CloudReferenceLineResponse": {
               "fields": {
                 "segment": {
                   "rule": "repeated",
-                  "type": "CloudReferenceLineSegment",
+                  "type": "apollo.common.Path",
                   "id": 1
-                }
-              }
-            },
-            "NavigationPath": {
-              "fields": {
-                "pathPoint": {
-                  "rule": "repeated",
-                  "type": "apollo.common.PathPoint",
-                  "id": 1
-                },
-                "pathPriority": {
-                  "type": "uint32",
-                  "id": 2
-                }
-              }
-            },
-            "NavigationInfo": {
-              "fields": {
-                "header": {
-                  "type": "apollo.common.Header",
-                  "id": 1
-                },
-                "navigationPath": {
-                  "rule": "repeated",
-                  "type": "NavigationPath",
-                  "id": 2
                 }
               }
             }
