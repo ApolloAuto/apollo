@@ -57,6 +57,13 @@ class HDMap {
    */
   int LoadMapFromFile(const std::string& map_filename);
 
+  /**
+   * @brief load map from a given protobuf message.
+   * @param map_proto map data in protobuf format
+   * @return 0:success, otherwise failed
+   */
+  int LoadMapFromProto(const Map& map_proto);
+
   LaneInfoConstPtr GetLaneById(const Id& id) const;
   JunctionInfoConstPtr GetJunctionById(const Id& id) const;
   SignalInfoConstPtr GetSignalById(const Id& id) const;
