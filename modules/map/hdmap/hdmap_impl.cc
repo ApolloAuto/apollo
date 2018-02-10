@@ -28,9 +28,9 @@ namespace apollo {
 namespace hdmap {
 namespace {
 
+using apollo::common::PointENU;
 using apollo::common::math::AABoxKDTreeParams;
 using apollo::common::math::Vec2d;
-using apollo::common::PointENU;
 
 Id CreateHDMapId(const std::string& string_id) {
   Id id;
@@ -47,7 +47,8 @@ constexpr int kBackwardDistance = 4;
 
 int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   Clear();
-
+  // TODO(startcode) seems map_ can be changed to a local variable of this
+  // function, but test will fail if I do so. if so.
   if (apollo::common::util::EndWith(map_filename, ".xml")) {
     if (!adapter::OpendriveAdapter::LoadData(map_filename, &map_)) {
       return -1;
@@ -55,7 +56,14 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   } else if (!apollo::common::util::GetProtoFromFile(map_filename, &map_)) {
     return -1;
   }
+  return LoadMapFromProto(map_);
+}
 
+int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
+  if (&map_proto != &map_) {  // avoid an unnecessary copy
+    Clear();
+    map_ = map_proto;
+  }
   for (const auto& lane : map_.lane()) {
     lane_table_[lane.id().id()].reset(new LaneInfo(lane));
   }
