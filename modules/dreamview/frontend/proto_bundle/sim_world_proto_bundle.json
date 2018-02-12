@@ -478,45 +478,6 @@
         },
         "common": {
           "nested": {
-            "sound": {
-              "nested": {
-                "SoundRequest": {
-                  "fields": {
-                    "header": {
-                      "type": "apollo.common.Header",
-                      "id": 1
-                    },
-                    "priority": {
-                      "type": "PriorityLevel",
-                      "id": 2
-                    },
-                    "mode": {
-                      "type": "Mode",
-                      "id": 3
-                    },
-                    "words": {
-                      "type": "string",
-                      "id": 4
-                    }
-                  },
-                  "nested": {
-                    "PriorityLevel": {
-                      "values": {
-                        "LOW": 0,
-                        "MEDIUM": 1,
-                        "HIGH": 2
-                      }
-                    },
-                    "Mode": {
-                      "values": {
-                        "SAY": 0,
-                        "BEEP": 1
-                      }
-                    }
-                  }
-                }
-              }
-            },
             "DriveEvent": {
               "fields": {
                 "header": {
@@ -589,7 +550,9 @@
                 "ROUTING_ERROR_NOT_READY": 8003,
                 "END_OF_INPUT": 9000,
                 "HTTP_LOGIC_ERROR": 10000,
-                "HTTP_RUNTIME_ERROR": 10001
+                "HTTP_RUNTIME_ERROR": 10001,
+                "RELATIVE_MAP_ERROR": 11000,
+                "RELATIVE_MAP_NOT_READY": 11001
               }
             },
             "StatusPb": {
@@ -1070,7 +1033,8 @@
                         "HWSYS": 9,
                         "ROUTING": 10,
                         "MONITOR": 11,
-                        "HMI": 12
+                        "HMI": 12,
+                        "RELATIVE_MAP": 13
                       }
                     },
                     "LogLevel": {
