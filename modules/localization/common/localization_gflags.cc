@@ -80,8 +80,8 @@ DEFINE_int32(
     lidar_localization_mode, 2,
     "Localization mode, 0 for intensity, 1 for altitude, 2 for fusion.");
 DEFINE_int32(lidar_yaw_align_mode, 1,
-    "image yaw align mode, 0 for intensity, "
-    "1 for fusion, 2 for fusion with multithread.");
+             "image yaw align mode, 0 for intensity, "
+             "1 for fusion, 2 for fusion with multithread.");
 DEFINE_int32(lidar_filter_size, 11, "Lidar filter size");
 DEFINE_int32(lidar_thread_num, 2, "Lidar thread number");
 DEFINE_double(lidar_imu_max_delay_time, 0.4,
