@@ -210,7 +210,6 @@ cc_library(
 cc_library(
     name = "polygon2d",
     srcs = [
-        "box2d.cc",
         "polygon2d.cc",
     ],
     hdrs = [
