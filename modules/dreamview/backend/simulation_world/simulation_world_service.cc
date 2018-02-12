@@ -762,11 +762,7 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
     for (int index : sampled_indices) {
       const auto &path_point = path.path_point()[index];
       auto *point = downsampled_path->add_path_point();
-      point->set_x(path_point.x());
-      point->set_y(path_point.y());
-      point->set_s(path_point.s());
-      point->set_kappa(path_point.kappa());
-      point->set_dkappa(path_point.dkappa());
+      point->CopyFrom(path_point);
     }
   }
 }
