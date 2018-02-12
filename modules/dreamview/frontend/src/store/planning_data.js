@@ -21,6 +21,7 @@ export default class PlanningData {
       stSpeedGraph: {},
       speedGraph: {},
       accelerationGraph: {},
+      thetaGraph: {},
       kappaGraph: {},
       dkappaGraph: {},
       dpPolyGraph: {},
@@ -175,21 +176,31 @@ export default class PlanningData {
     }
   }
 
+  updateThetaGraph(paths) {
+    for (const path of paths) {
+      const name = path.name === "planning_reference_line" ? "ReferenceLine" : path.name;
+      this.data.thetaGraph[name] =
+        this.extractDataPoints(path.pathPoint, 's', 'theta');
+    }
+  }
+
   updateKappaGraph(paths) {
     for (const path of paths) {
-      this.data.kappaGraph[path.name] =
+      const name = path.name === "planning_reference_line" ? "ReferenceLine" : path.name;
+      this.data.kappaGraph[name] =
         this.extractDataPoints(path.pathPoint, 's', 'kappa');
     }
   }
 
   updateDkappaGraph(paths) {
     for (const path of paths) {
-      this.data.dkappaGraph[path.name] =
+      const name = path.name === "planning_reference_line" ? "ReferenceLine" : path.name;
+      this.data.dkappaGraph[name] =
         this.extractDataPoints(path.pathPoint, 's', 'dkappa');
     }
   }
 
-  updadteLatencyGraph(currentTime, latencyStates) {
+  updateLatencyGraph(currentTime, latencyStates) {
     const timeRange = 300000; // 5 min
     for (const moduleName in this.latencyGraph) {
       let graph = this.latencyGraph[moduleName];
@@ -261,6 +272,7 @@ export default class PlanningData {
       if (planningData.path) {
         this.updateKappaGraph(planningData.path);
         this.updateDkappaGraph(planningData.path);
+        this.updateThetaGraph(planningData.path);
       }
 
       if (planningData.dpPolyGraph) {
@@ -268,7 +280,7 @@ export default class PlanningData {
       }
 
       if (world.latency) {
-        this.updadteLatencyGraph(world.planningTime, world.latency);
+        this.updateLatencyGraph(world.planningTime, world.latency);
       }
 
       this.updatePlanningTime(world.planningTime);
