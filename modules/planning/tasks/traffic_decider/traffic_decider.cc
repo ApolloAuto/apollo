@@ -46,14 +46,6 @@ void TrafficDecider::RegisterRules() {
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new BacksideVehicle(config);
                          });
-  rule_factory_.Register(RuleConfig::SIGNAL_LIGHT,
-                         [](const RuleConfig &config) -> TrafficRule * {
-                           return new SignalLight(config);
-                         });
-  rule_factory_.Register(RuleConfig::CROSSWALK,
-                         [](const RuleConfig &config) -> TrafficRule * {
-                           return new Crosswalk(config);
-                         });
   rule_factory_.Register(RuleConfig::REROUTING,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new Rerouting(config);
@@ -66,22 +58,33 @@ void TrafficDecider::RegisterRules() {
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new Destination(config);
                          });
-  rule_factory_.Register(RuleConfig::STOP_SIGN,
-                         [](const RuleConfig &config) -> TrafficRule * {
-                           return new StopSign(config);
-                         });
   rule_factory_.Register(RuleConfig::CHANGE_LANE,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new ChangeLane(config);
                          });
-  rule_factory_.Register(RuleConfig::SIDEPASS_VEHICLE,
-                         [](const RuleConfig &config) -> TrafficRule * {
-                           return new SidepassVehicle(config);
-                         });
-  rule_factory_.Register(RuleConfig::KEEP_CLEAR,
-                         [](const RuleConfig &config) -> TrafficRule * {
-                           return new KeepClear(config);
-                         });
+
+  if (!FLAGS_use_navigation_mode) {
+    rule_factory_.Register(RuleConfig::SIGNAL_LIGHT,
+                           [](const RuleConfig &config) -> TrafficRule * {
+                             return new SignalLight(config);
+                           });
+    rule_factory_.Register(RuleConfig::CROSSWALK,
+                           [](const RuleConfig &config) -> TrafficRule * {
+                             return new Crosswalk(config);
+                           });
+    rule_factory_.Register(RuleConfig::STOP_SIGN,
+                           [](const RuleConfig &config) -> TrafficRule * {
+                             return new StopSign(config);
+                           });
+    rule_factory_.Register(RuleConfig::SIDEPASS_VEHICLE,
+                           [](const RuleConfig &config) -> TrafficRule * {
+                             return new SidepassVehicle(config);
+                           });
+    rule_factory_.Register(RuleConfig::KEEP_CLEAR,
+                           [](const RuleConfig &config) -> TrafficRule * {
+                             return new KeepClear(config);
+                           });
+  }
 }
 
 bool TrafficDecider::Init(const PlanningConfig &config) {
