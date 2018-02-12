@@ -96,23 +96,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "car_sound_proto",
-    deps = [
-        ":car_sound_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "car_sound_proto_lib",
-    srcs = [
-        "car_sound.proto",
-    ],
-    deps = [
-        ":header_proto_lib",
-    ],
-)
-
-cc_proto_library(
     name = "drive_event_proto",
     deps = [
         ":drive_event_proto_lib",
