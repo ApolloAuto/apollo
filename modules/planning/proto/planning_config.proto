@@ -33,6 +33,7 @@ message RuleConfig {
     CHANGE_LANE = 9;
     SIDEPASS_VEHICLE = 10;
     KEEP_CLEAR=11;
+    CIPV=12;
   }
   optional RuleId rule_id = 1;
 }
