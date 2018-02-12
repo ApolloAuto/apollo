@@ -67,4 +67,22 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "hdmap_util_test",
+    size = "medium",
+    timeout = "short",
+    srcs = [
+        "hdmap_util_test.cc",
+    ],
+    data = [
+        ":testdata",
+    ],
+    deps = [
+        ":hdmap_util",
+        "//modules/common/adapters:adapter_manager",
+        "@glog//:glog",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
