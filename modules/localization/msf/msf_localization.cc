@@ -22,8 +22,8 @@
 #include "modules/drivers/gnss/proto/config.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/math/quaternion.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_tokenizer.h"
@@ -111,9 +111,7 @@ Status MSFLocalization::Start() {
   return Status::OK();
 }
 
-Status MSFLocalization::Stop() {
-  return Status::OK();
-}
+Status MSFLocalization::Stop() { return Status::OK(); }
 
 Status MSFLocalization::Init() {
   InitParams();
@@ -206,9 +204,9 @@ void MSFLocalization::InitParams() {
     std::string ant_imu_leverarm_file =
         common::util::TranslatePath(FLAGS_ant_imu_leverarm_file);
     AERROR << "Ant imu lever arm file: " << ant_imu_leverarm_file;
-    CHECK(LoadGnssAntennaExtrinsic(ant_imu_leverarm_file, &offset_x,
-                                   &offset_y, &offset_z, &uncertainty_x,
-                                   &uncertainty_y, &uncertainty_z));
+    CHECK(LoadGnssAntennaExtrinsic(ant_imu_leverarm_file, &offset_x, &offset_y,
+                                   &offset_z, &uncertainty_x, &uncertainty_y,
+                                   &uncertainty_z));
 
     localizaiton_param_.imu_to_ant_offset.offset_x = offset_x;
     localizaiton_param_.imu_to_ant_offset.offset_y = offset_y;
@@ -241,10 +239,10 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
     auto itr = lidar_localization_list.begin();
     auto itr_end = lidar_localization_list.end();
     for (; itr != itr_end; ++itr) {
-      latest_lidar_localization_status_
-          = static_cast<MeasureState>(itr->state());
-      if (itr->state() == LocalizationMeasureState::OK
-          || itr->state() == LocalizationMeasureState::VALID) {
+      latest_lidar_localization_status_ =
+          static_cast<MeasureState>(itr->state());
+      if (itr->state() == LocalizationMeasureState::OK ||
+          itr->state() == LocalizationMeasureState::VALID) {
         // publish lidar message to debug
         AdapterManager::PublishLocalizationMsfLidar(itr->localization());
       }
@@ -278,14 +276,13 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
     status.set_measurement_time(itr->localization().measurement_time());
     AdapterManager::PublishLocalizationMsfStatus(status);
 
-    if (itr->state() == LocalizationMeasureState::OK
-        || itr->state() == LocalizationMeasureState::VALID) {
+    if (itr->state() == LocalizationMeasureState::OK ||
+        itr->state() == LocalizationMeasureState::VALID) {
       // add PI/2 for heading
       LocalizationEstimate local_result = itr->localization();
-      apollo::localization::Pose *posepb_loc
-          = local_result.mutable_pose();
-      double new_heading = apollo::common::math::
-          NormalizeAngle(posepb_loc->heading() + M_PI_2);
+      apollo::localization::Pose *posepb_loc = local_result.mutable_pose();
+      double new_heading =
+          apollo::common::math::NormalizeAngle(posepb_loc->heading() + M_PI_2);
       posepb_loc->set_heading(new_heading);
 
       PublishPoseBroadcastTF(local_result);
@@ -301,9 +298,9 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
 }  // namespace localization
 
 void MSFLocalization::OnGnssBestPose(const GnssBestPose &bestgnsspos_msg) {
-  if ((localization_state_ == LocalizationMeasureState::OK
-      || localization_state_ == LocalizationMeasureState::VALID)
-      && FLAGS_gnss_only_init) {
+  if ((localization_state_ == LocalizationMeasureState::OK ||
+       localization_state_ == LocalizationMeasureState::VALID) &&
+      FLAGS_gnss_only_init) {
     return;
   }
 
@@ -316,10 +313,10 @@ void MSFLocalization::OnGnssBestPose(const GnssBestPose &bestgnsspos_msg) {
     auto itr = gnss_localization_list.begin();
     auto itr_end = gnss_localization_list.end();
     for (; itr != itr_end; ++itr) {
-      latest_gnss_localization_status_
-          = static_cast<MeasureState>(itr->state());
-      if (itr->state() == LocalizationMeasureState::OK
-          || itr->state() == LocalizationMeasureState::VALID) {
+      latest_gnss_localization_status_ =
+          static_cast<MeasureState>(itr->state());
+      if (itr->state() == LocalizationMeasureState::OK ||
+          itr->state() == LocalizationMeasureState::VALID) {
         AdapterManager::PublishLocalizationMsfGnss(itr->localization());
       }
     }
@@ -329,9 +326,9 @@ void MSFLocalization::OnGnssBestPose(const GnssBestPose &bestgnsspos_msg) {
 }
 
 void MSFLocalization::OnGnssRtkObs(const EpochObservation &raw_obs_msg) {
-  if ((localization_state_ == LocalizationMeasureState::OK
-      || localization_state_ == LocalizationMeasureState::VALID)
-      && FLAGS_gnss_only_init) {
+  if ((localization_state_ == LocalizationMeasureState::OK ||
+       localization_state_ == LocalizationMeasureState::VALID) &&
+      FLAGS_gnss_only_init) {
     return;
   }
 
@@ -344,10 +341,10 @@ void MSFLocalization::OnGnssRtkObs(const EpochObservation &raw_obs_msg) {
     auto itr = gnss_localization_list.begin();
     auto itr_end = gnss_localization_list.end();
     for (; itr != itr_end; ++itr) {
-      latest_gnss_localization_status_
-          = static_cast<MeasureState>(itr->state());
-      if (itr->state() == LocalizationMeasureState::OK
-          || itr->state() == LocalizationMeasureState::VALID) {
+      latest_gnss_localization_status_ =
+          static_cast<MeasureState>(itr->state());
+      if (itr->state() == LocalizationMeasureState::OK ||
+          itr->state() == LocalizationMeasureState::VALID) {
         AdapterManager::PublishLocalizationMsfGnss(itr->localization());
       }
     }
@@ -357,9 +354,9 @@ void MSFLocalization::OnGnssRtkObs(const EpochObservation &raw_obs_msg) {
 }
 
 void MSFLocalization::OnGnssRtkEph(const GnssEphemeris &gnss_orbit_msg) {
-  if ((localization_state_ == LocalizationMeasureState::OK
-      || localization_state_ == LocalizationMeasureState::VALID)
-      && FLAGS_gnss_only_init) {
+  if ((localization_state_ == LocalizationMeasureState::OK ||
+       localization_state_ == LocalizationMeasureState::VALID) &&
+      FLAGS_gnss_only_init) {
     return;
   }
 
@@ -392,8 +389,8 @@ bool MSFLocalization::LoadGnssAntennaExtrinsic(
   return false;
 }
 
-bool MSFLocalization::LoadZoneIdFromFile(
-    const std::string &folder_path, int *zone_id) {
+bool MSFLocalization::LoadZoneIdFromFile(const std::string &folder_path,
+                                         int *zone_id) {
   std::string map_zone_id_folder;
   if (common::util::DirectoryExists(folder_path + "/map/000/north")) {
     map_zone_id_folder = folder_path + "/map/000/north";

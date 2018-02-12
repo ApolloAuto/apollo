@@ -267,6 +267,11 @@ bool SidepassVehicle::MakeSidepassObstacleDecision(
 
 bool SidepassVehicle::ApplyRule(Frame* const,
                                 ReferenceLineInfo* const reference_line_info) {
+  if (FLAGS_use_navigation_mode) {
+    // do not sidepass on highway.
+    return true;
+  }
+
   reference_line_ = &(reference_line_info->reference_line());
   auto* path_decision = reference_line_info->path_decision();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();

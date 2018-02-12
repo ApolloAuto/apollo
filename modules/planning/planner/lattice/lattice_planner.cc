@@ -107,15 +107,14 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
   bool first_reference_line = true;
   for (auto& reference_line_info : frame->reference_line_info()) {
     reference_line_info.SetPriorityCost(priority_cost);
-    status = PlanOnReferenceLine(planning_start_point, frame,
-                                 &reference_line_info);
+    status =
+        PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
     if (status != Status::OK()) {
       if (reference_line_info.IsChangeLanePath()) {
         AERROR << "Planner failed to change lane to "
                << reference_line_info.Lanes().Id();
       } else {
-        AERROR << "Planner failed to "
-               << reference_line_info.Lanes().Id();
+        AERROR << "Planner failed to " << reference_line_info.Lanes().Id();
       }
     }
     if (first_reference_line) {

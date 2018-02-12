@@ -44,9 +44,7 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 
-std::string Planning::Name() const {
-  return "planning";
-}
+std::string Planning::Name() const { return "planning"; }
 
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
@@ -102,6 +100,12 @@ Status Planning::Init() {
   }
   if (AdapterManager::GetRoutingRequest() == nullptr) {
     std::string error_msg("RoutingRequest is not registered");
+    AERROR << error_msg;
+    return Status(ErrorCode::PLANNING_ERROR, error_msg);
+  }
+  if (FLAGS_use_navigation_mode && FLAGS_enable_prediction &&
+      AdapterManager::GetPerceptionObstacles() == nullptr) {
+    std::string error_msg("Perception is not registered");
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }

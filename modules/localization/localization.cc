@@ -73,9 +73,7 @@ Status Localization::Start() {
   return Status::OK();
 }
 
-void Localization::Stop() {
-  localization_->Stop();
-}
+void Localization::Stop() { localization_->Stop(); }
 
 }  // namespace localization
 }  // namespace apollo
