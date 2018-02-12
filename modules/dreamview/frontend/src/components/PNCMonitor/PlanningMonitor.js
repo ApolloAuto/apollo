@@ -51,6 +51,7 @@ export default class PlanningMonitor extends React.Component {
             <div>
                 {this.generateScatterGraph('speedGraph', data.speedGraph)}
                 {this.generateScatterGraph('accelerationGraph', data.accelerationGraph)}
+                {this.generateScatterGraph('thetaGraph', data.thetaGraph)}
                 {this.generateScatterGraph('kappaGraph', data.kappaGraph)}
                 {this.generateScatterGraph('dpPolyGraph', data.dpPolyGraph)}
                 {this.generateStGraph(data.stGraph)}
