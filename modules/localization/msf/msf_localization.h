@@ -83,10 +83,10 @@ class MSFLocalization : public LocalizationBase {
   void OnGnssBestPose(const GnssBestPose &bestgnsspos_msg);
 
  private:
-  bool LoadGnssAntennaExtrinsic(const std::string &file_path,
-                                double *offset_x, double *offset_y,
-                                double *offset_z, double *uncertainty_x,
-                                double *uncertainty_y, double *uncertainty_z);
+  bool LoadGnssAntennaExtrinsic(const std::string &file_path, double *offset_x,
+                                double *offset_y, double *offset_z,
+                                double *uncertainty_x, double *uncertainty_y,
+                                double *uncertainty_z);
   bool LoadZoneIdFromFile(const std::string &folder_path, int *zone_id);
 
  private:
