@@ -44,6 +44,9 @@ export default class RosWebSocketEndpoint {
                     STORE.hmi.updateStatus(message.data);
                     RENDERER.updateGroundImage(STORE.hmi.currentMap);
                     break;
+                case "SimControlStatus":
+                    STORE.setOptionStatus('simControlEnabled', message.enabled);
+                    break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
 

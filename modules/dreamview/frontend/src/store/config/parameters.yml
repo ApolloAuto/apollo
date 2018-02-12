@@ -42,6 +42,7 @@ planning:
     width: 1.4
 options:
   defaults:
+    enableSimControl: false
     showModuleController: false
     showMenu: false
     showPOI: false
