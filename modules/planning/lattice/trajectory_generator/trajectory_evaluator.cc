@@ -53,10 +53,12 @@ TrajectoryEvaluator::TrajectoryEvaluator(
       continue;
     }
     for (const auto lat_trajectory : lat_trajectories) {
+      /**
       if (!ConstraintChecker1d::IsValidLateralTrajectory(*lat_trajectory,
                                                          *lon_trajectory)) {
         continue;
       }
+      */
       if (!is_auto_tuning_) {
         double cost =
             Evaluate(planning_target, lon_trajectory, lat_trajectory);
