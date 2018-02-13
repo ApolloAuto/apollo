@@ -107,7 +107,7 @@ void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
 }
 
 void ThirdPartyPerception::OnContiRadar(const ContiRadar& message) {
-  AINFO << "Received delphi esr data: run delphi esr callback.";
+  AINFO << "Received delphi esr data: run continental radar callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
   current_radar_obstacles_ = conversion::ContiToRadarObstacles(
