@@ -27,15 +27,15 @@ DECLARE_string(adapter_config_filename);
 
 DECLARE_double(third_party_perception_freq);
 DECLARE_bool(enable_mobileye);
-DECLARE_bool(enable_delphi_esr);
+DECLARE_bool(enable_radar);
 
 // flags to calibrate mobileye, radar and localization
 DECLARE_double(mobileye_pos_adjust);
-DECLARE_double(delphi_esr_pos_adjust);
+DECLARE_double(radar_pos_adjust);
 
 // object id offset
 DECLARE_int32(mobileye_id_offset);
-DECLARE_int32(delphi_esr_id_offset);
+DECLARE_int32(radar_id_offset);
 
 // flags to create fake bounding box
 DECLARE_double(default_car_length);
@@ -55,6 +55,6 @@ DECLARE_double(filter_y_distance);
 DECLARE_double(movable_speed_threshold);
 DECLARE_double(movable_heading_threshold);
 DECLARE_int32(movable_frames_count_threshold);
-DECLARE_int32(keep_delphi_esr_frames);
+DECLARE_int32(keep_radar_frames);
 
 #endif

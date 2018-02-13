@@ -30,18 +30,20 @@
 namespace apollo {
 namespace third_party_perception {
 
-using apollo::common::adapter::AdapterManager;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
-using apollo::drivers::Mobileye;
+using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
 using apollo::drivers::DelphiESR;
 using apollo::drivers::Esr_track01_500;
+using apollo::drivers::Mobileye;
 using apollo::localization::LocalizationEstimate;
-using apollo::perception::PerceptionObstacles;
 using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
 using apollo::perception::Point;
 
-std::string ThirdPartyPerception::Name() const { return FLAGS_module_name; }
+std::string ThirdPartyPerception::Name() const {
+  return FLAGS_module_name;
+}
 
 Status ThirdPartyPerception::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
@@ -67,7 +69,9 @@ Status ThirdPartyPerception::Start() {
   return Status::OK();
 }
 
-void ThirdPartyPerception::Stop() { timer_.stop(); }
+void ThirdPartyPerception::Stop() {
+  timer_.stop();
+}
 
 void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
   AINFO << "Received mobileye data: run mobileye callback.";
@@ -86,7 +90,7 @@ void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
       message, localization_, last_radar_obstacles_);
   RadarObstacles filtered_radar_obstacles =
       filter::FilterRadarObstacles(current_radar_obstacles_);
-  if (FLAGS_enable_delphi_esr) {
+  if (FLAGS_enable_radar) {
     delphi_esr_obstacles_ = conversion::RadarObstaclesToPerceptionObstacles(
         filtered_radar_obstacles);
   }
