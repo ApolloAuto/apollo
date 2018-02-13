@@ -415,6 +415,10 @@ Status Planning::Plan(const double current_time_stamp,
     reference_line->set_name("planning_reference_line");
     const auto& reference_points =
         best_reference_line->reference_line().reference_points();
+    double s = 0.0;
+    double prev_x = 0.0;
+    double prev_y = 0.0;
+    bool empty_path = true;
     for (const auto& reference_point : reference_points) {
       auto* path_point = reference_line->add_path_point();
       path_point->set_x(reference_point.x());
@@ -422,6 +426,17 @@ Status Planning::Plan(const double current_time_stamp,
       path_point->set_theta(reference_point.heading());
       path_point->set_kappa(reference_point.kappa());
       path_point->set_dkappa(reference_point.dkappa());
+      if (empty_path) {
+        path_point->set_s(0.0);
+        empty_path = false;
+      } else {
+        double dx = reference_point.x() - prev_x;
+        double dy = reference_point.y() - prev_y;
+        s += std::hypot(dx, dy);
+        path_point->set_s(s);
+      }
+      prev_x = reference_point.x();
+      prev_y = reference_point.y();
     }
   }
 
