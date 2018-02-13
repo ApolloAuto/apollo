@@ -34,8 +34,8 @@
 namespace apollo {
 namespace third_party_perception {
 
-using apollo::common::Quaternion;
 using apollo::common::PointENU;
+using apollo::common::Quaternion;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::Point;
@@ -43,9 +43,8 @@ using apollo::perception::Point;
 double GetAngleFromQuaternion(const Quaternion quaternion) {
   double theta = std::atan2(2.0 * quaternion.qw() * quaternion.qz() +
                                 quaternion.qx() * quaternion.qy(),
-                            1.0 -
-                                2.0 * (quaternion.qy() * quaternion.qy() +
-                                       quaternion.qz() * quaternion.qz())) +
+                            1.0 - 2.0 * (quaternion.qy() * quaternion.qy() +
+                                         quaternion.qz() * quaternion.qz())) +
                  std::acos(-1.0) / 2.0;
   return theta;
 }
@@ -235,7 +234,7 @@ double Speed(const double vx, const double vy) {
 
 double HeadingDifference(const double theta1, const double theta2) {
   double theta_diff = std::abs(theta1 - theta2);
-  return theta_diff > PI ? (2 * PI - theta_diff) : theta_diff;
+  return theta_diff > M_PI ? (2 * M_PI - theta_diff) : theta_diff;
 }
 
 }  // namespace third_party_perception
