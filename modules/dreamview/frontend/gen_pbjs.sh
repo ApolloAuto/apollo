@@ -35,4 +35,6 @@ node_modules/protobufjs/bin/pbjs -t json ../proto/simulation_world.proto \
 
 node_modules/protobufjs/bin/pbjs -t json $MAP_PROTOS \
     ../../common/proto/geometry.proto \
+    ../../common/proto/header.proto \
+    ../../common/proto/error_code.proto \
     -o proto_bundle/map_proto_bundle.json
