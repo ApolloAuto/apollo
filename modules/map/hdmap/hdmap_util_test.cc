@@ -26,6 +26,7 @@ using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::AdapterManagerConfig;
 using apollo::common::time::Clock;
+using apollo::relative_map::MapMsg;
 
 class HDMapUtilTestSuite : public ::testing::Test {
  protected:
@@ -61,7 +62,7 @@ void HDMapUtilTestSuite::InitMapProto(Map* map_proto) {
 
 TEST_F(HDMapUtilTestSuite, ReuseMap) {
   MapMsg map_msg;
-  InitMapProto(map_msg.mutable_map());
+  InitMapProto(map_msg.mutable_hdmap());
   map_msg.mutable_header()->set_sequence_num(1);
   FLAGS_use_navigation_mode = true;
   AdapterManagerConfig adapter_config;

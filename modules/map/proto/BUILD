@@ -19,7 +19,6 @@ proto_library(
         "map_id.proto",
         "map_junction.proto",
         "map_lane.proto",
-        "map_msg.proto",
         "map_overlap.proto",
         "map_road.proto",
         "map_signal.proto",
@@ -29,7 +28,6 @@ proto_library(
     ],
     deps = [
         "//modules/common/proto:common_proto_lib",
-        "//modules/common/proto:header_proto_lib",
     ],
 )
 

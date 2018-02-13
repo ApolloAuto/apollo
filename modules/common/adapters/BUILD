@@ -93,7 +93,6 @@ cc_library(
         "//modules/localization/proto:imu_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:sins_pva_proto",
-        "//modules/map/proto:map_proto",
         "//modules/map/relative_map/proto:navigation_proto",
         "//modules/monitor/proto:system_status_proto",
         "//modules/perception/proto:perception_proto",
