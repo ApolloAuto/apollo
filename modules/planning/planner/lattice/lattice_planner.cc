@@ -350,7 +350,7 @@ Status LatticePlanner::PlanOnReferenceLine(
           backup_trajectory_generator.GenerateTrajectory(
               discretized_reference_line);
       reference_line_info->SetCost(FLAGS_backup_trajectory_cost);
-
+      reference_line_info->SetTrajectory(trajectory);
       reference_line_info->SetDrivable(true);
       return Status::OK();
 
