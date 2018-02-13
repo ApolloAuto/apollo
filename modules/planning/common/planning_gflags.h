@@ -178,6 +178,9 @@ DECLARE_double(stop_sign_min_pass_distance);
 DECLARE_double(stop_sign_stop_distance);
 DECLARE_double(stop_sign_max_watch_vehicle_stop_speed);
 DECLARE_double(stop_sign_creep_buffer);
+DECLARE_bool(enable_sidepass);
+DECLARE_double(sidepass_wait_time_sec);
+
 /// destination
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(destination_check_distance);
