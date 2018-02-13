@@ -389,7 +389,11 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
         velocity_heading = shift_heading;
       }
     }
-    velocity_heading = heading_filter_.Filter(velocity_heading);
+    double filtered_heading = heading_filter_.Filter(velocity_heading);
+    if (type_ == PerceptionObstacle::BICYCLE ||
+      type_ == PerceptionObstacle::PEDESTRIAN) {
+      velocity_heading = filtered_heading;
+    }
     velocity_x = speed * std::cos(velocity_heading);
     velocity_y = speed * std::sin(velocity_heading);
   }
