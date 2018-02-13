@@ -73,11 +73,9 @@ class RadarUtil {
     return in_flag;
   }
 
-  static void MockRadarPolygon(
-    const Eigen::Vector3d &center, const double length,
-    const double width,
-    const double theta,
-    PolygonDType *polygon);
+  static void MockRadarPolygon(const Eigen::Vector3d &center,
+                               const double length, const double width,
+                               const double theta, PolygonDType *polygon);
 };
 
 }  // namespace perception

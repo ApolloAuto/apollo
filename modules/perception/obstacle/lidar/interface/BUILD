@@ -11,7 +11,7 @@ cc_library(
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/onboard:perception_obstacle_hdmapinput",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

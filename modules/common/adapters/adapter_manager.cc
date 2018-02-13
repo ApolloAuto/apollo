@@ -171,6 +171,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::RELATIVE_MAP:
         EnableRelativeMap(FLAGS_relative_map_topic, config);
         break;
+      case AdapterConfig::NAVIGATION:
+        EnableNavigation(FLAGS_navigation_topic, config);
+        break;
       default:
         AERROR << "Unknown adapter config type!";
         break;

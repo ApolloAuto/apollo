@@ -35,9 +35,7 @@ class SharedData {
 
   // this api should clear all the memory used,
   // and would be called by SharedDataManager when reset DAGStreaming.
-  virtual void Reset() {
-    CHECK(false) << "reset() not implemented.";
-  }
+  virtual void Reset() { CHECK(false) << "reset() not implemented."; }
 
   virtual void RemoveStaleData() {
     CHECK(false) << "remove_stale_data() not implemented.";

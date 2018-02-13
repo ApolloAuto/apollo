@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 
@@ -70,10 +70,7 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   map_polygons[0].points[3].x = 20;
   map_polygons[0].points[3].y = -20;
   std::vector<ObjectPtr> objects;
-  radar_detector->Detect(raw_obstacles,
-                         map_polygons,
-                         options,
-                         &objects);
+  radar_detector->Detect(raw_obstacles, map_polygons, options, &objects);
   EXPECT_EQ(objects.size(), 1);
   EXPECT_TRUE(fabs(objects[0]->center(0) - 0.0) < 1e-5);
   EXPECT_TRUE(fabs(objects[0]->center(1) - 0.0) < 1e-5);
@@ -85,10 +82,7 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   Eigen::Vector2d location(3.0 * time_diff, 4.0 * time_diff);
   radar_obs->set_longitude_dist(location(0));
   radar_obs->set_lateral_dist(location(1));
-  radar_detector->Detect(raw_obstacles,
-                         map_polygons,
-                         options,
-                         &objects);
+  radar_detector->Detect(raw_obstacles, map_polygons, options, &objects);
   EXPECT_EQ(objects.size(), 1);
   EXPECT_TRUE(fabs(objects[0]->center(0) - location(0)) < 1e-2);
   EXPECT_TRUE(fabs(objects[0]->center(1) - location(1)) < 1e-2);

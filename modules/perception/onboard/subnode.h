@@ -66,25 +66,17 @@ class Subnode : public Thread {
                     const std::vector<EventID> &sub_events,
                     const std::vector<EventID> &pub_events);
 
-  void Stop() {
-    stop_ = true;
-  }
+  void Stop() { stop_ = true; }
 
   // @brief Subnode process interface, should be realized in derived class.
   // @return Status.
   virtual apollo::common::Status ProcEvents() = 0;
 
-  SubnodeID id() const {
-    return id_;
-  }
+  SubnodeID id() const { return id_; }
 
-  std::string name() const {
-    return name_;
-  }
+  std::string name() const { return name_; }
 
-  std::string reserve() const {
-    return reserve_;
-  }
+  std::string reserve() const { return reserve_; }
 
   virtual std::string DebugString() const;
 

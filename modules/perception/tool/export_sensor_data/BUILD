@@ -1,5 +1,4 @@
 load("//tools:cpplint.bzl", "cpplint")
-
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -13,13 +12,13 @@ cc_library(
     deps = [
         "//modules/common:apollo_app",
         "//modules/common:log",
-        "//modules/perception/lib/pcl_util",
         "//modules/common/adapters:adapter_manager",
-        "//modules/perception/lib/base:base",
         "//modules/perception/common:perception_common",
-        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/lib/base",
+        "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/radar/modest:perception_obstacle_radar_modest_modest_detector",
-        "@pcl//:pcl",
+        "//modules/perception/onboard:perception_onboard",
+        "@pcl",
         "@ros//:ros_common",
     ],
 )
@@ -35,10 +34,10 @@ cc_binary(
         ":export_sensor_data_lib",
         "//external:gflags",
         "//modules/common:log",
-        "//modules/perception/lib/pcl_util",
         "//modules/perception/common:perception_common",
+        "//modules/perception/lib/base",
+        "//modules/perception/lib/pcl_util",
         "//modules/perception/proto:perception_proto",
-        "//modules/perception/lib/base:base",
         "@ros//:ros_common",
     ],
 )
