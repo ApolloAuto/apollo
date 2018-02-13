@@ -101,7 +101,7 @@ using LocalizationMsfSinsPvaAdapter =
 using LocalizationMsfStatusAdapter =
     Adapter<apollo::localization::LocalizationStatus>;
 using RelativeMapAdapter = Adapter<apollo::relative_map::MapMsg>;
-using NavigationAdapter = Adapter<apollo::relative_map::NavigationPath>;
+using NavigationAdapter = Adapter<apollo::relative_map::NavigationInfo>;
 
 }  // namespace adapter
 }  // namespace common
