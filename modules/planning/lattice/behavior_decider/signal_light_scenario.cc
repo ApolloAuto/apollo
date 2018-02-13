@@ -66,8 +66,8 @@ int SignalLightScenario::ComputeScenarioDecision(
 
     if ((signal.color() == TrafficLight::RED &&
          stop_deceleration < FLAGS_max_stop_deceleration) ||
-        (signal.color() == TrafficLight::UNKNOWN &&
-         stop_deceleration < FLAGS_max_stop_deceleration) ||
+        // (signal.color() == TrafficLight::UNKNOWN &&
+        //  stop_deceleration < FLAGS_max_stop_deceleration) ||
         (signal.color() == TrafficLight::YELLOW &&
          stop_deceleration < FLAGS_max_stop_deacceleration_for_yellow_light)) {
       CreateStopObstacle(frame, reference_line_info, signal_light);
