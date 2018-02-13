@@ -22,6 +22,7 @@
 
 #include "gflags/gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/http_client.h"
 #include "modules/common/util/json_util.h"
@@ -57,6 +58,7 @@ namespace dreamview {
 namespace {
 
 using apollo::canbus::Chassis;
+using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::common::util::FindOrNull;
@@ -184,6 +186,7 @@ void HMI::RegisterMessageHandlers() {
             conn, JsonUtil::ProtoToTypedJson("HMIConfig", config_).dump());
         websocket_->SendData(
             conn, JsonUtil::ProtoToTypedJson("HMIStatus", status_).dump());
+        SendVehicleParam(conn);
       });
 
   // HMI client asks for executing module command.
@@ -332,6 +335,20 @@ void HMI::BroadcastHMIStatus() {
   }
 }
 
+void HMI::SendVehicleParam(WebSocketHandler::Connection *conn) {
+  if (websocket_ == nullptr) {
+    return;
+  }
+
+  const auto json_str = JsonUtil::ProtoToTypedJson(
+      "VehicleParam", VehicleConfigHelper::GetConfig().vehicle_param()).dump();
+  if (conn != nullptr) {
+    websocket_->SendData(conn, json_str);
+  } else {
+    websocket_->BroadcastData(json_str);
+  }
+}
+
 int HMI::RunComponentCommand(const Map<std::string, Component> &components,
                              const std::string &component_name,
                              const std::string &command_name) {
@@ -418,6 +435,8 @@ void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
   // Check available updates for current vehicle.
   // CheckOTAUpdates();
   BroadcastHMIStatus();
+  // Broadcast new VehicleParam.
+  SendVehicleParam();
 }
 
 void HMI::ChangeModeTo(const std::string &mode_name) {
