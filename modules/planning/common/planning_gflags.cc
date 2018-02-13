@@ -304,6 +304,12 @@ DEFINE_double(stop_sign_stop_distance, 1.0,
 DEFINE_double(stop_sign_max_watch_vehicle_stop_speed, 0.5,
               "max speed(m/s) for watch vehicles to be considered as a stop."
               "(this check is looser than adc)");
+
+DEFINE_bool(enable_sidepass, true,
+            "True to enable side pass long stopping obstacles");
+DEFINE_double(sidepass_wait_time_sec, 30.0,
+              "Waiting time in seconds before deciding to sidepass");
+
 /// destination
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
