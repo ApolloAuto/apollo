@@ -20,10 +20,10 @@ cc_binary(
         "//modules/perception/obstacle/common:perception_obstacle_common",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
         "//modules/perception/obstacle/onboard:perception_obstacle_lidar_process",
-        "@eigen//:eigen",
-        "@glew//:glew",
-        "@glfw//:glfw",
-        "@opengl//:opengl",
+        "@eigen",
+        "@glew",
+        "@glfw",
+        "@opengl",
     ],
 )
 
@@ -43,13 +43,13 @@ cc_binary(
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/common:perception_obstacle_common",
-        "//modules/perception/obstacle/onboard:perception_obstacle_obstacle_perception",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
         "//modules/perception/obstacle/onboard:perception_obstacle_lidar_process",
-        "@eigen//:eigen",
-        "@glew//:glew",
-        "@glfw//:glfw",
-        "@opengl//:opengl",
+        "//modules/perception/obstacle/onboard:perception_obstacle_obstacle_perception",
+        "@eigen",
+        "@glew",
+        "@glfw",
+        "@opengl",
     ],
 )
 

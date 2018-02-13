@@ -58,5 +58,6 @@ DECLARE_string(localization_lidar_topic);
 DECLARE_string(localization_sins_pva_topic);
 DECLARE_string(localization_msf_status);
 DECLARE_string(relative_map_topic);
+DECLARE_string(navigation_topic);
 
 #endif  // MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_
