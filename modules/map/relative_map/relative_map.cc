@@ -17,6 +17,7 @@
 #include "modules/map/relative_map/relative_map.h"
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 
 namespace apollo {
@@ -28,6 +29,7 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorLogBuffer;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::perception::PerceptionObstacles;
+using apollo::common::VehicleStateProvider;
 
 RelativeMap::RelativeMap()
     : monitor_logger_(MonitorMessageItem::RELATIVE_MAP) {}
@@ -52,13 +54,28 @@ Status RelativeMap::Init() {
 
   AdapterManager::Init(adapter_conf_);
   if (!AdapterManager::GetPerceptionObstacles()) {
-    AERROR << "Perception should be configured as dependency in adapter.conf";
-    return Status(ErrorCode::RELATIVE_MAP_ERROR,
-                  "perception is not configured");
+    std::string error_msg(
+        "Perception should be configured as dependency in adapter.conf");
+    AERROR << error_msg;
+    return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
   }
   if (!AdapterManager::GetMonitor()) {
-    AERROR << "Monitor should be configured as dependency in adapter.conf";
-    return Status(ErrorCode::RELATIVE_MAP_ERROR, "Monitor is not configured");
+    std::string error_msg(
+        "Monitor should be configured as dependency in adapter.conf");
+    AERROR << error_msg;
+    return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
+  }
+  if (AdapterManager::GetLocalization() == nullptr) {
+    std::string error_msg(
+        "Localization should be configured as dependency in adapter.conf");
+    AERROR << error_msg;
+    return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
+  }
+  if (AdapterManager::GetChassis() == nullptr) {
+    std::string error_msg(
+        "Chassis should be configured as dependency in adapter.conf");
+    AERROR << error_msg;
+    return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
   }
   return Status::OK();
 }
@@ -78,12 +95,22 @@ apollo::common::Status RelativeMap::Start() {
 
 void RelativeMap::RunOnce(const PerceptionObstacles& perception_obstacles) {
   MapMsg map_msg;
+
   CreateMapFromPerception(perception_obstacles, &map_msg);
   Publish(&map_msg);
 }
 
 void RelativeMap::CreateMapFromPerception(
     const PerceptionObstacles& perception_obstacles, MapMsg* map_msg) {
+  // update vehicle state from localization and chassis
+  const auto& localization =
+      AdapterManager::GetLocalization()->GetLatestObserved();
+  ADEBUG << "Get localization:" << localization.DebugString();
+  const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
+  ADEBUG << "Get chassis:" << chassis.DebugString();
+  VehicleStateProvider::instance()->Update(localization, chassis);
+
+  // update navigation_lane from perception_obstacles (lane marker)
   navigation_lane_.Update(perception_obstacles);
 
   const auto& navigation_path = navigation_lane_.Path();

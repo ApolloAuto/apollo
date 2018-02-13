@@ -44,6 +44,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/relative_map/proto:navigation_proto",
         "//modules/perception/proto:perception_proto",
     ],

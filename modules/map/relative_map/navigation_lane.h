@@ -17,6 +17,7 @@
 #ifndef MODULES_MAP_RELATIVE_MAP_NAVIGATION_LANE_H_
 #define MODULES_MAP_RELATIVE_MAP_NAVIGATION_LANE_H_
 
+#include "modules/common/proto/vehicle_state.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
@@ -36,10 +37,14 @@ class NavigationLane {
   double EvaluateCubicPolynomial(const double c0, const double c1,
                                  const double c2, const double c3,
                                  const double z) const;
+  void ConvertLaneMarkerToPath(const perception::LaneMarkers& lane_marker,
+                               common::Path* path);
 
   perception::PerceptionObstacles perception_obstacles_;
 
   NavigationPath navigation_path_;
+
+  common::VehicleState adc_state_;
 };
 
 }  // namespace relative_map
