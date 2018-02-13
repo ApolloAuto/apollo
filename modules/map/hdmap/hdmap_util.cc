@@ -22,6 +22,7 @@ namespace apollo {
 namespace hdmap {
 
 using apollo::common::adapter::AdapterManager;
+using apollo::relative_map::MapMsg;
 
 namespace {
 
@@ -80,7 +81,7 @@ std::unique_ptr<HDMap> CreateMap(const std::string& map_file_path) {
 
 std::unique_ptr<HDMap> CreateMap(const MapMsg& map_msg) {
   std::unique_ptr<HDMap> hdmap(new HDMap());
-  if (hdmap->LoadMapFromProto(map_msg.map()) != 0) {
+  if (hdmap->LoadMapFromProto(map_msg.hdmap()) != 0) {
     AERROR << "Failed to load RelativeMap: "
            << map_msg.header().ShortDebugString();
     return nullptr;

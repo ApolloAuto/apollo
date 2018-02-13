@@ -27,7 +27,6 @@ using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorLogBuffer;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::hdmap::MapMsg;
 using apollo::perception::PerceptionObstacles;
 
 RelativeMap::RelativeMap()

@@ -26,8 +26,8 @@ cc_library(
         "//modules/common/monitor_log",
         "//modules/common/status",
         "//modules/common/util",
-        "//modules/map/proto:map_proto",
         "//modules/map/relative_map/common:relative_map_gflags",
+        "//modules/map/relative_map/proto:navigation_proto",
     ],
 )
 
