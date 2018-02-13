@@ -176,23 +176,8 @@ message CloudReferenceLineRoutingRequest {
   optional apollo.routing.RoutingResponse routing = 1;
 }
 
-message CloudReferenceLinePoint {
-  optional double x = 1;
-  optional double y = 2;
-  optional double z = 3;
-  optional double theta = 4;
-  optional double kappa = 5;
-  optional double lane_s = 6;
-  optional double dkappa = 7;
-}
-
-message CloudReferenceLineSegment {
-  optional string lane_id = 1;
-  repeated CloudReferenceLinePoint point = 2;
-}
-
 message CloudReferenceLineResponse {
-  repeated CloudReferenceLineSegment segment = 1;
+  repeated apollo.common.Path segment = 1;
 }
 
 
