@@ -168,6 +168,11 @@ double Gaussian(const double u, const double std, const double x);
 // Sigmoid
 double Sigmoid(const double x);
 
+// Rotate Axis (2D): the theta represents the angle when rotate axis of (x0, y0)
+// to axis of (x1, y1)
+void RotateAxis(const double theta, const double x0, const double y0,
+                double *x1, double *y1);
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
