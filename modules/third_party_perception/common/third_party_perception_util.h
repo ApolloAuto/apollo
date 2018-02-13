@@ -34,9 +34,6 @@
 namespace apollo {
 namespace third_party_perception {
 
-// TODO(lizh): use common const
-const double PI = 3.141592653;
-
 double GetAngleFromQuaternion(const apollo::common::Quaternion quaternion);
 
 void FillPerceptionPolygon(
