@@ -61,14 +61,16 @@ def generate_future_traj(rosbag_in, rosbag_out, future_pose_list):
     if (len(future_pose_list) < ptr_end):
         return
     with rosbag.Bag(rosbag_in, 'r') as bag_in, rosbag.Bag(rosbag_out, 'w') as bag_out:
-        for topic, localization, t in bag_in.read_messages():
+        for topic, msg, t in bag_in.read_messages():
             if topic == '/apollo/localization/pose' and ptr_end < len(future_pose_list):
                 # augment localization with future localization
-                new_localization = localization
+                new_localization = msg
                 augment_future_traj(new_localization, ptr_start, ptr_end, future_pose_list)
                 bag_out.write(topic, new_localization, t)
                 ptr_start += 1
                 ptr_end += 1
+            else:
+                bag_out.write(topic, msg, t)
 
 def augment_future_traj(new_localization, ptr_start, ptr_end, pose_list):
     """
