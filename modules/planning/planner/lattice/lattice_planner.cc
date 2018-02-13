@@ -341,7 +341,8 @@ Status LatticePlanner::PlanOnReferenceLine(
     return Status::OK();
   } else {
     AERROR << "Planning failed";
-    if (FLAGS_enable_backup_trajectory) {
+    if (FLAGS_enable_backup_trajectory &&
+        !reference_line_info->IsChangeLanePath()) {
       AERROR << "Use backup trajectory";
       BackupTrajectoryGenerator backup_trajectory_generator(
           init_s, init_d, planning_init_point.relative_time(),
