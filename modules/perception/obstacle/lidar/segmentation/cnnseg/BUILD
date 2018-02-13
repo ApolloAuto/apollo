@@ -37,7 +37,7 @@ cc_library(
         "//modules/perception/obstacle/lidar/segmentation/cnnseg:cnnseg_util",
         "//modules/perception/obstacle/lidar/segmentation/cnnseg/proto:cnnseg_proto",
         "@caffe//:lib",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -74,7 +74,7 @@ cc_test(
         "@caffe//:lib",
         "@gtest//:main",
         "@opencv2//:core",
-        "@pcl//:pcl",
+        "@pcl",
     ],
 )
 

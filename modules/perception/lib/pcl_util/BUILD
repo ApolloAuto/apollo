@@ -7,7 +7,7 @@ cc_library(
     srcs = [],
     hdrs = glob(["*.h"]),
     deps = [
-        "@pcl//:pcl",
+        "@pcl",
     ],
 )
 

@@ -50,13 +50,11 @@ class ModestRadarDetector : public BaseRadarDetector {
   // @return collection state
   bool CollectRadarResult(std::vector<ObjectPtr> *objects);
 
-  std::string name() const override {
-    return "ModestRadarDetector";
-  }
+  std::string name() const override { return "ModestRadarDetector"; }
 
  private:
   void RoiFilter(const std::vector<PolygonDType> &map_polygons,
-                 std::vector<ObjectPtr>* filter_objects);
+                 std::vector<ObjectPtr> *filter_objects);
 
   // for unit test
   bool result_init_ = true;

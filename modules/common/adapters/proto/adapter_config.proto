@@ -45,6 +45,7 @@ message AdapterConfig {
     LOCALIZATION_MSF_STATUS = 38;
     STATIC_INFO = 39;
     RELATIVE_MAP = 40;
+    NAVIGATION = 41;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

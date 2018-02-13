@@ -16,10 +16,7 @@
 
 #include "modules/perception/onboard/shared_data_manager.h"
 
-#include <string>
-
 #include "modules/common/log.h"
-#include "modules/perception/onboard/shared_data.h"
 
 namespace apollo {
 namespace perception {

@@ -114,7 +114,7 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
 
   // preprocess send a msg -> proc receive a msg
   double enter_proc_latency = (proc_subnode_handle_event_start_ts -
-      image_lights->preprocess_send_timestamp);
+                               image_lights->preprocess_send_timestamp);
 
   if (TimeUtil::GetCurrentTime() - event.local_timestamp > valid_ts_interval_) {
     AERROR << "TLProcSubnode failed to process image"
@@ -189,13 +189,13 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
         << " revise_latency: " << revise_latency * 1000 << " ms."
         << " TLProcSubnode::handle_event latency: "
         << (TimeUtil::GetCurrentTime() - proc_subnode_handle_event_start_ts) *
-            1000
+               1000
         << " ms."
         << " enter_proc_latency: " << enter_proc_latency * 1000 << " ms."
         << " preprocess_latency: "
         << (image_lights->preprocess_send_timestamp -
             image_lights->preprocess_receive_timestamp) *
-            1000
+               1000
         << " ms.";
 
   return true;
@@ -393,7 +393,7 @@ bool TLProcSubnode::PublishMessage(
   common::Header *header = result.mutable_header();
   header->set_timestamp_sec(ros::Time::now().toSec());
   header->set_sequence_num(seq_num_++);
-  uint64_t timestamp = static_cast<uint64_t>(image_lights->image->ts()*1e9);
+  uint64_t timestamp = static_cast<uint64_t>(image_lights->image->ts() * 1e9);
 
   header->set_camera_timestamp(timestamp);
   // add traffic light result
@@ -553,13 +553,13 @@ bool TLProcSubnode::PublishMessage(
                   3.0, CV_RGB(255, 0, 0), 2);
     }
     // draw image border size (offset between hdmap-box and detection-box)
-//    if (light_debug->project_error() > 100) {
+    //    if (light_debug->project_error() > 100) {
     std::string img_border_txt =
         "Offset size: " + std::to_string(light_debug->project_error());
     constexpr int kPosYOffset = 1000;
     cv::putText(img, img_border_txt, cv::Point(30, kPosYOffset),
                 cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(255, 0, 0), 2);
-//    }
+    //    }
 
     cv::resize(img, img, cv::Size(960, 540));
     cv::imwrite(filename, img);
