@@ -33,6 +33,7 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion {
 
+using apollo::drivers::ContiRadar;
 using apollo::drivers::DelphiESR;
 using apollo::drivers::Mobileye;
 using apollo::localization::LocalizationEstimate;
@@ -131,6 +132,91 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
 
   obstacles.mutable_header()->CopyFrom(mobileye.header());
 
+  return obstacles;
+}
+
+RadarObstacles ContiToRadarObstacles(
+    const apollo::drivers::ContiRadar& conti_radar,
+    const apollo::localization::LocalizationEstimate& localization,
+    const RadarObstacles& last_radar_obstacles) {
+  RadarObstacles obstacles;
+
+  const double last_timestamp = last_radar_obstacles.header().timestamp_sec();
+  const double current_timestamp = conti_radar.header().timestamp_sec();
+
+  const auto adc_pos = localization.pose().position();
+  const auto adc_vel = localization.pose().linear_velocity();
+  const auto adc_quaternion = localization.pose().orientation();
+  const double adc_theta = GetAngleFromQuaternion(adc_quaternion);
+
+  for (int index = 0; index < conti_radar.contiobs_size(); ++index) {
+    const auto& contiobs = conti_radar.contiobs(index);
+
+    RadarObstacle rob;
+
+    rob.set_id(contiobs.obstacle_id());
+    rob.set_rcs(contiobs.rcs());
+    rob.set_length(GetDefaultObjectLength(4));
+    rob.set_width(GetDefaultObjectWidth(4));
+    rob.set_height(3.0);
+
+    Point relative_pos_sl;
+    relative_pos_sl.set_x(contiobs.longitude_dist());
+    relative_pos_sl.set_y(contiobs.lateral_dist());
+    rob.mutable_relative_position()->CopyFrom(relative_pos_sl);
+
+    Point relative_pos_xy = SLtoXY(relative_pos_sl, adc_theta);
+    Point absolute_pos;
+    absolute_pos.set_x(adc_pos.x() + relative_pos_xy.x());
+    absolute_pos.set_y(adc_pos.y() + relative_pos_xy.y());
+    absolute_pos.set_z(adc_pos.z());
+    rob.mutable_absolute_position()->CopyFrom(absolute_pos);
+
+    double theta = GetNearestLaneHeading(rob.absolute_position());
+    rob.set_theta(theta);
+
+    rob.mutable_relative_velocity()->set_x(contiobs.longitude_vel());
+    rob.mutable_relative_velocity()->set_y(contiobs.lateral_vel());
+
+    const auto iter = last_radar_obstacles.radar_obstacle().find(index);
+    Point absolute_vel;
+    if (iter == last_radar_obstacles.radar_obstacle().end()) {
+      rob.set_count(0);
+      rob.set_movable(false);
+      rob.set_moving_frames_count(0);
+      absolute_vel.set_x(0.0);
+      absolute_vel.set_y(0.0);
+      absolute_vel.set_z(0.0);
+    } else {
+      rob.set_count(iter->second.count() + 1);
+      rob.set_movable(iter->second.movable());
+      absolute_vel.set_x(
+          (absolute_pos.x() - iter->second.absolute_position().x()) /
+          (current_timestamp - last_timestamp));
+      absolute_vel.set_y(
+          (absolute_pos.y() - iter->second.absolute_position().y()) /
+          (current_timestamp - last_timestamp));
+      absolute_vel.set_z(0.0);
+      double v_heading = std::atan2(absolute_vel.y(), absolute_vel.x());
+      double heading_diff = HeadingDifference(v_heading, rob.theta());
+      if (heading_diff < FLAGS_movable_heading_threshold &&
+          Speed(absolute_vel) * std::cos(heading_diff) >
+              FLAGS_movable_speed_threshold) {
+        rob.set_moving_frames_count(iter->second.moving_frames_count() + 1);
+      } else {
+        rob.set_moving_frames_count(0);
+      }
+    }
+
+    rob.mutable_absolute_velocity()->CopyFrom(absolute_vel);
+
+    if (rob.moving_frames_count() >= FLAGS_movable_frames_count_threshold) {
+      rob.set_movable(true);
+    }
+    (*obstacles.mutable_radar_obstacle())[index] = rob;
+  }
+
+  obstacles.mutable_header()->CopyFrom(conti_radar.header());
   return obstacles;
 }
 
