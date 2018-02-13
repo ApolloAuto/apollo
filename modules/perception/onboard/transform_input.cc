@@ -16,6 +16,7 @@
 #include "modules/perception/onboard/transform_input.h"
 
 #include <string>
+
 #include "eigen_conversions/eigen_msg.h"
 #include "ros/include/ros/ros.h"
 
@@ -61,11 +62,10 @@ bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans) {
   ADEBUG << "get " << FLAGS_lidar_tf2_frame_id << " to "
          << FLAGS_lidar_tf2_child_frame_id << " trans: " << lidar2novatel_trans;
 
-
   if (!tf2_buffer.canTransform(FLAGS_localization_tf2_frame_id,
                                FLAGS_localization_tf2_child_frame_id,
-                               query_stamp,
-                               ros::Duration(kTf2BuffSize), &err_msg)) {
+                               query_stamp, ros::Duration(kTf2BuffSize),
+                               &err_msg)) {
     AERROR << "Cannot transform frame: " << FLAGS_localization_tf2_frame_id
            << " to frame " << FLAGS_localization_tf2_child_frame_id
            << " , err: " << err_msg
@@ -74,8 +74,8 @@ bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans) {
   }
   try {
     transform_stamped = tf2_buffer.lookupTransform(
-        FLAGS_localization_tf2_frame_id,
-        FLAGS_localization_tf2_child_frame_id, query_stamp);
+        FLAGS_localization_tf2_frame_id, FLAGS_localization_tf2_child_frame_id,
+        query_stamp);
   } catch (tf2::TransformException& ex) {
     AERROR << "Exception: " << ex.what();
     return false;
@@ -90,7 +90,7 @@ bool GetVelodyneTrans(const double query_time, Eigen::Matrix4d* trans) {
   return true;
 }
 
-bool GetRadarTrans(const double query_time, Eigen::Matrix4d *trans) {
+bool GetRadarTrans(const double query_time, Eigen::Matrix4d* trans) {
   if (!trans) {
     AERROR << "failed to get trans, the trans ptr can not be NULL";
     return false;
@@ -125,11 +125,10 @@ bool GetRadarTrans(const double query_time, Eigen::Matrix4d *trans) {
   ADEBUG << "get " << FLAGS_radar_tf2_frame_id << " to "
          << FLAGS_radar_tf2_child_frame_id << " trans: " << radar2novatel_trans;
 
-
   if (!tf2_buffer.canTransform(FLAGS_localization_tf2_frame_id,
                                FLAGS_localization_tf2_child_frame_id,
-                               query_stamp,
-                               ros::Duration(kTf2BuffSize), &err_msg)) {
+                               query_stamp, ros::Duration(kTf2BuffSize),
+                               &err_msg)) {
     AERROR << "Cannot transform frame: " << FLAGS_localization_tf2_frame_id
            << " to frame " << FLAGS_localization_tf2_child_frame_id
            << " , err: " << err_msg
@@ -138,8 +137,8 @@ bool GetRadarTrans(const double query_time, Eigen::Matrix4d *trans) {
   }
   try {
     transform_stamped = tf2_buffer.lookupTransform(
-        FLAGS_localization_tf2_frame_id,
-        FLAGS_localization_tf2_child_frame_id, query_stamp);
+        FLAGS_localization_tf2_frame_id, FLAGS_localization_tf2_child_frame_id,
+        query_stamp);
   } catch (tf2::TransformException& ex) {
     AERROR << "Exception: " << ex.what();
     return false;

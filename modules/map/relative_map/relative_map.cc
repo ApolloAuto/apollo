@@ -35,8 +35,10 @@ RelativeMap::RelativeMap()
 
 Status RelativeMap::Init() {
   if (!FLAGS_use_navigation_mode) {
-    AWARN << "FLAGS_use_navigation_mode is false, system is not configured "
-             "for relative map mode";
+    AERROR << "FLAGS_use_navigation_mode is false, system is not configured "
+              "for relative map mode";
+    return Status(ErrorCode::RELATIVE_MAP_ERROR,
+                  "FLAGS_use_navigation_mode is not true.");
   }
   adapter_conf_.Clear();
   if (!common::util::GetProtoFromFile(

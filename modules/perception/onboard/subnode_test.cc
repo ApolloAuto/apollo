@@ -14,9 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
+#include "modules/perception/onboard/subnode.h"
 
-#include <google/protobuf/text_format.h>
+#include "google/protobuf/text_format.h"
+#include "gtest/gtest.h"
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
@@ -25,7 +26,6 @@
 #include "modules/perception/onboard/proto/dag_config.pb.h"
 #include "modules/perception/onboard/shared_data.h"
 #include "modules/perception/onboard/shared_data_manager.h"
-#include "modules/perception/onboard/subnode.h"
 
 namespace apollo {
 namespace perception {

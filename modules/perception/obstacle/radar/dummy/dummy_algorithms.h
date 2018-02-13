@@ -29,18 +29,14 @@ class DummyRadarDetector : public BaseRadarDetector {
   DummyRadarDetector() : BaseRadarDetector() {}
   ~DummyRadarDetector() = default;
 
-  bool Init() override {
-    return result_init_;
-  }
+  bool Init() override { return result_init_; }
 
   bool Detect(const ContiRadar &raw_obstacles,
               const std::vector<PolygonDType> &map_polygons,
               const RadarDetectorOptions &options,
               std::vector<ObjectPtr> *objects) override;
 
-  std::string name() const override {
-    return "DummyRadarDetector";
-  }
+  std::string name() const override { return "DummyRadarDetector"; }
 
  private:
   // for unit test

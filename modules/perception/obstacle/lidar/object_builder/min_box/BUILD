@@ -14,7 +14,7 @@ cc_library(
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/common:perception_obstacle_common",
         "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

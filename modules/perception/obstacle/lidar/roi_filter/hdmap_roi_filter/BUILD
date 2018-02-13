@@ -24,8 +24,8 @@ cc_library(
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
         "//modules/perception/obstacle/onboard:perception_obstacle_hdmapinput",
-        "@eigen//:eigen",
-        "@pcl//:pcl",
+        "@eigen",
+        "@pcl",
     ],
 )
 
@@ -43,7 +43,7 @@ cc_test(
         "//modules/common:log",
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
-        "@gtest//:gtest",
+        "@gtest",
         "@gtest//:main",
     ],
 )

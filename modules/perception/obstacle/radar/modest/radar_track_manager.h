@@ -42,7 +42,7 @@ class RadarTrackManager {
   // @brief: update tracking state
   // @param [in]: built radar obstacles
   // @return nothing
-  void Update(SensorObjects* radar_obs);
+  void Update(SensorObjects *radar_obs);
 
   // @brief match observation obstacles to existed tracking states by
   //            tracking id
@@ -65,7 +65,7 @@ class RadarTrackManager {
   // @param [IN]: indexs of unassigend tracking state
   // @return nothing
   void UpdateUnassignedTrack(const double &timestamp,
-                             const std::vector<int>& unassigned_track);
+                             const std::vector<int> &unassigned_track);
 
   // @brief delete stale tracking states
   // @return nothing
@@ -75,19 +75,15 @@ class RadarTrackManager {
   // @param [IN]: indexs of unassigend observation obstacles
   // @return nothing
   void CreateNewTrack(const SensorObjects &radar_obs,
-                      const std::vector<int>& unassigned_obs);
+                      const std::vector<int> &unassigned_obs);
 
   // @brief get radar obstacles
   // @return radar obstacles
-  SensorObjects &GetRadarObs() {
-    return radar_obs_;
-  }
+  SensorObjects &GetRadarObs() { return radar_obs_; }
 
   // @brief get tracking state
   // @return tracking states
-  std::vector<RadarTrack> &GetTracks() {
-    return obs_tracks_;
-  }
+  std::vector<RadarTrack> &GetTracks() { return obs_tracks_; }
 
  private:
   double DistanceBetweenObs(const Object &obs1, double timestamp1,

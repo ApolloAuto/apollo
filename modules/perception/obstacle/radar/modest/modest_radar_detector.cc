@@ -17,11 +17,12 @@
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 
 #include <memory>
+
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/radar/modest/conti_radar_util.h"
 #include "modules/perception/obstacle/radar/modest/object_builder.h"
 #include "modules/perception/obstacle/radar/modest/radar_util.h"
-#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -182,10 +183,10 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
   // preparation
 
   SensorObjects radar_objects;
-  object_builder_.Build(
-    raw_obstacles, radar_pose, main_velocity, &radar_objects);
-  radar_objects.timestamp = static_cast<double>(
-    raw_obstacles.header().timestamp_sec());
+  object_builder_.Build(raw_obstacles, radar_pose, main_velocity,
+                        &radar_objects);
+  radar_objects.timestamp =
+      static_cast<double>(raw_obstacles.header().timestamp_sec());
   radar_objects.sensor_type = RADAR;
 
   // roi filter
@@ -222,7 +223,7 @@ bool ModestRadarDetector::CollectRadarResult(std::vector<ObjectPtr> *objects) {
 
 void ModestRadarDetector::RoiFilter(
     const std::vector<PolygonDType> &map_polygons,
-    std::vector<ObjectPtr>* filter_objects) {
+    std::vector<ObjectPtr> *filter_objects) {
   AINFO << "Before using hdmap, object size:" << filter_objects->size();
   // use new hdmap
   if (use_had_map_) {

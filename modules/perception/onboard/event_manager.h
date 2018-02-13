@@ -64,9 +64,7 @@ class EventManager {
   bool GetEventMeta(const std::vector<EventID> &event_id,
                     std::vector<std::string> *str_list) const;
 
-  int NumEvents() const {
-    return event_queue_map_.size();
-  }
+  int NumEvents() const { return event_queue_map_.size(); }
 
  private:
   using EventQueue = FixedSizeConQueue<Event>;

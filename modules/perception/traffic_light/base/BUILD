@@ -28,6 +28,7 @@ cc_library(
         "//modules/perception/traffic_light/util:perception_traffic_light_util",
     ],
 )
+
 cc_test(
     name = "perception_traffic_light_base_test",
     size = "small",
@@ -45,7 +46,6 @@ cc_test(
         "//modules/perception/traffic_light/util:perception_traffic_light_util",
         "@gtest//:main",
         "@opencv2//:core",
-
     ],
 )
 
