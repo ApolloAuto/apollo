@@ -44,6 +44,7 @@ from modules.drivers.proto import mobileye_pb2
 from modules.drivers.proto import delphi_esr_pb2
 from modules.drivers.proto import conti_radar_pb2
 from modules.monitor.proto import system_status_pb2
+from modules.map.relative_map.proto import navigation_pb2
 
 Refreshrate = 16
 
