@@ -1,18 +1,18 @@
 /******************************************************************************
-  * Copyright 2017 The Apollo Authors. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *****************************************************************************/
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/routing/core/result_generator.h"
 
 #include <algorithm>
@@ -66,7 +66,7 @@ const NodeWithRange& GetLargestRange(
   CHECK(!node_vec.empty());
   size_t result_idx = 0;
   double result_range_length = 0.0;
-  for (size_t i = 1; i < node_vec.size(); ++i) {
+  for (size_t i = 0; i < node_vec.size(); ++i) {
     if (node_vec[i].Length() > result_range_length) {
       result_range_length = node_vec[i].Length();
       result_idx = i;
@@ -270,10 +270,10 @@ void ExtendForward(bool enable_use_road_id,
          nodes_of_curr_passage->back().GetTopoNode()->OutToSucEdge()) {
       const auto& succ_node = edge->ToNode();
       // if succ node is not in the same road
-      // if (enable_use_road_id &&
-      //     succ_node->RoadId() != nodes_of_curr_passage->back().RoadId()) {
-      //   continue;
-      // }
+      if (enable_use_road_id &&
+          succ_node->RoadId() != nodes_of_curr_passage->back().RoadId()) {
+        continue;
+      }
       // if succ node has been inserted
       if (ContainsKey(node_set_of_curr_passage, succ_node)) {
         continue;
@@ -400,10 +400,10 @@ bool ResultGenerator::GeneratePassageRegion(
     GetNodesOfWaysBasedOnVirtual(nodes, &nodes_of_ways);
   }
   for (const auto& way : nodes_of_ways) {
-    std::vector<std::vector<NodeWithRange>> nodes_of_passages;
     if (way.empty()) {
       return false;
     }
+    std::vector<std::vector<NodeWithRange>> nodes_of_passages;
     std::vector<ChangeLaneType> change_lane_type;
     if (!ExtractBasicPassages(way, &nodes_of_passages, &change_lane_type)) {
       return false;

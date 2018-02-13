@@ -32,7 +32,7 @@ from shapely.geometry import LineString, Point
 from numpy.polynomial.polynomial import polyval
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
-from modules.planning.proto import planning_internal_pb2
+from modules.relative_map.proto import navigation_info_pb2
 from modules.drivers.proto import mobileye_pb2
 
 # pip install -U flask-cors
@@ -85,7 +85,7 @@ def navigation():
         return jsonify([])
     # send to ros
     routing_pub.publish(res.content)
-    navigation_info = planning_internal_pb2.NavigationInfo()
+    navigation_info = navigation_info_pb2.NavigationInfo()
     navigation_info.ParseFromString(res.content)
     # send to browser
     latlon_path = []

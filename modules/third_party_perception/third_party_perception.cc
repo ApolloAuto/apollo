@@ -30,32 +30,44 @@
 namespace apollo {
 namespace third_party_perception {
 
-using apollo::common::adapter::AdapterManager;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
-using apollo::drivers::Mobileye;
+using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
+using apollo::drivers::ContiRadar;
 using apollo::drivers::DelphiESR;
 using apollo::drivers::Esr_track01_500;
+using apollo::drivers::Mobileye;
 using apollo::localization::LocalizationEstimate;
-using apollo::perception::PerceptionObstacles;
 using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
 using apollo::perception::Point;
 
-std::string ThirdPartyPerception::Name() const { return FLAGS_module_name; }
+std::string ThirdPartyPerception::Name() const {
+  return FLAGS_module_name;
+}
 
 Status ThirdPartyPerception::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
 
   CHECK(AdapterManager::GetMobileye()) << "Mobileye is not initialized.";
   AdapterManager::AddMobileyeCallback(&ThirdPartyPerception::OnMobileye, this);
-  CHECK(AdapterManager::GetDelphiESR()) << "DelphiESR is not initialized.";
-  AdapterManager::AddDelphiESRCallback(&ThirdPartyPerception::OnDelphiESR,
-                                       this);
   CHECK(AdapterManager::GetLocalization())
       << "Localization is not initialized.";
   AdapterManager::AddLocalizationCallback(&ThirdPartyPerception::OnLocalization,
                                           this);
 
+  // TODO(all) : need to merge the delphi/conti_radar before adaptor manager
+  // level. This is just temperary change.
+  if (!FLAGS_use_conti_radar) {
+    CHECK(AdapterManager::GetDelphiESR()) << "DelphiESR is not initialized.";
+    AdapterManager::AddDelphiESRCallback(&ThirdPartyPerception::OnDelphiESR,
+                                         this);
+  } else {
+    CHECK(AdapterManager::GetContiRadar())
+        << "GetContiRadar is not initialized.";
+    AdapterManager::AddContiRadarCallback(&ThirdPartyPerception::OnContiRadar,
+                                          this);
+  }
   return Status::OK();
 }
 
@@ -67,7 +79,9 @@ Status ThirdPartyPerception::Start() {
   return Status::OK();
 }
 
-void ThirdPartyPerception::Stop() { timer_.stop(); }
+void ThirdPartyPerception::Stop() {
+  timer_.stop();
+}
 
 void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
   AINFO << "Received mobileye data: run mobileye callback.";
@@ -86,8 +100,22 @@ void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
       message, localization_, last_radar_obstacles_);
   RadarObstacles filtered_radar_obstacles =
       filter::FilterRadarObstacles(current_radar_obstacles_);
-  if (FLAGS_enable_delphi_esr) {
-    delphi_esr_obstacles_ = conversion::RadarObstaclesToPerceptionObstacles(
+  if (FLAGS_enable_radar) {
+    radar_obstacles_ = conversion::RadarObstaclesToPerceptionObstacles(
+        filtered_radar_obstacles);
+  }
+}
+
+void ThirdPartyPerception::OnContiRadar(const ContiRadar& message) {
+  AINFO << "Received delphi esr data: run delphi esr callback.";
+  std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
+  last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
+  current_radar_obstacles_ = conversion::ContiToRadarObstacles(
+      message, localization_, last_radar_obstacles_);
+  RadarObstacles filtered_radar_obstacles =
+      filter::FilterRadarObstacles(current_radar_obstacles_);
+  if (FLAGS_enable_radar) {
+    radar_obstacles_ = conversion::RadarObstaclesToPerceptionObstacles(
         filtered_radar_obstacles);
   }
 }
@@ -104,13 +132,13 @@ void ThirdPartyPerception::OnTimer(const ros::TimerEvent&) {
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
 
   PerceptionObstacles obstacles =
-      fusion::MobileyeRadarFusion(mobileye_obstacles_, delphi_esr_obstacles_);
+      fusion::MobileyeRadarFusion(mobileye_obstacles_, radar_obstacles_);
 
   AdapterManager::FillPerceptionObstaclesHeader(FLAGS_node_name, &obstacles);
   AdapterManager::PublishPerceptionObstacles(obstacles);
 
   mobileye_obstacles_.Clear();
-  delphi_esr_obstacles_.Clear();
+  radar_obstacles_.Clear();
 }
 
 }  // namespace third_party_perception
