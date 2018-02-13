@@ -14,8 +14,8 @@ cc_library(
         "//modules/common:log",
         "//modules/perception/obstacle/common:perception_obstacle_common",
         "//modules/perception/obstacle/radar/interface:perception_obstacle_radar_interface",
-        "@eigen//:eigen",
-        "@pcl//:pcl",
+        "@eigen",
+        "@pcl",
     ],
 )
 
