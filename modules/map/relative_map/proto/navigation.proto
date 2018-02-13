@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package apollo.relative_map;
+
+import "modules/common/proto/header.proto";
+import "modules/common/proto/pnc_point.proto";
+
+message NavigationPath {
+  repeated apollo.common.PathPoint path_point = 1;
+  optional uint32 path_priority = 2; // highest = 0 which can directly reach destination
+}
+
+message NavigationInfo {
+  optional apollo.common.Header header = 1;
+  repeated NavigationPath navigation_path = 2;
+}
+
+

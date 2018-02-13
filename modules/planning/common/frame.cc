@@ -389,9 +389,7 @@ const Obstacle *Frame::FindCollisionObstacle() const {
   return nullptr;
 }
 
-uint32_t Frame::SequenceNum() const {
-  return sequence_num_;
-}
+uint32_t Frame::SequenceNum() const { return sequence_num_; }
 
 std::string Frame::DebugString() const {
   return "Frame: " + std::to_string(sequence_num_);
@@ -447,9 +445,7 @@ void Frame::AlignPredictionTime(const double planning_start_time,
   }
 }
 
-Obstacle *Frame::Find(const std::string &id) {
-  return obstacles_.Find(id);
-}
+Obstacle *Frame::Find(const std::string &id) { return obstacles_.Find(id); }
 
 void Frame::AddObstacle(const Obstacle &obstacle) {
   obstacles_.Add(obstacle.Id(), obstacle);
@@ -457,10 +453,13 @@ void Frame::AddObstacle(const Obstacle &obstacle) {
 
 const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
   double min_cost = std::numeric_limits<double>::infinity();
+  drive_reference_line_info_ = nullptr;
   for (const auto &reference_line_info : reference_line_info_) {
-    if (reference_line_info.ReachedDestination() ||
-        (reference_line_info.IsDrivable() &&
-         reference_line_info.Cost() < min_cost)) {
+    if (reference_line_info.ReachedDestination()) {
+      drive_reference_line_info_ = &reference_line_info;
+      return drive_reference_line_info_;
+    } else if (reference_line_info.IsDrivable() &&
+               reference_line_info.Cost() < min_cost) {
       drive_reference_line_info_ = &reference_line_info;
       min_cost = reference_line_info.Cost();
     }
