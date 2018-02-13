@@ -94,7 +94,7 @@ EndConditionSampler::SampleLonEndConditionsForPathTimeBounds(
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
 
   constexpr std::size_t num_s_section = 4;
-  std::array<double, num_s_section> s_offsets = {0.0, -1.0, -2.0, -3.0};
+  std::array<double, num_s_section> s_offsets = {-0.5, -1.0, -2.0, -3.0};
 
   for (const SampleBound& sample_bound : planning_target.sample_bound()) {
     // no longer using sample s_dot
