@@ -395,7 +395,7 @@ DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
-DEFINE_double(collision_buffer_expansion_ratio, 0.2,
+DEFINE_double(collision_buffer_expansion_ratio, 0.0,
               "The ratio w.r.t. the vehicle dimension "
               "to expand in collision checking");
 DEFINE_double(decision_horizon, 200.0,
