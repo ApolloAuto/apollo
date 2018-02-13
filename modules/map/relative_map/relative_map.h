@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include "modules/map/proto/map_msg.pb.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
@@ -72,7 +72,7 @@ class RelativeMap : public RelativeMapInterface {
  private:
   void CreateMapFromPerception(
       const apollo::perception::PerceptionObstacles& perception_obstacles,
-      apollo::hdmap::MapMsg* map_msg);
+      MapMsg* map_msg);
 
   common::adapter::AdapterManagerConfig adapter_conf_;
   apollo::common::monitor::MonitorLogger monitor_logger_;
