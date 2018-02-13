@@ -104,7 +104,7 @@ EndConditionSampler::SampleLonEndConditionsForPathTimeBounds(
     std::vector<double> s_samples;
     for (const auto& s_offset : s_offsets) {
       s_samples.push_back(std::max(
-          init_s_[0], sample_bound.s_upper() - s_dot * 3.0 + s_offset));
+          init_s_[0], sample_bound.s_lower() - s_dot * 3.0 + s_offset));
     }
 
     for (const auto s : s_samples) {
