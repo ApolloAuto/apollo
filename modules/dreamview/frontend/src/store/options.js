@@ -6,7 +6,6 @@ export default class Options {
     // Side Bar options
     @observable showModuleController = PARAMETERS.options.defaults.showModuleController;
     @observable showMenu = PARAMETERS.options.defaults.showMenu;
-    @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
     @observable showRouteEditingBar = PARAMETERS.options.defaults.showRouteEditingBar;
     @observable showPOI = PARAMETERS.options.defaults.showPOI;
     @observable showDataRecorder = PARAMETERS.options.defaults.showDataRecorder;
@@ -18,6 +17,7 @@ export default class Options {
         'showMenu', 'showRouteEditingBar', 'showDataRecorder'];
 
     // Layer Menu options
+    @observable cameraAngle = PARAMETERS.options.defaults.cameraAngle;
     @observable showDecisionMain = PARAMETERS.options.defaults.showDecisionMain;
     @observable showDecisionObstacle = PARAMETERS.options.defaults.showDecisionObstacle;
     @observable showPlanning = PARAMETERS.options.defaults.showPlanning;
@@ -49,8 +49,8 @@ export default class Options {
     @observable showPositionLocalization = PARAMETERS.options.defaults.showPositionLocalization;
 
     // Others
-    @observable cameraAngle = PARAMETERS.options.defaults.cameraAngle;
-    @observable simControlEnabled = false;
+    @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
+    @observable simControlEnabled = PARAMETERS.options.defaults.enableSimControl;
     @observable tasksPanelLocked = false;
 
     @observable hideOptionToggle = {

@@ -50,6 +50,14 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
 }
 
 void SimulationWorldUpdater::RegisterMessageHandlers() {
+  // Send current sim_control status to the new client.
+  websocket_->RegisterConnectionReadyHandler(
+      [this](WebSocketHandler::Connection *conn) {
+        Json response;
+        response["type"] = "SimControlStatus";
+        response["enabled"] = sim_control_->IsEnabled();
+        websocket_->SendData(conn, response.dump());
+      });
   map_ws_->RegisterMessageHandler(
       "RetrieveMapData",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
