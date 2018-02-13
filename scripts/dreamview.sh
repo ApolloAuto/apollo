@@ -27,7 +27,8 @@ source "${DIR}/apollo_base.sh"
 bash scripts/monitor.sh "$@"
 
 rm -rf modules/dreamview/frontend/dist/assets/map_data
-ln -s /apollo/modules/map/data/ modules/dreamview/frontend/dist/assets/map_data
+ln -s `pwd`/modules/map/data/ modules/dreamview/frontend/dist/assets/map_data
+
 # run function from apollo_base.sh
 # run command_name module_name
 run dreamview "$@"
