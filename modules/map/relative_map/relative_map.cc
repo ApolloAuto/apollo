@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,10 @@ void RelativeMap::RunOnce(const PerceptionObstacles& perception_obstacles) {
 
 void RelativeMap::CreateMapFromPerception(
     const PerceptionObstacles& perception_obstacles, MapMsg* map_msg) {
-  // TODO(all) create map proto
+  navigation_lane_.Update(perception_obstacles);
+
+  const auto& navigation_path = navigation_lane_.Path();
+  // TODO(all) create map proto from navigation_path
 }
 
 void RelativeMap::Stop() {

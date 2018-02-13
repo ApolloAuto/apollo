@@ -20,6 +20,7 @@ cc_library(
         ":relative_map_conf",
     ],
     deps = [
+        ":navigation_lane_lib",
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_manager",
@@ -28,6 +29,23 @@ cc_library(
         "//modules/common/util",
         "//modules/map/relative_map/common:relative_map_gflags",
         "//modules/map/relative_map/proto:navigation_proto",
+        "//modules/perception/proto:perception_proto",
+    ],
+)
+
+cc_library(
+    name = "navigation_lane_lib",
+    srcs = [
+        "navigation_lane.cc",
+    ],
+    hdrs = [
+        "navigation_lane.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/map/relative_map/proto:navigation_proto",
+        "//modules/perception/proto:perception_proto",
     ],
 )
 

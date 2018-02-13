@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
+#include "modules/map/relative_map/navigation_lane.h"
 #include "modules/map/relative_map/relative_map_interface.h"
 
 namespace apollo {
@@ -76,6 +77,8 @@ class RelativeMap : public RelativeMapInterface {
 
   common::adapter::AdapterManagerConfig adapter_conf_;
   apollo::common::monitor::MonitorLogger monitor_logger_;
+
+  NavigationLane navigation_lane_;
 };
 
 }  // namespace relative_map
