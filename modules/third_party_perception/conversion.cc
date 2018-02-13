@@ -18,6 +18,7 @@
  * @file
  */
 
+#include <cmath>
 #include <vector>
 
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
@@ -35,8 +36,8 @@ namespace conversion {
 using apollo::drivers::DelphiESR;
 using apollo::drivers::Mobileye;
 using apollo::localization::LocalizationEstimate;
-using apollo::perception::PerceptionObstacles;
 using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
 using apollo::perception::Point;
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
@@ -179,12 +180,12 @@ RadarObstacles DelphiToRadarObstacles(
     rob.set_height(3.0);
 
     const double range = data_500.can_tx_track_range();
-    const double angle = data_500.can_tx_track_angle() * PI / 180.0;
+    const double angle = data_500.can_tx_track_angle() * M_PI / 180.0;
     Point relative_pos_sl;
-    relative_pos_sl.set_x(
-        range * std::cos(angle) +
-        FLAGS_delphi_esr_pos_adjust +  // offset: imu <-> mobileye
-        rob.length() / 2.0);           // make x the middle point of the vehicle
+    relative_pos_sl.set_x(range * std::cos(angle) +
+                          FLAGS_radar_pos_adjust +  // offset: imu <-> mobileye
+                          rob.length() /
+                              2.0);  // make x the middle point of the vehicle
     relative_pos_sl.set_y(range * std::sin(angle));
     rob.mutable_relative_position()->CopyFrom(relative_pos_sl);
 
@@ -255,7 +256,7 @@ PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     auto* pob = obstacles.add_perception_obstacle();
     const auto& radar_obstacle = iter.second;
 
-    pob->set_id(radar_obstacle.id() + FLAGS_delphi_esr_id_offset);
+    pob->set_id(radar_obstacle.id() + FLAGS_radar_id_offset);
 
     pob->set_type(PerceptionObstacle::VEHICLE);
     pob->set_length(radar_obstacle.length());
