@@ -9,8 +9,8 @@ cc_library(
         "geometry_util.cc",
         "graph_util.cc",
         "hungarian_bigraph_matcher.cc",
+        "object_sequence.cc",
         "pose_util.cc",
-        "object_sequence.cc"
     ],
     hdrs = [
         "convex_hullxy.h",
@@ -19,8 +19,8 @@ cc_library(
         "geometry_util.h",
         "graph_util.h",
         "hungarian_bigraph_matcher.h",
+        "object_sequence.h",
         "pose_util.h",
-        "object_sequence.h"
     ],
     linkopts = [
         "-lqhull",
@@ -30,7 +30,7 @@ cc_library(
         "//modules/perception/lib/base",
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/base:perception_obstacle_base",
-        "@eigen//:eigen",
+        "@eigen",
         "@yaml_cpp//:yaml",
     ],
 )

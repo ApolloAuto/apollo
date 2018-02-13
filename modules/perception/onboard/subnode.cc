@@ -17,11 +17,8 @@
 #include "modules/perception/onboard/subnode.h"
 
 #include <sstream>
-#include <string>
-#include <vector>
 
 #include "modules/common/log.h"
-#include "modules/perception/onboard/event_manager.h"
 
 namespace apollo {
 namespace perception {

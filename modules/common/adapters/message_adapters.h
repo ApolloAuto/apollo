@@ -43,6 +43,7 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 #include "sensor_msgs/CompressedImage.h"
@@ -101,6 +102,7 @@ using LocalizationMsfSinsPvaAdapter =
 using LocalizationMsfStatusAdapter =
     Adapter<apollo::localization::LocalizationStatus>;
 using RelativeMapAdapter = Adapter<apollo::hdmap::MapMsg>;
+using NavigationAdapter = Adapter<apollo::planning_internal::NavigationPath>;
 
 }  // namespace adapter
 }  // namespace common

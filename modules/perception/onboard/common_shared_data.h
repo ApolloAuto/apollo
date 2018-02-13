@@ -17,7 +17,6 @@
 #ifndef MODULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
 #define MODULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
 
-#include <boost/format.hpp>
 #include <map>
 #include <memory>
 #include <sstream>
@@ -25,6 +24,7 @@
 #include <utility>
 #include <vector>
 
+#include "boost/format.hpp"
 #include "gflags/gflags.h"
 
 #include "modules/perception/lib/base/mutex.h"
@@ -77,9 +77,7 @@ class CommonSharedData : public SharedData {
   CommonSharedData() {}
   virtual ~CommonSharedData() {}
 
-  bool Init() override {
-    return true;
-  }
+  bool Init() override { return true; }
   // @brief: you must impl your own name func
   // @return: name of your own class
   virtual std::string name() const = 0;
@@ -122,13 +120,9 @@ class CommonSharedData : public SharedData {
 
   // @brief: num of data stored in shared data
   // @return: num of data
-  unsigned Size() const {
-    return data_map_.size();
-  }
+  unsigned Size() const { return data_map_.size(); }
 
-  CommonSharedDataStat GetStat() const {
-    return stat_;
-  }
+  CommonSharedDataStat GetStat() const { return stat_; }
 
  private:
   typedef std::map<std::string, SharedDataPtr<M>> SharedDataMap;
