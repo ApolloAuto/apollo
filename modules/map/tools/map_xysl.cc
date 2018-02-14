@@ -295,6 +295,7 @@ int main(int argc, char *argv[]) {
     map_util.PointToSL(point, &lane_id, &s, &l, &heading);
     printf("lane_id[%s], s[%f], l[%f], heading[%f]\n", lane_id.c_str(), s, l,
            heading);
+    map_util.PrintLane(lane_id);
     valid_arg = true;
   }
   if (FLAGS_sl_to_xy) {
@@ -303,6 +304,7 @@ int main(int argc, char *argv[]) {
     map_util.SLToPoint(map_util.GetLane(FLAGS_lane), FLAGS_s, FLAGS_l, &point,
                        &heading);
     printf("x[%f] y[%f], heading[%f]\n", point.x(), point.y(), heading);
+    map_util.PrintLane(FLAGS_lane);
     valid_arg = true;
   }
   if (FLAGS_xy_to_lane) {
@@ -318,6 +320,7 @@ int main(int argc, char *argv[]) {
     }
     printf("lane[%s] s[%f], l[%f], heading[%f]\n", FLAGS_lane.c_str(), s, l,
            heading);
+    map_util.PrintLane(FLAGS_lane);
     valid_arg = true;
   }
   if (FLAGS_lane_to_lane) {
@@ -337,6 +340,8 @@ int main(int argc, char *argv[]) {
     }
     printf("lane[%s] s[%f], l[%f], heading[%f]\n", FLAGS_to_lane.c_str(),
            target_s, target_l, target_heading);
+    map_util.PrintLane(FLAGS_from_lane);
+    map_util.PrintLane(FLAGS_to_lane);
     valid_arg = true;
   }
   if (!FLAGS_lane.empty()) {
