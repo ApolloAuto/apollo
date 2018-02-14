@@ -30,6 +30,7 @@
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/handlers/websocket.h"
 #include "modules/dreamview/proto/point_cloud.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "sensor_msgs/PointCloud2.h"
 
 /**
@@ -65,6 +66,9 @@ class PointCloudUpdater {
 
   void UpdatePointCloud(const sensor_msgs::PointCloud2 &point_cloud);
 
+  void UpdateLocalizationTime(
+    const apollo::localization::LocalizationEstimate &localization);
+
   WebSocketHandler *websocket_;
 
   bool enabled_ = false;
@@ -77,7 +81,8 @@ class PointCloudUpdater {
   // NOTE: Use boost until we have std version of rwlock support.
   boost::shared_mutex mutex_;
 
-  double last_receive_time_ = 0.0;
+  double last_point_cloud_time_ = 0.0;
+  double last_localization_time_ = 0.0;
 };
 
 }  // namespace dreamview
