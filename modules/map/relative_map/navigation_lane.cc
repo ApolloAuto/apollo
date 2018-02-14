@@ -22,7 +22,13 @@
 
 namespace apollo {
 namespace relative_map {
+namespace {
 
+double GetDistance(const common::VehicleState& adc_state,
+                   const common::PathPoint& p) {
+  return std::hypot(adc_state.x() - p.x(), adc_state.y() - p.y());
+}
+}
 using apollo::perception::PerceptionObstacles;
 using apollo::common::VehicleStateProvider;
 
@@ -37,11 +43,19 @@ bool NavigationLane::Update(const PerceptionObstacles& perception_obstacles) {
   // update adc_state_ from VehicleStateProvider
   adc_state_ = VehicleStateProvider::instance()->vehicle_state();
 
-  // TODO(All): consider lane_marker qualities when converting lane_marker to
-  // navigation path
   navigation_path_.Clear();
   auto* path = navigation_path_.mutable_path();
-  ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
+  const auto& lane_marker = perception_obstacles_.lane_marker();
+
+  const double kQualityThreshold = 0.5;
+  if (navigation_info_.navigation_path_size() > 0 &&
+      std::fmax(lane_marker.left_lane_marker().quality(),
+                lane_marker.right_lane_marker().quality()) <
+          kQualityThreshold) {
+    ConvertNavigationLineToPath();
+  } else {
+    ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
+  }
   return true;
 }
 
@@ -49,6 +63,51 @@ double NavigationLane::EvaluateCubicPolynomial(const double c0, const double c1,
                                                const double c2, const double c3,
                                                const double z) const {
   return c3 * std::pow(z, 3) + c2 * std::pow(z, 2) + c1 * z + c0;
+}
+
+void NavigationLane::ConvertNavigationLineToPath() {
+  if (navigation_info_.navigation_path_size() == 0 ||
+      !navigation_info_.navigation_path(0).has_path() ||
+      navigation_info_.navigation_path(0).path().path_point_size() == 0) {
+    // path is empty
+    return;
+  }
+  navigation_path_.Clear();
+  auto* curr_path = navigation_path_.mutable_path();
+  UpdateProjectionIndex();
+
+  // TODO(All): support multiple navigation path
+  // only support 1 navigation path
+  const auto& path = navigation_info_.navigation_path(0).path();
+  int curr_project_index = last_project_index_;
+  for (int i = curr_project_index; i < path.path_point_size(); ++i) {
+    auto* point = curr_path->add_path_point();
+    point->CopyFrom(path.path_point(i));
+    const double accumulated_s =
+        path.path_point(i).s() - path.path_point(curr_project_index).s();
+    point->set_s(accumulated_s);
+  }
+}
+
+// project adc_state_ onto path
+void NavigationLane::UpdateProjectionIndex() {
+  // TODO(All): support multiple navigation path
+  // only support 1 navigation path
+  const auto& path = navigation_info_.navigation_path(0).path();
+  int index = 0;
+  double min_d = std::numeric_limits<double>::max();
+  for (int i = last_project_index_; i + 1 < path.path_point_size(); ++i) {
+    const double d = GetDistance(adc_state_, path.path_point(i));
+    if (d < min_d) {
+      min_d = d;
+      index = i;
+    }
+    const double kMaxDistance = 50.0;
+    if (d > kMaxDistance) {
+      break;
+    }
+  }
+  last_project_index_ = index;
 }
 
 void NavigationLane::ConvertLaneMarkerToPath(

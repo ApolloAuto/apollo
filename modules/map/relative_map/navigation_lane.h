@@ -30,6 +30,9 @@ class NavigationLane {
   ~NavigationLane() = default;
 
   bool Update(const perception::PerceptionObstacles& perception_obstacles);
+  void UpdateNavigationInfo(const NavigationInfo& navigation_info) {
+    navigation_info_ = navigation_info;
+  }
 
   const NavigationPath& Path() { return navigation_path_; }
 
@@ -40,9 +43,20 @@ class NavigationLane {
   void ConvertLaneMarkerToPath(const perception::LaneMarkers& lane_marker,
                                common::Path* path);
 
+  void ConvertNavigationLineToPath();
+
+  void UpdateProjectionIndex();
+
+  // received from topic: /apollo/perception_obstacles
   perception::PerceptionObstacles perception_obstacles_;
 
+  // received from topic: /apollo/navigation
+  NavigationInfo navigation_info_;
+
+  // navigation_path_ is the combined results from perception and navigation
   NavigationPath navigation_path_;
+
+  int last_project_index_ = 0;
 
   common::VehicleState adc_state_;
 };
