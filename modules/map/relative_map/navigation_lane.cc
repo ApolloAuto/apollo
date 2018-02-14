@@ -37,8 +37,8 @@ bool NavigationLane::Update(const PerceptionObstacles& perception_obstacles) {
   // update adc_state_ from VehicleStateProvider
   adc_state_ = VehicleStateProvider::instance()->vehicle_state();
 
-  // TODO(All): lane_marker --> navigation path
-
+  // TODO(All): consider lane_marker qualities when converting lane_marker to
+  // navigation path
   navigation_path_.Clear();
   auto* path = navigation_path_.mutable_path();
   ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
