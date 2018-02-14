@@ -25,6 +25,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "gtest/gtest_prod.h"
 
@@ -82,12 +83,13 @@ class SimulationWorldService {
 
   /**
    * @brief Returns the binary representation of the SimulationWorld object.
-   * @param radius the search distance from the current car location
-   * @param enable_pnc_monitor whether the planning debugging data should be
-   * included.
-   * @return wire format string of SimulationWorld proto.
+   * @param radius the search distance from the current car location.
+   * @param sim_world output of binary format sim_world string.
+   * @param sim_world_with_planning_data output of binary format sim_world
+   * string with planning_data.
    */
-  std::string GetWireFormatString(double radius, bool enable_pnc_monitor);
+  void GetWireFormatString(double radius, std::string *sim_world,
+                           std::string *sim_world_with_planning_data);
 
   /**
    * @brief Returns the json representation of the map element Ids and hash
@@ -133,7 +135,9 @@ class SimulationWorldService {
     buffer.AddMonitorMsgItem(log_level, msg);
   }
 
-  void GetMapElementIds(double radius, MapElementIds *ids);
+  void GetMapElementIds(double radius, MapElementIds *ids) const;
+
+  nlohmann::json GetRoutePathAsJson() const;
 
  private:
   /**
@@ -197,6 +201,9 @@ class SimulationWorldService {
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
   SimulationWorld world_;
+
+  // Downsampled route paths to be rendered in frontend.
+  std::vector<RoutePath> route_paths_;
 
   // The handle of MapService, not owned by SimulationWorldService.
   const MapService *map_service_;

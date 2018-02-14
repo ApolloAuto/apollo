@@ -138,6 +138,14 @@ new_http_archive(
     url = "https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.5.3.zip",
 )
 
+new_http_archive(
+    name = "qpOASES",
+    build_file = "third_party/qpOASES.BUILD",
+    sha256 = "e70b49586b58b8f5fd348e951f3c3094ed0ad371a96097a499f343a7aeec7dbe",
+    strip_prefix = "qp-oases-3.2.1-1",
+    url = "https://github.com/startcode/qp-oases/archive/v3.2.1-1.zip",
+)
+
 # IpOpt
 new_local_repository(
     name = "ipopt",
@@ -149,7 +157,7 @@ new_local_repository(
 new_local_repository(
     name = "local_integ",
     build_file = "third_party/local_integ.BUILD",
-    path = "/usr/local/local_integ",
+    path = "/usr/local/apollo/local_integ",
 )
 
 # Proj.4

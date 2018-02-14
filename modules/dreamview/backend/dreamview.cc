@@ -37,14 +37,34 @@ using apollo::common::time::Clock;
 using apollo::common::util::PathExists;
 using apollo::hdmap::BaseMapFile;
 
-std::string Dreamview::Name() const { return FLAGS_dreamview_module_name; }
+std::string Dreamview::Name() const {
+  return FLAGS_dreamview_module_name;
+}
+
+void Dreamview::TerminateProfilingMode(const ros::TimerEvent& event) {
+  Stop();
+  ros::shutdown();
+  AWARN << "Profiling timer called shutdown!";
+}
 
 Status Dreamview::Init() {
   AdapterManager::Init(FLAGS_dreamview_adapter_config_filename);
   VehicleConfigHelper::Init();
 
+  if (FLAGS_dreamview_profiling_mode &&
+      FLAGS_dreamview_profiling_duration > 0.0) {
+    exit_timer_ = AdapterManager::CreateTimer(
+        ros::Duration(FLAGS_dreamview_profiling_duration),
+        &Dreamview::TerminateProfilingMode, this, true, true);
+    AWARN << "============================================================";
+    AWARN << "| Dreamview running in profiling mode, exit in "
+          << FLAGS_dreamview_profiling_duration << " seconds |";
+    AWARN << "============================================================";
+  }
+
   // Check the expected adapters are initialized.
   CHECK(AdapterManager::GetChassis()) << "ChassisAdapter is not initialized.";
+  CHECK(AdapterManager::GetGps()) << "GpsAdapter is not initialized.";
   CHECK(AdapterManager::GetPlanning()) << "PlanningAdapter is not initialized.";
   CHECK(AdapterManager::GetLocalization())
       << "LocalizationAdapter is not initialized.";
@@ -64,6 +84,8 @@ Status Dreamview::Init() {
       << "CompressedImageAdapter is not initialized.";
   CHECK(AdapterManager::GetImageShort())
       << "ImageShortAdapter is not initialized.";
+  CHECK(AdapterManager::GetPointCloud())
+      << "PointCloudAdapter is not initialized.";
 
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
@@ -81,15 +103,20 @@ Status Dreamview::Init() {
 
   image_.reset(new ImageHandler());
   websocket_.reset(new WebSocketHandler());
+  map_ws_.reset(new WebSocketHandler());
+  point_cloud_ws_.reset(new WebSocketHandler());
   map_service_.reset(new MapService());
   sim_control_.reset(new SimControl(map_service_.get()));
 
-  sim_world_updater_.reset(
-      new SimulationWorldUpdater(websocket_.get(), sim_control_.get(),
-                                 map_service_.get(), FLAGS_routing_from_file));
+  sim_world_updater_.reset(new SimulationWorldUpdater(
+      websocket_.get(), map_ws_.get(), sim_control_.get(), map_service_.get(),
+      FLAGS_routing_from_file));
+  point_cloud_updater_.reset(new PointCloudUpdater(point_cloud_ws_.get()));
   hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
 
   server_->addWebSocketHandler("/websocket", *websocket_);
+  server_->addWebSocketHandler("/map", *map_ws_);
+  server_->addWebSocketHandler("/pointcloud", *point_cloud_ws_);
   server_->addHandler("/image", *image_);
 
   ApolloApp::SetCallbackThreadNumber(FLAGS_dreamview_worker_num);
@@ -99,9 +126,7 @@ Status Dreamview::Init() {
 
 Status Dreamview::Start() {
   sim_world_updater_->Start();
-  if (FLAGS_enable_sim_control) {
-    sim_control_->Init(true);
-  }
+  point_cloud_updater_->Start();
   return Status::OK();
 }
 

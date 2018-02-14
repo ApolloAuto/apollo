@@ -28,6 +28,7 @@ enum StopReasonCode {
   STOP_REASON_YIELD_SIGN = 102;
   STOP_REASON_CLEAR_ZONE = 103;
   STOP_REASON_CROSSWALK = 104;
+  STOP_REASON_CREEPER = 105;
 }
 
 message ObjectStop {
@@ -73,6 +74,11 @@ message ObjectOvertake {
 }
 
 message ObjectSidePass {
+  enum Type {
+    LEFT = 1;
+    RIGHT = 2;
+  };
+  optional Type type = 1;
 }
 
 // unified object decision while estop

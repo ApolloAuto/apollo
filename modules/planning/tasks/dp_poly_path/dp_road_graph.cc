@@ -33,6 +33,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_thread_pool.h"
@@ -296,12 +297,15 @@ bool DPRoadGraph::SamplePathWaypoints(
     const double eff_right_width = right_width - half_adc_width - kBoundaryBuff;
     const double eff_left_width = left_width - half_adc_width - kBoundaryBuff;
 
-    double kDefaultUnitL = 1.2 / (config_.sample_points_num_each_level() - 1);
+    const size_t num_sample_per_level =
+        FLAGS_use_navigation_mode ? config_.navigator_sample_num_each_level()
+                                  : config_.sample_points_num_each_level();
+
+    double kDefaultUnitL = 1.2 / (num_sample_per_level - 1);
     if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
       kDefaultUnitL = 1.0;
     }
-    const double sample_l_range =
-        kDefaultUnitL * (config_.sample_points_num_each_level() - 1);
+    const double sample_l_range = kDefaultUnitL * (num_sample_per_level - 1);
     double sample_right_boundary = -eff_right_width;
     double sample_left_boundary = eff_left_width;
 
@@ -324,12 +328,23 @@ bool DPRoadGraph::SamplePathWaypoints(
       sample_l.push_back(reference_line_info_.OffsetToOtherReferenceLine());
     } else {
       common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
-                                  config_.sample_points_num_each_level() - 1,
-                                  &sample_l);
+                                  num_sample_per_level - 1, &sample_l);
       if (HasSidepass()) {
         // currently only left nudge is supported. Need road hard boundary for
         // both sides
-        sample_l.push_back(eff_left_width + config_.sidepass_distance());
+        sample_l.clear();
+        switch (sidepass_.type()) {
+          case ObjectSidePass::LEFT: {
+            sample_l.push_back(eff_left_width + config_.sidepass_distance());
+            break;
+          }
+          case ObjectSidePass::RIGHT: {
+            sample_l.push_back(-eff_right_width - config_.sidepass_distance());
+            break;
+          }
+          default:
+            break;
+        }
       }
     }
     std::vector<common::SLPoint> level_points;
@@ -348,7 +363,7 @@ bool DPRoadGraph::SamplePathWaypoints(
       sample_layer_debug.add_sl_point()->CopyFrom(sl);
       level_points.push_back(std::move(sl));
     }
-    if (!reference_line_info_.IsChangeLanePath()) {
+    if (!reference_line_info_.IsChangeLanePath() && !HasSidepass()) {
       auto sl_zero = common::util::MakeSLPoint(s, 0.0);
       sample_layer_debug.add_sl_point()->CopyFrom(sl_zero);
       level_points.push_back(sl_zero);
@@ -460,6 +475,7 @@ bool DPRoadGraph::HasSidepass() {
   const auto &path_decision = reference_line_info_.path_decision();
   for (const auto &obstacle : path_decision.path_obstacles().Items()) {
     if (obstacle->LateralDecision().has_sidepass()) {
+      sidepass_ = obstacle->LateralDecision().sidepass();
       return true;
     }
   }

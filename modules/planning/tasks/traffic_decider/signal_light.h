@@ -38,21 +38,20 @@ class SignalLight : public TrafficRule {
 
   virtual ~SignalLight() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 
  private:
   void ReadSignals();
   bool FindValidSignalLight(ReferenceLineInfo* const reference_line_info);
   apollo::perception::TrafficLight GetSignal(const std::string& signal_id);
-  void MakeDecisions(Frame* frame,
+  void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
-  double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
-                             const hdmap::PathOverlap* signal_light);
-  bool BuildStopDecision(Frame* frame,
+  bool BuildStopDecision(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info,
-                         const hdmap::PathOverlap* signal_light);
+                         hdmap::PathOverlap* const signal_light);
   void SetCreepForwardSignalDecision(
-      const ReferenceLineInfo* reference_line_info,
+      ReferenceLineInfo* const reference_line_info,
       hdmap::PathOverlap* const signal_light) const;
 
   std::vector<hdmap::PathOverlap> signal_lights_from_path_;

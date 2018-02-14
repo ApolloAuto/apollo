@@ -13,7 +13,7 @@ There are three main components of 3D obstacle perception:
 
 The following sections describe the obstacle perception pipeline given input as 3D point cloud data from the LiDAR sensor that are resolved by Apollo:
 
-- HDMap Region ofInterest (ROI) Filter
+- HDMap Region of Interest (ROI) Filter
 - Convolutional Neural Networks (CNN) Segmentation
 - MinBox Builder
 - HM ObjectTracker
@@ -22,7 +22,7 @@ The following sections describe the obstacle perception pipeline given input as 
 HDMap Region of Interest (ROI) Filter
 -------------------------------------
 
-The Region of Interest (ROI) specifies the drivable area that includes road surfaces and junctions that are retrieved from the HD (hi-resolution) map. The HDMap ROI filter processes LiDAR points that are outside the ROI, removing background objects, e.g., buildings and trees around the road. What remains is the point cloud in the ROI for subsequent processing.
+The Region of Interest (ROI) specifies the drivable area that includes road surfaces and junctions that are retrieved from the HD (high-resolution) map. The HDMap ROI filter processes LiDAR points that are outside the ROI, removing background objects, e.g., buildings and trees around the road. What remains is the point cloud in the ROI for subsequent processing.
 
 Given an HDMap, the affiliation of each LiDAR point indicates whether it is inside or outside the ROI. Each LiDAR point can be queried with a lookup table (LUT) of 2D quantization of the region around the car. The
 input and output of the HDMap ROI filter module are summarized in the table below.
@@ -195,7 +195,7 @@ The table below explains the parameter usage and default values for CNN Segmenta
 | feature_param {height}       | The number of cells in Y (row) axis of the 2D grid. | 512        |
 | feature_param {range}        | The range of the 2D grid with respect to the origin (the LiDAR sensor). | 60 meters  |
 
-
+**Note: the provided model is a sample for experiment purpose only.**
 
 ### MinBox Builder
 

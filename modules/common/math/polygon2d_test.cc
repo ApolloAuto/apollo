@@ -16,6 +16,7 @@
 
 #include "modules/common/math/polygon2d.h"
 
+#include <algorithm>
 #include <string>
 
 #include "gtest/gtest.h"

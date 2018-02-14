@@ -53,6 +53,7 @@ body {
 }
 
 
+
 /* Adjust the scrollbar style. */
 
  ::-webkit-scrollbar {
@@ -204,6 +205,11 @@ body {
         width: 100%;
         height: 100%;
         overflow: hidden;
+
+
+         ::-webkit-scrollbar {
+            width: 6px;
+        }
     }
 
     .SplitPane {
@@ -260,6 +266,7 @@ body {
         position: relative;
     }
 }
+
 
 /* This is the styles for the main canvas of the dreamview container.
    It is applied to the major <div> of <Dreamview>. */
@@ -764,7 +771,7 @@ body {
         }
     }
 
-    .traffic-light-indicator {
+    .traffic-light-and-driving-mode {
         position: absolute;
         top: 246px;
         right: 20px;
@@ -1139,6 +1146,34 @@ body {
     }
 }
 
+.data-recorder {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+
+    flex: 1 auto;
+
+    z-index: 10;
+    margin-right: 3px;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    .drive-event-card {
+        table {
+            width: 100%;
+            text-align: center;
+        }
+        .drive-event-msg {
+            width: 100%;
+        }
+        .toolbar {
+            button {
+                width: 200px;
+            }
+        }
+    }
+}
+
 .loader {
     flex: 0 0 auto;
 
@@ -1277,13 +1312,52 @@ body {
 
 .pnc-monitor {
     height: 100%;
+    border: 1px solid #000000;
+    box-sizing: border-box;
 
     background-color: #1D2226;
     overflow: auto;
 
     .scatter-graph {
-        margin: 5px;
-        border: 1px solid #54585A;
-        box-shadow: 4px 4px 2px #54585A;
+        margin: 0px;
+        border: 1px #000000;
+        border-style: solid none;
+    }
+
+    .react-tabs {
+        &__tab-list {
+            display: table;
+            width: 100%;
+            margin: 0px;
+            border-bottom: 1px solid #000000;
+            padding: 0;
+        }
+
+        &__tab {
+            display: table-cell;
+
+            position: relative;
+            border: 1px solid transparent;
+            border-bottom: none;
+            padding: 6px 12px;
+
+            background: #1D2226;
+            color: #999999;
+            list-style: none;
+            cursor: pointer;
+
+            &--selected {
+                background: #2A3238;
+                color: #FFFFFF;
+            }
+        }
+
+        &__tab-panel {
+            display: none;
+
+            &--selected {
+                display: block;
+            }
+        }
     }
 }

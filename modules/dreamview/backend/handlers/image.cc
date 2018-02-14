@@ -41,8 +41,8 @@ void ImageHandler::OnImage(const sensor_msgs::Image &image) {
 
   unsigned char *yuv = (unsigned char *)&(image.data[0]);
   auto mat = cv::Mat(image.height, image.width, CV_8UC3);
-  apollo::perception::traffic_light::Yuyv2rgbAvx(yuv, mat.data,
-                                                 image.height * image.width);
+  apollo::perception::traffic_light::Yuyv2rgb(yuv, mat.data,
+                                              image.height * image.width);
   cv::cvtColor(mat, mat, CV_RGB2BGR);
 
   cv::resize(mat, mat,

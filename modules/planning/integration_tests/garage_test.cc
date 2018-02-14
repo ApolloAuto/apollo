@@ -45,6 +45,7 @@ class GarageTest : public PlanningTestBase {
     FLAGS_test_data_dir = "modules/planning/testdata/garage_test";
     FLAGS_planning_upper_speed_limit = 12.5;
     FLAGS_enable_lag_prediction = false;
+    FLAGS_enable_stop_sign = false;
   }
 };
 
@@ -56,7 +57,7 @@ TEST_F(GarageTest, stop_obstacle) {
   FLAGS_test_localization_file = "stop_obstacle_localization.pb.txt";
   FLAGS_test_chassis_file = "stop_obstacle_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -67,7 +68,7 @@ TEST_F(GarageTest, follow) {
   FLAGS_test_localization_file = "follow_localization.pb.txt";
   FLAGS_test_chassis_file = "follow_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -78,7 +79,7 @@ TEST_F(GarageTest, stop_dest) {
   FLAGS_test_localization_file = "stop_dest_localization.pb.txt";
   FLAGS_test_chassis_file = "stop_dest_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -90,7 +91,7 @@ TEST_F(GarageTest, out_of_map) {
   FLAGS_test_localization_file = "out_of_map_localization.pb.txt";
   FLAGS_test_chassis_file = "out_of_map_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -102,7 +103,7 @@ TEST_F(GarageTest, stop_over_line) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 }  // namespace planning

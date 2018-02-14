@@ -28,21 +28,23 @@ namespace dreamview {
 
 using apollo::common::PointENU;
 using apollo::common::util::JsonUtil;
-using apollo::hdmap::Map;
-using apollo::hdmap::Id;
-using apollo::hdmap::LaneInfoConstPtr;
+using apollo::hdmap::ClearAreaInfoConstPtr;
 using apollo::hdmap::CrosswalkInfoConstPtr;
-using apollo::hdmap::JunctionInfoConstPtr;
-using apollo::hdmap::SignalInfoConstPtr;
-using apollo::hdmap::StopSignInfoConstPtr;
-using apollo::hdmap::YieldSignInfoConstPtr;
 using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::Id;
+using apollo::hdmap::JunctionInfoConstPtr;
+using apollo::hdmap::LaneInfoConstPtr;
+using apollo::hdmap::Map;
 using apollo::hdmap::Path;
 using apollo::hdmap::PncMap;
+using apollo::hdmap::RoadInfoConstPtr;
 using apollo::hdmap::RouteSegments;
+using apollo::hdmap::SignalInfoConstPtr;
 using apollo::hdmap::SimMapFile;
-using apollo::routing::RoutingResponse;
+using apollo::hdmap::StopSignInfoConstPtr;
+using apollo::hdmap::YieldSignInfoConstPtr;
 using apollo::routing::RoutingRequest;
+using apollo::routing::RoutingResponse;
 using google::protobuf::RepeatedPtrField;
 
 namespace {
@@ -59,8 +61,7 @@ void ExtractIds(const std::vector<MapElementInfoConstPtr> &items,
   std::sort(ids->begin(), ids->end());
 }
 
-template <typename MapElementInfoConstPtr>
-void ExtractOverlapIds(const std::vector<MapElementInfoConstPtr> &items,
+void ExtractOverlapIds(const std::vector<SignalInfoConstPtr> &items,
                        RepeatedPtrField<std::string> *ids) {
   for (const auto &item : items) {
     for (auto &overlap_id : item->signal().overlap_id()) {
@@ -70,6 +71,36 @@ void ExtractOverlapIds(const std::vector<MapElementInfoConstPtr> &items,
   // The output is sorted so that the calculated hash will be
   // invariant to the order of elements.
   std::sort(ids->begin(), ids->end());
+}
+
+void ExtractOverlapIds(const std::vector<StopSignInfoConstPtr> &items,
+                       RepeatedPtrField<std::string> *ids) {
+  for (const auto &item : items) {
+    for (auto &overlap_id : item->stop_sign().overlap_id()) {
+      ids->Add()->assign(overlap_id.id());
+    }
+  }
+  // The output is sorted so that the calculated hash will be
+  // invariant to the order of elements.
+  std::sort(ids->begin(), ids->end());
+}
+
+void ExtractRoadAndLaneIds(const std::vector<LaneInfoConstPtr> &lanes,
+                           RepeatedPtrField<std::string> *lane_ids,
+                           RepeatedPtrField<std::string> *road_ids) {
+  lane_ids->Reserve(lanes.size());
+  road_ids->Reserve(lanes.size());
+
+  for (const auto &lane : lanes) {
+    lane_ids->Add()->assign(lane->id().id());
+    if (!lane->road_id().id().empty()) {
+      road_ids->Add()->assign(lane->road_id().id());
+    }
+  }
+  // The output is sorted so that the calculated hash will be
+  // invariant to the order of elements.
+  std::sort(lane_ids->begin(), lane_ids->end());
+  std::sort(road_ids->begin(), road_ids->end());
 }
 
 }  // namespace
@@ -155,7 +186,13 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
   if (sim_map_->GetLanes(point, radius, &lanes) != 0) {
     AERROR << "Fail to get lanes from sim_map.";
   }
-  ExtractIds(lanes, ids->mutable_lane());
+  ExtractRoadAndLaneIds(lanes, ids->mutable_lane(), ids->mutable_road());
+
+  std::vector<ClearAreaInfoConstPtr> clear_areas;
+  if (sim_map_->GetClearAreas(point, radius, &clear_areas) != 0) {
+    AERROR << "Fail to get clear areas from sim_map.";
+  }
+  ExtractIds(clear_areas, ids->mutable_clear_area());
 
   std::vector<CrosswalkInfoConstPtr> crosswalks;
   if (sim_map_->GetCrosswalks(point, radius, &crosswalks) != 0) {
@@ -182,6 +219,7 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
     AERROR << "Failed to get stop signs from sim_map.";
   }
   ExtractIds(stop_signs, ids->mutable_stop_sign());
+  ExtractOverlapIds(stop_signs, ids->mutable_overlap());
 
   std::vector<YieldSignInfoConstPtr> yield_signs;
   if (sim_map_->GetYieldSigns(point, radius, &yield_signs) != 0) {
@@ -204,6 +242,14 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     auto element = sim_map_->GetLaneById(map_id);
     if (element) {
       *result.add_lane() = element->lane();
+    }
+  }
+
+  for (const auto &id : ids.clear_area()) {
+    map_id.set_id(id);
+    auto element = sim_map_->GetClearAreaById(map_id);
+    if (element) {
+      *result.add_clear_area() = element->clear_area();
     }
   }
 
@@ -244,6 +290,14 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     auto element = sim_map_->GetYieldSignById(map_id);
     if (element) {
       *result.add_yield() = element->yield_sign();
+    }
+  }
+
+  for (const auto &id : ids.road()) {
+    map_id.set_id(id);
+    auto element = sim_map_->GetRoadById(map_id);
+    if (element) {
+      *result.add_road() = element->road();
     }
   }
 

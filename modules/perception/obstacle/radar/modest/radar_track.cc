@@ -67,29 +67,17 @@ void RadarTrack::UpdataObsRadar(ObjectPtr obs_radar, const double timestamp) {
   timestamp_ = timestamp;
 }
 
-void RadarTrack::SetObsRadar(ObjectPtr obs_radar) {
-  obs_radar_ = obs_radar;
-}
+void RadarTrack::SetObsRadar(ObjectPtr obs_radar) { obs_radar_ = obs_radar; }
 
-void RadarTrack::IncreaseTrackedTimes() {
-  tracked_times_++;
-}
+void RadarTrack::IncreaseTrackedTimes() { tracked_times_++; }
 
-int RadarTrack::GetObsId() const {
-  return obs_id_;
-}
+int RadarTrack::GetObsId() const { return obs_id_; }
 
-ObjectPtr RadarTrack::GetObsRadar() {
-  return obs_radar_;
-}
+ObjectPtr RadarTrack::GetObsRadar() { return obs_radar_; }
 
-double RadarTrack::GetTimestamp() {
-  return timestamp_;
-}
+double RadarTrack::GetTimestamp() { return timestamp_; }
 
-double RadarTrack::GetTrackingTime() {
-  return tracking_time_;
-}
+double RadarTrack::GetTrackingTime() { return tracking_time_; }
 
 }  // namespace perception
 }  // namespace apollo

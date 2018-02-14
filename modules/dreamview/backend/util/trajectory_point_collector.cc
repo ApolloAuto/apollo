@@ -21,21 +21,26 @@
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 
+using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::common::TrajectoryPoint;
 
 namespace apollo {
 namespace dreamview {
 namespace util {
 
-void TrajectoryPointCollector::Collect(const TrajectoryPoint &point) {
+void TrajectoryPointCollector::Collect(const TrajectoryPoint &point,
+                                       const double base_time) {
   if (has_previous_) {
-    Object *trajectory = world_->add_planning_trajectory();
-    trajectory->set_position_x(previous_.path_point().x());
-    trajectory->set_position_y(previous_.path_point().y());
-    trajectory->set_heading(
+    Object *trajectory_point = world_->add_planning_trajectory();
+    trajectory_point->set_timestamp_sec(previous_.relative_time() + base_time);
+    trajectory_point->set_position_x(previous_.path_point().x());
+    trajectory_point->set_position_y(previous_.path_point().y());
+    trajectory_point->set_speed(previous_.v());
+    trajectory_point->set_speed_acceleration(previous_.a());
+    trajectory_point->set_kappa(previous_.path_point().kappa());
+    trajectory_point->set_heading(
         atan2(point.path_point().y() - previous_.path_point().y(),
               point.path_point().x() - previous_.path_point().x()));
 
@@ -43,19 +48,16 @@ void TrajectoryPointCollector::Collect(const TrajectoryPoint &point) {
         VehicleConfigHelper::GetConfig().vehicle_param();
     Box2d trajectory_box(
         {previous_.path_point().x(), previous_.path_point().y()},
-        trajectory->heading(), vehicle_param.length(), vehicle_param.width());
+        trajectory_point->heading(), vehicle_param.length(),
+        vehicle_param.width());
 
     std::vector<Vec2d> corners;
     trajectory_box.GetAllCorners(&corners);
     for (const auto &corner : corners) {
-      PolygonPoint *polygon_point = trajectory->add_polygon_point();
+      PolygonPoint *polygon_point = trajectory_point->add_polygon_point();
       polygon_point->set_x(corner.x());
       polygon_point->set_y(corner.y());
     }
-
-    trajectory->set_speed(point.v());
-    trajectory->set_speed_acceleration(point.a());
-    trajectory->set_timestamp_sec(point.relative_time());
   }
   previous_ = point;
   has_previous_ = true;

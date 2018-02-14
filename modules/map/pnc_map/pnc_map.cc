@@ -42,10 +42,10 @@
 namespace apollo {
 namespace hdmap {
 
-using apollo::routing::RoutingResponse;
+using apollo::common::PointENU;
 using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
-using apollo::common::PointENU;
+using apollo::routing::RoutingResponse;
 using common::util::MakePointENU;
 
 namespace {
@@ -55,19 +55,6 @@ const double kDuplicatedPointsEpsilon = 1e-7;
 
 // Maximum lateral error used in trajectory approximation.
 const double kTrajectoryApproximationMaxError = 2.0;
-
-void RemoveDuplicates(std::vector<Vec2d> *points) {
-  CHECK_NOTNULL(points);
-  int count = 0;
-  const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
-  for (size_t i = 0; i < points->size(); ++i) {
-    if (count == 0 ||
-        (*points)[i].DistanceSquareTo((*points)[count - 1]) > limit) {
-      (*points)[count++] = (*points)[i];
-    }
-  }
-  points->resize(count);
-}
 
 void RemoveDuplicates(std::vector<MapPathPoint> *points) {
   CHECK_NOTNULL(points);
@@ -88,7 +75,9 @@ void RemoveDuplicates(std::vector<MapPathPoint> *points) {
 
 PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
 
-const hdmap::HDMap *PncMap::hdmap() const { return hdmap_; }
+const hdmap::HDMap *PncMap::hdmap() const {
+  return hdmap_;
+}
 
 LaneWaypoint PncMap::ToLaneWaypoint(
     const routing::LaneWaypoint &waypoint) const {
@@ -161,6 +150,11 @@ std::vector<routing::LaneWaypoint> PncMap::FutureRouteWaypoints() const {
 
 void PncMap::UpdateRoutingRange(int adc_index) {
   // track routing range.
+  if (range_start_ > adc_index || range_end_ < adc_index) {
+    range_lane_ids_.clear();
+    range_start_ = std::max(0, adc_index - 1);
+    range_end_ = range_start_;
+  }
   while (range_start_ + 1 < adc_index) {
     range_lane_ids_.erase(route_indices_[range_start_].segment.lane->id().id());
     ++range_start_;
@@ -247,6 +241,10 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
         route_indices_.emplace_back();
         route_indices_.back().segment =
             ToLaneSegment(passage.segment(lane_index));
+        if (route_indices_.back().segment.lane == nullptr) {
+          AERROR << "Fail to get lane segment from passage.";
+          return false;
+        }
         route_indices_.back().index = {road_index, passage_index, lane_index};
       }
     }
@@ -316,9 +314,8 @@ int PncMap::SearchForwardWaypointIndex(int start,
 int PncMap::SearchBackwardWaypointIndex(int start,
                                         const LaneWaypoint &waypoint) const {
   int i = std::min(static_cast<int>(route_indices_.size() - 1), start);
-  while (
-      i >= 0 &&
-      !RouteSegments::WithinLaneSegment(route_indices_[i].segment, waypoint)) {
+  while (i >= 0 && !RouteSegments::WithinLaneSegment(route_indices_[i].segment,
+                                                     waypoint)) {
     --i;
   }
   return i;
@@ -725,10 +722,9 @@ void PncMap::AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
       const auto &segment = lane->segments()[i];
       const double next_accumulate_s = accumulate_s + segment.length();
       if (start_s > accumulate_s && start_s < next_accumulate_s) {
-        points->emplace_back(
-            segment.start() +
-                segment.unit_direction() * (start_s - accumulate_s),
-            lane->headings()[i], LaneWaypoint(lane, start_s));
+        points->emplace_back(segment.start() + segment.unit_direction() *
+                                                   (start_s - accumulate_s),
+                             lane->headings()[i], LaneWaypoint(lane, start_s));
       }
       if (end_s > accumulate_s && end_s < next_accumulate_s) {
         points->emplace_back(

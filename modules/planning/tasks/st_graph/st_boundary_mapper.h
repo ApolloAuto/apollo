@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 /**
-*   @file
-**/
+ *   @file
+ **/
 
 #ifndef MODULES_PLANNING_TASKS_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 #define MODULES_PLANNING_TASKS_ST_GRAPH_ST_BOUNDARY_MAPPER_H_

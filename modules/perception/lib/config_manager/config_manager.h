@@ -144,17 +144,11 @@ class ConfigManager {
   bool GetModelConfig(const std::string& model_name,
                       const ModelConfig** model_config);
 
-  size_t NumModels() const {
-    return model_config_map_.size();
-  }
+  size_t NumModels() const { return model_config_map_.size(); }
 
-  const std::string& work_root() const {
-    return work_root_;
-  }
+  const std::string& work_root() const { return work_root_; }
 
-  void SetWorkRoot(const std::string& work_root) {
-    work_root_ = work_root;
-  }
+  void SetWorkRoot(const std::string& work_root) { work_root_ = work_root; }
 
  private:
   ~ConfigManager();
@@ -181,9 +175,7 @@ class ModelConfig {
 
   bool Reset(const ModelConfigProto& proto);
 
-  std::string name() const {
-    return name_;
-  }
+  std::string name() const { return name_; }
 
   bool GetValue(const std::string& name, int* value) const {
     return GetValueFromMap<int>(name, integer_param_map_, value);

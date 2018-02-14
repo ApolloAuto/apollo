@@ -40,9 +40,7 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-std::string Control::Name() const {
-  return FLAGS_control_node_name;
-}
+std::string Control::Name() const { return FLAGS_control_node_name; }
 
 Status Control::Init() {
   init_time_ = Clock::NowInSeconds();
@@ -74,6 +72,8 @@ Status Control::Init() {
   CHECK(AdapterManager::GetPlanning()) << "Planning is not initialized.";
 
   CHECK(AdapterManager::GetPad()) << "Pad is not initialized.";
+
+  CHECK(AdapterManager::GetMonitor()) << "Monitor is not initialized.";
 
   CHECK(AdapterManager::GetControlCommand())
       << "ControlCommand publisher is not initialized.";
@@ -278,7 +278,7 @@ Status Control::CheckInput() {
   }
 
   // Add tempprary flag for test
-  if (FLAGS_use_relative_position) {
+  if (FLAGS_use_navigation_mode) {
     localization_.mutable_pose()->mutable_position()->set_x(0.0);
     localization_.mutable_pose()->mutable_position()->set_y(0.0);
     localization_.mutable_pose()->set_heading(0.0);

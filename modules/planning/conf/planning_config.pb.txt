@@ -32,11 +32,12 @@ em_planner_config {
         path_l_cost_param_k: 1.5
         path_out_lane_cost: 1e8
         path_end_l_cost: 1.0e4
-        sidepass_distance: 0.5
+        sidepass_distance: 2.8
+        navigator_sample_num_each_level: 3
     }
     dp_st_speed_config {
-        total_path_length: 150
-        total_time: 8.0
+        total_path_length: 149
+        total_time: 7.0
         matrix_dimension_s: 150
         matrix_dimension_t: 8
 
@@ -53,6 +54,7 @@ em_planner_config {
         default_speed_cost: 1.0e3
         exceed_speed_penalty: 10.0
         low_speed_penalty: 10.0
+        keep_clear_low_speed_penalty: 10.0
 
         accel_penalty: 1.0
         decel_penalty: 1.0
@@ -179,17 +181,7 @@ em_planner_config {
     }
 }
 
-qp_spline_reference_line_smoother_config {
-    spline_order: 5
-    max_spline_length: 25.0
-    max_constraint_interval : 5.0
-    longitudinal_boundary_bound: 2.0
-    lateral_boundary_bound: 0.25
-    second_derivative_weight: 200.0
-    third_derivative_weight: 1000.0
-    num_of_total_points: 500
-    regularization_weight: 1.0e-5
-}
+smoother_type: QP_SPLINE_SMOOTHER
 
 rule_config : {
     rule_id: BACKSIDE_VEHICLE
@@ -214,4 +206,10 @@ rule_config : {
 }
 rule_config : {
     rule_id: SIDEPASS_VEHICLE
+}
+rule_config : {
+    rule_id: KEEP_CLEAR
+}
+rule_config : {
+    rule_id: CIPV
 }

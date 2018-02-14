@@ -23,8 +23,8 @@
 #include <algorithm>
 
 #include "modules/common/log.h"
-#include "modules/common/util/string_util.h"
 #include "modules/common/math/linear_interpolation.h"
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace planning {
@@ -71,11 +71,11 @@ double ConstantAccelerationTrajectory1d::ParamLength() const {
 }
 
 std::string ConstantAccelerationTrajectory1d::ToString() const {
-  return apollo::common::util::StrCat(
-      apollo::common::util::PrintIter(s_, "\t"),
-      apollo::common::util::PrintIter(t_, "\t"),
-      apollo::common::util::PrintIter(v_, "\t"),
-      apollo::common::util::PrintIter(a_, "\t"), "\n");
+  return apollo::common::util::StrCat(apollo::common::util::PrintIter(s_, "\t"),
+                                      apollo::common::util::PrintIter(t_, "\t"),
+                                      apollo::common::util::PrintIter(v_, "\t"),
+                                      apollo::common::util::PrintIter(a_, "\t"),
+                                      "\n");
 }
 
 double ConstantAccelerationTrajectory1d::Evaluate(const std::uint32_t order,
@@ -157,7 +157,7 @@ std::array<double, 4> ConstantAccelerationTrajectory1d::Evaluate(
   double a = a_[index - 1];
   double j = 0.0;
 
-  return {s, v, a, j};
+  return {{s, v, a, j}};
 }
 
 }  // namespace planning

@@ -37,7 +37,7 @@ The perception module outputs are:
 - [ ] 4. Launch the perception module using the command `./scripts/perception.sh start` or by enabling the perception button on the *Module Controller* page of the web GUI. The command for stopping perception is `./scripts/perception.sh stop`. Note: please do not try to use GUI to enable perception but use script to stop it, vice versa. 
 
 
-- [ ] 5. Download the demo data from the Apollo [Open Data Platform](https://console.bce.baidu.com/apollo/task/download).
+- [ ] 5. Download the demo data from the Apollo [Open Data Platform](http://data.apollo.auto).
 
 ## Function enable/disable
 The perception framework is a directed acyclic graph (DAG). There are three components in DAG configuration, including sub-nodes, edges and shared data. Each function is implemented as a sub-node in DAG. The sub-nodes that share data have an edge from producer to customer.
@@ -148,7 +148,7 @@ A typical DAG configuration for a perception module is shown in the example belo
   }
 ```
 
-**Note**: Nvidia GPU and CUDA are required to run the perception module with Caffe. Apollo provides the CUDA and Caffe libraries in the released docker. However, the Nvidia GPU driver is not installed in the released dev docker image.
+**Note**: Nvidia GPU and CUDA are required to run the perception module with Caffe. Apollo provides the CUDA and Caffe libraries in the release docker image. However, the Nvidia GPU driver is not installed in the dev docker image.
 
 To run the perception module with CUDA acceleration, install the exact same version of the Nvidia driver in the docker that is installed in your host machine, and then build Apollo with the GPU option (i.e., using `./apollo.sh build_gpu` or `./apollo.sh build_opt_gpu`).
 

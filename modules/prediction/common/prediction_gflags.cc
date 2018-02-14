@@ -27,6 +27,8 @@ DEFINE_string(prediction_conf_file,
 DEFINE_string(prediction_adapter_config_filename,
               "modules/prediction/conf/adapter.conf",
               "Default conf file for prediction");
+DEFINE_string(prediction_data_file_prefix, "data/prediction/feature",
+              "Prefix of files to store feature data");
 DEFINE_bool(prediction_test_mode, false, "Set prediction to test mode");
 DEFINE_double(
     prediction_test_duration, -1.0,
@@ -68,6 +70,8 @@ DEFINE_double(still_obstacle_speed_threshold, 2.0,
 DEFINE_double(still_pedestrian_speed_threshold, 0.5,
               "Speed threshold for still pedestrians");
 DEFINE_double(still_obstacle_position_std, 1.0,
+              "Position standard deviation for still obstacles");
+DEFINE_double(still_pedestrian_position_std, 0.5,
               "Position standard deviation for still obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");

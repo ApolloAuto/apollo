@@ -51,10 +51,15 @@ bool PbfSensorManager::Init() {
   sensor_id = GetSensorType(RADAR);
   type = RADAR;
   PbfSensor *radar = new PbfSensor(type, sensor_id);
+  if (radar == nullptr) {
+    AERROR << "Fail to create PbfSensor. sensor_id = " << sensor_id;
+    return false;
+  }
   if (sensors_.find(sensor_id) == sensors_.end()) {
     sensors_[sensor_id] = radar;
   } else {
     AERROR << "The velodyne 64 and radar sensor ids are conflict.";
+    delete radar;
     return false;
   }
   return true;
@@ -70,6 +75,10 @@ void PbfSensorManager::AddSensorMeasurements(const SensorObjects &objects) {
     AWARN << "Cannot find sensor " << sensor_id
           << " and create one in SensorManager";
     sensor = new PbfSensor(type, sensor_id);
+    if (sensor == nullptr) {
+      AERROR << "Fail to create PbfSensor. sensor_id = " << sensor_id;
+      return;
+    }
     sensors_[sensor_id] = sensor;
   } else {
     sensor = it->second;

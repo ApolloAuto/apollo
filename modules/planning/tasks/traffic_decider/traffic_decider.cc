@@ -24,8 +24,11 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/backside_vehicle.h"
 #include "modules/planning/tasks/traffic_decider/change_lane.h"
+#include "modules/planning/tasks/traffic_decider/cipv.h"
+#include "modules/planning/tasks/traffic_decider/creeper.h"
 #include "modules/planning/tasks/traffic_decider/crosswalk.h"
 #include "modules/planning/tasks/traffic_decider/destination.h"
+#include "modules/planning/tasks/traffic_decider/keep_clear.h"
 #include "modules/planning/tasks/traffic_decider/reference_line_end.h"
 #include "modules/planning/tasks/traffic_decider/rerouting.h"
 #include "modules/planning/tasks/traffic_decider/sidepass_vehicle.h"
@@ -44,14 +47,6 @@ void TrafficDecider::RegisterRules() {
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new BacksideVehicle(config);
                          });
-  rule_factory_.Register(RuleConfig::SIGNAL_LIGHT,
-                         [](const RuleConfig &config) -> TrafficRule * {
-                           return new SignalLight(config);
-                         });
-  rule_factory_.Register(RuleConfig::CROSSWALK,
-                         [](const RuleConfig &config) -> TrafficRule * {
-                           return new Crosswalk(config);
-                         });
   rule_factory_.Register(RuleConfig::REROUTING,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new Rerouting(config);
@@ -64,17 +59,34 @@ void TrafficDecider::RegisterRules() {
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new Destination(config);
                          });
-  rule_factory_.Register(RuleConfig::STOP_SIGN,
-                         [](const RuleConfig &config) -> TrafficRule * {
-                           return new StopSign(config);
-                         });
   rule_factory_.Register(RuleConfig::CHANGE_LANE,
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new ChangeLane(config);
                          });
+
+  rule_factory_.Register(RuleConfig::CIPV,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new CIPV(config);
+                         });
+  rule_factory_.Register(RuleConfig::SIGNAL_LIGHT,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new SignalLight(config);
+                         });
+  rule_factory_.Register(RuleConfig::CROSSWALK,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new Crosswalk(config);
+                         });
+  rule_factory_.Register(RuleConfig::STOP_SIGN,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new StopSign(config);
+                         });
   rule_factory_.Register(RuleConfig::SIDEPASS_VEHICLE,
                          [](const RuleConfig &config) -> TrafficRule * {
-                           return new ChangeLane(config);
+                           return new SidepassVehicle(config);
+                         });
+  rule_factory_.Register(RuleConfig::KEEP_CLEAR,
+                         [](const RuleConfig &config) -> TrafficRule * {
+                           return new KeepClear(config);
                          });
 }
 
@@ -87,6 +99,9 @@ bool TrafficDecider::Init(const PlanningConfig &config) {
 
 Status TrafficDecider::Execute(Frame *frame,
                                ReferenceLineInfo *reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
   Task::Execute(frame, reference_line_info);
 
   for (const auto &rule_config : rule_configs_) {
@@ -103,6 +118,9 @@ Status TrafficDecider::Execute(Frame *frame,
     rule->ApplyRule(frame, reference_line_info);
     ADEBUG << "Applied rule " << RuleConfig::RuleId_Name(rule_config.rule_id());
   }
+
+  Creeper::instance()->Run(frame, reference_line_info);
+
   return Status::OK();
 }
 

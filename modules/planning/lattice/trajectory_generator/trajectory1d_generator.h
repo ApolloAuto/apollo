@@ -24,8 +24,8 @@
 #include <memory>
 #include <vector>
 
-#include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/lattice/trajectory_generator/end_condition_sampler.h"
+#include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 
 namespace apollo {
@@ -43,17 +43,21 @@ class Trajectory1dGenerator {
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle);
 
+  void GenerateLateralTrajectoryBundle(
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) const;
+
  private:
   void GenerateSpeedProfilesForCruising(
       const double target_speed,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
-  void GenerateLongitudinalTrajectoryBundle(
+  void GenerateSpeedProfilesForPathTimeBound(
       const PlanningTarget& planning_target,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
-  void GenerateLateralTrajectoryBundle(
-      std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) const;
+  void GenerateLongitudinalTrajectoryBundle(
+      const PlanningTarget& planning_target,
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
  private:
   EndConditionSampler* end_condition_sampler_;

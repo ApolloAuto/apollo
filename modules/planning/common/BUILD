@@ -196,7 +196,7 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/reference_line",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -312,7 +312,7 @@ cc_library(
         "//modules/common:log",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

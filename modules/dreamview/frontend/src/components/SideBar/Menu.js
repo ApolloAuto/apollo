@@ -12,6 +12,8 @@ import decisionIcon from "assets/images/menu/Decision.png";
 import planningIcon from "assets/images/menu/Planning.png";
 import cameraIcon from "assets/images/menu/PointOfView.png";
 
+import { POINT_CLOUD_WS } from "store/websocket";
+
 const MenuIconMapping = {
         perception: perceptionIcon,
         prediction: predictionIcon,
@@ -22,6 +24,7 @@ const MenuIconMapping = {
 };
 
 const MenuIdOptionMapping = {
+        perceptionPointCloud: 'showPointCloud',
         perceptionVehicle: 'showObstaclesVehicle',
         perceptionPedestrian: 'showObstaclesPedestrian',
         perceptionBicycle: 'showObstaclesBicycle',
@@ -37,10 +40,13 @@ const MenuIdOptionMapping = {
         routing: 'showRouting',
         decisionMain: 'showDecisionMain',
         decisionObstacle: 'showDecisionObstacle',
+        planningCar: 'showPlanningCar',
         planningReference: 'showPlanningReference',
-        planingDpOptimizer: 'showPlaningDpOptimizer',
+        planningDpOptimizer: 'showPlanningDpOptimizer',
         planningQpOptimizer: 'showPlanningQpOptimizer',
-        planningLine: 'showPlanning'
+        planningLine: 'showPlanning',
+        positionLocalization: 'showPositionLocalization',
+        positionGps: 'showPositionGps',
 };
 
 @observer
@@ -51,6 +57,9 @@ class MenuItemCheckbox extends React.Component {
             <ul>
                 <li id={id} onClick={() => {
                     options.toggle(MenuIdOptionMapping[id]);
+                    if (id === "perceptionPointCloud") {
+                        POINT_CLOUD_WS.togglePointCloud(options.showPointCloud);
+                    }
                 }}>
                     <div className="switch">
                         <input type="checkbox" name={id} className="toggle-switch"
@@ -73,7 +82,7 @@ class SubMenu extends React.Component {
             entries = Object.keys(data)
                 .map(key => {
                     const item = data[key];
-                    if (options.hideOptions[key]) {
+                    if (options.hideOptionToggle[key]) {
                         return null;
                     }
                     return (
@@ -85,7 +94,7 @@ class SubMenu extends React.Component {
             entries = Object.keys(data)
                 .map(key => {
                     const item = data[key];
-                    if (options.hideOptions[key]) {
+                    if (options.hideOptionToggle[key]) {
                         return null;
                     }
                     return (

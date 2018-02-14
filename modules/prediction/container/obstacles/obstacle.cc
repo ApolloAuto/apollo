@@ -52,9 +52,8 @@ double Damp(const double x, const double sigma) {
 
 Obstacle::Obstacle() {
   double heading_filter_param = FLAGS_heading_filter_param;
-  if (FLAGS_heading_filter_param < 0.0 || FLAGS_heading_filter_param > 1.0) {
-    heading_filter_param = 0.98;
-  }
+  CHECK_LT(heading_filter_param, 1.0);
+  CHECK_GT(heading_filter_param, 0.0);
   heading_filter_ = common::DigitalFilter{{1.0, 1.0 - heading_filter_param},
                                           {heading_filter_param}};
 }
@@ -386,12 +385,13 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
       double angle_diff = ::apollo::common::math::NormalizeAngle(
           shift_heading - velocity_heading);
       if (std::fabs(angle_diff) > FLAGS_max_lane_angle_diff) {
+        ADEBUG << "Shift velocity heading to be " << shift_heading;
         velocity_heading = shift_heading;
       }
     }
     double filtered_heading = heading_filter_.Filter(velocity_heading);
     if (type_ == PerceptionObstacle::BICYCLE ||
-        type_ == PerceptionObstacle::PEDESTRIAN) {
+      type_ == PerceptionObstacle::PEDESTRIAN) {
       velocity_heading = filtered_heading;
     }
     velocity_x = speed * std::cos(velocity_heading);
@@ -1104,17 +1104,18 @@ void Obstacle::SetMotionStatus() {
     ++feature_riter;
   }
 
-  double delta_ts = feature_history_.front().timestamp() -
-                    feature_history_.back().timestamp();
   double std = FLAGS_still_obstacle_position_std;
-  double speed_sensibility =
-      std::sqrt(2 * history_size) * 4 * std / ((history_size + 1) * delta_ts);
-  double speed = feature_history_.front().speed();
   double speed_threshold = FLAGS_still_obstacle_speed_threshold;
   if (type_ == PerceptionObstacle::PEDESTRIAN ||
       type_ == PerceptionObstacle::BICYCLE) {
     speed_threshold = FLAGS_still_pedestrian_speed_threshold;
+    std = FLAGS_still_pedestrian_position_std;
   }
+  double delta_ts = feature_history_.front().timestamp() -
+                    feature_history_.back().timestamp();
+  double speed_sensibility =
+      std::sqrt(2 * history_size) * 4 * std / ((history_size + 1) * delta_ts);
+  double speed = feature_history_.front().speed();
   if (speed < speed_threshold) {
     ADEBUG << "Obstacle [" << id_ << "] has a small speed [" << speed
            << "] and is considered stationary.";

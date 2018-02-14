@@ -58,8 +58,8 @@ class SimulationWorldUpdater {
    * of hdmap.
    * @param routing_from_file whether to read initial routing from file.
    */
-  SimulationWorldUpdater(WebSocketHandler *websocket, SimControl *sim_control,
-                         const MapService *map_service,
+  SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
+                         SimControl *sim_control, const MapService *map_service,
                          bool routing_from_file = false);
 
   /**
@@ -119,11 +119,14 @@ class SimulationWorldUpdater {
     }
   }
 
+  void RegisterMessageHandlers();
+
   ros::Timer timer_;
   SimulationWorldService sim_world_service_;
-  const MapService *map_service_;
-  WebSocketHandler *websocket_;
-  SimControl *sim_control_;
+  const MapService *map_service_ = nullptr;
+  WebSocketHandler *websocket_ = nullptr;
+  WebSocketHandler *map_ws_ = nullptr;
+  SimControl *sim_control_ = nullptr;
 
   // End point for requesting default route
   apollo::routing::POI poi_;
@@ -131,12 +134,11 @@ class SimulationWorldUpdater {
   // The simulation_world in wire format to be pushed to frontend, which is
   // updated by timer.
   std::string simulation_world_;
+  std::string simulation_world_with_planning_data_;
 
   // Mutex to protect concurrent access to simulation_world_json_.
   // NOTE: Use boost until we have std version of rwlock support.
   boost::shared_mutex mutex_;
-
-  bool enable_pnc_monitor_ = false;
 };
 
 }  // namespace dreamview

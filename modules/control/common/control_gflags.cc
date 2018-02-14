@@ -51,8 +51,6 @@ DEFINE_double(steer_angle_rate, 100.0,
 DEFINE_bool(enable_gain_scheduler, false,
             "Enable gain scheduler for higher vechile speed");
 DEFINE_bool(set_steer_limit, false, "Set steer limit");
-DEFINE_bool(use_relative_position, false, "Use relative position");
 DEFINE_double(query_relative_time, 1.5,
               "Temp flag to query target by relative time");
-DEFINE_bool(use_mpc, false, "Use MPC controller for both lat/lon control");
 DEFINE_bool(enable_slope_offset, false, "Enable slope offset compensation");

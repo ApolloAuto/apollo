@@ -8,9 +8,8 @@ import WS from "store/websocket";
 export default class Others extends React.Component {
     render() {
         const { options, enableHMIButtonsOnly } = this.props.store;
-        const { isPanelLocked, toggleLock } = this.props;
 
-        const disablePanel = enableHMIButtonsOnly || isPanelLocked;
+        const disablePanel = enableHMIButtonsOnly || options.tasksPanelLocked;
 
         return (
             <div className="others card">
@@ -24,25 +23,35 @@ export default class Others extends React.Component {
                             onClick={() => {
                                 WS.dumpMessages();
                             }}>Dump Message</button>
-                    <CheckboxItem id={"showVideo"}
-                                  title={"Camera Sensor"}
-                                  isChecked={options.showVideo}
-                                  disabled={disablePanel}
-                                  onClick={() => {
-                                        options.toggleSideBar("showVideo");
-                                  }}/>
                     <CheckboxItem id={"showPNCMonitor"}
                                   title={"PNC Monitor"}
                                   isChecked={options.showPNCMonitor}
                                   disabled={disablePanel}
                                   onClick={() => {
-                                        this.props.store.handleSideBarClick('showPNCMonitor');
+                                      this.props.store.handleOptionToggle('showPNCMonitor');
+                                  }}/>
+                    <CheckboxItem id={"toggleSimControl"}
+                                  title={"SimControl"}
+                                  isChecked={options.simControlEnabled}
+                                  disabled={false}
+                                  onClick={() => {
+                                      WS.toggleSimControl(!options.simControlEnabled);
+                                      this.props.store.handleOptionToggle('simControlEnabled');
+                                  }}/>
+                    <CheckboxItem id={"showVideo"}
+                                  title={"Camera Sensor"}
+                                  isChecked={options.showVideo}
+                                  disabled={disablePanel}
+                                  onClick={() => {
+                                      this.props.store.handleOptionToggle('showVideo');
                                   }}/>
                     <CheckboxItem id={"panelLock"}
                                   title={"Lock Task Panel"}
-                                  isChecked={isPanelLocked}
+                                  isChecked={options.tasksPanelLocked}
                                   disabled={false}
-                                  onClick={toggleLock}/>
+                                  onClick={() => {
+                                    this.props.store.handleOptionToggle('tasksPanelLocked');
+                                  }}/>
                 </div>
             </div>
         );

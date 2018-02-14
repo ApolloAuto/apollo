@@ -21,6 +21,10 @@
 
 DECLARE_string(dreamview_module_name);
 
+DECLARE_bool(dreamview_profiling_mode);
+
+DECLARE_double(dreamview_profiling_duration);
+
 DECLARE_string(dreamview_adapter_config_filename);
 
 DECLARE_string(hmi_config_filename);
@@ -28,8 +32,6 @@ DECLARE_string(hmi_config_filename);
 DECLARE_string(static_file_dir);
 
 DECLARE_string(server_ports);
-
-DECLARE_bool(enable_sim_control);
 
 DECLARE_bool(routing_from_file);
 
@@ -42,7 +44,11 @@ DECLARE_string(ssl_certificate);
 DECLARE_double(sim_map_radius);
 
 DECLARE_int32(dreamview_worker_num);
+
 DECLARE_bool(enable_update_size_check);
+
 DECLARE_uint32(max_update_size);
+
+DECLARE_bool(sim_world_with_routing_path);
 
 #endif  // MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_

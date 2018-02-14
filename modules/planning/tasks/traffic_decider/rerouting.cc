@@ -32,8 +32,8 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::adapter::AdapterManager;
-using apollo::common::util::Dropbox;
 using apollo::common::time::Clock;
+using apollo::common::util::Dropbox;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 
@@ -105,7 +105,7 @@ bool Rerouting::ChangeLaneFailRerouting() {
   return true;
 }
 
-bool Rerouting::ApplyRule(Frame* frame,
+bool Rerouting::ApplyRule(Frame* const frame,
                           ReferenceLineInfo* const reference_line_info) {
   frame_ = frame;
   reference_line_info_ = reference_line_info;

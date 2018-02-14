@@ -62,21 +62,23 @@ class PathDecision {
 
   void SetStBoundary(const std::string &id, const StBoundary &boundary);
   void EraseStBoundaries();
-  MainStop main_stop() const {
-    return main_stop_;
-  }
-  double stop_reference_line_s() const {
-    return stop_reference_line_s_;
-  }
+  MainStop main_stop() const { return main_stop_; }
+  double stop_reference_line_s() const { return stop_reference_line_s_; }
   bool MergeWithMainStop(const ObjectStop &obj_stop, const std::string &obj_id,
                          const ReferenceLine &ref_line,
                          const SLBoundary &adc_sl_boundary);
+  void SetCIPVInfo(const perception::CIPVInfo &cipv_info) {
+    cipv_info_ = cipv_info;
+  }
+
+  const perception::CIPVInfo &cipv_info() { return cipv_info_; }
 
  private:
   std::mutex obstacle_mutex_;
   IndexedList<std::string, PathObstacle> path_obstacles_;
   MainStop main_stop_;
   double stop_reference_line_s_ = std::numeric_limits<double>::max();
+  perception::CIPVInfo cipv_info_;
 };
 
 }  // namespace planning

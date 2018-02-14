@@ -62,6 +62,7 @@ function start() {
         /apollo/sensor/gnss/imu \
         /apollo/sensor/gnss/ins_stat \
         /apollo/sensor/gnss/odometry \
+        /apollo/sensor/gnss/raw_data \
         /apollo/sensor/gnss/rtk_eph \
         /apollo/sensor/gnss/rtk_obs \
         /apollo/sensor/mobileye \
@@ -79,6 +80,7 @@ function start() {
         /apollo/localization/msf_gnss \
         /apollo/localization/msf_lidar \
         /apollo/localization/msf_status \
+        /apollo/navigation \
         /apollo/drive_event \
         /tf \
         /tf_static \

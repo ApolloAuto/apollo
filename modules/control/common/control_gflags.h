@@ -47,9 +47,7 @@ DECLARE_double(max_abs_speed_when_stopped);
 DECLARE_double(steer_angle_rate);
 DECLARE_bool(enable_gain_scheduler);
 DECLARE_bool(set_steer_limit);
-DECLARE_bool(use_relative_position);
 DECLARE_double(query_relative_time);
-DECLARE_bool(use_mpc);
 DECLARE_bool(enable_slope_offset);
 
 #endif  // MODULES_CONTROL_COMMON_CONTROL_GFLAGS_H_

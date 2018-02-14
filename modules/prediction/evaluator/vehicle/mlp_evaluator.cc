@@ -23,6 +23,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/file.h"
 #include "modules/map/proto/map_lane.pb.h"
+#include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 
@@ -82,6 +83,10 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
     double probability = ComputeProbability(feature_values);
     lane_sequence_ptr->set_probability(probability);
+  }
+
+  if (FLAGS_prediction_offline_mode) {
+    FeatureOutput::Insert(*latest_feature_ptr);
   }
 }
 

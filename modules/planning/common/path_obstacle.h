@@ -139,12 +139,8 @@ class PathObstacle {
    **/
   static bool IsLateralDecision(const ObjectDecisionType& decision);
 
-  void SetBlockingObstacle(bool blocking) {
-    is_blocking_obstacle_ = blocking;
-  }
-  bool IsBlockingObstacle() const {
-    return is_blocking_obstacle_;
-  }
+  void SetBlockingObstacle(bool blocking) { is_blocking_obstacle_ = blocking; }
+  bool IsBlockingObstacle() const { return is_blocking_obstacle_; }
 
  private:
   FRIEND_TEST(MergeLongitudinalDecision, AllDecisions);

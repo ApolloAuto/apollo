@@ -23,8 +23,8 @@
 
 #include <array>
 #include <string>
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -40,8 +40,7 @@ namespace planning {
 class PathTimeNeighborhood {
  public:
   PathTimeNeighborhood(
-      const std::vector<const Obstacle*>& obstacles,
-      const double ego_s,
+      const std::vector<const Obstacle*>& obstacles, const double ego_s,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   const std::vector<PathTimeObstacle>& GetPathTimeObstacles() const;
@@ -49,15 +48,14 @@ class PathTimeNeighborhood {
   bool GetPathTimeObstacle(const std::string& obstacle_id,
                            PathTimeObstacle* path_time_obstacle);
 
-  double SpeedAtT(
-      const std::string& obstacle_id, const double s, const double t) const;
+  double SpeedAtT(const std::string& obstacle_id, const double s,
+                  const double t) const;
 
-  std::vector<std::pair<double, double>>
-  GetPathBlockingIntervals(const double t) const;
+  std::vector<std::pair<double, double>> GetPathBlockingIntervals(
+      const double t) const;
 
-  std::vector<std::vector<std::pair<double, double>>>
-  GetPathBlockingIntervals(const double t_start, const double t_end,
-      const double t_resolution);
+  std::vector<std::vector<std::pair<double, double>>> GetPathBlockingIntervals(
+      const double t_start, const double t_end, const double t_resolution);
 
   std::pair<double, double> get_path_range() const;
 
@@ -68,14 +66,15 @@ class PathTimeNeighborhood {
       const std::vector<const Obstacle*>& obstacles,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
-  SLBoundary ComputeObstacleBoundary(const common::math::Box2d& box,
+  SLBoundary ComputeObstacleBoundary(
+      const common::math::Box2d& box,
       const std::vector<common::PathPoint>& discretized_ref_points) const;
 
-  PathTimePoint SetPathTimePoint(const std::string& obstacle_id,
-                                 const double s,
+  PathTimePoint SetPathTimePoint(const std::string& obstacle_id, const double s,
                                  const double t) const;
 
-  void SetStaticPathTimeObstacle(const Obstacle* obstacle,
+  void SetStaticPathTimeObstacle(
+      const Obstacle* obstacle,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
  private:

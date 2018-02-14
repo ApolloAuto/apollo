@@ -21,6 +21,7 @@ cc_library(
         "//modules/perception/traffic_light/interface:perception_traffic_light_interface",
     ],
 )
+
 cc_test(
     name = "perception_traffic_light_reviser_test",
     size = "small",
@@ -42,4 +43,5 @@ cc_test(
         "@opencv2//:core",
     ],
 )
+
 cpplint()

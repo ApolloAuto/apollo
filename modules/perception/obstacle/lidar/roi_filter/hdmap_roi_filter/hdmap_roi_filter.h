@@ -52,7 +52,7 @@ class HdmapROIFilter : public BaseROIFilter {
   ~HdmapROIFilter() {}
 
   bool Init() override;
-  std::string name() const {
+  std::string name() const override {
     return "HdmapROIFilter";
   }
 

@@ -27,8 +27,8 @@ namespace planning {
 ObjectPriority::ObjectPriority(const RuleConfig& config)
     : TrafficRule(config) {}
 
-bool ObjectPriority::ApplyRule(Frame* frame,
-                                ReferenceLineInfo* const reference_line_info) {
+bool ObjectPriority::ApplyRule(Frame* const frame,
+                               ReferenceLineInfo* const reference_line_info) {
   return true;
 }
 

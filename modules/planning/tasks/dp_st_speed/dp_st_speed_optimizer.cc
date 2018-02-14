@@ -37,8 +37,8 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning_internal::STGraphDebug;
@@ -62,15 +62,16 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
   for (auto* obstacle : path_decision->path_obstacles().Items()) {
     auto id = obstacle->Id();
     if (!obstacle->st_boundary().IsEmpty()) {
-      path_decision->Find(id)->SetBlockingObstacle(true);
+      if (obstacle->st_boundary().boundary_type() ==
+          StBoundary::BoundaryType::KEEP_CLEAR) {
+        path_decision->Find(id)->SetBlockingObstacle(false);
+      } else {
+        path_decision->Find(id)->SetBlockingObstacle(true);
+      }
       boundaries.push_back(&obstacle->st_boundary());
-      ADEBUG << "obstacle " << id << " is blocking.";
     } else if (FLAGS_enable_side_vehicle_st_boundary &&
                (adc_sl_boundary_.start_l() > 2.0 ||
                 adc_sl_boundary_.end_l() < -2.0)) {
-      if (obstacle->obstacle()->IsVirtual()) {
-        continue;
-      }
       if (path_decision->Find(id)->reference_line_st_boundary().IsEmpty()) {
         continue;
       }
@@ -104,9 +105,7 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
   if (!boundary_mapper
            .GetSpeedLimits(path_decision->path_obstacles(), &speed_limit)
            .ok()) {
-    const std::string msg =
-        "Getting speed limits for dp st speed optimizer failed!";
-    AERROR << msg;
+    AERROR << "Getting speed limits for dp st speed optimizer failed!";
     return false;
   }
 
@@ -119,41 +118,12 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
       init_point_, adc_sl_boundary_);
 
   if (!st_graph.Search(speed_data).ok()) {
-    const std::string msg(
-        "With history decision: failed to search graph with dynamic "
-        "programming.");
-    AERROR << msg;
+    AERROR << "failed to search graph with dynamic programming.";
     RecordSTGraphDebug(st_graph_data, st_graph_debug);
     return false;
   }
   RecordSTGraphDebug(st_graph_data, st_graph_debug);
   return true;
-}
-
-bool DpStSpeedOptimizer::CreateStBoundaryWithHistoryDecision(
-    const StBoundaryMapper& boundary_mapper, const PathData& path_data,
-    SpeedData* speed_data, PathDecision* path_decision) {
-  if (!FLAGS_try_history_decision) {
-    return false;
-  }
-  path_decision->EraseStBoundaries();
-  const auto* last_frame = FrameHistory::instance()->Latest();
-  if (!last_frame) {
-    return false;
-  }
-  if (boundary_mapper
-          .CreateStBoundaryWithHistory(
-              last_frame->trajectory().decision().object_decision(),
-              path_decision)
-          .code() == ErrorCode::PLANNING_ERROR) {
-    const std::string msg =
-        "With history decision: decision for dp st speed optimizer "
-        "failed.";
-    AERROR << msg;
-    return false;
-  }
-  return SearchStGraph(boundary_mapper, path_data, speed_data, path_decision,
-                       nullptr);
 }
 
 Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
@@ -185,23 +155,20 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   auto* debug = reference_line_info_->mutable_debug();
   STGraphDebug* st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
-  if (!CreateStBoundaryWithHistoryDecision(boundary_mapper, path_data,
-                                           speed_data, path_decision)) {
-    path_decision->EraseStBoundaries();
-    if (boundary_mapper.CreateStBoundary(path_decision).code() ==
-        ErrorCode::PLANNING_ERROR) {
-      const std::string msg =
-          "Mapping obstacle for dp st speed optimizer failed.";
-      AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR, msg);
-    }
-    if (!SearchStGraph(boundary_mapper, path_data, speed_data, path_decision,
-                       st_graph_debug)) {
-      const std::string msg(
-          Name() + ":Failed to search graph with dynamic programming.");
-      AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR, msg);
-    }
+  path_decision->EraseStBoundaries();
+  if (boundary_mapper.CreateStBoundary(path_decision).code() ==
+      ErrorCode::PLANNING_ERROR) {
+    const std::string msg =
+        "Mapping obstacle for dp st speed optimizer failed.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  if (!SearchStGraph(boundary_mapper, path_data, speed_data, path_decision,
+                     st_graph_debug)) {
+    const std::string msg(Name() +
+                          ":Failed to search graph with dynamic programming.");
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   return Status::OK();
 }

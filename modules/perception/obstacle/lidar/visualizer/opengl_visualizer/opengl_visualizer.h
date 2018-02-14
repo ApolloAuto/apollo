@@ -65,7 +65,6 @@ class OpenglVisualizer {
 
   boost::shared_ptr<GLFWViewer> opengl_vs_;
   std::string name_;
-  bool init_ = false;
 };
 
 }  // namespace perception

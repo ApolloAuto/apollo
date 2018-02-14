@@ -33,7 +33,8 @@ class ObjectPriority : public TrafficRule {
   explicit ObjectPriority(const RuleConfig& config);
   virtual ~ObjectPriority() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 };
 
 }  // namespace planning

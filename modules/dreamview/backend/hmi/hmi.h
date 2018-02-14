@@ -20,6 +20,7 @@
 #include <string>
 
 #include "gtest/gtest_prod.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/dreamview/backend/handlers/websocket.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
@@ -38,7 +39,9 @@ class HMI {
 
  private:
   // Broadcast HMIStatus to all clients.
-  void BroadcastHMIStatus() const;
+  void BroadcastHMIStatus();
+  // Send VehicleParam to the given conn, or broadcast if conn is null.
+  void SendVehicleParam(WebSocketHandler::Connection *conn = nullptr);
 
   void RegisterMessageHandlers();
 
@@ -59,6 +62,8 @@ class HMI {
 
   // Check if there is available updates.
   void CheckOTAUpdates();
+  void SubmitDriveEvent(const uint64_t event_time_ms,
+                        const std::string &event_msg) const;
 
   HMIConfig config_;
   HMIStatus status_;
@@ -66,6 +71,8 @@ class HMI {
   // No ownership.
   WebSocketHandler *websocket_;
   MapService *map_service_;
+
+  apollo::common::monitor::MonitorLogger logger_;
 
   FRIEND_TEST(HMITest, RunComponentCommand);
 };

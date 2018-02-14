@@ -32,63 +32,92 @@ export default class QuickStarter extends React.Component {
     constructor(props) {
         super(props);
 
+        this.utterance = window.speechSynthesis ? new SpeechSynthesisUtterance() : null;
+
         this.rtKRecord = {
             "Start": () => {
                 WS.executeToolCommand("rtk_record_replay", "start_recorder");
+                this.speechSynthesis('Start RTK recorder');
             },
             "Stop": () => {
                 WS.executeToolCommand("rtk_record_replay", "stop_recorder");
+                this.speechSynthesis('Stop RTK recorder');
             },
         };
 
         this.rtkReplay = {
             "Start": () => {
                 WS.executeToolCommand("rtk_record_replay", "start_player");
+                this.speechSynthesis('Start RTK replay');
             },
             "Stop": () => {
-                WS.executeToolCommand("rtk_record_replay", "start_player");
+                WS.executeToolCommand("rtk_record_replay", "stop_player");
+                this.speechSynthesis('Stop RTK replay');
             },
         };
 
         this.setup = {
             "Setup": () => {
                 WS.executeModeCommand("start");
+                this.speechSynthesis('Setup');
             },
         };
 
         this.reset = {
             "Reset All": () => {
                 WS.executeModeCommand("stop");
+                this.speechSynthesis('Reset All');
             },
         };
 
         this.auto = {
             "Start Auto": () => {
                 WS.changeDrivingMode("COMPLETE_AUTO_DRIVE");
+                this.speechSynthesis('Start Auto');
+            },
+        };
+        this.version = {
+            "Version": () => {
+                // TODO(all): change to nice UI.
+                alert(this.props.store.hmi.dockerImage);
             },
         };
     }
 
+    componentWillUpdate() {
+        if (this.utterance) {
+            window.speechSynthesis.cancel();
+        }
+    }
+
+    speechSynthesis(phrase) {
+        if (this.utterance) {
+            this.utterance.text = phrase;
+            window.speechSynthesis.speak(this.utterance);
+        }
+    }
+
     render() {
         const { hmi } = this.props.store;
-        const { isPanelLocked } = this.props;
+        const { tasksPanelLocked } = this.props.store.options;
 
         return (
             <div className="card">
                 <div className="card-header"><span>Quick Start</span></div>
                 <div className="card-content-column">
-                    <CommandGroup disabled={isPanelLocked} commands={this.setup} />
-                    <CommandGroup disabled={isPanelLocked} commands={this.reset} />
+                    <CommandGroup disabled={false} commands={this.version} />
+                    <CommandGroup disabled={tasksPanelLocked} commands={this.setup} />
+                    <CommandGroup disabled={tasksPanelLocked} commands={this.reset} />
                     <CommandGroup disabled={!hmi.enableStartAuto} commands={this.auto}
                                   extraButtonClass="start-auto-button"
                                   extraCommandClass="start-auto-command" />
                     {hmi.showRTKCommands &&
                         <CommandGroup name="Record"
-                                      disabled={isPanelLocked}
+                                      disabled={tasksPanelLocked}
                                       commands={this.rtKRecord} />}
                     {hmi.showRTKCommands &&
                         <CommandGroup name="Replay"
-                                      disabled={isPanelLocked}
+                                      disabled={tasksPanelLocked}
                                       commands={this.rtkReplay} />}
                 </div>
             </div>

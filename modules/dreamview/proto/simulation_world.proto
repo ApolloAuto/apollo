@@ -88,25 +88,28 @@ message Object {
   optional double spin = 14;
   optional double spin_acceleration = 15;
   optional double spin_jerk = 16;
-  optional double speed_heading = 30;
+  optional double speed_heading = 17;
+  optional double kappa = 18;
 
   // Signal Info
   // For objects with signals set and current signal such as Traffic Light,
   // Stop Sign, and Vehicle Signal.
-  repeated string signal_set = 17;
-  optional string current_signal = 18;
+  repeated string signal_set = 19;
+  optional string current_signal = 20;
 
   // Time Info
-  optional double timestamp_sec = 19;
+  optional double timestamp_sec = 21;
 
   // Decision Info
-  repeated Decision decision = 20;
+  repeated Decision decision = 22;
 
   // Chassis Info
   // For ADC
-  optional double throttle_percentage = 21;
-  optional double brake_percentage = 22;
-  optional double steering_angle = 23;
+  optional double throttle_percentage = 23;
+  optional double brake_percentage = 24;
+  optional double steering_percentage = 25;
+  optional double steering_angle = 26;
+  optional double steering_ratio = 27;
   enum DisengageType {
     DISENGAGE_NONE = 0;
     DISENGAGE_UNKNOWN = 1;
@@ -117,7 +120,7 @@ message Object {
     DISENGAGE_CHASSIS_ERROR = 6;
   };
 
-  optional DisengageType disengage_type = 24;
+  optional DisengageType disengage_type = 28;
 
   enum Type {
     UNKNOWN = 0;
@@ -129,11 +132,11 @@ message Object {
     VIRTUAL = 6; // virtual object created by decision module.
   };
 
-  optional Type type = 25;  // obstacle type
-  repeated Prediction prediction = 26;
+  optional Type type = 29;  // obstacle type
+  repeated Prediction prediction = 30;
 
   // perception confidence level. Range: [0,1]
-  optional double confidence = 27 [default = 1];
+  optional double confidence = 31 [default = 1];
 }
 
 message DelaysInMs {
@@ -161,6 +164,8 @@ message MapElementIds {
   repeated string stop_sign = 5;
   repeated string yield = 6;
   repeated string overlap = 7;
+  repeated string road = 8;
+  repeated string clear_area = 9;
 }
 
 // Next-id: 17
@@ -208,6 +213,10 @@ message SimulationWorld {
   optional uint64 map_hash = 16;
   optional double map_radius = 17;
 
-  // Planning debugging data
-  optional apollo.planning_internal.PlanningData planning_data = 18;
+  // Planning data
+  optional double planning_time = 18;
+  optional apollo.planning_internal.PlanningData planning_data = 19;
+
+  // GPS
+  optional Object gps = 20;
 }

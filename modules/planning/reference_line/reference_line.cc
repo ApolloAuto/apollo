@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <limits>
 #include <string>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -373,6 +374,19 @@ const MapPath& ReferenceLine::map_path() const { return map_path_; }
 bool ReferenceLine::GetLaneWidth(const double s, double* const left_width,
                                  double* const right_width) const {
   return map_path_.GetWidth(s, left_width, right_width);
+}
+
+void ReferenceLine::GetLaneFromS(
+    const double s, std::vector<hdmap::LaneInfoConstPtr>* lanes) const {
+  CHECK_NOTNULL(lanes);
+  auto ref_point = GetReferencePoint(s);
+  std::unordered_set<hdmap::LaneInfoConstPtr> lane_set;
+  for (auto& lane_waypoint : ref_point.lane_waypoints()) {
+    if (lane_set.find(lane_waypoint.lane) == lane_set.end()) {
+      lanes->push_back(lane_waypoint.lane);
+      lane_set.insert(lane_waypoint.lane);
+    }
+  }
 }
 
 bool ReferenceLine::IsOnRoad(const common::math::Vec2d& vec2d_point) const {

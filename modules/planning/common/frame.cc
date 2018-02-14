@@ -195,29 +195,77 @@ bool Frame::CreateReferenceLineInfo() {
  * @brief: create static virtual object with lane width,
  *         mainly used for virtual stop wall
  */
-const Obstacle *Frame::AddVirtualStopObstacle(
-    ReferenceLineInfo *const reference_line_info, const std::string &object_id,
-    const double object_s) {
+const Obstacle *Frame::CreateVirtualStopObstacle(
+    ReferenceLineInfo *const reference_line_info,
+    const std::string &obstacle_id, const double obstacle_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
     return nullptr;
   }
 
   const auto &reference_line = reference_line_info->reference_line();
-  const double box_center_s = object_s + FLAGS_virtual_stop_wall_length / 2.0;
+  const double box_center_s = obstacle_s + FLAGS_virtual_stop_wall_length / 2.0;
   auto box_center = reference_line.GetReferencePoint(box_center_s);
-  double heading = reference_line.GetReferencePoint(object_s).heading();
+  double heading = reference_line.GetReferencePoint(obstacle_s).heading();
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
-  reference_line.GetLaneWidth(object_s, &lane_left_width, &lane_right_width);
-  Box2d stop_wall_box{box_center, heading, FLAGS_virtual_stop_wall_height,
+  reference_line.GetLaneWidth(obstacle_s, &lane_left_width, &lane_right_width);
+  Box2d stop_wall_box{box_center, heading, FLAGS_virtual_stop_wall_length,
                       lane_left_width + lane_right_width};
 
-  return AddStaticVirtualObstacle(object_id, stop_wall_box);
+  return CreateStaticVirtualObstacle(obstacle_id, stop_wall_box);
 }
 
-const Obstacle *Frame::AddStaticVirtualObstacle(const std::string &id,
-                                                const Box2d &box) {
+/**
+ * @brief: create static virtual object with lane width,
+ */
+const Obstacle *Frame::CreateStaticObstacle(
+    ReferenceLineInfo *const reference_line_info,
+    const std::string &obstacle_id, const double obstacle_start_s,
+    const double obstacle_end_s) {
+  if (reference_line_info == nullptr) {
+    AERROR << "reference_line_info nullptr";
+    return nullptr;
+  }
+
+  const auto &reference_line = reference_line_info->reference_line();
+
+  // start_xy
+  common::SLPoint sl_point;
+  sl_point.set_s(obstacle_start_s);
+  sl_point.set_l(0.0);
+  common::math::Vec2d obstacle_start_xy;
+  if (!reference_line.SLToXY(sl_point, &obstacle_start_xy)) {
+    AERROR << "Failed to get start_xy from sl: " << sl_point.DebugString();
+    return nullptr;
+  }
+
+  // end_xy
+  sl_point.set_s(obstacle_end_s);
+  sl_point.set_l(0.0);
+  common::math::Vec2d obstacle_end_xy;
+  if (!reference_line.SLToXY(sl_point, &obstacle_end_xy)) {
+    AERROR << "Failed to get end_xy from sl: " << sl_point.DebugString();
+    return nullptr;
+  }
+
+  double left_lane_width = 0.0;
+  double right_lane_width = 0.0;
+  if (!reference_line.GetLaneWidth(obstacle_start_s, &left_lane_width,
+                                   &right_lane_width)) {
+    AERROR << "Failed to get lane width at s[" << obstacle_start_s << "]";
+    return nullptr;
+  }
+
+  common::math::Box2d obstacle_box{
+      common::math::LineSegment2d(obstacle_start_xy, obstacle_end_xy),
+      left_lane_width + right_lane_width};
+
+  return CreateStaticVirtualObstacle(obstacle_id, obstacle_box);
+}
+
+const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
+                                                   const Box2d &box) {
   const auto *object = obstacles_.Find(id);
   if (object) {
     AWARN << "obstacle " << id << " already exist.";
@@ -248,7 +296,7 @@ int Frame::CreateDestinationObstacle() {
 
   double dest_lane_s =
       std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
-                        FLAGS_stop_distance_destination);
+                        FLAGS_destination_stop_distance);
   auto dest_point = lane->GetSmoothPoint(dest_lane_s);
   double left_width = 0.0;
   double right_width = 0.0;
@@ -259,7 +307,7 @@ int Frame::CreateDestinationObstacle() {
                         FLAGS_virtual_stop_wall_length,
                         left_width + right_width};
   // add destination's projection to each reference line info
-  AddStaticVirtualObstacle(FLAGS_destination_obstacle_id, destination_box);
+  CreateStaticVirtualObstacle(FLAGS_destination_obstacle_id, destination_box);
   return 0;
 }
 
@@ -405,10 +453,13 @@ void Frame::AddObstacle(const Obstacle &obstacle) {
 
 const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
   double min_cost = std::numeric_limits<double>::infinity();
+  drive_reference_line_info_ = nullptr;
   for (const auto &reference_line_info : reference_line_info_) {
-    if (reference_line_info.ReachedDestination() ||
-        (reference_line_info.IsDrivable() &&
-         reference_line_info.Cost() < min_cost)) {
+    if (reference_line_info.ReachedDestination()) {
+      drive_reference_line_info_ = &reference_line_info;
+      return drive_reference_line_info_;
+    } else if (reference_line_info.IsDrivable() &&
+               reference_line_info.Cost() < min_cost) {
       drive_reference_line_info_ = &reference_line_info;
       min_cost = reference_line_info.Cost();
     }

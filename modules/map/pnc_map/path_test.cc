@@ -91,6 +91,77 @@ std::string ToString(const T& val) {
 
 }  // namespace
 
+TEST(TestSuite, LaneSegment) {
+  Lane lane1;
+  {
+    lane1.mutable_id()->set_id("lane1");
+    auto* line_segment =
+        lane1.mutable_central_curve()->add_segment()->mutable_line_segment();
+    *line_segment->add_point() = MakePoint(0, 0, 0);
+    *line_segment->add_point() = MakePoint(0, 3, 0);
+    lane1.set_length(3.0);
+    *lane1.add_left_sample() = MakeSample(0.0, 4.0);
+    *lane1.add_left_sample() = MakeSample(1.0, 5.0);
+    *lane1.add_left_sample() = MakeSample(3.0, 6.0);
+    *lane1.add_right_sample() = MakeSample(0.0, 7.0);
+    *lane1.add_right_sample() = MakeSample(2.0, 8.0);
+    *lane1.add_right_sample() = MakeSample(3.0, 5.0);
+  }
+  LaneInfoConstPtr lane_info1(new LaneInfo(lane1));
+  Lane lane2;
+  {
+    lane2.mutable_id()->set_id("lane2");
+    auto* line_segment =
+        lane2.mutable_central_curve()->add_segment()->mutable_line_segment();
+    *line_segment->add_point() = MakePoint(0, 0, 0);
+    *line_segment->add_point() = MakePoint(0, 3, 0);
+    lane2.set_length(3.0);
+    *lane2.add_left_sample() = MakeSample(0.0, 4.0);
+    *lane2.add_left_sample() = MakeSample(1.0, 5.0);
+    *lane2.add_left_sample() = MakeSample(3.0, 6.0);
+    *lane2.add_right_sample() = MakeSample(0.0, 7.0);
+    *lane2.add_right_sample() = MakeSample(2.0, 8.0);
+    *lane2.add_right_sample() = MakeSample(3.0, 5.0);
+  }
+  LaneInfoConstPtr lane_info2(new LaneInfo(lane2));
+
+  {  // one segment
+    std::vector<LaneSegment> segments;
+    segments.emplace_back(LaneSegment(lane_info1, 0, 1));
+    LaneSegment::Join(&segments);
+    EXPECT_EQ(1, segments.size());
+    EXPECT_EQ("lane1", segments[0].lane->id().id());
+    EXPECT_FLOAT_EQ(0, segments[0].start_s);
+    EXPECT_FLOAT_EQ(1, segments[0].end_s);
+  }
+
+  {  // two segments
+    std::vector<LaneSegment> segments;
+    segments.emplace_back(LaneSegment(lane_info1, 0, 1));
+    segments.emplace_back(LaneSegment(lane_info1, 2, 3));
+    LaneSegment::Join(&segments);
+    EXPECT_EQ(1, segments.size());
+    EXPECT_EQ("lane1", segments[0].lane->id().id());
+    EXPECT_FLOAT_EQ(0, segments[0].start_s);
+    EXPECT_FLOAT_EQ(3, segments[0].end_s);
+  }
+
+  {  // three segments
+    std::vector<LaneSegment> segments;
+    segments.emplace_back(LaneSegment(lane_info1, 0, 1));
+    segments.emplace_back(LaneSegment(lane_info1, 2, 3));
+    segments.emplace_back(LaneSegment(lane_info2, 0, 2));
+    LaneSegment::Join(&segments);
+    EXPECT_EQ(2, segments.size());
+    EXPECT_EQ("lane1", segments[0].lane->id().id());
+    EXPECT_FLOAT_EQ(0, segments[0].start_s);
+    EXPECT_FLOAT_EQ(3, segments[0].end_s);
+    EXPECT_EQ("lane2", segments[1].lane->id().id());
+    EXPECT_FLOAT_EQ(0, segments[1].start_s);
+    EXPECT_FLOAT_EQ(2, segments[1].end_s);
+  }
+}
+
 TEST(TestSuite, hdmap_line_path) {
   Lane lane;
   lane.mutable_id()->set_id("id");
@@ -142,7 +213,7 @@ TEST(TestSuite, hdmap_line_path) {
   EXPECT_EQ(path_approximation->original_ids().size(), 2);
   EXPECT_EQ(path_approximation->original_ids()[0], 0);
   EXPECT_EQ(path_approximation->original_ids()[1], 3);
-  EXPECT_EQ(path.lane_segments().size(), 3);
+  EXPECT_EQ(path.lane_segments().size(), 1);
 
   EXPECT_EQ(path.lane_segments_to_next_point().size(), 3);
   EXPECT_EQ(path.lane_segments_to_next_point()[0].lane->id().id(), "id");
@@ -527,15 +598,13 @@ TEST(TestSuite, hdmap_s_path) {
   const int kNumSegments = 100;
   for (int i = 0; i <= kNumSegments; ++i) {
     if (i <= kNumSegments / 2) {
-      const double p = -M_PI_2 +
-                       2.0 * M_PI * static_cast<double>(i) /
-                           static_cast<double>(kNumSegments);
+      const double p = -M_PI_2 + 2.0 * M_PI * static_cast<double>(i) /
+                                     static_cast<double>(kNumSegments);
       points.push_back(
           MakeMapPathPoint(kRadius * cos(p), kRadius * (sin(p) - 1.0)));
     } else {
-      const double p = M_PI_2 -
-                       2.0 * M_PI * static_cast<double>(i) /
-                           static_cast<double>(kNumSegments);
+      const double p = M_PI_2 - 2.0 * M_PI * static_cast<double>(i) /
+                                    static_cast<double>(kNumSegments);
       points.push_back(
           MakeMapPathPoint(kRadius * cos(p), kRadius * (sin(p) + 1.0)));
     }
@@ -605,15 +674,13 @@ TEST(TestSuite, hdmap_path_get_smooth_point) {
   std::vector<MapPathPoint> points;
   for (int i = 0; i <= kNumSegments; ++i) {
     if (i <= kNumSegments / 2) {
-      const double p = -M_PI_2 +
-                       2.0 * M_PI * static_cast<double>(i) /
-                           static_cast<double>(kNumSegments);
+      const double p = -M_PI_2 + 2.0 * M_PI * static_cast<double>(i) /
+                                     static_cast<double>(kNumSegments);
       points.push_back(
           MakeMapPathPoint(kRadius * cos(p), kRadius * (sin(p) - 1.0)));
     } else {
-      const double p = M_PI_2 -
-                       2.0 * M_PI * static_cast<double>(i) /
-                           static_cast<double>(kNumSegments);
+      const double p = M_PI_2 - 2.0 * M_PI * static_cast<double>(i) /
+                                    static_cast<double>(kNumSegments);
       points.push_back(
           MakeMapPathPoint(kRadius * cos(p), kRadius * (sin(p) + 1.0)));
     }

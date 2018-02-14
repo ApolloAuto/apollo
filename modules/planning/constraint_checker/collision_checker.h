@@ -22,22 +22,38 @@
 #define MODULES_PLANNING_CONSTRAINT_CHECKER_COLLISION_CHECKER_H_
 
 #include <vector>
+#include <array>
 
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/common/obstacle.h"
 #include "modules/common/math/box2d.h"
+#include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
 
 namespace apollo {
 namespace planning {
 
 class CollisionChecker {
  public:
-  explicit CollisionChecker(const std::vector<const Obstacle*>& obstacles);
+  explicit CollisionChecker(
+      const std::vector<const Obstacle*>& obstacles,
+      const std::array<double, 3>& adc_init_s,
+      const std::array<double, 3>& adc_init_d,
+      const std::vector<apollo::common::PathPoint>& discretized_reference_line);
 
   bool InCollision(const DiscretizedTrajectory& discretized_trajectory);
 
  private:
-  void BuildPredictedEnv(const std::vector<const Obstacle*>& obstacles);
+  void BuildPredictedEnv(
+      const std::vector<const Obstacle*>& obstacles,
+      const std::array<double, 3>& adc_init_s,
+      const std::array<double, 3>& adc_init_d,
+      const std::vector<apollo::common::PathPoint>& discretized_reference_line);
+
+  bool IgnoreObstaclesBehind(const std::array<double, 3>& adc_init_d);
+
+  bool IsBehind(
+      const Obstacle* obstacle,
+      const std::array<double, 3>& adc_init_s,
+      const std::vector<apollo::common::PathPoint>& discretized_reference_line);
 
   std::vector<std::vector<common::math::Box2d>> predicted_envs_;
 };

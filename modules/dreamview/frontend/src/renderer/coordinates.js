@@ -14,6 +14,7 @@ export default class Coordinates {
             x: x,
             y: y
         };
+        console.log("Offset is set to x:" + x + ", y:" + y);
     }
 
     applyOffset(point, reverse = false) {

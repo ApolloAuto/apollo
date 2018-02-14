@@ -22,6 +22,7 @@
 
 #include "gflags/gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/http_client.h"
 #include "modules/common/util/json_util.h"
@@ -31,6 +32,7 @@
 #include "modules/common/util/util.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/data/proto/static_info.pb.h"
+#include "modules/data/util/info_collector.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 #include "modules/monitor/proto/system_status.pb.h"
@@ -56,6 +58,7 @@ namespace dreamview {
 namespace {
 
 using apollo::canbus::Chassis;
+using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::common::util::FindOrNull;
@@ -138,9 +141,13 @@ bool GuaranteeDrivingMode(const Chassis::DrivingMode target_mode,
 }  // namespace
 
 HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
-    : websocket_(websocket), map_service_(map_service) {
+    : websocket_(websocket),
+      map_service_(map_service),
+      logger_(apollo::common::monitor::MonitorMessageItem::HMI) {
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
+  config_.set_docker_image(apollo::data::InfoCollector::GetDockerImage());
+
   // If the module path doesn't exist, remove it from list.
   auto *modules = config_.mutable_modules();
   for (auto iter = modules->begin(); iter != modules->end();) {
@@ -179,6 +186,7 @@ void HMI::RegisterMessageHandlers() {
             conn, JsonUtil::ProtoToTypedJson("HMIConfig", config_).dump());
         websocket_->SendData(
             conn, JsonUtil::ProtoToTypedJson("HMIStatus", status_).dump());
+        SendVehicleParam(conn);
       });
 
   // HMI client asks for executing module command.
@@ -283,6 +291,22 @@ void HMI::RegisterMessageHandlers() {
         }
       });
 
+  // HMI client asks for adding new DriveEvent.
+  websocket_->RegisterMessageHandler(
+      "SubmitDriveEvent",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // json should contain event_time_ms and event_msg.
+        uint64_t event_time_ms;
+        std::string event_msg;
+        if (JsonUtil::GetNumberFromJson(json, "event_time_ms", &event_time_ms)
+            && JsonUtil::GetStringFromJson(json, "event_msg", &event_msg)) {
+          SubmitDriveEvent(event_time_ms, event_msg);
+        } else {
+          AERROR << "Truncated SubmitDriveEvent request.";
+        }
+      });
+
+
   // Received new system status, broadcast to clients.
   AdapterManager::AddSystemStatusCallback(
       [this](const monitor::SystemStatus &system_status) {
@@ -294,11 +318,34 @@ void HMI::RegisterMessageHandlers() {
       });
 }
 
-void HMI::BroadcastHMIStatus() const {
+void HMI::BroadcastHMIStatus() {
   // In unit tests, we may leave websocket_ as NULL and skip broadcasting.
   if (websocket_) {
     websocket_->BroadcastData(
         JsonUtil::ProtoToTypedJson("HMIStatus", status_).dump());
+  }
+
+  // Broadcast messages.
+  apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
+  if (status_.current_map().empty()) {
+    log_buffer.WARN("You haven't select map yet!");
+  }
+  if (status_.current_vehicle().empty()) {
+    log_buffer.WARN("You haven't select vehicle yet!");
+  }
+}
+
+void HMI::SendVehicleParam(WebSocketHandler::Connection *conn) {
+  if (websocket_ == nullptr) {
+    return;
+  }
+
+  const auto json_str = JsonUtil::ProtoToTypedJson(
+      "VehicleParam", VehicleConfigHelper::GetConfig().vehicle_param()).dump();
+  if (conn != nullptr) {
+    websocket_->SendData(conn, json_str);
+  } else {
+    websocket_->BroadcastData(json_str);
   }
 }
 
@@ -388,6 +435,8 @@ void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
   // Check available updates for current vehicle.
   // CheckOTAUpdates();
   BroadcastHMIStatus();
+  // Broadcast new VehicleParam.
+  SendVehicleParam();
 }
 
 void HMI::ChangeModeTo(const std::string &mode_name) {
@@ -417,7 +466,7 @@ void HMI::CheckOTAUpdates() {
       VehicleInfo::Brand_Name(vehicle_info.brand()),
       ".", VehicleInfo::Model_Name(vehicle_info.model()));
   ota_request["vin"] = vehicle_info.license().vin();
-  ota_request["tag"] = std::getenv("DOCKER_IMG");
+  ota_request["tag"] = apollo::data::InfoCollector::GetDockerImage();
 
   Json ota_response;
   const auto status = apollo::common::util::HttpClient::Post(
@@ -427,6 +476,15 @@ void HMI::CheckOTAUpdates() {
                                       status_.mutable_ota_update()));
     AINFO << "Found available OTA update: " << status_.ota_update();
   }
+}
+
+void HMI::SubmitDriveEvent(const uint64_t event_time_ms,
+                           const std::string &event_msg) const {
+  apollo::common::DriveEvent drive_event;
+  AdapterManager::FillDriveEventHeader("HMI", &drive_event);
+  drive_event.mutable_header()->set_timestamp_sec(event_time_ms / 1000.0);
+  drive_event.set_event(event_msg);
+  AdapterManager::PublishDriveEvent(drive_event);
 }
 
 }  // namespace dreamview

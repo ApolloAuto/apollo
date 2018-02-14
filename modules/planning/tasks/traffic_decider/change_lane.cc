@@ -37,7 +37,7 @@ constexpr double kMinGuardVehicleSpeed = 1.0;
 constexpr double kGuardDistance = 100.0;
 constexpr double kMinOvertakeDistance = 10.0;
 constexpr double kOvertakeTimeBuffer = 2.0;
-}
+}  // namespace
 
 ChangeLane::ChangeLane(const RuleConfig& config) : TrafficRule(config) {}
 
@@ -136,7 +136,7 @@ bool ChangeLane::CreateGuardObstacle(
   return true;
 }
 
-bool ChangeLane::ApplyRule(Frame* frame,
+bool ChangeLane::ApplyRule(Frame* const frame,
                            ReferenceLineInfo* const reference_line_info) {
   // The reference line is not a change lane reference line, skip
   if (reference_line_info->Lanes().IsOnSegment()) {

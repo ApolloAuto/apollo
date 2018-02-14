@@ -37,14 +37,28 @@ using google::protobuf::util::JsonStringToMessage;
 using google::protobuf::util::MessageToJsonString;
 
 SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
+                                               WebSocketHandler *map_ws,
                                                SimControl *sim_control,
                                                const MapService *map_service,
                                                bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
       websocket_(websocket),
+      map_ws_(map_ws),
       sim_control_(sim_control) {
-  websocket_->RegisterMessageHandler(
+  RegisterMessageHandlers();
+}
+
+void SimulationWorldUpdater::RegisterMessageHandlers() {
+  // Send current sim_control status to the new client.
+  websocket_->RegisterConnectionReadyHandler(
+      [this](WebSocketHandler::Connection *conn) {
+        Json response;
+        response["type"] = "SimControlStatus";
+        response["enabled"] = sim_control_->IsEnabled();
+        websocket_->SendData(conn, response.dump());
+      });
+  map_ws_->RegisterMessageHandler(
       "RetrieveMapData",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         auto iter = json.find("elements");
@@ -52,8 +66,11 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           MapElementIds map_element_ids;
           if (JsonStringToMessage(iter->dump(), &map_element_ids).ok()) {
             auto retrieved = map_service_->RetrieveMapElements(map_element_ids);
-            websocket_->SendData(
-                conn, JsonUtil::ProtoToTypedJson("MapData", retrieved).dump());
+
+            std::string retrieved_map_string;
+            retrieved.SerializeToString(&retrieved_map_string);
+
+            map_ws_->SendBinaryData(conn, retrieved_map_string, true);
           } else {
             AERROR << "Failed to parse MapElementIds from json";
           }
@@ -119,23 +136,33 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
           return;
         }
 
+        bool enable_pnc_monitor = false;
         auto planning = json.find("planning");
         if (planning != json.end() && planning->is_boolean()) {
-          enable_pnc_monitor_ = json["planning"];
+          enable_pnc_monitor = json["planning"];
         }
         std::string to_send;
         {
           // Pay the price to copy the data instead of sending data over the
           // wire while holding the lock.
           boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
-          to_send = simulation_world_;
+          to_send = enable_pnc_monitor ? simulation_world_with_planning_data_
+                                       : simulation_world_;
         }
-        if (FLAGS_enable_update_size_check && !enable_pnc_monitor_ &&
+        if (FLAGS_enable_update_size_check && !enable_pnc_monitor &&
             to_send.size() > FLAGS_max_update_size) {
           AWARN << "update size is too big:" << to_send.size();
           return;
         }
         websocket_->SendBinaryData(conn, to_send, true);
+      });
+
+  websocket_->RegisterMessageHandler(
+      "RequestRoutePath",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response = sim_world_service_.GetRoutePathAsJson();
+        response["type"] = "RoutePath";
+        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(
@@ -173,7 +200,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
   websocket_->RegisterMessageHandler(
       "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
         sim_world_service_.SetToClear();
-        sim_control_->ClearPlanning();
+        sim_control_->Reset();
       });
 
   websocket_->RegisterMessageHandler(
@@ -183,6 +210,19 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
         DumpMessage(AdapterManager::GetRoutingResponse(), "RoutingResponse");
         DumpMessage(AdapterManager::GetLocalization(), "Localization");
         DumpMessage(AdapterManager::GetPlanning(), "Planning");
+      });
+
+  websocket_->RegisterMessageHandler(
+      "ToggleSimControl",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        auto enable = json.find("enable");
+        if (enable != json.end() && enable->is_boolean()) {
+          if (*enable) {
+            sim_control_->Start();
+          } else {
+            sim_control_->Stop();
+          }
+        }
       });
 }
 
@@ -273,8 +313,9 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
 
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    simulation_world_ = sim_world_service_.GetWireFormatString(
-        FLAGS_sim_map_radius, enable_pnc_monitor_);
+    sim_world_service_.GetWireFormatString(
+        FLAGS_sim_map_radius, &simulation_world_,
+        &simulation_world_with_planning_data_);
   }
 }
 

@@ -1,5 +1,4 @@
 load("//tools:cpplint.bzl", "cpplint")
-
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -44,30 +43,30 @@ cc_library(
         "//modules/perception/obstacle/common:perception_obstacle_common",
         "//modules/perception/obstacle/fusion/interface:perception_obstacle_fusion_interface",
         "//modules/perception/obstacle/onboard:perception_obstacle_hdmapinput",
-        "@eigen//:eigen",
-        "@pcl//:pcl",
+        "@eigen",
+        "@pcl",
     ],
 )
 
 cc_test(
-   name = "probabilistic_fusion_test",
-   size = "small",
-   srcs = [
-       "probabilistic_fusion_test.cc",
-   ],
-   data = [
-       "//modules/perception:perception_data",
-       "//modules/perception:perception_model",
-       "//modules/perception/conf:perception_config",
-   ],
-   deps = [
-       ":probabilistic_fusion",
-       "//external:gflags",
-       "//modules/common:log",
-       "//modules/perception/lib/pcl_util",
-       "@gtest//:gtest",
-       "@gtest//:main",
-   ],
+    name = "probabilistic_fusion_test",
+    size = "small",
+    srcs = [
+        "probabilistic_fusion_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+        "//modules/perception:perception_model",
+        "//modules/perception/conf:perception_config",
+    ],
+    deps = [
+        ":probabilistic_fusion",
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/perception/lib/pcl_util",
+        "@gtest",
+        "@gtest//:main",
+    ],
 )
 
 cc_test(
@@ -86,7 +85,7 @@ cc_test(
         "//external:gflags",
         "//modules/common:log",
         "//modules/perception/lib/pcl_util",
-        "@gtest//:gtest",
+        "@gtest",
         "@gtest//:main",
     ],
 )
@@ -107,7 +106,7 @@ cc_test(
         "//external:gflags",
         "//modules/common:log",
         "//modules/perception/lib/pcl_util",
-        "@gtest//:gtest",
+        "@gtest",
         "@gtest//:main",
     ],
 )
@@ -128,7 +127,7 @@ cc_test(
         "//external:gflags",
         "//modules/common:log",
         "//modules/perception/lib/pcl_util",
-        "@gtest//:gtest",
+        "@gtest",
         "@gtest//:main",
     ],
 )

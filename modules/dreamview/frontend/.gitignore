@@ -1,4 +1,4 @@
 node_modules/
 yarn-error.log
-!*bundle.js
 dist_offline/
+dist/assets/map_data

@@ -26,11 +26,11 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/proto/sl_boundary.pb.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/obstacle.h"
-#include "modules/planning/lattice/util/reference_line_matcher.h"
 #include "modules/common/math/linear_interpolation.h"
+#include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/lattice/util/reference_line_matcher.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -48,7 +48,7 @@ int LastIndexBefore(const prediction::Trajectory& trajectory, const double t) {
     return -1;
   }
   if (trajectory.trajectory_point(0).relative_time() > t) {
-    return -1;
+    return 0;
   }
   int start = 0;
   int end = num_traj_point - 1;
@@ -69,10 +69,8 @@ int LastIndexBefore(const prediction::Trajectory& trajectory, const double t) {
 }  // namespace
 
 PathTimeNeighborhood::PathTimeNeighborhood(
-    const std::vector<const Obstacle*>& obstacles,
-    const double ego_s,
+    const std::vector<const Obstacle*>& obstacles, const double ego_s,
     const std::vector<PathPoint>& discretized_ref_points) {
-
   path_range_.first = ego_s;
   path_range_.second = ego_s + FLAGS_decision_horizon;
 
@@ -86,7 +84,6 @@ PathTimeNeighborhood::PathTimeNeighborhood(
 SLBoundary PathTimeNeighborhood::ComputeObstacleBoundary(
     const Box2d& box,
     const std::vector<PathPoint>& discretized_ref_points) const {
-
   double start_s(std::numeric_limits<double>::max());
   double end_s(std::numeric_limits<double>::lowest());
   double start_l(std::numeric_limits<double>::max());
@@ -96,7 +93,7 @@ SLBoundary PathTimeNeighborhood::ComputeObstacleBoundary(
 
   for (const auto& point : corners) {
     auto sl_point = ReferenceLineMatcher::GetReferenceLineCoordinate(
-            discretized_ref_points, point.x(), point.y());
+        discretized_ref_points, point.x(), point.y());
     start_s = std::fmin(start_s, sl_point.first);
     end_s = std::fmax(end_s, sl_point.first);
     start_l = std::fmin(start_l, sl_point.second);
@@ -116,6 +113,7 @@ void PathTimeNeighborhood::SetupObstacles(
     const std::vector<const Obstacle*>& obstacles,
     const std::vector<PathPoint>& discretized_ref_points) {
 
+  double half_lane_width = FLAGS_default_reference_line_width * 0.5;
   for (const Obstacle* obstacle : obstacles) {
     if (prediction_traj_map_.find(obstacle->Id()) ==
         prediction_traj_map_.end()) {
@@ -125,22 +123,22 @@ void PathTimeNeighborhood::SetupObstacles(
     }
 
     if (!obstacle->HasTrajectory()) {
-       SetStaticPathTimeObstacle(obstacle, discretized_ref_points);
-       continue;
+      SetStaticPathTimeObstacle(obstacle, discretized_ref_points);
+      continue;
     }
 
     double relative_time = time_range_.first;
     while (relative_time < time_range_.second) {
       TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       Box2d box = obstacle->GetBoundingBox(point);
-      SLBoundary sl_boundary = ComputeObstacleBoundary(box,
-          discretized_ref_points);
+      SLBoundary sl_boundary =
+          ComputeObstacleBoundary(box, discretized_ref_points);
 
       // the obstacle is not shown on the region to be considered.
       if (sl_boundary.end_s() < path_range_.first ||
-          sl_boundary.start_s() > path_range_.second  ||
-          (sl_boundary.start_l() > FLAGS_lateral_obstacle_ignore_thred &&
-           sl_boundary.end_l() < -FLAGS_lateral_obstacle_ignore_thred)) {
+          sl_boundary.start_s() > path_range_.second ||
+          (sl_boundary.start_l() > half_lane_width &&
+           sl_boundary.end_l() < -half_lane_width)) {
         if (path_time_obstacle_map_.find(obstacle->Id()) !=
             path_time_obstacle_map_.end()) {
           break;
@@ -154,22 +152,21 @@ void PathTimeNeighborhood::SetupObstacles(
           path_time_obstacle_map_.end()) {
         path_time_obstacle_map_[obstacle->Id()].set_obstacle_id(obstacle->Id());
 
-        path_time_obstacle_map_[obstacle->Id()].mutable_bottom_left()
-            ->CopyFrom(SetPathTimePoint(obstacle->Id(),
-                           sl_boundary.start_s(), relative_time));
+        path_time_obstacle_map_[obstacle->Id()].mutable_bottom_left()->CopyFrom(
+            SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(),
+                             relative_time));
 
-        path_time_obstacle_map_[obstacle->Id()].mutable_upper_left()
-            ->CopyFrom(SetPathTimePoint(obstacle->Id(),
-                           sl_boundary.end_s(), relative_time));
+        path_time_obstacle_map_[obstacle->Id()].mutable_upper_left()->CopyFrom(
+            SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(),
+                             relative_time));
       }
 
-      path_time_obstacle_map_[obstacle->Id()].mutable_bottom_right()
-          ->CopyFrom(SetPathTimePoint(obstacle->Id(),
-                         sl_boundary.start_s(), relative_time));
+      path_time_obstacle_map_[obstacle->Id()].mutable_bottom_right()->CopyFrom(
+          SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(),
+                           relative_time));
 
-      path_time_obstacle_map_[obstacle->Id()].mutable_upper_right()
-          ->CopyFrom(SetPathTimePoint(obstacle->Id(),
-                         sl_boundary.end_s(), relative_time));
+      path_time_obstacle_map_[obstacle->Id()].mutable_upper_right()->CopyFrom(
+          SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(), relative_time));
 
       relative_time += FLAGS_trajectory_time_resolution;
     }
@@ -213,20 +210,20 @@ void PathTimeNeighborhood::SetStaticPathTimeObstacle(
   SLBoundary sl_boundary = ComputeObstacleBoundary(box, discretized_ref_points);
 
   path_time_obstacle_map_[obstacle_id].set_obstacle_id(obstacle_id);
-  path_time_obstacle_map_[obstacle_id].mutable_bottom_left()
-      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.start_s(), 0.0));
-  path_time_obstacle_map_[obstacle_id].mutable_bottom_right()
-      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.start_s(),
-                                  FLAGS_trajectory_time_length));
-  path_time_obstacle_map_[obstacle_id].mutable_upper_left()
-      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.end_s(), 0.0));
-  path_time_obstacle_map_[obstacle_id].mutable_upper_right()
-      ->CopyFrom(SetPathTimePoint(obstacle_id, sl_boundary.end_s(),
-                                  FLAGS_trajectory_time_length));
+  path_time_obstacle_map_[obstacle_id].mutable_bottom_left()->CopyFrom(
+      SetPathTimePoint(obstacle_id, sl_boundary.start_s(), 0.0));
+  path_time_obstacle_map_[obstacle_id].mutable_bottom_right()->CopyFrom(
+      SetPathTimePoint(obstacle_id, sl_boundary.start_s(),
+                       FLAGS_trajectory_time_length));
+  path_time_obstacle_map_[obstacle_id].mutable_upper_left()->CopyFrom(
+      SetPathTimePoint(obstacle_id, sl_boundary.end_s(), 0.0));
+  path_time_obstacle_map_[obstacle_id].mutable_upper_right()->CopyFrom(
+      SetPathTimePoint(obstacle_id, sl_boundary.end_s(),
+                       FLAGS_trajectory_time_length));
 }
 
-double PathTimeNeighborhood::SpeedAtT(
-    const std::string& obstacle_id, const double s, const double t) const {
+double PathTimeNeighborhood::SpeedAtT(const std::string& obstacle_id,
+                                      const double s, const double t) const {
   bool found =
       prediction_traj_map_.find(obstacle_id) != prediction_traj_map_.end();
   CHECK(found);
@@ -242,8 +239,7 @@ double PathTimeNeighborhood::SpeedAtT(
 
   int curr_index = LastIndexBefore(trajectory, t);
   int next_index = curr_index + 1;
-  double heading =
-      trajectory.trajectory_point(curr_index).path_point().theta();
+  double heading = trajectory.trajectory_point(curr_index).path_point().theta();
 
   if (curr_index == num_traj_point - 1) {
     curr_index = num_traj_point - 2;
@@ -305,16 +301,12 @@ PathTimeNeighborhood::GetPathBlockingIntervals(const double t) const {
       continue;
     }
     double s_upper = common::math::lerp(
-        pt_obstacle.upper_left().s(),
-        pt_obstacle.upper_left().t(),
-        pt_obstacle.upper_right().s(),
-        pt_obstacle.upper_right().t(), t);
+        pt_obstacle.upper_left().s(), pt_obstacle.upper_left().t(),
+        pt_obstacle.upper_right().s(), pt_obstacle.upper_right().t(), t);
 
     double s_lower = common::math::lerp(
-        pt_obstacle.bottom_left().s(),
-        pt_obstacle.bottom_left().t(),
-        pt_obstacle.bottom_right().s(),
-        pt_obstacle.bottom_right().t(), t);
+        pt_obstacle.bottom_left().s(), pt_obstacle.bottom_left().t(),
+        pt_obstacle.bottom_right().s(), pt_obstacle.bottom_right().t(), t);
 
     intervals.emplace_back(s_lower, s_upper);
   }
@@ -322,8 +314,9 @@ PathTimeNeighborhood::GetPathBlockingIntervals(const double t) const {
 }
 
 std::vector<std::vector<std::pair<double, double>>>
-PathTimeNeighborhood::GetPathBlockingIntervals(
-    const double t_start, const double t_end, const double t_resolution) {
+PathTimeNeighborhood::GetPathBlockingIntervals(const double t_start,
+                                               const double t_end,
+                                               const double t_resolution) {
   std::vector<std::vector<std::pair<double, double>>> intervals;
   for (double t = t_start; t <= t_end; t += t_resolution) {
     intervals.push_back(GetPathBlockingIntervals(t));
@@ -338,7 +331,6 @@ std::pair<double, double> PathTimeNeighborhood::get_path_range() const {
 std::pair<double, double> PathTimeNeighborhood::get_time_range() const {
   return time_range_;
 }
-
 
 }  // namespace planning
 }  // namespace apollo

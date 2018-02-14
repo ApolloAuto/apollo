@@ -20,8 +20,10 @@
 
 #include "modules/planning/tasks/dp_st_speed/dp_st_cost.h"
 
+#include <algorithm>
 #include <limits>
 
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed/st_point.h"
 
 namespace apollo {
@@ -41,6 +43,9 @@ DpStCost::DpStCost(const DpStSpeedConfig& config,
   for (auto& obstacle : obstacles) {
     boundary_map_[obstacle->st_boundary().id()] = index++;
   }
+
+  AddToKeepClearRange(obstacles);
+
   boundary_cost_.resize(obstacles_.size());
   for (auto& vec : boundary_cost_) {
     vec.resize(config_.matrix_dimension_t(), std::make_pair(-1.0, -1.0));
@@ -49,12 +54,67 @@ DpStCost::DpStCost(const DpStSpeedConfig& config,
   jerk_cost_.fill(-1.0);
 }
 
+void DpStCost::AddToKeepClearRange(
+    const std::vector<const PathObstacle*>& obstacles) {
+  for (const auto& obstacle : obstacles) {
+    if (obstacle->st_boundary().IsEmpty()) {
+      continue;
+    }
+    if (obstacle->st_boundary().boundary_type() !=
+        StBoundary::BoundaryType::KEEP_CLEAR) {
+      continue;
+    }
+
+    double start_s = obstacle->st_boundary().min_s();
+    double end_s = obstacle->st_boundary().max_s();
+    keep_clear_range_.emplace_back(start_s, end_s);
+  }
+  SortAndMergeRange(&keep_clear_range_);
+}
+
+void DpStCost::SortAndMergeRange(
+    std::vector<std::pair<double, double>>* keep_clear_range) {
+  if (!keep_clear_range || keep_clear_range->empty()) {
+    return;
+  }
+  std::sort(keep_clear_range->begin(), keep_clear_range->end());
+  std::size_t i = 0;
+  std::size_t j = i + 1;
+  while (j < keep_clear_range->size()) {
+    if (keep_clear_range->at(i).second < keep_clear_range->at(j).first) {
+      ++i;
+      ++j;
+    } else {
+      keep_clear_range->at(i).second = std::max(keep_clear_range->at(i).second,
+                                                keep_clear_range->at(j).second);
+      ++j;
+    }
+  }
+  keep_clear_range->resize(i + 1);
+}
+
+bool DpStCost::InKeepClearRange(double s) const {
+  if (keep_clear_range_.empty()) {
+    return false;
+  }
+  for (const auto& p : keep_clear_range_) {
+    if (p.first <= s && p.second >= s) {
+      return true;
+    }
+  }
+  return false;
+}
+
 double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
   const double s = st_graph_point.point().s();
   const double t = st_graph_point.point().t();
 
   double cost = 0.0;
   for (const auto* obstacle : obstacles_) {
+    if (!obstacle->IsBlockingObstacle()) {
+      continue;
+    }
+
     auto boundary = obstacle->st_boundary();
     const double kIgnoreDistance = 200.0;
     if (boundary.min_s() > kIgnoreDistance) {
@@ -114,15 +174,20 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
   if (speed < 0) {
     return kInf;
   }
+
+  if (speed < FLAGS_max_stop_speed && InKeepClearRange(second.s())) {
+    // first.s in range
+    cost += config_.keep_clear_low_speed_penalty() * unit_t_ *
+            config_.default_speed_cost();
+  }
+
   double det_speed = (speed - speed_limit) / speed_limit;
   if (det_speed > 0) {
-    cost = config_.exceed_speed_penalty() * config_.default_speed_cost() *
-           fabs(speed * speed) * unit_t_;
+    cost += config_.exceed_speed_penalty() * config_.default_speed_cost() *
+            fabs(speed * speed) * unit_t_;
   } else if (det_speed < 0) {
-    cost = config_.low_speed_penalty() * config_.default_speed_cost() *
-           -det_speed * unit_t_;
-  } else {
-    cost = 0.0;
+    cost += config_.low_speed_penalty() * config_.default_speed_cost() *
+            -det_speed * unit_t_;
   }
   return cost;
 }

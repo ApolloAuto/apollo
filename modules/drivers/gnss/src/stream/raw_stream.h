@@ -80,7 +80,7 @@ class RawStream {
   const ros::Publisher _rtk_data_publisher;
   const ros::Publisher _stream_status_publisher;
 
-  boost::shared_ptr<apollo::common::gnss_status::StreamStatus> _stream_status;
+  boost::shared_ptr<apollo::drivers::gnss_status::StreamStatus> _stream_status;
   std::unique_ptr<std::thread> _data_thread_ptr;
   std::unique_ptr<std::thread> _rtk_thread_ptr;
 };

@@ -1,10 +1,10 @@
 {
     "name": "dreamview",
-    "version": "0.7.0",
+    "version": "2.0.0",
     "description": "Visiualization of the Apollo simulator.",
     "main": "app.js",
-    "author": "adusim",
-    "license": "MIT",
+    "author": "adu-sim",
+    "license": "Apache 2.0",
     "scripts": {
         "build": "./gen_pbjs.sh; node_modules/.bin/webpack -p --progress",
         "start": "./gen_pbjs.sh; node_modules/.bin/webpack-dev-server --watch-poll",
@@ -13,21 +13,21 @@
     },
     "dependencies": {
         "chart.js": "^2.7.0",
-        "chartjs-plugin-zoom": "^0.5.0",
         "classnames": "^2.2.5",
         "font-awesome": "^4.7.0",
         "imports-loader": "0.6.5",
         "jDataView": "^2.3.0",
         "mobx": "^3.1.10",
         "mobx-react": "^4.1.8",
+        "protobufjs": "^6.8.4",
         "react": "^16.0.0",
         "react-dom": "^16.0.0",
         "react-rangeslider": "^2.2.0",
         "react-split-pane": "^0.1.66",
+        "react-tabs": "^2.2.1",
         "stats.js": "^0.17.0",
         "three": "~0.84.0",
-        "three-line-2d": "^1.1.6",
-        "protobufjs": "^6.8.4"
+        "three-line-2d": "^1.1.6"
     },
     "devDependencies": {
         "babel-core": "^6.24.1",
@@ -56,6 +56,7 @@
         "url-loader": "^0.5.8",
         "webpack": "^2.6.1",
         "webpack-dev-server": "^2.4.5",
+        "worker-loader": "^1.1.0",
         "yaml-loader": "^0.4.0"
     }
 }

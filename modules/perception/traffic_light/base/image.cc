@@ -37,7 +37,7 @@ bool Image::Init(const double &ts, const CameraId &device_id,
   return true;
 }
 bool Image::Init(const double &ts, const CameraId &device_id,
-                 std::shared_ptr<const sensor_msgs::Image> image_data) {
+                 boost::shared_ptr<const sensor_msgs::Image> image_data) {
   contain_mat_ = false;
   contain_image_ = true;
   timestamp_ = ts, camera_id_ = device_id, image_data_ = image_data;
@@ -61,7 +61,7 @@ bool Image::GenerateMat() {
       if (image_data_->encoding.compare("yuyv") == 0) {
         unsigned char *yuv = (unsigned char *)&(image_data_->data[0]);
         mat_ = cv::Mat(image_data_->height, image_data_->width, CV_8UC3);
-        Yuyv2rgbAvx(yuv, mat_.data, image_data_->height * image_data_->width);
+        Yuyv2rgb(yuv, mat_.data, image_data_->height * image_data_->width);
         cv::cvtColor(mat_, mat_, CV_RGB2BGR);
       }
 

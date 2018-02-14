@@ -34,6 +34,10 @@ function start() {
         echo "Started supervisord with dev conf"
     fi
     supervisorctl start monitor > /dev/null
+
+    rm -rf modules/dreamview/frontend/dist/assets/map_data
+    ln -s `pwd`/modules/map/data/ modules/dreamview/frontend/dist/assets/map_data
+
     supervisorctl start dreamview > /dev/null
     echo "Dreamview is running at http://localhost:8888"
 }

@@ -40,12 +40,12 @@ class ComparableCost {
  public:
   ComparableCost() = default;
   ComparableCost(const bool has_collision, const bool out_of_boundary,
-                 const bool out_of_lane, const double safety_cost,
+                 const bool out_of_lane, const double safety_cost_,
                  const double smoothness_cost_)
-      : smoothness_cost(smoothness_cost_) {
-    cost_items[0] = has_collision;
-    cost_items[1] = out_of_boundary;
-    cost_items[2] = out_of_lane;
+      : safety_cost(safety_cost_), smoothness_cost(smoothness_cost_) {
+    cost_items[HAS_COLLISION] = has_collision;
+    cost_items[OUT_OF_BOUNDARY] = out_of_boundary;
+    cost_items[OUT_OF_LANE] = out_of_lane;
   }
   ComparableCost(const ComparableCost &) = default;
 
@@ -77,13 +77,9 @@ class ComparableCost {
       return -1;
     }
   }
-  ComparableCost &operator+(const ComparableCost &other) {
-    for (size_t i = 0; i < cost_items.size(); ++i) {
-      cost_items[i] = (cost_items[i] || other.cost_items[i]);
-    }
-    safety_cost += other.safety_cost;
-    smoothness_cost += other.smoothness_cost;
-    return *this;
+  ComparableCost operator+(const ComparableCost &other) {
+    ComparableCost lhs = *this;
+    return lhs += other;
   }
   ComparableCost &operator+=(const ComparableCost &other) {
     for (size_t i = 0; i < cost_items.size(); ++i) {

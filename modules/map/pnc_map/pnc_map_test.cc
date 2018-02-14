@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/map/pnc_map/pnc_map.h"
+
 #include <algorithm>
 #include <vector>
 
@@ -25,9 +27,6 @@
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/routing/proto/routing.pb.h"
-
-#define private public
-#include "modules/map/pnc_map/pnc_map.h"
 
 DECLARE_double(min_length_for_lane_change);
 

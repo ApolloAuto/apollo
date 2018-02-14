@@ -168,26 +168,33 @@ void PrintLane(const apollo::hdmap::MapUtil &map_util,
             << lane.left_neighbor_forward_lane_id() << "] right_forward["
             << lane.right_neighbor_forward_lane_id() << "] left_reverse["
             << lane.left_neighbor_reverse_lane_id() << "] right_reverse["
-            << lane.right_neighbor_reverse_lane_id() << "]"
-            << "Left Boundary: [ virtual?:"
-            << (lane.left_boundary().virtual_() ? "Y," : "N,") << "Type: ";
+            << lane.right_neighbor_reverse_lane_id() << "], "
+            << "Left Boundary: [ virtual?:" << std::boolalpha
+            << lane.left_boundary().virtual_() << ", Type: [";
   for (const auto &boundary_type : lane.left_boundary().boundary_type()) {
-    std::cout << boundary_type.s() << ": ";
+    std::cout << "s: " << boundary_type.s() << "->";
     for (const auto t : boundary_type.types()) {
-      std::cout << t << ", ";
+      std::cout << LaneBoundaryType::Type_Name(
+                       static_cast<LaneBoundaryType::Type>(t))
+                << ", ";
     }
   }
 
-  std::cout << "Right Boundary: [ virtual?:"
-            << (lane.right_boundary().virtual_() ? "Y," : "N,") << "Type: ";
+  std::cout << "]; Right Boundary: [ virtual?:" << std::boolalpha
+            << lane.right_boundary().virtual_() << ", Type: ";
   for (const auto &boundary_type : lane.left_boundary().boundary_type()) {
-    std::cout << boundary_type.s() << ": ";
+    std::cout << "s: " << boundary_type.s() << "->";
     for (const auto t : boundary_type.types()) {
-      std::cout << t << ", ";
+      std::cout << LaneBoundaryType::Type_Name(
+                       static_cast<LaneBoundaryType::Type>(t))
+                << ", ";
     }
   }
-  std::cout << "] overlap[" << lane.overlap_id() << "] stop_sign num:["
-            << lane_ptr->stop_signs().size() << "]"
+  std::cout << "] overlap[" << lane.overlap_id() << "]; stop_sign overlap_id [";
+  for (const auto stop_sign : lane_ptr->stop_signs()) {
+    std::cout << stop_sign->id().id() << ", ";
+  }
+  std::cout << "];"
             << " start point(x,y,heading):" << start_point.x() << ","
             << start_point.y() << "," << start_heading
             << " end point(x,y,heading):" << end_point.x() << ","
@@ -316,6 +323,8 @@ int main(int argc, char *argv[]) {
       !FLAGS_lane_to_lane && FLAGS_lane.empty() && FLAGS_dump_txt_map.empty() &&
       FLAGS_dump_bin_map.empty() && FLAGS_signal_info.empty() &&
       FLAGS_overlap.empty()) {
+    std::cout << "usage: --map_dir map/file/directory/" << std::endl;
+    std::cout << "usage: --base_map_filename map_file_name" << std::endl;
     std::cout << "usage: --dump_txt_map text_map_file" << std::endl;
     std::cout << "usage: --dump_bin_map bin_map_file" << std::endl;
     std::cout << "usage: --xy_to_sl --x x --y y" << std::endl;

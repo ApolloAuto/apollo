@@ -35,7 +35,7 @@
       <thead>
         <tr>
           <th>Vehicle</th>
-          <th>Time (UTC)</th>
+          <th>Time</th>
           <th>Duration</th>
           <th>Map</th>
           <th>Type</th>
@@ -56,7 +56,7 @@
 
     {# Draw map path. #}
     {% if task.map_path %}
-      <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&key={{ conf.gmap_api_key }}"></script>
+      <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&key=AIzaSyC2THXHPs0lkchGfcUOHTm-aVujoBHh2Sc"></script>
       <script type="text/javascript" src="{{ url_for('static', filename='js/gmap_util.js') }}"></script>
       <div style="width:100%; height:350px;">
         <div id="gmap_canvas" style="width: 100%; height: 100%;"></div>

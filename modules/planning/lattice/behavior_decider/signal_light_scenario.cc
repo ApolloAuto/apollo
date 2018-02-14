@@ -36,9 +36,9 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::adapter::AdapterManager;
+using apollo::common::util::WithinBound;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
-using apollo::common::util::WithinBound;
 
 void SignalLightScenario::Reset() {}
 
@@ -65,11 +65,11 @@ int SignalLightScenario::ComputeScenarioDecision(
         GetStopDeceleration(reference_line_info, signal_light);
 
     if ((signal.color() == TrafficLight::RED &&
-         stop_deceleration < FLAGS_stop_max_deceleration) ||
-        (signal.color() == TrafficLight::UNKNOWN &&
-         stop_deceleration < FLAGS_stop_max_deceleration) ||
+         stop_deceleration < FLAGS_max_stop_deceleration) ||
+        // (signal.color() == TrafficLight::UNKNOWN &&
+        //  stop_deceleration < FLAGS_max_stop_deceleration) ||
         (signal.color() == TrafficLight::YELLOW &&
-         stop_deceleration < FLAGS_max_deacceleration_for_yellow_light_stop)) {
+         stop_deceleration < FLAGS_max_stop_deacceleration_for_yellow_light)) {
       CreateStopObstacle(frame, reference_line_info, signal_light);
     }
   }
@@ -89,7 +89,7 @@ bool SignalLightScenario::FindValidSignalLight(
   }
   signal_lights_along_reference_line_.clear();
   for (const hdmap::PathOverlap& signal_light : signal_lights) {
-    if (signal_light.start_s + FLAGS_stop_max_distance_buffer >
+    if (signal_light.start_s + FLAGS_max_stop_distance_buffer >
         reference_line_info->AdcSlBoundary().end_s()) {
       signal_lights_along_reference_line_.push_back(&signal_light);
     }
@@ -136,7 +136,7 @@ double SignalLightScenario::GetStopDeceleration(
     const hdmap::PathOverlap* signal_light) {
   double adc_speed =
       common::VehicleStateProvider::instance()->linear_velocity();
-  if (adc_speed < FLAGS_stop_min_speed) {
+  if (adc_speed < FLAGS_max_stop_speed) {
     return 0.0;
   }
   double stop_distance = 0.0;
@@ -146,7 +146,7 @@ double SignalLightScenario::GetStopDeceleration(
   if (stop_line_s > adc_front_s) {
     stop_distance = stop_line_s - adc_front_s;
   } else {
-    stop_distance = stop_line_s + FLAGS_stop_max_distance_buffer - adc_front_s;
+    stop_distance = stop_line_s + FLAGS_max_stop_distance_buffer - adc_front_s;
   }
   if (stop_distance < 1e-5) {
     // longitudinal_acceleration_lower_bound is a negative value.
@@ -158,9 +158,10 @@ double SignalLightScenario::GetStopDeceleration(
 void SignalLightScenario::CreateStopObstacle(
     Frame* frame, ReferenceLineInfo* const reference_line_info,
     const hdmap::PathOverlap* signal_light) {
+  // check
   const auto& reference_line = reference_line_info->reference_line();
   const double stop_s =
-      signal_light->start_s - FLAGS_stop_distance_traffic_light;
+      signal_light->start_s - FLAGS_traffic_light_stop_distance;
   const double box_center_s =
       signal_light->start_s + FLAGS_virtual_stop_wall_length / 2.0;
   if (!WithinBound(0.0, reference_line.Length(), stop_s) ||
@@ -169,19 +170,23 @@ void SignalLightScenario::CreateStopObstacle(
            << " is not on reference line";
     return;
   }
-  double heading = reference_line.GetReferencePoint(stop_s).heading();
-  double left_lane_width = 0.0;
-  double right_lane_width = 0.0;
-  reference_line.GetLaneWidth(signal_light->start_s, &left_lane_width,
-                              &right_lane_width);
 
-  auto box_center = reference_line.GetReferencePoint(box_center_s);
-  common::math::Box2d stop_box{box_center, heading,
-                               FLAGS_virtual_stop_wall_length,
-                               left_lane_width + right_lane_width};
-  reference_line_info->AddObstacle(frame->AddStaticVirtualObstacle(
-      FLAGS_signal_light_virtual_object_id_prefix + signal_light->object_id,
-      stop_box));
+  // create virtual stop wall
+  std::string virtual_obstacle_id =
+      FLAGS_signal_light_virtual_obstacle_id_prefix + signal_light->object_id;
+  auto* obstacle = frame->CreateVirtualStopObstacle(
+      reference_line_info, virtual_obstacle_id, signal_light->start_s);
+  if (!obstacle) {
+    AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
+    return;
+  }
+  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  if (!stop_wall) {
+    AERROR << "Failed to create path_obstacle for: " << virtual_obstacle_id;
+    return;
+  }
+
+  return;
 }
 
 }  // namespace planning

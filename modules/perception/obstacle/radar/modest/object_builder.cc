@@ -16,8 +16,7 @@
 #include "modules/perception/obstacle/radar/modest/object_builder.h"
 
 #include <cmath>
-#include <map>
-#include "modules/common/log.h"
+
 #include "modules/perception/obstacle/radar/modest/conti_radar_util.h"
 #include "modules/perception/obstacle/radar/modest/radar_util.h"
 
@@ -66,8 +65,7 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     Eigen::Matrix<double, 3, 1> velocity_r;
     Eigen::Matrix<double, 3, 1> velocity_w;
     velocity_r << raw_obstacles.contiobs(i).longitude_vel(),
-                  raw_obstacles.contiobs(i).lateral_vel(),
-                  0.0;
+        raw_obstacles.contiobs(i).lateral_vel(), 0.0;
     velocity_w = radar_pose.topLeftCorner(3, 3) * velocity_r;
 
     //  calculate the absolute velodity
@@ -77,8 +75,8 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
 
     Eigen::Vector3f ref_velocity(main_velocity(0), main_velocity(1), 0.0);
     if (ContiRadarUtil::IsConflict(ref_velocity,
-        object_ptr->velocity.cast<float>())) {
-        object_ptr->is_background = true;
+                                   object_ptr->velocity.cast<float>())) {
+      object_ptr->is_background = true;
     }
 
     object_ptr->length = 1.0;
@@ -86,8 +84,8 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     object_ptr->height = 1.0;
     object_ptr->type = UNKNOWN;
     object_ptr->score_type = SCORE_RADAR;
-    object_ptr->score = static_cast<float>(
-        raw_obstacles.contiobs(i).probexist());
+    object_ptr->score =
+        static_cast<float>(raw_obstacles.contiobs(i).probexist());
 
     Eigen::Matrix3d dist_rms;
     Eigen::Matrix3d vel_rms;

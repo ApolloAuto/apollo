@@ -54,6 +54,10 @@ enum ErrorCode {
   // HTTP request error codes.
   HTTP_LOGIC_ERROR = 10000;
   HTTP_RUNTIME_ERROR = 10001;
+
+  // Relative Map error codes.
+  RELATIVE_MAP_ERROR = 11000; // general relative map error code
+  RELATIVE_MAP_NOT_READY = 11001;
 }
 
 message StatusPb {

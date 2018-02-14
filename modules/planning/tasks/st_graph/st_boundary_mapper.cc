@@ -55,7 +55,7 @@ using apollo::common::util::StrCat;
 namespace {
 constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
-}
+}  // namespace
 
 StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
                                    const StBoundaryConfig& config,
@@ -75,6 +75,7 @@ StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
 
 Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
   const auto& path_obstacles = path_decision->path_obstacles();
+
   if (planning_time_ < 0.0) {
     const std::string msg = "Fail to get params since planning_time_ < 0.";
     AERROR << msg;
@@ -189,6 +190,7 @@ Status StBoundaryMapper::CreateStBoundaryWithHistory(
     } else {
       decision = iter->second;
     }
+
     if (!path_obstacle->HasLongitudinalDecision()) {
       if (!MapWithoutDecision(path_obstacle).ok()) {
         std::string msg = StrCat("Fail to map obstacle ", path_obstacle->Id(),
@@ -309,9 +311,14 @@ Status StBoundaryMapper::MapWithoutDecision(PathObstacle* path_obstacle) const {
                       .ExpandByT(boundary_t_buffer);
   boundary.SetId(path_obstacle->Id());
   const auto& prev_st_boundary = path_obstacle->st_boundary();
+  const auto& ref_line_st_boundary =
+      path_obstacle->reference_line_st_boundary();
   if (!prev_st_boundary.IsEmpty()) {
     boundary.SetBoundaryType(prev_st_boundary.boundary_type());
+  } else if (!ref_line_st_boundary.IsEmpty()) {
+    boundary.SetBoundaryType(ref_line_st_boundary.boundary_type());
   }
+
   path_obstacle->SetStBoundary(boundary);
   return Status::OK();
 }
@@ -346,10 +353,19 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
 
       if (CheckOverlap(curr_point_on_path, obs_box,
                        st_boundary_config_.boundary_buffer())) {
-        lower_points->emplace_back(curr_point_on_path.s(), 0.0);
-        lower_points->emplace_back(curr_point_on_path.s(), planning_time_);
-        upper_points->emplace_back(planning_distance_, 0.0);
-        upper_points->emplace_back(planning_distance_, planning_time_);
+        const double backward_distance =
+            -vehicle_param_.front_edge_to_center();
+        const double forward_distance =
+            vehicle_param_.length() + vehicle_param_.width() +
+            obs_box.length() + obs_box.width();
+        double low_s =  std::fmax(0.0,
+                                  curr_point_on_path.s() + backward_distance);
+        double high_s = std::fmin(planning_distance_,
+                                  curr_point_on_path.s() + forward_distance);
+        lower_points->emplace_back(low_s, 0.0);
+        lower_points->emplace_back(low_s, planning_time_);
+        upper_points->emplace_back(high_s, 0.0);
+        upper_points->emplace_back(high_s, planning_time_);
         break;
       }
     }
@@ -500,6 +516,7 @@ Status StBoundaryMapper::MapWithDecision(
   boundary.SetId(path_obstacle->obstacle()->Id());
   boundary.SetCharacteristicLength(characteristic_length);
   path_obstacle->SetStBoundary(boundary);
+
   return Status::OK();
 }
 

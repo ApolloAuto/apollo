@@ -21,18 +21,29 @@
 #include "modules/planning/constraint_checker/collision_checker.h"
 
 #include <utility>
+#include <array>
+#include <cmath>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/lattice/util/reference_line_frame_converter.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
+using apollo::common::math::Box2d;
+
 CollisionChecker::CollisionChecker(
-    const std::vector<const Obstacle*>& obstacles) {
-  BuildPredictedEnv(obstacles);
+    const std::vector<const Obstacle*>& obstacles,
+    const std::array<double, 3>& adc_init_s,
+    const std::array<double, 3>& adc_init_d,
+    const std::vector<PathPoint>& discretized_reference_line) {
+  BuildPredictedEnv(obstacles, adc_init_s, adc_init_d,
+                    discretized_reference_line);
 }
 
 bool CollisionChecker::InCollision(
@@ -62,22 +73,57 @@ bool CollisionChecker::InCollision(
 }
 
 void CollisionChecker::BuildPredictedEnv(
-    const std::vector<const Obstacle*>& obstacles) {
+    const std::vector<const Obstacle*>& obstacles,
+    const std::array<double, 3>& adc_init_s,
+    const std::array<double, 3>& adc_init_d,
+    const std::vector<PathPoint>& discretized_reference_line) {
   CHECK(predicted_envs_.empty());
+
+  bool ignore_obstacles_behind = IgnoreObstaclesBehind(adc_init_d);
+  std::vector<const Obstacle*> obstacles_considered;
+  for (const Obstacle* obstacle : obstacles) {
+    if (ignore_obstacles_behind &&
+        IsBehind(obstacle, adc_init_s, discretized_reference_line)) {
+      continue;
+    }
+    obstacles_considered.push_back(obstacle);
+  }
 
   double relative_time = 0.0;
   while (relative_time < FLAGS_trajectory_time_length) {
     std::vector<common::math::Box2d> predicted_env;
-    for (const Obstacle* obstacle : obstacles) {
+    for (const Obstacle* obstacle : obstacles_considered) {
       // If an obstacle has no trajectory, it is considered as static.
       // Obstacle::GetPointAtTime has handled this case.
-      common::TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
-      common::math::Box2d box = obstacle->GetBoundingBox(point);
+      TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
+      Box2d box = obstacle->GetBoundingBox(point);
       predicted_env.push_back(std::move(box));
     }
     predicted_envs_.push_back(std::move(predicted_env));
     relative_time += FLAGS_trajectory_time_resolution;
   }
+}
+
+bool CollisionChecker::IgnoreObstaclesBehind(
+    const std::array<double, 3>& adc_init_d) {
+  return std::abs(adc_init_d[0]) < FLAGS_default_reference_line_width * 0.5;
+}
+
+bool CollisionChecker::IsBehind(
+    const Obstacle* obstacle,
+    const std::array<double, 3>& adc_init_s,
+    const std::vector<PathPoint>& discretized_reference_line) {
+  double half_lane_width = FLAGS_default_reference_line_width * 0.5;
+  TrajectoryPoint point = obstacle->GetPointAtTime(0.0);
+  std::pair<double, double> sl_point =
+      ReferenceLineFrameConverter::CartesianToFrenet(discretized_reference_line,
+          point.path_point().x(), point.path_point().y());
+  if (sl_point.first < adc_init_s[0] &&
+      std::abs(sl_point.second) < half_lane_width) {
+    ADEBUG << "Ignore obstacle [" << obstacle->Id() << "]";
+    return true;
+  }
+  return false;
 }
 
 }  // namespace planning

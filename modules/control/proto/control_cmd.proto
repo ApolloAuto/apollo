@@ -134,6 +134,11 @@ message SimpleMPCDebug {
   optional bool is_full_stop = 23;
   optional double station_feedback = 24;
   optional double speed_feedback = 25;
+  optional double acceleration_cmd_closeloop = 26;
+  optional double acceleration_cmd = 27;
+  optional double acceleration_lookup = 28;
+  optional double speed_lookup = 29;
+  optional double calibration_value = 30;
 }
 
 message InputDebug {

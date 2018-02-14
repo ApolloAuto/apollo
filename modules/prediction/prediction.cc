@@ -110,11 +110,6 @@ void Prediction::Stop() {
 }
 
 void Prediction::OnLocalization(const LocalizationEstimate& localization) {
-  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::instance()->GetContainer(
-          AdapterConfig::PERCEPTION_OBSTACLES));
-  CHECK_NOTNULL(obstacles_container);
-
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::instance()->GetContainer(AdapterConfig::LOCALIZATION));
   CHECK_NOTNULL(pose_container);
@@ -143,9 +138,6 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
     ros::shutdown();
   }
 
-  ADEBUG << "Received a perception message ["
-         << perception_obstacles.ShortDebugString() << "].";
-
   double start_timestamp = Clock::NowInSeconds();
 
   // Insert obstacle
@@ -154,6 +146,9 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
           AdapterConfig::PERCEPTION_OBSTACLES));
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles);
+
+  ADEBUG << "Received a perception message ["
+         << perception_obstacles.ShortDebugString() << "].";
 
   // Update ADC status
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
@@ -175,7 +170,7 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
     adc_container->SetPosition(adc_position);
   }
 
-  // Make predictions
+  // Make evaluations
   EvaluatorManager::instance()->Run(perception_obstacles);
 
   // No prediction for offline mode
@@ -183,6 +178,7 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
     return;
   }
 
+  // Make predictions
   PredictorManager::instance()->Run(perception_obstacles);
 
   auto prediction_obstacles =

@@ -44,7 +44,6 @@ class MPCControllerTest : public ::testing::Test, MPCController {
  public:
   virtual void SetupTestCase() {
     FLAGS_v = 4;
-    FLAGS_use_mpc = true;
     FLAGS_control_conf_file =
         "modules/control/testdata/mpc_controller_test/lincoln.pb.txt ";
     ControlConf control_conf;

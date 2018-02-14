@@ -40,7 +40,7 @@ bash apollo.sh build
 请按照如下步骤启动Apollo。
 ### 启动Apollo
 ```
-# 启动人际交互界面(HMI)
+# 启动人机交互界面(HMI)
 bash scripts/bootstrap.sh
 ```
 ### 访问 HMI
@@ -70,7 +70,7 @@ Apollo文档可以在[docs](https://github.com/ApolloAuto/apollo/blob/master/doc
 非常欢迎您随时提出疑问或提交bug报告: [Github Issues](https://github.com/ApolloAuto/apollo/issues)。
 
 ## 版权
-Apollo遵守[Apache-2.0 licenses](License)。
+Apollo遵守[Apache-2.0 license](LICENSE)。
 
 ## 免责声明
 请参考Apollo的免责声明[Apollo official website](http://apollo.auto/docs/disclaimer_cn.html)。

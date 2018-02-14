@@ -49,6 +49,7 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::ChassisAdapter;
+using apollo::common::adapter::GpsAdapter;
 using apollo::common::adapter::LocalizationAdapter;
 using apollo::common::adapter::MonitorAdapter;
 using apollo::common::adapter::PerceptionObstaclesAdapter;
@@ -61,6 +62,7 @@ using apollo::common::time::millis;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::GetProtoFromFile;
 using apollo::hdmap::Path;
+using apollo::localization::Gps;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
@@ -211,12 +213,14 @@ SimulationWorldService::SimulationWorldService(const MapService *map_service,
   auto_driving_car->set_height(vehicle_param.height());
   auto_driving_car->set_width(vehicle_param.width());
   auto_driving_car->set_length(vehicle_param.length());
+  auto_driving_car->set_steering_ratio(vehicle_param.steer_ratio());
 }
 
 void SimulationWorldService::Update() {
   if (to_clear_) {
     // Clears received data.
     AdapterManager::GetChassis()->ClearData();
+    AdapterManager::GetGps()->ClearData();
     AdapterManager::GetLocalization()->ClearData();
     AdapterManager::GetPerceptionObstacles()->ClearData();
     AdapterManager::GetPlanning()->ClearData();
@@ -228,11 +232,15 @@ void SimulationWorldService::Update() {
     auto car = world_.auto_driving_car();
     world_.Clear();
     *world_.mutable_auto_driving_car() = car;
+
+    route_paths_.clear();
+
     to_clear_ = false;
   }
 
   AdapterManager::Observe();
   UpdateWithLatestObserved("Chassis", AdapterManager::GetChassis());
+  UpdateWithLatestObserved("Gps", AdapterManager::GetGps());
   UpdateWithLatestObserved("Localization", AdapterManager::GetLocalization());
 
   // Clear objects received from last frame and populate with the new objects.
@@ -272,17 +280,15 @@ void SimulationWorldService::UpdateDelays() {
       SecToMs(AdapterManager::GetTrafficLightDetection()->GetDelaySec()));
 }
 
-std::string SimulationWorldService::GetWireFormatString(
-    double radius, bool enable_pnc_monitor) {
+void SimulationWorldService::GetWireFormatString(
+    double radius, std::string *sim_world,
+    std::string *sim_world_with_planning_data) {
   PopulateMapInfo(radius);
-  if (!enable_pnc_monitor) {
-    world_.clear_planning_data();
-  }
 
-  std::string bin;
-  world_.SerializeToString(&bin);
+  world_.SerializeToString(sim_world_with_planning_data);
 
-  return bin;
+  world_.clear_planning_data();
+  world_.SerializeToString(sim_world);
 }
 
 Json SimulationWorldService::GetUpdateAsJson(double radius) const {
@@ -298,7 +304,7 @@ Json SimulationWorldService::GetUpdateAsJson(double radius) const {
 }
 
 void SimulationWorldService::GetMapElementIds(double radius,
-                                              MapElementIds *ids) {
+                                              MapElementIds *ids) const {
   // Gather required map element ids based on current location.
   apollo::common::PointENU point;
   const auto &adc = world_.auto_driving_car();
@@ -366,7 +372,25 @@ void SimulationWorldService::UpdateSimulationWorld(
 }
 
 template <>
+void SimulationWorldService::UpdateSimulationWorld(const Gps &gps) {
+  Object *gps_position = world_.mutable_gps();
+  gps_position->set_timestamp_sec(gps.header().timestamp_sec());
+
+  const auto &pose = gps.localization();
+  gps_position->set_position_x(pose.position().x() +
+                               map_service_->GetXOffset());
+  gps_position->set_position_y(pose.position().y() +
+                               map_service_->GetYOffset());
+
+  double heading = apollo::common::math::QuaternionToHeading(
+      pose.orientation().qw(), pose.orientation().qx(), pose.orientation().qy(),
+      pose.orientation().qz());
+  gps_position->set_heading(heading);
+}
+
+template <>
 void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
+  const auto &vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
   Object *auto_driving_car = world_.mutable_auto_driving_car();
 
   auto_driving_car->set_speed(chassis.speed_mps());
@@ -374,11 +398,19 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   auto_driving_car->set_brake_percentage(chassis.brake_percentage());
 
   // In case of out-of-range percentages, reduces it to zero.
-  int angle_percentage = chassis.steering_percentage();
+  double angle_percentage = chassis.steering_percentage();
   if (angle_percentage > 100 || angle_percentage < -100) {
     angle_percentage = 0;
   }
-  auto_driving_car->set_steering_angle(angle_percentage);
+  auto_driving_car->set_steering_percentage(angle_percentage);
+
+  double steering_angle =
+      angle_percentage / 100.0 * vehicle_param.max_steer_angle();
+  auto_driving_car->set_steering_angle(steering_angle);
+
+  double kappa = std::tan(steering_angle / vehicle_param.steer_ratio()) /
+                 vehicle_param.length();
+  auto_driving_car->set_kappa(kappa);
 
   UpdateTurnSignal(chassis.signal(), auto_driving_car);
 
@@ -469,6 +501,8 @@ void SimulationWorldService::UpdatePlanningTrajectory(
   const double cutoff_time = world_.auto_driving_car().timestamp_sec();
   const double header_time = trajectory.header().timestamp_sec();
 
+  world_.set_planning_time(header_time);
+
   // Collect trajectory
   util::TrajectoryPointCollector collector(&world_);
 
@@ -480,7 +514,7 @@ void SimulationWorldService::UpdatePlanningTrajectory(
     if (collecting_started ||
         point.relative_time() + header_time >= cutoff_time) {
       collecting_started = true;
-      collector.Collect(point);
+      collector.Collect(point, header_time);
     }
   }
   for (int i = 0; i < world_.planning_trajectory_size(); ++i) {
@@ -728,11 +762,7 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
     for (int index : sampled_indices) {
       const auto &path_point = path.path_point()[index];
       auto *point = downsampled_path->add_path_point();
-      point->set_x(path_point.x());
-      point->set_y(path_point.y());
-      point->set_s(path_point.s());
-      point->set_kappa(path_point.kappa());
-      point->set_dkappa(path_point.dkappa());
+      point->CopyFrom(path_point);
     }
   }
 }
@@ -809,15 +839,14 @@ void SimulationWorldService::UpdateSimulationWorld(
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const RoutingResponse &routing_response) {
-  auto header_time = routing_response.header().timestamp_sec();
-
   std::vector<Path> paths;
   if (!map_service_->GetPathsFromRouting(routing_response, &paths)) {
     return;
   }
 
   world_.clear_route_path();
-  world_.set_routing_time(header_time);
+  route_paths_.clear();
+  world_.set_routing_time(routing_response.header().timestamp_sec());
 
   for (const Path &path : paths) {
     // Downsample the path points for frontend display.
@@ -826,14 +855,38 @@ void SimulationWorldService::UpdateSimulationWorld(
     std::vector<int> sampled_indices =
         DownsampleByAngle(path.path_points(), angle_threshold);
 
-    RoutePath *route_path = world_.add_route_path();
+    route_paths_.emplace_back();
+    RoutePath *route_path = &route_paths_.back();
     for (int index : sampled_indices) {
       const auto &path_point = path.path_points()[index];
       PolygonPoint *route_point = route_path->add_point();
       route_point->set_x(path_point.x() + map_service_->GetXOffset());
       route_point->set_y(path_point.y() + map_service_->GetYOffset());
     }
+
+    // Populate route path
+    if (FLAGS_sim_world_with_routing_path) {
+      auto *new_path = world_.add_route_path();
+      *new_path = *route_path;
+    }
   }
+}
+
+Json SimulationWorldService::GetRoutePathAsJson() const {
+  Json response;
+  response["routingTime"] = world_.routing_time();
+  response["routePath"] = Json::array();
+  for (const auto &route_path : route_paths_) {
+    Json path;
+    path["point"] = Json::array();
+    for (const auto &route_point : route_path.point()) {
+      path["point"].push_back({{"x", route_point.x()},
+                               {"y", route_point.y()},
+                               {"z", route_point.z()}});
+    }
+    response["routePath"].push_back(path);
+  }
+  return response;
 }
 
 void SimulationWorldService::ReadRoutingFromFile(

@@ -46,7 +46,7 @@ double GetLaneChangeLateralShift(const double v) {
   const double a = (l_ref - b) / v_ref;
   return a * v + b;
 }
-}
+}  // namespace
 
 using Vec2d = apollo::common::math::Vec2d;
 

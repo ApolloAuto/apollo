@@ -14,6 +14,8 @@ import Decision from "renderer/decision.js";
 import Prediction from "renderer/prediction.js";
 import Routing from "renderer/routing.js";
 import RoutingEditor from "renderer/routing_editor.js";
+import Gnss from "renderer/gnss.js";
+import PointCloud from "renderer/point_cloud.js";
 
 const _ = require('lodash');
 
@@ -43,10 +45,10 @@ class Renderer {
         this.map = new Map();
 
         // The main autonomous driving car.
-        this.adc = new AutoDrivingCar();
-        // The mesh this.adc.mesh is not added to the scene because it
-        // takes time to load. It will be added later on.
-        this.adcMeshAddedToScene = false;
+        this.adc = new AutoDrivingCar('adc', this.scene);
+
+        // The car that projects the starting point of the planning trajectory
+        this.planningAdc = OFFLINE_PLAYBACK ? null : new AutoDrivingCar('plannigAdc', this.scene);
 
         // The planning tranjectory.
         this.planningTrajectory = new PlanningTrajectory();
@@ -65,6 +67,11 @@ class Renderer {
 
         // The route editor
         this.routingEditor = new RoutingEditor();
+
+        // The GNSS/GPS
+        this.gnss = new Gnss();
+
+        this.pointCloud = new PointCloud();
 
         // The Performance Monitor
         this.stats = null;
@@ -298,20 +305,17 @@ class Renderer {
             return;
         }
 
-        // Upon the first time in render() it sees car mesh loaded,
-        // added it to the scene.
-        if (!this.adcMeshAddedToScene) {
-            this.adcMeshAddedToScene = true;
-            this.adc.mesh.name = "adc";
-            this.scene.add(this.adc.mesh);
-        }
-
         // Upon the first time in render() it sees ground mesh loaded,
         // added it to the scene.
         if (this.ground.type === "default" && !this.ground.initialized) {
             this.ground.initialize(this.coordinates);
             this.ground.mesh.name = "ground";
             this.scene.add(this.ground.mesh);
+        }
+
+        if (this.pointCloud.initialized === false) {
+            this.pointCloud.initialize();
+            this.scene.add(this.pointCloud.points);
         }
 
         this.adjustCamera(this.adc.mesh, this.options.cameraAngle);
@@ -330,13 +334,27 @@ class Renderer {
     }
 
     updateWorld(world) {
-        this.adc.update(world, this.coordinates);
+        this.adc.update(this.coordinates, world.autoDrivingCar);
         this.ground.update(world, this.coordinates, this.scene);
         this.planningTrajectory.update(world, world.planningData, this.coordinates, this.scene);
         this.perceptionObstacles.update(world, this.coordinates, this.scene);
         this.decision.update(world, this.coordinates, this.scene);
         this.prediction.update(world, this.coordinates, this.scene);
-        this.routing.update(world, this.coordinates, this.scene);
+        this.updateRouting(world.routingTime, world.routePath);
+        this.gnss.update(world, this.coordinates, this.scene);
+
+        if (this.planningAdc &&
+            world.planningTrajectory && world.planningTrajectory.length) {
+            this.planningAdc.update(this.coordinates, world.planningTrajectory[0]);
+        }
+    }
+
+    updateRouting(routingTime, routePath) {
+        this.routing.update(routingTime, routePath, this.coordinates, this.scene);
+    }
+
+    updateGroundImage(mapName) {
+        this.ground.updateImage(mapName);
     }
 
     updateGroundMetadata(serverUrl, mapInfo) {
@@ -345,6 +363,13 @@ class Renderer {
 
     updateMap(newData) {
         this.map.appendMapData(newData, this.coordinates, this.scene);
+    }
+
+    updatePointCloud(pointCloud) {
+        if (!this.coordinates.isInitialized() || !this.adc.mesh) {
+            return;
+        }
+        this.pointCloud.update(pointCloud, this.adc.mesh);
     }
 
     updateMapIndex(hash, elementIds, radius) {

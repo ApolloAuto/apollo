@@ -155,6 +155,16 @@ class LaneInfo {
   double GetWidth(const double s) const;
   double GetEffectiveWidth(const double s) const;
 
+  const std::vector<SampledWidth> &sampled_left_road_width() const {
+    return sampled_left_road_width_;
+  }
+  const std::vector<SampledWidth> &sampled_right_road_width() const {
+    return sampled_right_road_width_;
+  }
+  void GetRoadWidth(const double s, double *left_width,
+                   double *right_width) const;
+  double GetRoadWidth(const double s) const;
+
   bool IsOnLane(const apollo::common::math::Vec2d &point) const;
   bool IsOnLane(const apollo::common::math::Box2d &box) const;
 
@@ -201,6 +211,9 @@ class LaneInfo {
   double total_length_ = 0.0;
   std::vector<SampledWidth> sampled_left_width_;
   std::vector<SampledWidth> sampled_right_width_;
+
+  std::vector<SampledWidth> sampled_left_road_width_;
+  std::vector<SampledWidth> sampled_right_road_width_;
 
   std::vector<LaneSegmentBox> segment_box_list_;
   std::unique_ptr<LaneSegmentKDTree> lane_segment_kdtree_;

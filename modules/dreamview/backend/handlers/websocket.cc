@@ -116,6 +116,7 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
       }
     }
   }
+
   // Note that while we are holding the connection lock, the connection won't be
   // closed and removed.
   int ret;

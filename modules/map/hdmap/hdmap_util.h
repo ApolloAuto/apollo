@@ -94,6 +94,7 @@ class HDMapUtil {
   HDMapUtil() = delete;
 
   static std::unique_ptr<HDMap> base_map_;
+  static uint64_t base_map_seq_;
   static std::mutex base_map_mutex_;
 
   static std::unique_ptr<HDMap> sim_map_;

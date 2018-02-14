@@ -17,6 +17,18 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "point_cloud_proto",
+    deps = [
+        ":point_cloud_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "point_cloud_proto_lib",
+    srcs = ["point_cloud.proto"],
+)
+
+cc_proto_library(
     name = "hmi_config_proto",
     deps = [
         ":hmi_config_proto_lib",
