@@ -1,0 +1,5 @@
+map_param {
+  default_left_width: 1.75
+  default_right_width: 1.75
+  default_speed_limit : 29.0576 # 65mph
+}

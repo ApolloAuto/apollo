@@ -16,6 +16,8 @@
 
 #include "modules/map/relative_map/relative_map.h"
 
+#include "modules/map/proto/map_lane.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
@@ -25,11 +27,13 @@ namespace relative_map {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorLogBuffer;
 using apollo::common::monitor::MonitorMessageItem;
+using apollo::hdmap::Lane;
+using apollo::hdmap::LaneBoundaryType;
 using apollo::perception::PerceptionObstacles;
-using apollo::common::VehicleStateProvider;
 
 RelativeMap::RelativeMap()
     : monitor_logger_(MonitorMessageItem::RELATIVE_MAP) {}
@@ -50,6 +54,14 @@ Status RelativeMap::Init() {
   } else {
     ADEBUG << "Adapter config file is loaded into: "
            << adapter_conf_.ShortDebugString();
+  }
+
+  config_.Clear();
+  if (!common::util::GetProtoFromFile(FLAGS_relative_map_config_filename,
+                                      &config_)) {
+    return Status(ErrorCode::RELATIVE_MAP_ERROR,
+                  "Unable to load relative map conf file: " +
+                      FLAGS_relative_map_config_filename);
   }
 
   AdapterManager::Init(adapter_conf_);
@@ -108,7 +120,9 @@ void RelativeMap::RunOnce(const PerceptionObstacles& perception_obstacles) {
 
   MapMsg map_msg;
   CreateMapFromPerception(perception_obstacles, &map_msg);
-  Publish(&map_msg);
+  if (map_msg.has_hdmap()) {
+    Publish(&map_msg);
+  }
 }
 
 void RelativeMap::RunOnce(const NavigationInfo& navigation_info) {
@@ -129,8 +143,69 @@ void RelativeMap::CreateMapFromPerception(
   // update navigation_lane from perception_obstacles (lane marker)
   navigation_lane_.Update(perception_obstacles);
 
-  const auto& navigation_path = navigation_lane_.Path();
-  // TODO(all) create map proto from navigation_path
+  // create map proto from navigation_path
+  if (!CreateMapFromNavigationPath(navigation_lane_.Path(),
+                                   map_msg->mutable_hdmap())) {
+    map_msg->clear_hdmap();
+    AERROR << "Failed to create map from navigation path";
+  }
+}
+
+bool RelativeMap::CreateMapFromNavigationPath(
+    const NavigationPath& navigation_path, hdmap::Map* hdmap) {
+  const auto& path = navigation_path.path();
+  if (path.path_point_size() < 2) {
+    AERROR << "The path length is invalid";
+    return false;
+  }
+  const auto& map_config = config_.map_param();
+  auto* lane = hdmap->add_lane();
+  lane->mutable_id()->set_id(std::to_string(navigation_path.path_priority()) +
+                             "_" + path.name());
+  // lane types
+  lane->set_type(Lane::CITY_DRIVING);
+  lane->set_turn(Lane::NO_TURN);
+
+  // left boundary
+  auto* left_boundary = lane->mutable_left_boundary()->add_boundary_type();
+  lane->mutable_left_boundary()->set_virtual_(false);
+  left_boundary->set_s(0.0);
+  left_boundary->add_types(LaneBoundaryType::SOLID_YELLOW);
+
+  // right boundary
+  auto* right_boundary = lane->mutable_right_boundary()->add_boundary_type();
+  lane->mutable_right_boundary()->set_virtual_(false);
+  right_boundary->set_s(0.0);
+  right_boundary->add_types(LaneBoundaryType::SOLID_YELLOW);
+
+  // speed limit
+  lane->set_speed_limit(map_config.default_speed_limit());
+
+  // center line
+  auto* curve_segment = lane->mutable_central_curve()->add_segment();
+  curve_segment->set_heading(path.path_point(0).theta());
+  auto* line_segment = curve_segment->mutable_line_segment();
+  for (const auto& path_point : path.path_point()) {
+    auto* point = line_segment->add_point();
+    point->set_x(path_point.x());
+    point->set_y(path_point.y());
+    point->set_z(path_point.z());
+  }
+
+  // left width
+  for (const auto& path_point : path.path_point()) {
+    auto* left_sample = lane->add_left_sample();
+    left_sample->set_s(path_point.s());
+    left_sample->set_width(map_config.default_left_width());
+  }
+
+  // right width
+  for (const auto& path_point : path.path_point()) {
+    auto* right_sample = lane->add_right_sample();
+    right_sample->set_s(path_point.s());
+    right_sample->set_width(map_config.default_right_width());
+  }
+  return true;
 }
 
 void RelativeMap::Stop() {
