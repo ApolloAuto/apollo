@@ -32,7 +32,7 @@ from shapely.geometry import LineString, Point
 from numpy.polynomial.polynomial import polyval
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
-from modules.relative_map.proto import navigation_info_pb2
+from modules.map.relative_map.proto import navigation_pb2
 from modules.drivers.proto import mobileye_pb2
 
 # pip install -U flask-cors
@@ -58,7 +58,7 @@ def add_listener():
     global routing_pub
     rospy.init_node("navigation_map_routing", anonymous=True)
     routing_pub = rospy.Publisher('/apollo/navigation',
-                                  String, queue_size=1)
+                                  navigation_pb2.NavigationInfo, queue_size=1)
 
 
 @app.route('/routing', methods=["POST", "GET"])
@@ -84,13 +84,13 @@ def navigation():
     if res.status_code != 200:
         return jsonify([])
     # send to ros
-    routing_pub.publish(res.content)
-    navigation_info = navigation_info_pb2.NavigationInfo()
+    navigation_info = navigation_pb2.NavigationInfo()
     navigation_info.ParseFromString(res.content)
+    routing_pub.publish(navigation_info)
     # send to browser
     latlon_path = []
     for path in navigation_info.navigation_path:
-        for point in path.path_point:
+        for point in path.path.path_point:
             lons, lats = projector(point.x, point.y, inverse=True)
             latlon_path.append({'lat': lats, 'lng': lons})
     latlon_path[0]['human'] = True
