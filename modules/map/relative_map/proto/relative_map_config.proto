@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.relative_map;
+
+message MapGenerationParam {
+  optional double default_left_width = 1 [default=1.75];
+  optional double default_right_width = 2 [default=1.75];
+  optional double default_speed_limit = 3 [default=29.0576]; // default is 65mph
+}
+
+message RelativeMapConfig {
+    optional MapGenerationParam map_param = 1;
+}

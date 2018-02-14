@@ -29,6 +29,7 @@ cc_library(
         "//modules/common/util",
         "//modules/map/relative_map/common:relative_map_gflags",
         "//modules/map/relative_map/proto:navigation_proto",
+        "//modules/map/relative_map/proto:relative_map_config_proto",
         "//modules/perception/proto:perception_proto",
     ],
 )
