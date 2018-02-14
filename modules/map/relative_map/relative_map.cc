@@ -103,6 +103,9 @@ apollo::common::Status RelativeMap::Start() {
 void RelativeMap::RunOnce(const PerceptionObstacles& perception_obstacles) {
   AdapterManager::Observe();
 
+  ADEBUG << "PerceptionObstacles received by RelativeMap:\n"
+         << perception_obstacles.DebugString();
+
   MapMsg map_msg;
   CreateMapFromPerception(perception_obstacles, &map_msg);
   Publish(&map_msg);
