@@ -91,6 +91,7 @@ apollo::common::Status RelativeMap::Start() {
   buffer.INFO("RelativeMap started");
 
   AdapterManager::AddPerceptionObstaclesCallback(&RelativeMap::RunOnce, this);
+  AdapterManager::AddNavigationCallback(&RelativeMap::RunOnce, this);
 
   if (AdapterManager::GetPerceptionObstacles()->Empty()) {
     AWARN << "Perception is not ready.";
@@ -105,6 +106,11 @@ void RelativeMap::RunOnce(const PerceptionObstacles& perception_obstacles) {
   MapMsg map_msg;
   CreateMapFromPerception(perception_obstacles, &map_msg);
   Publish(&map_msg);
+}
+
+void RelativeMap::RunOnce(const NavigationInfo& navigation_info) {
+  AdapterManager::Observe();
+  navigation_lane_.UpdateNavigationInfo(navigation_info);
 }
 
 void RelativeMap::CreateMapFromPerception(

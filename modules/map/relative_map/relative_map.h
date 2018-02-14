@@ -70,6 +70,13 @@ class RelativeMap : public RelativeMapInterface {
   void RunOnce(
       const perception::PerceptionObstacles& perception_obstacles) override;
 
+  /**
+   * @brief Data callback upon receiving a navigation message.
+   * This function is used to update the navigation path.
+   * @param navigation_info received message.
+   */
+  void RunOnce(const NavigationInfo& navigation_info);
+
  private:
   void CreateMapFromPerception(
       const apollo::perception::PerceptionObstacles& perception_obstacles,
