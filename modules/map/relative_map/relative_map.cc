@@ -77,6 +77,12 @@ Status RelativeMap::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
   }
+  if (AdapterManager::GetNavigation() == nullptr) {
+    std::string error_msg(
+        "Navigation should be configured as dependency in adapter.conf");
+    AERROR << error_msg;
+    return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
+  }
   return Status::OK();
 }
 
@@ -94,8 +100,9 @@ apollo::common::Status RelativeMap::Start() {
 }
 
 void RelativeMap::RunOnce(const PerceptionObstacles& perception_obstacles) {
-  MapMsg map_msg;
+  AdapterManager::Observe();
 
+  MapMsg map_msg;
   CreateMapFromPerception(perception_obstacles, &map_msg);
   Publish(&map_msg);
 }

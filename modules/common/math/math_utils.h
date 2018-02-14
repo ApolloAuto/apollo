@@ -168,8 +168,9 @@ double Gaussian(const double u, const double std, const double x);
 // Sigmoid
 double Sigmoid(const double x);
 
-// Rotate Axis (2D): the theta represents the angle when rotate axis of (x0, y0)
-// to axis of (x1, y1)
+// Rotate Axis (2D):
+// convert a point (x0, y0) in axis1 to a point (x1, y1) in axis2 where the
+// angle from axis1 to axis2 is theta
 void RotateAxis(const double theta, const double x0, const double y0,
                 double *x1, double *y1);
 
