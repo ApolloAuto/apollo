@@ -93,7 +93,8 @@ def navigation():
         for point in path.path.path_point:
             lons, lats = projector(point.x, point.y, inverse=True)
             latlon_path.append({'lat': lats, 'lng': lons})
-    latlon_path[0]['human'] = True
+    if len(latlon_path) > 0:
+        latlon_path[0]['human'] = True
     return jsonify(latlon_path)
 
 
