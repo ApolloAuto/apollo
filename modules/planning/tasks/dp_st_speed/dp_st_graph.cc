@@ -47,6 +47,9 @@ bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
   const common::math::LineSegment2d seg(p1.point(), p2.point());
   for (const auto* boundary : boundaries) {
+    if (boundary->boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+      continue;
+    }
     if (boundary->HasOverlap(seg)) {
       return true;
     }
@@ -70,14 +73,17 @@ DpStGraph::DpStGraph(const StGraphData& st_graph_data,
       std::fmin(dp_st_speed_config_.total_path_length(),
                 st_graph_data_.path_data_length()));
   unit_s_ = dp_st_speed_config_.total_path_length() /
-            dp_st_speed_config_.matrix_dimension_s();
+            (dp_st_speed_config_.matrix_dimension_s() - 1);
   unit_t_ = dp_st_speed_config_.total_time() /
-            dp_st_speed_config_.matrix_dimension_t();
+            (dp_st_speed_config_.matrix_dimension_t() - 1);
 }
 
 Status DpStGraph::Search(SpeedData* const speed_data) {
   constexpr double kBounadryEpsilon = 1e-2;
   for (const auto& boundary : st_graph_data_.st_boundaries()) {
+    if (boundary->boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+      continue;
+    }
     if (boundary->IsPointInBoundary({0.0, 0.0}) ||
         (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
          std::fabs(boundary->min_s()) < kBounadryEpsilon)) {

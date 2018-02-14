@@ -108,11 +108,11 @@ class DreamviewStore {
         }
     }
 
-    handleSideBarClick(option) {
+    handleOptionToggle(option) {
         const oldShowPNCMonitor = this.options.showPNCMonitor;
         const oldShowRouteEditingBar = this.options.showRouteEditingBar;
 
-        this.options.toggleSideBar(option);
+        this.options.toggle(option);
 
         // disable tools turned off after toggling
         if (oldShowPNCMonitor && !this.options.showPNCMonitor) {
@@ -134,6 +134,10 @@ class DreamviewStore {
                     break;
             }
         }
+    }
+
+    setOptionStatus(option, enabled) {
+        this.options[option] = (enabled || false);
     }
 
     // This function is triggerred automatically whenever a observable changes

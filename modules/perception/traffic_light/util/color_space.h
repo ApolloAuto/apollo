@@ -35,16 +35,17 @@
 
 #ifndef USB_CAM_INCLUDE_USB_CAM_UTILITY_H_
 #define USB_CAM_INCLUDE_USB_CAM_UTILITY_H_
-
+#ifdef __x86_64__
+#define __USE_AVX__
 #include <immintrin.h>
 #include <x86intrin.h>
 #include <cstdint>
-
+#endif
 namespace apollo {
 namespace perception {
 namespace traffic_light {
-
-void Yuyv2rgbAvx(unsigned char *YUV, unsigned char *RGB, int NumPixels);
+void Yuyv2rgb(unsigned char *YUV, unsigned char *RGB, int NumPixels);
+#ifdef  __USE_AVX__
 
 #define SIMD_INLINE inline __attribute__((always_inline))
 
@@ -533,7 +534,7 @@ template <bool align>
 SIMD_INLINE __m256i LoadPermuted(const __m256i *p) {
   return _mm256_permute4x64_epi64(Load<align>(p), 0xD8);
 }
-
+#endif
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

@@ -118,7 +118,6 @@ DECLARE_double(within_lane_bound);
 
 DECLARE_double(virtual_stop_wall_length);
 DECLARE_double(virtual_stop_wall_height);
-DECLARE_string(reference_line_end_obstacle_id);
 
 DECLARE_double(prediction_total_time);
 DECLARE_bool(align_prediction_time);
@@ -154,15 +153,17 @@ DECLARE_double(max_valid_stop_distance);
 DECLARE_double(creep_stop_distance);
 /// keep_clear
 DECLARE_bool(enable_keep_clear);
-DECLARE_string(keep_clear_virtual_object_id_prefix);
+DECLARE_string(keep_clear_virtual_obstacle_id_prefix);
+DECLARE_string(keep_clear_junction_virtual_obstacle_id_prefix);
+DECLARE_double(keep_clear_min_pass_distance);
 /// traffic light
 DECLARE_bool(enable_traffic_light);
-DECLARE_string(signal_light_virtual_object_id_prefix);
+DECLARE_string(signal_light_virtual_obstacle_id_prefix);
 DECLARE_double(max_stop_deacceleration_for_yellow_light);
 DECLARE_double(traffic_light_stop_distance);
 /// crosswalk
 DECLARE_bool(enable_crosswalk);
-DECLARE_string(crosswalk_virtual_object_id_prefix);
+DECLARE_string(crosswalk_virtual_obstacle_id_prefix);
 DECLARE_double(crosswalk_expand_distance);
 DECLARE_double(crosswalk_strick_l_distance);
 DECLARE_double(crosswalk_loose_l_distance);
@@ -171,16 +172,21 @@ DECLARE_double(crosswalk_stop_distance);
 /// stop_sign
 DECLARE_bool(enable_stop_sign);
 DECLARE_bool(enable_stop_sign_creeping);
-DECLARE_string(stop_sign_virtual_object_id_prefix);
+DECLARE_string(stop_sign_virtual_obstacle_id_prefix);
 DECLARE_double(stop_sign_stop_duration);
 DECLARE_double(stop_sign_min_pass_distance);
 DECLARE_double(stop_sign_stop_distance);
 DECLARE_double(stop_sign_max_watch_vehicle_stop_speed);
 DECLARE_double(stop_sign_creep_buffer);
+DECLARE_bool(enable_sidepass);
+DECLARE_double(sidepass_wait_time_sec);
+
 /// destination
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(destination_check_distance);
 DECLARE_double(destination_stop_distance);
+/// reference_line end
+DECLARE_string(reference_line_end_obstacle_id_prefix);
 
 DECLARE_bool(enable_sqp_solver);
 
@@ -195,7 +201,6 @@ DECLARE_double(lattice_epsilon);
 DECLARE_int32(num_lattice_traj_to_plot);
 DECLARE_double(default_cruise_speed);
 DECLARE_double(spiral_downsample_curvature_thred);
-DECLARE_bool(enable_sample_bound_planning);
 DECLARE_bool(enable_lattice_st_image_dump);
 DECLARE_bool(enable_auto_tuning);
 DECLARE_double(trajectory_time_resolution);
@@ -203,7 +208,6 @@ DECLARE_double(trajectory_space_resolution);
 DECLARE_double(lateral_acceleration_bound);
 DECLARE_double(collision_buffer_expansion_ratio);
 DECLARE_double(decision_horizon);
-DECLARE_double(lateral_obstacle_ignore_thred);
 DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);
 
@@ -212,6 +216,8 @@ DECLARE_double(weight_lon_travel);
 DECLARE_double(weight_lon_jerk);
 DECLARE_double(weight_lon_collision);
 DECLARE_double(weight_lat_offset);
+DECLARE_double(weight_lat_comfort);
+DECLARE_double(priority_cost_gap);
 DECLARE_double(weight_same_side_offset);
 DECLARE_double(weight_opposite_side_offset);
 DECLARE_double(weight_dist_travelled);

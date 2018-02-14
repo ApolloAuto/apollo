@@ -26,7 +26,6 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/lattice/trajectory_generator/backup_trajectory_generator.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
@@ -35,6 +34,7 @@
 #include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
 #include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
+#include "modules/planning/lattice/trajectory_generator/backup_trajectory_generator.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_combiner.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_evaluator.h"
@@ -103,30 +103,23 @@ Status LatticePlanner::Init(const PlanningConfig& config) {
 Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
                             Frame* frame) {
   auto status = Status::OK();
-  bool has_plan = false;
-  auto it = std::find_if(
-      frame->reference_line_info().begin(), frame->reference_line_info().end(),
-      [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
-  if (it != frame->reference_line_info().end()) {
-    status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
-    has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
-                it->TrajectoryLength() > FLAGS_change_lane_min_length);
-    if (!has_plan) {
-      AERROR << "Fail to plan for lane change.";
-    }
-  }
-
-  if (!has_plan || !FLAGS_prioritize_change_lane) {
-    for (auto& reference_line_info : frame->reference_line_info()) {
+  double priority_cost = 0.0;
+  bool first_reference_line = true;
+  for (auto& reference_line_info : frame->reference_line_info()) {
+    reference_line_info.SetPriorityCost(priority_cost);
+    status =
+        PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
+    if (status != Status::OK()) {
       if (reference_line_info.IsChangeLanePath()) {
-        continue;
-      }
-      status = PlanOnReferenceLine(planning_start_point, frame,
-                                   &reference_line_info);
-      if (status != Status::OK()) {
-        AERROR << "planner failed to make a driving plan for: "
+        AERROR << "Planner failed to change lane to "
                << reference_line_info.Lanes().Id();
+      } else {
+        AERROR << "Planner failed to " << reference_line_info.Lanes().Id();
       }
+    }
+    if (first_reference_line) {
+      priority_cost += FLAGS_priority_cost_gap;
+      first_reference_line = false;
     }
   }
   return status;
@@ -348,7 +341,8 @@ Status LatticePlanner::PlanOnReferenceLine(
     return Status::OK();
   } else {
     AERROR << "Planning failed";
-    if (FLAGS_enable_backup_trajectory) {
+    if (FLAGS_enable_backup_trajectory &&
+        !reference_line_info->IsChangeLanePath()) {
       AERROR << "Use backup trajectory";
       BackupTrajectoryGenerator backup_trajectory_generator(
           init_s, init_d, planning_init_point.relative_time(),
@@ -357,7 +351,7 @@ Status LatticePlanner::PlanOnReferenceLine(
           backup_trajectory_generator.GenerateTrajectory(
               discretized_reference_line);
       reference_line_info->SetCost(FLAGS_backup_trajectory_cost);
-
+      reference_line_info->SetTrajectory(trajectory);
       reference_line_info->SetDrivable(true);
       return Status::OK();
 

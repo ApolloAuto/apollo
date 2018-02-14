@@ -78,13 +78,13 @@ DEFINE_string(gnss_rtk_eph_topic, "/apollo/sensor/gnss/rtk_eph",
               "Gnss rtk ephemeris topic name");
 DEFINE_string(gnss_best_pose_topic, "/apollo/sensor/gnss/best_pose",
               "Gnss rtk best gnss pose");
-DEFINE_string(localization_gnss_topic,
-              "/apollo/localization/msf_gnss",
+DEFINE_string(localization_gnss_topic, "/apollo/localization/msf_gnss",
               "Gnss localization measurement topic name");
-DEFINE_string(localization_lidar_topic,
-              "/apollo/localization/msf_lidar",
+DEFINE_string(localization_lidar_topic, "/apollo/localization/msf_lidar",
               "Lidar localization measurement topic name");
 DEFINE_string(localization_sins_pva_topic, "/apollo/localization/msf_sins_pva",
               "Localization sins pva topic name");
 DEFINE_string(localization_msf_status, "/apollo/localization/msf_status",
               "msf localization status");
+DEFINE_string(relative_map_topic, "/apollo/relative_map", "relative map");
+DEFINE_string(navigation_topic, "/apollo/navigation", "navigation");

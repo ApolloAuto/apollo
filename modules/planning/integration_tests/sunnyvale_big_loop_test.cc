@@ -46,6 +46,10 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     FLAGS_test_base_map_filename = "base_map.bin";
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_big_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
+
+    FLAGS_enable_stop_sign = false;
+    FLAGS_enable_crosswalk = false;
+    FLAGS_enable_keep_clear = false;
   }
 };
 
@@ -280,11 +284,12 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
 
 /*
  * kee_clear: not blocking, KEEP_CLEAR static obstacle built
- * bag: 2018-01-29-17-22-46/2018-01-29-17-33-47_11.bag
+ * bag: 2018-01-29-17-22-46/2018-01-29-17-22-47_0.bag
  * decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
   FLAGS_enable_keep_clear = true;
+  FLAGS_enable_traffic_light = false;
 
   std::string seq_num = "9";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -297,7 +302,9 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
 
 TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   std::string seq_num = "10";
+  FLAGS_enable_traffic_light = true;
   FLAGS_enable_prediction = false;
+  FLAGS_enable_keep_clear = false;
 
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";

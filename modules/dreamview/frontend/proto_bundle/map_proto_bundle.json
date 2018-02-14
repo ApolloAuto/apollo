@@ -1,0 +1,1010 @@
+{
+  "nested": {
+    "apollo": {
+      "nested": {
+        "hdmap": {
+          "nested": {
+            "ClearArea": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 2
+                },
+                "polygon": {
+                  "type": "Polygon",
+                  "id": 3
+                }
+              }
+            },
+            "Crosswalk": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "polygon": {
+                  "type": "Polygon",
+                  "id": 2
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
+                }
+              }
+            },
+            "Polygon": {
+              "fields": {
+                "point": {
+                  "rule": "repeated",
+                  "type": "apollo.common.PointENU",
+                  "id": 1
+                }
+              }
+            },
+            "LineSegment": {
+              "fields": {
+                "point": {
+                  "rule": "repeated",
+                  "type": "apollo.common.PointENU",
+                  "id": 1
+                }
+              }
+            },
+            "CurveSegment": {
+              "oneofs": {
+                "curveType": {
+                  "oneof": [
+                    "lineSegment"
+                  ]
+                }
+              },
+              "fields": {
+                "lineSegment": {
+                  "type": "LineSegment",
+                  "id": 1
+                },
+                "s": {
+                  "type": "double",
+                  "id": 6
+                },
+                "startPosition": {
+                  "type": "apollo.common.PointENU",
+                  "id": 7
+                },
+                "heading": {
+                  "type": "double",
+                  "id": 8
+                },
+                "length": {
+                  "type": "double",
+                  "id": 9
+                }
+              }
+            },
+            "Curve": {
+              "fields": {
+                "segment": {
+                  "rule": "repeated",
+                  "type": "CurveSegment",
+                  "id": 1
+                }
+              }
+            },
+            "Id": {
+              "fields": {
+                "id": {
+                  "type": "string",
+                  "id": 1
+                }
+              }
+            },
+            "Junction": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "polygon": {
+                  "type": "Polygon",
+                  "id": 2
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
+                }
+              }
+            },
+            "LaneBoundaryType": {
+              "fields": {
+                "s": {
+                  "type": "double",
+                  "id": 1
+                },
+                "types": {
+                  "rule": "repeated",
+                  "type": "Type",
+                  "id": 2,
+                  "options": {
+                    "packed": false
+                  }
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "DOTTED_YELLOW": 1,
+                    "DOTTED_WHITE": 2,
+                    "SOLID_YELLOW": 3,
+                    "SOLID_WHITE": 4,
+                    "DOUBLE_YELLOW": 5,
+                    "CURB": 6
+                  }
+                }
+              }
+            },
+            "LaneBoundary": {
+              "fields": {
+                "curve": {
+                  "type": "Curve",
+                  "id": 1
+                },
+                "length": {
+                  "type": "double",
+                  "id": 2
+                },
+                "virtual": {
+                  "type": "bool",
+                  "id": 3
+                },
+                "boundaryType": {
+                  "rule": "repeated",
+                  "type": "LaneBoundaryType",
+                  "id": 4
+                }
+              }
+            },
+            "LaneSampleAssociation": {
+              "fields": {
+                "s": {
+                  "type": "double",
+                  "id": 1
+                },
+                "width": {
+                  "type": "double",
+                  "id": 2
+                }
+              }
+            },
+            "Lane": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "centralCurve": {
+                  "type": "Curve",
+                  "id": 2
+                },
+                "leftBoundary": {
+                  "type": "LaneBoundary",
+                  "id": 3
+                },
+                "rightBoundary": {
+                  "type": "LaneBoundary",
+                  "id": 4
+                },
+                "length": {
+                  "type": "double",
+                  "id": 5
+                },
+                "speedLimit": {
+                  "type": "double",
+                  "id": 6
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 7
+                },
+                "predecessorId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 8
+                },
+                "successorId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 9
+                },
+                "leftNeighborForwardLaneId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 10
+                },
+                "rightNeighborForwardLaneId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 11
+                },
+                "type": {
+                  "type": "LaneType",
+                  "id": 12
+                },
+                "turn": {
+                  "type": "LaneTurn",
+                  "id": 13
+                },
+                "leftNeighborReverseLaneId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 14
+                },
+                "rightNeighborReverseLaneId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 15
+                },
+                "junctionId": {
+                  "type": "Id",
+                  "id": 16
+                },
+                "leftSample": {
+                  "rule": "repeated",
+                  "type": "LaneSampleAssociation",
+                  "id": 17
+                },
+                "rightSample": {
+                  "rule": "repeated",
+                  "type": "LaneSampleAssociation",
+                  "id": 18
+                },
+                "direction": {
+                  "type": "LaneDirection",
+                  "id": 19
+                },
+                "leftRoadSample": {
+                  "rule": "repeated",
+                  "type": "LaneSampleAssociation",
+                  "id": 20
+                },
+                "rightRoadSample": {
+                  "rule": "repeated",
+                  "type": "LaneSampleAssociation",
+                  "id": 21
+                }
+              },
+              "nested": {
+                "LaneType": {
+                  "values": {
+                    "NONE": 1,
+                    "CITY_DRIVING": 2,
+                    "BIKING": 3,
+                    "SIDEWALK": 4,
+                    "PARKING": 5
+                  }
+                },
+                "LaneTurn": {
+                  "values": {
+                    "NO_TURN": 1,
+                    "LEFT_TURN": 2,
+                    "RIGHT_TURN": 3,
+                    "U_TURN": 4
+                  }
+                },
+                "LaneDirection": {
+                  "values": {
+                    "FORWARD": 1,
+                    "BACKWARD": 2,
+                    "BIDIRECTION": 3
+                  }
+                }
+              }
+            },
+            "MapMsg": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "map": {
+                  "type": "apollo.hdmap.Map",
+                  "id": 3
+                }
+              }
+            },
+            "LaneOverlapInfo": {
+              "fields": {
+                "startS": {
+                  "type": "double",
+                  "id": 1
+                },
+                "endS": {
+                  "type": "double",
+                  "id": 2
+                },
+                "isMerge": {
+                  "type": "bool",
+                  "id": 3
+                }
+              }
+            },
+            "SignalOverlapInfo": {
+              "fields": {}
+            },
+            "StopSignOverlapInfo": {
+              "fields": {}
+            },
+            "CrosswalkOverlapInfo": {
+              "fields": {}
+            },
+            "JunctionOverlapInfo": {
+              "fields": {}
+            },
+            "YieldOverlapInfo": {
+              "fields": {}
+            },
+            "ClearAreaOverlapInfo": {
+              "fields": {}
+            },
+            "SpeedBumpOverlapInfo": {
+              "fields": {}
+            },
+            "ParkingSpaceOverlapInfo": {
+              "fields": {}
+            },
+            "ObjectOverlapInfo": {
+              "oneofs": {
+                "overlapInfo": {
+                  "oneof": [
+                    "laneOverlapInfo",
+                    "signalOverlapInfo",
+                    "stopSignOverlapInfo",
+                    "crosswalkOverlapInfo",
+                    "junctionOverlapInfo",
+                    "yieldSignOverlapInfo",
+                    "clearAreaOverlapInfo",
+                    "speedBumpOverlapInfo",
+                    "parkingSpaceOverlapInfo"
+                  ]
+                }
+              },
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "laneOverlapInfo": {
+                  "type": "LaneOverlapInfo",
+                  "id": 3
+                },
+                "signalOverlapInfo": {
+                  "type": "SignalOverlapInfo",
+                  "id": 4
+                },
+                "stopSignOverlapInfo": {
+                  "type": "StopSignOverlapInfo",
+                  "id": 5
+                },
+                "crosswalkOverlapInfo": {
+                  "type": "CrosswalkOverlapInfo",
+                  "id": 6
+                },
+                "junctionOverlapInfo": {
+                  "type": "JunctionOverlapInfo",
+                  "id": 7
+                },
+                "yieldSignOverlapInfo": {
+                  "type": "YieldOverlapInfo",
+                  "id": 8
+                },
+                "clearAreaOverlapInfo": {
+                  "type": "ClearAreaOverlapInfo",
+                  "id": 9
+                },
+                "speedBumpOverlapInfo": {
+                  "type": "SpeedBumpOverlapInfo",
+                  "id": 10
+                },
+                "parkingSpaceOverlapInfo": {
+                  "type": "ParkingSpaceOverlapInfo",
+                  "id": 11
+                }
+              }
+            },
+            "Overlap": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "object": {
+                  "rule": "repeated",
+                  "type": "ObjectOverlapInfo",
+                  "id": 2
+                }
+              }
+            },
+            "Projection": {
+              "fields": {
+                "proj": {
+                  "type": "string",
+                  "id": 1
+                }
+              }
+            },
+            "Header": {
+              "fields": {
+                "version": {
+                  "type": "bytes",
+                  "id": 1
+                },
+                "date": {
+                  "type": "bytes",
+                  "id": 2
+                },
+                "projection": {
+                  "type": "Projection",
+                  "id": 3
+                },
+                "district": {
+                  "type": "bytes",
+                  "id": 4
+                },
+                "generation": {
+                  "type": "bytes",
+                  "id": 5
+                },
+                "revMajor": {
+                  "type": "bytes",
+                  "id": 6
+                },
+                "revMinor": {
+                  "type": "bytes",
+                  "id": 7
+                },
+                "left": {
+                  "type": "double",
+                  "id": 8
+                },
+                "top": {
+                  "type": "double",
+                  "id": 9
+                },
+                "right": {
+                  "type": "double",
+                  "id": 10
+                },
+                "bottom": {
+                  "type": "double",
+                  "id": 11
+                },
+                "vendor": {
+                  "type": "bytes",
+                  "id": 12
+                }
+              }
+            },
+            "Map": {
+              "fields": {
+                "header": {
+                  "type": "Header",
+                  "id": 1
+                },
+                "crosswalk": {
+                  "rule": "repeated",
+                  "type": "Crosswalk",
+                  "id": 2
+                },
+                "junction": {
+                  "rule": "repeated",
+                  "type": "Junction",
+                  "id": 3
+                },
+                "lane": {
+                  "rule": "repeated",
+                  "type": "Lane",
+                  "id": 4
+                },
+                "stopSign": {
+                  "rule": "repeated",
+                  "type": "StopSign",
+                  "id": 5
+                },
+                "signal": {
+                  "rule": "repeated",
+                  "type": "Signal",
+                  "id": 6
+                },
+                "yield": {
+                  "rule": "repeated",
+                  "type": "YieldSign",
+                  "id": 7
+                },
+                "overlap": {
+                  "rule": "repeated",
+                  "type": "Overlap",
+                  "id": 8
+                },
+                "clearArea": {
+                  "rule": "repeated",
+                  "type": "ClearArea",
+                  "id": 9
+                },
+                "speedBump": {
+                  "rule": "repeated",
+                  "type": "SpeedBump",
+                  "id": 10
+                },
+                "road": {
+                  "rule": "repeated",
+                  "type": "Road",
+                  "id": 11
+                }
+              }
+            },
+            "BoundaryEdge": {
+              "fields": {
+                "curve": {
+                  "type": "Curve",
+                  "id": 1
+                },
+                "type": {
+                  "type": "Type",
+                  "id": 2
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "NORMAL": 1,
+                    "LEFT_BOUNDARY": 2,
+                    "RIGHT_BOUNDARY": 3
+                  }
+                }
+              }
+            },
+            "BoundaryPolygon": {
+              "fields": {
+                "edge": {
+                  "rule": "repeated",
+                  "type": "BoundaryEdge",
+                  "id": 1
+                }
+              }
+            },
+            "RoadBoundary": {
+              "fields": {
+                "outerPolygon": {
+                  "type": "BoundaryPolygon",
+                  "id": 1
+                },
+                "hole": {
+                  "rule": "repeated",
+                  "type": "BoundaryPolygon",
+                  "id": 2
+                }
+              }
+            },
+            "RoadROIBoundary": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "roadBoundaries": {
+                  "rule": "repeated",
+                  "type": "RoadBoundary",
+                  "id": 2
+                }
+              }
+            },
+            "RoadSection": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "laneId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 2
+                },
+                "boundary": {
+                  "type": "RoadBoundary",
+                  "id": 3
+                }
+              }
+            },
+            "Road": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "section": {
+                  "rule": "repeated",
+                  "type": "RoadSection",
+                  "id": 2
+                },
+                "junctionId": {
+                  "type": "Id",
+                  "id": 3
+                }
+              }
+            },
+            "Subsignal": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "type": {
+                  "type": "Type",
+                  "id": 2
+                },
+                "location": {
+                  "type": "apollo.common.PointENU",
+                  "id": 3
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 1,
+                    "CIRCLE": 2,
+                    "ARROW_LEFT": 3,
+                    "ARROW_FORWARD": 4,
+                    "ARROW_RIGHT": 5,
+                    "ARROW_LEFT_AND_FORWARD": 6,
+                    "ARROW_RIGHT_AND_FORWARD": 7,
+                    "ARROW_U_TURN": 8
+                  }
+                }
+              }
+            },
+            "Signal": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "boundary": {
+                  "type": "Polygon",
+                  "id": 2
+                },
+                "subsignal": {
+                  "rule": "repeated",
+                  "type": "Subsignal",
+                  "id": 3
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 4
+                },
+                "type": {
+                  "type": "Type",
+                  "id": 5
+                },
+                "stopLine": {
+                  "rule": "repeated",
+                  "type": "Curve",
+                  "id": 6
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 1,
+                    "MIX_2_HORIZONTAL": 2,
+                    "MIX_2_VERTICAL": 3,
+                    "MIX_3_HORIZONTAL": 4,
+                    "MIX_3_VERTICAL": 5,
+                    "SINGLE": 6
+                  }
+                }
+              }
+            },
+            "SpeedBump": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 2
+                },
+                "position": {
+                  "rule": "repeated",
+                  "type": "Curve",
+                  "id": 3
+                }
+              }
+            },
+            "StopSign": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "stopLine": {
+                  "rule": "repeated",
+                  "type": "Curve",
+                  "id": 2
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
+                },
+                "type": {
+                  "type": "StopType",
+                  "id": 4
+                }
+              },
+              "nested": {
+                "StopType": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "ONE_WAY": 1,
+                    "TWO_WAY": 2,
+                    "THREE_WAY": 3,
+                    "FOUR_WAY": 4,
+                    "ALL_WAY": 5
+                  }
+                }
+              }
+            },
+            "YieldSign": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "stopLine": {
+                  "rule": "repeated",
+                  "type": "Curve",
+                  "id": 2
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
+                }
+              }
+            }
+          }
+        },
+        "common": {
+          "nested": {
+            "PointENU": {
+              "fields": {
+                "x": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "y": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "z": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 0
+                  }
+                }
+              }
+            },
+            "PointLLH": {
+              "fields": {
+                "lon": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "lat": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "height": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 0
+                  }
+                }
+              }
+            },
+            "Point2D": {
+              "fields": {
+                "x": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "y": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": null
+                  }
+                }
+              }
+            },
+            "Point3D": {
+              "fields": {
+                "x": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "y": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "z": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": null
+                  }
+                }
+              }
+            },
+            "Quaternion": {
+              "fields": {
+                "qx": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "qy": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "qz": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "qw": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": null
+                  }
+                }
+              }
+            },
+            "Header": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "moduleName": {
+                  "type": "string",
+                  "id": 2
+                },
+                "sequenceNum": {
+                  "type": "uint32",
+                  "id": 3
+                },
+                "lidarTimestamp": {
+                  "type": "uint64",
+                  "id": 4
+                },
+                "cameraTimestamp": {
+                  "type": "uint64",
+                  "id": 5
+                },
+                "radarTimestamp": {
+                  "type": "uint64",
+                  "id": 6
+                },
+                "version": {
+                  "type": "uint32",
+                  "id": 7,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "status": {
+                  "type": "StatusPb",
+                  "id": 8
+                }
+              }
+            },
+            "ErrorCode": {
+              "values": {
+                "OK": 0,
+                "CONTROL_ERROR": 1000,
+                "CONTROL_INIT_ERROR": 1001,
+                "CONTROL_COMPUTE_ERROR": 1002,
+                "CANBUS_ERROR": 2000,
+                "CAN_CLIENT_ERROR_BASE": 2100,
+                "CAN_CLIENT_ERROR_OPEN_DEVICE_FAILED": 2101,
+                "CAN_CLIENT_ERROR_FRAME_NUM": 2102,
+                "CAN_CLIENT_ERROR_SEND_FAILED": 2103,
+                "CAN_CLIENT_ERROR_RECV_FAILED": 2104,
+                "LOCALIZATION_ERROR": 3000,
+                "LOCALIZATION_ERROR_MSG": 3100,
+                "LOCALIZATION_ERROR_LIDAR": 3200,
+                "LOCALIZATION_ERROR_INTEG": 3300,
+                "LOCALIZATION_ERROR_GNSS": 3400,
+                "PERCEPTION_ERROR": 4000,
+                "PERCEPTION_ERROR_TF": 4001,
+                "PERCEPTION_ERROR_PROCESS": 4002,
+                "PERCEPTION_FATAL": 4003,
+                "PREDICTION_ERROR": 5000,
+                "PLANNING_ERROR": 6000,
+                "HDMAP_DATA_ERROR": 7000,
+                "ROUTING_ERROR": 8000,
+                "ROUTING_ERROR_REQUEST": 8001,
+                "ROUTING_ERROR_RESPONSE": 8002,
+                "ROUTING_ERROR_NOT_READY": 8003,
+                "END_OF_INPUT": 9000,
+                "HTTP_LOGIC_ERROR": 10000,
+                "HTTP_RUNTIME_ERROR": 10001,
+                "RELATIVE_MAP_ERROR": 11000,
+                "RELATIVE_MAP_NOT_READY": 11001
+              }
+            },
+            "StatusPb": {
+              "fields": {
+                "errorCode": {
+                  "type": "ErrorCode",
+                  "id": 1,
+                  "options": {
+                    "default": "OK"
+                  }
+                },
+                "msg": {
+                  "type": "string",
+                  "id": 2
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

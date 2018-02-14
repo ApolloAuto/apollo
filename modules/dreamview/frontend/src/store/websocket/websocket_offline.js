@@ -1,7 +1,5 @@
-import devConfig from "store/config/dev.yml";
 import STORE from "store";
 import RENDERER from "renderer";
-
 
 export default class OfflinePlaybackWebSocketEndpoint {
     constructor(serverAddr) {

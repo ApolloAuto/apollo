@@ -90,6 +90,7 @@ DECLARE_double(imu_to_ant_offset_uz);
 
 // common
 DECLARE_double(imu_rate);
+DECLARE_bool(if_utm_zone_id_from_folder);
 DECLARE_int32(local_utm_zone_id);
 DECLARE_bool(trans_gpstime_to_utctime);
 DECLARE_int32(gnss_mode);

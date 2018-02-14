@@ -58,8 +58,8 @@ class SimulationWorldUpdater {
    * of hdmap.
    * @param routing_from_file whether to read initial routing from file.
    */
-  SimulationWorldUpdater(WebSocketHandler *websocket, SimControl *sim_control,
-                         const MapService *map_service,
+  SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
+                         SimControl *sim_control, const MapService *map_service,
                          bool routing_from_file = false);
 
   /**
@@ -123,9 +123,10 @@ class SimulationWorldUpdater {
 
   ros::Timer timer_;
   SimulationWorldService sim_world_service_;
-  const MapService *map_service_;
-  WebSocketHandler *websocket_;
-  SimControl *sim_control_;
+  const MapService *map_service_ = nullptr;
+  WebSocketHandler *websocket_ = nullptr;
+  WebSocketHandler *map_ws_ = nullptr;
+  SimControl *sim_control_ = nullptr;
 
   // End point for requesting default route
   apollo::routing::POI poi_;

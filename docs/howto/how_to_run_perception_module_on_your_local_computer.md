@@ -23,8 +23,11 @@ wget http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_
 
 4. Install Nvidia driver in docker (using Linux-x86-375.39 version as example):
 ```
+source /apollo/scripts/install_gcc.sh
+ln -s /usr/bin/cc /usr/bin/cc1
 chmod +x ./NVIDIA-Linux-x86_64-375.39.run
 ./NVIDIA-Linux-x86_64-375.39.run --no-opengl-files -a -s
+source /apollo/scripts/recover_gcc.sh
 ```
 
 5. Commit a new docker image (in host):

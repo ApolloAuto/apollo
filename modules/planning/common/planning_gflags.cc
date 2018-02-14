@@ -219,8 +219,6 @@ DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
 DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
-DEFINE_string(reference_line_end_obstacle_id, "REF_END",
-              "Obstacle id for the end of reference line obstacle");
 DEFINE_double(signal_expire_time_sec, 5.0,
               "consider the signal msg is expired if its timestamp over "
               "this threshold (second)");
@@ -254,13 +252,19 @@ DEFINE_double(creep_stop_distance, 0.5,
               "stop distance(m) to the stop line of next lane overlap "
               "while creeping ");
 /// keep_clear
-DEFINE_bool(enable_keep_clear, true, "enable keep clear zone");
-DEFINE_string(keep_clear_virtual_object_id_prefix, "KC_",
-              "prefix for converting keep_clear id to virtual object id");
+DEFINE_bool(enable_keep_clear, false, "enable keep clear zone");
+DEFINE_string(keep_clear_virtual_obstacle_id_prefix, "KC_",
+              "prefix for converting keep_clear id to virtual obstacle id");
+DEFINE_string(keep_clear_junction_virtual_obstacle_id_prefix, "KC_JC_",
+              "prefix for converting keep_clear(junction) id "
+              "to virtual obstacle id");
+DEFINE_double(keep_clear_min_pass_distance, 2.0,
+              "valid min distance(m) for vehicles to be considered as "
+              "have passed keep_clear zone (stop_line_end_s)");
 /// traffic light
 DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
-DEFINE_string(signal_light_virtual_object_id_prefix, "SL_",
-              "prefix for converting signal id to virtual object id");
+DEFINE_string(signal_light_virtual_obstacle_id_prefix, "SL_",
+              "prefix for converting signal id to virtual obstacle id");
 DEFINE_double(max_stop_deacceleration_for_yellow_light, 3.0,
               "treat yellow light as red when deceleration (abstract value"
               " in m/s^2) is less than this threshold; otherwise treated"
@@ -269,8 +273,8 @@ DEFINE_double(traffic_light_stop_distance, 1.0,
               "stop distance from traffic light line");
 /// crosswalk
 DEFINE_bool(enable_crosswalk, true, "enable crosswalk");
-DEFINE_string(crosswalk_virtual_object_id_prefix, "CW_",
-              "prefix for converting crosswalk id to virtual object id");
+DEFINE_string(crosswalk_virtual_obstacle_id_prefix, "CW_",
+              "prefix for converting crosswalk id to virtual obstacle id");
 DEFINE_double(crosswalk_expand_distance, 2.0,
               "crosswalk expand distance(meter) "
               "for pedestrian/bicycle detection");
@@ -288,8 +292,8 @@ DEFINE_bool(enable_stop_sign, true, "enable stop_sign");
 DEFINE_bool(enable_stop_sign_creeping, false,
             "enable stop_sign creeping forward at one way "
             "or two way stop signs.");
-DEFINE_string(stop_sign_virtual_object_id_prefix, "SS_",
-              "prefix for converting stop_sign id to virtual object id");
+DEFINE_string(stop_sign_virtual_obstacle_id_prefix, "SS_",
+              "prefix for converting stop_sign id to virtual obstacle id");
 DEFINE_double(stop_sign_stop_duration, 3.0,
               "min time(second) to stop at stop sign");
 DEFINE_double(stop_sign_min_pass_distance, 3.0,
@@ -300,6 +304,12 @@ DEFINE_double(stop_sign_stop_distance, 1.0,
 DEFINE_double(stop_sign_max_watch_vehicle_stop_speed, 0.5,
               "max speed(m/s) for watch vehicles to be considered as a stop."
               "(this check is looser than adc)");
+
+DEFINE_bool(enable_sidepass, true,
+            "True to enable side pass long stopping obstacles");
+DEFINE_double(sidepass_wait_time_sec, 30.0,
+              "Waiting time in seconds before deciding to sidepass");
+
 /// destination
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
@@ -308,6 +318,9 @@ DEFINE_double(destination_check_distance, 5.0,
               " it is considered to reach destination");
 DEFINE_double(destination_stop_distance, 0.5,
               "stop distance from destination line");
+/// reference_line end
+DEFINE_string(reference_line_end_obstacle_id_prefix, "REF_END_",
+              "Obstacle id for the end of reference line obstacle");
 
 // according to DMV's rule, turn signal should be on within 200 ft from
 // intersection.
@@ -374,23 +387,19 @@ DEFINE_int32(num_lattice_traj_to_plot, 5,
 DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
 DEFINE_double(spiral_downsample_curvature_thred, 0.02,
               "curvature threshold for down sampling reference line points");
-DEFINE_bool(enable_sample_bound_planning, true,
-            "enable SampleBound based motion planning");
 DEFINE_bool(enable_lattice_st_image_dump, false,
             "enable sending the lattice st image");
 DEFINE_bool(enable_auto_tuning, false, "enable auto tuning data emission");
+
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
-DEFINE_double(collision_buffer_expansion_ratio, 0.2,
+DEFINE_double(collision_buffer_expansion_ratio, 0.0,
               "The ratio w.r.t. the vehicle dimension "
               "to expand in collision checking");
 DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
-DEFINE_double(lateral_obstacle_ignore_thred, 2.0,
-              "Lateral threshold for "
-              "obstacles to be considered in path-time graph");
 DEFINE_bool(enable_backup_trajectory, false,
             "If generate backup trajectory when planning fail");
 DEFINE_double(backup_trajectory_cost, 1000.0,
@@ -402,6 +411,9 @@ DEFINE_double(weight_lon_jerk, 1.0, "Weight of longitudinal jerk cost");
 DEFINE_double(weight_lon_collision, 2.0,
               "Weight of logitudinal collision cost");
 DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
+DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");
+DEFINE_double(priority_cost_gap, 5.0,
+              "Gap to increase the priority cost of reference line.");
 DEFINE_double(weight_same_side_offset, 1.0,
               "Weight of same side lateral offset cost");
 DEFINE_double(weight_opposite_side_offset, 10.0,

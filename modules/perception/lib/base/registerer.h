@@ -77,9 +77,7 @@ class Any {
   Any(const Any &other)
       : content_(other.content_ ? other.content_->clone() : NULL) {}
 
-  ~Any() {
-    delete content_;
-  }
+  ~Any() { delete content_; }
 
   template <typename ValueType>
   ValueType *AnyCast() {
@@ -99,9 +97,7 @@ class Any {
    public:
     explicit Holder(const ValueType &value) : held_(value) {}
     virtual ~Holder() {}
-    virtual PlaceHolder *clone() const {
-      return new Holder(held_);
-    }
+    virtual PlaceHolder *clone() const { return new Holder(held_); }
 
     ValueType held_;
   };
@@ -115,9 +111,7 @@ class ObjectFactory {
  public:
   ObjectFactory() {}
   virtual ~ObjectFactory() {}
-  virtual Any NewInstance() {
-    return Any();
-  }
+  virtual Any NewInstance() { return Any(); }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(ObjectFactory);

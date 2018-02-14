@@ -100,9 +100,7 @@ typedef std::shared_ptr<const Object> ObjectConstPtr;
 
 // Sensor single frame objects.
 struct SensorObjects {
-  SensorObjects() {
-    sensor2world_pose = Eigen::Matrix4d::Zero();
-  }
+  SensorObjects() { sensor2world_pose = Eigen::Matrix4d::Zero(); }
 
   std::string ToString() const;
 

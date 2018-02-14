@@ -239,10 +239,6 @@ class HungarianOptimizer {
   std::vector<int> preimage_;  // i.e. the agents
   std::vector<int> image_;     // i.e. the tasks
 
-  // The locations of a zero found in step 4.
-  int zero_col_;
-  int zero_row_;
-
   // The width_ and height_ of the initial (non-expanded) cost matrix.
   int width_;
   int height_;

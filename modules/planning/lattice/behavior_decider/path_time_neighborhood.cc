@@ -112,6 +112,8 @@ SLBoundary PathTimeNeighborhood::ComputeObstacleBoundary(
 void PathTimeNeighborhood::SetupObstacles(
     const std::vector<const Obstacle*>& obstacles,
     const std::vector<PathPoint>& discretized_ref_points) {
+
+  double half_lane_width = FLAGS_default_reference_line_width * 0.5;
   for (const Obstacle* obstacle : obstacles) {
     if (prediction_traj_map_.find(obstacle->Id()) ==
         prediction_traj_map_.end()) {
@@ -135,8 +137,8 @@ void PathTimeNeighborhood::SetupObstacles(
       // the obstacle is not shown on the region to be considered.
       if (sl_boundary.end_s() < path_range_.first ||
           sl_boundary.start_s() > path_range_.second ||
-          (sl_boundary.start_l() > FLAGS_lateral_obstacle_ignore_thred &&
-           sl_boundary.end_l() < -FLAGS_lateral_obstacle_ignore_thred)) {
+          (sl_boundary.start_l() > half_lane_width &&
+           sl_boundary.end_l() < -half_lane_width)) {
         if (path_time_obstacle_map_.find(obstacle->Id()) !=
             path_time_obstacle_map_.end()) {
           break;

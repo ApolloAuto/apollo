@@ -81,7 +81,7 @@ class TLPreprocessorSubnode : public Subnode {
   // @brief sub short focus camera
   void SubShortFocusCamera(const sensor_msgs::Image &msg);
 
-  void SubCameraImage(std::shared_ptr<const sensor_msgs::Image> msg,
+  void SubCameraImage(boost::shared_ptr<const sensor_msgs::Image> msg,
                       CameraId camera_id);
 
   void CameraSelection(double ts);
@@ -119,4 +119,3 @@ REGISTER_SUBNODE(TLPreprocessorSubnode);
 }  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_ONBOARD_TL_PREPROCESSOR_SUBNODE_H_
-

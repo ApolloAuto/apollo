@@ -7,7 +7,7 @@ import MainView from "components/Layouts/MainView";
 import ToolView from "components/Layouts/ToolView";
 import PNCMonitor from "components/PNCMonitor";
 import SideBar from "components/SideBar";
-import WS from "store/websocket";
+import WS, {MAP_WS} from "store/websocket";
 
 
 @inject("store") @observer
@@ -31,6 +31,7 @@ export default class Dreamview extends React.Component {
 
     componentDidMount() {
         WS.initialize();
+        MAP_WS.initialize();
         window.addEventListener("resize", () => {
             this.props.store.updateDimension();
         });

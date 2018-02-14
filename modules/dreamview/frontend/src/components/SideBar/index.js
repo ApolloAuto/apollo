@@ -14,30 +14,30 @@ export default class SideBar extends React.Component {
             <div className="side-bar">
                 <ButtonPanel enableHMIButtonsOnly={enableHMIButtonsOnly}
                              onTasks={() => {
-                                this.props.store.handleSideBarClick('showTasks');
+                                this.props.store.handleOptionToggle('showTasks');
                              }}
                              showTasks={options.showTasks}
                              onModuleController={() => {
-                                this.props.store.handleSideBarClick('showModuleController');
+                                this.props.store.handleOptionToggle('showModuleController');
                              }}
                              showModuleController={options.showModuleController}
                              onMenu={() => {
-                                    this.props.store.handleSideBarClick('showMenu');
+                                    this.props.store.handleOptionToggle('showMenu');
                                  }}
                              showMenu={options.showMenu}
                              onRouteEditingBar={() => {
-                                    this.props.store.handleSideBarClick('showRouteEditingBar');
+                                    this.props.store.handleOptionToggle('showRouteEditingBar');
                                  }}
                              showRouteEditingBar={options.showRouteEditingBar}
                              onDataRecorder={() => {
-                                    this.props.store.handleSideBarClick('showDataRecorder');
+                                    this.props.store.handleOptionToggle('showDataRecorder');
                                  }}
                              showDataRecorder={options.showDataRecorder} />
                 <SubButtonPanel enablePOI={
                                     !enableHMIButtonsOnly && !options.showRouteEditingBar
                                 }
                                 onPOI={() => {
-                                    this.props.store.handleSideBarClick('showPOI');
+                                    this.props.store.handleOptionToggle('showPOI');
                                 }}
                                 showPOI={!options.showRouteEditingBar && options.showPOI} />
             </div>

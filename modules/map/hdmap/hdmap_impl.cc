@@ -28,9 +28,9 @@ namespace apollo {
 namespace hdmap {
 namespace {
 
+using apollo::common::PointENU;
 using apollo::common::math::AABoxKDTreeParams;
 using apollo::common::math::Vec2d;
-using apollo::common::PointENU;
 
 Id CreateHDMapId(const std::string& string_id) {
   Id id;
@@ -47,7 +47,8 @@ constexpr int kBackwardDistance = 4;
 
 int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   Clear();
-
+  // TODO(startcode) seems map_ can be changed to a local variable of this
+  // function, but test will fail if I do so. if so.
   if (apollo::common::util::EndWith(map_filename, ".xml")) {
     if (!adapter::OpendriveAdapter::LoadData(map_filename, &map_)) {
       return -1;
@@ -55,7 +56,14 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   } else if (!apollo::common::util::GetProtoFromFile(map_filename, &map_)) {
     return -1;
   }
+  return LoadMapFromProto(map_);
+}
 
+int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
+  if (&map_proto != &map_) {  // avoid an unnecessary copy
+    Clear();
+    map_ = map_proto;
+  }
   for (const auto& lane : map_.lane()) {
     lane_table_[lane.id().id()].reset(new LaneInfo(lane));
   }
@@ -211,7 +219,9 @@ int HDMapImpl::GetRoads(const Vec2d& point, double distance,
   }
   std::unordered_set<std::string> road_ids;
   for (auto& lane : lanes) {
-    road_ids.insert(lane->road_id().id());
+    if (!lane->road_id().id().empty()) {
+      road_ids.insert(lane->road_id().id());
+    }
   }
 
   for (auto& road_id : road_ids) {
@@ -871,9 +881,12 @@ int HDMapImpl::SearchObjects(const Vec2d& center, const double radius,
   }
   auto objects = kdtree.GetObjects(center, radius);
   std::unordered_set<std::string> result_ids;
+  result_ids.reserve(objects.size());
   for (const auto* object_ptr : objects) {
     result_ids.insert(object_ptr->object()->id().id());
   }
+
+  results->reserve(result_ids.size());
   results->assign(result_ids.begin(), result_ids.end());
   return 0;
 }

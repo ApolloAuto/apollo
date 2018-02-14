@@ -37,18 +37,28 @@ using google::protobuf::util::JsonStringToMessage;
 using google::protobuf::util::MessageToJsonString;
 
 SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
+                                               WebSocketHandler *map_ws,
                                                SimControl *sim_control,
                                                const MapService *map_service,
                                                bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
       websocket_(websocket),
+      map_ws_(map_ws),
       sim_control_(sim_control) {
   RegisterMessageHandlers();
 }
 
 void SimulationWorldUpdater::RegisterMessageHandlers() {
-  websocket_->RegisterMessageHandler(
+  // Send current sim_control status to the new client.
+  websocket_->RegisterConnectionReadyHandler(
+      [this](WebSocketHandler::Connection *conn) {
+        Json response;
+        response["type"] = "SimControlStatus";
+        response["enabled"] = sim_control_->IsEnabled();
+        websocket_->SendData(conn, response.dump());
+      });
+  map_ws_->RegisterMessageHandler(
       "RetrieveMapData",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         auto iter = json.find("elements");
@@ -56,8 +66,11 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           MapElementIds map_element_ids;
           if (JsonStringToMessage(iter->dump(), &map_element_ids).ok()) {
             auto retrieved = map_service_->RetrieveMapElements(map_element_ids);
-            websocket_->SendData(
-                conn, JsonUtil::ProtoToTypedJson("MapData", retrieved).dump());
+
+            std::string retrieved_map_string;
+            retrieved.SerializeToString(&retrieved_map_string);
+
+            map_ws_->SendBinaryData(conn, retrieved_map_string, true);
           } else {
             AERROR << "Failed to parse MapElementIds from json";
           }
@@ -142,6 +155,14 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           return;
         }
         websocket_->SendBinaryData(conn, to_send, true);
+      });
+
+  websocket_->RegisterMessageHandler(
+      "RequestRoutePath",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response = sim_world_service_.GetRoutePathAsJson();
+        response["type"] = "RoutePath";
+        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(

@@ -36,9 +36,7 @@ struct Event {
   // TODO(Yangguang Li):
   double local_timestamp = 0.0;  // local timestamp to compute process delay.
 
-  Event() {
-    local_timestamp = TimeUtil::GetCurrentTime();
-  }
+  Event() { local_timestamp = TimeUtil::GetCurrentTime(); }
 
   std::string to_string() const {
     std::ostringstream oss;

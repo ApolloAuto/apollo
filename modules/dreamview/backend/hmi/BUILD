@@ -28,6 +28,7 @@ cc_library(
     deps = [
         ":vehicle_manager",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/kv_db",
         "//modules/common/monitor_log",
         "//modules/common/util:http_client",

@@ -132,7 +132,8 @@ Status SpeedDecider::MakeObjectDecision(
     const auto& boundary = path_obstacle->st_boundary();
 
     if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
-        boundary.max_t() < 0.0) {
+        boundary.max_t() < 0.0 ||
+        boundary.min_t() > dp_st_speed_config_.total_time()) {
       AppendIgnoreDecision(path_obstacle);
       continue;
     }

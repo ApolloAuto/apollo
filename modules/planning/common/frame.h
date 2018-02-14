@@ -75,8 +75,6 @@ class Frame {
 
   std::list<ReferenceLineInfo> &reference_line_info();
 
-  void AddObstacle(const Obstacle &obstacle);
-
   Obstacle *Find(const std::string &id);
 
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
@@ -85,12 +83,14 @@ class Frame {
 
   const std::vector<const Obstacle *> obstacles() const;
 
-  const Obstacle *AddStaticVirtualObstacle(const std::string &id,
-                                           const common::math::Box2d &box);
-
-  const Obstacle *AddVirtualStopObstacle(
+  const Obstacle *CreateVirtualStopObstacle(
       ReferenceLineInfo *const reference_line_info,
-      const std::string &object_id, const double object_s);
+      const std::string &obstacle_id, const double obstacle_s);
+
+  const Obstacle *CreateStaticObstacle(
+      ReferenceLineInfo *const reference_line_info,
+      const std::string &obstacle_id, const double obstacle_start_s,
+      const double obstacle_end_s);
 
   bool Rerouting();
 
@@ -124,6 +124,14 @@ class Frame {
    */
   int CreateDestinationObstacle();
 
+  /**
+   * @brief create a static virtual obstacle
+   */
+  const Obstacle *CreateStaticVirtualObstacle(const std::string &id,
+                                              const common::math::Box2d &box);
+
+  void AddObstacle(const Obstacle &obstacle);
+
  private:
   uint32_t sequence_num_ = 0;
   const hdmap::HDMap *hdmap_ = nullptr;
@@ -141,6 +149,8 @@ class Frame {
   prediction::PredictionObstacles prediction_;
 
   ThreadSafeIndexedObstacles obstacles_;
+
+  perception::CIPVInfo cipv_info_;
 
   ChangeLaneDecider change_lane_decider_;
 

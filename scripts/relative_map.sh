@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,12 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-cd "${DIR}/.."
 source "${DIR}/apollo_base.sh"
 
-python ./modules/tools/car_sound/car_sound.py $@
+# run_customized_path function from apollo_base.sh
+# run_customized_path module_path module_name
 
+# FIXME(all): temporary enable --use_navigation_mode in this script to make
+# it easier to test relative_map node. Need removed in the future.
+
+run_customized_path map/relative_map relative_map "$@" --use_navigation_mode

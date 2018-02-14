@@ -206,7 +206,8 @@ float TrackObjectDistance::ComputePointNumDistance(
   const TrackedObjectPtr& last_object = track->current_object_;
   int old_point_number = last_object->object_ptr->cloud->size();
   int new_point_number = new_object->object_ptr->cloud->size();
-  float point_num_distance = fabs(old_point_number - new_point_number) * 1.0f /
+  float point_num_distance = std::abs(old_point_number - new_point_number) *
+                             1.0f /
                              std::max(old_point_number, new_point_number);
   return point_num_distance;
 }

@@ -80,8 +80,8 @@ DEFINE_int32(
     lidar_localization_mode, 2,
     "Localization mode, 0 for intensity, 1 for altitude, 2 for fusion.");
 DEFINE_int32(lidar_yaw_align_mode, 1,
-    "image yaw align mode, 0 for intensity, "
-    "1 for fusion, 2 for fusion with multithread.");
+             "image yaw align mode, 0 for intensity, "
+             "1 for fusion, 2 for fusion with multithread.");
 DEFINE_int32(lidar_filter_size, 11, "Lidar filter size");
 DEFINE_int32(lidar_thread_num, 2, "Lidar thread number");
 DEFINE_double(lidar_imu_max_delay_time, 0.4,
@@ -119,6 +119,8 @@ DEFINE_double(imu_to_ant_offset_uz, 0.0, "Imu ant offset z uncertainty");
 
 // common
 DEFINE_double(imu_rate, 1.0, "");
+DEFINE_bool(if_utm_zone_id_from_folder, true,
+            "load utm zone id from local map folder");
 DEFINE_int32(local_utm_zone_id, 50, "UTM zone id");
 DEFINE_bool(trans_gpstime_to_utctime, true, "");
 DEFINE_int32(gnss_mode, 0, "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");

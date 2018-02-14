@@ -37,7 +37,7 @@ class ContiRadarIDExpansion {
 
   void SetNeedRestart(const bool need_restart);
 
-  void UpdateTimestamp(const double &timestamp);
+  void UpdateTimestamp(const double& timestamp);
 
  private:
   int GetNextId();

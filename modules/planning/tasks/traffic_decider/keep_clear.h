@@ -21,6 +21,8 @@
 #ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_KEEP_CLEAR_H_
 #define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_KEEP_CLEAR_H_
 
+#include <string>
+
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
 namespace apollo {
@@ -38,10 +40,10 @@ class KeepClear : public TrafficRule {
                  ReferenceLineInfo* const reference_line_info);
 
  private:
-  bool BuildKeepClearObstacle(
-      Frame* const frame,
-      ReferenceLineInfo* const reference_line_info,
-      hdmap::PathOverlap* const keep_clear_overlap);
+  bool BuildKeepClearObstacle(Frame* const frame,
+                              ReferenceLineInfo* const reference_line_info,
+                              hdmap::PathOverlap* const keep_clear_overlap,
+                              const std::string& virtual_obstacle_id);
 };
 
 }  // namespace planning

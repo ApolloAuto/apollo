@@ -1,9 +1,7 @@
 import STORE from "store";
 import RENDERER from "renderer";
 
-const protobuf = require("protobufjs/light");
-const root = protobuf.Root.fromJSON(require("../../../proto_bundle/proto_bundle.json"));
-const SimWorldMessage = root.lookupType("apollo.dreamview.SimulationWorld");
+const Worker = require('worker-loader!utils/webworker.js');
 
 export default class RosWebSocketEndpoint {
     constructor(serverAddr) {
@@ -14,7 +12,8 @@ export default class RosWebSocketEndpoint {
         this.lastSeqNum = -1;
         this.currMapRadius = null;
         this.updatePOI = true;
-        this.updateGround = true;
+        this.routingTime = undefined;
+        this.worker = new Worker();
     }
 
     initialize() {
@@ -30,26 +29,23 @@ export default class RosWebSocketEndpoint {
             return;
         }
         this.websocket.onmessage = event => {
-            let message = null;
-            if (typeof event.data === "string") {
-                message = JSON.parse(event.data);
-            } else {
-                message = SimWorldMessage.toObject(
-                        SimWorldMessage.decode(new Uint8Array(event.data)),
-                        {enums: String});
-                message.type = "SimWorldUpdate";
-            }
-
+            this.worker.postMessage({
+                source: 'realtime',
+                data: event.data,
+            });
+        };
+        this.worker.onmessage = event => {
+            const message = event.data;
             switch (message.type) {
                 case "HMIConfig":
                     STORE.hmi.initialize(message.data);
                     break;
                 case "HMIStatus":
                     STORE.hmi.updateStatus(message.data);
-                    if (this.updateGround) {
-                        RENDERER.updateGroundImage(STORE.hmi.currentMap);
-                        this.updateGround = false;
-                    }
+                    RENDERER.updateGroundImage(STORE.hmi.currentMap);
+                    break;
+                case "SimControlStatus":
+                    STORE.setOptionStatus('simControlEnabled', message.enabled);
                     break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
@@ -75,18 +71,22 @@ export default class RosWebSocketEndpoint {
                         RENDERER.updateMapIndex(message.mapHash,
                             message.mapElementIds, message.mapRadius);
                     }
+                    if (this.routingTime !== message.routingTime) {
+                        // A new routing needs to be fetched from backend.
+                        this.requestRoutePath();
+                        this.routingTime = message.routingTime;
+                    }
                     this.counter += 1;
                     break;
                 case "MapElementIds":
                     RENDERER.updateMapIndex(message.mapHash,
                             message.mapElementIds, message.mapRadius);
                     break;
-                case "MapData":
-                    RENDERER.updateMap(message.data);
-                    STORE.setInitializationStatus(true);
-                    break;
                 case "DefaultEndPoint":
                     STORE.routeEditingManager.updateDefaultRoutingEndPoint(message);
+                    break;
+                case "RoutePath":
+                    RENDERER.updateRouting(message.routingTime, message.routePath);
                     break;
             }
         };
@@ -127,13 +127,6 @@ export default class RosWebSocketEndpoint {
                 ". New seq: " + world.sequenceNum + ".");
         }
         this.lastSeqNum = world.sequenceNum;
-    }
-
-    requestMapData(elements) {
-        this.websocket.send(JSON.stringify({
-            type: "RetrieveMapData",
-            elements: elements,
-        }));
     }
 
     requestMapElementIdsByRadius(radius) {
@@ -183,7 +176,6 @@ export default class RosWebSocketEndpoint {
             new_map: map,
         }));
         this.updatePOI = true;
-        this.updateGround = true;
     }
 
     changeVehicle(vehcile) {
@@ -235,6 +227,12 @@ export default class RosWebSocketEndpoint {
         this.websocket.send(JSON.stringify({
             type: "ToggleSimControl",
             enable: enable,
+        }));
+    }
+
+    requestRoutePath() {
+        this.websocket.send(JSON.stringify({
+            type: "RequestRoutePath",
         }));
     }
 }

@@ -50,15 +50,11 @@ class DAGStreaming : public Thread {
 
   void Stop();
 
-  size_t NumSubnodes() const {
-    return subnode_map_.size();
-  }
+  size_t NumSubnodes() const { return subnode_map_.size(); }
 
   void Reset();
 
-  void RemoveStaleData() {
-    shared_data_manager_.RemoveStaleData();
-  }
+  void RemoveStaleData() { shared_data_manager_.RemoveStaleData(); }
 
   size_t CongestionValue() const;
 
@@ -95,9 +91,7 @@ class DAGStreamingMonitor : public Thread {
 
   virtual ~DAGStreamingMonitor() {}
 
-  void Stop() {
-    stop_ = true;
-  }
+  void Stop() { stop_ = true; }
 
  protected:
   void Run() override;

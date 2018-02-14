@@ -7,8 +7,8 @@ import PARAMETERS from "store/config/parameters.yml";
 export default class Ground {
     constructor() {
         this.type = "default";
-        this.loaded_map = null;
-        this.update_map = null;
+        this.loadedMap = null;
+        this.updateMap = null;
         this.mesh = null;
         this.geometry = null;
         this.initialized = false;
@@ -25,7 +25,7 @@ export default class Ground {
             return false;
         }
 
-        if (this.loaded_map === this.update_map && !this.render(coordinates)) {
+        if (this.loadedMap === this.updateMap && !this.render(coordinates)) {
             return false;
         }
 
@@ -34,9 +34,10 @@ export default class Ground {
     }
 
     update(world, coordinates, scene) {
-        if (this.initialized === true && this.loaded_map !== this.update_map) {
-            const dir = this.titleCaseToSnakeCase(this.update_map);
-            const server = 'http://' + window.location.hostname + ':8888';
+        if (this.initialized === true && this.loadedMap !== this.updateMap) {
+            const dir = this.titleCaseToSnakeCase(this.updateMap);
+            const host = window.location;
+            const server = `${host.protocol}//${host.hostname}:${PARAMETERS.server.port}`;
             const imgUrl = server + '/assets/map_data/' + dir + '/background.jpg';
             loadTexture(imgUrl, texture => {
                 console.log("updating ground image with " + dir);
@@ -49,12 +50,12 @@ export default class Ground {
                     this.render(coordinates);
                 });
             });
-            this.loaded_map = this.update_map;
+            this.loadedMap = this.updateMap;
         }
     }
 
     updateImage(mapName) {
-        this.update_map = mapName;
+        this.updateMap = mapName;
     }
 
     render(coordinates, mapName = 'defaults') {
