@@ -16,6 +16,8 @@
 
 #include "modules/map/relative_map/navigation_lane.h"
 
+#include <limits>
+
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
