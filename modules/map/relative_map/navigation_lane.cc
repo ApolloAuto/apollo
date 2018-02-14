@@ -143,7 +143,11 @@ void NavigationLane::ConvertLaneMarkerToPath(
     point->set_x(x1);
     point->set_y(y1);
     point->set_s(accumulated_s);
-    accumulated_s += std::hypot(x1, y1);
+
+    if (path->path_point_size() > 1) {
+      auto& pre_point = path->path_point(path->path_point_size() - 2);
+      accumulated_s += std::hypot(x1 - pre_point.x(), y1 - pre_point.y());
+    }
   }
 }
 
