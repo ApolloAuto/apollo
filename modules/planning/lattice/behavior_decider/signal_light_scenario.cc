@@ -20,6 +20,7 @@
 
 #include "modules/planning/lattice/behavior_decider/signal_light_scenario.h"
 
+#include <algorithm>
 #include <limits>
 #include <string>
 #include <vector>
@@ -40,119 +41,107 @@ using apollo::common::util::WithinBound;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 
-void SignalLightScenario::Reset() {}
-
-bool SignalLightScenario::Init() {
-  exist_ = true;
-  return exist_;
-}
-
 int SignalLightScenario::ComputeScenarioDecision(
     Frame* frame, ReferenceLineInfo* const reference_line_info,
     PlanningTarget* planning_target) {
   CHECK(frame != nullptr);
 
-  if (!FindValidSignalLight(reference_line_info)) {
+  auto signals_from_map = FindValidSignalLightFromMap(reference_line_info);
+  if (signals_from_map.empty()) {
     ADEBUG << "No valid signal light along reference line";
     return 0;
   }
-  ReadSignals();
+  auto detected_signals = GetPerceptionDetectedSignals();
 
-  for (const hdmap::PathOverlap* signal_light :
-       signal_lights_along_reference_line_) {
-    const TrafficLight signal = GetSignal(signal_light->object_id);
+  double stop_s = std::numeric_limits<double>::max();
+  for (const auto signal_from_map : signals_from_map) {
+    auto it_signal = detected_signals.find(signal_from_map->object_id);
+    if (it_signal == detected_signals.end()) {
+      AWARN << "Cannot detect signal which is marked on the map; signal id: "
+          << signal_from_map->object_id;
+      continue;
+    }
+
     double stop_deceleration =
-        GetStopDeceleration(reference_line_info, signal_light);
+        EstimateStopDeceleration(reference_line_info, signal_from_map);
 
-    if ((signal.color() == TrafficLight::RED &&
+    if ((it_signal->second->color() == TrafficLight::RED &&
          stop_deceleration < FLAGS_max_stop_deceleration) ||
         // (signal.color() == TrafficLight::UNKNOWN &&
         //  stop_deceleration < FLAGS_max_stop_deceleration) ||
-        (signal.color() == TrafficLight::YELLOW &&
+        (it_signal->second->color() == TrafficLight::YELLOW &&
          stop_deceleration < FLAGS_max_stop_deacceleration_for_yellow_light)) {
-      CreateStopObstacle(frame, reference_line_info, signal_light);
+      CreateStopObstacle(frame, reference_line_info, signal_from_map);
+
+      stop_s = std::min(stop_s, signal_from_map->start_s);
     }
+  }
+
+  if (stop_s < std::numeric_limits<double>::max()) {
+    planning_target->set_stop_point(stop_s);
   }
 
   return 0;
 }
 
-bool SignalLightScenario::FindValidSignalLight(
+std::vector<const hdmap::PathOverlap*>
+SignalLightScenario::FindValidSignalLightFromMap(
     ReferenceLineInfo* const reference_line_info) {
+
   const std::vector<hdmap::PathOverlap>& signal_lights =
       reference_line_info->reference_line().map_path().signal_overlaps();
-  if (signal_lights.size() <= 0) {
+  if (signal_lights.size() == 0) {
     ADEBUG << "No signal lights from reference line.";
-    return false;
-  } else {
-    ADEBUG << "Found signal_lights size=" << signal_lights.size();
+    return std::vector<const hdmap::PathOverlap*>();
   }
-  signal_lights_along_reference_line_.clear();
-  for (const hdmap::PathOverlap& signal_light : signal_lights) {
+  ADEBUG << "Found signal_lights size=" << signal_lights.size();
+
+  std::vector<const hdmap::PathOverlap*> signal_lights_along_reference_line;
+  for (const auto& signal_light : signal_lights) {
     if (signal_light.start_s + FLAGS_max_stop_distance_buffer >
         reference_line_info->AdcSlBoundary().end_s()) {
-      signal_lights_along_reference_line_.push_back(&signal_light);
+      signal_lights_along_reference_line.push_back(&signal_light);
     }
   }
-  return signal_lights_along_reference_line_.size() > 0;
+  return signal_lights_along_reference_line;
 }
 
-void SignalLightScenario::ReadSignals() {
-  detected_signals_.clear();
-  detected_signals_.clear();
-  if (AdapterManager::GetTrafficLightDetection()->Empty()) {
-    return;
+std::unordered_map<std::string, const TrafficLight*>
+SignalLightScenario::GetPerceptionDetectedSignals() {
+  if (AdapterManager::GetTrafficLightDetection()->Empty() ||
+      (AdapterManager::GetTrafficLightDetection()->GetDelaySec() >
+            FLAGS_signal_expire_time_sec)) {
+    ADEBUG << "traffic light signals msg is either empty or outdated.";
+    return std::unordered_map<std::string, const TrafficLight*>();
   }
-  if (AdapterManager::GetTrafficLightDetection()->GetDelaySec() >
-      FLAGS_signal_expire_time_sec) {
-    AWARN << "traffic signals msg is expired: "
-          << AdapterManager::GetTrafficLightDetection()->GetDelaySec();
-    return;
-  }
-  const TrafficLightDetection& detection =
+
+  std::unordered_map<std::string, const TrafficLight*> detected_signals;
+  const auto& signal_msg =
       AdapterManager::GetTrafficLightDetection()->GetLatestObserved();
-  for (int j = 0; j < detection.traffic_light_size(); j++) {
-    const TrafficLight& signal = detection.traffic_light(j);
-    detected_signals_[signal.id()] = &signal;
+
+  for (int j = 0; j < signal_msg.traffic_light_size(); ++j) {
+    const auto& signal = signal_msg.traffic_light(j);
+    detected_signals[signal.id()] = &signal;
   }
+  return detected_signals;
 }
 
-TrafficLight SignalLightScenario::GetSignal(const std::string& signal_id) {
-  const auto* result =
-      apollo::common::util::FindPtrOrNull(detected_signals_, signal_id);
-  if (result == nullptr) {
-    TrafficLight traffic_light;
-    traffic_light.set_id(signal_id);
-    traffic_light.set_color(TrafficLight::UNKNOWN);
-    traffic_light.set_confidence(0.0);
-    traffic_light.set_tracking_time(0.0);
-    return traffic_light;
-  }
-  return *result;
-}
-
-double SignalLightScenario::GetStopDeceleration(
+double SignalLightScenario::EstimateStopDeceleration(
     ReferenceLineInfo* const reference_line_info,
     const hdmap::PathOverlap* signal_light) {
-  double adc_speed =
+  double ego_speed =
       common::VehicleStateProvider::instance()->linear_velocity();
-  if (adc_speed < FLAGS_max_stop_speed) {
-    return 0.0;
-  }
-  double stop_distance = 0.0;
-  double adc_front_s = reference_line_info->AdcSlBoundary().end_s();
-  double stop_line_s = signal_light->start_s;
 
-  if (stop_line_s > adc_front_s) {
-    stop_distance = stop_line_s - adc_front_s;
+  double ego_front_s = reference_line_info->AdcSlBoundary().end_s();
+  double stop_s = signal_light->start_s;
+
+  if (stop_s >= ego_front_s) {
+    double stop_distance = stop_s - ego_front_s;
+    return (ego_speed * ego_speed) / stop_distance * 0.5;
   } else {
-    stop_distance = stop_line_s + FLAGS_max_stop_distance_buffer - adc_front_s;
-  }
-  if (stop_distance < 1e-5) {
     // longitudinal_acceleration_lower_bound is a negative value.
     return -FLAGS_longitudinal_acceleration_lower_bound;
   }
-  return (adc_speed * adc_speed) / (2 * stop_distance);
 }
 
 void SignalLightScenario::CreateStopObstacle(
