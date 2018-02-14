@@ -30,6 +30,18 @@ class RoutingData:
         self.segment_x = []
         self.segment_y = []
 
+    def update_navigation(self, navigation_info_pb):
+        routing_x = []
+        routing_y = []
+        for navi_path in navigation_info_pb.navigation_path:
+            for path_point in navi_path.path.path_point:
+                routing_x.append(path_point.x)
+                routing_y.append(path_point.y)
+        self.routing_data_lock.acquire()
+        self.routing_x = routing_x
+        self.routing_y = routing_y
+        self.routing_data_lock.release()
+
     def update(self, routing_str):
         self.routing_str = routing_str
         routing_json = json.loads(routing_str.data)
