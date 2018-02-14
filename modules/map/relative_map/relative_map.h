@@ -21,6 +21,7 @@
 #include <string>
 
 #include "modules/map/relative_map/proto/navigation.pb.h"
+#include "modules/map/relative_map/proto/relative_map_config.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
@@ -82,7 +83,11 @@ class RelativeMap : public RelativeMapInterface {
       const apollo::perception::PerceptionObstacles& perception_obstacles,
       MapMsg* map_msg);
 
+  bool CreateMapFromNavigationPath(const NavigationPath& navigation_path,
+                                   hdmap::Map* hdmap);
+
   common::adapter::AdapterManagerConfig adapter_conf_;
+  RelativeMapConfig config_;
   apollo::common::monitor::MonitorLogger monitor_logger_;
 
   NavigationLane navigation_lane_;

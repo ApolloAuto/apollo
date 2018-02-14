@@ -18,4 +18,7 @@
 
 DEFINE_string(relative_map_adapter_config_filename,
               "modules/map/relative_map/conf/adapter.conf",
-              "Default conf file for relative map");
+              "gflags conf file for relative map");
+DEFINE_string(relative_map_config_filename,
+              "modules/map/relative_map/conf/relative_map_config.pb.txt",
+              "Relative map configuration file");

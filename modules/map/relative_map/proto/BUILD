@@ -21,4 +21,18 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "relative_map_config_proto",
+    deps = [
+        ":relative_map_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "relative_map_config_proto_lib",
+    srcs = [
+        "relative_map_config.proto",
+    ],
+)
+
 cpplint()
