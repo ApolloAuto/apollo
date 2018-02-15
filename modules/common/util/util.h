@@ -82,6 +82,8 @@ common::math::Vec2d MakeVec2d(const T& t) {
 
 PointENU MakePointENU(const double x, const double y, const double z);
 
+PointENU operator+(const PointENU enu, const math::Vec2d& xy);
+
 PointENU MakePointENU(const math::Vec2d& xy);
 
 apollo::perception::Point MakePerceptionPoint(const double x, const double y,
