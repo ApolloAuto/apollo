@@ -151,7 +151,7 @@ class ReferenceLineInfo {
   void SetObjectDecisions(ObjectDecisions* object_decisions) const;
   const common::VehicleState vehicle_state_;
   const common::TrajectoryPoint adc_planning_point_;
-  const ReferenceLine reference_line_;
+  ReferenceLine reference_line_;
 
   /**
    * @brief this is the number that measures the goodness of this reference

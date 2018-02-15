@@ -28,7 +28,7 @@ DEFINE_string(planning_adapter_config_filename,
               "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
 
-DEFINE_string(smoother_config_file,
+DEFINE_string(smoother_config_filename,
               "modules/planning/conf/smoother_config.pb.txt",
               "The configuration file for qp sline smoother");
 
