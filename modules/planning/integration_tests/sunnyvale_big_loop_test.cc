@@ -315,6 +315,19 @@ TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   FLAGS_enable_prediction = true;
 }
 
+TEST_F(SunnyvaleBigLoopTest, abort_change_lane_for_fast_back_vehicle) {
+  std::string seq_num = "11";
+  FLAGS_enable_traffic_light = true;
+  FLAGS_enable_keep_clear = false;
+
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(0);
+}
+
 }  // namespace planning
 }  // namespace apollo
 
