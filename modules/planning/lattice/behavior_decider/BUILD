@@ -18,8 +18,8 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/lattice/behavior_decider:path_time_graph",
         "//modules/planning/lattice/behavior_decider:condition_filter",
-        "//modules/planning/lattice/behavior_decider:path_time_neighborhood",
         "//modules/planning/lattice/behavior_decider:scenario_manager",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/proto:planning_proto",
@@ -86,12 +86,12 @@ cc_library(
 )
 
 cc_library(
-    name = "path_time_neighborhood",
-    srcs = [
-        "path_time_neighborhood.cc",
-    ],
+    name = "path_time_graph",
     hdrs = [
-        "path_time_neighborhood.h",
+        "path_time_graph.h",
+    ],
+    srcs = [
+        "path_time_graph.cc",
     ],
     deps = [
         "//modules/common",
@@ -117,8 +117,8 @@ cc_library(
     ],
     deps = [
         "//modules/common/math:linear_interpolation",
+        "//modules/planning/lattice/behavior_decider:path_time_graph",
         "//modules/planning/lattice/behavior_decider:feasible_region",
-        "//modules/planning/lattice/behavior_decider:path_time_neighborhood",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/proto:planning_proto",
     ],

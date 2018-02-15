@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_PATH_TIME_NEIGHBORHOOD_H_
-#define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_PATH_TIME_NEIGHBORHOOD_H_
+#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_PATH_TIME_GRAPH_H_
+#define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_PATH_TIME_GRAPH_H_
 
 #include <array>
 #include <string>
@@ -37,9 +37,9 @@
 namespace apollo {
 namespace planning {
 
-class PathTimeNeighborhood {
+class PathTimeGraph {
  public:
-  PathTimeNeighborhood(
+  PathTimeGraph(
       const std::vector<const Obstacle*>& obstacles, const double ego_s,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
@@ -60,6 +60,9 @@ class PathTimeNeighborhood {
   std::pair<double, double> get_path_range() const;
 
   std::pair<double, double> get_time_range() const;
+
+  std::vector<std::pair<double, double>> GetPathTimeNeighborhoodPoints(
+      const double s_dist, const double t_density) const;
 
  private:
   void SetupObstacles(
@@ -95,4 +98,4 @@ class PathTimeNeighborhood {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_PATH_TIME_NEIGHBORHOOD_H_
+#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_PATH_TIME_GRAPH_H_

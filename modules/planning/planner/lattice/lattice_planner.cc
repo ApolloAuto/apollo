@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 
+#include "../../lattice/behavior_decider/path_time_graph.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
@@ -33,7 +34,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
-#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
 #include "modules/planning/lattice/trajectory_generator/backup_trajectory_generator.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_combiner.h"
@@ -159,8 +159,8 @@ Status LatticePlanner::PlanOnReferenceLine(
   current_time = Clock::NowInSeconds();
 
   // 4. parse the decision and get the planning target.
-  std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_ptr(
-      new PathTimeNeighborhood(frame->obstacles(), init_s[0],
+  std::shared_ptr<PathTimeGraph> path_time_neighborhood_ptr(
+      new PathTimeGraph(frame->obstacles(), init_s[0],
                                discretized_reference_line));
 
   decider_.UpdatePathTimeNeighborhood(path_time_neighborhood_ptr);
