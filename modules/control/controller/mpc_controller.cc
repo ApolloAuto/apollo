@@ -61,10 +61,10 @@ void WriteHeaders(std::ofstream &file_stream) {}
 
 MPCController::MPCController() : name_("MPC Controller") {
   if (FLAGS_enable_csv_debug) {
-    steer_log_file_.open(GetLogFileName());
-    steer_log_file_ << std::fixed;
-    steer_log_file_ << std::setprecision(6);
-    WriteHeaders(steer_log_file_);
+    mpc_log_file_.open(GetLogFileName());
+    mpc_log_file_ << std::fixed;
+    mpc_log_file_ << std::setprecision(6);
+    WriteHeaders(mpc_log_file_);
   }
   AINFO << "Using " << name_;
 }
@@ -215,8 +215,8 @@ Status MPCController::Init(const ControlConf *control_conf) {
 }
 
 void MPCController::CloseLogFile() {
-  if (FLAGS_enable_csv_debug && steer_log_file_.is_open()) {
-    steer_log_file_.close();
+  if (FLAGS_enable_csv_debug && mpc_log_file_.is_open()) {
+    mpc_log_file_.close();
   }
 }
 
