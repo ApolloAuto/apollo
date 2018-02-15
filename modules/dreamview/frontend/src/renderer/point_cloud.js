@@ -35,7 +35,7 @@ export default class PointCloud {
         geometry.colors = colors;
 
         const material = new THREE.PointsMaterial({
-            size: 0.1,
+            size: 0.2,
             transparent: true,
             opacity: 0.7,
             vertexColors: THREE.VertexColors

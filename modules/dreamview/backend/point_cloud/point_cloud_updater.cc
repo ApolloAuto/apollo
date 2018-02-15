@@ -30,6 +30,7 @@ namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
+using apollo::localization::LocalizationEstimate;
 using sensor_msgs::PointCloud2;
 using Json = nlohmann::json;
 
@@ -54,8 +55,8 @@ void PointCloudUpdater::RegisterMessageHandlers() {
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         std::string to_send;
         // If there is no point_cloud data for more than 2 seconds, reset.
-        if ((point_cloud_.num_size() > 0) &&
-            (Clock::NowInSeconds() - last_receive_time_ > 2.0)) {
+        if (point_cloud_.num_size() > 0 &&
+            std::fabs(last_localization_time_ - last_point_cloud_time_) > 2.0) {
           point_cloud_.clear_num();
           boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
           point_cloud_.SerializeToString(&point_cloud_str_);
@@ -90,6 +91,8 @@ void PointCloudUpdater::RegisterMessageHandlers() {
 void PointCloudUpdater::Start() {
   AdapterManager::AddPointCloudCallback(&PointCloudUpdater::UpdatePointCloud,
                                         this);
+  AdapterManager::AddLocalizationCallback(
+    &PointCloudUpdater::UpdateLocalizationTime, this);
 }
 
 void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
@@ -97,7 +100,7 @@ void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
     return;
   }
 
-  last_receive_time_ = Clock::NowInSeconds();
+  last_point_cloud_time_ = point_cloud.header.stamp.toSec();
   // transform from ros to pcl
   pcl::PointCloud<pcl::PointXYZ> pcl_data;
   pcl::fromROSMsg(point_cloud, pcl_data);
@@ -117,6 +120,11 @@ void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
     point_cloud_.SerializeToString(&point_cloud_str_);
   }
+}
+
+void PointCloudUpdater::UpdateLocalizationTime(
+  const LocalizationEstimate &localization) {
+  last_localization_time_ = localization.header().timestamp_sec();
 }
 
 }  // namespace dreamview
