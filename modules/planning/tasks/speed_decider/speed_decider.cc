@@ -203,6 +203,11 @@ Status SpeedDecider::MakeObjectDecision(
             path_obstacle->AddLongitudinalDecision("dp_st_graph/cross",
                                                    stop_decision);
           }
+          const std::string msg =
+              "Failed to find a solution for crossing obstacle:" +
+              obstacle->Id();
+          AERROR << msg;
+          return Status(ErrorCode::PLANNING_ERROR, msg);
         }
         break;
       default:

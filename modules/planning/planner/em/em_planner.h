@@ -28,6 +28,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/reference_line_info.h"
+#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -92,6 +93,20 @@ class EMPlanner : public Planner {
 
   std::vector<common::SpeedPoint> GenerateSpeedHotStart(
       const common::TrajectoryPoint& planning_init_point);
+
+  void GenerateFallbackPathProfile(const ReferenceLineInfo* reference_line_info,
+                                   PathData* path_data);
+
+  void GenerateFallbackSpeedProfile(
+      const ReferenceLineInfo* reference_line_info, SpeedData* speed_data);
+
+  SpeedData GenerateStopProfile(const double init_speed,
+                                const double init_acc) const;
+
+  SpeedData GenerateStopProfileFromPolynomial(const double init_speed,
+                                              const double init_acc) const;
+
+  bool IsValidProfile(const QuinticPolynomialCurve1d& curve) const;
 
   void RecordObstacleDebugInfo(ReferenceLineInfo* reference_line_info);
 
