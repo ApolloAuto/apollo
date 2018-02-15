@@ -139,6 +139,8 @@ message SimpleMPCDebug {
   optional double acceleration_lookup = 28;
   optional double speed_lookup = 29;
   optional double calibration_value = 30;
+  repeated double matrix_q_updated = 31;     // matrix_q_updated_ size = 6
+  repeated double matrix_r_updated = 32;    // matrix_r_updated_ size = 2
 }
 
 message InputDebug {
