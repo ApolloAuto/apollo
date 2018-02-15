@@ -44,10 +44,10 @@ using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::util::Dropbox;
-using apollo::common::adapter::AdapterManager;
 
 ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
                                      const TrajectoryPoint& adc_planning_point,
@@ -93,6 +93,13 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   if (!AddObstacles(obstacles)) {
     AERROR << "Failed to add obstacles to reference line";
     return false;
+  }
+
+  if (hdmap::GetSpeedControls()) {
+    auto* speed_controls = hdmap::GetSpeedControls();
+    for (const auto& speed_control : speed_controls->speed_control()) {
+      reference_line_.AddSpeedLimit(speed_control);
+    }
   }
 
   if (FLAGS_use_navigation_mode && FLAGS_enable_prediction) {
