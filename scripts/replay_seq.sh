@@ -16,6 +16,6 @@
 # limitations under the License.
 ###############################################################################
 
-# e.g. replay.sh 1_chassis.pb.txt
+# e.g. replay_seq.sh 11
 
-python /apollo/modules/tools/replay/replay_file.py $@
+python /apollo/modules/tools/replay/replay_sequence.py $@
