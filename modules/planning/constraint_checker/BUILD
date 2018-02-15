@@ -29,11 +29,11 @@ cc_library(
         "constraint_checker1d.h",
     ],
     deps = [
-        "//modules/planning/math/curve1d:curve1d",
-        "//modules/planning/common:planning_gflags",
         "//modules/common:log",
-        "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common:frame",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/math/curve1d",
     ],
 )
 
@@ -47,13 +47,13 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math:box2d",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/lattice/util:reference_line_frame_converter",
         "//modules/prediction/proto:prediction_proto",
-        "//modules/common/configs:vehicle_config_helper",
     ],
 )
 
