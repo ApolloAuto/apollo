@@ -53,6 +53,11 @@ using common::adapter::AdapterManager;
 using common::math::Vec2d;
 using common::time::Clock;
 
+namespace {
+constexpr double kPathOptimizationFallbackClost = 2e4;
+constexpr double kSpeedOptimizationFallbackClost = 2e4;
+}
+
 void EMPlanner::RegisterTasks() {
   task_factory_.Register(TRAFFIC_DECIDER,
                          []() -> Task* { return new TrafficDecider(); });
@@ -199,7 +204,6 @@ Status EMPlanner::PlanOnReferenceLine(
     const double start_timestamp = Clock::NowInSeconds();
     ret = optimizer->Execute(frame, reference_line_info);
     if (!ret.ok()) {
-      reference_line_info->AddCost(std::numeric_limits<double>::infinity());
       AERROR << "Failed to run tasks[" << optimizer->Name()
              << "], Error message: " << ret.error_message();
       break;
@@ -217,13 +221,17 @@ Status EMPlanner::PlanOnReferenceLine(
   RecordObstacleDebugInfo(reference_line_info);
 
   if (reference_line_info->path_data().Empty()) {
+    ADEBUG << "Path fallback.";
     GenerateFallbackPathProfile(reference_line_info,
                                 reference_line_info->mutable_path_data());
+    reference_line_info->AddCost(kPathOptimizationFallbackClost);
   }
 
-  if (reference_line_info->speed_data().Empty()) {
+  if (!ret.ok() || reference_line_info->speed_data().Empty()) {
+    ADEBUG << "Speed fallback.";
     GenerateFallbackSpeedProfile(reference_line_info,
                                  reference_line_info->mutable_speed_data());
+    reference_line_info->AddCost(kSpeedOptimizationFallbackClost);
   }
 
   DiscretizedTrajectory trajectory;
@@ -251,10 +259,8 @@ Status EMPlanner::PlanOnReferenceLine(
   }
 
   reference_line_info->SetTrajectory(trajectory);
-  if (ret == Status::OK()) {  // vehicle can drive on this reference line.
-    reference_line_info->SetDrivable(true);
-  }
-  return ret;
+  reference_line_info->SetDrivable(true);
+  return Status::OK();
 }
 
 std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
@@ -368,8 +374,8 @@ void EMPlanner::GenerateFallbackPathProfile(
     path_point.set_s(s);
 
     path_points.push_back(std::move(path_point));
-    path_data->SetDiscretizedPath(DiscretizedPath(path_points));
   }
+  path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));
 }
 
 void EMPlanner::GenerateFallbackSpeedProfile(
