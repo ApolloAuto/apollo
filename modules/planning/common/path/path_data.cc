@@ -72,7 +72,7 @@ const DiscretizedPath &PathData::discretized_path() const {
   return discretized_path_;
 }
 
-bool PathData::IsEmpty() const {
+bool PathData::Empty() const {
   return discretized_path_.NumOfPoints() == 0 &&
          frenet_path_.NumOfPoints() == 0;
 }
