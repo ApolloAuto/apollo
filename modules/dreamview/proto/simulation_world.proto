@@ -4,6 +4,7 @@ package apollo.dreamview;
 
 import "modules/common/monitor_log/proto/monitor_log.proto";
 import "modules/planning/proto/planning_internal.proto";
+import "modules/perception/proto/perception_obstacle.proto";
 
 // Next-id: 4
 message PolygonPoint {
@@ -168,7 +169,7 @@ message MapElementIds {
   repeated string clear_area = 9;
 }
 
-// Next-id: 17
+// Next-id: 22
 message SimulationWorld {
   // Timestamp in milliseconds
   optional double timestamp = 1;
@@ -199,6 +200,7 @@ message SimulationWorld {
   // Speed limit
   optional double speed_limit = 10;
 
+  // Module delays
   optional DelaysInMs delay = 11;
 
   optional apollo.common.monitor.MonitorMessage monitor = 12;
@@ -219,4 +221,7 @@ message SimulationWorld {
 
   // GPS
   optional Object gps = 20;
+
+  // Lane Markers from perception
+  optional apollo.perception.LaneMarkers lane_marker = 21;
 }

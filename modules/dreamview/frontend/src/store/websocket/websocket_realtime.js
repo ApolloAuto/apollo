@@ -98,7 +98,8 @@ export default class RosWebSocketEndpoint {
         // Request simulation world every 100ms.
         clearInterval(this.timer);
         this.timer = setInterval(() => {
-            if (this.websocket.readyState === this.websocket.OPEN) {
+            if (this.websocket.readyState === this.websocket.OPEN &&
+                !STORE.hmi.showNavigationMap) {
                 // Load default routing end point.
                 if (this.updatePOI) {
                     this.requestDefaultRoutingEndPoint();
