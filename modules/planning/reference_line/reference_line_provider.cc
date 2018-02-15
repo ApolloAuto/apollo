@@ -77,9 +77,10 @@ ReferenceLineProvider::ReferenceLineProvider(
   if (s_smoother_factory_.Empty()) {
     RegisterSmoothers();
   }
-  CHECK(common::util::GetProtoFromFile(FLAGS_smoother_config_file,
+  CHECK(common::util::GetProtoFromFile(FLAGS_smoother_config_filename,
                                        &smoother_config_))
-      << "Failed to load smoother config file " << FLAGS_smoother_config_file;
+      << "Failed to load smoother config file "
+      << FLAGS_smoother_config_filename;
   smoother_ = s_smoother_factory_.CreateObject(smoother_type, smoother_config_);
   is_initialized_ = true;
 }  // namespace planning
