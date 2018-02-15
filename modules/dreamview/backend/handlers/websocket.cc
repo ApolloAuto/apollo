@@ -26,8 +26,8 @@ limitations under the License.
 namespace apollo {
 namespace dreamview {
 
-using apollo::common::util::StrCat;
 using apollo::common::util::ContainsKey;
+using apollo::common::util::StrCat;
 
 void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
   {
@@ -151,6 +151,19 @@ bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
     return false;
   }
 
+  switch (bits &= 0x7f) {
+    case WEBSOCKET_OPCODE_TEXT:
+      return handleJsonData(conn, data, data_len);
+    case WEBSOCKET_OPCODE_BINARY:
+      return handleBinaryData(conn, data, data_len);
+    default:
+      AERROR << "Unknown WebSocket bits flag: " << bits;
+      return true;
+  }
+}
+
+bool WebSocketHandler::handleJsonData(Connection *conn, char *data,
+                                      size_t data_len) {
   Json json;
   try {
     json = Json::parse(data, data + data_len);
@@ -171,6 +184,14 @@ bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
     return true;
   }
   message_handlers_[type](json, conn);
+  return true;
+}
+
+bool WebSocketHandler::handleBinaryData(Connection *conn, char *data,
+                                        size_t data_len) {
+  auto type = "Binary";
+  std::string data_string(data, data_len);
+  message_handlers_[type](data_string, conn);
   return true;
 }
 

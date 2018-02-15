@@ -69,6 +69,7 @@ Status Dreamview::Init() {
   CHECK(AdapterManager::GetLocalization())
       << "LocalizationAdapter is not initialized.";
   CHECK(AdapterManager::GetMonitor()) << "MonitorAdapter is not initialized.";
+  CHECK(AdapterManager::GetNavigation()) << "NavigationAdapter is not initialized.";
   CHECK(AdapterManager::GetPad()) << "PadAdapter is not initialized.";
   CHECK(AdapterManager::GetPrediction())
       << "PredictionAdapter is not initialized.";
