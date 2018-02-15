@@ -16,6 +16,7 @@ enum TurnSignal {
 message LatencyStats {
   optional double total_time_ms = 1;
   repeated double controller_time_ms = 2;
+  optional bool total_time_exceeded = 3;
 }
 
 // next id : 27
