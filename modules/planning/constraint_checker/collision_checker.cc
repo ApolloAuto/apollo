@@ -20,9 +20,9 @@
 
 #include "modules/planning/constraint_checker/collision_checker.h"
 
-#include <utility>
 #include <array>
 #include <cmath>
+#include <utility>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
@@ -110,14 +110,14 @@ bool CollisionChecker::IgnoreObstaclesBehind(
 }
 
 bool CollisionChecker::IsBehind(
-    const Obstacle* obstacle,
-    const std::array<double, 3>& adc_init_s,
+    const Obstacle* obstacle, const std::array<double, 3>& adc_init_s,
     const std::vector<PathPoint>& discretized_reference_line) {
   double half_lane_width = FLAGS_default_reference_line_width * 0.5;
   TrajectoryPoint point = obstacle->GetPointAtTime(0.0);
   std::pair<double, double> sl_point =
       ReferenceLineFrameConverter::CartesianToFrenet(discretized_reference_line,
-          point.path_point().x(), point.path_point().y());
+                                                     point.path_point().x(),
+                                                     point.path_point().y());
   if (sl_point.first < adc_init_s[0] &&
       std::abs(sl_point.second) < half_lane_width) {
     ADEBUG << "Ignore obstacle [" << obstacle->Id() << "]";

@@ -21,8 +21,8 @@
 #ifndef MODULES_PLANNING_CONSTRAINT_CHECKER_COLLISION_CHECKER_H_
 #define MODULES_PLANNING_CONSTRAINT_CHECKER_COLLISION_CHECKER_H_
 
-#include <vector>
 #include <array>
+#include <vector>
 
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/obstacle.h"
@@ -51,8 +51,7 @@ class CollisionChecker {
   bool IgnoreObstaclesBehind(const std::array<double, 3>& adc_init_d);
 
   bool IsBehind(
-      const Obstacle* obstacle,
-      const std::array<double, 3>& adc_init_s,
+      const Obstacle* obstacle, const std::array<double, 3>& adc_init_s,
       const std::vector<apollo::common::PathPoint>& discretized_reference_line);
 
   std::vector<std::vector<common::math::Box2d>> predicted_envs_;
