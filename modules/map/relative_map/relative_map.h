@@ -84,6 +84,7 @@ class RelativeMap : public RelativeMapInterface {
       MapMsg* map_msg);
 
   bool CreateMapFromNavigationPath(const NavigationPath& navigation_path,
+                                   double left_width, double right_width,
                                    hdmap::Map* hdmap);
 
   common::adapter::AdapterManagerConfig adapter_conf_;
