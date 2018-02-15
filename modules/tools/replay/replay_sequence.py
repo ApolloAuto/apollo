@@ -25,8 +25,7 @@ import rospy
 from std_msgs.msg import String
 from google.protobuf import text_format
 
-import common.proto_utils as proto_utils
-
+import common.message_manager as message_manager
 
 def generate_message(filename, pb_type):
     f_handle = file(filename, 'r')
@@ -40,22 +39,28 @@ def seq_publisher(seq_num, period):
     """publisher"""
     rospy.init_node('replay_node', anonymous=True)
     messages = {}
-    for topic, msg_type in proto_utils.topic_pb_dict.iteritems():
+    for msg in message_manager.topic_pb_list:
+        topic = msg.topic()
+        name = msg.name()
+        msg_type = msg.msg_type()
         messages[topic] = {}
-        filename = str(seq_num) + "_" + topic + ".pb.txt"
+        filename = str(seq_num) + "_" + name + ".pb.txt"
         print "trying to load pb file:", filename
         messages[topic]["publisher"] = rospy.Publisher(
             topic, msg_type, queue_size=1)
-        pb_msg = msg_type()
-        if not proto_utils.get_pb_from_file(filename, pb_msg):
+        pb_msg = msg.parse_file(filename)
+        if not pb_msg:
             print topic, " pb is none"
+            # continue
         messages[topic]["value"] = pb_msg
 
     rate = rospy.Rate(int(1.0 / period))  # 10hz
     while not rospy.is_shutdown():
-        for topic, module_features in messages:
-            if module_features["value"] is not None:
-                module_features["publisher"].publish(module_features["value"])
+        for topic in messages:
+            if messages[topic]["value"] is not None:
+                print "publish: ", topic
+                messages[topic]["publisher"].publish(
+                    messages[topic]["value"])
         rate.sleep()
 
 
