@@ -720,6 +720,31 @@
                 }
               }
             },
+            "SpeedControl": {
+              "fields": {
+                "name": {
+                  "type": "string",
+                  "id": 1
+                },
+                "polygon": {
+                  "type": "apollo.hdmap.Polygon",
+                  "id": 2
+                },
+                "speedLimit": {
+                  "type": "double",
+                  "id": 3
+                }
+              }
+            },
+            "SpeedControls": {
+              "fields": {
+                "speedControl": {
+                  "rule": "repeated",
+                  "type": "SpeedControl",
+                  "id": 1
+                }
+              }
+            },
             "StopSign": {
               "fields": {
                 "id": {
