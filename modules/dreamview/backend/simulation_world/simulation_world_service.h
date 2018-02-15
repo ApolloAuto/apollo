@@ -71,7 +71,9 @@ class SimulationWorldService {
    * @brief Get a read-only view of the SimulationWorld.
    * @return Constant reference to the SimulationWorld object.
    */
-  inline const SimulationWorld &world() const { return world_; }
+  inline const SimulationWorld &world() const {
+    return world_;
+  }
 
   /**
    * @brief Returns the json representation of the SimulationWorld object.
@@ -109,7 +111,9 @@ class SimulationWorldService {
   /**
    * @brief Sets the flag to clear the owned simulation world object.
    */
-  void SetToClear() { to_clear_ = true; }
+  void SetToClear() {
+    to_clear_ = true;
+  }
 
   /**
    * @brief Check whether the SimulationWorld object has enough information.

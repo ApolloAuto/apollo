@@ -50,7 +50,9 @@ class SimControl : SimControlInterface {
    */
   explicit SimControl(const MapService *map_service);
 
-  inline bool IsEnabled() const { return enabled_; }
+  inline bool IsEnabled() const {
+    return enabled_;
+  }
 
   /**
    * @brief setup callbacks and timer

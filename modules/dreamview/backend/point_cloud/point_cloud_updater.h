@@ -42,8 +42,8 @@ namespace dreamview {
 
 /**
  * @class PointCloudUpdater
- * @brief A wrapper around WebSocketHandler to keep pushing PointCloud to frontend
- * via websocket while handling the response from frontend.
+ * @brief A wrapper around WebSocketHandler to keep pushing PointCloud to
+ * frontend via websocket while handling the response from frontend.
  */
 class PointCloudUpdater {
  public:
@@ -67,7 +67,7 @@ class PointCloudUpdater {
   void UpdatePointCloud(const sensor_msgs::PointCloud2 &point_cloud);
 
   void UpdateLocalizationTime(
-    const apollo::localization::LocalizationEstimate &localization);
+      const apollo::localization::LocalizationEstimate &localization);
 
   WebSocketHandler *websocket_;
 
