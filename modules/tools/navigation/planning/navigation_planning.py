@@ -29,6 +29,7 @@ from modules.drivers.proto import mobileye_pb2
 from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.localization.proto import localization_pb2
+from modules.map.relative_map.proto import navigation_pb2
 from path_decider import PathDecider
 from speed_decider import SpeedDecider
 from trajectory_generator import TrajectoryGenerator
@@ -66,7 +67,7 @@ adv = None
 
 
 def routing_callback(routing_str):
-    routing_provider.update(routing_str)
+    routing_provider.update_navigation(routing_str)
 
 
 def localization_callback(localization_pb):
@@ -158,8 +159,8 @@ def init():
     rospy.Subscriber('/apollo/canbus/chassis',
                      chassis_pb2.Chassis,
                      chassis_callback)
-    rospy.Subscriber('/apollo/navigation/routing',
-                     String, routing_callback)
+    rospy.Subscriber('/apollo/navigation',
+                     navigation_pb2.NavigationInfo, routing_callback)
     planning_pub = rospy.Publisher(FLAGS.navigation_planning_topic,
                                    planning_pb2.ADCTrajectory, queue_size=1)
 
