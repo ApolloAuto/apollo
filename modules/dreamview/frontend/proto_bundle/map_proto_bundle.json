@@ -817,6 +817,39 @@
                   "id": 3
                 }
               }
+            },
+            "MapGenerationParam": {
+              "fields": {
+                "defaultLeftWidth": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 1.75
+                  }
+                },
+                "defaultRightWidth": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1.75
+                  }
+                },
+                "defaultSpeedLimit": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 29.0576
+                  }
+                }
+              }
+            },
+            "RelativeMapConfig": {
+              "fields": {
+                "mapParam": {
+                  "type": "MapGenerationParam",
+                  "id": 1
+                }
+              }
             }
           }
         },
