@@ -1,12 +1,12 @@
 const protobuf = require("protobufjs/light");
 const simWorldRoot = protobuf.Root.fromJSON(
-    require("../../proto_bundle/sim_world_proto_bundle.json")
+    require("proto_bundle/sim_world_proto_bundle.json")
 );
 const SimWorldMessage = simWorldRoot.lookupType("apollo.dreamview.SimulationWorld");
-const mapRoot = protobuf.Root.fromJSON(require("../../proto_bundle/map_proto_bundle.json"));
+const mapRoot = protobuf.Root.fromJSON(require("proto_bundle/map_proto_bundle.json"));
 const mapMessage = mapRoot.lookupType("apollo.hdmap.Map");
 const pointCloudRoot = protobuf.Root.fromJSON(
-    require("../../proto_bundle/point_cloud_proto_bundle.json")
+    require("proto_bundle/point_cloud_proto_bundle.json")
 );
 const pointCloudMessage = pointCloudRoot.lookupType("apollo.dreamview.PointCloud");
 
