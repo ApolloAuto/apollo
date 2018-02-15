@@ -36,7 +36,7 @@ using PathTimePointPair = std::pair<PathTimePoint, PathTimePoint>;
 
 ConditionFilter::ConditionFilter(
     const std::array<double, 3>& init_s, const double speed_limit,
-    std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood)
+    std::shared_ptr<PathTimeGraph> path_time_neighborhood)
     : feasible_region_(init_s, speed_limit),
       ptr_path_time_neighborhood_(path_time_neighborhood) {}
 
