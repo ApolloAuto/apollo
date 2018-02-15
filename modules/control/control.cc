@@ -40,7 +40,9 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-std::string Control::Name() const { return FLAGS_control_node_name; }
+std::string Control::Name() const {
+  return FLAGS_control_node_name;
+}
 
 Status Control::Init() {
   init_time_ = Clock::NowInSeconds();
@@ -233,6 +235,8 @@ void Control::OnTimer(const ros::TimerEvent &) {
 
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
   control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
+  control_command.mutable_latency_stats()->set_total_time_exceeded(
+      time_diff_ms < control_conf_.control_period());
   ADEBUG << "control cycle time is: " << time_diff_ms << " ms.";
   status.Save(control_command.mutable_header()->mutable_status());
 
