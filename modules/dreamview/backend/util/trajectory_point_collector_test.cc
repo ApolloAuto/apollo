@@ -29,7 +29,9 @@ namespace util {
 
 class TrajectoryPointCollectorTest : public ::testing::Test {
  public:
-  virtual void SetUp() { apollo::common::VehicleConfigHelper::Init(); }
+  virtual void SetUp() {
+    apollo::common::VehicleConfigHelper::Init();
+  }
 };
 
 TEST_F(TrajectoryPointCollectorTest, ThreePoints) {

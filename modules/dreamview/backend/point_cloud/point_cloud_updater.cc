@@ -20,9 +20,9 @@
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "pcl_conversions/pcl_conversions.h"
 #include "pcl/point_cloud.h"
 #include "pcl/point_types.h"
+#include "pcl_conversions/pcl_conversions.h"
 #include "third_party/json/json.hpp"
 
 namespace apollo {
@@ -65,7 +65,7 @@ void PointCloudUpdater::RegisterMessageHandlers() {
           boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
           to_send = point_cloud_str_;
         }
-        websocket_->SendBinaryData(conn, to_send, true);;
+        websocket_->SendBinaryData(conn, to_send, true);
       });
   websocket_->RegisterMessageHandler(
       "TogglePointCloud",
@@ -92,7 +92,7 @@ void PointCloudUpdater::Start() {
   AdapterManager::AddPointCloudCallback(&PointCloudUpdater::UpdatePointCloud,
                                         this);
   AdapterManager::AddLocalizationCallback(
-    &PointCloudUpdater::UpdateLocalizationTime, this);
+      &PointCloudUpdater::UpdateLocalizationTime, this);
 }
 
 void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
@@ -107,7 +107,7 @@ void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
 
   point_cloud_.Clear();
   for (size_t idx = 0; idx < pcl_data.size(); idx += kDownsampleRate) {
-    pcl::PointXYZ& pt = pcl_data.points[idx];
+    pcl::PointXYZ &pt = pcl_data.points[idx];
     if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z)) {
       point_cloud_.add_num(pt.x);
       point_cloud_.add_num(pt.y);
@@ -123,7 +123,7 @@ void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
 }
 
 void PointCloudUpdater::UpdateLocalizationTime(
-  const LocalizationEstimate &localization) {
+    const LocalizationEstimate &localization) {
   last_localization_time_ = localization.header().timestamp_sec();
 }
 
