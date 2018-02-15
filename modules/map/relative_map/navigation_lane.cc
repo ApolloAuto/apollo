@@ -31,6 +31,7 @@ double GetDistance(const common::VehicleState& adc_state,
   return std::hypot(adc_state.x() - p.x(), adc_state.y() - p.y());
 }
 }
+
 using apollo::perception::PerceptionObstacles;
 using apollo::common::VehicleStateProvider;
 
@@ -54,7 +55,7 @@ bool NavigationLane::Update(const PerceptionObstacles& perception_obstacles) {
       std::fmax(lane_marker.left_lane_marker().quality(),
                 lane_marker.right_lane_marker().quality()) <
           kQualityThreshold) {
-    ConvertNavigationLineToPath();
+    ConvertNavigationLineToPath(path);
   } else {
     ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
   }
@@ -67,34 +68,49 @@ double NavigationLane::EvaluateCubicPolynomial(const double c0, const double c1,
   return c3 * std::pow(z, 3) + c2 * std::pow(z, 2) + c1 * z + c0;
 }
 
-void NavigationLane::ConvertNavigationLineToPath() {
+void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
+  CHECK_NOTNULL(path);
   if (navigation_info_.navigation_path_size() == 0 ||
       !navigation_info_.navigation_path(0).has_path() ||
       navigation_info_.navigation_path(0).path().path_point_size() == 0) {
     // path is empty
     return;
   }
-  navigation_path_.Clear();
-  auto* curr_path = navigation_path_.mutable_path();
+  path->set_name("Path from navigation.");
   UpdateProjectionIndex();
 
   // TODO(All): support multiple navigation path
-  // only support 1 navigation path
-  const auto& path = navigation_info_.navigation_path(0).path();
+  // currently, only 1 navigation path is supported
+  const auto& navigation_path = navigation_info_.navigation_path(0).path();
   int curr_project_index = last_project_index_;
-  for (int i = curr_project_index; i < path.path_point_size(); ++i) {
-    auto* point = curr_path->add_path_point();
-    point->CopyFrom(path.path_point(i));
+
+  // offset between the current vehicle state and navigation line
+  const double dx =
+      adc_state_.x() - navigation_path.path_point(curr_project_index).x();
+  const double dy =
+      adc_state_.y() - navigation_path.path_point(curr_project_index).y();
+  for (int i = curr_project_index; i < navigation_path.path_point_size(); ++i) {
+    auto* point = path->add_path_point();
+    point->CopyFrom(navigation_path.path_point(i));
+
+    // shift to adc_state_ (x, y)
+    point->set_x(point->x() + dx);
+    point->set_y(point->y() + dy);
     const double accumulated_s =
-        path.path_point(i).s() - path.path_point(curr_project_index).s();
+        navigation_path.path_point(i).s() -
+        navigation_path.path_point(curr_project_index).s();
     point->set_s(accumulated_s);
   }
+
+  // set left/right width invalid as no width info from navigation line
+  left_width_ = -1.0;
+  right_width_ = -1.0;
 }
 
 // project adc_state_ onto path
 void NavigationLane::UpdateProjectionIndex() {
   // TODO(All): support multiple navigation path
-  // only support 1 navigation path
+  // currently, only 1 navigation path is supported
   const auto& path = navigation_info_.navigation_path(0).path();
   int index = 0;
   double min_d = std::numeric_limits<double>::max();
@@ -114,6 +130,9 @@ void NavigationLane::UpdateProjectionIndex() {
 
 void NavigationLane::ConvertLaneMarkerToPath(
     const perception::LaneMarkers& lane_marker, common::Path* path) {
+  CHECK_NOTNULL(path);
+
+  path->set_name("Path from lane markers.");
   const auto& left_lane = lane_marker.left_lane_marker();
   const auto& right_lane = lane_marker.right_lane_marker();
 
@@ -128,6 +147,13 @@ void NavigationLane::ConvertLaneMarkerToPath(
     const double x_r = EvaluateCubicPolynomial(
         right_lane.c0_position(), right_lane.c1_heading_angle(),
         right_lane.c2_curvature(), right_lane.c3_curvature_derivative(), z);
+
+    if (left_width_ < 0.0) {
+      left_width_ = std::fabs(x_l);
+    }
+    if (right_width_ < 0.0) {
+      right_width_ = std::fabs(x_r);
+    }
 
     double x1 = 0.0;
     double y1 = 0.0;

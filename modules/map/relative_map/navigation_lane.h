@@ -35,6 +35,8 @@ class NavigationLane {
   }
 
   const NavigationPath& Path() { return navigation_path_; }
+  double left_width() { return left_width_; }
+  double right_width() { return right_width_; }
 
  private:
   double EvaluateCubicPolynomial(const double c0, const double c1,
@@ -43,7 +45,7 @@ class NavigationLane {
   void ConvertLaneMarkerToPath(const perception::LaneMarkers& lane_marker,
                                common::Path* path);
 
-  void ConvertNavigationLineToPath();
+  void ConvertNavigationLineToPath(common::Path* path);
 
   void UpdateProjectionIndex();
 
@@ -55,6 +57,12 @@ class NavigationLane {
 
   // navigation_path_ is the combined results from perception and navigation
   NavigationPath navigation_path_;
+
+  // when invalid, left_width_ < 0
+  double left_width_ = -1.0;
+
+  // when invalid, right_width_ < 0
+  double right_width_ = -1.0;
 
   int last_project_index_ = 0;
 
