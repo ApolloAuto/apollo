@@ -192,7 +192,9 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
   }
 }
 
-inline double SecToMs(const double sec) { return sec * 1000.0; }
+inline double SecToMs(const double sec) {
+  return sec * 1000.0;
+}
 
 }  // namespace
 
@@ -480,6 +482,10 @@ void SimulationWorldService::UpdateSimulationWorld(
     const PerceptionObstacles &obstacles) {
   for (const auto &obstacle : obstacles.perception_obstacle()) {
     CreateWorldObjectIfAbsent(obstacle);
+  }
+
+  if (obstacles.has_lane_marker()) {
+    world_.mutable_lane_marker()->CopyFrom(obstacles.lane_marker());
   }
 }
 

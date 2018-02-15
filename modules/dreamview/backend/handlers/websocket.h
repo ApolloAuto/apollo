@@ -90,6 +90,9 @@ class WebSocketHandler : public CivetWebSocketHandler {
   bool handleData(CivetServer *server, Connection *conn, int bits, char *data,
                   size_t data_len) override;
 
+  bool handleJsonData(Connection *conn, char *data, size_t data_len);
+  bool handleBinaryData(Connection *conn, char *data, size_t data_len);
+
   /**
    * @brief Callback method for when the connection is closed.
    *

@@ -6,12 +6,14 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const FaviconsWebpackPlugin = require("favicons-webpack-plugin");
 const ProgressBarPlugin = require("progress-bar-webpack-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
     context: path.join(__dirname, "src"),
 
     entry: {
         app: "./app.js",
+        navigation: "./utils/navigation/index.js"
     },
 
     output: {
@@ -39,6 +41,7 @@ module.exports = {
             utils: path.resolve(__dirname, "src/utils"),
             renderer: path.resolve(__dirname, "src/renderer"),
             assets: path.resolve(__dirname, "assets"),
+            proto_bundle: path.resolve(__dirname, "proto_bundle"),
         }
     },
 
@@ -184,6 +187,12 @@ module.exports = {
         new webpack.DefinePlugin({
             OFFLINE_PLAYBACK: JSON.stringify(false),
         }),
+
+        // Uncomment me to analyze bundles
+        // new BundleAnalyzerPlugin({
+        //     analyzerMode: 'server',
+        //     analyzerPort: '7777'
+        // }),
     ],
 
     devServer: {
