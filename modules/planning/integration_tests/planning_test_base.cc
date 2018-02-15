@@ -47,7 +47,8 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
   FLAGS_planning_adapter_config_filename =
       "modules/planning/testdata/conf/adapter.conf";
-  FLAGS_smoother_config_filename = "modules/planning/conf/smoother_config.pb.txt";
+  FLAGS_smoother_config_filename =
+      "modules/planning/conf/smoother_config.pb.txt";
   FLAGS_map_dir = "modules/planning/testdata";
   FLAGS_test_localization_file = "garage_localization.pb.txt";
   FLAGS_test_chassis_file = "garage_chassis.pb.txt";

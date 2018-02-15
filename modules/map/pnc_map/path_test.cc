@@ -52,16 +52,6 @@ Point MakePoint(double x, double y, double z) {
   return pt;
 }
 
-Lane MakeDefaultLane() {
-  Lane lane;
-  lane.mutable_id()->set_id("test");
-  auto* segment =
-      lane.mutable_central_curve()->add_segment()->mutable_line_segment();
-  *segment->add_point() = MakePoint(0, 0, 0);
-  *segment->add_point() = MakePoint(1, 1, 1);
-  return lane;
-}
-
 LaneSampleAssociation MakeSample(double s, double width) {
   LaneSampleAssociation sample;
   sample.set_s(s);

@@ -108,7 +108,7 @@ void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
   point_cloud_.Clear();
   for (size_t idx = 0; idx < pcl_data.size(); idx += kDownsampleRate) {
     pcl::PointXYZ &pt = pcl_data.points[idx];
-    if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z)) {
+    if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z)) {
       point_cloud_.add_num(pt.x);
       point_cloud_.add_num(pt.y);
       // TODO(unacao): velodyne height should be updated by hmi store
