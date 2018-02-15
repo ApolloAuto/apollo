@@ -318,6 +318,14 @@ Status MPCController::ComputeControlCommand(
     steer_angle_feedforwardterm_updated_ = steer_angle_feedforwardterm_;
   }
 
+  debug->add_matrix_q_updated(matrix_q_updated_(0, 0));
+  debug->add_matrix_q_updated(matrix_q_updated_(1, 1));
+  debug->add_matrix_q_updated(matrix_q_updated_(2, 2));
+  debug->add_matrix_q_updated(matrix_q_updated_(3, 3));
+
+  debug->add_matrix_r_updated(matrix_r_updated_(0, 0));
+  debug->add_matrix_r_updated(matrix_r_updated_(1, 1));
+
   Eigen::MatrixXd control_matrix(controls_, 1);
   control_matrix << 0, 0;
 
