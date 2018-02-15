@@ -35,7 +35,7 @@ using apollo::common::PointENU;
 BehaviorDecider::BehaviorDecider() {}
 
 void BehaviorDecider::UpdatePathTimeNeighborhood(
-    std::shared_ptr<PathTimeNeighborhood> p) {
+    std::shared_ptr<PathTimeGraph> p) {
   path_time_neighborhood_ = p;
 }
 
