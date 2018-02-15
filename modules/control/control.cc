@@ -40,9 +40,7 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-std::string Control::Name() const {
-  return FLAGS_control_node_name;
-}
+std::string Control::Name() const { return FLAGS_control_node_name; }
 
 Status Control::Init() {
   init_time_ = Clock::NowInSeconds();

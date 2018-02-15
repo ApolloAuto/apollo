@@ -37,9 +37,7 @@ using apollo::common::time::Clock;
 using apollo::common::util::PathExists;
 using apollo::hdmap::BaseMapFile;
 
-std::string Dreamview::Name() const {
-  return FLAGS_dreamview_module_name;
-}
+std::string Dreamview::Name() const { return FLAGS_dreamview_module_name; }
 
 void Dreamview::TerminateProfilingMode(const ros::TimerEvent& event) {
   Stop();
@@ -69,7 +67,8 @@ Status Dreamview::Init() {
   CHECK(AdapterManager::GetLocalization())
       << "LocalizationAdapter is not initialized.";
   CHECK(AdapterManager::GetMonitor()) << "MonitorAdapter is not initialized.";
-  CHECK(AdapterManager::GetNavigation()) << "NavigationAdapter is not initialized.";
+  CHECK(AdapterManager::GetNavigation())
+      << "NavigationAdapter is not initialized.";
   CHECK(AdapterManager::GetPad()) << "PadAdapter is not initialized.";
   CHECK(AdapterManager::GetPrediction())
       << "PredictionAdapter is not initialized.";
