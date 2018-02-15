@@ -18,7 +18,7 @@ cc_library(
         "//modules/planning/constraint_checker",
         "//modules/planning/constraint_checker:collision_checker",
         "//modules/planning/lattice/behavior_decider",
-        "//modules/planning/lattice/behavior_decider:path_time_neighborhood",
+        "//modules/planning/lattice/behavior_decider:path_time_graph",
         "//modules/planning/lattice/trajectory_generator:backup_trajectory_generator",
         "//modules/planning/lattice/trajectory_generator:trajectory1d_generator",
         "//modules/planning/lattice/trajectory_generator:trajectory_combiner",

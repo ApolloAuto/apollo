@@ -29,7 +29,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
+#include "modules/planning/lattice/behavior_decider/path_time_graph.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
@@ -40,7 +40,7 @@ class BehaviorDecider {
  public:
   BehaviorDecider();
 
-  void UpdatePathTimeNeighborhood(std::shared_ptr<PathTimeNeighborhood> p);
+  void UpdatePathTimeNeighborhood(std::shared_ptr<PathTimeGraph> p);
 
   virtual ~BehaviorDecider() = default;
 
@@ -51,7 +51,7 @@ class BehaviorDecider {
       const std::vector<common::PathPoint>& discretized_reference_line);
 
  private:
-  std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_;
+  std::shared_ptr<PathTimeGraph> path_time_neighborhood_;
 };
 
 }  // namespace planning

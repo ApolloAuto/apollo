@@ -53,7 +53,7 @@ cc_library(
         "//modules/planning/math/curve1d:curve1d",
         "//modules/planning/constraint_checker:constraint_checker1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
-        "//modules/planning/lattice/behavior_decider:path_time_neighborhood",
+        "//modules/planning/lattice/behavior_decider:path_time_graph",
     ],
 )
 

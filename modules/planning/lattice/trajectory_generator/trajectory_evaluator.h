@@ -27,7 +27,7 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
+#include "../behavior_decider/path_time_graph.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -53,7 +53,7 @@ class TrajectoryEvaluator {
       const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
       const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories,
       bool is_auto_tuning,
-      std::shared_ptr<PathTimeNeighborhood> pathtime_neighborhood);
+      std::shared_ptr<PathTimeGraph> pathtime_neighborhood);
 
   virtual ~TrajectoryEvaluator() = default;
 
@@ -118,7 +118,7 @@ class TrajectoryEvaluator {
 
   bool is_auto_tuning_ = false;
 
-  std::shared_ptr<PathTimeNeighborhood> pathtime_neighborhood_;
+  std::shared_ptr<PathTimeGraph> pathtime_neighborhood_;
 
   std::vector<std::vector<std::pair<double, double>>> path_time_intervals_;
 };
