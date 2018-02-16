@@ -51,7 +51,7 @@ message LocalizationEstimate {
 
   // The time of pose measurement, seconds since the GPS epoch (Jan 6, 1980).
   optional double measurement_time = 4;  // In seconds.
-  
+
   // Future trajectory acturally driven by the drivers
   repeated apollo.common.TrajectoryPoint trajectory_point = 5;
 }
