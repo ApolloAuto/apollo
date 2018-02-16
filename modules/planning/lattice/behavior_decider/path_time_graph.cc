@@ -39,6 +39,7 @@ using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
 using apollo::perception::PerceptionObstacle;
+using apollo::common::math::lerp;
 
 namespace {
 
@@ -330,6 +331,50 @@ std::pair<double, double> PathTimeGraph::get_path_range() const {
 
 std::pair<double, double> PathTimeGraph::get_time_range() const {
   return time_range_;
+}
+
+std::vector<std::pair<double, double> >
+PathTimeGraph::GetPathTimeNeighborhoodPoints(const std::size_t index,
+                                             const double s_dist,
+                                             const double t_min_density) const {
+  CHECK(index < path_time_obstacles_.size());
+  CHECK(t_min_density > 0.0);
+
+  const auto& pt_obstacle = path_time_obstacles_[index];
+
+  double s0 = 0.0;
+  double s1 = 0.0;
+
+  double t0 = 0.0;
+  double t1 = 0.0;
+  if (s_dist > 0.0) {
+    s0 = pt_obstacle.upper_left().s();
+    s1 = pt_obstacle.upper_right().s();
+
+    t0 = pt_obstacle.upper_left().t();
+    t1 = pt_obstacle.upper_right().t();
+  } else {
+    s0 = pt_obstacle.bottom_left().s();
+    s1 = pt_obstacle.bottom_right().s();
+
+    t0 = pt_obstacle.bottom_left().t();
+    t1 = pt_obstacle.bottom_right().t();
+  }
+
+  CHECK(t1 > t0);
+
+  std::size_t num_sections = std::size_t((t1 - t0) / t_min_density) + 1;
+  double t_interval = (t1 - t0) / num_sections;
+
+  std::vector<std::pair<double, double>> pt_pairs;
+  for (std::size_t i = 0; i <= num_sections; ++i) {
+    double t = t_interval * i + t0;
+    double s = lerp(s0, t0, s1, t1, t) + s_dist;
+
+    pt_pairs.emplace_back(s, t);
+  }
+
+  return pt_pairs;
 }
 
 }  // namespace planning
