@@ -60,8 +60,6 @@ class PointCloudUpdater {
   void Start();
 
  private:
-  static constexpr int kDownsampleRate = 12;
-
   void RegisterMessageHandlers();
 
   void UpdatePointCloud(const sensor_msgs::PointCloud2 &point_cloud);

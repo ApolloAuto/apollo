@@ -20,6 +20,7 @@
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "pcl/filters/voxel_grid.h"
 #include "pcl/point_cloud.h"
 #include "pcl/point_types.h"
 #include "pcl_conversions/pcl_conversions.h"
@@ -33,8 +34,6 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using sensor_msgs::PointCloud2;
 using Json = nlohmann::json;
-
-constexpr int PointCloudUpdater::kDownsampleRate;
 
 PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
     : websocket_(websocket) {
@@ -102,18 +101,25 @@ void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
 
   last_point_cloud_time_ = point_cloud.header.stamp.toSec();
   // transform from ros to pcl
-  pcl::PointCloud<pcl::PointXYZ> pcl_data;
-  pcl::fromROSMsg(point_cloud, pcl_data);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr(
+      new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::fromROSMsg(point_cloud, *pcl_ptr);
+
+  pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
+  voxel_grid.setInputCloud(pcl_ptr);
+  voxel_grid.setLeafSize(1.0f, 1.0f, 0.2f);
+  voxel_grid.filter(*pcl_ptr);
+  AINFO << "filtered point cloud data size: " << pcl_ptr->size();
 
   point_cloud_.Clear();
-  for (size_t idx = 0; idx < pcl_data.size(); idx += kDownsampleRate) {
-    pcl::PointXYZ &pt = pcl_data.points[idx];
-    if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z)) {
+  for (size_t idx = 0; idx < pcl_ptr->size(); ++idx) {
+    pcl::PointXYZ &pt = pcl_ptr->points[idx];
+    if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z)) {
       point_cloud_.add_num(pt.x);
       point_cloud_.add_num(pt.y);
       // TODO(unacao): velodyne height should be updated by hmi store
       // upon vehicle change.
-      point_cloud_.add_num(pt.z + 1.91);
+      point_cloud_.add_num(pt.z + 1.91f);
     }
   }
   {

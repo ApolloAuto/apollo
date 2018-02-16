@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const MAX_POINTS = 8400;
+const MAX_POINTS = 10000;
 const HEIGHT_COLOR_MAPPING = {
     0.5: 0xFF0000,
     1.0: 0xFF7F00,
@@ -35,7 +35,7 @@ export default class PointCloud {
         geometry.colors = colors;
 
         const material = new THREE.PointsMaterial({
-            size: 0.2,
+            size: 0.25,
             transparent: true,
             opacity: 0.7,
             vertexColors: THREE.VertexColors
