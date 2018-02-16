@@ -40,7 +40,9 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-std::string Control::Name() const { return FLAGS_control_node_name; }
+std::string Control::Name() const {
+  return FLAGS_control_node_name;
+}
 
 Status Control::Init() {
   init_time_ = Clock::NowInSeconds();
@@ -279,12 +281,6 @@ Status Control::CheckInput() {
     }
   }
 
-  // Add tempprary flag for test
-  if (FLAGS_use_navigation_mode) {
-    localization_.mutable_pose()->mutable_position()->set_x(0.0);
-    localization_.mutable_pose()->mutable_position()->set_y(0.0);
-    localization_.mutable_pose()->set_heading(0.0);
-  }
   common::VehicleStateProvider::instance()->Update(localization_, chassis_);
 
   return Status::OK();
