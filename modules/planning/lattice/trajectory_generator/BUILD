@@ -51,9 +51,8 @@ cc_library(
         "//modules/common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/constraint_checker:constraint_checker1d",
-        "//modules/planning/lattice/behavior_decider:path_time_neighborhood",
-        "//modules/planning/math/curve1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
+        "//modules/planning/lattice/behavior_decider:path_time_graph",
     ],
 )
 
