@@ -56,7 +56,7 @@ cc_library(
         ":publishable_trajectory",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/common/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/common:planning_gflags",
     ],
 )

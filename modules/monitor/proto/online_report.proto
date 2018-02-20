@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.monitor;
 
-import "modules/common/proto/vehicle_state.proto";
+import "modules/common/vehicle_state/proto/vehicle_state.proto";
 import "modules/data/proto/static_info.proto";
 
 message VehicleStateReport {
