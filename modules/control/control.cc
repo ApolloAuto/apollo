@@ -34,6 +34,7 @@ namespace control {
 using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
@@ -281,7 +282,7 @@ Status Control::CheckInput() {
     }
   }
 
-  common::VehicleStateProvider::instance()->Update(localization_, chassis_);
+  VehicleStateProvider::instance()->Update(localization_, chassis_);
 
   return Status::OK();
 }
