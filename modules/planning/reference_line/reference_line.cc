@@ -373,6 +373,9 @@ const MapPath& ReferenceLine::map_path() const { return map_path_; }
 
 bool ReferenceLine::GetLaneWidth(const double s, double* const left_width,
                                  double* const right_width) const {
+  if (map_path_.path_points().empty()) {
+    return false;
+  }
   return map_path_.GetWidth(s, left_width, right_width);
 }
 
