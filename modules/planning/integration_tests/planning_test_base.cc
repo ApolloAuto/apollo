@@ -39,6 +39,7 @@ DEFINE_string(test_chassis_file, "garage_chassis.pb.txt",
               "The chassis test file");
 DEFINE_string(test_prediction_file, "", "The prediction module test file");
 DEFINE_string(test_traffic_light_file, "", "The traffic light test file");
+DEFINE_string(test_relative_map_file, "", "The relative map test file");
 
 DEFINE_string(test_previous_planning_file, "",
               "The previous planning test file");
@@ -91,6 +92,14 @@ bool PlanningTestBase::SetUpAdapters() {
     return false;
   }
   AINFO << "Using Chassis file: " << chassis_file;
+  auto relative_map_file =
+      FLAGS_test_data_dir + "/" + FLAGS_test_relative_map_file;
+  if (!FLAGS_test_relative_map_file.empty() &&
+      !AdapterManager::FeedRelativeMapFile(relative_map_file)) {
+    AERROR << "Failed to load relative_map file: " << relative_map_file;
+    return false;
+  }
+  AINFO << "Using RelativeMap file: " << relative_map_file;
   if (FLAGS_enable_prediction && !FLAGS_test_prediction_file.empty()) {
     auto prediction_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file;
