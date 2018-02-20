@@ -62,66 +62,31 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_enable_lag_prediction = false;
 }
 
+#define FEED_ADAPTER(TYPE, FILENAME)                                         \
+  if (!AdapterManager::Get##TYPE()) {                                        \
+    AERROR << #TYPE                                                          \
+        " is not registered in adapter manager, check adapter file "         \
+           << FLAGS_planning_adapter_config_filename;                        \
+    return false;                                                            \
+  }                                                                          \
+  if (!FILENAME.empty() && !AdapterManager::Feed##TYPE##File(                \
+                               FLAGS_test_data_dir + "/" + FILENAME)) {      \
+    AERROR << "Failed to feed " #TYPE " file " << FLAGS_test_data_dir << "/" \
+           << FILENAME;                                                      \
+    return false;                                                            \
+  }                                                                          \
+  AINFO << "Using " #TYPE << " provided by " << FILENAME;
+
 bool PlanningTestBase::SetUpAdapters() {
   if (!AdapterManager::Initialized()) {
     AdapterManager::Init(FLAGS_planning_adapter_config_filename);
   }
-  if (!AdapterManager::GetRoutingResponse()) {
-    AERROR << "routing is not registered in adapter manager, check adapter "
-              "config file."
-           << FLAGS_planning_adapter_config_filename;
-    return false;
-  }
-  auto routing_response_file =
-      FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file;
-  if (!AdapterManager::FeedRoutingResponseFile(routing_response_file)) {
-    AERROR << "failed to routing file: " << routing_response_file;
-    return false;
-  }
-  AINFO << "Using Routing " << routing_response_file;
-  auto localization_file =
-      FLAGS_test_data_dir + "/" + FLAGS_test_localization_file;
-  if (!AdapterManager::FeedLocalizationFile(localization_file)) {
-    AERROR << "Failed to load localization file: " << localization_file;
-    return false;
-  }
-  AINFO << "Using Localization file: " << localization_file;
-  auto chassis_file = FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file;
-  if (!AdapterManager::FeedChassisFile(chassis_file)) {
-    AERROR << "Failed to load chassis file: " << chassis_file;
-    return false;
-  }
-  AINFO << "Using Chassis file: " << chassis_file;
-  auto relative_map_file =
-      FLAGS_test_data_dir + "/" + FLAGS_test_relative_map_file;
-  if (!FLAGS_test_relative_map_file.empty() &&
-      !AdapterManager::FeedRelativeMapFile(relative_map_file)) {
-    AERROR << "Failed to load relative_map file: " << relative_map_file;
-    return false;
-  }
-  AINFO << "Using RelativeMap file: " << relative_map_file;
-  if (FLAGS_enable_prediction && !FLAGS_test_prediction_file.empty()) {
-    auto prediction_file =
-        FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file;
-    if (!AdapterManager::FeedPredictionFile(prediction_file)) {
-      AERROR << "Failed to load prediction file: " << prediction_file;
-      return false;
-    }
-    AINFO << "Using Prediction file: " << prediction_file;
-  } else {
-    AINFO << "Prediction is disabled";
-  }
-  if (FLAGS_enable_traffic_light && !FLAGS_test_traffic_light_file.empty()) {
-    auto traffic_light_file =
-        FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file;
-    if (!AdapterManager::FeedTrafficLightDetectionFile(traffic_light_file)) {
-      AERROR << "Failed to load traffic light file: " << traffic_light_file;
-      return false;
-    }
-    AINFO << "Using Traffic Light file: " << traffic_light_file;
-  } else {
-    AINFO << "Traffic Light is disabled";
-  }
+  FEED_ADAPTER(RoutingResponse, FLAGS_test_routing_response_file);
+  FEED_ADAPTER(Localization, FLAGS_test_localization_file);
+  FEED_ADAPTER(Chassis, FLAGS_test_chassis_file);
+  FEED_ADAPTER(RelativeMap, FLAGS_test_relative_map_file);
+  FEED_ADAPTER(Prediction, FLAGS_test_prediction_file);
+  FEED_ADAPTER(TrafficLightDetection, FLAGS_test_traffic_light_file);
   return true;
 }
 
