@@ -28,7 +28,7 @@
 #include <vector>
 
 #include "modules/common/proto/geometry.pb.h"
-#include "modules/common/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -100,9 +100,13 @@ class Frame {
       const double planning_start_time,
       prediction::PredictionObstacles *prediction_obstacles);
 
-  ADCTrajectory *mutable_trajectory() { return &trajectory_; }
+  ADCTrajectory *mutable_trajectory() {
+    return &trajectory_;
+  }
 
-  const ADCTrajectory &trajectory() const { return trajectory_; }
+  const ADCTrajectory &trajectory() const {
+    return trajectory_;
+  }
 
  private:
   bool CreateReferenceLineInfo();
