@@ -28,7 +28,7 @@ cc_library(
         "route_segments.h",
     ],
     deps = [
-        "//modules/common/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/map/hdmap",
         "//modules/map/pnc_map:path",
         "//modules/routing/common:routing_gflags",
@@ -46,7 +46,7 @@ cc_library(
     deps = [
         ":path",
         ":route_segments",
-        "//modules/common/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/map/hdmap",
         "//modules/planning/common:planning_gflags",
         "//modules/routing/common:routing_gflags",
