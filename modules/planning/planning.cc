@@ -46,6 +46,15 @@ using apollo::common::time::Clock;
 
 std::string Planning::Name() const { return "planning"; }
 
+#define CHECK_ADAPTER(NAME)                                              \
+  if (AdapterManager::Get##NAME() == nullptr) {                          \
+    AERROR << #NAME << " is not registered";                             \
+    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registerd"); \
+  }
+
+#define CHECK_ADAPTER_IF(CONDITION, NAME) \
+  if (CONDITION) CHECK_ADAPTER(NAME)
+
 void Planning::RegisterPlanners() {
   planner_factory_.Register(
       PlanningConfig::RTK, []() -> Planner* { return new RTKReplayPlanner(); });
@@ -80,49 +89,15 @@ Status Planning::Init() {
   if (!AdapterManager::Initialized()) {
     AdapterManager::Init(FLAGS_planning_adapter_config_filename);
   }
-  if (AdapterManager::GetLocalization() == nullptr) {
-    std::string error_msg("Localization is not registered");
-    AERROR << error_msg;
-    return Status(ErrorCode::PLANNING_ERROR, error_msg);
-  }
-  if (AdapterManager::GetChassis() == nullptr) {
-    std::string error_msg("Chassis is not registered");
-    AERROR << error_msg;
-    return Status(ErrorCode::PLANNING_ERROR, error_msg);
-  }
-  if (AdapterManager::GetRoutingResponse() == nullptr) {
-    std::string error_msg("RoutingResponse is not registered");
-    AERROR << error_msg;
-    return Status(ErrorCode::PLANNING_ERROR, error_msg);
-  }
-  if (AdapterManager::GetRoutingRequest() == nullptr) {
-    std::string error_msg("RoutingRequest is not registered");
-    AERROR << error_msg;
-    return Status(ErrorCode::PLANNING_ERROR, error_msg);
-  }
-  if (FLAGS_use_navigation_mode &&
-      AdapterManager::GetRelativeMap() == nullptr) {
-    std::string error_msg("Relative map is not registered");
-    AERROR << error_msg;
-    return Status(ErrorCode::PLANNING_ERROR, error_msg);
-  }
-  if (FLAGS_use_navigation_mode && FLAGS_enable_prediction &&
-      AdapterManager::GetPerceptionObstacles() == nullptr) {
-    std::string error_msg("Perception is not registered");
-    AERROR << error_msg;
-    return Status(ErrorCode::PLANNING_ERROR, error_msg);
-  }
-  if (FLAGS_enable_prediction && AdapterManager::GetPrediction() == nullptr) {
-    std::string error_msg("Enabled prediction, but no prediction is observed.");
-    AERROR << error_msg;
-    return Status(ErrorCode::PLANNING_ERROR, error_msg);
-  }
-  if (FLAGS_enable_traffic_light &&
-      AdapterManager::GetTrafficLightDetection() == nullptr) {
-    std::string error_msg("Traffic Light Detection is not registered");
-    AERROR << error_msg;
-    return Status(ErrorCode::PLANNING_ERROR, error_msg);
-  }
+  CHECK_ADAPTER(Localization);
+  CHECK_ADAPTER(Chassis);
+  CHECK_ADAPTER(RoutingResponse);
+  CHECK_ADAPTER(RoutingRequest);
+  CHECK_ADAPTER_IF(FLAGS_use_navigation_mode, RelativeMap);
+  CHECK_ADAPTER_IF(FLAGS_use_navigation_mode && FLAGS_enable_prediction,
+                   PerceptionObstacles);
+  CHECK_ADAPTER_IF(FLAGS_enable_prediction, Prediction);
+  CHECK_ADAPTER_IF(FLAGS_enable_traffic_light, TrafficLightDetection);
 
   if (!FLAGS_use_navigation_mode) {
     hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
