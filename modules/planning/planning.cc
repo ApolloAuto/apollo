@@ -70,9 +70,6 @@ Status Planning::InitFrame(const uint32_t sequence_num,
 }
 
 Status Planning::Init() {
-  hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
-  CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
-
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
@@ -103,6 +100,12 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
+  if (FLAGS_use_navigation_mode &&
+      AdapterManager::GetRelativeMap() == nullptr) {
+    std::string error_msg("Relative map is not registered");
+    AERROR << error_msg;
+    return Status(ErrorCode::PLANNING_ERROR, error_msg);
+  }
   if (FLAGS_use_navigation_mode && FLAGS_enable_prediction &&
       AdapterManager::GetPerceptionObstacles() == nullptr) {
     std::string error_msg("Perception is not registered");
@@ -120,8 +123,13 @@ Status Planning::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::PLANNING_ERROR, error_msg);
   }
-  reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
-      new ReferenceLineProvider(hdmap_, config_.smoother_type()));
+
+  if (!FLAGS_use_navigation_mode) {
+    hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
+    CHECK(hdmap_) << "Failed to load map";
+    reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
+        new ReferenceLineProvider(hdmap_, config_.smoother_type()));
+  }
 
   RegisterPlanners();
   planner_ = planner_factory_.CreateObject(config_.planner_type());
@@ -189,10 +197,13 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
 }
 
 void Planning::RunOnce() {
-  const double start_timestamp = Clock::NowInSeconds();
-
   // snapshot all coming data
   AdapterManager::Observe();
+
+  const double start_timestamp = Clock::NowInSeconds();
+
+  hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
+  CHECK(hdmap_) << "Failed to load map";
 
   ADCTrajectory not_ready_pb;
   auto* not_ready = not_ready_pb.mutable_decision()
