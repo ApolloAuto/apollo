@@ -16,7 +16,7 @@ cc_library(
         "//modules/common/configs:config_gflags",
         "//modules/common/math:box2d",
         "//modules/common/math:quaternion",
-        "//modules/common/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/common/status",
         "//modules/localization/common:localization_common",
         "@eigen//:eigen",
