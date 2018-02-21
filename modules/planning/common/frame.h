@@ -100,13 +100,9 @@ class Frame {
       const double planning_start_time,
       prediction::PredictionObstacles *prediction_obstacles);
 
-  ADCTrajectory *mutable_trajectory() {
-    return &trajectory_;
-  }
+  ADCTrajectory *mutable_trajectory() { return &trajectory_; }
 
-  const ADCTrajectory &trajectory() const {
-    return trajectory_;
-  }
+  const ADCTrajectory &trajectory() const { return trajectory_; }
 
  private:
   bool CreateReferenceLineInfo();

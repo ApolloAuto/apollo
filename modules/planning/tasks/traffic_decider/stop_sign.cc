@@ -134,10 +134,9 @@ void StopSign::MakeDecisions(Frame* frame,
     double stop_deceleration = util::GetADCStopDeceleration(
         reference_line_info, next_stop_sign_overlap_->start_s);
     if (stop_deceleration < FLAGS_max_stop_deceleration) {
-      BuildStopDecision(
-          frame, reference_line_info,
-          const_cast<PathOverlap*>(next_stop_sign_overlap_),
-          FLAGS_stop_sign_stop_distance);
+      BuildStopDecision(frame, reference_line_info,
+                        const_cast<PathOverlap*>(next_stop_sign_overlap_),
+                        FLAGS_stop_sign_stop_distance);
     }
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] STOP";
   }
@@ -146,8 +145,7 @@ void StopSign::MakeDecisions(Frame* frame,
 /**
  * @brief: fine next stop sign ahead of adc along reference line
  */
-bool StopSign::FindNextStopSign(
-    ReferenceLineInfo* const reference_line_info) {
+bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(reference_line_info);
 
   next_stop_sign_overlap_ = nullptr;
@@ -158,7 +156,7 @@ bool StopSign::FindNextStopSign(
   double min_start_s = std::numeric_limits<double>::max();
   for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
     if (adc_front_edge_s - stop_sign_overlap.end_s <=
-        FLAGS_stop_sign_min_pass_distance &&
+            FLAGS_stop_sign_min_pass_distance &&
         stop_sign_overlap.start_s < min_start_s) {
       min_start_s = stop_sign_overlap.start_s;
       next_stop_sign_overlap_ = const_cast<PathOverlap*>(&stop_sign_overlap);
@@ -223,11 +221,9 @@ int StopSign::GetAssociatedLanes(const StopSignInfo& stop_sign_info) {
   Dropbox<std::vector<std::string>>::Open()->Set(db_key_associated_lanes,
                                                  associated_lanes);
   std::string s;
-  std::for_each(associated_lanes.begin(),
-                associated_lanes.end(),
-                [&](std::string &id) { s = s.empty() ? id : s + "," + id; });
-  ADEBUG << "update dropbox: [" << db_key_associated_lanes
-         << "] = " << s;
+  std::for_each(associated_lanes.begin(), associated_lanes.end(),
+                [&](std::string& id) { s = s.empty() ? id : s + "," + id; });
+  ADEBUG << "update dropbox: [" << db_key_associated_lanes << "] = " << s;
 
   return 0;
 }
@@ -235,9 +231,8 @@ int StopSign::GetAssociatedLanes(const StopSignInfo& stop_sign_info) {
 /**
  * @brief: process & update stop status
  */
-int StopSign::ProcessStopStatus(
-    ReferenceLineInfo* const reference_line_info,
-    const StopSignInfo& stop_sign_info) {
+int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
+                                const StopSignInfo& stop_sign_info) {
   CHECK_NOTNULL(reference_line_info);
 
   // get stop status from dropbox
@@ -299,8 +294,7 @@ int StopSign::ProcessStopStatus(
       auto* path_overlap =
           reference_line_info->reference_line().map_path().NextLaneOverlap(
               reference_line_info->AdcSlBoundary().end_s());
-      if (path_overlap->start_s -
-              reference_line_info->AdcSlBoundary().end_s() >
+      if (path_overlap->start_s - reference_line_info->AdcSlBoundary().end_s() >
           kDeltaS) {
         // keep in CREEPING status
       } else {
@@ -338,8 +332,7 @@ int StopSign::ProcessStopStatus(
 /**
  * @brief: check valid stop_sign stop
  */
-bool StopSign::CheckADCkStop(
-    ReferenceLineInfo* const reference_line_info) {
+bool StopSign::CheckADCkStop(ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(reference_line_info);
 
   double adc_speed = reference_line_info->AdcPlanningPoint().v();
@@ -371,9 +364,8 @@ bool StopSign::CheckADCkStop(
 /**
  * @brief: read watch vehicles from drop box
  */
-int StopSign::GetWatchVehicles(
-    const StopSignInfo& stop_sign_info,
-    StopSignLaneVehicles* watch_vehicles) {
+int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
+                               StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
   watch_vehicles->clear();
@@ -690,11 +682,10 @@ int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
   return 0;
 }
 
-bool StopSign::BuildStopDecision(
-    Frame* frame,
-    ReferenceLineInfo* const reference_line_info,
-    PathOverlap* const overlap,
-    const double stop_buffer) {
+bool StopSign::BuildStopDecision(Frame* frame,
+                                 ReferenceLineInfo* const reference_line_info,
+                                 PathOverlap* const overlap,
+                                 const double stop_buffer) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
   CHECK_NOTNULL(overlap);
@@ -742,7 +733,6 @@ bool StopSign::BuildStopDecision(
   return true;
 }
 
-
 void StopSign::ClearOtherStopSignDropbox(
     ReferenceLineInfo* const reference_line_info) {
   const std::vector<PathOverlap>& stop_sign_overlaps =
@@ -751,9 +741,9 @@ void StopSign::ClearOtherStopSignDropbox(
     auto stop_sign_ptr = HDMapUtil::BaseMap().GetStopSignById(
         hdmap::MakeMapId(stop_sign_overlap.object_id));
     std::string stop_sign_id = stop_sign_ptr.get()->id().id();
-    if (next_stop_sign_== nullptr ||
-        (next_stop_sign_!= nullptr &&
-        stop_sign_id != next_stop_sign_->id().id())) {
+    if (next_stop_sign_ == nullptr ||
+        (next_stop_sign_ != nullptr &&
+         stop_sign_id != next_stop_sign_->id().id())) {
       ClearDropbox(stop_sign_id);
     }
   }
@@ -782,8 +772,7 @@ void StopSign::ClearDropbox(const std::string& stop_sign_id) {
   ADEBUG << "remove dropbox item: " << db_key_associated_lanes;
 }
 
-void StopSign::ClearDropboxWatchvehicles(
-    const std::string& stop_sign_id) {
+void StopSign::ClearDropboxWatchvehicles(const std::string& stop_sign_id) {
   // clear watch vehicles from dropbox
   std::string db_key_associated_lanes =
       db_key_stop_sign_associated_lanes_prefix_ + stop_sign_id;

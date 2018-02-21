@@ -65,8 +65,9 @@ int ScenarioManager::ComputeWorldDecision(
         ADEBUG << "scenario[" << scenario->Name() << "] does exists";
       }
       // compute decision
-      if (0 == scenario->ComputeScenarioDecision(frame, reference_line_info,
-                                                 planning_target)) {
+      if (0 ==
+          scenario->ComputeScenarioDecision(frame, reference_line_info,
+                                            planning_target)) {
         ADEBUG << "scenario[" << scenario->Name()
                << "] Success in computing decision";
       } else {

@@ -87,7 +87,6 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
 void Trajectory1dGenerator::GenerateSpeedProfilesForPathTimeBound(
     const PlanningTarget& planning_target,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
-
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
       end_condition_sampler_->SampleLonEndConditionsForPathTimeBounds(
           planning_target);

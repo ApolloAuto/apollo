@@ -27,9 +27,8 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-double GetADCStopDeceleration(
-    ReferenceLineInfo* const reference_line_info,
-    const double stop_line_s);
+double GetADCStopDeceleration(ReferenceLineInfo* const reference_line_info,
+                              const double stop_line_s);
 
 }  // util
 }  // namespace planning
