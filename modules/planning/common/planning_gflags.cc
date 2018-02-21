@@ -187,8 +187,6 @@ DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
 
-DEFINE_bool(try_history_decision, false, "try history decision first");
-
 DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
@@ -222,13 +220,6 @@ DEFINE_double(virtual_stop_wall_height, 2.0,
 DEFINE_double(signal_expire_time_sec, 5.0,
               "consider the signal msg is expired if its timestamp over "
               "this threshold (second)");
-
-// Speed Decider
-DEFINE_double(low_speed_obstacle_threshold, 2.0,
-              "speed lower than this value is considered as low speed");
-DEFINE_double(
-    decelerating_obstacle_threshold, -0.25,
-    "acceleration lower than this value is considered as decelerating");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
@@ -359,8 +350,6 @@ DEFINE_double(perception_confidence_threshold, 0.4,
               "this threshold.");
 
 // QpSt optimizer
-DEFINE_bool(enable_slowdown_profile_generator, true,
-            "True to enable slowdown speed profile generator.");
 DEFINE_double(slowdown_profile_deceleration, -1.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");
 DEFINE_bool(enable_follow_accel_constraint, true,
@@ -382,8 +371,6 @@ DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
 
 /// Lattice Planner
 DEFINE_double(lattice_epsilon, 1e-6, "Epsilon in lattice planner.");
-DEFINE_int32(num_lattice_traj_to_plot, 5,
-             "Number of lattice trajectories to plot");
 DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
 DEFINE_double(spiral_downsample_curvature_thred, 0.02,
               "curvature threshold for down sampling reference line points");

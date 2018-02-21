@@ -103,7 +103,6 @@ DECLARE_double(st_max_t);
 DECLARE_double(static_obstacle_speed_threshold);
 DECLARE_bool(enable_nudge_decision);
 DECLARE_bool(enable_nudge_slowdown);
-DECLARE_bool(try_history_decision);
 DECLARE_double(static_decision_nudge_l_buffer);
 DECLARE_double(lateral_ignore_buffer);
 DECLARE_double(min_stop_distance_obstacle);
@@ -134,12 +133,7 @@ DECLARE_bool(enable_prediction);
 DECLARE_double(turn_signal_distance);
 DECLARE_bool(right_turn_creep_forward);
 
-// speed decider
-DECLARE_double(low_speed_obstacle_threshold);
-DECLARE_double(decelerating_obstacle_threshold);
-
 // QpSt optimizer
-DECLARE_bool(enable_slowdown_profile_generator);
 DECLARE_double(slowdown_profile_deceleration);
 DECLARE_bool(enable_follow_accel_constraint);
 
@@ -177,7 +171,6 @@ DECLARE_double(stop_sign_stop_duration);
 DECLARE_double(stop_sign_min_pass_distance);
 DECLARE_double(stop_sign_stop_distance);
 DECLARE_double(stop_sign_max_watch_vehicle_stop_speed);
-DECLARE_double(stop_sign_creep_buffer);
 DECLARE_bool(enable_sidepass);
 DECLARE_double(sidepass_wait_time_sec);
 
@@ -198,7 +191,6 @@ DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 
 // lattice planner
 DECLARE_double(lattice_epsilon);
-DECLARE_int32(num_lattice_traj_to_plot);
 DECLARE_double(default_cruise_speed);
 DECLARE_double(spiral_downsample_curvature_thred);
 DECLARE_bool(enable_lattice_st_image_dump);
