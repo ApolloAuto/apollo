@@ -113,7 +113,6 @@ SLBoundary PathTimeGraph::ComputeObstacleBoundary(
 void PathTimeGraph::SetupObstacles(
     const std::vector<const Obstacle*>& obstacles,
     const std::vector<PathPoint>& discretized_ref_points) {
-
   double half_lane_width = FLAGS_default_reference_line_width * 0.5;
   for (const Obstacle* obstacle : obstacles) {
     if (prediction_traj_map_.find(obstacle->Id()) ==
@@ -223,8 +222,8 @@ void PathTimeGraph::SetStaticPathTimeObstacle(
                        FLAGS_trajectory_time_length));
 }
 
-double PathTimeGraph::SpeedAtT(const std::string& obstacle_id,
-                                      const double s, const double t) const {
+double PathTimeGraph::SpeedAtT(const std::string& obstacle_id, const double s,
+                               const double t) const {
   bool found =
       prediction_traj_map_.find(obstacle_id) != prediction_traj_map_.end();
   CHECK(found);
@@ -268,8 +267,9 @@ double PathTimeGraph::SpeedAtT(const std::string& obstacle_id,
   return std::cos(ref_theta) * v_x + std::sin(ref_theta) * v_y;
 }
 
-PathTimePoint PathTimeGraph::SetPathTimePoint(
-    const std::string& obstacle_id, const double s, const double t) const {
+PathTimePoint PathTimeGraph::SetPathTimePoint(const std::string& obstacle_id,
+                                              const double s,
+                                              const double t) const {
   PathTimePoint path_time_point;
   path_time_point.set_s(s);
   path_time_point.set_t(t);
@@ -278,13 +278,13 @@ PathTimePoint PathTimeGraph::SetPathTimePoint(
   return path_time_point;
 }
 
-const std::vector<PathTimeObstacle>&
-PathTimeGraph::GetPathTimeObstacles() const {
+const std::vector<PathTimeObstacle>& PathTimeGraph::GetPathTimeObstacles()
+    const {
   return path_time_obstacles_;
 }
 
-bool PathTimeGraph::GetPathTimeObstacle(
-    const std::string& obstacle_id, PathTimeObstacle* path_time_obstacle) {
+bool PathTimeGraph::GetPathTimeObstacle(const std::string& obstacle_id,
+                                        PathTimeObstacle* path_time_obstacle) {
   if (path_time_obstacle_map_.find(obstacle_id) ==
       path_time_obstacle_map_.end()) {
     return false;
@@ -293,8 +293,8 @@ bool PathTimeGraph::GetPathTimeObstacle(
   return true;
 }
 
-std::vector<std::pair<double, double>>
-PathTimeGraph::GetPathBlockingIntervals(const double t) const {
+std::vector<std::pair<double, double>> PathTimeGraph::GetPathBlockingIntervals(
+    const double t) const {
   CHECK(time_range_.first <= t && t <= time_range_.second);
   std::vector<std::pair<double, double>> intervals;
   for (const auto& pt_obstacle : path_time_obstacles_) {
@@ -316,8 +316,8 @@ PathTimeGraph::GetPathBlockingIntervals(const double t) const {
 
 std::vector<std::vector<std::pair<double, double>>>
 PathTimeGraph::GetPathBlockingIntervals(const double t_start,
-                                               const double t_end,
-                                               const double t_resolution) {
+                                        const double t_end,
+                                        const double t_resolution) {
   std::vector<std::vector<std::pair<double, double>>> intervals;
   for (double t = t_start; t <= t_end; t += t_resolution) {
     intervals.push_back(GetPathBlockingIntervals(t));
@@ -333,7 +333,7 @@ std::pair<double, double> PathTimeGraph::get_time_range() const {
   return time_range_;
 }
 
-std::vector<std::pair<double, double> >
+std::vector<std::pair<double, double>>
 PathTimeGraph::GetPathTimeNeighborhoodPoints(const std::size_t index,
                                              const double s_dist,
                                              const double t_min_density) const {

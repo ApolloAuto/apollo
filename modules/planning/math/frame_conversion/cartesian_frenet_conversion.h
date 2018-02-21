@@ -58,8 +58,9 @@ class CartesianFrenetConverter {
                                   std::array<double, 3>* const ptr_d_condition);
 
   static void cartesian_to_frenet(const double rs, const double rx,
-      const double ry, const double rtheta, const double x, const double y,
-      double* ptr_s, double* ptr_d);
+                                  const double ry, const double rtheta,
+                                  const double x, const double y, double* ptr_s,
+                                  double* ptr_d);
 
   /**
    * Convert a vehicle state in Frenet frame to Cartesian frame.

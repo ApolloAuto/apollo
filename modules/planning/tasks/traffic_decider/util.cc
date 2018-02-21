@@ -28,9 +28,8 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-double GetADCStopDeceleration(
-    ReferenceLineInfo* const reference_line_info,
-    const double stop_line_s) {
+double GetADCStopDeceleration(ReferenceLineInfo* const reference_line_info,
+                              const double stop_line_s) {
   double adc_speed =
       common::VehicleStateProvider::instance()->linear_velocity();
   if (adc_speed < FLAGS_max_stop_speed) {
@@ -43,8 +42,8 @@ double GetADCStopDeceleration(
   if (stop_line_s > adc_front_edge_s) {
     stop_distance = stop_line_s - adc_front_edge_s;
   } else {
-    stop_distance = stop_line_s +
-        FLAGS_max_stop_distance_buffer - adc_front_edge_s;
+    stop_distance =
+        stop_line_s + FLAGS_max_stop_distance_buffer - adc_front_edge_s;
   }
   if (stop_distance < 1e-5) {
     return std::numeric_limits<double>::max();

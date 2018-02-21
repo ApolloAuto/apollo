@@ -55,15 +55,15 @@ bool Creeper::Run(Frame* frame, ReferenceLineInfo* reference_line_info) {
 
   constexpr double kMaxCreepTargetDistance = 5.0;
   return BuildStopDecision(*const_cast<PathOverlap*>(next_overlap),
-                         FLAGS_creep_stop_distance, kMaxCreepTargetDistance,
-                         frame, reference_line_info);
+                           FLAGS_creep_stop_distance, kMaxCreepTargetDistance,
+                           frame, reference_line_info);
 }
 
 bool Creeper::BuildStopDecision(const PathOverlap& overlap,
-                              const double stop_buffer,
-                              const double max_creeping_target_distance,
-                              Frame* frame,
-                              ReferenceLineInfo* reference_line_info) {
+                                const double stop_buffer,
+                                const double max_creeping_target_distance,
+                                Frame* frame,
+                                ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
 
   // check

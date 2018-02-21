@@ -159,9 +159,8 @@ Status LatticePlanner::PlanOnReferenceLine(
   current_time = Clock::NowInSeconds();
 
   // 4. parse the decision and get the planning target.
-  std::shared_ptr<PathTimeGraph> path_time_neighborhood_ptr(
-      new PathTimeGraph(frame->obstacles(), init_s[0],
-                               discretized_reference_line));
+  std::shared_ptr<PathTimeGraph> path_time_neighborhood_ptr(new PathTimeGraph(
+      frame->obstacles(), init_s[0], discretized_reference_line));
 
   decider_.UpdatePathTimeNeighborhood(path_time_neighborhood_ptr);
   PlanningTarget planning_target =
