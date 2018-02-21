@@ -154,30 +154,34 @@ bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
     return false;
   }
 
-  WebSocketHandler::data_.write(data, data_len);
-  if (WebSocketHandler::current_opcode_ == 0x00) {
-    WebSocketHandler::current_opcode_ = bits & 0x7f;
+  data_.write(data, data_len);
+  if (current_opcode_ == 0x00) {
+    current_opcode_ = bits & 0x7f;
   }
 
   bool result = true;
-  bool isFinalFragment = bits & 0x80;
-  if (isFinalFragment) {
-    switch (WebSocketHandler::current_opcode_) {
+
+  // The FIN bit (the left most significant bit) is used to indicates
+  // the final fragment in a message. Note, the first fragment MAY
+  // also be the final fragment.
+  bool is_final_fragment = bits & 0x80;
+  if (is_final_fragment) {
+    switch (current_opcode_) {
       case WEBSOCKET_OPCODE_TEXT:
-        result = handleJsonData(conn, WebSocketHandler::data_.str());
+        result = handleJsonData(conn, data_.str());
         break;
       case WEBSOCKET_OPCODE_BINARY:
-        result = handleBinaryData(conn, WebSocketHandler::data_.str());
+        result = handleBinaryData(conn, data_.str());
         break;
       default:
         AERROR << "Unknown WebSocket bits flag: " << bits;
         break;
     }
 
-    // rest opcode and data
-    WebSocketHandler::current_opcode_ = 0x00;
-    WebSocketHandler::data_.clear();
-    WebSocketHandler::data_.str(std::string());
+    // reset opcode and data
+    current_opcode_ = 0x00;
+    data_.clear();
+    data_.str(std::string());
   }
 
   return result;
