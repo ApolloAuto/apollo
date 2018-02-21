@@ -1,6 +1,6 @@
 import PARAMETERS from "store/config/parameters.yml";
 
-import GMAP_NAVIGATOR from "utils/navigation/gmap_navigator";
+import GMAP_NAVIGATOR from "components/Navigation/GmapNavigator";
 import NavigationWebSocketEndpoint from "store/websocket/websocket_navigation";
 
 function deduceWebsocketServerAddr() {

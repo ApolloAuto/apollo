@@ -16,7 +16,6 @@
 # limitations under the License.
 ###############################################################################
 
-set -x
 mkdir -p proto_bundle
 
 # proto dependencies

@@ -13,7 +13,7 @@ module.exports = {
 
     entry: {
         app: "./app.js",
-        navigation: "./utils/navigation/index.js"
+        navigation: "./components/Navigation/entry.js"
     },
 
     output: {
