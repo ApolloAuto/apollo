@@ -369,8 +369,8 @@ class GmapNavigator {
 
     controlUI.addEventListener("click", () => {
       const start = this.vehicleMarker.getPosition();
-      const endLat = 37.506039;
-      const endLng = -122.340299;
+      const endLat = 37.50582457077844;
+      const endLng = -122.34000922633726;
       this.requestRouting(start.lat(), start.lng(), endLat, endLng);
     });
   }
