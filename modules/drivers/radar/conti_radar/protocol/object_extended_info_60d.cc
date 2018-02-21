@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/conti_radar/protocol/object_extended_info_60d.h"
+#include "modules/drivers/radar/conti_radar/protocol/object_extended_info_60d.h"
 
 #include "glog/logging.h"
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
-#include "modules/drivers/conti_radar/protocol/const_vars.h"
+#include "modules/drivers/radar/conti_radar/protocol/const_vars.h"
 
 namespace apollo {
 namespace drivers {

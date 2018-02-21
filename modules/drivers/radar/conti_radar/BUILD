@@ -16,7 +16,7 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/conti_radar/protocol:drivers_conti_radar_protocol",
+        "//modules/drivers/radar/conti_radar/protocol:drivers_conti_radar_protocol",
     ],
 )
 
@@ -50,7 +50,7 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/conti_radar/protocol:drivers_conti_radar_protocol",
+        "//modules/drivers/radar/conti_radar/protocol:drivers_conti_radar_protocol",
     ],
 )
 

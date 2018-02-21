@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/conti_radar/protocol/cluster_quality_info_702.h"
-#include "modules/drivers/conti_radar/protocol/const_vars.h"
+#include "modules/drivers/radar/conti_radar/protocol/cluster_quality_info_702.h"
+#include "modules/drivers/radar/conti_radar/protocol/const_vars.h"
 
 #include "glog/logging.h"
 

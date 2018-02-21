@@ -18,8 +18,8 @@
  * @file
  */
 
-#include "modules/drivers/conti_radar/conti_radar_canbus.h"
-#include "modules/drivers/conti_radar/conti_radar_message_manager.h"
+#include "modules/drivers/radar/conti_radar/conti_radar_canbus.h"
+#include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 
 /**

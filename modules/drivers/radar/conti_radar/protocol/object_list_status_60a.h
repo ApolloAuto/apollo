@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_CONTI_RADAR_PROTOCOL_OBJECT_QUALITY_INFO_60C_H_
-#define MODULES_DRIVERS_CONTI_RADAR_PROTOCOL_OBJECT_QUALITY_INFO_60C_H_
+#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_OBJECT_LIST_STATUS_60A_H_
+#define MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_OBJECT_LIST_STATUS_60A_H_
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
@@ -26,38 +26,24 @@ namespace conti_radar {
 
 using apollo::drivers::ContiRadar;
 
-class ObjectQualityInfo60C
+class ObjectListStatus60A
     : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
   static const uint32_t ID;
-  ObjectQualityInfo60C();
+  ObjectListStatus60A();
   void Parse(const std::uint8_t* bytes, int32_t length,
              ContiRadar* conti_radar) const override;
 
  private:
-  int object_id(const std::uint8_t* bytes, int32_t length) const;
+  int num_of_objects(const std::uint8_t* bytes, int32_t length) const;
 
-  int longitude_dist_rms(const std::uint8_t* bytes, int32_t length) const;
+  int meas_counter(const std::uint8_t* bytes, int32_t length) const;
 
-  int lateral_dist_rms(const std::uint8_t* bytes, int32_t length) const;
-
-  int longitude_vel_rms(const std::uint8_t* bytes, int32_t length) const;
-
-  int lateral_vel_rms(const std::uint8_t* bytes, int32_t length) const;
-
-  int longitude_accel_rms(const std::uint8_t* bytes, int32_t length) const;
-
-  int lateral_accel_rms(const std::uint8_t* bytes, int32_t length) const;
-
-  int oritation_angle_rms(const std::uint8_t* bytes, int32_t length) const;
-
-  int probexist(const std::uint8_t* bytes, int32_t length) const;
-
-  int meas_state(const std::uint8_t* bytes, int32_t length) const;
+  int interface_version(const std::uint8_t* bytes, int32_t length) const;
 };
 
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_ESR_PROTOCOL_OBJECT_QUALITY_INFO_60C_H_
+#endif  // MODULES_CANBUS_VEHICL_ESR_PROTOCOL_OBJECT_LIST_STATUS_60A_H_
