@@ -71,8 +71,9 @@ class StopSign : public TrafficRule {
                          ReferenceLineInfo* const reference_line_info,
                          hdmap::PathOverlap* const overlap,
                          const double stop_buffer);
+  void ClearOtherStopSignDropbox(ReferenceLineInfo* const reference_line_info);
   void ClearDropbox(const std::string& stop_sign_id);
-  void ClearDropboxWatchvehicles();
+  void ClearDropboxWatchvehicles(const std::string& stop_sign_id);
 
  private:
   constexpr static char const* const db_key_stop_sign_stop_status_prefix_ =
@@ -81,6 +82,8 @@ class StopSign : public TrafficRule {
       "kStopSignStopStarttime_";
   constexpr static char const* const db_key_stop_sign_watch_vehicle_prefix_ =
       "kStopSignWatchVehicle_";
+  constexpr static char const* const db_key_stop_sign_associated_lanes_prefix_ =
+      "kStopSignAssociateLane_";
 
   hdmap::PathOverlap* next_stop_sign_overlap_ = nullptr;
   hdmap::StopSignInfo* next_stop_sign_ = nullptr;
