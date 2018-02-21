@@ -19,16 +19,16 @@
  * @brief The class of ContiRadarMessageManager
  */
 
-#include "modules/drivers/conti_radar/conti_radar_message_manager.h"
+#include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 
-#include "modules/drivers/conti_radar/protocol/cluster_general_info_701.h"
-#include "modules/drivers/conti_radar/protocol/cluster_list_status_600.h"
-#include "modules/drivers/conti_radar/protocol/cluster_quality_info_702.h"
-#include "modules/drivers/conti_radar/protocol/object_extended_info_60d.h"
-#include "modules/drivers/conti_radar/protocol/object_general_info_60b.h"
-#include "modules/drivers/conti_radar/protocol/object_list_status_60a.h"
-#include "modules/drivers/conti_radar/protocol/object_quality_info_60c.h"
-#include "modules/drivers/conti_radar/protocol/radar_state_201.h"
+#include "modules/drivers/radar/conti_radar/protocol/cluster_general_info_701.h"
+#include "modules/drivers/radar/conti_radar/protocol/cluster_list_status_600.h"
+#include "modules/drivers/radar/conti_radar/protocol/cluster_quality_info_702.h"
+#include "modules/drivers/radar/conti_radar/protocol/object_extended_info_60d.h"
+#include "modules/drivers/radar/conti_radar/protocol/object_general_info_60b.h"
+#include "modules/drivers/radar/conti_radar/protocol/object_list_status_60a.h"
+#include "modules/drivers/radar/conti_radar/protocol/object_quality_info_60c.h"
+#include "modules/drivers/radar/conti_radar/protocol/radar_state_201.h"
 
 namespace apollo {
 namespace drivers {

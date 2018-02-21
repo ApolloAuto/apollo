@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_CONTI_RADAR_PROTOCOL_RADAR_CONFIG_200_H_
-#define MODULES_DRIVERS_CONTI_RADAR_PROTOCOL_RADAR_CONFIG_200_H_
+#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_RADAR_CONFIG_200_H_
+#define MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_RADAR_CONFIG_200_H_
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
@@ -106,4 +106,4 @@ class RadarConfig200
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CONTI_RADAR_PROTOCOL_RADAR_CONFIG_200_H_
+#endif  // MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_RADAR_CONFIG_200_H_

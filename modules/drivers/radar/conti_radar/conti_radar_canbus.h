@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DRIVERS_CONTI_RADAR_CONTI_RADAR_CANBUS_H_
-#define MODULES_DRIVERS_CONTI_RADAR_CONTI_RADAR_CANBUS_H_
+#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_H_
+#define MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_H_
 
 #include <memory>
 #include <string>
@@ -44,8 +44,8 @@
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 #include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
-#include "modules/drivers/conti_radar/conti_radar_message_manager.h"
-#include "modules/drivers/conti_radar/protocol/radar_config_200.h"
+#include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
+#include "modules/drivers/radar/conti_radar/protocol/radar_config_200.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 
 /**
@@ -123,4 +123,4 @@ class ContiRadarCanbus : public apollo::common::ApolloApp {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CONTI_RADAR_CONTI_RADAR_CANBUS_H_
+#endif  // MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_CANBUS_H_

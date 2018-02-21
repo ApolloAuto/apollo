@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_CONTI_RADAR_PROTOCOL_RADAR_STATE_201_H_
-#define MODULES_DRIVERS_CONTI_RADAR_PROTOCOL_RADAR_STATE_201_H_
+#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_CLUSTER_LIST_STATUS_600_H_
+#define MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_CLUSTER_LIST_STATUS_600_H_
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
@@ -25,32 +25,27 @@ namespace drivers {
 namespace conti_radar {
 
 using apollo::drivers::ContiRadar;
-using ::apollo::drivers::conti_radar::OutputType;
-using ::apollo::drivers::conti_radar::RcsThreshold;
 
-class RadarState201 : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
+class ClusterListStatus600
+    : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
   static const uint32_t ID;
-  RadarState201();
+  ClusterListStatus600();
   void Parse(const std::uint8_t* bytes, int32_t length,
              ContiRadar* conti_radar) const override;
 
  private:
-  int max_dist(const std::uint8_t* bytes, int32_t length) const;
+  int near(const std::uint8_t* bytes, int32_t length) const;
 
-  int radar_power(const std::uint8_t* bytes, int32_t length) const;
+  int far(const std::uint8_t* bytes, int32_t length) const;
 
-  OutputType output_type(const std::uint8_t* bytes, int32_t length) const;
+  int meas_counter(const std::uint8_t* bytes, int32_t length) const;
 
-  RcsThreshold rcs_threshold(const std::uint8_t* bytes, int32_t length) const;
-
-  bool send_quality(const std::uint8_t* bytes, int32_t length) const;
-
-  bool send_ext_info(const std::uint8_t* bytes, int32_t length) const;
+  int interface_version(const std::uint8_t* bytes, int32_t length) const;
 };
 
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_ESR_PROTOCOL_RADAR_STATE_201_H_
+#endif  // MODULES_CANBUS_VEHICL_ESR_PROTOCOL_CLUSTER_LIST_STATUS_600_H_

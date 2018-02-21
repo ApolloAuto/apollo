@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_CONTI_RADAR_PROTOCOL_CLUSER_QUALITY_INFO_702_H_
-#define MODULES_DRIVERS_CONTI_RADAR_PROTOCOL_CLUSER_QUALITY_INFO_702_H_
+#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_OBJECT_EXTENDED_INFO_60D_H_
+#define MODULES_DRIVERS_RADAR_CONTI_RADAR_PROTOCOL_OBJECT_EXTENDED_INFO_60D_H_
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
@@ -26,34 +26,32 @@ namespace conti_radar {
 
 using apollo::drivers::ContiRadar;
 
-class ClusterQualityInfo702
+class ObjectExtendedInfo60D
     : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
   static const uint32_t ID;
-  ClusterQualityInfo702();
+  ObjectExtendedInfo60D();
   void Parse(const std::uint8_t* bytes, int32_t length,
              ContiRadar* conti_radar) const override;
 
  private:
-  int target_id(const std::uint8_t* bytes, int32_t length) const;
+  int object_id(const std::uint8_t* bytes, int32_t length) const;
 
-  int longitude_dist_rms(const std::uint8_t* bytes, int32_t length) const;
+  double longitude_accel(const std::uint8_t* bytes, int32_t length) const;
 
-  int lateral_dist_rms(const std::uint8_t* bytes, int32_t length) const;
+  double lateral_accel(const std::uint8_t* bytes, int32_t length) const;
 
-  int longitude_vel_rms(const std::uint8_t* bytes, int32_t length) const;
+  int obstacle_class(const std::uint8_t* bytes, int32_t length) const;
 
-  int pdh0(const std::uint8_t* bytes, int32_t length) const;
+  double oritation_angle(const std::uint8_t* bytes, int32_t length) const;
 
-  int ambig_state(const std::uint8_t* bytes, int32_t length) const;
+  double object_length(const std::uint8_t* bytes, int32_t length) const;
 
-  int invalid_state(const std::uint8_t* bytes, int32_t length) const;
-
-  int lateral_vel_rms(const std::uint8_t* bytes, int32_t length) const;
+  double object_width(const std::uint8_t* bytes, int32_t length) const;
 };
 
 }  // namespace conti_radar
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_CANBUS_VEHICL_ESR_PROTOCOL_CLUSER_QUALITY_INFO_702_H_
+#endif  // MODULES_CANBUS_VEHICL_ESR_PROTOCOL_OBJECT_EXTENDED_INFO_60D_H_

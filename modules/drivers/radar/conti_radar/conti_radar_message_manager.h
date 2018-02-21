@@ -18,14 +18,14 @@
  * @file conti_radar_message_manager.h
  * @brief The class of ContiRadarMessageManager
  */
-#ifndef MODULES_DRIVERS_CONTI_RADAR_CONTI_RADAR_MESSAGE_MANAGER_H_
-#define MODULES_DRIVERS_CONTI_RADAR_CONTI_RADAR_MESSAGE_MANAGER_H_
+#ifndef MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_MESSAGE_MANAGER_H_
+#define MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_MESSAGE_MANAGER_H_
 
 #include <memory>
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/conti_radar/protocol/radar_config_200.h"
+#include "modules/drivers/radar/conti_radar/protocol/radar_config_200.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -65,4 +65,4 @@ class ContiRadarMessageManager : public MessageManager<ContiRadar> {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_CONTI_RADAR_CONTI_RADAR_MESSAGE_MANAGER_H_
+#endif  // MODULES_DRIVERS_RADAR_CONTI_RADAR_CONTI_RADAR_MESSAGE_MANAGER_H_

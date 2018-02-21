@@ -16,6 +16,6 @@ proto_library(
     ],
     deps = [
         "//modules/common/proto:header_proto_lib",
-        "//modules/drivers/conti_radar/proto:conti_radar_proto_lib",
+        "//modules/drivers/radar/conti_radar/proto:conti_radar_proto_lib",
     ],
 )

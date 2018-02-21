@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/conti_radar/protocol/cluster_list_status_600.h"
+#include "modules/drivers/radar/conti_radar/protocol/object_list_status_60a.h"
 
 #include "glog/logging.h"
 
@@ -28,22 +28,21 @@ namespace conti_radar {
 using apollo::drivers::canbus::Byte;
 using apollo::drivers::ContiRadarObs;
 
-ClusterListStatus600::ClusterListStatus600() {}
-const uint32_t ClusterListStatus600::ID = 0x600;
+ObjectListStatus60A::ObjectListStatus60A() {}
+const uint32_t ObjectListStatus60A::ID = 0x60A;
 
-void ClusterListStatus600::Parse(const std::uint8_t* bytes, int32_t length,
-                                 ContiRadar* conti_radar) const {
-  auto status = conti_radar->mutable_cluster_list_status();
-  status->set_near(near(bytes, length));
-  status->set_far(far(bytes, length));
+void ObjectListStatus60A::Parse(const std::uint8_t* bytes, int32_t length,
+                                ContiRadar* conti_radar) const {
+  auto status = conti_radar->mutable_object_list_status();
+  auto num_of_obj = num_of_objects(bytes, length);
+  status->set_nof_objects(num_of_obj);
   status->set_meas_counter(meas_counter(bytes, length));
   status->set_interface_version(interface_version(bytes, length));
-  auto counter = status->near() + status->far();
-  conti_radar->mutable_contiobs()->Reserve(counter);
+  conti_radar->mutable_contiobs()->Reserve(num_of_obj);
 }
 
-int ClusterListStatus600::near(const std::uint8_t* bytes,
-                               int32_t length) const {
+int ObjectListStatus60A::num_of_objects(const std::uint8_t* bytes,
+                                        int32_t length) const {
   Byte t0(bytes);
   int32_t x = t0.get_byte(0, 8);
 
@@ -51,21 +50,13 @@ int ClusterListStatus600::near(const std::uint8_t* bytes,
   return ret;
 }
 
-int ClusterListStatus600::far(const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
-  int32_t x = t0.get_byte(0, 8);
-
-  int ret = x;
-  return ret;
-}
-
-int ClusterListStatus600::meas_counter(const std::uint8_t* bytes,
-                                       int32_t length) const {
+int ObjectListStatus60A::meas_counter(const std::uint8_t* bytes,
+                                      int32_t length) const {
   Byte t0(bytes + 2);
-  int32_t x = t0.get_byte(0, 8);
+  uint32_t x = t0.get_byte(0, 8);
 
   Byte t1(bytes + 3);
-  uint32_t t = t0.get_byte(0, 8);
+  uint32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;
 
@@ -73,8 +64,8 @@ int ClusterListStatus600::meas_counter(const std::uint8_t* bytes,
   return ret;
 }
 
-int ClusterListStatus600::interface_version(const std::uint8_t* bytes,
-                                            int32_t length) const {
+int ObjectListStatus60A::interface_version(const std::uint8_t* bytes,
+                                           int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(4, 4);
 
