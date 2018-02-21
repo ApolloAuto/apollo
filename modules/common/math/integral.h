@@ -22,10 +22,10 @@
 #ifndef MODULES_COMMON_MATH_INTEGRAL_H_
 #define MODULES_COMMON_MATH_INTEGRAL_H_
 
+#include <array>
 #include <functional>
 #include <utility>
 #include <vector>
-
 /**
  * @namespace apollo::common::math
  * @brief apollo::common::math
@@ -49,8 +49,8 @@ template <std::size_t N>
 std::pair<std::array<double, N>, std::array<double, N>>
 GetGaussLegendrePoints();
 
-template <> inline
-std::pair<std::array<double, 2>, std::array<double, 2>>
+template <>
+inline std::pair<std::array<double, 2>, std::array<double, 2>>
 GetGaussLegendrePoints<2>() {
   std::array<double, 2> x;
   x[0] = -5.77350269189625764507e-01;
@@ -63,8 +63,8 @@ GetGaussLegendrePoints<2>() {
   return std::make_pair(x, w);
 }
 
-template <> inline
-std::pair<std::array<double, 3>, std::array<double, 3>>
+template <>
+inline std::pair<std::array<double, 3>, std::array<double, 3>>
 GetGaussLegendrePoints<3>() {
   std::array<double, 3> x;
   x[0] = 0.00000000000000000000e+00;
@@ -79,8 +79,8 @@ GetGaussLegendrePoints<3>() {
   return std::make_pair(x, w);
 }
 
-template <> inline
-std::pair<std::array<double, 4>, std::array<double, 4>>
+template <>
+inline std::pair<std::array<double, 4>, std::array<double, 4>>
 GetGaussLegendrePoints<4>() {
   std::array<double, 4> x;
   x[0] = 3.39981043584856264792e-01;
@@ -97,8 +97,8 @@ GetGaussLegendrePoints<4>() {
   return std::make_pair(x, w);
 }
 
-template <> inline
-std::pair<std::array<double, 5>, std::array<double, 5>>
+template <>
+inline std::pair<std::array<double, 5>, std::array<double, 5>>
 GetGaussLegendrePoints<5>() {
   std::array<double, 5> x;
   x[0] = 0.00000000000000000000e+00;
@@ -117,8 +117,8 @@ GetGaussLegendrePoints<5>() {
   return std::make_pair(x, w);
 }
 
-template <> inline
-std::pair<std::array<double, 6>, std::array<double, 6>>
+template <>
+inline std::pair<std::array<double, 6>, std::array<double, 6>>
 GetGaussLegendrePoints<6>() {
   std::array<double, 6> x;
   x[0] = 6.61209386466264513688e-01;
@@ -139,8 +139,8 @@ GetGaussLegendrePoints<6>() {
   return std::make_pair(x, w);
 }
 
-template <> inline
-std::pair<std::array<double, 7>, std::array<double, 7>>
+template <>
+inline std::pair<std::array<double, 7>, std::array<double, 7>>
 GetGaussLegendrePoints<7>() {
   std::array<double, 7> x;
   x[0] = 0.00000000000000000000e+00;
@@ -163,8 +163,8 @@ GetGaussLegendrePoints<7>() {
   return std::make_pair(x, w);
 }
 
-template <> inline
-std::pair<std::array<double, 8>, std::array<double, 8>>
+template <>
+inline std::pair<std::array<double, 8>, std::array<double, 8>>
 GetGaussLegendrePoints<8>() {
   std::array<double, 8> x;
   x[0] = 1.83434642495649804936e-01;
@@ -189,8 +189,8 @@ GetGaussLegendrePoints<8>() {
   return std::make_pair(x, w);
 }
 
-template <> inline
-std::pair<std::array<double, 9>, std::array<double, 9>>
+template <>
+inline std::pair<std::array<double, 9>, std::array<double, 9>>
 GetGaussLegendrePoints<9>() {
   std::array<double, 9> x;
   x[0] = 0.00000000000000000000e+00;
@@ -217,8 +217,8 @@ GetGaussLegendrePoints<9>() {
   return std::make_pair(x, w);
 }
 
-template <> inline
-std::pair<std::array<double, 10>, std::array<double, 10>>
+template <>
+inline std::pair<std::array<double, 10>, std::array<double, 10>>
 GetGaussLegendrePoints<10>() {
   std::array<double, 10> x;
   x[0] = 1.48874338981631210881e-01;
