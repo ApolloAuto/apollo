@@ -149,17 +149,19 @@ void RelativeMap::CreateMapFromPerception(
   navigation_lane_.Update(perception_obstacles);
 
   // create map proto from navigation_path
-  if (!CreateMapFromNavigationPath(
+  if (!CreateMapMsgFromNavigationPath(
           navigation_lane_.Path(), navigation_lane_.left_width(),
-          navigation_lane_.right_width(), map_msg->mutable_hdmap())) {
+          navigation_lane_.right_width(), map_msg)) {
     map_msg->clear_hdmap();
     AERROR << "Failed to create map from navigation path";
   }
 }
 
-bool RelativeMap::CreateMapFromNavigationPath(
+bool RelativeMap::CreateMapMsgFromNavigationPath(
     const NavigationPath& navigation_path, double left_width,
-    double right_width, hdmap::Map* hdmap) {
+    double right_width, MapMsg* map_msg) {
+  auto* navigation_info = map_msg->mutable_navigation_path();
+  auto* hdmap = map_msg->mutable_hdmap();
   const auto& path = navigation_path.path();
   if (path.path_point_size() < 2) {
     AERROR << "The path length is invalid";
@@ -169,6 +171,7 @@ bool RelativeMap::CreateMapFromNavigationPath(
   auto* lane = hdmap->add_lane();
   lane->mutable_id()->set_id(std::to_string(navigation_path.path_priority()) +
                              "_" + path.name());
+  (*navigation_info)[lane->id().id()] = navigation_path;
   // lane types
   lane->set_type(Lane::CITY_DRIVING);
   lane->set_turn(Lane::NO_TURN);
