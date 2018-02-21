@@ -153,9 +153,8 @@ std::string PathData::DebugString() const {
                static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
 
   return apollo::common::util::StrCat(
-      "[\n",
-      apollo::common::util::PrintDebugStringIter(
-          path_points.begin(), path_points.begin() + limit, ",\n"),
+      "[\n", apollo::common::util::PrintDebugStringIter(
+                 path_points.begin(), path_points.begin() + limit, ",\n"),
       "]\n");
 }
 

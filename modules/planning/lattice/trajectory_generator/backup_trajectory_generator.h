@@ -28,8 +28,8 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
 #include "modules/planning/math/curve1d/curve1d.h"
@@ -80,7 +80,8 @@ class BackupTrajectoryGenerator {
   };
 
   std::priority_queue<Trajectory1dPair, std::vector<Trajectory1dPair>,
-                      CostComparator> trajectory_pair_pqueue_;
+                      CostComparator>
+      trajectory_pair_pqueue_;
 };
 
 }  // namespace planning

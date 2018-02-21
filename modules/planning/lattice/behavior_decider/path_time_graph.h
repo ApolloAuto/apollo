@@ -39,9 +39,9 @@ namespace planning {
 
 class PathTimeGraph {
  public:
-  PathTimeGraph(
-      const std::vector<const Obstacle*>& obstacles, const double ego_s,
-      const std::vector<common::PathPoint>& discretized_ref_points);
+  PathTimeGraph(const std::vector<const Obstacle*>& obstacles,
+                const double ego_s,
+                const std::vector<common::PathPoint>& discretized_ref_points);
 
   const std::vector<PathTimeObstacle>& GetPathTimeObstacles() const;
 
@@ -62,8 +62,7 @@ class PathTimeGraph {
   std::pair<double, double> get_time_range() const;
 
   std::vector<std::pair<double, double>> GetPathTimeNeighborhoodPoints(
-      const std::size_t index,
-      const double s_dist,
+      const std::size_t index, const double s_dist,
       const double t_density) const;
 
  private:
