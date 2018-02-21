@@ -41,12 +41,23 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     bool is_auto_tuning, std::shared_ptr<PathTimeGraph> pathtime_neighborhood)
     : is_auto_tuning_(is_auto_tuning),
       pathtime_neighborhood_(pathtime_neighborhood) {
-  double start_time = 0.0;
-  double end_time = FLAGS_trajectory_time_length;
+  const double start_time = 0.0;
+  const double end_time = FLAGS_trajectory_time_length;
   path_time_intervals_ = pathtime_neighborhood_->GetPathBlockingIntervals(
       start_time, end_time, FLAGS_trajectory_time_resolution);
 
+  // if we have a stop point along the reference line,
+  // filter out the lon. trajectories that pass the stop point.
+  double stop_point = std::numeric_limits<double>::max();
+  if (planning_target.has_stop_point()) {
+    stop_point = planning_target.stop_point();
+  }
   for (const auto lon_trajectory : lon_trajectories) {
+    double lon_end_s = lon_trajectory->Evaluate(0, end_time);
+    if (lon_end_s > stop_point) {
+      continue;
+    }
+
     if (!ConstraintChecker1d::IsValidLongitudinalTrajectory(*lon_trajectory)) {
       continue;
     }
