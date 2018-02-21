@@ -58,7 +58,7 @@ int SignalLightScenario::ComputeScenarioDecision(
     auto it_signal = detected_signals.find(signal_from_map->object_id);
     if (it_signal == detected_signals.end()) {
       AWARN << "Cannot detect signal which is marked on the map; signal id: "
-          << signal_from_map->object_id;
+            << signal_from_map->object_id;
       continue;
     }
 
@@ -87,7 +87,6 @@ int SignalLightScenario::ComputeScenarioDecision(
 std::vector<const hdmap::PathOverlap*>
 SignalLightScenario::FindValidSignalLightFromMap(
     ReferenceLineInfo* const reference_line_info) {
-
   const std::vector<hdmap::PathOverlap>& signal_lights =
       reference_line_info->reference_line().map_path().signal_overlaps();
   if (signal_lights.size() == 0) {
@@ -110,7 +109,7 @@ std::unordered_map<std::string, const TrafficLight*>
 SignalLightScenario::GetPerceptionDetectedSignals() {
   if (AdapterManager::GetTrafficLightDetection()->Empty() ||
       (AdapterManager::GetTrafficLightDetection()->GetDelaySec() >
-            FLAGS_signal_expire_time_sec)) {
+       FLAGS_signal_expire_time_sec)) {
     ADEBUG << "traffic light signals msg is either empty or outdated.";
     return std::unordered_map<std::string, const TrafficLight*>();
   }

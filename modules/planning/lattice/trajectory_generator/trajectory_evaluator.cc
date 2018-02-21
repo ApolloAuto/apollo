@@ -38,11 +38,9 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     const PlanningTarget& planning_target,
     const std::vector<std::shared_ptr<Trajectory1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Trajectory1d>>& lat_trajectories,
-    bool is_auto_tuning,
-    std::shared_ptr<PathTimeGraph> pathtime_neighborhood)
+    bool is_auto_tuning, std::shared_ptr<PathTimeGraph> pathtime_neighborhood)
     : is_auto_tuning_(is_auto_tuning),
       pathtime_neighborhood_(pathtime_neighborhood) {
-
   double start_time = 0.0;
   double end_time = FLAGS_trajectory_time_length;
   path_time_intervals_ = pathtime_neighborhood_->GetPathBlockingIntervals(
@@ -60,8 +58,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(
       }
       */
       if (!is_auto_tuning_) {
-        double cost =
-            Evaluate(planning_target, lon_trajectory, lat_trajectory);
+        double cost = Evaluate(planning_target, lon_trajectory, lat_trajectory);
         cost_queue_.push(PairCost({lon_trajectory, lat_trajectory}, cost));
       } else {
         std::vector<double> cost_components;
@@ -194,8 +191,7 @@ double TrajectoryEvaluator::LatComfortCost(
        t += FLAGS_trajectory_time_resolution) {
     double s = lon_trajectory->Evaluate(0, t);
     double cost = lat_trajectory->Evaluate(1, s) *
-                  lon_trajectory->Evaluate(1, t) /
-                  FLAGS_default_cruise_speed;
+                  lon_trajectory->Evaluate(1, t) / FLAGS_default_cruise_speed;
     cost_sqr_sum += cost * cost;
     cost_abs_sum += std::abs(cost);
   }
