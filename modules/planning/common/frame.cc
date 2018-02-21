@@ -77,6 +77,10 @@ const common::VehicleState &Frame::vehicle_state() const {
 }
 
 bool Frame::Rerouting() {
+  if (FLAGS_use_navigation_mode) {
+    AERROR << "Rerouting not supported in navigation mode";
+    return false;
+  }
   auto *adapter_manager = AdapterManager::instance();
   if (adapter_manager->GetRoutingResponse()->Empty()) {
     AERROR << "No previous routing available";
@@ -280,6 +284,9 @@ const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
 }
 
 int Frame::CreateDestinationObstacle() {
+  if (FLAGS_use_navigation_mode) {
+    return 0;
+  }
   const auto &routing =
       AdapterManager::GetRoutingResponse()->GetLatestObserved();
   if (routing.routing_request().waypoint_size() < 2) {
@@ -410,9 +417,11 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   auto debug_chassis = planning_data->mutable_chassis();
   debug_chassis->CopyFrom(chassis);
 
-  auto debug_routing = planning_data->mutable_routing();
-  debug_routing->CopyFrom(
-      AdapterManager::GetRoutingResponse()->GetLatestObserved());
+  if (!FLAGS_use_navigation_mode) {
+    auto debug_routing = planning_data->mutable_routing();
+    debug_routing->CopyFrom(
+        AdapterManager::GetRoutingResponse()->GetLatestObserved());
+  }
 
   planning_data->mutable_prediction_header()->CopyFrom(prediction_.header());
 }
