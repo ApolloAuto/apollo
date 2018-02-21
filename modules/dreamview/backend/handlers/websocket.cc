@@ -144,6 +144,9 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
   return true;
 }
 
+thread_local unsigned char WebSocketHandler::current_opcode_ = 0x00;
+thread_local std::stringstream WebSocketHandler::data_;
+
 bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
                                   int bits, char *data, size_t data_len) {
   // Ignore connection close request.
@@ -151,22 +154,40 @@ bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
     return false;
   }
 
-  switch (bits &= 0x7f) {
-    case WEBSOCKET_OPCODE_TEXT:
-      return handleJsonData(conn, data, data_len);
-    case WEBSOCKET_OPCODE_BINARY:
-      return handleBinaryData(conn, data, data_len);
-    default:
-      AERROR << "Unknown WebSocket bits flag: " << bits;
-      return true;
+  WebSocketHandler::data_.write(data, data_len);
+  if (WebSocketHandler::current_opcode_ == 0x00) {
+    WebSocketHandler::current_opcode_ = bits & 0x7f;
   }
+
+  bool result = true;
+  bool isFinalFragment = bits & 0x80;
+  if (isFinalFragment) {
+    switch (WebSocketHandler::current_opcode_) {
+      case WEBSOCKET_OPCODE_TEXT:
+        result = handleJsonData(conn, WebSocketHandler::data_.str());
+        break;
+      case WEBSOCKET_OPCODE_BINARY:
+        result = handleBinaryData(conn, WebSocketHandler::data_.str());
+        break;
+      default:
+        AERROR << "Unknown WebSocket bits flag: " << bits;
+        break;
+    }
+
+    // rest opcode and data
+    WebSocketHandler::current_opcode_ = 0x00;
+    WebSocketHandler::data_.clear();
+    WebSocketHandler::data_.str(std::string());
+  }
+
+  return result;
 }
 
-bool WebSocketHandler::handleJsonData(Connection *conn, char *data,
-                                      size_t data_len) {
+bool WebSocketHandler::handleJsonData(Connection *conn,
+                                      const std::string &data) {
   Json json;
   try {
-    json = Json::parse(data, data + data_len);
+    json = Json::parse(data.begin(), data.end());
   } catch (const std::exception &e) {
     AERROR << "Failed to parse JSON data: " << e.what();
     return false;
@@ -187,11 +208,10 @@ bool WebSocketHandler::handleJsonData(Connection *conn, char *data,
   return true;
 }
 
-bool WebSocketHandler::handleBinaryData(Connection *conn, char *data,
-                                        size_t data_len) {
+bool WebSocketHandler::handleBinaryData(Connection *conn,
+                                        const std::string &data) {
   auto type = "Binary";
-  std::string data_string(data, data_len);
-  message_handlers_[type](data_string, conn);
+  message_handlers_[type](data, conn);
   return true;
 }
 

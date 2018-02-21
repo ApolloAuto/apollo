@@ -48,6 +48,11 @@ namespace dreamview {
  * to all the connected clients.
  */
 class WebSocketHandler : public CivetWebSocketHandler {
+  // In case of receiving fragmented message,
+  // websocket opcode and accumulated data are stored.
+  thread_local static unsigned char current_opcode_;
+  thread_local static std::stringstream data_;
+
  public:
   using Json = nlohmann::json;
   using Connection = struct mg_connection;
@@ -90,8 +95,8 @@ class WebSocketHandler : public CivetWebSocketHandler {
   bool handleData(CivetServer *server, Connection *conn, int bits, char *data,
                   size_t data_len) override;
 
-  bool handleJsonData(Connection *conn, char *data, size_t data_len);
-  bool handleBinaryData(Connection *conn, char *data, size_t data_len);
+  bool handleJsonData(Connection *conn, const std::string &data);
+  bool handleBinaryData(Connection *conn, const std::string &data);
 
   /**
    * @brief Callback method for when the connection is closed.
