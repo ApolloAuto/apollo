@@ -265,6 +265,88 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
 }
 
 /*
+ * stop_sign:
+ * bag:
+ *    step 1/3: 22018-02-15-16-37-45/2018-02-15-16-40-46_3.bag
+ *    step2:    22018-02-15-16-37-45/2018-02-15-16-41-46_4.bag
+ * step 1:
+ *   adc decision: STOP
+ * step 2:
+ *   pass stop sign
+ * step 3:
+ *   come back to the same stop sign 2nd time
+ *   adc decision: STOP
+ */
+TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
+  FLAGS_enable_stop_sign = true;
+
+  std::string seq_num = "12";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(0);
+
+  // check dropbox value to make sure they are set
+  std::string db_key_stop_status = "kStopSignStopStatus_9762";
+  StopSign::StopSignStopStatus* status =
+      Dropbox<StopSign::StopSignStopStatus>::Open()->Get(db_key_stop_status);
+  EXPECT_TRUE(status != nullptr);
+
+  std::string db_key_stop_starttime = "kStopSignStopStarttime_9762";
+  double* start_time = Dropbox<double>::Open()->Get(db_key_stop_starttime);
+  EXPECT_TRUE(start_time != nullptr);
+
+  std::string db_key_associated_lanes = "kStopSignAssociateLane_9762";
+  std::vector<std::string>* associated_lanes =
+      Dropbox<std::vector<std::string>>::Open()->Get(db_key_associated_lanes);
+  EXPECT_TRUE(associated_lanes != nullptr);
+
+  // step 2: pass stop sign
+  seq_num = "13";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(1);
+
+  // check dropbox value to make sure everything is cleared for that stop sign
+  db_key_stop_status = "kStopSignStopStatus_9762";
+  status = Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
+      db_key_stop_status);
+  EXPECT_TRUE(status == nullptr);
+
+  db_key_stop_starttime = "kStopSignStopStarttime_9762";
+  start_time = Dropbox<double>::Open()->Get(db_key_stop_starttime);
+  EXPECT_TRUE(start_time == nullptr);
+
+  std::string db_key_watch_vehicle = "kStopSignWatchVehicle_743_1_-2";
+  std::vector<std::string>* value =
+      Dropbox<std::vector<std::string>>::Open()->Get(db_key_watch_vehicle);
+  EXPECT_TRUE(value == nullptr);
+  db_key_watch_vehicle = "kStopSignWatchVehicle_743_1_-1";
+  value = Dropbox<std::vector<std::string>>::Open()->Get(db_key_watch_vehicle);
+  EXPECT_TRUE(value == nullptr);
+  db_key_watch_vehicle = "kStopSignWatchVehicle_868_1_-1";
+  value = Dropbox<std::vector<std::string>>::Open()->Get(db_key_watch_vehicle);
+  EXPECT_TRUE(value == nullptr);
+
+  db_key_associated_lanes = "kStopSignAssociateLane_9762";
+  associated_lanes =
+      Dropbox<std::vector<std::string>>::Open()->Get(db_key_associated_lanes);
+  EXPECT_TRUE(associated_lanes == nullptr);
+
+  // step 3: 2nd round
+  seq_num = "12";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(2);
+}
+
+/*
  * crosswalk: pedestrian on crosswalk
  * bag: 2018-01-29-17-22-46/2018-01-29-17-31-47_9.bag
  * decision: STOP
