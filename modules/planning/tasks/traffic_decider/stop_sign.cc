@@ -66,6 +66,7 @@ bool StopSign::ApplyRule(Frame* frame,
   }
 
   bool stop_sign_ahead = FindNextStopSign(reference_line_info);
+
   ClearOtherStopSignDropbox(reference_line_info);
 
   if (!stop_sign_ahead) {
@@ -313,8 +314,21 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
       }
       break;
     }
-    case StopSignStopStatus::STOP_DONE:
+    case StopSignStopStatus::STOP_DONE: {
+      // adjust STOP_DONE status. this may happen if there's bad data in DP
+      double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+      double stop_line_start_s = next_stop_sign_overlap_->start_s;
+      double distance_stop_line_to_adc_front_edge =
+          stop_line_start_s - adc_front_edge_s;
+      if (distance_stop_line_to_adc_front_edge >
+          FLAGS_max_valid_stop_distance) {
+        ADEBUG << "adjust STOP_DONE status. not a valid stop. "
+            << "too far from stop line["
+            << distance_stop_line_to_adc_front_edge << "]";
+        stop_status_ = StopSignStopStatus::TO_STOP;
+      }
       break;
+    }
     default:
       break;
   }
@@ -768,7 +782,7 @@ void StopSign::ClearDropbox(const std::string& stop_sign_id) {
   // clear associate lanes from dropbox
   std::string db_key_associated_lanes =
       db_key_stop_sign_associated_lanes_prefix_ + stop_sign_id;
-  Dropbox<double>::Open()->Remove(db_key_associated_lanes);
+  Dropbox<std::vector<std::string>>::Open()->Remove(db_key_associated_lanes);
   ADEBUG << "remove dropbox item: " << db_key_associated_lanes;
 }
 
