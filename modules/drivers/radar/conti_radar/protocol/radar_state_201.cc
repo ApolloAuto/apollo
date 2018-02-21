@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/conti_radar/protocol/radar_state_201.h"
+#include "modules/drivers/radar/conti_radar/protocol/radar_state_201.h"
 
 #include "glog/logging.h"
 

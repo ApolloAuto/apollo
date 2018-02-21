@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "modules/common/apollo_app.h"
-#include "modules/drivers/conti_radar/conti_radar_canbus.h"
+#include "modules/drivers/radar/conti_radar/conti_radar_canbus.h"
 
 using ::apollo::drivers::conti_radar::ContiRadarCanbus;
 APOLLO_MAIN(ContiRadarCanbus);
