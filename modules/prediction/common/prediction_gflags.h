@@ -92,9 +92,6 @@ DECLARE_double(default_lateral_approach_speed);
 DECLARE_double(time_upper_bound_to_lane_center);
 DECLARE_double(time_lower_bound_to_lane_center);
 DECLARE_double(sample_time_gap);
-DECLARE_double(motion_weight_a);
-DECLARE_double(motion_weight_b);
-DECLARE_double(motion_weight_c);
 DECLARE_double(cost_alpha);
 DECLARE_double(default_time_to_lane_center);
 
