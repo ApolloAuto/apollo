@@ -333,14 +333,18 @@ std::pair<double, double> PathTimeGraph::get_time_range() const {
   return time_range_;
 }
 
-std::vector<std::pair<double, double>>
-PathTimeGraph::GetPathTimeNeighborhoodPoints(const std::size_t index,
+std::vector<PathTimePoint>
+PathTimeGraph::GetPathTimeNeighborhoodPoints(const std::string& obstacle_id,
                                              const double s_dist,
                                              const double t_min_density) const {
-  CHECK(index < path_time_obstacles_.size());
   CHECK(t_min_density > 0.0);
+  std::vector<PathTimePoint> pt_pairs;
+  if (path_time_obstacle_map_.find(obstacle_id) ==
+      path_time_obstacle_map_.end()) {
+    return pt_pairs;
+  }
 
-  const auto& pt_obstacle = path_time_obstacles_[index];
+  const auto& pt_obstacle = path_time_obstacle_map_.at(obstacle_id);
 
   double s0 = 0.0;
   double s1 = 0.0;
@@ -366,12 +370,17 @@ PathTimeGraph::GetPathTimeNeighborhoodPoints(const std::size_t index,
   std::size_t num_sections = std::size_t((t1 - t0) / t_min_density) + 1;
   double t_interval = (t1 - t0) / num_sections;
 
-  std::vector<std::pair<double, double>> pt_pairs;
   for (std::size_t i = 0; i <= num_sections; ++i) {
     double t = t_interval * i + t0;
     double s = lerp(s0, t0, s1, t1, t) + s_dist;
+    double v = SpeedAtT(obstacle_id, s, t);
 
-    pt_pairs.emplace_back(s, t);
+    PathTimePoint ptt;
+    ptt.set_obstacle_id(obstacle_id);
+    ptt.set_t(t);
+    ptt.set_s(s);
+    ptt.set_v(v);
+    pt_pairs.push_back(std::move(ptt));
   }
 
   return pt_pairs;
