@@ -137,12 +137,11 @@ void Crosswalk::MakeDecisions(Frame* const frame,
           !path_obstacle->reference_line_st_boundary().IsEmpty();
 
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-             << "] crosswalk_id[" << crosswalk_id
-             << "] obstacle_l[" << obstacle_sl_point.l()
-             << "] within_crosswalk_area[" << in_crosswalk
-             << "] within_expanded_crosswalk_area[" << in_expanded_crosswalk
-             << "] is_on_road[" << is_on_road << "] is_path_cross["
-             << is_path_cross << "]";
+             << "] crosswalk_id[" << crosswalk_id << "] obstacle_l["
+             << obstacle_sl_point.l() << "] within_crosswalk_area["
+             << in_crosswalk << "] within_expanded_crosswalk_area["
+             << in_expanded_crosswalk << "] is_on_road[" << is_on_road
+             << "] is_path_cross[" << is_path_cross << "]";
 
       bool stop = false;
       if (obstacle_l_distance >= FLAGS_crosswalk_loose_l_distance) {

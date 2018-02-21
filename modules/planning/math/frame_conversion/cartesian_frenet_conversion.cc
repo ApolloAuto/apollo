@@ -78,7 +78,6 @@ void CartesianFrenetConverter::cartesian_to_frenet(
 void CartesianFrenetConverter::cartesian_to_frenet(
     const double rs, const double rx, const double ry, const double rtheta,
     const double x, const double y, double* ptr_s, double* ptr_d) {
-
   const double dx = x - rx;
   const double dy = y - ry;
 
