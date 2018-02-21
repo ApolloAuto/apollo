@@ -31,16 +31,12 @@ using common::adapter::AdapterManager;
 DEFINE_string(test_data_dir, "", "the test data folder");
 DEFINE_bool(test_update_golden_log, false,
             "true to update decision golden log file.");
-DEFINE_string(test_routing_response_file, "garage_routing.pb.txt",
-              "The routing file used in test");
-DEFINE_string(test_localization_file, "garage_localization.pb.txt",
-              "The localization test file");
-DEFINE_string(test_chassis_file, "garage_chassis.pb.txt",
-              "The chassis test file");
+DEFINE_string(test_routing_response_file, "", "The routing file used in test");
+DEFINE_string(test_localization_file, "", "The localization test file");
+DEFINE_string(test_chassis_file, "", "The chassis test file");
 DEFINE_string(test_prediction_file, "", "The prediction module test file");
 DEFINE_string(test_traffic_light_file, "", "The traffic light test file");
 DEFINE_string(test_relative_map_file, "", "The relative map test file");
-
 DEFINE_string(test_previous_planning_file, "",
               "The previous planning test file");
 
@@ -51,9 +47,10 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_smoother_config_filename =
       "modules/planning/conf/smoother_config.pb.txt";
   FLAGS_map_dir = "modules/planning/testdata";
-  FLAGS_test_localization_file = "garage_localization.pb.txt";
-  FLAGS_test_chassis_file = "garage_chassis.pb.txt";
-  FLAGS_test_prediction_file = "garage_prediction.pb.txt";
+  FLAGS_test_localization_file = "";
+  FLAGS_test_chassis_file = "";
+  FLAGS_test_routing_response_file = "";
+  FLAGS_test_prediction_file = "";
   FLAGS_align_prediction_time = false;
   FLAGS_estimate_current_vehicle_state = false;
   FLAGS_enable_reference_line_provider_thread = false;
@@ -62,20 +59,23 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_enable_lag_prediction = false;
 }
 
-#define FEED_ADAPTER(TYPE, FILENAME)                                         \
-  if (!AdapterManager::Get##TYPE()) {                                        \
-    AERROR << #TYPE                                                          \
-        " is not registered in adapter manager, check adapter file "         \
-           << FLAGS_planning_adapter_config_filename;                        \
-    return false;                                                            \
-  }                                                                          \
-  if (!FILENAME.empty() && !AdapterManager::Feed##TYPE##File(                \
-                               FLAGS_test_data_dir + "/" + FILENAME)) {      \
-    AERROR << "Failed to feed " #TYPE " file " << FLAGS_test_data_dir << "/" \
-           << FILENAME;                                                      \
-    return false;                                                            \
-  }                                                                          \
-  AINFO << "Using " #TYPE << " provided by " << FILENAME;
+#define FEED_ADAPTER(TYPE, FILENAME)                                           \
+  if (!AdapterManager::Get##TYPE()) {                                          \
+    AERROR << #TYPE                                                            \
+        " is not registered in adapter manager, check adapter file "           \
+           << FLAGS_planning_adapter_config_filename;                          \
+    return false;                                                              \
+  }                                                                            \
+  if (!FILENAME.empty()) {                                                     \
+    if (!AdapterManager::Feed##TYPE##File(FLAGS_test_data_dir + "/" +          \
+                                          FILENAME)) {                         \
+      AERROR << "Failed to feed " #TYPE " file " << FLAGS_test_data_dir << "/" \
+             << FILENAME;                                                      \
+      return false;                                                            \
+    }                                                                          \
+    AINFO << "Using " #TYPE << " provided by " << FLAGS_test_data_dir << "/"   \
+          << FILENAME;                                                         \
+  }
 
 bool PlanningTestBase::SetUpAdapters() {
   if (!AdapterManager::Initialized()) {

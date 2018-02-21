@@ -199,8 +199,13 @@ void ReferenceLineProvider::GenerateThread() {
 }
 
 double ReferenceLineProvider::LastTimeDelay() {
-  std::lock_guard<std::mutex> lock(reference_lines_mutex_);
-  return last_calculation_time_;
+  if (FLAGS_enable_reference_line_provider_thread &&
+      !FLAGS_use_navigation_mode) {
+    std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+    return last_calculation_time_;
+  } else {
+    return last_calculation_time_;
+  }
 }
 
 bool ReferenceLineProvider::GetReferenceLines(
@@ -210,12 +215,15 @@ bool ReferenceLineProvider::GetReferenceLines(
   CHECK_NOTNULL(segments);
 
   if (FLAGS_use_navigation_mode) {
+    double start_time = Clock::NowInSeconds();
     bool result = GetReferenceLinesFromRelativeMap(
         AdapterManager::GetRelativeMap()->GetLatestObserved(), reference_lines,
         segments);
     if (!result) {
       AERROR << "Failed to get reference line from relative map";
     }
+    double end_time = Clock::NowInSeconds();
+    last_calculation_time_ = end_time - start_time;
     return result;
   }
 
@@ -260,7 +268,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     const relative_map::MapMsg &relative_map,
     std::list<ReferenceLine> *reference_line,
     std::list<hdmap::RouteSegments> *segments) {
-  if (!relative_map.navigation_path_size() <= 0) {
+  if (relative_map.navigation_path_size() <= 0) {
     return false;
   }
   auto *hdmap = HDMapUtil::BaseMapPtr();
