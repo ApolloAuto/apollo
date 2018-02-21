@@ -55,6 +55,7 @@ DECLARE_string(test_chassis_file);
 DECLARE_string(test_data_dir);
 DECLARE_string(test_prediction_file);
 DECLARE_string(test_traffic_light_file);
+DECLARE_string(test_relative_map_file);
 DECLARE_string(test_previous_planning_file);
 
 class PlanningTestBase : public ::testing::Test {

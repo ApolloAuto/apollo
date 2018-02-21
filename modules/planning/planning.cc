@@ -177,8 +177,13 @@ void Planning::RunOnce() {
 
   const double start_timestamp = Clock::NowInSeconds();
 
-  hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
-  CHECK(hdmap_) << "Failed to load map";
+  if (FLAGS_use_navigation_mode) {
+    // hdmap is created on the fly with relative map
+    hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
+    CHECK(hdmap_) << "Failed to load map";
+    reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
+        new ReferenceLineProvider(hdmap_, config_.smoother_type()));
+  }
 
   ADCTrajectory not_ready_pb;
   auto* not_ready = not_ready_pb.mutable_decision()
@@ -188,7 +193,8 @@ void Planning::RunOnce() {
     not_ready->set_reason("localization not ready");
   } else if (AdapterManager::GetChassis()->Empty()) {
     not_ready->set_reason("chassis not ready");
-  } else if (AdapterManager::GetRoutingResponse()->Empty()) {
+  } else if (!FLAGS_use_navigation_mode &&
+             AdapterManager::GetRoutingResponse()->Empty()) {
     not_ready->set_reason("routing not ready");
   }
   if (not_ready->has_reason()) {
@@ -234,7 +240,8 @@ void Planning::RunOnce() {
     return;
   }
 
-  if (!reference_line_provider_->UpdateRoutingResponse(
+  if (!FLAGS_use_navigation_mode &&
+      !reference_line_provider_->UpdateRoutingResponse(
           AdapterManager::GetRoutingResponse()->GetLatestObserved())) {
     std::string msg("Failed to update routing in reference line provider");
     AERROR << msg;
@@ -249,7 +256,9 @@ void Planning::RunOnce() {
   }
 
   // Update reference line provider
-  reference_line_provider_->UpdateVehicleState(vehicle_state);
+  if (!FLAGS_use_navigation_mode) {
+    reference_line_provider_->UpdateVehicleState(vehicle_state);
+  }
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
   bool is_replan = false;
