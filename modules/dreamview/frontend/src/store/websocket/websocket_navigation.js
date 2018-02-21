@@ -1,5 +1,5 @@
 import Worker from 'worker-loader!utils/webworker.js';
-import GMAP_NAVIGATOR from "utils/navigation/gmap_navigator";
+import GMAP_NAVIGATOR from "components/Navigation/GmapNavigator";
 
 export default class NavigationWebSocketEndpoint {
     constructor(serverAddr) {
