@@ -47,10 +47,15 @@ class FeasibleRegion {
   void Setup(const std::array<double, 3>& init_s, const double speed_limit);
 
   std::array<double, 3> init_s_;
+
   double speed_limit_;
+
   double t_at_zero_speed_;
+
   double s_at_zero_speed_;
+
   double t_at_speed_limit_;
+
   double s_at_speed_limit_;
 };
 

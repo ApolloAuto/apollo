@@ -70,13 +70,17 @@ int LastIndexBefore(const prediction::Trajectory& trajectory, const double t) {
 }  // namespace
 
 PathTimeGraph::PathTimeGraph(
-    const std::vector<const Obstacle*>& obstacles, const double ego_s,
-    const std::vector<PathPoint>& discretized_ref_points) {
-  path_range_.first = ego_s;
-  path_range_.second = ego_s + FLAGS_decision_horizon;
+    const std::vector<const Obstacle*>& obstacles,
+    const std::vector<PathPoint>& discretized_ref_points,
+    const double s_start,
+    const double s_end,
+    const double t_start,
+    const double t_end) {
+  path_range_.first = s_start;
+  path_range_.second = s_end;
 
-  time_range_.first = 0.0;
-  time_range_.second = FLAGS_trajectory_time_length;
+  time_range_.first = t_start;
+  time_range_.second = t_end;
 
   discretized_ref_points_ = discretized_ref_points;
   SetupObstacles(obstacles, discretized_ref_points);
