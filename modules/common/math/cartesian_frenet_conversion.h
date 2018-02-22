@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 /**
- * @file cartesian_frenet_conversion.h
+ * @file
  **/
 
-#ifndef MODULES_PLANNING_MATH_FRAME_CONVERSION_CARTESIAN_FRENET_CONVERSION_H_
-#define MODULES_PLANNING_MATH_FRAME_CONVERSION_CARTESIAN_FRENET_CONVERSION_H_
+#ifndef MODULES_COMMON_MATH_CARTESIAN_FRENET_CONVERSION_H_
+#define MODULES_COMMON_MATH_CARTESIAN_FRENET_CONVERSION_H_
 
 #include <array>
 
@@ -103,4 +103,4 @@ class CartesianFrenetConverter {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_FRAME_CONVERSION_CARTESIAN_FRENET_CONVERSION_H_
+#endif  // MODULES_COMMON_MATH_CARTESIAN_FRENET_CONVERSION_H_
