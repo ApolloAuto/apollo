@@ -22,6 +22,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/map/relative_map/relative_map.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
@@ -80,6 +81,9 @@ Status Prediction::Init() {
 
   CHECK(AdapterManager::GetLocalization()) << "Localization is not ready.";
   CHECK(AdapterManager::GetPerceptionObstacles()) << "Perception is not ready.";
+  if (FLAGS_use_navigation_mode) {
+    CHECK(AdapterManager::GetRelativeMap());
+  }
 
   // Set perception obstacle callback function
   AdapterManager::AddPerceptionObstaclesCallback(&Prediction::RunOnce, this);
@@ -88,7 +92,7 @@ Status Prediction::Init() {
   // Set planning callback function
   AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
 
-  if (!PredictionMap::Ready()) {
+  if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     return OnError("Map cannot be loaded.");
   }
 
@@ -132,6 +136,15 @@ void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
 }
 
 void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
+  if (FLAGS_prediction_offline_mode) {
+    PredictOnNavigation(perception_obstacles);
+  } else {
+    PredictOnHDMap(perception_obstacles);
+  }
+}
+
+void Prediction::PredictOnHDMap(
+    const PerceptionObstacles& perception_obstacles) {
   if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0 &&
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
@@ -202,6 +215,11 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   }
 
   Publish(&prediction_obstacles);
+}
+
+void Prediction::PredictOnNavigation(
+    const PerceptionObstacles& perception_obstacles) {
+  // TODO(kechxu): implement
 }
 
 Status Prediction::OnError(const std::string& error_msg) {
