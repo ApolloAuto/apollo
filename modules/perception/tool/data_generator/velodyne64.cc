@@ -20,6 +20,8 @@
 
 #include "modules/perception/tool/data_generator/velodyne64.h"
 
+#include <cmath>
+
 namespace apollo {
 namespace perception {
 namespace data_generator {
@@ -92,7 +94,8 @@ void Velodyne64::TransPointCloudMsgToPCL(
   size_t points_num = 0;
   for (size_t i = 0; i < in_cloud.size(); ++i) {
     pcl_util::PointXYZIT& pt = in_cloud.points[i];
-    if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z) && !isnan(pt.intensity)) {
+    if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z) &&
+        !std::isnan(pt.intensity)) {
       cloud->points[points_num].x = pt.x;
       cloud->points[points_num].y = pt.y;
       cloud->points[points_num].z = pt.z;

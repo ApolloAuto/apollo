@@ -154,7 +154,8 @@ void CommonSharedData<M>::RemoveStaleData() {
   bool has_change = false;
   for (auto iter = data_added_time_map_.begin();
        iter != data_added_time_map_.end();) {
-    if (now - iter->second > FLAGS_shared_data_stale_time) {
+    if (now - iter->second >
+        static_cast<uint64_t>(FLAGS_shared_data_stale_time)) {
       const size_t erase_cnt = data_map_.erase(iter->first);
       if (erase_cnt != 1u) {
         AWARN << "_data_map erase cnt:" << erase_cnt << " key:" << iter->first;
