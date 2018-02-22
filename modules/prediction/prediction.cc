@@ -85,12 +85,17 @@ Status Prediction::Init() {
     CHECK(AdapterManager::GetRelativeMap());
   }
 
+  if (FLAGS_use_navigation_mode) {
+    // Set relative map callback function
+    AdapterManager::AddRelativeMapCallback(&Prediction::OnRelativeMap, this);
+  } else {
+    // Set localization callback function
+    AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
+    // Set planning callback function
+    AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
+  }
   // Set perception obstacle callback function
   AdapterManager::AddPerceptionObstaclesCallback(&Prediction::RunOnce, this);
-  // Set localization callback function
-  AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
-  // Set planning callback function
-  AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
 
   if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     return OnError("Map cannot be loaded.");
@@ -133,6 +138,10 @@ void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
 
   ADEBUG << "Received a planning message [" << adc_trajectory.ShortDebugString()
          << "].";
+}
+
+void Prediction::OnRelativeMap(const relative_map::MapMsg& relative_map) {
+  // TODO(kechxu): implement
 }
 
 void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
