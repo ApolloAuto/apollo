@@ -159,7 +159,7 @@ PathTimePointPair ConditionFilter::QueryPathTimeObstacleIntervals(
   return block_interval;
 }
 
-std::vector<SamplePoint> ConditionFilter::QuerySamplePoints() const {
+std::vector<SamplePoint> ConditionFilter::QueryNeighborPoints() const {
   std::vector<SamplePoint> sample_points;
   for (const auto& path_time_obstacle :
        ptr_path_time_neighborhood_->GetPathTimeObstacles()) {
@@ -250,7 +250,7 @@ std::vector<double> ConditionFilter::UniformTimeStamps(
 // Compute pixel img for lattice st
 bool ConditionFilter::GenerateLatticeStPixels(
     apollo::planning_internal::LatticeStTraining* st_data, double timestamp,
-    std::string st_img_name) {
+    std::string st_img_name) const {
   int num_rows = 250;
   int num_cols = 160;
   double s_step = 100.0 / static_cast<double>(num_rows);
@@ -297,7 +297,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
   return true;
 }
 
-bool ConditionFilter::WithinObstacleSt(double s, double t) {
+bool ConditionFilter::WithinObstacleSt(double s, double t) const {
   const auto& path_time_obstacles =
       ptr_path_time_neighborhood_->GetPathTimeObstacles();
 
