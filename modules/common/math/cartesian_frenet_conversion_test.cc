@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file cartesian_frenet_conversion_test.cc
- **/
-#include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
+#include "modules/common/math/cartesian_frenet_conversion.h"
 
 #include <array>
 #include <cmath>

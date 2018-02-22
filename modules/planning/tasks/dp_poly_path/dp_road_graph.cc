@@ -33,12 +33,12 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
+#include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_thread_pool.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
-#include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
 namespace apollo {
 namespace planning {
