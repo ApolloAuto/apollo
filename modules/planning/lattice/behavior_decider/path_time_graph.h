@@ -61,7 +61,7 @@ class PathTimeGraph {
 
   std::pair<double, double> get_time_range() const;
 
-  std::vector<PathTimePoint> GetPathTimeNeighborhoodPoints(
+  std::vector<PathTimePoint> GetObstacleSurroundingPoints(
       const std::string& obstacle_id, const double s_dist,
       const double t_density) const;
 

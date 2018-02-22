@@ -273,7 +273,6 @@ PathTimePoint PathTimeGraph::SetPathTimePoint(const std::string& obstacle_id,
   PathTimePoint path_time_point;
   path_time_point.set_s(s);
   path_time_point.set_t(t);
-  path_time_point.set_v(0.0);
   path_time_point.set_obstacle_id(obstacle_id);
   return path_time_point;
 }
@@ -334,7 +333,7 @@ std::pair<double, double> PathTimeGraph::get_time_range() const {
 }
 
 std::vector<PathTimePoint>
-PathTimeGraph::GetPathTimeNeighborhoodPoints(const std::string& obstacle_id,
+PathTimeGraph::GetObstacleSurroundingPoints(const std::string& obstacle_id,
                                              const double s_dist,
                                              const double t_min_density) const {
   CHECK(t_min_density > 0.0);

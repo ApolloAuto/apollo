@@ -32,15 +32,14 @@
 namespace apollo {
 namespace planning {
 
-using PathTimePointPair = std::pair<PathTimePoint, PathTimePoint>;
-
 ConditionFilter::ConditionFilter(
     const std::array<double, 3>& init_s, const double speed_limit,
-    std::shared_ptr<PathTimeGraph> path_time_neighborhood)
+    std::shared_ptr<PathTimeGraph> path_time_graph)
     : init_s_(init_s),
       feasible_region_(init_s, speed_limit),
-      ptr_path_time_neighborhood_(path_time_neighborhood) {}
+      ptr_path_time_graph_(path_time_graph) {}
 
+/**
 std::vector<SampleBound> ConditionFilter::QuerySampleBounds() const {
   // std::set<double> timestamps = CriticalTimeStamps();
   std::vector<double> timestamps = UniformTimeStamps(8);
@@ -128,7 +127,9 @@ std::vector<SampleBound> ConditionFilter::QuerySampleBounds(
   }
   return sample_bounds;
 }
+**/
 
+/**
 PathTimePointPair ConditionFilter::QueryPathTimeObstacleIntervals(
     const double t, const PathTimeObstacle& path_time_obstacle) const {
   PathTimePointPair block_interval;
@@ -158,40 +159,45 @@ PathTimePointPair ConditionFilter::QueryPathTimeObstacleIntervals(
 
   return block_interval;
 }
+**/
 
-std::vector<SamplePoint> ConditionFilter::QueryNeighborPoints() const {
+std::vector<SamplePoint>
+ConditionFilter::QueryPathTimeObstacleSamplePoints() const {
   std::vector<SamplePoint> sample_points;
   for (const auto& path_time_obstacle :
-       ptr_path_time_neighborhood_->GetPathTimeObstacles()) {
+       ptr_path_time_graph_->GetPathTimeObstacles()) {
     std::string obstacle_id = path_time_obstacle.obstacle_id();
+
     std::vector<PathTimePoint> overtake_path_time_points =
-        ptr_path_time_neighborhood_->GetPathTimeNeighborhoodPoints(
+        ptr_path_time_graph_->GetObstacleSurroundingPoints(
             obstacle_id, FLAGS_lattice_epsilon, FLAGS_time_min_density);
     for (const PathTimePoint& path_time_point : overtake_path_time_points) {
-      double v = ptr_path_time_neighborhood_->SpeedAtT(obstacle_id,
+      double v = ptr_path_time_graph_->SpeedAtT(obstacle_id,
           path_time_point.s(), path_time_point.t());
       SamplePoint sample_point;
       sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
       sample_point.mutable_path_time_point()->set_s(FLAGS_default_lon_buffer);
-      sample_point.set_v(v);
+      sample_point.set_ref_v(v);
       sample_points.push_back(std::move(sample_point));
     }
+
     std::vector<PathTimePoint> follow_path_time_points =
-        ptr_path_time_neighborhood_->GetPathTimeNeighborhoodPoints(
+        ptr_path_time_graph_->GetObstacleSurroundingPoints(
             obstacle_id, -FLAGS_lattice_epsilon, FLAGS_time_min_density);
     for (const PathTimePoint& path_time_point : follow_path_time_points) {
-      double v = ptr_path_time_neighborhood_->SpeedAtT(obstacle_id,
+      double v = ptr_path_time_graph_->SpeedAtT(obstacle_id,
           path_time_point.s(), path_time_point.t());
       SamplePoint sample_point;
       sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
       sample_point.mutable_path_time_point()->set_s(-FLAGS_default_lon_buffer);
-      sample_point.set_v(v);
+      sample_point.set_ref_v(v);
       sample_points.push_back(std::move(sample_point));
     }
   }
   return sample_points;
 }
 
+/**
 std::vector<PathTimePointPair> ConditionFilter::QueryPathTimeObstacleIntervals(
     const double t) const {
   std::vector<PathTimePointPair> path_intervals;
@@ -214,11 +220,13 @@ std::vector<PathTimePointPair> ConditionFilter::QueryPathTimeObstacleIntervals(
 
   return path_intervals;
 }
+**/
 
+/**
 std::set<double> ConditionFilter::CriticalTimeStamps() const {
   std::set<double> critical_timestamps;
   for (const auto& path_time_obstacle :
-       ptr_path_time_neighborhood_->GetPathTimeObstacles()) {
+       ptr_path_time_graph_->GetPathTimeObstacles()) {
     double t_start = path_time_obstacle.bottom_left().t();
     double t_end = path_time_obstacle.upper_right().t();
     critical_timestamps.insert(t_start);
@@ -246,6 +254,7 @@ std::vector<double> ConditionFilter::UniformTimeStamps(
 
   return timestamps;
 }
+**/
 
 // Compute pixel img for lattice st
 bool ConditionFilter::GenerateLatticeStPixels(
@@ -256,7 +265,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
   double s_step = 100.0 / static_cast<double>(num_rows);
   double t_step = 8.0 / static_cast<double>(num_cols);
 
-  if (ptr_path_time_neighborhood_->GetPathTimeObstacles().empty()) {
+  if (ptr_path_time_graph_->GetPathTimeObstacles().empty()) {
     ADEBUG << "No_Path_Time_Neighborhood_Obstacle_in_this_frame";
     return false;
   }
@@ -299,7 +308,7 @@ bool ConditionFilter::GenerateLatticeStPixels(
 
 bool ConditionFilter::WithinObstacleSt(double s, double t) const {
   const auto& path_time_obstacles =
-      ptr_path_time_neighborhood_->GetPathTimeObstacles();
+      ptr_path_time_graph_->GetPathTimeObstacles();
 
   for (const PathTimeObstacle& path_time_obstacle : path_time_obstacles) {
     if (t < path_time_obstacle.upper_left().t() ||
