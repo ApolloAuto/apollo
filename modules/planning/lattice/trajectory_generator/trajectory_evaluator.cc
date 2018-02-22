@@ -50,7 +50,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(
   // filter out the lon. trajectories that pass the stop point.
   double stop_point = std::numeric_limits<double>::max();
   if (planning_target.has_stop_point()) {
-    stop_point = planning_target.stop_point();
+    stop_point = planning_target.stop_point().s();
   }
   for (const auto lon_trajectory : lon_trajectories) {
     double lon_end_s = lon_trajectory->Evaluate(0, end_time);
