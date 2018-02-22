@@ -444,7 +444,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
         int val = j * 10 + k;
         EXPECT_NEAR(val, pt.x(), kEpsilon);
         EXPECT_NEAR(val, pt.y(), kEpsilon);
-        EXPECT_NEAR(val, pt.z(), kEpsilon);
+        EXPECT_NEAR(0.0, pt.z(), kEpsilon);
       }
     }
     EXPECT_NEAR(123.456, obj.timestamp_sec(), kEpsilon);
