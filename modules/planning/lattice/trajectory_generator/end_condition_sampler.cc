@@ -88,6 +88,37 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
   return end_s_conditions;
 }
 
+
+std::vector<std::pair<std::array<double, 3>, double>>
+EndConditionSampler::SampleLonEndConditionsForStopping(
+    const double ref_stop_point) const {
+  // time interval is one second plus the last one 0.01
+  constexpr std::size_t num_time_section = 9;
+  std::array<double, num_time_section> time_sections;
+  for (std::size_t i = 0; i + 1 < num_time_section; ++i) {
+    time_sections[i] = FLAGS_trajectory_time_length - i;
+  }
+  time_sections[num_time_section - 1] = 0.01;
+
+  constexpr std::size_t num_stop_section = 3;
+  std::array<double, num_stop_section> s_offsets;
+  for (std::size_t i = 0; i < num_stop_section; ++i) {
+    s_offsets[i] = -1 * i;
+  }
+
+  std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
+  for (const auto& time : time_sections) {
+    for (const auto& s_offset : s_offsets) {
+      std::array<double, 3> end_s;
+      end_s[0] = std::max(init_s_[0], ref_stop_point + s_offset);
+      end_s[1] = 0.0;
+      end_s[2] = 0.0;
+      end_s_conditions.emplace_back(end_s, time);
+    }
+  }
+  return end_s_conditions;
+}
+
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLonEndConditionsForPathTimeBounds(
     const PlanningTarget& planning_target) const {
