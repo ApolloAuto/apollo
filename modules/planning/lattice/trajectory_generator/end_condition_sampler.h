@@ -54,6 +54,10 @@ class EndConditionSampler {
   SampleLonEndConditionsForPathTimeBounds(
       const PlanningTarget& planning_target) const;
 
+  std::vector<std::pair<std::array<double, 3>, double>>
+  SampleLonEndConditionsForNeighborPoints(
+      const PlanningTarget& planning_target) const;
+
  private:
   std::array<double, 3> init_s_;
 

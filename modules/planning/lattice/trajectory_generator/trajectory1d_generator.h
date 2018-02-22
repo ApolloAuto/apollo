@@ -59,6 +59,10 @@ class Trajectory1dGenerator {
       const PlanningTarget& planning_target,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
+  void GenerateSpeedProfilesForNeighborPoints(
+      const PlanningTarget& planning_target,
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
+
   void GenerateLongitudinalTrajectoryBundle(
       const PlanningTarget& planning_target,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;

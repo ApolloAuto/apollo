@@ -46,6 +46,7 @@ message SampleBound {
 message PlanningTarget {
   optional DiscretizedReferenceLine discretized_reference_line = 1;
   repeated SampleBound sample_bound = 2;
-  optional double stop_point = 3;
-  optional double cruise_speed = 4;
+  repeated SamplePoint neighbor_point = 3;
+  optional double stop_point = 4;
+  optional double cruise_speed = 5;
 }

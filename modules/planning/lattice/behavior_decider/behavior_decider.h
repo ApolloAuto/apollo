@@ -29,6 +29,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/lattice/behavior_decider/condition_filter.h"
 #include "modules/planning/lattice/behavior_decider/path_time_graph.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -51,6 +52,19 @@ class BehaviorDecider {
       const std::vector<common::PathPoint>& discretized_reference_line);
 
  private:
+  void AddSampleBounds(
+    const ConditionFilter& condition_filter,
+    PlanningTarget* const plannint_target);
+
+  void AddNeighborPoints(
+    const ConditionFilter& condition_filter,
+    PlanningTarget* const plannint_target);
+
+  void DumpLatticeImage(const int index,
+      const common::TrajectoryPoint& init_planning_point,
+      const ConditionFilter& condition_filter,
+      ReferenceLineInfo* const reference_line_info);
+
   std::shared_ptr<PathTimeGraph> path_time_neighborhood_;
 };
 
