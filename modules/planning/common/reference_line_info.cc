@@ -102,10 +102,11 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
     }
   }
 
-  if (FLAGS_use_navigation_mode && FLAGS_enable_prediction) {
-    auto cipv_info = AdapterManager::GetPerceptionObstacles()
-                         ->GetLatestObserved()
-                         .cipv_info();
+  if (FLAGS_use_navigation_mode &&
+      !AdapterManager::GetPerceptionObstacles()->Empty()) {
+    const auto& cipv_info = AdapterManager::GetPerceptionObstacles()
+                                ->GetLatestObserved()
+                                .cipv_info();
     path_decision_.SetCIPVInfo(cipv_info);
   }
 
