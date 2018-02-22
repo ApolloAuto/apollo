@@ -387,6 +387,18 @@
                 }
               }
             },
+            "ControlData": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "stationError": {
+                  "type": "double",
+                  "id": 2
+                }
+              }
+            },
             "SimulationWorld": {
               "fields": {
                 "timestamp": {
@@ -475,6 +487,10 @@
                 "laneMarker": {
                   "type": "apollo.perception.LaneMarkers",
                   "id": 21
+                },
+                "controlData": {
+                  "type": "ControlData",
+                  "id": 22
                 }
               }
             }
