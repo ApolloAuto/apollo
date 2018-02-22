@@ -34,9 +34,9 @@ using apollo::common::PointENU;
 
 BehaviorDecider::BehaviorDecider() {}
 
-void BehaviorDecider::UpdatePathTimeNeighborhood(
-    std::shared_ptr<PathTimeGraph> p) {
-  path_time_neighborhood_ = p;
+void BehaviorDecider::UpdatePathTimeGraph(
+    std::shared_ptr<PathTimeGraph> path_time_graph) {
+  path_time_graph_ = path_time_graph;
 }
 
 PlanningTarget BehaviorDecider::Analyze(
@@ -44,6 +44,7 @@ PlanningTarget BehaviorDecider::Analyze(
     const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line) {
+
   CHECK(frame != nullptr);
   CHECK_GT(discretized_reference_line.size(), 0);
 
@@ -60,17 +61,19 @@ PlanningTarget BehaviorDecider::Analyze(
   }
 
   CHECK(FLAGS_default_cruise_speed <= FLAGS_planning_upper_speed_limit);
+
   ConditionFilter condition_filter(lon_init_state,
                                    FLAGS_planning_upper_speed_limit,
-                                   path_time_neighborhood_);
+                                   path_time_graph_);
 
   // AddSampleBounds(condition_filter, &planning_target);
 
-  AddNeighborPoints(condition_filter, &planning_target);
+  ComputePathTimeSamplePoints(condition_filter, &planning_target);
 
   return planning_target;
 }
 
+/**
 void BehaviorDecider::AddSampleBounds(
     const ConditionFilter& condition_filter,
     PlanningTarget* const planning_target) {
@@ -87,12 +90,13 @@ void BehaviorDecider::AddSampleBounds(
     }
   }
 }
+**/
 
-void BehaviorDecider::AddNeighborPoints(
+void BehaviorDecider::ComputePathTimeSamplePoints(
     const ConditionFilter& condition_filter,
     PlanningTarget* const planning_target) {
   std::vector<SamplePoint> neighbor_points =
-      condition_filter.QueryNeighborPoints();
+      condition_filter.QueryPathTimeObstacleSamplePoints();
   for (const auto& neighbor_point : neighbor_points) {
     planning_target->add_neighbor_point()->CopyFrom(neighbor_point);
   }
