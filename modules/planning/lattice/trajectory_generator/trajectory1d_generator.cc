@@ -103,6 +103,7 @@ void Trajectory1dGenerator::GenerateSpeedProfileForStopping(
   }
 }
 
+/**
 void Trajectory1dGenerator::GenerateSpeedProfilesForPathTimeBound(
     const PlanningTarget& planning_target,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
@@ -122,12 +123,13 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForPathTimeBound(
     ptr_lon_trajectory_bundle->push_back(lattice_traj_ptr);
   }
 }
+**/
 
-void Trajectory1dGenerator::GenerateSpeedProfilesForNeighborPoints(
+void Trajectory1dGenerator::GenerateSpeedProfilesForPathTimeObstacles(
     const PlanningTarget& planning_target,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
-      end_condition_sampler_->SampleLonEndConditionsForNeighborPoints(
+      end_condition_sampler_->SampleLonEndConditionsForPathTimePoints(
           planning_target);
 
   for (const auto& end_condition : end_conditions) {
@@ -153,7 +155,7 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
   // GenerateSpeedProfilesForPathTimeBound(planning_target,
   //                                       ptr_lon_trajectory_bundle);
 
-  GenerateSpeedProfilesForNeighborPoints(planning_target,
+  GenerateSpeedProfilesForPathTimeObstacles(planning_target,
                                          ptr_lon_trajectory_bundle);
 
   if (planning_target.has_stop_point()) {

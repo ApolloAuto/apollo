@@ -41,7 +41,7 @@ class BehaviorDecider {
  public:
   BehaviorDecider();
 
-  void UpdatePathTimeNeighborhood(std::shared_ptr<PathTimeGraph> p);
+  void UpdatePathTimeGraph(std::shared_ptr<PathTimeGraph> p);
 
   virtual ~BehaviorDecider() = default;
 
@@ -52,11 +52,13 @@ class BehaviorDecider {
       const std::vector<common::PathPoint>& discretized_reference_line);
 
  private:
+  /**
   void AddSampleBounds(
     const ConditionFilter& condition_filter,
     PlanningTarget* const plannint_target);
+    **/
 
-  void AddNeighborPoints(
+  void ComputePathTimeSamplePoints(
     const ConditionFilter& condition_filter,
     PlanningTarget* const plannint_target);
 
@@ -65,7 +67,7 @@ class BehaviorDecider {
       const ConditionFilter& condition_filter,
       ReferenceLineInfo* const reference_line_info);
 
-  std::shared_ptr<PathTimeGraph> path_time_neighborhood_;
+  std::shared_ptr<PathTimeGraph> path_time_graph_;
 };
 
 }  // namespace planning

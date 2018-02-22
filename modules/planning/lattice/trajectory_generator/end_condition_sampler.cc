@@ -119,6 +119,7 @@ EndConditionSampler::SampleLonEndConditionsForStopping(
   return end_s_conditions;
 }
 
+/**
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLonEndConditionsForPathTimeBounds(
     const PlanningTarget& planning_target) const {
@@ -146,14 +147,15 @@ EndConditionSampler::SampleLonEndConditionsForPathTimeBounds(
 
   return end_s_conditions;
 }
+**/
 
 std::vector<std::pair<std::array<double, 3>, double>>
-EndConditionSampler::SampleLonEndConditionsForNeighborPoints(
+EndConditionSampler::SampleLonEndConditionsForPathTimePoints(
     const PlanningTarget& planning_target) const {
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
   for (const SamplePoint& neighbor_point : planning_target.neighbor_point()) {
     double s = neighbor_point.path_time_point().s();
-    double v = neighbor_point.v();
+    double v = neighbor_point.ref_v();
     std::array<double, 3> end_state = {s, v, 0.0};
     end_s_conditions.push_back({end_state,
                                 neighbor_point.path_time_point().t()});
