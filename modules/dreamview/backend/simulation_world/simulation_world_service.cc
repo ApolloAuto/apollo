@@ -52,10 +52,11 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
-using apollo::common::time::millis;
 using apollo::common::time::ToSecond;
+using apollo::common::time::millis;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::GetProtoFromFile;
+using apollo::control::ControlCommand;
 using apollo::hdmap::Path;
 using apollo::localization::Gps;
 using apollo::localization::LocalizationEstimate;
@@ -253,6 +254,8 @@ void SimulationWorldService::Update() {
   UpdateWithLatestObserved("PredictionObstacles",
                            AdapterManager::GetPrediction());
   UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
+  UpdateWithLatestObserved("ControlCommand",
+                           AdapterManager::GetControlCommand());
   for (const auto &kv : obj_map_) {
     *world_.add_object() = kv.second;
   }
@@ -910,6 +913,24 @@ void SimulationWorldService::RegisterMessageCallbacks() {
       &SimulationWorldService::UpdateSimulationWorld, this);
   AdapterManager::AddRoutingResponseCallback(
       &SimulationWorldService::UpdateSimulationWorld, this);
+}
+
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const ControlCommand &control_command) {
+  auto *control_data = world_.mutable_control_data();
+  control_data->set_timestamp_sec(control_command.header().timestamp_sec());
+
+  if (control_command.has_debug()) {
+    auto &debug = control_command.debug();
+    if (debug.has_simple_lon_debug() &&
+        debug.simple_lon_debug().has_station_error()) {
+      control_data->set_station_error(debug.simple_lon_debug().station_error());
+    } else if (debug.has_simple_mpc_debug() &&
+               debug.simple_mpc_debug().has_station_error()) {
+      control_data->set_station_error(debug.simple_mpc_debug().station_error());
+    }
+  }
 }
 
 }  // namespace dreamview

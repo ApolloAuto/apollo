@@ -40,7 +40,36 @@ export default class ControlData {
                 real: [],
                 autoModeZone: []
             },
+            stationErrorGraph: {
+                error: [],
+            }
         };
+    }
+
+    updateStationErrorGraph(controlData) {
+        if (!controlData.stationError) {
+            return;
+        }
+
+        const graph = this.data.stationErrorGraph;
+        const currentTimestamp = controlData.timestampSec;
+
+        // clean up data if needed
+        const removeAllPoints = graph.error.length > 0 &&
+              currentTimestamp < graph.error[graph.error.length - 1].x;
+        const removeOldestPoint = (graph.length >= MAX_HISTORY_POINTS);
+        if (removeAllPoints) {
+            graph.error = [];
+        } else if (removeOldestPoint) {
+            graph.error.shift();
+        }
+
+        // add new data
+        const hasNewData = graph.error.length === 0 ||
+            currentTimestamp !== graph.error[graph.error.length - 1].x;
+        if (hasNewData) {
+            graph.error.push({x: currentTimestamp, y: controlData.stationError});
+        }
     }
 
     updateSteerCurve(graph, adc) {
@@ -167,6 +196,10 @@ export default class ControlData {
             this.data.trajectoryGraph.pose[0].rotation = adc.heading;
 
             this.updateTime(world.planningTime);
+        }
+
+        if (world.controlData) {
+            this.updateStationErrorGraph(world.controlData);
         }
     }
 }
