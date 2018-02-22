@@ -23,6 +23,7 @@ cc_library(
         "//modules/perception/lib/pcl_util",
         "//modules/perception/proto:perception_proto",
         "@eigen",
+        "@opencv2//:core",
     ],
 )
 
