@@ -25,8 +25,6 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 
-#include "modules/common/configs/vehicle_config_helper.h"
-
 /**
  * @namespace apollo::dreamview::util
  * @brief apollo::dreamview::util
