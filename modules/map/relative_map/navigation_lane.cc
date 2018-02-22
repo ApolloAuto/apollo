@@ -20,20 +20,22 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 namespace apollo {
 namespace relative_map {
-namespace {
 
-double GetDistance(const common::VehicleState& adc_state,
-                   const common::PathPoint& p) {
-  return std::hypot(adc_state.x() - p.x(), adc_state.y() - p.y());
-}
-}
-
-using apollo::perception::PerceptionObstacles;
 using apollo::common::VehicleStateProvider;
+using apollo::common::util::DistanceXY;
+using apollo::perception::PerceptionObstacles;
+
+NavigationLane::NavigationLane(const NavigationLaneConfig& config)
+    : config_(config) {}
+
+void NavigationLane::SetConfig(const NavigationLaneConfig& config) {
+  config_ = config;
+}
 
 bool NavigationLane::Update(const PerceptionObstacles& perception_obstacles) {
   // udpate perception_obstacles_
@@ -50,11 +52,10 @@ bool NavigationLane::Update(const PerceptionObstacles& perception_obstacles) {
   auto* path = navigation_path_.mutable_path();
   const auto& lane_marker = perception_obstacles_.lane_marker();
 
-  const double kQualityThreshold = 0.5;
   if (navigation_info_.navigation_path_size() > 0 &&
       std::fmax(lane_marker.left_lane_marker().quality(),
                 lane_marker.right_lane_marker().quality()) <
-          kQualityThreshold) {
+          config_.min_lane_marker_quality()) {
     ConvertNavigationLineToPath(path);
   } else {
     ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
@@ -115,7 +116,7 @@ void NavigationLane::UpdateProjectionIndex() {
   int index = 0;
   double min_d = std::numeric_limits<double>::max();
   for (int i = last_project_index_; i + 1 < path.path_point_size(); ++i) {
-    const double d = GetDistance(adc_state_, path.path_point(i));
+    const double d = DistanceXY(adc_state_, path.path_point(i));
     if (d < min_d) {
       min_d = d;
       index = i;
