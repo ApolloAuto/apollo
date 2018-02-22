@@ -414,3 +414,7 @@ DEFINE_double(lon_collision_overtake_buffer, 5.0,
               "Longitudinal collision buffer for overtake");
 DEFINE_double(lon_collision_cost_std, 0.5,
               "The standard deviation of logitudinal collision cost function");
+DEFINE_double(default_lon_buffer, 5.0,
+              "Default longitudinal buffer to sample path-time points.");
+DEFINE_double(time_min_density, 1.0,
+              "Minimal time density to search sample points.");
