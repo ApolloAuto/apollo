@@ -59,6 +59,9 @@ class SimulationWorldService {
   // SimulationWorld.
   static constexpr int kMaxMonitorItems = 30;
 
+  // Angle threshold is about 5.72 degree.
+  static constexpr double kAngleThreshold = 0.1;
+
   /**
    * @brief Constructor of SimulationWorldService.
    * @param map_service the pointer of MapService.
