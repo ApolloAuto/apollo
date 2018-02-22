@@ -16,6 +16,11 @@ message PathTimePoint {
   optional string obstacle_id = 4;
 }
 
+message SamplePoint {
+  optional PathTimePoint path_time_point = 1;
+  optional double v = 2;
+}
+
 message PathTimeObstacle {
   optional string obstacle_id = 1;
   optional PathTimePoint bottom_left = 2;

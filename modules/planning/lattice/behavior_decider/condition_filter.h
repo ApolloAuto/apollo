@@ -45,6 +45,8 @@ class ConditionFilter {
 
   std::vector<SampleBound> QuerySampleBounds() const;
 
+  std::vector<SamplePoint> QuerySamplePoints() const;
+
   std::vector<std::pair<PathTimePoint, PathTimePoint>>
   QueryPathTimeObstacleIntervals(const double t) const;
 
@@ -66,6 +68,8 @@ class ConditionFilter {
       const std::size_t num_of_time_segments) const;
 
  private:
+  std::array<double, 3> init_s_;
+
   FeasibleRegion feasible_region_;
 
   std::shared_ptr<PathTimeGraph> ptr_path_time_neighborhood_;
