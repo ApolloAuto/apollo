@@ -8,6 +8,11 @@ message MapGenerationParam {
   optional double default_speed_limit = 3 [default=29.0576]; // default is 65mph
 }
 
+message NavigationLaneConfig {
+    optional double min_lane_marker_quality = 1 [default=0.5];
+}
+
 message RelativeMapConfig {
     optional MapGenerationParam map_param = 1;
+    optional NavigationLaneConfig navigation_lane = 2;
 }
