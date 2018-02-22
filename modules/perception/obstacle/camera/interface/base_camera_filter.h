@@ -14,22 +14,4 @@
  * limitations under the License.
  *****************************************************************************/
 
-// The base class of measurement estimation filtering, like Kalman filtering
-
-// // @brief: tracking objects.
-// // @param [in]: raw frame from camera.
-// // @param [in]: current frame object list.
-// // @param [in]: timestamp.
-// // @param [in]: options.
-// // @param [out]: current tracked objects.
-// virtual bool predict_velocity(const cv::Mat &frame,
-//                               const std::vector<VisualObjectPtr> &objects,
-//                               double timestamp,
-//                               const CameraTrackerOptions &options,
-//                               std::vector<VisualObjectPtr> *tracked_objects) = 0;
-//
-// virtual bool predict_shape(const cv::Mat &frame,
-//                            const std::vector<VisualObjectPtr> &objects,
-//                            double timestamp,
-//                            const CameraTrackerOptions &options,
-//                            std::vector<VisualObjectPtr> *tracked_objects) = 0;
+// The base class of measurement estimation filtering, ex Kalman Filtering
