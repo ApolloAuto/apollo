@@ -373,13 +373,11 @@ PathTimeGraph::GetPathTimeNeighborhoodPoints(const std::string& obstacle_id,
   for (std::size_t i = 0; i <= num_sections; ++i) {
     double t = t_interval * i + t0;
     double s = lerp(s0, t0, s1, t1, t) + s_dist;
-    double v = SpeedAtT(obstacle_id, s, t);
 
     PathTimePoint ptt;
     ptt.set_obstacle_id(obstacle_id);
     ptt.set_t(t);
     ptt.set_s(s);
-    ptt.set_v(v);
     pt_pairs.push_back(std::move(ptt));
   }
 

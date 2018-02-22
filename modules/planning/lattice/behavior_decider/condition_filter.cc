@@ -37,7 +37,8 @@ using PathTimePointPair = std::pair<PathTimePoint, PathTimePoint>;
 ConditionFilter::ConditionFilter(
     const std::array<double, 3>& init_s, const double speed_limit,
     std::shared_ptr<PathTimeGraph> path_time_neighborhood)
-    : feasible_region_(init_s, speed_limit),
+    : init_s_(init_s),
+      feasible_region_(init_s, speed_limit),
       ptr_path_time_neighborhood_(path_time_neighborhood) {}
 
 std::vector<SampleBound> ConditionFilter::QuerySampleBounds() const {
@@ -156,6 +157,39 @@ PathTimePointPair ConditionFilter::QueryPathTimeObstacleIntervals(
   block_interval.second.set_obstacle_id(path_time_obstacle.obstacle_id());
 
   return block_interval;
+}
+
+std::vector<SamplePoint> ConditionFilter::QuerySamplePoints() const {
+  std::vector<SamplePoint> sample_points;
+  for (const auto& path_time_obstacle :
+       ptr_path_time_neighborhood_->GetPathTimeObstacles()) {
+    std::string obstacle_id = path_time_obstacle.obstacle_id();
+    std::vector<PathTimePoint> overtake_path_time_points =
+        ptr_path_time_neighborhood_->GetPathTimeNeighborhoodPoints(
+            obstacle_id, FLAGS_lattice_epsilon, FLAGS_time_min_density);
+    for (const PathTimePoint& path_time_point : overtake_path_time_points) {
+      double v = ptr_path_time_neighborhood_->SpeedAtT(obstacle_id,
+          path_time_point.s(), path_time_point.t());
+      SamplePoint sample_point;
+      sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
+      sample_point.mutable_path_time_point()->set_s(FLAGS_default_lon_buffer);
+      sample_point.set_v(v);
+      sample_points.push_back(std::move(sample_point));
+    }
+    std::vector<PathTimePoint> follow_path_time_points =
+        ptr_path_time_neighborhood_->GetPathTimeNeighborhoodPoints(
+            obstacle_id, -FLAGS_lattice_epsilon, FLAGS_time_min_density);
+    for (const PathTimePoint& path_time_point : follow_path_time_points) {
+      double v = ptr_path_time_neighborhood_->SpeedAtT(obstacle_id,
+          path_time_point.s(), path_time_point.t());
+      SamplePoint sample_point;
+      sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
+      sample_point.mutable_path_time_point()->set_s(-FLAGS_default_lon_buffer);
+      sample_point.set_v(v);
+      sample_points.push_back(std::move(sample_point));
+    }
+  }
+  return sample_points;
 }
 
 std::vector<PathTimePointPair> ConditionFilter::QueryPathTimeObstacleIntervals(

@@ -218,5 +218,7 @@ DECLARE_double(lat_offset_bound);
 DECLARE_double(lon_collision_yield_buffer);
 DECLARE_double(lon_collision_overtake_buffer);
 DECLARE_double(lon_collision_cost_std);
+DECLARE_double(default_lon_buffer);
+DECLARE_double(time_min_density);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H
