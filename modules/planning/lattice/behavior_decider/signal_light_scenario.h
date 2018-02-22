@@ -50,13 +50,6 @@ class SignalLightScenario : public Scenario {
   std::vector<const hdmap::PathOverlap*> FindValidSignalLightFromMap(
       ReferenceLineInfo* const reference_line_info);
 
-  double EstimateStopDeceleration(ReferenceLineInfo* const reference_line_info,
-                                  const hdmap::PathOverlap* signal_light);
-
-  void CreateStopObstacle(Frame* frame,
-                          ReferenceLineInfo* const reference_line_info,
-                          const hdmap::PathOverlap* signal_light);
-
   DECLARE_SCENARIO(SignalLightScenario);
 };
 
