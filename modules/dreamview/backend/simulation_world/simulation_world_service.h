@@ -59,6 +59,9 @@ class SimulationWorldService {
   // SimulationWorld.
   static constexpr int kMaxMonitorItems = 30;
 
+  // Angle threshold is about 5.72 degree.
+  static constexpr double kAngleThreshold = 0.1;
+
   /**
    * @brief Constructor of SimulationWorldService.
    * @param map_service the pointer of MapService.
@@ -169,8 +172,8 @@ class SimulationWorldService {
   void UpdateMainDecision(const apollo::planning::MainDecision &main_decision,
                           double update_timestamp_sec, Object *world_main_stop);
   void CreatePredictionTrajectory(
-      Object *world_object,
-      const apollo::prediction::PredictionObstacle &obstacle);
+      const apollo::prediction::PredictionObstacle &obstacle,
+      Object *world_object);
   void UpdatePlanningData(const apollo::planning_internal::PlanningData &data);
 
   void PopulateMapInfo(double radius);
