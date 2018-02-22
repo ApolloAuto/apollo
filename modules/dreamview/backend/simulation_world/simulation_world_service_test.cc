@@ -284,7 +284,6 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
     EXPECT_DOUBLE_EQ(0.0, point.position_x());
     EXPECT_DOUBLE_EQ(10.0, point.position_y());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
-    EXPECT_EQ(4, point.polygon_point_size());
   }
 
   // Check last point.
@@ -294,7 +293,6 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
     EXPECT_DOUBLE_EQ(280.0, point.position_x());
     EXPECT_DOUBLE_EQ(290.0, point.position_y());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
-    EXPECT_EQ(4, point.polygon_point_size());
   }
 }
 

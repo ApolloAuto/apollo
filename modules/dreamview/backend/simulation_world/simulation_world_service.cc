@@ -39,6 +39,7 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 
 namespace apollo {
 namespace dreamview {
@@ -48,12 +49,6 @@ using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::ChassisAdapter;
-using apollo::common::adapter::GpsAdapter;
-using apollo::common::adapter::LocalizationAdapter;
-using apollo::common::adapter::MonitorAdapter;
-using apollo::common::adapter::PerceptionObstaclesAdapter;
-using apollo::common::adapter::PlanningAdapter;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
@@ -819,7 +814,6 @@ void SimulationWorldService::CreatePredictionTrajectory(
       PolygonPoint *world_point = prediction->add_predicted_trajectory();
       world_point->set_x(point.path_point().x() + map_service_->GetXOffset());
       world_point->set_y(point.path_point().y() + map_service_->GetYOffset());
-      world_point->set_z(point.path_point().z());
     }
   }
 }
