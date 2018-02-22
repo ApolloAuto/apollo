@@ -17,8 +17,11 @@
 // The base class of transforming camera space objects into other defined
 // 3D spaces, like world space or ego-car space
 
+// Eigen::Matrix4d* camera2world_pose
+
 // void trans_object_to_world(const CameraTrackerOptions& options,
-//                            const std::vector<VisualObjectPtr> *visual_objects) {
+//                            const std::vector<VisualObjectPtr>
+//                            *visual_objects) {
 //     if (options.camera2world_pose == nullptr) {
 //         LOG(INFO) << "can not trans object from camera to world";
 //         return;
@@ -34,7 +37,8 @@
 //
 //         Eigen::Vector3d center = (*visual_objects)[i]->center;
 //         Eigen::Vector4d ctr(center.x(), center.y(), center.z(), 1.0);
-//         (*visual_objects)[i]->center = ((*options.camera2world_pose) * ctr).head(3);
+//         (*visual_objects)[i]->center = ((*options.camera2world_pose) *
+//         ctr).head(3);
 //
 //         XLOG(DEBUG) << "world center" << (*visual_objects)[i]->center;
 //     }
