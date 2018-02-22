@@ -54,10 +54,13 @@ namespace dreamview {
  * NOTE: This class is not thread-safe.
  */
 class SimulationWorldService {
- public:
+public:
   // The maximum number of monitor message items to be kept in
   // SimulationWorld.
   static constexpr int kMaxMonitorItems = 30;
+
+  // Angle threshold is about 5.72 degree.
+  static constexpr double kAngleThreshold = 0.1;
 
   /**
    * @brief Constructor of SimulationWorldService.
@@ -133,8 +136,8 @@ class SimulationWorldService {
    *        modules/common/monitor_log/proto/monitor_log.proto
    */
   void PublishMonitorMessage(
-      apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
-      const std::string &msg) {
+    apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
+    const std::string &msg) {
     apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.AddMonitorMsgItem(log_level, msg);
   }
@@ -143,7 +146,7 @@ class SimulationWorldService {
 
   nlohmann::json GetRoutePathAsJson() const;
 
- private:
+private:
   /**
    * @brief Update simulation world with incoming data, e.g., chassis,
    * localization, planning, perception, etc.
@@ -152,14 +155,14 @@ class SimulationWorldService {
   void UpdateSimulationWorld(const DataType &data);
 
   Object &CreateWorldObjectIfAbsent(
-      const apollo::perception::PerceptionObstacle &obstacle);
+    const apollo::perception::PerceptionObstacle &obstacle);
   void SetObstacleInfo(const apollo::perception::PerceptionObstacle &obstacle,
                        Object *world_object);
   void SetObstaclePolygon(
-      const apollo::perception::PerceptionObstacle &obstacle,
-      Object *world_object);
+    const apollo::perception::PerceptionObstacle &obstacle,
+    Object *world_object);
   void UpdatePlanningTrajectory(
-      const apollo::planning::ADCTrajectory &trajectory);
+    const apollo::planning::ADCTrajectory &trajectory);
   bool LocateMarker(const apollo::planning::ObjectDecisionType &decision,
                     Decision *world_decision);
   void FindNudgeRegion(const apollo::planning::ObjectDecisionType &decision,
@@ -169,8 +172,8 @@ class SimulationWorldService {
   void UpdateMainDecision(const apollo::planning::MainDecision &main_decision,
                           double update_timestamp_sec, Object *world_main_stop);
   void CreatePredictionTrajectory(
-      Object *world_object,
-      const apollo::prediction::PredictionObstacle &obstacle);
+    Object *world_object,
+    const apollo::prediction::PredictionObstacle &obstacle);
   void UpdatePlanningData(const apollo::planning_internal::PlanningData &data);
 
   void PopulateMapInfo(double radius);
