@@ -43,37 +43,11 @@ class ConditionFilter {
 
   std::vector<SamplePoint> QueryPathTimeObstacleSamplePoints() const;
 
-  /**
-  std::vector<SampleBound> QuerySampleBounds(const double t) const;
-
-  std::vector<SampleBound> QuerySampleBounds() const;
-  **/
-
-  /**
-  std::vector<std::pair<PathTimePoint, PathTimePoint>>
-  QueryPathTimeObstacleIntervals(const double t) const;
-  **/
-
   bool GenerateLatticeStPixels(
       apollo::planning_internal::LatticeStTraining* st_data, double timestamp,
       std::string st_img_name) const;
 
   bool WithinObstacleSt(double s, double t) const;
-
- private:
-  /**
-  // Return true only if t is within the range of time slot,
-  // but will output block interval anyway(maybe be extension)
-  std::pair<PathTimePoint, PathTimePoint> QueryPathTimeObstacleIntervals(
-      const double t, const PathTimeObstacle& critical_condition) const;
-      **/
-
-  /**
-  std::set<double> CriticalTimeStamps() const;
-
-  std::vector<double> UniformTimeStamps(
-      const std::size_t num_of_time_segments) const;
-  **/
 
  private:
   std::array<double, 3> init_s_;
