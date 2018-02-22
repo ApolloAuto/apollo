@@ -159,10 +159,11 @@ Status LatticePlanner::PlanOnReferenceLine(
   current_time = Clock::NowInSeconds();
 
   // 4. parse the decision and get the planning target.
-  std::shared_ptr<PathTimeGraph> path_time_neighborhood_ptr(new PathTimeGraph(
-      frame->obstacles(), init_s[0], discretized_reference_line));
+  auto ptr_path_time_graph = std::make_shared<PathTimeGraph>(
+      frame->obstacles(), discretized_reference_line, init_s[0],
+      init_s[0] + FLAGS_decision_horizon, 0.0, FLAGS_trajectory_time_length);
 
-  decider_.UpdatePathTimeGraph(path_time_neighborhood_ptr);
+  decider_.UpdatePathTimeGraph(ptr_path_time_graph);
   PlanningTarget planning_target =
       decider_.Analyze(frame, reference_line_info, planning_init_point, init_s,
                        discretized_reference_line);
@@ -187,7 +188,7 @@ Status LatticePlanner::PlanOnReferenceLine(
   //   and sort them according to the cost.
   TrajectoryEvaluator trajectory_evaluator(
       planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle,
-      FLAGS_enable_auto_tuning, path_time_neighborhood_ptr);
+      FLAGS_enable_auto_tuning, ptr_path_time_graph);
 
   ADEBUG << "Trajectory_Evaluator_Construction_Time = "
          << (Clock::NowInSeconds() - current_time) * 1000;
