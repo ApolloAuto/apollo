@@ -438,14 +438,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
       const Prediction& prediction = obj.prediction(j);
       EXPECT_NEAR((sim_world.object_size() - i - 1) * 0.1 + j,
                   prediction.probability(), kEpsilon);
-      EXPECT_EQ(prediction.predicted_trajectory_size(), 8);
-      for (int k = 0; k < prediction.predicted_trajectory_size(); ++k) {
-        const auto& pt = prediction.predicted_trajectory(k);
-        int val = j * 10 + k;
-        EXPECT_NEAR(val, pt.x(), kEpsilon);
-        EXPECT_NEAR(val, pt.y(), kEpsilon);
-        EXPECT_NEAR(0.0, pt.z(), kEpsilon);
-      }
+      EXPECT_EQ(prediction.predicted_trajectory_size(), 2);  // Downsampled
     }
     EXPECT_NEAR(123.456, obj.timestamp_sec(), kEpsilon);
   }
