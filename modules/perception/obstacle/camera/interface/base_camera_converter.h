@@ -16,88 +16,46 @@
 
 // The base class of converting 2D detections into 3D objects
 
-
-#ifndef ADU_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_TRANSFORMER_H
-#define ADU_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_TRANSFORMER_H
-
-// SAMPLE CODE:
-//
-// class DefaultCameraTransformer : public BaseCameraTransformer {
-// public:
-//     DefaultCameraTransformer() : BaseCameraTransformer() {}
-//     virtual ~DefaultCameraTransformer() {}
-//
-//     virtual bool init() override {
-//         // Do something.
-//         return true;
-//     }
-//
-//     virtual bool transform(const cv::Mat& frame,
-//              const CameraTransformerOptions& options,
-//              std::vector<VisualObjectPtr>* objects) override {
-//          // Do something.
-//          return true;
-//      }
-//
-//      virtual std::string name() const override {
-//          return "DefaultCameraTransformer";
-//      }
-//
-// };
-//
-// // Register plugin.
-// REGISTER_CAMERA_TRANSFORMER(DefaultCameraTransformer);
-////////////////////////////////////////////////////////
-// USING CODE:
-//
-// BaseCameraTransformer* camera_transformer =
-//    BaseCameraTransformerRegisterer::get_instance_by_name("DefaultCameraTransformer");
-// using camera_transformer to do somethings.
-// ////////////////////////////////////////////////////
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_CONVERTER_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_CONVERTER_H_
 
 #include <string>
 #include <vector>
 
-#include <Eigen/Core>
-#include <opencv2/opencv.hpp>
+#include "Eigen/Core"
+#include "opencv2/opencv.hpp"
 
-#include "lib/base/noncopyable.h"
-#include "lib/base/registerer.h"
-#include "obstacle/camera/common/visual_object.h"
+#include "modules/common/macro.h"
+#include "modules/perception/lib/base/registerer.h"
+#include "modules/perception/obstacle/camera/common/visual_object.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
-namespace obstacle {
 
-struct CameraTransformerOptions {
+class BaseCameraConverter {
+ public:
+  BaseCameraConverter() {}
+  virtual ~BaseCameraConverter() {}
+
+  virtual bool init() = 0;
+
+  // @brief: Convert 2D detected objects into physical 3D objects
+  // @param [in/out]: detected object lists
+  virtual bool converter(std::vector<VisualObjectPtr>* objects) {
+    return true;
+  };
+
+  virtual std::string name() const = 0;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(BaseCameraConverter);
 };
 
-class BaseCameraTransformer {
-public:
-    BaseCameraTransformer() = default;
-    virtual ~BaseCameraTransformer() = default;
+REGISTER_REGISTERER(BaseCameraConverter);
+#define REGISTER_CAMERA_CONVERTER(name) \
+  REGISTER_CLASS(BaseCameraConverter, name)
 
-    virtual bool init() = 0;
-
-    // @brief: Frame from camera  -> objects.
-    // @param [in]: raw frame from camera.
-    // @param [in]: options.
-    // @param [out]: transformed objects.
-    virtual bool transform(const cv::Mat& frame,
-            const CameraTransformerOptions& options,
-            std::vector<VisualObjectPtr>* objects) = 0;
-
-    virtual std::string name() const = 0;
-
-private:
-    DISALLOW_COPY_AND_ASSIGN(BaseCameraTransformer);
-};
-
-REGISTER_REGISTERER(BaseCameraTransformer);
-#define REGISTER_CAMERA_TRANSFORMER(name) REGISTER_CLASS(BaseCameraTransformer, name)
-
-}  // namespace obstacle
 }  // namespace perception
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // ADU_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_TRANSFORMER_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_CONVERTER_H_
