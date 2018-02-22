@@ -41,9 +41,7 @@ class BaseCameraConverter {
 
   // @brief: Convert 2D detected objects into physical 3D objects
   // @param [in/out]: detected object lists, added 3D position and orientation
-  virtual bool converter(std::vector<VisualObjectPtr>* objects) {
-    return true;
-  };
+  virtual bool converter(std::vector<VisualObjectPtr>* objects) = 0;
 
   virtual std::string name() const = 0;
 
