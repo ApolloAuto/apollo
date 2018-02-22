@@ -157,7 +157,7 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
                                          ptr_lon_trajectory_bundle);
 
   if (planning_target.has_stop_point()) {
-    GenerateSpeedProfileForStopping(planning_target.stop_point(),
+    GenerateSpeedProfileForStopping(planning_target.stop_point().s(),
                                     ptr_lon_trajectory_bundle);
   }
 }
