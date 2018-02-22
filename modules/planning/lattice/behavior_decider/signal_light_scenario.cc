@@ -53,7 +53,9 @@ int SignalLightScenario::ComputeScenarioDecision(
   }
   auto detected_signals = GetPerceptionDetectedSignals();
 
-  double stop_s = std::numeric_limits<double>::max();
+  StopPoint stop_point;
+  stop_point.set_s(std::numeric_limits<double>::max());
+  stop_point.set_type(StopPoint::HARD);
   for (const auto signal_from_map : signals_from_map) {
     auto it_signal = detected_signals.find(signal_from_map->object_id);
     if (it_signal == detected_signals.end()) {
@@ -62,14 +64,19 @@ int SignalLightScenario::ComputeScenarioDecision(
       continue;
     }
 
-    if ((it_signal->second->color() == TrafficLight::RED) ||
-        (it_signal->second->color() == TrafficLight::YELLOW)) {
-      stop_s = std::min(stop_s, signal_from_map->start_s);
+    if (signal_from_map->start_s < stop_point.s()) {
+      stop_point.set_s(signal_from_map->start_s);
+      if (it_signal->second->color() == TrafficLight::RED) {
+        stop_point.set_type(StopPoint::HARD);
+      } else if (it_signal->second->color() == TrafficLight::YELLOW) {
+        stop_point.set_type(StopPoint::SOFT);
+      }
     }
   }
 
-  if (stop_s < std::numeric_limits<double>::max()) {
-    planning_target->set_stop_point(stop_s);
+  if (stop_point.s() < std::numeric_limits<double>::max()) {
+    planning_target->mutable_stop_point()->set_s(stop_point.s());
+    planning_target->mutable_stop_point()->set_type(stop_point.type());
   }
 
   return 0;

@@ -43,6 +43,7 @@ using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
+using apollo::hdmap::HDMapUtil;
 
 std::string Planning::Name() const { return "planning"; }
 
@@ -100,7 +101,7 @@ Status Planning::Init() {
   CHECK_ADAPTER_IF(FLAGS_enable_traffic_light, TrafficLightDetection);
 
   if (!FLAGS_use_navigation_mode) {
-    hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
+    hdmap_ = HDMapUtil::BaseMapPtr();
     CHECK(hdmap_) << "Failed to load map";
     reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
         new ReferenceLineProvider(hdmap_, config_.smoother_type()));
@@ -177,14 +178,6 @@ void Planning::RunOnce() {
 
   const double start_timestamp = Clock::NowInSeconds();
 
-  if (FLAGS_use_navigation_mode) {
-    // hdmap is created on the fly with relative map
-    hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
-    CHECK(hdmap_) << "Failed to load map";
-    reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
-        new ReferenceLineProvider(hdmap_, config_.smoother_type()));
-  }
-
   ADCTrajectory not_ready_pb;
   auto* not_ready = not_ready_pb.mutable_decision()
                         ->mutable_main_decision()
@@ -196,12 +189,18 @@ void Planning::RunOnce() {
   } else if (!FLAGS_use_navigation_mode &&
              AdapterManager::GetRoutingResponse()->Empty()) {
     not_ready->set_reason("routing not ready");
+  } else if (HDMapUtil::BaseMapPtr() == nullptr) {
+    not_ready->set_reason("map not ready");
   }
   if (not_ready->has_reason()) {
     AERROR << not_ready->reason() << "; skip the planning cycle.";
     PublishPlanningPb(&not_ready_pb, start_timestamp);
     return;
   }
+
+  hdmap_ = HDMapUtil::BaseMapPtr();
+  reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
+      new ReferenceLineProvider(hdmap_, config_.smoother_type()));
 
   // localization
   const auto& localization =
@@ -334,7 +333,7 @@ void Planning::RunOnce() {
 
   auto seq_num = frame_->SequenceNum();
   FrameHistory::instance()->Add(seq_num, std::move(frame_));
-}
+}  // namespace planning
 
 void Planning::Stop() {
   AERROR << "Planning Stop is called";
