@@ -69,6 +69,8 @@ Status RelativeMap::Init() {
                       FLAGS_relative_map_config_filename);
   }
 
+  navigation_lane_.SetConfig(config_.navigation_lane());
+
   AdapterManager::Init(adapter_conf_);
   if (!AdapterManager::GetPerceptionObstacles()) {
     std::string error_msg(

@@ -19,6 +19,7 @@
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
+#include "modules/map/relative_map/proto/relative_map_config.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
@@ -27,7 +28,10 @@ namespace relative_map {
 class NavigationLane {
  public:
   NavigationLane() = default;
+  explicit NavigationLane(const NavigationLaneConfig& config);
   ~NavigationLane() = default;
+
+  void SetConfig(const NavigationLaneConfig& config);
 
   bool Update(const perception::PerceptionObstacles& perception_obstacles);
   void UpdateNavigationInfo(const NavigationInfo& navigation_info) {
@@ -48,6 +52,8 @@ class NavigationLane {
   void ConvertNavigationLineToPath(common::Path* path);
 
   void UpdateProjectionIndex();
+
+  NavigationLaneConfig config_;
 
   // received from topic: /apollo/perception_obstacles
   perception::PerceptionObstacles perception_obstacles_;
