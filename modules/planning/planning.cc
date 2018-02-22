@@ -198,9 +198,12 @@ void Planning::RunOnce() {
     return;
   }
 
-  hdmap_ = HDMapUtil::BaseMapPtr();
-  reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
-      new ReferenceLineProvider(hdmap_, config_.smoother_type()));
+  if (FLAGS_use_navigation_mode) {
+    // recreate reference line provider in every cycle
+    hdmap_ = HDMapUtil::BaseMapPtr();
+    reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
+        new ReferenceLineProvider(hdmap_, config_.smoother_type()));
+  }
 
   // localization
   const auto& localization =
