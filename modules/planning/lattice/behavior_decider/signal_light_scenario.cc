@@ -62,17 +62,8 @@ int SignalLightScenario::ComputeScenarioDecision(
       continue;
     }
 
-    double stop_deceleration =
-        EstimateStopDeceleration(reference_line_info, signal_from_map);
-
-    if ((it_signal->second->color() == TrafficLight::RED &&
-         stop_deceleration < FLAGS_max_stop_deceleration) ||
-        // (signal.color() == TrafficLight::UNKNOWN &&
-        //  stop_deceleration < FLAGS_max_stop_deceleration) ||
-        (it_signal->second->color() == TrafficLight::YELLOW &&
-         stop_deceleration < FLAGS_max_stop_deacceleration_for_yellow_light)) {
-      CreateStopObstacle(frame, reference_line_info, signal_from_map);
-
+    if ((it_signal->second->color() == TrafficLight::RED) ||
+        (it_signal->second->color() == TrafficLight::YELLOW)) {
       stop_s = std::min(stop_s, signal_from_map->start_s);
     }
   }
@@ -123,58 +114,6 @@ SignalLightScenario::GetPerceptionDetectedSignals() {
     detected_signals[signal.id()] = &signal;
   }
   return detected_signals;
-}
-
-double SignalLightScenario::EstimateStopDeceleration(
-    ReferenceLineInfo* const reference_line_info,
-    const hdmap::PathOverlap* signal_light) {
-  double ego_speed =
-      common::VehicleStateProvider::instance()->linear_velocity();
-
-  double ego_front_s = reference_line_info->AdcSlBoundary().end_s();
-  double stop_s = signal_light->start_s;
-
-  if (stop_s >= ego_front_s) {
-    double stop_distance = stop_s - ego_front_s;
-    return (ego_speed * ego_speed) / stop_distance * 0.5;
-  } else {
-    // longitudinal_acceleration_lower_bound is a negative value.
-    return -FLAGS_longitudinal_acceleration_lower_bound;
-  }
-}
-
-void SignalLightScenario::CreateStopObstacle(
-    Frame* frame, ReferenceLineInfo* const reference_line_info,
-    const hdmap::PathOverlap* signal_light) {
-  // check
-  const auto& reference_line = reference_line_info->reference_line();
-  const double stop_s =
-      signal_light->start_s - FLAGS_traffic_light_stop_distance;
-  const double box_center_s =
-      signal_light->start_s + FLAGS_virtual_stop_wall_length / 2.0;
-  if (!WithinBound(0.0, reference_line.Length(), stop_s) ||
-      !WithinBound(0.0, reference_line.Length(), box_center_s)) {
-    ADEBUG << "signal " << signal_light->object_id
-           << " is not on reference line";
-    return;
-  }
-
-  // create virtual stop wall
-  std::string virtual_obstacle_id =
-      FLAGS_signal_light_virtual_obstacle_id_prefix + signal_light->object_id;
-  auto* obstacle = frame->CreateVirtualStopObstacle(
-      reference_line_info, virtual_obstacle_id, signal_light->start_s);
-  if (!obstacle) {
-    AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
-    return;
-  }
-  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
-  if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for: " << virtual_obstacle_id;
-    return;
-  }
-
-  return;
 }
 
 }  // namespace planning

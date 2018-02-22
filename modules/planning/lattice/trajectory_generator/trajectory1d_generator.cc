@@ -63,7 +63,7 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
     const double target_speed,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
   ADEBUG << "cruise speed is  " << target_speed;
-  std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
+  auto end_conditions =
       end_condition_sampler_->SampleLonEndConditionsForCruising(target_speed);
 
   for (const auto& end_condition : end_conditions) {
@@ -76,6 +76,25 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
         new LatticeTrajectory1d(
             std::shared_ptr<Curve1d>(new QuarticPolynomialCurve1d(
                 init_lon_state_, end_state, end_condition.second))));
+
+    lattice_traj_ptr->set_target_velocity(end_condition.first[1]);
+    lattice_traj_ptr->set_target_time(end_condition.second);
+    ptr_lon_trajectory_bundle->push_back(lattice_traj_ptr);
+  }
+}
+
+void Trajectory1dGenerator::GenerateSpeedProfileForStopping(
+    const double stop_point,
+    std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
+  ADEBUG << "stop point is " << stop_point;
+  auto end_conditions =
+      end_condition_sampler_->SampleLonEndConditionsForStopping(stop_point);
+
+  for (const auto& end_condition : end_conditions) {
+    std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(
+        new LatticeTrajectory1d(
+            std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
+                init_lon_state_, end_condition.first, end_condition.second))));
 
     lattice_traj_ptr->set_target_position(end_condition.first[0]);
     lattice_traj_ptr->set_target_velocity(end_condition.first[1]);
@@ -114,6 +133,11 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
   //
   GenerateSpeedProfilesForPathTimeBound(planning_target,
                                         ptr_lon_trajectory_bundle);
+
+  if (planning_target.has_stop_point()) {
+    GenerateSpeedProfileForStopping(planning_target.stop_point(),
+                                    ptr_lon_trajectory_bundle);
+  }
 }
 
 void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
