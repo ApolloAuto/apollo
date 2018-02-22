@@ -48,7 +48,7 @@ class BaseCameraDetector {
   virtual bool multitask(const cv::Mat& frame,
                          std::vector<VisualObjectPtr>* objects, cv::Mat* mask) {
     return true;
-  };
+  }
 
   // @brief: Extract deep learning ROI features for each object
   // @param [in/out]: detected objects, with 2D bbox and its features
