@@ -808,7 +808,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 }
 
 void SimulationWorldService::CreatePredictionTrajectory(
-    Object *world_object, const PredictionObstacle &obstacle) {
+    const PredictionObstacle &obstacle, Object *world_object) {
   for (const auto &traj : obstacle.trajectory()) {
     Prediction *prediction = world_object->add_prediction();
     prediction->set_probability(traj.probability());
@@ -839,7 +839,7 @@ void SimulationWorldService::UpdateSimulationWorld(
     auto &world_obj = CreateWorldObjectIfAbsent(obstacle.perception_obstacle());
 
     // Add prediction trajectory to the object.
-    CreatePredictionTrajectory(&world_obj, obstacle);
+    CreatePredictionTrajectory(obstacle, &world_obj);
 
     world_obj.set_timestamp_sec(
         std::max(obstacle.timestamp(), world_obj.timestamp_sec()));

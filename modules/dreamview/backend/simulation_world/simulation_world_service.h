@@ -172,8 +172,8 @@ class SimulationWorldService {
   void UpdateMainDecision(const apollo::planning::MainDecision &main_decision,
                           double update_timestamp_sec, Object *world_main_stop);
   void CreatePredictionTrajectory(
-      Object *world_object,
-      const apollo::prediction::PredictionObstacle &obstacle);
+      const apollo::prediction::PredictionObstacle &obstacle,
+      Object *world_object);
   void UpdatePlanningData(const apollo::planning_internal::PlanningData &data);
 
   void PopulateMapInfo(double radius);
