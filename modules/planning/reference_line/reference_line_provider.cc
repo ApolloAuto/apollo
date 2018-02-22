@@ -278,6 +278,12 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     auto lane_ptr = hdmap->GetLaneById(hdmap::MakeMapId(lane_id));
     RouteSegments segment;
     segment.emplace_back(lane_ptr, 0.0, lane_ptr->total_length());
+    segment.SetCanExit(true);
+    segment.SetId(lane_id);
+    segment.SetNextAction(routing::FORWARD);
+    segment.SetIsOnSegment(true);
+    segment.SetStopForDestination(false);
+    segment.SetPreviousAction(routing::FORWARD);
     segments->emplace_back(segment);
     std::vector<ReferencePoint> ref_points;
     for (const auto &path_point : path_points) {
