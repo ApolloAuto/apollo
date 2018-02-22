@@ -47,7 +47,7 @@ namespace dreamview {
 const float kEpsilon = 0.01;
 
 class SimulationWorldServiceTest : public ::testing::Test {
- public:
+public:
   virtual void SetUp() {
     // Setup AdapterManager.
     AdapterManagerConfig config;
@@ -66,12 +66,12 @@ class SimulationWorldServiceTest : public ::testing::Test {
     AdapterManager::Init(config);
 
     FLAGS_routing_response_file =
-        "modules/dreamview/backend/testdata/routing.pb.txt";
+      "modules/dreamview/backend/testdata/routing.pb.txt";
     apollo::common::VehicleConfigHelper::Init();
     sim_world_service_.reset(new SimulationWorldService(map_service_.get()));
   }
 
- protected:
+protected:
   SimulationWorldServiceTest() {
     FLAGS_map_dir = "modules/dreamview/backend/testdata";
     FLAGS_base_map_filename = "garage.bin";
@@ -155,7 +155,7 @@ TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
   chassis.set_brake_percentage(10);
   chassis.set_steering_percentage(25);
   chassis.mutable_signal()->set_turn_signal(
-      apollo::common::VehicleSignal::TURN_RIGHT);
+    apollo::common::VehicleSignal::TURN_RIGHT);
 
   // Commit the update.
   sim_world_service_->UpdateSimulationWorld(chassis);
@@ -185,8 +185,8 @@ TEST_F(SimulationWorldServiceTest, UpdateLocalization) {
 
   auto pose = localization.pose();
   auto heading = apollo::common::math::QuaternionToHeading(
-      pose.orientation().qw(), pose.orientation().qx(), pose.orientation().qy(),
-      pose.orientation().qz());
+                   pose.orientation().qw(), pose.orientation().qx(), pose.orientation().qy(),
+                   pose.orientation().qz());
   localization.mutable_pose()->set_heading(heading);
 
   // Commit the update.
@@ -197,8 +197,8 @@ TEST_F(SimulationWorldServiceTest, UpdateLocalization) {
   EXPECT_DOUBLE_EQ(1.0, car.position_x());
   EXPECT_DOUBLE_EQ(1.5, car.position_y());
   EXPECT_DOUBLE_EQ(
-      apollo::common::math::QuaternionToHeading(0.0, 0.0, 0.0, 0.0),
-      car.heading());
+    apollo::common::math::QuaternionToHeading(0.0, 0.0, 0.0, 0.0),
+    car.heading());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
@@ -289,7 +289,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
   // Check last point.
   {
     const Object point =
-        world.planning_trajectory(world.planning_trajectory_size() - 1);
+      world.planning_trajectory(world.planning_trajectory_size() - 1);
     EXPECT_DOUBLE_EQ(280.0, point.position_x());
     EXPECT_DOUBLE_EQ(290.0, point.position_y());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
@@ -300,23 +300,23 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   DecisionResult decision_res;
 
   decision_res.mutable_vehicle_signal()->set_turn_signal(
-      apollo::common::VehicleSignal::TURN_RIGHT);
+    apollo::common::VehicleSignal::TURN_RIGHT);
 
   apollo::planning::MainDecision* main_decision =
-      decision_res.mutable_main_decision();
+    decision_res.mutable_main_decision();
   main_decision->add_target_lane()->set_speed_limit(35);
   apollo::planning::MainStop* main_stop = main_decision->mutable_stop();
   main_stop->mutable_stop_point()->set_x(45678.9);
   main_stop->mutable_stop_point()->set_y(1234567.8);
   main_stop->set_stop_heading(1.234);
   main_stop->set_reason_code(
-      apollo::planning::StopReasonCode::STOP_REASON_CROSSWALK);
+    apollo::planning::StopReasonCode::STOP_REASON_CROSSWALK);
 
   apollo::planning::ObjectDecisions* obj_decisions =
-      decision_res.mutable_object_decision();
+    decision_res.mutable_object_decision();
   // The 1st obstacle is from perception and has 2 decisions: nudge or sidepass.
   apollo::planning::ObjectDecision* obj_decision1 =
-      obj_decisions->add_decision();
+    obj_decisions->add_decision();
   obj_decision1->set_perception_id(1);
   Object& perception1 = sim_world_service_->obj_map_["1"];
   perception1.set_type(Object_Type_UNKNOWN_UNMOVABLE);
@@ -341,10 +341,10 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   obj_decision1->add_object_decision()->mutable_sidepass();
   // The 2nd obstacle is virtual and has only 1 decision: yield.
   apollo::planning::ObjectDecision* obj_decision2 =
-      obj_decisions->add_decision();
+    obj_decisions->add_decision();
   obj_decision2->set_perception_id(2);
   apollo::planning::ObjectYield* yield =
-      obj_decision2->add_object_decision()->mutable_yield();
+    obj_decision2->add_object_decision()->mutable_yield();
   apollo::common::PointENU* fence_point = yield->mutable_fence_point();
   fence_point->set_x(-1859.98);
   fence_point->set_y(-3000.03);
@@ -438,14 +438,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
       const Prediction& prediction = obj.prediction(j);
       EXPECT_NEAR((sim_world.object_size() - i - 1) * 0.1 + j,
                   prediction.probability(), kEpsilon);
-      EXPECT_EQ(prediction.predicted_trajectory_size(), 8);
-      for (int k = 0; k < prediction.predicted_trajectory_size(); ++k) {
-        const auto& pt = prediction.predicted_trajectory(k);
-        int val = j * 10 + k;
-        EXPECT_NEAR(val, pt.x(), kEpsilon);
-        EXPECT_NEAR(val, pt.y(), kEpsilon);
-        EXPECT_NEAR(0.0, pt.z(), kEpsilon);
-      }
+      EXPECT_EQ(prediction.predicted_trajectory_size(), 2);  // Downsampled
     }
     EXPECT_NEAR(123.456, obj.timestamp_sec(), kEpsilon);
   }
@@ -454,23 +447,24 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
 TEST_F(SimulationWorldServiceTest, UpdateRouting) {
   // Load routing from file
   sim_world_service_.reset(
-      new SimulationWorldService(map_service_.get(), true));
+    new SimulationWorldService(map_service_.get(), true));
   sim_world_service_->UpdateSimulationWorld(
-      *AdapterManager::GetRoutingResponse()->GetLatestPublished());
+    *AdapterManager::GetRoutingResponse()->GetLatestPublished());
 
   auto& world = sim_world_service_->world_;
   EXPECT_EQ(world.routing_time(), 1234.5);
   EXPECT_EQ(1, world.route_path_size());
 
   double points[23][2] = {
-      {-1826.41, -3027.52}, {-1839.88, -3023.9},  {-1851.95, -3020.71},
-      {-1857.06, -3018.62}, {-1858.04, -3017.94}, {-1859.56, -3016.51},
-      {-1860.48, -3014.95}, {-1861.12, -3013.2},  {-1861.62, -3010.06},
-      {-1861.29, -3005.88}, {-1859.8, -2999.36},  {-1855.8, -2984.56},
-      {-1851.39, -2968.23}, {-1844.32, -2943.14}, {-1842.9, -2939.22},
-      {-1841.74, -2937.09}, {-1839.35, -2934.03}, {-1837.76, -2932.88},
-      {-1835.53, -2931.86}, {-1833.36, -2931.52}, {-1831.33, -2931.67},
-      {-1827.05, -2932.6},  {-1809.64, -2937.85}};
+    { -1826.41, -3027.52}, { -1839.88, -3023.9},  { -1851.95, -3020.71},
+    { -1857.06, -3018.62}, { -1858.04, -3017.94}, { -1859.56, -3016.51},
+    { -1860.48, -3014.95}, { -1861.12, -3013.2},  { -1861.62, -3010.06},
+    { -1861.29, -3005.88}, { -1859.8, -2999.36},  { -1855.8, -2984.56},
+    { -1851.39, -2968.23}, { -1844.32, -2943.14}, { -1842.9, -2939.22},
+    { -1841.74, -2937.09}, { -1839.35, -2934.03}, { -1837.76, -2932.88},
+    { -1835.53, -2931.86}, { -1833.36, -2931.52}, { -1831.33, -2931.67},
+    { -1827.05, -2932.6},  { -1809.64, -2937.85}
+  };
 
   const auto& path = world.route_path(0);
   EXPECT_EQ(23, path.point_size());

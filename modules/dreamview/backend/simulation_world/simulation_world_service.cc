@@ -23,6 +23,7 @@
 
 #include "google/protobuf/util/json_util.h"
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
@@ -39,7 +40,6 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/common/configs/vehicle_config_helper.h"
 
 namespace apollo {
 namespace dreamview {
@@ -51,6 +51,7 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
+using apollo::common::PathPoint;
 using apollo::common::time::Clock;
 using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
@@ -188,9 +189,7 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
   }
 }
 
-inline double SecToMs(const double sec) {
-  return sec * 1000.0;
-}
+inline double SecToMs(const double sec) { return sec * 1000.0; }
 
 }  // namespace
 
@@ -756,10 +755,8 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   planning_data->clear_path();
   for (auto &path : data.path()) {
     // Downsample the path points for frontend display.
-    // Angle threshold is about 5.72 degree.
-    constexpr double angle_threshold = 0.1;
-    std::vector<int> sampled_indices =
-        DownsampleByAngle(path.path_point(), angle_threshold);
+    auto sampled_indices =
+        DownsampleByAngle(path.path_point(), kAngleThreshold);
 
     auto *downsampled_path = planning_data->add_path();
     downsampled_path->set_name(path.name());
@@ -813,10 +810,18 @@ void SimulationWorldService::CreatePredictionTrajectory(
   for (const auto &traj : obstacle.trajectory()) {
     Prediction *prediction = world_object->add_prediction();
     prediction->set_probability(traj.probability());
+
+    std::vector<PathPoint> points;
     for (const auto &point : traj.trajectory_point()) {
+      points.push_back(point.path_point());
+    }
+    auto sampled_indices = DownsampleByAngle(points, kAngleThreshold);
+
+    for (auto index : sampled_indices) {
+      const auto &point = points[index];
       PolygonPoint *world_point = prediction->add_predicted_trajectory();
-      world_point->set_x(point.path_point().x() + map_service_->GetXOffset());
-      world_point->set_y(point.path_point().y() + map_service_->GetYOffset());
+      world_point->set_x(point.x() + map_service_->GetXOffset());
+      world_point->set_y(point.y() + map_service_->GetYOffset());
     }
   }
 }
@@ -853,10 +858,8 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   for (const Path &path : paths) {
     // Downsample the path points for frontend display.
-    // Angle threshold is about 5.72 degree.
-    constexpr double angle_threshold = 0.1;
-    std::vector<int> sampled_indices =
-        DownsampleByAngle(path.path_points(), angle_threshold);
+    auto sampled_indices =
+        DownsampleByAngle(path.path_points(), kAngleThreshold);
 
     route_paths_.emplace_back();
     RoutePath *route_path = &route_paths_.back();
