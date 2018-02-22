@@ -259,6 +259,16 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
          << "; stop_start_time: " << stop_start_time
          << "; wait_time: " << wait_time;
 
+  // adjust status. this may happen if there's bad data in Dropbox
+  double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+  double stop_line_start_s = next_stop_sign_overlap_->start_s;
+  if (stop_line_start_s - adc_front_edge_s >
+      FLAGS_max_valid_stop_distance) {
+    ADEBUG << "adjust stop status. too far from stop line. distance["
+        << stop_line_start_s - adc_front_edge_s << "]";
+    stop_status_ = StopSignStopStatus::TO_STOP;
+  }
+
   // check & update stop status
   switch (stop_status_) {
     case StopSignStopStatus::UNKNOWN:
@@ -314,21 +324,8 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
       }
       break;
     }
-    case StopSignStopStatus::STOP_DONE: {
-      // adjust STOP_DONE status. this may happen if there's bad data in DP
-      double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
-      double stop_line_start_s = next_stop_sign_overlap_->start_s;
-      double distance_stop_line_to_adc_front_edge =
-          stop_line_start_s - adc_front_edge_s;
-      if (distance_stop_line_to_adc_front_edge >
-          FLAGS_max_valid_stop_distance) {
-        ADEBUG << "adjust STOP_DONE status. not a valid stop. "
-            << "too far from stop line["
-            << distance_stop_line_to_adc_front_edge << "]";
-        stop_status_ = StopSignStopStatus::TO_STOP;
-      }
+    case StopSignStopStatus::STOP_DONE:
       break;
-    }
     default:
       break;
   }
