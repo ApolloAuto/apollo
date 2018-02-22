@@ -31,7 +31,7 @@ cc_library(
         "//modules/planning/math:polynomial_xd",
         "//modules/planning/math/curve1d:polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
-        "//modules/planning/math/frame_conversion:cartesian_frenet_conversion",
+        "//modules/common/math:cartesian_frenet_conversion",
         "//modules/planning/math/smoothing_spline:spline_1d_constraint",
         "//modules/planning/math/smoothing_spline:spline_1d_generator",
         "//modules/planning/math/smoothing_spline:spline_1d_kernel",

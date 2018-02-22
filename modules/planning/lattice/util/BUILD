@@ -31,8 +31,8 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/math:cartesian_frenet_conversion",
         "//modules/planning/lattice/util:reference_line_matcher",
-        "//modules/planning/math/frame_conversion:cartesian_frenet_conversion",
     ],
 )
 
