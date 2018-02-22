@@ -47,14 +47,14 @@ PlanningTarget BehaviorDecider::Analyze(
   CHECK(frame != nullptr);
   CHECK_GT(discretized_reference_line.size(), 0);
 
-  PlanningTarget ret;
+  PlanningTarget planning_target;
   if (ScenarioManager::instance()->ComputeWorldDecision(
-          frame, reference_line_info, &ret) != 0) {
+          frame, reference_line_info, &planning_target) != 0) {
     AERROR << "ComputeWorldDecision error!";
   }
 
   for (const auto& reference_point : discretized_reference_line) {
-    ret.mutable_discretized_reference_line()
+    planning_target.mutable_discretized_reference_line()
         ->add_discretized_reference_line_point()
         ->CopyFrom(reference_point);
   }
@@ -64,29 +64,21 @@ PlanningTarget BehaviorDecider::Analyze(
                                    FLAGS_planning_upper_speed_limit,
                                    path_time_neighborhood_);
 
+  // AddSampleBounds(condition_filter, &planning_target);
+
+  AddNeighborPoints(condition_filter, &planning_target);
+
+  return planning_target;
+}
+
+void BehaviorDecider::AddSampleBounds(
+    const ConditionFilter& condition_filter,
+    PlanningTarget* const planning_target) {
   std::vector<SampleBound> sample_bounds = condition_filter.QuerySampleBounds();
-
-  static int decision_cycles = 0;
-  if (FLAGS_enable_lattice_st_image_dump) {
-    apollo::planning_internal::LatticeStTraining st_data;
-    double timestamp = init_planning_point.relative_time();
-    std::string st_img_name = "DecisionCycle_" +
-                              std::to_string(decision_cycles) + "_" +
-                              std::to_string(timestamp);
-    if (condition_filter.GenerateLatticeStPixels(&st_data, timestamp,
-                                                 st_img_name)) {
-      ADEBUG << "Created_lattice_st_image_named = " << st_img_name
-             << "_for_timestamp = " << timestamp
-             << " num_colored_pixels = " << st_data.pixel_size();
-      planning_internal::Debug* ptr_debug =
-          reference_line_info->mutable_debug();
-      ptr_debug->mutable_planning_data()->mutable_lattice_st_image()->CopyFrom(
-          st_data);
-    }
+  for (const auto& sample_bound : sample_bounds) {
+    planning_target->add_sample_bound()->CopyFrom(sample_bound);
   }
-  decision_cycles += 1;
 
-  // Debug SampleBound
   if (sample_bounds.empty()) {
     ADEBUG << "Sample_bounds empty";
   } else {
@@ -94,11 +86,45 @@ PlanningTarget BehaviorDecider::Analyze(
       ADEBUG << "Sample_bound: " << sample_bound.ShortDebugString();
     }
   }
+}
 
-  for (const auto& sample_bound : sample_bounds) {
-    ret.add_sample_bound()->CopyFrom(sample_bound);
+void BehaviorDecider::AddNeighborPoints(
+    const ConditionFilter& condition_filter,
+    PlanningTarget* const planning_target) {
+  std::vector<SamplePoint> neighbor_points =
+      condition_filter.QueryNeighborPoints();
+  for (const auto& neighbor_point : neighbor_points) {
+    planning_target->add_neighbor_point()->CopyFrom(neighbor_point);
   }
-  return ret;
+
+  if (neighbor_points.empty()) {
+    ADEBUG << "Sample_bounds empty";
+  } else {
+    for (const SamplePoint& neighbor_point : neighbor_points) {
+      ADEBUG << "Neighbor point: " << neighbor_point.ShortDebugString();
+    }
+  }
+}
+
+void BehaviorDecider::DumpLatticeImage(const int index,
+    const common::TrajectoryPoint& init_planning_point,
+    const ConditionFilter& condition_filter,
+    ReferenceLineInfo* const reference_line_info) {
+  apollo::planning_internal::LatticeStTraining st_data;
+  double timestamp = init_planning_point.relative_time();
+  std::string st_img_name = "DecisionCycle_" +
+                            std::to_string(index) + "_" +
+                            std::to_string(timestamp);
+  if (condition_filter.GenerateLatticeStPixels(&st_data, timestamp,
+                                               st_img_name)) {
+    ADEBUG << "Created_lattice_st_image_named = " << st_img_name
+           << "_for_timestamp = " << timestamp
+           << " num_colored_pixels = " << st_data.pixel_size();
+    planning_internal::Debug* ptr_debug =
+        reference_line_info->mutable_debug();
+    ptr_debug->mutable_planning_data()->mutable_lattice_st_image()->CopyFrom(
+        st_data);
+  }
 }
 
 }  // namespace planning
