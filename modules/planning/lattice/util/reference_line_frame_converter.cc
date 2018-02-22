@@ -19,9 +19,8 @@
  **/
 
 #include "modules/planning/lattice/util/reference_line_frame_converter.h"
-
+#include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
-#include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
 namespace apollo {
 namespace planning {

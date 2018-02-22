@@ -90,7 +90,7 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/lattice/util:reference_line_matcher",
         "//modules/planning/math/curve1d",
-        "//modules/planning/math/frame_conversion:cartesian_frenet_conversion",
+        "//modules/common/math:cartesian_frenet_conversion",
     ],
 )
 
