@@ -7,16 +7,7 @@ cc_library(
     srcs = ["geometry_camera_converter.cc"],
     hdrs = ["geometry_camera_converter.h"],
     deps = [
-
-        "//modules/common",
-        "//modules/common:log",
-        "//modules/perception/common:perception_common",
-        "//modules/perception/lib/base",
-        "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/common:perception_obstacle_common",
-        "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
-        "@eigen"
-        
+    
     ]
 )
 
