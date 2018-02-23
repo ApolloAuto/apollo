@@ -53,12 +53,6 @@ PlanningTarget BehaviorDecider::Analyze(
     AERROR << "ComputeWorldDecision error!";
   }
 
-  for (const auto& reference_point : discretized_reference_line) {
-    planning_target.mutable_discretized_reference_line()
-        ->add_discretized_reference_line_point()
-        ->CopyFrom(reference_point);
-  }
-
   CHECK(FLAGS_default_cruise_speed <= FLAGS_planning_upper_speed_limit);
 
   ConditionFilter condition_filter(lon_init_state,
@@ -74,17 +68,17 @@ PlanningTarget BehaviorDecider::Analyze(
 void BehaviorDecider::ComputePathTimeSamplePoints(
     const ConditionFilter& condition_filter,
     PlanningTarget* const planning_target) {
-  std::vector<SamplePoint> neighbor_points =
-      condition_filter.QueryPathTimeObstacleSamplePoints();
-  for (const auto& neighbor_point : neighbor_points) {
-    planning_target->add_neighbor_point()->CopyFrom(neighbor_point);
+  auto sample_points = condition_filter.QueryPathTimeObstacleSamplePoints();
+
+  for (const auto& sample_point : sample_points) {
+    planning_target->add_sample_point()->CopyFrom(sample_point);
   }
 
-  if (neighbor_points.empty()) {
-    ADEBUG << "Sample_bounds empty";
+  if (sample_points.empty()) {
+    ADEBUG << "Obstacle path time points are empty.";
   } else {
-    for (const SamplePoint& neighbor_point : neighbor_points) {
-      ADEBUG << "Neighbor point: " << neighbor_point.ShortDebugString();
+    for (const SamplePoint& sample_point : sample_points) {
+      ADEBUG << "Neighbor point: " << sample_point.ShortDebugString();
     }
   }
 }

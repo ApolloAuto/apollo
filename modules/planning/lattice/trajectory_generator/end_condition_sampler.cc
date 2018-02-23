@@ -123,12 +123,12 @@ std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLonEndConditionsForPathTimePoints(
     const PlanningTarget& planning_target) const {
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
-  for (const SamplePoint& neighbor_point : planning_target.neighbor_point()) {
-    double s = neighbor_point.path_time_point().s();
-    double v = neighbor_point.ref_v();
+  for (const SamplePoint& sample_point : planning_target.sample_point()) {
+    double s = sample_point.path_time_point().s();
+    double v = sample_point.ref_v();
     std::array<double, 3> end_state = {s, v, 0.0};
-    end_s_conditions.push_back({end_state,
-                                neighbor_point.path_time_point().t()});
+    end_s_conditions.emplace_back(
+        end_state, sample_point.path_time_point().t());
   }
   return end_s_conditions;
 }
