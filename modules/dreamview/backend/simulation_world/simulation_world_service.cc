@@ -45,13 +45,13 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::canbus::Chassis;
+using apollo::common::PathPoint;
 using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::PathPoint;
 using apollo::common::time::Clock;
 using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
@@ -70,6 +70,7 @@ using apollo::planning::StopReasonCode;
 using apollo::planning_internal::PlanningData;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
+using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingResponse;
 
 using Json = nlohmann::json;
@@ -257,6 +258,7 @@ void SimulationWorldService::Update() {
   UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
   UpdateWithLatestObserved("ControlCommand",
                            AdapterManager::GetControlCommand());
+  UpdateWithLatestObserved("Navigation", AdapterManager::GetNavigation());
   for (const auto &kv : obj_map_) {
     *world_.add_object() = kv.second;
   }
@@ -934,6 +936,28 @@ void SimulationWorldService::UpdateSimulationWorld(
     } else if (debug.has_simple_mpc_debug() &&
                debug.simple_mpc_debug().has_station_error()) {
       control_data->set_station_error(debug.simple_mpc_debug().station_error());
+    }
+  }
+}
+
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const NavigationInfo &navigation_info) {
+  world_.clear_navigation_path();
+  for (auto &navigation_path : navigation_info.navigation_path()) {
+    if (navigation_path.has_path()) {
+      auto &path = navigation_path.path();
+
+      // Downsample the path points for frontend display.
+      auto sampled_indices =
+          DownsampleByAngle(path.path_point(), kAngleThreshold);
+
+      auto *downsampled_path = world_.add_navigation_path();
+      for (int index : sampled_indices) {
+        const auto &path_point = path.path_point()[index];
+        auto *point = downsampled_path->add_path_point();
+        point->CopyFrom(path_point);
+      }
     }
   }
 }
