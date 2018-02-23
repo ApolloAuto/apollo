@@ -248,6 +248,7 @@ cc_library(
     ],
     deps = [
         ":math_utils",
+        "//modules/common/proto:pnc_point_proto",
     ],
 )
 
