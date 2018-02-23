@@ -21,10 +21,10 @@
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/proto/geometry.pb.h"
+#include "modules/common/math/path_matcher.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/behavior_decider/condition_filter.h"
 #include "modules/planning/lattice/behavior_decider/scenario_manager.h"
-#include "modules/planning/lattice/util/reference_line_matcher.h"
 
 namespace apollo {
 namespace planning {

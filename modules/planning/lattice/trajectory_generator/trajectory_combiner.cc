@@ -19,8 +19,8 @@
 #include <algorithm>
 
 #include "modules/common/math/cartesian_frenet_conversion.h"
+#include "modules/common/math/path_matcher.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/lattice/util/reference_line_matcher.h"
 
 namespace apollo {
 namespace planning {
@@ -58,7 +58,7 @@ DiscretizedTrajectory TrajectoryCombiner::Combine(
     double d_pprime = lat_trajectory.Evaluate(2, s_param);
 
     PathPoint matched_ref_point =
-        ReferenceLineMatcher::MatchToReferenceLine(reference_line, s);
+        PathMatcher::MatchToPath(reference_line, s);
 
     double x = 0.0;
     double y = 0.0;
