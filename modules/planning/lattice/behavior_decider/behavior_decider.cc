@@ -33,11 +33,9 @@ using apollo::common::PathPoint;
 using apollo::common::PointENU;
 
 BehaviorDecider::BehaviorDecider(
-    std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line,
     std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
     std::shared_ptr<PredictionQuerier> ptr_prediction_obstacles)
-    : ptr_reference_line_(ptr_reference_line),
-      ptr_path_time_graph_(ptr_path_time_graph),
+    : ptr_path_time_graph_(ptr_path_time_graph),
       ptr_prediction_obstacles_(ptr_prediction_obstacles) {}
 
 PlanningTarget BehaviorDecider::Analyze(
@@ -65,7 +63,6 @@ PlanningTarget BehaviorDecider::Analyze(
 
   ConditionFilter condition_filter(lon_init_state,
                                    FLAGS_planning_upper_speed_limit,
-                                   ptr_reference_line_,
                                    ptr_path_time_graph_,
                                    ptr_prediction_obstacles_);
 

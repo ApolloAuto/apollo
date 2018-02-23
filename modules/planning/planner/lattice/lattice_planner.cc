@@ -26,7 +26,6 @@
 #include <utility>
 #include <vector>
 
-#include "../../lattice/behavior_decider/prediction_querier.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
@@ -36,6 +35,7 @@
 #include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
 #include "modules/planning/lattice/behavior_decider/path_time_graph.h"
+#include "modules/planning/lattice/behavior_decider/prediction_querier.h"
 #include "modules/planning/lattice/trajectory_generator/backup_trajectory_generator.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_combiner.h"
@@ -105,7 +105,7 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
                             Frame* frame) {
   auto status = Status::OK();
   double priority_cost = 0.0;
-  bool first_reference_line = true;
+  std::size_t index = 0;
   for (auto& reference_line_info : frame->reference_line_info()) {
     reference_line_info.SetPriorityCost(priority_cost);
     status =
@@ -118,10 +118,7 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
         AERROR << "Planner failed to " << reference_line_info.Lanes().Id();
       }
     }
-    if (first_reference_line) {
-      priority_cost += FLAGS_priority_cost_gap;
-      first_reference_line = false;
-    }
+    priority_cost += FLAGS_priority_cost_gap * (++index);
   }
   return status;
 }
@@ -160,19 +157,17 @@ Status LatticePlanner::PlanOnReferenceLine(
          << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
-
-  auto ptr_prediction_obstacles = std::make_shared<PredictionQuerier>(
-      frame->obstacles());
+  auto ptr_prediction_querier = std::make_shared<PredictionQuerier>(
+      frame->obstacles(), ptr_reference_line);
 
   // 4. parse the decision and get the planning target.
   auto ptr_path_time_graph = std::make_shared<PathTimeGraph>(
-      ptr_prediction_obstacles->GetObstacles(), *ptr_reference_line,
+      ptr_prediction_querier->GetObstacles(), *ptr_reference_line,
       init_s[0], init_s[0] + FLAGS_decision_horizon,
       0.0, FLAGS_trajectory_time_length);
 
-  BehaviorDecider behavior_decider(ptr_reference_line,
-                                   ptr_path_time_graph,
-                                   ptr_prediction_obstacles);
+  BehaviorDecider behavior_decider(ptr_path_time_graph,
+                                   ptr_prediction_querier);
 
   PlanningTarget planning_target = behavior_decider.Analyze(frame,
       reference_line_info, planning_init_point, init_s,
