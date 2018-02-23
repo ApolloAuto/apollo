@@ -127,6 +127,11 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
   connection_lock->unlock();
 
   if (ret != static_cast<int>(data.size())) {
+    // When data is empty, the header length (2) is returned.
+    if (data.size() == 0 && ret == 2) {
+      return true;
+    }
+
     // Determine error message based on return value.
     std::string msg;
     if (ret == 0) {
