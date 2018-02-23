@@ -31,6 +31,7 @@ namespace planning {
 
 using apollo::common::PathPoint;
 using apollo::common::PointENU;
+using apollo::common::TrajectoryPoint;
 
 BehaviorDecider::BehaviorDecider(
     std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
@@ -40,10 +41,9 @@ BehaviorDecider::BehaviorDecider(
 
 PlanningTarget BehaviorDecider::Analyze(
     Frame* frame, ReferenceLineInfo* const reference_line_info,
-    const common::TrajectoryPoint& init_planning_point,
+    const TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
-    const std::vector<common::PathPoint>& discretized_reference_line) {
-
+    const std::vector<PathPoint>& discretized_reference_line) {
   CHECK(frame != nullptr);
   CHECK_GT(discretized_reference_line.size(), 0);
 

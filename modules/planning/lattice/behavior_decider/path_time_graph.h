@@ -44,7 +44,8 @@ class PathTimeGraph {
                 const double s_start,
                 const double s_end,
                 const double t_start,
-                const double t_end);
+                const double t_end,
+                const double path_width);
 
   const std::vector<PathTimeObstacle>& GetPathTimeObstacles() const;
 
@@ -89,6 +90,8 @@ class PathTimeGraph {
   std::unordered_map<std::string, PathTimeObstacle> path_time_obstacle_map_;
 
   std::vector<PathTimeObstacle> path_time_obstacles_;
+
+  double half_path_width_;
 };
 
 }  // namespace planning
