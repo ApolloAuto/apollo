@@ -32,12 +32,13 @@ namespace planning {
 using apollo::common::PathPoint;
 using apollo::common::PointENU;
 
-BehaviorDecider::BehaviorDecider() {}
-
-void BehaviorDecider::UpdatePathTimeGraph(
-    std::shared_ptr<PathTimeGraph> path_time_graph) {
-  path_time_graph_ = path_time_graph;
-}
+BehaviorDecider::BehaviorDecider(
+    std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line,
+    std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
+    std::shared_ptr<PredictionQuerier> ptr_prediction_obstacles)
+    : ptr_reference_line_(ptr_reference_line),
+      ptr_path_time_graph_(ptr_path_time_graph),
+      ptr_prediction_obstacles_(ptr_prediction_obstacles) {}
 
 PlanningTarget BehaviorDecider::Analyze(
     Frame* frame, ReferenceLineInfo* const reference_line_info,
@@ -64,33 +65,14 @@ PlanningTarget BehaviorDecider::Analyze(
 
   ConditionFilter condition_filter(lon_init_state,
                                    FLAGS_planning_upper_speed_limit,
-                                   path_time_graph_);
-
-  // AddSampleBounds(condition_filter, &planning_target);
+                                   ptr_reference_line_,
+                                   ptr_path_time_graph_,
+                                   ptr_prediction_obstacles_);
 
   ComputePathTimeSamplePoints(condition_filter, &planning_target);
 
   return planning_target;
 }
-
-/**
-void BehaviorDecider::AddSampleBounds(
-    const ConditionFilter& condition_filter,
-    PlanningTarget* const planning_target) {
-  std::vector<SampleBound> sample_bounds = condition_filter.QuerySampleBounds();
-  for (const auto& sample_bound : sample_bounds) {
-    planning_target->add_sample_bound()->CopyFrom(sample_bound);
-  }
-
-  if (sample_bounds.empty()) {
-    ADEBUG << "Sample_bounds empty";
-  } else {
-    for (const SampleBound& sample_bound : sample_bounds) {
-      ADEBUG << "Sample_bound: " << sample_bound.ShortDebugString();
-    }
-  }
-}
-**/
 
 void BehaviorDecider::ComputePathTimeSamplePoints(
     const ConditionFilter& condition_filter,
