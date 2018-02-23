@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include "../../lattice/behavior_decider/path_time_graph.h"
+#include "modules/planning/lattice/behavior_decider/path_time_graph.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
@@ -162,7 +162,7 @@ Status LatticePlanner::PlanOnReferenceLine(
   std::shared_ptr<PathTimeGraph> path_time_neighborhood_ptr(new PathTimeGraph(
       frame->obstacles(), init_s[0], discretized_reference_line));
 
-  decider_.UpdatePathTimeNeighborhood(path_time_neighborhood_ptr);
+  decider_.UpdatePathTimeGraph(path_time_neighborhood_ptr);
   PlanningTarget planning_target =
       decider_.Analyze(frame, reference_line_info, planning_init_point, init_s,
                        discretized_reference_line);
