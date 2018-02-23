@@ -27,9 +27,9 @@
 #include <vector>
 
 #include "modules/common/math/linear_interpolation.h"
+#include "modules/common/math/path_matcher.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/lattice/util/reference_line_matcher.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 
 namespace apollo {
@@ -68,7 +68,7 @@ SLBoundary PathTimeGraph::ComputeObstacleBoundary(
   box.GetAllCorners(&corners);
 
   for (const auto& point : corners) {
-    auto sl_point = ReferenceLineMatcher::GetReferenceLineCoordinate(
+    auto sl_point = PathMatcher::GetPathFrenetCoordinate(
         discretized_ref_points, point.x(), point.y());
     start_s = std::fmin(start_s, sl_point.first);
     end_s = std::fmax(end_s, sl_point.first);

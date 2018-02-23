@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include "modules/planning/lattice/util/reference_line_matcher.h"
+#include "modules/common/math/path_matcher.h"
 #include "modules/common/math/linear_interpolation.h"
 
 namespace apollo {
@@ -110,7 +110,7 @@ double PredictionQuerier::ProjectVelocityAlongReferenceLine(
   double v_x = v * std::cos(heading);
   double v_y = v * std::sin(heading);
   common::PathPoint obstacle_point_on_ref_line =
-      ReferenceLineMatcher::MatchToReferenceLine(*ptr_reference_line_, s);
+      PathMatcher::MatchToPath(*ptr_reference_line_, s);
   double ref_theta = obstacle_point_on_ref_line.theta();
 
   return std::cos(ref_theta) * v_x + std::sin(ref_theta) * v_y;

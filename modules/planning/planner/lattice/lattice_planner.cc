@@ -30,6 +30,7 @@
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
+#include "modules/common/math/path_matcher.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
@@ -41,7 +42,6 @@
 #include "modules/planning/lattice/trajectory_generator/trajectory_combiner.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_evaluator.h"
 #include "modules/planning/lattice/util/lattice_trajectory1d.h"
-#include "modules/planning/lattice/util/reference_line_matcher.h"
 
 namespace apollo {
 namespace planning {
@@ -144,7 +144,7 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // 2. compute the matched point of the init planning point on the reference
   // line.
-  PathPoint matched_point = ReferenceLineMatcher::MatchToReferenceLine(
+  PathPoint matched_point = PathMatcher::MatchToPath(
       *ptr_reference_line, planning_init_point.path_point().x(),
       planning_init_point.path_point().y());
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTIC_UTIL_REFERENCE_LINE_MATCHER_H_
-#define MODULES_PLANNING_LATTIC_UTIL_REFERENCE_LINE_MATCHER_H_
+#ifndef MODULES_COMMON_MATH_PATH_MATCHER_H_
+#define MODULES_COMMON_MATH_PATH_MATCHER_H_
 
 #include <utility>
 #include <vector>
@@ -29,19 +29,19 @@
 namespace apollo {
 namespace planning {
 
-class ReferenceLineMatcher {
+class PathMatcher {
  public:
-  ReferenceLineMatcher() = delete;
+  PathMatcher() = delete;
 
-  static common::PathPoint MatchToReferenceLine(
+  static common::PathPoint MatchToPath(
       const std::vector<common::PathPoint>& reference_line, const double x,
       const double y);
 
-  static std::pair<double, double> GetReferenceLineCoordinate(
+  static std::pair<double, double> GetPathFrenetCoordinate(
       const std::vector<common::PathPoint>& reference_line, const double x,
       const double y);
 
-  static common::PathPoint MatchToReferenceLine(
+  static common::PathPoint MatchToPath(
       const std::vector<common::PathPoint>& reference_line, const double s);
 
  private:
@@ -53,4 +53,4 @@ class ReferenceLineMatcher {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTIC_UTIL_REFERENCE_LINE_MATCHER_H_
+#endif  // MODULES_COMMON_MATH_PATH_MATCHER_H_
