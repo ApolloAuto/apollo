@@ -597,8 +597,6 @@ void ReferenceLine::AddSpeedLimit(double start_s, double end_s,
                                   double speed_limit) {
   // assume no overlaps between speed limit regions.
   speed_limit_.emplace_back(start_s, end_s, speed_limit);
-  AERROR << "Added start_s: " << start_s << " , end_s: " << end_s
-         << ", speed_limit: " << speed_limit;
 }
 
 }  // namespace planning
