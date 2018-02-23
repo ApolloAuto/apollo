@@ -25,6 +25,7 @@ cc_library(
     deps = [
         ":trajectory",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/math:linear_interpolation",
         "//modules/planning/common:planning_util",
         "@eigen//:eigen",
     ],
