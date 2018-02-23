@@ -19,8 +19,7 @@
 
 #include <memory>
 #include <vector>
-
-#include "Eigen/Core"
+#include <Eigen/Core>
 
 #include "modules/perception/obstacle/base/types.h"
 

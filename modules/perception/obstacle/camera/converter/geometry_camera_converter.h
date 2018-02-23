@@ -14,73 +14,81 @@
  * limitations under the License.
  *****************************************************************************/
 
-// Convert 2D detections into 3D objects
+// Convert 2D detections into 3D objects with physical position in camera space
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_CONVERTER_GEOMETRY_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_CONVERTER_GEOMETRY_H_
 
+#include <yaml-cpp/yaml.h>
+#include <Eigen/Geometry>
+
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <Eigen/Geometry>
-#include <yaml-cpp/yaml.h>
+
 #include <opencv2/opencv.hpp>
 
-#include "xlog.h"
-#include "lib/config_manager/config_manager.h"
-
-#include "obstacle/common/camera.h"
-#include "obstacle/camera/common/util.h"
-#include "obstacle/camera/interface/base_camera_transformer.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/obstacle/camera/common/camera.h"
+#include "modules/perception/obstacle/camera/common/visual_object.h"
+#include "modules/perception/obstacle/camera/interface/base_camera_converter.h"
 
 namespace apollo {
 namespace perception {
 
 class GeometryCameraConverter : public BaseCameraConverter {
-public:
+ public:
+  GeometryCameraConverter() : BaseCameraConverter() {}
 
-    GeometryCameraConverter() : BaseCameraConverter() {}
+  virtual ~GeometryCameraConverter() {}
 
-    virtual ~GeometryCameraConverter() {}
+  bool Init() override;
 
-    virtual bool Init() override;
+  // @brief: Convert 2D detected objects into physical 3D objects
+  // @param [in/out] objects : detected object lists, added 3D position and
+  // orientation
+  bool Convert(std::vector<VisualObjectPtr> *objects) override;
 
-   // @brief: Convert 2D detected objects into physical 3D objects
-   // @param [in/out]: detected object lists, added 3D position and orientation
-   virtual bool Convert(std::vector<VisualObjectPtr>* objects) override;
+  void SetDebug(bool flag);
 
-    void SetDebug(bool flag);
+  std::string Name() const override;
 
-    virtual std::string name() const override;
+ private:
+  bool LoadCameraIntrinsics(const std::string &file_path);
 
-private:
+  bool ConvertSingle(const float &h, const float &w, const float &l,
+                     const float &alpha_deg, const Eigen::Vector2f &upper_left,
+                     const Eigen::Vector2f &lower_right, float *distance_w,
+                     float *distance_h,
+                     Eigen::Vector2f *mass_center_pixel);
 
-  bool instance_transform(const float &h, const float &w, const float &l, const float &alpha_deg,
-                          const Eigen::Vector2f &upper_left, const Eigen::Vector2f &lower_right,
-                          float &distance_w, float &distance_h,
-                          Eigen::Vector2f &mass_center_pixel);
+  void Rotate(const float &alpha_deg,
+              std::vector<Eigen::Vector3f> *corners) const;
 
-    bool load_camera_intrinsics(const std::string &file_name);
+  float SearchDistance(const int &pixel_length, const bool &use_width,
+                       const Eigen::Matrix<float, 3, 1> &mass_center_v) const;
 
-    void rotate_object(float alpha_deg, std::vector<Eigen::Vector3f > &corners) const;
+  void SearchCenterDirection(
+      const Eigen::Matrix<float, 2, 1> &box_center_pixel, const float &curr_d,
+      Eigen::Matrix<float, 3, 1> *mass_center_v,
+      Eigen::Matrix<float, 2, 1> *mass_center_pixel) const;
 
-    float distance_binary_search(const int &target_pixel_length, const bool &use_width,
-                                  const Eigen::Matrix<float, 3, 1> &mass_center_v) const;
+  Eigen::Matrix<float, 3, 1> MakeUnit(
+      const Eigen::Matrix<float, 3, 1> &v) const;
 
-    void mass_center_search(const Eigen::Matrix<float, 2, 1> &target_box_center_pixel,
-                            const double &curr_d, Eigen::Matrix<float, 3, 1> &mass_center_v,
-                            Eigen::Matrix<float, 2, 1> &mass_center_pixel) const;
+  Camera<float> camera_model_;
+  std::vector<Eigen::Vector3f> corners_;
+  static const int kMaxDistanceSearchDepth_ = 20;
+  static const int kMaxCenterDirectionSearchDepth_ = 10;
+  bool debug_ = false;
 
-    Eigen::Matrix<float, 3, 1> to_unit_v(const Eigen::Matrix<float, 3, 1> &v) const;
-
-    Camera<float> camera_model_;
-    std::vector<Eigen::Vector3f> _corners_;
-    static const int max_distance_binary_search_depth = 20;
-    static const int max_mass_center_search_depth = 10;
-    bool debug_ = false;
+  DISALLOW_COPY_AND_ASSIGN(GeometryCameraConverter);
 };
+
+// Register plugin
+REGISTER_CAMERA_CONVERTER(GeometryCameraConverter);
 
 }  // namespace perception
 }  // namespace apollo

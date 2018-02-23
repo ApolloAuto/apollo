@@ -21,9 +21,8 @@
 
 #include <string>
 #include <vector>
-
-#include "Eigen/Core"
-#include "opencv2/opencv.hpp"
+#include <Eigen/Core>
+#include <opencv2/opencv.hpp>
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
@@ -54,7 +53,7 @@ class BaseCameraDetector {
   // @param [in/out]: detected objects, with 2D bbox and its features
   virtual bool Extract(std::vector<VisualObjectPtr>* objects) = 0;
 
-  virtual std::string name() const = 0;
+  virtual std::string Name() const = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseCameraDetector);
