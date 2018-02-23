@@ -41,14 +41,11 @@ export default class PointCloudWebSocketEndpoint {
         // Request point cloud every 100ms.
         clearInterval(this.timer);
         this.timer = setInterval(() => {
-            if (this.websocket.readyState === this.websocket.OPEN) {
-                if (STORE.options.showPointCloud === true) {
-                    this.websocket.send(JSON.stringify({
-                        type : "RequestPointCloud"
-                    }));
-                } else {
-                    RENDERER.updatePointCloud({num:[]});
-                }
+            if (this.websocket.readyState === this.websocket.OPEN
+                && STORE.options.showPointCloud === true) {
+                this.websocket.send(JSON.stringify({
+                    type : "RequestPointCloud"
+                }));
             }
         }, 100);
     }
@@ -58,5 +55,8 @@ export default class PointCloudWebSocketEndpoint {
             type: "TogglePointCloud",
             enable: enable,
         }));
+        if (STORE.options.showPointCloud === false) {
+            RENDERER.updatePointCloud({num:[]});
+        }
     }
 }
