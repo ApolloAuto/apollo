@@ -67,11 +67,9 @@ std::vector<PathPoint> ToDiscretizedReferenceLine(
     path_point.set_kappa(ref_point.kappa());
     path_point.set_dkappa(ref_point.dkappa());
 
-    double dx = 0.0;
-    double dy = 0.0;
     if (!path_points.empty()) {
-      dx = path_point.x() - path_points.back().x();
-      dy = path_point.y() - path_points.back().y();
+      double dx = path_point.x() - path_points.back().x();
+      double dy = path_point.y() - path_points.back().y();
       s += std::sqrt(dx * dx + dy * dy);
     }
     path_point.set_s(s);
@@ -95,21 +93,16 @@ void ComputeInitFrenetState(const PathPoint& matched_point,
 
 }  // namespace
 
-LatticePlanner::LatticePlanner() {}
-
-Status LatticePlanner::Init(const PlanningConfig& config) {
-  return Status::OK();
-}
-
 Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
                             Frame* frame) {
-  auto status = Status::OK();
+  std::size_t success_line_count = 0;
   double priority_cost = 0.0;
   std::size_t index = 0;
   for (auto& reference_line_info : frame->reference_line_info()) {
     reference_line_info.SetPriorityCost(priority_cost);
-    status =
-        PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
+    auto status = PlanOnReferenceLine(planning_start_point,
+        frame, &reference_line_info);
+
     if (status != Status::OK()) {
       if (reference_line_info.IsChangeLanePath()) {
         AERROR << "Planner failed to change lane to "
@@ -117,10 +110,17 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
       } else {
         AERROR << "Planner failed to " << reference_line_info.Lanes().Id();
       }
+    } else {
+      success_line_count += 1;
     }
     priority_cost += FLAGS_priority_cost_gap * (++index);
   }
-  return status;
+
+  if (success_line_count > 0) {
+    return Status::OK();
+  }
+  return Status(ErrorCode::PLANNING_ERROR,
+      "Failed to plan on any reference line.");
 }
 
 Status LatticePlanner::PlanOnReferenceLine(
