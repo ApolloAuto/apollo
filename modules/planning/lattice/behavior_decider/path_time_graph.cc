@@ -295,10 +295,12 @@ PathTimeGraph::GetObstacleSurroundingPoints(const std::string& obstacle_id,
     t1 = pt_obstacle.bottom_right().t();
   }
 
-  CHECK(t1 > t0);
+  double time_gap = t1 - t0;
+  CHECK(time_gap > -FLAGS_lattice_epsilon);
+  time_gap = std::abs(time_gap);
 
-  std::size_t num_sections = std::size_t((t1 - t0) / t_min_density) + 1;
-  double t_interval = (t1 - t0) / num_sections;
+  std::size_t num_sections = std::size_t(time_gap / t_min_density) + 1;
+  double t_interval = time_gap / num_sections;
 
   for (std::size_t i = 0; i <= num_sections; ++i) {
     double t = t_interval * i + t0;
