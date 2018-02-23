@@ -68,8 +68,6 @@ class LatticePlanner : public Planner {
                                std::vector<common::SpeedPoint>* st_points,
                                std::vector<common::FrenetFramePoint>* sl_points,
                                ReferenceLineInfo* reference_line_info);
-
-  BehaviorDecider decider_;
 };
 
 }  // namespace planning

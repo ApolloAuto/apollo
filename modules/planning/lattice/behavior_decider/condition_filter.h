@@ -30,6 +30,7 @@
 
 #include "modules/planning/lattice/behavior_decider/feasible_region.h"
 #include "modules/planning/lattice/behavior_decider/path_time_graph.h"
+#include "modules/planning/lattice/behavior_decider/prediction_querier.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 
@@ -38,8 +39,11 @@ namespace planning {
 
 class ConditionFilter {
  public:
-  ConditionFilter(const std::array<double, 3>& init_s, const double speed_limit,
-                  std::shared_ptr<PathTimeGraph> path_time_graph);
+  ConditionFilter(
+      const std::array<double, 3>& init_s, const double speed_limit,
+      std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line,
+      std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
+      std::shared_ptr<PredictionQuerier> ptr_prediction_obstacles);
 
   std::vector<SamplePoint> QueryPathTimeObstacleSamplePoints() const;
 
@@ -54,7 +58,11 @@ class ConditionFilter {
 
   FeasibleRegion feasible_region_;
 
+  std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line_;
+
   std::shared_ptr<PathTimeGraph> ptr_path_time_graph_;
+
+  std::shared_ptr<PredictionQuerier> ptr_prediction_obstacles_;
 };
 
 }  // namespace planning

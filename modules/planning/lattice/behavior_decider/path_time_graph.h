@@ -51,9 +51,6 @@ class PathTimeGraph {
   bool GetPathTimeObstacle(const std::string& obstacle_id,
                            PathTimeObstacle* path_time_obstacle);
 
-  double SpeedAtT(const std::string& obstacle_id, const double s,
-                  const double t) const;
-
   std::vector<std::pair<double, double>> GetPathBlockingIntervals(
       const double t) const;
 
@@ -80,7 +77,7 @@ class PathTimeGraph {
   PathTimePoint SetPathTimePoint(const std::string& obstacle_id, const double s,
                                  const double t) const;
 
-  void SetStaticPathTimeObstacle(
+  void SetStaticObstacle(
       const Obstacle* obstacle,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
@@ -89,12 +86,7 @@ class PathTimeGraph {
 
   std::pair<double, double> path_range_;
 
-  // obstacle_id -> critical conditions
   std::unordered_map<std::string, PathTimeObstacle> path_time_obstacle_map_;
-
-  std::unordered_map<std::string, prediction::Trajectory> prediction_traj_map_;
-
-  std::vector<common::PathPoint> discretized_ref_points_;
 
   std::vector<PathTimeObstacle> path_time_obstacles_;
 };
