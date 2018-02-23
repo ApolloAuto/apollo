@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,14 @@
  * @file
  **/
 
-#include "modules/planning/lattice/util/reference_line_matcher.h"
+#include "modules/common/math/path_matcher.h"
 
 #include <algorithm>
 #include <cmath>
 #include <vector>
 
 #include "glog/logging.h"
-#include "modules/common/math/math_utils.h"
 #include "modules/common/math/linear_interpolation.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
@@ -36,7 +33,7 @@ namespace planning {
 using apollo::common::PathPoint;
 using apollo::common::math::InterpolateUsingLinearApproximation;
 
-PathPoint ReferenceLineMatcher::MatchToReferenceLine(
+PathPoint PathMatcher::MatchToPath(
     const std::vector<PathPoint>& reference_line, const double x,
     const double y) {
   CHECK_GT(reference_line.size(), 0);
@@ -71,10 +68,10 @@ PathPoint ReferenceLineMatcher::MatchToReferenceLine(
                              reference_line[index_end], x, y);
 }
 
-std::pair<double, double> ReferenceLineMatcher::GetReferenceLineCoordinate(
+std::pair<double, double> PathMatcher::GetPathFrenetCoordinate(
     const std::vector<PathPoint>& reference_line, const double x,
     const double y) {
-  auto matched_path_point = MatchToReferenceLine(reference_line, x, y);
+  auto matched_path_point = MatchToPath(reference_line, x, y);
   double rtheta = matched_path_point.theta();
   double rx = matched_path_point.x();
   double ry = matched_path_point.y();
@@ -88,7 +85,7 @@ std::pair<double, double> ReferenceLineMatcher::GetReferenceLineCoordinate(
   return relative_coordinate;
 }
 
-PathPoint ReferenceLineMatcher::MatchToReferenceLine(
+PathPoint PathMatcher::MatchToPath(
     const std::vector<PathPoint>& reference_line, const double s) {
   auto comp = [](const PathPoint& point, const double s) {
     return point.s() < s;
@@ -107,10 +104,10 @@ PathPoint ReferenceLineMatcher::MatchToReferenceLine(
   return InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower, s);
 }
 
-PathPoint ReferenceLineMatcher::FindProjectionPoint(const PathPoint& p0,
-                                                    const PathPoint& p1,
-                                                    const double x,
-                                                    const double y) {
+PathPoint PathMatcher::FindProjectionPoint(const PathPoint& p0,
+                                           const PathPoint& p1,
+                                           const double x,
+                                           const double y) {
   double v0x = x - p0.x();
   double v0y = y - p0.y();
 
