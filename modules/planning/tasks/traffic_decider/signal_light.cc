@@ -104,8 +104,8 @@ void SignalLight::MakeDecisions(Frame* const frame,
   bool has_stop = false;
   for (auto& signal_light : signal_lights_from_path_) {
     const TrafficLight signal = GetSignal(signal_light.object_id);
-    double stop_deceleration = util::GetADCStopDeceleration(
-        reference_line_info, signal_light.start_s);
+    double stop_deceleration =
+        util::GetADCStopDeceleration(reference_line_info, signal_light.start_s);
 
     planning_internal::SignalLightDebug::SignalDebug* signal_debug =
         signal_light_debug->add_signal();

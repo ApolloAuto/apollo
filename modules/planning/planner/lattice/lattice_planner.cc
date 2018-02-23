@@ -26,21 +26,22 @@
 #include <utility>
 #include <vector>
 
+#include "../../lattice/behavior_decider/prediction_querier.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
+#include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
-#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
+#include "modules/planning/lattice/behavior_decider/path_time_graph.h"
 #include "modules/planning/lattice/trajectory_generator/backup_trajectory_generator.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_combiner.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_evaluator.h"
 #include "modules/planning/lattice/util/lattice_trajectory1d.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
-#include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
 namespace apollo {
 namespace planning {
@@ -107,15 +108,14 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
   bool first_reference_line = true;
   for (auto& reference_line_info : frame->reference_line_info()) {
     reference_line_info.SetPriorityCost(priority_cost);
-    status = PlanOnReferenceLine(planning_start_point, frame,
-                                 &reference_line_info);
+    status =
+        PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
     if (status != Status::OK()) {
       if (reference_line_info.IsChangeLanePath()) {
         AERROR << "Planner failed to change lane to "
                << reference_line_info.Lanes().Id();
       } else {
-        AERROR << "Planner failed to "
-               << reference_line_info.Lanes().Id();
+        AERROR << "Planner failed to " << reference_line_info.Lanes().Id();
       }
     }
     if (first_reference_line) {
@@ -141,13 +141,14 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   reference_line_info->set_is_on_reference_line();
   // 1. obtain a reference line and transform it to the PathPoint format.
-  auto discretized_reference_line = ToDiscretizedReferenceLine(
-      reference_line_info->reference_line().reference_points());
+  auto ptr_reference_line = std::make_shared<std::vector<PathPoint>>(
+      ToDiscretizedReferenceLine(
+          reference_line_info->reference_line().reference_points()));
 
   // 2. compute the matched point of the init planning point on the reference
   // line.
   PathPoint matched_point = ReferenceLineMatcher::MatchToReferenceLine(
-      discretized_reference_line, planning_init_point.path_point().x(),
+      *ptr_reference_line, planning_init_point.path_point().x(),
       planning_init_point.path_point().y());
 
   // 3. according to the matched point, compute the init state in Frenet frame.
@@ -159,15 +160,23 @@ Status LatticePlanner::PlanOnReferenceLine(
          << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
-  // 4. parse the decision and get the planning target.
-  std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_ptr(
-      new PathTimeNeighborhood(frame->obstacles(), init_s[0],
-                               discretized_reference_line));
 
-  decider_.UpdatePathTimeNeighborhood(path_time_neighborhood_ptr);
-  PlanningTarget planning_target =
-      decider_.Analyze(frame, reference_line_info, planning_init_point, init_s,
-                       discretized_reference_line);
+  auto ptr_prediction_obstacles = std::make_shared<PredictionQuerier>(
+      frame->obstacles());
+
+  // 4. parse the decision and get the planning target.
+  auto ptr_path_time_graph = std::make_shared<PathTimeGraph>(
+      ptr_prediction_obstacles->GetObstacles(), *ptr_reference_line,
+      init_s[0], init_s[0] + FLAGS_decision_horizon,
+      0.0, FLAGS_trajectory_time_length);
+
+  BehaviorDecider behavior_decider(ptr_reference_line,
+                                   ptr_path_time_graph,
+                                   ptr_prediction_obstacles);
+
+  PlanningTarget planning_target = behavior_decider.Analyze(frame,
+      reference_line_info, planning_init_point, init_s,
+      *ptr_reference_line);
 
   ADEBUG << "Decision_Time = " << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
@@ -189,7 +198,7 @@ Status LatticePlanner::PlanOnReferenceLine(
   //   and sort them according to the cost.
   TrajectoryEvaluator trajectory_evaluator(
       planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle,
-      FLAGS_enable_auto_tuning, path_time_neighborhood_ptr);
+      FLAGS_enable_auto_tuning, ptr_path_time_graph);
 
   ADEBUG << "Trajectory_Evaluator_Construction_Time = "
          << (Clock::NowInSeconds() - current_time) * 1000;
@@ -202,7 +211,7 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // Get instance of collision checker and constraint checker
   CollisionChecker collision_checker(frame->obstacles(), init_s, init_d,
-                                     discretized_reference_line);
+                                     *ptr_reference_line);
 
   // 7. always get the best pair of trajectories to combine; return the first
   // collision-free trajectory.
@@ -230,7 +239,7 @@ Status LatticePlanner::PlanOnReferenceLine(
 
     // combine two 1d trajectories to one 2d trajectory
     auto combined_trajectory = TrajectoryCombiner::Combine(
-        discretized_reference_line, *trajectory_pair.first,
+        *ptr_reference_line, *trajectory_pair.first,
         *trajectory_pair.second, planning_init_point.relative_time());
 
     // check longitudinal and lateral acceleration
@@ -342,16 +351,17 @@ Status LatticePlanner::PlanOnReferenceLine(
     return Status::OK();
   } else {
     AERROR << "Planning failed";
-    if (FLAGS_enable_backup_trajectory) {
+    if (FLAGS_enable_backup_trajectory &&
+        !reference_line_info->IsChangeLanePath()) {
       AERROR << "Use backup trajectory";
       BackupTrajectoryGenerator backup_trajectory_generator(
           init_s, init_d, planning_init_point.relative_time(),
           &trajectory1d_generator);
       DiscretizedTrajectory trajectory =
-          backup_trajectory_generator.GenerateTrajectory(
-              discretized_reference_line);
-      reference_line_info->SetCost(FLAGS_backup_trajectory_cost);
+          backup_trajectory_generator.GenerateTrajectory(*ptr_reference_line);
 
+      reference_line_info->SetCost(FLAGS_backup_trajectory_cost);
+      reference_line_info->SetTrajectory(trajectory);
       reference_line_info->SetDrivable(true);
       return Status::OK();
 

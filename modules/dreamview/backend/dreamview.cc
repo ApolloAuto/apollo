@@ -64,11 +64,15 @@ Status Dreamview::Init() {
 
   // Check the expected adapters are initialized.
   CHECK(AdapterManager::GetChassis()) << "ChassisAdapter is not initialized.";
+  CHECK(AdapterManager::GetControlCommand())
+      << "ControlCommandAdapter is not initialized.";
   CHECK(AdapterManager::GetGps()) << "GpsAdapter is not initialized.";
   CHECK(AdapterManager::GetPlanning()) << "PlanningAdapter is not initialized.";
   CHECK(AdapterManager::GetLocalization())
       << "LocalizationAdapter is not initialized.";
   CHECK(AdapterManager::GetMonitor()) << "MonitorAdapter is not initialized.";
+  CHECK(AdapterManager::GetNavigation())
+      << "NavigationAdapter is not initialized.";
   CHECK(AdapterManager::GetPad()) << "PadAdapter is not initialized.";
   CHECK(AdapterManager::GetPrediction())
       << "PredictionAdapter is not initialized.";
@@ -84,6 +88,8 @@ Status Dreamview::Init() {
       << "CompressedImageAdapter is not initialized.";
   CHECK(AdapterManager::GetImageShort())
       << "ImageShortAdapter is not initialized.";
+  CHECK(AdapterManager::GetPointCloud())
+      << "PointCloudAdapter is not initialized.";
 
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
@@ -102,16 +108,19 @@ Status Dreamview::Init() {
   image_.reset(new ImageHandler());
   websocket_.reset(new WebSocketHandler());
   map_ws_.reset(new WebSocketHandler());
+  point_cloud_ws_.reset(new WebSocketHandler());
   map_service_.reset(new MapService());
   sim_control_.reset(new SimControl(map_service_.get()));
 
   sim_world_updater_.reset(new SimulationWorldUpdater(
       websocket_.get(), map_ws_.get(), sim_control_.get(), map_service_.get(),
       FLAGS_routing_from_file));
+  point_cloud_updater_.reset(new PointCloudUpdater(point_cloud_ws_.get()));
   hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
 
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addWebSocketHandler("/map", *map_ws_);
+  server_->addWebSocketHandler("/pointcloud", *point_cloud_ws_);
   server_->addHandler("/image", *image_);
 
   ApolloApp::SetCallbackThreadNumber(FLAGS_dreamview_worker_num);
@@ -121,6 +130,7 @@ Status Dreamview::Init() {
 
 Status Dreamview::Start() {
   sim_world_updater_->Start();
+  point_cloud_updater_->Start();
   return Status::OK();
 }
 

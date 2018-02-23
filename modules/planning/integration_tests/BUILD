@@ -24,7 +24,7 @@ cc_library(
         "//modules/planning:planning_lib",
         "//modules/planning/proto:dp_poly_path_config_proto",
         "//modules/planning/proto:dp_st_speed_config_proto",
-        "@gtest//:gtest",
+        "@gtest",
     ],
 )
 
@@ -68,6 +68,21 @@ cc_test(
     data = [
         "//modules/common/configs:config_gflags",
         "//modules/map:map_data",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":planning_test_base",
+    ],
+)
+
+cc_test(
+    name = "navigation_mode_test",
+    size = "small",
+    srcs = [
+        "navigation_mode_test.cc",
+    ],
+    data = [
+        "//modules/common/configs:config_gflags",
         "//modules/planning:planning_testdata",
     ],
     deps = [

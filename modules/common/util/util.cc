@@ -38,6 +38,14 @@ PointENU MakePointENU(const double x, const double y, const double z) {
   return point_enu;
 }
 
+PointENU operator+(const PointENU enu, const math::Vec2d& xy) {
+  PointENU point;
+  point.set_x(enu.x() + xy.x());
+  point.set_y(enu.y() + xy.y());
+  point.set_z(enu.z());
+  return point;
+}
+
 PointENU MakePointENU(const math::Vec2d& xy) {
   PointENU point_enu;
   point_enu.set_x(xy.x());

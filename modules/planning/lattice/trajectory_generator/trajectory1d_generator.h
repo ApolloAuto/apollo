@@ -51,7 +51,17 @@ class Trajectory1dGenerator {
       const double target_speed,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
+  void GenerateSpeedProfileForStopping(
+      const double stop_point,
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
+
+  /**
   void GenerateSpeedProfilesForPathTimeBound(
+      const PlanningTarget& planning_target,
+      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
+      **/
+
+  void GenerateSpeedProfilesForPathTimeObstacles(
       const PlanningTarget& planning_target,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 

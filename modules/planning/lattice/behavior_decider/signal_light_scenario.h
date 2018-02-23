@@ -33,32 +33,22 @@ namespace planning {
 
 class SignalLightScenario : public Scenario {
  public:
-  void Reset() override;
+  void Reset() override {}
 
-  bool Init() override;
+  bool Init() override { return true; }
 
-  bool ScenarioExist() const override { return exist_; }
+  bool ScenarioExist() const override { return true; }
 
   virtual int ComputeScenarioDecision(
       Frame* frame, ReferenceLineInfo* const reference_line_info,
       PlanningTarget* planning_target);
 
  private:
-  bool exist_ = false;
-
-  void ReadSignals();
-  bool FindValidSignalLight(ReferenceLineInfo* const reference_line_info);
-
-  apollo::perception::TrafficLight GetSignal(const std::string& signal_id);
-  double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
-                             const hdmap::PathOverlap* signal_light);
-  void CreateStopObstacle(Frame* frame,
-                          ReferenceLineInfo* const reference_line_info,
-                          const hdmap::PathOverlap* signal_light);
-
-  std::vector<const hdmap::PathOverlap*> signal_lights_along_reference_line_;
   std::unordered_map<std::string, const apollo::perception::TrafficLight*>
-      detected_signals_;
+  GetPerceptionDetectedSignals();
+
+  std::vector<const hdmap::PathOverlap*> FindValidSignalLightFromMap(
+      ReferenceLineInfo* const reference_line_info);
 
   DECLARE_SCENARIO(SignalLightScenario);
 };

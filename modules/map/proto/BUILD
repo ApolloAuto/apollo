@@ -23,6 +23,7 @@ proto_library(
         "map_road.proto",
         "map_signal.proto",
         "map_speed_bump.proto",
+        "map_speed_control.proto",
         "map_stop_sign.proto",
         "map_yield_sign.proto",
     ],

@@ -27,7 +27,7 @@ void RadarTrackManager::Process(const SensorObjects &radar_obs) {
   Update(&radar_obs_);
 }
 
-void RadarTrackManager::Update(SensorObjects* radar_obs) {
+void RadarTrackManager::Update(SensorObjects *radar_obs) {
   std::vector<std::pair<int, int>> assignment;
   std::vector<int> unassigned_track;
   std::vector<int> unassigned_obs;
@@ -42,8 +42,7 @@ void RadarTrackManager::Update(SensorObjects* radar_obs) {
 void RadarTrackManager::AssignTrackObsIdMatch(
     const SensorObjects &radar_obs,
     std::vector<std::pair<int, int>> *assignment,
-    std::vector<int> *unassigned_track,
-    std::vector<int> *unassigned_obs) {
+    std::vector<int> *unassigned_track, std::vector<int> *unassigned_obs) {
   assignment->resize(obs_tracks_.size() * 2);
   int assignment_num = 0;
   std::vector<bool> track_used(obs_tracks_.size(), false);
@@ -99,7 +98,7 @@ void RadarTrackManager::UpdateAssignedTrack(
 }
 
 void RadarTrackManager::UpdateUnassignedTrack(
-    const double &timestamp, const std::vector<int>& unassigned_track) {
+    const double &timestamp, const std::vector<int> &unassigned_track) {
   double time_stamp = timestamp;
   for (size_t i = 0; i < unassigned_track.size(); i++) {
     if (obs_tracks_[unassigned_track[i]].GetObsRadar() != nullptr) {
@@ -123,11 +122,10 @@ void RadarTrackManager::DeleteLostTrack() {
 }
 
 void RadarTrackManager::CreateNewTrack(const SensorObjects &radar_obs,
-                                       const std::vector<int>& unassigned_obs) {
+                                       const std::vector<int> &unassigned_obs) {
   for (size_t i = 0; i < unassigned_obs.size(); i++) {
-    obs_tracks_.push_back(RadarTrack(
-                         *(radar_obs.objects[unassigned_obs[i]]),
-                           radar_obs.timestamp));
+    obs_tracks_.push_back(RadarTrack(*(radar_obs.objects[unassigned_obs[i]]),
+                                     radar_obs.timestamp));
   }
 }
 
@@ -136,8 +134,7 @@ double RadarTrackManager::DistanceBetweenObs(const Object &obs1,
                                              const Object &obs2,
                                              double timestamp2) {
   double time_diff = timestamp2 - timestamp1;
-  return (obs2.center - obs1.center
-          - obs1.velocity * time_diff).head(2).norm();
+  return (obs2.center - obs1.center - obs1.velocity * time_diff).head(2).norm();
 }
 
 }  // namespace perception

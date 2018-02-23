@@ -12,6 +12,8 @@ import decisionIcon from "assets/images/menu/Decision.png";
 import planningIcon from "assets/images/menu/Planning.png";
 import cameraIcon from "assets/images/menu/PointOfView.png";
 
+import { POINT_CLOUD_WS } from "store/websocket";
+
 const MenuIconMapping = {
         perception: perceptionIcon,
         prediction: predictionIcon,
@@ -22,6 +24,7 @@ const MenuIconMapping = {
 };
 
 const MenuIdOptionMapping = {
+        perceptionPointCloud: 'showPointCloud',
         perceptionVehicle: 'showObstaclesVehicle',
         perceptionPedestrian: 'showObstaclesPedestrian',
         perceptionBicycle: 'showObstaclesBicycle',
@@ -54,6 +57,9 @@ class MenuItemCheckbox extends React.Component {
             <ul>
                 <li id={id} onClick={() => {
                     options.toggle(MenuIdOptionMapping[id]);
+                    if (id === "perceptionPointCloud") {
+                        POINT_CLOUD_WS.togglePointCloud(options.showPointCloud);
+                    }
                 }}>
                     <div className="switch">
                         <input type="checkbox" name={id} className="toggle-switch"

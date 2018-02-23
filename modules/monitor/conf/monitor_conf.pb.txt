@@ -19,7 +19,7 @@ modules {
 modules {
   name: "radar"
   process_conf {
-    process_cmd_keywords: "modules/drivers/conti_radar/conti_radar"
+    process_cmd_keywords: "modules/drivers/radar/conti_radar/conti_radar"
   }
   topic_conf {
     type: CONTI_RADAR

@@ -23,7 +23,8 @@ COMMON_PROTOS='../../common/proto/*.proto'
 LOCALIZATION_PROTOS='../../localization/proto/localization.proto ../../localization/proto/pose.proto'
 CHASSIS_PROTOS='../../canbus/proto/chassis.proto'
 PLANNING_PROTOS='../../planning/proto/sl_boundary.proto ../../planning/proto/decision.proto ../../planning/proto/planning_internal.proto'
-PERCEPTION_PROTOS='../../perception/proto/traffic_light_detection.proto'
+PERCEPTION_PROTOS='../../perception/proto/traffic_light_detection.proto ../../perception/proto/perception_obstacle.proto'
+REALTIVE_MAP_PROTOS='../../map/relative_map/proto/*.proto'
 MAP_PROTOS='../../map/proto/*.proto'
 MONITOR_PROTOS='../../common/monitor_log/proto/monitor_log.proto'
 ROUTING_PROTOS='../../routing/proto/routing.proto'
@@ -34,5 +35,12 @@ node_modules/protobufjs/bin/pbjs -t json ../proto/simulation_world.proto \
     -o proto_bundle/sim_world_proto_bundle.json
 
 node_modules/protobufjs/bin/pbjs -t json $MAP_PROTOS \
+    $REALTIVE_MAP_PROTOS \
     ../../common/proto/geometry.proto \
+    ../../common/proto/header.proto \
+    ../../common/proto/error_code.proto \
+    ../../common/proto/pnc_point.proto \
     -o proto_bundle/map_proto_bundle.json
+
+node_modules/protobufjs/bin/pbjs -t json ../proto/point_cloud.proto \
+    -o proto_bundle/point_cloud_proto_bundle.json

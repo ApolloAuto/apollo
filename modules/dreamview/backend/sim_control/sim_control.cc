@@ -27,11 +27,11 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::canbus::Chassis;
+using apollo::common::Header;
 using apollo::common::Point3D;
 using apollo::common::Quaternion;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::Header;
 using apollo::common::math::HeadingToQuaternion;
 using apollo::common::math::InverseQuaternionRotate;
 using apollo::common::math::NormalizeAngle;
@@ -207,7 +207,9 @@ bool SimControl::NextPointWithinRange() {
   return next_point_index_ < current_trajectory_.trajectory_point_size() - 1;
 }
 
-void SimControl::TimerCallback(const ros::TimerEvent& event) { RunOnce(); }
+void SimControl::TimerCallback(const ros::TimerEvent& event) {
+  RunOnce();
+}
 
 void SimControl::RunOnce() {
   // Result of the interpolation.

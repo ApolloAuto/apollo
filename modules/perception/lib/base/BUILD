@@ -6,16 +6,16 @@ cc_library(
     name = "base",
     srcs = [
         "registerer.cc",
-        "timer.cc",
         "thread.cc",
+        "timer.cc",
     ],
     hdrs = [
-        "registerer.h",
-        "timer.h",
-        "time_util.h",
-        "mutex.h",
-        "thread.h",
         "concurrent_queue.h",
+        "mutex.h",
+        "registerer.h",
+        "thread.h",
+        "time_util.h",
+        "timer.h",
     ],
     linkopts = [
         "-lboost_filesystem",
@@ -24,7 +24,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:log",
-        "@gtest//:gtest",
+        "@gtest",
     ],
 )
 

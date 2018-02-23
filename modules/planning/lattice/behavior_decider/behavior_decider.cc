@@ -32,73 +32,85 @@ namespace planning {
 using apollo::common::PathPoint;
 using apollo::common::PointENU;
 
-BehaviorDecider::BehaviorDecider() {}
-
-void BehaviorDecider::UpdatePathTimeNeighborhood(
-    std::shared_ptr<PathTimeNeighborhood> p) {
-  path_time_neighborhood_ = p;
-}
+BehaviorDecider::BehaviorDecider(
+    std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line,
+    std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
+    std::shared_ptr<PredictionQuerier> ptr_prediction_obstacles)
+    : ptr_reference_line_(ptr_reference_line),
+      ptr_path_time_graph_(ptr_path_time_graph),
+      ptr_prediction_obstacles_(ptr_prediction_obstacles) {}
 
 PlanningTarget BehaviorDecider::Analyze(
     Frame* frame, ReferenceLineInfo* const reference_line_info,
     const common::TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
     const std::vector<common::PathPoint>& discretized_reference_line) {
+
   CHECK(frame != nullptr);
   CHECK_GT(discretized_reference_line.size(), 0);
 
-  PlanningTarget ret;
+  PlanningTarget planning_target;
   if (ScenarioManager::instance()->ComputeWorldDecision(
-          frame, reference_line_info, &ret) != 0) {
+          frame, reference_line_info, &planning_target) != 0) {
     AERROR << "ComputeWorldDecision error!";
   }
 
   for (const auto& reference_point : discretized_reference_line) {
-    ret.mutable_discretized_reference_line()
+    planning_target.mutable_discretized_reference_line()
         ->add_discretized_reference_line_point()
         ->CopyFrom(reference_point);
   }
 
   CHECK(FLAGS_default_cruise_speed <= FLAGS_planning_upper_speed_limit);
+
   ConditionFilter condition_filter(lon_init_state,
                                    FLAGS_planning_upper_speed_limit,
-                                   path_time_neighborhood_);
+                                   ptr_reference_line_,
+                                   ptr_path_time_graph_,
+                                   ptr_prediction_obstacles_);
 
-  std::vector<SampleBound> sample_bounds = condition_filter.QuerySampleBounds();
+  ComputePathTimeSamplePoints(condition_filter, &planning_target);
 
-  static int decision_cycles = 0;
-  if (FLAGS_enable_lattice_st_image_dump) {
-    apollo::planning_internal::LatticeStTraining st_data;
-    double timestamp = init_planning_point.relative_time();
-    std::string st_img_name = "DecisionCycle_" +
-                              std::to_string(decision_cycles) + "_" +
-                              std::to_string(timestamp);
-    if (condition_filter.GenerateLatticeStPixels(&st_data, timestamp,
-                                                 st_img_name)) {
-      ADEBUG << "Created_lattice_st_image_named = " << st_img_name
-             << "_for_timestamp = " << timestamp
-             << " num_colored_pixels = " << st_data.pixel_size();
-      planning_internal::Debug* ptr_debug =
-          reference_line_info->mutable_debug();
-      ptr_debug->mutable_planning_data()->mutable_lattice_st_image()->CopyFrom(
-          st_data);
-    }
+  return planning_target;
+}
+
+void BehaviorDecider::ComputePathTimeSamplePoints(
+    const ConditionFilter& condition_filter,
+    PlanningTarget* const planning_target) {
+  std::vector<SamplePoint> neighbor_points =
+      condition_filter.QueryPathTimeObstacleSamplePoints();
+  for (const auto& neighbor_point : neighbor_points) {
+    planning_target->add_neighbor_point()->CopyFrom(neighbor_point);
   }
-  decision_cycles += 1;
 
-  // Debug SampleBound
-  if (sample_bounds.empty()) {
+  if (neighbor_points.empty()) {
     ADEBUG << "Sample_bounds empty";
   } else {
-    for (const SampleBound& sample_bound : sample_bounds) {
-      ADEBUG << "Sample_bound: " << sample_bound.ShortDebugString();
+    for (const SamplePoint& neighbor_point : neighbor_points) {
+      ADEBUG << "Neighbor point: " << neighbor_point.ShortDebugString();
     }
   }
+}
 
-  for (const auto& sample_bound : sample_bounds) {
-    ret.add_sample_bound()->CopyFrom(sample_bound);
+void BehaviorDecider::DumpLatticeImage(const int index,
+    const common::TrajectoryPoint& init_planning_point,
+    const ConditionFilter& condition_filter,
+    ReferenceLineInfo* const reference_line_info) {
+  apollo::planning_internal::LatticeStTraining st_data;
+  double timestamp = init_planning_point.relative_time();
+  std::string st_img_name = "DecisionCycle_" +
+                            std::to_string(index) + "_" +
+                            std::to_string(timestamp);
+  if (condition_filter.GenerateLatticeStPixels(&st_data, timestamp,
+                                               st_img_name)) {
+    ADEBUG << "Created_lattice_st_image_named = " << st_img_name
+           << "_for_timestamp = " << timestamp
+           << " num_colored_pixels = " << st_data.pixel_size();
+    planning_internal::Debug* ptr_debug =
+        reference_line_info->mutable_debug();
+    ptr_debug->mutable_planning_data()->mutable_lattice_st_image()->CopyFrom(
+        st_data);
   }
-  return ret;
 }
 
 }  // namespace planning

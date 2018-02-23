@@ -29,7 +29,9 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
+#include "modules/planning/lattice/behavior_decider/condition_filter.h"
+#include "modules/planning/lattice/behavior_decider/path_time_graph.h"
+#include "modules/planning/lattice/behavior_decider/prediction_querier.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
@@ -38,9 +40,10 @@ namespace planning {
 
 class BehaviorDecider {
  public:
-  BehaviorDecider();
-
-  void UpdatePathTimeNeighborhood(std::shared_ptr<PathTimeNeighborhood> p);
+  BehaviorDecider(
+      std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line,
+      std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
+      std::shared_ptr<PredictionQuerier> ptr_prediction_obstacles);
 
   virtual ~BehaviorDecider() = default;
 
@@ -51,7 +54,20 @@ class BehaviorDecider {
       const std::vector<common::PathPoint>& discretized_reference_line);
 
  private:
-  std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood_;
+  void ComputePathTimeSamplePoints(
+    const ConditionFilter& condition_filter,
+    PlanningTarget* const plannint_target);
+
+  void DumpLatticeImage(const int index,
+      const common::TrajectoryPoint& init_planning_point,
+      const ConditionFilter& condition_filter,
+      ReferenceLineInfo* const reference_line_info);
+
+  std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line_;
+
+  std::shared_ptr<PathTimeGraph> ptr_path_time_graph_;
+
+  std::shared_ptr<PredictionQuerier> ptr_prediction_obstacles_;
 };
 
 }  // namespace planning

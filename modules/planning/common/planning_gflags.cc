@@ -28,7 +28,7 @@ DEFINE_string(planning_adapter_config_filename,
               "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
 
-DEFINE_string(smoother_config_file,
+DEFINE_string(smoother_config_filename,
               "modules/planning/conf/smoother_config.pb.txt",
               "The configuration file for qp sline smoother");
 
@@ -187,8 +187,6 @@ DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
 
-DEFINE_bool(try_history_decision, false, "try history decision first");
-
 DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
@@ -222,13 +220,6 @@ DEFINE_double(virtual_stop_wall_height, 2.0,
 DEFINE_double(signal_expire_time_sec, 5.0,
               "consider the signal msg is expired if its timestamp over "
               "this threshold (second)");
-
-// Speed Decider
-DEFINE_double(low_speed_obstacle_threshold, 2.0,
-              "speed lower than this value is considered as low speed");
-DEFINE_double(
-    decelerating_obstacle_threshold, -0.25,
-    "acceleration lower than this value is considered as decelerating");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
@@ -304,6 +295,12 @@ DEFINE_double(stop_sign_stop_distance, 1.0,
 DEFINE_double(stop_sign_max_watch_vehicle_stop_speed, 0.5,
               "max speed(m/s) for watch vehicles to be considered as a stop."
               "(this check is looser than adc)");
+
+DEFINE_bool(enable_sidepass, true,
+            "True to enable side pass long stopping obstacles");
+DEFINE_double(sidepass_wait_time_sec, 30.0,
+              "Waiting time in seconds before deciding to sidepass");
+
 /// destination
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
@@ -353,8 +350,6 @@ DEFINE_double(perception_confidence_threshold, 0.4,
               "this threshold.");
 
 // QpSt optimizer
-DEFINE_bool(enable_slowdown_profile_generator, true,
-            "True to enable slowdown speed profile generator.");
 DEFINE_double(slowdown_profile_deceleration, -1.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");
 DEFINE_bool(enable_follow_accel_constraint, true,
@@ -376,8 +371,6 @@ DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
 
 /// Lattice Planner
 DEFINE_double(lattice_epsilon, 1e-6, "Epsilon in lattice planner.");
-DEFINE_int32(num_lattice_traj_to_plot, 5,
-             "Number of lattice trajectories to plot");
 DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
 DEFINE_double(spiral_downsample_curvature_thred, 0.02,
               "curvature threshold for down sampling reference line points");
@@ -389,7 +382,7 @@ DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
-DEFINE_double(collision_buffer_expansion_ratio, 0.2,
+DEFINE_double(collision_buffer_expansion_ratio, 0.0,
               "The ratio w.r.t. the vehicle dimension "
               "to expand in collision checking");
 DEFINE_double(decision_horizon, 200.0,
@@ -421,3 +414,7 @@ DEFINE_double(lon_collision_overtake_buffer, 5.0,
               "Longitudinal collision buffer for overtake");
 DEFINE_double(lon_collision_cost_std, 0.5,
               "The standard deviation of logitudinal collision cost function");
+DEFINE_double(default_lon_buffer, 5.0,
+              "Default longitudinal buffer to sample path-time points.");
+DEFINE_double(time_min_density, 1.0,
+              "Minimal time density to search sample points.");

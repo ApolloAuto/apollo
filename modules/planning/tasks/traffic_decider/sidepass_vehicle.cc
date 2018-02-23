@@ -73,8 +73,8 @@ bool SidepassVehicle::UpdateSidepassStatus(
         double* wait_start_time =
             Dropbox<double>::Open()->Get(db_key_sidepass_adc_wait_start_time);
         DCHECK_NOTNULL(wait_start_time);
-        constexpr double kWaitDuration = 2.0;
-        if (Clock::NowInSeconds() - *wait_start_time > kWaitDuration) {
+        if (Clock::NowInSeconds() - *wait_start_time >
+            FLAGS_sidepass_wait_time_sec) {
           // calculate if the left/right lane exist
           std::vector<hdmap::LaneInfoConstPtr> lanes;
           reference_line_->GetLaneFromS(
@@ -267,6 +267,15 @@ bool SidepassVehicle::MakeSidepassObstacleDecision(
 
 bool SidepassVehicle::ApplyRule(Frame* const,
                                 ReferenceLineInfo* const reference_line_info) {
+  if (FLAGS_use_navigation_mode) {
+    // do not sidepass on highway.
+    return true;
+  }
+  if (!FLAGS_enable_sidepass) {
+    ADEBUG << "Side pass rule is disabled";
+    return true;
+  }
+
   reference_line_ = &(reference_line_info->reference_line());
   auto* path_decision = reference_line_info->path_decision();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();

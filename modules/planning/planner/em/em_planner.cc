@@ -32,7 +32,6 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
-#include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 #include "modules/planning/tasks/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/tasks/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/tasks/path_decider/path_decider.h"
@@ -53,6 +52,11 @@ using common::TrajectoryPoint;
 using common::adapter::AdapterManager;
 using common::math::Vec2d;
 using common::time::Clock;
+
+namespace {
+constexpr double kPathOptimizationFallbackClost = 2e4;
+constexpr double kSpeedOptimizationFallbackClost = 2e4;
+}
 
 void EMPlanner::RegisterTasks() {
   task_factory_.Register(TRAFFIC_DECIDER,
@@ -200,7 +204,6 @@ Status EMPlanner::PlanOnReferenceLine(
     const double start_timestamp = Clock::NowInSeconds();
     ret = optimizer->Execute(frame, reference_line_info);
     if (!ret.ok()) {
-      reference_line_info->AddCost(std::numeric_limits<double>::infinity());
       AERROR << "Failed to run tasks[" << optimizer->Name()
              << "], Error message: " << ret.error_message();
       break;
@@ -216,6 +219,20 @@ Status EMPlanner::PlanOnReferenceLine(
   }
 
   RecordObstacleDebugInfo(reference_line_info);
+
+  if (reference_line_info->path_data().Empty()) {
+    ADEBUG << "Path fallback.";
+    GenerateFallbackPathProfile(reference_line_info,
+                                reference_line_info->mutable_path_data());
+    reference_line_info->AddCost(kPathOptimizationFallbackClost);
+  }
+
+  if (!ret.ok() || reference_line_info->speed_data().Empty()) {
+    ADEBUG << "Speed fallback.";
+    GenerateFallbackSpeedProfile(reference_line_info,
+                                 reference_line_info->mutable_speed_data());
+    reference_line_info->AddCost(kSpeedOptimizationFallbackClost);
+  }
 
   DiscretizedTrajectory trajectory;
   if (!reference_line_info->CombinePathAndSpeedProfile(
@@ -242,10 +259,8 @@ Status EMPlanner::PlanOnReferenceLine(
   }
 
   reference_line_info->SetTrajectory(trajectory);
-  if (ret == Status::OK()) {  // vehicle can drive on this reference line.
-    reference_line_info->SetDrivable(true);
-  }
-  return ret;
+  reference_line_info->SetDrivable(true);
+  return Status::OK();
 }
 
 std::vector<SpeedPoint> EMPlanner::GenerateInitSpeedProfile(
@@ -332,6 +347,132 @@ std::vector<SpeedPoint> EMPlanner::GenerateSpeedHotStart(
     s += v * FLAGS_trajectory_time_min_interval;
   }
   return hot_start_speed_profile;
+}
+
+void EMPlanner::GenerateFallbackPathProfile(
+    const ReferenceLineInfo* reference_line_info, PathData* path_data) {
+  auto adc_point = reference_line_info->AdcPlanningPoint();
+  double adc_s = reference_line_info->AdcSlBoundary().end_s();
+  const double max_s = 150.0;
+  const double unit_s = 1.0;
+
+  // projection of adc point onto reference line
+  const auto& adc_ref_point =
+      reference_line_info->reference_line().GetReferencePoint(adc_s);
+
+  DCHECK(adc_point.has_path_point());
+  const double dx = adc_point.path_point().x() - adc_ref_point.x();
+  const double dy = adc_point.path_point().y() - adc_ref_point.y();
+
+  std::vector<common::PathPoint> path_points;
+  for (double s = adc_s; s < max_s; s += unit_s) {
+    const auto& ref_point =
+        reference_line_info->reference_line().GetReferencePoint(adc_s);
+    common::PathPoint path_point = common::util::MakePathPoint(
+        ref_point.x() + dx, ref_point.y() + dy, 0.0, ref_point.heading(),
+        ref_point.kappa(), ref_point.dkappa(), 0.0);
+    path_point.set_s(s);
+
+    path_points.push_back(std::move(path_point));
+  }
+  path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));
+}
+
+void EMPlanner::GenerateFallbackSpeedProfile(
+    const ReferenceLineInfo* reference_line_info, SpeedData* speed_data) {
+  *speed_data = GenerateStopProfileFromPolynomial(
+      reference_line_info->AdcPlanningPoint().v(),
+      reference_line_info->AdcPlanningPoint().a());
+
+  if (speed_data->Empty()) {
+    *speed_data =
+        GenerateStopProfile(reference_line_info->AdcPlanningPoint().v(),
+                            reference_line_info->AdcPlanningPoint().a());
+  }
+}
+
+SpeedData EMPlanner::GenerateStopProfile(const double init_speed,
+                                         const double init_acc) const {
+  AERROR << "Slowing down the car.";
+  SpeedData speed_data;
+
+  const double kFixedJerk = -1.0;
+  const double first_point_acc = std::fmin(0.0, init_acc);
+
+  const double max_t = 3.0;
+  const double unit_t = 0.02;
+
+  double pre_s = 0.0;
+  const double t_mid =
+      (FLAGS_slowdown_profile_deceleration - first_point_acc) / kFixedJerk;
+  const double s_mid = init_speed * t_mid +
+                       0.5 * first_point_acc * t_mid * t_mid +
+                       1.0 / 6.0 * kFixedJerk * t_mid * t_mid * t_mid;
+  const double v_mid =
+      init_speed + first_point_acc * t_mid + 0.5 * kFixedJerk * t_mid * t_mid;
+
+  for (double t = 0.0; t < max_t; t += unit_t) {
+    double s = 0.0;
+    double v = 0.0;
+    if (t <= t_mid) {
+      s = std::fmax(pre_s, init_speed * t + 0.5 * first_point_acc * t * t +
+                               1.0 / 6.0 * kFixedJerk * t * t * t);
+      v = std::fmax(
+          0.0, init_speed + first_point_acc * t + 0.5 * kFixedJerk * t * t);
+      const double a = first_point_acc + kFixedJerk * t;
+      speed_data.AppendSpeedPoint(s, t, v, a, 0.0);
+      pre_s = s;
+    } else {
+      s = std::fmax(pre_s, s_mid + v_mid * (t - t_mid) +
+                               0.5 * FLAGS_slowdown_profile_deceleration *
+                                   (t - t_mid) * (t - t_mid));
+      v = std::fmax(0.0,
+                    v_mid + (t - t_mid) * FLAGS_slowdown_profile_deceleration);
+      speed_data.AppendSpeedPoint(s, t, v, FLAGS_slowdown_profile_deceleration,
+                                  0.0);
+    }
+    pre_s = s;
+  }
+  return speed_data;
+}
+
+SpeedData EMPlanner::GenerateStopProfileFromPolynomial(
+    const double init_speed, const double init_acc) const {
+  AERROR << "Slowing down the car with polynomial.";
+  constexpr double kMaxT = 4.0;
+  for (double t = 2.0; t <= kMaxT; t += 0.5) {
+    for (double s = 0.0; s < 50.0; s += 1.0) {
+      QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, s, 0.0, 0.0, t);
+      if (!IsValidProfile(curve)) {
+        continue;
+      }
+      constexpr double kUnitT = 0.02;
+      SpeedData speed_data;
+      for (double curve_t = 0.0; curve_t <= t; curve_t += kUnitT) {
+        const double curve_s = curve.Evaluate(0, curve_t);
+        const double curve_v = curve.Evaluate(1, curve_t);
+        const double curve_a = curve.Evaluate(2, curve_t);
+        const double curve_da = curve.Evaluate(3, curve_t);
+        speed_data.AppendSpeedPoint(curve_s, curve_t, curve_v, curve_a,
+                                    curve_da);
+      }
+      return speed_data;
+    }
+  }
+  return SpeedData();
+}
+
+bool EMPlanner::IsValidProfile(const QuinticPolynomialCurve1d& curve) const {
+  for (double evaluate_t = 0.1; evaluate_t <= curve.ParamLength();
+       evaluate_t += 0.2) {
+    const double v = curve.Evaluate(1, evaluate_t);
+    const double a = curve.Evaluate(2, evaluate_t);
+    constexpr double kEpsilon = 1e-3;
+    if (v < -kEpsilon || a < -5.0) {
+      return false;
+    }
+  }
+  return true;
 }
 
 }  // namespace planning

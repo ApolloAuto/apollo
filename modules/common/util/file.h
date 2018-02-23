@@ -46,9 +46,9 @@ namespace util {
 
 template <typename MessageType>
 bool SetProtoToASCIIFile(const MessageType &message, int file_descriptor) {
-  using google::protobuf::io::ZeroCopyOutputStream;
-  using google::protobuf::io::FileOutputStream;
   using google::protobuf::TextFormat;
+  using google::protobuf::io::FileOutputStream;
+  using google::protobuf::io::ZeroCopyOutputStream;
   if (file_descriptor < 0) {
     AERROR << "Invalid file descriptor.";
     return false;
@@ -88,9 +88,9 @@ bool SetProtoToASCIIFile(const MessageType &message,
  */
 template <typename MessageType>
 bool GetProtoFromASCIIFile(const std::string &file_name, MessageType *message) {
-  using google::protobuf::io::ZeroCopyInputStream;
-  using google::protobuf::io::FileInputStream;
   using google::protobuf::TextFormat;
+  using google::protobuf::io::FileInputStream;
+  using google::protobuf::io::ZeroCopyInputStream;
   int file_descriptor = open(file_name.c_str(), O_RDONLY);
   if (file_descriptor < 0) {
     AERROR << "Failed to open file " << file_name << " in text mode.";
@@ -159,11 +159,11 @@ bool GetProtoFromFile(const std::string &file_name, MessageType *message) {
   // Try the binary parser first if it's much likely a binary proto.
   if (EndWith(file_name, ".bin")) {
     return GetProtoFromBinaryFile(file_name, message) ||
-        GetProtoFromASCIIFile(file_name, message);
+           GetProtoFromASCIIFile(file_name, message);
   }
 
   return GetProtoFromASCIIFile(file_name, message) ||
-      GetProtoFromBinaryFile(file_name, message);
+         GetProtoFromBinaryFile(file_name, message);
 }
 
 /**
@@ -187,11 +187,12 @@ std::string TranslatePath(const std::string &src_path);
  * @brief Get absolute path by concatenating prefix and relative_path.
  * @return The absolute path.
  */
-std::string GetAbsolutePath(const std::string& prefix,
-                            const std::string& relative_path);
+std::string GetAbsolutePath(const std::string &prefix,
+                            const std::string &relative_path);
 
 /**
  * @brief Check if the path exists.
+ * @param path a file name, such as /a/b/c.txt
  * @return If the path exists.
  */
 bool PathExists(const std::string &path);

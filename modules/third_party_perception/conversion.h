@@ -21,8 +21,10 @@
 #ifndef MODEULES_THIRD_PARTY_PERCEPTION_CONVERSION_H_
 #define MODEULES_THIRD_PARTY_PERCEPTION_CONVERSION_H_
 
+#include <cstdint>
 #include <queue>
 
+#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -43,6 +45,11 @@ apollo::perception::PerceptionObstacles MobileyeToPerceptionObstacles(
 
 RadarObstacles DelphiToRadarObstacles(
     const apollo::drivers::DelphiESR& delphi_esr,
+    const apollo::localization::LocalizationEstimate& localization,
+    const RadarObstacles& last_radar_obstacles);
+
+RadarObstacles ContiToRadarObstacles(
+    const apollo::drivers::ContiRadar& conti_radar,
     const apollo::localization::LocalizationEstimate& localization,
     const RadarObstacles& last_radar_obstacles);
 

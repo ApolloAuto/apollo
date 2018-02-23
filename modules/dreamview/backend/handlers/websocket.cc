@@ -26,8 +26,8 @@ limitations under the License.
 namespace apollo {
 namespace dreamview {
 
-using apollo::common::util::StrCat;
 using apollo::common::util::ContainsKey;
+using apollo::common::util::StrCat;
 
 void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
   {
@@ -127,6 +127,11 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
   connection_lock->unlock();
 
   if (ret != static_cast<int>(data.size())) {
+    // When data is empty, the header length (2) is returned.
+    if (data.size() == 0 && ret == 2) {
+      return true;
+    }
+
     // Determine error message based on return value.
     std::string msg;
     if (ret == 0) {
@@ -144,6 +149,9 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
   return true;
 }
 
+thread_local unsigned char WebSocketHandler::current_opcode_ = 0x00;
+thread_local std::stringstream WebSocketHandler::data_;
+
 bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
                                   int bits, char *data, size_t data_len) {
   // Ignore connection close request.
@@ -151,9 +159,44 @@ bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
     return false;
   }
 
+  data_.write(data, data_len);
+  if (current_opcode_ == 0x00) {
+    current_opcode_ = bits & 0x7f;
+  }
+
+  bool result = true;
+
+  // The FIN bit (the left most significant bit) is used to indicates
+  // the final fragment in a message. Note, the first fragment MAY
+  // also be the final fragment.
+  bool is_final_fragment = bits & 0x80;
+  if (is_final_fragment) {
+    switch (current_opcode_) {
+      case WEBSOCKET_OPCODE_TEXT:
+        result = handleJsonData(conn, data_.str());
+        break;
+      case WEBSOCKET_OPCODE_BINARY:
+        result = handleBinaryData(conn, data_.str());
+        break;
+      default:
+        AERROR << "Unknown WebSocket bits flag: " << bits;
+        break;
+    }
+
+    // reset opcode and data
+    current_opcode_ = 0x00;
+    data_.clear();
+    data_.str(std::string());
+  }
+
+  return result;
+}
+
+bool WebSocketHandler::handleJsonData(Connection *conn,
+                                      const std::string &data) {
   Json json;
   try {
-    json = Json::parse(data, data + data_len);
+    json = Json::parse(data.begin(), data.end());
   } catch (const std::exception &e) {
     AERROR << "Failed to parse JSON data: " << e.what();
     return false;
@@ -171,6 +214,13 @@ bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
     return true;
   }
   message_handlers_[type](json, conn);
+  return true;
+}
+
+bool WebSocketHandler::handleBinaryData(Connection *conn,
+                                        const std::string &data) {
+  auto type = "Binary";
+  message_handlers_[type](data, conn);
   return true;
 }
 

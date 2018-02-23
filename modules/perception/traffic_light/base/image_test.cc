@@ -27,13 +27,9 @@ class ImageTest : public ::testing::Test {
   virtual ~ImageTest() {}
 
  protected:
-  void SetUp() override {
-    _image = new Image();
-  }
+  void SetUp() override { _image = new Image(); }
 
-  void TearDown() override {
-    delete _image;
-  }
+  void TearDown() override { delete _image; }
 
  protected:
   Image *_image;

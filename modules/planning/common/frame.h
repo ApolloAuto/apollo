@@ -28,7 +28,7 @@
 #include <vector>
 
 #include "modules/common/proto/geometry.pb.h"
-#include "modules/common/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -85,13 +85,11 @@ class Frame {
 
   const Obstacle *CreateVirtualStopObstacle(
       ReferenceLineInfo *const reference_line_info,
-      const std::string &obstacle_id,
-      const double obstacle_s);
+      const std::string &obstacle_id, const double obstacle_s);
 
   const Obstacle *CreateStaticObstacle(
       ReferenceLineInfo *const reference_line_info,
-      const std::string &obstacle_id,
-      const double obstacle_start_s,
+      const std::string &obstacle_id, const double obstacle_start_s,
       const double obstacle_end_s);
 
   bool Rerouting();
@@ -129,9 +127,8 @@ class Frame {
   /**
    * @brief create a static virtual obstacle
    */
-  const Obstacle *CreateStaticVirtualObstacle(
-      const std::string &id,
-      const common::math::Box2d &box);
+  const Obstacle *CreateStaticVirtualObstacle(const std::string &id,
+                                              const common::math::Box2d &box);
 
   void AddObstacle(const Obstacle &obstacle);
 
@@ -152,6 +149,8 @@ class Frame {
   prediction::PredictionObstacles prediction_;
 
   ThreadSafeIndexedObstacles obstacles_;
+
+  perception::CIPVInfo cipv_info_;
 
   ChangeLaneDecider change_lane_decider_;
 

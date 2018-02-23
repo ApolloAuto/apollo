@@ -40,7 +40,7 @@ class RelativePositionTest : public ControlTestBase {
     FLAGS_control_conf_file =
         "modules/control/testdata/conf/lincoln_lite.pb.txt";
 
-    FLAGS_use_relative_position = true;
+    FLAGS_use_navigation_mode = true;
     FLAGS_query_relative_time = 1.0;
   }
 };

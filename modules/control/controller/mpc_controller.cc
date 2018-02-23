@@ -61,10 +61,10 @@ void WriteHeaders(std::ofstream &file_stream) {}
 
 MPCController::MPCController() : name_("MPC Controller") {
   if (FLAGS_enable_csv_debug) {
-    steer_log_file_.open(GetLogFileName());
-    steer_log_file_ << std::fixed;
-    steer_log_file_ << std::setprecision(6);
-    WriteHeaders(steer_log_file_);
+    mpc_log_file_.open(GetLogFileName());
+    mpc_log_file_ << std::fixed;
+    mpc_log_file_ << std::setprecision(6);
+    WriteHeaders(mpc_log_file_);
   }
   AINFO << "Using " << name_;
 }
@@ -215,8 +215,8 @@ Status MPCController::Init(const ControlConf *control_conf) {
 }
 
 void MPCController::CloseLogFile() {
-  if (FLAGS_enable_csv_debug && steer_log_file_.is_open()) {
-    steer_log_file_.close();
+  if (FLAGS_enable_csv_debug && mpc_log_file_.is_open()) {
+    mpc_log_file_.close();
   }
 }
 
@@ -317,6 +317,14 @@ Status MPCController::ComputeControlCommand(
     matrix_r_updated_ = matrix_r_;
     steer_angle_feedforwardterm_updated_ = steer_angle_feedforwardterm_;
   }
+
+  debug->add_matrix_q_updated(matrix_q_updated_(0, 0));
+  debug->add_matrix_q_updated(matrix_q_updated_(1, 1));
+  debug->add_matrix_q_updated(matrix_q_updated_(2, 2));
+  debug->add_matrix_q_updated(matrix_q_updated_(3, 3));
+
+  debug->add_matrix_r_updated(matrix_r_updated_(0, 0));
+  debug->add_matrix_r_updated(matrix_r_updated_(1, 1));
 
   Eigen::MatrixXd control_matrix(controls_, 1);
   control_matrix << 0, 0;

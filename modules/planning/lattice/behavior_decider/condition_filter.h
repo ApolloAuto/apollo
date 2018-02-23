@@ -29,7 +29,8 @@
 #include <vector>
 
 #include "modules/planning/lattice/behavior_decider/feasible_region.h"
-#include "modules/planning/lattice/behavior_decider/path_time_neighborhood.h"
+#include "modules/planning/lattice/behavior_decider/path_time_graph.h"
+#include "modules/planning/lattice/behavior_decider/prediction_querier.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 
@@ -38,37 +39,30 @@ namespace planning {
 
 class ConditionFilter {
  public:
-  ConditionFilter(const std::array<double, 3>& init_s, const double speed_limit,
-                  std::shared_ptr<PathTimeNeighborhood> path_time_neighborhood);
+  ConditionFilter(
+      const std::array<double, 3>& init_s, const double speed_limit,
+      std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line,
+      std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
+      std::shared_ptr<PredictionQuerier> ptr_prediction_obstacles);
 
-  std::vector<SampleBound> QuerySampleBounds(const double t) const;
-
-  std::vector<SampleBound> QuerySampleBounds() const;
-
-  std::vector<std::pair<PathTimePoint, PathTimePoint>>
-  QueryPathTimeObstacleIntervals(const double t) const;
+  std::vector<SamplePoint> QueryPathTimeObstacleSamplePoints() const;
 
   bool GenerateLatticeStPixels(
       apollo::planning_internal::LatticeStTraining* st_data, double timestamp,
-      std::string st_img_name);
+      std::string st_img_name) const;
 
-  bool WithinObstacleSt(double s, double t);
-
- private:
-  // Return true only if t is within the range of time slot,
-  // but will output block interval anyway(maybe be extension)
-  std::pair<PathTimePoint, PathTimePoint> QueryPathTimeObstacleIntervals(
-      const double t, const PathTimeObstacle& critical_condition) const;
-
-  std::set<double> CriticalTimeStamps() const;
-
-  std::vector<double> UniformTimeStamps(
-      const std::size_t num_of_time_segments) const;
+  bool WithinObstacleSt(double s, double t) const;
 
  private:
+  std::array<double, 3> init_s_;
+
   FeasibleRegion feasible_region_;
 
-  std::shared_ptr<PathTimeNeighborhood> ptr_path_time_neighborhood_;
+  std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line_;
+
+  std::shared_ptr<PathTimeGraph> ptr_path_time_graph_;
+
+  std::shared_ptr<PredictionQuerier> ptr_prediction_obstacles_;
 };
 
 }  // namespace planning

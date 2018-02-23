@@ -26,13 +26,13 @@
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 using apollo::canbus::Chassis;
+using apollo::common::TrajectoryPoint;
 using apollo::common::monitor::MonitorMessage;
 using apollo::localization::LocalizationEstimate;
-using apollo::planning::ADCTrajectory;
-using apollo::common::TrajectoryPoint;
-using apollo::planning::DecisionResult;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using apollo::planning::ADCTrajectory;
+using apollo::planning::DecisionResult;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 
@@ -284,7 +284,6 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
     EXPECT_DOUBLE_EQ(0.0, point.position_x());
     EXPECT_DOUBLE_EQ(10.0, point.position_y());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
-    EXPECT_EQ(4, point.polygon_point_size());
   }
 
   // Check last point.
@@ -294,7 +293,6 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
     EXPECT_DOUBLE_EQ(280.0, point.position_x());
     EXPECT_DOUBLE_EQ(290.0, point.position_y());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
-    EXPECT_EQ(4, point.polygon_point_size());
   }
 }
 
@@ -440,14 +438,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
       const Prediction& prediction = obj.prediction(j);
       EXPECT_NEAR((sim_world.object_size() - i - 1) * 0.1 + j,
                   prediction.probability(), kEpsilon);
-      EXPECT_EQ(prediction.predicted_trajectory_size(), 8);
-      for (int k = 0; k < prediction.predicted_trajectory_size(); ++k) {
-        const auto& pt = prediction.predicted_trajectory(k);
-        int val = j * 10 + k;
-        EXPECT_NEAR(val, pt.x(), kEpsilon);
-        EXPECT_NEAR(val, pt.y(), kEpsilon);
-        EXPECT_NEAR(val, pt.z(), kEpsilon);
-      }
+      EXPECT_EQ(prediction.predicted_trajectory_size(), 2);  // Downsampled
     }
     EXPECT_NEAR(123.456, obj.timestamp_sec(), kEpsilon);
   }

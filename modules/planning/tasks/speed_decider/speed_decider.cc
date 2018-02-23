@@ -132,7 +132,8 @@ Status SpeedDecider::MakeObjectDecision(
     const auto& boundary = path_obstacle->st_boundary();
 
     if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
-        boundary.max_t() < 0.0) {
+        boundary.max_t() < 0.0 ||
+        boundary.min_t() > dp_st_speed_config_.total_time()) {
       AppendIgnoreDecision(path_obstacle);
       continue;
     }
@@ -202,6 +203,11 @@ Status SpeedDecider::MakeObjectDecision(
             path_obstacle->AddLongitudinalDecision("dp_st_graph/cross",
                                                    stop_decision);
           }
+          const std::string msg =
+              "Failed to find a solution for crossing obstacle:" +
+              obstacle->Id();
+          AERROR << msg;
+          return Status(ErrorCode::PLANNING_ERROR, msg);
         }
         break;
       default:
@@ -252,8 +258,8 @@ bool SpeedDecider::CreateStopDecision(const PathObstacle& path_obstacle,
   PerceptionObstacle::Type obstacle_type =
       path_obstacle.obstacle()->Perception().type();
   ADEBUG << "STOP: obstacle_id[" << path_obstacle.obstacle()->Id()
-      << "] obstacle_type[" << PerceptionObstacle_Type_Name(obstacle_type)
-      << "]";
+         << "] obstacle_type[" << PerceptionObstacle_Type_Name(obstacle_type)
+         << "]";
 
   return true;
 }
@@ -291,8 +297,8 @@ bool SpeedDecider::CreateFollowDecision(
   PerceptionObstacle::Type obstacle_type =
       path_obstacle.obstacle()->Perception().type();
   ADEBUG << "FOLLOW: obstacle_id[" << path_obstacle.obstacle()->Id()
-      << "] obstacle_type[" << PerceptionObstacle_Type_Name(obstacle_type)
-      << "]";
+         << "] obstacle_type[" << PerceptionObstacle_Type_Name(obstacle_type)
+         << "]";
 
   return true;
 }
@@ -339,8 +345,8 @@ bool SpeedDecider::CreateYieldDecision(
   yield->set_fence_heading(ref_point.heading());
 
   ADEBUG << "YIELD: obstacle_id[" << path_obstacle.obstacle()->Id()
-      << "] obstacle_type[" << PerceptionObstacle_Type_Name(obstacle_type)
-      << "]";
+         << "] obstacle_type[" << PerceptionObstacle_Type_Name(obstacle_type)
+         << "]";
 
   return true;
 }
@@ -350,7 +356,7 @@ bool SpeedDecider::CreateOvertakeDecision(
     ObjectDecisionType* const overtake_decision) const {
   DCHECK_NOTNULL(overtake_decision);
 
-  constexpr double kOvertakeTimeBuffer = 3.0;  // in seconds
+  constexpr double kOvertakeTimeBuffer = 3.0;    // in seconds
   constexpr double kMinOvertakeDistance = 10.0;  // in meters
 
   const auto& velocity = path_obstacle.obstacle()->Perception().velocity();
@@ -385,8 +391,8 @@ bool SpeedDecider::CreateOvertakeDecision(
   PerceptionObstacle::Type obstacle_type =
       path_obstacle.obstacle()->Perception().type();
   ADEBUG << "OVERTAKE: obstacle_id[" << path_obstacle.obstacle()->Id()
-      << "] obstacle_type[" << PerceptionObstacle_Type_Name(obstacle_type)
-      << "]";
+         << "] obstacle_type[" << PerceptionObstacle_Type_Name(obstacle_type)
+         << "]";
 
   return true;
 }

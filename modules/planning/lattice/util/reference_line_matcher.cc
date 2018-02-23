@@ -26,6 +26,7 @@
 
 #include "glog/logging.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 
@@ -33,7 +34,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::PathPoint;
-using apollo::planning::util::InterpolateUsingLinearApproximation;
+using apollo::common::math::InterpolateUsingLinearApproximation;
 
 PathPoint ReferenceLineMatcher::MatchToReferenceLine(
     const std::vector<PathPoint>& reference_line, const double x,

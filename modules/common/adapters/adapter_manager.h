@@ -64,6 +64,13 @@ namespace adapter {
   static AdapterConfig &Get##name##Config() {                                  \
     return instance()->name##config_;                                          \
   }                                                                            \
+  static void Feed##name##Data(const name##Adapter::DataType &data) {          \
+    if (!instance()->name##_) {                                                \
+      AERROR << "Initialize adapter before feeding protobuf";                  \
+      return;                                                                  \
+    }                                                                          \
+    Get##name()->FeedData(data);                                               \
+  }                                                                            \
   static bool Feed##name##File(const std::string &proto_file) {                \
     if (!instance()->name##_) {                                                \
       AERROR << "Initialize adapter before feeding protobuf";                  \
@@ -271,6 +278,8 @@ class AdapterManager {
   REGISTER_ADAPTER(LocalizationMsfSinsPva);
   REGISTER_ADAPTER(LocalizationMsfStatus);
   REGISTER_ADAPTER(DriveEvent);
+  REGISTER_ADAPTER(RelativeMap);
+  REGISTER_ADAPTER(Navigation);
 
   DECLARE_SINGLETON(AdapterManager);
 };

@@ -15,6 +15,7 @@ export default [
         title: 'Perception',
         type: 'checkbox',
         data: {
+            perceptionPointCloud: 'Point Cloud',
             perceptionVehicle: 'Vehicle',
             perceptionPedestrian: 'Pedestrian',
             perceptionBicycle: 'Bicycle',

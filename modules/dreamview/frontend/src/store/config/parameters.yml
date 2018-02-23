@@ -42,6 +42,7 @@ planning:
     width: 1.4
 options:
   defaults:
+    enableSimControl: false
     showModuleController: false
     showMenu: false
     showPOI: false
@@ -70,6 +71,7 @@ options:
     showObstaclesVelocity: true
     showObstaclesHeading: true
     showObstaclesId: true
+    showPointCloud: true
     showPositionGps: false
     showPositionLocalization: true
     cameraAngle: Default
@@ -77,4 +79,5 @@ debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false
   performanceMonitor: false
-
+server:
+  port: 8888

@@ -32,53 +32,48 @@ export default class QuickStarter extends React.Component {
     constructor(props) {
         super(props);
 
+        this.utterance = window.speechSynthesis ? new SpeechSynthesisUtterance() : null;
+
         this.rtKRecord = {
             "Start": () => {
                 WS.executeToolCommand("rtk_record_replay", "start_recorder");
-                const msg = new SpeechSynthesisUtterance('Start RTK recorder');
-                window.speechSynthesis.speak(msg);
+                this.speechSynthesis('Start RTK recorder');
             },
             "Stop": () => {
                 WS.executeToolCommand("rtk_record_replay", "stop_recorder");
-                const msg = new SpeechSynthesisUtterance('Stop RTK recorder');
-                window.speechSynthesis.speak(msg);
+                this.speechSynthesis('Stop RTK recorder');
             },
         };
 
         this.rtkReplay = {
             "Start": () => {
                 WS.executeToolCommand("rtk_record_replay", "start_player");
-                const msg = new SpeechSynthesisUtterance('Start RTK replay');
-                window.speechSynthesis.speak(msg);
+                this.speechSynthesis('Start RTK replay');
             },
             "Stop": () => {
                 WS.executeToolCommand("rtk_record_replay", "stop_player");
-                const msg = new SpeechSynthesisUtterance('Stop RTK replay');
-                window.speechSynthesis.speak(msg);
+                this.speechSynthesis('Stop RTK replay');
             },
         };
 
         this.setup = {
             "Setup": () => {
                 WS.executeModeCommand("start");
-                const msg = new SpeechSynthesisUtterance('Setup');
-                window.speechSynthesis.speak(msg);
+                this.speechSynthesis('Setup');
             },
         };
 
         this.reset = {
             "Reset All": () => {
                 WS.executeModeCommand("stop");
-                const msg = new SpeechSynthesisUtterance('Reset All');
-                window.speechSynthesis.speak(msg);
+                this.speechSynthesis('Reset All');
             },
         };
 
         this.auto = {
             "Start Auto": () => {
                 WS.changeDrivingMode("COMPLETE_AUTO_DRIVE");
-                const msg = new SpeechSynthesisUtterance('Start Auto');
-                window.speechSynthesis.speak(msg);
+                this.speechSynthesis('Start Auto');
             },
         };
         this.version = {
@@ -87,6 +82,19 @@ export default class QuickStarter extends React.Component {
                 alert(this.props.store.hmi.dockerImage);
             },
         };
+    }
+
+    componentWillUpdate() {
+        if (this.utterance) {
+            window.speechSynthesis.cancel();
+        }
+    }
+
+    speechSynthesis(phrase) {
+        if (this.utterance) {
+            this.utterance.text = phrase;
+            window.speechSynthesis.speak(this.utterance);
+        }
     }
 
     render() {

@@ -28,6 +28,7 @@ DECLARE_string(base_map_filename);
 DECLARE_string(sim_map_filename);
 DECLARE_string(routing_map_filename);
 DECLARE_string(end_way_point_filename);
+DECLARE_string(speed_control_filename);
 
 DECLARE_string(vehicle_config_path);
 
@@ -35,5 +36,6 @@ DECLARE_bool(use_ros_time);
 
 DECLARE_string(localization_tf2_frame_id);
 DECLARE_string(localization_tf2_child_frame_id);
+DECLARE_bool(use_navigation_mode);
 
 #endif  // MODULES_COMMON_CONFIGS_GFLAGS_H_

@@ -1759,6 +1759,5 @@ lane_id {
   id: "1_-1"
 }
 engage_advice {
-  advice: DISALLOW_ENGAGE
-  reason: "Not on reference line"
+  advice: KEEP_ENGAGED
 }

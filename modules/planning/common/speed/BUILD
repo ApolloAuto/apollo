@@ -28,6 +28,7 @@ cc_library(
         ":st_point",
         "//modules/common:log",
         "//modules/planning/proto:planning_proto",
+        "@gtest",
     ],
 )
 

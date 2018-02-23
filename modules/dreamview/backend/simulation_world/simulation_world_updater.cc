@@ -50,6 +50,15 @@ SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
 }
 
 void SimulationWorldUpdater::RegisterMessageHandlers() {
+  // Send current sim_control status to the new client.
+  websocket_->RegisterConnectionReadyHandler(
+      [this](WebSocketHandler::Connection *conn) {
+        Json response;
+        response["type"] = "SimControlStatus";
+        response["enabled"] = sim_control_->IsEnabled();
+        websocket_->SendData(conn, response.dump());
+      });
+
   map_ws_->RegisterMessageHandler(
       "RetrieveMapData",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -66,6 +75,20 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           } else {
             AERROR << "Failed to parse MapElementIds from json";
           }
+        }
+      });
+
+  websocket_->RegisterMessageHandler(
+      "Binary",
+      [this](const std::string &data, WebSocketHandler::Connection *conn) {
+        apollo::relative_map::NavigationInfo navigation_info;
+        if (navigation_info.ParseFromString(data)) {
+          AdapterManager::FillNavigationHeader(FLAGS_dreamview_module_name,
+                                               &navigation_info);
+          AdapterManager::PublishNavigation(navigation_info);
+        } else {
+          AERROR << "Failed to parse navigation info from string. String size: "
+                 << data.size();
         }
       });
 

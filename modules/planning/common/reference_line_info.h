@@ -30,7 +30,7 @@
 
 #include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/map/pnc_map/pnc_map.h"
@@ -151,7 +151,7 @@ class ReferenceLineInfo {
   void SetObjectDecisions(ObjectDecisions* object_decisions) const;
   const common::VehicleState vehicle_state_;
   const common::TrajectoryPoint adc_planning_point_;
-  const ReferenceLine reference_line_;
+  ReferenceLine reference_line_;
 
   /**
    * @brief this is the number that measures the goodness of this reference

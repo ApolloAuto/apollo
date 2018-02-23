@@ -720,6 +720,31 @@
                 }
               }
             },
+            "SpeedControl": {
+              "fields": {
+                "name": {
+                  "type": "string",
+                  "id": 1
+                },
+                "polygon": {
+                  "type": "apollo.hdmap.Polygon",
+                  "id": 2
+                },
+                "speedLimit": {
+                  "type": "double",
+                  "id": 3
+                }
+              }
+            },
+            "SpeedControls": {
+              "fields": {
+                "speedControl": {
+                  "rule": "repeated",
+                  "type": "SpeedControl",
+                  "id": 1
+                }
+              }
+            },
             "StopSign": {
               "fields": {
                 "id": {
@@ -769,6 +794,85 @@
                   "rule": "repeated",
                   "type": "Id",
                   "id": 3
+                }
+              }
+            }
+          }
+        },
+        "relative_map": {
+          "nested": {
+            "NavigationPath": {
+              "fields": {
+                "path": {
+                  "type": "apollo.common.Path",
+                  "id": 1
+                },
+                "pathPriority": {
+                  "type": "uint32",
+                  "id": 2
+                }
+              }
+            },
+            "NavigationInfo": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "navigationPath": {
+                  "rule": "repeated",
+                  "type": "NavigationPath",
+                  "id": 2
+                }
+              }
+            },
+            "MapMsg": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "hdmap": {
+                  "type": "apollo.hdmap.Map",
+                  "id": 2
+                },
+                "navigationPath": {
+                  "keyType": "string",
+                  "type": "NavigationPath",
+                  "id": 3
+                }
+              }
+            },
+            "MapGenerationParam": {
+              "fields": {
+                "defaultLeftWidth": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 1.75
+                  }
+                },
+                "defaultRightWidth": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1.75
+                  }
+                },
+                "defaultSpeedLimit": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 29.0576
+                  }
+                }
+              }
+            },
+            "RelativeMapConfig": {
+              "fields": {
+                "mapParam": {
+                  "type": "MapGenerationParam",
+                  "id": 1
                 }
               }
             }
@@ -898,6 +1002,224 @@
                   "options": {
                     "default": null
                   }
+                }
+              }
+            },
+            "Header": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "moduleName": {
+                  "type": "string",
+                  "id": 2
+                },
+                "sequenceNum": {
+                  "type": "uint32",
+                  "id": 3
+                },
+                "lidarTimestamp": {
+                  "type": "uint64",
+                  "id": 4
+                },
+                "cameraTimestamp": {
+                  "type": "uint64",
+                  "id": 5
+                },
+                "radarTimestamp": {
+                  "type": "uint64",
+                  "id": 6
+                },
+                "version": {
+                  "type": "uint32",
+                  "id": 7,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "status": {
+                  "type": "StatusPb",
+                  "id": 8
+                }
+              }
+            },
+            "ErrorCode": {
+              "values": {
+                "OK": 0,
+                "CONTROL_ERROR": 1000,
+                "CONTROL_INIT_ERROR": 1001,
+                "CONTROL_COMPUTE_ERROR": 1002,
+                "CANBUS_ERROR": 2000,
+                "CAN_CLIENT_ERROR_BASE": 2100,
+                "CAN_CLIENT_ERROR_OPEN_DEVICE_FAILED": 2101,
+                "CAN_CLIENT_ERROR_FRAME_NUM": 2102,
+                "CAN_CLIENT_ERROR_SEND_FAILED": 2103,
+                "CAN_CLIENT_ERROR_RECV_FAILED": 2104,
+                "LOCALIZATION_ERROR": 3000,
+                "LOCALIZATION_ERROR_MSG": 3100,
+                "LOCALIZATION_ERROR_LIDAR": 3200,
+                "LOCALIZATION_ERROR_INTEG": 3300,
+                "LOCALIZATION_ERROR_GNSS": 3400,
+                "PERCEPTION_ERROR": 4000,
+                "PERCEPTION_ERROR_TF": 4001,
+                "PERCEPTION_ERROR_PROCESS": 4002,
+                "PERCEPTION_FATAL": 4003,
+                "PREDICTION_ERROR": 5000,
+                "PLANNING_ERROR": 6000,
+                "HDMAP_DATA_ERROR": 7000,
+                "ROUTING_ERROR": 8000,
+                "ROUTING_ERROR_REQUEST": 8001,
+                "ROUTING_ERROR_RESPONSE": 8002,
+                "ROUTING_ERROR_NOT_READY": 8003,
+                "END_OF_INPUT": 9000,
+                "HTTP_LOGIC_ERROR": 10000,
+                "HTTP_RUNTIME_ERROR": 10001,
+                "RELATIVE_MAP_ERROR": 11000,
+                "RELATIVE_MAP_NOT_READY": 11001
+              }
+            },
+            "StatusPb": {
+              "fields": {
+                "errorCode": {
+                  "type": "ErrorCode",
+                  "id": 1,
+                  "options": {
+                    "default": "OK"
+                  }
+                },
+                "msg": {
+                  "type": "string",
+                  "id": 2
+                }
+              }
+            },
+            "SLPoint": {
+              "fields": {
+                "s": {
+                  "type": "double",
+                  "id": 1
+                },
+                "l": {
+                  "type": "double",
+                  "id": 2
+                }
+              }
+            },
+            "FrenetFramePoint": {
+              "fields": {
+                "s": {
+                  "type": "double",
+                  "id": 1
+                },
+                "l": {
+                  "type": "double",
+                  "id": 2
+                },
+                "dl": {
+                  "type": "double",
+                  "id": 3
+                },
+                "ddl": {
+                  "type": "double",
+                  "id": 4
+                }
+              }
+            },
+            "SpeedPoint": {
+              "fields": {
+                "s": {
+                  "type": "double",
+                  "id": 1
+                },
+                "t": {
+                  "type": "double",
+                  "id": 2
+                },
+                "v": {
+                  "type": "double",
+                  "id": 3
+                },
+                "a": {
+                  "type": "double",
+                  "id": 4
+                },
+                "da": {
+                  "type": "double",
+                  "id": 5
+                }
+              }
+            },
+            "PathPoint": {
+              "fields": {
+                "x": {
+                  "type": "double",
+                  "id": 1
+                },
+                "y": {
+                  "type": "double",
+                  "id": 2
+                },
+                "z": {
+                  "type": "double",
+                  "id": 3
+                },
+                "theta": {
+                  "type": "double",
+                  "id": 4
+                },
+                "kappa": {
+                  "type": "double",
+                  "id": 5
+                },
+                "s": {
+                  "type": "double",
+                  "id": 6
+                },
+                "dkappa": {
+                  "type": "double",
+                  "id": 7
+                },
+                "ddkappa": {
+                  "type": "double",
+                  "id": 8
+                },
+                "laneId": {
+                  "type": "string",
+                  "id": 9
+                }
+              }
+            },
+            "Path": {
+              "fields": {
+                "name": {
+                  "type": "string",
+                  "id": 1
+                },
+                "pathPoint": {
+                  "rule": "repeated",
+                  "type": "PathPoint",
+                  "id": 2
+                }
+              }
+            },
+            "TrajectoryPoint": {
+              "fields": {
+                "pathPoint": {
+                  "type": "PathPoint",
+                  "id": 1
+                },
+                "v": {
+                  "type": "double",
+                  "id": 2
+                },
+                "a": {
+                  "type": "double",
+                  "id": 3
+                },
+                "relativeTime": {
+                  "type": "double",
+                  "id": 4
                 }
               }
             }

@@ -27,6 +27,7 @@ cc_library(
     deps = [
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_util",
+        "//modules/common/math:linear_interpolation",
     ],
 )
 
@@ -42,7 +43,7 @@ cc_library(
         ":discretized_path",
         ":frenet_frame_path",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/math/frame_conversion:cartesian_frenet_conversion",
+        "//modules/common/math:cartesian_frenet_conversion",
         "//modules/planning/reference_line",
     ],
 )

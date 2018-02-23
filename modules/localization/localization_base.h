@@ -23,10 +23,12 @@
 #define MODULES_LOCALIZATION_LOCALIZATION_BASE_H_
 
 #include <memory>
+
 #include "tf2_ros/transform_broadcaster.h"
 
-#include "modules/common/status/status.h"
 #include "modules/localization/proto/localization.pb.h"
+
+#include "modules/common/status/status.h"
 
 /**
  * @namespace apollo::localization

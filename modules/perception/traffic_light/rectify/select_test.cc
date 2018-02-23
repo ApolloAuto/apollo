@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/traffic_light/rectify/select.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -22,10 +23,9 @@ namespace traffic_light {
 
 class MatchTest : public ::testing::Test {
  protected:
-  virtual void SetUp() {
-  }
-  ~MatchTest() {
-  }
+  virtual void SetUp() {}
+  ~MatchTest() {}
+
  protected:
   GaussianSelect select;
 };

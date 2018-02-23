@@ -37,9 +37,7 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
 
-std::string Perception::Name() const {
-  return "perception";
-}
+std::string Perception::Name() const { return "perception"; }
 
 Status Perception::Init() {
   AdapterManager::Init(FLAGS_perception_adapter_config_filename);

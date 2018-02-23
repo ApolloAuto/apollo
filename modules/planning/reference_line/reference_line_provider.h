@@ -31,11 +31,12 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
-#include "modules/common/proto/vehicle_state.pb.h"
 
 #include "modules/common/util/factory.h"
 #include "modules/common/util/util.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/map/pnc_map/pnc_map.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
@@ -135,6 +136,11 @@ class ReferenceLineProvider {
 
   AnchorPoint GetAnchorPoint(const ReferenceLine& reference_line,
                              double s) const;
+
+  bool GetReferenceLinesFromRelativeMap(
+      const relative_map::MapMsg& relative_map,
+      std::list<ReferenceLine>* reference_line,
+      std::list<hdmap::RouteSegments>* segments);
 
   static void RegisterSmoothers();
 

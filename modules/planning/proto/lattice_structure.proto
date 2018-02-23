@@ -12,8 +12,12 @@ message DiscretizedReferenceLine {
 message PathTimePoint {
   optional double t = 1;
   optional double s = 2;
-  optional double v = 3;
   optional string obstacle_id = 4;
+}
+
+message SamplePoint {
+  optional PathTimePoint path_time_point = 1;
+  optional double ref_v = 2;
 }
 
 message PathTimeObstacle {
@@ -38,9 +42,19 @@ message SampleBound {
   optional LatticeSamplingConfig sample_config = 6;
 }
 
+message StopPoint {
+  required double s = 1;
+  enum Type {
+    HARD = 0;
+    SOFT = 1;
+  }
+  required Type type = 2 [default = HARD]; 
+}
+
 message PlanningTarget {
   optional DiscretizedReferenceLine discretized_reference_line = 1;
   repeated SampleBound sample_bound = 2;
-  optional double stop_point = 3;
-  optional double cruise_speed = 4;
+  repeated SamplePoint neighbor_point = 3;
+  optional StopPoint stop_point = 4;
+  optional double cruise_speed = 5;
 }

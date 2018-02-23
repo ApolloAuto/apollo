@@ -13,7 +13,20 @@ proto_library(
     deps = [
         "//modules/common/monitor_log/proto:monitor_log_proto_lib",
         "//modules/planning/proto:planning_internal_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
     ],
+)
+
+cc_proto_library(
+    name = "point_cloud_proto",
+    deps = [
+        ":point_cloud_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "point_cloud_proto_lib",
+    srcs = ["point_cloud.proto"],
 )
 
 cc_proto_library(

@@ -34,12 +34,12 @@ namespace planning {
 
 using common::adapter::AdapterManager;
 
-#define RUN_GOLDEN_TEST(case_num)                                         \
-  {                                                                       \
-    const ::testing::TestInfo* const test_info =                          \
-        ::testing::UnitTest::GetInstance()->current_test_info();          \
-    bool run_planning_success = RunPlanning(test_info->name(), case_num); \
-    EXPECT_TRUE(run_planning_success);                                    \
+#define RUN_GOLDEN_TEST(sub_case_num)                                         \
+  {                                                                           \
+    const ::testing::TestInfo* const test_info =                              \
+        ::testing::UnitTest::GetInstance()->current_test_info();              \
+    bool run_planning_success = RunPlanning(test_info->name(), sub_case_num); \
+    EXPECT_TRUE(run_planning_success);                                        \
   }
 
 #define TMAIN                                            \
@@ -55,6 +55,7 @@ DECLARE_string(test_chassis_file);
 DECLARE_string(test_data_dir);
 DECLARE_string(test_prediction_file);
 DECLARE_string(test_traffic_light_file);
+DECLARE_string(test_relative_map_file);
 DECLARE_string(test_previous_planning_file);
 
 class PlanningTestBase : public ::testing::Test {

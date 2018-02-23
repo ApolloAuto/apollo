@@ -36,7 +36,8 @@ export default class Ground {
     update(world, coordinates, scene) {
         if (this.initialized === true && this.loadedMap !== this.updateMap) {
             const dir = this.titleCaseToSnakeCase(this.updateMap);
-            const server = 'http://' + window.location.hostname + ':8888';
+            const host = window.location;
+            const server = `${host.protocol}//${host.hostname}:${PARAMETERS.server.port}`;
             const imgUrl = server + '/assets/map_data/' + dir + '/background.jpg';
             loadTexture(imgUrl, texture => {
                 console.log("updating ground image with " + dir);

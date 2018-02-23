@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/traffic_light/rectify/cropbox.h"
 
 #include "gtest/gtest.h"
-#include "modules/perception/traffic_light/rectify/cropbox.h"
 
 namespace apollo {
 namespace perception {
@@ -28,9 +28,7 @@ class CropBoxTest : public ::testing::Test {
     _min_crop_size = 270;
     _crop_local = new CropBox(_crop_scale, _min_crop_size);
   }
-  ~CropBoxTest() {
-    delete (_crop_local);
-  }
+  ~CropBoxTest() { delete (_crop_local); }
 
  protected:
   IGetBox *_crop_local;
@@ -77,6 +75,7 @@ TEST_F(CropBoxTest, crop2) {
   cv::Rect rect(1231, 527, 624, 552);
   ASSERT_TRUE(rect == cbox) << rect << cbox;
 }
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

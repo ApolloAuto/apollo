@@ -25,6 +25,7 @@
 
 #include "modules/planning/proto/sl_boundary.pb.h"
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/dropbox.h"
 #include "modules/common/util/string_util.h"
@@ -43,6 +44,7 @@ using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::util::Dropbox;
@@ -92,6 +94,22 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
     AERROR << "Failed to add obstacles to reference line";
     return false;
   }
+
+  if (hdmap::GetSpeedControls()) {
+    auto* speed_controls = hdmap::GetSpeedControls();
+    for (const auto& speed_control : speed_controls->speed_control()) {
+      reference_line_.AddSpeedLimit(speed_control);
+    }
+  }
+
+  if (FLAGS_use_navigation_mode &&
+      !AdapterManager::GetPerceptionObstacles()->Empty()) {
+    const auto& cipv_info = AdapterManager::GetPerceptionObstacles()
+                                ->GetLatestObserved()
+                                .cipv_info();
+    path_decision_.SetCIPVInfo(cipv_info);
+  }
+
   is_inited_ = true;
   return true;
 }

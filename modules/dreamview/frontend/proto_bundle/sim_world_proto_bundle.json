@@ -387,6 +387,18 @@
                 }
               }
             },
+            "ControlData": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "stationError": {
+                  "type": "double",
+                  "id": 2
+                }
+              }
+            },
             "SimulationWorld": {
               "fields": {
                 "timestamp": {
@@ -471,6 +483,14 @@
                 "gps": {
                   "type": "Object",
                   "id": 20
+                },
+                "laneMarker": {
+                  "type": "apollo.perception.LaneMarkers",
+                  "id": 21
+                },
+                "controlData": {
+                  "type": "ControlData",
+                  "id": 22
                 }
               }
             }
@@ -478,45 +498,6 @@
         },
         "common": {
           "nested": {
-            "sound": {
-              "nested": {
-                "SoundRequest": {
-                  "fields": {
-                    "header": {
-                      "type": "apollo.common.Header",
-                      "id": 1
-                    },
-                    "priority": {
-                      "type": "PriorityLevel",
-                      "id": 2
-                    },
-                    "mode": {
-                      "type": "Mode",
-                      "id": 3
-                    },
-                    "words": {
-                      "type": "string",
-                      "id": 4
-                    }
-                  },
-                  "nested": {
-                    "PriorityLevel": {
-                      "values": {
-                        "LOW": 0,
-                        "MEDIUM": 1,
-                        "HIGH": 2
-                      }
-                    },
-                    "Mode": {
-                      "values": {
-                        "SAY": 0,
-                        "BEEP": 1
-                      }
-                    }
-                  }
-                }
-              }
-            },
             "DriveEvent": {
               "fields": {
                 "header": {
@@ -589,7 +570,9 @@
                 "ROUTING_ERROR_NOT_READY": 8003,
                 "END_OF_INPUT": 9000,
                 "HTTP_LOGIC_ERROR": 10000,
-                "HTTP_RUNTIME_ERROR": 10001
+                "HTTP_RUNTIME_ERROR": 10001,
+                "RELATIVE_MAP_ERROR": 11000,
+                "RELATIVE_MAP_NOT_READY": 11001
               }
             },
             "StatusPb": {
@@ -933,106 +916,6 @@
                 }
               }
             },
-            "VehicleState": {
-              "fields": {
-                "x": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "y": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "z": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "timestamp": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "roll": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "pitch": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "yaw": {
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "heading": {
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "kappa": {
-                  "type": "double",
-                  "id": 9,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "linearVelocity": {
-                  "type": "double",
-                  "id": 10,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "angularVelocity": {
-                  "type": "double",
-                  "id": 11,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "linearAcceleration": {
-                  "type": "double",
-                  "id": 12,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "gear": {
-                  "type": "apollo.canbus.Chassis.GearPosition",
-                  "id": 13
-                },
-                "drivingMode": {
-                  "type": "apollo.canbus.Chassis.DrivingMode",
-                  "id": 14
-                },
-                "pose": {
-                  "type": "apollo.localization.Pose",
-                  "id": 15
-                }
-              }
-            },
             "monitor": {
               "nested": {
                 "MonitorMessageItem": {
@@ -1070,7 +953,8 @@
                         "HWSYS": 9,
                         "ROUTING": 10,
                         "MONITOR": 11,
-                        "HMI": 12
+                        "HMI": 12,
+                        "RELATIVE_MAP": 13
                       }
                     },
                     "LogLevel": {
@@ -2502,83 +2386,12 @@
                 }
               }
             },
-            "CloudReferenceLinePoint": {
-              "fields": {
-                "x": {
-                  "type": "double",
-                  "id": 1
-                },
-                "y": {
-                  "type": "double",
-                  "id": 2
-                },
-                "z": {
-                  "type": "double",
-                  "id": 3
-                },
-                "theta": {
-                  "type": "double",
-                  "id": 4
-                },
-                "kappa": {
-                  "type": "double",
-                  "id": 5
-                },
-                "laneS": {
-                  "type": "double",
-                  "id": 6
-                },
-                "dkappa": {
-                  "type": "double",
-                  "id": 7
-                }
-              }
-            },
-            "CloudReferenceLineSegment": {
-              "fields": {
-                "laneId": {
-                  "type": "string",
-                  "id": 1
-                },
-                "point": {
-                  "rule": "repeated",
-                  "type": "CloudReferenceLinePoint",
-                  "id": 2
-                }
-              }
-            },
             "CloudReferenceLineResponse": {
               "fields": {
                 "segment": {
                   "rule": "repeated",
-                  "type": "CloudReferenceLineSegment",
+                  "type": "apollo.common.Path",
                   "id": 1
-                }
-              }
-            },
-            "NavigationPath": {
-              "fields": {
-                "pathPoint": {
-                  "rule": "repeated",
-                  "type": "apollo.common.PathPoint",
-                  "id": 1
-                },
-                "pathPriority": {
-                  "type": "uint32",
-                  "id": 2
-                }
-              }
-            },
-            "NavigationInfo": {
-              "fields": {
-                "header": {
-                  "type": "apollo.common.Header",
-                  "id": 1
-                },
-                "navigationPath": {
-                  "rule": "repeated",
-                  "type": "NavigationPath",
-                  "id": 2
                 }
               }
             }
@@ -2707,6 +2520,221 @@
                 "containLights": {
                   "type": "bool",
                   "id": 4
+                }
+              }
+            },
+            "Point": {
+              "fields": {
+                "x": {
+                  "type": "double",
+                  "id": 1
+                },
+                "y": {
+                  "type": "double",
+                  "id": 2
+                },
+                "z": {
+                  "type": "double",
+                  "id": 3
+                }
+              }
+            },
+            "PerceptionObstacle": {
+              "fields": {
+                "id": {
+                  "type": "int32",
+                  "id": 1
+                },
+                "position": {
+                  "type": "Point",
+                  "id": 2
+                },
+                "theta": {
+                  "type": "double",
+                  "id": 3
+                },
+                "velocity": {
+                  "type": "Point",
+                  "id": 4
+                },
+                "length": {
+                  "type": "double",
+                  "id": 5
+                },
+                "width": {
+                  "type": "double",
+                  "id": 6
+                },
+                "height": {
+                  "type": "double",
+                  "id": 7
+                },
+                "polygonPoint": {
+                  "rule": "repeated",
+                  "type": "Point",
+                  "id": 8
+                },
+                "trackingTime": {
+                  "type": "double",
+                  "id": 9
+                },
+                "type": {
+                  "type": "Type",
+                  "id": 10
+                },
+                "timestamp": {
+                  "type": "double",
+                  "id": 11
+                },
+                "pointCloud": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 12
+                },
+                "confidence": {
+                  "type": "double",
+                  "id": 13,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "confidenceType": {
+                  "type": "ConfidenceType",
+                  "id": 14,
+                  "options": {
+                    "default": "CONFIDENCE_CNN"
+                  }
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "UNKNOWN_MOVABLE": 1,
+                    "UNKNOWN_UNMOVABLE": 2,
+                    "PEDESTRIAN": 3,
+                    "BICYCLE": 4,
+                    "VEHICLE": 5
+                  }
+                },
+                "ConfidenceType": {
+                  "values": {
+                    "CONFIDENCE_UNKNOWN": 0,
+                    "CONFIDENCE_CNN": 1,
+                    "CONFIDENCE_RADAR": 2
+                  }
+                }
+              }
+            },
+            "CIPVInfo": {
+              "fields": {
+                "cipvId": {
+                  "type": "int32",
+                  "id": 1
+                },
+                "potentialCipvId": {
+                  "rule": "repeated",
+                  "type": "int32",
+                  "id": 2,
+                  "options": {
+                    "packed": false
+                  }
+                }
+              }
+            },
+            "LaneMarker": {
+              "fields": {
+                "laneType": {
+                  "type": "LaneType",
+                  "id": 1
+                },
+                "quality": {
+                  "type": "double",
+                  "id": 2
+                },
+                "modelDegree": {
+                  "type": "int32",
+                  "id": 3
+                },
+                "c0Position": {
+                  "type": "double",
+                  "id": 4
+                },
+                "c1HeadingAngle": {
+                  "type": "double",
+                  "id": 5
+                },
+                "c2Curvature": {
+                  "type": "double",
+                  "id": 6
+                },
+                "c3CurvatureDerivative": {
+                  "type": "double",
+                  "id": 7
+                },
+                "viewRange": {
+                  "type": "double",
+                  "id": 8
+                }
+              },
+              "nested": {
+                "LaneType": {
+                  "values": {
+                    "LANE_TYPE_UNKNOWN": 0,
+                    "LANE_TYPE_DASHED": 1,
+                    "LANE_TYPE_SOLID": 2,
+                    "LANE_TYPE_ROAD_EDGE": 3
+                  }
+                }
+              }
+            },
+            "LaneMarkers": {
+              "fields": {
+                "leftLaneMarker": {
+                  "type": "LaneMarker",
+                  "id": 1
+                },
+                "rightLaneMarker": {
+                  "type": "LaneMarker",
+                  "id": 2
+                },
+                "nextLeftLaneMarker": {
+                  "rule": "repeated",
+                  "type": "LaneMarker",
+                  "id": 3
+                },
+                "nextRightLaneMarker": {
+                  "rule": "repeated",
+                  "type": "LaneMarker",
+                  "id": 4
+                }
+              }
+            },
+            "PerceptionObstacles": {
+              "fields": {
+                "perceptionObstacle": {
+                  "rule": "repeated",
+                  "type": "PerceptionObstacle",
+                  "id": 1
+                },
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 2
+                },
+                "errorCode": {
+                  "type": "apollo.common.ErrorCode",
+                  "id": 3,
+                  "options": {
+                    "default": "OK"
+                  }
+                },
+                "laneMarker": {
+                  "type": "LaneMarkers",
+                  "id": 4
+                },
+                "cipvInfo": {
+                  "type": "CIPVInfo",
+                  "id": 5
                 }
               }
             }

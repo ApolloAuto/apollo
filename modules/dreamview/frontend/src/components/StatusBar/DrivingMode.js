@@ -4,18 +4,23 @@ import classNames from "classnames";
 export default class DrivingMode extends React.PureComponent {
     constructor(props) {
         super(props);
-        this.utterance = new SpeechSynthesisUtterance();
+
+        this.utterance = window.speechSynthesis ? new SpeechSynthesisUtterance() : null;
     }
 
     componentWillUpdate() {
-        window.speechSynthesis.cancel();
+        if (this.utterance) {
+            window.speechSynthesis.cancel();
+        }
     }
 
     render() {
         const { drivingMode, isAutoMode } = this.props;
 
-        this.utterance.text = `Entering to ${drivingMode} mode`;
-        window.speechSynthesis.speak(this.utterance);
+        if (this.utterance) {
+            this.utterance.text = `Entering to ${drivingMode} mode`;
+            window.speechSynthesis.speak(this.utterance);
+        }
 
         return (
             <div className={classNames({

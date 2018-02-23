@@ -23,6 +23,7 @@
 
 #include "google/protobuf/util/json_util.h"
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
@@ -48,19 +49,15 @@ using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::ChassisAdapter;
-using apollo::common::adapter::GpsAdapter;
-using apollo::common::adapter::LocalizationAdapter;
-using apollo::common::adapter::MonitorAdapter;
-using apollo::common::adapter::PerceptionObstaclesAdapter;
-using apollo::common::adapter::PlanningAdapter;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
+using apollo::common::PathPoint;
 using apollo::common::time::Clock;
 using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::GetProtoFromFile;
+using apollo::control::ControlCommand;
 using apollo::hdmap::Path;
 using apollo::localization::Gps;
 using apollo::localization::LocalizationEstimate;
@@ -192,7 +189,9 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
   }
 }
 
-inline double SecToMs(const double sec) { return sec * 1000.0; }
+inline double SecToMs(const double sec) {
+  return sec * 1000.0;
+}
 
 }  // namespace
 
@@ -256,6 +255,8 @@ void SimulationWorldService::Update() {
   UpdateWithLatestObserved("PredictionObstacles",
                            AdapterManager::GetPrediction());
   UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
+  UpdateWithLatestObserved("ControlCommand",
+                           AdapterManager::GetControlCommand());
   for (const auto &kv : obj_map_) {
     *world_.add_object() = kv.second;
   }
@@ -480,6 +481,10 @@ void SimulationWorldService::UpdateSimulationWorld(
     const PerceptionObstacles &obstacles) {
   for (const auto &obstacle : obstacles.perception_obstacle()) {
     CreateWorldObjectIfAbsent(obstacle);
+  }
+
+  if (obstacles.has_lane_marker()) {
+    world_.mutable_lane_marker()->CopyFrom(obstacles.lane_marker());
   }
 }
 
@@ -752,21 +757,15 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   planning_data->clear_path();
   for (auto &path : data.path()) {
     // Downsample the path points for frontend display.
-    // Angle threshold is about 5.72 degree.
-    constexpr double angle_threshold = 0.1;
-    std::vector<int> sampled_indices =
-        DownsampleByAngle(path.path_point(), angle_threshold);
+    auto sampled_indices =
+        DownsampleByAngle(path.path_point(), kAngleThreshold);
 
     auto *downsampled_path = planning_data->add_path();
     downsampled_path->set_name(path.name());
     for (int index : sampled_indices) {
       const auto &path_point = path.path_point()[index];
       auto *point = downsampled_path->add_path_point();
-      point->set_x(path_point.x());
-      point->set_y(path_point.y());
-      point->set_s(path_point.s());
-      point->set_kappa(path_point.kappa());
-      point->set_dkappa(path_point.dkappa());
+      point->CopyFrom(path_point);
     }
   }
 }
@@ -809,15 +808,22 @@ void SimulationWorldService::UpdateSimulationWorld(
 }
 
 void SimulationWorldService::CreatePredictionTrajectory(
-    Object *world_object, const PredictionObstacle &obstacle) {
+    const PredictionObstacle &obstacle, Object *world_object) {
   for (const auto &traj : obstacle.trajectory()) {
     Prediction *prediction = world_object->add_prediction();
     prediction->set_probability(traj.probability());
+
+    std::vector<PathPoint> points;
     for (const auto &point : traj.trajectory_point()) {
+      points.push_back(point.path_point());
+    }
+    auto sampled_indices = DownsampleByAngle(points, kAngleThreshold);
+
+    for (auto index : sampled_indices) {
+      const auto &point = points[index];
       PolygonPoint *world_point = prediction->add_predicted_trajectory();
-      world_point->set_x(point.path_point().x() + map_service_->GetXOffset());
-      world_point->set_y(point.path_point().y() + map_service_->GetYOffset());
-      world_point->set_z(point.path_point().z());
+      world_point->set_x(point.x() + map_service_->GetXOffset());
+      world_point->set_y(point.y() + map_service_->GetYOffset());
     }
   }
 }
@@ -833,7 +839,7 @@ void SimulationWorldService::UpdateSimulationWorld(
     auto &world_obj = CreateWorldObjectIfAbsent(obstacle.perception_obstacle());
 
     // Add prediction trajectory to the object.
-    CreatePredictionTrajectory(&world_obj, obstacle);
+    CreatePredictionTrajectory(obstacle, &world_obj);
 
     world_obj.set_timestamp_sec(
         std::max(obstacle.timestamp(), world_obj.timestamp_sec()));
@@ -854,10 +860,8 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   for (const Path &path : paths) {
     // Downsample the path points for frontend display.
-    // Angle threshold is about 5.72 degree.
-    constexpr double angle_threshold = 0.1;
-    std::vector<int> sampled_indices =
-        DownsampleByAngle(path.path_points(), angle_threshold);
+    auto sampled_indices =
+        DownsampleByAngle(path.path_points(), kAngleThreshold);
 
     route_paths_.emplace_back();
     RoutePath *route_path = &route_paths_.back();
@@ -914,6 +918,24 @@ void SimulationWorldService::RegisterMessageCallbacks() {
       &SimulationWorldService::UpdateSimulationWorld, this);
   AdapterManager::AddRoutingResponseCallback(
       &SimulationWorldService::UpdateSimulationWorld, this);
+}
+
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const ControlCommand &control_command) {
+  auto *control_data = world_.mutable_control_data();
+  control_data->set_timestamp_sec(control_command.header().timestamp_sec());
+
+  if (control_command.has_debug()) {
+    auto &debug = control_command.debug();
+    if (debug.has_simple_lon_debug() &&
+        debug.simple_lon_debug().has_station_error()) {
+      control_data->set_station_error(debug.simple_lon_debug().station_error());
+    } else if (debug.has_simple_mpc_debug() &&
+               debug.simple_mpc_debug().has_station_error()) {
+      control_data->set_station_error(debug.simple_mpc_debug().station_error());
+    }
+  }
 }
 
 }  // namespace dreamview

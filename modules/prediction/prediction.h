@@ -28,6 +28,7 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/prediction/prediction_interface.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 
@@ -78,9 +79,17 @@ class Prediction : public PredictionInterface {
  private:
   common::Status OnError(const std::string &error_msg);
 
+  void PredictOnHDMap(
+      const perception::PerceptionObstacles &perception_obstacles);
+
+  void PredictOnNavigation(
+      const perception::PerceptionObstacles &perception_obstacles);
+
   void OnLocalization(const localization::LocalizationEstimate &localization);
 
   void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
+
+  void OnRelativeMap(const relative_map::MapMsg& relative_map);
 
   bool IsValidTrajectoryPoint(
       const ::apollo::common::TrajectoryPoint &trajectory_point);

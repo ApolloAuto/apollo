@@ -21,8 +21,14 @@ namespace apollo {
 namespace hdmap {
 
 int HDMap::LoadMapFromFile(const std::string& map_filename) {
-  AINFO << "Loading HDMap: " << map_filename << "...";
+  AINFO << "Loading HDMap: " << map_filename << " ...";
   return impl_.LoadMapFromFile(map_filename);
+}
+
+int HDMap::LoadMapFromProto(const Map& map_proto) {
+  AINFO << "Loading HDMap with header: "
+        << map_proto.header().ShortDebugString();
+  return impl_.LoadMapFromProto(map_proto);
 }
 
 LaneInfoConstPtr HDMap::GetLaneById(const Id& id) const {

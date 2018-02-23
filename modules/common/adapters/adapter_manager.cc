@@ -31,9 +31,7 @@ void AdapterManager::Observe() {
   }
 }
 
-bool AdapterManager::Initialized() {
-  return instance()->initialized_;
-}
+bool AdapterManager::Initialized() { return instance()->initialized_; }
 
 void AdapterManager::Reset() {
   instance()->initialized_ = false;
@@ -169,6 +167,12 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::LOCALIZATION_MSF_STATUS:
         EnableLocalizationMsfStatus(FLAGS_localization_msf_status, config);
+        break;
+      case AdapterConfig::RELATIVE_MAP:
+        EnableRelativeMap(FLAGS_relative_map_topic, config);
+        break;
+      case AdapterConfig::NAVIGATION:
+        EnableNavigation(FLAGS_navigation_topic, config);
         break;
       default:
         AERROR << "Unknown adapter config type!";

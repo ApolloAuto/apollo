@@ -11,18 +11,19 @@ cc_library(
     hdrs = [
         "hdmap_struct.h",
         "object.h",
-        "types.h",
         "object_supplement.h",
+        "types.h",
     ],
     deps = [
         "//modules/common",
-        "//modules/common/util:string_util",
         "//modules/common/proto:error_code_proto",
+        "//modules/common/util:string_util",
         "//modules/perception/common:perception_common",
-        "//modules/perception/lib/pcl_util",
         "//modules/perception/lib/base",
+        "//modules/perception/lib/pcl_util",
         "//modules/perception/proto:perception_proto",
-        "@eigen//:eigen",
+        "@eigen",
+        "@opencv2//:core",
     ],
 )
 

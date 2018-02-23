@@ -8,6 +8,7 @@ cc_library(
         ":aabox2d",
         ":aaboxkdtree2d",
         ":angle",
+        ":cartesian_frenet_conversion",
         ":box2d",
         ":euler_angles_zxy",
         ":factorial",
@@ -210,7 +211,6 @@ cc_library(
 cc_library(
     name = "polygon2d",
     srcs = [
-        "box2d.cc",
         "polygon2d.cc",
     ],
     hdrs = [
@@ -248,6 +248,7 @@ cc_library(
     ],
     deps = [
         ":math_utils",
+        "//modules/common/proto:pnc_point_proto",
     ],
 )
 
@@ -290,6 +291,22 @@ cc_library(
         "//modules/common:log",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
+        "@eigen//:eigen",
+    ],
+)
+
+cc_library(
+    name = "cartesian_frenet_conversion",
+    srcs = [
+        "cartesian_frenet_conversion.cc",
+    ],
+    hdrs = [
+        "cartesian_frenet_conversion.h",
+    ],
+    deps = [
+        "//modules/common:log",
+        "//modules/common/math:math_utils",
+        "//modules/common/math:vec2d",
         "@eigen//:eigen",
     ],
 )
@@ -468,6 +485,18 @@ cc_test(
     ],
     deps = [
         ":kalman_filter",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "cartesian_frenet_conversion_test",
+    size = "small",
+    srcs = [
+        "cartesian_frenet_conversion_test.cc",
+    ],
+    deps = [
+        ":cartesian_frenet_conversion",
         "@gtest//:main",
     ],
 )

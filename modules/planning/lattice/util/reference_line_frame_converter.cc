@@ -19,8 +19,7 @@
  **/
 
 #include "modules/planning/lattice/util/reference_line_frame_converter.h"
-
-#include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
+#include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/planning/lattice/util/reference_line_matcher.h"
 
 namespace apollo {
@@ -29,20 +28,18 @@ namespace planning {
 std::pair<double, double> ReferenceLineFrameConverter::CartesianToFrenet(
     const std::vector<common::PathPoint>& discretized_reference_line,
     const double x, const double y) {
-
   auto matched_point = ReferenceLineMatcher::MatchToReferenceLine(
       discretized_reference_line, x, y);
 
   double s = 0.0;
   double d = 0.0;
 
-  CartesianFrenetConverter::cartesian_to_frenet(matched_point.s(),
-      matched_point.x(), matched_point.y(), matched_point.theta(), x, y, &s,
-      &d);
+  CartesianFrenetConverter::cartesian_to_frenet(
+      matched_point.s(), matched_point.x(), matched_point.y(),
+      matched_point.theta(), x, y, &s, &d);
 
   return std::pair<double, double>(s, d);
 }
 
 }  // namespace planning
 }  // namespace apollo
-

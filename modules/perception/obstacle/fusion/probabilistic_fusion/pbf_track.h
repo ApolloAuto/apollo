@@ -154,7 +154,8 @@ class PbfTrack {
   // radar confidant regions
   static double s_max_radar_confident_angle_;
   static double s_min_radar_confident_distance_;
-  static std::string s_motion_fusion_method_;
+  static char *s_motion_fusion_method_;
+
   // publish conditions
   static bool s_publish_if_has_lidar_;
   static bool s_publish_if_has_radar_;
