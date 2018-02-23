@@ -41,7 +41,6 @@ class ConditionFilter {
  public:
   ConditionFilter(
       const std::array<double, 3>& init_s, const double speed_limit,
-      std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line,
       std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
       std::shared_ptr<PredictionQuerier> ptr_prediction_obstacles);
 
@@ -57,8 +56,6 @@ class ConditionFilter {
   std::array<double, 3> init_s_;
 
   FeasibleRegion feasible_region_;
-
-  std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line_;
 
   std::shared_ptr<PathTimeGraph> ptr_path_time_graph_;
 

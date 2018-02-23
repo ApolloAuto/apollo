@@ -41,7 +41,6 @@ namespace planning {
 class BehaviorDecider {
  public:
   BehaviorDecider(
-      std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line,
       std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
       std::shared_ptr<PredictionQuerier> ptr_prediction_obstacles);
 
@@ -62,8 +61,6 @@ class BehaviorDecider {
       const common::TrajectoryPoint& init_planning_point,
       const ConditionFilter& condition_filter,
       ReferenceLineInfo* const reference_line_info);
-
-  std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line_;
 
   std::shared_ptr<PathTimeGraph> ptr_path_time_graph_;
 

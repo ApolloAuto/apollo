@@ -57,7 +57,9 @@ int LastIndexBefore(const prediction::Trajectory& trajectory, const double t) {
 }  // namespace
 
 PredictionQuerier::PredictionQuerier(
-    const std::vector<const Obstacle*>& obstacles) {
+    const std::vector<const Obstacle*>& obstacles,
+    std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line)
+    : ptr_reference_line_(ptr_reference_line) {
   for (const auto obstacle : obstacles) {
     if (id_obstacle_map_.find(obstacle->Id()) == id_obstacle_map_.end()) {
       id_obstacle_map_[obstacle->Id()] = obstacle;
@@ -74,7 +76,6 @@ std::vector<const Obstacle*> PredictionQuerier::GetObstacles() const {
 
 double PredictionQuerier::ProjectVelocityAlongReferenceLine(
     const std::string& obstacle_id,
-    const std::vector<common::PathPoint>& discretized_reference_line,
     const double s,
     const double t) const {
   CHECK(id_obstacle_map_.find(obstacle_id) != id_obstacle_map_.end());
@@ -109,7 +110,7 @@ double PredictionQuerier::ProjectVelocityAlongReferenceLine(
   double v_x = v * std::cos(heading);
   double v_y = v * std::sin(heading);
   common::PathPoint obstacle_point_on_ref_line =
-      ReferenceLineMatcher::MatchToReferenceLine(discretized_reference_line, s);
+      ReferenceLineMatcher::MatchToReferenceLine(*ptr_reference_line_, s);
   double ref_theta = obstacle_point_on_ref_line.theta();
 
   return std::cos(ref_theta) * v_x + std::sin(ref_theta) * v_y;

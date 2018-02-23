@@ -41,20 +41,14 @@ class EndConditionSampler {
 
   virtual ~EndConditionSampler();
 
-  std::vector<std::pair<std::array<double, 3>, double>> SampleLatEndConditions()
-      const;
+  std::vector<std::pair<std::array<double, 3>, double>>
+  SampleLatEndConditions() const;
 
   std::vector<std::pair<std::array<double, 3>, double>>
   SampleLonEndConditionsForCruising(const double ref_cruise_speed) const;
 
   std::vector<std::pair<std::array<double, 3>, double>>
   SampleLonEndConditionsForStopping(const double ref_stop_point) const;
-
-  /**
-  std::vector<std::pair<std::array<double, 3>, double>>
-  SampleLonEndConditionsForPathTimeBounds(
-      const PlanningTarget& planning_target) const;
-  **/
 
   std::vector<std::pair<std::array<double, 3>, double>>
   SampleLonEndConditionsForPathTimePoints(
