@@ -7,7 +7,7 @@ cc_library(
     srcs = [],
     hdrs = glob(["*.h"]),
     deps = [
-        "//modules/perception/lib/base",
+        "//modules/perception/lib/base:base",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/camera/common:perception_obstacle_camera_common",
         "@eigen"
