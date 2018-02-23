@@ -97,11 +97,11 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common/math:linear_interpolation",
+        "//modules/common/math:path_matcher",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/lattice/util:reference_line_matcher",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/reference_line",
         "@glog",
@@ -136,8 +136,8 @@ cc_library(
     ],
     deps = [
         "//modules/common/math:math",
+        "//modules/common/math:path_matcher",
         "//modules/planning/common:obstacle",
-        "//modules/planning/lattice/util:reference_line_matcher",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/proto:planning_proto",
     ],

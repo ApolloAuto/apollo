@@ -181,6 +181,20 @@ cc_library(
     ],
 )
 
+cc_library(
+    name= "path_matcher",
+    srcs = [
+        "path_matcher.cc",
+    ],
+    hdrs = [
+        "path_matcher.h",
+    ],
+    deps = [
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/math:linear_interpolation",
+    ],
+)
+
 cc_test(
     name = "angle_test",
     size = "small",

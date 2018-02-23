@@ -86,11 +86,11 @@ cc_library(
     ],
     deps = [
         "//modules/common",
+        "//modules/common/math:path_matcher",
+        "//modules/common/math:cartesian_frenet_conversion",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/planning/lattice/util:reference_line_matcher",
         "//modules/planning/math/curve1d",
-        "//modules/common/math:cartesian_frenet_conversion",
     ],
 )
 
