@@ -36,10 +36,14 @@ using apollo::common::math::lerp;
 
 ConditionFilter::ConditionFilter(
     const std::array<double, 3>& init_s, const double speed_limit,
-    std::shared_ptr<PathTimeGraph> path_time_graph)
+    std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line,
+    std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
+    std::shared_ptr<PredictionQuerier> ptr_prediction_obstacles)
     : init_s_(init_s),
       feasible_region_(init_s, speed_limit),
-      ptr_path_time_graph_(path_time_graph) {}
+      ptr_reference_line_(ptr_reference_line),
+      ptr_path_time_graph_(ptr_path_time_graph),
+      ptr_prediction_obstacles_(ptr_prediction_obstacles) {}
 
 std::vector<SamplePoint>
 ConditionFilter::QueryPathTimeObstacleSamplePoints() const {
@@ -52,7 +56,8 @@ ConditionFilter::QueryPathTimeObstacleSamplePoints() const {
         ptr_path_time_graph_->GetObstacleSurroundingPoints(
             obstacle_id, FLAGS_lattice_epsilon, FLAGS_time_min_density);
     for (const PathTimePoint& path_time_point : overtake_path_time_points) {
-      double v = ptr_path_time_graph_->SpeedAtT(obstacle_id,
+      double v = ptr_prediction_obstacles_->ProjectVelocityAlongReferenceLine(
+          obstacle_id, *ptr_reference_line_,
           path_time_point.s(), path_time_point.t());
       SamplePoint sample_point;
       sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
@@ -65,7 +70,8 @@ ConditionFilter::QueryPathTimeObstacleSamplePoints() const {
         ptr_path_time_graph_->GetObstacleSurroundingPoints(
             obstacle_id, -FLAGS_lattice_epsilon, FLAGS_time_min_density);
     for (const PathTimePoint& path_time_point : follow_path_time_points) {
-      double v = ptr_path_time_graph_->SpeedAtT(obstacle_id,
+      double v = ptr_prediction_obstacles_->ProjectVelocityAlongReferenceLine(
+          obstacle_id, *ptr_reference_line_,
           path_time_point.s(), path_time_point.t());
       SamplePoint sample_point;
       sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
