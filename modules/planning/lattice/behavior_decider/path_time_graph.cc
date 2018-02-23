@@ -47,12 +47,19 @@ PathTimeGraph::PathTimeGraph(
     const double s_start,
     const double s_end,
     const double t_start,
-    const double t_end) {
+    const double t_end,
+    const double path_width) {
+  CHECK(s_start < s_end);
+  CHECK(t_start < t_end);
+  CHECK(path_width > 0.0);
+
   path_range_.first = s_start;
   path_range_.second = s_end;
 
   time_range_.first = t_start;
   time_range_.second = t_end;
+
+  half_path_width_ = path_width * 0.5;
 
   SetupObstacles(obstacles, discretized_ref_points);
 }
@@ -88,7 +95,6 @@ SLBoundary PathTimeGraph::ComputeObstacleBoundary(
 void PathTimeGraph::SetupObstacles(
     const std::vector<const Obstacle*>& obstacles,
     const std::vector<PathPoint>& discretized_ref_points) {
-  double half_lane_width = FLAGS_default_reference_line_width * 0.5;
   for (const Obstacle* obstacle : obstacles) {
     if (!obstacle->HasTrajectory()) {
       SetStaticObstacle(obstacle, discretized_ref_points);
@@ -105,8 +111,8 @@ void PathTimeGraph::SetupObstacles(
       // the obstacle is not shown on the region to be considered.
       if (sl_boundary.end_s() < path_range_.first ||
           sl_boundary.start_s() > path_range_.second ||
-          (sl_boundary.start_l() > half_lane_width &&
-           sl_boundary.end_l() < -half_lane_width)) {
+          (sl_boundary.start_l() > half_path_width_ &&
+           sl_boundary.end_l() < -half_path_width_)) {
         if (path_time_obstacle_map_.find(obstacle->Id()) !=
             path_time_obstacle_map_.end()) {
           break;
