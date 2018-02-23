@@ -41,44 +41,19 @@ using apollo::common::math::Box2d;
 using apollo::perception::PerceptionObstacle;
 using apollo::common::math::lerp;
 
-namespace {
-
-int LastIndexBefore(const prediction::Trajectory& trajectory, const double t) {
-  int num_traj_point = trajectory.trajectory_point_size();
-  if (num_traj_point == 0) {
-    return -1;
-  }
-  if (trajectory.trajectory_point(0).relative_time() > t) {
-    return 0;
-  }
-  int start = 0;
-  int end = num_traj_point - 1;
-  while (start + 1 < end) {
-    int mid = start + (end - start) / 2;
-    if (trajectory.trajectory_point(mid).relative_time() <= t) {
-      start = mid;
-    } else {
-      end = mid;
-    }
-  }
-  if (trajectory.trajectory_point(end).relative_time() <= t) {
-    return end;
-  }
-  return start;
-}
-
-}  // namespace
-
 PathTimeGraph::PathTimeGraph(
-    const std::vector<const Obstacle*>& obstacles, const double ego_s,
-    const std::vector<PathPoint>& discretized_ref_points) {
-  path_range_.first = ego_s;
-  path_range_.second = ego_s + FLAGS_decision_horizon;
+    const std::vector<const Obstacle*>& obstacles,
+    const std::vector<PathPoint>& discretized_ref_points,
+    const double s_start,
+    const double s_end,
+    const double t_start,
+    const double t_end) {
+  path_range_.first = s_start;
+  path_range_.second = s_end;
 
-  time_range_.first = 0.0;
-  time_range_.second = FLAGS_trajectory_time_length;
+  time_range_.first = t_start;
+  time_range_.second = t_end;
 
-  discretized_ref_points_ = discretized_ref_points;
   SetupObstacles(obstacles, discretized_ref_points);
 }
 
@@ -115,15 +90,8 @@ void PathTimeGraph::SetupObstacles(
     const std::vector<PathPoint>& discretized_ref_points) {
   double half_lane_width = FLAGS_default_reference_line_width * 0.5;
   for (const Obstacle* obstacle : obstacles) {
-    if (prediction_traj_map_.find(obstacle->Id()) ==
-        prediction_traj_map_.end()) {
-      prediction_traj_map_[obstacle->Id()] = obstacle->Trajectory();
-    } else {
-      AWARN << "Duplicated obstacle found [" << obstacle->Id() << "]";
-    }
-
     if (!obstacle->HasTrajectory()) {
-      SetStaticPathTimeObstacle(obstacle, discretized_ref_points);
+      SetStaticObstacle(obstacle, discretized_ref_points);
       continue;
     }
 
@@ -200,7 +168,7 @@ void PathTimeGraph::SetupObstacles(
   }
 }
 
-void PathTimeGraph::SetStaticPathTimeObstacle(
+void PathTimeGraph::SetStaticObstacle(
     const Obstacle* obstacle,
     const std::vector<PathPoint>& discretized_ref_points) {
   TrajectoryPoint start_point = obstacle->GetPointAtTime(0.0);
@@ -220,51 +188,6 @@ void PathTimeGraph::SetStaticPathTimeObstacle(
   path_time_obstacle_map_[obstacle_id].mutable_upper_right()->CopyFrom(
       SetPathTimePoint(obstacle_id, sl_boundary.end_s(),
                        FLAGS_trajectory_time_length));
-}
-
-double PathTimeGraph::SpeedAtT(const std::string& obstacle_id, const double s,
-                               const double t) const {
-  bool found =
-      prediction_traj_map_.find(obstacle_id) != prediction_traj_map_.end();
-  CHECK(found);
-  CHECK_GE(t, 0.0);
-  auto it_trajectory = prediction_traj_map_.find(obstacle_id);
-  CHECK(it_trajectory != prediction_traj_map_.end());
-
-  const prediction::Trajectory& trajectory = it_trajectory->second;
-  int num_traj_point = trajectory.trajectory_point_size();
-  if (num_traj_point < 2) {
-    return 0.0;
-  }
-
-  int curr_index = LastIndexBefore(trajectory, t);
-  int next_index = curr_index + 1;
-  double heading = trajectory.trajectory_point(curr_index).path_point().theta();
-
-  if (curr_index == num_traj_point - 1) {
-    curr_index = num_traj_point - 2;
-    next_index = num_traj_point - 1;
-  }
-
-  double v_curr = trajectory.trajectory_point(curr_index).v();
-  double t_curr = trajectory.trajectory_point(curr_index).relative_time();
-  double x_curr = trajectory.trajectory_point(curr_index).path_point().x();
-  double y_curr = trajectory.trajectory_point(curr_index).path_point().y();
-  double v_next = trajectory.trajectory_point(next_index).v();
-  double t_next = trajectory.trajectory_point(next_index).relative_time();
-  double x_next = trajectory.trajectory_point(next_index).path_point().x();
-  double y_next = trajectory.trajectory_point(next_index).path_point().y();
-  double v = apollo::common::math::lerp(v_curr, t_curr, v_next, t_next, t);
-  if (std::abs(x_next - x_curr) > 0.1 && std::abs(y_next - y_curr) > 0.1) {
-    heading = std::atan2(y_next - y_curr, x_next - x_curr);
-  }
-  double v_x = v * std::cos(heading);
-  double v_y = v * std::sin(heading);
-  PathPoint obstacle_point_on_ref_line =
-      ReferenceLineMatcher::MatchToReferenceLine(discretized_ref_points_, s);
-  double ref_theta = obstacle_point_on_ref_line.theta();
-
-  return std::cos(ref_theta) * v_x + std::sin(ref_theta) * v_y;
 }
 
 PathTimePoint PathTimeGraph::SetPathTimePoint(const std::string& obstacle_id,
@@ -300,13 +223,15 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetPathBlockingIntervals(
     if (t > pt_obstacle.time_upper() || t < pt_obstacle.time_lower()) {
       continue;
     }
-    double s_upper = common::math::lerp(
-        pt_obstacle.upper_left().s(), pt_obstacle.upper_left().t(),
-        pt_obstacle.upper_right().s(), pt_obstacle.upper_right().t(), t);
+    double s_upper = lerp(pt_obstacle.upper_left().s(),
+                          pt_obstacle.upper_left().t(),
+                          pt_obstacle.upper_right().s(),
+                          pt_obstacle.upper_right().t(), t);
 
-    double s_lower = common::math::lerp(
-        pt_obstacle.bottom_left().s(), pt_obstacle.bottom_left().t(),
-        pt_obstacle.bottom_right().s(), pt_obstacle.bottom_right().t(), t);
+    double s_lower = lerp(pt_obstacle.bottom_left().s(),
+                          pt_obstacle.bottom_left().t(),
+                          pt_obstacle.bottom_right().s(),
+                          pt_obstacle.bottom_right().t(), t);
 
     intervals.emplace_back(s_lower, s_upper);
   }
