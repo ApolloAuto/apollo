@@ -164,14 +164,13 @@ Status LatticePlanner::PlanOnReferenceLine(
   auto ptr_path_time_graph = std::make_shared<PathTimeGraph>(
       ptr_prediction_querier->GetObstacles(), *ptr_reference_line,
       init_s[0], init_s[0] + FLAGS_decision_horizon,
-      0.0, FLAGS_trajectory_time_length);
+      0.0, FLAGS_trajectory_time_length, FLAGS_default_reference_line_width);
 
   BehaviorDecider behavior_decider(ptr_path_time_graph,
                                    ptr_prediction_querier);
 
   PlanningTarget planning_target = behavior_decider.Analyze(frame,
-      reference_line_info, planning_init_point, init_s,
-      *ptr_reference_line);
+      reference_line_info, planning_init_point, init_s, *ptr_reference_line);
 
   ADEBUG << "Decision_Time = " << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
