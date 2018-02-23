@@ -61,7 +61,7 @@ class EndConditionSampler {
 
   double s_dot_limit_;
 
-  FeasibleRegion* ptr_feasible_region_;
+  FeasibleRegion feasible_region_;
 };
 
 }  // namespace planning
