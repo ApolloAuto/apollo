@@ -20,8 +20,11 @@
 
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 
+#include <cmath>
+
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -89,23 +92,26 @@ double QuinticPolynomialCurve1d::Evaluate(const uint32_t order,
 void QuinticPolynomialCurve1d::ComputeCoefficients(
     const double x0, const double dx0, const double ddx0, const double x1,
     const double dx1, const double ddx1, const double p) {
-  CHECK_GT(p, 0.0);
+  if (p < -FLAGS_lattice_epsilon) {
+    AERROR << "Negative parameter p = " << p;
+  }
 
   coef_[0] = x0;
   coef_[1] = dx0;
   coef_[2] = ddx0 / 2.0;
 
-  const double p2 = p * p;
-  const double p3 = p * p2;
+  const double p1 = std::abs(p);
+  const double p2 = p1 * p1;
+  const double p3 = p1 * p2;
 
   // the direct analytical method is at least 6 times faster than using matrix
   // inversion.
-  const double c0 = (x1 - 0.5 * p2 * ddx0 - dx0 * p - x0) / p3;
-  const double c1 = (dx1 - ddx0 * p - dx0) / p2;
-  const double c2 = (ddx1 - ddx0) / p;
+  const double c0 = (x1 - 0.5 * p2 * ddx0 - dx0 * p1 - x0) / p3;
+  const double c1 = (dx1 - ddx0 * p1 - dx0) / p2;
+  const double c2 = (ddx1 - ddx0) / p1;
 
   coef_[3] = 0.5 * (20.0 * c0 - 8.0 * c1 + c2);
-  coef_[4] = (-15.0 * c0 + 7.0 * c1 - c2) / p;
+  coef_[4] = (-15.0 * c0 + 7.0 * c1 - c2) / p1;
   coef_[5] = (6.0 * c0 - 3.0 * c1 + 0.5 * c2) / p2;
 }
 
