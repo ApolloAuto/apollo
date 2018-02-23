@@ -1,0 +1,31 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build the appolo project",
+            "type": "shell",
+            // you can change the "build" option to others acording to the "apollo.sh" file
+            "command": "bash dev_build.sh build",
+            "group": {
+                "kind": "build",
+                "isDefault": true // default building task invoked by "Ctrl+Shift+B"
+            },
+            // format the error message
+            "problemMatcher": {
+                "owner": "cc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        }
+    ]
+}
