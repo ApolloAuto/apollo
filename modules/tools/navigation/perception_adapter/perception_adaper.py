@@ -54,7 +54,7 @@ def mobileye_callback(mobileye_pb):
         mobileye_pb.lka_767.view_range
 
     perception_pb.lane_marker.right_lane_marker.lane_type = \
-        lane_type_mapper.get(mobileye_pb.lka_766.lane_type,
+        lane_type_mapper.get(mobileye_pb.lka_768.lane_type,
                              perception_obstacle_pb2.LaneMarker.LANE_TYPE_UNKNOWN)
     perception_pb.lane_marker.right_lane_marker.quality = \
         mobileye_pb.lka_768.quality / 4.0
