@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/math:linear_interpolation",
         "//modules/planning/common:planning_common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math:hermite_spline",

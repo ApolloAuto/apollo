@@ -24,6 +24,7 @@
 #include <utility>
 
 #include "modules/common/log.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/planning/common/planning_util.h"
 
 namespace apollo {
@@ -69,8 +70,8 @@ common::PathPoint DiscretizedPath::EvaluateUsingLinearApproximation(
   if (it_lower == path_points_.end()) {
     return path_points_.back();
   }
-  return util::InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower,
-                                                   path_s);
+  return common::math::InterpolateUsingLinearApproximation(
+      *(it_lower - 1), *it_lower, path_s);
 }
 
 const std::vector<common::PathPoint> &DiscretizedPath::path_points() const {
