@@ -78,10 +78,9 @@ void ReferenceLineProvider::RegisterSmoothers() {
 ReferenceLineProvider::ReferenceLineProvider(
     const hdmap::HDMap *base_map,
     PlanningConfig::ReferenceLineSmootherType smoother_type) {
-  if (!base_map || FLAGS_use_navigation_mode) {
-    return;
+  if (!FLAGS_use_navigation_mode) {
+    pnc_map_.reset(new hdmap::PncMap(base_map));
   }
-  pnc_map_.reset(new hdmap::PncMap(base_map));
   if (s_smoother_factory_.Empty()) {
     RegisterSmoothers();
   }
