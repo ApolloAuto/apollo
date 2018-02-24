@@ -690,6 +690,18 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   }
 }
 
+void SimulationWorldService::DownsamplePath(
+    const apollo::common::Path &path, apollo::common::Path *downsampled_path) {
+  auto sampled_indices = DownsampleByAngle(path.path_point(), kAngleThreshold);
+
+  downsampled_path->set_name(path.name());
+  for (int index : sampled_indices) {
+    const auto &path_point = path.path_point()[index];
+    auto *point = downsampled_path->add_path_point();
+    point->CopyFrom(path_point);
+  }
+}
+
 void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   auto *planning_data = world_.mutable_planning_data();
 
@@ -758,17 +770,7 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   // Update path
   planning_data->clear_path();
   for (auto &path : data.path()) {
-    // Downsample the path points for frontend display.
-    auto sampled_indices =
-        DownsampleByAngle(path.path_point(), kAngleThreshold);
-
-    auto *downsampled_path = planning_data->add_path();
-    downsampled_path->set_name(path.name());
-    for (int index : sampled_indices) {
-      const auto &path_point = path.path_point()[index];
-      auto *point = downsampled_path->add_path_point();
-      point->CopyFrom(path_point);
-    }
+    DownsamplePath(path, planning_data->add_path());
   }
 }
 
@@ -946,18 +948,7 @@ void SimulationWorldService::UpdateSimulationWorld(
   world_.clear_navigation_path();
   for (auto &navigation_path : navigation_info.navigation_path()) {
     if (navigation_path.has_path()) {
-      auto &path = navigation_path.path();
-
-      // Downsample the path points for frontend display.
-      auto sampled_indices =
-          DownsampleByAngle(path.path_point(), kAngleThreshold);
-
-      auto *downsampled_path = world_.add_navigation_path();
-      for (int index : sampled_indices) {
-        const auto &path_point = path.path_point()[index];
-        auto *point = downsampled_path->add_path_point();
-        point->CopyFrom(path_point);
-      }
+      DownsamplePath(navigation_path.path(), world_.add_navigation_path());
     }
   }
 }
