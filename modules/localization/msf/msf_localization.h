@@ -87,7 +87,10 @@ class MSFLocalization : public LocalizationBase {
                                 double *offset_y, double *offset_z,
                                 double *uncertainty_x, double *uncertainty_y,
                                 double *uncertainty_z);
-  bool LoadZoneIdFromFile(const std::string &folder_path, int *zone_id);
+  bool LoadImuVehicleExtrinsic(const std::string &file_path,
+                                double *quat_qx, double *quat_qy,
+                                double *quat_qz, double *quat_qw);
+  bool LoadZoneIdFromFolder(const std::string &folder_path, int *zone_id);
 
  private:
   apollo::common::monitor::MonitorLogger monitor_logger_;
