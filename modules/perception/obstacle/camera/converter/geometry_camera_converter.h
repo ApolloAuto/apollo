@@ -21,14 +21,13 @@
 
 #include <yaml-cpp/yaml.h>
 #include <Eigen/Geometry>
+#include <opencv2/opencv.hpp>
 
 #include <algorithm>
 #include <cmath>
 #include <limits>
 #include <string>
 #include <vector>
-
-#include <opencv2/opencv.hpp>
 
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/common/camera.h"

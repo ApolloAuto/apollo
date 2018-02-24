@@ -20,11 +20,10 @@
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_TRACKER_H_
 
 #include <Eigen/Core>
+#include <opencv2/opencv.hpp>
 
 #include <string>
 #include <vector>
-
-#include <opencv2/opencv.hpp>
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
