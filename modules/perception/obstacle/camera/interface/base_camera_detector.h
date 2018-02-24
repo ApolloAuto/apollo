@@ -19,11 +19,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_DETECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_DETECTOR_H_
 
+#include <Eigen/Core>
+#include <opencv2/opencv.hpp>
+
 #include <string>
 #include <vector>
-
-#include "Eigen/Core"
-#include "opencv2/opencv.hpp"
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
@@ -37,24 +37,24 @@ class BaseCameraDetector {
   BaseCameraDetector() {}
   virtual ~BaseCameraDetector() {}
 
-  virtual bool init() = 0;
+  virtual bool Init() = 0;
 
   // @brief: Object detection on image from camera
   // @param [in]: image frame from camera
   // @param [in/out]: detected objects
-  virtual bool detect(const cv::Mat& frame,
+  virtual bool Detect(const cv::Mat& frame,
                       std::vector<VisualObjectPtr>* objects) = 0;
 
-  virtual bool multitask(const cv::Mat& frame,
+  virtual bool Multitask(const cv::Mat& frame,
                          std::vector<VisualObjectPtr>* objects, cv::Mat* mask) {
     return true;
   }
 
   // @brief: Extract deep learning ROI features for each object
   // @param [in/out]: detected objects, with 2D bbox and its features
-  virtual bool extract(std::vector<VisualObjectPtr>* objects) = 0;
+  virtual bool Extract(std::vector<VisualObjectPtr>* objects) = 0;
 
-  virtual std::string name() const = 0;
+  virtual std::string Name() const = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseCameraDetector);
