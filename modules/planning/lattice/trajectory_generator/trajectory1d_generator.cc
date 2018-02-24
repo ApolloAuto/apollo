@@ -38,14 +38,15 @@ namespace planning {
 
 Trajectory1dGenerator::Trajectory1dGenerator(
     const std::array<double, 3>& lon_init_state,
-    const std::array<double, 3>& lat_init_state)
-    : init_lon_state_(lon_init_state), init_lat_state_(lat_init_state) {
-  end_condition_sampler_ = new EndConditionSampler(
-      lon_init_state, lat_init_state, FLAGS_planning_upper_speed_limit);
-}
-
-Trajectory1dGenerator::~Trajectory1dGenerator() {
-  delete end_condition_sampler_;
+    const std::array<double, 3>& lat_init_state,
+    std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
+    std::shared_ptr<PredictionQuerier> ptr_prediction_querier)
+    : init_lon_state_(lon_init_state),
+      init_lat_state_(lat_init_state),
+      end_condition_sampler_(lon_init_state, lat_init_state,
+                             FLAGS_planning_upper_speed_limit,
+                             ptr_path_time_graph,
+                             ptr_prediction_querier) {
 }
 
 void Trajectory1dGenerator::GenerateTrajectoryBundles(
@@ -64,7 +65,7 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
   ADEBUG << "cruise speed is  " << target_speed;
   auto end_conditions =
-      end_condition_sampler_->SampleLonEndConditionsForCruising(target_speed);
+      end_condition_sampler_.SampleLonEndConditionsForCruising(target_speed);
 
   for (const auto& end_condition : end_conditions) {
     // Only the last two elements in the end_condition are useful.
@@ -88,7 +89,7 @@ void Trajectory1dGenerator::GenerateSpeedProfileForStopping(
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
   ADEBUG << "stop point is " << stop_point;
   auto end_conditions =
-      end_condition_sampler_->SampleLonEndConditionsForStopping(stop_point);
+      end_condition_sampler_.SampleLonEndConditionsForStopping(stop_point);
 
   for (const auto& end_condition : end_conditions) {
     std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(
@@ -102,35 +103,11 @@ void Trajectory1dGenerator::GenerateSpeedProfileForStopping(
     ptr_lon_trajectory_bundle->push_back(lattice_traj_ptr);
   }
 }
-
-/**
-void Trajectory1dGenerator::GenerateSpeedProfilesForPathTimeBound(
-    const PlanningTarget& planning_target,
-    std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
-  std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
-      end_condition_sampler_->SampleLonEndConditionsForPathTimeBounds(
-          planning_target);
-
-  for (const auto& end_condition : end_conditions) {
-    std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(
-        new LatticeTrajectory1d(
-            std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
-                init_lon_state_, end_condition.first, end_condition.second))));
-
-    lattice_traj_ptr->set_target_position(end_condition.first[0]);
-    lattice_traj_ptr->set_target_velocity(end_condition.first[1]);
-    lattice_traj_ptr->set_target_time(end_condition.second);
-    ptr_lon_trajectory_bundle->push_back(lattice_traj_ptr);
-  }
-}
-**/
 
 void Trajectory1dGenerator::GenerateSpeedProfilesForPathTimeObstacles(
-    const PlanningTarget& planning_target,
     std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const {
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
-      end_condition_sampler_->SampleLonEndConditionsForPathTimePoints(
-          planning_target);
+      end_condition_sampler_.SampleLonEndConditionsForPathTimePoints();
 
   for (const auto& end_condition : end_conditions) {
     std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(
@@ -152,11 +129,7 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
   GenerateSpeedProfilesForCruising(planning_target.cruise_speed(),
                                    ptr_lon_trajectory_bundle);
 
-  // GenerateSpeedProfilesForPathTimeBound(planning_target,
-  //                                       ptr_lon_trajectory_bundle);
-
-  GenerateSpeedProfilesForPathTimeObstacles(planning_target,
-                                         ptr_lon_trajectory_bundle);
+  GenerateSpeedProfilesForPathTimeObstacles(ptr_lon_trajectory_bundle);
 
   if (planning_target.has_stop_point()) {
     GenerateSpeedProfileForStopping(planning_target.stop_point().s(),
@@ -167,7 +140,7 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
 void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
     std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) const {
   std::vector<std::pair<std::array<double, 3>, double>> end_conditions =
-      end_condition_sampler_->SampleLatEndConditions();
+      end_condition_sampler_.SampleLatEndConditions();
 
   for (const auto& end_condition : end_conditions) {
     std::shared_ptr<LatticeTrajectory1d> lattice_traj_ptr(

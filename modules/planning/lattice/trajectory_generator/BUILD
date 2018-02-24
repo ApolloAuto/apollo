@@ -14,6 +14,8 @@ cc_library(
         "//modules/common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/behavior_decider:feasible_region",
+        "//modules/planning/lattice/behavior_decider:path_time_graph",
+        "//modules/planning/lattice/behavior_decider:prediction_querier",
         "//modules/planning/proto:lattice_structure_proto",
     ],
 )
@@ -29,6 +31,8 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/lattice/behavior_decider:path_time_graph",
+        "//modules/planning/lattice/behavior_decider:prediction_querier",
         "//modules/planning/lattice/trajectory1d:lattice_trajectory1d",
         "//modules/planning/lattice/trajectory_generator:end_condition_sampler",
         "//modules/planning/lattice/util:lattice_trajectory1d",
