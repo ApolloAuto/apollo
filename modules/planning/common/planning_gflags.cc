@@ -292,9 +292,12 @@ DEFINE_double(stop_sign_min_pass_distance, 3.0,
               "have passed stop sign (stop_line_end_s)");
 DEFINE_double(stop_sign_stop_distance, 1.0,
               "stop distance from stop line of stop sign");
-DEFINE_double(stop_sign_max_watch_vehicle_stop_speed, 0.5,
-              "max speed(m/s) for watch vehicles to be considered as a stop."
-              "(this check is looser than adc)");
+DEFINE_double(stop_sign_watch_vehicle_max_stop_speed, 0.5,
+              "max speed(m/s) for watch vehicles to be considered as "
+              " a valid stop.(this check is looser than adc)");
+DEFINE_double(stop_sign_watch_vehicle_max_stop_distance, 5.0,
+              "max stop distance for watch vehicles to be considered as "
+              " a valid stop.(this check is looser than adc)");
 
 DEFINE_bool(enable_sidepass, true,
             "True to enable side pass long stopping obstacles");
