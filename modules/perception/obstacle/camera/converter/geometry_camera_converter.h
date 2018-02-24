@@ -61,8 +61,7 @@ class GeometryCameraConverter : public BaseCameraConverter {
   bool ConvertSingle(const float &h, const float &w, const float &l,
                      const float &alpha_deg, const Eigen::Vector2f &upper_left,
                      const Eigen::Vector2f &lower_right, float *distance_w,
-                     float *distance_h,
-                     Eigen::Vector2f *mass_center_pixel);
+                     float *distance_h, Eigen::Vector2f *mass_center_pixel);
 
   void Rotate(const float &alpha_deg,
               std::vector<Eigen::Vector3f> *corners) const;

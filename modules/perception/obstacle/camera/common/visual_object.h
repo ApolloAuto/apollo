@@ -17,9 +17,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H
 
+#include <Eigen/Core>
 #include <memory>
 #include <vector>
-#include <Eigen/Core>
 
 #include "modules/perception/obstacle/base/types.h"
 

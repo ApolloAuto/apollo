@@ -45,9 +45,8 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
     float distance_w = 0.0;
     float distance_h = 0.0;
     Eigen::Vector2f mass_center_pixel = Eigen::Vector2f::Zero();
-    ConvertSingle(obj->height, obj->width, obj->length, deg_alpha,
-                  upper_left, lower_right, &distance_w, &distance_h,
-                  &mass_center_pixel);
+    ConvertSingle(obj->height, obj->width, obj->length, deg_alpha, upper_left,
+                  lower_right, &distance_w, &distance_h, &mass_center_pixel);
 
     // TODO(cheni-kuei) Choose distance_h or distance_w, considering
     // truncation, type, longer side, or strategy
@@ -72,20 +71,20 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
     obj->center = Eigen::Vector3f(
         camera_ray.x() * scale, camera_ray.y() * scale, camera_ray.z() * scale);
 
-     if (debug_) {
-        //  obj->pts8.clear();
-        //  for (size_t i = 0; i < corners_.size(); ++i) {
-        //      Eigen::Vector2d point_2d =
-        //      camera_model_.project(corners_[i] + obj->center);
-        //      obj->pts8.push_back(static_cast<float>(point_2d.x()));
-        //      obj->pts8.push_back(static_cast<float>(point_2d.y()));
-        //  }
-         //
-        //  // 3D center projection
-        //  Eigen::Vector2d point_2d = camera_model_.project(obj->center);
-        //  obj->pts8.push_back(static_cast<float>(point_2d.x()));
-        //  obj->pts8.push_back(static_cast<float>(point_2d.y()));
-     }
+    if (debug_) {
+      //  obj->pts8.clear();
+      //  for (size_t i = 0; i < corners_.size(); ++i) {
+      //      Eigen::Vector2d point_2d =
+      //      camera_model_.project(corners_[i] + obj->center);
+      //      obj->pts8.push_back(static_cast<float>(point_2d.x()));
+      //      obj->pts8.push_back(static_cast<float>(point_2d.y()));
+      //  }
+      //
+      //  // 3D center projection
+      //  Eigen::Vector2d point_2d = camera_model_.project(obj->center);
+      //  obj->pts8.push_back(static_cast<float>(point_2d.x()));
+      //  obj->pts8.push_back(static_cast<float>(point_2d.y()));
+    }
   }
 
   return true;
