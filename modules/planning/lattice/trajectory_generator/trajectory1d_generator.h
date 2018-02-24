@@ -25,6 +25,8 @@
 #include <vector>
 
 #include "modules/planning/lattice/trajectory_generator/end_condition_sampler.h"
+#include "modules/planning/lattice/behavior_decider/path_time_graph.h"
+#include "modules/planning/lattice/behavior_decider/prediction_querier.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 
@@ -33,10 +35,13 @@ namespace planning {
 
 class Trajectory1dGenerator {
  public:
-  Trajectory1dGenerator(const std::array<double, 3>& lon_init_state,
-                        const std::array<double, 3>& lat_init_state);
+  Trajectory1dGenerator(
+      const std::array<double, 3>& lon_init_state,
+      const std::array<double, 3>& lat_init_state,
+      std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
+      std::shared_ptr<PredictionQuerier> ptr_prediction_querier);
 
-  virtual ~Trajectory1dGenerator();
+  virtual ~Trajectory1dGenerator() = default;
 
   void GenerateTrajectoryBundles(
       const PlanningTarget& planning_target,
@@ -55,14 +60,7 @@ class Trajectory1dGenerator {
       const double stop_point,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
-  /**
-  void GenerateSpeedProfilesForPathTimeBound(
-      const PlanningTarget& planning_target,
-      std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
-      **/
-
   void GenerateSpeedProfilesForPathTimeObstacles(
-      const PlanningTarget& planning_target,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
   void GenerateLongitudinalTrajectoryBundle(
@@ -70,9 +68,9 @@ class Trajectory1dGenerator {
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
  private:
-  EndConditionSampler* end_condition_sampler_;
   std::array<double, 3> init_lon_state_;
   std::array<double, 3> init_lat_state_;
+  EndConditionSampler end_condition_sampler_;
 };
 
 }  // namespace planning
