@@ -5,7 +5,7 @@
             "label": "build the appolo project",
             "type": "shell",
             // you can change the "build" option to others acording to the "apollo.sh" file
-            "command": "bash dev_build.sh build",
+            "command": "bash apollo_docker.sh build",
             "group": {
                 "kind": "build",
                 "isDefault": true // default building task invoked by "Ctrl+Shift+B"
