@@ -40,16 +40,16 @@ namespace apollo {
 namespace perception {
 
 using apollo::common::adapter::AdapterManager;
+using Eigen::Affine3d;
+using Eigen::Matrix4d;
 using pcl_util::Point;
-using pcl_util::PointD;
 using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
+using pcl_util::PointD;
 using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
-using Eigen::Matrix4d;
-using Eigen::Affine3d;
-using std::string;
 using std::map;
+using std::string;
 
 bool LidarProcessSubnode::InitInternal() {
   if (inited_) {
@@ -367,7 +367,8 @@ void LidarProcessSubnode::TransPointCloudToPCL(
   size_t points_num = 0;
   for (size_t idx = 0; idx < in_cloud.size(); ++idx) {
     pcl_util::PointXYZIT& pt = in_cloud.points[idx];
-    if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z) && !isnan(pt.intensity)) {
+    if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z) &&
+        !std::isnan(pt.intensity)) {
       cloud->points[points_num].x = pt.x;
       cloud->points[points_num].y = pt.y;
       cloud->points[points_num].z = pt.z;

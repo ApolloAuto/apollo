@@ -30,6 +30,7 @@ cc_binary(
         ":lidar_ex_checker_lib",
         "//external:gflags",
         "//modules/common:log",
+        "@pcl//:pcl",
         "@ros//:ros_common",
     ],
 )

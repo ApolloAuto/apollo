@@ -333,7 +333,8 @@ void LidarProcess::TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
   size_t points_num = 0;
   for (size_t idx = 0; idx < in_cloud.size(); ++idx) {
     pcl_util::PointXYZIT& pt = in_cloud.points[idx];
-    if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z) && !isnan(pt.intensity)) {
+    if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z) &&
+        !std::isnan(pt.intensity)) {
       cloud->points[points_num].x = pt.x;
       cloud->points[points_num].y = pt.y;
       cloud->points[points_num].z = pt.z;
