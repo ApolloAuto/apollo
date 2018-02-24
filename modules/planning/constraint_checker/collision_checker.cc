@@ -26,8 +26,8 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
+#include "modules/common/math/path_matcher.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/lattice/util/reference_line_frame_converter.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
@@ -115,9 +115,8 @@ bool CollisionChecker::IsBehind(
   double half_lane_width = FLAGS_default_reference_line_width * 0.5;
   TrajectoryPoint point = obstacle->GetPointAtTime(0.0);
   std::pair<double, double> sl_point =
-      ReferenceLineFrameConverter::CartesianToFrenet(discretized_reference_line,
-                                                     point.path_point().x(),
-                                                     point.path_point().y());
+      PathMatcher::GetPathFrenetCoordinate(discretized_reference_line,
+          point.path_point().x(), point.path_point().y());
   if (sl_point.first < adc_init_s[0] &&
       std::abs(sl_point.second) < half_lane_width) {
     ADEBUG << "Ignore obstacle [" << obstacle->Id() << "]";
