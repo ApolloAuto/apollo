@@ -323,7 +323,8 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
           orientation.qw(), orientation.qx(),
           orientation.qy(), orientation.qz());
 
-      Eigen::Quaternion<double> quat_vehicle_world = quaternion * imu_vehicle_quat_;
+      Eigen::Quaternion<double> quat_vehicle_world = 
+          quaternion * imu_vehicle_quat_;
       apollo::common::Quaternion* orientation_vehicle_world =
           posepb_loc->mutable_orientation_vehicle_world();
       orientation_vehicle_world->set_qx(quat_vehicle_world.x());
