@@ -1857,11 +1857,11 @@ decision {
           reason_code: STOP_REASON_SIGNAL
           distance_s: -1
           stop_point {
-            x: 587050.98527786427
-            y: 4141558.1996725076
+            x: 587051.21815573378
+            y: 4141558.5256650988
             z: 0
           }
-          stop_heading: 0.96878626716418581
+          stop_heading: 0.95483717803783263
         }
       }
     }
