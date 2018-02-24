@@ -95,7 +95,7 @@ class Message(object):
 
         if self.msg_received:
             seq_diff = sequence_num - self.sequence_num
-            if seq_diff == 0:
+            if seq_diff != 0:
                 self.msg_interval = (time - self.msg_time) * 1000 / seq_diff
             else:
                 self.msg_interval = (time - self.msg_time) * 1000
