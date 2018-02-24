@@ -30,6 +30,8 @@
 #include "gtest/gtest_prod.h"
 
 #include "ros/include/ros/ros.h"
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 #include "sensor_msgs/PointCloud2.h"
 
 #include "modules/drivers/gnss/proto/imu.pb.h"
@@ -103,6 +105,9 @@ class MSFLocalization : public LocalizationBase {
   MeasureState latest_gnss_localization_status_;
 
   // FRIEND_TEST(MSFLocalizationTest, InitParams);
+
+  // rotation from the vehicle coord to imu coord
+  Eigen::Quaternion<double> imu_vehicle_quat_;
 };
 
 }  // namespace localization
