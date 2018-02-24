@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_UTIL_LATTICE_TRAJECTORY1D_H_
-#define MODULES_PLANNING_LATTICE_UTIL_LATTICE_TRAJECTORY1D_H_
+#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY1D_LATTICE_TRAJECTORY1D_H_
+#define MODULES_PLANNING_LATTICE_TRAJECTORY1D_LATTICE_TRAJECTORY1D_H_
 
 #include <memory>
 #include <string>
@@ -78,4 +78,4 @@ class LatticeTrajectory1d : public Curve1d {
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_LATTICE_UTIL_LATTICE_TRAJECTORY1D_H_ */
+#endif  // MODULES_PLANNING_LATTICE_TRAJECTORY1D_LATTICE_TRAJECTORY1D_H_

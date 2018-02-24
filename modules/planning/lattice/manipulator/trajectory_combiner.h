@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,27 +18,27 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_UTIL_REFERENCE_LINE_FRAME_CONVERTER_H_
-#define MODULES_PLANNING_LATTICE_UTIL_REFERENCE_LINE_FRAME_CONVERTER_H_
+#ifndef MODULES_PLANNING_LATTICE_MANIPULATOR_TRAJECTORY_COMBINER_H_
+#define MODULES_PLANNING_LATTICE_MANIPULATOR_TRAJECTORY_COMBINER_H_
 
-#include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {
 namespace planning {
 
-class ReferenceLineFrameConverter {
+class TrajectoryCombiner {
  public:
-  ReferenceLineFrameConverter() = delete;
-
-  static std::pair<double, double> CartesianToFrenet(
-      const std::vector<common::PathPoint>& discretized_reference_line,
-      const double x, const double y);
+  static DiscretizedTrajectory Combine(
+      const std::vector<common::PathPoint>& reference_line,
+      const Curve1d& lon_trajectory, const Curve1d& lat_trajectory,
+      const double init_relative_time);
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif /* MODULES_PLANNING_LATTICE_UTIL_REFERENCE_LINE_FRAME_CONVERTER_H_ */
+#endif  // MODULES_PLANNING_LATTICE_MANIPULATOR_TRAJECTORY_COMBINER_H_

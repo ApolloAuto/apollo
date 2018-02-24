@@ -1,7 +1,7 @@
 import STORE from "store";
 import RENDERER from "renderer";
 
-const Worker = require('worker-loader!utils/webworker.js');
+const Worker = require('utils/webworker.js');
 
 export default class PointCloudWebSocketEndpoint {
     constructor(serverAddr) {
