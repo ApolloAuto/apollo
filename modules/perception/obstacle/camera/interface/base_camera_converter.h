@@ -19,11 +19,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_CONVERTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_CONVERTER_H_
 
+#include <Eigen/Core>
+#include <opencv2/opencv.hpp>
+
 #include <string>
 #include <vector>
-
-#include "Eigen/Core"
-#include "opencv2/opencv.hpp"
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
@@ -37,13 +37,13 @@ class BaseCameraConverter {
   BaseCameraConverter() {}
   virtual ~BaseCameraConverter() {}
 
-  virtual bool init() = 0;
+  virtual bool Init() = 0;
 
   // @brief: Convert 2D detected objects into physical 3D objects
   // @param [in/out]: detected object lists, added 3D position and orientation
-  virtual bool converter(std::vector<VisualObjectPtr>* objects) = 0;
+  virtual bool Convert(std::vector<VisualObjectPtr>* objects) = 0;
 
-  virtual std::string name() const = 0;
+  virtual std::string Name() const = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseCameraConverter);
