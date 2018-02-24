@@ -41,7 +41,7 @@
 #include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_combiner.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_evaluator.h"
-#include "modules/planning/lattice/util/lattice_trajectory1d.h"
+#include "modules/planning/lattice/trajectory1d/lattice_trajectory1d.h"
 
 namespace apollo {
 namespace planning {
