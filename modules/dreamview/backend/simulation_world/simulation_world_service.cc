@@ -45,13 +45,13 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::canbus::Chassis;
+using apollo::common::PathPoint;
 using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::PathPoint;
 using apollo::common::time::Clock;
 using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
@@ -70,6 +70,7 @@ using apollo::planning::StopReasonCode;
 using apollo::planning_internal::PlanningData;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
+using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingResponse;
 
 using Json = nlohmann::json;
@@ -257,6 +258,7 @@ void SimulationWorldService::Update() {
   UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
   UpdateWithLatestObserved("ControlCommand",
                            AdapterManager::GetControlCommand());
+  UpdateWithLatestObserved("Navigation", AdapterManager::GetNavigation());
   for (const auto &kv : obj_map_) {
     *world_.add_object() = kv.second;
   }
@@ -688,6 +690,18 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   }
 }
 
+void SimulationWorldService::DownsamplePath(
+    const apollo::common::Path &path, apollo::common::Path *downsampled_path) {
+  auto sampled_indices = DownsampleByAngle(path.path_point(), kAngleThreshold);
+
+  downsampled_path->set_name(path.name());
+  for (int index : sampled_indices) {
+    const auto &path_point = path.path_point()[index];
+    auto *point = downsampled_path->add_path_point();
+    point->CopyFrom(path_point);
+  }
+}
+
 void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   auto *planning_data = world_.mutable_planning_data();
 
@@ -756,17 +770,7 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   // Update path
   planning_data->clear_path();
   for (auto &path : data.path()) {
-    // Downsample the path points for frontend display.
-    auto sampled_indices =
-        DownsampleByAngle(path.path_point(), kAngleThreshold);
-
-    auto *downsampled_path = planning_data->add_path();
-    downsampled_path->set_name(path.name());
-    for (int index : sampled_indices) {
-      const auto &path_point = path.path_point()[index];
-      auto *point = downsampled_path->add_path_point();
-      point->CopyFrom(path_point);
-    }
+    DownsamplePath(path, planning_data->add_path());
   }
 }
 
@@ -934,6 +938,17 @@ void SimulationWorldService::UpdateSimulationWorld(
     } else if (debug.has_simple_mpc_debug() &&
                debug.simple_mpc_debug().has_station_error()) {
       control_data->set_station_error(debug.simple_mpc_debug().station_error());
+    }
+  }
+}
+
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const NavigationInfo &navigation_info) {
+  world_.clear_navigation_path();
+  for (auto &navigation_path : navigation_info.navigation_path()) {
+    if (navigation_path.has_path()) {
+      DownsamplePath(navigation_path.path(), world_.add_navigation_path());
     }
   }
 }
