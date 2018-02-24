@@ -19,7 +19,6 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/lattice/behavior_decider:path_time_graph",
-        "//modules/planning/lattice/behavior_decider:condition_filter",
         "//modules/planning/lattice/behavior_decider:scenario_manager",
         "//modules/planning/lattice/behavior_decider:prediction_querier",
         "//modules/planning/proto:lattice_sampling_config_proto",
@@ -105,24 +104,6 @@ cc_library(
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/reference_line",
         "@glog",
-    ],
-)
-
-cc_library(
-    name = "condition_filter",
-    srcs = [
-        "condition_filter.cc",
-    ],
-    hdrs = [
-        "condition_filter.h",
-    ],
-    deps = [
-        "//modules/common/math:linear_interpolation",
-        "//modules/planning/lattice/behavior_decider:path_time_graph",
-        "//modules/planning/lattice/behavior_decider:feasible_region",
-        "//modules/planning/lattice/behavior_decider:prediction_querier",
-        "//modules/planning/proto:lattice_structure_proto",
-        "//modules/planning/proto:planning_proto",
     ],
 )
 
