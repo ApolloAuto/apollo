@@ -18,17 +18,4 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "lattice_trajectory1d",
-    srcs = [
-        "lattice_trajectory1d.cc",
-    ],
-    hdrs = [
-        "lattice_trajectory1d.h",
-    ],
-    deps = [
-        "//modules/planning/math/curve1d",
-    ],
-)
-
 cpplint()
