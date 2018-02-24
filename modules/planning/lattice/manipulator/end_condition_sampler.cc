@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/lattice/trajectory_generator/end_condition_sampler.h"
+#include "modules/planning/lattice/manipulator/end_condition_sampler.h"
 
 #include <algorithm>
 #include <utility>
@@ -29,14 +29,18 @@
 namespace apollo {
 namespace planning {
 
-EndConditionSampler::EndConditionSampler(const std::array<double, 3>& init_s,
-                                         const std::array<double, 3>& init_d,
-                                         const double s_dot_limit)
-    : init_s_(init_s), init_d_(init_d), s_dot_limit_(s_dot_limit) {
-  ptr_feasible_region_ = new FeasibleRegion(init_s, s_dot_limit);
+EndConditionSampler::EndConditionSampler(
+    const std::array<double, 3>& init_s,
+    const std::array<double, 3>& init_d,
+    const double s_dot_limit,
+    std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
+    std::shared_ptr<PredictionQuerier> ptr_prediction_querier)
+    : init_s_(init_s), init_d_(init_d),
+      s_dot_limit_(s_dot_limit),
+      feasible_region_(init_s, s_dot_limit),
+      ptr_path_time_graph_(ptr_path_time_graph),
+      ptr_prediction_querier_(ptr_prediction_querier) {
 }
-
-EndConditionSampler::~EndConditionSampler() { delete ptr_feasible_region_; }
 
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLatEndConditions() const {
@@ -80,6 +84,10 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
       end_s[0] = 0.0;  // this will not be used in QuarticPolynomial
       end_s[1] = velocity_seg * i;
       end_s[2] = 0.0;
+      if (end_s[1] > feasible_region_.VUpper(time) ||
+          end_s[1] < feasible_region_.VLower(time)) {
+        continue;
+      }
       end_s_conditions.emplace_back(end_s, time);
     }
     std::array<double, 3> end_s = {0.0, init_s_[1], 0.0};
@@ -120,17 +128,57 @@ EndConditionSampler::SampleLonEndConditionsForStopping(
 }
 
 std::vector<std::pair<std::array<double, 3>, double>>
-EndConditionSampler::SampleLonEndConditionsForPathTimePoints(
-    const PlanningTarget& planning_target) const {
+EndConditionSampler::SampleLonEndConditionsForPathTimePoints() const {
+  std::vector<SamplePoint> sample_points = QueryPathTimeObstacleSamplePoints();
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
-  for (const SamplePoint& neighbor_point : planning_target.neighbor_point()) {
-    double s = neighbor_point.path_time_point().s();
-    double v = neighbor_point.ref_v();
+  for (const SamplePoint& sample_point : sample_points) {
+    double s = sample_point.path_time_point().s();
+    double v = sample_point.ref_v();
+    double t = sample_point.path_time_point().t();
+    if (s > feasible_region_.SUpper(t) ||
+        s < feasible_region_.SLower(t)) {
+      continue;
+    }
     std::array<double, 3> end_state = {s, v, 0.0};
-    end_s_conditions.push_back({end_state,
-                                neighbor_point.path_time_point().t()});
+    end_s_conditions.emplace_back(end_state, t);
   }
   return end_s_conditions;
+}
+
+std::vector<SamplePoint>
+EndConditionSampler::QueryPathTimeObstacleSamplePoints() const {
+  std::vector<SamplePoint> sample_points;
+  for (const auto& path_time_obstacle :
+       ptr_path_time_graph_->GetPathTimeObstacles()) {
+    std::string obstacle_id = path_time_obstacle.obstacle_id();
+
+    std::vector<PathTimePoint> overtake_path_time_points =
+        ptr_path_time_graph_->GetObstacleSurroundingPoints(
+            obstacle_id, FLAGS_lattice_epsilon, FLAGS_time_min_density);
+    for (const PathTimePoint& path_time_point : overtake_path_time_points) {
+      double v = ptr_prediction_querier_->ProjectVelocityAlongReferenceLine(
+          obstacle_id, path_time_point.s(), path_time_point.t());
+      SamplePoint sample_point;
+      sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
+      sample_point.mutable_path_time_point()->set_s(FLAGS_default_lon_buffer);
+      sample_point.set_ref_v(v);
+      sample_points.push_back(std::move(sample_point));
+    }
+
+    std::vector<PathTimePoint> follow_path_time_points =
+        ptr_path_time_graph_->GetObstacleSurroundingPoints(
+            obstacle_id, -FLAGS_lattice_epsilon, FLAGS_time_min_density);
+    for (const PathTimePoint& path_time_point : follow_path_time_points) {
+      double v = ptr_prediction_querier_->ProjectVelocityAlongReferenceLine(
+          obstacle_id, path_time_point.s(), path_time_point.t());
+      SamplePoint sample_point;
+      sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
+      sample_point.mutable_path_time_point()->set_s(-FLAGS_default_lon_buffer);
+      sample_point.set_ref_v(v);
+      sample_points.push_back(std::move(sample_point));
+    }
+  }
+  return sample_points;
 }
 
 }  // namespace planning

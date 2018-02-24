@@ -14,31 +14,43 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
+#ifndef MODULES_PERCEPTION_OBSTACLE_VISUALIZER_GL_RASTER_TEXT_H_
+#define MODULES_PERCEPTION_OBSTACLE_VISUALIZER_GL_RASTER_TEXT_H_
 
-#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_TRAJECTORY_COMBINER_H_
-#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_TRAJECTORY_COMBINER_H_
+#include <boost/shared_ptr.hpp>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/math/curve1d/curve1d.h"
-
 namespace apollo {
-namespace planning {
+namespace perception {
 
-class TrajectoryCombiner {
+class GLRasterText {
  public:
-  static DiscretizedTrajectory Combine(
-      const std::vector<common::PathPoint>& reference_line,
-      const Curve1d& lon_trajectory, const Curve1d& lat_trajectory,
-      const double init_relative_time);
+  GLRasterText() {}
+  ~GLRasterText() {}
+
+  void init();
+
+  void print_string(const char* s);
+
+ private:
+  void make_raster_font();
+  static GLubyte _s_space_bitmap[];
+  static GLubyte _s_letters_bitmaps[][13];
+  static GLubyte _s_numbers_bitmaps[][13];
+  static GLubyte _s_asccii_bitmaps[][13];
+  static GLuint _s_font_offset;
 };
 
-}  // namespace planning
+}  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_TRAJECTORY_COMBINER_H_
+#endif  // PERCEPTION_GL_RASTER_TEXT_H

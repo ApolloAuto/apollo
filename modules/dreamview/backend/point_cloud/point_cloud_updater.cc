@@ -38,6 +38,7 @@ using Json = nlohmann::json;
 PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
     : websocket_(websocket) {
   RegisterMessageHandlers();
+  point_cloud_.SerializeToString(&point_cloud_str_);
 }
 
 void PointCloudUpdater::RegisterMessageHandlers() {
