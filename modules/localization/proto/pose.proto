@@ -25,9 +25,9 @@ message Pose {
   // The VRP is the center of rear axle.
   optional apollo.common.PointENU position = 1;
 
-  // A quaternion that represents the rotation from the map coordinate
-  // (East/North/Up) to the
-  // vehicle coordinate (Right/Forward/Up).
+  // A quaternion that represents the rotation from the IMU coordinate
+  // (Right/Forward/Up) to the
+  // world coordinate (East/North/Up).
   optional apollo.common.Quaternion orientation = 2;
 
   // Linear velocity of the VRP in the map reference frame.
@@ -49,7 +49,7 @@ message Pose {
   // Right/forward/up in meters per square second.
   optional apollo.common.Point3D linear_acceleration_vrf = 7;
 
-  // Angular velocity of the vehicle in the vehicle reference frame.
+  // Angular velocity of the VRP in the vehicle reference frame.
   // Around right/forward/up axes in radians per second.
   optional apollo.common.Point3D angular_velocity_vrf = 8;
 
@@ -57,4 +57,9 @@ message Pose {
 
   // Roll/pitch/yaw in radians.
   optional apollo.common.Point3D euler_angles = 9;
+
+  // A quaternion that represents the rotation from the vehicle coordinate
+  // (Right/Forward/Up) to the
+  // world coordinate (East/North/Up).
+  optional apollo.common.Quaternion orientation_vehicle_world = 10;
 }
