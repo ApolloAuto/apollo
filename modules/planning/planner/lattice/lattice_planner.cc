@@ -41,7 +41,7 @@
 #include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_combiner.h"
 #include "modules/planning/lattice/trajectory_generator/trajectory_evaluator.h"
-#include "modules/planning/lattice/util/lattice_trajectory1d.h"
+#include "modules/planning/lattice/trajectory1d/lattice_trajectory1d.h"
 
 namespace apollo {
 namespace planning {
@@ -166,8 +166,7 @@ Status LatticePlanner::PlanOnReferenceLine(
       init_s[0], init_s[0] + FLAGS_decision_horizon,
       0.0, FLAGS_trajectory_time_length, FLAGS_default_reference_line_width);
 
-  BehaviorDecider behavior_decider(ptr_path_time_graph,
-                                   ptr_prediction_querier);
+  BehaviorDecider behavior_decider;
 
   PlanningTarget planning_target = behavior_decider.Analyze(frame,
       reference_line_info, planning_init_point, init_s, *ptr_reference_line);
@@ -176,7 +175,8 @@ Status LatticePlanner::PlanOnReferenceLine(
   current_time = Clock::NowInSeconds();
 
   // 5. generate 1d trajectory bundle for longitudinal and lateral respectively.
-  Trajectory1dGenerator trajectory1d_generator(init_s, init_d);
+  Trajectory1dGenerator trajectory1d_generator(
+      init_s, init_d, ptr_path_time_graph, ptr_prediction_querier);
   std::vector<std::shared_ptr<Curve1d>> lon_trajectory1d_bundle;
   std::vector<std::shared_ptr<Curve1d>> lat_trajectory1d_bundle;
   trajectory1d_generator.GenerateTrajectoryBundles(

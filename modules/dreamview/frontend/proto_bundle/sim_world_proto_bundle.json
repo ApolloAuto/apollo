@@ -491,6 +491,11 @@
                 "controlData": {
                   "type": "ControlData",
                   "id": 22
+                },
+                "navigationPath": {
+                  "rule": "repeated",
+                  "type": "apollo.common.Path",
+                  "id": 23
                 }
               }
             }

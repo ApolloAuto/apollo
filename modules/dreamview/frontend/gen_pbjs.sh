@@ -35,11 +35,9 @@ node_modules/protobufjs/bin/pbjs -t json ../proto/simulation_world.proto \
     -o proto_bundle/sim_world_proto_bundle.json
 
 node_modules/protobufjs/bin/pbjs -t json $MAP_PROTOS \
-    $REALTIVE_MAP_PROTOS \
     ../../common/proto/geometry.proto \
     ../../common/proto/header.proto \
     ../../common/proto/error_code.proto \
-    ../../common/proto/pnc_point.proto \
     -o proto_bundle/map_proto_bundle.json
 
 node_modules/protobufjs/bin/pbjs -t json ../proto/point_cloud.proto \

@@ -4,6 +4,124 @@
       "nested": {
         "hdmap": {
           "nested": {
+            "Projection": {
+              "fields": {
+                "proj": {
+                  "type": "string",
+                  "id": 1
+                }
+              }
+            },
+            "Header": {
+              "fields": {
+                "version": {
+                  "type": "bytes",
+                  "id": 1
+                },
+                "date": {
+                  "type": "bytes",
+                  "id": 2
+                },
+                "projection": {
+                  "type": "Projection",
+                  "id": 3
+                },
+                "district": {
+                  "type": "bytes",
+                  "id": 4
+                },
+                "generation": {
+                  "type": "bytes",
+                  "id": 5
+                },
+                "revMajor": {
+                  "type": "bytes",
+                  "id": 6
+                },
+                "revMinor": {
+                  "type": "bytes",
+                  "id": 7
+                },
+                "left": {
+                  "type": "double",
+                  "id": 8
+                },
+                "top": {
+                  "type": "double",
+                  "id": 9
+                },
+                "right": {
+                  "type": "double",
+                  "id": 10
+                },
+                "bottom": {
+                  "type": "double",
+                  "id": 11
+                },
+                "vendor": {
+                  "type": "bytes",
+                  "id": 12
+                }
+              }
+            },
+            "Map": {
+              "fields": {
+                "header": {
+                  "type": "Header",
+                  "id": 1
+                },
+                "crosswalk": {
+                  "rule": "repeated",
+                  "type": "Crosswalk",
+                  "id": 2
+                },
+                "junction": {
+                  "rule": "repeated",
+                  "type": "Junction",
+                  "id": 3
+                },
+                "lane": {
+                  "rule": "repeated",
+                  "type": "Lane",
+                  "id": 4
+                },
+                "stopSign": {
+                  "rule": "repeated",
+                  "type": "StopSign",
+                  "id": 5
+                },
+                "signal": {
+                  "rule": "repeated",
+                  "type": "Signal",
+                  "id": 6
+                },
+                "yield": {
+                  "rule": "repeated",
+                  "type": "YieldSign",
+                  "id": 7
+                },
+                "overlap": {
+                  "rule": "repeated",
+                  "type": "Overlap",
+                  "id": 8
+                },
+                "clearArea": {
+                  "rule": "repeated",
+                  "type": "ClearArea",
+                  "id": 9
+                },
+                "speedBump": {
+                  "rule": "repeated",
+                  "type": "SpeedBump",
+                  "id": 10
+                },
+                "road": {
+                  "rule": "repeated",
+                  "type": "Road",
+                  "id": 11
+                }
+              }
+            },
             "ClearArea": {
               "fields": {
                 "id": {
@@ -420,124 +538,6 @@
                 }
               }
             },
-            "Projection": {
-              "fields": {
-                "proj": {
-                  "type": "string",
-                  "id": 1
-                }
-              }
-            },
-            "Header": {
-              "fields": {
-                "version": {
-                  "type": "bytes",
-                  "id": 1
-                },
-                "date": {
-                  "type": "bytes",
-                  "id": 2
-                },
-                "projection": {
-                  "type": "Projection",
-                  "id": 3
-                },
-                "district": {
-                  "type": "bytes",
-                  "id": 4
-                },
-                "generation": {
-                  "type": "bytes",
-                  "id": 5
-                },
-                "revMajor": {
-                  "type": "bytes",
-                  "id": 6
-                },
-                "revMinor": {
-                  "type": "bytes",
-                  "id": 7
-                },
-                "left": {
-                  "type": "double",
-                  "id": 8
-                },
-                "top": {
-                  "type": "double",
-                  "id": 9
-                },
-                "right": {
-                  "type": "double",
-                  "id": 10
-                },
-                "bottom": {
-                  "type": "double",
-                  "id": 11
-                },
-                "vendor": {
-                  "type": "bytes",
-                  "id": 12
-                }
-              }
-            },
-            "Map": {
-              "fields": {
-                "header": {
-                  "type": "Header",
-                  "id": 1
-                },
-                "crosswalk": {
-                  "rule": "repeated",
-                  "type": "Crosswalk",
-                  "id": 2
-                },
-                "junction": {
-                  "rule": "repeated",
-                  "type": "Junction",
-                  "id": 3
-                },
-                "lane": {
-                  "rule": "repeated",
-                  "type": "Lane",
-                  "id": 4
-                },
-                "stopSign": {
-                  "rule": "repeated",
-                  "type": "StopSign",
-                  "id": 5
-                },
-                "signal": {
-                  "rule": "repeated",
-                  "type": "Signal",
-                  "id": 6
-                },
-                "yield": {
-                  "rule": "repeated",
-                  "type": "YieldSign",
-                  "id": 7
-                },
-                "overlap": {
-                  "rule": "repeated",
-                  "type": "Overlap",
-                  "id": 8
-                },
-                "clearArea": {
-                  "rule": "repeated",
-                  "type": "ClearArea",
-                  "id": 9
-                },
-                "speedBump": {
-                  "rule": "repeated",
-                  "type": "SpeedBump",
-                  "id": 10
-                },
-                "road": {
-                  "rule": "repeated",
-                  "type": "Road",
-                  "id": 11
-                }
-              }
-            },
             "BoundaryEdge": {
               "fields": {
                 "curve": {
@@ -799,85 +799,6 @@
             }
           }
         },
-        "relative_map": {
-          "nested": {
-            "NavigationPath": {
-              "fields": {
-                "path": {
-                  "type": "apollo.common.Path",
-                  "id": 1
-                },
-                "pathPriority": {
-                  "type": "uint32",
-                  "id": 2
-                }
-              }
-            },
-            "NavigationInfo": {
-              "fields": {
-                "header": {
-                  "type": "apollo.common.Header",
-                  "id": 1
-                },
-                "navigationPath": {
-                  "rule": "repeated",
-                  "type": "NavigationPath",
-                  "id": 2
-                }
-              }
-            },
-            "MapMsg": {
-              "fields": {
-                "header": {
-                  "type": "apollo.common.Header",
-                  "id": 1
-                },
-                "hdmap": {
-                  "type": "apollo.hdmap.Map",
-                  "id": 2
-                },
-                "navigationPath": {
-                  "keyType": "string",
-                  "type": "NavigationPath",
-                  "id": 3
-                }
-              }
-            },
-            "MapGenerationParam": {
-              "fields": {
-                "defaultLeftWidth": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 1.75
-                  }
-                },
-                "defaultRightWidth": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 1.75
-                  }
-                },
-                "defaultSpeedLimit": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 29.0576
-                  }
-                }
-              }
-            },
-            "RelativeMapConfig": {
-              "fields": {
-                "mapParam": {
-                  "type": "MapGenerationParam",
-                  "id": 1
-                }
-              }
-            }
-          }
-        },
         "common": {
           "nested": {
             "PointENU": {
@@ -1091,135 +1012,6 @@
                 "msg": {
                   "type": "string",
                   "id": 2
-                }
-              }
-            },
-            "SLPoint": {
-              "fields": {
-                "s": {
-                  "type": "double",
-                  "id": 1
-                },
-                "l": {
-                  "type": "double",
-                  "id": 2
-                }
-              }
-            },
-            "FrenetFramePoint": {
-              "fields": {
-                "s": {
-                  "type": "double",
-                  "id": 1
-                },
-                "l": {
-                  "type": "double",
-                  "id": 2
-                },
-                "dl": {
-                  "type": "double",
-                  "id": 3
-                },
-                "ddl": {
-                  "type": "double",
-                  "id": 4
-                }
-              }
-            },
-            "SpeedPoint": {
-              "fields": {
-                "s": {
-                  "type": "double",
-                  "id": 1
-                },
-                "t": {
-                  "type": "double",
-                  "id": 2
-                },
-                "v": {
-                  "type": "double",
-                  "id": 3
-                },
-                "a": {
-                  "type": "double",
-                  "id": 4
-                },
-                "da": {
-                  "type": "double",
-                  "id": 5
-                }
-              }
-            },
-            "PathPoint": {
-              "fields": {
-                "x": {
-                  "type": "double",
-                  "id": 1
-                },
-                "y": {
-                  "type": "double",
-                  "id": 2
-                },
-                "z": {
-                  "type": "double",
-                  "id": 3
-                },
-                "theta": {
-                  "type": "double",
-                  "id": 4
-                },
-                "kappa": {
-                  "type": "double",
-                  "id": 5
-                },
-                "s": {
-                  "type": "double",
-                  "id": 6
-                },
-                "dkappa": {
-                  "type": "double",
-                  "id": 7
-                },
-                "ddkappa": {
-                  "type": "double",
-                  "id": 8
-                },
-                "laneId": {
-                  "type": "string",
-                  "id": 9
-                }
-              }
-            },
-            "Path": {
-              "fields": {
-                "name": {
-                  "type": "string",
-                  "id": 1
-                },
-                "pathPoint": {
-                  "rule": "repeated",
-                  "type": "PathPoint",
-                  "id": 2
-                }
-              }
-            },
-            "TrajectoryPoint": {
-              "fields": {
-                "pathPoint": {
-                  "type": "PathPoint",
-                  "id": 1
-                },
-                "v": {
-                  "type": "double",
-                  "id": 2
-                },
-                "a": {
-                  "type": "double",
-                  "id": 3
-                },
-                "relativeTime": {
-                  "type": "double",
-                  "id": 4
                 }
               }
             }
