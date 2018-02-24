@@ -484,13 +484,15 @@ int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
     return -1;
   }
 
+  /* skip the speed check to make it less strick
   auto speed = std::hypot(perception_obstacle.velocity().x(),
                           perception_obstacle.velocity().y());
-  if (speed > FLAGS_stop_sign_max_watch_vehicle_stop_speed) {
+  if (speed > FLAGS_stop_sign_watch_vehicle_max_stop_speed) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
            << "] velocity[" << speed << "] not stopped. skip";
     return -1;
   }
+  */
 
   // check a valid stop for stop line of the stop_sign
   auto over_lap_info = assoc_lane_it->second.get()->GetObjectOverlapInfo(
@@ -502,7 +504,8 @@ int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
   double stop_line_s = over_lap_info->lane_overlap_info().start_s();
   double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
   double distance_to_stop_line = stop_line_s - obstacle_end_s;
-  if (distance_to_stop_line > FLAGS_max_valid_stop_distance) {
+  if (distance_to_stop_line >
+    FLAGS_stop_sign_watch_vehicle_max_stop_distance) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
            << "] distance_to_stop_line[" << distance_to_stop_line
            << "]; stop_line_s" << stop_line_s << "]; obstacle_end_s["
@@ -615,11 +618,15 @@ int StopSign::RemoveWatchVehicle(
       double stop_line_end_s = over_lap_info->lane_overlap_info().end_s();
       double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
       double distance_pass_stop_line = obstacle_end_s - stop_line_end_s;
-      if (distance_pass_stop_line > FLAGS_stop_sign_min_pass_distance) {
+      bool is_path_cross =
+          !path_obstacle.reference_line_st_boundary().IsEmpty();
+      if (distance_pass_stop_line > FLAGS_stop_sign_min_pass_distance &&
+          !is_path_cross) {
         ADEBUG << "obstacle_id[" << obstacle_id << "] type["
                << obstacle_type_name << "] distance_pass_stop_line["
                << distance_pass_stop_line << "]; stop_line_end_s["
                << stop_line_end_s << "]; obstacle_end_s[" << obstacle_end_s
+               << "] is_path_cross[" << is_path_cross
                << "] passed stop sign. erase from watch_vehicles";
         erase = true;
       }
