@@ -178,10 +178,10 @@ void MSFLocalization::InitParams() {
   AINFO << "utm zone id: " << localizaiton_param_.utm_zone_id;
 
   // vehicle imu extrinsic
-  localizaiton_param_.imu_vehicle_quat[0] = FLAGS_imu_vehicle_qx;
-  localizaiton_param_.imu_vehicle_quat[1] = FLAGS_imu_vehicle_qy;
-  localizaiton_param_.imu_vehicle_quat[2] = FLAGS_imu_vehicle_qz;
-  localizaiton_param_.imu_vehicle_quat[3] = FLAGS_imu_vehicle_qw;
+  imu_vehicle_quat_.x() = FLAGS_imu_vehicle_qx;
+  imu_vehicle_quat_.y() = FLAGS_imu_vehicle_qy;
+  imu_vehicle_quat_.z() = FLAGS_imu_vehicle_qz;
+  imu_vehicle_quat_.w() = FLAGS_imu_vehicle_qw;
   // try to load imu vehicle quat from file
   if (FLAGS_if_vehicle_imu_from_file) {
     double qx = 0.0;
@@ -194,19 +194,19 @@ void MSFLocalization::InitParams() {
     AINFO << "Vehile imu file: " << vehicle_imu_file;
 
     if (LoadImuVehicleExtrinsic(vehicle_imu_file, &qx, &qy, &qz, &qw)) {
-      localizaiton_param_.imu_vehicle_quat[0] = qx;
-      localizaiton_param_.imu_vehicle_quat[1] = qy;
-      localizaiton_param_.imu_vehicle_quat[2] = qz;
-      localizaiton_param_.imu_vehicle_quat[3] = qw;
+      imu_vehicle_quat_.x() = qx;
+      imu_vehicle_quat_.y() = qy;
+      imu_vehicle_quat_.z() = qz;
+      imu_vehicle_quat_.w() = qw;
     } else {
       AWARN << "Can't load imu vehicle quat from file, use default value.";
     }
   }
   AINFO << "imu_vehicle_quat: "
-        << localizaiton_param_.imu_vehicle_quat[0] << " "
-        << localizaiton_param_.imu_vehicle_quat[1] << " "
-        << localizaiton_param_.imu_vehicle_quat[2] << " "
-        << localizaiton_param_.imu_vehicle_quat[3];
+        << imu_vehicle_quat_.x() << " "
+        << imu_vehicle_quat_.y() << " "
+        << imu_vehicle_quat_.z() << " "
+        << imu_vehicle_quat_.w();
 
   // common
   localizaiton_param_.imu_rate = FLAGS_imu_rate;
@@ -315,6 +315,21 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
       double new_heading =
           apollo::common::math::NormalizeAngle(posepb_loc->heading() + M_PI_2);
       posepb_loc->set_heading(new_heading);
+
+      // set orientation_vehicle_world
+      const apollo::common::Quaternion& orientation =
+          posepb_loc->orientation();
+      const Eigen::Quaternion<double> quaternion(
+          orientation.qw(), orientation.qx(),
+          orientation.qy(), orientation.qz());
+
+      Eigen::Quaternion<double> quat_vehicle_world = quaternion * imu_vehicle_quat_;
+      apollo::common::Quaternion* orientation_vehicle_world =
+          posepb_loc->mutable_orientation_vehicle_world();
+      orientation_vehicle_world->set_qx(quat_vehicle_world.x());
+      orientation_vehicle_world->set_qy(quat_vehicle_world.y());
+      orientation_vehicle_world->set_qz(quat_vehicle_world.z());
+      orientation_vehicle_world->set_qw(quat_vehicle_world.w());
 
       PublishPoseBroadcastTF(local_result);
       AdapterManager::PublishLocalization(local_result);
