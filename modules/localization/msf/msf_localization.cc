@@ -167,15 +167,46 @@ void MSFLocalization::InitParams() {
   AERROR << "lidar_height: " << localizaiton_param_.lidar_height_file;
 
   localizaiton_param_.utm_zone_id = FLAGS_local_utm_zone_id;
-  // try load zone id from config file in local_map folder
+  // try load zone id from local_map folder
   if (FLAGS_if_utm_zone_id_from_folder) {
-    bool success = LoadZoneIdFromFile(localizaiton_param_.map_path,
+    bool success = LoadZoneIdFromFolder(localizaiton_param_.map_path,
                                       &localizaiton_param_.utm_zone_id);
     if (!success) {
-      AWARN << "Can't load utm zone id from config file, use default value.";
+      AWARN << "Can't load utm zone id from map folder, use default value.";
     }
   }
   AINFO << "utm zone id: " << localizaiton_param_.utm_zone_id;
+
+  // vehicle imu extrinsic
+  imu_vehicle_quat_.x() = FLAGS_imu_vehicle_qx;
+  imu_vehicle_quat_.y() = FLAGS_imu_vehicle_qy;
+  imu_vehicle_quat_.z() = FLAGS_imu_vehicle_qz;
+  imu_vehicle_quat_.w() = FLAGS_imu_vehicle_qw;
+  // try to load imu vehicle quat from file
+  if (FLAGS_if_vehicle_imu_from_file) {
+    double qx = 0.0;
+    double qy = 0.0;
+    double qz = 0.0;
+    double qw = 0.0;
+
+    std::string vehicle_imu_file =
+        common::util::TranslatePath(FLAGS_vehicle_imu_file);
+    AINFO << "Vehile imu file: " << vehicle_imu_file;
+
+    if (LoadImuVehicleExtrinsic(vehicle_imu_file, &qx, &qy, &qz, &qw)) {
+      imu_vehicle_quat_.x() = qx;
+      imu_vehicle_quat_.y() = qy;
+      imu_vehicle_quat_.z() = qz;
+      imu_vehicle_quat_.w() = qw;
+    } else {
+      AWARN << "Can't load imu vehicle quat from file, use default value.";
+    }
+  }
+  AINFO << "imu_vehicle_quat: "
+        << imu_vehicle_quat_.x() << " "
+        << imu_vehicle_quat_.y() << " "
+        << imu_vehicle_quat_.z() << " "
+        << imu_vehicle_quat_.w();
 
   // common
   localizaiton_param_.imu_rate = FLAGS_imu_rate;
@@ -285,6 +316,22 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
           apollo::common::math::NormalizeAngle(posepb_loc->heading() + M_PI_2);
       posepb_loc->set_heading(new_heading);
 
+      // set orientation_vehicle_world
+      const apollo::common::Quaternion& orientation =
+          posepb_loc->orientation();
+      const Eigen::Quaternion<double> quaternion(
+          orientation.qw(), orientation.qx(),
+          orientation.qy(), orientation.qz());
+
+      Eigen::Quaternion<double> quat_vehicle_world = 
+          quaternion * imu_vehicle_quat_;
+      apollo::common::Quaternion* orientation_vehicle_world =
+          posepb_loc->mutable_orientation_vehicle_world();
+      orientation_vehicle_world->set_qx(quat_vehicle_world.x());
+      orientation_vehicle_world->set_qy(quat_vehicle_world.y());
+      orientation_vehicle_world->set_qz(quat_vehicle_world.z());
+      orientation_vehicle_world->set_qw(quat_vehicle_world.w());
+
       PublishPoseBroadcastTF(local_result);
       AdapterManager::PublishLocalization(local_result);
     }
@@ -389,7 +436,28 @@ bool MSFLocalization::LoadGnssAntennaExtrinsic(
   return false;
 }
 
-bool MSFLocalization::LoadZoneIdFromFile(const std::string &folder_path,
+bool MSFLocalization::LoadImuVehicleExtrinsic(
+    const std::string &file_path, double *quat_qx, double *quat_qy,
+    double *quat_qz, double *quat_qw) {
+  if (!common::util::PathExists(file_path)) {
+    return false;
+  }
+  YAML::Node config = YAML::LoadFile(file_path);
+  if (config["transform"]) {
+    if (config["transform"]["translation"]) {
+      if (config["transform"]["rotation"]) {
+        *quat_qx = config["transform"]["rotation"]["x"].as<double>();
+        *quat_qy = config["transform"]["rotation"]["y"].as<double>();
+        *quat_qz = config["transform"]["rotation"]["z"].as<double>();
+        *quat_qw = config["transform"]["rotation"]["w"].as<double>();
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool MSFLocalization::LoadZoneIdFromFolder(const std::string &folder_path,
                                          int *zone_id) {
   std::string map_zone_id_folder;
   if (common::util::DirectoryExists(folder_path + "/map/000/north")) {
