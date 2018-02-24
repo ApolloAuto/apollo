@@ -34,6 +34,9 @@ export default class PointCloudWebSocketEndpoint {
         this.worker.onmessage = event => {
             if (event.data.type === "PointCloudStatus") {
               STORE.setOptionStatus('showPointCloud', event.data.enabled);
+              if (STORE.options.showPointCloud === false) {
+                RENDERER.updatePointCloud({num:[]});
+              }
             } else if (STORE.options.showPointCloud === true && event.data.num !== undefined) {
                 RENDERER.updatePointCloud(event.data);
             }

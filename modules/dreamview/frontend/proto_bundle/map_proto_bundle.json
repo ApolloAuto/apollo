@@ -868,11 +868,26 @@
                 }
               }
             },
+            "NavigationLaneConfig": {
+              "fields": {
+                "minLaneMarkerQuality": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 0.5
+                  }
+                }
+              }
+            },
             "RelativeMapConfig": {
               "fields": {
                 "mapParam": {
                   "type": "MapGenerationParam",
                   "id": 1
+                },
+                "navigationLane": {
+                  "type": "NavigationLaneConfig",
+                  "id": 2
                 }
               }
             }
