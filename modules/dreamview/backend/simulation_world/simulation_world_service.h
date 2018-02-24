@@ -37,6 +37,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -174,6 +175,10 @@ class SimulationWorldService {
   void CreatePredictionTrajectory(
       const apollo::prediction::PredictionObstacle &obstacle,
       Object *world_object);
+
+  void DownsamplePath(const apollo::common::Path &paths,
+                      apollo::common::Path *downsampled_path);
+
   void UpdatePlanningData(const apollo::planning_internal::PlanningData &data);
 
   void PopulateMapInfo(double radius);

@@ -18,13 +18,13 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_TRAJECTORY1D_GENERATOR_H_
-#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_TRAJECTORY1D_GENERATOR_H_
+#ifndef MODULES_PLANNING_LATTICE_MANIPULATOR_TRAJECTORY1D_GENERATOR_H_
+#define MODULES_PLANNING_LATTICE_MANIPULATOR_TRAJECTORY1D_GENERATOR_H_
 
 #include <memory>
 #include <vector>
 
-#include "modules/planning/lattice/trajectory_generator/end_condition_sampler.h"
+#include "modules/planning/lattice/manipulator/end_condition_sampler.h"
 #include "modules/planning/lattice/behavior_decider/path_time_graph.h"
 #include "modules/planning/lattice/behavior_decider/prediction_querier.h"
 #include "modules/planning/math/curve1d/curve1d.h"
@@ -76,4 +76,4 @@ class Trajectory1dGenerator {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // PLANNING_LATTICE_TRAJECTORY_GENERATOR_TRAJECTORY1D_GENERATOR_H_
+#endif  // MODULES_PLANNING_LATTICE_MANIPULATOR_TRAJECTORY1D_GENERATOR_H_
