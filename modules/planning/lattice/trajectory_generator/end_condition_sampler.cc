@@ -32,11 +32,12 @@ namespace planning {
 EndConditionSampler::EndConditionSampler(const std::array<double, 3>& init_s,
                                          const std::array<double, 3>& init_d,
                                          const double s_dot_limit)
-    : init_s_(init_s), init_d_(init_d), s_dot_limit_(s_dot_limit) {
-  ptr_feasible_region_ = new FeasibleRegion(init_s, s_dot_limit);
+    : init_s_(init_s), init_d_(init_d),
+      s_dot_limit_(s_dot_limit),
+      feasible_region_(init_s, s_dot_limit) {
 }
 
-EndConditionSampler::~EndConditionSampler() { delete ptr_feasible_region_; }
+EndConditionSampler::~EndConditionSampler() {}
 
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLatEndConditions() const {
@@ -80,6 +81,10 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
       end_s[0] = 0.0;  // this will not be used in QuarticPolynomial
       end_s[1] = velocity_seg * i;
       end_s[2] = 0.0;
+      if (end_s[1] > feasible_region_.VUpper(time) ||
+          end_s[1] < feasible_region_.VLower(time)) {
+        continue;
+      }
       end_s_conditions.emplace_back(end_s, time);
     }
     std::array<double, 3> end_s = {0.0, init_s_[1], 0.0};
@@ -123,12 +128,16 @@ std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLonEndConditionsForPathTimePoints(
     const PlanningTarget& planning_target) const {
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
-  for (const SamplePoint& neighbor_point : planning_target.neighbor_point()) {
-    double s = neighbor_point.path_time_point().s();
-    double v = neighbor_point.ref_v();
+  for (const SamplePoint& sample_point : planning_target.sample_point()) {
+    double s = sample_point.path_time_point().s();
+    double v = sample_point.ref_v();
+    double t = sample_point.path_time_point().t();
+    if (s > feasible_region_.SUpper(t) ||
+        s < feasible_region_.SLower(t)) {
+      continue;
+    }
     std::array<double, 3> end_state = {s, v, 0.0};
-    end_s_conditions.push_back({end_state,
-                                neighbor_point.path_time_point().t()});
+    end_s_conditions.emplace_back(end_state, t);
   }
   return end_s_conditions;
 }

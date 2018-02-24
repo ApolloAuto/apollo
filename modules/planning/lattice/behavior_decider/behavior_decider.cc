@@ -31,6 +31,7 @@ namespace planning {
 
 using apollo::common::PathPoint;
 using apollo::common::PointENU;
+using apollo::common::TrajectoryPoint;
 
 BehaviorDecider::BehaviorDecider(
     std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
@@ -40,10 +41,9 @@ BehaviorDecider::BehaviorDecider(
 
 PlanningTarget BehaviorDecider::Analyze(
     Frame* frame, ReferenceLineInfo* const reference_line_info,
-    const common::TrajectoryPoint& init_planning_point,
+    const TrajectoryPoint& init_planning_point,
     const std::array<double, 3>& lon_init_state,
-    const std::vector<common::PathPoint>& discretized_reference_line) {
-
+    const std::vector<PathPoint>& discretized_reference_line) {
   CHECK(frame != nullptr);
   CHECK_GT(discretized_reference_line.size(), 0);
 
@@ -51,12 +51,6 @@ PlanningTarget BehaviorDecider::Analyze(
   if (ScenarioManager::instance()->ComputeWorldDecision(
           frame, reference_line_info, &planning_target) != 0) {
     AERROR << "ComputeWorldDecision error!";
-  }
-
-  for (const auto& reference_point : discretized_reference_line) {
-    planning_target.mutable_discretized_reference_line()
-        ->add_discretized_reference_line_point()
-        ->CopyFrom(reference_point);
   }
 
   CHECK(FLAGS_default_cruise_speed <= FLAGS_planning_upper_speed_limit);
@@ -74,17 +68,17 @@ PlanningTarget BehaviorDecider::Analyze(
 void BehaviorDecider::ComputePathTimeSamplePoints(
     const ConditionFilter& condition_filter,
     PlanningTarget* const planning_target) {
-  std::vector<SamplePoint> neighbor_points =
-      condition_filter.QueryPathTimeObstacleSamplePoints();
-  for (const auto& neighbor_point : neighbor_points) {
-    planning_target->add_neighbor_point()->CopyFrom(neighbor_point);
+  auto sample_points = condition_filter.QueryPathTimeObstacleSamplePoints();
+
+  for (const auto& sample_point : sample_points) {
+    planning_target->add_sample_point()->CopyFrom(sample_point);
   }
 
-  if (neighbor_points.empty()) {
-    ADEBUG << "Sample_bounds empty";
+  if (sample_points.empty()) {
+    ADEBUG << "Obstacle path time points are empty.";
   } else {
-    for (const SamplePoint& neighbor_point : neighbor_points) {
-      ADEBUG << "Neighbor point: " << neighbor_point.ShortDebugString();
+    for (const SamplePoint& sample_point : sample_points) {
+      ADEBUG << "Neighbor point: " << sample_point.ShortDebugString();
     }
   }
 }
