@@ -38,7 +38,6 @@ message StopPoint {
 }
 
 message PlanningTarget {
-  repeated SamplePoint sample_point = 1;
-  optional StopPoint stop_point = 2;
-  optional double cruise_speed = 3;
+  optional StopPoint stop_point = 1;
+  optional double cruise_speed = 2;
 }
