@@ -14,15 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PERCEPTION_OBSTACLE_COMMON_CAMERA_H
-#define ADU_PERCEPTION_OBSTACLE_COMMON_CAMERA_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAMERA_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAMERA_H_
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
-namespace adu {
+namespace apollo {
 namespace perception {
-namespace obstacle {
 
 template <typename T> class Camera;
 template <typename T> class CameraDistort;
@@ -363,8 +362,7 @@ std::ostream& operator<< (std::ostream& cout, const CameraDistort<T>& camera) {
     return cout;
 }
 
-} // namespace obstacle
-} // namespace perception
-} // namespace adu
+}  // namespace perception
+}  // namespace apollo
 
-#endif //
+#endif // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAMERA_H_
