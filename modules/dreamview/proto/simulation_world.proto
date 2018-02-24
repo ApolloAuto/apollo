@@ -5,6 +5,7 @@ package apollo.dreamview;
 import "modules/common/monitor_log/proto/monitor_log.proto";
 import "modules/planning/proto/planning_internal.proto";
 import "modules/perception/proto/perception_obstacle.proto";
+import "modules/common/proto/pnc_point.proto";
 
 // Next-id: 4
 message PolygonPoint {
@@ -174,7 +175,7 @@ message ControlData {
   optional double station_error = 2;
 }
 
-// Next-id: 23
+// Next-id: 24
 message SimulationWorld {
   // Timestamp in milliseconds
   optional double timestamp = 1;
@@ -232,4 +233,7 @@ message SimulationWorld {
 
   // Control data
   optional ControlData control_data = 22;
+
+  // Relative Map
+  repeated apollo.common.Path navigation_path = 23;
 }

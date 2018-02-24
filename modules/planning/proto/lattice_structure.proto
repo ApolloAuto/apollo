@@ -2,13 +2,6 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/common/proto/pnc_point.proto";
-import "modules/planning/proto/lattice_sampling_config.proto";
-
-message DiscretizedReferenceLine {
-  repeated apollo.common.PathPoint discretized_reference_line_point = 2;
-}
-
 message PathTimePoint {
   optional double t = 1;
   optional double s = 2;
@@ -32,16 +25,6 @@ message PathTimeObstacle {
   optional double path_upper = 9;
 }
 
-message SampleBound {
-  optional double t = 1;
-  optional double s_upper = 2;
-  optional double s_lower = 3;
-  optional double v_upper = 4;
-  optional double v_lower = 5;
-  optional double v_reference = 7;
-  optional LatticeSamplingConfig sample_config = 6;
-}
-
 message StopPoint {
   required double s = 1;
   enum Type {
@@ -52,9 +35,6 @@ message StopPoint {
 }
 
 message PlanningTarget {
-  optional DiscretizedReferenceLine discretized_reference_line = 1;
-  repeated SampleBound sample_bound = 2;
-  repeated SamplePoint neighbor_point = 3;
-  optional StopPoint stop_point = 4;
-  optional double cruise_speed = 5;
+  optional StopPoint stop_point = 1;
+  optional double cruise_speed = 2;
 }

@@ -150,11 +150,20 @@ module.exports = {
                 test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: "file-loader",
             }, {
-                test: /\.webworker\.js$/,
-                use: {
+                test: /webworker\.js$/,
+                use: [
+                {
                     loader: 'worker-loader',
-                    options: { inline: true },
+                    options: {
+                        name: 'worker.bundle.js'
+                    },
                 },
+                {
+                    loader: "babel-loader",
+                    options: {
+                        presets: ["es2015"],
+                    }
+                }]
             },
         ]
     },

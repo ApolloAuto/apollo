@@ -1,11 +1,5 @@
 import polyval from "compute-polynomial";
-import protobuf from "protobufjs/light";
 import { UTMToWGS84 } from "utils/coordinate_converter";
-
-const root = protobuf.Root.fromJSON(
-  require("proto_bundle/map_proto_bundle.json")
-);
-const navInfoMessage = root.lookupType("apollo.relative_map.NavigationInfo");
 
 class GmapNavigator {
   constructor() {
@@ -91,11 +85,10 @@ class GmapNavigator {
 
   update(data) {
     const adc = data.autoDrivingCar;
-    if (adc) {
-      this.updateCenterVehicle(adc);
-      this.updateLaneMarkers(adc, data.laneMarker);
-      this.updatePlanningPath(adc, data.planningTrajectory);
-    }
+    this.updateCenterVehicle(adc);
+    this.updateLaneMarkers(adc, data.laneMarker);
+    this.updateNavigationPath(data.navigationPath);
+    this.updatePlanningPath(adc, data.planningTrajectory);
   }
 
   updateCenterVehicle(autoDrivingCar) {
@@ -212,6 +205,38 @@ class GmapNavigator {
     this.plannedPath.setMap(this.map);
   }
 
+  updateNavigationPath(navigationPaths) {
+    if (!navigationPaths) {
+      return;
+    }
+
+    const paths = navigationPaths.map(navigationPath => {
+      return navigationPath.pathPoint.map(point => {
+        const [lon, lat] = UTMToWGS84(point.x, point.y);
+        return { lat: lat, lng: lon };
+      });
+    });
+
+    if (this.routingPath) {
+      this.routingPath.forEach(path => {
+        path.setMap(null);
+      });
+      this.routingPath = [];
+    }
+    paths.forEach(path => {
+      this.routingPath.push(
+        new google.maps.Polyline({
+          path: path,
+          geodesic: true,
+          strokeColor: "#cd5c5c",
+          strokeOpacity: 0.8,
+          strokeWeight: 6,
+          map: this.map
+        })
+      );
+    });
+  }
+
   createCenterControl(controlDiv) {
     const map = this.map;
 
@@ -257,61 +282,26 @@ class GmapNavigator {
       return;
     }
 
-    const url =
-      "http://navi-env.axty8vi3ic.us-west-2.elasticbeanstalk.com" +
-      "/dreamview/navigation" +
-      `?origin=${startLat},${startLng}` +
-      `&destination=${endLat},${endLng}` +
-      "&heading=0";
+    const url = "http://navi-env.axty8vi3ic.us-west-2.elasticbeanstalk.com" +
+        "/dreamview/navigation" +
+        `?origin=${startLat},${startLng}` +
+        `&destination=${endLat},${endLng}` +
+        "&heading=0";
     fetch(url, {
-      method: "GET",
-      mode: "cors"
-    })
-      .then(response => {
+        method: "GET",
+        mode: "cors"
+    }).then(response => {
         return response.arrayBuffer();
-      })
-      .then(response => {
+    }).then(response => {
         if (!response.byteLength) {
           console.warn("No navigation info received.");
           return;
         }
 
         this.WS.publishNavigationInfo(response);
-
-        const navigationInfo = navInfoMessage.toObject(
-          navInfoMessage.decode(new Uint8Array(response)),
-          { enums: String }
-        );
-
-        const paths = navigationInfo.navigationPath.map(naviPath => {
-          return naviPath.path.pathPoint.map(point => {
-            const [lon, lat] = UTMToWGS84(point.x, point.y);
-            return { lat: lat, lng: lon };
-          });
-        });
-
-        if (this.routingPath) {
-          this.routingPath.forEach(path => {
-            path.setMap(null);
-          });
-          this.routingPath = [];
-        }
-        paths.forEach(path => {
-          this.routingPath.push(
-            new google.maps.Polyline({
-              path: paths[0],
-              geodesic: true,
-              strokeColor: "#cd5c5c",
-              strokeOpacity: 0.8,
-              strokeWeight: 6,
-              map: this.map
-            })
-          );
-        });
-      })
-      .catch(error => {
+    }).catch(error => {
         console.error("Failed to retrieve navigation data:", error);
-      });
+    });
   }
 
   createControlElement(parentDiv, backgroundColor, text) {

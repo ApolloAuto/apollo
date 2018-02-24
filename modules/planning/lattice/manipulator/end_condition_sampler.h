@@ -18,14 +18,18 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_END_CONDITION_SAMPLER_H_
-#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATOR_END_CONDITION_SAMPLER_H_
+#ifndef MODULES_PLANNING_LATTICE_MANIPULATOR_END_CONDITION_SAMPLER_H_
+#define MODULES_PLANNING_LATTICE_MANIPULATOR_END_CONDITION_SAMPLER_H_
 
 #include <array>
 #include <utility>
 #include <vector>
+#include <memory>
+#include <string>
 
 #include "modules/planning/lattice/behavior_decider/feasible_region.h"
+#include "modules/planning/lattice/behavior_decider/path_time_graph.h"
+#include "modules/planning/lattice/behavior_decider/prediction_querier.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 
 namespace apollo {
@@ -35,11 +39,14 @@ namespace planning {
 // Output: sampled ending 1 dimensional states with corresponding time duration.
 class EndConditionSampler {
  public:
-  EndConditionSampler(const std::array<double, 3>& init_s,
-                      const std::array<double, 3>& init_d,
-                      const double s_dot_limit);
+  EndConditionSampler(
+      const std::array<double, 3>& init_s,
+      const std::array<double, 3>& init_d,
+      const double s_dot_limit,
+      std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
+      std::shared_ptr<PredictionQuerier> ptr_prediction_querier);
 
-  virtual ~EndConditionSampler();
+  virtual ~EndConditionSampler() = default;
 
   std::vector<std::pair<std::array<double, 3>, double>>
   SampleLatEndConditions() const;
@@ -51,20 +58,21 @@ class EndConditionSampler {
   SampleLonEndConditionsForStopping(const double ref_stop_point) const;
 
   std::vector<std::pair<std::array<double, 3>, double>>
-  SampleLonEndConditionsForPathTimePoints(
-      const PlanningTarget& planning_target) const;
+  SampleLonEndConditionsForPathTimePoints() const;
+
+ private:
+  std::vector<SamplePoint> QueryPathTimeObstacleSamplePoints() const;
 
  private:
   std::array<double, 3> init_s_;
-
   std::array<double, 3> init_d_;
-
   double s_dot_limit_;
-
-  FeasibleRegion* ptr_feasible_region_;
+  FeasibleRegion feasible_region_;
+  std::shared_ptr<PathTimeGraph> ptr_path_time_graph_;
+  std::shared_ptr<PredictionQuerier> ptr_prediction_querier_;
 };
 
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // PLANNING_LATTICE_TRAJECTORY_GENERATOR_END_CONDITION_SAMPLER_H_
+#endif  // MODULES_PLANNING_LATTICE_MANIPULATOR_END_CONDITION_SAMPLER_H_
