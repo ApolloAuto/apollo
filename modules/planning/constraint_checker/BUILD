@@ -49,10 +49,10 @@ cc_library(
         "//modules/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math:box2d",
+        "//modules/common/math:path_matcher",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/planning/lattice/util:reference_line_frame_converter",
         "//modules/prediction/proto:prediction_proto",
     ],
 )
