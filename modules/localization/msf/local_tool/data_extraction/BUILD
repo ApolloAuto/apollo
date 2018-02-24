@@ -22,10 +22,10 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common/math:math",
+        "//modules/common/math",
+        "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:measure_proto",
-        "//modules/localization/proto:gps_proto",
         "@eigen//:eigen",
         "@pcl//:pcl",
         "@ros//:ros_common",
@@ -47,6 +47,7 @@ cc_binary(
         ":data_extraction",
         "//modules/common:log",
         "@eigen//:eigen",
+        "@pcl//:pcl",
         "@ros//:ros_common",
     ],
 )
@@ -64,8 +65,8 @@ cc_binary(
     linkstatic = 0,
     deps = [
         ":data_extraction",
-        "//modules/localization/msf/local_tool/local_visualization/offline_visual:offline_local_visualizer_lib",
         "//modules/common:log",
+        "//modules/localization/msf/local_tool/local_visualization/offline_visual:offline_local_visualizer_lib",
         "@eigen//:eigen",
     ],
 )

@@ -22,7 +22,7 @@ namespace apollo {
 namespace perception {
 
 bool GeometryCameraConverter::Init() {
-  ConfigManager *config_manager = ConfigManager::instance();
+  // ConfigManager *config_manager = ConfigManager::instance();
 
   // if (!load_camera_intrinsics(FLAGS_onsemi_obstacle_intrinsics)) {
   //   XLOG(ERROR) << "camera intrinsics not found: "
@@ -90,9 +90,7 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
   return true;
 }
 
-void GeometryCameraConverter::SetDebug(bool flag) {
-  debug_ = flag;
-}
+void GeometryCameraConverter::SetDebug(bool flag) { debug_ = flag; }
 
 std::string GeometryCameraConverter::Name() const {
   return "GeometryCameraConverter";
