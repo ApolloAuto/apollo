@@ -167,15 +167,46 @@ void MSFLocalization::InitParams() {
   AERROR << "lidar_height: " << localizaiton_param_.lidar_height_file;
 
   localizaiton_param_.utm_zone_id = FLAGS_local_utm_zone_id;
-  // try load zone id from config file in local_map folder
+  // try load zone id from local_map folder
   if (FLAGS_if_utm_zone_id_from_folder) {
-    bool success = LoadZoneIdFromFile(localizaiton_param_.map_path,
+    bool success = LoadZoneIdFromFolder(localizaiton_param_.map_path,
                                       &localizaiton_param_.utm_zone_id);
     if (!success) {
-      AWARN << "Can't load utm zone id from config file, use default value.";
+      AWARN << "Can't load utm zone id from map folder, use default value.";
     }
   }
   AINFO << "utm zone id: " << localizaiton_param_.utm_zone_id;
+
+  // vehicle imu extrinsic
+  localizaiton_param_.imu_vehicle_quat[0] = FLAGS_imu_vehicle_qx;
+  localizaiton_param_.imu_vehicle_quat[1] = FLAGS_imu_vehicle_qy;
+  localizaiton_param_.imu_vehicle_quat[2] = FLAGS_imu_vehicle_qz;
+  localizaiton_param_.imu_vehicle_quat[3] = FLAGS_imu_vehicle_qw;
+  // try to load imu vehicle quat from file
+  if (FLAGS_if_vehicle_imu_from_file) {
+    double qx = 0.0;
+    double qy = 0.0;
+    double qz = 0.0;
+    double qw = 0.0;
+
+    std::string vehicle_imu_file =
+        common::util::TranslatePath(FLAGS_vehicle_imu_file);
+    AINFO << "Vehile imu file: " << vehicle_imu_file;
+
+    if (LoadImuVehicleExtrinsic(vehicle_imu_file, &qx, &qy, &qz, &qw)) {
+      localizaiton_param_.imu_vehicle_quat[0] = qx;
+      localizaiton_param_.imu_vehicle_quat[1] = qy;
+      localizaiton_param_.imu_vehicle_quat[2] = qz;
+      localizaiton_param_.imu_vehicle_quat[3] = qw;
+    } else {
+      AWARN << "Can't load imu vehicle quat from file, use default value.";
+    }
+  }
+  AINFO << "imu_vehicle_quat: "
+        << localizaiton_param_.imu_vehicle_quat[0] << " "
+        << localizaiton_param_.imu_vehicle_quat[1] << " "
+        << localizaiton_param_.imu_vehicle_quat[2] << " "
+        << localizaiton_param_.imu_vehicle_quat[3];
 
   // common
   localizaiton_param_.imu_rate = FLAGS_imu_rate;
@@ -389,7 +420,28 @@ bool MSFLocalization::LoadGnssAntennaExtrinsic(
   return false;
 }
 
-bool MSFLocalization::LoadZoneIdFromFile(const std::string &folder_path,
+bool MSFLocalization::LoadImuVehicleExtrinsic(
+    const std::string &file_path, double *quat_qx, double *quat_qy,
+    double *quat_qz, double *quat_qw) {
+  if (!common::util::PathExists(file_path)) {
+    return false;
+  }
+  YAML::Node config = YAML::LoadFile(file_path);
+  if (config["transform"]) {
+    if (config["transform"]["translation"]) {
+      if (config["transform"]["rotation"]) {
+        *quat_qx = config["transform"]["rotation"]["x"].as<double>();
+        *quat_qy = config["transform"]["rotation"]["y"].as<double>();
+        *quat_qz = config["transform"]["rotation"]["z"].as<double>();
+        *quat_qw = config["transform"]["rotation"]["w"].as<double>();
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool MSFLocalization::LoadZoneIdFromFolder(const std::string &folder_path,
                                          int *zone_id) {
   std::string map_zone_id_folder;
   if (common::util::DirectoryExists(folder_path + "/map/000/north")) {
