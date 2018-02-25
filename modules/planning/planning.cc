@@ -290,10 +290,16 @@ void Planning::RunOnce() {
     std::string msg("Failed to init frame");
     AERROR << msg;
     if (FLAGS_publish_estop) {
-      ADCTrajectory estop;
-      estop.mutable_estop();
-      status.Save(estop.mutable_header()->mutable_status());
-      PublishPlanningPb(&estop, start_timestamp);
+      // Because the function "Control::ProduceControlCommand()" checks the
+      // "estop" signal with the following line (Line 170 in control.cc):
+      // estop_ = estop_ || trajectory_.estop().is_estop();
+      // we should add more information to ensure the estop being triggered.
+      ADCTrajectory estop_trajectory;
+      EStop* estop = estop_trajectory.mutable_estop();
+      estop->set_is_estop(true);
+      estop->set_reason(status.error_message());
+      status.Save(estop_trajectory.mutable_header()->mutable_status());
+      PublishPlanningPb(&estop_trajectory, start_timestamp);
     } else {
       not_ready->set_reason(msg);
       status.Save(not_ready_pb.mutable_header()->mutable_status());
@@ -326,7 +332,13 @@ void Planning::RunOnce() {
     AERROR << "Planning failed:" << status.ToString();
     if (FLAGS_publish_estop) {
       AERROR << "Planning failed and set estop";
-      trajectory_pb->mutable_estop();
+      // Because the function "Control::ProduceControlCommand()" checks the
+      // "estop" signal with the following line (Line 170 in control.cc):
+      // estop_ = estop_ || trajectory_.estop().is_estop();
+      // we should add more information to ensure the estop being triggered.
+      EStop* estop = trajectory_pb->mutable_estop();
+      estop->set_is_estop(true);
+      estop->set_reason(status.error_message());
     }
   }
 
