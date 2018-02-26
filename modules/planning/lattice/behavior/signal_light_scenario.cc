@@ -55,7 +55,6 @@ int SignalLightScenario::ComputeScenarioDecision(
 
   StopPoint stop_point;
   stop_point.set_s(std::numeric_limits<double>::max());
-  stop_point.set_type(StopPoint::HARD);
   for (const auto signal_from_map : signals_from_map) {
     auto it_signal = detected_signals.find(signal_from_map->object_id);
     if (it_signal == detected_signals.end()) {
