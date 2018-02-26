@@ -19,5 +19,10 @@
 namespace apollo {
 namespace prediction {
 
+void RelativeObstaclesContainer::Insert(
+    const ::google::protobuf::Message& message) {
+  // TODO(kechxu) implement
+}
+
 }  // namespace prediction
 }  // namespace apollo
