@@ -98,6 +98,14 @@ DECLARE_bool(imu_coord_rfu);
 DECLARE_bool(gnss_only_init);
 DECLARE_bool(enable_lidar_localization);
 
+// imu vehicle extrinsic
+DECLARE_string(vehicle_imu_file);
+DECLARE_bool(if_vehicle_imu_from_file);
+DECLARE_double(imu_vehicle_qx);
+DECLARE_double(imu_vehicle_qy);
+DECLARE_double(imu_vehicle_qz);
+DECLARE_double(imu_vehicle_qw);
+
 // Debug
 DECLARE_bool(use_visualize);
 
