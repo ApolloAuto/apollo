@@ -107,7 +107,7 @@ TEST_F(LidarProcessTest, test_Process) {
     pt.y = org_cloud->points[i].y;
     pt.z = org_cloud->points[i].z;
     pt.intensity = org_cloud->points[i].intensity;
-    if (isnan(org_cloud->points[i].x)) continue;
+    if (std::isnan(org_cloud->points[i].x)) continue;
     point_cloud->push_back(pt);
   }
   std::shared_ptr<Matrix4d> velodyne_trans = std::make_shared<Matrix4d>();
