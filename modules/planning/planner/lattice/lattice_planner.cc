@@ -35,13 +35,13 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
-#include "modules/planning/lattice/behavior_decider/path_time_graph.h"
-#include "modules/planning/lattice/behavior_decider/prediction_querier.h"
-#include "modules/planning/lattice/manipulator/backup_trajectory_generator.h"
-#include "modules/planning/lattice/manipulator/trajectory1d_generator.h"
-#include "modules/planning/lattice/manipulator/trajectory_combiner.h"
-#include "modules/planning/lattice/manipulator/trajectory_evaluator.h"
+#include "modules/planning/lattice/behavior/path_time_graph.h"
+#include "modules/planning/lattice/behavior/prediction_querier.h"
 #include "modules/planning/lattice/trajectory1d/lattice_trajectory1d.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory1d_generator.h"
+#include "modules/planning/lattice/trajectory_generation/backup_trajectory_generator.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory_combiner.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory_evaluator.h"
 
 namespace apollo {
 namespace planning {

@@ -19,7 +19,9 @@
  **/
 
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
+
 #include <cmath>
+
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 

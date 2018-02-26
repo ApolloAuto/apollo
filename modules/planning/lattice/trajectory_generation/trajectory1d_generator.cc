@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/lattice/manipulator/trajectory1d_generator.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory1d_generator.h"
 
 #include <algorithm>
 #include <cmath>

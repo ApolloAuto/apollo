@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/lattice/behavior_decider/prediction_querier.h"
+#include "modules/planning/lattice/behavior/prediction_querier.h"
 
 #include <string>
 
