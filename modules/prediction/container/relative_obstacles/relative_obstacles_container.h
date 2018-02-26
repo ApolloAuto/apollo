@@ -21,17 +21,30 @@
 #ifndef MODULES_PREDICTION_CONTAINER_RELATIVE_OBSTACLES_CONTAINER_H_
 #define MODULES_PREDICTION_CONTAINER_RELATIVE_OBSTACLES_CONTAINER_H_
 
+#include "modules/prediction/container/container.h"
 #include "modules/prediction/container/relative_obstacles/relative_obstacle.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace prediction {
 
-class RelativeObstaclesContainer {
+class RelativeObstaclesContainer : public Container {
  public:
-  RelativeObstaclesContainer();
+  /**
+   * @brief Constructor
+   */
+  RelativeObstaclesContainer() = default;
 
-  virtual ~RelativeObstaclesContainer();
+  /**
+   * @brief Destructor
+   */
+  virtual ~RelativeObstaclesContainer() = default;
+
+  /**
+   * @brief Insert a data message into the container
+   * @param Data message to be inserted in protobuf
+   */
+  void Insert(const ::google::protobuf::Message& message) override;
 };
 
 }  // namespace prediction

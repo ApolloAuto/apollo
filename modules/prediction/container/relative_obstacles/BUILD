@@ -19,6 +19,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/perception/proto:perception_proto",
+        "//modules/prediction/container:container",
         ":relative_obstacle",
     ],
 )
