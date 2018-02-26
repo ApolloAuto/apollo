@@ -24,6 +24,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
+#include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_tokenizer.h"
@@ -309,28 +310,34 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
 
     if (itr->state() == LocalizationMeasureState::OK ||
         itr->state() == LocalizationMeasureState::VALID) {
-      // add PI/2 for heading
+      // caculate orientation_vehicle_world
       LocalizationEstimate local_result = itr->localization();
       apollo::localization::Pose *posepb_loc = local_result.mutable_pose();
-      double new_heading =
-          apollo::common::math::NormalizeAngle(posepb_loc->heading() + M_PI_2);
-      posepb_loc->set_heading(new_heading);
-
-      // set orientation_vehicle_world
       const apollo::common::Quaternion& orientation =
           posepb_loc->orientation();
       const Eigen::Quaternion<double> quaternion(
           orientation.qw(), orientation.qx(),
           orientation.qy(), orientation.qz());
-
       Eigen::Quaternion<double> quat_vehicle_world =
           quaternion * imu_vehicle_quat_;
-      apollo::common::Quaternion* orientation_vehicle_world =
-          posepb_loc->mutable_orientation_vehicle_world();
-      orientation_vehicle_world->set_qx(quat_vehicle_world.x());
-      orientation_vehicle_world->set_qy(quat_vehicle_world.y());
-      orientation_vehicle_world->set_qz(quat_vehicle_world.z());
-      orientation_vehicle_world->set_qw(quat_vehicle_world.w());
+
+      // set heading according to rotation of vehicle
+      posepb_loc->set_heading(
+          common::math::QuaternionToHeading(quat_vehicle_world.w(),
+                                            quat_vehicle_world.x(),
+                                            quat_vehicle_world.y(),
+                                            quat_vehicle_world.z()));
+
+      // set euler angles according to rotation of vehicle
+      apollo::common::Point3D *eulerangles =
+          posepb_loc->mutable_euler_angles();
+      common::math::EulerAnglesZXYd euler_angle(quat_vehicle_world.w(),
+                                                quat_vehicle_world.x(),
+                                                quat_vehicle_world.y(),
+                                                quat_vehicle_world.z());
+      eulerangles->set_x(euler_angle.pitch());
+      eulerangles->set_y(euler_angle.roll());
+      eulerangles->set_z(euler_angle.yaw());
 
       PublishPoseBroadcastTF(local_result);
       AdapterManager::PublishLocalization(local_result);

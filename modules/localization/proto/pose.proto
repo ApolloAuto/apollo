@@ -42,7 +42,8 @@ message Pose {
   // Around east/north/up axes in radians per second.
   optional apollo.common.Point3D angular_velocity = 5;
 
-  // heading
+  // Heading
+  // The heading is zero when the car is facing East and positive when facing North.
   optional double heading = 6;
 
   // Linear acceleration of the VRP in the vehicle reference frame.
@@ -53,13 +54,11 @@ message Pose {
   // Around right/forward/up axes in radians per second.
   optional apollo.common.Point3D angular_velocity_vrf = 8;
 
-  // Roll/pitch/yaw that represents a rotation of the intrinsic sequence z-y-x.
-
-  // Roll/pitch/yaw in radians.
+  // Roll/pitch/yaw that represents a rotation with intrinsic sequence z-x-y.
+  // in world coordinate (East/North/Up)
+  // The roll, in (-pi/2, pi/2), corresponds to a rotation around the y-axis.
+  // The pitch, in [-pi, pi), corresponds to a rotation around the x-axis.
+  // The yaw, in [-pi, pi), corresponds to a rotation around the z-axis.
+  // The direction of rotation follows the right-hand rule.
   optional apollo.common.Point3D euler_angles = 9;
-
-  // A quaternion that represents the rotation from the vehicle coordinate
-  // (Right/Forward/Up) to the
-  // world coordinate (East/North/Up).
-  optional apollo.common.Quaternion orientation_vehicle_world = 10;
 }

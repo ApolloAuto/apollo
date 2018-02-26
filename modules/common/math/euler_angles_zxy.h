@@ -96,7 +96,7 @@ class EulerAnglesZXY {
    * @param qw Quaternion w-coordinate
    * @param qx Quaternion x-coordinate
    * @param qy Quaternion y-coordinate
-   * @param qzQuaternion z-coordinate
+   * @param qz Quaternion z-coordinate
    */
   EulerAnglesZXY(T qw, T qx, T qy, T qz)
       : roll_(std::atan2(2.0 * (qw * qy - qx * qz),
