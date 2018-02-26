@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/lattice/behavior_decider/signal_light_scenario.h"
+#include "modules/planning/lattice/behavior/signal_light_scenario.h"
 
 #include <algorithm>
 #include <limits>
