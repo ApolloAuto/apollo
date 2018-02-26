@@ -238,9 +238,9 @@ function release() {
   mkdir -p $MODULES_DIR
   for m in common control canbus localization perception dreamview \
        prediction planning routing calibration third_party_perception monitor data \
-       drivers/delphi_esr \
+       drivers/radar/delphi_esr \
        drivers/gnss \
-       drivers/conti_radar \
+       drivers/radar/conti_radar \
        drivers/mobileye \
        calibration/republish_msg \
        calibration/lidar_ex_checker
