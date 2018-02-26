@@ -96,15 +96,13 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
     double emu_x = point->x() + dx;
     double emu_y = point->y() + dy;
 
-    double x = 0.0;
-    double y = 0.0;
-    common::math::RotateAxis(-adc_state_.heading(), emu_x, emu_y, &x, &y);
+    double flu_x = 0.0;
+    double flu_y = 0.0;
+    common::math::RotateAxis(-adc_state_.heading(), emu_x, emu_y, &flu_x,
+                             &flu_y);
 
-    double rfu_x = -y;
-    double rfu_y = x;
-
-    point->set_x(rfu_x);
-    point->set_y(rfu_y);
+    point->set_x(flu_x);
+    point->set_y(flu_y);
     const double accumulated_s =
         navigation_path.path_point(i).s() -
         navigation_path.path_point(curr_project_index).s();
@@ -164,8 +162,9 @@ void NavigationLane::ConvertLaneMarkerToPath(
       right_width_ = std::fabs(x_r);
     }
 
-    double x1 = (std::fabs(x_r) - std::fabs(x_l)) / 2.0;
-    double y1 = z;
+    // FLU coordinates
+    double x1 = z;
+    double y1 = (std::fabs(x_l) - std::fabs(x_r)) / 2.0;
 
     auto* point = path->add_path_point();
     point->set_x(x1);
