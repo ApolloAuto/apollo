@@ -297,7 +297,7 @@ if __name__ == "__main__":
     fig = plt.figure()
     ax = plt.subplot2grid((1, 1), (0, 0), rowspan=1, colspan=1)
     left_lm, = ax.plot([], [], 'b-')
-    right_lm, = ax.plot([], [], 'b-')
+    right_lm, = ax.plot([], [], 'g-')
     middle_lm, = ax.plot([], [], 'r-')
 
     ani = animation.FuncAnimation(fig, update, interval=100)

@@ -193,7 +193,6 @@ DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 // lattice planner
 DECLARE_double(lattice_epsilon);
 DECLARE_double(default_cruise_speed);
-DECLARE_double(spiral_downsample_curvature_thred);
 DECLARE_bool(enable_lattice_st_image_dump);
 DECLARE_bool(enable_auto_tuning);
 DECLARE_double(trajectory_time_resolution);

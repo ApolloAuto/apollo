@@ -86,17 +86,25 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
   int curr_project_index = last_project_index_;
 
   // offset between the current vehicle state and navigation line
-  const double dx =
-      adc_state_.x() - navigation_path.path_point(curr_project_index).x();
-  const double dy =
-      adc_state_.y() - navigation_path.path_point(curr_project_index).y();
+  const double dx = -navigation_path.path_point(curr_project_index).x();
+  const double dy = -navigation_path.path_point(curr_project_index).y();
   for (int i = curr_project_index; i < navigation_path.path_point_size(); ++i) {
     auto* point = path->add_path_point();
     point->CopyFrom(navigation_path.path_point(i));
 
-    // shift to adc_state_ (x, y)
-    point->set_x(point->x() + dx);
-    point->set_y(point->y() + dy);
+    // shift to (0, 0)
+    double emu_x = point->x() + dx;
+    double emu_y = point->y() + dy;
+
+    double x = 0.0;
+    double y = 0.0;
+    common::math::RotateAxis(-adc_state_.heading(), emu_x, emu_y, &x, &y);
+
+    double rfu_x = -y;
+    double rfu_y = x;
+
+    point->set_x(rfu_x);
+    point->set_y(rfu_y);
     const double accumulated_s =
         navigation_path.path_point(i).s() -
         navigation_path.path_point(curr_project_index).s();
@@ -156,15 +164,8 @@ void NavigationLane::ConvertLaneMarkerToPath(
       right_width_ = std::fabs(x_r);
     }
 
-    double x1 = 0.0;
-    double y1 = 0.0;
-    // rotate from vehicle axis to x-y axis
-    common::math::RotateAxis(-adc_state_.heading(), z, (x_l + x_r) / 2.0, &x1,
-                             &y1);
-
-    // shift to get point on x-y axis
-    x1 += adc_state_.x();
-    y1 += adc_state_.y();
+    double x1 = (std::fabs(x_r) - std::fabs(x_l)) / 2.0;
+    double y1 = z;
 
     auto* point = path->add_path_point();
     point->set_x(x1);
