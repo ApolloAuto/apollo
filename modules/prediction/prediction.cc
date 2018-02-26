@@ -145,15 +145,6 @@ void Prediction::OnRelativeMap(const relative_map::MapMsg& relative_map) {
 }
 
 void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
-  if (FLAGS_prediction_offline_mode) {
-    PredictOnNavigation(perception_obstacles);
-  } else {
-    PredictOnHDMap(perception_obstacles);
-  }
-}
-
-void Prediction::PredictOnHDMap(
-    const PerceptionObstacles& perception_obstacles) {
   if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0 &&
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
