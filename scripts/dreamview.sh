@@ -26,9 +26,6 @@ source "${DIR}/apollo_base.sh"
 # Dreamview depends on monitor module to get system runtime status.
 bash scripts/monitor.sh "$@"
 
-rm -rf modules/dreamview/frontend/dist/assets/map_data
-ln -s `pwd`/modules/map/data/ modules/dreamview/frontend/dist/assets/map_data
-
 # run function from apollo_base.sh
 # run command_name module_name
 run dreamview "$@"

@@ -236,7 +236,7 @@ function release() {
   # modules data and conf
   MODULES_DIR="${APOLLO_DIR}/modules"
   mkdir -p $MODULES_DIR
-  for m in common control canbus localization decision perception dreamview \
+  for m in common control canbus localization perception dreamview \
        prediction planning routing calibration third_party_perception monitor data \
        drivers/delphi_esr \
        drivers/gnss \
@@ -268,6 +268,7 @@ function release() {
 
   # dreamview runfiles
   cp -Lr bazel-bin/modules/dreamview/dreamview.runfiles/apollo/modules/dreamview/frontend $MODULES_DIR/dreamview
+  ln -s /apollo/modules/map/data $MODULES_DIR/dreamview/frontend/dist/assets/map_data
 
   # perception model
   cp -r modules/perception/model/ $MODULES_DIR/perception
