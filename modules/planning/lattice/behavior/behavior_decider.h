@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHAVIOR_DECIDER_H_
-#define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHAVIOR_DECIDER_H_
+#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_BEHAVIOR_DECIDER_H_
+#define MODULES_PLANNING_LATTICE_BEHAVIOR_BEHAVIOR_DECIDER_H_
 
 #include <memory>
 #include <vector>
@@ -29,8 +29,8 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/lattice/behavior_decider/path_time_graph.h"
-#include "modules/planning/lattice/behavior_decider/prediction_querier.h"
+#include "modules/planning/lattice/behavior/path_time_graph.h"
+#include "modules/planning/lattice/behavior/prediction_querier.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
@@ -53,4 +53,4 @@ class BehaviorDecider {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_BEHAVIOR_DECIDER_H_
+#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_BEHAVIOR_DECIDER_H_

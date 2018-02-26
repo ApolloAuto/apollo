@@ -18,15 +18,15 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SIGNAL_LIGHT_SCENARIO_H_
-#define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SIGNAL_LIGHT_SCENARIO_H_
+#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_SIGNAL_LIGHT_SCENARIO_H_
+#define MODULES_PLANNING_LATTICE_BEHAVIOR_SIGNAL_LIGHT_SCENARIO_H_
 
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+#include "modules/planning/lattice/behavior/scenario.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/planning/lattice/behavior_decider/scenario.h"
 
 namespace apollo {
 namespace planning {
@@ -56,4 +56,4 @@ class SignalLightScenario : public Scenario {
 }  // namespace planning
 }  // namespace apollo
 
-#endif
+#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_SIGNAL_LIGHT_SCENARIO_H_

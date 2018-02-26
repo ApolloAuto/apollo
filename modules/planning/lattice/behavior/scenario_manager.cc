@@ -18,11 +18,11 @@
  * @file
  **/
 
-#include "modules/planning/lattice/behavior_decider/scenario_manager.h"
+#include "modules/planning/lattice/behavior/scenario_manager.h"
 
+#include "modules/planning/lattice/behavior/ego_vehicle_scenario.h"
+#include "modules/planning/lattice/behavior/signal_light_scenario.h"
 #include "modules/common/log.h"
-#include "modules/planning/lattice/behavior_decider/ego_vehicle_scenario.h"
-#include "modules/planning/lattice/behavior_decider/signal_light_scenario.h"
 
 namespace apollo {
 namespace planning {
