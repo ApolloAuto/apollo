@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/lattice/manipulator/backup_trajectory_generator.h"
-#include "modules/planning/lattice/manipulator/trajectory_combiner.h"
+#include "modules/planning/lattice/trajectory_generation/backup_trajectory_generator.h"
+
+#include "modules/planning/lattice/trajectory_generation/trajectory_combiner.h"
 
 namespace apollo {
 namespace planning {

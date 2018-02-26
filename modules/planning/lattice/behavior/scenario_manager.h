@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
-#define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
+#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_SCENARIO_MANAGER_H_
+#define MODULES_PLANNING_LATTICE_BEHAVIOR_SCENARIO_MANAGER_H_
 
 #include <memory>
 #include <string>
@@ -27,9 +27,9 @@
 #include <utility>
 #include <vector>
 
+#include "modules/planning/lattice/behavior/scenario.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/lattice/behavior_decider/scenario.h"
 
 namespace apollo {
 namespace planning {
@@ -78,4 +78,4 @@ class ScenarioManager {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_SCENARIO_MANAGER_H_
+#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_SCENARIO_MANAGER_H_

@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_MANIPULATOR_TRAJECTORY_EVALUATOR_H_
-#define MODULES_PLANNING_LATTICE_MANIPULATOR_TRAJECTORY_EVALUATOR_H_
+#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_EVALUATOR_H_
+#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_EVALUATOR_H_
 
 #include <functional>
 #include <memory>
@@ -27,7 +27,7 @@
 #include <utility>
 #include <vector>
 
-#include "../behavior_decider/path_time_graph.h"
+#include "../behavior/path_time_graph.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -126,4 +126,5 @@ class TrajectoryEvaluator {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_MANIPULATOR_TRAJECTORY_EVALUATOR_H_
+#endif
+// MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_EVALUATOR_H_
