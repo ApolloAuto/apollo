@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/lattice/behavior_decider/signal_light_scenario.h"
+#include "modules/planning/lattice/behavior/signal_light_scenario.h"
 
 #include <algorithm>
 #include <limits>
@@ -74,7 +74,8 @@ int SignalLightScenario::ComputeScenarioDecision(
     }
   }
 
-  if (stop_point.s() < std::numeric_limits<double>::max()) {
+  if (stop_point.s() < std::numeric_limits<double>::max() &&
+      stop_point.has_type()) {
     planning_target->mutable_stop_point()->set_s(stop_point.s());
     planning_target->mutable_stop_point()->set_type(stop_point.type());
   }

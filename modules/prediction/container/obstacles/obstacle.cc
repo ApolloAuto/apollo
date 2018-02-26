@@ -602,9 +602,7 @@ void Obstacle::InitKFLaneTracker(const std::string& lane_id,
 
   // observation matrix
   Eigen::Matrix<double, 2, 4> H;
-  H.setZero();
-  H(0, 0) = 1.0;
-  H(1, 1) = 1.0;
+  H.setIdentity();
   kf.SetObservationMatrix(H);
 
   // Set covariance of transition noise matrix Q

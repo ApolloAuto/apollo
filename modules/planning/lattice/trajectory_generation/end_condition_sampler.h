@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_MANIPULATOR_END_CONDITION_SAMPLER_H_
-#define MODULES_PLANNING_LATTICE_MANIPULATOR_END_CONDITION_SAMPLER_H_
+#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_END_CONDITION_SAMPLER_H_
+#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_END_CONDITION_SAMPLER_H_
 
 #include <array>
 #include <utility>
@@ -27,9 +27,9 @@
 #include <memory>
 #include <string>
 
-#include "modules/planning/lattice/behavior_decider/feasible_region.h"
-#include "modules/planning/lattice/behavior_decider/path_time_graph.h"
-#include "modules/planning/lattice/behavior_decider/prediction_querier.h"
+#include "modules/planning/lattice/behavior/feasible_region.h"
+#include "modules/planning/lattice/behavior/path_time_graph.h"
+#include "modules/planning/lattice/behavior/prediction_querier.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 
 namespace apollo {
@@ -75,4 +75,5 @@ class EndConditionSampler {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_MANIPULATOR_END_CONDITION_SAMPLER_H_
+#endif
+// MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_END_CONDITION_SAMPLER_H_

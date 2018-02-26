@@ -13,9 +13,9 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/lattice/behavior_decider:feasible_region",
-        "//modules/planning/lattice/behavior_decider:path_time_graph",
-        "//modules/planning/lattice/behavior_decider:prediction_querier",
+        "//modules/planning/lattice/behavior:feasible_region",
+        "//modules/planning/lattice/behavior:path_time_graph",
+        "//modules/planning/lattice/behavior:prediction_querier",
         "//modules/planning/proto:lattice_structure_proto",
     ],
 )
@@ -31,14 +31,14 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/lattice/behavior_decider:path_time_graph",
-        "//modules/planning/lattice/behavior_decider:prediction_querier",
+        "//modules/planning/lattice/behavior:path_time_graph",
+        "//modules/planning/lattice/behavior:prediction_querier",
         "//modules/planning/lattice/trajectory1d:lattice_trajectory1d",
         "//modules/planning/lattice/trajectory1d:standing_still_trajectory1d",
         "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
         "//modules/planning/lattice/trajectory1d:constant_deceleration_trajectory1d",
         "//modules/planning/lattice/trajectory1d:piecewise_trajectory1d",
-        "//modules/planning/lattice/manipulator:end_condition_sampler",
+        "//modules/planning/lattice/trajectory_generation:end_condition_sampler",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
@@ -60,7 +60,7 @@ cc_library(
         "//modules/planning/constraint_checker:constraint_checker1d",
         "//modules/planning/math/curve1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
-        "//modules/planning/lattice/behavior_decider:path_time_graph",
+        "//modules/planning/lattice/behavior:path_time_graph",
     ],
 )
 
@@ -77,8 +77,8 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/lattice/trajectory1d:constant_deceleration_trajectory1d",
-        "//modules/planning/lattice/manipulator:trajectory1d_generator",
-        "//modules/planning/lattice/manipulator:trajectory_combiner",
+        "//modules/planning/lattice/trajectory_generation:trajectory1d_generator",
+        "//modules/planning/lattice/trajectory_generation:trajectory_combiner",
         "//modules/planning/math/curve1d",
     ],
 )
