@@ -126,7 +126,7 @@ class GmapNavigator {
 
     const lane = [];
     for (let x = 0; x < markerRange; ++x) {
-      const y = -1 * polyval(markerCoef, x);
+      const y = polyval(markerCoef, x);
       const newX = x * Math.cos(heading) - y * Math.sin(heading);
       const newY = y * Math.cos(heading) + x * Math.sin(heading);
       const [plon, plat] = UTMToWGS84(adcX + newX, adcY + newY);
