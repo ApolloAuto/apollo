@@ -577,6 +577,9 @@ int StopSign::RemoveWatchVehicle(
 
   bool erase = false;
 
+  bool is_path_cross =
+      !path_obstacle.reference_line_st_boundary().IsEmpty();
+
   // check obstacle is on an associate lane guarded by stop sign
   std::string obstable_lane_id = obstacle_lane.get()->id().id();
   auto assoc_lane_it = std::find_if(
@@ -585,11 +588,13 @@ int StopSign::RemoveWatchVehicle(
           std::pair<LaneInfoConstPtr, OverlapInfoConstPtr>& assc_lane) {
         return assc_lane.first.get()->id().id() == obstable_lane_id;
       });
-  if (assoc_lane_it == associated_lanes_.end()) {
+  if (assoc_lane_it == associated_lanes_.end() && !is_path_cross) {
     ADEBUG
         << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
         << "] lane_id[" << obstable_lane_id
-        << "] not associated with current stop_sign. erase from watch_vehicles";
+        << "] is_path_cross[" << is_path_cross
+        << "] not on a lane associated with current stop_sign, AND "
+        << " PATH not crossed. erase from watch_vehicles";
     erase = true;
   }
 
@@ -618,8 +623,6 @@ int StopSign::RemoveWatchVehicle(
       double stop_line_end_s = over_lap_info->lane_overlap_info().end_s();
       double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
       double distance_pass_stop_line = obstacle_end_s - stop_line_end_s;
-      bool is_path_cross =
-          !path_obstacle.reference_line_st_boundary().IsEmpty();
       if (distance_pass_stop_line > FLAGS_stop_sign_min_pass_distance &&
           !is_path_cross) {
         ADEBUG << "obstacle_id[" << obstacle_id << "] type["
