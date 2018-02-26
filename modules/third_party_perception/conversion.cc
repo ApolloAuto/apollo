@@ -175,16 +175,18 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
       mobileye.lka_766().quality() / 4.0);
   obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_model_degree(
       mobileye.lka_766().model_degree());
+
+  // Convert everything to FLU
   obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_c0_position(
-      mobileye.lka_766().position());
+      -mobileye.lka_766().position());
   obstacles.mutable_lane_marker()
       ->mutable_left_lane_marker()
-      ->set_c1_heading_angle(mobileye.lka_767().heading_angle());
+      ->set_c1_heading_angle(-mobileye.lka_767().heading_angle());
   obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_c2_curvature(
-      mobileye.lka_766().curvature());
+      -mobileye.lka_766().curvature());
   obstacles.mutable_lane_marker()
       ->mutable_left_lane_marker()
-      ->set_c3_curvature_derivative(mobileye.lka_766().curvature_derivative());
+      ->set_c3_curvature_derivative(-mobileye.lka_766().curvature_derivative());
   obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_view_range(
       mobileye.lka_767().view_range());
 
@@ -194,16 +196,16 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
       ->mutable_right_lane_marker()
       ->set_model_degree(mobileye.lka_768().model_degree());
   obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_c0_position(
-      mobileye.lka_768().position());
+      -mobileye.lka_768().position());
   obstacles.mutable_lane_marker()
       ->mutable_right_lane_marker()
-      ->set_c1_heading_angle(mobileye.lka_769().heading_angle());
+      ->set_c1_heading_angle(-mobileye.lka_769().heading_angle());
   obstacles.mutable_lane_marker()
       ->mutable_right_lane_marker()
-      ->set_c2_curvature(mobileye.lka_768().curvature());
+      ->set_c2_curvature(-mobileye.lka_768().curvature());
   obstacles.mutable_lane_marker()
       ->mutable_right_lane_marker()
-      ->set_c3_curvature_derivative(mobileye.lka_768().curvature_derivative());
+      ->set_c3_curvature_derivative(-mobileye.lka_768().curvature_derivative());
   obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_view_range(
       mobileye.lka_769().view_range());
 
