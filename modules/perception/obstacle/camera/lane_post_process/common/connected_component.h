@@ -16,27 +16,25 @@
 
 // @brief: connected component analysis for lane detection
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CONNECTED_COMPONENTS_H_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CONNECTED_COMPONENTS_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CONNECTED_COMPONENT_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CONNECTED_COMPONENT_H_
 
 #include <memory>
-#include <vector>
 #include <string>
 #include <unordered_set>
-#include <opencv2/core/core.hpp>
+#include <vector>
+
 #include <Eigen/Core>
+#include <opencv2/core/core.hpp>
 
-#include <cuda.h>
-#include <cuda_runtime.h>
+//#include <cuda.h>
+//#include <cuda_runtime.h>
 
-#include <xlog.h>
+#include "modules/common/log.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
 
-#include "type.hpp"
-
-namespace adu {
+namespace apollo {
 namespace perception {
-namespace obstacle {
-namespace lane_post_process {
 
 #ifndef NUM_RESERVE_VERTICES
 #define NUM_RESERVE_VERTICES 4
@@ -46,316 +44,340 @@ namespace lane_post_process {
 #define NUM_RESERVE_EDGES 6
 #endif
 
-#define _CUDA_CC true
+#define CUDA_CC false
 
 class DisjointSet {
-public:
-    DisjointSet() : m_disjoint_array(), m_subset_num(0) {}
-    DisjointSet(size_t size) : m_disjoint_array(), m_subset_num(0) {
-        m_disjoint_array.reserve(size);
-    }
-    ~DisjointSet() {}
+ public:
+  DisjointSet()
+      : subset_num_(0) {}
 
-    void init(size_t size) {
-        m_disjoint_array.clear();
-        m_disjoint_array.reserve(size);
-        m_subset_num = 0;
-    }
+  DisjointSet(size_t siz)
+      : subset_num_(0) {
+    disjoint_array_.reserve(siz);
+  }
 
-    void reset() {
-        m_disjoint_array.clear();
-        m_subset_num = 0;
-    }
+  ~DisjointSet() {}
 
-    int add();        // add a new element, which is a subset by itself;
-    int find(int x);  // return the root of x
-    void unite(int x, int y);
-    int size() const { return m_subset_num; }
-    size_t num() const { return m_disjoint_array.size(); }
+  void Init(size_t siz) {
+    disjoint_array_.clear();
+    disjoint_array_.reserve(siz);
+    subset_num_ = 0;
+  }
 
-private:
-    std::vector<int> m_disjoint_array;
-    int m_subset_num;
+  void Reset() {
+    disjoint_array_.clear();
+    subset_num_ = 0;
+  }
+
+  // get the number of subsets (root nodes)
+  int Size() const { return subset_num_; }
+  // get the total number of elements
+  size_t Num() const { return disjoint_array_.size(); }
+  // add a new element
+  int Add();
+  // find the root element of x
+  int Find(int x);
+  // union two elements x and y
+  void Unite(int x, int y);
+
+ private:
+  std::vector<int> disjoint_array_;
+  int subset_num_;
 };
 
 class ConnectedComponent {
-public:
-    typedef Eigen::Matrix<ScalarType, 2, 1> Vertex;
-    typedef Eigen::Matrix<ScalarType, 2, 1> Displacement;
-    enum BoundingBoxSplitType {
-        NONE = -1,       // without split
-        VERTICAL,        // split in vertical direction (y)
-        HORIZONTAL,      // split in horizontal direction (x)
-    };
+ public:
+  typedef Eigen::Matrix<ScalarType, 2, 1> Vertex;
+  typedef Eigen::Matrix<ScalarType, 2, 1> Displacement;
 
-    struct Edge {
-        int start_vertex_id;
-        int end_vertex_id;
-        Displacement vec;
-        ScalarType len;
-        ScalarType orie;
-        Edge ()
-            : start_vertex_id(-1),
-              end_vertex_id(-1),
-              vec(0.0, 0.0),
-              len(0.0),
-              orie(0.0) {}
+  enum BoundingBoxSplitType {
+    NONE = -1,   // do not split
+    VERTICAL,    // split in vertical direction (y)
+    HORIZONTAL,  // split in horizontal direction (x)
+  };
 
-        int get_start_vertex_id() const {
-            return start_vertex_id;
-        }
-        int get_end_vertex_id() const {
-            return end_vertex_id;
-        }
-    };
+  struct Edge {
+    int start_vertex_id;
+    int end_vertex_id;
+    Displacement vec;
+    ScalarType len;
+    ScalarType orie;
 
-    struct BoundingBox {
-        int x_min;  // left
-        int y_min;  // up
-        int x_max;  // right
-        int y_max;  // down
-        std::shared_ptr<std::vector<int> > bbox_pixel_idx;
-        BoundingBoxSplitType split;
-        std::shared_ptr<std::vector<int> > left_contour;
-        std::shared_ptr<std::vector<int> > up_contour;
-        std::shared_ptr<std::vector<int> > right_contour;
-        std::shared_ptr<std::vector<int> > down_contour;
+    Edge()
+        : start_vertex_id(-1),
+          end_vertex_id(-1),
+          vec(0.0, 0.0),
+          len(0.0),
+          orie(0.0) {}
 
-        BoundingBox ()
-            : x_min(-1), y_min(-1), x_max(-1), y_max(-1),
-              split(BoundingBoxSplitType::NONE) {
-            bbox_pixel_idx = std::make_shared<std::vector<int> >();
-            left_contour = std::make_shared<std::vector<int> >();
-            up_contour = std::make_shared<std::vector<int> >();
-            right_contour = std::make_shared<std::vector<int> >();
-            down_contour = std::make_shared<std::vector<int> >();
-        }
+    int get_start_vertex_id() const { return start_vertex_id; }
 
-        BoundingBox (int x, int y)
-            : x_min(x), y_min(y), x_max(x), y_max(y),
-              split(BoundingBoxSplitType::NONE) {
-            bbox_pixel_idx = std::make_shared<std::vector<int> >();
-            left_contour = std::make_shared<std::vector<int> >();
-            up_contour = std::make_shared<std::vector<int> >();
-            right_contour = std::make_shared<std::vector<int> >();
-            down_contour = std::make_shared<std::vector<int> >();
-        }
+    int get_end_vertex_id() const { return end_vertex_id; }
+  };
 
-        int width() const {
-            return x_max - x_min + 1;
-        }
+  struct BoundingBox {
+    int x_min;  // left
+    int y_min;  // up
+    int x_max;  // right
+    int y_max;  // down
+    std::shared_ptr<std::vector<int>> bbox_pixel_idx;
+    BoundingBoxSplitType split;
+    std::shared_ptr<std::vector<int>> left_contour;
+    std::shared_ptr<std::vector<int>> up_contour;
+    std::shared_ptr<std::vector<int>> right_contour;
+    std::shared_ptr<std::vector<int>> down_contour;
 
-        int height() const {
-            return y_max - y_min + 1;
-        }
-    };
-
-    ConnectedComponent()
-        : _pixel_count(0), _bbox() {
-        _pixels = std::make_shared<std::vector<cv::Point2i> >();
-        _vertices = std::make_shared<std::vector<Vertex> >();
-        _vertices->reserve(NUM_RESERVE_VERTICES);
-        _edges = std::make_shared<std::vector<Edge> >();
-        _edges->reserve(NUM_RESERVE_EDGES);
-        _max_len_edge_id = -1;
-        _clockwise_edge = std::make_shared<Edge>();
-        _anticlockwise_edge = std::make_shared<Edge>();
-        _inner_edge = std::make_shared<Edge>();
-        _clockwise_edges = std::make_shared<std::vector<Edge> >();
-        _anticlockwise_edges = std::make_shared<std::vector<Edge> >();
-        _inner_edges = std::make_shared<std::vector<Edge> >();
+    BoundingBox()
+        : x_min(-1),
+          y_min(-1),
+          x_max(-1),
+          y_max(-1),
+          split(BoundingBoxSplitType::NONE) {
+      bbox_pixel_idx = std::make_shared<std::vector<int>>();
+      left_contour = std::make_shared<std::vector<int>>();
+      up_contour = std::make_shared<std::vector<int>>();
+      right_contour = std::make_shared<std::vector<int>>();
+      down_contour = std::make_shared<std::vector<int>>();
     }
 
-    ConnectedComponent(int x, int y)
-        : _pixel_count(1), _bbox(x, y) {
-        _pixels = std::make_shared<std::vector<cv::Point2i> >();
-        _pixels->push_back(cv::Point(x, y));
-        _vertices = std::make_shared<std::vector<Vertex> >();
-        _vertices->reserve(NUM_RESERVE_VERTICES);
-        _edges = std::make_shared<std::vector<Edge> >();
-        _edges->reserve(NUM_RESERVE_EDGES);
-        _max_len_edge_id = -1;
-        _clockwise_edge = std::make_shared<Edge>();
-        _anticlockwise_edge = std::make_shared<Edge>();
-        _inner_edge = std::make_shared<Edge>();
-        _clockwise_edges = std::make_shared<std::vector<Edge> >();
-        _anticlockwise_edges = std::make_shared<std::vector<Edge> >();
-        _inner_edges = std::make_shared<std::vector<Edge> >();
+    BoundingBox(int x, int y)
+        : x_min(x),
+          y_min(y),
+          x_max(x),
+          y_max(y),
+          split(BoundingBoxSplitType::NONE) {
+      bbox_pixel_idx = std::make_shared<std::vector<int>>();
+      left_contour = std::make_shared<std::vector<int>>();
+      up_contour = std::make_shared<std::vector<int>>();
+      right_contour = std::make_shared<std::vector<int>>();
+      down_contour = std::make_shared<std::vector<int>>();
     }
 
-    ~ConnectedComponent() {}
-
-    // CC pixels
-    void addPixel(int x, int y);
-    int getPixelCount() const { return _pixel_count; }
-    std::shared_ptr<const std::vector<cv::Point2i> > getPixels() const {
-        return _pixels;
+    int width() const {
+      return x_max - x_min + 1;
     }
 
-    // bounding box
-    const BoundingBox* bbox() const { return &_bbox; }
-    int x_min() const { return _bbox.x_min; }
-    int y_min() const { return _bbox.y_min; }
-    int x_max() const { return _bbox.x_max; }
-    int y_max() const { return _bbox.y_max; }
-
-    cv::Rect getBoundingBox() const {
-        return cv::Rect(_bbox.x_min, _bbox.y_min,
-                        _bbox.x_max - _bbox.x_min + 1,
-                        _bbox.y_max - _bbox.y_min + 1);
+    int height() const {
+      return y_max - y_min + 1;
     }
+  };
 
-    int getBoundingBoxArea() const {
-        int area = (_bbox.x_max - _bbox.x_min + 1) * (_bbox.y_max - _bbox.y_min + 1);
-#if _DEBUG
-        CHECK_GE(area, 0);
-#endif
-        return area;
-    }
+  ConnectedComponent()
+      : pixel_count_(0),
+        bbox_() {
+    pixels_ = std::make_shared<std::vector<cv::Point2i>>();
+    vertices_ = std::make_shared<std::vector<Vertex>>();
+    vertices_->reserve(NUM_RESERVE_VERTICES);
+    edges_ = std::make_shared<std::vector<Edge>>();
+    edges_->reserve(NUM_RESERVE_EDGES);
+    max_len_edge_id_ = -1;
+    clockwise_edge_ = std::make_shared<Edge>();
+    anticlockwise_edge_ = std::make_shared<Edge>();
+    inner_edge_ = std::make_shared<Edge>();
+    clockwise_edges_ = std::make_shared<std::vector<Edge>>();
+    anticlockwise_edges_ = std::make_shared<std::vector<Edge>>();
+    inner_edges_ = std::make_shared<std::vector<Edge>>();
+  }
 
-    // split bounding box
-    BoundingBoxSplitType determineSplit(ScalarType split_siz);
+  ConnectedComponent(int x, int y)
+      : pixel_count_(1),
+        bbox_(x, y) {
+    pixels_ = std::make_shared<std::vector<cv::Point2i>>();
+    pixels_->push_back(cv::Point(x, y));
+    vertices_ = std::make_shared<std::vector<Vertex>>();
+    vertices_->reserve(NUM_RESERVE_VERTICES);
+    edges_ = std::make_shared<std::vector<Edge>>();
+    edges_->reserve(NUM_RESERVE_EDGES);
+    max_len_edge_id_ = -1;
+    clockwise_edge_ = std::make_shared<Edge>();
+    anticlockwise_edge_ = std::make_shared<Edge>();
+    inner_edge_ = std::make_shared<Edge>();
+    clockwise_edges_ = std::make_shared<std::vector<Edge>>();
+    anticlockwise_edges_ = std::make_shared<std::vector<Edge>>();
+    inner_edges_ = std::make_shared<std::vector<Edge>>();
+  }
 
-    void findContourForSplit();
+  ~ConnectedComponent() {}
 
-    // bounding box pixels
-    void findBboxPixels();
+  // CC pixels
+  void AddPixel(int x, int y);
+  int GetPixelCount() const { return pixel_count_; }
+  std::shared_ptr<const std::vector<cv::Point2i>> GetPixels() const {
+      return pixels_;
+  }
 
-    std::shared_ptr<const std::vector<int> > bbox_pixel_idx() const {
-        return _bbox.bbox_pixel_idx;
-    }
+  // bounding box
+  const BoundingBox* bbox() const { return &bbox_; }
+  int x_min() const { return bbox_.x_min; }
+  int y_min() const { return bbox_.y_min; }
+  int x_max() const { return bbox_.x_max; }
+  int y_max() const { return bbox_.y_max; }
 
-    int getBboxPixelCount() const {
-        return static_cast<int>(_bbox.bbox_pixel_idx->size());
-    }
+  cv::Rect GetBoundingBox() const {
+    return cv::Rect(bbox_.x_min,
+                    bbox_.y_min,
+                    bbox_.x_max - bbox_.x_min + 1,
+                    bbox_.y_max - bbox_.y_min + 1);
+  }
 
-    // vertices
-    void findVertices();
-    std::shared_ptr<const std::vector<Vertex> > getVertices() const {
-        return _vertices;
-    }
+  int GetBoundingBoxArea() const {
+    return (bbox_.x_max - bbox_.x_min + 1) * (bbox_.y_max - bbox_.y_min + 1);
+  }
 
-    Vertex getVertex(int vertex_id) const {
-        assert(vertex_id >= 0 && vertex_id < this->getVertexCount());
-        return _vertices->at(vertex_id);
-    }
+  // split bounding box
+  BoundingBoxSplitType DetermineSplit(ScalarType split_siz);
 
-    int getVertexCount() const { return static_cast<int>(_vertices->size()); }
+  void FindContourForSplit();
 
-    // edges
-    bool isValidEdgeVertices(int i, int j) {
-        return i >= 0 &&
-               i < this->getVertexCount() &&
-               j >= 0 &&
-               j < this->getVertexCount() &&
-               i != j;
-    }
+  // bounding box pixels
+  void FindBboxPixels();
 
-    void findEdges();
-    int getEdgeCount() const { return static_cast<int>(_edges->size()); }
-    const Edge* getMaxLenthEdge() const { return &_edges->at(_max_len_edge_id); }
-    std::shared_ptr<const Edge> getClockWiseEdge() const { return _clockwise_edge; }
-    std::shared_ptr<const Edge> getAntiClockWiseEdge() const { return _anticlockwise_edge; }
-    std::shared_ptr<const Edge> getInnerEdge() const { return _inner_edge; }
+  std::shared_ptr<const std::vector<int>> bbox_pixel_idx() const {
+    return bbox_.bbox_pixel_idx;
+  }
 
-    void splitContourVertical(int start_vertex_id, int end_vertex_id,
+  int GetBboxPixelCount() const {
+    return static_cast<int>(bbox_.bbox_pixel_idx->size());
+  }
+
+  // vertices
+  void FindVertices();
+  std::shared_ptr<const std::vector<Vertex>> GetVertices() const {
+    return vertices_;
+  }
+
+  Vertex GetVertex(int vertex_id) const {
+    //assert(vertex_id >= 0 && vertex_id < this->getVertexCount());
+    return vertices_->at(vertex_id);
+  }
+
+  int GetVertexCount() const {
+    return static_cast<int>(vertices_->size());
+  }
+
+  // edges
+  bool IsValidEdgeVertices(int i, int j) {
+    return i >= 0 && i < this->GetVertexCount() &&
+           j >= 0 && j < this->GetVertexCount() &&
+           i != j;
+  }
+
+  void FindEdges();
+  int GetEdgeCount() const {
+      return static_cast<int>(edges_->size());
+  }
+  const Edge* GetMaxLenthEdge() const {
+      return &edges_->at(max_len_edge_id_);
+  }
+  std::shared_ptr<const Edge> GetClockWiseEdge() const {
+      return clockwise_edge_;
+  }
+  std::shared_ptr<const Edge> GetAntiClockWiseEdge() const {
+    return anticlockwise_edge_;
+  }
+  std::shared_ptr<const Edge> GetInnerEdge() const {
+    return inner_edge_;
+  }
+
+  void SplitContour(int split_len);
+  std::shared_ptr<std::vector<Edge>> GetClockWiseEdges() const {
+    return clockwise_edges_;
+  }
+  std::shared_ptr<std::vector<Edge>> GetAntiClockWiseEdges() const {
+    return anticlockwise_edges_;
+  }
+  std::shared_ptr<std::vector<Edge>> GetInnerEdges() const {
+    return inner_edges_;
+  }
+
+  void Process(ScalarType split_siz, int split_len);
+
+ private:
+  int Sub2Ind(int row, int col, int width) {
+    return row * width + col;
+  }
+
+  void SplitContourVertical(int start_vertex_id, int end_vertex_id,
+                            int len_split, bool is_clockwise);
+  void SplitContourVertical(int len_split, bool is_clockwise,
+                            int start_pos, int end_pos);
+  void SplitContourHorizontal(int start_vertex_id, int end_vertex_id,
                               int len_split, bool is_clockwise);
-    void splitContourVertical(int len_split, bool is_clockwise, int start_pos, int end_pos);
-    void splitContourHorizontal(int start_vertex_id, int end_vertex_id,
-                                int len_split, bool is_clockwise);
-    void splitContourHorizontal(int len_split, bool is_clockwise, int start_pos, int end_pos);
-    void splitContour(int split_len);
-    std::shared_ptr<std::vector<Edge> > getClockWiseEdges() const { return _clockwise_edges; }
-    std::shared_ptr<std::vector<Edge> > getAntiClockWiseEdges() const {
-        return _anticlockwise_edges;
-    }
-    std::shared_ptr<std::vector<Edge> > getInnerEdges() const { return _inner_edges; }
+  void SplitContourHorizontal(int len_split, bool is_clockwise,
+                              int start_pos, int end_pos);
 
-    void process(ScalarType split_siz, int split_len);
+  std::vector<int> GetSplitRanges(int siz, int len_split);
 
-private:
-    int sub2ind(int row, int col, int width) {
-        return row * width + col;
-    }
+  Edge MakeEdge(int i, int j);
 
-    std::vector<int> get_split_ranges(int siz, int len_split);
-
-    Edge makeEdge(int i, int j);
-
-    int _pixel_count;
-    std::shared_ptr<std::vector<cv::Point2i> > _pixels;
-    BoundingBox _bbox;
-    std::shared_ptr<std::vector<Vertex> > _vertices;
-    std::shared_ptr<std::vector<Edge> > _edges;
-    int _max_len_edge_id;
-    std::shared_ptr<Edge> _clockwise_edge, _anticlockwise_edge;
-    std::shared_ptr<Edge> _inner_edge;
-    std::shared_ptr<std::vector<Edge> > _clockwise_edges, _anticlockwise_edges;
-    std::shared_ptr<std::vector<Edge> > _inner_edges;
+  int pixel_count_;
+  std::shared_ptr<std::vector<cv::Point2i>> pixels_;
+  BoundingBox bbox_;
+  std::shared_ptr<std::vector<Vertex>> vertices_;
+  std::shared_ptr<std::vector<Edge>> edges_;
+  int max_len_edge_id_;
+  std::shared_ptr<Edge> clockwise_edge_, anticlockwise_edge_;
+  std::shared_ptr<Edge> inner_edge_;
+  std::shared_ptr<std::vector<Edge>> clockwise_edges_, anticlockwise_edges_;
+  std::shared_ptr<std::vector<Edge>> inner_edges_;
 };
 
 typedef std::shared_ptr<ConnectedComponent> ConnectedComponentPtr;
 typedef const std::shared_ptr<ConnectedComponent> ConnectedComponentConstPtr;
 
-bool find_cc(const cv::Mat &src, std::vector<std::shared_ptr<ConnectedComponent> > &cc);
-bool find_cc(const cv::Mat &src, const cv::Rect &roi,
-             std::vector<std::shared_ptr<ConnectedComponent> > &cc);
-bool find_cc_block(const cv::Mat &src, const cv::Rect &roi,
-                   std::vector<std::shared_ptr<ConnectedComponent> >& cc);
 
 class ConnectedComponentGenerator {
-public:
-    ConnectedComponentGenerator(int image_width, int image_height);
-    ConnectedComponentGenerator(int image_width, int image_height, cv::Rect roi);
+ public:
+  ConnectedComponentGenerator(int image_width, int image_height);
+  ConnectedComponentGenerator(int image_width, int image_height, cv::Rect roi);
 
-    ~ConnectedComponentGenerator() {
-#if _CUDA_CC
-        cudaFree(_label_array);
-        cudaFreeArray(_img_array);
+  ~ConnectedComponentGenerator() {
+#if CUDA_CC
+    cudaFree(label_array_);
+    cudaFreeArray(img_array_);
 
-        cudaError_t cuda_err = cudaGetLastError();
-        if (cuda_err != cudaSuccess) {
-            XLOG(ERROR) << "failed to release arrays '_label_array' and '_img_array' with CUDA: "
-                        << cudaGetErrorString(cuda_err);
-        }
-
-        free(_labels);
-#endif
+    cudaError_t cuda_err = cudaGetLastError();
+    if (cuda_err != cudaSuccess) {
+      AERROR << "failed to release label_array and img_array with CUDA: "
+             << cudaGetErrorString(cuda_err);
     }
 
-    bool find_cc(const cv::Mat& lane_map, std::vector<std::shared_ptr<ConnectedComponent> >& cc);
+    free(labels_);
+#endif
+  }
 
-private:
-#if _CUDA_CC
-    bool block_union_find(const unsigned char* img);
+  bool FindCC(const cv::Mat& lane_map,
+              std::vector<std::shared_ptr<ConnectedComponent>>& cc);
+
+ private:
+#if CUDA_CC
+  bool BlockUnionFind(const unsigned char* img);
 #endif
 
-private:
-    size_t _total_pix;
-    int _image_width;
-    int _image_height;
+ private:
+  size_t total_pix_;
+  int image_width_;
+  int image_height_;
 
-    int _width;
-    int _height;
-    int _roi_x_min;
-    int _roi_y_min;
-    int _roi_x_max;
-    int _roi_y_max;
+  int width_;
+  int height_;
+  int roi_x_min_;
+  int roi_y_min_;
+  int roi_x_max_;
+  int roi_y_max_;
 
-#if _CUDA_CC
-    int* _labels;
+#if CUDA_CC
+  int* labels_;
 #else
-    DisjointSet _labels;
-    std::vector<int> _frame_label;
+  DisjointSet labels_;
+  std::vector<int> frame_label_;
 #endif
-    std::vector<int> _root_map;
-    cudaArray* _img_array;
-    int* _label_array;
+  std::vector<int> root_map_;
+  cudaArray* img_array_;
+  int* label_array_;
 };
 
-}  // namespace lane_post_process
-}  // namespace obstacle
 }  // namespace perception
-}  // namespace adu
+}  // namespace apollo
 
-#endif  // ADU_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CONNECTED_COMPONENTS_HPP
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CONNECTED_COMPONENT_H_
