@@ -39,7 +39,7 @@ float PbfTrackObjectDistance::Compute(
     const PbfTrackPtr &fused_track, const PbfSensorObjectPtr &sensor_object,
     const TrackObjectDistanceOptions &options) {
   const SensorType &sensor_type = sensor_object->sensor_type;
-  ADEBUG << "sensor type: " << sensor_type;
+  ADEBUG << "sensor type: " << static_cast<int>(sensor_type);
   PbfSensorObjectPtr fused_object = fused_track->GetFusedObject();
   if (fused_object == nullptr) {
     ADEBUG << "fused object is nullptr";

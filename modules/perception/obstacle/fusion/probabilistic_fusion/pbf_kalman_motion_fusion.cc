@@ -110,7 +110,7 @@ void PbfKalmanMotionFusion::UpdateWithObject(
   p_matrix_.block<2, 2>(0, 2) = Eigen::Matrix2d::Zero();
 
   Eigen::Vector3d measured_acceleration = Eigen::Vector3d::Zero();
-  if (new_object->sensor_type == VELODYNE_64) {
+  if (new_object->sensor_type == SensorType::VELODYNE_64) {
     belief_anchor_point_ = new_object->object->center;
     belief_velocity_ = new_object->object->velocity;
     if (GetLidarHistoryLength() >= 3) {
@@ -130,7 +130,7 @@ void PbfKalmanMotionFusion::UpdateWithObject(
     history_velocity_.push_back(belief_velocity_);
     history_time_diff_.push_back(new_object->timestamp);
     history_velocity_is_radar_.push_back(false);
-  } else if (new_object->sensor_type == RADAR) {
+  } else if (new_object->sensor_type == SensorType::RADAR) {
     belief_anchor_point_(0) = new_object->object->center(0);
     belief_anchor_point_(1) = new_object->object->center(1);
     belief_velocity_(0) = new_object->object->velocity(0);
@@ -153,7 +153,7 @@ void PbfKalmanMotionFusion::UpdateWithObject(
     history_velocity_is_radar_.push_back(true);
   } else {
     AERROR << "unsupported sensor type for PbfKalmanMotionFusion: "
-           << new_object->sensor_type;
+           << static_cast<int>(new_object->sensor_type);
     return;
   }
 
