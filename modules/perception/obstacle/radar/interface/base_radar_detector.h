@@ -77,7 +77,7 @@ struct RadarDetectorOptions {
   Eigen::Matrix4d *radar2world_pose = nullptr;
   Eigen::Vector3f car_linear_speed = Eigen::Vector3f::Zero();
 };
-enum ContiObjectType {
+enum class ContiObjectType {
   CONTI_POINT = 0,
   CONTI_CAR = 1,
   CONTI_TRUCK = 2,
@@ -88,7 +88,7 @@ enum ContiObjectType {
   CONTI_UNKNOWN = 7,
   CONTI_MAX_OBJECT_TYPE = 8,
 };
-enum ContiMeasState {
+enum class ContiMeasState {
   CONTI_DELETED = 0,
   CONTI_NEW = 1,
   CONTI_MEASURED = 2,
