@@ -25,8 +25,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include <opencv2/opencv.hpp>
-
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
 #include "modules/perception/obstacle/common/hungarian_bigraph_matcher.h"

@@ -236,7 +236,7 @@ void tracker_and_id_management(
   }
 
   // Keep unmatched tracks here
-  for (auto &trk : tracked) {
+  for (auto &trk : *tracked) {
     if (!trackedID_to_detectedID.count(trk._track_id) &&
         trk._last_seen_frame_cnt + max_kept_frame_cnt >= curr_frame_cnt) {
       trk._detect_id = -1;
@@ -244,7 +244,7 @@ void tracker_and_id_management(
     }
   }
 
-  std::swap(new_tracked, tracked);
+  std::swap(new_tracked, *tracked);
 }
 
 void print_affinity_matrix(

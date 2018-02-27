@@ -21,13 +21,13 @@
 #include <google/protobuf/io/gzip_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
+#include <opencv2/opencv.hpp>
 #include <fstream>
 #include <iostream>
 #include <iterator>
 #include <string>
 #include <vector>
 
-#include <opencv2/opencv.hpp>
 
 #include "modules/perception/obstacle/camera/common/visual_object.h"
 

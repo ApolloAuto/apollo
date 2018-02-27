@@ -17,10 +17,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_BASE_AFFINITY_TRACKER_H
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_BASE_AFFINITY_TRACKER_H
 
+#include <opencv2/opencv.hpp>
+
 #include <limits>
 #include <vector>
 
-#include <opencv2/opencv.hpp>
 
 namespace apollo {
 namespace perception {
