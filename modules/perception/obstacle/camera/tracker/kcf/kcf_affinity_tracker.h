@@ -14,51 +14,53 @@
  * limitations under the License.
  *****************************************************************************/
 
- #ifndef ADU_PERCEPTION_OBSTACLE_CAMERA_KCF_AFFINITY_TRACKER_H
+#ifndef ADU_PERCEPTION_OBSTACLE_CAMERA_KCF_AFFINITY_TRACKER_H
 #define ADU_PERCEPTION_OBSTACLE_CAMERA_KCF_AFFINITY_TRACKER_H
 
-#include <vector>
 #include <limits>
 #include <unordered_map>
+#include <vector>
 
+#include "kcf_components.h"
 #include "obstacle/camera/tracker/mix_camera_tracker/base_affinity_tracker.h"
 #include "obstacle/camera/tracker/mix_camera_tracker/mix_camera_tracker_util.h"
-#include "kcf_components.h"
 
 namespace adu {
 namespace perception {
 namespace obstacle {
 
 class KCFAffinityTracker : public BaseAffinityTracker {
-public:
-    KCFAffinityTracker() : BaseAffinityTracker() {}
+ public:
+  KCFAffinityTracker() : BaseAffinityTracker() {}
 
-    virtual ~KCFAffinityTracker() {}
+  virtual ~KCFAffinityTracker() {}
 
-    virtual bool init() override;
+  virtual bool init() override;
 
-    virtual bool get_affinity_matrix(const cv::Mat &img,
-                                     const std::vector<Tracked> &tracked,
-                                     const std::vector<Detected> &detected,
-                                     std::vector<std::vector<float > > &affinity_matrix) override;
+  virtual bool get_affinity_matrix(
+      const cv::Mat &img, const std::vector<Tracked> &tracked,
+      const std::vector<Detected> &detected,
+      std::vector<std::vector<float>> &affinity_matrix) override;
 
-    virtual bool update_tracked(const cv::Mat &img, const std::vector<Detected> &detected,
-                                std::vector<Tracked> &tracked) override;
-private:
-    // z_f for all detected objects
-    std::unordered_map<int, std::vector<cv::Mat>> _detected_features;
+  virtual bool update_tracked(const cv::Mat &img,
+                              const std::vector<Detected> &detected,
+                              std::vector<Tracked> &tracked) override;
 
-    // KCF module used
-    KCFComponents _kcf_component;
+ private:
+  // z_f for all detected objects
+  std::unordered_map<int, std::vector<cv::Mat>> _detected_features;
 
-    // HACK: Should save it globally somewhere
-    cv::Mat _prev_img;
+  // KCF module used
+  KCFComponents kcf_component_;
 
-    float _keep_threshold = 0.0f; // 0.4f, 0.0f
+  // // HACK: Should save it globally somewhere
+  // cv::Mat _prev_img;
+
+  float keep_threshold_ = 0.0f;  // 0.4f, 0.0f
 };
 
 }  // namespace obstacle
 }  // namespace perception
 }  // namespace adu
 
-#endif //ADU_PERCEPTION_OBSTACLE_CAMERA_KCF_AFFINITY_TRACKER_H
+#endif  // ADU_PERCEPTION_OBSTACLE_CAMERA_KCF_AFFINITY_TRACKER_H
