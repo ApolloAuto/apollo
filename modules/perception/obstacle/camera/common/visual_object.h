@@ -43,7 +43,7 @@ struct alignas(16) VisualObject {
   float trunc_height = 0.0f;
 
   // Object type from detection
-  ObjectType type = UNKNOWN;
+  ObjectType type = ObjectType::UNKNOWN;
   // Probability of each object type
   std::vector<float> type_probs;
 

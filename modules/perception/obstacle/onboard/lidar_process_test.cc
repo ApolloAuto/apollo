@@ -121,10 +121,10 @@ TEST_F(LidarProcessTest, test_GeneratePbMsg) {
   lidar_process_.timestamp_ = timestamp;
   vector<ObjectPtr> objs;
   ObjectPtr obj1 = std::make_shared<Object>();
-  obj1->type = VEHICLE;
+  obj1->type = ObjectType::VEHICLE;
   objs.push_back(obj1);
   ObjectPtr obj2 = std::make_shared<Object>();
-  obj2->type = PEDESTRIAN;
+  obj2->type = ObjectType::PEDESTRIAN;
   objs.push_back(obj2);
   lidar_process_.objects_ = objs;
 

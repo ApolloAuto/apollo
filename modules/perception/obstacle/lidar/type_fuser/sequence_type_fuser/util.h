@@ -30,7 +30,7 @@ namespace apollo {
 namespace perception {
 
 enum {
-  VALID_OBJECT_TYPE = MAX_OBJECT_TYPE - 2,
+  VALID_OBJECT_TYPE = static_cast<int>(ObjectType::MAX_OBJECT_TYPE) - 2,
 };
 
 typedef Eigen::Matrix<double, VALID_OBJECT_TYPE, 1> Vectord;

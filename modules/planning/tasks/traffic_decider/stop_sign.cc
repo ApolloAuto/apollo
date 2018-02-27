@@ -286,17 +286,13 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
       }
       break;
     case StopSignStopStatus::STOPPING:
-      if (!CheckADCkStop(reference_line_info)) {
-        stop_status_ = StopSignStopStatus::TO_STOP;
-      } else {
-        if (wait_time >= FLAGS_stop_sign_stop_duration) {
-          if (FLAGS_enable_stop_sign_creeping &&
-              (stop_sign_info.stop_sign().type() == hdmap::StopSign::ONE_WAY ||
-               stop_sign_info.stop_sign().type() == hdmap::StopSign::TWO_WAY)) {
-            stop_status_ = StopSignStopStatus::CREEPING;
-          } else {
-            stop_status_ = StopSignStopStatus::STOP_DONE;
-          }
+      if (wait_time >= FLAGS_stop_sign_stop_duration) {
+        if (FLAGS_enable_stop_sign_creeping &&
+            (stop_sign_info.stop_sign().type() == hdmap::StopSign::ONE_WAY ||
+             stop_sign_info.stop_sign().type() == hdmap::StopSign::TWO_WAY)) {
+          stop_status_ = StopSignStopStatus::CREEPING;
+        } else {
+          stop_status_ = StopSignStopStatus::STOP_DONE;
         }
       }
       break;
@@ -588,14 +584,42 @@ int StopSign::RemoveWatchVehicle(
           std::pair<LaneInfoConstPtr, OverlapInfoConstPtr>& assc_lane) {
         return assc_lane.first.get()->id().id() == obstable_lane_id;
       });
-  if (assoc_lane_it == associated_lanes_.end() && !is_path_cross) {
-    ADEBUG
-        << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-        << "] lane_id[" << obstable_lane_id
-        << "] is_path_cross[" << is_path_cross
-        << "] not on a lane associated with current stop_sign, AND "
-        << " PATH not crossed. erase from watch_vehicles";
-    erase = true;
+  if (assoc_lane_it != associated_lanes_.end()) {
+    // check pass stop line of the stop_sign
+    auto over_lap_info = assoc_lane_it->second.get()->GetObjectOverlapInfo(
+        obstacle_lane.get()->id());
+    if (over_lap_info == nullptr) {
+      AERROR << "can't find over_lap_info for id: " << obstable_lane_id;
+      return -1;
+    }
+
+    double stop_line_end_s = over_lap_info->lane_overlap_info().end_s();
+    double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
+    double distance_pass_stop_line = obstacle_end_s - stop_line_end_s;
+    if (distance_pass_stop_line > FLAGS_stop_sign_min_pass_distance &&
+        !is_path_cross) {
+      erase = true;
+
+      ADEBUG << "obstacle_id[" << obstacle_id
+          << "] type[" << obstacle_type_name
+          << "] distance_pass_stop_line[" << distance_pass_stop_line
+          << "] stop_line_end_s[" << stop_line_end_s
+          << "] obstacle_end_s[" << obstacle_end_s
+          << "] is_path_cross[" << is_path_cross
+          << "] passed stop sign, AND path not crosses. "
+          << "erase from watch_vehicles";
+    }
+  } else {
+    // passes associated lane (in junction)
+    if (!is_path_cross) {
+      erase = true;
+      ADEBUG << "obstacle_id[" << obstacle_id
+          << "] type[" << obstacle_type_name
+          << "] obstable_lane_id[" << obstable_lane_id
+          << "] is_path_cross[" << is_path_cross
+          << "] passed associated lane, AND path not crosses. "
+          << "erase from watch_vehicles";
+    }
   }
 
   // check if obstacle stops
@@ -612,29 +636,6 @@ int StopSign::RemoveWatchVehicle(
     }
   }
   */
-
-  // check pass stop line of the stop_sign
-  if (!erase) {
-    auto over_lap_info = assoc_lane_it->second.get()->GetObjectOverlapInfo(
-        obstacle_lane.get()->id());
-    if (over_lap_info == nullptr) {
-      AERROR << "can't find over_lap_info for id: " << obstable_lane_id;
-    } else {
-      double stop_line_end_s = over_lap_info->lane_overlap_info().end_s();
-      double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
-      double distance_pass_stop_line = obstacle_end_s - stop_line_end_s;
-      if (distance_pass_stop_line > FLAGS_stop_sign_min_pass_distance &&
-          !is_path_cross) {
-        ADEBUG << "obstacle_id[" << obstacle_id << "] type["
-               << obstacle_type_name << "] distance_pass_stop_line["
-               << distance_pass_stop_line << "]; stop_line_end_s["
-               << stop_line_end_s << "]; obstacle_end_s[" << obstacle_end_s
-               << "] is_path_cross[" << is_path_cross
-               << "] passed stop sign. erase from watch_vehicles";
-        erase = true;
-      }
-    }
-  }
 
   if (erase) {
     for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();

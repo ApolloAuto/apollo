@@ -102,7 +102,7 @@ void LidarProcessSubnode::OnPointCloud(
 
   std::shared_ptr<SensorObjects> out_sensor_objects(new SensorObjects);
   out_sensor_objects->timestamp = timestamp_;
-  out_sensor_objects->sensor_type = VELODYNE_64;
+  out_sensor_objects->sensor_type = SensorType::VELODYNE_64;
   out_sensor_objects->sensor_id = device_id_;
   out_sensor_objects->seq_num = seq_num_;
 
