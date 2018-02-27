@@ -64,8 +64,7 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   if (obstacle->type() == PerceptionObstacle::PEDESTRIAN) {
     prediction_total_time = FLAGS_prediction_pedestrian_total_time;
   }
-  DrawFreeMoveTrajectoryPoints(
-      position, velocity, acc, theta, obstacle->kf_motion_tracker(),
+  DrawFreeMoveTrajectoryPoints(position, velocity, acc, theta,
       prediction_total_time, FLAGS_prediction_period, &points);
 
   Trajectory trajectory = GenerateTrajectory(points);
@@ -78,10 +77,11 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
 
 void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
     const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
-    const Eigen::Vector2d& acc, double theta,
-    const KalmanFilter<double, 6, 2, 0>& kf, double total_time, double period,
+    const Eigen::Vector2d& acc, const double theta,
+    const double total_time, const double period,
     std::vector<TrajectoryPoint>* points) {
-  Eigen::Matrix<double, 6, 1> state(kf.GetStateEstimate());
+  Eigen::Matrix<double, 6, 1> state;
+  state.setZero();
   state(0, 0) = 0.0;
   state(1, 0) = 0.0;
   state(2, 0) = velocity(0);
@@ -89,7 +89,8 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
   state(4, 0) = common::math::Clamp(acc(0), FLAGS_min_acc, FLAGS_max_acc);
   state(5, 0) = common::math::Clamp(acc(1), FLAGS_min_acc, FLAGS_max_acc);
 
-  Eigen::Matrix<double, 6, 6> transition(kf.GetTransitionMatrix());
+  Eigen::Matrix<double, 6, 6> transition;
+  transition.setIdentity();
   transition(0, 2) = period;
   transition(0, 4) = 0.5 * period * period;
   transition(1, 3) = period;
