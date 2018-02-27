@@ -101,7 +101,7 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
 
     double flu_x = 0.0;
     double flu_y = 0.0;
-    common::math::RotateAxis(-adc_state_.heading(), emu_x, emu_y, &flu_x,
+    common::math::RotateAxis(adc_state_.heading(), emu_x, emu_y, &flu_x,
                              &flu_y);
 
     point->set_x(flu_x);
