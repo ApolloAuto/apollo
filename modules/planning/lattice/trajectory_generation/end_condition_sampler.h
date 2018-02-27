@@ -66,7 +66,6 @@ class EndConditionSampler {
  private:
   std::array<double, 3> init_s_;
   std::array<double, 3> init_d_;
-  double s_dot_limit_;
   FeasibleRegion feasible_region_;
   std::shared_ptr<PathTimeGraph> ptr_path_time_graph_;
   std::shared_ptr<PredictionQuerier> ptr_prediction_querier_;
