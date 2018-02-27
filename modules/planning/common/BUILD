@@ -142,6 +142,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/math:hermite_spline",
         "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_state_proto",
     ],
 )
 
