@@ -38,12 +38,11 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     const PlanningTarget& planning_target,
     const std::vector<std::shared_ptr<Trajectory1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Trajectory1d>>& lat_trajectories,
-    bool is_auto_tuning, std::shared_ptr<PathTimeGraph> pathtime_neighborhood)
-    : is_auto_tuning_(is_auto_tuning),
-      pathtime_neighborhood_(pathtime_neighborhood) {
+    std::shared_ptr<PathTimeGraph> path_time_graph)
+    : path_time_graph_(path_time_graph) {
   const double start_time = 0.0;
   const double end_time = FLAGS_trajectory_time_length;
-  path_time_intervals_ = pathtime_neighborhood_->GetPathBlockingIntervals(
+  path_time_intervals_ = path_time_graph_->GetPathBlockingIntervals(
       start_time, end_time, FLAGS_trajectory_time_resolution);
 
   // if we have a stop point along the reference line,
@@ -68,7 +67,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(
         continue;
       }
       */
-      if (!is_auto_tuning_) {
+      if (!FLAGS_enable_auto_tuning) {
         double cost = Evaluate(planning_target, lon_trajectory, lat_trajectory);
         cost_queue_.push(PairCost({lon_trajectory, lat_trajectory}, cost));
       } else {
@@ -80,7 +79,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(
       }
     }
   }
-  if (!is_auto_tuning_) {
+  if (!FLAGS_enable_auto_tuning) {
     ADEBUG << "Number of valid 1d trajectory pairs: " << cost_queue_.size();
   } else {
     ADEBUG << "Number of valid 1d trajectory pairs: "
@@ -89,7 +88,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(
 }
 
 bool TrajectoryEvaluator::has_more_trajectory_pairs() const {
-  if (!is_auto_tuning_) {
+  if (!FLAGS_enable_auto_tuning) {
     return !cost_queue_.empty();
   } else {
     return !cost_queue_with_components_.empty();
@@ -97,7 +96,7 @@ bool TrajectoryEvaluator::has_more_trajectory_pairs() const {
 }
 
 std::size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
-  if (!is_auto_tuning_) {
+  if (!FLAGS_enable_auto_tuning) {
     return cost_queue_.size();
   } else {
     return cost_queue_with_components_.size();
@@ -107,7 +106,7 @@ std::size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
 std::pair<std::shared_ptr<Trajectory1d>, std::shared_ptr<Trajectory1d>>
 TrajectoryEvaluator::next_top_trajectory_pair() {
   CHECK(has_more_trajectory_pairs() == true);
-  if (!is_auto_tuning_) {
+  if (!FLAGS_enable_auto_tuning) {
     auto top = cost_queue_.top();
     cost_queue_.pop();
     return top.first;
@@ -119,7 +118,7 @@ TrajectoryEvaluator::next_top_trajectory_pair() {
 }
 
 double TrajectoryEvaluator::top_trajectory_pair_cost() const {
-  if (!is_auto_tuning_) {
+  if (!FLAGS_enable_auto_tuning) {
     return cost_queue_.top().second;
   } else {
     return cost_queue_with_components_.top().second.second;
@@ -128,7 +127,7 @@ double TrajectoryEvaluator::top_trajectory_pair_cost() const {
 
 std::vector<double> TrajectoryEvaluator::top_trajectory_pair_component_cost()
     const {
-  CHECK(is_auto_tuning_);
+  CHECK(FLAGS_enable_auto_tuning);
   return cost_queue_with_components_.top().second.first;
 }
 
