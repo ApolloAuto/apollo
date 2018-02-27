@@ -14,84 +14,78 @@
  * limitations under the License.
  *****************************************************************************/
 
- //
-// Basic components for running KCF tracker (get feature, detect, train)
+// Components for running KCF tracker, ex: get features, detect, train in KCF
 //
-// Reference
+// Reference:
 //
-// 1. Henriques, João F., et al. "High-speed tracking with kernelized correlation filters."
-// IEEE Transactions on Pattern Analysis and Machine Intelligence 37.3 (2015): 583-596.
+// 1. Henriques, João F., et al. "High-speed tracking with kernelized
+// correlation filters."
+// IEEE Transactions on Pattern Analysis and Machine Intelligence 37.3 (2015):
+// 583-596.
 //
-// 2. https://github.com/foolwood/KCF
+// 2. KCFcpp, https://github.com/joaofaro/KCFcpp
+// BSD 3-Clause "New" or "Revised" License
+// https://github.com/joaofaro/KCFcpp/blob/master/LICENSE
 //
-// 3. https://github.com/joaofaro/KCFcpp
+// 3. KCF, https://github.com/foolwood/KCF
+// Another implementation of KCF tracker
 //
 
-#ifndef ADU_PERCEPTION_OBSTACLE_CAMERA_KCF_COMPONENTS_H
-#define ADU_PERCEPTION_OBSTACLE_CAMERA_KCF_COMPONENTS_H
-
-#include <cmath>
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_KCF_COMPONENTS_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_KCF_COMPONENTS_H_
 
 #include <opencv2/opencv.hpp>
+#include <cmath>
 
 #include "obstacle/camera/tracker/mix_camera_tracker/base_affinity_tracker.h"
-//#include "obstacle/camera/tracker/mix_camera_tracker/kcf/kcf_fhog.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
-namespace obstacle {
 
 class KCFComponents {
-public:
+ public:
+  KCFComponents() {}
 
-    KCFComponents() {}
+  bool Init();
 
-    bool init();
+  // Get x_f or z_f
+  bool GetFeatures(const cv::Mat &img, const cv::Rect &box,
+                   std::vector<cv::Mat>* feature);
 
-    // Get x_f or z_f
-    bool get_feature(const cv::Mat &img, const cv::Rect &box, std::vector<cv::Mat> &feature);
+  // Get response score
+  bool Detect(const Tracked &tracked_obj, const std::vector<cv::Mat> &z_f,
+              float* score);
 
-    // Get response score
-    bool detect(const Tracked &tracked_obj, const std::vector<cv::Mat> &z_f, float &score);
+  // Get alpha_f
+  bool Train(const cv::Mat &img, Tracked* tracked_obj);
 
-    // Get alpha_f
-    bool train(const cv::Mat &img, Tracked &tracked_obj);
+ private:
+  cv::Mat GaussianCorrelation(const std::vector<cv::Mat> &xf,
+                              const std::vector<cv::Mat> &yf);
 
-private:
+  cv::Mat ComplexMultiplication(const cv::Mat &x1, const cv::Mat &x2);
 
-    cv::Mat gaussian_correlation(std::vector<cv::Mat> xf, std::vector<cv::Mat> yf);
+  cv::Mat ComplexDivision(const cv::Mat &x1, const cv::Mat &x2);
 
-    cv::Mat complex_multiplication(const cv::Mat &x1, const cv::Mat &x2);
+  // init only: Create Gaussian Peak as regression target
+  cv::Mat CreateGaussianPeak(int sizey, int sizex);
 
-    cv::Mat complex_division(const cv::Mat &x1, const cv::Mat &x2);
+  // init only: Discrete Fast Fourier Transform
+  cv::Mat FFTD(cv::Mat img);
 
-    // init only: Create Gaussian Peak as regression target
-    cv::Mat create_gaussian_peak(int sizey, int sizex);
+  // init only: get hann window
+  cv::Mat CalculateHann(const cv::Size &sz);
 
-    // init only: Discrete Fast Fourier Transform
-    cv::Mat fftd(cv::Mat img);
+  cv::Mat y_f_;
+  cv::Mat cos_window_;
 
-    // init only: get hann window
-    cv::Mat calculate_hann(const cv::Size &sz);
-
-    cv::Mat _y_f;
-
-    cv::Mat _cos_window;
-
-    // TODO  Put patch size into config and init
-    int _window_size = 50; // 100, 50
-
-    int _cell_size = 4;
-
-    float _kernel_sigma = 0.5f;
-
-    float _lambda = 0.0001f;
-
-//	HogFeature _hog_extractor;
+  int window_size_ = 50;
+  int cell_size_ = 4;
+  float kernel_sigma_ = 0.5f;
+  float lambda_ = 0.0001f;
 };
 
-} //namespace adu
-} //namespace perception
-} //namespace obstacle
+}  // namespace perception
+}  // namespace apollo
 
-#endif //ADU_PERCEPTION_OBSTACLE_CAMERA_KCF_COMPONENTS_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_KCF_COMPONENTS_H_
