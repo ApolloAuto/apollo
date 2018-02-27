@@ -20,10 +20,10 @@
 #include <algorithm>
 #include <vector>
 
-#include "obstacle/camera/lane_post_process/common/type.hpp"
-#include "obstacle/camera/lane_post_process/common/util.hpp"
+#include "obstacle/camera/lane_post_process/common/type.h"
+#include "obstacle/camera/lane_post_process/common/util.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
 
 struct GroupParam {
@@ -687,6 +687,6 @@ inline Bbox Group::bbox(const std::vector<Marker>& markers) const {
 }
 
 }  // namespace perception
-}  // namespace adu
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_GROUP_H_
