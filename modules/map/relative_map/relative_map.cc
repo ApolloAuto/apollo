@@ -105,6 +105,12 @@ Status RelativeMap::Init() {
   return Status::OK();
 }
 
+void LogErrorStatus(MapMsg* map_msg, const std::string& error_msg) {
+  auto* status = map_msg->mutable_header()->mutable_status();
+  status->set_msg(error_msg);
+  status->set_error_code(ErrorCode::RELATIVE_MAP_ERROR);
+}
+
 apollo::common::Status RelativeMap::Start() {
   MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("RelativeMap started");
@@ -127,9 +133,7 @@ void RelativeMap::RunOnce(const PerceptionObstacles& perception_obstacles) {
 
   MapMsg map_msg;
   CreateMapFromPerception(perception_obstacles, &map_msg);
-  if (map_msg.has_hdmap()) {
-    Publish(&map_msg);
-  }
+  Publish(&map_msg);
 }
 
 void RelativeMap::RunOnce(const NavigationInfo& navigation_info) {
@@ -137,7 +141,7 @@ void RelativeMap::RunOnce(const NavigationInfo& navigation_info) {
   navigation_lane_.UpdateNavigationInfo(navigation_info);
 }
 
-void RelativeMap::CreateMapFromPerception(
+bool RelativeMap::CreateMapFromPerception(
     const PerceptionObstacles& perception_obstacles, MapMsg* map_msg) {
   CHECK_NOTNULL(map_msg);
 
@@ -152,13 +156,21 @@ void RelativeMap::CreateMapFromPerception(
   // update navigation_lane from perception_obstacles (lane marker)
   navigation_lane_.Update(perception_obstacles);
 
+  if (navigation_lane_.Path().path().path_point_size() == 0) {
+    LogErrorStatus(map_msg, "navigation lane has no path points");
+    return false;
+  }
+
   // create map proto from navigation_path
   if (!CreateMapMsgFromNavigationPath(
           navigation_lane_.Path(), navigation_lane_.left_width(),
           navigation_lane_.right_width(), map_msg)) {
     map_msg->clear_hdmap();
+    LogErrorStatus(map_msg, "Failed to create map from navigation path");
     AERROR << "Failed to create map from navigation path";
+    return false;
   }
+  return true;
 }
 
 bool RelativeMap::CreateMapMsgFromNavigationPath(
