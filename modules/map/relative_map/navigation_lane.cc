@@ -52,14 +52,17 @@ bool NavigationLane::Update(const PerceptionObstacles& perception_obstacles) {
   auto* path = navigation_path_.mutable_path();
   const auto& lane_marker = perception_obstacles_.lane_marker();
 
-  if (navigation_info_.navigation_path_size() > 0 &&
-      std::fmax(lane_marker.left_lane_marker().quality(),
-                lane_marker.right_lane_marker().quality()) <
-          config_.min_lane_marker_quality()) {
+  if (std::fmin(lane_marker.left_lane_marker().quality(),
+                lane_marker.right_lane_marker().quality()) >
+      config_.min_lane_marker_quality()) {
+    ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
+  } else if (navigation_info_.navigation_path_size() > 0) {
     ConvertNavigationLineToPath(path);
   } else {
-    ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
+    AERROR << "Navigation Path is empty because neither lane markers nor "
+              "navigation line are available.";
   }
+
   return true;
 }
 
@@ -144,36 +147,59 @@ void NavigationLane::ConvertLaneMarkerToPath(
   const auto& right_lane = lane_marker.right_lane_marker();
 
   const double unit_z = 1.0;
-  double accumulated_s = 0.0;
-  for (double z = 0;
-       z <= std::fmin(left_lane.view_range(), right_lane.view_range());
-       z += unit_z) {
-    const double x_l = EvaluateCubicPolynomial(
-        left_lane.c0_position(), left_lane.c1_heading_angle(),
-        left_lane.c2_curvature(), left_lane.c3_curvature_derivative(), z);
-    const double x_r = EvaluateCubicPolynomial(
-        right_lane.c0_position(), right_lane.c1_heading_angle(),
-        right_lane.c2_curvature(), right_lane.c3_curvature_derivative(), z);
+  if (left_lane.view_range() > right_lane.view_range()) {
+    double accumulated_s = 0.0;
+    for (double z = 0; z <= left_lane.view_range(); z += unit_z) {
+      const double x_l = EvaluateCubicPolynomial(
+          left_lane.c0_position(), left_lane.c1_heading_angle(),
+          left_lane.c2_curvature(), left_lane.c3_curvature_derivative(), z);
 
-    if (left_width_ < 0.0) {
-      left_width_ = std::fabs(x_l);
+      if (left_width_ < 0.0) {
+        left_width_ = std::fabs(x_l);
+      }
+      if (right_width_ < 0.0) {
+        right_width_ = left_width_;
+      }
+
+      double x1 = z;
+      double y1 = -std::fabs(x_l);
+
+      auto* point = path->add_path_point();
+      point->set_x(x1);
+      point->set_y(y1);
+      point->set_s(accumulated_s);
+
+      if (path->path_point_size() > 1) {
+        auto& pre_point = path->path_point(path->path_point_size() - 2);
+        accumulated_s += std::hypot(x1 - pre_point.x(), y1 - pre_point.y());
+      }
     }
-    if (right_width_ < 0.0) {
-      right_width_ = std::fabs(x_r);
-    }
+  } else {
+    double accumulated_s = 0.0;
+    for (double z = 0; z <= right_lane.view_range(); z += unit_z) {
+      const double x_r = EvaluateCubicPolynomial(
+          right_lane.c0_position(), right_lane.c1_heading_angle(),
+          right_lane.c2_curvature(), right_lane.c3_curvature_derivative(), z);
 
-    // FLU coordinates
-    double x1 = z;
-    double y1 = (std::fabs(x_l) - std::fabs(x_r)) / 2.0;
+      if (right_width_ < 0.0) {
+        right_width_ = left_width_;
+      }
+      if (left_width_ < 0.0) {
+        left_width_ = right_width_;
+      }
 
-    auto* point = path->add_path_point();
-    point->set_x(x1);
-    point->set_y(y1);
-    point->set_s(accumulated_s);
+      double x1 = z;
+      double y1 = std::fabs(x_r);
 
-    if (path->path_point_size() > 1) {
-      auto& pre_point = path->path_point(path->path_point_size() - 2);
-      accumulated_s += std::hypot(x1 - pre_point.x(), y1 - pre_point.y());
+      auto* point = path->add_path_point();
+      point->set_x(x1);
+      point->set_y(y1);
+      point->set_s(accumulated_s);
+
+      if (path->path_point_size() > 1) {
+        auto& pre_point = path->path_point(path->path_point_size() - 2);
+        accumulated_s += std::hypot(x1 - pre_point.x(), y1 - pre_point.y());
+      }
     }
   }
 }
