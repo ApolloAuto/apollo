@@ -193,9 +193,8 @@ Status LatticePlanner::PlanOnReferenceLine(
   // dynamic constraints.
   //   second, evaluate the feasible longitudinal and lateral trajectory pairs
   //   and sort them according to the cost.
-  TrajectoryEvaluator trajectory_evaluator(
-      planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle,
-      FLAGS_enable_auto_tuning, ptr_path_time_graph);
+  TrajectoryEvaluator trajectory_evaluator(planning_target,
+      lon_trajectory1d_bundle, lat_trajectory1d_bundle, ptr_path_time_graph);
 
   ADEBUG << "Trajectory_Evaluator_Construction_Time = "
          << (Clock::NowInSeconds() - current_time) * 1000;
