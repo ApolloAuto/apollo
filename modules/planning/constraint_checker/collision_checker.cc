@@ -60,8 +60,7 @@ bool CollisionChecker::InCollision(
     common::math::Box2d ego_box(
         {trajectory_point.path_point().x(), trajectory_point.path_point().y()},
         trajectory_point.path_point().theta(),
-        ego_length * (1.0 + FLAGS_collision_buffer_expansion_ratio),
-        ego_width * (1.0 + FLAGS_collision_buffer_expansion_ratio));
+        ego_length, ego_width);
     for (const auto& obstacle_box : predicted_envs_[time_index]) {
       if (ego_box.HasOverlap(obstacle_box)) {
         return true;
