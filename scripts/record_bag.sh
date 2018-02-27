@@ -81,6 +81,7 @@ function start() {
         /apollo/localization/msf_lidar \
         /apollo/localization/msf_status \
         /apollo/navigation \
+        /apollo/relative_map \
         /apollo/drive_event \
         /tf \
         /tf_static \
