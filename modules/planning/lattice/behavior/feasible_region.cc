@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/lattice/behavior_decider/feasible_region.h"
+#include "modules/planning/lattice/behavior/feasible_region.h"
 
 #include <cmath>
 

@@ -14,34 +14,31 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/base/types.h"
+/**
+ * @file
+ **/
+
+#ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_COMBINER_H_
+#define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_COMBINER_H_
+
+#include <vector>
+
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {
-namespace perception {
+namespace planning {
 
-std::string GetSensorType(SensorType sensor_type) {
-  switch (sensor_type) {
-    case SensorType::VELODYNE_64:
-      return "velodyne_64";
-    case SensorType::VELODYNE_16:
-      return "velodyne_16";
-    case SensorType::RADAR:
-      return "radar";
-    case SensorType::CAMERA:
-      return "camera";
-    case SensorType::UNKNOWN_SENSOR_TYPE:
-      return "unknown_sensor_type";
-  }
-  return "";
-}
+class TrajectoryCombiner {
+ public:
+  static DiscretizedTrajectory Combine(
+      const std::vector<common::PathPoint>& reference_line,
+      const Curve1d& lon_trajectory, const Curve1d& lat_trajectory,
+      const double init_relative_time);
+};
 
-bool is_lidar(SensorType sensor_type) {
-  return (sensor_type == SensorType::VELODYNE_64);
-}
-
-bool is_radar(SensorType sensor_type) {
-  return (sensor_type == SensorType::RADAR);
-}
-
-}  // namespace perception
+}  // namespace planning
 }  // namespace apollo
+
+#endif  // MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_COMBINER_H_

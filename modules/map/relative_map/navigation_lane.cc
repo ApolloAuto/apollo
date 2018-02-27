@@ -52,14 +52,17 @@ bool NavigationLane::Update(const PerceptionObstacles& perception_obstacles) {
   auto* path = navigation_path_.mutable_path();
   const auto& lane_marker = perception_obstacles_.lane_marker();
 
-  if (navigation_info_.navigation_path_size() > 0 &&
-      std::fmax(lane_marker.left_lane_marker().quality(),
-                lane_marker.right_lane_marker().quality()) <
-          config_.min_lane_marker_quality()) {
+  if (std::fmin(lane_marker.left_lane_marker().quality(),
+                lane_marker.right_lane_marker().quality()) >
+      config_.min_lane_marker_quality()) {
+    ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
+  } else if (navigation_info_.navigation_path_size() > 0) {
     ConvertNavigationLineToPath(path);
   } else {
-    ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
+    AERROR << "Navigation Path is empty because neither lane markers nor "
+              "navigation line are available.";
   }
+
   return true;
 }
 
@@ -86,17 +89,23 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
   int curr_project_index = last_project_index_;
 
   // offset between the current vehicle state and navigation line
-  const double dx =
-      adc_state_.x() - navigation_path.path_point(curr_project_index).x();
-  const double dy =
-      adc_state_.y() - navigation_path.path_point(curr_project_index).y();
+  const double dx = -navigation_path.path_point(curr_project_index).x();
+  const double dy = -navigation_path.path_point(curr_project_index).y();
   for (int i = curr_project_index; i < navigation_path.path_point_size(); ++i) {
     auto* point = path->add_path_point();
     point->CopyFrom(navigation_path.path_point(i));
 
-    // shift to adc_state_ (x, y)
-    point->set_x(point->x() + dx);
-    point->set_y(point->y() + dy);
+    // shift to (0, 0)
+    double emu_x = point->x() + dx;
+    double emu_y = point->y() + dy;
+
+    double flu_x = 0.0;
+    double flu_y = 0.0;
+    common::math::RotateAxis(adc_state_.heading(), emu_x, emu_y, &flu_x,
+                             &flu_y);
+
+    point->set_x(flu_x);
+    point->set_y(flu_y);
     const double accumulated_s =
         navigation_path.path_point(i).s() -
         navigation_path.path_point(curr_project_index).s();
@@ -138,42 +147,59 @@ void NavigationLane::ConvertLaneMarkerToPath(
   const auto& right_lane = lane_marker.right_lane_marker();
 
   const double unit_z = 1.0;
-  double accumulated_s = 0.0;
-  for (double z = 0;
-       z <= std::fmin(left_lane.view_range(), right_lane.view_range());
-       z += unit_z) {
-    const double x_l = EvaluateCubicPolynomial(
-        left_lane.c0_position(), left_lane.c1_heading_angle(),
-        left_lane.c2_curvature(), left_lane.c3_curvature_derivative(), z);
-    const double x_r = EvaluateCubicPolynomial(
-        right_lane.c0_position(), right_lane.c1_heading_angle(),
-        right_lane.c2_curvature(), right_lane.c3_curvature_derivative(), z);
+  if (left_lane.view_range() > right_lane.view_range()) {
+    double accumulated_s = 0.0;
+    for (double z = 0; z <= left_lane.view_range(); z += unit_z) {
+      const double x_l = EvaluateCubicPolynomial(
+          left_lane.c0_position(), left_lane.c1_heading_angle(),
+          left_lane.c2_curvature(), left_lane.c3_curvature_derivative(), z);
 
-    if (left_width_ < 0.0) {
-      left_width_ = std::fabs(x_l);
+      if (left_width_ < 0.0) {
+        left_width_ = std::fabs(x_l);
+      }
+      if (right_width_ < 0.0) {
+        right_width_ = left_width_;
+      }
+
+      double x1 = z;
+      double y1 = -std::fabs(x_l);
+
+      auto* point = path->add_path_point();
+      point->set_x(x1);
+      point->set_y(y1);
+      point->set_s(accumulated_s);
+
+      if (path->path_point_size() > 1) {
+        auto& pre_point = path->path_point(path->path_point_size() - 2);
+        accumulated_s += std::hypot(x1 - pre_point.x(), y1 - pre_point.y());
+      }
     }
-    if (right_width_ < 0.0) {
-      right_width_ = std::fabs(x_r);
-    }
+  } else {
+    double accumulated_s = 0.0;
+    for (double z = 0; z <= right_lane.view_range(); z += unit_z) {
+      const double x_r = EvaluateCubicPolynomial(
+          right_lane.c0_position(), right_lane.c1_heading_angle(),
+          right_lane.c2_curvature(), right_lane.c3_curvature_derivative(), z);
 
-    double x1 = 0.0;
-    double y1 = 0.0;
-    // rotate from vehicle axis to x-y axis
-    common::math::RotateAxis(-adc_state_.heading(), z, (x_l + x_r) / 2.0, &x1,
-                             &y1);
+      if (right_width_ < 0.0) {
+        right_width_ = left_width_;
+      }
+      if (left_width_ < 0.0) {
+        left_width_ = right_width_;
+      }
 
-    // shift to get point on x-y axis
-    x1 += adc_state_.x();
-    y1 += adc_state_.y();
+      double x1 = z;
+      double y1 = std::fabs(x_r);
 
-    auto* point = path->add_path_point();
-    point->set_x(x1);
-    point->set_y(y1);
-    point->set_s(accumulated_s);
+      auto* point = path->add_path_point();
+      point->set_x(x1);
+      point->set_y(y1);
+      point->set_s(accumulated_s);
 
-    if (path->path_point_size() > 1) {
-      auto& pre_point = path->path_point(path->path_point_size() - 2);
-      accumulated_s += std::hypot(x1 - pre_point.x(), y1 - pre_point.y());
+      if (path->path_point_size() > 1) {
+        auto& pre_point = path->path_point(path->path_point_size() - 2);
+        accumulated_s += std::hypot(x1 - pre_point.x(), y1 - pre_point.y());
+      }
     }
   }
 }

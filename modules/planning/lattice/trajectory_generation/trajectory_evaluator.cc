@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/lattice/manipulator/trajectory_evaluator.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory_evaluator.h"
 
 #include <cmath>
 #include <functional>

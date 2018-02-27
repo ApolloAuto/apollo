@@ -187,7 +187,7 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
                         &radar_objects);
   radar_objects.timestamp =
       static_cast<double>(raw_obstacles.header().timestamp_sec());
-  radar_objects.sensor_type = RADAR;
+  radar_objects.sensor_type = SensorType::RADAR;
 
   // roi filter
   auto &filter_objects = radar_objects.objects;

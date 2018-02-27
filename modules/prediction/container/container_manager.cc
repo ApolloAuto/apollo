@@ -17,7 +17,9 @@
 #include "modules/prediction/container/container_manager.h"
 
 #include "modules/common/log.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/container/relative_obstacles/relative_obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/relative_map/relative_map_container.h"
@@ -58,7 +60,11 @@ std::unique_ptr<Container> ContainerManager::CreateContainer(
     const common::adapter::AdapterConfig::MessageType& type) {
   std::unique_ptr<Container> container_ptr(nullptr);
   if (type == AdapterConfig::PERCEPTION_OBSTACLES) {
-    container_ptr.reset(new ObstaclesContainer());
+    if (FLAGS_use_navigation_mode) {
+      container_ptr.reset(new RelativeObstaclesContainer());
+    } else {
+      container_ptr.reset(new ObstaclesContainer());
+    }
   } else if (type == AdapterConfig::LOCALIZATION) {
     container_ptr.reset(new PoseContainer());
   } else if (type == AdapterConfig::PLANNING_TRAJECTORY) {

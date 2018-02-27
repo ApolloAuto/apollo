@@ -107,7 +107,7 @@ TEST_F(LidarProcessTest, test_Process) {
     pt.y = org_cloud->points[i].y;
     pt.z = org_cloud->points[i].z;
     pt.intensity = org_cloud->points[i].intensity;
-    if (isnan(org_cloud->points[i].x)) continue;
+    if (std::isnan(org_cloud->points[i].x)) continue;
     point_cloud->push_back(pt);
   }
   std::shared_ptr<Matrix4d> velodyne_trans = std::make_shared<Matrix4d>();
@@ -121,10 +121,10 @@ TEST_F(LidarProcessTest, test_GeneratePbMsg) {
   lidar_process_.timestamp_ = timestamp;
   vector<ObjectPtr> objs;
   ObjectPtr obj1 = std::make_shared<Object>();
-  obj1->type = VEHICLE;
+  obj1->type = ObjectType::VEHICLE;
   objs.push_back(obj1);
   ObjectPtr obj2 = std::make_shared<Object>();
-  obj2->type = PEDESTRIAN;
+  obj2->type = ObjectType::PEDESTRIAN;
   objs.push_back(obj2);
   lidar_process_.objects_ = objs;
 

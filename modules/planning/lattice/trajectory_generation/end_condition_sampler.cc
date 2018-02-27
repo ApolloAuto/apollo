@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/lattice/manipulator/end_condition_sampler.h"
+#include "modules/planning/lattice/trajectory_generation/end_condition_sampler.h"
 
 #include <algorithm>
 #include <utility>

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/lattice/manipulator/trajectory_combiner.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory_combiner.h"
 
 #include <algorithm>
 

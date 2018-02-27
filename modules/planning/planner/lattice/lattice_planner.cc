@@ -35,13 +35,13 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
-#include "modules/planning/lattice/behavior_decider/path_time_graph.h"
-#include "modules/planning/lattice/behavior_decider/prediction_querier.h"
-#include "modules/planning/lattice/manipulator/backup_trajectory_generator.h"
-#include "modules/planning/lattice/manipulator/trajectory1d_generator.h"
-#include "modules/planning/lattice/manipulator/trajectory_combiner.h"
-#include "modules/planning/lattice/manipulator/trajectory_evaluator.h"
+#include "modules/planning/lattice/behavior/path_time_graph.h"
+#include "modules/planning/lattice/behavior/prediction_querier.h"
 #include "modules/planning/lattice/trajectory1d/lattice_trajectory1d.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory1d_generator.h"
+#include "modules/planning/lattice/trajectory_generation/backup_trajectory_generator.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory_combiner.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory_evaluator.h"
 
 namespace apollo {
 namespace planning {
@@ -96,10 +96,13 @@ void ComputeInitFrenetState(const PathPoint& matched_point,
 Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
                             Frame* frame) {
   std::size_t success_line_count = 0;
-  double priority_cost = 0.0;
   std::size_t index = 0;
   for (auto& reference_line_info : frame->reference_line_info()) {
-    reference_line_info.SetPriorityCost(priority_cost);
+    if (index != 0) {
+      reference_line_info.SetPriorityCost(FLAGS_priority_cost_gap);
+    } else {
+      reference_line_info.SetPriorityCost(0.0);
+    }
     auto status = PlanOnReferenceLine(planning_start_point,
         frame, &reference_line_info);
 
@@ -113,7 +116,7 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
     } else {
       success_line_count += 1;
     }
-    priority_cost += FLAGS_priority_cost_gap * (++index);
+    ++index;
   }
 
   if (success_line_count > 0) {

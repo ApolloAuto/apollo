@@ -18,27 +18,30 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_MANIPULATOR_TRAJECTORY_COMBINER_H_
-#define MODULES_PLANNING_LATTICE_MANIPULATOR_TRAJECTORY_COMBINER_H_
+#include "modules/planning/lattice/behavior/ego_vehicle_scenario.h"
 
-#include <vector>
-
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/math/curve1d/curve1d.h"
+#include "modules/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-class TrajectoryCombiner {
- public:
-  static DiscretizedTrajectory Combine(
-      const std::vector<common::PathPoint>& reference_line,
-      const Curve1d& lon_trajectory, const Curve1d& lat_trajectory,
-      const double init_relative_time);
-};
+void EgoVehicleScenario::Reset() {}
+
+bool EgoVehicleScenario::Init() {
+  exist_ = true;
+  return exist_;
+}
+
+int EgoVehicleScenario::ComputeScenarioDecision(
+    Frame* frame, ReferenceLineInfo* const reference_line_info,
+    PlanningTarget* const decision) {
+  CHECK(frame != nullptr);
+
+  decision->set_cruise_speed(FLAGS_default_cruise_speed);
+
+  return 0;
+}
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_PLANNING_LATTICE_MANIPULATOR_TRAJECTORY_COMBINER_H_

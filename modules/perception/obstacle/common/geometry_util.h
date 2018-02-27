@@ -135,7 +135,7 @@ void ComputeBboxSizeCenter(typename pcl::PointCloud<PointT>::Ptr cloud,
   Eigen::Vector3d max_pt(-DBL_MAX, -DBL_MAX, -DBL_MAX);
 
   Eigen::Vector3d loc_pt;
-  for (int i = 0; i < cloud->size(); i++) {
+  for (std::size_t i = 0; i < cloud->size(); i++) {
     Eigen::Vector3d pt = Eigen::Vector3d(cloud->points[i].x, cloud->points[i].y,
                                          cloud->points[i].z);
     loc_pt[0] = pt.dot(dir);

@@ -23,10 +23,10 @@
 
 #include <vector>
 
+#include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/common/status/status.h"
-#include "modules/planning/lattice/behavior_decider/behavior_decider.h"
+#include "modules/planning/lattice/behavior/behavior_decider.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"

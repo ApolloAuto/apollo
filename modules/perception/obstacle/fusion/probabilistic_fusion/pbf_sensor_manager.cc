@@ -42,14 +42,14 @@ PbfSensorManager::~PbfSensorManager() {
 bool PbfSensorManager::Init() {
   sensors_.clear();
 
-  std::string sensor_id = GetSensorType(VELODYNE_64);
-  SensorType type = VELODYNE_64;
+  std::string sensor_id = GetSensorType(SensorType::VELODYNE_64);
+  SensorType type = SensorType::VELODYNE_64;
 
   PbfSensor *velodyne_64 = new PbfSensor(type, sensor_id);
   sensors_[sensor_id] = velodyne_64;
 
-  sensor_id = GetSensorType(RADAR);
-  type = RADAR;
+  sensor_id = GetSensorType(SensorType::RADAR);
+  type = SensorType::RADAR;
   PbfSensor *radar = new PbfSensor(type, sensor_id);
   if (radar == nullptr) {
     AERROR << "Fail to create PbfSensor. sensor_id = " << sensor_id;

@@ -30,6 +30,8 @@
 #include "gtest/gtest_prod.h"
 
 #include "ros/include/ros/ros.h"
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 #include "sensor_msgs/PointCloud2.h"
 
 #include "modules/drivers/gnss/proto/imu.pb.h"
@@ -87,7 +89,10 @@ class MSFLocalization : public LocalizationBase {
                                 double *offset_y, double *offset_z,
                                 double *uncertainty_x, double *uncertainty_y,
                                 double *uncertainty_z);
-  bool LoadZoneIdFromFile(const std::string &folder_path, int *zone_id);
+  bool LoadImuVehicleExtrinsic(const std::string &file_path,
+                                double *quat_qx, double *quat_qy,
+                                double *quat_qz, double *quat_qw);
+  bool LoadZoneIdFromFolder(const std::string &folder_path, int *zone_id);
 
  private:
   apollo::common::monitor::MonitorLogger monitor_logger_;
@@ -100,6 +105,9 @@ class MSFLocalization : public LocalizationBase {
   MeasureState latest_gnss_localization_status_;
 
   // FRIEND_TEST(MSFLocalizationTest, InitParams);
+
+  // rotation from the vehicle coord to imu coord
+  Eigen::Quaternion<double> imu_vehicle_quat_;
 };
 
 }  // namespace localization

@@ -18,10 +18,10 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_EGO_VEHICLE_SCENARIO_H_
-#define MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_EGO_VEHICLE_SCENARIO_H_
+#ifndef MODULES_PLANNING_LATTICE_BEHAVIOR_EGO_VEHICLE_SCENARIO_H_
+#define MODULES_PLANNING_LATTICE_BEHAVIOR_EGO_VEHICLE_SCENARIO_H_
 
-#include "modules/planning/lattice/behavior_decider/scenario.h"
+#include "modules/planning/lattice/behavior/scenario.h"
 
 namespace apollo {
 namespace planning {
@@ -47,4 +47,4 @@ class EgoVehicleScenario : public Scenario {
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_DECIDER_EGO_VEHICLE_SCENARIO_H_
+#endif  // MODULES_PLANNING_LATTICE_BEHAVIOR_EGO_VEHICLE_SCENARIO_H_
