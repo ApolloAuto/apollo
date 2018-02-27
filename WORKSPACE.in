@@ -153,6 +153,13 @@ new_local_repository(
     path = "/usr/local/ipopt/include/coin",
 )
 
+# Cuda
+new_local_repository(
+    name = "cuda",
+    build_file = "third_party/cuda.BUILD",
+    path = "/usr/local/cuda/include",
+)
+
 # Local-integ
 new_local_repository(
     name = "local_integ",
