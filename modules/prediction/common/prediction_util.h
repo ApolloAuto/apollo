@@ -86,20 +86,6 @@ void GenerateFreeMoveTrajectoryPoints(
     const size_t num, const double period,
     std::vector<apollo::common::TrajectoryPoint>* points);
 
-/**
- * @brief Generate a set of lane sequence trajectory points
- * @param state matrix
- * @param transition matrix
- * @param lane sequence
- * @param total number of generated trajectory points required
- * @param trajectory point interval period
- * @param generated trajectory points
- */
-void GenerateLaneSequenceTrajectoryPoints(
-    Eigen::Matrix<double, 4, 1>* state, Eigen::Matrix<double, 4, 4>* transition,
-    const LaneSequence& sequence, const size_t num, const double period,
-    std::vector<::apollo::common::TrajectoryPoint>* points);
-
 }  // namespace predictor_util
 }  // namespace prediction
 }  // namespace apollo
