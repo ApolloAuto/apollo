@@ -193,9 +193,8 @@ Status LatticePlanner::PlanOnReferenceLine(
   // dynamic constraints.
   //   second, evaluate the feasible longitudinal and lateral trajectory pairs
   //   and sort them according to the cost.
-  TrajectoryEvaluator trajectory_evaluator(
-      planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle,
-      FLAGS_enable_auto_tuning, ptr_path_time_graph);
+  TrajectoryEvaluator trajectory_evaluator(planning_target,
+      lon_trajectory1d_bundle, lat_trajectory1d_bundle, ptr_path_time_graph);
 
   ADEBUG << "Trajectory_Evaluator_Construction_Time = "
          << (Clock::NowInSeconds() - current_time) * 1000;
@@ -207,7 +206,7 @@ Status LatticePlanner::PlanOnReferenceLine(
          << "  number_lat_traj = " << lat_trajectory1d_bundle.size();
 
   // Get instance of collision checker and constraint checker
-  CollisionChecker collision_checker(frame->obstacles(), init_s, init_d,
+  CollisionChecker collision_checker(frame->obstacles(), init_s[0], init_d[0],
                                      *ptr_reference_line);
 
   // 7. always get the best pair of trajectories to combine; return the first
@@ -218,7 +217,7 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // planning_internal::Debug* ptr_debug = reference_line_info->mutable_debug();
 
-  int num_lattice_traj = 0;
+  std::size_t num_lattice_traj = 0;
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
     double trajectory_pair_cost =
         trajectory_evaluator.top_trajectory_pair_cost();
