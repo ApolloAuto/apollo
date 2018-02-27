@@ -207,7 +207,7 @@ Status LatticePlanner::PlanOnReferenceLine(
          << "  number_lat_traj = " << lat_trajectory1d_bundle.size();
 
   // Get instance of collision checker and constraint checker
-  CollisionChecker collision_checker(frame->obstacles(), init_s, init_d,
+  CollisionChecker collision_checker(frame->obstacles(), init_s[0], init_d[0],
                                      *ptr_reference_line);
 
   // 7. always get the best pair of trajectories to combine; return the first
@@ -218,7 +218,7 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // planning_internal::Debug* ptr_debug = reference_line_info->mutable_debug();
 
-  int num_lattice_traj = 0;
+  std::size_t num_lattice_traj = 0;
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
     double trajectory_pair_cost =
         trajectory_evaluator.top_trajectory_pair_cost();
