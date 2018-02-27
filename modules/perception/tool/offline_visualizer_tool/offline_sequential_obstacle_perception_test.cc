@@ -173,7 +173,7 @@ class SequentialPerceptionTest {
         dynamic_cast<VelodyneRawFrame*>(frame->get());
     velodyne_frame->timestamp_ = timestamp;
     velodyne_frame->pose_ = pose;
-    velodyne_frame->sensor_type_ = VELODYNE_64;
+    velodyne_frame->sensor_type_ = SensorType::VELODYNE_64;
     velodyne_frame->cloud_ = cloud;
     return true;
   }
@@ -227,7 +227,7 @@ class SequentialPerceptionTest {
     RadarRawFrame* radar_frame = dynamic_cast<RadarRawFrame*>(frame->get());
     radar_frame->timestamp_ = timestamp;
     radar_frame->pose_ = pose;
-    radar_frame->sensor_type_ = RADAR;
+    radar_frame->sensor_type_ = SensorType::RADAR;
     radar_frame->raw_obstacles_ = radar_obs_proto;
     radar_frame->car_linear_speed_ = velocity;
     return true;

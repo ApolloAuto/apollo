@@ -139,6 +139,8 @@ void RelativeMap::RunOnce(const NavigationInfo& navigation_info) {
 
 void RelativeMap::CreateMapFromPerception(
     const PerceptionObstacles& perception_obstacles, MapMsg* map_msg) {
+  CHECK_NOTNULL(map_msg);
+
   // update vehicle state from localization and chassis
   const auto& localization =
       AdapterManager::GetLocalization()->GetLatestObserved();

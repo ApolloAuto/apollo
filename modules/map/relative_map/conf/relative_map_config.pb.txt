@@ -3,3 +3,7 @@ map_param {
   default_right_width: 1.75
   default_speed_limit : 29.0576 # 65mph
 }
+
+navigation_lane {
+  min_lane_marker_quality: 0.49
+}

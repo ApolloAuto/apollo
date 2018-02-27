@@ -69,7 +69,7 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
     motion_fusion_->Initialize(obj);
     invisible_in_radar_ = false;
   } else {
-    AERROR << "Unsupported sensor type : " << sensor_type
+    AERROR << "Unsupported sensor type : " << static_cast<int>(sensor_type)
            << ", sensor id : " << sensor_id;
   }
 
@@ -224,7 +224,7 @@ void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
       AERROR << "Something must be wrong.";
     }
   } else {
-    AERROR << "Unsupport sensor type " << sensor_type;
+    AERROR << "Unsupport sensor type " << static_cast<int>(sensor_type);
     return;
   }
 }
@@ -288,7 +288,7 @@ bool PbfTrack::AbleToPublish() {
   PbfSensorObjectPtr radar_object = GetLatestRadarObject();
   if (s_publish_if_has_radar_ && !invisible_in_radar_ &&
       radar_object != nullptr) {
-    if (radar_object->sensor_type == RADAR) {
+    if (radar_object->sensor_type == SensorType::RADAR) {
       if (radar_object->object->radar_supplement->range >
               s_min_radar_confident_distance_ &&
           radar_object->object->radar_supplement->angle <
