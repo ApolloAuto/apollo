@@ -148,6 +148,10 @@ void NavigationLane::ConvertLaneMarkerToPath(
 
   const double unit_z = 1.0;
   if (left_lane.view_range() > right_lane.view_range()) {
+    const double x_l_0 = EvaluateCubicPolynomial(
+        left_lane.c0_position(), left_lane.c1_heading_angle(),
+        left_lane.c2_curvature(), left_lane.c3_curvature_derivative(), 0.0);
+
     double accumulated_s = 0.0;
     for (double z = 0; z <= left_lane.view_range(); z += unit_z) {
       const double x_l = EvaluateCubicPolynomial(
@@ -162,7 +166,8 @@ void NavigationLane::ConvertLaneMarkerToPath(
       }
 
       double x1 = z;
-      double y1 = -std::fabs(x_l);
+      // TODO(All): use more precise method to shift y
+      double y1 = std::fabs(x_l) - std::fabs(x_l_0);
 
       auto* point = path->add_path_point();
       point->set_x(x1);
@@ -175,6 +180,9 @@ void NavigationLane::ConvertLaneMarkerToPath(
       }
     }
   } else {
+    const double x_r_0 = EvaluateCubicPolynomial(
+        right_lane.c0_position(), right_lane.c1_heading_angle(),
+        right_lane.c2_curvature(), right_lane.c3_curvature_derivative(), 0.0);
     double accumulated_s = 0.0;
     for (double z = 0; z <= right_lane.view_range(); z += unit_z) {
       const double x_r = EvaluateCubicPolynomial(
@@ -189,7 +197,8 @@ void NavigationLane::ConvertLaneMarkerToPath(
       }
 
       double x1 = z;
-      double y1 = std::fabs(x_r);
+      // TODO(All): use more precise method to shift y
+      double y1 = -std::fabs(x_r) + std::fabs(x_r_0);
 
       auto* point = path->add_path_point();
       point->set_x(x1);
