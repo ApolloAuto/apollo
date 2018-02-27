@@ -62,6 +62,7 @@ cc_library(
         "//modules/common/proto:common_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util:map_util",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
