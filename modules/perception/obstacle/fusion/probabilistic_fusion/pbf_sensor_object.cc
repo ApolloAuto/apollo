@@ -20,7 +20,9 @@ namespace apollo {
 namespace perception {
 
 PbfSensorObject::PbfSensorObject()
-    : sensor_type(UNKNOWN_SENSOR_TYPE), timestamp(0.0), invisible_period(0.0) {
+    : sensor_type(SensorType::UNKNOWN_SENSOR_TYPE),
+      timestamp(0.0),
+      invisible_period(0.0) {
   object.reset(new Object());
 }
 

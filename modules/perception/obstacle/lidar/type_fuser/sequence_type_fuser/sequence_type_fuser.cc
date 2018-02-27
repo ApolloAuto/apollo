@@ -107,8 +107,9 @@ bool SequenceTypeFuser::FuseType(const TypeFuserOptions& options,
     ObjectSequence::TrackedObjects tracked_objects;
     for (auto& object : *objects) {
       if (object->is_background) {
-        object->type_probs.assign(MAX_OBJECT_TYPE, 0);
-        object->type = UNKNOWN_UNMOVABLE;
+        object->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
+                                  0);
+        object->type = ObjectType::UNKNOWN_UNMOVABLE;
         continue;
       }
       const int& track_id = object->track_id;

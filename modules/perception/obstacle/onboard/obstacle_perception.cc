@@ -21,9 +21,9 @@
 #include "modules/common/time/time.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/timer.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 #include "modules/perception/obstacle/radar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 
 DEFINE_string(obstacle_show_type, "fused",
               "show obstacle from lidar/radar/fused");
@@ -117,7 +117,7 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
   PERF_BLOCK_START();
 
   std::shared_ptr<SensorObjects> sensor_objects(new SensorObjects());
-  if (frame->sensor_type_ == VELODYNE_64) {
+  if (frame->sensor_type_ == SensorType::VELODYNE_64) {
     /// lidar obstacle detection
     VelodyneRawFrame* velodyne_frame = dynamic_cast<VelodyneRawFrame*>(frame);
     std::shared_ptr<Eigen::Matrix4d> velodyne_pose(new Eigen::Matrix4d);
@@ -140,7 +140,7 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
       }
       lidar_pose_inited_ = true;
     }
-  } else if (frame->sensor_type_ == RADAR) {
+  } else if (frame->sensor_type_ == SensorType::RADAR) {
     /// radar obstacle detection
     RadarRawFrame* radar_frame = dynamic_cast<RadarRawFrame*>(frame);
     RadarDetectorOptions options;
@@ -149,7 +149,7 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
     std::vector<ObjectPtr> objects;
     std::vector<PolygonDType> map_polygons;
     if (!radar_detector_->Detect(radar_frame->raw_obstacles_, map_polygons,
-                                options, &objects)) {
+                                 options, &objects)) {
       AERROR << "Radar perception error!, " << std::fixed
              << std::setprecision(12) << radar_frame->timestamp_;
       return false;
@@ -162,7 +162,7 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
       frame_content_.SetTrackedObjects(sensor_objects->objects);
     }
   } else {
-    AERROR << "Unknown sensor type : " << frame->sensor_type_;
+    AERROR << "Unknown sensor type : " << static_cast<int>(frame->sensor_type_);
     return false;
   }
   sensor_objects->sensor_type = frame->sensor_type_;
@@ -185,7 +185,7 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
   if (FLAGS_enable_visualization) {
     if (obstacle_show_type_ == SHOW_FUSED) {
       frame_content_.SetTrackedObjects(fused_objects);
-      if (frame->sensor_type_ != VELODYNE_64) {
+      if (frame->sensor_type_ != SensorType::VELODYNE_64) {
         return true;
       }
     }

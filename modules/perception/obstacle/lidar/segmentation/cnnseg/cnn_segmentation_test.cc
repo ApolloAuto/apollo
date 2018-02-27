@@ -67,11 +67,11 @@ int F2I(float val, float ori, float scale) {
 
 cv::Vec3b GetTypeColor(ObjectType type) {
   switch (type) {
-    case PEDESTRIAN:
+    case ObjectType::PEDESTRIAN:
       return cv::Vec3b(255, 128, 128);  // pink
-    case BICYCLE:
+    case ObjectType::BICYCLE:
       return cv::Vec3b(0, 0, 255);  // blue
-    case VEHICLE:
+    case ObjectType::VEHICLE:
       return cv::Vec3b(0, 255, 0);  // green
     default:
       return cv::Vec3b(0, 255, 255);  // yellow
