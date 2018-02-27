@@ -409,7 +409,8 @@ void GLFWViewer::DrawObstacle(const ObjectPtr obj, bool show_cloud,
                               bool show_polygon, bool show_velocity,
                               bool show_direction) {
   float type_color[3] = {0, 0, 0};
-  GetClassColor(obj->type, type_color);
+  // TODO(All): modify GetClassColor params
+  GetClassColor(static_cast<int>(obj->type), type_color);
   if (show_polygon) {
     double h = obj->height;
     glColor3f(type_color[0], type_color[1], type_color[2]);
