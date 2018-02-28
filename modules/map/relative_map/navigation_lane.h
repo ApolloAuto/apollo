@@ -33,7 +33,13 @@ class NavigationLane {
 
   void SetConfig(const NavigationLaneConfig& config);
 
-  bool Update(const perception::PerceptionObstacles& perception_obstacles);
+  bool GeneratePath();
+
+  void UpdatePerception(
+      const perception::PerceptionObstacles& perception_obstacles) {
+    perception_obstacles_ = perception_obstacles;
+  }
+
   void UpdateNavigationInfo(const NavigationInfo& navigation_info) {
     navigation_info_ = navigation_info;
   }
