@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@
 #include <utility>
 
 #include "modules/common/log.h"
-#include "modules/perception/obstacle/camera/tracker/mix_camera_tracker_util.h"
+#include "modules/perception/obstacle/camera/tracker/cascaded_camera_tracker_util.h"
 
 namespace apollo {
 namespace perception {
 
-void get_detected_from_vo(const cv::Size &sz,
-                          const std::vector<VisualObjectPtr> &objects,
-                          const float &scale, std::vector<Detected> *detected) {
+void GetDetectedFromVO(const cv::Size &sz,
+                       const std::vector<VisualObjectPtr> &objects,
+                       const float &scale, std::vector<Detected> *detected) {
   size_t i = 0;
   detected->clear();
   for (auto obj_ptr : objects) {
@@ -58,17 +58,17 @@ void get_detected_from_vo(const cv::Size &sz,
     int height = static_cast<int>((y2 - y1) * scale);
 
     Detected obj;
-    obj._detect_id = i;
+    obj.detect_id_ = i;
     obj_ptr->id = static_cast<int>(i);
-    obj._box = cv::Rect(x, y, width, height);
-    obj._features = obj_ptr->dl_roi_feature;
+    obj.box_ = cv::Rect(x, y, width, height);
+    obj.features_ = obj_ptr->dl_roi_feature;
     detected->push_back(obj);
     ++i;
   }
 }
 
-void merge_affinity_matrix(const std::vector<std::vector<float>> &to_merge,
-                           std::vector<std::vector<float>> *affinity_matrix) {
+void MergeAffinityMatrix(const std::vector<std::vector<float>> &to_merge,
+                         std::vector<std::vector<float>> *affinity_matrix) {
   if (to_merge.empty() || affinity_matrix->empty()) {
     return;
   } else if (to_merge.size() != affinity_matrix->size()) {
@@ -89,8 +89,8 @@ void merge_affinity_matrix(const std::vector<std::vector<float>> &to_merge,
   return;
 }
 
-void filter_affinity_matrix(float high_threshold, float other_threshold,
-                            std::vector<std::vector<float>> *affinity_matrix) {
+void FilterAffinityMatrix(float high_threshold, float other_threshold,
+                          std::vector<std::vector<float>> *affinity_matrix) {
   for (size_t i = 0; i < affinity_matrix->size(); ++i) {
     for (size_t j = 0; j < (*affinity_matrix)[0].size(); ++j) {
       if ((*affinity_matrix)[i][j] > high_threshold) {
@@ -132,9 +132,9 @@ void filter_affinity_matrix(float high_threshold, float other_threshold,
   return;
 }
 
-void matrix_matching(const std::vector<std::vector<float>> &affinity_matrix,
-                     std::unordered_map<int, int> *local_matching,
-                     std::unordered_set<int> *local_matched_detected) {
+void MatrixMatching(const std::vector<std::vector<float>> &affinity_matrix,
+                    std::unordered_map<int, int> *local_matching,
+                    std::unordered_set<int> *local_matched_detected) {
   if (affinity_matrix.empty()) {
     return;
   }
@@ -168,11 +168,11 @@ void matrix_matching(const std::vector<std::vector<float>> &affinity_matrix,
   }
 }
 
-void tracker_and_id_management(
-    const std::unordered_map<int, int> &local_matching,
-    const std::unordered_set<int> &local_matched_detected,
-    const std::vector<Detected> &detected, std::vector<Tracked> *tracked,
-    int *next_tracked_id, std::map<int, int> *id_mapping, int curr_frame_cnt) {
+void ManageTrackerAndID(const std::unordered_map<int, int> &local_matching,
+                        const std::unordered_set<int> &local_matched_detected,
+                        const std::vector<Detected> &detected,
+                        std::vector<Tracked> *tracked, int *next_tracked_id,
+                        std::map<int, int> *id_mapping, int curr_frame_cnt) {
   // Output:
   // Create, update and delete tracks, with the given matching result. (Ad-hoc
   // strategy here of test)
@@ -184,7 +184,7 @@ void tracker_and_id_management(
   // Sort local matching output based on tracked_id for easier debugging
   std::map<int, std::pair<int, int>> tracked_id_local_index;
   for (const auto &pair : local_matching) {
-    int track_id = (*tracked)[pair.first]._track_id;
+    int track_id = (*tracked)[pair.first].track_id_;
 
     if (tracked_id_local_index.find(track_id) == tracked_id_local_index.end()) {
       tracked_id_local_index[track_id] =
@@ -198,16 +198,15 @@ void tracker_and_id_management(
   std::unordered_map<int, int> trackedID_to_detectedID;
   for (const auto &item : tracked_id_local_index) {
     int track_id =
-        (*tracked)[item.second.first]._track_id;  // The same as item.first
-    size_t detect_id = detected[item.second.second]._detect_id;
+        (*tracked)[item.second.first].track_id_;  // The same as item.first
+    size_t detect_id = detected[item.second.second].detect_id_;
 
     Tracked curr_tracked;
-    curr_tracked._last_seen_frame_cnt = curr_frame_cnt;
-    curr_tracked._last_seen_timestamp =
-        detected[item.second.second]._last_seen_timestamp;
-    curr_tracked._track_id = track_id;
-    curr_tracked._detect_id = detect_id;
-    curr_tracked._box = detected[item.second.second]._box;
+    curr_tracked.last_frame_idx_ = curr_frame_cnt;
+    curr_tracked.last_timestamp_ = detected[item.second.second].last_timestamp_;
+    curr_tracked.track_id_ = track_id;
+    curr_tracked.detect_id_ = detect_id;
+    curr_tracked.box_ = detected[item.second.second].box_;
     new_tracked.emplace_back(curr_tracked);
 
     (*id_mapping)[static_cast<int>(detect_id)] = track_id;
@@ -218,17 +217,17 @@ void tracker_and_id_management(
   for (size_t i = 0; i < detected.size(); ++i) {
     if (local_matched_detected.find(i) == local_matched_detected.end()) {
       Tracked curr_tracked;
-      curr_tracked._last_seen_frame_cnt = curr_frame_cnt;
-      curr_tracked._last_seen_timestamp = detected[i]._last_seen_timestamp;
-      curr_tracked._track_id = *next_tracked_id;
-      curr_tracked._detect_id = detected[i]._detect_id;
-      curr_tracked._box = detected[i]._box;
+      curr_tracked.last_frame_idx_ = curr_frame_cnt;
+      curr_tracked.last_timestamp_ = detected[i].last_timestamp_;
+      curr_tracked.track_id_ = *next_tracked_id;
+      curr_tracked.detect_id_ = detected[i].detect_id_;
+      curr_tracked.box_ = detected[i].box_;
       new_tracked.emplace_back(curr_tracked);
 
-      (*id_mapping)[static_cast<int>(detected[i]._detect_id)] =
+      (*id_mapping)[static_cast<int>(detected[i].detect_id_)] =
           *next_tracked_id;
       trackedID_to_detectedID[*next_tracked_id] =
-          static_cast<int>(detected[i]._detect_id);
+          static_cast<int>(detected[i].detect_id_);
 
       // ID management
       ++(*next_tracked_id);
@@ -237,9 +236,9 @@ void tracker_and_id_management(
 
   // Keep unmatched tracks here
   for (auto &trk : *tracked) {
-    if (!trackedID_to_detectedID.count(trk._track_id) &&
-        trk._last_seen_frame_cnt + max_kept_frame_cnt >= curr_frame_cnt) {
-      trk._detect_id = -1;
+    if (!trackedID_to_detectedID.count(trk.track_id_) &&
+        trk.last_frame_idx_ + max_kept_frame_cnt >= curr_frame_cnt) {
+      trk.detect_id_ = -1;
       new_tracked.emplace_back(trk);
     }
   }
@@ -247,14 +246,13 @@ void tracker_and_id_management(
   std::swap(new_tracked, *tracked);
 }
 
-void print_affinity_matrix(
-    const std::vector<std::vector<float>> &affinity_matrix,
-    const std::vector<Tracked> &tracked,
-    const std::vector<Detected> &detected) {
+void PrintAffinityMatrix(const std::vector<std::vector<float>> &affinity_matrix,
+                         const std::vector<Tracked> &tracked,
+                         const std::vector<Detected> &detected) {
   if (!affinity_matrix.empty()) {
     std::string to_print = "T/ detect ID:";
     for (size_t j = 0; j < affinity_matrix[0].size(); ++j) {
-      to_print += " " + std::to_string(detected[j]._detect_id);
+      to_print += " " + std::to_string(detected[j].detect_id_);
     }
     AINFO << to_print;
 
@@ -264,8 +262,8 @@ void print_affinity_matrix(
         to_print_affinity += std::to_string(affinity_matrix[i][j]) + " ";
       }
 
-      AINFO << i << "th T, track_id:" << tracked[i]._track_id
-            << " pre_detect_id:" << tracked[i]._detect_id << "\t"
+      AINFO << i << "th T, track_id:" << tracked[i].track_id_
+            << " predetect_id_:" << tracked[i].detect_id_ << "\t"
             << to_print_affinity;
     }
   } else {
