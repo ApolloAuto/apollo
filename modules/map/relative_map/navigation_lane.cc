@@ -25,6 +25,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/map/relative_map/common/relative_map_gflags.h"
 
 namespace apollo {
 namespace relative_map {
@@ -110,8 +111,7 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
         navigation_path.path_point(curr_project_index).s();
     point->set_s(accumulated_s);
 
-    constexpr double kMaxAccumulatedS = 100.0;
-    if (accumulated_s > kMaxAccumulatedS) {
+    if (accumulated_s > FLAGS_max_len_from_navigation_line) {
       break;
     }
   }
