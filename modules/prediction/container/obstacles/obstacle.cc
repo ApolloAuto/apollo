@@ -26,6 +26,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/map_util.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
@@ -360,7 +361,8 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
   double speed = std::hypot(velocity_x, velocity_y);
   double velocity_heading = perception_obstacle.theta();
 
-  if (FLAGS_enable_adjust_velocity_heading && history_size() > 0) {
+  if (!FLAGS_use_navigation_mode &&
+      FLAGS_enable_adjust_velocity_heading && history_size() > 0) {
     double diff_x =
         feature->position().x() - feature_history_.front().position().x();
     double diff_y =
