@@ -110,6 +110,11 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
         navigation_path.path_point(i).s() -
         navigation_path.path_point(curr_project_index).s();
     point->set_s(accumulated_s);
+
+    constexpr double kMaxAccumulatedS = 100.0;
+    if (accumulated_s > kMaxAccumulatedS) {
+      break;
+    }
   }
 
   // set left/right width invalid as no width info from navigation line
