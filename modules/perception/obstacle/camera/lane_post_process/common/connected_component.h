@@ -14,19 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CONNECTED_COMPONENT_H_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CONNECTED_COMPONENT_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CC_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CC_H_
+
+#include <Eigen/Core>
+#include <opencv2/core/core.hpp>
+// #include <cuda.h>
+// #include <cuda_runtime.h>
 
 #include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
-
-#include <Eigen/Core>
-#include <opencv2/core/core.hpp>
-
-// #include <cuda.h>
-// #include <cuda_runtime.h>
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
@@ -49,14 +48,14 @@ class DisjointSet {
   DisjointSet()
       : subset_num_(0) {}
 
-  DisjointSet(size_t siz)
+  explicit DisjointSet(const size_t siz)
       : subset_num_(0) {
     disjoint_array_.reserve(siz);
   }
 
   ~DisjointSet() {}
 
-  void Init(size_t siz) {
+  void Init(const size_t siz) {
     disjoint_array_.clear();
     disjoint_array_.reserve(siz);
     subset_num_ = 0;
@@ -245,7 +244,7 @@ class ConnectedComponent {
   }
 
   Vertex GetVertex(int vertex_id) const {
-    //assert(vertex_id >= 0 && vertex_id < this->getVertexCount());
+    // assert(vertex_id >= 0 && vertex_id < this->getVertexCount());
     return vertices_->at(vertex_id);
   }
 
@@ -346,7 +345,7 @@ class ConnectedComponentGenerator {
 
   bool FindConnectedComponents(
       const cv::Mat& lane_map,
-      std::vector<std::shared_ptr<ConnectedComponent>>& cc);
+      std::vector<std::shared_ptr<ConnectedComponent>>* cc);
 
  private:
 #if CUDA_CC
@@ -379,4 +378,4 @@ class ConnectedComponentGenerator {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CONNECTED_COMPONENT_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CC_H_
