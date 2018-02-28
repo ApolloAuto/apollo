@@ -92,11 +92,6 @@ Feature* Obstacle::mutable_latest_feature() {
 
 size_t Obstacle::history_size() const { return feature_history_.size(); }
 
-const KalmanFilter<double, 4, 2, 0>& Obstacle::kf_lane_tracker(
-    const std::string& lane_id) {
-  return FindOrDie(kf_lane_trackers_, lane_id);
-}
-
 const KalmanFilter<double, 6, 2, 0>& Obstacle::kf_motion_tracker() const {
   return kf_motion_tracker_;
 }
@@ -172,7 +167,6 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   SetCurrentLanes(&feature);
   SetNearbyLanes(&feature);
   SetLaneGraphFeature(&feature, obstacle_clusters);
-  UpdateKFLaneTrackers(&feature);
 
   // Insert obstacle feature to history
   InsertFeatureToHistory(feature);
@@ -590,161 +584,6 @@ void Obstacle::UpdateKFMotionTracker(const Feature& feature) {
   }
 }
 
-void Obstacle::InitKFLaneTracker(const std::string& lane_id,
-                                 const double beta) {
-  KalmanFilter<double, 4, 2, 0> kf;
-
-  // transition matrix: update delta_t at each processing step
-  Eigen::Matrix<double, 4, 4> F;
-  F.setIdentity();
-  F(1, 1) = beta;
-  kf.SetTransitionMatrix(F);
-
-  // observation matrix
-  Eigen::Matrix<double, 2, 4> H;
-  H.setIdentity();
-  kf.SetObservationMatrix(H);
-
-  // Set covariance of transition noise matrix Q
-  Eigen::Matrix<double, 4, 4> Q;
-  Q.setIdentity();
-  Q *= FLAGS_q_var;
-  kf.SetTransitionNoise(Q);
-
-  // Set observation noise matrix R
-  Eigen::Matrix<double, 2, 2> R;
-  R.setIdentity();
-  R *= FLAGS_r_var;
-  kf.SetObservationNoise(R);
-
-  // Set current state covariance matrix P
-  Eigen::Matrix<double, 4, 4> P;
-  P.setIdentity();
-  P *= FLAGS_p_var;
-  kf.SetStateCovariance(P);
-
-  kf_lane_trackers_.emplace(lane_id, std::move(kf));
-}
-
-void Obstacle::UpdateKFLaneTrackers(Feature* feature) {
-  if (!feature->has_lane()) {
-    return;
-  }
-  std::unordered_set<std::string> lane_ids;
-  for (auto& lane_feature : feature->lane().current_lane_feature()) {
-    if (!lane_feature.lane_id().empty()) {
-      lane_ids.insert(lane_feature.lane_id());
-    }
-  }
-  for (auto& lane_feature : feature->lane().nearby_lane_feature()) {
-    if (!lane_feature.lane_id().empty()) {
-      lane_ids.insert(lane_feature.lane_id());
-    }
-  }
-  if (lane_ids.empty()) {
-    return;
-  }
-
-  auto iter = kf_lane_trackers_.begin();
-  while (iter != kf_lane_trackers_.end()) {
-    if (lane_ids.find(iter->first) == lane_ids.end()) {
-      iter = kf_lane_trackers_.erase(iter);
-    } else {
-      ++iter;
-    }
-  }
-
-  double ts = feature->timestamp();
-  double speed = feature->speed();
-  double acc = feature->acc();
-  for (auto& lane_feature : feature->lane().current_lane_feature()) {
-    std::string lane_id = lane_feature.lane_id();
-    if (lane_id.empty()) {
-      continue;
-    }
-    double s = lane_feature.lane_s();
-    double l = lane_feature.lane_l();
-    UpdateKFLaneTracker(lane_id, s, l, speed, acc, ts, FLAGS_go_approach_rate);
-  }
-  for (auto& nearby_lane_feature : feature->lane().nearby_lane_feature()) {
-    std::string lane_id = nearby_lane_feature.lane_id();
-    if (lane_id.empty()) {
-      continue;
-    }
-    double s = nearby_lane_feature.lane_s();
-    double l = nearby_lane_feature.lane_l();
-    UpdateKFLaneTracker(lane_id, s, l, speed, acc, ts,
-                        FLAGS_cutin_approach_rate);
-  }
-
-  if (FLAGS_enable_kf_tracking && id_ >= 0) {
-    UpdateLaneBelief(feature);
-  }
-}
-
-void Obstacle::UpdateKFLaneTracker(const std::string& lane_id,
-                                   const double lane_s, const double lane_l,
-                                   const double lane_speed,
-                                   const double lane_acc,
-                                   const double timestamp, const double beta) {
-  auto* kf_ptr = FindOrNull(kf_lane_trackers_, lane_id);
-  if (kf_ptr != nullptr) {
-    double delta_ts = 0.0;
-    if (feature_history_.size() > 0) {
-      delta_ts = timestamp - feature_history_.front().timestamp();
-    }
-    if (delta_ts > FLAGS_double_precision) {
-      auto F = kf_ptr->GetTransitionMatrix();
-      F(0, 2) = delta_ts;
-      F(0, 3) = 0.5 * delta_ts * delta_ts;
-      F(2, 3) = delta_ts;
-      kf_ptr->SetTransitionMatrix(F);
-      kf_ptr->Predict();
-
-      Eigen::Matrix<double, 2, 1> z;
-      z(0, 0) = lane_s;
-      z(1, 0) = lane_l;
-      kf_ptr->Correct(z);
-    }
-  } else {
-    InitKFLaneTracker(lane_id, beta);
-    auto& kf = FindOrDie(kf_lane_trackers_, lane_id);
-    Eigen::Matrix<double, 4, 1> state;
-    state.setZero();
-    state(0, 0) = lane_s;
-    state(1, 0) = lane_l;
-    state(2, 0) = lane_speed;
-    state(3, 0) = lane_acc;
-
-    auto P = kf.GetStateCovariance();
-    kf.SetStateEstimate(state, P);
-  }
-}
-
-void Obstacle::UpdateLaneBelief(Feature* feature) {
-  if ((!feature->has_lane()) || (!feature->lane().has_lane_feature())) {
-    return;
-  }
-  const std::string& lane_id = feature->lane().lane_feature().lane_id();
-  if (lane_id.empty()) {
-    return;
-  }
-
-  auto* kf_ptr = FindOrNull(kf_lane_trackers_, lane_id);
-  if (kf_ptr == nullptr) {
-    return;
-  }
-
-  double lane_speed = kf_ptr->GetStateEstimate()(2, 0);
-  double lane_acc = common::math::Clamp(kf_ptr->GetStateEstimate()(3, 0),
-                                        FLAGS_min_acc, FLAGS_max_acc);
-
-  ADEBUG << "Obstacle [" << id_ << "] has tracked lane speed [" << std::fixed
-         << std::setprecision(6) << lane_speed << "]";
-  ADEBUG << "Obstacle [" << id_ << "] has tracked lane acceleration ["
-         << std::fixed << std::setprecision(6) << lane_acc << "]";
-}
-
 void Obstacle::InitKFPedestrianTracker(const Feature& feature) {
   // Set transition matrix F
   Eigen::Matrix<double, 2, 2> F;
@@ -828,7 +667,6 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
   current_lanes_ = current_lanes;
   if (current_lanes_.empty()) {
     ADEBUG << "Obstacle [" << id_ << "] has no current lanes.";
-    kf_lane_trackers_.clear();
     return;
   }
   Lane lane;
