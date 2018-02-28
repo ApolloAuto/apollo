@@ -26,22 +26,22 @@ namespace apollo {
 namespace perception {
 
 template <typename T>
-class Camera;
+class CameraModel;
 template <typename T>
 class CameraDistort;
 
 /**@brief Print the matrix.*/
 template <typename T>
-std::ostream& operator<<(std::ostream& cout, const Camera<T>& camera);
+std::ostream& operator<<(std::ostream& cout, const CameraModel<T>& camera);
 
 template <typename T>
 std::ostream& operator<<(std::ostream& cout, const CameraDistort<T>& camera);
 
 /**@brief camera intrinsic of pin-hole camera model*/
 template <typename T>
-class Camera {
+class CameraModel {
  public:
-  Camera() {
+  CameraModel() {
     _focal_length_x = 1;
     _focal_length_y = 1;
     _center_x = 0;
@@ -177,7 +177,8 @@ class Camera {
     return _height;
   }
 
-  friend std::ostream& operator<<<>(std::ostream& out, const Camera<T>& camera);
+  friend std::ostream& operator<<<>(std::ostream& out,
+                                    const CameraModel<T>& camera);
 
  protected:
   /**@brief Normalize a 2D pixel. Convert a 2D pixel as if the image is taken
@@ -223,7 +224,7 @@ class Camera {
 
 /**@brief camera intrinsic of pin-hole camera model with distortion*/
 template <typename T>
-class CameraDistort : public Camera<T> {
+class CameraDistort : public CameraModel<T> {
  public:
   /**@brief The default constructor. */
   CameraDistort() {
@@ -305,7 +306,7 @@ class CameraDistort : public Camera<T> {
    * whose K = identity matrix. */
   virtual Eigen::Matrix<T, 2, 1> pixel_normalize(
       const Eigen::Matrix<T, 2, 1>& pt2d) const {
-    Eigen::Matrix<T, 2, 1> pt2d_distort = Camera<T>::pixel_normalize(pt2d);
+    Eigen::Matrix<T, 2, 1> pt2d_distort = CameraModel<T>::pixel_normalize(pt2d);
 
     Eigen::Matrix<T, 2, 1> pt2d_undistort = pt2d_distort;  // Initial guess
     for (unsigned int i = 0; i < 20; ++i) {
@@ -349,7 +350,7 @@ class CameraDistort : public Camera<T> {
     pt2d_undistort[0] = pt2d_radial[0] + dpt2d[0];
     pt2d_undistort[1] = pt2d_radial[1] + dpt2d[1];
     // Add intrinsic K
-    return Camera<T>::pixel_denormalize(pt2d_undistort);
+    return CameraModel<T>::pixel_denormalize(pt2d_undistort);
   }
 
  protected:
@@ -362,7 +363,7 @@ class CameraDistort : public Camera<T> {
 };
 
 template <typename T>
-std::ostream& operator<<(std::ostream& cout, const Camera<T>& camera) {
+std::ostream& operator<<(std::ostream& cout, const CameraModel<T>& camera) {
   cout << camera._intrinsic << "\n [" << camera._width << "," << camera._height
        << "]\n";
   return cout;
