@@ -228,6 +228,10 @@ bool NavigationLane::CreateMap(const MapGenerationParam& map_config,
                                MapMsg* map_msg) const {
   auto* navigation_info = map_msg->mutable_navigation_path();
   auto* hdmap = map_msg->mutable_hdmap();
+  auto* lane_marker = map_msg->mutable_lane_marker();
+
+  lane_marker->CopyFrom(perception_obstacles_.lane_marker());
+
   const auto& path = navigation_path_.path();
   if (path.path_point_size() < 2) {
     AERROR << "The path length is invalid";
