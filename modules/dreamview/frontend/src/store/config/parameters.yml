@@ -74,6 +74,13 @@ options:
     showPointCloud: false
     showPositionGps: false
     showPositionLocalization: true
+    showMapCrosswalk: true
+    showMapClearArea: true
+    showMapJunction: false
+    showMapLane: true
+    showMapRoad: false
+    showMapSignal: true
+    showMapStopSign: true
     cameraAngle: Default
 debug:
   # Turn this on for monitor related debugging
