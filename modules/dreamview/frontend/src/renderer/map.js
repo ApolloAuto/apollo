@@ -60,7 +60,6 @@ export default class Map {
             result[kind] = [];
             const newIds = elementIds[kind];
             const oldData = data[kind];
-
             for (let i = 0; i < newIds.length; ++i) {
                 const found = oldData ? oldData.find(old => {
                     return old.id.id === newIds[i];
@@ -445,6 +444,7 @@ export default class Map {
                         break;
                     case "overlap":
                         this.extractOverlaps(newData['overlap']);
+                        this.data[kind].push(newData[kind][i]);
                         break;
                     case "signal":
                         this.data[kind].push(Object.assign(newData[kind][i], {
