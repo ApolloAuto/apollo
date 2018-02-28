@@ -17,10 +17,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H
 
+#include <Eigen/Core>
 #include <memory>
 #include <vector>
-
-#include "Eigen/Core"
 
 #include "modules/perception/obstacle/base/types.h"
 
@@ -44,7 +43,7 @@ struct alignas(16) VisualObject {
   float trunc_height = 0.0f;
 
   // Object type from detection
-  ObjectType type = UNKNOWN;
+  ObjectType type = ObjectType::UNKNOWN;
   // Probability of each object type
   std::vector<float> type_probs;
 

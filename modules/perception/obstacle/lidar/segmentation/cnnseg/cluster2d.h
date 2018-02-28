@@ -30,7 +30,7 @@ namespace apollo {
 namespace perception {
 namespace cnnseg {
 
-enum MetaType {
+enum class MetaType {
   META_UNKNOWN,
   META_SMALLMOT,
   META_BIGMOT,
@@ -47,16 +47,16 @@ struct Obstacle {
   MetaType meta_type;
   std::vector<float> meta_type_probs;
 
-  Obstacle() : score(0.0), height(-5.0), meta_type(META_UNKNOWN) {
+  Obstacle() : score(0.0), height(-5.0), meta_type(MetaType::META_UNKNOWN) {
     cloud.reset(new apollo::perception::pcl_util::PointCloud);
-    meta_type_probs.assign(MAX_META_TYPE, 0.0);
+    meta_type_probs.assign(static_cast<int>(MetaType::MAX_META_TYPE), 0.0);
   }
 };
 
 class Cluster2D {
  public:
-  Cluster2D() {}
-  ~Cluster2D() {}
+  Cluster2D() = default;
+  ~Cluster2D() = default;
 
   bool Init(int rows, int cols, float range) {
     rows_ = rows;
@@ -203,7 +203,7 @@ class Cluster2D {
   void Classify(const caffe::Blob<float>& classify_pt_blob) {
     const float* classify_pt_data = classify_pt_blob.cpu_data();
     int num_classes = classify_pt_blob.channels();
-    CHECK_EQ(num_classes, MAX_META_TYPE);
+    CHECK_EQ(num_classes, static_cast<int>(MetaType::MAX_META_TYPE));
     for (size_t obs_id = 0; obs_id < obstacles_.size(); obs_id++) {
       Obstacle* obs = &obstacles_[obs_id];
       for (size_t grid_id = 0; grid_id < obs->grids.size(); grid_id++) {
@@ -260,7 +260,7 @@ class Cluster2D {
       apollo::perception::ObjectPtr out_obj(new apollo::perception::Object);
       out_obj->cloud = obs->cloud;
       out_obj->score = obs->score;
-      out_obj->score_type = SCORE_CNN;
+      out_obj->score_type = ScoreType::SCORE_CNN;
       out_obj->type = GetObjectType(obs->meta_type);
       out_obj->type_probs = GetObjectTypeProbs(obs->meta_type_probs);
       objects->push_back(out_obj);
@@ -294,17 +294,11 @@ class Cluster2D {
     return IsValidRow(row) && IsValidCol(col);
   }
 
-  inline bool IsValidRow(int row) const {
-    return row >= 0 && row < rows_;
-  }
+  inline bool IsValidRow(int row) const { return row >= 0 && row < rows_; }
 
-  inline bool IsValidCol(int col) const {
-    return col >= 0 && col < cols_;
-  }
+  inline bool IsValidCol(int col) const { return col >= 0 && col < cols_; }
 
-  inline int RowCol2Grid(int row, int col) const {
-    return row * cols_ + col;
-  }
+  inline int RowCol2Grid(int row, int col) const { return row * cols_ + col; }
 
   void Traverse(Node* x) {
     std::vector<Node*> p;
@@ -329,31 +323,36 @@ class Cluster2D {
 
   ObjectType GetObjectType(const MetaType meta_type_id) {
     switch (meta_type_id) {
-      case META_UNKNOWN:
-        return UNKNOWN;
-      case META_SMALLMOT:
-        return VEHICLE;
-      case META_BIGMOT:
-        return VEHICLE;
-      case META_NONMOT:
-        return BICYCLE;
-      case META_PEDESTRIAN:
-        return PEDESTRIAN;
+      case MetaType::META_UNKNOWN:
+        return ObjectType::UNKNOWN;
+      case MetaType::META_SMALLMOT:
+        return ObjectType::VEHICLE;
+      case MetaType::META_BIGMOT:
+        return ObjectType::VEHICLE;
+      case MetaType::META_NONMOT:
+        return ObjectType::BICYCLE;
+      case MetaType::META_PEDESTRIAN:
+        return ObjectType::PEDESTRIAN;
       default: {
         AERROR << "Undefined ObjectType output by CNNSeg model.";
-        return UNKNOWN;
+        return ObjectType::UNKNOWN;
       }
     }
   }
 
   std::vector<float> GetObjectTypeProbs(
       const std::vector<float>& meta_type_probs) {
-    std::vector<float> object_type_probs(MAX_OBJECT_TYPE, 0.0);
-    object_type_probs[UNKNOWN] = meta_type_probs[META_UNKNOWN];
-    object_type_probs[VEHICLE] =
-        meta_type_probs[META_SMALLMOT] + meta_type_probs[META_BIGMOT];
-    object_type_probs[BICYCLE] = meta_type_probs[META_NONMOT];
-    object_type_probs[PEDESTRIAN] = meta_type_probs[META_PEDESTRIAN];
+    std::vector<float> object_type_probs(
+        static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0.0);
+    object_type_probs[static_cast<int>(ObjectType::UNKNOWN)] =
+        meta_type_probs[static_cast<int>(MetaType::META_UNKNOWN)];
+    object_type_probs[static_cast<int>(ObjectType::VEHICLE)] =
+        meta_type_probs[static_cast<int>(MetaType::META_SMALLMOT)] +
+        meta_type_probs[static_cast<int>(MetaType::META_BIGMOT)];
+    object_type_probs[static_cast<int>(ObjectType::BICYCLE)] =
+        meta_type_probs[static_cast<int>(MetaType::META_NONMOT)];
+    object_type_probs[static_cast<int>(ObjectType::PEDESTRIAN)] =
+        meta_type_probs[static_cast<int>(MetaType::META_PEDESTRIAN)];
     return object_type_probs;
   }
 

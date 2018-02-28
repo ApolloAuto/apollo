@@ -170,7 +170,8 @@ DECLARE_string(stop_sign_virtual_obstacle_id_prefix);
 DECLARE_double(stop_sign_stop_duration);
 DECLARE_double(stop_sign_min_pass_distance);
 DECLARE_double(stop_sign_stop_distance);
-DECLARE_double(stop_sign_max_watch_vehicle_stop_speed);
+DECLARE_double(stop_sign_watch_vehicle_max_stop_speed);
+DECLARE_double(stop_sign_watch_vehicle_max_stop_distance);
 DECLARE_bool(enable_sidepass);
 DECLARE_double(sidepass_wait_time_sec);
 
@@ -192,13 +193,11 @@ DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 // lattice planner
 DECLARE_double(lattice_epsilon);
 DECLARE_double(default_cruise_speed);
-DECLARE_double(spiral_downsample_curvature_thred);
 DECLARE_bool(enable_lattice_st_image_dump);
 DECLARE_bool(enable_auto_tuning);
 DECLARE_double(trajectory_time_resolution);
 DECLARE_double(trajectory_space_resolution);
 DECLARE_double(lateral_acceleration_bound);
-DECLARE_double(collision_buffer_expansion_ratio);
 DECLARE_double(decision_horizon);
 DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);

@@ -21,26 +21,26 @@ namespace perception {
 
 std::string GetSensorType(SensorType sensor_type) {
   switch (sensor_type) {
-    case VELODYNE_64:
+    case SensorType::VELODYNE_64:
       return "velodyne_64";
-    case VELODYNE_16:
+    case SensorType::VELODYNE_16:
       return "velodyne_16";
-    case RADAR:
+    case SensorType::RADAR:
       return "radar";
-    case CAMERA:
+    case SensorType::CAMERA:
       return "camera";
-    case UNKNOWN_SENSOR_TYPE:
+    case SensorType::UNKNOWN_SENSOR_TYPE:
       return "unknown_sensor_type";
   }
   return "";
 }
 
 bool is_lidar(SensorType sensor_type) {
-  return (sensor_type == VELODYNE_64);
+  return (sensor_type == SensorType::VELODYNE_64);
 }
 
 bool is_radar(SensorType sensor_type) {
-  return (sensor_type == RADAR);
+  return (sensor_type == SensorType::RADAR);
 }
 
 }  // namespace perception

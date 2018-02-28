@@ -79,7 +79,7 @@ class RelativeMap : public RelativeMapInterface {
   void RunOnce(const NavigationInfo& navigation_info);
 
  private:
-  void CreateMapFromPerception(
+  bool CreateMapFromPerception(
       const apollo::perception::PerceptionObstacles& perception_obstacles,
       MapMsg* map_msg);
 

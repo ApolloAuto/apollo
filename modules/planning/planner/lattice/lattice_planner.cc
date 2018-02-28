@@ -26,22 +26,22 @@
 #include <utility>
 #include <vector>
 
-#include "../../lattice/behavior_decider/prediction_querier.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
+#include "modules/common/math/path_matcher.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
-#include "modules/planning/lattice/behavior_decider/path_time_graph.h"
-#include "modules/planning/lattice/trajectory_generator/backup_trajectory_generator.h"
-#include "modules/planning/lattice/trajectory_generator/trajectory1d_generator.h"
-#include "modules/planning/lattice/trajectory_generator/trajectory_combiner.h"
-#include "modules/planning/lattice/trajectory_generator/trajectory_evaluator.h"
-#include "modules/planning/lattice/util/lattice_trajectory1d.h"
-#include "modules/planning/lattice/util/reference_line_matcher.h"
+#include "modules/planning/lattice/behavior/path_time_graph.h"
+#include "modules/planning/lattice/behavior/prediction_querier.h"
+#include "modules/planning/lattice/trajectory1d/lattice_trajectory1d.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory1d_generator.h"
+#include "modules/planning/lattice/trajectory_generation/backup_trajectory_generator.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory_combiner.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory_evaluator.h"
 
 namespace apollo {
 namespace planning {
@@ -67,11 +67,9 @@ std::vector<PathPoint> ToDiscretizedReferenceLine(
     path_point.set_kappa(ref_point.kappa());
     path_point.set_dkappa(ref_point.dkappa());
 
-    double dx = 0.0;
-    double dy = 0.0;
     if (!path_points.empty()) {
-      dx = path_point.x() - path_points.back().x();
-      dy = path_point.y() - path_points.back().y();
+      double dx = path_point.x() - path_points.back().x();
+      double dy = path_point.y() - path_points.back().y();
       s += std::sqrt(dx * dx + dy * dy);
     }
     path_point.set_s(s);
@@ -95,21 +93,19 @@ void ComputeInitFrenetState(const PathPoint& matched_point,
 
 }  // namespace
 
-LatticePlanner::LatticePlanner() {}
-
-Status LatticePlanner::Init(const PlanningConfig& config) {
-  return Status::OK();
-}
-
 Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
                             Frame* frame) {
-  auto status = Status::OK();
-  double priority_cost = 0.0;
-  bool first_reference_line = true;
+  std::size_t success_line_count = 0;
+  std::size_t index = 0;
   for (auto& reference_line_info : frame->reference_line_info()) {
-    reference_line_info.SetPriorityCost(priority_cost);
-    status =
-        PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
+    if (index != 0) {
+      reference_line_info.SetPriorityCost(FLAGS_priority_cost_gap);
+    } else {
+      reference_line_info.SetPriorityCost(0.0);
+    }
+    auto status = PlanOnReferenceLine(planning_start_point,
+        frame, &reference_line_info);
+
     if (status != Status::OK()) {
       if (reference_line_info.IsChangeLanePath()) {
         AERROR << "Planner failed to change lane to "
@@ -117,13 +113,17 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
       } else {
         AERROR << "Planner failed to " << reference_line_info.Lanes().Id();
       }
+    } else {
+      success_line_count += 1;
     }
-    if (first_reference_line) {
-      priority_cost += FLAGS_priority_cost_gap;
-      first_reference_line = false;
-    }
+    ++index;
   }
-  return status;
+
+  if (success_line_count > 0) {
+    return Status::OK();
+  }
+  return Status(ErrorCode::PLANNING_ERROR,
+      "Failed to plan on any reference line.");
 }
 
 Status LatticePlanner::PlanOnReferenceLine(
@@ -147,7 +147,7 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // 2. compute the matched point of the init planning point on the reference
   // line.
-  PathPoint matched_point = ReferenceLineMatcher::MatchToReferenceLine(
+  PathPoint matched_point = PathMatcher::MatchToPath(
       *ptr_reference_line, planning_init_point.path_point().x(),
       planning_init_point.path_point().y());
 
@@ -160,29 +160,26 @@ Status LatticePlanner::PlanOnReferenceLine(
          << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
-
-  auto ptr_prediction_obstacles = std::make_shared<PredictionQuerier>(
-      frame->obstacles());
+  auto ptr_prediction_querier = std::make_shared<PredictionQuerier>(
+      frame->obstacles(), ptr_reference_line);
 
   // 4. parse the decision and get the planning target.
   auto ptr_path_time_graph = std::make_shared<PathTimeGraph>(
-      ptr_prediction_obstacles->GetObstacles(), *ptr_reference_line,
+      ptr_prediction_querier->GetObstacles(), *ptr_reference_line,
       init_s[0], init_s[0] + FLAGS_decision_horizon,
-      0.0, FLAGS_trajectory_time_length);
+      0.0, FLAGS_trajectory_time_length, FLAGS_default_reference_line_width);
 
-  BehaviorDecider behavior_decider(ptr_reference_line,
-                                   ptr_path_time_graph,
-                                   ptr_prediction_obstacles);
+  BehaviorDecider behavior_decider;
 
   PlanningTarget planning_target = behavior_decider.Analyze(frame,
-      reference_line_info, planning_init_point, init_s,
-      *ptr_reference_line);
+      reference_line_info, planning_init_point, init_s, *ptr_reference_line);
 
   ADEBUG << "Decision_Time = " << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
   // 5. generate 1d trajectory bundle for longitudinal and lateral respectively.
-  Trajectory1dGenerator trajectory1d_generator(init_s, init_d);
+  Trajectory1dGenerator trajectory1d_generator(
+      init_s, init_d, ptr_path_time_graph, ptr_prediction_querier);
   std::vector<std::shared_ptr<Curve1d>> lon_trajectory1d_bundle;
   std::vector<std::shared_ptr<Curve1d>> lat_trajectory1d_bundle;
   trajectory1d_generator.GenerateTrajectoryBundles(
@@ -196,9 +193,8 @@ Status LatticePlanner::PlanOnReferenceLine(
   // dynamic constraints.
   //   second, evaluate the feasible longitudinal and lateral trajectory pairs
   //   and sort them according to the cost.
-  TrajectoryEvaluator trajectory_evaluator(
-      planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle,
-      FLAGS_enable_auto_tuning, ptr_path_time_graph);
+  TrajectoryEvaluator trajectory_evaluator(planning_target,
+      lon_trajectory1d_bundle, lat_trajectory1d_bundle, ptr_path_time_graph);
 
   ADEBUG << "Trajectory_Evaluator_Construction_Time = "
          << (Clock::NowInSeconds() - current_time) * 1000;
@@ -210,7 +206,7 @@ Status LatticePlanner::PlanOnReferenceLine(
          << "  number_lat_traj = " << lat_trajectory1d_bundle.size();
 
   // Get instance of collision checker and constraint checker
-  CollisionChecker collision_checker(frame->obstacles(), init_s, init_d,
+  CollisionChecker collision_checker(frame->obstacles(), init_s[0], init_d[0],
                                      *ptr_reference_line);
 
   // 7. always get the best pair of trajectories to combine; return the first
@@ -221,7 +217,7 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // planning_internal::Debug* ptr_debug = reference_line_info->mutable_debug();
 
-  int num_lattice_traj = 0;
+  std::size_t num_lattice_traj = 0;
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
     double trajectory_pair_cost =
         trajectory_evaluator.top_trajectory_pair_cost();

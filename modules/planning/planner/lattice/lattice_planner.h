@@ -23,9 +23,10 @@
 
 #include <vector>
 
+#include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/lattice/behavior_decider/behavior_decider.h"
+#include "modules/planning/lattice/behavior/behavior_decider.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -35,11 +36,13 @@ namespace planning {
 
 class LatticePlanner : public Planner {
  public:
-  LatticePlanner();
+  LatticePlanner() = default;
 
   virtual ~LatticePlanner() = default;
 
-  common::Status Init(const PlanningConfig& config) override;
+  common::Status Init(const PlanningConfig& config) override {
+    return common::Status::OK();
+  }
 
   /**
    * @brief Override function Plan in parent class Planner.

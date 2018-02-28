@@ -67,10 +67,10 @@ struct alignas(16) Object {
   // foreground score/probability
   float score = 0.0;
   // foreground score/probability type
-  ScoreType score_type = SCORE_CNN;
+  ScoreType score_type = ScoreType::SCORE_CNN;
 
   // Object classification type.
-  ObjectType type = UNKNOWN;
+  ObjectType type = ObjectType::UNKNOWN;
   // Probability of each type, used for track type.
   std::vector<float> type_probs;
 
@@ -107,7 +107,7 @@ struct SensorObjects {
   // Transmit error_code to next subnode.
   common::ErrorCode error_code = common::ErrorCode::OK;
 
-  SensorType sensor_type = UNKNOWN_SENSOR_TYPE;
+  SensorType sensor_type = SensorType::UNKNOWN_SENSOR_TYPE;
   std::string sensor_id;
   double timestamp = 0.0;
   SeqId seq_num = 0;
