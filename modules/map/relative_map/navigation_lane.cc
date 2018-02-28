@@ -43,14 +43,7 @@ void NavigationLane::SetConfig(const NavigationLaneConfig& config) {
   config_ = config;
 }
 
-bool NavigationLane::Update(const PerceptionObstacles& perception_obstacles) {
-  // udpate perception_obstacles_
-  perception_obstacles_ = perception_obstacles;
-  if (!perception_obstacles.has_lane_marker()) {
-    AERROR << "No lane marker in perception_obstacles.";
-    return false;
-  }
-
+bool NavigationLane::GeneratePath() {
   // update adc_state_ from VehicleStateProvider
   adc_state_ = VehicleStateProvider::instance()->vehicle_state();
 
