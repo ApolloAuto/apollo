@@ -13,13 +13,13 @@ cc_library(
     "kcf_components.h"
   ],
   deps = [
-    # "@yaml_cpp//:yaml",
-    # "@eigen//:eigen",
-    # "@opencv2//:core",
-    # "//modules/perception/lib/base:base",
-    # "//modules/perception/lib/config_manager:config_manager",
-    # "//modules/perception/obstacle/camera/common:perception_obstacle_camera_common",
-    # "//modules/perception/obstacle/camera/interface:perception_obstacle_camera_interface"
+    "//modules/perception/lib/base:base",
+    "//modules/perception/obstacle/base:perception_obstacle_base",
+    "//modules/perception/obstacle/common:perception_obstacle_common",
+    "//modules/perception/obstacle/camera/common:perception_obstacle_camera_common",
+    "//modules/perception/obstacle/camera/tracker:perception_obstacle_camera_tracker_cascaded",
+    "@eigen//:eigen",
+    "@opencv2//:core",
   ]
 )
 

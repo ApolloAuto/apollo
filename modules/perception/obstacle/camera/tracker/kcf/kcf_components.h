@@ -35,9 +35,11 @@
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_KCF_COMPONENTS_H_
 
 #include <opencv2/opencv.hpp>
+#include <algorithm>
 #include <cmath>
+#include <vector>
 
-#include "obstacle/camera/tracker/mix_camera_tracker/base_affinity_tracker.h"
+#include "modules/perception/obstacle/camera/tracker/base_affinity_tracker.h"
 
 namespace apollo {
 namespace perception {
@@ -50,14 +52,14 @@ class KCFComponents {
 
   // Get x_f or z_f
   bool GetFeatures(const cv::Mat &img, const cv::Rect &box,
-                   std::vector<cv::Mat>* feature);
+                   std::vector<cv::Mat> *feature);
 
   // Get response score
   bool Detect(const Tracked &tracked_obj, const std::vector<cv::Mat> &z_f,
-              float* score);
+              float *score);
 
   // Get alpha_f
-  bool Train(const cv::Mat &img, Tracked* tracked_obj);
+  bool Train(const cv::Mat &img, Tracked *tracked_obj);
 
  private:
   cv::Mat GaussianCorrelation(const std::vector<cv::Mat> &xf,
@@ -68,7 +70,7 @@ class KCFComponents {
   cv::Mat ComplexDivision(const cv::Mat &x1, const cv::Mat &x2);
 
   // init only: Create Gaussian Peak as regression target
-  cv::Mat CreateGaussianPeak(int sizey, int sizex);
+  cv::Mat CreateGaussianPeak(const int &sizey, const int &sizex);
 
   // init only: Discrete Fast Fourier Transform
   cv::Mat FFTD(cv::Mat img);
@@ -79,10 +81,9 @@ class KCFComponents {
   cv::Mat y_f_;
   cv::Mat cos_window_;
 
-  int window_size_ = 50;
-  int cell_size_ = 4;
-  float kernel_sigma_ = 0.5f;
-  float lambda_ = 0.0001f;
+  const int kWindowSize_ = 50;
+  const float kKernelSigma_ = 0.5f;
+  const float kLambda_ = 0.0001f;
 };
 
 }  // namespace perception
