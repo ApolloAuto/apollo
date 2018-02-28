@@ -679,7 +679,7 @@ ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
                   static_cast<size_t>(height_));
   cudaBindTextureToArray(img_tex, img_array_, uchar_desc);
   cudaMalloc(
-      (void**)&label_array_,
+      reinterpret_cast<void**>(&label_array_),
       static_cast<size_t>(width_) * static_cast<size_t>(height_) * sizeof(int));
   labels_ = static_cast<int*>(malloc(total_pix_ * sizeof(int)));
 #else
@@ -724,7 +724,7 @@ ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
   cudaBindTextureToArray(img_tex, img_array_, uchar_desc);
 
   cudaMalloc(
-      (void**)&label_array_,
+      reinterpret_cast<void**>(&label_array_),
       static_cast<size_t>(width_) * static_cast<size_t>(height_) * sizeof(int));
 
   cudaError_t cuda_err = cudaGetLastError();
@@ -742,7 +742,7 @@ ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
 }
 
 bool ConnectedComponentGenerator::FindConnectedComponents(
-    const cv::Mat& lane_map, vector<shared_ptr<ConnectedComponent>>& cc) {
+    const cv::Mat& lane_map, vector<shared_ptr<ConnectedComponent>>* cc) {
   if (lane_map.empty()) {
     AERROR << "input lane map is empty";
     return false;
@@ -761,9 +761,14 @@ bool ConnectedComponentGenerator::FindConnectedComponents(
     return false;
   }
 
-  cc.clear();
+  if (cc == NULL) {
+    AERROR << "the pointer of output connected components is null.";
+    return false;
+  }
 
-  labels_.reset();
+  cc->clear();
+
+  labels_.Reset();
   root_map_.clear();
 
   int x = 0;
@@ -798,7 +803,7 @@ bool ConnectedComponentGenerator::FindConnectedComponents(
       if (cur_p[x] > 0) {
         if (left_val == 0 && up_val == 0) {
           // current pixel is foreground and has no connected neighbors
-          frame_label_[cur_idx] = labels_.add();
+          frame_label_[cur_idx] = labels_.Add();
           root_map_.push_back(-1);
         } else if (left_val != 0 && up_val == 0) {
           // current pixel is foreground and has left neighbor connected
@@ -821,11 +826,11 @@ bool ConnectedComponentGenerator::FindConnectedComponents(
     }  // end for x
     prev_p = cur_p;
   }  // end for y
-  if (root_map_.size() != labels_.num()) {
+  if (root_map_.size() != labels_.Num()) {
     AERROR << "the size of root map and labels are not equal.";
     return false;
   }
-  AINFO << "subset number = " << labels_.size();
+  AINFO << "subset number = " << labels_.Size();
 
   // second loop logic
   cur_idx = 0;
@@ -835,21 +840,21 @@ bool ConnectedComponentGenerator::FindConnectedComponents(
     for (x = roi_x_min_; x <= roi_x_max_; x++, cur_idx++) {
       curt_label = frame_label_[cur_idx];
       if (curt_label >= 0) {
-        if (curt_label >= static_cast<int>(labels_.num())) {
+        if (curt_label >= static_cast<int>(labels_.Num())) {
           AERROR << "curt_label should be smaller than labels.num(): "
-                 << curt_label << " vs. " << labels_.num();
+                 << curt_label << " vs. " << labels_.Num();
           return false;
         }
-        curt_label = labels_.find(curt_label);
+        curt_label = labels_.Find(curt_label);
         if (curt_label >= static_cast<int>(root_map_.size())) {
           AERROR << "curt_label should be smaller than root_map.size() "
                  << curt_label << " vs. " << root_map_.size();
           return false;
         }
         if (root_map_[curt_label] != -1) {
-          cc[root_map_[curt_label]]->addPixel(x, y);
+          cc->at(root_map_[curt_label])->AddPixel(x, y);
         } else {
-          cc.push_back(std::make_shared<ConnectedComponent>(x, y));
+          cc->push_back(std::make_shared<ConnectedComponent>(x, y));
           root_map_[curt_label] = cc_count++;
         }
       }
