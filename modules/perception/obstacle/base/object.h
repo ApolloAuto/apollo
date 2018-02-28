@@ -67,7 +67,7 @@ struct alignas(16) Object {
   // foreground score/probability
   float score = 0.0;
   // foreground score/probability type
-  ScoreType score_type = SCORE_CNN;
+  ScoreType score_type = ScoreType::SCORE_CNN;
 
   // Object classification type.
   ObjectType type = ObjectType::UNKNOWN;

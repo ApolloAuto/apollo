@@ -27,6 +27,7 @@
 
 #include "gflags/gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -75,7 +76,12 @@ int SignalLightScenario::ComputeScenarioDecision(
 
   if (stop_point.s() < std::numeric_limits<double>::max() &&
       stop_point.has_type()) {
-    planning_target->mutable_stop_point()->set_s(stop_point.s());
+    const auto& vehicle_config =
+      common::VehicleConfigHelper::instance()->GetConfig();
+    double front_edge_to_center =
+        vehicle_config.vehicle_param().front_edge_to_center();
+    planning_target->mutable_stop_point()->set_s(
+        stop_point.s() - front_edge_to_center);
     planning_target->mutable_stop_point()->set_type(stop_point.type());
   }
 

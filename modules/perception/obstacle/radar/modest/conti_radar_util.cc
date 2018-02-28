@@ -29,7 +29,8 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
     const double &lo_dist_rms = contiobs.longitude_dist_rms();
     const double &la_dist_rms = contiobs.lateral_dist_rms();
     const double &probexist = contiobs.probexist();
-    if (cls == CONTI_CAR || cls == CONTI_TRUCK) {
+    if (cls == static_cast<int>(ContiObjectType::CONTI_CAR) ||
+        cls == static_cast<int>(ContiObjectType::CONTI_TRUCK)) {
       if (probexist < params.probexist_vehicle) {
         return true;
       } else if (lo_vel_rms > params.lo_vel_rms_vehicle ||
@@ -40,7 +41,7 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
       } else if (tracking_times <= delay_frames) {
         return true;
       }
-    } else if (cls == CONTI_PEDESTRIAN) {
+    } else if (cls == static_cast<int>(ContiObjectType::CONTI_PEDESTRIAN)) {
       if (probexist < params.probexist_pedestrian) {
         return true;
       } else if (lo_vel_rms > params.lo_vel_rms_pedestrian ||
@@ -49,7 +50,8 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
                  la_dist_rms > params.la_dist_rms_pedestrian) {
         return true;
       }
-    } else if (cls == CONTI_MOTOCYCLE || cls == CONTI_BICYCLE) {
+    } else if (cls == static_cast<int>(ContiObjectType::CONTI_MOTOCYCLE) ||
+               cls == static_cast<int>(ContiObjectType::CONTI_BICYCLE)) {
       if (probexist < params.probexist_bicycle) {
         return true;
       } else if (lo_vel_rms > params.lo_vel_rms_bicycle ||
@@ -58,8 +60,9 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
                  la_dist_rms > params.la_dist_rms_bicycle) {
         return true;
       }
-    } else if (cls == CONTI_POINT || cls == CONTI_WIDE ||
-               cls == CONTI_UNKNOWN) {
+    } else if (cls == static_cast<int>(ContiObjectType::CONTI_POINT) ||
+               cls == static_cast<int>(ContiObjectType::CONTI_WIDE) ||
+               cls == static_cast<int>(ContiObjectType::CONTI_UNKNOWN)) {
       if (probexist < params.probexist_unknown) {
         return true;
       } else if (lo_vel_rms > params.lo_vel_rms_unknown ||
@@ -73,8 +76,9 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
     }
   }
   int meas_state = contiobs.meas_state();
-  if (meas_state == CONTI_DELETED || meas_state == CONTI_PREDICTED ||
-      meas_state == CONTI_DELETED_FOR) {
+  if (meas_state == static_cast<int>(ContiMeasState::CONTI_DELETED) ||
+      meas_state == static_cast<int>(ContiMeasState::CONTI_PREDICTED) ||
+      meas_state == static_cast<int>(ContiMeasState::CONTI_DELETED_FOR)) {
     return true;
   }
   return false;
