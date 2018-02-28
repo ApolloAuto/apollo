@@ -146,21 +146,23 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   // Set obstacle observation for KF tracking
   SetStatus(perception_obstacle, timestamp, &feature);
 
-  // Update KF
-  if (!kf_motion_tracker_.IsInitialized()) {
-    InitKFMotionTracker(feature);
-  }
-  UpdateKFMotionTracker(feature);
-  if (type_ == PerceptionObstacle::PEDESTRIAN) {
-    if (!kf_pedestrian_tracker_.IsInitialized()) {
-      InitKFPedestrianTracker(feature);
+  if (!FLAGS_use_navigation_mode) {
+    // Update KF
+    if (!kf_motion_tracker_.IsInitialized()) {
+      InitKFMotionTracker(feature);
     }
-    UpdateKFPedestrianTracker(feature);
-  }
+    UpdateKFMotionTracker(feature);
+    if (type_ == PerceptionObstacle::PEDESTRIAN) {
+      if (!kf_pedestrian_tracker_.IsInitialized()) {
+        InitKFPedestrianTracker(feature);
+      }
+      UpdateKFPedestrianTracker(feature);
+    }
 
-  // Update obstacle status based on KF if enabled
-  if (FLAGS_enable_kf_tracking) {
-    UpdateStatus(&feature);
+    // Update obstacle status based on KF if enabled
+    if (FLAGS_enable_kf_tracking) {
+      UpdateStatus(&feature);
+    }
   }
 
   // Set obstacle lane features
