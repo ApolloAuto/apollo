@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ T poly_eval(const T& x, const int& order,
   int poly_order = order;
   if (order > MAX_POLY_ORDER) {
     AERROR << "the order of polynomial function must be smaller than "
-                << MAX_POLY_ORDER;
+           << MAX_POLY_ORDER;
     AINFO << "forcing polynomial order to " << MAX_POLY_ORDER;
     poly_order = MAX_POLY_ORDER;
   }
