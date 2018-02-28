@@ -398,8 +398,11 @@ export default class Map {
                     if (kind !== "overlap") {
                         this.removeDrewObjects(oldData.drewObjects, scene);
                     }
-                    if (kind === 'lane') {
+                    if (kind === "lane") {
                         delete this.laneHeading[oldData.id.id];
+                    }
+                    if (kind === "overlap") {
+                        delete this.overlapMap[oldData.id.id];
                     }
                 }
             });
