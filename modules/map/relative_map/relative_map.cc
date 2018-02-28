@@ -112,8 +112,12 @@ apollo::common::Status RelativeMap::Start() {
   MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("RelativeMap started");
 
-  AdapterManager::AddPerceptionObstaclesCallback(&RelativeMap::RunOnce, this);
-  AdapterManager::AddNavigationCallback(&RelativeMap::RunOnce, this);
+  timer_ = AdapterManager::CreateTimer(
+      ros::Duration(1.0 / FLAGS_relative_map_loop_rate), &RelativeMap::OnTimer,
+      this);
+
+  AdapterManager::AddNavigationCallback(&RelativeMap::OnReceiveNavigationInfo,
+                                        this);
 
   if (AdapterManager::GetPerceptionObstacles()->Empty()) {
     AWARN << "Perception is not ready.";
@@ -122,25 +126,35 @@ apollo::common::Status RelativeMap::Start() {
   return Status::OK();
 }
 
-void RelativeMap::RunOnce(const PerceptionObstacles& perception_obstacles) {
+void RelativeMap::OnTimer(const ros::TimerEvent&) {
+  RunOnce();
+}
+
+void RelativeMap::RunOnce() {
   AdapterManager::Observe();
 
-  ADEBUG << "PerceptionObstacles received by RelativeMap:\n"
-         << perception_obstacles.DebugString();
-
   MapMsg map_msg;
-  CreateMapFromPerception(perception_obstacles, &map_msg);
+  CreateMapFromNavigationLane(&map_msg);
   Publish(&map_msg);
 }
 
-void RelativeMap::RunOnce(const NavigationInfo& navigation_info) {
-  AdapterManager::Observe();
+
+void RelativeMap::OnReceiveNavigationInfo(
+    const NavigationInfo& navigation_info) {
   navigation_lane_.UpdateNavigationInfo(navigation_info);
 }
 
-bool RelativeMap::CreateMapFromPerception(
-    const PerceptionObstacles& perception_obstacles, MapMsg* map_msg) {
+bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
   CHECK_NOTNULL(map_msg);
+
+  if (AdapterManager::GetLocalization()->Empty()) {
+    LogErrorStatus(map_msg, "localization is not ready");
+    return false;
+  }
+  if (AdapterManager::GetChassis()->Empty()) {
+    LogErrorStatus(map_msg, "chassis is not ready");
+    return false;
+  }
 
   // update vehicle state from localization and chassis
   const auto& localization =
@@ -151,7 +165,15 @@ bool RelativeMap::CreateMapFromPerception(
   VehicleStateProvider::instance()->Update(localization, chassis);
 
   // update navigation_lane from perception_obstacles (lane marker)
-  navigation_lane_.Update(perception_obstacles);
+  if (!AdapterManager::GetPerceptionObstacles()->Empty()) {
+    navigation_lane_.UpdatePerception(
+        AdapterManager::GetPerceptionObstacles()->GetLatestObserved());
+  }
+
+  if (!navigation_lane_.GeneratePath()) {
+    LogErrorStatus(map_msg, "navigation lane fails to generate path");
+    return false;
+  }
 
   if (navigation_lane_.Path().path().path_point_size() == 0) {
     LogErrorStatus(map_msg, "navigation lane has no path points");
