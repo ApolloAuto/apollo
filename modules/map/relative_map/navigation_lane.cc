@@ -45,8 +45,8 @@ void NavigationLane::SetConfig(const NavigationLaneConfig& config) {
 }
 
 bool NavigationLane::GeneratePath() {
-  // update adc_state_ from VehicleStateProvider
-  adc_state_ = VehicleStateProvider::instance()->vehicle_state();
+  // original_pose is in world coordination: ENU
+  original_pose_ = VehicleStateProvider::instance()->original_pose();
 
   navigation_path_.Clear();
   auto* path = navigation_path_.mutable_path();
@@ -90,8 +90,8 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
   int curr_project_index = last_project_index_;
 
   // offset between the current vehicle state and navigation line
-  const double dx = -adc_state_.x();
-  const double dy = -adc_state_.y();
+  const double dx = -original_pose_.position().x();
+  const double dy = -original_pose_.position().y();
   for (int i = curr_project_index; i < navigation_path.path_point_size(); ++i) {
     auto* point = path->add_path_point();
     point->CopyFrom(navigation_path.path_point(i));
@@ -102,7 +102,8 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
 
     double flu_x = 0.0;
     double flu_y = 0.0;
-    common::math::RotateAxis(adc_state_.heading(), emu_x, emu_y, &flu_x,
+    common::math::RotateAxis(original_pose_.heading(),
+                             emu_x, emu_y, &flu_x,
                              &flu_y);
 
     point->set_x(flu_x);
@@ -130,7 +131,8 @@ void NavigationLane::UpdateProjectionIndex() {
   int index = 0;
   double min_d = std::numeric_limits<double>::max();
   for (int i = last_project_index_; i + 1 < path.path_point_size(); ++i) {
-    const double d = DistanceXY(adc_state_, path.path_point(i));
+    const double d = DistanceXY(original_pose_.position(),
+                                path.path_point(i));
     if (d < min_d) {
       min_d = d;
       index = i;
