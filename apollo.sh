@@ -216,7 +216,7 @@ function warn_proprietary_sw() {
 function release() {
   RELEASE_DIR="${HOME}/.cache/apollo_release"
   if [ -d "${RELEASE_DIR}" ]; then
-    rm -fr "${RELEASE_DIR}"
+    rm -rf "${RELEASE_DIR}"
   fi
   APOLLO_RELEASE_DIR="${RELEASE_DIR}/apollo"
   mkdir -p "${APOLLO_RELEASE_DIR}"
@@ -243,12 +243,6 @@ function release() {
 
   # scripts
   cp -r scripts ${APOLLO_RELEASE_DIR}
-
-  # dreamview runfiles
-  rm -rf $MODULES_RELEASE_DIR/dreamview/frontend
-  cp -Lr bazel-bin/modules/dreamview/dreamview.runfiles/apollo/modules/dreamview/frontend $MODULES_RELEASE_DIR/dreamview
-  rm -rf $MODULES_RELEASE_DIR/dreamview/frontend/dist/assets/map_data
-  ln -s /apollo/modules/map/data $MODULES_RELEASE_DIR/dreamview/frontend/dist/assets/map_data
 
   # lib
   LIB_DIR="${APOLLO_RELEASE_DIR}/lib"
