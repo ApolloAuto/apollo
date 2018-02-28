@@ -10,6 +10,7 @@ cc_library(
         "timer.cc",
     ],
     hdrs = [
+        "singleton.h",
         "concurrent_queue.h",
         "mutex.h",
         "registerer.h",

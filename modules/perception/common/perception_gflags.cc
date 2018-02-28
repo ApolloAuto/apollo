@@ -70,6 +70,13 @@ DEFINE_string(short_camera_extrinsic_file,
               "modules/perception/data/params/short_camera_extrinsics.yaml",
               "short_camera extrinsic file");
 
+DEFINE_string(front_camera_extrinsics_file,
+"modules/perception/data/params/front_camera_extrinsics.yaml",
+"front_camera extrinsic file");
+DEFINE_string(front_camera_intrinsics_file,
+"modules/perception/data/params/front_camera_intrinsics.yaml",
+"front_camera intrinsic file");
+
 /// obstacle/onboard/fusion_subnode.cc
 DEFINE_string(onboard_fusion, "ProbabilisticFusion",
               "fusion name which enabled onboard");
@@ -88,3 +95,6 @@ DEFINE_double(a_matrix_covariance_coeffcient_1, 0.05,
               "Kalman fitler matrix a coeffcients, a_matrix_(0, 2)");
 DEFINE_double(a_matrix_covariance_coeffcient_2, 0.05,
               "Kalman fitler matrix a coeffcients, a_matrix_(1, 3)");
+
+/// calibration_config_manager.cc
+DEFINE_int32(obs_camera_detector_gpu, 0, "device id for camera detector");
