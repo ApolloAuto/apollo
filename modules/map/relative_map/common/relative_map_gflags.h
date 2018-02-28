@@ -21,5 +21,6 @@
 
 DECLARE_string(relative_map_adapter_config_filename);
 DECLARE_string(relative_map_config_filename);
+DECLARE_int32(relative_map_loop_rate);
 
 #endif  // MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_GFLAGS_H_
