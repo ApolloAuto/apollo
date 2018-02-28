@@ -24,3 +24,6 @@ DEFINE_string(relative_map_config_filename,
               "Relative map configuration file");
 
 DEFINE_int32(relative_map_loop_rate, 10, "Loop rate for relative_map node");
+
+DEFINE_double(max_len_from_navigation_line, 100.0,
+              "max navigation path length from navigation line");
