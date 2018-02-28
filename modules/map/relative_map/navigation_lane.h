@@ -18,6 +18,7 @@
 #define MODULES_MAP_RELATIVE_MAP_NAVIGATION_LANE_H_
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/map/relative_map/proto/relative_map_config.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -78,7 +79,8 @@ class NavigationLane {
 
   int last_project_index_ = 0;
 
-  common::VehicleState adc_state_;
+  // in world coordination: ENU
+  localization::Pose original_pose_;
 };
 
 }  // namespace relative_map
