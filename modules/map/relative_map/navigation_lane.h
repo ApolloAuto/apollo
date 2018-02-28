@@ -39,8 +39,8 @@ class NavigationLane {
   }
 
   const NavigationPath& Path() { return navigation_path_; }
-  double left_width() { return left_width_; }
-  double right_width() { return right_width_; }
+
+  bool CreateMap(const MapGenerationParam& map_config, MapMsg* map_msg) const;
 
  private:
   double EvaluateCubicPolynomial(const double c0, const double c1,

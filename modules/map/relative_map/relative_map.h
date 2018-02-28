@@ -83,10 +83,6 @@ class RelativeMap : public RelativeMapInterface {
       const apollo::perception::PerceptionObstacles& perception_obstacles,
       MapMsg* map_msg);
 
-  bool CreateMapMsgFromNavigationPath(const NavigationPath& navigation_path,
-                                      double left_width, double right_width,
-                                      relative_map::MapMsg* map_msg);
-
   common::adapter::AdapterManagerConfig adapter_conf_;
   RelativeMapConfig config_;
   apollo::common::monitor::MonitorLogger monitor_logger_;
