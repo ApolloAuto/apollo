@@ -47,6 +47,13 @@ const MenuIdOptionMapping = {
         planningLine: 'showPlanning',
         positionLocalization: 'showPositionLocalization',
         positionGps: 'showPositionGps',
+        mapCrosswalk: 'showMapCrosswalk',
+        mapClearArea: 'showMapClearArea',
+        mapJunction: 'showMapJunction',
+        mapLane: 'showMapLane',
+        mapRoad: 'showMapRoad',
+        mapSignal: 'showMapSignal',
+        mapStopSign: 'showMapStopSign',
 };
 
 @observer
