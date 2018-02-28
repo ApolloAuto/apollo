@@ -75,7 +75,7 @@ bool NavigationLane::Update(const PerceptionObstacles& perception_obstacles) {
 double NavigationLane::EvaluateCubicPolynomial(const double c0, const double c1,
                                                const double c2, const double c3,
                                                const double z) const {
-  return c3 * std::pow(z, 3) + c2 * std::pow(z, 2) + c1 * z + c0;
+  return ((c3 * z + c2) * z + c1) * z + c0;
 }
 
 void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
