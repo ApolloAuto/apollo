@@ -1,0 +1,34 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/proto/decision.proto";
+
+/*
+  This file defines the data types that represents the internal state of the planning module.
+  It will not be refreshed in each planning cycle.
+*/
+
+message ReroutingStatus {
+    optional double last_rerouting_time = 1;
+}
+
+message SidePassStatus {
+    // a sidepass sequence includes:
+    // driving -> wait -> sidepass -> driving
+    enum Status {
+        UNKNOWN = 0;
+        DRIVING = 1;
+        WAIT = 2;
+        SIDEPASS = 3;
+    }
+    optional Status status = 1;
+    optional double wait_start_time = 2;
+    optional string pass_obstacle_id = 3;
+    optional apollo.planning.ObjectSidePass.Type pass_side = 4;
+}
+
+message PlanningStatus {
+    optional ReroutingStatus rerouting = 1;
+    optional SidePassStatus side_pass = 2;
+}

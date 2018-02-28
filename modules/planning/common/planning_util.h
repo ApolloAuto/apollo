@@ -24,7 +24,7 @@
 #include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/planning_state.pb.h"
+#include "modules/planning/proto/planning_status.pb.h"
 
 /**
  * @namespace apollo::common::util
@@ -47,7 +47,7 @@ common::TrajectoryPoint interpolate(const common::TrajectoryPoint &tp0,
  * This function returns the run-time state of the planning module.
  * @Warnning: this function is not thread safe.
  */
-PlanningState *GetPlanningState();
+PlanningStatus *GetPlanningStatus();
 
 void DumpPlanningContext();
 
