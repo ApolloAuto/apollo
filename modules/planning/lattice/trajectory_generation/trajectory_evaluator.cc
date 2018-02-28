@@ -148,8 +148,10 @@ double TrajectoryEvaluator::Evaluate(
   double lon_jerk_cost = LonComfortCost(lon_trajectory);
   double lon_collision_cost = LonCollisionCost(lon_trajectory);
 
+  double evaluation_horizon = std::min(FLAGS_decision_horizon,
+		  lon_trajectory->Evaluate(0, lon_trajectory->ParamLength()));
   std::vector<double> s_values;
-  for (double s = 0.0; s < FLAGS_decision_horizon;
+  for (double s = 0.0; s < evaluation_horizon;
        s += FLAGS_trajectory_space_resolution) {
     s_values.push_back(s);
   }
