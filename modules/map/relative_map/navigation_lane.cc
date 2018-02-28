@@ -52,12 +52,13 @@ bool NavigationLane::GeneratePath() {
   auto* path = navigation_path_.mutable_path();
   const auto& lane_marker = perception_obstacles_.lane_marker();
 
-  if (std::fmin(lane_marker.left_lane_marker().quality(),
-                lane_marker.right_lane_marker().quality()) >
-      config_.min_lane_marker_quality()) {
-    ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
-  } else if (navigation_info_.navigation_path_size() > 0) {
+  // priority: navigation line > perception lane marker
+  if (navigation_info_.navigation_path_size() > 0) {
     ConvertNavigationLineToPath(path);
+  } else if (std::fmin(lane_marker.left_lane_marker().quality(),
+                       lane_marker.right_lane_marker().quality()) >
+             config_.min_lane_marker_quality()) {
+    ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
   } else {
     AERROR << "Navigation Path is empty because neither lane markers nor "
               "navigation line are available.";
@@ -89,8 +90,8 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
   int curr_project_index = last_project_index_;
 
   // offset between the current vehicle state and navigation line
-  const double dx = -navigation_path.path_point(curr_project_index).x();
-  const double dy = -navigation_path.path_point(curr_project_index).y();
+  const double dx = -adc_state_.x();
+  const double dy = -adc_state_.y();
   for (int i = curr_project_index; i < navigation_path.path_point_size(); ++i) {
     auto* point = path->add_path_point();
     point->CopyFrom(navigation_path.path_point(i));
