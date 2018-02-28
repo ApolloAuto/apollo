@@ -1,7 +1,5 @@
 planner_type : EM
 em_planner_config {
-    task : TRAFFIC_DECIDER
-
     task : DP_POLY_PATH_OPTIMIZER
 
     task : PATH_DECIDER
