@@ -30,6 +30,7 @@
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
 
 namespace apollo {
 namespace perception {
@@ -113,6 +114,7 @@ struct SensorObjects {
   SeqId seq_num = 0;
   std::vector<ObjectPtr> objects;
   Eigen::Matrix4d sensor2world_pose;
+  LaneObjectsPtr lane_objects;
 };
 
 }  // namespace perception
