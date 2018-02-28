@@ -31,7 +31,7 @@ ROUTING_PROTOS='../../routing/proto/routing.proto'
 
 node_modules/protobufjs/bin/pbjs -t json ../proto/simulation_world.proto \
     $COMMON_PROTOS $LOCALIZATION_PROTOS $CHASSIS_PROTOS $PLANNING_PROTOS \
-    $PERCEPTION_PROTOS $MONITOR_PROTOS $ROUTING_PROTOS \
+    $PERCEPTION_PROTOS $MONITOR_PROTOS $ROUTING_PROTOS $MAP_PROTOS \
     -o proto_bundle/sim_world_proto_bundle.json
 
 node_modules/protobufjs/bin/pbjs -t json $MAP_PROTOS \

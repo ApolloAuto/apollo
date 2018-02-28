@@ -18,8 +18,11 @@
 
 #include <limits>
 
+#include "modules/map/proto/map_lane.pb.h"
+
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
@@ -27,7 +30,10 @@ namespace apollo {
 namespace relative_map {
 
 using apollo::common::VehicleStateProvider;
+using apollo::common::math::Vec2d;
 using apollo::common::util::DistanceXY;
+using apollo::hdmap::Lane;
+using apollo::common::util::operator+;
 using apollo::perception::PerceptionObstacles;
 
 NavigationLane::NavigationLane(const NavigationLaneConfig& config)
@@ -37,14 +43,7 @@ void NavigationLane::SetConfig(const NavigationLaneConfig& config) {
   config_ = config;
 }
 
-bool NavigationLane::Update(const PerceptionObstacles& perception_obstacles) {
-  // udpate perception_obstacles_
-  perception_obstacles_ = perception_obstacles;
-  if (!perception_obstacles.has_lane_marker()) {
-    AERROR << "No lane marker in perception_obstacles.";
-    return false;
-  }
-
+bool NavigationLane::GeneratePath() {
   // update adc_state_ from VehicleStateProvider
   adc_state_ = VehicleStateProvider::instance()->vehicle_state();
 
@@ -69,7 +68,7 @@ bool NavigationLane::Update(const PerceptionObstacles& perception_obstacles) {
 double NavigationLane::EvaluateCubicPolynomial(const double c0, const double c1,
                                                const double c2, const double c3,
                                                const double z) const {
-  return c3 * std::pow(z, 3) + c2 * std::pow(z, 2) + c1 * z + c0;
+  return ((c3 * z + c2) * z + c1) * z + c0;
 }
 
 void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
@@ -216,6 +215,78 @@ void NavigationLane::ConvertLaneMarkerToPath(
       }
     }
   }
+}
+
+bool NavigationLane::CreateMap(const MapGenerationParam& map_config,
+                               MapMsg* map_msg) const {
+  auto* navigation_info = map_msg->mutable_navigation_path();
+  auto* hdmap = map_msg->mutable_hdmap();
+  auto* lane_marker = map_msg->mutable_lane_marker();
+
+  lane_marker->CopyFrom(perception_obstacles_.lane_marker());
+
+  const auto& path = navigation_path_.path();
+  if (path.path_point_size() < 2) {
+    AERROR << "The path length is invalid";
+    return false;
+  }
+  auto* lane = hdmap->add_lane();
+  lane->mutable_id()->set_id(std::to_string(navigation_path_.path_priority()) +
+                             "_" + path.name());
+  (*navigation_info)[lane->id().id()] = navigation_path_;
+  // lane types
+  lane->set_type(Lane::CITY_DRIVING);
+  lane->set_turn(Lane::NO_TURN);
+
+  // speed limit
+  lane->set_speed_limit(map_config.default_speed_limit());
+
+  // center line
+  auto* curve_segment = lane->mutable_central_curve()->add_segment();
+  curve_segment->set_heading(path.path_point(0).theta());
+  auto* line_segment = curve_segment->mutable_line_segment();
+  // left boundary
+  auto* left_boundary = lane->mutable_left_boundary();
+  auto* left_boundary_type = left_boundary->add_boundary_type();
+  left_boundary->set_virtual_(false);
+  left_boundary_type->set_s(0.0);
+  left_boundary_type->add_types(
+      perception_obstacles_.lane_marker().left_lane_marker().lane_type());
+  auto* left_segment =
+      left_boundary->mutable_curve()->add_segment()->mutable_line_segment();
+  // right boundary
+  auto* right_boundary = lane->mutable_right_boundary();
+  auto* right_boundary_type = right_boundary->add_boundary_type();
+  right_boundary->set_virtual_(false);
+  right_boundary_type->set_s(0.0);
+  right_boundary_type->add_types(
+      perception_obstacles_.lane_marker().right_lane_marker().lane_type());
+  auto* right_segment =
+      right_boundary->mutable_curve()->add_segment()->mutable_line_segment();
+  const double lane_left_width =
+      left_width_ > 0 ? left_width_ : map_config.default_left_width();
+  const double lane_right_width =
+      right_width_ > 0 ? right_width_ : map_config.default_right_width();
+  for (const auto& path_point : path.path_point()) {
+    auto* point = line_segment->add_point();
+    point->set_x(path_point.x());
+    point->set_y(path_point.y());
+    point->set_z(path_point.z());
+    auto* left_sample = lane->add_left_sample();
+    left_sample->set_s(path_point.s());
+    left_sample->set_width(lane_left_width);
+    left_segment->add_point()->CopyFrom(
+        *point +
+        lane_left_width * Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
+    auto* right_sample = lane->add_right_sample();
+    right_sample->set_s(path_point.s());
+    right_sample->set_width(lane_right_width);
+    right_segment->add_point()->CopyFrom(
+        *point +
+        lane_right_width * Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
+  }
+
+  return true;
 }
 
 }  // namespace relative_map

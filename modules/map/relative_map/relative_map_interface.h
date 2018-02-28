@@ -42,11 +42,9 @@ namespace relative_map {
 class RelativeMapInterface : public apollo::common::ApolloApp {
  public:
   /**
-   * @brief main logic of the relativem map module, triggered upon receiving a
-   * new frame of perception obstacle message.
+   * @brief main logic of the relativem map module, triggered by timer.
    */
-  virtual void RunOnce(
-      const perception::PerceptionObstacles &perception_obstacles) = 0;
+  virtual void RunOnce() = 0;
 
   /**
    * @brief Fill the header and publish the prediction message.
