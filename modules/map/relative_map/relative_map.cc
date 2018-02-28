@@ -35,9 +35,6 @@ using apollo::common::util::operator+;
 using apollo::common::math::Vec2d;
 using apollo::common::monitor::MonitorLogBuffer;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::hdmap::Lane;
-// using apollo::common::util::operator+;
-using apollo::hdmap::LaneBoundaryType;
 using apollo::perception::PerceptionObstacles;
 
 RelativeMap::RelativeMap()
@@ -162,82 +159,11 @@ bool RelativeMap::CreateMapFromPerception(
   }
 
   // create map proto from navigation_path
-  if (!CreateMapMsgFromNavigationPath(
-          navigation_lane_.Path(), navigation_lane_.left_width(),
-          navigation_lane_.right_width(), map_msg)) {
-    map_msg->clear_hdmap();
+  if (!navigation_lane_.CreateMap(config_.map_param(), map_msg)) {
     LogErrorStatus(map_msg, "Failed to create map from navigation path");
     AERROR << "Failed to create map from navigation path";
     return false;
   }
-  return true;
-}
-
-bool RelativeMap::CreateMapMsgFromNavigationPath(
-    const NavigationPath& navigation_path, double left_width,
-    double right_width, MapMsg* map_msg) {
-  auto* navigation_info = map_msg->mutable_navigation_path();
-  auto* hdmap = map_msg->mutable_hdmap();
-  const auto& path = navigation_path.path();
-  if (path.path_point_size() < 2) {
-    AERROR << "The path length is invalid";
-    return false;
-  }
-  const auto& map_config = config_.map_param();
-  auto* lane = hdmap->add_lane();
-  lane->mutable_id()->set_id(std::to_string(navigation_path.path_priority()) +
-                             "_" + path.name());
-  (*navigation_info)[lane->id().id()] = navigation_path;
-  // lane types
-  lane->set_type(Lane::CITY_DRIVING);
-  lane->set_turn(Lane::NO_TURN);
-
-  // speed limit
-  lane->set_speed_limit(map_config.default_speed_limit());
-
-  // center line
-  auto* curve_segment = lane->mutable_central_curve()->add_segment();
-  curve_segment->set_heading(path.path_point(0).theta());
-  auto* line_segment = curve_segment->mutable_line_segment();
-  // left boundary
-  auto* left_boundary = lane->mutable_left_boundary();
-  auto* left_boundary_type = left_boundary->add_boundary_type();
-  left_boundary->set_virtual_(false);
-  left_boundary_type->set_s(0.0);
-  left_boundary_type->add_types(LaneBoundaryType::SOLID_YELLOW);
-  auto* left_segment =
-      left_boundary->mutable_curve()->add_segment()->mutable_line_segment();
-  // right boundary
-  auto* right_boundary = lane->mutable_right_boundary();
-  auto* right_boundary_type = right_boundary->add_boundary_type();
-  right_boundary->set_virtual_(false);
-  right_boundary_type->set_s(0.0);
-  right_boundary_type->add_types(LaneBoundaryType::SOLID_YELLOW);
-  auto* right_segment =
-      right_boundary->mutable_curve()->add_segment()->mutable_line_segment();
-  const double lane_left_width =
-      left_width > 0 ? left_width : map_config.default_left_width();
-  const double lane_right_width =
-      right_width > 0 ? right_width : map_config.default_right_width();
-  for (const auto& path_point : path.path_point()) {
-    auto* point = line_segment->add_point();
-    point->set_x(path_point.x());
-    point->set_y(path_point.y());
-    point->set_z(path_point.z());
-    auto* left_sample = lane->add_left_sample();
-    left_sample->set_s(path_point.s());
-    left_sample->set_width(lane_left_width);
-    left_segment->add_point()->CopyFrom(
-        *point +
-        lane_left_width * Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
-    auto* right_sample = lane->add_right_sample();
-    right_sample->set_s(path_point.s());
-    right_sample->set_width(lane_right_width);
-    right_segment->add_point()->CopyFrom(
-        *point +
-        lane_right_width * Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
-  }
-
   return true;
 }
 
