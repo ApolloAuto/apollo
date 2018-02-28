@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-// @brief: connected component analysis for lane detection
-
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CONNECTED_COMPONENT_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CONNECTED_COMPONENT_H_
 
@@ -27,8 +25,8 @@
 #include <Eigen/Core>
 #include <opencv2/core/core.hpp>
 
-//#include <cuda.h>
-//#include <cuda_runtime.h>
+// #include <cuda.h>
+// #include <cuda_runtime.h>
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
@@ -346,8 +344,9 @@ class ConnectedComponentGenerator {
 #endif
   }
 
-  bool FindCC(const cv::Mat& lane_map,
-              std::vector<std::shared_ptr<ConnectedComponent>>& cc);
+  bool FindConnectedComponents(
+      const cv::Mat& lane_map,
+      std::vector<std::shared_ptr<ConnectedComponent>>& cc);
 
  private:
 #if CUDA_CC
@@ -368,13 +367,13 @@ class ConnectedComponentGenerator {
 
 #if CUDA_CC
   int* labels_;
+  cudaArray* img_array_;
+  int* label_array_;
 #else
   DisjointSet labels_;
   std::vector<int> frame_label_;
 #endif
   std::vector<int> root_map_;
-  cudaArray* img_array_;
-  int* label_array_;
 };
 
 }  // namespace perception

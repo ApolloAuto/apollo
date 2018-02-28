@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -477,7 +477,7 @@ struct LaneObject {
     new_lane_object->semantic = semantic;
     new_lane_object->is_compensated = is_compensated;
 
-    for (size_t i = 0; i < new_lane_object.point_num; ++i) {
+    for (size_t i = 0; i < new_lane_object->point_num; ++i) {
       new_lane_object->pos.push_back(pos[i]);
       new_lane_object->orie.push_back(orie[i]);
       new_lane_object->image_pos.push_back(image_pos[i]);
