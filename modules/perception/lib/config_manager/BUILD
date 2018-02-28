@@ -18,7 +18,7 @@ cc_library(
         "//modules/perception/common:perception_common",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager/proto:config_proto",
-        "//modules/perception/obstacle/camera/common:perception_obstacle_camera_common",
+        "//modules/perception/obstacle/camera/common:obstacle_camera_common",
         "@undistort//:undistort",
         "@yaml_cpp//:yaml",
         "@opencv2//:imgproc",
