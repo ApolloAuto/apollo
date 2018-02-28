@@ -39,7 +39,6 @@
 #include "modules/planning/tasks/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 #include "modules/planning/tasks/speed_decider/speed_decider.h"
-#include "modules/planning/tasks/traffic_decider/traffic_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -59,8 +58,6 @@ constexpr double kSpeedOptimizationFallbackClost = 2e4;
 }  // namespace
 
 void EMPlanner::RegisterTasks() {
-  task_factory_.Register(TRAFFIC_DECIDER,
-                         []() -> Task* { return new TrafficDecider(); });
   task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
                          []() -> Task* { return new DpPolyPathOptimizer(); });
   task_factory_.Register(PATH_DECIDER,
@@ -169,17 +166,10 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
 Status EMPlanner::PlanOnReferenceLine(
     const TrajectoryPoint& planning_start_point, Frame* frame,
     ReferenceLineInfo* reference_line_info) {
-  if (!reference_line_info->IsInited()) {
-    if (!reference_line_info->Init(frame->obstacles())) {
-      AERROR << "Failed to init reference line";
-      return Status(ErrorCode::PLANNING_ERROR, "Init reference line failed");
-    }
-  }
   if (!reference_line_info->IsChangeLanePath()) {
     const double kStraightForwardLineCost = 10.0;
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
-
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
   auto* heuristic_speed_data = reference_line_info->mutable_speed_data();
   auto speed_profile =
