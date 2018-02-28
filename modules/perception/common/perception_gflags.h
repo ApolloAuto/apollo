@@ -54,6 +54,10 @@ DECLARE_string(radar_tf2_child_frame_id);
 DECLARE_string(radar_extrinsic_file);
 DECLARE_string(short_camera_extrinsic_file);
 
+/// camera config
+DECLARE_string(front_camera_extrinsics_file);
+DECLARE_string(front_camera_intrinsics_file);
+
 /// obstacle/onboard/fusion_subnode.cc
 DECLARE_string(onboard_fusion);
 
@@ -70,5 +74,8 @@ DECLARE_double(r_matrix_amplifier);
 DECLARE_double(p_matrix_amplifier);
 DECLARE_double(a_matrix_covariance_coeffcient_1);
 DECLARE_double(a_matrix_covariance_coeffcient_2);
+
+/// calibration_config_manager.cc
+DECLARE_int32(obs_camera_detector_gpu);
 
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
