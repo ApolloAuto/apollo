@@ -28,25 +28,16 @@
 namespace apollo {
 namespace planning {
 
-class SidepassVehicle : public TrafficRule {
+class SidePassVehicle : public TrafficRule {
  public:
-  explicit SidepassVehicle(const RuleConfig& config);
-  virtual ~SidepassVehicle() = default;
+  explicit SidePassVehicle(const RuleConfig& config);
+  virtual ~SidePassVehicle() = default;
 
   bool ApplyRule(Frame* const frame,
                  ReferenceLineInfo* const reference_line_info);
 
-  // a sidepass sequence includes:
-  // driving -> wait -> sidepass -> driving
-  enum class SidepassStatus {
-    UNKNOWN = 0,
-    DRIVING = 1,
-    WAIT = 2,
-    SIDEPASS = 3,
-  };
-
  private:
-  bool UpdateSidepassStatus(const SLBoundary& adc_sl_boundary,
+  bool UpdateSidePassStatus(const SLBoundary& adc_sl_boundary,
                             const common::TrajectoryPoint& adc_planning_point,
                             PathDecision* path_decision);
 
@@ -57,19 +48,10 @@ class SidepassVehicle : public TrafficRule {
    * @brief When the reference line info indicates that there is no lane change,
    * use lane keeping strategy for back side vehicles.
    */
-  bool MakeSidepassObstacleDecision(
+  bool MakeSidePassObstacleDecision(
       const SLBoundary& adc_sl_boundary,
       const common::TrajectoryPoint& adc_planning_point,
       PathDecision* path_decision);
-
-  constexpr static char const* const db_key_sidepass_status =
-      "DROPBOX_KEY_SIDEPASS_STATUS";
-  constexpr static char const* const db_key_sidepass_adc_wait_start_time =
-      "DROPBOX_KEY_SIDEPASS_OBSTACLE_ADC_WAIT_TIME";
-  constexpr static char const* const db_key_sidepass_obstacle_id =
-      "DROPBOX_KEY_SIDEPASS_OBSTACLE_ID";
-  constexpr static char const* const db_key_sidepass_side =
-      "DROPBOX_KEY_SIDEPASS_SIDE";
 
   const hdmap::HDMap* hdmap_ = nullptr;
   const ReferenceLine* reference_line_ = nullptr;
