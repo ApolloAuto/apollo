@@ -47,6 +47,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/map/relative_map/common:relative_map_gflags",
         "//modules/map/relative_map/proto:navigation_proto",
         "//modules/map/relative_map/proto:relative_map_config_proto",
         "//modules/perception/proto:perception_proto",
