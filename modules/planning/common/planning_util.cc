@@ -156,9 +156,9 @@ common::SLPoint interpolate(const common::SLPoint &start,
   return point;
 }
 
-PlanningState *GetPlanningState() {
-  static PlanningState state;
-  return &state;
+PlanningStatus *GetPlanningStatus() {
+  static PlanningStatus status;
+  return &status;
 }
 
 void DumpPlanningContext() {

@@ -205,7 +205,7 @@ rule_config : {
     rule_id: STOP_SIGN
 }
 rule_config : {
-    rule_id: SIDEPASS_VEHICLE
+    rule_id: SIDE_PASS_VEHICLE
 }
 rule_config : {
     rule_id: KEEP_CLEAR
