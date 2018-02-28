@@ -228,16 +228,19 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "planning_state_proto",
+    name = "planning_status_proto",
     deps = [
-        ":planning_state_proto_lib",
+        ":planning_status_proto_lib",
     ],
 )
 
 proto_library(
-    name = "planning_state_proto_lib",
+    name = "planning_status_proto_lib",
     srcs = [
-        "planning_state.proto",
+        "planning_status.proto",
+    ],
+    deps = [
+        ":decision_proto_lib",
     ],
 )
 
