@@ -22,18 +22,17 @@ namespace apollo {
 namespace perception {
 
 bool KCFComponents::Init() {
-
-  y_f_ = CreateGaussianPeak(window_size_, window_size_);
+  y_f_ = CreateGaussianPeak(kWindowSize_, kWindowSize_);
   cos_window_ = CalculateHann(y_f_.size());
 
   return true;
 }
 
 bool KCFComponents::GetFeatures(const cv::Mat &img, const cv::Rect &box,
-                                std::vector<cv::Mat> &feature) {
+                                std::vector<cv::Mat> *feature) {
   // Fixed image patch size
   cv::Mat box_img = img(box);
-  cv::resize(box_img, box_img, cv::Size(_window_size, _window_size));
+  cv::resize(box_img, box_img, cv::Size(kWindowSize_, kWindowSize_));
 
   // Gray scale features
   if (box_img.channels() == 3) {
@@ -46,56 +45,46 @@ bool KCFComponents::GetFeatures(const cv::Mat &img, const cv::Rect &box,
 
   // Cosine Window Smoothness
   for (size_t i = 0; i < feat.size(); ++i) {
-    feat[i] = feat[i].mul(_cos_window);
+    feat[i] = feat[i].mul(cos_window_);
   }
 
   // Discrete Fourier Transform
-  feature.clear();
-  feature.resize(feat.size());
+  feature->clear();
+  feature->resize(feat.size());
   for (size_t i = 0; i < feat.size(); ++i) {
-    cv::dft(feat[i], feature[i], cv::DFT_COMPLEX_OUTPUT);
+    cv::dft(feat[i], (*feature)[i], cv::DFT_COMPLEX_OUTPUT);
   }
 
   return true;
 }
 
 bool KCFComponents::Detect(const Tracked &tracked_obj,
-                           const std::vector<cv::Mat> &z_f, float &score) {
-  cv::Mat k_f = gaussian_correlation(z_f, tracked_obj._x_f);
+                           const std::vector<cv::Mat> &z_f, float *score) {
+  cv::Mat k_f = GaussianCorrelation(z_f, tracked_obj.x_f_);
 
   cv::Mat response;
-  cv::idft(complex_multiplication(tracked_obj._alpha_f, k_f), response,
+  cv::idft(ComplexMultiplication(tracked_obj.alpha_f_, k_f), response,
            cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
 
   cv::Point max_loc;
   double max_val = 0.0;
   cv::minMaxLoc(response, NULL, &max_val, NULL, &max_loc);
-  score = static_cast<float>(max_val);
-
-  //    // TODO use max_loc for position confidence
-  //    max_loc.x -= z_f[0].cols / 2;
-  //    max_loc.y -= z_f[0].rows / 2;
-  //    // Debug visualization
-  //    cv::Mat response_color;
-  //    response.convertTo(response_color, CV_8UC1, 255);
-  //    cv::applyColorMap(response_color, response_color, cv::COLORMAP_JET);
-  //    cv::imshow("response", response_color);
-  //    cv::waitKey(0);
+  *score = static_cast<float>(max_val);
 
   return true;
 }
 
-bool KCFComponents::Train(const cv::Mat &img, Tracked &tracked_obj) {
-  cv::Mat k_f = gaussian_correlation(tracked_obj._x_f, tracked_obj._x_f);
+bool KCFComponents::Train(const cv::Mat &img, Tracked *tracked_obj) {
+  cv::Mat k_f = GaussianCorrelation(tracked_obj->x_f_, tracked_obj->x_f_);
 
-  cv::Mat alpha_f = complex_division(_y_f, k_f + cv::Scalar(_lambda, 0));
-  alpha_f.copyTo(tracked_obj._alpha_f);
+  cv::Mat alpha_f = ComplexDivision(y_f_, k_f + cv::Scalar(kLambda_, 0));
+  alpha_f.copyTo(tracked_obj->alpha_f_);
 
   return true;
 }
 
-cv::Mat KCFComponents::gaussian_correlation(std::vector<cv::Mat> xf,
-                                            std::vector<cv::Mat> yf) {
+cv::Mat KCFComponents::GaussianCorrelation(const std::vector<cv::Mat> &xf,
+                                           const std::vector<cv::Mat> &yf) {
   int nn = xf[0].size().area();
   double xx = 0;
   double yy = 0;
@@ -113,7 +102,7 @@ cv::Mat KCFComponents::gaussian_correlation(std::vector<cv::Mat> xf,
 
   cv::Mat k;
   float numel_xf = nn * xf.size();
-  cv::exp((-1 / (_kernel_sigma * _kernel_sigma)) *
+  cv::exp((-1 / (kKernelSigma_ * kKernelSigma_)) *
               max(0.0, (xx + yy - 2 * xy) / numel_xf),
           k);
   k.convertTo(k, CV_32FC1);
@@ -123,8 +112,8 @@ cv::Mat KCFComponents::gaussian_correlation(std::vector<cv::Mat> xf,
   return kf;
 }
 
-cv::Mat KCFComponents::complex_multiplication(const cv::Mat &x1,
-                                              const cv::Mat &x2) {
+cv::Mat KCFComponents::ComplexMultiplication(const cv::Mat &x1,
+                                             const cv::Mat &x2) {
   std::vector<cv::Mat> planes1;
   cv::split(x1, planes1);
 
@@ -140,7 +129,7 @@ cv::Mat KCFComponents::complex_multiplication(const cv::Mat &x1,
   return result;
 }
 
-cv::Mat KCFComponents::complex_division(const cv::Mat &x1, const cv::Mat &x2) {
+cv::Mat KCFComponents::ComplexDivision(const cv::Mat &x1, const cv::Mat &x2) {
   std::vector<cv::Mat> planes1;
   cv::split(x1, planes1);
 
@@ -161,7 +150,7 @@ cv::Mat KCFComponents::complex_division(const cv::Mat &x1, const cv::Mat &x2) {
   return result;
 }
 
-cv::Mat KCFComponents::create_gaussian_peak(int sizey, int sizex) {
+cv::Mat KCFComponents::CreateGaussianPeak(const int &sizey, const int &sizex) {
   cv::Mat_<float> res(sizey, sizex);
 
   int syh = (sizey) / 2;
@@ -169,20 +158,22 @@ cv::Mat KCFComponents::create_gaussian_peak(int sizey, int sizex) {
 
   // Assume the tracking padding is still 2.5, which means the center of box is
   // the focus
-  float output_sigma = std::sqrt((float)sizex * sizey) / 2.5 * 0.125;
+  float output_sigma =
+      std::sqrt(static_cast<float>(sizex) * static_cast<float>(sizey)) / 2.5f *
+      0.125f;
   float mult = -0.5 / (output_sigma * output_sigma);
 
   for (int i = 0; i < sizey; i++) {
     for (int j = 0; j < sizex; j++) {
       int ih = i - syh;
       int jh = j - sxh;
-      res(i, j) = std::exp(mult * (float)(ih * ih + jh * jh));
+      res(i, j) = std::exp(mult * static_cast<float>(ih * ih + jh * jh));
     }
   }
-  return fftd(res);
+  return FFTD(res);
 }
 
-cv::Mat KCFComponents::fftd(cv::Mat img) {
+cv::Mat KCFComponents::FFTD(cv::Mat img) {
   if (img.channels() == 1) {
     cv::Mat planes[] = {cv::Mat_<float>(img),
                         cv::Mat_<float>::zeros(img.size())};
@@ -194,7 +185,7 @@ cv::Mat KCFComponents::fftd(cv::Mat img) {
   return img;
 }
 
-cv::Mat KCFComponents::calculate_hann(const cv::Size &sz) {
+cv::Mat KCFComponents::CalculateHann(const cv::Size &sz) {
   cv::Mat temp1(cv::Size(sz.width, 1), CV_32FC1);
   cv::Mat temp2(cv::Size(sz.height, 1), CV_32FC1);
 
