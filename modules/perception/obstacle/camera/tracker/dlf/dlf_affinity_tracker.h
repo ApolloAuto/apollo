@@ -19,43 +19,38 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_DLF_AFFINITY_TRACKER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_DLF_AFFINITY_TRACKER_H_
 
-#include <vector>
 #include <limits>
 #include <unordered_map>
+#include <vector>
 
-#include "modules/perception/obstacle/camera/common/util.h"
-#include "modules/perception/obstacle/camera/common/visual_object.h"
 #include "modules/perception/obstacle/camera/tracker/base_affinity_tracker.h"
-#include "modules/perception/obstacle/camera/tracker/cascaded_camera_tracker_util.h"
 
 namespace apollo {
 namespace perception {
 
 class DLFAffinityTracker : public BaseAffinityTracker {
-public:
+ public:
+  DLFAffinityTracker() : BaseAffinityTracker() {}
 
-    DLFAffinityTracker() : BaseAffinityTracker() {}
+  virtual ~DLFAffinityTracker() {}
 
-    virtual ~DLFAffinityTracker() {}
+  bool Init() override;
 
-    bool Init() override;
+  bool GetAffinityMatrix(
+      const cv::Mat &img, const std::vector<Tracked> &tracked,
+      const std::vector<Detected> &detected,
+      std::vector<std::vector<float>> *affinity_matrix) override;
 
-    bool GetAffinityMatrix(
-        const cv::Mat &img, const std::vector<Tracked> &tracked,
-        const std::vector<Detected> &detected,
-        std::vector<std::vector<float>> *affinity_matrix) override;
+  bool UpdateTracked(const cv::Mat &img, const std::vector<Detected> &detected,
+                     std::vector<Tracked> *tracked) override;
 
-    bool UpdateTracked(const cv::Mat &img,
-                               const std::vector<Detected> &detected,
-                               std::vector<Tracked> *tracked) override;
-
-private:
-    //  Thresholds are fine-tuned and detector-dependant
-    const float kConfThreshold_ = 0.9f;
-    const float kFilterThreshold_ = 0.3f;
+ private:
+  //  Thresholds are fine-tuned and detector-dependant
+  const float kConfThreshold_ = 0.9f;
+  const float kFilterThreshold_ = 0.3f;
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_DLF_AFFINITY_TRACKER_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_DLF_AFFINITY_TRACKER_H_

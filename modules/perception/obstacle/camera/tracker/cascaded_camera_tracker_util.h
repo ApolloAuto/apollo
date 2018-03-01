@@ -52,8 +52,9 @@ void MatrixMatching(const std::vector<std::vector<float>> &affinity_matrix,
 void ManageTrackerAndID(const std::unordered_map<int, int> &local_matching,
                         const std::unordered_set<int> &local_matched_detected,
                         const std::vector<Detected> &detected,
+                        const int &frame_idx, const float &timestamp,
                         std::vector<Tracked> *tracked, int *next_tracked_id,
-                        std::map<int, int> *id_mapping, int curr_frame_cnt);
+                        std::unordered_map<int, std::pair<int, float>> *id_mapping);
 
 void PrintAffinityMatrix(const std::vector<std::vector<float>> &affinity_matrix,
                          const std::vector<Tracked> &tracked,
