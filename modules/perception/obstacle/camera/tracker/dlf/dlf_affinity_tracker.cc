@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "dlf_affinity_tracker.h"
+#include "modules/perception/obstacle/camera/tracker/dlf/dlf_affinity_tracker.h"
 
 namespace apollo {
 namespace perception {

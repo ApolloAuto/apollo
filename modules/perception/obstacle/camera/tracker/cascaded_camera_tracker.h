@@ -20,10 +20,14 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_CASCADED_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_CASCADED_H_
 
+#include <opencv2/opencv.hpp>
 #include <algorithm>
 #include <map>
-#include <opencv2/opencv.hpp>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
+#include <utility>
+#include <string>
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
