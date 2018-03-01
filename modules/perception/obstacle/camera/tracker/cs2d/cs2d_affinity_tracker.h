@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ class CS2DAffinityTracker : public BaseAffinityTracker {
                       std::vector<Tracked> *tracked) override;
 
  private:
-  float sz_lim = 0.5f;
-  float pos_range = 1.5f;
+  float sz_lim_ = 0.5f;
+  float pos_range_ = 1.5f;
 };
 
 }  // namespace perception

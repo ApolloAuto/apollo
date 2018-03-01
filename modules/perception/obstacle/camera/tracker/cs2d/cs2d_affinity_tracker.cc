@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,10 +46,10 @@ bool CS2DAffinityTracker::GetAffinityMatrix(
     float c_y = static_cast<float>(box.y) + h / 2;
 
     // 2D center position change limits
-    float x_min = c_x - pos_range * w;
-    float x_max = c_x + pos_range * w;
-    float y_min = c_y - pos_range * h;
-    float y_max = c_y + pos_range * h;
+    float x_min = c_x - pos_range_ * w;
+    float x_max = c_x + pos_range_ * w;
+    float y_min = c_y - pos_range_ * h;
+    float y_max = c_y + pos_range_ * h;
 
     for (size_t j = 0; j < selected_entry_matrix_[0].size(); ++j) {
       bool related = true;
@@ -62,11 +62,11 @@ bool CS2DAffinityTracker::GetAffinityMatrix(
 
       // 2D size change limits
       float ratio_w = w_d / w;
-      if (ratio_w > (1.0f + sz_lim) || ratio_w < (1.0f - sz_lim)) {
+      if (ratio_w > (1.0f + sz_lim_) || ratio_w < (1.0f - sz_lim_)) {
         related = false;
       }
       float ratio_h = h_d / h;
-      if (ratio_h > (1.0f + sz_lim) || ratio_h < (1.0f - sz_lim)) {
+      if (ratio_h > (1.0f + sz_lim_) || ratio_h < (1.0f - sz_lim_)) {
         related = false;
       }
 
@@ -86,7 +86,7 @@ bool CS2DAffinityTracker::GetAffinityMatrix(
 
   return true;
 }
-
+// TODO(unknown): dummy implementation for pure virtual methdo in base class
 bool CS2DAffinityTracker::UpdateTracked(const cv::Mat &img,
                                          const std::vector<Detected> &detected,
                                          std::vector<Tracked> *tracked) {
