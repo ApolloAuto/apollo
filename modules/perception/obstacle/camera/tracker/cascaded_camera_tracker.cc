@@ -20,7 +20,7 @@ namespace adu {
 namespace perception {
 namespace obstacle {
 
-bool MixCameraTracker::init() {
+bool CascadedCameraTracker::init() {
 
     // TODO Config here for turing trackers on or off
 
@@ -32,15 +32,12 @@ bool MixCameraTracker::init() {
         init_flag &= _dlf_tracker.init();
     }
 
-//    // TODO Disable DAT for now
-//    init_flag &= _dat_tracker.init();
-
     init_flag &= _kcf_tracker.init();
 
     return init_flag;
 }
 
-bool MixCameraTracker::associate(const cv::Mat &frame,
+bool CascadedCameraTracker::associate(const cv::Mat &frame,
                                  const std::vector<VisualObjectPtr> &objects,
                                  double timestamp,
                                  const CameraTrackerOptions &options,
@@ -112,19 +109,6 @@ bool MixCameraTracker::associate(const cv::Mat &frame,
         }
     }
 
-//    // TODO Disable DAT for now. Upgrade "update_tracked" logic in DAT
-//    // (2) dat
-//    timer.tic();
-//    std::vector<std::vector<float > > dat_affinity_matrix;
-//    _dat_tracker.set_selected_entries(affinity_matrix);
-//    _dat_tracker.get_affinity_matrix(img, _tracked, detected, dat_affinity_matrix);
-//    if (_verbose) {
-//        XLOG(INFO) << "DAT Affinity time: " << timer.toc() << "ms";
-//    }
-//
-//    // Merge
-//    merge_affinity_matrix(dat_affinity_matrix, affinity_matrix);
-
     // (3) kcf
     timer.tic();
     std::vector<std::vector<float > > kcf_affinity_matrix;
@@ -162,13 +146,6 @@ bool MixCameraTracker::associate(const cv::Mat &frame,
         }
     }
 
-//    // TODO Disable DAT for now
-//    timer.tic();
-//    _dat_tracker.update_tracked(img, detected, _tracked);
-//    if (_verbose) {
-//        XLOG(INFO) << "DAT Update time: " << timer.toc() << "ms";
-//    }
-
     timer.tic();
     _kcf_tracker.update_tracked(img, detected, _tracked);
     if (_verbose) {
@@ -193,135 +170,11 @@ bool MixCameraTracker::associate(const cv::Mat &frame,
     return true;
 }
 
-bool MixCameraTracker::predict_shape(const cv::Mat &frame,
-                                          const std::vector<VisualObjectPtr> &objects,
-                                          double timestamp,
-                                          const CameraTrackerOptions &options,
-                                          std::vector<VisualObjectPtr> *tracked_objects) {
-    return true;
+std::string CascadedCameraTracker::name() const {
+    return "CascadedCameraTracker";
 }
 
-bool MixCameraTracker::predict_velocity(const cv::Mat &frame,
-                                             const std::vector<VisualObjectPtr> &objects,
-                                             double timestamp,
-                                             const CameraTrackerOptions &options,
-                                             std::vector<VisualObjectPtr> *tracked_objects) {
-
-    *tracked_objects = objects;
-
-    // update lost_frame_count
-    for (auto iter: _tracked_filters) {
-        iter.second.lost_frame_count += 1;
-    }
-
-    // create and reduce lost_frame_count to 0 if matched. predict here
-    for (auto obj_ptr: *tracked_objects) {
-
-        int tracked_id = obj_ptr->track_id;
-        double now_timestamp = obj_ptr->latest_tracked_time;
-
-        if (tracked_id != -1) {
-            if (_tracked_filters.find(tracked_id) != _tracked_filters.end()) {
-
-                double last_timestamp = _tracked_filters[tracked_id].last_seen_timestamp;
-
-                _tracked_filters[tracked_id].lost_frame_count = 0;
-                _tracked_filters[tracked_id].last_seen_timestamp = obj_ptr->latest_tracked_time;
-
-                _tracked_filters[tracked_id].position.predict(now_timestamp - last_timestamp);
-                _tracked_filters[tracked_id].orientation.predict(now_timestamp - last_timestamp);
-                _tracked_filters[tracked_id].size_3d_1.predict(now_timestamp - last_timestamp);
-                _tracked_filters[tracked_id].size_3d_2.predict(now_timestamp - last_timestamp);
-            }
-            else {
-                _tracked_filters[tracked_id] = Filter();
-                _tracked_filters[tracked_id].track_id = tracked_id;
-                _tracked_filters[tracked_id].last_seen_timestamp = obj_ptr->latest_tracked_time;
-            }
-        }
-    }
-
-    // destroy old filters
-    std::vector<int> id_to_destroy;
-    for (const auto iter: _tracked_filters) {
-        if (iter.second.lost_frame_count > _max_kep_frame_cnt) {
-            id_to_destroy.push_back(iter.first);
-        }
-    }
-    for (const auto id: id_to_destroy) {
-        _tracked_filters.erase(id);
-    }
-
-    // filter orientation and 3d size for tracked_objects in camera space
-    for (auto obj_ptr: *tracked_objects) {
-        int tracked_id = obj_ptr->track_id;
-
-        if (tracked_id != -1 && _tracked_filters.find(tracked_id) != _tracked_filters.end()) {
-
-            // Regenerate theta...
-            // This definition is correct for OpenGL viewer...
-            double beta = std::atan2(obj_ptr->center.x(), obj_ptr->center.z());
-            double theta = obj_ptr->alpha + beta;
-            if (theta > M_PI) {
-                theta -= 2*M_PI;
-            }
-            else if (theta < -M_PI) {
-                theta += 2*M_PI;
-            }
-            obj_ptr->theta = theta;
-
-            // Orientation
-            Eigen::Vector2d z;
-            z << obj_ptr->alpha, obj_ptr->theta;
-            _tracked_filters[tracked_id].orientation.correct(z);
-            Eigen::Vector4d x = _tracked_filters[tracked_id].orientation.get_state();
-            obj_ptr->alpha = x(0);
-            obj_ptr->theta = x(1);
-
-            // 3D size 1
-            z << obj_ptr->height, obj_ptr->width;
-            _tracked_filters[tracked_id].size_3d_1.correct(z);
-            x = _tracked_filters[tracked_id].size_3d_1.get_state();
-            obj_ptr->height = x(0);
-            obj_ptr->width = x(1);
-
-            // 3D size 2
-            z << obj_ptr->length, 0.0;
-            _tracked_filters[tracked_id].size_3d_2.correct(z);
-            x = _tracked_filters[tracked_id].size_3d_2.get_state();
-            obj_ptr->length = x(0);
-        }
-    }
-
-    // do orientation filter before this, cause it update everything about orientation and update the original
-    this->trans_object_to_world(options, tracked_objects);
-
-    // filter position for tracked_objects in world space
-    for (auto obj_ptr: *tracked_objects) {
-        int tracked_id = obj_ptr->track_id;
-
-        if (tracked_id != -1 && _tracked_filters.find(tracked_id) != _tracked_filters.end()) {
-            Eigen::Vector2d z;
-            z << obj_ptr->center(0), obj_ptr->center(1);
-            _tracked_filters[tracked_id].position.correct(z);
-
-            Eigen::Vector4d x = _tracked_filters[tracked_id].position.get_state();
-            obj_ptr->center(0) = x[0];
-            obj_ptr->center(1) = x[1];
-            obj_ptr->velocity(0) = x[2];
-            obj_ptr->velocity(1) = x[3];
-            obj_ptr->velocity(2) = 0;
-        }
-    }
-
-    return true;
-}
-
-std::string MixCameraTracker::name() const {
-    return "MixCameraTracker";
-}
-
-REGISTER_CAMERA_TRACKER(MixCameraTracker);
+REGISTER_CAMERA_TRACKER(CascadedCameraTracker);
 
 }  // namespace obstacle
 }  // namespace perception

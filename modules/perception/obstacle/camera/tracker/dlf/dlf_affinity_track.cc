@@ -1,0 +1,80 @@
+/******************************************************************************
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
+#include "dlf_affinity_tracker.h"
+
+namespace adu {
+namespace perception {
+namespace obstacle {
+
+bool DLFAffinityTracker::init() {
+    return true;
+}
+
+bool DLFAffinityTracker::get_affinity_matrix(const cv::Mat &img,
+                                              const std::vector<Tracked> &tracked,
+                                              const std::vector<Detected> &detected,
+                                              std::vector<std::vector<float > > &affinity_matrix) {
+    affinity_matrix.clear();
+
+    // Return if empty
+    if (tracked.empty() || detected.empty()) {
+        return true;
+    }
+
+    // Construct output. Default as 0.0 for not selected entries
+    affinity_matrix = std::vector<std::vector<float > >(tracked.size(),
+                                                        std::vector<float >(detected.size(), 0.0f));
+
+    size_t dim = tracked[0]._features.size();
+    for (size_t i = 0; i < _selected_entry_matrix.size(); ++i) {
+        for (size_t j = 0; j < _selected_entry_matrix[0].size(); ++j) {
+
+            float sum = 0.0f;
+            for (size_t k = 0; k < dim; ++k) {
+                sum += tracked[i]._features[k] * detected[j]._features[k];
+            }
+
+            // High recall filtering and High confidence assignment (Experiment dependent)
+            if (sum >= _conf_threshold) {
+                sum = 1.0f;
+            }
+            else if (sum <= _filter_threshold) {
+                sum = 0.0f;
+            }
+
+            affinity_matrix[i][j] = sum;
+        }
+    }
+
+    return true;
+}
+
+bool DLFAffinityTracker::update_tracked(const cv::Mat &img, const std::vector<Detected> &detected,
+                                        std::vector<Tracked> &tracked) {
+    for (auto &obj: tracked) {
+        int d_id = obj._detect_id;
+        if (d_id >= 0) {
+            obj._features = detected[d_id]._features;
+        }
+    }
+
+    return true;
+}
+
+} //namespace adu
+} //namespace perception
+} //namespace obstacle
