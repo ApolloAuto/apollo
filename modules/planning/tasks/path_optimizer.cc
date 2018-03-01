@@ -20,8 +20,12 @@
 
 #include "modules/planning/tasks/path_optimizer.h"
 
+#include "modules/planning/common/planning_gflags.h"
+
 namespace apollo {
 namespace planning {
+
+using apollo::common::Status;
 
 PathOptimizer::PathOptimizer(const std::string& name) : Task(name) {}
 
@@ -32,7 +36,17 @@ apollo::common::Status PathOptimizer::Execute(
       reference_line_info->speed_data(), reference_line_info->reference_line(),
       frame->PlanningStartPoint(), reference_line_info->mutable_path_data());
   RecordDebugInfo(reference_line_info->path_data());
-
+  if (ret != Status::OK()) {
+    reference_line_info->SetDrivable(false);
+    AERROR << "Reference Line " << reference_line_info->Lanes().Id()
+           << " is not drivable after " << Name();
+  }
+  if (reference_line_info->IsChangeLanePath() &&
+      reference_line_info->TrajectoryLength() > FLAGS_change_lane_min_length) {
+    reference_line_info->SetDrivable(false);
+    AERROR << "Change lane reference line is shorter than "
+           << FLAGS_change_lane_min_length << ", not drivable";
+  }
   return ret;
 }
 
