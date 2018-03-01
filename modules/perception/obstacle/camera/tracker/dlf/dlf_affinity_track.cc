@@ -16,9 +16,8 @@
 
 #include "dlf_affinity_tracker.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
-namespace obstacle {
 
 bool DLFAffinityTracker::init() {
     return true;
