@@ -119,6 +119,24 @@ cc_library(
 )
 
 cc_library(
+    name = "perception_obstacle_motion_manager_subnode",
+    srcs = [
+        "motion_manager_service.cc",
+    ],
+    hdrs = [
+        "motion_manager_service.h",
+    ],
+    deps = [
+
+        "//modules/common/adapters:adapter_manager",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/obstacle/camera/motionmanager:perception_obstacle_camera_motionmanager",
+        "@ros//:ros_common",
+    ],
+)
+
+cc_library(
     name = "perception_obstacle_obstacle_perception",
     srcs = [
         "obstacle_perception.cc",
