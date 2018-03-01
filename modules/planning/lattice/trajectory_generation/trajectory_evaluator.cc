@@ -20,6 +20,7 @@
 
 #include "modules/planning/lattice/trajectory_generation/trajectory_evaluator.h"
 
+#include <algorithm>
 #include <cmath>
 #include <functional>
 #include <limits>
@@ -149,7 +150,7 @@ double TrajectoryEvaluator::Evaluate(
   double lon_collision_cost = LonCollisionCost(lon_trajectory);
 
   double evaluation_horizon = std::min(FLAGS_decision_horizon,
-		  lon_trajectory->Evaluate(0, lon_trajectory->ParamLength()));
+      lon_trajectory->Evaluate(0, lon_trajectory->ParamLength()));
   std::vector<double> s_values;
   for (double s = 0.0; s < evaluation_horizon;
        s += FLAGS_trajectory_space_resolution) {
