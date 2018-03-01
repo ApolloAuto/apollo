@@ -13,9 +13,9 @@ cc_library(
         "//modules/common:log",
         "@eigen//:eigen",
         "@opencv2//:core",
-        "//modules/perception/obstacle/camera/lane_post_process/common:type",
-        "//modules/perception/obstacle/camera/lane_post_process/common:util",
-        "//modules/perception/obstacle/camera/lane_post_process/common:connected_component_analysis",
+        "//modules/perception/obstacle/camera/lane_post_process/common:perception_obstacle_camera_lane_post_process_common_type",
+        "//modules/perception/obstacle/camera/lane_post_process/common:perception_obstacle_camera_lane_post_process_common_util",
+        "//modules/perception/obstacle/camera/lane_post_process/common:perception_obstacle_camera_lane_post_process_common_connected_component_analysis",
         "//modules/perception/obstacle/camera/lane_post_process/common:projector"
     ],
 )
