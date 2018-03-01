@@ -27,3 +27,7 @@ DEFINE_int32(relative_map_loop_rate, 10, "Loop rate for relative_map node");
 
 DEFINE_double(max_len_from_navigation_line, 100.0,
               "max navigation path length from navigation line");
+
+DEFINE_bool(
+    enable_navigation_line, true,
+    "True to consider navigation line info into generate navigation path");
