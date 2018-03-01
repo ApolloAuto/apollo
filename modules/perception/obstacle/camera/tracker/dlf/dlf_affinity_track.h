@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PERCEPTION_OBSTACLE_CAMERA_DLF_AFFINITY_TRACKER_H
-#define ADU_PERCEPTION_OBSTACLE_CAMERA_DLF_AFFINITY_TRACKER_H
+// Tracker which uses deep learning ROI features from detection
+
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_DLF_AFFINITY_TRACKER_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_DLF_AFFINITY_TRACKER_H_
 
 #include <vector>
 #include <limits>
@@ -23,9 +25,8 @@
 
 #include "obstacle/camera/tracker/mix_camera_tracker/base_affinity_tracker.h"
 
-namespace adu {
+namespace apollo {
 namespace perception {
-namespace obstacle {
 
 class DLFAffinityTracker : public BaseAffinityTracker {
 public:
@@ -50,8 +51,7 @@ private:
     float _filter_threshold = 0.3f; // 0.75f too high for small objs
 };
 
-}  // namespace obstacle
 }  // namespace perception
-}  // namespace adu
+}  // namespace apollo
 
-#endif //ADU_PERCEPTION_OBSTACLE_CAMERA_DLF_AFFINITY_TRACKER_H
+#endif // MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_DLF_AFFINITY_TRACKER_H_
