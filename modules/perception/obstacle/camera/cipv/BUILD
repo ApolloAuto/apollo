@@ -10,7 +10,7 @@ cc_library(
         "@eigen//:eigen",
         "//modules/common:log",
         "//modules/perception/lib/base:base",
-        "//modules/perception/obstacle/camera/common:obstacle_camera_common",
+        "//modules/perception/obstacle/camera/common:common",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/common:perception_obstacle_common",
         "//modules/perception/obstacle/camera/lane_post_process/common:perception_obstacle_camera_lane_post_process_common_type"

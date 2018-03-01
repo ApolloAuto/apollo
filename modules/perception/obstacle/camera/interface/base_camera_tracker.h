@@ -41,7 +41,8 @@ class BaseCameraTracker {
 
   // @brief: Assign global track id for camera objects (ID association)
   // @param [in/out]: object lists, added tracking related information
-  virtual bool Associate(const float& timestamp,
+  virtual bool Associate(const cv::Mat &img,
+                         const float& timestamp,
                          std::vector<VisualObjectPtr>* objects) = 0;
 
   virtual std::string Name() const = 0;
