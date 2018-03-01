@@ -99,7 +99,7 @@ def update(frame_number):
 
     ax.axvline(x=0.0, alpha=0.3)
     ax.axhline(y=0.0, alpha=0.3)
-    ax.set_xlim([-10, 10])
+    ax.set_xlim([10, -10])
     ax.set_ylim([-10, 200])
     ax.relim()
 
