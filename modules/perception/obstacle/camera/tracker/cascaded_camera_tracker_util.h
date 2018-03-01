@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <utility>
 
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
@@ -49,12 +50,12 @@ void MatrixMatching(const std::vector<std::vector<float>> &affinity_matrix,
 
 // @brief Create, update and delete tracks, from the matching result
 // ID mapping is done here as well
-void ManageTrackerAndID(const std::unordered_map<int, int> &local_matching,
-                        const std::unordered_set<int> &local_matched_detected,
-                        const std::vector<Detected> &detected,
-                        const int &frame_idx, const float &timestamp,
-                        std::vector<Tracked> *tracked, int *next_tracked_id,
-                        std::unordered_map<int, std::pair<int, float>> *id_mapping);
+void ManageTrackerAndID(
+    const std::unordered_map<int, int> &local_matching,
+    const std::unordered_set<int> &local_matched_detected,
+    const std::vector<Detected> &detected, const int &frame_idx,
+    const float &timestamp, std::vector<Tracked> *tracked, int *next_tracked_id,
+    std::unordered_map<int, std::pair<int, float>> *id_mapping);
 
 void PrintAffinityMatrix(const std::vector<std::vector<float>> &affinity_matrix,
                          const std::vector<Tracked> &tracked,

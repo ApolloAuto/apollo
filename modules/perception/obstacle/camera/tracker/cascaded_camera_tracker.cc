@@ -49,14 +49,16 @@ bool CascadedCameraTracker::Associate(const cv::Mat& img,
   // cs2d
   std::vector<std::vector<float>> cs2d_affinity_matrix;
   cs2d_tracker_.SelectFull(tracks_.size(), detected.size());
-  cs2d_tracker_.GetAffinityMatrix(img, tracks_, detected, &cs2d_affinity_matrix);
+  cs2d_tracker_.GetAffinityMatrix(img, tracks_, detected,
+                                  &cs2d_affinity_matrix);
   MergeAffinityMatrix(cs2d_affinity_matrix, &affinity_matrix);
 
   // dlf
   if (dl_feature_) {
     std::vector<std::vector<float>> dlf_affinity_matrix;
     dlf_tracker_.SelectFull(tracks_.size(), detected.size());
-    dlf_tracker_.GetAffinityMatrix(img, tracks_, detected, &dlf_affinity_matrix);
+    dlf_tracker_.GetAffinityMatrix(img, tracks_, detected,
+                                   &dlf_affinity_matrix);
 
     // Merge
     MergeAffinityMatrix(dlf_affinity_matrix, &affinity_matrix);
@@ -81,8 +83,9 @@ bool CascadedCameraTracker::Associate(const cv::Mat& img,
   MatrixMatching(affinity_matrix, &local_matching, &local_matched_detected);
 
   // Tracker and ID management
-  ManageTrackerAndID(local_matching, local_matched_detected, detected, frame_idx_,
-                     timestamp, &tracks_, &next_track_id_, &id_mapping);
+  ManageTrackerAndID(local_matching, local_matched_detected, detected,
+                     frame_idx_, timestamp, &tracks_, &next_track_id_,
+                     &id_mapping);
 
   // Update information used in tracks for the next frame
   cs2d_tracker_.UpdateTracked(img, detected, &tracks_);
