@@ -19,55 +19,55 @@
 namespace apollo {
 namespace perception {
 
-bool DLFAffinityTracker::init() {
+bool DLFAffinityTracker::Init() {
     return true;
 }
 
-bool DLFAffinityTracker::get_affinity_matrix(const cv::Mat &img,
-                                              const std::vector<Tracked> &tracked,
-                                              const std::vector<Detected> &detected,
-                                              std::vector<std::vector<float > > &affinity_matrix) {
-    affinity_matrix.clear();
+bool DLFAffinityTracker::get_affinity_matrixetAffinityMatrix(
+    const cv::Mat &img, const std::vector<Tracked> &tracked,
+    const std::vector<Detected> &detected,
+    std::vector<std::vector<float>> *affinity_matrix) {
 
-    // Return if empty
-    if (tracked.empty() || detected.empty()) {
-        return true;
-    }
+    affinity_matrix->clear();
 
-    // Construct output. Default as 0.0 for not selected entries
-    affinity_matrix = std::vector<std::vector<float > >(tracked.size(),
+    if (tracked.empty() || detected.empty()) return true;
+
+    // Output. Default as 0.0 for not selected entries
+    *affinity_matrix = std::vector<std::vector<float > >(tracked.size(),
                                                         std::vector<float >(detected.size(), 0.0f));
 
-    size_t dim = tracked[0]._features.size();
+    size_t dim = tracked[0].features_.size();
     for (size_t i = 0; i < _selected_entry_matrix.size(); ++i) {
         for (size_t j = 0; j < _selected_entry_matrix[0].size(); ++j) {
 
             float sum = 0.0f;
             for (size_t k = 0; k < dim; ++k) {
-                sum += tracked[i]._features[k] * detected[j]._features[k];
+                sum += tracked[i].features_[k] * detected[j].features_[k];
             }
 
-            // High recall filtering and High confidence assignment (Experiment dependent)
-            if (sum >= _conf_threshold) {
+            // Filtering. Ad-hoc
+            if (sum >= kConfThreshold_) {
                 sum = 1.0f;
             }
-            else if (sum <= _filter_threshold) {
+            else if (sum <= kFilterThreshold_) {
                 sum = 0.0f;
             }
 
-            affinity_matrix[i][j] = sum;
+            (*affinity_matrix)[i][j] = sum;
         }
     }
 
     return true;
 }
 
-bool DLFAffinityTracker::update_tracked(const cv::Mat &img, const std::vector<Detected> &detected,
-                                        std::vector<Tracked> &tracked) {
-    for (auto &obj: tracked) {
-        int d_id = obj._detect_id;
-        if (d_id >= 0) {
-            obj._features = detected[d_id]._features;
+bool DLFAffinityTracker::UpdateTracked(const cv::Mat &img,
+                           const std::vector<Detected> &detected,
+                           std::vector<Tracked> *tracked) {
+
+    for (auto &obj: *tracked) {
+        int d_id = obj.detect_id_;
+        if (d_id >= 0 && d_id < detected.size()) {
+          obj.features_ = detected[d_id].features_;
         }
     }
 

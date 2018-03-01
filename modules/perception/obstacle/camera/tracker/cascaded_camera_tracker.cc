@@ -14,110 +14,89 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/camera/interface/cascaded_camera_tracker.h"
+#include "modules/perception/obstacle/camera/tracker/cascaded_camera_tracker.h"
 
 namespace apollo {
 namespace perception {
 
 bool CascadedCameraTracker::Init() {
 
-    // TODO Config here for turing trackers on or off
-
     bool init_flag = true;
 
-    init_flag &= _cs2d_tracker.init();
-
-    if (_with_dl_feature) {
-        init_flag &= _dlf_tracker.init();
-    }
-
-    init_flag &= _kcf_tracker.init();
+    init_flag &= cs2d_tracker_.Init();
+    if (dl_feature_) init_flag &= dlf_tracker_.Init();
+    init_flag &= kcf_tracker_.Init();
 
     return init_flag;
 }
 
 bool CascadedCameraTracker::Associate(const cv::Mat &img, const float& timestamp,
-               std::vector<VisualObjectPtr>* objects) {
-    _frame_cnt++;
+                                      std::vector<VisualObjectPtr>* objects) {
+    frame_idx_++;
 
-    *tracked_objects = objects;  // TODO: What kind of API design is this? Who defined this
-    std::map<int, int> id_mapping;  // detect to track
+    // detect id to track id mapping
+    std::map<int, int> id_mapping;
 
-    float scale = 1.0f; // TODO put scale adjustment in config
-    cv::Mat img;
-    cv::resize(frame, img, cv::Size(static_cast<int>(frame.cols * scale),
-                                    static_cast<int>(frame.rows * scale)));
+    float scale = 1.0f;
     std::vector<Detected> detected;
-    get_detected_from_vo(frame.size(), objects, scale, detected);
-    for (auto& dets: detected) {
-        dets._last_seen_frame_cnt = _frame_cnt;
-        dets._last_seen_timestamp = timestamp;
-    }
+    GetDetectedFromVO(img.size(), scale, *objects,  detected);
 
     // Affinity matrix
     std::vector<std::vector<float > > affinity_matrix;
-    affinity_matrix = std::vector<std::vector<float>>(_tracked.size(),
+    affinity_matrix = std::vector<std::vector<float>>(tracks_.size(),
                                                       std::vector<float>(detected.size(), 1.0f));
 
     // cs2d
     std::vector<std::vector<float > > cs2d_affinity_matrix;
-    _cs2d_tracker.set_full_selection(_tracked.size(), detected.size());
-    _cs2d_tracker.get_affinity_matrix(img, _tracked, detected, cs2d_affinity_matrix);
+    cs2d_tracker_.SelectFull(tracks_.size(), detected.size());
+    cs2d_tracker_.GetAffinityMatrix(img, tracks_, detected, cs2d_affinity_matrix);
     merge_affinity_matrix(cs2d_affinity_matrix, affinity_matrix);
 
     // dlf
-    if (_with_dl_feature) {
-
+    if (dl_feature_) {
         std::vector<std::vector<float > > dlf_affinity_matrix;
-        _dlf_tracker.set_full_selection(_tracked.size(), detected.size());
-        _dlf_tracker.get_affinity_matrix(img, _tracked, detected, dlf_affinity_matrix);
+        dlf_tracker_.SelectFull(tracks_.size(), detected.size());
+        dlf_tracker_.GetAffinityMatrix(img, tracks_, detected, dlf_affinity_matrix);
 
         // Merge
-        merge_affinity_matrix(dlf_affinity_matrix, affinity_matrix);
+        MergeAffinityMatrix(dlf_affinity_matrix, affinity_matrix);
 
-        // High confidence selection filtering. Thresholds are tuned
-        // 1st pass high value as 0.95. No competing high value in the cross
-        filter_affinity_matrix(0.95f, 0.95f, affinity_matrix);
-
-        // 2nd pass value above 0.7. The others for 0.3
-        filter_affinity_matrix(0.7f, 0.3f, affinity_matrix);
-
-        // 3rd pass value above 0.5. The others for 0.2
-        filter_affinity_matrix(0.5f, 0.2f, affinity_matrix);
-
+        // High confidence selection filtering. Thresholds are tuned in 3 passes
+        // For entry higher than threshold, see if there is other competing
+        // high scores in the cross (same row or column)
+        FilterAffinityMatrix(0.95f, 0.95f, affinity_matrix);
+        FilterAffinityMatrix(0.7f, 0.3f, affinity_matrix);
+        FilterAffinityMatrix(0.5f, 0.2f, affinity_matrix);
     }
 
     // kcf
     std::vector<std::vector<float > > kcf_affinity_matrix;
-    _kcf_tracker.set_selected_entries(affinity_matrix);
-    _kcf_tracker.get_affinity_matrix(img, _tracked, detected, kcf_affinity_matrix);
-    merge_affinity_matrix(kcf_affinity_matrix, affinity_matrix);
+    kcf_tracker_.SelectEntries(affinity_matrix);
+    kcf_tracker_.GetAffinityMatrix(img, tracks_, detected, kcf_affinity_matrix);
+    MergeAffinityMatrix(kcf_affinity_matrix, affinity_matrix);
 
     // Matching
     std::unordered_map<int, int> local_matching;
     std::unordered_set<int> local_matched_detected;
-    matrix_matching(affinity_matrix, local_matching, local_matched_detected);
+    MatrixMatchings(affinity_matrix, local_matching, local_matched_detected);
 
     // Tracker and ID management
-    tracker_and_id_management(local_matching, local_matched_detected, detected,
-                              _tracked, _next_tracked_id, id_mapping, _frame_cnt);
+    ManageTrackerAndID(local_matching, local_matched_detected, detected,
+                       tracks_, next_track_id_, id_mapping, frame_idx_);
 
     // Update information used in tracks for the next frame
-    _cs2d_tracker.update_tracked(img, detected, _tracked);
-    if (_with_dl_feature) _dlf_tracker.update_tracked(img, detected, _tracked);
-    _kcf_tracker.update_tracked(img, detected, _tracked);
+    cs2d_tracker_.UpdateTracked(img, detected, tracks_);
+    if (dl_feature_) dlf_tracker_.UpdateTracked(img, detected, tracks_);
+    kcf_tracker_.UpdateTracked(img, detected, tracks_);
 
-    // Output: Id mapping from detected id to tracked id
-    for (auto obj_ptr: *tracked_objects) {
-
-        obj_ptr->latest_tracked_time = timestamp;
+    for (auto obj_ptr: *objects) {
+        obj_ptr->last_track_timestamp = timestamp;
 
         if (id_mapping.find(obj_ptr->id) != id_mapping.end()) {
             obj_ptr->track_id = id_mapping[obj_ptr->id];
         }
-        else {
-            // Should not happen since every detected object will have a tracked ID
-            XLOG(WARN) << "WARN: Detection" << obj_ptr->id << " has no tracking ID";
+        else { // Should not happen
+            AWARN << "Det: " << obj_ptr->id << " has no tracking ID";
             obj_ptr->track_id = -1;
         }
     }
@@ -126,7 +105,7 @@ bool CascadedCameraTracker::Associate(const cv::Mat &img, const float& timestamp
 }
 
 std::string CascadedCameraTracker::Name() const {
-    return "CascadedCameraTracker";
+  return "CascadedCameraTracker";
 }
 
 REGISTER_CAMERA_TRACKER(CascadedCameraTracker);
