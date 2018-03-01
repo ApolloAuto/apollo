@@ -33,9 +33,9 @@
 namespace apollo {
 namespace perception {
 
-void GetDetectedFromVO(const cv::Size &sz,
+void GetDetectedFromVO(const cv::Size &sz, const float &scale,
                        const std::vector<VisualObjectPtr> &objects,
-                       const float &scale, std::vector<Detected> *detected);
+                       std::vector<Detected> *detected);
 
 void MergeAffinityMatrix(const std::vector<std::vector<float>> &to_merge,
                          std::vector<std::vector<float>> *affinity_matrix);
@@ -47,6 +47,8 @@ void MatrixMatching(const std::vector<std::vector<float>> &affinity_matrix,
                     std::unordered_map<int, int> *local_matching,
                     std::unordered_set<int> *local_matched_detected);
 
+// @brief Create, update and delete tracks, from the matching result
+// ID mapping is done here as well
 void ManageTrackerAndID(const std::unordered_map<int, int> &local_matching,
                         const std::unordered_set<int> &local_matched_detected,
                         const std::vector<Detected> &detected,
