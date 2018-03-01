@@ -163,12 +163,12 @@ void MatrixMatching(const std::vector<std::vector<float>> &affinity_matrix,
   }
 }
 
-void ManageTrackerAndID(const std::unordered_map<int, int> &local_matching,
-                        const std::unordered_set<int> &local_matched_detected,
-                        const std::vector<Detected> &detected,
-                        const int &frame_idx, const float &timestamp,
-                        std::vector<Tracked> *tracked, int *next_tracked_id,
-                        std::unordered_map<int, std::pair<int, float>> *id_mapping) {
+void ManageTrackerAndID(
+    const std::unordered_map<int, int> &local_matching,
+    const std::unordered_set<int> &local_matched_detected,
+    const std::vector<Detected> &detected, const int &frame_idx,
+    const float &timestamp, std::vector<Tracked> *tracked, int *next_tracked_id,
+    std::unordered_map<int, std::pair<int, float>> *id_mapping) {
   id_mapping->clear();
   std::vector<Tracked> new_tracked;
   const int kMaxKeptFrame = 10;
@@ -224,7 +224,7 @@ void ManageTrackerAndID(const std::unordered_map<int, int> &local_matching,
       (*id_mapping)[d_id] = std::make_pair(*next_tracked_id, timestamp);
       trackedID_to_detectedID[*next_tracked_id] = detected[i].detect_id_;
 
-      ++(*next_tracked_id); // ID management
+      ++(*next_tracked_id);  // ID management
     }
   }
 
