@@ -198,17 +198,18 @@ double TrajectoryEvaluator::LatOffsetCost(
 double TrajectoryEvaluator::LatComfortCost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory,
     const std::shared_ptr<Trajectory1d>& lat_trajectory) const {
-  double cost_sqr_sum = 0.0;
-  double cost_abs_sum = 0.0;
+  double max_cost = 0.0;
   for (double t = 0.0; t < FLAGS_trajectory_time_length;
        t += FLAGS_trajectory_time_resolution) {
     double s = lon_trajectory->Evaluate(0, t);
-    double cost = lat_trajectory->Evaluate(1, s) *
-                  lon_trajectory->Evaluate(1, t) / FLAGS_default_cruise_speed;
-    cost_sqr_sum += cost * cost;
-    cost_abs_sum += std::abs(cost);
+    double s_dot = lon_trajectory->Evaluate(1, t);
+    double s_dotdot = lon_trajectory->Evaluate(2, t);
+    double l_prime = lat_trajectory->Evaluate(1, s);
+    double l_primeprime = lat_trajectory->Evaluate(2, s);
+    double cost = l_primeprime * s_dot * s_dot + l_prime * s_dotdot;
+    max_cost = std::max(max_cost, std::abs(cost));
   }
-  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
+  return max_cost;
 }
 
 double TrajectoryEvaluator::LonComfortCost(
