@@ -93,7 +93,7 @@ void NavigationLane::MergeNavigationLineAndLaneMarker(
 
   const double len = std::fmin(
       navigation_path.path_point(navigation_path.path_point_size() - 1).s(),
-      lane_marker_path.path_point(navigation_path.path_point_size() - 1).s());
+      lane_marker_path.path_point(lane_marker_path.path_point_size() - 1).s());
 
   const double ds = 1.0;
   int navigation_index = 0;
