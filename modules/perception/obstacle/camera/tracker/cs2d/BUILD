@@ -7,7 +7,7 @@ cc_library(
     srcs = ["cs2d_affinity_tracker.cc"],
     hdrs =  glob(["*.h"]),
     deps = [
-        "//modules/perception/obstacle/camera/tracker:perception_obstacle_camera_tracker_cascaded"
+        "//modules/perception/obstacle/camera/tracker:camera_tracker_cascaded"
     ]
 )
 
