@@ -88,8 +88,8 @@ bool CS2DAffinityTracker::GetAffinityMatrix(
 }
 // TODO(unknown): dummy implementation for pure virtual method in base class
 bool CS2DAffinityTracker::UpdateTracked(const cv::Mat &img,
-                                         const std::vector<Detected> &detected,
-                                         std::vector<Tracked> *tracked) {
+                                        const std::vector<Detected> &detected,
+                                        std::vector<Tracked> *tracked) {
   return true;
 }
 

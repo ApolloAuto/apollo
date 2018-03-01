@@ -34,9 +34,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_KCF_COMPONENTS_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_KCF_COMPONENTS_H_
 
-#include <opencv2/opencv.hpp>
 #include <algorithm>
 #include <cmath>
+#include <opencv2/opencv.hpp>
 #include <vector>
 
 #include "modules/perception/obstacle/camera/tracker/base_affinity_tracker.h"

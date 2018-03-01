@@ -20,57 +20,56 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_CASCADED_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_CASCADED_H_
 
-#include <opencv2/opencv.hpp>
-#include <map>
-#include <vector>
 #include <algorithm>
+#include <map>
+#include <opencv2/opencv.hpp>
+#include <vector>
 
-#include "modules/common/macro.h"
 #include "modules/common/log.h"
+#include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_tracker.h"
 #include "modules/perception/obstacle/camera/tracker/base_affinity_tracker.h"
 #include "modules/perception/obstacle/camera/tracker/cascaded_camera_tracker_util.h"
+#include "modules/perception/obstacle/camera/tracker/cs2d/cs2d_affinity_tracker.h"
 #include "modules/perception/obstacle/camera/tracker/dlf/dlf_affinity_tracker.h"
 #include "modules/perception/obstacle/camera/tracker/kcf/kcf_affinity_tracker.h"
-#include "modules/perception/obstacle/camera/tracker/cs2d/cs2d_affinity_tracker.h"
 
 namespace apollo {
 namespace perception {
 
 class CascadedCameraTracker : public BaseCameraTracker {
-public:
+ public:
+  CascadedCameraTracker() : BaseCameraTracker() {}
 
-    CascadedCameraTracker() : BaseCameraTracker() {}
+  virtual ~CascadedCameraTracker() {}
 
-    virtual ~CascadedCameraTracker() {}
+  bool Init() override;
 
-    bool Init() override;
+  bool Associate(const cv::Mat& img, const float& timestamp,
+                 std::vector<VisualObjectPtr>* objects) override;
 
-     bool Associate(const cv::Mat &img, const float& timestamp,
-                    std::vector<VisualObjectPtr>* objects) override;
+  std::string Name() const override;
 
-    std::string Name() const override;
+ private:
+  bool dl_feature_ = true;
 
-private:
-    bool dl_feature_ = true;
+  // Trackers for different stages
+  CS2DAffinityTracker cs2d_tracker_;
+  DLFAffinityTracker dlf_tracker_;
+  KCFAffinityTracker kcf_tracker_;
 
-    // Trackers for different stages
-    CS2DAffinityTracker cs2d_tracker_;
-    DLFAffinityTracker dlf_tracker_;
-    KCFAffinityTracker kcf_tracker_;
+  // Tracking and ID management
+  std::vector<Tracked> tracks_;
+  int frame_idx_ = 0;
+  int next_track_id_ = 0;
+  const int kKeptFrameCnt = 10;  // Latent space of potential tracks
 
-    // Tracking and ID management
-    std::vector<Tracked> tracks_;
-    int frame_idx_ = 0;
-    int next_track_id_ = 0;
-    const int kKeptFrameCnt = 10; // Latent space of potential tracks
-
-    DISALLOW_COPY_AND_ASSIGN(CascadedCameraTracker);
+  DISALLOW_COPY_AND_ASSIGN(CascadedCameraTracker);
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif // MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_CASCADED_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_CASCADED_H_
