@@ -57,6 +57,9 @@ void PrintAffinityMatrix(const std::vector<std::vector<float>> &affinity_matrix,
                          const std::vector<Tracked> &tracked,
                          const std::vector<Detected> &detected);
 
+cv::Rect EnlargeBox(const cv::Size &img_size, const float &scale,
+                    const cv::Rect &box);
+
 }  // namespace perception
 }  // namespace apollo
 

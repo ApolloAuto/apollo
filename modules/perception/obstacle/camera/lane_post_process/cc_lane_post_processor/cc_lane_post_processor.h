@@ -19,7 +19,6 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_H_
 
-//#include <gflags/gflags.h>
 #include <Eigen/Core>
 #include <opencv2/opencv.hpp>
 
@@ -30,7 +29,7 @@
 
 #include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-//#include "modules/perception/obstacle/camera/common/util.h"
+#include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/interface/base_lane_post_processor.h"
 #include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/lane_frame.h"
 

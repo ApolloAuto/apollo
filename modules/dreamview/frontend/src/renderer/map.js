@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import {MAP_WS} from "store/websocket";
+import STORE from "store";
+import { MAP_WS } from "store/websocket";
 
 import {
     drawSegmentsFromPoints,
@@ -49,6 +50,7 @@ export default class Map {
         this.laneHeading = {};
         this.overlapMap = {};
         this.initialized = false;
+        this.elementKindsDrawn = '';
     }
 
     // The result will be the all the elements in current but not in data.
@@ -57,6 +59,10 @@ export default class Map {
         let empty = true;
 
         for (const kind in elementIds) {
+            if (!this.shouldDrawThisElementKind(kind)) {
+                continue;
+            }
+
             result[kind] = [];
             const newIds = elementIds[kind];
             const oldData = data[kind];
@@ -381,16 +387,22 @@ export default class Map {
         const newData = {};
 
         for (const kind in this.data) {
+            const drawThisKind = this.shouldDrawThisElementKind(kind);
             newData[kind] = [];
             const oldDataOfThisKind = this.data[kind];
             const currentIds = elementIds[kind];
             oldDataOfThisKind.forEach(oldData => {
-                if (currentIds && currentIds.includes(oldData.id.id)) {
+                if (drawThisKind && currentIds && currentIds.includes(oldData.id.id)) {
                     newData[kind].push(oldData);
                 } else {
-                    this.removeDrewObjects(oldData.drewObjects, scene);
-                    if (kind === 'lane') {
+                    if (kind !== "overlap") {
+                        this.removeDrewObjects(oldData.drewObjects, scene);
+                    }
+                    if (kind === "lane") {
                         delete this.laneHeading[oldData.id.id];
+                    }
+                    if (kind === "overlap") {
+                        delete this.overlapMap[oldData.id.id];
                     }
                 }
             });
@@ -472,10 +484,27 @@ export default class Map {
         }
     }
 
+    shouldDrawThisElementKind(kind) {
+        // Ex: mapping 'lane' to 'showMapLane' option
+        const optionName = `showMap${kind[0].toUpperCase()}${kind.slice(1)}`;
+
+        // NOTE: return true if the option is not found
+        return STORE.options[optionName] !== false;
+    }
+
     updateIndex(hash, elementIds, scene) {
-        if (hash !== this.hash) {
+        let newElementKindsDrawn = '';
+        for (const kind of Object.keys(elementIds).sort()) {
+            if (this.shouldDrawThisElementKind(kind)) {
+                newElementKindsDrawn += kind;
+            }
+        }
+
+        if (hash !== this.hash || this.elementKindsDrawn !== newElementKindsDrawn) {
             this.hash = hash;
+            this.elementKindsDrawn = newElementKindsDrawn;
             const diff = this.diffMapElements(elementIds, this.data);
+            this.removeExpiredElements(elementIds, scene);
             if (!_.isEmpty(diff) || !this.initialized) {
                 MAP_WS.requestMapData(diff);
                 this.initialized = true;

@@ -25,6 +25,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/map/relative_map/common/relative_map_gflags.h"
 
 namespace apollo {
 namespace relative_map {
@@ -44,19 +45,25 @@ void NavigationLane::SetConfig(const NavigationLaneConfig& config) {
 }
 
 bool NavigationLane::GeneratePath() {
-  // update adc_state_ from VehicleStateProvider
-  adc_state_ = VehicleStateProvider::instance()->vehicle_state();
+  // original_pose is in world coordination: ENU
+  original_pose_ = VehicleStateProvider::instance()->original_pose();
 
   navigation_path_.Clear();
   auto* path = navigation_path_.mutable_path();
   const auto& lane_marker = perception_obstacles_.lane_marker();
 
-  if (std::fmin(lane_marker.left_lane_marker().quality(),
+  // priority: merge > navigation line > perception lane marker
+  if (navigation_info_.navigation_path_size() > 0 &&
+      std::fmin(lane_marker.left_lane_marker().quality(),
                 lane_marker.right_lane_marker().quality()) >
-      config_.min_lane_marker_quality()) {
-    ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
+          config_.min_lane_marker_quality()) {
+    MergeNavigationLineAndLaneMarker(perception_obstacles_.lane_marker(), path);
   } else if (navigation_info_.navigation_path_size() > 0) {
     ConvertNavigationLineToPath(path);
+  } else if (std::fmin(lane_marker.left_lane_marker().quality(),
+                       lane_marker.right_lane_marker().quality()) >
+             config_.min_lane_marker_quality()) {
+    ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
   } else {
     AERROR << "Navigation Path is empty because neither lane markers nor "
               "navigation line are available.";
@@ -69,6 +76,78 @@ double NavigationLane::EvaluateCubicPolynomial(const double c0, const double c1,
                                                const double c2, const double c3,
                                                const double z) const {
   return ((c3 * z + c2) * z + c1) * z + c0;
+}
+
+void NavigationLane::MergeNavigationLineAndLaneMarker(
+    const perception::LaneMarkers& lane_marker, common::Path* path) {
+  CHECK_NOTNULL(path);
+
+  common::Path navigation_path;
+  ConvertNavigationLineToPath(&navigation_path);
+
+  common::Path lane_marker_path;
+  ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(),
+                          &lane_marker_path);
+
+  const double len = std::fmin(
+      navigation_path.path_point(navigation_path.path_point_size() - 1).s(),
+      lane_marker_path.path_point(navigation_path.path_point_size() - 1).s());
+
+  const double ds = 1.0;
+  int navigation_index = 0;
+  int lane_marker_index = 0;
+  for (double s = 0.0; s < len; s += ds) {
+    auto p1 = GetPathPointByS(navigation_path, navigation_index, s,
+                              &navigation_index);
+    auto p2 = GetPathPointByS(lane_marker_path, lane_marker_index, s,
+                              &lane_marker_index);
+    auto* p = path->add_path_point();
+    p->set_x((p1.x() + p2.x()) / 2.0);
+    p->set_y((p1.y() + p2.y()) / 2.0);
+    p->set_theta((p1.theta() + p2.theta()) / 2.0);
+    p->set_kappa((p1.kappa() + p2.kappa()) / 2.0);
+    p->set_dkappa((p1.dkappa() + p2.dkappa()) / 2.0);
+  }
+}
+
+common::PathPoint NavigationLane::GetPathPointByS(const common::Path& path,
+                                                  const int start_index,
+                                                  const double s,
+                                                  int* matched_index) {
+  CHECK_NOTNULL(matched_index);
+
+  constexpr double kEpsilon = 1e-9;
+  if (std::fabs(path.path_point(start_index).s() - s) < kEpsilon) {
+    *matched_index = start_index;
+    return path.path_point(start_index);
+  }
+  int i = start_index;
+  while (i + 1 < path.path_point_size() && path.path_point(i + 1).s() < s) {
+    ++i;
+  }
+  *matched_index = i;
+
+  // x, y, z, theta, kappa, s, dkappa, ddkappa
+  const double r = (s - path.path_point(i).s()) /
+                   (path.path_point(i + 1).s() - path.path_point(i).s());
+  const double x =
+      path.path_point(i).x() * (1 - r) + path.path_point(i + 1).x() * r;
+  const double y =
+      path.path_point(i).y() * (1 - r) + path.path_point(i + 1).y() * r;
+  const double z =
+      path.path_point(i).z() * (1 - r) + path.path_point(i + 1).z() * r;
+  const double theta =
+      path.path_point(i).theta() * (1 - r) + path.path_point(i + 1).theta() * r;
+  const double kappa =
+      path.path_point(i).kappa() * (1 - r) + path.path_point(i + 1).kappa() * r;
+  const double dkappa = path.path_point(i).dkappa() * (1 - r) +
+                        path.path_point(i + 1).dkappa() * r;
+  const double ddkappa = path.path_point(i).ddkappa() * (1 - r) +
+                         path.path_point(i + 1).ddkappa() * r;
+
+  auto p = common::util::MakePathPoint(x, y, z, theta, kappa, dkappa, ddkappa);
+  p.set_s(s);
+  return p;
 }
 
 void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
@@ -88,8 +167,8 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
   int curr_project_index = last_project_index_;
 
   // offset between the current vehicle state and navigation line
-  const double dx = -navigation_path.path_point(curr_project_index).x();
-  const double dy = -navigation_path.path_point(curr_project_index).y();
+  const double dx = -original_pose_.position().x();
+  const double dy = -original_pose_.position().y();
   for (int i = curr_project_index; i < navigation_path.path_point_size(); ++i) {
     auto* point = path->add_path_point();
     point->CopyFrom(navigation_path.path_point(i));
@@ -100,7 +179,7 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
 
     double flu_x = 0.0;
     double flu_y = 0.0;
-    common::math::RotateAxis(adc_state_.heading(), emu_x, emu_y, &flu_x,
+    common::math::RotateAxis(original_pose_.heading(), emu_x, emu_y, &flu_x,
                              &flu_y);
 
     point->set_x(flu_x);
@@ -110,8 +189,7 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path* path) {
         navigation_path.path_point(curr_project_index).s();
     point->set_s(accumulated_s);
 
-    constexpr double kMaxAccumulatedS = 100.0;
-    if (accumulated_s > kMaxAccumulatedS) {
+    if (accumulated_s > FLAGS_max_len_from_navigation_line) {
       break;
     }
   }
@@ -129,13 +207,13 @@ void NavigationLane::UpdateProjectionIndex() {
   int index = 0;
   double min_d = std::numeric_limits<double>::max();
   for (int i = last_project_index_; i + 1 < path.path_point_size(); ++i) {
-    const double d = DistanceXY(adc_state_, path.path_point(i));
+    const double d = DistanceXY(original_pose_.position(), path.path_point(i));
     if (d < min_d) {
       min_d = d;
       index = i;
     }
     const double kMaxDistance = 50.0;
-    if (d > kMaxDistance) {
+    if (last_project_index_ != 0 && d > kMaxDistance) {
       break;
     }
   }

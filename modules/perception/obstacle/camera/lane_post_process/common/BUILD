@@ -38,6 +38,7 @@ cc_library(
     hdrs = ["projector.h"],
     deps = [
         "//modules/common:log",
+        "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/obstacle/camera/common:perception_obstacle_camera_common",
         "@eigen//:eigen",
         "@opencv2//:core",
