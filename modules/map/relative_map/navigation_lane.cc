@@ -53,12 +53,14 @@ bool NavigationLane::GeneratePath() {
   const auto& lane_marker = perception_obstacles_.lane_marker();
 
   // priority: merge > navigation line > perception lane marker
-  if (navigation_info_.navigation_path_size() > 0 &&
+  if (FLAGS_enable_navigation_line &&
+      navigation_info_.navigation_path_size() > 0 &&
       std::fmin(lane_marker.left_lane_marker().quality(),
                 lane_marker.right_lane_marker().quality()) >
           config_.min_lane_marker_quality()) {
     MergeNavigationLineAndLaneMarker(perception_obstacles_.lane_marker(), path);
-  } else if (navigation_info_.navigation_path_size() > 0) {
+  } else if (FLAGS_enable_navigation_line &&
+             navigation_info_.navigation_path_size() > 0) {
     ConvertNavigationLineToPath(path);
   } else if (std::fmin(lane_marker.left_lane_marker().quality(),
                        lane_marker.right_lane_marker().quality()) >
