@@ -89,22 +89,17 @@ const int kDelayTime(0);
 enum MarkerShapeType {
   POINT = 0,
   LINE_SEGMENT,
-  POLYNOMIAL,
 };
 
 enum SpaceType {
   IMAGE = 0,
-  EGO_CAR,
-  IPM,
   VEHICLE,
 };
 
 typedef Eigen::Matrix<ScalarType, 2, 1> Vector2D;
 
 enum AssociationMethod {
-  GREEDY_SEARCH = 0,
-  GREEDY_SLIDING_WINDOW,
-  GREEDY_GROUP_CONNECT,
+  GREEDY_GROUP_CONNECT = 0,
 };
 
 struct AssociationParam {
@@ -228,124 +223,18 @@ struct LaneInstance {
     bounds = box;
   }
 
-  static bool compare_siz(const LaneInstance &a, const LaneInstance &b) {
+  static bool CompareSiz(const LaneInstance &a, const LaneInstance &b) {
     return a.siz > b.siz;
   }
 
-  static bool compare_bound(const LaneInstance &a, const LaneInstance &b) {
+  static bool CompareBound(const LaneInstance &a, const LaneInstance &b) {
     return a.bounds(0) < b.bounds(0);  // x_min
   }
 
-  bool has_overlap(const LaneInstance &a) {
+  bool HasOverlap(const LaneInstance &a) {
     return a.bounds(0) <= this->bounds(2) && a.bounds(2) >= this->bounds(0);
   }
 };
-
-struct CCLanePoint {
-  Vector2D pos;
-  Vector2D orie;
-  ScalarType angle;
-  Vector2D image_pos;
-  ScalarType confidence;
-  int frame_id;
-  ScalarType score;
-  int point_id;
-  Eigen::Matrix<ScalarType, 1, MAX_POLY_ORDER + 1> power_x;
-
-  CCLanePoint()
-      : pos(0.0, 0.0),
-        orie(1.0, 0.0),
-        angle(0.0),
-        image_pos(0.0, 0.0),
-        confidence(1.0),
-        frame_id(-1),
-        score(0.0),
-        point_id(-1) {
-    power_x.setZero();
-  }
-
-  static bool compare_score(const CCLanePoint &a, const CCLanePoint &b) {
-    return a.score > b.score;
-  }
-};
-
-struct CCLaneSegment {
-  ScalarType start;
-  ScalarType end;
-  std::vector<std::shared_ptr<CCLanePoint>> points;
-  PolyModel model;
-  int order;
-
-  CCLaneSegment()
-      : start(std::numeric_limits<ScalarType>::max()),
-        end(-std::numeric_limits<ScalarType>::max()) {
-    model.setZero();
-    order = 0;
-  }
-
-  void add_point(const std::shared_ptr<CCLanePoint> &p) {
-    points.push_back(p);
-    start = std::min(start, p->pos(0));
-    end = std::max(end, p->pos(0));
-  }
-};
-
-struct CCLaneTrack {
-  SpaceType space_type;
-  std::vector<CCLaneSegment> segments;
-  size_t tot_point_num;
-  Eigen::Matrix<ScalarType, Eigen::Dynamic, 1> y_values;
-  ScalarType lateral_dist;
-  Bbox bbox;
-
-  CCLaneTrack() : space_type(SpaceType::EGO_CAR) {
-    tot_point_num = 0;
-    segments.clear();
-    lateral_dist = 0.0;
-    bbox << std::numeric_limits<ScalarType>::max(),  // x_min
-        std::numeric_limits<ScalarType>::max(),      // y_min
-        -std::numeric_limits<ScalarType>::max(),     // x_max
-        -std::numeric_limits<ScalarType>::max();     // y_max
-  }
-
-  Bbox compute_bound() {
-    bbox(0) = std::numeric_limits<ScalarType>::max();   // x_min
-    bbox(1) = std::numeric_limits<ScalarType>::max();   // y_min
-    bbox(2) = -std::numeric_limits<ScalarType>::max();  // x_max
-    bbox(3) = -std::numeric_limits<ScalarType>::max();  // y_max
-
-    for (auto it_segment = segments.begin(); it_segment != segments.end();
-         ++it_segment) {
-      for (size_t i = 0; i < it_segment->points.size(); ++i) {
-        bbox(0) = std::min(it_segment->points[i]->pos(0), bbox(0));
-        bbox(1) = std::min(it_segment->points[i]->pos(1), bbox(1));
-        bbox(2) = std::max(it_segment->points[i]->pos(0), bbox(2));
-        bbox(3) = std::max(it_segment->points[i]->pos(1), bbox(3));
-      }
-    }
-    return bbox;
-  }
-
-  ScalarType size() const {
-    return std::max(bbox(2) - bbox(0), bbox(3) - bbox(1));
-  }
-
-  ScalarType x_min() const {
-    return bbox(0);
-  }
-  ScalarType y_min() const {
-    return bbox(1);
-  }
-  ScalarType x_max() const {
-    return bbox(2);
-  }
-  ScalarType y_max() const {
-    return bbox(3);
-  }
-};
-
-typedef std::shared_ptr<CCLaneTrack> CCLaneTrackPtr;
-typedef const std::shared_ptr<CCLaneTrack> CCLaneTrackConstPtr;
 
 struct L3CubicCurve {
   float x_start;
@@ -403,7 +292,7 @@ struct LaneObject {
     confidence.reserve(100);
   }
 
-  std::string get_spatial_label() const {
+  std::string GetSpatialLabel() const {
     switch (spatial) {
       case SpatialLabelType::L_0:
         return "L0";
@@ -471,7 +360,7 @@ struct LaneObject {
   }
   */
 
-  void copy_to(LaneObject* new_lane_object) {
+  void CopyTo(LaneObject* new_lane_object) {
     new_lane_object->point_num = point_num;
     new_lane_object->spatial = spatial;
     new_lane_object->semantic = semantic;

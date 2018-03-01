@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-// @brief: connected component analysis for lane detection
-
 #include <algorithm>
 #include <cmath>
 #include <limits>

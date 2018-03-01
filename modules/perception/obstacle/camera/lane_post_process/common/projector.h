@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 // brief: image space to ego-car ground space projection
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_PROJECTOR_H_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_PROJECTOR_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_PROJECTOR_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_PROJECTOR_H_
 
 #include <cmath>
 #include <Eigen/Eigen>
@@ -30,161 +30,143 @@
 namespace apollo {
 namespace perception {
 
-//#define _DEBUG false
-
 template <typename T>
 class Projector {
  public:
   Projector();
 
-  bool init(const cv::Rect &roi, const T &max_distance = 200.0,
+  bool Init(const cv::Rect &roi, const T &max_distance = 200.0,
             bool visualize = false);
 
-  bool uv_2_xy(const T &u, const T &v, Eigen::Matrix<T, 2, 1> *p) const;
+  bool UvToXy(const T &u, const T &v, Eigen::Matrix<T, 2, 1> *p) const;
 
-  bool uv_2_xy(const int &u, const int &v, Eigen::Matrix<T, 2, 1> *p) const {
-    return uv_2_xy(static_cast<T>(u), static_cast<T>(v), p);
-  }
-
-  Eigen::Affine3d _camera_ex;
-  Eigen::Affine3d _camera_to_ego_car;
-
-  bool is_init() const {
-    return _is_init;
+  bool UvToXy(const int &u, const int &v, Eigen::Matrix<T, 2, 1> *p) const {
+    return UvToXy(static_cast<T>(u), static_cast<T>(v), p);
   }
 
-  bool is_valid_uv(const int &x, const int &y) const {
-    return is_valid_uv(static_cast<T>(x), static_cast<T>(y));
+  //Eigen::Affine3d camera_ex_;
+  //Eigen::Affine3d camera_to_ego_car_;
+
+  bool is_init() const { return is_init_; }
+
+  bool IsValidUv(const int &x, const int &y) const {
+    return IsValidUv(static_cast<T>(x), static_cast<T>(y));
   }
 
-  bool is_valid_uv(const T &x, const T &y) const;
+  bool IsValidUv(const T &x, const T &y) const;
 
-  bool is_valid_xy(const T &x, const T &y) const {
-    return x >= _xy_xmin && x <= _xy_xmax && y >= _xy_ymin && y <= _xy_ymax;
-  }
-
-  bool is_vis() const {
-    return _is_vis;
-  }
-  T x_step() const {
-    return _x_step;
-  }
-  T y_step() const {
-    return _y_step;
-  }
-  T xy_image_xmin() const {
-    return _xy_image_xmin;
-  }
-  T xy_image_xmax() const {
-    return _xy_image_xmax;
-  }
-  T xy_image_ymin() const {
-    return _xy_image_ymin;
-  }
-  T xy_image_ymax() const {
-    return _xy_image_ymax;
+  bool IsValidUv(const T &x, const T &y) const {
+    return x >= xy_xmin_ && x <= xy_xmax_ && y >= xy_ymin_ && y <= xy_ymax_;
   }
 
-  bool is_valid_xy_in_xy_image(const T &x, const T &y) const {
-    return x >= _xy_image_xmin && x <= _xy_image_xmax && y >= _xy_image_ymin &&
-           y <= _xy_image_ymax;
+  bool is_vis() const { return is_vis_; }
+  T x_step() const { return x_step_; }
+  T y_step() const { return y_step_; }
+  T xy_image_xmin() const { return xy_image_xmin_; }
+  T xy_image_xmax() const { return xy_image_xmax_; }
+  T xy_image_ymin() const { return xy_image_ymin_; }
+  T xy_image_ymax() const { return xy_image_ymax_; }
+
+  bool IsValidXyInXyImage(const T &x, const T &y) const {
+    return x >= xy_image_xmin_ && x <= xy_image_xmax_ &&
+           y >= xy_image_ymin_ && y <= xy_image_ymax_;
   }
 
   int xy_image_cols() const {
-    CHECK(_is_init) << "Error: projector is not initialized.";
-    return _xy_image_cols;
+    //CHECK(_is_init) << "Error: projector is not initialized.";
+    return xy_image_cols_;
   }
 
   int xy_image_rows() const {
-    CHECK(_is_init) << "Error: projector is not initialized.";
-    return _xy_image_rows;
+    //CHECK(_is_init) << "Error: projector is not initialized.";
+    return xy_image_rows_;
   }
 
-  bool xy_2_xy_image_point(const T &x, const T &y, cv::Point *p) const;
-  bool xy_2_xy_image_point(const Eigen::Matrix<T, 2, 1> &pos,
-                           cv::Point *p) const {
-    return xy_2_xy_image_point(pos.x(), pos.y(), p);
+  bool XyToXyImagePoint(const T &x, const T &y, cv::Point *p) const;
+  bool XyToXyImagePoint(const Eigen::Matrix<T, 2, 1> &pos,
+                        cv::Point *p) const {
+    return XyToXyImagePoint(pos.x(), pos.y(), p);
   }
 
-  bool uv_2_xy_image_point(const T &u, const T &v, cv::Point *p) const;
+  bool UvToXyImagePoint(const T &u, const T &v, cv::Point *p) const;
 
-  bool uv_2_xy_image_point(const int &u, const int &v, cv::Point *p) const {
-    return uv_2_xy_image_point(static_cast<T>(u), static_cast<T>(v), p);
+  bool UvToXyImagePoint(const int &u, const int &v, cv::Point *p) const {
+    return UvToXyImagePoint(static_cast<T>(u), static_cast<T>(v), p);
   }
 
  protected:
-  bool project(T u, T v, Eigen::Matrix<T, 2, 1> *xy_point);
+  bool Project(const T &u, const T &v, Eigen::Matrix<T, 2, 1> *xy_point);
 
  private:
-  Eigen::Matrix<T, 3, 3> _trans_mat;
+  Eigen::Matrix<T, 3, 3> trans_mat_;
 
   // for visualizing IPM image
-  std::vector<Eigen::Matrix<T, 2, 1>> _xy_grid;
-  std::vector<cv::Point> _uv_2_xy_image;
-  T _x_step;
-  T _y_step;
-  T _xy_image_xmin;
-  T _xy_image_xmax;
-  int _xy_image_cols;
-  T _xy_image_ymin;
-  T _xy_image_ymax;
-  int _xy_image_rows;
+  std::vector<Eigen::Matrix<T, 2, 1>> xy_grid_;
+  std::vector<cv::Point> uv_2_xy_image_;
+  T x_step_;
+  T y_step_;
+  T xy_image_xmin_;
+  T xy_image_xmax_;
+  int xy_image_cols_;
+  T xy_image_ymin_;
+  T xy_image_ymax_;
+  int xy_image_rows_;
 
   // ROI limits in IPM space
-  T _xy_xmin;
-  T _xy_ymin;
-  T _xy_xmax;
-  T _xy_ymax;
+  T xy_xmin_;
+  T xy_ymin_;
+  T xy_xmax_;
+  T xy_ymax_;
 
   // ROI bounds in image space
-  T _uv_xmin;
-  T _uv_ymin;
-  T _uv_xmax;
-  T _uv_ymax;
+  T uv_xmin_;
+  T uv_ymin_;
+  T uv_xmax_;
+  T uv_ymax_;
 
-  T _uv_roi_x_step;   // the horizontal direction sampling step of ROI in image
+  T uv_roi_x_step_;   // the horizontal direction sampling step of ROI in image
                       // space
-  T _uv_roi_y_step;   // the vertical direction sampling step of ROI in image
+  T uv_roi_y_step_;   // the vertical direction sampling step of ROI in image
                       // space
-  int _uv_roi_cols;   // the column number of ROI in image space
-  int _uv_roi_rows;   // the row number of ROI in image space
-  int _uv_roi_count;  // the count of ROI sample points
+  int uv_roi_cols_;   // the column number of ROI in image space
+  int uv_roi_rows_;   // the row number of ROI in image space
+  int uv_roi_count_;  // the count of ROI sample points
 
-  std::vector<bool> _valid_xy;
-  std::vector<Eigen::Matrix<T, 2, 1>> _uv_2_xy;
+  std::vector<bool> valid_xy_;
+  std::vector<Eigen::Matrix<T, 2, 1>> uv_2_xy_;
 
-  bool _is_init;
-  bool _is_vis;
+  bool is_init_;
+  bool is_vis_;
 };
 
 template <typename T>
 Projector<T>::Projector() {
-  _xy_xmin = std::numeric_limits<T>::max();
-  _xy_ymin = std::numeric_limits<T>::max();
-  _xy_xmax = -std::numeric_limits<T>::max();
-  _xy_ymax = -std::numeric_limits<T>::max();
+  xy_xmin_ = std::numeric_limits<T>::max();
+  xy_ymin_ = std::numeric_limits<T>::max();
+  xy_xmax_ = -std::numeric_limits<T>::max();
+  xy_ymax_ = -std::numeric_limits<T>::max();
 
-  _uv_xmin = static_cast<T>(0);
-  _uv_ymin = static_cast<T>(0);
-  _uv_xmax = static_cast<T>(0);
-  _uv_ymax = static_cast<T>(0);
+  uv_xmin_ = static_cast<T>(0);
+  uv_ymin_ = static_cast<T>(0);
+  uv_xmax_ = static_cast<T>(0);
+  uv_ymax_ = static_cast<T>(0);
 
-  _uv_roi_x_step = static_cast<T>(1);
-  _uv_roi_y_step = static_cast<T>(1);
+  uv_roi_x_step_ = static_cast<T>(1);
+  uv_roi_y_step_ = static_cast<T>(1);
 
-  _uv_roi_cols = static_cast<int>((_uv_xmax - _uv_xmin) / _uv_roi_x_step) + 1;
-  _uv_roi_rows = static_cast<int>((_uv_ymax - _uv_ymin) / _uv_roi_y_step) + 1;
-  _uv_roi_count = _uv_roi_rows * _uv_roi_cols;
+  uv_roi_cols_ = static_cast<int>((uv_xmax_ - uv_xmin_) / uv_roi_x_step_) + 1;
+  uv_roi_rows_ = static_cast<int>((uv_ymax_ - uv_ymin_) / uv_roi_y_step_) + 1;
+  uv_roi_count_ = uv_roi_rows_ * uv_roi_cols_;
 
-  _is_vis = false;
-  _x_step = static_cast<T>(0.1);
-  _y_step = static_cast<T>(0.1);
+  is_vis_ = false;
+  x_step_ = static_cast<T>(0.1);
+  y_step_ = static_cast<T>(0.1);
 
-  _is_init = false;
+  is_init_ = false;
 }
 
 template <typename T>
-bool Projector<T>::init(const cv::Rect &roi, const T &max_distance,
+bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
                         bool visualize) {
   AINFO << "Initialize projector ...";
 
@@ -195,201 +177,192 @@ bool Projector<T>::init(const cv::Rect &roi, const T &max_distance,
   const config_manager::CameraCalibrationPtr camera_calibration =
       calibration_config_manager->get_camera_calibration();
 
-  _trans_mat = camera_calibration->get_camera2car_homography_mat().cast<T>();
-#if _DEBUG
-  AINFO << "homography matirx: ";
-  for (int i = 0; i < 3; ++i) {
-    AINFO << "              " << _trans_mat(i, 0) << ", "
-          << _trans_mat(i, 1) << ", " << _trans_mat(i, 2) << "\n";
-  }
-#endif
+  trans_mat_ = camera_calibration->get_camera2car_homography_mat().cast<T>();
 
   // set ROI
-  _uv_xmin = static_cast<T>(roi.x);
-  if (_uv_xmin < 0) {
+  uv_xmin_ = static_cast<T>(roi.x);
+  if (uv_xmin_ < 0) {
     AERROR << "invalid ROI x min: " << roi.x;
     return false;
   }
 
-  _uv_ymin = static_cast<T>(roi.y);
-  if (_uv_ymin < 0) {
+  uv_ymin_ = static_cast<T>(roi.y);
+  if (uv_ymin_ < 0) {
     AERROR << "invalid ROI y min: " << roi.y;
     return false;
   }
 
-  _uv_xmax = static_cast<T>(roi.x + roi.width - 1);
-  if (_uv_xmax < 0) {
+  uv_xmax_ = static_cast<T>(roi.x + roi.width - 1);
+  if (uv_xmax_ < 0) {
     AERROR << "invalid ROI x max: " << roi.x + roi.width - 1;
     return false;
   }
 
-  _uv_ymax = static_cast<T>(roi.y + roi.height - 1);
-  if (_uv_ymax < 0) {
+  uv_ymax_ = static_cast<T>(roi.y + roi.height - 1);
+  if (uv_ymax_ < 0) {
     AERROR << "invalid ROI y max: " << roi.y + roi.height - 1;
     return false;
   }
 
   AINFO << "ROI in image space: "
-        << "x_min=" << _uv_xmin << ", "
-        << "x_max=" << _uv_xmax << ", "
-        << "y_min=" << _uv_ymin << ", "
-        << "y_max=" << _uv_ymax << ".";
+        << "x_min=" << uv_xmin_ << ", "
+        << "x_max=" << uv_xmax_ << ", "
+        << "y_min=" << uv_ymin_ << ", "
+        << "y_max=" << uv_ymax_ << ".";
   AINFO << "ROI width = " << roi.width << ", height = " << roi.height;
 
-  _uv_roi_cols = static_cast<int>((_uv_xmax - _uv_xmin) / _uv_roi_x_step) + 1;
-  _uv_roi_rows = static_cast<int>((_uv_ymax - _uv_ymin) / _uv_roi_y_step) + 1;
-  _uv_roi_count = _uv_roi_rows * _uv_roi_cols;
-  AINFO << "sampling step_x (u) = " << _uv_roi_x_step << ", "
-        << "sampling step_y (v) = " << _uv_roi_y_step;
-  AINFO << "ROI #columns = " << _uv_roi_cols << ", "
-        << "#rows = " << _uv_roi_rows;
+  uv_roi_cols_ = static_cast<int>((uv_xmax_ - uv_xmin_) / uv_roi_x_step_) + 1;
+  uv_roi_rows_ = static_cast<int>((uv_ymax_ - uv_ymin_) / uv_roi_y_step_) + 1;
+  uv_roi_count_ = uv_roi_rows_ * uv_roi_cols_;
+  AINFO << "sampling step_x (u) = " << uv_roi_x_step_ << ", "
+        << "sampling step_y (v) = " << uv_roi_y_step_;
+  AINFO << "ROI #columns = " << uv_roi_cols_ << ", "
+        << "#rows = " << uv_roi_rows_;
 
   // do point-wise transform of ROI from image space to ground space
-  _valid_xy.assign(_uv_roi_count, true);
-  _uv_2_xy.resize(_uv_roi_count);
+  valid_xy_.assign(uv_roi_count_, true);
+  uv_2_xy_.resize(uv_roi_count_);
   int count_fail_points = 0;
   int count_too_far_points = 0;
-  T v = _uv_ymin;
-  for (int i = 0; i < _uv_roi_rows; ++i) {
-    T u = _uv_xmin;
-    for (int j = 0; j < _uv_roi_cols; ++j) {
+  T v = uv_ymin_;
+  for (int i = 0; i < uv_roi_rows_; ++i) {
+    T u = uv_xmin_;
+    for (int j = 0; j < uv_roi_cols_; ++j) {
       // point coordinate in image space (x, y)
-      int id = i * _uv_roi_cols + j;
+      int id = i * uv_roi_cols_ + j;
 
       // transform point from image space to ego-car ground space
-      if (!project(u, v, &(_uv_2_xy[id]))) {
-        _valid_xy[id] = false;
+      if (!Project(u, v, &(uv_2_xy_[id]))) {
+        valid_xy_[id] = false;
         ++count_fail_points;
         continue;
       }
 
       // ignore points which is too far away from origin
-      if (_uv_2_xy[id].x() > max_distance || _uv_2_xy[id].y() > max_distance) {
-        _valid_xy[id] = false;
+      if (uv_2_xy_[id].x() > max_distance || uv_2_xy_[id].y() > max_distance) {
+        valid_xy_[id] = false;
         ++count_too_far_points;
         continue;
       }
 
       //
-      if (_uv_2_xy[id].x() < 0) {
-        _valid_xy[id] = false;
+      if (uv_2_xy_[id].x() < 0) {
+        valid_xy_[id] = false;
         ++count_too_far_points;
         continue;
       }
 
       // update xy limits
-      _xy_xmin = std::min(_xy_xmin, _uv_2_xy[id].x());
-      _xy_ymin = std::min(_xy_ymin, _uv_2_xy[id].y());
-      _xy_xmax = std::max(_xy_xmax, _uv_2_xy[id].x());
-      _xy_ymax = std::max(_xy_ymax, _uv_2_xy[id].y());
+      xy_xmin_ = std::min(xy_xmin_, uv_2_xy_[id].x());
+      xy_ymin_ = std::min(xy_ymin_, uv_2_xy_[id].y());
+      xy_xmax_ = std::max(xy_xmax_, uv_2_xy_[id].x());
+      xy_ymax_ = std::max(xy_ymax_, uv_2_xy_[id].y());
 
-      u += _uv_roi_x_step;
+      u += uv_roi_x_step_;
     }
-    v += _uv_roi_y_step;
+    v += uv_roi_y_step_;
   }
   AINFO << "#failed points = " << count_fail_points << " ("
-        << _uv_roi_count << ").";
+        << uv_roi_count_ << ").";
   AINFO << "#too far points = " << count_too_far_points << " ("
-        << _uv_roi_count << ").";
+        << uv_roi_count_ << ").";
   AINFO << " xy limits: "
-        << "x_min=" << _xy_xmin << ", "
-        << "x_max=" << _xy_xmax << ", "
-        << "y_min=" << _xy_ymin << ", "
-        << "y_max=" << _xy_ymax;
+        << "x_min=" << xy_xmin_ << ", "
+        << "x_max=" << xy_xmax_ << ", "
+        << "y_min=" << xy_ymin_ << ", "
+        << "y_max=" << xy_ymax_;
 
-  _is_vis = visualize;
-  if (_is_vis) {
+  is_vis_ = visualize;
+  if (is_vis_) {
     // build a 2D grid in ground plane and
     // find the index mapping for each valid point of image space
-    _xy_image_xmin = std::min(std::floor(_xy_xmin), static_cast<T>(0));
-    _xy_image_xmin = std::max(_xy_image_xmin, -max_distance);
-    _xy_image_xmax = std::max(std::ceil(_xy_xmax), static_cast<T>(0));
-    _xy_image_xmax = std::min(_xy_image_xmax, max_distance);
-    _xy_image_ymin = std::min(std::floor(_xy_ymin), static_cast<T>(0));
-    _xy_image_ymin = std::max(_xy_image_ymin, -max_distance);
-    _xy_image_ymax = std::max(std::ceil(_xy_ymax), static_cast<T>(0));
-    _xy_image_ymax = std::min(_xy_image_ymax, max_distance);
+    xy_image_xmin_ = std::min(std::floor(xy_xmin_), static_cast<T>(0));
+    xy_image_xmin_ = std::max(xy_image_xmin_, -max_distance);
+    xy_image_xmax_ = std::max(std::ceil(xy_xmax_), static_cast<T>(0));
+    xy_image_xmax_ = std::min(xy_image_xmax_, max_distance);
+    xy_image_ymin_ = std::min(std::floor(xy_ymin_), static_cast<T>(0));
+    xy_image_ymin_ = std::max(xy_image_ymin_, -max_distance);
+    xy_image_ymax_ = std::max(std::ceil(xy_ymax_), static_cast<T>(0));
+    xy_image_ymax_ = std::min(xy_image_ymax_, max_distance);
 
-    _x_step = max_distance / static_cast<T>(1000);
-    _y_step = max_distance / static_cast<T>(1000);
+    x_step_ = max_distance / static_cast<T>(1000);
+    y_step_ = max_distance / static_cast<T>(1000);
 
-    _xy_image_cols = static_cast<int>(std::ceil(
-                         (_xy_image_xmax - _xy_image_xmin) / _x_step)) +
-                     1;
-    _xy_image_rows = static_cast<int>(std::ceil(
-                         (_xy_image_ymax - _xy_image_ymin) / _y_step)) +
-                     1;
-    AINFO << "xy_image_xmin = " << _xy_image_xmin
-          << ", xy_image_xmax = " << _xy_image_xmax
-          << ", xy_image_ymin = " << _xy_image_ymin
-          << ", xy_image_ymax = " << _xy_image_ymax;
-    AINFO << "xy_image: step_x=" << _x_step << ", "
-          << "step_y=" << _y_step;
-    AINFO << "xy_image: #cols = " << _xy_image_cols
-          << ", #rows = " << _xy_image_rows;
+    xy_image_cols_ = static_cast<int>(std::ceil(
+                         (xy_image_xmax_ - xy_image_xmin_) / x_step_)) + 1;
+    xy_image_rows_ = static_cast<int>(std::ceil(
+                         (xy_image_ymax_ - xy_image_ymin_) / y_step_)) + 1;
+    AINFO << "xy_image_xmin = " << xy_image_xmin_
+          << ", xy_image_xmax = " << xy_image_xmax_
+          << ", xy_image_ymin = " << xy_image_ymin_
+          << ", xy_image_ymax = " << xy_image_ymax_;
+    AINFO << "xy_image: step_x=" << x_step_ << ", "
+          << "step_y=" << y_step_;
+    AINFO << "xy_image: #cols = " << xy_image_cols_
+          << ", #rows = " << xy_image_rows_;
 
-    _xy_grid.resize(_xy_image_rows * _xy_image_cols);
-    T y = _xy_image_ymax;
-    for (int i = 0; i < _xy_image_rows; i++) {
-      T x = _xy_image_xmin;
-      for (int j = 0; j < _xy_image_cols; j++) {
-        _xy_grid[i * _xy_image_cols + j].x() = x;
-        _xy_grid[i * _xy_image_cols + j].y() = y;
-        x += _x_step;
+    xy_grid_.resize(xy_image_rows_ * xy_image_cols_);
+    T y = xy_image_ymax_;
+    for (int i = 0; i < xy_image_rows_; i++) {
+      T x = xy_image_xmin_;
+      for (int j = 0; j < xy_image_cols_; j++) {
+        xy_grid_[i * xy_image_cols_ + j].x() = x;
+        xy_grid_[i * xy_image_cols_ + j].y() = y;
+        x += x_step_;
       }
-      y = y - _y_step;
+      y = y - y_step_;
     }
 
-    _uv_2_xy_image.resize(_uv_roi_count);
-    T v = _uv_ymin;
-    for (int i = 0; i < _uv_roi_rows; ++i) {
-      T u = _uv_xmin;
-      for (int j = 0; j < _uv_roi_cols; ++j) {
-        int id = i * _uv_roi_cols + j;
-        if (_valid_xy[id]) {
-          xy_2_xy_image_point(static_cast<T>(_uv_2_xy[id].x()),
-                              static_cast<T>(_uv_2_xy[id].y()),
-                              &_uv_2_xy_image[id]);
+    uv_2_xy_image_.resize(uv_roi_count_);
+    T v = uv_ymin_;
+    for (int i = 0; i < uv_roi_rows_; ++i) {
+      T u = uv_xmin_;
+      for (int j = 0; j < uv_roi_cols_; ++j) {
+        int id = i * uv_roi_cols_ + j;
+        if (valid_xy_[id]) {
+          XyToXyImagePoint(static_cast<T>(uv_2_xy_[id].x()),
+                           static_cast<T>(uv_2_xy_[id].y()),
+                           &uv_2_xy_image_[id]);
         } else {
-          _uv_2_xy_image[id].x = -1;
-          _uv_2_xy_image[id].y = -1;
+          uv_2_xy_image_[id].x = -1;
+          uv_2_xy_image_[id].y = -1;
         }
-        u += _uv_roi_x_step;
+        u += uv_roi_x_step_;
       }
-      v += _uv_roi_y_step;
+      v += uv_roi_y_step_;
     }
   }
 
-  _is_init = true;
+  is_init_ = true;
 
   AINFO << "succ. to initialize projector.";
   return true;
 }
 
 template <typename T>
-bool Projector<T>::xy_2_xy_image_point(const T &x, const T &y,
-                                       cv::Point *p) const {
-  if (!is_valid_xy_in_xy_image(x, y)) {
+bool Projector<T>::XyToXyImagePoint(const T &x, const T &y,
+                                    cv::Point *p) const {
+  if (!IsValidXyInXyImage(x, y)) {
     return false;
   }
 
-  int j = static_cast<int>(std::round((x - _xy_image_xmin) / _x_step));
+  int j = static_cast<int>(std::round((x - xy_image_xmin_) / x_step_));
   if (j < 0) {
     return false;
   }
-  if (j >= _xy_image_cols) {
+  if (j >= xy_image_cols_) {
     return false;
   }
 
-  int i = static_cast<int>(std::round((y - _xy_image_ymin) / _y_step));
+  int i = static_cast<int>(std::round((y - xy_image_ymin_) / y_step_));
   if (i < 0) {
     return false;
   }
-  if (i >= _xy_image_rows) {
+  if (i >= xy_image_rows_) {
     return false;
   }
 
-  i = (_xy_image_rows - 1) - i;
+  i = (xy_image_rows_ - 1) - i;
 
   p->x = j;
   p->y = i;
@@ -398,104 +371,105 @@ bool Projector<T>::xy_2_xy_image_point(const T &x, const T &y,
 }
 
 template <typename T>
-bool Projector<T>::is_valid_uv(const T &x, const T &y) const {
-  if (!(x >= _uv_xmin && x <= _uv_xmax && y >= _uv_ymin && y <= _uv_ymax)) {
+bool Projector<T>::IsValidUv(const T &x, const T &y) const {
+  if (!(x >= uv_xmin_ && x <= uv_xmax_ && y >= uv_ymin_ && y <= uv_ymax_)) {
     AINFO << "image point "
           << "(" << x << ", " << y << ")"
           << " is not in ROI: "
-          << "x_min=" << _uv_xmin << ", "
-          << "x_max=" << _uv_xmax << ", "
-          << "y_min=" << _uv_ymin << ", "
-          << "y_max=" << _uv_ymax << ". ";
+          << "x_min=" << uv_xmin_ << ", "
+          << "x_max=" << uv_xmax_ << ", "
+          << "y_min=" << uv_ymin_ << ", "
+          << "y_max=" << uv_ymax_ << ". ";
     return false;
   }
   return true;
 }
 
 template <typename T>
-bool Projector<T>::uv_2_xy(const T &u, const T &v,
-                           Eigen::Matrix<T, 2, 1> *p) const {
+bool Projector<T>::UvToXy(const T &u, const T &v,
+                          Eigen::Matrix<T, 2, 1> *p) const {
   if (p == nullptr) {
     AERROR << "point pointer is null.";
     return false;
   }
-  if (!_is_init) {
+  if (!is_init_) {
     AERROR << "projector is not initialized.";
     return false;
   }
 
-  if (!is_valid_uv(u, v)) {
+  if (!IsValidUv(u, v)) {
     return false;
   }
 
-  int id = static_cast<int>(std::round((v - _uv_ymin) / _uv_roi_y_step)) *
+  int id = static_cast<int>(std::round((v - uv_ymin_) / uv_roi_y_step_)) *
                _uv_roi_cols +
-           static_cast<int>(std::round((u - _uv_xmin) / _uv_roi_x_step));
-  if (id < 0 || id >= _uv_roi_count) {
+           static_cast<int>(std::round((u - uv_xmin_) / uv_roi_x_step_));
+  if (id < 0 || id >= uv_roi_count_) {
     AERROR << "pixel id is not valid: " << id;
     return false;
   }
 
-  if (!_valid_xy.at(id)) {
+  if (!valid_xy_.at(id)) {
     AINFO << "image point "
           << "(" << u << ", " << v << ")"
           << " is not valid for transformation.";
     return false;
   }
 
-  p->x() = _uv_2_xy.at(id).x();
-  p->y() = _uv_2_xy.at(id).y();
+  p->x() = uv_2_xy_.at(id).x();
+  p->y() = uv_2_xy_.at(id).y();
   return true;
 }
 
 template <typename T>
-bool Projector<T>::uv_2_xy_image_point(const T &u, const T &v,
-                                       cv::Point *p) const {
+bool Projector<T>::UvToXyImagePoint(const T &u, const T &v,
+                                    cv::Point *p) const {
   if (p == nullptr) {
     AERROR << "point pointer is null.";
     return false;
   }
-  if (!_is_init) {
+  if (!is_init_) {
     AERROR << "projector is not initialized.";
     return false;
   }
 
-  if (!is_valid_uv(u, v)) {
+  if (!IsValidUv(u, v)) {
     AINFO << "image point "
           << "(" << u << ", " << v << ")"
           << " is not in ROI.";
     return false;
   }
 
-  int id = static_cast<int>(std::round((v - _uv_ymin) / _uv_roi_y_step)) *
-               _uv_roi_cols +
-           static_cast<int>(std::round((u - _uv_xmin) / _uv_roi_x_step));
-  if (id < 0 || id >= _uv_roi_count) {
+  int id = static_cast<int>(std::round((v - uv_ymin_) / uv_roi_y_step_)) *
+               uv_roi_cols_ +
+           static_cast<int>(std::round((u - uv_xmin_) / uv_roi_x_step_));
+  if (id < 0 || id >= uv_roi_count_) {
     AERROR << "pixel id is not valid: " << id;
     return false;
   }
 
-  if (!_valid_xy.at(id)) {
+  if (!valid_xy_.at(id)) {
     AINFO << "image point "
           << "(" << u << ", " << v << ")"
           << " is not valid for transformation.";
     return false;
   }
 
-  p->x = _uv_2_xy_image.at(id).x;
-  p->y = _uv_2_xy_image.at(id).y;
+  p->x = uv_2_xy_image_.at(id).x;
+  p->y = uv_2_xy_image_.at(id).y;
   return true;
 }
 
 template <typename T>
-bool Projector<T>::project(T u, T v, Eigen::Matrix<T, 2, 1> *xy_point) {
+bool Projector<T>::Project(const T &u, const T &v,
+                           Eigen::Matrix<T, 2, 1> *xy_point) {
   if (xy_point == nullptr) {
     AERROR << "xy_point is a null pointer.";
     return false;
   }
 
   Eigen::Matrix<T, 3, 1> uv_point(u, v, static_cast<T>(1));
-  Eigen::Matrix<T, 3, 1> xy_p = _trans_mat * uv_point;
+  Eigen::Matrix<T, 3, 1> xy_p = trans_mat_ * uv_point;
 
   T scale = xy_p(2);
   if (std::abs(scale) < 1e-6) {
@@ -519,4 +493,4 @@ bool Projector<T>::project(T u, T v, Eigen::Matrix<T, 2, 1> *xy_point) {
 }  // perception
 }  // apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_PROJECTOR_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_PROJECTOR_H_
