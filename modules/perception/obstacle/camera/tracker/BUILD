@@ -17,6 +17,7 @@ cc_library(
         ],
     deps =
         [
+          "//modules/common:log",
           "//modules/perception/lib/base",
           "//modules/perception/obstacle/base:perception_obstacle_base",
           "//modules/perception/obstacle/common:perception_obstacle_common",

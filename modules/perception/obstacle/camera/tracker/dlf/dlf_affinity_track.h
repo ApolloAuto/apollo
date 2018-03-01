@@ -23,7 +23,10 @@
 #include <limits>
 #include <unordered_map>
 
-#include "obstacle/camera/tracker/mix_camera_tracker/base_affinity_tracker.h"
+#include "modules/perception/obstacle/camera/common/util.h"
+#include "modules/perception/obstacle/camera/common/visual_object.h"
+#include "modules/perception/obstacle/camera/tracker/base_affinity_tracker.h"
+#include "modules/perception/obstacle/camera/tracker/cascaded_camera_tracker_util.h"
 
 namespace apollo {
 namespace perception {
@@ -35,20 +38,21 @@ public:
 
     virtual ~DLFAffinityTracker() {}
 
-    virtual bool init() override;
+    bool Init() override;
 
-    virtual bool get_affinity_matrix(const cv::Mat &img,
-                                     const std::vector<Tracked> &tracked,
-                                     const std::vector<Detected> &detected,
-                                     std::vector<std::vector<float > > &affinity_matrix) override;
+    bool GetAffinityMatrix(
+        const cv::Mat &img, const std::vector<Tracked> &tracked,
+        const std::vector<Detected> &detected,
+        std::vector<std::vector<float>> *affinity_matrix) override;
 
-    virtual bool update_tracked(const cv::Mat &img, const std::vector<Detected> &detected,
-                                std::vector<Tracked> &tracked) override;
+    bool UpdateTracked(const cv::Mat &img,
+                               const std::vector<Detected> &detected,
+                               std::vector<Tracked> *tracked) override;
 
 private:
-    // TODO Thresholds are fine-tuned detector-dependant values for DL features
-    float _conf_threshold = 0.9f; // 0.85f, 0.9f
-    float _filter_threshold = 0.3f; // 0.75f too high for small objs
+    //  Thresholds are fine-tuned and detector-dependant
+    const float kConfThreshold_ = 0.9f;
+    const float kFilterThreshold_ = 0.3f;
 };
 
 }  // namespace perception
