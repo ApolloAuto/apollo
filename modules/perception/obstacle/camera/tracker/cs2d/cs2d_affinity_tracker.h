@@ -39,7 +39,7 @@ class CS2DAffinityTracker : public BaseAffinityTracker {
       std::vector<std::vector<float>> *affinity_matrix) override;
 
   bool UpdateTracked(const cv::Mat &img, const std::vector<Detected> &detected,
-                      std::vector<Tracked> *tracked) override;
+                     std::vector<Tracked> *tracked) override;
 
  private:
   float sz_lim_ = 0.5f;
