@@ -26,12 +26,15 @@
 #include <algorithm>
 
 #include "modules/common/macro.h"
+#include "modules/common/log.h"
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_tracker.h"
+#include "modules/perception/obstacle/camera/tracker/base_affinity_tracker.h"
 #include "modules/perception/obstacle/camera/tracker/cascaded_camera_tracker_util.h"
 #include "modules/perception/obstacle/camera/tracker/dlf/dlf_affinity_tracker.h"
 #include "modules/perception/obstacle/camera/tracker/kcf/kcf_affinity_tracker.h"
+#include "modules/perception/obstacle/camera/tracker/cs2d/cs2d_affinity_tracker.h"
 
 namespace apollo {
 namespace perception {
