@@ -31,7 +31,10 @@ namespace apollo {
 namespace perception {
 
 // @brief: convert angle from the range of [-pi, pi] to [0, 2*pi]
-inline void rect_angle(ScalarType* theta) {
+inline void RectAngle(ScalarType* theta) {
+  if (theta == NULL) {
+    return;
+  }
   if (*theta < 0) {
     (*theta) += static_cast<ScalarType>(2 * M_PI);
   }
@@ -39,7 +42,7 @@ inline void rect_angle(ScalarType* theta) {
 
 // @brief: fit polynomial function with QR decomposition (using Eigen 3)
 template <typename T = ScalarType>
-bool poly_fit(const std::vector<Eigen::Matrix<T, 2, 1>>& pos_vec,
+bool PolyFit(const std::vector<Eigen::Matrix<T, 2, 1>>& pos_vec,
               const int& order, Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1>* coeff,
               const bool& is_x_axis = true) {
   if (coeff == NULL) {
@@ -85,7 +88,7 @@ bool poly_fit(const std::vector<Eigen::Matrix<T, 2, 1>>& pos_vec,
 
 // @brief: evaluate y value of given x for a polynomial function
 template <typename T = ScalarType>
-T poly_eval(const T& x, const int& order,
+T PolyEval(const T& x, const int& order,
             const Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1>& coeff) {
   int poly_order = order;
   if (order > MAX_POLY_ORDER) {
