@@ -44,8 +44,6 @@ void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   if (latest_feature_ptr->has_width()) {
     obstacle_width = latest_feature_ptr->width();
   }
-  CHECK(latest_feature_ptr->has_velocity_heading());
-  double obstacle_heading = latest_feature_ptr->velocity_heading();
 
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
@@ -59,7 +57,7 @@ void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
     CHECK_NOTNULL(lane_sequence_ptr);
     double probability = ComputeProbability(obstacle_length,
-        obstacle_width, obstacle_heading, *lane_sequence_ptr);
+        obstacle_width, *lane_sequence_ptr);
     lane_sequence_ptr->set_probability(probability);
   }
 }
@@ -67,7 +65,6 @@ void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 double CostEvaluator::ComputeProbability(
     const double obstacle_length,
     const double obstacle_width,
-    const double obstacle_heading,
     const LaneSequence& lane_sequence) {
   if (lane_sequence.lane_segment_size() == 0 ||
       lane_sequence.lane_segment(0).lane_point_size() == 0) {
