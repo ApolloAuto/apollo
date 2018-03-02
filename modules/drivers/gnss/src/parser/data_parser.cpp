@@ -90,7 +90,7 @@ DataParser::DataParser(
       _raw_imu_publisher(
           nh.advertise<apollo::drivers::gnss::Imu>(imu_topic, 64)),
       _imu_publisher(
-          nh.advertise<apollo::localization::CorrectedImu>(corr_imu_topic, 64)),
+          nh.advertise<apollo::localization::Imu>(corr_imu_topic, 64)),
       _nav_odometry_publisher(
           nh.advertise<apollo::localization::Gps>(odometry_topic, 64)),
       _gnss_status_publisher(
@@ -326,8 +326,8 @@ void DataParser::publish_odometry_message(const MessagePtr message) {
 
 void DataParser::publish_corrimu_message(const MessagePtr message) {
   ::apollo::drivers::gnss::Ins *ins = As<::apollo::drivers::gnss::Ins>(message);
-  boost::shared_ptr<::apollo::localization::CorrectedImu> imu(
-      new ::apollo::localization::CorrectedImu());
+  boost::shared_ptr<::apollo::localization::Imu> imu(
+      new ::apollo::localization::Imu());
   if (!imu) {
     ROS_ERROR("New imu failed.");
     return;
