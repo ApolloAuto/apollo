@@ -51,17 +51,22 @@ def draw_lane_boundary(lane, ax, color_val, lane_marker):
         if curve.HasField('line_segment'):
             px = []
             py = []
-            px_lane_marker = []
-            py_lane_marker = []
+
             for p in curve.line_segment.point:
                 px.append(float(p.y))
                 py.append(float(p.x))
-                px_lane_marker.append(evaluate_poly(left_c0, left_c1,
-                                                    left_c2, left_c3,
-                                                    float(p.x)))
-                py_lane_marker.append(float(p.x))
+
             ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
-            ax.plot(px_lane_marker, py_lane_marker, ls='--', c='g', alpha=0.5)
+
+    # draw lane marker
+    px_lane_marker = []
+    py_lane_marker = []
+    for x in range(int(lane_marker.left_lane_marker.view_range)):
+        px_lane_marker.append(-evaluate_poly(left_c0, left_c1,
+                                             left_c2, left_c3,
+                                             float(x)))
+        py_lane_marker.append(float(x))
+    ax.plot(px_lane_marker, py_lane_marker, ls='--', c='g', alpha=0.5)
 
     right_c0 = float(lane_marker.right_lane_marker.c0_position)
     right_c1 = float(lane_marker.right_lane_marker.c1_heading_angle)
@@ -71,17 +76,20 @@ def draw_lane_boundary(lane, ax, color_val, lane_marker):
         if curve.HasField('line_segment'):
             px = []
             py = []
-            px_lane_marker = []
-            py_lane_marker = []
             for p in curve.line_segment.point:
                 px.append(float(p.y))
                 py.append(float(p.x))
-                px_lane_marker.append(evaluate_poly(right_c0, right_c1,
-                                                    right_c2, right_c3,
-                                                    float(p.x)))
-                py_lane_marker.append(float(p.x))
             ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
-            ax.plot(px_lane_marker, py_lane_marker, ls='--', c='g', alpha=0.5)
+
+    # draw lane marker
+    px_lane_marker = []
+    py_lane_marker = []
+    for x in range(int(lane_marker.right_lane_marker.view_range)):
+        px_lane_marker.append(-evaluate_poly(right_c0, right_c1,
+                                             right_c2, right_c3,
+                                             float(x)))
+        py_lane_marker.append(float(x))
+    ax.plot(px_lane_marker, py_lane_marker, ls='--', c='g', alpha=0.5)
 
     if localization_pb is None:
         return
@@ -104,8 +112,8 @@ def draw_lane_boundary(lane, ax, color_val, lane_marker):
         newy = y * math.cos(- heading + 1.570796) + x * math.sin(
             -heading + 1.570796)
 
-        routing_x.append(newx)
-        routing_y.append(-1 * newy)
+        routing_x.append(-1 * newx)
+        routing_y.append(newy)
 
     ax.plot(routing_x, routing_y, c='k')
 
