@@ -22,6 +22,7 @@ cc_library(
         "//modules/perception/lib/base",
         "//modules/perception/lib/pcl_util",
         "//modules/perception/proto:perception_proto",
+        "//modules/perception/obstacle/camera/lane_post_process/common:perception_obstacle_camera_lane_post_process_common_type",
         "@eigen",
         "@opencv2//:core",
     ],

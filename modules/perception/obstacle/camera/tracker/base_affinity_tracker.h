@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,60 +14,42 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_BASE_AFFINITY_TRACKER_H
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_BASE_AFFINITY_TRACKER_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_BASE_AFFINITY_TRACKER_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_BASE_AFFINITY_TRACKER_H_
 
 #include <opencv2/opencv.hpp>
-
 #include <limits>
 #include <vector>
-
 
 namespace apollo {
 namespace perception {
 
 class Tracked {
  public:
-  // Time
-  double _last_seen_timestamp;
-  int _last_seen_frame_cnt;
+  cv::Rect box_;   // 2D bounding box
+  int track_id_;   // unique tracking id
+  int detect_id_;  // -1 means unmatched but kept
+  float first_timestamp_;
+  float last_timestamp_;
+  int last_frame_idx_;
 
-  // Basic information
-  cv::Rect _box;
-  int _track_id;   // unique tracking id
-  int _detect_id;  // -1 means unmatched but kept
-
-  // DLF
-  std::vector<float> _features;
-
-  // DAT
-  cv::Mat _box_hist;
-  cv::Mat _prob_look_up;
-  float _self_dat_score;
+  // DLF: Deep Learning ROI Pooling features from detection
+  std::vector<float> features_;
 
   // KCF
-  bool _kcf_set = false;
-  std::vector<cv::Mat> _x_f;
-  cv::Mat _alpha_f;
-
-  // Debug Purpose: May be removed or nor used.
-  cv::Mat _box_img;
+  bool kcf_set_ = false;
+  std::vector<cv::Mat> x_f_;
+  cv::Mat alpha_f_;
 };
 
 class Detected {
  public:
-  double _last_seen_timestamp;
-  int _last_seen_frame_cnt;
+  cv::Rect box_;   // 2D bounding box
+  int detect_id_;  // -1 means unmatched but kept
 
-  cv::Rect _box;
-  size_t _detect_id;
-
-  // DLF: Deep Learning ROI Pooling features from detection's layers
-  std::vector<float> _features;
+  // DLF: Deep Learning ROI Pooling features from detection
+  std::vector<float> features_;
 };
-
-// Change the usage of Tracked and Detected to array of pointers after the
-// size and contents become huge
 
 class BaseAffinityTracker {
  public:
@@ -75,27 +57,33 @@ class BaseAffinityTracker {
 
   virtual ~BaseAffinityTracker() {}
 
-  virtual bool init() = 0;
+  virtual bool Init() = 0;
 
-  // For high computation cost methods, the specific pair of affinity can be
-  // chosen to do computation
-  // The positive value entries in prev_affinity_matrix is chosen to get score
-  // Input must be regular and of the size corresponding to the following call
-  // (Ex: there must be the same number of entries in each row of the matrix)
-  virtual bool set_selected_entries(
+  // @brief Choose some entries in the matrix to do computation for affinity
+  //
+  // Skip the entry with
+  // 1. 0 or negative affinity score
+  // 2. High score (>= 9.0)
+  //
+  // Input must be regular and of the size in the following calls
+  // (There must be the same number of entries in each row of the matrix)
+  //
+  virtual bool SelectEntries(
       const std::vector<std::vector<float>> &prev_matrix) {
-    if (prev_matrix.empty()) {
-      return true;
-    }
+    if (prev_matrix.empty()) return true;
 
-    _selected_entry_matrix.clear();
-    _selected_entry_matrix = std::vector<std::vector<bool>>(
-        prev_matrix.size(), std::vector<bool>(prev_matrix[0].size(), false));
-    for (size_t i = 0; i < prev_matrix.size(); ++i) {
-      for (size_t j = 0; j < prev_matrix[0].size(); ++j) {
-        if (prev_matrix[i][j] > std::numeric_limits<float>::epsilon() &&
-            prev_matrix[i][j] < 9.0f) {
-          _selected_entry_matrix[i][j] = true;
+    int row = prev_matrix.size();
+    if (!row) return true;
+    int col = prev_matrix[0].size();
+
+    selected_entry_matrix_.clear();
+    selected_entry_matrix_ =
+        std::vector<std::vector<bool>>(row, std::vector<bool>(col, false));
+    for (int i = 0; i < row; ++i) {
+      for (int j = 0; j < col; ++j) {
+        if (9.0f > prev_matrix[i][j] &&
+            prev_matrix[i][j] > std::numeric_limits<float>::epsilon()) {
+          selected_entry_matrix_[i][j] = true;
         }
       }
     }
@@ -103,33 +91,34 @@ class BaseAffinityTracker {
     return true;
   }
 
-  // Set the selection matrix to full entries
-  virtual bool set_full_selection(const size_t &row, const size_t &col) {
-    _selected_entry_matrix.clear();
-    _selected_entry_matrix =
+  // @brief Set the selection matrix to full entries
+  virtual bool SelectFull(const int &row, const int &col) {
+    selected_entry_matrix_.clear();
+    selected_entry_matrix_ =
         std::vector<std::vector<bool>>(row, std::vector<bool>(col, true));
     return true;
   }
 
-  // Get affinity_matrix between tracked objs and detected objs
-  // row:tracked objects, col:detected objects
-  // affinity_matrix[t_i][d_j]: score for the affinity of i_th tracked and j_th
-  // detected
-  virtual bool get_affinity_matrix(
+  // @brief Get affinity_matrix between tracked objs and detected objs
+  // rows: tracked objects, cols: detected objects
+  // affinity_matrix[i][j]: score for the affinity between i_th tracked obj and
+  // j_th detected obj
+  virtual bool GetAffinityMatrix(
       const cv::Mat &img, const std::vector<Tracked> &tracked,
       const std::vector<Detected> &detected,
       std::vector<std::vector<float>> *affinity_matrix) = 0;
 
-  // Update features and information used in tracked objects for the next frame
-  virtual bool update_tracked(const cv::Mat &img,
-                              const std::vector<Detected> &detected,
-                              std::vector<Tracked> *tracked) = 0;
+  // @brief Update information used in tracked objects, for the next frame
+  virtual bool UpdateTracked(const cv::Mat &img,
+                             const std::vector<Detected> &detected,
+                             std::vector<Tracked> *tracked) = 0;
 
  protected:
-  // Matrix for selecting which entries need calculation
-  std::vector<std::vector<bool>> _selected_entry_matrix;
+  // @brief Matrix for selecting which entries need calculation
+  std::vector<std::vector<bool>> selected_entry_matrix_;
 };
+
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_BASE_AFFINITY_TRACKER_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_BASE_AFFINITY_TRACKER_H_

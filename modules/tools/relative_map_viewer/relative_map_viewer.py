@@ -24,25 +24,50 @@ from modules.map.relative_map.proto import navigation_pb2
 ax = None
 map_msg = None
 
+def evaluate_poly(c0, c1, c2, c3, x):
+  return ((c3 * x + c2) * x + c1) * x + c0
 
-def draw_lane_boundary(lane, ax, color_val):
+
+def draw_lane_boundary(lane, ax, color_val, lane_marker):
     """draw boundary"""
+    left_c0 = float(lane_marker.left_lane_marker.c0_position)
+    left_c1 = float(lane_marker.left_lane_marker.c1_heading_angle)
+    left_c2 = float(lane_marker.left_lane_marker.c2_curvature)
+    left_c3 = float(lane_marker.left_lane_marker.c3_curvature_derivative)
+
     for curve in lane.left_boundary.curve.segment:
         if curve.HasField('line_segment'):
             px = []
             py = []
+            px_lane_marker = []
+            py_lane_marker = []
             for p in curve.line_segment.point:
                 px.append(float(p.y))
                 py.append(float(p.x))
+                px_lane_marker.append(evaluate_poly(left_c0, left_c1,
+                    left_c2, left_c3, float(p.x)))
+                py_lane_marker.append(float(p.x))
             ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
+            ax.plot(px_lane_marker, py_lane_marker, ls='--', c='g', alpha=0.5)
+
+    right_c0 = float(lane_marker.right_lane_marker.c0_position)
+    right_c1 = float(lane_marker.right_lane_marker.c1_heading_angle)
+    right_c2 = float(lane_marker.right_lane_marker.c2_curvature)
+    right_c3 = float(lane_marker.right_lane_marker.c3_curvature_derivative)
     for curve in lane.right_boundary.curve.segment:
         if curve.HasField('line_segment'):
             px = []
             py = []
+            px_lane_marker = []
+            py_lane_marker = []
             for p in curve.line_segment.point:
                 px.append(float(p.y))
                 py.append(float(p.x))
+                px_lane_marker.append(evaluate_poly(right_c0, right_c1,
+                    right_c2, right_c3, float(p.x)))
+                py_lane_marker.append(float(p.x))
             ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
+            ax.plot(px_lane_marker, py_lane_marker, ls='--', c='g', alpha=0.5)
 
 
 def draw_lane_central(lane, ax, color_val):
@@ -61,7 +86,7 @@ def update(frame_number):
     plt.cla()
     if map_msg is not None:
         for lane in map_msg.hdmap.lane:
-            draw_lane_boundary(lane, ax, 'b')
+            draw_lane_boundary(lane, ax, 'b', map_msg.lane_marker)
             draw_lane_central(lane, ax, 'r')
 
         for key in map_msg.navigation_path:
@@ -74,7 +99,7 @@ def update(frame_number):
 
     ax.axvline(x=0.0, alpha=0.3)
     ax.axhline(y=0.0, alpha=0.3)
-    ax.set_xlim([-10, 10])
+    ax.set_xlim([10, -10])
     ax.set_ylim([-10, 200])
     ax.relim()
 

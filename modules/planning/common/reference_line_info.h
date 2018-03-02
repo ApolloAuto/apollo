@@ -161,7 +161,7 @@ class ReferenceLineInfo {
 
   bool is_inited_ = false;
 
-  bool is_drivable_ = false;
+  bool is_drivable_ = true;
 
   PathDecision path_decision_;
 
