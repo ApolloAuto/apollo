@@ -33,4 +33,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "projector",
+    hdrs = ["projector.h"],
+    deps = [
+        "//modules/common:log",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/obstacle/camera/common:obstacle_camera_common",
+        "@eigen//:eigen",
+        "@opencv2//:core",
+    ],
+)
+
 cpplint()
