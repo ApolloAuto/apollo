@@ -239,9 +239,9 @@ void NavigationLane::ConvertLaneMarkerToPath(
 
   const double current_speed =
       VehicleStateProvider::instance()->vehicle_state().linear_velocity();
-  double path_range = current_speed * 6.0;
-  if (path_range < 4.0) {
-    path_range = 4.0;
+  double path_range = current_speed * 10.0;
+  if (path_range < 60.0) {
+    path_range = 60.0;
   }
 
   const double unit_z = 1.0;
