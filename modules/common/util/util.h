@@ -32,10 +32,11 @@
 
 #include "google/protobuf/util/message_differencer.h"
 
-#include "modules/common/math/vec2d.h"
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+
+#include "modules/common/math/vec2d.h"
 
 /**
  * @namespace apollo::common::util
@@ -160,6 +161,14 @@ bool SamePointXY(const U& u, const V& v) {
 PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,
                                             const PathPoint& p2,
                                             const double w1, const double w2);
+
+// a wrapper template function for remove_if (notice that remove_if cannot
+// change the Container size)
+template <class Container, class F>
+auto erase_where(Container& c, F&& f) {
+  return c.erase(std::remove_if(c.begin(), c.end(), std::forward<F>(f)),
+                 c.end());
+}
 
 }  // namespace util
 }  // namespace common
