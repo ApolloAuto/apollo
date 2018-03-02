@@ -17,7 +17,6 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_FRAME_CONTENT_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_FRAME_CONTENT_H_
 
-#include <boost/shared_ptr.hpp>
 #include <deque>
 #include <iomanip>
 #include <map>
@@ -25,6 +24,8 @@
 #include <string>
 #include <thread>
 #include <vector>
+
+#include <boost/shared_ptr.hpp>
 
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
@@ -35,10 +36,10 @@ namespace perception {
 
 class BaseContent {
  public:
-  BaseContent() {}
+  BaseContent() = default;
 
-  ~BaseContent() {}
-  double _timestamp = -1;
+  ~BaseContent() = default;
+  double _timestamp = -1.0;
 };
 
 class CameraContent : public BaseContent {
@@ -158,29 +159,37 @@ class FrameContent {
   void offset_object(ObjectPtr object, const Eigen::Vector3d& offset);
 
  private:
+  const double kEpsilon_ = 1e-6;
+
+  long DoubleToMapKey(const double d) {
+    return static_cast<long>(d / kEpsilon_);
+  }
+
+  double MapKeyToDouble(const long key) { return key * kEpsilon_; }
+
   // input
   // 1.radar
-  std::map<double, RadarContent> _radar_caches;
+  std::map<long, RadarContent> _radar_caches;
   double _current_radar_timestamp;
 
   // 2.camera
-  std::map<double, CameraContent> _camera_caches;
+  std::map<long, CameraContent> _camera_caches;
   double _current_camera_timestamp;
 
   // 3.fusion
-  std::map<double, FusionContent> _fusion_caches;
+  std::map<long, FusionContent> _fusion_caches;
   double _current_fusion_timestamp;
 
   // 4.ground truth
-  std::map<double, GroundTruthContent> _gt_caches;
+  std::map<long, GroundTruthContent> _gt_caches;
   double _current_gt_timestamp;
 
   // 5.image
-  std::map<double, ImageContent> _image_caches;
+  std::map<long, ImageContent> _image_caches;
   double _current_image_timestamp;
 
   // 6.motion
-  std::map<double, MotionContent> _motion_caches;
+  std::map<long, MotionContent> _motion_caches;
   double _current_motion_timestamp;
 
   Eigen::Vector3d _global_offset;
