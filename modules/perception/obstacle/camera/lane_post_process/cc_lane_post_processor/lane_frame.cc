@@ -918,53 +918,6 @@ bool LaneFrame::FitPolyCurve(const int& graph_id,
   return true;
 }
 
-/*
-bool LaneFrame::Process(vector<LaneInstance>* instances) {
-  if (instances == NULL) {
-      AERROR << "the pointer of input instances is null.";
-      return false;
-  }
-
-  // do marker association
-  switch (opts_.assoc_param.method) {
-    case AssociationMethod::GREEDY_GROUP_CONNECT: {
-      AINFO << "using greedy group connection algorithm "
-            << "for marker association ...";
-      if (!GreedyGroupConnectAssociation()) {
-          AERROR << "failed to do marker association.";
-          return false;
-      }
-      break;
-    }
-    default: {
-      AFATAL << "unknown marker association method.";
-    }
-  }
-  AINFO << "number of lane instance candidates = " << graphs_.size();
-
-  // compute tight bounding box for graphs
-  ComputeBbox();
-
-  // generate lane instances
-  instances->clear();
-  instances->reserve(graphs_.size());
-  for (int k = 0; k < GraphNum(); ++k) {
-    ScalarType siz = std::max(boxes_.at(k)(2) - boxes_.at(k)(0),
-                              boxes_.at(k)(3) - boxes_.at(k)(1));
-    // remove too small graphs
-    if (siz >= opts_.min_instance_size_prefiltered) {
-      instances->push_back(LaneInstance(k, siz, boxes_.at(k)));
-    } else {
-      ADEBUG << "size of graph " << k << " is too small: " << siz << " ("
-             << opts_.min_instance_size_prefiltered << "), "
-             << "removed.";
-    }
-  }
-
-  instances->shrink_to_fit();
-  return true;
-}
- */
 bool LaneFrame::Process(LaneInstancesPtr instances) {
   if (instances == NULL) {
     AERROR << "the pointer of input instances is null.";
