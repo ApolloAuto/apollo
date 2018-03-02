@@ -194,8 +194,10 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
   return true;
 }
 
-bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1, const CorrectedImu &imu2,
-                                     const double timestamp_sec, CorrectedImu *imu_msg) {
+bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1,
+                                     const CorrectedImu &imu2,
+                                     const double timestamp_sec,
+                                     CorrectedImu *imu_msg) {
   DCHECK_NOTNULL(imu_msg);
   if (!(imu1.has_header() && imu1.header().has_timestamp_sec() &&
         imu2.has_header() && imu2.header().has_timestamp_sec())) {
