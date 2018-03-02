@@ -18,6 +18,7 @@
 
 import rospy
 import matplotlib.pyplot as plt
+import numpy as np
 import matplotlib.animation as animation
 from modules.map.relative_map.proto import navigation_pb2
 
@@ -99,8 +100,13 @@ def update(frame_number):
 
     ax.axvline(x=0.0, alpha=0.3)
     ax.axhline(y=0.0, alpha=0.3)
-    ax.set_xlim([-10, 10])
+    ax.set_xlim([10, -10])
     ax.set_ylim([-10, 200])
+    y = 10
+    while y < 200:
+        ax.plot([10, -10], [y, y], ls='-', c='g', alpha=0.3)
+        y = y + 10
+    plt.yticks(np.arange(10, 200, 10))
     ax.relim()
 
 

@@ -32,12 +32,11 @@ cc_library(
         "//modules/planning/tasks:task",
         "//modules/planning/tasks/dp_poly_path:dp_poly_path_optimizer",
         "//modules/planning/tasks/dp_st_speed:dp_st_speed_optimizer",
-        "//modules/planning/tasks/poly_st_speed:poly_st_speed_optimizer",
         "//modules/planning/tasks/path_decider",
+        "//modules/planning/tasks/poly_st_speed:poly_st_speed_optimizer",
         "//modules/planning/tasks/qp_spline_path",
         "//modules/planning/tasks/qp_spline_st_speed:qp_spline_st_speed_optimizer",
         "//modules/planning/tasks/speed_decider",
-        "//modules/planning/tasks/traffic_decider",
         "@eigen//:eigen",
     ],
 )

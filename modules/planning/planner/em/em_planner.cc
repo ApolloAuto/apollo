@@ -39,7 +39,6 @@
 #include "modules/planning/tasks/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 #include "modules/planning/tasks/speed_decider/speed_decider.h"
-#include "modules/planning/tasks/traffic_decider/traffic_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -56,11 +55,9 @@ using common::time::Clock;
 namespace {
 constexpr double kPathOptimizationFallbackClost = 2e4;
 constexpr double kSpeedOptimizationFallbackClost = 2e4;
-}
+}  // namespace
 
 void EMPlanner::RegisterTasks() {
-  task_factory_.Register(TRAFFIC_DECIDER,
-                         []() -> Task* { return new TrafficDecider(); });
   task_factory_.Register(DP_POLY_PATH_OPTIMIZER,
                          []() -> Task* { return new DpPolyPathOptimizer(); });
   task_factory_.Register(PATH_DECIDER,
@@ -144,50 +141,35 @@ void EMPlanner::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame) {
-  auto status = Status::OK();
-  bool has_plan = false;
-  auto it = std::find_if(
-      frame->reference_line_info().begin(), frame->reference_line_info().end(),
-      [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
-  if (it != frame->reference_line_info().end()) {
-    status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
-    has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
-                it->TrajectoryLength() > FLAGS_change_lane_min_length);
-    if (!has_plan) {
-      AERROR << "Fail to plan for lane change.";
+  bool has_drivable_reference_line = false;
+  auto status =
+      Status(ErrorCode::PLANNING_ERROR, "reference line not drivable");
+  for (auto& reference_line_info : frame->reference_line_info()) {
+    if (!reference_line_info.IsDrivable()) {
+      continue;
+    }
+    auto cur_status =
+        PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
+    if (cur_status.ok() && reference_line_info.IsDrivable()) {
+      has_drivable_reference_line = true;
+      if (FLAGS_prioritize_change_lane &&
+          reference_line_info.IsChangeLanePath()) {
+        break;
+      }
+    } else {
+      reference_line_info.SetDrivable(false);
     }
   }
-
-  if (!has_plan || !FLAGS_prioritize_change_lane) {
-    for (auto& reference_line_info : frame->reference_line_info()) {
-      if (reference_line_info.IsChangeLanePath()) {
-        continue;
-      }
-      status = PlanOnReferenceLine(planning_start_point, frame,
-                                   &reference_line_info);
-      if (status != Status::OK()) {
-        AERROR << "planner failed to make a driving plan for: "
-               << reference_line_info.Lanes().Id();
-      }
-    }
-  }
-  return status;
+  return has_drivable_reference_line ? Status::OK() : status;
 }
 
 Status EMPlanner::PlanOnReferenceLine(
     const TrajectoryPoint& planning_start_point, Frame* frame,
     ReferenceLineInfo* reference_line_info) {
-  if (!reference_line_info->IsInited()) {
-    if (!reference_line_info->Init(frame->obstacles())) {
-      AERROR << "Failed to init reference line";
-      return Status(ErrorCode::PLANNING_ERROR, "Init reference line failed");
-    }
-  }
   if (!reference_line_info->IsChangeLanePath()) {
     const double kStraightForwardLineCost = 10.0;
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
-
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
   auto* heuristic_speed_data = reference_line_info->mutable_speed_data();
   auto speed_profile =

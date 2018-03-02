@@ -43,6 +43,7 @@ class NavigationLane {
 
   void UpdateNavigationInfo(const NavigationInfo& navigation_info) {
     navigation_info_ = navigation_info;
+    last_project_index_ = 0;
   }
 
   const NavigationPath& Path() { return navigation_path_; }
@@ -53,6 +54,14 @@ class NavigationLane {
   double EvaluateCubicPolynomial(const double c0, const double c1,
                                  const double c2, const double c3,
                                  const double z) const;
+
+  void MergeNavigationLineAndLaneMarker(
+      const perception::LaneMarkers& lane_marker, common::Path* path);
+
+  common::PathPoint GetPathPointByS(const common::Path& path,
+                                    const int start_index, const double s,
+                                    int* matched_index);
+
   void ConvertLaneMarkerToPath(const perception::LaneMarkers& lane_marker,
                                common::Path* path);
 

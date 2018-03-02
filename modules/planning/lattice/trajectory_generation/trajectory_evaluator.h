@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_EVALUATOR_H_
 #define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_EVALUATOR_H_
 
+#include <array>
 #include <functional>
 #include <memory>
 #include <queue>
@@ -49,6 +50,7 @@ class TrajectoryEvaluator {
 
  public:
   explicit TrajectoryEvaluator(
+      const std::array<double, 3>& init_s,
       const PlanningTarget& planning_target,
       const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
       const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories,
@@ -91,6 +93,9 @@ class TrajectoryEvaluator {
   double LonObjectiveCost(const std::shared_ptr<Curve1d>& lon_trajectory,
                           const PlanningTarget& planning_target) const;
 
+  std::vector<double> CreateLongitudinalGuideVelocity(
+      const PlanningTarget& planning_target) const;
+
   struct CostComparator
       : public std::binary_function<const PairCost&, const PairCost&, bool> {
     bool operator()(const PairCost& left, const PairCost& right) const {
@@ -118,6 +123,8 @@ class TrajectoryEvaluator {
   std::shared_ptr<PathTimeGraph> path_time_graph_;
 
   std::vector<std::vector<std::pair<double, double>>> path_time_intervals_;
+
+  std::array<double, 3> init_s_;
 };
 
 }  // namespace planning

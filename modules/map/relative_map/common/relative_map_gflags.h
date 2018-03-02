@@ -23,5 +23,6 @@ DECLARE_string(relative_map_adapter_config_filename);
 DECLARE_string(relative_map_config_filename);
 DECLARE_int32(relative_map_loop_rate);
 DECLARE_double(max_len_from_navigation_line);
+DECLARE_bool(enable_navigation_line);
 
 #endif  // MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_GFLAGS_H_

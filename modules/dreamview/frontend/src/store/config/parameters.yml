@@ -82,6 +82,9 @@ options:
     showMapSignal: true
     showMapStopSign: true
     cameraAngle: Default
+navigation:
+  # possible options: BaiduMap or GoogleMap
+  map: "BaiduMap"
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false
