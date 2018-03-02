@@ -241,7 +241,12 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     map_id.set_id(id);
     auto element = sim_map_->GetLaneById(map_id);
     if (element) {
-      *result.add_lane() = element->lane();
+      auto lane = element->lane();
+      lane.clear_left_sample();
+      lane.clear_right_sample();
+      lane.clear_left_road_sample();
+      lane.clear_right_road_sample();
+      *result.add_lane() = lane;
     }
   }
 
