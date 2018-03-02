@@ -95,11 +95,9 @@ void NavigationLane::MergeNavigationLineAndLaneMarker(
     auto p2 = GetPathPointByS(lane_marker_path, lane_marker_index, s,
                               &lane_marker_index);
     auto *p = path->add_path_point();
-    p->set_x((p1.x() + p2.x()) / 2.0);
-    p->set_y((p1.y() + p2.y()) / 2.0);
-    p->set_theta((p1.theta() + p2.theta()) / 2.0);
-    p->set_kappa((p1.kappa() + p2.kappa()) / 2.0);
-    p->set_dkappa((p1.dkappa() + p2.dkappa()) / 2.0);
+    const double kWeight = 0.9;
+    *p = common::util::GetWeightedAverageOfTwoPathPoints(p1, p2, kWeight,
+                                                         1 - kWeight);
   }
 }
 
@@ -122,24 +120,9 @@ common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
 
   // x, y, z, theta, kappa, s, dkappa, ddkappa
   const double r = (s - path.path_point(i).s()) /
-      (path.path_point(i + 1).s() - path.path_point(i).s());
-  const double x =
-      path.path_point(i).x() * (1 - r) + path.path_point(i + 1).x() * r;
-  const double y =
-      path.path_point(i).y() * (1 - r) + path.path_point(i + 1).y() * r;
-  const double z =
-      path.path_point(i).z() * (1 - r) + path.path_point(i + 1).z() * r;
-  const double theta =
-      path.path_point(i).theta() * (1 - r) + path.path_point(i + 1).theta() * r;
-  const double kappa =
-      path.path_point(i).kappa() * (1 - r) + path.path_point(i + 1).kappa() * r;
-  const double dkappa = path.path_point(i).dkappa() * (1 - r) +
-      path.path_point(i + 1).dkappa() * r;
-  const double ddkappa = path.path_point(i).ddkappa() * (1 - r) +
-      path.path_point(i + 1).ddkappa() * r;
-
-  auto p = common::util::MakePathPoint(x, y, z, theta, kappa, dkappa, ddkappa);
-  p.set_s(s);
+                   (path.path_point(i + 1).s() - path.path_point(i).s());
+  auto p = common::util::GetWeightedAverageOfTwoPathPoints(
+      path.path_point(i), path.path_point(i + 1), 1 - r, r);
   return p;
 }
 
@@ -159,6 +142,13 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
   const auto &navigation_path = navigation_info_.navigation_path(0).path();
   int curr_project_index = last_project_index_;
 
+  double dist =
+      navigation_path.path_point(navigation_path.path_point_size() - 1).s() -
+      navigation_path.path_point(curr_project_index).s();
+  if (dist < 20) {
+    return;
+  }
+
   // offset between the current vehicle state and navigation line
   const double dx = -original_pose_.position().x();
   const double dy = -original_pose_.position().y();
@@ -177,9 +167,10 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
 
     point->set_x(flu_x);
     point->set_y(flu_y);
+    point->set_theta(point->theta() - original_pose_.heading());
     const double accumulated_s =
         navigation_path.path_point(i).s() -
-            navigation_path.path_point(curr_project_index).s();
+        navigation_path.path_point(curr_project_index).s();
     point->set_s(accumulated_s);
 
     if (accumulated_s > FLAGS_max_len_from_navigation_line) {
@@ -187,9 +178,14 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
     }
   }
 
-  // set left/right width invalid as no width info from navigation line
-  left_width_ = -1.0;
-  right_width_ = -1.0;
+  const perception::LaneMarkers &lane_marker =
+      perception_obstacles_.lane_marker();
+  const auto &left_lane = lane_marker.left_lane_marker();
+  const auto &right_lane = lane_marker.right_lane_marker();
+  left_width_ = (std::fabs(left_lane.c0_position()) +
+                 std::fabs(right_lane.c0_position())) /
+                2.0;
+  right_width_ = left_width_;
 }
 
 // project adc_state_ onto path
@@ -229,13 +225,16 @@ void NavigationLane::ConvertLaneMarkerToPath(
   double quality_divider = left_quality + right_quality;
 
   double path_c1 = (left_lane.c1_heading_angle() * left_quality +
-      right_lane.c1_heading_angle() * right_quality) / quality_divider;
+                    right_lane.c1_heading_angle() * right_quality) /
+                   quality_divider;
 
   double path_c2 = (left_lane.c2_curvature() * left_quality +
-      right_lane.c2_curvature() * right_quality) / quality_divider;
+                    right_lane.c2_curvature() * right_quality) /
+                   quality_divider;
 
-  double path_c3 = (left_lane.c3_curvature_derivative() * left_lane.quality() +
-      right_lane.c3_curvature_derivative() * left_lane.quality()) /
+  double path_c3 =
+      (left_lane.c3_curvature_derivative() * left_lane.quality() +
+       right_lane.c3_curvature_derivative() * left_lane.quality()) /
       quality_divider;
 
   const double current_speed =
@@ -265,7 +264,8 @@ void NavigationLane::ConvertLaneMarkerToPath(
   }
 
   left_width_ = (std::fabs(left_lane.c0_position()) +
-      std::fabs(right_lane.c0_position())) / 2.0;
+                 std::fabs(right_lane.c0_position())) /
+                2.0;
   right_width_ = left_width_;
 }
 
@@ -284,7 +284,7 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
   }
   auto *lane = hdmap->add_lane();
   lane->mutable_id()->set_id(std::to_string(navigation_path_.path_priority()) +
-      "_" + path.name());
+                             "_" + path.name());
   (*navigation_info)[lane->id().id()] = navigation_path_;
   // lane types
   lane->set_type(Lane::CITY_DRIVING);
@@ -329,15 +329,13 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
     left_sample->set_width(lane_left_width);
     left_segment->add_point()->CopyFrom(
         *point +
-            lane_left_width
-                * Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
+        lane_left_width * Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
     auto *right_sample = lane->add_right_sample();
     right_sample->set_s(path_point.s());
     right_sample->set_width(lane_right_width);
     right_segment->add_point()->CopyFrom(
         *point +
-            lane_right_width
-                * Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
+        lane_right_width * Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
   }
 
   return true;
