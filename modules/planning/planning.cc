@@ -32,6 +32,7 @@
 #include "modules/planning/planner/lattice/lattice_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
+#include "modules/planning/tasks/traffic_decider/traffic_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -310,6 +311,18 @@ void Planning::RunOnce() {
     FrameHistory::instance()->Add(seq_num, std::move(frame_));
 
     return;
+  }
+
+  for (auto& ref_line_info : frame_->reference_line_info()) {
+    TrafficDecider traffic_decider;
+    traffic_decider.Init(config_);
+    auto traffic_status = traffic_decider.Execute(frame_.get(), &ref_line_info);
+    if (!traffic_status.ok() || !ref_line_info.IsDrivable()) {
+      ref_line_info.SetDrivable(false);
+      AWARN << "Reference line " << ref_line_info.Lanes().Id()
+            << " traffic decider failed";
+      continue;
+    }
   }
 
   status = Plan(start_timestamp, stitching_trajectory, trajectory_pb);

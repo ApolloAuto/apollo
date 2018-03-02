@@ -29,6 +29,7 @@
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker1d.h"
+#include "modules/planning/lattice/trajectory1d/piecewise_acceleration_trajectory1d.h"
 
 namespace apollo {
 namespace planning {
@@ -36,11 +37,12 @@ namespace planning {
 using Trajectory1d = Curve1d;
 
 TrajectoryEvaluator::TrajectoryEvaluator(
+    const std::array<double, 3>& init_s,
     const PlanningTarget& planning_target,
     const std::vector<std::shared_ptr<Trajectory1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Trajectory1d>>& lat_trajectories,
     std::shared_ptr<PathTimeGraph> path_time_graph)
-    : path_time_graph_(path_time_graph) {
+    : init_s_(init_s), path_time_graph_(path_time_graph) {
   const double start_time = 0.0;
   const double end_time = FLAGS_trajectory_time_length;
   path_time_intervals_ = path_time_graph_->GetPathBlockingIntervals(
@@ -138,17 +140,21 @@ double TrajectoryEvaluator::Evaluate(
     const std::shared_ptr<Trajectory1d>& lat_trajectory,
     std::vector<double>* cost_components) const {
   // Costs:
-  // 1. Cost to achieve the objective
+  // 1. Cost of missing the objective, e.g., cruise, stop, etc.
   // 2. Cost of logitudinal jerk
   // 3. Cost of logitudinal collision
   // 4. Cost of lateral offsets
   // 5. Cost of lateral comfort
 
   // Longitudinal costs
-  double lon_travel_cost = LonObjectiveCost(lon_trajectory, planning_target);
+  double lon_objective_cost = LonObjectiveCost(lon_trajectory,
+      planning_target);
+
   double lon_jerk_cost = LonComfortCost(lon_trajectory);
+
   double lon_collision_cost = LonCollisionCost(lon_trajectory);
 
+  // decides the longitudinal evaluation horizon for lateral trajectories.
   double evaluation_horizon = std::min(FLAGS_decision_horizon,
       lon_trajectory->Evaluate(0, lon_trajectory->ParamLength()));
   std::vector<double> s_values;
@@ -159,16 +165,17 @@ double TrajectoryEvaluator::Evaluate(
 
   // Lateral costs
   double lat_offset_cost = LatOffsetCost(lat_trajectory, s_values);
+
   double lat_comfort_cost = LatComfortCost(lon_trajectory, lat_trajectory);
 
   if (cost_components != nullptr) {
-    cost_components->push_back(lon_travel_cost);
+    cost_components->push_back(lon_objective_cost);
     cost_components->push_back(lon_jerk_cost);
     cost_components->push_back(lon_collision_cost);
     cost_components->push_back(lat_offset_cost);
   }
 
-  return lon_travel_cost * FLAGS_weight_lon_travel +
+  return lon_objective_cost * FLAGS_weight_lon_travel +
          lon_jerk_cost * FLAGS_weight_lon_jerk +
          lon_collision_cost * FLAGS_weight_lon_collision +
          lat_offset_cost * FLAGS_weight_lat_offset +
@@ -198,17 +205,18 @@ double TrajectoryEvaluator::LatOffsetCost(
 double TrajectoryEvaluator::LatComfortCost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory,
     const std::shared_ptr<Trajectory1d>& lat_trajectory) const {
-  double cost_sqr_sum = 0.0;
-  double cost_abs_sum = 0.0;
+  double max_cost = 0.0;
   for (double t = 0.0; t < FLAGS_trajectory_time_length;
        t += FLAGS_trajectory_time_resolution) {
     double s = lon_trajectory->Evaluate(0, t);
-    double cost = lat_trajectory->Evaluate(1, s) *
-                  lon_trajectory->Evaluate(1, t) / FLAGS_default_cruise_speed;
-    cost_sqr_sum += cost * cost;
-    cost_abs_sum += std::abs(cost);
+    double s_dot = lon_trajectory->Evaluate(1, t);
+    double s_dotdot = lon_trajectory->Evaluate(2, t);
+    double l_prime = lat_trajectory->Evaluate(1, s);
+    double l_primeprime = lat_trajectory->Evaluate(2, s);
+    double cost = l_primeprime * s_dot * s_dot + l_prime * s_dotdot;
+    max_cost = std::max(max_cost, std::abs(cost));
   }
-  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
+  return max_cost;
 }
 
 double TrajectoryEvaluator::LonComfortCost(
@@ -285,6 +293,44 @@ std::vector<double> TrajectoryEvaluator::evaluate_per_lonlat_trajectory(
     const std::vector<apollo::common::FrenetFramePoint> sl_points) {
   std::vector<double> ret;
   return ret;
+}
+
+std::vector<double> TrajectoryEvaluator::CreateLongitudinalGuideVelocity(
+    const PlanningTarget& planning_target) const {
+  double comfort_a = FLAGS_longitudinal_acceleration_lower_bound
+      * FLAGS_comfort_acceleration_factor;
+
+  double cruise_s_dot = planning_target.cruise_speed();
+  ConstantAccelerationTrajectory1d lon_traj(init_s_[0], cruise_s_dot);
+
+  if (!planning_target.has_stop_point()) {
+    lon_traj.AppendSgment(0.0, FLAGS_trajectory_time_length);
+  } else {
+    double stop_s = planning_target.stop_point().s();
+    double dist = stop_s - init_s_[0];
+    double stop_a = -cruise_s_dot * cruise_s_dot * 0.5 / dist;
+    if (stop_a > comfort_a) {
+      double stop_t = cruise_s_dot / (-comfort_a);
+      double stop_dist = cruise_s_dot * stop_t * 0.5;
+      double cruise_t = (dist - stop_dist) / cruise_s_dot;
+      lon_traj.AppendSgment(0.0, cruise_t);
+      lon_traj.AppendSgment(comfort_a, stop_t);
+    } else {
+      double stop_t = cruise_s_dot / (-stop_a);
+      lon_traj.AppendSgment(stop_a, stop_t);
+    }
+    if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
+      lon_traj.AppendSgment(0.0,
+          FLAGS_trajectory_time_length - lon_traj.ParamLength());
+    }
+  }
+
+  std::vector<double> reference_s_dot;
+  for (double t = 0.0; t < FLAGS_trajectory_time_length;
+      t += FLAGS_trajectory_time_resolution) {
+    reference_s_dot.push_back(lon_traj.Evaluate(1, t));
+  }
+  return reference_s_dot;
 }
 
 }  // namespace planning
