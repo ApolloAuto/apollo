@@ -91,9 +91,10 @@ class TrajectoryEvaluator {
   double LonCollisionCost(const std::shared_ptr<Curve1d>& lon_trajectory) const;
 
   double LonObjectiveCost(const std::shared_ptr<Curve1d>& lon_trajectory,
-                          const PlanningTarget& planning_target) const;
+                          const PlanningTarget& planning_target,
+                          const std::vector<double>& ref_s_dot) const;
 
-  std::vector<double> CreateLongitudinalGuideVelocity(
+  std::vector<double> ComputeLongitudinalGuideVelocity(
       const PlanningTarget& planning_target) const;
 
   struct CostComparator
