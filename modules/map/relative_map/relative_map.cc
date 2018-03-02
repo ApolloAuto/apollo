@@ -163,6 +163,7 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
   VehicleStateProvider::instance()->Update(localization, chassis);
+  map_msg->mutable_localization()->CopyFrom(localization);
 
   // update navigation_lane from perception_obstacles (lane marker)
   if (!AdapterManager::GetPerceptionObstacles()->Empty()) {
