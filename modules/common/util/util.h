@@ -169,6 +169,17 @@ void erase_where(Container& c, F&& f) {  // NOLINT
   c.erase(std::remove_if(c.begin(), c.end(), std::forward<F>(f)), c.end());
 }
 
+// a wrapper template function for remove_if on associative containers
+template <class Container, class F>
+void erase_map_where(Container& c, F&& f) {  // NOLINT
+  for (auto it = c.begin(); it != c.end();) {
+    if (f(*it))
+      it = c.erase(it);
+    else
+      ++it;
+  }
+}
+
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
