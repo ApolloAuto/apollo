@@ -17,16 +17,27 @@
 ###############################################################################
 
 import rospy
+import math
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.animation as animation
 from modules.map.relative_map.proto import navigation_pb2
+from modules.localization.proto import localization_pb2
 
 ax = None
 map_msg = None
+navigation_path_x = []
+navigation_path_y = []
+localization_pb = None
+
 
 def evaluate_poly(c0, c1, c2, c3, x):
-  return ((c3 * x + c2) * x + c1) * x + c0
+    return ((c3 * x + c2) * x + c1) * x + c0
+
+
+def localization_callback(localization_pb2):
+    global localization_pb
+    localization_pb = localization_pb2
 
 
 def draw_lane_boundary(lane, ax, color_val, lane_marker):
@@ -46,7 +57,8 @@ def draw_lane_boundary(lane, ax, color_val, lane_marker):
                 px.append(float(p.y))
                 py.append(float(p.x))
                 px_lane_marker.append(evaluate_poly(left_c0, left_c1,
-                    left_c2, left_c3, float(p.x)))
+                                                    left_c2, left_c3,
+                                                    float(p.x)))
                 py_lane_marker.append(float(p.x))
             ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
             ax.plot(px_lane_marker, py_lane_marker, ls='--', c='g', alpha=0.5)
@@ -65,10 +77,47 @@ def draw_lane_boundary(lane, ax, color_val, lane_marker):
                 px.append(float(p.y))
                 py.append(float(p.x))
                 px_lane_marker.append(evaluate_poly(right_c0, right_c1,
-                    right_c2, right_c3, float(p.x)))
+                                                    right_c2, right_c3,
+                                                    float(p.x)))
                 py_lane_marker.append(float(p.x))
             ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
             ax.plot(px_lane_marker, py_lane_marker, ls='--', c='g', alpha=0.5)
+
+    if localization_pb is None:
+        return
+
+    vx = localization_pb.pose.position.x
+    vy = localization_pb.pose.position.y
+    heading = localization_pb.pose.heading
+
+    path_x = [x - vx for x in navigation_path_x]
+    path_y = [y - vy for y in navigation_path_y]
+
+    routing_x = []
+    routing_y = []
+
+    for i in range(len(path_x)):
+        x = path_x[i]
+        y = path_y[i]
+        newx = x * math.cos(- heading + 1.570796) - y * math.sin(
+            -heading + 1.570796)
+        newy = y * math.cos(- heading + 1.570796) + x * math.sin(
+            -heading + 1.570796)
+
+        routing_x.append(newx)
+        routing_y.append(-1 * newy)
+
+    ax.plot(routing_x, routing_y, c='k')
+
+
+def navigation_callback(navigation_info_pb):
+    global navigation_path_x, navigation_path_y
+    navigation_path_x = []
+    navigation_path_y = []
+    for navi_path in navigation_info_pb.navigation_path:
+        for path_point in navi_path.path.path_point:
+            navigation_path_x.append(path_point.x)
+            navigation_path_y.append(path_point.y)
 
 
 def draw_lane_central(lane, ax, color_val):
@@ -120,6 +169,11 @@ def add_listener():
     rospy.Subscriber('/apollo/relative_map',
                      navigation_pb2.MapMsg,
                      map_callback)
+    rospy.Subscriber('/apollo/navigation',
+                     navigation_pb2.NavigationInfo, navigation_callback)
+    rospy.Subscriber('/apollo/localization/pose',
+                     localization_pb2.LocalizationEstimate,
+                     localization_callback)
 
 
 if __name__ == '__main__':
