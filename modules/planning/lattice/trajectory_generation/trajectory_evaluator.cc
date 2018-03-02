@@ -42,7 +42,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     const std::vector<std::shared_ptr<Trajectory1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Trajectory1d>>& lat_trajectories,
     std::shared_ptr<PathTimeGraph> path_time_graph)
-    : init_s_(init_s), path_time_graph_(path_time_graph) {
+    : path_time_graph_(path_time_graph), init_s_(init_s) {
   const double start_time = 0.0;
   const double end_time = FLAGS_trajectory_time_length;
   path_time_intervals_ = path_time_graph_->GetPathBlockingIntervals(
