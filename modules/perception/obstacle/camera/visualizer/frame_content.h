@@ -20,11 +20,11 @@
 #include <boost/shared_ptr.hpp>
 #include <deque>
 #include <iomanip>
+#include <map>
 #include <sstream>
 #include <string>
 #include <thread>
 #include <vector>
-#include <map>
 
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
@@ -129,27 +129,19 @@ class FrameContent {
   Eigen::Matrix4d get_pose_v2w();
   cv::Mat get_camera_image();
 
-  int get_pose_type() {
-    return _continuous_type;
-  }
+  int get_pose_type() { return _continuous_type; }
 
-  void set_pose_type(int type) {
-    _continuous_type = type;
-  }
+  void set_pose_type(int type) { _continuous_type = type; }
 
   std::vector<ObjectPtr> get_camera_objects();
   std::vector<ObjectPtr> get_radar_objects();
   double get_visualization_timestamp();
 
-  inline bool has_radar_data() {
-    return _radar_caches.size();
-  }
+  inline bool has_radar_data() { return _radar_caches.size(); }
 
   CameraFrameSupplementPtr get_camera_frame_supplement();
 
-  inline bool has_camera_data() {
-    return _camera_caches.size();
-  }
+  inline bool has_camera_data() { return _camera_caches.size(); }
   /*   inline void set_camera2velo_pose(const Eigen::Matrix4d& pose) {
          _pose_camera2velo = pose;
      }*/

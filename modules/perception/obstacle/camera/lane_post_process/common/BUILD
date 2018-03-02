@@ -7,7 +7,7 @@ cc_library(
     hdrs = ["type.h"],
     deps = [
         "//modules/common:log",
-        "@eigen//:eigen",
+        "@eigen",
         "@opencv2//:core",
     ],
 )
@@ -28,7 +28,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/perception/obstacle/camera/lane_post_process/common:perception_obstacle_camera_lane_post_process_common_type",
-        "@eigen//:eigen",
+        "@eigen",
         "@opencv2//:core",
     ],
 )
@@ -38,9 +38,9 @@ cc_library(
     hdrs = ["projector.h"],
     deps = [
         "//modules/common:log",
-        "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/obstacle/camera/common:obstacle_camera_common",
-        "@eigen//:eigen",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/obstacle/camera/common",
+        "@eigen",
         "@opencv2//:core",
     ],
 )
