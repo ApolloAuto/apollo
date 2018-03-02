@@ -230,70 +230,49 @@ void NavigationLane::ConvertLaneMarkerToPath(
   const auto& left_lane = lane_marker.left_lane_marker();
   const auto& right_lane = lane_marker.right_lane_marker();
 
+  double path_c0 = (left_lane.c0_position() + right_lane.c0_position()) / 2.0;
+
+  double quality_divider = left_lane.quality() + right_lane.quality();
+
+  double path_c1 = (left_lane.c1_heading_angle() * left_lane.quality() +
+      right_lane.c1_heading_angle() * left_lane.quality()) / quality_divider;
+
+  double path_c2 = (left_lane.c2_curvature() * left_lane.quality() +
+      right_lane.c2_curvature() * left_lane.quality()) / quality_divider;
+
+  double path_c3 = (left_lane.c3_curvature_derivative() * left_lane.quality() +
+      right_lane.c3_curvature_derivative() * left_lane.quality()) /
+      quality_divider;
+
+  double path_range = std::fmax(left_lane.view_range(),
+                                right_lane.view_range());
+
   const double unit_z = 1.0;
-  if (left_lane.view_range() > right_lane.view_range()) {
-    const double x_l_0 = EvaluateCubicPolynomial(
-        left_lane.c0_position(), left_lane.c1_heading_angle(),
-        left_lane.c2_curvature(), left_lane.c3_curvature_derivative(), 0.0);
+  double accumulated_s = 0.0;
+  for (double z = 0; z <= path_range; z += unit_z) {
+    const double x_l = EvaluateCubicPolynomial(path_c0, path_c1,
+                                               path_c2, path_c3, z);
 
-    double accumulated_s = 0.0;
-    for (double z = 0; z <= left_lane.view_range(); z += unit_z) {
-      const double x_l = EvaluateCubicPolynomial(
-          left_lane.c0_position(), left_lane.c1_heading_angle(),
-          left_lane.c2_curvature(), left_lane.c3_curvature_derivative(), z);
-
-      if (left_width_ < 0.0) {
-        left_width_ = std::fabs(x_l);
-      }
-      if (right_width_ < 0.0) {
-        right_width_ = left_width_;
-      }
-
-      double x1 = z;
-      // TODO(All): use more precise method to shift y
-      double y1 = std::fabs(x_l) - std::fabs(x_l_0);
-
-      auto* point = path->add_path_point();
-      point->set_x(x1);
-      point->set_y(y1);
-      point->set_s(accumulated_s);
-
-      if (path->path_point_size() > 1) {
-        auto& pre_point = path->path_point(path->path_point_size() - 2);
-        accumulated_s += std::hypot(x1 - pre_point.x(), y1 - pre_point.y());
-      }
+    if (left_width_ < 0.0) {
+      left_width_ = (std::fabs(left_lane.c0_position()) +
+          std::fabs(right_lane.c0_position())) / 2.0;
     }
-  } else {
-    const double x_r_0 = EvaluateCubicPolynomial(
-        right_lane.c0_position(), right_lane.c1_heading_angle(),
-        right_lane.c2_curvature(), right_lane.c3_curvature_derivative(), 0.0);
-    double accumulated_s = 0.0;
-    for (double z = 0; z <= right_lane.view_range(); z += unit_z) {
-      const double x_r = EvaluateCubicPolynomial(
-          right_lane.c0_position(), right_lane.c1_heading_angle(),
-          right_lane.c2_curvature(), right_lane.c3_curvature_derivative(), z);
-
-      if (right_width_ < 0.0) {
-        right_width_ = left_width_;
-      }
-      if (left_width_ < 0.0) {
-        left_width_ = right_width_;
-      }
-
-      double x1 = z;
-      // TODO(All): use more precise method to shift y
-      double y1 = -std::fabs(x_r) + std::fabs(x_r_0);
-
-      auto* point = path->add_path_point();
-      point->set_x(x1);
-      point->set_y(y1);
-      point->set_s(accumulated_s);
-
-      if (path->path_point_size() > 1) {
-        auto& pre_point = path->path_point(path->path_point_size() - 2);
-        accumulated_s += std::hypot(x1 - pre_point.x(), y1 - pre_point.y());
-      }
+    if (right_width_ < 0.0) {
+      right_width_ = left_width_;
     }
+
+    double x1 = z;
+    double y1 = x_l;
+
+    auto* point = path->add_path_point();
+    point->set_x(x1);
+    point->set_y(y1);
+
+    if (path->path_point_size() > 1) {
+      auto& pre_point = path->path_point(path->path_point_size() - 2);
+      accumulated_s += std::hypot(x1 - pre_point.x(), y1 - pre_point.y());
+    }
+    point->set_s(accumulated_s);
   }
 }
 
