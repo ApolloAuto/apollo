@@ -165,9 +165,8 @@ PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,
 // a wrapper template function for remove_if (notice that remove_if cannot
 // change the Container size)
 template <class Container, class F>
-auto erase_where(Container& c, F&& f) {
-  return c.erase(std::remove_if(c.begin(), c.end(), std::forward<F>(f)),
-                 c.end());
+void erase_where(Container& c, F&& f) {  // NOLINT
+  c.erase(std::remove_if(c.begin(), c.end(), std::forward<F>(f)), c.end());
 }
 
 }  // namespace util

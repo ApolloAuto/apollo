@@ -123,7 +123,7 @@ T RTKLocalization::InterpolateXYZ(const T &p1, const T &p2,
 }
 
 bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
-                                      CorrectedImu *imu_msg) {
+                                      Imu *imu_msg) {
   if (imu_msg == nullptr) {
     AERROR << "imu_msg should NOT be nullptr.";
     return false;
@@ -194,10 +194,8 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
   return true;
 }
 
-bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1,
-                                     const CorrectedImu &imu2,
-                                     const double timestamp_sec,
-                                     CorrectedImu *imu_msg) {
+bool RTKLocalization::InterpolateIMU(const Imu &imu1, const Imu &imu2,
+                                     const double timestamp_sec, Imu *imu_msg) {
   DCHECK_NOTNULL(imu_msg);
   if (!(imu1.has_header() && imu1.header().has_timestamp_sec() &&
         imu2.has_header() && imu2.header().has_timestamp_sec())) {
@@ -256,7 +254,7 @@ void RTKLocalization::PrepareLocalizationMsg(
   const auto &gps_msg = AdapterManager::GetGps()->GetLatestObserved();
 
   bool imu_valid = true;
-  CorrectedImu imu_msg;
+  Imu imu_msg;
   if (FLAGS_enable_gps_imu_interprolate) {
     // find the matching gps and imu message
     double gps_time_stamp = gps_msg.header().timestamp_sec();
@@ -282,8 +280,7 @@ void RTKLocalization::PrepareLocalizationMsg(
 }
 
 void RTKLocalization::ComposeLocalizationMsg(
-    const localization::Gps &gps_msg,
-    const localization::CorrectedImu &imu_msg,
+    const localization::Gps &gps_msg, const localization::Imu &imu_msg,
     LocalizationEstimate *localization) {
   localization->Clear();
 
