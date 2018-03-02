@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef apollo_PERCEPTION_LIB_BASE_CONCURRENT_QUEUE_H
-#define apollo_PERCEPTION_LIB_BASE_CONCURRENT_QUEUE_H
+#ifndef MODULES_PERCEPTION_LIB_BASE_CONCURRENT_QUEUE_H_
+#define MODULES_PERCEPTION_LIB_BASE_CONCURRENT_QUEUE_H_
 
 #include <queue>
 
@@ -135,7 +135,9 @@ class FixedSizeConQueue : public ConcurrentQueue<Data> {
     return true;
   }
 
-  bool full() const { return this->_queue.size() >= _max_count; }
+  bool full() const {
+    return this->_queue.size() >= _max_count;
+  }
 
  private:
   CondVar _condition_full;
@@ -146,4 +148,4 @@ class FixedSizeConQueue : public ConcurrentQueue<Data> {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_LIB_BASE_CONCURRENT_QUEUE_H
+#endif  // MODULES_PERCEPTION_LIB_BASE_CONCURRENT_QUEUE_H_
