@@ -11,7 +11,6 @@ cc_library(
         "mlp_evaluator.h",
     ],
     deps = [
-        "//modules/common/configs:config_gflags",
         "//modules/common/math:math_utils",
         "//modules/common/util",
         "//modules/map/proto:map_proto",

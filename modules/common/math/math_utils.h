@@ -174,6 +174,14 @@ double Sigmoid(const double x);
 void RotateAxis(const double theta, const double x0, const double y0,
                 double *x1, double *y1);
 
+inline std::pair<double, double> RFUToFLU(const double x, const double y) {
+  return std::make_pair(y, -x);
+}
+
+inline std::pair<double, double> FLUToRFU(const double x, const double y) {
+  return std::make_pair(-y, x);
+}
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo

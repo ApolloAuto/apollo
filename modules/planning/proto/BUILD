@@ -228,6 +228,23 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "planning_status_proto",
+    deps = [
+        ":planning_status_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "planning_status_proto_lib",
+    srcs = [
+        "planning_status.proto",
+    ],
+    deps = [
+        ":decision_proto_lib",
+    ],
+)
+
+cc_proto_library(
     name = "lattice_sampling_config_proto",
     deps = [
         ":lattice_sampling_config_proto_lib",

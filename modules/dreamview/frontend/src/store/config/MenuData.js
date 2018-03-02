@@ -68,5 +68,18 @@ export default [
             positionLocalization: 'Localization',
             positionGps: 'GPS',
         }
+    }, {
+        id: 'map',
+        title: 'Map',
+        type: 'checkbox',
+        data: {
+            mapCrosswalk: 'Crosswalk',
+            mapClearArea: 'Clear Area',
+            mapJunction: 'Junction',
+            mapLane: 'Lane',
+            mapRoad: 'Road',
+            mapSignal: 'Signal',
+            mapStopSign: 'Stop Sign',
+        }
     },
 ];

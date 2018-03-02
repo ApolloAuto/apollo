@@ -91,8 +91,8 @@ void RotateAxis(const double theta, const double x0, const double y0,
 
   const double cos_theta = std::cos(theta);
   const double sin_theta = std::sin(theta);
-  *x1 = x0 * cos_theta - y0 * sin_theta;
-  *y1 = x0 * sin_theta + y0 * cos_theta;
+  *x1 = x0 * cos_theta + y0 * sin_theta;
+  *y1 = -x0 * sin_theta + y0 * cos_theta;
 }
 
 }  // namespace math

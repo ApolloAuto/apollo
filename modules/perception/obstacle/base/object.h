@@ -30,6 +30,7 @@
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
 
 namespace apollo {
 namespace perception {
@@ -67,7 +68,7 @@ struct alignas(16) Object {
   // foreground score/probability
   float score = 0.0;
   // foreground score/probability type
-  ScoreType score_type = SCORE_CNN;
+  ScoreType score_type = ScoreType::SCORE_CNN;
 
   // Object classification type.
   ObjectType type = ObjectType::UNKNOWN;
@@ -91,6 +92,8 @@ struct alignas(16) Object {
   Eigen::Matrix3d position_uncertainty;
   Eigen::Matrix3d velocity_uncertainty;
 
+  // CIPV
+  bool b_cipv = false;
   // sensor particular suplplements, default nullptr
   RadarSupplementPtr radar_supplement = nullptr;
 };
@@ -113,6 +116,9 @@ struct SensorObjects {
   SeqId seq_num = 0;
   std::vector<ObjectPtr> objects;
   Eigen::Matrix4d sensor2world_pose;
+  LaneObjectsPtr lane_objects;
+  uint32_t cipv_index = -1;
+  uint32_t cipv_track_id = -1;
 };
 
 }  // namespace perception

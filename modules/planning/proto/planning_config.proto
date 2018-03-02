@@ -31,7 +31,7 @@ message RuleConfig {
     DESTINATION = 7;
     STOP_SIGN = 8;
     CHANGE_LANE = 9;
-    SIDEPASS_VEHICLE = 10;
+    SIDE_PASS_VEHICLE = 10;
     KEEP_CLEAR=11;
     CIPV=12;
   }
