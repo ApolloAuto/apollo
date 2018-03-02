@@ -78,6 +78,9 @@ DECLARE_double(rnn_min_lane_relatice_s);
 DECLARE_bool(enable_adjust_velocity_heading);
 DECLARE_double(heading_filter_param);
 
+// Cost evaluator
+DECLARE_double(cost_exp_coeff);
+
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
 DECLARE_double(lane_change_dist);
