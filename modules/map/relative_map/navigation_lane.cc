@@ -159,6 +159,13 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
   const auto &navigation_path = navigation_info_.navigation_path(0).path();
   int curr_project_index = last_project_index_;
 
+  double dist = navigation_path.path_point(
+      navigation_path.path_point_size() - 1).s()
+      - navigation_path.path_point(curr_project_index).s();
+  if (dist < 20) {
+    return;
+  }
+
   // offset between the current vehicle state and navigation line
   const double dx = -original_pose_.position().x();
   const double dy = -original_pose_.position().y();
@@ -177,6 +184,7 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
 
     point->set_x(flu_x);
     point->set_y(flu_y);
+    point->set_theta(point->theta() - original_pose_.heading());
     const double accumulated_s =
         navigation_path.path_point(i).s() -
             navigation_path.path_point(curr_project_index).s();
@@ -187,9 +195,13 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
     }
   }
 
-  // set left/right width invalid as no width info from navigation line
-  left_width_ = -1.0;
-  right_width_ = -1.0;
+  const perception::LaneMarkers &lane_marker =
+      perception_obstacles_.lane_marker();
+  const auto &left_lane = lane_marker.left_lane_marker();
+  const auto &right_lane = lane_marker.right_lane_marker();
+  left_width_ = (std::fabs(left_lane.c0_position()) +
+      std::fabs(right_lane.c0_position())) / 2.0;
+  right_width_ = left_width_;
 }
 
 // project adc_state_ onto path
