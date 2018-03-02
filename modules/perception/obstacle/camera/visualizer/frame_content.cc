@@ -17,6 +17,7 @@
 #include <Eigen/LU>
 #include <map>
 #include "modules/common/log.h"
+#include "modules/common/util/util.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
 
 namespace apollo {
@@ -152,14 +153,10 @@ void FrameContent::update_timestamp(double ref) {
     ref = best_ts;
     _current_image_timestamp = ref;
   }
-  for (std::map<double, ImageContent>::iterator it = _image_caches.begin();
-       it != _image_caches.end();) {
-    if (it->first < _current_image_timestamp) {
-      _image_caches.erase(it++);
-    } else {
-      ++it;
-    }
-  }
+  common::util::erase_map_where(
+      _image_caches, [this](std::map<double, ImageContent>::value_type& p) {
+        return p.first < this->_current_image_timestamp;
+      });
 
   std::string ts_string = std::to_string(ref);
   AINFO << "cur time: " << ts_string
@@ -181,14 +178,11 @@ void FrameContent::update_timestamp(double ref) {
     }
   }
   _current_radar_timestamp = best_ts;
-  for (std::map<double, RadarContent>::iterator it = _radar_caches.begin();
-       it != _radar_caches.end();) {
-    if (it->first < best_ts) {
-      _radar_caches.erase(it++);
-    } else {
-      ++it;
-    }
-  }
+  common::util::erase_map_where(
+      _radar_caches, [best_ts](std::map<double, RadarContent>::value_type& p) {
+        return p.first < best_ts;
+      });
+
   best_delta = FLT_MAX;
   best_ts = -1;
   for (std::map<double, FusionContent>::iterator it = _fusion_caches.begin();
@@ -202,14 +196,11 @@ void FrameContent::update_timestamp(double ref) {
     }
   }
   _current_fusion_timestamp = best_ts;
-  for (std::map<double, FusionContent>::iterator it = _fusion_caches.begin();
-       it != _fusion_caches.end();) {
-    if (it->first < best_ts) {
-      _fusion_caches.erase(it++);
-    } else {
-      ++it;
-    }
-  }
+  common::util::erase_map_where(
+      _fusion_caches,
+      [best_ts](std::map<double, FusionContent>::value_type& p) {
+        return p.first < best_ts;
+      });
 
   // find camera tracked best ts
   best_delta = FLT_MAX;
@@ -225,14 +216,11 @@ void FrameContent::update_timestamp(double ref) {
     }
   }
   _current_camera_timestamp = best_ts;
-  for (std::map<double, CameraContent>::iterator it = _camera_caches.begin();
-       it != _camera_caches.end();) {
-    if (it->first < best_ts) {
-      _camera_caches.erase(it++);
-    } else {
-      ++it;
-    }
-  }
+  common::util::erase_map_where(
+      _camera_caches,
+      [best_ts](std::map<double, CameraContent>::value_type& p) {
+        return p.first < best_ts;
+      });
 
   best_delta = FLT_MAX;
   best_ts = -1;
@@ -246,14 +234,11 @@ void FrameContent::update_timestamp(double ref) {
     }
   }
   _current_gt_timestamp = best_ts;
-  for (std::map<double, GroundTruthContent>::iterator it = _gt_caches.begin();
-       it != _gt_caches.end();) {
-    if (it->first < best_ts) {
-      _gt_caches.erase(it++);
-    } else {
-      ++it;
-    }
-  }
+  common::util::erase_map_where(
+      _gt_caches,
+      [best_ts](std::map<double, GroundTruthContent>::value_type& p) {
+        return p.first < best_ts;
+      });
 
   // get motion timestamp
   best_delta = FLT_MAX;
@@ -269,14 +254,11 @@ void FrameContent::update_timestamp(double ref) {
     }
   }
   _current_motion_timestamp = best_ts;
-  for (std::map<double, MotionContent>::iterator it = _motion_caches.begin();
-       it != _motion_caches.end();) {
-    if (it->first < best_ts) {
-      _motion_caches.erase(it++);
-    } else {
-      ++it;
-    }
-  }
+  common::util::erase_map_where(
+      _motion_caches,
+      [best_ts](std::map<double, MotionContent>::value_type& p) {
+        return p.first < best_ts;
+      });
 }
 
 Eigen::Matrix4d FrameContent::get_camera_to_world_pose() {
