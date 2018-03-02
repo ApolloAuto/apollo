@@ -17,6 +17,7 @@ proto_library(
     deps = [
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
+        "//modules/localization/proto:localization_proto_lib",
         "//modules/map/proto:map_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
     ],
