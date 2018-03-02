@@ -62,25 +62,34 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   bool Init() override;
 
-  bool Process(
-      const cv::Mat &lane_map,
-      const CameraLanePostProcessOptions &options,
-      LaneObjectsPtr lane_instances) override;
+  bool Process(const cv::Mat &lane_map,
+               const CameraLanePostProcessOptions &options,
+               LaneObjectsPtr lane_instances) override;
 
   void set_max_distance_to_see(ScalarType max_distance_to_see) {
     max_distance_to_see_ = max_distance_to_see;
   }
-  void set_vis(bool vis) { vis_ = vis; }
+  void set_vis(bool vis) {
+    vis_ = vis;
+  }
 
-  std::string name() const { return "CCLanePostProcessor"; }
+  std::string name() const {
+    return "CCLanePostProcessor";
+  }
 
-  CCLanePostProcessorOptions options() const { return options_; }
+  CCLanePostProcessorOptions options() const {
+    return options_;
+  }
 
-  cv::Rect roi() const { return roi_; }
+  cv::Rect roi() const {
+    return roi_;
+  }
 
-  const std::shared_ptr<LaneFrame>& cur_frame() { return cur_frame_; }
+  const std::shared_ptr<LaneFrame> &cur_frame() {
+    return cur_frame_;
+  }
 
-  std::shared_ptr<std::vector<LaneInstance>>& cur_lane_instances() {
+  std::shared_ptr<std::vector<LaneInstance>> &cur_lane_instances() {
     return cur_lane_instances_;
   }
 
