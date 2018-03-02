@@ -157,6 +157,10 @@ bool SamePointXY(const U& u, const V& v) {
          (u.y() - v.y()) * (u.y() - v.y()) < kMathEpsilonSqr;
 }
 
+PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,
+                                            const PathPoint& p2,
+                                            const double w1, const double w2);
+
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
