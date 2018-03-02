@@ -14,25 +14,25 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_KCF_AFFINITY_TRACKER_H_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_KCF_AFFINITY_TRACKER_H_
+// Tracker which uses deep learning ROI features from detection
+
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_DLF_AFFINITY_TRACKER_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_DLF_AFFINITY_TRACKER_H_
 
 #include <limits>
 #include <unordered_map>
 #include <vector>
 
 #include "modules/perception/obstacle/camera/tracker/base_affinity_tracker.h"
-#include "modules/perception/obstacle/camera/tracker/cascaded_camera_tracker_util.h"
-#include "modules/perception/obstacle/camera/tracker/kcf/kcf_components.h"
 
 namespace apollo {
 namespace perception {
 
-class KCFAffinityTracker : public BaseAffinityTracker {
+class DLFAffinityTracker : public BaseAffinityTracker {
  public:
-  KCFAffinityTracker() : BaseAffinityTracker() {}
+  DLFAffinityTracker() : BaseAffinityTracker() {}
 
-  virtual ~KCFAffinityTracker() {}
+  virtual ~DLFAffinityTracker() {}
 
   bool Init() override;
 
@@ -45,17 +45,12 @@ class KCFAffinityTracker : public BaseAffinityTracker {
                      std::vector<Tracked> *tracked) override;
 
  private:
-  // KCF module
-  KCFComponents kcf_component_;
-
-  // z_f for all detected objects
-  std::unordered_map<int, std::vector<cv::Mat>> detected_features_;
-
-  const float kKeepThreshold_ = 0.0f;
-  const float kScale_ = 2.5f;
+  //  Thresholds are fine-tuned and detector-dependant
+  const float kConfThreshold_ = 0.9f;
+  const float kFilterThreshold_ = 0.3f;
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_KCF_AFFINITY_TRACKER_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_DLF_AFFINITY_TRACKER_H_

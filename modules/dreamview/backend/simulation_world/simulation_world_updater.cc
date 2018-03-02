@@ -222,9 +222,15 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       "Dump", [this](const Json &json, WebSocketHandler::Connection *conn) {
         DumpMessage(AdapterManager::GetChassis(), "Chassis");
         DumpMessage(AdapterManager::GetPrediction(), "Prediction");
+        DumpMessage(AdapterManager::GetRoutingRequest(), "RoutingRequest");
         DumpMessage(AdapterManager::GetRoutingResponse(), "RoutingResponse");
         DumpMessage(AdapterManager::GetLocalization(), "Localization");
         DumpMessage(AdapterManager::GetPlanning(), "Planning");
+        DumpMessage(AdapterManager::GetControlCommand(), "Control");
+        DumpMessage(AdapterManager::GetPerceptionObstacles(), "Perception");
+        DumpMessage(AdapterManager::GetTrafficLightDetection(), "TrafficLight");
+        DumpMessage(AdapterManager::GetRelativeMap(), "RelativeMap");
+        DumpMessage(AdapterManager::GetNavigation(), "Navigation");
       });
 
   websocket_->RegisterMessageHandler(

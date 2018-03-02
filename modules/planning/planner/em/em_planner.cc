@@ -56,7 +56,7 @@ using common::time::Clock;
 namespace {
 constexpr double kPathOptimizationFallbackClost = 2e4;
 constexpr double kSpeedOptimizationFallbackClost = 2e4;
-}
+}  // namespace
 
 void EMPlanner::RegisterTasks() {
   task_factory_.Register(TRAFFIC_DECIDER,
@@ -144,34 +144,26 @@ void EMPlanner::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame) {
-  auto status = Status::OK();
-  bool has_plan = false;
-  auto it = std::find_if(
-      frame->reference_line_info().begin(), frame->reference_line_info().end(),
-      [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
-  if (it != frame->reference_line_info().end()) {
-    status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
-    has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
-                it->TrajectoryLength() > FLAGS_change_lane_min_length);
-    if (!has_plan) {
-      AERROR << "Fail to plan for lane change.";
+  bool has_drivable_reference_line = false;
+  auto status =
+      Status(ErrorCode::PLANNING_ERROR, "reference line not drivable");
+  for (auto& reference_line_info : frame->reference_line_info()) {
+    if (!reference_line_info.IsDrivable()) {
+      continue;
+    }
+    auto cur_status =
+        PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
+    if (cur_status.ok() && reference_line_info.IsDrivable()) {
+      has_drivable_reference_line = true;
+      if (FLAGS_prioritize_change_lane &&
+          reference_line_info.IsChangeLanePath()) {
+        break;
+      }
+    } else {
+      reference_line_info.SetDrivable(false);
     }
   }
-
-  if (!has_plan || !FLAGS_prioritize_change_lane) {
-    for (auto& reference_line_info : frame->reference_line_info()) {
-      if (reference_line_info.IsChangeLanePath()) {
-        continue;
-      }
-      status = PlanOnReferenceLine(planning_start_point, frame,
-                                   &reference_line_info);
-      if (status != Status::OK()) {
-        AERROR << "planner failed to make a driving plan for: "
-               << reference_line_info.Lanes().Id();
-      }
-    }
-  }
-  return status;
+  return has_drivable_reference_line ? Status::OK() : status;
 }
 
 Status EMPlanner::PlanOnReferenceLine(

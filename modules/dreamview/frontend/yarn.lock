@@ -4458,16 +4458,6 @@ isstream@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
 
-jDataView@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/jDataView/-/jDataView-2.3.0.tgz#e63c1972fdc9e6ee01c6deb868c6196904e813e0"
-  dependencies:
-    jdataview "*"
-
-jdataview@*:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/jdataview/-/jdataview-2.5.0.tgz#3081b3fea651f9317ec6bd4feb2ddc98aa41d595"
-
 jimp@^0.2.13, jimp@^0.2.21:
   version "0.2.28"
   resolved "https://registry.yarnpkg.com/jimp/-/jimp-0.2.28.tgz#dd529a937190f42957a7937d1acc3a7762996ea2"
