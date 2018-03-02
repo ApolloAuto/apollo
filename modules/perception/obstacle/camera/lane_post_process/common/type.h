@@ -116,7 +116,7 @@ struct AssociationParam {
   ScalarType min_orientation_estimation_size;
 
   AssociationParam()
-      : method(AssociationMethod::GREEDY_SEARCH),
+      : method(AssociationMethod::GREEDY_GROUP_CONNECT),
         min_distance(0.0),
         max_distance(100.0),
         distance_weight(0.4),
@@ -431,6 +431,10 @@ struct LaneDebugContent {
 typedef std::vector<LaneObject> LaneObjects;
 typedef std::shared_ptr<LaneObjects> LaneObjectsPtr;
 typedef const std::shared_ptr<LaneObjects> LaneObjectsConstPtr;
+
+typedef std::vector<LaneInstance> LaneInstances;
+typedef std::shared_ptr<LaneInstances> LaneInstancesPtr;
+typedef const std::shared_ptr<LaneInstances> LaneInstancesConstPtr;
 
 // typedef adu::perception::obstacle::transformer_tool::
 //         Projector<ScalarType> Projector;

@@ -14,14 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-// brief: image space to ego-car ground space projection
+// brief: image space to ego-car vehicle space projection
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_PROJECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_PROJECTOR_H_
 
-#include <cmath>
 #include <Eigen/Eigen>
 #include <opencv2/opencv.hpp>
+
+#include <vector>
+#include <limits>
+#include <algorithm>
 
 #include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
@@ -44,9 +47,6 @@ class Projector {
     return UvToXy(static_cast<T>(u), static_cast<T>(v), p);
   }
 
-  //Eigen::Affine3d camera_ex_;
-  //Eigen::Affine3d camera_to_ego_car_;
-
   bool is_init() const { return is_init_; }
 
   bool IsValidUv(const int &x, const int &y) const {
@@ -55,7 +55,7 @@ class Projector {
 
   bool IsValidUv(const T &x, const T &y) const;
 
-  bool IsValidUv(const T &x, const T &y) const {
+  bool IsValidXy(const T &x, const T &y) const {
     return x >= xy_xmin_ && x <= xy_xmax_ && y >= xy_ymin_ && y <= xy_ymax_;
   }
 
@@ -72,15 +72,9 @@ class Projector {
            y >= xy_image_ymin_ && y <= xy_image_ymax_;
   }
 
-  int xy_image_cols() const {
-    //CHECK(_is_init) << "Error: projector is not initialized.";
-    return xy_image_cols_;
-  }
+  int xy_image_cols() const { return xy_image_cols_; }
 
-  int xy_image_rows() const {
-    //CHECK(_is_init) << "Error: projector is not initialized.";
-    return xy_image_rows_;
-  }
+  int xy_image_rows() const { return xy_image_rows_; }
 
   bool XyToXyImagePoint(const T &x, const T &y, cv::Point *p) const;
   bool XyToXyImagePoint(const Eigen::Matrix<T, 2, 1> &pos,
@@ -171,10 +165,10 @@ bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
   AINFO << "Initialize projector ...";
 
   // read transformation matrix from calibration config manager
-  config_manager::CalibrationConfigManager *calibration_config_manager =
-      base::Singleton<config_manager::CalibrationConfigManager>::get();
+  CalibrationConfigManager *calibration_config_manager =
+      Singleton<CalibrationConfigManager>::get();
 
-  const config_manager::CameraCalibrationPtr camera_calibration =
+  const CameraCalibrationPtr camera_calibration =
       calibration_config_manager->get_camera_calibration();
 
   trans_mat_ = camera_calibration->get_camera2car_homography_mat().cast<T>();
@@ -402,7 +396,7 @@ bool Projector<T>::UvToXy(const T &u, const T &v,
   }
 
   int id = static_cast<int>(std::round((v - uv_ymin_) / uv_roi_y_step_)) *
-               _uv_roi_cols +
+               uv_roi_cols_ +
            static_cast<int>(std::round((u - uv_xmin_) / uv_roi_x_step_));
   if (id < 0 || id >= uv_roi_count_) {
     AERROR << "pixel id is not valid: " << id;
@@ -490,7 +484,7 @@ bool Projector<T>::Project(const T &u, const T &v,
   return true;
 }
 
-}  // perception
-}  // apollo
+}  // namespace perception
+}  // namespace apollo
 
 #endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_PROJECTOR_H_

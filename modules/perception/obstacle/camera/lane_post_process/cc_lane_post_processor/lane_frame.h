@@ -16,8 +16,8 @@
 
 // @brief: lane detection on a single image frame
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_LANE_FRAME_H_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_LANE_FRAME_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_FRAME_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_FRAME_H_
 
 #include <Eigen/Core>
 #include <opencv2/opencv.hpp>
@@ -96,17 +96,16 @@ class LaneFrame {
             const LaneFrameOptions& options);
 
   bool Init(const std::vector<ConnectedComponentPtr>& input_cc,
-            const std::shared_ptr<Projector>& projector,
+            const std::shared_ptr<Projector<ScalarType>>& projector,
             const LaneFrameOptions& options);
 
-  void SetTransformer(const std::shared_ptr<Projector>& projector) {
+  void SetTransformer(
+      const std::shared_ptr<Projector<ScalarType>>& projector) {
     projector_ = projector;
     is_projector_init_ = true;
   }
 
-  // void process();
-
-  bool Process(std::vector<LaneInstance>* instances);
+  bool Process(LaneInstancesPtr instances);
 
   int MarkerNum() const {
     return static_cast<int>(markers_.size());
@@ -143,30 +142,40 @@ class LaneFrame {
 
   bool GreedyGroupConnectAssociation();
 
-  int AddGroupIntoGraph(const Group& group, Graph& graph,
-                        std::unordered_set<int>& hash_marker_idx);
+  int AddGroupIntoGraph(const Group& group, Graph* graph,
+                        std::unordered_set<int>* hash_marker_idx);
 
-  int AddGroupIntoGraph(const Group& group, Graph& graph,
-                        std::unordered_set<int>& hash_marker_idx,
-                        int start_marker_ascend_id, int end_marker_descend_id);
+  int AddGroupIntoGraph(const Group& group,
+                        const int& start_marker_ascend_id,
+                        const int& end_marker_descend_id,
+                        Graph* graph,
+                        std::unordered_set<int>* hash_marker_idx);
 
   void ComputeBbox();
 
  private:
-  LaneFrameOptions opts_;                                    // options
-  std::vector<Marker> markers_;                              // markers
-  int max_cc_num_;
-  std::vector<int> cc_idx_;                                  // CC index for each marker
-  std::unordered_map<int, std::vector<int>> cc_marker_lut_;  // marker indices for each CC
+  // options
+  LaneFrameOptions opts_;
 
-  std::shared_ptr<const Projector> projector_;
+  // markers
+  std::vector<Marker> markers_;
+  int max_cc_num_;
+
+  // CC index for each marker
+  std::vector<int> cc_idx_;
+  // marker indices for each CC
+  std::unordered_map<int, std::vector<int>> cc_marker_lut_;
+
+  std::shared_ptr<const Projector<ScalarType>> projector_;
   bool is_projector_init_;
 
-  std::vector<Graph> graphs_;                                // lane marker clusters
-  std::vector<Bbox> boxes_;                                  // tight bounding boxes for lane cluster
+  // lane marker clusters
+  std::vector<Graph> graphs_;
+  // tight bounding boxes of lane clusters
+  std::vector<Bbox> boxes_;
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_LANE_FRAME_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_FRAME_H_

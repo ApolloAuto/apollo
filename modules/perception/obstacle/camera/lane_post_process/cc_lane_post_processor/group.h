@@ -17,8 +17,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_GROUP_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_GROUP_H_
 
-#include <algorithm>
 #include <vector>
+#include <limits>
+#include <algorithm>
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
@@ -112,9 +113,6 @@ inline int Group::ComputeOrientation(const std::vector<Marker>& markers,
                              start_marker_count - 2);
       }
       int end_ind = start_marker_count - 1;
-      //XLOG_IF(ERROR, start_ind > end_ind) << "start_ind (" << start_ind
-      //                                    << ") is larger than end_ind ("
-      //                                    << end_ind << ")";
       ADEBUG << "start markers: start_ind=" << start_ind
              << ", end_ind=" << end_ind;
 
@@ -128,9 +126,6 @@ inline int Group::ComputeOrientation(const std::vector<Marker>& markers,
           std::min(group_param.orientation_estimation_skip_marker_num,
                    start_marker_count - 1);
       int end_ind = start_marker_count - 1;
-      //XLOG_IF(ERROR, start_ind > end_ind) << "start_ind (" << start_ind
-      //                                    << ") is larger than end_ind ("
-      //                                    << end_ind << ")";
       ADEBUG << "start markers: start_ind=" << start_ind
              << ", end_ind=" << end_ind;
 
@@ -165,9 +160,6 @@ inline int Group::ComputeOrientation(const std::vector<Marker>& markers,
         end_ind = std::min(group_param.orientation_estimation_skip_marker_num,
                            end_marker_count - 2);
       }
-      //XLOG_IF(ERROR, start_ind < end_ind) << "start_ind (" << start_ind
-      //                                    << ") is smaller than end_ind ("
-      //                                    << end_ind << ")";
       ADEBUG << "end markers: start_ind=" << start_ind
              << ", end_ind=" << end_ind;
 
@@ -180,9 +172,6 @@ inline int Group::ComputeOrientation(const std::vector<Marker>& markers,
       int start_ind = end_marker_count - 1;
       int end_ind = std::min(group_param.orientation_estimation_skip_marker_num,
                              end_marker_count - 1);
-      //XLOG_IF(ERROR, start_ind < end_ind) << "start_ind (" << start_ind
-      //                                    << ") is smaller than end_ind ("
-      //                                    << end_ind << ")";
       ADEBUG << "end markers: start_ind=" << start_ind
              << ", end_ind=" << end_ind;
 
@@ -255,27 +244,16 @@ inline ScalarType Group::ComputeDistance(const Group& tar_group,
 
   // angle from reference marker to the target one
   ScalarType gamma = std::atan2(displacement(1), displacement(0));
-  //XLOG_IF(ERROR, gamma < -static_cast<ScalarType>(M_PI) ||
-  //                   gamma > static_cast<ScalarType>(M_PI))
-  //    << "gamma is out range of [-pi, pi]: " << gamma;
   if (gamma < 0) {
     gamma += 2 * static_cast<ScalarType>(M_PI);
   }
   ADEBUG << "gamma = " << std::to_string(gamma / M_PI * 180.0);
 
   ScalarType deviation_angle_dist = std::abs(beta - gamma);
-  //XLOG_IF(ERROR, deviation_angle_dist < 0 ||
-  //                   deviation_angle_dist > 2 * static_cast<ScalarType>(M_PI))
-  //    << "deviation_angle_dist is out range of [0, 2*pi]: "
-  //    << deviation_angle_dist;
   if (deviation_angle_dist > static_cast<ScalarType>(M_PI)) {
     deviation_angle_dist =
         2 * static_cast<ScalarType>(M_PI) - deviation_angle_dist;
   }
-  //XLOG_IF(ERROR, deviation_angle_dist < 0 ||
-  //                   deviation_angle_dist > static_cast<ScalarType>(M_PI))
-  //    << "deviation_angle_dist is out range of [0, pi]: "
-  //    << deviation_angle_dist;
   ADEBUG << "(3) deviation_angle_dist = "
          << std::to_string(deviation_angle_dist / M_PI * 180.0);
   if (deviation_angle_dist > param.max_deviation_angle) {
@@ -294,14 +272,9 @@ inline ScalarType Group::ComputeDistance(const Group& tar_group,
     ADEBUG << "alpha = " << std::to_string(alpha / M_PI * 180.0);
 
     orie_dist = std::abs(alpha - beta);
-    //XLOG_IF(ERROR,
-    //        orie_dist < 0 || orie_dist > 2 * static_cast<ScalarType>(M_PI))
-    //    << "orie_dist is out range of [0, 2*pi]: " << orie_dist;
     if (orie_dist > static_cast<ScalarType>(M_PI)) {
       orie_dist = 2 * static_cast<ScalarType>(M_PI) - orie_dist;
     }
-    //XLOG_IF(ERROR, orie_dist < 0 || orie_dist > static_cast<ScalarType>(M_PI))
-    //    << "orie_dist is out range of [0, pi]: " << orie_dist;
     ADEBUG << "(4b) orie_dist = "
            << std::to_string(orie_dist / M_PI * 180.0) << " ("
            << std::to_string(param.max_relative_orie / M_PI * 180.0) << ")";
@@ -310,7 +283,6 @@ inline ScalarType Group::ComputeDistance(const Group& tar_group,
     }
   }
 
-  //
   ScalarType r =
       std::max(std::abs(param.min_distance), std::abs(param.max_distance));
   if (r > kEpsilon) {
@@ -331,10 +303,6 @@ inline ScalarType Group::ComputeDistance(const Group& tar_group,
                     param.deviation_angle_weight * deviation_angle_dist +
                     param.relative_orie_weight * orie_dist;
 
-  //XLOG_IF(ERROR, !std::isfinite(dist)) << "the distance value is infinite.";
-  //XLOG_IF(ERROR, dist < 0) << "the distance value is negative: "
-  //                         << std::to_string(dist);
-
   ADEBUG << "overall distance = " << std::to_string(dist) << "\n";
   return dist;
 }
@@ -346,7 +314,6 @@ inline Bbox Group::GetBbox(const std::vector<Marker>& markers) const {
            -std::numeric_limits<ScalarType>::max());  // y_max
 
   for (int i : this->marker_idx) {
-    //assert(i >= 0 && i < static_cast<int>(markers.size()));
     box(0) = std::min(box(0), markers[i].pos.x());
     box(1) = std::min(box(1), markers[i].pos.y());
     box(2) = std::max(box(2), markers[i].pos.x());

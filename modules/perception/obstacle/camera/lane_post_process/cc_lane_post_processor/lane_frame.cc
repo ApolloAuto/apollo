@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <algorithm>
-
 #include <boost/filesystem.hpp>
 
-#include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/lane_frame.hpp"
+#include <limits>
+#include <algorithm>
+
+#include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/lane_frame.h"
 
 namespace apollo {
 namespace perception {
@@ -45,8 +46,6 @@ void LaneFrame::ComputeBbox() {
 
     for (size_t j = 0; j < graphs_[k].size(); ++j) {
       int i = graphs_[k][j].first;
-      //XLOG_IF(ERROR, i < 0 || i >= marker_num()) << "invalid marker index: "
-      //                                           << i;
       boxes_[k](0) = std::min(boxes_[k](0), markers_.at(i).pos(0));
       boxes_[k](1) = std::min(boxes_[k](1), markers_.at(i).pos(1));
       boxes_[k](2) = std::max(boxes_[k](2), markers_.at(i).pos(0));
@@ -92,9 +91,6 @@ ScalarType LaneFrame::ComputeMarkerPairDistance(const Marker& ref,
 
   // orientation angle of target marker
   ScalarType alpha = tar.angle;
-  // XLOG_IF(ERROR, alpha < -static_cast<ScalarType>(M_PI) ||
-  //               alpha > static_cast<ScalarType>(M_PI))
-  //    << "alpha is out range of [-pi, pi]: " << alpha;
   if (alpha < 0) {
     alpha += (2 * static_cast<ScalarType>(M_PI));
   }
@@ -102,9 +98,6 @@ ScalarType LaneFrame::ComputeMarkerPairDistance(const Marker& ref,
 
   // orientation angle of reference marker
   ScalarType beta = ref.angle;
-  // XLOG_IF(ERROR, beta < -static_cast<ScalarType>(M_PI) ||
-  //                   beta > static_cast<ScalarType>(M_PI))
-  //    << "beta is out range of [-pi, pi]: " << beta;
   if (beta < 0) {
     beta += (2 * static_cast<ScalarType>(M_PI));
   }
@@ -112,49 +105,34 @@ ScalarType LaneFrame::ComputeMarkerPairDistance(const Marker& ref,
 
   // deviation angle from reference marker to the target one
   ScalarType gamma = std::atan2(displacement(1), displacement(0));
-  // XLOG_IF(ERROR, gamma < -static_cast<ScalarType>(M_PI) ||
-  //                   gamma > static_cast<ScalarType>(M_PI))
-  //    << "gamma is out range of [-pi, pi]: " << gamma;
   if (gamma < 0) {
     gamma += (2 * static_cast<ScalarType>(M_PI));
   }
   ADEBUG << "gamma = " << std::to_string(gamma / M_PI * 180.0);
 
   ScalarType deviation_angle_dist = std::abs(beta - gamma);
-  // XLOG_IF(ERROR, deviation_angle_dist < 0 ||
-  //                   deviation_angle_dist > 2 * static_cast<ScalarType>(M_PI))
-  //    << "deviation_angle_dist is out range of [0, 2*pi]: "
-  //    << deviation_angle_dist;
   if (deviation_angle_dist > static_cast<ScalarType>(M_PI)) {
     deviation_angle_dist =
         2 * static_cast<ScalarType>(M_PI) - deviation_angle_dist;
   }
-  // XLOG_IF(ERROR, deviation_angle_dist < 0 ||
-  //                   deviation_angle_dist > static_cast<ScalarType>(M_PI))
-  //    << "deviation_angle_dist is out range of [0, pi]: "
-  //    << deviation_angle_dist;
   ADEBUG << "deviation_angle_dist = "
          << std::to_string(deviation_angle_dist / M_PI * 180.0);
 
   ScalarType orie_dist = std::abs(alpha - beta);
-  // XLOG_IF(ERROR, orie_dist < 0 || orie_dist > 2 *
-  // static_cast<ScalarType>(M_PI))
-  //    << "orie_dist is out range of [0, 2*pi]: " << orie_dist;
 
   if (orie_dist > static_cast<ScalarType>(M_PI)) {
     orie_dist = 2 * static_cast<ScalarType>(M_PI) - orie_dist;
   }
-  // XLOG_IF(ERROR, orie_dist < 0 || orie_dist > static_cast<ScalarType>(M_PI))
-  //    << "orie_dist is out range of [0, pi]: " << orie_dist;
-  ADEBUG << "orie_dist = " << std::to_string(orie_dist / M_PI * 180.0);
 
-  ADEBUG << "max_distance = " << std::to_string(opts_.assoc_param.max_distance)
-         << ", "
+  ADEBUG << "orie_dist = " << std::to_string(orie_dist / M_PI * 180.0);
+  ADEBUG << "max_distance = "
+         << std::to_string(opts_.assoc_param.max_distance) << ", "
          << "max_deviation_angle = "
-         << std::to_string(opts_.assoc_param.max_deviation_angle / M_PI * 180.0)
-         << ", "
+         << std::to_string(
+             opts_.assoc_param.max_deviation_angle / M_PI * 180.0) << ", "
          << "max_relative_orie = "
-         << std::to_string(opts_.assoc_param.max_relative_orie / M_PI * 180.0);
+         << std::to_string(
+             opts_.assoc_param.max_relative_orie / M_PI * 180.0);
 
   if (pos_dist > opts_.assoc_param.max_distance ||
       deviation_angle_dist > opts_.assoc_param.max_deviation_angle ||
@@ -163,26 +141,12 @@ ScalarType LaneFrame::ComputeMarkerPairDistance(const Marker& ref,
   }
 
   pos_dist /= opts_.assoc_param.max_distance;
-  // XLOG_IF(ERROR, pos_dist < static_cast<ScalarType>(0) ||
-  //                   pos_dist > static_cast<ScalarType>(1))
-  //    << "pos_dist is out range of [0, 1]: " << pos_dist;
-
-  deviation_angle_dist /= _opts.assoc_param.max_deviation_angle;
-  // XLOG_IF(ERROR, deviation_angle_dist < static_cast<ScalarType>(0) ||
-  //                   deviation_angle_dist > static_cast<ScalarType>(1))
-  //    << "deviation_angle_dist is out range of [0, 1]: "
-  //    << deviation_angle_dist;
-
+  deviation_angle_dist /= opts_.assoc_param.max_deviation_angle;
   orie_dist /= opts_.assoc_param.max_relative_orie;
-  // XLOG_IF(ERROR, orie_dist < static_cast<ScalarType>(0) ||
-  //                   orie_dist > static_cast<ScalarType>(1))
-  //    << "orie_dist is out range of [0, 1]: " << orie_dist;
 
   dist = opts_.assoc_param.distance_weight * pos_dist +
          opts_.assoc_param.deviation_angle_weight * deviation_angle_dist +
          opts_.assoc_param.relative_orie_weight * orie_dist;
-  // XLOG_IF(ERROR, dist < static_cast<ScalarType>(0)) << "dist is negative: "
-  //                                                  << dist;
   return dist;
 }
 
@@ -198,22 +162,22 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
   markers_.clear();
   for (int i = 0; i < static_cast<int>(input_cc.size()); ++i) {
     const ConnectedComponentPtr cc_ptr = input_cc.at(i);
-    if (cc_ptr->getPixelCount() >= opts_.min_cc_pixel_num &&
+    if (cc_ptr->GetPixelCount() >= opts_.min_cc_pixel_num &&
         (cc_ptr->bbox()->width() >= opts_.min_cc_size ||
          cc_ptr->bbox()->height() >= opts_.min_cc_size)) {
       const shared_ptr<vector<ConnectedComponent::Edge>>& inner_edges =
-          cc_ptr->getInnerEdges();
+          cc_ptr->GetInnerEdges();
       int n_inner_edges = static_cast<int>(inner_edges->size());
       for (int j = 0; j < n_inner_edges; ++j) {
         const ConnectedComponent::Edge* edge_ptr = &(inner_edges->at(j));
         Marker marker;
         marker.shape_type = MarkerShapeType::LINE_SEGMENT;
         marker.space_type = opts_.space_type;
-        marker.pos = cc_ptr->getVertex(edge_ptr->end_vertex_id);
+        marker.pos = cc_ptr->GetVertex(edge_ptr->end_vertex_id);
         marker.image_pos = marker.pos;
         marker.vis_pos = cv::Point(static_cast<int>(marker.pos.x()),
                                    static_cast<int>(marker.pos.y()));
-        marker.start_pos = cc_ptr->getVertex(edge_ptr->start_vertex_id);
+        marker.start_pos = cc_ptr->GetVertex(edge_ptr->start_vertex_id);
         marker.image_start_pos = marker.start_pos;
         marker.vis_start_pos =
             cv::Point(static_cast<int>(marker.start_pos.x()),
@@ -228,7 +192,7 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
 
         marker.orie(0) = std::cos(marker.angle);
         marker.orie(1) = std::sin(marker.angle);
-        marker.original_id = static_cast<int>(_markers.size());
+        marker.original_id = static_cast<int>(markers_.size());
         marker.cc_id = i;
         marker.inner_edge_id = j;
         marker.cc_edge_ascend_id = j;
@@ -317,7 +281,7 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
 }
 
 bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
-                     const shared_ptr<Projector>& projector,
+                     const shared_ptr<Projector<ScalarType>>& projector,
                      const LaneFrameOptions& options) {
   if (options.space_type != SpaceType::VEHICLE) {
     AERROR << "the space type is not VEHICLE.";
@@ -335,7 +299,7 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
     ADEBUG << "cc " << i;
     if (cc_ptr->GetPixelCount() >= opts_.min_cc_pixel_num) {
       const shared_ptr<vector<ConnectedComponent::Edge>>& inner_edges =
-          cc_ptr->getInnerEdges();
+          cc_ptr->GetInnerEdges();
 
       int n = 0;
       for (int j = 0; j < static_cast<int>(inner_edges->size()); ++j) {
@@ -347,28 +311,28 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
         marker.shape_type = MarkerShapeType::LINE_SEGMENT;
         marker.space_type = opts_.space_type;
 
-        if (!projector_->uv_2_xy(static_cast<ScalarType>(pos(0)),
-                                 static_cast<ScalarType>(pos(1)),
-                                 &(marker.pos))) {
+        if (!projector_->UvToXy(static_cast<ScalarType>(pos(0)),
+                                static_cast<ScalarType>(pos(1)),
+                                &(marker.pos))) {
           continue;
         }
         marker.image_pos = pos;
         if (projector_->is_vis()) {
-          if (!projector_->uv_2_xy_image_point(static_cast<ScalarType>(pos(0)),
-                                               static_cast<ScalarType>(pos(1)),
-                                               &marker.vis_pos)) {
+          if (!projector_->UvToXyImagePoint(static_cast<ScalarType>(pos(0)),
+                                            static_cast<ScalarType>(pos(1)),
+                                            &marker.vis_pos)) {
             return false;
           }
         }
 
-        if (!projector_->uv_2_xy(static_cast<ScalarType>(start_pos(0)),
+        if (!projector_->UvToXy(static_cast<ScalarType>(start_pos(0)),
                                  static_cast<ScalarType>(start_pos(1)),
                                  &(marker.start_pos))) {
           continue;
         }
         marker.image_start_pos = start_pos;
         if (projector_->is_vis()) {
-          if (!projector_->uv_2_xy_image_point(
+          if (!projector_->UvToXyImagePoint(
               static_cast<ScalarType>(start_pos(0)),
               static_cast<ScalarType>(start_pos(1)),
               &marker.vis_start_pos)) {
@@ -378,9 +342,6 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
 
         marker.orie = marker.pos - marker.start_pos;
         marker.angle = std::atan2(marker.orie(1), marker.orie(0));
-        //XLOG_IF(ERROR, marker.angle < -static_cast<ScalarType>(M_PI) ||
-        //                   marker.angle > static_cast<ScalarType>(M_PI))
-        //    << "marker.angle is out range of [-pi, pi]: " << marker.angle;
         if (marker.angle < -static_cast<ScalarType>(M_PI) ||
             marker.angle > static_cast<ScalarType>(M_PI)) {
             AERROR << "marker.angle is out range of [-pi, pi]: "
@@ -498,19 +459,10 @@ vector<int> LaneFrame::ComputeMarkerEdges(
     bool early_stop_flag = false;
     if (opts_.use_cc) {
       for (int j : cc_marker_lut_[markers_[i].cc_id]) {
-        //XLOG_IF(ERROR, _markers[j].cc_id != _markers[i].cc_id)
-        //    << "cc id of marker " << j << " (" << _markers[j].cc_id << ")"
-        //    << " is not equal to cc id of marker " << i << " ("
-        //    << _markers[i].cc_id << ")";
-
         if (markers_[j].cc_edge_ascend_id ==
             markers_[i].cc_edge_ascend_id + 1) {
-          //XLOG_IF(ERROR, !edges->at(i).empty()) << "edges of marker " << i
-          //                                      << " is not empty.";
-
           (*edges)[i][j] = static_cast<ScalarType>(0);
           connect_status[i] = j;
-
           ADEBUG << "  dist " << j << " = " << 0.0 << " cc "
                 << markers_[i].cc_id << " ( << "
                 << markers_[j].cc_edge_descend_id << ")";
@@ -566,8 +518,6 @@ vector<int> LaneFrame::ComputeMarkerEdges(
       ADEBUG << "marker i: y=" << std::to_string(markers_[i].pos(1))
              << ", "
              << "marker j: y=" << std::to_string(markers_[j].start_pos(1));
-
-      //XLOG_IF(ERROR, edges->at(i).find(j) != edges->at(i).end());
 
       ScalarType dist = ComputeMarkerPairDistance(markers_[i], markers_[j]);
       ADEBUG << " dist " << j << " = " << std::to_string(dist) << " cc "
@@ -765,33 +715,6 @@ bool LaneFrame::GreedyGroupConnectAssociation() {
     from_group_idx[tar_group_id].insert(src_group_id);
   }
 
-  // debug
-  /*
-  Eigen::Matrix<int, 1, Eigen::Dynamic> connect_col_sum =
-      connect_mat.colwise().sum();
-  Eigen::Matrix<int, Eigen::Dynamic, 1> connect_row_sum =
-      connect_mat.rowwise().sum();
-  for (int i = 0; i < n; ++i) {
-    if (!(connect_col_sum(i) == 0 || connect_col_sum(i) == 1)) {
-      XLOG(ERROR) << "connect_col_sum of group " << i << " = "
-                  << connect_col_sum(i) << ".";
-      return false;
-    }
-
-    if (!(connect_row_sum(i) == 0 || connect_row_sum(i) == 1)) {
-      XLOG(ERROR) << "connect_row_sum of group " << i << " = "
-                  << connect_row_sum(i) << ".";
-      return false;
-    }
-
-    if (connect_mat(i, i) != 0) {
-      XLOG(ERROR) << "connect_mat(i, i) of group " << i
-                  << " is not equal to zero.";
-      return false;
-    }
-  }
-  */
-
   // generate lane clusters
   vector<int> lut_to_id(n, -1);
   vector<int> lut_from_id(n, -1);
@@ -827,9 +750,6 @@ bool LaneFrame::GreedyGroupConnectAssociation() {
       cur_group_id = k;
 
       while (cur_group_id != -1) {
-        //assert(cur_group_id >= 0);
-        //assert(cur_group_id < static_cast<int>(groups.size()));
-        //assert(hash_group_idx.find(cur_group_id) == hash_group_idx.end());
         hash_group_idx.insert(cur_group_id);
 
         int n_markers_group =
@@ -838,22 +758,23 @@ bool LaneFrame::GreedyGroupConnectAssociation() {
           if (n_markers_group >=
               opts_.orientation_estimation_skip_marker_num + 2) {
               AddGroupIntoGraph(
-                groups[cur_group_id], graphs_.back(), hash_marker_idx,
-                opts_.orientation_estimation_skip_marker_num, 0);
+                groups[cur_group_id],
+                opts_.orientation_estimation_skip_marker_num, 0,
+                &(graphs_.back()), &hash_marker_idx);
           } else {
-              AddGroupIntoGraph(groups[cur_group_id], graphs_.back(),
-                                hash_marker_idx);
+              AddGroupIntoGraph(groups[cur_group_id],
+                                &(graphs_.back()), &hash_marker_idx);
           }
         } else {
           if (n_markers_group >=
               opts_.orientation_estimation_skip_marker_num * 2 + 2) {
-            AddGroupIntoGraph(groups[cur_group_id], graphs_.back(),
-                              hash_marker_idx,
+            AddGroupIntoGraph(groups[cur_group_id],
                               opts_.orientation_estimation_skip_marker_num,
-                              opts_.orientation_estimation_skip_marker_num);
+                              opts_.orientation_estimation_skip_marker_num,
+                              &(graphs_.back()), &hash_marker_idx);
           } else {
-            AddGroupIntoGraph(groups[cur_group_id], graphs_.back(),
-                              hash_marker_idx);
+            AddGroupIntoGraph(groups[cur_group_id],
+                              &(graphs_.back()), &hash_marker_idx);
           }
         }
         cur_group_id = lut_to_id[cur_group_id];
@@ -874,27 +795,25 @@ bool LaneFrame::GreedyGroupConnectAssociation() {
 }
 
 int LaneFrame::AddGroupIntoGraph(const Group& group,
-                                 Graph& graph,
-                                 unordered_set<int>& hash_marker_idx) {
+                                 Graph* graph,
+                                 unordered_set<int>* hash_marker_idx) {
   int count_markers = 0;
 
   int cur_marker_id = group.start_marker_idx[0];
-  if (!graph.empty() && graph.back().second == -1) {
-    XLOG_IF(ERROR, graph.back().first == -1) << "graph.back().first = "
-                                             << graph.back().first;
+  if (!graph->empty() && graph->back().second == -1) {
     if (cur_marker_id != -1) {
-      graph.back().second = cur_marker_id;
+      graph->back().second = cur_marker_id;
     }
   }
 
   int next_marker_id = -1;
   while (cur_marker_id != -1) {
-    CHECK(is_valid_marker(cur_marker_id));
-    CHECK(hash_marker_idx.find(cur_marker_id) == hash_marker_idx.end());
+    CHECK(IsValidMarker(cur_marker_id));
+    CHECK(hash_marker_idx->find(cur_marker_id) == hash_marker_idx->end());
 
-    next_marker_id = _markers[cur_marker_id].cc_next_marker_id;
-    graph.push_back(make_pair(cur_marker_id, next_marker_id));
-    hash_marker_idx.insert(cur_marker_id);
+    next_marker_id = markers_[cur_marker_id].cc_next_marker_id;
+    graph->push_back(make_pair(cur_marker_id, next_marker_id));
+    hash_marker_idx->insert(cur_marker_id);
 
     cur_marker_id = next_marker_id;
     ++count_markers;
@@ -904,36 +823,34 @@ int LaneFrame::AddGroupIntoGraph(const Group& group,
 }
 
 int LaneFrame::AddGroupIntoGraph(const Group& group,
-                                 Graph& graph,
-                                 unordered_set<int>& hash_marker_idx,
-                                 int start_marker_ascend_id,
-                                 int end_marker_descend_id) {
+                                 const int& start_marker_ascend_id,
+                                 const int& end_marker_descend_id,
+                                 Graph* graph,
+                                 unordered_set<int>* hash_marker_idx) {
   int count_markers = 0;
 
   int cur_marker_id = group.start_marker_idx.at(start_marker_ascend_id);
-  if (!graph.empty() && graph.back().second == -1) {
-    //XLOG_IF(ERROR, graph.back().first == -1) << "graph.back().first = "
-    //                                         << graph.back().first;
+  if (!graph->empty() && graph->back().second == -1) {
     if (cur_marker_id != -1) {
-      graph.back().second = cur_marker_id;
+      graph->back().second = cur_marker_id;
     }
   }
 
   int next_marker_id = -1;
   while (cur_marker_id != -1 &&
          markers_[cur_marker_id].cc_edge_descend_id >= end_marker_descend_id) {
-    //CHECK(is_valid_marker(cur_marker_id));
-    //CHECK(hash_marker_idx.find(cur_marker_id) == hash_marker_idx.end());
+    CHECK(IsValidMarker(cur_marker_id));
+    CHECK(hash_marker_idx->find(cur_marker_id) == hash_marker_idx->end());
 
     next_marker_id = markers_[cur_marker_id].cc_next_marker_id;
-    graph.push_back(make_pair(cur_marker_id, next_marker_id));
-    hash_marker_idx.insert(cur_marker_id);
+    graph->push_back(make_pair(cur_marker_id, next_marker_id));
+    hash_marker_idx->insert(cur_marker_id);
 
     cur_marker_id = next_marker_id;
     ++count_markers;
   }
-  if (!graph.empty()) {
-    graph.back().second = -1;  // set the last node available to be connected
+  if (!graph->empty()) {
+    graph->back().second = -1;  // set the last node available to be connected
   }
 
   return count_markers;
@@ -1001,6 +918,7 @@ bool LaneFrame::FitPolyCurve(const int& graph_id,
   return true;
 }
 
+/*
 bool LaneFrame::Process(vector<LaneInstance>* instances) {
   if (instances == NULL) {
       AERROR << "the pointer of input instances is null.";
@@ -1010,11 +928,57 @@ bool LaneFrame::Process(vector<LaneInstance>* instances) {
   // do marker association
   switch (opts_.assoc_param.method) {
     case AssociationMethod::GREEDY_GROUP_CONNECT: {
-      XLOG(INFO) << "using greedy group connection algorithm "
-                 << "for marker association ...";
+      AINFO << "using greedy group connection algorithm "
+            << "for marker association ...";
       if (!GreedyGroupConnectAssociation()) {
           AERROR << "failed to do marker association.";
           return false;
+      }
+      break;
+    }
+    default: {
+      AFATAL << "unknown marker association method.";
+    }
+  }
+  AINFO << "number of lane instance candidates = " << graphs_.size();
+
+  // compute tight bounding box for graphs
+  ComputeBbox();
+
+  // generate lane instances
+  instances->clear();
+  instances->reserve(graphs_.size());
+  for (int k = 0; k < GraphNum(); ++k) {
+    ScalarType siz = std::max(boxes_.at(k)(2) - boxes_.at(k)(0),
+                              boxes_.at(k)(3) - boxes_.at(k)(1));
+    // remove too small graphs
+    if (siz >= opts_.min_instance_size_prefiltered) {
+      instances->push_back(LaneInstance(k, siz, boxes_.at(k)));
+    } else {
+      ADEBUG << "size of graph " << k << " is too small: " << siz << " ("
+             << opts_.min_instance_size_prefiltered << "), "
+             << "removed.";
+    }
+  }
+
+  instances->shrink_to_fit();
+  return true;
+}
+ */
+bool LaneFrame::Process(LaneInstancesPtr instances) {
+  if (instances == NULL) {
+    AERROR << "the pointer of input instances is null.";
+    return false;
+  }
+
+  // do marker association
+  switch (opts_.assoc_param.method) {
+    case AssociationMethod::GREEDY_GROUP_CONNECT: {
+      AINFO << "using greedy group connection algorithm "
+            << "for marker association ...";
+      if (!GreedyGroupConnectAssociation()) {
+        AERROR << "failed to do marker association.";
+        return false;
       }
       break;
     }

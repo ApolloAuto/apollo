@@ -53,20 +53,18 @@ struct CCLanePostProcessorOptions {
 class CCLanePostProcessor : public BaseCameraLanePostProcessor {
  public:
   CCLanePostProcessor() : BaseCameraLanePostProcessor() {
-    //pitch_ = -0.01;
-    //ground_height_ = 1.6;
     max_distance_to_see_ = 200.0;
     vis_ = false;
     is_init_ = false;
   }
 
-  virtual ~CCLanePostProcessor(){};
+  ~CCLanePostProcessor() {}
 
-  virtual bool Init() override;
+  bool Init() override;
 
-  virtual bool Process(
+  bool Process(
       const cv::Mat &lane_map,
-      const adu::perception::obstacle::CameraLanePostProcessOptions &options,
+      const CameraLanePostProcessOptions &options,
       LaneObjectsPtr lane_instances) override;
 
   void set_max_distance_to_see(ScalarType max_distance_to_see) {
@@ -76,7 +74,7 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   std::string name() const { return "CCLanePostProcessor"; }
 
-  CCLanePostProcesserOptions options() const { return options_; }
+  CCLanePostProcessorOptions options() const { return options_; }
 
   cv::Rect roi() const { return roi_; }
 
@@ -96,26 +94,21 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
                                       LaneObject *lane_object);
 
   // @brief: generate lane instances from lane map (using lane_frame)
-  bool GenerateLaneInstances(const cv::Mat &lane_map,
-                             std::vector<LaneInstance>* lane_instances);
+  bool GenerateLaneInstances(const cv::Mat &lane_map);
 
   bool CompensateLaneObjects(LaneObjectsPtr lane_objects);
 
   bool EnrichLaneInfo(LaneObjectsPtr lane_objects);
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(CCLanePostProcessor);
-
-  CCLanePostProcesserOptions options_;
+  CCLanePostProcessorOptions options_;
 
   double time_stamp_;
   int frame_id_;
   std::shared_ptr<ConnectedComponentGenerator> cc_generator_;
   std::shared_ptr<LaneFrame> cur_frame_;
-  std::shared_ptr<std::vector<LaneInstance>> cur_lane_instances_;
+  LaneInstancesPtr cur_lane_instances_;
 
-  //ScalarType _pitch;
-  //ScalarType _ground_height;
   ScalarType max_distance_to_see_;
   int image_width_;
   int image_height_;
@@ -123,10 +116,12 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   bool is_x_longitude_;
 
-  std::shared_ptr<Projector> _projector;
+  std::shared_ptr<Projector<ScalarType>> projector_;
 
   bool is_init_;
   bool vis_;
+
+  DISALLOW_COPY_AND_ASSIGN(CCLanePostProcessor);
 };
 
 }  // namespace perception
