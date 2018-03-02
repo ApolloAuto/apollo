@@ -1,5 +1,5 @@
-import Worker from 'utils/webworker.js';
-import GMAP_NAVIGATOR from "components/Navigation/GmapNavigator";
+import Worker from "utils/webworker.js";
+import MAP_NAVIGATOR from "components/Navigation/MapNavigator";
 
 export default class NavigationWebSocketEndpoint {
     constructor(serverAddr) {
@@ -21,7 +21,7 @@ export default class NavigationWebSocketEndpoint {
         }
         this.websocket.onmessage = event => {
             this.worker.postMessage({
-                source: 'realtime',
+                source: "realtime",
                 data: event.data,
             });
         };
@@ -29,7 +29,7 @@ export default class NavigationWebSocketEndpoint {
             const message = event.data;
             switch (message.type) {
                 case "SimWorldUpdate":
-                    GMAP_NAVIGATOR.update(message);
+                    MAP_NAVIGATOR.update(message);
                     break;
                 default:
                     break;
@@ -50,10 +50,12 @@ export default class NavigationWebSocketEndpoint {
     }
 
     requestSimulationWorld() {
-        this.websocket.send(JSON.stringify({
-            type : "RequestSimulationWorld",
-            planning : false,
-        }));
+        this.websocket.send(
+            JSON.stringify({
+                type: "RequestSimulationWorld",
+                planning: false,
+            })
+        );
     }
 
     publishNavigationInfo(data) {
