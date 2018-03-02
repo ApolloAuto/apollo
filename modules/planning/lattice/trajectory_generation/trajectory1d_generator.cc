@@ -145,7 +145,7 @@ void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
 
   // Use the common function to generate trajectory bundles.
   GenerateTrajectoryBundlesWithCondition<QuinticPolynomialCurve1d>(
-      init_lat_state_, end_conditions, ptr_lon_trajectory_bundle);
+      init_lat_state_, end_conditions, ptr_lat_trajectory_bundle);
 }
 
 }  // namespace planning
