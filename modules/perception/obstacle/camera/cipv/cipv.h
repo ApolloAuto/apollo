@@ -25,6 +25,7 @@
 #include "Eigen/Eigen"
 #include "Eigen/Geometry"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/camera/common/lane_object.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
@@ -42,7 +43,7 @@ struct CipvOptions {
 const float MAX_DIST_OBJECT_TO_LANE_METER = 20.0f;
 const float MAX_VEHICLE_WIDTH_METER = 5.0f;
 
-// **** To do **** Should be from ego_vehicle_info header file
+// **** To do **** use width and length from vehicle_param_
 const float EGO_CAR_WIDTH_METER = 1.620f;   // 1.620 meter
 const float EGO_CAR_LENGTH_METER = 3.564f;  // 3.564 meter
 // *********************
@@ -143,9 +144,10 @@ class Cipv {
                                            LaneLine *left_lane_line,
                                            LaneLine *right_lane_line);
   // Member variables
-  bool _b_image_based_cipv = false;
-  int32_t _debug_level = 0;
-  float _time_unit = 0.0f;
+  bool b_image_based_cipv_ = false;
+  int32_t debug_level_ = 0;
+  float time_unit_ = 0.0f;
+  common::VehicleParam vehicle_param_;
 };
 
 }  // namespace obstacle
