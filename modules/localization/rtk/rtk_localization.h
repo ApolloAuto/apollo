@@ -76,11 +76,11 @@ class RTKLocalization : public LocalizationBase {
 
   void PrepareLocalizationMsg(LocalizationEstimate *localization);
   void ComposeLocalizationMsg(const localization::Gps &gps,
-                              const localization::Imu &imu,
+                              const localization::CorrectedImu &imu,
                               LocalizationEstimate *localization);
-  bool FindMatchingIMU(const double gps_timestamp_sec, Imu *imu_msg);
-  bool InterpolateIMU(const Imu &imu1, const Imu &imu2,
-                      const double timestamp_sec, Imu *msgbuf);
+  bool FindMatchingIMU(const double gps_timestamp_sec, CorrectedImu *imu_msg);
+  bool InterpolateIMU(const CorrectedImu &imu1, const CorrectedImu &imu2,
+                      const double timestamp_sec, CorrectedImu *msgbuf);
   template <class T>
   T InterpolateXYZ(const T &p1, const T &p2, const double &frac1);
 
