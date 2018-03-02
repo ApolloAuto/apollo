@@ -25,15 +25,15 @@
 namespace apollo {
 namespace perception {
 
-using std::shared_ptr;
-using std::vector;
-using std::unordered_set;
 using std::atan2;
-using std::numeric_limits;
-using std::swap;
 using std::max;
 using std::min;
+using std::numeric_limits;
+using std::shared_ptr;
 using std::sqrt;
+using std::swap;
+using std::unordered_set;
+using std::vector;
 
 const ScalarType kEpsCross = 0.001;
 const ScalarType kCloseToBboxPercentage = 0.0;
@@ -79,7 +79,6 @@ void DisjointSet::Unite(int x, int y) {
 
   --subset_num_;
 }
-
 
 /** ConnectedComponent **/
 void ConnectedComponent::AddPixel(int x, int y) {
@@ -141,14 +140,14 @@ void ConnectedComponent::FindContourForSplit() {
   // initialize contours
   if (bbox_.split == BoundingBoxSplitType::VERTICAL) {
     bbox_.left_contour.reset(
-      new std::vector<int>(bbox_.y_max - bbox_.y_min + 1, bbox_.x_max));
+        new std::vector<int>(bbox_.y_max - bbox_.y_min + 1, bbox_.x_max));
     bbox_.right_contour.reset(
-      new std::vector<int>(bbox_.y_max - bbox_.y_min + 1, bbox_.x_min));
+        new std::vector<int>(bbox_.y_max - bbox_.y_min + 1, bbox_.x_min));
   } else if (bbox_.split == BoundingBoxSplitType::HORIZONTAL) {
     bbox_.up_contour.reset(
-      new std::vector<int>(bbox_.x_max - bbox_.x_min + 1, bbox_.y_max));
+        new std::vector<int>(bbox_.x_max - bbox_.x_min + 1, bbox_.y_max));
     bbox_.down_contour.reset(
-      new std::vector<int>(bbox_.x_max - bbox_.x_min + 1, bbox_.y_min));
+        new std::vector<int>(bbox_.x_max - bbox_.x_min + 1, bbox_.y_min));
   }
 
   // find contour pixels
@@ -157,15 +156,14 @@ void ConnectedComponent::FindContourForSplit() {
     if (bbox_.split == BoundingBoxSplitType::VERTICAL) {
       int y = pixels_->at(i).y - bbox_.y_min;
       bbox_.left_contour->at(y) =
-        min(bbox_.left_contour->at(y), pixels_->at(i).x);
+          min(bbox_.left_contour->at(y), pixels_->at(i).x);
       bbox_.right_contour->at(y) =
-        max(bbox_.right_contour->at(y), pixels_->at(i).x);
+          max(bbox_.right_contour->at(y), pixels_->at(i).x);
     } else if (bbox_.split == BoundingBoxSplitType::HORIZONTAL) {
       int x = pixels_->at(i).x - bbox_.x_min;
-      bbox_.up_contour->at(x) =
-        min(bbox_.up_contour->at(x), pixels_->at(i).y);
+      bbox_.up_contour->at(x) = min(bbox_.up_contour->at(x), pixels_->at(i).y);
       bbox_.down_contour->at(x) =
-        max(bbox_.down_contour->at(x), pixels_->at(i).y);
+          max(bbox_.down_contour->at(x), pixels_->at(i).y);
     }
   }
 }
@@ -247,7 +245,8 @@ void ConnectedComponent::FindVertices() {
           vertices_->push_back(Vertex(p->x, p->y));
         }
       } else {
-        AERROR << "the point " << "(" << p->x << ", " << p->y << ")"
+        AERROR << "the point "
+               << "(" << p->x << ", " << p->y << ")"
                << " is not on bounding box.";
       }
     }
@@ -411,8 +410,7 @@ void ConnectedComponent::FindEdges() {
 }
 
 void ConnectedComponent::SplitContourVertical(int start_vertex_id,
-                                              int end_vertex_id,
-                                              int len_split,
+                                              int end_vertex_id, int len_split,
                                               bool is_clockwise) {
   int start_pos =
       static_cast<int>(vertices_->at(start_vertex_id)(1));          // y_start
@@ -459,16 +457,17 @@ void ConnectedComponent::SplitContourVertical(int len_split, bool is_clockwise,
     x = is_clockwise ? bbox_.right_contour->at(end_pos - this->y_min())
                      : bbox_.left_contour->at(end_pos - this->y_min());
     vertices_->push_back(Vertex(x, end_pos));
-    (is_clockwise ? clockwise_edges_ : anticlockwise_edges_)->push_back(
-        MakeEdge(start_vertex_id, static_cast<int>(vertices_->size()) - 1));
+    (is_clockwise ? clockwise_edges_ : anticlockwise_edges_)
+        ->push_back(
+            MakeEdge(start_vertex_id, static_cast<int>(vertices_->size()) - 1));
     start_pos = end_pos - 1;
     x = is_clockwise ? bbox_.right_contour->at(start_pos - this->y_min())
                      : bbox_.left_contour->at(start_pos - this->y_min());
     vertices_->push_back(Vertex(x, start_pos));
     start_vertex_id = static_cast<int>(vertices_->size()) - 1;
   }
-  (is_clockwise ? clockwise_edges_ : anticlockwise_edges_)->push_back(
-      MakeEdge(start_vertex_id, end_vertex_id));
+  (is_clockwise ? clockwise_edges_ : anticlockwise_edges_)
+      ->push_back(MakeEdge(start_vertex_id, end_vertex_id));
 }
 
 void ConnectedComponent::SplitContourHorizontal(int start_vertex_id,
@@ -495,8 +494,8 @@ void ConnectedComponent::SplitContourHorizontal(int start_vertex_id,
       vertices_->push_back(Vertex(start_pos, y));
       start_vertex_id = static_cast<int>(vertices_->size()) - 1;
     }
-    (is_clockwise ? clockwise_edges_ : anticlockwise_edges_)->push_back(
-        MakeEdge(start_vertex_id, end_vertex_id));
+    (is_clockwise ? clockwise_edges_ : anticlockwise_edges_)
+        ->push_back(MakeEdge(start_vertex_id, end_vertex_id));
   } else {
     // direction from right to left
     int width = start_pos - end_pos + 1;
@@ -522,8 +521,7 @@ void ConnectedComponent::SplitContourHorizontal(int start_vertex_id,
 
 void ConnectedComponent::SplitContourHorizontal(int len_split,
                                                 bool is_clockwise,
-                                                int start_pos,
-                                                int end_pos) {
+                                                int start_pos, int end_pos) {
   if (start_pos <= end_pos) {
     // direction from left to right
     int y = (is_clockwise ? bbox_.down_contour : bbox_.up_contour)
@@ -657,7 +655,6 @@ vector<int> ConnectedComponent::GetSplitRanges(int siz, int len_split) {
   return lens;
 }
 
-
 /* connected component generator */
 ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
                                                          int image_height)
@@ -705,19 +702,18 @@ ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
     AFATAL << "y_min is less than zero: " << roi_y_min_;
   }
   if (roi_x_max_ >= image_width_) {
-    AFATAL << "x_max is larger than image width: "
-           << roi_x_max_ << "|" << image_width_;
+    AFATAL << "x_max is larger than image width: " << roi_x_max_ << "|"
+           << image_width_;
   }
   if (roi_y_max_ >= image_height_) {
-    AFATAL << "y_max is larger than image height: "
-           << roi_y_max_ << "|" << image_height_;
+    AFATAL << "y_max is larger than image height: " << roi_y_max_ << "|"
+           << image_height_;
   }
   total_pix_ = static_cast<size_t>(width_) * static_cast<size_t>(height_);
 #if _CUDA_CC
   cudaChannelFormatDesc uchar_desc = cudaCreateChannelDesc<unsigned char>();
   img_array_ = NULL;
-  cudaMallocArray(&img_array_, &uchar_desc,
-                  static_cast<size_t>(width_),
+  cudaMallocArray(&img_array_, &uchar_desc, static_cast<size_t>(width_),
                   static_cast<size_t>(height_));
   cudaBindTextureToArray(img_tex, img_array_, uchar_desc);
 

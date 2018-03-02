@@ -17,12 +17,12 @@
 #include <Eigen/Core>
 #include <opencv2/opencv.hpp>
 
-#include <memory>
-#include <string>
-#include <vector>
-#include <utility>
 #include <algorithm>
 #include <limits>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "modules/common/log.h"
 // #include "modules/perception/obstacle/camera/
@@ -360,7 +360,7 @@ struct LaneObject {
   }
   */
 
-  void CopyTo(LaneObject* new_lane_object) {
+  void CopyTo(LaneObject *new_lane_object) {
     new_lane_object->point_num = point_num;
     new_lane_object->spatial = spatial;
     new_lane_object->semantic = semantic;

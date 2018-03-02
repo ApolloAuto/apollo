@@ -31,11 +31,11 @@
 #include <vector>
 
 #include "modules/common/log.h"
-#include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
-#include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
+#include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/group.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/connected_component.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/projector.h"
-#include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/group.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 
 namespace apollo {
 namespace perception {
@@ -99,8 +99,7 @@ class LaneFrame {
             const std::shared_ptr<Projector<ScalarType>>& projector,
             const LaneFrameOptions& options);
 
-  void SetTransformer(
-      const std::shared_ptr<Projector<ScalarType>>& projector) {
+  void SetTransformer(const std::shared_ptr<Projector<ScalarType>>& projector) {
     projector_ = projector;
     is_projector_init_ = true;
   }
@@ -145,10 +144,8 @@ class LaneFrame {
   int AddGroupIntoGraph(const Group& group, Graph* graph,
                         std::unordered_set<int>* hash_marker_idx);
 
-  int AddGroupIntoGraph(const Group& group,
-                        const int& start_marker_ascend_id,
-                        const int& end_marker_descend_id,
-                        Graph* graph,
+  int AddGroupIntoGraph(const Group& group, const int& start_marker_ascend_id,
+                        const int& end_marker_descend_id, Graph* graph,
                         std::unordered_set<int>* hash_marker_idx);
 
   void ComputeBbox();
