@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/camera/visualizer/frame_content.h"
 #include <Eigen/LU>
 #include <map>
 #include "modules/common/log.h"
+#include "modules/perception/obstacle/camera/visualizer/frame_content.h"
 
 namespace apollo {
 namespace perception {
@@ -143,7 +143,7 @@ void FrameContent::update_timestamp(double ref) {
     }
     best_ts = FLT_MAX;
     for (std::map<double, ImageContent>::iterator it = _image_caches.begin();
-         it != _image_caches.end(); it++) {
+         it != _image_caches.end(); ++it) {
       double it_ts = it->first;
       if (it_ts < best_ts && _current_image_timestamp != it_ts) {
         best_ts = it_ts;
@@ -157,7 +157,7 @@ void FrameContent::update_timestamp(double ref) {
     if (it->first < _current_image_timestamp) {
       _image_caches.erase(it++);
     } else {
-      it++;
+      ++it;
     }
   }
 
@@ -171,7 +171,7 @@ void FrameContent::update_timestamp(double ref) {
   best_ts = -1;
 
   for (std::map<double, RadarContent>::iterator it = _radar_caches.begin();
-       it != _radar_caches.end(); it++) {
+       it != _radar_caches.end(); ++it) {
     double it_ts = it->first;
     double delta = fabs(it_ts - ref);
 
@@ -186,13 +186,13 @@ void FrameContent::update_timestamp(double ref) {
     if (it->first < best_ts) {
       _radar_caches.erase(it++);
     } else {
-      it++;
+      ++it;
     }
   }
   best_delta = FLT_MAX;
   best_ts = -1;
   for (std::map<double, FusionContent>::iterator it = _fusion_caches.begin();
-       it != _fusion_caches.end(); it++) {
+       it != _fusion_caches.end(); ++it) {
     double it_ts = it->first;
     double delta = fabs(it_ts - ref);
 
@@ -207,7 +207,7 @@ void FrameContent::update_timestamp(double ref) {
     if (it->first < best_ts) {
       _fusion_caches.erase(it++);
     } else {
-      it++;
+      ++it;
     }
   }
 
@@ -215,7 +215,7 @@ void FrameContent::update_timestamp(double ref) {
   best_delta = FLT_MAX;
   best_ts = -1;
   for (std::map<double, CameraContent>::iterator it = _camera_caches.begin();
-       it != _camera_caches.end(); it++) {
+       it != _camera_caches.end(); ++it) {
     double it_ts = it->first;
     double delta = fabs(it_ts - ref);
 
@@ -230,14 +230,14 @@ void FrameContent::update_timestamp(double ref) {
     if (it->first < best_ts) {
       _camera_caches.erase(it++);
     } else {
-      it++;
+      ++it;
     }
   }
 
   best_delta = FLT_MAX;
   best_ts = -1;
   for (std::map<double, GroundTruthContent>::iterator it = _gt_caches.begin();
-       it != _gt_caches.end(); it++) {
+       it != _gt_caches.end(); ++it) {
     double it_ts = it->first;
     double delta = fabs(it_ts - ref);
     if (delta < best_delta) {
@@ -251,7 +251,7 @@ void FrameContent::update_timestamp(double ref) {
     if (it->first < best_ts) {
       _gt_caches.erase(it++);
     } else {
-      it++;
+      ++it;
     }
   }
 
@@ -259,7 +259,7 @@ void FrameContent::update_timestamp(double ref) {
   best_delta = FLT_MAX;
   best_ts = -1;
   for (std::map<double, MotionContent>::iterator it = _motion_caches.begin();
-       it != _motion_caches.end(); it++) {
+       it != _motion_caches.end(); ++it) {
     double it_ts = it->first;
     double delta = fabs(it_ts - ref);
 
@@ -274,7 +274,7 @@ void FrameContent::update_timestamp(double ref) {
     if (it->first < best_ts) {
       _motion_caches.erase(it++);
     } else {
-      it++;
+      ++it;
     }
   }
 }
