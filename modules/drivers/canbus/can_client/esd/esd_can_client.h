@@ -56,7 +56,7 @@ class EsdCanClient : public CanClient {
   /**
    * @brief Destructor
    */
-  virtual ~EsdCanClient() = default;
+  virtual ~EsdCanClient();
 
   /**
    * @brief Start the ESD CAN client.
