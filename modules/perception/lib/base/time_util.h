@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef apollo_PERCEPTION_LIB_BASE_TIME_UTIL_H
-#define apollo_PERCEPTION_LIB_BASE_TIME_UTIL_H
+#ifndef apollo_PERCEPTION_LIB_BASE_TIME_UTIL_H_
+#define apollo_PERCEPTION_LIB_BASE_TIME_UTIL_H_
 
 #include <sys/time.h>
 #include <iomanip>
@@ -67,4 +67,4 @@ class TimeUtil {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_LIB_BASE_TIME_UTIL_H
+#endif  // apollo_PERCEPTION_LIB_BASE_TIME_UTIL_H__

@@ -51,9 +51,13 @@ class Timer {
 
 class TimerWrapper {
  public:
-  explicit TimerWrapper(const std::string &msg) : msg_(msg) { timer_.Start(); }
+  explicit TimerWrapper(const std::string &msg) : msg_(msg) {
+    timer_.Start();
+  }
 
-  ~TimerWrapper() { timer_.End(msg_); }
+  ~TimerWrapper() {
+    timer_.End(msg_);
+  }
 
  private:
   Timer timer_;
