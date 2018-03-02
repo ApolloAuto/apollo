@@ -10,7 +10,8 @@ cc_library(
         "//modules/perception/lib/base:base",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/camera/common:common",
-        "@eigen"
+        "@eigen",
+        "@opencv2//:core",
     ]
 )
 
