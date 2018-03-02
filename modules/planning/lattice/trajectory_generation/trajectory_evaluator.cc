@@ -37,12 +37,11 @@ namespace planning {
 using Trajectory1d = Curve1d;
 
 TrajectoryEvaluator::TrajectoryEvaluator(
-    const std::array<double, 3>& init_s,
-    const PlanningTarget& planning_target,
+    const std::array<double, 3>& init_s, const PlanningTarget& planning_target,
     const std::vector<std::shared_ptr<Trajectory1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Trajectory1d>>& lat_trajectories,
     std::shared_ptr<PathTimeGraph> path_time_graph)
-    : init_s_(init_s), path_time_graph_(path_time_graph) {
+    : path_time_graph_(path_time_graph), init_s_(init_s) {
   const double start_time = 0.0;
   const double end_time = FLAGS_trajectory_time_length;
   path_time_intervals_ = path_time_graph_->GetPathBlockingIntervals(
@@ -147,16 +146,16 @@ double TrajectoryEvaluator::Evaluate(
   // 5. Cost of lateral comfort
 
   // Longitudinal costs
-  double lon_objective_cost = LonObjectiveCost(lon_trajectory,
-      planning_target);
+  double lon_objective_cost = LonObjectiveCost(lon_trajectory, planning_target);
 
   double lon_jerk_cost = LonComfortCost(lon_trajectory);
 
   double lon_collision_cost = LonCollisionCost(lon_trajectory);
 
   // decides the longitudinal evaluation horizon for lateral trajectories.
-  double evaluation_horizon = std::min(FLAGS_decision_horizon,
-      lon_trajectory->Evaluate(0, lon_trajectory->ParamLength()));
+  double evaluation_horizon =
+      std::min(FLAGS_decision_horizon,
+               lon_trajectory->Evaluate(0, lon_trajectory->ParamLength()));
   std::vector<double> s_values;
   for (double s = 0.0; s < evaluation_horizon;
        s += FLAGS_trajectory_space_resolution) {
@@ -297,8 +296,8 @@ std::vector<double> TrajectoryEvaluator::evaluate_per_lonlat_trajectory(
 
 std::vector<double> TrajectoryEvaluator::CreateLongitudinalGuideVelocity(
     const PlanningTarget& planning_target) const {
-  double comfort_a = FLAGS_longitudinal_acceleration_lower_bound
-      * FLAGS_comfort_acceleration_factor;
+  double comfort_a = FLAGS_longitudinal_acceleration_lower_bound *
+                     FLAGS_comfort_acceleration_factor;
 
   double cruise_s_dot = planning_target.cruise_speed();
   ConstantAccelerationTrajectory1d lon_traj(init_s_[0], cruise_s_dot);
@@ -320,14 +319,14 @@ std::vector<double> TrajectoryEvaluator::CreateLongitudinalGuideVelocity(
       lon_traj.AppendSgment(stop_a, stop_t);
     }
     if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
-      lon_traj.AppendSgment(0.0,
-          FLAGS_trajectory_time_length - lon_traj.ParamLength());
+      lon_traj.AppendSgment(
+          0.0, FLAGS_trajectory_time_length - lon_traj.ParamLength());
     }
   }
 
   std::vector<double> reference_s_dot;
   for (double t = 0.0; t < FLAGS_trajectory_time_length;
-      t += FLAGS_trajectory_time_resolution) {
+       t += FLAGS_trajectory_time_resolution) {
     reference_s_dot.push_back(lon_traj.Evaluate(1, t));
   }
   return reference_s_dot;
