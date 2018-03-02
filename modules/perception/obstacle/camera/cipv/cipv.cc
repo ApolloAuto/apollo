@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <math.h>
 #include "modules/perception/obstacle/camera/cipv/cipv.h"
+
+#include <math.h>
+
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -80,9 +82,9 @@ bool Cipv::distance_from_point_to_line_segment(
   *distance = sqrt(dx * dx + dy * dy);
   if (_debug_level >= 2) {
     AINFO << "distance_from_point (" << point[0] << ", " << point[1]
-               << ") _to_line_segment (" << line_seg_start_point[0] << ", "
-               << line_seg_start_point[1] << ")->(" << line_seg_end_point[0]
-               << ", " << line_seg_end_point[1] << "): " << *distance << "m";
+          << ") _to_line_segment (" << line_seg_start_point[0] << ", "
+          << line_seg_start_point[1] << ")->(" << line_seg_end_point[0] << ", "
+          << line_seg_end_point[1] << "): " << *distance << "m";
   }
   return true;
 }
@@ -95,7 +97,7 @@ bool Cipv::get_egolane(const LaneObjectsPtr lane_objects,
     if ((*lane_objects)[i].spatial == L_0) {
       if (_debug_level >= 2) {
         AINFO << "[get_egolane]LEFT(*lane_objects)[i].image_pos.size(): "
-                   << (*lane_objects)[i].image_pos.size();
+              << (*lane_objects)[i].image_pos.size();
       }
       if ((*lane_objects)[i].image_pos.size() <
           MIN_LANE_LINE_LENGTH_FOR_CIPV_DETERMINATION) {
@@ -116,7 +118,7 @@ bool Cipv::get_egolane(const LaneObjectsPtr lane_objects,
     } else if ((*lane_objects)[i].spatial == R_0) {
       if (_debug_level >= 2) {
         AINFO << "[get_egolane]RIGHT(*lane_objects)[i].image_pos.size(): "
-                   << (*lane_objects)[i].image_pos.size();
+              << (*lane_objects)[i].image_pos.size();
       }
       if ((*lane_objects)[i].image_pos.size() <
           MIN_LANE_LINE_LENGTH_FOR_CIPV_DETERMINATION) {
@@ -210,11 +212,10 @@ bool Cipv::make_virtual_ego_lane_from_yaw_rate(const float yaw_rate,
 }
 
 // Elongate lane line
-bool Cipv::elongate_egolane(
-    const LaneObjectsPtr lane_objects,
-    const bool b_left_valid, const bool b_right_valid,
-    const float yaw_rate, const float velocity,
-    EgoLane *egolane_image, EgoLane *egolane_ground) {
+bool Cipv::elongate_egolane(const LaneObjectsPtr lane_objects,
+                            const bool b_left_valid, const bool b_right_valid,
+                            const float yaw_rate, const float velocity,
+                            EgoLane *egolane_image, EgoLane *egolane_ground) {
   float offset_distance = EGO_CAR_HALF_VIRTUAL_LANE;
   // When left lane line is available
   if (b_left_valid && b_right_valid) {
@@ -427,9 +428,9 @@ bool Cipv::find_closest_edge_of_object_ground(
 
   if (_debug_level >= 2) {
     AINFO << "start(" << closted_object_edge->start_point[0] << ", "
-               << closted_object_edge->start_point[1] << ")->";
+          << closted_object_edge->start_point[1] << ")->";
     AINFO << "end(" << closted_object_edge->end_point[0] << ", "
-               << closted_object_edge->end_point[1] << ")";
+          << closted_object_edge->end_point[1] << ")";
   }
   return true;
 }
@@ -443,28 +444,28 @@ bool Cipv::are_distances_sane(const float distance_start_point_to_right_lane,
   if (distance_start_point_to_right_lane > MAX_DIST_OBJECT_TO_LANE_METER) {
     if (_debug_level >= 1) {
       AINFO << "distance from start to right lane(" << distance
-                 << " m) is too long";
+            << " m) is too long";
     }
     return false;
   }
   if (distance_start_point_to_left_lane > MAX_DIST_OBJECT_TO_LANE_METER) {
     if (_debug_level >= 1) {
       AINFO << "distance from start to left lane(" << distance
-                 << " m) is too long";
+            << " m) is too long";
     }
     return false;
   }
   if (distance_end_point_to_right_lane > MAX_DIST_OBJECT_TO_LANE_METER) {
     if (_debug_level >= 1) {
       AINFO << "distance from end to right lane(" << distance
-                 << " m) is too long";
+            << " m) is too long";
     }
     return false;
   }
   if (distance_end_point_to_left_lane > MAX_DIST_OBJECT_TO_LANE_METER) {
     if (_debug_level >= 1) {
       AINFO << "distance from end to left lane(" << distance
-                 << " m) is too long";
+            << " m) is too long";
     }
     return false;
   }
@@ -504,19 +505,19 @@ bool Cipv::is_point_left_of_line(const Point2Df &point,
   if (cross_product > 0.0f) {
     if (_debug_level >= 2) {
       AINFO << "point (" << point[0] << ", " << point[1]
-                 << ") is left of line_segment (" << line_seg_start_point[0]
-                 << ", " << line_seg_start_point[1] << ")->("
-                 << line_seg_end_point[0] << ", " << line_seg_end_point[1]
-                 << "), cross_product: " << cross_product;
+            << ") is left of line_segment (" << line_seg_start_point[0] << ", "
+            << line_seg_start_point[1] << ")->(" << line_seg_end_point[0]
+            << ", " << line_seg_end_point[1]
+            << "), cross_product: " << cross_product;
     }
     return true;
   } else {
     if (_debug_level >= 2) {
       AINFO << "point (" << point[0] << ", " << point[1]
-                 << ") is right of line_segment (" << line_seg_start_point[0]
-                 << ", " << line_seg_start_point[1] << ")->("
-                 << line_seg_end_point[0] << ", " << line_seg_end_point[1]
-                 << "), cross_product: " << cross_product;
+            << ") is right of line_segment (" << line_seg_start_point[0] << ", "
+            << line_seg_start_point[1] << ")->(" << line_seg_end_point[0]
+            << ", " << line_seg_end_point[1]
+            << "), cross_product: " << cross_product;
     }
     return false;
   }
@@ -561,7 +562,7 @@ bool Cipv::is_object_in_the_lane_ground(const ObjectPtr &object,
 
   if (_debug_level >= 3) {
     AINFO << "egolane_ground.left_line.line_point.size(): "
-               << egolane_ground.left_line.line_point.size();
+          << egolane_ground.left_line.line_point.size();
   }
   if (egolane_ground.left_line.line_point.size() <= 1) {
     if (_debug_level >= 1) {
@@ -591,7 +592,7 @@ bool Cipv::is_object_in_the_lane_ground(const ObjectPtr &object,
     // Check if the end point is on the right of the line segment
     if (_debug_level >= 3) {
       AINFO << "[Left] closest_index: " << closest_index
-                 << ", shortest_distance: " << shortest_distance;
+            << ", shortest_distance: " << shortest_distance;
     }
     if (is_point_left_of_line(
             closted_object_edge.end_point,
@@ -603,7 +604,7 @@ bool Cipv::is_object_in_the_lane_ground(const ObjectPtr &object,
 
   if (_debug_level >= 3) {
     AINFO << "egolane_ground.right_line.line_point.size(): "
-               << egolane_ground.right_line.line_point.size();
+          << egolane_ground.right_line.line_point.size();
   }
   // Check start_point and right lane
   if (egolane_ground.right_line.line_point.size() <= 1) {
@@ -631,7 +632,7 @@ bool Cipv::is_object_in_the_lane_ground(const ObjectPtr &object,
   if (closest_index >= 0) {
     if (_debug_level >= 3) {
       AINFO << "[right] closest_index: " << closest_index
-                 << ", shortest_distance: " << shortest_distance;
+            << ", shortest_distance: " << shortest_distance;
     }
     // Check if the end point is on the right of the line segment
     if (is_point_left_of_line(
@@ -672,10 +673,9 @@ bool Cipv::is_object_in_the_lane(const ObjectPtr &object,
 bool Cipv::determine_cipv(std::shared_ptr<SensorObjects> sensor_objects,
                           CipvOptions *options) {
   if (_debug_level >= 3) {
-    AINFO << "Cipv Got SensorObjects size "
-               << sensor_objects->objects.size();
+    AINFO << "Cipv Got SensorObjects size " << sensor_objects->objects.size();
     AINFO << "Cipv Got lane object size "
-               << sensor_objects->lane_objects->size();
+          << sensor_objects->lane_objects->size();
   }
   float yaw_rate = options->yaw_rate;
   float velocity = options->yaw_rate;
@@ -693,16 +693,14 @@ bool Cipv::determine_cipv(std::shared_ptr<SensorObjects> sensor_objects,
   // Get ego lanes (in both image and ground coordinate)
   get_egolane(sensor_objects->lane_objects, &egolane_image, &egolane_ground,
               &b_left_valid, &b_right_valid);
-  elongate_egolane(sensor_objects->lane_objects,
-                   b_left_valid, b_right_valid,
-                   yaw_rate, velocity,
-                   &egolane_image, &egolane_ground);
+  elongate_egolane(sensor_objects->lane_objects, b_left_valid, b_right_valid,
+                   yaw_rate, velocity, &egolane_image, &egolane_ground);
 
   for (int32_t i = 0; i < static_cast<int32_t>(sensor_objects->objects.size());
        i++) {
     if (_debug_level >= 2) {
       AINFO << "sensor_objects->objects[i]->track_id: "
-                 << sensor_objects->objects[i]->track_id;
+            << sensor_objects->objects[i]->track_id;
     }
     if (is_object_in_the_lane(sensor_objects->objects[i], egolane_image,
                               egolane_ground) == true) {
@@ -761,9 +759,7 @@ bool Cipv::determine_cipv(std::shared_ptr<SensorObjects> sensor_objects,
   return true;
 }
 
-std::string Cipv::name() const {
-  return "Cipv";
-}
+std::string Cipv::name() const { return "Cipv"; }
 
 // Register plugin.
 // REGISTER_CIPV(Cipv);
