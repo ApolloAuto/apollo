@@ -432,6 +432,12 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   }
 
   planning_data->mutable_prediction_header()->CopyFrom(prediction_.header());
+
+  auto relative_map = AdapterManager::GetRelativeMap();
+  if (!relative_map->Empty()) {
+    planning_data->mutable_relative_map()->CopyFrom(
+        relative_map->GetLatestObserved());
+  }
 }
 
 void Frame::AlignPredictionTime(const double planning_start_time,
