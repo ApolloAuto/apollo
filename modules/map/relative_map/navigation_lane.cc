@@ -152,7 +152,9 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
   // offset between the current vehicle state and navigation line
   const double dx = -original_pose_.position().x();
   const double dy = -original_pose_.position().y();
-  for (int i = curr_project_index; i < navigation_path.path_point_size(); ++i) {
+  const double ref_s = navigation_path.path_point(curr_project_index).s();
+  for (int i = std::max(0, curr_project_index - 3);
+       i < navigation_path.path_point_size(); ++i) {
     auto *point = path->add_path_point();
     point->CopyFrom(navigation_path.path_point(i));
 
@@ -168,9 +170,7 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
     point->set_x(flu_x);
     point->set_y(flu_y);
     point->set_theta(point->theta() - original_pose_.heading());
-    const double accumulated_s =
-        navigation_path.path_point(i).s() -
-        navigation_path.path_point(curr_project_index).s();
+    const double accumulated_s = navigation_path.path_point(i).s() - ref_s;
     point->set_s(accumulated_s);
 
     if (accumulated_s > FLAGS_max_len_from_navigation_line) {
@@ -247,8 +247,9 @@ void NavigationLane::ConvertLaneMarkerToPath(
   }
 
   const double unit_z = 1.0;
-  double accumulated_s = 0.0;
-  for (double z = 0; z <= path_range; z += unit_z) {
+  const double start_s = -2.0;
+  double accumulated_s = start_s;
+  for (double z = start_s; z <= path_range; z += unit_z) {
     double x_l = EvaluateCubicPolynomial(path_c0, path_c1, path_c2, path_c3, z);
 
     double x1 = z;
