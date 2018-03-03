@@ -16,11 +16,11 @@
 
 // @brief: CC lane post-processor source file
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <numeric>
 #include <unordered_map>
-#include <algorithm>
 
 #include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/cc_lane_post_processor.h"
 
@@ -28,11 +28,11 @@ namespace apollo {
 namespace perception {
 
 using std::pair;
-using std::string;
-using std::vector;
-using std::unordered_map;
 using std::shared_ptr;
+using std::string;
 using std::to_string;
+using std::unordered_map;
+using std::vector;
 
 bool CompOriginLateralDistObjectID(const pair<ScalarType, int> &a,
                                    const pair<ScalarType, int> &b) {
@@ -95,7 +95,7 @@ bool CCLanePostProcessor::Init() {
   }
 
   if (!model_config->GetValue("lane_map_confidence_thresh",
-                               &options_.lane_map_conf_thresh)) {
+                              &options_.lane_map_conf_thresh)) {
     AERROR << "the confidence threshold of label map not found.";
     return false;
   }
@@ -111,7 +111,7 @@ bool CCLanePostProcessor::Init() {
 
   // parameters on generating markers
   if (!model_config->GetValue("min_cc_pixel_num",
-                               &options_.frame.min_cc_pixel_num)) {
+                              &options_.frame.min_cc_pixel_num)) {
     AERROR << "minimum CC pixel number not found.";
     return false;
   }
@@ -122,9 +122,9 @@ bool CCLanePostProcessor::Init() {
   }
 
   if (!model_config->GetValue(options_.frame.space_type == SpaceType::IMAGE
-                                   ? "min_y_search_offset_image"
-                                   : "min_y_search_offset",
-                               &options_.frame.min_y_search_offset)) {
+                                  ? "min_y_search_offset_image"
+                                  : "min_y_search_offset",
+                              &options_.frame.min_y_search_offset)) {
     AERROR << "minimum verticle offset used for marker association not found.";
     return false;
   }
@@ -143,25 +143,25 @@ bool CCLanePostProcessor::Init() {
   }
 
   if (!model_config->GetValue(options_.frame.space_type == SpaceType::IMAGE
-                                   ? "assoc_min_distance_image"
-                                   : "assoc_min_distance",
-                               &options_.frame.assoc_param.min_distance)) {
+                                  ? "assoc_min_distance_image"
+                                  : "assoc_min_distance",
+                              &options_.frame.assoc_param.min_distance)) {
     AERROR << "minimum distance threshold for marker association not found.";
     return false;
   }
   AINFO << "assoc_min_distance = " << options_.frame.assoc_param.min_distance;
 
   if (!model_config->GetValue(options_.frame.space_type == SpaceType::IMAGE
-                                   ? "assoc_max_distance_image"
-                                   : "assoc_max_distance",
-                               &options_.frame.assoc_param.max_distance)) {
+                                  ? "assoc_max_distance_image"
+                                  : "assoc_max_distance",
+                              &options_.frame.assoc_param.max_distance)) {
     AERROR << "maximum distance threshold for marker association not found.";
     return false;
   }
   AINFO << "assoc_max_distance = " << options_.frame.assoc_param.max_distance;
 
   if (!model_config->GetValue("assoc_distance_weight",
-                               &options_.frame.assoc_param.distance_weight)) {
+                              &options_.frame.assoc_param.distance_weight)) {
     AERROR << "distance weight for marker association not found.";
     return false;
   }
@@ -192,9 +192,9 @@ bool CCLanePostProcessor::Init() {
         << options_.frame.assoc_param.deviation_angle_weight;
 
   if (!model_config->GetValue(options_.frame.space_type == SpaceType::IMAGE
-                                   ? "assoc_max_relative_orie_image"
-                                   : "assoc_max_relative_orie",
-                               &options_.frame.assoc_param.max_relative_orie)) {
+                                  ? "assoc_max_relative_orie_image"
+                                  : "assoc_max_relative_orie",
+                              &options_.frame.assoc_param.max_relative_orie)) {
     AERROR << "max relative orientation threshold "
            << "for marker association not found.";
     return false;
@@ -271,24 +271,24 @@ bool CCLanePostProcessor::Init() {
 
   // parameters on finding lane objects
   if (!model_config->GetValue("lane_interval_distance",
-                               &options_.frame.lane_interval_distance)) {
+                              &options_.frame.lane_interval_distance)) {
     AERROR << "The predefined lane interval distance is not found.";
     return false;
   }
 
   if (!model_config->GetValue(options_.frame.space_type == SpaceType::IMAGE
-                                   ? "min_instance_size_prefiltered_image"
-                                   : "min_instance_size_prefiltered",
-                               &options_.frame.min_instance_size_prefiltered)) {
+                                  ? "min_instance_size_prefiltered_image"
+                                  : "min_instance_size_prefiltered",
+                              &options_.frame.min_instance_size_prefiltered)) {
     AERROR << "The minimum size of lane instances "
            << "to be prefiltered is not found.";
     return false;
   }
 
   if (!model_config->GetValue(options_.frame.space_type == SpaceType::IMAGE
-                                   ? "max_size_to_fit_straight_line_image"
-                                   : "max_size_to_fit_straight_line",
-                               &options_.frame.max_size_to_fit_straight_line)) {
+                                  ? "max_size_to_fit_straight_line_image"
+                                  : "max_size_to_fit_straight_line",
+                              &options_.frame.max_size_to_fit_straight_line)) {
     AERROR << "The maximum size used for fitting straight lines "
            << "on lane instances is not found.";
     return false;
@@ -296,7 +296,7 @@ bool CCLanePostProcessor::Init() {
 
   // 3. initialize projector
   if (!model_config->GetValue("max_distance_to_see_for_transformer",
-                               &max_distance_to_see_)) {
+                              &max_distance_to_see_)) {
     AERROR << "maximum perception distance for transformer is not found, "
               "use default value";
     return false;
@@ -604,8 +604,8 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
   AINFO << "time for frame processing: " << time_lane_frame << " ms";
   AINFO << "number of lane instances = " << cur_lane_instances_->size();
 
-  AINFO << "lane post-processing runtime for current frame: "
-        << time_cur_frame << " ms";
+  AINFO << "lane post-processing runtime for current frame: " << time_cur_frame
+        << " ms";
 
   return true;
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/lib/base/timer.h"
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_UTIL_H_
 
-#include "modules/common/log.h"
+#include <vector>
+#include "modules/obstacle/base/types.h"
 
 namespace apollo {
 namespace perception {
+namespace obstacle {
+namespace yolo {
 
-using std::string;
-using std::chrono::duration_cast;
-using std::chrono::milliseconds;
+bool load_types(const std::string &path, std::vector<ObjectType> *types);
+bool load_anchors(const std::string &path, std::vector<float> *anchors);
 
-void Timer::Start() {
-  start_time_ = std::chrono::system_clock::now();
-}
-
-uint64_t Timer::End(const string &msg) {
-  end_time_ = std::chrono::system_clock::now();
-  uint64_t elapsed_time =
-      duration_cast<milliseconds>(end_time_ - start_time_).count();
-
-  ADEBUG << "TIMER " << msg << " elapsed_time: " << elapsed_time << " ms";
-
-  // start new timer.
-  start_time_ = end_time_;
-  return elapsed_time;
-}
-
+}  // namespace yolo
+}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
+
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_UTIL_H_

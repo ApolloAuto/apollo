@@ -17,6 +17,7 @@
 #include <Eigen/LU>
 #include <map>
 #include "modules/common/log.h"
+#include "modules/common/util/util.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
 
 namespace apollo {
@@ -33,21 +34,23 @@ void FrameContent::set_image_content(double timestamp, cv::Mat image) {
   image_content._timestamp = timestamp;
 
   image_content._image_mat_src = image;
-  _image_caches[timestamp] = image_content;
+  _image_caches[DoubleToMapKey(timestamp)] = image_content;
 }
 
 void FrameContent::set_motion_content(double timestamp,
                                       MotionBufferPtr motion_buffer) {
   MotionContent motion_content;
   motion_content._motion_frame_content = *motion_buffer;
-  _motion_caches[timestamp] = motion_content;
+  _motion_caches[DoubleToMapKey(timestamp)] = motion_content;
 }
 
 void FrameContent::set_camera_content(double timestamp,
                                       Eigen::Matrix4d pose_c2w,
                                       const std::vector<ObjectPtr>& objects,
                                       const CameraFrameSupplement& supplement) {
-  if (_camera_caches.find(timestamp) != _camera_caches.end()) return;
+  if (_camera_caches.find(DoubleToMapKey(timestamp)) != _camera_caches.end()) {
+    return;
+  }
 
   CameraContent content;
   content._timestamp = timestamp;
@@ -59,13 +62,15 @@ void FrameContent::set_camera_content(double timestamp,
     // offset_object(content._camera_objects[i], _global_offset);
   }
   content._camera_frame_supplement->clone(supplement);
-  _camera_caches[timestamp] = content;
+  _camera_caches[DoubleToMapKey(timestamp)] = content;
 }
 
 void FrameContent::set_camera_content(double timestamp,
                                       Eigen::Matrix4d pose_c2w,
                                       const std::vector<ObjectPtr>& objects) {
-  if (_camera_caches.find(timestamp) != _camera_caches.end()) return;
+  if (_camera_caches.find(DoubleToMapKey(timestamp)) != _camera_caches.end()) {
+    return;
+  }
 
   CameraContent content;
   content._timestamp = timestamp;
@@ -89,7 +94,7 @@ void FrameContent::set_camera_content(double timestamp,
     content._camera_objects[i]->clone(*objects[i]);
     offset_object(content._camera_objects[i], _global_offset);
   }
-  _camera_caches[timestamp] = content;
+  _camera_caches[DoubleToMapKey(timestamp)] = content;
 }
 
 void FrameContent::set_radar_content(double timestamp,
@@ -103,7 +108,7 @@ void FrameContent::set_radar_content(double timestamp,
     content._radar_objects[i]->clone(*objects[i]);
     offset_object(content._radar_objects[i], _global_offset);
   }
-  _radar_caches[timestamp] = content;
+  _radar_caches[DoubleToMapKey(timestamp)] = content;
 }
 
 void FrameContent::set_fusion_content(double timestamp,
@@ -117,7 +122,7 @@ void FrameContent::set_fusion_content(double timestamp,
     content._fused_objects[i]->clone(*objects[i]);
     offset_object(content._fused_objects[i], _global_offset);
   }
-  _fusion_caches[timestamp] = content;
+  _fusion_caches[DoubleToMapKey(timestamp)] = content;
 }
 
 void FrameContent::set_gt_content(double timestamp,
@@ -131,7 +136,7 @@ void FrameContent::set_gt_content(double timestamp,
     content._gt_objects[i]->clone(*objects[i]);
     offset_object(content._gt_objects[i], _global_offset);
   }
-  _gt_caches[timestamp] = content;
+  _gt_caches[DoubleToMapKey(timestamp)] = content;
 }
 
 void FrameContent::update_timestamp(double ref) {
@@ -142,8 +147,7 @@ void FrameContent::update_timestamp(double ref) {
       return;
     }
     best_ts = FLT_MAX;
-    for (std::map<double, ImageContent>::iterator it = _image_caches.begin();
-         it != _image_caches.end(); ++it) {
+    for (auto it = _image_caches.begin(); it != _image_caches.end(); ++it) {
       double it_ts = it->first;
       if (it_ts < best_ts && _current_image_timestamp != it_ts) {
         best_ts = it_ts;
@@ -152,14 +156,10 @@ void FrameContent::update_timestamp(double ref) {
     ref = best_ts;
     _current_image_timestamp = ref;
   }
-  for (std::map<double, ImageContent>::iterator it = _image_caches.begin();
-       it != _image_caches.end();) {
-    if (it->first < _current_image_timestamp) {
-      _image_caches.erase(it++);
-    } else {
-      ++it;
-    }
-  }
+  common::util::erase_map_where(
+      _image_caches, [this](std::map<int64_t, ImageContent>::value_type& p) {
+        return this->MapKeyToDouble(p.first) < this->_current_image_timestamp;
+      });
 
   std::string ts_string = std::to_string(ref);
   AINFO << "cur time: " << ts_string
@@ -170,9 +170,9 @@ void FrameContent::update_timestamp(double ref) {
   best_delta = FLT_MAX;
   best_ts = -1;
 
-  for (std::map<double, RadarContent>::iterator it = _radar_caches.begin();
+  for (std::map<int64_t, RadarContent>::iterator it = _radar_caches.begin();
        it != _radar_caches.end(); ++it) {
-    double it_ts = it->first;
+    double it_ts = MapKeyToDouble(it->first);
     double delta = fabs(it_ts - ref);
 
     if (delta < best_delta) {
@@ -181,18 +181,15 @@ void FrameContent::update_timestamp(double ref) {
     }
   }
   _current_radar_timestamp = best_ts;
-  for (std::map<double, RadarContent>::iterator it = _radar_caches.begin();
-       it != _radar_caches.end();) {
-    if (it->first < best_ts) {
-      _radar_caches.erase(it++);
-    } else {
-      ++it;
-    }
-  }
+  common::util::erase_map_where(
+      _radar_caches,
+      [this, best_ts](std::map<int64_t, RadarContent>::value_type& p) {
+        return this->MapKeyToDouble(p.first) < best_ts;
+      });
+
   best_delta = FLT_MAX;
   best_ts = -1;
-  for (std::map<double, FusionContent>::iterator it = _fusion_caches.begin();
-       it != _fusion_caches.end(); ++it) {
+  for (auto it = _fusion_caches.begin(); it != _fusion_caches.end(); ++it) {
     double it_ts = it->first;
     double delta = fabs(it_ts - ref);
 
@@ -202,21 +199,17 @@ void FrameContent::update_timestamp(double ref) {
     }
   }
   _current_fusion_timestamp = best_ts;
-  for (std::map<double, FusionContent>::iterator it = _fusion_caches.begin();
-       it != _fusion_caches.end();) {
-    if (it->first < best_ts) {
-      _fusion_caches.erase(it++);
-    } else {
-      ++it;
-    }
-  }
+  common::util::erase_map_where(
+      _fusion_caches,
+      [this, best_ts](std::map<int64_t, FusionContent>::value_type& p) {
+        return this->MapKeyToDouble(p.first) < best_ts;
+      });
 
   // find camera tracked best ts
   best_delta = FLT_MAX;
   best_ts = -1;
-  for (std::map<double, CameraContent>::iterator it = _camera_caches.begin();
-       it != _camera_caches.end(); ++it) {
-    double it_ts = it->first;
+  for (auto it = _camera_caches.begin(); it != _camera_caches.end(); ++it) {
+    double it_ts = MapKeyToDouble(it->first);
     double delta = fabs(it_ts - ref);
 
     if (delta < best_delta) {
@@ -225,19 +218,15 @@ void FrameContent::update_timestamp(double ref) {
     }
   }
   _current_camera_timestamp = best_ts;
-  for (std::map<double, CameraContent>::iterator it = _camera_caches.begin();
-       it != _camera_caches.end();) {
-    if (it->first < best_ts) {
-      _camera_caches.erase(it++);
-    } else {
-      ++it;
-    }
-  }
+  common::util::erase_map_where(
+      _camera_caches,
+      [this, best_ts](std::map<int64_t, CameraContent>::value_type& p) {
+        return this->MapKeyToDouble(p.first) < best_ts;
+      });
 
   best_delta = FLT_MAX;
   best_ts = -1;
-  for (std::map<double, GroundTruthContent>::iterator it = _gt_caches.begin();
-       it != _gt_caches.end(); ++it) {
+  for (auto it = _gt_caches.begin(); it != _gt_caches.end(); ++it) {
     double it_ts = it->first;
     double delta = fabs(it_ts - ref);
     if (delta < best_delta) {
@@ -246,20 +235,16 @@ void FrameContent::update_timestamp(double ref) {
     }
   }
   _current_gt_timestamp = best_ts;
-  for (std::map<double, GroundTruthContent>::iterator it = _gt_caches.begin();
-       it != _gt_caches.end();) {
-    if (it->first < best_ts) {
-      _gt_caches.erase(it++);
-    } else {
-      ++it;
-    }
-  }
+  common::util::erase_map_where(
+      _gt_caches,
+      [this, best_ts](std::map<int64_t, GroundTruthContent>::value_type& p) {
+        return this->MapKeyToDouble(p.first) < best_ts;
+      });
 
   // get motion timestamp
   best_delta = FLT_MAX;
   best_ts = -1;
-  for (std::map<double, MotionContent>::iterator it = _motion_caches.begin();
-       it != _motion_caches.end(); ++it) {
+  for (auto it = _motion_caches.begin(); it != _motion_caches.end(); ++it) {
     double it_ts = it->first;
     double delta = fabs(it_ts - ref);
 
@@ -269,19 +254,15 @@ void FrameContent::update_timestamp(double ref) {
     }
   }
   _current_motion_timestamp = best_ts;
-  for (std::map<double, MotionContent>::iterator it = _motion_caches.begin();
-       it != _motion_caches.end();) {
-    if (it->first < best_ts) {
-      _motion_caches.erase(it++);
-    } else {
-      ++it;
-    }
-  }
+  common::util::erase_map_where(
+      _motion_caches,
+      [this, best_ts](std::map<int64_t, MotionContent>::value_type& p) {
+        return this->MapKeyToDouble(p.first) < best_ts;
+      });
 }
 
 Eigen::Matrix4d FrameContent::get_camera_to_world_pose() {
-  std::map<double, CameraContent>::iterator it =
-      _camera_caches.find(_current_camera_timestamp);
+  auto it = _camera_caches.find(DoubleToMapKey(_current_camera_timestamp));
   if (it == _camera_caches.end()) {
     return Eigen::Matrix4d::Identity();
   }
@@ -290,8 +271,7 @@ Eigen::Matrix4d FrameContent::get_camera_to_world_pose() {
 }
 
 cv::Mat FrameContent::get_camera_image() {
-  std::map<double, ImageContent>::iterator it =
-      _image_caches.find(_current_image_timestamp);
+  auto it = _image_caches.find(DoubleToMapKey(_current_image_timestamp));
   if (it == _image_caches.end()) {
     cv::Mat mat = cv::Mat::zeros(1080, 1920, CV_8UC3);
     return mat;
@@ -301,8 +281,7 @@ cv::Mat FrameContent::get_camera_image() {
 }
 
 const MotionBuffer FrameContent::get_motion_buffer() {
-  std::map<double, MotionContent>::iterator it =
-      _motion_caches.find(_current_motion_timestamp);
+  auto it = _motion_caches.find(DoubleToMapKey(_current_motion_timestamp));
   if (it == _motion_caches.end()) {
     return MotionBuffer(0);
   }
@@ -324,8 +303,7 @@ Eigen::Matrix4d FrameContent::get_opengl_camera_system_pose() {
 }
 
 std::vector<ObjectPtr> FrameContent::get_radar_objects() {
-  std::map<double, RadarContent>::iterator it =
-      _radar_caches.find(_current_radar_timestamp);
+  auto it = _radar_caches.find(DoubleToMapKey(_current_radar_timestamp));
   if (it == _radar_caches.end()) {
     return std::vector<ObjectPtr>();
   }
@@ -334,8 +312,7 @@ std::vector<ObjectPtr> FrameContent::get_radar_objects() {
 }
 
 std::vector<ObjectPtr> FrameContent::get_camera_objects() {
-  std::map<double, CameraContent>::iterator it =
-      _camera_caches.find(_current_camera_timestamp);
+  auto it = _camera_caches.find(DoubleToMapKey(_current_camera_timestamp));
   if (it == _camera_caches.end()) {
     return std::vector<ObjectPtr>();
   }
@@ -344,8 +321,7 @@ std::vector<ObjectPtr> FrameContent::get_camera_objects() {
 }
 
 CameraFrameSupplementPtr FrameContent::get_camera_frame_supplement() {
-  std::map<double, CameraContent>::iterator it =
-      _camera_caches.find(_current_camera_timestamp);
+  auto it = _camera_caches.find(DoubleToMapKey(_current_camera_timestamp));
   if (it == _camera_caches.end()) {
     CameraFrameSupplementPtr supplement_ptr;
     supplement_ptr.reset(new CameraFrameSupplement);
@@ -364,8 +340,7 @@ double FrameContent::get_visualization_timestamp() {
 }
 
 std::vector<ObjectPtr> FrameContent::get_fused_objects() {
-  std::map<double, FusionContent>::iterator it =
-      _fusion_caches.find(_current_fusion_timestamp);
+  auto it = _fusion_caches.find(DoubleToMapKey(_current_fusion_timestamp));
   if (it == _fusion_caches.end()) {
     return std::vector<ObjectPtr>();
   }
@@ -374,8 +349,7 @@ std::vector<ObjectPtr> FrameContent::get_fused_objects() {
 }
 
 std::vector<ObjectPtr> FrameContent::get_gt_objects() {
-  std::map<double, GroundTruthContent>::iterator it =
-      _gt_caches.find(_current_gt_timestamp);
+  auto it = _gt_caches.find(DoubleToMapKey(_current_gt_timestamp));
   if (it == _gt_caches.end()) {
     return std::vector<ObjectPtr>();
   }
