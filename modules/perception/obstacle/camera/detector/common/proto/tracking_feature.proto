@@ -1,4 +1,4 @@
-package adu.perception.obstacle;
+package apollo.perception.obstacle;
 
 message FeatureParam {
     optional int32 feat_stride = 1 [default = 32];
@@ -27,4 +27,3 @@ message ReorgParam {
     optional int32 ref_height = 1 [default = 0];
     optional int32 ref_width = 2 [default = 0];
 }
-
