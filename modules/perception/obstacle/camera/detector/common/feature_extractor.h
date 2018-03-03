@@ -13,23 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_FEATURE_EXTRACTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_FEATURE_EXTRACTOR_H_
 
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/gzip_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
+#include <caffe/caffe.hpp>
 #include <vector>
 
-#include <caffe/caffe.hpp>
-#include "modules/common/log.h
-
-#include "modules/lib/base/noncopyable.h"
-#include "modules/obstacle/base/types.h"
-#include "modules/obstacle/camera/common/caffe_bridge.hpp"
-#include "modules/obstacle/camera/common/visual_object.h"
-#include "modules/obstacle/camera/detector/common/tracking_feature.pb.h"
+#include "modules/common/log.h"
+#include "modules/perception/lib/base/noncopyable.h"
+#include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/obstacle/camera/common/visual_object.h"
+#include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -43,35 +41,11 @@ class BaseFeatureExtractor {
                     const boost::shared_ptr<caffe::Blob<float>> feat_blob,
                     int input_width = 0, int input_height = 0) = 0;
 
-  virtual bool init(const ExtractorParam &param,
-                    const anakin::Tensor<float> *feat_tensor,
-                    int input_width = 0, int input_height = 0) {
-    feat_tensor_ = feat_tensor;
-    feat_blob_.reset(new caffe::Blob<float>());
-    if (!sync_tensor_blob()) {
-      return false;
-    }
-    return init(param, feat_blob_, input_width, input_height);
-  }
-
   // @brief: extract feature for each detected object
   // @param [in/out]: objects with bounding boxes and feature vector.
   virtual bool extract(std::vector<VisualObjectPtr> *objects) = 0;
 
  protected:
-  bool sync_tensor_blob() {
-    if (feat_tensor_ == nullptr || feat_blob_ == nullptr) {
-      return false;
-    }
-    // TODO: unit test not covered
-    if (!tensor_to_blob(*feat_tensor_, feat_blob_.get())) {
-      return false;
-    }
-    AINFO << feat_blob_->shape(0) << ", " << feat_blob_->shape(1) << ", "
-          << feat_blob_->shape(2) << ", " << feat_blob_->shape(3);
-    return true;
-  }
-  const anakin::Tensor<float> *feat_tensor_ = nullptr;
   boost::shared_ptr<caffe::Blob<float>> feat_blob_ = nullptr;
 
  private:
@@ -80,9 +54,9 @@ class BaseFeatureExtractor {
 
 class ReorgFeatureExtractor : public BaseFeatureExtractor {
  public:
-  virtual bool init(const ExtractorParam &param,
-                    const boost::shared_ptr<caffe::Blob<float>> feat_blob,
-                    int input_width = 0, int input_height = 0) override;
+  bool init(const ExtractorParam &param,
+            const boost::shared_ptr<caffe::Blob<float>> feat_blob,
+            int input_width = 0, int input_height = 0) override;
   virtual bool extract(std::vector<VisualObjectPtr> *objects);
 
  protected:
@@ -97,9 +71,9 @@ class ReorgFeatureExtractor : public BaseFeatureExtractor {
 
 class ROIPoolingFeatureExtractor : public BaseFeatureExtractor {
  public:
-  virtual bool init(const ExtractorParam &param,
-                    const boost::shared_ptr<caffe::Blob<float>> feat_blob,
-                    int input_width = 0, int input_height = 0) override;
+  bool init(const ExtractorParam &param,
+            const boost::shared_ptr<caffe::Blob<float>> feat_blob,
+            int input_width = 0, int input_height = 0) override;
   virtual bool extract(std::vector<VisualObjectPtr> *objects);
 
  protected:
@@ -116,4 +90,4 @@ class ROIPoolingFeatureExtractor : public BaseFeatureExtractor {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_FEATURE_EXTRACTOR_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_FEATURE_EXTRACTOR

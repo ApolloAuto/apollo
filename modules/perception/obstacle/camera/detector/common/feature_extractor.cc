@@ -14,17 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/obstacle/camera/detector/common/feature_extractor.h"
-
-#include <fstream>
-#include <iostream>
-#include "modules/common/log.h
+#include "modules/perception/obstacle/camera/detector/common/feature_extractor.h"
 
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <fstream>
+#include <iostream>
 
-#include "modules/obstacle/camera/common/util.h"
+#include "modules/common/log.h"
+#include "modules/perception/obstacle/camera/common/util.h"
 
 namespace apollo {
 namespace perception {
@@ -79,7 +78,6 @@ bool ReorgFeatureExtractor::extract(std::vector<VisualObjectPtr> *objects) {
   if (objects->size() == 0) {
     return true;
   }
-  sync_tensor_blob();
   if (!skip_reorg_) {
     reorg_layer_->Forward(bottom_vec_, top_vec_);
   }
@@ -145,7 +143,6 @@ bool ROIPoolingFeatureExtractor::extract(
   if (objects->size() == 0) {
     return true;
   }
-  sync_tensor_blob();
   rois_blob_.Reshape({static_cast<int>(objects->size()), 5});
   float *rois_data = rois_blob_.mutable_cpu_data();
   for (const auto &obj : *objects) {
