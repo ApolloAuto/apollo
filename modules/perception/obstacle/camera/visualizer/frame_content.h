@@ -25,7 +25,7 @@
 #include <thread>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
+#include "boost/shared_ptr.hpp"
 
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
@@ -161,35 +161,35 @@ class FrameContent {
  private:
   const double kEpsilon_ = 1e-6;
 
-  long DoubleToMapKey(const double d) {
-    return static_cast<long>(d / kEpsilon_);
+  int64_t DoubleToMapKey(const double d) {
+    return static_cast<int64_t>(d / kEpsilon_);
   }
 
-  double MapKeyToDouble(const long key) { return key * kEpsilon_; }
+  double MapKeyToDouble(const int64_t key) { return key * kEpsilon_; }
 
   // input
   // 1.radar
-  std::map<long, RadarContent> _radar_caches;
+  std::map<int64_t, RadarContent> _radar_caches;
   double _current_radar_timestamp;
 
   // 2.camera
-  std::map<long, CameraContent> _camera_caches;
+  std::map<int64_t, CameraContent> _camera_caches;
   double _current_camera_timestamp;
 
   // 3.fusion
-  std::map<long, FusionContent> _fusion_caches;
+  std::map<int64_t, FusionContent> _fusion_caches;
   double _current_fusion_timestamp;
 
   // 4.ground truth
-  std::map<long, GroundTruthContent> _gt_caches;
+  std::map<int64_t, GroundTruthContent> _gt_caches;
   double _current_gt_timestamp;
 
   // 5.image
-  std::map<long, ImageContent> _image_caches;
+  std::map<int64_t, ImageContent> _image_caches;
   double _current_image_timestamp;
 
   // 6.motion
-  std::map<long, MotionContent> _motion_caches;
+  std::map<int64_t, MotionContent> _motion_caches;
   double _current_motion_timestamp;
 
   Eigen::Vector3d _global_offset;
@@ -203,4 +203,4 @@ class FrameContent {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // APOLLO_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_FRAME_CONTENT_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_FRAME_CONTENT_H_
