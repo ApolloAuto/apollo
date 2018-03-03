@@ -17,6 +17,7 @@ cc_library(
         "thread.h",
         "time_util.h",
         "timer.h",
+        "noncopyable.h",
     ],
     linkopts = [
         "-lboost_filesystem",
