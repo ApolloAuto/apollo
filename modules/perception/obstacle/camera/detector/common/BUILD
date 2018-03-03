@@ -16,4 +16,26 @@ cc_library(
         "@cuda",
     ]
 )
+
+cc_library(
+    name = "feature_extractor",
+    srcs = ["feature_extractor.cc"],
+    hdrs = ["feature_extractor.h"],
+    deps = [
+        "@caffe//:lib",
+        "@eigen//:eigen",
+        "@opencv2//:core",
+        "@undistort//:undistort",
+        "//modules/common:log",
+        "//modules/perception/lib/base:base",
+        "@opencv2//:imgproc",
+        "@cuda",
+        "//modules/perception/lib/pcl_util:pcl_util",
+        "//modules/perception/obstacle/camera/common:common",
+        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/camera/detector/common/proto:tracking_feature_proto",
+    ]
+)
+
+
 cpplint()
