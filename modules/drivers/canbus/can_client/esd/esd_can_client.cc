@@ -40,6 +40,12 @@ bool EsdCanClient::Init(const CANCardParameter &parameter) {
   return true;
 }
 
+EsdCanClient::~EsdCanClient() {
+  if (dev_handler_) {
+    Stop();
+  }
+}
+
 ErrorCode EsdCanClient::Start() {
   if (is_started_) {
     return ErrorCode::OK;

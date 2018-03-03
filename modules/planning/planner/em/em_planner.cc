@@ -142,9 +142,13 @@ void EMPlanner::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
                        Frame* frame) {
   bool has_drivable_reference_line = false;
+  bool disable_low_priority_path = false;
   auto status =
       Status(ErrorCode::PLANNING_ERROR, "reference line not drivable");
   for (auto& reference_line_info : frame->reference_line_info()) {
+    if (disable_low_priority_path) {
+      reference_line_info.SetDrivable(false);
+    }
     if (!reference_line_info.IsDrivable()) {
       continue;
     }
@@ -154,7 +158,7 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
       has_drivable_reference_line = true;
       if (FLAGS_prioritize_change_lane &&
           reference_line_info.IsChangeLanePath()) {
-        break;
+        disable_low_priority_path = true;
       }
     } else {
       reference_line_info.SetDrivable(false);

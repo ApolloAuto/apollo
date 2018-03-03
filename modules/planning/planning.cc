@@ -255,7 +255,7 @@ void Planning::RunOnce() {
   }
 
   if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
-    AERROR_EVERY(100) << "prediction is enabled but no prediction provided";
+    AWARN_EVERY(100) << "prediction is enabled but no prediction provided";
   }
 
   // Update reference line provider
@@ -302,9 +302,12 @@ void Planning::RunOnce() {
       status.Save(estop_trajectory.mutable_header()->mutable_status());
       PublishPlanningPb(&estop_trajectory, start_timestamp);
     } else {
-      not_ready->set_reason(msg);
-      status.Save(not_ready_pb.mutable_header()->mutable_status());
-      PublishPlanningPb(&not_ready_pb, start_timestamp);
+      trajectory_pb->mutable_decision()
+          ->mutable_main_decision()
+          ->mutable_not_ready()
+          ->set_reason(msg);
+      status.Save(trajectory_pb->mutable_header()->mutable_status());
+      PublishPlanningPb(trajectory_pb, start_timestamp);
     }
 
     auto seq_num = frame_->SequenceNum();
@@ -408,8 +411,8 @@ Status Planning::Plan(const double current_time_stamp,
 
   ExportReferenceLineDebug(ptr_debug);
 
-  const auto* best_reference_line = frame_->FindDriveReferenceLineInfo();
-  if (!best_reference_line) {
+  const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
+  if (!best_ref_info) {
     std::string msg("planner failed to make a driving plan");
     AERROR << msg;
     if (last_publishable_trajectory_) {
@@ -417,24 +420,23 @@ Status Planning::Plan(const double current_time_stamp,
     }
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  ptr_debug->MergeFrom(best_reference_line->debug());
+  ptr_debug->MergeFrom(best_ref_info->debug());
   trajectory_pb->mutable_latency_stats()->MergeFrom(
-      best_reference_line->latency_stats());
+      best_ref_info->latency_stats());
   // set right of way status
-  trajectory_pb->set_right_of_way_status(
-      best_reference_line->GetRightOfWayStatus());
-  for (const auto& id : best_reference_line->TargetLaneId()) {
+  trajectory_pb->set_right_of_way_status(best_ref_info->GetRightOfWayStatus());
+  for (const auto& id : best_ref_info->TargetLaneId()) {
     trajectory_pb->add_lane_id()->CopyFrom(id);
   }
 
-  best_reference_line->ExportDecision(trajectory_pb->mutable_decision());
+  best_ref_info->ExportDecision(trajectory_pb->mutable_decision());
 
   // Add debug information.
   if (FLAGS_enable_record_debug) {
     auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
     reference_line->set_name("planning_reference_line");
     const auto& reference_points =
-        best_reference_line->reference_line().reference_points();
+        best_ref_info->reference_line().reference_points();
     double s = 0.0;
     double prev_x = 0.0;
     double prev_y = 0.0;
@@ -461,7 +463,7 @@ Status Planning::Plan(const double current_time_stamp,
   }
 
   last_publishable_trajectory_.reset(new PublishableTrajectory(
-      current_time_stamp, best_reference_line->trajectory()));
+      current_time_stamp, best_ref_info->trajectory()));
 
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
@@ -479,8 +481,7 @@ Status Planning::Plan(const double current_time_stamp,
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
 
-  best_reference_line->ExportEngageAdvice(
-      trajectory_pb->mutable_engage_advice());
+  best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice());
 
   return status;
 }

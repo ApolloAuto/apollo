@@ -1,7 +1,6 @@
 import STORE from "store";
 import RENDERER from "renderer";
-
-const Worker = require('utils/webworker.js');
+import Worker from 'utils/webworker.js';
 
 export default class RosWebSocketEndpoint {
     constructor(serverAddr) {

@@ -6,6 +6,7 @@ import "modules/common/proto/header.proto";
 import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/localization/proto/localization.proto";
+import "modules/map/relative_map/proto/navigation.proto";
 import "modules/routing/proto/routing.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
 import "modules/planning/proto/sl_boundary.proto";
@@ -128,7 +129,7 @@ message DpPolyGraphDebug {
   repeated apollo.common.SLPoint min_cost_point = 2;
 }
 
-// next id: 21
+// next id: 22
 message PlanningData {
   // input
   optional apollo.localization.LocalizationEstimate adc_position = 7;
@@ -148,6 +149,7 @@ message PlanningData {
   repeated ReferenceLineDebug reference_line = 19;
   optional DpPolyGraphDebug dp_poly_graph = 20;
   optional LatticeStTraining lattice_st_image = 21;
+  optional apollo.relative_map.MapMsg relative_map = 22;
 }
 
 message LatticeStPixel {

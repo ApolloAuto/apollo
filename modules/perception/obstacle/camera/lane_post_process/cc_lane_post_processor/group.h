@@ -17,9 +17,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_GROUP_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_GROUP_H_
 
-#include <vector>
-#include <limits>
 #include <algorithm>
+#include <limits>
+#include <vector>
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
@@ -134,9 +134,7 @@ inline int Group::ComputeOrientation(const std::vector<Marker>& markers,
       break;
     }
 
-    default: {
-      AFATAL << "unknown marker shape type.";
-    }
+    default: { AFATAL << "unknown marker shape type."; }
   }
   start_angle = std::atan2(start_orie(1), start_orie(0));
   RectAngle(&start_angle);
@@ -180,9 +178,7 @@ inline int Group::ComputeOrientation(const std::vector<Marker>& markers,
       break;
     }
 
-    default: {
-      AFATAL << "unknown marker shape type.";
-    }
+    default: { AFATAL << "unknown marker shape type."; }
   }
   end_angle = std::atan2(end_orie(1), end_orie(0));
   RectAngle(&end_angle);
@@ -192,16 +188,15 @@ inline int Group::ComputeOrientation(const std::vector<Marker>& markers,
 
 inline ScalarType Group::ComputeDistance(const Group& tar_group,
                                          const AssociationParam& param) const {
-  ADEBUG << "source point = (" << this->end_pos(0) << ", "
-         << this->end_pos(1) << ")";
+  ADEBUG << "source point = (" << this->end_pos(0) << ", " << this->end_pos(1)
+         << ")";
   ADEBUG << "target point = (" << tar_group.start_pos(0) << ", "
          << tar_group.start_pos(1) << ")";
   Vector2D displacement = tar_group.start_pos - this->end_pos;
   ScalarType norm_v = this->end_orie.norm();
   if (norm_v < kEpsilon) {
-    ADEBUG
-        << "norm of orientation vector for reference group is too small: "
-        << norm_v;
+    ADEBUG << "norm of orientation vector for reference group is too small: "
+           << norm_v;
   }
 
   // (1) compute the projection distance of the target marker w.r.t. model
@@ -209,8 +204,8 @@ inline ScalarType Group::ComputeDistance(const Group& tar_group,
   if (norm_v >= kEpsilon) {
     projection_dist /= norm_v;
   }
-  ADEBUG << "(1) projection_dist = " << std::to_string(projection_dist)
-         << " [" << std::to_string(param.min_distance) << ", "
+  ADEBUG << "(1) projection_dist = " << std::to_string(projection_dist) << " ["
+         << std::to_string(param.min_distance) << ", "
          << std::to_string(param.max_distance) << "]";
   if (projection_dist < param.min_distance ||
       projection_dist > param.max_distance) {
@@ -231,8 +226,8 @@ inline ScalarType Group::ComputeDistance(const Group& tar_group,
   if (norm_v >= kEpsilon) {
     departure_dist /= norm_v;
   }
-  ADEBUG << "(2) departure_dist = " << std::to_string(departure_dist)
-         << " (" << std::to_string(param.max_departure_distance) << ")";
+  ADEBUG << "(2) departure_dist = " << std::to_string(departure_dist) << " ("
+         << std::to_string(param.max_departure_distance) << ")";
   if (departure_dist > param.max_departure_distance) {
     return -2;
   }
@@ -263,9 +258,9 @@ inline ScalarType Group::ComputeDistance(const Group& tar_group,
   // (4) relative orientation angle
   ScalarType tar_group_start_len = tar_group.start_orie.norm();
   ScalarType orie_dist = 0;
-  ADEBUG << "(4a) tar_group_start_len = "
-         << std::to_string(tar_group_start_len) << " ("
-         << std::to_string(param.min_orientation_estimation_size) << ")";
+  ADEBUG << "(4a) tar_group_start_len = " << std::to_string(tar_group_start_len)
+         << " (" << std::to_string(param.min_orientation_estimation_size)
+         << ")";
   if (tar_group_start_len > param.min_orientation_estimation_size) {
     // orientation angle of start markers on target group
     ScalarType alpha = tar_group.start_angle;
@@ -275,9 +270,9 @@ inline ScalarType Group::ComputeDistance(const Group& tar_group,
     if (orie_dist > static_cast<ScalarType>(M_PI)) {
       orie_dist = 2 * static_cast<ScalarType>(M_PI) - orie_dist;
     }
-    ADEBUG << "(4b) orie_dist = "
-           << std::to_string(orie_dist / M_PI * 180.0) << " ("
-           << std::to_string(param.max_relative_orie / M_PI * 180.0) << ")";
+    ADEBUG << "(4b) orie_dist = " << std::to_string(orie_dist / M_PI * 180.0)
+           << " (" << std::to_string(param.max_relative_orie / M_PI * 180.0)
+           << ")";
     if (orie_dist > param.max_relative_orie) {
       return -4;
     }

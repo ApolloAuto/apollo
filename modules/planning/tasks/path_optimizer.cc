@@ -41,12 +41,6 @@ apollo::common::Status PathOptimizer::Execute(
     AERROR << "Reference Line " << reference_line_info->Lanes().Id()
            << " is not drivable after " << Name();
   }
-  if (reference_line_info->IsChangeLanePath() &&
-      reference_line_info->TrajectoryLength() > FLAGS_change_lane_min_length) {
-    reference_line_info->SetDrivable(false);
-    AERROR << "Change lane reference line is shorter than "
-           << FLAGS_change_lane_min_length << ", not drivable";
-  }
   return ret;
 }
 

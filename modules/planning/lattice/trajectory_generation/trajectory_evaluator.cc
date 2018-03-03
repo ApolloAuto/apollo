@@ -146,7 +146,10 @@ double TrajectoryEvaluator::Evaluate(
   // 5. Cost of lateral comfort
 
   // Longitudinal costs
-  double lon_objective_cost = LonObjectiveCost(lon_trajectory, planning_target);
+  auto reference_s_dot = ComputeLongitudinalGuideVelocity(planning_target);
+
+  double lon_objective_cost = LonObjectiveCost(lon_trajectory, planning_target,
+      reference_s_dot);
 
   double lon_jerk_cost = LonComfortCost(lon_trajectory);
 
@@ -234,17 +237,17 @@ double TrajectoryEvaluator::LonComfortCost(
 
 double TrajectoryEvaluator::LonObjectiveCost(
     const std::shared_ptr<Trajectory1d>& lon_trajectory,
-    const PlanningTarget& planning_target) const {
+    const PlanningTarget& planning_target,
+    const std::vector<double>& ref_s_dots) const {
   double t_max = lon_trajectory->ParamLength();
-  double dist_s =
-      lon_trajectory->Evaluate(0, t_max) - lon_trajectory->Evaluate(0, 0.0);
+  double dist_s = lon_trajectory->Evaluate(0, t_max)
+      - lon_trajectory->Evaluate(0, 0.0);
 
   double speed_cost_sqr_sum = 0.0;
   double speed_cost_abs_sum = 0.0;
-  for (double t = 0.0; t < FLAGS_trajectory_time_length;
-       t += FLAGS_trajectory_time_resolution) {
-    double cost =
-        planning_target.cruise_speed() - lon_trajectory->Evaluate(1, t);
+  for (std::size_t i = 0; i < ref_s_dots.size(); ++i) {
+    double t = i * FLAGS_trajectory_time_resolution;
+    double cost = ref_s_dots[i] - lon_trajectory->Evaluate(1, t);
     speed_cost_sqr_sum += cost * cost;
     speed_cost_abs_sum += std::abs(cost);
   }
@@ -294,7 +297,7 @@ std::vector<double> TrajectoryEvaluator::evaluate_per_lonlat_trajectory(
   return ret;
 }
 
-std::vector<double> TrajectoryEvaluator::CreateLongitudinalGuideVelocity(
+std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
     const PlanningTarget& planning_target) const {
   double comfort_a = FLAGS_longitudinal_acceleration_lower_bound *
                      FLAGS_comfort_acceleration_factor;

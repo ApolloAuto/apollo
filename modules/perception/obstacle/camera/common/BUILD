@@ -7,9 +7,9 @@ cc_library(
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     deps = [
-      "//modules/perception/obstacle/base:perception_obstacle_base",
-      "@eigen"
-    ]
+        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "@eigen",
+    ],
 )
 
 cpplint()
