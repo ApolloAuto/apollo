@@ -16,6 +16,7 @@
 
 #include "modules/map/relative_map/navigation_lane.h"
 
+#include <algorithm>
 #include <limits>
 
 #include "modules/map/proto/map_lane.pb.h"
