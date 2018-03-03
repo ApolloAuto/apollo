@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H_
-#include <caffe/caffe.hpp>
 
-#include <infer.h>
+#include <caffe/caffe.hpp>
+#include <memory>
+#include "include/undistortion.h"
+
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -26,21 +28,21 @@ namespace obstacle {
 void gpu_memcpy(const size_t N, const void *X, void *Y);
 
 inline void perception_gpu_memset(const size_t N, const int alpha, void *X) {
-  CUDA_CHECK(cudaMemset(X, alpha, N));
+  //  CUDA_CHECK(cudaMemset(X, alpha, N));
 }
 inline void perception_memset(const size_t N, const int alpha, void *X) {
   memset(X, alpha, N);
 }
 
 inline void PerceptionMallocHost(void **ptr, size_t size, bool *use_cuda) {
-  CUDA_CHECK(cudaMallocHost(ptr, size));
+  //  CUDA_CHECK(cudaMallocHost(ptr, size));
   *use_cuda = true;
   return;
 }
 
 inline void PerceptionFreeHost(void *ptr, bool use_cuda) {
   if (use_cuda) {
-    CUDA_CHECK(cudaFreeHost(ptr));
+    //    CUDA_CHECK(cudaFreeHost(ptr));
     return;
   }
   free(ptr);
@@ -83,8 +85,12 @@ class SyncedMemory {
   void *mutable_gpu_data();
 
   enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };
-  SyncedHead head() { return head_; }
-  size_t size() { return size_; }
+  SyncedHead head() {
+    return head_;
+  }
+  size_t size() {
+    return size_;
+  }
 
   void async_gpu_push(const cudaStream_t &stream);
 
@@ -105,27 +111,14 @@ class SyncedMemory {
 };  // class SyncedMemory
 int divup(int a, int b);
 
-void resize(cv::Mat frame, anakin::Tensor<float> *dst,
-            std::shared_ptr<SyncedMemory> src_gpu, int start_axis);
 void resize(cv::Mat frame, caffe::Blob<float> *dst,
             std::shared_ptr<SyncedMemory> src_gpu, int start_axis);
-void resize(const uchar *src, std::shared_ptr<SyncedMemory> src_gpu,
-            int origin_width, int origin_height, anakin::Tensor<float> *dst,
-            int start_axis);
 
 // resize with mean and scale
-void resize(cv::Mat frame, anakin::Tensor<float> *dst,
-            std::shared_ptr<SyncedMemory> src_gpu, int start_axis,
-            const float mean_b, const float mean_g, const float mean_r,
-            const float scale);
 void resize(cv::Mat frame, caffe::Blob<float> *dst,
             std::shared_ptr<SyncedMemory> src_gpu, int start_axis,
             const float mean_b, const float mean_g, const float mean_r,
             const float scale);
-void resize(const uchar *src, std::shared_ptr<SyncedMemory> src_gpu,
-            int origin_width, int origin_height, anakin::Tensor<float> *dst,
-            int start_axis, const float mean_b, const float mean_g,
-            const float mean_r, const float scale);
 }  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
