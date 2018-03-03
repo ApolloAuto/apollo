@@ -24,19 +24,19 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "modules/common/log.h
-#include <obstacle/camera/detector/common/util.h>
 
-#include <obstacle/camera/common/util.h>
-#include "modules/caffe/blob.hpp"
-#include "modules/caffe/layer.hpp"
-#include "modules/caffe/proto/caffe.pb.h"
+#include <caffe/proto/caffe.pb.h>
+#include <caffe/blob.hpp>
+#include <caffe/layer.hpp>
 
-#include "modules/infer.h"
-#include "modules/layer.h"
-#include "modules/net.h"
+#include "infer.h"
+#include "layer.h"
+#include "net.h"
 
-#include "modules/obstacle/camera/common/visual_object.h"
+#include "modules/common/log.h"
+#include "modules/perception/obstacle/camera/common/util.h"
+#include "modules/perception/obstacle/camera/common/visual_object.h"
+#include "modules/perception/obstacle/camera/detector/common/util.h"
 
 namespace apollo {
 namespace perception {
