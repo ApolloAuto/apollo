@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_UTIL_H_
 
+#include <string>
 #include <vector>
-#include "modules/obstacle/base/types.h"
+
+#include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
 namespace perception {
@@ -32,4 +34,4 @@ bool load_anchors(const std::string &path, std::vector<float> *anchors);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_UTIL_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_UTIL

@@ -14,32 +14,38 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/obstacle/camera/detector/yolo_camera_detector/util.h"
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/util.h"
 
 #include <fstream>
 #include <iostream>
 #include <map>
-#include "modules/common/log.h
+#include <string>
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
 namespace obstacle {
 namespace yolo {
 
+using apollo::perception::ObjectType;
+
 bool load_types(const std::string &path, std::vector<ObjectType> *types) {
   const std::map<std::string, ObjectType> type_map = {
-      {"UNKNOWN", UNKNOWN},
-      {"UNKNOWN_MOVABLE", UNKNOWN_MOVABLE},
-      {"UNKNOWN_UNMOVABLE", UNKNOWN_UNMOVABLE},
-      {"PEDESTRIAN", PEDESTRIAN},
-      {"BICYCLE", BICYCLE},
-      {"VEHICLE", VEHICLE},
+      {"UNKNOWN", apollo::perception::ObjectType::UNKNOWN},
+      {"UNKNOWN_MOVABLE", apollo::perception::ObjectType::UNKNOWN_MOVABLE},
+      {"UNKNOWN_UNMOVABLE", apollo::perception::ObjectType::UNKNOWN_UNMOVABLE},
+      {"PEDESTRIAN", apollo::perception::ObjectType::PEDESTRIAN},
+      {"BICYCLE", apollo::perception::ObjectType::BICYCLE},
+      {"VEHICLE", apollo::perception::ObjectType::VEHICLE},
   };
 
   std::ifstream ifs(path, std::ifstream::in);
   if (!ifs.good()) {
     AERROR << "type_list not found, use default: VEHICLE, BICYCLE, PEDESTRIAN";
-    (*types) = {VEHICLE, BICYCLE, PEDESTRIAN};
+    (*types) = {apollo::perception::ObjectType::VEHICLE,
+                apollo::perception::ObjectType::BICYCLE,
+                apollo::perception::ObjectType::PEDESTRIAN};
   } else {
     std::string type;
     AINFO << "Supported types: ";

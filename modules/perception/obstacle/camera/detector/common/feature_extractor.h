@@ -20,11 +20,10 @@
 #include <google/protobuf/io/gzip_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
+#include <caffe/caffe.hpp>
 #include <vector>
 
-#include <caffe/caffe.hpp>
 #include "modules/common/log.h"
-
 #include "modules/perception/lib/base/noncopyable.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
@@ -91,4 +90,4 @@ class ROIPoolingFeatureExtractor : public BaseFeatureExtractor {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_FEATURE_EXTRACTOR_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_FEATURE_EXTRACTOR
