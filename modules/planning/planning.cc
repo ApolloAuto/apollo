@@ -302,9 +302,12 @@ void Planning::RunOnce() {
       status.Save(estop_trajectory.mutable_header()->mutable_status());
       PublishPlanningPb(&estop_trajectory, start_timestamp);
     } else {
-      not_ready->set_reason(msg);
-      status.Save(not_ready_pb.mutable_header()->mutable_status());
-      PublishPlanningPb(&not_ready_pb, start_timestamp);
+      trajectory_pb->mutable_decision()
+          ->mutable_main_decision()
+          ->mutable_not_ready()
+          ->set_reason(msg);
+      status.Save(trajectory_pb->mutable_header()->mutable_status());
+      PublishPlanningPb(trajectory_pb, start_timestamp);
     }
 
     auto seq_num = frame_->SequenceNum();
