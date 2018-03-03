@@ -62,7 +62,7 @@ def draw_lane_boundary(lane, ax, color_val, lane_marker):
     px_lane_marker = []
     py_lane_marker = []
     for x in range(int(lane_marker.left_lane_marker.view_range)):
-        px_lane_marker.append(-evaluate_poly(left_c0, left_c1,
+        px_lane_marker.append(evaluate_poly(left_c0, left_c1,
                                              left_c2, left_c3,
                                              float(x)))
         py_lane_marker.append(float(x))
@@ -85,7 +85,7 @@ def draw_lane_boundary(lane, ax, color_val, lane_marker):
     px_lane_marker = []
     py_lane_marker = []
     for x in range(int(lane_marker.right_lane_marker.view_range)):
-        px_lane_marker.append(-evaluate_poly(right_c0, right_c1,
+        px_lane_marker.append(evaluate_poly(right_c0, right_c1,
                                              right_c2, right_c3,
                                              float(x)))
         py_lane_marker.append(float(x))
