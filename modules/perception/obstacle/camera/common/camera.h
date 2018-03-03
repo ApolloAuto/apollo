@@ -145,37 +145,23 @@ class CameraModel {
   }
 
   /**@brief Get the x focal length. */
-  inline T get_focal_length_x() const {
-    return _focal_length_x;
-  }
+  inline T get_focal_length_x() const { return _focal_length_x; }
   /**@brief Get the y focal length. */
-  inline T get_focal_length_y() const {
-    return _focal_length_y;
-  }
+  inline T get_focal_length_y() const { return _focal_length_y; }
   /**@brief Get the optical center x. */
-  inline T get_center_x() const {
-    return _center_x;
-  }
+  inline T get_center_x() const { return _center_x; }
   /**@brief Get the optical center y. */
-  inline T get_center_y() const {
-    return _center_y;
-  }
+  inline T get_center_y() const { return _center_y; }
   /**@brief Get the intrinsic matrix K. */
   inline const Eigen::Matrix<T, 3, 3>& get_intrinsic() const {
     return _intrinsic;
   }
   /**@brief Get the intrinsic matrix K. */
-  inline Eigen::Matrix<T, 3, 3>& get_intrinsic() {
-    return _intrinsic;
-  }
+  inline Eigen::Matrix<T, 3, 3>& get_intrinsic() { return _intrinsic; }
   /**@brief Get the image width */
-  inline T get_width() const {
-    return _width;
-  }
+  inline T get_width() const { return _width; }
   /**@brief Get the image height */
-  inline T get_height() const {
-    return _height;
-  }
+  inline T get_height() const { return _height; }
 
   friend std::ostream& operator<<<>(std::ostream& out,
                                     const CameraModel<T>& camera);

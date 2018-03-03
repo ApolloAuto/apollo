@@ -4,8 +4,14 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "common",
-    srcs = glob(["*.cc"]),
-    hdrs = glob(["*.h"]),
+    srcs = [
+    ],
+    hdrs = [
+        "camera.h",
+        "lane_object.h",
+        "util.h",
+        "visual_object.h",
+    ],
     deps = [
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "@eigen",
