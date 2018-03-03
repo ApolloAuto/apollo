@@ -173,10 +173,11 @@ void erase_where(Container& c, F&& f) {  // NOLINT
 template <class Container, class F>
 void erase_map_where(Container& c, F&& f) {  // NOLINT
   for (auto it = c.begin(); it != c.end();) {
-    if (f(*it))
+    if (f(*it)) {
       it = c.erase(it);
-    else
+    } else {
       ++it;
+    }
   }
 }
 
