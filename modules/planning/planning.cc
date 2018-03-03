@@ -255,7 +255,7 @@ void Planning::RunOnce() {
   }
 
   if (FLAGS_enable_prediction && AdapterManager::GetPrediction()->Empty()) {
-    AERROR_EVERY(100) << "prediction is enabled but no prediction provided";
+    AWARN_EVERY(100) << "prediction is enabled but no prediction provided";
   }
 
   // Update reference line provider
