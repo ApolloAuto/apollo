@@ -77,6 +77,8 @@ struct alignas(16) VisualObject {
   float track_age = 0.0f;
   // [second] the last observed timestamp
   float last_track_timestamp = 0.0f;
+
+  std::vector<float> object_feature;
 };
 
 typedef std::shared_ptr<VisualObject> VisualObjectPtr;
