@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/obstacle/camera/detector/common/util.h"
+#include "modules/perception/obstacle/camera/detector/common/util.h"
 
 namespace apollo {
 namespace perception {
@@ -28,9 +28,9 @@ SyncedMemory::~SyncedMemory() {
     int initial_device = -1;
     cudaGetDevice(&initial_device);
     if (gpu_device_ != -1) {
-      CUDA_CHECK(cudaSetDevice(gpu_device_));
+      //      CUDA_CHECK(cudaSetDevice(gpu_device_));
     }
-    CUDA_CHECK(cudaFree(gpu_ptr_));
+    //    CUDA_CHECK(cudaFree(gpu_ptr_));
     cudaSetDevice(initial_device);
   }
 }
@@ -60,16 +60,16 @@ inline void SyncedMemory::to_cpu() {
 inline void SyncedMemory::to_gpu() {
   switch (head_) {
     case UNINITIALIZED:
-      CUDA_CHECK(cudaGetDevice(&gpu_device_));
-      CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
+      //      CUDA_CHECK(cudaGetDevice(&gpu_device_));
+      // CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
       perception_gpu_memset(size_, 0, gpu_ptr_);
       head_ = HEAD_AT_GPU;
       own_gpu_data_ = true;
       break;
     case HEAD_AT_CPU:
       if (gpu_ptr_ == NULL) {
-        CUDA_CHECK(cudaGetDevice(&gpu_device_));
-        CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
+        //      CUDA_CHECK(cudaGetDevice(&gpu_device_));
+        //      CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
         own_gpu_data_ = true;
       }
       gpu_memcpy(size_, cpu_ptr_, gpu_ptr_);
@@ -111,9 +111,9 @@ void SyncedMemory::set_gpu_data(void *data) {
     int initial_device = -1;
     cudaGetDevice(&initial_device);
     if (gpu_device_ != -1) {
-      CUDA_CHECK(cudaSetDevice(gpu_device_));
+      //    CUDA_CHECK(cudaSetDevice(gpu_device_));
     }
-    CUDA_CHECK(cudaFree(gpu_ptr_));
+    //    CUDA_CHECK(cudaFree(gpu_ptr_));
     cudaSetDevice(initial_device);
   }
   gpu_ptr_ = data;
@@ -136,12 +136,12 @@ void *SyncedMemory::mutable_gpu_data() {
 void SyncedMemory::async_gpu_push(const cudaStream_t &stream) {
   CHECK(head_ == HEAD_AT_CPU);
   if (gpu_ptr_ == NULL) {
-    CUDA_CHECK(cudaGetDevice(&gpu_device_));
-    CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
+    //    CUDA_CHECK(cudaGetDevice(&gpu_device_));
+    //    CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
     own_gpu_data_ = true;
   }
   const cudaMemcpyKind put = cudaMemcpyHostToDevice;
-  CUDA_CHECK(cudaMemcpyAsync(gpu_ptr_, cpu_ptr_, size_, put, stream));
+  //  CUDA_CHECK(cudaMemcpyAsync(gpu_ptr_, cpu_ptr_, size_, put, stream));
   // Assume caller will synchronize on the stream before use
   head_ = SYNCED;
 }
