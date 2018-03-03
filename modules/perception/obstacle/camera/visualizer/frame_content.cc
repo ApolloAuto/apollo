@@ -157,7 +157,7 @@ void FrameContent::update_timestamp(double ref) {
     _current_image_timestamp = ref;
   }
   common::util::erase_map_where(
-      _image_caches, [this](std::map<long, ImageContent>::value_type& p) {
+      _image_caches, [this](std::map<int64_t, ImageContent>::value_type& p) {
         return this->MapKeyToDouble(p.first) < this->_current_image_timestamp;
       });
 
@@ -170,7 +170,7 @@ void FrameContent::update_timestamp(double ref) {
   best_delta = FLT_MAX;
   best_ts = -1;
 
-  for (std::map<long, RadarContent>::iterator it = _radar_caches.begin();
+  for (std::map<int64_t, RadarContent>::iterator it = _radar_caches.begin();
        it != _radar_caches.end(); ++it) {
     double it_ts = MapKeyToDouble(it->first);
     double delta = fabs(it_ts - ref);
@@ -183,7 +183,7 @@ void FrameContent::update_timestamp(double ref) {
   _current_radar_timestamp = best_ts;
   common::util::erase_map_where(
       _radar_caches,
-      [this, best_ts](std::map<long, RadarContent>::value_type& p) {
+      [this, best_ts](std::map<int64_t, RadarContent>::value_type& p) {
         return this->MapKeyToDouble(p.first) < best_ts;
       });
 
@@ -201,7 +201,7 @@ void FrameContent::update_timestamp(double ref) {
   _current_fusion_timestamp = best_ts;
   common::util::erase_map_where(
       _fusion_caches,
-      [this, best_ts](std::map<long, FusionContent>::value_type& p) {
+      [this, best_ts](std::map<int64_t, FusionContent>::value_type& p) {
         return this->MapKeyToDouble(p.first) < best_ts;
       });
 
@@ -220,7 +220,7 @@ void FrameContent::update_timestamp(double ref) {
   _current_camera_timestamp = best_ts;
   common::util::erase_map_where(
       _camera_caches,
-      [this, best_ts](std::map<long, CameraContent>::value_type& p) {
+      [this, best_ts](std::map<int64_t, CameraContent>::value_type& p) {
         return this->MapKeyToDouble(p.first) < best_ts;
       });
 
@@ -237,7 +237,7 @@ void FrameContent::update_timestamp(double ref) {
   _current_gt_timestamp = best_ts;
   common::util::erase_map_where(
       _gt_caches,
-      [this, best_ts](std::map<long, GroundTruthContent>::value_type& p) {
+      [this, best_ts](std::map<int64_t, GroundTruthContent>::value_type& p) {
         return this->MapKeyToDouble(p.first) < best_ts;
       });
 
@@ -256,7 +256,7 @@ void FrameContent::update_timestamp(double ref) {
   _current_motion_timestamp = best_ts;
   common::util::erase_map_where(
       _motion_caches,
-      [this, best_ts](std::map<long, MotionContent>::value_type& p) {
+      [this, best_ts](std::map<int64_t, MotionContent>::value_type& p) {
         return this->MapKeyToDouble(p.first) < best_ts;
       });
 }
