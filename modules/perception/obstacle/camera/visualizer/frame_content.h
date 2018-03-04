@@ -130,19 +130,27 @@ class FrameContent {
   Eigen::Matrix4d get_pose_v2w();
   cv::Mat get_camera_image();
 
-  int get_pose_type() { return _continuous_type; }
+  int get_pose_type() {
+    return _continuous_type;
+  }
 
-  void set_pose_type(int type) { _continuous_type = type; }
+  void set_pose_type(int type) {
+    _continuous_type = type;
+  }
 
   std::vector<ObjectPtr> get_camera_objects();
   std::vector<ObjectPtr> get_radar_objects();
   double get_visualization_timestamp();
 
-  inline bool has_radar_data() { return _radar_caches.size(); }
+  inline bool has_radar_data() {
+    return _radar_caches.size();
+  }
 
   CameraFrameSupplementPtr get_camera_frame_supplement();
 
-  inline bool has_camera_data() { return _camera_caches.size(); }
+  inline bool has_camera_data() {
+    return _camera_caches.size();
+  }
   /*   inline void set_camera2velo_pose(const Eigen::Matrix4d& pose) {
          _pose_camera2velo = pose;
      }*/
@@ -165,7 +173,9 @@ class FrameContent {
     return static_cast<int64_t>(d / kEpsilon_);
   }
 
-  double MapKeyToDouble(const int64_t key) { return key * kEpsilon_; }
+  double MapKeyToDouble(const int64_t key) {
+    return key * kEpsilon_;
+  }
 
   // input
   // 1.radar

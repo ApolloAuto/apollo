@@ -25,6 +25,7 @@ cc_library(
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "//modules/perception/obstacle/common:perception_obstacle_common",
         "//modules/perception/obstacle/radar/interface:perception_obstacle_radar_interface",
+        "//modules/perception/obstacle/camera/visualizer/common:perception_obstacle_camera_visualizer_common",
         "@eigen//:eigen",
         "@glew//:glew",
         "@glfw//:glfw",

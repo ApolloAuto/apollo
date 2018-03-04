@@ -41,11 +41,11 @@ double get_quaternion_angle(const Eigen::Quaterniond &quat) {
 }
 
 Frame::Frame()
-        : _t(0, 0, 0), _q(Eigen::Quaterniond(1, 0, 0, 0)), _reference_frame(NULL) {}
+    : _t(0, 0, 0), _q(Eigen::Quaterniond(1, 0, 0, 0)), _reference_frame(NULL) {}
 
 Frame::Frame(const Eigen::Vector3d &position,
              const Eigen::Quaterniond &orientation)
-        : _t(position), _q(orientation), _reference_frame(NULL) {}
+    : _t(position), _q(orientation), _reference_frame(NULL) {}
 
 Frame &Frame::operator=(const Frame &frame) {
   // Automatic compiler generated version would not emit the modified() signals
@@ -63,7 +63,7 @@ Frame::Frame(const Frame &frame) {
 const double *Frame::matrix() const {
   static double m[4][4];
   get_matrix(m);
-  return (const double *) (m);
+  return (const double *)(m);
 }
 
 void Frame::get_matrix(double m[4][4]) const {
@@ -249,8 +249,8 @@ void Frame::rotate_around_point(const Eigen::Quaterniond &rotation,
   Eigen::AngleAxisd angleAxis(rotAngle, resRotAxis);
 
   Eigen::Vector3d trans =
-          point +
-          Eigen::Quaterniond(angleAxis)._transformVector(position() - point) - _t;
+      point +
+      Eigen::Quaterniond(angleAxis)._transformVector(position() - point) - _t;
 
   _t += trans;
 }
@@ -267,7 +267,7 @@ void Frame::set_position(double x, double y, double z) {
 }
 
 void Frame::set_position_and_orientation(
-        const Eigen::Vector3d &position, const Eigen::Quaterniond &orientation) {
+    const Eigen::Vector3d &position, const Eigen::Quaterniond &orientation) {
   if (reference_frame()) {
     _t = reference_frame()->coordinates_of(position);
     _q = reference_frame()->orientation().inverse() * orientation;
@@ -322,15 +322,15 @@ Eigen::Quaterniond Frame::orientation() const {
 
 void Frame::set_reference_frame(const Frame *const refFrame) {
   if (setting_asreference_frame_will_create_a_loop(refFrame)) {
-    std::cerr <<
-              "Frame::set_reference_frame would create a loop in Frame hierarchy";
+    std::cerr
+        << "Frame::set_reference_frame would create a loop in Frame hierarchy";
   } else {
     _reference_frame = refFrame;
   }
 }
 
 bool Frame::setting_asreference_frame_will_create_a_loop(
-        const Frame *const frame) {
+    const Frame *const frame) {
   const Frame *f = frame;
   while (f != NULL) {
     if (f == this) return true;
@@ -347,7 +347,7 @@ Eigen::Vector3d Frame::coordinates_of(const Eigen::Vector3d &src) const {
 }
 
 Eigen::Vector3d Frame::inverse_coordinates_of(
-        const Eigen::Vector3d &src) const {
+    const Eigen::Vector3d &src) const {
   const Frame *fr = this;
   Eigen::Vector3d res = src;
   while (fr != NULL) {
@@ -357,13 +357,12 @@ Eigen::Vector3d Frame::inverse_coordinates_of(
   return res;
 }
 
-Eigen::Vector3d Frame::local_coordinates_of(
-        const Eigen::Vector3d &src) const {
+Eigen::Vector3d Frame::local_coordinates_of(const Eigen::Vector3d &src) const {
   return rotation().inverse()._transformVector(src - translation());
 }
 
 Eigen::Vector3d Frame::local_inverse_coordinates_of(
-        const Eigen::Vector3d &src) const {
+    const Eigen::Vector3d &src) const {
   return rotation()._transformVector(src) + translation();
 }
 
@@ -373,7 +372,7 @@ Eigen::Vector3d Frame::coordinates_of_from(const Eigen::Vector3d &src,
     return src;
   else if (reference_frame())
     return local_coordinates_of(
-            reference_frame()->coordinates_of_from(src, from));
+        reference_frame()->coordinates_of_from(src, from));
   else
     return local_coordinates_of(from->inverse_coordinates_of(src));
 }
@@ -397,7 +396,7 @@ Eigen::Vector3d Frame::coordinates_of_in(const Eigen::Vector3d &src,
 
 void Frame::get_coordinates_of(const double src[3], double res[3]) const {
   const Eigen::Vector3d r =
-          coordinates_of(Eigen::Vector3d(src[0], src[1], src[2]));
+      coordinates_of(Eigen::Vector3d(src[0], src[1], src[2]));
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -406,7 +405,7 @@ void Frame::get_coordinates_of(const double src[3], double res[3]) const {
 void Frame::get_inverse_coordinates_of(const double src[3],
                                        double res[3]) const {
   const Eigen::Vector3d r =
-          inverse_coordinates_of(Eigen::Vector3d(src[0], src[1], src[2]));
+      inverse_coordinates_of(Eigen::Vector3d(src[0], src[1], src[2]));
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -414,7 +413,7 @@ void Frame::get_inverse_coordinates_of(const double src[3],
 
 void Frame::get_local_coordinates_of(const double src[3], double res[3]) const {
   const Eigen::Vector3d r =
-          local_coordinates_of(Eigen::Vector3d(src[0], src[1], src[2]));
+      local_coordinates_of(Eigen::Vector3d(src[0], src[1], src[2]));
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -423,7 +422,7 @@ void Frame::get_local_coordinates_of(const double src[3], double res[3]) const {
 void Frame::get_local_inverse_coordinates_of(const double src[3],
                                              double res[3]) const {
   const Eigen::Vector3d r =
-          local_inverse_coordinates_of(Eigen::Vector3d(src[0], src[1], src[2]));
+      local_inverse_coordinates_of(Eigen::Vector3d(src[0], src[1], src[2]));
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -432,7 +431,7 @@ void Frame::get_local_inverse_coordinates_of(const double src[3],
 void Frame::get_coordinates_of_in(const double src[3], double res[3],
                                   const Frame *const in) const {
   const Eigen::Vector3d r =
-          coordinates_of_in(Eigen::Vector3d(src[0], src[1], src[2]), in);
+      coordinates_of_in(Eigen::Vector3d(src[0], src[1], src[2]), in);
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -441,7 +440,7 @@ void Frame::get_coordinates_of_in(const double src[3], double res[3],
 void Frame::get_coordinates_of_from(const double src[3], double res[3],
                                     const Frame *const from) const {
   const Eigen::Vector3d r =
-          coordinates_of_from(Eigen::Vector3d(src[0], src[1], src[2]), from);
+      coordinates_of_from(Eigen::Vector3d(src[0], src[1], src[2]), from);
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -469,7 +468,7 @@ Eigen::Vector3d Frame::local_transform_of(const Eigen::Vector3d &src) const {
 }
 
 Eigen::Vector3d Frame::local_inverse_transform_of(
-        const Eigen::Vector3d &src) const {
+    const Eigen::Vector3d &src) const {
   return rotation()._transformVector(src);
 }
 
@@ -509,7 +508,7 @@ void Frame::get_transform_of(const double src[3], double res[3]) const {
 
 void Frame::get_inverse_transform_of(const double src[3], double res[3]) const {
   Eigen::Vector3d r =
-          inverse_transform_of(Eigen::Vector3d(src[0], src[1], src[2]));
+      inverse_transform_of(Eigen::Vector3d(src[0], src[1], src[2]));
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -517,7 +516,7 @@ void Frame::get_inverse_transform_of(const double src[3], double res[3]) const {
 
 void Frame::get_local_transform_of(const double src[3], double res[3]) const {
   Eigen::Vector3d r =
-          local_transform_of(Eigen::Vector3d(src[0], src[1], src[2]));
+      local_transform_of(Eigen::Vector3d(src[0], src[1], src[2]));
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -526,7 +525,7 @@ void Frame::get_local_transform_of(const double src[3], double res[3]) const {
 void Frame::get_local_inverse_transform_of(const double src[3],
                                            double res[3]) const {
   Eigen::Vector3d r =
-          local_inverse_transform_of(Eigen::Vector3d(src[0], src[1], src[2]));
+      local_inverse_transform_of(Eigen::Vector3d(src[0], src[1], src[2]));
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -535,7 +534,7 @@ void Frame::get_local_inverse_transform_of(const double src[3],
 void Frame::get_transform_of_in(const double src[3], double res[3],
                                 const Frame *const in) const {
   Eigen::Vector3d r =
-          transform_of_in(Eigen::Vector3d(src[0], src[1], src[2]), in);
+      transform_of_in(Eigen::Vector3d(src[0], src[1], src[2]), in);
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -544,7 +543,7 @@ void Frame::get_transform_of_in(const double src[3], double res[3],
 void Frame::get_transform_of_from(const double src[3], double res[3],
                                   const Frame *const from) const {
   Eigen::Vector3d r =
-          transform_of_from(Eigen::Vector3d(src[0], src[1], src[2]), from);
+      transform_of_from(Eigen::Vector3d(src[0], src[1], src[2]), from);
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -584,7 +583,7 @@ void Frame::align_with_frame(const Frame *const frame, bool move,
   double coef = directions[0][index[0]].dot(directions[1][index[1]]);
   if (fabs(coef) >= threshold) {
     const Eigen::Vector3d axis =
-            directions[0][index[0]].cross(directions[1][index[1]]);
+        directions[0][index[0]].cross(directions[1][index[1]]);
     double angle = asin(axis.norm());
     if (coef >= 0.0) angle = -angle;
     // set_orientation(Eigen::Quaterniond(axis, angle) * orientation());
@@ -637,9 +636,8 @@ void Frame::project_on_line(const Eigen::Vector3d &origin,
   Eigen::Vector3d proj = shift;
 
   if (direction.squaredNorm() < 1.0E-10) {
-    std::cout
-            << "Vec::projectOnAxis: axis direction is not normalized (norm)."
-            << std::endl;
+    std::cout << "Vec::projectOnAxis: axis direction is not normalized (norm)."
+              << std::endl;
   }
 
   proj = (proj.dot(direction) / direction.squaredNorm()) * direction;
