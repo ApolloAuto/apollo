@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/camera/visualizer/common/camera.h"
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
 namespace apollo {
 namespace perception {
@@ -102,20 +102,20 @@ void Camera::setscreen_widthandheight(int width, int height) {
 
 double Camera::znear() const {
   double z =
-          distance_to_scene_center() - zclipping_coefficient() * scene_radius();
+      distance_to_scene_center() - zclipping_coefficient() * scene_radius();
 
   // Prevents negative or null zNear values.
   const double zMin =
-          znear_coefficient() * zclipping_coefficient() * scene_radius();
+      znear_coefficient() * zclipping_coefficient() * scene_radius();
 
   if (z < zMin) {
     switch (type()) {
       case Camera::PERSPECTIVE:
         z = zMin;
-            break;
+        break;
       case Camera::ORTHOGRAPHIC:
         z = 0.0;
-            break;
+        break;
     }
   }
   return z;
@@ -158,7 +158,7 @@ double Camera::distance_to_scene_center() const {
 void Camera::get_ortho_width_height(GLdouble *halfWidth,
                                     GLdouble *halfHeight) const {
   const double dist =
-          _ortho_coef * fabs(cameracoordinates_of(revolve_around_point())(2));
+      _ortho_coef * fabs(cameracoordinates_of(revolve_around_point())(2));
   // #CONNECTION# fit_screen_region
   *halfWidth = dist * ((aspect_ratio() < 1.0) ? 1.0 : aspect_ratio());
   *halfHeight = dist * ((aspect_ratio() < 1.0) ? 1.0 / aspect_ratio() : 1.0);
@@ -265,28 +265,28 @@ void Camera::load_projection_matrix_stereo(bool leftBuffer) const {
       // compute half width of screen,
       // corresponding to zero parallax plane to deduce decay of cameras
       screenHalfWidth = focus_distance() * tan(horizontalfield_of_view() / 2.0);
-          shift = screenHalfWidth * io_distance() / physicalscreen_width();
-          // should be * current y    / y total
-          // to take into account that the window doesn't cover the entire screen
+      shift = screenHalfWidth * io_distance() / physicalscreen_width();
+      // should be * current y    / y total
+      // to take into account that the window doesn't cover the entire screen
 
-          // compute half width of "view" at znear and the delta corresponding to
-          // the shifted camera to deduce what to set for asymmetric frustums
-          halfWidth = znear() * tan(horizontalfield_of_view() / 2.0);
-          delta = shift * znear() / focus_distance();
-          side = leftBuffer ? -1.0 : 1.0;
+      // compute half width of "view" at znear and the delta corresponding to
+      // the shifted camera to deduce what to set for asymmetric frustums
+      halfWidth = znear() * tan(horizontalfield_of_view() / 2.0);
+      delta = shift * znear() / focus_distance();
+      side = leftBuffer ? -1.0 : 1.0;
 
-          left = -halfWidth + side * delta;
-          right = halfWidth + side * delta;
-          top = halfWidth / aspect_ratio();
-          bottom = -top;
-          glFrustum(left, right, bottom, top, znear(), zfar());
-          break;
+      left = -halfWidth + side * delta;
+      right = halfWidth + side * delta;
+      top = halfWidth / aspect_ratio();
+      bottom = -top;
+      glFrustum(left, right, bottom, top, znear(), zfar());
+      break;
 
     case Camera::ORTHOGRAPHIC:
       std::cout << "Camera::setProjectionMatrixStereo: Stereo not available "
-              "with Ortho mode"
+                   "with Ortho mode"
                 << std::endl;
-          break;
+      break;
   }
 }
 
@@ -296,8 +296,8 @@ void Camera::load_model_view_matrix_stereo(bool leftBuffer) const {
 
   double halfWidth = focus_distance() * tan(horizontalfield_of_view() / 2.0);
   double shift =
-          halfWidth * io_distance() /
-          physicalscreen_width();  // * current window width / full screen width
+      halfWidth * io_distance() /
+      physicalscreen_width();  // * current window width / full screen width
 
   compute_model_view_matrix();
   if (leftBuffer) {
@@ -487,7 +487,6 @@ void Camera::fit_bounding_box(const Eigen::Vector3d &min,
   fit_sphere(0.5 * (min + max), 0.5 * diameter);
 }
 
-
 /* Pan the camera */
 void Camera::pan_by_mouse(int deltaX, int deltaY) {
   Eigen::Vector3d trans(static_cast<double>(deltaX),
@@ -498,7 +497,7 @@ void Camera::pan_by_mouse(int deltaX, int deltaY) {
       trans *= 2.0 * tan(field_of_view() / 2.0) *
                fabs((frame()->coordinates_of(revolve_around_point()))(2)) /
                screen_height();
-          break;
+      break;
     case Camera::ORTHOGRAPHIC: {
       GLdouble w = 0.0;
       GLdouble h = 0.0;
@@ -515,7 +514,7 @@ void Camera::pan_by_mouse(int deltaX, int deltaY) {
 void Camera::rotate_by_mouse_from_qgwidget(int preX, int preY, int x, int y) {
   Eigen::Vector3d trans = projectedcoordinates_of(revolve_around_point());
   Eigen::Quaterniond rot =
-          deformed_ball_quaternion(preX, preY, x, y, trans[0], trans[1]);
+      deformed_ball_quaternion(preX, preY, x, y, trans[0], trans[1]);
   frame()->rotate_around_point(rot, revolve_around_point());
 }
 
@@ -524,7 +523,7 @@ Eigen::Quaterniond Camera::get_rotatation_by_mouse_from_qgwidget(int preX,
                                                                  int x, int y) {
   Eigen::Vector3d trans = projectedcoordinates_of(revolve_around_point());
   Eigen::Quaterniond rot =
-          deformed_ball_quaternion(preX, preY, x, y, trans[0], trans[1]);
+      deformed_ball_quaternion(preX, preY, x, y, trans[0], trans[1]);
   return rot;
 }
 
@@ -565,19 +564,19 @@ void Camera::rotate_by_mouse(int deltaX, int deltaY) {
 
 void Camera::rotate(Eigen::Vector3d i_axis, double i_angle) {
   frame()->rotate_around_point(
-          Eigen::Quaterniond(i_angle, i_axis(0), i_axis(1), i_axis(2)),
-          revolve_around_point());
+      Eigen::Quaterniond(i_angle, i_axis(0), i_axis(1), i_axis(2)),
+      revolve_around_point());
 }
 
 void Camera::setup_vector(const Eigen::Vector3d &up, bool noMove) {
   Eigen::Quaterniond q = Eigen::Quaterniond().FromTwoVectors(
-          Eigen::Vector3d(0.0, 1.0, 0.0), frame()->transform_of(up));
+      Eigen::Vector3d(0.0, 1.0, 0.0), frame()->transform_of(up));
 
   if (!noMove) {
     frame()->set_position(
-            revolve_around_point() -
-            (frame()->orientation() *
-             q)._transformVector(frame()->coordinates_of(revolve_around_point())));
+        revolve_around_point() -
+        (frame()->orientation() *
+         q)._transformVector(frame()->coordinates_of(revolve_around_point())));
   }
 
   frame()->rotate(q);
@@ -651,7 +650,7 @@ void Camera::set_from_model_view_matrix(const GLdouble *const modelViewMatrix) {
   Eigen::Quaterniond q(upperLeft);
   set_orientation(q);
   set_position(-q._transformVector(Eigen::Vector3d(
-          modelViewMatrix[12], modelViewMatrix[13], modelViewMatrix[14])));
+      modelViewMatrix[12], modelViewMatrix[13], modelViewMatrix[14])));
 }
 
 void Camera::set_from_projection_matrix(const double matrix[12]) {
@@ -678,22 +677,22 @@ void Camera::set_from_projection_matrix(const double matrix[12]) {
   // computation of a 4x4 determinant that is developped according to
   // its 4th column. This implies some 3x3 determinants.
   const Eigen::Vector3d cam_pos =
-          Eigen::Vector3d(
-                  det(matrix[ind(0, 1)], matrix[ind(0, 2)], matrix[ind(0, 3)],
-                      matrix[ind(1, 1)], matrix[ind(1, 2)], matrix[ind(1, 3)],
-                      matrix[ind(2, 1)], matrix[ind(2, 2)], matrix[ind(2, 3)]),
+      Eigen::Vector3d(
+          det(matrix[ind(0, 1)], matrix[ind(0, 2)], matrix[ind(0, 3)],
+              matrix[ind(1, 1)], matrix[ind(1, 2)], matrix[ind(1, 3)],
+              matrix[ind(2, 1)], matrix[ind(2, 2)], matrix[ind(2, 3)]),
 
-                  -det(matrix[ind(0, 0)], matrix[ind(0, 2)], matrix[ind(0, 3)],
-                       matrix[ind(1, 0)], matrix[ind(1, 2)], matrix[ind(1, 3)],
-                       matrix[ind(2, 0)], matrix[ind(2, 2)], matrix[ind(2, 3)]),
+          -det(matrix[ind(0, 0)], matrix[ind(0, 2)], matrix[ind(0, 3)],
+               matrix[ind(1, 0)], matrix[ind(1, 2)], matrix[ind(1, 3)],
+               matrix[ind(2, 0)], matrix[ind(2, 2)], matrix[ind(2, 3)]),
 
-                  det(matrix[ind(0, 0)], matrix[ind(0, 1)], matrix[ind(0, 3)],
-                      matrix[ind(1, 0)], matrix[ind(1, 1)], matrix[ind(1, 3)],
-                      matrix[ind(2, 0)], matrix[ind(2, 1)], matrix[ind(2, 3)])) /
+          det(matrix[ind(0, 0)], matrix[ind(0, 1)], matrix[ind(0, 3)],
+              matrix[ind(1, 0)], matrix[ind(1, 1)], matrix[ind(1, 3)],
+              matrix[ind(2, 0)], matrix[ind(2, 1)], matrix[ind(2, 3)])) /
 
-          (-det(matrix[ind(0, 0)], matrix[ind(0, 1)], matrix[ind(0, 2)],
-                matrix[ind(1, 0)], matrix[ind(1, 1)], matrix[ind(1, 2)],
-                matrix[ind(2, 0)], matrix[ind(2, 1)], matrix[ind(2, 2)]));
+      (-det(matrix[ind(0, 0)], matrix[ind(0, 1)], matrix[ind(0, 2)],
+            matrix[ind(1, 0)], matrix[ind(1, 1)], matrix[ind(1, 2)],
+            matrix[ind(2, 0)], matrix[ind(2, 1)], matrix[ind(2, 2)]));
 
   // We compute the rotation matrix column by column.
 
@@ -744,7 +743,7 @@ void Camera::set_from_projection_matrix(const double matrix[12]) {
 void Camera::get_cameracoordinates_of(const double src[3],
                                       double res[3]) const {
   Eigen::Vector3d r =
-          cameracoordinates_of(Eigen::Vector3d(src[0], src[1], src[2]));
+      cameracoordinates_of(Eigen::Vector3d(src[0], src[1], src[2]));
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -752,7 +751,7 @@ void Camera::get_cameracoordinates_of(const double src[3],
 
 void Camera::get_worldcoordinates_of(const double src[3], double res[3]) const {
   Eigen::Vector3d r =
-          worldcoordinates_of(Eigen::Vector3d(src[0], src[1], src[2]));
+      worldcoordinates_of(Eigen::Vector3d(src[0], src[1], src[2]));
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -803,7 +802,7 @@ Eigen::Vector3d Camera::unprojectedcoordinates_of(const Eigen::Vector3d &src,
 void Camera::get_projectedcoordinates_of(const double src[3], double res[3],
                                          const Frame *frame) const {
   Eigen::Vector3d r =
-          projectedcoordinates_of(Eigen::Vector3d(src[0], src[1], src[2]), frame);
+      projectedcoordinates_of(Eigen::Vector3d(src[0], src[1], src[2]), frame);
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -812,7 +811,7 @@ void Camera::get_projectedcoordinates_of(const double src[3], double res[3],
 void Camera::get_unprojectedcoordinates_of(const double src[3], double res[3],
                                            const Frame *frame) const {
   Eigen::Vector3d r =
-          unprojectedcoordinates_of(Eigen::Vector3d(src[0], src[1], src[2]), frame);
+      unprojectedcoordinates_of(Eigen::Vector3d(src[0], src[1], src[2]), frame);
   for (int i = 0; i < 3; ++i) {
     res[i] = r[i];
   }
@@ -888,20 +887,20 @@ void Camera::draw(bool drawFarPlane, double scale) const {
   switch (type()) {
     case Camera::PERSPECTIVE:
       glBegin(GL_LINES);
-          glVertex3f(0.0f, 0.0f, 0.0f);
-          glVertex3f(points[farIndex](0), points[farIndex](1),
-                     -points[farIndex](2));
-          glVertex3f(0.0f, 0.0f, 0.0f);
-          glVertex3f(-points[farIndex](0), points[farIndex](1),
-                     -points[farIndex](2));
-          glVertex3f(0.0f, 0.0f, 0.0f);
-          glVertex3f(-points[farIndex](0), -points[farIndex](1),
-                     -points[farIndex](2));
-          glVertex3f(0.0f, 0.0f, 0.0f);
-          glVertex3f(points[farIndex](0), -points[farIndex](1),
-                     -points[farIndex](2));
-          glEnd();
-          break;
+      glVertex3f(0.0f, 0.0f, 0.0f);
+      glVertex3f(points[farIndex](0), points[farIndex](1),
+                 -points[farIndex](2));
+      glVertex3f(0.0f, 0.0f, 0.0f);
+      glVertex3f(-points[farIndex](0), points[farIndex](1),
+                 -points[farIndex](2));
+      glVertex3f(0.0f, 0.0f, 0.0f);
+      glVertex3f(-points[farIndex](0), -points[farIndex](1),
+                 -points[farIndex](2));
+      glVertex3f(0.0f, 0.0f, 0.0f);
+      glVertex3f(points[farIndex](0), -points[farIndex](1),
+                 -points[farIndex](2));
+      glEnd();
+      break;
     case Camera::ORTHOGRAPHIC:
       if (drawFarPlane) {
         glBegin(GL_LINES);
@@ -977,19 +976,19 @@ void Camera::get_frustum_planes_coefficients(GLdouble coef[6][4]) const {
     }
     case Camera::ORTHOGRAPHIC:
       normal[0] = -right;
-          normal[1] = right;
-          normal[4] = up;
-          normal[5] = -up;
+      normal[1] = right;
+      normal[4] = up;
+      normal[5] = -up;
 
-          GLdouble hw = 0.0;
-          GLdouble hh = 0.0;
+      GLdouble hw = 0.0;
+      GLdouble hh = 0.0;
 
-          get_ortho_width_height(&hw, &hh);
-          dist[0] = (pos - hw * right).dot(normal[0]);
-          dist[1] = (pos + hw * right).dot(normal[1]);
-          dist[4] = (pos + hh * up).dot(normal[4]);
-          dist[5] = (pos - hh * up).dot(normal[5]);
-          break;
+      get_ortho_width_height(&hw, &hh);
+      dist[0] = (pos - hw * right).dot(normal[0]);
+      dist[1] = (pos + hw * right).dot(normal[1]);
+      dist[4] = (pos + hh * up).dot(normal[4]);
+      dist[5] = (pos - hh * up).dot(normal[5]);
+      break;
   }
 
   // Front and far planes are identical for both camera types.
@@ -1032,8 +1031,8 @@ Eigen::Quaterniond Camera::deformed_ball_quaternion(int preX, int preY, int x,
   // Should be divided by the projectOnBall size, but it is 1.0
   Eigen::Vector3d axis = p2.cross(p1);
   const double angle =
-          2.0 *
-          asin(sqrt(axis.squaredNorm() / p1.squaredNorm() / p2.squaredNorm()));
+      2.0 *
+      asin(sqrt(axis.squaredNorm() / p1.squaredNorm() / p2.squaredNorm()));
   axis.normalize();
   Eigen::AngleAxisd angleAxis(angle, axis);
   return Eigen::Quaterniond(angleAxis);
