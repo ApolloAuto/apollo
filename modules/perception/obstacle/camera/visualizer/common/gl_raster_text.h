@@ -31,25 +31,29 @@
 
 namespace apollo {
 namespace perception {
+namespace lowcostvisualizer {
 
 class GLRasterText {
- public:
-  GLRasterText() {}
-  ~GLRasterText() {}
+public:
+    GLRasterText() {}
 
-  void init();
+    ~GLRasterText() {}
 
-  void print_string(const char* s);
+    void init();
 
- private:
-  void make_raster_font();
-  static GLubyte _s_space_bitmap[];
-  static GLubyte _s_letters_bitmaps[][13];
-  static GLubyte _s_numbers_bitmaps[][13];
-  static GLubyte _s_asccii_bitmaps[][13];
-  static GLuint _s_font_offset;
+    void print_string(const char *s);
+
+private:
+    void make_raster_font();
+
+    static GLubyte _s_space_bitmap[];
+    static GLubyte _s_letters_bitmaps[][13];
+    static GLubyte _s_numbers_bitmaps[][13];
+    static GLubyte _s_asccii_bitmaps[][13];
+    static GLuint _s_font_offset;
 };
 
+}  // namespace lowcostvisualizer
 }  // namespace perception
 }  // namespace apollo
 
