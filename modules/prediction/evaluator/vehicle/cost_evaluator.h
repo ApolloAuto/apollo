@@ -47,7 +47,6 @@ class CostEvaluator : public Evaluator {
   double ComputeProbability(
       const double obstacle_length,
       const double obstacle_width,
-      const double obstacle_heading,
       const LaneSequence& lane_sequence);
 };
 

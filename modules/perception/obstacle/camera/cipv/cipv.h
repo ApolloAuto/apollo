@@ -14,15 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_CIPV_H
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_CIPV_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_CIPV_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_CIPV_H_
 
-#include <Eigen/Dense>
-#include <Eigen/Eigen>
-#include <Eigen/Geometry>
 #include <array>
 #include <memory>
 #include <string>
+
+#include "Eigen/Dense"
+#include "Eigen/Eigen"
+#include "Eigen/Geometry"
+
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/camera/common/lane_object.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
@@ -40,7 +43,7 @@ struct CipvOptions {
 const float MAX_DIST_OBJECT_TO_LANE_METER = 20.0f;
 const float MAX_VEHICLE_WIDTH_METER = 5.0f;
 
-// **** To do **** Should be from ego_vehicle_info header file
+// **** To do **** use width and length from vehicle_param_
 const float EGO_CAR_WIDTH_METER = 1.620f;   // 1.620 meter
 const float EGO_CAR_LENGTH_METER = 3.564f;  // 3.564 meter
 // *********************
@@ -75,9 +78,9 @@ class Cipv {
                                            float *distance);
 
   // Determine CIPV among multiple objects
-  bool get_egolane(const LaneObjectsPtr lane_objects,
-                   EgoLane *egolane_image, EgoLane *egolane_ground,
-                   bool *b_left_valid, bool *b_right_valid);
+  bool get_egolane(const LaneObjectsPtr lane_objects, EgoLane *egolane_image,
+                   EgoLane *egolane_ground, bool *b_left_valid,
+                   bool *b_right_valid);
 
   // Elongate lane line
   bool elongate_egolane(const LaneObjectsPtr lane_objects,
@@ -132,8 +135,8 @@ class Cipv {
                          LaneLine *virtual_lane_line);
 
   float vehicle_dynamics(const uint32_t tick, const float yaw_rate,
-                         const float velocity, const float time_unit,
-                         float *x, float *y);
+                         const float velocity, const float time_unit, float *x,
+                         float *y);
   // Make a virtual lane line using a yaw_rate
   bool make_virtual_ego_lane_from_yaw_rate(const float yaw_rate,
                                            const float velocity,
@@ -141,13 +144,14 @@ class Cipv {
                                            LaneLine *left_lane_line,
                                            LaneLine *right_lane_line);
   // Member variables
-  bool _b_image_based_cipv;
-  int32_t _debug_level;
-  float _time_unit;
+  bool b_image_based_cipv_ = false;
+  int32_t debug_level_ = 0;
+  float time_unit_ = 0.0f;
+  common::VehicleParam vehicle_param_;
 };
 
 }  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_CIPV_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_CIPV_H_

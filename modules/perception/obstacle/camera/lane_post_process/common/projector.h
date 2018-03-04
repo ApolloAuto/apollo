@@ -22,9 +22,9 @@
 #include <Eigen/Eigen>
 #include <opencv2/opencv.hpp>
 
-#include <vector>
-#include <limits>
 #include <algorithm>
+#include <limits>
+#include <vector>
 
 #include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
@@ -47,7 +47,9 @@ class Projector {
     return UvToXy(static_cast<T>(u), static_cast<T>(v), p);
   }
 
-  bool is_init() const { return is_init_; }
+  bool is_init() const {
+    return is_init_;
+  }
 
   bool IsValidUv(const int &x, const int &y) const {
     return IsValidUv(static_cast<T>(x), static_cast<T>(y));
@@ -59,26 +61,43 @@ class Projector {
     return x >= xy_xmin_ && x <= xy_xmax_ && y >= xy_ymin_ && y <= xy_ymax_;
   }
 
-  bool is_vis() const { return is_vis_; }
-  T x_step() const { return x_step_; }
-  T y_step() const { return y_step_; }
-  T xy_image_xmin() const { return xy_image_xmin_; }
-  T xy_image_xmax() const { return xy_image_xmax_; }
-  T xy_image_ymin() const { return xy_image_ymin_; }
-  T xy_image_ymax() const { return xy_image_ymax_; }
-
-  bool IsValidXyInXyImage(const T &x, const T &y) const {
-    return x >= xy_image_xmin_ && x <= xy_image_xmax_ &&
-           y >= xy_image_ymin_ && y <= xy_image_ymax_;
+  bool is_vis() const {
+    return is_vis_;
+  }
+  T x_step() const {
+    return x_step_;
+  }
+  T y_step() const {
+    return y_step_;
+  }
+  T xy_image_xmin() const {
+    return xy_image_xmin_;
+  }
+  T xy_image_xmax() const {
+    return xy_image_xmax_;
+  }
+  T xy_image_ymin() const {
+    return xy_image_ymin_;
+  }
+  T xy_image_ymax() const {
+    return xy_image_ymax_;
   }
 
-  int xy_image_cols() const { return xy_image_cols_; }
+  bool IsValidXyInXyImage(const T &x, const T &y) const {
+    return x >= xy_image_xmin_ && x <= xy_image_xmax_ && y >= xy_image_ymin_ &&
+           y <= xy_image_ymax_;
+  }
 
-  int xy_image_rows() const { return xy_image_rows_; }
+  int xy_image_cols() const {
+    return xy_image_cols_;
+  }
+
+  int xy_image_rows() const {
+    return xy_image_rows_;
+  }
 
   bool XyToXyImagePoint(const T &x, const T &y, cv::Point *p) const;
-  bool XyToXyImagePoint(const Eigen::Matrix<T, 2, 1> &pos,
-                        cv::Point *p) const {
+  bool XyToXyImagePoint(const Eigen::Matrix<T, 2, 1> &pos, cv::Point *p) const {
     return XyToXyImagePoint(pos.x(), pos.y(), p);
   }
 
@@ -256,10 +275,10 @@ bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
     }
     v += uv_roi_y_step_;
   }
-  AINFO << "#failed points = " << count_fail_points << " ("
-        << uv_roi_count_ << ").";
-  AINFO << "#too far points = " << count_too_far_points << " ("
-        << uv_roi_count_ << ").";
+  AINFO << "#failed points = " << count_fail_points << " (" << uv_roi_count_
+        << ").";
+  AINFO << "#too far points = " << count_too_far_points << " (" << uv_roi_count_
+        << ").";
   AINFO << " xy limits: "
         << "x_min=" << xy_xmin_ << ", "
         << "x_max=" << xy_xmax_ << ", "
@@ -283,9 +302,11 @@ bool Projector<T>::Init(const cv::Rect &roi, const T &max_distance,
     y_step_ = max_distance / static_cast<T>(1000);
 
     xy_image_cols_ = static_cast<int>(std::ceil(
-                         (xy_image_xmax_ - xy_image_xmin_) / x_step_)) + 1;
+                         (xy_image_xmax_ - xy_image_xmin_) / x_step_)) +
+                     1;
     xy_image_rows_ = static_cast<int>(std::ceil(
-                         (xy_image_ymax_ - xy_image_ymin_) / y_step_)) + 1;
+                         (xy_image_ymax_ - xy_image_ymin_) / y_step_)) +
+                     1;
     AINFO << "xy_image_xmin = " << xy_image_xmin_
           << ", xy_image_xmax = " << xy_image_xmax_
           << ", xy_image_ymin = " << xy_image_ymin_
@@ -467,8 +488,8 @@ bool Projector<T>::Project(const T &u, const T &v,
 
   T scale = xy_p(2);
   if (std::abs(scale) < 1e-6) {
-    AINFO << "Cannot solve point: scale factor is too small ("
-          << scale << "), " << " u=" << u << " v=" << v << ".";
+    AINFO << "Cannot solve point: scale factor is too small (" << scale << "), "
+          << " u=" << u << " v=" << v << ".";
     return false;
   }
 

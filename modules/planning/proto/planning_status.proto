@@ -28,7 +28,22 @@ message SidePassStatus {
     optional apollo.planning.ObjectSidePass.Type pass_side = 4;
 }
 
+message StopSignStatus {
+    enum Status {
+        UNKNOWN = 0;
+        TO_STOP = 1;
+        STOPPING = 2;
+        CREEPING = 3;
+        STOP_DONE = 4;
+    }
+    optional Status status = 1;
+    optional double stop_start_time = 2;
+    repeated string associated_lanes = 3;
+    repeated string watch_vehicles = 4;
+}
+
 message PlanningStatus {
     optional ReroutingStatus rerouting = 1;
     optional SidePassStatus side_pass = 2;
+    optional StopSignStatus stop_sign = 3;
 }

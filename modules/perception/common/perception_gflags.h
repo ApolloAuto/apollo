@@ -78,4 +78,18 @@ DECLARE_double(a_matrix_covariance_coeffcient_2);
 /// calibration_config_manager.cc
 DECLARE_int32(obs_camera_detector_gpu);
 
+/// visualization
+DECLARE_bool(show_front_radar_raw);
+DECLARE_bool(show_camera_objects);
+DECLARE_bool(show_radar_objects);
+DECLARE_bool(show_front_radar_objects);
+DECLARE_bool(show_fused_objects);
+DECLARE_bool(show_fusion_association);
+DECLARE_bool(capture_screen);
+DECLARE_string(screen_output_dir);
+
+DECLARE_double(car_length);
+DECLARE_double(car_width);
+
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
+
