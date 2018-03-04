@@ -58,29 +58,32 @@
 
 namespace apollo {
 namespace perception {
+namespace lowcostvisualizer {
 
 class BaseVisualizer {
- public:
-  BaseVisualizer() = default;
-  virtual ~BaseVisualizer() = default;
+public:
+    BaseVisualizer() = default;
 
-  virtual bool init() = 0;
+    virtual ~BaseVisualizer() = default;
 
-  virtual std::string name() const = 0;
+    virtual bool init() = 0;
 
-  virtual void update_camera_system(FrameContent* content) {}
+    virtual std::string name() const = 0;
 
-  virtual void render(const FrameContent& content) = 0;
+    virtual void update_camera_system(FrameContent *content) {}
 
-  // virtual void set_motion_buffer(MotionBuffer &motion_buffer) {}
+    virtual void render(const FrameContent &content) = 0;
 
- private:
-  DISALLOW_COPY_AND_ASSIGN(BaseVisualizer);
+    // virtual void set_motion_buffer(MotionBuffer &motion_buffer) {}
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(BaseVisualizer);
 };
 
 REGISTER_REGISTERER(BaseVisualizer);
 #define REGISTER_VISUALIZER(name) REGISTER_CLASS(BaseVisualizer, name)
 
+}  // namespace lowcostvisualizer
 }  // namespace perception
 }  // namespace apollo
 
