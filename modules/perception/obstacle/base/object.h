@@ -96,6 +96,7 @@ struct alignas(16) Object {
   bool b_cipv = false;
   // sensor particular suplplements, default nullptr
   RadarSupplementPtr radar_supplement = nullptr;
+  CameraSupplementPtr camera_supplement = nullptr;
 };
 
 typedef std::shared_ptr<Object> ObjectPtr;
