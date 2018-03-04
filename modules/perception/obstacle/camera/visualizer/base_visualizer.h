@@ -61,7 +61,7 @@ namespace perception {
 namespace lowcostvisualizer {
 
 class BaseVisualizer {
-public:
+ public:
     BaseVisualizer() = default;
 
     virtual ~BaseVisualizer() = default;
@@ -76,8 +76,8 @@ public:
 
     // virtual void set_motion_buffer(MotionBuffer &motion_buffer) {}
 
-private:
-    DISALLOW_COPY_AND_ASSIGN(BaseVisualizer);
+ private:
+      DISALLOW_COPY_AND_ASSIGN(BaseVisualizer);
 };
 
 REGISTER_REGISTERER(BaseVisualizer);
