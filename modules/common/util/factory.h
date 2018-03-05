@@ -92,7 +92,7 @@ class Factory {
    */
   template <typename... Args>
   std::unique_ptr<AbstractProduct> CreateObjectOrNull(const IdentifierType &id,
-                                                      Args... args) {
+                                                      Args &&... args) {
     auto id_iter = producers_.find(id);
     if (id_iter != producers_.end()) {
       return std::unique_ptr<AbstractProduct>(
@@ -109,8 +109,8 @@ class Factory {
    */
   template <typename... Args>
   std::unique_ptr<AbstractProduct> CreateObject(const IdentifierType &id,
-                                                Args... args) {
-    auto result = CreateObjectOrNull(id, args...);
+                                                Args &&... args) {
+    auto result = CreateObjectOrNull(id, std::forward<Args>(args)...);
     AERROR_IF(!result) << "Factory could not create Object of type : " << id;
     return result;
   }
