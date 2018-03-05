@@ -175,6 +175,24 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "perception_obstacle_lowcost_visualizer_subnode",
+    srcs = [
+        "visualization_subnode.cc",
+    ],
+    hdrs = [
+        "visualization_subnode.h",
+        "object_shared_data.h",
+    ],
+    deps = [
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/obstacle/base:perception_obstacle_base",
+        ":perception_obstacle_shared_data",
+        "//modules/perception/obstacle/camera/visualizer:perception_obstacle_camera_visualizer",
+    ],
+)
+
 cc_test(
     name = "hdmap_input_test",
     size = "small",
