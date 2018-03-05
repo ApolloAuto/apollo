@@ -33,4 +33,8 @@ DECLARE_double(sensor_freq);
 
 // System gflags
 DECLARE_string(sensor_node_name);
+
+// Ultrasonic entrance num
+DECLARE_int32(entrance_num);
+
 #endif

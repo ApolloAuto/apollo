@@ -135,8 +135,8 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::CONTI_RADAR:
         EnableContiRadar(FLAGS_conti_radar_topic, config);
         break;
-      case AdapterConfig::SONIC_RADAR:
-        EnableUltrasonic(FLAGS_sonic_radar_topic, config);
+      case AdapterConfig::ULTRASONIC_RADAR:
+        EnableUltrasonic(FLAGS_ultrasonic_radar_topic, config);
         break;
       case AdapterConfig::COMPRESSED_IMAGE:
         EnableCompressedImage(FLAGS_compressed_image_topic, config);
