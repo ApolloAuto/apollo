@@ -45,14 +45,14 @@ using apollo::drivers::canbus::SenderMessage;
 
 class UltrasonicRadarMessageManager : public MessageManager<Ultrasonic> {
  public:
-  UltrasonicRadarMessageManager();
+  UltrasonicRadarMessageManager(int entrance_num);
   virtual ~UltrasonicRadarMessageManager() {}
   void Parse(const uint32_t message_id, const uint8_t *data, int32_t length);
   void set_can_client(std::shared_ptr<CanClient> can_client);
 
  private:
-  bool is_configured_ = false;
   std::shared_ptr<CanClient> can_client_;
+  int entrance_num_;
 };
 
 }  // namespace ultrasonic_radar

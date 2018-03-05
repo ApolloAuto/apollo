@@ -13,4 +13,5 @@ message CanConf {
 
 message UltrasonicRadarConf {
   optional CanConf can_conf = 1;
+  required int32 entrance_num = 2;
 }

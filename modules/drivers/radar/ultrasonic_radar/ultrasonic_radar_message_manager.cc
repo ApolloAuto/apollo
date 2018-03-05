@@ -28,8 +28,9 @@ namespace ultrasonic_radar {
 
 using ::apollo::common::adapter::AdapterManager;
 
-UltrasonicRadarMessageManager::UltrasonicRadarMessageManager() {
-  sensor_data_.mutable_ranges()->Resize(FLAGS_entrance_num, 0.0);
+UltrasonicRadarMessageManager::UltrasonicRadarMessageManager(int entrance_num)
+    : entrance_num_(entrance_num) {
+  sensor_data_.mutable_ranges()->Resize(entrance_num_, 0.0);
 }
 
 void UltrasonicRadarMessageManager::set_can_client(
@@ -39,7 +40,6 @@ void UltrasonicRadarMessageManager::set_can_client(
 
 void UltrasonicRadarMessageManager::Parse(const uint32_t message_id,
                                      const uint8_t *data, int32_t length) {
-  static std::vector<bool> data_set(4, false);
   if (message_id == 0x301) {
     sensor_data_.set_ranges(0, data[1]);
     sensor_data_.set_ranges(1, data[2]);
