@@ -58,7 +58,6 @@
 
 namespace apollo {
 namespace perception {
-namespace lowcostvisualizer {
 
 class BaseVisualizer {
  public:
@@ -83,7 +82,7 @@ class BaseVisualizer {
 REGISTER_REGISTERER(BaseVisualizer);
 #define REGISTER_VISUALIZER(name) REGISTER_CLASS(BaseVisualizer, name)
 
-}  // namespace lowcostvisualizer
+
 }  // namespace perception
 }  // namespace apollo
 
