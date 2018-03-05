@@ -1,16 +1,16 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "sonic_radar_proto",
+    name = "ultrasonic_radar_proto",
     deps = [
-        ":sonic_radar_proto_lib",
+        ":ultrasonic_radar_proto_lib",
     ],
 )
 
 proto_library(
-    name = "sonic_radar_proto_lib",
+    name = "ultrasonic_radar_proto_lib",
     srcs = [
-        "sonic_radar_conf.proto",
+        "ultrasonic_radar_conf.proto",
     ],
     deps = [
         "//modules/drivers/canbus/proto:canbus_proto_lib",

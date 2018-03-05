@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "modules/common/apollo_app.h"
-#include "modules/drivers/radar/sonic_radar/sonic_radar_canbus.h"
+#include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_canbus.h"
 
-using ::apollo::drivers::sonic_radar::SonicRadarCanbus;
-APOLLO_MAIN(SonicRadarCanbus);
+using ::apollo::drivers::ultrasonic_radar::UltrasonicRadarCanbus;
+APOLLO_MAIN(UltrasonicRadarCanbus);
