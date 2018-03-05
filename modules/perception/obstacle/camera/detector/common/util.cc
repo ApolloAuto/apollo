@@ -140,7 +140,7 @@ void SyncedMemory::async_gpu_push(const cudaStream_t &stream) {
     //    CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
     own_gpu_data_ = true;
   }
-  const cudaMemcpyKind put = cudaMemcpyHostToDevice;
+  // const cudaMemcpyKind put = cudaMemcpyHostToDevice;
   //  CUDA_CHECK(cudaMemcpyAsync(gpu_ptr_, cpu_ptr_, size_, put, stream));
   // Assume caller will synchronize on the stream before use
   head_ = SYNCED;
