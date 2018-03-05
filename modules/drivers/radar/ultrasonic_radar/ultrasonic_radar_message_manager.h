@@ -15,24 +15,24 @@
  *****************************************************************************/
 
 /**
- * @file sonic_radar_message_manager.h
- * @brief The class of SonicRadarMessageManager
+ * @file ultrasonic_radar_message_manager.h
+ * @brief The class of UltrasonicRadarMessageManager
  */
-#ifndef MODULES_DRIVERS_RADAR_SONIC_RADAR_SONIC_RADAR_MESSAGE_MANAGER_H_
-#define MODULES_DRIVERS_RADAR_SONIC_RADAR_SONIC_RADAR_MESSAGE_MANAGER_H_
+#ifndef MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_MESSAGE_MANAGER_H_
+#define MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_MESSAGE_MANAGER_H_
 
 #include <memory>
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/proto/sonic_radar.pb.h"
+#include "modules/drivers/proto/ultrasonic_radar.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
 
 namespace apollo {
 namespace drivers {
-namespace sonic_radar {
+namespace ultrasonic_radar {
 
 using ::apollo::drivers::canbus::ProtocolData;
 using ::apollo::common::adapter::AdapterManager;
@@ -43,10 +43,10 @@ using ::apollo::common::ErrorCode;
 using apollo::drivers::canbus::CanClient;
 using apollo::drivers::canbus::SenderMessage;
 
-class SonicRadarMessageManager : public MessageManager<Ultrasonic> {
+class UltrasonicRadarMessageManager : public MessageManager<Ultrasonic> {
  public:
-  SonicRadarMessageManager();
-  virtual ~SonicRadarMessageManager() {}
+  UltrasonicRadarMessageManager();
+  virtual ~UltrasonicRadarMessageManager() {}
   void Parse(const uint32_t message_id, const uint8_t *data, int32_t length);
   void set_can_client(std::shared_ptr<CanClient> can_client);
 
@@ -55,8 +55,8 @@ class SonicRadarMessageManager : public MessageManager<Ultrasonic> {
   std::shared_ptr<CanClient> can_client_;
 };
 
-}  // namespace sonic_radar
+}  // namespace ultrasonic_radar
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_RADAR_SONIC_RADAR_SONIC_RADAR_MESSAGE_MANAGER_H_
+#endif  // MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_MESSAGE_MANAGER_H_

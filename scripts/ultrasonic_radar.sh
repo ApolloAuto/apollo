@@ -25,5 +25,5 @@ source "$DIR/apollo_base.sh"
 
 # run function from apollo_base.sh
 # run command_name module_name
-run_customized_path drivers/radar/sonic_radar sonic_radar "$@"
+run_customized_path drivers/radar/ultrasonic_radar ultrasonic_radar "$@"
 

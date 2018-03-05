@@ -32,3 +32,6 @@ DEFINE_double(sensor_freq, 100,
 
 // System gflags
 DEFINE_string(sensor_node_name, "", "Sensor node name.");
+
+// Ultrasonic entrance num
+DEFINE_int32(entrance_num, 12, "Ultrasonic entrance num.");
