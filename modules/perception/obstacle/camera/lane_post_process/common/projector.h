@@ -19,12 +19,12 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_PROJECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_PROJECTOR_H_
 
-#include <Eigen/Eigen>
-#include <opencv2/opencv.hpp>
-
 #include <algorithm>
 #include <limits>
 #include <vector>
+
+#include "Eigen/Eigen"
+#include "opencv2/opencv.hpp"
 
 #include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
@@ -47,9 +47,7 @@ class Projector {
     return UvToXy(static_cast<T>(u), static_cast<T>(v), p);
   }
 
-  bool is_init() const {
-    return is_init_;
-  }
+  bool is_init() const { return is_init_; }
 
   bool IsValidUv(const int &x, const int &y) const {
     return IsValidUv(static_cast<T>(x), static_cast<T>(y));
@@ -61,40 +59,22 @@ class Projector {
     return x >= xy_xmin_ && x <= xy_xmax_ && y >= xy_ymin_ && y <= xy_ymax_;
   }
 
-  bool is_vis() const {
-    return is_vis_;
-  }
-  T x_step() const {
-    return x_step_;
-  }
-  T y_step() const {
-    return y_step_;
-  }
-  T xy_image_xmin() const {
-    return xy_image_xmin_;
-  }
-  T xy_image_xmax() const {
-    return xy_image_xmax_;
-  }
-  T xy_image_ymin() const {
-    return xy_image_ymin_;
-  }
-  T xy_image_ymax() const {
-    return xy_image_ymax_;
-  }
+  bool is_vis() const { return is_vis_; }
+  T x_step() const { return x_step_; }
+  T y_step() const { return y_step_; }
+  T xy_image_xmin() const { return xy_image_xmin_; }
+  T xy_image_xmax() const { return xy_image_xmax_; }
+  T xy_image_ymin() const { return xy_image_ymin_; }
+  T xy_image_ymax() const { return xy_image_ymax_; }
 
   bool IsValidXyInXyImage(const T &x, const T &y) const {
     return x >= xy_image_xmin_ && x <= xy_image_xmax_ && y >= xy_image_ymin_ &&
            y <= xy_image_ymax_;
   }
 
-  int xy_image_cols() const {
-    return xy_image_cols_;
-  }
+  int xy_image_cols() const { return xy_image_cols_; }
 
-  int xy_image_rows() const {
-    return xy_image_rows_;
-  }
+  int xy_image_rows() const { return xy_image_rows_; }
 
   bool XyToXyImagePoint(const T &x, const T &y, cv::Point *p) const;
   bool XyToXyImagePoint(const Eigen::Matrix<T, 2, 1> &pos, cv::Point *p) const {

@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_OBJECT_SEQUENCE_H_
 #define MODULES_PERCEPTION_OBSTACLE_COMMON_OBJECT_SEQUENCE_H_
+
 #include <map>
 #include <mutex>
 #include <vector>
@@ -26,7 +28,7 @@ namespace perception {
 
 class ObjectSequence {
  public:
-  typedef std::map<double, ObjectPtr> TrackedObjects;
+  typedef std::map<int64_t, ObjectPtr> TrackedObjects;
 
   /**
    * @brief Construct
@@ -65,10 +67,16 @@ class ObjectSequence {
   void RemoveStaleTracks(double current_stamp);
 
  private:
+  const double kEps = 1e-9;
+  int64_t DoubleToMapKey(const double d) {
+    return static_cast<int64_t>(d / kEps);
+  }
+  double MapKeyToDouble(const int64_t key) { return key * kEps; }
+
   double current_;
   std::map<int, TrackedObjects> sequence_;
   std::mutex mutex_;
-  static constexpr double s_max_time_out_ = 5;  // 5 seconds
+  static constexpr double s_max_time_out_ = 5.0;  // 5 seconds
 };
 
 }  // namespace perception

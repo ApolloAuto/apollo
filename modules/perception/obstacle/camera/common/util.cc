@@ -17,9 +17,10 @@
 #include <fcntl.h>
 #include <iomanip>
 
-#include <gflags/gflags.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+
+#include "gflags/gflags.h"
 
 #include "modules/perception/obstacle/camera/common/util.h"
 
@@ -185,7 +186,7 @@ bool load_gt_form_file(const std::string &gt_path,
 void draw_visual_objects(const std::vector<VisualObjectPtr> &visual_objects,
                          cv::Mat &img) {
   for (const auto &obj : visual_objects) {
-    // 3D BBox
+// 3D BBox
 #if 0
         if (obj->pts8.size() >= 17) {
             cv::Point pixels[9];

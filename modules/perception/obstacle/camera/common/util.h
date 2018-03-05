@@ -17,17 +17,17 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_UTIL_H_
 
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/gzip_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/text_format.h>
-#include <opencv2/opencv.hpp>
-
 #include <fstream>
 #include <iostream>
 #include <iterator>
 #include <string>
 #include <vector>
+
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/gzip_stream.h"
+#include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "google/protobuf/text_format.h"
+#include "opencv2/opencv.hpp"
 
 #include "modules/perception/obstacle/camera/common/visual_object.h"
 
@@ -102,4 +102,4 @@ ObjectType get_object_type(const std::string &type_text);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_UTIL_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_UTIL_H_
