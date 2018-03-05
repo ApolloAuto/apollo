@@ -21,13 +21,14 @@
 #ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_EVALUATOR_H_
 #define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_EVALUATOR_H_
 
+#include <array>
 #include <functional>
 #include <memory>
 #include <queue>
 #include <utility>
 #include <vector>
 
-#include "../behavior/path_time_graph.h"
+#include "modules/planning/lattice/behavior/path_time_graph.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -49,11 +50,11 @@ class TrajectoryEvaluator {
 
  public:
   explicit TrajectoryEvaluator(
+      const std::array<double, 3>& init_s,
       const PlanningTarget& planning_target,
       const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
       const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories,
-      bool is_auto_tuning,
-      std::shared_ptr<PathTimeGraph> pathtime_neighborhood);
+      std::shared_ptr<PathTimeGraph> path_time_graph);
 
   virtual ~TrajectoryEvaluator() = default;
 
@@ -70,8 +71,8 @@ class TrajectoryEvaluator {
 
   std::vector<double> evaluate_per_lonlat_trajectory(
       const PlanningTarget& planning_target,
-      const std::vector<apollo::common::SpeedPoint> st_points,
-      const std::vector<apollo::common::FrenetFramePoint> sl_points);
+      const std::vector<common::SpeedPoint> st_points,
+      const std::vector<common::FrenetFramePoint> sl_points);
 
  private:
   double Evaluate(const PlanningTarget& planning_target,
@@ -90,7 +91,11 @@ class TrajectoryEvaluator {
   double LonCollisionCost(const std::shared_ptr<Curve1d>& lon_trajectory) const;
 
   double LonObjectiveCost(const std::shared_ptr<Curve1d>& lon_trajectory,
-                          const PlanningTarget& planning_target) const;
+                          const PlanningTarget& planning_target,
+                          const std::vector<double>& ref_s_dot) const;
+
+  std::vector<double> ComputeLongitudinalGuideVelocity(
+      const PlanningTarget& planning_target) const;
 
   struct CostComparator
       : public std::binary_function<const PairCost&, const PairCost&, bool> {
@@ -116,11 +121,11 @@ class TrajectoryEvaluator {
                       CostComponentComparator>
       cost_queue_with_components_;
 
-  bool is_auto_tuning_ = false;
-
-  std::shared_ptr<PathTimeGraph> pathtime_neighborhood_;
+  std::shared_ptr<PathTimeGraph> path_time_graph_;
 
   std::vector<std::vector<std::pair<double, double>>> path_time_intervals_;
+
+  std::array<double, 3> init_s_;
 };
 
 }  // namespace planning

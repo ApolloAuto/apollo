@@ -42,7 +42,7 @@ enum class SensorType {
   UNKNOWN_SENSOR_TYPE = 10,
 };
 
-enum ScoreType {
+enum class ScoreType {
   UNKNOWN_SCORE_TYPE = 0,
   SCORE_CNN = 1,
   SCORE_RADAR = 2,

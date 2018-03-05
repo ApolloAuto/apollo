@@ -17,9 +17,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_VISUALIZER_GL_RASTER_TEXT_H_
 #define MODULES_PERCEPTION_OBSTACLE_VISUALIZER_GL_RASTER_TEXT_H_
 
-#include <boost/shared_ptr.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <boost/shared_ptr.hpp>
 
 #include <cstdio>
 #include <cstdlib>
@@ -31,18 +31,21 @@
 
 namespace apollo {
 namespace perception {
+namespace lowcostvisualizer {
 
 class GLRasterText {
  public:
   GLRasterText() {}
+
   ~GLRasterText() {}
 
   void init();
 
-  void print_string(const char* s);
+  void print_string(const char *s);
 
  private:
   void make_raster_font();
+
   static GLubyte _s_space_bitmap[];
   static GLubyte _s_letters_bitmaps[][13];
   static GLubyte _s_numbers_bitmaps[][13];
@@ -50,6 +53,7 @@ class GLRasterText {
   static GLuint _s_font_offset;
 };
 
+}  // namespace lowcostvisualizer
 }  // namespace perception
 }  // namespace apollo
 

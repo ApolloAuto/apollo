@@ -1,6 +1,8 @@
 import PARAMETERS from "store/config/parameters.yml";
 
-import GMAP_NAVIGATOR from "components/Navigation/GmapNavigator";
+import MAP_NAVIGATOR from "components/Navigation/MapNavigator";
+import BaiduMapAdapter from "components/Navigation/BaiduMapAdapter";
+import GoogleMapAdapter from "components/Navigation/GoogleMapAdapter";
 import NavigationWebSocketEndpoint from "store/websocket/websocket_navigation";
 
 function deduceWebsocketServerAddr() {
@@ -15,5 +17,8 @@ window.onload = function() {
     const serverAddr = deduceWebsocketServerAddr();
     const WS = new NavigationWebSocketEndpoint(serverAddr);
     WS.initialize();
-    GMAP_NAVIGATOR.initialize(WS);
+
+    const mapAdapter =
+        PARAMETERS.navigation.map === "GoogleMap" ? new GoogleMapAdapter() : new BaiduMapAdapter();
+    MAP_NAVIGATOR.initialize(WS, mapAdapter);
 };

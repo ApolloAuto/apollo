@@ -1,7 +1,6 @@
 import STORE from "store";
 import RENDERER from "renderer";
-
-const Worker = require('utils/webworker.js');
+import Worker from 'utils/webworker.js';
 
 export default class RosWebSocketEndpoint {
     constructor(serverAddr) {
@@ -9,7 +8,6 @@ export default class RosWebSocketEndpoint {
         this.websocket = null;
         this.counter = 0;
         this.lastUpdateTimestamp = 0;
-        this.lastSeqNum = -1;
         this.currMapRadius = null;
         this.updatePOI = true;
         this.routingTime = undefined;
@@ -116,18 +114,12 @@ export default class RosWebSocketEndpoint {
     }
 
     checkMessage(world) {
-        if (this.lastUpdateTimestamp !== 0
-            && world.timestamp - this.lastUpdateTimestamp > 150) {
-            console.log("Last sim_world_update took " +
-                (world.timestamp - this.lastUpdateTimestamp) + "ms");
+        const now = new Date().getTime();
+        const duration = now - this.lastUpdateTimestamp;
+        if (this.lastUpdateTimestamp !== 0 && duration > 250) {
+            console.log("Last sim_world_update took " + duration + "ms");
         }
-        this.lastUpdateTimestamp = world.timestamp;
-        if (this.lastSeqNum !== -1
-            && world.sequenceNum > this.lastSeqNum + 1) {
-            console.debug("Last seq: " + this.lastSeqNum +
-                ". New seq: " + world.sequenceNum + ".");
-        }
-        this.lastSeqNum = world.sequenceNum;
+        this.lastUpdateTimestamp = now;
     }
 
     requestMapElementIdsByRadius(radius) {

@@ -24,6 +24,7 @@ cc_library(
     hdrs = ["obstacle.h"],
     deps = [
         "//modules/common:log",
+        "//modules/common/configs:config_gflags",
         "//modules/common/math:kalman_filter",
         "//modules/common/math:math_utils",
         "//modules/common/proto:error_code_proto",
@@ -52,7 +53,6 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",
@@ -73,7 +73,6 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",

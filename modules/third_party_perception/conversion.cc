@@ -44,15 +44,14 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::perception::Point;
 
-std::map<std::int32_t, ::apollo::perception::LaneMarker_LaneType>
-    lane_conversion_map = {
-        {0, apollo::perception::LaneMarker::LANE_TYPE_DASHED},
-        {1, apollo::perception::LaneMarker::LANE_TYPE_SOLID},
-        {2, apollo::perception::LaneMarker::LANE_TYPE_UNKNOWN},
-        {3, apollo::perception::LaneMarker::LANE_TYPE_ROAD_EDGE},
-        {4, apollo::perception::LaneMarker::LANE_TYPE_SOLID},
-        {5, apollo::perception::LaneMarker::LANE_TYPE_DASHED},
-        {6, apollo::perception::LaneMarker::LANE_TYPE_UNKNOWN}};
+std::map<std::int32_t, ::apollo::hdmap::LaneBoundaryType_Type>
+    lane_conversion_map = {{0, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
+                           {1, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
+                           {2, apollo::hdmap::LaneBoundaryType::UNKNOWN},
+                           {3, apollo::hdmap::LaneBoundaryType::CURB},
+                           {4, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
+                           {5, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
+                           {6, apollo::hdmap::LaneBoundaryType::UNKNOWN}};
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
     const Mobileye& mobileye, const LocalizationEstimate& localization) {

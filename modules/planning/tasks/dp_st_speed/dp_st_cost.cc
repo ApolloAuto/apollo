@@ -245,7 +245,6 @@ double DpStCost::JerkCost(const double jerk) {
   constexpr double kEpsilon = 0.1;
   constexpr size_t kShift = 200;
   const size_t jerk_key = static_cast<size_t>(jerk / kEpsilon + 0.5 + kShift);
-  DCHECK_LT(jerk_key, jerk_cost_.size());
   if (jerk_key >= jerk_cost_.size()) {
     return kInf;
   }

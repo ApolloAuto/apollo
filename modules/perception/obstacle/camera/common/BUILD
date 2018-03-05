@@ -3,13 +3,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_obstacle_camera_common",
-    srcs = [],
-    hdrs = glob(["*.h"]),
+    name = "common",
+    srcs = [
+    ],
+    hdrs = [
+        "camera.h",
+        "lane_object.h",
+        "util.h",
+        "visual_object.h",
+    ],
     deps = [
         "//modules/perception/obstacle/base:perception_obstacle_base",
-        "@eigen"
-    ]
+        "@eigen",
+    ],
 )
 
 cpplint()

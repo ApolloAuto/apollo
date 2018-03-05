@@ -122,14 +122,6 @@ class Obstacle {
   size_t history_size() const;
 
   /**
-   * @brief Get the lane Kalman filter by lane ID.
-   * @param lane_id The lane ID.
-   * @return The lane Kalman filter.
-   */
-  const common::math::KalmanFilter<double, 4, 2, 0>& kf_lane_tracker(
-      const std::string& lane_id);
-
-  /**
    * @brief Get the motion Kalman filter.
    * @return The motion Kalman filter.
    */
@@ -217,15 +209,6 @@ class Obstacle {
 
   void UpdateKFMotionTracker(const Feature& feature);
 
-  void InitKFLaneTracker(const std::string& lane_id, const double beta);
-
-  void UpdateKFLaneTrackers(Feature* feature);
-
-  void UpdateKFLaneTracker(const std::string& lane_id, const double lane_s,
-                           const double lane_l, const double lane_speed,
-                           const double lane_acc, const double timestamp,
-                           const double beta);
-
   void UpdateLaneBelief(Feature* feature);
 
   void SetCurrentLanes(Feature* feature);
@@ -255,8 +238,6 @@ class Obstacle {
   common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
   common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
   common::DigitalFilter heading_filter_;
-  std::unordered_map<std::string, common::math::KalmanFilter<double, 4, 2, 0>>
-      kf_lane_trackers_;
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
   std::vector<Eigen::MatrixXf> rnn_states_;
   bool rnn_enabled_ = false;
