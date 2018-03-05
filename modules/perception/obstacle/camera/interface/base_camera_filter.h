@@ -15,3 +15,45 @@
  *****************************************************************************/
 
 // The base class of measurement estimation filtering, ex Kalman Filtering
+
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_FILTER_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_FILTER_H_
+
+#include <string>
+#include <vector>
+
+#include "Eigen/Core"
+#include "opencv2/opencv.hpp"
+
+#include "modules/common/macro.h"
+#include "modules/perception/lib/base/registerer.h"
+#include "modules/perception/obstacle/camera/common/visual_object.h"
+
+namespace apollo {
+namespace perception {
+
+class BaseCameraFilter {
+ public:
+  BaseCameraFilter() {}
+  virtual ~BaseCameraFilter() {}
+
+  virtual bool Init() = 0;
+
+  // @brief: Run filtering on each tracked object to update measurements
+  // @param [in/out] objects : tracked object lists, with updated 3D position,
+  // 3D size, 3D velocity and orientation
+  virtual bool Filter(std::vector<VisualObjectPtr>* objects) = 0;
+
+  virtual std::string Name() const = 0;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(BaseCameraFilter);
+};
+
+REGISTER_REGISTERER(BaseCameraFilter);
+#define REGISTER_CAMERA_FILTER(name) REGISTER_CLASS(BaseCameraFilter, name)
+
+}  // namespace perception
+}  // namespace apollo
+
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_FILTER_H_
