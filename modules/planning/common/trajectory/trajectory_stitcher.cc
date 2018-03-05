@@ -22,6 +22,7 @@
 
 #include <algorithm>
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -57,7 +58,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const double planning_cycle_time,
     const PublishableTrajectory* prev_trajectory, bool* is_replan) {
   *is_replan = true;
-  if (!FLAGS_enable_trajectory_stitcher) {
+  if (!FLAGS_enable_trajectory_stitcher || FLAGS_use_navigation_mode) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
   if (!prev_trajectory) {
