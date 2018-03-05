@@ -8,3 +8,5 @@ can_conf {
   enable_debug_mode: false
   enable_receiver_log: false
 }
+
+entrance_num: 12
