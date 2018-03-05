@@ -59,7 +59,8 @@ apollo::common::Status UltrasonicRadarCanbus::Init() {
   AINFO << "Can client is successfully created.";
 
   sensor_message_manager_ =
-      std::unique_ptr<UltrasonicRadarMessageManager>(new UltrasonicRadarMessageManager());
+      std::unique_ptr<UltrasonicRadarMessageManager>(
+          new UltrasonicRadarMessageManager(ultrasonic_radar_conf_.entrance_num()));
   if (sensor_message_manager_ == nullptr) {
     return OnError("Failed to create message manager.");
   }
@@ -82,11 +83,7 @@ apollo::common::Status UltrasonicRadarCanbus::Start() {
     return OnError("Failed to start can client");
   }
   AINFO << "Can client is started.";
-  /*
-  if (ConfigureRadar() != ErrorCode::OK) {
-    return OnError("Failed to configure radar.");
-  }*/
-  AINFO << "The radar is successfully configured.";
+
   // 2. start receive first then send
   if (can_receiver_.Start() != ErrorCode::OK) {
     return OnError("Failed to start can receiver.");
