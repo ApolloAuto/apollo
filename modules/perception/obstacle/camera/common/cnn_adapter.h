@@ -14,24 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#define PERCEPTION_CNN_ADAPTER_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CNN_ADAPTER_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CNN_ADAPTER_H_
 
-#include <caffe/caffe.hpp>
+#include "caffe/caffe.hpp"
 
 #include "modules/perception/obstacle/camera/common/caffe_bridge.hpp"
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/detector/common/util.h"
-
-#include "infer.h"
-#include "layer.h"
-#include "layers/input_layer.h"
-#include "net.h"
-#include "rt/BatchStream.h"
-#include "rt/EntropyCalibrator.h"
-#include "rt/anakin_rt.pb.h"
-#include "rt/rt_common.h"
-#include "rt_infer.h"
-#include "rt_net.h"
 
 namespace apollo {
 namespace perception {
@@ -288,4 +278,4 @@ class CNNTensorRT : public CNNAdapter {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // PERCEPTION_CNN_ADAPTER_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CNN_ADAPTER_H_

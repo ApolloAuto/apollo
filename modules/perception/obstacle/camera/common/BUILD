@@ -7,6 +7,7 @@ cc_library(
     srcs = [
     ],
     hdrs = [
+        "caffe_bridge.hpp",
         "camera.h",
         "lane_object.h",
         "util.h",
@@ -15,6 +16,7 @@ cc_library(
     deps = [
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "@eigen",
+        "@undistort",
     ],
 )
 
