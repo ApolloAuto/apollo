@@ -30,7 +30,7 @@ cc_library(
         "//modules/common:log",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "@caffe//:lib",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

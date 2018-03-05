@@ -36,7 +36,8 @@ bool ObjectSequence::AddTrackedFrameObjects(
       }
       iter = res.first;
     }
-    auto res = iter->second.insert(std::make_pair(timestamp, obj));
+    auto res =
+        iter->second.insert(std::make_pair(DoubleToMapKey(timestamp), obj));
     if (!res.second) {
       AERROR << "Fail to insert object.";
       return false;
@@ -61,7 +62,7 @@ bool ObjectSequence::GetTrackInTemporalWindow(int track_id,
     return false;
   }
   for (auto& tobj : iter->second) {
-    if (tobj.first >= start_time) {
+    if (MapKeyToDouble(tobj.first) >= start_time) {
       track->insert(tobj);
     }
   }
@@ -72,12 +73,13 @@ void ObjectSequence::RemoveStaleTracks(double current_stamp) {
   for (auto outer_iter = sequence_.begin(); outer_iter != sequence_.end();) {
     CHECK(outer_iter->second.size() > 0) << "Find empty tracks.";
     auto& track = outer_iter->second;
-    if (current_stamp - track.rbegin()->first > s_max_time_out_) {
+    if (current_stamp - MapKeyToDouble(track.rbegin()->first) >
+        s_max_time_out_) {
       sequence_.erase(outer_iter++);
       continue;
     }
     for (auto inner_iter = track.begin(); inner_iter != track.end();) {
-      if (current_stamp - inner_iter->first > s_max_time_out_) {
+      if (current_stamp - MapKeyToDouble(inner_iter->first) > s_max_time_out_) {
         track.erase(inner_iter++);
         continue;
       } else {
