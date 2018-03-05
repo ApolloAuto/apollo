@@ -14,13 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/obstacle/camera/detector/common/tracking_feature.pb.h"
-#include "modules/obstacle/camera/detector/yolo_camera_detector/util.h"
-#include "modules/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 
-#include "modules/lib/base/file_util.h"
-#include "modules/obstacle/camera/common/flags.h"
-#include "modules/obstacle/camera/common/util.h"
+#include "modules/perception/obstacle/camera/detector/common/tracking_feature.pb.h"
+
+#include "modules/obstacle/camera/detector/yolo_camera_detector/util.h"
+
+#include "modules/perception/lib/base/file_util.h"
+#include "modules/perception/obstacle/camera/common/flags.h"
+#include "modules/perception/obstacle/camera/common/util.h"
 
 namespace apollo {
 namespace perception {

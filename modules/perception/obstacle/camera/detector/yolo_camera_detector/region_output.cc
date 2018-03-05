@@ -17,9 +17,10 @@
 #include "modules/obstacle/camera/detector/yolo_camera_detector/region_output.h"
 
 #include <map>
-#include <opencv2/opencv.hpp>
 #include <vector>
-#include "modules/boost/iterator/counting_iterator.hpp"
+
+#include <boost/iterator/counting_iterator.hpp>
+#include <opencv2/opencv.hpp>
 
 namespace apollo {
 namespace perception {
