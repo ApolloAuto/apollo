@@ -72,7 +72,7 @@ class BaseVisualizer {
 
     virtual void update_camera_system(FrameContent *content) {}
 
-    virtual void render(const FrameContent &content) = 0;
+    virtual void render(FrameContent *content) = 0;
 
     // virtual void set_motion_buffer(MotionBuffer &motion_buffer) {}
 
