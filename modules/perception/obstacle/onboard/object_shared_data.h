@@ -41,10 +41,12 @@ namespace perception {
 OBJECT_SHARED_DATA(LidarObjectData);
 OBJECT_SHARED_DATA(RadarObjectData);
 OBJECT_SHARED_DATA(CameraObjectData);
+OBJECT_SHARED_DATA(CIPVObjectData);
 
 REGISTER_SHAREDDATA(LidarObjectData);
 REGISTER_SHAREDDATA(RadarObjectData);
 REGISTER_SHAREDDATA(CameraObjectData);
+REGISTER_SHAREDDATA(CIPVObjectData);
 
 }  // namespace perception
 }  // namespace apollo
