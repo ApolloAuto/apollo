@@ -98,11 +98,6 @@ do
     shift
 done
 
-# Included default maps.
-for map_name in ${DEFAULT_MAPS[@]}; do
-    source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
-done
-
 if [ ! -z "$VERSION_OPT" ]; then
     VERSION=$VERSION_OPT
 elif [ ${ARCH} == "x86_64" ]; then
@@ -121,6 +116,11 @@ fi
 if [ "$INCHINA" == "yes" ]; then
     DOCKER_REPO=registry.docker-cn.com/apolloauto/apollo
 fi
+
+# Included default maps.
+for map_name in ${DEFAULT_MAPS[@]}; do
+    source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+done
 
 IMG=${DOCKER_REPO}:$VERSION
 
@@ -168,7 +168,7 @@ function main(){
     LOCALIZATION_VOLUME=apollo_localization_volume
     docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
 
-    LOCALIZATION_VOLUME_IMAGE=apolloauto/apollo:localization_volume-${ARCH}-latest
+    LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
     docker pull ${LOCALIZATION_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
 
