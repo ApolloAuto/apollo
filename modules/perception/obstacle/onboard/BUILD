@@ -159,6 +159,22 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "perception_obstacle_shared_data",
+    srcs = [
+        "camera_shared_data.cc",
+        "fusion_shared_data.cc",
+    ],
+    hdrs = [
+        "camera_shared_data.h",
+        "fusion_shared_data.h",
+    ],
+    deps = [
+        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/obstacle/base:perception_obstacle_base",
+    ],
+)
+
 cc_test(
     name = "hdmap_input_test",
     size = "small",
