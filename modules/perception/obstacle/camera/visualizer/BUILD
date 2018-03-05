@@ -7,11 +7,13 @@ cc_library(
     srcs = [
         "frame_content.cc",
         "glfw_fusion_viewer.cc",
+        "gl_fusion_visualizer.cc",
     ],
     hdrs = [
         "frame_content.h",
         "base_visualizer.h",
         "glfw_fusion_viewer.h",
+        "gl_fusion_visualizer.h",
     ],
     copts = [
         "-Wno-deprecated",
