@@ -47,6 +47,7 @@ DECLARE_string(static_info_topic);
 DECLARE_string(mobileye_topic);
 DECLARE_string(delphi_esr_topic);
 DECLARE_string(conti_radar_topic);
+DECLARE_string(sonic_radar_topic);
 DECLARE_string(compressed_image_topic);
 DECLARE_string(image_short_topic);
 DECLARE_string(image_long_topic);
