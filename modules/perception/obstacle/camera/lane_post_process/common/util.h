@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <Eigen/Core>
-#include <Eigen/QR>
-
 #include <cmath>
 #include <utility>
 #include <vector>
+
+#include "Eigen/Core"
+#include "Eigen/QR"
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
@@ -43,24 +43,22 @@ inline void RectAngle(ScalarType* theta) {
 // @brief: fit polynomial function with QR decomposition (using Eigen 3)
 template <typename T = ScalarType>
 bool PolyFit(const std::vector<Eigen::Matrix<T, 2, 1>>& pos_vec,
-              const int& order, Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1>* coeff,
-              const bool& is_x_axis = true) {
+             const int& order, Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1>* coeff,
+             const bool& is_x_axis = true) {
   if (coeff == NULL) {
     AERROR << "The coefficient pointer is NULL.";
     return false;
   }
 
   if (order > MAX_POLY_ORDER) {
-    AERROR << "The order of polynomial must be smaller than "
-           << MAX_POLY_ORDER;
+    AERROR << "The order of polynomial must be smaller than " << MAX_POLY_ORDER;
     return false;
   }
 
   int n = static_cast<int>(pos_vec.size());
   if (n <= order) {
-    AERROR
-        << "The number of points should be larger than the order. #points = "
-        << pos_vec.size();
+    AERROR << "The number of points should be larger than the order. #points = "
+           << pos_vec.size();
     return false;
   }
 
@@ -89,7 +87,7 @@ bool PolyFit(const std::vector<Eigen::Matrix<T, 2, 1>>& pos_vec,
 // @brief: evaluate y value of given x for a polynomial function
 template <typename T = ScalarType>
 T PolyEval(const T& x, const int& order,
-            const Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1>& coeff) {
+           const Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1>& coeff) {
   int poly_order = order;
   if (order > MAX_POLY_ORDER) {
     AERROR << "the order of polynomial function must be smaller than "
