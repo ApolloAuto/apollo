@@ -16,12 +16,12 @@ proto_library(
         "delphi_esr.proto",
         "mobileye.proto",
         "radar.proto",
-        "sonic_radar.proto"
+        "ultrasonic_radar.proto"
     ],
     deps = [
         "//modules/common/proto:header_proto_lib",
         "//modules/drivers/radar/conti_radar/proto:conti_radar_proto_lib",
-        "//modules/drivers/radar/sonic_radar/proto:sonic_radar_proto_lib",
+        "//modules/drivers/radar/ultrasonic_radar/proto:ultrasonic_radar_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:common_proto_lib",
     ],

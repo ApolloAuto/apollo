@@ -15,74 +15,49 @@
  *****************************************************************************/
 
 /**
- * @file sonic_radar_message_manager.h
- * @brief The class of SonicRadarMessageManager
+ * @file ultrasonic_radar_message_manager.h
+ * @brief The class of UltrasonicRadarMessageManager
  */
 
-#include "modules/drivers/radar/sonic_radar/sonic_radar_message_manager.h"
-#include "modules/drivers/radar/sonic_radar/protocol/range_fill_301.h"
-#include "modules/drivers/radar/sonic_radar/protocol/range_fill_302.h"
-#include "modules/drivers/radar/sonic_radar/protocol/range_fill_303.h"
-#include "modules/drivers/radar/sonic_radar/protocol/range_fill_304.h"
+#include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
 
 
 namespace apollo {
 namespace drivers {
-namespace sonic_radar {
+namespace ultrasonic_radar {
 
 using ::apollo::common::adapter::AdapterManager;
 
-SonicRadarMessageManager::SonicRadarMessageManager() {
-  AddRecvProtocolData<RangeFill301, true>();
-  AddRecvProtocolData<RangeFill302, true>();
-  AddRecvProtocolData<RangeFill303, true>();
-  AddRecvProtocolData<RangeFill304, true>();
+UltrasonicRadarMessageManager::UltrasonicRadarMessageManager() {
+  sensor_data_.mutable_ranges()->Resize(FLAGS_entrance_num, 0.0);
 }
 
-void SonicRadarMessageManager::set_can_client(
+void UltrasonicRadarMessageManager::set_can_client(
     std::shared_ptr<CanClient> can_client) {
   can_client_ = can_client;
 }
 
-void SonicRadarMessageManager::Parse(const uint32_t message_id,
+void UltrasonicRadarMessageManager::Parse(const uint32_t message_id,
                                      const uint8_t *data, int32_t length) {
-  ProtocolData<Ultrasonic> *sensor_protocol_data =
-      GetMutableProtocolDataById(message_id);
-  AINFO << "SonicRadarMessageManager::Parse, message_id: " << message_id
-        << ", length: " << length;
-  sensor_protocol_data->Parse(data, length, &sensor_data_);
   static std::vector<bool> data_set(4, false);
   if (message_id == 0x301) {
-    if (data_set[0]) {
-      AINFO << "one set again.";
-    }
-    data_set[0] = true;
-  } else if (message_id == 0x302) { // for 4 - 7
-    if (data_set[1]) {
-      AINFO << "two set again.";
-    }
-    data_set[1] = true;
-  } else if (message_id == 0x303) { // for 8 - 9
-    if (data_set[2]) {
-      AINFO << "three set again.";
-    }
-    data_set[2] = true;
+    sensor_data_.set_ranges(0, data[1]);
+    sensor_data_.set_ranges(1, data[2]);
+    sensor_data_.set_ranges(2, data[3]);
+    sensor_data_.set_ranges(3, data[4]);
+  } else if (message_id == 0x302) {
+    sensor_data_.set_ranges(4, data[1]);
+    sensor_data_.set_ranges(5, data[2]);
+    sensor_data_.set_ranges(6, data[3]);
+    sensor_data_.set_ranges(7, data[4]);
+  } else if (message_id == 0x303) {
+    sensor_data_.set_ranges(8, data[1]);
+    sensor_data_.set_ranges(9, data[2]);
   } else if (message_id == 0x304) {
-    if (data_set[3]) {
-      AINFO << "four set again.";
-    }
-    data_set[3] = true;
-    for (int i = 0; i < 4; ++i) {
-      if (!data_set[i]) {
-        AINFO << "set not complete.";
-      }
-      data_set[i] = false;
-    }
-    sensor_data_.Clear();
+    sensor_data_.set_ranges(10, data[1]);
+    sensor_data_.set_ranges(11, data[2]);
     AdapterManager::FillUltrasonicHeader(FLAGS_sensor_node_name, &sensor_data_);
-    //AdapterManager::PublishUltrasonic(sensor_data_);
-  } else {
-    ;
+    AdapterManager::PublishUltrasonic(sensor_data_);
   }
 
   received_ids_.insert(message_id);
@@ -102,6 +77,6 @@ void SonicRadarMessageManager::Parse(const uint32_t message_id,
   }
 }
 
-}  // namespace sonic_radar
+}  // namespace ultrasonic_radar
 }  // namespace drivers
 }  // namespace apollo

@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DRIVERS_RADAR_SONIC_RADAR_SONIC_RADAR_CANBUS_H_
-#define MODULES_DRIVERS_RADAR_SONIC_RADAR_SONIC_RADAR_CANBUS_H_
+#ifndef MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_CANBUS_H_
+#define MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_CANBUS_H_
 
 #include <memory>
 #include <string>
@@ -44,9 +44,9 @@
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 #include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
-#include "modules/drivers/radar/sonic_radar/sonic_radar_message_manager.h"
-//#include "modules/drivers/radar/sonic_radar/protocol/radar_config_200.h"
-#include "modules/drivers/proto/sonic_radar.pb.h"
+#include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
+#include "modules/drivers/radar/ultrasonic_radar/proto/ultrasonic_radar_conf.pb.h"
+#include "modules/drivers/proto/ultrasonic_radar.pb.h"
 
 /**
  * @namespace apollo::drivers
@@ -54,12 +54,12 @@
  */
 namespace apollo {
 namespace drivers {
-namespace sonic_radar {
+namespace ultrasonic_radar {
 
 /**
-* @class SonicRadarCanbus
+* @class UltrasonicRadarCanbus
 *
-* @brief template of canbus-based sensor module main class (e.g., sonic_radar).
+* @brief template of canbus-based sensor module main class (e.g., ultrasonic_radar).
 */
 
 using apollo::common::adapter::AdapterConfig;
@@ -74,11 +74,11 @@ using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::canbus::SensorCanbusConf;
 
-class SonicRadarCanbus : public apollo::common::ApolloApp {
+class UltrasonicRadarCanbus : public apollo::common::ApolloApp {
  public:
   // TODO(lizh): check whether we need a new msg item, say
   // MonitorMessageItem::SENSORCANBUS
-  SonicRadarCanbus()
+  UltrasonicRadarCanbus()
       : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
 
   /**
@@ -109,17 +109,17 @@ class SonicRadarCanbus : public apollo::common::ApolloApp {
   Status OnError(const std::string &error_msg);
   void RegisterCanClients();
 
-  SonicRadarConf sonic_radar_conf_;
+  UltrasonicRadarConf ultrasonic_radar_conf_;
   std::shared_ptr<CanClient> can_client_;
   CanReceiver<Ultrasonic> can_receiver_;
-  std::unique_ptr<SonicRadarMessageManager> sensor_message_manager_;
+  std::unique_ptr<UltrasonicRadarMessageManager> sensor_message_manager_;
 
   int64_t last_timestamp_ = 0;
   apollo::common::monitor::MonitorLogger monitor_logger_;
 };
 
-}  // namespace sonic_radar
+}  // namespace ultrasonic_radar
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_RADAR_SONIC_RADAR_SONIC_RADAR_CANBUS_H_
+#endif  // MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_CANBUS_H_

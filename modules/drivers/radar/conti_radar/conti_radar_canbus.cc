@@ -37,10 +37,6 @@ std::string ContiRadarCanbus::Name() const {
 }
 
 apollo::common::Status ContiRadarCanbus::Init() {
-  AINFO << "FLAGS_adapter_config_filename: " << FLAGS_adapter_config_filename;
-  cout << "FLAGS_adapter_config_filename: " << FLAGS_adapter_config_filename << endl;
-  AINFO << "FLAGS_sensor_conf_file: " << FLAGS_sensor_conf_file;
-  cout << "FLAGS_sensor_conf_file: " << FLAGS_sensor_conf_file << endl;
   AdapterManager::Init(FLAGS_adapter_config_filename);
   AINFO << "The adapter manager is successfully initialized.";
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_sensor_conf_file,

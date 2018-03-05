@@ -32,7 +32,7 @@
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
-#include "modules/drivers/proto/sonic_radar.pb.h"
+#include "modules/drivers/proto/ultrasonic_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/localization/proto/gps.pb.h"
