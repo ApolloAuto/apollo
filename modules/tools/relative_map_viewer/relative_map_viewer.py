@@ -23,9 +23,11 @@ import numpy as np
 import matplotlib.animation as animation
 from modules.map.relative_map.proto import navigation_pb2
 from modules.localization.proto import localization_pb2
+from modules.planning.proto import planning_pb2
 
 ax = None
 map_msg = None
+planning_msg = None
 navigation_path_x = []
 navigation_path_y = []
 localization_pb = None
@@ -155,6 +157,14 @@ def update(frame_number):
                 y.append(point.x)
             ax.plot(x, y, ls='-', c='g', alpha=0.3)
 
+    if planning_msg is not None:
+        x = []
+        y = []
+        for tp in planning_msg.trajectory_point:
+            x.append(tp.path_point.y)
+            y.append(tp.path_point.x)
+        ax.plot(x, y, ls=':', c='r', linewidth=5.0)
+
     ax.axvline(x=0.0, alpha=0.3)
     ax.axhline(y=0.0, alpha=0.3)
     ax.set_xlim([10, -10])
@@ -173,6 +183,10 @@ def map_callback(map_msg_pb):
     global map_msg
     map_msg = map_msg_pb
 
+def planning_callback(planning_msg_pb):
+    global planning_msg
+    planning_msg = planning_msg_pb
+
 
 def add_listener():
     rospy.init_node('relative_map_plot', anonymous=True)
@@ -184,6 +198,9 @@ def add_listener():
     rospy.Subscriber('/apollo/localization/pose',
                      localization_pb2.LocalizationEstimate,
                      localization_callback)
+    rospy.Subscriber('/apollo/planning',
+                     planning_pb2.ADCTrajectory,
+                     planning_callback)
 
 
 if __name__ == '__main__':
