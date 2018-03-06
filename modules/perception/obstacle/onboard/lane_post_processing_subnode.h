@@ -49,11 +49,9 @@ class LanePostProcessingSubnode : public Subnode {
   bool InitSharedData();
   bool InitAlgorithmPlugin();
   bool InitWorkRoot();
-  bool GetSharedData(const Event& event,
-                     std::shared_ptr<SensorObjects>* objs);
-  void PublishDataAndEvent(
-      double timestamp,
-      const SharedDataPtr<LaneObjects>& lane_objects);
+  bool GetSharedData(const Event& event, std::shared_ptr<SensorObjects>* objs);
+  void PublishDataAndEvent(double timestamp,
+                           const SharedDataPtr<LaneObjects>& lane_objects);
 
   std::unique_ptr<BaseCameraLanePostProcessor> lane_post_processor_;
   CameraObjectData* camera_object_data_ = nullptr;

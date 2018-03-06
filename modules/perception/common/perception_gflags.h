@@ -101,4 +101,3 @@ DECLARE_bool(show_camera_parsing);
 DECLARE_string(frame_visualizer);
 
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
-
