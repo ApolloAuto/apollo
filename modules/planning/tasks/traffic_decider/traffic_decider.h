@@ -55,6 +55,7 @@ class TrafficDecider : public Task {
 
  private:
   void RegisterRules();
+  void BuildPlanningTarget(ReferenceLineInfo *reference_line_info);
 
   apollo::common::util::Factory<RuleConfig::RuleId, TrafficRule,
                                 TrafficRule *(*)(const RuleConfig &config)>

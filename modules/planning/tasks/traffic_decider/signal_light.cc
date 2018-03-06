@@ -215,7 +215,12 @@ bool SignalLight::BuildStopDecision(
 
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
-  stop_decision->set_reason_code(StopReasonCode::STOP_REASON_SIGNAL);
+  auto signal_color = GetSignal(signal_light->object_id).color();
+  if (signal_color == TrafficLight::YELLOW) {
+    stop_decision->set_reason_code(StopReasonCode::STOP_REASON_YELLOW_SIGNAL);
+  } else {
+    stop_decision->set_reason_code(StopReasonCode::STOP_REASON_SIGNAL);
+  }
   stop_decision->set_distance_s(-FLAGS_traffic_light_stop_distance);
   stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
