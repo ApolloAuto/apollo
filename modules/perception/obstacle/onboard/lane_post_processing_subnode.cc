@@ -18,12 +18,12 @@
 
 #include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
 
-#include <cfloat>
-
 #include <yaml-cpp/yaml.h>
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <opencv2/opencv.hpp>
+
+#include <cfloat>
 
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -139,7 +139,7 @@ Status LanePostProcessingSubnode::ProcEvents() {
   const EventMeta &event_meta = sub_meta_events_[0];
   Event event;
   event_manager_->Subscribe(event_meta.event_id, &event);
-  //PERF_FUNCTION();
+  // PERF_FUNCTION();
   ++seq_num_;
   shared_ptr<SensorObjects> objs;
   if (!GetSharedData(event, &objs)) {
