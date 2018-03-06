@@ -41,7 +41,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/common",
-        "//modules/perception/obstacle/fusion/interface:perception_obstacle_fusion_interface",
+        "//modules/perception/obstacle/fusion/interface",
         "//modules/perception/obstacle/onboard:hdmapinput",
         "@eigen",
         "@pcl",

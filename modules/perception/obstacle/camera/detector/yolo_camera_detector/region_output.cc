@@ -16,9 +16,9 @@
 
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/region_output.h"
 
+#include <algorithm>
 #include <map>
 #include <vector>
-#include <algorithm>
 
 #include "boost/iterator/counting_iterator.hpp"
 #include "opencv2/opencv.hpp"
@@ -63,16 +63,19 @@ float get_jaccard_overlap(const NormalizedBBox &bbox1,
                           const NormalizedBBox &bbox2) {
   NormalizedBBox intersect_bbox;
   get_intersect_bbox(bbox1, bbox2, &intersect_bbox);
-  float intersect_width = 0.f;
-  float intersect_height = 0.f;
-  intersect_width = intersect_bbox.xmax - intersect_bbox.xmin;
-  intersect_height = intersect_bbox.ymax - intersect_bbox.ymin;
+  float intersect_width = intersect_bbox.xmax - intersect_bbox.xmin;
+  float intersect_height = intersect_bbox.ymax - intersect_bbox.ymin;
 
-  if (intersect_width > 0 && intersect_height > 0) {
+  if (intersect_width > 0.0 && intersect_height > 0.0) {
     float intersect_size = intersect_width * intersect_height;
     float bbox1_size = get_bbox_size(bbox1);
     float bbox2_size = get_bbox_size(bbox2);
-    return intersect_size / (bbox1_size + bbox2_size - intersect_size);
+    const double delta = bbox1_size + bbox2_size - intersect_size;
+    if (delta > 0) {
+      return intersect_size / std::fmax(delta, 1e-9);
+    } else {
+      return intersect_size / std::fmin(delta, -1e-9);
+    }
   } else {
     return 0.;
   }
@@ -139,7 +142,7 @@ void apply_nms_fast(const std::vector<NormalizedBBox> &bboxes,
 void cross_class_merge(std::vector<int> *indices_ref,
                        std::vector<int> *indices_target,
                        std::vector<NormalizedBBox> bboxes, float scale) {
-  for (int i = 0; i < static_cast<int>(indices_ref->size()); i++) {
+  for (int i = 0; i < static_cast<int>(indices_ref->size()); ++i) {
     int ref_idx = indices_ref->at(i);
     NormalizedBBox &bbox_ref = bboxes[ref_idx];
     for (std::vector<int>::iterator it = indices_target->begin();
@@ -155,7 +158,7 @@ void cross_class_merge(std::vector<int> *indices_ref,
           bbox_target.ymax <= bbox_ref.ymax) {
         it = indices_target->erase(it);
       } else {
-        it++;
+        ++it;
       }
     }
   }
