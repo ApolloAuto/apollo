@@ -25,8 +25,6 @@
 #include "opencv2/opencv.hpp"
 
 #include "modules/common/log.h"
-// #include "modules/perception/obstacle/camera/
-//           lane_post_process/common/projector.h"
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_TYPE_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_TYPE_H_
@@ -435,9 +433,6 @@ typedef const std::shared_ptr<LaneObjects> LaneObjectsConstPtr;
 typedef std::vector<LaneInstance> LaneInstances;
 typedef std::shared_ptr<LaneInstances> LaneInstancesPtr;
 typedef const std::shared_ptr<LaneInstances> LaneInstancesConstPtr;
-
-// typedef adu::perception::transformer_tool::
-//         Projector<ScalarType> Projector;
 
 }  // namespace perception
 }  // namespace apollo
