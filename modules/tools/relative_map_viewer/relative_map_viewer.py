@@ -64,9 +64,8 @@ def draw_lane_boundary(lane, ax, color_val, lane_marker):
     px_lane_marker = []
     py_lane_marker = []
     for x in range(int(lane_marker.left_lane_marker.view_range)):
-        px_lane_marker.append(evaluate_poly(left_c0, left_c1,
-                                             left_c2, left_c3,
-                                             float(x)))
+        px_lane_marker.append(
+            evaluate_poly(left_c0, left_c1, left_c2, left_c3, float(x)))
         py_lane_marker.append(float(x))
     ax.plot(px_lane_marker, py_lane_marker, ls='--', c='g', alpha=0.5)
 
@@ -87,9 +86,8 @@ def draw_lane_boundary(lane, ax, color_val, lane_marker):
     px_lane_marker = []
     py_lane_marker = []
     for x in range(int(lane_marker.right_lane_marker.view_range)):
-        px_lane_marker.append(evaluate_poly(right_c0, right_c1,
-                                             right_c2, right_c3,
-                                             float(x)))
+        px_lane_marker.append(
+            evaluate_poly(right_c0, right_c1, right_c2, right_c3, float(x)))
         py_lane_marker.append(float(x))
     ax.plot(px_lane_marker, py_lane_marker, ls='--', c='g', alpha=0.5)
 
@@ -109,9 +107,9 @@ def draw_lane_boundary(lane, ax, color_val, lane_marker):
     for i in range(len(path_x)):
         x = path_x[i]
         y = path_y[i]
-        newx = x * math.cos(- heading + 1.570796) - y * math.sin(
+        newx = x * math.cos(-heading + 1.570796) - y * math.sin(
             -heading + 1.570796)
-        newy = y * math.cos(- heading + 1.570796) + x * math.sin(
+        newy = y * math.cos(-heading + 1.570796) + x * math.sin(
             -heading + 1.570796)
 
         routing_x.append(-1 * newx)
@@ -183,6 +181,7 @@ def map_callback(map_msg_pb):
     global map_msg
     map_msg = map_msg_pb
 
+
 def planning_callback(planning_msg_pb):
     global planning_msg
     planning_msg = planning_msg_pb
@@ -190,16 +189,14 @@ def planning_callback(planning_msg_pb):
 
 def add_listener():
     rospy.init_node('relative_map_plot', anonymous=True)
-    rospy.Subscriber('/apollo/relative_map',
-                     navigation_pb2.MapMsg,
+    rospy.Subscriber('/apollo/relative_map', navigation_pb2.MapMsg,
                      map_callback)
-    rospy.Subscriber('/apollo/navigation',
-                     navigation_pb2.NavigationInfo, navigation_callback)
+    rospy.Subscriber('/apollo/navigation', navigation_pb2.NavigationInfo,
+                     navigation_callback)
     rospy.Subscriber('/apollo/localization/pose',
                      localization_pb2.LocalizationEstimate,
                      localization_callback)
-    rospy.Subscriber('/apollo/planning',
-                     planning_pb2.ADCTrajectory,
+    rospy.Subscriber('/apollo/planning', planning_pb2.ADCTrajectory,
                      planning_callback)
 
 
