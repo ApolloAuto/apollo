@@ -78,6 +78,9 @@ DECLARE_double(a_matrix_covariance_coeffcient_2);
 /// calibration_config_manager.cc
 DECLARE_int32(obs_camera_detector_gpu);
 
+// obstacle/onboard/lane_post_processing_subnode.cc
+DECLARE_string(onboard_lane_post_processor);
+
 /// visualization
 DECLARE_bool(show_front_radar_raw);
 DECLARE_bool(show_camera_objects);
