@@ -86,7 +86,7 @@ export default class HMI {
         return this.currentMode === "RTK Record / Replay";
     }
 
-    @computed get showNavigationMap() {
+    @computed get inNavigationMode() {
         return this.currentMode === "Navigation";
     }
 }
