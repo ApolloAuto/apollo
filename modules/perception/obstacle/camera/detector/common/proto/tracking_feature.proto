@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.perception.obstacle;
+package apollo.perception;
 
 message FeatureParam {
     optional int32 feat_stride = 1 [default = 32];
