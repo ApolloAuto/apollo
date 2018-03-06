@@ -99,6 +99,10 @@ DEFINE_double(a_matrix_covariance_coeffcient_2, 0.05,
 /// calibration_config_manager.cc
 DEFINE_int32(obs_camera_detector_gpu, 0, "device id for camera detector");
 
+// obstacle/onboard/lane_post_processing_subnode.cc
+DEFINE_string(onboard_lane_post_processor, "CCLanePostProcessor",
+              "onboard lane post-processing algorithm name");
+
 /// visualization
 DEFINE_bool(show_front_radar_raw, false, "");
 DEFINE_bool(show_back_radar_raw, false, "");

@@ -118,8 +118,13 @@ struct SensorObjects {
   std::vector<ObjectPtr> objects;
   Eigen::Matrix4d sensor2world_pose;
   LaneObjectsPtr lane_objects;
+
   uint32_t cipv_index = -1;
   uint32_t cipv_track_id = -1;
+
+  //sensor particular suplplements, default nullptr
+  RadarFrameSupplementPtr radar_frame_supplement = nullptr;
+  CameraFrameSupplementPtr camera_frame_supplement = nullptr;
 };
 
 }  // namespace perception

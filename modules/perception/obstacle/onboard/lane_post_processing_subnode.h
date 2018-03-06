@@ -19,6 +19,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_LANE_POST_PROCESSING_SUBNODE_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_LANE_POST_PROCESSING_SUBNODE_H_
 
+#include <string>
+
 #include <Eigen/Core>
 
 #include "modules/common/adapters/adapter_manager.h"

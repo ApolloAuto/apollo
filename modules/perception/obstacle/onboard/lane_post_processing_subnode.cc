@@ -18,10 +18,12 @@
 
 #include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
 
+#include <cfloat>
+
 #include <yaml-cpp/yaml.h>
 #include <Eigen/Core>
 #include <Eigen/Dense>
-#include <cfloat>
+#include <opencv2/opencv.hpp>
 
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -36,6 +38,9 @@ namespace apollo {
 namespace perception {
 
 using std::string;
+using std::shared_ptr;
+using apollo::common::Status;
+using apollo::common::ErrorCode;
 
 bool LanePostProcessingSubnode::InitInternal() {
   // init shared data
@@ -45,7 +50,7 @@ bool LanePostProcessingSubnode::InitInternal() {
   }
 
   // init plugins
-  if (!InitAlgorithmPlugins()) {
+  if (!InitAlgorithmPlugin()) {
     AERROR << "failed to init algorithm plugins.";
     return false;
   }
@@ -91,10 +96,10 @@ bool LanePostProcessingSubnode::InitAlgorithmPlugin() {
   // init lane post-processer
   lane_post_processor_.reset(
       BaseCameraLanePostProcessorRegisterer::GetInstanceByName(
-          FLAGS_onboard_lane_post_processer));
+          FLAGS_onboard_lane_post_processor));
   if (!lane_post_processor_) {
     AERROR << "failed to get instance: "
-           << FLAGS_onboard_lane_post_processer;
+           << FLAGS_onboard_lane_post_processor;
     return false;
   }
   if (!lane_post_processor_->Init()) {
@@ -105,7 +110,7 @@ bool LanePostProcessingSubnode::InitAlgorithmPlugin() {
 
   AINFO << "init alg pulgins successfully\n"
         << " lane post-processer:     "
-        << FLAGS_onboard_lane_post_processer;
+        << FLAGS_onboard_lane_post_processor;
   return true;
 }
 
@@ -134,13 +139,12 @@ Status LanePostProcessingSubnode::ProcEvents() {
   const EventMeta &event_meta = sub_meta_events_[0];
   Event event;
   event_manager_->Subscribe(event_meta.event_id, &event);
-  PERF_FUNCTION();
+  //PERF_FUNCTION();
   ++seq_num_;
-  std::shared_ptr<SensorObjects> objs;
-  bool status = GetSharedData(event, &objs);
-  if (!status) {
-    AERROR << "failed to get shared data. event:" << event.to_string();
-    return FAIL;
+  shared_ptr<SensorObjects> objs;
+  if (!GetSharedData(event, &objs)) {
+    AERROR << "Failed to get shared data. event:" << event.to_string();
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
   }
 
   cv::Mat lane_map = objs->camera_frame_supplement->lane_map;
@@ -153,17 +157,17 @@ Status LanePostProcessingSubnode::ProcEvents() {
     (*lane_instances)[i].timestamp = event.timestamp;
     (*lane_instances)[i].seq_num = seq_num_;
   }
-  AINFO << "before publish lane objects, objects num: "
+  AINFO << "Before publish lane objects, objects num: "
         << lane_instances->size();
 
   PublishDataAndEvent(event.timestamp, lane_instances);
 
-  AINFO << "successfully finished lane post processing";
-  return SUCC;
+  AINFO << "Successfully finished lane post processing";
+  return Status::OK();
 }
 
 bool LanePostProcessingSubnode::GetSharedData(
-    const Event &event, std::shared_ptr<SensorObjects> *objs) {
+    const Event &event, shared_ptr<SensorObjects> *objs) {
   double timestamp = event.timestamp;
   string device_id = event.reserve;
   device_id_ = device_id;
@@ -174,9 +178,8 @@ bool LanePostProcessingSubnode::GetSharedData(
            << " device_id:" << device_id;
     return false;
   }
-  //bool get_data_succ = false;
-  //get_data_succ = _camera_object_data->get(data_key, objs);
-  if (!camera_object_data_->get(data_key, objs)) {
+
+  if (!camera_object_data_->Get(data_key, objs)) {
     AERROR << "failed to get shared data. event:" << event.to_string();
     return false;
   }
@@ -193,7 +196,7 @@ void LanePostProcessingSubnode::PublishDataAndEvent(
     return;
   }
 
-  if (!lane_shared_data_->add(key, lane_objects)) {
+  if (!lane_shared_data_->Add(key, lane_objects)) {
     AWARN << "failed to add LaneSharedData. key: " << key
           << " num_detected_objects: " << lane_objects->size();
     return;
@@ -205,7 +208,7 @@ void LanePostProcessingSubnode::PublishDataAndEvent(
     Event event;
     event.event_id = event_meta.event_id;
     event.timestamp = timestamp;
-    event.reserve = _device_id;
+    event.reserve = device_id_;
     event_manager_->Publish(event);
   }
   AINFO << "succeed to publish data and event.";
