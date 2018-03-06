@@ -27,6 +27,7 @@ cc_library(
         "//modules/common",
         "//modules/common/math:linear_interpolation",
         "//modules/planning/math/curve1d",
+        "//modules/planning/common:planning_gflags",
     ],
 )
 
