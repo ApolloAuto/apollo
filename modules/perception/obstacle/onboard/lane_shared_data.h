@@ -19,23 +19,21 @@
 
 #include <string>
 
-#include "modules/perception/onboard/common_shared_data.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
+#include "modules/perception/onboard/common_shared_data.h"
 
 namespace apollo {
 namespace perception {
 
 class LaneSharedData : public CommonSharedData<LaneObjects> {
  public:
-    LaneSharedData() = default;
-    virtual ~LaneSharedData() = default;
+  LaneSharedData() = default;
+  virtual ~LaneSharedData() = default;
 
-    std::string name() const override {
-        return "LaneSharedData";
-    }
+  std::string name() const override { return "LaneSharedData"; }
 
  private:
-    DISALLOW_COPY_AND_ASSIGN(LaneSharedData);
+  DISALLOW_COPY_AND_ASSIGN(LaneSharedData);
 };
 
 REGISTER_SHAREDDATA(LaneSharedData);

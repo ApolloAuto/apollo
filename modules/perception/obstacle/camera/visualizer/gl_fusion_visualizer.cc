@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/camera/visualizer/gl_fusion_visualizer.h"
 #include "modules/common/log.h"
+#include "modules/perception/obstacle/camera/visualizer/gl_fusion_visualizer.h"
 
 namespace apollo {
 namespace perception {
@@ -94,9 +94,7 @@ void GLFusionVisualizer::set_main_car_points() {
 }
 
 void GLFusionVisualizer::update_camera_system(FrameContent *content) {
-  Eigen::Matrix4d pose_v2w = content->get_opengl_camera_system_pose();
-
-  pose_v2w = Eigen::Matrix4d::Identity();
+  Eigen::Matrix4d pose_v2w = Eigen::Matrix4d::Identity();
   Eigen::Vector4d camera_center_w(_camera_center_velodyne[0],
                                   _camera_center_velodyne[1],
                                   _camera_center_velodyne[2], 0);
