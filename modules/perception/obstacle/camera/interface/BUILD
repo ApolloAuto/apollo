@@ -8,7 +8,7 @@ cc_library(
     hdrs = glob(["*.h"]),
     deps = [
         "//modules/perception/lib/base",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common",
         "@eigen",
         "@opencv2//:core",

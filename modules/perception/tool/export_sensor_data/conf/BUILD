@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-    name = "perception_tool_export_sensor_data_config",
+    name = "config",
     srcs = [
         "export_sensor_data.flag",
     ],
