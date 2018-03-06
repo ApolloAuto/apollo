@@ -33,7 +33,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 class BaseFeatureExtractor {
  public:
@@ -88,7 +87,6 @@ class ROIPoolingFeatureExtractor : public BaseFeatureExtractor {
   int input_width_ = 0;
 };
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

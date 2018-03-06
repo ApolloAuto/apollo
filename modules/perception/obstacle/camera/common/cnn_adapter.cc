@@ -20,7 +20,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 // CNNCaffe
 bool CNNCaffe::init(const std::vector<std::string> &input_names,
@@ -138,6 +137,5 @@ boost::shared_ptr<caffe::Blob<float>> CNNTensorRT::get_blob_by_name(
 // CNNTensorRT END
 */
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
