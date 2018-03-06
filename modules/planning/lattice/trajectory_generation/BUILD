@@ -61,6 +61,7 @@ cc_library(
         "//modules/planning/math/curve1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/lattice/behavior:path_time_graph",
+        "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d"
     ],
 )
 

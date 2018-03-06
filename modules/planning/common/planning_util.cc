@@ -156,6 +156,11 @@ common::SLPoint interpolate(const common::SLPoint &start,
   return point;
 }
 
+PlanningStatus *GetPlanningStatus() {
+  static PlanningStatus status;
+  return &status;
+}
+
 void DumpPlanningContext() {
   AdapterManager::GetLocalization()->DumpLatestMessage();
   AdapterManager::GetChassis()->DumpLatestMessage();

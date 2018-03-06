@@ -88,6 +88,15 @@ modules {
     process_cmd_keywords: "rosbag/record"
   }
 }
+modules {
+  name: "relative_map"
+  process_conf {
+    process_cmd_keywords: "modules/map/relative_map/relative_map"
+  }
+  topic_conf {
+    type: RELATIVE_MAP
+  }
+}
 hardware {
   name: "velodyne"
   topic_conf {

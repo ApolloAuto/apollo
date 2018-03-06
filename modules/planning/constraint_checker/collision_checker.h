@@ -35,26 +35,26 @@ class CollisionChecker {
  public:
   explicit CollisionChecker(
       const std::vector<const Obstacle*>& obstacles,
-      const std::array<double, 3>& adc_init_s,
-      const std::array<double, 3>& adc_init_d,
-      const std::vector<apollo::common::PathPoint>& discretized_reference_line);
+      const double ego_vehicle_s,
+      const double ego_vehicle_d,
+      const std::vector<common::PathPoint>& discretized_reference_line);
 
   bool InCollision(const DiscretizedTrajectory& discretized_trajectory);
 
  private:
-  void BuildPredictedEnv(
+  void BuildPredictedEnvironment(
       const std::vector<const Obstacle*>& obstacles,
-      const std::array<double, 3>& adc_init_s,
-      const std::array<double, 3>& adc_init_d,
+      const double ego_vehicle_s,
+      const double ego_vehicle_d,
+      const std::vector<common::PathPoint>& discretized_reference_line);
+
+  bool IsEgoVehicleInLane(const double ego_vehicle_d);
+
+  bool ShouldIgnore(
+      const Obstacle* obstacle, const double ego_vehicle_s,
       const std::vector<apollo::common::PathPoint>& discretized_reference_line);
 
-  bool IgnoreObstaclesBehind(const std::array<double, 3>& adc_init_d);
-
-  bool IsBehind(
-      const Obstacle* obstacle, const std::array<double, 3>& adc_init_s,
-      const std::vector<apollo::common::PathPoint>& discretized_reference_line);
-
-  std::vector<std::vector<common::math::Box2d>> predicted_envs_;
+  std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
 };
 
 }  // namespace planning

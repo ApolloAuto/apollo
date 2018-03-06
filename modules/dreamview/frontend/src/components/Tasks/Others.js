@@ -19,7 +19,7 @@ export default class Others extends React.Component {
                             onClick={() => {
                                 WS.resetBackend();
                             }}>Reset Backend Data</button>
-                    <button disabled={disablePanel}
+                    <button disabled={false}
                             onClick={() => {
                                 WS.dumpMessages();
                             }}>Dump Message</button>

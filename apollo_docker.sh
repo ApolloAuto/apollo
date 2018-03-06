@@ -47,13 +47,24 @@ function print_usage() {
 
 function start_build_docker() {
   docker ps --format "{{.Names}}" | grep apollo_dev 1>/dev/null 2>&1
-  if [ $? != 0 ]; then
-    bash docker/scripts/dev_start.sh
+  if [ $? != 0 ]; then    
+    # If Google is reachable, we fetch the docker image directly. 
+    if ping -q -c 1 -W 1 www.google.com >/dev/null; then
+      opt=""
+    # If Google is unreachable but Baidu reachable, we fetch the docker image from China. 
+    elif ping -q -c 1 -W 1 www.baidu.com >/dev/null; then
+      opt="-C"
+    # If Baidu is unreachable, we use local images. 
+    else
+      opt="-l"
+    fi
+    #echo ${opt}
+    bash docker/scripts/dev_start.sh ${opt}
   fi
 }
 
 function gen_docker() {
-  IMG="apolloauto/apollo:run-${MACHINE_ARCH}-20180130_1338"
+  IMG="apolloauto/apollo:run-${MACHINE_ARCH}-20180302_1123"
   RELEASE_DIR=${HOME}/.cache/apollo_release
   APOLLO_DIR="${RELEASE_DIR}/apollo"
 

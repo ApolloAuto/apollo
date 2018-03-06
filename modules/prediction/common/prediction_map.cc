@@ -25,7 +25,6 @@
 #include <utility>
 #include <vector>
 
-#include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"

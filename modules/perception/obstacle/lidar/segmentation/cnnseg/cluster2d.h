@@ -30,7 +30,7 @@ namespace apollo {
 namespace perception {
 namespace cnnseg {
 
-enum MetaType {
+enum class MetaType {
   META_UNKNOWN,
   META_SMALLMOT,
   META_BIGMOT,
@@ -47,9 +47,9 @@ struct Obstacle {
   MetaType meta_type;
   std::vector<float> meta_type_probs;
 
-  Obstacle() : score(0.0), height(-5.0), meta_type(META_UNKNOWN) {
+  Obstacle() : score(0.0), height(-5.0), meta_type(MetaType::META_UNKNOWN) {
     cloud.reset(new apollo::perception::pcl_util::PointCloud);
-    meta_type_probs.assign(MAX_META_TYPE, 0.0);
+    meta_type_probs.assign(static_cast<int>(MetaType::MAX_META_TYPE), 0.0);
   }
 };
 
@@ -203,7 +203,7 @@ class Cluster2D {
   void Classify(const caffe::Blob<float>& classify_pt_blob) {
     const float* classify_pt_data = classify_pt_blob.cpu_data();
     int num_classes = classify_pt_blob.channels();
-    CHECK_EQ(num_classes, MAX_META_TYPE);
+    CHECK_EQ(num_classes, static_cast<int>(MetaType::MAX_META_TYPE));
     for (size_t obs_id = 0; obs_id < obstacles_.size(); obs_id++) {
       Obstacle* obs = &obstacles_[obs_id];
       for (size_t grid_id = 0; grid_id < obs->grids.size(); grid_id++) {
@@ -260,7 +260,7 @@ class Cluster2D {
       apollo::perception::ObjectPtr out_obj(new apollo::perception::Object);
       out_obj->cloud = obs->cloud;
       out_obj->score = obs->score;
-      out_obj->score_type = SCORE_CNN;
+      out_obj->score_type = ScoreType::SCORE_CNN;
       out_obj->type = GetObjectType(obs->meta_type);
       out_obj->type_probs = GetObjectTypeProbs(obs->meta_type_probs);
       objects->push_back(out_obj);
@@ -323,15 +323,15 @@ class Cluster2D {
 
   ObjectType GetObjectType(const MetaType meta_type_id) {
     switch (meta_type_id) {
-      case META_UNKNOWN:
+      case MetaType::META_UNKNOWN:
         return ObjectType::UNKNOWN;
-      case META_SMALLMOT:
+      case MetaType::META_SMALLMOT:
         return ObjectType::VEHICLE;
-      case META_BIGMOT:
+      case MetaType::META_BIGMOT:
         return ObjectType::VEHICLE;
-      case META_NONMOT:
+      case MetaType::META_NONMOT:
         return ObjectType::BICYCLE;
-      case META_PEDESTRIAN:
+      case MetaType::META_PEDESTRIAN:
         return ObjectType::PEDESTRIAN;
       default: {
         AERROR << "Undefined ObjectType output by CNNSeg model.";
@@ -345,13 +345,14 @@ class Cluster2D {
     std::vector<float> object_type_probs(
         static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0.0);
     object_type_probs[static_cast<int>(ObjectType::UNKNOWN)] =
-        meta_type_probs[META_UNKNOWN];
+        meta_type_probs[static_cast<int>(MetaType::META_UNKNOWN)];
     object_type_probs[static_cast<int>(ObjectType::VEHICLE)] =
-        meta_type_probs[META_SMALLMOT] + meta_type_probs[META_BIGMOT];
+        meta_type_probs[static_cast<int>(MetaType::META_SMALLMOT)] +
+        meta_type_probs[static_cast<int>(MetaType::META_BIGMOT)];
     object_type_probs[static_cast<int>(ObjectType::BICYCLE)] =
-        meta_type_probs[META_NONMOT];
+        meta_type_probs[static_cast<int>(MetaType::META_NONMOT)];
     object_type_probs[static_cast<int>(ObjectType::PEDESTRIAN)] =
-        meta_type_probs[META_PEDESTRIAN];
+        meta_type_probs[static_cast<int>(MetaType::META_PEDESTRIAN)];
     return object_type_probs;
   }
 

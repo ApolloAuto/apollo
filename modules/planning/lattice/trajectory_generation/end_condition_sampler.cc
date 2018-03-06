@@ -36,7 +36,6 @@ EndConditionSampler::EndConditionSampler(
     std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
     std::shared_ptr<PredictionQuerier> ptr_prediction_querier)
     : init_s_(init_s), init_d_(init_d),
-      s_dot_limit_(s_dot_limit),
       feasible_region_(init_s, s_dot_limit),
       ptr_path_time_graph_(ptr_path_time_graph),
       ptr_prediction_querier_(ptr_prediction_querier) {
@@ -46,7 +45,7 @@ std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLatEndConditions() const {
   std::vector<std::pair<std::array<double, 3>, double>> end_d_conditions;
   std::array<double, 5> end_d_candidates = {0.0, -0.25, 0.25, -0.5, 0.5};
-  std::array<double, 4> end_s_candidates = {10.0, 20.0, 30.0, 40.0};
+  std::array<double, 4> end_s_candidates = {10.0, 20.0, 40.0, 80.0};
 
   for (const auto& s : end_s_candidates) {
     for (const auto& d : end_d_candidates) {

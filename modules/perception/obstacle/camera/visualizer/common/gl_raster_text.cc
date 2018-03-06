@@ -18,6 +18,7 @@
 
 namespace apollo {
 namespace perception {
+namespace lowcostvisualizer {
 
 GLubyte GLRasterText::_s_space_bitmap[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -330,12 +331,14 @@ void GLRasterText::init() {
   make_raster_font();
 }
 
-void GLRasterText::print_string(const char* s) {
+void GLRasterText::print_string(const char *s) {
   glPushAttrib(GL_LIST_BIT);
   glListBase(_s_font_offset);
-  glCallLists(strlen(s), GL_UNSIGNED_BYTE, reinterpret_cast<const GLubyte*>(s));
+  glCallLists(strlen(s), GL_UNSIGNED_BYTE,
+              reinterpret_cast<const GLubyte *>(s));
   glPopAttrib();
 }
 
+}  // namespace lowcostvisualizer
 }  // namespace perception
 }  // namespace apollo

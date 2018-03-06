@@ -31,7 +31,7 @@
 #include "modules/planning/tasks/traffic_decider/keep_clear.h"
 #include "modules/planning/tasks/traffic_decider/reference_line_end.h"
 #include "modules/planning/tasks/traffic_decider/rerouting.h"
-#include "modules/planning/tasks/traffic_decider/sidepass_vehicle.h"
+#include "modules/planning/tasks/traffic_decider/side_pass_vehicle.h"
 #include "modules/planning/tasks/traffic_decider/signal_light.h"
 #include "modules/planning/tasks/traffic_decider/stop_sign.h"
 
@@ -80,9 +80,9 @@ void TrafficDecider::RegisterRules() {
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new StopSign(config);
                          });
-  rule_factory_.Register(RuleConfig::SIDEPASS_VEHICLE,
+  rule_factory_.Register(RuleConfig::SIDE_PASS_VEHICLE,
                          [](const RuleConfig &config) -> TrafficRule * {
-                           return new SidepassVehicle(config);
+                           return new SidePassVehicle(config);
                          });
   rule_factory_.Register(RuleConfig::KEEP_CLEAR,
                          [](const RuleConfig &config) -> TrafficRule * {

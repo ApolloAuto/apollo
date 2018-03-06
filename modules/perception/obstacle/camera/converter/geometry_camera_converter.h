@@ -76,7 +76,7 @@ class GeometryCameraConverter : public BaseCameraConverter {
   Eigen::Matrix<float, 3, 1> MakeUnit(
       const Eigen::Matrix<float, 3, 1> &v) const;
 
-  Camera<float> camera_model_;
+  CameraModel<float> camera_model_;
   std::vector<Eigen::Vector3f> corners_;
   static const int kMaxDistanceSearchDepth_ = 20;
   static const int kMaxCenterDirectionSearchDepth_ = 10;

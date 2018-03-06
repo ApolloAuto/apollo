@@ -39,11 +39,10 @@ Creeper::Creeper() {}
 
 bool Creeper::Run(Frame* frame, ReferenceLineInfo* reference_line_info) {
   if (!in_use_) {
-    AINFO << "Creeper is not in use, skipped.";
+    ADEBUG << "Creeper is not in use, skipped.";
     return true;
   }
 
-  AINFO << "Creeper is running.";
   // find next overlap
   auto* next_overlap =
       reference_line_info->reference_line().map_path().NextLaneOverlap(

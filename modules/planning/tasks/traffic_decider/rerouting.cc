@@ -24,18 +24,18 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/dropbox.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
-using apollo::common::util::Dropbox;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
+using apollo::planning::util::GetPlanningStatus;
 
 Rerouting::Rerouting(const RuleConfig& config) : TrafficRule(config) {}
 
@@ -84,13 +84,13 @@ bool Rerouting::ChangeLaneFailRerouting() {
     return true;
   }
   // 6. Check if we have done rerouting before
+  auto* rerouting = GetPlanningStatus()->mutable_rerouting();
   const std::string last_rerouting_time_key =
       "kLastReroutingTime_" + segments.Id();
-  double* last_routing_time =
-      common::util::Dropbox<double>::Open()->Get(last_rerouting_time_key);
   double current_time = Clock::NowInSeconds();
-  if (last_routing_time != nullptr &&
-      current_time - *last_routing_time < FLAGS_rerouting_cooldown_time) {
+  if (rerouting->has_last_rerouting_time() &&
+      (current_time - rerouting->last_rerouting_time() <
+       FLAGS_rerouting_cooldown_time)) {
     ADEBUG << "Skip rerouting and wait for previous rerouting result";
     return true;
   }
@@ -100,8 +100,7 @@ bool Rerouting::ChangeLaneFailRerouting() {
   }
 
   // store last rerouting time.
-  common::util::Dropbox<double>::Open()->Set(last_rerouting_time_key,
-                                             current_time);
+  rerouting->set_last_rerouting_time(current_time);
   return true;
 }
 

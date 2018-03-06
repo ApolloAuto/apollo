@@ -77,11 +77,10 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
            << "] will draw a lane sequence trajectory [" << ToString(sequence)
            << "] with probability [" << sequence.probability() << "].";
 
-    std::string curr_lane_id = sequence.lane_segment(0).lane_id();
     std::vector<TrajectoryPoint> points;
     DrawLaneSequenceTrajectoryPoints(
-        feature, curr_lane_id, obstacle->kf_lane_tracker(curr_lane_id),
-        sequence, FLAGS_prediction_duration, FLAGS_prediction_period, &points);
+        *obstacle, sequence, FLAGS_prediction_duration,
+        FLAGS_prediction_period, &points);
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());
@@ -93,32 +92,65 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
 }
 
 void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
-    const Feature& feature, const std::string& lane_id,
-    const KalmanFilter<double, 4, 2, 0>& kf, const LaneSequence& sequence,
-    double total_time, double period, std::vector<TrajectoryPoint>* points) {
-  Eigen::Matrix<double, 4, 1> state(kf.GetStateEstimate());
+    const Obstacle& obstacle, const LaneSequence& lane_sequence,
+    const double total_time, const double period,
+    std::vector<TrajectoryPoint>* points) {
+  const Feature& feature = obstacle.latest_feature();
+  if (!feature.has_position() || !feature.has_velocity() ||
+      !feature.position().has_x() || !feature.position().has_y()) {
+    AERROR << "Obstacle [" << obstacle.id()
+           << " is missing position or velocity";
+    return;
+  }
 
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
+  double speed = feature.speed();
+
+  int lane_segment_index = 0;
+  std::string lane_id =
+      lane_sequence.lane_segment(lane_segment_index).lane_id();
   std::shared_ptr<const LaneInfo> lane_info = PredictionMap::LaneById(lane_id);
   double lane_s = 0.0;
   double lane_l = 0.0;
-  if (PredictionMap::GetProjection(position, lane_info, &lane_s, &lane_l)) {
-    state(0, 0) = lane_s;
-    state(1, 0) = lane_l;
-    state(2, 0) = feature.speed();
-    state(3, 0) = feature.acc();
+  if (!PredictionMap::GetProjection(position, lane_info, &lane_s, &lane_l)) {
+    AERROR << "Failed in getting lane s and lane l";
+    return;
   }
-  if (FLAGS_enable_lane_sequence_acc && sequence.has_acceleration()) {
-    state(3, 0) = sequence.acceleration();
-  }
-  Eigen::Matrix<double, 4, 4> transition(kf.GetTransitionMatrix());
-  transition(0, 2) = period;
-  transition(0, 3) = 0.5 * period * period;
-  transition(2, 3) = period;
+  size_t total_num = static_cast<size_t>(total_time / period);
+  for (size_t i = 0; i < total_num; ++i) {
+    double relative_time = static_cast<double>(i) * period;
+    Eigen::Vector2d point;
+    double theta = M_PI;
+    if (!PredictionMap::SmoothPointFromLane(lane_id, lane_s, lane_l, &point,
+                                            &theta)) {
+      AERROR << "Unable to get smooth point from lane [" << lane_id
+             << "] with s [" << lane_s << "] and l [" << lane_l << "]";
+      break;
+    }
+    TrajectoryPoint trajectory_point;
+    PathPoint path_point;
+    path_point.set_x(point.x());
+    path_point.set_y(point.y());
+    path_point.set_z(0.0);
+    path_point.set_theta(theta);
+    path_point.set_lane_id(lane_id);
+    trajectory_point.mutable_path_point()->CopyFrom(path_point);
+    trajectory_point.set_v(speed);
+    trajectory_point.set_a(0.0);
+    trajectory_point.set_relative_time(relative_time);
+    points->emplace_back(std::move(trajectory_point));
 
-  size_t num = static_cast<size_t>(total_time / period);
-  ::apollo::prediction::predictor_util::GenerateLaneSequenceTrajectoryPoints(
-      &state, &transition, sequence, num, period, points);
+    lane_s += speed * period;
+
+    while (lane_s > PredictionMap::LaneById(lane_id)->total_length() &&
+           lane_segment_index + 1 < lane_sequence.lane_segment_size()) {
+      lane_segment_index += 1;
+      lane_s = lane_s - PredictionMap::LaneById(lane_id)->total_length();
+      lane_id = lane_sequence.lane_segment(lane_segment_index).lane_id();
+    }
+
+    lane_l *= FLAGS_go_approach_rate;
+  }
 }
 
 }  // namespace prediction

@@ -79,12 +79,6 @@ class Prediction : public PredictionInterface {
  private:
   common::Status OnError(const std::string &error_msg);
 
-  void PredictOnHDMap(
-      const perception::PerceptionObstacles &perception_obstacles);
-
-  void PredictOnNavigation(
-      const perception::PerceptionObstacles &perception_obstacles);
-
   void OnLocalization(const localization::LocalizationEstimate &localization);
 
   void OnPlanning(const planning::ADCTrajectory &adc_trajectory);

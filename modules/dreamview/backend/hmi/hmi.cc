@@ -45,11 +45,6 @@ DEFINE_string(map_data_path, "/apollo/modules/map/data", "Path to map data.");
 DEFINE_string(vehicle_data_path, "/apollo/modules/calibration/data",
               "Path to vehicle data.");
 
-DEFINE_string(ota_service_url, "http://180.76.145.202:5000/query",
-              "OTA service url. [Attention! It's still in experiment.]");
-DEFINE_string(ota_vehicle_info_file, "modules/tools/ota/vehicle_info.pb.txt",
-              "Vehicle info to request OTA.");
-
 DEFINE_double(system_status_lifetime_seconds, 30,
               "Lifetime of a valid SystemStatus message.");
 
@@ -434,8 +429,6 @@ void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
 
   CHECK(VehicleManager::instance()->UseVehicle(*vehicle));
   RunModeCommand("stop");
-  // Check available updates for current vehicle.
-  // CheckOTAUpdates();
   BroadcastHMIStatus();
   // Broadcast new VehicleParam.
   SendVehicleParam();
@@ -455,29 +448,6 @@ void HMI::ChangeModeTo(const std::string &mode_name) {
 
   RunModeCommand(previous_mode, "stop");
   BroadcastHMIStatus();
-}
-
-void HMI::CheckOTAUpdates() {
-  VehicleInfo vehicle_info;
-  if (!GetProtoFromASCIIFile(FLAGS_ota_vehicle_info_file, &vehicle_info)) {
-    return;
-  }
-
-  Json ota_request;
-  ota_request["car_type"] = apollo::common::util::StrCat(
-      VehicleInfo::Brand_Name(vehicle_info.brand()), ".",
-      VehicleInfo::Model_Name(vehicle_info.model()));
-  ota_request["vin"] = vehicle_info.license().vin();
-  ota_request["tag"] = apollo::data::InfoCollector::GetDockerImage();
-
-  Json ota_response;
-  const auto status = apollo::common::util::HttpClient::Post(
-      FLAGS_ota_service_url, ota_request, &ota_response);
-  if (status.ok()) {
-    CHECK(JsonUtil::GetStringFromJson(ota_response, "tag",
-                                      status_.mutable_ota_update()));
-    AINFO << "Found available OTA update: " << status_.ota_update();
-  }
 }
 
 void HMI::SubmitDriveEvent(const uint64_t event_time_ms,

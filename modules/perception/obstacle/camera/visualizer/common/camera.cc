@@ -15,14 +15,14 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/camera/visualizer/common/camera.h"
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
 namespace apollo {
 namespace perception {
+namespace lowcostvisualizer {
 
 // using namespace std;
-
 Camera::Camera() : _field_of_view(M_PI / 4.0f) {
   set_frame(new Frame());
 
@@ -55,7 +55,7 @@ Camera::~Camera() {
   delete _frame;
 }
 
-Camera::Camera(const Camera& camera) {
+Camera::Camera(const Camera &camera) {
   set_frame(new Frame());
 
   for (int j = 0; j < 16; ++j) {
@@ -66,7 +66,7 @@ Camera::Camera(const Camera& camera) {
   (*this) = camera;
 }
 
-Camera& Camera::operator=(const Camera& camera) {
+Camera &Camera::operator=(const Camera &camera) {
   setscreen_widthandheight(camera.screen_width(), camera.screen_height());
   setfield_of_view(camera.field_of_view());
   setscene_radius(camera.scene_radius());
@@ -109,14 +109,14 @@ double Camera::znear() const {
       znear_coefficient() * zclipping_coefficient() * scene_radius();
 
   if (z < zMin) {
-      switch (type()) {
-          case Camera::PERSPECTIVE:
-              z = zMin;
-              break;
-          case Camera::ORTHOGRAPHIC:
-              z = 0.0;
-              break;
-      }
+    switch (type()) {
+      case Camera::PERSPECTIVE:
+        z = zMin;
+        break;
+      case Camera::ORTHOGRAPHIC:
+        z = 0.0;
+        break;
+    }
   }
   return z;
 }
@@ -140,7 +140,7 @@ void Camera::set_type(Type type) {
   _type = type;
 }
 
-void Camera::set_frame(Frame* const mcf) {
+void Camera::set_frame(Frame *const mcf) {
   if (!mcf) {
     return;
   }
@@ -155,8 +155,8 @@ double Camera::distance_to_scene_center() const {
   return fabs((frame()->coordinates_of(scene_center()))(2));
 }
 
-void Camera::get_ortho_width_height(GLdouble* halfWidth,
-                                    GLdouble* halfHeight) const {
+void Camera::get_ortho_width_height(GLdouble *halfWidth,
+                                    GLdouble *halfHeight) const {
   const double dist =
       _ortho_coef * fabs(cameracoordinates_of(revolve_around_point())(2));
   // #CONNECTION# fit_screen_region
@@ -327,8 +327,8 @@ void Camera::get_model_view_matrix(GLdouble m[16]) const {
 
 /*! Fills \p m with the product of the ModelView and Projection matrices.
 
-    Calls get_model_view_matrix() and get_projection_matrix() and then fills \p
-   m with the product of these two matrices. */
+Calls get_model_view_matrix() and get_projection_matrix() and then fills \p
+m with the product of these two matrices. */
 void Camera::get_model_view_projection_matrix(GLdouble m[16]) const {
   GLdouble mv[16];
   GLdouble proj[16];
@@ -358,27 +358,27 @@ void Camera::setscene_radius(double radius) {
 }
 
 /*! Similar to setscene_radius() and setscene_center(), but the scene limits are
-   defined by a (world
-    axis aligned) bounding box. */
-void Camera::set_scene_bounding_box(const Eigen::Vector3d& min,
-                                    const Eigen::Vector3d& max) {
+defined by a (world
+axis aligned) bounding box. */
+void Camera::set_scene_bounding_box(const Eigen::Vector3d &min,
+                                    const Eigen::Vector3d &max) {
   setscene_center((min + max) / 2.0);
   setscene_radius(0.5 * (max - min).norm());
 }
 
-void Camera::setscene_center(const Eigen::Vector3d& center) {
+void Camera::setscene_center(const Eigen::Vector3d &center) {
   _scene_center = center;
   set_revolve_around_point(scene_center());
 }
 
 /*! setscene_center() to the result of point_under_pixel(\p pixel).
 
-    Returns \c true if a point_under_pixel() was found and scene_center() was
-   actually changed.
+Returns \c true if a point_under_pixel() was found and scene_center() was
+actually changed.
 
-    See also set_revolve_around_point_from_pixel(). See the point_under_pixel()
-   documentation. */
-bool Camera::setscene_center_from_pixel(const Eigen::Vector2i& pixel) {
+See also set_revolve_around_point_from_pixel(). See the point_under_pixel()
+documentation. */
+bool Camera::setscene_center_from_pixel(const Eigen::Vector2i &pixel) {
   bool found = false;
   Eigen::Vector3d point = point_under_pixel(pixel, &found);
   if (found) {
@@ -388,8 +388,8 @@ bool Camera::setscene_center_from_pixel(const Eigen::Vector2i& pixel) {
 }
 
 /*! Changes the revolve_around_point() to \p rap (defined in the world
- * coordinate system). */
-void Camera::set_revolve_around_point(const Eigen::Vector3d& rap) {
+* coordinate system). */
+void Camera::set_revolve_around_point(const Eigen::Vector3d &rap) {
   const double prevDist = fabs(cameracoordinates_of(revolve_around_point())(2));
 
   _revolve_around_point = rap;
@@ -404,7 +404,7 @@ void Camera::set_revolve_around_point(const Eigen::Vector3d& rap) {
   }
 }
 
-bool Camera::set_revolve_around_point_from_pixel(const Eigen::Vector2i& pixel) {
+bool Camera::set_revolve_around_point_from_pixel(const Eigen::Vector2i &pixel) {
   bool found = false;
   Eigen::Vector3d point = point_under_pixel(pixel, &found);
   if (found) {
@@ -413,7 +413,7 @@ bool Camera::set_revolve_around_point_from_pixel(const Eigen::Vector2i& pixel) {
   return found;
 }
 
-double Camera::pixelgl_ratio(const Eigen::Vector3d& position) const {
+double Camera::pixelgl_ratio(const Eigen::Vector3d &position) const {
   switch (type()) {
     case Camera::PERSPECTIVE:
       return 2.0 * fabs((frame()->coordinates_of(position))(2)) *
@@ -437,8 +437,8 @@ void Camera::setfov_to_fit_scene() {
   }
 }
 
-Eigen::Vector3d Camera::point_under_pixel(const Eigen::Vector2i& pixel,
-                                          bool* found) const {
+Eigen::Vector3d Camera::point_under_pixel(const Eigen::Vector2i &pixel,
+                                          bool *found) const {
   double depth = 0.0;
   // Qt uses upper corner for its origin while GL uses the lower corner.
   glReadPixels(pixel(0), screen_height() - 1 - pixel(1), 1, 1,
@@ -457,11 +457,11 @@ void Camera::center_scene() {
   frame()->project_on_line(scene_center(), view_direction());
 }
 
-void Camera::look_at(const Eigen::Vector3d& target) {
+void Camera::look_at(const Eigen::Vector3d &target) {
   setview_direction(target - position());
 }
 
-void Camera::fit_sphere(const Eigen::Vector3d& center, double radius) {
+void Camera::fit_sphere(const Eigen::Vector3d &center, double radius) {
   double distance = 0.0f;
   switch (type()) {
     case Camera::PERSPECTIVE: {
@@ -480,13 +480,12 @@ void Camera::fit_sphere(const Eigen::Vector3d& center, double radius) {
   frame()->set_position(newPos);
 }
 
-void Camera::fit_bounding_box(const Eigen::Vector3d& min,
-                              const Eigen::Vector3d& max) {
+void Camera::fit_bounding_box(const Eigen::Vector3d &min,
+                              const Eigen::Vector3d &max) {
   double diameter = std::max(fabs(max[1] - min[1]), fabs(max[0] - min[0]));
   diameter = std::max(fabs(max[2] - min[2]), diameter);
   fit_sphere(0.5 * (min + max), 0.5 * diameter);
 }
-
 
 /* Pan the camera */
 void Camera::pan_by_mouse(int deltaX, int deltaY) {
@@ -569,7 +568,7 @@ void Camera::rotate(Eigen::Vector3d i_axis, double i_angle) {
       revolve_around_point());
 }
 
-void Camera::setup_vector(const Eigen::Vector3d& up, bool noMove) {
+void Camera::setup_vector(const Eigen::Vector3d &up, bool noMove) {
   Eigen::Quaterniond q = Eigen::Quaterniond().FromTwoVectors(
       Eigen::Vector3d(0.0, 1.0, 0.0), frame()->transform_of(up));
 
@@ -591,13 +590,13 @@ void Camera::set_orientation(double theta, double phi) {
   set_orientation(rot1 * rot2);
 }
 
-void Camera::set_orientation(const Eigen::Quaterniond& q) {
+void Camera::set_orientation(const Eigen::Quaterniond &q) {
   frame()->set_orientation(q);
 }
 
-static void setFromRotatedBasis(Eigen::Quaterniond* q, const Eigen::Vector3d& X,
-                                const Eigen::Vector3d& Y,
-                                const Eigen::Vector3d& Z) {
+static void setFromRotatedBasis(Eigen::Quaterniond *q, const Eigen::Vector3d &X,
+                                const Eigen::Vector3d &Y,
+                                const Eigen::Vector3d &Z) {
   Eigen::Matrix3d m;
   double normX = X.norm();
   double normY = Y.norm();
@@ -610,7 +609,7 @@ static void setFromRotatedBasis(Eigen::Quaterniond* q, const Eigen::Vector3d& X,
   *q = Eigen::Quaterniond(m);
 }
 
-void Camera::setview_direction(const Eigen::Vector3d& direction) {
+void Camera::setview_direction(const Eigen::Vector3d &direction) {
   if (direction.squaredNorm() < 1E-10) {
     return;
   }
@@ -638,7 +637,7 @@ static inline unsigned int ind(unsigned int i, unsigned int j) {
   return (i * 4 + j);
 }
 
-void Camera::set_from_model_view_matrix(const GLdouble* const modelViewMatrix) {
+void Camera::set_from_model_view_matrix(const GLdouble *const modelViewMatrix) {
   // Get upper left (rotation) matrix
   Eigen::Matrix3d upperLeft;
   for (int i = 0; i < 3; ++i) {
@@ -765,8 +764,8 @@ void Camera::get_viewport(GLint viewport[4]) const {
   viewport[3] = -screen_height();
 }
 
-Eigen::Vector3d Camera::projectedcoordinates_of(const Eigen::Vector3d& src,
-                                                const Frame* frame) const {
+Eigen::Vector3d Camera::projectedcoordinates_of(const Eigen::Vector3d &src,
+                                                const Frame *frame) const {
   GLdouble x = 0.0;
   GLdouble y = 0.0;
   GLdouble z = 0.0;
@@ -778,14 +777,14 @@ Eigen::Vector3d Camera::projectedcoordinates_of(const Eigen::Vector3d& src,
     gluProject(tmp(0), tmp(1), tmp(2), _model_view_matrix, _projection_matrix,
                viewport, &x, &y, &z);
   } else {
-      gluProject(src(0), src(1), src(2), _model_view_matrix, _projection_matrix,
-                 viewport, &x, &y, &z);
+    gluProject(src(0), src(1), src(2), _model_view_matrix, _projection_matrix,
+               viewport, &x, &y, &z);
   }
   return Eigen::Vector3d(x, y, z);
 }
 
-Eigen::Vector3d Camera::unprojectedcoordinates_of(const Eigen::Vector3d& src,
-                                                  const Frame* frame) const {
+Eigen::Vector3d Camera::unprojectedcoordinates_of(const Eigen::Vector3d &src,
+                                                  const Frame *frame) const {
   GLdouble x = 0.0;
   GLdouble y = 0.0;
   GLdouble z = 0.0;
@@ -801,7 +800,7 @@ Eigen::Vector3d Camera::unprojectedcoordinates_of(const Eigen::Vector3d& src,
 }
 
 void Camera::get_projectedcoordinates_of(const double src[3], double res[3],
-                                         const Frame* frame) const {
+                                         const Frame *frame) const {
   Eigen::Vector3d r =
       projectedcoordinates_of(Eigen::Vector3d(src[0], src[1], src[2]), frame);
   for (int i = 0; i < 3; ++i) {
@@ -810,7 +809,7 @@ void Camera::get_projectedcoordinates_of(const double src[3], double res[3],
 }
 
 void Camera::get_unprojectedcoordinates_of(const double src[3], double res[3],
-                                           const Frame* frame) const {
+                                           const Frame *frame) const {
   Eigen::Vector3d r =
       unprojectedcoordinates_of(Eigen::Vector3d(src[0], src[1], src[2]), frame);
   for (int i = 0; i < 3; ++i) {
@@ -1039,5 +1038,6 @@ Eigen::Quaterniond Camera::deformed_ball_quaternion(int preX, int preY, int x,
   return Eigen::Quaterniond(angleAxis);
 }
 
+}  // namespace lowcostvisualizer
 }  // namespace perception
 }  // namespace apollo
