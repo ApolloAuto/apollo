@@ -18,9 +18,10 @@
 
 #include <map>
 #include <vector>
+#include <algorithm>
 
-#include <boost/iterator/counting_iterator.hpp>
-#include <opencv2/opencv.hpp>
+#include "boost/iterator/counting_iterator.hpp"
+#include "opencv2/opencv.hpp"
 
 namespace apollo {
 namespace perception {
