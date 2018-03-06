@@ -18,8 +18,8 @@
  * @file ultrasonic_radar_message_manager.h
  * @brief The class of UltrasonicRadarMessageManager
  */
-#ifndef MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_MESSAGE_MANAGER_H_
-#define MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_MESSAGE_MANAGER_H_
+#ifndef MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_MESSAGE_MANAGER_H_
+#define MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_MESSAGE_MANAGER_H_
 
 #include <memory>
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
@@ -45,7 +45,7 @@ using apollo::drivers::canbus::SenderMessage;
 
 class UltrasonicRadarMessageManager : public MessageManager<Ultrasonic> {
  public:
-  UltrasonicRadarMessageManager(int entrance_num);
+  explicit UltrasonicRadarMessageManager(int entrance_num);
   virtual ~UltrasonicRadarMessageManager() {}
   void Parse(const uint32_t message_id, const uint8_t *data, int32_t length);
   void set_can_client(std::shared_ptr<CanClient> can_client);
@@ -59,4 +59,4 @@ class UltrasonicRadarMessageManager : public MessageManager<Ultrasonic> {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_ULTRASONIC_RADAR_MESSAGE_MANAGER_H_
+#endif  // MODULES_DRIVERS_RADAR_ULTRASONIC_RADAR_MESSAGE_MANAGER_H_
