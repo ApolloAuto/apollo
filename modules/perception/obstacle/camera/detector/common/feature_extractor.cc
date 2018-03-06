@@ -20,7 +20,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fstream>
-#include <iostream>
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/common/util.h"

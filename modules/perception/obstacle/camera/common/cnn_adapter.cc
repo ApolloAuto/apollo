@@ -21,8 +21,8 @@
 namespace apollo {
 namespace perception {
 namespace obstacle {
-/////////////////////////////CNNCaffe
-/// BEGIN////////////////////////////////////////////////
+
+// CNNCaffe
 bool CNNCaffe::init(const std::vector<std::string> &input_names,
                     const std::vector<std::string> &output_names,
                     const std::string &proto_file,
@@ -50,78 +50,10 @@ boost::shared_ptr<caffe::Blob<float>> CNNCaffe::get_blob_by_name(
     const std::string &name) {
   return net_->blob_by_name(name);
 }
+// CNNCaffe END
 
-/////////////////////////////CNNCaffe
-/// END////////////////////////////////////////////////
-
-/////////////////////////////CNNAnakin
-/// BEGIN////////////////////////////////////////////////
-bool CNNAnakin::init(const std::vector<std::string> &input_names,
-                     const std::vector<std::string> &output_names,
-                     const std::string &proto_file,
-                     const std::string &weight_file, int gpu_id,
-                     const std::string &model_root) {
-  input_names_ = input_names;
-  output_names_ = output_names;
-  // init GPU
-  AINFO << "Creating network from " << weight_file;
-  if (gpu_id >= 0) {
-    inference_.SetDevice(gpu_id);
-    inference_.setMode(anakin::ModeType::mGPU);
-  } else {
-    AINFO << "must use gpu mode";
-    return false;
-  }
-  AINFO << "Using device: " << gpu_id;
-
-  if (!inference_.initNet("", weight_file.c_str())) {
-    AERROR << "network init error. ";
-    return false;
-  }
-  AINFO << "Network created!";
-  inference_.makeshape();
-  for (auto name : input_names) {
-    create_blob(name);
-  }
-  for (auto name : output_names) {
-    create_blob(name);
-  }
-  gpu_id_ = gpu_id;
-  AINFO << "CNNAnakin init done!";
-  return true;
-}
-
-boost::shared_ptr<caffe::Blob<float>> CNNAnakin::get_blob_by_name(
-    const std::string &name) {
-  auto iter = blobs_.find(name);
-  if (iter == blobs_.end()) {
-    return nullptr;
-  }
-
-  return iter->second;
-}
-
-void CNNAnakin::forward() {
-  inference_.SetDevice(gpu_id_);
-  const std::vector<anakin::Tensor<float> *> &input_tensors =
-      inference_.getInputTensors();
-  const std::vector<anakin::Tensor<float> *> &output_tensors =
-      inference_.getOutputTensors();
-  for (const auto &name : input_names_) {
-    sync_blob(name, false);
-  }
-  inference_.execute();
-  cudaDeviceSynchronize();
-  for (const auto &name : output_names_) {
-    sync_blob(name, true);
-  }
-}
-
-/////////////////////////////CNNAnakin
-/// END////////////////////////////////////////////////
-
-/////////////////////////////CNNTensorRT
-/// BEGIN////////////////////////////////////////////////
+/*
+// CNNTensorRT
 bool CNNTensorRT::init(const std::vector<std::string> &input_names,
                        const std::vector<std::string> &output_names,
                        const std::string &proto_file,
@@ -203,6 +135,9 @@ boost::shared_ptr<caffe::Blob<float>> CNNTensorRT::get_blob_by_name(
   }
   return iter->second;
 }
+// CNNTensorRT END
+*/
+
 }  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
