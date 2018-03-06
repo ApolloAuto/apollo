@@ -22,13 +22,24 @@ namespace apollo {
 namespace perception {
 
 bool GeometryCameraConverter::Init() {
-  // ConfigManager *config_manager = ConfigManager::instance();
+  ConfigManager *config_manager = ConfigManager::instance();
 
-  // if (!load_camera_intrinsics(FLAGS_onsemi_obstacle_intrinsics)) {
-  //   XLOG(ERROR) << "camera intrinsics not found: "
-  //               << FLAGS_onsemi_obstacle_intrinsics;
-  //   return false;
-  // }
+  const ModelConfig* model_config = nullptr;
+  if (!config_manager->GetModelConfig(Name(), &model_config)) {
+    AERROR << "Model config: " << Name() << " not found";
+    return false;
+  }
+
+  std::string intrinsic_file_path = "";
+  if (!model_config->GetValue("camera_intrinsic_file", &intrinsic_file_path)) {
+    AERROR << "Failed to get camera intrinsics file path: " << Name();
+    return false;
+  }
+
+  if (!LoadCameraIntrinsics(intrinsic_file_path)) {
+    AERROR << "Failed to get camera intrinsics: " << intrinsic_file_path;
+    return false;
+  }
 
   return true;
 }
@@ -70,21 +81,6 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
                                        camera_ray.z() * camera_ray.z());
     obj->center = Eigen::Vector3f(
         camera_ray.x() * scale, camera_ray.y() * scale, camera_ray.z() * scale);
-
-    if (debug_) {
-      //  obj->pts8.clear();
-      //  for (size_t i = 0; i < corners_.size(); ++i) {
-      //      Eigen::Vector2d point_2d =
-      //      camera_model_.project(corners_[i] + obj->center);
-      //      obj->pts8.push_back(static_cast<float>(point_2d.x()));
-      //      obj->pts8.push_back(static_cast<float>(point_2d.y()));
-      //  }
-      //
-      //  // 3D center projection
-      //  Eigen::Vector2d point_2d = camera_model_.project(obj->center);
-      //  obj->pts8.push_back(static_cast<float>(point_2d.x()));
-      //  obj->pts8.push_back(static_cast<float>(point_2d.y()));
-    }
   }
 
   return true;

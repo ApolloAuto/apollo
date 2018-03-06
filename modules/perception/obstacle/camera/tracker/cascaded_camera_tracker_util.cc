@@ -56,7 +56,7 @@ void GetDetectedFromVO(const cv::Size &sz, const float &scale,
     Detected obj;
     obj.detect_id_ = i;
     obj.box_ = cv::Rect(x, y, width, height);
-    obj.features_ = obj_ptr->dl_roi_feature;
+    obj.features_ = obj_ptr->object_feature;
     detected->emplace_back(obj);
     ++i;
   }

@@ -49,7 +49,7 @@ struct alignas(16) VisualObject {
   std::vector<float> type_probs;
 
   // ROI pooling feature from layers of deep learning detection model
-  std::vector<float> dl_roi_feature;
+  std::vector<float> object_feature;
 
   // [meter] physical size of 3D oriented bounding box
   // length is the size in the main direction
@@ -84,8 +84,6 @@ struct alignas(16) VisualObject {
   float track_age = 0.0f;
   // [second] the last observed timestamp
   float last_track_timestamp = 0.0f;
-
-  std::vector<float> object_feature;
 };
 
 typedef std::shared_ptr<VisualObject> VisualObjectPtr;
