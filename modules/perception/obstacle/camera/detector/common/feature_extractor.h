@@ -16,18 +16,20 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_FEATURE_EXTRACTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_FEATURE_EXTRACTOR_H_
 
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/gzip_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/text_format.h>
-#include <caffe/caffe.hpp>
 #include <vector>
+
+#include "caffe/caffe.hpp"
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/gzip_stream.h"
+#include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "google/protobuf/text_format.h"
+
+#include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
 
 #include "modules/common/log.h"
 #include "modules/perception/lib/base/noncopyable.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
-#include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
 
 namespace apollo {
 namespace perception {
