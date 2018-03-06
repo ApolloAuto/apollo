@@ -33,4 +33,5 @@ DECLARE_double(sensor_freq);
 
 // System gflags
 DECLARE_string(sensor_node_name);
+
 #endif

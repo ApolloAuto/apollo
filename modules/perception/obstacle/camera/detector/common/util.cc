@@ -18,7 +18,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 SyncedMemory::~SyncedMemory() {
   if (cpu_ptr_ && own_cpu_data_) {
@@ -145,6 +144,5 @@ void SyncedMemory::async_gpu_push(const cudaStream_t &stream) {
   // Assume caller will synchronize on the stream before use
   head_ = SYNCED;
 }
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo

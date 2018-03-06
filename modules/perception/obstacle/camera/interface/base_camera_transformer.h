@@ -16,3 +16,46 @@
 
 // The base class of transforming camera space objects into other defined
 // 3D spaces, like world space or ego-car space
+
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_TRANSFORMER_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_TRANSFORMER_H_
+
+#include <string>
+#include <vector>
+
+#include "Eigen/Core"
+#include "opencv2/opencv.hpp"
+
+#include "modules/common/macro.h"
+#include "modules/perception/lib/base/registerer.h"
+#include "modules/perception/obstacle/camera/common/visual_object.h"
+
+namespace apollo {
+namespace perception {
+
+class BaseCameraTransformer {
+ public:
+  BaseCameraTransformer() {}
+  virtual ~BaseCameraTransformer() {}
+
+  virtual bool Init() = 0;
+
+  // @brief: Transform 3D position of objects into targeted space
+  // @param [in/out] objects : object lists with 3D positions in camera space,
+  // which get transformed into targeted 3D space
+  virtual bool Transform(std::vector<VisualObjectPtr>* objects) = 0;
+
+  virtual std::string Name() const = 0;
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(BaseCameraTransformer);
+};
+
+REGISTER_REGISTERER(BaseCameraTransformer);
+#define REGISTER_CAMERA_TRANSFORMER(name) \
+  REGISTER_CLASS(BaseCameraTransformer, name)
+
+}  // namespace perception
+}  // namespace apollo
+
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_TRANSFORMER_H_

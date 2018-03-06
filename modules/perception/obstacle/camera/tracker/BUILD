@@ -6,7 +6,7 @@ cc_library(
     name = "base_affinity",
     srcs = [],
     hdrs = ["base_affinity_tracker.h"],
-    deps = ["@opencv2//:core"]
+    deps = ["@opencv2//:core"],
 )
 
 cc_library(
@@ -14,33 +14,33 @@ cc_library(
     srcs = ["cascaded_camera_tracker_util.cc"],
     hdrs = ["cascaded_camera_tracker_util.h"],
     deps = [
-        "@eigen",
+        ":base_affinity",
         "//modules/common:log",
         "//modules/perception/lib/base",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
-        "//modules/perception/obstacle/common:perception_obstacle_common",
-        "//modules/perception/obstacle/camera/common:common",
-        ":base_affinity"
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/common:util",
+        "//modules/perception/obstacle/common",
+        "@eigen",
     ],
 )
 
 cc_library(
     name = "cascaded",
-    srcs = ["cascaded_camera_tracker.cc",],
-    hdrs = ["cascaded_camera_tracker.h",],
+    srcs = ["cascaded_camera_tracker.cc"],
+    hdrs = ["cascaded_camera_tracker.h"],
     deps = [
-        "@eigen",
+        ":base_affinity",
+        ":util",
         "//modules/common:log",
         "//modules/perception/lib/base",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
-        "//modules/perception/obstacle/common:perception_obstacle_common",
-        "//modules/perception/obstacle/camera/common:common",
-        "//modules/perception/obstacle/camera/interface:interface",
-        "//modules/perception/obstacle/camera/tracker/cs2d:cs2d",
-        "//modules/perception/obstacle/camera/tracker/dlf:dlf",
-        "//modules/perception/obstacle/camera/tracker/kcf:kcf",
-        ":base_affinity",
-        ":util"
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/common",
+        "//modules/perception/obstacle/camera/interface",
+        "//modules/perception/obstacle/camera/tracker/cs2d",
+        "//modules/perception/obstacle/camera/tracker/dlf",
+        "//modules/perception/obstacle/camera/tracker/kcf",
+        "//modules/perception/obstacle/common",
+        "@eigen",
     ],
 )
 

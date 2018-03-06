@@ -7,15 +7,15 @@ cc_library(
     srcs = ["cipv.cc"],
     hdrs = ["cipv.h"],
     deps = [
-        "@eigen//:eigen",
         "//modules/common:log",
-        "//modules/perception/lib/base:base",
-        "//modules/perception/obstacle/camera/common:common",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
-        "//modules/perception/obstacle/common:perception_obstacle_common",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/perception/obstacle/camera/lane_post_process/common:perception_obstacle_camera_lane_post_process_common_type"
-    ]
+        "//modules/perception/lib/base",
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/common",
+        "//modules/perception/obstacle/camera/lane_post_process/common:type",
+        "//modules/perception/obstacle/common",
+        "@eigen",
+    ],
 )
 
 cpplint()

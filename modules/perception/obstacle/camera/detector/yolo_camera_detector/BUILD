@@ -2,16 +2,18 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-# cc_library(
-#     name = "region_output",
-#     srcs = [
-#         "region_output.cc",
-#     ],
-#     hdrs = [
-#         "region_output.h",
-#     ],
-# )
-#
+cc_library(
+    name = "region_output",
+    srcs = ["region_output.cc"],
+    hdrs = ["region_output.h"],
+    deps = [
+        "//modules/common:log",
+        "//modules/perception/obstacle/camera/common:util",
+        "//modules/perception/obstacle/camera/detector/common:util",
+        "@caffe//:lib",
+        "@opencv2//:core",
+    ],
+)
 
 # cc_library(
 #     name = "yolo_camera_detector",
@@ -23,7 +25,7 @@ package(default_visibility = ["//visibility:public"])
 #     ],
 #     deps = [
 #         "//modules/common:log",
-#         "//modules/perception/obstacle/base:perception_obstacle_base",
+#         "//modules/perception/obstacle/base",
 #         "@caffe//:lib",
 #         "@eigen",
 #     ],
@@ -35,7 +37,7 @@ cc_library(
     hdrs = ["util.h"],
     deps = [
         "//modules/common:log",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/base",
         "@caffe//:lib",
         "@eigen",
     ],

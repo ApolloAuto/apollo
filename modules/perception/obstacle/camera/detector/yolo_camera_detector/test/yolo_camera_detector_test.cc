@@ -29,13 +29,12 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 TEST(YoloCameraDetectorTest, yolo_camera_detector_roipooling_test) {
   std::string yolo_config = "./data/models/yolo_camera_detector/config.pt";
 
-  adu::perception::obstacle::yolo::YoloParam yolo_param;
-  adu::perception::obstacle::yolo::YoloParam origin_yolo_param;
+  adu::perception::yolo::YoloParam yolo_param;
+  adu::perception::yolo::YoloParam origin_yolo_param;
 
   {
     BaseCameraDetector *camera_detector =
@@ -244,8 +243,8 @@ TEST(YoloCameraDetectorTest, nms_test) {
 TEST(YoloCameraDetectorTest, input_tensor_test) {
   std::string yolo_config = "./data/models/yolo_camera_detector/config.pt";
 
-  adu::perception::obstacle::yolo::YoloParam yolo_param;
-  adu::perception::obstacle::yolo::YoloParam origin_yolo_param;
+  adu::perception::yolo::YoloParam yolo_param;
+  adu::perception::yolo::YoloParam origin_yolo_param;
 
   load_text_proto_message_file(yolo_config, yolo_param);
   origin_yolo_param.CopyFrom(yolo_param);
@@ -267,6 +266,5 @@ TEST(YoloCameraDetectorTest, input_tensor_test) {
   ofs << out_str;
   ofs.close();
 }
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo

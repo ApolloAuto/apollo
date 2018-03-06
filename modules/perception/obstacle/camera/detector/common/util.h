@@ -25,7 +25,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 void gpu_memcpy(const size_t N, const void *X, void *Y);
 
 inline void perception_gpu_memset(const size_t N, const int alpha, void *X) {
@@ -116,7 +115,6 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst,
             std::shared_ptr<SyncedMemory> src_gpu, int start_axis,
             const float mean_b, const float mean_g, const float mean_r,
             const float scale);
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

@@ -26,7 +26,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 DEFINE_string(onsemi_obstacle_extrinsics,
               "./conf/params/onsemi_obstacle_extrinsics.yaml",
@@ -343,6 +342,5 @@ ObjectType get_object_type(const std::string &type) {
   }
 }
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo

@@ -64,7 +64,7 @@ DEFINE_double(sim_map_radius, 200.0,
               "The radius within which Dreamview will find all the map "
               "elements around the car.");
 
-DEFINE_int32(dreamview_worker_num, 3, "number of dreamview thread workers");
+DEFINE_int32(dreamview_worker_num, 1, "number of dreamview thread workers");
 
 DEFINE_bool(enable_update_size_check, true,
             "True to check if the update byte number is less than threshold");

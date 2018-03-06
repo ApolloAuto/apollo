@@ -23,14 +23,12 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 namespace yolo {
 
 bool load_types(const std::string &path, std::vector<ObjectType> *types);
 bool load_anchors(const std::string &path, std::vector<float> *anchors);
 
 }  // namespace yolo
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

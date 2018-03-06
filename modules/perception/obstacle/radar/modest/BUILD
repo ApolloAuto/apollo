@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_obstacle_radar_modest_modest_detector",
+    name = "modest_detector",
     srcs = [
         "conti_radar_id_expansion.cc",
         "conti_radar_util.cc",
@@ -26,8 +26,8 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/obstacle/common:perception_obstacle_common",
-        "//modules/perception/obstacle/radar/interface:perception_obstacle_radar_interface",
+        "//modules/perception/obstacle/common",
+        "//modules/perception/obstacle/radar/interface",
         "@eigen",
         "@pcl",
     ],
@@ -40,10 +40,10 @@ cc_test(
         "conti_radar_id_expansion_test.cc",
     ],
     deps = [
+        ":modest_detector",
         "//external:gflags",
         "//modules/common:log",
         "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/radar/modest:perception_obstacle_radar_modest_modest_detector",
         "@gtest",
         "@gtest//:main",
     ],
@@ -61,10 +61,10 @@ cc_test(
         "//modules/perception/conf:perception_config",
     ],
     deps = [
+        ":modest_detector",
         "//external:gflags",
         "//modules/common:log",
         "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/radar/modest:perception_obstacle_radar_modest_modest_detector",
         "@gtest",
         "@gtest//:main",
     ],
@@ -82,10 +82,10 @@ cc_test(
         "//modules/perception/conf:perception_config",
     ],
     deps = [
+        ":modest_detector",
         "//external:gflags",
         "//modules/common:log",
         "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/radar/modest:perception_obstacle_radar_modest_modest_detector",
         "@gtest",
         "@gtest//:main",
     ],

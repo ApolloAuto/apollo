@@ -22,7 +22,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 Cipv::Cipv(void) {}
 
@@ -768,6 +767,5 @@ std::string Cipv::name() const {
 // Register plugin.
 // REGISTER_CIPV(Cipv);
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
