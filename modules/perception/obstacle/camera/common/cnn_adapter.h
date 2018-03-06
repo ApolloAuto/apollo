@@ -25,7 +25,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 class CNNAdapter {
  public:
@@ -274,7 +273,6 @@ class CNNTensorRT : public CNNAdapter {
   int gpu_id_ = 0;
   bool _int8_flag = false;
 };
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

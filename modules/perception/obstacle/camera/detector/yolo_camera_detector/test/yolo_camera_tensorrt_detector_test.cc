@@ -29,7 +29,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 TEST(YoloCameraTensorRTDetectorTest, yolo_camera_detector_test) {
   /*   std::string yolo_test_config =
@@ -37,8 +36,8 @@ TEST(YoloCameraTensorRTDetectorTest, yolo_camera_detector_test) {
 
      std::string yolo_config = "./data/models/yolo_camera_detector/config.pt";
 
-     adu::perception::obstacle::yolo::YoloParam yolo_param;
-     adu::perception::obstacle::yolo::YoloParam origin_yolo_param;
+     adu::perception::yolo::YoloParam yolo_param;
+     adu::perception::yolo::YoloParam origin_yolo_param;
      int origin_gpu_flag = FLAGS_camera_detector_gpu;
 
      load_text_proto_message_file(yolo_test_config, yolo_param);
@@ -113,6 +112,5 @@ TEST(YoloCameraTensorRTDetectorTest, yolo_camera_detector_test) {
      }*/
 }
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo

@@ -25,7 +25,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 DECLARE_int32(obs_camera_detector_gpu);
 
@@ -71,7 +70,7 @@ void YoloCameraDetector::init_anchor(const std::string &yolo_root) {
   yolo::load_anchors(anchors_file, &anchors);
   num_anchors_ = anchors.size() / 2;
   obj_size_ = output_height_ * output_width_ * anchors.size() / 2;
-  anchor_.reset(new adu::perception::obstacle::SyncedMemory(anchors.size() *
+  anchor_.reset(new adu::perception::SyncedMemory(anchors.size() *
                                                             sizeof(float)));
 
   auto anchor_cpu_data = anchor_->mutable_cpu_data();
@@ -88,12 +87,12 @@ void YoloCameraDetector::init_anchor(const std::string &yolo_root) {
   res_cls_tensor_.reset(new anakin::Tensor<float>());
   res_cls_tensor_->Reshape(1, 1, types_.size(), obj_size_);
 
-  overlapped_.reset(new adu::perception::obstacle::SyncedMemory(
+  overlapped_.reset(new adu::perception::SyncedMemory(
       top_k_ * top_k_ * sizeof(bool)));
   overlapped_->cpu_data();
   overlapped_->gpu_data();
   idx_sm_.reset(
-      new adu::perception::obstacle::SyncedMemory(top_k_ * sizeof(int)));
+      new adu::perception::SyncedMemory(top_k_ * sizeof(int)));
   idx_sm_->cpu_data();
   idx_sm_->gpu_data();
 }
@@ -175,7 +174,7 @@ bool YoloCameraDetector::init_cnn(const std::string &yolo_root) {
   output_names.push_back(net_param.lor_blob());
   output_names.push_back(net_param.seg_blob());
 
-  adu::perception::obstacle::FeatureParam feat_param;
+  adu::perception::FeatureParam feat_param;
   load_text_proto_message_file(feature_file, feat_param);
   for (auto extractor : feat_param.extractor()) {
     output_names.push_back(extractor.feat_blob());
@@ -368,6 +367,5 @@ bool YoloCameraDetector::detect(const cv::Mat &frame,
 std::string YoloCameraDetector::name() const { return "YoloCameraDetector"; }
 // Register plugin.
 REGISTER_CAMERA_DETECTOR(YoloCameraDetector);
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
