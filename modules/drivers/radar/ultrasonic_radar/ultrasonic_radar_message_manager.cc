@@ -29,7 +29,8 @@ namespace ultrasonic_radar {
 using ::apollo::common::adapter::AdapterManager;
 
 UltrasonicRadarMessageManager::UltrasonicRadarMessageManager(int entrance_num)
-    : entrance_num_(entrance_num) {
+    : MessageManager<Ultrasonic>(),
+      entrance_num_(entrance_num) {
   sensor_data_.mutable_ranges()->Resize(entrance_num_, 0.0);
 }
 
