@@ -26,7 +26,7 @@ namespace apollo {
 namespace perception {
 
 class LaneSharedData : public CommonSharedData<LaneObjects> {
-public:
+ public:
     LaneSharedData() = default;
     virtual ~LaneSharedData() = default;
 
@@ -34,7 +34,7 @@ public:
         return "LaneSharedData";
     }
 
-private:
+ private:
     DISALLOW_COPY_AND_ASSIGN(LaneSharedData);
 };
 
