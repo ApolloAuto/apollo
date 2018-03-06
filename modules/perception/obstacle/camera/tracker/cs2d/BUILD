@@ -7,9 +7,9 @@ cc_library(
     srcs = ["cs2d_affinity_tracker.cc"],
     hdrs = ["cs2d_affinity_tracker.h"],
     deps = [
-        "//modules/perception/obstacle/base:perception_obstacle_base",
-        "//modules/perception/obstacle/camera/tracker:base_affinity"
-    ]
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/tracker:base_affinity",
+    ],
 )
 
 cpplint()

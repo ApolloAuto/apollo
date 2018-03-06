@@ -8,10 +8,10 @@ cc_library(
     hdrs = ["region_output.h"],
     deps = [
         "//modules/common:log",
-        "//modules/perception/obstacle/camera/common:common",
+        "//modules/perception/obstacle/camera/common:util",
         "//modules/perception/obstacle/camera/detector/common:util",
-        "@opencv2//:core",
         "@caffe//:lib",
+        "@opencv2//:core",
     ],
 )
 
@@ -25,7 +25,7 @@ cc_library(
 #     ],
 #     deps = [
 #         "//modules/common:log",
-#         "//modules/perception/obstacle/base:perception_obstacle_base",
+#         "//modules/perception/obstacle/base",
 #         "@caffe//:lib",
 #         "@eigen",
 #     ],
@@ -37,7 +37,7 @@ cc_library(
     hdrs = ["util.h"],
     deps = [
         "//modules/common:log",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/base",
         "@caffe//:lib",
         "@eigen",
     ],
