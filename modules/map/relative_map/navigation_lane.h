@@ -67,7 +67,7 @@ class NavigationLane {
 
   void ConvertNavigationLineToPath(common::Path* path);
 
-  void UpdateProjectionIndex();
+  bool UpdateProjectionIndex();
 
   NavigationLaneConfig config_;
 

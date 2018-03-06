@@ -37,6 +37,9 @@ DEFINE_double(max_len_for_navigation_lane, 250.0,
 DEFINE_double(ratio_navigation_lane_len_to_speed, 6.0,
               "navigation lane length to adv speed ratio");
 
+DEFINE_double(max_distance_to_navigation_line, 6.0,
+              "max distance to navigation line in navigation mode");
+
 DEFINE_bool(
     enable_navigation_line, true,
     "True to consider navigation line info into generate navigation path");

@@ -19,9 +19,10 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_LANE_POST_PROCESSING_SUBNODE_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_LANE_POST_PROCESSING_SUBNODE_H_
 
+#include <memory>
 #include <string>
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/obstacle/base/object.h"
@@ -49,11 +50,9 @@ class LanePostProcessingSubnode : public Subnode {
   bool InitSharedData();
   bool InitAlgorithmPlugin();
   bool InitWorkRoot();
-  bool GetSharedData(const Event& event,
-                     std::shared_ptr<SensorObjects>* objs);
-  void PublishDataAndEvent(
-      double timestamp,
-      const SharedDataPtr<LaneObjects>& lane_objects);
+  bool GetSharedData(const Event& event, std::shared_ptr<SensorObjects>* objs);
+  void PublishDataAndEvent(double timestamp,
+                           const SharedDataPtr<LaneObjects>& lane_objects);
 
   std::unique_ptr<BaseCameraLanePostProcessor> lane_post_processor_;
   CameraObjectData* camera_object_data_ = nullptr;

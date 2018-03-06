@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_VISUALIZER_CAMERA_H
-#define MODULES_PERCEPTION_OBSTACLE_VISUALIZER_CAMERA_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_VISUALIZER_CAMERA_H_
+#define MODULES_PERCEPTION_OBSTACLE_VISUALIZER_CAMERA_H_
 
 #include "GL/glu.h"
 #include "modules/perception/obstacle/camera/visualizer/common/frame.h"
@@ -37,9 +37,7 @@ class Camera {
   enum Type { PERSPECTIVE, ORTHOGRAPHIC };
 
  public:
-  Eigen::Vector3d position() const {
-    return frame()->position();
-  }
+  Eigen::Vector3d position() const { return frame()->position(); }
 
   Eigen::Vector3d up_vector() const {
     return frame()->inverse_transform_of(Eigen::Vector3d(0.0, 1.0, 0.0));
@@ -53,17 +51,13 @@ class Camera {
     return frame()->inverse_transform_of(Eigen::Vector3d(1.0, 0.0, 0.0));
   }
 
-  Eigen::Quaterniond orientation() const {
-    return frame()->orientation();
-  }
+  Eigen::Quaterniond orientation() const { return frame()->orientation(); }
 
   void set_from_model_view_matrix(const double *const modelViewMatrix);
 
   void set_from_projection_matrix(const double matrix[12]);
 
-  void set_position(const Eigen::Vector3d &pos) {
-    frame()->set_position(pos);
-  }
+  void set_position(const Eigen::Vector3d &pos) { frame()->set_position(pos); }
 
   void set_orientation(const Eigen::Quaterniond &q);
 
@@ -102,13 +96,9 @@ class Camera {
 
   void rotate(Eigen::Vector3d i_axis, double i_angle);
 
-  Type type() const {
-    return _type;
-  }
+  Type type() const { return _type; }
 
-  double field_of_view() const {
-    return _field_of_view;
-  }
+  double field_of_view() const { return _field_of_view; }
 
   double horizontalfield_of_view() const {
     return 2.0 * atan(tan(field_of_view() / 2.0) * aspect_ratio());
@@ -119,25 +109,17 @@ class Camera {
            static_cast<double>(_screen_height);
   }
 
-  int screen_width() const {
-    return _screen_width;
-  }
+  int screen_width() const { return _screen_width; }
 
-  int screen_height() const {
-    return _screen_height;
-  }
+  int screen_height() const { return _screen_height; }
 
   void get_viewport(GLint viewport[4]) const;
 
   double pixelgl_ratio(const Eigen::Vector3d &position) const;
 
-  double znear_coefficient() const {
-    return _znear_coef;
-  }
+  double znear_coefficient() const { return _znear_coef; }
 
-  double zclipping_coefficient() const {
-    return _zclipping_coef;
-  }
+  double zclipping_coefficient() const { return _zclipping_coef; }
 
   virtual double znear() const;
 
@@ -167,21 +149,13 @@ class Camera {
 
   void setscreen_widthandheight(int width, int height);
 
-  void setznear_coefficient(double coef) {
-    _znear_coef = coef;
-  }
+  void setznear_coefficient(double coef) { _znear_coef = coef; }
 
-  void setzclipping_coefficient(double coef) {
-    _zclipping_coef = coef;
-  }
+  void setzclipping_coefficient(double coef) { _zclipping_coef = coef; }
 
-  double scene_radius() const {
-    return _scene_radius;
-  }
+  double scene_radius() const { return _scene_radius; }
 
-  Eigen::Vector3d scene_center() const {
-    return _scene_center;
-  }
+  Eigen::Vector3d scene_center() const { return _scene_center; }
 
   double distance_to_scene_center() const;
 
@@ -198,13 +172,9 @@ class Camera {
 
   bool set_revolve_around_point_from_pixel(const Eigen::Vector2i &pixel);
 
-  Eigen::Vector3d revolve_around_point() const {
-    return _revolve_around_point;
-  }
+  Eigen::Vector3d revolve_around_point() const { return _revolve_around_point; }
 
-  Frame *frame() const {
-    return _frame;
-  }
+  Frame *frame() const { return _frame; }
 
   void set_frame(Frame *const mcf);
 
@@ -255,37 +225,25 @@ class Camera {
   Eigen::Vector3d point_under_pixel(const Eigen::Vector2i &pixel,
                                     bool *found) const;
 
-  double io_distance() const {
-    return _io_distance;
-  }
+  double io_distance() const { return _io_distance; }
 
   double physical_distance_to_screen() const {
     return _physical_distance_to_screen;
   }
 
-  double physicalscreen_width() const {
-    return _physicalscreen_width;
-  }
+  double physicalscreen_width() const { return _physicalscreen_width; }
 
-  double focus_distance() const {
-    return _focus_distance;
-  }
+  double focus_distance() const { return _focus_distance; }
 
-  void setio_distance(double distance) {
-    _io_distance = distance;
-  }
+  void setio_distance(double distance) { _io_distance = distance; }
 
   void setphysical_distance_to_screen(double distance) {
     _physical_distance_to_screen = distance;
   }
 
-  void set_physicalscreen_width(double width) {
-    _physicalscreen_width = width;
-  }
+  void set_physicalscreen_width(double width) { _physicalscreen_width = width; }
 
-  void setfocus_distance(double distance) {
-    _focus_distance = distance;
-  }
+  void setfocus_distance(double distance) { _focus_distance = distance; }
 
  private:
   // Frame
@@ -316,4 +274,4 @@ class Camera {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // QGLVIEWER_CAMERA_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_VISUALIZER_CAMERA_H_

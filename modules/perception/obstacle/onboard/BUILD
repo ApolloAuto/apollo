@@ -42,7 +42,7 @@ cc_library(
 )
 
 cc_library(
-    name = "perception_obstacle_lidar_subnode",
+    name = "lidar_subnode",
     srcs = [
         "lidar_process_subnode.cc",
     ],
@@ -62,13 +62,13 @@ cc_library(
         "//modules/perception/obstacle/lidar/tracker/hm_tracker",
         "//modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
-        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/onboard",
         "@ros//:ros_common",
     ],
 )
 
 cc_library(
-    name = "perception_obstacle_radar_subnode",
+    name = "radar_subnode",
     srcs = [
         "radar_process_subnode.cc",
     ],
@@ -91,14 +91,14 @@ cc_library(
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
         "//modules/perception/obstacle/radar/dummy",
         "//modules/perception/obstacle/radar/modest:modest_detector",
-        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/onboard",
         "@eigen",
         "@ros//:ros_common",
     ],
 )
 
 cc_library(
-    name = "perception_obstacle_fusion_subnode",
+    name = "fusion_subnode",
     srcs = [
         "fusion_subnode.cc",
     ],
@@ -113,7 +113,7 @@ cc_library(
         "//modules/perception/obstacle/fusion/probabilistic_fusion",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
-        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/onboard",
         "@ros//:ros_common",
     ],
 )
@@ -130,7 +130,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/motionmanager",
-        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/onboard",
         "@ros//:ros_common",
     ],
 )
@@ -153,7 +153,7 @@ cc_library(
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
         "//modules/perception/obstacle/onboard:lidar_process",
         "//modules/perception/obstacle/radar/modest:modest_detector",
-        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/onboard",
         "@ros//:ros_common",
     ],
 )
@@ -170,7 +170,7 @@ cc_library(
     ],
     deps = [
         "//modules/perception/obstacle/base",
-        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/onboard",
     ],
 )
 
@@ -183,22 +183,22 @@ cc_library(
         "object_shared_data.h",
     ],
     deps = [
-        "//modules/common/adapters:adapter_manager",
-        "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
-        "//modules/perception/obstacle/camera/interface:interface",
-        "//modules/perception/obstacle/onboard:perception_obstacle_shared_data",
-        "//modules/perception/onboard:perception_onboard",
         "//modules/common:log",
-        "//modules/perception/common:perception_common",
-        "//modules/perception/lib/base:base",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/perception/common",
+        "//modules/perception/lib/base",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/interface",
+        "//modules/perception/obstacle/onboard:perception_obstacle_shared_data",
+        "//modules/perception/onboard",
         "@eigen",
         "@opencv2//:core",
     ],
 )
 
 cc_library(
-    name = "perception_obstacle_lowcost_visualizer_subnode",
+    name = "visualization_subnode",
     srcs = [
         "visualization_subnode.cc",
     ],
@@ -212,7 +212,7 @@ cc_library(
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common:util",
         "//modules/perception/obstacle/camera/visualizer",
-        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/onboard",
     ],
 )
 
