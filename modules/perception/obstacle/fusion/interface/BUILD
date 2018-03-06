@@ -9,8 +9,8 @@ cc_library(
     deps = [
         "//modules/perception/lib/base",
         "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
-        "//modules/perception/obstacle/onboard:perception_obstacle_hdmapinput",
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/onboard:hdmapinput",
         "@eigen",
     ],
 )

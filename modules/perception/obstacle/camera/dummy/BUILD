@@ -8,7 +8,7 @@ package(default_visibility = ["//visibility:public"])
 #     hdrs = ["dummy_algorithms.h"],
 #     deps = [
 #         "//modules/common:log",
-#         "//modules/perception/obstacle/base:perception_obstacle_base",
+#         "//modules/perception/obstacle/base",
 #         "@caffe//:lib",
 #         "@eigen",
 #     ],

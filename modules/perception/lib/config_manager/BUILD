@@ -15,7 +15,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/util",
-        "//modules/perception/common:perception_common",
+        "//modules/perception/common",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager/proto:config_proto",
         "//modules/perception/obstacle/camera/common",
@@ -33,7 +33,7 @@ cc_test(
     data = ["//modules/perception:perception_data"],
     deps = [
         ":config_manager",
-        "//modules/perception/common:perception_common",
+        "//modules/perception/common",
         "@gtest//:main",
     ],
 )

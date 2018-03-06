@@ -14,11 +14,11 @@ cc_library(
     ],
     deps = [
         "//modules/perception/lib/base",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common:util",
         "//modules/perception/obstacle/camera/tracker:base_affinity",
         "//modules/perception/obstacle/camera/tracker:util",
-        "//modules/perception/obstacle/common:perception_obstacle_common",
+        "//modules/perception/obstacle/common",
         "@eigen",
         "@opencv2//:core",
     ],

@@ -3,25 +3,25 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_obstacle_lidar_type_fuser_sequence_type_fuser",
+    name = "sequence_type_fuser",
     srcs = [
         "sequence_type_fuser.cc",
-        "util.cc"
+        "util.cc",
     ],
     hdrs = [
         "sequence_type_fuser.h",
-        "util.h"
+        "util.h",
     ],
     deps = [
         "//modules/common",
         "//modules/common:log",
-        "//modules/perception/lib/config_manager",
-        "//modules/perception/common:perception_common",
+        "//modules/perception/common",
         "//modules/perception/lib/base",
+        "//modules/perception/lib/config_manager",
         "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/common:perception_obstacle_common",
-        "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
-        "@eigen//:eigen",
+        "//modules/perception/obstacle/common",
+        "//modules/perception/obstacle/lidar/interface",
+        "@eigen",
     ],
 )
 
@@ -40,13 +40,13 @@ cc_test(
         "-lqhull",
     ],
     deps = [
-        ":perception_obstacle_lidar_type_fuser_sequence_type_fuser",
+        ":sequence_type_fuser",
         "//modules/common:log",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/obstacle/lidar/object_builder/min_box:perception_obstacle_lidar_object_builder_min_box",
-        "//modules/perception/obstacle/lidar/tracker/hm_tracker:perception_obstacle_lidar_tracker_hm_tracker",
+        "//modules/perception/obstacle/lidar/object_builder/min_box",
+        "//modules/perception/obstacle/lidar/tracker/hm_tracker",
         "@gtest//:main",
-        "@pcl//:pcl",
+        "@pcl",
     ],
 )
 

@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_obstacle_camera_lane_post_process_common_type",
+    name = "type",
     hdrs = ["type.h"],
     deps = [
         "//modules/common:log",
@@ -13,21 +13,21 @@ cc_library(
 )
 
 cc_library(
-    name = "perception_obstacle_camera_lane_post_process_common_util",
+    name = "util",
     hdrs = ["util.h"],
     deps = [
+        ":type",
         "//modules/common:log",
-        "//modules/perception/obstacle/camera/lane_post_process/common:perception_obstacle_camera_lane_post_process_common_type",
     ],
 )
 
 cc_library(
-    name = "perception_obstacle_camera_lane_post_process_common_connected_component_analysis",
+    name = "connected_component",
     srcs = ["connected_component.cc"],
     hdrs = ["connected_component.h"],
     deps = [
+        ":type",
         "//modules/common:log",
-        "//modules/perception/obstacle/camera/lane_post_process/common:perception_obstacle_camera_lane_post_process_common_type",
         "@eigen",
         "@opencv2//:core",
     ],
