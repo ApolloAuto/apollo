@@ -108,7 +108,8 @@ export default class QuickStarter extends React.Component {
                     <CommandGroup disabled={false} commands={this.version} />
                     <CommandGroup disabled={tasksPanelLocked} commands={this.setup} />
                     <CommandGroup disabled={tasksPanelLocked} commands={this.reset} />
-                    <CommandGroup disabled={!hmi.enableStartAuto} commands={this.auto}
+                    <CommandGroup disabled={!hmi.enableStartAuto || tasksPanelLocked}
+                                  commands={this.auto}
                                   extraButtonClass="start-auto-button"
                                   extraCommandClass="start-auto-command" />
                     {hmi.showRTKCommands &&

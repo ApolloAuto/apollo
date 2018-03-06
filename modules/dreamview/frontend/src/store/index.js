@@ -53,7 +53,7 @@ class DreamviewStore {
     @observable moduleDelay = observable.map();
 
     @computed get enableHMIButtonsOnly() {
-        return !this.isInitialized || this.hmi.showNavigationMap;
+        return !this.isInitialized;
     }
 
     @action updateTimestamp(newTimestamp) {
