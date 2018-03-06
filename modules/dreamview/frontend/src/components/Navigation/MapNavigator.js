@@ -35,6 +35,10 @@ class MapNavigator {
         });
     }
 
+    isInitialized() {
+        return this.WS && this.mapAdapter && this.mapAdapter.isInitialized();
+    }
+
     createControls() {
         this.mapAdapter.createControl({
             text: "Center Vehicle is ON",
@@ -102,8 +106,16 @@ class MapNavigator {
         });
     }
 
+    disableControls() {
+        this.mapAdapter.disableControls();
+    }
+
+    enableControls() {
+        this.mapAdapter.enableControls();
+    }
+
     update(data) {
-        if (!this.WS || !this.mapAdapter || !this.mapAdapter.isInitialized()) {
+        if (!this.isInitialized()) {
             return;
         }
 
