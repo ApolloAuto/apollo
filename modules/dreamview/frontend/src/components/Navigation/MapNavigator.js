@@ -259,14 +259,14 @@ class MapNavigator {
             `?origin=${startLat},${startLng}` +
             `&destination=${endLat},${endLng}` +
             "&heading=0";
-        fetch(url, {
+        fetch(encodeURI(url), {
             method: "GET",
             mode: "cors",
         }).then(response => {
             return response.arrayBuffer();
         }).then(response => {
             if (!response.byteLength) {
-                console.warn("No navigation info received.");
+                alert("No navigation info received.");
                 return;
             }
 
