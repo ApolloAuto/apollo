@@ -17,18 +17,19 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_REGION_OUTPUT_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_REGION_OUTPUT_H_
 
-//#include <boost/property_tree/json_parser.hpp>
-//#include <boost/property_tree/ptree.hpp>
-//#include <boost/regex.hpp>
+// #include <boost/property_tree/json_parser.hpp>
+// #include <boost/property_tree/ptree.hpp>
+// #include <boost/regex.hpp>
 
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
+#include <memory>
 
-#include <caffe/proto/caffe.pb.h>
-#include <caffe/blob.hpp>
-#include <caffe/layer.hpp>
+#include "caffe/proto/caffe.pb.h"
+#include "caffe/blob.hpp"
+#include "caffe/layer.hpp"
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/common/util.h"
