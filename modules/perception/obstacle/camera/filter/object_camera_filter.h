@@ -33,8 +33,8 @@
 
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
-#include "modules/perception/obstacle/camera/interface/base_camera_filter.h"
 #include "modules/perception/obstacle/camera/filter/kalman_filter_1d.h"
+#include "modules/perception/obstacle/camera/interface/base_camera_filter.h"
 
 namespace apollo {
 namespace perception {
@@ -47,42 +47,46 @@ class ObjectCameraFilter : public BaseCameraFilter {
 
   bool Init() override;
 
-  bool Filter(std::vector<VisualObjectPtr>* objects) override;
+  bool Filter(const float &timestamp,
+              std::vector<VisualObjectPtr> *objects) override;
 
   std::string Name() const override;
 
  private:
   class ObjectFilter {
    public:
-    int track_id = -1;
-    int lost_frame_count = 0;
-    float last_seen_timestamp = 0.0f;
+    int track_id_ = -1;
+    int lost_frame_cnt_ = 0;
+    float last_timestamp_ = 0.0f;
 
     KalmanFilter1D x_;
     KalmanFilter1D y_;
     KalmanFilter1D z_;
-
     KalmanFilter1D alpha_;
     KalmanFilter1D theta_;
-
-    KalmanFilter1D length_;
-    KalmanFilter1D width_;
-    KalmanFilter1D height_;
-
-    // TODO(later) tune and put in config
-    ObjectFilter() {
-      x_.Init();
-      y_.Init();
-      z_.Init();
-      alpha_.Init();
-      theta_.Init();
-      length_.Init();
-      width_.Init();
-      height_.Init();
-    }
+    KalmanFilter1D l_;
+    KalmanFilter1D w_;
+    KalmanFilter1D h_;
   };
 
   std::map<int, ObjectFilter> tracked_filters_;
+  const int kMaxKeptFrameCnt = 10;
+
+  // @brief Create filters for new track ids
+  void Create(const int &track_id, const float &timestamp,
+              const VisualObjectPtr &obj_ptr);
+
+  // @brief Predict step
+  void Predict(const int &track_id, const float &timestamp);
+
+  // @brief Update step
+  void Update(const int &track_id, const VisualObjectPtr &obj_ptr);
+
+  // @brief Get output of estimated state
+  void GetState(const int &track_id, VisualObjectPtr obj_ptr);
+
+  // @brief Destroy old filters
+  void Destroy();
 
   DISALLOW_COPY_AND_ASSIGN(ObjectCameraFilter);
 };

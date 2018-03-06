@@ -16,7 +16,9 @@
 
 #include "modules/perception/obstacle/camera/filter/kalman_filter_1d.h"
 
-bool KalmanFilter1D::Init() {
+bool KalmanFilter1D::Init(const float& x) {
+  // TODO(later) tune and put in config
+
   return true;
 }
 

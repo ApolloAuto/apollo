@@ -20,7 +20,7 @@
 
 class KalmanFilter1D {
  public:
-  bool Init();
+  bool Init(const float& x);
 
   bool Predict(const float& time_diff);
 
