@@ -38,7 +38,7 @@ namespace planning {
 
 namespace {
 
-// A common function for trajectory bundles generation with 
+// A common function for trajectory bundles generation with
 // a given initial and  end conditions.
 typedef std::array<double, 3> InitCondition;
 typedef std::vector<std::pair<std::array<double, 3>, double>> EndConditions;
@@ -71,7 +71,7 @@ Trajectory1dGenerator::Trajectory1dGenerator(
       init_lat_state_(lat_init_state),
       end_condition_sampler_(lon_init_state, lat_init_state,
                              FLAGS_planning_upper_speed_limit,
-                             ptr_path_time_graph, 
+                             ptr_path_time_graph,
                              ptr_prediction_querier) {
 }
 
@@ -94,7 +94,7 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
       end_condition_sampler_.SampleLonEndConditionsForCruising(target_speed);
 
   // For the cruising case, We use the "QuarticPolynomialCurve1d" class (not the
-  // "QuinticPolynomialCurve1d" class) to generate curves. Therefore, we can't  
+  // "QuinticPolynomialCurve1d" class) to generate curves. Therefore, we can't
   // invoke the common function to generate trajectory bundles.
   for (const auto& end_condition : end_conditions) {
     // Only the last two elements in the end_condition are useful.
