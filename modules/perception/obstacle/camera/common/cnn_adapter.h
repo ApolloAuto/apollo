@@ -217,7 +217,7 @@ class CNNAnakin : public CNNAdapter {
 
 class CNNTensorRT : public CNNAdapter {
  public:
-  CNNTensorRT(bool int8_flag) : _int8_flag(int8_flag){};
+  CNNTensorRT(bool int8_flag) : int8_flag_(int8_flag){};
 
   virtual bool init(const std::vector<std::string> &input_names,
                     const std::vector<std::string> &output_names,
@@ -271,7 +271,7 @@ class CNNTensorRT : public CNNAdapter {
   std::vector<std::string> output_names_;
 
   int gpu_id_ = 0;
-  bool _int8_flag = false;
+  bool int8_flag_ = false;
 };
 }  // namespace perception
 }  // namespace apollo

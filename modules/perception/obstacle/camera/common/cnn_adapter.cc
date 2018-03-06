@@ -72,7 +72,7 @@ bool CNNTensorRT::init(const std::vector<std::string> &input_names,
   anakin::BatchStream calibrationStream;
   nvinfer1::Int8EntropyCalibrator calibrator(calibrationStream, 0, true,
                                              model_root);
-  if (_int8_flag) {
+  if (int8_flag_) {
     AINFO << model_root;
     inference_.initNet(proto_file.c_str(), weight_file.c_str(), &calibrator);
   } else {

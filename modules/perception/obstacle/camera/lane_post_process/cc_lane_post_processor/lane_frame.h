@@ -42,50 +42,41 @@ namespace perception {
 
 struct LaneFrameOptions {
   // used for initialization
-  SpaceType space_type;  // space type
+  SpaceType space_type = SpaceType::IMAGE;  // space type
   cv::Rect image_roi;
-  bool use_cc;
-  int min_cc_pixel_num;  // minimum number of pixels of CC
-  int min_cc_size;       // minimum size of CC
+  bool use_cc = true;
+  int min_cc_pixel_num = 10;  // minimum number of pixels of CC
+  int min_cc_size = 5;        // minimum size of CC
 
   // used for greedy search association method
-  int max_cc_marker_match_num;  // maximum number of markers used for matching
-                                // for each CC
+  // maximum number of markers used for matching for each CC
+  int max_cc_marker_match_num = 1;
 
   // used for marker association
-  ScalarType min_y_search_offset;  // minimum longitudinal offset used for
-                                   // search upper markers
+  // minimum longitudinal offset used for
+  // search upper markers
+  ScalarType min_y_search_offset = 0.0;
+
   AssociationParam assoc_param;
   GroupParam group_param;
-  int orientation_estimation_skip_marker_num;
+  int orientation_estimation_skip_marker_num = 1;
 
   // for determining lane object label
-  ScalarType lane_interval_distance;  // predefined label interval distance
+  // predefined label interval distance
+  ScalarType lane_interval_distance = 4.0;
 
   // for fitting curve
-  ScalarType min_instance_size_prefiltered;  // minimum size of lane instance to
-                                             // be prefiltered
-  ScalarType max_size_to_fit_straight_line;  // maximum size of instance to fit
-                                             // a straight line
+  // minimum size of lane instance to
+  // be prefiltered
+  ScalarType min_instance_size_prefiltered = 3.0;
 
-  LaneFrameOptions()
-      : space_type(SpaceType::IMAGE),
-        use_cc(true),
-        min_cc_pixel_num(10),
-        min_cc_size(5),
-        max_cc_marker_match_num(1),
-        min_y_search_offset(0.0),
-        orientation_estimation_skip_marker_num(1),
-        lane_interval_distance(4.0),
-        min_instance_size_prefiltered(3.0),
-        max_size_to_fit_straight_line(5.0) {}
+  // maximum size of instance to fit
+  // a straight line
+  ScalarType max_size_to_fit_straight_line = 4.0;
 };
 
 class LaneFrame {
  public:
-  LaneFrame() {}
-  ~LaneFrame() {}
-
   bool Init(const std::vector<ConnectedComponentPtr>& input_cc,
             const LaneFrameOptions& options);
 
@@ -138,7 +129,7 @@ class LaneFrame {
 
   // markers
   std::vector<Marker> markers_;
-  int max_cc_num_;
+  int max_cc_num_ = 0;
 
   // CC index for each marker
   std::vector<int> cc_idx_;
@@ -146,7 +137,7 @@ class LaneFrame {
   std::unordered_map<int, std::vector<int>> cc_marker_lut_;
 
   std::shared_ptr<const Projector<ScalarType>> projector_;
-  bool is_projector_init_;
+  bool is_projector_init_ = false;
 
   // lane marker clusters
   std::vector<Graph> graphs_;
