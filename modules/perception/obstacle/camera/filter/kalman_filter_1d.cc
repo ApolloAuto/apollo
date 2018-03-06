@@ -17,7 +17,6 @@
 #include "modules/perception/obstacle/camera/filter/kalman_filter_1d.h"
 
 bool KalmanFilter1D::Init(const float& x) {
-
   x_ << x, 0.0f;
   F_ << 1.0f, 0.033f, 0.0f, 1.0f;
   H_ << 1.0f, 0.0f;
@@ -36,7 +35,6 @@ bool KalmanFilter1D::Init(const float& x) {
 }
 
 bool KalmanFilter1D::Predict(const float& time_diff) {
-
   F_(0, 1) = time_diff;
 
   x_ = F_ * x_;
