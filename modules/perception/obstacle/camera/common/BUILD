@@ -9,11 +9,10 @@ cc_library(
     hdrs = [
         "camera.h",
         "lane_object.h",
-        "util.h",
         "visual_object.h",
     ],
     deps = [
-        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/base",
         "@eigen",
         "@undistort",
     ],
@@ -30,7 +29,7 @@ cc_library(
     ],
     deps = [
         "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/base",
         "@eigen",
         "@undistort",
     ],

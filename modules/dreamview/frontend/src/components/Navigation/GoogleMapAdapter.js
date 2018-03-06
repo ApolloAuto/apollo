@@ -1,6 +1,7 @@
 export default class GoogleMapAdapter {
     constructor() {
         this.map = null;
+        this.controls = [];
     }
 
     isInitialized() {
@@ -84,9 +85,24 @@ export default class GoogleMapAdapter {
         controlUI.appendChild(controlText);
 
         // Setup the click event listeners: simply set the map to Chicago.
-        controlUI.addEventListener("click", onClickHandler);
+        controlUI.addEventListener("click", () => {
+            onClickHandler(controlText);
+        });
 
         this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(controlDiv);
+        this.controls.push(controlDiv);
+    }
+
+    disableControls() {
+        this.controls.forEach(control => {
+            control.style.display = "none";
+        });
+    }
+
+    enableControls() {
+        this.controls.forEach(control => {
+            control.style.display = "block";
+        });
     }
 
     getMarkerPosition(marker) {

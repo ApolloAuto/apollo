@@ -32,7 +32,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 struct CipvOptions {
   float velocity = 0.0f;
@@ -59,7 +58,7 @@ const float AVERAGE_FRATE_RATE = 0.1f;
 class Cipv {
   // Member functions
  public:
-  //    friend class ::adu::perception::obstacle::OnlineCalibrationService;
+  //    friend class ::adu::perception::OnlineCalibrationService;
   Cipv(void);
   ~Cipv(void);
 
@@ -150,7 +149,6 @@ class Cipv {
   common::VehicleParam vehicle_param_;
 };
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

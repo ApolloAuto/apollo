@@ -1,5 +1,6 @@
 import STORE from "store";
 import RENDERER from "renderer";
+import MAP_NAVIGATOR from "components/Navigation/MapNavigator";
 import Worker from 'utils/webworker.js';
 
 export default class RosWebSocketEndpoint {
@@ -74,6 +75,9 @@ export default class RosWebSocketEndpoint {
                         this.requestRoutePath();
                         this.routingTime = message.routingTime;
                     }
+                    if (STORE.hmi.showNavigationMap && MAP_NAVIGATOR.isInitialized()) {
+                        MAP_NAVIGATOR.update(message);
+                    }
                     this.counter += 1;
                     break;
                 case "MapElementIds":
@@ -96,8 +100,7 @@ export default class RosWebSocketEndpoint {
         // Request simulation world every 100ms.
         clearInterval(this.timer);
         this.timer = setInterval(() => {
-            if (this.websocket.readyState === this.websocket.OPEN &&
-                !STORE.hmi.showNavigationMap) {
+            if (this.websocket.readyState === this.websocket.OPEN) {
                 // Load default routing end point.
                 if (this.updatePOI) {
                     this.requestDefaultRoutingEndPoint();
@@ -227,5 +230,9 @@ export default class RosWebSocketEndpoint {
         this.websocket.send(JSON.stringify({
             type: "RequestRoutePath",
         }));
+    }
+
+    publishNavigationInfo(data) {
+        this.websocket.send(data);
     }
 }
