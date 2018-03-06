@@ -23,13 +23,18 @@
 namespace apollo {
 namespace perception {
 
-Cipv::Cipv(void) {}
+Cipv::Cipv(void)
+    : vehicle_param_(
+          common::VehicleConfigHelper::instance()->GetConfig().vehicle_param()),
+      EGO_CAR_WIDTH_METER(vehicle_param_.width()),
+      EGO_CAR_LENGTH_METER(vehicle_param_.length()),
+      EGO_CAR_MARGIN_METER(0.5f),
+      EGO_CAR_VIRTUAL_LANE(EGO_CAR_WIDTH_METER + EGO_CAR_MARGIN_METER),
+      EGO_CAR_HALF_VIRTUAL_LANE(EGO_CAR_VIRTUAL_LANE / 2.0f) {}
 
-Cipv::~Cipv(void) {
-  //    clear();
-}
+Cipv::~Cipv(void) {}
 
-bool Cipv::init() {
+bool Cipv::Init() {
   b_image_based_cipv_ = false;
   debug_level_ = 0;  // 0: no debug message
                      // 1: minimal output
@@ -45,9 +50,10 @@ bool Cipv::init() {
 }
 
 // Distance from a point to a line segment
-bool Cipv::distance_from_point_to_line_segment(
-    const Point2Df &point, const Point2Df &line_seg_start_point,
-    const Point2Df &line_seg_end_point, float *distance) {
+bool Cipv::DistanceFromPointToLineSegment(const Point2Df &point,
+                                          const Point2Df &line_seg_start_point,
+                                          const Point2Df &line_seg_end_point,
+                                          float *distance) {
   float x_start_diff = point[0] - line_seg_start_point[0];
   float y_start_diff = point[1] - line_seg_start_point[1];
   float x_end_diff = line_seg_end_point[0] - line_seg_start_point[0];
@@ -91,13 +97,13 @@ bool Cipv::distance_from_point_to_line_segment(
 }
 
 // Determine CIPV among multiple objects
-bool Cipv::get_egolane(const LaneObjectsPtr lane_objects,
-                       EgoLane *egolane_image, EgoLane *egolane_ground,
-                       bool *b_left_valid, bool *b_right_valid) {
+bool Cipv::GetEgoLane(const LaneObjectsPtr lane_objects, EgoLane *egolane_image,
+                      EgoLane *egolane_ground, bool *b_left_valid,
+                      bool *b_right_valid) {
   for (size_t i = 0; i < lane_objects->size(); ++i) {
     if ((*lane_objects)[i].spatial == L_0) {
       if (debug_level_ >= 2) {
-        AINFO << "[get_egolane]LEFT(*lane_objects)[i].image_pos.size(): "
+        AINFO << "[GetEgoLane]LEFT(*lane_objects)[i].image_pos.size(): "
               << (*lane_objects)[i].image_pos.size();
       }
       if ((*lane_objects)[i].image_pos.size() <
@@ -118,7 +124,7 @@ bool Cipv::get_egolane(const LaneObjectsPtr lane_objects,
       }
     } else if ((*lane_objects)[i].spatial == R_0) {
       if (debug_level_ >= 2) {
-        AINFO << "[get_egolane]RIGHT(*lane_objects)[i].image_pos.size(): "
+        AINFO << "[GetEgoLane]RIGHT(*lane_objects)[i].image_pos.size(): "
               << (*lane_objects)[i].image_pos.size();
       }
       if ((*lane_objects)[i].image_pos.size() <
@@ -142,9 +148,9 @@ bool Cipv::get_egolane(const LaneObjectsPtr lane_objects,
 }
 
 // Make a virtual lane line using a reference lane line and its offset distance
-bool Cipv::make_virtual_lane(const LaneLine &ref_lane_line,
-                             const float yaw_rate, const float offset_distance,
-                             LaneLine *virtual_lane_line) {
+bool Cipv::MakeVirtualLane(const LaneLine &ref_lane_line, const float yaw_rate,
+                           const float offset_distance,
+                           LaneLine *virtual_lane_line) {
   // ** to do *** Use union of lane line and yaw_rate path to determine the
   // virtual lane
   virtual_lane_line->line_point.clear();
@@ -162,9 +168,9 @@ bool Cipv::make_virtual_lane(const LaneLine &ref_lane_line,
   return true;
 }
 
-float Cipv::vehicle_dynamics(const uint32_t tick, const float yaw_rate,
-                             const float velocity, const float time_unit,
-                             float *x, float *y) {
+float Cipv::VehicleDynamics(const uint32_t tick, const float yaw_rate,
+                            const float velocity, const float time_unit,
+                            float *x, float *y) {
   // straight model;
   *x = tick;
   *y = 0.0f;
@@ -185,11 +191,11 @@ float Cipv::vehicle_dynamics(const uint32_t tick, const float yaw_rate,
 }
 
 // Make a virtual lane line using a yaw_rate
-bool Cipv::make_virtual_ego_lane_from_yaw_rate(const float yaw_rate,
-                                               const float velocity,
-                                               const float offset_distance,
-                                               LaneLine *left_lane_line,
-                                               LaneLine *right_lane_line) {
+bool Cipv::MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
+                                         const float velocity,
+                                         const float offset_distance,
+                                         LaneLine *left_lane_line,
+                                         LaneLine *right_lane_line) {
   // ** to do *** Use union of lane line and yaw_rate path to determine the
   // virtual lane
   float x = 0.0f;
@@ -199,7 +205,7 @@ bool Cipv::make_virtual_ego_lane_from_yaw_rate(const float yaw_rate,
 
   if (b_image_based_cipv_ == false) {
     for (uint32_t i = 0; i < 120; i += 5) {
-      vehicle_dynamics(i, yaw_rate, velocity, time_unit_, &x, &y);
+      VehicleDynamics(i, yaw_rate, velocity, time_unit_, &x, &y);
       Eigen::Vector2f left_point(x, y + offset_distance);
       left_lane_line->line_point.push_back(left_point);
       Eigen::Vector2f right_point(x, y - offset_distance);
@@ -213,10 +219,10 @@ bool Cipv::make_virtual_ego_lane_from_yaw_rate(const float yaw_rate,
 }
 
 // Elongate lane line
-bool Cipv::elongate_egolane(const LaneObjectsPtr lane_objects,
-                            const bool b_left_valid, const bool b_right_valid,
-                            const float yaw_rate, const float velocity,
-                            EgoLane *egolane_image, EgoLane *egolane_ground) {
+bool Cipv::ElongateEgoLane(const LaneObjectsPtr lane_objects,
+                           const bool b_left_valid, const bool b_right_valid,
+                           const float yaw_rate, const float velocity,
+                           EgoLane *egolane_image, EgoLane *egolane_ground) {
   float offset_distance = EGO_CAR_HALF_VIRTUAL_LANE;
   // When left lane line is available
   if (b_left_valid && b_right_valid) {
@@ -227,8 +233,8 @@ bool Cipv::elongate_egolane(const LaneObjectsPtr lane_objects,
     // Generate virtual left lane based on right lane
     offset_distance = -(fabs(egolane_ground->right_line.line_point[0][1]) +
                         EGO_CAR_HALF_VIRTUAL_LANE);
-    make_virtual_lane(egolane_ground->right_line, yaw_rate, offset_distance,
-                      &egolane_ground->left_line);
+    MakeVirtualLane(egolane_ground->right_line, yaw_rate, offset_distance,
+                    &egolane_ground->left_line);
     AINFO << "Made left lane";
 
     // When only right lane line is avaiable
@@ -236,16 +242,16 @@ bool Cipv::elongate_egolane(const LaneObjectsPtr lane_objects,
     // Generate virtual right lane based on left lane
     offset_distance = (fabs(egolane_ground->left_line.line_point[0][1]) +
                        EGO_CAR_HALF_VIRTUAL_LANE);
-    make_virtual_lane(egolane_ground->left_line, yaw_rate, offset_distance,
-                      &egolane_ground->right_line);
+    MakeVirtualLane(egolane_ground->left_line, yaw_rate, offset_distance,
+                    &egolane_ground->right_line);
     AINFO << "Made right lane";
 
     // When there is no lane lines available
   } else {  // if (!b_left_valid && !b_right_valid)
     // Generate new egolane using yaw-rate and yaw-angle
-    make_virtual_ego_lane_from_yaw_rate(yaw_rate, velocity, offset_distance,
-                                        &egolane_ground->left_line,
-                                        &egolane_ground->right_line);
+    MakeVirtualEgoLaneFromYawRate(yaw_rate, velocity, offset_distance,
+                                  &egolane_ground->left_line,
+                                  &egolane_ground->right_line);
     AINFO << "Made both lane_objects";
   }
 
@@ -253,9 +259,9 @@ bool Cipv::elongate_egolane(const LaneObjectsPtr lane_objects,
 }
 
 // Get closest edge of an object in image cooridnate
-bool Cipv::find_closest_edge_of_object_image(
-    const ObjectPtr &object, const EgoLane &egolane_image,
-    LineSegment2Df *closted_object_edge) {
+bool Cipv::FindClosestEdgeOfObjectImage(const ObjectPtr &object,
+                                        const EgoLane &egolane_image,
+                                        LineSegment2Df *closted_object_edge) {
   float size_x = object->length;
   float size_y = object->width;
   float size_z = object->height;
@@ -336,9 +342,9 @@ bool Cipv::find_closest_edge_of_object_image(
 // Get closest edge of an object in ground cooridnate
 // *** TO DO *** This funcion should be changed to find min-y and max-y edges
 // to determine CIPV.
-bool Cipv::find_closest_edge_of_object_ground(
-    const ObjectPtr &object, const EgoLane &egolane_ground,
-    LineSegment2Df *closted_object_edge) {
+bool Cipv::FindClosestEdgeOfObjectGround(const ObjectPtr &object,
+                                         const EgoLane &egolane_ground,
+                                         LineSegment2Df *closted_object_edge) {
   if (debug_level_ >= 2) {
     AINFO << "object->track_id: " << object->track_id;
     // AINFO << "object->length: " << object->length;
@@ -437,10 +443,10 @@ bool Cipv::find_closest_edge_of_object_ground(
 }
 
 // Check if the distance between lane and object are OK
-bool Cipv::are_distances_sane(const float distance_start_point_to_right_lane,
-                              const float distance_start_point_to_left_lane,
-                              const float distance_end_point_to_right_lane,
-                              const float distance_end_point_to_left_lane) {
+bool Cipv::AreDistancesSane(const float distance_start_point_to_right_lane,
+                            const float distance_start_point_to_left_lane,
+                            const float distance_end_point_to_right_lane,
+                            const float distance_end_point_to_left_lane) {
   float distance = -1.0f;
   if (distance_start_point_to_right_lane > MAX_DIST_OBJECT_TO_LANE_METER) {
     if (debug_level_ >= 1) {
@@ -495,9 +501,9 @@ bool Cipv::are_distances_sane(const float distance_start_point_to_right_lane,
 }
 
 // Check if a point is left of a line segment
-bool Cipv::is_point_left_of_line(const Point2Df &point,
-                                 const Point2Df &line_seg_start_point,
-                                 const Point2Df &line_seg_end_point) {
+bool Cipv::IsPointLeftOfLine(const Point2Df &point,
+                             const Point2Df &line_seg_start_point,
+                             const Point2Df &line_seg_end_point) {
   float cross_product = ((line_seg_end_point[0] - line_seg_start_point[0]) *
                          (point[1] - line_seg_start_point[1])) -
                         ((line_seg_end_point[1] - line_seg_start_point[1]) *
@@ -524,8 +530,8 @@ bool Cipv::is_point_left_of_line(const Point2Df &point,
   }
 }
 // Check if the object is in the lane in image space
-bool Cipv::is_object_in_the_lane_image(const ObjectPtr &object,
-                                       const EgoLane &egolane_image) {
+bool Cipv::IsObjectInTheLaneImage(const ObjectPtr &object,
+                                  const EgoLane &egolane_image) {
   return true;
 }
 
@@ -537,10 +543,9 @@ bool Cipv::is_object_in_the_lane_image(const ObjectPtr &object,
 // *+------*    |
 //  |           |
 // l_lane     r_lane
-bool Cipv::is_object_in_the_lane_ground(const ObjectPtr &object,
-                                        const EgoLane &egolane_ground) {
+bool Cipv::IsObjectInTheLaneGround(const ObjectPtr &object,
+                                   const EgoLane &egolane_ground) {
   LineSegment2Df closted_object_edge;
-  uint32_t i;
   bool b_left_lane_clear = false;
   bool b_right_lane_clear = false;
   float shortest_distance = 0.0f;
@@ -552,8 +557,8 @@ bool Cipv::is_object_in_the_lane_ground(const ObjectPtr &object,
 
   int closest_index = -1;
   // Find closest edge of a given object bounding box
-  float b_valid_object = find_closest_edge_of_object_ground(
-      object, egolane_ground, &closted_object_edge);
+  float b_valid_object = FindClosestEdgeOfObjectGround(object, egolane_ground,
+                                                       &closted_object_edge);
   if (!b_valid_object) {
     if (debug_level_ >= 1) {
       ADEBUG << "The closest edge of an object is not available";
@@ -575,10 +580,10 @@ bool Cipv::is_object_in_the_lane_ground(const ObjectPtr &object,
   // Check end_point and left lane
   closest_index = -1;
   shortest_distance = MAX_FLOAT;
-  for (i = 0; i < egolane_ground.left_line.line_point.size() - 1; i++) {
+  for (size_t i = 0; i + 1 < egolane_ground.left_line.line_point.size(); ++i) {
     // If a end point is in the clostest left lane line segments
     distance = MAX_FLOAT;
-    if (distance_from_point_to_line_segment(
+    if (DistanceFromPointToLineSegment(
             closted_object_edge.end_point,
             egolane_ground.left_line.line_point[i],
             egolane_ground.left_line.line_point[i + 1], &distance) == true) {
@@ -595,7 +600,7 @@ bool Cipv::is_object_in_the_lane_ground(const ObjectPtr &object,
       AINFO << "[Left] closest_index: " << closest_index
             << ", shortest_distance: " << shortest_distance;
     }
-    if (is_point_left_of_line(
+    if (IsPointLeftOfLine(
             closted_object_edge.end_point,
             egolane_ground.left_line.line_point[closest_index],
             egolane_ground.left_line.line_point[closest_index + 1]) == false) {
@@ -616,10 +621,10 @@ bool Cipv::is_object_in_the_lane_ground(const ObjectPtr &object,
   }
   closest_index = -1;
   shortest_distance = MAX_FLOAT;
-  for (i = 0; i < egolane_ground.right_line.line_point.size() - 1; i++) {
+  for (size_t i = 0; i + 1 < egolane_ground.right_line.line_point.size(); ++i) {
     // If a end point is in the clostest right lane line segments
     distance = MAX_FLOAT;
-    if (distance_from_point_to_line_segment(
+    if (DistanceFromPointToLineSegment(
             closted_object_edge.start_point,
             egolane_ground.right_line.line_point[i],
             egolane_ground.right_line.line_point[i + 1], &distance) == true) {
@@ -636,7 +641,7 @@ bool Cipv::is_object_in_the_lane_ground(const ObjectPtr &object,
             << ", shortest_distance: " << shortest_distance;
     }
     // Check if the end point is on the right of the line segment
-    if (is_point_left_of_line(
+    if (IsPointLeftOfLine(
             closted_object_edge.start_point,
             egolane_ground.right_line.line_point[closest_index],
             egolane_ground.right_line.line_point[closest_index + 1]) == true) {
@@ -645,10 +650,10 @@ bool Cipv::is_object_in_the_lane_ground(const ObjectPtr &object,
   }
 
   // Check if the distance is sane
-  if (are_distances_sane(shortest_distance_start_point_to_right_lane,
-                         shortest_distance_start_point_to_left_lane,
-                         shortest_distance_end_point_to_right_lane,
-                         shortest_distance_end_point_to_left_lane)) {
+  if (AreDistancesSane(shortest_distance_start_point_to_right_lane,
+                       shortest_distance_start_point_to_left_lane,
+                       shortest_distance_end_point_to_right_lane,
+                       shortest_distance_end_point_to_left_lane)) {
     return (b_left_lane_clear && b_right_lane_clear);
 
   } else {
@@ -659,20 +664,20 @@ bool Cipv::is_object_in_the_lane_ground(const ObjectPtr &object,
 }
 
 // Check if the object is in the lane in ego-ground space
-bool Cipv::is_object_in_the_lane(const ObjectPtr &object,
-                                 const EgoLane &egolane_image,
-                                 const EgoLane &egolane_ground) {
+bool Cipv::IsObjectInTheLane(const ObjectPtr &object,
+                             const EgoLane &egolane_image,
+                             const EgoLane &egolane_ground) {
   if (b_image_based_cipv_ == true) {
-    return is_object_in_the_lane_image(object, egolane_image);
+    return IsObjectInTheLaneImage(object, egolane_image);
   } else {
-    return is_object_in_the_lane_ground(object, egolane_ground);
+    return IsObjectInTheLaneGround(object, egolane_ground);
   }
 }
 
 // =====================================================================
 // Determine CIPV among multiple objects
-bool Cipv::determine_cipv(std::shared_ptr<SensorObjects> sensor_objects,
-                          CipvOptions *options) {
+bool Cipv::DetermineCipv(std::shared_ptr<SensorObjects> sensor_objects,
+                         CipvOptions *options) {
   if (debug_level_ >= 3) {
     AINFO << "Cipv Got SensorObjects size " << sensor_objects->objects.size();
     AINFO << "Cipv Got lane object size "
@@ -692,10 +697,10 @@ bool Cipv::determine_cipv(std::shared_ptr<SensorObjects> sensor_objects,
   EgoLane egolane_ground;
 
   // Get ego lanes (in both image and ground coordinate)
-  get_egolane(sensor_objects->lane_objects, &egolane_image, &egolane_ground,
-              &b_left_valid, &b_right_valid);
-  elongate_egolane(sensor_objects->lane_objects, b_left_valid, b_right_valid,
-                   yaw_rate, velocity, &egolane_image, &egolane_ground);
+  GetEgoLane(sensor_objects->lane_objects, &egolane_image, &egolane_ground,
+             &b_left_valid, &b_right_valid);
+  ElongateEgoLane(sensor_objects->lane_objects, b_left_valid, b_right_valid,
+                  yaw_rate, velocity, &egolane_image, &egolane_ground);
 
   for (int32_t i = 0; i < static_cast<int32_t>(sensor_objects->objects.size());
        i++) {
@@ -703,8 +708,8 @@ bool Cipv::determine_cipv(std::shared_ptr<SensorObjects> sensor_objects,
       AINFO << "sensor_objects->objects[i]->track_id: "
             << sensor_objects->objects[i]->track_id;
     }
-    if (is_object_in_the_lane(sensor_objects->objects[i], egolane_image,
-                              egolane_ground) == true) {
+    if (IsObjectInTheLane(sensor_objects->objects[i], egolane_image,
+                          egolane_ground) == true) {
       if (cipv_index >= 0) {  // if there is existing CIPV
         // if objects[i] is closer than objects[cipv_index] in ego-x coordinate
         // AINFO << "sensor_objects->objects[i]->center[0]: "
@@ -760,9 +765,7 @@ bool Cipv::determine_cipv(std::shared_ptr<SensorObjects> sensor_objects,
   return true;
 }
 
-std::string Cipv::name() const {
-  return "Cipv";
-}
+std::string Cipv::Name() const { return "Cipv"; }
 
 // Register plugin.
 // REGISTER_CIPV(Cipv);
