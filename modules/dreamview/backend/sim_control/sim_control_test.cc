@@ -80,6 +80,14 @@ class SimControlTest : public ::testing::Test {
           apollo::common::adapter::AdapterConfig::ROUTING_RESPONSE);
     }
 
+    {
+      auto *sub_config = config.add_config();
+      sub_config->set_mode(
+          apollo::common::adapter::AdapterConfig::RECEIVE_ONLY);
+      sub_config->set_type(
+          apollo::common::adapter::AdapterConfig::NAVIGATION);
+    }
+
     AdapterManager::Init(config);
 
     sim_control_->Start();

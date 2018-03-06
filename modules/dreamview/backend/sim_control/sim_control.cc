@@ -75,11 +75,14 @@ void SimControl::Init(bool set_start_point, double start_velocity,
   AdapterManager::AddPlanningCallback(&SimControl::OnPlanning, this);
   AdapterManager::AddRoutingResponseCallback(&SimControl::OnRoutingResponse,
                                              this);
+  AdapterManager::AddNavigationCallback(&SimControl::OnReceiveNavigationInfo,
+                                        this);
+
   // Start timer to publish localization and chassis messages.
   sim_control_timer_ = AdapterManager::CreateTimer(
       ros::Duration(kSimControlInterval), &SimControl::TimerCallback, this);
 
-  if (set_start_point) {
+  if (set_start_point && !FLAGS_use_navigation_mode) {
     apollo::common::PointENU start_point;
     if (!map_service_->GetStartPoint(&start_point)) {
       AWARN << "Failed to get a dummy start point from map!";
@@ -90,6 +93,17 @@ void SimControl::Init(bool set_start_point, double start_velocity,
 
   start_velocity_ = start_velocity;
   start_acceleration_ = start_acceleration;
+}
+
+void SimControl::OnReceiveNavigationInfo(
+    const relative_map::NavigationInfo& navigation_info) {
+  navigation_info_ = navigation_info;
+  if (navigation_info_.navigation_path_size() > 0) {
+    const auto& path = navigation_info_.navigation_path(0).path();
+    if (path.path_point_size() > 0) {
+      adc_position_ = path.path_point(0);
+    }
+  }
 }
 
 void SimControl::SetStartPoint(const double x, const double y) {
@@ -291,10 +305,21 @@ void SimControl::PublishLocalization(double lambda) {
   pose->mutable_position()->set_y(cur_y);
   double cur_z = Interpolate(prev.z(), next.z(), lambda);
   pose->mutable_position()->set_z(cur_z);
-
   // Set orientation and heading
   double cur_theta = NormalizeAngle(
       prev.theta() + lambda * NormalizeAngle(next.theta() - prev.theta()));
+
+  if (FLAGS_use_navigation_mode) {
+    double flu_x = cur_x;
+    double flu_y = cur_y;
+    double enu_x = 0.0;
+    double enu_y = 0.0;
+    common::math::RotateAxis(-cur_theta, flu_x, flu_y, &enu_x, &enu_y);
+    enu_x += adc_position_.x();
+    enu_y += adc_position_.y();
+    pose->mutable_position()->set_x(enu_x);
+    pose->mutable_position()->set_y(enu_y);
+  }
 
   Eigen::Quaternion<double> cur_orientation =
       HeadingToQuaternion<double>(cur_theta);
@@ -333,6 +358,10 @@ void SimControl::PublishLocalization(double lambda) {
                  pose->mutable_linear_acceleration_vrf());
 
   AdapterManager::PublishLocalization(localization);
+
+  adc_position_.set_x(pose->position().x());
+  adc_position_.set_y(pose->position().y());
+  adc_position_.set_z(pose->position().z());
 }
 
 }  // namespace dreamview
