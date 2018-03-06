@@ -3,13 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_common",
-    srcs = glob([
-        "*.cc",
-    ]),
-    hdrs = glob([
-        "*.h",
-    ]),
+    name = "common",
+    srcs = [
+        "perception_gflags.cc",
+    ],
+    hdrs = [
+        "perception_gflags.h",
+    ],
     deps = [
         "//modules/common",
     ],

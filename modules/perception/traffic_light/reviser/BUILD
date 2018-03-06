@@ -36,8 +36,8 @@ cc_test(
     deps = [
         "perception_traffic_light_reviser",
         "//modules/common:log",
-        "//modules/perception/common:perception_common",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/common",
+        "//modules/perception/obstacle/base",
         "@caffe//:lib",
         "@gtest//:main",
         "@opencv2//:core",
