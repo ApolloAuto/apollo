@@ -160,17 +160,19 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
     point->CopyFrom(navigation_path.path_point(i));
 
     // shift to (0, 0)
-    double emu_x = point->x() + dx;
-    double emu_y = point->y() + dy;
+    double enu_x = point->x() + dx;
+    double enu_y = point->y() + dy;
 
     double flu_x = 0.0;
     double flu_y = 0.0;
-    common::math::RotateAxis(original_pose_.heading(), emu_x, emu_y, &flu_x,
+    common::math::RotateAxis(original_pose_.heading(), enu_x, enu_y, &flu_x,
                              &flu_y);
 
     point->set_x(flu_x);
     point->set_y(flu_y);
-    point->set_theta(point->theta() - original_pose_.heading());
+    point->set_theta(common::math::NormalizeAngle(
+        common::math::NormalizeAngle(point->theta())
+            - original_pose_.heading()));
     const double accumulated_s = navigation_path.path_point(i).s() - ref_s;
     point->set_s(accumulated_s);
 
