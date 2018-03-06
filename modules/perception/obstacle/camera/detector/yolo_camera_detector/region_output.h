@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_REGION_OUTPUT_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_REGION_OUTPUT_H_
 
 //#include <boost/property_tree/json_parser.hpp>
@@ -29,9 +30,9 @@
 #include <caffe/blob.hpp>
 #include <caffe/layer.hpp>
 
-#include "infer.h"
-#include "layer.h"
-#include "net.h"
+//#include "infer.h"
+//#include "layer.h"
+//#include "net.h"
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/common/util.h"
@@ -40,7 +41,8 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
+//namespace obstacle {
+
 static const char NormalNMS[] = "NormalNMS";
 static const char LinearSoftNMS[] = "LinearSoftNMS";
 static const char GuassianSoftNMS[] = "GuassianSoftNMS";
@@ -73,11 +75,13 @@ struct AnchorBox {
   float w;
   float h;
 };
+
 struct NMSParam {
   float threshold;
   std::string type = BoxVote;
   float sigma;
 };
+
 template <typename Dtype>
 inline Dtype sigmoid(Dtype x) {
   return 1.0 / (1.0 + exp(-x));
@@ -144,7 +148,7 @@ void cross_class_merge(std::vector<int> *indices_ref,
 void recover_bbox(int roi_w, int roi_h, int offset_y,
                   std::vector<VisualObjectPtr> *objects);
 
-}  // namespace obstacle
+//}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

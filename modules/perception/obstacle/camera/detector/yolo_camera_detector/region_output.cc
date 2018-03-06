@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/obstacle/camera/detector/yolo_camera_detector/region_output.h"
-
 #include <map>
 #include <vector>
 
 #include <boost/iterator/counting_iterator.hpp>
 #include <opencv2/opencv.hpp>
+
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/region_output.h"
 
 namespace apollo {
 namespace perception {
@@ -182,14 +182,14 @@ void recover_bbox(int roi_w, int roi_h, int offset_y,
 
     // Truncation assignment based on bbox positions
     if ((ymin < eps) || (ymax >= 1.0 - eps)) {
-      obj->truncated_vertical = 0.5;
+      obj->trunc_height = 0.5;
     } else {
-      obj->truncated_vertical = 0.0;
+      obj->trunc_height = 0.0;
     }
     if ((xmin < eps) || (xmax >= 1.0 - eps)) {
-      obj->truncated_horizontal = 0.5;
+      obj->trunc_width = 0.5;
     } else {
-      obj->truncated_horizontal = 0.0;
+      obj->trunc_width = 0.0;
     }
   }
 }
