@@ -1,6 +1,7 @@
 export default class BaiduMapAdapter {
     constructor() {
         this.map = null;
+        this.controls = [];
     }
 
     isInitialized() {
@@ -84,8 +85,20 @@ export default class BaiduMapAdapter {
             new BMap.Size(offsetX, offsetY),
             onClickHandler
         );
-
         this.map.addControl(myControl);
+        this.controls.push(myControl);
+    }
+
+    disableControls() {
+        this.controls.forEach(control => {
+            this.map.removeControl(control);
+        });
+    }
+
+    enableControls() {
+        this.controls.forEach(control => {
+            this.map.addControl(control);
+        });
     }
 
     getMarkerPosition(marker) {
