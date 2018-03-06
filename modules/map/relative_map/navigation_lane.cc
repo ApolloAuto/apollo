@@ -170,7 +170,9 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
 
     point->set_x(flu_x);
     point->set_y(flu_y);
-    point->set_theta(point->theta() - original_pose_.heading());
+    point->set_theta(common::math::NormalizeAngle(
+        common::math::NormalizeAngle(point->theta())
+            - original_pose_.heading()));
     const double accumulated_s = navigation_path.path_point(i).s() - ref_s;
     point->set_s(accumulated_s);
 
