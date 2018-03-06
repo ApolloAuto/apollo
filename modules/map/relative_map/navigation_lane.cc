@@ -136,7 +136,9 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
     return;
   }
   path->set_name("Path from navigation.");
-  UpdateProjectionIndex();
+  if (UpdateProjectionIndex()) {
+    return;
+  }
 
   // TODO(All): support multiple navigation path
   // currently, only 1 navigation path is supported
@@ -192,7 +194,7 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
 }
 
 // project adc_state_ onto path
-void NavigationLane::UpdateProjectionIndex() {
+bool NavigationLane::UpdateProjectionIndex() {
   // TODO(All): support multiple navigation path
   // currently, only 1 navigation path is supported
   const auto &path = navigation_info_.navigation_path(0).path();
@@ -209,7 +211,11 @@ void NavigationLane::UpdateProjectionIndex() {
       break;
     }
   }
+  if (min_d < 6) {
+    return false;
+  }
   last_project_index_ = index;
+  return true;
 }
 
 void NavigationLane::ConvertLaneMarkerToPath(
