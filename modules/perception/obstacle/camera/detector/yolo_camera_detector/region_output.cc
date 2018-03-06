@@ -14,17 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/region_output.h"
+
 #include <map>
 #include <vector>
 
 #include <boost/iterator/counting_iterator.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/region_output.h"
-
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 void get_intersect_bbox(const NormalizedBBox &bbox1,
                         const NormalizedBBox &bbox2,
@@ -97,6 +96,7 @@ void get_max_score_index(const std::vector<float> &scores,
     score_index_vec->resize(top_k);
   }
 }
+
 void apply_nms_fast(const std::vector<NormalizedBBox> &bboxes,
                     const std::vector<float> &scores,
                     const float score_threshold, const float nms_threshold,
@@ -194,6 +194,5 @@ void recover_bbox(int roi_w, int roi_h, int offset_y,
   }
 }
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo

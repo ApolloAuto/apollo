@@ -30,10 +30,6 @@
 #include <caffe/blob.hpp>
 #include <caffe/layer.hpp>
 
-//#include "infer.h"
-//#include "layer.h"
-//#include "net.h"
-
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
@@ -41,7 +37,6 @@
 
 namespace apollo {
 namespace perception {
-//namespace obstacle {
 
 static const char NormalNMS[] = "NormalNMS";
 static const char LinearSoftNMS[] = "LinearSoftNMS";
@@ -148,7 +143,6 @@ void cross_class_merge(std::vector<int> *indices_ref,
 void recover_bbox(int roi_w, int roi_h, int offset_y,
                   std::vector<VisualObjectPtr> *objects);
 
-//}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 
