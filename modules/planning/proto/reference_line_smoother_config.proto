@@ -3,6 +3,10 @@ syntax = "proto2";
 package apollo.planning;
 
 message ReferenceLineSmootherConfig {
+  enum DrivingSide {
+      LEFT = 1; // left hand driving country like UK and JP
+      RIGHT = 2; // right hand driving country like CN and US
+  }
   optional uint32 spline_order = 1 [default = 5];
   optional double max_spline_length = 2 [default = 25];
   optional double max_constraint_interval = 3 [default = 5];
@@ -13,4 +17,9 @@ message ReferenceLineSmootherConfig {
   optional uint32 num_of_total_points = 8 [default = 500];
   optional double regularization_weight = 9 [ default = 0.1 ];
   optional double curb_shift = 10 [default=0.2];
+  optional DrivingSide driving_side = 11 [default=RIGHT];
+  // If a lane width larger than this value times adc width, this lane is considered as a wide lane
+  optional double wide_lane_threshold_factor=12 [default=2.0];
+  // In a wide lane case, leave the left side (or right side on a left-handed driving map) this amount times adc width
+  optional double wide_lane_shift_remain_factor = 13 [default=0.5];
 }
