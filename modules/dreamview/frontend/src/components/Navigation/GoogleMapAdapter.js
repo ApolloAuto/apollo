@@ -13,6 +13,7 @@ export default class GoogleMapAdapter {
             center: initPoint,
             zoom: 20,
             mapTypeId: google.maps.MapTypeId.ROADMAP,
+            fullscreenControl: false
         };
         this.map = new google.maps.Map(document.getElementById(divElementName), mapOptions);
     }
