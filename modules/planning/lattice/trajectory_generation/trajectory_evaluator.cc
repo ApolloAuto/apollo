@@ -303,6 +303,7 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
                      FLAGS_comfort_acceleration_factor;
 
   double cruise_s_dot = planning_target.cruise_speed();
+
   ConstantAccelerationTrajectory1d lon_traj(init_s_[0], cruise_s_dot);
 
   if (!planning_target.has_stop_point()) {
