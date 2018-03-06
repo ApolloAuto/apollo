@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto2"
 
 load("//tools:cpplint.bzl", "cpplint")
 

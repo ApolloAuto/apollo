@@ -16,12 +16,13 @@
 
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_H_
 
-#include <caffe/caffe.hpp>
+#include "caffe/caffe.hpp"
+
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/proto/yolo.pb.h"
 
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/common/cnn_adapter.h"
 #include "modules/perception/obstacle/camera/detector/common/feature_extractor.h"
-#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/proto/yolo.pb.h"
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/region_output.h"
 #include "modules/perception/obstacle/camera/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_detector.h"
