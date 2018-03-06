@@ -14,35 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAFFE_BRIDGE_HPP_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAFFE_BRIDGE_HPP_
-
-#include "caffe/caffe.hpp"
+#include "modules/perception/obstacle/camera/dummy/dummy_algorithms.h"
 
 namespace apollo {
 namespace perception {
 namespace obstacle {
 
-template <typename Dtype>
-bool tensor_to_blob(const anakin::Tensor<Dtype> &tensor,
-                    caffe::Blob<Dtype> *blob) {
-  if (blob == nullptr) {
-    return false;
-  }
-  blob->Reshape(tensor.dims());
-  memcpy(blob->mutable_cpu_data(), tensor.cpu_data(),
-         sizeof(Dtype) * blob->count());
-  return true;
-}
+REGISTER_CAMERA_PARSER(DummyCameraParser);
+REGISTER_CAMERA_DETECTOR(DummyCameraDetector);
+// REGISTER_CAMERA_LIGHT_DETECTOR(DummyCameraLightDetector);
+REGISTER_CAMERA_TRACKER(DummyCameraTracker);
+REGISTER_CAMERA_TRANSFORMER(DummyCameraTransformer);
 
-template bool tensor_to_blob(const anakin::Tensor<float> &tensor,
-                             caffe::Blob<float> *blob);
-#if 0
-template bool tensor_to_blob(
-    const anakin::Tensor<double> &tensor, caffe::Blob<double> *blob);
-#endif
 }  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAFFE_BRIDGE_HPP_

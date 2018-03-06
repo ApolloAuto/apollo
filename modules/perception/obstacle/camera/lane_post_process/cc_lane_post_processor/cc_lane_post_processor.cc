@@ -42,7 +42,6 @@ bool CompOriginLateralDistObjectID(const pair<ScalarType, int> &a,
 bool CCLanePostProcessor::Init() {
   // 1. get model config
   ConfigManager *config_manager = ConfigManager::instance();
-  //     Singleton<config_manager::ConfigManager>::get();
 
   const ModelConfig *model_config = NULL;
   if (!config_manager->GetModelConfig(this->name(), &model_config)) {

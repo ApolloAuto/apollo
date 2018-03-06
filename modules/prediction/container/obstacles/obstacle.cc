@@ -175,7 +175,11 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   InsertFeatureToHistory(feature);
 
   // Set obstacle motion status
-  SetMotionStatus();
+  if (FLAGS_use_navigation_mode) {
+    SetMotionStatusBySpeed();
+  } else {
+    SetMotionStatus();
+  }
 
   // Trim historical features
   Trim();
@@ -973,6 +977,29 @@ void Obstacle::SetMotionStatus() {
     } else {
       ADEBUG << "Obstacle [" << id_ << "] is stationary.";
       feature_history_.front().set_is_still(true);
+    }
+  }
+}
+
+void Obstacle::SetMotionStatusBySpeed() {
+  int history_size = static_cast<int>(feature_history_.size());
+  if (history_size < 2) {
+    ADEBUG << "Obstacle [" << id_ << "] has no history and "
+           << "is considered moving.";
+    if (history_size > 0) {
+      feature_history_.front().set_is_still(false);
+    }
+    return;
+  }
+
+  double speed_threshold = FLAGS_still_obstacle_speed_threshold;
+  double speed = feature_history_.front().speed();
+
+  if (FLAGS_use_navigation_mode) {
+    if (speed < speed_threshold) {
+      feature_history_.front().set_is_still(true);
+    } else {
+      feature_history_.front().set_is_still(false);
     }
   }
 }

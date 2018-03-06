@@ -12,6 +12,7 @@ package(default_visibility = ["//visibility:public"])
 #     ],
 # )
 #
+
 # cc_library(
 #     name = "yolo_camera_detector",
 #     srcs = [
@@ -19,6 +20,12 @@ package(default_visibility = ["//visibility:public"])
 #     ],
 #     hdrs = [
 #         "yolo_camera_detector.h",
+#     ],
+#     deps = [
+#         "//modules/common:log",
+#         "//modules/perception/obstacle/base:perception_obstacle_base",
+#         "@caffe//:lib",
+#         "@eigen",
 #     ],
 # )
 
@@ -30,7 +37,7 @@ cc_library(
         "//modules/common:log",
         "//modules/perception/obstacle/base:perception_obstacle_base",
         "@caffe//:lib",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

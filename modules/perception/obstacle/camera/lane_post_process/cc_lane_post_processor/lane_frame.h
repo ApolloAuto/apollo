@@ -19,9 +19,6 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_FRAME_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_FRAME_H_
 
-#include <Eigen/Core>
-#include <opencv2/opencv.hpp>
-
 #include <cmath>
 #include <memory>
 #include <string>
@@ -29,6 +26,9 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
+#include "Eigen/Core"
+#include "opencv2/opencv.hpp"
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/group.h"
@@ -39,12 +39,6 @@
 
 namespace apollo {
 namespace perception {
-
-#define MAX_GRAPH_NUM 20
-
-// #ifndef _DUMP_RESULT
-// #define _DUMP_RESULT true
-// #endif
 
 struct LaneFrameOptions {
   // used for initialization
@@ -106,29 +100,17 @@ class LaneFrame {
 
   bool Process(LaneInstancesPtr instances);
 
-  int MarkerNum() const {
-    return static_cast<int>(markers_.size());
-  }
+  int MarkerNum() const { return static_cast<int>(markers_.size()); }
 
-  bool IsValidMarker(int i) {
-    return i >= 0 && i < MarkerNum();
-  }
+  bool IsValidMarker(int i) { return i >= 0 && i < MarkerNum(); }
 
-  const Marker* marker(int i) {
-    return &(markers_.at(i));
-  }
+  const Marker* marker(int i) { return &(markers_.at(i)); }
 
-  int GraphNum() const {
-    return static_cast<int>(graphs_.size());
-  }
+  int GraphNum() const { return static_cast<int>(graphs_.size()); }
 
-  const Graph* graph(int i) {
-    return &(graphs_.at(i));
-  }
+  const Graph* graph(int i) { return &(graphs_.at(i)); }
 
-  Bbox bbox(int i) const {
-    return boxes_.at(i);
-  }
+  Bbox bbox(int i) const { return boxes_.at(i); }
 
   bool FitPolyCurve(const int& graph_id, const ScalarType& graph_siz,
                     PolyModel* poly_coef, ScalarType* lateral_distance) const;
