@@ -234,9 +234,22 @@ function release() {
   done
 
   # modules data and conf
-  MODULES_RELEASE_DIR="${APOLLO_RELEASE_DIR}/modules"
-  mkdir -p $MODULES_RELEASE_DIR
-  rsync -a modules/ ${MODULES_RELEASE_DIR} --exclude modules/map/data/
+  CONFS=$(find modules/ -name "conf")
+  DATAS=$(find modules/ -name "data")
+  rm -rf test/*
+  for conf in $CONFS; do
+    mkdir -p $APOLLO_RELEASE_DIR/$conf
+    rsync -a $conf/* $APOLLO_RELEASE_DIR/$conf
+  done
+  for data in $DATAS; do
+    mkdir -p $APOLLO_RELEASE_DIR/$data
+    if [ $data != "modules/map/data" ]; then
+      rsync -a $data/* $APOLLO_RELEASE_DIR/$data
+    fi
+  done
+
+  # dreamview frontend
+  cp -a modules/dreamview/frontend $APOLLO_RELEASE_DIR/modules/dreamview
 
   # remove all pyc file in modules/
   find modules/ -name "*.pyc" | xargs -I {} rm {}
