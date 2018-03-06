@@ -17,6 +17,7 @@
 // 1 dimensional constant velocity kalman filter
 
 #include "Eigen/Core"
+#include "Eigen/Dense"
 
 class KalmanFilter1D {
  public:
@@ -24,7 +25,19 @@ class KalmanFilter1D {
 
   bool Predict(const float& time_diff);
 
-  bool Update(const float& x);
+  bool Update(const float& z);
 
   Eigen::Vector2f GetState();
+
+ private:
+  Eigen::Matrix<float, 2, 1> x_;
+  Eigen::Matrix<float, 2, 2> P_;
+  Eigen::Matrix<float, 2, 2> F_;
+  Eigen::Matrix<float, 2, 2> Q_;
+  Eigen::Matrix<float, 1, 2> H_;
+  Eigen::Matrix<float, 1, 1> R_;
+  Eigen::Matrix<float, 1, 1> y_;
+  Eigen::Matrix<float, 1, 1> z_;
+  Eigen::Matrix<float, 1, 1> S_;
+  Eigen::Matrix<float, 2, 1> K_;
 };
