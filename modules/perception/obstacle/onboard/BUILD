@@ -175,6 +175,29 @@ cc_library(
 )
 
 cc_library(
+    name = "lane_post_processing_subnode",
+    srcs = ["lane_post_processing_subnode.cc"],
+    hdrs = [
+        "lane_post_processing_subnode.h",
+        "lane_shared_data.h",
+        "object_shared_data.h",
+    ],
+    deps = [
+        "//modules/common/adapters:adapter_manager",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/camera/interface:interface",
+        "//modules/perception/obstacle/onboard:perception_obstacle_shared_data",
+        "//modules/perception/onboard:perception_onboard",
+        "//modules/common:log",
+        "//modules/perception/common:perception_common",
+        "//modules/perception/lib/base:base",
+        "@eigen",
+        "@opencv2//:core",
+    ],
+)
+
+cc_library(
     name = "perception_obstacle_lowcost_visualizer_subnode",
     srcs = [
         "visualization_subnode.cc",
