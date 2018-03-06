@@ -42,15 +42,21 @@ export default class Ground {
             loadTexture(imgUrl, texture => {
                 console.log("updating ground image with " + dir);
                 this.mesh.material.map = texture;
+                this.mesh.type = "reflection";
                 this.render(coordinates, dir);
             }, err => {
                 console.log("using grid as ground image...");
                 loadTexture(gridGround, texture => {
                     this.mesh.material.map = texture;
+                    this.mesh.type = "grid";
                     this.render(coordinates);
                 });
             });
             this.loadedMap = this.updateMap;
+        } else if (this.initialized && this.mesh.type === "grid") {
+            const adc = world.autoDrivingCar;
+            const position = coordinates.applyOffset({x: adc.positionX, y: adc.positionY});
+            this.mesh.position.set(position.x, position.y, 0);
         }
     }
 
