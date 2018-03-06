@@ -244,15 +244,15 @@ double TrajectoryEvaluator::LonObjectiveCost(
       - lon_trajectory->Evaluate(0, 0.0);
 
   double speed_cost_sqr_sum = 0.0;
-  double speed_cost_abs_sum = 0.0;
+  double speed_cost_weight_sum = 0.0;
   for (std::size_t i = 0; i < ref_s_dots.size(); ++i) {
     double t = i * FLAGS_trajectory_time_resolution;
     double cost = ref_s_dots[i] - lon_trajectory->Evaluate(1, t);
-    speed_cost_sqr_sum += cost * cost;
-    speed_cost_abs_sum += std::abs(cost);
+    speed_cost_sqr_sum += t * t * std::abs(cost);
+    speed_cost_weight_sum += t * t;
   }
   double speed_cost =
-      speed_cost_sqr_sum / (speed_cost_abs_sum + FLAGS_lattice_epsilon);
+      speed_cost_sqr_sum / (speed_cost_weight_sum + FLAGS_lattice_epsilon);
   double dist_travelled_cost = 1.0 / (1.0 + dist_s);
   return (speed_cost * FLAGS_weight_target_speed +
           dist_travelled_cost * FLAGS_weight_dist_travelled) /
