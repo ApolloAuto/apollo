@@ -29,7 +29,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 class YoloCameraDetector : public BaseCameraDetector {
  public:
@@ -97,12 +96,11 @@ class YoloCameraDetector : public BaseCameraDetector {
   float cross_class_merge_threshold_ = 1;
   float confidence_threshold_ = 0.1;
   std::shared_ptr<BaseProjector> projector_;
-  adu::perception::obstacle::yolo::YoloParam yolo_param_;
+  adu::perception::yolo::YoloParam yolo_param_;
   int image_height_ = 0;
   int image_width_ = 0;
 };
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

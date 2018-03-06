@@ -23,7 +23,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 const float LOWEST_FLOAT = -std::numeric_limits<float>::max();
@@ -77,7 +76,6 @@ struct EgoLane{
     LaneLine right_line;
 };
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

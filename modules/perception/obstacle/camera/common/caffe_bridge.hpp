@@ -21,7 +21,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 template <typename Dtype>
 bool tensor_to_blob(const anakin::Tensor<Dtype> &tensor,
@@ -41,7 +40,6 @@ template bool tensor_to_blob(const anakin::Tensor<float> &tensor,
 template bool tensor_to_blob(
     const anakin::Tensor<double> &tensor, caffe::Blob<double> *blob);
 #endif
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

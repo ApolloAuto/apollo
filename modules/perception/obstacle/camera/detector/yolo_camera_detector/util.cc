@@ -25,7 +25,6 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 namespace yolo {
 
 using apollo::perception::ObjectType;
@@ -84,6 +83,5 @@ bool load_anchors(const std::string &path, std::vector<float> *anchors) {
 }
 
 }  // namespace yolo
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
