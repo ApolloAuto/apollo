@@ -3,17 +3,17 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_obstacle_camera_visualizer",
+    name = "visualizer",
     srcs = [
         "frame_content.cc",
-        "glfw_fusion_viewer.cc",
         "gl_fusion_visualizer.cc",
+        "glfw_fusion_viewer.cc",
     ],
     hdrs = [
-        "frame_content.h",
         "base_visualizer.h",
-        "glfw_fusion_viewer.h",
+        "frame_content.h",
         "gl_fusion_visualizer.h",
+        "glfw_fusion_viewer.h",
     ],
     copts = [
         "-Wno-deprecated",
@@ -22,15 +22,15 @@ cc_library(
         "//modules/common:log",
         "//modules/drivers/proto:sensor_proto",
         "//modules/perception/lib/base",
-        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lib/config_manager",
         "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
-        "//modules/perception/obstacle/common:perception_obstacle_common",
-        "//modules/perception/obstacle/radar/interface:perception_obstacle_radar_interface",
-        "//modules/perception/obstacle/camera/visualizer/common:perception_obstacle_camera_visualizer_common",
-        "@eigen//:eigen",
-        "@glew//:glew",
-        "@glfw//:glfw",
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/visualizer/common",
+        "//modules/perception/obstacle/common",
+        "//modules/perception/obstacle/radar/interface",
+        "@eigen",
+        "@glew",
+        "@glfw",
     ],
 )
 
