@@ -15,6 +15,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",
+        "//modules/map/relative_map/proto:navigation_proto",
         "@gtest//:gtest",
     ],
 )
