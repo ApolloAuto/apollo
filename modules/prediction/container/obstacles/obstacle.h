@@ -226,6 +226,8 @@ class Obstacle {
 
   void SetMotionStatus();
 
+  void SetMotionStatusBySpeed();
+
   void InsertFeatureToHistory(const Feature& feature);
 
   void Trim();

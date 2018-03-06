@@ -16,8 +16,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H_
 
-#include <caffe/caffe.hpp>
 #include <memory>
+
+#include "caffe/caffe.hpp"
 #include "include/undistortion.h"
 
 #include "modules/common/log.h"
@@ -85,12 +86,8 @@ class SyncedMemory {
   void *mutable_gpu_data();
 
   enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };
-  SyncedHead head() {
-    return head_;
-  }
-  size_t size() {
-    return size_;
-  }
+  SyncedHead head() { return head_; }
+  size_t size() { return size_; }
 
   void async_gpu_push(const cudaStream_t &stream);
 
