@@ -75,29 +75,19 @@ void RemoveDuplicates(std::vector<MapPathPoint> *points) {
 
 PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
 
-const hdmap::HDMap *PncMap::hdmap() const {
-  return hdmap_;
-}
+const hdmap::HDMap *PncMap::hdmap() const { return hdmap_; }
 
 LaneWaypoint PncMap::ToLaneWaypoint(
     const routing::LaneWaypoint &waypoint) const {
   auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(waypoint.id()));
-  if (lane) {
-    return LaneWaypoint(lane, waypoint.s());
-  } else {
-    AERROR << "Invalid waypoint lane id: " << waypoint.id();
-    return LaneWaypoint();
-  }
+  CHECK(lane) << "invalid lane id: " << waypoint.id();
+  return LaneWaypoint(lane, waypoint.s());
 }
 
 LaneSegment PncMap::ToLaneSegment(const routing::LaneSegment &segment) const {
   auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(segment.id()));
-  if (lane) {
-    return LaneSegment(lane, segment.start_s(), segment.end_s());
-  } else {
-    AERROR << "Invalid waypoint lane id: " << segment.id();
-    return LaneSegment();
-  }
+  CHECK(lane) << "invalid lane id: " << segment.id();
+  return LaneSegment(lane, segment.start_s(), segment.end_s());
 }
 
 void PncMap::UpdateNextRoutingWaypointIndex(int cur_index) {
