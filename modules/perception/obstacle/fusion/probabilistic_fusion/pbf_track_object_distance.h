@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_ // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_ // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PBF_PBF_TRACK_OBJECT_DISTANCE_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PBF_PBF_TRACK_OBJECT_DISTANCE_H_
 
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -28,10 +28,11 @@ namespace perception {
 struct TrackObjectDistanceOptions {
   Eigen::Vector3d *ref_point = nullptr;
 };
+
 class PbfTrackObjectDistance {
  public:
-  PbfTrackObjectDistance();
-  virtual ~PbfTrackObjectDistance();
+  PbfTrackObjectDistance() = default;
+  virtual ~PbfTrackObjectDistance() = default;
 
   float Compute(const PbfTrackPtr &fused_track,
                 const PbfSensorObjectPtr &sensor_object,
@@ -66,4 +67,4 @@ class PbfTrackObjectDistance {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_ // NOLINT
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PBF_PBF_TRACK_OBJECT_DISTANCE_H_

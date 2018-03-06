@@ -17,7 +17,7 @@ cc_library(
         "//modules/perception/lib/base",
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/radar/modest:modest_detector",
-        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/onboard",
         "@pcl",
         "@ros//:ros_common",
     ],
