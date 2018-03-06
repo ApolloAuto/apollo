@@ -21,22 +21,26 @@ class SensorCamera extends React.Component {
 @inject("store") @observer
 class SceneView extends React.Component {
     render() {
-        const { sceneDimension, meters, monitor, options, trafficSignal, video } = this.props.store;
+        const { sceneDimension, meters, monitor,
+                options, trafficSignal, video, hmi } = this.props.store;
 
         return (
-            <div className="main-view" style={{height: sceneDimension.height}}>
+            <div className="main-view" style={{ height: sceneDimension.height }}>
                 <Scene  width={sceneDimension.width}
                         height={sceneDimension.height}
                         options={options}
-                        invisible={false}/>
+                        invisible={false} />
                 {options.showRouteEditingBar
                     ? <RouteEditingBar />
                     : <StatusBar meters={meters}
                                  trafficSignal={trafficSignal}
                                  showNotification={!options.showTasks}
-                                 monitor={monitor}/>}
-                {options.showVideo && <SensorCamera /> }
+                                 monitor={monitor} />}
+                {options.showVideo && <SensorCamera />}
                 {OFFLINE_PLAYBACK && <PlaybackControls />}
+                {hmi.showNavigationMap &&
+                    <Navigation viewHeight={sceneDimension.height}
+                                viewWidth={sceneDimension.width} />}
             </div>
         );
     }
@@ -45,12 +49,10 @@ class SceneView extends React.Component {
 @inject("store") @observer
 export default class MainView extends React.Component {
     render() {
-        const { isInitialized, sceneDimension, hmi } = this.props.store;
+        const { isInitialized, sceneDimension } = this.props.store;
 
-        if (hmi.showNavigationMap) {
-            return <Navigation height={sceneDimension.height}/>;
-        } else if (!isInitialized && !OFFLINE_PLAYBACK) {
-            return <Loader height={sceneDimension.height}/>;
+        if (!isInitialized && !OFFLINE_PLAYBACK) {
+            return <Loader height={sceneDimension.height} />;
         } else {
             return <SceneView />;
         }
