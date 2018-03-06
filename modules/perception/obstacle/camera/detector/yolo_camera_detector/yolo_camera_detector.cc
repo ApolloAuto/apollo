@@ -320,13 +320,13 @@ bool YoloCameraDetector::detect(const cv::Mat &frame,
           << sizeof(obj->internal_type_probs);
   }
 
-  int valid_obj_idx = 0;
-  int total_obj_idx = 0;
   auto ori_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().ori_blob());
   auto dim_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().dim_blob());
   if (ori_blob != nullptr && dim_blob != nullptr) {
+    int valid_obj_idx = 0;
+    int total_obj_idx = 0;
     while (total_obj_idx < static_cast<int>(temp_objects.size())) {
       const auto &obj = temp_objects[total_obj_idx];
       if ((obj->lower_right[1] - obj->upper_left[1]) >= _min_2d_height &&

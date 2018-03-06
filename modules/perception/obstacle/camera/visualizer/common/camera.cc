@@ -15,6 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/camera/visualizer/common/camera.h"
+
+#include <cmath>
+
 #include <algorithm>
 #include <iostream>
 
@@ -51,9 +54,7 @@ Camera::Camera() : _field_of_view(M_PI / 4.0f) {
   compute_projection_matrix();
 }
 
-Camera::~Camera() {
-  delete _frame;
-}
+Camera::~Camera() { delete _frame; }
 
 Camera::Camera(const Camera &camera) {
   set_frame(new Frame());
@@ -449,9 +450,7 @@ Eigen::Vector3d Camera::point_under_pixel(const Eigen::Vector2i &pixel,
   return point;
 }
 
-void Camera::show_entire_scene() {
-  fit_sphere(scene_center(), scene_radius());
-}
+void Camera::show_entire_scene() { fit_sphere(scene_center(), scene_radius()); }
 
 void Camera::center_scene() {
   frame()->project_on_line(scene_center(), view_direction());
@@ -829,7 +828,7 @@ void Camera::draw(bool drawFarPlane, double scale) const {
 
   switch (type()) {
     case Camera::PERSPECTIVE: {
-      points[0](1) = points[0](2) * tan(field_of_view() / 2.0);
+      points[0](1) = points[0](2) * std::tan(field_of_view() / 2.0);
       points[0](0) = points[0](1) * aspect_ratio();
 
       const double ratio = points[1](2) / points[0](2);

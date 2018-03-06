@@ -19,14 +19,14 @@
 #include <yaml-cpp/yaml.h>
 #include <boost/shared_ptr.hpp>
 
+#include <cfloat>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <cfloat>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/camera/visualizer/common/bmp.h"
@@ -213,9 +213,7 @@ void GLFWFusionViewer::spin_once() {
   glfwSwapBuffers(_window);
 }
 
-void GLFWFusionViewer::close() {
-  glfwTerminate();
-}
+void GLFWFusionViewer::close() { glfwTerminate(); }
 
 void GLFWFusionViewer::set_camera_para(Eigen::Vector3d i_position,
                                        Eigen::Vector3d i_scn_center,
@@ -302,7 +300,6 @@ bool GLFWFusionViewer::opengl_init() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_NORMALIZE);
   glEnable(GL_COLOR_MATERIAL);
-
 
   GLenum err = glewInit();
   if (GLEW_OK != err) {
@@ -497,7 +494,7 @@ vec3 GLFWFusionViewer::get_velocity_src_position(const ObjectPtr& object) {
   float y11 = 0.0f;
   float x22 = 0.0f;
   float y22 = 0.0f;
-  if (abs(cos_direction_velocity) > 0.707)  {  // <45 degree
+  if (abs(cos_direction_velocity) > 0.707) {  // <45 degree
     x1 = size.x / 2;
     y1 = 0;
     x2 = x1 * -1;
@@ -718,13 +715,9 @@ void GLFWFusionViewer::mouse_move(double xpos, double ypos) {
   _mouse_prev_y = ypos;
 }
 
-void GLFWFusionViewer::mouse_wheel(double delta) {
-  _mode_mat(2, 3) -= delta;
-}
+void GLFWFusionViewer::mouse_wheel(double delta) { _mode_mat(2, 3) -= delta; }
 
-void GLFWFusionViewer::reset() {
-  _mode_mat = Eigen::Matrix4d::Identity();
-}
+void GLFWFusionViewer::reset() { _mode_mat = Eigen::Matrix4d::Identity(); }
 
 void GLFWFusionViewer::keyboard(int key) {
   switch (key) {
@@ -1091,10 +1084,8 @@ void GLFWFusionViewer::draw_camera_box2d(const std::vector<ObjectPtr>& objects,
 
     std::vector<Eigen::Vector2d> points;
     points.resize(8);
-    Eigen::Vector3d tc =
-        (v2c * Eigen::Vector4d(center[0], center[1], center[2], 1)).head(3);
 
-    tc = center.head(3);
+    Eigen::Vector3d tc = center.head(3);
     get_boundingbox(tc, v2c, width, height, length, obj->direction, theta,
                     &points);
 
@@ -1148,9 +1139,8 @@ void GLFWFusionViewer::draw_camera_box2d(const std::vector<ObjectPtr>& objects,
         // Draw texts using OpenGL
         // distance
         if (_show_type_id_label) {
-          std::string c =
-              std::to_string(static_cast<int>(
-                             (sqrt(tc.x() * tc.x() + tc.z() * tc.z()))));
+          std::string c = std::to_string(
+              static_cast<int>((sqrt(tc.x() * tc.x() + tc.z() * tc.z()))));
           glColor3ub(box2d_color[0], box2d_color[1], box2d_color[2]);
           double x_txt = points[7].x();
           double y_txt = points[7].y() - 8;
@@ -1589,7 +1579,9 @@ void GLFWFusionViewer::draw_camera_box(const std::vector<ObjectPtr>& objects,
                     offset_x, offset_y, image_width, image_height);
     }
 
+    // TODO(All) fix the code after continue
     continue;
+    /*
     if (_show_camera_box2d) {
       if (obj->camera_supplement != nullptr) {
         auto box2d_color = s_color_table[obj->track_id % s_color_table.size()];
@@ -1600,9 +1592,8 @@ void GLFWFusionViewer::draw_camera_box(const std::vector<ObjectPtr>& objects,
                     image_width, image_height);
         // Draw texts using OpenGL
         // distance
-        std::string c =
-            std::to_string(static_cast<int>(
-                           (sqrt(tc.x() * tc.x() + tc.z() * tc.z()))));
+        std::string c = std::to_string(
+            static_cast<int>((sqrt(tc.x() * tc.x() + tc.z() * tc.z()))));
         auto dis_txt_color =
             s_color_table[obj->track_id % s_color_table.size()];
         glColor3ub(dis_txt_color[0], dis_txt_color[1], dis_txt_color[2]);
@@ -1643,6 +1634,7 @@ void GLFWFusionViewer::draw_camera_box(const std::vector<ObjectPtr>& objects,
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);  // reset the color to white
       }
     }
+    */
   }
 }
 

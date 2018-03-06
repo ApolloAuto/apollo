@@ -18,17 +18,16 @@
 
 #include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
 
-#include <yaml-cpp/yaml.h>
-#include <Eigen/Core>
-#include <Eigen/Dense>
-#include <opencv2/opencv.hpp>
-
 #include <cfloat>
+
+#include "Eigen/Dense"
+#include "opencv2/opencv.hpp"
+#include "yaml-cpp/yaml.h"
 
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/base/time_util.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
@@ -72,13 +71,13 @@ bool LanePostProcessingSubnode::InitSharedData() {
   }
 
   // init preprocess_data
-  camera_object_data_ = dynamic_cast<CameraObjectData*>(
+  camera_object_data_ = dynamic_cast<CameraObjectData *>(
       shared_data_manager_->GetSharedData("CameraObjectData"));
   if (camera_object_data_ == nullptr) {
     AERROR << "failed to get shared data instance: CameraObjectData ";
     return false;
   }
-  lane_shared_data_ = dynamic_cast<LaneSharedData*>(
+  lane_shared_data_ = dynamic_cast<LaneSharedData *>(
       shared_data_manager_->GetSharedData("LaneSharedData"));
   if (lane_shared_data_ == nullptr) {
     AERROR << "failed to get shared data instance: LaneSharedData ";
@@ -86,8 +85,7 @@ bool LanePostProcessingSubnode::InitSharedData() {
   }
 
   AINFO << "init shared data successfully, data: "
-        << camera_object_data_->name() << " and "
-        << lane_shared_data_->name();
+        << camera_object_data_->name() << " and " << lane_shared_data_->name();
 
   return true;
 }
@@ -98,8 +96,7 @@ bool LanePostProcessingSubnode::InitAlgorithmPlugin() {
       BaseCameraLanePostProcessorRegisterer::GetInstanceByName(
           FLAGS_onboard_lane_post_processor));
   if (!lane_post_processor_) {
-    AERROR << "failed to get instance: "
-           << FLAGS_onboard_lane_post_processor;
+    AERROR << "failed to get instance: " << FLAGS_onboard_lane_post_processor;
     return false;
   }
   if (!lane_post_processor_->Init()) {
@@ -109,8 +106,7 @@ bool LanePostProcessingSubnode::InitAlgorithmPlugin() {
   }
 
   AINFO << "init alg pulgins successfully\n"
-        << " lane post-processer:     "
-        << FLAGS_onboard_lane_post_processor;
+        << " lane post-processer:     " << FLAGS_onboard_lane_post_processor;
   return true;
 }
 
@@ -128,8 +124,7 @@ bool LanePostProcessingSubnode::InitWorkRoot() {
   // get work root dir
   work_root_dir_ = config_manager->work_root();
 
-  AINFO << "init config manager successfully, work_root: "
-        << work_root_dir_;
+  AINFO << "init config manager successfully, work_root: " << work_root_dir_;
   return true;
 }
 
@@ -166,16 +161,15 @@ Status LanePostProcessingSubnode::ProcEvents() {
   return Status::OK();
 }
 
-bool LanePostProcessingSubnode::GetSharedData(
-    const Event &event, shared_ptr<SensorObjects> *objs) {
+bool LanePostProcessingSubnode::GetSharedData(const Event &event,
+                                              shared_ptr<SensorObjects> *objs) {
   double timestamp = event.timestamp;
   string device_id = event.reserve;
   device_id_ = device_id;
   string data_key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id, &data_key)) {
-    AERROR << "failed to produce shared data key. EventID:"
-           << event.event_id << " timestamp:" << timestamp
-           << " device_id:" << device_id;
+    AERROR << "failed to produce shared data key. EventID:" << event.event_id
+           << " timestamp:" << timestamp << " device_id:" << device_id;
     return false;
   }
 
@@ -187,8 +181,7 @@ bool LanePostProcessingSubnode::GetSharedData(
 }
 
 void LanePostProcessingSubnode::PublishDataAndEvent(
-    double timestamp,
-    const SharedDataPtr<LaneObjects> &lane_objects) {
+    double timestamp, const SharedDataPtr<LaneObjects> &lane_objects) {
   string key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key)) {
     AERROR << "failed to produce shared key. time: "
