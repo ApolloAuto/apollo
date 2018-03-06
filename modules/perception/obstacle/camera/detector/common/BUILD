@@ -7,14 +7,14 @@ cc_library(
     srcs = ["util.cc"],
     hdrs = ["util.h"],
     deps = [
-        "@caffe//:lib",
-        "@eigen//:eigen",
-        "@opencv2//:core",
-        "@undistort//:undistort",
         "//modules/common:log",
-        "@opencv2//:imgproc",
+        "@caffe//:lib",
         "@cuda",
-    ]
+        "@eigen",
+        "@opencv2//:core",
+        "@opencv2//:imgproc",
+        "@undistort",
+    ],
 )
 
 cc_library(
@@ -22,20 +22,19 @@ cc_library(
     srcs = ["feature_extractor.cc"],
     hdrs = ["feature_extractor.h"],
     deps = [
-        "@caffe//:lib",
-        "@eigen//:eigen",
-        "@opencv2//:core",
-        "@undistort//:undistort",
         "//modules/common:log",
-        "//modules/perception/lib/base:base",
-        "@opencv2//:imgproc",
-        "@cuda",
-        "//modules/perception/lib/pcl_util:pcl_util",
-        "//modules/perception/obstacle/camera/common:common",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/lib/base",
+        "//modules/perception/lib/pcl_util",
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/common:util",
         "//modules/perception/obstacle/camera/detector/common/proto:tracking_feature_proto",
-    ]
+        "@caffe//:lib",
+        "@cuda",
+        "@eigen",
+        "@opencv2//:core",
+        "@opencv2//:imgproc",
+        "@undistort",
+    ],
 )
-
 
 cpplint()

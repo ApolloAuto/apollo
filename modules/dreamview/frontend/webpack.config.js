@@ -13,7 +13,6 @@ module.exports = {
 
     entry: {
         app: "./app.js",
-        navigation: "./components/Navigation/entry.js"
     },
 
     output: {
@@ -181,10 +180,6 @@ module.exports = {
         new FaviconsWebpackPlugin("./favicon.png"),
         new CopyWebpackPlugin([
             {
-                from: 'components/Navigation/navigation_viewer.html',
-                to:  'components/Navigation/navigation_viewer.html',
-                toType: 'file',
-            }, {
                 from: '../node_modules/three/examples/fonts',
                 to: 'fonts',
             }

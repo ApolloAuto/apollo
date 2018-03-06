@@ -15,7 +15,7 @@ cc_binary(
         "//modules/perception/traffic_light/base:perception_traffic_light_base",
         "//modules/perception/traffic_light/util:perception_traffic_light_util",
         "//modules/perception/lib/base",
-        "//modules/perception/common:perception_common",
+        "//modules/perception/common",
         "//modules/perception/proto:perception_proto",
         "@ros//:ros_common",
     ],

@@ -20,14 +20,12 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fstream>
-#include <iostream>
 
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/common/util.h"
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 bool ReorgFeatureExtractor::init(
     const ExtractorParam &param,
@@ -168,6 +166,5 @@ bool ROIPoolingFeatureExtractor::extract(
   return true;
 }
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo

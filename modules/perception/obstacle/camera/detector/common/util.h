@@ -16,15 +16,15 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H_
 
-#include <caffe/caffe.hpp>
 #include <memory>
+
+#include "caffe/caffe.hpp"
 #include "include/undistortion.h"
 
 #include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 void gpu_memcpy(const size_t N, const void *X, void *Y);
 
 inline void perception_gpu_memset(const size_t N, const int alpha, void *X) {
@@ -85,12 +85,8 @@ class SyncedMemory {
   void *mutable_gpu_data();
 
   enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };
-  SyncedHead head() {
-    return head_;
-  }
-  size_t size() {
-    return size_;
-  }
+  SyncedHead head() { return head_; }
+  size_t size() { return size_; }
 
   void async_gpu_push(const cudaStream_t &stream);
 
@@ -119,7 +115,6 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst,
             std::shared_ptr<SyncedMemory> src_gpu, int start_axis,
             const float mean_b, const float mean_g, const float mean_r,
             const float scale);
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 

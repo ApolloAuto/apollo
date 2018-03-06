@@ -30,7 +30,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
         "//modules/common/status",
-        "//modules/perception/common:perception_common",
+        "//modules/perception/common",
         "//modules/perception/lib/base",
         "//modules/perception/onboard/proto:dag_proto",
         "@eigen",

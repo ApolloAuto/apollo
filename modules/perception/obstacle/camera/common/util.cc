@@ -14,18 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <fcntl.h>
-#include <iomanip>
+#include "modules/perception/obstacle/camera/common/util.h"
 
-#include <gflags/gflags.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <algorithm>
+#include <iomanip>
 
-#include "modules/perception/obstacle/camera/common/util.h"
+#include "gflags/gflags.h"
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 DEFINE_string(onsemi_obstacle_extrinsics,
               "./conf/params/onsemi_obstacle_extrinsics.yaml",
@@ -63,8 +63,10 @@ bool load_visual_object_form_file(
 
   while (!feof(fp)) {
     VisualObjectPtr obj(new VisualObject());
-    std::fill(obj->type_probs.begin(),
-              obj->type_probs.begin() + (int)ObjectType::MAX_OBJECT_TYPE, 0);
+    std::fill(
+        obj->type_probs.begin(),
+        obj->type_probs.begin() + static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
+        0);
 
     double trash = 0.0;
     char type[255];
@@ -74,7 +76,7 @@ bool load_visual_object_form_file(
     double y2 = 0.0;
     int ret =
         fscanf(fp,
-               "%s %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf "
+               "%s %lf %lf %f %lf %lf %lf %lf %f %f %f %f %f %f %f %f "
                "%lf %lf",
                type, &trash, &trash, &obj->alpha, &x1, &y1, &x2, &y2,
                &obj->height, &obj->width, &obj->length, &obj->center.x(),
@@ -85,7 +87,8 @@ bool load_visual_object_form_file(
     obj->lower_right[0] = x2 < 1920 ? x2 : 1920;
     obj->lower_right[1] = y2 < 1080 ? y2 : 1080;
     obj->type = get_object_type(std::string(type));
-    obj->type_probs[obj->type] = static_cast<float>(obj->score);
+    obj->type_probs[static_cast<int>(obj->type)] =
+        static_cast<float>(obj->score);
 
     if (ret >= 15) {
       visual_objects->push_back(obj);
@@ -120,7 +123,7 @@ bool write_visual_object_to_file(const std::string &file_name,
 }
 
 bool load_gt_form_file(const std::string &gt_path,
-                       std::vector<VisualObjectPtr> &visual_objects) {
+                       std::vector<VisualObjectPtr> *visual_objects) {
   std::ifstream gt_file(gt_path);
 
   std::string line;
@@ -132,12 +135,13 @@ bool load_gt_form_file(const std::string &gt_path,
     std::copy(std::istream_iterator<std::string>(iss),
               std::istream_iterator<std::string>(), back_inserter(tokens));
 
-    // TODO Decide where to Eliminate -99 2D only cases, since they don't have
-    // 3d (2409 test)
+    // TODO(All) Decide where to Eliminate -99 2D only cases, since they don't
+    // have 3d (2409 test)
     if (tokens.size() == 16 && tokens[3].compare("-99") != 0) {
       VisualObjectPtr obj(new VisualObject());
 
-      // TODO Why the 2409 test data ground truth has exchanged alpha and theta
+      // TODO(All) Why the 2409 test data ground truth has exchanged alpha and
+      // theta
       // position?
 
       obj->type = get_object_type(tokens[0]);
@@ -177,15 +181,16 @@ bool load_gt_form_file(const std::string &gt_path,
         obj->truncated_vertical = 0.0;
       }
 
-      visual_objects.push_back(obj);
+      visual_objects->push_back(obj);
     }
   }
+  return true;
 }
 
 void draw_visual_objects(const std::vector<VisualObjectPtr> &visual_objects,
-                         cv::Mat &img) {
+                         cv::Mat *img) {
   for (const auto &obj : visual_objects) {
-    // 3D BBox
+// 3D BBox
 #if 0
         if (obj->pts8.size() >= 17) {
             cv::Point pixels[9];
@@ -194,23 +199,23 @@ void draw_visual_objects(const std::vector<VisualObjectPtr> &visual_objects,
                                       static_cast<int>(obj->pts8[i*2 + 1]));
             }
 
-            cv::line(img, pixels[4], pixels[5], COLOR_GREEN, 1);
-            cv::line(img, pixels[5], pixels[6], COLOR_YELLOW, 1);
-            cv::line(img, pixels[6], pixels[7], COLOR_BLUE, 1);
-            cv::line(img, pixels[7], pixels[4], COLOR_YELLOW, 1);
+            cv::line(*img, pixels[4], pixels[5], COLOR_GREEN, 1);
+            cv::line(*img, pixels[5], pixels[6], COLOR_YELLOW, 1);
+            cv::line(*img, pixels[6], pixels[7], COLOR_BLUE, 1);
+            cv::line(*img, pixels[7], pixels[4], COLOR_YELLOW, 1);
 
-            cv::line(img, pixels[0], pixels[1], COLOR_GREEN, 1);
-            cv::line(img, pixels[1], pixels[2], COLOR_YELLOW, 1);
-            cv::line(img, pixels[2], pixels[3], COLOR_BLUE, 1);
-            cv::line(img, pixels[3], pixels[0], COLOR_YELLOW, 1);
+            cv::line(*img, pixels[0], pixels[1], COLOR_GREEN, 1);
+            cv::line(*img, pixels[1], pixels[2], COLOR_YELLOW, 1);
+            cv::line(*img, pixels[2], pixels[3], COLOR_BLUE, 1);
+            cv::line(*img, pixels[3], pixels[0], COLOR_YELLOW, 1);
 
-            cv::line(img, pixels[0], pixels[4], COLOR_GREEN, 1);
-            cv::line(img, pixels[1], pixels[5], COLOR_GREEN, 1);
-            cv::line(img, pixels[2], pixels[6], COLOR_BLUE, 1);
-            cv::line(img, pixels[3], pixels[7], COLOR_BLUE, 1);
+            cv::line(*img, pixels[0], pixels[4], COLOR_GREEN, 1);
+            cv::line(*img, pixels[1], pixels[5], COLOR_GREEN, 1);
+            cv::line(*img, pixels[2], pixels[6], COLOR_BLUE, 1);
+            cv::line(*img, pixels[3], pixels[7], COLOR_BLUE, 1);
 
-            //3D center
-            cv::circle(img, pixels[8], 3, COLOR_RED, 3);
+            // 3D center
+            cv::circle(*img, pixels[8], 3, COLOR_RED, 3);
         }
 #endif
 
@@ -230,10 +235,10 @@ void draw_visual_objects(const std::vector<VisualObjectPtr> &visual_objects,
     bbox[3].x = x1;
     bbox[3].y = y2;
 
-    cv::line(img, bbox[0], bbox[1], COLOR_WHITE, 1);
-    cv::line(img, bbox[1], bbox[2], COLOR_WHITE, 1);
-    cv::line(img, bbox[2], bbox[3], COLOR_WHITE, 1);
-    cv::line(img, bbox[3], bbox[0], COLOR_WHITE, 1);
+    cv::line(*img, bbox[0], bbox[1], COLOR_WHITE, 1);
+    cv::line(*img, bbox[1], bbox[2], COLOR_WHITE, 1);
+    cv::line(*img, bbox[2], bbox[3], COLOR_WHITE, 1);
+    cv::line(*img, bbox[3], bbox[0], COLOR_WHITE, 1);
 
     //  Text
     std::stringstream stream;
@@ -249,18 +254,18 @@ void draw_visual_objects(const std::vector<VisualObjectPtr> &visual_objects,
     stream << std::fixed << std::setprecision(2) << obj->theta * 180.0 / M_PI;
     stream << " deg, D:";
     stream << obj->id;
-    cv::putText(img, stream.str(), cv::Point(x1, y1 - 5),
+    cv::putText(*img, stream.str(), cv::Point(x1, y1 - 5),
                 cv::FONT_HERSHEY_PLAIN, 0.8, COLOR_WHITE);
   }
 }
 
 void draw_gt_objects_text(const std::vector<VisualObjectPtr> &visual_objects,
-                          cv::Mat &img) {
+                          cv::Mat *img) {
   for (const auto &obj : visual_objects) {
     // 2D BBox
     int x1 = static_cast<int>(obj->upper_left[0]);
-    int y1 = static_cast<int>(obj->upper_left[1]);
-    int x2 = static_cast<int>(obj->lower_right[0]);
+    // int y1 = static_cast<int>(obj->upper_left[1]);
+    // int x2 = static_cast<int>(obj->lower_right[0]);
     int y2 = static_cast<int>(obj->lower_right[1]);
 
     //  Text
@@ -277,7 +282,7 @@ void draw_gt_objects_text(const std::vector<VisualObjectPtr> &visual_objects,
     stream << std::fixed << std::setprecision(2) << obj->theta * 180.0 / M_PI;
     stream << " deg, D:";
     stream << obj->id;
-    cv::putText(img, stream.str(), cv::Point(x1, y2 + 10),
+    cv::putText(*img, stream.str(), cv::Point(x1, y2 + 10),
                 cv::FONT_HERSHEY_PLAIN, 0.8, COLOR_BLACK);
   }
 }
@@ -337,6 +342,5 @@ ObjectType get_object_type(const std::string &type) {
   }
 }
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo

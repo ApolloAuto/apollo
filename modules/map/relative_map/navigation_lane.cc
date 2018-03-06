@@ -234,8 +234,8 @@ void NavigationLane::ConvertLaneMarkerToPath(
                    quality_divider;
 
   double path_c3 =
-      (left_lane.c3_curvature_derivative() * left_lane.quality() +
-       right_lane.c3_curvature_derivative() * left_lane.quality()) /
+      (left_lane.c3_curvature_derivative() * left_quality +
+       right_lane.c3_curvature_derivative() * right_quality) /
       quality_divider;
 
   const double current_speed =

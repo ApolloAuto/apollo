@@ -14,16 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ADU_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAFFE_BRIDGE_HPP_
-#define ADU_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAFFE_BRIDGE_HPP_
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAFFE_BRIDGE_HPP_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAFFE_BRIDGE_HPP_
 
-#include <caffe/caffe.hpp>
-
-#include "infer.h"
+#include "caffe/caffe.hpp"
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
 template <typename Dtype>
 bool tensor_to_blob(const anakin::Tensor<Dtype> &tensor,
@@ -40,10 +37,10 @@ bool tensor_to_blob(const anakin::Tensor<Dtype> &tensor,
 template bool tensor_to_blob(const anakin::Tensor<float> &tensor,
                              caffe::Blob<float> *blob);
 #if 0
-template bool tensor_to_blob(const anakin::Tensor<double> &tensor, caffe::Blob<double> *blob);
+template bool tensor_to_blob(
+    const anakin::Tensor<double> &tensor, caffe::Blob<double> *blob);
 #endif
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // ADU_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAFFE_BRIDGE_HPP_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAFFE_BRIDGE_HPP_

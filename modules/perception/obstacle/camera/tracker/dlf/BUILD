@@ -7,10 +7,10 @@ cc_library(
     srcs = ["dlf_affinity_tracker.cc"],
     hdrs = ["dlf_affinity_tracker.h"],
     deps = [
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/tracker:base_affinity",
         "@eigen",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
-        "//modules/perception/obstacle/camera/tracker:base_affinity"
-    ]
+    ],
 )
 
 cpplint()

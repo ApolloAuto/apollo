@@ -7,12 +7,12 @@ cc_library(
     srcs = [],
     hdrs = glob(["*.h"]),
     deps = [
-        "//modules/perception/lib/base:base",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
-        "//modules/perception/obstacle/camera/common:common",
+        "//modules/perception/lib/base",
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/common",
         "@eigen",
         "@opencv2//:core",
-    ]
+    ],
 )
 
 cpplint()

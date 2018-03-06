@@ -91,5 +91,11 @@ DECLARE_string(screen_output_dir);
 DECLARE_double(car_length);
 DECLARE_double(car_width);
 
+DECLARE_bool(show_front_radar_objects);
+DECLARE_bool(show_back_radar_objects);
+DECLARE_bool(show_camera_objects2d);
+DECLARE_bool(show_camera_parsing);
+DECLARE_string(frame_visualizer);
+
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
 

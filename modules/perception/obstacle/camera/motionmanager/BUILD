@@ -3,9 +3,9 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_obstacle_camera_motionmanager",
+    name = "motionmanager",
     srcs = [
-        "vehicleplanemotion.cc"
+        "vehicleplanemotion.cc",
     ],
     hdrs = [
         "vehicleplanemotion.h",
@@ -14,7 +14,7 @@ cc_library(
         "-Wno-deprecated",
     ],
     deps = [
-        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/base",
     ],
 )
 

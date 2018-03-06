@@ -58,7 +58,6 @@
 
 namespace apollo {
 namespace perception {
-namespace lowcostvisualizer {
 
 class BaseVisualizer {
  public:
@@ -72,7 +71,7 @@ class BaseVisualizer {
 
     virtual void update_camera_system(FrameContent *content) {}
 
-    virtual void render(const FrameContent &content) = 0;
+    virtual void render(FrameContent *content) = 0;
 
     // virtual void set_motion_buffer(MotionBuffer &motion_buffer) {}
 
@@ -83,7 +82,7 @@ class BaseVisualizer {
 REGISTER_REGISTERER(BaseVisualizer);
 #define REGISTER_VISUALIZER(name) REGISTER_CLASS(BaseVisualizer, name)
 
-}  // namespace lowcostvisualizer
+
 }  // namespace perception
 }  // namespace apollo
 

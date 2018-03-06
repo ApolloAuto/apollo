@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_obstacle_hdmapinput",
+    name = "hdmapinput",
     srcs = ["hdmap_input.cc"],
     hdrs = ["hdmap_input.h"],
     deps = [
@@ -12,31 +12,31 @@ cc_library(
         "//modules/common/configs:config_gflags",
         "//modules/map/hdmap",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/perception/common:perception_common",
+        "//modules/perception/common",
         "//modules/perception/lib/base",
         "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/base",
         "@eigen",
     ],
 )
 
 cc_library(
-    name = "perception_obstacle_lidar_process",
+    name = "lidar_process",
     srcs = ["lidar_process.cc"],
     hdrs = ["lidar_process.h"],
     deps = [
-        ":perception_obstacle_hdmapinput",
+        ":hdmapinput",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/obstacle/lidar/dummy:perception_obstacle_lidar_dummy",
-        "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
-        "//modules/perception/obstacle/lidar/object_builder/min_box:perception_obstacle_lidar_object_builder_min_box",
+        "//modules/perception/obstacle/lidar/dummy",
+        "//modules/perception/obstacle/lidar/interface",
+        "//modules/perception/obstacle/lidar/object_builder/min_box",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
-        "//modules/perception/obstacle/lidar/segmentation/cnnseg:perception_obstacle_lidar_segmention_cnnseg",
-        "//modules/perception/obstacle/lidar/tracker/hm_tracker:perception_obstacle_lidar_tracker_hm_tracker",
-        "//modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser:perception_obstacle_lidar_type_fuser_sequence_type_fuser",
-        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
-        "//modules/perception/obstacle/radar/dummy:perception_obstacle_radar_dummy",
+        "//modules/perception/obstacle/lidar/segmentation/cnnseg",
+        "//modules/perception/obstacle/lidar/tracker/hm_tracker",
+        "//modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser",
+        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
+        "//modules/perception/obstacle/radar/dummy",
         "@ros//:ros_common",
     ],
 )
@@ -51,17 +51,17 @@ cc_library(
         "object_shared_data.h",
     ],
     deps = [
-        ":perception_obstacle_hdmapinput",
+        ":hdmapinput",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/obstacle/lidar/dummy:perception_obstacle_lidar_dummy",
-        "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
-        "//modules/perception/obstacle/lidar/object_builder/min_box:perception_obstacle_lidar_object_builder_min_box",
+        "//modules/perception/obstacle/lidar/dummy",
+        "//modules/perception/obstacle/lidar/interface",
+        "//modules/perception/obstacle/lidar/object_builder/min_box",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
-        "//modules/perception/obstacle/lidar/segmentation/cnnseg:perception_obstacle_lidar_segmention_cnnseg",
-        "//modules/perception/obstacle/lidar/tracker/hm_tracker:perception_obstacle_lidar_tracker_hm_tracker",
-        "//modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser:perception_obstacle_lidar_type_fuser_sequence_type_fuser",
-        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
+        "//modules/perception/obstacle/lidar/segmentation/cnnseg",
+        "//modules/perception/obstacle/lidar/tracker/hm_tracker",
+        "//modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser",
+        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
         "//modules/perception/onboard:perception_onboard",
         "@ros//:ros_common",
     ],
@@ -77,20 +77,20 @@ cc_library(
         "radar_process_subnode.h",
     ],
     deps = [
-        ":perception_obstacle_hdmapinput",
+        ":hdmapinput",
         "//modules/common",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
-        "//modules/perception/common:perception_common",
+        "//modules/perception/common",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
-        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
-        "//modules/perception/obstacle/radar/dummy:perception_obstacle_radar_dummy",
-        "//modules/perception/obstacle/radar/modest:perception_obstacle_radar_modest_modest_detector",
+        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
+        "//modules/perception/obstacle/radar/dummy",
+        "//modules/perception/obstacle/radar/modest:modest_detector",
         "//modules/perception/onboard:perception_onboard",
         "@eigen",
         "@ros//:ros_common",
@@ -107,19 +107,19 @@ cc_library(
         "object_shared_data.h",
     ],
     deps = [
-        ":perception_obstacle_hdmapinput",
+        ":hdmapinput",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/fusion/probabilistic_fusion",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
-        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
+        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
         "//modules/perception/onboard:perception_onboard",
         "@ros//:ros_common",
     ],
 )
 
 cc_library(
-    name = "perception_obstacle_motion_manager_subnode",
+    name = "motion_manager_subnode",
     srcs = [
         "motion_manager_service.cc",
     ],
@@ -127,17 +127,16 @@ cc_library(
         "motion_manager_service.h",
     ],
     deps = [
-
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
+        "//modules/perception/obstacle/camera/motionmanager",
         "//modules/perception/onboard:perception_onboard",
-        "//modules/perception/obstacle/camera/motionmanager:perception_obstacle_camera_motionmanager",
         "@ros//:ros_common",
     ],
 )
 
 cc_library(
-    name = "perception_obstacle_obstacle_perception",
+    name = "obstacle_perception",
     srcs = [
         "obstacle_perception.cc",
     ],
@@ -146,16 +145,51 @@ cc_library(
         "sensor_raw_frame.h",
     ],
     deps = [
-        ":perception_obstacle_hdmapinput",
+        ":hdmapinput",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/fusion/probabilistic_fusion",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
-        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer:perception_obstacle_lidar_opengl_visualizer",
-        "//modules/perception/obstacle/onboard:perception_obstacle_lidar_process",
-        "//modules/perception/obstacle/radar/modest:perception_obstacle_radar_modest_modest_detector",
+        "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
+        "//modules/perception/obstacle/onboard:lidar_process",
+        "//modules/perception/obstacle/radar/modest:modest_detector",
         "//modules/perception/onboard:perception_onboard",
         "@ros//:ros_common",
+    ],
+)
+
+cc_library(
+    name = "perception_obstacle_shared_data",
+    srcs = [
+        "camera_shared_data.cc",
+        "fusion_shared_data.cc",
+    ],
+    hdrs = [
+        "camera_shared_data.h",
+        "fusion_shared_data.h",
+    ],
+    deps = [
+        "//modules/perception/obstacle/base",
+        "//modules/perception/onboard:perception_onboard",
+    ],
+)
+
+cc_library(
+    name = "perception_obstacle_lowcost_visualizer_subnode",
+    srcs = [
+        "visualization_subnode.cc",
+    ],
+    hdrs = [
+        "object_shared_data.h",
+        "visualization_subnode.h",
+    ],
+    deps = [
+        ":perception_obstacle_shared_data",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/common:util",
+        "//modules/perception/obstacle/camera/visualizer",
+        "//modules/perception/onboard:perception_onboard",
     ],
 )
 
@@ -170,14 +204,14 @@ cc_test(
         "//modules/perception:perception_data",
     ],
     deps = [
-        ":perception_obstacle_hdmapinput",
+        ":hdmapinput",
         "//modules/common/configs:config_gflags",
         "@gtest//:main",
     ],
 )
 
 cc_test(
-    name = "perception_obstacle_lidar_process_test",
+    name = "lidar_process_test",
     size = "small",
     srcs = [
         "lidar_process_test.cc",
@@ -187,7 +221,7 @@ cc_test(
         "//modules/perception:perception_data",
     ],
     deps = [
-        ":perception_obstacle_lidar_process",
+        ":lidar_process",
         "@gtest//:main",
     ],
 )
