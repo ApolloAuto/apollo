@@ -259,11 +259,12 @@ void NavigationLane::ConvertLaneMarkerToPath(
   const double start_s = -2.0;
   double accumulated_s = start_s;
   for (double z = start_s; z <= path_range; z += unit_z) {
-    double x_l = EvaluateCubicPolynomial(path_c0, path_c1, path_c2, path_c3, z);
-
     double x1 = z;
-    double y1 = x_l;
-
+    double y1 = 0;
+    if (left_lane.view_range() > FLAGS_min_view_range_to_use_lane_marker ||
+        right_lane.view_range() > FLAGS_min_view_range_to_use_lane_marker) {
+      y1 = EvaluateCubicPolynomial(path_c0, path_c1, path_c2, path_c3, z);
+    }
     auto *point = path->add_path_point();
     point->set_x(x1);
     point->set_y(y1);
