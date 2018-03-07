@@ -17,9 +17,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_H_
 
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "caffe/caffe.hpp"
 
@@ -105,6 +105,8 @@ class YoloCameraDetector : public BaseCameraDetector {
   int image_height_ = 0;
   int image_width_ = 0;
 };
+
+REGISTER_CAMERA_DETECTOR(YoloCameraDetector);
 
 }  // namespace perception
 }  // namespace apollo
