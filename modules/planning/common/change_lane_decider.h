@@ -24,7 +24,6 @@
 
 #include "modules/planning/proto/planning_status.pb.h"
 
-#include "modules/common/util/dropbox.h"
 #include "modules/map/pnc_map/route_segments.h"
 #include "modules/planning/common/reference_line_info.h"
 
