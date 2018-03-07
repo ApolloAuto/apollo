@@ -383,6 +383,10 @@ export default class Map {
         }
     }
 
+    removeAllElements(scene) {
+        this.removeExpiredElements([], scene);
+    }
+
     removeExpiredElements(elementIds, scene) {
         const newData = {};
 
@@ -493,21 +497,25 @@ export default class Map {
     }
 
     updateIndex(hash, elementIds, scene) {
-        let newElementKindsDrawn = '';
-        for (const kind of Object.keys(elementIds).sort()) {
-            if (this.shouldDrawThisElementKind(kind)) {
-                newElementKindsDrawn += kind;
+        if (STORE.hmi.inNavigationMode) {
+            MAP_WS.requestRelativeMapData();
+        } else {
+            let newElementKindsDrawn = '';
+            for (const kind of Object.keys(elementIds).sort()) {
+                if (this.shouldDrawThisElementKind(kind)) {
+                    newElementKindsDrawn += kind;
+                }
             }
-        }
 
-        if (hash !== this.hash || this.elementKindsDrawn !== newElementKindsDrawn) {
-            this.hash = hash;
-            this.elementKindsDrawn = newElementKindsDrawn;
-            const diff = this.diffMapElements(elementIds, this.data);
-            this.removeExpiredElements(elementIds, scene);
-            if (!_.isEmpty(diff) || !this.initialized) {
-                MAP_WS.requestMapData(diff);
-                this.initialized = true;
+            if (hash !== this.hash || this.elementKindsDrawn !== newElementKindsDrawn) {
+                this.hash = hash;
+                this.elementKindsDrawn = newElementKindsDrawn;
+                const diff = this.diffMapElements(elementIds, this.data);
+                this.removeExpiredElements(elementIds, scene);
+                if (!_.isEmpty(diff) || !this.initialized) {
+                    MAP_WS.requestMapData(diff);
+                    this.initialized = true;
+                }
             }
         }
     }

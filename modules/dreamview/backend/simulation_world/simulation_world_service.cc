@@ -58,6 +58,7 @@ using apollo::common::time::millis;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::GetProtoFromFile;
 using apollo::control::ControlCommand;
+using apollo::hdmap::Map;
 using apollo::hdmap::Path;
 using apollo::localization::Gps;
 using apollo::localization::LocalizationEstimate;
@@ -70,6 +71,7 @@ using apollo::planning::StopReasonCode;
 using apollo::planning_internal::PlanningData;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
+using apollo::relative_map::MapMsg;
 using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingResponse;
 
@@ -259,6 +261,11 @@ void SimulationWorldService::Update() {
   UpdateWithLatestObserved("ControlCommand",
                            AdapterManager::GetControlCommand());
   UpdateWithLatestObserved("Navigation", AdapterManager::GetNavigation());
+
+  if (FLAGS_use_navigation_mode) {
+    UpdateWithLatestObserved("RelativeMap", AdapterManager::GetRelativeMap());
+  }
+
   for (const auto &kv : obj_map_) {
     *world_.add_object() = kv.second;
   }
@@ -321,6 +328,10 @@ void SimulationWorldService::PopulateMapInfo(double radius) {
   GetMapElementIds(radius, world_.mutable_map_element_ids());
   world_.set_map_hash(map_service_->CalculateMapHash(world_.map_element_ids()));
   world_.set_map_radius(radius);
+}
+
+const Map &SimulationWorldService::GetRelativeMap() const {
+  return relative_map_;
 }
 
 template <>
@@ -950,6 +961,13 @@ void SimulationWorldService::UpdateSimulationWorld(
     if (navigation_path.has_path()) {
       DownsamplePath(navigation_path.path(), world_.add_navigation_path());
     }
+  }
+}
+
+template <>
+void SimulationWorldService::UpdateSimulationWorld(const MapMsg &map_msg) {
+  if (map_msg.has_hdmap()) {
+    relative_map_.CopyFrom(map_msg.hdmap());
   }
 }
 
