@@ -19,12 +19,6 @@
 namespace apollo {
 namespace perception {
 
-DEFINE_string(onboard_mix_camera_detector, "DummyCameraDetector",
-              "onboard camera detector.");
-DEFINE_string(onboard_mix_camera_transformer, "DummyCameraTransformer",
-              "onboard camera transformer.");
-DEFINE_string(onboard_mix_camera_tracker, "DummyCameraTracker",
-              "onboard camera tracker.");
 DEFINE_bool(use_center_buffer, false, "use center buffer");
 using base::FileUtil;
 using base::TimeUtil;
@@ -52,16 +46,8 @@ bool CameraProcessSubnode::InitInternal() {
     XLOG(ERROR) << "Failed to init shared data.";
     return false;
   }
-  // init plugins
-  if (!init_alg_plugins()) {
-    XLOG(ERROR) << "Failed to init algorithm plugins.";
-    return false;
-  }
-  // init work_root
-  if (!init_work_root()) {
-    XLOG(ERROR) << "Failed to init work root.";
-    return false;
-  }
+
+  AlgRgsInit();
 
   // parse reserve fileds
   map<string, string> reserve_field_map;
@@ -109,74 +95,25 @@ bool CameraProcessSubnode::init_shared_data() {
   return true;
 }
 
-bool CameraProcessSubnode::init_alg_plugins() {
-  // init camera detector
-  _camera_detector.reset(BaseCameraDetectorRegisterer::get_instance_by_name(
-      FLAGS_onboard_mix_camera_detector));
-  if (!_camera_detector) {
-    XLOG(ERROR) << "Failed to get instance: "
-                << FLAGS_onboard_mix_camera_detector;
-    return false;
-  }
-  if (!_camera_detector->init()) {
-    XLOG(ERROR) << "Failed to init camera detector: "
-                << _camera_detector->name();
-    return false;
-  }
-  // init camera transformer
-  _camera_transformer.reset(
-      BaseCameraTransformerRegisterer::get_instance_by_name(
-          FLAGS_onboard_mix_camera_transformer));
-  if (!_camera_transformer) {
-    XLOG(ERROR) << "Failed to get instance: "
-                << FLAGS_onboard_mix_camera_transformer;
-    return false;
-  }
-  if (!_camera_transformer->init()) {
-    XLOG(ERROR) << "Failed to init camera transformer: "
-                << _camera_transformer->name();
-    return false;
-  }
+bool CameraProcessSubnode::AlgRgsInit() {
+  detector_.reset(BaseCameraDetectorRegisterer::get_instance_by_name("YoloCameraDetector"));
+  detector_->Init();
 
-  // init camera tracker
-  _camera_tracker.reset(BaseCameraTrackerRegisterer::get_instance_by_name(
-      FLAGS_onboard_mix_camera_tracker));
-  if (!_camera_tracker) {
-    XLOG(ERROR) << "Failed to get instance: "
-                << FLAGS_onboard_mix_camera_tracker;
-    return false;
-  }
-  if (!_camera_tracker->init()) {
-    XLOG(ERROR) << "Failed to init camera tracker: " << _camera_tracker->name();
-    return false;
-  }
+  converter_.reset(BaseCameraConverterRegisterer::get_instance_by_name("GeometryCameraConverter"));
+  converter_->Init();
 
-  XLOG(INFO) << "Init alg pulgins successfully\n"
-             << "  camera_detector:         "
-             << FLAGS_onboard_mix_camera_detector << "\n"
-             << "  camera_transformer:      "
-             << FLAGS_onboard_mix_camera_transformer << "\n"
-             << "  camera_tracker:          "
-             << FLAGS_onboard_mix_camera_tracker;
-  return true;
-}
+  tracker_.reset(BaseCameraTrackerRegisterer::get_instance_by_name("CascadedCameraTracker"));
+  tracker_->Init();
 
-bool CameraProcessSubnode::init_work_root() {
-  ConfigManager *config_manager = base::Singleton<ConfigManager>::get();
-  if (config_manager == NULL) {
-    XLOG(ERROR) << "failed to get ConfigManager instance.";
-    return false;
-  }
+  transformer_.reset(BaseCameraTransformerRegisterer::get_instance_by_name("FlatCameraTransformer"));
+  transformer_->Init();
+  transformer_->SetExtrinsics(camera_to_car_);
 
-  if (!config_manager->init()) {
-    XLOG(ERROR) << "failed to init ConfigManager";
-    return false;
-  }
-  // get work root dir
-  _work_root_dir = config_manager->work_root();
+  filter_.reset(BaseCameraFilterRegisterer::get_instance_by_name("ObjectCameraFilter"));
+  filter_->Init();
 
-  XLOG(INFO) << "Init config manager successfully, work_root: "
-             << _work_root_dir;
+  lane_processor_.reset(BaseCameraLanePostProcessorRegisterer::get_instance_by_name("CCLanePostProcessor"));
+  lane_processor_->Init();
   return true;
 }
 
@@ -221,10 +158,6 @@ bool CameraProcessSubnode::init_subscriber(
   }
   _device_id = citer->second;
 
-  string new_source_name = source_name;
-  if (source_type == onboard::FILE_SOURCE) {
-    new_source_name = FileUtil::get_absolute_path(_work_root_dir, source_name);
-  }
   // register subscriber
   bool ret = _stream_input.register_subscriber(
       source_type, new_source_name, &CameraProcessSubnode::image_callback, this);
@@ -239,195 +172,71 @@ bool CameraProcessSubnode::init_subscriber(
   return true;
 }
 
-void CameraProcessSubnode::image_callback(
-    const sensor_msgs::Image::ConstPtr &image_message) {
-  cv::Mat img;
-
-  if (!this->trans_message_to_cv_mat(image_message, &img)) {
-    XLOG(ERROR) << "trans messagea to cv mat error!";
-    return;
-  }
-
-  image_process(img, image_message->header.stamp.toSec());
-}
-
-void CameraProcessSubnode::image_process(const cv::Mat &img,
-                                       double timestamp) {
+void CameraProcessSubnode::ImgCallback(
+    const sensor_msgs::Image::ConstPtr &message) {
   ++_seq_num;
-  const double unix_timestamp = timestamp;
+  float timestamp = message->header.stamp.toSec();
 
-  const double cur_time = TimeUtil::get_current_time();
-  const double start_latency = (cur_time - unix_timestamp) * 1e3;
+  cv::Mat img;
+  MessageToMat(message, &img));
 
-  XLOG(INFO) << "FRAME_STATISTICS:Detector:Start:msg_time["
-             << GLOG_TIMESTAMP(timestamp) << "]:cur_time["
-             << GLOG_TIMESTAMP(cur_time) << "]:cur_latency[" << start_latency
-             << "]";
+  std::vector<VisualObjectPtr> objects;
+  cv::Mat mask = cv::Mat::zeros(img.rows, img.cols, CV_32FC1);
+  detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
+  converter_->Convert(&objects);
+  tracker_->Associate(img, timestamp, &objects);
+  transformer_->Transform(&objects);
+  filter_->Filter(timestamp, &objects);
 
-  // create output sensor object
-  std::shared_ptr<SensorObjects> out_sensor_objects(new SensorObjects);
-  out_sensor_objects->type = CAMERA;
-  out_sensor_objects->name = get_sensor_name(CAMERA);
-  out_sensor_objects->timestamp = timestamp;
-  out_sensor_objects->seq_num = _seq_num;
-  // create frame supplements for SensorObjects
-  (out_sensor_objects->camera_frame_supplement)
-      .reset(new CameraFrameSupplement);
+  std::shared_ptr<SensorObjects> out_objs(new SensorObjects);
+  out_objs->type = CAMERA;
+  out_objs->name = get_sensor_name(CAMERA);
+  out_objs->timestamp = timestamp;
+  out_objs->seq_num = _seq_num;
+  out_objs->sensor2world_pose = camera_to_car_;
+  (out_objs->camera_frame_supplement).reset(new CameraFrameSupplement);
+  trans_visualobject_to_sensorobject(objects, &out_objs);
 
   onboard::SharedDataPtr<CameraItem> camera_item_ptr(new CameraItem);
-
   camera_item_ptr->image_src_mat = img.clone();
-
-  // get trans matrix for camera -> car
-  Matrix4d camera_to_car_pose;
-  if (!this->get_camera_car_trans(timestamp, &camera_to_car_pose)) {
-    XLOG(ERROR) << "Failed to get_camera_car_trans at time: "
-                << GLOG_TIMESTAMP(timestamp);
-    out_sensor_objects->error_code = ERROR_TF;
-    publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
-    return;
-  }
-
-  out_sensor_objects->sensor2world_pose = camera_to_car_pose;
-
-  // camera detect and track
-  CameraDetectorOptions camera_detector_options;
-  CameraTrackerOptions camera_tracker_options(&camera_to_car_pose);
-  std::vector<VisualObjectPtr> track_objects;
-  std::vector<VisualObjectPtr> objects;
-  cv::Mat lane_map =
-      cv::Mat::zeros(img.rows, img.cols, CV_32FC1);
-
-  if (!_camera_detector->multitask(img, camera_detector_options,
-                                   &objects, &lane_map)) {
-    XLOG(ERROR) << "Failed to detect and parse.";
-    out_sensor_objects->error_code = ERROR_PROCESS;
-    publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
-    return;
-  }
-
-  tracker_->Associate(img, timestamp, &objects);
-
-
-  if (!_camera_tracker->associate(img, objects, timestamp,
-                                  camera_tracker_options, &objects)) {
-    XLOG(ERROR) << "Failed to associate.";
-    out_sensor_objects->error_code = ERROR_PROCESS;
-    publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
-    return;
-  }
-
-  PERF_BLOCK_END("camera_smooth_center");
-  if (FLAGS_use_center_buffer &&
-      !_camera_tracker->smooth_center(&objects)) {
-    XLOG(ERROR) << "Failed to associate.";
-    out_sensor_objects->error_code = ERROR_PROCESS;
-    publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
-    return;
-  }
-
-  PERF_BLOCK_END("camera_associate");
-  if (!_camera_tracker->predict_shape(img, objects, timestamp,
-                                      camera_tracker_options,
-                                      &objects)) {
-    XLOG(ERROR) << "Failed to predict_shape.";
-    out_sensor_objects->error_code = ERROR_PROCESS;
-    publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
-    return;
-  }
-  PERF_BLOCK_END("camera_predict_in_2d");
-  // bbox transform
-  CameraTransformerOptions camera_transformer_options;
-  if (!_camera_transformer->transform(img, camera_transformer_options,
-                                      &objects)) {
-    XLOG(ERROR) << "Failed to transform.";
-    out_sensor_objects->error_code = ERROR_PROCESS;
-    publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
-    return;
-  }
-  XLOG(INFO) << "camera transform objects num: "
-             << objects.size();
-
-  PERF_BLOCK_END("camera_transform");
-
-  // camera tracking
-  if (!_camera_tracker->predict_velocity(img, objects,
-                                         timestamp, camera_tracker_options,
-                                         &track_objects)) {
-    XLOG(ERROR) << "Failed to track.";
-    out_sensor_objects->error_code = ERROR_PROCESS;
-    publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
-    return;
-  }
-  XLOG(INFO) << "camera track track_objects num: " << track_objects.size();
-
-  PERF_BLOCK_END("camera_tracking");
-
-  // lane parsing
-  CameraParserOptions camera_parser_options;
-
-  // transform objects 3D boundingbox information to car
-  this->trans_visualobject_to_sensorobject(track_objects, &out_sensor_objects);
-
-  // add parsing mats as supplements of SensorObjects
-  lane_map.copyTo(out_sensor_objects->camera_frame_supplement->lane_map);
-
-  XLOG(INFO) << "before publish camera objects, objects num: "
-             << out_sensor_objects->objects.size();
-  publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
-  const double end_timestamp = base::TimeUtil::get_current_time();
-  const double end_latency = (end_timestamp - unix_timestamp) * 1e3;
+  mask.copyTo(out_objs->camera_frame_supplement->lane_map);
+  publish_data_and_event(timestamp, out_objs, camera_item_ptr);
 }
 
-bool CameraProcessSubnode::trans_message_to_cv_mat(
-    const sensor_msgs::Image::ConstPtr &image_msg, cv::Mat *mat) {
-  try {
+bool CameraProcessSubnode::MessageToMat(
+    const sensor_msgs::Image::ConstPtr& message, cv::Mat* mat)
     cv_bridge::CvImageConstPtr cv_ptr =
-        cv_bridge::toCvShare(image_msg, sensor_msgs::image_encodings::BGR8);
-    cv::Mat tmp_img = cv_ptr->image;
-    mat->create(tmp_img.rows, tmp_img.cols, CV_8UC3);
-    _undistortion_handler->handle(tmp_img.data, mat->data);
-  } catch (cv_bridge::Exception &e) {
-    XLOG(ERROR) << "trans image error, cv_bridge exception: " << e.what();
-    return false;
-  }
-  return true;
+        cv_bridge::toCvShare(message, sensor_msgs::image_encodings::BGR8);
+    cv::Mat img = cv_ptr->image;
+
+    mat->create(img.rows, img.cols, CV_8UC3);
+    _undistortion_handler->handle(img.data, mat->data);
+    return true;
 }
 
-bool CameraProcessSubnode::get_camera_car_trans(double timestamp,
-                                              Matrix4d *camera_to_car_pose) {
-  *camera_to_car_pose = _camera_to_car_mat;
-  XLOG(INFO) << "Timestamp: " << GLOG_TIMESTAMP(timestamp)
-             << "Camera2Car matrix: " << endl
-             << *camera_to_car_pose;
+void CameraProcessSubnode::VisualObjToSensorObj(
+    const std::vector<VisualObjectPtr> &objects,
+    onboard::SharedDataPtr<SensorObjects>* sensor_objects)
+  for (size_t i = 0; i < objects.size(); ++i) {
+    VisualObjectPtr vobj = objects[i];
+    ObjectPtr obj = new Object();
 
-  return true;
-}
-void CameraProcessSubnode::trans_visualobject_to_sensorobject(
-    const std::vector<VisualObjectPtr> track_objects,
-    onboard::SharedDataPtr<SensorObjects> *sensor_objects) {
-  for (size_t i = 0; i < track_objects.size(); ++i) {
-    ObjectPtr obj(new Object);
-    (obj->camera_supplement).reset(new CameraSupplement);
-
-    obj->id = track_objects[i]->id;
-    obj->direction = track_objects[i]->direction;
-    obj->theta = track_objects[i]->theta;
-    obj->center = track_objects[i]->center;
-    obj->length = track_objects[i]->length;
-    obj->width = track_objects[i]->width;
-    obj->height = track_objects[i]->height;
-    obj->type = track_objects[i]->type;
-    obj->type_probs.assign(track_objects[i]->type_probs,
-                           track_objects[i]->type_probs + MAX_OBJECT_TYPE);
-    // obj->internal_type = track_objects[i]->internal_type;
-    // obj->internal_type_probs = track_objects[i]->internal_type_probs;
-    obj->track_id = track_objects[i]->track_id;
-    obj->tracking_time = track_objects[i]->tracking_time;
-    obj->latest_tracked_time = track_objects[i]->latest_tracked_time;
-    obj->velocity = track_objects[i]->velocity;
-    obj->velocity_uncertainty = track_objects[i]->velocity_uncertainty;
-    obj->position_uncertainty = track_objects[i]->position_uncertainty;
+    obj->id = vobj->id;
+    obj->direction = vobj->direction;
+    obj->theta = vobj->theta;
+    obj->center = vobj->center;
+    obj->length = vobj->length;
+    obj->width = vobj->width;
+    obj->height = vobj->height;
+    obj->type = vobj->type;
+    obj->type_probs.assign(vobj->type_probs,
+                           vobj->type_probs + MAX_OBJECT_TYPE);
+    obj->track_id = vobj->track_id;
+    obj->tracking_time = vobj->tracking_time;
+    obj->latest_tracked_time = vobj->latest_tracked_time;
+    obj->velocity = vobj->velocity;
+    obj->velocity_uncertainty = vobj->velocity_uncertainty;
+    obj->position_uncertainty = vobj->position_uncertainty;
     obj->anchor_point = obj->center;
     XLOG(INFO) << "Target " << obj->track_id << " velocity "
                << obj->velocity.transpose();
@@ -436,16 +245,17 @@ void CameraProcessSubnode::trans_visualobject_to_sensorobject(
     Eigen::Matrix2f rotate;
     rotate << cos(obj->theta), -sin(obj->theta), sin(obj->theta),
         cos(obj->theta);
-    obj->camera_supplement->upper_left << track_objects[i]->upper_left[0],
-        track_objects[i]->upper_left[1];
-    obj->camera_supplement->lower_right << track_objects[i]->lower_right[0],
-        track_objects[i]->lower_right[1];
+    (obj->camera_supplement).reset(new CameraSupplement());
+    obj->camera_supplement->upper_left << vobj->upper_left[0],
+        vobj->upper_left[1];
+    obj->camera_supplement->lower_right << vobj->lower_right[0],
+        vobj->lower_right[1];
 
-    obj->camera_supplement->alpha = track_objects[i]->alpha;
-    obj->camera_supplement->pts8.assign(track_objects[i]->pts8,
-                                        track_objects[i]->pts8 + 16);
+    // obj->camera_supplement->alpha = vobj->alpha;
+    // obj->camera_supplement->pts8.assign(vobj->pts8,
+    //                                     vobj->pts8 + 16);
 
-    ((*sensor_objects)->objects).push_back(obj);
+    ((*sensor_objects)->objects).emplace_back(obj);
   }
 }
 
