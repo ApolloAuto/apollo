@@ -273,6 +273,8 @@ void NavigationLane::ConvertLaneMarkerToPath(
       accumulated_s += std::hypot(x1 - pre_point.x(), y1 - pre_point.y());
     }
     point->set_s(accumulated_s);
+    point->set_theta(
+        std::atan2(3 * path_c3 * x1 * x1 + 2 * path_c2 * x1 + path_c1, 1));
   }
 
   left_width_ = (std::fabs(left_lane.c0_position()) +
