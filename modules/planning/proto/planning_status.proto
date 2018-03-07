@@ -41,14 +41,28 @@ message StopSignStatus {
     repeated string watch_vehicles = 2;
   }
 
-  required string stop_sign_id = 1;
+  optional string stop_sign_id = 1;
   optional Status status = 2;
   optional double stop_start_time = 3;
   repeated LaneWatchVehicles lane_watch_vehicles = 4;
+}
+
+message ChangeLaneStatus {
+   enum Status {
+       IN_CHANGE_LANE = 1; // during change lane state
+       CHANGE_LANE_FAILED = 2; // change lane failed
+       CHANGE_LANE_SUCCESS = 3; // change lane failed
+   }
+   optional Status status = 1;
+   // the id of the route segment that the vehicle is driving on
+   optional string path_id = 2;
+   // the time stamp when the state started.
+   optional double timestamp = 3;
 }
 
 message PlanningStatus {
   optional ReroutingStatus rerouting = 1;
   optional SidePassStatus side_pass = 2;
   optional StopSignStatus stop_sign = 3;
+  optional ChangeLaneStatus change_lane = 4;
 }

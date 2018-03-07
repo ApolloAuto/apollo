@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 
-#include "modules/common/log.h
 #include <gtest/gtest.h>
 #include <caffe/caffe.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "modules/obstacle/camera/common/flags.h"
-#include "modules/obstacle/camera/common/util.h"
-#include "modules/obstacle/camera/detector/common/feature_extractor.h"
-#include "modules/obstacle/camera/detector/yolo_camera_detector/region_output.h"
-#include "modules/obstacle/camera/detector/yolo_camera_detector/util.h"
-#include "modules/obstacle/camera/detector/yolo_camera_detector/yolo.pb.h"
-#include "modules/obstacle/camera/interface/base_camera_detector.h"
+#include "modules/common/log.h
+#include "modules/perception/obstacle/camera/common/flags.h"
+#include "modules/perception/obstacle/camera/common/util.h"
+#include "modules/perception/obstacle/camera/detector/common/feature_extractor.h"
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/region_output.h"
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/util.h"
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo.pb.h"
+#include "modules/perception/obstacle/camera/interface/base_camera_detector.h"
 
 namespace apollo {
 namespace perception {

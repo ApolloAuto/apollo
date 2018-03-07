@@ -17,18 +17,18 @@
 #ifndef MODULES_PERCEPTION_ONBOARD_SUBNODE_H_
 #define MODULES_PERCEPTION_ONBOARD_SUBNODE_H_
 
-#include <stdio.h>
 #include <unistd.h>
-
+#include <cstdio>
 #include <string>
 #include <vector>
+
+#include "modules/perception/onboard/proto/dag_config.pb.h"
 
 #include "modules/common/macro.h"
 #include "modules/common/status/status.h"
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/lib/base/thread.h"
 #include "modules/perception/onboard/event_manager.h"
-#include "modules/perception/onboard/proto/dag_config.pb.h"
 #include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/types.h"
 
@@ -38,21 +38,11 @@ namespace perception {
 class EventManager;
 class SharedDataManager;
 
-// Subnode virtual class, all business subnodes, including SubnodeIn and
-// SubnodeOut,
-// are derived this one.
+// @brief Subnode virtual class, all business subnodes, including SubnodeIn and
+//        SubnodeOut, are derived this one.
 class Subnode : public Thread {
  public:
-  Subnode()
-      : Thread(true),
-        id_(0),
-        type_(DAGConfig::SUBNODE_NORMAL),
-        event_manager_(NULL),
-        shared_data_manager_(NULL),
-        stop_(false),
-        inited_(false),
-        total_count_(0),
-        failed_count_(0) {}
+  Subnode() : Thread(true) {}
 
   virtual ~Subnode() {}
 
@@ -61,10 +51,10 @@ class Subnode : public Thread {
   // @return  bool
   // @retval
   virtual bool Init(const DAGConfig::Subnode &config,
-                    EventManager *event_manager,
-                    SharedDataManager *shared_data_manager,
                     const std::vector<EventID> &sub_events,
-                    const std::vector<EventID> &pub_events);
+                    const std::vector<EventID> &pub_events,
+                    EventManager *event_manager,
+                    SharedDataManager *shared_data_manager);
 
   void Stop() { stop_ = true; }
 
@@ -92,21 +82,21 @@ class Subnode : public Thread {
   void Run() override;
 
   // following variable can be accessed by Derived Class.
-  SubnodeID id_;
+  SubnodeID id_ = 0;
   std::string name_;
   std::string reserve_;
-  DAGConfig::SubnodeType type_;
-  EventManager *event_manager_;
-  SharedDataManager *shared_data_manager_;
+  DAGConfig::SubnodeType type_ = DAGConfig::SUBNODE_NORMAL;
+  EventManager *event_manager_ = nullptr;
+  SharedDataManager *shared_data_manager_ = nullptr;
 
   std::vector<EventMeta> sub_meta_events_;
   std::vector<EventMeta> pub_meta_events_;
 
  private:
-  volatile bool stop_;
-  bool inited_;
-  int total_count_;
-  int failed_count_;
+  volatile bool stop_ = false;
+  bool inited_ = false;
+  int total_count_ = 0;
+  int failed_count_ = 0;
   DISALLOW_COPY_AND_ASSIGN(Subnode);
 };
 

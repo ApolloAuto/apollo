@@ -31,6 +31,43 @@ cc_library(
 #     ],
 # )
 
+filegroup(
+    name = "testdata",
+    srcs = glob([
+        "testdata/**",
+    ]),
+)
+
+# cc_test(
+#     name = "yolo_camera_detector_test",
+#     size = "small",
+#     srcs = [
+#         "yolo_camera_detector_test.cc",
+#     ],
+#     data = [
+#         ":testdata"
+#     ],
+#     deps = [
+#         ":yolo_camera_detector",
+#         "@gtest//:main",
+#     ],
+# )
+
+# cc_test(
+#     name = "yolo_camera_tensorrt_detector_test",
+#     size = "small",
+#     srcs = [
+#         "yolo_camera_tensorrt_detector_test.cc",
+#     ],
+#     data = [
+#         ":testdata"
+#     ],
+#     deps = [
+#         ":yolo_camera_detector",
+#         "@gtest//:main",
+#     ],
+# )
+
 cc_library(
     name = "util",
     srcs = ["util.cc"],
