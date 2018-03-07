@@ -55,6 +55,9 @@ class NavigationLane {
                                  const double c2, const double c3,
                                  const double z) const;
 
+  double GetKappa(const double c1, const double c2,
+                  const double c3, const double x);
+
   void MergeNavigationLineAndLaneMarker(
       const perception::LaneMarkers& lane_marker, common::Path* path);
 
