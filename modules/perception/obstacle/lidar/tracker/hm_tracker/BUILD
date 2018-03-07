@@ -27,6 +27,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:log",
+        "//modules/perception/common",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/common",
