@@ -20,6 +20,7 @@
 
 #include "modules/planning/common/reference_line_info.h"
 
+#include <algorithm>
 #include <functional>
 #include <utility>
 
