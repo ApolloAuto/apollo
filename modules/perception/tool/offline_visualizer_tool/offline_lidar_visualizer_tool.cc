@@ -23,10 +23,10 @@
 
 #include "pcl/io/pcd_io.h"
 
+#include "modules/perception/common/file_system_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
-#include "modules/perception/obstacle/common/file_system_util.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"

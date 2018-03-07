@@ -122,11 +122,11 @@ bool Cipv::GetEgoLane(const LaneObjectsPtr lane_objects, EgoLane *egolane_image,
 bool Cipv::MakeVirtualLane(const LaneLine &ref_lane_line, const float yaw_rate,
                            const float offset_distance,
                            LaneLine *virtual_lane_line) {
-  // ** to do *** Use union of lane line and yaw_rate path to determine the
+  // TODO(All): Use union of lane line and yaw_rate path to determine the
   // virtual lane
   virtual_lane_line->line_point.clear();
   if (b_image_based_cipv_ == false) {
-    for (uint32_t i = 0; i < ref_lane_line.line_point.size(); i++) {
+    for (uint32_t i = 0; i < ref_lane_line.line_point.size(); ++i) {
       Eigen::Vector2f virtual_line_point(
           ref_lane_line.line_point[i][0],
           ref_lane_line.line_point[i][1] + offset_distance);
