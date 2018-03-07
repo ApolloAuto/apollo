@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "camera_converter_geometry",
+    name = "converter",
     srcs = ["geometry_camera_converter.cc"],
     hdrs = ["geometry_camera_converter.h"],
     deps = [
