@@ -145,6 +145,8 @@ class SimulationWorldService {
 
   void GetMapElementIds(double radius, MapElementIds *ids) const;
 
+  const apollo::hdmap::Map &GetRelativeMap() const;
+
   nlohmann::json GetRoutePathAsJson() const;
 
  private:
@@ -229,6 +231,9 @@ class SimulationWorldService {
   // Whether to clear the SimulationWorld in the next timer cycle, set by
   // frontend request.
   bool to_clear_ = false;
+
+  // Relative map used/retrieved in navigation mode
+  apollo::hdmap::Map relative_map_;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);

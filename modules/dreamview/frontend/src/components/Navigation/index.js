@@ -39,6 +39,10 @@ export default class Navigation extends React.Component {
         MAP_NAVIGATOR.disableControls();
     }
 
+    componentWillUnmount() {
+        MAP_NAVIGATOR.reset();
+    }
+
     render() {
         const { viewHeight, viewWidth } = this.props;
 
