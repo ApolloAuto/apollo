@@ -173,8 +173,8 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
     point->set_x(flu_x);
     point->set_y(flu_y);
     point->set_theta(common::math::NormalizeAngle(
-        common::math::NormalizeAngle(point->theta())
-            - original_pose_.heading()));
+        common::math::NormalizeAngle(point->theta()) -
+        original_pose_.heading()));
     const double accumulated_s = navigation_path.path_point(i).s() - ref_s;
     point->set_s(accumulated_s);
 
@@ -241,10 +241,9 @@ void NavigationLane::ConvertLaneMarkerToPath(
                     right_lane.c2_curvature() * right_quality) /
                    quality_divider;
 
-  double path_c3 =
-      (left_lane.c3_curvature_derivative() * left_quality +
-       right_lane.c3_curvature_derivative() * right_quality) /
-      quality_divider;
+  double path_c3 = (left_lane.c3_curvature_derivative() * left_quality +
+                    right_lane.c3_curvature_derivative() * right_quality) /
+                   quality_divider;
 
   const double current_speed =
       VehicleStateProvider::instance()->vehicle_state().linear_velocity();
