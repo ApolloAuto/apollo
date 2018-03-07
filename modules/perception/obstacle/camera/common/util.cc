@@ -24,6 +24,8 @@
 
 #include "gflags/gflags.h"
 
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace perception {
 
@@ -340,6 +342,29 @@ ObjectType get_object_type(const std::string &type) {
   } else {
     return ObjectType::UNKNOWN;
   }
+}
+
+bool load_text_proto_message_file(const std::string& path,
+                                  google::protobuf::Message& msg) {
+  int fd = open(path.c_str(), O_RDONLY);
+  if (fd < 0) {
+    AERROR << "path[" << path << "]";
+    return false;
+  }
+
+  google::protobuf::io::FileInputStream file_in(fd);
+
+  if (!google::protobuf::TextFormat::Parse(&file_in, &msg)) {
+    AERROR << "path[" << path << "]";
+    return false;
+  }
+
+  if (close(fd) != 0) {
+    AERROR << "fail to close file: " << path;
+    return false;
+  }
+
+  return true;
 }
 
 }  // namespace perception

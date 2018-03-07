@@ -18,14 +18,11 @@
 
 namespace apollo {
 namespace perception {
-namespace obstacle {
 
-REGISTER_CAMERA_PARSER(DummyCameraParser);
+// REGISTER_CAMERA_PARSER(DummyCameraParser);
 REGISTER_CAMERA_DETECTOR(DummyCameraDetector);
-// REGISTER_CAMERA_LIGHT_DETECTOR(DummyCameraLightDetector);
 REGISTER_CAMERA_TRACKER(DummyCameraTracker);
 REGISTER_CAMERA_TRANSFORMER(DummyCameraTransformer);
 
-}  // namespace obstacle
 }  // namespace perception
 }  // namespace apollo

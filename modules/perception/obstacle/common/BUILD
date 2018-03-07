@@ -21,6 +21,7 @@ cc_library(
         "hungarian_bigraph_matcher.h",
         "object_sequence.h",
         "pose_util.h",
+        "camera.h",
     ],
     linkopts = [
         "-lqhull",
@@ -31,6 +32,7 @@ cc_library(
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/base",
         "@eigen",
+        "@opencv2//:core",
         "@yaml_cpp//:yaml",
     ],
 )

@@ -16,8 +16,6 @@
 
 #include "modules/perception/obstacle/camera/common/cnn_adapter.h"
 
-#include "modules/perception/obstacle/camera/common/caffe_bridge.hpp"
-
 namespace apollo {
 namespace perception {
 
