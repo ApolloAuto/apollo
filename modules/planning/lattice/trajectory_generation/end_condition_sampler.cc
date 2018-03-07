@@ -65,7 +65,7 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
   for (std::size_t i = 0; i + 1 < num_time_section; ++i) {
     time_sections[i] = FLAGS_trajectory_time_length - i;
   }
-  time_sections[num_time_section - 1] = 0.01;
+  time_sections[num_time_section - 1] = FLAGS_polynomial_minimal_param;
 
   // velocity samples consists of 10 equally distributed samples plus ego's
   // current velocity
@@ -105,7 +105,7 @@ EndConditionSampler::SampleLonEndConditionsForStopping(
   for (std::size_t i = 0; i + 1 < num_time_section; ++i) {
     time_sections[i] = FLAGS_trajectory_time_length - i;
   }
-  time_sections[num_time_section - 1] = 0.01;
+  time_sections[num_time_section - 1] = FLAGS_polynomial_minimal_param;
 
   constexpr std::size_t num_stop_section = 3;
   std::array<double, num_stop_section> s_offsets;
@@ -115,6 +115,9 @@ EndConditionSampler::SampleLonEndConditionsForStopping(
 
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
   for (const auto& time : time_sections) {
+    if (time < FLAGS_polynomial_minimal_param) {
+      continue;
+    }
     for (const auto& s_offset : s_offsets) {
       std::array<double, 3> end_s;
       end_s[0] = std::max(init_s_[0], ref_stop_point + s_offset);
@@ -131,6 +134,9 @@ EndConditionSampler::SampleLonEndConditionsForPathTimePoints() const {
   std::vector<SamplePoint> sample_points = QueryPathTimeObstacleSamplePoints();
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
   for (const SamplePoint& sample_point : sample_points) {
+    if (sample_point.path_time_point().t() < FLAGS_polynomial_minimal_param) {
+      continue;
+    }
     double s = sample_point.path_time_point().s();
     double v = sample_point.ref_v();
     double t = sample_point.path_time_point().t();

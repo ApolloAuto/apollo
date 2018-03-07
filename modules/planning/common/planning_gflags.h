@@ -220,6 +220,7 @@ DECLARE_double(lon_collision_cost_std);
 DECLARE_double(default_lon_buffer);
 DECLARE_double(time_min_density);
 DECLARE_double(comfort_acceleration_factor);
+DECLARE_double(polynomial_minimal_param);
 
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);
