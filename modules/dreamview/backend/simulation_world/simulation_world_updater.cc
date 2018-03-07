@@ -78,6 +78,15 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         }
       });
 
+  map_ws_->RegisterMessageHandler(
+      "RetrieveRelativeMapData",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        std::string retrieved_map_string;
+        sim_world_service_.GetRelativeMap().SerializeToString(
+            &retrieved_map_string);
+        map_ws_->SendBinaryData(conn, retrieved_map_string, true);
+      });
+
   websocket_->RegisterMessageHandler(
       "Binary",
       [this](const std::string &data, WebSocketHandler::Connection *conn) {

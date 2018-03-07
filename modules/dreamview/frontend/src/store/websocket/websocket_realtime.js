@@ -12,6 +12,7 @@ export default class RosWebSocketEndpoint {
         this.currMapRadius = null;
         this.updatePOI = true;
         this.routingTime = undefined;
+        this.currentMode = null;
         this.worker = new Worker();
     }
 
@@ -49,11 +50,25 @@ export default class RosWebSocketEndpoint {
                 case "SimWorldUpdate":
                     this.checkMessage(message);
 
+                    const updateCoordination = (this.currentMode !== STORE.hmi.currentMode);
+                    this.currentMode = STORE.hmi.currentMode;
+                    if (STORE.hmi.inNavigationMode) {
+                        // In navigation mode, relative map is set and the relative position
+                        // of auto driving car is (0, 0). Absolute position of the car
+                        // only needed in MAP_NAVIGATOR.
+                        if (MAP_NAVIGATOR.isInitialized()) {
+                            MAP_NAVIGATOR.update(message);
+                        }
+                        message.autoDrivingCar.positionX = 0;
+                        message.autoDrivingCar.positionY = 0;
+                        message.autoDrivingCar.heading = 0;
+                    }
                     STORE.updateTimestamp(message.timestamp);
                     STORE.updateModuleDelay(message);
                     RENDERER.maybeInitializeOffest(
                         message.autoDrivingCar.positionX,
-                        message.autoDrivingCar.positionY);
+                        message.autoDrivingCar.positionY,
+                        updateCoordination);
                     STORE.meters.update(message);
                     STORE.monitor.update(message);
                     STORE.trafficSignal.update(message);
@@ -74,9 +89,6 @@ export default class RosWebSocketEndpoint {
                         // A new routing needs to be fetched from backend.
                         this.requestRoutePath();
                         this.routingTime = message.routingTime;
-                    }
-                    if (STORE.hmi.showNavigationMap && MAP_NAVIGATOR.isInitialized()) {
-                        MAP_NAVIGATOR.update(message);
                     }
                     this.counter += 1;
                     break;
