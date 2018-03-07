@@ -242,8 +242,8 @@ proto_library(
     ],
     deps = [
         ":decision_proto_lib",
+        ":planning_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
-        ":planning_proto_lib"
     ],
 )
 
