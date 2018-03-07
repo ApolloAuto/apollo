@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_REFERENCE_LINE_INFO_H_
 #define MODULES_PLANNING_COMMON_REFERENCE_LINE_INFO_H_
 
+#include <algorithm>
 #include <limits>
 #include <list>
 #include <memory>
@@ -31,8 +32,8 @@
 #include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
+#include "modules/planning/proto/planning.pb.h"
 
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
@@ -74,15 +75,27 @@ class ReferenceLineInfo {
   const DiscretizedTrajectory& trajectory() const;
   double TrajectoryLength() const;
 
-  double Cost() const { return cost_; }
-  void AddCost(double cost) { cost_ += cost; }
-  void SetCost(double cost) { cost_ = cost; }
-  double PriorityCost() const { return priority_cost_; }
-  void SetPriorityCost(double cost) { priority_cost_ = cost; }
+  double Cost() const {
+    return cost_;
+  }
+  void AddCost(double cost) {
+    cost_ += cost;
+  }
+  void SetCost(double cost) {
+    cost_ = cost;
+  }
+  double PriorityCost() const {
+    return priority_cost_;
+  }
+  void SetPriorityCost(double cost) {
+    priority_cost_ = cost;
+  }
   // For lattice planner'speed planning target
   void SetStopPoint(const StopPoint& stop_point);
   void SetCruiseSpeed(double speed);
-  const PlanningTarget& planning_target() const { return planning_target_;}
+  const PlanningTarget& planning_target() const {
+    return planning_target_;
+  }
 
   /**
    * @brief check if current reference line is started from another reference
@@ -93,10 +106,18 @@ class ReferenceLineInfo {
    **/
   bool IsStartFrom(const ReferenceLineInfo& previous_reference_line_info) const;
 
-  planning_internal::Debug* mutable_debug() { return &debug_; }
-  const planning_internal::Debug& debug() const { return debug_; }
-  LatencyStats* mutable_latency_stats() { return &latency_stats_; }
-  const LatencyStats& latency_stats() const { return latency_stats_; }
+  planning_internal::Debug* mutable_debug() {
+    return &debug_;
+  }
+  const planning_internal::Debug& debug() const {
+    return debug_;
+  }
+  LatencyStats* mutable_latency_stats() {
+    return &latency_stats_;
+  }
+  const LatencyStats& latency_stats() const {
+    return latency_stats_;
+  }
 
   const PathData& path_data() const;
   const SpeedData& speed_data() const;
@@ -142,7 +163,9 @@ class ReferenceLineInfo {
     offset_to_other_reference_line_ = offset;
   }
 
-  void set_is_on_reference_line() { is_on_reference_line_ = true; }
+  void set_is_on_reference_line() {
+    is_on_reference_line_ = true;
+  }
 
  private:
   void ExportTurnSignal(common::VehicleSignal* signal) const;
