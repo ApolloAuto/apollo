@@ -27,6 +27,7 @@
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
+#include "modules/common/log.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_converter.h"
@@ -96,8 +97,6 @@ class CameraProcessSubnode : public Subnode {
       const std::map<std::string, std::string>& reserve_field_map);
   bool init_subscriber(
       const std::map<std::string, std::string>& reserve_field_map);
-  bool resize_image(const sensor_msgs::Image::ConstPtr& image_message_src,
-                    sensor_msgs::Image::Ptr image_message);
   void image_callback(const sensor_msgs::Image::ConstPtr& image_message);
   void image_process(const cv::Mat& image_mat_src, double time_stamp);
 
@@ -110,9 +109,6 @@ class CameraProcessSubnode : public Subnode {
   void trans_visualobject_to_sensorobject(
       const std::vector<VisualObjectPtr> track_objects,
       onboard::SharedDataPtr<SensorObjects>* sensor_object);
-
-  void update_l3_sensorobject_elements(
-      onboard::SharedDataPtr<SensorObjects>* sensor_objects);
 
   void publish_data_and_event(
       double timestamp,
