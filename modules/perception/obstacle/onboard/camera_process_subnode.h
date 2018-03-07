@@ -66,12 +66,23 @@ class CameraProcessSubnode : public Subnode {
 
  private:
   bool InitInternal() override;
-
-  void OnPointCloud(const sensor_msgs::PointCloud2& message);
-
-  void RegistAllAlgorithm();
+  void AlgRgsInit();
   bool InitFrameDependence();
   bool InitAlgorithmPlugin();
+
+  void ImgCallback(const sensor_msgs::Image::ConstPtr& message);
+
+  bool MessageToMat(const sensor_msgs::Image::ConstPtr& message, cv::Mat* mat);
+
+  void VisualObjToSensorObj(
+      const std::vector<VisualObjectPtr> &objects,
+      onboard::SharedDataPtr<SensorObjects>* sensor_objects);
+
+  void publish_data_and_event(
+      double timestamp,
+      const onboard::SharedDataPtr<SensorObjects>& sensor_object,
+      const onboard::SharedDataPtr<CameraItem>& camera_item);
+
 
   void PublishDataAndEvent(double timestamp,
                            const SharedDataPtr<SensorObjects>& data);
@@ -82,38 +93,22 @@ class CameraProcessSubnode : public Subnode {
   common::ErrorCode error_code_ = common::OK;
   LidarObjectData* processing_data_ = nullptr;
   std::string device_id_;
+  Eigen::Matrix4d camera_to_car_;
 
   std::unique_ptr<BaseCameraDetector> detector_;
   std::unique_ptr<BaseCameraConverter> converter_;
   std::unique_ptr<BaseCameraTracker> tracker_;
   std::unique_ptr<BaseCameraTransformer> transformer_;
   std::unique_ptr<BaseCameraFilter> filter_;
-  std::unique_ptr<BaseCameraLanePostProcessor> lane_processor_;
 
   bool init_shared_data();
-  bool init_alg_plugins();
-  bool init_work_root();
   bool init_calibration_input(
       const std::map<std::string, std::string>& reserve_field_map);
   bool init_subscriber(
       const std::map<std::string, std::string>& reserve_field_map);
-  void image_callback(const sensor_msgs::Image::ConstPtr& image_message);
-  void image_process(const cv::Mat& image_mat_src, double time_stamp);
 
-  bool trans_message_to_cv_mat(const sensor_msgs::Image::ConstPtr& image_msg,
-                               cv::Mat* mat);
 
-  bool get_camera_car_trans(double timestamp,
-                            Eigen::Matrix4d* camera_to_car_pose);
 
-  void trans_visualobject_to_sensorobject(
-      const std::vector<VisualObjectPtr> track_objects,
-      onboard::SharedDataPtr<SensorObjects>* sensor_object);
-
-  void publish_data_and_event(
-      double timestamp,
-      const onboard::SharedDataPtr<SensorObjects>& sensor_object,
-      const onboard::SharedDataPtr<CameraItem>& camera_item);
 
   CameraObjectData* _camera_object_data = nullptr;  // release by framework
   CameraSharedData* _camera_shared_data = nullptr;  // release by framework
@@ -122,17 +117,11 @@ class CameraProcessSubnode : public Subnode {
   Eigen::Matrix4d _camera_to_car_mat;
   Eigen::Matrix<double, 3, 4> _camera_intrinsic;  // camera intrinsic
 
-  std::unique_ptr<BaseCameraDetector> _camera_detector;
-  std::unique_ptr<BaseCameraTransformer> _camera_transformer;
-  std::unique_ptr<BaseCameraTracker> _camera_tracker;
-  std::unique_ptr<BaseCameraParser> _lane_camera_parser;
+
   std::string _device_id;
-  std::string _work_root_dir;
   double _msg_average_latency = 0.0;
   int _msg_count_in_stat_window = 0;
   uint64_t _total_msg_count = 0;
-  base::Mutex _mutex;  // Protect _seq_num.
-  SeqId _seq_num = 0;
 
   onboard::StreamInput<sensor_msgs::Image, MixDetectorSubnode> _stream_input;
 };
