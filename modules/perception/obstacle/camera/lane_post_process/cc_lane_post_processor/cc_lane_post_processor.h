@@ -19,13 +19,13 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_H_
 
-#include <Eigen/Core>
-#include <opencv2/opencv.hpp>
-
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "Eigen/Core"
+#include "opencv2/opencv.hpp"
 
 #include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"

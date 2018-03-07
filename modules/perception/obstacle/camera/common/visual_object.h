@@ -51,6 +51,11 @@ struct alignas(16) VisualObject {
   // ROI pooling feature from layers of deep learning detection model
   std::vector<float> object_feature;
 
+  // Internal object classification type.
+  InternalObjectType internal_type;
+  // Internal probability of each type, used for track type.
+  float internal_type_probs[INT_MAX_OBJECT_TYPE];
+
   // [meter] physical size of 3D oriented bounding box
   // length is the size in the main direction
   float length = 0.0f;

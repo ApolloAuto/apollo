@@ -18,9 +18,10 @@
 
 #include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
 
+#include <Eigen/Dense>
+
 #include <cfloat>
 
-#include "Eigen/Dense"
 #include "opencv2/opencv.hpp"
 #include "yaml-cpp/yaml.h"
 
@@ -122,7 +123,7 @@ bool LanePostProcessingSubnode::InitWorkRoot() {
     return false;
   }
   // get work root dir
-  work_root_dir_ = config_manager->work_root();
+  work_root_dir_ = config_manager->WorkRoot();
 
   AINFO << "init config manager successfully, work_root: " << work_root_dir_;
   return true;

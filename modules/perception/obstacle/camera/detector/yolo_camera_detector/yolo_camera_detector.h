@@ -14,7 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_H_
+
+#include <vector>
+#include <string>
+#include <memory>
 
 #include "caffe/caffe.hpp"
 
@@ -36,25 +41,25 @@ class YoloCameraDetector : public BaseCameraDetector {
 
   virtual ~YoloCameraDetector() {}
 
-  virtual bool init(const CameraDetectorInitOptions &options =
-                        CameraDetectorInitOptions()) override;
+  bool Init(const CameraDetectorInitOptions &options =
+            CameraDetectorInitOptions()) override;
 
-  virtual bool detect(const cv::Mat &frame,
-                      const CameraDetectorOptions &options,
-                      std::vector<VisualObjectPtr> *objects) override;
+  bool Detect(const cv::Mat &frame,
+              const CameraDetectorOptions &options,
+              std::vector<VisualObjectPtr> *objects) override;
 
-  virtual bool multitask(const cv::Mat &frame,
-                         const CameraDetectorOptions &options,
-                         std::vector<VisualObjectPtr> *objects, cv::Mat *mask);
+  bool Multitask(const cv::Mat &frame,
+                 const CameraDetectorOptions &options,
+                 std::vector<VisualObjectPtr> *objects, cv::Mat *mask);
 
-  virtual bool extract(std::vector<VisualObjectPtr> *objects) {
+  bool Extract(std::vector<VisualObjectPtr> *objects) {
     for (auto &extractor : extractors_) {
       extractor->extract(objects);
     }
     return true;
   }
 
-  virtual std::string name() const override;
+  std::string Name() const override;
 
  protected:
   bool get_objects_gpu(std::vector<VisualObjectPtr> *objects);
@@ -70,8 +75,8 @@ class YoloCameraDetector : public BaseCameraDetector {
  private:
   std::shared_ptr<CNNAdapter> cnnadapter_;
 
-  boost::shared_ptr<anakin::Tensor<float>> res_cls_tensor_ = nullptr;
-  boost::shared_ptr<anakin::Tensor<float>> res_box_tensor_ = nullptr;
+  // boost::shared_ptr<anakin::Tensor<float>> res_cls_tensor_ = nullptr;
+  // boost::shared_ptr<anakin::Tensor<float>> res_box_tensor_ = nullptr;
   std::shared_ptr<SyncedMemory> image_data_ = nullptr;
   std::shared_ptr<SyncedMemory> overlapped_ = nullptr;
   std::shared_ptr<SyncedMemory> idx_sm_ = nullptr;
@@ -96,7 +101,7 @@ class YoloCameraDetector : public BaseCameraDetector {
   float cross_class_merge_threshold_ = 1;
   float confidence_threshold_ = 0.1;
   std::shared_ptr<BaseProjector> projector_;
-  adu::perception::yolo::YoloParam yolo_param_;
+  obstacle::yolo::YoloParam yolo_param_;
   int image_height_ = 0;
   int image_width_ = 0;
 };

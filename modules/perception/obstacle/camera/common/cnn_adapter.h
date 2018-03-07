@@ -17,9 +17,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CNN_ADAPTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CNN_ADAPTER_H_
 
+#include <string>
+#include <vector>
+
 #include "caffe/caffe.hpp"
 
-#include "modules/perception/obstacle/camera/common/caffe_bridge.hpp"
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/detector/common/util.h"
 
@@ -48,11 +50,11 @@ class CNNCaffe : public CNNAdapter {
  public:
   CNNCaffe() = default;
 
-  virtual bool init(const std::vector<std::string> &input_names,
-                    const std::vector<std::string> &output_names,
-                    const std::string &proto_file,
-                    const std::string &weight_file, int gpu_id,
-                    const std::string &model_root = "") override;
+  bool init(const std::vector<std::string> &input_names,
+            const std::vector<std::string> &output_names,
+            const std::string &proto_file,
+            const std::string &weight_file, int gpu_id,
+            const std::string &model_root = "") override;
 
   void forward() override;
 
@@ -84,137 +86,7 @@ class CNNCaffe : public CNNAdapter {
   int gpu_id_ = 0;
 };
 
-class CNNAnakin : public CNNAdapter {
- public:
-  CNNAnakin() = default;
-
-  virtual bool init(const std::vector<std::string> &input_names,
-                    const std::vector<std::string> &output_names,
-                    const std::string &proto_file,
-                    const std::string &weight_file, int gpu_id,
-                    const std::string &model_root = "") override;
-
-  void forward() override;
-
-  boost::shared_ptr<caffe::Blob<float>> get_blob_by_name(
-      const std::string &name) override;
-
-  bool shape(const std::string &name, std::vector<int> *res) override {
-    auto blob = get_blob_by_name(name);
-    if (blob == nullptr) {
-      return false;
-    }
-    *res = blob->shape();
-    return true;
-  }
-
-  bool reshape_input(const std::string &name,
-                     const std::vector<int> &shape) override {
-    inference_.SetDevice(gpu_id_);
-    anakin::Net<float> *net =
-        static_cast<anakin::Net<float> *>(inference_.getNetwork());
-    int layer_idx = net->getLayerIdx("input");
-    if (layer_idx == -1) {
-      return false;
-    }
-    auto layer =
-        static_cast<anakin::InputLayer<float> *>(net->getLayer(layer_idx));
-
-    auto blob_iter = blobs_.find(name);
-    if (blob_iter == blobs_.end()) {
-      return false;
-    }
-
-    auto &dims = layer->get_input_dim();
-    dims.resize(shape.size());
-    dims.assign(shape.begin(), shape.end());
-    blob_iter->second->Reshape(shape);
-
-    cudaDeviceSynchronize();
-    inference_.execute();
-    cudaDeviceSynchronize();
-
-    for (const auto &name : output_names_) {
-      if (!sync_blob(name, true)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
- protected:
-  bool sync_blob(const string &name, bool tensor_to_blob_flag) {
-    anakin::Net<float> *net =
-        static_cast<anakin::Net<float> *>(inference_.getNetwork());
-    auto blob_iter = blobs_.find(name);
-    int tensor_idx = net->getTensorIdx(name);
-    if (tensor_idx == -1 || blob_iter == blobs_.end()) {
-      AINFO << "cannot find " << name << " tensor ";
-      return true;
-    }
-    auto tensor = net->getTensor(tensor_idx);
-    if (tensor_to_blob_flag) {
-      blob_iter->second->Reshape(tensor->dims());
-      cudaMemcpy(blob_iter->second->mutable_gpu_data(),
-                 (float *)tensor->gpu_data(), tensor->count() * sizeof(float),
-                 cudaMemcpyDeviceToDevice);
-    } else {
-      tensor->Reshape(blob_iter->second->shape());
-      cudaMemcpy(tensor->gpu_mutable_data(),
-                 (float *)blob_iter->second->gpu_data(),
-                 tensor->count() * sizeof(float), cudaMemcpyDeviceToDevice);
-    }
-
-    return true;
-  }
-  bool create_blob(const std::string &name) {
-    anakin::Net<float> *net;
-    net = static_cast<anakin::Net<float> *>(inference_.getNetwork());
-    int tensor_idx = net->getTensorIdx(name);
-    if (tensor_idx == -1) {
-      return false;
-    }
-    auto tensor = net->getTensor(tensor_idx);
-
-    boost::shared_ptr<caffe::Blob<float>> blob;
-    blob.reset(new caffe::Blob<float>);
-
-    // TODO: unit test not covered
-    blob->Reshape(tensor->dims());
-    blobs_.insert(std::make_pair(name, blob));
-    return true;
-  }
-  void sync_blob(const std::vector<anakin::Tensor<float> *> &v_tensors,
-                 bool tensor_to_blob_flag) {
-    for (auto tensor : v_tensors) {
-      std::string name = tensor->getName();
-      auto blob = blobs_.find(name);
-      if (blob != blobs_.end()) {
-        CHECK(blob->second->count() == tensor->count())
-            << "Blob and Tensor should have the save count(" << name
-            << "): " << blob->second->count() << " V.S. " << tensor->count();
-        if (tensor_to_blob_flag) {
-          cudaMemcpy(blob->second->mutable_gpu_data(),
-                     (float *)tensor->gpu_data(),
-                     tensor->count() * sizeof(float), cudaMemcpyDeviceToDevice);
-        } else {
-          cudaMemcpy(tensor->gpu_mutable_data(),
-                     (float *)blob->second->gpu_data(),
-                     tensor->count() * sizeof(float), cudaMemcpyDeviceToDevice);
-        }
-      }
-    }
-  }
-
- private:
-  ::anakin::Infer<float> inference_;
-  std::map<std::string, boost::shared_ptr<caffe::Blob<float>>> blobs_;
-  std::vector<std::string> input_names_;
-  std::vector<std::string> output_names_;
-  int gpu_id_ = 0;
-};
-
+/*
 class CNNTensorRT : public CNNAdapter {
  public:
   CNNTensorRT(bool int8_flag) : int8_flag_(int8_flag){};
@@ -263,8 +135,8 @@ class CNNTensorRT : public CNNAdapter {
   }
 
  private:
-  ::anakin::RTInfer<float> inference_;
-  // name  blob //
+  //::anakin::RTInfer<float> inference_;
+  // name blob
   std::map<std::string, boost::shared_ptr<caffe::Blob<float>>> blobs_;
   std::map<std::string, void *> name_buffers_;
   std::vector<std::string> input_names_;
@@ -273,6 +145,8 @@ class CNNTensorRT : public CNNAdapter {
   int gpu_id_ = 0;
   bool int8_flag_ = false;
 };
+*/
+
 }  // namespace perception
 }  // namespace apollo
 
