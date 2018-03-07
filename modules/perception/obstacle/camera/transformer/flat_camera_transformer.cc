@@ -19,9 +19,7 @@
 namespace apollo {
 namespace perception {
 
-bool FlatCameraTransformer::Init() {
-  return true;
-}
+bool FlatCameraTransformer::Init() { return true; }
 
 bool FlatCameraTransformer::Transform(std::vector<VisualObjectPtr> *objects) {
   if (!objects) return false;

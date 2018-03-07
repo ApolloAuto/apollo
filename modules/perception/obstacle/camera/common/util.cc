@@ -74,14 +74,13 @@ bool load_visual_object_form_file(
     double y1 = 0.0;
     double x2 = 0.0;
     double y2 = 0.0;
-    int ret =
-        fscanf(fp,
-               "%s %lf %lf %f %lf %lf %lf %lf %f %f %f %f %f %f %f %f "
-               "%lf %lf",
-               type, &trash, &trash, &obj->alpha, &x1, &y1, &x2, &y2,
-               &obj->height, &obj->width, &obj->length, &obj->center.x(),
-               &obj->center.y(), &obj->center.z(), &obj->theta, &obj->score,
-               &obj->trunc_height, &obj->trunc_width);
+    int ret = fscanf(fp,
+                     "%s %lf %lf %f %lf %lf %lf %lf %f %f %f %f %f %f %f %f "
+                     "%lf %lf",
+                     type, &trash, &trash, &obj->alpha, &x1, &y1, &x2, &y2,
+                     &obj->height, &obj->width, &obj->length, &obj->center.x(),
+                     &obj->center.y(), &obj->center.z(), &obj->theta,
+                     &obj->score, &obj->trunc_height, &obj->trunc_width);
     obj->upper_left[0] = x1 > 0 ? x1 : 0;
     obj->upper_left[1] = y1 > 0 ? y1 : 0;
     obj->lower_right[0] = x2 < 1920 ? x2 : 1920;
