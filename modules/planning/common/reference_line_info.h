@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_REFERENCE_LINE_INFO_H_
 #define MODULES_PLANNING_COMMON_REFERENCE_LINE_INFO_H_
 
+#include <algorithm>
 #include <limits>
 #include <list>
 #include <memory>
@@ -31,8 +32,8 @@
 #include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
+#include "modules/planning/proto/planning.pb.h"
 
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
@@ -82,7 +83,7 @@ class ReferenceLineInfo {
   // For lattice planner'speed planning target
   void SetStopPoint(const StopPoint& stop_point);
   void SetCruiseSpeed(double speed);
-  const PlanningTarget& planning_target() const { return planning_target_;}
+  const PlanningTarget& planning_target() const { return planning_target_; }
 
   /**
    * @brief check if current reference line is started from another reference

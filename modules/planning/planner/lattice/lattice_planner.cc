@@ -177,9 +177,6 @@ Status LatticePlanner::PlanOnReferenceLine(
            << "Current ego s: " << init_s[0];
   }
 
-  // behavior_decider.Analyze(frame,
-  //    reference_line_info, planning_init_point, init_s, *ptr_reference_line);
-
   ADEBUG << "Decision_Time = " << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 

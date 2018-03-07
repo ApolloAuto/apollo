@@ -49,7 +49,7 @@ struct alignas(16) VisualObject {
   std::vector<float> type_probs;
 
   // ROI pooling feature from layers of deep learning detection model
-  std::vector<float> dl_roi_feature;
+  std::vector<float> object_feature;
 
   // Internal object classification type.
   InternalObjectType internal_type;
@@ -65,18 +65,13 @@ struct alignas(16) VisualObject {
   // [radian] observation angle of object, ranging as [-pi, pi]
   float alpha = 0.0f;
 
-  // Truncation ratio prediction from DNN. 0.0 means non-truncated box ( or <
-  // threshold, ex: 0.05)
-  double truncated_horizontal = 0.0;
-  double truncated_vertical = 0.0;
-
   // [radian] Rotation around the vertical axis, ranging as [-pi, pi]
   // the yaw angle, theta = 0.0f means direction = (1, 0, 0)
   float theta = 0.0f;
   // main direction
   Eigen::Vector3f direction = Eigen::Vector3f(1.0f, 0.0f, 0.0f);
 
-  // [meter] physical center of the object, (cx, cy, cz)
+  // [meter] center of the object
   Eigen::Vector3f center = Eigen::Vector3f::Zero();
   // [meter] distance to object physical center from camera origin
   float distance = 0.0f;
@@ -89,8 +84,6 @@ struct alignas(16) VisualObject {
   float track_age = 0.0f;
   // [second] the last observed timestamp
   float last_track_timestamp = 0.0f;
-
-  std::vector<float> object_feature;
 };
 
 typedef std::shared_ptr<VisualObject> VisualObjectPtr;
