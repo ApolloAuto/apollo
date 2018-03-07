@@ -16,13 +16,13 @@
 
 // @brief: CC lane post-processor source file
 
+#include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/cc_lane_post_processor.h"
+
 #include <algorithm>
 #include <cmath>
 #include <limits>
 #include <numeric>
 #include <unordered_map>
-
-#include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/cc_lane_post_processor.h"
 
 namespace apollo {
 namespace perception {

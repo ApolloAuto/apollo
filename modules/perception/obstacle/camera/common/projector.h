@@ -14,23 +14,33 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_DETECTOR_UTIL_H_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_DETECTOR_UTIL_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_PROJECTOR_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_PROJECTOR_H_
+
+#include <Eigen/Core>
 
 #include <string>
 #include <vector>
 
-#include "modules/perception/obstacle/base/types.h"
-
 namespace apollo {
 namespace perception {
-namespace yolo {
 
-bool load_types(const std::string &path, std::vector<ObjectType> *types);
-bool load_anchors(const std::string &path, std::vector<float> *anchors);
+class BaseProjector {
+ public:
+  virtual bool project(std::vector<float>* feature) = 0;
+};
 
-}  // namespace yolo
+class MatrixProjector : public BaseProjector {
+ public:
+  explicit MatrixProjector(std::string weight_file);
+
+  bool project(std::vector<float>* feature) override;
+
+ private:
+  Eigen::MatrixXf matrix_;
+};
+
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_DETECTOR_UTIL_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_PROJECTOR_H_

@@ -146,7 +146,7 @@ class ConfigManager {
 
   size_t NumModels() const { return model_config_map_.size(); }
 
-  const std::string& work_root() const { return work_root_; }
+  const std::string& WorkRoot() const { return work_root_; }
 
   void SetWorkRoot(const std::string& work_root) { work_root_ = work_root; }
 
