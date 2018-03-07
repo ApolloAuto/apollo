@@ -60,18 +60,13 @@ struct alignas(16) VisualObject {
   // [radian] observation angle of object, ranging as [-pi, pi]
   float alpha = 0.0f;
 
-  // Truncation ratio prediction from DNN. 0.0 means non-truncated box ( or <
-  // threshold, ex: 0.05)
-  double truncated_horizontal = 0.0;
-  double truncated_vertical = 0.0;
-
   // [radian] Rotation around the vertical axis, ranging as [-pi, pi]
   // the yaw angle, theta = 0.0f means direction = (1, 0, 0)
   float theta = 0.0f;
   // main direction
   Eigen::Vector3f direction = Eigen::Vector3f(1.0f, 0.0f, 0.0f);
 
-  // [meter] physical center of the object, (cx, cy, cz)
+  // [meter] center of the object
   Eigen::Vector3f center = Eigen::Vector3f::Zero();
   // [meter] distance to object physical center from camera origin
   float distance = 0.0f;
