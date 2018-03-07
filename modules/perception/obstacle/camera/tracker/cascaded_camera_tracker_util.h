@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <utility>
 
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
@@ -33,9 +34,9 @@
 namespace apollo {
 namespace perception {
 
-void GetDetectedFromVO(const cv::Size &sz,
+void GetDetectedFromVO(const cv::Size &sz, const float &scale,
                        const std::vector<VisualObjectPtr> &objects,
-                       const float &scale, std::vector<Detected> *detected);
+                       std::vector<Detected> *detected);
 
 void MergeAffinityMatrix(const std::vector<std::vector<float>> &to_merge,
                          std::vector<std::vector<float>> *affinity_matrix);
@@ -47,11 +48,14 @@ void MatrixMatching(const std::vector<std::vector<float>> &affinity_matrix,
                     std::unordered_map<int, int> *local_matching,
                     std::unordered_set<int> *local_matched_detected);
 
-void ManageTrackerAndID(const std::unordered_map<int, int> &local_matching,
-                        const std::unordered_set<int> &local_matched_detected,
-                        const std::vector<Detected> &detected,
-                        std::vector<Tracked> *tracked, int *next_tracked_id,
-                        std::map<int, int> *id_mapping, int curr_frame_cnt);
+// @brief Create, update and delete tracks, from the matching result
+// ID mapping is done here as well
+void ManageTrackerAndID(
+    const std::unordered_map<int, int> &local_matching,
+    const std::unordered_set<int> &local_matched_detected,
+    const std::vector<Detected> &detected, const int &frame_idx,
+    const float &timestamp, std::vector<Tracked> *tracked, int *next_tracked_id,
+    std::unordered_map<int, std::pair<int, float>> *id_mapping);
 
 void PrintAffinityMatrix(const std::vector<std::vector<float>> &affinity_matrix,
                          const std::vector<Tracked> &tracked,

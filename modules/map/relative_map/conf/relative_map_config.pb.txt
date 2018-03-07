@@ -1,7 +1,7 @@
 map_param {
   default_left_width: 1.75
   default_right_width: 1.75
-  default_speed_limit : 29.0576 # 65mph
+  default_speed_limit : 8.9408 # 20mph
 }
 
 navigation_lane {

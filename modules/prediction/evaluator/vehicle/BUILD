@@ -84,5 +84,26 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "cost_evaluator",
+    srcs = [
+        "cost_evaluator.cc",
+    ],
+    hdrs = [
+        "cost_evaluator.h",
+    ],
+    deps = [
+        "//modules/common/math:math_utils",
+        "//modules/common/util",
+        "//modules/map/proto:map_proto",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_util",
+        "//modules/prediction/common:feature_output",
+        "//modules/prediction/container/obstacles:obstacle",
+        "//modules/prediction/evaluator",
+        "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/proto:lane_graph_proto",
+    ],
+)
 
 cpplint()

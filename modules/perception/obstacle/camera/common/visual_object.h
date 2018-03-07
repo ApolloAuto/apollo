@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H_
 
-#include <Eigen/Core>
 #include <memory>
 #include <vector>
+
+#include "Eigen/Core"
 
 #include "modules/perception/obstacle/base/types.h"
 
@@ -58,6 +59,12 @@ struct alignas(16) VisualObject {
 
   // [radian] observation angle of object, ranging as [-pi, pi]
   float alpha = 0.0f;
+
+  // Truncation ratio prediction from DNN. 0.0 means non-truncated box ( or <
+  // threshold, ex: 0.05)
+  double truncated_horizontal = 0.0;
+  double truncated_vertical = 0.0;
+
   // [radian] Rotation around the vertical axis, ranging as [-pi, pi]
   // the yaw angle, theta = 0.0f means direction = (1, 0, 0)
   float theta = 0.0f;
@@ -77,6 +84,8 @@ struct alignas(16) VisualObject {
   float track_age = 0.0f;
   // [second] the last observed timestamp
   float last_track_timestamp = 0.0f;
+
+  std::vector<float> object_feature;
 };
 
 typedef std::shared_ptr<VisualObject> VisualObjectPtr;
@@ -85,4 +94,4 @@ typedef std::shared_ptr<const VisualObject> VisualObjectConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H_

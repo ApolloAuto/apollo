@@ -37,7 +37,6 @@ std::string ContiRadarCanbus::Name() const {
 apollo::common::Status ContiRadarCanbus::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
   AINFO << "The adapter manager is successfully initialized.";
-
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_sensor_conf_file,
                                                 &conti_radar_conf_)) {
     return OnError("Unable to load canbus conf file: " +

@@ -15,8 +15,8 @@ cc_library(
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:header_proto",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/traffic_light/base:perception_traffic_light_base",
-        "//modules/perception/traffic_light/interface:perception_traffic_light_interface",
+        "//modules/perception/traffic_light/base",
+        "//modules/perception/traffic_light/interface",
         "//modules/perception/traffic_light/projection:perception_traffic_light_projection",
     ],
 )

@@ -21,8 +21,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "modules/perception/obstacle/camera/common/util.h"
-#include "modules/perception/obstacle/camera/common/visual_object.h"
 #include "modules/perception/obstacle/camera/tracker/base_affinity_tracker.h"
 #include "modules/perception/obstacle/camera/tracker/cascaded_camera_tracker_util.h"
 #include "modules/perception/obstacle/camera/tracker/kcf/kcf_components.h"

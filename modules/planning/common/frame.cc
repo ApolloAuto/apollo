@@ -191,8 +191,16 @@ bool Frame::CreateReferenceLineInfo() {
     reference_line_info_.back().SetOffsetToOtherReferenceLine(-offset);
   }
 
-  // delay the time-consumping reference_line_info init() step to planner.
-  return true;
+  bool has_valid_reference_line = false;
+  for (auto &ref_info : reference_line_info_) {
+    if (!ref_info.Init(obstacles())) {
+      AERROR << "Failed to init reference line";
+      continue;
+    } else {
+      has_valid_reference_line = true;
+    }
+  }
+  return has_valid_reference_line;
 }
 
 /**
@@ -424,6 +432,13 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   }
 
   planning_data->mutable_prediction_header()->CopyFrom(prediction_.header());
+
+  auto relative_map = AdapterManager::GetRelativeMap();
+  if (!relative_map->Empty()) {
+    // TODO(all): down size relative debug output.
+    planning_data->mutable_relative_map()->CopyFrom(
+        relative_map->GetLatestObserved());
+  }
 }
 
 void Frame::AlignPredictionTime(const double planning_start_time,

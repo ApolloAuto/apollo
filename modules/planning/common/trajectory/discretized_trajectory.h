@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file discretized_trajectory.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_COMMON_TRAJECTORY_DISCRETIZED_TRAJECTORY_H_

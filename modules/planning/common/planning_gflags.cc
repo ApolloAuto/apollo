@@ -419,3 +419,9 @@ DEFINE_double(default_lon_buffer, 5.0,
               "Default longitudinal buffer to sample path-time points.");
 DEFINE_double(time_min_density, 1.0,
               "Minimal time density to search sample points.");
+DEFINE_double(comfort_acceleration_factor, 0.5,
+              "Factor for comfort acceleration.");
+
+// navigation mode
+DEFINE_double(navigation_fallback_cruise_time, 8.0,
+              "The time range of fallback cruise under navigation mode.");

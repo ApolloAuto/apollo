@@ -23,46 +23,41 @@
 namespace apollo {
 namespace perception {
 
-void GetDetectedFromVO(const cv::Size &sz,
+void GetDetectedFromVO(const cv::Size &sz, const float &scale,
                        const std::vector<VisualObjectPtr> &objects,
-                       const float &scale, std::vector<Detected> *detected) {
-  size_t i = 0;
+                       std::vector<Detected> *detected) {
+  int i = 0;
   detected->clear();
   for (auto obj_ptr : objects) {
     // Get the boxes and make sure they are within the original image
-    // double x1 = std::min(obj_ptr->upper_left.x(),
-    // static_cast<double>(sz.width - 1));
-    double x1 = std::min(static_cast<float>(obj_ptr->upper_left[0]),
-                         static_cast<float>(sz.width - 1));
-    x1 = std::max(x1, 0.0);
-    // double y1 = std::min(obj_ptr->upper_left.y(),
-    // static_cast<double>(sz.height - 1));
-    double y1 = std::min(static_cast<float>(obj_ptr->upper_left[1]),
-                         static_cast<float>(sz.height - 1));
-    y1 = std::max(y1, 0.0);
+    float x1 = std::min(static_cast<float>(obj_ptr->upper_left[0]),
+                        static_cast<float>(sz.width - 1));
+    x1 = std::max(x1, 0.0f);
 
-    // double x2 = std::min(obj_ptr->lower_right.x(),
-    // static_cast<double>(sz.width - 1));
-    double x2 = std::min(static_cast<float>(obj_ptr->lower_right[0]),
-                         static_cast<float>(sz.width - 1));
-    x2 = std::max(x2, 0.0);
-    // double y2 = std::min(obj_ptr->lower_right.y(),
-    // static_cast<double>(sz.height - 1));
-    double y2 = std::min(static_cast<float>(obj_ptr->lower_right[1]),
-                         static_cast<float>(sz.height - 1));
-    y2 = std::max(y2, 0.0);
+    float y1 = std::min(static_cast<float>(obj_ptr->upper_left[1]),
+                        static_cast<float>(sz.height - 1));
+    y1 = std::max(y1, 0.0f);
+
+    float x2 = std::min(static_cast<float>(obj_ptr->lower_right[0]),
+                        static_cast<float>(sz.width - 1));
+    x2 = std::max(x2, 0.0f);
+
+    float y2 = std::min(static_cast<float>(obj_ptr->lower_right[1]),
+                        static_cast<float>(sz.height - 1));
+    y2 = std::max(y2, 0.0f);
 
     int x = static_cast<int>(x1 * scale);
     int y = static_cast<int>(y1 * scale);
     int width = static_cast<int>((x2 - x1) * scale);
     int height = static_cast<int>((y2 - y1) * scale);
 
+    obj_ptr->id = i;
+
     Detected obj;
     obj.detect_id_ = i;
-    obj_ptr->id = static_cast<int>(i);
     obj.box_ = cv::Rect(x, y, width, height);
     obj.features_ = obj_ptr->dl_roi_feature;
-    detected->push_back(obj);
+    detected->emplace_back(obj);
     ++i;
   }
 }
@@ -79,8 +74,8 @@ void MergeAffinityMatrix(const std::vector<std::vector<float>> &to_merge,
 
   for (size_t i = 0; i < affinity_matrix->size(); ++i) {
     for (size_t j = 0; j < (*affinity_matrix)[0].size(); ++j) {
-      if ((*affinity_matrix)[i][j] <
-          9.0f) {  // For saving high confidence selection
+      // For saving high confidence selection
+      if ((*affinity_matrix)[i][j] < 9.0f) {
         (*affinity_matrix)[i][j] *= to_merge[i][j];
       }
     }
@@ -168,18 +163,15 @@ void MatrixMatching(const std::vector<std::vector<float>> &affinity_matrix,
   }
 }
 
-void ManageTrackerAndID(const std::unordered_map<int, int> &local_matching,
-                        const std::unordered_set<int> &local_matched_detected,
-                        const std::vector<Detected> &detected,
-                        std::vector<Tracked> *tracked, int *next_tracked_id,
-                        std::map<int, int> *id_mapping, int curr_frame_cnt) {
-  // Output:
-  // Create, update and delete tracks, with the given matching result. (Ad-hoc
-  // strategy here of test)
-  // ID mapping done here as well
+void ManageTrackerAndID(
+    const std::unordered_map<int, int> &local_matching,
+    const std::unordered_set<int> &local_matched_detected,
+    const std::vector<Detected> &detected, const int &frame_idx,
+    const float &timestamp, std::vector<Tracked> *tracked, int *next_tracked_id,
+    std::unordered_map<int, std::pair<int, float>> *id_mapping) {
   id_mapping->clear();
   std::vector<Tracked> new_tracked;
-  const int max_kept_frame_cnt = 10;
+  const int kMaxKeptFrame = 10;
 
   // Sort local matching output based on tracked_id for easier debugging
   std::map<int, std::pair<int, int>> tracked_id_local_index;
@@ -199,45 +191,47 @@ void ManageTrackerAndID(const std::unordered_map<int, int> &local_matching,
   for (const auto &item : tracked_id_local_index) {
     int track_id =
         (*tracked)[item.second.first].track_id_;  // The same as item.first
-    size_t detect_id = detected[item.second.second].detect_id_;
+    float first_timestamp = (*tracked)[item.second.first].first_timestamp_;
+    int d_id = detected[item.second.second].detect_id_;
 
     Tracked curr_tracked;
-    curr_tracked.last_frame_idx_ = curr_frame_cnt;
-    curr_tracked.last_timestamp_ = detected[item.second.second].last_timestamp_;
+    curr_tracked.last_frame_idx_ = frame_idx;
+    curr_tracked.first_timestamp_ = first_timestamp;
+    curr_tracked.last_timestamp_ = timestamp;
     curr_tracked.track_id_ = track_id;
-    curr_tracked.detect_id_ = detect_id;
+    curr_tracked.detect_id_ = d_id;
     curr_tracked.box_ = detected[item.second.second].box_;
     new_tracked.emplace_back(curr_tracked);
 
-    (*id_mapping)[static_cast<int>(detect_id)] = track_id;
-    trackedID_to_detectedID[track_id] = static_cast<int>(detect_id);
+    (*id_mapping)[d_id] = std::make_pair(track_id, first_timestamp);
+    trackedID_to_detectedID[track_id] = d_id;
   }
 
   // Create new tracked based on unmatched detected
   for (size_t i = 0; i < detected.size(); ++i) {
     if (local_matched_detected.find(i) == local_matched_detected.end()) {
+      int d_id = detected[i].detect_id_;
+
       Tracked curr_tracked;
-      curr_tracked.last_frame_idx_ = curr_frame_cnt;
-      curr_tracked.last_timestamp_ = detected[i].last_timestamp_;
+      curr_tracked.last_frame_idx_ = frame_idx;
+      curr_tracked.first_timestamp_ = timestamp;
+      curr_tracked.last_timestamp_ = timestamp;
       curr_tracked.track_id_ = *next_tracked_id;
-      curr_tracked.detect_id_ = detected[i].detect_id_;
+      curr_tracked.detect_id_ = d_id;
       curr_tracked.box_ = detected[i].box_;
       new_tracked.emplace_back(curr_tracked);
 
-      (*id_mapping)[static_cast<int>(detected[i].detect_id_)] =
-          *next_tracked_id;
-      trackedID_to_detectedID[*next_tracked_id] =
-          static_cast<int>(detected[i].detect_id_);
+      (*id_mapping)[d_id] = std::make_pair(*next_tracked_id, timestamp);
+      trackedID_to_detectedID[*next_tracked_id] = detected[i].detect_id_;
 
-      // ID management
-      ++(*next_tracked_id);
+      ++(*next_tracked_id);  // ID management
     }
   }
 
   // Keep unmatched tracks here
   for (auto &trk : *tracked) {
     if (!trackedID_to_detectedID.count(trk.track_id_) &&
-        trk.last_frame_idx_ + max_kept_frame_cnt >= curr_frame_cnt) {
+        trk.last_frame_idx_ + kMaxKeptFrame >= frame_idx) {
       trk.detect_id_ = -1;
       new_tracked.emplace_back(trk);
     }

@@ -29,6 +29,7 @@ class Tracked {
   cv::Rect box_;   // 2D bounding box
   int track_id_;   // unique tracking id
   int detect_id_;  // -1 means unmatched but kept
+  float first_timestamp_;
   float last_timestamp_;
   int last_frame_idx_;
 
@@ -45,8 +46,6 @@ class Detected {
  public:
   cv::Rect box_;   // 2D bounding box
   int detect_id_;  // -1 means unmatched but kept
-  float last_timestamp_;
-  int last_frame_idx_;
 
   // DLF: Deep Learning ROI Pooling features from detection
   std::vector<float> features_;

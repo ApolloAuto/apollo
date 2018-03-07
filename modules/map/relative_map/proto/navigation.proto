@@ -4,6 +4,7 @@ package apollo.relative_map;
 
 import "modules/common/proto/header.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/localization/proto/localization.proto";
 import "modules/map/proto/map.proto";
 import "modules/perception/proto/perception_obstacle.proto";
 
@@ -34,4 +35,7 @@ message MapMsg {
 
   // lane marker info from perception
   optional apollo.perception.LaneMarkers lane_marker = 4;
+
+  // localization
+  optional apollo.localization.LocalizationEstimate localization = 5;
 }

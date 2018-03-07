@@ -20,6 +20,7 @@
 
 #include "modules/planning/common/reference_line_info.h"
 
+#include <algorithm>
 #include <functional>
 #include <utility>
 
@@ -109,7 +110,9 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
                                 .cipv_info();
     path_decision_.SetCIPVInfo(cipv_info);
   }
-
+  // set lattice planning target speed limit;
+  double cruise_speed = FLAGS_speed_upper_bound;
+  SetCruiseSpeed(std::min(FLAGS_default_cruise_speed, cruise_speed));
   is_inited_ = true;
   return true;
 }
@@ -286,6 +289,14 @@ double ReferenceLineInfo::TrajectoryLength() const {
     return 0.0;
   }
   return tps.back().path_point().s();
+}
+
+void ReferenceLineInfo::SetStopPoint(const StopPoint& stop_point) {
+  planning_target_.mutable_stop_point()->CopyFrom(stop_point);
+}
+
+void ReferenceLineInfo::SetCruiseSpeed(double speed) {
+  planning_target_.set_cruise_speed(speed);
 }
 
 bool ReferenceLineInfo::IsStartFrom(

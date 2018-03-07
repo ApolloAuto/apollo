@@ -163,9 +163,9 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
       return false;
     }
 
-    bool result = inst->Init(
-        subnode_config, &event_manager_, &shared_data_manager_,
-        subnode_sub_events_map[subnode_id], subnode_pub_events_map[subnode_id]);
+    bool result = inst->Init(subnode_config, subnode_sub_events_map[subnode_id],
+                             subnode_pub_events_map[subnode_id],
+                             &event_manager_, &shared_data_manager_);
     if (!result) {
       AERROR << "failed to Init subnode. name: " << inst->name();
       return false;

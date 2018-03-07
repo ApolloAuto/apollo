@@ -12,8 +12,8 @@ cc_library(
         "@opencv2//:core",
         "//modules/perception/lib/base:base",
         "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/obstacle/camera/common:obstacle_camera_common",
-        "//modules/perception/obstacle/camera/interface:obstacle_camera_interface"
+        "//modules/perception/obstacle/camera/common:common",
+        "//modules/perception/obstacle/camera/interface:interface"
     ]
 )
 

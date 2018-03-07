@@ -92,8 +92,11 @@ struct alignas(16) Object {
   Eigen::Matrix3d position_uncertainty;
   Eigen::Matrix3d velocity_uncertainty;
 
+  // CIPV
+  bool b_cipv = false;
   // sensor particular suplplements, default nullptr
   RadarSupplementPtr radar_supplement = nullptr;
+  CameraSupplementPtr camera_supplement = nullptr;
 };
 
 typedef std::shared_ptr<Object> ObjectPtr;
@@ -115,6 +118,13 @@ struct SensorObjects {
   std::vector<ObjectPtr> objects;
   Eigen::Matrix4d sensor2world_pose;
   LaneObjectsPtr lane_objects;
+
+  uint32_t cipv_index = -1;
+  uint32_t cipv_track_id = -1;
+
+  // sensor particular suplplements, default nullptr
+  RadarFrameSupplementPtr radar_frame_supplement = nullptr;
+  CameraFrameSupplementPtr camera_frame_supplement = nullptr;
 };
 
 }  // namespace perception
