@@ -35,13 +35,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "caffe_bridge",
-    hdrs = [
-        "caffe_bridge.hpp",
-    ],
-)
-
 # cc_library(
 #     name = "cnn_adapter",
 #     srcs = [
