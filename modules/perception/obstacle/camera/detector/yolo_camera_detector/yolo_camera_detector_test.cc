@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 
-#include <caffe/caffe.hpp>
 #include <gtest/gtest.h>
+#include <caffe/caffe.hpp>
 #include <opencv2/opencv.hpp>
 
 #include "modules/common/log.h
