@@ -141,6 +141,7 @@ Status Planning::Start() {
 
 void Planning::OnTimer(const ros::TimerEvent&) {
   RunOnce();
+
   if (FLAGS_planning_test_mode && FLAGS_test_duration > 0.0 &&
       Clock::NowInSeconds() - start_time_ > FLAGS_test_duration) {
     ros::shutdown();
@@ -156,6 +157,11 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb,
       !AdapterManager::GetRoutingResponse()->Empty()) {
     trajectory_pb->mutable_routing_header()->CopyFrom(
         AdapterManager::GetRoutingResponse()->GetLatestObserved().header());
+  }
+
+  if (FLAGS_use_navigation_mode &&
+      trajectory_pb->trajectory_point_size() == 0) {
+    SetFallbackCruiseTrajectory(trajectory_pb);
   }
 
   // NOTICE:
@@ -364,7 +370,24 @@ void Planning::RunOnce() {
 
   auto seq_num = frame_->SequenceNum();
   FrameHistory::instance()->Add(seq_num, std::move(frame_));
-}  // namespace planning
+}
+
+void Planning::SetFallbackCruiseTrajectory(ADCTrajectory* cruise_trajectory) {
+  CHECK_NOTNULL(cruise_trajectory);
+
+  const double v = VehicleStateProvider::instance()->linear_velocity();
+  for (double t = 0.0; t < FLAGS_navigation_fallback_cruise_time; t += 0.1) {
+    const double s = t * v;
+
+    auto* cruise_point = cruise_trajectory->add_trajectory_point();
+    cruise_point->mutable_path_point()->CopyFrom(
+        common::util::MakePathPoint(s, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+    cruise_point->mutable_path_point()->set_s(s);
+    cruise_point->set_v(v);
+    cruise_point->set_a(0.0);
+    cruise_point->set_relative_time(t);
+  }
+}
 
 void Planning::Stop() {
   AERROR << "Planning Stop is called";

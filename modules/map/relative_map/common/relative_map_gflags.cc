@@ -40,6 +40,9 @@ DEFINE_double(ratio_navigation_lane_len_to_speed, 6.0,
 DEFINE_double(max_distance_to_navigation_line, 6.0,
               "max distance to navigation line in navigation mode");
 
+DEFINE_double(min_view_range_to_use_lane_marker, 0.5,
+              "min view range to use lane_marker");
+
 DEFINE_bool(
     enable_navigation_line, true,
     "True to consider navigation line info into generate navigation path");

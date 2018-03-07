@@ -36,26 +36,23 @@ cc_library(
 )
 
 cc_library(
-    name = "caffe_bridge",
-    hdrs = [
-        "caffe_bridge.hpp",
+    name = "projector",
+    srcs = ["projector.cc"],
+    hdrs = ["projector.h"],
+    deps = [
+        "//modules/common:log",
+        "@eigen",
     ],
 )
 
-# cc_library(
-#     name = "cnn_adapter",
-#     srcs = [
-#         "cnn_adapter.cc",
-#     ],
-#     hdrs = [
-#         "cnn_adapter.h",
-#     ],
-#     deps = [
-#         ":caffe_bridge",
-#         "//modules/perception/lib/pcl_util",
-#         "@eigen",
-#         "@undistort",
-#     ],
-# )
+cc_library(
+    name = "cnn_adapter",
+    srcs = ["cnn_adapter.cc"],
+    hdrs = ["cnn_adapter.h"],
+    deps = [
+        "//modules/perception/obstacle/camera/common:util",
+        "//modules/perception/obstacle/camera/detector/common:util",
+    ],
+)
 
 cpplint()

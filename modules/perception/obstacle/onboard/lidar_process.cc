@@ -221,7 +221,7 @@ bool LidarProcess::InitFrameDependence() {
     return false;
   }
   AINFO << "Init config manager successfully, work_root: "
-        << config_manager->work_root();
+        << config_manager->WorkRoot();
 
   /// init hdmap
   if (FLAGS_enable_hdmap_input) {

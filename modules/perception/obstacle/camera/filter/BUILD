@@ -7,25 +7,25 @@ cc_library(
     srcs = ["kalman_filter_1d.cc"],
     hdrs = ["kalman_filter_1d.h"],
     deps = [
+        "@eigen",
         "@yaml_cpp//:yaml",
-        "@eigen//:eigen",
-    ]
+    ],
 )
 
 cc_library(
-    name = "object_camera_filter",
+    name = "object_filter",
     srcs = ["object_camera_filter.cc"],
     hdrs = ["object_camera_filter.h"],
     deps = [
-        "@yaml_cpp//:yaml",
-        "@eigen//:eigen",
+        ":kalman_filter_1d",
+        "//modules/perception/lib/base",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/obstacle/camera/common",
+        "//modules/perception/obstacle/camera/interface",
+        "@eigen",
         "@opencv2//:core",
-        "//modules/perception/lib/base:base",
-        "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/obstacle/camera/common:common",
-        "//modules/perception/obstacle/camera/interface:interface",
-        ":kalman_filter_1d"
-    ]
+        "@yaml_cpp//:yaml",
+    ],
 )
 
 cpplint()

@@ -34,6 +34,16 @@ enum class ObjectType {
   MAX_OBJECT_TYPE = 6,
 };
 
+enum InternalObjectType {
+  INT_BACKGROUND = 0,
+  INT_SMALLMOT = 1,
+  INT_PEDESTRIAN = 2,
+  INT_NONMOT = 3,
+  INT_BIGMOT = 4,
+  INT_UNKNOWN = 5,
+  INT_MAX_OBJECT_TYPE = 6,
+};
+
 enum class SensorType {
   VELODYNE_64 = 0,
   VELODYNE_16 = 1,

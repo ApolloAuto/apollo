@@ -221,4 +221,7 @@ DECLARE_double(default_lon_buffer);
 DECLARE_double(time_min_density);
 DECLARE_double(comfort_acceleration_factor);
 
-#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H
+// navigation mode
+DECLARE_double(navigation_fallback_cruise_time);
+
+#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_

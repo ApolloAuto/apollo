@@ -3,16 +3,17 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "interface",
-    srcs = [],
-    hdrs = glob(["*.h"]),
+    name = "flat_transformer",
+    srcs = ["flat_camera_transformer.cc"],
+    hdrs = ["flat_camera_transformer.h"],
     deps = [
         "//modules/perception/lib/base",
-        "//modules/perception/obstacle/base",
+        "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/common",
-        "//modules/perception/obstacle/common",
+        "//modules/perception/obstacle/camera/interface",
         "@eigen",
         "@opencv2//:core",
+        "@yaml_cpp//:yaml",
     ],
 )
 

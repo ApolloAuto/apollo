@@ -14,39 +14,58 @@
  * limitations under the License.
  *****************************************************************************/
 
-// The base class of camera 2D object detection
+// @brief: The base class of camera 2D object detection
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_DETECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_DETECTOR_H_
 
+#include <Eigen/Core>
+
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "Eigen/Core"
 #include "opencv2/opencv.hpp"
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
+#include "modules/perception/obstacle/common/camera.h"
 
 namespace apollo {
 namespace perception {
+
+struct CameraDetectorInitOptions {
+  std::shared_ptr<CameraDistortD> intrinsic;
+};
+
+struct CameraDetectorOptions {
+  cv::Mat gray_frame;
+  cv::Mat range_frame;
+  std::shared_ptr<CameraDistortD> intrinsic;
+  std::shared_ptr<Eigen::Matrix4d> extrinsic_ground2camera;
+  std::shared_ptr<Eigen::Matrix4d> extrinsic_stereo;
+};
 
 class BaseCameraDetector {
  public:
   BaseCameraDetector() {}
   virtual ~BaseCameraDetector() {}
 
-  virtual bool Init() = 0;
+  virtual bool Init(const CameraDetectorInitOptions &options =
+                    CameraDetectorInitOptions()) = 0;
 
   // @brief: Object detection on image from camera
   // @param [in]: image frame from camera
   // @param [in/out]: detected objects
   virtual bool Detect(const cv::Mat& frame,
+                      const CameraDetectorOptions& options,
                       std::vector<VisualObjectPtr>* objects) = 0;
 
   virtual bool Multitask(const cv::Mat& frame,
-                         std::vector<VisualObjectPtr>* objects, cv::Mat* mask) {
+                         const CameraDetectorOptions& options,
+                         std::vector<VisualObjectPtr>* objects,
+                         cv::Mat* mask) {
     return true;
   }
 

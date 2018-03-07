@@ -27,10 +27,13 @@ namespace apollo {
 namespace perception {
 namespace yolo {
 
-using apollo::perception::ObjectType;
+using std::string;
+using std::vector;
+using std::map;
+using std::ifstream;
 
-bool load_types(const std::string &path, std::vector<ObjectType> *types) {
-  const std::map<std::string, ObjectType> type_map = {
+bool load_types(const string &path, vector<ObjectType> *types) {
+  const map<string, ObjectType> type_map = {
       {"UNKNOWN", apollo::perception::ObjectType::UNKNOWN},
       {"UNKNOWN_MOVABLE", apollo::perception::ObjectType::UNKNOWN_MOVABLE},
       {"UNKNOWN_UNMOVABLE", apollo::perception::ObjectType::UNKNOWN_UNMOVABLE},
@@ -39,20 +42,21 @@ bool load_types(const std::string &path, std::vector<ObjectType> *types) {
       {"VEHICLE", apollo::perception::ObjectType::VEHICLE},
   };
 
-  std::ifstream ifs(path, std::ifstream::in);
+  ifstream ifs(path, ifstream::in);
   if (!ifs.good()) {
     AERROR << "type_list not found, use default: VEHICLE, BICYCLE, PEDESTRIAN";
     (*types) = {apollo::perception::ObjectType::VEHICLE,
                 apollo::perception::ObjectType::BICYCLE,
                 apollo::perception::ObjectType::PEDESTRIAN};
   } else {
-    std::string type;
+    string type;
     AINFO << "Supported types: ";
     while (ifs >> type) {
       if (type_map.find(type) == type_map.end()) {
         AERROR << "Invalid type: " << type;
         return false;
       }
+
       (*types).push_back(type_map.at(type));
       AINFO << "\t\t" << type;
     }
@@ -62,9 +66,9 @@ bool load_types(const std::string &path, std::vector<ObjectType> *types) {
   return true;
 }
 
-bool load_anchors(const std::string &path, std::vector<float> *anchors) {
+bool load_anchors(const string &path, vector<float> *anchors) {
   int num_anchors = 0;
-  std::ifstream ifs(path, std::ifstream::in);
+  ifstream ifs(path, ifstream::in);
   ifs >> num_anchors;
   if (!ifs.good()) {
     AERROR << "Failed to get number of anchors!";

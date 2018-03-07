@@ -14,33 +14,33 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAFFE_BRIDGE_HPP_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAFFE_BRIDGE_HPP_
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_PROJECTOR_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_PROJECTOR_H_
 
-#include "caffe/caffe.hpp"
+#include <Eigen/Core>
+
+#include <string>
+#include <vector>
 
 namespace apollo {
 namespace perception {
 
-template <typename Dtype>
-bool tensor_to_blob(const anakin::Tensor<Dtype> &tensor,
-                    caffe::Blob<Dtype> *blob) {
-  if (blob == nullptr) {
-    return false;
-  }
-  blob->Reshape(tensor.dims());
-  memcpy(blob->mutable_cpu_data(), tensor.cpu_data(),
-         sizeof(Dtype) * blob->count());
-  return true;
-}
+class BaseProjector {
+ public:
+  virtual bool project(std::vector<float>* feature) = 0;
+};
 
-template bool tensor_to_blob(const anakin::Tensor<float> &tensor,
-                             caffe::Blob<float> *blob);
-#if 0
-template bool tensor_to_blob(
-    const anakin::Tensor<double> &tensor, caffe::Blob<double> *blob);
-#endif
+class MatrixProjector : public BaseProjector {
+ public:
+  explicit MatrixProjector(std::string weight_file);
+
+  bool project(std::vector<float>* feature) override;
+
+ private:
+  Eigen::MatrixXf matrix_;
+};
+
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CAFFE_BRIDGE_HPP_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_PROJECTOR_H_

@@ -173,8 +173,8 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
     point->set_x(flu_x);
     point->set_y(flu_y);
     point->set_theta(common::math::NormalizeAngle(
-        common::math::NormalizeAngle(point->theta())
-            - original_pose_.heading()));
+        common::math::NormalizeAngle(point->theta()) -
+        original_pose_.heading()));
     const double accumulated_s = navigation_path.path_point(i).s() - ref_s;
     point->set_s(accumulated_s);
 
@@ -211,7 +211,7 @@ bool NavigationLane::UpdateProjectionIndex() {
       break;
     }
   }
-  if (min_d < FLAGS_max_distance_to_navigation_line) {
+  if (min_d > FLAGS_max_distance_to_navigation_line) {
     return false;
   }
   last_project_index_ = index;
@@ -241,10 +241,9 @@ void NavigationLane::ConvertLaneMarkerToPath(
                     right_lane.c2_curvature() * right_quality) /
                    quality_divider;
 
-  double path_c3 =
-      (left_lane.c3_curvature_derivative() * left_quality +
-       right_lane.c3_curvature_derivative() * right_quality) /
-      quality_divider;
+  double path_c3 = (left_lane.c3_curvature_derivative() * left_quality +
+                    right_lane.c3_curvature_derivative() * right_quality) /
+                   quality_divider;
 
   const double current_speed =
       VehicleStateProvider::instance()->vehicle_state().linear_velocity();
@@ -259,11 +258,12 @@ void NavigationLane::ConvertLaneMarkerToPath(
   const double start_s = -2.0;
   double accumulated_s = start_s;
   for (double z = start_s; z <= path_range; z += unit_z) {
-    double x_l = EvaluateCubicPolynomial(path_c0, path_c1, path_c2, path_c3, z);
-
     double x1 = z;
-    double y1 = x_l;
-
+    double y1 = 0;
+    if (left_lane.view_range() > FLAGS_min_view_range_to_use_lane_marker ||
+        right_lane.view_range() > FLAGS_min_view_range_to_use_lane_marker) {
+      y1 = EvaluateCubicPolynomial(path_c0, path_c1, path_c2, path_c3, z);
+    }
     auto *point = path->add_path_point();
     point->set_x(x1);
     point->set_y(y1);
@@ -273,6 +273,8 @@ void NavigationLane::ConvertLaneMarkerToPath(
       accumulated_s += std::hypot(x1 - pre_point.x(), y1 - pre_point.y());
     }
     point->set_s(accumulated_s);
+    point->set_theta(
+        std::atan2(3 * path_c3 * x1 * x1 + 2 * path_c2 * x1 + path_c1, 1));
   }
 
   left_width_ = (std::fabs(left_lane.c0_position()) +

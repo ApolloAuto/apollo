@@ -47,12 +47,12 @@ const cv::Scalar COLOR_BLACK = cv::Scalar(0, 0, 0);
 class Timer {
  public:
   Timer() {
-    _scale = 1.0 / (static_cast<double>(cvGetTickFrequency()) * 1000.);
+    scale_ = 1.0 / (static_cast<double>(cvGetTickFrequency()) * 1000.);
     tic();
   }
-  void tic() { _start = static_cast<double>(cv::getTickCount()); }
+  void tic() { start_ = static_cast<double>(cv::getTickCount()); }
   double toc(bool reset = false) {
-    double time = (static_cast<double>(cvGetTickCount()) - _start) * _scale;
+    double time = (static_cast<double>(cvGetTickCount()) - start_) * scale_;
     if (reset) {
       tic();
     }
@@ -60,8 +60,8 @@ class Timer {
   }
 
  private:
-  double _start;
-  double _scale;
+  double start_ = 0.0;
+  double scale_ = 0.0;
 };
 
 inline void l2norm(float *feat_data, int feat_dim) {
@@ -98,6 +98,9 @@ bool load_gt_form_file(const std::string &gt_path,
 std::string get_type_text(ObjectType type);
 
 ObjectType get_object_type(const std::string &type_text);
+
+bool load_text_proto_message_file(const std::string& path,
+                                  google::protobuf::Message* msg);
 
 }  // namespace perception
 }  // namespace apollo

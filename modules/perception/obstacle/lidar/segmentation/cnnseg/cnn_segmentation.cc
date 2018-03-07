@@ -212,7 +212,7 @@ bool CNNSegmentation::GetConfigs(string* config_file, string* proto_file,
     AERROR << "Failed to get model config for CNNSegmentation";
     return false;
   }
-  const string& work_root = config_manager->work_root();
+  const string& work_root = config_manager->WorkRoot();
 
   if (!model_config->GetValue("config_file", config_file)) {
     AERROR << "Failed to get value of config_file.";

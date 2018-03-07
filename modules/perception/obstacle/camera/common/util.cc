@@ -24,6 +24,8 @@
 
 #include "gflags/gflags.h"
 
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace perception {
 
@@ -74,14 +76,13 @@ bool load_visual_object_form_file(
     double y1 = 0.0;
     double x2 = 0.0;
     double y2 = 0.0;
-    int ret =
-        fscanf(fp,
-               "%s %lf %lf %f %lf %lf %lf %lf %f %f %f %f %f %f %f %f "
-               "%lf %lf",
-               type, &trash, &trash, &obj->alpha, &x1, &y1, &x2, &y2,
-               &obj->height, &obj->width, &obj->length, &obj->center.x(),
-               &obj->center.y(), &obj->center.z(), &obj->theta, &obj->score,
-               &obj->truncated_vertical, &obj->truncated_horizontal);
+    int ret = fscanf(fp,
+                     "%s %lf %lf %f %lf %lf %lf %lf %f %f %f %f %f %f %f %f "
+                     "%lf %lf",
+                     type, &trash, &trash, &obj->alpha, &x1, &y1, &x2, &y2,
+                     &obj->height, &obj->width, &obj->length, &obj->center.x(),
+                     &obj->center.y(), &obj->center.z(), &obj->theta,
+                     &obj->score, &obj->trunc_height, &obj->trunc_width);
     obj->upper_left[0] = x1 > 0 ? x1 : 0;
     obj->upper_left[1] = y1 > 0 ? y1 : 0;
     obj->lower_right[0] = x2 < 1920 ? x2 : 1920;
@@ -170,15 +171,15 @@ bool load_gt_form_file(const std::string &gt_path,
       // (Only possible to do this with this kind of gt, not detection)
       // (2 pixels to frame boundaries)
       if (obj->upper_left[0] <= 2.0 || obj->lower_right[0] >= 1918.0) {
-        obj->truncated_horizontal = 0.5;
+        obj->trunc_width = 0.5f;
       } else {
-        obj->truncated_horizontal = 0.0;
+        obj->trunc_width = 0.0f;
       }
 
       if (obj->upper_left[1] <= 2.0 || obj->lower_right[1] >= 1078.0) {
-        obj->truncated_vertical = 0.5;
+        obj->trunc_height = 0.5f;
       } else {
-        obj->truncated_vertical = 0.0;
+        obj->trunc_height = 0.0f;
       }
 
       visual_objects->push_back(obj);
@@ -340,6 +341,34 @@ ObjectType get_object_type(const std::string &type) {
   } else {
     return ObjectType::UNKNOWN;
   }
+}
+
+bool load_text_proto_message_file(const std::string& path,
+                                  google::protobuf::Message* msg) {
+  if (msg == nullptr) {
+    AERROR << "msg is a null pointer.";
+    return false;
+  }
+
+  int fd = open(path.c_str(), O_RDONLY);
+  if (fd < 0) {
+    AERROR << "path[" << path << "]";
+    return false;
+  }
+
+  google::protobuf::io::FileInputStream file_in(fd);
+
+  if (!google::protobuf::TextFormat::Parse(&file_in, msg)) {
+    AERROR << "path[" << path << "]";
+    return false;
+  }
+
+  if (close(fd) != 0) {
+    AERROR << "fail to close file: " << path;
+    return false;
+  }
+
+  return true;
 }
 
 }  // namespace perception

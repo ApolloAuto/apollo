@@ -32,6 +32,7 @@ bool CascadedCameraTracker::Init() {
 bool CascadedCameraTracker::Associate(const cv::Mat& img,
                                       const float& timestamp,
                                       std::vector<VisualObjectPtr>* objects) {
+  if (!objects) return false;
   frame_idx_++;
 
   // detect id to (track id, first_timestamp) mapping

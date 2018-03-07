@@ -39,7 +39,6 @@ cc_library(
     ],
     deps = [
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/util:dropbox",
         "//modules/common/util:factory",
         "//modules/common/util:map_util",
         "//modules/perception/proto:perception_proto",
