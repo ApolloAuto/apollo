@@ -32,9 +32,7 @@ using apollo::common::TrajectoryPoint;
 
 OpenSpacePlanner::OpenSpacePlanner() {}
 
-Status OpenSpacePlanner::Init(const PlanningConfig&) {
-  return Status::OK();
-}
+Status OpenSpacePlanner::Init(const PlanningConfig&) { return Status::OK(); }
 
 apollo::common::Status OpenSpacePlanner::Plan(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -153,7 +151,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
                   "Distance approach problem failed to solve");
   }
 
-  // TODO(QiL): Step 9 : Publish trajectoryPoint in planning trajectory
+  // TODO(QiL): Step 9 : Publish trajectoryPoint in planning trajectory, i.e.
+  // Fullfil frame.
   return Status::OK();
 }
 
@@ -174,8 +173,8 @@ Status ObsHRep(const std::size_t& nOb, const Eigen::MatrixXd& vOb,
   // start building H representation
   // TODO(QiL) : Add basic sanity check for H representation.
   for (std::size_t i = 1; i != nOb; ++i) {
-    Eigen::MatrixXd A_i(int(vOb(i - 1, 0)), 2);
-    Eigen::MatrixXd b_i(int(vOb(i - 1, 0)), 1);
+    Eigen::MatrixXd A_i(static_cast<int>(vOb(i - 1, 0)), 2);
+    Eigen::MatrixXd b_i(static_cast<int>(vOb(i - 1, 0)), 1);
 
     // take two subsequent vertices, and computer hyperplane
     for (int j = 1; j != vOb(i, 1); ++j) {

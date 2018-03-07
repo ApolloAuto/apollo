@@ -164,7 +164,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
     for (std::size_t j = 1; j <= vObsum_; ++j) {
       x_l[i * vObsum_ + j] = 0.0;
-      // TODO:(QiL) refine this variables limits
+      // TODO(QiL): refine this variables limits
       x_u[i * vObsum_ + j] = 100.0;
 
       ++variable_index;
@@ -177,7 +177,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (std::size_t i = 1; i <= horizon_ + 1; ++i) {
     for (std::size_t j = 1; j <= 4 * nOb_; ++j) {
       x_l[i * 4 * nOb_ + j] = 0.0;
-      // TODO:(QiL) refine this variables limits
+      // TODO(QiL): refine this variables limits
       x_u[i * 4 * nOb_ + j] = 100.0;
 
       ++variable_index;
