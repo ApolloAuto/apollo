@@ -50,7 +50,7 @@ Status Perception::Init() {
     return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init ConfigManager.");
   }
   AINFO << "Init config manager successfully, work_root: "
-        << config_manager->work_root();
+        << config_manager->WorkRoot();
 
   const std::string dag_config_path = apollo::common::util::GetAbsolutePath(
       FLAGS_work_root, FLAGS_dag_config_path);
