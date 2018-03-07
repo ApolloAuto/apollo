@@ -41,7 +41,7 @@ message StopSignStatus {
     repeated string watch_vehicles = 2;
   }
 
-  required string stop_sign_id = 1;
+  optional string stop_sign_id = 1;
   optional Status status = 2;
   optional double stop_start_time = 3;
   repeated LaneWatchVehicles lane_watch_vehicles = 4;
