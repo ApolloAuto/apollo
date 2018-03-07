@@ -126,4 +126,13 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "validation_checker",
+    srcs = ["validation_checker.cc"],
+    hdrs = ["validation_checker.h"],
+    deps = [
+        "//modules/common/proto:pnc_point_proto",
+    ],
+)
+
 cpplint()
