@@ -52,7 +52,7 @@ bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
 
   string yolo_config =
       apollo::common::util::GetAbsolutePath(yolo_root, "config.pt");
-  load_text_proto_message_file(yolo_config, &yolo_param_);
+  LoadTextProtoMessageFile(yolo_config, &yolo_param_);
   load_intrinsic(options);
   if (!init_cnn(yolo_root)) {
     return false;
@@ -186,7 +186,7 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   output_names.push_back(net_param.seg_blob());
 
   FeatureParam feat_param;
-  load_text_proto_message_file(feature_file, &feat_param);
+  LoadTextProtoMessageFile(feature_file, &feat_param);
   for (auto extractor : feat_param.extractor()) {
     output_names.push_back(extractor.feat_blob());
   }
