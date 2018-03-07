@@ -30,9 +30,7 @@ class Thread {
   explicit Thread(bool joinable = false, const std::string& name = "Thread")
       : joinable_(joinable), thread_name_(name) {}
 
-  pthread_t Tid() const {
-    return tid_;
-  }
+  pthread_t Tid() const { return tid_; }
 
   void SetJoinable(bool joinable) {
     if (!started_) {
@@ -46,12 +44,8 @@ class Thread {
 
   bool IsAlive();
 
-  std::string thread_name() const {
-    return thread_name_;
-  }
-  void set_thread_name(const std::string& name) {
-    thread_name_ = name;
-  }
+  std::string thread_name() const { return thread_name_; }
+  void set_thread_name(const std::string& name) { thread_name_ = name; }
 
  protected:
   virtual void Run() = 0;
