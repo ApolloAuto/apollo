@@ -46,8 +46,8 @@ using std::map;
 using std::vector;
 using std::string;
 
-bool MixDetectorSubnode::init_internal() {
-  // init shared data
+bool CameraProcessSubnode::InitInternal() {
+
   if (!init_shared_data()) {
     XLOG(ERROR) << "Failed to init shared data.";
     return false;
@@ -82,11 +82,11 @@ bool MixDetectorSubnode::init_internal() {
     return false;
   }
 
-  XLOG(INFO) << "Init MixDetectorSubnode sucessfully";
+  XLOG(INFO) << "Init CameraProcessSubnode sucessfully";
   return true;
 }
 
-bool MixDetectorSubnode::init_shared_data() {
+bool CameraProcessSubnode::init_shared_data() {
   CHECK(_shared_data_manager != nullptr);
   // init preprocess_data
   _camera_object_data = dynamic_cast<CameraObjectData *>(
@@ -109,7 +109,7 @@ bool MixDetectorSubnode::init_shared_data() {
   return true;
 }
 
-bool MixDetectorSubnode::init_alg_plugins() {
+bool CameraProcessSubnode::init_alg_plugins() {
   // init camera detector
   _camera_detector.reset(BaseCameraDetectorRegisterer::get_instance_by_name(
       FLAGS_onboard_mix_camera_detector));
@@ -161,7 +161,7 @@ bool MixDetectorSubnode::init_alg_plugins() {
   return true;
 }
 
-bool MixDetectorSubnode::init_work_root() {
+bool CameraProcessSubnode::init_work_root() {
   ConfigManager *config_manager = base::Singleton<ConfigManager>::get();
   if (config_manager == NULL) {
     XLOG(ERROR) << "failed to get ConfigManager instance.";
@@ -180,7 +180,7 @@ bool MixDetectorSubnode::init_work_root() {
   return true;
 }
 
-bool MixDetectorSubnode::init_calibration_input(
+bool CameraProcessSubnode::init_calibration_input(
     const map<string, string> &reserve_field_map) {
   CalibrationConfigManager *config_manager =
       base::Singleton<CalibrationConfigManager>::get();
@@ -198,7 +198,7 @@ bool MixDetectorSubnode::init_calibration_input(
   return true;
 }
 
-bool MixDetectorSubnode::init_subscriber(
+bool CameraProcessSubnode::init_subscriber(
     const map<string, string> &reserve_field_map) {
   auto citer = reserve_field_map.find("source_type");
   if (citer == reserve_field_map.end()) {
@@ -227,7 +227,7 @@ bool MixDetectorSubnode::init_subscriber(
   }
   // register subscriber
   bool ret = _stream_input.register_subscriber(
-      source_type, new_source_name, &MixDetectorSubnode::image_callback, this);
+      source_type, new_source_name, &CameraProcessSubnode::image_callback, this);
   if (!ret) {
     XLOG(ERROR) << "Failed to register input stream. [type: " << source_type
                 << "] [name: " << new_source_name << "].";
@@ -239,66 +239,23 @@ bool MixDetectorSubnode::init_subscriber(
   return true;
 }
 
-bool MixDetectorSubnode::resize_image(
-    const sensor_msgs::Image::ConstPtr &image_message_src,
-    sensor_msgs::Image::Ptr image_message) {
-  // copy image properties
-  float divisor = static_cast<float>(image_message_src->width / 1920.0);
-  image_message->header = image_message_src->header;
-  image_message->height = image_message_src->height / divisor;
-  image_message->width = image_message_src->width / divisor;
-  image_message->encoding = image_message_src->encoding;
-  image_message->is_bigendian = image_message_src->is_bigendian;
-  image_message->step = image_message_src->step / divisor;
-  image_message->data.resize(image_message->step * image_message->height);
-  int data_length = image_message_src->step / image_message_src->width;
-  // copy every divisorth byte
-  // subpixels will be merged if multiple bytes per pixel
-  uint new_index = 0;
-  for (uint row = 0; row < image_message->height; ++row) {
-    int row_offset = static_cast<int>(row * divisor) * image_message_src->step;
-    for (uint col = 0; col < image_message->width; ++col) {
-      int old_index =
-          row_offset + static_cast<int>(col * divisor) * data_length;
-      for (size_t k = 0; k < data_length; ++k) {
-        image_message->data[new_index++] =
-            image_message_src->data[old_index + k];
-      }
-    }
-  }
-}
-
-void MixDetectorSubnode::image_callback(
+void CameraProcessSubnode::image_callback(
     const sensor_msgs::Image::ConstPtr &image_message) {
-  PERF_FUNCTION();
-  // trans image
-  cv::Mat image_mat_src;
-  if (image_message->width != 1920) {
-    sensor_msgs::Image::Ptr image_message_src =
-        boost::make_shared<sensor_msgs::Image>();
-    resize_image(image_message, image_message_src);
-    if (!this->trans_message_to_cv_mat(image_message_src, &image_mat_src)) {
-      XLOG(ERROR) << "trans messagea to cv mat error!";
-      return;
-    }
-  } else {
-    if (!this->trans_message_to_cv_mat(image_message, &image_mat_src)) {
-      XLOG(ERROR) << "trans messagea to cv mat error!";
-      return;
-    }
+  cv::Mat img;
+
+  if (!this->trans_message_to_cv_mat(image_message, &img)) {
+    XLOG(ERROR) << "trans messagea to cv mat error!";
+    return;
   }
-  image_process(image_mat_src, image_message->header.stamp.toSec());
+
+  image_process(img, image_message->header.stamp.toSec());
 }
 
-void MixDetectorSubnode::image_process(const cv::Mat &image_mat_src,
-                                       double time_stamp) {
-  PERF_FUNCTION();
+void CameraProcessSubnode::image_process(const cv::Mat &img,
+                                       double timestamp) {
   ++_seq_num;
-  const double timestamp = time_stamp;
-  // const double unix_timestamp = base::TimeUtil::gps2unix(timestamp);
   const double unix_timestamp = timestamp;
 
-  // format: FRAME_STATISTICS:device:Event:timestamp:currenttime
   const double cur_time = TimeUtil::get_current_time();
   const double start_latency = (cur_time - unix_timestamp) * 1e3;
 
@@ -319,9 +276,7 @@ void MixDetectorSubnode::image_process(const cv::Mat &image_mat_src,
 
   onboard::SharedDataPtr<CameraItem> camera_item_ptr(new CameraItem);
 
-  camera_item_ptr->image_src_mat = image_mat_src.clone();
-
-  XLOG(INFO) << "trans message to cv mat success";
+  camera_item_ptr->image_src_mat = img.clone();
 
   // get trans matrix for camera -> car
   Matrix4d camera_to_car_pose;
@@ -335,32 +290,27 @@ void MixDetectorSubnode::image_process(const cv::Mat &image_mat_src,
 
   out_sensor_objects->sensor2world_pose = camera_to_car_pose;
 
-  XLOG(INFO) << "get camera car trans success";
-
-  XLOG(DEBUG) << "Camera2World Transform matrix: \n"
-              << camera_to_car_pose << ", time: " << GLOG_TIMESTAMP(timestamp);
-
-  PERF_BLOCK_START();
-
   // camera detect and track
   CameraDetectorOptions camera_detector_options;
   CameraTrackerOptions camera_tracker_options(&camera_to_car_pose);
   std::vector<VisualObjectPtr> track_objects;
-  std::vector<VisualObjectPtr> visual_objects;
+  std::vector<VisualObjectPtr> objects;
   cv::Mat lane_map =
-      cv::Mat::zeros(image_mat_src.rows, image_mat_src.cols, CV_32FC1);
+      cv::Mat::zeros(img.rows, img.cols, CV_32FC1);
 
-  if (!_camera_detector->multitask(image_mat_src, camera_detector_options,
-                                   &visual_objects, &lane_map)) {
+  if (!_camera_detector->multitask(img, camera_detector_options,
+                                   &objects, &lane_map)) {
     XLOG(ERROR) << "Failed to detect and parse.";
     out_sensor_objects->error_code = ERROR_PROCESS;
     publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
     return;
   }
 
-  PERF_BLOCK_END("camera_detect");
-  if (!_camera_tracker->associate(image_mat_src, visual_objects, timestamp,
-                                  camera_tracker_options, &visual_objects)) {
+  tracker_->Associate(img, timestamp, &objects);
+
+
+  if (!_camera_tracker->associate(img, objects, timestamp,
+                                  camera_tracker_options, &objects)) {
     XLOG(ERROR) << "Failed to associate.";
     out_sensor_objects->error_code = ERROR_PROCESS;
     publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
@@ -369,7 +319,7 @@ void MixDetectorSubnode::image_process(const cv::Mat &image_mat_src,
 
   PERF_BLOCK_END("camera_smooth_center");
   if (FLAGS_use_center_buffer &&
-      !_camera_tracker->smooth_center(&visual_objects)) {
+      !_camera_tracker->smooth_center(&objects)) {
     XLOG(ERROR) << "Failed to associate.";
     out_sensor_objects->error_code = ERROR_PROCESS;
     publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
@@ -377,9 +327,9 @@ void MixDetectorSubnode::image_process(const cv::Mat &image_mat_src,
   }
 
   PERF_BLOCK_END("camera_associate");
-  if (!_camera_tracker->predict_shape(image_mat_src, visual_objects, timestamp,
+  if (!_camera_tracker->predict_shape(img, objects, timestamp,
                                       camera_tracker_options,
-                                      &visual_objects)) {
+                                      &objects)) {
     XLOG(ERROR) << "Failed to predict_shape.";
     out_sensor_objects->error_code = ERROR_PROCESS;
     publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
@@ -388,20 +338,20 @@ void MixDetectorSubnode::image_process(const cv::Mat &image_mat_src,
   PERF_BLOCK_END("camera_predict_in_2d");
   // bbox transform
   CameraTransformerOptions camera_transformer_options;
-  if (!_camera_transformer->transform(image_mat_src, camera_transformer_options,
-                                      &visual_objects)) {
+  if (!_camera_transformer->transform(img, camera_transformer_options,
+                                      &objects)) {
     XLOG(ERROR) << "Failed to transform.";
     out_sensor_objects->error_code = ERROR_PROCESS;
     publish_data_and_event(timestamp, out_sensor_objects, camera_item_ptr);
     return;
   }
-  XLOG(INFO) << "camera transform visual_objects num: "
-             << visual_objects.size();
+  XLOG(INFO) << "camera transform objects num: "
+             << objects.size();
 
   PERF_BLOCK_END("camera_transform");
 
   // camera tracking
-  if (!_camera_tracker->predict_velocity(image_mat_src, visual_objects,
+  if (!_camera_tracker->predict_velocity(img, objects,
                                          timestamp, camera_tracker_options,
                                          &track_objects)) {
     XLOG(ERROR) << "Failed to track.";
@@ -419,9 +369,6 @@ void MixDetectorSubnode::image_process(const cv::Mat &image_mat_src,
   // transform objects 3D boundingbox information to car
   this->trans_visualobject_to_sensorobject(track_objects, &out_sensor_objects);
 
-  // update elements in sensorobjects
-  this->update_l3_sensorobject_elements(&out_sensor_objects);
-
   // add parsing mats as supplements of SensorObjects
   lane_map.copyTo(out_sensor_objects->camera_frame_supplement->lane_map);
 
@@ -432,7 +379,7 @@ void MixDetectorSubnode::image_process(const cv::Mat &image_mat_src,
   const double end_latency = (end_timestamp - unix_timestamp) * 1e3;
 }
 
-bool MixDetectorSubnode::trans_message_to_cv_mat(
+bool CameraProcessSubnode::trans_message_to_cv_mat(
     const sensor_msgs::Image::ConstPtr &image_msg, cv::Mat *mat) {
   try {
     cv_bridge::CvImageConstPtr cv_ptr =
@@ -447,7 +394,7 @@ bool MixDetectorSubnode::trans_message_to_cv_mat(
   return true;
 }
 
-bool MixDetectorSubnode::get_camera_car_trans(double timestamp,
+bool CameraProcessSubnode::get_camera_car_trans(double timestamp,
                                               Matrix4d *camera_to_car_pose) {
   *camera_to_car_pose = _camera_to_car_mat;
   XLOG(INFO) << "Timestamp: " << GLOG_TIMESTAMP(timestamp)
@@ -456,7 +403,7 @@ bool MixDetectorSubnode::get_camera_car_trans(double timestamp,
 
   return true;
 }
-void MixDetectorSubnode::trans_visualobject_to_sensorobject(
+void CameraProcessSubnode::trans_visualobject_to_sensorobject(
     const std::vector<VisualObjectPtr> track_objects,
     onboard::SharedDataPtr<SensorObjects> *sensor_objects) {
   for (size_t i = 0; i < track_objects.size(); ++i) {
@@ -502,16 +449,7 @@ void MixDetectorSubnode::trans_visualobject_to_sensorobject(
   }
 }
 
-void MixDetectorSubnode::update_l3_sensorobject_elements(
-    onboard::SharedDataPtr<SensorObjects> *sensor_objects) {
-  for (size_t i = 0; i < (*sensor_objects)->objects.size(); ++i) {
-    ObjectPtr &obj = (*sensor_objects)->objects[i];
-    obj->heading_c = atan2(obj->center.y(), obj->center.x());
-    obj->heading_l = atan2(obj->center.y() + obj->width / 2, obj->center.x());
-    obj->heading_r = atan2(obj->center.y() - obj->width / 2, obj->center.x());
-  }
-}
-void MixDetectorSubnode::publish_data_and_event(
+void CameraProcessSubnode::publish_data_and_event(
     double timestamp,
     const onboard::SharedDataPtr<SensorObjects> &sensor_objects,
     const onboard::SharedDataPtr<CameraItem> &camera_item) {
