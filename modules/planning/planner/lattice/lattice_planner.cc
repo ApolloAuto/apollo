@@ -38,8 +38,8 @@
 #include "modules/planning/lattice/behavior/path_time_graph.h"
 #include "modules/planning/lattice/behavior/prediction_querier.h"
 #include "modules/planning/lattice/trajectory1d/lattice_trajectory1d.h"
-#include "modules/planning/lattice/trajectory_generation/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_generation/backup_trajectory_generator.h"
+#include "modules/planning/lattice/trajectory_generation/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_generation/trajectory_combiner.h"
 #include "modules/planning/lattice/trajectory_generation/trajectory_evaluator.h"
 
@@ -103,8 +103,8 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
     } else {
       reference_line_info.SetPriorityCost(0.0);
     }
-    auto status = PlanOnReferenceLine(planning_start_point,
-        frame, &reference_line_info);
+    auto status =
+        PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
 
     if (status != Status::OK()) {
       if (reference_line_info.IsChangeLanePath()) {
@@ -123,7 +123,7 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
     return Status::OK();
   }
   return Status(ErrorCode::PLANNING_ERROR,
-      "Failed to plan on any reference line.");
+                "Failed to plan on any reference line.");
 }
 
 Status LatticePlanner::PlanOnReferenceLine(
@@ -141,8 +141,8 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   reference_line_info->set_is_on_reference_line();
   // 1. obtain a reference line and transform it to the PathPoint format.
-  auto ptr_reference_line = std::make_shared<std::vector<PathPoint>>(
-      ToDiscretizedReferenceLine(
+  auto ptr_reference_line =
+      std::make_shared<std::vector<PathPoint>>(ToDiscretizedReferenceLine(
           reference_line_info->reference_line().reference_points()));
 
   // 2. compute the matched point of the init planning point on the reference
@@ -165,11 +165,11 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // 4. parse the decision and get the planning target.
   auto ptr_path_time_graph = std::make_shared<PathTimeGraph>(
-      ptr_prediction_querier->GetObstacles(), *ptr_reference_line,
-      init_s[0], init_s[0] + FLAGS_decision_horizon,
-      0.0, FLAGS_trajectory_time_length, FLAGS_default_reference_line_width);
+      ptr_prediction_querier->GetObstacles(), *ptr_reference_line, init_s[0],
+      init_s[0] + FLAGS_decision_horizon, 0.0, FLAGS_trajectory_time_length,
+      FLAGS_default_reference_line_width);
 
-  //BehaviorDecider behavior_decider;
+  // BehaviorDecider behavior_decider;
 
   PlanningTarget planning_target = reference_line_info->planning_target();
   if (planning_target.has_stop_point()) {
@@ -177,7 +177,7 @@ Status LatticePlanner::PlanOnReferenceLine(
            << "Current ego s: " << init_s[0];
   }
 
-  //behavior_decider.Analyze(frame,
+  // behavior_decider.Analyze(frame,
   //    reference_line_info, planning_init_point, init_s, *ptr_reference_line);
 
   ADEBUG << "Decision_Time = " << (Clock::NowInSeconds() - current_time) * 1000;
@@ -199,8 +199,9 @@ Status LatticePlanner::PlanOnReferenceLine(
   // dynamic constraints.
   //   second, evaluate the feasible longitudinal and lateral trajectory pairs
   //   and sort them according to the cost.
-  TrajectoryEvaluator trajectory_evaluator(init_s, planning_target,
-      lon_trajectory1d_bundle, lat_trajectory1d_bundle, ptr_path_time_graph);
+  TrajectoryEvaluator trajectory_evaluator(
+      init_s, planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle,
+      ptr_path_time_graph);
 
   ADEBUG << "Trajectory_Evaluator_Construction_Time = "
          << (Clock::NowInSeconds() - current_time) * 1000;
@@ -241,8 +242,8 @@ Status LatticePlanner::PlanOnReferenceLine(
 
     // combine two 1d trajectories to one 2d trajectory
     auto combined_trajectory = TrajectoryCombiner::Combine(
-        *ptr_reference_line, *trajectory_pair.first,
-        *trajectory_pair.second, planning_init_point.relative_time());
+        *ptr_reference_line, *trajectory_pair.first, *trajectory_pair.second,
+        planning_init_point.relative_time());
 
     // check longitudinal and lateral acceleration
     // considering trajectory curvatures
