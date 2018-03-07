@@ -25,7 +25,6 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/dropbox.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_common.h"
@@ -33,6 +32,7 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_util.h"
 #include "modules/planning/tasks/traffic_decider/util.h"
 
 namespace apollo {
@@ -41,7 +41,6 @@ namespace planning {
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
-using apollo::common::util::Dropbox;
 using apollo::common::util::WithinBound;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneInfo;
@@ -53,6 +52,7 @@ using apollo::hdmap::StopSignInfoConstPtr;
 using apollo::perception::PerceptionObstacle;
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
+using apollo::planning::util::GetPlanningStatus;
 
 StopSign::StopSign(const RuleConfig& config) : TrafficRule(config) {}
 
@@ -65,11 +65,7 @@ bool StopSign::ApplyRule(Frame* frame,
     return true;
   }
 
-  bool stop_sign_ahead = FindNextStopSign(reference_line_info);
-
-  ClearOtherStopSignDropbox(reference_line_info);
-
-  if (!stop_sign_ahead) {
+  if (!FindNextStopSign(reference_line_info)) {
     return true;
   }
 
@@ -93,14 +89,14 @@ void StopSign::MakeDecisions(Frame* frame,
   GetWatchVehicles(*next_stop_sign_, &watch_vehicles);
 
   auto* path_decision = reference_line_info->path_decision();
-  if (stop_status_ == StopSignStopStatus::TO_STOP) {
+  if (stop_status_ == StopSignStatus::TO_STOP) {
     for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
       // add to watch_vehicles if adc is still proceeding to stop sign
       AddWatchVehicle(*path_obstacle, &watch_vehicles);
     }
   } else if (!watch_vehicles.empty() &&
-             (stop_status_ == StopSignStopStatus::STOPPING ||
-              stop_status_ == StopSignStopStatus::STOP_DONE)) {
+             (stop_status_ == StopSignStatus::STOPPING ||
+              stop_status_ == StopSignStatus::STOP_DONE)) {
     // get all vehicles currently watched
     std::vector<std::string> watch_vehicle_ids;
     for (StopSignLaneVehicles::iterator it = watch_vehicles.begin();
@@ -120,10 +116,10 @@ void StopSign::MakeDecisions(Frame* frame,
   UpdateWatchVehicles(&watch_vehicles);
 
   std::string stop_sign_id = next_stop_sign_->id().id();
-  if (stop_status_ == StopSignStopStatus::STOP_DONE && watch_vehicles.empty()) {
+  if (stop_status_ == StopSignStatus::STOP_DONE && watch_vehicles.empty()) {
     // stop done and no vehicles to wait for
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] DONE";
-  } else if (stop_status_ == StopSignStopStatus::CREEPING) {
+  } else if (stop_status_ == StopSignStatus::CREEPING) {
     auto* next_overlap =
         reference_line_info->reference_line().map_path().NextLaneOverlap(
             reference_line_info->AdcSlBoundary().end_s());
@@ -164,7 +160,9 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
     }
   }
 
+
   if (next_stop_sign_overlap_ == nullptr) {
+    GetPlanningStatus()->clear_stop_sign();
     return false;
   }
 
@@ -172,6 +170,16 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
       hdmap::MakeMapId(next_stop_sign_overlap_->object_id));
   next_stop_sign_ =
       std::move(const_cast<StopSignInfo*>(next_stop_sign_ptr.get()));
+
+  // clear status for unrelavant stop signs
+  if (GetPlanningStatus()->has_stop_sign()) {
+    auto stop_sign_status = GetPlanningStatus()->stop_sign();
+    if (stop_sign_status.stop_sign_id() != next_stop_sign_->id().id()) {
+      GetPlanningStatus()->clear_stop_sign();
+      GetPlanningStatus()->mutable_stop_sign()->set_stop_sign_id(
+          next_stop_sign_->id().id());
+    }
+  }
 
   // find all the lanes associated/guarded by the stop sign
   GetAssociatedLanes(*next_stop_sign_);
@@ -216,16 +224,6 @@ int StopSign::GetAssociatedLanes(const StopSignInfo& stop_sign_info) {
     }
   }
 
-  // update dropbox to remember associate lanes
-  std::string db_key_associated_lanes =
-      db_key_stop_sign_associated_lanes_prefix_ + stop_sign_info.id().id();
-  Dropbox<std::vector<std::string>>::Open()->Set(db_key_associated_lanes,
-                                                 associated_lanes);
-  std::string s;
-  std::for_each(associated_lanes.begin(), associated_lanes.end(),
-                [&](std::string& id) { s = s.empty() ? id : s + "," + id; });
-  ADEBUG << "update dropbox: [" << db_key_associated_lanes << "] = " << s;
-
   return 0;
 }
 
@@ -236,27 +234,20 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
                                 const StopSignInfo& stop_sign_info) {
   CHECK_NOTNULL(reference_line_info);
 
-  // get stop status from dropbox
-  std::string stop_sign_id = stop_sign_info.id().id();
-  std::string db_key_stop_status =
-      db_key_stop_sign_stop_status_prefix_ + stop_sign_id;
-  StopSignStopStatus* status =
-      Dropbox<StopSignStopStatus>::Open()->Get(db_key_stop_status);
-  stop_status_ = (status == nullptr) ? StopSignStopStatus::UNKNOWN : *status;
-  ADEBUG
-      << "get stop_status_: "
-      << static_cast<typename std::underlying_type<StopSignStopStatus>::type>(
-             stop_status_);
+  // get stop status from PlanningStatus
+  auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  if (!stop_sign_status->has_status()) {
+    stop_sign_status->set_status(StopSignStatus::UNKNOWN);
+  }
+  stop_status_ = stop_sign_status->status();
 
-  // get stop start time from dropbox
-  std::string db_key_stop_starttime =
-      db_key_stop_sign_stop_starttime_prefix_ + stop_sign_id;
-  double* start_time = Dropbox<double>::Open()->Get(db_key_stop_starttime);
-  double stop_start_time =
-      (start_time == nullptr) ? Clock::NowInSeconds() + 1 : *start_time;
+  // get stop start time from PlanningStatus
+  double stop_start_time = Clock::NowInSeconds() + 1;
+  if (stop_sign_status->has_stop_start_time()) {
+    stop_start_time = stop_sign_status->stop_start_time();
+  }
   double wait_time = Clock::NowInSeconds() - stop_start_time;
-  ADEBUG << "db_key_stop_starttime: " << db_key_stop_starttime
-         << "; stop_start_time: " << stop_start_time
+  ADEBUG << "stop_start_time: " << stop_start_time
          << "; wait_time: " << wait_time;
 
   // adjust status. this may happen if there's bad data in Dropbox
@@ -266,37 +257,36 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
       FLAGS_max_valid_stop_distance) {
     ADEBUG << "adjust stop status. too far from stop line. distance["
         << stop_line_start_s - adc_front_edge_s << "]";
-    stop_status_ = StopSignStopStatus::TO_STOP;
+    stop_status_ = StopSignStatus::TO_STOP;
   }
 
   // check & update stop status
   switch (stop_status_) {
-    case StopSignStopStatus::UNKNOWN:
-    case StopSignStopStatus::TO_STOP:
+    case StopSignStatus::UNKNOWN:
+    case StopSignStatus::TO_STOP:
       if (!CheckADCkStop(reference_line_info)) {
-        stop_status_ = StopSignStopStatus::TO_STOP;
+        stop_status_ = StopSignStatus::TO_STOP;
       } else {
         stop_start_time = Clock::NowInSeconds();
-        stop_status_ = StopSignStopStatus::STOPPING;
+        stop_status_ = StopSignStatus::STOPPING;
 
-        // update dropbox: stop start time
-        Dropbox<double>::Open()->Set(db_key_stop_starttime, stop_start_time);
-        ADEBUG << "update dropbox: [" << db_key_stop_starttime
-               << "] = " << stop_start_time;
+        // update PlanningStatus: stop start time
+        stop_sign_status->set_stop_start_time(stop_start_time);
+        ADEBUG << "update stop_start_time: " << stop_start_time;
       }
       break;
-    case StopSignStopStatus::STOPPING:
+    case StopSignStatus::STOPPING:
       if (wait_time >= FLAGS_stop_sign_stop_duration) {
         if (FLAGS_enable_stop_sign_creeping &&
             (stop_sign_info.stop_sign().type() == hdmap::StopSign::ONE_WAY ||
              stop_sign_info.stop_sign().type() == hdmap::StopSign::TWO_WAY)) {
-          stop_status_ = StopSignStopStatus::CREEPING;
+          stop_status_ = StopSignStatus::CREEPING;
         } else {
-          stop_status_ = StopSignStopStatus::STOP_DONE;
+          stop_status_ = StopSignStatus::STOP_DONE;
         }
       }
       break;
-    case StopSignStopStatus::CREEPING: {
+    case StopSignStatus::CREEPING: {
       constexpr double kDeltaS = 0.5;
       auto* path_overlap =
           reference_line_info->reference_line().map_path().NextLaneOverlap(
@@ -315,23 +305,20 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
           }
         }
         if (all_far_away) {
-          stop_status_ = StopSignStopStatus::STOP_DONE;
+          stop_status_ = StopSignStatus::STOP_DONE;
         }
       }
       break;
     }
-    case StopSignStopStatus::STOP_DONE:
+    case StopSignStatus::STOP_DONE:
       break;
     default:
       break;
   }
 
-  // update dropbox: stop status
-  Dropbox<StopSignStopStatus>::Open()->Set(db_key_stop_status, stop_status_);
-  ADEBUG
-      << "update dropbox: [" << db_key_stop_status << "] = "
-      << static_cast<typename std::underlying_type<StopSignStopStatus>::type>(
-             stop_status_);
+  // update PlanningStatus: stop status
+  stop_sign_status->set_status(stop_status_);
+  ADEBUG << "update stop_status: " << StopSignStatus_Status_Name(stop_status_);
 
   return 0;
 }
@@ -369,7 +356,7 @@ bool StopSign::CheckADCkStop(ReferenceLineInfo* const reference_line_info) {
 }
 
 /**
- * @brief: read watch vehicles from drop box
+ * @brief: read watch vehicles from PlanningStatus
  */
 int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
                                StopSignLaneVehicles* watch_vehicles) {
@@ -377,50 +364,39 @@ int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
 
   watch_vehicles->clear();
 
-  // get watch vehicles for associated_lanes
-  for (auto associated_lane : associated_lanes_) {
-    const LaneInfo* associated_lane_info = associated_lane.first.get();
-    std::string associated_lane_id = associated_lane_info->id().id();
-
-    // get watch vehicles for associated_lanes from dropbox
-    std::string db_key_watch_vehicle =
-        db_key_stop_sign_watch_vehicle_prefix_ + associated_lane_id;
-    std::vector<std::string>* value =
-        Dropbox<std::vector<std::string>>::Open()->Get(db_key_watch_vehicle);
-    std::vector<std::string> watch_vehicle_ids;
-    if (value != nullptr) {
-      watch_vehicle_ids = *value;
-    }
-
+  StopSignStatus stop_sign_status = GetPlanningStatus()->stop_sign();
+  for (int i = 0; i < stop_sign_status.lane_watch_vehicles_size(); i++) {
+    auto lane_watch_vehicles = stop_sign_status.lane_watch_vehicles(i);
+    std::string associated_lane_id = lane_watch_vehicles.lane_id();
     std::string s;
-    std::for_each(watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
-                  [&](std::string& id) { s = s.empty() ? id : s + "," + id; });
-    ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
-           << s << "]; size[" << watch_vehicle_ids.size() << "]";
-
-    if (!watch_vehicle_ids.empty()) {
-      (*watch_vehicles)[associated_lane_id] = watch_vehicle_ids;
+    for (int j = 0; j < lane_watch_vehicles.watch_vehicles_size(); j++) {
+      std::string vehicle = lane_watch_vehicles.watch_vehicles(j);
+      s = s.empty() ? vehicle : s + "," + vehicle;
+      (*watch_vehicles)[associated_lane_id].push_back(vehicle);
     }
+    ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id
+        << "] vehicle[" << s << "]";
   }
 
   return 0;
 }
 
 /**
- * @brief: update drop box with watch vehicles
+ * @brief: update PlanningStatus with watch vehicles
  */
 int StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  ClearDropboxWatchvehicles(next_stop_sign_->id().id());
+  auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  stop_sign_status->clear_lane_watch_vehicles();
 
   for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
        it != watch_vehicles->end(); ++it) {
-    std::string associated_lane_id = it->first;
-    std::string db_key_watch_vehicle =
-        db_key_stop_sign_watch_vehicle_prefix_ + associated_lane_id;
-    Dropbox<std::vector<std::string>>::Open()->Set(db_key_watch_vehicle,
-                                                   it->second);
+    auto* lane_watch_vehicles = stop_sign_status->add_lane_watch_vehicles();
+    lane_watch_vehicles->set_lane_id(it->first);
+    for (size_t i = 0; i < it->second.size(); i++) {
+      lane_watch_vehicles->add_watch_vehicles(it->second[i]);
+    }
   }
 
   return 0;
@@ -494,7 +470,7 @@ int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
   auto over_lap_info = assoc_lane_it->second.get()->GetObjectOverlapInfo(
       obstacle_lane.get()->id());
   if (over_lap_info == nullptr) {
-    AERROR << "can't find over_lap_info for id: " << obstable_lane_id;
+    ADEBUG << "can't find over_lap_info for id: " << obstable_lane_id;
     return -1;
   }
   double stop_line_s = over_lap_info->lane_overlap_info().start_s();
@@ -753,65 +729,6 @@ bool StopSign::BuildStopDecision(Frame* frame,
       RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 
   return true;
-}
-
-void StopSign::ClearOtherStopSignDropbox(
-    ReferenceLineInfo* const reference_line_info) {
-  const std::vector<PathOverlap>& stop_sign_overlaps =
-      reference_line_info->reference_line().map_path().stop_sign_overlaps();
-  for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
-    auto stop_sign_ptr = HDMapUtil::BaseMap().GetStopSignById(
-        hdmap::MakeMapId(stop_sign_overlap.object_id));
-    std::string stop_sign_id = stop_sign_ptr.get()->id().id();
-    if (next_stop_sign_ == nullptr ||
-        (next_stop_sign_ != nullptr &&
-         stop_sign_id != next_stop_sign_->id().id())) {
-      ClearDropbox(stop_sign_id);
-    }
-  }
-}
-
-void StopSign::ClearDropbox(const std::string& stop_sign_id) {
-  // clear stop status from dropbox
-  std::string db_key_stop_status =
-      db_key_stop_sign_stop_status_prefix_ + stop_sign_id;
-  Dropbox<StopSignStopStatus>::Open()->Remove(db_key_stop_status);
-  ADEBUG << "remove dropbox item: " << db_key_stop_status;
-
-  // clear stop start time from dropbox
-  std::string db_key_stop_starttime =
-      db_key_stop_sign_stop_starttime_prefix_ + stop_sign_id;
-  Dropbox<double>::Open()->Remove(db_key_stop_starttime);
-  ADEBUG << "remove dropbox item: " << db_key_stop_starttime;
-
-  // clear watch vehicles from dropbox
-  ClearDropboxWatchvehicles(stop_sign_id);
-
-  // clear associate lanes from dropbox
-  std::string db_key_associated_lanes =
-      db_key_stop_sign_associated_lanes_prefix_ + stop_sign_id;
-  Dropbox<std::vector<std::string>>::Open()->Remove(db_key_associated_lanes);
-  ADEBUG << "remove dropbox item: " << db_key_associated_lanes;
-}
-
-void StopSign::ClearDropboxWatchvehicles(const std::string& stop_sign_id) {
-  // clear watch vehicles from dropbox
-  std::string db_key_associated_lanes =
-      db_key_stop_sign_associated_lanes_prefix_ + stop_sign_id;
-  std::vector<std::string>* value =
-      Dropbox<std::vector<std::string>>::Open()->Get(db_key_associated_lanes);
-  std::vector<std::string> associated_lane_ids;
-  if (value == nullptr) {
-    return;
-  }
-
-  associated_lane_ids = *value;
-  for (auto associated_lane_id : associated_lane_ids) {
-    std::string db_key_watch_vehicle =
-        db_key_stop_sign_watch_vehicle_prefix_ + associated_lane_id;
-    Dropbox<std::vector<std::string>>::Open()->Remove(db_key_watch_vehicle);
-    ADEBUG << "remove dropbox item: " << db_key_watch_vehicle;
-  }
 }
 
 }  // namespace planning
