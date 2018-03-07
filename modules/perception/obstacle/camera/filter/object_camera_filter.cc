@@ -19,9 +19,7 @@
 namespace apollo {
 namespace perception {
 
-bool ObjectCameraFilter::Init() {
-  return true;
-}
+bool ObjectCameraFilter::Init() { return true; }
 
 bool ObjectCameraFilter::Filter(const float &timestamp,
                                 std::vector<VisualObjectPtr> *objects) {
@@ -48,9 +46,7 @@ bool ObjectCameraFilter::Filter(const float &timestamp,
   return true;
 }
 
-std::string ObjectCameraFilter::Name() const {
-  return "ObjectCameraFilter";
-}
+std::string ObjectCameraFilter::Name() const { return "ObjectCameraFilter"; }
 
 void ObjectCameraFilter::Create(const int &track_id, const float &timestamp,
                                 const VisualObjectPtr &obj_ptr) {

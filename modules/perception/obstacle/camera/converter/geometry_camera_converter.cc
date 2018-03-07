@@ -24,7 +24,7 @@ namespace perception {
 bool GeometryCameraConverter::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
 
-  const ModelConfig* model_config = nullptr;
+  const ModelConfig *model_config = nullptr;
   if (!config_manager->GetModelConfig(Name(), &model_config)) {
     AERROR << "Model config: " << Name() << " not found";
     return false;
