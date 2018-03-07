@@ -28,6 +28,7 @@ ln -s /usr/bin/cc /usr/bin/cc1
 chmod +x ./NVIDIA-Linux-x86_64-375.39.run
 ./NVIDIA-Linux-x86_64-375.39.run --no-opengl-files -a -s
 source /apollo/scripts/recover_gcc.sh
+rm /usr/bin/cc1
 ```
 
 5. Commit a new docker image (in host):
