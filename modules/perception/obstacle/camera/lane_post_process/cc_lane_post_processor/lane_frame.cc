@@ -791,12 +791,11 @@ int LaneFrame::AddGroupIntoGraph(const Group& group, Graph* graph,
     }
   }
 
-  int next_marker_id = -1;
   while (cur_marker_id != -1) {
     CHECK(IsValidMarker(cur_marker_id));
     CHECK(hash_marker_idx->find(cur_marker_id) == hash_marker_idx->end());
 
-    next_marker_id = markers_[cur_marker_id].cc_next_marker_id;
+    int next_marker_id = markers_[cur_marker_id].cc_next_marker_id;
     graph->push_back(make_pair(cur_marker_id, next_marker_id));
     hash_marker_idx->insert(cur_marker_id);
 
@@ -820,13 +819,12 @@ int LaneFrame::AddGroupIntoGraph(const Group& group,
     }
   }
 
-  int next_marker_id = -1;
   while (cur_marker_id != -1 &&
          markers_[cur_marker_id].cc_edge_descend_id >= end_marker_descend_id) {
     CHECK(IsValidMarker(cur_marker_id));
     CHECK(hash_marker_idx->find(cur_marker_id) == hash_marker_idx->end());
 
-    next_marker_id = markers_[cur_marker_id].cc_next_marker_id;
+    int next_marker_id = markers_[cur_marker_id].cc_next_marker_id;
     graph->push_back(make_pair(cur_marker_id, next_marker_id));
     hash_marker_idx->insert(cur_marker_id);
 
