@@ -211,7 +211,7 @@ bool NavigationLane::UpdateProjectionIndex() {
       break;
     }
   }
-  if (min_d < FLAGS_max_distance_to_navigation_line) {
+  if (min_d > FLAGS_max_distance_to_navigation_line) {
     return false;
   }
   last_project_index_ = index;
