@@ -54,9 +54,8 @@ std::vector<cv::Scalar> color_table = {
     cv::Scalar(255, 255, 255),
 };
 
-bool load_visual_object_form_file(
-    const std::string &file_name,
-    std::vector<VisualObjectPtr> *visual_objects) {
+bool LoadVisualObjectFromFile(const std::string &file_name,
+                              std::vector<VisualObjectPtr> *visual_objects) {
   FILE *fp = fopen(file_name.c_str(), "r");
   if (!fp) {
     std::cout << "load file: " << file_name << " error!" << std::endl;
@@ -78,7 +77,7 @@ bool load_visual_object_form_file(
     double y2 = 0.0;
     int ret = fscanf(fp,
                      "%s %lf %lf %f %lf %lf %lf %lf %f %f %f %f %f %f %f %f "
-                     "%lf %lf",
+                     "%f %f",
                      type, &trash, &trash, &obj->alpha, &x1, &y1, &x2, &y2,
                      &obj->height, &obj->width, &obj->length, &obj->center.x(),
                      &obj->center.y(), &obj->center.z(), &obj->theta,
@@ -87,7 +86,7 @@ bool load_visual_object_form_file(
     obj->upper_left[1] = y1 > 0 ? y1 : 0;
     obj->lower_right[0] = x2 < 1920 ? x2 : 1920;
     obj->lower_right[1] = y2 < 1080 ? y2 : 1080;
-    obj->type = get_object_type(std::string(type));
+    obj->type = GetObjectType(std::string(type));
     obj->type_probs[static_cast<int>(obj->type)] =
         static_cast<float>(obj->score);
 
@@ -99,8 +98,8 @@ bool load_visual_object_form_file(
   return true;
 }
 
-bool write_visual_object_to_file(const std::string &file_name,
-                                 std::vector<VisualObjectPtr> *visual_objects) {
+bool WriteVisualObjectToFile(const std::string &file_name,
+                             std::vector<VisualObjectPtr> *visual_objects) {
   FILE *fp = fopen(file_name.c_str(), "w");
   if (!fp) {
     std::cout << "write file: " << file_name << " error!" << std::endl;
@@ -108,7 +107,7 @@ bool write_visual_object_to_file(const std::string &file_name,
   }
 
   for (auto &obj : *visual_objects) {
-    std::string type = get_type_text(obj->type);
+    std::string type = GetTypeText(obj->type);
 
     fprintf(fp,
             "%s %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f "
@@ -123,8 +122,8 @@ bool write_visual_object_to_file(const std::string &file_name,
   return true;
 }
 
-bool load_gt_form_file(const std::string &gt_path,
-                       std::vector<VisualObjectPtr> *visual_objects) {
+bool LoadGTfromFile(const std::string &gt_path,
+                    std::vector<VisualObjectPtr> *visual_objects) {
   std::ifstream gt_file(gt_path);
 
   std::string line;
@@ -145,7 +144,7 @@ bool load_gt_form_file(const std::string &gt_path,
       // theta
       // position?
 
-      obj->type = get_object_type(tokens[0]);
+      obj->type = GetObjectType(tokens[0]);
 
       //            obj->alpha = std::stod(tokens[3]);
       obj->alpha = std::stod(tokens[14]);
@@ -188,8 +187,8 @@ bool load_gt_form_file(const std::string &gt_path,
   return true;
 }
 
-void draw_visual_objects(const std::vector<VisualObjectPtr> &visual_objects,
-                         cv::Mat *img) {
+void DrawVisualObejcts(const std::vector<VisualObjectPtr> &visual_objects,
+                       cv::Mat *img) {
   for (const auto &obj : visual_objects) {
 // 3D BBox
 #if 0
@@ -260,8 +259,8 @@ void draw_visual_objects(const std::vector<VisualObjectPtr> &visual_objects,
   }
 }
 
-void draw_gt_objects_text(const std::vector<VisualObjectPtr> &visual_objects,
-                          cv::Mat *img) {
+void DrawGTObjectsText(const std::vector<VisualObjectPtr> &visual_objects,
+                       cv::Mat *img) {
   for (const auto &obj : visual_objects) {
     // 2D BBox
     int x1 = static_cast<int>(obj->upper_left[0]);
@@ -288,7 +287,7 @@ void draw_gt_objects_text(const std::vector<VisualObjectPtr> &visual_objects,
   }
 }
 
-std::string get_type_text(ObjectType type) {
+std::string GetTypeText(ObjectType type) {
   if (type == ObjectType::VEHICLE) {
     return "car";
   }
@@ -302,7 +301,7 @@ std::string get_type_text(ObjectType type) {
   return "unknown";
 }
 
-ObjectType get_object_type(const std::string &type) {
+ObjectType GetObjectType(const std::string &type) {
   std::string temp_type = type;
   std::transform(temp_type.begin(), temp_type.end(), temp_type.begin(),
                  (int (*)(int))std::tolower);
@@ -343,8 +342,8 @@ ObjectType get_object_type(const std::string &type) {
   }
 }
 
-bool load_text_proto_message_file(const std::string& path,
-                                  google::protobuf::Message* msg) {
+bool LoadTextProtoMessageFile(const std::string &path,
+                              google::protobuf::Message *msg) {
   if (msg == nullptr) {
     AERROR << "msg is a null pointer.";
     return false;

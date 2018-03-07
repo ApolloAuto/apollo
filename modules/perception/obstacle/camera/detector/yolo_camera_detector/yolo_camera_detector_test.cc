@@ -247,7 +247,7 @@ TEST(YoloCameraDetectorTest, input_tensor_test) {
   adu::perception::yolo::YoloParam yolo_param;
   adu::perception::yolo::YoloParam origin_yolo_param;
 
-  load_text_proto_message_file(yolo_config, yolo_param);
+  LoadTextProtoMessageFile(yolo_config, yolo_param);
   origin_yolo_param.CopyFrom(yolo_param);
 
   {
