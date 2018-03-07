@@ -27,7 +27,6 @@ namespace apollo {
 namespace perception {
 namespace yolo {
 
-//using apollo::perception::ObjectType;
 using std::string;
 using std::vector;
 using std::map;

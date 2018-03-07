@@ -16,6 +16,9 @@
 
 #include "modules/perception/obstacle/camera/common/cnn_adapter.h"
 
+#include <string>
+#include <vector>
+
 namespace apollo {
 namespace perception {
 

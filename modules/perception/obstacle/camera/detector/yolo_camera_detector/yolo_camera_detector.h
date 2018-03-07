@@ -75,8 +75,8 @@ class YoloCameraDetector : public BaseCameraDetector {
  private:
   std::shared_ptr<CNNAdapter> cnnadapter_;
 
-  //boost::shared_ptr<anakin::Tensor<float>> res_cls_tensor_ = nullptr;
-  //boost::shared_ptr<anakin::Tensor<float>> res_box_tensor_ = nullptr;
+  // boost::shared_ptr<anakin::Tensor<float>> res_cls_tensor_ = nullptr;
+  // boost::shared_ptr<anakin::Tensor<float>> res_box_tensor_ = nullptr;
   std::shared_ptr<SyncedMemory> image_data_ = nullptr;
   std::shared_ptr<SyncedMemory> overlapped_ = nullptr;
   std::shared_ptr<SyncedMemory> idx_sm_ = nullptr;

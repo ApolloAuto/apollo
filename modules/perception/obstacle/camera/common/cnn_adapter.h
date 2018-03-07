@@ -17,6 +17,9 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CNN_ADAPTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_CNN_ADAPTER_H_
 
+#include <string>
+#include <vector>
+
 #include "caffe/caffe.hpp"
 
 #include "modules/perception/obstacle/camera/common/util.h"
@@ -47,11 +50,11 @@ class CNNCaffe : public CNNAdapter {
  public:
   CNNCaffe() = default;
 
-  virtual bool init(const std::vector<std::string> &input_names,
-                    const std::vector<std::string> &output_names,
-                    const std::string &proto_file,
-                    const std::string &weight_file, int gpu_id,
-                    const std::string &model_root = "") override;
+  bool init(const std::vector<std::string> &input_names,
+            const std::vector<std::string> &output_names,
+            const std::string &proto_file,
+            const std::string &weight_file, int gpu_id,
+            const std::string &model_root = "") override;
 
   void forward() override;
 

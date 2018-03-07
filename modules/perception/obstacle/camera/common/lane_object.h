@@ -17,10 +17,10 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_LANE_OBJECT_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_LANE_OBJECT_H_
 
+#include <Eigen/Eigen>
+
 #include <limits>
 #include <vector>
-
-#include <Eigen/Eigen>
 
 namespace apollo {
 namespace perception {

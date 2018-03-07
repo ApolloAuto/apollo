@@ -17,24 +17,24 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_PROJECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_PROJECTOR_H_
 
+#include <Eigen/Core>
+
 #include <string>
 #include <vector>
-
-#include <Eigen/Core>
 
 namespace apollo {
 namespace perception {
 
 class BaseProjector {
  public:
-  virtual void project(std::vector<float> &feature) = 0;
+  virtual bool project(std::vector<float>* feature) = 0;
 };
 
 class MatrixProjector : public BaseProjector {
  public:
-  MatrixProjector(std::string weight_file);
+  explicit MatrixProjector(std::string weight_file);
 
-  virtual void project(std::vector<float> &feature) override;
+  bool project(std::vector<float>* feature) override;
 
  private:
   Eigen::MatrixXf matrix_;

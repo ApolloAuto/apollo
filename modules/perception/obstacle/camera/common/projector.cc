@@ -18,6 +18,8 @@
 
 #include <fstream>
 
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace perception {
 
@@ -27,18 +29,25 @@ using std::ifstream;
 using Eigen::MatrixXf;
 using Eigen::Map;
 
-void MatrixProjector::project(vector<float> &feature) {
-  if (feature.size() > 0) {
-    feature.insert(feature.begin(), 1.0f);
-    MatrixXf v = Map<MatrixXf>(&feature[0], 1, feature.size());
+bool MatrixProjector::project(vector<float>* feature) {
+  if (feature == nullptr) {
+    AERROR << "feature is a null pointer.";
+    return false;
+  }
+
+  if (feature->size() > 0) {
+    feature->insert(feature->begin(), 1.0f);
+    MatrixXf v = Map<MatrixXf>(&(feature->at(0)), 1, feature->size());
     MatrixXf projected_feature = v * matrix_;
 
-    feature.resize(projected_feature.size());
+    feature->resize(projected_feature.size());
     float *project_data = projected_feature.data();
-    for (auto feat = feature.begin(); feat != feature.end(); ++feat) {
+    for (auto feat = feature->begin(); feat != feature->end(); ++feat) {
       *feat = *project_data++;
     }
   }
+
+  return true;
 }
 
 MatrixProjector::MatrixProjector(string weight_file) {

@@ -19,7 +19,6 @@
 namespace apollo {
 namespace perception {
 
-// REGISTER_CAMERA_PARSER(DummyCameraParser);
 REGISTER_CAMERA_DETECTOR(DummyCameraDetector);
 REGISTER_CAMERA_TRACKER(DummyCameraTracker);
 REGISTER_CAMERA_TRANSFORMER(DummyCameraTransformer);

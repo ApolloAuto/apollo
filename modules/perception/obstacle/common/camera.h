@@ -19,10 +19,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_CAMERA_H_
 #define MODULES_PERCEPTION_OBSTACLE_COMMON_CAMERA_H_
 
-#include <iostream>
-
 #include <Eigen/Core>
 #include <Eigen/Dense>
+
+#include <iostream>
+#include <algorithm>
 
 #include "opencv2/core/eigen.hpp"
 #include "opencv2/opencv.hpp"
@@ -191,8 +192,8 @@ class Camera {
   virtual Eigen::Matrix<T, 2, 1> pixel_normalize(
       const Eigen::Matrix<T, 2, 1>& pt2d) const {
     Eigen::Matrix<T, 2, 1> p;
-    p[0] = (pt2d[0] - _center_x) / ((double)_focal_length_x);
-    p[1] = (pt2d[1] - _center_y) / ((double)_focal_length_y);
+    p[0] = (pt2d[0] - _center_x) / (static_cast<double>(_focal_length_x));
+    p[1] = (pt2d[1] - _center_y) / (static_cast<double>(_focal_length_y));
 
     return p;
   }

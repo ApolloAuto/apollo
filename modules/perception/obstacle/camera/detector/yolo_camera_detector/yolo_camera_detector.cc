@@ -52,7 +52,7 @@ bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
 
   string yolo_config =
       apollo::common::util::GetAbsolutePath(yolo_root, "config.pt");
-  load_text_proto_message_file(yolo_config, yolo_param_);
+  load_text_proto_message_file(yolo_config, &yolo_param_);
   load_intrinsic(options);
   if (!init_cnn(yolo_root)) {
     return false;
@@ -88,11 +88,11 @@ void YoloCameraDetector::init_anchor(const string &yolo_root) {
       apollo::common::util::GetAbsolutePath(
           model_root, model_param.types_file());
   yolo::load_types(types_file, &types_);
-  //res_box_tensor_.reset(new anakin::Tensor<float>());
-  //res_box_tensor_->Reshape(1, 1, obj_size_, s_box_block_size);
+  // res_box_tensor_.reset(new anakin::Tensor<float>());
+  // res_box_tensor_->Reshape(1, 1, obj_size_, s_box_block_size);
 
-  //res_cls_tensor_.reset(new anakin::Tensor<float>());
-  //res_cls_tensor_->Reshape(1, 1, types_.size(), obj_size_);
+  // res_cls_tensor_.reset(new anakin::Tensor<float>());
+  // res_cls_tensor_->Reshape(1, 1, types_.size(), obj_size_);
 
   overlapped_.reset(new SyncedMemory(top_k_ * top_k_ * sizeof(bool)));
   overlapped_->cpu_data();
@@ -122,8 +122,8 @@ void YoloCameraDetector::load_intrinsic(
   confidence_threshold_ = model_param.confidence_threshold();
   _min_2d_height = model_param.min_2d_height();
   _min_3d_height = model_param.min_3d_height();
-  // inference input shape
 
+  // inference input shape
   if (options.intrinsic == nullptr) {
     AERROR << "options.intrinsic is nullptr!";
     image_height_ = 1208;
@@ -133,12 +133,12 @@ void YoloCameraDetector::load_intrinsic(
     image_width_ = options.intrinsic->get_width();
   }
 
-  offset_y_ = int(offset_ratio * image_height_ + .5);
+  offset_y_ = static_cast<int>(offset_ratio * image_height_ + .5);
   float roi_ratio = cropped_ratio * image_height_ / image_width_;
-  width_ =
-      int(resized_width + aligned_pixel / 2) / aligned_pixel * aligned_pixel;
-  height_ = int(width_ * roi_ratio + aligned_pixel / 2) / aligned_pixel *
-            aligned_pixel;
+  width_ = static_cast<int>(resized_width + aligned_pixel / 2) /
+      aligned_pixel * aligned_pixel;
+  height_ = static_cast<int>(width_ * roi_ratio + aligned_pixel / 2) /
+      aligned_pixel * aligned_pixel;
   AINFO << "image_height=" << image_height_ << ", "
         << "image_width=" << image_width_ << ", "
         << "roi_ratio=" << roi_ratio;
@@ -186,7 +186,7 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   output_names.push_back(net_param.seg_blob());
 
   FeatureParam feat_param;
-  load_text_proto_message_file(feature_file, feat_param);
+  load_text_proto_message_file(feature_file, &feat_param);
   for (auto extractor : feat_param.extractor()) {
     output_names.push_back(extractor.feat_blob());
   }
@@ -360,7 +360,7 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
 
   int det_id = 0;
   for (auto &obj : *objects) {
-    projector_->project(obj->object_feature);
+    projector_->project(&(obj->object_feature));
 
     // Assign unique detection box id per box for this frame
     obj->id = det_id;

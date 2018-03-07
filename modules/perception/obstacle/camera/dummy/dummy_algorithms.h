@@ -17,56 +17,38 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DUMMY_DUMMY_ALGORITHMS_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DUMMY_DUMMY_ALGORITHMS_H_
 
+#include <string>
+#include <vector>
+
 #include "modules/perception/obstacle/camera/common/projector.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_detector.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_tracker.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_transformer.h"
-//#include "modules/perception/obstacle/camera/interface/base_camera_parser.h"
 
 namespace apollo {
 namespace perception {
-
-/*
-class DummyCameraParser : public BaseCameraParser {
- public:
-  DummyCameraParser() : BaseCameraParser() {}
-  virtual ~DummyCameraParser() {}
-
-  virtual bool init() override { return true; }
-
-  virtual bool parse(const cv::Mat &frame, const CameraParserOptions &options,
-                     cv::Mat *result) override {
-    return true;
-  }
-
-  virtual std::string name() const override { return "DummyCameraParser"; }
-
- private:
-  DISALLOW_COPY_AND_ASSIGN(DummyCameraParser);
-};
-*/
 
 class DummyCameraDetector : public BaseCameraDetector {
  public:
   DummyCameraDetector() : BaseCameraDetector() {}
   virtual ~DummyCameraDetector() {}
 
-  virtual bool Init(const CameraDetectorInitOptions &options =
+  bool Init(const CameraDetectorInitOptions &options =
                     CameraDetectorInitOptions()) override {
     return true;
   }
 
-  virtual bool Detect(const cv::Mat &frame,
+  bool Detect(const cv::Mat &frame,
                       const CameraDetectorOptions &options,
                       std::vector<VisualObjectPtr> *objects) override {
     return true;
   }
 
-  virtual bool Extract(std::vector<VisualObjectPtr>* objects) override {
+  bool Extract(std::vector<VisualObjectPtr>* objects) override {
     return true;
   }
 
-  virtual std::string Name() const override { return "DummyCameraDetector"; }
+  std::string Name() const override { return "DummyCameraDetector"; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(DummyCameraDetector);
@@ -77,10 +59,10 @@ class DummyCameraTracker : public BaseCameraTracker {
   DummyCameraTracker() : BaseCameraTracker() {}
   virtual ~DummyCameraTracker() {}
 
-  virtual bool Init() override { return true; }
+  bool Init() override { return true; }
 
   /*
-  virtual bool predict_velocity(
+  bool predict_velocity(
       const cv::Mat &frame, const std::vector<VisualObjectPtr> &objects,
       double timestamp, const CameraTrackerOptions &options,
       std::vector<VisualObjectPtr> *tracked_objects) override {
@@ -89,7 +71,7 @@ class DummyCameraTracker : public BaseCameraTracker {
     return true;
   }
 
-  virtual bool predict_shape(
+  bool predict_shape(
       const cv::Mat &frame, const std::vector<VisualObjectPtr> &objects,
       double timestamp, const CameraTrackerOptions &options,
       std::vector<VisualObjectPtr> *tracked_objects) override {
@@ -97,12 +79,12 @@ class DummyCameraTracker : public BaseCameraTracker {
   }
   */
 
-  virtual bool Associate(const cv::Mat& img, const float& timestamp,
+  bool Associate(const cv::Mat& img, const float& timestamp,
                          std::vector<VisualObjectPtr>* objects) override {
     return true;
   }
 
-  virtual std::string Name() const override { return "DummyCameraTracker"; }
+  std::string Name() const override { return "DummyCameraTracker"; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(DummyCameraTracker);
@@ -113,13 +95,13 @@ class DummyCameraTransformer : public BaseCameraTransformer {
   DummyCameraTransformer() : BaseCameraTransformer() {}
   virtual ~DummyCameraTransformer() {}
 
-  virtual bool Init() override { return true; }
+  bool Init() override { return true; }
 
-  virtual bool Transform(std::vector<VisualObjectPtr>* objects) override {
+  bool Transform(std::vector<VisualObjectPtr>* objects) override {
     return true;
   }
 
-  virtual std::string Name() const override {
+  std::string Name() const override {
     return "DummyCameraTransformer";
   }
 
@@ -129,7 +111,7 @@ class DummyCameraTransformer : public BaseCameraTransformer {
 
 class DummyProjector : public BaseProjector {
  public:
-  virtual void project(std::vector<float> &feature) override {}
+  bool project(std::vector<float> *feature) override { return true; }
 };
 
 }  // namespace perception

@@ -100,7 +100,7 @@ std::string get_type_text(ObjectType type);
 ObjectType get_object_type(const std::string &type_text);
 
 bool load_text_proto_message_file(const std::string& path,
-                                  google::protobuf::Message& msg);
+                                  google::protobuf::Message* msg);
 
 }  // namespace perception
 }  // namespace apollo

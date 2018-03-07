@@ -66,12 +66,12 @@ bool UnityRecognize::InitModel(const ConfigManager *config_manager,
     AERROR << "classify_model not found." << name();
     return false;
   }
-  classify_model = GetAbsolutePath(config_manager->work_root(), classify_model);
+  classify_model = GetAbsolutePath(config_manager->WorkRoot(), classify_model);
   if (!model_config->GetValue("classify_net", &classify_net)) {
     AERROR << "classify_net not found." << name();
     return false;
   }
-  classify_net = GetAbsolutePath(config_manager->work_root(), classify_net);
+  classify_net = GetAbsolutePath(config_manager->WorkRoot(), classify_net);
 
   float classify_threshold = 0.0;
   int classify_resize_width = 0;

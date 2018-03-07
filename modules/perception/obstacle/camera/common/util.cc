@@ -345,7 +345,12 @@ ObjectType get_object_type(const std::string &type) {
 }
 
 bool load_text_proto_message_file(const std::string& path,
-                                  google::protobuf::Message& msg) {
+                                  google::protobuf::Message* msg) {
+  if (msg == nullptr) {
+    AERROR << "msg is a null pointer.";
+    return false;
+  }
+
   int fd = open(path.c_str(), O_RDONLY);
   if (fd < 0) {
     AERROR << "path[" << path << "]";
@@ -354,7 +359,7 @@ bool load_text_proto_message_file(const std::string& path,
 
   google::protobuf::io::FileInputStream file_in(fd);
 
-  if (!google::protobuf::TextFormat::Parse(&file_in, &msg)) {
+  if (!google::protobuf::TextFormat::Parse(&file_in, msg)) {
     AERROR << "path[" << path << "]";
     return false;
   }
