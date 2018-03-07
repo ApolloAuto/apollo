@@ -160,7 +160,6 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
     }
   }
 
-
   if (next_stop_sign_overlap_ == nullptr) {
     GetPlanningStatus()->clear_stop_sign();
     return false;
@@ -250,13 +249,12 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
   ADEBUG << "stop_start_time: " << stop_start_time
          << "; wait_time: " << wait_time;
 
-  // adjust status. this may happen if there's bad data in Dropbox
+  // adjust status. this may happen if there's bad data
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   double stop_line_start_s = next_stop_sign_overlap_->start_s;
-  if (stop_line_start_s - adc_front_edge_s >
-      FLAGS_max_valid_stop_distance) {
+  if (stop_line_start_s - adc_front_edge_s > FLAGS_max_valid_stop_distance) {
     ADEBUG << "adjust stop status. too far from stop line. distance["
-        << stop_line_start_s - adc_front_edge_s << "]";
+           << stop_line_start_s - adc_front_edge_s << "]";
     stop_status_ = StopSignStatus::TO_STOP;
   }
 
@@ -374,8 +372,8 @@ int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
       s = s.empty() ? vehicle : s + "," + vehicle;
       (*watch_vehicles)[associated_lane_id].push_back(vehicle);
     }
-    ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id
-        << "] vehicle[" << s << "]";
+    ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
+           << s << "]";
   }
 
   return 0;
@@ -476,8 +474,7 @@ int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
   double stop_line_s = over_lap_info->lane_overlap_info().start_s();
   double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
   double distance_to_stop_line = stop_line_s - obstacle_end_s;
-  if (distance_to_stop_line >
-    FLAGS_stop_sign_watch_vehicle_max_stop_distance) {
+  if (distance_to_stop_line > FLAGS_stop_sign_watch_vehicle_max_stop_distance) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
            << "] distance_to_stop_line[" << distance_to_stop_line
            << "]; stop_line_s" << stop_line_s << "]; obstacle_end_s["
@@ -549,8 +546,7 @@ int StopSign::RemoveWatchVehicle(
 
   bool erase = false;
 
-  bool is_path_cross =
-      !path_obstacle.reference_line_st_boundary().IsEmpty();
+  bool is_path_cross = !path_obstacle.reference_line_st_boundary().IsEmpty();
 
   // check obstacle is on an associate lane guarded by stop sign
   std::string obstable_lane_id = obstacle_lane.get()->id().id();
@@ -576,25 +572,22 @@ int StopSign::RemoveWatchVehicle(
         !is_path_cross) {
       erase = true;
 
-      ADEBUG << "obstacle_id[" << obstacle_id
-          << "] type[" << obstacle_type_name
-          << "] distance_pass_stop_line[" << distance_pass_stop_line
-          << "] stop_line_end_s[" << stop_line_end_s
-          << "] obstacle_end_s[" << obstacle_end_s
-          << "] is_path_cross[" << is_path_cross
-          << "] passed stop sign, AND path not crosses. "
-          << "erase from watch_vehicles";
+      ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+             << "] distance_pass_stop_line[" << distance_pass_stop_line
+             << "] stop_line_end_s[" << stop_line_end_s << "] obstacle_end_s["
+             << obstacle_end_s << "] is_path_cross[" << is_path_cross
+             << "] passed stop sign, AND path not crosses. "
+             << "erase from watch_vehicles";
     }
   } else {
     // passes associated lane (in junction)
     if (!is_path_cross) {
       erase = true;
-      ADEBUG << "obstacle_id[" << obstacle_id
-          << "] type[" << obstacle_type_name
-          << "] obstable_lane_id[" << obstable_lane_id
-          << "] is_path_cross[" << is_path_cross
-          << "] passed associated lane, AND path not crosses. "
-          << "erase from watch_vehicles";
+      ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+             << "] obstable_lane_id[" << obstable_lane_id << "] is_path_cross["
+             << is_path_cross
+             << "] passed associated lane, AND path not crosses. "
+             << "erase from watch_vehicles";
     }
   }
 
