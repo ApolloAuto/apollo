@@ -16,9 +16,10 @@
 
 #include "modules/perception/obstacle/camera/cipv/cipv.h"
 
-#include <math.h>
+#include <cmath>
 
 #include "modules/common/log.h"
+#include "modules/common/math/line_segment2d.h"
 
 namespace apollo {
 namespace perception {
@@ -54,45 +55,15 @@ bool Cipv::DistanceFromPointToLineSegment(const Point2Df &point,
                                           const Point2Df &line_seg_start_point,
                                           const Point2Df &line_seg_end_point,
                                           float *distance) {
-  float x_start_diff = point[0] - line_seg_start_point[0];
-  float y_start_diff = point[1] - line_seg_start_point[1];
-  float x_end_diff = line_seg_end_point[0] - line_seg_start_point[0];
-  float y_end_diff = line_seg_end_point[1] - line_seg_start_point[1];
-
-  float dot = x_start_diff * x_end_diff + y_start_diff * y_end_diff;
-  float len_sq = x_end_diff * x_end_diff + y_end_diff * y_end_diff;
-  float param = -1.0f;
-  if (fabs(len_sq) > B_FLT_EPSILON) {  // in case of 0 length line
-    param = dot / len_sq;
-  } else {
+  common::math::Vec2d p = {point[0], point[1]};
+  common::math::LineSegment2d line_seg(
+      {line_seg_start_point[0], line_seg_start_point[1]},
+      {line_seg_end_point[0], line_seg_end_point[1]});
+  if (line_seg.length_sqr() <= B_FLT_EPSILON) {
+    // line length = 0
     return false;
   }
-
-  float xx = 0.0f;
-  float yy = 0.0f;
-
-  if (param < 0) {
-    // return false;
-    xx = line_seg_start_point[0];
-    yy = line_seg_start_point[1];
-  } else if (param > 1) {
-    // return false;
-    xx = line_seg_end_point[0];
-    yy = line_seg_end_point[1];
-  } else {
-    xx = line_seg_start_point[0] + param * x_end_diff;
-    yy = line_seg_start_point[1] + param * y_end_diff;
-  }
-
-  float dx = point[0] - xx;
-  float dy = point[1] - yy;
-  *distance = sqrt(dx * dx + dy * dy);
-  if (debug_level_ >= 2) {
-    AINFO << "distance_from_point (" << point[0] << ", " << point[1]
-          << ") to_line_segment_ (" << line_seg_start_point[0] << ", "
-          << line_seg_start_point[1] << ")->(" << line_seg_end_point[0] << ", "
-          << line_seg_end_point[1] << "): " << *distance << "m";
-  }
+  *distance = line_seg.DistanceTo(p);
   return true;
 }
 
@@ -703,25 +674,23 @@ bool Cipv::DetermineCipv(std::shared_ptr<SensorObjects> sensor_objects,
                   yaw_rate, velocity, &egolane_image, &egolane_ground);
 
   for (int32_t i = 0; i < static_cast<int32_t>(sensor_objects->objects.size());
-       i++) {
+       ++i) {
     if (debug_level_ >= 2) {
       AINFO << "sensor_objects->objects[i]->track_id: "
             << sensor_objects->objects[i]->track_id;
     }
     if (IsObjectInTheLane(sensor_objects->objects[i], egolane_image,
                           egolane_ground) == true) {
-      if (cipv_index >= 0) {  // if there is existing CIPV
-        // if objects[i] is closer than objects[cipv_index] in ego-x coordinate
+      if (cipv_index < 0 ||
+          sensor_objects->objects[i]->center[0] <
+              sensor_objects->objects[cipv_index]->center[0]) {
+        // cipv_index is not set or if objects[i] is closer than
+        // objects[cipv_index] in ego-x coordinate
+
         // AINFO << "sensor_objects->objects[i]->center[0]: "
         //            << sensor_objects->objects[i]->center[0];
         // AINFO << "sensor_objects->objects[cipv_index]->center[0]: "
         //            << sensor_objects->objects[cipv_index]->center[0];
-        if (sensor_objects->objects[i]->center[0] <
-            sensor_objects->objects[cipv_index]->center[0]) {
-          cipv_index = i;
-          cipv_track_id = sensor_objects->objects[i]->track_id;
-        }
-      } else {
         cipv_index = i;
         cipv_track_id = sensor_objects->objects[i]->track_id;
       }
