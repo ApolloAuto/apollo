@@ -20,8 +20,10 @@
 #include <limits>
 #include <map>
 #include <utility>
+
 #include "Eigen/StdVector"
 #include "boost/format.hpp"
+
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
@@ -31,15 +33,11 @@ EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2d);
 namespace apollo {
 namespace perception {
 
-PbfTrackObjectDistance::PbfTrackObjectDistance() {}
-
-PbfTrackObjectDistance::~PbfTrackObjectDistance() {}
-
 float PbfTrackObjectDistance::Compute(
     const PbfTrackPtr &fused_track, const PbfSensorObjectPtr &sensor_object,
     const TrackObjectDistanceOptions &options) {
   const SensorType &sensor_type = sensor_object->sensor_type;
-  ADEBUG << "sensor type: " << sensor_type;
+  ADEBUG << "sensor type: " << static_cast<int>(sensor_type);
   PbfSensorObjectPtr fused_object = fused_track->GetFusedObject();
   if (fused_object == nullptr) {
     ADEBUG << "fused object is nullptr";
@@ -52,7 +50,7 @@ float PbfTrackObjectDistance::Compute(
     return (std::numeric_limits<float>::max)();
   }
 
-  float distance = (std::numeric_limits<float>::max)();
+  float distance = std::numeric_limits<float>::max();
   const PbfSensorObjectPtr &lidar_object = fused_track->GetLatestLidarObject();
   const PbfSensorObjectPtr &radar_object = fused_track->GetLatestRadarObject();
   if (is_lidar(sensor_type)) {
@@ -197,12 +195,11 @@ bool PbfTrackObjectDistance::ComputePolygonCenter(
   int nu = std::max(range, size / range + 1);
   nu = std::min(nu, size);
   int count = 0;
-  std::map<double, int>::iterator it = distance2idx.begin();
-  for (; it != distance2idx.end() && count < nu; ++it, ++count) {
+  for (auto it = distance2idx.begin(); it != distance2idx.end() && count < nu;
+       ++it, ++count) {
     polygon_part.push_back(polygon[it->second]);
   }
-  bool state = ComputePolygonCenter(polygon_part, center);
-  return state;
+  return ComputePolygonCenter(polygon_part, center);
 }
 
 }  // namespace perception

@@ -199,7 +199,9 @@ Status SignalsXmlParser::ParseStopSigns(
         sub_node = sub_node->FirstChildElement("objectReference");
         while (sub_node) {
           std::string stop_line_id;
-          UtilXmlParser::QueryStringAttribute(*sub_node, "id", &stop_line_id);
+          int checker = UtilXmlParser::QueryStringAttribute(*sub_node,
+                                                            "id",
+                                                            &stop_line_id);
           CHECK(checker == tinyxml2::XML_SUCCESS);
           stop_sign_internal.stop_line_ids.insert(stop_line_id);
 

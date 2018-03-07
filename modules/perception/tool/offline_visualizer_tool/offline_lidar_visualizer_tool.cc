@@ -175,11 +175,11 @@ class OfflineLidarPerceptionTool {
       Eigen::Vector3f dir_velo3(dir_velo[0], dir_velo[1], dir_velo[2]);
       double theta = VectorTheta2dXy(coord_dir, dir_velo3);
       std::string type = "unknown";
-      if (obj->type == PEDESTRIAN) {
+      if (obj->type == ObjectType::PEDESTRIAN) {
         type = "pedestrain";
-      } else if (obj->type == VEHICLE) {
+      } else if (obj->type == ObjectType::VEHICLE) {
         type = "smallMot";
-      } else if (obj->type == BICYCLE) {
+      } else if (obj->type == ObjectType::BICYCLE) {
         type = "nonMot";
       }
       // write tracking details

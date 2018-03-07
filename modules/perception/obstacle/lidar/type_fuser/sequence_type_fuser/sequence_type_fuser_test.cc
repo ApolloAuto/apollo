@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/sequence_type_fuser.h"
+
 #include "gtest/gtest.h"
+
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 
@@ -81,7 +83,7 @@ void SequenceTypeFuserTest::BuildObjects() {
       objects_[i][j]->track_id = static_cast<int>(j);
       objects_[i][j]->score = 0.95;
       std::vector<float>& type_probs = objects_[i][j]->type_probs;
-      type_probs.resize(MAX_OBJECT_TYPE, 0.0);
+      type_probs.resize(static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0.0);
       GenerateSmoothProb(&type_probs, j, 0.7);
       std::cout << j << "th object prob: ";
       for (size_t m = 0; m < type_probs.size(); ++m) {

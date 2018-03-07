@@ -64,6 +64,9 @@ cc_library(
 
 cc_library(
     name = "string_util",
+    srcs = [
+        "string_util.cc",
+    ],
     hdrs = [
         "string_util.h",
     ],
@@ -122,30 +125,6 @@ cc_test(
     ],
     deps = [
         ":factory",
-        "//modules/common",
-        "//modules/common:log",
-        "@gtest//:main",
-    ],
-)
-
-cc_library(
-    name = "dropbox",
-    hdrs = [
-        "dropbox.h",
-    ],
-    deps = [
-        "//modules/common:log",
-    ],
-)
-
-cc_test(
-    name = "dropbox_test",
-    size = "small",
-    srcs = [
-        "dropbox_test.cc",
-    ],
-    deps = [
-        ":dropbox",
         "//modules/common",
         "//modules/common:log",
         "@gtest//:main",

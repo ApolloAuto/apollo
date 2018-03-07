@@ -52,16 +52,6 @@ Point MakePoint(double x, double y, double z) {
   return pt;
 }
 
-Lane MakeDefaultLane() {
-  Lane lane;
-  lane.mutable_id()->set_id("test");
-  auto* segment =
-      lane.mutable_central_curve()->add_segment()->mutable_line_segment();
-  *segment->add_point() = MakePoint(0, 0, 0);
-  *segment->add_point() = MakePoint(1, 1, 1);
-  return lane;
-}
-
 LaneSampleAssociation MakeSample(double s, double width) {
   LaneSampleAssociation sample;
   sample.set_s(s);
@@ -805,8 +795,8 @@ TEST(TestSuite, compute_lane_segments_from_points) {
   const Path path(points);
   EXPECT_EQ(path.lane_segments().size(), 2);
   EXPECT_EQ(path.lane_segments()[0].lane->id().id(), "id1");
-  EXPECT_NEAR(path.lane_segments()[0].start_s, 0.1, 1e-6);
-  EXPECT_NEAR(path.lane_segments()[0].end_s, 0.7, 1e-6);
+  EXPECT_NEAR(path.lane_segments()[0].start_s, 0.0, 1e-6);
+  EXPECT_NEAR(path.lane_segments()[0].end_s, 1.0, 1e-6);
   EXPECT_EQ(path.lane_segments()[1].lane->id().id(), "id2");
   EXPECT_NEAR(path.lane_segments()[1].start_s, 0.0, 1e-6);
   EXPECT_NEAR(path.lane_segments()[1].end_s, 0.4, 1e-6);

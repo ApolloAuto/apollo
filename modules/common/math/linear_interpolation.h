@@ -25,6 +25,7 @@
 #include <cmath>
 
 #include "modules/common/log.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 /**
  * @namespace apollo::common::math
@@ -69,6 +70,13 @@ T lerp(const T& x0, const double t0, const T& x1, const double t1,
  */
 double slerp(const double a0, const double t0, const double a1, const double t1,
              const double t);
+
+apollo::common::PathPoint InterpolateUsingLinearApproximation(
+    const common::PathPoint &p0, const common::PathPoint &p1, const double s);
+
+apollo::common::TrajectoryPoint InterpolateUsingLinearApproximation(
+    const common::TrajectoryPoint &tp0, const common::TrajectoryPoint &tp1,
+    const double t);
 
 }  // namespace math
 }  // namespace common

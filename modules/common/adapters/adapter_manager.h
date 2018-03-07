@@ -269,6 +269,7 @@ class AdapterManager {
   REGISTER_ADAPTER(Mobileye);
   REGISTER_ADAPTER(DelphiESR);
   REGISTER_ADAPTER(ContiRadar);
+  REGISTER_ADAPTER(Ultrasonic);
   REGISTER_ADAPTER(CompressedImage);
   REGISTER_ADAPTER(GnssRtkObs);
   REGISTER_ADAPTER(GnssRtkEph);

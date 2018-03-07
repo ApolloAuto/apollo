@@ -131,10 +131,10 @@ TEST_F(HmObjectTrackerTest, Track) {
     // test tracking
     *(tracker_options_.velodyne_trans) = pose;
     std::vector<ObjectPtr> result_objects;
-    // assert tracking succesfully
+    // assert tracking successfully
     EXPECT_TRUE(hm_tracker_->Track(objects, time_stamp, tracker_options_,
                                    &result_objects));
-    // assert reports completly
+    // assert reports completely
     EXPECT_TRUE(result_objects.size() >= objects.size());
     std::map<int, int> id_pool;
     for (size_t j = 0; j < result_objects.size(); ++j) {

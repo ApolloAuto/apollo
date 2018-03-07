@@ -1,7 +1,7 @@
 import STORE from "store";
 import RENDERER from "renderer";
-
-const Worker = require('worker-loader!utils/webworker.js');
+import MAP_NAVIGATOR from "components/Navigation/MapNavigator";
+import Worker from 'utils/webworker.js';
 
 export default class RosWebSocketEndpoint {
     constructor(serverAddr) {
@@ -9,10 +9,10 @@ export default class RosWebSocketEndpoint {
         this.websocket = null;
         this.counter = 0;
         this.lastUpdateTimestamp = 0;
-        this.lastSeqNum = -1;
         this.currMapRadius = null;
         this.updatePOI = true;
         this.routingTime = undefined;
+        this.currentMode = null;
         this.worker = new Worker();
     }
 
@@ -50,11 +50,25 @@ export default class RosWebSocketEndpoint {
                 case "SimWorldUpdate":
                     this.checkMessage(message);
 
+                    const updateCoordination = (this.currentMode !== STORE.hmi.currentMode);
+                    this.currentMode = STORE.hmi.currentMode;
+                    if (STORE.hmi.inNavigationMode) {
+                        // In navigation mode, relative map is set and the relative position
+                        // of auto driving car is (0, 0). Absolute position of the car
+                        // only needed in MAP_NAVIGATOR.
+                        if (MAP_NAVIGATOR.isInitialized()) {
+                            MAP_NAVIGATOR.update(message);
+                        }
+                        message.autoDrivingCar.positionX = 0;
+                        message.autoDrivingCar.positionY = 0;
+                        message.autoDrivingCar.heading = 0;
+                    }
                     STORE.updateTimestamp(message.timestamp);
                     STORE.updateModuleDelay(message);
                     RENDERER.maybeInitializeOffest(
                         message.autoDrivingCar.positionX,
-                        message.autoDrivingCar.positionY);
+                        message.autoDrivingCar.positionY,
+                        updateCoordination);
                     STORE.meters.update(message);
                     STORE.monitor.update(message);
                     STORE.trafficSignal.update(message);
@@ -115,18 +129,12 @@ export default class RosWebSocketEndpoint {
     }
 
     checkMessage(world) {
-        if (this.lastUpdateTimestamp !== 0
-            && world.timestamp - this.lastUpdateTimestamp > 150) {
-            console.log("Last sim_world_update took " +
-                (world.timestamp - this.lastUpdateTimestamp) + "ms");
+        const now = new Date().getTime();
+        const duration = now - this.lastUpdateTimestamp;
+        if (this.lastUpdateTimestamp !== 0 && duration > 250) {
+            console.log("Last sim_world_update took " + duration + "ms");
         }
-        this.lastUpdateTimestamp = world.timestamp;
-        if (this.lastSeqNum !== -1
-            && world.sequenceNum > this.lastSeqNum + 1) {
-            console.debug("Last seq: " + this.lastSeqNum +
-                ". New seq: " + world.sequenceNum + ".");
-        }
-        this.lastSeqNum = world.sequenceNum;
+        this.lastUpdateTimestamp = now;
     }
 
     requestMapElementIdsByRadius(radius) {
@@ -234,5 +242,9 @@ export default class RosWebSocketEndpoint {
         this.websocket.send(JSON.stringify({
             type: "RequestRoutePath",
         }));
+    }
+
+    publishNavigationInfo(data) {
+        this.websocket.send(data);
     }
 }

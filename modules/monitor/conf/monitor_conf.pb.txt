@@ -19,7 +19,7 @@ modules {
 modules {
   name: "radar"
   process_conf {
-    process_cmd_keywords: "modules/drivers/conti_radar/conti_radar"
+    process_cmd_keywords: "modules/drivers/radar/conti_radar/conti_radar"
   }
   topic_conf {
     type: CONTI_RADAR
@@ -86,6 +86,15 @@ modules {
   name: "record_bag"
   process_conf {
     process_cmd_keywords: "rosbag/record"
+  }
+}
+modules {
+  name: "relative_map"
+  process_conf {
+    process_cmd_keywords: "modules/map/relative_map/relative_map"
+  }
+  topic_conf {
+    type: RELATIVE_MAP
   }
 }
 hardware {

@@ -21,6 +21,7 @@
 #ifndef MODEULES_THIRD_PARTY_PERCEPTION_CONVERSION_H_
 #define MODEULES_THIRD_PARTY_PERCEPTION_CONVERSION_H_
 
+#include <cstdint>
 #include <queue>
 
 #include "modules/drivers/proto/conti_radar.pb.h"

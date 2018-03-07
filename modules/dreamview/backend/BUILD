@@ -16,6 +16,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/dreamview/backend/handlers:websocket",
         "//modules/dreamview/backend/hmi",
+        "//modules/dreamview/backend/point_cloud:point_cloud_updater",
         "//modules/dreamview/backend/sim_control",
         "//modules/dreamview/backend/simulation_world:simulation_world_updater",
         "//modules/map/hdmap:hdmap_util",

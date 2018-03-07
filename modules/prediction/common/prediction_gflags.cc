@@ -75,7 +75,7 @@ DEFINE_double(still_pedestrian_position_std, 0.5,
               "Position standard deviation for still obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
-DEFINE_int32(max_num_current_lane, 1, "Max number to search current lanes");
+DEFINE_int32(max_num_current_lane, 2, "Max number to search current lanes");
 DEFINE_int32(max_num_nearby_lane, 2, "Max number to search nearby lanes");
 DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
               "Max angle difference for a candiate lane");
@@ -104,6 +104,10 @@ DEFINE_double(rnn_min_lane_relatice_s, 5.0,
 DEFINE_bool(enable_adjust_velocity_heading, false,
             "adjust velocity heading to lane heading");
 DEFINE_double(heading_filter_param, 0.99, "heading filter parameter");
+
+// Cost evaluator
+DEFINE_double(cost_exp_coeff, 1.5,
+              "Coefficient of the exponential term in cost evaluator.");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,

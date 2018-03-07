@@ -7,7 +7,11 @@ cc_library(
     srcs = [
         "lib/liblocalization_msf_local_integ.so",
     ],
-    hdrs = [
-        "include/localization_integ.h",
+    hdrs = glob([
+        "include/*.h",
+    ]),
+    linkopts = [
+        "-L/usr/lib/x86_64-linux-gnu",
+        "-lz",
     ],
 )

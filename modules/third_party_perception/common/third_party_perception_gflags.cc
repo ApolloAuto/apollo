@@ -24,7 +24,7 @@ DEFINE_string(module_name, "third_party_perception", "Module name");
 
 DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
 
-DEFINE_double(third_party_perception_freq, 100,
+DEFINE_double(third_party_perception_freq, 10,
               "third party perception timer frequency.");
 DEFINE_bool(enable_mobileye, true, "switch to turn on/off mobileye obstacles");
 DEFINE_bool(enable_radar, true, "switch to turn on/off radar obstacles");

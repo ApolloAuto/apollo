@@ -1,7 +1,5 @@
 planner_type : EM
 em_planner_config {
-    task : TRAFFIC_DECIDER
-
     task : DP_POLY_PATH_OPTIMIZER
 
     task : PATH_DECIDER
@@ -205,7 +203,7 @@ rule_config : {
     rule_id: STOP_SIGN
 }
 rule_config : {
-    rule_id: SIDEPASS_VEHICLE
+    rule_id: SIDE_PASS_VEHICLE
 }
 rule_config : {
     rule_id: KEEP_CLEAR

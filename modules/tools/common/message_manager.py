@@ -26,6 +26,7 @@ from modules.routing.proto import routing_pb2
 from modules.control.proto import control_cmd_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.common.proto import drive_event_pb2
+from modules.map.relative_map.proto import navigation_pb2
 
 import proto_utils
 
@@ -75,6 +76,9 @@ topic_pb_list = [
                 traffic_light_detection_pb2.TrafficLightDetection),
     MessageType("drive_event", "/apollo/drive_event",
                 drive_event_pb2.DriveEvent),
+    MessageType("relative_map", "/apollo/relative_map", navigation_pb2.MapMsg),
+    MessageType("relative_map", "/apollo/navigation",
+                navigation_pb2.NavigationInfo),
 ]
 
 

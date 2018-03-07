@@ -24,7 +24,7 @@
 namespace apollo {
 namespace perception {
 
-enum ObjectType {
+enum class ObjectType {
   UNKNOWN = 0,
   UNKNOWN_MOVABLE = 1,
   UNKNOWN_UNMOVABLE = 2,
@@ -34,7 +34,17 @@ enum ObjectType {
   MAX_OBJECT_TYPE = 6,
 };
 
-enum SensorType {
+enum InternalObjectType {
+  INT_BACKGROUND = 0,
+  INT_SMALLMOT = 1,
+  INT_PEDESTRIAN = 2,
+  INT_NONMOT = 3,
+  INT_BIGMOT = 4,
+  INT_UNKNOWN = 5,
+  INT_MAX_OBJECT_TYPE = 6,
+};
+
+enum class SensorType {
   VELODYNE_64 = 0,
   VELODYNE_16 = 1,
   RADAR = 2,
@@ -42,7 +52,7 @@ enum SensorType {
   UNKNOWN_SENSOR_TYPE = 10,
 };
 
-enum ScoreType {
+enum class ScoreType {
   UNKNOWN_SCORE_TYPE = 0,
   SCORE_CNN = 1,
   SCORE_RADAR = 2,

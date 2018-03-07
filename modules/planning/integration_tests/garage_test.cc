@@ -40,10 +40,12 @@ DECLARE_string(test_chassis_file);
 class GarageTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
+    FLAGS_use_navigation_mode = false;
     FLAGS_map_dir = "modules/planning/testdata/garage_map";
     FLAGS_base_map_filename = "base_map.txt";
     FLAGS_test_data_dir = "modules/planning/testdata/garage_test";
     FLAGS_planning_upper_speed_limit = 12.5;
+    FLAGS_test_routing_response_file = "garage_routing.pb.txt";
     FLAGS_enable_lag_prediction = false;
     FLAGS_enable_stop_sign = false;
   }

@@ -78,8 +78,8 @@ bool RadarProcessSubnode::InitInternal() {
   CHECK(AdapterManager::GetContiRadar()) << "Radar is not initialized.";
   AdapterManager::AddContiRadarCallback(&RadarProcessSubnode::OnRadar, this);
   CHECK(AdapterManager::GetLocalization()) << "Localiztion is not initialized.";
-  AdapterManager::AddLocalizationCallback(
-    &RadarProcessSubnode::OnLocalization, this);
+  AdapterManager::AddLocalizationCallback(&RadarProcessSubnode::OnLocalization,
+                                          this);
   localization_buffer_.set_capacity(FLAGS_localization_buffer_size);
   std::string radar_extrinstic_path = FLAGS_radar_extrinsic_file;
   AINFO << "radar extrinsic path: " << radar_extrinstic_path;
@@ -100,7 +100,7 @@ bool RadarProcessSubnode::InitInternal() {
   }
   short_camera_extrinsic_ = short_camera_extrinsic.matrix();
   AINFO << "get short camera  extrinsic succ. pose: \n"
-    << short_camera_extrinsic_;
+        << short_camera_extrinsic_;
   inited_ = true;
 
   return true;
@@ -140,8 +140,8 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
     return;
   }
   std::shared_ptr<Matrix4d> radar2world_pose = std::make_shared<Matrix4d>();
-  *radar2world_pose = *velodyne2world_pose *
-    short_camera_extrinsic_ *  radar_extrinsic_;
+  *radar2world_pose =
+      *velodyne2world_pose * short_camera_extrinsic_ * radar_extrinsic_;
   AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
 
   // Current Localiztion, radar postion.
@@ -177,7 +177,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
   options.radar2world_pose = &(*radar2world_pose);
   std::shared_ptr<SensorObjects> radar_objects(new SensorObjects);
   radar_objects->timestamp = timestamp;
-  radar_objects->sensor_type = RADAR;
+  radar_objects->sensor_type = SensorType::RADAR;
   radar_objects->sensor2world_pose = *radar2world_pose;
   bool result = radar_detector_->Detect(radar_obs_proto, map_polygons, options,
                                         &radar_objects->objects);
@@ -205,7 +205,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
 }
 
 void RadarProcessSubnode::OnLocalization(
-  const apollo::localization::LocalizationEstimate &localization) {
+    const apollo::localization::LocalizationEstimate &localization) {
   double timestamp = localization.header().timestamp_sec();
   AINFO << "localization timestamp:" << GLOG_TIMESTAMP(timestamp);
   LocalizationPair localization_pair;

@@ -373,6 +373,9 @@ const MapPath& ReferenceLine::map_path() const { return map_path_; }
 
 bool ReferenceLine::GetLaneWidth(const double s, double* const left_width,
                                  double* const right_width) const {
+  if (map_path_.path_points().empty()) {
+    return false;
+  }
   return map_path_.GetWidth(s, left_width, right_width);
 }
 
@@ -405,8 +408,8 @@ bool ReferenceLine::IsOnRoad(const SLBoundary& sl_boundary) const {
   double left_width = 0.0;
   double right_width = 0.0;
   map_path_.GetWidth(middle_s, &left_width, &right_width);
-  return sl_boundary.start_l() >= -right_width &&
-         sl_boundary.end_l() <= left_width;
+  return !(sl_boundary.start_l() > left_width ||
+           sl_boundary.end_l() < -right_width);
 }
 
 bool ReferenceLine::IsBlockRoad(const common::math::Box2d& box2d,
@@ -425,11 +428,7 @@ bool ReferenceLine::IsOnRoad(const SLPoint& sl_point) const {
     return false;
   }
 
-  if (sl_point.l() <= -right_width || sl_point.l() >= left_width) {
-    return false;
-  }
-
-  return true;
+  return !(sl_point.l() < -right_width || sl_point.l() > left_width);
 }
 
 // return a rough approximated SLBoundary using box length. It is guaranteed to
@@ -500,6 +499,31 @@ bool ReferenceLine::GetSLBoundary(const common::math::Box2d& box,
   return true;
 }
 
+bool ReferenceLine::GetSLBoundary(const hdmap::Polygon& polygon,
+                                  SLBoundary* const sl_boundary) const {
+  double start_s(std::numeric_limits<double>::max());
+  double end_s(std::numeric_limits<double>::lowest());
+  double start_l(std::numeric_limits<double>::max());
+  double end_l(std::numeric_limits<double>::lowest());
+  for (const auto& point : polygon.point()) {
+    SLPoint sl_point;
+    if (!XYToSL(point, &sl_point)) {
+      AERROR << "failed to get projection for point: " << point.DebugString()
+             << " on reference line.";
+      return false;
+    }
+    start_s = std::fmin(start_s, sl_point.s());
+    end_s = std::fmax(end_s, sl_point.s());
+    start_l = std::fmin(start_l, sl_point.l());
+    end_l = std::fmax(end_l, sl_point.l());
+  }
+  sl_boundary->set_start_s(start_s);
+  sl_boundary->set_end_s(end_s);
+  sl_boundary->set_start_l(start_l);
+  sl_boundary->set_end_l(end_l);
+  return true;
+}
+
 bool ReferenceLine::HasOverlap(const common::math::Box2d& box) const {
   SLBoundary sl_boundary;
   if (!GetSLBoundary(box, &sl_boundary)) {
@@ -542,6 +566,11 @@ std::string ReferenceLine::DebugString() const {
 }
 
 double ReferenceLine::GetSpeedLimitFromS(const double s) const {
+  for (const auto& speed_limit : speed_limit_) {
+    if (s >= speed_limit.start_s && s <= speed_limit.end_s) {
+      return speed_limit.speed_limit;
+    }
+  }
   const auto& map_path_point = GetReferencePoint(s);
   double speed_limit = FLAGS_planning_upper_speed_limit;
   for (const auto& lane_waypoint : map_path_point.lane_waypoints()) {
@@ -553,6 +582,21 @@ double ReferenceLine::GetSpeedLimitFromS(const double s) const {
         std::fmin(lane_waypoint.lane->lane().speed_limit(), speed_limit);
   }
   return speed_limit;
+}
+
+void ReferenceLine::AddSpeedLimit(const hdmap::SpeedControl& speed_control) {
+  SLBoundary sl_boundary;
+  if (GetSLBoundary(speed_control.polygon(), &sl_boundary) &&
+      IsOnRoad(sl_boundary)) {
+    AddSpeedLimit(sl_boundary.start_s(), sl_boundary.end_s(),
+                  speed_control.speed_limit());
+  }
+}
+
+void ReferenceLine::AddSpeedLimit(double start_s, double end_s,
+                                  double speed_limit) {
+  // assume no overlaps between speed limit regions.
+  speed_limit_.emplace_back(start_s, end_s, speed_limit);
 }
 
 }  // namespace planning

@@ -71,9 +71,20 @@ options:
     showObstaclesVelocity: true
     showObstaclesHeading: true
     showObstaclesId: true
+    showPointCloud: false
     showPositionGps: false
     showPositionLocalization: true
+    showMapCrosswalk: true
+    showMapClearArea: true
+    showMapJunction: false
+    showMapLane: true
+    showMapRoad: false
+    showMapSignal: true
+    showMapStopSign: true
     cameraAngle: Default
+navigation:
+  # possible options: BaiduMap or GoogleMap
+  map: "GoogleMap"
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false

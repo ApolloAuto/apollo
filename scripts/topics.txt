@@ -9,10 +9,12 @@
 /apollo/localization/pose
 /apollo/monitor
 /apollo/monitor/static_info
+/apollo/navigation
 /apollo/perception/obstacles
 /apollo/perception/traffic_light
 /apollo/planning
 /apollo/prediction
+/apollo/relative_map
 /apollo/routing_request
 /apollo/routing_response
 /apollo/sensor/conti_radar

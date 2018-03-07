@@ -20,6 +20,8 @@
 
 #include "modules/planning/tasks/traffic_decider/traffic_decider.h"
 
+#include <limits>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/backside_vehicle.h"
@@ -31,7 +33,7 @@
 #include "modules/planning/tasks/traffic_decider/keep_clear.h"
 #include "modules/planning/tasks/traffic_decider/reference_line_end.h"
 #include "modules/planning/tasks/traffic_decider/rerouting.h"
-#include "modules/planning/tasks/traffic_decider/sidepass_vehicle.h"
+#include "modules/planning/tasks/traffic_decider/side_pass_vehicle.h"
 #include "modules/planning/tasks/traffic_decider/signal_light.h"
 #include "modules/planning/tasks/traffic_decider/stop_sign.h"
 
@@ -80,9 +82,9 @@ void TrafficDecider::RegisterRules() {
                          [](const RuleConfig &config) -> TrafficRule * {
                            return new StopSign(config);
                          });
-  rule_factory_.Register(RuleConfig::SIDEPASS_VEHICLE,
+  rule_factory_.Register(RuleConfig::SIDE_PASS_VEHICLE,
                          [](const RuleConfig &config) -> TrafficRule * {
-                           return new SidepassVehicle(config);
+                           return new SidePassVehicle(config);
                          });
   rule_factory_.Register(RuleConfig::KEEP_CLEAR,
                          [](const RuleConfig &config) -> TrafficRule * {
@@ -95,6 +97,41 @@ bool TrafficDecider::Init(const PlanningConfig &config) {
   rule_configs_ = config.rule_config();
   is_init_ = true;
   return true;
+}
+
+void TrafficDecider::BuildPlanningTarget(
+    ReferenceLineInfo *reference_line_info) {
+  double min_s = std::numeric_limits<double>::infinity();
+  StopPoint stop_point;
+  for (const auto *obstacle :
+       reference_line_info->path_decision()->path_obstacles().Items()) {
+    if (obstacle->obstacle()->IsVirtual() &&
+        obstacle->HasLongitudinalDecision() &&
+        obstacle->LongitudinalDecision().has_stop() &&
+        obstacle->PerceptionSLBoundary().start_s() < min_s) {
+      min_s = obstacle->PerceptionSLBoundary().start_s();
+      const auto &stop_code =
+          obstacle->LongitudinalDecision().stop().reason_code();
+      if (stop_code == StopReasonCode::STOP_REASON_DESTINATION ||
+          stop_code == StopReasonCode::STOP_REASON_CROSSWALK ||
+          stop_code == StopReasonCode::STOP_REASON_STOP_SIGN ||
+          stop_code == StopReasonCode::STOP_REASON_YIELD_SIGN ||
+          stop_code == StopReasonCode::STOP_REASON_CREEPER ||
+          stop_code == StopReasonCode::STOP_REASON_REFERENCE_END) {
+        stop_point.set_type(StopPoint::HARD);
+        ADEBUG << "Hard stop at: " << min_s
+               << "REASON: " << StopReasonCode_Name(stop_code);
+      } else if (stop_code == StopReasonCode::STOP_REASON_YELLOW_SIGNAL) {
+        stop_point.set_type(StopPoint::SOFT);
+        ADEBUG << "Soft stop at: " << min_s << "  STOP_REASON_YELLOW_SIGNAL";
+      } else {
+        min_s = -1.0;
+        ADEBUG << "No planning target found at reference line.";
+      }
+    }
+  }
+  stop_point.set_s(min_s);
+  reference_line_info->SetStopPoint(stop_point);
 }
 
 Status TrafficDecider::Execute(Frame *frame,
@@ -120,7 +157,7 @@ Status TrafficDecider::Execute(Frame *frame,
   }
 
   Creeper::instance()->Run(frame, reference_line_info);
-
+  BuildPlanningTarget(reference_line_info);
   return Status::OK();
 }
 

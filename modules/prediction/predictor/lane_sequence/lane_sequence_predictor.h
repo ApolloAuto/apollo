@@ -53,17 +53,16 @@ class LaneSequencePredictor : public SequencePredictor {
  protected:
   /**
    * @brief Draw lane sequence trajectory points
-   * @param Kalman filter
+   * @param Obstacle
    * @param Lane sequence
    * @param Total prediction time
    * @param Prediction period
    * @param A vector of generated trajectory points
    */
   void DrawLaneSequenceTrajectoryPoints(
-      const Feature& feature, const std::string& lane_id,
-      const common::math::KalmanFilter<double, 4, 2, 0>& kf,
-      const LaneSequence& sequence, double total_time, double period,
-      std::vector<common::TrajectoryPoint>* points);
+      const Obstacle& obstacle, const LaneSequence& lane_sequence,
+      const double total_time, const double period,
+      std::vector<apollo::common::TrajectoryPoint>* points);
 };
 
 }  // namespace prediction

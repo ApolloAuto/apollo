@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/sequence_type_fuser.h"
 
 #include "modules/common/log.h"
@@ -43,7 +44,7 @@ bool SequenceTypeFuser::Init() {
     AERROR << "Failed to find transition_property_file_path in config. ";
     return false;
   }
-  const std::string& work_root = ConfigManager::instance()->work_root();
+  const std::string& work_root = ConfigManager::instance()->WorkRoot();
   transition_property_file_path =
       GetAbsolutePath(work_root, transition_property_file_path);
 
@@ -107,8 +108,9 @@ bool SequenceTypeFuser::FuseType(const TypeFuserOptions& options,
     ObjectSequence::TrackedObjects tracked_objects;
     for (auto& object : *objects) {
       if (object->is_background) {
-        object->type_probs.assign(MAX_OBJECT_TYPE, 0);
-        object->type = UNKNOWN_UNMOVABLE;
+        object->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
+                                  0);
+        object->type = ObjectType::UNKNOWN_UNMOVABLE;
         continue;
       }
       const int& track_id = object->track_id;

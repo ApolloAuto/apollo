@@ -31,9 +31,9 @@
 #include "modules/common/macro.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
+#include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
-#include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
 namespace apollo {
 namespace planning {

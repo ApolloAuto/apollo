@@ -42,8 +42,12 @@ class MapService {
  public:
   explicit MapService(bool use_sim_map = true);
 
-  inline double GetXOffset() const { return x_offset_; }
-  inline double GetYOffset() const { return y_offset_; }
+  inline double GetXOffset() const {
+    return x_offset_;
+  }
+  inline double GetYOffset() const {
+    return y_offset_;
+  }
 
   void CollectMapElementIds(const apollo::common::PointENU &point,
                             double raidus, MapElementIds *ids) const;

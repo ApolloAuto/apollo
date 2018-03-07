@@ -127,22 +127,30 @@ LaneWaypoint LeftNeighborWaypoint(const LaneWaypoint& waypoint) {
 }
 
 void LaneSegment::Join(std::vector<LaneSegment>* segments) {
+  constexpr double kSegmentDelta = 0.5;
   std::size_t k = 0;
   std::size_t i = 0;
   while (i < segments->size()) {
     std::size_t j = i;
     while (j + 1 < segments->size() &&
-           segments->at(i).lane->id().id() ==
-               segments->at(j + 1).lane->id().id()) {
+           segments->at(i).lane == segments->at(j + 1).lane) {
       ++j;
     }
-    segments->at(k).lane = segments->at(i).lane;
-    segments->at(k).start_s = segments->at(i).start_s;
-    segments->at(k).end_s = segments->at(j).end_s;
+    auto& segment_k = segments->at(k);
+    segment_k.lane = segments->at(i).lane;
+    segment_k.start_s = segments->at(i).start_s;
+    segment_k.end_s = segments->at(j).end_s;
+    if (segment_k.start_s < kSegmentDelta) {
+      segment_k.start_s = 0.0;
+    }
+    if (segment_k.end_s + kSegmentDelta >= segment_k.lane->total_length()) {
+      segment_k.end_s = segment_k.lane->total_length();
+    }
     i = j + 1;
     ++k;
   }
   segments->resize(k);
+  segments->shrink_to_fit();  // release memory
 }
 
 LaneWaypoint RightNeighborWaypoint(const LaneWaypoint& waypoint) {

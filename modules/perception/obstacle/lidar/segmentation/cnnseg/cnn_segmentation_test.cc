@@ -36,15 +36,15 @@
 #define VISUALIZE
 
 using apollo::perception::CNNSegmentation;
-using std::vector;
-using std::string;
-using std::unordered_set;
-using std::shared_ptr;
-using apollo::perception::pcl_util::PointCloudPtr;
+using apollo::perception::ObjectPtr;
 using apollo::perception::pcl_util::PointCloud;
+using apollo::perception::pcl_util::PointCloudPtr;
 using apollo::perception::pcl_util::PointIndices;
 using apollo::perception::pcl_util::PointXYZIT;
-using apollo::perception::ObjectPtr;
+using std::shared_ptr;
+using std::string;
+using std::unordered_set;
+using std::vector;
 
 namespace apollo {
 namespace perception {
@@ -67,11 +67,11 @@ int F2I(float val, float ori, float scale) {
 
 cv::Vec3b GetTypeColor(ObjectType type) {
   switch (type) {
-    case PEDESTRIAN:
+    case ObjectType::PEDESTRIAN:
       return cv::Vec3b(255, 128, 128);  // pink
-    case BICYCLE:
+    case ObjectType::BICYCLE:
       return cv::Vec3b(0, 0, 255);  // blue
-    case VEHICLE:
+    case ObjectType::VEHICLE:
       return cv::Vec3b(0, 255, 0);  // green
     default:
       return cv::Vec3b(0, 255, 255);  // yellow
@@ -96,9 +96,7 @@ bool IsValidRowCol(int row, int rows, int col, int cols) {
   return row >= 0 && row < rows && col >= 0 && col < cols;
 }
 
-int RowCol2Grid(int row, int col, int cols) {
-  return row * cols + col;
-}
+int RowCol2Grid(int row, int col, int cols) { return row * cols + col; }
 
 bool GetPointCloudFromFile(const string &pcd_file, PointCloudPtr cloud) {
   pcl::PointCloud<PointXYZIT> ori_cloud;
@@ -114,7 +112,7 @@ bool GetPointCloudFromFile(const string &pcd_file, PointCloudPtr cloud) {
     point.y = ori_cloud.points[i].y;
     point.z = ori_cloud.points[i].z;
     point.intensity = ori_cloud.points[i].intensity;
-    if (isnan(ori_cloud.points[i].x)) {
+    if (std::isnan(ori_cloud.points[i].x)) {
       continue;
     }
     cloud->push_back(point);

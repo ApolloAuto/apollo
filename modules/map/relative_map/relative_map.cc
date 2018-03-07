@@ -16,7 +16,11 @@
 
 #include "modules/map/relative_map/relative_map.h"
 
+#include "modules/map/proto/map_lane.pb.h"
+
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/math/vec2d.h"
+#include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 
@@ -25,11 +29,13 @@ namespace relative_map {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
+using apollo::common::util::operator+;
+using apollo::common::math::Vec2d;
 using apollo::common::monitor::MonitorLogBuffer;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::perception::PerceptionObstacles;
-using apollo::common::VehicleStateProvider;
 
 RelativeMap::RelativeMap()
     : monitor_logger_(MonitorMessageItem::RELATIVE_MAP) {}
@@ -51,6 +57,16 @@ Status RelativeMap::Init() {
     ADEBUG << "Adapter config file is loaded into: "
            << adapter_conf_.ShortDebugString();
   }
+
+  config_.Clear();
+  if (!common::util::GetProtoFromFile(FLAGS_relative_map_config_filename,
+                                      &config_)) {
+    return Status(ErrorCode::RELATIVE_MAP_ERROR,
+                  "Unable to load relative map conf file: " +
+                      FLAGS_relative_map_config_filename);
+  }
+
+  navigation_lane_.SetConfig(config_.navigation_lane());
 
   AdapterManager::Init(adapter_conf_);
   if (!AdapterManager::GetPerceptionObstacles()) {
@@ -77,14 +93,31 @@ Status RelativeMap::Init() {
     AERROR << error_msg;
     return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
   }
+  if (AdapterManager::GetNavigation() == nullptr) {
+    std::string error_msg(
+        "Navigation should be configured as dependency in adapter.conf");
+    AERROR << error_msg;
+    return Status(ErrorCode::RELATIVE_MAP_ERROR, error_msg);
+  }
   return Status::OK();
+}
+
+void LogErrorStatus(MapMsg* map_msg, const std::string& error_msg) {
+  auto* status = map_msg->mutable_header()->mutable_status();
+  status->set_msg(error_msg);
+  status->set_error_code(ErrorCode::RELATIVE_MAP_ERROR);
 }
 
 apollo::common::Status RelativeMap::Start() {
   MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("RelativeMap started");
 
-  AdapterManager::AddPerceptionObstaclesCallback(&RelativeMap::RunOnce, this);
+  timer_ = AdapterManager::CreateTimer(
+      ros::Duration(1.0 / FLAGS_relative_map_loop_rate), &RelativeMap::OnTimer,
+      this);
+
+  AdapterManager::AddNavigationCallback(&RelativeMap::OnReceiveNavigationInfo,
+                                        this);
 
   if (AdapterManager::GetPerceptionObstacles()->Empty()) {
     AWARN << "Perception is not ready.";
@@ -93,15 +126,36 @@ apollo::common::Status RelativeMap::Start() {
   return Status::OK();
 }
 
-void RelativeMap::RunOnce(const PerceptionObstacles& perception_obstacles) {
-  MapMsg map_msg;
+void RelativeMap::OnTimer(const ros::TimerEvent&) {
+  RunOnce();
+}
 
-  CreateMapFromPerception(perception_obstacles, &map_msg);
+void RelativeMap::RunOnce() {
+  AdapterManager::Observe();
+
+  MapMsg map_msg;
+  CreateMapFromNavigationLane(&map_msg);
   Publish(&map_msg);
 }
 
-void RelativeMap::CreateMapFromPerception(
-    const PerceptionObstacles& perception_obstacles, MapMsg* map_msg) {
+
+void RelativeMap::OnReceiveNavigationInfo(
+    const NavigationInfo& navigation_info) {
+  navigation_lane_.UpdateNavigationInfo(navigation_info);
+}
+
+bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
+  CHECK_NOTNULL(map_msg);
+
+  if (AdapterManager::GetLocalization()->Empty()) {
+    LogErrorStatus(map_msg, "localization is not ready");
+    return false;
+  }
+  if (AdapterManager::GetChassis()->Empty()) {
+    LogErrorStatus(map_msg, "chassis is not ready");
+    return false;
+  }
+
   // update vehicle state from localization and chassis
   const auto& localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
@@ -109,12 +163,31 @@ void RelativeMap::CreateMapFromPerception(
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
   VehicleStateProvider::instance()->Update(localization, chassis);
+  map_msg->mutable_localization()->CopyFrom(localization);
 
   // update navigation_lane from perception_obstacles (lane marker)
-  navigation_lane_.Update(perception_obstacles);
+  if (!AdapterManager::GetPerceptionObstacles()->Empty()) {
+    navigation_lane_.UpdatePerception(
+        AdapterManager::GetPerceptionObstacles()->GetLatestObserved());
+  }
 
-  const auto& navigation_path = navigation_lane_.Path();
-  // TODO(all) create map proto from navigation_path
+  if (!navigation_lane_.GeneratePath()) {
+    LogErrorStatus(map_msg, "navigation lane fails to generate path");
+    return false;
+  }
+
+  if (navigation_lane_.Path().path().path_point_size() == 0) {
+    LogErrorStatus(map_msg, "navigation lane has no path points");
+    return false;
+  }
+
+  // create map proto from navigation_path
+  if (!navigation_lane_.CreateMap(config_.map_param(), map_msg)) {
+    LogErrorStatus(map_msg, "Failed to create map from navigation path");
+    AERROR << "Failed to create map from navigation path";
+    return false;
+  }
+  return true;
 }
 
 void RelativeMap::Stop() {

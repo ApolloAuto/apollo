@@ -41,6 +41,12 @@ bool SocketCanClientRaw::Init(const CANCardParameter &parameter) {
   return true;
 }
 
+SocketCanClientRaw::~SocketCanClientRaw() {
+  if (dev_handler_) {
+    Stop();
+  }
+}
+
 ErrorCode SocketCanClientRaw::Start() {
   if (is_started_) {
     return ErrorCode::OK;

@@ -48,4 +48,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "mpc_controller_test",
+    size = "small",
+    srcs = [
+        "mpc_controller_test.cc",
+    ],
+    data = ["//modules/control:control_testdata"],
+    deps = [
+        ":control_test_base",
+        "@gtest//:gtest",
+    ],
+)
+
 cpplint()

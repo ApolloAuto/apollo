@@ -59,20 +59,16 @@ class LRUCache {
   /**@brief Change cache's max capacity. New capacity must be larger than size
    * in use. */
   bool ChangeCapacity(int capacity) {
-    if (list_.size() > capacity) {
+    if (static_cast<int>(list_.size()) > capacity) {
       return false;
     }
     capacity_ = capacity;
     return true;
   }
   /**@brief return cache's in use. */
-  int Size() {
-    return list_.size();
-  }
+  int Size() { return list_.size(); }
   /**@brief return cache's max capacity. */
-  int Capacity() {
-    return capacity_;
-  }
+  int Capacity() { return capacity_; }
 
  protected:
   /**@brief do something before remove a element from cache.
@@ -123,7 +119,7 @@ Element *LRUCache<Key, Element>::Put(const Key &key, Element *value) {
     return node_remove;
   }
   // reached capacity, remove value in list, remove key in map
-  if (map_.size() >= capacity_) {
+  if (static_cast<int>(map_.size()) >= capacity_) {
     node_remove = ClearOne();
     // ListReverseIterator ritr = list_.rbegin();
     // while(ritr != list_.rend()) {
@@ -136,7 +132,7 @@ Element *LRUCache<Key, Element>::Put(const Key &key, Element *value) {
     //     ++ritr;
     // }
   }
-  if (map_.size() >= capacity_) {
+  if (static_cast<int>(map_.size()) >= capacity_) {
     std::cout << "LRUCache Warning: the cache size is temporarily increased!"
               << std::endl;
   }
@@ -223,9 +219,7 @@ class MapNodeCacheL2 : public LRUCache<Key, MapNode> {
    * Return true if the element can be removed. Return false if the element
    * can't be removed. Then the cache will try to find another element to
    * remove. */
-  virtual bool Destroy(MapNode **value) {
-    return !((*value)->GetIsReserved());
-  }
+  virtual bool Destroy(MapNode **value) { return !((*value)->GetIsReserved()); }
 };
 
 }  // namespace msf

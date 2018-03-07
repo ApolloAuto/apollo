@@ -3,6 +3,7 @@ import PARAMETERS from "store/config/parameters.yml";
 import OfflinePlaybackWebSocketEndpoint from "store/websocket/websocket_offline";
 import RealtimeWebSocketEndpoint from "store/websocket/websocket_realtime";
 import MapDataWebSocketEndpoint from "store/websocket/websocket_map";
+import PointCloudWebSocketEndpoint from "store/websocket/websocket_point_cloud";
 
 // Returns the websocket server address based on the web server address.
 // Follows the convention that the websocket is served on the same host/port
@@ -17,6 +18,9 @@ function deduceWebsocketServerAddr(type) {
   switch (type) {
     case "map":
       path = "map";
+      break;
+    case "point_cloud":
+      path = "pointcloud";
       break;
     case "sim_world":
       path = OFFLINE_PLAYBACK ? "RosPlayBack" : "websocket";
@@ -36,3 +40,6 @@ export default WS;
 
 const mapServerAddr = deduceWebsocketServerAddr("map");
 export const MAP_WS = new MapDataWebSocketEndpoint(mapServerAddr);
+
+const pointCloudServerAddr = deduceWebsocketServerAddr("point_cloud");
+export const POINT_CLOUD_WS = new PointCloudWebSocketEndpoint(pointCloudServerAddr);

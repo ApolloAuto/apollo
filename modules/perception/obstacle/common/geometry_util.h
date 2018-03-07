@@ -33,7 +33,7 @@ namespace perception {
 template <typename PointT>
 void TransformPointCloud(const Eigen::Matrix4d& trans_mat,
                          pcl::PointCloud<PointT>* cloud_in_out) {
-  for (int i = 0; i < cloud_in_out->size(); ++i) {
+  for (std::size_t i = 0; i < cloud_in_out->size(); ++i) {
     PointT& p = cloud_in_out->at(i);
     Eigen::Vector4d v(p.x, p.y, p.z, 1);
     v = trans_mat * v;
@@ -68,7 +68,7 @@ void TransformPointCloud(const pcl::PointCloud<PointType>& cloud_in,
   if (cloud_out->points.size() < cloud_in.points.size()) {
     cloud_out->points.resize(cloud_in.points.size());
   }
-  for (int i = 0; i < cloud_in.size(); ++i) {
+  for (std::size_t i = 0; i < cloud_in.size(); ++i) {
     const PointType& p = cloud_in.at(i);
     Eigen::Vector4d v(p.x, p.y, p.z, 1);
     v = trans_mat * v;
@@ -135,7 +135,7 @@ void ComputeBboxSizeCenter(typename pcl::PointCloud<PointT>::Ptr cloud,
   Eigen::Vector3d max_pt(-DBL_MAX, -DBL_MAX, -DBL_MAX);
 
   Eigen::Vector3d loc_pt;
-  for (int i = 0; i < cloud->size(); i++) {
+  for (std::size_t i = 0; i < cloud->size(); i++) {
     Eigen::Vector3d pt = Eigen::Vector3d(cloud->points[i].x, cloud->points[i].y,
                                          cloud->points[i].z);
     loc_pt[0] = pt.dot(dir);

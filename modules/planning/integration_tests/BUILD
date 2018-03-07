@@ -75,4 +75,19 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "navigation_mode_test",
+    size = "small",
+    srcs = [
+        "navigation_mode_test.cc",
+    ],
+    data = [
+        "//modules/common/configs:config_gflags",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":planning_test_base",
+    ],
+)
+
 cpplint()

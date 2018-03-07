@@ -30,6 +30,8 @@ DEFINE_string(routing_map_filename, "routing_map.bin|routing_map.txt",
               "Routing map files in the map_dir, search in order.");
 DEFINE_string(end_way_point_filename, "default_end_way_point.txt",
               "End way point of the map, will be sent in RoutingRequest.");
+DEFINE_string(speed_control_filename, "speed_control.pb.txt",
+              "The speed control region in a map.");
 
 DEFINE_string(vehicle_config_path, "modules/common/data/mkz_config.pb.txt",
               "the file path of vehicle config file");

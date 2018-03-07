@@ -86,7 +86,8 @@ bool KVDB::Has(const std::string &key) {
 
   std::string value;
   const auto status = GetDB()->Get(options, key, &value);
-  return !status.IsNotFound();
+  CHECK(status.ok() || status.IsNotFound()) << status.ToString();
+  return status.ok();
 }
 
 std::string KVDB::Get(const std::string &key,
@@ -95,6 +96,7 @@ std::string KVDB::Get(const std::string &key,
 
   std::string value;
   const auto status = GetDB()->Get(options, key, &value);
+  CHECK(status.ok() || status.IsNotFound()) << status.ToString();
   return status.ok() ? value : default_value;
 }
 

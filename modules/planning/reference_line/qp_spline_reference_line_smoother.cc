@@ -42,9 +42,7 @@ QpSplineReferenceLineSmoother::QpSplineReferenceLineSmoother(
   spline_solver_.reset(new Spline2dSolver(t_knots_, config.spline_order()));
 }
 
-void QpSplineReferenceLineSmoother::Clear() {
-  t_knots_.clear();
-}
+void QpSplineReferenceLineSmoother::Clear() { t_knots_.clear(); }
 
 bool QpSplineReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
@@ -200,9 +198,7 @@ bool QpSplineReferenceLineSmoother::AddKernel() {
   return true;
 }
 
-bool QpSplineReferenceLineSmoother::Solve() {
-  return spline_solver_->Solve();
-}
+bool QpSplineReferenceLineSmoother::Solve() { return spline_solver_->Solve(); }
 
 void QpSplineReferenceLineSmoother::SetAnchorPoints(
     const std::vector<AnchorPoint>& anchor_points) {

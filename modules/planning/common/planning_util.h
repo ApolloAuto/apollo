@@ -24,7 +24,7 @@
 #include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_status.pb.h"
 
 /**
  * @namespace apollo::common::util
@@ -40,16 +40,14 @@ common::SLPoint interpolate(const common::SLPoint &start,
 common::PathPoint interpolate(const common::PathPoint &p0,
                               const common::PathPoint &p1, const double s);
 
-common::PathPoint InterpolateUsingLinearApproximation(
-    const common::PathPoint &p0, const common::PathPoint &p1, const double s);
-
 common::TrajectoryPoint interpolate(const common::TrajectoryPoint &tp0,
                                     const common::TrajectoryPoint &tp1,
                                     const double t);
-
-common::TrajectoryPoint InterpolateUsingLinearApproximation(
-    const common::TrajectoryPoint &tp0, const common::TrajectoryPoint &tp1,
-    const double t);
+/**
+ * This function returns the run-time state of the planning module.
+ * @Warnning: this function is not thread safe.
+ */
+PlanningStatus *GetPlanningStatus();
 
 void DumpPlanningContext();
 

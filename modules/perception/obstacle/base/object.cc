@@ -30,7 +30,7 @@ using apollo::common::util::StrCat;
 
 Object::Object() {
   cloud.reset(new pcl_util::PointCloud);
-  type_probs.resize(MAX_OBJECT_TYPE, 0);
+  type_probs.resize(static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0);
   position_uncertainty << 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01;
   velocity_uncertainty << 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01;
 }
@@ -41,6 +41,11 @@ void Object::clone(const Object& rhs) {
   radar_supplement = nullptr;
   if (rhs.radar_supplement != nullptr) {
     radar_supplement.reset(new RadarSupplement(*rhs.radar_supplement));
+  }
+  camera_supplement = nullptr;
+  if (rhs.camera_supplement != nullptr) {
+    camera_supplement.reset(new CameraSupplement());
+    camera_supplement->clone(*(rhs.camera_supplement));
   }
 }
 
@@ -72,7 +77,7 @@ std::string Object::ToString() const {
                        polygon.size(),
                        ", "
                        "type: ",
-                       type,
+                       static_cast<int>(type),
                        ", "
                        "is_background: ",
                        is_background, "]"));

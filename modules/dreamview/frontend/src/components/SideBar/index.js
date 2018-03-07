@@ -8,11 +8,12 @@ import WS from "store/websocket";
 @inject("store") @observer
 export default class SideBar extends React.Component {
     render() {
-        const { options, enableHMIButtonsOnly } = this.props.store;
+        const { options, enableHMIButtonsOnly, hmi } = this.props.store;
 
         return (
             <div className="side-bar">
                 <ButtonPanel enableHMIButtonsOnly={enableHMIButtonsOnly}
+                             inNavigationMode={hmi.inNavigationMode}
                              onTasks={() => {
                                 this.props.store.handleOptionToggle('showTasks');
                              }}

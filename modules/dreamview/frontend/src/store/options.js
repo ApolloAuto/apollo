@@ -45,8 +45,16 @@ export default class Options {
         PARAMETERS.options.defaults.showObstaclesHeading;
     @observable showObstaclesId =
         PARAMETERS.options.defaults.showObstaclesId;
+    @observable showPointCloud = PARAMETERS.options.defaults.showPointCloud;
     @observable showPositionGps = PARAMETERS.options.defaults.showPositionGps;
     @observable showPositionLocalization = PARAMETERS.options.defaults.showPositionLocalization;
+    @observable showMapCrosswalk = PARAMETERS.options.defaults.showMapCrosswalk;
+    @observable showMapClearArea = PARAMETERS.options.defaults.showMapClearArea;
+    @observable showMapJunction = PARAMETERS.options.defaults.showMapJunction;
+    @observable showMapLane = PARAMETERS.options.defaults.showMapLane;
+    @observable showMapRoad = PARAMETERS.options.defaults.showMapRoad;
+    @observable showMapSignal = PARAMETERS.options.defaults.showMapSignal;
+    @observable showMapStopSign = PARAMETERS.options.defaults.showMapStopSign;
 
     // Others
     @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;

@@ -53,8 +53,9 @@ class ThirdPartyPerception : public apollo::common::ApolloApp {
  private:
   // Upon receiving mobileye data
   void OnMobileye(const apollo::drivers::Mobileye& message);
-  // Upon receiving radar data
+  // Upon receiving esr radar data
   void OnDelphiESR(const apollo::drivers::DelphiESR& message);
+  // Upon receiving conti radar data
   void OnContiRadar(const apollo::drivers::ContiRadar& message);
   // Upon receiving localization data
   void OnLocalization(

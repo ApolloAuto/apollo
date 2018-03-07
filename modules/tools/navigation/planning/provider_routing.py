@@ -70,6 +70,18 @@ class RoutingProvider:
         self.SMOOTH_BACKWARD_DIST = 150
         self.human = False
 
+    def update_navigation(self, navigation_info_pb):
+        self.routing_str = navigation_info_pb
+        self.human = True
+        routing_points = []
+        for navi_path in navigation_info_pb.navigation_path:
+            for path_point in navi_path.path.path_point:
+                routing_points.append([path_point.x, path_point.y])
+        self.routing_lock.acquire()
+        self.routing_points = routing_points
+        self.routing_lock.release()
+        self.routing = LineString(self.routing_points)
+
     def update(self, routing_str):
         self.routing_str = routing_str
         routing_json = json.loads(routing_str.data)

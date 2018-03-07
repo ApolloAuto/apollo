@@ -39,11 +39,10 @@ Creeper::Creeper() {}
 
 bool Creeper::Run(Frame* frame, ReferenceLineInfo* reference_line_info) {
   if (!in_use_) {
-    AINFO << "Creeper is not in use, skipped.";
+    ADEBUG << "Creeper is not in use, skipped.";
     return true;
   }
 
-  AINFO << "Creeper is running.";
   // find next overlap
   auto* next_overlap =
       reference_line_info->reference_line().map_path().NextLaneOverlap(
@@ -55,15 +54,15 @@ bool Creeper::Run(Frame* frame, ReferenceLineInfo* reference_line_info) {
 
   constexpr double kMaxCreepTargetDistance = 5.0;
   return BuildStopDecision(*const_cast<PathOverlap*>(next_overlap),
-                         FLAGS_creep_stop_distance, kMaxCreepTargetDistance,
-                         frame, reference_line_info);
+                           FLAGS_creep_stop_distance, kMaxCreepTargetDistance,
+                           frame, reference_line_info);
 }
 
 bool Creeper::BuildStopDecision(const PathOverlap& overlap,
-                              const double stop_buffer,
-                              const double max_creeping_target_distance,
-                              Frame* frame,
-                              ReferenceLineInfo* reference_line_info) {
+                                const double stop_buffer,
+                                const double max_creeping_target_distance,
+                                Frame* frame,
+                                ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
 
   // check

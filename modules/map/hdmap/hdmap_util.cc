@@ -45,6 +45,18 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
 
 }  // namespace
 
+const SpeedControls* GetSpeedControls() {
+  static std::unique_ptr<SpeedControls> speed_control_;
+  if (speed_control_ == nullptr) {
+    speed_control_.reset(new SpeedControls());
+    if (!common::util::GetProtoFromFile(SpeedControlFile(),
+                                        speed_control_.get())) {
+      speed_control_->Clear();
+    }
+  }
+  return speed_control_.get();
+}  // namespace hdmap
+
 std::string BaseMapFile() {
   if (FLAGS_use_navigation_mode) {
     AWARN << "base_map file is not used when FLAGS_use_navigation_mode is true";

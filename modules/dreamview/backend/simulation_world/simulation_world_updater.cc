@@ -58,6 +58,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         response["enabled"] = sim_control_->IsEnabled();
         websocket_->SendData(conn, response.dump());
       });
+
   map_ws_->RegisterMessageHandler(
       "RetrieveMapData",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -74,6 +75,29 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           } else {
             AERROR << "Failed to parse MapElementIds from json";
           }
+        }
+      });
+
+  map_ws_->RegisterMessageHandler(
+      "RetrieveRelativeMapData",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        std::string retrieved_map_string;
+        sim_world_service_.GetRelativeMap().SerializeToString(
+            &retrieved_map_string);
+        map_ws_->SendBinaryData(conn, retrieved_map_string, true);
+      });
+
+  websocket_->RegisterMessageHandler(
+      "Binary",
+      [this](const std::string &data, WebSocketHandler::Connection *conn) {
+        apollo::relative_map::NavigationInfo navigation_info;
+        if (navigation_info.ParseFromString(data)) {
+          AdapterManager::FillNavigationHeader(FLAGS_dreamview_module_name,
+                                               &navigation_info);
+          AdapterManager::PublishNavigation(navigation_info);
+        } else {
+          AERROR << "Failed to parse navigation info from string. String size: "
+                 << data.size();
         }
       });
 
@@ -207,9 +231,15 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       "Dump", [this](const Json &json, WebSocketHandler::Connection *conn) {
         DumpMessage(AdapterManager::GetChassis(), "Chassis");
         DumpMessage(AdapterManager::GetPrediction(), "Prediction");
+        DumpMessage(AdapterManager::GetRoutingRequest(), "RoutingRequest");
         DumpMessage(AdapterManager::GetRoutingResponse(), "RoutingResponse");
         DumpMessage(AdapterManager::GetLocalization(), "Localization");
         DumpMessage(AdapterManager::GetPlanning(), "Planning");
+        DumpMessage(AdapterManager::GetControlCommand(), "Control");
+        DumpMessage(AdapterManager::GetPerceptionObstacles(), "Perception");
+        DumpMessage(AdapterManager::GetTrafficLightDetection(), "TrafficLight");
+        DumpMessage(AdapterManager::GetRelativeMap(), "RelativeMap");
+        DumpMessage(AdapterManager::GetNavigation(), "Navigation");
       });
 
   websocket_->RegisterMessageHandler(

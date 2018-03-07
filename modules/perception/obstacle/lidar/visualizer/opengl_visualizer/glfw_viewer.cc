@@ -204,21 +204,27 @@ bool GLFWViewer::OpenglInit() {
     for (int i = 0; i < kCloud_VAO_Num_; i++) {
       glBindVertexArray(cloud_VAO_buf_ids_[i]);
 
-      glGenBuffers(NUM_VBO_TYPE, cloud_VBO_buf_ids_[i]);
-      glBindBuffer(GL_ARRAY_BUFFER, cloud_VBO_buf_ids_[i][VBO_VERTICES]);
+      glGenBuffers(static_cast<int>(VBO_Type::NUM_VBO_TYPE),
+                   cloud_VBO_buf_ids_[i]);
+      glBindBuffer(
+          GL_ARRAY_BUFFER,
+          cloud_VBO_buf_ids_[i][static_cast<int>(VBO_Type::VBO_VERTICES)]);
       glBufferData(GL_ARRAY_BUFFER, sizeof(cloud_verts_), cloud_verts_,
                    GL_STREAM_DRAW);
       glVertexPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
       glEnableClientState(GL_VERTEX_ARRAY);
 
-      glBindBuffer(GL_ARRAY_BUFFER, cloud_VBO_buf_ids_[i][VBO_COLORS]);
+      glBindBuffer(
+          GL_ARRAY_BUFFER,
+          cloud_VBO_buf_ids_[i][static_cast<int>(VBO_Type::VBO_COLORS)]);
       glBufferData(GL_ARRAY_BUFFER, sizeof(cloud_colors), cloud_colors,
                    GL_STREAM_DRAW);
       glColorPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
       glEnableClientState(GL_COLOR_ARRAY);
 
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                   cloud_VBO_buf_ids_[i][VBO_ELEMENTS]);
+      glBindBuffer(
+          GL_ELEMENT_ARRAY_BUFFER,
+          cloud_VBO_buf_ids_[i][static_cast<int>(VBO_Type::VBO_ELEMENTS)]);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cloud_indices),
                    cloud_indices, GL_STREAM_DRAW);
     }
@@ -249,21 +255,27 @@ bool GLFWViewer::OpenglInit() {
 
       glBindVertexArray(circle_VAO_buf_ids_[vao]);
 
-      glGenBuffers(NUM_VBO_TYPE, circle_VBO_buf_ids_[vao]);
-      glBindBuffer(GL_ARRAY_BUFFER, circle_VBO_buf_ids_[vao][VBO_VERTICES]);
+      glGenBuffers(static_cast<int>(VBO_Type::NUM_VBO_TYPE),
+                   circle_VBO_buf_ids_[vao]);
+      glBindBuffer(
+          GL_ARRAY_BUFFER,
+          circle_VBO_buf_ids_[vao][static_cast<int>(VBO_Type::VBO_VERTICES)]);
       glBufferData(GL_ARRAY_BUFFER, sizeof(circle_verts), circle_verts,
                    GL_STATIC_DRAW);
       glVertexPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
       glEnableClientState(GL_VERTEX_ARRAY);
 
-      glBindBuffer(GL_ARRAY_BUFFER, circle_VBO_buf_ids_[vao][VBO_COLORS]);
+      glBindBuffer(
+          GL_ARRAY_BUFFER,
+          circle_VBO_buf_ids_[vao][static_cast<int>(VBO_Type::VBO_COLORS)]);
       glBufferData(GL_ARRAY_BUFFER, sizeof(circle_colors), circle_colors,
                    GL_STATIC_DRAW);
       glColorPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
       glEnableClientState(GL_COLOR_ARRAY);
 
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                   circle_VBO_buf_ids_[vao][VBO_ELEMENTS]);
+      glBindBuffer(
+          GL_ELEMENT_ARRAY_BUFFER,
+          circle_VBO_buf_ids_[vao][static_cast<int>(VBO_Type::VBO_ELEMENTS)]);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(circle_indices),
                    circle_indices, GL_STATIC_DRAW);
     }
@@ -346,7 +358,9 @@ void GLFWViewer::DrawCloud() {
       }
 
       glBindVertexArray(cloud_VAO_buf_ids_[vao]);
-      glBindBuffer(GL_ARRAY_BUFFER, cloud_VBO_buf_ids_[vao][VBO_VERTICES]);
+      glBindBuffer(
+          GL_ARRAY_BUFFER,
+          cloud_VBO_buf_ids_[vao][static_cast<int>(VBO_Type::VBO_VERTICES)]);
       glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(cloud_verts_), cloud_verts_);
       glDrawElements(GL_POINTS, p_num, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
       glBindVertexArray(0);
@@ -409,7 +423,8 @@ void GLFWViewer::DrawObstacle(const ObjectPtr obj, bool show_cloud,
                               bool show_polygon, bool show_velocity,
                               bool show_direction) {
   float type_color[3] = {0, 0, 0};
-  GetClassColor(obj->type, type_color);
+  // TODO(All): modify GetClassColor params
+  GetClassColor(static_cast<int>(obj->type), type_color);
   if (show_polygon) {
     double h = obj->height;
     glColor3f(type_color[0], type_color[1], type_color[2]);

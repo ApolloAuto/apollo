@@ -8,3 +8,6 @@ third_derivative_weight: 1000.0
 num_of_total_points: 500
 regularization_weight: 1.0e-5
 curb_shift: 0.2
+driving_side: RIGHT
+wide_lane_threshold_factor: 2.0
+wide_lane_shift_remain_factor: 0.5

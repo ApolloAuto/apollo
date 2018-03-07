@@ -45,11 +45,6 @@ DEFINE_string(map_data_path, "/apollo/modules/map/data", "Path to map data.");
 DEFINE_string(vehicle_data_path, "/apollo/modules/calibration/data",
               "Path to vehicle data.");
 
-DEFINE_string(ota_service_url, "http://180.76.145.202:5000/query",
-              "OTA service url. [Attention! It's still in experiment.]");
-DEFINE_string(ota_vehicle_info_file, "modules/tools/ota/vehicle_info.pb.txt",
-              "Vehicle info to request OTA.");
-
 DEFINE_double(system_status_lifetime_seconds, 30,
               "Lifetime of a valid SystemStatus message.");
 
@@ -120,7 +115,7 @@ bool GuaranteeDrivingMode(const Chassis::DrivingMode target_mode,
 
   constexpr int kMaxTries = 3;
   constexpr auto kTryInterval = std::chrono::milliseconds(500);
-  auto* chassis = CHECK_NOTNULL(AdapterManager::GetChassis());
+  auto *chassis = CHECK_NOTNULL(AdapterManager::GetChassis());
   for (int i = 0; i < kMaxTries; ++i) {
     // Send driving action periodically until entering target driving mode.
     AdapterManager::FillPadHeader("HMI", &pad);
@@ -298,14 +293,14 @@ void HMI::RegisterMessageHandlers() {
         // json should contain event_time_ms and event_msg.
         uint64_t event_time_ms;
         std::string event_msg;
-        if (JsonUtil::GetNumberFromJson(json, "event_time_ms", &event_time_ms)
-            && JsonUtil::GetStringFromJson(json, "event_msg", &event_msg)) {
+        if (JsonUtil::GetNumberFromJson(json, "event_time_ms",
+                                        &event_time_ms) &&
+            JsonUtil::GetStringFromJson(json, "event_msg", &event_msg)) {
           SubmitDriveEvent(event_time_ms, event_msg);
         } else {
           AERROR << "Truncated SubmitDriveEvent request.";
         }
       });
-
 
   // Received new system status, broadcast to clients.
   AdapterManager::AddSystemStatusCallback(
@@ -340,8 +335,10 @@ void HMI::SendVehicleParam(WebSocketHandler::Connection *conn) {
     return;
   }
 
-  const auto json_str = JsonUtil::ProtoToTypedJson(
-      "VehicleParam", VehicleConfigHelper::GetConfig().vehicle_param()).dump();
+  const auto json_str =
+      JsonUtil::ProtoToTypedJson(
+          "VehicleParam", VehicleConfigHelper::GetConfig().vehicle_param())
+          .dump();
   if (conn != nullptr) {
     websocket_->SendData(conn, json_str);
   } else {
@@ -412,8 +409,8 @@ void HMI::ChangeMapTo(const std::string &map_name) {
   CHECK(fout) << "Fail to open " << FLAGS_global_flagfile;
   fout << "\n--map_dir=" << *map_dir << std::endl;
   // Also reload simulation map.
-  CHECK(map_service_->ReloadMap(true)) << "Failed to load map from "
-                                       << *map_dir;
+  CHECK(map_service_->ReloadMap(true))
+      << "Failed to load map from " << *map_dir;
   RunModeCommand("stop");
   BroadcastHMIStatus();
 }
@@ -432,8 +429,6 @@ void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
 
   CHECK(VehicleManager::instance()->UseVehicle(*vehicle));
   RunModeCommand("stop");
-  // Check available updates for current vehicle.
-  // CheckOTAUpdates();
   BroadcastHMIStatus();
   // Broadcast new VehicleParam.
   SendVehicleParam();
@@ -453,29 +448,6 @@ void HMI::ChangeModeTo(const std::string &mode_name) {
 
   RunModeCommand(previous_mode, "stop");
   BroadcastHMIStatus();
-}
-
-void HMI::CheckOTAUpdates() {
-  VehicleInfo vehicle_info;
-  if (!GetProtoFromASCIIFile(FLAGS_ota_vehicle_info_file, &vehicle_info)) {
-    return;
-  }
-
-  Json ota_request;
-  ota_request["car_type"] = apollo::common::util::StrCat(
-      VehicleInfo::Brand_Name(vehicle_info.brand()),
-      ".", VehicleInfo::Model_Name(vehicle_info.model()));
-  ota_request["vin"] = vehicle_info.license().vin();
-  ota_request["tag"] = apollo::data::InfoCollector::GetDockerImage();
-
-  Json ota_response;
-  const auto status = apollo::common::util::HttpClient::Post(
-      FLAGS_ota_service_url, ota_request, &ota_response);
-  if (status.ok()) {
-    CHECK(JsonUtil::GetStringFromJson(ota_response, "tag",
-                                      status_.mutable_ota_update()));
-    AINFO << "Found available OTA update: " << status_.ota_update();
-  }
 }
 
 void HMI::SubmitDriveEvent(const uint64_t event_time_ms,

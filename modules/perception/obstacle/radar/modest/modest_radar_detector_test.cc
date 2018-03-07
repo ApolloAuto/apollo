@@ -40,7 +40,7 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   radar_obs->set_lateral_vel(4.0);
   radar_obs->set_oritation_angle(0);
   radar_obs->set_obstacle_id(1);
-  radar_obs->set_obstacle_class(CONTI_CAR);
+  radar_obs->set_obstacle_class(static_cast<int>(ContiObjectType::CONTI_CAR));
   radar_obs->set_longitude_dist_rms(0.1);
   radar_obs->set_lateral_dist_rms(0.1);
   radar_obs->set_longitude_vel_rms(0.1);
@@ -48,7 +48,7 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   radar_obs->set_length(1.0);
   radar_obs->set_width(1.0);
   radar_obs->set_probexist(1.0);
-  radar_obs->set_meas_state(CONTI_NEW);
+  radar_obs->set_meas_state(static_cast<int>(ContiMeasState::CONTI_NEW));
   RadarDetectorOptions options;
   Eigen::Matrix4d radar2world_pose;
   radar2world_pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
@@ -76,7 +76,7 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   EXPECT_TRUE(fabs(objects[0]->center(1) - 0.0) < 1e-5);
   EXPECT_TRUE(fabs(objects[0]->velocity(0) - 3.3) < 1e-5);
   EXPECT_TRUE(fabs(objects[0]->velocity(1) - 4.4) < 1e-5);
-  EXPECT_TRUE(objects[0]->type == UNKNOWN);
+  EXPECT_TRUE(objects[0]->type == ObjectType::UNKNOWN);
   objects.resize(0);
   header->set_timestamp_sec(123456789.074);
   Eigen::Vector2d location(3.0 * time_diff, 4.0 * time_diff);
@@ -88,7 +88,7 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   EXPECT_TRUE(fabs(objects[0]->center(1) - location(1)) < 1e-2);
   EXPECT_TRUE(fabs(objects[0]->velocity(0) - 3.3) < 1e-2);
   EXPECT_TRUE(fabs(objects[0]->velocity(1) - 4.4) < 1e-2);
-  EXPECT_TRUE(objects[0]->type == UNKNOWN);
+  EXPECT_TRUE(objects[0]->type == ObjectType::UNKNOWN);
   delete radar_detector;
 }
 

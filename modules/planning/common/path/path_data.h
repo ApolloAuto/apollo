@@ -61,7 +61,7 @@ class PathData {
 
   void Clear();
 
-  bool IsEmpty() const;
+  bool Empty() const;
 
   std::string DebugString() const;
 
