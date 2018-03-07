@@ -130,7 +130,11 @@ void TrafficDecider::BuildPlanningTarget(
       }
     }
   }
-  stop_point.set_s(min_s);
+  const auto& vehicle_config =
+      common::VehicleConfigHelper::instance()->GetConfig();
+  double front_edge_to_center =
+      vehicle_config.vehicle_param().front_edge_to_center();
+  stop_point.set_s(min_s - front_edge_to_center);
   reference_line_info->SetStopPoint(stop_point);
 }
 
