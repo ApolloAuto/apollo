@@ -39,6 +39,35 @@ class MapNavigator {
         return this.WS && this.mapAdapter && this.mapAdapter.isInitialized();
     }
 
+    reset() {
+        this.routingPaths.forEach((path) => {
+            console.log(path);
+            this.mapAdapter.removePolyline(path);
+        });
+        this.routingPaths = [];
+
+        if (this.plannedPath) {
+            this.mapAdapter.removePolyline(this.plannedPath);
+            this.plannedPath = null;
+        }
+
+        if (this.rightLaneMarker) {
+            this.mapAdapter.removePolyline(this.rightLaneMarker);
+            this.rightLaneMarker = null;
+        }
+
+        if (this.leftLaneMarker) {
+            this.mapAdapter.removePolyline(this.leftLaneMarker);
+            this.leftLaneMarker = null;
+        }
+
+        this.WS = null;
+        this.mapAdapter = null;
+        this.vehicleMarker = null;
+        this.destinationMarker = null;
+        this.centerVehicle = true;
+    }
+
     createControls() {
         this.mapAdapter.createControl({
             text: "Center Vehicle is ON",
@@ -259,14 +288,14 @@ class MapNavigator {
             `?origin=${startLat},${startLng}` +
             `&destination=${endLat},${endLng}` +
             "&heading=0";
-        fetch(url, {
+        fetch(encodeURI(url), {
             method: "GET",
             mode: "cors",
         }).then(response => {
             return response.arrayBuffer();
         }).then(response => {
             if (!response.byteLength) {
-                console.warn("No navigation info received.");
+                alert("No navigation info received.");
                 return;
             }
 

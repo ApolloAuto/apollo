@@ -38,7 +38,7 @@ class SceneView extends React.Component {
                                  monitor={monitor} />}
                 {options.showVideo && <SensorCamera />}
                 {OFFLINE_PLAYBACK && <PlaybackControls />}
-                {hmi.showNavigationMap &&
+                {hmi.inNavigationMode &&
                     <Navigation viewHeight={sceneDimension.height}
                                 viewWidth={sceneDimension.width} />}
             </div>
