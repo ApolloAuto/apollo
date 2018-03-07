@@ -132,8 +132,8 @@ class Renderer {
         this.animate();
     }
 
-    maybeInitializeOffest(x, y) {
-        if (!this.coordinates.isInitialized()) {
+    maybeInitializeOffest(x, y, forced_update = false) {
+        if (!this.coordinates.isInitialized() || forced_update) {
             this.coordinates.initialize(x, y);
         }
     }
@@ -361,7 +361,10 @@ class Renderer {
         this.ground.initialize(serverUrl, mapInfo);
     }
 
-    updateMap(newData) {
+    updateMap(newData, removeOldMap = false) {
+        if (removeOldMap) {
+            this.map.removeAllElements(this.scene);
+        }
         this.map.appendMapData(newData, this.coordinates, this.scene);
     }
 

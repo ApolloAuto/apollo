@@ -13,7 +13,7 @@ export default class SideBar extends React.Component {
         return (
             <div className="side-bar">
                 <ButtonPanel enableHMIButtonsOnly={enableHMIButtonsOnly}
-                             inNavigationMode={hmi.showNavigationMap}
+                             inNavigationMode={hmi.inNavigationMode}
                              onTasks={() => {
                                 this.props.store.handleOptionToggle('showTasks');
                              }}
