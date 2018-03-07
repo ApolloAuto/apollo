@@ -28,10 +28,6 @@ message SidePassStatus {
   optional apollo.planning.ObjectSidePass.Type pass_side = 4;
 }
 
-message WatchVehicles {
-  required string lane_id = 1;
-  repeated string vehicles = 2;
-}
 message StopSignStatus {
   enum Status {
     UNKNOWN = 0;
@@ -40,11 +36,15 @@ message StopSignStatus {
     CREEPING = 3;
     STOP_DONE = 4;
   }
-  required string stop_sign = 1;
+  message LaneWatchVehicles {
+    required string lane_id = 1;
+    repeated string watch_vehicles = 2;
+  }
+
+  required string stop_sign_id = 1;
   optional Status status = 2;
   optional double stop_start_time = 3;
-  repeated string associated_lanes = 4;
-  repeated WatchVehicles watch_vehicles = 5;
+  repeated LaneWatchVehicles lane_watch_vehicles = 4;
 }
 
 message PlanningStatus {
