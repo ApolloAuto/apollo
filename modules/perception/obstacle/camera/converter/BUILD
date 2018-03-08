@@ -7,14 +7,14 @@ cc_library(
     srcs = ["geometry_camera_converter.cc"],
     hdrs = ["geometry_camera_converter.h"],
     deps = [
-        "@yaml_cpp//:yaml",
+        "//modules/perception/lib/base",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/obstacle/camera/common",
+        "//modules/perception/obstacle/camera/interface",
         "@eigen//:eigen",
         "@opencv2//:core",
-        "//modules/perception/lib/base:base",
-        "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/obstacle/camera/common:common",
-        "//modules/perception/obstacle/camera/interface:interface"
-    ]
+        "@yaml_cpp//:yaml",
+    ],
 )
 
 cpplint()

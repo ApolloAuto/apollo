@@ -11,21 +11,21 @@ cc_library(
     ],
     hdrs = [
         "compression.h",
+        "extract_ground_plane.h",
         "rect2d.h",
         "system_utility.h",
-        "timer.h",
+        "threadpool.h",
         "time_conversion.h",
-        "extract_ground_plane.h",
+        "timer.h",
         "voxel_grid_covariance_hdmap.h",
-        "threadpool.h"
     ],
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",
     ],
     deps = [
-        "//modules/common:macro",
         "//modules/common:log",
+        "//modules/common:macro",
         "@eigen//:eigen",
         "@gtest//:gtest",
     ],
