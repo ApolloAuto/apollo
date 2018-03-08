@@ -37,11 +37,11 @@ class PlaneMotion {
   ~PlaneMotion(void);
 
  private:
-  MotionBufferPtr _mot_buffer;
-  int _buffer_size;
-  float _time_unit;
-  int _time_increment;     // the time increment units in motion input
-  float _time_difference;  // the time difference for each buffer input
+  MotionBufferPtr mot_buffer_;
+  int buffer_size_;
+  float time_unit_;
+  int time_increment_;     // the time increment units in motion input
+  float time_difference_;  // the time difference for each buffer input
   Eigen::Matrix3f _mat_motion_2d_image;
   // motion matrix of accumulation through high sampling CAN+IMU input sequence
   void generate_motion_matrix(
@@ -49,9 +49,9 @@ class PlaneMotion {
 
  public:
   void cleanbuffer() {
-    if (_mot_buffer != nullptr) {
-      _mot_buffer->clear();
-      _mot_buffer = nullptr;
+    if (mot_buffer_ != nullptr) {
+      mot_buffer_->clear();
+      mot_buffer_ = nullptr;
     }
 
     _mat_motion_2d_image = Eigen::Matrix3f::Identity();
@@ -59,12 +59,12 @@ class PlaneMotion {
 
   void set_buffer_size(int s) {
     cleanbuffer();
-    _buffer_size = s;
-    // _mot_buffer.reserve(_buffer_size);
-    if (_mot_buffer == nullptr) {
-      _mot_buffer = std::make_shared<MotionBuffer>(_buffer_size);
+    buffer_size_ = s;
+    // mot_buffer_.reserve(buffer_size_);
+    if (mot_buffer_ == nullptr) {
+      mot_buffer_ = std::make_shared<MotionBuffer>(buffer_size_);
     } else {
-      _mot_buffer->set_capacity(_buffer_size);
+      mot_buffer_->set_capacity(buffer_size_);
     }
   }
 
@@ -77,7 +77,7 @@ class PlaneMotion {
                       bool image_read);
 
   MotionBufferPtr get_buffer() {
-    return _mot_buffer;
+    return mot_buffer_;
   }
 };
 

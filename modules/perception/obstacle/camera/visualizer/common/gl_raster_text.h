@@ -46,11 +46,11 @@ class GLRasterText {
  private:
   void make_raster_font();
 
-  static GLubyte _s_space_bitmap[];
-  static GLubyte _s_letters_bitmaps[][13];
-  static GLubyte _s_numbers_bitmaps[][13];
-  static GLubyte _s_asccii_bitmaps[][13];
-  static GLuint _s_font_offset;
+  static GLubyte s_space_bitmap_[];
+  static GLubyte s_letters_bitmaps_[][13];
+  static GLubyte s_numbers_bitmaps_[][13];
+  static GLubyte s_asccii_bitmaps_[][13];
+  static GLuint s_font_offset_;
 };
 
 }  // namespace lowcostvisualizer
