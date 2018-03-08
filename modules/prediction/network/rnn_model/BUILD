@@ -11,11 +11,11 @@ cc_library(
         "rnn_model.h",
     ],
     deps = [
-        "//modules/prediction/proto:network_model_proto",
-        "//modules/prediction/network:net_model",
-        "//modules/prediction/network:net_layer",
         "//modules/common:log",
         "//modules/common:macro",
+        "//modules/prediction/network:net_layer",
+        "//modules/prediction/network:net_model",
+        "//modules/prediction/proto:network_model_proto",
         "@eigen//:eigen",
     ],
 )
@@ -30,7 +30,7 @@ cc_test(
         "//modules/prediction:prediction_data",
     ],
     deps = [
-        "//modules/prediction/network/rnn_model:rnn_model",
+        "//modules/prediction/network/rnn_model",
         "@gtest//:main",
     ],
 )
