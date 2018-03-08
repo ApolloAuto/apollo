@@ -14,23 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/common/file_system_util.h"
+#ifndef MODULES_PERCEPTION_COMMON_FILE_SYSTEM_UTIL_H_
+#define MODULES_PERCEPTION_COMMON_FILE_SYSTEM_UTIL_H_
 
-#include "gtest/gtest.h"
-#include "modules/common/log.h"
+#include <string>
+#include <vector>
 
 namespace apollo {
 namespace perception {
 
-TEST(FileSystemUtilTest, GetFileNamesInFolderById) {
-  std::string data_path = "modules/perception/data/hm_tracker_test/";
-  std::vector<std::string> seg_filenames;
-  GetFileNamesInFolderById(data_path, ".seg", &seg_filenames);
-  std::vector<std::string> pose_filenames;
-  GetFileNamesInFolderById(data_path, ".pose", &pose_filenames);
-  EXPECT_EQ(seg_filenames.size(), 8);
-  EXPECT_EQ(pose_filenames.size(), 8);
-}
+std::string GetFileName(const std::string& path);
+
+void GetFileNamesInFolderById(const std::string& folder, const std::string& ext,
+                              std::vector<std::string>* ret);
 
 }  // namespace perception
 }  // namespace apollo
+
+#endif  // MODULES_PERCEPTION_COMMON_FILE_SYSTEM_UTIL_H_
