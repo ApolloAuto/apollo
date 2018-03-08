@@ -66,9 +66,15 @@ class CameraProcessSubnode : public Subnode {
 
  private:
   bool InitInternal() override;
-  void AlgRgsInit();
+
+  void InitModules();
+
   bool InitFrameDependence();
-  bool InitAlgorithmPlugin();
+  bool init_shared_data();
+  bool init_calibration_input(
+      const std::map<std::string, std::string>& reserve_field_map);
+  bool init_subscriber(
+      const std::map<std::string, std::string>& reserve_field_map);
 
   void ImgCallback(const sensor_msgs::Image::ConstPtr& message);
 
@@ -78,19 +84,12 @@ class CameraProcessSubnode : public Subnode {
       const std::vector<VisualObjectPtr> &objects,
       onboard::SharedDataPtr<SensorObjects>* sensor_objects);
 
-  void publish_data_and_event(
-      double timestamp,
-      const onboard::SharedDataPtr<SensorObjects>& sensor_object,
+  void PublishDataAndEvent(
+      const float &timestamp,
+      const onboard::SharedDataPtr<SensorObjects>& sensor_objects,
       const onboard::SharedDataPtr<CameraItem>& camera_item);
 
-
-  void PublishDataAndEvent(double timestamp,
-                           const SharedDataPtr<SensorObjects>& data);
-
-  bool inited_ = false;
-  float timestamp_ = 0.0f;
   SeqId seq_num_ = 0;
-  common::ErrorCode error_code_ = common::OK;
   LidarObjectData* processing_data_ = nullptr;
   std::string device_id_;
   Eigen::Matrix4d camera_to_car_;
@@ -101,28 +100,11 @@ class CameraProcessSubnode : public Subnode {
   std::unique_ptr<BaseCameraTransformer> transformer_;
   std::unique_ptr<BaseCameraFilter> filter_;
 
-  bool init_shared_data();
-  bool init_calibration_input(
-      const std::map<std::string, std::string>& reserve_field_map);
-  bool init_subscriber(
-      const std::map<std::string, std::string>& reserve_field_map);
-
-
-
-
-  CameraObjectData* _camera_object_data = nullptr;  // release by framework
-  CameraSharedData* _camera_shared_data = nullptr;  // release by framework
+  CameraObjectData* _camera_object_data = nullptr;
+  CameraSharedData* _camera_shared_data = nullptr;
 
   adu::perception::config_manager::CameraUndistortionPtr _undistortion_handler;
-  Eigen::Matrix4d _camera_to_car_mat;
-  Eigen::Matrix<double, 3, 4> _camera_intrinsic;  // camera intrinsic
-
-
-  std::string _device_id;
-  double _msg_average_latency = 0.0;
-  int _msg_count_in_stat_window = 0;
-  uint64_t _total_msg_count = 0;
-
+  Eigen::Matrix<double, 3, 4> _camera_intrinsic;
   onboard::StreamInput<sensor_msgs::Image, MixDetectorSubnode> _stream_input;
 };
 

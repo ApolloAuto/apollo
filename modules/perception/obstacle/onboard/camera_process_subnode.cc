@@ -19,56 +19,40 @@
 namespace apollo {
 namespace perception {
 
-DEFINE_bool(use_center_buffer, false, "use center buffer");
-using base::FileUtil;
-using base::TimeUtil;
-using common::perception::ERROR_TF;
-using common::perception::ERROR_PROCESS;
-using config_manager::ConfigManager;
-using config_manager::CalibrationConfigManager;
-using config_manager::CameraCalibrationPtr;
-using Eigen::Matrix4d;
-using onboard::Event;
-using onboard::EventMeta;
-using onboard::IoStreamType;
-using onboard::SharedDataPtr;
-using onboard::Subnode;
-using onboard::SubnodeHelper;
-using onboard::TransformType;
-using std::endl;
-using std::map;
-using std::vector;
-using std::string;
-
 bool CameraProcessSubnode::InitInternal() {
 
-  if (!init_shared_data()) {
-    XLOG(ERROR) << "Failed to init shared data.";
-    return false;
-  }
-
-  AlgRgsInit();
-
   // parse reserve fileds
-  map<string, string> reserve_field_map;
+  map<std::string, std::string> reserve_field_map;
   if (!SubnodeHelper::parse_reserve_field(_reserve, &reserve_field_map)) {
     XLOG(ERROR) << "Failed to parse reserve filed: " << _reserve;
     return false;
   }
 
-  // init transform input
-  if (!init_calibration_input(reserve_field_map)) {
-    XLOG(ERROR) << "Failed to init transform input: " << _reserve;
-    return false;
-  }
+  init_shared_data();
+  init_calibration_input(reserve_field_map);
+  init_subscriber(reserve_field_map);
 
-  // init subscriber
-  if (!init_subscriber(reserve_field_map)) {
-    XLOG(ERROR) << "Failed to init subscriber, reserve: " << _reserve;
-    return false;
-  }
+  InitModules();
 
-  XLOG(INFO) << "Init CameraProcessSubnode sucessfully";
+  return true;
+}
+
+bool CameraProcessSubnode::InitModules() {
+  detector_.reset(BaseCameraDetectorRegisterer::get_instance_by_name("YoloCameraDetector"));
+  detector_->Init();
+
+  converter_.reset(BaseCameraConverterRegisterer::get_instance_by_name("GeometryCameraConverter"));
+  converter_->Init();
+
+  tracker_.reset(BaseCameraTrackerRegisterer::get_instance_by_name("CascadedCameraTracker"));
+  tracker_->Init();
+
+  transformer_.reset(BaseCameraTransformerRegisterer::get_instance_by_name("FlatCameraTransformer"));
+  transformer_->Init();
+  transformer_->SetExtrinsics(camera_to_car_);
+
+  filter_.reset(BaseCameraFilterRegisterer::get_instance_by_name("ObjectCameraFilter"));
+  filter_->Init();
   return true;
 }
 
@@ -95,30 +79,8 @@ bool CameraProcessSubnode::init_shared_data() {
   return true;
 }
 
-bool CameraProcessSubnode::AlgRgsInit() {
-  detector_.reset(BaseCameraDetectorRegisterer::get_instance_by_name("YoloCameraDetector"));
-  detector_->Init();
-
-  converter_.reset(BaseCameraConverterRegisterer::get_instance_by_name("GeometryCameraConverter"));
-  converter_->Init();
-
-  tracker_.reset(BaseCameraTrackerRegisterer::get_instance_by_name("CascadedCameraTracker"));
-  tracker_->Init();
-
-  transformer_.reset(BaseCameraTransformerRegisterer::get_instance_by_name("FlatCameraTransformer"));
-  transformer_->Init();
-  transformer_->SetExtrinsics(camera_to_car_);
-
-  filter_.reset(BaseCameraFilterRegisterer::get_instance_by_name("ObjectCameraFilter"));
-  filter_->Init();
-
-  lane_processor_.reset(BaseCameraLanePostProcessorRegisterer::get_instance_by_name("CCLanePostProcessor"));
-  lane_processor_->Init();
-  return true;
-}
-
 bool CameraProcessSubnode::init_calibration_input(
-    const map<string, string> &reserve_field_map) {
+    const map<std::string, std::string> &reserve_field_map) {
   CalibrationConfigManager *config_manager =
       base::Singleton<CalibrationConfigManager>::get();
   CameraCalibrationPtr calibrator = config_manager->get_camera_calibration();
@@ -136,7 +98,7 @@ bool CameraProcessSubnode::init_calibration_input(
 }
 
 bool CameraProcessSubnode::init_subscriber(
-    const map<string, string> &reserve_field_map) {
+    const map<std::string, std::string> &reserve_field_map) {
   auto citer = reserve_field_map.find("source_type");
   if (citer == reserve_field_map.end()) {
     XLOG(ERROR) << "Failed to find field source_type, reserve: " << _reserve;
@@ -149,7 +111,7 @@ bool CameraProcessSubnode::init_subscriber(
     XLOG(ERROR) << "Failed to find field source_name, reserve: " << _reserve;
     return false;
   }
-  const string &source_name = citer->second;
+  const std::string &source_name = citer->second;
 
   citer = reserve_field_map.find("device_id");
   if (citer == reserve_field_map.end()) {
@@ -167,8 +129,6 @@ bool CameraProcessSubnode::init_subscriber(
     return false;
   }
 
-  XLOG(INFO) << "Init subscriber successfully, source_type: " << source_type
-             << ", source_name: " << new_source_name;
   return true;
 }
 
@@ -189,18 +149,13 @@ void CameraProcessSubnode::ImgCallback(
   filter_->Filter(timestamp, &objects);
 
   std::shared_ptr<SensorObjects> out_objs(new SensorObjects);
-  out_objs->type = CAMERA;
-  out_objs->name = get_sensor_name(CAMERA);
   out_objs->timestamp = timestamp;
-  out_objs->seq_num = _seq_num;
-  out_objs->sensor2world_pose = camera_to_car_;
-  (out_objs->camera_frame_supplement).reset(new CameraFrameSupplement);
-  trans_visualobject_to_sensorobject(objects, &out_objs);
+  VisualObjToSensorObj(objects, &out_objs);
 
   onboard::SharedDataPtr<CameraItem> camera_item_ptr(new CameraItem);
   camera_item_ptr->image_src_mat = img.clone();
   mask.copyTo(out_objs->camera_frame_supplement->lane_map);
-  publish_data_and_event(timestamp, out_objs, camera_item_ptr);
+  PublishDataAndEvent(timestamp, out_objs, camera_item_ptr);
 }
 
 bool CameraProcessSubnode::MessageToMat(
@@ -217,6 +172,12 @@ bool CameraProcessSubnode::MessageToMat(
 void CameraProcessSubnode::VisualObjToSensorObj(
     const std::vector<VisualObjectPtr> &objects,
     onboard::SharedDataPtr<SensorObjects>* sensor_objects)
+  out_objs->type = CAMERA;
+  out_objs->name = get_sensor_name(CAMERA);
+  out_objs->seq_num = seq_num_;
+  out_objs->sensor2world_pose = camera_to_car_;
+  (out_objs->camera_frame_supplement).reset(new CameraFrameSupplement);
+
   for (size_t i = 0; i < objects.size(); ++i) {
     VisualObjectPtr vobj = objects[i];
     ObjectPtr obj = new Object();
@@ -235,16 +196,7 @@ void CameraProcessSubnode::VisualObjToSensorObj(
     obj->tracking_time = vobj->tracking_time;
     obj->latest_tracked_time = vobj->latest_tracked_time;
     obj->velocity = vobj->velocity;
-    obj->velocity_uncertainty = vobj->velocity_uncertainty;
-    obj->position_uncertainty = vobj->position_uncertainty;
     obj->anchor_point = obj->center;
-    XLOG(INFO) << "Target " << obj->track_id << " velocity "
-               << obj->velocity.transpose();
-    Eigen::Vector3d point;
-    point[2] = obj->center[2];
-    Eigen::Matrix2f rotate;
-    rotate << cos(obj->theta), -sin(obj->theta), sin(obj->theta),
-        cos(obj->theta);
     (obj->camera_supplement).reset(new CameraSupplement());
     obj->camera_supplement->upper_left << vobj->upper_left[0],
         vobj->upper_left[1];
@@ -259,27 +211,16 @@ void CameraProcessSubnode::VisualObjToSensorObj(
   }
 }
 
-void CameraProcessSubnode::publish_data_and_event(
+void CameraProcessSubnode::PublishDataAndEvent(
     double timestamp,
     const onboard::SharedDataPtr<SensorObjects> &sensor_objects,
     const onboard::SharedDataPtr<CameraItem> &camera_item) {
-  string key;
-  if (!SubnodeHelper::produce_shared_data_key(timestamp, _device_id, &key)) {
-    XLOG(ERROR) << "Failed to produce shared key. time: "
-                << GLOG_TIMESTAMP(timestamp) << ", device_id: " << _device_id;
-    return;
-  }
+  std::string key = "";
+  SubnodeHelper::produce_shared_data_key(timestamp, _device_id, &key));
 
-  if (!_camera_object_data->add(key, sensor_objects)) {
-    XLOG(WARN) << "Failed to add CameraObjectData. key: " << key
-               << " num_detected_objects: " << (sensor_objects->objects).size();
-    return;
-  }
-  if (!_camera_shared_data->add(key, camera_item)) {
-    XLOG(WARN) << "Failed to add CameraSharedData. key: " << key;
-    return;
-  }
-  // pub events
+  _camera_object_data->add(key, sensor_objects));
+  _camera_shared_data->add(key, camera_item));
+
   for (size_t idx = 0; idx < _pub_meta_events.size(); ++idx) {
     const EventMeta &event_meta = _pub_meta_events[idx];
     Event event;
@@ -288,7 +229,6 @@ void CameraProcessSubnode::publish_data_and_event(
     event.reserve = _device_id;
     _event_manager->publish(event);
   }
-  XLOG(INFO) << "publish data and event success.";
 }
 
 }  // namespace perception
