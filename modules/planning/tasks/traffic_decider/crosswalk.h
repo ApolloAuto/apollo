@@ -31,7 +31,7 @@ namespace planning {
 
 class Crosswalk : public TrafficRule {
  public:
-  explicit Crosswalk(const RuleConfig& config);
+  explicit Crosswalk(const TrafficRuleConfig& config);
   virtual ~Crosswalk() = default;
 
   bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);

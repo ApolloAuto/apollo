@@ -31,7 +31,7 @@ namespace planning {
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 
-ReferenceLineEnd::ReferenceLineEnd(const RuleConfig& config)
+ReferenceLineEnd::ReferenceLineEnd(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
 bool ReferenceLineEnd::ApplyRule(Frame* frame,
@@ -88,7 +88,7 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
 
   auto* path_decision = reference_line_info->path_decision();
   path_decision->AddLongitudinalDecision(
-      RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 
   return true;
 }
