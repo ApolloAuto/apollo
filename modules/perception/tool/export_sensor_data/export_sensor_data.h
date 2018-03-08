@@ -64,7 +64,7 @@ class ExportSensorData {
   typedef std::pair<double, apollo::localization::LocalizationEstimate>
       LocalizationPair;
   boost::circular_buffer<LocalizationPair> localization_buffer_;
-  ContiRadarIDExpansion _conti_id_expansion;
+  ContiRadarIDExpansion conti_id_expansion_;
   Mutex mutex_;
   Eigen::Matrix4d radar2velodyne_extrinsic_;
 };

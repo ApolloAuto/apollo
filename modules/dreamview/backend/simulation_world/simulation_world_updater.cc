@@ -240,6 +240,8 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         DumpMessage(AdapterManager::GetTrafficLightDetection(), "TrafficLight");
         DumpMessage(AdapterManager::GetRelativeMap(), "RelativeMap");
         DumpMessage(AdapterManager::GetNavigation(), "Navigation");
+        DumpMessage(AdapterManager::GetContiRadar(), "ContiRadar");
+        DumpMessage(AdapterManager::GetMobileye(), "Mobileye");
       });
 
   websocket_->RegisterMessageHandler(

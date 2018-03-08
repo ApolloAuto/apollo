@@ -30,8 +30,8 @@ class Singleton {
  public:
   // @brief Get the singleton instance
   static T* get() {
-    pthread_once(&_p_once, &Singleton::_new);
-    return _instance;
+    pthread_once(&p_once_, &Singleton::new_);
+    return instance_;
   }
 
  private:
@@ -39,27 +39,27 @@ class Singleton {
   ~Singleton();
 
   // @brief Construct the singleton instance
-  static void _new() {
-    _instance = new T();
+  static void new_() {
+    instance_ = new T();
   }
 
   // @brief  Destruct the singleton instance
   // @note Only work with gcc
-  __attribute__((destructor)) static void _delete() {
+  __attribute__((destructor)) static void delete_() {
     typedef char T_must_be_complete[sizeof(T) == 0 ? -1 : 1];
     (void)sizeof(T_must_be_complete);
-    delete _instance;
+    delete instance_;
   }
 
-  static pthread_once_t _p_once;  // Initialization once control
-  static T* _instance;            // The singleton instance
+  static pthread_once_t p_once_;  // Initialization once control
+  static T* instance_;            // The singleton instance
 };
 
 template <typename T>
-pthread_once_t Singleton<T>::_p_once = PTHREAD_ONCE_INIT;
+pthread_once_t Singleton<T>::p_once_ = PTHREAD_ONCE_INIT;
 
 template <typename T>
-T* Singleton<T>::_instance = NULL;
+T* Singleton<T>::instance_ = NULL;
 
 }  // namespace perception
 }  // namespace apollo

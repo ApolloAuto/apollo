@@ -28,7 +28,7 @@ DEFINE_double(
 DEFINE_string(dreamview_adapter_config_filename,
               "modules/dreamview/conf/adapter.conf", "The adapter config file");
 
-DEFINE_string(hmi_config_filename, "modules/dreamview/conf/hmi.conf",
+DEFINE_string(hmi_config_filename, "/apollo/modules/dreamview/conf/hmi.conf",
               "The HMI config file");
 
 DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",

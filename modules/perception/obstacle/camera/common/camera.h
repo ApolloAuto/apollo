@@ -364,6 +364,9 @@ std::ostream& operator<<(std::ostream& cout, const CameraDistort<T>& camera) {
   return cout;
 }
 
+typedef CameraModel<double> CameraD;
+typedef CameraDistort<double> CameraDistortD;
+
 }  // namespace perception
 }  // namespace apollo
 

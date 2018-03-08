@@ -136,9 +136,9 @@ Status CommonSubnode::ProcEvents() {
 
   // user defined logic api.
   if (!HandleEvent(sub_event, &pub_event)) {
-    AWARN << "failed to call _handle_event. sub_event: <"
+    AWARN << "failed to call handle_event_. sub_event: <"
           << sub_event.to_string() << "> pub_event: <" << pub_event.to_string();
-    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to call _handle_event.");
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to call handle_event_.");
   }
 
   if (!event_manager_->Publish(pub_event)) {
