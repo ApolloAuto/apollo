@@ -157,7 +157,11 @@ class Renderer {
         this.controls.target.set(carPosition.x, carPosition.y, 0);
 
         this.camera.position.set(carPosition.x, carPosition.y, 50);
-        this.camera.up.set(0, 1, 0);
+        if (this.coordinates.systemName === "FLU") {
+            this.camera.up.set(1, 0, 0);
+        } else {
+            this.camera.up.set(0, 1, 0);
+        }
         this.camera.lookAt(carPosition.x, carPosition.y, 0);
     }
 
@@ -217,7 +221,11 @@ class Renderer {
             this.camera.position.x = target.position.x;
             this.camera.position.y = target.position.y + deltaY;
             this.camera.position.z = (target.position.z + deltaZ) * 2;
-            this.camera.up.set(0, 1, 0);
+            if (this.coordinates.systemName === "FLU") {
+                this.camera.up.set(1, 0, 0);
+            } else {
+                this.camera.up.set(0, 1, 0);
+            }
             this.camera.lookAt({
                 x: target.position.x,
                 y: target.position.y + deltaY,
