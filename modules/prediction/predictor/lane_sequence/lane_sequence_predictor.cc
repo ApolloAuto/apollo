@@ -24,6 +24,7 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/common/validation_checker.h"
 
 namespace apollo {
 namespace prediction {
@@ -81,6 +82,15 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
     DrawLaneSequenceTrajectoryPoints(
         *obstacle, sequence, FLAGS_prediction_duration,
         FLAGS_prediction_period, &points);
+
+    if (FLAGS_enable_trajectory_validation_check &&
+        !ValidationChecker::ValidCentripedalAcceleration(points)) {
+      continue;
+    }
+
+    if (points.empty()) {
+      continue;
+    }
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());
