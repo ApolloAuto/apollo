@@ -36,6 +36,9 @@ namespace dreamview {
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
  public:
+  // High level HMI action trigger.
+  bool Trigger(const HMIAction action);
+
   // Run a command on current system mode.
   void RunModeCommand(const std::string& command_name);
   // Run a command on given module.
