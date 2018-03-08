@@ -132,6 +132,7 @@ cc_library(
     hdrs = ["validation_checker.h"],
     deps = [
         "//modules/common/proto:pnc_point_proto",
+        "//modules/prediction/common:prediction_gflags",
     ],
 )
 
