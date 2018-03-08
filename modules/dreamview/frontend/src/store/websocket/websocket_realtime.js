@@ -62,6 +62,7 @@ export default class RosWebSocketEndpoint {
                         message.autoDrivingCar.positionX = 0;
                         message.autoDrivingCar.positionY = 0;
                         message.autoDrivingCar.heading = 0;
+                        RENDERER.coordinates.setSystem("FLU");
                     }
                     STORE.updateTimestamp(message.timestamp);
                     STORE.updateModuleDelay(message);
