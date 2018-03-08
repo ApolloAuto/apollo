@@ -19,6 +19,10 @@
 namespace apollo {
 namespace perception {
 
+void gpu_memcpy(const size_t N, const void *X, void *Y) {
+  AFATAL << "Not implemented, yet";
+}
+
 SyncedMemory::~SyncedMemory() {
   if (cpu_ptr_ && own_cpu_data_) {
     PerceptionFreeHost(cpu_ptr_, cpu_malloc_use_cuda_);
@@ -144,5 +148,19 @@ void SyncedMemory::async_gpu_push(const cudaStream_t &stream) {
   // Assume caller will synchronize on the stream before use
   head_ = SYNCED;
 }
+
+void resize(cv::Mat frame, caffe::Blob<float> *dst,
+            std::shared_ptr<SyncedMemory> src_gpu, int start_axis) {
+  AFATAL << "Not implemented, yet";
+}
+
+// resize with mean and scale
+void resize(cv::Mat frame, caffe::Blob<float> *dst,
+            std::shared_ptr<SyncedMemory> src_gpu, int start_axis,
+            const float mean_b, const float mean_g, const float mean_r,
+            const float scale) {
+  AFATAL << "Not implemented, yet";
+}
+
 }  // namespace perception
 }  // namespace apollo
