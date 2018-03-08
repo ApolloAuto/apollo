@@ -14,14 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_HM_TRACK_OBJECT_MATCHER_H_ // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_HM_TRACK_OBJECT_MATCHER_H_ // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PBF_PBF_HM_TRACK_OBJECT_MATCHER_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PBF_PBF_HM_TRACK_OBJECT_MATCHER_H_
 
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
+
 #include "modules/common/macro.h"
-#include "modules/perception/obstacle/common/graph_util.h"
+#include "modules/perception/common/graph_util.h"
 #include "modules/perception/obstacle/common/hungarian_bigraph_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
@@ -76,4 +77,4 @@ class PbfHmTrackObjectMatcher : public PbfBaseTrackObjectMatcher {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_HM_TRACK_OBJECT_MATCHER_H_ // NOLINT
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PBF_PBF_HM_TRACK_OBJECT_MATCHER_H_
