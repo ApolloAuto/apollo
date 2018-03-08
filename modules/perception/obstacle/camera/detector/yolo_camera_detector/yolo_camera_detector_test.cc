@@ -19,37 +19,53 @@
 #include <caffe/caffe.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "modules/common/log.h
-#include "modules/perception/obstacle/camera/common/flags.h"
+#include "modules/common/log.h"
+#include "modules/common/util/file.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/detector/common/feature_extractor.h"
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/proto/yolo.pb.h"
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/region_output.h"
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/util.h"
-#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo.pb.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_detector.h"
+
+DECLARE_string(yolo_config_filename);
 
 namespace apollo {
 namespace perception {
 
-TEST(YoloCameraDetectorTest, yolo_camera_detector_roipooling_test) {
-  std::string yolo_config = "./data/models/yolo_camera_detector/config.pt";
+using apollo::common::util::GetProtoFromASCIIFile;
+using apollo::common::util::SetProtoToASCIIFile;
+using apollo::perception::obstacle::yolo::YoloParam;
 
-  adu::perception::yolo::YoloParam yolo_param;
-  adu::perception::yolo::YoloParam origin_yolo_param;
+class YoloCameraDetectorTest : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    FLAGS_config_manager_path =
+        "/apollo/modules/perception/obstacle/camera/detector/"
+        "yolo_camera_detector/testdata/config_manager.config",
+    FLAGS_yolo_config_filename = "config_test.pt";
+    RegisterFactoryYoloCameraDetector();
+  }
+};
+
+/*
+TEST_F(YoloCameraDetectorTest, yolo_camera_detector_roipooling_test) {
+  YoloParam yolo_param;
+  YoloParam origin_yolo_param;
 
   {
     BaseCameraDetector *camera_detector =
-        BaseCameraDetectorRegisterer::get_instance_by_name(
-            "YoloCameraDetector");
-    CHECK(camera_detector->init());
-    CHECK_EQ(camera_detector->name(), "YoloCameraDetector");
+        BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector");
+    CHECK(camera_detector->Init());
+    CHECK_EQ(camera_detector->Name(), "YoloCameraDetector");
     cv::Mat frame = cv::imread("test.jpg", CV_LOAD_IMAGE_COLOR);
-    CHECK((frame.data != nullptr));
+    CHECK_NOTNULL(frame.data);
 
     CameraDetectorOptions options;
     std::vector<VisualObjectPtr> objects;
     Timer timer;
-    /*CHECK_EQ(camera_detector->detect(frame, options, NULL), false);
+    CHECK_EQ(camera_detector->detect(frame, options, NULL), false);
     CHECK(camera_detector->detect(frame, options, &objects));
     AINFO << "detection time: " << timer.toc() << "ms";
     int obj_idx = 0;
@@ -64,15 +80,15 @@ TEST(YoloCameraDetectorTest, yolo_camera_detector_roipooling_test) {
             }
             // EXPECT_LT(abs(sum_of_squares - 1.0), 1e-3);
         }
-    }*/
+    }
     std::vector<VisualObjectPtr> mixed_objects;
     cv::Mat lane_map(frame.rows, frame.cols, CV_32FC1);
 
-    CHECK(camera_detector->multitask(frame, options, &objects, &lane_map));
+    CHECK(camera_detector->Multitask(frame, options, &objects, &lane_map));
     cv::imwrite("result.jpg", lane_map);
   }
 }
-/*
+
 TEST(YoloCameraDetectorTest, nms_test) {
     {
         std::vector<NormalizedBBox> test_objects;
@@ -241,31 +257,25 @@ TEST(YoloCameraDetectorTest, nms_test) {
     }
 }
 */
-TEST(YoloCameraDetectorTest, input_tensor_test) {
-  std::string yolo_config = "./data/models/yolo_camera_detector/config.pt";
 
-  adu::perception::yolo::YoloParam yolo_param;
-  adu::perception::yolo::YoloParam origin_yolo_param;
+TEST_F(YoloCameraDetectorTest, input_tensor_test) {
+  const std::string yolo_config =
+      "/apollo/modules/perception/model/yolo_camera_detector/config_test.pt";
 
-  LoadTextProtoMessageFile(yolo_config, yolo_param);
-  origin_yolo_param.CopyFrom(yolo_param);
+  YoloParam yolo_param;
+  CHECK(GetProtoFromASCIIFile(yolo_config, &yolo_param));
+  YoloParam origin_yolo_param = yolo_param;
 
   {
-    std::string out_str;
-    std::ofstream ofs(yolo_config, std::ofstream::out);
-    google::protobuf::TextFormat::PrintToString(yolo_param, &out_str);
-    ofs << out_str;
-    ofs.close();
+    CHECK(SetProtoToASCIIFile(yolo_param, yolo_config));
     BaseCameraDetector *camera_detector =
-        BaseCameraDetectorRegisterer::get_instance_by_name(
-            "YoloCameraDetector");
-    CHECK(camera_detector->init());
+        BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector");
+    CHECK_NOTNULL(camera_detector);
+    // CHECK(camera_detector->Init());
   }
-  std::string out_str;
-  std::ofstream ofs(yolo_config, std::ofstream::out);
-  google::protobuf::TextFormat::PrintToString(origin_yolo_param, &out_str);
-  ofs << out_str;
-  ofs.close();
+  // Recover to origin config.
+  CHECK(SetProtoToASCIIFile(origin_yolo_param, yolo_config));
 }
+
 }  // namespace perception
 }  // namespace apollo
