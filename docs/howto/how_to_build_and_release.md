@@ -62,8 +62,12 @@ code
 Use the keyboard shortcut (Ctrl+K Ctrl+O) to open the Apollo project. 
 ### Build the Apollo project in VSCode
 Use the keyboard shortcut (Ctrl+Shift+B) to build the Apollo project. 
+### Clean the Apollo project in VSCode
+Select the "Tasks->Run Tasks..." menu command and click "clean the apollo project" from a popup menu to clean the Apollo project. 
+### Run a code style check task for the Apollo project in VSCode
+Select the "Tasks->Run Tasks..." menu command and click "code style check for the apollo project" from a popup menu to check the code style for the Apollo project. 
 ### Change the building option
- you can change the "build" option to an other one such as "build_gpu" (refer to the "apollo.sh" file for details) in ".vscode/tasks.json"
+ you can change the "build" option to another one such as "build_gpu" (refer to the "apollo.sh" file for details) in ".vscode/tasks.json"
 
 ## <span id="test">Test</span>
 ```bash
