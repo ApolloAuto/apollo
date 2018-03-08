@@ -102,7 +102,7 @@ class CalibrationConfigManager {
   bool reset();
 
   inline CameraCalibrationPtr get_camera_calibration() {
-    return _camera_calibration;
+    return camera_calibration_;
   }
 
  private:
@@ -113,14 +113,14 @@ class CalibrationConfigManager {
 
   friend class Singleton<CalibrationConfigManager>;
 
-  Mutex _mutex;  // multi-thread init safe.
-  bool _inited = false;
-  std::string _camera_extrinsic_path;
-  std::string _camera_intrinsic_path;
-  std::string _radar_extrinsic_path;
-  std::string _work_root;
-  CameraCalibrationPtr _camera_calibration;
-  RadarCalibrationPtr _radar_calibration;
+  Mutex mutex_;  // multi-thread init safe.
+  bool inited_ = false;
+  std::string camera_extrinsic_path_;
+  std::string camera_intrinsic_path_;
+  std::string radar_extrinsic_path_;
+  std::string work_root_;
+  CameraCalibrationPtr camera_calibration_;
+  RadarCalibrationPtr radar_calibration_;
 
   DISALLOW_COPY_AND_ASSIGN(CalibrationConfigManager);
 };
@@ -135,7 +135,7 @@ class CameraCalibration {
   void calculate_homographic();
 
   inline const Eigen::Matrix<double, 3, 4>& get_camera_intrinsic() {
-    return _camera_intrinsic;
+    return camera_intrinsic_;
   }
 
   inline const Eigen::Matrix<double, 4, 4>& get_camera_extrinsics() {
@@ -147,54 +147,54 @@ class CameraCalibration {
   }
 
   inline CameraUndistortionPtr get_camera_undistort_handler() {
-    return _undistort_handler;
+    return undistort_handler_;
   }
 
   inline CameraDistortPtr get_camera_model() {
-    return _camera_model;
+    return camera_model_;
   }
 
   //
   Eigen::Matrix<double, 3, 3> get_camera2car_homography_mat() {
-    return _homography_mat;
+    return homography_mat_;
   }
 
   Eigen::Matrix<double, 3, 3> get_car2camera_homography_mat() {
-    return _homography_mat_inverse;
+    return homography_mat_inverse_;
   }
 
   Eigen::Matrix<double, 3, 4> get_camera_projection_mat() {
-    return _camera_projection_mat;
+    return camera_projection_mat_;
   }
 
   inline void get_image_height_width(int32_t* image_height,
                                      int32_t* image_width) {
-    *image_height = static_cast<int32_t>(_image_height);
-    *image_width = static_cast<int32_t>(_image_width);
+    *image_height = static_cast<int32_t>(image_height_);
+    *image_width = static_cast<int32_t>(image_width_);
   }
 
  private:
   bool init_undistortion(const std::string& intrinsics_path);
   void init_camera_model();
 
-  Eigen::Matrix<double, 3, 4> _camera_intrinsic;  // camera intrinsic
+  Eigen::Matrix<double, 3, 4> camera_intrinsic_;  // camera intrinsic
   std::shared_ptr<Eigen::Matrix<double, 4, 4>>
       _camera2car_pose;  // camera to ego car pose
   std::shared_ptr<Eigen::Matrix<double, 4, 4>>
       _car2camera_pose;  // car to camera pose
-  Eigen::Matrix<double, 3, 4> _camera_projection_mat;
+  Eigen::Matrix<double, 3, 4> camera_projection_mat_;
   Eigen::Matrix<double, 3, 3>
-      _homography_mat;  // homography mat from camera 2 car
+      homography_mat_;  // homography mat from camera 2 car
   Eigen::Matrix<double, 3, 3>
-      _homography_mat_inverse;  // homography mat from car 2 camera
+      homography_mat_inverse_;  // homography mat from car 2 camera
   volatile std::shared_ptr<Eigen::Matrix<double, 3, 3>>
-      _camera_homography;  // final homography based on online calibration
-  CameraUndistortionPtr _undistort_handler;
-  CameraDistortPtr _camera_model;
-  size_t _image_height;
-  size_t _image_width;
-  Eigen::Quaterniond _extrinsic_quat;
-  CameraCoeffient _camera_coefficient;
+      camera_homography_;  // final homography based on online calibration
+  CameraUndistortionPtr undistort_handler_;
+  CameraDistortPtr camera_model_;
+  size_t image_height_;
+  size_t image_width_;
+  Eigen::Quaterniond extrinsic_quat_;
+  CameraCoeffient camera_coefficient_;
 };
 
 class RadarCalibration {

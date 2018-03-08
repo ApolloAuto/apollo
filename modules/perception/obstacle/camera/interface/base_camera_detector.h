@@ -28,8 +28,8 @@
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
+#include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
-#include "modules/perception/obstacle/common/camera.h"
 
 namespace apollo {
 namespace perception {

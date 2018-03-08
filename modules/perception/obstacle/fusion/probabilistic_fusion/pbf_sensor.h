@@ -32,13 +32,13 @@ class PbfSensor {
   explicit PbfSensor(const SensorType &type, const std::string &sensor_id);
   ~PbfSensor();
 
-  /**@brief query frames whose time stamp is in range (_latest_fused_time_stamp,
+  /**@brief query frames whose time stamp is in range (latest_fused_time_stamp_,
    * time_stamp]*/
   void QueryLatestFrames(double time_stamp,
                          std::vector<PbfSensorFramePtr> *frames);
 
   /**@brief query latest frame whose time stamp is in range
-   * (_latest_fused_time_stamp, time_stamp]*/
+   * (latest_fused_time_stamp_, time_stamp]*/
   PbfSensorFramePtr QueryLatestFrame(double time_stamp);
 
   /**@brief add a frame objects*/
@@ -58,7 +58,7 @@ class PbfSensor {
   std::string sensor_id_;
   SensorType sensor_type_;
 
-  /**@brief max size of _frames*/
+  /**@brief max size of frames_*/
   static size_t s_max_cached_frame_number_;
 
   double latest_query_timestamp_;
