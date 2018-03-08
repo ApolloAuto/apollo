@@ -267,7 +267,8 @@ bool Spline2dConstraint::AddPointAngleConstraint(const double t,
 
   // add inequality constraint
   Eigen::MatrixXd affine_inequality = Eigen::MatrixXd::Zero(2, total_param_);
-  Eigen::MatrixXd affine_inequality_boundary = Eigen::MatrixXd::Zero(2, 1);
+  const Eigen::MatrixXd affine_inequality_boundary =
+      Eigen::MatrixXd::Zero(2, 1);
   std::vector<double> t_coef = DerivativeCoef(rel_t);
   int x_sign = 1;
   int y_sign = 1;
