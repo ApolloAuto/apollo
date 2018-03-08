@@ -63,7 +63,7 @@ bool FusionSubnode::InitInternal() {
 }
 
 bool FusionSubnode::InitOutputStream() {
-  // expect _reserve format:
+  // expect reserve_ format:
   //       pub_driven_event_id:n
   //       lidar_output_stream : event_id=n&sink_type=m&sink_name=x
   //       radar_output_stream : event_id=n&sink_type=m&sink_name=x

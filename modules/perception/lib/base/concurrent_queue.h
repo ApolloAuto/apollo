@@ -95,7 +95,7 @@ class FixedSizeConQueue : public ConcurrentQueue<Data> {
   virtual void push(const Data& data) {
     MutexLock lock(&this->mutex_);
     while (this->queue_.size() >= max_count_) {
-      _condition_full.Wait(&this->mutex_);
+      condition_full_.Wait(&this->mutex_);
     }
     this->queue_.push(data);
     this->condition_variable_.Signal();
@@ -119,7 +119,7 @@ class FixedSizeConQueue : public ConcurrentQueue<Data> {
     }
     *data = this->queue_.front();
     this->queue_.pop();
-    _condition_full.Signal();
+    condition_full_.Signal();
   }
 
   virtual bool try_pop(Data* data) {
@@ -131,7 +131,7 @@ class FixedSizeConQueue : public ConcurrentQueue<Data> {
 
     *data = this->queue_.front();
     this->queue_.pop();
-    _condition_full.Signal();
+    condition_full_.Signal();
     return true;
   }
 
@@ -140,7 +140,7 @@ class FixedSizeConQueue : public ConcurrentQueue<Data> {
   }
 
  private:
-  CondVar _condition_full;
+  CondVar condition_full_;
   const size_t max_count_;
   DISALLOW_COPY_AND_ASSIGN(FixedSizeConQueue);
 };

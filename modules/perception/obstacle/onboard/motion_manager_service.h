@@ -39,7 +39,7 @@ class MotionManagerService : public Subnode {
  public:
   MotionManagerService() = default;
   virtual ~MotionManagerService() {
-    delete _vehicle_planemotion;
+    delete vehicle_planemotion_;
   }
 
   apollo::common::Status ProcEvents() override {
@@ -52,13 +52,13 @@ class MotionManagerService : public Subnode {
  private:
   void OnLocalization(
       const apollo::localization::LocalizationEstimate &localization);
-  PlaneMotion *_vehicle_planemotion = nullptr;
+  PlaneMotion *vehicle_planemotion_ = nullptr;
   double pre_azimuth = 0;  // a invalid value
   double pre_timestamp = 0;
-  bool _start_flag = false;
-  const int _motion_buffer_size = 6000;
-  const int _motion_sensor_frequency = 100;
-  Mutex _mutex;
+  bool start_flag_ = false;
+  const int motion_buffer_size_ = 6000;
+  const int motion_sensor_frequency_ = 100;
+  Mutex mutex_;
 
   DISALLOW_COPY_AND_ASSIGN(MotionManagerService);
 };

@@ -158,7 +158,7 @@ void CommonSharedData<M>::RemoveStaleData() {
         static_cast<uint64_t>(FLAGS_shared_data_stale_time)) {
       const size_t erase_cnt = data_map_.erase(iter->first);
       if (erase_cnt != 1u) {
-        AWARN << "_data_map erase cnt:" << erase_cnt << " key:" << iter->first;
+        AWARN << "data_map_ erase cnt:" << erase_cnt << " key:" << iter->first;
         return;
       }
       iter = data_added_time_map_.erase(iter);
@@ -228,7 +228,7 @@ bool CommonSharedData<M>::Remove(const std::string &key) {
 
   const size_t erase_cnt = data_added_time_map_.erase(key);
   if (erase_cnt != 1u) {
-    AWARN << "_data_added_time_map erase cnt:" << erase_cnt << " key:" << key;
+    AWARN << "data_added_time_map_ erase cnt:" << erase_cnt << " key:" << key;
     return false;
   }
   ++stat_.remove_cnt;
@@ -257,7 +257,7 @@ bool CommonSharedData<M>::Pop(const std::string &key, SharedDataPtr<M> *data) {
   }
   const size_t erase_cnt = data_added_time_map_.erase(key);
   if (erase_cnt != 1u) {
-    AWARN << "_data_added_time_map erase cnt:" << erase_cnt << " key:" << key;
+    AWARN << "data_added_time_map_ erase cnt:" << erase_cnt << " key:" << key;
     return false;
   }
   ++stat_.get_cnt;
