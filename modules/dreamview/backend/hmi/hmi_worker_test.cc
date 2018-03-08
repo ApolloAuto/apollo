@@ -20,7 +20,7 @@
 namespace apollo {
 namespace dreamview {
 
-TEST(HMIWorkTest, Init) {
+TEST(HMIWorkerTest, Init) {
   const auto& hmi_config = HMIWorker::instance()->GetConfig();
   EXPECT_GT(hmi_config.available_vehicles().size(), 0);
 }
