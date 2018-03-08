@@ -90,11 +90,8 @@ Status Dreamview::Init() {
       << "ImageShortAdapter is not initialized.";
   CHECK(AdapterManager::GetPointCloud())
       << "PointCloudAdapter is not initialized.";
-
-  if (FLAGS_use_navigation_mode) {
-    CHECK(AdapterManager::GetRelativeMap())
-        << "RelativeMapAdapter is not initialized.";
-  }
+  CHECK(AdapterManager::GetRelativeMap())
+      << "RelativeMapAdapter is not initialized.";
 
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
