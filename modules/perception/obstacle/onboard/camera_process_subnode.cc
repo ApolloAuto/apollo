@@ -20,7 +20,7 @@ namespace apollo {
 namespace perception {
 
 bool CameraProcessSubnode::InitInternal() {
-  //  Subnode config in DAG streaming
+  // Subnode config in DAG streaming
   std::map<std::string, std::string> fields;
   SubnodeHelper::ParseReserveField(reserve_, &fields);
   device_id_ = fields["device_id"];
@@ -34,8 +34,6 @@ bool CameraProcessSubnode::InitInternal() {
   InitCalibration();
 
   InitModules();
-
-  // void (T::*fp)(const name##Adapter::DataType &data), T *obj
 
   apollo::common::adapter::AdapterManager::AddImageShortCallback(
       &CameraProcessSubnode::ImgCallback, this);
@@ -136,8 +134,6 @@ void CameraProcessSubnode::VisualObjToSensorObj(
     obj->width = vobj->width;
     obj->height = vobj->height;
     obj->type = vobj->type;
-    // obj->type_probs.assign(vobj->type_probs,
-    //                        vobj->type_probs + MAX_OBJECT_TYPE);
     obj->track_id = vobj->track_id;
     obj->tracking_time = vobj->track_age;
     obj->latest_tracked_time = vobj->last_track_timestamp;
@@ -147,6 +143,8 @@ void CameraProcessSubnode::VisualObjToSensorObj(
     obj->camera_supplement->upper_left = vobj->upper_left.cast<double>();
     obj->camera_supplement->lower_right = vobj->lower_right.cast<double>();
     obj->camera_supplement->alpha = vobj->alpha;
+    // obj->type_probs.assign(vobj->type_probs,
+    //                        vobj->type_probs + MAX_OBJECT_TYPE);
     // obj->camera_supplement->pts8.assign(vobj->pts8,
     //                                     vobj->pts8 + 16);
 
