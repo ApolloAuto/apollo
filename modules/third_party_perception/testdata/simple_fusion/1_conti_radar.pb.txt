@@ -1,0 +1,2470 @@
+header {
+  timestamp_sec: 1520381229.4073982
+  module_name: "conti_radar"
+  sequence_num: 689
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4074028
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 0
+  longitude_dist: 76.600000000000023
+  lateral_dist: -3.5999999999999943
+  longitude_vel: -14
+  lateral_vel: 1
+  rcs: 5
+  dynprop: 2
+  longitude_dist_rms: 0.288
+  lateral_dist_rms: 0.478
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.794
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.0600000000000005
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4074042
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 1
+  longitude_dist: 83.200000000000045
+  lateral_dist: 14.800000000000011
+  longitude_vel: -13.75
+  lateral_vel: 0.25
+  rcs: 8
+  dynprop: 2
+  longitude_dist_rms: 0.288
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.0299999999999994
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4074049
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 2
+  longitude_dist: 37.200000000000045
+  lateral_dist: -25.999999999999972
+  longitude_vel: -0.25
+  lateral_vel: 14.5
+  rcs: 8.5
+  dynprop: 4
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 1.023
+  lateral_vel_rms: 1.317
+  probexist: 0.999
+  meas_state: 3
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 1.6000000000000227
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 5
+  width: 2
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4074056
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 3
+  longitude_dist: 192
+  lateral_dist: -19.399999999999977
+  longitude_vel: -14
+  lateral_vel: -4
+  rcs: 22
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 0.794
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.794
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.0499999999999989
+  lateral_accel: 0
+  oritation_angle: -2.7999999999999829
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 0.4
+  width: 0.60000000000000009
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4074063
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 4
+  longitude_dist: 131.60000000000002
+  lateral_dist: -3.9999999999999716
+  longitude_vel: -14
+  lateral_vel: 1.5
+  rcs: 2
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 0.616
+  lateral_vel_rms: 1.317
+  probexist: 0.999
+  meas_state: 2
+  longitude_accel: -1.1099999999999994
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4074073
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 5
+  longitude_dist: 167.40000000000009
+  lateral_dist: 11.400000000000006
+  longitude_vel: -14
+  lateral_vel: 1.75
+  rcs: 10
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.794
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.794
+  probexist: 0.999
+  meas_state: 2
+  longitude_accel: -1.2699999999999996
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.407408
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 6
+  longitude_dist: 96.800000000000068
+  lateral_dist: -0.39999999999997726
+  longitude_vel: -13.75
+  lateral_vel: -0.25
+  rcs: 10.5
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.478
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.08
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.407409
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 7
+  longitude_dist: 2.8000000000000114
+  lateral_dist: -8.1999999999999886
+  longitude_vel: -14
+  lateral_vel: -0.75
+  rcs: -4.5
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.794
+  lateral_vel_rms: 0.794
+  probexist: 0.999
+  meas_state: 2
+  longitude_accel: -1.1400000000000006
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4074097
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 8
+  longitude_dist: 107.60000000000002
+  lateral_dist: 0.80000000000001137
+  longitude_vel: -13.75
+  lateral_vel: -0.25
+  rcs: 6
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.794
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -0.99000000000000021
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4074156
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 9
+  longitude_dist: 141.40000000000009
+  lateral_dist: -8.7999999999999829
+  longitude_vel: -14
+  lateral_vel: 0.5
+  rcs: -2.5
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 1.317
+  longitude_vel_rms: 0.794
+  lateral_vel_rms: 1.317
+  probexist: 0.99
+  meas_state: 3
+  longitude_accel: -1.1899999999999995
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.317
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4074166
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 10
+  longitude_dist: 62.600000000000023
+  lateral_dist: -6.7999999999999829
+  longitude_vel: -13.75
+  lateral_vel: -2
+  rcs: 4
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 1.317
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -0.59999999999999964
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.317
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4074175
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 11
+  longitude_dist: 96.200000000000045
+  lateral_dist: -3.5999999999999943
+  longitude_vel: -14
+  lateral_vel: 0.5
+  rcs: 15.5
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.478
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.0999999999999996
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4074183
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 12
+  longitude_dist: 116
+  lateral_dist: 11.200000000000017
+  longitude_vel: 2.75
+  lateral_vel: 3.5
+  rcs: 15
+  dynprop: 4
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.794
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.129999999999999
+  lateral_accel: 0
+  oritation_angle: 0.80000000000001137
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.407419
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 13
+  longitude_dist: 4.4000000000000341
+  lateral_dist: -4.5999999999999943
+  longitude_vel: -14.5
+  lateral_vel: -0.25
+  rcs: -6
+  dynprop: 2
+  longitude_dist_rms: 0.224
+  lateral_dist_rms: 0.288
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -2.25
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4076686
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 14
+  longitude_dist: 2.8000000000000114
+  lateral_dist: -10.199999999999989
+  longitude_vel: -14
+  lateral_vel: 0
+  rcs: -3.5
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.794
+  lateral_vel_rms: 0.616
+  probexist: 0.999
+  meas_state: 3
+  longitude_accel: -1.2400000000000002
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.317
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4079216
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 15
+  longitude_dist: 245.60000000000002
+  lateral_dist: 21.400000000000006
+  longitude_vel: -13.75
+  lateral_vel: 0
+  rcs: 4
+  dynprop: 2
+  longitude_dist_rms: 1.023
+  lateral_dist_rms: 2.187
+  longitude_vel_rms: 1.317
+  lateral_vel_rms: 2.187
+  probexist: 0.75
+  meas_state: 3
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 4.676
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4081764
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 16
+  longitude_dist: 24
+  lateral_dist: -26.799999999999983
+  longitude_vel: 0
+  lateral_vel: 9.5
+  rcs: 12.5
+  dynprop: 4
+  longitude_dist_rms: 1.023
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 1.023
+  lateral_vel_rms: 1.023
+  probexist: 0.75
+  meas_state: 3
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 1.6000000000000227
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 1
+  width: 1
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4084597
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 17
+  longitude_dist: 13.600000000000023
+  lateral_dist: -5.1999999999999886
+  longitude_vel: -13.75
+  lateral_vel: 0.5
+  rcs: -8.5
+  dynprop: 2
+  longitude_dist_rms: 0.288
+  lateral_dist_rms: 0.371
+  longitude_vel_rms: 0.288
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -0.16000000000000014
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 0.794
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4087553
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 18
+  longitude_dist: 44.800000000000068
+  lateral_dist: -33.799999999999983
+  longitude_vel: -13.75
+  lateral_vel: 0
+  rcs: 7
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.0399999999999991
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 0.60000000000000009
+  width: 0.2
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4089549
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 19
+  longitude_dist: 224.20000000000005
+  lateral_dist: -12.599999999999994
+  longitude_vel: -13.5
+  lateral_vel: 0
+  rcs: 3
+  dynprop: 2
+  longitude_dist_rms: 1.317
+  lateral_dist_rms: 2.187
+  longitude_vel_rms: 2.187
+  lateral_vel_rms: 2.187
+  probexist: 0.25
+  meas_state: 3
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 4.676
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.669
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4092133
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 20
+  longitude_dist: 208.40000000000009
+  lateral_dist: -7.3999999999999773
+  longitude_vel: -13.75
+  lateral_vel: -0.25
+  rcs: 8.5
+  dynprop: 2
+  longitude_dist_rms: 1.023
+  lateral_dist_rms: 1.317
+  longitude_vel_rms: 1.697
+  lateral_vel_rms: 2.187
+  probexist: 0.5
+  meas_state: 3
+  longitude_accel: -0.91000000000000014
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 2.817
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4094675
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 21
+  longitude_dist: 21.399999999999977
+  lateral_dist: -3.9999999999999716
+  longitude_vel: -14
+  lateral_vel: 0
+  rcs: 11
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.478
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -0.76999999999999957
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.409754
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 22
+  longitude_dist: 89.800000000000068
+  lateral_dist: -1.9999999999999716
+  longitude_vel: -14
+  lateral_vel: 0
+  rcs: 12.5
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.478
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.1099999999999994
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4099884
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 23
+  longitude_dist: 166.20000000000005
+  lateral_dist: 0.80000000000001137
+  longitude_vel: -14
+  lateral_vel: 1
+  rcs: 10
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 1.317
+  longitude_vel_rms: 0.794
+  lateral_vel_rms: 1.317
+  probexist: 0.99
+  meas_state: 3
+  longitude_accel: -1.1999999999999993
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.317
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4102688
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 24
+  longitude_dist: 58.399999999999977
+  lateral_dist: -3.5999999999999943
+  longitude_vel: -14
+  lateral_vel: 1
+  rcs: 8
+  dynprop: 2
+  longitude_dist_rms: 0.288
+  lateral_dist_rms: 0.478
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -0.78999999999999915
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.410497
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 25
+  longitude_dist: 179.80000000000007
+  lateral_dist: 18.600000000000023
+  longitude_vel: -14
+  lateral_vel: 1
+  rcs: 13
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.794
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 1.023
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.1400000000000006
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4107494
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 26
+  longitude_dist: 216
+  lateral_dist: 7.4000000000000057
+  longitude_vel: -14
+  lateral_vel: 2.75
+  rcs: 10.5
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 0.616
+  lateral_vel_rms: 1.023
+  probexist: 0.75
+  meas_state: 2
+  longitude_accel: -1.2899999999999991
+  lateral_accel: 0
+  oritation_angle: 2.8000000000000114
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4110062
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 27
+  longitude_dist: 26.800000000000068
+  lateral_dist: -4.3999999999999773
+  longitude_vel: -14
+  lateral_vel: 0.75
+  rcs: 5
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.478
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -0.82000000000000028
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4113131
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 28
+  longitude_dist: 7.6000000000000227
+  lateral_dist: -17.399999999999977
+  longitude_vel: -13.75
+  lateral_vel: -0.5
+  rcs: -2
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 1.317
+  longitude_vel_rms: 1.317
+  lateral_vel_rms: 1.317
+  probexist: 0.999
+  meas_state: 3
+  longitude_accel: -0.91000000000000014
+  lateral_accel: 0
+  oritation_angle: -2.7999999999999829
+  longitude_accel_rms: 1.697
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4115584
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 29
+  longitude_dist: 30.399999999999977
+  lateral_dist: -6.3999999999999773
+  longitude_vel: -13.75
+  lateral_vel: -0.25
+  rcs: -4.5
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 0.794
+  longitude_vel_rms: 1.317
+  lateral_vel_rms: 2.187
+  probexist: 0.9
+  meas_state: 2
+  longitude_accel: -0.42999999999999972
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 3.63
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4120359
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 30
+  longitude_dist: 49.800000000000068
+  lateral_dist: 30.000000000000028
+  longitude_vel: -13.75
+  lateral_vel: 0
+  rcs: 5.5
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 0.794
+  longitude_vel_rms: 0.616
+  lateral_vel_rms: 1.317
+  probexist: 0.75
+  meas_state: 3
+  longitude_accel: -1.17
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.317
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4121079
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 31
+  longitude_dist: 62
+  lateral_dist: -23.999999999999972
+  longitude_vel: -13.75
+  lateral_vel: -0.5
+  rcs: -1
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 1.317
+  lateral_vel_rms: 1.697
+  probexist: 0.75
+  meas_state: 2
+  longitude_accel: -0.85999999999999943
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 2.187
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.412302
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 32
+  longitude_dist: 37.399999999999977
+  lateral_dist: -34.199999999999989
+  longitude_vel: -13.75
+  lateral_vel: -0.75
+  rcs: 18
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 1.023
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.0399999999999991
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.41256
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 33
+  longitude_dist: 59
+  lateral_dist: -30.799999999999983
+  longitude_vel: -13.75
+  lateral_vel: 0.25
+  rcs: 0
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.794
+  probexist: 0.75
+  meas_state: 2
+  longitude_accel: -1.1199999999999992
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4128692
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 34
+  longitude_dist: 196.60000000000002
+  lateral_dist: 25.000000000000028
+  longitude_vel: -14
+  lateral_vel: 0
+  rcs: 15
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.794
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.794
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.1199999999999992
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4130781
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 35
+  longitude_dist: 11.800000000000011
+  lateral_dist: 11.200000000000017
+  longitude_vel: -13.75
+  lateral_vel: 0.5
+  rcs: -2
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.478
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -0.92999999999999972
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.413378
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 36
+  longitude_dist: 211.40000000000009
+  lateral_dist: 22.800000000000011
+  longitude_vel: -14
+  lateral_vel: 0
+  rcs: 16.5
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 1.023
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.1500000000000004
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4136341
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 37
+  longitude_dist: 28.600000000000023
+  lateral_dist: 29.200000000000017
+  longitude_vel: -13.75
+  lateral_vel: 0.25
+  rcs: 8.5
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.616
+  lateral_vel_rms: 0.478
+  probexist: 1
+  meas_state: 2
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4138653
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 38
+  longitude_dist: 117.60000000000002
+  lateral_dist: 8.6000000000000227
+  longitude_vel: -14
+  lateral_vel: 1
+  rcs: 13.5
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.08
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 0.2
+  width: 0.2
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4141726
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 39
+  longitude_dist: 43.600000000000023
+  lateral_dist: -40.799999999999983
+  longitude_vel: 0
+  lateral_vel: 14.5
+  rcs: 13.5
+  dynprop: 4
+  longitude_dist_rms: 1.023
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 1.317
+  lateral_vel_rms: 1.317
+  probexist: 0.5
+  meas_state: 3
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 1.6000000000000227
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 1
+  width: 1
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4143703
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 40
+  longitude_dist: 86
+  lateral_dist: -23.599999999999994
+  longitude_vel: -13.75
+  lateral_vel: 0
+  rcs: 3.5
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 1.317
+  lateral_vel_rms: 2.187
+  probexist: 0.75
+  meas_state: 2
+  longitude_accel: -0.16999999999999993
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 4.676
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4152904
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 41
+  longitude_dist: 192.20000000000005
+  lateral_dist: -29.599999999999994
+  longitude_vel: -26.25
+  lateral_vel: 0
+  rcs: 7
+  dynprop: 2
+  longitude_dist_rms: 1.023
+  lateral_dist_rms: 2.187
+  longitude_vel_rms: 0.616
+  lateral_vel_rms: 2.187
+  probexist: 0.75
+  meas_state: 1
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 4.676
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4153113
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 42
+  longitude_dist: 57
+  lateral_dist: 11.800000000000011
+  longitude_vel: -13.75
+  lateral_vel: 0.5
+  rcs: 13.5
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.794
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.1199999999999992
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4153125
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 43
+  longitude_dist: 119.80000000000007
+  lateral_dist: -0.799999999999983
+  longitude_vel: -14
+  lateral_vel: 1.25
+  rcs: 12.5
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.794
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.08
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4153929
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 44
+  longitude_dist: 24
+  lateral_dist: 9.2000000000000171
+  longitude_vel: -13.75
+  lateral_vel: -0.25
+  rcs: -3.5
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 1.317
+  lateral_vel_rms: 1.697
+  probexist: 0.75
+  meas_state: 2
+  longitude_accel: -1.0399999999999991
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 2.187
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4156625
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 45
+  longitude_dist: 203.20000000000005
+  lateral_dist: -4.7999999999999829
+  longitude_vel: -14
+  lateral_vel: 0.75
+  rcs: 15
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.1199999999999992
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4159331
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 46
+  longitude_dist: -1.5999999999999659
+  lateral_dist: 10.800000000000011
+  longitude_vel: -13.25
+  lateral_vel: 0
+  rcs: 0.5
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 1.023
+  lateral_vel_rms: 0.794
+  probexist: 0.999
+  meas_state: 3
+  longitude_accel: -0.72000000000000064
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.317
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.41663
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 47
+  longitude_dist: 32.200000000000045
+  lateral_dist: -31.799999999999983
+  longitude_vel: -13.75
+  lateral_vel: -0.5
+  rcs: 7.5
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.794
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.0299999999999994
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 1
+  width: 0.2
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4166362
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 48
+  longitude_dist: 71.399999999999977
+  lateral_dist: -58.199999999999989
+  longitude_vel: 0
+  lateral_vel: 19
+  rcs: 9
+  dynprop: 4
+  longitude_dist_rms: 1.023
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 1.317
+  lateral_vel_rms: 2.187
+  probexist: 0.75
+  meas_state: 3
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 1.6000000000000227
+  longitude_accel_rms: 4.676
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 1
+  width: 1
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4167986
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 49
+  longitude_dist: 40.800000000000068
+  lateral_dist: 9.6000000000000227
+  longitude_vel: -13.75
+  lateral_vel: 0
+  rcs: -2
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 1.697
+  lateral_vel_rms: 2.187
+  probexist: 0.75
+  meas_state: 2
+  longitude_accel: -0.41999999999999993
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 3.63
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4170556
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 50
+  longitude_dist: 60.600000000000023
+  lateral_dist: -8.3999999999999773
+  longitude_vel: -14
+  lateral_vel: 0
+  rcs: 1
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 0.794
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 1.317
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.0899999999999999
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 0.4
+  width: 0.4
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4172163
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 51
+  longitude_dist: 63.200000000000045
+  lateral_dist: 30.600000000000023
+  longitude_vel: -13.75
+  lateral_vel: -1
+  rcs: 4.5
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 1.317
+  longitude_vel_rms: 1.023
+  lateral_vel_rms: 1.317
+  probexist: 0.99
+  meas_state: 3
+  longitude_accel: -1.0499999999999989
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.317
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.417505
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 52
+  longitude_dist: 35
+  lateral_dist: 10.600000000000023
+  longitude_vel: -13.75
+  lateral_vel: 0.5
+  rcs: 6.5
+  dynprop: 2
+  longitude_dist_rms: 0.288
+  lateral_dist_rms: 0.478
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -0.91999999999999993
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4177046
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 53
+  longitude_dist: 94
+  lateral_dist: -21.999999999999972
+  longitude_vel: -13.75
+  lateral_vel: -0.75
+  rcs: 4.5
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 1.317
+  longitude_vel_rms: 1.317
+  lateral_vel_rms: 1.697
+  probexist: 0.5
+  meas_state: 3
+  longitude_accel: -1.0999999999999996
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 2.187
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4183695
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 54
+  longitude_dist: 112.39999999999998
+  lateral_dist: 14.000000000000028
+  longitude_vel: 7.25
+  lateral_vel: 4.25
+  rcs: 12
+  dynprop: 0
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -0.79999999999999893
+  lateral_accel: 0
+  oritation_angle: 0.40000000000000568
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4183762
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 55
+  longitude_dist: 58.800000000000068
+  lateral_dist: -36.599999999999994
+  longitude_vel: -13.75
+  lateral_vel: -0.5
+  rcs: 1
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.794
+  probexist: 0.99
+  meas_state: 2
+  longitude_accel: -1.0299999999999994
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4186356
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 56
+  longitude_dist: 157.20000000000005
+  lateral_dist: 10.000000000000028
+  longitude_vel: -14
+  lateral_vel: 0.5
+  rcs: 18.5
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.794
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.1500000000000004
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4188435
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 57
+  longitude_dist: 17.399999999999977
+  lateral_dist: 10.000000000000028
+  longitude_vel: -13.75
+  lateral_vel: -0.25
+  rcs: 5.5
+  dynprop: 2
+  longitude_dist_rms: 0.288
+  lateral_dist_rms: 0.478
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -0.91000000000000014
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4189823
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 58
+  longitude_dist: 54.600000000000023
+  lateral_dist: -2.9999999999999716
+  longitude_vel: -14
+  lateral_vel: 4
+  rcs: 8.5
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 1.023
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.17
+  lateral_accel: 0
+  oritation_angle: 2.8000000000000114
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4192731
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 59
+  longitude_dist: 5.8000000000000114
+  lateral_dist: 11.200000000000017
+  longitude_vel: -13.75
+  lateral_vel: 0.75
+  rcs: -1
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.794
+  lateral_vel_rms: 0.794
+  probexist: 0.999
+  meas_state: 3
+  longitude_accel: -0.97000000000000064
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4196296
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 60
+  longitude_dist: 91
+  lateral_dist: -5.3999999999999773
+  longitude_vel: -14
+  lateral_vel: -0.5
+  rcs: 8.5
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 1.023
+  lateral_vel_rms: 2.187
+  probexist: 0.9
+  meas_state: 2
+  longitude_accel: -1.0099999999999998
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 2.817
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4197581
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 61
+  longitude_dist: 216.80000000000007
+  lateral_dist: 3.4000000000000057
+  longitude_vel: -14
+  lateral_vel: 0
+  rcs: 14.5
+  dynprop: 2
+  longitude_dist_rms: 1.023
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 0.616
+  lateral_vel_rms: 2.187
+  probexist: 0.75
+  meas_state: 1
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 4.676
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4200118
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 62
+  longitude_dist: 43
+  lateral_dist: 30.000000000000028
+  longitude_vel: -13.75
+  lateral_vel: 0.5
+  rcs: 7.5
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 0.616
+  probexist: 0.75
+  meas_state: 2
+  longitude_accel: -1.0999999999999996
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4202714
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 63
+  longitude_dist: 39
+  lateral_dist: -5.5999999999999943
+  longitude_vel: -14
+  lateral_vel: 0.25
+  rcs: 2
+  dynprop: 2
+  longitude_dist_rms: 0.371
+  lateral_dist_rms: 0.478
+  longitude_vel_rms: 0.371
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.129999999999999
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4205225
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 64
+  longitude_dist: 6.2000000000000455
+  lateral_dist: 9.0000000000000284
+  longitude_vel: -13.5
+  lateral_vel: 0.5
+  rcs: -7.5
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.616
+  lateral_vel_rms: 0.794
+  probexist: 0.999
+  meas_state: 3
+  longitude_accel: -0.23000000000000043
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4208286
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 65
+  longitude_dist: 13.600000000000023
+  lateral_dist: 28.800000000000011
+  longitude_vel: -13
+  lateral_vel: 0
+  rcs: 6.5
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.794
+  lateral_vel_rms: 0.616
+  probexist: 0.999
+  meas_state: 3
+  longitude_accel: -0.11999999999999922
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.317
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4210615
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 66
+  longitude_dist: 103
+  lateral_dist: -21.799999999999983
+  longitude_vel: -14
+  lateral_vel: 0.25
+  rcs: 15.5
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 1.023
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -1.129999999999999
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.234
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.421375
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 67
+  longitude_dist: 33.399999999999977
+  lateral_dist: 29.400000000000006
+  longitude_vel: -13.75
+  lateral_vel: 0.25
+  rcs: 6.5
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.616
+  longitude_vel_rms: 0.616
+  lateral_vel_rms: 0.616
+  probexist: 1
+  meas_state: 2
+  longitude_accel: -0.69999999999999929
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.165
+  length: 1.6
+  width: 1.6
+  obstacle_class: 4
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4216049
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 68
+  longitude_dist: 50.800000000000068
+  lateral_dist: 11.200000000000017
+  longitude_vel: -13.75
+  lateral_vel: -0.5
+  rcs: 3.5
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 0.794
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 1.697
+  probexist: 0.75
+  meas_state: 2
+  longitude_accel: -1.1400000000000006
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.317
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4218309
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 69
+  longitude_dist: 16.600000000000023
+  lateral_dist: -5.3999999999999773
+  longitude_vel: -13.75
+  lateral_vel: 0
+  rcs: -1.5
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 0.794
+  longitude_vel_rms: 0.616
+  lateral_vel_rms: 2.187
+  probexist: 0.75
+  meas_state: 1
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 4.676
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4220691
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 70
+  longitude_dist: 53.600000000000023
+  lateral_dist: 30.200000000000017
+  longitude_vel: -13.75
+  lateral_vel: -0.25
+  rcs: 0.5
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 0.794
+  lateral_vel_rms: 1.317
+  probexist: 0.75
+  meas_state: 3
+  longitude_accel: -0.99000000000000021
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.317
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4223826
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 71
+  longitude_dist: 85
+  lateral_dist: -0.59999999999999432
+  longitude_vel: -14
+  lateral_vel: -1.25
+  rcs: 1.5
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 1.023
+  lateral_vel_rms: 1.697
+  probexist: 0.75
+  meas_state: 2
+  longitude_accel: -1.17
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.697
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 4.4
+  width: 1.8
+  obstacle_class: 1
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4225767
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 72
+  longitude_dist: 70.200000000000045
+  lateral_dist: 12.800000000000011
+  longitude_vel: -13.75
+  lateral_vel: 0
+  rcs: 2
+  dynprop: 2
+  longitude_dist_rms: 0.478
+  lateral_dist_rms: 0.794
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 1.317
+  probexist: 0.75
+  meas_state: 2
+  longitude_accel: -1.0899999999999999
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 0.8
+  width: 0.4
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.422828
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 73
+  longitude_dist: 107.20000000000005
+  lateral_dist: 19.600000000000023
+  longitude_vel: -13.75
+  lateral_vel: -0.75
+  rcs: 4
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 0.478
+  lateral_vel_rms: 1.317
+  probexist: 0.75
+  meas_state: 2
+  longitude_accel: -1.129999999999999
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 1.023
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4230931
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 74
+  longitude_dist: 44.200000000000045
+  lateral_dist: -7.9999999999999716
+  longitude_vel: -14
+  lateral_vel: 0.5
+  rcs: -5
+  dynprop: 2
+  longitude_dist_rms: 0.616
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 0.794
+  lateral_vel_rms: 1.317
+  probexist: 0.999
+  meas_state: 2
+  longitude_accel: -1.1199999999999992
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 1.317
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 0.2
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4233356
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 75
+  longitude_dist: 96.200000000000045
+  lateral_dist: -22.599999999999994
+  longitude_vel: -14
+  lateral_vel: -0.25
+  rcs: 5.5
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 1.317
+  longitude_vel_rms: 1.317
+  lateral_vel_rms: 1.697
+  probexist: 0.5
+  meas_state: 3
+  longitude_accel: -1
+  lateral_accel: 0
+  oritation_angle: -3.1999999999999886
+  longitude_accel_rms: 2.817
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4236133
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 76
+  longitude_dist: 26
+  lateral_dist: -30.599999999999994
+  longitude_vel: 0
+  lateral_vel: 10.5
+  rcs: 7.5
+  dynprop: 4
+  longitude_dist_rms: 1.023
+  lateral_dist_rms: 1.317
+  longitude_vel_rms: 1.317
+  lateral_vel_rms: 2.187
+  probexist: 0.25
+  meas_state: 3
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 1.6000000000000227
+  longitude_accel_rms: 2.187
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 1
+  width: 1
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4239194
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 77
+  longitude_dist: 34.200000000000045
+  lateral_dist: -29.799999999999983
+  longitude_vel: 0
+  lateral_vel: 13.5
+  rcs: 28
+  dynprop: 4
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 1.023
+  longitude_vel_rms: 1.317
+  lateral_vel_rms: 1.317
+  probexist: 0.75
+  meas_state: 3
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 1.6000000000000227
+  longitude_accel_rms: 1.317
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.332
+  length: 1
+  width: 1
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4241116
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 78
+  longitude_dist: 74.800000000000068
+  lateral_dist: 12.600000000000023
+  longitude_vel: -13.5
+  lateral_vel: 0
+  rcs: 2.5
+  dynprop: 2
+  longitude_dist_rms: 1.023
+  lateral_dist_rms: 1.317
+  longitude_vel_rms: 2.187
+  lateral_vel_rms: 2.187
+  probexist: 0.25
+  meas_state: 3
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 4.676
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.669
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4243667
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 79
+  longitude_dist: 223.80000000000007
+  lateral_dist: 25.200000000000017
+  longitude_vel: -13.75
+  lateral_vel: 0
+  rcs: 7
+  dynprop: 2
+  longitude_dist_rms: 1.023
+  lateral_dist_rms: 2.187
+  longitude_vel_rms: 2.187
+  lateral_vel_rms: 2.187
+  probexist: 0.5
+  meas_state: 3
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 4.676
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.669
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4246397
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 80
+  longitude_dist: 238.20000000000005
+  lateral_dist: 5.2000000000000171
+  longitude_vel: -13.75
+  lateral_vel: 0
+  rcs: 4
+  dynprop: 2
+  longitude_dist_rms: 1.023
+  lateral_dist_rms: 2.187
+  longitude_vel_rms: 2.187
+  lateral_vel_rms: 2.187
+  probexist: 0.5
+  meas_state: 3
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 4.676
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.669
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+contiobs {
+  header {
+    timestamp_sec: 1520381229.4249284
+    module_name: "conti_radar"
+    sequence_num: 689
+  }
+  clusterortrack: false
+  obstacle_id: 81
+  longitude_dist: 31.600000000000023
+  lateral_dist: -9.1999999999999886
+  longitude_vel: -13.75
+  lateral_vel: 0
+  rcs: 2.5
+  dynprop: 2
+  longitude_dist_rms: 0.794
+  lateral_dist_rms: 0.794
+  longitude_vel_rms: 0.616
+  lateral_vel_rms: 2.187
+  probexist: 0.75
+  meas_state: 1
+  longitude_accel: 0
+  lateral_accel: 0
+  oritation_angle: 3.2000000000000171
+  longitude_accel_rms: 4.676
+  lateral_accel_rms: 0.005
+  oritation_angle_rms: 0.471
+  length: 0
+  width: 0
+  obstacle_class: 0
+}
+object_list_status {
+  nof_objects: 82
+  meas_counter: 28432
+  interface_version: 0
+}
