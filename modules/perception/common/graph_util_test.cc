@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/common/graph_util.h"
+#include "modules/perception/common/graph_util.h"
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 #include "gtest/gtest.h"
 
 #include "modules/common/log.h"
