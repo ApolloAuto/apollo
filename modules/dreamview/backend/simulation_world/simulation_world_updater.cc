@@ -81,10 +81,12 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   map_ws_->RegisterMessageHandler(
       "RetrieveRelativeMapData",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        std::string retrieved_map_string;
-        sim_world_service_.GetRelativeMap().SerializeToString(
-            &retrieved_map_string);
-        map_ws_->SendBinaryData(conn, retrieved_map_string, true);
+        std::string to_send;
+        {
+          boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+          to_send = relative_map_string_;
+        }
+        map_ws_->SendBinaryData(conn, to_send, true);
       });
 
   websocket_->RegisterMessageHandler(
@@ -348,6 +350,8 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
     sim_world_service_.GetWireFormatString(
         FLAGS_sim_map_radius, &simulation_world_,
         &simulation_world_with_planning_data_);
+    sim_world_service_.GetRelativeMap().SerializeToString(
+        &relative_map_string_);
   }
 }
 
