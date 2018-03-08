@@ -119,17 +119,17 @@ cc_library(
 )
 
 cc_library(
-    name = "motion_manager_subnode",
+    name = "motion_subnode",
     srcs = [
-        "motion_manager_service.cc",
+        "motion_service.cc",
     ],
     hdrs = [
-        "motion_manager_service.h",
+        "motion_service.h",
     ],
     deps = [
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/obstacle/camera/motionmanager",
+        "//modules/perception/obstacle/camera/motion",
         "//modules/perception/onboard",
         "@ros//:ros_common",
     ],
@@ -230,10 +230,10 @@ cc_library(
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/cipv:camera_cipv",
         "//modules/perception/obstacle/camera/common:util",
-        "//modules/perception/obstacle/camera/motionmanager",
+        "//modules/perception/obstacle/camera/motion",
         "//modules/perception/obstacle/camera/visualizer",
         "//modules/perception/obstacle/onboard:lane_post_processing_subnode",
-        "//modules/perception/obstacle/onboard:motion_manager_subnode",
+        "//modules/perception/obstacle/onboard:motion_subnode",
         "//modules/perception/onboard",
     ],
 )
