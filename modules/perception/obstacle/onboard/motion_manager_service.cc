@@ -29,8 +29,8 @@ bool MotionManagerService::InitInternal() {
   AdapterManager::AddLocalizationCallback(&MotionManagerService::OnLocalization,
                                           this);
   AINFO << "start to init MotionManagerService.";
-  _vehicle_planemotion = new PlaneMotion(_motion_buffer_size, false,
-                                         1.0f / _motion_sensor_frequency);
+  vehicle_planemotion_ = new PlaneMotion(motion_buffer_size_, false,
+                                         1.0f / motion_sensor_frequency_);
 
   AINFO << "init MotionManagerService success.";
   return true;
@@ -47,8 +47,8 @@ void MotionManagerService::OnLocalization(
   vehicle_status.velocity = sqrt(velx * velx + vely * vely + velz * velz);
 
   double timestamp_diff = 0;
-  if (!_start_flag) {
-    _start_flag = true;
+  if (!start_flag_) {
+    start_flag_ = true;
     vehicle_status.yaw_rate = 0;
     timestamp_diff = 0;
   } else {
@@ -59,7 +59,7 @@ void MotionManagerService::OnLocalization(
   pre_timestamp = localization.measurement_time();
 
   // add motion to buffer
-  _vehicle_planemotion->add_new_motion(&vehicle_status, timestamp_diff, false);
+  vehicle_planemotion_->add_new_motion(&vehicle_status, timestamp_diff, false);
 }
 
 REGISTER_SUBNODE(MotionManagerService);

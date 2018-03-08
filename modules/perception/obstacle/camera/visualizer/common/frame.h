@@ -57,13 +57,13 @@ class Frame {
   void get_orientation(double *q0, double *q1, double *q2, double *q3) const;
 
   void set_translation(const Eigen::Vector3d &translation) {
-    _t = translation;
+    t_ = translation;
   }
 
   void set_translation(double x, double y, double z);
 
   void set_rotation(const Eigen::Quaterniond &rotation) {
-    _q = rotation;
+    q_ = rotation;
   }
 
   void set_rotation(double q0, double q1, double q2, double q3);
@@ -72,11 +72,11 @@ class Frame {
                                     const Eigen::Quaterniond &rotation);
 
   Eigen::Vector3d translation() const {
-    return _t;
+    return t_;
   }
 
   Eigen::Quaterniond rotation() const {
-    return _q;
+    return q_;
   }
 
   void get_translation(double *x, double *y, double *z) const;
@@ -84,7 +84,7 @@ class Frame {
   void get_rotation(double *q0, double *q1, double *q2, double *q3) const;
 
   const Frame *reference_frame() const {
-    return _reference_frame;
+    return reference_frame_;
   }
 
   void set_reference_frame(const Frame *const refFrame);
@@ -199,11 +199,11 @@ class Frame {
 
  private:
   // Position and orientation
-  Eigen::Vector3d _t;
-  Eigen::Quaterniond _q;
+  Eigen::Vector3d t_;
+  Eigen::Quaterniond q_;
 
   // Frame composition
-  const Frame *_reference_frame;
+  const Frame *reference_frame_;
 };
 
 Eigen::Vector3d get_quaternion_axis(const Eigen::Quaterniond &quat);

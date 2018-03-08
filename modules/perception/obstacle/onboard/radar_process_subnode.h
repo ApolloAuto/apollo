@@ -85,7 +85,7 @@ class RadarProcessSubnode : public Subnode {
   Eigen::Matrix4d short_camera_extrinsic_;
 
   boost::circular_buffer<LocalizationPair> localization_buffer_;
-  ContiRadarIDExpansion _conti_id_expansion;
+  ContiRadarIDExpansion conti_id_expansion_;
   std::unique_ptr<BaseRadarDetector> radar_detector_;
   HDMapInput *hdmap_input_ = NULL;
   // here we use HdmapROIFilter

@@ -39,30 +39,30 @@ class BaseContent {
   BaseContent() = default;
 
   ~BaseContent() = default;
-  double _timestamp = -1.0;
+  double timestamp_ = -1.0;
 };
 
 class CameraContent : public BaseContent {
  public:
   CameraContent()
-      : _camera_frame_supplement(new CameraFrameSupplement),
+      : camera_frame_supplement_(new CameraFrameSupplement),
         _pose_c2w(Eigen::Matrix4d::Identity()) {}
-  std::vector<ObjectPtr> _camera_objects;
-  CameraFrameSupplementPtr _camera_frame_supplement;
+  std::vector<ObjectPtr> camera_objects_;
+  CameraFrameSupplementPtr camera_frame_supplement_;
   Eigen::Matrix4d _pose_c2w;
 };
 
 class ImageContent : public BaseContent {
  public:
-  cv::Mat _image_mat_src;
+  cv::Mat image_mat_src_;
 };
 
 class MotionContent : public BaseContent {
  public:
-  //    MotionContent() : _motion_frame_content(new MotionBuffer) {}
-  //    MotionBufferPtr _motion_frame_content;
+  //    MotionContent() : motion_frame_content_(new MotionBuffer) {}
+  //    MotionBufferPtr motion_frame_content_;
   //    MotionContent() {}
-  MotionBuffer _motion_frame_content;
+  MotionBuffer motion_frame_content_;
 };
 
 class RadarContent : public BaseContent {
@@ -71,20 +71,20 @@ class RadarContent : public BaseContent {
       : _pose_fr2w(Eigen::Matrix4d::Identity()),
         _pose_br2w(Eigen::Matrix4d::Identity()) {}
   Eigen::Matrix4d _pose_fr2w;
-  // RadarRawObstacles _radar_raw_front;
+  // RadarRawObstacles radar_raw_front_;
   Eigen::Matrix4d _pose_br2w;
-  // RadarRawObstacles _radar_raw_back;
-  std::vector<ObjectPtr> _radar_objects;
+  // RadarRawObstacles radar_raw_back_;
+  std::vector<ObjectPtr> radar_objects_;
 };
 
 class FusionContent : public BaseContent {
  public:
-  std::vector<ObjectPtr> _fused_objects;
+  std::vector<ObjectPtr> fused_objects_;
 };
 
 class GroundTruthContent : public BaseContent {
  public:
-  std::vector<ObjectPtr> _gt_objects;
+  std::vector<ObjectPtr> gt_objects_;
 };
 
 class ContentComparison {
@@ -97,9 +97,9 @@ class ContentComparison {
 
   bool operator()(const BaseContent& lhs, const BaseContent& rhs) const {
     if (reverse) {
-      return (lhs._timestamp > rhs._timestamp);
+      return (lhs.timestamp_ > rhs.timestamp_);
     } else {
-      return (lhs._timestamp < rhs._timestamp);
+      return (lhs.timestamp_ < rhs.timestamp_);
     }
   }
 };
@@ -131,11 +131,11 @@ class FrameContent {
   cv::Mat get_camera_image();
 
   int get_pose_type() {
-    return _continuous_type;
+    return continuous_type_;
   }
 
   void set_pose_type(int type) {
-    _continuous_type = type;
+    continuous_type_ = type;
   }
 
   std::vector<ObjectPtr> get_camera_objects();
@@ -143,13 +143,13 @@ class FrameContent {
   double get_visualization_timestamp();
 
   inline bool has_radar_data() {
-    return _radar_caches.size();
+    return radar_caches_.size();
   }
 
   CameraFrameSupplementPtr get_camera_frame_supplement();
 
   inline bool has_camera_data() {
-    return _camera_caches.size();
+    return camera_caches_.size();
   }
   /*   inline void set_camera2velo_pose(const Eigen::Matrix4d& pose) {
          _pose_camera2velo = pose;
@@ -179,32 +179,32 @@ class FrameContent {
 
   // input
   // 1.radar
-  std::map<int64_t, RadarContent> _radar_caches;
-  double _current_radar_timestamp;
+  std::map<int64_t, RadarContent> radar_caches_;
+  double current_radar_timestamp_;
 
   // 2.camera
-  std::map<int64_t, CameraContent> _camera_caches;
-  double _current_camera_timestamp;
+  std::map<int64_t, CameraContent> camera_caches_;
+  double current_camera_timestamp_;
 
   // 3.fusion
-  std::map<int64_t, FusionContent> _fusion_caches;
-  double _current_fusion_timestamp;
+  std::map<int64_t, FusionContent> fusion_caches_;
+  double current_fusion_timestamp_;
 
   // 4.ground truth
-  std::map<int64_t, GroundTruthContent> _gt_caches;
-  double _current_gt_timestamp;
+  std::map<int64_t, GroundTruthContent> gt_caches_;
+  double current_gt_timestamp_;
 
   // 5.image
-  std::map<int64_t, ImageContent> _image_caches;
-  double _current_image_timestamp;
+  std::map<int64_t, ImageContent> image_caches_;
+  double current_image_timestamp_;
 
   // 6.motion
-  std::map<int64_t, MotionContent> _motion_caches;
-  double _current_motion_timestamp;
+  std::map<int64_t, MotionContent> motion_caches_;
+  double current_motion_timestamp_;
 
-  Eigen::Vector3d _global_offset;
-  bool _global_offset_initialized;
-  int _continuous_type;
+  Eigen::Vector3d global_offset_;
+  bool global_offset_initialized_;
+  int continuous_type_;
   Eigen::Matrix4d _pose_camera2velo;
 
   DISALLOW_COPY_AND_ASSIGN(FrameContent);

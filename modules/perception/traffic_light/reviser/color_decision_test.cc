@@ -24,24 +24,24 @@ namespace traffic_light {
 class DecisionTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    _reviser = new ColorReviser;
-    ASSERT_TRUE(_reviser->Init());
+    reviser_ = new ColorReviser;
+    ASSERT_TRUE(reviser_->Init());
     AINFO << "Setup";
   }
-  ~DecisionTest() { delete _reviser; }
+  ~DecisionTest() { delete reviser_; }
 
  protected:
-  BaseReviser *_reviser;
+  BaseReviser *reviser_;
 };
 
-void do_test(BaseReviser *_reviser, const std::vector<int> &color_list,
+void do_test(BaseReviser *reviser_, const std::vector<int> &color_list,
              TLColor color) {
   ReviseOption option(100);
   for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<LightPtr> light;
     light.emplace_back(new Light);
     light[0]->status.color = TLColor(color_list[i]);
-    _reviser->Revise(option, &light);
+    reviser_->Revise(option, &light);
     option.ts += 0.1;
     ASSERT_TRUE(light[0]->status.color == color);
   }
@@ -49,19 +49,19 @@ void do_test(BaseReviser *_reviser, const std::vector<int> &color_list,
 
 TEST_F(DecisionTest, red_flash) {
   std::vector<int> color_list = {1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1};
-  do_test(_reviser, color_list, RED);
+  do_test(reviser_, color_list, RED);
 }
 
 TEST_F(DecisionTest, green_flash) {
   std::vector<int> color_list = {3, 3, 3, 0, 3, 0, 3, 3, 0, 3,
                                  0, 3, 0, 3, 0, 0, 0, 0, 0, 3};
-  do_test(_reviser, color_list, GREEN);
+  do_test(reviser_, color_list, GREEN);
 }
 
 TEST_F(DecisionTest, yellow_flash) {
   std::vector<int> color_list = {2, 0, 2, 2, 2, 0, 2, 2,
                                  0, 2, 0, 0, 2, 2, 0, 2};
-  do_test(_reviser, color_list, YELLOW);
+  do_test(reviser_, color_list, YELLOW);
 }
 
 TEST_F(DecisionTest, mix) {
@@ -74,7 +74,7 @@ TEST_F(DecisionTest, mix) {
     std::vector<LightPtr> light;
     light.emplace_back(new Light);
     light[0]->status.color = TLColor(color_list[i]);
-    _reviser->Revise(option, &light);
+    reviser_->Revise(option, &light);
     option.ts += 0.1;
     ASSERT_TRUE(light[0]->status.color == TLColor(gt_list[i]));
   }
@@ -90,7 +90,7 @@ TEST_F(DecisionTest, mix_yellow) {
     std::vector<LightPtr> light;
     light.emplace_back(new Light);
     light[0]->status.color = TLColor(color_list[i]);
-    _reviser->Revise(option, &light);
+    reviser_->Revise(option, &light);
     option.ts += 0.1;
     ASSERT_TRUE(TLColor(gt_list[i]) == light[0]->status.color);
   }
@@ -130,7 +130,7 @@ TEST_F(DecisionTest, mix_yellow_red_flash) {
     std::vector<LightPtr> light;
     light.emplace_back(new Light);
     light[0]->status.color = TLColor(color_list[i]);
-    _reviser->Revise(option, &light);
+    reviser_->Revise(option, &light);
     option.ts = ts_list[i];
     ASSERT_TRUE(TLColor(gt_list[i]) == light[0]->status.color) << " i: " << i;
   }
