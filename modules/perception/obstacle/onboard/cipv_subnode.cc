@@ -21,7 +21,7 @@
 #include <string>
 #include <map>
 #include <memory>
-#include "modules/perception/obstacle/onboard/motion_manager_service.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/onboard/dag_streaming.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
@@ -104,12 +104,12 @@ apollo::common::Status CIPVSubnode::ProcEvents() {
     }
     CipvOptions cipv_options;
     // *** To Do *** use motion manager
-    // MotionManagerService* motion_manager_service =
-    //   dynamic_cast<MotionManagerService*>
-    //     (DAGStreaming::GetSubnodeByName("MotionManagerService"));
+    // MotionService* motion_service =
+    //   dynamic_cast<MotionService*>
+    //     (DAGStreaming::GetSubnodeByName("MotionService"));
     // double timestamp = event.timestamp;
     // VehicleInformation vehicle_information;
-    // motion_manager_service->get_vehicle_information(timestamp,
+    // motion_service->get_vehicle_information(timestamp,
     //                                                &vehicle_information);
     // cipv_options.yaw_angle = vehicle_information.yaw_angle;
     // cipv_options.velocity = vehicle_information.velocity;
