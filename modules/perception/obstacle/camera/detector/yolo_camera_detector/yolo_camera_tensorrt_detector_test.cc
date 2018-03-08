@@ -40,9 +40,9 @@ TEST(YoloCameraTensorRTDetectorTest, yolo_camera_detector_test) {
      adu::perception::yolo::YoloParam origin_yolo_param;
      int origin_gpu_flag = FLAGS_camera_detector_gpu;
 
-     load_text_proto_message_file(yolo_test_config, yolo_param);
+     LoadTextProtoMessageFile(yolo_test_config, yolo_param);
      // roipooling feature extractor
-     load_text_proto_message_file(yolo_config, origin_yolo_param);
+     LoadTextProtoMessageFile(yolo_config, origin_yolo_param);
      {
          yolo_param.mutable_model_param()->set_model_type(yolo::ModelType::TensorRT);
          yolo_param.mutable_model_param()->set_proto_file("tensorrt.pt");
