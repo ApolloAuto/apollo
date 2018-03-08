@@ -66,7 +66,7 @@ std::string TitleCase(const std::string &origin,
 }
 
 // List subdirs and return a dict of {subdir_title: subdir_path}.
-Map<std::string, std::string> ListDirAsDict(const std::string& dir) {
+Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
   Map<std::string, std::string> result;
   const auto subdirs = apollo::common::util::ListSubDirectories(dir);
   for (const auto &subdir : subdirs) {
@@ -132,18 +132,18 @@ HMIWorker::HMIWorker() {
   }
 }
 
-int HMIWorker::RunModuleCommand(const std::string& module,
-                                const std::string& command) {
+int HMIWorker::RunModuleCommand(const std::string &module,
+                                const std::string &command) {
   return RunComponentCommand(config_.modules(), module, command);
 }
 
-int HMIWorker::RunHardwareCommand(const std::string& hardware,
-                                  const std::string& command) {
+int HMIWorker::RunHardwareCommand(const std::string &hardware,
+                                  const std::string &command) {
   return RunComponentCommand(config_.hardware(), hardware, command);
 }
 
-int HMIWorker::RunToolCommand(const std::string& tool,
-                              const std::string& command) {
+int HMIWorker::RunToolCommand(const std::string &tool,
+                              const std::string &command) {
   return RunComponentCommand(config_.tools(), tool, command);
 }
 
@@ -181,7 +181,7 @@ bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
 
   constexpr int kMaxTries = 3;
   constexpr auto kTryInterval = std::chrono::milliseconds(500);
-  auto* chassis = CHECK_NOTNULL(AdapterManager::GetChassis());
+  auto *chassis = CHECK_NOTNULL(AdapterManager::GetChassis());
   for (int i = 0; i < kMaxTries; ++i) {
     // Send driving action periodically until entering target driving mode.
     AdapterManager::FillPadHeader("HMI", &pad);
@@ -210,8 +210,8 @@ void HMIWorker::RunModeCommand(const std::string &command_name) {
   }
 }
 
-void HMIWorker::ChangeToMap(const std::string& map_name,
-                            MapService* map_service) {
+void HMIWorker::ChangeToMap(const std::string &map_name,
+                            MapService *map_service) {
   if (status_.current_map() == map_name) {
     return;
   }
@@ -229,12 +229,11 @@ void HMIWorker::ChangeToMap(const std::string& map_name,
   CHECK(fout) << "Fail to open " << FLAGS_global_flagfile;
   fout << "\n--map_dir=" << *map_dir << std::endl;
   // Also reload simulation map.
-  CHECK(map_service->ReloadMap(true)) << "Failed to load map from "
-                                      << *map_dir;
+  CHECK(map_service->ReloadMap(true)) << "Failed to load map from " << *map_dir;
   RunModeCommand("stop");
 }
 
-void HMIWorker::ChangeToVehicle(const std::string& vehicle_name) {
+void HMIWorker::ChangeToVehicle(const std::string &vehicle_name) {
   if (status_.current_vehicle() == vehicle_name) {
     return;
   }
@@ -250,8 +249,8 @@ void HMIWorker::ChangeToVehicle(const std::string& vehicle_name) {
   RunModeCommand("stop");
 }
 
-void HMIWorker::ChangeToMode(const std::string& mode_name) {
-  const std::string& old_mode = status_.current_mode();
+void HMIWorker::ChangeToMode(const std::string &mode_name) {
+  const std::string &old_mode = status_.current_mode();
   if (old_mode == mode_name) {
     return;
   }
@@ -259,7 +258,7 @@ void HMIWorker::ChangeToMode(const std::string& mode_name) {
     AERROR << "Unknown mode " << mode_name;
     return;
   }
-  const auto& old_modules = config_.modes().at(old_mode).live_modules();
+  const auto &old_modules = config_.modes().at(old_mode).live_modules();
   status_.set_current_mode(mode_name);
   apollo::common::KVDB::Put("apollo:dreamview:mode", mode_name);
 
@@ -269,7 +268,7 @@ void HMIWorker::ChangeToMode(const std::string& mode_name) {
   }
 }
 
-void HMIWorker::UpdateSystemStatus(const monitor::SystemStatus& system_status) {
+void HMIWorker::UpdateSystemStatus(const monitor::SystemStatus &system_status) {
   *status_.mutable_system_status() = system_status;
 }
 
