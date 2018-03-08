@@ -194,6 +194,11 @@ bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
   adc_route_index_ = route_index;
   UpdateRoutingRange(adc_route_index_);
 
+  if (routing_waypoint_index_.empty()) {
+    AERROR << "No routing waypoint index";
+    return false;
+  }
+
   int last_index = GetWaypointIndex(routing_waypoint_index_.back().waypoint);
   if (next_routing_waypoint_index_ == routing_waypoint_index_.size() - 1 ||
       (!stop_for_destination_ &&
@@ -249,6 +254,10 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
   routing_waypoint_index_.clear();
   int i = 0;
   const auto &request_waypoints = routing.routing_request().waypoint();
+  if (request_waypoints.empty()) {
+    AERROR << "Invalid routing: no request waypoints";
+    return false;
+  }
   for (std::size_t j = 0; j < route_indices_.size(); ++j) {
     while (i < request_waypoints.size() &&
            RouteSegments::WithinLaneSegment(route_indices_[j].segment,
