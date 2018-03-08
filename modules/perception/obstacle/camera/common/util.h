@@ -99,9 +99,6 @@ std::string GetTypeText(ObjectType type);
 
 ObjectType GetObjectType(const std::string &type_text);
 
-bool LoadTextProtoMessageFile(const std::string& path,
-                                  google::protobuf::Message* msg);
-
 }  // namespace perception
 }  // namespace apollo
 
