@@ -20,19 +20,36 @@ namespace apollo {
 namespace perception {
 
 bool CameraProcessSubnode::InitInternal() {
+  //  Subnode config in DAG streaming
+  std::map<string, string> fields;
+  SubnodeHelper::ParseReserveField(reserve_, &fields));
+  device_id_ = fields["device_id"];
 
-  // parse reserve fileds
-  map<std::string, std::string> reserve_field_map;
-  if (!SubnodeHelper::parse_reserve_field(_reserve, &reserve_field_map)) {
-    XLOG(ERROR) << "Failed to parse reserve filed: " << _reserve;
-    return false;
-  }
+  // Shared Data
+  cam_obj_data_ = static_cast<CameraObjectData*>(
+      shared_data_manager_->GetSharedData("CameraObjectData"));
+  cam_shared_data_ = static_cast<CameraSharedData*>(
+      shared_data_manager_->GetSharedData("CameraSharedData"));
 
-  init_shared_data();
-  init_calibration_input(reserve_field_map);
-  init_subscriber(reserve_field_map);
+  InitCalibration();
 
   InitModules();
+
+  AdapterManager::AddImageShortCallback(&CameraProcessSubnode::ImgCallback,
+                                        this);
+  return true;
+}
+
+bool CameraProcessSubnode::InitCalibration() {
+  auto ccm = base::Singleton<CalibrationConfigManager>::get();
+  CameraCalibrationPtr calibrator = ccm->get_camera_calibration();
+
+  const onboard::TransformInput &camera2car_trans =
+      calibrator->get_camera_transform();
+  camera2car_trans.query_pos(0.0, &camera_to_car_);
+
+  intrinsics_ = calibrator->get_camera_intrinsic();
+  undistortion_handler_ = calibrator->get_camera_undistort_handler();
 
   return true;
 }
@@ -53,81 +70,6 @@ bool CameraProcessSubnode::InitModules() {
 
   filter_.reset(BaseCameraFilterRegisterer::get_instance_by_name("ObjectCameraFilter"));
   filter_->Init();
-  return true;
-}
-
-bool CameraProcessSubnode::init_shared_data() {
-  CHECK(_shared_data_manager != nullptr);
-  // init preprocess_data
-  _camera_object_data = dynamic_cast<CameraObjectData *>(
-      _shared_data_manager->get_shared_data("CameraObjectData"));
-  if (_camera_object_data == nullptr) {
-    XLOG(ERROR) << "Failed to get shared data instance: CameraObjectData ";
-    return false;
-  }
-  XLOG(INFO) << "Init shared data successfully, data: "
-             << _camera_object_data->name();
-
-  _camera_shared_data = dynamic_cast<CameraSharedData *>(
-      _shared_data_manager->get_shared_data("CameraSharedData"));
-  if (_camera_shared_data == nullptr) {
-    XLOG(ERROR) << "Failed to get shared data instance: CameraSharedData ";
-    return false;
-  }
-  XLOG(INFO) << "Init shared data successfully, data: "
-             << _camera_shared_data->name();
-  return true;
-}
-
-bool CameraProcessSubnode::init_calibration_input(
-    const map<std::string, std::string> &reserve_field_map) {
-  CalibrationConfigManager *config_manager =
-      base::Singleton<CalibrationConfigManager>::get();
-  CameraCalibrationPtr calibrator = config_manager->get_camera_calibration();
-  const onboard::TransformInput &camera2car_trans =
-      calibrator->get_camera_transform();
-  if (!camera2car_trans.query_pos(0.0, &_camera_to_car_mat)) {
-    XLOG(ERROR) << "Failed to query camera to ego car space";
-    return false;
-  }
-  _camera_intrinsic = calibrator->get_camera_intrinsic();
-  _undistortion_handler = calibrator->get_camera_undistort_handler();
-
-  XLOG(INFO) << "Init calibration successfully.";
-  return true;
-}
-
-bool CameraProcessSubnode::init_subscriber(
-    const map<std::string, std::string> &reserve_field_map) {
-  auto citer = reserve_field_map.find("source_type");
-  if (citer == reserve_field_map.end()) {
-    XLOG(ERROR) << "Failed to find field source_type, reserve: " << _reserve;
-    return false;
-  }
-  IoStreamType source_type =
-      static_cast<IoStreamType>(atoi((citer->second).c_str()));
-  citer = reserve_field_map.find("source_name");
-  if (citer == reserve_field_map.end()) {
-    XLOG(ERROR) << "Failed to find field source_name, reserve: " << _reserve;
-    return false;
-  }
-  const std::string &source_name = citer->second;
-
-  citer = reserve_field_map.find("device_id");
-  if (citer == reserve_field_map.end()) {
-    XLOG(ERROR) << "Failed to find field device_id, reserve: " << _reserve;
-    return false;
-  }
-  _device_id = citer->second;
-
-  // register subscriber
-  bool ret = _stream_input.register_subscriber(
-      source_type, new_source_name, &CameraProcessSubnode::image_callback, this);
-  if (!ret) {
-    XLOG(ERROR) << "Failed to register input stream. [type: " << source_type
-                << "] [name: " << new_source_name << "].";
-    return false;
-  }
 
   return true;
 }
@@ -216,18 +158,18 @@ void CameraProcessSubnode::PublishDataAndEvent(
     const onboard::SharedDataPtr<SensorObjects> &sensor_objects,
     const onboard::SharedDataPtr<CameraItem> &camera_item) {
   std::string key = "";
-  SubnodeHelper::produce_shared_data_key(timestamp, _device_id, &key));
+  SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key));
 
-  _camera_object_data->add(key, sensor_objects));
-  _camera_shared_data->add(key, camera_item));
+  cam_obj_data_->add(key, sensor_objects));
+  cam_shared_data_->add(key, camera_item));
 
-  for (size_t idx = 0; idx < _pub_meta_events.size(); ++idx) {
-    const EventMeta &event_meta = _pub_meta_events[idx];
+  for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
+    const EventMeta& event_meta = pub_meta_events_[idx];
     Event event;
     event.event_id = event_meta.event_id;
     event.timestamp = timestamp;
-    event.reserve = _device_id;
-    _event_manager->publish(event);
+    event.reserve = device_id_;
+    event_manager_->Publish(event);
   }
 }
 
