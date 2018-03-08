@@ -44,9 +44,9 @@ using apollo::common::util::make_unique;
 using Json = WebSocketHandler::Json;
 
 HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
-    : websocket_(websocket)
-    , map_service_(map_service)
-    , logger_(apollo::common::monitor::MonitorMessageItem::HMI) {
+    : websocket_(websocket),
+      map_service_(map_service),
+      logger_(apollo::common::monitor::MonitorMessageItem::HMI) {
   // Register websocket message handlers.
   if (websocket_) {
     RegisterMessageHandlers();
@@ -57,8 +57,8 @@ void HMI::RegisterMessageHandlers() {
   // Send current config and status to new HMI client.
   websocket_->RegisterConnectionReadyHandler(
       [this](WebSocketHandler::Connection *conn) {
-        const auto& config = HMIWorker::instance()->GetConfig();
-        const auto& status = HMIWorker::instance()->GetStatus();
+        const auto &config = HMIWorker::instance()->GetConfig();
+        const auto &status = HMIWorker::instance()->GetStatus();
         websocket_->SendData(
             conn, JsonUtil::ProtoToTypedJson("HMIConfig", config).dump());
         websocket_->SendData(
@@ -185,8 +185,9 @@ void HMI::RegisterMessageHandlers() {
         // json should contain event_time_ms and event_msg.
         uint64_t event_time_ms;
         std::string event_msg;
-        if (JsonUtil::GetNumberFromJson(json, "event_time_ms", &event_time_ms)
-            && JsonUtil::GetStringFromJson(json, "event_msg", &event_msg)) {
+        if (JsonUtil::GetNumberFromJson(json, "event_time_ms",
+                                        &event_time_ms) &&
+            JsonUtil::GetStringFromJson(json, "event_msg", &event_msg)) {
           HMIWorker::SubmitDriveEvent(event_time_ms, event_msg);
         } else {
           AERROR << "Truncated SubmitDriveEvent request.";
@@ -206,7 +207,7 @@ void HMI::RegisterMessageHandlers() {
 
 void HMI::BroadcastHMIStatus() {
   // In unit tests, we may leave websocket_ as NULL and skip broadcasting.
-  const auto& status = HMIWorker::instance()->GetStatus();
+  const auto &status = HMIWorker::instance()->GetStatus();
   if (websocket_) {
     websocket_->BroadcastData(
         JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
@@ -227,8 +228,10 @@ void HMI::SendVehicleParam(WebSocketHandler::Connection *conn) {
     return;
   }
 
-  const auto json_str = JsonUtil::ProtoToTypedJson(
-      "VehicleParam", VehicleConfigHelper::GetConfig().vehicle_param()).dump();
+  const auto json_str =
+      JsonUtil::ProtoToTypedJson(
+          "VehicleParam", VehicleConfigHelper::GetConfig().vehicle_param())
+          .dump();
   if (conn != nullptr) {
     websocket_->SendData(conn, json_str);
   } else {
