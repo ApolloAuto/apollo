@@ -8,8 +8,8 @@ cc_library(
         ":aabox2d",
         ":aaboxkdtree2d",
         ":angle",
-        ":cartesian_frenet_conversion",
         ":box2d",
+        ":cartesian_frenet_conversion",
         ":euler_angles_zxy",
         ":factorial",
         ":integral",
@@ -182,7 +182,7 @@ cc_library(
 )
 
 cc_library(
-    name= "path_matcher",
+    name = "path_matcher",
     srcs = [
         "path_matcher.cc",
     ],
@@ -190,8 +190,8 @@ cc_library(
         "path_matcher.h",
     ],
     deps = [
-        "//modules/common/proto:pnc_point_proto",
         "//modules/common/math:linear_interpolation",
+        "//modules/common/proto:pnc_point_proto",
     ],
 )
 

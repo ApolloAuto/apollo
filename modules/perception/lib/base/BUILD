@@ -10,14 +10,14 @@ cc_library(
         "timer.cc",
     ],
     hdrs = [
-        "singleton.h",
         "concurrent_queue.h",
         "mutex.h",
+        "noncopyable.h",
         "registerer.h",
+        "singleton.h",
         "thread.h",
         "time_util.h",
         "timer.h",
-        "noncopyable.h",
     ],
     linkopts = [
         "-lboost_filesystem",
