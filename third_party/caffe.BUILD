@@ -6,7 +6,7 @@ cc_library(
     name = "lib",
     includes = [
         ".",
-        "/usr/include"
+        "/usr/include",
     ],
     linkopts = [
         "-Wl,-rpath,/usr/lib/x86_64-linux-gnu/",
