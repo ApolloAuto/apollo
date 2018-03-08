@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/camera/motionmanager/vehicleplanemotion.h"
+#include "modules/perception/obstacle/camera/motion/vehicleplanemotion.h"
 
 namespace apollo {
 namespace perception {

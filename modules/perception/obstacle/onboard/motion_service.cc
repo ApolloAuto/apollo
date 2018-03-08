@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/onboard/motion_manager_service.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
@@ -24,19 +24,19 @@ namespace perception {
 
 using apollo::common::adapter::AdapterManager;
 
-bool MotionManagerService::InitInternal() {
+bool MotionService::InitInternal() {
   CHECK(AdapterManager::GetLocalization()) << "Localiztion is not initialized.";
-  AdapterManager::AddLocalizationCallback(&MotionManagerService::OnLocalization,
+  AdapterManager::AddLocalizationCallback(&MotionService::OnLocalization,
                                           this);
-  AINFO << "start to init MotionManagerService.";
+  AINFO << "start to init MotionService.";
   vehicle_planemotion_ = new PlaneMotion(motion_buffer_size_, false,
                                          1.0f / motion_sensor_frequency_);
 
-  AINFO << "init MotionManagerService success.";
+  AINFO << "init MotionService success.";
   return true;
 }
 
-void MotionManagerService::OnLocalization(
+void MotionService::OnLocalization(
     const apollo::localization::LocalizationEstimate& localization) {
   const auto& velocity = localization.pose().linear_velocity();
   // Get VehicleStatus
@@ -62,7 +62,7 @@ void MotionManagerService::OnLocalization(
   vehicle_planemotion_->add_new_motion(&vehicle_status, timestamp_diff, false);
 }
 
-REGISTER_SUBNODE(MotionManagerService);
+REGISTER_SUBNODE(MotionService);
 
 }  // namespace perception
 }  // namespace apollo
