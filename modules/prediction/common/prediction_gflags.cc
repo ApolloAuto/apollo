@@ -126,6 +126,8 @@ DEFINE_double(adc_trajectory_search_length, 10.0,
 DEFINE_double(virtual_lane_radius, 0.5, "Radius to search virtual lanes");
 DEFINE_double(default_lateral_approach_speed, 0.5,
               "Default lateral speed approaching to center of lane");
+DEFINE_double(centripedal_acc_threshold, 2.0,
+              "Threshold of centripedal acceleration.");
 
 // move sequence prediction
 DEFINE_double(time_upper_bound_to_lane_center, 5.0,

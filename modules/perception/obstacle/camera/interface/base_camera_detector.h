@@ -52,8 +52,8 @@ class BaseCameraDetector {
   BaseCameraDetector() {}
   virtual ~BaseCameraDetector() {}
 
-  virtual bool Init(const CameraDetectorInitOptions &options =
-                    CameraDetectorInitOptions()) = 0;
+  virtual bool Init(const CameraDetectorInitOptions& options =
+                        CameraDetectorInitOptions()) = 0;
 
   // @brief: Object detection on image from camera
   // @param [in]: image frame from camera
@@ -64,8 +64,7 @@ class BaseCameraDetector {
 
   virtual bool Multitask(const cv::Mat& frame,
                          const CameraDetectorOptions& options,
-                         std::vector<VisualObjectPtr>* objects,
-                         cv::Mat* mask) {
+                         std::vector<VisualObjectPtr>* objects, cv::Mat* mask) {
     return true;
   }
 

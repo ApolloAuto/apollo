@@ -218,6 +218,13 @@ bool NavigationLane::UpdateProjectionIndex() {
   return true;
 }
 
+double NavigationLane::GetKappa(const double c1, const double c2,
+                const double c3, const double x) {
+  const double dy = 3 * c3 * x * x + 2 * c2 * x + c1;
+  const double d2y = 6 * c3 * x + 2 * c2;
+  return std::fabs(d2y) / std::pow((1 + dy * dy), 1.5);
+}
+
 void NavigationLane::ConvertLaneMarkerToPath(
     const perception::LaneMarkers &lane_marker, common::Path *path) {
   CHECK_NOTNULL(path);
@@ -275,6 +282,11 @@ void NavigationLane::ConvertLaneMarkerToPath(
     point->set_s(accumulated_s);
     point->set_theta(
         std::atan2(3 * path_c3 * x1 * x1 + 2 * path_c2 * x1 + path_c1, 1));
+    point->set_kappa(GetKappa(path_c1, path_c2, path_c3, x1));
+
+    const double k1 = GetKappa(path_c1, path_c2, path_c3, x1 - 0.0001);
+    const double k2 = GetKappa(path_c1, path_c2, path_c3, x1 + 0.0001);
+    point->set_dkappa((k2 - k1) / 0.0002);
   }
 
   left_width_ = (std::fabs(left_lane.c0_position()) +

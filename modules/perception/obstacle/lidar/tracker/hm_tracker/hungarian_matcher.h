@@ -65,9 +65,7 @@ class HungarianMatcher : public BaseMatcher {
                          std::vector<int>* sub_unassigned_tracks,
                          std::vector<int>* sub_unassigned_objects);
 
-  std::string Name() const {
-    return "HungarianMatcher";
-  }
+  std::string Name() const { return "HungarianMatcher"; }
 
  protected:
   // @brief compute association matrix
