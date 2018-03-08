@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,39 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/dreamview/backend/hmi/hmi_worker.h"
 
-#ifndef MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
-#define MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
+#include "gtest/gtest.h"
 
-#include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/dreamview/backend/handlers/websocket.h"
-#include "modules/dreamview/backend/map/map_service.h"
-
-/**
- * @namespace apollo::dreamview
- * @brief apollo::dreamview
- */
 namespace apollo {
 namespace dreamview {
 
-class HMI {
- public:
-  HMI(WebSocketHandler *websocket, MapService *map_service);
-
- private:
-  // Broadcast HMIStatus to all clients.
-  void BroadcastHMIStatus();
-
-  void RegisterMessageHandlers();
-
-  // No ownership.
-  WebSocketHandler *websocket_;
-  MapService *map_service_;
-
-  apollo::common::monitor::MonitorLogger logger_;
-};
+TEST(HMIWorkTest, Init) {
+  const auto& hmi_config = HMIWorker::instance()->GetConfig();
+  EXPECT_GT(hmi_config.available_vehicles().size(), 0);
+}
 
 }  // namespace dreamview
 }  // namespace apollo
-
-#endif  // MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
