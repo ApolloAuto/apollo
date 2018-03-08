@@ -187,7 +187,6 @@ cc_library(
         ":planning_gflags",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/common/util:dropbox",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/pnc_map",
         "//modules/map/proto:map_proto",
@@ -196,8 +195,8 @@ cc_library(
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
-        "//modules/planning/reference_line",
         "//modules/planning/proto:lattice_structure_proto",
+        "//modules/planning/reference_line",
         "@eigen",
     ],
 )
@@ -228,7 +227,6 @@ cc_library(
     deps = [
         ":planning_gflags",
         ":reference_line_info",
-        "//modules/common/util:dropbox",
         "//modules/map/pnc_map:route_segments",
         "//modules/planning/proto:planning_proto",
     ],

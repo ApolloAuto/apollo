@@ -3,6 +3,8 @@ syntax = "proto2";
 package apollo.planning;
 
 import "modules/planning/proto/decision.proto";
+import "modules/common/proto/drive_state.proto";
+import "modules/planning/proto/planning.proto";
 
 /*
   This file defines the data types that represents the internal state of the planning module.
@@ -60,9 +62,23 @@ message ChangeLaneStatus {
    optional double timestamp = 3;
 }
 
+message RightOfWayStatus {
+    // whether the vehicle has right of way in junction
+    map<string, bool> junction = 1;
+}
+
 message PlanningStatus {
   optional ReroutingStatus rerouting = 1;
   optional SidePassStatus side_pass = 2;
   optional StopSignStatus stop_sign = 3;
   optional ChangeLaneStatus change_lane = 4;
+  optional RightOfWayStatus right_of_way = 5;
+  optional apollo.common.EngageAdvice engage_advice = 6;
+  optional SpecialStatus special_status = 7;
+}
+
+message SpecialStatus {
+    // special status for test purpose
+  optional int32 trajectory_index = 1;
+  repeated apollo.planning.ADCTrajectory trajectory = 2;
 }
