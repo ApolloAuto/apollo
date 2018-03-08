@@ -115,7 +115,6 @@ cc_library(
         "//modules/perception/obstacle/camera/tracker",
         "//modules/perception/obstacle/camera/transformer",
         "//modules/perception/obstacle/camera/filter",
-        "//modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor",
         "@eigen",
         "@opencv2//:core",
         "@ros//:ros_common",
