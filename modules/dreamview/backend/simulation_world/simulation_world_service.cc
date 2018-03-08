@@ -963,6 +963,13 @@ template <>
 void SimulationWorldService::UpdateSimulationWorld(const MapMsg &map_msg) {
   if (map_msg.has_hdmap()) {
     relative_map_.CopyFrom(map_msg.hdmap());
+    for (int i = 0; i < relative_map_.lane_size(); ++i) {
+      auto *lane = relative_map_.mutable_lane(i);
+      lane->clear_left_sample();
+      lane->clear_right_sample();
+      lane->clear_left_road_sample();
+      lane->clear_right_road_sample();
+    }
   }
 }
 
