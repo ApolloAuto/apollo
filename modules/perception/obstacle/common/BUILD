@@ -6,7 +6,6 @@ cc_library(
     name = "common",
     srcs = [
         "geometry_util.cc",
-        "graph_util.cc",
         "hungarian_bigraph_matcher.cc",
         "object_sequence.cc",
         "pose_util.cc",
@@ -16,7 +15,6 @@ cc_library(
         "convex_hullxy.h",
         "disjoint_set.h",
         "geometry_util.h",
-        "graph_util.h",
         "hungarian_bigraph_matcher.h",
         "object_sequence.h",
         "pose_util.h",
@@ -42,7 +40,6 @@ cc_test(
         "convex_hullxy_test.cc",
         "disjoint_set_test.cc",
         "geometry_util_test.cc",
-        "graph_util_test.cc",
         "hungarian_bigraph_matcher_test.cc",
         "object_sequence_test.cc",
         "pose_util_test.cc",
