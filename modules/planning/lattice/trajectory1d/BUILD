@@ -26,8 +26,8 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common/math:linear_interpolation",
-        "//modules/planning/math/curve1d",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/math/curve1d",
     ],
 )
 

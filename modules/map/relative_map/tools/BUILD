@@ -6,8 +6,8 @@ cc_binary(
     name = "navigation_dummy",
     srcs = ["navigation_dummy.cc"],
     deps = [
-        "//modules/map/relative_map:relative_map_lib",
         "//modules/common",
+        "//modules/map/relative_map:relative_map_lib",
         "@ros//:ros_common",
     ],
 )

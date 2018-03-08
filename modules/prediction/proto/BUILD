@@ -70,8 +70,8 @@ proto_library(
     ],
     deps = [
         "//modules/common/proto:common_proto_lib",
-        "//modules/prediction/proto:lane_graph_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
+        "//modules/prediction/proto:lane_graph_proto_lib",
     ],
 )
 
