@@ -43,10 +43,7 @@
 #include <yaml-cpp/yaml.h>
 #include <Eigen/Core>
 #include <Eigen/Dense>
-#include "lib/base/file_util.h"
 #include "lib/base/macros.h"
-#include "lib/base/perf.h"
-#include "lib/base/time_util.h"
 #include "lib/config_manager/config_manager.h"
 #include "onboard/event_manager.h"
 #include "onboard/shared_data_manager.h"
@@ -67,14 +64,9 @@ class CameraProcessSubnode : public Subnode {
  private:
   bool InitInternal() override;
 
-  void InitModules();
+  bool InitCalibration();
 
-  bool InitFrameDependence();
-  bool init_shared_data();
-  bool init_calibration_input(
-      const std::map<std::string, std::string>& reserve_field_map);
-  bool init_subscriber(
-      const std::map<std::string, std::string>& reserve_field_map);
+  bool InitModules();
 
   void ImgCallback(const sensor_msgs::Image::ConstPtr& message);
 
@@ -90,22 +82,23 @@ class CameraProcessSubnode : public Subnode {
       const onboard::SharedDataPtr<CameraItem>& camera_item);
 
   SeqId seq_num_ = 0;
-  LidarObjectData* processing_data_ = nullptr;
   std::string device_id_;
-  Eigen::Matrix4d camera_to_car_;
 
+  // Shared Data
+  std::shared_ptr<CameraObjectData> cam_obj_data_;
+  std::shared_ptr<CameraSharedData> cam_shared_data_;
+
+  // Calibration
+  Eigen::Matrix4d camera_to_car_;
+  Eigen::Matrix<double, 3, 4> intrinsics_;
+  adu::perception::config_manager::CameraUndistortionPtr undistortion_handler_;
+
+  // Modules
   std::unique_ptr<BaseCameraDetector> detector_;
   std::unique_ptr<BaseCameraConverter> converter_;
   std::unique_ptr<BaseCameraTracker> tracker_;
   std::unique_ptr<BaseCameraTransformer> transformer_;
   std::unique_ptr<BaseCameraFilter> filter_;
-
-  CameraObjectData* _camera_object_data = nullptr;
-  CameraSharedData* _camera_shared_data = nullptr;
-
-  adu::perception::config_manager::CameraUndistortionPtr _undistortion_handler;
-  Eigen::Matrix<double, 3, 4> _camera_intrinsic;
-  onboard::StreamInput<sensor_msgs::Image, MixDetectorSubnode> _stream_input;
 };
 
 REGISTER_SUBNODE(CameraProcessSubnode);
