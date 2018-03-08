@@ -118,6 +118,8 @@ DEFINE_bool(enable_lane_sequence_acc, false,
 DEFINE_bool(enable_trim_prediction_trajectory, false,
             "If trim the prediction trajectory to avoid crossing"
             "protected adc planning trajectory.");
+DEFINE_bool(enable_trajectory_validation_check, false,
+            "If check the validity of prediction trajectory.");
 DEFINE_double(distance_beyond_junction, 0.5,
               "If the obstacle is in junction more than this threshold,"
               "consider it in junction.");
