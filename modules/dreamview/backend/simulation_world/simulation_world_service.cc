@@ -192,9 +192,7 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
   }
 }
 
-inline double SecToMs(const double sec) {
-  return sec * 1000.0;
-}
+inline double SecToMs(const double sec) { return sec * 1000.0; }
 
 }  // namespace
 
