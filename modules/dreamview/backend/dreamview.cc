@@ -37,9 +37,7 @@ using apollo::common::time::Clock;
 using apollo::common::util::PathExists;
 using apollo::hdmap::BaseMapFile;
 
-std::string Dreamview::Name() const {
-  return FLAGS_dreamview_module_name;
-}
+std::string Dreamview::Name() const { return FLAGS_dreamview_module_name; }
 
 void Dreamview::TerminateProfilingMode(const ros::TimerEvent& event) {
   Stop();
