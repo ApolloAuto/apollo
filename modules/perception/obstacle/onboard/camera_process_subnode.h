@@ -18,36 +18,34 @@
 #define MODULES_PERCEPTION_OBSTACLE_ONBORAD_LIDAR_PROCESS_SUBNODE_H_
 
 #include <algorithm>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "Eigen/Core"
+#include "Eigen/Dense"
+#include "cv_bridge/cv_bridge.h"
 #include "sensor_msgs/Image.h"
+#include "yaml-cpp/yaml.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
-#include "modules/common/log.h"
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/log.h"
+#include "modules/perception/lib/base/singleton.h"
+#include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_converter.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_detector.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_filter.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_tracker.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_transformer.h"
 #include "modules/perception/obstacle/camera/interface/base_lane_post_processor.h"
+#include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
-
-#include <cv_bridge/cv_bridge.h>
-#include <yaml-cpp/yaml.h>
-#include <Eigen/Core>
-#include <Eigen/Dense>
-#include "lib/base/macros.h"
-#include "lib/config_manager/config_manager.h"
-#include "onboard/event_manager.h"
-#include "onboard/shared_data_manager.h"
-#include "onboard/types.h"
+#include "modules/perception/onboard/subnode_helper.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -68,30 +66,28 @@ class CameraProcessSubnode : public Subnode {
 
   bool InitModules();
 
-  void ImgCallback(const sensor_msgs::Image::ConstPtr& message);
+  void ImgCallback(const sensor_msgs::Image& message);
 
-  bool MessageToMat(const sensor_msgs::Image::ConstPtr& message, cv::Mat* mat);
+  bool MessageToMat(const sensor_msgs::Image& message, cv::Mat* mat);
 
-  void VisualObjToSensorObj(
-      const std::vector<VisualObjectPtr> &objects,
-      onboard::SharedDataPtr<SensorObjects>* sensor_objects);
+  void VisualObjToSensorObj(const std::vector<VisualObjectPtr>& objects,
+                            SharedDataPtr<SensorObjects>* sensor_objects);
 
-  void PublishDataAndEvent(
-      const float &timestamp,
-      const onboard::SharedDataPtr<SensorObjects>& sensor_objects,
-      const onboard::SharedDataPtr<CameraItem>& camera_item);
+  void PublishDataAndEvent(const float& timestamp,
+                           const SharedDataPtr<SensorObjects>& sensor_objects,
+                           const SharedDataPtr<CameraItem>& camera_item);
 
   SeqId seq_num_ = 0;
   std::string device_id_;
 
   // Shared Data
-  std::shared_ptr<CameraObjectData> cam_obj_data_;
-  std::shared_ptr<CameraSharedData> cam_shared_data_;
+  CameraObjectData* cam_obj_data_;
+  CameraSharedData* cam_shared_data_;
 
   // Calibration
   Eigen::Matrix4d camera_to_car_;
   Eigen::Matrix<double, 3, 4> intrinsics_;
-  adu::perception::config_manager::CameraUndistortionPtr undistortion_handler_;
+  CameraUndistortionPtr undistortion_handler_;
 
   // Modules
   std::unique_ptr<BaseCameraDetector> detector_;
