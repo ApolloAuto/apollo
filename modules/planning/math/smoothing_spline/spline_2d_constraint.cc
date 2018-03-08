@@ -275,14 +275,13 @@ bool Spline2dConstraint::AddPointAngleConstraint(const double t,
   if (normalized_angle < 0) {
     normalized_angle += M_PI * 2;
   }
+
   if (normalized_angle > (M_PI / 2) && normalized_angle < (M_PI * 1.5)) {
     x_sign = -1;
-    affine_inequality_boundary(0, 0) *= -1;
   }
 
   if (normalized_angle >= M_PI) {
     y_sign = -1;
-    affine_inequality_boundary(1, 0) *= -1;
   }
 
   for (uint32_t i = 0; i < t_coef.size(); ++i) {
