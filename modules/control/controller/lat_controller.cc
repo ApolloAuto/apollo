@@ -123,6 +123,8 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   lqr_eps_ = control_conf->lat_controller_conf().eps();
   lqr_max_iteration_ = control_conf->lat_controller_conf().max_iteration();
 
+  query_relative_time_ = control_conf->query_relative_time();
+
   return true;
 }
 
@@ -501,7 +503,7 @@ void LatController::ComputeLateralErrors(
   TrajectoryPoint target_point;
   if (FLAGS_use_navigation_mode) {
     target_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
-        FLAGS_query_relative_time);
+        query_relative_time_);
   } else {
     target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
   }
