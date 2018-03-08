@@ -24,14 +24,14 @@ PlaneMotion::PlaneMotion(int s) {
 }
 
 PlaneMotion::PlaneMotion(int s, bool sync_time_stamp, float time_unit)
-    : _time_unit(time_unit) {
+    : time_unit_(time_unit) {
   init(s);
 }
 
 PlaneMotion::~PlaneMotion(void) {
-  if (_mot_buffer != nullptr) {
-    _mot_buffer->clear();
-    _mot_buffer = nullptr;
+  if (mot_buffer_ != nullptr) {
+    mot_buffer_->clear();
+    mot_buffer_ = nullptr;
   }
 }
 
@@ -39,8 +39,8 @@ PlaneMotion::~PlaneMotion(void) {
 void PlaneMotion::generate_motion_matrix(VehicleStatus *vehicledata) {
   Eigen::Matrix3f motion_2d = Eigen::Matrix3f::Identity();
 
-  float theta = _time_unit * vehicledata->yaw_rate;
-  float displacement = _time_unit * vehicledata->velocity;
+  float theta = time_unit_ * vehicledata->yaw_rate;
+  float displacement = time_unit_ * vehicledata->velocity;
 
   Eigen::Rotation2Df rot2d(theta);
   Eigen::Vector2f trans;
@@ -62,21 +62,21 @@ void PlaneMotion::add_new_motion(VehicleStatus *vehicledata,
   _mat_motion_2d_image =
       _mat_motion_2d_image * vehicledata->motion;  // accumulate CAN+IMU motion
 
-  _time_difference +=
+  time_difference_ +=
       motion_time_dif;  // accumulate time diff before inserting into buffer
 
   if (image_read) {
     // image capture time stamp to insert the buffer for the accumulated motion
-    for (int k = 0; k < static_cast<int>(_mot_buffer->size()); k++) {
-      (*_mot_buffer)[k].motion *= _mat_motion_2d_image;
+    for (int k = 0; k < static_cast<int>(mot_buffer_->size()); k++) {
+      (*mot_buffer_)[k].motion *= _mat_motion_2d_image;
     }
 
-    vehicledata->time_d = _time_difference;
+    vehicledata->time_d = time_difference_;
     vehicledata->motion = _mat_motion_2d_image;
-    _mot_buffer->push_back(*vehicledata);  // a new image frame is added
+    mot_buffer_->push_back(*vehicledata);  // a new image frame is added
     _mat_motion_2d_image =
         Eigen::Matrix3f::Identity();  // reset image accumulated motion
-    _time_difference = 0;             // reset the accumulated time difference
+    time_difference_ = 0;             // reset the accumulated time difference
   }
 }
 
