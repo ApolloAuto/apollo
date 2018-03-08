@@ -16,6 +16,11 @@
 
 #include "modules/prediction/common/validation_checker.h"
 
+#include <cmath>
+#include <algorithm>
+
+#include "modules/prediction/common/prediction_gflags.h"
+
 namespace apollo {
 namespace prediction {
 
@@ -23,8 +28,21 @@ using apollo::common::TrajectoryPoint;
 
 bool ValidationChecker::ValidCentripedalAcceleration(
     const std::vector<TrajectoryPoint>& trajectory_points) {
-  // TODO(kechxu) implement
-  return true;
+  std::size_t num_point = trajectory_points.size();
+  if (num_point < 2) {
+    return true;
+  }
+  double max_centripedal_acc = 0.0;
+  for (std::size_t i = 0; i + 1 < num_point; ++i) {
+    const auto& first_point = trajectory_points[i];
+    const auto& second_point = trajectory_points[i + 1];
+    double theta_diff = std::abs(second_point.path_point().theta() -
+                                 first_point.path_point().theta());
+    double v = (first_point.v() + second_point.v()) / 2.0;
+    double centripedal_acc = v * theta_diff;
+    max_centripedal_acc = std::max(max_centripedal_acc, centripedal_acc);
+  }
+  return max_centripedal_acc < FLAGS_centripedal_acc_threshold;
 }
 
 }  // namespace prediction

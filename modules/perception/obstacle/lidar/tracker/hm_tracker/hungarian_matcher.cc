@@ -18,8 +18,8 @@
 #include <vector>
 
 #include "modules/common/log.h"
+#include "modules/perception/common/graph_util.h"
 #include "modules/perception/obstacle/common/geometry_util.h"
-#include "modules/perception/obstacle/common/graph_util.h"
 #include "modules/perception/obstacle/common/hungarian_bigraph_matcher.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hungarian_matcher.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/track_object_distance.h"
