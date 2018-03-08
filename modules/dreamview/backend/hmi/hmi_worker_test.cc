@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/dreamview/backend/hmi/hmi_worker.h"
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H_
-#define MODULES_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H_
-
-#include <string>
-#include <vector>
+#include "gtest/gtest.h"
 
 namespace apollo {
-namespace perception {
+namespace dreamview {
 
-std::string GetFileName(const std::string& path);
+TEST(HMIWorkerTest, Init) {
+  const auto& hmi_config = HMIWorker::instance()->GetConfig();
+  EXPECT_GT(hmi_config.available_vehicles().size(), 0);
+}
 
-void GetFileNamesInFolderById(const std::string& folder, const std::string& ext,
-                              std::vector<std::string>* ret);
-
-}  // namespace perception
+}  // namespace dreamview
 }  // namespace apollo
-
-#endif  // MODULES_PERCEPTION_OBSTACLE_COMMON_FILE_SYSTEM_UTIL_H_

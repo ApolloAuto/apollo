@@ -215,7 +215,7 @@ inline ScalarType Group::ComputeDistance(const Group& tar_group,
   // (2) compute the departure distance to target marker
   // line equation:
   // A * x + B * y + C = 0
-  // A = _v.y(), B = -_v.x(), C = _v.x() * _p.y() - _v.y() * _p.x();
+  // A = v_.y(), B = -v_.x(), C = v_.x() * p_.y() - v_.y() * p_.x();
   // the normal distance from a point (x2, y2) to the line:
   // d = |A * x2 + B * y2 + C| / sqrt(A^2 + B^2)
   ScalarType departure_dist =

@@ -125,13 +125,18 @@ void TrafficDecider::BuildPlanningTarget(
         stop_point.set_type(StopPoint::SOFT);
         ADEBUG << "Soft stop at: " << min_s << "  STOP_REASON_YELLOW_SIGNAL";
       } else {
-        min_s = -1.0;
         ADEBUG << "No planning target found at reference line.";
       }
     }
   }
-  stop_point.set_s(min_s);
-  reference_line_info->SetStopPoint(stop_point);
+  if (min_s != std::numeric_limits<double>::infinity()) {
+    const auto &vehicle_config =
+        common::VehicleConfigHelper::instance()->GetConfig();
+    double front_edge_to_center =
+        vehicle_config.vehicle_param().front_edge_to_center();
+    stop_point.set_s(min_s - front_edge_to_center);
+    reference_line_info->SetStopPoint(stop_point);
+  }
 }
 
 Status TrafficDecider::Execute(Frame *frame,

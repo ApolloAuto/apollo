@@ -19,18 +19,17 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_DETECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_DETECTOR_H_
 
-#include <Eigen/Core>
-
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "Eigen/Core"
 #include "opencv2/opencv.hpp"
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
+#include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
-#include "modules/perception/obstacle/common/camera.h"
 
 namespace apollo {
 namespace perception {
@@ -52,8 +51,8 @@ class BaseCameraDetector {
   BaseCameraDetector() {}
   virtual ~BaseCameraDetector() {}
 
-  virtual bool Init(const CameraDetectorInitOptions &options =
-                    CameraDetectorInitOptions()) = 0;
+  virtual bool Init(const CameraDetectorInitOptions& options =
+                        CameraDetectorInitOptions()) = 0;
 
   // @brief: Object detection on image from camera
   // @param [in]: image frame from camera
@@ -64,8 +63,7 @@ class BaseCameraDetector {
 
   virtual bool Multitask(const cv::Mat& frame,
                          const CameraDetectorOptions& options,
-                         std::vector<VisualObjectPtr>* objects,
-                         cv::Mat* mask) {
+                         std::vector<VisualObjectPtr>* objects, cv::Mat* mask) {
     return true;
   }
 

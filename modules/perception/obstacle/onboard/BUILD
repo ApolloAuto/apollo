@@ -98,6 +98,31 @@ cc_library(
 )
 
 cc_library(
+    name = "camera_subnode",
+    srcs = [
+        "camera_process_subnode.cc",
+    ],
+    hdrs = [
+        "camera_process_subnode.h",
+        "object_shared_data.h",
+    ],
+    deps = [
+        "//modules/common/adapters:adapter_manager",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/onboard",
+        "//modules/perception/obstacle/camera/detector/yolo_camera_detector",
+        "//modules/perception/obstacle/camera/converter",
+        "//modules/perception/obstacle/camera/tracker",
+        "//modules/perception/obstacle/camera/transformer",
+        "//modules/perception/obstacle/camera/filter",
+        "@eigen",
+        "@opencv2//:core",
+        "@ros//:ros_common",
+        ":perception_obstacle_shared_data"
+    ],
+)
+
+cc_library(
     name = "fusion_subnode",
     srcs = [
         "fusion_subnode.cc",
@@ -119,17 +144,17 @@ cc_library(
 )
 
 cc_library(
-    name = "motion_manager_subnode",
+    name = "motion_subnode",
     srcs = [
-        "motion_manager_service.cc",
+        "motion_service.cc",
     ],
     hdrs = [
-        "motion_manager_service.h",
+        "motion_service.h",
     ],
     deps = [
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/obstacle/camera/motionmanager",
+        "//modules/perception/obstacle/camera/motion",
         "//modules/perception/onboard",
         "@ros//:ros_common",
     ],
@@ -212,6 +237,28 @@ cc_library(
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common:util",
         "//modules/perception/obstacle/camera/visualizer",
+        "//modules/perception/onboard",
+    ],
+)
+
+cc_library(
+    name = "cipv_subnode",
+    srcs = [
+        "cipv_subnode.cc",
+    ],
+    hdrs = [
+        "cipv_subnode.h",
+    ],
+    deps = [
+        ":perception_obstacle_shared_data",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/cipv:camera_cipv",
+        "//modules/perception/obstacle/camera/common:util",
+        "//modules/perception/obstacle/camera/motion",
+        "//modules/perception/obstacle/camera/visualizer",
+        "//modules/perception/obstacle/onboard:lane_post_processing_subnode",
+        "//modules/perception/obstacle/onboard:motion_subnode",
         "//modules/perception/onboard",
     ],
 )

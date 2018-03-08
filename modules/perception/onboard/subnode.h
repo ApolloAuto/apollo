@@ -127,23 +127,23 @@ class CommonSubnode : public Subnode {
 // public:
 //     virtual apollo::common::Status proc_events() {
 //         // SubnodeNormal
-//         _event_mgr->sub(EVENT_TYPE_A, event_a);
-//         _data_mgr->get_data(data)
+//         event_mgr_->sub(EVENT_TYPE_A, event_a);
+//         data_mgr_->get_data(data)
 //         do something.
-//         _data_mgr->set_data(data)
-//         _event_mgr->pub(event_b);
+//         data_mgr_->set_data(data)
+//         event_mgr_->pub(event_b);
 //
 //         //SubnodeIn
-//         _ros_io->sub(Topic, message_a);
+//         ros_io_->sub(Topic, message_a);
 //         do something.
-//         _data_mgr->set_data(data)
-//         _event_mgr->pub(event_c);
+//         data_mgr_->set_data(data)
+//         event_mgr_->pub(event_c);
 //
 //         //SubnodeOut
-//         _event_mgr->sub(EVENT_TYPE_D, event_d);
-//         _data_mgr->get_data(data)
+//         event_mgr_->sub(EVENT_TYPE_D, event_d);
+//         data_mgr_->get_data(data)
 //         do something.
-//         _ros_io->pub(message_e);
+//         ros_io_->pub(message_e);
 //
 //
 //         printf("Process one event.\n");

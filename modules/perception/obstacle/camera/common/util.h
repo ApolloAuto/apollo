@@ -86,21 +86,18 @@ inline void l2norm(float *feat_data, int feat_dim) {
   }
 }
 
-bool load_visual_object_form_file(const std::string &file_name,
+bool LoadVisualObjectFromFile(const std::string &file_name,
                                   std::vector<VisualObjectPtr> *visual_objects);
 
-bool write_visual_object_to_file(const std::string &file_name,
+bool WriteVisualObjectToFile(const std::string &file_name,
                                  std::vector<VisualObjectPtr> *visual_objects);
 
-bool load_gt_form_file(const std::string &gt_path,
+bool LoadGTfromFile(const std::string &gt_path,
                        std::vector<VisualObjectPtr> *visual_objects);
 
-std::string get_type_text(ObjectType type);
+std::string GetTypeText(ObjectType type);
 
-ObjectType get_object_type(const std::string &type_text);
-
-bool load_text_proto_message_file(const std::string& path,
-                                  google::protobuf::Message* msg);
+ObjectType GetObjectType(const std::string &type_text);
 
 }  // namespace perception
 }  // namespace apollo

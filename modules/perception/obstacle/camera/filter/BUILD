@@ -13,7 +13,7 @@ cc_library(
 )
 
 cc_library(
-    name = "object_filter",
+    name = "filter",
     srcs = ["object_camera_filter.cc"],
     hdrs = ["object_camera_filter.h"],
     deps = [

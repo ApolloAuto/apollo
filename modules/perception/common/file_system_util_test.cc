@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/common/file_system_util.h"
+#include "modules/perception/common/file_system_util.h"
 
 #include "gtest/gtest.h"
 #include "modules/common/log.h"

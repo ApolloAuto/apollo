@@ -20,12 +20,12 @@ namespace apollo {
 namespace perception {
 namespace lowcostvisualizer {
 
-GLubyte GLRasterText::_s_space_bitmap[] = {
+GLubyte GLRasterText::s_space_bitmap_[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00  // ' '
 };
 
-GLubyte GLRasterText::_s_letters_bitmaps[][13] = {
+GLubyte GLRasterText::s_letters_bitmaps_[][13] = {
     {0x00, 0x00, 0xc3, 0xc3, 0xc3, 0xc3, 0xff, 0xc3, 0xc3, 0xc3, 0x66, 0x3c,
      0x18},  // 'A'
     {0x00, 0x00, 0xfe, 0xc7, 0xc3, 0xc3, 0xc7, 0xfe, 0xc7, 0xc3, 0xc3, 0xc7,
@@ -80,7 +80,7 @@ GLubyte GLRasterText::_s_letters_bitmaps[][13] = {
      0xff}  // 'Z'
 };
 
-GLubyte GLRasterText::_s_numbers_bitmaps[][13] = {
+GLubyte GLRasterText::s_numbers_bitmaps_[][13] = {
     {0x00, 0x00, 0x3c, 0x7e, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x7e,
      0x3c},  // '0'
     {0x00, 0x00, 0x7c, 0x7c, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x38,
@@ -103,7 +103,7 @@ GLubyte GLRasterText::_s_numbers_bitmaps[][13] = {
      0x7e}  // '9'
 };
 
-GLubyte GLRasterText::_s_asccii_bitmaps[][13] = {
+GLubyte GLRasterText::s_asccii_bitmaps_[][13] = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
      0x00},
     {0x00, 0x00, 0x18, 0x18, 0x00, 0x00, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18,
@@ -295,33 +295,33 @@ GLubyte GLRasterText::_s_asccii_bitmaps[][13] = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x8f, 0xf1, 0x60, 0x00, 0x00,
      0x00}};
 
-GLuint GLRasterText::_s_font_offset = 0;
+GLuint GLRasterText::s_font_offset_ = 0;
 
 void GLRasterText::make_raster_font() {
   GLuint i;
   GLuint j;
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-  _s_font_offset = glGenLists(128);
+  s_font_offset_ = glGenLists(128);
   //    // 'A' to 'Z'
   //    for (i = 0, j = 'A'; i < 26; i++, j++) {
-  //        glNewList(_s_font_offset + j, GL_COMPILE);
-  //        glBitmap(8, 13, 0.0, 2.0, 10.0, 0.0, _s_letters_bitmaps[i]);
+  //        glNewList(s_font_offset_ + j, GL_COMPILE);
+  //        glBitmap(8, 13, 0.0, 2.0, 10.0, 0.0, s_letters_bitmaps_[i]);
   //        glEndList();
   //    }
   //    // space
-  //    glNewList(_s_font_offset + ' ', GL_COMPILE);
-  //    glBitmap(8, 13, 0.0, 2.0, 10.0, 0.0, _s_space_bitmap);
+  //    glNewList(s_font_offset_ + ' ', GL_COMPILE);
+  //    glBitmap(8, 13, 0.0, 2.0, 10.0, 0.0, s_space_bitmap_);
   //    glEndList();
   //    // '0' to '9'
   //    for (i = 0, j = '0'; i < 10; ++i, ++j) {
-  //        glNewList(_s_font_offset + j, GL_COMPILE);
-  //        glBitmap(8, 13, 0.0, 2.0, 10.0, 0.0, _s_numbers_bitmaps[i]);
+  //        glNewList(s_font_offset_ + j, GL_COMPILE);
+  //        glBitmap(8, 13, 0.0, 2.0, 10.0, 0.0, s_numbers_bitmaps_[i]);
   //        glEndList();
   //    }
   for (i = 0, j = ' '; i < 95; ++i, ++j) {
-    glNewList(_s_font_offset + j, GL_COMPILE);
-    glBitmap(8, 13, 0.0, 2.0, 10.0, 0.0, _s_asccii_bitmaps[i]);
+    glNewList(s_font_offset_ + j, GL_COMPILE);
+    glBitmap(8, 13, 0.0, 2.0, 10.0, 0.0, s_asccii_bitmaps_[i]);
     glEndList();
   }
 }
@@ -333,7 +333,7 @@ void GLRasterText::init() {
 
 void GLRasterText::print_string(const char *s) {
   glPushAttrib(GL_LIST_BIT);
-  glListBase(_s_font_offset);
+  glListBase(s_font_offset_);
   glCallLists(strlen(s), GL_UNSIGNED_BYTE,
               reinterpret_cast<const GLubyte *>(s));
   glPopAttrib();

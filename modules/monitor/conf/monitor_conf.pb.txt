@@ -1,34 +1,28 @@
 modules {
-  name: "canbus"
-  process_conf {
-    process_cmd_keywords: "modules/canbus/canbus"
-  }
-}
-modules {
   name: "GPS"
   process_conf {
     process_cmd_keywords: "gnss_nodelet_manager"
   }
 }
 modules {
-  name: "velodyne"
-  process_conf {
-    process_cmd_keywords: "velodyne_nodelet_manager"
-  }
-}
-modules {
-  name: "radar"
-  process_conf {
-    process_cmd_keywords: "modules/drivers/radar/conti_radar/conti_radar"
-  }
-  topic_conf {
-    type: CONTI_RADAR
-  }
-}
-modules {
   name: "camera"
   process_conf {
     process_cmd_keywords: "camera_nodelet_manager"
+  }
+}
+modules {
+  name: "canbus"
+  process_conf {
+    process_cmd_keywords: "modules/canbus/canbus"
+  }
+}
+modules {
+  name: "control"
+  process_conf {
+    process_cmd_keywords: "modules/control/control"
+  }
+  topic_conf {
+    type: CONTROL_COMMAND
   }
 }
 modules {
@@ -41,16 +35,16 @@ modules {
   }
 }
 modules {
-  name: "perception"
+  name: "navigation_control"
   process_conf {
-    process_cmd_keywords: "modules/perception/perception"
+    process_cmd_keywords: "modules/control/control"
   }
   topic_conf {
-    type: PERCEPTION_OBSTACLES
+    type: CONTROL_COMMAND
   }
 }
 modules {
-  name: "prediction"
+  name: "navigation_prediction"
   process_conf {
     process_cmd_keywords: "modules/prediction/prediction"
   }
@@ -59,9 +53,18 @@ modules {
   }
 }
 modules {
-  name: "routing"
+  name: "navigation_routing"
   process_conf {
-    process_cmd_keywords: "modules/routing/routing"
+    process_cmd_keywords: "modules/tools/navigation/routing/navigation_routing.py"
+  }
+}
+modules {
+  name: "perception"
+  process_conf {
+    process_cmd_keywords: "modules/perception/perception"
+  }
+  topic_conf {
+    type: PERCEPTION_OBSTACLES
   }
 }
 modules {
@@ -74,12 +77,21 @@ modules {
   }
 }
 modules {
-  name: "control"
+  name: "prediction"
   process_conf {
-    process_cmd_keywords: "modules/control/control"
+    process_cmd_keywords: "modules/prediction/prediction"
   }
   topic_conf {
-    type: CONTROL_COMMAND
+    type: PREDICTION
+  }
+}
+modules {
+  name: "radar"
+  process_conf {
+    process_cmd_keywords: "modules/drivers/radar/conti_radar/conti_radar"
+  }
+  topic_conf {
+    type: CONTI_RADAR
   }
 }
 modules {
@@ -95,6 +107,27 @@ modules {
   }
   topic_conf {
     type: RELATIVE_MAP
+  }
+}
+modules {
+  name: "routing"
+  process_conf {
+    process_cmd_keywords: "modules/routing/routing"
+  }
+}
+modules {
+  name: "third_party_perception"
+  process_conf {
+    process_cmd_keywords: "modules/third_party_perception/third_party_perception"
+  }
+  topic_conf {
+    type: PERCEPTION_OBSTACLES
+  }
+}
+modules {
+  name: "velodyne"
+  process_conf {
+    process_cmd_keywords: "velodyne_nodelet_manager"
   }
 }
 hardware {

@@ -88,12 +88,12 @@ struct PointXYZIH {
     data[3] = 1.0f;
   }
 
-  explicit PointXYZIH(float _intensity) {
+  explicit PointXYZIH(float intensity_) {
     x = 0.0f;
     y = 0.0f;
     z = 0.0f;
     data[3] = 1.0f;
-    intensity = _intensity;
+    intensity = intensity_;
   }
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;

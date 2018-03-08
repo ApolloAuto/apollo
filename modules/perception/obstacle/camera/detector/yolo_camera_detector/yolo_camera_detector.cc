@@ -16,13 +16,14 @@
 
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 
-#include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
-
-#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/util.h"
-// #include "modules/perception/lib/base/file_util.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/camera/common/util.h"
+#include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
+#include "modules/perception/obstacle/camera/detector/common/util.h"
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/util.h"
+
+DEFINE_string(yolo_config_filename, "config.pt", "Yolo config filename.");
 
 namespace apollo {
 namespace perception {
@@ -30,11 +31,8 @@ namespace perception {
 using std::string;
 using std::vector;
 
-DECLARE_int32(obs_camera_detector_gpu);
-
 bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
   ConfigManager *config_manager = ConfigManager::instance();
-  //    base::Singleton<config_manager::ConfigManager>::get();
   string model_name = this->Name();
   const ModelConfig *model_config = NULL;
   if (!config_manager->GetModelConfig(model_name, &model_config)) {
@@ -50,9 +48,9 @@ bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
   }
   yolo_root = apollo::common::util::GetAbsolutePath(work_root, yolo_root);
 
-  string yolo_config =
-      apollo::common::util::GetAbsolutePath(yolo_root, "config.pt");
-  load_text_proto_message_file(yolo_config, &yolo_param_);
+  const string yolo_config = apollo::common::util::GetAbsolutePath(
+      yolo_root, FLAGS_yolo_config_filename);
+  CHECK(apollo::common::util::GetProtoFromASCIIFile(yolo_config, &yolo_param_));
   load_intrinsic(options);
   if (!init_cnn(yolo_root)) {
     return false;
@@ -186,7 +184,7 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   output_names.push_back(net_param.seg_blob());
 
   FeatureParam feat_param;
-  load_text_proto_message_file(feature_file, &feat_param);
+  CHECK(apollo::common::util::GetProtoFromASCIIFile(feature_file, &feat_param));
   for (auto extractor : feat_param.extractor()) {
     output_names.push_back(extractor.feat_blob());
   }
@@ -373,8 +371,11 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
 
 string YoloCameraDetector::Name() const { return "YoloCameraDetector"; }
 
-// Register plugin.
-REGISTER_CAMERA_DETECTOR(YoloCameraDetector);
+bool YoloCameraDetector::get_objects_gpu(
+    std::vector<VisualObjectPtr> *objects) {
+  AFATAL << "Not implemented, yet!";
+  return false;
+}
 
 }  // namespace perception
 }  // namespace apollo
