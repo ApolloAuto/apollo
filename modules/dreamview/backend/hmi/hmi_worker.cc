@@ -132,6 +132,12 @@ HMIWorker::HMIWorker() {
   }
 }
 
+bool HMIWorker::Trigger(const HMIAction action) {
+  AINFO << "HMIAction " << HMIAction_Name(action) << " was triggered!";
+  // TODO(xiaoxq): Do the action.
+  return false;
+}
+
 int HMIWorker::RunModuleCommand(const std::string &module,
                                 const std::string &command) {
   return RunComponentCommand(config_.modules(), module, command);

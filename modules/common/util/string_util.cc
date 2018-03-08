@@ -22,6 +22,21 @@
 namespace apollo {
 namespace common {
 namespace util {
+namespace {
+
+// A table which maps a char to its value in Base64 mode.
+std::vector<int> Base64CodeTable() {
+  static const std::string kBase64Array =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+  std::vector<int> table(256, -1);
+  for (size_t i = 0; i < kBase64Array.length(); ++i) {
+    table[kBase64Array[i]] = i;
+  }
+  return table;
+}
+
+}  // namespace
 
 void split(const std::string& str, char ch, std::vector<std::string>* result) {
   result->clear();
@@ -54,6 +69,29 @@ void rtrim(std::string* str) {
                           [](int ch) { return !std::isspace(ch); })
                  .base(),
              str->end());
+}
+
+std::string Base64Decode(const std::string &base64_str) {
+  static const std::vector<int> kBase64CodeTable = Base64CodeTable();
+
+  std::string bytes;
+  // Binary string is generally 3/4 the length of base64 string
+  bytes.reserve(base64_str.length() * 3 / 4 + 3);
+  unsigned int sum = 0, sum_bits = 0;
+  for (const char c : base64_str) {
+    if (kBase64CodeTable[c] == -1) {
+      break;
+    }
+
+    // Convert 6-bits Base64 chars to 8-bits general bytes.
+    sum = (sum << 6) + kBase64CodeTable[c];
+    sum_bits += 6;
+    if (sum_bits >= 8) {
+      bytes.push_back((sum >> (sum_bits - 8)) & 0xFF);
+      sum_bits -= 8;
+    }
+  }
+  return bytes;
 }
 
 }  // namespace util
