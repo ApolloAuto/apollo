@@ -34,7 +34,7 @@ namespace planning {
  */
 class Destination : public TrafficRule {
  public:
-  explicit Destination(const RuleConfig& config);
+  explicit Destination(const TrafficRuleConfig& config);
   virtual ~Destination() = default;
 
   bool ApplyRule(Frame* const, ReferenceLineInfo* const reference_line_info);

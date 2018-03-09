@@ -34,7 +34,7 @@ namespace planning {
 
 class SignalLight : public TrafficRule {
  public:
-  explicit SignalLight(const RuleConfig& config);
+  explicit SignalLight(const TrafficRuleConfig& config);
 
   virtual ~SignalLight() = default;
 

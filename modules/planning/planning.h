@@ -25,6 +25,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/traffic_rule_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
@@ -115,6 +116,8 @@ class Planning : public PlanningInterface {
       planner_factory_;
 
   PlanningConfig config_;
+
+  TrafficRuleConfigs traffic_rule_configs_;
 
   const hdmap::HDMap* hdmap_ = nullptr;
 

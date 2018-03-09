@@ -35,7 +35,7 @@ namespace planning {
 using apollo::common::time::Clock;
 using apollo::planning::util::GetPlanningStatus;
 
-SidePassVehicle::SidePassVehicle(const RuleConfig& config)
+SidePassVehicle::SidePassVehicle(const TrafficRuleConfig& config)
     : TrafficRule(config), hdmap_(apollo::hdmap::HDMapUtil::BaseMapPtr()) {}
 
 bool SidePassVehicle::UpdateSidePassStatus(
