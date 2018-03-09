@@ -42,6 +42,7 @@ namespace planning {
 
 using MapPath = hdmap::Path;
 using apollo::common::SLPoint;
+using apollo::common::util::DistanceXY;
 using apollo::hdmap::InterpolatedIndex;
 
 ReferenceLine::ReferenceLine(
@@ -123,6 +124,20 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
   return true;
 }
 
+ReferencePoint ReferenceLine::GetNearestReferencePoint(
+    const common::math::Vec2d& xy) const {
+  double min_dist = std::numeric_limits<double>::max();
+  int min_index = 0;
+  for (std::size_t i = 0; i < reference_points_.size(); ++i) {
+    const double distance = DistanceXY(xy, reference_points_[i]);
+    if (distance < min_dist) {
+      min_dist = distance;
+      min_index = i;
+    }
+  }
+  return reference_points_[min_index];
+}
+
 bool ReferenceLine::Shrink(const common::math::Vec2d& point,
                            double look_backward, double look_forward) {
   common::SLPoint sl;
@@ -158,7 +173,7 @@ bool ReferenceLine::Shrink(const common::math::Vec2d& point,
   return true;
 }
 
-ReferencePoint ReferenceLine::GetNearestReferencepoint(const double s) const {
+ReferencePoint ReferenceLine::GetNearestReferencePoint(const double s) const {
   const auto& accumulated_s = map_path_.accumulated_s();
   if (s < accumulated_s.front() - 1e-2) {
     AWARN << "The requested s " << s << " < 0";
