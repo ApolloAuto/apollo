@@ -283,6 +283,8 @@ void SimulationWorldService::UpdateDelays() {
       SecToMs(AdapterManager::GetPrediction()->GetDelaySec()));
   delays->set_traffic_light(
       SecToMs(AdapterManager::GetTrafficLightDetection()->GetDelaySec()));
+  delays->set_control(
+      SecToMs(AdapterManager::GetControlCommand()->GetDelaySec()));
 }
 
 void SimulationWorldService::GetWireFormatString(
