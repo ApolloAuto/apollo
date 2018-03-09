@@ -625,7 +625,7 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
     if (sl_point.s() < 0 || sl_point.s() > prefix_ref.Length()) {
       continue;
     }
-    auto prefix_ref_point = prefix_ref.GetNearestReferencepoint(sl_point.s());
+    auto prefix_ref_point = prefix_ref.GetNearestReferencePoint(sl_point.s());
     point.path_point.set_x(prefix_ref_point.x());
     point.path_point.set_y(prefix_ref_point.y());
     point.path_point.set_z(0.0);
