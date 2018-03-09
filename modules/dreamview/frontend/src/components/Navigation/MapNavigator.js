@@ -13,6 +13,8 @@ class MapNavigator {
         this.leftLaneMarker = null;
         this.destinationMarker = null;
         this.centerVehicle = true;
+
+        this.routingRequestPoints = [];
     }
 
     initialize(WS, mapAdapter) {
@@ -40,7 +42,7 @@ class MapNavigator {
     }
 
     reset() {
-        this.routingPaths.forEach((path) => {
+        this.routingPaths.forEach(path => {
             console.log(path);
             this.mapAdapter.removePolyline(path);
         });
@@ -102,35 +104,7 @@ class MapNavigator {
 
                 const start = this.mapAdapter.getMarkerPosition(this.vehicleMarker);
                 const end = this.mapAdapter.getMarkerPosition(this.destinationMarker);
-                this.requestRouting(start.lat, start.lng, end.lat, end.lng);
-            },
-        });
-
-        this.mapAdapter.createControl({
-            text: "TO Cananda West",
-            tip: "Click to send routing request",
-            color: "#FF8C00",
-            offsetX: 152,
-            offsetY: 0,
-            onClickHandler: textElementDiv => {
-                const start = this.mapAdapter.getMarkerPosition(this.vehicleMarker);
-                const endLat = 37.50582457077844;
-                const endLng = -122.34000922633726;
-                this.requestRouting(start.lat, start.lng, endLat, endLng);
-            },
-        });
-
-        this.mapAdapter.createControl({
-            text: "TO Cananda East",
-            tip: "Click to send routing request",
-            color: "#00BFFF",
-            offsetX: 10,
-            offsetY: 0,
-            onClickHandler: textElementDiv => {
-                const start = this.mapAdapter.getMarkerPosition(this.vehicleMarker);
-                const endLat = 37.464198;
-                const endLng = -122.298453;
-                this.requestRouting(start.lat, start.lng, endLat, endLng);
+                this.requestRoute(start.lat, start.lng, end.lat, end.lng);
             },
         });
     }
@@ -277,7 +251,7 @@ class MapNavigator {
         });
     }
 
-    requestRouting(startLat, startLng, endLat, endLng) {
+    requestRoute(startLat, startLng, endLat, endLng) {
         if (!startLat || !startLng || !endLat || !endLng) {
             return;
         }
@@ -302,6 +276,30 @@ class MapNavigator {
             this.WS.publishNavigationInfo(response);
         }).catch(error => {
             console.error("Failed to retrieve navigation data:", error);
+        });
+    }
+
+    sendRoutingRequest() {
+        if (this.routingRequestPoints) {
+            const start =
+                this.routingRequestPoints.length > 1
+                    ? this.routingRequestPoints[0]
+                    : this.mapAdapter.getMarkerPosition(this.vehicleMarker);
+            const end = this.routingRequestPoints[this.routingRequestPoints.length - 1];
+            this.routingRequestPoints = [];
+
+            this.requestRoute(start.lat, start.lng, end.lat, end.lng);
+            return true;
+        } else {
+            alert("Please select a route");
+            return false;
+        }
+    }
+
+    addDefaultEndPoint(points) {
+        points.forEach(point => {
+            const [lng, lat] = UTMToWGS84(point.x, point.y);
+            this.routingRequestPoints.push({ lat: lat, lng: lng });
         });
     }
 }
