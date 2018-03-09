@@ -17,6 +17,7 @@
 #include "modules/planning/planning.h"
 
 #include <algorithm>
+#include <list>
 #include <vector>
 
 #include "google/protobuf/repeated_field.h"
