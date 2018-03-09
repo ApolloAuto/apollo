@@ -25,7 +25,7 @@
 namespace apollo {
 namespace planning {
 
-BacksideVehicle::BacksideVehicle(const RuleConfig& config)
+BacksideVehicle::BacksideVehicle(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
 void BacksideVehicle::MakeLaneKeepingObstacleDecision(

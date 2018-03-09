@@ -41,7 +41,8 @@ using apollo::common::util::WithinBound;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 
-SignalLight::SignalLight(const RuleConfig& config) : TrafficRule(config) {}
+SignalLight::SignalLight(const TrafficRuleConfig& config)
+    : TrafficRule(config) {}
 
 bool SignalLight::ApplyRule(Frame* const frame,
                             ReferenceLineInfo* const reference_line_info) {
@@ -237,7 +238,7 @@ bool SignalLight::BuildStopDecision(
   }
 
   path_decision->AddLongitudinalDecision(
-      RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 
   return true;
 }
