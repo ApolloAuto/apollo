@@ -100,7 +100,7 @@ void StopSign::MakeDecisions(Frame* frame,
     // get all vehicles currently watched
     std::vector<std::string> watch_vehicle_ids;
     for (StopSignLaneVehicles::iterator it = watch_vehicles.begin();
-         it != watch_vehicles.end(); it++) {
+         it != watch_vehicles.end(); ++it) {
       std::copy(it->second.begin(), it->second.end(),
                 std::back_inserter(watch_vehicle_ids));
     }
@@ -608,7 +608,7 @@ int StopSign::RemoveWatchVehicle(
 
   if (erase) {
     for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
-         it != watch_vehicles->end(); it++) {
+         it != watch_vehicles->end(); ++it) {
       std::vector<std::string> vehicles = it->second;
       vehicles.erase(std::remove(vehicles.begin(), vehicles.end(), obstacle_id),
                      vehicles.end());
