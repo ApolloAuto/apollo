@@ -54,7 +54,7 @@ using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
 using apollo::planning::util::GetPlanningStatus;
 
-StopSign::StopSign(const RuleConfig& config) : TrafficRule(config) {}
+StopSign::StopSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool StopSign::ApplyRule(Frame* frame,
                          ReferenceLineInfo* const reference_line_info) {
@@ -719,7 +719,7 @@ bool StopSign::BuildStopDecision(Frame* frame,
 
   auto* path_decision = reference_line_info->path_decision();
   path_decision->AddLongitudinalDecision(
-      RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 
   return true;
 }

@@ -32,7 +32,7 @@ namespace planning {
 
 using apollo::hdmap::PathOverlap;
 
-KeepClear::KeepClear(const RuleConfig& config) : TrafficRule(config) {}
+KeepClear::KeepClear(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool KeepClear::ApplyRule(Frame* const frame,
                           ReferenceLineInfo* const reference_line_info) {

@@ -33,7 +33,7 @@ namespace planning {
  */
 class KeepClear : public TrafficRule {
  public:
-  explicit KeepClear(const RuleConfig& config);
+  explicit KeepClear(const TrafficRuleConfig& config);
   virtual ~KeepClear() = default;
 
   bool ApplyRule(Frame* const frame,
