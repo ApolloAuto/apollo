@@ -11,7 +11,6 @@ cc_library(
         "pose_util.cc",
     ],
     hdrs = [
-        "camera.h",
         "convex_hullxy.h",
         "disjoint_set.h",
         "geometry_util.h",

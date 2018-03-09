@@ -71,9 +71,7 @@ Trajectory1dGenerator::Trajectory1dGenerator(
       init_lat_state_(lat_init_state),
       end_condition_sampler_(lon_init_state, lat_init_state,
                              FLAGS_planning_upper_speed_limit,
-                             ptr_path_time_graph,
-                             ptr_prediction_querier) {
-}
+                             ptr_path_time_graph, ptr_prediction_querier) {}
 
 void Trajectory1dGenerator::GenerateTrajectoryBundles(
     const PlanningTarget& planning_target,
@@ -143,8 +141,7 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
 
   GenerateSpeedProfilesForPathTimeObstacles(ptr_lon_trajectory_bundle);
 
-  if (planning_target.has_stop_point()
-      && planning_target.stop_point().s() > 0) {
+  if (planning_target.has_stop_point()) {
     GenerateSpeedProfileForStopping(planning_target.stop_point().s(),
                                     ptr_lon_trajectory_bundle);
   }

@@ -40,7 +40,7 @@ exports_files(["googletest/LICENSE"])
 
 config_setting(
     name = "windows",
-    values = { "cpu": "x64_windows" },
+    values = {"cpu": "x64_windows"},
 )
 
 config_setting(
@@ -70,7 +70,7 @@ cc_library(
             "googlemock/src/gmock_main.cc",
         ],
     ),
-    hdrs =glob([
+    hdrs = glob([
         "googletest/include/gtest/*.h",
         "googlemock/include/gmock/*.h",
     ]),
@@ -79,6 +79,14 @@ cc_library(
             ":windows": [],
             ":windows_msvc": [],
             "//conditions:default": ["-pthread"],
+        },
+    ),
+    defines = select(
+        {
+            ":has_absl": [
+                "GTEST_HAS_ABSL=1",
+            ],
+            "//conditions:default": [],
         },
     ),
     includes = [
@@ -94,21 +102,15 @@ cc_library(
             "-pthread",
         ],
     }),
-    defines = select ({
-        ":has_absl": [
-        "GTEST_HAS_ABSL=1",
-        ],
-        "//conditions:default": [],
-    }
+    deps = select(
+        {
+            ":has_absl": [
+                "@com_google_absl//absl/types:optional",
+                "@com_google_absl//absl/strings",
+            ],
+            "//conditions:default": [],
+        },
     ),
-    deps = select ({
-        ":has_absl": [
-        "@com_google_absl//absl/types:optional",
-        "@com_google_absl//absl/strings"
-        ],
-        "//conditions:default": [],
-    }
-    )
 )
 
 cc_library(

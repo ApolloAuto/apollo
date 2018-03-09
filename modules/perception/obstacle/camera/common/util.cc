@@ -342,33 +342,5 @@ ObjectType GetObjectType(const std::string &type) {
   }
 }
 
-bool LoadTextProtoMessageFile(const std::string &path,
-                              google::protobuf::Message *msg) {
-  if (msg == nullptr) {
-    AERROR << "msg is a null pointer.";
-    return false;
-  }
-
-  int fd = open(path.c_str(), O_RDONLY);
-  if (fd < 0) {
-    AERROR << "path[" << path << "]";
-    return false;
-  }
-
-  google::protobuf::io::FileInputStream file_in(fd);
-
-  if (!google::protobuf::TextFormat::Parse(&file_in, msg)) {
-    AERROR << "path[" << path << "]";
-    return false;
-  }
-
-  if (close(fd) != 0) {
-    AERROR << "fail to close file: " << path;
-    return false;
-  }
-
-  return true;
-}
-
 }  // namespace perception
 }  // namespace apollo

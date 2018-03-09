@@ -75,23 +75,23 @@ class GeometryUtilTest : public testing::Test {
   GeometryUtilTest() {}
   virtual ~GeometryUtilTest() {}
   void SetUp() {
-    ConstructPointCloud(&_clouds);
-    ASSERT_EQ(5, _clouds.size());
+    ConstructPointCloud(&clouds_);
+    ASSERT_EQ(5, clouds_.size());
     Eigen::Vector3d translation(-0.0189, 1.0061, 1);
     Eigen::Vector4d rotation(0.0099, -0.0029, 0.6989, 0.7151);
-    TransAffineToMatrix4(translation, rotation, &_trans_matrix);
+    TransAffineToMatrix4(translation, rotation, &trans_matrix_);
   }
   void TearDown() {}
 
  protected:
-  std::vector<pcl_util::PointCloudPtr> _clouds;
-  Eigen::Matrix4d _trans_matrix;
+  std::vector<pcl_util::PointCloudPtr> clouds_;
+  Eigen::Matrix4d trans_matrix_;
 };
 
 TEST_F(GeometryUtilTest, TransformPointCloud1) {
   pcl_util::PointCloudPtr in_out_cloud(new pcl_util::PointCloud);
-  pcl::copyPointCloud(*_clouds[0], *in_out_cloud);
-  TransformPointCloud<pcl_util::Point>(_trans_matrix, in_out_cloud);
+  pcl::copyPointCloud(*clouds_[0], *in_out_cloud);
+  TransformPointCloud<pcl_util::Point>(trans_matrix_, in_out_cloud);
   EXPECT_NEAR(64.184380, in_out_cloud->at(0).x, EPSILON);
   EXPECT_NEAR(13.708398, in_out_cloud->at(0).y, EPSILON);
   EXPECT_NEAR(1.715922, in_out_cloud->at(0).z, EPSILON);
@@ -102,20 +102,20 @@ TEST_F(GeometryUtilTest, TransformPointCloud2) {
   point_in.x = 1.0;
   point_in.y = 1.0;
   point_in.z = 1.0;
-  TransformPoint(point_in, _trans_matrix, &point_out);
+  TransformPoint(point_in, trans_matrix_, &point_out);
   EXPECT_NEAR(-0.985772, point_out.x, EPSILON);
   EXPECT_NEAR(2.010278, point_out.y, EPSILON);
   EXPECT_NEAR(2.027878, point_out.z, EPSILON);
 
   pcl_util::PointCloudPtr in_out_cloud(new pcl_util::PointCloud);
-  pcl::copyPointCloud(*_clouds[0], *in_out_cloud);
-  TransformPointCloud<pcl_util::Point>(_trans_matrix, in_out_cloud);
+  pcl::copyPointCloud(*clouds_[0], *in_out_cloud);
+  TransformPointCloud<pcl_util::Point>(trans_matrix_, in_out_cloud);
   EXPECT_NEAR(64.184380, in_out_cloud->at(0).x, EPSILON);
   EXPECT_NEAR(13.708398, in_out_cloud->at(0).y, EPSILON);
   EXPECT_NEAR(1.715922, in_out_cloud->at(0).z, EPSILON);
 
   pcl_util::PointCloudPtr out_cloud(new pcl_util::PointCloud);
-  TransformPointCloud(*_clouds[0], _trans_matrix, out_cloud.get());
+  TransformPointCloud(*clouds_[0], trans_matrix_, out_cloud.get());
   EXPECT_NEAR(64.184380, out_cloud->at(0).x, EPSILON);
   EXPECT_NEAR(13.708398, out_cloud->at(0).y, EPSILON);
   EXPECT_NEAR(1.715922, out_cloud->at(0).z, EPSILON);
@@ -145,7 +145,7 @@ TEST_F(GeometryUtilTest, TransformPointCloud3) {
 
 TEST_F(GeometryUtilTest, TransformPointCloud) {
   pcl_util::PointDCloudPtr trans_cloud(new pcl_util::PointDCloud);
-  TransformPointCloud(_clouds[0], _trans_matrix, trans_cloud);
+  TransformPointCloud(clouds_[0], trans_matrix_, trans_cloud);
   EXPECT_NEAR(64.184377, trans_cloud->at(0).x, EPSILON);
   EXPECT_NEAR(13.708398, trans_cloud->at(0).y, EPSILON);
   EXPECT_NEAR(1.715922, trans_cloud->at(0).z, EPSILON);
@@ -189,9 +189,9 @@ TEST_F(GeometryUtilTest, GetCloudMinMax3D) {
 
 TEST_F(GeometryUtilTest, ComputeBboxSizeCenter) {
   std::vector<ObjectPtr> objects;
-  for (size_t i = 0; i < _clouds.size(); ++i) {
+  for (size_t i = 0; i < clouds_.size(); ++i) {
     ObjectPtr object(new Object);
-    object->cloud = _clouds[i];
+    object->cloud = clouds_[i];
     objects.push_back(object);
   }
   EXPECT_EQ(5, objects.size());
@@ -218,27 +218,27 @@ TEST_F(GeometryUtilTest, GetCloudBarycenter) {
   Eigen::Vector3f barycenter;
   // case 1
   barycenter =
-      GetCloudBarycenter<apollo::perception::pcl_util::Point>(_clouds[0])
+      GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[0])
           .cast<float>();
   EXPECT_NEAR(14.188400, barycenter[0], EPSILON);
   // case 2
   barycenter =
-      GetCloudBarycenter<apollo::perception::pcl_util::Point>(_clouds[1])
+      GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[1])
           .cast<float>();
   EXPECT_NEAR(15.661365, barycenter[0], EPSILON);
   // case 3
   barycenter =
-      GetCloudBarycenter<apollo::perception::pcl_util::Point>(_clouds[2])
+      GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[2])
           .cast<float>();
   EXPECT_NEAR(29.376224, barycenter[0], EPSILON);
   // case 4
   barycenter =
-      GetCloudBarycenter<apollo::perception::pcl_util::Point>(_clouds[3])
+      GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[3])
           .cast<float>();
   EXPECT_NEAR(13.144600, barycenter[0], EPSILON);
   // case 5
   barycenter =
-      GetCloudBarycenter<apollo::perception::pcl_util::Point>(_clouds[4])
+      GetCloudBarycenter<apollo::perception::pcl_util::Point>(clouds_[4])
           .cast<float>();
   EXPECT_NEAR(14.668054, barycenter[0], EPSILON);
 }
@@ -246,9 +246,9 @@ TEST_F(GeometryUtilTest, GetCloudBarycenter) {
 TEST_F(GeometryUtilTest, TransAffineToMatrix4) {
   Eigen::Vector3d translation(-0.0189, 1.0061, 1);
   Eigen::Vector4d rotation(0.0099, -0.0029, 0.6989, 0.7151);
-  Eigen::Matrix4d _trans_matrix;
-  TransAffineToMatrix4(translation, rotation, &_trans_matrix);
-  AINFO << "trans_matrix: " << _trans_matrix;
+  Eigen::Matrix4d trans_matrix_;
+  TransAffineToMatrix4(translation, rotation, &trans_matrix_);
+  AINFO << "trans_matrix: " << trans_matrix_;
 }
 
 TEST_F(GeometryUtilTest, ComputeMostConsistentBboxDirection) {

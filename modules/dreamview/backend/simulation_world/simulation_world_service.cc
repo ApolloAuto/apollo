@@ -192,9 +192,7 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
   }
 }
 
-inline double SecToMs(const double sec) {
-  return sec * 1000.0;
-}
+inline double SecToMs(const double sec) { return sec * 1000.0; }
 
 }  // namespace
 
@@ -261,10 +259,7 @@ void SimulationWorldService::Update() {
   UpdateWithLatestObserved("ControlCommand",
                            AdapterManager::GetControlCommand());
   UpdateWithLatestObserved("Navigation", AdapterManager::GetNavigation());
-
-  if (FLAGS_use_navigation_mode) {
-    UpdateWithLatestObserved("RelativeMap", AdapterManager::GetRelativeMap());
-  }
+  UpdateWithLatestObserved("RelativeMap", AdapterManager::GetRelativeMap());
 
   for (const auto &kv : obj_map_) {
     *world_.add_object() = kv.second;
@@ -968,6 +963,13 @@ template <>
 void SimulationWorldService::UpdateSimulationWorld(const MapMsg &map_msg) {
   if (map_msg.has_hdmap()) {
     relative_map_.CopyFrom(map_msg.hdmap());
+    for (int i = 0; i < relative_map_.lane_size(); ++i) {
+      auto *lane = relative_map_.mutable_lane(i);
+      lane->clear_left_sample();
+      lane->clear_right_sample();
+      lane->clear_left_road_sample();
+      lane->clear_right_road_sample();
+    }
   }
 }
 

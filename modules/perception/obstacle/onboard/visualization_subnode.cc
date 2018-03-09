@@ -38,66 +38,66 @@ bool VisualizationSubnode::InitInternal() {
   CHECK(shared_data_manager_ != NULL);
   // init radar object data
   if (FLAGS_show_radar_objects) {
-    _radar_object_data = dynamic_cast<RadarObjectData*>(
+    radar_object_data_ = dynamic_cast<RadarObjectData*>(
         shared_data_manager_->GetSharedData("RadarObjectData"));
-    if (_radar_object_data == nullptr) {
+    if (radar_object_data_ == nullptr) {
       AERROR << "Failed to get RadarObjectData.";
       return false;
     }
     AINFO << "Init shared datas successfully, data: "
-          << _radar_object_data->name();
+          << radar_object_data_->name();
   }
 
   // init camera object data
   if (FLAGS_show_camera_objects || FLAGS_show_camera_objects2d ||
       FLAGS_show_camera_parsing) {
-    _camera_object_data = dynamic_cast<CameraObjectData*>(
+    camera_object_data_ = dynamic_cast<CameraObjectData*>(
         shared_data_manager_->GetSharedData("CameraObjectData"));
-    if (_camera_object_data == nullptr) {
+    if (camera_object_data_ == nullptr) {
       AERROR << "Failed to get CameraObjectData.";
       return false;
     }
-    _cipv_object_data = dynamic_cast<CIPVObjectData*>(
+    cipv_object_data_ = dynamic_cast<CIPVObjectData*>(
         shared_data_manager_->GetSharedData("CIPVObjectData"));
-    if (_cipv_object_data == nullptr) {
+    if (cipv_object_data_ == nullptr) {
       AERROR << "Failed to get CIPVObjectData.";
       return false;
     }
     AINFO << "Init shared datas successfully, data: "
-          << _camera_object_data->name();
+          << camera_object_data_->name();
   }
 
   // init fusion data
   if (FLAGS_show_fused_objects) {
-    _fusion_data = dynamic_cast<FusionSharedData*>(
+    fusion_data_ = dynamic_cast<FusionSharedData*>(
         shared_data_manager_->GetSharedData("FusionSharedData"));
-    if (_fusion_data == nullptr) {
+    if (fusion_data_ == nullptr) {
       AERROR << "Failed to get FusionSharedDataData.";
       return false;
     }
-    AINFO << "Init shared datas successfully, data: " << _fusion_data->name();
+    AINFO << "Init shared datas successfully, data: " << fusion_data_->name();
   }
 
   // init camera shared data
   if (FLAGS_show_camera_objects || FLAGS_show_camera_objects2d ||
       FLAGS_show_camera_parsing) {
-    _camera_shared_data = dynamic_cast<CameraSharedData*>(
+    camera_shared_data_ = dynamic_cast<CameraSharedData*>(
         shared_data_manager_->GetSharedData("CameraSharedData"));
-    if (_camera_shared_data == nullptr) {
+    if (camera_shared_data_ == nullptr) {
       AERROR << "Failed to get CameraSharedData.";
       return false;
     }
     AINFO << "Init shared datas successfully, data: "
-          << _camera_shared_data->name();
+          << camera_shared_data_->name();
   }
   // init frame_visualizer
-  _frame_visualizer.reset(
+  frame_visualizer_.reset(
       BaseVisualizerRegisterer::GetInstanceByName(FLAGS_frame_visualizer));
-  if (!_frame_visualizer) {
+  if (!frame_visualizer_) {
     AERROR << "Failed to get instance: " << FLAGS_frame_visualizer;
     return false;
   }
-  _content.set_pose_type(FrameContent::IMAGE_CONTINUOUS);
+  content_.set_pose_type(FrameContent::IMAGE_CONTINUOUS);
   AINFO << "visualize according to continuous image: ";
   // init stream
   if (!InitStream()) {
@@ -108,9 +108,9 @@ bool VisualizationSubnode::InitInternal() {
   CalibrationConfigManager* config_manager =
       Singleton<CalibrationConfigManager>::get();
   CameraCalibrationPtr calibrator = config_manager->get_camera_calibration();
-  _camera_to_car_pose = calibrator->get_camera_extrinsics();
+  camera_to_car_pose_ = calibrator->get_camera_extrinsics();
   AINFO << "Init camera to car transform successfully.";
-  _content.set_camera2car_pose(_camera_to_car_pose);
+  content_.set_camera2car_pose(camera_to_car_pose_);
   return true;
 }
 
@@ -126,42 +126,42 @@ bool VisualizationSubnode::InitStream() {
     AERROR << "Failed to find vis_driven_event_id:" << reserve_;
     return false;
   }
-  _vis_driven_event_id = static_cast<EventID>(atoi((iter->second).c_str()));
+  vis_driven_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
 
   auto radar_iter = reserve_field_map.find("radar_event_id");
   if (radar_iter == reserve_field_map.end()) {
     AERROR << "Failed to find radar_event_id:" << reserve_;
     return false;
   }
-  _radar_event_id = static_cast<EventID>(atoi((radar_iter->second).c_str()));
+  radar_event_id_ = static_cast<EventID>(atoi((radar_iter->second).c_str()));
 
   auto camera_iter = reserve_field_map.find("camera_event_id");
   if (camera_iter == reserve_field_map.end()) {
     AERROR << "Failed to find camera_event_id:" << reserve_;
     return false;
   }
-  _camera_event_id = static_cast<EventID>(atoi((camera_iter->second).c_str()));
+  camera_event_id_ = static_cast<EventID>(atoi((camera_iter->second).c_str()));
 
   auto cipv_iter = reserve_field_map.find("cipv_event_id");
   if (cipv_iter == reserve_field_map.end()) {
     AERROR << "Failed to find cipv_event_id:" << reserve_;
     return false;
   }
-  _cipv_event_id = static_cast<EventID>(atoi((cipv_iter->second).c_str()));
+  cipv_event_id_ = static_cast<EventID>(atoi((cipv_iter->second).c_str()));
 
   auto fusion_iter = reserve_field_map.find("fusion_event_id");
   if (fusion_iter == reserve_field_map.end()) {
     AERROR << "Failed to find fusion_event_id:" << reserve_;
     return false;
   }
-  _fusion_event_id = static_cast<EventID>(atoi((fusion_iter->second).c_str()));
+  fusion_event_id_ = static_cast<EventID>(atoi((fusion_iter->second).c_str()));
 
   auto motion_iter = reserve_field_map.find("motion_event_id");
   if (motion_iter == reserve_field_map.end()) {
     AERROR << "Failed to find motion_event_id:" << reserve_;
-    _motion_event_id = -1;
+    motion_event_id_ = -1;
   } else {
-    _motion_event_id =
+    motion_event_id_ =
         static_cast<EventID>(atoi((motion_iter->second).c_str()));
   }
 
@@ -171,7 +171,7 @@ bool VisualizationSubnode::InitStream() {
 bool VisualizationSubnode::SubscribeEvents(const EventMeta& event_meta,
                                            std::vector<Event>* events) const {
   Event event;
-  if (event_meta.event_id == _vis_driven_event_id) {
+  if (event_meta.event_id == vis_driven_event_id_) {
     // blocking
     //        if (!event_manager_->subscribe(event_meta.event_id, &event, true))
     //        {
@@ -196,13 +196,13 @@ void VisualizationSubnode::GetFrameData(const Event& event,
                                         const std::string& data_key,
                                         const double timestamp,
                                         FrameContent* content) {
-  if (event.event_id == _camera_event_id) {
+  if (event.event_id == camera_event_id_) {
     if (FLAGS_show_camera_objects || FLAGS_show_camera_objects2d ||
         FLAGS_show_camera_parsing) {
       std::shared_ptr<CameraItem> camera_item;
-      if (!_camera_shared_data->Get(data_key, &camera_item) ||
+      if (!camera_shared_data_->Get(data_key, &camera_item) ||
           camera_item == nullptr) {
-        AERROR << "Failed to get shared data: " << _camera_shared_data->name();
+        AERROR << "Failed to get shared data: " << camera_shared_data_->name();
         return;
       }
       cv::Mat clone_image = camera_item->image_src_mat;
@@ -210,8 +210,8 @@ void VisualizationSubnode::GetFrameData(const Event& event,
       content->set_image_content(timestamp, image);
 
       std::shared_ptr<SensorObjects> objs;
-      if (!_camera_object_data->Get(data_key, &objs) || objs == nullptr) {
-        AERROR << "Failed to get shared data: " << _camera_object_data->name();
+      if (!camera_object_data_->Get(data_key, &objs) || objs == nullptr) {
+        AERROR << "Failed to get shared data: " << camera_object_data_->name();
         return;
       }
 
@@ -228,13 +228,13 @@ void VisualizationSubnode::GetFrameData(const Event& event,
                                     objs->objects);
       }
     }
-  } else if (event.event_id == _motion_event_id) {
+  } else if (event.event_id == motion_event_id_) {
     /*std::shared_ptr<CameraItem> camera_item;
     AERROR << "Motion_Visualization key: in Motion Visualization: " << data_key;
-    if (!_camera_shared_data->Get(data_key, &camera_item) ||
+    if (!camera_shared_data_->Get(data_key, &camera_item) ||
         camera_item == nullptr) {
       AERROR << "Failed to get shared data in Motion Visualization: "
-             << _camera_shared_data->name() << " " << data_key;
+             << camera_shared_data_->name() << " " << data_key;
       return;
     }*/
 
@@ -243,35 +243,35 @@ void VisualizationSubnode::GetFrameData(const Event& event,
     //        std::cout<< "motion_buffer.size(): " <<
     //        camera_item->motion_buffer->size() << std::endl;
 
-  } else if (event.event_id == _radar_event_id) {
+  } else if (event.event_id == radar_event_id_) {
     if (device_id == "radar_front" && FLAGS_show_radar_objects) {
       std::shared_ptr<SensorObjects> objs;
-      if (!_radar_object_data->Get(data_key, &objs) || objs == nullptr) {
-        AERROR << "Failed to get shared data: " << _radar_object_data->name();
+      if (!radar_object_data_->Get(data_key, &objs) || objs == nullptr) {
+        AERROR << "Failed to get shared data: " << radar_object_data_->name();
         return;
       }
       content->set_radar_content(timestamp, objs->objects);
     }
-  } else if (event.event_id == _fusion_event_id) {
+  } else if (event.event_id == fusion_event_id_) {
     if (FLAGS_show_fused_objects) {
       AINFO << "vis_driven_event data_key = " << data_key;
       SharedDataPtr<FusionItem> fusion_item;
-      if (!_fusion_data->Get(data_key, &fusion_item) ||
+      if (!fusion_data_->Get(data_key, &fusion_item) ||
           fusion_item == nullptr) {
-        AERROR << "Failed to get shared data: " << _fusion_data->name();
+        AERROR << "Failed to get shared data: " << fusion_data_->name();
         return;
       }
       content->set_fusion_content(timestamp, fusion_item->obstacles);
 
       AINFO << "Set fused objects : " << fusion_item->obstacles.size();
     }
-  } else if (event.event_id == _cipv_event_id) {
+  } else if (event.event_id == cipv_event_id_) {
     if (FLAGS_show_camera_objects || FLAGS_show_camera_objects2d ||
         FLAGS_show_camera_parsing) {
       std::shared_ptr<CameraItem> camera_item;
-      if (!_camera_shared_data->Get(data_key, &camera_item) ||
+      if (!camera_shared_data_->Get(data_key, &camera_item) ||
           camera_item == nullptr) {
-        AERROR << "Failed to get shared data: " << _camera_shared_data->name();
+        AERROR << "Failed to get shared data: " << camera_shared_data_->name();
         return;
       }
       cv::Mat clone_image = camera_item->image_src_mat;
@@ -279,8 +279,8 @@ void VisualizationSubnode::GetFrameData(const Event& event,
       content->set_image_content(timestamp, image);
 
       std::shared_ptr<SensorObjects> objs;
-      if (!_cipv_object_data->Get(data_key, &objs) || objs == nullptr) {
-        AERROR << "Failed to get shared data: " << _cipv_object_data->name();
+      if (!cipv_object_data_->Get(data_key, &objs) || objs == nullptr) {
+        AERROR << "Failed to get shared data: " << cipv_object_data_->name();
         return;
       }
 
@@ -300,8 +300,8 @@ void VisualizationSubnode::GetFrameData(const Event& event,
     }
   }
 
-  if (event.event_id == _vis_driven_event_id) {
-    // _vis_driven_event_id fusion -> visualization
+  if (event.event_id == vis_driven_event_id_) {
+    // vis_driven_event_id_ fusion -> visualization
     content->update_timestamp(timestamp);
   }
 }
@@ -326,27 +326,27 @@ apollo::common::Status VisualizationSubnode::ProcEvents() {
                << " device_id:" << device_id;
         return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
       }
-      //            GetFrameData(device_id, data_key, &_content, timestamp);
-      if (event_meta.event_id == _vis_driven_event_id) {
+      //            GetFrameData(device_id, data_key, &content_, timestamp);
+      if (event_meta.event_id == vis_driven_event_id_) {
         AERROR << "vis_driven_event_1: " << events[j].event_id << " "
-               << timestamp << " " << device_id << " " << _motion_event_id;
+               << timestamp << " " << device_id << " " << motion_event_id_;
       }
-      GetFrameData(events[j], device_id, data_key, timestamp, &_content);
-      if (event_meta.event_id == _vis_driven_event_id) {
+      GetFrameData(events[j], device_id, data_key, timestamp, &content_);
+      if (event_meta.event_id == vis_driven_event_id_) {
         // Init of frame_visualizer must be in one thread with render,
         // so you must move it from init_internal.
-        if (!_init) {
-          _frame_visualizer->init();
-          // if (_camera_visualizer) {
-          //     _camera_visualizer->init();
+        if (!init_) {
+          frame_visualizer_->init();
+          // if (camera_visualizer_) {
+          //     camera_visualizer_->init();
           // }
-          _init = true;
+          init_ = true;
         }
-        _frame_visualizer->update_camera_system(&_content);
-        _frame_visualizer->render(&_content);
-        //                _frame_visualizer->set_motion_buffer(_motion_buffer);
-        // if (_camera_visualizer) {
-        //     _camera_visualizer->render(_content);
+        frame_visualizer_->update_camera_system(&content_);
+        frame_visualizer_->render(&content_);
+        //                frame_visualizer_->set_motion_buffer(motion_buffer_);
+        // if (camera_visualizer_) {
+        //     camera_visualizer_->render(content_);
         // }
       }
     }

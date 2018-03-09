@@ -56,25 +56,25 @@ class VisualizationSubnode : public Subnode {
                     const std::string& data_key, const double timestamp,
                     FrameContent* content);
 
-  RadarObjectData* _radar_object_data = nullptr;
-  CameraObjectData* _camera_object_data = nullptr;
-  CIPVObjectData* _cipv_object_data = nullptr;
-  CameraSharedData* _camera_shared_data = nullptr;
-  FusionSharedData* _fusion_data = nullptr;
-  std::unique_ptr<BaseVisualizer> _frame_visualizer;
-  FrameContent _content;
+  RadarObjectData* radar_object_data_ = nullptr;
+  CameraObjectData* camera_object_data_ = nullptr;
+  CIPVObjectData* cipv_object_data_ = nullptr;
+  CameraSharedData* camera_shared_data_ = nullptr;
+  FusionSharedData* fusion_data_ = nullptr;
+  std::unique_ptr<BaseVisualizer> frame_visualizer_;
+  FrameContent content_;
 
-  EventID _vis_driven_event_id;
-  EventID _radar_event_id;
-  EventID _camera_event_id;
-  EventID _fusion_event_id;
-  EventID _motion_event_id;
-  EventID _cipv_event_id;
+  EventID vis_driven_event_id_;
+  EventID radar_event_id_;
+  EventID camera_event_id_;
+  EventID fusion_event_id_;
+  EventID motion_event_id_;
+  EventID cipv_event_id_;
 
-  //    MotionBufferPtr _motion_buffer;
-  Eigen::Matrix4d _camera_to_car_pose;
+  //    MotionBufferPtr motion_buffer_;
+  Eigen::Matrix4d camera_to_car_pose_;
 
-  bool _init = false;
+  bool init_ = false;
   DISALLOW_COPY_AND_ASSIGN(VisualizationSubnode);
 };
 

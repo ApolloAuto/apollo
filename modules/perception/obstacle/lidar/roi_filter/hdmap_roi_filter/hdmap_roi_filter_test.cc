@@ -66,12 +66,12 @@ bool LoadPolygonFile(const std::string& absolute_file_name,
 
 class HdmapROIFilterTest : public testing::Test, HdmapROIFilter {
  public:
-  HdmapROIFilterTest() : _pts_cloud_ptr(new pcl_util::PointCloud) {}
+  HdmapROIFilterTest() : pts_cloud_ptr_(new pcl_util::PointCloud) {}
 
  protected:
   void SetUp() {
-    LoadPolygonFile(polygon_file_name, &_polygons);
-    pcl::io::loadPCDFile(pcd_file_name, *_pts_cloud_ptr);
+    LoadPolygonFile(polygon_file_name, &polygons_);
+    pcl::io::loadPCDFile(pcd_file_name, *pts_cloud_ptr_);
   }
 
   void TearDown() {}
@@ -80,9 +80,9 @@ class HdmapROIFilterTest : public testing::Test, HdmapROIFilter {
   void init();
   void filter();
 
-  std::unique_ptr<HdmapROIFilter> _hdmap_roi_filter_ptr;
-  std::vector<PolygonType> _polygons;
-  pcl_util::PointCloudPtr _pts_cloud_ptr;
+  std::unique_ptr<HdmapROIFilter> hdmap_roi_filter_ptr_;
+  std::vector<PolygonType> polygons_;
+  pcl_util::PointCloudPtr pts_cloud_ptr_;
 };
 
 void HdmapROIFilterTest::init() {
@@ -94,9 +94,9 @@ void HdmapROIFilterTest::init() {
 void HdmapROIFilterTest::filter() {
   pcl_util::PointIndices indices;
 
-  ASSERT_TRUE(FilterWithPolygonMask(_pts_cloud_ptr, _polygons, &indices));
+  ASSERT_TRUE(FilterWithPolygonMask(pts_cloud_ptr_, polygons_, &indices));
 
-  size_t points_num = _pts_cloud_ptr->size();
+  size_t points_num = pts_cloud_ptr_->size();
   std::vector<bool> is_in_roi(points_num, false);
 
   for (const auto& id : indices.indices) {
@@ -109,7 +109,7 @@ void HdmapROIFilterTest::filter() {
   size_t true_negitive = 0, false_negitive = 0;
 
   for (size_t i = 0; i < points_num; ++i) {
-    const auto& pt = _pts_cloud_ptr->points[i];
+    const auto& pt = pts_cloud_ptr_->points[i];
 
     if (pt.z > 0) {
       EXPECT_TRUE(is_in_roi[i]);

@@ -30,7 +30,7 @@ namespace planning {
 
 class ObjectPriority : public TrafficRule {
  public:
-  explicit ObjectPriority(const RuleConfig& config);
+  explicit ObjectPriority(const TrafficRuleConfig& config);
   virtual ~ObjectPriority() = default;
 
   bool ApplyRule(Frame* const frame,

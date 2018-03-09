@@ -19,18 +19,17 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_DETECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_DETECTOR_H_
 
-#include <Eigen/Core>
-
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "Eigen/Core"
 #include "opencv2/opencv.hpp"
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
+#include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
-#include "modules/perception/obstacle/common/camera.h"
 
 namespace apollo {
 namespace perception {

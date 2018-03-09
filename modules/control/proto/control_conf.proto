@@ -37,4 +37,6 @@ message ControlConf {
   optional double minimum_speed_resolution = 15;
 
   optional apollo.control.MPCControllerConf mpc_controller_conf = 16;
+
+  optional double query_relative_time = 17;
 }

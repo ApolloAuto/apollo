@@ -25,7 +25,7 @@ cc_library(
 )
 
 cc_library(
-    name = "cascaded",
+    name = "tracker",
     srcs = ["cascaded_camera_tracker.cc"],
     hdrs = ["cascaded_camera_tracker.h"],
     deps = [

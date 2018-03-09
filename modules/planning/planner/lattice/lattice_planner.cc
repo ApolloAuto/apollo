@@ -298,9 +298,12 @@ Status LatticePlanner::PlanOnReferenceLine(
     if (!lattice_traj_ptr) {
       ADEBUG << "Dynamically casting trajectory1d ptr. failed.";
     }
-    ADEBUG << "Ending Lon. State s = " << lattice_traj_ptr->target_position()
-           << " ds = " << lattice_traj_ptr->target_velocity()
-           << " t = " << lattice_traj_ptr->target_time();
+
+    if (lattice_traj_ptr->has_target_position()) {
+      ADEBUG << "Ending Lon. State s = " << lattice_traj_ptr->target_position()
+             << " ds = " << lattice_traj_ptr->target_velocity()
+             << " t = " << lattice_traj_ptr->target_time();
+    }
 
     ADEBUG << "InputPose";
     ADEBUG << "XY: " << planning_init_point.ShortDebugString();

@@ -37,7 +37,7 @@ class StopSign : public TrafficRule {
       StopSignLaneVehicles;
 
  public:
-  explicit StopSign(const RuleConfig& config);
+  explicit StopSign(const TrafficRuleConfig& config);
   virtual ~StopSign() = default;
 
   bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);

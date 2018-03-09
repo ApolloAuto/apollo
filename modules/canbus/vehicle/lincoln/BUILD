@@ -46,10 +46,10 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "//modules/common/kv_db",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "//modules/common/kv_db",
         "@gtest//:gtest",
     ],
 )

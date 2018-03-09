@@ -67,7 +67,7 @@ class GLFWFusionViewer {
   bool initialize();
 
   void set_frame_content(FrameContent *frame_content) {
-    _frame_content = frame_content;
+    frame_content_ = frame_content;
   }
 
   void spin();
@@ -77,18 +77,18 @@ class GLFWFusionViewer {
   void close();
 
   void set_background_color(Eigen::Vector3d i_bg_color) {
-    _bg_color = i_bg_color;
+    bg_color_ = i_bg_color;
   }
 
   void set_camera_para(Eigen::Vector3d i_position, Eigen::Vector3d i_scn_center,
                        Eigen::Vector3d i_up_vector);
 
   void set_forward_dir(Eigen::Vector3d forward) {
-    _forward_dir = forward;
+    forward_dir_ = forward;
   }
 
   void set_main_car(const std::vector<Eigen::Vector3d> &main_car) {
-    _main_car = main_car;
+    main_car_ = main_car;
   }
 
   // callback assistants
@@ -202,27 +202,27 @@ class GLFWFusionViewer {
                       int offset_y, int image_width, int image_height);
 
  private:
-  bool _init;
+  bool init_;
 
-  GLFWwindow *_window;
-  Camera *_pers_camera;
-  Eigen::Vector3d _forward_dir;
-  std::vector<Eigen::Vector3d> _main_car;
+  GLFWwindow *window_;
+  Camera *pers_camera_;
+  Eigen::Vector3d forward_dir_;
+  std::vector<Eigen::Vector3d> main_car_;
 
-  Eigen::Vector3d _bg_color;
-  int _win_width;
-  int _win_height;
-  int _mouse_prev_x;
-  int _mouse_prev_y;
-  Eigen::Matrix4d _mode_mat;
-  Eigen::Matrix4d _view_mat;
+  Eigen::Vector3d bg_color_;
+  int win_width_;
+  int win_height_;
+  int mouse_prev_x_;
+  int mouse_prev_y_;
+  Eigen::Matrix4d mode_mat_;
+  Eigen::Matrix4d view_mat_;
 
-  FrameContent *_frame_content;
-  unsigned char *_rgba_buffer;
+  FrameContent *frame_content_;
+  unsigned char *rgba_buffer_;
 
-  double _vao_trans_x;
-  double _vao_trans_y;
-  double _vao_trans_z;
+  double vao_trans_x_;
+  double vao_trans_y_;
+  double vao_trans_z_;
   double _Rotate_x;
   double _Rotate_y;
   double _Rotate_z;
@@ -263,37 +263,37 @@ class GLFWFusionViewer {
   // @brief, draw 2d camera frame, show 2d or 3d classification
   void draw_camera_frame(FrameContent *content, bool show_3d_class);
 
-  bool _use_class_color = true;
+  bool use_class_color_ = true;
 
-  bool _capture_screen = false;
-  bool _capture_video = false;
+  bool capture_screen_ = false;
+  bool capture_video_ = false;
 
-  int _scene_width;
-  int _scene_height;
-  int _image_width;
-  int _image_height;
+  int scene_width_;
+  int scene_height_;
+  int image_width_;
+  int image_height_;
 
-  Eigen::Matrix<double, 3, 4> _camera_intrinsic;  // camera intrinsic
+  Eigen::Matrix<double, 3, 4> camera_intrinsic_;  // camera intrinsic
 
-  bool _show_fusion_pc;
-  bool _show_radar_pc;
+  bool show_fusion_pc_;
+  bool show_radar_pc_;
   bool _show_camera_box2d;     // show 2d bbox in camera frame
   bool _show_camera_box3d;     // show 3d bbox in camera frame
-  bool _show_associate_color;  // show same color for both 3d pc bbox and camera
+  bool show_associate_color_;  // show same color for both 3d pc bbox and camera
                                // bbox
-  bool _show_type_id_label;
-  bool _show_lane;
-  bool _draw_lane_objects;
+  bool show_type_id_label_;
+  bool show_lane_;
+  bool draw_lane_objects_;
 
   static std::vector<std::vector<int>> s_color_table;
-  std::shared_ptr<GLRasterText> _raster_text;
+  std::shared_ptr<GLRasterText> raster_text_;
 
   // pin-hole camera model with distortion
   std::shared_ptr<::apollo::perception::CameraDistort<double>>
-      _distort_camera_intrinsic;
+      distort_camera_intrinsic_;
 
   // frame count
-  int _frame_count;
+  int frame_count_;
 };
 
 }  // namespace lowcostvisualizer
