@@ -181,10 +181,10 @@ bool CIPVSubnode::GetSharedData(const Event& event,
   }
   bool get_data_succ = false;
   // *** To DO *** uncomment
-//  get_data_succ = _camera_object_data->get(data_key, objs);
-//  std::shared_ptr<lane_post_process::LaneObjects> lane_objects;
-//  get_data_succ = _lane_shared_data->get(data_key, &lane_objects);
-//  (*objs)->lane_objects = lane_objects;
+  get_data_succ = _camera_object_data->Get(data_key, objs);
+  std::shared_ptr<LaneObjects> lane_objects;
+  get_data_succ = _lane_shared_data->Get(data_key, &lane_objects);
+  (*objs)->lane_objects = lane_objects;
 
   if (!get_data_succ) {
     AERROR << "Failed to get shared data. event:" << event.to_string();
