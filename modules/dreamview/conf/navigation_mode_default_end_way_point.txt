@@ -1,0 +1,35 @@
+landmark {
+    name: "Route: Crossman Ave",
+    waypoint {
+        pose {
+            x: 587547.2499092664,
+            y: 4140721.6298193936,
+        }
+    }
+   waypoint {
+        pose {
+            x: 587662.5321276619,
+            y: 4141210.2986105587,
+        }
+    }
+}
+
+landmark {
+    name: "POI: Cananda West",
+    waypoint {
+        pose {
+          x: 558332.4387239887,
+          y: 4151192.0907792537,
+        }
+    }
+}
+
+landmark {
+    name: "POI: Cananda East",
+    waypoint {
+        pose {
+          x: 562039.7927849567,
+          y: 4146600.4216080043,
+        }
+    }
+}
