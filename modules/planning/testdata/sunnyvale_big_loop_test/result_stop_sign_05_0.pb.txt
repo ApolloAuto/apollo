@@ -1744,7 +1744,7 @@ decision {
     }
     decision {
       id: "SS_9762"
-      perception_id: 383354331
+      perception_id: -766708661
       object_decision {
         stop {
           reason_code: STOP_REASON_STOP_SIGN
