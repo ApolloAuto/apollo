@@ -32,14 +32,27 @@ namespace planning {
 
 ConstantAccelerationTrajectory1d::ConstantAccelerationTrajectory1d(
     const double start_s, const double start_v) {
+  Reset(start_s, start_v);
+}
+
+void ConstantAccelerationTrajectory1d::Reset(
+    const double start_s, const double start_v) {
+  Clear();
   s_.push_back(start_s);
   v_.push_back(start_v);
   a_.push_back(0.0);
   t_.push_back(0.0);
 }
 
-void ConstantAccelerationTrajectory1d::AppendSgment(const double a,
-                                                    const double t_duration) {
+void ConstantAccelerationTrajectory1d::Clear() {
+  s_.clear();
+  v_.clear();
+  a_.clear();
+  t_.clear();
+}
+
+void ConstantAccelerationTrajectory1d::AppendSegment(
+    const double a, const double t_duration) {
   double s0 = s_.back();
   double v0 = v_.back();
   double t0 = t_.back();
@@ -60,11 +73,13 @@ void ConstantAccelerationTrajectory1d::AppendSgment(const double a,
 }
 
 void ConstantAccelerationTrajectory1d::PopSegment() {
-  if (a_.size() > 0) {
+  if (a_.size() > 1) {
     s_.pop_back();
     v_.pop_back();
     a_.pop_back();
     t_.pop_back();
+  } else {
+    AWARN << "Pop segment failed because zero or one state exists.";
   }
 }
 
