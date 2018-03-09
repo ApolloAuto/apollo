@@ -54,7 +54,7 @@ using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
 using apollo::planning::util::GetPlanningStatus;
 
-StopSign::StopSign(const RuleConfig& config) : TrafficRule(config) {}
+StopSign::StopSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool StopSign::ApplyRule(Frame* frame,
                          ReferenceLineInfo* const reference_line_info) {
@@ -100,7 +100,7 @@ void StopSign::MakeDecisions(Frame* frame,
     // get all vehicles currently watched
     std::vector<std::string> watch_vehicle_ids;
     for (StopSignLaneVehicles::iterator it = watch_vehicles.begin();
-         it != watch_vehicles.end(); it++) {
+         it != watch_vehicles.end(); ++it) {
       std::copy(it->second.begin(), it->second.end(),
                 std::back_inserter(watch_vehicle_ids));
     }
@@ -608,7 +608,7 @@ int StopSign::RemoveWatchVehicle(
 
   if (erase) {
     for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
-         it != watch_vehicles->end(); it++) {
+         it != watch_vehicles->end(); ++it) {
       std::vector<std::string> vehicles = it->second;
       vehicles.erase(std::remove(vehicles.begin(), vehicles.end(), obstacle_id),
                      vehicles.end());
@@ -719,7 +719,7 @@ bool StopSign::BuildStopDecision(Frame* frame,
 
   auto* path_decision = reference_line_info->path_decision();
   path_decision->AddLongitudinalDecision(
-      RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 
   return true;
 }

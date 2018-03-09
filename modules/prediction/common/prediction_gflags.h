@@ -86,6 +86,7 @@ DECLARE_double(lane_sequence_threshold);
 DECLARE_double(lane_change_dist);
 DECLARE_bool(enable_lane_sequence_acc);
 DECLARE_bool(enable_trim_prediction_trajectory);
+DECLARE_bool(enable_trajectory_validation_check);
 DECLARE_double(distance_beyond_junction);
 DECLARE_double(adc_trajectory_search_length);
 DECLARE_double(virtual_lane_radius);

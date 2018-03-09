@@ -108,14 +108,17 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
       converted_vx = converted_speed * std::cos(mob->theta());
       converted_vy = converted_speed * std::sin(mob->theta());
     } else {
-      converted_x = xy_point.x();
-      converted_y = xy_point.y();
+      // TODO(QiL) : need to load configs from mobileye for offset
+      converted_x = mobileye.details_739(index).obstacle_pos_x();
+      converted_y = mobileye.details_739(index).obstacle_pos_y();
+      if (mobileye.details_73b_size() <= index) {
+        mob->set_theta(0.0);
+      } else {
+        mob->set_theta(mobileye.details_73b(index).obstacle_angle());
+      }
 
-      // TODO(QiL) : double verify the theta
-      mob->set_theta(GetNearestLaneHeading(converted_x, converted_y, adc_z));
-      converted_speed = mob_vel_x;
-      converted_vx = converted_speed * std::cos(mob->theta());
-      converted_vy = converted_speed * std::sin(mob->theta());
+      converted_vx = mob_vel_x;
+      converted_vy = 0.0;
     }
 
     mob->set_id(mob_id);

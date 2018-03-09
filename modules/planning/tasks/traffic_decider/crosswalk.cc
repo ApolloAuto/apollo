@@ -42,7 +42,7 @@ using apollo::common::util::WithinBound;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::PerceptionObstacle;
 
-Crosswalk::Crosswalk(const RuleConfig& config) : TrafficRule(config) {}
+Crosswalk::Crosswalk(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool Crosswalk::ApplyRule(Frame* frame,
                           ReferenceLineInfo* const reference_line_info) {
@@ -253,7 +253,7 @@ bool Crosswalk::BuildStopDecision(Frame* const frame,
 
   auto* path_decision = reference_line_info->path_decision();
   path_decision->AddLongitudinalDecision(
-      RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 
   return true;
 }

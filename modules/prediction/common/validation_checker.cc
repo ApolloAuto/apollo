@@ -16,8 +16,8 @@
 
 #include "modules/prediction/common/validation_checker.h"
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 #include "modules/prediction/common/prediction_gflags.h"
 
@@ -38,8 +38,13 @@ bool ValidationChecker::ValidCentripedalAcceleration(
     const auto& second_point = trajectory_points[i + 1];
     double theta_diff = std::abs(second_point.path_point().theta() -
                                  first_point.path_point().theta());
+    double time_diff =
+        std::abs(second_point.relative_time() - first_point.relative_time());
+    if (time_diff < FLAGS_double_precision) {
+      continue;
+    }
     double v = (first_point.v() + second_point.v()) / 2.0;
-    double centripedal_acc = v * theta_diff;
+    double centripedal_acc = v * theta_diff / time_diff;
     max_centripedal_acc = std::max(max_centripedal_acc, centripedal_acc);
   }
   return max_centripedal_acc < FLAGS_centripedal_acc_threshold;

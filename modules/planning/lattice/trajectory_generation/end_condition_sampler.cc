@@ -30,16 +30,15 @@ namespace apollo {
 namespace planning {
 
 EndConditionSampler::EndConditionSampler(
-    const std::array<double, 3>& init_s,
-    const std::array<double, 3>& init_d,
+    const std::array<double, 3>& init_s, const std::array<double, 3>& init_d,
     const double s_dot_limit,
     std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
     std::shared_ptr<PredictionQuerier> ptr_prediction_querier)
-    : init_s_(init_s), init_d_(init_d),
+    : init_s_(init_s),
+      init_d_(init_d),
       feasible_region_(init_s, s_dot_limit),
       ptr_path_time_graph_(ptr_path_time_graph),
-      ptr_prediction_querier_(ptr_prediction_querier) {
-}
+      ptr_prediction_querier_(ptr_prediction_querier) {}
 
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLatEndConditions() const {
@@ -95,7 +94,6 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
   return end_s_conditions;
 }
 
-
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLonEndConditionsForStopping(
     const double ref_stop_point) const {
@@ -110,7 +108,7 @@ EndConditionSampler::SampleLonEndConditionsForStopping(
   constexpr std::size_t num_stop_section = 3;
   std::array<double, num_stop_section> s_offsets;
   for (std::size_t i = 0; i < num_stop_section; ++i) {
-    s_offsets[i] = -1 * i;
+    s_offsets[i] = -static_cast<double>(i);
   }
 
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
@@ -140,8 +138,7 @@ EndConditionSampler::SampleLonEndConditionsForPathTimePoints() const {
     double s = sample_point.path_time_point().s();
     double v = sample_point.ref_v();
     double t = sample_point.path_time_point().t();
-    if (s > feasible_region_.SUpper(t) ||
-        s < feasible_region_.SLower(t)) {
+    if (s > feasible_region_.SUpper(t) || s < feasible_region_.SLower(t)) {
       continue;
     }
     std::array<double, 3> end_state = {s, v, 0.0};
