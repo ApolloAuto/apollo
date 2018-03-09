@@ -36,6 +36,32 @@
 namespace apollo {
 namespace planning {
 
+namespace {
+
+// A common function for trajectory bundles generation with
+// a given initial and  end conditions.
+typedef std::array<double, 3> InitCondition;
+typedef std::vector<std::pair<std::array<double, 3>, double>> EndConditions;
+
+void GenerateTrajectoryBundlesWithCondition(
+    const InitCondition& init_state, const EndConditions& end_conditions,
+    std::vector<std::shared_ptr<Curve1d>>* ptr_trajectory_bundle) {
+  CHECK_NOTNULL(ptr_trajectory_bundle);
+
+  for (const auto& end_condition : end_conditions) {
+    auto ptr_trajectory1d = std::make_shared<LatticeTrajectory1d>(
+        std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
+            init_state, end_condition.first, end_condition.second)));
+
+    ptr_trajectory1d->set_target_position(end_condition.first[0]);
+    ptr_trajectory1d->set_target_velocity(end_condition.first[1]);
+    ptr_trajectory1d->set_target_time(end_condition.second);
+    ptr_trajectory_bundle->push_back(ptr_trajectory1d);
+  }
+}
+
+}  // namespace
+
 Trajectory1dGenerator::Trajectory1dGenerator(
     const std::array<double, 3>& lon_init_state,
     const std::array<double, 3>& lat_init_state,
@@ -65,6 +91,9 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
   auto end_conditions =
       end_condition_sampler_.SampleLonEndConditionsForCruising(target_speed);
 
+  // For the cruising case, We use the "QuarticPolynomialCurve1d" class (not the
+  // "QuinticPolynomialCurve1d" class) to generate curves. Therefore, we can't
+  // invoke the common function to generate trajectory bundles.
   for (const auto& end_condition : end_conditions) {
     // Only the last two elements in the end_condition are useful.
     std::array<double, 2> end_state;
@@ -88,16 +117,9 @@ void Trajectory1dGenerator::GenerateSpeedProfileForStopping(
   auto end_conditions =
       end_condition_sampler_.SampleLonEndConditionsForStopping(stop_point);
 
-  for (const auto& end_condition : end_conditions) {
-    auto ptr_trajectory1d = std::make_shared<LatticeTrajectory1d>(
-        std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
-            init_lon_state_, end_condition.first, end_condition.second)));
-
-    ptr_trajectory1d->set_target_position(end_condition.first[0]);
-    ptr_trajectory1d->set_target_velocity(end_condition.first[1]);
-    ptr_trajectory1d->set_target_time(end_condition.second);
-    ptr_lon_trajectory_bundle->push_back(ptr_trajectory1d);
-  }
+  // Use the common function to generate trajectory bundles.
+  GenerateTrajectoryBundlesWithCondition(init_lon_state_, end_conditions,
+                                         ptr_lon_trajectory_bundle);
 }
 
 void Trajectory1dGenerator::GenerateSpeedProfilesForPathTimeObstacles(
@@ -105,16 +127,9 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForPathTimeObstacles(
   auto end_conditions =
       end_condition_sampler_.SampleLonEndConditionsForPathTimePoints();
 
-  for (const auto& end_condition : end_conditions) {
-    auto ptr_trajectory1d = std::make_shared<LatticeTrajectory1d>(
-        std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
-            init_lon_state_, end_condition.first, end_condition.second)));
-
-    ptr_trajectory1d->set_target_position(end_condition.first[0]);
-    ptr_trajectory1d->set_target_velocity(end_condition.first[1]);
-    ptr_trajectory1d->set_target_time(end_condition.second);
-    ptr_lon_trajectory_bundle->push_back(ptr_trajectory1d);
-  }
+  // Use the common function to generate trajectory bundles.
+  GenerateTrajectoryBundlesWithCondition(init_lon_state_, end_conditions,
+                                         ptr_lon_trajectory_bundle);
 }
 
 void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
@@ -135,16 +150,10 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
 void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
     std::vector<std::shared_ptr<Curve1d>>* ptr_lat_trajectory_bundle) const {
   auto end_conditions = end_condition_sampler_.SampleLatEndConditions();
-  for (const auto& end_condition : end_conditions) {
-    auto ptr_trajectory1d = std::make_shared<LatticeTrajectory1d>(
-        std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
-            init_lat_state_, end_condition.first, end_condition.second)));
 
-    ptr_trajectory1d->set_target_position(end_condition.first[0]);
-    ptr_trajectory1d->set_target_velocity(end_condition.first[1]);
-    ptr_trajectory1d->set_target_time(end_condition.second);
-    ptr_lat_trajectory_bundle->push_back(ptr_trajectory1d);
-  }
+  // Use the common function to generate trajectory bundles.
+  GenerateTrajectoryBundlesWithCondition(init_lat_state_, end_conditions,
+                                         ptr_lat_trajectory_bundle);
 }
 
 }  // namespace planning
