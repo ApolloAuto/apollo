@@ -79,9 +79,9 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
            << "] with probability [" << sequence.probability() << "].";
 
     std::vector<TrajectoryPoint> points;
-    DrawLaneSequenceTrajectoryPoints(
-        *obstacle, sequence, FLAGS_prediction_duration,
-        FLAGS_prediction_period, &points);
+    DrawLaneSequenceTrajectoryPoints(*obstacle, sequence,
+                                     FLAGS_prediction_duration,
+                                     FLAGS_prediction_period, &points);
 
     if (points.empty()) {
       continue;

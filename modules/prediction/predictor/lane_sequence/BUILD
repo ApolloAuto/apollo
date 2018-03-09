@@ -17,7 +17,7 @@ cc_library(
         "//modules/prediction/common:validation_checker",
         "//modules/prediction/predictor/sequence:sequence_predictor",
         "//modules/prediction/proto:lane_graph_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
