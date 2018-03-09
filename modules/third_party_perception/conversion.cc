@@ -111,7 +111,12 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
       // TODO(QiL) : need to load configs from mobileye for offset
       converted_x = mobileye.details_739(index).obstacle_pos_x();
       converted_y = mobileye.details_739(index).obstacle_pos_y();
-      mob->set_theta(mobileye.details_73b(index).obstacle_angle());
+      if (mobileye.details_73b_size() <= index) {
+        mob->set_theta(0.0);
+      } else {
+        mob->set_theta(mobileye.details_73b(index).obstacle_angle());
+      }
+
       converted_vx = mob_vel_x;
       converted_vy = 0.0;
     }
