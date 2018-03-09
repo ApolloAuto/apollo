@@ -291,7 +291,7 @@ void Planning::RunOnce() {
       PublishPlanningPb(&not_ready_pb, start_timestamp);
       return;
     }
-    stitching_trajectory = TrajectoryStitcher::StitchToReferenceLine(
+    stitching_trajectory = TrajectoryStitcher::CalculateInitPoint(
         vehicle_state, reference_lines.front());
   } else {
     stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
