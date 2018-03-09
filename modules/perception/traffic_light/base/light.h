@@ -34,13 +34,13 @@ namespace perception {
 namespace traffic_light {
 
 typedef apollo::perception::TrafficLight::Color TLColor;
-const TLColor UNKNOWN_COLOR = apollo::perception::TrafficLight::UNKNOWN;
-const TLColor GREEN = apollo::perception::TrafficLight::GREEN;
-const TLColor RED = apollo::perception::TrafficLight::RED;
-const TLColor YELLOW = apollo::perception::TrafficLight::YELLOW;
-const TLColor BLACK = apollo::perception::TrafficLight::BLACK;
+const TLColor UNKNOWN_COLOR = TrafficLight::UNKNOWN;
+const TLColor GREEN = TrafficLight::GREEN;
+const TLColor RED = TrafficLight::RED;
+const TLColor YELLOW = TrafficLight::YELLOW;
+const TLColor BLACK = TrafficLight::BLACK;
 // When the light has been covered by some objected, the color returned.
-const TLColor DEFAULT_UNKNOWN_COLOR = apollo::perception::TrafficLight::UNKNOWN;
+const TLColor DEFAULT_UNKNOWN_COLOR = TrafficLight::UNKNOWN;
 
 enum DetectionClassId {
   UNKNOWN_CLASS = -1,
