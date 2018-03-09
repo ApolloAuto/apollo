@@ -47,6 +47,8 @@ TrajectoryEvaluator::TrajectoryEvaluator(
   path_time_intervals_ = path_time_graph_->GetPathBlockingIntervals(
       start_time, end_time, FLAGS_trajectory_time_resolution);
 
+  reference_s_dot_ = ComputeLongitudinalGuideVelocity(planning_target);
+
   // if we have a stop point along the reference line,
   // filter out the lon. trajectories that pass the stop point.
   double stop_point = std::numeric_limits<double>::max();
@@ -146,10 +148,8 @@ double TrajectoryEvaluator::Evaluate(
   // 5. Cost of lateral comfort
 
   // Longitudinal costs
-  auto reference_s_dot = ComputeLongitudinalGuideVelocity(planning_target);
-
   double lon_objective_cost = LonObjectiveCost(lon_trajectory, planning_target,
-      reference_s_dot);
+      reference_s_dot_);
 
   double lon_jerk_cost = LonComfortCost(lon_trajectory);
 

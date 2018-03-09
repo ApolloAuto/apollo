@@ -126,6 +126,8 @@ class TrajectoryEvaluator {
   std::vector<std::vector<std::pair<double, double>>> path_time_intervals_;
 
   std::array<double, 3> init_s_;
+
+  std::vector<double> reference_s_dot_;
 };
 
 }  // namespace planning
