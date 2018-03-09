@@ -23,8 +23,6 @@
 
 #include <limits>
 #include <list>
-#include <string>
-#include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
