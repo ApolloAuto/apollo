@@ -7,7 +7,7 @@ import RadioItem from 'components/common/RadioItem';
 @observer
 export default class POI extends React.Component {
     render() {
-        const { routeEditingManager, options } = this.props;
+        const { routeEditingManager, options, inNavigationMode } = this.props;
 
         const entries = Object.keys(routeEditingManager.defaultRoutingEndPoint)
             .map(key => {
@@ -15,9 +15,9 @@ export default class POI extends React.Component {
                     <RadioItem extraClasses={["poi-button"]}
                                key={`poi_${key}`} id='poi' title={key}
                                onClick={() => {
-                                    routeEditingManager.addDefaultEndPoint(key);
+                                    routeEditingManager.addDefaultEndPoint(key, inNavigationMode);
                                     if (!options.showRouteEditingBar) {
-                                        routeEditingManager.sendRoutingRequest();
+                                        routeEditingManager.sendRoutingRequest(inNavigationMode);
                                     }
                                     options.showPOI = false;
                                }}
