@@ -110,9 +110,7 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
     } else {
       converted_x = xy_point.x();
       converted_y = xy_point.y();
-
-      // TODO(QiL) : double verify the theta
-      mob->set_theta(GetNearestLaneHeading(converted_x, converted_y, adc_z));
+      mob->set_theta(moileye.details_73b().obstacle_angle());
       converted_speed = mob_vel_x;
       converted_vx = converted_speed * std::cos(mob->theta());
       converted_vy = converted_speed * std::sin(mob->theta());
