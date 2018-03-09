@@ -52,8 +52,7 @@ TrajectoryStitcher::ComputeReinitStitchingTrajectory(
   return std::vector<TrajectoryPoint>(1, init_point);
 }
 
-//  Stitch to reference line based on location
-std::vector<TrajectoryPoint> TrajectoryStitcher::StitchToReferenceLine(
+std::vector<TrajectoryPoint> TrajectoryStitcher::CalculateInitPoint(
     const VehicleState& vehicle_state, const ReferenceLine& reference_line) {
   Vec2d adc_pose(vehicle_state.x(), vehicle_state.y());
   auto ref_point = reference_line.GetNearestReferencePoint(adc_pose);
