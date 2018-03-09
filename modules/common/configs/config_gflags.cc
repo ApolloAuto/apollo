@@ -46,3 +46,7 @@ DEFINE_string(localization_tf2_child_frame_id, "localization",
 
 DEFINE_bool(use_navigation_mode, false,
             "Use relative position in navigation mode");
+DEFINE_string(
+    navigation_mode_end_way_point_file,
+    "modules/dreamview/conf/navigation_mode_default_end_way_point.txt",
+    "end_way_point file used if navigation mode is set.");
