@@ -120,7 +120,8 @@ void TrafficDecider::BuildPlanningTarget(
           stop_code == StopReasonCode::STOP_REASON_STOP_SIGN ||
           stop_code == StopReasonCode::STOP_REASON_YIELD_SIGN ||
           stop_code == StopReasonCode::STOP_REASON_CREEPER ||
-          stop_code == StopReasonCode::STOP_REASON_REFERENCE_END) {
+          stop_code == StopReasonCode::STOP_REASON_REFERENCE_END ||
+          stop_code == StopReasonCode::STOP_REASON_SIGNAL) {
         stop_point.set_type(StopPoint::HARD);
         ADEBUG << "Hard stop at: " << min_s
                << "REASON: " << StopReasonCode_Name(stop_code);
