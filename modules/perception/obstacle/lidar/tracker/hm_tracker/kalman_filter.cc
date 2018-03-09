@@ -17,7 +17,7 @@
 #include <algorithm>
 
 #include "modules/common/log.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
+#include "modules/perception/common/geometry_util.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/kalman_filter.h"
 
 namespace apollo {

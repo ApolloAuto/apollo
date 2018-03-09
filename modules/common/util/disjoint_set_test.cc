@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/common/disjoint_set.h"
+#include "modules/common/util/disjoint_set.h"
 
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
 
 namespace apollo {
-namespace perception {
+namespace common {
+namespace util {
 
 class DisjointSetTest : public testing::Test {
  protected:
@@ -50,17 +51,12 @@ class DisjointSetTest : public testing::Test {
   }
   void TearDown() {}
   struct Node {
-    Node* parent;
-    char node_rank;
-
-    Node() {
-      parent = nullptr;
-      node_rank = 0;
-    }
+    Node* parent = nullptr;
+    char node_rank = 0;
   };
-  Node* node1_;
-  Node* node2_;
-  Node* node3_;
+  Node* node1_ = nullptr;
+  Node* node2_ = nullptr;
+  Node* node3_ = nullptr;
 };
 
 TEST_F(DisjointSetTest, DisjointSetMakeSet) {
@@ -98,5 +94,6 @@ TEST_F(DisjointSetTest, DisjointSetUnion) {
   EXPECT_EQ(node1_->parent, node2_->parent);
 }
 
-}  // namespace perception
+}  // namespace util
+}  // namespace common
 }  // namespace apollo
