@@ -83,6 +83,9 @@ void CollisionChecker::BuildPredictedEnvironment(
   bool ego_vehicle_in_lane = IsEgoVehicleInLane(ego_vehicle_d);
   std::vector<const Obstacle*> obstacles_considered;
   for (const Obstacle* obstacle : obstacles) {
+    if (obstacle->IsVirtual()) {
+      continue;
+    }
     if (ego_vehicle_in_lane &&
         ShouldIgnore(obstacle, ego_vehicle_s, discretized_reference_line)) {
       continue;
