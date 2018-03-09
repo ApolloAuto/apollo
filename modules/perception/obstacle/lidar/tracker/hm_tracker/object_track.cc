@@ -21,7 +21,7 @@
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
+#include "modules/perception/common/geometry_util.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/kalman_filter.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/object_track.h"
 
@@ -118,7 +118,7 @@ ObjectTrack::ObjectTrack(TrackedObjectPtr obj) {
   belief_velocity_ = initial_velocity;
   const double uncertainty_factor = 5.0;
   belief_velocity_uncertainty_ =
-    Eigen::Matrix3f::Identity() * uncertainty_factor;
+      Eigen::Matrix3f::Identity() * uncertainty_factor;
   belief_velocity_accelaration_ = Eigen::Vector3f::Zero();
   // NEED TO NOTICE: All the states would be collected mainly based on states
   // of tracked object. Thus, update tracked object when you update the state
@@ -377,13 +377,9 @@ bool ObjectTrack::CheckTrackStaticHypothesisByVelocityAngleChange(
 }
 
 /*class ObjectTrackSet*/
-ObjectTrackSet::ObjectTrackSet() {
-  tracks_.reserve(1000);
-}
+ObjectTrackSet::ObjectTrackSet() { tracks_.reserve(1000); }
 
-ObjectTrackSet::~ObjectTrackSet() {
-  Clear();
-}
+ObjectTrackSet::~ObjectTrackSet() { Clear(); }
 
 bool ObjectTrackSet::SetTrackConsecutiveInvisibleMaximum(
     const int& track_consecutive_invisible_maximum) {

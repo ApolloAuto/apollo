@@ -48,12 +48,12 @@ class CIPVSubnode : public Subnode {
             const Event& event,
             std::shared_ptr<SensorObjects>* sensor_objects) const;
 
-    CameraObjectData* _camera_object_data = nullptr;
-    LaneSharedData* _lane_shared_data = nullptr;
-    CIPVObjectData* _cipv_object_data = nullptr;
-    EventID _camera_event_id;
-    EventID _lane_event_id;
-    Cipv _cipv;
+    CameraObjectData* camera_object_data_ = nullptr;
+    LaneSharedData* lane_shared_data_ = nullptr;
+    CIPVObjectData* cipv_object_data_ = nullptr;
+    EventID camera_event_id_;
+    EventID lane_event_id_;
+    Cipv cipv_;
     DISALLOW_COPY_AND_ASSIGN(CIPVSubnode);
 };
 

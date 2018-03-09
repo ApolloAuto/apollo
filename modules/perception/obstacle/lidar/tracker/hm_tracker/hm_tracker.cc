@@ -18,8 +18,8 @@
 #include <numeric>
 
 #include "modules/common/log.h"
+#include "modules/perception/common/geometry_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/feature_descriptor.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hungarian_matcher.h"

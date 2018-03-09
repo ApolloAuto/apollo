@@ -18,7 +18,7 @@
 
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 
-#include "modules/perception/obstacle/common/geometry_util.h"
+#include "modules/perception/common/geometry_util.h"
 
 namespace apollo {
 namespace perception {

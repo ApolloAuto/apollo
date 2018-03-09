@@ -16,7 +16,7 @@
 
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/tracked_object.h"
 
-#include "modules/perception/obstacle/common/geometry_util.h"
+#include "modules/perception/common/geometry_util.h"
 
 namespace apollo {
 namespace perception {

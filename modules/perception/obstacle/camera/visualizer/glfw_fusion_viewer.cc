@@ -37,8 +37,8 @@ namespace apollo {
 namespace perception {
 namespace lowcostvisualizer {
 
-using ::apollo::perception::CalibrationConfigManager;
-using ::apollo::perception::CameraCalibrationPtr;
+using apollo::perception::CalibrationConfigManager;
+using apollo::perception::CameraCalibrationPtr;
 
 const double pace_zoom = 15;
 const double My_PI = 3.14159265359;
