@@ -38,11 +38,9 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
 
 CollisionChecker::CollisionChecker(
-    const std::vector<const Obstacle*>& obstacles,
-    const double ego_vehicle_s,
+    const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
     const double ego_vehicle_d,
     const std::vector<PathPoint>& discretized_reference_line) {
-
   BuildPredictedEnvironment(obstacles, ego_vehicle_s, ego_vehicle_d,
                             discretized_reference_line);
 }
@@ -50,7 +48,7 @@ CollisionChecker::CollisionChecker(
 bool CollisionChecker::InCollision(
     const DiscretizedTrajectory& discretized_trajectory) {
   CHECK_LE(discretized_trajectory.NumOfPoints(),
-      predicted_bounding_rectangles_.size());
+           predicted_bounding_rectangles_.size());
   const auto& vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
   double ego_length = vehicle_config.vehicle_param().length();
@@ -72,8 +70,7 @@ bool CollisionChecker::InCollision(
 }
 
 void CollisionChecker::BuildPredictedEnvironment(
-    const std::vector<const Obstacle*>& obstacles,
-    const double ego_vehicle_s,
+    const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
     const double ego_vehicle_d,
     const std::vector<PathPoint>& discretized_reference_line) {
   CHECK(predicted_bounding_rectangles_.empty());
@@ -108,8 +105,7 @@ void CollisionChecker::BuildPredictedEnvironment(
   }
 }
 
-bool CollisionChecker::IsEgoVehicleInLane(
-    const double ego_vehicle_d) {
+bool CollisionChecker::IsEgoVehicleInLane(const double ego_vehicle_d) {
   return std::abs(ego_vehicle_d) < FLAGS_default_reference_line_width * 0.5;
 }
 
@@ -118,9 +114,9 @@ bool CollisionChecker::ShouldIgnore(
     const std::vector<PathPoint>& discretized_reference_line) {
   double half_lane_width = FLAGS_default_reference_line_width * 0.5;
   TrajectoryPoint point = obstacle->GetPointAtTime(0.0);
-  auto obstacle_reference_line_position =
-      PathMatcher::GetPathFrenetCoordinate(discretized_reference_line,
-          point.path_point().x(), point.path_point().y());
+  auto obstacle_reference_line_position = PathMatcher::GetPathFrenetCoordinate(
+      discretized_reference_line, point.path_point().x(),
+      point.path_point().y());
 
   if (obstacle_reference_line_position.first < ego_vehicle_s &&
       std::abs(obstacle_reference_line_position.second) < half_lane_width) {
