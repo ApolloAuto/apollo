@@ -113,7 +113,7 @@ bool ChangeLane::CreateGuardObstacle(
   double ref_s = sl_point.s() + kStepDistance;
   for (double t = last_point.relative_time() + time_delta; ref_s < end_s;
        ref_s += kStepDistance, s += kStepDistance, t += time_delta) {
-    auto ref_point = reference_line.GetNearestReferencepoint(ref_s);
+    auto ref_point = reference_line.GetNearestReferencePoint(ref_s);
 
     Vec2d xy_point;
     if (!reference_line.SLToXY(common::util::MakeSLPoint(ref_s, sl_point.l()),
