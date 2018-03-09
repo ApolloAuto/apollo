@@ -38,8 +38,8 @@ ConstantAccelerationTrajectory1d::ConstantAccelerationTrajectory1d(
   t_.push_back(0.0);
 }
 
-void ConstantAccelerationTrajectory1d::AppendSgment(const double a,
-                                                    const double t_duration) {
+void ConstantAccelerationTrajectory1d::AppendSegment(
+    const double a, const double t_duration) {
   double s0 = s_.back();
   double v0 = v_.back();
   double t0 = t_.back();
