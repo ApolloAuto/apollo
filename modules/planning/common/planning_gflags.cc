@@ -28,6 +28,10 @@ DEFINE_string(planning_adapter_config_filename,
               "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
 
+DEFINE_string(traffic_rule_config_filename,
+              "modules/planning/conf/traffic_rule_config.pb.txt",
+              "Traffic rule config filename");
+
 DEFINE_string(smoother_config_filename,
               "modules/planning/conf/smoother_config.pb.txt",
               "The configuration file for qp sline smoother");

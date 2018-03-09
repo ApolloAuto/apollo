@@ -11,6 +11,7 @@ active_controllers: LAT_CONTROLLER
 active_controllers: LON_CONTROLLER
 max_steering_percentage_allowed: 100
 minimum_speed_resolution: 0.2
+query_relative_time: 0.8
 lat_controller_conf {
   ts: 0.01
   preview_window: 0

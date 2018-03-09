@@ -85,6 +85,11 @@ Status Planning::Init() {
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
 
+  CHECK(apollo::common::util::GetProtoFromFile(
+      FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
+      << "Failed to load traffic rule config file "
+      << FLAGS_traffic_rule_config_filename;
+
   // initialize planning thread pool
   PlanningThreadPool::instance()->Init();
 
@@ -324,7 +329,7 @@ void Planning::RunOnce() {
 
   for (auto& ref_line_info : frame_->reference_line_info()) {
     TrafficDecider traffic_decider;
-    traffic_decider.Init(config_);
+    traffic_decider.Init(traffic_rule_configs_);
     auto traffic_status = traffic_decider.Execute(frame_.get(), &ref_line_info);
     if (!traffic_status.ok() || !ref_line_info.IsDrivable()) {
       ref_line_info.SetDrivable(false);

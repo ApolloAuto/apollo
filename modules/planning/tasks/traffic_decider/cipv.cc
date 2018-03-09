@@ -30,7 +30,7 @@ namespace planning {
 using apollo::common::util::WithinBound;
 using apollo::hdmap::PathOverlap;
 
-CIPV::CIPV(const RuleConfig& config) : TrafficRule(config) {}
+CIPV::CIPV(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool CIPV::ApplyRule(Frame* frame, ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
