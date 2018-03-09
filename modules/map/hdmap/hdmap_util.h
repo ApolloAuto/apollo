@@ -58,9 +58,7 @@ std::string RoutingMapFile();
  * @return end way point file path
  */
 inline std::string EndWayPointFile() {
-  if (FLAGS_use_navigation_mode &&
-      apollo::common::util::PathExists(
-          FLAGS_navigation_mode_end_way_point_file)) {
+  if (FLAGS_use_navigation_mode) {
     return apollo::common::util::StrCat(
         FLAGS_navigation_mode_end_way_point_file);
   } else {
