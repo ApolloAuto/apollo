@@ -96,6 +96,9 @@ void PathTimeGraph::SetupObstacles(
     const std::vector<const Obstacle*>& obstacles,
     const std::vector<PathPoint>& discretized_ref_points) {
   for (const Obstacle* obstacle : obstacles) {
+    if (obstacle->IsVirtual()) {
+      continue;
+    }
     if (!obstacle->HasTrajectory()) {
       SetStaticObstacle(obstacle, discretized_ref_points);
       continue;
