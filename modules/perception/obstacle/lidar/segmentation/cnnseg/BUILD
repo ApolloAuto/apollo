@@ -46,6 +46,7 @@ cc_library(
     hdrs = ["cluster2d.h"],
     deps = [
         "//modules/common:log",
+        "//modules/common/util:disjoint_set",
         "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/common",
