@@ -108,12 +108,12 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
       converted_vx = converted_speed * std::cos(mob->theta());
       converted_vy = converted_speed * std::sin(mob->theta());
     } else {
-      converted_x = xy_point.x();
-      converted_y = xy_point.y();
+      // TODO(QiL) : need to load configs from mobileye for offset
+      converted_x = mobileye.details_739(index).obstacle_pos_x();
+      converted_y = mobileye.details_739(index).obstacle_pos_y();
       mob->set_theta(mobileye.details_73b(index).obstacle_angle());
-      converted_speed = mob_vel_x;
-      converted_vx = converted_speed * std::cos(mob->theta());
-      converted_vy = converted_speed * std::sin(mob->theta());
+      converted_vx = mob_vel_x;
+      converted_vy = 0.0;
     }
 
     mob->set_id(mob_id);
