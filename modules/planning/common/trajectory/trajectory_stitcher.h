@@ -36,7 +36,11 @@ class TrajectoryStitcher {
  public:
   TrajectoryStitcher() = delete;
 
-  static std::vector<common::TrajectoryPoint> StitchToReferenceLine(
+  /**
+   * @brief Stitch to reference line based on location
+   * Find the init location that helps the vehicle approach the reference line
+   */
+  static std::vector<common::TrajectoryPoint> CalculateInitPoint(
       const common::VehicleState& vehicle_state,
       const ReferenceLine& reference_line);
 
