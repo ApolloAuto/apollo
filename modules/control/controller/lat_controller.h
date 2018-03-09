@@ -227,6 +227,8 @@ class LatController : public Controller {
   std::ofstream steer_log_file_;
 
   const std::string name_;
+
+  double query_relative_time_;
 };
 
 }  // namespace control
