@@ -45,6 +45,7 @@ cc_library(
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/third_party_perception/common:third_party_perception_gflags",
         "//modules/third_party_perception/common:third_party_perception_util",
         "//modules/third_party_perception/proto:third_party_perception_proto",
