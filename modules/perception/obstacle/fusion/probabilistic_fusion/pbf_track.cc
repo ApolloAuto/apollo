@@ -19,8 +19,8 @@
 #include "boost/format.hpp"
 
 #include "modules/common/macro.h"
+#include "modules/perception/common/geometry_util.h"
 #include "modules/perception/obstacle/base/types.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"

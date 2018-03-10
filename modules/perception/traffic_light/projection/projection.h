@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H_
-#define MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H_
+#ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_PROJECTION_H_
+#define MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_PROJECTION_H_
 
 #include <cmath>
 
@@ -58,4 +58,4 @@ REGISTER_PROJECTION(BoundaryProjection);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_BASE_LIGHTS_PROJECTION_H_
+#endif  // MODULES_PERCEPTION_TRAFFIC_LIGHT_PROJECTION_PROJECTION_H_

@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_DISJOINT_SET_H_
-#define MODULES_PERCEPTION_OBSTACLE_COMMON_DISJOINT_SET_H_
+#ifndef MODULES_COMMON_UTIL_DISJOINT_SET_H_
+#define MODULES_COMMON_UTIL_DISJOINT_SET_H_
 
 namespace apollo {
-namespace perception {
+namespace common {
+namespace util {
 
 template <class T>
 void DisjointSetMakeSet(T *x) {
@@ -69,7 +70,8 @@ void DisjointSetUnion(T *x, T *y) {
   }
 }
 
-}  // namespace perception
+}  // namespace util
+}  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_COMMON_DISJOINT_SET_H_
+#endif  // MODULES_PERCEPTION_COMMON_UTIL_DISJOINT_SET_H_

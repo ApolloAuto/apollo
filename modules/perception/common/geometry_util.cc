@@ -14,7 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/common/geometry_util.h"
+#include "modules/perception/common/geometry_util.h"
+
+#include "modules/common/math/math_utils.h"
 
 namespace apollo {
 namespace perception {
@@ -25,7 +27,7 @@ using pcl_util::PointCloudPtr;
 
 /*
  * Transform point cloud methods
- * */
+ */
 void TransformPointCloud(pcl_util::PointCloudPtr cloud,
                          const std::vector<int>& indices,
                          pcl_util::PointDCloud* trans_cloud) {
@@ -121,12 +123,9 @@ double VectorTheta2dXy(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2) {
   double cos_theta =
       (v1.head(2).cwiseProduct(v2.head(2))).sum() / (v1_len * v2_len);
   double sin_theta = (v1(0) * v2(1) - v1(1) * v2(0)) / (v1_len * v2_len);
-  if (cos_theta > 1) {
-    cos_theta = 1;
-  }
-  if (cos_theta < -1) {
-    cos_theta = -1;
-  }
+
+  cos_theta = common::math::Clamp(cos_theta, 1.0, -1.0);
+
   double theta = acos(cos_theta);
   if (sin_theta < 0) {
     theta = -theta;

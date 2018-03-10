@@ -17,11 +17,13 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_MOTION_SERVICE_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_MOTION_SERVICE_H_
 
-#include <Eigen/Core>
-#include "modules/common/adapters/adapter_manager.h"
+#include "Eigen/Core"
+
 #include "modules/localization/proto/localization.pb.h"
+
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/lib/base/mutex.h"
-#include "modules/perception/obstacle/camera/motion/vehicleplanemotion.h"
+#include "modules/perception/obstacle/camera/motion/plane_motion.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
 
@@ -38,20 +40,15 @@ struct VehicleInformation {
 class MotionService : public Subnode {
  public:
   MotionService() = default;
-  virtual ~MotionService() {
-    delete vehicle_planemotion_;
-  }
+  virtual ~MotionService() { delete vehicle_planemotion_; }
 
-  apollo::common::Status ProcEvents() override {
-    return apollo::common::Status::OK();
-  }
+  common::Status ProcEvents() override { return common::Status::OK(); }
 
  protected:
   bool InitInternal() override;
 
  private:
-  void OnLocalization(
-      const apollo::localization::LocalizationEstimate &localization);
+  void OnLocalization(const localization::LocalizationEstimate &localization);
   PlaneMotion *vehicle_planemotion_ = nullptr;
   double pre_azimuth = 0;  // a invalid value
   double pre_timestamp = 0;
@@ -66,4 +63,4 @@ class MotionService : public Subnode {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_ONBOARD_MOTION_SERVICE_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_ONBOARD_MOTION_SERVICE_H_
