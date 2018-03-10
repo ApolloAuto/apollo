@@ -57,6 +57,7 @@ std::map<std::int32_t, ::apollo::hdmap::LaneBoundaryType_Type>
 PerceptionObstacles MobileyeToPerceptionObstacles(
     const Mobileye& mobileye, const LocalizationEstimate& localization,
     const Chassis& chassis) {
+  PerceptionObstacles obstacles;
   // retrieve position and velocity of the main vehicle from the localization
   // position
   double adc_x = localization.pose().position().x();
