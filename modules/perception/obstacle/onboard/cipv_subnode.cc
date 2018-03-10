@@ -123,9 +123,7 @@ apollo::common::Status CIPVSubnode::ProcEvents() {
 
     // call cipv module
     if (cipv_.DetermineCipv(sensor_objs, &cipv_options)) {
-      // *** To Do *** when camera_detector_subnode.cpp is included, add this
-      // publish_data_and_event(event.timestamp, event.reserve,
-      //                        sensor_objs, cipv_object_data_);
+      PublishDataAndEvent(event.timestamp, sensor_objs, cipv_object_data_);
     }
 
     return Status::OK();
@@ -169,14 +167,14 @@ bool CIPVSubnode::SubscribeEvents(Event *event) const {
 }
 
 bool CIPVSubnode::GetSharedData(const Event& event,
-                                std::shared_ptr<SensorObjects>* objs) const {
+                                std::shared_ptr<SensorObjects>* objs) {
   double timestamp = event.timestamp;
-  const string& device_id = event.reserve;
+  device_id_ = event.reserve;
   string data_key;
-  if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id,
+  if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_,
                                               &data_key)) {
     AERROR << "Failed to produce shared data key. EventID:" << event.event_id
-           << " timestamp:" << timestamp << " device_id:" << device_id;
+           << " timestamp:" << timestamp << " device_id_:" << device_id_;
     return false;
   }
   bool get_data_succ = false;
@@ -192,6 +190,25 @@ bool CIPVSubnode::GetSharedData(const Event& event,
   }
   return true;
 }
+
+void CIPVSubnode::PublishDataAndEvent(
+    const float &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
+    CIPVObjectData *cipv_object_data) {
+  std::string key = "";
+  SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
+
+  cipv_object_data->Add(key, sensor_objects);
+
+  for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
+    const EventMeta &event_meta = pub_meta_events_[idx];
+    Event event;
+    event.event_id = event_meta.event_id;
+    event.timestamp = timestamp;
+    event.reserve = device_id_;
+    event_manager_->Publish(event);
+  }
+}
+
 
 REGISTER_SUBNODE(CIPVSubnode);
 
