@@ -341,10 +341,12 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
       perception_obstacles_.lane_marker().right_lane_marker().lane_type());
   auto *right_segment =
       right_boundary->mutable_curve()->add_segment()->mutable_line_segment();
-  const double lane_left_width =
-      left_width_ > 0 ? left_width_ : map_config.default_left_width();
-  const double lane_right_width =
-      right_width_ > 0 ? right_width_ : map_config.default_right_width();
+  const double lane_left_width = left_width_ > FLAGS_min_lane_half_width
+                                     ? left_width_
+                                     : map_config.default_left_width();
+  const double lane_right_width = right_width_ > FLAGS_min_lane_half_width
+                                      ? right_width_
+                                      : map_config.default_right_width();
   for (const auto &path_point : path.path_point()) {
     auto *point = line_segment->add_point();
     point->set_x(path_point.x());
