@@ -14,15 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_VEHICLEPLANEMOTION_H
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_VEHICLEPLANEMOTION_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_VEHICLEPLANEMOTION_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_VEHICLEPLANEMOTION_H_
 
-#include <math.h>
-#include <stdio.h>
-#include <Eigen/Dense>
-#include <Eigen/Eigen>
-#include <Eigen/Geometry>
+#include <cmath>
+#include <cstdio>
+
 #include <memory>
+
+#include "Eigen/Dense"
+#include "Eigen/Eigen"
+#include "Eigen/Geometry"
 
 #include "modules/perception/obstacle/base/object_supplement.h"
 
@@ -42,7 +44,7 @@ class PlaneMotion {
   float time_unit_;
   int time_increment_;     // the time increment units in motion input
   float time_difference_;  // the time difference for each buffer input
-  Eigen::Matrix3f _mat_motion_2d_image;
+  Eigen::Matrix3f mat_motion_2d_image_ = Eigen::Matrix3f::Identity();
   // motion matrix of accumulation through high sampling CAN+IMU input sequence
   void generate_motion_matrix(
       VehicleStatus *vehicledata);  // generate inverse motion
@@ -54,7 +56,7 @@ class PlaneMotion {
       mot_buffer_ = nullptr;
     }
 
-    _mat_motion_2d_image = Eigen::Matrix3f::Identity();
+    mat_motion_2d_image_ = Eigen::Matrix3f::Identity();
   }
 
   void set_buffer_size(int s) {
@@ -68,20 +70,15 @@ class PlaneMotion {
     }
   }
 
-  void init(int s) {
-    set_buffer_size(s);
-    _mat_motion_2d_image = Eigen::Matrix3f::Identity();
-  }
+  // void init(int s) { set_buffer_size(s); }
 
   void add_new_motion(VehicleStatus *vehicledata, float motion_time_dif,
                       bool image_read);
 
-  MotionBufferPtr get_buffer() {
-    return mot_buffer_;
-  }
+  MotionBufferPtr get_buffer() { return mot_buffer_; }
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_VEHICLEPLANEMOTION_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_VEHICLEPLANEMOTION_H_
