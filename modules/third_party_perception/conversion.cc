@@ -36,6 +36,7 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion {
 
+using apollo::canbus::Chassis;
 using apollo::drivers::ContiRadar;
 using apollo::drivers::DelphiESR;
 using apollo::drivers::Mobileye;
@@ -54,8 +55,8 @@ std::map<std::int32_t, ::apollo::hdmap::LaneBoundaryType_Type>
                            {6, apollo::hdmap::LaneBoundaryType::UNKNOWN}};
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
-    const Mobileye& mobileye, const LocalizationEstimate& localization) {
-  PerceptionObstacles obstacles;
+    const Mobileye& mobileye, const LocalizationEstimate& localization,
+    const Chassis& chassis) {
   // retrieve position and velocity of the main vehicle from the localization
   // position
   double adc_x = localization.pose().position().x();
@@ -118,7 +119,7 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
                        M_PI);
       }
 
-      converted_vx = mob_vel_x;
+      converted_vx = mob_vel_x + chassis.speed_mps();
       converted_vy = 0.0;
     }
 

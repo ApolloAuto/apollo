@@ -26,6 +26,7 @@
 #include <queue>
 #include <string>
 
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
@@ -60,6 +61,8 @@ class ThirdPartyPerception : public apollo::common::ApolloApp {
   // Upon receiving localization data
   void OnLocalization(
       const apollo::localization::LocalizationEstimate& message);
+  // Upont receiving chassis data
+  void OnChassis(const apollo::canbus::Chassis& message);
   // publish perception obstacles when timer is triggered
   void OnTimer(const ros::TimerEvent&);
 
@@ -68,6 +71,7 @@ class ThirdPartyPerception : public apollo::common::ApolloApp {
   apollo::perception::PerceptionObstacles mobileye_obstacles_;
   apollo::perception::PerceptionObstacles radar_obstacles_;
   apollo::localization::LocalizationEstimate localization_;
+  apollo::canbus::Chassis chassis_;
   RadarObstacles current_radar_obstacles_;
   RadarObstacles last_radar_obstacles_;
 };
