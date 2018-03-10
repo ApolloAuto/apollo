@@ -43,5 +43,9 @@ bool is_radar(SensorType sensor_type) {
   return (sensor_type == SensorType::RADAR);
 }
 
+bool is_camera(SensorType sensor_type) {
+  return (sensor_type == SensorType::CAMERA);
+}
+
 }  // namespace perception
 }  // namespace apollo
