@@ -28,7 +28,7 @@ module.exports = {
         // without the extension.
         //
         // Needs ".json" and ".scss" for Grommet.
-        extensions: [".wepack.js", ".web.js",
+        extensions: [".webpack.js", ".web.js",
                      ".jsx", ".js",
                      ".json",
                      ".scss", ".css",
