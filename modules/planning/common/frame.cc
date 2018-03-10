@@ -435,9 +435,8 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
 
   auto relative_map = AdapterManager::GetRelativeMap();
   if (!relative_map->Empty()) {
-    // TODO(all): down size relative debug output.
-    planning_data->mutable_relative_map()->CopyFrom(
-        relative_map->GetLatestObserved());
+    planning_data->mutable_relative_map()->mutable_header()->CopyFrom(
+        relative_map->GetLatestObserved().header());
   }
 }
 
