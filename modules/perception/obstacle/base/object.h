@@ -92,6 +92,9 @@ struct alignas(16) Object {
   Eigen::Matrix3d position_uncertainty;
   Eigen::Matrix3d velocity_uncertainty;
 
+  // modeling uncertainty from sensor level tracker
+  Eigen::Matrix<double, 4, 4> uncertainty;
+
   // CIPV
   bool b_cipv = false;
   // sensor particular suplplements, default nullptr
