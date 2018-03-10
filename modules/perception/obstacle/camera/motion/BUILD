@@ -5,10 +5,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "motion",
     srcs = [
-        "vehicleplanemotion.cc",
+        "plane_motion.cc",
     ],
     hdrs = [
-        "vehicleplanemotion.h",
+        "plane_motion.h",
     ],
     copts = [
         "-Wno-deprecated",

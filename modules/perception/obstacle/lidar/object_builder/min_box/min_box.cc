@@ -19,9 +19,9 @@
 #include <limits>
 #include <vector>
 
+#include "modules/perception/common/geometry_util.h"
 #include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/common/convex_hullxy.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
 
 namespace apollo {
 namespace perception {

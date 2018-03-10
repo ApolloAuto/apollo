@@ -17,7 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H
 
-#include "modules/perception/obstacle/common/geometry_util.h"
+#include "modules/perception/common/geometry_util.h"
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
 
 namespace apollo {

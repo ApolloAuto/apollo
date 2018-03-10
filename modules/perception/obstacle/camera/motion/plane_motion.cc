@@ -14,18 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/camera/motion/vehicleplanemotion.h"
+#include "modules/perception/obstacle/camera/motion/plane_motion.h"
 
 namespace apollo {
 namespace perception {
 
-PlaneMotion::PlaneMotion(int s) {
-  init(s);
-}
+PlaneMotion::PlaneMotion(int s) { set_buffer_size(s); }
 
 PlaneMotion::PlaneMotion(int s, bool sync_time_stamp, float time_unit)
     : time_unit_(time_unit) {
-  init(s);
+  set_buffer_size(s);
 }
 
 PlaneMotion::~PlaneMotion(void) {
@@ -59,8 +57,8 @@ void PlaneMotion::add_new_motion(VehicleStatus *vehicledata,
   generate_motion_matrix(vehicledata);  // compute vehicledata.motion
 
   // both CAN+IMU and image time stamp
-  _mat_motion_2d_image =
-      _mat_motion_2d_image * vehicledata->motion;  // accumulate CAN+IMU motion
+  mat_motion_2d_image_ =
+      mat_motion_2d_image_ * vehicledata->motion;  // accumulate CAN+IMU motion
 
   time_difference_ +=
       motion_time_dif;  // accumulate time diff before inserting into buffer
@@ -68,13 +66,13 @@ void PlaneMotion::add_new_motion(VehicleStatus *vehicledata,
   if (image_read) {
     // image capture time stamp to insert the buffer for the accumulated motion
     for (int k = 0; k < static_cast<int>(mot_buffer_->size()); k++) {
-      (*mot_buffer_)[k].motion *= _mat_motion_2d_image;
+      (*mot_buffer_)[k].motion *= mat_motion_2d_image_;
     }
 
     vehicledata->time_d = time_difference_;
-    vehicledata->motion = _mat_motion_2d_image;
+    vehicledata->motion = mat_motion_2d_image_;
     mot_buffer_->push_back(*vehicledata);  // a new image frame is added
-    _mat_motion_2d_image =
+    mat_motion_2d_image_ =
         Eigen::Matrix3f::Identity();  // reset image accumulated motion
     time_difference_ = 0;             // reset the accumulated time difference
   }

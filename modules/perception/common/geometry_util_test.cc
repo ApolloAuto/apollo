@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/common/geometry_util.h"
+#include "modules/perception/common/geometry_util.h"
 
-#include <boost/algorithm/string.hpp>
 #include <cfloat>
 #include <fstream>
 #include <string>
 #include <vector>
 
+#include "boost/algorithm/string.hpp"
 #include "gtest/gtest.h"
+
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 
@@ -33,7 +34,9 @@ using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
 using pcl_util::PointDCloud;
 
+namespace {
 const double EPSILON = 1e-6;
+}
 
 static bool ConstructPointCloud(std::vector<pcl_util::PointCloudPtr>* clouds) {
   std::string pcd_data(
