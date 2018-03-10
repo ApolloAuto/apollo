@@ -102,18 +102,19 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 }
 
 /*
- * stop_sign: adc stopped + wait_time < 3sec
+ * stop_sign: adc stopped + wait_time < FLAGS_stop_sign_stop_duration
  *   adc status: STOPPING => STOPPING
  *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   FLAGS_enable_stop_sign = true;
+  double wait_time = FLAGS_stop_sign_stop_duration - 1;
 
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::STOPPING);
-  double stop_start_time = Clock::NowInSeconds() - 2;
+  double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
   std::string seq_num = "2";
@@ -130,18 +131,19 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 }
 
 /*
- * stop_sign: adc stopped + wait time > 3
+ * stop_sign: adc stopped + wait time > FLAGS_stop_sign_stop_duration
  *   adc status: STOPPING => STOP_DONE
  *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   FLAGS_enable_stop_sign = true;
+  double wait_time = FLAGS_stop_sign_stop_duration + 1;
 
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::STOPPING);
-  double stop_start_time = Clock::NowInSeconds() - 4;
+  double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
   std::string seq_num = "2";
@@ -163,12 +165,14 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
  * step 1:
  *   adc decision: STOP
  * step 2:
- *   wait_time = 4, other vehicles arrived at other stop sign later than adc
+ *   wait_time > FLAGS_stop_sign_stop_duration,
+ *      other vehicles arrived at other stop sign later than adc
  *   adc status: STOPPING => STOP_DONE
  *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
   FLAGS_enable_stop_sign = true;
+  double wait_time = FLAGS_stop_sign_stop_duration + 1;
 
   std::string seq_num = "3";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -180,7 +184,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
 
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
-  double stop_start_time = Clock::NowInSeconds() - 4;
+  double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
   seq_num = "4";
@@ -197,17 +201,19 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
  * step 1:
  *   adc decision: STOP
  * step 2:
- *   wait_time = 4, other vehicles arrived at other stop sign earlier than adc
+ *   wait_time > FLAGS_stop_sign_stop_duration,
+ *      other vehicles arrived at other stop sign earlier than adc
  *   adc status: STOPPING => STOPPING (i.e. waiting)
  *   decision: STOP
  * step 3:
- *   wait_time = 4,
+ *   wait_time > FLAGS_stop_sign_stop_duration,
  *     and other vehicles arrived at other stop sign earlier than adc GONE
  *   adc status: STOPPING => STOPPING => STOP_DONE
  *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   FLAGS_enable_stop_sign = true;
+  double wait_time = FLAGS_stop_sign_stop_duration + 1;
 
   std::string seq_num = "5";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -223,7 +229,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
 
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
-  double stop_start_time = Clock::NowInSeconds() - 4;
+  double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
   seq_num = "6";
@@ -250,7 +256,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   // previously watch vehicles are gone
 
   // set PlanningStatus
-  stop_start_time = Clock::NowInSeconds() - 4;
+  stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
   seq_num = "7";
