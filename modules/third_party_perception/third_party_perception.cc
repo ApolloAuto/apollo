@@ -41,6 +41,7 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::perception::Point;
+using apollo::canbus::Chassis;
 
 std::string ThirdPartyPerception::Name() const {
   return FLAGS_module_name;
