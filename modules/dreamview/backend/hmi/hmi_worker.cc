@@ -35,10 +35,6 @@ DEFINE_string(map_data_path, "/apollo/modules/map/data", "Path to map data.");
 DEFINE_string(vehicle_data_path, "/apollo/modules/calibration/data",
               "Path to vehicle data.");
 
-DEFINE_string(global_flagfile,
-              "/apollo/modules/common/data/global_flagfile.txt",
-              "Global flagfile shared by all modules.");
-
 namespace apollo {
 namespace dreamview {
 namespace {
@@ -50,6 +46,8 @@ using apollo::common::util::FindOrNull;
 using apollo::common::util::StringTokenizer;
 using apollo::control::DrivingAction;
 using google::protobuf::Map;
+
+constexpr char kNavigationModeName[] = "Navigation";
 
 // Convert a string to be title-like. E.g.: "hello_world" -> "Hello World".
 std::string TitleCase(const std::string &origin,
@@ -78,9 +76,9 @@ Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
 }
 
 // Run a supported command of some component, return the ret code.
-int RunComponentCommand(
-    const google::protobuf::Map<std::string, Component> &components,
-    const std::string &component_name, const std::string &command_name) {
+int RunComponentCommand(const Map<std::string, Component> &components,
+                        const std::string &component_name,
+                        const std::string &command_name) {
   const auto *component = FindOrNull(components, component_name);
   if (component == nullptr) {
     AERROR << "Cannot find component " << component_name;
@@ -96,6 +94,20 @@ int RunComponentCommand(
 
   AERROR_IF(ret != 0) << "Command returns " << ret << ": " << *cmd;
   return ret;
+}
+
+template <class FlagType, class ValueType>
+void SetGlobalFlag(const std::string &flag_name, const ValueType &value,
+                   FlagType* flag) {
+  static constexpr char kGlobalFlagfile[] =
+      "/apollo/modules/common/data/global_flagfile.txt";
+  if (*flag != value) {
+    *flag = value;
+    // Overwrite global flagfile.
+    std::ofstream fout(kGlobalFlagfile, std::ios_base::app);
+    CHECK(fout) << "Fail to open global flagfile " << kGlobalFlagfile;
+    fout << "\n--" << flag_name << "=" << value << std::endl;
+  }
 }
 
 }  // namespace
@@ -124,11 +136,25 @@ HMIWorker::HMIWorker() {
   ADEBUG << "Loaded HMI config: " << config_.DebugString();
 
   // Init HMIStatus.
-  // If the default mode is unavailable, select the first one.
   const auto &modes = config_.modes();
-  if (!ContainsKey(modes, status_.current_mode())) {
-    CHECK(!modes.empty());
+  if (FLAGS_use_navigation_mode && ContainsKey(modes, kNavigationModeName)) {
+    // If the FLAG_use_navigation_mode is set, set it in HMIStatus.
+    status_.set_current_mode(kNavigationModeName);
+  } else if (!ContainsKey(modes, status_.current_mode())) {
+    CHECK(!modes.empty()) << "No available modes to run vehicle.";
+    // If the default mode is unavailable, select the first one.
     status_.set_current_mode(modes.begin()->first);
+  }
+
+  // If the FLAGS_map_dir is set, set it in HMIStatus.
+  if (!FLAGS_map_dir.empty()) {
+    for (const auto &entry : config_.available_maps()) {
+      // entry is (map_name, map_path)
+      if (entry.second == FLAGS_map_dir) {
+        status_.set_current_map(entry.first);
+        break;
+      }
+    }
   }
 }
 
@@ -229,11 +255,7 @@ void HMIWorker::ChangeToMap(const std::string &map_name,
   status_.set_current_map(map_name);
   apollo::common::KVDB::Put("apollo:dreamview:map", map_name);
 
-  FLAGS_map_dir = *map_dir;
-  // Append new map_dir flag to global flagfile.
-  std::ofstream fout(FLAGS_global_flagfile, std::ios_base::app);
-  CHECK(fout) << "Fail to open " << FLAGS_global_flagfile;
-  fout << "\n--map_dir=" << *map_dir << std::endl;
+  SetGlobalFlag("map_dir", *map_dir, &FLAGS_map_dir);
   // Also reload simulation map.
   CHECK(map_service->ReloadMap(true)) << "Failed to load map from " << *map_dir;
   RunModeCommand("stop");
@@ -268,6 +290,9 @@ void HMIWorker::ChangeToMode(const std::string &mode_name) {
   status_.set_current_mode(mode_name);
   apollo::common::KVDB::Put("apollo:dreamview:mode", mode_name);
 
+  const bool use_navigation_mode = (mode_name == kNavigationModeName);
+  SetGlobalFlag("use_navigation_mode", use_navigation_mode,
+                &FLAGS_use_navigation_mode);
   // Now stop all old modules.
   for (const auto &module : old_modules) {
     RunModuleCommand(module, "stop");
