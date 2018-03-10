@@ -111,7 +111,8 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
       converted_vy = converted_speed * std::sin(mob->theta());
     } else {
       // TODO(QiL) : need to load configs from mobileye for offset
-      converted_x = mobileye.details_739(index).obstacle_pos_x();
+      // 2.5 is a temp estimated value
+      converted_x = mobileye.details_739(index).obstacle_pos_x() + 2.5;
       converted_y = mobileye.details_739(index).obstacle_pos_y();
       if (mobileye.details_73b_size() <= index) {
         mob->set_theta(0.0);
