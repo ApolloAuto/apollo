@@ -114,7 +114,8 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
       if (mobileye.details_73b_size() <= index) {
         mob->set_theta(0.0);
       } else {
-        mob->set_theta(mobileye.details_73b(index).obstacle_angle());
+        mob->set_theta(mobileye.details_73b(index).obstacle_angle() / 180 *
+                       M_PI);
       }
 
       converted_vx = mob_vel_x;
