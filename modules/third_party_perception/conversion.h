@@ -53,7 +53,8 @@ RadarObstacles DelphiToRadarObstacles(
 RadarObstacles ContiToRadarObstacles(
     const apollo::drivers::ContiRadar& conti_radar,
     const apollo::localization::LocalizationEstimate& localization,
-    const RadarObstacles& last_radar_obstacles);
+    const RadarObstacles& last_radar_obstacles,
+    const apollo::canbus::Chassis& chassis);
 
 apollo::perception::PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     const RadarObstacles& radar_obstacles);
