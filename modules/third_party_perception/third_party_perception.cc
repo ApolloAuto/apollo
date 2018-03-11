@@ -30,6 +30,7 @@
 namespace apollo {
 namespace third_party_perception {
 
+using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
@@ -41,7 +42,6 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::perception::Point;
-using apollo::canbus::Chassis;
 
 std::string ThirdPartyPerception::Name() const {
   return FLAGS_module_name;
@@ -120,7 +120,7 @@ void ThirdPartyPerception::OnContiRadar(const ContiRadar& message) {
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
   current_radar_obstacles_ = conversion::ContiToRadarObstacles(
-      message, localization_, last_radar_obstacles_);
+      message, localization_, last_radar_obstacles_, chassis_);
   RadarObstacles filtered_radar_obstacles =
       filter::FilterRadarObstacles(current_radar_obstacles_);
   if (FLAGS_enable_radar) {
