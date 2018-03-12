@@ -22,7 +22,7 @@
 #include <vector>
 #include "caffe/caffe.hpp"
 #include "modules/common/log.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/proto/cnnseg.pb.h"
 
 namespace apollo {

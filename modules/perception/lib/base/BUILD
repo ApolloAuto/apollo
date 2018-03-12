@@ -16,7 +16,6 @@ cc_library(
         "registerer.h",
         "singleton.h",
         "thread.h",
-        "time_util.h",
         "timer.h",
     ],
     linkopts = [
