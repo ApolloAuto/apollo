@@ -30,7 +30,7 @@
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/radar/modest/conti_radar_id_expansion.h"
 #include "modules/perception/onboard/dag_streaming.h"
 

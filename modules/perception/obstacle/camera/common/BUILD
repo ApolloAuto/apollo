@@ -28,7 +28,7 @@ cc_library(
         "visual_object.h",
     ],
     deps = [
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/base",
         "@eigen",
         "@undistort",

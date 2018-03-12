@@ -17,10 +17,19 @@ cc_library(
         "perception_gflags.h",
     ],
     deps = [
+        ":pcl_util",
         "//modules/common",
         "//modules/common/math:math_utils",
-        "//modules/perception/lib/pcl_util",
         "@eigen",
+    ],
+)
+
+cc_library(
+    name = "pcl_util",
+    srcs = [],
+    hdrs = ["pcl_types.h"],
+    deps = [
+        "@pcl",
     ],
 )
 

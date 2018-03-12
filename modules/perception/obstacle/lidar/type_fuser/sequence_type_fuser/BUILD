@@ -18,7 +18,7 @@ cc_library(
         "//modules/perception/common",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/lidar/interface",
         "@eigen",

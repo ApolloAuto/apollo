@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef apollo_PERCEPTION_LIB_BASE_TIME_UTIL_H_
-#define apollo_PERCEPTION_LIB_BASE_TIME_UTIL_H_
+#ifndef MODULES_COMMON_TIME_TIME_UTIL_H_
+#define MODULES_COMMON_TIME_TIME_UTIL_H_
 
 #include <sys/time.h>
 #include <iomanip>
@@ -23,7 +23,8 @@
 #include "modules/common/macro.h"
 
 namespace apollo {
-namespace perception {
+namespace common {
+namespace time {
 
 #define GLOG_TIMESTAMP(timestamp) \
   std::fixed << std::setprecision(9) << timestamp
@@ -64,7 +65,8 @@ class TimeUtil {
   DISALLOW_COPY_AND_ASSIGN(TimeUtil);
 };
 
-}  // namespace perception
+}  // namespace time
+}  // namespace common
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_LIB_BASE_TIME_UTIL_H__
+#endif  // MODULES_COMMON_TIME_TIME_UTIL_H__

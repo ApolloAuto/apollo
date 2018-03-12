@@ -18,10 +18,11 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common/proto:error_code_proto",
+        "//modules/common/time",
         "//modules/common/util:string_util",
         "//modules/perception/common",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
-        "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/camera/lane_post_process/common:type",
         "//modules/perception/proto:perception_proto",
         "@eigen",
