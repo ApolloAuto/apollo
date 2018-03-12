@@ -133,6 +133,7 @@ HMIWorker::HMIWorker() {
   *config_.mutable_available_maps() = ListDirAsDict(FLAGS_map_data_path);
   *config_.mutable_available_vehicles() =
       ListDirAsDict(FLAGS_vehicle_data_path);
+  config_.set_utm_zone_id(FLAGS_local_utm_zone_id);
   ADEBUG << "Loaded HMI config: " << config_.DebugString();
 
   // Init HMIStatus.
