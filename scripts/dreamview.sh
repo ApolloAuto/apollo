@@ -23,8 +23,10 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-# Dreamview depends on monitor module to get system runtime status.
-bash scripts/monitor.sh "$@"
+echo "Dreamview relies on roscore and monitor. Start them if you are going to"
+echo "start dreamview:"
+echo "    bash scripts/roscore.sh start"
+echo "    bash scripts/monitor.sh start"
 
 # run function from apollo_base.sh
 # run command_name module_name
