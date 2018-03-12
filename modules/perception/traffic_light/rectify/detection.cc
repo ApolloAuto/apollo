@@ -28,13 +28,13 @@ namespace traffic_light {
 void Detection::Perform(const cv::Mat &ros_image,
                         std::vector<LightPtr> *lights) {
   cv::Mat crop_image = ros_image(crop_box_);
-  apollo::perception::Timer timer;
+  Timer timer;
   timer.Start();
   lights->clear();
   // resize
   cv::Mat fw_image;
-  float crop_col_shrink_ = 0;
-  float crop_row_shrink_ = 0;
+  float crop_col_shrink_ = 0.0f;
+  float crop_row_shrink_ = 0.0f;
   float col_shrink = static_cast<float>(resize_len_) / (crop_image.cols);
   float row_shrink = static_cast<float>(resize_len_) / (crop_image.rows);
   crop_col_shrink_ = std::max(col_shrink, row_shrink);
@@ -59,9 +59,9 @@ void Detection::Perform(const cv::Mat &ros_image,
   float inflate_col = 1.0f / crop_col_shrink_;
   float inflate_row = 1.0f / crop_row_shrink_;
   SelectOutputBboxes(crop_image.size(), VERTICAL_CLASS, inflate_col,
-                                       inflate_row, lights);
+                     inflate_row, lights);
   SelectOutputBboxes(crop_image.size(), QUADRATE_CLASS, inflate_col,
-                                       inflate_row, lights);
+                     inflate_row, lights);
 
   AINFO << "Dump output Done! Get box num:" << lights->size();
 
@@ -124,8 +124,7 @@ bool Detection::SelectOutputBboxes(const cv::Size &img_size, int class_id,
       continue;
     }
 
-    tmp->region.rectified_roi =
-        RefinedBox(tmp->region.rectified_roi, img_size);
+    tmp->region.rectified_roi = RefinedBox(tmp->region.rectified_roi, img_size);
     tmp->region.is_detected = true;
     tmp->region.detect_class_id = DetectionClassId(class_id);
     lights->push_back(tmp);

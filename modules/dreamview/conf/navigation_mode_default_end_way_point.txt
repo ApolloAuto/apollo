@@ -1,0 +1,51 @@
+landmark {
+    name: "POI: Cananda West",
+    waypoint {
+        pose {
+          x: 558332.4387239887,
+          y: 4151192.0907792537,
+        }
+    }
+}
+
+landmark {
+    name: "POI: Cananda East",
+    waypoint {
+        pose {
+          x: 562039.7927849567,
+          y: 4146600.4216080043,
+        }
+    }
+}
+
+landmark {
+    name: "Route: Caribbean to Crossman",
+    waypoint {
+        pose {
+            x: 587074.2977157715,
+            y: 4141569.560433219,
+        }
+    }
+   waypoint {
+        pose {
+            x: 587537.6809338385,
+            y: 4140715.096199132,
+        }
+    }
+}
+
+landmark {
+    name: "Route: Crossman to Caribbean",
+    waypoint {
+        pose {
+            x: 587545.6665281074,
+            y: 4140715.939279582,
+        }
+    }
+   waypoint {
+        pose {
+            x: 587065.2253807376,
+            y: 4141581.9434267264,
+        }
+    }
+}

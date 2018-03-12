@@ -289,7 +289,7 @@ DEFINE_bool(enable_stop_sign_creeping, false,
             "or two way stop signs.");
 DEFINE_string(stop_sign_virtual_obstacle_id_prefix, "SS_",
               "prefix for converting stop_sign id to virtual obstacle id");
-DEFINE_double(stop_sign_stop_duration, 3.0,
+DEFINE_double(stop_sign_stop_duration, 1.0,
               "min time(second) to stop at stop sign");
 DEFINE_double(stop_sign_min_pass_distance, 3.0,
               "valid min distance(m) for vehicles to be considered as "

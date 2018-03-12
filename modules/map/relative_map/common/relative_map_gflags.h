@@ -29,4 +29,5 @@ DECLARE_double(max_len_for_navigation_lane);
 DECLARE_double(ratio_navigation_lane_len_to_speed);
 DECLARE_double(max_distance_to_navigation_line);
 DECLARE_double(min_view_range_to_use_lane_marker);
+DECLARE_double(min_lane_half_width);
 #endif  // MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_GFLAGS_H_

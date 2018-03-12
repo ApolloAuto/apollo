@@ -47,6 +47,8 @@ TrajectoryEvaluator::TrajectoryEvaluator(
   path_time_intervals_ = path_time_graph_->GetPathBlockingIntervals(
       start_time, end_time, FLAGS_trajectory_time_resolution);
 
+  reference_s_dot_ = ComputeLongitudinalGuideVelocity(planning_target);
+
   // if we have a stop point along the reference line,
   // filter out the lon. trajectories that pass the stop point.
   double stop_point = std::numeric_limits<double>::max();
@@ -146,10 +148,8 @@ double TrajectoryEvaluator::Evaluate(
   // 5. Cost of lateral comfort
 
   // Longitudinal costs
-  auto reference_s_dot = ComputeLongitudinalGuideVelocity(planning_target);
-
   double lon_objective_cost = LonObjectiveCost(lon_trajectory, planning_target,
-      reference_s_dot);
+      reference_s_dot_);
 
   double lon_jerk_cost = LonComfortCost(lon_trajectory);
 
@@ -307,23 +307,26 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
   ConstantAccelerationTrajectory1d lon_traj(init_s_[0], cruise_s_dot);
 
   if (!planning_target.has_stop_point()) {
-    lon_traj.AppendSgment(0.0, FLAGS_trajectory_time_length);
+    lon_traj.AppendSegment(0.0, FLAGS_trajectory_time_length);
   } else {
+    double stop_a = FLAGS_longitudinal_acceleration_lower_bound;
     double stop_s = planning_target.stop_point().s();
     double dist = stop_s - init_s_[0];
-    double stop_a = -cruise_s_dot * cruise_s_dot * 0.5 / dist;
+    if (dist > FLAGS_lattice_epsilon) {
+      stop_a = -cruise_s_dot * cruise_s_dot * 0.5 / dist;
+    }
     if (stop_a > comfort_a) {
       double stop_t = cruise_s_dot / (-comfort_a);
       double stop_dist = cruise_s_dot * stop_t * 0.5;
       double cruise_t = (dist - stop_dist) / cruise_s_dot;
-      lon_traj.AppendSgment(0.0, cruise_t);
-      lon_traj.AppendSgment(comfort_a, stop_t);
+      lon_traj.AppendSegment(0.0, cruise_t);
+      lon_traj.AppendSegment(comfort_a, stop_t);
     } else {
       double stop_t = cruise_s_dot / (-stop_a);
-      lon_traj.AppendSgment(stop_a, stop_t);
+      lon_traj.AppendSegment(stop_a, stop_t);
     }
     if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
-      lon_traj.AppendSgment(
+      lon_traj.AppendSegment(
           0.0, FLAGS_trajectory_time_length - lon_traj.ParamLength());
     }
   }

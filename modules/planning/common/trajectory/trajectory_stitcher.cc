@@ -21,9 +21,11 @@
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
 
 #include <algorithm>
+#include <list>
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -32,6 +34,7 @@ namespace planning {
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
+using apollo::common::util::DistanceXY;
 
 std::vector<TrajectoryPoint>
 TrajectoryStitcher::ComputeReinitStitchingTrajectory(
@@ -49,6 +52,29 @@ TrajectoryStitcher::ComputeReinitStitchingTrajectory(
   return std::vector<TrajectoryPoint>(1, init_point);
 }
 
+//  Stitch to reference line based on location
+std::vector<TrajectoryPoint> TrajectoryStitcher::StitchToReferenceLine(
+    const VehicleState& vehicle_state, const ReferenceLine& reference_line) {
+  Vec2d adc_pose(vehicle_state.x(), vehicle_state.y());
+  auto ref_point = reference_line.GetNearestReferencePoint(adc_pose);
+  double distance = DistanceXY(ref_point, adc_pose);
+  constexpr double kEpsilon = 0.01;
+  if (distance - kEpsilon > FLAGS_replan_lateral_distance_threshold) {
+    Vec2d shift_direction = adc_pose - ref_point;
+    shift_direction.Normalize();
+    ref_point +=
+        shift_direction * (distance - FLAGS_replan_lateral_distance_threshold);
+  }
+  std::vector<TrajectoryPoint> trajectory_points;
+  trajectory_points.emplace_back();
+  auto& init_point = trajectory_points.back();
+  init_point.mutable_path_point()->CopyFrom(ref_point.ToPathPoint(0.0));
+  init_point.set_v(vehicle_state.linear_velocity());
+  init_point.set_a(vehicle_state.linear_acceleration());
+  init_point.set_relative_time(0.0);
+  return trajectory_points;
+}
+
 // Planning from current vehicle state:
 // if 1. the auto-driving mode is off or
 //    2. we don't have the trajectory from last planning cycle or
@@ -58,7 +84,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const double planning_cycle_time,
     const PublishableTrajectory* prev_trajectory, bool* is_replan) {
   *is_replan = true;
-  if (!FLAGS_enable_trajectory_stitcher || FLAGS_use_navigation_mode) {
+  if (!FLAGS_enable_trajectory_stitcher) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
   if (!prev_trajectory) {

@@ -36,6 +36,7 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion {
 
+using apollo::canbus::Chassis;
 using apollo::drivers::ContiRadar;
 using apollo::drivers::DelphiESR;
 using apollo::drivers::Mobileye;
@@ -54,7 +55,8 @@ std::map<std::int32_t, ::apollo::hdmap::LaneBoundaryType_Type>
                            {6, apollo::hdmap::LaneBoundaryType::UNKNOWN}};
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
-    const Mobileye& mobileye, const LocalizationEstimate& localization) {
+    const Mobileye& mobileye, const LocalizationEstimate& localization,
+    const Chassis& chassis) {
   PerceptionObstacles obstacles;
   // retrieve position and velocity of the main vehicle from the localization
   // position
@@ -108,12 +110,19 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
       converted_vx = converted_speed * std::cos(mob->theta());
       converted_vy = converted_speed * std::sin(mob->theta());
     } else {
-      converted_x = xy_point.x();
-      converted_y = xy_point.y();
-      mob->set_theta(mobileye.details_73b(index).obstacle_angle());
-      converted_speed = mob_vel_x;
-      converted_vx = converted_speed * std::cos(mob->theta());
-      converted_vy = converted_speed * std::sin(mob->theta());
+      // TODO(QiL) : need to load configs from mobileye for offset
+      // 2.5 is a temp estimated value
+      converted_x = mobileye.details_739(index).obstacle_pos_x() + 2.5;
+      converted_y = mobileye.details_739(index).obstacle_pos_y();
+      if (mobileye.details_73b_size() <= index) {
+        mob->set_theta(0.0);
+      } else {
+        mob->set_theta(mobileye.details_73b(index).obstacle_angle() / 180 *
+                       M_PI);
+      }
+
+      converted_vx = mob_vel_x + chassis.speed_mps();
+      converted_vy = 0.0;
     }
 
     mob->set_id(mob_id);

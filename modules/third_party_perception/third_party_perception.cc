@@ -41,6 +41,7 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::perception::Point;
+using apollo::canbus::Chassis;
 
 std::string ThirdPartyPerception::Name() const {
   return FLAGS_module_name;
@@ -55,6 +56,8 @@ Status ThirdPartyPerception::Init() {
       << "Localization is not initialized.";
   AdapterManager::AddLocalizationCallback(&ThirdPartyPerception::OnLocalization,
                                           this);
+  CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
+  AdapterManager::AddChassisCallback(&ThirdPartyPerception::OnChassis, this);
 
   // TODO(all) : need to merge the delphi/conti_radar before adaptor manager
   // level. This is just temperary change.
@@ -87,9 +90,15 @@ void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
   AINFO << "Received mobileye data: run mobileye callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   if (FLAGS_enable_mobileye) {
-    mobileye_obstacles_ =
-        conversion::MobileyeToPerceptionObstacles(message, localization_);
+    mobileye_obstacles_ = conversion::MobileyeToPerceptionObstacles(
+        message, localization_, chassis_);
   }
+}
+
+void ThirdPartyPerception::OnChassis(const Chassis& message) {
+  AINFO << "Received chassis data: run chassis callback.";
+  std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
+  chassis_.CopyFrom(message);
 }
 
 void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {

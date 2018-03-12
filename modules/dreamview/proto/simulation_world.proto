@@ -148,6 +148,7 @@ message DelaysInMs {
   optional double planning = 5;
   optional double prediction= 7;
   optional double traffic_light = 8;
+  optional double control = 9;
 }
 
 message RoutePath {
