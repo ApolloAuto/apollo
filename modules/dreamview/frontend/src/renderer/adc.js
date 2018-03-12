@@ -38,7 +38,7 @@ export default class AutoDrivingCar {
     }
 
     update(coordinates, pose) {
-        if (!this.mesh || !pose) {
+        if (!this.mesh || !pose || !_.isNumber(pose.positionX) || !_.isNumber(pose.positionY)) {
             return;
         }
 
