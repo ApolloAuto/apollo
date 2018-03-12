@@ -5,12 +5,14 @@ import classNames from "classnames";
 import RadioItem from 'components/common/RadioItem';
 
 import menuData from 'store/config/MenuData';
-import perceptionIcon from "assets/images/menu/Perception.png";
-import predictionIcon from "assets/images/menu/Prediction.png";
-import routingIcon from "assets/images/menu/Routing.png";
-import decisionIcon from "assets/images/menu/Decision.png";
-import planningIcon from "assets/images/menu/Planning.png";
-import cameraIcon from "assets/images/menu/PointOfView.png";
+import perceptionIcon from "assets/images/menu/perception.png";
+import predictionIcon from "assets/images/menu/prediction.png";
+import routingIcon from "assets/images/menu/routing.png";
+import decisionIcon from "assets/images/menu/decision.png";
+import planningIcon from "assets/images/menu/planning.png";
+import cameraIcon from "assets/images/menu/point_of_view.png";
+import positionIcon from "assets/images/menu/position.png";
+import mapIcon from "assets/images/menu/map.png";
 
 import { POINT_CLOUD_WS } from "store/websocket";
 
@@ -20,7 +22,9 @@ const MenuIconMapping = {
         routing: routingIcon,
         decision: decisionIcon,
         planning: planningIcon,
-        camera: cameraIcon
+        camera: cameraIcon,
+        position: positionIcon,
+        map: mapIcon,
 };
 
 const MenuIdOptionMapping = {
@@ -144,7 +148,7 @@ export default class Menu extends React.Component {
             });
 
         return (
-            <div className="nav-side-menu" id="layer-menu">
+            <div className="tool-view-menu" id="layer-menu">
                 {subMenu}
             </div>
         );

@@ -26,7 +26,7 @@ export default class POI extends React.Component {
             });
 
         return (
-            <div className="nav-side-menu" id="poi-list">
+            <div className="tool-view-menu" id="poi-list">
                 <div className="card">
                     <div className="card-header"><span>Point of Interest</span></div>
                     <div className="card-content-row">{entries}</div>
