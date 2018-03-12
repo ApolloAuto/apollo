@@ -40,6 +40,7 @@ module.exports = {
             utils: path.resolve(__dirname, "src/utils"),
             renderer: path.resolve(__dirname, "src/renderer"),
             assets: path.resolve(__dirname, "assets"),
+            proto_bundle: path.resolve(__dirname, "proto_bundle"),
         }
     },
 
