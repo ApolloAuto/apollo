@@ -39,7 +39,6 @@ DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
 DECLARE_double(reference_line_lateral_buffer);
 DECLARE_double(prepare_rerouting_time);
-DECLARE_double(rerouting_cooldown_time);
 
 DECLARE_bool(enable_smooth_reference_line);
 DECLARE_double(spiral_smoother_max_deviation);
@@ -194,7 +193,7 @@ DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 // lattice planner
 DECLARE_double(lattice_epsilon);
 DECLARE_double(default_cruise_speed);
-DECLARE_bool(enable_lattice_st_image_dump);
+
 DECLARE_bool(enable_auto_tuning);
 DECLARE_double(trajectory_time_resolution);
 DECLARE_double(trajectory_space_resolution);

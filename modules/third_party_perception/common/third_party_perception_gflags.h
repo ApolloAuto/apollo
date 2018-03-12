@@ -19,7 +19,6 @@
 
 #include "gflags/gflags.h"
 
-DECLARE_string(node_namespace);
 DECLARE_string(node_name);
 DECLARE_string(module_name);
 
