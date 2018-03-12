@@ -22,6 +22,7 @@
 // The directory which contains a group of related maps, such as base_map,
 // sim_map, routing_topo_grapth, etc.
 DECLARE_string(map_dir);
+DECLARE_int32(local_utm_zone_id);
 
 DECLARE_string(test_base_map_filename);
 DECLARE_string(base_map_filename);
