@@ -16,8 +16,6 @@
 
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 
-DEFINE_string(node_namespace, "/apollo/third_party_perception",
-              "Global node namespace");
 DEFINE_string(node_name, "third_party_perception",
               "The chassis module name in proto");
 DEFINE_string(module_name, "third_party_perception", "Module name");

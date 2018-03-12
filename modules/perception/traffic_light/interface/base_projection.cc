@@ -17,11 +17,6 @@
 
 namespace apollo {
 namespace perception {
-namespace traffic_light {
-
-DEFINE_string(traffic_light_projection, "",
-              "the projection enabled for traffic_light");
-
-}  // namespace traffic_light
+namespace traffic_light {}  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo
