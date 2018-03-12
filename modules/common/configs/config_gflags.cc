@@ -18,7 +18,7 @@
 
 DEFINE_string(map_dir, "modules/map/data/demo",
               "Directory which contains a group of related maps.");
-DEFINE_int32(local_utm_zone_id, 50, "UTM zone id.");
+DEFINE_int32(local_utm_zone_id, 10, "UTM zone id.");
 
 DEFINE_string(test_base_map_filename, "",
               "If not empty, use this test base map files.");
