@@ -20,7 +20,7 @@ cc_library(
         "//external:gflags",
         "//modules/common",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/lidar/interface",
         "//modules/perception/obstacle/onboard:hdmapinput",
@@ -41,7 +41,7 @@ cc_test(
     deps = [
         "//external:gflags",
         "//modules/common:log",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
         "@gtest",
         "@gtest//:main",

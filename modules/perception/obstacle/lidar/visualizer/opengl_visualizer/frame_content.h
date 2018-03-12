@@ -24,7 +24,7 @@
 #include <thread>
 #include <vector>
 
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 
 namespace apollo {

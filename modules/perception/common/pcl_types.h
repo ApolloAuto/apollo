@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIB_PCL_UTIL_PCL_TYPES_H_
-#define MODULES_PERCEPTION_LIB_PCL_UTIL_PCL_TYPES_H_
+#ifndef MODULES_PERCEPTION_COMMON_PCL_TYPES_H_
+#define MODULES_PERCEPTION_COMMON_PCL_TYPES_H_
 
 #include "pcl/common/time.h"
 #include "pcl/common/transforms.h"
@@ -183,4 +183,4 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(
     (double, x, x)(double, y, y)(double, z, z)(uint8_t, intensity, intensity)(
         uint8_t, ring, ring)(double, timestamp, timestamp))
 
-#endif  // MODULES_PERCEPTION_LIB_PCL_UTIL_PCL_TYPES_H_
+#endif  // MODULES_PERCEPTION_COMMON_PCL_TYPES_H_

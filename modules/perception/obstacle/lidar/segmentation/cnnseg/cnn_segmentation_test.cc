@@ -30,7 +30,7 @@
 
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 
 #define VISUALIZE

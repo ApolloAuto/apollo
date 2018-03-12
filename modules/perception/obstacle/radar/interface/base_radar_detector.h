@@ -62,7 +62,7 @@
 #include "modules/common/macro.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/perception/lib/base/registerer.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
 

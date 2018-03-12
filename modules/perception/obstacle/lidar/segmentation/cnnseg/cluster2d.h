@@ -24,7 +24,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/disjoint_set.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/util.h"
 

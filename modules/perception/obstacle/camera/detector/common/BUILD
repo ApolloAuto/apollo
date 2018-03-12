@@ -23,8 +23,8 @@ cc_library(
     hdrs = ["feature_extractor.h"],
     deps = [
         "//modules/common:log",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
-        "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common:util",
         "//modules/perception/obstacle/camera/detector/common/proto:tracking_feature_proto",
