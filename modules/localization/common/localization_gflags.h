@@ -70,7 +70,7 @@ DECLARE_bool(integ_sins_align_with_vel);
 DECLARE_bool(integ_sins_state_check);
 DECLARE_double(integ_sins_state_span_time);
 DECLARE_double(integ_sins_state_pos_std);
-DECLARE_bool(using_raw_gnsspos);
+
 DECLARE_double(vel_threshold_get_yaw);
 DECLARE_bool(integ_debug_log_flag);
 
