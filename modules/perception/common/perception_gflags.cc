@@ -103,14 +103,7 @@ DEFINE_int32(obs_camera_detector_gpu, 0, "device id for camera detector");
 DEFINE_string(onboard_lane_post_processor, "CCLanePostProcessor",
               "onboard lane post-processing algorithm name");
 
-/// visualization
-DEFINE_bool(show_front_radar_raw, false, "");
-DEFINE_bool(show_back_radar_raw, false, "");
-
-DEFINE_bool(show_radar_objects, false, "");
-DEFINE_bool(show_front_radar_objects, false, "");
-DEFINE_bool(show_back_radar_objects, false, "");
-
+/// visualizationDEFINE_bool(show_radar_objects, false, "");
 DEFINE_bool(show_camera_objects2d, false, "");
 DEFINE_bool(show_camera_objects, false, "");
 DEFINE_bool(show_camera_parsing, false, "");
@@ -124,6 +117,3 @@ DEFINE_bool(capture_screen, false, "");
 DEFINE_string(screen_output_dir, "./", "");
 
 DEFINE_string(frame_visualizer, "GLFusionVisualizer", "");
-
-DEFINE_double(car_length, 3.564, "car_length");
-DEFINE_double(car_width, 1.620, "car_width");

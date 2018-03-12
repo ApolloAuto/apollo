@@ -17,10 +17,7 @@
 #ifndef MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_GFLAGS_H_
 #define MODULES_THIRD_PARTY_PERCEPTION_THIRD_PARTY_PERCEPTION_GFLAGS_H_
 
-#include "gflags/gflags.h"
-
-DECLARE_string(node_namespace);
-DECLARE_string(node_name);
+#include "gflags/gflags.h" DECLARE_string(node_name);
 DECLARE_string(module_name);
 
 DECLARE_string(adapter_config_filename);
