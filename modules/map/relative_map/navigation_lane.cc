@@ -31,6 +31,7 @@
 namespace apollo {
 namespace relative_map {
 
+using apollo::common::Path;
 using apollo::common::VehicleStateProvider;
 using apollo::common::math::Vec2d;
 using apollo::common::util::DistanceXY;
@@ -72,8 +73,7 @@ double NavigationLane::EvaluateCubicPolynomial(const double c0, const double c1,
   return ((c3 * z + c2) * z + c1) * z + c0;
 }
 
-void NavigationLane::MergeNavigationLineAndLaneMarker(
-    const perception::LaneMarkers &lane_marker, common::Path *path) {
+void NavigationLane::MergeNavigationLineAndLaneMarker(common::Path *path) {
   CHECK_NOTNULL(path);
 
   common::Path navigation_path;
@@ -136,18 +136,22 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
     return;
   }
   path->set_name("Path from navigation.");
-  if (!UpdateProjectionIndex()) {
+  const auto &navigation_path = navigation_info_.navigation_path(0).path();
+  if (!UpdateProjectionIndex(navigation_path)) {
     return;
   }
 
   // TODO(All): support multiple navigation path
   // currently, only 1 navigation path is supported
-  const auto &navigation_path = navigation_info_.navigation_path(0).path();
   int curr_project_index = last_project_index_;
+  if (curr_project_index < 0 ||
+      curr_project_index >= navigation_path.path_point_size()) {
+    AERROR << "Invalid projection index " << curr_project_index;
+    return;
+  }
 
-  double dist =
-      navigation_path.path_point(navigation_path.path_point_size() - 1).s() -
-      navigation_path.path_point(curr_project_index).s();
+  double dist = navigation_path.path_point().rbegin()->s() -
+                navigation_path.path_point(curr_project_index).s();
   if (dist < 20) {
     return;
   }
@@ -194,10 +198,9 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
 }
 
 // project adc_state_ onto path
-bool NavigationLane::UpdateProjectionIndex() {
+bool NavigationLane::UpdateProjectionIndex(const common::Path &path) {
   // TODO(All): support multiple navigation path
   // currently, only 1 navigation path is supported
-  const auto &path = navigation_info_.navigation_path(0).path();
   int index = 0;
   double min_d = std::numeric_limits<double>::max();
   for (int i = last_project_index_; i + 1 < path.path_point_size(); ++i) {
@@ -219,7 +222,7 @@ bool NavigationLane::UpdateProjectionIndex() {
 }
 
 double NavigationLane::GetKappa(const double c1, const double c2,
-                const double c3, const double x) {
+                                const double c3, const double x) {
   const double dy = 3 * c3 * x * x + 2 * c2 * x + c1;
   const double d2y = 6 * c3 * x + 2 * c2;
   return std::fabs(d2y) / std::pow((1 + dy * dy), 1.5);
