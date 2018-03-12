@@ -304,7 +304,7 @@ body {
         flex: 1 1 auto;
 
         border-right: 3px solid #000000;
-        padding: 25px 10px 25px 20px;
+        padding: 15px 10px 25px 20px;
         background: #1D2226;
 
         @include small-screen {
@@ -432,7 +432,7 @@ body {
         }
     }
 
-    .nav-side-menu {
+    .tool-view-menu {
         display: flex;
         flex-flow: row nowrap;
         align-items: stretch;
@@ -464,8 +464,8 @@ body {
                 transform: translate(-30%, 25%);
 
                 @include small-screen {
-                    width: 15px;
-                    height: 15px;
+                    width: 20px;
+                    height: 20px;
                     transform: translate(-50%, 10%);
                 }
             }
@@ -563,9 +563,14 @@ body {
         }
 
         .icon {
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             margin: auto;
+
+            @include small-screen {
+                width: 30px;
+                height: 30px;
+            }
         }
 
         .label {
