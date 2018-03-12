@@ -6,6 +6,7 @@ cc_library(
     name = "time",
     hdrs = [
         "time.h",
+        "time_util.h",
     ],
     deps = [
         "//modules/common:log",
