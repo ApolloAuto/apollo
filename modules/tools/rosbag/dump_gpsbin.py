@@ -50,8 +50,7 @@ def dump_bag(in_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description=
-        "A tool to dump gpsimu raw data ")
+        description="A tool to dump gpsimu raw data ")
     parser.add_argument(
         "in_dir", action="store", type=str, help="the input ros bag directory")
 
