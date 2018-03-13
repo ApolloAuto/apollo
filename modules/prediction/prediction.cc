@@ -79,8 +79,7 @@ Status Prediction::Init() {
   EvaluatorManager::instance()->Init(prediction_conf_);
   PredictorManager::instance()->Init(prediction_conf_);
 
-  CHECK(AdapterManager::GetLocalization())
-      << "Localization is not registered.";
+  CHECK(AdapterManager::GetLocalization()) << "Localization is not registered.";
   CHECK(AdapterManager::GetPerceptionObstacles())
       << "Perception is not registered.";
 
