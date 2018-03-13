@@ -105,8 +105,6 @@ DEFINE_bool(enable_adjust_velocity_heading, false,
 DEFINE_double(heading_filter_param, 0.99, "heading filter parameter");
 
 // Cost evaluator
-DEFINE_double(cost_exp_coeff, 1.5,
-              "Coefficient of the exponential term in cost evaluator.");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,

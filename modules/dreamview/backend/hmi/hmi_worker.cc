@@ -98,7 +98,7 @@ int RunComponentCommand(const Map<std::string, Component> &components,
 
 template <class FlagType, class ValueType>
 void SetGlobalFlag(const std::string &flag_name, const ValueType &value,
-                   FlagType* flag) {
+                   FlagType *flag) {
   static constexpr char kGlobalFlagfile[] =
       "/apollo/modules/common/data/global_flagfile.txt";
   if (*flag != value) {

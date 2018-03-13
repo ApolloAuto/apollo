@@ -25,8 +25,8 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
-#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/pcl_types.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 
 namespace apollo {

@@ -10,7 +10,6 @@ cc_library(
     hdrs = [
         "async_fusion.h",
     ],
-
     deps = [
         "//modules/common",
         "//modules/common:log",

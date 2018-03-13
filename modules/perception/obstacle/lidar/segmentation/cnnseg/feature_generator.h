@@ -40,9 +40,7 @@ class FeatureGenerator {
 
   void Generate(const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
 
-  inline std::string name() const {
-    return "FeatureGenerator";
-  }
+  inline std::string name() const { return "FeatureGenerator"; }
 
  private:
   Dtype LogCount(int count) {

@@ -19,11 +19,11 @@
 #include "boost/format.hpp"
 
 #include "modules/common/macro.h"
+#include "modules/perception/common/geometry_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/types.h"
-#include "modules/perception/common/geometry_util.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_imf_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_imf_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
 
@@ -43,8 +43,8 @@ double PbfTrack::s_min_radar_confident_distance_ = 40;
 bool PbfTrack::s_publish_if_has_lidar_ = true;
 bool PbfTrack::s_publish_if_has_radar_ = true;
 
-PbfTrack::PbfTrack(PbfSensorObjectPtr obj):
-        s_motion_fusion_method_("PbfKalmanMotionFusion") {
+PbfTrack::PbfTrack(PbfSensorObjectPtr obj)
+    : s_motion_fusion_method_("PbfKalmanMotionFusion") {
   idx_ = GetNextTrackId();
   SensorType sensor_type = obj->sensor_type;
   std::string sensor_id = obj->sensor_id;
@@ -90,8 +90,7 @@ void PbfTrack::SetMotionFusionMethod(const std::string motion_fusion_method) {
   }
 }
 
-PbfTrack::~PbfTrack() {
-}
+PbfTrack::~PbfTrack() {}
 
 void PbfTrack::UpdateWithSensorObject(PbfSensorObjectPtr obj,
                                       double match_dist) {
@@ -142,9 +141,8 @@ void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
       &camera_objects_, sensor_id, timestamp, s_max_camera_invisible_period_,
       &invisible_in_camera_);
 
-  is_dead_ = (lidar_objects_.empty() &&
-          radar_objects_.empty() &&
-          camera_objects_.empty());
+  is_dead_ = (lidar_objects_.empty() && radar_objects_.empty() &&
+              camera_objects_.empty());
 
   if (!is_dead_) {
     double time_diff = timestamp - fused_timestamp_;

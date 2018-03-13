@@ -121,7 +121,4 @@ DEFINE_string(screen_output_dir, "./", "");
 
 DEFINE_string(frame_visualizer, "GLFusionVisualizer", "");
 
-DEFINE_double(car_length, 3.564, "car_length");
-DEFINE_double(car_width, 1.620, "car_width");
-
 DEFINE_bool(has_lidar, true, "if perception has lidar sensor");

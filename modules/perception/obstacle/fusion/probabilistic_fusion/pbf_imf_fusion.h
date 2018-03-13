@@ -17,11 +17,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_  // NOLINT
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_  // NOLINT
 
+#include <map>
 #include <queue>
 #include <string>
 #include <utility>
 #include <vector>
-#include <map>
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
@@ -74,15 +74,11 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   virtual void GetState(Eigen::Vector3d* anchor_point,
                         Eigen::Vector3d* velocity);
 
-  std::string Name() {
-    return name_;
-  }
+  std::string Name() { return name_; }
 
   // @brief check if filter has been initialized
   // @return initialization status
-  bool Initialized() const {
-    return initialized_;
-  }
+  bool Initialized() const { return initialized_; }
 
  protected:
   // @brief cache sensor objects in history
@@ -130,4 +126,5 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_ // NOLINT
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_
+        // // NOLINT
