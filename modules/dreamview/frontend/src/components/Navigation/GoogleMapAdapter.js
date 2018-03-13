@@ -90,7 +90,7 @@ export default class GoogleMapAdapter {
             onClickHandler(controlText);
         });
 
-        this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(controlDiv);
+        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlDiv);
         this.controls.push(controlDiv);
     }
 
