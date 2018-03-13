@@ -236,6 +236,7 @@ function release() {
   # modules data and conf
   CONFS=$(find modules/ -name "conf")
   DATAS=$(find modules/ -name "data")
+  OTHER=(modules/tools)
   rm -rf test/*
   for conf in $CONFS; do
     mkdir -p $APOLLO_RELEASE_DIR/$conf
@@ -246,6 +247,11 @@ function release() {
     if [ $data != "modules/map/data" ]; then
       rsync -a $data/* $APOLLO_RELEASE_DIR/$data
     fi
+  done
+  # Other
+  for path in $OTHER; do
+    mkdir -p $APOLLO_RELEASE_DIR/$path
+    rsync -a $path/* $APOLLO_RELEASE_DIR/$path
   done
 
   # dreamview frontend
