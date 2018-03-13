@@ -9,6 +9,16 @@ export default class HMI {
 
     vehicles = [];
     @observable currentVehicle = 'none';
+    vehicleParam = {
+        frontEdgeToCenter: 3.89,
+        backEdgeToCenter: 1.04,
+        leftEdgeToCenter: 1.055,
+        rightEdgeToCenter: 1.055,
+        height: 1.48,
+        width: 2.11,
+        length: 4.933,
+        steerRatio: 16,
+    };
 
     maps = [];
     @observable currentMap = 'none';
@@ -74,6 +84,10 @@ export default class HMI {
 
     @action update(world) {
         this.enableStartAuto = world.engageAdvice === "READY_TO_ENGAGE";
+    }
+
+    updateVehicleParam(vehicleParam) {
+        this.vehicleParam = vehicleParam;
     }
 
     @action toggleModule(id) {
