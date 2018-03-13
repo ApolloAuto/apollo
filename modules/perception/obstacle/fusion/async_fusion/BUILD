@@ -3,15 +3,11 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "imf_fusion",
+    name = "async_fusion",
     srcs = [
-        "imf_fusion.cc",
-        "async_track.cc",
         "async_fusion.cc",
     ],
     hdrs = [
-        "imf_fusion.h",
-        "async_track.h",
         "async_fusion.h",
     ],
 
