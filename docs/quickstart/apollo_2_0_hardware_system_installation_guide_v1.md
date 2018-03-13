@@ -1,4 +1,4 @@
-# Apollo 2.0 Hardware and System Installation Guide
+# Apollo 2.5 Hardware and System Installation Guide
 
 * [About This Guide](#about-this-guide)
     * [Document Conventions](#document-conventions)
@@ -35,7 +35,7 @@
 
 # About This Guide
 
-The *Apollo 2.0 Hardware and System Installation Guide* provides the instructions to install all of the hardware components and system software for the **Apollo Project **. The system installation information included pertains to the procedures to download and install the Apollo Linux Kernel.
+The *Apollo 2.5 Hardware and System Installation Guide* provides the instructions to install all of the hardware components and system software for the **Apollo Project **. The system installation information included pertains to the procedures to download and install the Apollo Linux Kernel.
 
 ## Document Conventions
 
@@ -57,7 +57,7 @@ The **Apollo Project** is an initiative that provides an open, complete, and rel
 
 ## Documentation
 
-The following set of documentation describes Apollo 2.0:
+The following set of documentation describes Apollo 2.5:
 
 - ***<u>[Apollo Hardware and System Installation Guide]</u>***  ─ Provides the instructions to install the hardware components and the system software for the vehicle:
 
@@ -236,7 +236,7 @@ The 64 line LiDAR system **HDL-64E S3** is available from Velodyne LiDAR, Inc.
 
 ## Cameras
 
-The cameras used are LI-USB30-AR023ZWDR with standard USB 3.0 case manufactured by Leopard Imaging Inc. We recommend using two cameras with 6 mm and 25 mm lens respectively to achieve the required performance.
+The cameras used are LI-USB30-AR023ZWDR with standard USB 3.0 case manufactured by Leopard Imaging Inc. We recommend using two cameras with 6 mm lens and one with 25 mm lens to achieve the required performance.
 
 ![camera_image](images/LI-camera.png)
 
@@ -288,7 +288,7 @@ Installing the hardware and the software components involves these tasks:
     - IPC
     - GPS Receiver and IMU
     - LiDAR
-    - Camera
+    - Cameras
     - Radar
 
 The actual steps to install all of the hardware and software components are detailed in the section, Steps for the Installation Tasks.
@@ -731,11 +731,11 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
 
 ### Installing the Cameras
 
-This section provides guidelines for the camera  installation procedure.
+This section provides guidelines for the camera installation procedure.
 
-The Apollo reference design recommends using two cameras with different focal lengths, 6 mm and 25 mm. The mounting of the cameras can be tailored to the actual design of the system. 
+The Apollo reference design recommends using three cameras with different focal lengths:two with 6 mm lens and one with 25 mm lens. The location of these cameras are very flexible, they can be placed on the side of LiDAR or inside of the front windshield. The mounting of the cameras can be tailored to the actual design of the system. 
 
-- Both of the cameras should face forward to the driving direction. The field of view (FOV) should be kept free from obstructions as much as possible.
+- All the cameras should face forward to the driving direction. The field of view (FOV) should be kept free from obstructions as much as possible.
 
 - ![Cameras_lock_screw](./images/LI-Camera-OnVehicle.png)
 
@@ -745,7 +745,7 @@ The Apollo reference design recommends using two cameras with different focal le
 
   ![Cameras_lock_screw](./images/LI-Camera-LockScrew.png)
 
-- Use USB 3.0 Cables to connect the cameras (USB 3.0 Micro-B) and the IPC(USB 3.0 type A), and use the screws to secure the connection.
+- Use USB 3.0 Cables to connect the cameras (USB 3.0 Micro-B) and the IPC(USB 3.0 type A), and then use the screws to secure the connection.
 
 
 
@@ -871,8 +871,8 @@ psrdiffsource auto any
 
 SETIMUTOANTOFFSET 0.00 1.10866 1.14165 0.05 0.05 0.08
 SETINSOFFSET 0 0 0
-EVENTOUTCONTROLMARK2 ENABLE POSITIVE 999999990 10
-EVENTOUTCONTROLMARK1 ENABLE POSITIVE 500000000 500000000
+EVENTOUTCONTROL MARK2 ENABLE POSITIVE 999999990 10
+EVENTOUTCONTROL MARK1 ENABLE POSITIVE 500000000 500000000
 
 
 LOG COM2 GPRMC ONTIME 1.0 0.25
@@ -924,8 +924,8 @@ rtksource auto any
 psrdiffsource auto any
 SETIMUTOANTOFFSET 0.00 1.10866 1.14165 0.05 0.05 0.08
 SETINSOFFSET 0 0 0
-EVENTOUTCONTROLMARK2 ENABLE POSITIVE 999999990 10
-EVENTOUTCONTROLMARK1 ENABLE POSITIVE 500000000 500000000
+EVENTOUTCONTROL MARK2 ENABLE POSITIVE 999999990 10
+EVENTOUTCONTROL MARK1 ENABLE POSITIVE 500000000 500000000
 
 
 LOG COM2 GPRMC ONTIME 1.0 0.25
