@@ -149,7 +149,8 @@ void PredictionMap::OnLane(
     if (on_lane && !candidate_lane->IsOnLane(vec_point)) {
       continue;
     }
-    if (!IsIdenticalLane(candidate_lane, prev_lanes) &&
+    if (!FLAGS_use_navigation_mode &&
+        !IsIdenticalLane(candidate_lane, prev_lanes) &&
         !IsSuccessorLane(candidate_lane, prev_lanes) &&
         !IsLeftNeighborLane(candidate_lane, prev_lanes) &&
         !IsRightNeighborLane(candidate_lane, prev_lanes)) {
