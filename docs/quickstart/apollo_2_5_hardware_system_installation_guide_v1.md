@@ -11,7 +11,7 @@
         * [IPC Front and Rear Views](#ipc-front-and-rear-views)
     * [Controller Area Network (CAN) Card](#controller-area-network-can-card)
     * [Global Positioning System (GPS) and Inertial Measurement Unit (IMU)](#global-positioning-system-gps-and-inertial-measurement-unit-imu)
-        * [Option 1: The NovAtel SPAN-IGM-A1](#ipc-configuration)
+        * [Option 1: The NovAtel SPAN-IGM-A1](#option-1:-the-novatel-spanigma1)
         * [Option 1: The NovAtel SPAN-IGM-A1](#option-1:-the-novatel-spanigma1)
         * [Option 2: The NovAtel SPAN ProPak6 and NovAtel IMU-IGM-A1](#option-2:-the-novatel-span-propak6-and-novatel-imuigma1)
     * [The GPS Receiver/Antenna](#the-gps-receiverantenna)
