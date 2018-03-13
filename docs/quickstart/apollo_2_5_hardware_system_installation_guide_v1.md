@@ -14,7 +14,7 @@
 
         * [Option 1: The NovAtel SPAN-IGM-A1](#option-1:-the-novatel-span-igm-a1)
         * [Option 2: The NovAtel SPAN ProPak6 and NovAtel IMU-IGM-A1](#option-2:-the-novatel-span-propak6-and-novatel-imu-igm-a1)
-    * [The GPS Receiver/Antenna](#the-gps-receiver/antenna)
+    * [The GPS Receiver/Antenna](#the-gps-receiver-antenna)
 * [Overview of the Installation Tasks](#overview-of-the-installation-tasks)
 * [Steps for the Installation Tasks](#steps-for-the-installation-tasks)
     * [At the Office](#at-the-office)
