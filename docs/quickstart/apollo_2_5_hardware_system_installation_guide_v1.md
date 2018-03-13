@@ -732,7 +732,7 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
 
 This section provides guidelines for the camera installation procedure.
 
-The Apollo reference design recommends using three cameras with different focal lengths:two with 6 mm lens and one with 25 mm lens. The location of these cameras are very flexible, they can be placed on the side of LiDAR or inside of the front windshield. The mounting of the cameras can be tailored to the actual design of the system. 
+The Apollo reference design recommends using three cameras with different focal lengths: two with 6 mm lens and one with 25 mm lens. The location of these cameras are very flexible, they can be placed on the side of LiDAR or inside of the front windshield. The mounting of the cameras can be tailored to the actual design of the system. 
 
 - All the cameras should face forward to the driving direction. The field of view (FOV) should be kept free from obstructions as much as possible.
 
