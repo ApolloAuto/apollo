@@ -44,6 +44,9 @@ export default class RosWebSocketEndpoint {
                     STORE.hmi.updateStatus(message.data);
                     RENDERER.updateGroundImage(STORE.hmi.currentMap);
                     break;
+                case "VehicleParam":
+                    STORE.hmi.updateVehicleParam(message.data);
+                    break;
                 case "SimControlStatus":
                     STORE.setOptionStatus('simControlEnabled', message.enabled);
                     break;
@@ -84,7 +87,7 @@ export default class RosWebSocketEndpoint {
                     this.updateMapIndex(message);
                     if (STORE.options.showPNCMonitor) {
                         STORE.planningData.update(message);
-                        STORE.controlData.update(message);
+                        STORE.controlData.update(message, STORE.hmi.vehicleParam);
                     }
                     if (this.routingTime !== message.routingTime) {
                         // A new routing needs to be fetched from backend.
