@@ -637,7 +637,7 @@ For more information about the NovAtel SPAN ProPak6, see:
 
 ### Installing the Light Detection and Ranging System (LiDAR)
 
-This section provides descriptions on the installation procedure of HDL-64E S3 LiDAR
+This section provides descriptions on the installation procedure of HDL-64E S3 LiDAR.
 
 #### Mounting
 
