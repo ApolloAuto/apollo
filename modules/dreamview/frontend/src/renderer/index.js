@@ -48,9 +48,9 @@ class Renderer {
         this.adc = new AutoDrivingCar('adc', this.scene);
 
         // The car that projects the starting point of the planning trajectory
-        this.planningAdc = OFFLINE_PLAYBACK ? null : new AutoDrivingCar('plannigAdc', this.scene);
+        this.planningAdc = OFFLINE_PLAYBACK ? null : new AutoDrivingCar('planningAdc', this.scene);
 
-        // The planning tranjectory.
+        // The planning trajectory.
         this.planningTrajectory = new PlanningTrajectory();
 
         // The perception obstacles.
