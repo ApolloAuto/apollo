@@ -122,7 +122,7 @@ Configure the IPC as follows:
 - PO-280W-OW 280W AC/DC power adapter
 - 2.5" SATA Hard Disk 1TB 7200rpm
 
-### IPC Front and Side Views
+### IPC Front and Rear Views
 
 The front and rear views of the IPC are shown with the Graphics Processing Unit (GPU) installed in the following pictures:
 
