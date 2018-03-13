@@ -9,8 +9,8 @@
     * [Onboard Computer System - IPC](#onboard-computer-system---ipc)
         * [IPC Configuration](#ipc-configuration)
         * [IPC Front and Rear Views](#ipc-front-and-rear-views)
-    * [Controller Area Network (CAN) Card](#controller-area-network-(can)-card)
-    * [Global Positioning System (GPS) and Inertial Measurement Unit (IMU)](#global-positioning-system-(gps)-and-inertial-measurement-unit-(imu))
+    * [Controller Area Network (CAN) Card](#controller-area-network-can-card)
+    * [Global Positioning System (GPS) and Inertial Measurement Unit (IMU)](#global-positioning-system-gps-and-inertial-measurement-unit-imu)
 
         * [Option 1: The NovAtel SPAN-IGM-A1](#option-1:-the-novatel-span-igm-a1)
         * [Option 2: The NovAtel SPAN ProPak6 and NovAtel IMU-IGM-A1](#option-2:-the-novatel-span-propak6-and-novatel-imu-igm-a1)
