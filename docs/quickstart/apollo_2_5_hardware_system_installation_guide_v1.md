@@ -519,7 +519,7 @@ The following two diagrams indicate the locations of where the three major compo
 
 
 
-![major_compoment_side_view](images/Car_Sideview.png)
+![major_compoment_side_view](images/Car_Sideview.PNG)
 
 
 
