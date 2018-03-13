@@ -16,9 +16,12 @@
 
 #include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_util.h"
 
 namespace apollo {
 namespace prediction {
+
+using apollo::prediction::math_util::Sigmoid;
 
 void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   CHECK_NOTNULL(obstacle_ptr);
@@ -66,8 +69,18 @@ double CostEvaluator::ComputeProbability(
     const double obstacle_length,
     const double obstacle_width,
     const LaneSequence& lane_sequence) {
+  double front_lateral_distance_cost =
+      FrontLateralDistanceCost(obstacle_length, obstacle_width, lane_sequence);
+  return Sigmoid(front_lateral_distance_cost);
+}
+
+double CostEvaluator::FrontLateralDistanceCost(
+    const double obstacle_length,
+    const double obstacle_width,
+    const LaneSequence& lane_sequence) {
   if (lane_sequence.lane_segment_size() == 0 ||
       lane_sequence.lane_segment(0).lane_point_size() == 0) {
+    AWARN << "Empty lane sequence.";
     return 0.0;
   }
   const LanePoint& lane_point =
@@ -75,17 +88,8 @@ double CostEvaluator::ComputeProbability(
   double lane_l = -lane_point.relative_l();
   double distance =
       lane_l - obstacle_length / 2.0 * std::sin(lane_point.angle_diff());
-  if (lane_l > 0.0) {
-    distance -= obstacle_width / 2.0 * std::cos(lane_point.angle_diff());
-  } else {
-    distance += obstacle_width / 2.0 * std::cos(lane_point.angle_diff());
-  }
-  distance = std::abs(distance);
   double half_lane_width = lane_point.width() / 2.0;
-  if (distance < half_lane_width + FLAGS_double_precision) {
-    return 1.0;
-  }
-  return std::exp(FLAGS_cost_exp_coeff * (half_lane_width - distance));
+  return half_lane_width - distance;
 }
 
 }  // namespace prediction
