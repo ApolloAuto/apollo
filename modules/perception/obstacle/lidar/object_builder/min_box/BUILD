@@ -11,7 +11,7 @@ cc_library(
         "//modules/common:log",
         "//modules/perception/common",
         "//modules/perception/lib/base",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/lidar/interface",
         "@eigen",
@@ -31,7 +31,7 @@ cc_test(
     deps = [
         ":min_box",
         "//modules/perception/common",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/common",
         "@gtest//:main",
     ],

@@ -16,7 +16,7 @@
 
 #include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
 
-#include "modules/perception/lib/base/time_util.h"
+#include "modules/common/time/time_util.h"
 #include "modules/perception/onboard/transform_input.h"
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
 #include "modules/perception/traffic_light/base/utils.h"
@@ -24,6 +24,8 @@
 namespace apollo {
 namespace perception {
 namespace traffic_light {
+
+using apollo::common::time::TimeUtil;
 
 bool TLPreprocessor::Init() {
   ConfigManager *config_manager = ConfigManager::instance();

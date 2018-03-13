@@ -34,7 +34,7 @@
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/common/util/factory.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/tool/data_generator/sensor.h"
 
 /**

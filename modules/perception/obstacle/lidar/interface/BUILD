@@ -8,7 +8,7 @@ cc_library(
     hdrs = glob(["*.h"]),
     deps = [
         "//modules/perception/lib/base",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/onboard:hdmapinput",
         "@eigen",
