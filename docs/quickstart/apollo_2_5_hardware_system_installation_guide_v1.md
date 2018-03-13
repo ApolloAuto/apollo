@@ -8,7 +8,7 @@
     * [Additional Components Required](#additional-components-required)
     * [Onboard Computer System - IPC](#onboard-computer-system---ipc)
         * [IPC Configuration](#ipc-configuration)
-        * [IPC Front and Rear Views](#ipc-front-and-rear-views)
+        * [IPC Front and Side Views](#ipc-front-and-side-views)
     * [Controller Area Network (CAN) Card](#controller-area-network-can-card)
     * [Global Positioning System (GPS) and Inertial Measurement Unit (IMU)](#global-positioning-system-gps-and-inertial-measurement-unit-imu)
         * [Option 1: The NovAtel SPAN-IGM-A1](#option-1-the-novatel-span-igm-a1)
@@ -121,9 +121,9 @@ Configure the IPC as follows:
 - PO-280W-OW 280W AC/DC power adapter
 - 2.5" SATA Hard Disk 1TB 7200rpm
 
-### IPC Front and Rear Views
+### IPC Front and Side Views
 
-The front and rear views of the IPC are shown with the Graphics Processing Unit (GPU) installed in the following pictures:
+The front and side views of the IPC are shown with the Graphics Processing Unit (GPU) installed in the following pictures:
 
 The front view of the Nuvo-6108GC:
 
