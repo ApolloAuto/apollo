@@ -30,6 +30,7 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
@@ -41,7 +42,6 @@
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/obstacle/common/pose_util.h"
 
 namespace apollo {
 namespace perception {
@@ -56,14 +56,14 @@ class RadarProcessSubnode : public Subnode {
   }
 
  private:
-  typedef std::pair<double,
-    apollo::localization::LocalizationEstimate> LocalizationPair;
+  typedef std::pair<double, apollo::localization::LocalizationEstimate>
+      LocalizationPair;
   bool InitInternal() override;
 
   void OnRadar(const ContiRadar &radar_obs);
 
   void OnLocalization(
-    const apollo::localization::LocalizationEstimate &localization);
+      const apollo::localization::LocalizationEstimate &localization);
 
   void RegistAllAlgorithm();
 

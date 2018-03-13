@@ -26,8 +26,8 @@
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/proto/cnnseg.pb.h"
 
 #include "modules/common/log.h"
-#include "modules/perception/lib/base/timer.h"
 #include "modules/perception/common/pcl_types.h"
+#include "modules/perception/lib/base/timer.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cluster2d.h"

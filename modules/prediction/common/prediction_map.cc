@@ -130,9 +130,9 @@ void PredictionMap::OnLane(
   common::PointENU hdmap_point;
   hdmap_point.set_x(point[0]);
   hdmap_point.set_y(point[1]);
-  if (HDMapUtil::BaseMap().GetLanesWithHeading(
-          hdmap_point, radius, heading, FLAGS_max_lane_angle_diff,
-          &candidate_lanes) != 0) {
+  if (HDMapUtil::BaseMap().GetLanesWithHeading(hdmap_point, radius, heading,
+                                               FLAGS_max_lane_angle_diff,
+                                               &candidate_lanes) != 0) {
     return;
   }
   int max_num_lane = FLAGS_max_num_current_lane;

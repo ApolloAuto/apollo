@@ -8,6 +8,7 @@ cc_library(
     srcs = [
         "pbf_base_track_object_matcher.cc",
         "pbf_hm_track_object_matcher.cc",
+        "pbf_imf_fusion.cc",
         "pbf_kalman_motion_fusion.cc",
         "pbf_sensor.cc",
         "pbf_sensor_manager.cc",
@@ -17,12 +18,12 @@ cc_library(
         "pbf_track_manager.cc",
         "pbf_track_object_distance.cc",
         "probabilistic_fusion.cc",
-        "pbf_imf_fusion.cc",
     ],
     hdrs = [
         "pbf_base_motion_fusion.h",
         "pbf_base_track_object_matcher.h",
         "pbf_hm_track_object_matcher.h",
+        "pbf_imf_fusion.h",
         "pbf_kalman_motion_fusion.h",
         "pbf_sensor.h",
         "pbf_sensor_manager.h",
@@ -32,7 +33,6 @@ cc_library(
         "pbf_track_manager.h",
         "pbf_track_object_distance.h",
         "probabilistic_fusion.h",
-        "pbf_imf_fusion.h",
     ],
     data = [
         "//modules/perception/conf:perception_config",
