@@ -34,7 +34,7 @@
 
 # About This Guide
 
-The *Apollo 2.5 Hardware and System Installation Guide* provides the instructions to install all of the hardware components and system software for the **Apollo Project **. The system installation information included pertains to the procedures to download and install the Apollo Linux Kernel.
+The *Apollo 2.5 Hardware and System Installation Guide* provides the instructions to install all of the hardware components and system software for the **Apollo Project**. The system installation information included pertains to the procedures to download and install the Apollo Linux Kernel.
 
 ## Document Conventions
 
