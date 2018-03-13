@@ -59,32 +59,29 @@ void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
     CHECK_NOTNULL(lane_sequence_ptr);
-    double probability = ComputeProbability(obstacle_length,
-        obstacle_width, *lane_sequence_ptr);
+    double probability =
+        ComputeProbability(obstacle_length, obstacle_width, *lane_sequence_ptr);
     lane_sequence_ptr->set_probability(probability);
   }
 }
 
-double CostEvaluator::ComputeProbability(
-    const double obstacle_length,
-    const double obstacle_width,
-    const LaneSequence& lane_sequence) {
+double CostEvaluator::ComputeProbability(const double obstacle_length,
+                                         const double obstacle_width,
+                                         const LaneSequence& lane_sequence) {
   double front_lateral_distance_cost =
       FrontLateralDistanceCost(obstacle_length, obstacle_width, lane_sequence);
   return Sigmoid(front_lateral_distance_cost);
 }
 
 double CostEvaluator::FrontLateralDistanceCost(
-    const double obstacle_length,
-    const double obstacle_width,
+    const double obstacle_length, const double obstacle_width,
     const LaneSequence& lane_sequence) {
   if (lane_sequence.lane_segment_size() == 0 ||
       lane_sequence.lane_segment(0).lane_point_size() == 0) {
     AWARN << "Empty lane sequence.";
     return 0.0;
   }
-  const LanePoint& lane_point =
-      lane_sequence.lane_segment(0).lane_point(0);
+  const LanePoint& lane_point = lane_sequence.lane_segment(0).lane_point(0);
   double lane_l = -lane_point.relative_l();
   double distance =
       lane_l - obstacle_length / 2.0 * std::sin(lane_point.angle_diff());

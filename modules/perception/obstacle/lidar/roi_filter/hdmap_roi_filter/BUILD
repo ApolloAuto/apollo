@@ -19,8 +19,8 @@ cc_library(
     deps = [
         "//external:gflags",
         "//modules/common",
-        "//modules/perception/lib/config_manager",
         "//modules/perception/common:pcl_util",
+        "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/lidar/interface",
         "//modules/perception/obstacle/onboard:hdmapinput",

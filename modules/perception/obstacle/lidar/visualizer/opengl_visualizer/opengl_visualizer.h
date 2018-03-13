@@ -35,9 +35,7 @@ class OpenglVisualizer {
 
   virtual bool Init();
 
-  virtual std::string Name() const {
-    return name_;
-  }
+  virtual std::string Name() const { return name_; }
 
   void UpdateCameraSystem(FrameContent *content);
 

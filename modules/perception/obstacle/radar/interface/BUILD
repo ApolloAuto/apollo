@@ -8,8 +8,8 @@ cc_library(
     hdrs = glob(["*.h"]),
     deps = [
         "//modules/drivers/proto:sensor_proto",
-        "//modules/perception/lib/base",
         "//modules/perception/common:pcl_util",
+        "//modules/perception/lib/base",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/onboard:hdmapinput",
         "@eigen",

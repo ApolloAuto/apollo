@@ -143,9 +143,7 @@ void OutputDebugImg(const std::shared_ptr<ImageLights> &image_lights,
 
 }  // namespace
 
-TLProcSubnode::~TLProcSubnode() {
-  preprocessing_data_ = nullptr;
-}
+TLProcSubnode::~TLProcSubnode() { preprocessing_data_ = nullptr; }
 
 bool TLProcSubnode::InitInternal() {
   RegisterFactoryUnityRectify();

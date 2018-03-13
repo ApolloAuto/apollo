@@ -229,9 +229,9 @@ void DAGStreamingMonitor::Run() {
 }
 
 Subnode* DAGStreaming::GetSubnodeByName(std::string name) {
-  std::unordered_map<std::string, SubnodeID>::iterator iter
-          = subnode_name_map_.find(name);
-  if (iter!= subnode_name_map_.end()) {
+  std::unordered_map<std::string, SubnodeID>::iterator iter =
+      subnode_name_map_.find(name);
+  if (iter != subnode_name_map_.end()) {
     return subnode_map_[iter->second].get();
   }
   return nullptr;

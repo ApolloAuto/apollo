@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/obstacle/onboard/motion_service.h"
+#include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
 
