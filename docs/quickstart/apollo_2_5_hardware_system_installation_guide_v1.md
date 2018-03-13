@@ -314,7 +314,7 @@ Perform the following tasks:
     - Apollo Kernel
     - Nvidia GPU Driver
 
-### Prepare the IPC
+### Preparing the IPC
 Follow these steps:
 1. Prepare and install the Controller Area Network (CAN) card: 	
   In the Neousys Nuvo-6108GC, ASUS® GTX-1080GPU-A8G-GAMING GPU card is pre-installed into one of the three PCI slots. We still need to install a CAN card into a PCI slot. 
