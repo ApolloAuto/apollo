@@ -72,11 +72,11 @@ export default class ControlData {
         }
     }
 
-    updateSteerCurve(graph, adc) {
-        const steeringAngle = adc.steeringAngle / adc.steeringRatio;
+    updateSteerCurve(graph, adc, vehicleParam) {
+        const steeringAngle = adc.steeringAngle / vehicleParam.steerRatio;
         let R = null;
         if (Math.abs(Math.tan(steeringAngle)) > 0.0001) {
-            R = adc.length / Math.tan(steeringAngle);
+            R = vehicleParam.length / Math.tan(steeringAngle);
         } else {
             R = 100000;
         }
@@ -177,7 +177,7 @@ export default class ControlData {
         }
     }
 
-    update(world) {
+    update(world, vehicleParam) {
         const trajectory = world.planningTrajectory;
         const adc = world.autoDrivingCar;
         if (trajectory && adc) {
@@ -190,7 +190,7 @@ export default class ControlData {
 
             this.updateGraph(this.data.trajectoryGraph,
                 trajectory, adc, 'positionX', 'positionY');
-            this.updateSteerCurve(this.data.trajectoryGraph, adc);
+            this.updateSteerCurve(this.data.trajectoryGraph, adc, vehicleParam);
             this.data.trajectoryGraph.pose[0].x = adc.positionX;
             this.data.trajectoryGraph.pose[0].y = adc.positionY;
             this.data.trajectoryGraph.pose[0].rotation = adc.heading;

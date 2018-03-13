@@ -213,7 +213,6 @@ SimulationWorldService::SimulationWorldService(const MapService *map_service,
   auto_driving_car->set_height(vehicle_param.height());
   auto_driving_car->set_width(vehicle_param.width());
   auto_driving_car->set_length(vehicle_param.length());
-  auto_driving_car->set_steering_ratio(vehicle_param.steer_ratio());
 }
 
 void SimulationWorldService::Update() {

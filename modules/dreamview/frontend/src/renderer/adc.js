@@ -9,7 +9,7 @@ const CAR_PROPERTIES = {
         menuOptionName: 'showPositionLocalization',
         carMaterial: carMaterial,
     },
-    'plannigAdc': {
+    'planningAdc': {
         menuOptionName: 'showPlanningCar',
         carMaterial: null,
     },
