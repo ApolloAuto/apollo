@@ -241,7 +241,7 @@ The cameras used are LI-USB30-AR023ZWDR with standard USB 3.0 case manufactured 
 
 ![online](images/online_icon.png)You can find more information at Leopard Imaging Inc. website:
 
-[https://www.leopardimaging.com/LI-USB30-AR230WDR.html](https://www.leopardimaging.com/LI-USB30-AR230WDR.html)
+[https://leopardimaging.com/product/li-usb30-ar023zwdr](https://leopardimaging.com/product/li-usb30-ar023zwdr)
 
 
 ## Radar
