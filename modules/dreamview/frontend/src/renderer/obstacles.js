@@ -61,7 +61,7 @@ export default class PerceptionObstacles {
         for (let i = 0; i < objects.length; i++) {
             const obstacle = objects[i];
             if (!STORE.options['showObstacles' + _.upperFirst(_.camelCase(obstacle.type))]
-                || !obstacle.positionX || !obstacle.positionY) {
+                || !_.isNumber(obstacle.positionX) || !_.isNumber(obstacle.positionY)) {
                 continue;
             }
             const position = coordinates.applyOffset(
