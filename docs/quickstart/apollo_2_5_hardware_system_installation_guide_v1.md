@@ -24,7 +24,7 @@
         * [Prerequisites](#prerequisites)
         * [Diagrams of the Major Component Installations](#diagrams-of-the-major-component-installations)
         * [Installing the GPS Receiver and Antenna](#installing-the-gps-receiver-and-antenna)
-        * [Installing the Light Detection and Ranging System (LiDAR)](#installing-the-light-detection-and-ranging-system-(lidar))
+        * [Installing the Light Detection and Ranging System (LiDAR)](#installing-the-light-detection-and-ranging-system-lidar)
         * [Installing the IPC](#installing-the-ipc)
         * [Configuring the GPS and IMU](#configuring-the-gps-and-imu)
 * [Setting up the Network](#setting-up-the-network)
