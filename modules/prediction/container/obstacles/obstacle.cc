@@ -854,7 +854,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature,
 }
 
 void Obstacle::SetLanePoints(Feature* feature) {
-  if (feature == nullptr || !feature->velocity_heading()) {
+  if (feature == nullptr || !feature->has_velocity_heading()) {
     AERROR << "Null feature or no velocity heading.";
     return;
   }
