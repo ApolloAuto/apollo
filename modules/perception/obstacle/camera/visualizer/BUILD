@@ -23,7 +23,7 @@ cc_library(
         "//modules/drivers/proto:sensor_proto",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/visualizer/common",
         "//modules/perception/obstacle/common",

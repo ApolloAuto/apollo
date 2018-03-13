@@ -28,7 +28,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"

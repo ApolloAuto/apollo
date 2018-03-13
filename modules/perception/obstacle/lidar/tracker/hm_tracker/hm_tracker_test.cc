@@ -27,7 +27,7 @@
 #include "modules/perception/common/file_system_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 

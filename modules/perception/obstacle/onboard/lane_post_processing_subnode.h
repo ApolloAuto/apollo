@@ -40,7 +40,7 @@ namespace perception {
 class LanePostProcessingSubnode : public Subnode {
  public:
   LanePostProcessingSubnode() = default;
-  virtual ~LanePostProcessingSubnode() {}
+  virtual ~LanePostProcessingSubnode() = default;
   apollo::common::Status ProcEvents() override;
 
  protected:
@@ -58,8 +58,8 @@ class LanePostProcessingSubnode : public Subnode {
   CameraObjectData* camera_object_data_ = nullptr;
   std::string device_id_;
   std::string work_root_dir_;
-  LaneSharedData* lane_shared_data_;
-  uint64_t seq_num_;
+  LaneSharedData* lane_shared_data_ = nullptr;
+  uint64_t seq_num_ = 0;
 
   DISALLOW_COPY_AND_ASSIGN(LanePostProcessingSubnode);
 };
