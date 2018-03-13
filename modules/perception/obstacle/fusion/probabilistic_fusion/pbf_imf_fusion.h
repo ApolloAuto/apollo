@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_IMF_FUSION_H_  // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_IMF_FUSION_H_  // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_  // NOLINT
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_  // NOLINT
 
 #include <queue>
 #include <string>
@@ -130,4 +130,4 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_IMF_FUSION_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_ // NOLINT

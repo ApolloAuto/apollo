@@ -17,11 +17,10 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_MOTION_SERVICE_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_MOTION_SERVICE_H_
 
-#include "Eigen/Core"
-
-#include "modules/localization/proto/localization.pb.h"
-
+#include <Eigen/Core>
+#include <list>
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/obstacle/camera/motion/plane_motion.h"
 #include "modules/perception/onboard/subnode.h"
@@ -44,6 +43,9 @@ class MotionService : public Subnode {
 
   common::Status ProcEvents() override { return common::Status::OK(); }
 
+  void GetVehicleInformation(float timestamp,
+                             VehicleInformation *vehicle_informatino);
+
  protected:
   bool InitInternal() override;
 
@@ -56,6 +58,7 @@ class MotionService : public Subnode {
   const int motion_buffer_size_ = 6000;
   const int motion_sensor_frequency_ = 100;
   Mutex mutex_;
+  std::list<VehicleInformation> vehicle_information_buffer_;
 
   DISALLOW_COPY_AND_ASSIGN(MotionService);
 };
