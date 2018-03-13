@@ -28,6 +28,7 @@ export default class HMI {
     @observable enableStartAuto = false;
 
     displayName = {};
+    utmZoneId = 10;
 
     @observable dockerImage = ''
 
@@ -37,6 +38,9 @@ export default class HMI {
         }
         if (config.modes) {
             this.modes = config.modes;
+        }
+        if (config.utmZoneId) {
+            this.utmZoneId = config.utmZoneId;
         }
         this.vehicles = Object.keys(config.availableVehicles).sort()
             .map(name => {

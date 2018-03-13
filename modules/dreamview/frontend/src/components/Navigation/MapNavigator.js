@@ -43,7 +43,6 @@ class MapNavigator {
 
     reset() {
         this.routingPaths.forEach(path => {
-            console.log(path);
             this.mapAdapter.removePolyline(path);
         });
         this.routingPaths = [];
