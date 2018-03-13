@@ -77,7 +77,7 @@ The following set of documentation describes Apollo 2.5:
       - Apollo Linux Kernel
       - NVIDIA GPU Driver
 
-- ***<u>[Apollo Quick Start Guide]</u>*** ─ A combination tutorial and roadmap that provide the complete set of end-to-end instructions. The Quick Start Guide also provides links to additional documents that describe the conversion of a regular car to an autonomous-driving vehicle.
+- ***<u>[Apollo Quick Start Guide]</u>*** ─ A combination of tutorial and roadmap that provides the complete set of end-to-end instructions. The Quick Start Guide also provides links to additional documents that describe the conversion of a regular car to an autonomous-driving vehicle.
 
 
 # Key Hardware Components
