@@ -18,6 +18,7 @@ cc_library(
         "//modules/prediction/predictor/lane_sequence:lane_sequence_predictor",
         "//modules/prediction/predictor/move_sequence:move_sequence_predictor",
         "//modules/prediction/predictor/regional:regional_predictor",
+        "//modules/prediction/predictor/empty:empty_predictor",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",
         "@glog//:glog",
