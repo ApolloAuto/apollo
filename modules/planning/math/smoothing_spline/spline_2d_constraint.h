@@ -95,6 +95,11 @@ class Spline2dConstraint {
   const AffineConstraint& inequality_constraint() const;
   const AffineConstraint& equality_constraint() const;
 
+  bool AddPointSecondDerivativeConstraint(const double t, const double ddx,
+                                          const double ddy);
+  bool AddPointThirdDerivativeConstraint(const double t, const double ddx,
+                                         const double ddy);
+
  private:
   uint32_t FindIndex(const double t) const;
   std::vector<double> AffineCoef(const double angle, const double t) const;
