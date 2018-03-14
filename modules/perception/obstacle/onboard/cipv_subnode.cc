@@ -103,20 +103,20 @@ apollo::common::Status CIPVSubnode::ProcEvents() {
                       "Failed to get shared data.");
     }
     CipvOptions cipv_options;
-    // *** To Do *** use motion manager
-    // MotionService* motion_service =
-    //   dynamic_cast<MotionService*>
-    //     (DAGStreaming::GetSubnodeByName("MotionService"));
-    // double timestamp = event.timestamp;
-    // VehicleInformation vehicle_information;
-    // motion_service->get_vehicle_information(timestamp,
-    //                                                &vehicle_information);
-    // cipv_options.yaw_angle = vehicle_information.yaw_angle;
-    // cipv_options.velocity = vehicle_information.velocity;
-    // cipv_options.yaw_rate = vehicle_information.yaw_rate;
-    cipv_options.yaw_angle = 0.0f;  // ***** fill in the value *****
-    cipv_options.velocity = 5.0f;  // ***** fill in the value *****
-    cipv_options.yaw_rate = 0.0f;  // ***** fill in the value *****
+    // Retrieve motion manager information and pass them to cipv_options
+    MotionService* motion_service =
+      dynamic_cast<MotionService*>
+        (DAGStreaming::GetSubnodeByName("MotionService"));
+    VehicleInformation vehicle_information;
+    motion_service->GetVehicleInformation(event.timestamp,
+                                          &vehicle_information);
+    cipv_options.velocity = vehicle_information.velocity;
+    cipv_options.yaw_rate = vehicle_information.yaw_rate;
+    cipv_options.yaw_angle = vehicle_information.yaw_rate
+                           * vehicle_information.time_diff;
+    // cipv_options.yaw_angle = 0.0f;  // ***** fill in the value *****
+    // cipv_options.velocity = 5.0f;  // ***** fill in the value *****
+    // cipv_options.yaw_rate = 0.0f;  // ***** fill in the value *****
     AINFO << "[CIPVSubnode] velocity " << cipv_options.velocity
               << ", yaw rate: " << cipv_options.yaw_rate
               << ", yaw angle: " << cipv_options.yaw_angle;
