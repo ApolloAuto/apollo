@@ -43,8 +43,7 @@ DEFINE_double(max_distance_to_navigation_line, 6.0,
 DEFINE_double(min_view_range_to_use_lane_marker, 0.5,
               "min view range to use lane_marker");
 
-DEFINE_double(min_lane_half_width, 1.1,
-              "min lane half width in meters");
+DEFINE_double(min_lane_half_width, 1.1, "min lane half width in meters");
 
 DEFINE_bool(
     enable_navigation_line, true,

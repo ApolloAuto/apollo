@@ -113,7 +113,6 @@ DECLARE_double(yield_distance);
 DECLARE_double(yield_distance_pedestrian_bycicle);
 DECLARE_double(follow_time_buffer);
 DECLARE_double(follow_min_time_sec);
-DECLARE_double(within_lane_bound);
 
 DECLARE_double(virtual_stop_wall_length);
 DECLARE_double(virtual_stop_wall_height);

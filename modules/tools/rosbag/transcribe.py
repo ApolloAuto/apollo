@@ -35,6 +35,7 @@ from common.message_manager import PbMessageManager
 g_message_manager = PbMessageManager()
 g_args = None
 
+
 def transcribe(proto_msg):
     header = proto_msg.header
     seq = "%05d" % header.sequence_num
