@@ -95,6 +95,4 @@ DECLARE_bool(show_camera_objects2d);
 DECLARE_bool(show_camera_parsing);
 DECLARE_string(frame_visualizer);
 
-DECLARE_bool(has_lidar);
-
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
