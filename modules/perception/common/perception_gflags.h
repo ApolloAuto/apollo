@@ -25,6 +25,8 @@ DECLARE_string(perception_adapter_config_filename);
 DECLARE_string(config_manager_path);
 DECLARE_string(work_root);
 
+/// enable low cost perception setup
+DECLARE_bool(is_lowcost);
 /// obstacle/base/object.cc
 DECLARE_bool(is_serialize_point_cloud);
 

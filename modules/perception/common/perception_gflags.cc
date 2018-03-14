@@ -25,6 +25,8 @@ DEFINE_string(config_manager_path, "./conf/config_manager.config",
               "The ModelConfig config paths file.");
 DEFINE_string(work_root, "modules/perception", "Project work root direcotry.");
 
+DEFINE_bool(is_lowcost, false, "enable lowcost perceptiond");
+
 /// obstacle/base/object.cc
 DEFINE_bool(is_serialize_point_cloud, false,
             "serialize and output object cloud");
