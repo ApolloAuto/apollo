@@ -114,4 +114,17 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "smoother_util",
+    srcs = [
+        "smoother_util.cc",
+    ],
+    deps = [
+        ":qp_spline_reference_line_smoother",
+        ":reference_line",
+        ":spiral_reference_line_smoother",
+        "//modules/planning/proto:planning_config_proto",
+    ],
+)
+
 cpplint()
