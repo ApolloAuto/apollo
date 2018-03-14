@@ -60,6 +60,10 @@ class PbfTrackObjectDistance {
   bool ComputePolygonCenter(const PolygonDType &polygon,
                             const Eigen::Vector3d &ref_pos, int range,
                             Eigen::Vector3d *center);
+  float ComputeDistanceAngleMatchProb(const PbfSensorObjectPtr &fused_object,
+                                      const PbfSensorObjectPtr &sensor_object);
+
+  float GetAngle(const ObjectPtr &obj);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(PbfTrackObjectDistance);
