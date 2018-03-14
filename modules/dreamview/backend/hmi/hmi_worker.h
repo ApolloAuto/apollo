@@ -24,6 +24,7 @@
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
+#include "modules/dreamview/proto/voice_detection.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
 /**
