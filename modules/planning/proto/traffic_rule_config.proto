@@ -7,6 +7,11 @@ message ReroutingConfig {
   optional double cooldown_time = 1 [default = 0.6];  // seconds
 }
 
+message BacksideVehicleConfig {
+  // a vehicle is considered within current lane if it is behind the ADC and its lateral difference is less than this number.
+  optional double backside_lane_width = 1 [default=4.0];
+}
+
 // TODO(all) migrate all other traffic rules to pb config
 message TrafficRuleConfig {
   enum RuleId {
@@ -26,6 +31,7 @@ message TrafficRuleConfig {
   optional RuleId rule_id = 1;
   oneof config {
     ReroutingConfig rerouting = 2;
+    BacksideVehicleConfig backside_vehicle = 3;
   }
 }
 

@@ -1,5 +1,8 @@
 config: {
     rule_id: BACKSIDE_VEHICLE
+    backside_vehicle {
+        backside_lane_width: 4.0
+    }
 }
 config: {
     rule_id: SIGNAL_LIGHT
