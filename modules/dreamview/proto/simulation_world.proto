@@ -6,6 +6,7 @@ import "modules/common/monitor_log/proto/monitor_log.proto";
 import "modules/planning/proto/planning_internal.proto";
 import "modules/perception/proto/perception_obstacle.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/routing/proto/routing.proto";
 
 // Next-id: 4
 message PolygonPoint {
@@ -20,7 +21,7 @@ message Prediction {
   repeated PolygonPoint predicted_trajectory = 2;
 }
 
-// Next-id: 12
+// Next-id: 13
 message Decision {
   enum Type {
     IGNORE = 0; // Ignore the object
@@ -62,6 +63,7 @@ message Decision {
     STOP_REASON_NOT_READY = 106;
   }
   optional StopReasonCode stopReason = 11;
+  optional apollo.routing.ChangeLaneType change_lane_type = 12;
 }
 
 // Next-id: 32
@@ -201,8 +203,9 @@ message SimulationWorld {
   // Planned trajectory
   repeated Object planning_trajectory = 8;
 
-  // Main stop
-  optional Object main_stop = 9;
+  // Main decision
+  optional Object main_stop = 9 [deprecated=true];
+  optional Object main_decision = 24;
 
   // Speed limit
   optional double speed_limit = 10;
