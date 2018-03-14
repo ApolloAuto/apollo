@@ -630,7 +630,6 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
     point.path_point.set_y(prefix_ref_point.y());
     point.path_point.set_z(0.0);
     point.path_point.set_theta(prefix_ref_point.heading());
-    point.path_point.set_dkappa(prefix_ref_point.dkappa());
     point.longitudinal_bound = 1e-6;
     point.lateral_bound = 1e-6;
     point.enforced = true;
