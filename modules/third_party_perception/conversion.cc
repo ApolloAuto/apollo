@@ -82,12 +82,25 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
     double mob_vel_x = data_739.obstacle_rel_vel_x();
     int mob_type = data_739.obstacle_type();
 
-    double mob_l = GetDefaultObjectLength(mob_type);
+    double mob_l = 0.0;
     double mob_w = 0.0;
     if (mobileye.details_73a_size() <= index) {
+      mob_l = GetDefaultObjectLength(mob_type);
       mob_w = GetDefaultObjectWidth(mob_type);
     } else {
-      mob_w = mobileye.details_73a(index).obstacle_width();
+      if (mobileye.details_73a(index).obstacle_length() >
+          FLAGS_max_mobileye_obstacle_length) {
+        mob_l = GetDefaultObjectLength(mob_type);
+      } else {
+        mob_l = mobileye.details_73a(index).obstacle_length();
+      }
+
+      if (mobileye.details_73a(index).obstacle_width() >
+          FLAGS_max_mobileye_obstacle_width) {
+        mob_w = GetDefaultObjectWidth(mob_type);
+      } else {
+        mob_w = mobileye.details_73a(index).obstacle_width();
+      }
     }
 
     mob_x += FLAGS_mobileye_pos_adjust;  // offset: imu <-> mobileye
