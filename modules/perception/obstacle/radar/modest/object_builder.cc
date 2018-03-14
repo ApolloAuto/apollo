@@ -125,6 +125,7 @@ bool ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     objects->push_back(object_ptr);
   }
   continuous_ids_ = current_con_ids;
+  return true;
 }
 
 }  // namespace perception
