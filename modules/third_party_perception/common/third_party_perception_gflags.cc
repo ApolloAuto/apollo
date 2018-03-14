@@ -78,3 +78,9 @@ DEFINE_int32(keep_radar_frames, 5, "number of delphi esr frames to keep");
 // TODO(QiL) : remove this temperary gflags
 DEFINE_bool(use_conti_radar, true,
             "use conti or delphi radar, true is conti, false is delphi");
+
+DEFINE_double(max_mobileye_obstacle_length, 31.2,
+              "maximum mobileye obstacle length");
+
+DEFINE_double(max_mobileye_obstacle_width, 12.7,
+              "maximum mobileye obstacle length");
