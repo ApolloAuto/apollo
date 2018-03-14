@@ -322,8 +322,6 @@ ReferencePoint ReferenceLine::InterpolateWithMatchedIndex(
   double s = s0 + index.offset;
   DCHECK_LE(s0 - 1.0e-6, s) << " s: " << s << " is less than s0 :" << s0;
   DCHECK_LE(s, s1 + 1.0e-6) << "s: " << s << " is larger than s1: " << s1;
-  CHECK(!p0.lane_waypoints().empty());
-  CHECK(!p1.lane_waypoints().empty());
 
   auto map_path_point = map_path_.GetSmoothPoint(index);
   double upper_bound = 0.0;
@@ -347,34 +345,34 @@ ReferencePoint ReferenceLine::Interpolate(const ReferencePoint& p0,
   DCHECK_LE(s0 - 1.0e-6, s) << " s: " << s << " is less than s0 :" << s0;
   DCHECK_LE(s, s1 + 1.0e-6) << "s: " << s << " is larger than s1: " << s1;
 
-  CHECK(!p0.lane_waypoints().empty());
-  CHECK(!p1.lane_waypoints().empty());
   const double x = common::math::lerp(p0.x(), s0, p1.x(), s1, s);
   const double y = common::math::lerp(p0.y(), s0, p1.y(), s1, s);
   const double heading =
       common::math::slerp(p0.heading(), s0, p1.heading(), s1, s);
   const double kappa = common::math::lerp(p0.kappa(), s0, p1.kappa(), s1, s);
   const double dkappa = common::math::lerp(p0.dkappa(), s0, p1.dkappa(), s1, s);
-  const auto& p0_waypoint = p0.lane_waypoints()[0];
   std::vector<hdmap::LaneWaypoint> waypoints;
   double upper_bound = 0.0;
   double lower_bound = 0.0;
-  if ((s - s0) + p0_waypoint.s <= p0_waypoint.lane->total_length()) {
-    const double lane_s = p0_waypoint.s + s - s0;
-    waypoints.emplace_back(p0_waypoint.lane, lane_s);
-    p0_waypoint.lane->GetWidth(lane_s, &upper_bound, &lower_bound);
-  }
-  const auto& p1_waypoint = p1.lane_waypoints()[0];
-  if (p1_waypoint.lane->id().id() != p0_waypoint.lane->id().id() &&
-      p1_waypoint.s - (s1 - s) >= 0) {
-    const double lane_s = p1_waypoint.s - (s1 - s);
-    waypoints.emplace_back(p1_waypoint.lane, lane_s);
-    p1_waypoint.lane->GetWidth(lane_s, &upper_bound, &lower_bound);
-  }
-  if (waypoints.empty()) {
-    const double lane_s = p0_waypoint.s;
-    waypoints.emplace_back(p0_waypoint.lane, lane_s);
-    p0_waypoint.lane->GetWidth(lane_s, &upper_bound, &lower_bound);
+  if (!p0.lane_waypoints().empty() && !p1.lane_waypoints().empty()) {
+    const auto& p0_waypoint = p0.lane_waypoints()[0];
+    if ((s - s0) + p0_waypoint.s <= p0_waypoint.lane->total_length()) {
+      const double lane_s = p0_waypoint.s + s - s0;
+      waypoints.emplace_back(p0_waypoint.lane, lane_s);
+      p0_waypoint.lane->GetWidth(lane_s, &upper_bound, &lower_bound);
+    }
+    const auto& p1_waypoint = p1.lane_waypoints()[0];
+    if (p1_waypoint.lane->id().id() != p0_waypoint.lane->id().id() &&
+        p1_waypoint.s - (s1 - s) >= 0) {
+      const double lane_s = p1_waypoint.s - (s1 - s);
+      waypoints.emplace_back(p1_waypoint.lane, lane_s);
+      p1_waypoint.lane->GetWidth(lane_s, &upper_bound, &lower_bound);
+    }
+    if (waypoints.empty()) {
+      const double lane_s = p0_waypoint.s;
+      waypoints.emplace_back(p0_waypoint.lane, lane_s);
+      p0_waypoint.lane->GetWidth(lane_s, &upper_bound, &lower_bound);
+    }
   }
   return ReferencePoint(hdmap::MapPathPoint({x, y}, heading, waypoints), kappa,
                         dkappa, lower_bound, upper_bound);
