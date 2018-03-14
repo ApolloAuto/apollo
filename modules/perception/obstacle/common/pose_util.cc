@@ -18,9 +18,12 @@
 #include "yaml-cpp/yaml.h"
 
 #include "modules/common/log.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace perception {
+
+using apollo::common::util::QuaternionToRotationMatrix;
 
 bool ReadPoseFile(const std::string &filename, Eigen::Matrix4d *pose,
                   int *frame_id, double *time_stamp) {
