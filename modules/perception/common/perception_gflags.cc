@@ -120,5 +120,3 @@ DEFINE_bool(capture_screen, false, "");
 DEFINE_string(screen_output_dir, "./", "");
 
 DEFINE_string(frame_visualizer, "GLFusionVisualizer", "");
-
-DEFINE_bool(has_lidar, true, "if perception has lidar sensor");
