@@ -25,23 +25,25 @@ The following is the precedure to train the MLP model using the released demo da
 
 6. In docker, under `/apollo/`, download the demo rosbag by `bash docs/demo_guide/rosbag_helper.sh download`
 
-7. In docker, under `/apollo/`, run prediction module by `bash scripts/prediction.sh`
+7. In docker, under `/apollo/`, run prediction module by `bash scripts/prediction.sh start_fe`
 
-8. Under `/apollo/`, play the demo rosbag by `rosbag play ./docs/demo_guide/demo_2.0.bag`
+8. Open a new terminal window, enter the apollo dev docker by Step 4.
 
-9. Under `/apollo/`, after the demo rosbag running is finished, stop the prediction module by `bash scripts/prediction.sh stop`
+9. In the new terminal window, under `/apollo/`, play the demo rosbag by `rosbag play ./docs/demo_guide/demo_2.0.bag`
 
-10. Checkout if there is a file called `feature.0.bin` under the folder `/apollo/data/prediction/`
+10. After the demo rosbag running is finished in the new terminal window, go to the old terminal window and stop the prediction module by pressing `Ctrl + C`.
 
-11. In docker, go to `/apollo/modules/tools/prediction/mlp_train/`, label the data by
+11. Checkout if there is a file called `feature.0.bin` under the folder `/apollo/data/prediction/`
+
+12. In docker, go to `/apollo/modules/tools/prediction/mlp_train/`, label the data by
 `python generate_labels.py -f /apollo/data/prediction/feature.0.bin`. Then checkout if there is a file called `feature.0.label.bin` under the folder `/apollo/data/prediction/`
 
-12. In docker under `/apollo/modules/tools/prediction/mlp_train/`, generate H5 files by `python generate_h5.py -f /apollo/data/prediction/feature.0.label.bin`. Then checkout if there is a file called `feature.0.label.h5`
+13. In docker under `/apollo/modules/tools/prediction/mlp_train/`, generate H5 files by `python generate_h5.py -f /apollo/data/prediction/feature.0.label.bin`. Then checkout if there is a file called `feature.0.label.h5`
 
-13. Exit dev docker
+14. Exit dev docker
 
-14. Go to the folder `APOLLO/modules/tools/prediction/mlp_train/`, run the training model by `python mlp_train.py APOLLO/data/prediction/feature.0.label.h5`
+15. Go to the folder `APOLLO/modules/tools/prediction/mlp_train/`, run the training model by `python mlp_train.py APOLLO/data/prediction/feature.0.label.h5`
 
-15. The model's evaluation report will be in the file `APOLLO/modules/tools/prediction/mlp_train/evaluation_report.log`.
+16. The model's evaluation report will be in the file `APOLLO/modules/tools/prediction/mlp_train/evaluation_report.log`.
 
-16. The model will be stored in the binary file `APOLLO/modules/tools/prediction/mlp_train/mlp_model.bin`, which can replace the old model in `APOLLO/modules/prediction/data/mlp_vehicle_model.bin` if you think it is better.
+17. The model will be stored in the binary file `APOLLO/modules/tools/prediction/mlp_train/mlp_model.bin`, which can replace the old model in `APOLLO/modules/prediction/data/mlp_vehicle_model.bin` if you think it is better.
