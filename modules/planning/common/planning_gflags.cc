@@ -210,8 +210,6 @@ DEFINE_double(
 DEFINE_double(
     follow_min_time_sec, 0.1,
     "min following time in st region before considering a valid follow");
-DEFINE_double(within_lane_bound, 4.0,
-              "distance to be considered within current lane");
 
 DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
