@@ -23,21 +23,20 @@
 namespace apollo {
 namespace perception {
 
-void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
+bool ObjectBuilder::Build(const ContiRadar &raw_obstacles,
                           const Eigen::Matrix4d &radar_pose,
                           const Eigen::Vector2d &main_velocity,
                           SensorObjects *radar_objects) {
   if (radar_objects == nullptr) {
     AERROR << "radar objects is nullptr.";
-    return;
+    return false;
   }
-  std::map<int, int> current_con_ids;
+  std::unordered_map<int, int> current_con_ids;
   auto objects = &(radar_objects->objects);
-  for (int i = 0; i < raw_obstacles.contiobs_size(); i++) {
+  for (int i = 0; i < raw_obstacles.contiobs_size(); ++i) {
     ObjectPtr object_ptr = ObjectPtr(new Object());
-    int obstacle_id = raw_obstacles.contiobs(i).obstacle_id();
-    std::map<int, int>::iterator continuous_id_it =
-        continuous_ids_.find(obstacle_id);
+    const int obstacle_id = raw_obstacles.contiobs(i).obstacle_id();
+    auto continuous_id_it = continuous_ids_.find(obstacle_id);
     if (continuous_id_it != continuous_ids_.end()) {
       current_con_ids[obstacle_id] = continuous_id_it->second + 1;
     } else {

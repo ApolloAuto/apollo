@@ -20,6 +20,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/common/util",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
         "//modules/perception/obstacle/base",
