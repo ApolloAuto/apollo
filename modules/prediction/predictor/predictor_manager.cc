@@ -26,6 +26,7 @@
 #include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
 #include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
 #include "modules/prediction/predictor/regional/regional_predictor.h"
+#include "modules/prediction/predictor/empty/empty_predictor.h"
 
 namespace apollo {
 namespace prediction {
@@ -42,6 +43,7 @@ void PredictorManager::RegisterPredictors() {
   RegisterPredictor(ObstacleConf::MOVE_SEQUENCE_PREDICTOR);
   RegisterPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
   RegisterPredictor(ObstacleConf::REGIONAL_PREDICTOR);
+  RegisterPredictor(ObstacleConf::EMPTY_PREDICTOR);
 }
 
 void PredictorManager::Init(const PredictionConf& config) {
