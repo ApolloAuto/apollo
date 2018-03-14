@@ -506,6 +506,42 @@ std::vector<double> Spline2dConstraint::AffineThirdDerivativeCoef(
   return result;
 }
 
+bool Spline2dConstraint::AddPointSecondDerivativeConstraint(const double t,
+                                                            const double ddx,
+                                                            const double ddy) {
+  const uint32_t num_params = spline_order_ + 1;
+  Eigen::MatrixXd affine_equality = Eigen::MatrixXd::Zero(2, total_param_);
+  Eigen::MatrixXd affine_boundary = Eigen::MatrixXd::Zero(2, 1);
+  affine_boundary << ddx, ddy;
+  std::vector<double> coef = SecondDerivativeCoef(t);
+  const std::size_t index = FindIndex(t);
+  const std::size_t index_offset = index * 2 * num_params;
+  const double rel_t = t - t_knots_[index];
+  for (std::size_t i = 0; i < num_params; ++i) {
+    affine_equality(0, i + index_offset) = coef[rel_t];
+    affine_equality(1, i + num_params + index_offset) = coef[rel_t];
+  }
+  return AddEqualityConstraint(affine_equality, affine_boundary);
+}
+
+bool Spline2dConstraint::AddPointThirdDerivativeConstraint(const double t,
+                                                           const double ddx,
+                                                           const double ddy) {
+  const uint32_t num_params = spline_order_ + 1;
+  Eigen::MatrixXd affine_equality = Eigen::MatrixXd::Zero(2, total_param_);
+  Eigen::MatrixXd affine_boundary = Eigen::MatrixXd::Zero(2, 1);
+  affine_boundary << ddx, ddy;
+  std::vector<double> coef = ThirdDerivativeCoef(t);
+  const std::size_t index = FindIndex(t);
+  const std::size_t index_offset = index * 2 * num_params;
+  const double rel_t = t - t_knots_[index];
+  for (std::size_t i = 0; i < num_params; ++i) {
+    affine_equality(0, i + index_offset) = coef[rel_t];
+    affine_equality(1, i + num_params + index_offset) = coef[rel_t];
+  }
+  return AddEqualityConstraint(affine_equality, affine_boundary);
+}
+
 double Spline2dConstraint::SignDistance(const Vec2d& xy_point,
                                         const double angle) const {
   return common::math::InnerProd(xy_point.x(), xy_point.y(), -std::sin(angle),
