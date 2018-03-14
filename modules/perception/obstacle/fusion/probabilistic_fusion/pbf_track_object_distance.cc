@@ -25,10 +25,14 @@
 #include "boost/format.hpp"
 
 #include "modules/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
 
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2d);
+
+DECLARE_bool(async_fusion);
+DECLARE_bool(use_distance_angle_fusion);
 
 namespace apollo {
 namespace perception {
@@ -53,29 +57,38 @@ float PbfTrackObjectDistance::Compute(
   float distance = std::numeric_limits<float>::max();
   const PbfSensorObjectPtr &lidar_object = fused_track->GetLatestLidarObject();
   const PbfSensorObjectPtr &radar_object = fused_track->GetLatestRadarObject();
-  if (is_lidar(sensor_type)) {
-    if (lidar_object != nullptr) {
-      distance =
-          ComputeVelodyne64Velodyne64(fused_object, sensor_object, *ref_point);
-    } else if (radar_object != nullptr) {
-      distance =
-          ComputeVelodyne64Radar(sensor_object, fused_object, *ref_point);
+
+  if (!FLAGS_async_fusion) {
+    if (is_lidar(sensor_type)) {
+      if (lidar_object != nullptr) {
+        distance = ComputeVelodyne64Velodyne64(fused_object, sensor_object,
+                                               *ref_point);
+      } else if (radar_object != nullptr) {
+        distance =
+            ComputeVelodyne64Radar(sensor_object, fused_object, *ref_point);
+      } else {
+        AWARN << "All of the objects are nullptr";
+      }
+    } else if (is_radar(sensor_type)) {
+      if (lidar_object != nullptr) {
+        distance =
+            ComputeVelodyne64Radar(fused_object, sensor_object, *ref_point);
+      } else if (radar_object != nullptr) {
+        distance = std::numeric_limits<float>::max();
+        //    distance = compute_radar_radar(fused_object, sensor_object,
+        //    *ref_point);
+      } else {
+        AWARN << "All of the objects are nullptr";
+      }
     } else {
-      AWARN << "All of the objects are nullptr";
-    }
-  } else if (is_radar(sensor_type)) {
-    if (lidar_object != nullptr) {
-      distance =
-          ComputeVelodyne64Radar(fused_object, sensor_object, *ref_point);
-    } else if (radar_object != nullptr) {
-      distance = std::numeric_limits<float>::max();
-      //    distance = compute_radar_radar(fused_object, sensor_object,
-      //    *ref_point);
-    } else {
-      AWARN << "All of the objects are nullptr";
+      AERROR << "fused sensor type is not support";
     }
   } else {
-    AERROR << "fused sensor type is not support";
+    if (FLAGS_use_distance_angle_fusion) {
+      distance = ComputeDistanceAngleMatchProb(fused_object, sensor_object);
+    } else {
+      AERROR << "other distance method not supported for async fusion";
+    }
   }
   return distance;
 }
@@ -107,6 +120,61 @@ float PbfTrackObjectDistance::ComputeRadarRadar(
   float distance =
       ComputeDistance3D(fused_object, sensor_object, ref_pos, range);
   ADEBUG << "compute_radar_radar distance " << distance;
+  return distance;
+}
+
+float PbfTrackObjectDistance::GetAngle(const ObjectPtr &obj) {
+  if (obj->center[0] == 0) {
+    if (obj->center[1] > 0) {
+      return M_PI / 2;
+    } else {
+      return -M_PI / 2;
+    }
+  }
+  return std::atan2(obj->center[1], obj->center[0]);
+}
+
+float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
+    const PbfSensorObjectPtr &fused_object,
+    const PbfSensorObjectPtr &sensor_object) {
+  static float weight_x = 0.7;
+  static float weight_y = 0.3;
+  static float weight_range = 0.5;
+  static float weight_angle = 0.5;
+  static float angle_tolerance = 30;
+
+  const ObjectPtr &fobj = fused_object->object;
+  const ObjectPtr &sobj = sensor_object->object;
+
+  if (fobj == nullptr || sobj == nullptr) {
+    AERROR << "Object is nullptr.";
+    return (std::numeric_limits<float>::max)();
+  }
+
+  Eigen::Vector3d &fcenter = fobj->center;
+  Eigen::Vector3d &scenter = sobj->center;
+  float range_distance_ratio = 0;
+  float angle_distance_ratio = 0;
+
+  if (fcenter[0] > 0 && fcenter[1] > 0) {
+    range_distance_ratio =
+        weight_x * std::abs(fcenter[0] - scenter[0]) / fcenter[0] +
+        weight_y * std::abs(fcenter[1] - scenter[1]) / fcenter[1];
+  } else if (fcenter[0] > 0) {
+    range_distance_ratio = std::abs(fcenter[0] - scenter[0]) / fcenter[0];
+  } else if (fcenter[1] > 0) {
+    range_distance_ratio = std::abs(fcenter[1] - scenter[1]) / fcenter[1];
+  }
+
+  float sangle = GetAngle(sobj);
+  float fangle = GetAngle(fobj);
+
+  angle_distance_ratio =
+      (std::abs(sangle - fangle) * 180) / (angle_tolerance * M_PI);
+
+  float distance =
+      weight_range * range_distance_ratio + weight_angle * angle_distance_ratio;
+
   return distance;
 }
 
