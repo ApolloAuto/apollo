@@ -51,7 +51,7 @@ cc_library(
         "//modules/planning/math/smoothing_spline:spline_2d_solver",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:reference_line_smoother_config_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -73,8 +73,8 @@ cc_library(
         "//modules/planning/math/curve1d:quintic_spiral_path",
         "//modules/planning/math/smoothing_spline:spline_2d_solver",
         "//modules/planning/proto:planning_proto",
-        "@eigen//:eigen",
-        "@ipopt//:ipopt",
+        "@eigen",
+        "@ipopt",
     ],
 )
 
