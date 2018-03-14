@@ -7,7 +7,7 @@ obstacle_conf {
 obstacle_conf {
   obstacle_type: VEHICLE
   obstacle_status: OFF_LANE
-  predictor_type: FREE_MOVE_PREDICTOR
+  predictor_type: EMPTY_PREDICTOR
 }
 obstacle_conf {
   obstacle_type: PEDESTRIAN
@@ -22,7 +22,7 @@ obstacle_conf {
 obstacle_conf {
   obstacle_type: BICYCLE
   obstacle_status: OFF_LANE
-  predictor_type: FREE_MOVE_PREDICTOR
+  predictor_type: EMPTY_PREDICTOR
 }
 obstacle_conf {
   obstacle_type: UNKNOWN
@@ -33,5 +33,5 @@ obstacle_conf {
 obstacle_conf {
   obstacle_type: UNKNOWN
   obstacle_status: OFF_LANE
-  predictor_type: FREE_MOVE_PREDICTOR
+  predictor_type: EMPTY_PREDICTOR
 }
