@@ -119,6 +119,7 @@ function set_lib_path() {
     PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/apollo/bazel-genfiles/external/caffe/lib:/home/caros/secure_upgrade/depend_lib
   fi
+  PY_LIB_PATH=${PY_LIB_PATH}:/usr/local/apollo/snowboy/Python
   export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
   if [ -e /usr/local/cuda-8.0/ ];then
     export PATH=/usr/local/cuda-8.0/bin:$PATH

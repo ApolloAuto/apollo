@@ -281,6 +281,8 @@ class AdapterManager {
   REGISTER_ADAPTER(DriveEvent);
   REGISTER_ADAPTER(RelativeMap);
   REGISTER_ADAPTER(Navigation);
+  REGISTER_ADAPTER(VoiceDetectionRequest);
+  REGISTER_ADAPTER(VoiceDetectionResponse);
 
   DECLARE_SINGLETON(AdapterManager);
 };
