@@ -35,7 +35,11 @@ bool ModestRadarDetector::Init() {
     AERROR << "not found model config: " << name();
     return false;
   }
-  if (!model_config->GetValue("use_had_map", &use_had_map_)) {
+  if (FLAGS_is_lowcost) {
+    use_had_map_ = false;
+  }
+  if (!FLAGS_is_lowcost &&
+        !model_config->GetValue("use_had_map", &use_had_map_)) {
     AERROR << "use_had_map not found.";
     return false;
   }
@@ -178,8 +182,13 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
     radar_pose = *(options.radar2world_pose);
   }
   Eigen::Vector2d main_velocity;
-  main_velocity[0] = options.car_linear_speed[0];
-  main_velocity[1] = options.car_linear_speed[1];
+  if (FLAGS_is_lowcost) {
+    main_velocity[0] = 0;
+    main_velocity[1] = 0;
+  } else {
+    main_velocity[0] = options.car_linear_speed[0];
+    main_velocity[1] = options.car_linear_speed[1];
+  }
   // preparation
 
   SensorObjects radar_objects;
