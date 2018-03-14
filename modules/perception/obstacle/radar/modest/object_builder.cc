@@ -16,7 +16,7 @@
 #include "modules/perception/obstacle/radar/modest/object_builder.h"
 
 #include <cmath>
-
+// #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/radar/modest/conti_radar_util.h"
 #include "modules/perception/obstacle/radar/modest/radar_util.h"
 
@@ -125,6 +125,7 @@ bool ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     objects->push_back(object_ptr);
   }
   continuous_ids_ = current_con_ids;
+  return true;
 }
 
 }  // namespace perception

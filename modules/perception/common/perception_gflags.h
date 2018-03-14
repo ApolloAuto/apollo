@@ -18,7 +18,7 @@
 #define MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
 
 #include "gflags/gflags.h"
-
+#include "modules/common/configs/config_gflags.h"
 DECLARE_string(perception_adapter_config_filename);
 
 /// lib/config_manager/config_manager.cc
