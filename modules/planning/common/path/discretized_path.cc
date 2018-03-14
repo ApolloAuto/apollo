@@ -43,7 +43,7 @@ void DiscretizedPath::set_path_points(
 common::PathPoint DiscretizedPath::Evaluate(const double path_s) const {
   CHECK_GT(path_points_.size(), 1);
   CHECK(path_points_.front().s() <= path_s &&
-        path_points_.back().s() <= path_s);
+        path_points_.back().s() >= path_s);
 
   auto it_lower = QueryLowerBound(path_s);
   if (it_lower == path_points_.begin()) {
