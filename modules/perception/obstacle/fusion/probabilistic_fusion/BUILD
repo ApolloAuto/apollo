@@ -40,6 +40,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:log",
+        "//modules/common/configs:config_gflags",
         "//modules/perception/common",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
