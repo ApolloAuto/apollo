@@ -136,7 +136,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
   // 1. get radar pose
   std::shared_ptr<Matrix4d> velodyne2world_pose = std::make_shared<Matrix4d>();
   if (!GetVelodyneTrans(timestamp, velodyne2world_pose.get())
-      && !FLAGS_is_lowcost) {
+      && !FLAGS_use_navigation_mode) {
     AERROR << "Failed to get trans at timestamp: " << GLOG_TIMESTAMP(timestamp);
     error_code_ = common::PERCEPTION_ERROR_TF;
     return;
@@ -144,7 +144,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
   std::shared_ptr<Matrix4d> radar2world_pose = std::make_shared<Matrix4d>();
   std::shared_ptr<Matrix4d> radar2car_pose = std::make_shared<Matrix4d>();
 
-  if (!FLAGS_is_lowcost) {
+  if (!FLAGS_use_navigation_mode) {
      *radar2world_pose =
        *velodyne2world_pose * short_camera_extrinsic_ * radar_extrinsic_;
      AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
@@ -161,7 +161,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
   std::vector<PolygonDType> map_polygons;
   RadarDetectorOptions options;
   // Current Localiztion, radar postion.
-  if (!FLAGS_is_lowcost) {
+  if (!FLAGS_use_navigation_mode) {
       PointD position;
       position.x = (*radar2world_pose)(0, 3);
       position.y = (*radar2world_pose)(1, 3);
@@ -192,7 +192,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
 
   // 4. Call RadarDetector::detect.
   PERF_BLOCK_START();
-  if (!FLAGS_is_lowcost) {
+  if (!FLAGS_use_navigation_mode) {
     options.radar2world_pose = &(*radar2world_pose);
   } else {
     options.radar2world_pose = &(*radar2car_pose);

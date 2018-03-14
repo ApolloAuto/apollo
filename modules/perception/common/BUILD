@@ -20,6 +20,7 @@ cc_library(
         ":pcl_util",
         "//modules/common",
         "//modules/common/math:math_utils",
+        "//modules/common/configs:config_gflags",
         "@eigen",
     ],
 )
