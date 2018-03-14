@@ -177,6 +177,14 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::NAVIGATION:
         EnableNavigation(FLAGS_navigation_topic, config);
         break;
+      case AdapterConfig::VOICE_DETECTION_REQUEST:
+        EnableVoiceDetectionRequest(FLAGS_voice_detection_request_topic,
+                                    config);
+        break;
+      case AdapterConfig::VOICE_DETECTION_RESPONSE:
+        EnableVoiceDetectionResponse(FLAGS_voice_detection_response_topic,
+                                     config);
+        break;
       default:
         AERROR << "Unknown adapter config type!";
         break;
