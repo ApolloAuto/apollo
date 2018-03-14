@@ -35,10 +35,10 @@ bool ModestRadarDetector::Init() {
     AERROR << "not found model config: " << name();
     return false;
   }
-  if (FLAGS_is_lowcost) {
+  if (FLAGS_use_navigation_mode) {
     use_had_map_ = false;
   }
-  if (!FLAGS_is_lowcost &&
+  if (!FLAGS_use_navigation_mode &&
         !model_config->GetValue("use_had_map", &use_had_map_)) {
     AERROR << "use_had_map not found.";
     return false;
@@ -182,7 +182,7 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
     radar_pose = *(options.radar2world_pose);
   }
   Eigen::Vector2d main_velocity;
-  if (FLAGS_is_lowcost) {
+  if (FLAGS_use_navigation_mode) {
     main_velocity[0] = 0;
     main_velocity[1] = 0;
   } else {
