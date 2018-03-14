@@ -75,28 +75,27 @@ class SmootherUtil {
     }
     for (std::size_t i = 1; i < raw_points_.size(); ++i) {
       std::vector<ReferencePoint> ref_points;
-      for (double s = 0.0; s < FLAGS_smooth_length && i < raw_points_.size();
-           ++i) {
-        LineSegment2d segment(raw_points_[i - 1], raw_points_[i]);
-        ref_points.emplace_back(MapPathPoint(raw_points_[i], segment.heading()),
+      std::size_t j = i;
+      for (double s = 0.0; s < FLAGS_smooth_length && j < raw_points_.size();
+           ++j) {
+        LineSegment2d segment(raw_points_[j - 1], raw_points_[j]);
+        ref_points.emplace_back(MapPathPoint(raw_points_[j], segment.heading()),
                                 0.0, 0.0, 0.0, 0.0);
         s += segment.length();
       }
+      i = std::max(i, j - 1);
       raw_reference_lines_.emplace_back(ref_points);
     }
 
-    double last_anchor_s = 0.0;
     for (std::size_t i = 0; i < raw_reference_lines_.size(); ++i) {
       const auto& raw_ref_line = raw_reference_lines_[i];
       ReferencePoint init_point;
       if (i == 0) {
         init_point = raw_ref_line.GetReferencePoint(0.0);
       } else {
-        init_point =
-            raw_reference_lines_[i - 1].GetReferencePoint(last_anchor_s);
+        init_point = raw_reference_lines_[i - 1].reference_points().back();
       }
       const auto anchor_points = CreateAnchorPoints(init_point, raw_ref_line);
-      last_anchor_s = anchor_points.back().path_point.s();
 
       std::unique_ptr<ReferenceLineSmoother> smoother_ptr(
           new QpSplineReferenceLineSmoother(config_));
