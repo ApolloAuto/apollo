@@ -30,6 +30,7 @@
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/radar/dummy/dummy_algorithms.h"
 #include "modules/perception/onboard/subnode_helper.h"
@@ -134,36 +135,53 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
 
   // 1. get radar pose
   std::shared_ptr<Matrix4d> velodyne2world_pose = std::make_shared<Matrix4d>();
-  if (!GetVelodyneTrans(timestamp, velodyne2world_pose.get())) {
+  if (!GetVelodyneTrans(timestamp, velodyne2world_pose.get())
+      && !FLAGS_is_lowcost) {
     AERROR << "Failed to get trans at timestamp: " << GLOG_TIMESTAMP(timestamp);
     error_code_ = common::PERCEPTION_ERROR_TF;
     return;
   }
   std::shared_ptr<Matrix4d> radar2world_pose = std::make_shared<Matrix4d>();
-  *radar2world_pose =
-      *velodyne2world_pose * short_camera_extrinsic_ * radar_extrinsic_;
-  AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
+  std::shared_ptr<Matrix4d> radar2car_pose = std::make_shared<Matrix4d>();
 
-  // Current Localiztion, radar postion.
-  PointD position;
-  position.x = (*radar2world_pose)(0, 3);
-  position.y = (*radar2world_pose)(1, 3);
-  position.z = (*radar2world_pose)(2, 3);
-  // 2. Get map polygons.
+  if (!FLAGS_is_lowcost) {
+     *radar2world_pose =
+       *velodyne2world_pose * short_camera_extrinsic_ * radar_extrinsic_;
+     AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
+
+  } else {
+    CalibrationConfigManager *config_manager =
+     Singleton<CalibrationConfigManager>::get();
+    CameraCalibrationPtr calibrator = config_manager->get_camera_calibration();
+    Eigen::Matrix4d camera_to_car = calibrator->get_camera_extrinsics();
+    *radar2car_pose = camera_to_car * radar_extrinsic_;
+    AINFO << "get radar trans pose succ. pose: \n" << *radar2car_pose;
+  }
+
   std::vector<PolygonDType> map_polygons;
-  HdmapStructPtr hdmap(new HdmapStruct);
-  if (FLAGS_enable_hdmap_input && hdmap_input_ &&
-      !hdmap_input_->GetROI(position, FLAGS_front_radar_forward_distance,
-                            &hdmap)) {
-    AWARN << "Failed to get roi. timestamp: " << GLOG_TIMESTAMP(timestamp)
-          << " position: [" << position.x << ", " << position.y << ", "
-          << position.z << "]";
-    // NOTE: if call hdmap failed, using empty map_polygons.
-  }
-  if (roi_filter_ != nullptr) {
-    roi_filter_->MergeHdmapStructToPolygons(hdmap, &map_polygons);
-  }
   RadarDetectorOptions options;
+  // Current Localiztion, radar postion.
+  if (!FLAGS_is_lowcost) {
+      PointD position;
+      position.x = (*radar2world_pose)(0, 3);
+      position.y = (*radar2world_pose)(1, 3);
+      position.z = (*radar2world_pose)(2, 3);
+      // 2. Get map polygons.
+      HdmapStructPtr hdmap(new HdmapStruct);
+      if (FLAGS_enable_hdmap_input && hdmap_input_ &&
+          !hdmap_input_->GetROI(position,
+           FLAGS_front_radar_forward_distance, &hdmap)) {
+          AWARN << "Failed to get roi. timestamp: " <<
+            GLOG_TIMESTAMP(timestamp) << " position: ["
+            << position.x << ", " << position.y << ", "
+              << position.z << "]";
+            // NOTE: if call hdmap failed, using empty map_polygons.
+        }
+
+       if (roi_filter_ != nullptr) {
+         roi_filter_->MergeHdmapStructToPolygons(hdmap, &map_polygons);
+       }
+  }
 
   // 3. get car car_linear_speed
   if (!GetCarLinearSpeed(timestamp, &(options.car_linear_speed))) {
@@ -174,7 +192,11 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
 
   // 4. Call RadarDetector::detect.
   PERF_BLOCK_START();
-  options.radar2world_pose = &(*radar2world_pose);
+  if (!FLAGS_is_lowcost) {
+    options.radar2world_pose = &(*radar2world_pose);
+  } else {
+    options.radar2world_pose = &(*radar2car_pose);
+  }
   std::shared_ptr<SensorObjects> radar_objects(new SensorObjects);
   radar_objects->timestamp = timestamp;
   radar_objects->sensor_type = SensorType::RADAR;
