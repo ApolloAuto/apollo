@@ -94,6 +94,10 @@
                 "stopReason": {
                   "type": "StopReasonCode",
                   "id": 11
+                },
+                "changeLaneType": {
+                  "type": "apollo.routing.ChangeLaneType",
+                  "id": 12
                 }
               },
               "nested": {
@@ -442,7 +446,14 @@
                 },
                 "mainStop": {
                   "type": "Object",
-                  "id": 9
+                  "id": 9,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "mainDecision": {
+                  "type": "Object",
+                  "id": 24
                 },
                 "speedLimit": {
                   "type": "double",

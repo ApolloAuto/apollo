@@ -192,7 +192,9 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
   }
 }
 
-inline double SecToMs(const double sec) { return sec * 1000.0; }
+inline double SecToMs(const double sec) {
+  return sec * 1000.0;
+}
 
 }  // namespace
 
@@ -545,12 +547,12 @@ void SimulationWorldService::UpdatePlanningTrajectory(
   }
 }
 
-void SimulationWorldService::UpdateMainDecision(
+void SimulationWorldService::UpdateMainStopDecision(
     const apollo::planning::MainDecision &main_decision,
-    double update_timestamp_sec, Object *world_main_stop) {
+    double update_timestamp_sec, Object *world_main_decision) {
   apollo::common::math::Vec2d stop_pt;
   double stop_heading = 0.0;
-  auto decision = world_main_stop->add_decision();
+  auto decision = world_main_decision->add_decision();
   decision->set_type(Decision::STOP);
   if (main_decision.has_not_ready()) {
     // The car is not ready!
@@ -577,10 +579,31 @@ void SimulationWorldService::UpdateMainDecision(
       SetStopReason(stop.reason_code(), decision);
     }
   }
-  world_main_stop->set_position_x(stop_pt.x() + map_service_->GetXOffset());
-  world_main_stop->set_position_y(stop_pt.y() + map_service_->GetYOffset());
-  world_main_stop->set_heading(stop_heading);
-  world_main_stop->set_timestamp_sec(update_timestamp_sec);
+
+  decision->set_position_x(stop_pt.x() + map_service_->GetXOffset());
+  decision->set_position_y(stop_pt.y() + map_service_->GetYOffset());
+  decision->set_heading(stop_heading);
+
+  world_main_decision->set_position_x(decision->position_x());
+  world_main_decision->set_position_y(decision->position_y());
+  world_main_decision->set_heading(decision->heading());
+  world_main_decision->set_timestamp_sec(update_timestamp_sec);
+}
+
+template <typename MainDecision>
+void SimulationWorldService::UpdateMainChangeLaneDecision(
+    const MainDecision &decision, Object *world_main_decision) {
+  if (decision.has_change_lane_type() &&
+      (decision.change_lane_type() == apollo::routing::ChangeLaneType::LEFT ||
+       decision.change_lane_type() == apollo::routing::ChangeLaneType::RIGHT)) {
+    auto change_lane_decision = world_main_decision->add_decision();
+    change_lane_decision->set_change_lane_type(decision.change_lane_type());
+    change_lane_decision->set_position_x(
+        world_.auto_driving_car().position_x() + map_service_->GetXOffset());
+    change_lane_decision->set_position_y(
+        world_.auto_driving_car().position_y() + map_service_->GetYOffset());
+    change_lane_decision->set_heading(world_.auto_driving_car().heading());
+  }
 }
 
 bool SimulationWorldService::LocateMarker(
@@ -648,12 +671,17 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
     world_.set_speed_limit(main_decision.target_lane(0).speed_limit());
   }
 
-  // Update relevant main stop with reason.
-  world_.clear_main_stop();
+  // Update relevant main stop with reason and change lane.
+  world_.clear_main_decision();
+  Object *world_main_decision = world_.mutable_main_decision();
   if (main_decision.has_not_ready() || main_decision.has_estop() ||
       main_decision.has_stop()) {
-    Object *world_main_stop = world_.mutable_main_stop();
-    UpdateMainDecision(main_decision, header_time, world_main_stop);
+    UpdateMainStopDecision(main_decision, header_time, world_main_decision);
+  }
+  if (main_decision.has_stop()) {
+    UpdateMainChangeLaneDecision(main_decision.stop(), world_main_decision);
+  } else if (main_decision.has_cruise()) {
+    UpdateMainChangeLaneDecision(main_decision.cruise(), world_main_decision);
   }
 
   // Update obstacle decision.
