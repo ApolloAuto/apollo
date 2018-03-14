@@ -18,15 +18,13 @@
 #define MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
 
 #include "gflags/gflags.h"
-
+#include "modules/common/configs/config_gflags.h"
 DECLARE_string(perception_adapter_config_filename);
 
 /// lib/config_manager/config_manager.cc
 DECLARE_string(config_manager_path);
 DECLARE_string(work_root);
 
-/// enable low cost perception setup
-DECLARE_bool(is_lowcost);
 /// obstacle/base/object.cc
 DECLARE_bool(is_serialize_point_cloud);
 
