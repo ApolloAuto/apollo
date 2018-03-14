@@ -66,6 +66,22 @@ void HMI::RegisterMessageHandlers() {
         SendVehicleParam(conn);
       });
 
+  // HMI client sends voice data.
+  websocket_->RegisterMessageHandler(
+      "VoicePiece",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // json should contain {data: "<base64 encoded audio/wav piece>"}.
+        std::string data;
+        if (JsonUtil::GetStringFromJson(json, "data", &data)) {
+          VoiceDetectionRequest request;
+          request.set_id(reinterpret_cast<uint64_t>(conn));
+          request.set_wav_stream(apollo::common::util::Base64Decode(data));
+          AdapterManager::PublishVoiceDetectionRequest(request);
+        } else {
+          AERROR << "Truncated voice piece.";
+        }
+      });
+
   // HMI client asks for executing module command.
   websocket_->RegisterMessageHandler(
       "ExecuteModuleCommand",
@@ -202,6 +218,14 @@ void HMI::RegisterMessageHandlers() {
           HMIWorker::instance()->UpdateSystemStatus(system_status);
           BroadcastHMIStatus();
         }
+      });
+
+  // Received VoiceDetection response.
+  AdapterManager::AddVoiceDetectionResponseCallback(
+      [this](const VoiceDetectionResponse &response) {
+        AINFO << "Client " << response.id() << " triggered VoiceDetection: "
+              << HMIAction_Name(response.action());
+        HMIWorker::instance()->Trigger(response.action());
       });
 }
 
