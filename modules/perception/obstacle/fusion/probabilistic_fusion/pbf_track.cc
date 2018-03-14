@@ -18,6 +18,7 @@
 
 #include "boost/format.hpp"
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/macro.h"
 #include "modules/perception/common/geometry_util.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -26,8 +27,6 @@
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_imf_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
-
-DECLARE_bool(has_lidar);
 
 namespace apollo {
 namespace perception {
@@ -147,18 +146,24 @@ void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
   if (!is_dead_) {
     double time_diff = timestamp - fused_timestamp_;
     motion_fusion_->UpdateWithoutObject(time_diff);
-    if (FLAGS_has_lidar) {
+    if (FLAGS_use_navigation_mode) {
       PerformMotionCompensation(fused_object_, timestamp);
     }
     invisible_period_ = timestamp - fused_timestamp_;
   }
 }
 
-int PbfTrack::GetTrackId() const { return idx_; }
+int PbfTrack::GetTrackId() const {
+  return idx_;
+}
 
-PbfSensorObjectPtr PbfTrack::GetFusedObject() { return fused_object_; }
+PbfSensorObjectPtr PbfTrack::GetFusedObject() {
+  return fused_object_;
+}
 
-double PbfTrack::GetFusedTimestamp() const { return fused_timestamp_; }
+double PbfTrack::GetFusedTimestamp() const {
+  return fused_timestamp_;
+}
 
 PbfSensorObjectPtr PbfTrack::GetLidarObject(const std::string &sensor_id) {
   PbfSensorObjectPtr obj = nullptr;
