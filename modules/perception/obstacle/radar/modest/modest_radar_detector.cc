@@ -39,7 +39,7 @@ bool ModestRadarDetector::Init() {
     use_had_map_ = false;
   }
   if (!FLAGS_use_navigation_mode &&
-        !model_config->GetValue("use_had_map", &use_had_map_)) {
+      !model_config->GetValue("use_had_map", &use_had_map_)) {
     AERROR << "use_had_map not found.";
     return false;
   }

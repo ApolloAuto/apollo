@@ -135,7 +135,9 @@ cc_library(
     ],
     deps = [
         ":hdmapinput",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/configs:config_gflags",
         "//modules/common/time",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/fusion/probabilistic_fusion",

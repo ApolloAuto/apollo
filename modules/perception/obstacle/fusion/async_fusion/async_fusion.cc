@@ -256,7 +256,7 @@ void AsyncFusion::FuseForegroundObjects(
 
   // fixme:zhangweide only create new track if it is camera sensor
   if (is_camera(sensor_type)) {
-      CreateNewTracks(*foreground_objects, unassigned_objects);
+    CreateNewTracks(*foreground_objects, unassigned_objects);
   }
 }
 
