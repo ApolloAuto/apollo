@@ -9,6 +9,7 @@
 * Install tensorflow: `conda install tensorflow`
 * Install keras (version 1.2.2): `conda install -c conda-forge keras=1.2.2`
 * Install h5py: `conda install h5py`
+* Install protobuf: `conda install -c conda-forge protobuf`
 
 ### Procedure
 The following is the precedure to train the MLP model using the released demo data. For convenience, we denote `APOLLO` as the path of the local apollo repository, for example `/home/username/apollo`.
@@ -42,8 +43,10 @@ The following is the precedure to train the MLP model using the released demo da
 
 14. Exit dev docker
 
-15. Go to the folder `APOLLO/modules/tools/prediction/mlp_train/`, run the training model by `python mlp_train.py APOLLO/data/prediction/feature.0.label.h5`
+15. Go to the folder `APOLLO/modules/tools/prediction/mlp_train/proto/` run `protoc --python_out=./ fnn_model.proto` to generate fnn_model_pb2.py
 
-16. The model's evaluation report will be in the file `APOLLO/modules/tools/prediction/mlp_train/evaluation_report.log`.
+16. Go to the folder `APOLLO/modules/tools/prediction/mlp_train/`, run the training model by `python mlp_train.py APOLLO/data/prediction/feature.0.label.h5`
 
-17. The model will be stored in the binary file `APOLLO/modules/tools/prediction/mlp_train/mlp_model.bin`, which can replace the old model in `APOLLO/modules/prediction/data/mlp_vehicle_model.bin` if you think it is better.
+17. The model's evaluation report will be in the file `APOLLO/modules/tools/prediction/mlp_train/evaluation_report.log`.
+
+18. The model will be stored in the binary file `APOLLO/modules/tools/prediction/mlp_train/mlp_model.bin`, which can replace the old model in `APOLLO/modules/prediction/data/mlp_vehicle_model.bin` if you think it is better.
