@@ -73,7 +73,8 @@ bool ReorgFeatureExtractor::init(
 }
 
 bool ReorgFeatureExtractor::extract(std::vector<VisualObjectPtr> *objects) {
-  if (objects->size() == 0) {
+  CHECK_NOTNULL(objects);
+  if (objects->empty()) {
     return true;
   }
   if (!skip_reorg_) {
@@ -138,7 +139,8 @@ bool ROIPoolingFeatureExtractor::init(
 
 bool ROIPoolingFeatureExtractor::extract(
     std::vector<VisualObjectPtr> *objects) {
-  if (objects->size() == 0) {
+  CHECK_NOTNULL(objects);
+  if (objects->empty()) {
     return true;
   }
   rois_blob_.Reshape({static_cast<int>(objects->size()), 5});

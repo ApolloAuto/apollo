@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/camera/detector/common/util.h"
+#include "modules/perception/common/mem_util.h"
 
 namespace apollo {
 namespace perception {

@@ -22,8 +22,8 @@
 
 #include "caffe/caffe.hpp"
 
+#include "modules/perception/common/mem_util.h"
 #include "modules/perception/obstacle/camera/common/util.h"
-#include "modules/perception/obstacle/camera/detector/common/util.h"
 
 namespace apollo {
 namespace perception {
@@ -52,9 +52,8 @@ class CNNCaffe : public CNNAdapter {
 
   bool init(const std::vector<std::string> &input_names,
             const std::vector<std::string> &output_names,
-            const std::string &proto_file,
-            const std::string &weight_file, int gpu_id,
-            const std::string &model_root = "") override;
+            const std::string &proto_file, const std::string &weight_file,
+            int gpu_id, const std::string &model_root = "") override;
 
   void forward() override;
 
