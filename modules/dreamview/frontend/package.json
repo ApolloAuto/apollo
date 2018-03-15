@@ -19,6 +19,7 @@
         "imports-loader": "0.6.5",
         "mobx": "^3.1.10",
         "mobx-react": "^4.1.8",
+        "node-wav": "^0.0.2",
         "proj4": "^2.4.4",
         "protobufjs": "^6.8.4",
         "react": "^16.0.0",
@@ -27,6 +28,7 @@
         "react-rangeslider": "^2.2.0",
         "react-split-pane": "^0.1.66",
         "react-tabs": "^2.2.1",
+        "recorder-js": "^1.0.7",
         "stats.js": "^0.17.0",
         "three": "~0.84.0",
         "three-line-2d": "^1.1.6"
