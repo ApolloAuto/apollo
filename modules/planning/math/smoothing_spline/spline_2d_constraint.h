@@ -75,6 +75,10 @@ class Spline2dConstraint {
       const std::vector<double>& lateral_bound);
 
   bool AddPointConstraint(const double t, const double x, const double y);
+  bool AddPointSecondDerivativeConstraint(const double t, const double ddx,
+                                          const double ddy);
+  bool AddPointThirdDerivativeConstraint(const double t, const double dddx,
+                                         const double dddy);
   bool AddPointAngleConstraint(const double t, const double angle);
 
   // guarantee upto values are joint
@@ -95,11 +99,6 @@ class Spline2dConstraint {
   const AffineConstraint& inequality_constraint() const;
   const AffineConstraint& equality_constraint() const;
 
-  bool AddPointSecondDerivativeConstraint(const double t, const double ddx,
-                                          const double ddy);
-  bool AddPointThirdDerivativeConstraint(const double t, const double ddx,
-                                         const double ddy);
-
  private:
   uint32_t FindIndex(const double t) const;
   std::vector<double> AffineCoef(const double angle, const double t) const;
@@ -115,6 +114,9 @@ class Spline2dConstraint {
   std::vector<double> ThirdDerivativeCoef(const double t) const;
   double SignDistance(const apollo::common::math::Vec2d& xy_point,
                       const double angle) const;
+  bool AddPointKthOrderDerivativeConstraint(
+      const double t, const double x_kth_derivative,
+      const double y_kth_derivative, const std::vector<double>& kth_coeff);
 
  private:
   AffineConstraint inequality_constraint_;
