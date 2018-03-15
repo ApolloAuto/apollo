@@ -155,6 +155,9 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
     prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
     if (obstacle != nullptr) {
+      if (obstacle->IsStill()) {
+        predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
+      }
       switch (perception_obstacle.type()) {
         case PerceptionObstacle::VEHICLE: {
           if (obstacle->IsOnLane()) {
