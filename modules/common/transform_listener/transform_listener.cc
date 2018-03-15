@@ -19,7 +19,7 @@
 #include <functional>
 
 #include "modules/common/log.h"
-#include "modules/common/time/clock.h"
+#include "modules/common/time/time.h"
 
 namespace apollo {
 namespace common {

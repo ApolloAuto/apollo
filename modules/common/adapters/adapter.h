@@ -36,7 +36,7 @@
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/proto/header.pb.h"
-#include "modules/common/time/clock.h"
+#include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
