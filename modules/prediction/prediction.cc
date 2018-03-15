@@ -20,7 +20,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/time/clock.h"
+#include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/map/relative_map/relative_map.h"
 #include "modules/prediction/common/feature_output.h"
