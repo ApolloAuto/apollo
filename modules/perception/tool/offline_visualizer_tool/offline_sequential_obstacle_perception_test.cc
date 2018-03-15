@@ -25,7 +25,7 @@
 #include "modules/common/util/file.h"
 #include "modules/perception/common/file_system_util.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/base/timer.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/onboard/obstacle_perception.h"
 

@@ -31,7 +31,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {

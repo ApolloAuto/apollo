@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_LIB_BASE_TIMER_H_
-#define MODULES_PERCEPTION_LIB_BASE_TIMER_H_
+#ifndef MODULES_COMMON_TIME_TIMER_H_
+#define MODULES_COMMON_TIME_TIMER_H_
 
 #include <stdint.h>
 #include <chrono>
@@ -24,7 +24,8 @@
 #include "modules/common/macro.h"
 
 namespace apollo {
-namespace perception {
+namespace common {
+namespace time {
 
 using TimePoint = std::chrono::system_clock::time_point;
 
@@ -51,13 +52,9 @@ class Timer {
 
 class TimerWrapper {
  public:
-  explicit TimerWrapper(const std::string &msg) : msg_(msg) {
-    timer_.Start();
-  }
+  explicit TimerWrapper(const std::string &msg) : msg_(msg) { timer_.Start(); }
 
-  ~TimerWrapper() {
-    timer_.End(msg_);
-  }
+  ~TimerWrapper() { timer_.End(msg_); }
 
  private:
   Timer timer_;
@@ -66,16 +63,17 @@ class TimerWrapper {
   DISALLOW_COPY_AND_ASSIGN(TimerWrapper);
 };
 
-}  // namespace perception
+}  // namespace time
+}  // namespace common
 }  // namespace apollo
 
 #define PERF_FUNCTION(function_name) \
-  apollo::perception::TimerWrapper _timer_wrapper_(function_name)
+  apollo::common::time::TimerWrapper _timer_wrapper_(function_name)
 
-#define PERF_BLOCK_START()           \
-  apollo::perception::Timer _timer_; \
+#define PERF_BLOCK_START()             \
+  apollo::common::time::Timer _timer_; \
   _timer_.Start()
 
 #define PERF_BLOCK_END(msg) _timer_.End(msg)
 
-#endif  // MODULES_PERCEPTION_LIB_BASE_TIMER_H_
+#endif  // MODULES_COMMON_TIME_TIMER_H_

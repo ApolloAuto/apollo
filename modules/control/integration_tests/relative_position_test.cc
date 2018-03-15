@@ -23,7 +23,7 @@
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
 
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/common/util/util.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/integration_tests/control_test_base.h"
