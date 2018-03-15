@@ -596,7 +596,7 @@ void SimulationWorldService::UpdateMainChangeLaneDecision(
   if (decision.has_change_lane_type() &&
       (decision.change_lane_type() == apollo::routing::ChangeLaneType::LEFT ||
        decision.change_lane_type() == apollo::routing::ChangeLaneType::RIGHT)) {
-    auto change_lane_decision = world_main_decision->add_decision();
+    auto *change_lane_decision = world_main_decision->add_decision();
     change_lane_decision->set_change_lane_type(decision.change_lane_type());
     change_lane_decision->set_position_x(
         world_.auto_driving_car().position_x() + map_service_->GetXOffset());
@@ -664,7 +664,7 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   UpdateTurnSignal(decision_res.vehicle_signal(),
                    world_.mutable_auto_driving_car());
 
-  apollo::planning::MainDecision main_decision = decision_res.main_decision();
+  const auto &main_decision = decision_res.main_decision();
 
   // Update speed limit.
   if (main_decision.target_lane_size() > 0) {
