@@ -14,10 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 
+/**
+ * @file
+ * @brief Defines a KalmanFilter1D class.
+ */
+
+#ifndef MODULES_COMMON_MATH_KALMAN_FILTER_1D_H_
+#define MODULES_COMMON_MATH_KALMAN_FILTER_1D_H_
+
 // 1 dimensional constant velocity kalman filter
 
 #include "Eigen/Core"
 #include "Eigen/Dense"
+
+namespace apollo {
+namespace common {
+namespace math {
 
 class KalmanFilter1D {
  public:
@@ -41,3 +53,9 @@ class KalmanFilter1D {
   Eigen::Matrix<float, 1, 1> S_;
   Eigen::Matrix<float, 2, 1> K_;
 };
+
+}  // namespace math
+}  // namespace common
+}  // namespace apollo
+
+#endif  // MODULES_COMMON_MATH_KALMAN_FILTER_1D_H_
