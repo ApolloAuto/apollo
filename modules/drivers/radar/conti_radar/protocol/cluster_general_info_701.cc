@@ -18,7 +18,7 @@
 
 #include "glog/logging.h"
 
-#include "modules/common/time/clock.h"
+#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 #include "modules/drivers/radar/conti_radar/protocol/const_vars.h"

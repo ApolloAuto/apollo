@@ -16,7 +16,7 @@ limitations under the License.
 #include "modules/map/hdmap/hdmap_util.h"
 
 #include "gtest/gtest.h"
-#include "modules/common/time/clock.h"
+#include "modules/common/time/time.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 
