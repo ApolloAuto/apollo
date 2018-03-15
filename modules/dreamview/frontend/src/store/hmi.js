@@ -30,7 +30,7 @@ export default class HMI {
     displayName = {};
     utmZoneId = 10;
 
-    @observable dockerImage = ''
+    @observable dockerImage = 'unknown';
 
     @action initialize(config) {
         if (config.dockerImage) {
