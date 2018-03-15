@@ -15,6 +15,7 @@ proto_library(
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
         "//modules/planning/proto:planning_internal_proto_lib",
+        "//modules/routing/proto:routing_proto_lib",
     ],
 )
 
