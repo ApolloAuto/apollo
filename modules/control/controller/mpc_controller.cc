@@ -88,7 +88,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   wheelbase_ = vehicle_param.wheel_base();
   steer_transmission_ratio_ = vehicle_param.steer_ratio();
   steer_single_direction_max_degree_ =
-      vehicle_param.max_steer_angle() / M_PI * 180;
+      vehicle_param.max_steer_angle() / steer_transmission_ratio_ / 180 * M_PI;
   max_lat_acc_ = control_conf->mpc_controller_conf().max_lateral_acceleration();
   max_acceleration_ = vehicle_param.max_acceleration();
   max_deceleration_ = vehicle_param.max_deceleration();
