@@ -254,7 +254,10 @@ void AsyncFusion::FuseForegroundObjects(
   UpdateUnassignedTracks(&tracks, unassigned_tracks, track2measurements_dist,
                          sensor_type, sensor_id, timestamp);
 
-  CreateNewTracks(*foreground_objects, unassigned_objects);
+  // fixme:zhangweide only create new track if it is camera sensor
+  if (is_camera(sensor_type)) {
+      CreateNewTracks(*foreground_objects, unassigned_objects);
+  }
 }
 
 }  // namespace perception
