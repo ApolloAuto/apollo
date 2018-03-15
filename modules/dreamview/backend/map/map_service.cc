@@ -105,6 +105,8 @@ void ExtractRoadAndLaneIds(const std::vector<LaneInfoConstPtr> &lanes,
 
 }  // namespace
 
+const char MapService::kMetaFileName[] = "/metaInfo.json";
+
 MapService::MapService(bool use_sim_map) : use_sim_map_(use_sim_map) {
   ReloadMap(false);
 }
@@ -132,9 +134,9 @@ bool MapService::ReloadMap(bool force_reload) {
 void MapService::UpdateOffsets() {
   x_offset_ = 0.0;
   y_offset_ = 0.0;
-  std::ifstream ifs(FLAGS_map_dir + meta_filename_);
+  std::ifstream ifs(FLAGS_map_dir + kMetaFileName);
   if (!ifs.is_open()) {
-    AINFO << "Failed to open map meta file: " << meta_filename_;
+    AINFO << "Failed to open map meta file: " << kMetaFileName;
   } else {
     nlohmann::json json;
     ifs >> json;
