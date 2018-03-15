@@ -243,14 +243,18 @@ bool Spline2dConstraint::AddPointConstraint(const double t, const double x,
 bool Spline2dConstraint::AddPointSecondDerivativeConstraint(const double t,
                                                             const double ddx,
                                                             const double ddy) {
-  std::vector<double> coef = SecondDerivativeCoef(t);
+  const std::size_t index = FindIndex(t);
+  const double rel_t = t - t_knots_[index];
+  std::vector<double> coef = SecondDerivativeCoef(rel_t);
   return AddPointKthOrderDerivativeConstraint(t, ddx, ddy, coef);
 }
 
 bool Spline2dConstraint::AddPointThirdDerivativeConstraint(const double t,
                                                            const double dddx,
                                                            const double dddy) {
-  std::vector<double> coef = ThirdDerivativeCoef(t);
+  const std::size_t index = FindIndex(t);
+  const double rel_t = t - t_knots_[index];
+  std::vector<double> coef = ThirdDerivativeCoef(rel_t);
   return AddPointKthOrderDerivativeConstraint(t, dddx, dddy, coef);
 }
 
@@ -263,10 +267,9 @@ bool Spline2dConstraint::AddPointKthOrderDerivativeConstraint(
   affine_boundary << x_kth_derivative, y_kth_derivative;
   const std::size_t index = FindIndex(t);
   const std::size_t index_offset = index * 2 * num_params;
-  const double rel_t = t - t_knots_[index];
   for (std::size_t i = 0; i < num_params; ++i) {
-    affine_equality(0, i + index_offset) = coef[rel_t];
-    affine_equality(1, i + num_params + index_offset) = coef[rel_t];
+    affine_equality(0, i + index_offset) = coef[i];
+    affine_equality(1, i + num_params + index_offset) = coef[i];
   }
   return AddEqualityConstraint(affine_equality, affine_boundary);
 }
