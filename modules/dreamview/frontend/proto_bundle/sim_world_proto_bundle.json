@@ -735,6 +735,15 @@
                 }
               }
             },
+            "Polygon": {
+              "fields": {
+                "point": {
+                  "rule": "repeated",
+                  "type": "Point3D",
+                  "id": 1
+                }
+              }
+            },
             "Header": {
               "fields": {
                 "timestampSec": {
