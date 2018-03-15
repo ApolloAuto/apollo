@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "modules/dreamview/backend/handlers/websocket.h"
+#include "modules/dreamview/backend/handlers/websocket_handler.h"
 
 #include <utility>
 #include <vector>
