@@ -1,21 +1,38 @@
 import React from 'react';
 import { inject, observer } from "mobx-react";
 import Recorder from "recorder-js";
-import Wav from "node-wav";
 
 import STORE from "store";
 import WS from "store/websocket";
 
 // Utils.
-function Downsample(buffer, in_sample_rate, out_sample_rate) {
+function PCM16Encode(channel) {
+    const kBitDepth = 16;
+
+    const samples = channel.length;
+    const buffer = new ArrayBuffer(samples * (kBitDepth >> 3));
+    const output = new Int16Array(buffer, 0);
+    let pos = 0;
+    for (let i = 0; i < samples; ++i) {
+        let v = Math.max(-1, Math.min(channel[i], 1));
+        v = ((v < 0) ? v * 32768 : v * 32767) | 0;
+        output[pos++] = v;
+    }
+    return Buffer(buffer);
+}
+
+function Downsample(buffer, in_sample_rate) {
+    // TODO(xiaoxq): Get updated from HMIConfig.
+    const kOutSampleRate = 16000;
+
     const Average = arr => arr.reduce( ( p, c ) => p + c, 0 ) / arr.length;
-    if (in_sample_rate === out_sample_rate) {
+    if (in_sample_rate === kOutSampleRate) {
         return buffer;
-    } else if (in_sample_rate < out_sample_rate) {
+    } else if (in_sample_rate < kOutSampleRate) {
         throw "Cannot increase sample rate.";
     }
 
-    const sample_ratio = in_sample_rate / out_sample_rate;
+    const sample_ratio = in_sample_rate / kOutSampleRate;
     const new_len = Math.round(buffer.length / sample_ratio);
     const result = new Float32Array(new_len);
 
@@ -35,12 +52,6 @@ export default class VoiceCommand extends React.Component {
         this.handleError = this.handleError.bind(this);
         this.handleStart = this.handleStart.bind(this);
         this.handleStop = this.handleStop.bind(this);
-        // TODO(xiaoxq): Get updated from HMIConfig.
-        this.audio_capturing_conf = {
-            channels: 1,
-            sample_rate: 16000,
-            bit_depth: 16,
-        };
     }
 
     componentWillMount() {
@@ -70,15 +81,8 @@ export default class VoiceCommand extends React.Component {
             this.recorder.stop().then(
                 ({blob, buffer}) => {
                     const downsampled = Downsample(
-                        buffer[0],
-                        this.audio_context.sampleRate,
-                        this.audio_capturing_conf.sample_rate);
-                    const wav = Wav.encode([downsampled], {
-                        sampleRate: this.audio_capturing_conf.sample_rate,
-                        bitsPerSample: this.audio_capturing_conf.bits_per_sample,
-                    });
-                    const WAV_HEADER_LEN = 44;
-                    WS.sendVoicePiece(wav.slice(WAV_HEADER_LEN));
+                        buffer[0], this.audio_context.sampleRate);
+                    WS.sendVoicePiece(PCM16Encode(downsampled));
                     // Start next cycle.
                     this.recorder.start();
                 }
