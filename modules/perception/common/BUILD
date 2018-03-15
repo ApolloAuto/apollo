@@ -19,8 +19,8 @@ cc_library(
     deps = [
         ":pcl_util",
         "//modules/common",
-        "//modules/common/math:math_utils",
         "//modules/common/configs:config_gflags",
+        "//modules/common/math:math_utils",
         "@eigen",
     ],
 )
@@ -31,6 +31,36 @@ cc_library(
     hdrs = ["pcl_types.h"],
     deps = [
         "@pcl",
+    ],
+)
+
+cc_library(
+    name = "convex_hullxy",
+    srcs = [],
+    hdrs = ["convex_hullxy.h"],
+    linkopts = [
+        "-lqhull",
+    ],
+    deps = [
+        "@pcl",
+    ],
+)
+
+cc_test(
+    name = "convex_hullxy_test",
+    size = "small",
+    srcs = [
+        "convex_hullxy_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+    ],
+    deps = [
+        ":convex_hullxy",
+        ":pcl_util",
+        "//modules/common:log",
+        "@eigen",
+        "@gtest//:main",
     ],
 )
 

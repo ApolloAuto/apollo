@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/common/convex_hullxy.h"
+#include "modules/perception/common/convex_hullxy.h"
 
-#include <boost/algorithm/string.hpp>
 #include <fstream>
 
+#include "boost/algorithm/string.hpp"
 #include "gtest/gtest.h"
+
 #include "modules/common/log.h"
 #include "modules/perception/common/pcl_types.h"
 

@@ -19,9 +19,9 @@
 #include <limits>
 #include <vector>
 
+#include "modules/perception/common/convex_hullxy.h"
 #include "modules/perception/common/geometry_util.h"
 #include "modules/perception/common/pcl_types.h"
-#include "modules/perception/obstacle/common/convex_hullxy.h"
 
 namespace apollo {
 namespace perception {
@@ -33,7 +33,7 @@ const float EPSILON = 1e-6;
 
 bool MinBoxObjectBuilder::Build(const ObjectBuilderOptions& options,
                                 std::vector<ObjectPtr>* objects) {
-  if (objects == NULL) {
+  if (objects == nullptr) {
     return false;
   }
 
