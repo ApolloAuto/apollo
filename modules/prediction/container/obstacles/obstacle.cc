@@ -101,6 +101,13 @@ const KalmanFilter<double, 2, 2, 4>& Obstacle::kf_pedestrian_tracker() const {
   return kf_pedestrian_tracker_;
 }
 
+bool Obstacle::IsStill() {
+  if (feature_history_.size() > 0) {
+    return feature_history_.front().is_still();
+  }
+  return true;
+}
+
 bool Obstacle::IsOnLane() {
   if (feature_history_.size() > 0) {
     if (feature_history_.front().has_lane() &&
