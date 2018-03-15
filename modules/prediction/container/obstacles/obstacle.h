@@ -135,6 +135,12 @@ class Obstacle {
       const;
 
   /**
+   * @brief Check if the obstacle is still.
+   * @return If the obstacle is still.
+   */
+  bool IsStill();
+
+  /**
    * @brief Check if the obstacle is on any lane.
    * @return If the obstacle is on any lane.
    */
