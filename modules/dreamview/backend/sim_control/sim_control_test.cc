@@ -22,7 +22,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "modules/common/time/clock.h"
+#include "modules/common/time/time.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"

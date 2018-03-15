@@ -28,7 +28,7 @@
 #include "IpIpoptApplication.hpp"
 #include "IpSolveStatistics.hpp"
 
-#include "modules/common/time/clock.h"
+#include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_spiral_path.h"
 #include "modules/planning/reference_line/spiral_problem_interface.h"

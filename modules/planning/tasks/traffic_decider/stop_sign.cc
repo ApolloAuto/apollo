@@ -24,7 +24,7 @@
 #include <limits>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/time/clock.h"
+#include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_common.h"

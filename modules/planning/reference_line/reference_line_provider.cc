@@ -26,7 +26,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/time/clock.h"
+#include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"

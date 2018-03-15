@@ -18,7 +18,7 @@
 #include <string>
 
 #include "modules/common/log.h"
-#include "modules/common/time/clock.h"
+#include "modules/common/time/time.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/common/time/timer.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
