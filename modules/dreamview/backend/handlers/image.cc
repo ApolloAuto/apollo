@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/perception/traffic_light/util/color_space.h"
 
 #include "opencv2/opencv.hpp"

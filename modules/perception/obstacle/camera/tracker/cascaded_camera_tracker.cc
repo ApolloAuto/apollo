@@ -112,7 +112,5 @@ std::string CascadedCameraTracker::Name() const {
   return "CascadedCameraTracker";
 }
 
-REGISTER_CAMERA_TRACKER(CascadedCameraTracker);
-
 }  // namespace perception
 }  // namespace apollo

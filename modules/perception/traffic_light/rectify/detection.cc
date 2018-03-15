@@ -18,12 +18,14 @@
 #include <algorithm>
 
 #include "modules/common/log.h"
-#include "modules/perception/lib/base/timer.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/traffic_light/base/utils.h"
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
+
+using apollo::common::time::Timer;
 
 void Detection::Perform(const cv::Mat &ros_image,
                         std::vector<LightPtr> *lights) {

@@ -34,6 +34,36 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "convex_hullxy",
+    srcs = [],
+    hdrs = ["convex_hullxy.h"],
+    linkopts = [
+        "-lqhull",
+    ],
+    deps = [
+        "@pcl",
+    ],
+)
+
+cc_test(
+    name = "convex_hullxy_test",
+    size = "small",
+    srcs = [
+        "convex_hullxy_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+    ],
+    deps = [
+        ":convex_hullxy",
+        ":pcl_util",
+        "//modules/common:log",
+        "@eigen",
+        "@gtest//:main",
+    ],
+)
+
 cc_test(
     name = "common_test",
     size = "small",

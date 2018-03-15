@@ -136,8 +136,6 @@ void GLFusionVisualizer::update_camera_system(FrameContent *content) {
   }
 }
 
-REGISTER_VISUALIZER(GLFusionVisualizer);
-
 }  // namespace lowcostvisualizer
 }  // namespace perception
 }  // namespace apollo

@@ -29,7 +29,7 @@
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/mpc_solver.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/common/util/string_util.h"
 #include "modules/control/common/control_gflags.h"
 

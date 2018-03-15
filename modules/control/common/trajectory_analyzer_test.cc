@@ -21,7 +21,7 @@
 
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;

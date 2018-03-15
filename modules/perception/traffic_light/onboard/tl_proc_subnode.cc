@@ -18,8 +18,8 @@
 #include <algorithm>
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/base/timer.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
 #include "modules/perception/traffic_light/base/utils.h"
@@ -41,6 +41,7 @@ namespace traffic_light {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::time::Timer;
 using apollo::common::adapter::AdapterManager;
 
 namespace {

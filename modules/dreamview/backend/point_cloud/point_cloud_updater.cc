@@ -18,7 +18,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "pcl/filters/voxel_grid.h"
 #include "pcl/point_cloud.h"

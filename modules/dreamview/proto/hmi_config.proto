@@ -14,32 +14,11 @@ message Mode {
   repeated string live_hardware = 2;
 }
 
-enum HMIAction {
-  SETUP = 0;
-  AUTO_MODE = 1;
-  DISENGAGE = 2;
-}
-
-message VoiceCommand {
-  message SnowboyModel {
-    optional string path = 1;
-
-    message Hotword {
-      optional string word = 1;
-      optional HMIAction action = 2;
-      optional float sensitivity = 3 [default = 0.75];
-      optional string response_message = 4;
-    }
-    repeated Hotword hotwords = 2;
-  }
-
-  optional string snowboy_resource = 1;
-  repeated SnowboyModel snowboy_models = 2;
-
-  // Required settings for audio input. Get from the Snowboy detector.
-  optional int32 channels = 3;  // E.g.: 1
-  optional int32 sample_rate = 4;  // E.g.: 16000
-  optional int32 bits_per_sample = 5;  // E.g.: 16
+message AudioCapturingConfig {
+  // Currently we only support single channel.
+  optional int32 channels = 1 [default = 1];
+  optional int32 sample_rate = 2;
+  optional int32 bits_per_sample = 3;
 }
 
 message HMIConfig {
@@ -51,7 +30,7 @@ message HMIConfig {
   map<string, string> available_vehicles = 6;  // {vehicle_name: vehicle_dir}
   map<string, Mode> modes = 7;                 // {mode_name: mode_config}
   optional int32 utm_zone_id = 8;              // FLAGS_local_utm_zone_id
-  optional VoiceCommand voice_command = 9;
+  optional AudioCapturingConfig audio_capturing_conf = 9;
 }
 
 message VehicleData {

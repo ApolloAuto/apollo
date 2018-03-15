@@ -28,7 +28,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 
 // gflags
 DEFINE_double(throttle_inc_delta, 2.0,

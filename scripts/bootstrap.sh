@@ -37,6 +37,7 @@ function start() {
     # Start monitor.
     supervisorctl start monitor > /dev/null
     # Start dreamview.
+    bash scripts/voice_detector.sh start
     supervisorctl start dreamview > /dev/null
     echo "Dreamview is running at http://localhost:8888"
 }
@@ -44,6 +45,7 @@ function start() {
 function stop() {
     # Stop modules in reverse order of the starting procedure.
     supervisorctl stop dreamview
+    bash scripts/voice_detector.sh stop
     supervisorctl stop monitor
     source scripts/roscore.sh stop
 }

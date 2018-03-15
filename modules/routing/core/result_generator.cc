@@ -24,7 +24,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/common/util/map_util.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/node_with_range.h"

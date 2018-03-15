@@ -31,6 +31,7 @@ cc_library(
         "@eigen",
         "@glew",
         "@glfw",
+        "@opengl"
     ],
 )
 

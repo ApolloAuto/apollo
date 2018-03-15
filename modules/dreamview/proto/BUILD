@@ -57,3 +57,15 @@ proto_library(
         "//modules/monitor/proto:system_status_proto_lib",
     ],
 )
+
+cc_proto_library(
+    name = "voice_detection_proto",
+    deps = [
+        ":voice_detection_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "voice_detection_proto_lib",
+    srcs = ["voice_detection.proto"],
+)
