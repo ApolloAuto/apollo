@@ -7,6 +7,10 @@ data_files {
   dest_path: "modules/control/conf/lincoln.pb.txt"
 }
 data_files {
+  source_path: "navigation_lincoln.pb.txt"
+  dest_path: "modules/control/conf/navigation_lincoln.pb.txt"
+}
+data_files {
   source_path: "start_velodyne.launch"
   dest_path: "<ros>/share/velodyne/launch/start_velodyne.launch"
 }
