@@ -124,7 +124,7 @@ message ADCTrajectory {
     repeated apollo.common.Polygon region = 1;
   }
 
-  // critial region will be empty is planning is NOT sure which region is critical
+  // critial region will be empty when planning is NOT sure which region is critical
   // critial regions may or may not overlap
   optional CriticalRegion critical_region = 20;
 }
