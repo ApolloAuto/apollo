@@ -21,14 +21,14 @@ class SideBarSubButton extends React.Component {
 
 export default class ButtonPanel extends React.Component {
     render() {
-        const { enablePOI, onPOI, showPOI } = this.props;
+        const { enablePanel, onPanel, showPanel, panelLabel } = this.props;
 
         return (
             <div>
-                <SideBarSubButton label="Default Routing"
-                               disabled={!enablePOI}
-                               onClick={onPOI}
-                               active={showPOI} />
+                <SideBarSubButton label={panelLabel}
+                               disabled={!enablePanel}
+                               onClick={onPanel}
+                               active={showPanel} />
             </div>
         );
     }

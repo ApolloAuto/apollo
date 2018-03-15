@@ -243,6 +243,13 @@ export default class RosWebSocketEndpoint {
         }));
     }
 
+    sendVoicePiece(data) {
+        this.websocket.send(JSON.stringify({
+            type: "VoicePiece",
+            data: btoa(String.fromCharCode(...data)),
+        }));
+    }
+
     toggleSimControl(enable) {
         this.websocket.send(JSON.stringify({
             type: "ToggleSimControl",
