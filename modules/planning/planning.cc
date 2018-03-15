@@ -23,7 +23,7 @@
 #include "google/protobuf/repeated_field.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"

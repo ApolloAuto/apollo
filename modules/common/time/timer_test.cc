@@ -14,32 +14,45 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/lib/base/timer.h"
+#include "modules/common/time/timer.h"
 
+#include <unistd.h>
+
+#include "gtest/gtest.h"
 #include "modules/common/log.h"
 
 namespace apollo {
-namespace perception {
+namespace common {
+namespace time {
 
-using std::string;
-using std::chrono::duration_cast;
-using std::chrono::milliseconds;
-
-void Timer::Start() {
-  start_time_ = std::chrono::system_clock::now();
+TEST(TimeTest, test_timer) {
+  Timer timer;
+  timer.Start();
+  usleep(100000);
+  uint64_t elapsed_time = timer.End("TimerTest");
+  EXPECT_TRUE(elapsed_time >= 99 && elapsed_time <= 101);
 }
 
-uint64_t Timer::End(const string &msg) {
-  end_time_ = std::chrono::system_clock::now();
-  uint64_t elapsed_time =
-      duration_cast<milliseconds>(end_time_ - start_time_).count();
-
-  ADEBUG << "TIMER " << msg << " elapsed_time: " << elapsed_time << " ms";
-
-  // start new timer.
-  start_time_ = end_time_;
-  return elapsed_time;
+TEST(TimerWrapperTest, test) {
+  TimerWrapper wrapper("TimerWrapperTest");
+  usleep(200000);
 }
 
-}  // namespace perception
+TEST(PerfFunctionTest, test) {
+  PERF_FUNCTION("FunctionTest");
+  usleep(100000);
+}
+
+TEST(PerfBlockTest, test) {
+  PERF_BLOCK_START();
+  // do somethings.
+  usleep(100000);
+  PERF_BLOCK_END("BLOCK1");
+
+  usleep(200000);
+  PERF_BLOCK_END("BLOCK2");
+}
+
+}  // namespace time
+}  // namespace common
 }  // namespace apollo

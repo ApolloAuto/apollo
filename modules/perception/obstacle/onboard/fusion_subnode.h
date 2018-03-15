@@ -26,7 +26,7 @@
 #include "modules/common/log.h"
 #include "modules/common/time/time_util.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/base/timer.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"

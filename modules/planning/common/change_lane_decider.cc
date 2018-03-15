@@ -20,7 +20,7 @@
 
 #include "modules/planning/common/change_lane_decider.h"
 
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 
