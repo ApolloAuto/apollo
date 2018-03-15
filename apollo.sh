@@ -236,7 +236,8 @@ function release() {
   # modules data and conf
   CONFS=$(find modules/ -name "conf")
   DATAS=$(find modules/ -name "data")
-  OTHER=(modules/tools)
+  OTHER=("modules/tools"
+         "modules/perception/model")
   rm -rf test/*
   for conf in $CONFS; do
     mkdir -p $APOLLO_RELEASE_DIR/$conf
@@ -249,7 +250,7 @@ function release() {
     fi
   done
   # Other
-  for path in $OTHER; do
+  for path in "${OTHER[@]}"; do
     mkdir -p $APOLLO_RELEASE_DIR/$path
     rsync -a $path/* $APOLLO_RELEASE_DIR/$path
   done
