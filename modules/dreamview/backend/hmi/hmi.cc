@@ -223,8 +223,9 @@ void HMI::RegisterMessageHandlers() {
   // Received VoiceDetection response.
   AdapterManager::AddVoiceDetectionResponseCallback(
       [this](const VoiceDetectionResponse &response) {
-        AINFO << "Client " << response.id() << " triggered VoiceDetection: "
-              << HMIAction_Name(response.action());
+        apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
+        log_buffer.INFO() << "Triggered action by voice: "
+                          << HMIAction_Name(response.action());
         HMIWorker::instance()->Trigger(response.action());
       });
 }
