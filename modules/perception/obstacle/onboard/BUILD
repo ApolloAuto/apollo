@@ -116,6 +116,7 @@ cc_library(
         "//modules/perception/obstacle/camera/filter",
         "//modules/perception/obstacle/camera/tracker",
         "//modules/perception/obstacle/camera/transformer",
+        "//modules/perception/obstacle/camera/dummy",
         "//modules/perception/onboard",
         "@eigen",
         "@opencv2//:core",

@@ -73,6 +73,8 @@ class CascadedCameraTracker : public BaseCameraTracker {
   DISALLOW_COPY_AND_ASSIGN(CascadedCameraTracker);
 };
 
+REGISTER_CAMERA_TRACKER(CascadedCameraTracker);
+
 }  // namespace perception
 }  // namespace apollo
 

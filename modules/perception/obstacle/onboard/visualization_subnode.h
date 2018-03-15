@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
+#include "modules/perception/obstacle/camera/visualizer/gl_fusion_visualizer.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
@@ -31,6 +32,7 @@
 
 namespace apollo {
 namespace perception {
+namespace lowcostvisualizer {
 
 class VisualizationSubnode : public Subnode {
  public:
@@ -78,6 +80,9 @@ class VisualizationSubnode : public Subnode {
   DISALLOW_COPY_AND_ASSIGN(VisualizationSubnode);
 };
 
+REGISTER_SUBNODE(VisualizationSubnode);
+
+}  // namespace lowcostvisualizer
 }  // namespace perception
 }  // namespace apollo
 
