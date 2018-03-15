@@ -20,7 +20,7 @@
 
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/common/util/file.h"
 
 namespace apollo {

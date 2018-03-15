@@ -18,7 +18,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {

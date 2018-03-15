@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "modules/perception/lib/base/mutex.h"
-#include "modules/perception/lib/base/timer.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/image_lights.h"

@@ -24,7 +24,7 @@
 
 #include "modules/planning/proto/planning_status.pb.h"
 
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
