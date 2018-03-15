@@ -159,11 +159,11 @@ class SmootherUtil {
       anchor.longitudinal_bound = FLAGS_longitudinal_bound;
       anchor_points.emplace_back(anchor);
     }
-    anchor_points.front().longitudinal_bound = 1e-6;
-    anchor_points.front().lateral_bound = 1e-6;
+    anchor_points.front().longitudinal_bound = 0;
+    anchor_points.front().lateral_bound = 0;
     anchor_points.front().enforced = true;
-    anchor_points.back().longitudinal_bound = 1e-6;
-    anchor_points.back().lateral_bound = 1e-6;
+    anchor_points.back().longitudinal_bound = 0;
+    anchor_points.back().lateral_bound = 0;
     anchor_points.back().enforced = true;
     return anchor_points;
   }
