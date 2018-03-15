@@ -116,13 +116,16 @@ body {
         }
     }
 
-    .selector {
+
+    .header-item {
         flex: 0 0 auto;
 
         position: relative;
         margin: 5px;
         border: 1px solid #383838;
+    }
 
+    .selector {
         select {
             display: block;
 
@@ -163,6 +166,13 @@ body {
             content: '';
             pointer-events: none;
         }
+    }
+
+    .header-button {
+        padding: 0.5em 3em 0.5em 3em;
+        background: #181818;
+        color: #ffffff;
+        text-align: center;
     }
 }
 
