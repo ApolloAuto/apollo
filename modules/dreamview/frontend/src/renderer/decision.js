@@ -91,14 +91,11 @@ export default class Decision {
 
     updateMainDecision(world, coordinates, scene) {
         const worldMainDecision = world.mainDecision ? world.mainDecision : world.mainStop;
-        if (!STORE.options.showDecisionMain || _.isEmpty(worldMainDecision)) {
-            for (const type in this.mainDecision) {
-                this.mainDecision[type].visible = false;
-            }
-        } else {
-            for (const type in this.mainDecision) {
-                this.mainDecision[type].visible = true;
-            }
+        for (const type in this.mainDecision) {
+            this.mainDecision[type].visible = false;
+        }
+
+        if (STORE.options.showDecisionMain && !_.isEmpty(worldMainDecision)) {
             if (!this.mainDecisionAddedToScene) {
                 for (const type in this.mainDecision) {
                     scene.add(this.mainDecision[type]);
@@ -140,6 +137,7 @@ export default class Decision {
                     this.mainDecision["STOP"].position.set(position.x, position.y, position.z);
                     this.mainDecision["STOP"].rotation.set(Math.PI / 2, heading - Math.PI / 2, 0);
                     this.mainDecision["STOP"][mainStopReason].visible = true;
+                    this.mainDecision["STOP"].visible = true;
                 }
 
                 const changeLaneType = _.attempt(() => decision.changeLaneType);
@@ -149,6 +147,7 @@ export default class Decision {
                     this.mainDecision["CHANGE_LANE"].rotation.set(
                         Math.PI / 2, heading - Math.PI / 2, 0);
                     this.mainDecision["CHANGE_LANE"][changeLaneType].visible = true;
+                    this.mainDecision["CHANGE_LANE"].visible = true;
                 }
             }
         }
