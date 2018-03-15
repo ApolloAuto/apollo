@@ -73,6 +73,7 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
   auto first_point = reference_points_.front();
   common::SLPoint first_sl;
   if (!other.XYToSL(first_point, &first_sl)) {
+    AWARN << "failed to project the first point to the other reference line";
     return false;
   }
   constexpr double kStitchingError = 2e-2;
@@ -81,6 +82,7 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
   auto last_point = reference_points_.back();
   common::SLPoint last_sl;
   if (!other.XYToSL(last_point, &last_sl)) {
+    AWARN << "failed to project the last point to the other reference line";
     return false;
   }
   bool last_join = last_sl.s() > 0 && last_sl.s() < other.Length() &&
@@ -98,10 +100,8 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
                             std::fabs(other_first.l()) < kStitchingError;
     if (other_on_current) {
       return true;
-    } else {
-      AERROR << "These reference lines are not connected";
-      return false;
     }
+    AERROR << "These reference lines are not connected";
     return false;
   }
   const auto& accumulated_s = other.map_path().accumulated_s();
@@ -197,6 +197,40 @@ ReferencePoint ReferenceLine::GetNearestReferencePoint(const double s) const {
       return reference_points_[index];
     }
   }
+}
+
+std::size_t ReferenceLine::GetNearestReferenceIndex(const double s) const {
+  const auto& accumulated_s = map_path_.accumulated_s();
+  if (s < accumulated_s.front() - 1e-2) {
+    AWARN << "The requested s " << s << " < 0";
+    return 0;
+  }
+  if (s > accumulated_s.back() + 1e-2) {
+    AWARN << "The requested s " << s << " > reference line length "
+          << accumulated_s.back();
+    return reference_points_.size() - 1;
+  }
+  auto it_lower =
+      std::lower_bound(accumulated_s.begin(), accumulated_s.end(), s);
+  return std::distance(accumulated_s.begin(), it_lower);
+}
+
+std::vector<ReferencePoint> ReferenceLine::GetReferencePoints(
+    double start_s, double end_s) const {
+  if (start_s < 0.0) {
+    start_s = 0.0;
+  }
+  if (end_s > Length()) {
+    end_s = Length();
+  }
+  std::vector<ReferencePoint> ref_points;
+  auto start_index = GetNearestReferenceIndex(start_s);
+  auto end_index = GetNearestReferenceIndex(end_s);
+  if (start_index < end_index) {
+    ref_points.assign(reference_points_.begin() + start_index,
+                      reference_points_.begin() + end_index);
+  }
+  return ref_points;
 }
 
 ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
