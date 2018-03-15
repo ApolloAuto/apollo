@@ -128,7 +128,7 @@ const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
   auto* routing_request_adapter = AdapterManager::GetRoutingRequest();
   if (routing_request_adapter) {
     routing_request_adapter->Observe();
-    if (routing_request_adapter->Empty()) {
+    if (!routing_request_adapter->Empty()) {
       *software->mutable_latest_routing_request() =
           routing_request_adapter->GetLatestObserved();
     }
