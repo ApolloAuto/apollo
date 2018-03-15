@@ -109,6 +109,10 @@ class DummyProjector : public BaseProjector {
   bool project(std::vector<float>* feature) override { return true; }
 };
 
+REGISTER_CAMERA_DETECTOR(DummyCameraDetector);
+REGISTER_CAMERA_TRACKER(DummyCameraTracker);
+REGISTER_CAMERA_TRANSFORMER(DummyCameraTransformer);
+
 }  // namespace perception
 }  // namespace apollo
 

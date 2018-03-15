@@ -46,8 +46,6 @@ typedef struct {
   GLfloat z;
 } vec3;
 
-using apollo::perception::FrameContent;
-
 template <typename T = float>
 T get_poly_value(T a, T b, T c, T d, T x) {
   T y = d;
