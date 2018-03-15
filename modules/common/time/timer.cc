@@ -17,6 +17,7 @@
 #include "modules/common/time/timer.h"
 
 #include "modules/common/log.h"
+#include "modules/common/time/time.h"
 
 namespace apollo {
 namespace common {
@@ -26,10 +27,10 @@ using std::string;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 
-void Timer::Start() { start_time_ = std::chrono::system_clock::now(); }
+void Timer::Start() { start_time_ = Clock::Now(); }
 
 uint64_t Timer::End(const string &msg) {
-  end_time_ = std::chrono::system_clock::now();
+  end_time_ = Clock::Now();
   uint64_t elapsed_time =
       duration_cast<milliseconds>(end_time_ - start_time_).count();
 
