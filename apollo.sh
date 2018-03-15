@@ -216,17 +216,17 @@ function warn_proprietary_sw() {
 function release() {
   RELEASE_DIR="${HOME}/.cache/apollo_release"
   if [ -d "${RELEASE_DIR}" ]; then
-    rm -fr "${RELEASE_DIR}"
+    rm -rf "${RELEASE_DIR}"
   fi
-  APOLLO_DIR="${RELEASE_DIR}/apollo"
-  mkdir -p "${APOLLO_DIR}"
+  APOLLO_RELEASE_DIR="${RELEASE_DIR}/apollo"
+  mkdir -p "${APOLLO_RELEASE_DIR}"
 
   # Find binaries and convert from //path:target to path/target
   BINARIES=$(bazel query "kind(cc_binary, //...)" | sed 's/^\/\///' | sed 's/:/\//')
   # Copy binaries to release dir.
   for BIN in ${BINARIES}; do
     SRC_PATH="bazel-bin/${BIN}"
-    DST_PATH="${APOLLO_DIR}/${BIN}"
+    DST_PATH="${APOLLO_RELEASE_DIR}/${BIN}"
     if [ -e "${SRC_PATH}" ]; then
       mkdir -p "$(dirname "${DST_PATH}")"
       cp "${SRC_PATH}" "${DST_PATH}"
@@ -234,54 +234,37 @@ function release() {
   done
 
   # modules data and conf
-  MODULES_DIR="${APOLLO_DIR}/modules"
-  mkdir -p $MODULES_DIR
-  for m in common control canbus localization decision perception dreamview \
-       prediction planning routing calibration third_party_perception monitor data \
-       drivers/delphi_esr \
-       drivers/gnss \
-       drivers/conti_radar \
-       drivers/mobileye \
-       calibration/republish_msg \
-       calibration/lidar_ex_checker
-  do
-    TARGET_DIR=$MODULES_DIR/$m
-    mkdir -p $TARGET_DIR
-    if [ -d modules/$m/conf ]; then
-      cp -r modules/$m/conf $TARGET_DIR
-    fi
-    if [ -d modules/$m/data ]; then
-      cp -r modules/$m/data $TARGET_DIR
+  CONFS=$(find modules/ -name "conf")
+  DATAS=$(find modules/ -name "data")
+  OTHER=(modules/tools)
+  rm -rf test/*
+  for conf in $CONFS; do
+    mkdir -p $APOLLO_RELEASE_DIR/$conf
+    rsync -a $conf/* $APOLLO_RELEASE_DIR/$conf
+  done
+  for data in $DATAS; do
+    mkdir -p $APOLLO_RELEASE_DIR/$data
+    if [ $data != "modules/map/data" ]; then
+      rsync -a $data/* $APOLLO_RELEASE_DIR/$data
     fi
   done
+  # Other
+  for path in $OTHER; do
+    mkdir -p $APOLLO_RELEASE_DIR/$path
+    rsync -a $path/* $APOLLO_RELEASE_DIR/$path
+  done
+
+  # dreamview frontend
+  cp -a modules/dreamview/frontend $APOLLO_RELEASE_DIR/modules/dreamview
 
   # remove all pyc file in modules/
   find modules/ -name "*.pyc" | xargs -I {} rm {}
 
-  # tools
-  cp -r modules/tools $MODULES_DIR
-  mkdir -p $MODULES_DIR/data/tools
-  cp -r modules/data/tools/recorder $MODULES_DIR/data/tools/
-
   # scripts
-  cp -r scripts ${APOLLO_DIR}
-
-  # dreamview runfiles
-  cp -Lr bazel-bin/modules/dreamview/dreamview.runfiles/apollo/modules/dreamview/frontend $MODULES_DIR/dreamview
-
-  # perception model
-  cp -r modules/perception/model/ $MODULES_DIR/perception
-
-  # velodyne launch
-  mkdir -p $MODULES_DIR/drivers/velodyne/velodyne
-  cp -r modules/drivers/velodyne/velodyne/launch $MODULES_DIR/drivers/velodyne/velodyne
-
-  # usb_cam launch
-  mkdir -p $MODULES_DIR/drivers/usb_cam
-  cp -r modules/drivers/usb_cam/launch $MODULES_DIR/drivers/usb_cam
+  cp -r scripts ${APOLLO_RELEASE_DIR}
 
   # lib
-  LIB_DIR="${APOLLO_DIR}/lib"
+  LIB_DIR="${APOLLO_RELEASE_DIR}/lib"
   mkdir "${LIB_DIR}"
   if $USE_ESD_CAN; then
     warn_proprietary_sw
@@ -294,12 +277,12 @@ function release() {
   cp -r py_proto/modules $LIB_DIR
 
   # doc
-  cp -r docs "${APOLLO_DIR}"
-  cp LICENSE "${APOLLO_DIR}"
-  cp third_party/ACKNOWLEDGEMENT.txt "${APOLLO_DIR}"
+  cp -r docs "${APOLLO_RELEASE_DIR}"
+  cp LICENSE "${APOLLO_RELEASE_DIR}"
+  cp third_party/ACKNOWLEDGEMENT.txt "${APOLLO_RELEASE_DIR}"
 
   # release info
-  META="${APOLLO_DIR}/meta.ini"
+  META="${APOLLO_RELEASE_DIR}/meta.ini"
   echo "git_commit: $(git rev-parse HEAD)" >> $META
   echo "car_type: LINCOLN.MKZ" >> $META
   echo "arch: ${MACHINE_ARCH}" >> $META

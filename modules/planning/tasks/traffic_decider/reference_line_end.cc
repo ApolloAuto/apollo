@@ -31,7 +31,7 @@ namespace planning {
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 
-ReferenceLineEnd::ReferenceLineEnd(const RuleConfig& config)
+ReferenceLineEnd::ReferenceLineEnd(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
 bool ReferenceLineEnd::ApplyRule(Frame* frame,
@@ -58,8 +58,8 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
   std::string virtual_obstacle_id =
       FLAGS_reference_line_end_obstacle_id_prefix +
       reference_line_info->Lanes().Id();
-  double obstacle_start_s = reference_line.Length() -
-      FLAGS_virtual_stop_wall_length;
+  double obstacle_start_s =
+      reference_line.Length() - FLAGS_virtual_stop_wall_length;
   auto* obstacle = frame->CreateVirtualStopObstacle(
       reference_line_info, virtual_obstacle_id, obstacle_start_s);
   if (!obstacle) {
@@ -88,7 +88,7 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
 
   auto* path_decision = reference_line_info->path_decision();
   path_decision->AddLongitudinalDecision(
-      RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 
   return true;
 }

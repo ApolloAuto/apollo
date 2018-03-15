@@ -41,7 +41,7 @@ using apollo::common::time::Clock;
 using LocalizationPb = localization::LocalizationEstimate;
 using ChassisPb = canbus::Chassis;
 using TrajectoryPb = planning::ADCTrajectory;
-using VehicleStateProvider = common::VehicleStateProvider;
+using apollo::common::VehicleStateProvider;
 
 const char data_path[] =
     "modules/control/testdata/longitudinal_controller_test/";

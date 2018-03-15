@@ -77,6 +77,10 @@ const common::VehicleState &Frame::vehicle_state() const {
 }
 
 bool Frame::Rerouting() {
+  if (FLAGS_use_navigation_mode) {
+    AERROR << "Rerouting not supported in navigation mode";
+    return false;
+  }
   auto *adapter_manager = AdapterManager::instance();
   if (adapter_manager->GetRoutingResponse()->Empty()) {
     AERROR << "No previous routing available";
@@ -187,8 +191,16 @@ bool Frame::CreateReferenceLineInfo() {
     reference_line_info_.back().SetOffsetToOtherReferenceLine(-offset);
   }
 
-  // delay the time-consumping reference_line_info init() step to planner.
-  return true;
+  bool has_valid_reference_line = false;
+  for (auto &ref_info : reference_line_info_) {
+    if (!ref_info.Init(obstacles())) {
+      AERROR << "Failed to init reference line";
+      continue;
+    } else {
+      has_valid_reference_line = true;
+    }
+  }
+  return has_valid_reference_line;
 }
 
 /**
@@ -280,6 +292,9 @@ const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
 }
 
 int Frame::CreateDestinationObstacle() {
+  if (FLAGS_use_navigation_mode) {
+    return 0;
+  }
   const auto &routing =
       AdapterManager::GetRoutingResponse()->GetLatestObserved();
   if (routing.routing_request().waypoint_size() < 2) {
@@ -410,11 +425,19 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   auto debug_chassis = planning_data->mutable_chassis();
   debug_chassis->CopyFrom(chassis);
 
-  auto debug_routing = planning_data->mutable_routing();
-  debug_routing->CopyFrom(
-      AdapterManager::GetRoutingResponse()->GetLatestObserved());
+  if (!FLAGS_use_navigation_mode) {
+    auto debug_routing = planning_data->mutable_routing();
+    debug_routing->CopyFrom(
+        AdapterManager::GetRoutingResponse()->GetLatestObserved());
+  }
 
   planning_data->mutable_prediction_header()->CopyFrom(prediction_.header());
+
+  auto relative_map = AdapterManager::GetRelativeMap();
+  if (!relative_map->Empty()) {
+    planning_data->mutable_relative_map()->mutable_header()->CopyFrom(
+        relative_map->GetLatestObserved().header());
+  }
 }
 
 void Frame::AlignPredictionTime(const double planning_start_time,

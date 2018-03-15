@@ -46,6 +46,9 @@ message AdapterConfig {
     STATIC_INFO = 39;
     RELATIVE_MAP = 40;
     NAVIGATION = 41;
+    ULTRASONIC_RADAR = 42;
+    VOICE_DETECTION_REQUEST = 43;
+    VOICE_DETECTION_RESPONSE = 44;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

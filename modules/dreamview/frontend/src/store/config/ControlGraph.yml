@@ -153,3 +153,21 @@ accelerationGraph:
                 pointRadius: 4
                 fill: false
                 showLine: true
+stationErrorGraph:
+    title: 'Station Error'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                labelString: 't (second)'
+            y:
+                labelString: 'error (m)'
+    properties:
+        lines:
+            error:
+                color: 'rgba(0, 106, 255, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: ture

@@ -61,8 +61,7 @@ DEFINE_double(r_var, 0.25, "Measurement noise covariance");
 DEFINE_double(p_var, 0.1, "Error covariance");
 DEFINE_double(go_approach_rate, 0.995,
               "The rate to approach to the reference line of going straight");
-DEFINE_double(cutin_approach_rate, 0.9,
-              "The rate to approach to the reference line of lane change");
+
 DEFINE_int32(still_obstacle_history_length, 10,
              "Min # historical frames for still obstacles");
 DEFINE_double(still_obstacle_speed_threshold, 2.0,
@@ -75,7 +74,7 @@ DEFINE_double(still_pedestrian_position_std, 0.5,
               "Position standard deviation for still obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
-DEFINE_int32(max_num_current_lane, 1, "Max number to search current lanes");
+DEFINE_int32(max_num_current_lane, 2, "Max number to search current lanes");
 DEFINE_int32(max_num_nearby_lane, 2, "Max number to search nearby lanes");
 DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
               "Max angle difference for a candiate lane");
@@ -105,6 +104,8 @@ DEFINE_bool(enable_adjust_velocity_heading, false,
             "adjust velocity heading to lane heading");
 DEFINE_double(heading_filter_param, 0.99, "heading filter parameter");
 
+// Cost evaluator
+
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,
               "Threshold for trimming lane sequence trajectories");
@@ -114,6 +115,8 @@ DEFINE_bool(enable_lane_sequence_acc, false,
 DEFINE_bool(enable_trim_prediction_trajectory, false,
             "If trim the prediction trajectory to avoid crossing"
             "protected adc planning trajectory.");
+DEFINE_bool(enable_trajectory_validation_check, false,
+            "If check the validity of prediction trajectory.");
 DEFINE_double(distance_beyond_junction, 0.5,
               "If the obstacle is in junction more than this threshold,"
               "consider it in junction.");
@@ -122,6 +125,8 @@ DEFINE_double(adc_trajectory_search_length, 10.0,
 DEFINE_double(virtual_lane_radius, 0.5, "Radius to search virtual lanes");
 DEFINE_double(default_lateral_approach_speed, 0.5,
               "Default lateral speed approaching to center of lane");
+DEFINE_double(centripedal_acc_threshold, 2.0,
+              "Threshold of centripedal acceleration.");
 
 // move sequence prediction
 DEFINE_double(time_upper_bound_to_lane_center, 5.0,

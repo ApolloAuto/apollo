@@ -31,7 +31,7 @@
 #include "gflags/gflags.h"
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/map/hdmap/hdmap.h"

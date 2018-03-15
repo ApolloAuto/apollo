@@ -1,12 +1,12 @@
 import STORE from "store";
 import RENDERER from "renderer";
-
-const Worker = require('worker-loader!utils/webworker.js');
+import Worker from 'utils/webworker.js';
 
 export default class MapDataWebSocketEndpoint {
     constructor(serverAddr) {
         this.serverAddr = serverAddr;
         this.websocket = null;
+        this.currentMode = null;
         this.worker = new Worker();
     }
 
@@ -28,7 +28,10 @@ export default class MapDataWebSocketEndpoint {
             });
         };
         this.worker.onmessage = event => {
-            RENDERER.updateMap(event.data);
+            const removeOldMap =
+                STORE.hmi.inNavigationMode || this.currentMode !== STORE.hmi.currentMode;
+            this.currentMode = STORE.hmi.currentMode;
+            RENDERER.updateMap(event.data, removeOldMap);
             STORE.setInitializationStatus(true);
         };
         this.websocket.onclose = event => {
@@ -40,6 +43,13 @@ export default class MapDataWebSocketEndpoint {
     requestMapData(elements) {
         this.websocket.send(JSON.stringify({
             type: "RetrieveMapData",
+            elements: elements,
+        }));
+    }
+
+    requestRelativeMapData(elements) {
+        this.websocket.send(JSON.stringify({
+            type: "RetrieveRelativeMapData",
             elements: elements,
         }));
     }

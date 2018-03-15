@@ -42,7 +42,7 @@ using apollo::common::util::WithinBound;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::PerceptionObstacle;
 
-Crosswalk::Crosswalk(const RuleConfig& config) : TrafficRule(config) {}
+Crosswalk::Crosswalk(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool Crosswalk::ApplyRule(Frame* frame,
                           ReferenceLineInfo* const reference_line_info) {
@@ -137,12 +137,11 @@ void Crosswalk::MakeDecisions(Frame* const frame,
           !path_obstacle->reference_line_st_boundary().IsEmpty();
 
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-             << "] crosswalk_id[" << crosswalk_id
-             << "] obstacle_l[" << obstacle_sl_point.l()
-             << "] within_crosswalk_area[" << in_crosswalk
-             << "] within_expanded_crosswalk_area[" << in_expanded_crosswalk
-             << "] is_on_road[" << is_on_road << "] is_path_cross["
-             << is_path_cross << "]";
+             << "] crosswalk_id[" << crosswalk_id << "] obstacle_l["
+             << obstacle_sl_point.l() << "] within_crosswalk_area["
+             << in_crosswalk << "] within_expanded_crosswalk_area["
+             << in_expanded_crosswalk << "] is_on_road[" << is_on_road
+             << "] is_path_cross[" << is_path_cross << "]";
 
       bool stop = false;
       if (obstacle_l_distance >= FLAGS_crosswalk_loose_l_distance) {
@@ -254,7 +253,7 @@ bool Crosswalk::BuildStopDecision(Frame* const frame,
 
   auto* path_decision = reference_line_info->path_decision();
   path_decision->AddLongitudinalDecision(
-      RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 
   return true;
 }

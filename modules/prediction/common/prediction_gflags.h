@@ -51,7 +51,7 @@ DECLARE_double(q_var);
 DECLARE_double(r_var);
 DECLARE_double(p_var);
 DECLARE_double(go_approach_rate);
-DECLARE_double(cutin_approach_rate);
+
 DECLARE_int32(still_obstacle_history_length);
 DECLARE_double(still_obstacle_speed_threshold);
 DECLARE_double(still_pedestrian_speed_threshold);
@@ -78,23 +78,24 @@ DECLARE_double(rnn_min_lane_relatice_s);
 DECLARE_bool(enable_adjust_velocity_heading);
 DECLARE_double(heading_filter_param);
 
+// Cost evaluator
+
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
 DECLARE_double(lane_change_dist);
 DECLARE_bool(enable_lane_sequence_acc);
 DECLARE_bool(enable_trim_prediction_trajectory);
+DECLARE_bool(enable_trajectory_validation_check);
 DECLARE_double(distance_beyond_junction);
 DECLARE_double(adc_trajectory_search_length);
 DECLARE_double(virtual_lane_radius);
 DECLARE_double(default_lateral_approach_speed);
+DECLARE_double(centripedal_acc_threshold);
 
 // move sequence prediction
 DECLARE_double(time_upper_bound_to_lane_center);
 DECLARE_double(time_lower_bound_to_lane_center);
 DECLARE_double(sample_time_gap);
-DECLARE_double(motion_weight_a);
-DECLARE_double(motion_weight_b);
-DECLARE_double(motion_weight_c);
 DECLARE_double(cost_alpha);
 DECLARE_double(default_time_to_lane_center);
 

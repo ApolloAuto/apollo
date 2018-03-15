@@ -21,8 +21,10 @@
 #ifndef MODEULES_THIRD_PARTY_PERCEPTION_CONVERSION_H_
 #define MODEULES_THIRD_PARTY_PERCEPTION_CONVERSION_H_
 
+#include <cstdint>
 #include <queue>
 
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
@@ -40,7 +42,8 @@ namespace conversion {
 
 apollo::perception::PerceptionObstacles MobileyeToPerceptionObstacles(
     const apollo::drivers::Mobileye& mobileye,
-    const apollo::localization::LocalizationEstimate& localization);
+    const apollo::localization::LocalizationEstimate& localization,
+    const apollo::canbus::Chassis& chassis);
 
 RadarObstacles DelphiToRadarObstacles(
     const apollo::drivers::DelphiESR& delphi_esr,
@@ -50,7 +53,8 @@ RadarObstacles DelphiToRadarObstacles(
 RadarObstacles ContiToRadarObstacles(
     const apollo::drivers::ContiRadar& conti_radar,
     const apollo::localization::LocalizationEstimate& localization,
-    const RadarObstacles& last_radar_obstacles);
+    const RadarObstacles& last_radar_obstacles,
+    const apollo::canbus::Chassis& chassis);
 
 apollo::perception::PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     const RadarObstacles& radar_obstacles);

@@ -28,7 +28,7 @@ namespace perception {
 class SensorRawFrame {
  public:
   SensorRawFrame()
-      : sensor_type_(UNKNOWN_SENSOR_TYPE),
+      : sensor_type_(SensorType::UNKNOWN_SENSOR_TYPE),
         timestamp_(0.0),
         pose_(Eigen::Matrix4d::Identity()) {}
   virtual ~SensorRawFrame() {}

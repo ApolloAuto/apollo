@@ -23,10 +23,10 @@
 
 #include "pcl/io/pcd_io.h"
 
+#include "modules/perception/common/file_system_util.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
-#include "modules/perception/obstacle/common/file_system_util.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
@@ -175,11 +175,11 @@ class OfflineLidarPerceptionTool {
       Eigen::Vector3f dir_velo3(dir_velo[0], dir_velo[1], dir_velo[2]);
       double theta = VectorTheta2dXy(coord_dir, dir_velo3);
       std::string type = "unknown";
-      if (obj->type == PEDESTRIAN) {
+      if (obj->type == ObjectType::PEDESTRIAN) {
         type = "pedestrain";
-      } else if (obj->type == VEHICLE) {
+      } else if (obj->type == ObjectType::VEHICLE) {
         type = "smallMot";
-      } else if (obj->type == BICYCLE) {
+      } else if (obj->type == ObjectType::BICYCLE) {
         type = "nonMot";
       }
       // write tracking details

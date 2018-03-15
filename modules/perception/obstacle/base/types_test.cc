@@ -24,11 +24,12 @@ namespace apollo {
 namespace perception {
 
 TEST(TypesTest, test_GetSensorType) {
-  EXPECT_EQ(GetSensorType(VELODYNE_64), "velodyne_64");
-  EXPECT_EQ(GetSensorType(VELODYNE_16), "velodyne_16");
-  EXPECT_EQ(GetSensorType(RADAR), "radar");
-  EXPECT_EQ(GetSensorType(CAMERA), "camera");
-  EXPECT_EQ(GetSensorType(UNKNOWN_SENSOR_TYPE), "unknown_sensor_type");
+  EXPECT_EQ(GetSensorType(SensorType::VELODYNE_64), "velodyne_64");
+  EXPECT_EQ(GetSensorType(SensorType::VELODYNE_16), "velodyne_16");
+  EXPECT_EQ(GetSensorType(SensorType::RADAR), "radar");
+  EXPECT_EQ(GetSensorType(SensorType::CAMERA), "camera");
+  EXPECT_EQ(GetSensorType(SensorType::UNKNOWN_SENSOR_TYPE),
+            "unknown_sensor_type");
   EXPECT_EQ(GetSensorType(SensorType(-1)), "");
 }
 

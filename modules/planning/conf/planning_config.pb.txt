@@ -1,7 +1,5 @@
 planner_type : EM
 em_planner_config {
-    task : TRAFFIC_DECIDER
-
     task : DP_POLY_PATH_OPTIMIZER
 
     task : PATH_DECIDER
@@ -182,34 +180,3 @@ em_planner_config {
 }
 
 smoother_type: QP_SPLINE_SMOOTHER
-
-rule_config : {
-    rule_id: BACKSIDE_VEHICLE
-}
-rule_config : {
-    rule_id: SIGNAL_LIGHT
-}
-rule_config : {
-    rule_id: REFERENCE_LINE_END
-}
-rule_config : {
-    rule_id: DESTINATION
-}
-rule_config : {
-    rule_id: CHANGE_LANE
-}
-rule_config : {
-    rule_id: CROSSWALK
-}
-rule_config : {
-    rule_id: STOP_SIGN
-}
-rule_config : {
-    rule_id: SIDEPASS_VEHICLE
-}
-rule_config : {
-    rule_id: KEEP_CLEAR
-}
-rule_config : {
-    rule_id: CIPV
-}

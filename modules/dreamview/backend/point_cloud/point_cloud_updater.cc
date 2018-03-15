@@ -20,9 +20,10 @@
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "pcl_conversions/pcl_conversions.h"
+#include "pcl/filters/voxel_grid.h"
 #include "pcl/point_cloud.h"
 #include "pcl/point_types.h"
+#include "pcl_conversions/pcl_conversions.h"
 #include "third_party/json/json.hpp"
 
 namespace apollo {
@@ -30,14 +31,14 @@ namespace dreamview {
 
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
+using apollo::localization::LocalizationEstimate;
 using sensor_msgs::PointCloud2;
 using Json = nlohmann::json;
-
-constexpr int PointCloudUpdater::kDownsampleRate;
 
 PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
     : websocket_(websocket) {
   RegisterMessageHandlers();
+  point_cloud_.SerializeToString(&point_cloud_str_);
 }
 
 void PointCloudUpdater::RegisterMessageHandlers() {
@@ -54,8 +55,8 @@ void PointCloudUpdater::RegisterMessageHandlers() {
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         std::string to_send;
         // If there is no point_cloud data for more than 2 seconds, reset.
-        if ((point_cloud_.num_size() > 0) &&
-            (Clock::NowInSeconds() - last_receive_time_ > 2.0)) {
+        if (point_cloud_.num_size() > 0 &&
+            std::fabs(last_localization_time_ - last_point_cloud_time_) > 2.0) {
           point_cloud_.clear_num();
           boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
           point_cloud_.SerializeToString(&point_cloud_str_);
@@ -64,7 +65,7 @@ void PointCloudUpdater::RegisterMessageHandlers() {
           boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
           to_send = point_cloud_str_;
         }
-        websocket_->SendBinaryData(conn, to_send, true);;
+        websocket_->SendBinaryData(conn, to_send, true);
       });
   websocket_->RegisterMessageHandler(
       "TogglePointCloud",
@@ -90,6 +91,8 @@ void PointCloudUpdater::RegisterMessageHandlers() {
 void PointCloudUpdater::Start() {
   AdapterManager::AddPointCloudCallback(&PointCloudUpdater::UpdatePointCloud,
                                         this);
+  AdapterManager::AddLocalizationCallback(
+      &PointCloudUpdater::UpdateLocalizationTime, this);
 }
 
 void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
@@ -97,26 +100,38 @@ void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
     return;
   }
 
-  last_receive_time_ = Clock::NowInSeconds();
+  last_point_cloud_time_ = point_cloud.header.stamp.toSec();
   // transform from ros to pcl
-  pcl::PointCloud<pcl::PointXYZ> pcl_data;
-  pcl::fromROSMsg(point_cloud, pcl_data);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr(
+      new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::fromROSMsg(point_cloud, *pcl_ptr);
+
+  pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
+  voxel_grid.setInputCloud(pcl_ptr);
+  voxel_grid.setLeafSize(1.0f, 1.0f, 0.2f);
+  voxel_grid.filter(*pcl_ptr);
+  AINFO << "filtered point cloud data size: " << pcl_ptr->size();
 
   point_cloud_.Clear();
-  for (size_t idx = 0; idx < pcl_data.size(); idx += kDownsampleRate) {
-    pcl::PointXYZ& pt = pcl_data.points[idx];
-    if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z)) {
+  for (size_t idx = 0; idx < pcl_ptr->size(); ++idx) {
+    pcl::PointXYZ &pt = pcl_ptr->points[idx];
+    if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z)) {
       point_cloud_.add_num(pt.x);
       point_cloud_.add_num(pt.y);
       // TODO(unacao): velodyne height should be updated by hmi store
       // upon vehicle change.
-      point_cloud_.add_num(pt.z + 1.91);
+      point_cloud_.add_num(pt.z + 1.91f);
     }
   }
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
     point_cloud_.SerializeToString(&point_cloud_str_);
   }
+}
+
+void PointCloudUpdater::UpdateLocalizationTime(
+    const LocalizationEstimate &localization) {
+  last_localization_time_ = localization.header().timestamp_sec();
 }
 
 }  // namespace dreamview

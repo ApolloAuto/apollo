@@ -119,6 +119,7 @@ function set_lib_path() {
     PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/apollo/bazel-genfiles/external/caffe/lib:/home/caros/secure_upgrade/depend_lib
   fi
+  PY_LIB_PATH=${PY_LIB_PATH}:/usr/local/apollo/snowboy/Python
   export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
   if [ -e /usr/local/cuda-8.0/ ];then
     export PATH=/usr/local/cuda-8.0/bin:$PATH
@@ -327,7 +328,7 @@ function stop_customized_path() {
   MODULE_PATH=$1
   MODULE=$2
 
-  pkill -SIGINT -f "modules/${MODULE_PATH}/${MODULE}"
+  pkill -f "modules/${MODULE_PATH}/${MODULE}"
   if [ $? -eq 0 ]; then
     echo "Successfully stopped module ${MODULE}."
   else

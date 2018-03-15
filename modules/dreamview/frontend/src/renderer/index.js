@@ -48,9 +48,9 @@ class Renderer {
         this.adc = new AutoDrivingCar('adc', this.scene);
 
         // The car that projects the starting point of the planning trajectory
-        this.planningAdc = OFFLINE_PLAYBACK ? null : new AutoDrivingCar('plannigAdc', this.scene);
+        this.planningAdc = OFFLINE_PLAYBACK ? null : new AutoDrivingCar('planningAdc', this.scene);
 
-        // The planning tranjectory.
+        // The planning trajectory.
         this.planningTrajectory = new PlanningTrajectory();
 
         // The perception obstacles.
@@ -132,8 +132,8 @@ class Renderer {
         this.animate();
     }
 
-    maybeInitializeOffest(x, y) {
-        if (!this.coordinates.isInitialized()) {
+    maybeInitializeOffest(x, y, forced_update = false) {
+        if (!this.coordinates.isInitialized() || forced_update) {
             this.coordinates.initialize(x, y);
         }
     }
@@ -157,7 +157,11 @@ class Renderer {
         this.controls.target.set(carPosition.x, carPosition.y, 0);
 
         this.camera.position.set(carPosition.x, carPosition.y, 50);
-        this.camera.up.set(0, 1, 0);
+        if (this.coordinates.systemName === "FLU") {
+            this.camera.up.set(1, 0, 0);
+        } else {
+            this.camera.up.set(0, 1, 0);
+        }
         this.camera.lookAt(carPosition.x, carPosition.y, 0);
     }
 
@@ -217,19 +221,16 @@ class Renderer {
             this.camera.position.x = target.position.x;
             this.camera.position.y = target.position.y + deltaY;
             this.camera.position.z = (target.position.z + deltaZ) * 2;
-            this.camera.up.set(0, 1, 0);
+            if (this.coordinates.systemName === "FLU") {
+                this.camera.up.set(1, 0, 0);
+            } else {
+                this.camera.up.set(0, 1, 0);
+            }
             this.camera.lookAt({
                 x: target.position.x,
                 y: target.position.y + deltaY,
                 z: 0
             });
-
-            this.controls.enabled = false;
-            break;
-        case "Monitor":
-            this.camera.position.set(target.position.x, target.position.y, 50);
-            this.camera.up.set(0, 1, 0);
-            this.camera.lookAt(target.position.x, target.position.y, 0);
 
             this.controls.enabled = false;
             break;
@@ -361,7 +362,10 @@ class Renderer {
         this.ground.initialize(serverUrl, mapInfo);
     }
 
-    updateMap(newData) {
+    updateMap(newData, removeOldMap = false) {
+        if (removeOldMap) {
+            this.map.removeAllElements(this.scene);
+        }
         this.map.appendMapData(newData, this.coordinates, this.scene);
     }
 

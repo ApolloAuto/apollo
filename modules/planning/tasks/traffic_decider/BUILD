@@ -15,7 +15,7 @@ cc_library(
         "object_priority.cc",
         "reference_line_end.cc",
         "rerouting.cc",
-        "sidepass_vehicle.cc",
+        "side_pass_vehicle.cc",
         "signal_light.cc",
         "stop_sign.cc",
         "util.cc",
@@ -31,7 +31,7 @@ cc_library(
         "object_priority.h",
         "reference_line_end.h",
         "rerouting.h",
-        "sidepass_vehicle.h",
+        "side_pass_vehicle.h",
         "signal_light.h",
         "stop_sign.h",
         "traffic_rule.h",
@@ -39,15 +39,16 @@ cc_library(
     ],
     deps = [
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/util:dropbox",
         "//modules/common/util:factory",
         "//modules/common/util:map_util",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:planning_util",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:traffic_rule_config_proto",
     ],
 )
 
@@ -65,6 +66,7 @@ cc_library(
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
+        "//modules/planning/proto:traffic_rule_config_proto",
         "//modules/planning/tasks:task",
     ],
 )

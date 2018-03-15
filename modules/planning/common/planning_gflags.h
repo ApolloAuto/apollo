@@ -24,7 +24,8 @@ DECLARE_double(test_duration);
 
 DECLARE_string(planning_config_file);
 DECLARE_string(planning_adapter_config_filename);
-DECLARE_string(smoother_config_file);
+DECLARE_string(traffic_rule_config_filename);
+DECLARE_string(smoother_config_filename);
 DECLARE_int32(planning_loop_rate);
 DECLARE_string(rtk_trajectory_filename);
 DECLARE_uint64(rtk_trajectory_forward);
@@ -38,7 +39,6 @@ DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
 DECLARE_double(reference_line_lateral_buffer);
 DECLARE_double(prepare_rerouting_time);
-DECLARE_double(rerouting_cooldown_time);
 
 DECLARE_bool(enable_smooth_reference_line);
 DECLARE_double(spiral_smoother_max_deviation);
@@ -103,7 +103,6 @@ DECLARE_double(st_max_t);
 DECLARE_double(static_obstacle_speed_threshold);
 DECLARE_bool(enable_nudge_decision);
 DECLARE_bool(enable_nudge_slowdown);
-DECLARE_bool(try_history_decision);
 DECLARE_double(static_decision_nudge_l_buffer);
 DECLARE_double(lateral_ignore_buffer);
 DECLARE_double(min_stop_distance_obstacle);
@@ -114,7 +113,6 @@ DECLARE_double(yield_distance);
 DECLARE_double(yield_distance_pedestrian_bycicle);
 DECLARE_double(follow_time_buffer);
 DECLARE_double(follow_min_time_sec);
-DECLARE_double(within_lane_bound);
 
 DECLARE_double(virtual_stop_wall_length);
 DECLARE_double(virtual_stop_wall_height);
@@ -134,12 +132,7 @@ DECLARE_bool(enable_prediction);
 DECLARE_double(turn_signal_distance);
 DECLARE_bool(right_turn_creep_forward);
 
-// speed decider
-DECLARE_double(low_speed_obstacle_threshold);
-DECLARE_double(decelerating_obstacle_threshold);
-
 // QpSt optimizer
-DECLARE_bool(enable_slowdown_profile_generator);
 DECLARE_double(slowdown_profile_deceleration);
 DECLARE_bool(enable_follow_accel_constraint);
 
@@ -176,8 +169,8 @@ DECLARE_string(stop_sign_virtual_obstacle_id_prefix);
 DECLARE_double(stop_sign_stop_duration);
 DECLARE_double(stop_sign_min_pass_distance);
 DECLARE_double(stop_sign_stop_distance);
-DECLARE_double(stop_sign_max_watch_vehicle_stop_speed);
-DECLARE_double(stop_sign_creep_buffer);
+DECLARE_double(stop_sign_watch_vehicle_max_stop_speed);
+DECLARE_double(stop_sign_watch_vehicle_max_stop_distance);
 DECLARE_bool(enable_sidepass);
 DECLARE_double(sidepass_wait_time_sec);
 
@@ -198,15 +191,12 @@ DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 
 // lattice planner
 DECLARE_double(lattice_epsilon);
-DECLARE_int32(num_lattice_traj_to_plot);
 DECLARE_double(default_cruise_speed);
-DECLARE_double(spiral_downsample_curvature_thred);
-DECLARE_bool(enable_lattice_st_image_dump);
+
 DECLARE_bool(enable_auto_tuning);
 DECLARE_double(trajectory_time_resolution);
 DECLARE_double(trajectory_space_resolution);
 DECLARE_double(lateral_acceleration_bound);
-DECLARE_double(collision_buffer_expansion_ratio);
 DECLARE_double(decision_horizon);
 DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);
@@ -226,5 +216,12 @@ DECLARE_double(lat_offset_bound);
 DECLARE_double(lon_collision_yield_buffer);
 DECLARE_double(lon_collision_overtake_buffer);
 DECLARE_double(lon_collision_cost_std);
+DECLARE_double(default_lon_buffer);
+DECLARE_double(time_min_density);
+DECLARE_double(comfort_acceleration_factor);
+DECLARE_double(polynomial_minimal_param);
 
-#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H
+// navigation mode
+DECLARE_double(navigation_fallback_cruise_time);
+
+#endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_

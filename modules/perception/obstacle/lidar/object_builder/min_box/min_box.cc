@@ -19,9 +19,9 @@
 #include <limits>
 #include <vector>
 
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/geometry_util.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/common/convex_hullxy.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
 
 namespace apollo {
 namespace perception {
@@ -322,10 +322,10 @@ void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
   const double min_eps = 10 * std::numeric_limits<double>::epsilon();
   // double min_eps = 0.1;
   // if ((max_pt[0] - min_pt[0]) < min_eps) {
-  //     _cloud->points[0].x += min_eps;
+  //     cloud_->points[0].x += min_eps;
   // }
   // if ((max_pt[1] - min_pt[1]) < min_eps) {
-  //     _cloud->points[0].y += min_eps;
+  //     cloud_->points[0].y += min_eps;
   // }
   const double diff_x = cloud->points[1].x - cloud->points[0].x;
   const double diff_y = cloud->points[1].y - cloud->points[0].y;

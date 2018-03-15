@@ -40,14 +40,43 @@ export default class ControlData {
                 real: [],
                 autoModeZone: []
             },
+            stationErrorGraph: {
+                error: [],
+            }
         };
     }
 
-    updateSteerCurve(graph, adc) {
-        const steeringAngle = adc.steeringAngle / adc.steeringRatio;
+    updateStationErrorGraph(controlData) {
+        if (!controlData.stationError) {
+            return;
+        }
+
+        const graph = this.data.stationErrorGraph;
+        const currentTimestamp = controlData.timestampSec;
+
+        // clean up data if needed
+        const removeAllPoints = graph.error.length > 0 &&
+              currentTimestamp < graph.error[graph.error.length - 1].x;
+        const removeOldestPoint = (graph.length >= MAX_HISTORY_POINTS);
+        if (removeAllPoints) {
+            graph.error = [];
+        } else if (removeOldestPoint) {
+            graph.error.shift();
+        }
+
+        // add new data
+        const hasNewData = graph.error.length === 0 ||
+            currentTimestamp !== graph.error[graph.error.length - 1].x;
+        if (hasNewData) {
+            graph.error.push({x: currentTimestamp, y: controlData.stationError});
+        }
+    }
+
+    updateSteerCurve(graph, adc, vehicleParam) {
+        const steeringAngle = adc.steeringAngle / vehicleParam.steerRatio;
         let R = null;
         if (Math.abs(Math.tan(steeringAngle)) > 0.0001) {
-            R = adc.length / Math.tan(steeringAngle);
+            R = vehicleParam.length / Math.tan(steeringAngle);
         } else {
             R = 100000;
         }
@@ -148,7 +177,7 @@ export default class ControlData {
         }
     }
 
-    update(world) {
+    update(world, vehicleParam) {
         const trajectory = world.planningTrajectory;
         const adc = world.autoDrivingCar;
         if (trajectory && adc) {
@@ -161,12 +190,16 @@ export default class ControlData {
 
             this.updateGraph(this.data.trajectoryGraph,
                 trajectory, adc, 'positionX', 'positionY');
-            this.updateSteerCurve(this.data.trajectoryGraph, adc);
+            this.updateSteerCurve(this.data.trajectoryGraph, adc, vehicleParam);
             this.data.trajectoryGraph.pose[0].x = adc.positionX;
             this.data.trajectoryGraph.pose[0].y = adc.positionY;
             this.data.trajectoryGraph.pose[0].rotation = adc.heading;
 
             this.updateTime(world.planningTime);
+        }
+
+        if (world.controlData) {
+            this.updateStationErrorGraph(world.controlData);
         }
     }
 }

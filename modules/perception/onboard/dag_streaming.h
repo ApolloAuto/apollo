@@ -20,6 +20,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "gflags/gflags.h"
@@ -41,6 +42,8 @@ DECLARE_bool(enable_timing_remove_stale_data);
 class Subnode;
 class DAGStreamingMonitor;
 
+typedef std::map<SubnodeID, std::unique_ptr<Subnode>> SubnodeMap;
+
 class DAGStreaming : public Thread {
  public:
   DAGStreaming();
@@ -58,6 +61,8 @@ class DAGStreaming : public Thread {
 
   size_t CongestionValue() const;
 
+  static Subnode *GetSubnodeByName(std::string name);
+
  protected:
   void Run() override;
 
@@ -69,16 +74,14 @@ class DAGStreaming : public Thread {
 
   bool InitSharedData(const DAGConfig::SharedDataConfig &data_config);
 
-  typedef std::map<SubnodeID, std::unique_ptr<Subnode>> SubnodeMap;
-
   EventManager event_manager_;
   SharedDataManager shared_data_manager_;
   bool inited_ = false;
   std::unique_ptr<DAGStreamingMonitor> monitor_;
   // NOTE(Yangguang Li): Guarantee Sunode should be firstly called destructor.
   // Subnode depends the EventManager and SharedDataManager.
-  SubnodeMap subnode_map_;
-
+  static SubnodeMap subnode_map_;
+  static std::unordered_map<std::string, SubnodeID> subnode_name_map_;
   DISALLOW_COPY_AND_ASSIGN(DAGStreaming);
 };
 

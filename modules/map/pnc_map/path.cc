@@ -27,6 +27,9 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/string_util.h"
 
+// https://nacto.org/publication/urban-street-design-guide/street-design-elements/lane-width/
+DEFINE_double(default_lane_width, 3.048, "default lane width is about 10 feet");
+
 namespace apollo {
 namespace hdmap {
 
@@ -127,22 +130,30 @@ LaneWaypoint LeftNeighborWaypoint(const LaneWaypoint& waypoint) {
 }
 
 void LaneSegment::Join(std::vector<LaneSegment>* segments) {
+  constexpr double kSegmentDelta = 0.5;
   std::size_t k = 0;
   std::size_t i = 0;
   while (i < segments->size()) {
     std::size_t j = i;
     while (j + 1 < segments->size() &&
-           segments->at(i).lane->id().id() ==
-               segments->at(j + 1).lane->id().id()) {
+           segments->at(i).lane == segments->at(j + 1).lane) {
       ++j;
     }
-    segments->at(k).lane = segments->at(i).lane;
-    segments->at(k).start_s = segments->at(i).start_s;
-    segments->at(k).end_s = segments->at(j).end_s;
+    auto& segment_k = segments->at(k);
+    segment_k.lane = segments->at(i).lane;
+    segment_k.start_s = segments->at(i).start_s;
+    segment_k.end_s = segments->at(j).end_s;
+    if (segment_k.start_s < kSegmentDelta) {
+      segment_k.start_s = 0.0;
+    }
+    if (segment_k.end_s + kSegmentDelta >= segment_k.lane->total_length()) {
+      segment_k.end_s = segment_k.lane->total_length();
+    }
     i = j + 1;
     ++k;
   }
   segments->resize(k);
+  segments->shrink_to_fit();  // release memory
 }
 
 LaneWaypoint RightNeighborWaypoint(const LaneWaypoint& waypoint) {
@@ -314,9 +325,9 @@ void Path::InitWidth() {
   for (int i = 0; i < num_sample_points_; ++i) {
     const MapPathPoint point = GetSmoothPoint(s);
     if (point.lane_waypoints().empty()) {
-      left_width_.push_back(0.0);
-      right_width_.push_back(0.0);
-      AERROR << "path point:" << point.DebugString() << " has invalid width.";
+      left_width_.push_back(FLAGS_default_lane_width / 2.0);
+      right_width_.push_back(FLAGS_default_lane_width / 2.0);
+      AWARN << "path point:" << point.DebugString() << " has invalid width.";
     } else {
       const LaneWaypoint waypoint = point.lane_waypoints()[0];
       CHECK_NOTNULL(waypoint.lane);

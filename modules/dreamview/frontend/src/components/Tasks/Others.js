@@ -33,7 +33,7 @@ export default class Others extends React.Component {
                     <CheckboxItem id={"toggleSimControl"}
                                   title={"SimControl"}
                                   isChecked={options.simControlEnabled}
-                                  disabled={false}
+                                  disabled={options.tasksPanelLocked}
                                   onClick={() => {
                                       WS.toggleSimControl(!options.simControlEnabled);
                                       this.props.store.handleOptionToggle('simControlEnabled');

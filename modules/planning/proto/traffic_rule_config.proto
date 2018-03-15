@@ -1,0 +1,40 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ReroutingConfig {
+  // should not rerouting more frequent than this number
+  optional double cooldown_time = 1 [default = 0.6];  // seconds
+}
+
+message BacksideVehicleConfig {
+  // a vehicle is considered within current lane if it is behind the ADC and its lateral difference is less than this number.
+  optional double backside_lane_width = 1 [default=4.0];
+}
+
+// TODO(all) migrate all other traffic rules to pb config
+message TrafficRuleConfig {
+  enum RuleId {
+    BACKSIDE_VEHICLE = 1;
+    SIGNAL_LIGHT = 2;
+    CROSSWALK = 3;
+    CLEAR_ZONE = 4;
+    REROUTING = 5;
+    REFERENCE_LINE_END = 6;
+    DESTINATION = 7;
+    STOP_SIGN = 8;
+    CHANGE_LANE = 9;
+    SIDE_PASS_VEHICLE = 10;
+    KEEP_CLEAR = 11;
+    CIPV = 12;
+  }
+  optional RuleId rule_id = 1;
+  oneof config {
+    ReroutingConfig rerouting = 2;
+    BacksideVehicleConfig backside_vehicle = 3;
+  }
+}
+
+message TrafficRuleConfigs {
+  repeated TrafficRuleConfig config = 1;
+}

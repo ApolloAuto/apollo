@@ -26,13 +26,13 @@
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 using apollo::canbus::Chassis;
+using apollo::common::TrajectoryPoint;
 using apollo::common::monitor::MonitorMessage;
 using apollo::localization::LocalizationEstimate;
-using apollo::planning::ADCTrajectory;
-using apollo::common::TrajectoryPoint;
-using apollo::planning::DecisionResult;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using apollo::planning::ADCTrajectory;
+using apollo::planning::DecisionResult;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 
@@ -284,7 +284,6 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
     EXPECT_DOUBLE_EQ(0.0, point.position_x());
     EXPECT_DOUBLE_EQ(10.0, point.position_y());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
-    EXPECT_EQ(4, point.polygon_point_size());
   }
 
   // Check last point.
@@ -294,7 +293,6 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
     EXPECT_DOUBLE_EQ(280.0, point.position_x());
     EXPECT_DOUBLE_EQ(290.0, point.position_y());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
-    EXPECT_EQ(4, point.polygon_point_size());
   }
 }
 
@@ -358,9 +356,10 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   EXPECT_EQ("RIGHT", world.auto_driving_car().current_signal());
   EXPECT_EQ(35, world.speed_limit());
 
-  const Object& world_main_stop = world.main_stop();
-  EXPECT_EQ(world_main_stop.decision(0).stopreason(),
-            Decision::STOP_REASON_CROSSWALK);
+  const Object& world_main_stop = world.main_decision();
+  EXPECT_EQ(1, world_main_stop.decision_size());
+  EXPECT_EQ(Decision::STOP_REASON_CROSSWALK,
+            world_main_stop.decision(0).stopreason());
   EXPECT_DOUBLE_EQ(45678.9, world_main_stop.position_x());
   EXPECT_DOUBLE_EQ(1234567.8, world_main_stop.position_y());
   EXPECT_DOUBLE_EQ(1.234, world_main_stop.heading());
@@ -369,7 +368,7 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
   for (auto& kv : sim_world_service_->obj_map_) {
     *sim_world_service_->world_.add_object() = kv.second;
   }
-  EXPECT_EQ(world.object_size(), 2);
+  EXPECT_EQ(2, world.object_size());
 
   for (int i = 0; i < 2; ++i) {
     const Object& obj_dec = world.object(i);
@@ -440,14 +439,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
       const Prediction& prediction = obj.prediction(j);
       EXPECT_NEAR((sim_world.object_size() - i - 1) * 0.1 + j,
                   prediction.probability(), kEpsilon);
-      EXPECT_EQ(prediction.predicted_trajectory_size(), 8);
-      for (int k = 0; k < prediction.predicted_trajectory_size(); ++k) {
-        const auto& pt = prediction.predicted_trajectory(k);
-        int val = j * 10 + k;
-        EXPECT_NEAR(val, pt.x(), kEpsilon);
-        EXPECT_NEAR(val, pt.y(), kEpsilon);
-        EXPECT_NEAR(val, pt.z(), kEpsilon);
-      }
+      EXPECT_EQ(prediction.predicted_trajectory_size(), 2);  // Downsampled
     }
     EXPECT_NEAR(123.456, obj.timestamp_sec(), kEpsilon);
   }

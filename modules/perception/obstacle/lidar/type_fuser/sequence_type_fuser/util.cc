@@ -23,15 +23,17 @@ namespace sequence_type_fuser {
 
 void FromStdVector(const std::vector<float>& src_prob, Vectord* dst_prob) {
   (*dst_prob)(0) = src_prob[0];
-  for (std::size_t i = 3; i < MAX_OBJECT_TYPE; ++i) {
+  for (std::size_t i = 3; i < static_cast<int>(ObjectType::MAX_OBJECT_TYPE);
+       ++i) {
     (*dst_prob)(i - 2) = static_cast<double>(src_prob[i]);
   }
 }
 
 void FromEigenVector(const Vectord& src_prob, std::vector<float>* dst_prob) {
-  dst_prob->assign(MAX_OBJECT_TYPE, 0);
+  dst_prob->assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0);
   dst_prob->at(0) = src_prob(0);
-  for (std::size_t i = 3; i < MAX_OBJECT_TYPE; ++i) {
+  for (std::size_t i = 3; i < static_cast<int>(ObjectType::MAX_OBJECT_TYPE);
+       ++i) {
     dst_prob->at(i) = static_cast<float>(src_prob(i - 2));
   }
 }

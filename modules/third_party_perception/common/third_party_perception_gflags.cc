@@ -16,15 +16,13 @@
 
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 
-DEFINE_string(node_namespace, "/apollo/third_party_perception",
-              "Global node namespace");
 DEFINE_string(node_name, "third_party_perception",
               "The chassis module name in proto");
 DEFINE_string(module_name, "third_party_perception", "Module name");
 
 DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
 
-DEFINE_double(third_party_perception_freq, 100,
+DEFINE_double(third_party_perception_freq, 10,
               "third party perception timer frequency.");
 DEFINE_bool(enable_mobileye, true, "switch to turn on/off mobileye obstacles");
 DEFINE_bool(enable_radar, true, "switch to turn on/off radar obstacles");
@@ -80,3 +78,9 @@ DEFINE_int32(keep_radar_frames, 5, "number of delphi esr frames to keep");
 // TODO(QiL) : remove this temperary gflags
 DEFINE_bool(use_conti_radar, true,
             "use conti or delphi radar, true is conti, false is delphi");
+
+DEFINE_double(max_mobileye_obstacle_length, 31.2,
+              "maximum mobileye obstacle length");
+
+DEFINE_double(max_mobileye_obstacle_width, 12.7,
+              "maximum mobileye obstacle length");

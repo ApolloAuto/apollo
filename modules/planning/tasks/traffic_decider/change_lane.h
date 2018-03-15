@@ -34,7 +34,7 @@ namespace planning {
  */
 class ChangeLane : public TrafficRule {
  public:
-  explicit ChangeLane(const RuleConfig& config);
+  explicit ChangeLane(const TrafficRuleConfig& config);
   virtual ~ChangeLane() = default;
 
   bool ApplyRule(Frame* const frame,

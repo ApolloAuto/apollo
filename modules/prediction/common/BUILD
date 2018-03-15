@@ -21,7 +21,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/proto:lane_graph_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -41,12 +41,11 @@ cc_library(
     hdrs = ["prediction_map.h"],
     deps = [
         ":prediction_gflags",
-        "//modules/common/configs:config_gflags",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:vec2d",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -55,7 +54,6 @@ cc_test(
     size = "small",
     srcs = ["prediction_map_test.cc"],
     data = [
-        "//modules/common/configs:config_gflags",
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
     ],
@@ -72,12 +70,12 @@ cc_library(
     srcs = ["feature_output.cc"],
     hdrs = ["feature_output.h"],
     deps = [
+        "//modules/common:log",
+        "//modules/common/util",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/proto:feature_proto",
         "//modules/prediction/proto:offline_features_proto",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/common:log",
-        "//modules/common/util:util",
-    ]
+    ],
 )
 
 cc_test(
@@ -87,7 +85,7 @@ cc_test(
     deps = [
         ":feature_output",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_library(
@@ -107,7 +105,6 @@ cc_test(
     size = "small",
     srcs = ["road_graph_test.cc"],
     data = [
-        "//modules/common/configs:config_gflags",
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
     ],
@@ -125,7 +122,17 @@ cc_library(
     hdrs = ["kml_map_based_test.h"],
     deps = [
         "//modules/common/configs:config_gflags",
-        "@gtest//:gtest",
+        "@gtest",
+    ],
+)
+
+cc_library(
+    name = "validation_checker",
+    srcs = ["validation_checker.cc"],
+    hdrs = ["validation_checker.h"],
+    deps = [
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/prediction/common:prediction_gflags",
     ],
 )
 

@@ -23,9 +23,9 @@
 #include "pcl/io/pcd_io.h"
 
 #include "modules/common/util/file.h"
+#include "modules/perception/common/file_system_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/timer.h"
-#include "modules/perception/obstacle/common/file_system_util.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/onboard/obstacle_perception.h"
 
@@ -173,7 +173,7 @@ class SequentialPerceptionTest {
         dynamic_cast<VelodyneRawFrame*>(frame->get());
     velodyne_frame->timestamp_ = timestamp;
     velodyne_frame->pose_ = pose;
-    velodyne_frame->sensor_type_ = VELODYNE_64;
+    velodyne_frame->sensor_type_ = SensorType::VELODYNE_64;
     velodyne_frame->cloud_ = cloud;
     return true;
   }
@@ -227,7 +227,7 @@ class SequentialPerceptionTest {
     RadarRawFrame* radar_frame = dynamic_cast<RadarRawFrame*>(frame->get());
     radar_frame->timestamp_ = timestamp;
     radar_frame->pose_ = pose;
-    radar_frame->sensor_type_ = RADAR;
+    radar_frame->sensor_type_ = SensorType::RADAR;
     radar_frame->raw_obstacles_ = radar_obs_proto;
     radar_frame->car_linear_speed_ = velocity;
     return true;

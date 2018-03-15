@@ -27,13 +27,13 @@ TEST(PbfSensorManagerTest, pbf_sensor_frame_manage_test) {
   EXPECT_TRUE(sensor_manager != nullptr);
   SensorObjects lidar_frame;
   lidar_frame.timestamp = 1234567891.01;
-  lidar_frame.sensor_type = VELODYNE_64;
+  lidar_frame.sensor_type = SensorType::VELODYNE_64;
   std::string lidar_name = GetSensorType(lidar_frame.sensor_type);
   ObjectPtr obj(new Object());
   lidar_frame.objects.push_back(obj);
   SensorObjects radar_frame;
   radar_frame.timestamp = 1234567891.11;
-  radar_frame.sensor_type = RADAR;
+  radar_frame.sensor_type = SensorType::RADAR;
   std::string radar_name = GetSensorType(radar_frame.sensor_type);
   ObjectPtr radar_obj(new Object());
   radar_frame.objects.push_back(radar_obj);

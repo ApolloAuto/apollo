@@ -269,6 +269,7 @@ class AdapterManager {
   REGISTER_ADAPTER(Mobileye);
   REGISTER_ADAPTER(DelphiESR);
   REGISTER_ADAPTER(ContiRadar);
+  REGISTER_ADAPTER(Ultrasonic);
   REGISTER_ADAPTER(CompressedImage);
   REGISTER_ADAPTER(GnssRtkObs);
   REGISTER_ADAPTER(GnssRtkEph);
@@ -280,6 +281,8 @@ class AdapterManager {
   REGISTER_ADAPTER(DriveEvent);
   REGISTER_ADAPTER(RelativeMap);
   REGISTER_ADAPTER(Navigation);
+  REGISTER_ADAPTER(VoiceDetectionRequest);
+  REGISTER_ADAPTER(VoiceDetectionResponse);
 
   DECLARE_SINGLETON(AdapterManager);
 };

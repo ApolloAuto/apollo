@@ -32,10 +32,11 @@
 
 #include "google/protobuf/util/message_differencer.h"
 
-#include "modules/common/math/vec2d.h"
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+
+#include "modules/common/math/vec2d.h"
 
 /**
  * @namespace apollo::common::util
@@ -81,6 +82,8 @@ common::math::Vec2d MakeVec2d(const T& t) {
 }
 
 PointENU MakePointENU(const double x, const double y, const double z);
+
+PointENU operator+(const PointENU enu, const math::Vec2d& xy);
 
 PointENU MakePointENU(const math::Vec2d& xy);
 
@@ -153,6 +156,52 @@ bool SamePointXY(const U& u, const V& v) {
   constexpr double kMathEpsilonSqr = 1e-8 * 1e-8;
   return (u.x() - v.x()) * (u.x() - v.x()) < kMathEpsilonSqr &&
          (u.y() - v.y()) * (u.y() - v.y()) < kMathEpsilonSqr;
+}
+
+PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,
+                                            const PathPoint& p2,
+                                            const double w1, const double w2);
+
+// a wrapper template function for remove_if (notice that remove_if cannot
+// change the Container size)
+template <class Container, class F>
+void erase_where(Container& c, F&& f) {  // NOLINT
+  c.erase(std::remove_if(c.begin(), c.end(), std::forward<F>(f)), c.end());
+}
+
+// a wrapper template function for remove_if on associative containers
+template <class Container, class F>
+void erase_map_where(Container& c, F&& f) {  // NOLINT
+  for (auto it = c.begin(); it != c.end();) {
+    if (f(*it)) {
+      it = c.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
+template <typename T>
+void QuaternionToRotationMatrix(const T* quat, T* R) {
+  T x2 = quat[0] * quat[0];
+  T xy = quat[0] * quat[1];
+  T rx = quat[3] * quat[0];
+  T y2 = quat[1] * quat[1];
+  T yz = quat[1] * quat[2];
+  T ry = quat[3] * quat[1];
+  T z2 = quat[2] * quat[2];
+  T zx = quat[2] * quat[0];
+  T rz = quat[3] * quat[2];
+  T r2 = quat[3] * quat[3];
+  R[0] = r2 + x2 - y2 - z2;  // fill diagonal terms
+  R[4] = r2 - x2 + y2 - z2;
+  R[8] = r2 - x2 - y2 + z2;
+  R[3] = 2 * (xy + rz);  // fill off diagonal terms
+  R[6] = 2 * (zx - ry);
+  R[7] = 2 * (yz + rx);
+  R[1] = 2 * (xy - rz);
+  R[2] = 2 * (zx + ry);
+  R[5] = 2 * (yz - rx);
 }
 
 }  // namespace util

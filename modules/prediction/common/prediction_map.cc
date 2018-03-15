@@ -25,7 +25,6 @@
 #include <utility>
 #include <vector>
 
-#include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -131,9 +130,9 @@ void PredictionMap::OnLane(
   common::PointENU hdmap_point;
   hdmap_point.set_x(point[0]);
   hdmap_point.set_y(point[1]);
-  if (HDMapUtil::BaseMap().GetLanesWithHeading(
-          hdmap_point, radius, heading, FLAGS_max_lane_angle_diff,
-          &candidate_lanes) != 0) {
+  if (HDMapUtil::BaseMap().GetLanesWithHeading(hdmap_point, radius, heading,
+                                               FLAGS_max_lane_angle_diff,
+                                               &candidate_lanes) != 0) {
     return;
   }
   int max_num_lane = FLAGS_max_num_current_lane;
@@ -150,7 +149,8 @@ void PredictionMap::OnLane(
     if (on_lane && !candidate_lane->IsOnLane(vec_point)) {
       continue;
     }
-    if (!IsIdenticalLane(candidate_lane, prev_lanes) &&
+    if (!FLAGS_use_navigation_mode &&
+        !IsIdenticalLane(candidate_lane, prev_lanes) &&
         !IsSuccessorLane(candidate_lane, prev_lanes) &&
         !IsLeftNeighborLane(candidate_lane, prev_lanes) &&
         !IsRightNeighborLane(candidate_lane, prev_lanes)) {

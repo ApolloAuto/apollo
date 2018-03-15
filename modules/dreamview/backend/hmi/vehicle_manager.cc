@@ -21,7 +21,7 @@
 #include "modules/common/util/string_util.h"
 
 DEFINE_string(vehicle_data_config_filename,
-              "modules/dreamview/conf/vehicle_data.pb.txt",
+              "/apollo/modules/dreamview/conf/vehicle_data.pb.txt",
               "Vehicle data config file.");
 
 namespace apollo {
@@ -47,8 +47,8 @@ bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
   }
 
   for (const auto &data_file : vehicle_data_.data_files()) {
-    const auto source_path = StrCat(
-        vehicle_data_path, "/", data_file.source_path());
+    const auto source_path =
+        StrCat(vehicle_data_path, "/", data_file.source_path());
     const auto &dest_path = data_file.dest_path();
 
     const bool ret = apollo::common::util::Copy(source_path, dest_path);
@@ -58,8 +58,8 @@ bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
   static const std::string kBroadcastExtrinsicsCmd =
       "bash scripts/broadcast_extrinsics.sh";
   const int ret = std::system(kBroadcastExtrinsicsCmd.c_str());
-  AERROR_IF(ret != 0) << "Command returns " << ret
-      << ": " << kBroadcastExtrinsicsCmd;
+  AERROR_IF(ret != 0) << "Command returns " << ret << ": "
+                      << kBroadcastExtrinsicsCmd;
 
   return true;
 }

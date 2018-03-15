@@ -22,6 +22,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/map/relative_map/relative_map.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
@@ -78,17 +79,18 @@ Status Prediction::Init() {
   EvaluatorManager::instance()->Init(prediction_conf_);
   PredictorManager::instance()->Init(prediction_conf_);
 
-  CHECK(AdapterManager::GetLocalization()) << "Localization is not ready.";
-  CHECK(AdapterManager::GetPerceptionObstacles()) << "Perception is not ready.";
+  CHECK(AdapterManager::GetLocalization()) << "Localization is not registered.";
+  CHECK(AdapterManager::GetPerceptionObstacles())
+      << "Perception is not registered.";
 
-  // Set perception obstacle callback function
-  AdapterManager::AddPerceptionObstaclesCallback(&Prediction::RunOnce, this);
   // Set localization callback function
   AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
   // Set planning callback function
   AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
+  // Set perception obstacle callback function
+  AdapterManager::AddPerceptionObstaclesCallback(&Prediction::RunOnce, this);
 
-  if (!PredictionMap::Ready()) {
+  if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     return OnError("Map cannot be loaded.");
   }
 
@@ -136,6 +138,13 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
     ros::shutdown();
+  }
+
+  AdapterManager::Observe();
+
+  if (FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
+    AERROR << "Relative map is empty.";
+    return;
   }
 
   double start_timestamp = Clock::NowInSeconds();

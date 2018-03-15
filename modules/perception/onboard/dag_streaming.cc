@@ -40,6 +40,9 @@ DEFINE_int32(max_allowed_congestion_value, 0,
 DEFINE_bool(enable_timing_remove_stale_data, true,
             "whether timing clean shared data");
 
+SubnodeMap DAGStreaming::subnode_map_;
+std::unordered_map<std::string, SubnodeID> DAGStreaming::subnode_name_map_;
+
 DAGStreaming::DAGStreaming()
     : Thread(true, "DAGStreamingThread"),
       inited_(false),
@@ -163,15 +166,15 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
       return false;
     }
 
-    bool result = inst->Init(
-        subnode_config, &event_manager_, &shared_data_manager_,
-        subnode_sub_events_map[subnode_id], subnode_pub_events_map[subnode_id]);
+    bool result = inst->Init(subnode_config, subnode_sub_events_map[subnode_id],
+                             subnode_pub_events_map[subnode_id],
+                             &event_manager_, &shared_data_manager_);
     if (!result) {
       AERROR << "failed to Init subnode. name: " << inst->name();
       return false;
     }
     subnode_map_.emplace(subnode_id, std::unique_ptr<Subnode>(inst));
-
+    subnode_name_map_[subnode_config.name()] = subnode_id;
     AINFO << "Init subnode succ. " << inst->DebugString();
   }
 
@@ -223,6 +226,15 @@ void DAGStreamingMonitor::Run() {
     }
     sleep(1);
   }
+}
+
+Subnode* DAGStreaming::GetSubnodeByName(std::string name) {
+  std::unordered_map<std::string, SubnodeID>::iterator iter =
+      subnode_name_map_.find(name);
+  if (iter != subnode_name_map_.end()) {
+    return subnode_map_[iter->second].get();
+  }
+  return nullptr;
 }
 
 }  // namespace perception

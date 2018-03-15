@@ -28,7 +28,8 @@
 namespace apollo {
 namespace planning {
 
-Destination::Destination(const RuleConfig& config) : TrafficRule(config) {}
+Destination::Destination(const TrafficRuleConfig& config)
+    : TrafficRule(config) {}
 
 bool Destination::ApplyRule(Frame* const,
                             ReferenceLineInfo* const reference_line_info) {
@@ -55,7 +56,8 @@ bool Destination::ApplyRule(Frame* const,
   stop.mutable_stop()->mutable_stop_point()->set_y(stop_point.y());
   stop.mutable_stop()->mutable_stop_point()->set_z(0.0);
   path_decision->AddLongitudinalDecision(
-      RuleConfig::RuleId_Name(config_.rule_id()), destination->Id(), stop);
+      TrafficRuleConfig::RuleId_Name(config_.rule_id()), destination->Id(),
+      stop);
   return true;
 }
 

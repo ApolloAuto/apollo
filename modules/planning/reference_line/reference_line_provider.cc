@@ -24,9 +24,11 @@
 #include <limits>
 #include <utility>
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
@@ -41,9 +43,12 @@ namespace planning {
 
 using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleState;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
+using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneWaypoint;
+using apollo::hdmap::MapPathPoint;
 using apollo::hdmap::RouteSegments;
 
 apollo::common::util::Factory<
@@ -73,13 +78,16 @@ void ReferenceLineProvider::RegisterSmoothers() {
 ReferenceLineProvider::ReferenceLineProvider(
     const hdmap::HDMap *base_map,
     PlanningConfig::ReferenceLineSmootherType smoother_type) {
-  pnc_map_.reset(new hdmap::PncMap(base_map));
+  if (!FLAGS_use_navigation_mode) {
+    pnc_map_.reset(new hdmap::PncMap(base_map));
+  }
   if (s_smoother_factory_.Empty()) {
     RegisterSmoothers();
   }
-  CHECK(common::util::GetProtoFromFile(FLAGS_smoother_config_file,
+  CHECK(common::util::GetProtoFromFile(FLAGS_smoother_config_filename,
                                        &smoother_config_))
-      << "Failed to load smoother config file " << FLAGS_smoother_config_file;
+      << "Failed to load smoother config file "
+      << FLAGS_smoother_config_filename;
   smoother_ = s_smoother_factory_.CreateObject(smoother_type, smoother_config_);
   is_initialized_ = true;
 }  // namespace planning
@@ -105,6 +113,9 @@ void ReferenceLineProvider::UpdateVehicleState(
 }
 
 bool ReferenceLineProvider::Start() {
+  if (FLAGS_use_navigation_mode) {
+    return true;
+  }
   if (!is_initialized_) {
     AERROR << "ReferenceLineProvider has NOT been initiated.";
     return false;
@@ -187,8 +198,13 @@ void ReferenceLineProvider::GenerateThread() {
 }
 
 double ReferenceLineProvider::LastTimeDelay() {
-  std::lock_guard<std::mutex> lock(reference_lines_mutex_);
-  return last_calculation_time_;
+  if (FLAGS_enable_reference_line_provider_thread &&
+      !FLAGS_use_navigation_mode) {
+    std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+    return last_calculation_time_;
+  } else {
+    return last_calculation_time_;
+  }
 }
 
 bool ReferenceLineProvider::GetReferenceLines(
@@ -196,6 +212,19 @@ bool ReferenceLineProvider::GetReferenceLines(
     std::list<hdmap::RouteSegments> *segments) {
   CHECK_NOTNULL(reference_lines);
   CHECK_NOTNULL(segments);
+
+  if (FLAGS_use_navigation_mode) {
+    double start_time = Clock::NowInSeconds();
+    bool result = GetReferenceLinesFromRelativeMap(
+        AdapterManager::GetRelativeMap()->GetLatestObserved(), reference_lines,
+        segments);
+    if (!result) {
+      AERROR << "Failed to get reference line from relative map";
+    }
+    double end_time = Clock::NowInSeconds();
+    last_calculation_time_ = end_time - start_time;
+    return result;
+  }
 
   if (FLAGS_enable_reference_line_provider_thread) {
     std::lock_guard<std::mutex> lock(reference_lines_mutex_);
@@ -232,6 +261,40 @@ void ReferenceLineProvider::PrioritzeChangeLane(
     }
     ++iter;
   }
+}
+
+bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
+    const relative_map::MapMsg &relative_map,
+    std::list<ReferenceLine> *reference_line,
+    std::list<hdmap::RouteSegments> *segments) {
+  if (relative_map.navigation_path_size() <= 0) {
+    return false;
+  }
+  auto *hdmap = HDMapUtil::BaseMapPtr();
+  for (const auto path_pair : relative_map.navigation_path()) {
+    const auto &lane_id = path_pair.first;
+    const auto &path_points = path_pair.second.path().path_point();
+    auto lane_ptr = hdmap->GetLaneById(hdmap::MakeMapId(lane_id));
+    RouteSegments segment;
+    segment.emplace_back(lane_ptr, 0.0, lane_ptr->total_length());
+    segment.SetCanExit(true);
+    segment.SetId(lane_id);
+    segment.SetNextAction(routing::FORWARD);
+    segment.SetIsOnSegment(true);
+    segment.SetStopForDestination(false);
+    segment.SetPreviousAction(routing::FORWARD);
+    segments->emplace_back(segment);
+    std::vector<ReferencePoint> ref_points;
+    for (const auto &path_point : path_points) {
+      ref_points.emplace_back(
+          MapPathPoint{Vec2d{path_point.x(), path_point.y()},
+                       path_point.theta(),
+                       LaneWaypoint(lane_ptr, path_point.s())},
+          path_point.kappa(), path_point.dkappa(), 0.0, 0.0);
+    }
+    reference_line->emplace_back(ref_points.begin(), ref_points.end());
+  }
+  return true;
 }
 
 bool ReferenceLineProvider::CreateRouteSegments(
@@ -456,41 +519,58 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
     const ReferenceLine &reference_line, double s) const {
   AnchorPoint anchor;
   anchor.longitudinal_bound = smoother_config_.longitudinal_boundary_bound();
-  const auto adc_half_width =
-      VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
   auto ref_point = reference_line.GetReferencePoint(s);
+  if (ref_point.lane_waypoints().empty()) {
+    anchor.path_point = ref_point.ToPathPoint(s);
+    anchor.lateral_bound = smoother_config_.lateral_boundary_bound();
+    return anchor;
+  }
+  const double adc_width =
+      VehicleConfigHelper::GetConfig().vehicle_param().width();
+  const double adc_half_width = adc_width / 2.0;
   const Vec2d left_vec =
       Vec2d::CreateUnitVec2d(ref_point.heading() + M_PI / 2.0);
-  const Vec2d right_vec =
-      Vec2d::CreateUnitVec2d(ref_point.heading() - M_PI / 2.0);
-
-  Vec2d all_shifts(0.0, 0.0);
-
+  auto waypoint = ref_point.lane_waypoints().front();
   // shift to center
   double left_width = 0.0;
   double right_width = 0.0;
-  reference_line.GetLaneWidth(s, &left_width, &right_width);
-  auto shift_to_center = (left_width - right_width) / 2.0 * left_vec;
-  all_shifts += shift_to_center;
+  waypoint.lane->GetWidth(waypoint.s, &left_width, &right_width);
+  double total_width = left_width + right_width;
+  // only need to track left side width shift
+  double shifted_left_width = total_width / 2.0;
 
-  // avoid curb boundary
-  if (!ref_point.lane_waypoints().empty()) {
-    const LaneWaypoint &waypoint = ref_point.lane_waypoints()[0];
-    auto left_type = hdmap::LeftBoundaryType(waypoint);
-    if (left_type == hdmap::LaneBoundaryType::CURB) {
-      all_shifts += smoother_config_.curb_shift() * right_vec;
-    }
-    auto right_type = hdmap::RightBoundaryType(waypoint);
-    if (right_type == hdmap::LaneBoundaryType::CURB) {
-      all_shifts += smoother_config_.curb_shift() * left_vec;
+  // shift to left (or right) on wide lanes
+  if (!(waypoint.lane->lane().left_boundary().virtual_() ||
+        waypoint.lane->lane().left_boundary().virtual_()) &&
+      total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
+    if (smoother_config_.driving_side() == ReferenceLineSmootherConfig::RIGHT) {
+      shifted_left_width =
+          adc_half_width +
+          adc_width * smoother_config_.wide_lane_shift_remain_factor();
+    } else {
+      shifted_left_width = std::fmax(
+          adc_half_width,
+          total_width -
+              (adc_half_width +
+               adc_width * smoother_config_.wide_lane_shift_remain_factor()));
     }
   }
 
-  ref_point += all_shifts;
+  // shift away from curb boundary
+  auto left_type = hdmap::LeftBoundaryType(waypoint);
+  if (left_type == hdmap::LaneBoundaryType::CURB) {
+    shifted_left_width += smoother_config_.curb_shift();
+  }
+  auto right_type = hdmap::RightBoundaryType(waypoint);
+  if (right_type == hdmap::LaneBoundaryType::CURB) {
+    shifted_left_width -= smoother_config_.curb_shift();
+  }
+
+  ref_point += left_vec * (left_width - shifted_left_width);
+  auto shifted_right_width = total_width - shifted_left_width;
   anchor.path_point = ref_point.ToPathPoint(s);
-  double effective_width = (left_width + right_width) / 2.0 - adc_half_width -
-                           FLAGS_reference_line_lateral_buffer -
-                           all_shifts.Length();
+  double effective_width = std::min(shifted_left_width, shifted_right_width) -
+                           adc_half_width - FLAGS_reference_line_lateral_buffer;
   anchor.lateral_bound =
       std::max(smoother_config_.lateral_boundary_bound(), effective_width);
   return anchor;
@@ -545,12 +625,11 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
     if (sl_point.s() < 0 || sl_point.s() > prefix_ref.Length()) {
       continue;
     }
-    auto prefix_ref_point = prefix_ref.GetNearestReferencepoint(sl_point.s());
+    auto prefix_ref_point = prefix_ref.GetNearestReferencePoint(sl_point.s());
     point.path_point.set_x(prefix_ref_point.x());
     point.path_point.set_y(prefix_ref_point.y());
     point.path_point.set_z(0.0);
     point.path_point.set_theta(prefix_ref_point.heading());
-    point.path_point.set_dkappa(prefix_ref_point.dkappa());
     point.longitudinal_bound = 1e-6;
     point.lateral_bound = 1e-6;
     point.enforced = true;

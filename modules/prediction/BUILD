@@ -21,6 +21,7 @@ cc_library(
         "//modules/common/time",
         "//modules/common/util",
         "//modules/localization/proto:localization_proto",
+        "//modules/map/relative_map:relative_map_lib",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/common:feature_output",

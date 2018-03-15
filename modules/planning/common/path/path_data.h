@@ -24,7 +24,6 @@
 #include <list>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "modules/planning/common/path/discretized_path.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
@@ -61,7 +60,7 @@ class PathData {
 
   void Clear();
 
-  bool IsEmpty() const;
+  bool Empty() const;
 
   std::string DebugString() const;
 

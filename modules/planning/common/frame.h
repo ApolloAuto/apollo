@@ -28,7 +28,7 @@
 #include <vector>
 
 #include "modules/common/proto/geometry.pb.h"
-#include "modules/common/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"

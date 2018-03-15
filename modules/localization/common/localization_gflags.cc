@@ -121,7 +121,6 @@ DEFINE_double(imu_to_ant_offset_uz, 0.0, "Imu ant offset z uncertainty");
 DEFINE_double(imu_rate, 1.0, "");
 DEFINE_bool(if_utm_zone_id_from_folder, true,
             "load utm zone id from local map folder");
-DEFINE_int32(local_utm_zone_id, 50, "UTM zone id");
 DEFINE_bool(trans_gpstime_to_utctime, true, "");
 DEFINE_int32(gnss_mode, 0, "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");
 DEFINE_bool(imu_coord_rfu, true, "Right/forward/up");
@@ -129,6 +128,18 @@ DEFINE_bool(gnss_only_init, false,
             "Whether use bestgnsspose as measure after initializaiton.");
 DEFINE_bool(enable_lidar_localization, true,
             "Enable lidar-based localization.");
+
+// imu vehicle extrinsic
+DEFINE_string(vehicle_imu_file,
+              "modules/localization/msf/params"
+              "/vehicle_params/vehicle_imu_extrinsics.yaml",
+              "Vehicle coord to imu coord.");
+DEFINE_bool(if_vehicle_imu_from_file, true,
+            "Whether load vehicle imu extrinsic from yaml file");
+DEFINE_double(imu_vehicle_qx, 0.0, "Vehicle imu quaternion qx");
+DEFINE_double(imu_vehicle_qy, 0.0, "Vehicle imu quaternion qy");
+DEFINE_double(imu_vehicle_qz, 0.0, "Vehicle imu quaternion qz");
+DEFINE_double(imu_vehicle_qw, 1.0, "Vehicle imu quaternion qw");
 
 // debug
 DEFINE_bool(use_visualize, false, "");

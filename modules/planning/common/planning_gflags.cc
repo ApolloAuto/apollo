@@ -28,7 +28,11 @@ DEFINE_string(planning_adapter_config_filename,
               "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
 
-DEFINE_string(smoother_config_file,
+DEFINE_string(traffic_rule_config_filename,
+              "modules/planning/conf/traffic_rule_config.pb.txt",
+              "Traffic rule config filename");
+
+DEFINE_string(smoother_config_filename,
               "modules/planning/conf/smoother_config.pb.txt",
               "The configuration file for qp sline smoother");
 
@@ -72,10 +76,6 @@ DEFINE_double(reference_line_lateral_buffer, 0.5,
 DEFINE_double(prepare_rerouting_time, 2.0,
               "If there are this amount of seconds left to finish driving on "
               "current route, and there is no routing, do rerouting");
-
-DEFINE_double(rerouting_cooldown_time, 0.6,
-              "Wait for at least this amount of seconds before send another "
-              "rerouting request");
 
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
@@ -187,8 +187,6 @@ DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
 
-DEFINE_bool(try_history_decision, false, "try history decision first");
-
 DEFINE_double(static_decision_nudge_l_buffer, 0.5, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
@@ -212,8 +210,6 @@ DEFINE_double(
 DEFINE_double(
     follow_min_time_sec, 0.1,
     "min following time in st region before considering a valid follow");
-DEFINE_double(within_lane_bound, 4.0,
-              "distance to be considered within current lane");
 
 DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
@@ -223,21 +219,12 @@ DEFINE_double(signal_expire_time_sec, 5.0,
               "consider the signal msg is expired if its timestamp over "
               "this threshold (second)");
 
-// Speed Decider
-DEFINE_double(low_speed_obstacle_threshold, 2.0,
-              "speed lower than this value is considered as low speed");
-DEFINE_double(
-    decelerating_obstacle_threshold, -0.25,
-    "acceleration lower than this value is considered as decelerating");
-
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
 DEFINE_bool(align_prediction_time, false,
             "enable align prediction data based planning time");
 
 // Trajectory
-DEFINE_bool(enable_rule_layer, true,
-            "enable rule for trajectory before model computation");
 
 // Traffic decision
 /// common
@@ -294,16 +281,19 @@ DEFINE_bool(enable_stop_sign_creeping, false,
             "or two way stop signs.");
 DEFINE_string(stop_sign_virtual_obstacle_id_prefix, "SS_",
               "prefix for converting stop_sign id to virtual obstacle id");
-DEFINE_double(stop_sign_stop_duration, 3.0,
+DEFINE_double(stop_sign_stop_duration, 1.0,
               "min time(second) to stop at stop sign");
 DEFINE_double(stop_sign_min_pass_distance, 3.0,
               "valid min distance(m) for vehicles to be considered as "
               "have passed stop sign (stop_line_end_s)");
 DEFINE_double(stop_sign_stop_distance, 1.0,
               "stop distance from stop line of stop sign");
-DEFINE_double(stop_sign_max_watch_vehicle_stop_speed, 0.5,
-              "max speed(m/s) for watch vehicles to be considered as a stop."
-              "(this check is looser than adc)");
+DEFINE_double(stop_sign_watch_vehicle_max_stop_speed, 0.5,
+              "max speed(m/s) for watch vehicles to be considered as "
+              " a valid stop.(this check is looser than adc)");
+DEFINE_double(stop_sign_watch_vehicle_max_stop_distance, 5.0,
+              "max stop distance for watch vehicles to be considered as "
+              " a valid stop.(this check is looser than adc)");
 
 DEFINE_bool(enable_sidepass, true,
             "True to enable side pass long stopping obstacles");
@@ -359,8 +349,6 @@ DEFINE_double(perception_confidence_threshold, 0.4,
               "this threshold.");
 
 // QpSt optimizer
-DEFINE_bool(enable_slowdown_profile_generator, true,
-            "True to enable slowdown speed profile generator.");
 DEFINE_double(slowdown_profile_deceleration, -1.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");
 DEFINE_bool(enable_follow_accel_constraint, true,
@@ -382,22 +370,15 @@ DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
 
 /// Lattice Planner
 DEFINE_double(lattice_epsilon, 1e-6, "Epsilon in lattice planner.");
-DEFINE_int32(num_lattice_traj_to_plot, 5,
-             "Number of lattice trajectories to plot");
 DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
-DEFINE_double(spiral_downsample_curvature_thred, 0.02,
-              "curvature threshold for down sampling reference line points");
-DEFINE_bool(enable_lattice_st_image_dump, false,
-            "enable sending the lattice st image");
+
 DEFINE_bool(enable_auto_tuning, false, "enable auto tuning data emission");
 
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
-DEFINE_double(collision_buffer_expansion_ratio, 0.0,
-              "The ratio w.r.t. the vehicle dimension "
-              "to expand in collision checking");
+
 DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
 DEFINE_bool(enable_backup_trajectory, false,
@@ -427,3 +408,15 @@ DEFINE_double(lon_collision_overtake_buffer, 5.0,
               "Longitudinal collision buffer for overtake");
 DEFINE_double(lon_collision_cost_std, 0.5,
               "The standard deviation of logitudinal collision cost function");
+DEFINE_double(default_lon_buffer, 5.0,
+              "Default longitudinal buffer to sample path-time points.");
+DEFINE_double(time_min_density, 1.0,
+              "Minimal time density to search sample points.");
+DEFINE_double(comfort_acceleration_factor, 0.5,
+              "Factor for comfort acceleration.");
+DEFINE_double(polynomial_minimal_param, 0.01,
+              "Minimal time parameter in polynomials.");
+
+// navigation mode
+DEFINE_double(navigation_fallback_cruise_time, 8.0,
+              "The time range of fallback cruise under navigation mode.");

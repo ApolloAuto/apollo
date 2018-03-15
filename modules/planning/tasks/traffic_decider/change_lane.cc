@@ -39,7 +39,7 @@ constexpr double kMinOvertakeDistance = 10.0;
 constexpr double kOvertakeTimeBuffer = 2.0;
 }  // namespace
 
-ChangeLane::ChangeLane(const RuleConfig& config) : TrafficRule(config) {}
+ChangeLane::ChangeLane(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool ChangeLane::FilterObstacles(ReferenceLineInfo* reference_line_info) {
   const auto& reference_line = reference_line_info->reference_line();
@@ -113,7 +113,7 @@ bool ChangeLane::CreateGuardObstacle(
   double ref_s = sl_point.s() + kStepDistance;
   for (double t = last_point.relative_time() + time_delta; ref_s < end_s;
        ref_s += kStepDistance, s += kStepDistance, t += time_delta) {
-    auto ref_point = reference_line.GetNearestReferencepoint(ref_s);
+    auto ref_point = reference_line.GetNearestReferencePoint(ref_s);
 
     Vec2d xy_point;
     if (!reference_line.SLToXY(common::util::MakeSLPoint(ref_s, sl_point.l()),
@@ -163,8 +163,8 @@ bool ChangeLane::ApplyRule(Frame* const frame,
     const auto& reference_line = reference_line_info->reference_line();
     for (const auto* path_obstacle : overtake_obstacles_) {
       auto overtake = CreateOvertakeDecision(reference_line, path_obstacle);
-      path_decision->AddLongitudinalDecision(RuleConfig::RuleId_Name(Id()),
-                                             path_obstacle->Id(), overtake);
+      path_decision->AddLongitudinalDecision(
+          TrafficRuleConfig::RuleId_Name(Id()), path_obstacle->Id(), overtake);
     }
   }
   return true;

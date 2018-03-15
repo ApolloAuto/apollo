@@ -25,4 +25,4 @@ source "$DIR/apollo_base.sh"
 
 # run function from apollo_base.sh
 # run command_name module_name
-run third_party_perception "$@"
+run third_party_perception "$@" --use_navigation_mode

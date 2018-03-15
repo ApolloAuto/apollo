@@ -1,0 +1,33 @@
+config: {
+    rule_id: BACKSIDE_VEHICLE
+    backside_vehicle {
+        backside_lane_width: 4.0
+    }
+}
+config: {
+    rule_id: SIGNAL_LIGHT
+}
+config: {
+    rule_id: REFERENCE_LINE_END
+}
+config: {
+    rule_id: DESTINATION
+}
+config: {
+    rule_id: CHANGE_LANE
+}
+config: {
+    rule_id: CROSSWALK
+}
+config: {
+    rule_id: STOP_SIGN
+}
+config: {
+    rule_id: SIDE_PASS_VEHICLE
+}
+config: {
+    rule_id: KEEP_CLEAR
+}
+config: {
+    rule_id: CIPV
+}

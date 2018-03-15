@@ -30,6 +30,7 @@
 namespace apollo {
 namespace third_party_perception {
 
+using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
@@ -55,6 +56,8 @@ Status ThirdPartyPerception::Init() {
       << "Localization is not initialized.";
   AdapterManager::AddLocalizationCallback(&ThirdPartyPerception::OnLocalization,
                                           this);
+  CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
+  AdapterManager::AddChassisCallback(&ThirdPartyPerception::OnChassis, this);
 
   // TODO(all) : need to merge the delphi/conti_radar before adaptor manager
   // level. This is just temperary change.
@@ -87,9 +90,15 @@ void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
   AINFO << "Received mobileye data: run mobileye callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   if (FLAGS_enable_mobileye) {
-    mobileye_obstacles_ =
-        conversion::MobileyeToPerceptionObstacles(message, localization_);
+    mobileye_obstacles_ = conversion::MobileyeToPerceptionObstacles(
+        message, localization_, chassis_);
   }
+}
+
+void ThirdPartyPerception::OnChassis(const Chassis& message) {
+  AINFO << "Received chassis data: run chassis callback.";
+  std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
+  chassis_.CopyFrom(message);
 }
 
 void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
@@ -107,11 +116,11 @@ void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
 }
 
 void ThirdPartyPerception::OnContiRadar(const ContiRadar& message) {
-  AINFO << "Received delphi esr data: run delphi esr callback.";
+  AINFO << "Received delphi esr data: run continental radar callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
   current_radar_obstacles_ = conversion::ContiToRadarObstacles(
-      message, localization_, last_radar_obstacles_);
+      message, localization_, last_radar_obstacles_, chassis_);
   RadarObstacles filtered_radar_obstacles =
       filter::FilterRadarObstacles(current_radar_obstacles_);
   if (FLAGS_enable_radar) {

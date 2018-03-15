@@ -224,7 +224,7 @@ class MPCController : public Controller {
   std::unique_ptr<Interpolation1D> steer_weight_interpolation_;
 
   // for logging purpose
-  std::ofstream steer_log_file_;
+  std::ofstream mpc_log_file_;
 
   const std::string name_;
 

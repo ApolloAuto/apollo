@@ -28,6 +28,7 @@
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control/sim_control_interface.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -50,7 +51,9 @@ class SimControl : SimControlInterface {
    */
   explicit SimControl(const MapService *map_service);
 
-  inline bool IsEnabled() const { return enabled_; }
+  inline bool IsEnabled() const {
+    return enabled_;
+  }
 
   /**
    * @brief setup callbacks and timer
@@ -83,6 +86,8 @@ class SimControl : SimControlInterface {
  private:
   void OnPlanning(const apollo::planning::ADCTrajectory &trajectory);
   void OnRoutingResponse(const apollo::routing::RoutingResponse &routing);
+  void OnReceiveNavigationInfo(
+      const relative_map::NavigationInfo &navigation_info);
 
   // Reset the start point, which can be a dummy point on the map or received
   // from the routing module.
@@ -138,11 +143,15 @@ class SimControl : SimControlInterface {
   apollo::common::TrajectoryPoint prev_point_;
   apollo::common::TrajectoryPoint next_point_;
 
+  common::PathPoint adc_position_;
+
   // Initial velocity and acceleration of the main vehicle
   double start_velocity_ = 0.0;
   double start_acceleration_ = 0.0;
 
   static constexpr int kPlanningCountToStart = 5;
+
+  relative_map::NavigationInfo navigation_info_;
 
   FRIEND_TEST(SimControlTest, Test);
 };

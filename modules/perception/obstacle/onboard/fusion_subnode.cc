@@ -18,6 +18,9 @@
 
 #include <map>
 
+#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/onboard/event_manager.h"
@@ -29,9 +32,13 @@ namespace perception {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
 
 bool FusionSubnode::InitInternal() {
   RegistAllAlgorithm();
+
+  CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
+
   CHECK(shared_data_manager_ != nullptr);
   fusion_.reset(BaseFusionRegisterer::GetInstanceByName(FLAGS_onboard_fusion));
   if (fusion_ == nullptr) {
@@ -63,7 +70,7 @@ bool FusionSubnode::InitInternal() {
 }
 
 bool FusionSubnode::InitOutputStream() {
-  // expect _reserve format:
+  // expect reserve_ format:
   //       pub_driven_event_id:n
   //       lidar_output_stream : event_id=n&sink_type=m&sink_name=x
   //       radar_output_stream : event_id=n&sink_type=m&sink_name=x
@@ -119,9 +126,23 @@ Status FusionSubnode::ProcEvents() {
              << " fused_obj_cnt:" << objects_.size();
       continue;
     }
+
+    // TODO(QiL): refine the logic here for low cost solution.
+    AdapterManager::Observe();
+    // chassis
+    const auto &chassis = AdapterManager::GetChassis()->GetLatestObserved();
+    ADEBUG << "Get chassis:" << chassis.DebugString();
+
     // public obstacle message
     PerceptionObstacles obstacles;
     if (GeneratePbMsg(&obstacles)) {
+      // Assume FLU coordinate system
+      if (FLAGS_use_navigation_mode) {
+        for (auto obstacle : obstacles.perception_obstacle()) {
+          obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
+                                             chassis.speed_mps());
+        }
+      }
       common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
     }
     AINFO << "Publish 3d perception fused msg. timestamp:"
@@ -179,9 +200,9 @@ bool FusionSubnode::BuildSensorObjs(
     // Make sure timestamp and type are filled.
     sensor_objects->timestamp = event.timestamp;
     if (event.event_id == lidar_event_id_) {
-      sensor_objects->sensor_type = VELODYNE_64;
+      sensor_objects->sensor_type = SensorType::VELODYNE_64;
     } else if (event.event_id == radar_event_id_) {
-      sensor_objects->sensor_type = RADAR;
+      sensor_objects->sensor_type = SensorType::RADAR;
     } else {
       AERROR << "Event id is not supported. event:" << event.to_string();
       return false;

@@ -136,6 +136,9 @@ class SimulationWorldUpdater {
   std::string simulation_world_;
   std::string simulation_world_with_planning_data_;
 
+  // Received relative map data in wire format.
+  std::string relative_map_string_;
+
   // Mutex to protect concurrent access to simulation_world_json_.
   // NOTE: Use boost until we have std version of rwlock support.
   boost::shared_mutex mutex_;

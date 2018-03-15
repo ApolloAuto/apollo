@@ -65,6 +65,8 @@ DEFINE_string(delphi_esr_topic, "/apollo/sensor/delphi_esr",
               "delphi esr radar topic name");
 DEFINE_string(conti_radar_topic, "/apollo/sensor/conti_radar",
               "delphi esr radar topic name");
+DEFINE_string(ultrasonic_radar_topic, "/apollo/sensor/ultrasonic_radar",
+              "ultrasonic esr radar topic name");
 // TODO(Authors): Change the topic name
 DEFINE_string(compressed_image_topic, "camera/image_raw",
               "CompressedImage topic name");
@@ -88,3 +90,9 @@ DEFINE_string(localization_msf_status, "/apollo/localization/msf_status",
               "msf localization status");
 DEFINE_string(relative_map_topic, "/apollo/relative_map", "relative map");
 DEFINE_string(navigation_topic, "/apollo/navigation", "navigation");
+DEFINE_string(voice_detection_request_topic,
+              "/apollo/hmi/voice_detection_request",
+              "Voice detetection request topic name.");
+DEFINE_string(voice_detection_response_topic,
+              "/apollo/hmi/voice_detection_response",
+              "Voice detetection response topic name.");

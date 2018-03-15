@@ -14,6 +14,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math:quaternion",
         "//modules/common/monitor_log",
         "//modules/common/proto:common_proto",

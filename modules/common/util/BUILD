@@ -36,6 +36,24 @@ cc_test(
 )
 
 cc_library(
+    name = "disjoint_set",
+    hdrs = ["disjoint_set.h"],
+)
+
+cc_test(
+    name = "disjoint_set_test",
+    size = "small",
+    srcs = [
+        "disjoint_set_test.cc",
+    ],
+    deps = [
+        ":disjoint_set",
+        "//modules/common:log",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
     name = "lru_cache",
     hdrs = ["lru_cache.h"],
 )
@@ -64,6 +82,9 @@ cc_library(
 
 cc_library(
     name = "string_util",
+    srcs = [
+        "string_util.cc",
+    ],
     hdrs = [
         "string_util.h",
     ],
@@ -122,30 +143,6 @@ cc_test(
     ],
     deps = [
         ":factory",
-        "//modules/common",
-        "//modules/common:log",
-        "@gtest//:main",
-    ],
-)
-
-cc_library(
-    name = "dropbox",
-    hdrs = [
-        "dropbox.h",
-    ],
-    deps = [
-        "//modules/common:log",
-    ],
-)
-
-cc_test(
-    name = "dropbox_test",
-    size = "small",
-    srcs = [
-        "dropbox_test.cc",
-    ],
-    deps = [
-        ":dropbox",
         "//modules/common",
         "//modules/common:log",
         "@gtest//:main",
@@ -239,7 +236,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/status",
         "//third_party/json",
-        "@curlpp//:curlpp",
+        "@curlpp",
     ],
 )
 

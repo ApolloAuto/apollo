@@ -1,6 +1,7 @@
 <launch>
   <arg name="traffic_short_topic_name" default="/apollo/sensor/camera/traffic/image_short" />
   <arg name="traffic_long_topic_name" default="/apollo/sensor/camera/traffic/image_long" />
+  <arg name="perception_obstacle" default="/apollo/perception/obstacle/camera" />
   <arg name="frame_rate" default="30"/>
 
   <group ns="camera_long">
@@ -43,4 +44,24 @@
     </node>
   </group>
 
+  <group ns="camera_obstacle">
+    <node pkg="nodelet" type="nodelet" name="camera_nodelet_manager" args="manager" respawn="true" />
+
+    <node pkg="nodelet" type="nodelet" name="sensor_camera_obstacle" output="screen"
+          args="load usb_cam/UsbCamNodelet camera_nodelet_manager" respawn="true" >
+      <param name="video_device" value="/dev/camera/obstacle" />
+    	<param name="image_width" value="1920" />
+    	<param name="image_height" value="1080" />
+    	<param name="pixel_format" value="yuyv" />
+      <param name="frame_rate" value="$(arg frame_rate)" />
+    	<param name="camera_frame_id" value="usb_cam" />
+    	<param name="io_method" value="mmap"/>
+      <param name="camera_timeout" value="2000" />
+      <param name="error_code" value="14" />
+	    <param name="camera_info_url" type="string" value="file://$(find usb_cam)/params/onsemi_obstacle_intrinsics.yaml" />
+      <remap from="/camera_short/image_raw0" to="$(arg perception_obstacle)" />
+      <remap from="/apollo/sensor/camera/traffic/camera_info" to="$(arg perception_obstacle)/camera_info" />
+    </node>
+  </group>
+  
 </launch>

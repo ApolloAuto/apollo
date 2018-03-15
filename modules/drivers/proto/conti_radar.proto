@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.drivers;
 
 import "modules/common/proto/header.proto";
-import "modules/drivers/conti_radar/proto/conti_radar_conf.proto";
+import "modules/drivers/radar/conti_radar/proto/conti_radar_conf.proto";
 
 message ClusterListStatus_600 {
   optional int32 near = 1 [default = 0];

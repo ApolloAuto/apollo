@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_REFERENCE_LINE_INFO_H_
 #define MODULES_PLANNING_COMMON_REFERENCE_LINE_INFO_H_
 
+#include <algorithm>
 #include <limits>
 #include <list>
 #include <memory>
@@ -30,7 +31,8 @@
 
 #include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/map/pnc_map/pnc_map.h"
@@ -78,6 +80,10 @@ class ReferenceLineInfo {
   void SetCost(double cost) { cost_ = cost; }
   double PriorityCost() const { return priority_cost_; }
   void SetPriorityCost(double cost) { priority_cost_ = cost; }
+  // For lattice planner'speed planning target
+  void SetStopPoint(const StopPoint& stop_point);
+  void SetCruiseSpeed(double speed);
+  const PlanningTarget& planning_target() const { return planning_target_; }
 
   /**
    * @brief check if current reference line is started from another reference
@@ -151,7 +157,7 @@ class ReferenceLineInfo {
   void SetObjectDecisions(ObjectDecisions* object_decisions) const;
   const common::VehicleState vehicle_state_;
   const common::TrajectoryPoint adc_planning_point_;
-  const ReferenceLine reference_line_;
+  ReferenceLine reference_line_;
 
   /**
    * @brief this is the number that measures the goodness of this reference
@@ -161,7 +167,7 @@ class ReferenceLineInfo {
 
   bool is_inited_ = false;
 
-  bool is_drivable_ = false;
+  bool is_drivable_ = true;
 
   PathDecision path_decision_;
 
@@ -184,6 +190,8 @@ class ReferenceLineInfo {
   double offset_to_other_reference_line_ = 0.0;
 
   double priority_cost_ = 0.0;
+
+  PlanningTarget planning_target_;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

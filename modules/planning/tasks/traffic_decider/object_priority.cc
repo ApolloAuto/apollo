@@ -24,7 +24,7 @@
 namespace apollo {
 namespace planning {
 
-ObjectPriority::ObjectPriority(const RuleConfig& config)
+ObjectPriority::ObjectPriority(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
 bool ObjectPriority::ApplyRule(Frame* const frame,

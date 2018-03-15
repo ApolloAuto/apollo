@@ -26,10 +26,11 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/common/time/time_util.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/base/time_util.h"
 #include "modules/perception/lib/base/timer.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/radar/dummy/dummy_algorithms.h"
 #include "modules/perception/onboard/subnode_helper.h"
@@ -78,8 +79,8 @@ bool RadarProcessSubnode::InitInternal() {
   CHECK(AdapterManager::GetContiRadar()) << "Radar is not initialized.";
   AdapterManager::AddContiRadarCallback(&RadarProcessSubnode::OnRadar, this);
   CHECK(AdapterManager::GetLocalization()) << "Localiztion is not initialized.";
-  AdapterManager::AddLocalizationCallback(
-    &RadarProcessSubnode::OnLocalization, this);
+  AdapterManager::AddLocalizationCallback(&RadarProcessSubnode::OnLocalization,
+                                          this);
   localization_buffer_.set_capacity(FLAGS_localization_buffer_size);
   std::string radar_extrinstic_path = FLAGS_radar_extrinsic_file;
   AINFO << "radar extrinsic path: " << radar_extrinstic_path;
@@ -100,7 +101,7 @@ bool RadarProcessSubnode::InitInternal() {
   }
   short_camera_extrinsic_ = short_camera_extrinsic.matrix();
   AINFO << "get short camera  extrinsic succ. pose: \n"
-    << short_camera_extrinsic_;
+        << short_camera_extrinsic_;
   inited_ = true;
 
   return true;
@@ -122,8 +123,8 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
   header->set_timestamp_sec(timestamp);
   header->set_radar_timestamp(timestamp * 1e9);
 
-  _conti_id_expansion.UpdateTimestamp(timestamp);
-  _conti_id_expansion.ExpandIds(&radar_obs_proto);
+  conti_id_expansion_.UpdateTimestamp(timestamp);
+  conti_id_expansion_.ExpandIds(&radar_obs_proto);
 
   if (fabs(timestamp - 0.0) < 10e-6) {
     AERROR << "Error timestamp: " << GLOG_TIMESTAMP(timestamp);
@@ -134,36 +135,53 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
 
   // 1. get radar pose
   std::shared_ptr<Matrix4d> velodyne2world_pose = std::make_shared<Matrix4d>();
-  if (!GetVelodyneTrans(timestamp, velodyne2world_pose.get())) {
+  if (!GetVelodyneTrans(timestamp, velodyne2world_pose.get())
+      && !FLAGS_use_navigation_mode) {
     AERROR << "Failed to get trans at timestamp: " << GLOG_TIMESTAMP(timestamp);
     error_code_ = common::PERCEPTION_ERROR_TF;
     return;
   }
   std::shared_ptr<Matrix4d> radar2world_pose = std::make_shared<Matrix4d>();
-  *radar2world_pose = *velodyne2world_pose *
-    short_camera_extrinsic_ *  radar_extrinsic_;
-  AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
+  std::shared_ptr<Matrix4d> radar2car_pose = std::make_shared<Matrix4d>();
 
-  // Current Localiztion, radar postion.
-  PointD position;
-  position.x = (*radar2world_pose)(0, 3);
-  position.y = (*radar2world_pose)(1, 3);
-  position.z = (*radar2world_pose)(2, 3);
-  // 2. Get map polygons.
+  if (!FLAGS_use_navigation_mode) {
+     *radar2world_pose =
+       *velodyne2world_pose * short_camera_extrinsic_ * radar_extrinsic_;
+     AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
+
+  } else {
+    CalibrationConfigManager *config_manager =
+     Singleton<CalibrationConfigManager>::get();
+    CameraCalibrationPtr calibrator = config_manager->get_camera_calibration();
+    Eigen::Matrix4d camera_to_car = calibrator->get_camera_extrinsics();
+    *radar2car_pose = camera_to_car * radar_extrinsic_;
+    AINFO << "get radar trans pose succ. pose: \n" << *radar2car_pose;
+  }
+
   std::vector<PolygonDType> map_polygons;
-  HdmapStructPtr hdmap(new HdmapStruct);
-  if (FLAGS_enable_hdmap_input && hdmap_input_ &&
-      !hdmap_input_->GetROI(position, FLAGS_front_radar_forward_distance,
-                            &hdmap)) {
-    AWARN << "Failed to get roi. timestamp: " << GLOG_TIMESTAMP(timestamp)
-          << " position: [" << position.x << ", " << position.y << ", "
-          << position.z << "]";
-    // NOTE: if call hdmap failed, using empty map_polygons.
-  }
-  if (roi_filter_ != nullptr) {
-    roi_filter_->MergeHdmapStructToPolygons(hdmap, &map_polygons);
-  }
   RadarDetectorOptions options;
+  // Current Localiztion, radar postion.
+  if (!FLAGS_use_navigation_mode) {
+      PointD position;
+      position.x = (*radar2world_pose)(0, 3);
+      position.y = (*radar2world_pose)(1, 3);
+      position.z = (*radar2world_pose)(2, 3);
+      // 2. Get map polygons.
+      HdmapStructPtr hdmap(new HdmapStruct);
+      if (FLAGS_enable_hdmap_input && hdmap_input_ &&
+          !hdmap_input_->GetROI(position,
+           FLAGS_front_radar_forward_distance, &hdmap)) {
+          AWARN << "Failed to get roi. timestamp: " <<
+            GLOG_TIMESTAMP(timestamp) << " position: ["
+            << position.x << ", " << position.y << ", "
+              << position.z << "]";
+            // NOTE: if call hdmap failed, using empty map_polygons.
+        }
+
+       if (roi_filter_ != nullptr) {
+         roi_filter_->MergeHdmapStructToPolygons(hdmap, &map_polygons);
+       }
+  }
 
   // 3. get car car_linear_speed
   if (!GetCarLinearSpeed(timestamp, &(options.car_linear_speed))) {
@@ -174,10 +192,14 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
 
   // 4. Call RadarDetector::detect.
   PERF_BLOCK_START();
-  options.radar2world_pose = &(*radar2world_pose);
+  if (!FLAGS_use_navigation_mode) {
+    options.radar2world_pose = &(*radar2world_pose);
+  } else {
+    options.radar2world_pose = &(*radar2car_pose);
+  }
   std::shared_ptr<SensorObjects> radar_objects(new SensorObjects);
   radar_objects->timestamp = timestamp;
-  radar_objects->sensor_type = RADAR;
+  radar_objects->sensor_type = SensorType::RADAR;
   radar_objects->sensor2world_pose = *radar2world_pose;
   bool result = radar_detector_->Detect(radar_obs_proto, map_polygons, options,
                                         &radar_objects->objects);
@@ -205,7 +227,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
 }
 
 void RadarProcessSubnode::OnLocalization(
-  const apollo::localization::LocalizationEstimate &localization) {
+    const apollo::localization::LocalizationEstimate &localization) {
   double timestamp = localization.header().timestamp_sec();
   AINFO << "localization timestamp:" << GLOG_TIMESTAMP(timestamp);
   LocalizationPair localization_pair;
