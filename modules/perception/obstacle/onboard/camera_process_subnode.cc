@@ -52,8 +52,17 @@ bool CameraProcessSubnode::InitCalibration() {
 }
 
 bool CameraProcessSubnode::InitModules() {
+  // RegisterFactoryYoloCameraDetector();
+  RegisterFactoryDummyCameraDetector();
+  RegisterFactoryGeometryCameraConverter();
+  RegisterFactoryCascadedCameraTracker();
+  RegisterFactoryFlatCameraTransformer();
+  RegisterFactoryObjectCameraFilter();
+
+  // detector_.reset(
+  //     BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector"));
   detector_.reset(
-      BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector"));
+      BaseCameraDetectorRegisterer::GetInstanceByName("DummyCameraDetector"));
   detector_->Init();
 
   converter_.reset(BaseCameraConverterRegisterer::GetInstanceByName(
@@ -120,7 +129,8 @@ void CameraProcessSubnode::VisualObjToSensorObj(
   (*sensor_objects)->sensor_id = device_id_;
   (*sensor_objects)->seq_num = seq_num_;
   (*sensor_objects)->sensor2world_pose = camera_to_car_;
-  ((*sensor_objects)->camera_frame_supplement).reset(new CameraFrameSupplement);
+  // ((*sensor_objects)->camera_frame_supplement)
+  // .reset(new CameraFrameSupplement);
 
   for (size_t i = 0; i < objects.size(); ++i) {
     VisualObjectPtr vobj = objects[i];

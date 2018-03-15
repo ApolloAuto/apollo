@@ -74,6 +74,8 @@ class GLFusionVisualizer : public BaseVisualizer {
   //    boost::circular_buffer<VehicleStatus> motion_buffer_;
 };
 
+REGISTER_VISUALIZER(GLFusionVisualizer);
+
 }  // namespace lowcostvisualizer
 }  // namespace perception
 }  // namespace apollo

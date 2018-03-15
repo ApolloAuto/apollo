@@ -22,6 +22,7 @@
 
 namespace apollo {
 namespace perception {
+namespace lowcostvisualizer {
 
 FrameContent::FrameContent() : global_offset_initialized_(false) {
   continuous_type_ = PC_CONTINUOUS;
@@ -364,5 +365,6 @@ void FrameContent::offset_object(ObjectPtr object,
   object->center[2] += offset[2];
 }
 
+}  // namespace lowcostvisualizer
 }  // namespace perception
 }  // namespace apollo

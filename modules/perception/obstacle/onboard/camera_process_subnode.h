@@ -40,6 +40,13 @@
 #include "modules/perception/obstacle/camera/interface/base_camera_filter.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_tracker.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_transformer.h"
+//  #include "modules/perception/obstacle/camera/detector/ \
+// yolo_camera_detector/yolo_camera_detector.h"
+#include "modules/perception/obstacle/camera/dummy/dummy_algorithms.h"
+#include "modules/perception/obstacle/camera/converter/geometry_camera_converter.h"
+#include "modules/perception/obstacle/camera/tracker/cascaded_camera_tracker.h"
+#include "modules/perception/obstacle/camera/filter/object_camera_filter.h"
+#include "modules/perception/obstacle/camera/transformer/flat_camera_transformer.h"
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
