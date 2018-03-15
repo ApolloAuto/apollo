@@ -8,8 +8,8 @@ cc_library(
     hdrs = ["region_output.h"],
     deps = [
         "//modules/common:log",
+        "//modules/perception/common:mem_util",
         "//modules/perception/obstacle/camera/common:util",
-        "//modules/perception/obstacle/camera/detector/common:util",
         "@caffe//:lib",
         "@opencv2//:core",
     ],
@@ -64,7 +64,7 @@ cc_test(
         "yolo_camera_detector_test.cc",
     ],
     data = [
-        ":testdata"
+        ":testdata",
     ],
     deps = [
         ":yolo_camera_detector",

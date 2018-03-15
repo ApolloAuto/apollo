@@ -22,19 +22,19 @@
 // #include <boost/regex.hpp>
 
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <memory>
 
-#include "caffe/proto/caffe.pb.h"
 #include "caffe/blob.hpp"
 #include "caffe/layer.hpp"
+#include "caffe/proto/caffe.pb.h"
 
 #include "modules/common/log.h"
+#include "modules/perception/common/mem_util.h"
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
-#include "modules/perception/obstacle/camera/detector/common/util.h"
 
 namespace apollo {
 namespace perception {

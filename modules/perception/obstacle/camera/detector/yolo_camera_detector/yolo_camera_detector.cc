@@ -17,10 +17,10 @@
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 
 #include "modules/common/util/file.h"
+#include "modules/perception/common/mem_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
-#include "modules/perception/obstacle/camera/detector/common/util.h"
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/util.h"
 
 DEFINE_string(yolo_config_filename, "config.pt", "Yolo config filename.");
@@ -63,14 +63,12 @@ bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
 
 void YoloCameraDetector::init_anchor(const string &yolo_root) {
   const auto &model_param = yolo_param_.model_param();
-  string model_root =
-      apollo::common::util::GetAbsolutePath(
-          yolo_root, model_param.model_name());
+  string model_root = apollo::common::util::GetAbsolutePath(
+      yolo_root, model_param.model_name());
 
   // loading anchors
-  string anchors_file =
-      apollo::common::util::GetAbsolutePath(
-          model_root, model_param.anchors_file());
+  string anchors_file = apollo::common::util::GetAbsolutePath(
+      model_root, model_param.anchors_file());
   vector<float> anchors;
   yolo::load_anchors(anchors_file, &anchors);
   num_anchors_ = anchors.size() / 2;
@@ -82,9 +80,8 @@ void YoloCameraDetector::init_anchor(const string &yolo_root) {
   anchor_->gpu_data();
 
   // loading types
-  string types_file =
-      apollo::common::util::GetAbsolutePath(
-          model_root, model_param.types_file());
+  string types_file = apollo::common::util::GetAbsolutePath(
+      model_root, model_param.types_file());
   yolo::load_types(types_file, &types_);
   // res_box_tensor_.reset(new anakin::Tensor<float>());
   // res_box_tensor_->Reshape(1, 1, obj_size_, s_box_block_size);
@@ -133,10 +130,10 @@ void YoloCameraDetector::load_intrinsic(
 
   offset_y_ = static_cast<int>(offset_ratio * image_height_ + .5);
   float roi_ratio = cropped_ratio * image_height_ / image_width_;
-  width_ = static_cast<int>(resized_width + aligned_pixel / 2) /
-      aligned_pixel * aligned_pixel;
+  width_ = static_cast<int>(resized_width + aligned_pixel / 2) / aligned_pixel *
+           aligned_pixel;
   height_ = static_cast<int>(width_ * roi_ratio + aligned_pixel / 2) /
-      aligned_pixel * aligned_pixel;
+            aligned_pixel * aligned_pixel;
   AINFO << "image_height=" << image_height_ << ", "
         << "image_width=" << image_width_ << ", "
         << "roi_ratio=" << roi_ratio;
@@ -154,18 +151,14 @@ void YoloCameraDetector::load_intrinsic(
 bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   auto const &net_param = yolo_param_.net_param();
   const auto &model_param = yolo_param_.model_param();
-  string model_root =
-      apollo::common::util::GetAbsolutePath(
-          yolo_root, model_param.model_name());
-  string proto_file =
-      apollo::common::util::GetAbsolutePath(
-          model_root, model_param.proto_file());
-  string weight_file =
-      apollo::common::util::GetAbsolutePath(
-          model_root, model_param.weight_file());
-  string feature_file =
-      apollo::common::util::GetAbsolutePath(
-          model_root, model_param.feature_file());
+  string model_root = apollo::common::util::GetAbsolutePath(
+      yolo_root, model_param.model_name());
+  string proto_file = apollo::common::util::GetAbsolutePath(
+      model_root, model_param.proto_file());
+  string weight_file = apollo::common::util::GetAbsolutePath(
+      model_root, model_param.weight_file());
+  string feature_file = apollo::common::util::GetAbsolutePath(
+      model_root, model_param.feature_file());
 
   const auto &model_type = model_param.model_type();
 
@@ -223,8 +216,8 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
 
   if (feat_param.has_remap_model()) {
     string track_model = feat_param.remap_model();
-    track_model = apollo::common::util::GetAbsolutePath(
-        model_root, track_model);
+    track_model =
+        apollo::common::util::GetAbsolutePath(model_root, track_model);
     AINFO << "Using tracking model: " << track_model;
     projector_.reset(new MatrixProjector(track_model));
   } else {
