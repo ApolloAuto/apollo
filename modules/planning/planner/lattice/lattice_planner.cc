@@ -31,7 +31,7 @@
 #include "modules/common/macro.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/math/path_matcher.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"

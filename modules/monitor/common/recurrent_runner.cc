@@ -19,7 +19,7 @@
 #include <utility>
 
 #include "modules/common/log.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 
 namespace apollo {
 namespace monitor {

@@ -33,7 +33,7 @@
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/common/util/util.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"

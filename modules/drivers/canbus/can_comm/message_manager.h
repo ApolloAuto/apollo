@@ -31,7 +31,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/canbus/common/byte.h"
 

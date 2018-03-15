@@ -24,7 +24,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/log.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
