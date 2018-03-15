@@ -70,7 +70,6 @@ class SnowboyDetector(object):
             response.id = request.id
             response.action = hotword.action
             self.voice_detection_pub.publish(response)
-            f.write('Action {} is triggered!\n'.format(hotword.action))
             print 'Action {} is triggered!'.format(hotword.action)
 
 def main():
