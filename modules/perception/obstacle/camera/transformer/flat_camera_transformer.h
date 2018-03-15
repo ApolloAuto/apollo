@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-// Transform objects in 3D camera space into 3D ego-car space
-//
-// 2 assumptions are used for this module
-// 1. The ego-car space is a flat ground. 3D objects are on the ground place
-// 2. The input 3D distances for objects, from camera origin to object center,
-// is accurate, and unit is meter
+/* Transform objects in 3D camera space into 3D ego-car space
+ *
+ * Two assumptions are used for this module
+ * 1. The ego-car space is a flat ground. 3D objects are on the ground place
+ * 2. The input 3D distances for objects, from camera origin to object center,
+ *    is accurate, and unit is meter
+ */
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRANSFORMER_FLAT_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRANSFORMER_FLAT_H_
@@ -46,7 +47,7 @@ class FlatCameraTransformer : public BaseCameraTransformer {
  public:
   FlatCameraTransformer() : BaseCameraTransformer() {}
 
-  virtual ~FlatCameraTransformer() {}
+  virtual ~FlatCameraTransformer() = default;
 
   bool Init() override;
 
