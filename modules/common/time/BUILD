@@ -8,7 +8,7 @@ cc_library(
         "timer.cc",
     ],
     hdrs = [
-        "clock.h",
+        "time.h",
         "time_util.h",
         "timer.h",
     ],
@@ -21,10 +21,10 @@ cc_library(
 )
 
 cc_test(
-    name = "clock_test",
+    name = "time_test",
     size = "small",
     srcs = [
-        "clock_test.cc",
+        "time_test.cc",
     ],
     deps = [
         ":time",
