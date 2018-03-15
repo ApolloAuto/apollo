@@ -94,12 +94,13 @@ class MapService {
   bool AddPathFromPassageRegion(const routing::Passage &passage_region,
                                 std::vector<apollo::hdmap::Path> *paths) const;
 
+  static const char kMetaFileName[];
+
   const bool use_sim_map_;
   const hdmap::HDMap *hdmap_ = nullptr;
   // A downsampled map for dreamview frontend display.
   const hdmap::HDMap *sim_map_ = nullptr;
   bool pending_ = true;
-  const std::string meta_filename_ = "/metaInfo.json";
   double x_offset_ = 0.0;
   double y_offset_ = 0.0;
 
