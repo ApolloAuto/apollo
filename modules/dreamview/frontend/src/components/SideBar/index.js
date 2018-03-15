@@ -34,13 +34,20 @@ export default class SideBar extends React.Component {
                                     this.props.store.handleOptionToggle('showDataRecorder');
                                  }}
                              showDataRecorder={options.showDataRecorder} />
-                <SubButtonPanel enablePOI={
+                <SubButtonPanel panelLabel="Voice Command"
+                                enablePanel={true}
+                                onPanel={() => {
+                                    this.props.store.handleOptionToggle('enableVoiceCommand');
+                                }}
+                                showPanel={options.enableVoiceCommand} />
+                <SubButtonPanel panelLabel="Default Routing"
+                                enablePanel={
                                     !enableHMIButtonsOnly && !options.showRouteEditingBar
                                 }
-                                onPOI={() => {
+                                onPanel={() => {
                                     this.props.store.handleOptionToggle('showPOI');
                                 }}
-                                showPOI={!options.showRouteEditingBar && options.showPOI} />
+                                showPanel={!options.showRouteEditingBar && options.showPOI} />
             </div>
         );
     }
