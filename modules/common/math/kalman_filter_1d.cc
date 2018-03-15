@@ -14,7 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/camera/filter/kalman_filter_1d.h"
+#include "modules/common/math/kalman_filter_1d.h"
+
+namespace apollo {
+namespace common {
+namespace math {
 
 bool KalmanFilter1D::Init(const float& x) {
   x_ << x, 0.0f;
@@ -60,6 +64,8 @@ bool KalmanFilter1D::Update(const float& z) {
   return true;
 }
 
-Eigen::Vector2f KalmanFilter1D::GetState() {
-  return x_;
-}
+Eigen::Vector2f KalmanFilter1D::GetState() { return x_; }
+
+}  // namespace math
+}  // namespace common
+}  // namespace apollo
