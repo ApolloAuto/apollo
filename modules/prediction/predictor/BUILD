@@ -14,14 +14,14 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/predictor/empty:empty_predictor",
         "//modules/prediction/predictor/free_move:free_move_predictor",
         "//modules/prediction/predictor/lane_sequence:lane_sequence_predictor",
         "//modules/prediction/predictor/move_sequence:move_sequence_predictor",
         "//modules/prediction/predictor/regional:regional_predictor",
-        "//modules/prediction/predictor/empty:empty_predictor",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",
-        "@glog//:glog",
+        "@glog",
     ],
 )
 
@@ -52,7 +52,7 @@ cc_library(
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/proto:prediction_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

@@ -19,8 +19,8 @@ cc_library(
     deps = [
         ":pcl_util",
         "//modules/common",
-        "//modules/common/math:math_utils",
         "//modules/common/configs:config_gflags",
+        "//modules/common/math:math_utils",
         "@eigen",
     ],
 )

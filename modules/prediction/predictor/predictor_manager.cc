@@ -22,11 +22,11 @@
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/predictor/empty/empty_predictor.h"
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 #include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
 #include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
 #include "modules/prediction/predictor/regional/regional_predictor.h"
-#include "modules/prediction/predictor/empty/empty_predictor.h"
 
 namespace apollo {
 namespace prediction {
