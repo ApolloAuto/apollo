@@ -15,6 +15,13 @@ config: {
 }
 config: {
     rule_id: CHANGE_LANE
+    change_lane {
+        min_overtake_distance: 10.0
+        min_overtake_time: 2.0
+        enable_guard_obstacle: true
+        guard_distance: 100.0
+        min_guard_speed: 1.0
+   }
 }
 config: {
     rule_id: CROSSWALK
