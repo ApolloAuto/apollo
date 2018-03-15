@@ -163,7 +163,6 @@ void PbfIMFFusion::UpdateWithObject(const PbfSensorObjectPtr new_object,
 
     state_pre = trans_matrix * state_pre;
     p_pre = trans_matrix * p_pre * trans_matrix.transpose() + q_matrix_pre;
-    p_pre = _c_matrix * p_pre * _c_matrix.transpose();
 
     _omega_matrix = _c_matrix.transpose() * _omega_matrix +
                     (_c_matrix.transpose() * _r_matrix_inverse * _c_matrix -
