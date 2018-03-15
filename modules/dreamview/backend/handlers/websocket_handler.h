@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DREAMVIEW_BACKEND_HANDLERS_WEBSOCKET_H_
-#define MODULES_DREAMVIEW_BACKEND_HANDLERS_WEBSOCKET_H_
+#ifndef MODULES_DREAMVIEW_BACKEND_HANDLERS_WEBSOCKET_HANDLER_H_
+#define MODULES_DREAMVIEW_BACKEND_HANDLERS_WEBSOCKET_HANDLER_H_
 
 #include <memory>
 #include <mutex>
@@ -41,11 +41,8 @@ namespace dreamview {
 /**
  * @class WebSocketHandler
  *
- * @brief The WebSocketHandler, built on top of CivetWebSocketHandler,
- * is a websocket handler that handles different types of websocket related
- * events.
- * the server and a client endpoint. The SendData() method is used to push data
- * to all the connected clients.
+ * @brief The WebSocketHandler, built on top of CivetWebSocketHandler, is a
+ * websocket handler that handles different types of websocket related events.
  */
 class WebSocketHandler : public CivetWebSocketHandler {
   // In case of receiving fragmented message,
@@ -85,12 +82,12 @@ class WebSocketHandler : public CivetWebSocketHandler {
    * client.
    *
    * @details In the websocket protocol, data is transmitted using a sequence of
-   * frames, and each frame received invokes this callback method. Since the the type
-   * of opcode (text, binary, etc) is given in the first frame, this method stores
-   * the opcode in a thread_local variable named current_opcode_. And data from each
-   * frame is accumulated to data_ until the final fragment is detected. See websocket
-   * RFC at http://tools.ietf.org/html/rfc6455, section 5.4 for more protocol and
-   * fragmentation details.
+   * frames, and each frame received invokes this callback method. Since the the
+   * type of opcode (text, binary, etc) is given in the first frame, this method
+   * stores the opcode in a thread_local variable named current_opcode_. And
+   * data from each frame is accumulated to data_ until the final fragment is
+   * detected. See websocket RFC at http://tools.ietf.org/html/rfc6455, section
+   * 5.4 for more protocol and fragmentation details.
    *
    * @param server the calling server
    * @param conn the connection information
@@ -170,4 +167,4 @@ class WebSocketHandler : public CivetWebSocketHandler {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif /* MODULES_DREAMVIEW_BACKEND_HANDLERS_WEBSOCKET_H_ */
+#endif /* MODULES_DREAMVIEW_BACKEND_HANDLERS_WEBSOCKET_HANDLER_H_ */

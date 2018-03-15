@@ -155,34 +155,38 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
     prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
     if (obstacle != nullptr) {
-      switch (perception_obstacle.type()) {
-        case PerceptionObstacle::VEHICLE: {
-          if (obstacle->IsOnLane()) {
-            predictor = GetPredictor(vehicle_on_lane_predictor_);
-          } else {
-            predictor = GetPredictor(vehicle_off_lane_predictor_);
+      if (obstacle->IsStill()) {
+        predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
+      } else {
+        switch (perception_obstacle.type()) {
+          case PerceptionObstacle::VEHICLE: {
+            if (obstacle->IsOnLane()) {
+              predictor = GetPredictor(vehicle_on_lane_predictor_);
+            } else {
+              predictor = GetPredictor(vehicle_off_lane_predictor_);
+            }
+            break;
           }
-          break;
-        }
-        case PerceptionObstacle::PEDESTRIAN: {
-          predictor = GetPredictor(pedestrian_predictor_);
-          break;
-        }
-        case PerceptionObstacle::BICYCLE: {
-          if (obstacle->IsOnLane() && !obstacle->IsNearJunction()) {
-            predictor = GetPredictor(cyclist_on_lane_predictor_);
-          } else {
-            predictor = GetPredictor(cyclist_off_lane_predictor_);
+          case PerceptionObstacle::PEDESTRIAN: {
+            predictor = GetPredictor(pedestrian_predictor_);
+            break;
           }
-          break;
-        }
-        default: {
-          if (obstacle->IsOnLane()) {
-            predictor = GetPredictor(default_on_lane_predictor_);
-          } else {
-            predictor = GetPredictor(default_off_lane_predictor_);
+          case PerceptionObstacle::BICYCLE: {
+            if (obstacle->IsOnLane() && !obstacle->IsNearJunction()) {
+              predictor = GetPredictor(cyclist_on_lane_predictor_);
+            } else {
+              predictor = GetPredictor(cyclist_off_lane_predictor_);
+            }
+            break;
           }
-          break;
+          default: {
+            if (obstacle->IsOnLane()) {
+              predictor = GetPredictor(default_on_lane_predictor_);
+            } else {
+              predictor = GetPredictor(default_off_lane_predictor_);
+            }
+            break;
+          }
         }
       }
 

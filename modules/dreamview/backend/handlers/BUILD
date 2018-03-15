@@ -3,12 +3,12 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "websocket",
+    name = "websocket_handler",
     srcs = [
-        "websocket.cc",
+        "websocket_handler.cc",
     ],
     hdrs = [
-        "websocket.h",
+        "websocket_handler.h",
     ],
     deps = [
         "//modules/common",
@@ -21,12 +21,12 @@ cc_library(
 )
 
 cc_library(
-    name = "image",
+    name = "image_handler",
     srcs = [
-        "image.cc",
+        "image_handler.cc",
     ],
     hdrs = [
-        "image.h",
+        "image_handler.h",
     ],
     deps = [
         "//modules/common/adapters:adapter_manager",
@@ -37,13 +37,13 @@ cc_library(
 )
 
 cc_test(
-    name = "websocket_test",
+    name = "websocket_handler_test",
     size = "small",
     srcs = [
-        "websocket_test.cc",
+        "websocket_handler_test.cc",
     ],
     deps = [
-        ":websocket",
+        ":websocket_handler",
         "//modules/common:log",
         "@gtest//:main",
     ],
