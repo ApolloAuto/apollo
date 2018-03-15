@@ -10,13 +10,9 @@ cc_library(
         "pose_util.cc",
     ],
     hdrs = [
-        "convex_hullxy.h",
         "hungarian_bigraph_matcher.h",
         "object_sequence.h",
         "pose_util.h",
-    ],
-    linkopts = [
-        "-lqhull",
     ],
     deps = [
         "//modules/common:log",
@@ -34,7 +30,6 @@ cc_test(
     name = "common_test",
     size = "small",
     srcs = [
-        "convex_hullxy_test.cc",
         "hungarian_bigraph_matcher_test.cc",
         "object_sequence_test.cc",
         "pose_util_test.cc",

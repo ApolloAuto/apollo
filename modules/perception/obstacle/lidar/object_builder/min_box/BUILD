@@ -10,6 +10,7 @@ cc_library(
         "//modules/common",
         "//modules/common:log",
         "//modules/perception/common",
+        "//modules/perception/common:convex_hullxy",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
         "//modules/perception/obstacle/common",
