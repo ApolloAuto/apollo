@@ -50,7 +50,7 @@ cc_library(
         "//modules/perception/obstacle/camera/detector/common:feature_extractor",
         "//modules/perception/obstacle/camera/detector/common/proto:tracking_feature_proto",
         "//modules/perception/obstacle/camera/detector/yolo_camera_detector/proto:yolo_camera_proto",
-        "//modules/perception/obstacle/camera/dummy:dummy_algorithms",
+        "//modules/perception/obstacle/camera/dummy",
         "//modules/perception/obstacle/camera/interface",
         "@caffe//:lib",
         "@eigen",

@@ -33,6 +33,7 @@
 
 namespace apollo {
 namespace perception {
+namespace lowcostvisualizer {
 
 class BaseContent {
  public:
@@ -210,6 +211,7 @@ class FrameContent {
   DISALLOW_COPY_AND_ASSIGN(FrameContent);
 };
 
+}  // namespace lowcostvisualizer
 }  // namespace perception
 }  // namespace apollo
 

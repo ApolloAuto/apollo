@@ -44,26 +44,6 @@ const cv::Scalar COLOR_YELLOW = cv::Scalar(0, 255, 255);
 const cv::Scalar COLOR_RED = cv::Scalar(0, 0, 255);
 const cv::Scalar COLOR_BLACK = cv::Scalar(0, 0, 0);
 
-class Timer {
- public:
-  Timer() {
-    scale_ = 1.0 / (static_cast<double>(cvGetTickFrequency()) * 1000.);
-    tic();
-  }
-  void tic() { start_ = static_cast<double>(cv::getTickCount()); }
-  double toc(bool reset = false) {
-    double time = (static_cast<double>(cvGetTickCount()) - start_) * scale_;
-    if (reset) {
-      tic();
-    }
-    return time;
-  }
-
- private:
-  double start_ = 0.0;
-  double scale_ = 0.0;
-};
-
 inline void l2norm(float *feat_data, int feat_dim) {
   if (feat_dim == 0) {
     return;
