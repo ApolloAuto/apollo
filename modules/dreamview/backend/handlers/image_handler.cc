@@ -13,10 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "sensor_msgs/Image.h"
 #include "sensor_msgs/CompressedImage.h"
+#include "sensor_msgs/Image.h"
 
-#include "modules/dreamview/backend/handlers/image.h"
+#include "modules/dreamview/backend/handlers/image_handler.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
@@ -45,9 +45,8 @@ void ImageHandler::OnImage(const sensor_msgs::Image &image) {
                                               image.height * image.width);
   cv::cvtColor(mat, mat, CV_RGB2BGR);
 
-  cv::resize(mat, mat,
-             cv::Size(image.width * ImageHandler::kImageScale,
-                      image.height * ImageHandler::kImageScale),
+  cv::resize(mat, mat, cv::Size(image.width * ImageHandler::kImageScale,
+                                image.height * ImageHandler::kImageScale),
              0, 0, CV_INTER_LINEAR);
 
   std::unique_lock<std::mutex> lock(mutex_);
@@ -70,8 +69,11 @@ void ImageHandler::OnImage(const sensor_msgs::CompressedImage &image) {
 }
 
 ImageHandler::ImageHandler() {
-  AdapterManager::AddCompressedImageCallback(&ImageHandler::OnImage, this);
-  AdapterManager::AddImageShortCallback(&ImageHandler::OnImage, this);
+  if (FLAGS_use_navigation_mode) {
+    AdapterManager::AddCompressedImageCallback(&ImageHandler::OnImage, this);
+  } else {
+    AdapterManager::AddImageShortCallback(&ImageHandler::OnImage, this);
+  }
 }
 
 bool ImageHandler::handleGet(CivetServer *server, struct mg_connection *conn) {
