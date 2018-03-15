@@ -24,7 +24,6 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/linear_interpolation.h"
-#include "modules/common/proto/pnc_point.pb.h"
 
 namespace apollo {
 namespace planning {
