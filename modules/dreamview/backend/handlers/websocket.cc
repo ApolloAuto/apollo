@@ -19,7 +19,7 @@ limitations under the License.
 #include <vector>
 
 #include "modules/common/log.h"
-#include "modules/common/time/time.h"
+#include "modules/common/time/clock.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/string_util.h"
 
