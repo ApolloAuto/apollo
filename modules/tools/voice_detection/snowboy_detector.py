@@ -27,7 +27,6 @@ import snowboydetect
 import common.proto_utils as proto_utils
 from modules.dreamview.proto import voice_detection_pb2
 
-f = open('/apollo/data/log/voice_detector.out', 'w')
 
 class SnowboyDetector(object):
     """
@@ -45,8 +44,6 @@ class SnowboyDetector(object):
             models.append(model.path)
             self.hotwords.extend(model.hotwords)
         models_str = ','.join(models).encode()
-        print config.snowboy_resource
-        print models_str
 
         # TODO(xiaoxq): Currently we only support single detector for all users.
         self.detector = snowboydetect.SnowboyDetect(
@@ -67,7 +64,6 @@ class SnowboyDetector(object):
         request = voice_detection_pb2.VoiceDetectionRequest()
         request.CopyFrom(data)
         hotword_index = self.detector.RunDetection(request.wav_stream)
-        f.write('Get {} bytes\n'.format(len(request.wav_stream)))
         if hotword_index > 0:
             hotword = self.hotwords[hotword_index - 1]
             response = voice_detection_pb2.VoiceDetectionResponse()
@@ -76,7 +72,6 @@ class SnowboyDetector(object):
             self.voice_detection_pub.publish(response)
             f.write('Action {} is triggered!\n'.format(hotword.action))
             print 'Action {} is triggered!'.format(hotword.action)
-        f.flush()
 
 def main():
     """Main rosnode"""
