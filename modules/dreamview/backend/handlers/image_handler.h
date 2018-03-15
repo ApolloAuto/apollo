@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_DREAMVIEW_BACKEND_HANDLERS_IMAGE_H_
-#define MODULES_DREAMVIEW_BACKEND_HANDLERS_IMAGE_H_
+#ifndef MODULES_DREAMVIEW_BACKEND_HANDLERS_IMAGE_HANDLER_H_
+#define MODULES_DREAMVIEW_BACKEND_HANDLERS_IMAGE_HANDLER_H_
 
 #include <condition_variable>
 #include <mutex>
@@ -66,4 +66,4 @@ class ImageHandler : public CivetHandler {
 }  // namespace dreamview
 }  // namespace apollo
 
-#endif /* MODULES_DREAMVIEW_BACKEND_WEBSOCKET_WEBSOCKET_H_ */
+#endif /* MODULES_DREAMVIEW_BACKEND_HANDLERS_IMAGE_HANDLER_H_ */
