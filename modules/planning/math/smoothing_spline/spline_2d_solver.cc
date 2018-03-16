@@ -177,8 +177,7 @@ bool Spline2dSolver::Solve() {
                        inequality_constraint_boundary.rows() * num_param);
 
   // initialize problem
-  int max_iteration_ = 1000;
-  int max_iter = std::max(max_iteration_, num_constraint);
+  int max_iter = std::max(FLAGS_default_qp_iteration_num, num_constraint);
 
   ::qpOASES::returnValue ret;
   const double start_timestamp = Clock::NowInSeconds();

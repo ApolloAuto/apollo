@@ -42,14 +42,12 @@ class YoloCameraDetector : public BaseCameraDetector {
   virtual ~YoloCameraDetector() {}
 
   bool Init(const CameraDetectorInitOptions &options =
-            CameraDetectorInitOptions()) override;
+                CameraDetectorInitOptions()) override;
 
-  bool Detect(const cv::Mat &frame,
-              const CameraDetectorOptions &options,
+  bool Detect(const cv::Mat &frame, const CameraDetectorOptions &options,
               std::vector<VisualObjectPtr> *objects) override;
 
-  bool Multitask(const cv::Mat &frame,
-                 const CameraDetectorOptions &options,
+  bool Multitask(const cv::Mat &frame, const CameraDetectorOptions &options,
                  std::vector<VisualObjectPtr> *objects, cv::Mat *mask);
 
   bool Extract(std::vector<VisualObjectPtr> *objects) {

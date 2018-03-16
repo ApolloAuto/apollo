@@ -140,7 +140,8 @@ class SmootherUtil {
     std::ofstream ofs(filename.c_str());
     ofs.precision(6);
     double s = 0.0;
-    for (std::size_t i = 0; i + 1 < ref_points_.size(); ++i) {
+    // skip the first point and the last point
+    for (std::size_t i = 1; i + 1 < ref_points_.size(); ++i) {
       const auto& point = ref_points_[i];
       ofs << std::fixed << "{\"kappa\": " << point.kappa() << ", \"s\": " << s
           << ", \"theta\": " << point.heading() << ", \"x\":" << point.x()

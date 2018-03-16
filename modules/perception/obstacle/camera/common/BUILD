@@ -50,8 +50,8 @@ cc_library(
     srcs = ["cnn_adapter.cc"],
     hdrs = ["cnn_adapter.h"],
     deps = [
+        "//modules/perception/common:mem_util",
         "//modules/perception/obstacle/camera/common:util",
-        "//modules/perception/obstacle/camera/detector/common:util",
     ],
 )
 
