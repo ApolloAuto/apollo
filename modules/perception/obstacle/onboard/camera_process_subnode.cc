@@ -19,6 +19,8 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::adapter::AdapterManager;
+
 bool CameraProcessSubnode::InitInternal() {
   // Subnode config in DAG streaming
   std::map<std::string, std::string> fields;
@@ -35,8 +37,8 @@ bool CameraProcessSubnode::InitInternal() {
 
   InitModules();
 
-  apollo::common::adapter::AdapterManager::AddImageShortCallback(
-      &CameraProcessSubnode::ImgCallback, this);
+  AdapterManager::AddImageShortCallback(&CameraProcessSubnode::ImgCallback,
+                                        this);
 
   return true;
 }
@@ -86,14 +88,20 @@ bool CameraProcessSubnode::InitModules() {
 }
 
 void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
-  ++seq_num_;
-  float timestamp = message.header.stamp.toSec();
+  AdapterManager::Observe();
+  sensor_msgs::Image msg = AdapterManager::GetImageShort()->GetLatestObserved();
+
+  // TODO(later) Some bags contain same timestamps for all frames
+  float timestamp = msg.header.stamp.toSec();
+  AINFO << "CameraProcessSubnode ImgCallback: "
+        << " frame: "<< ++seq_num_ << " timestamp: ";
+  AINFO << std::fixed << std::setprecision(10) << timestamp;
 
   cv::Mat img;
-  MessageToMat(message, &img);
-
+  MessageToMat(msg, &img);
   std::vector<VisualObjectPtr> objects;
   cv::Mat mask = cv::Mat::zeros(img.rows, img.cols, CV_32FC1);
+
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
   converter_->Convert(&objects);
   tracker_->Associate(img, timestamp, &objects);
@@ -110,15 +118,14 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   PublishDataAndEvent(timestamp, out_objs, camera_item_ptr);
 }
 
-bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &message,
-                                        cv::Mat *mat) {
-  sensor_msgs::ImageConstPtr ptr(&message);
-  cv_bridge::CvImageConstPtr cv_ptr =
-      cv_bridge::toCvShare(ptr, sensor_msgs::image_encodings::BGR8);
-  cv::Mat img = cv_ptr->image;
+bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
+                                        cv::Mat *img) {
+  cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
+  cv::Mat cv_img = cv_ptr->image;
 
-  mat->create(img.rows, img.cols, CV_8UC3);
-  undistortion_handler_->handle(img.data, mat->data);
+  img->create(cv_img.rows, cv_img.cols, CV_8UC3);
+  undistortion_handler_->handle(cv_img.data, img->data);
+
   return true;
 }
 
@@ -129,8 +136,7 @@ void CameraProcessSubnode::VisualObjToSensorObj(
   (*sensor_objects)->sensor_id = device_id_;
   (*sensor_objects)->seq_num = seq_num_;
   (*sensor_objects)->sensor2world_pose = camera_to_car_;
-  // ((*sensor_objects)->camera_frame_supplement)
-  // .reset(new CameraFrameSupplement);
+  ((*sensor_objects)->camera_frame_supplement).reset(new CameraFrameSupplement);
 
   for (size_t i = 0; i < objects.size(); ++i) {
     VisualObjectPtr vobj = objects[i];
@@ -165,6 +171,7 @@ void CameraProcessSubnode::VisualObjToSensorObj(
 void CameraProcessSubnode::PublishDataAndEvent(
     const float &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
     const SharedDataPtr<CameraItem> &camera_item) {
+  // TODO(later) If timestamp is wrong in bag, the key is the same
   std::string key = "";
   SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
 
