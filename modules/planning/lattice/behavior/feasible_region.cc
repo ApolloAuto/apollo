@@ -45,15 +45,17 @@ void FeasibleRegion::Setup(const std::array<double, 3>& init_s,
   t_at_zero_speed_ = v / max_deceleration;
   s_at_zero_speed_ = init_s[0] + v * v / (2.0 * max_deceleration);
 
-  double delta_v = std::abs(v - speed_limit);
-  if (v < speed_limit) {
+  double delta_v = speed_limit - v;
+  if (delta_v < 0.0) {
+    t_at_speed_limit_ = delta_v / FLAGS_longitudinal_acceleration_lower_bound;
+    s_at_speed_limit_ = init_s_[0] + v * t_at_speed_limit_ +
+                        0.5 * FLAGS_longitudinal_acceleration_lower_bound *
+                            t_at_speed_limit_ * t_at_speed_limit_;
+  } else {
     t_at_speed_limit_ = delta_v / FLAGS_longitudinal_acceleration_upper_bound;
     s_at_speed_limit_ = init_s_[0] + v * t_at_speed_limit_ +
                         0.5 * FLAGS_longitudinal_acceleration_upper_bound *
                             t_at_speed_limit_ * t_at_speed_limit_;
-  } else {
-    t_at_speed_limit_ = 0.0;
-    s_at_speed_limit_ = init_s_[0];
   }
 }
 
