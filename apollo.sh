@@ -105,6 +105,13 @@ function generate_build_targets() {
   fi
 }
 
+function build_perception_cuda() {
+    cur_dir=$(pwd)
+    src_dir="modules/perception/cuda_util"
+    cd $src_dir && mkdir -p build && cd build && cmake .. && make
+    cd $cur_dir
+}
+
 #=================================================
 #              Build functions
 #=================================================
@@ -113,6 +120,9 @@ function build() {
   START_TIME=$(get_now)
 
   info "Start building, please wait ..."
+  if [ "$MACHINE_ARCH" == "x86_64" ]; then
+      build_perception_cuda
+  fi
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
 
