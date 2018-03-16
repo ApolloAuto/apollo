@@ -55,6 +55,7 @@ cc_test(
     deps = [
         ":hm_tracker",
         "//modules/common:log",
+        "//modules/common/util",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/lidar/object_builder/min_box",
         "@gtest//:main",

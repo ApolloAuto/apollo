@@ -253,6 +253,11 @@ bool RemoveAllFiles(const std::string &directory_path);
  */
 std::vector<std::string> ListSubDirectories(const std::string &directory_path);
 
+std::string GetFileName(const std::string &path);
+
+void GetFileNamesInFolderById(const std::string &folder, const std::string &ext,
+                              std::vector<std::string> *ret);
+
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
