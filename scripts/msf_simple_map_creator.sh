@@ -1,6 +1,6 @@
 #! /bin/bash
 if [ $# -lt 3 ]; then
-    echo "Usage: msf_monitor_data_exporter.sh [bags folder] [extrinsic_file] [zone_id]"
+    echo "Usage: msf_simple_map_creator.sh [bags folder] [extrinsic_file] [zone_id]"
     exit 1;
 fi
 
