@@ -24,12 +24,13 @@
 #include <limits>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
@@ -294,10 +295,10 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
         // keep in CREEPING status
       } else {
         bool all_far_away = true;
-        const double kBoundaryMinT = 6.0;
         for (auto* obstacle :
              reference_line_info->path_decision()->path_obstacles().Items()) {
-          if (obstacle->reference_line_st_boundary().min_t() < kBoundaryMinT) {
+          if (obstacle->reference_line_st_boundary().min_t() <
+              config_.stop_sign().boundary_min_t()) {
             all_far_away = false;
             break;
           }
