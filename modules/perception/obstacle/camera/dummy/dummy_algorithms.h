@@ -43,6 +43,12 @@ class DummyCameraDetector : public BaseCameraDetector {
     return true;
   }
 
+  bool Multitask(const cv::Mat& frame, const CameraDetectorOptions& options,
+                 std::vector<VisualObjectPtr>* objects,
+                 cv::Mat* mask) override {
+    return true;
+  }
+
   bool Extract(std::vector<VisualObjectPtr>* objects) override { return true; }
 
   std::string Name() const override { return "DummyCameraDetector"; }

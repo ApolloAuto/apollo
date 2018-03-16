@@ -109,6 +109,7 @@ cc_library(
     ],
     deps = [
         ":perception_obstacle_shared_data",
+        "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/converter",
@@ -237,6 +238,7 @@ cc_library(
     ],
     deps = [
         ":perception_obstacle_shared_data",
+        "//modules/common:log",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common:util",
