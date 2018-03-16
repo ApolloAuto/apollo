@@ -95,6 +95,12 @@ modules {
   }
 }
 modules {
+  name: "mobileye"
+  process_conf {
+    process_cmd_keywords: "modules/drivers/mobileye/mobileye"
+  }
+}
+modules {
   name: "navigation_prediction"
   process_conf {
     process_cmd_keywords: "modules/prediction/prediction"
