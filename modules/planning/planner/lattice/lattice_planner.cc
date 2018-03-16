@@ -198,7 +198,7 @@ Status LatticePlanner::PlanOnReferenceLine(
   //   and sort them according to the cost.
   TrajectoryEvaluator trajectory_evaluator(
       init_s, planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle,
-      ptr_path_time_graph);
+      ptr_path_time_graph, ptr_reference_line);
 
   ADEBUG << "Trajectory_Evaluator_Construction_Time = "
          << (Clock::NowInSeconds() - current_time) * 1000;
