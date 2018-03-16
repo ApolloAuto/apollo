@@ -103,6 +103,11 @@ void MotionService::GetVehicleInformation(
   }
 }
 
+void MotionService::GetMotionBuffer(MotionBufferPtr motion_buffer) {
+  motion_buffer = vehicle_planemotion_->get_buffer();
+  return;
+}
+
 REGISTER_SUBNODE(MotionService);
 
 }  // namespace perception

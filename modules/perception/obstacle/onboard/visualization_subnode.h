@@ -64,6 +64,7 @@ class VisualizationSubnode : public Subnode {
   CameraSharedData* camera_shared_data_ = nullptr;
   FusionSharedData* fusion_data_ = nullptr;
   std::unique_ptr<BaseVisualizer> frame_visualizer_;
+  MotionBufferPtr motion_buffer_;
   FrameContent content_;
 
   EventID vis_driven_event_id_;

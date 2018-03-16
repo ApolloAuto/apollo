@@ -130,4 +130,6 @@ DEFINE_bool(async_fusion, false, "use distance angle ");
 DEFINE_bool(use_distance_angle_fusion, true,
         "use distance angle prob distance in fusion");
 
+DEFINE_bool(show_motion, false,
+        "visualize motion and object trajectories");
 
