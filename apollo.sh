@@ -237,7 +237,8 @@ function release() {
   CONFS=$(find modules/ -name "conf")
   DATAS=$(find modules/ -name "data")
   OTHER=("modules/tools"
-         "modules/perception/model")
+         "modules/perception/model"
+         "modules/localization/msf/params/vehicle_params")
   rm -rf test/*
   for conf in $CONFS; do
     mkdir -p $APOLLO_RELEASE_DIR/$conf
