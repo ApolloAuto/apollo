@@ -59,8 +59,5 @@ if [ "$RELEASE_DOCKER" != "1" ];then
   # setup ros package
   # this is a temporary solution to avoid ros package downloading.
   ROS="/home/tmp/ros"
-  chmod a+w "${ROS}/share/velodyne/launch/start_velodyne.launch"
-  chmod a+w -R "${ROS}/share/velodyne_pointcloud/params"
-  chmod a+w "${ROS}/share/gnss_driver/launch/gnss_driver.launch"
-  chmod a+w "${ROS}/share/gnss_driver/conf/gnss_conf_mkz.txt"
+  chmod a+w -R /home/tmp
 fi

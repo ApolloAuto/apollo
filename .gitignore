@@ -14,6 +14,7 @@ WORKSPACE
 # generated files
 generated_data_warehouse.conf
 modules/common/data/ssl_keys
+modules/perception/cuda_util/build
 
 # Eclipse IDE files
 .project
