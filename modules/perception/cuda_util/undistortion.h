@@ -28,7 +28,7 @@
     cudaError_t error = condition;            \
     if (error != cudaSuccess) {               \
       std::cout << cudaGetErrorString(error); \
-      return (int)error;                      \
+      return static_cast<int>(error);         \
     }                                         \
   } while (0)
 
