@@ -325,19 +325,16 @@ int main(int argc, char** argv) {
         std::vector<unsigned int> layer_counts;
         map.GetCountSafe(pt3d, zone_id, resolution_id, &layer_counts);
         if (layer_counts.size() == 0) {
-          std::cerr << "[FATAL ERROR] Map node should at least have one layer."
-                    << std::endl;
+          std::cout << "No ground layer, skip." << std::endl;
+          continue;
         }
-        DCHECK_GT(layer_counts.size(), 0);
         if (layer_counts[layer_id] > 0) {
           std::vector<float> layer_alts;
           map.GetAltSafe(pt3d, zone_id, resolution_id, &layer_alts);
           if (layer_alts.size() == 0) {
-            std::cerr
-                << "[FATAL ERROR] Map node should at least have one layer."
-                << std::endl;
+            std::cout << "No ground points, skip." << std::cout;
+            continue;
           }
-          DCHECK_GT(layer_alts.size(), 0);
           float alt = layer_alts[layer_id];
           double height_diff = pt3d[2] - alt;
           VarianceOnline(&mean_height_diff, &var_height_diff,
