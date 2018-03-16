@@ -56,6 +56,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
+        "//modules/common/math:path_matcher",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/constraint_checker:constraint_checker1d",
         "//modules/planning/lattice/behavior:path_time_graph",
