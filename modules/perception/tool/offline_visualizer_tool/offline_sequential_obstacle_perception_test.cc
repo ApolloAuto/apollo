@@ -22,10 +22,9 @@
 #include "Eigen/Core"
 #include "pcl/io/pcd_io.h"
 
-#include "modules/common/util/file.h"
-#include "modules/perception/common/file_system_util.h"
-#include "modules/perception/common/perception_gflags.h"
 #include "modules/common/time/timer.h"
+#include "modules/common/util/file.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/onboard/obstacle_perception.h"
 
@@ -248,7 +247,8 @@ class SequentialPerceptionTest {
       /// get files with specified extension
       std::string ext = std::string(".") + source.extension;
       std::vector<std::string> files_list;
-      GetFileNamesInFolderById(source.folder_path, ext, &files_list);
+      common::util::GetFileNamesInFolderById(source.folder_path, ext,
+                                             &files_list);
       /// get sensor files
       std::vector<SensorFile>& sensor_files_list =
           sensors_files_lists[sensor_key];
