@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(perception_util)
+project(cuda_util)
 include(cmake/Options.cmake)
 include(cmake/Packages.cmake)
 
-file(GLOB _SRCS "*.cpp")
+file(GLOB _SRCS "*.cc")
 list(APPEND CUDA_NVCC_FLAGS -std=c++11)
 
 set(cuda_file undistortion.cu util.cu region_output.cu network.cu)

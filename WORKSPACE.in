@@ -197,3 +197,9 @@ new_local_repository(
     path = "/usr/local/apollo/undistort",
 )
 
+# perception cuda util
+new_local_repository(
+    name = "perception_cuda",
+    build_file = "third_party/perception_cuda.BUILD",
+    path = "/home/tmp/perception_cuda",
+)
