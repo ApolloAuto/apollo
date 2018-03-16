@@ -35,90 +35,98 @@ static const char BoxVote[] = "BoxVote";
 static const int s_box_block_size = 16;
 
 struct NormalizedBBox {
-    float xmin = -1;
-    float ymin = -1;
-    float xmax = -1;
-    float ymax = -1;
-    int label = -1;
-    float score = -1;
-    float size = -1;
-    bool mask = false;
+  float xmin = -1;
+  float ymin = -1;
+  float xmax = -1;
+  float ymax = -1;
+  int label = -1;
+  float score = -1;
+  float size = -1;
+  bool mask = false;
 
-    bool operator()(NormalizedBBox i, NormalizedBBox j) {
-        return i.score < j.score;
-    }
+  bool operator()(NormalizedBBox i, NormalizedBBox j) {
+    return i.score < j.score;
+  }
 };
 
 struct BBox3D {
-    float h = -1;
-    float w = -1;
-    float l = -1;
-    float alpha = -1;
+  float h = -1;
+  float w = -1;
+  float l = -1;
+  float alpha = -1;
 };
 
 struct AnchorBox {
-    float w;
-    float h;
+  float w;
+  float h;
 };
 struct NMSParam {
-
-    float threshold;
-    std::string type = BoxVote;
-    float sigma;
+  float threshold;
+  std::string type = BoxVote;
+  float sigma;
 };
-template<typename Dtype>
+template <typename Dtype>
 inline Dtype sigmoid(Dtype x) {
-    return 1.0 / (1.0 + exp(-x));
+  return 1.0 / (1.0 + exp(-x));
 }
 
-template<typename Dtype>
-NormalizedBBox get_region_box(const std::vector<AnchorBox> anchor_boxes, const Dtype *loc_data,
-                              int i, int j, int w, int h, int n, int index) {
-    NormalizedBBox bbox;
-    Dtype cx = (i + sigmoid(loc_data[index + 0])) / w;
-    Dtype cy = (j + sigmoid(loc_data[index + 1])) / h;
-    Dtype hw = exp(loc_data[index + 2]) * anchor_boxes[n].w / w * 0.5;
-    Dtype hh = exp(loc_data[index + 3]) * anchor_boxes[n].h / h * 0.5;
-    bbox.xmin = cx - hw;
-    bbox.ymin = cy - hh;
-    bbox.xmax = cx + hw;
-    bbox.ymax = cy + hh;
-    return bbox;
+template <typename Dtype>
+NormalizedBBox get_region_box(const std::vector<AnchorBox> anchor_boxes,
+                              const Dtype *loc_data, int i, int j, int w, int h,
+                              int n, int index) {
+  NormalizedBBox bbox;
+  Dtype cx = (i + sigmoid(loc_data[index + 0])) / w;
+  Dtype cy = (j + sigmoid(loc_data[index + 1])) / h;
+  Dtype hw = exp(loc_data[index + 2]) * anchor_boxes[n].w / w * 0.5;
+  Dtype hh = exp(loc_data[index + 3]) * anchor_boxes[n].h / h * 0.5;
+  bbox.xmin = cx - hw;
+  bbox.ymin = cy - hh;
+  bbox.xmax = cx + hw;
+  bbox.ymax = cy + hh;
+  return bbox;
 }
 
-template<typename T>
+template <typename T>
 bool sort_score_pair_descend(const std::pair<float, T> &pair1,
                              const std::pair<float, T> &pair2) {
-    return pair1.first > pair2.first;
+  return pair1.first > pair2.first;
 }
 
-void get_max_score_index(const std::vector<float> &scores, const float threshold,
-                         const int top_k, std::vector<std::pair<float, int> > *score_index_vec);
+void get_max_score_index(const std::vector<float> &scores,
+                         const float threshold, const int top_k,
+                         std::vector<std::pair<float, int> > *score_index_vec);
 
 float get_bbox_size(const NormalizedBBox &bbox);
 
-void get_intersect_bbox(const NormalizedBBox &bbox1, const NormalizedBBox &bbox2,
+void get_intersect_bbox(const NormalizedBBox &bbox1,
+                        const NormalizedBBox &bbox2,
                         NormalizedBBox *intersect_bbox);
 
-float get_jaccard_overlap(const NormalizedBBox &bbox1, const NormalizedBBox &bbox2);
+float get_jaccard_overlap(const NormalizedBBox &bbox1,
+                          const NormalizedBBox &bbox2);
 
-void apply_nms(const bool* overlapped, const int num, std::vector<int>* indices);
-void apply_nms_gpu(const float* bbox_data, const float* conf_data,
+void apply_nms(const bool *overlapped, const int num,
+               std::vector<int> *indices);
+void apply_nms_gpu(const float *bbox_data, const float *conf_data,
                    const int num_bboxes, const float confidence_threshold,
-                   const int top_k, const float nms_threshold, std::vector<int>* indices,
-                   std::shared_ptr<SyncedMemory> overlappe, std::shared_ptr <SyncedMemory> idx_sm);
-void compute_overlapped_by_idx_gpu(const int nthreads,
-                                   const float* bbox_data, const float overlap_threshold,
-                                   const int* idx, const int num_idx, bool* overlapped_data);
+                   const int top_k, const float nms_threshold,
+                   std::vector<int> *indices,
+                   std::shared_ptr<SyncedMemory> overlappe,
+                   std::shared_ptr<SyncedMemory> idx_sm);
+void compute_overlapped_by_idx_gpu(const int nthreads, const float *bbox_data,
+                                   const float overlap_threshold,
+                                   const int *idx, const int num_idx,
+                                   bool *overlapped_data);
 
 void apply_nms_fast(const std::vector<NormalizedBBox> &bboxes,
-                    const std::vector<float> &scores, const float score_threshold,
-                    const float nms_threshold, const float eta, const int top_k,
+                    const std::vector<float> &scores,
+                    const float score_threshold, const float nms_threshold,
+                    const float eta, const int top_k,
                     std::vector<int> *indices);
 
-void cross_class_merge(std::vector<int> *indices_ref, std::vector<int> *indices_target,
+void cross_class_merge(std::vector<int> *indices_ref,
+                       std::vector<int> *indices_target,
                        std::vector<NormalizedBBox> bboxes, float scale);
-
 }
 }
 

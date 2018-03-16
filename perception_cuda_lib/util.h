@@ -16,106 +16,109 @@
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H
-#include <caffe/caffe.hpp>
 #include <cuda_runtime.h>
+#include <caffe/caffe.hpp>
 #include <memory>
 
 namespace apollo {
 namespace perception {
 
-#define CUDA_CHECK(condition) \
-  /* Code block avoids redefinition of cudaError_t error */ \
-  do { \
-    cudaError_t error = condition; \
+#define CUDA_CHECK(condition)                                         \
+  /* Code block avoids redefinition of cudaError_t error */           \
+  do {                                                                \
+    cudaError_t error = condition;                                    \
     CHECK_EQ(error, cudaSuccess) << " " << cudaGetErrorString(error); \
   } while (0)
 
 void gpu_memcpy(const size_t N, const void *X, void *Y);
 
 inline void perception_gpu_memset(const size_t N, const int alpha, void *X) {
-    CUDA_CHECK(cudaMemset(X, alpha, N));
+  CUDA_CHECK(cudaMemset(X, alpha, N));
 }
 inline void perception_memset(const size_t N, const int alpha, void *X) {
-    memset(X, alpha, N);
+  memset(X, alpha, N);
 }
 
 inline void PerceptionMallocHost(void **ptr, size_t size, bool *use_cuda) {
-    CUDA_CHECK(cudaMallocHost(ptr, size));
-    *use_cuda = true;
-    return;
+  CUDA_CHECK(cudaMallocHost(ptr, size));
+  *use_cuda = true;
+  return;
 }
 
 inline void PerceptionFreeHost(void *ptr, bool use_cuda) {
-    if (use_cuda) {
-        CUDA_CHECK(cudaFreeHost(ptr));
-        return;
-    }
-    free(ptr);
+  if (use_cuda) {
+    CUDA_CHECK(cudaFreeHost(ptr));
     return;
+  }
+  free(ptr);
+  return;
 }
 
 class SyncedMemory {
-public:
-    SyncedMemory()
-            : cpu_ptr_(NULL), gpu_ptr_(NULL), size_(0), head_(UNINITIALIZED),
-              own_cpu_data_(false), cpu_malloc_use_cuda_(false), own_gpu_data_(false),
-              gpu_device_(-1) {
-    }
-    explicit SyncedMemory(size_t size)
-            : cpu_ptr_(NULL), gpu_ptr_(NULL), size_(size), head_(UNINITIALIZED),
-              own_cpu_data_(false), cpu_malloc_use_cuda_(false), own_gpu_data_(false),
-              gpu_device_(-1) {
-    }
+ public:
+  SyncedMemory()
+      : cpu_ptr_(NULL),
+        gpu_ptr_(NULL),
+        size_(0),
+        head_(UNINITIALIZED),
+        own_cpu_data_(false),
+        cpu_malloc_use_cuda_(false),
+        own_gpu_data_(false),
+        gpu_device_(-1) {}
+  explicit SyncedMemory(size_t size)
+      : cpu_ptr_(NULL),
+        gpu_ptr_(NULL),
+        size_(size),
+        head_(UNINITIALIZED),
+        own_cpu_data_(false),
+        cpu_malloc_use_cuda_(false),
+        own_gpu_data_(false),
+        gpu_device_(-1) {}
 
-    ~SyncedMemory();
+  ~SyncedMemory();
 
-    const void *cpu_data();
+  const void *cpu_data();
 
-    void set_cpu_data(void *data);
+  void set_cpu_data(void *data);
 
-    const void *gpu_data();
+  const void *gpu_data();
 
-    void set_gpu_data(void *data);
+  void set_gpu_data(void *data);
 
-    void *mutable_cpu_data();
+  void *mutable_cpu_data();
 
-    void *mutable_gpu_data();
+  void *mutable_gpu_data();
 
-    enum SyncedHead {
-        UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED
-    };
-    SyncedHead head() {
-        return head_;
-    }
-    size_t size() {
-        return size_;
-    }
+  enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };
+  SyncedHead head() { return head_; }
+  size_t size() { return size_; }
 
-       void async_gpu_push(const cudaStream_t &stream);
+  void async_gpu_push(const cudaStream_t &stream);
 
-private:
-    void to_cpu();
+ private:
+  void to_cpu();
 
-    void to_gpu();
+  void to_gpu();
 
-    void *cpu_ptr_;
-    void *gpu_ptr_;
-    size_t size_;
-    SyncedHead head_;
-    bool own_cpu_data_;
-    bool cpu_malloc_use_cuda_;
-    bool own_gpu_data_;
-    int gpu_device_;
-DISABLE_COPY_AND_ASSIGN(SyncedMemory);
+  void *cpu_ptr_;
+  void *gpu_ptr_;
+  size_t size_;
+  SyncedHead head_;
+  bool own_cpu_data_;
+  bool cpu_malloc_use_cuda_;
+  bool own_gpu_data_;
+  int gpu_device_;
+  DISABLE_COPY_AND_ASSIGN(SyncedMemory);
 };  // class SyncedMemory
 int divup(int a, int b);
 
-void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr<SyncedMemory> src_gpu,
-            int start_axis);
+void resize(cv::Mat frame, caffe::Blob<float> *dst,
+            std::shared_ptr<SyncedMemory> src_gpu, int start_axis);
 
-//resize with mean and scale
-void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr<SyncedMemory> src_gpu,
-            int start_axis, const float mean_b, const float mean_g, const float mean_r, 
+// resize with mean and scale
+void resize(cv::Mat frame, caffe::Blob<float> *dst,
+            std::shared_ptr<SyncedMemory> src_gpu, int start_axis,
+            const float mean_b, const float mean_g, const float mean_r,
             const float scale);
 }  // namespace perception
 }  // namespace apollo

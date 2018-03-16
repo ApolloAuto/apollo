@@ -20,28 +20,14 @@
 namespace apollo {
 namespace perception {
 
-void GetObjectsGPU(int n,
-                  const float *loc_data,
-                  const float *obj_data,
-                  const float *cls_data,
-                  const float *ori_data,
-                  const float *dim_data,
-                  const float *lof_data,
-                  const float *lor_data,
-                  const float *anchor_data,
-                  int width,
-                  int height,
-                  int num_anchors,
-                  int num_classes,
-                  float confidence_threshold,
-                  bool with_ori,
-                  bool with_dim,
-                  bool with_lof,
-                  bool with_lor,
-                  float *res_box_data,
-                  float *res_cls_data, 
-                  int s_box_block_size);
-
+void GetObjectsGPU(int n, const float *loc_data, const float *obj_data,
+                   const float *cls_data, const float *ori_data,
+                   const float *dim_data, const float *lof_data,
+                   const float *lor_data, const float *anchor_data, int width,
+                   int height, int num_anchors, int num_classes,
+                   float confidence_threshold, bool with_ori, bool with_dim,
+                   bool with_lof, bool with_lor, float *res_box_data,
+                   float *res_cls_data, int s_box_block_size);
 
 }  // namespace perception
 }  // namespace apollo

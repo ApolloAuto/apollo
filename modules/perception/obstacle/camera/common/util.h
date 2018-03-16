@@ -67,13 +67,13 @@ inline void l2norm(float *feat_data, int feat_dim) {
 }
 
 bool LoadVisualObjectFromFile(const std::string &file_name,
-                                  std::vector<VisualObjectPtr> *visual_objects);
+                              std::vector<VisualObjectPtr> *visual_objects);
 
 bool WriteVisualObjectToFile(const std::string &file_name,
-                                 std::vector<VisualObjectPtr> *visual_objects);
+                             std::vector<VisualObjectPtr> *visual_objects);
 
 bool LoadGTfromFile(const std::string &gt_path,
-                       std::vector<VisualObjectPtr> *visual_objects);
+                    std::vector<VisualObjectPtr> *visual_objects);
 
 std::string GetTypeText(ObjectType type);
 

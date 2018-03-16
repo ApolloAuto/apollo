@@ -38,9 +38,7 @@ class CameraSharedData : public CommonSharedData<CameraItem> {
   CameraSharedData() = default;
   virtual ~CameraSharedData() = default;
 
-  std::string name() const override {
-    return "CameraSharedData";
-  }
+  std::string name() const override { return "CameraSharedData"; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CameraSharedData);

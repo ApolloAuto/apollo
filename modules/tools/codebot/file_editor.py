@@ -14,12 +14,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-############################################################################### 
+###############################################################################
 
 import os
 import sys
 import re
 import subprocess
+
 
 class FileEditor:
     define_gflags_pattern = re.compile("DEFINE_[a-z]+\(([a-z_]+),")
@@ -43,7 +44,8 @@ class FileEditor:
         if self.__basename == "BUILD":
             self.execute(['buildifier', self.__filename])
         elif self.__ext == ".cc" or self.__ext == ".h" or self.__ext == ".hpp":
-            self.execute(['clang-format', '-i', '-style=Google', self.__filename])
+            self.execute(
+                ['clang-format', '-i', '-style=Google', self.__filename])
         elif self.__ext == ".py":
             self.execute(['yapf', '-i', self.__filename])
         else:
@@ -56,12 +58,16 @@ class FileEditor:
         return FileEditor.define_gflags_pattern.findall(self.__content)
 
     def delete_doxygen_file(self):
-        self.__content = re.sub('^ \* @file %s$' % self.__basename, ' * @file', self.__content)
+        self.__content = re.sub('^ \* @file %s$' % self.__basename, ' * @file',
+                                self.__content)
 
     def delete_gflag(self, flag):
-        self.__content = re.sub(r'DEFINE_[a-z]+\(%s,\s*(.|\s)*?"\);' % flag, "", self.__content, re.MULTILINE)
-        self.__content = re.sub(r'DECLARE_[a-z]+\(%s\);' % flag, "", self.__content, re.MULTILINE)
-        self.__content = re.sub(r'--(no)?%s(=.*?)?' % flag, "", self.__content, re.MULTILINE)
+        self.__content = re.sub(r'DEFINE_[a-z]+\(%s,\s*(.|\s)*?"\);' % flag,
+                                "", self.__content, re.MULTILINE)
+        self.__content = re.sub(r'DECLARE_[a-z]+\(%s\);' % flag, "",
+                                self.__content, re.MULTILINE)
+        self.__content = re.sub(r'--(no)?%s(=.*?)?' % flag, "", self.__content,
+                                re.MULTILINE)
 
     def used_gflags(self):
         return FileEditor.used_gflags_pattern.findall(self.__content)
@@ -69,4 +75,3 @@ class FileEditor:
     def execute(self, command):
         result = subprocess.call(command, stdout=subprocess.PIPE)
         return result
-

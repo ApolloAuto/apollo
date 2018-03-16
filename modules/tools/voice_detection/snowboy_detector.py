@@ -33,6 +33,7 @@ class SnowboyDetector(object):
     Detect voice command with snowboy. For more information, please refer to
         https://github.com/Kitt-AI/snowboy
     """
+
     def __init__(self):
         CONF_FILE = '/apollo/modules/tools/voice_detection/voice_detection.conf'
         config = proto_utils.get_pb_from_text_file(
@@ -52,12 +53,13 @@ class SnowboyDetector(object):
         self.detector.SetAudioGain(config.audio_gain)
 
         sensitivity_str = '%.2f' % config.sensitivity
-        self.detector.SetSensitivity(
-            ','.join([sensitivity_str] * self.detector.NumHotwords()))
+        self.detector.SetSensitivity(','.join(
+            [sensitivity_str] * self.detector.NumHotwords()))
 
         self.voice_detection_pub = rospy.Publisher(
             '/apollo/hmi/voice_detection_response',
-            voice_detection_pb2.VoiceDetectionResponse, queue_size=1)
+            voice_detection_pb2.VoiceDetectionResponse,
+            queue_size=1)
 
     def voice_detection_request_callback(self, data):
         """New message received"""
@@ -71,6 +73,7 @@ class SnowboyDetector(object):
             response.action = hotword.action
             self.voice_detection_pub.publish(response)
             print 'Action {} is triggered!'.format(hotword.action)
+
 
 def main():
     """Main rosnode"""

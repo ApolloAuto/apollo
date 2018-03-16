@@ -69,9 +69,7 @@ MPCController::MPCController() : name_("MPC Controller") {
   AINFO << "Using " << name_;
 }
 
-MPCController::~MPCController() {
-  CloseLogFile();
-}
+MPCController::~MPCController() { CloseLogFile(); }
 
 bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
@@ -220,13 +218,9 @@ void MPCController::CloseLogFile() {
   }
 }
 
-void MPCController::Stop() {
-  CloseLogFile();
-}
+void MPCController::Stop() { CloseLogFile(); }
 
-std::string MPCController::Name() const {
-  return name_;
-}
+std::string MPCController::Name() const { return name_; }
 
 void MPCController::LoadMPCGainScheduler(
     const MPCControllerConf &mpc_controller_conf) {
@@ -559,8 +553,8 @@ void MPCController::ComputeLateralErrors(
   debug->set_heading_error(delta_theta);
   // theta_error_dot = angular_v - matched_point.path_point().kappa() *
   // matched_point.v();
-  debug->set_heading_error_rate(angular_v - matched_point.path_point().kappa() *
-                                                matched_point.v());
+  debug->set_heading_error_rate(
+      angular_v - matched_point.path_point().kappa() * matched_point.v());
 
   // matched_theta = matched_point.path_point().theta();
   debug->set_ref_heading(matched_point.path_point().theta());

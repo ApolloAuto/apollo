@@ -22,8 +22,8 @@
 #include <string>
 #include <vector>
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
-#include "modules/perception/obstacle/camera/visualizer/gl_fusion_visualizer.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
+#include "modules/perception/obstacle/camera/visualizer/gl_fusion_visualizer.h"
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"

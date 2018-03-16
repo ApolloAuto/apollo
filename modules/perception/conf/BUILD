@@ -11,8 +11,8 @@ filegroup(
     name = "perception_config",
     srcs = [
         "config_manager.config",
-        "dag_streaming.config",
         "dag_camera_obstacle_offline.config",
-        "perception.conf"
+        "dag_streaming.config",
+        "perception.conf",
     ],
 )

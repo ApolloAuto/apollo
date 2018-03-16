@@ -20,6 +20,7 @@ import os
 import git
 import subprocess
 
+
 class GitHelper:
     def __init__(self, path, remote):
         self.__path = path
@@ -39,7 +40,8 @@ class GitHelper:
     def rebase_with_remote(self):
         remote = self.find_remote(self.__remote)
         remote.fetch()
-        self.execute(["git", "pull", "--rebase", "-Xtheirs", self.__remote, "master"])
+        self.execute(
+            ["git", "pull", "--rebase", "-Xtheirs", self.__remote, "master"])
 
     def find_remote(self, remote_name):
         for remote in self.__repo.remotes:
@@ -48,7 +50,7 @@ class GitHelper:
         print("Remote name %s not found" % name)
 
     def reset_to_remote(self):
-        self.__repo.git.reset("--hard", "%s/master" % (self.__remote/master))
+        self.__repo.git.reset("--hard", "%s/master" % (self.__remote / master))
 
     def get_nth_commit_from_branch(self, branch, n):
         i = 0
@@ -73,9 +75,10 @@ class GitHelper:
                 commits.append(commit)
         return commits
 
-
     def get_changed_files_since_commit(self, commit):
-        output=self.execute(['git', 'diff', '--name-only', '%s..HEAD' % commit.hexsha])
+        output = self.execute(
+            ['git', 'diff', '--name-only',
+             '%s..HEAD' % commit.hexsha])
         files = []
         for f in output.split("\n"):
             if len(f.strip()) == 0:
@@ -83,4 +86,3 @@ class GitHelper:
             print f
             files.append(os.path.join(self.__path, f))
         return files
-

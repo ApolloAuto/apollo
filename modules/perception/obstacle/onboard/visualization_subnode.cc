@@ -16,9 +16,9 @@
 
 #include "modules/perception/obstacle/onboard/visualization_subnode.h"
 
-#include <vector>
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
 #include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/camera/common/util.h"
