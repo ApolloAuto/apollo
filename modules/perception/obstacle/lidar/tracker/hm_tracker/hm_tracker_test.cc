@@ -24,7 +24,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/log.h"
-#include "modules/perception/common/file_system_util.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/common/pcl_types.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -96,9 +96,9 @@ TEST_F(HmObjectTrackerTest, Track) {
   // test tracking via hm tracker
   std::string data_path = "modules/perception/data/hm_tracker_test/";
   std::vector<std::string> seg_filenames;
-  GetFileNamesInFolderById(data_path, ".seg", &seg_filenames);
+  common::util::GetFileNamesInFolderById(data_path, ".seg", &seg_filenames);
   std::vector<std::string> pose_filenames;
-  GetFileNamesInFolderById(data_path, ".pose", &pose_filenames);
+  common::util::GetFileNamesInFolderById(data_path, ".pose", &pose_filenames);
   int frame_id = -1;
   double time_stamp = 0.0;
   EXPECT_GT(seg_filenames.size(), 0);

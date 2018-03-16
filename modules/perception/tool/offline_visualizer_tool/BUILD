@@ -13,6 +13,7 @@ cc_binary(
     deps = [
         "//modules/common",
         "//modules/common:log",
+        "//modules/common/util",
         "//modules/perception/common",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
