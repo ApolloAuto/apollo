@@ -245,7 +245,9 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common:util",
+        "//modules/perception/obstacle/camera/motion",
         "//modules/perception/obstacle/camera/visualizer",
+        "//modules/perception/obstacle/onboard:motion_subnode",
         "//modules/perception/onboard",
     ],
 )

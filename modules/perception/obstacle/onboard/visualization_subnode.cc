@@ -24,6 +24,9 @@
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
+#include "modules/perception/onboard/dag_streaming.h"
+
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/subnode_helper.h"
@@ -68,6 +71,12 @@ bool VisualizationSubnode::InitInternal() {
           << camera_object_data_->name();
   }
 
+  // init motion service
+  if (FLAGS_show_motion) {
+    MotionService *motion_service = dynamic_cast<MotionService *>(
+       DAGStreaming::GetSubnodeByName("MotionService"));
+    motion_service->GetMotionBuffer(motion_buffer_);
+  }
   // init fusion data
   if (FLAGS_show_fused_objects) {
     fusion_data_ = dynamic_cast<FusionSharedData*>(
@@ -203,7 +212,7 @@ void VisualizationSubnode::GetFrameData(const Event& event,
                                         FrameContent* content) {
   if (event.event_id == camera_event_id_) {
     if (FLAGS_show_camera_objects || FLAGS_show_camera_objects2d ||
-        FLAGS_show_camera_parsing) {
+        FLAGS_show_camera_parsing || FLAGS_show_motion) {
       std::shared_ptr<CameraItem> camera_item;
       if (!camera_shared_data_->Get(data_key, &camera_item) ||
           camera_item == nullptr) {
@@ -231,6 +240,9 @@ void VisualizationSubnode::GetFrameData(const Event& event,
       } else {
         content->set_camera_content(timestamp, objs->sensor2world_pose,
                                     objs->objects);
+      }
+      if (FLAGS_show_motion) {
+        content->set_motion_content(timestamp, motion_buffer_);
       }
     }
   } else if (event.event_id == motion_event_id_) {

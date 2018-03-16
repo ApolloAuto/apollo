@@ -45,6 +45,7 @@ class MotionService : public Subnode {
 
   void GetVehicleInformation(float timestamp,
                              VehicleInformation *vehicle_informatino);
+  void GetMotionBuffer(MotionBufferPtr motion_buffer);
 
  protected:
   bool InitInternal() override;
@@ -59,7 +60,7 @@ class MotionService : public Subnode {
   const int motion_sensor_frequency_ = 100;
   Mutex mutex_;
   std::list<VehicleInformation> vehicle_information_buffer_;
-
+  // MotionBufferPtr motion_buffer_;
   DISALLOW_COPY_AND_ASSIGN(MotionService);
 };
 
