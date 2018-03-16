@@ -125,7 +125,7 @@ const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
       LoadFiles(instance()->config_.software_configs());
 
   // Store latest routing request.
-  auto* routing_request_adapter = AdapterManager::GetRoutingRequest();
+  auto *routing_request_adapter = AdapterManager::GetRoutingRequest();
   if (routing_request_adapter) {
     routing_request_adapter->Observe();
     if (!routing_request_adapter->Empty()) {
@@ -151,7 +151,7 @@ std::string InfoCollector::GetDockerImage() {
       return meta["tag"].as<std::string>();
     }
   }
-  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
+  if (const char *docker_image = std::getenv("DOCKER_IMG")) {
     return docker_image;
   }
   return "";

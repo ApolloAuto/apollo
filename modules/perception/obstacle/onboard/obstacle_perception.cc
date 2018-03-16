@@ -19,8 +19,8 @@
 
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
-#include "modules/perception/common/perception_gflags.h"
 #include "modules/common/time/timer.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 #include "modules/perception/obstacle/radar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"

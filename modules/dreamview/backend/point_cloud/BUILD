@@ -22,7 +22,7 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//third_party/json",
         "@com_google_protobuf//:protobuf",
-        "@pcl//:pcl",
+        "@pcl",
     ],
 )
 
