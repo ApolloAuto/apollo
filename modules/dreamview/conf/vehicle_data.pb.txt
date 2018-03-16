@@ -67,6 +67,10 @@ data_files {
   dest_path: "modules/localization/msf/params/gnss_params/ant_imu_leverarm.yaml"
 }
 data_files {
+  source_path: "vehicle_params"
+  dest_path: "modules/localization/msf/params/vehicle_params"
+}
+data_files {
   source_path: "vehicle_info.pb.txt"
   dest_path: "modules/tools/ota/vehicle_info.pb.txt"
 }
