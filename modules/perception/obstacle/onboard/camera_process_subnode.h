@@ -72,7 +72,7 @@ class CameraProcessSubnode : public Subnode {
 
   void ImgCallback(const sensor_msgs::Image& message);
 
-  bool MessageToMat(const sensor_msgs::Image& message, cv::Mat* mat);
+  bool MessageToMat(const sensor_msgs::Image& msg, cv::Mat* img);
 
   void VisualObjToSensorObj(const std::vector<VisualObjectPtr>& objects,
                             SharedDataPtr<SensorObjects>* sensor_objects);
