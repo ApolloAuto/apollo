@@ -17,16 +17,18 @@
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_FUSION_SUBNODE_H_
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time_util.h"
-#include "modules/perception/common/perception_gflags.h"
 #include "modules/common/time/timer.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -64,6 +66,8 @@ class FusionSubnode : public Subnode {
                                  const std::vector<Event> &events);
   void RegistAllAlgorithm();
 
+  void OnChassis(const apollo::canbus::Chassis &message);
+
   double timestamp_;
   std::vector<ObjectPtr> objects_;
   common::ErrorCode error_code_ = common::OK;
@@ -74,6 +78,8 @@ class FusionSubnode : public Subnode {
   EventID pub_driven_event_id_;
   EventID lidar_event_id_;
   EventID radar_event_id_;
+  std::mutex fusion_subnode_mutex_;
+  apollo::canbus::Chassis chassis_;
   DISALLOW_COPY_AND_ASSIGN(FusionSubnode);
 };
 
