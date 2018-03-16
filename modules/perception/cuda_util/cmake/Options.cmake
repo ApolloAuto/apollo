@@ -9,8 +9,8 @@ set (CMAKE_CXX_FLAGS "-std=c++11 -g -O2 -DNDEBUG -fopenmp -Wall" CACHE STRING ""
                                                                 # DO NOT remove -g flags,
                                                                 # we should reserve symbol
                                                                 # info to debug coredump  file.
-																
-set (CMAKE_CXX_COMPILER ${COV_HOME}/bin/g++ CACHE STRING "" FORCE)
+
+#set (CMAKE_CXX_COMPILER /usr/bin/g++ CACHE STRING "" FORCE)
 
 ######################## option switches #####################################################
 SET(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS};-cudart=static")
