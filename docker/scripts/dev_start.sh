@@ -172,6 +172,13 @@ function main(){
     docker pull ${LOCALIZATION_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
 
+    YOLO3D_VOLUME=apollo_yolo3d_volume
+    docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
+
+    YOLO3D_VOLUME_IMAGE=apolloauto/apollo:yolo3d_volume-${ARCH}-latest
+    docker pull ${YOLO3D_VOLUME_IMAGE}
+    docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
+
     info "Starting docker container \"apollo_dev\" ..."
     docker run -it \
         -d \
@@ -179,6 +186,7 @@ function main(){
         --name apollo_dev \
         ${MAP_VOLUME_CONF} \
         --volumes-from ${LOCALIZATION_VOLUME} \
+        --volumes-from ${YOLO3D_VOLUME} \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
         -e USER=$USER \
