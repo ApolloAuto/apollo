@@ -22,8 +22,7 @@
 
 #include "caffe/caffe.hpp"
 
-#include "modules/perception/common/mem_util.h"
-#include "modules/perception/obstacle/camera/common/util.h"
+#include "include/util.h"
 
 namespace apollo {
 namespace perception {
@@ -84,67 +83,6 @@ class CNNCaffe : public CNNAdapter {
   boost::shared_ptr<caffe::Net<float>> net_;
   int gpu_id_ = 0;
 };
-
-/*
-class CNNTensorRT : public CNNAdapter {
- public:
-  CNNTensorRT(bool int8_flag) : int8_flag_(int8_flag){};
-
-  virtual bool init(const std::vector<std::string> &input_names,
-                    const std::vector<std::string> &output_names,
-                    const std::string &proto_file,
-                    const std::string &weight_file, int gpu_id,
-                    const std::string &model_root = "") override;
-
-  void forward() override;
-
-  boost::shared_ptr<caffe::Blob<float>> get_blob_by_name(
-      const std::string &name) override;
-
-  bool shape(const std::string &name, std::vector<int> *res) override {
-    auto blob = get_blob_by_name(name);
-    if (blob == nullptr) {
-      return false;
-    }
-    *res = blob->shape();
-    return true;
-  }
-
-  bool reshape_input(const std::string &name,
-                     const std::vector<int> &shape) override {
-    return true;
-  }
-
- protected:
-  void sync_blob(const std::vector<std::string> &v_names,
-                 bool buffer_to_blob_flag) {
-    for (auto name : v_names) {
-      auto blob = get_blob_by_name(name);
-      int count = blob->count();
-      if (buffer_to_blob_flag) {
-        float *gpu_data = blob->mutable_gpu_data();
-        cudaMemcpy(gpu_data, (float *)name_buffers_[name],
-                   count * sizeof(float), cudaMemcpyDeviceToDevice);
-      } else {
-        const float *gpu_data = blob->gpu_data();
-        cudaMemcpy((float *)name_buffers_[name], gpu_data,
-                   count * sizeof(float), cudaMemcpyDeviceToDevice);
-      }
-    }
-  }
-
- private:
-  //::anakin::RTInfer<float> inference_;
-  // name blob
-  std::map<std::string, boost::shared_ptr<caffe::Blob<float>>> blobs_;
-  std::map<std::string, void *> name_buffers_;
-  std::vector<std::string> input_names_;
-  std::vector<std::string> output_names_;
-
-  int gpu_id_ = 0;
-  bool int8_flag_ = false;
-};
-*/
 
 }  // namespace perception
 }  // namespace apollo
