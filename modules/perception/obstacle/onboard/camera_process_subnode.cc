@@ -91,11 +91,10 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   AdapterManager::Observe();
   sensor_msgs::Image msg = AdapterManager::GetImageShort()->GetLatestObserved();
 
-  // TODO(later) Some bags contain same timestamps for all frames
-  float timestamp = msg.header.stamp.toSec();
+  double timestamp = msg.header.stamp.toSec();
   AINFO << "CameraProcessSubnode ImgCallback: "
         << " frame: "<< ++seq_num_ << " timestamp: ";
-  AINFO << std::fixed << std::setprecision(10) << timestamp;
+  AINFO << std::fixed << std::setprecision(20) << timestamp;
 
   cv::Mat img;
   MessageToMat(msg, &img);
@@ -169,9 +168,8 @@ void CameraProcessSubnode::VisualObjToSensorObj(
 }
 
 void CameraProcessSubnode::PublishDataAndEvent(
-    const float &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
+    const double &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
     const SharedDataPtr<CameraItem> &camera_item) {
-  // TODO(later) If timestamp is wrong in bag, the key is the same
   std::string key = "";
   SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
 
