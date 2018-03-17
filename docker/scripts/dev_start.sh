@@ -20,7 +20,7 @@ INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20180314_0000"
+VERSION_X86_64="dev-x86_64-20180315_1337"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 
@@ -172,6 +172,13 @@ function main(){
     docker pull ${LOCALIZATION_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
 
+    YOLO3D_VOLUME=apollo_yolo3d_volume
+    docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
+
+    YOLO3D_VOLUME_IMAGE=apolloauto/apollo:yolo3d_volume-${ARCH}-latest
+    docker pull ${YOLO3D_VOLUME_IMAGE}
+    docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
+
     info "Starting docker container \"apollo_dev\" ..."
     docker run -it \
         -d \
@@ -179,6 +186,7 @@ function main(){
         --name apollo_dev \
         ${MAP_VOLUME_CONF} \
         --volumes-from ${LOCALIZATION_VOLUME} \
+        --volumes-from ${YOLO3D_VOLUME} \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
         -e USER=$USER \

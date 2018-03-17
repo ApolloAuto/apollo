@@ -14,6 +14,9 @@ cc_library(
         "string_tokenizer.h",
         "util.h",
     ],
+    linkopts = [
+        "-lboost_filesystem",
+    ],
     deps = [
         ":string_util",
         "//modules/common/math",
@@ -154,6 +157,9 @@ cc_test(
     size = "small",
     srcs = [
         "file_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
     ],
     tags = [
         "external",

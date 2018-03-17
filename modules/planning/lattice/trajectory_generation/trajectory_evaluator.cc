@@ -27,6 +27,7 @@
 #include <utility>
 
 #include "modules/common/log.h"
+#include "modules/common/math/path_matcher.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker1d.h"
 #include "modules/planning/lattice/trajectory1d/piecewise_acceleration_trajectory1d.h"
@@ -35,13 +36,16 @@ namespace apollo {
 namespace planning {
 
 using Trajectory1d = Curve1d;
+using apollo::common::PathPoint;
 
 TrajectoryEvaluator::TrajectoryEvaluator(
     const std::array<double, 3>& init_s, const PlanningTarget& planning_target,
     const std::vector<std::shared_ptr<Trajectory1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Trajectory1d>>& lat_trajectories,
-    std::shared_ptr<PathTimeGraph> path_time_graph)
-    : path_time_graph_(path_time_graph), init_s_(init_s) {
+    std::shared_ptr<PathTimeGraph> path_time_graph,
+    std::shared_ptr<std::vector<PathPoint>> reference_line)
+    : path_time_graph_(path_time_graph), reference_line_(reference_line),
+      init_s_(init_s) {
   const double start_time = 0.0;
   const double end_time = FLAGS_trajectory_time_length;
   path_time_intervals_ = path_time_graph_->GetPathBlockingIntervals(
@@ -155,6 +159,9 @@ double TrajectoryEvaluator::Evaluate(
 
   double lon_collision_cost = LonCollisionCost(lon_trajectory);
 
+  double centripetal_acc_cost =
+      CentripetalAccelerationCost(lon_trajectory);
+
   // decides the longitudinal evaluation horizon for lateral trajectories.
   double evaluation_horizon =
       std::min(FLAGS_decision_horizon,
@@ -180,6 +187,7 @@ double TrajectoryEvaluator::Evaluate(
   return lon_objective_cost * FLAGS_weight_lon_travel +
          lon_jerk_cost * FLAGS_weight_lon_jerk +
          lon_collision_cost * FLAGS_weight_lon_collision +
+         centripetal_acc_cost * FLAGS_weight_centripetal_acceleration +
          lat_offset_cost * FLAGS_weight_lat_offset +
          lat_comfort_cost * FLAGS_weight_lat_comfort;
 }
@@ -287,6 +295,31 @@ double TrajectoryEvaluator::LonCollisionCost(
     }
   }
   return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
+}
+
+double TrajectoryEvaluator::CentripetalAccelerationCost(
+    const std::shared_ptr<Trajectory1d>& lon_trajectory) const {
+  double centripetal_acc_sum = 0.0;
+  double centripetal_acc_sqr_sum = 0.0;
+  for (double t = 0.0; t < FLAGS_trajectory_time_length;
+       t += FLAGS_trajectory_time_resolution) {
+    double s = lon_trajectory->Evaluate(0, t);
+    double v = lon_trajectory->Evaluate(1, t);
+    PathPoint ref_point = PathMatcher::MatchToPath(*reference_line_, s);
+    double kappa = 0.0;
+    if (ref_point.has_kappa()) {
+      kappa = ref_point.kappa();
+    } else {
+      AERROR << "Reference point has no kappa at s = " << s
+             << ", use zero kappa instead.";
+    }
+    double centripetal_acc = v * v * kappa;
+    centripetal_acc_sum += std::abs(centripetal_acc);
+    centripetal_acc_sqr_sum += centripetal_acc * centripetal_acc;
+  }
+
+  return centripetal_acc_sqr_sum /
+         (centripetal_acc_sum + FLAGS_lattice_epsilon);
 }
 
 std::vector<double> TrajectoryEvaluator::evaluate_per_lonlat_trajectory(

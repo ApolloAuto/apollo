@@ -30,6 +30,7 @@
 
 namespace apollo {
 namespace perception {
+namespace lowcostvisualizer {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
@@ -91,6 +92,7 @@ bool VisualizationSubnode::InitInternal() {
           << camera_shared_data_->name();
   }
   // init frame_visualizer
+  RegisterFactoryGLFusionVisualizer();
   frame_visualizer_.reset(
       BaseVisualizerRegisterer::GetInstanceByName(FLAGS_frame_visualizer));
   if (!frame_visualizer_) {
@@ -128,41 +130,44 @@ bool VisualizationSubnode::InitStream() {
   }
   vis_driven_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
 
-  auto radar_iter = reserve_field_map.find("radar_event_id");
-  if (radar_iter == reserve_field_map.end()) {
-    AERROR << "Failed to find radar_event_id:" << reserve_;
-    return false;
+  iter = reserve_field_map.find("radar_event_id");
+  if (iter == reserve_field_map.end()) {
+    AWARN << "Failed to find radar_event_id_: " << reserve_;
+    radar_event_id_ = -1;
+  } else {
+    radar_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
   }
-  radar_event_id_ = static_cast<EventID>(atoi((radar_iter->second).c_str()));
 
-  auto camera_iter = reserve_field_map.find("camera_event_id");
-  if (camera_iter == reserve_field_map.end()) {
-    AERROR << "Failed to find camera_event_id:" << reserve_;
-    return false;
+  iter = reserve_field_map.find("camera_event_id");
+  if (iter == reserve_field_map.end()) {
+    AWARN << "Failed to find camera_event_id_: " << reserve_;
+    camera_event_id_ = -1;
+  } else {
+    camera_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
   }
-  camera_event_id_ = static_cast<EventID>(atoi((camera_iter->second).c_str()));
 
-  auto cipv_iter = reserve_field_map.find("cipv_event_id");
-  if (cipv_iter == reserve_field_map.end()) {
-    AERROR << "Failed to find cipv_event_id:" << reserve_;
-    return false;
+  iter = reserve_field_map.find("cipv_event_id");
+  if (iter == reserve_field_map.end()) {
+    AWARN << "Failed to find cipv_event_id_: " << reserve_;
+    cipv_event_id_ = -1;
+  } else {
+    cipv_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
   }
-  cipv_event_id_ = static_cast<EventID>(atoi((cipv_iter->second).c_str()));
 
-  auto fusion_iter = reserve_field_map.find("fusion_event_id");
-  if (fusion_iter == reserve_field_map.end()) {
-    AERROR << "Failed to find fusion_event_id:" << reserve_;
-    return false;
+  iter = reserve_field_map.find("fusion_event_id");
+  if (iter == reserve_field_map.end()) {
+    AWARN << "Failed to find fusion_event_id_: " << reserve_;
+    fusion_event_id_ = -1;
+  } else {
+    fusion_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
   }
-  fusion_event_id_ = static_cast<EventID>(atoi((fusion_iter->second).c_str()));
 
-  auto motion_iter = reserve_field_map.find("motion_event_id");
-  if (motion_iter == reserve_field_map.end()) {
-    AERROR << "Failed to find motion_event_id:" << reserve_;
+  iter = reserve_field_map.find("motion_event_id");
+  if (iter == reserve_field_map.end()) {
+    AWARN << "Failed to find motion_event_id_: " << reserve_;
     motion_event_id_ = -1;
   } else {
-    motion_event_id_ =
-        static_cast<EventID>(atoi((motion_iter->second).c_str()));
+    motion_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
   }
 
   return true;
@@ -326,11 +331,9 @@ apollo::common::Status VisualizationSubnode::ProcEvents() {
                << " device_id:" << device_id;
         return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
       }
-      //            GetFrameData(device_id, data_key, &content_, timestamp);
-      if (event_meta.event_id == vis_driven_event_id_) {
-        AERROR << "vis_driven_event_1: " << events[j].event_id << " "
-               << timestamp << " " << device_id << " " << motion_event_id_;
-      }
+      AINFO << "event: " << events[j].event_id << " timestamp: "
+            << timestamp << " device_id:" << device_id;
+
       GetFrameData(events[j], device_id, data_key, timestamp, &content_);
       if (event_meta.event_id == vis_driven_event_id_) {
         // Init of frame_visualizer must be in one thread with render,
@@ -354,7 +357,6 @@ apollo::common::Status VisualizationSubnode::ProcEvents() {
   return Status::OK();
 }
 
-REGISTER_SUBNODE(VisualizationSubnode);
-
+}  // namespace lowcostvisualizer
 }  // namespace perception
 }  // namespace apollo

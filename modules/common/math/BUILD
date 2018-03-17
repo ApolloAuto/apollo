@@ -119,7 +119,7 @@ cc_library(
     deps = [
         ":math_utils",
         ":vec2d",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -146,7 +146,7 @@ cc_library(
         ":math_utils",
         ":vec2d",
         "//modules/common/proto:common_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -156,7 +156,7 @@ cc_library(
         "matrix_operations.h",
     ],
     deps = [
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -168,7 +168,17 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/math:matrix_operations",
-        "@eigen//:eigen",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "kalman_filter_1d",
+    srcs = ["kalman_filter_1d.cc"],
+    hdrs = ["kalman_filter_1d.h"],
+    deps = [
+        "@eigen",
+        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -289,7 +299,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -305,7 +315,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -321,7 +331,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/math:math_utils",
         "//modules/common/math:vec2d",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -360,7 +370,7 @@ cc_test(
     deps = [
         ":linear_interpolation",
         "//modules/common:log",
-        "@eigen//:eigen",
+        "@eigen",
         "@gtest//:main",
     ],
 )

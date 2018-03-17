@@ -109,6 +109,7 @@ cc_library(
     ],
     deps = [
         ":perception_obstacle_shared_data",
+        "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/converter",
@@ -116,6 +117,7 @@ cc_library(
         "//modules/perception/obstacle/camera/filter",
         "//modules/perception/obstacle/camera/tracker",
         "//modules/perception/obstacle/camera/transformer",
+        "//modules/perception/obstacle/camera/dummy",
         "//modules/perception/onboard",
         "@eigen",
         "@opencv2//:core",
@@ -238,6 +240,7 @@ cc_library(
     ],
     deps = [
         ":perception_obstacle_shared_data",
+        "//modules/common:log",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common:util",

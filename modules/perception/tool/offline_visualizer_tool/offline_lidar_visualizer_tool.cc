@@ -23,7 +23,7 @@
 
 #include "pcl/io/pcd_io.h"
 
-#include "modules/perception/common/file_system_util.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/common/pcl_types.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -75,8 +75,9 @@ class OfflineLidarPerceptionTool {
     std::vector<std::string> pcd_file_names;
     std::vector<std::string> pose_file_names;
     AINFO << "starting to run";
-    GetFileNamesInFolderById(pose_folder, ".pose", &pose_file_names);
-    GetFileNamesInFolderById(pcd_folder, ".pcd", &pcd_file_names);
+    common::util::GetFileNamesInFolderById(pose_folder, ".pose",
+                                           &pose_file_names);
+    common::util::GetFileNamesInFolderById(pcd_folder, ".pcd", &pcd_file_names);
     AINFO << " pose size " << pose_file_names.size();
     AINFO << " pcd size " << pcd_file_names.size();
     if (pose_file_names.size() != pcd_file_names.size()) {

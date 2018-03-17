@@ -18,7 +18,6 @@
 
 #include <map>
 
-#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
@@ -30,6 +29,7 @@
 namespace apollo {
 namespace perception {
 
+using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
@@ -37,7 +37,10 @@ using apollo::common::adapter::AdapterManager;
 bool FusionSubnode::InitInternal() {
   RegistAllAlgorithm();
 
+  AdapterManager::Init(FLAGS_perception_adapter_config_filename);
+
   CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
+  AdapterManager::AddChassisCallback(&FusionSubnode::OnChassis, this);
 
   CHECK(shared_data_manager_ != nullptr);
   fusion_.reset(BaseFusionRegisterer::GetInstanceByName(FLAGS_onboard_fusion));
@@ -107,6 +110,7 @@ bool FusionSubnode::InitOutputStream() {
 }
 
 Status FusionSubnode::ProcEvents() {
+  std::lock_guard<std::mutex> lock(fusion_subnode_mutex_);
   for (auto event_meta : sub_meta_events_) {
     std::vector<Event> events;
     if (!SubscribeEvents(event_meta, &events)) {
@@ -127,12 +131,6 @@ Status FusionSubnode::ProcEvents() {
       continue;
     }
 
-    // TODO(QiL): refine the logic here for low cost solution.
-    AdapterManager::Observe();
-    // chassis
-    const auto &chassis = AdapterManager::GetChassis()->GetLatestObserved();
-    ADEBUG << "Get chassis:" << chassis.DebugString();
-
     // public obstacle message
     PerceptionObstacles obstacles;
     if (GeneratePbMsg(&obstacles)) {
@@ -140,7 +138,7 @@ Status FusionSubnode::ProcEvents() {
       if (FLAGS_use_navigation_mode) {
         for (auto obstacle : obstacles.perception_obstacle()) {
           obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
-                                             chassis.speed_mps());
+                                             chassis_.speed_mps());
         }
       }
       common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
@@ -262,6 +260,12 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
 
 void FusionSubnode::RegistAllAlgorithm() {
   RegisterFactoryProbabilisticFusion();
+}
+
+void FusionSubnode::OnChassis(const Chassis &chassis) {
+  ADEBUG << "Received chassis data: run chassis callback.";
+  std::lock_guard<std::mutex> lock(fusion_subnode_mutex_);
+  chassis_.CopyFrom(chassis);
 }
 
 }  // namespace perception

@@ -35,11 +35,16 @@
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/obstacle/camera/converter/geometry_camera_converter.h"
+#include "modules/perception/obstacle/camera/dummy/dummy_algorithms.h"
+#include "modules/perception/obstacle/camera/filter/object_camera_filter.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_converter.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_detector.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_filter.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_tracker.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_transformer.h"
+#include "modules/perception/obstacle/camera/tracker/cascaded_camera_tracker.h"
+#include "modules/perception/obstacle/camera/transformer/flat_camera_transformer.h"
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
@@ -67,12 +72,12 @@ class CameraProcessSubnode : public Subnode {
 
   void ImgCallback(const sensor_msgs::Image& message);
 
-  bool MessageToMat(const sensor_msgs::Image& message, cv::Mat* mat);
+  bool MessageToMat(const sensor_msgs::Image& msg, cv::Mat* img);
 
   void VisualObjToSensorObj(const std::vector<VisualObjectPtr>& objects,
                             SharedDataPtr<SensorObjects>* sensor_objects);
 
-  void PublishDataAndEvent(const float& timestamp,
+  void PublishDataAndEvent(const double& timestamp,
                            const SharedDataPtr<SensorObjects>& sensor_objects,
                            const SharedDataPtr<CameraItem>& camera_item);
 
