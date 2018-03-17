@@ -47,6 +47,7 @@ namespace dreamview {
 using apollo::canbus::Chassis;
 using apollo::common::PathPoint;
 using apollo::common::Point3D;
+using apollo::common::PointENU;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
@@ -58,6 +59,7 @@ using apollo::common::time::millis;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::GetProtoFromFile;
 using apollo::control::ControlCommand;
+using apollo::hdmap::Curve;
 using apollo::hdmap::Map;
 using apollo::hdmap::Path;
 using apollo::localization::Gps;
@@ -77,6 +79,9 @@ using apollo::routing::RoutingResponse;
 
 using Json = nlohmann::json;
 using ::google::protobuf::util::MessageToJsonString;
+
+// Angle threshold is about 5.72 degree.
+static constexpr double kAngleThreshold = 0.1;
 
 namespace {
 
@@ -189,6 +194,21 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
     auto_driving_car->set_current_signal("EMERGENCY");
   } else {
     auto_driving_car->set_current_signal("");
+  }
+}
+
+void DownsampleCurve(Curve *curve) {
+  auto *line_segment = curve->mutable_segment(0)->mutable_line_segment();
+  std::vector<PointENU> points(line_segment->point().begin(),
+                               line_segment->point().end());
+  line_segment->clear_point();
+
+  // Downsample points by angle then by distance.
+  std::vector<int> sampled_indices = DownsampleByAngle(points, kAngleThreshold);
+  for (int index : sampled_indices) {
+    auto *point = line_segment->add_point();
+    point->set_x(points[index].x());
+    point->set_y(points[index].y());
   }
 }
 
@@ -725,8 +745,8 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   }
 }
 
-void SimulationWorldService::DownsamplePath(
-    const apollo::common::Path &path, apollo::common::Path *downsampled_path) {
+void SimulationWorldService::DownsamplePath(const common::Path &path,
+                                            common::Path *downsampled_path) {
   auto sampled_indices = DownsampleByAngle(path.path_point(), kAngleThreshold);
 
   downsampled_path->set_name(path.name());
@@ -998,6 +1018,10 @@ void SimulationWorldService::UpdateSimulationWorld(const MapMsg &map_msg) {
       lane->clear_right_sample();
       lane->clear_left_road_sample();
       lane->clear_right_road_sample();
+
+      DownsampleCurve(lane->mutable_central_curve());
+      DownsampleCurve(lane->mutable_left_boundary()->mutable_curve());
+      DownsampleCurve(lane->mutable_right_boundary()->mutable_curve());
     }
   }
 }
