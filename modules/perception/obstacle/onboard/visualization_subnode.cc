@@ -331,11 +331,9 @@ apollo::common::Status VisualizationSubnode::ProcEvents() {
                << " device_id:" << device_id;
         return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
       }
-      //            GetFrameData(device_id, data_key, &content_, timestamp);
-      if (event_meta.event_id == vis_driven_event_id_) {
-        AERROR << "vis_driven_event_1: " << events[j].event_id << " "
-               << timestamp << " " << device_id << " " << motion_event_id_;
-      }
+      AINFO << "event: " << events[j].event_id << " timestamp: "
+            << timestamp << " device_id:" << device_id;
+
       GetFrameData(events[j], device_id, data_key, timestamp, &content_);
       if (event_meta.event_id == vis_driven_event_id_) {
         // Init of frame_visualizer must be in one thread with render,
