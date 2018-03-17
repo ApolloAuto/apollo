@@ -44,21 +44,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "mem_util",
-    srcs = ["mem_util.cc"],
-    hdrs = ["mem_util.h"],
-    deps = [
-        "//modules/common:log",
-        "@caffe//:lib",
-        "@cuda",
-        "@eigen",
-        "@opencv2//:core",
-        "@opencv2//:imgproc",
-        "@undistort",
-    ],
-)
-
 cc_test(
     name = "convex_hullxy_test",
     size = "small",

@@ -17,10 +17,13 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_DETECTOR_UTIL_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_DETECTOR_UTIL_H_
 
+#include <cmath>
+
 #include <string>
 #include <vector>
 
 #include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/obstacle/camera/common/visual_object.h"
 
 namespace apollo {
 namespace perception {
@@ -28,6 +31,13 @@ namespace yolo {
 
 bool load_types(const std::string &path, std::vector<ObjectType> *types);
 bool load_anchors(const std::string &path, std::vector<float> *anchors);
+
+void recover_bbox(int roi_w, int roi_h, int offset_y,
+                  std::vector<VisualObjectPtr> *objects);
+
+inline float sigmoid(float x) {
+  return 1.0f / (1.0f + std::exp(-x));
+}
 
 }  // namespace yolo
 }  // namespace perception

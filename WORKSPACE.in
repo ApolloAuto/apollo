@@ -191,11 +191,13 @@ http_archive(
 )
 
 # camera undistort for perception
-new_local_repository(
-    name = "undistort",
-    build_file = "third_party/undistort.BUILD",
-    path = "/usr/local/apollo/undistort",
-)
+#new_local_repository(
+#    name = "undistort",
+#    build_file = "third_party/undistort.BUILD",
+#    path = "/usr/local/apollo/undistort",
+#)
+
+# CUDA-related utilities for perception
 
 # perception cuda util
 new_local_repository(
