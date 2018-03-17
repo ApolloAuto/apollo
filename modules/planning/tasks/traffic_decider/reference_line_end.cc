@@ -41,15 +41,17 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
   double remain_s =
       reference_line.Length() - reference_line_info->AdcSlBoundary().end_s();
   const double& velocity = frame->vehicle_state().linear_velocity();
-  const double stop_acc = std::fabs(common::VehicleConfigHelper::GetConfig()
-                                        .vehicle_param()
-                                        .max_deceleration() /
-                                    3.0);
+  const double stop_acc =
+      std::fabs(common::VehicleConfigHelper::GetConfig()
+                    .vehicle_param()
+                    .max_deceleration()) *
+      config_.reference_line_end().stop_acc_to_max_deceleration_ratio();
   const double stop_s = velocity * velocity / (2.0 * stop_acc) +
                         FLAGS_virtual_stop_wall_length +
                         FLAGS_destination_stop_distance;
-  constexpr double kMinReferenceLineRemainLength = 10.0;
-  if (stop_s < remain_s && remain_s > kMinReferenceLineRemainLength) {
+  if (stop_s < remain_s &&
+      remain_s >
+          config_.reference_line_end().min_reference_line_remain_length()) {
     ADEBUG << "have enough reference line to drive on";
     return true;
   }
