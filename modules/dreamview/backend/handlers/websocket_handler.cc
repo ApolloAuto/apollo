@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 
+#include <cerrno>
 #include <utility>
 #include <vector>
 
@@ -137,7 +138,7 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
     if (ret == 0) {
       msg = "Connection Closed";
     } else if (ret < 0) {
-      msg = "Send Error";
+      msg = "Send Error: " + std::string(std::strerror(errno));
     } else {
       msg = StrCat("Expect to send ", data.size(), " bytes. But sent ", ret,
                    " bytes");
