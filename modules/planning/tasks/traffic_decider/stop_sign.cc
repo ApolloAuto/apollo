@@ -647,7 +647,7 @@ int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
                << "] not exist any more. erase.";
         obstacle_it = vehicles.erase(obstacle_it);
       } else {
-        obstacle_it++;
+        ++obstacle_it;
       }
     }
     it->second = vehicles;
