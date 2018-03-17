@@ -252,7 +252,8 @@ bool StBoundaryMapper::MapStopDecision(
     const ObjectDecisionType& stop_decision) const {
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
 
-  if (stop_obstacle->PerceptionSLBoundary().start_s() > planning_distance_) {
+  if (stop_obstacle->PerceptionSLBoundary().start_s() >
+      adc_sl_boundary_.end_s() + planning_distance_) {
     return true;
   }
 
