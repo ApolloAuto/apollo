@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/common/mem_util.h"
+#include "util.h"
 
 namespace apollo {
 namespace perception {
-
-void gpu_memcpy(const size_t N, const void *X, void *Y) {
-  AFATAL << "Not implemented, yet";
-}
 
 SyncedMemory::~SyncedMemory() {
   if (cpu_ptr_ && own_cpu_data_) {
@@ -31,9 +27,9 @@ SyncedMemory::~SyncedMemory() {
     int initial_device = -1;
     cudaGetDevice(&initial_device);
     if (gpu_device_ != -1) {
-      // CUDA_CHECK(cudaSetDevice(gpu_device_));
+      CUDA_CHECK(cudaSetDevice(gpu_device_));
     }
-    // CUDA_CHECK(cudaFree(gpu_ptr_));
+    CUDA_CHECK(cudaFree(gpu_ptr_));
     cudaSetDevice(initial_device);
   }
 }
@@ -63,16 +59,16 @@ inline void SyncedMemory::to_cpu() {
 inline void SyncedMemory::to_gpu() {
   switch (head_) {
     case UNINITIALIZED:
-      // CUDA_CHECK(cudaGetDevice(&gpu_device_));
-      // CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
+      CUDA_CHECK(cudaGetDevice(&gpu_device_));
+      CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
       perception_gpu_memset(size_, 0, gpu_ptr_);
       head_ = HEAD_AT_GPU;
       own_gpu_data_ = true;
       break;
     case HEAD_AT_CPU:
       if (gpu_ptr_ == NULL) {
-        // CUDA_CHECK(cudaGetDevice(&gpu_device_));
-        // CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
+        CUDA_CHECK(cudaGetDevice(&gpu_device_));
+        CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
         own_gpu_data_ = true;
       }
       gpu_memcpy(size_, cpu_ptr_, gpu_ptr_);
@@ -114,9 +110,9 @@ void SyncedMemory::set_gpu_data(void *data) {
     int initial_device = -1;
     cudaGetDevice(&initial_device);
     if (gpu_device_ != -1) {
-      // CUDA_CHECK(cudaSetDevice(gpu_device_));
+      CUDA_CHECK(cudaSetDevice(gpu_device_));
     }
-    // CUDA_CHECK(cudaFree(gpu_ptr_));
+    CUDA_CHECK(cudaFree(gpu_ptr_));
     cudaSetDevice(initial_device);
   }
   gpu_ptr_ = data;
@@ -139,27 +135,14 @@ void *SyncedMemory::mutable_gpu_data() {
 void SyncedMemory::async_gpu_push(const cudaStream_t &stream) {
   CHECK(head_ == HEAD_AT_CPU);
   if (gpu_ptr_ == NULL) {
-    // CUDA_CHECK(cudaGetDevice(&gpu_device_));
-    // CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
+    CUDA_CHECK(cudaGetDevice(&gpu_device_));
+    CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
     own_gpu_data_ = true;
   }
-  // const cudaMemcpyKind put = cudaMemcpyHostToDevice;
-  // CUDA_CHECK(cudaMemcpyAsync(gpu_ptr_, cpu_ptr_, size_, put, stream));
+  const cudaMemcpyKind put = cudaMemcpyHostToDevice;
+  CUDA_CHECK(cudaMemcpyAsync(gpu_ptr_, cpu_ptr_, size_, put, stream));
   // Assume caller will synchronize on the stream before use
   head_ = SYNCED;
-}
-
-void resize(cv::Mat frame, caffe::Blob<float> *dst,
-            std::shared_ptr<SyncedMemory> src_gpu, int start_axis) {
-  AFATAL << "Not implemented, yet";
-}
-
-// resize with mean and scale
-void resize(cv::Mat frame, caffe::Blob<float> *dst,
-            std::shared_ptr<SyncedMemory> src_gpu, int start_axis,
-            const float mean_b, const float mean_g, const float mean_r,
-            const float scale) {
-  AFATAL << "Not implemented, yet";
 }
 
 }  // namespace perception

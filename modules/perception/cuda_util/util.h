@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,36 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_COMMON_MEM_UTIL_H_
-#define MODULES_PERCEPTION_COMMON_MEM_UTIL_H_
 
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H
+#include <cuda_runtime.h>
+#include <caffe/caffe.hpp>
 #include <memory>
-
-#include "caffe/caffe.hpp"
-#include "include/undistortion.h"
-
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
+
+#define CUDA_CHECK(condition)                                         \
+  /* Code block avoids redefinition of cudaError_t error */           \
+  do {                                                                \
+    cudaError_t error = condition;                                    \
+    CHECK_EQ(error, cudaSuccess) << " " << cudaGetErrorString(error); \
+  } while (0)
+
 void gpu_memcpy(const size_t N, const void *X, void *Y);
 
 inline void perception_gpu_memset(const size_t N, const int alpha, void *X) {
-  // CUDA_CHECK(cudaMemset(X, alpha, N));
+  CUDA_CHECK(cudaMemset(X, alpha, N));
 }
 inline void perception_memset(const size_t N, const int alpha, void *X) {
   memset(X, alpha, N);
 }
 
 inline void PerceptionMallocHost(void **ptr, size_t size, bool *use_cuda) {
-  // CUDA_CHECK(cudaMallocHost(ptr, size));
+  CUDA_CHECK(cudaMallocHost(ptr, size));
   *use_cuda = true;
   return;
 }
 
 inline void PerceptionFreeHost(void *ptr, bool use_cuda) {
   if (use_cuda) {
-    // CUDA_CHECK(cudaFreeHost(ptr));
+    CUDA_CHECK(cudaFreeHost(ptr));
     return;
   }
   free(ptr);
@@ -52,8 +57,8 @@ inline void PerceptionFreeHost(void *ptr, bool use_cuda) {
 class SyncedMemory {
  public:
   SyncedMemory()
-      : cpu_ptr_(nullptr),
-        gpu_ptr_(nullptr),
+      : cpu_ptr_(NULL),
+        gpu_ptr_(NULL),
         size_(0),
         head_(UNINITIALIZED),
         own_cpu_data_(false),
@@ -61,8 +66,8 @@ class SyncedMemory {
         own_gpu_data_(false),
         gpu_device_(-1) {}
   explicit SyncedMemory(size_t size)
-      : cpu_ptr_(nullptr),
-        gpu_ptr_(nullptr),
+      : cpu_ptr_(NULL),
+        gpu_ptr_(NULL),
         size_(size),
         head_(UNINITIALIZED),
         own_cpu_data_(false),
@@ -105,7 +110,6 @@ class SyncedMemory {
   int gpu_device_;
   DISABLE_COPY_AND_ASSIGN(SyncedMemory);
 };  // class SyncedMemory
-
 int divup(int a, int b);
 
 void resize(cv::Mat frame, caffe::Blob<float> *dst,
@@ -119,4 +123,4 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_COMMON_MEM_UTIL_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H
