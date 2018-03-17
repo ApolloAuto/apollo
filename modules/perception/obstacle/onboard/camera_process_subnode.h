@@ -77,7 +77,7 @@ class CameraProcessSubnode : public Subnode {
   void VisualObjToSensorObj(const std::vector<VisualObjectPtr>& objects,
                             SharedDataPtr<SensorObjects>* sensor_objects);
 
-  void PublishDataAndEvent(const float& timestamp,
+  void PublishDataAndEvent(const double& timestamp,
                            const SharedDataPtr<SensorObjects>& sensor_objects,
                            const SharedDataPtr<CameraItem>& camera_item);
 
