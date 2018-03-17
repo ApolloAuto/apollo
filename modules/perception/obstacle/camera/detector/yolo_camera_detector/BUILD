@@ -35,7 +35,7 @@ cc_library(
         "//modules/perception/obstacle/camera/interface",
         "@caffe//:lib",
         "@eigen",
-        "@perception_util",
+        "@perception_cuda",
     ],
 )
 
@@ -53,7 +53,7 @@ cc_test(
     deps = [
         ":yolo_camera_detector",
         "//modules/common/util",
-        "@perception_util",
+        "@perception_cuda",
         "@gtest//:main",
     ],
 )
