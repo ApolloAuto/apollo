@@ -54,7 +54,8 @@ class TrajectoryEvaluator {
       const PlanningTarget& planning_target,
       const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
       const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories,
-      std::shared_ptr<PathTimeGraph> path_time_graph);
+      std::shared_ptr<PathTimeGraph> path_time_graph,
+      std::shared_ptr<std::vector<apollo::common::PathPoint>> reference_line);
 
   virtual ~TrajectoryEvaluator() = default;
 
@@ -94,6 +95,9 @@ class TrajectoryEvaluator {
                           const PlanningTarget& planning_target,
                           const std::vector<double>& ref_s_dot) const;
 
+  double CentripetalAccelerationCost(
+      const std::shared_ptr<Curve1d>& lon_trajectory) const;
+
   std::vector<double> ComputeLongitudinalGuideVelocity(
       const PlanningTarget& planning_target) const;
 
@@ -122,6 +126,8 @@ class TrajectoryEvaluator {
       cost_queue_with_components_;
 
   std::shared_ptr<PathTimeGraph> path_time_graph_;
+
+  std::shared_ptr<std::vector<apollo::common::PathPoint>> reference_line_;
 
   std::vector<std::vector<std::pair<double, double>>> path_time_intervals_;
 
