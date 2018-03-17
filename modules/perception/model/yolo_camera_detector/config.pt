@@ -1,12 +1,12 @@
 model_param {
   model_name: "yolo3d_1128"
-  proto_file: "tensorrt.pt"
+  proto_file: "deploy.pt"
   weight_file: "deploy.md"
   offset_ratio: 0.36423841
   confidence_threshold: 0.5
-  min_2d_height: 17 
+  min_2d_height: 17
   min_3d_height: 0.5
-  model_type: TensorRT
+  model_type: Caffe
   cropped_ratio: 0.635762
   resized_width: 960
   aligned_pixel: 32

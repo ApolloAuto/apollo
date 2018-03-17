@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace perception {
 
@@ -28,6 +30,10 @@ bool CNNCaffe::init(const std::vector<std::string> &input_names,
                     const std::string &proto_file,
                     const std::string &weight_file, int gpu_id,
                     const std::string &model_root) {
+  AINFO << "[Debug] proto_file: " << proto_file;
+  AINFO << "[Debug] weight_file: " << weight_file;
+  AINFO << "[Debug] model_root: " << model_root;
+
   if (gpu_id >= 0) {
     caffe::Caffe::SetDevice(gpu_id);
     caffe::Caffe::set_mode(caffe::Caffe::GPU);
@@ -51,92 +57,6 @@ boost::shared_ptr<caffe::Blob<float>> CNNCaffe::get_blob_by_name(
   return net_->blob_by_name(name);
 }
 // CNNCaffe END
-
-/*
-// CNNTensorRT
-bool CNNTensorRT::init(const std::vector<std::string> &input_names,
-                       const std::vector<std::string> &output_names,
-                       const std::string &proto_file,
-                       const std::string &weight_file, int gpu_id,
-                       const std::string &model_root) {
-  // input_names_ = input_names;
-  // output_names_ = output_names;
-  // init GPU
-  gpu_id_ = gpu_id;
-
-  if (gpu_id >= 0) {
-    CUDA_CHECK(cudaSetDevice(gpu_id));
-  } else {
-    AINFO << "must use gpu mode";
-    return false;
-  }
-  anakin::BatchStream calibrationStream;
-  nvinfer1::Int8EntropyCalibrator calibrator(calibrationStream, 0, true,
-                                             model_root);
-  if (int8_flag_) {
-    AINFO << model_root;
-    inference_.initNet(proto_file.c_str(), weight_file.c_str(), &calibrator);
-  } else {
-    inference_.initNet(proto_file.c_str(), weight_file.c_str(), nullptr);
-  }
-  const std::vector<anakin::Tensor<float> *> &input_tensors =
-      inference_.getInputTensors();
-  const std::vector<anakin::Tensor<float> *> &output_tensors =
-      inference_.getOutputTensors();
-  //  CHECK(input_tensors.size() == input_names.size()) << "number of input
-  //  tensor and name should be equal!"; CHECK(output_tensors.size() ==
-  //  output_names.size()) << "number of output tensor and name should be
-  //  equal!";
-
-  inference_.execute();
-  std::vector<void *> buffers = inference_.getBuffers();
-  int cnt = 0;
-  for (int i = 0; i < input_tensors.size(); i++, cnt++) {
-    boost::shared_ptr<caffe::Blob<float>> blob;
-    blob.reset(new caffe::Blob<float>);
-    blob->Reshape(input_tensors[i]->dims());
-
-    blobs_.insert(std::make_pair(input_names[i], blob));
-    name_buffers_.insert(std::make_pair(input_names[i], buffers[cnt]));
-    input_names_.push_back(input_names[i]);
-  }
-  for (int i = 0; i < output_tensors.size(); i++, cnt++) {
-    boost::shared_ptr<caffe::Blob<float>> blob;
-    blob.reset(new caffe::Blob<float>);
-    blob->Reshape(output_tensors[i]->dims());
-
-    name_buffers_.insert(std::make_pair(output_names[i], buffers[cnt]));
-    blobs_.insert(std::make_pair(output_names[i], blob));
-    output_names_.push_back(output_names[i]);
-  }
-
-  for (auto tmp : input_names) {
-    AINFO << tmp;
-  }
-  for (auto tmp : output_names) {
-    AINFO << tmp;
-  }
-  return true;
-}
-
-void CNNTensorRT::forward() {
-  CUDA_CHECK(cudaSetDevice(gpu_id_));
-  sync_blob(input_names_, false);
-  inference_.execute();
-  cudaDeviceSynchronize();
-  sync_blob(output_names_, true);
-}
-
-boost::shared_ptr<caffe::Blob<float>> CNNTensorRT::get_blob_by_name(
-    const std::string &name) {
-  auto iter = blobs_.find(name);
-  if (iter == blobs_.end()) {
-    return nullptr;
-  }
-  return iter->second;
-}
-// CNNTensorRT END
-*/
 
 }  // namespace perception
 }  // namespace apollo
