@@ -21,7 +21,7 @@ cc_library(
         "//modules/perception/obstacle/camera/common",
         "@cuda",
         "@opencv2//:imgproc",
-        "@perception_util",
+        "@perception_cuda",
         "@yaml_cpp//:yaml",
     ],
 )
