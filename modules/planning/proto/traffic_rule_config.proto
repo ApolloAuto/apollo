@@ -24,6 +24,11 @@ message StopSignConfig {
     optional double boundary_min_t = 1 [ default=6.0 ];
 }
 
+message ReferenceLineEndConfig {
+    optional double stop_acc_to_max_deceleration_ratio = 1 [ default=3.0 ];
+    optional double min_reference_line_remain_length = 2 [ default=10.0 ];
+}
+
 // TODO(all) migrate all other traffic rules to pb config
 message TrafficRuleConfig {
   enum RuleId {
@@ -46,6 +51,7 @@ message TrafficRuleConfig {
     BacksideVehicleConfig backside_vehicle = 3;
     ChangeLaneConfig change_lane = 4;
     StopSignConfig stop_sign = 5;
+    ReferenceLineEndConfig reference_line_end = 6;
   }
 }
 
