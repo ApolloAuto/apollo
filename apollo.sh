@@ -108,7 +108,16 @@ function generate_build_targets() {
 function build_perception_cuda() {
     cur_dir=$(pwd)
     src_dir="modules/perception/cuda_util"
+    sudo mkdir "/home/tmp/perception_cuda"
+    tar_include_dir="/home/tmp/perception_cuda/include/"
+    tar_lib_dir="/home/tmp/perception_cuda/lib/"
     cd $src_dir && mkdir -p build && cd build && cmake .. && make
+    sudo mkdir $tar_lib_dir
+    sudo cp "libcuda_util.so" $tar_lib_dir
+    sudo mkdir $tar_include_dir
+    cd $cur_dir
+    cd $src_dir
+    sudo cp "network.h" "region_output.h" "undistortion.h" "util.h" $tar_include_dir
     cd $cur_dir
 }
 
