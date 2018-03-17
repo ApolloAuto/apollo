@@ -63,6 +63,8 @@ typedef pcl_util::PointDCloud PolygonDType;
 
 using SeqId = uint32_t;
 
+std::string GetObjectName(const ObjectType& obj_type);
+
 std::string GetSensorType(SensorType sensor_type);
 
 bool is_lidar(SensorType sensor_type);

@@ -39,6 +39,16 @@ struct alignas(16) VisualObject {
   // lower-right corner: x2, y2
   Eigen::Vector2f lower_right;
 
+  // front box upper-left corner: x1, y1
+  Eigen::Vector2d front_upper_left;
+  // front box  lower-right corner: x2, y2
+  Eigen::Vector2d front_lower_right;
+
+  // front box upper-left corner: x1, y1
+  Eigen::Vector2d back_upper_left;
+  // front box  lower-right corner: x2, y2
+  Eigen::Vector2d back_lower_right;
+
   // 2D bounding box truncation ratio, for out-of-image objects
   float trunc_width = 0.0f;
   float trunc_height = 0.0f;

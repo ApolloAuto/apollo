@@ -14,7 +14,7 @@ cc_library(
     deps = [
         "//modules/perception/obstacle/base",
         "@eigen",
-        "@undistort",
+        "@perception_util",
     ],
 )
 
@@ -31,7 +31,7 @@ cc_library(
         "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/base",
         "@eigen",
-        "@undistort",
+        "@perception_util",
     ],
 )
 
@@ -50,8 +50,8 @@ cc_library(
     srcs = ["cnn_adapter.cc"],
     hdrs = ["cnn_adapter.h"],
     deps = [
-        "//modules/perception/common:mem_util",
         "//modules/perception/obstacle/camera/common:util",
+        "@perception_util",
     ],
 )
 
