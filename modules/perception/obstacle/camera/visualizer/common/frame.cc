@@ -215,7 +215,7 @@ void Frame::translate(double *x, double *y, double *z) {
 
 void Frame::rotate(const Eigen::Quaterniond &q) {
   Eigen::Quaterniond qbis = q;
-  rotate(qbis);
+  rotate_q(qbis);
 }
 
 void Frame::rotate_q(const Eigen::Quaterniond &q) {
