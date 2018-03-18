@@ -209,7 +209,7 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
       cnnadapter_.reset(new CNNCaffe);
       break;
     default:
-      AFATAL << "unknown model type.";
+      AERROR << "unknown model type.";
       return false;
   }
 
@@ -472,7 +472,7 @@ bool YoloCameraDetector::get_objects_cpu(
     int label = it->first;
     if (conf_scores.find(label) == conf_scores.end()) {
       // Something bad happened if there are no predictions for current label.
-      AFATAL << "Could not find confidence predictions for " << label;
+      AERROR << "Could not find confidence predictions for " << label;
       continue;
     }
 
