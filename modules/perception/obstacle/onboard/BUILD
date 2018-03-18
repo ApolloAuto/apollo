@@ -119,6 +119,7 @@ cc_library(
         "//modules/perception/obstacle/camera/transformer",
         "//modules/perception/obstacle/camera/dummy",
         "//modules/perception/onboard",
+        "//modules/perception/traffic_light/util",
         "@eigen",
         "@opencv2//:core",
         "@ros//:ros_common",
