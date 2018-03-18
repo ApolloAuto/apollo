@@ -16,6 +16,8 @@
 
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 
+#include "modules/perception/traffic_light/util/color_space.h"
+
 namespace apollo {
 namespace perception {
 
@@ -119,8 +121,16 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
 bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
                                         cv::Mat *img) {
-  cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
-  cv::Mat cv_img = cv_ptr->image;
+  cv::Mat cv_img;
+  if (msg.encoding.compare("yuyv") == 0) {
+    unsigned char *yuv = (unsigned char *)&(msg.data[0]);
+    cv_img = cv::Mat(msg.height, msg.width, CV_8UC3);
+    traffic_light::Yuyv2rgb(yuv, cv_img.data, msg.height * msg.width);
+    cv::cvtColor(cv_img, cv_img, CV_RGB2BGR);
+  } else {
+    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
+    cv_img = cv_ptr->image;
+  }
 
   img->create(cv_img.rows, cv_img.cols, CV_8UC3);
   undistortion_handler_->handle(cv_img.data, img->data);
