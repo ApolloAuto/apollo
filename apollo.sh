@@ -167,6 +167,10 @@ function build() {
 function cibuild() {
   START_TIME=$(get_now)
 
+  if [ "$MACHINE_ARCH" == "x86_64" ]; then
+      build_perception_cuda
+  fi
+
   echo "Start building, please wait ..."
   generate_build_targets
   echo "Building on $MACHINE_ARCH..."
