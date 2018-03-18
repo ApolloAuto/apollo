@@ -134,7 +134,7 @@ inline int Group::ComputeOrientation(const std::vector<Marker>& markers,
       break;
     }
 
-    default: { AFATAL << "unknown marker shape type."; }
+    default: { AERROR << "unknown marker shape type."; }
   }
   start_angle = std::atan2(start_orie(1), start_orie(0));
   RectAngle(&start_angle);
@@ -178,7 +178,7 @@ inline int Group::ComputeOrientation(const std::vector<Marker>& markers,
       break;
     }
 
-    default: { AFATAL << "unknown marker shape type."; }
+    default: { AERROR << "unknown marker shape type."; }
   }
   end_angle = std::atan2(end_orie(1), end_orie(0));
   RectAngle(&end_angle);
