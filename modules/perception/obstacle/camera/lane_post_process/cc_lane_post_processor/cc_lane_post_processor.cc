@@ -61,7 +61,7 @@ bool CCLanePostProcessor::Init() {
     AINFO << "using image space to generate lane instances ...";
     options_.space_type = SpaceType::IMAGE;
   } else {
-    AFATAL << "invalid space type" << space_type;
+    AERROR << "invalid space type" << space_type;
     return false;
   }
   options_.frame.space_type = options_.space_type;
@@ -256,7 +256,7 @@ bool CCLanePostProcessor::Init() {
       return false;
     }
   } else {
-    AFATAL << "invalid marker association method.";
+    AERROR << "invalid marker association method.";
     return false;
   }
 
@@ -310,7 +310,7 @@ bool CCLanePostProcessor::Init() {
   } else if (options_.space_type == SpaceType::IMAGE) {
     is_x_longitude_ = false;
   } else {
-    AFATAL << "invalid space type" << space_type;
+    AERROR << "invalid space type" << space_type;
     return false;
   }
 
