@@ -1,20 +1,25 @@
 config: {
     rule_id: BACKSIDE_VEHICLE
+    enabled: true
     backside_vehicle {
         backside_lane_width: 4.0
     }
 }
 config: {
     rule_id: SIGNAL_LIGHT
+    enabled: true
 }
 config: {
     rule_id: REFERENCE_LINE_END
+    enabled: true
 }
 config: {
     rule_id: DESTINATION
+    enabled: true
 }
 config: {
     rule_id: CHANGE_LANE
+    enabled: true
     change_lane {
         min_overtake_distance: 10.0
         min_overtake_time: 2.0
@@ -25,16 +30,21 @@ config: {
 }
 config: {
     rule_id: CROSSWALK
+    enabled: true
 }
 config: {
     rule_id: STOP_SIGN
+    enabled: true
 }
 config: {
     rule_id: SIDE_PASS_VEHICLE
+    enabled: true
 }
 config: {
     rule_id: KEEP_CLEAR
+    enabled: false
 }
 config: {
     rule_id: CIPV
+    enabled: true
 }
