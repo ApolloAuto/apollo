@@ -19,13 +19,13 @@
 #include <string>
 #include <vector>
 
+#include "modules/perception/common/sequence_type_fuser/base_type_fuser.h"
 #include "modules/perception/obstacle/lidar/interface/base_ground_detector.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_builder.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
-#include "modules/perception/obstacle/lidar/interface/base_type_fuser.h"
 
 namespace apollo {
 namespace perception {
