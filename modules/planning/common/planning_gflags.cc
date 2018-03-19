@@ -266,7 +266,6 @@ DEFINE_double(crosswalk_min_pass_distance, 1.0,
 DEFINE_double(crosswalk_stop_distance, 1.0,
               "stop distance from stop line of crosswalk");
 /// stop_sign
-DEFINE_bool(enable_stop_sign, true, "enable stop_sign");
 DEFINE_bool(enable_stop_sign_creeping, false,
             "enable stop_sign creeping forward at one way "
             "or two way stop signs.");
@@ -284,8 +283,6 @@ DEFINE_double(stop_sign_watch_vehicle_max_stop_distance, 5.0,
               "max stop distance for watch vehicles to be considered as "
               " a valid stop.(this check is looser than adc)");
 
-DEFINE_bool(enable_sidepass, true,
-            "True to enable side pass long stopping obstacles");
 DEFINE_double(sidepass_wait_time_sec, 30.0,
               "Waiting time in seconds before deciding to sidepass");
 
@@ -319,6 +316,8 @@ DEFINE_int32(trajectory_point_num_for_debug, 10,
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
 DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
+DEFINE_bool(enable_traffic_light_detection, true,
+            "True to enable traffic light detection input.");
 
 DEFINE_bool(enable_lag_prediction, true,
             "Enable lagged prediction, which is more tolerant to obstacles "

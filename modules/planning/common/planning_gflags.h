@@ -128,6 +128,7 @@ DECLARE_double(perception_confidence_threshold);
 
 DECLARE_bool(enable_record_debug);
 DECLARE_bool(enable_prediction);
+DECLARE_bool(enable_traffic_light_detection);
 
 DECLARE_double(turn_signal_distance);
 DECLARE_bool(right_turn_creep_forward);
@@ -159,14 +160,12 @@ DECLARE_double(crosswalk_loose_l_distance);
 DECLARE_double(crosswalk_min_pass_distance);
 DECLARE_double(crosswalk_stop_distance);
 /// stop_sign
-DECLARE_bool(enable_stop_sign);
 DECLARE_bool(enable_stop_sign_creeping);
 DECLARE_double(stop_sign_stop_duration);
 DECLARE_double(stop_sign_min_pass_distance);
 DECLARE_double(stop_sign_stop_distance);
 DECLARE_double(stop_sign_watch_vehicle_max_stop_speed);
 DECLARE_double(stop_sign_watch_vehicle_max_stop_distance);
-DECLARE_bool(enable_sidepass);
 DECLARE_double(sidepass_wait_time_sec);
 
 /// destination

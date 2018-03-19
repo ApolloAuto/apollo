@@ -62,10 +62,6 @@ bool StopSign::ApplyRule(Frame* frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (!FLAGS_enable_stop_sign) {
-    return true;
-  }
-
   if (!FindNextStopSign(reference_line_info)) {
     return true;
   }
