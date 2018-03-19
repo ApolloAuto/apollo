@@ -259,18 +259,6 @@ DEFINE_double(traffic_light_stop_distance, 1.0,
 /// crosswalk
 DEFINE_string(crosswalk_virtual_obstacle_id_prefix, "CW_",
               "prefix for converting crosswalk id to virtual obstacle id");
-DEFINE_double(crosswalk_expand_distance, 2.0,
-              "crosswalk expand distance(meter) "
-              "for pedestrian/bicycle detection");
-DEFINE_double(crosswalk_strick_l_distance, 4.0,
-              "strick stop rule within this l_distance");
-DEFINE_double(crosswalk_loose_l_distance, 5.0,
-              "loose stop rule beyond this l_distance");
-DEFINE_double(crosswalk_min_pass_distance, 1.0,
-              "valid min distance(m) for vehicles to be considered as "
-              "have passed crosswalk (stop_line_end_s)");
-DEFINE_double(crosswalk_stop_distance, 1.0,
-              "stop distance from stop line of crosswalk");
 /// stop_sign
 DEFINE_bool(enable_stop_sign_creeping, false,
             "enable stop_sign creeping forward at one way "
