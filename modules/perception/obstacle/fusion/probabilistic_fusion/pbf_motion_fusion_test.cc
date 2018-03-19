@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_imf_fusion.h"
 
 #include <algorithm>
 #include <functional>
@@ -32,7 +34,9 @@ class PbfMotionFusionTest : public testing::Test {
   ~PbfMotionFusionTest() {}
   void SetUp() override {
     PbfBaseMotionFusion *kalman_motion_fusion = new PbfKalmanMotionFusion();
+    PbfIMFFusion *imf_motion_fusion = new PbfIMFFusion();
     motion_fusion_algs_.push_back(kalman_motion_fusion);
+    motion_fusion_algs_.push_back(imf_motion_fusion);
   }
   void TearDown() override {
     for (auto &seg_alg : motion_fusion_algs_) {
@@ -44,6 +48,7 @@ class PbfMotionFusionTest : public testing::Test {
  protected:
   std::vector<PbfBaseMotionFusion *> motion_fusion_algs_;
 };
+
 TEST_F(PbfMotionFusionTest, test_initialize_with_lidar_object) {
   ObjectPtr lidar_object(new Object());
   double lidar_timestamp = 1234567891.012;
@@ -52,6 +57,7 @@ TEST_F(PbfMotionFusionTest, test_initialize_with_lidar_object) {
   lidar_object->center = lidar_position;
   lidar_object->anchor_point = lidar_position;
   lidar_object->velocity = lidar_velocity;
+  lidar_object->uncertainty.setIdentity();
   PbfSensorObjectPtr pbf_lidar_object(new PbfSensorObject(
       lidar_object, SensorType::VELODYNE_64, lidar_timestamp));
   for (auto motion_fusion_alg : motion_fusion_algs_) {
