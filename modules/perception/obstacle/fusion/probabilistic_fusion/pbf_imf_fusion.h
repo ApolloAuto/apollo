@@ -74,12 +74,6 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   virtual void GetState(Eigen::Vector3d* anchor_point,
                         Eigen::Vector3d* velocity);
 
-  std::string Name() { return name_; }
-
-  // @brief check if filter has been initialized
-  // @return initialization status
-  bool Initialized() const { return initialized_; }
-
  protected:
   // @brief cache sensor objects in history
   // @param[IN] new object: new object for current update
@@ -118,9 +112,6 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   Eigen::Matrix<double, 4, 4> _q_matrix;
   // the covariance of the observation noise
   Eigen::Matrix<double, 4, 4> _r_matrix_inverse;
-
-  std::string _name;
-  bool _initialized;
 };
 
 }  // namespace perception
