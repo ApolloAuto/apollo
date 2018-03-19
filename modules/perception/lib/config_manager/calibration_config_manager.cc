@@ -16,11 +16,13 @@
 
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 
-#include <gflags/gflags.h>
-#include <math.h>
+#include <cmath>
+
 #include "Eigen/Eigen"
-#include "modules/common/log.h"
+#include "gflags/gflags.h"
 #include "yaml-cpp/yaml.h"
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {

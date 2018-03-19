@@ -29,8 +29,8 @@ using apollo::common::time::TimeUtil;
 
 bool TLPreprocessor::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
-  const ModelConfig *model_config = NULL;
-  if (!config_manager->GetModelConfig(name(), &model_config)) {
+  const ModelConfig *model_config = config_manager->GetModelConfig(name());
+  if (model_config == nullptr) {
     AERROR << "not found model: " << name();
     return false;
   }
