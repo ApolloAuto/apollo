@@ -175,7 +175,7 @@ function main(){
     YOLO3D_VOLUME=apollo_yolo3d_volume
     docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
 
-    YOLO3D_VOLUME_IMAGE=apolloauto/apollo:yolo3d_volume-${ARCH}-latest
+    YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
     docker pull ${YOLO3D_VOLUME_IMAGE}
     docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
 
