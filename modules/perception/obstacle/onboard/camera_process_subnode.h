@@ -36,6 +36,7 @@
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/converter/geometry_camera_converter.h"
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 #include "modules/perception/obstacle/camera/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/camera/filter/object_camera_filter.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_converter.h"

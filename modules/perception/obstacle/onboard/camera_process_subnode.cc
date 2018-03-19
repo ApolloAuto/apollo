@@ -56,17 +56,14 @@ bool CameraProcessSubnode::InitCalibration() {
 }
 
 bool CameraProcessSubnode::InitModules() {
-  // RegisterFactoryYoloCameraDetector();
-  RegisterFactoryDummyCameraDetector();
+  RegisterFactoryYoloCameraDetector();
   RegisterFactoryGeometryCameraConverter();
   RegisterFactoryCascadedCameraTracker();
   RegisterFactoryFlatCameraTransformer();
   RegisterFactoryObjectCameraFilter();
 
-  // detector_.reset(
-  //     BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector"));
   detector_.reset(
-      BaseCameraDetectorRegisterer::GetInstanceByName("DummyCameraDetector"));
+      BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector"));
   detector_->Init();
 
   converter_.reset(BaseCameraConverterRegisterer::GetInstanceByName(
