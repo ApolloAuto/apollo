@@ -620,7 +620,7 @@ body {
         width: 90px;
         height: 80px;
         border: none;
-        padding: 20px;
+        padding: 10px;
 
         font-size: 14px;
         text-align: center;
@@ -1167,29 +1167,68 @@ body {
 }
 
 .data-recorder {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: stretch;
+    table {
+        width: 100%;
+        height: 100%;
 
-    flex: 1 auto;
+        td:first-child {
+            width: 100px;
+            border: none;
 
-    z-index: 10;
-    margin-right: 3px;
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    .drive-event-card {
-        table {
-            width: 100%;
-            text-align: center;
+            box-sizing: border-box;
+            white-space: nowrap;
         }
-        .drive-event-msg {
-            width: 100%;
+        td:nth-child(2) {
+            border: 10px solid #1D2226;
         }
-        .toolbar {
-            button {
-                width: 200px;
+
+        .drive-event-time-row {
+            span {
+                position: relative;
+                padding: 10px 145px 10px 10px;
+
+                background: #101315;
+                white-space: nowrap;
+
+                .timestamp-button {
+                    position: absolute;
+                    top: 0px;
+                    right: 0px;
+                    padding: 5px 20px;
+                    border: 5px solid #101315;
+
+                    outline: none;
+                    background: #006AFF;
+                    color: #FFFFFF;
+                }
             }
+        }
+        .drive-event-msg-row {
+            width: 70%;
+            height: 70%;
+
+            textarea {
+                height: 100%;
+                width: 100%;
+                max-width: 600px;
+                color: #FFFFFF;
+
+                border: 1px solid #383838;
+                background: #101315;
+
+                resize: none;
+            }
+        }
+        .submit-button {
+            padding: 10px 35px;
+            border: none;
+
+            outline: none;
+            background: #000000;
+            color: #FFFFFF;
+        }
+        .submit-button:active {
+            background: #383838;
         }
     }
 }

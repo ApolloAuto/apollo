@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_REGION_OUTPUT_H
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_REGION_OUTPUT_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_REGION_OUTPUT_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_REGION_OUTPUT_H_
 
 #include <map>
 #include <memory>
@@ -132,4 +132,4 @@ void cross_class_merge(std::vector<int> *indices_ref,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_REGION_OUTPUT_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_REGION_OUTPUT_H_

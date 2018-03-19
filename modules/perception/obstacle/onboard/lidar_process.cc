@@ -26,13 +26,13 @@
 #include "modules/common/log.h"
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/common/sequence_type_fuser/sequence_type_fuser.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
-#include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/sequence_type_fuser.h"
 
 namespace apollo {
 namespace perception {

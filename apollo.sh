@@ -105,22 +105,6 @@ function generate_build_targets() {
   fi
 }
 
-function build_perception_cuda() {
-    cur_dir=$(pwd)
-    src_dir="modules/perception/cuda_util"
-    sudo mkdir "/home/tmp/perception_cuda"
-    tar_include_dir="/home/tmp/perception_cuda/include/"
-    tar_lib_dir="/home/tmp/perception_cuda/lib/"
-    cd $src_dir && mkdir -p build && cd build && cmake .. && make
-    sudo mkdir $tar_lib_dir
-    sudo cp "libcuda_util.so" $tar_lib_dir
-    sudo mkdir $tar_include_dir
-    cd $cur_dir
-    cd $src_dir
-    sudo cp "network.h" "region_output.h" "undistortion.h" "util.h" $tar_include_dir
-    cd $cur_dir
-}
-
 #=================================================
 #              Build functions
 #=================================================
@@ -129,9 +113,6 @@ function build() {
   START_TIME=$(get_now)
 
   info "Start building, please wait ..."
-  if [ "$MACHINE_ARCH" == "x86_64" ]; then
-      build_perception_cuda
-  fi
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
 
@@ -166,10 +147,6 @@ function build() {
 
 function cibuild() {
   START_TIME=$(get_now)
-
-  if [ "$MACHINE_ARCH" == "x86_64" ]; then
-      build_perception_cuda
-  fi
 
   echo "Start building, please wait ..."
   generate_build_targets
@@ -360,7 +337,7 @@ function run_test() {
     echo -e "${RED}Need GPU to run the tests.${NO_COLOR}"
     echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   else
-    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | grep -v "yolo_camera_detector_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   fi
   if [ $? -ne 0 ]; then
     fail 'Test failed!'

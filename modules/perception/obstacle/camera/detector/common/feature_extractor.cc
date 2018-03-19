@@ -22,10 +22,13 @@
 #include <fstream>
 
 #include "modules/common/log.h"
+#include "modules/common/math/math_utils.h"
 #include "modules/perception/obstacle/camera/common/util.h"
 
 namespace apollo {
 namespace perception {
+
+using apollo::common::math::L2Norm;
 
 bool ReorgFeatureExtractor::init(
     const ExtractorParam &param,
@@ -96,7 +99,7 @@ bool ReorgFeatureExtractor::extract(std::vector<VisualObjectPtr> *objects) {
       obj->object_feature.push_back(feat_data[c * spatial_dim]);
     }
     // feature normalization
-    l2norm(obj->object_feature.data(), obj->object_feature.size());
+    L2Norm(obj->object_feature.size(), obj->object_feature.data());
   }
 
   return true;
@@ -162,7 +165,7 @@ bool ROIPoolingFeatureExtractor::extract(
     obj->object_feature.resize(feat_dim);
     memcpy(obj->object_feature.data(), feat_data,
            feat_dim * sizeof(feat_data[0]));
-    l2norm(obj->object_feature.data(), feat_dim);
+    L2Norm(feat_dim, obj->object_feature.data());
     feat_data += feat_dim;
   }
   return true;
