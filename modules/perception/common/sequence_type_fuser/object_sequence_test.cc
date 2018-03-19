@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/obstacle/common/object_sequence.h"
+#include "modules/perception/common/sequence_type_fuser/object_sequence.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {

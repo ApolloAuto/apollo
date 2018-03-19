@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_H_
-#define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_H_
+#ifndef MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_SEQUENCE_TYPE_FUSER_H_
+#define MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_SEQUENCE_TYPE_FUSER_H_
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include "modules/perception/obstacle/common/object_sequence.h"
-#include "modules/perception/obstacle/lidar/interface/base_type_fuser.h"
-#include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/util.h"
+#include "modules/perception/common/sequence_type_fuser/base_type_fuser.h"
+#include "modules/perception/common/sequence_type_fuser/fuser_util.h"
+#include "modules/perception/common/sequence_type_fuser/object_sequence.h"
 
 namespace apollo {
 namespace perception {
@@ -65,7 +65,7 @@ class SequenceTypeFuser : public BaseTypeFuser {
  protected:
   /**
    * @brief Fuse type over object sequence by a linear-chain CRF.
-   * The fusion problem is modeled as inferring the discrete state 
+   * The fusion problem is modeled as inferring the discrete state
    * in a chain CRF. Note, log(P({X}|O)) = sigma_i{E_unary(X_i,O)} +
    * sigma_ij{E_pairwise(X_i,X_j)} - logZ,
    * E_unary(X_i,O) = sigma{logP(classifier)},
@@ -121,4 +121,4 @@ REGISTER_TYPEFUSER(SequenceTypeFuser);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_H_
+#endif  // MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_SEQUENCE_TYPE_FUSER_H_
