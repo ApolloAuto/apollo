@@ -6,12 +6,10 @@ cc_library(
     name = "common",
     srcs = [
         "hungarian_bigraph_matcher.cc",
-        "object_sequence.cc",
         "pose_util.cc",
     ],
     hdrs = [
         "hungarian_bigraph_matcher.h",
-        "object_sequence.h",
         "pose_util.h",
     ],
     deps = [
@@ -31,7 +29,6 @@ cc_test(
     size = "small",
     srcs = [
         "hungarian_bigraph_matcher_test.cc",
-        "object_sequence_test.cc",
         "pose_util_test.cc",
     ],
     data = [

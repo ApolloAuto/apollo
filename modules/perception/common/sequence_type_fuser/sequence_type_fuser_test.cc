@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/sequence_type_fuser.h"
+#include "modules/perception/common/sequence_type_fuser/sequence_type_fuser.h"
 
 #include "gtest/gtest.h"
 

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_UTIL_H_
-#define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_UTIL_H_
+#ifndef MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_FUSER_UTIL_H_
+#define MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_FUSER_UTIL_H_
 
 #include <fstream>
 #include <iostream>
@@ -37,7 +37,7 @@ typedef Eigen::Matrix<double, VALID_OBJECT_TYPE, 1> Vectord;
 typedef Eigen::Matrix<int, VALID_OBJECT_TYPE, 1> Vectori;
 typedef Eigen::Matrix<double, VALID_OBJECT_TYPE, VALID_OBJECT_TYPE> Matrixd;
 
-namespace sequence_type_fuser {
+namespace fuser_util {
 
 /**
  * @brief Convert probability format from std to eigen vector
@@ -109,8 +109,8 @@ bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix);
 bool LoadMultipleMatricesFile(const std::string& filename,
                               std::map<std::string, Matrixd>* matrices);
 
-}  // namespace sequence_type_fuser
+}  // namespace fuser_util
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_SEQUENCE_TYPE_FUSER_UTIL_H_
+#endif  // MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_FUSER_UTIL_H_
