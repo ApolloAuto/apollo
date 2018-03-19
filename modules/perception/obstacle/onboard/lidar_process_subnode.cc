@@ -24,15 +24,15 @@
 
 #include "modules/common/log.h"
 #include "modules/common/time/time_util.h"
-#include "modules/perception/common/perception_gflags.h"
 #include "modules/common/time/timer.h"
+#include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/common/sequence_type_fuser/sequence_type_fuser.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
-#include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/sequence_type_fuser.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/onboard/transform_input.h"
 
@@ -48,8 +48,6 @@ using pcl_util::PointCloudPtr;
 using pcl_util::PointD;
 using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
-using std::map;
-using std::string;
 
 bool LidarProcessSubnode::InitInternal() {
   if (inited_) {
@@ -68,7 +66,7 @@ bool LidarProcessSubnode::InitInternal() {
     return false;
   }
   // parse reserve fileds
-  map<string, string> reserve_field_map;
+  std::map<std::string, std::string> reserve_field_map;
   if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
     AERROR << "Failed to parse reserve filed: " << reserve_;
     return false;
@@ -250,7 +248,7 @@ bool LidarProcessSubnode::InitFrameDependence() {
   /// init share data
   CHECK(shared_data_manager_ != nullptr);
   // init preprocess_data
-  const string lidar_processing_data_name("LidarObjectData");
+  const std::string lidar_processing_data_name("LidarObjectData");
   processing_data_ = dynamic_cast<LidarObjectData*>(
       shared_data_manager_->GetSharedData(lidar_processing_data_name));
   if (processing_data_ == nullptr) {
