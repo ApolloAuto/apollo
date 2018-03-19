@@ -404,6 +404,14 @@
                 "stationError": {
                   "type": "double",
                   "id": 2
+                },
+                "lateralError": {
+                  "type": "double",
+                  "id": 3
+                },
+                "headingError": {
+                  "type": "double",
+                  "id": 4
                 }
               }
             },

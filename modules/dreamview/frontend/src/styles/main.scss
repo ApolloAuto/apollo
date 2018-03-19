@@ -634,12 +634,13 @@ body {
             height: 60px;
         }
     }
-
+    .sub-button:not(:last-child) {
+        border-bottom: 1px solid #1D2226;
+    }
     .sub-button:disabled {
         cursor: not-allowed;
         opacity: 0.3;
     }
-
     .sub-button-active {
         background: #30A5FF;
         color: #FFFFFF;
