@@ -18,6 +18,7 @@ cc_library(
     copts = [
         "-Wno-deprecated",
     ],
+    linkopts = ["-lGLU -lGL -lglut"],
     deps = [
         "//modules/common:log",
         "//modules/drivers/proto:sensor_proto",
@@ -31,7 +32,8 @@ cc_library(
         "@eigen",
         "@glew",
         "@glfw",
-        "@opengl"
+        "@pcl",
+        "@vtk"
     ],
 )
 
