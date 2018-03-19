@@ -67,6 +67,8 @@ void Crosswalk::MakeDecisions(Frame* const frame,
 
   std::vector<const hdmap::PathOverlap*> crosswalks_to_stop;
 
+  const auto& crosswalk_conf = config_.crosswalk();
+
   for (auto crosswalk_overlap : crosswalk_overlaps_) {
     auto crosswalk_ptr = HDMapUtil::BaseMap().GetCrosswalkById(
         hdmap::MakeMapId(crosswalk_overlap->object_id));
@@ -75,8 +77,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
 
     // skip crosswalk if master vehicle body already passes the stop line
     double stop_line_end_s = crosswalk_overlap->end_s;
-    if (adc_front_edge_s - stop_line_end_s >
-        FLAGS_crosswalk_min_pass_distance) {
+    if (adc_front_edge_s - stop_line_end_s > crosswalk_conf.pass_distance()) {
       ADEBUG << "skip: crosswalk_id[" << crosswalk_id << "] stop_line_end_s["
              << stop_line_end_s << "] adc_front_edge_s[" << adc_front_edge_s
              << "]. adc_front_edge passes stop_line_end_s + buffer.";
@@ -108,7 +109,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
       const Polygon2d crosswalk_poly = crosswalk_info->polygon();
       bool in_crosswalk = crosswalk_poly.IsPointIn(point);
       const Polygon2d crosswalk_exp_poly =
-          crosswalk_poly.ExpandByDistance(FLAGS_crosswalk_expand_distance);
+          crosswalk_poly.ExpandByDistance(crosswalk_conf.expand_distance());
       bool in_expanded_crosswalk = crosswalk_exp_poly.IsPointIn(point);
 
       if (!in_expanded_crosswalk) {
@@ -140,7 +141,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
              << "] is_path_cross[" << is_path_cross << "]";
 
       bool stop = false;
-      if (obstacle_l_distance >= FLAGS_crosswalk_loose_l_distance) {
+      if (obstacle_l_distance >= crosswalk_conf.loose_l_distance()) {
         // (1) when obstacle_l_distance is big enough(>= loose_l_distance),
         //     STOP only if path crosses
         if (is_path_cross) {
@@ -149,7 +150,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
                  << obstacle_type_name << "] crosswalk_id[" << crosswalk_id
                  << "]";
         }
-      } else if (obstacle_l_distance <= FLAGS_crosswalk_strick_l_distance) {
+      } else if (obstacle_l_distance <= crosswalk_conf.strict_l_distance()) {
         // (2) when l_distance <= strick_l_distance + on_road(not on sideway),
         //     always STOP
         // (3) when l_distance <= strick_l_distance + not on_road(on sideway),
@@ -219,7 +220,8 @@ bool Crosswalk::BuildStopDecision(Frame* const frame,
 
   // create virtual stop wall
   std::string virtual_obstacle_id =
-      FLAGS_crosswalk_virtual_obstacle_id_prefix + crosswalk_overlap->object_id;
+      config_.crosswalk().virtual_obstacle_id_prefix() +
+      crosswalk_overlap->object_id;
   auto* obstacle = frame->CreateVirtualStopObstacle(
       reference_line_info, virtual_obstacle_id, crosswalk_overlap->start_s);
   if (!obstacle) {
@@ -232,16 +234,17 @@ bool Crosswalk::BuildStopDecision(Frame* const frame,
     return false;
   }
 
+  const double stop_distance = config_.crosswalk().stop_distance();
+
   // build stop decision
-  const double stop_s =
-      crosswalk_overlap->start_s - FLAGS_crosswalk_stop_distance;
+  const double stop_s = crosswalk_overlap->start_s - stop_distance;
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
   stop_decision->set_reason_code(StopReasonCode::STOP_REASON_CROSSWALK);
-  stop_decision->set_distance_s(-FLAGS_crosswalk_stop_distance);
+  stop_decision->set_distance_s(-stop_distance);
   stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
   stop_decision->mutable_stop_point()->set_y(stop_point.y());

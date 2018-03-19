@@ -29,6 +29,21 @@ message ReferenceLineEndConfig {
     optional double min_reference_line_remain_length = 2 [ default=10.0 ];
 }
 
+message CrosswalkConfig {
+    // prefix for converting crosswalk id to virtual obstacle id;
+    optional string virtual_obstacle_id_prefix = 1 [default="CW_"];
+    //valid min distance(m) for vehicles to be considered as have passed cross walk.
+    optional double pass_distance = 2 [default = 1.0];
+    // crosswalk expand distance for pedestrain/bicycle detection
+    optional double expand_distance = 3 [default=2.0];
+    // loose stop rule beyond this l_distance
+    optional double loose_l_distance = 4 [default=5.0];
+    // strict stop rule within this l_distance
+    optional double strict_l_distance = 5 [default=4.0];
+    // the distance to stop before crosswalk
+    optional double stop_distance = 6 [default=1.0];
+}
+
 // TODO(all) migrate all other traffic rules to pb config
 message TrafficRuleConfig {
   enum RuleId {
@@ -53,6 +68,7 @@ message TrafficRuleConfig {
     ChangeLaneConfig change_lane = 5;
     StopSignConfig stop_sign = 6;
     ReferenceLineEndConfig reference_line_end = 7;
+    CrosswalkConfig crosswalk = 8;
   }
 }
 

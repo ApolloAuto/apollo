@@ -31,6 +31,14 @@ config: {
 config: {
     rule_id: CROSSWALK
     enabled: true
+    crosswalk {
+        virtual_obstacle_id_prefix: "CW_"
+        pass_distance: 1.0
+        expand_distance: 2.0
+        loose_l_distance: 5.0
+        strict_l_distance: 4.0
+        stop_distance: 1.0
+    }
 }
 config: {
     rule_id: STOP_SIGN
