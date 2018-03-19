@@ -43,8 +43,9 @@ bool CCLanePostProcessor::Init() {
   // 1. get model config
   ConfigManager *config_manager = ConfigManager::instance();
 
-  const ModelConfig *model_config = NULL;
-  if (!config_manager->GetModelConfig(this->name(), &model_config)) {
+  const ModelConfig *model_config =
+      config_manager->GetModelConfig(this->name());
+  if (model_config == nullptr) {
     AERROR << "not found model: " << this->name();
     return false;
   }

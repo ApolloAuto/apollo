@@ -52,8 +52,9 @@ bool ProbabilisticFusion::Init() {
       << "Failed to get PbfSensorManager instance";
   track_manager_ = PbfTrackManager::instance();
   ACHECK(track_manager_ != nullptr) << "Failed to get PbfTrackManager instance";
-  const ModelConfig *model_config = NULL;
-  if (!ConfigManager::instance()->GetModelConfig(name(), &model_config)) {
+  const ModelConfig *model_config =
+      ConfigManager::instance()->GetModelConfig(name());
+  if (model_config == nullptr) {
     AERROR << "not found model config: " << name();
     return false;
   }
@@ -220,9 +221,7 @@ bool ProbabilisticFusion::Fuse(
   return true;
 }
 
-std::string ProbabilisticFusion::name() const {
-  return "ProbabilisticFusion";
-}
+std::string ProbabilisticFusion::name() const { return "ProbabilisticFusion"; }
 
 void ProbabilisticFusion::FuseFrame(const PbfSensorFramePtr &frame) {
   AINFO << "Fusing frame: " << frame->sensor_id << ","
