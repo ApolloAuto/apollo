@@ -41,8 +41,8 @@ bool TLPreprocessorSubnode::InitInternal() {
 
   ConfigManager *config_manager = ConfigManager::instance();
   std::string model_name("TLPreprocessorSubnode");
-  const ModelConfig *model_config(nullptr);
-  if (!config_manager->GetModelConfig(model_name, &model_config)) {
+  const ModelConfig *model_config = config_manager->GetModelConfig(model_name);
+  if (model_config == nullptr) {
     AERROR << "TLPreprocessorSubnode not found model: " << model_name;
     return false;
   }

@@ -30,8 +30,9 @@ namespace perception {
 bool ModestRadarDetector::Init() {
   using apollo::perception::ConfigManager;
   using apollo::perception::ModelConfig;
-  const ModelConfig *model_config = nullptr;
-  if (!ConfigManager::instance()->GetModelConfig(name(), &model_config)) {
+  const ModelConfig *model_config =
+      ConfigManager::instance()->GetModelConfig(name());
+  if (model_config == nullptr) {
     AERROR << "not found model config: " << name();
     return false;
   }
@@ -39,7 +40,7 @@ bool ModestRadarDetector::Init() {
     use_had_map_ = false;
   }
   if (!FLAGS_use_navigation_mode &&
-        !model_config->GetValue("use_had_map", &use_had_map_)) {
+      !model_config->GetValue("use_had_map", &use_had_map_)) {
     AERROR << "use_had_map not found.";
     return false;
   }

@@ -112,19 +112,19 @@ bool ConfigManager::Reset() {
   return InitInternal();
 }
 
-bool ConfigManager::GetModelConfig(const std::string& model_name,
-                                   const ModelConfig** model_config) {
+const ModelConfig* ConfigManager::GetModelConfig(
+    const std::string& model_name) {
   if (!inited_ && !Init()) {
-    return false;
+    AERROR << "ConfigManager is not initiated.";
+    return nullptr;
   }
 
   ModelConfigMapConstIterator citer = model_config_map_.find(model_name);
 
   if (citer == model_config_map_.end()) {
-    return false;
+    return nullptr;
   }
-  *model_config = citer->second;
-  return true;
+  return citer->second;
 }
 
 ConfigManager::~ConfigManager() {

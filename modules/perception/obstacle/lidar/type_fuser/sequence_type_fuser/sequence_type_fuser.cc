@@ -26,8 +26,9 @@ namespace perception {
 using apollo::common::util::GetAbsolutePath;
 
 bool SequenceTypeFuser::Init() {
-  const ModelConfig* model_config = NULL;
-  if (!ConfigManager::instance()->GetModelConfig(name(), &model_config)) {
+  const ModelConfig* model_config =
+      ConfigManager::instance()->GetModelConfig(name());
+  if (model_config == nullptr) {
     AERROR << "Failed to found model config: " << name();
     return false;
   }
