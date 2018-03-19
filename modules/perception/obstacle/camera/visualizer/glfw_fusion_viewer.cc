@@ -205,11 +205,12 @@ void GLFWFusionViewer::spin() {
 }
 
 void GLFWFusionViewer::spin_once() {
-  if (!frame_content_) {  // if frame_content_ may be always guarantteed, remove
-                          // this line.
+  if (!frame_content_) {
+    AWARN << "GLFWFusionViewer::spin_once : No frame content";
     return;
   }
 
+  AINFO << "GLFWFusionViewer::spin_once()";
   glfwPollEvents();
   render();
   glfwSwapBuffers(window_);
@@ -853,8 +854,10 @@ GLuint GLFWFusionViewer::image_to_gl_texture(const cv::Mat& mat,
 }
 
 void GLFWFusionViewer::draw_camera_frame(FrameContent* content) {
+  AINFO << "GLFWFusionViewer::draw_camera_frame";
   cv::Mat image_mat_src = content->get_camera_image().clone();
   if (image_mat_src.empty()) {
+    AWARN << "GLFWFusionViewer::draw_camera_frame : No image found";
     return;
   }
   int image_width = image_mat_src.cols;
