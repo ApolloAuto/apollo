@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TYPE_FUSER_H_
-#define MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TYPE_FUSER_H_
+#ifndef MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_BASE_TYPE_FUSER_H_
+#define MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_BASE_TYPE_FUSER_H_
 
 // SAMPLE CODE:
 //
@@ -106,4 +106,4 @@ REGISTER_REGISTERER(BaseTypeFuser);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_INTERFACE_BASE_TYPE_FUSER_H_
+#endif  // MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_BASE_TYPE_FUSER_H_

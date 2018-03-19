@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_NETWORK_H
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_NETWORK_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_NETWORK_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_NETWORK_H_
 
 namespace apollo {
 namespace perception {
@@ -32,4 +32,4 @@ void GetObjectsGPU(int n, const float *loc_data, const float *obj_data,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_NETWORK_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_NETWORK_H_
