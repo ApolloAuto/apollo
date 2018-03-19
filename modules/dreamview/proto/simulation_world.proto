@@ -176,6 +176,8 @@ message MapElementIds {
 message ControlData {
   optional double timestamp_sec = 1;
   optional double station_error = 2;
+  optional double lateral_error = 3;
+  optional double heading_error = 4;
 }
 
 // Next-id: 24
