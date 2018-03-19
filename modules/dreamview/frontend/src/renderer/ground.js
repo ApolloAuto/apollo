@@ -13,7 +13,7 @@ export default class Ground {
         this.mesh = null;
         this.geometry = null;
         this.initialized = false;
-        this.inNavigationMode = null;
+        this.inNaviMode = null;
 
         loadTexture(gridGround, texture => {
             this.geometry = new THREE.PlaneGeometry(1, 1);
