@@ -184,11 +184,13 @@ bool GLFWFusionViewer::initialize() {
   CameraCalibrationPtr calibrator = config_manager->get_camera_calibration();
   camera_intrinsic_ = calibrator->get_camera_intrinsic();
   distort_camera_intrinsic_ = calibrator->get_camera_model();
-
+  AINFO << " GLFWFusionViewer::initialize() config_manager Finished" << std::endl;
+  
   // Init Raster Text
   raster_text_ = std::make_shared<GLRasterText>();
   raster_text_->init();
 
+  AINFO << " GLFWFusionViewer::initialize() Finished" << std::endl;
   init_ = true;
   return true;
 }
