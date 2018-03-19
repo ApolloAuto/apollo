@@ -42,8 +42,9 @@ AsyncFusion::~AsyncFusion() {
 bool AsyncFusion::Init() {
   track_manager_ = PbfTrackManager::instance();
   ACHECK(track_manager_ != nullptr) << "Failed to get PbfTrackManager instance";
-  const ModelConfig *model_config = NULL;
-  if (!ConfigManager::instance()->GetModelConfig(name(), &model_config)) {
+  const ModelConfig *model_config =
+      ConfigManager::instance()->GetModelConfig(name());
+  if (model_config == nullptr) {
     AERROR << "not found model config: " << name();
     return false;
   }
@@ -256,7 +257,7 @@ void AsyncFusion::FuseForegroundObjects(
 
   // fixme:zhangweide only create new track if it is camera sensor
   if (is_camera(sensor_type)) {
-      CreateNewTracks(*foreground_objects, unassigned_objects);
+    CreateNewTracks(*foreground_objects, unassigned_objects);
   }
 }
 

@@ -37,8 +37,9 @@ bool HmObjectTracker::Init() {
   using apollo::perception::ConfigManager;
   using apollo::perception::ModelConfig;
 
-  const ModelConfig* model_config = nullptr;
-  if (!ConfigManager::instance()->GetModelConfig(name(), &model_config)) {
+  const ModelConfig* model_config =
+      ConfigManager::instance()->GetModelConfig(name());
+  if (model_config == nullptr) {
     AERROR << "not found model config: " << name();
     return false;
   }
