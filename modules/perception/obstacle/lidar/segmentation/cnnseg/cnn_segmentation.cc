@@ -207,8 +207,9 @@ bool CNNSegmentation::GetConfigs(string* config_file, string* proto_file,
                                  string* weight_file) {
   ConfigManager* config_manager = ConfigManager::instance();
 
-  const ModelConfig* model_config = nullptr;
-  if (!config_manager->GetModelConfig("CNNSegmentation", &model_config)) {
+  const ModelConfig* model_config =
+      config_manager->GetModelConfig("CNNSegmentation");
+  if (model_config == nullptr) {
     AERROR << "Failed to get model config for CNNSegmentation";
     return false;
   }

@@ -16,15 +16,15 @@
 
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 
-#include <utility>
-#include <map>
-
 #include <cmath>
+#include <map>
+#include <utility>
+
+#include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
 
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/camera/common/util.h"
-#include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/util.h"
 
 DEFINE_string(yolo_config_filename, "config.pt", "Yolo config filename.");
@@ -39,8 +39,8 @@ using std::map;
 bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
   ConfigManager *config_manager = ConfigManager::instance();
   string model_name = this->Name();
-  const ModelConfig *model_config = NULL;
-  if (!config_manager->GetModelConfig(model_name, &model_config)) {
+  const ModelConfig *model_config = config_manager->GetModelConfig(model_name);
+  if (model_config == nullptr) {
     AERROR << "not found model: " << model_name;
     return false;
   }
@@ -394,20 +394,20 @@ string YoloCameraDetector::Name() const { return "YoloCameraDetector"; }
 bool YoloCameraDetector::get_objects_cpu(
     std::vector<VisualObjectPtr> *objects) {
   int num_classes = types_.size();
-  auto loc_blob = cnnadapter_->get_blob_by_name(
-      yolo_param_.net_param().loc_blob());
-  auto obj_blob = cnnadapter_->get_blob_by_name(
-      yolo_param_.net_param().obj_blob());
-  auto cls_blob = cnnadapter_->get_blob_by_name(
-      yolo_param_.net_param().cls_blob());
-  auto dim_blob = cnnadapter_->get_blob_by_name(
-      yolo_param_.net_param().dim_blob());
-  auto ori_blob = cnnadapter_->get_blob_by_name(
-      yolo_param_.net_param().ori_blob());
-  auto lof_blob = cnnadapter_->get_blob_by_name(
-      yolo_param_.net_param().lof_blob());
-  auto lor_blob = cnnadapter_->get_blob_by_name(
-      yolo_param_.net_param().lor_blob());
+  auto loc_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().loc_blob());
+  auto obj_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().obj_blob());
+  auto cls_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().cls_blob());
+  auto dim_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().dim_blob());
+  auto ori_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().ori_blob());
+  auto lof_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().lof_blob());
+  auto lor_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().lor_blob());
 
   int batch = obj_blob->num();
   int height = obj_blob->channels();
@@ -426,37 +426,33 @@ bool YoloCameraDetector::get_objects_cpu(
   const float *dim_data = with_dim ? dim_blob->cpu_data() : nullptr;
   const float *lof_data = with_lof ? lof_blob->cpu_data() : nullptr;
   const float *lor_data = with_lor ? lor_blob->cpu_data() : nullptr;
-  if (res_box_tensor_ == nullptr ||
-      res_cls_tensor_ == nullptr ||
+  if (res_box_tensor_ == nullptr || res_cls_tensor_ == nullptr ||
       overlapped_ == nullptr) {
     return false;
   }
 
   for (int i = 0; i < obj_size_; ++i) {
-    get_object_helper(i, loc_data, obj_data, cls_data, ori_data,
-                      dim_data, lof_data, lor_data,
-                      width, height, num_classes,
-                      with_ori, with_dim, with_lof, with_lor);
+    get_object_helper(i, loc_data, obj_data, cls_data, ori_data, dim_data,
+                      lof_data, lor_data, width, height, num_classes, with_ori,
+                      with_dim, with_lof, with_lor);
   }
 
-  const float *cpu_cls_data
-      = static_cast<const float*>(res_cls_tensor_->cpu_data());
+  const float *cpu_cls_data =
+      static_cast<const float *>(res_cls_tensor_->cpu_data());
 
   map<int, vector<int> > indices;
   map<int, vector<float> > conf_scores;
   int num_kept = 0;
   for (int k = 0; k < num_classes; k++) {
-    apply_nms_gpu(static_cast<const float*>(res_box_tensor_->gpu_data()),
-                  cpu_cls_data + k * obj_size_,
-                  obj_size_, confidence_threshold_,
-                  top_k_, nms_.threshold,
-                  &(indices[static_cast<int>(types_[k])]),
-                  overlapped_, idx_sm_);
+    apply_nms_gpu(static_cast<const float *>(res_box_tensor_->gpu_data()),
+                  cpu_cls_data + k * obj_size_, obj_size_,
+                  confidence_threshold_, top_k_, nms_.threshold,
+                  &(indices[static_cast<int>(types_[k])]), overlapped_,
+                  idx_sm_);
     num_kept += indices[static_cast<int>(types_[k])].size();
     vector<float> conf_score(cpu_cls_data + k * obj_size_,
                              cpu_cls_data + (k + 1) * obj_size_);
-    conf_scores.insert(
-        std::make_pair(static_cast<int>(types_[k]), conf_score));
+    conf_scores.insert(std::make_pair(static_cast<int>(types_[k]), conf_score));
   }
   if (num_kept == 0) {
     AINFO << "Couldn't find any detections";
@@ -465,8 +461,8 @@ bool YoloCameraDetector::get_objects_cpu(
 
   objects->clear();
   objects->reserve(num_kept);
-  const float* cpu_box_data
-      = static_cast<const float *>(res_box_tensor_->cpu_data());
+  const float *cpu_box_data =
+      static_cast<const float *>(res_box_tensor_->cpu_data());
 
   for (auto it = indices.begin(); it != indices.end(); ++it) {
     int label = it->first;
@@ -487,8 +483,8 @@ bool YoloCameraDetector::get_objects_cpu(
 
       VisualObjectPtr obj(new VisualObject);
       obj->type = static_cast<ObjectType>(label);
-      obj->type_probs.assign(
-          static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0.0f);
+      obj->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
+                             0.0f);
       for (int k = 0; k < num_classes; ++k) {
         int type_k = static_cast<int>(types_[k]);
         obj->type_probs[type_k] = conf_scores[type_k][idx];
@@ -530,27 +526,17 @@ bool YoloCameraDetector::get_objects_cpu(
   return true;
 }
 
-void YoloCameraDetector::get_object_helper(const int i,
-                                           const float *loc_data,
-                                           const float *obj_data,
-                                           const float *cls_data,
-                                           const float *ori_data,
-                                           const float *dim_data,
-                                           const float *lof_data,
-                                           const float *lor_data,
-                                           const int width,
-                                           const int height,
-                                           const int num_classes,
-                                           const bool with_ori,
-                                           const bool with_dim,
-                                           const bool with_lof,
-                                           const bool with_lor) {
-  const float* anchor_data
-      = static_cast<const float*>(anchor_->cpu_data());
-  float* res_box_data
-      = static_cast<float*>(res_box_tensor_->mutable_cpu_data());
-  float* res_cls_data
-      = static_cast<float*>(res_cls_tensor_->mutable_cpu_data());
+void YoloCameraDetector::get_object_helper(
+    const int i, const float *loc_data, const float *obj_data,
+    const float *cls_data, const float *ori_data, const float *dim_data,
+    const float *lof_data, const float *lor_data, const int width,
+    const int height, const int num_classes, const bool with_ori,
+    const bool with_dim, const bool with_lof, const bool with_lor) {
+  const float *anchor_data = static_cast<const float *>(anchor_->cpu_data());
+  float *res_box_data =
+      static_cast<float *>(res_box_tensor_->mutable_cpu_data());
+  float *res_cls_data =
+      static_cast<float *>(res_cls_tensor_->mutable_cpu_data());
 
   int box_block = s_box_block_size;
 
@@ -567,14 +553,15 @@ void YoloCameraDetector::get_object_helper(const int i,
 
   float cx = (w + yolo::sigmoid(loc_data[offset_loc + 0])) / width;
   float cy = (h + yolo::sigmoid(loc_data[offset_loc + 1])) / height;
-  float hw = std::exp(loc_data[offset_loc + 2]) *
-      anchor_data[2 * c] / width * 0.5;
-  float hh = std::exp(loc_data[offset_loc + 3]) *
-      anchor_data[2 * c + 1] / height * 0.5;
+  float hw =
+      std::exp(loc_data[offset_loc + 2]) * anchor_data[2 * c] / width * 0.5;
+  float hh = std::exp(loc_data[offset_loc + 3]) * anchor_data[2 * c + 1] /
+             height * 0.5;
 
   for (int k = 0; k < num_classes; ++k) {
-    float prob = (cls_data[offset_cls + k] * scale > confidence_threshold_ ?
-                  cls_data[offset_cls + k] * scale : 0);
+    float prob = (cls_data[offset_cls + k] * scale > confidence_threshold_
+                      ? cls_data[offset_cls + k] * scale
+                      : 0);
     res_cls_data[k * width * height * num_anchors_ + i] = prob;
   }
   res_box_data[i * box_block + 0] = cx - hw;
@@ -584,8 +571,8 @@ void YoloCameraDetector::get_object_helper(const int i,
 
   if (with_ori) {
     int offset_ori = ((h * width + w) * num_anchors_ + c) * 2;
-    res_box_data[i * box_block + 4]
-        = std::atan2(ori_data[offset_ori + 1], ori_data[offset_ori]);
+    res_box_data[i * box_block + 4] =
+        std::atan2(ori_data[offset_ori + 1], ori_data[offset_ori]);
   }
 
   if (with_dim) {
@@ -595,14 +582,14 @@ void YoloCameraDetector::get_object_helper(const int i,
     res_box_data[i * box_block + 7] = dim_data[offset_dim + 2];
   }
 
-  float* dst_ptr = nullptr;
-  const float* src_ptr = nullptr;
+  float *dst_ptr = nullptr;
+  const float *src_ptr = nullptr;
   if (with_lof) {
     int offset_lof = ((h * width + w) * num_anchors_ + c) * 4;
     dst_ptr = res_box_data + i * box_block + 8;
     src_ptr = lof_data + offset_lof;
-    float sb_x  = src_ptr[0] * hw * 2.0f + cx;
-    float sb_y  = src_ptr[1] * hh * 2.0f + cy;
+    float sb_x = src_ptr[0] * hw * 2.0f + cx;
+    float sb_y = src_ptr[1] * hh * 2.0f + cy;
     float sb_hw = std::exp(src_ptr[2]) * hw;
     float sb_hh = std::exp(src_ptr[3]) * hh;
     dst_ptr[0] = sb_x - sb_hw;
@@ -615,8 +602,8 @@ void YoloCameraDetector::get_object_helper(const int i,
     int offset_lor = ((h * width + w) * num_anchors_ + c) * 4;
     dst_ptr = res_box_data + i * box_block + 12;
     src_ptr = lor_data + offset_lor;
-    float sb_x  = src_ptr[0] * hw * 2.0f + cx;
-    float sb_y  = src_ptr[1] * hh * 2.0f + cy;
+    float sb_x = src_ptr[0] * hw * 2.0f + cx;
+    float sb_y = src_ptr[1] * hh * 2.0f + cy;
     float sb_hw = std::exp(src_ptr[2]) * hw;
     float sb_hh = std::exp(src_ptr[3]) * hh;
     dst_ptr[0] = sb_x - sb_hw;

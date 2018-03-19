@@ -25,8 +25,8 @@
 
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/proto/yolo.pb.h"
 
-#include "include/util.h"
 #include "include/region_output.h"
+#include "include/util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/common/cnn_adapter.h"
@@ -72,21 +72,12 @@ class YoloCameraDetector : public BaseCameraDetector {
 
   bool get_objects_cpu(std::vector<VisualObjectPtr> *objects);
 
-  void get_object_helper(int idx,
-                         const float *loc_data,
-                         const float *obj_data,
-                         const float *cls_data,
-                         const float *ori_data,
-                         const float *dim_data,
-                         const float *lof_data,
-                         const float *lor_data,
-                         int width,
-                         int height,
-                         int num_classes,
-                         bool with_ori,
-                         bool with_dim,
-                         bool with_lof,
-                         bool with_lor);
+  void get_object_helper(int idx, const float *loc_data, const float *obj_data,
+                         const float *cls_data, const float *ori_data,
+                         const float *dim_data, const float *lof_data,
+                         const float *lor_data, int width, int height,
+                         int num_classes, bool with_ori, bool with_dim,
+                         bool with_lof, bool with_lor);
 
  private:
   std::shared_ptr<CNNAdapter> cnnadapter_;

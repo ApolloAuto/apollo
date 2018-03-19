@@ -36,8 +36,8 @@ bool UnityRectify::Init() {
     return false;
   }
 
-  const ModelConfig *model_config = nullptr;
-  if (!config_manager->GetModelConfig(name(), &model_config)) {
+  const ModelConfig *model_config = config_manager->GetModelConfig(name());
+  if (model_config == nullptr) {
     AERROR << "not found model config: " << name();
     return false;
   }
@@ -78,8 +78,8 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
     AERROR << "detection_model not found." << model_config->name();
     return false;
   }
-  detection_model = GetAbsolutePath(config_manager->WorkRoot(),
-                                    detection_model);
+  detection_model =
+      GetAbsolutePath(config_manager->WorkRoot(), detection_model);
   if (!model_config->GetValue("detection_net", &detection_net)) {
     AERROR << "detection_net not found." << model_config->name();
     return false;

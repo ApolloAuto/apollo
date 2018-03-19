@@ -169,10 +169,10 @@ bool TLProcSubnode::InitInternal() {
   }
 
   // init image_border
-  ConfigManager *config_manager = ConfigManager::instance();
   std::string model_name("TLProcSubnode");
-  const ModelConfig *model_config(nullptr);
-  if (!config_manager->GetModelConfig(model_name, &model_config)) {
+  ConfigManager *config_manager = ConfigManager::instance();
+  const ModelConfig *model_config = config_manager->GetModelConfig(model_name);
+  if (model_config == nullptr) {
     AERROR << "TLProcSubnode not found model: " << model_name;
     return false;
   }
