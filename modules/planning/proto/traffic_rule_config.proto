@@ -46,12 +46,13 @@ message TrafficRuleConfig {
     CIPV = 12;
   }
   optional RuleId rule_id = 1;
+  optional bool enabled = 2;
   oneof config {
-    ReroutingConfig rerouting = 2;
-    BacksideVehicleConfig backside_vehicle = 3;
-    ChangeLaneConfig change_lane = 4;
-    StopSignConfig stop_sign = 5;
-    ReferenceLineEndConfig reference_line_end = 6;
+    ReroutingConfig rerouting = 3;
+    BacksideVehicleConfig backside_vehicle = 4;
+    ChangeLaneConfig change_lane = 5;
+    StopSignConfig stop_sign = 6;
+    ReferenceLineEndConfig reference_line_end = 7;
   }
 }
 

@@ -239,7 +239,6 @@ DEFINE_double(creep_stop_distance, 0.5,
               "stop distance(m) to the stop line of next lane overlap "
               "while creeping ");
 /// keep_clear
-DEFINE_bool(enable_keep_clear, false, "enable keep clear zone");
 DEFINE_string(keep_clear_virtual_obstacle_id_prefix, "KC_",
               "prefix for converting keep_clear id to virtual obstacle id");
 DEFINE_string(keep_clear_junction_virtual_obstacle_id_prefix, "KC_JC_",
@@ -249,7 +248,6 @@ DEFINE_double(keep_clear_min_pass_distance, 2.0,
               "valid min distance(m) for vehicles to be considered as "
               "have passed keep_clear zone (stop_line_end_s)");
 /// traffic light
-DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
 DEFINE_string(signal_light_virtual_obstacle_id_prefix, "SL_",
               "prefix for converting signal id to virtual obstacle id");
 DEFINE_double(max_stop_deacceleration_for_yellow_light, 3.0,
@@ -259,7 +257,6 @@ DEFINE_double(max_stop_deacceleration_for_yellow_light, 3.0,
 DEFINE_double(traffic_light_stop_distance, 1.0,
               "stop distance from traffic light line");
 /// crosswalk
-DEFINE_bool(enable_crosswalk, true, "enable crosswalk");
 DEFINE_string(crosswalk_virtual_obstacle_id_prefix, "CW_",
               "prefix for converting crosswalk id to virtual obstacle id");
 DEFINE_double(crosswalk_expand_distance, 2.0,
@@ -275,7 +272,6 @@ DEFINE_double(crosswalk_min_pass_distance, 1.0,
 DEFINE_double(crosswalk_stop_distance, 1.0,
               "stop distance from stop line of crosswalk");
 /// stop_sign
-DEFINE_bool(enable_stop_sign, true, "enable stop_sign");
 DEFINE_bool(enable_stop_sign_creeping, false,
             "enable stop_sign creeping forward at one way "
             "or two way stop signs.");
@@ -295,8 +291,6 @@ DEFINE_double(stop_sign_watch_vehicle_max_stop_distance, 5.0,
               "max stop distance for watch vehicles to be considered as "
               " a valid stop.(this check is looser than adc)");
 
-DEFINE_bool(enable_sidepass, true,
-            "True to enable side pass long stopping obstacles");
 DEFINE_double(sidepass_wait_time_sec, 30.0,
               "Waiting time in seconds before deciding to sidepass");
 
@@ -332,6 +326,8 @@ DEFINE_int32(trajectory_point_num_for_debug, 10,
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
 DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
+DEFINE_bool(enable_traffic_light_detection, true,
+            "True to enable traffic light detection input.");
 
 DEFINE_bool(enable_lag_prediction, true,
             "Enable lagged prediction, which is more tolerant to obstacles "

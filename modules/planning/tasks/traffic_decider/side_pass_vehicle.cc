@@ -228,10 +228,6 @@ bool SidePassVehicle::ApplyRule(Frame* const,
     // do not sidepass on highway.
     return true;
   }
-  if (!FLAGS_enable_sidepass) {
-    ADEBUG << "Side pass rule is disabled";
-    return true;
-  }
 
   reference_line_ = &(reference_line_info->reference_line());
   auto* path_decision = reference_line_info->path_decision();
