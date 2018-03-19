@@ -105,7 +105,7 @@ Status Planning::Init() {
   CHECK_ADAPTER_IF(FLAGS_use_navigation_mode && FLAGS_enable_prediction,
                    PerceptionObstacles);
   CHECK_ADAPTER_IF(FLAGS_enable_prediction, Prediction);
-  CHECK_ADAPTER_IF(FLAGS_enable_traffic_light, TrafficLightDetection);
+  CHECK_ADAPTER(TrafficLightDetection);
 
   if (!FLAGS_use_navigation_mode) {
     hdmap_ = HDMapUtil::BaseMapPtr();

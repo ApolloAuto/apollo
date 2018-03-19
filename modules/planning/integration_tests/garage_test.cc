@@ -47,7 +47,6 @@ class GarageTest : public PlanningTestBase {
     FLAGS_planning_upper_speed_limit = 12.5;
     FLAGS_test_routing_response_file = "garage_routing.pb.txt";
     FLAGS_enable_lag_prediction = false;
-    FLAGS_enable_stop_sign = false;
   }
 };
 

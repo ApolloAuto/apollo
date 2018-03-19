@@ -39,10 +39,6 @@ bool KeepClear::ApplyRule(Frame* const frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (!FLAGS_enable_keep_clear) {
-    return true;
-  }
-
   // keep_clear zone
   const std::vector<PathOverlap>& keep_clear_overlaps =
       reference_line_info->reference_line().map_path().clear_area_overlaps();
