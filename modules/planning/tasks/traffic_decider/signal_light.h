@@ -54,6 +54,8 @@ class SignalLight : public TrafficRule {
       ReferenceLineInfo* const reference_line_info,
       hdmap::PathOverlap* const signal_light) const;
 
+ private:
+  static constexpr char const* const SIGNAL_LIGHT_VO_ID_PREFIX = "SL_";
   std::vector<hdmap::PathOverlap> signal_lights_from_path_;
   std::unordered_map<std::string, const apollo::perception::TrafficLight*>
       detected_signals_;

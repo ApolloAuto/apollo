@@ -195,7 +195,7 @@ bool SignalLight::BuildStopDecision(
 
   // create virtual stop wall
   std::string virtual_obstacle_id =
-      FLAGS_signal_light_virtual_obstacle_id_prefix + signal_light->object_id;
+      SIGNAL_LIGHT_VO_ID_PREFIX + signal_light->object_id;
   auto* obstacle = frame->CreateVirtualStopObstacle(
       reference_line_info, virtual_obstacle_id, signal_light->start_s);
   if (!obstacle) {

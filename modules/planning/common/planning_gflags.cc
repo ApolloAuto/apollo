@@ -240,18 +240,11 @@ DEFINE_double(creep_stop_distance, 0.5,
               "while creeping ");
 /// keep_clear
 DEFINE_bool(enable_keep_clear, false, "enable keep clear zone");
-DEFINE_string(keep_clear_virtual_obstacle_id_prefix, "KC_",
-              "prefix for converting keep_clear id to virtual obstacle id");
-DEFINE_string(keep_clear_junction_virtual_obstacle_id_prefix, "KC_JC_",
-              "prefix for converting keep_clear(junction) id "
-              "to virtual obstacle id");
 DEFINE_double(keep_clear_min_pass_distance, 2.0,
               "valid min distance(m) for vehicles to be considered as "
               "have passed keep_clear zone (stop_line_end_s)");
 /// traffic light
 DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
-DEFINE_string(signal_light_virtual_obstacle_id_prefix, "SL_",
-              "prefix for converting signal id to virtual obstacle id");
 DEFINE_double(max_stop_deacceleration_for_yellow_light, 3.0,
               "treat yellow light as red when deceleration (abstract value"
               " in m/s^2) is less than this threshold; otherwise treated"
@@ -260,8 +253,6 @@ DEFINE_double(traffic_light_stop_distance, 1.0,
               "stop distance from traffic light line");
 /// crosswalk
 DEFINE_bool(enable_crosswalk, true, "enable crosswalk");
-DEFINE_string(crosswalk_virtual_obstacle_id_prefix, "CW_",
-              "prefix for converting crosswalk id to virtual obstacle id");
 DEFINE_double(crosswalk_expand_distance, 2.0,
               "crosswalk expand distance(meter) "
               "for pedestrian/bicycle detection");
@@ -279,8 +270,6 @@ DEFINE_bool(enable_stop_sign, true, "enable stop_sign");
 DEFINE_bool(enable_stop_sign_creeping, false,
             "enable stop_sign creeping forward at one way "
             "or two way stop signs.");
-DEFINE_string(stop_sign_virtual_obstacle_id_prefix, "SS_",
-              "prefix for converting stop_sign id to virtual obstacle id");
 DEFINE_double(stop_sign_stop_duration, 1.0,
               "min time(second) to stop at stop sign");
 DEFINE_double(stop_sign_min_pass_distance, 3.0,
@@ -309,8 +298,6 @@ DEFINE_double(destination_check_distance, 5.0,
 DEFINE_double(destination_stop_distance, 0.5,
               "stop distance from destination line");
 /// reference_line end
-DEFINE_string(reference_line_end_obstacle_id_prefix, "REF_END_",
-              "Obstacle id for the end of reference line obstacle");
 
 // according to DMV's rule, turn signal should be on within 200 ft from
 // intersection.
