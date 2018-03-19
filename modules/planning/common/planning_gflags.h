@@ -153,11 +153,6 @@ DECLARE_double(max_stop_deacceleration_for_yellow_light);
 DECLARE_double(traffic_light_stop_distance);
 /// crosswalk
 DECLARE_bool(enable_crosswalk);
-DECLARE_double(crosswalk_expand_distance);
-DECLARE_double(crosswalk_strick_l_distance);
-DECLARE_double(crosswalk_loose_l_distance);
-DECLARE_double(crosswalk_min_pass_distance);
-DECLARE_double(crosswalk_stop_distance);
 /// stop_sign
 DECLARE_bool(enable_stop_sign);
 DECLARE_bool(enable_stop_sign_creeping);
