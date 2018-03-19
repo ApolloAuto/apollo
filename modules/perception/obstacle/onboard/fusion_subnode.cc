@@ -62,6 +62,11 @@ bool FusionSubnode::InitInternal() {
   if (lidar_object_data_ == nullptr) {
     AWARN << "Failed to get LidarObjectData.";
   }
+  camera_object_data_ = dynamic_cast<CameraObjectData *>(
+      shared_data_manager_->GetSharedData("CameraObjectData"));
+  if (camera_object_data_ == nullptr) {
+    AWARN << "Failed to get CameraObjectData.";
+  }
 
   if (!InitOutputStream()) {
     AERROR << "Failed to init output stream.";
@@ -105,6 +110,16 @@ bool FusionSubnode::InitOutputStream() {
     radar_event_id_ = -1;
   } else {
     radar_event_id_ = static_cast<EventID>(atoi((radar_iter->second).c_str()));
+  }
+
+  auto camera_iter = reserve_field_map.find("camera_event_id");
+  if (camera_iter == reserve_field_map.end()) {
+    AWARN << "Failed to find camera_event_id:" << reserve_;
+    AINFO << "camera_event_id will be set -1";
+    camera_event_id_ = -1;
+  } else {
+    camera_event_id_ =
+        static_cast<EventID>(atoi((camera_iter->second).c_str()));
   }
   return true;
 }
@@ -171,6 +186,8 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     PERF_BLOCK_END("fusion_lidar");
   } else if (event_meta.event_id == radar_event_id_) {
     PERF_BLOCK_END("fusion_radar");
+  } else if (event_meta.event_id == camera_event_id_) {
+    PERF_BLOCK_END("fusion_camera");
   }
   timestamp_ = sensor_objs[0].timestamp;
   error_code_ = common::OK;
@@ -201,6 +218,8 @@ bool FusionSubnode::BuildSensorObjs(
       sensor_objects->sensor_type = SensorType::VELODYNE_64;
     } else if (event.event_id == radar_event_id_) {
       sensor_objects->sensor_type = SensorType::RADAR;
+    } else if (event.event_id == camera_event_id_) {
+      sensor_objects->sensor_type = SensorType::CAMERA;
     } else {
       AERROR << "Event id is not supported. event:" << event.to_string();
       return false;
@@ -228,6 +247,9 @@ bool FusionSubnode::GetSharedData(const Event &event,
   } else if (event.event_id == radar_event_id_ &&
              radar_object_data_ != nullptr) {
     get_data_succ = radar_object_data_->Get(data_key, objs);
+  } else if (event.event_id == camera_event_id_ &&
+             camera_object_data_ != nullptr) {
+    get_data_succ = camera_object_data_->Get(data_key, objs);
   } else {
     AERROR << "Event id is not supported. event:" << event.to_string();
     return false;
