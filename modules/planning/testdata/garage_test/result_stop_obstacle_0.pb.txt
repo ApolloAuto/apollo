@@ -1744,6 +1744,22 @@ decision {
         }
       }
     }
+    decision {
+      id: "SS_2"
+      perception_id: -1262210198
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_STOP_SIGN
+          distance_s: -1
+          stop_point {
+            x: 586367.0778901038
+            y: 4140783.9337301059
+            z: 0
+          }
+          stop_heading: 1.2918556462461872
+        }
+      }
+    }
   }
   vehicle_signal {
     turn_signal: TURN_NONE
