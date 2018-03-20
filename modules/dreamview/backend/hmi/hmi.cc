@@ -58,7 +58,7 @@ void HMI::RegisterMessageHandlers() {
   websocket_->RegisterConnectionReadyHandler(
       [this](WebSocketHandler::Connection *conn) {
         const auto &config = HMIWorker::instance()->GetConfig();
-        const auto &status = HMIWorker::instance()->GetStatus();
+        const auto status = HMIWorker::instance()->GetStatus();
         websocket_->SendData(
             conn, JsonUtil::ProtoToTypedJson("HMIConfig", config).dump());
         websocket_->SendData(
@@ -235,7 +235,7 @@ void HMI::RegisterMessageHandlers() {
 
 void HMI::BroadcastHMIStatus() {
   // In unit tests, we may leave websocket_ as NULL and skip broadcasting.
-  const auto &status = HMIWorker::instance()->GetStatus();
+  const auto status = HMIWorker::instance()->GetStatus();
   if (websocket_) {
     websocket_->BroadcastData(
         JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
