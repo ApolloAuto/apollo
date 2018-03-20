@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/motion/plane_motion.h"
 
 namespace apollo {
@@ -52,29 +53,44 @@ void PlaneMotion::generate_motion_matrix(VehicleStatus *vehicledata) {
   vehicledata->motion = motion_2d;
 }
 
-void PlaneMotion::add_new_motion(VehicleStatus *vehicledata,
-                                 float motion_time_dif, bool image_read) {
+void PlaneMotion::accumulate_motion(VehicleStatus *vehicledata,
+                                        float motion_time_dif) {
   generate_motion_matrix(vehicledata);  // compute vehicledata.motion
+  // accumulate CAN+IMU / Localization motion
+  mat_motion_2d_image_ *= vehicledata->motion;
+  time_difference_ += motion_time_dif;
+}
 
-  // both CAN+IMU and image time stamp
+void PlaneMotion::update_motion_buffer(VehicleStatus *vehicledata) {
+  for (int k = 0; k < static_cast<int>(mot_buffer_->size()); k++) {
+    (*mot_buffer_)[k].motion *= mat_motion_2d_image_;
+  }
+
+  vehicledata->time_d = time_difference_;
+  vehicledata->motion = mat_motion_2d_image_;
+  mot_buffer_->push_back(*vehicledata);  // a new image frame is added
   mat_motion_2d_image_ =
-      mat_motion_2d_image_ * vehicledata->motion;  // accumulate CAN+IMU motion
-
-  time_difference_ +=
-      motion_time_dif;  // accumulate time diff before inserting into buffer
-
-  if (image_read) {
-    // image capture time stamp to insert the buffer for the accumulated motion
-    for (int k = 0; k < static_cast<int>(mot_buffer_->size()); k++) {
-      (*mot_buffer_)[k].motion *= mat_motion_2d_image_;
-    }
-
-    vehicledata->time_d = time_difference_;
-    vehicledata->motion = mat_motion_2d_image_;
-    mot_buffer_->push_back(*vehicledata);  // a new image frame is added
-    mat_motion_2d_image_ =
-        Eigen::Matrix3f::Identity();  // reset image accumulated motion
-    time_difference_ = 0;             // reset the accumulated time difference
+      Eigen::Matrix3f::Identity();  // reset image accumulated motion
+  time_difference_ = 0;             // reset the accumulated time difference
+}
+void PlaneMotion::add_new_motion(VehicleStatus *vehicledata,
+                                 float motion_time_dif,
+                                 int motion_operation_flag) {
+  switch (motion_operation_flag) {
+    case ACCUM_MOTION:
+        accumulate_motion(vehicledata, motion_time_dif);
+        break;
+    case ACCUM_PUSH_MOTION:
+        accumulate_motion(vehicledata, motion_time_dif);
+        update_motion_buffer(vehicledata);
+        break;
+    case PUSH_ACCUM_MOTION:
+        update_motion_buffer(vehicledata);
+        accumulate_motion(vehicledata, motion_time_dif);
+        break;
+    default:
+        AERROR << "motion operation flag:wrong type";
+        return;
   }
 }
 

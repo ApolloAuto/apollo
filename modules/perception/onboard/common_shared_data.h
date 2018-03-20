@@ -23,6 +23,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <algorithm>
+#include <limits>
 
 #include "boost/format.hpp"
 #include "gflags/gflags.h"
@@ -77,7 +79,10 @@ class CommonSharedData : public SharedData {
   CommonSharedData() {}
   virtual ~CommonSharedData() {}
 
-  bool Init() override { return true; }
+  bool Init() override {
+    latest_timestamp_ = std::numeric_limits<double>::min();
+    return true;
+  }
   // @brief: you must impl your own name func
   // @return: name of your own class
   virtual std::string name() const = 0;
@@ -103,6 +108,7 @@ class CommonSharedData : public SharedData {
 
   bool Get(const CommonSharedDataKey &key, SharedDataPtr<M> *data);
 
+  double GetLatestTimestamp() const;
   // @brief: remove shared data with the given key
   // @param [in]: key
   // @return : true or false
@@ -135,6 +141,7 @@ class CommonSharedData : public SharedData {
   Mutex mutex_;
   CommonSharedDataStat stat_;
   DataAddedTimeMap data_added_time_map_;
+  double latest_timestamp_ = std::numeric_limits<double>::min();
 
   DISALLOW_COPY_AND_ASSIGN(CommonSharedData);
 };
@@ -145,6 +152,7 @@ void CommonSharedData<M>::Reset() {
   AINFO << "Reset " << name() << ", map size: " << data_map_.size();
   data_map_.clear();
   data_added_time_map_.clear();
+  latest_timestamp_ = std::numeric_limits<double>::min();
 }
 
 template <class M>
@@ -186,7 +194,6 @@ bool CommonSharedData<M>::Add(const std::string &key,
 
   const uint64_t timestamp = ::time(NULL);
   data_added_time_map_.emplace(DataKeyTimestampPair(key, timestamp));
-
   ++stat_.add_cnt;
   return true;
 }
@@ -194,6 +201,8 @@ bool CommonSharedData<M>::Add(const std::string &key,
 template <class M>
 bool CommonSharedData<M>::Add(const CommonSharedDataKey &key,
                               const SharedDataPtr<M> &data) {
+  // update latest_timestamp for SharedData
+  latest_timestamp_ = std::max(latest_timestamp_, key.timestamp);
   return Add(key.ToString(), data);
 }
 
@@ -214,6 +223,11 @@ template <class M>
 bool CommonSharedData<M>::Get(const CommonSharedDataKey &key,
                               SharedDataPtr<M> *data) {
   return Get(key.ToString(), data);
+}
+
+template <class M>
+double CommonSharedData<M>::GetLatestTimestamp() const {
+  return latest_timestamp_;
 }
 
 template <class M>

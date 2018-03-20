@@ -14,6 +14,8 @@ cc_library(
         "-Wno-deprecated",
     ],
     deps = [
+        "//modules/common",
+        "//modules/common:log",
         "//modules/perception/obstacle/base",
     ],
 )

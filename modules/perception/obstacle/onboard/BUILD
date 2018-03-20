@@ -159,6 +159,7 @@ cc_library(
         "motion_service.h",
     ],
     deps = [
+        ":perception_obstacle_shared_data",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/motion",
