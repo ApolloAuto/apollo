@@ -17,10 +17,10 @@
 #ifndef MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_CLUSTERS_H_
 #define MODULES_PREDICTION_CONTAINER_OBSTACLES_OBSTACLE_CLUSTERS_H_
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
-#include <memory>
 
 #include "modules/common/macro.h"
 #include "modules/map/hdmap/hdmap_common.h"
@@ -31,19 +31,29 @@ namespace prediction {
 
 class ObstacleClusters {
  public:
-  ObstacleClusters() = default;
+  /**
+   * @brief Remove all lane graphs
+   */
+  static void Init();
 
-  void Init();
-
-  const LaneGraph& GetLaneGraph(
+  /**
+   * @brief Obtain a lane graph given a lane info and s
+   * @param lane start s
+   * @param lane total length
+   * @param lane info
+   * @return a corresponding lane graph
+   */
+  static const LaneGraph& GetLaneGraph(
       const double start_s, const double length,
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
  private:
-  void Clear();
+  ObstacleClusters() = delete;
+
+  static void Clear();
 
  private:
-  std::unordered_map<std::string, LaneGraph> lane_graphs_;
+  static std::unordered_map<std::string, LaneGraph> lane_graphs_;
 };
 
 }  // namespace prediction
