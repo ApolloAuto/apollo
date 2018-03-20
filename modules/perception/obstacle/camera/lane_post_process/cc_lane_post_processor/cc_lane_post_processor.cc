@@ -595,7 +595,7 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
 
 bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
                                   const CameraLanePostProcessOptions &options,
-                                  LaneObjectsPtr lane_objects) {
+                                  LaneObjectsPtr* lane_objects) {
   if (!is_init_) {
     AERROR << "lane post-processor is not initialized";
     return false;
@@ -632,8 +632,8 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     AINFO << "generate lane objects in image space ...";
     ScalarType x_center = static_cast<ScalarType>(roi_.x + roi_.width / 2);
 
-    lane_objects.reset(new LaneObjects());
-    lane_objects->reserve(2);
+    lane_objects->reset(new LaneObjects());
+    (*lane_objects)->reserve(2);
     bool is_left_lane_found = false;
     bool is_right_lane_found = false;
     for (auto it = cur_lane_instances_->begin();
@@ -652,30 +652,31 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
         if (is_left_lane_found) {
           continue;
         }
-        lane_objects->push_back(cur_object);
-        lane_objects->back().spatial = SpatialLabelType::L_0;
+        (*lane_objects)->push_back(cur_object);
+        (*lane_objects)->back().spatial = SpatialLabelType::L_0;
         is_left_lane_found = true;
       } else {
         // for right lane
         if (is_right_lane_found) {
           continue;
         }
-        lane_objects->push_back(cur_object);
-        lane_objects->back().spatial = SpatialLabelType::R_0;
+        (*lane_objects)->push_back(cur_object);
+        (*lane_objects)->back().spatial = SpatialLabelType::R_0;
         is_right_lane_found = true;
       }
 
-      AINFO << " lane object " << lane_objects->back().GetSpatialLabel()
-            << " has " << lane_objects->back().pos.size() << " points: "
-            << "lateral distance = " << lane_objects->back().lateral_distance;
+      AINFO << " lane object " << (*lane_objects)->back().GetSpatialLabel()
+            << " has " << (*lane_objects)->back().pos.size() << " points: "
+            << "lateral distance = "
+            << (*lane_objects)->back().lateral_distance;
     }
 
   } else {
     /// for vehicle space coordinate
     // select lane instances with non-overlap assumption
     AINFO << "generate lane objects ...";
-    lane_objects.reset(new LaneObjects());
-    lane_objects->reserve(2 * MAX_LANE_SPATIAL_LABELS);
+    lane_objects->reset(new LaneObjects());
+    (*lane_objects)->reserve(2 * MAX_LANE_SPATIAL_LABELS);
     vector<pair<ScalarType, int>> origin_lateral_dist_object_id;
     origin_lateral_dist_object_id.reserve(2 * MAX_LANE_SPATIAL_LABELS);
     int count_lane_objects = 0;
@@ -692,9 +693,9 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       LaneObject cur_object;
       AddInstanceIntoLaneObject(*it, &cur_object);
 
-      if (lane_objects->empty()) {
+      if ((*lane_objects)->empty()) {
         // create a new lane object
-        lane_objects->push_back(cur_object);
+        (*lane_objects)->push_back(cur_object);
         origin_lateral_dist_object_id.push_back(
             std::make_pair(cur_object.lateral_distance, count_lane_objects++));
         ADEBUG << "generate a new lane object from instance";
@@ -706,7 +707,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       vector<pair<ScalarType, ScalarType>> lateral_distances(
           count_lane_objects);
       size_t cross_over_lane_object_id = 0;
-      for (size_t k = 0; k < lane_objects->size(); ++k) {
+      for (size_t k = 0; k < (*lane_objects)->size(); ++k) {
         // min distance to instance group
         lateral_distances[k].first = std::numeric_limits<ScalarType>::max();
         // max distance to instance group
@@ -716,8 +717,8 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
         for (size_t i = 0; i < cur_object.pos.size(); ++i) {
           ScalarType deta_y =
               cur_object.pos[i].y() - PolyEval(cur_object.pos[i].x(),
-                                               lane_objects->at(k).order,
-                                               lane_objects->at(k).model);
+                                               (*lane_objects)->at(k).order,
+                                               (*lane_objects)->at(k).model);
           lateral_distances[k].first =
               std::min(lateral_distances[k].first, deta_y);
           lateral_distances[k].second =
@@ -786,7 +787,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       }
 
       // accept the new lane object
-      lane_objects->push_back(cur_object);
+      (*lane_objects)->push_back(cur_object);
       origin_lateral_dist_object_id.push_back(
           std::make_pair(cur_object.lateral_distance, count_lane_objects++));
       ADEBUG << "generate a new lane object from instance.";
@@ -806,7 +807,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     }
 
     vector<int> valid_lane_objects;
-    valid_lane_objects.reserve(lane_objects->size());
+    valid_lane_objects.reserve((*lane_objects)->size());
 
     // for left-side lanes
     for (int spatial_index = 0; spatial_index <= i_l0; ++spatial_index) {
@@ -815,14 +816,16 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       }
       int i_l = i_l0 - spatial_index;
       int object_id = origin_lateral_dist_object_id.at(i_l).second;
-      lane_objects->at(object_id).spatial =
+      (*lane_objects)->at(object_id).spatial =
           static_cast<SpatialLabelType>(spatial_index);
       valid_lane_objects.push_back(object_id);
 
-      AINFO << " lane object " << lane_objects->at(object_id).GetSpatialLabel()
-            << " has " << lane_objects->at(object_id).pos.size() << " points: "
+      AINFO << " lane object "
+            << (*lane_objects)->at(object_id).GetSpatialLabel()
+            << " has "
+            << (*lane_objects)->at(object_id).pos.size() << " points: "
             << "lateral distance="
-            << lane_objects->at(object_id).lateral_distance;
+            << (*lane_objects)->at(object_id).lateral_distance;
     }
 
     // for right-side lanes
@@ -833,16 +836,18 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
         break;
       }
       int object_id = origin_lateral_dist_object_id.at(i_r).second;
-      lane_objects->at(object_id).spatial = static_cast<SpatialLabelType>(
+      (*lane_objects)->at(object_id).spatial = static_cast<SpatialLabelType>(
           MAX_LANE_SPATIAL_LABELS + spatial_index);
       valid_lane_objects.push_back(object_id);
 
-      AINFO << " lane object " << lane_objects->at(object_id).GetSpatialLabel()
-            << " has " << lane_objects->at(object_id).pos.size() << " points: "
+      AINFO << " lane object "
+            << (*lane_objects)->at(object_id).GetSpatialLabel()
+            << " has " << (*lane_objects)->at(object_id).pos.size()
+            << " points: "
             << "lateral distance="
-            << lane_objects->at(object_id).lateral_distance;
+            << (*lane_objects)->at(object_id).lateral_distance;
     }
-    if (lane_objects->size() != static_cast<size_t>(count_lane_objects)) {
+    if ((*lane_objects)->size() != static_cast<size_t>(count_lane_objects)) {
       AERROR << "the number of lane objects does not match.";
       return false;
     }
@@ -850,19 +855,19 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     // keep only the lane objects with valid spatial labels
     std::sort(valid_lane_objects.begin(), valid_lane_objects.end());
     for (size_t i = 0; i < valid_lane_objects.size(); ++i) {
-      lane_objects->at(i) = lane_objects->at(valid_lane_objects[i]);
+      (*lane_objects)->at(i) = (*lane_objects)->at(valid_lane_objects[i]);
     }
-    lane_objects->resize(valid_lane_objects.size());
+    (*lane_objects)->resize(valid_lane_objects.size());
   }
 
-  AINFO << "number of lane objects = " << lane_objects->size();
+  AINFO << "number of lane objects = " << (*lane_objects)->size();
   if (options_.space_type != SpaceType::IMAGE) {
-    if (!CompensateLaneObjects(lane_objects)) {
+    if (!CompensateLaneObjects((*lane_objects))) {
       AERROR << "fail to compensate lane objects.";
       return false;
     }
   }
-  EnrichLaneInfo(lane_objects);
+  EnrichLaneInfo((*lane_objects));
 
   return true;
 }

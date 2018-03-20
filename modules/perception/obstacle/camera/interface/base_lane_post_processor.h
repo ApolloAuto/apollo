@@ -78,11 +78,11 @@ class BaseCameraLanePostProcessor {
   // @param [out]: lane objects
   virtual bool Process(const cv::Mat& lane_map,
                        const CameraLanePostProcessOptions& options,
-                       apollo::perception::LaneObjectsPtr lane_instances) = 0;
+                       LaneObjectsPtr lane_instances) = 0;
   */
   virtual bool Process(const cv::Mat& lane_map,
                        const CameraLanePostProcessOptions& options,
-                       apollo::perception::LaneObjectsPtr lane_instances) = 0;
+                       LaneObjectsPtr* lane_instances) = 0;
 
   virtual std::string name() const = 0;
 
