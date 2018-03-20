@@ -534,6 +534,7 @@ void GLFWFusionViewer::render() {
 
   frame_count_++;
 
+  AINFO << "GLFWFusionViewer::render()";
   // 1. Bottom left, draw 3d detection and classification results (lidar tracked
   // objects), and lanes in ego-car ground space
   glViewport(0, 0, image_width_, image_height_);
