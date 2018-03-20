@@ -17,9 +17,9 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H_
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H_
 
-#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "gflags/gflags.h"
 #include "opencv2/opencv.hpp"
@@ -37,7 +37,7 @@ enum CameraId {
   CAMERA_ID_COUNT = 2
 };
 
-const std::map<int, std::string> kCameraIdToStr = {
+const std::unordered_map<int, std::string> kCameraIdToStr = {
     {static_cast<int>(LONG_FOCUS), "long_focus_camera_25mm"},
     {static_cast<int>(SHORT_FOCUS), "short_focus_camera_6mm"}};
 

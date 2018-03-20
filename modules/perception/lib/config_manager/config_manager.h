@@ -117,11 +117,11 @@
 #ifndef MODULES_PERCEPTION_LIB_CONFIG_MANAGER_H_
 #define MODULES_PERCEPTION_LIB_CONFIG_MANAGER_H_
 
-#include <map>
 #include <mutex>
 #include <sstream>
 #include <string>
 #include <typeinfo>
+#include <unordered_map>
 #include <vector>
 
 #include "google/protobuf/message.h"
@@ -154,7 +154,7 @@ class ConfigManager {
 
   bool InitInternal();
 
-  typedef std::map<std::string, ModelConfig*> ModelConfigMap;
+  typedef std::unordered_map<std::string, ModelConfig*> ModelConfigMap;
   typedef ModelConfigMap::iterator ModelConfigMapIterator;
   typedef ModelConfigMap::const_iterator ModelConfigMapConstIterator;
 
@@ -225,7 +225,7 @@ class ModelConfig {
  private:
   template <typename T>
   bool GetValueFromMap(const std::string& name,
-                       const std::map<std::string, T>& container,
+                       const std::unordered_map<std::string, T>& container,
                        T* value) const;
 
   template <typename T>
@@ -236,16 +236,20 @@ class ModelConfig {
   std::string name_;
   std::string version_;
 
-  typedef std::map<std::string, int> IntegerParamMap;
-  typedef std::map<std::string, std::string> StringParamMap;
-  typedef std::map<std::string, double> DoubleParamMap;
-  typedef std::map<std::string, float> FloatParamMap;
-  typedef std::map<std::string, bool> BoolParamMap;
-  typedef std::map<std::string, std::vector<int>> ArrayIntegerParamMap;
-  typedef std::map<std::string, std::vector<std::string>> ArrayStringParamMap;
-  typedef std::map<std::string, std::vector<double>> ArrayDoubleParamMap;
-  typedef std::map<std::string, std::vector<float>> ArrayFloatParamMap;
-  typedef std::map<std::string, std::vector<bool>> ArrayBoolParamMap;
+  typedef std::unordered_map<std::string, int> IntegerParamMap;
+  typedef std::unordered_map<std::string, std::string> StringParamMap;
+  typedef std::unordered_map<std::string, double> DoubleParamMap;
+  typedef std::unordered_map<std::string, float> FloatParamMap;
+  typedef std::unordered_map<std::string, bool> BoolParamMap;
+  typedef std::unordered_map<std::string, std::vector<int>>
+      ArrayIntegerParamMap;
+  typedef std::unordered_map<std::string, std::vector<std::string>>
+      ArrayStringParamMap;
+  typedef std::unordered_map<std::string, std::vector<double>>
+      ArrayDoubleParamMap;
+  typedef std::unordered_map<std::string, std::vector<float>>
+      ArrayFloatParamMap;
+  typedef std::unordered_map<std::string, std::vector<bool>> ArrayBoolParamMap;
 
   IntegerParamMap integer_param_map_;
   StringParamMap string_param_map_;
@@ -262,10 +266,10 @@ class ModelConfig {
 };
 
 template <typename T>
-bool ModelConfig::GetValueFromMap(const std::string& name,
-                                  const std::map<std::string, T>& container,
-                                  T* value) const {
-  typename std::map<std::string, T>::const_iterator citer =
+bool ModelConfig::GetValueFromMap(
+    const std::string& name,
+    const std::unordered_map<std::string, T>& container, T* value) const {
+  typename std::unordered_map<std::string, T>::const_iterator citer =
       container.find(name);
 
   if (citer == container.end()) {
