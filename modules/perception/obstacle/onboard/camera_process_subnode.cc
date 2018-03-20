@@ -96,7 +96,12 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   AINFO << std::fixed << std::setprecision(20) << timestamp;
 
   cv::Mat img;
-  MessageToMat(msg, &img);
+  if (!FLAGS_image_file_debug) {
+    MessageToMat(msg, &img);
+  } else {
+    img = cv::imread(FLAGS_image_file_path, CV_LOAD_IMAGE_COLOR);
+  }
+
   std::vector<VisualObjectPtr> objects;
   cv::Mat mask = cv::Mat::zeros(img.rows, img.cols, CV_32FC1);
 
@@ -125,9 +130,12 @@ bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
     traffic_light::Yuyv2rgb(yuv, cv_img.data, msg.height * msg.width);
     cv::cvtColor(cv_img, cv_img, CV_RGB2BGR);
   } else {
-    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
+    // cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
+    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg,
+      sensor_msgs::image_encodings::BGR8);
     cv_img = cv_ptr->image;
   }
+  AINFO << "cv_img: " << cv_img.rows << " " << cv_img.cols;
 
   img->create(cv_img.rows, cv_img.cols, CV_8UC3);
   undistortion_handler_->handle(cv_img.data, img->data);
