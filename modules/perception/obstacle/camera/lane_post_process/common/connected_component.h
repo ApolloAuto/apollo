@@ -20,9 +20,6 @@
 #include <Eigen/Core>
 #include <opencv2/core/core.hpp>
 
-// #include <cuda.h>
-// #include <cuda_runtime.h>
-
 #include <memory>
 #include <string>
 #include <unordered_set>

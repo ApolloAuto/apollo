@@ -122,9 +122,7 @@ class SimulationWorldService {
    * @return True if the object is ready to push.
    */
   bool ReadyToPush() const {
-    return world_.has_auto_driving_car() &&
-           world_.auto_driving_car().has_position_x() &&
-           world_.auto_driving_car().has_position_y();
+    return ready_to_push_.load();
   }
 
   /**
@@ -236,6 +234,9 @@ class SimulationWorldService {
 
   // Relative map used/retrieved in navigation mode
   apollo::hdmap::Map relative_map_;
+
+  // Whether the sim_world is ready to push to frontend
+  std::atomic<bool> ready_to_push_;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);

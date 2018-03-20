@@ -36,4 +36,24 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "cc_lane_post_processor_test",
+    size = "small",
+    srcs = [
+        "cc_lane_post_processor_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+        "//modules/perception:perception_model",
+        "//modules/perception/conf:perception_config",
+    ],
+    deps = [
+        ":cc_lane_post_processor",
+        "//modules/common/util",
+        "@opencv2//:core",
+        "@opencv2//:highgui",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
