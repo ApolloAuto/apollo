@@ -1534,7 +1534,7 @@ void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
 
 void GLFWFusionViewer::draw_car_trajectory(FrameContent* content) {
     const MotionBuffer& motion_buffer = content->get_motion_buffer();
-    Eigen::Vector3d center_d = pers_camera_->scene_center();
+    // Eigen::Vector3d center_d = pers_camera_->scene_center();
     Eigen::Vector3f center;
 //    center << center_d(0,0),
 //              center_d(1,0),
@@ -1584,7 +1584,7 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
     const MotionBuffer &motion_buffer = content->get_motion_buffer();
     int motion_size = motion_buffer.size();
     if (motion_size > 0) {
-        auto &motion_mat = motion_buffer[motion_buffer.size() - 1].motion;
+        // auto &motion_mat = motion_buffer[motion_buffer.size() - 1].motion;
 //        Eigen::Matrix3f tmp = motion_mat;
 //        Eigen::Matrix2f rotat2d = tmp.block(0, 0, 2, 2);
 //        Eigen::Vector2f trans   = tmp.block(0, 2, 2, 1);
@@ -1620,7 +1620,7 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
                 glLineWidth(1);
                 glBegin(GL_LINE_STRIP);
 ////                logging
-                int cur_id = trackjectory.first;
+                // int cur_id = trackjectory.first;
 //                auto &timestamps = object_timestamps[cur_id];
 //                std::cout<< "track: " << cur_id << " with size " <<
 //                  trackjectory.second.size() <<": ";
@@ -1645,7 +1645,7 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
 //                    std::cout<<std::to_string(timestamps[it]) <<" ";
 //                }
 //                std::cout<<std::endl;
-                for (int it = trackjectory.second.size() - 1, count = 0;
+                for (std::size_t it = trackjectory.second.size() - 1, count = 0;
                       it > 0; it--, count++) {
                     if (count >= 10 || count > motion_buffer.size()) {
                         continue;
@@ -1655,7 +1655,7 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
                     pt <<   trackjectory.second[it].first,
                             trackjectory.second[it].second,
                             1.0;
-                    if (it == trackjectory.second.size()-1) {
+                    if (it == trackjectory.second.size() - 1) {
                         proj_pt = pt;
                     } else {
                         auto &motion_mat =
