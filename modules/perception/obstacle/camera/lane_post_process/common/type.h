@@ -276,8 +276,6 @@ struct LaneObject {
         return "unknown spatial label";
     }
   }
-
-  void CopyTo(LaneObject *new_lane_object) const { *new_lane_object = *this; }
 };
 
 // struct for L3 Lane information
