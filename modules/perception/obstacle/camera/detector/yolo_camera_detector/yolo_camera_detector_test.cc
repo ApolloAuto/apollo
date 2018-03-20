@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 
 #include <string>
@@ -129,7 +130,6 @@ TEST_F(YoloCameraDetectorTest, multi_task_test) {
 
   const std::string lane_map_result_file = FLAGS_test_dir + "lane_map.jpg";
   lane_map.convertTo(lane_map, CV_8UC3, 255.0f);
-  cv::imwrite("result.jpg", lane_map);
   cv::imwrite(lane_map_result_file, lane_map);
 }
 

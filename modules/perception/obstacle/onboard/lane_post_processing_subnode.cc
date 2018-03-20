@@ -146,7 +146,7 @@ Status LanePostProcessingSubnode::ProcEvents() {
   CameraLanePostProcessOptions options;
   options.timestamp = event.timestamp;
 
-  lane_post_processor_->Process(lane_map, options, lane_instances);
+  lane_post_processor_->Process(lane_map, options, &lane_instances);
   for (size_t i = 0; i < lane_instances->size(); ++i) {
     (*lane_instances)[i].timestamp = event.timestamp;
     (*lane_instances)[i].seq_num = seq_num_;

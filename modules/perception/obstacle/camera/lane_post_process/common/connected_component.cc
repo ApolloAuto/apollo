@@ -20,7 +20,6 @@
 #include <utility>
 
 #include "modules/perception/obstacle/camera/lane_post_process/common/connected_component.h"
-// #include "util.cu"
 
 namespace apollo {
 namespace perception {
