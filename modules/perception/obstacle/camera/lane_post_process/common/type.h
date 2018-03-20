@@ -24,6 +24,8 @@
 #include "Eigen/Core"
 #include "opencv2/opencv.hpp"
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "modules/common/log.h"
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_TYPE_H_
@@ -253,41 +255,46 @@ struct L3LaneInfo {
 };
 
 struct LaneObject {
-  size_t point_num;
-  std::vector<Vector2D> pos;
-  std::vector<Vector2D> orie;
-  std::vector<Vector2D> image_pos;
-  std::vector<ScalarType> confidence;
-  SpatialLabelType spatial;
-  SemanticLabelType semantic;
-  bool is_compensated;
-
-  ScalarType longitude_start;
-  ScalarType longitude_end;
-  int order;
-  PolyModel model;
-  ScalarType lateral_distance;
-
-  L3CubicCurve pos_curve;
-  L3CubicCurve img_curve;
-  L3LaneInfo lane_info;
-  double timestamp;
-  int seq_num;
-
-  LaneObject()
-      : point_num(0),
-        spatial(SpatialLabelType::L_0),
-        semantic(SemanticLabelType::UNKNOWN),
-        is_compensated(false),
-        longitude_start(std::numeric_limits<ScalarType>::max()),
-        longitude_end(-std::numeric_limits<ScalarType>::max()),
-        order(0),
-        lateral_distance(0.0) {
+  LaneObject() {
     model.setZero();
     pos.reserve(100);
     orie.reserve(100);
     image_pos.reserve(100);
     confidence.reserve(100);
+  }
+
+  size_t point_num = 0;
+  std::vector<Vector2D> pos;
+  std::vector<Vector2D> orie;
+  std::vector<Vector2D> image_pos;
+  std::vector<ScalarType> confidence;
+  SpatialLabelType spatial = SpatialLabelType::L_0;
+  SemanticLabelType semantic = SemanticLabelType::UNKNOWN;
+  bool is_compensated = false;
+
+  ScalarType longitude_start = std::numeric_limits<ScalarType>::max();
+  ScalarType longitude_end = -std::numeric_limits<ScalarType>::max();
+  int order = 0;
+  PolyModel model;
+  ScalarType lateral_distance = 0.0;
+
+  L3CubicCurve pos_curve;
+  L3CubicCurve img_curve;
+  L3LaneInfo lane_info;
+  double timestamp = 0.0;
+  int seq_num = 0;
+
+  LaneMarker ToLaneMarkerProto() {
+    LaneMarker lane_marker;
+    // TODO(All): calculate confidence for all points
+    lane_marker.set_quality(confidence.front());
+    lane_marker.set_model_degree(MAX_POLY_ORDER);
+    lane_marker.set_c0_position(model(0, 0));
+    lane_marker.set_c1_heading_angle(model(1, 0));
+    lane_marker.set_c2_curvature(model(2, 0));
+    lane_marker.set_c3_curvature_derivative(model(3, 0));
+    lane_marker.set_view_range(longitude_end - longitude_start);
+    return std::move(lane_marker);
   }
 
   std::string GetSpatialLabel() const {
@@ -309,54 +316,6 @@ struct LaneObject {
         return "unknown spatial label";
     }
   }
-
-  /*
-  void copy_to(LaneObject& new_lane_object) {
-    new_lane_object.point_num = point_num;
-    new_lane_object.spatial = spatial;
-    new_lane_object.semantic = semantic;
-    new_lane_object.is_compensated = is_compensated;
-
-    for (size_t i = 0; i < new_lane_object.point_num; ++i) {
-      new_lane_object.pos.push_back(pos[i]);
-      new_lane_object.orie.push_back(orie[i]);
-      new_lane_object.image_pos.push_back(image_pos[i]);
-      new_lane_object.confidence.push_back(confidence[i]);
-    }
-
-    new_lane_object.longitude_start = longitude_start;
-    new_lane_object.longitude_end = longitude_end;
-    new_lane_object.order = order;
-    for (int i = 0; i <= MAX_POLY_ORDER; ++i) {
-      new_lane_object.model(i) = model(i);
-    }
-    new_lane_object.lateral_distance = lateral_distance;
-
-    new_lane_object.pos_curve.a = pos_curve.a;
-    new_lane_object.pos_curve.b = pos_curve.b;
-    new_lane_object.pos_curve.c = pos_curve.c;
-    new_lane_object.pos_curve.d = pos_curve.d;
-    new_lane_object.pos_curve.x_start = pos_curve.x_start;
-    new_lane_object.pos_curve.x_end = pos_curve.x_end;
-
-    new_lane_object.img_curve.a = img_curve.a;
-    new_lane_object.img_curve.b = img_curve.b;
-    new_lane_object.img_curve.c = img_curve.c;
-    new_lane_object.img_curve.d = img_curve.d;
-    new_lane_object.img_curve.x_start = img_curve.x_start;
-    new_lane_object.img_curve.x_end = img_curve.x_end;
-
-    new_lane_object.lane_info.lane_id = lane_info.lane_id;
-    new_lane_object.lane_info.left_idx = lane_info.left_idx;
-    new_lane_object.lane_info.right_idx = lane_info.right_idx;
-    new_lane_object.lane_info.lane_width = lane_info.lane_width;
-    new_lane_object.lane_info.carleft_idx = lane_info.carleft_idx;
-    new_lane_object.lane_info.carright_idx = lane_info.carright_idx;
-
-    new_lane_object.timestamp = timestamp;
-    new_lane_object.seq_num = seq_num;
-  }
-  */
 
   void CopyTo(LaneObject *new_lane_object) {
     new_lane_object->point_num = point_num;
