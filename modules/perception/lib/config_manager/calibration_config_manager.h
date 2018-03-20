@@ -52,7 +52,7 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
-#include "include/undistortion.h"
+#include "modules/perception/cuda_util/undistortion.h"
 #include "modules/common/macro.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/mutex.h"

@@ -18,7 +18,7 @@ cc_library(
         "@eigen",
         "@opencv2//:core",
         "@opencv2//:imgproc",
-        "@perception_cuda",
+        "//modules/perception/cuda_util",
     ],
 )
 

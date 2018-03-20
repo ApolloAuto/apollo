@@ -19,9 +19,9 @@ cc_library(
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager/proto:config_proto",
         "//modules/perception/obstacle/camera/common",
+        "//modules/perception/cuda_util",
         "@cuda",
         "@opencv2//:imgproc",
-        "@perception_cuda",
         "@yaml_cpp//:yaml",
     ],
 )
