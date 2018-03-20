@@ -36,6 +36,8 @@ message DestinationConfig {
 }
 
 message KeepClearConfig {
+  // min s_distance to be considered have passed keep_clear (stop_line_end_s)
+  optional double min_pass_s_distance = 1 [ default=2.0 ]; // meter
 }
 
 message ReferenceLineEndConfig {
