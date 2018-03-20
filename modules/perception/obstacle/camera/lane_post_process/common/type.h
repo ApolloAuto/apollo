@@ -34,14 +34,6 @@
 namespace apollo {
 namespace perception {
 
-// #ifndef DEBUG
-// #define DEBUG true
-// #endif
-
-#ifndef M_PI
-#define M_PI REAL(3.1415926535897932384626433832795029)
-#endif
-
 #ifndef UF_BLOCK_WIDTH
 #define UF_BLOCK_WIDTH 32
 #endif
@@ -68,7 +60,7 @@ namespace perception {
 
 typedef float ScalarType;
 
-const ScalarType kEpsilon = 1e-5;
+constexpr ScalarType kEpsilon = 1e-5;
 
 // define colors for visualization (Blue, Green, Red)
 const cv::Scalar kBlack(0, 0, 0);
@@ -84,7 +76,7 @@ const cv::Scalar kPurple(255, 48, 155);
 const cv::Scalar kGreenYellow(47, 255, 173);
 
 // delay time for visualization
-const int kDelayTime(0);
+constexpr int kDelayTime = 0;
 
 enum MarkerShapeType {
   POINT = 0,
@@ -103,75 +95,43 @@ enum AssociationMethod {
 };
 
 struct AssociationParam {
-  AssociationMethod method;
-  ScalarType min_distance;
-  ScalarType max_distance;
-  ScalarType distance_weight;
-  ScalarType max_deviation_angle;
-  ScalarType deviation_angle_weight;
-  ScalarType max_relative_orie;
-  ScalarType relative_orie_weight;
-  ScalarType max_departure_distance;
-  ScalarType departure_distance_weight;
-  ScalarType min_orientation_estimation_size;
-
-  AssociationParam()
-      : method(AssociationMethod::GREEDY_GROUP_CONNECT),
-        min_distance(0.0),
-        max_distance(100.0),
-        distance_weight(0.4),
-        max_deviation_angle(static_cast<ScalarType>(M_PI / 6.0)),
-        deviation_angle_weight(0.4),
-        max_relative_orie(static_cast<ScalarType>(M_PI / 6.0)),
-        relative_orie_weight(0.2),
-        max_departure_distance(50.0),
-        departure_distance_weight(0.4),
-        min_orientation_estimation_size(5.0) {}
+  AssociationMethod method = AssociationMethod::GREEDY_GROUP_CONNECT;
+  ScalarType min_distance = 0.0;
+  ScalarType max_distance = 100.0;
+  ScalarType distance_weight = 0.4;
+  ScalarType max_deviation_angle = static_cast<ScalarType>(M_PI / 6.0);
+  ScalarType deviation_angle_weight = 0.4;
+  ScalarType max_relative_orie = static_cast<ScalarType>(M_PI / 6.0);
+  ScalarType relative_orie_weight = 0.2;
+  ScalarType max_departure_distance = 50.0;
+  ScalarType departure_distance_weight = 0.4;
+  ScalarType min_orientation_estimation_size = 5.0;
 };
 
 struct Marker {
-  MarkerShapeType shape_type;
-  int marker_type;
-  SpaceType space_type;
-  Vector2D pos;
-  Vector2D image_pos;
-  Vector2D start_pos;
-  Vector2D image_start_pos;
-  Vector2D orie;
-  ScalarType angle;
-  int original_id;
-  int cc_id;
-  int inner_edge_id;
-  int cc_edge_ascend_id;
-  int cc_edge_descend_id;
-  int cc_next_marker_id;
-  int lane_id;
-  ScalarType confidence;
+  MarkerShapeType shape_type = MarkerShapeType::LINE_SEGMENT;
+  int marker_type = 0;
+  SpaceType space_type = SpaceType::IMAGE;
+  Vector2D pos{0.0, 0.0};
+  Vector2D image_pos{0.0, 0.0};
+  Vector2D start_pos{0.0, 0.0};
+  Vector2D image_start_pos{0.0, 0.0};
+  Vector2D orie{0.0, -1.0};
+  ScalarType angle = static_cast<ScalarType>(-M_PI / 2.0);
+  int original_id = -1;
+  int cc_id = -1;
+  int inner_edge_id = -1;
+  int cc_edge_ascend_id = -1;
+  int cc_edge_descend_id = -1;
+  int cc_next_marker_id = -1;
+  int lane_id = -1;
+  ScalarType confidence = 0.0;
 
   cv::Point vis_pos;
   cv::Point vis_start_pos;
 
-  Marker()
-      : shape_type(MarkerShapeType::LINE_SEGMENT),
-        marker_type(0),
-        space_type(SpaceType::IMAGE),
-        pos(0.0, 0.0),
-        image_pos(0.0, 0.0),
-        start_pos(0.0, 0.0),
-        image_start_pos(0.0, 0.0),
-        orie(0.0, -1.0),
-        angle(static_cast<ScalarType>(-M_PI / 2.0)),
-        original_id(-1),
-        cc_id(-1),
-        inner_edge_id(-1),
-        cc_edge_ascend_id(-1),
-        cc_edge_descend_id(-1),
-        cc_next_marker_id(-1),
-        lane_id(-1),
-        confidence(0.0) {}
-
   static bool comp(const Marker &a, const Marker &b) {
-    assert(a.space_type == b.space_type);
+    CHECK_EQ(a.space_type, b.space_type);
     return (a.space_type == SpaceType::IMAGE) ? a.pos(1) > b.pos(1)
                                               : a.pos(1) < b.pos(1);
   }
@@ -282,7 +242,7 @@ struct LaneObject {
   L3CubicCurve img_curve;
   L3LaneInfo lane_info;
   double timestamp = 0.0;
-  int seq_num = 0;
+  int32_t seq_num = 0;
 
   LaneMarker ToLaneMarkerProto() {
     LaneMarker lane_marker;
@@ -317,51 +277,7 @@ struct LaneObject {
     }
   }
 
-  void CopyTo(LaneObject *new_lane_object) {
-    new_lane_object->point_num = point_num;
-    new_lane_object->spatial = spatial;
-    new_lane_object->semantic = semantic;
-    new_lane_object->is_compensated = is_compensated;
-
-    for (size_t i = 0; i < new_lane_object->point_num; ++i) {
-      new_lane_object->pos.push_back(pos[i]);
-      new_lane_object->orie.push_back(orie[i]);
-      new_lane_object->image_pos.push_back(image_pos[i]);
-      new_lane_object->confidence.push_back(confidence[i]);
-    }
-
-    new_lane_object->longitude_start = longitude_start;
-    new_lane_object->longitude_end = longitude_end;
-    new_lane_object->order = order;
-    for (int i = 0; i <= MAX_POLY_ORDER; ++i) {
-      new_lane_object->model(i) = model(i);
-    }
-    new_lane_object->lateral_distance = lateral_distance;
-
-    new_lane_object->pos_curve.a = pos_curve.a;
-    new_lane_object->pos_curve.b = pos_curve.b;
-    new_lane_object->pos_curve.c = pos_curve.c;
-    new_lane_object->pos_curve.d = pos_curve.d;
-    new_lane_object->pos_curve.x_start = pos_curve.x_start;
-    new_lane_object->pos_curve.x_end = pos_curve.x_end;
-
-    new_lane_object->img_curve.a = img_curve.a;
-    new_lane_object->img_curve.b = img_curve.b;
-    new_lane_object->img_curve.c = img_curve.c;
-    new_lane_object->img_curve.d = img_curve.d;
-    new_lane_object->img_curve.x_start = img_curve.x_start;
-    new_lane_object->img_curve.x_end = img_curve.x_end;
-
-    new_lane_object->lane_info.lane_id = lane_info.lane_id;
-    new_lane_object->lane_info.left_idx = lane_info.left_idx;
-    new_lane_object->lane_info.right_idx = lane_info.right_idx;
-    new_lane_object->lane_info.lane_width = lane_info.lane_width;
-    new_lane_object->lane_info.carleft_idx = lane_info.carleft_idx;
-    new_lane_object->lane_info.carright_idx = lane_info.carright_idx;
-
-    new_lane_object->timestamp = timestamp;
-    new_lane_object->seq_num = seq_num;
-  }
+  void CopyTo(LaneObject *new_lane_object) const { *new_lane_object = *this; }
 };
 
 // struct for L3 Lane information
@@ -371,19 +287,13 @@ struct L3LaneLine {
   L3CubicCurve pos_curve;
   L3CubicCurve img_curve;
 };
+
 struct RoadInfo {
-  double timestamp;
-  double seq_num;
+  double timestamp = 0.0;
+  int32_t seq_num = 0;
   std::vector<L3LaneLine> lane_line_vec;
   std::vector<L3LaneInfo> lane_vec;
 };
-
-/*
-struct LaneDebugContent {
-    std::vector<LaneObject> lane_objects;
-    std::vector<LaneInstance> cur_lane_instances;
-};
-*/
 
 typedef std::vector<LaneObject> LaneObjects;
 typedef std::shared_ptr<LaneObjects> LaneObjectsPtr;
