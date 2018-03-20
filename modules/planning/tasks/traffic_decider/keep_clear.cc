@@ -43,8 +43,8 @@ bool KeepClear::ApplyRule(Frame* const frame,
   const std::vector<PathOverlap>& keep_clear_overlaps =
       reference_line_info->reference_line().map_path().clear_area_overlaps();
   for (const auto& keep_clear_overlap : keep_clear_overlaps) {
-    const auto obstacle_id = FLAGS_keep_clear_virtual_obstacle_id_prefix +
-                             keep_clear_overlap.object_id;
+    const auto obstacle_id =
+        KEEP_CLEAR_VO_ID_PREFIX + keep_clear_overlap.object_id;
     if (BuildKeepClearObstacle(frame, reference_line_info,
                                const_cast<PathOverlap*>(&keep_clear_overlap),
                                obstacle_id)) {
@@ -60,8 +60,7 @@ bool KeepClear::ApplyRule(Frame* const frame,
       reference_line_info->reference_line().map_path().junction_overlaps();
   for (const auto& junction_overlap : junction_overlaps) {
     const auto obstacle_id =
-        FLAGS_keep_clear_junction_virtual_obstacle_id_prefix +
-        junction_overlap.object_id;
+        KEEP_CLEAR_JUNCTION_VO_ID_PREFIX + junction_overlap.object_id;
     if (BuildKeepClearObstacle(frame, reference_line_info,
                                const_cast<PathOverlap*>(&junction_overlap),
                                obstacle_id)) {
