@@ -101,7 +101,7 @@ SignalLightScenario::FindValidSignalLightFromMap(
 
   std::vector<const hdmap::PathOverlap*> signal_lights_along_reference_line;
   for (const auto& signal_light : signal_lights) {
-    if (signal_light.start_s + FLAGS_max_stop_distance_buffer >
+    if (signal_light.start_s + FLAGS_signal_light_min_pass_s_distance >
         reference_line_info->AdcSlBoundary().end_s()) {
       signal_lights_along_reference_line.push_back(&signal_light);
     }

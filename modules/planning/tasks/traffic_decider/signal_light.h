@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "modules/perception/proto/traffic_light_detection.pb.h"
-
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
 namespace apollo {
