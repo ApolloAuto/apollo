@@ -25,7 +25,7 @@
 #include "modules/perception/obstacle/camera/motion/plane_motion.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
-
+#include "modules/perception/obstacle/onboard/camera_shared_data.h"
 namespace apollo {
 namespace perception {
 
@@ -55,11 +55,13 @@ class MotionService : public Subnode {
   PlaneMotion *vehicle_planemotion_ = nullptr;
   double pre_azimuth = 0;  // a invalid value
   double pre_timestamp = 0;
+  // double pre_camera_timestamp = 0;
   bool start_flag_ = false;
   const int motion_buffer_size_ = 6000;
   const int motion_sensor_frequency_ = 100;
   Mutex mutex_;
   std::list<VehicleInformation> vehicle_information_buffer_;
+  CameraSharedData* camera_shared_data_ = nullptr;
   // MotionBufferPtr motion_buffer_;
   DISALLOW_COPY_AND_ASSIGN(MotionService);
 };
