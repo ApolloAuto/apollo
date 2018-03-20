@@ -98,8 +98,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   cv::Mat img;
   if (!FLAGS_image_file_debug) {
     MessageToMat(msg, &img);
-  }
-  else {
+  } else {
     img = cv::imread(FLAGS_image_file_path, CV_LOAD_IMAGE_COLOR);
   }
 
@@ -132,7 +131,8 @@ bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
     cv::cvtColor(cv_img, cv_img, CV_RGB2BGR);
   } else {
     // cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
-    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg,
+      sensor_msgs::image_encodings::BGR8);
     cv_img = cv_ptr->image;
   }
   AINFO << "cv_img: " << cv_img.rows << " " << cv_img.cols;

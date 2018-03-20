@@ -73,9 +73,8 @@ DEFINE_string(short_camera_extrinsic_file,
               "short_camera extrinsic file");
 
 /// obstacle/onboard/camera_process_subnode.cc
-DEFINE_string(image_file_path,
-              "/apollo/modules/perception/data/yolo_camera_detector_test/test.jpg",
-              "Debug image file");
+// Ex: /apollo/modules/perception/data/yolo_camera_detector_test/test.jpg
+DEFINE_string(image_file_path, "", "Debug image file");
 DEFINE_bool(image_file_debug, false, "Debug ROS to CV image");
 
 DEFINE_string(front_camera_extrinsics_file,
