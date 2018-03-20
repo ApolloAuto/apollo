@@ -66,7 +66,8 @@ class HMIWorker {
 
   // Get current config and status.
   inline const HMIConfig& GetConfig() const { return config_; }
-  inline const HMIStatus& GetStatus() const { return status_; }
+  // HMIStatus is updated frequently, so we return a copy instead of reference.
+  inline const HMIStatus GetStatus() const { return status_; }
 
  private:
   HMIConfig config_;
