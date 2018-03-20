@@ -180,7 +180,7 @@ bool LanePostProcessingSubnode::GetSharedData(const Event &event,
 }
 
 void LanePostProcessingSubnode::PublishDataAndEvent(
-    double timestamp, const SharedDataPtr<LaneObjects> &lane_objects) {
+    const double timestamp, const SharedDataPtr<LaneObjects> &lane_objects) {
   string key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key)) {
     AERROR << "failed to produce shared key. time: "
