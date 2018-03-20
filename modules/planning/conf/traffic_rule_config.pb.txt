@@ -44,6 +44,9 @@ config: {
 config: {
     rule_id: KEEP_CLEAR
     enabled: false
+    keep_clear {
+      min_pass_s_distance: 2.0
+    }
 }
 
 config: {

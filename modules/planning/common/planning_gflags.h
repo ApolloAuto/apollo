@@ -146,7 +146,6 @@ DECLARE_double(signal_expire_time_sec);
 DECLARE_double(max_valid_stop_distance);
 DECLARE_double(creep_stop_distance);
 /// keep_clear
-DECLARE_double(keep_clear_min_pass_distance);
 /// traffic light
 DECLARE_double(max_stop_deacceleration_for_yellow_light);
 DECLARE_double(traffic_light_stop_distance);
