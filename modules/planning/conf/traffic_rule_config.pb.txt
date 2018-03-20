@@ -38,6 +38,9 @@ config: {
 config: {
   rule_id: DESTINATION
   enabled: true
+  destination {
+    stop_distance: 0.5
+  }
 }
 
 config: {
@@ -61,6 +64,9 @@ config: {
 config: {
   rule_id: SIDE_PASS_VEHICLE
   enabled: true
+  side_pass_vehicle {
+    wait_time: 30.0
+  }
 }
 
 config: {
