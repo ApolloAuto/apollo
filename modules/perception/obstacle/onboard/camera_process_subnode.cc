@@ -136,9 +136,11 @@ bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
     cv_img = cv_ptr->image;
   }
   AINFO << "cv_img: " << cv_img.rows << " " << cv_img.cols;
+  *img = cv_img.clone();
 
-  img->create(cv_img.rows, cv_img.cols, CV_8UC3);
-  undistortion_handler_->handle(cv_img.data, img->data);
+  // TODO(later): This undistortion is buggy, maybe due to resolution
+  // img->create(cv_img.rows, cv_img.cols, CV_8UC3);
+  // undistortion_handler_->handle(cv_img.data, img->data);
 
   return true;
 }
