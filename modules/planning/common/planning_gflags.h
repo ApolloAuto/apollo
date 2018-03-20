@@ -144,19 +144,12 @@ DECLARE_double(max_stop_speed);
 DECLARE_double(max_stop_deceleration);
 DECLARE_double(signal_expire_time_sec);
 DECLARE_double(max_valid_stop_distance);
-DECLARE_double(creep_stop_distance);
 /// keep_clear
 /// traffic light
 DECLARE_double(max_stop_deacceleration_for_yellow_light);
 DECLARE_double(traffic_light_stop_distance);
 /// crosswalk
 /// stop_sign
-DECLARE_bool(enable_stop_sign_creeping);
-DECLARE_double(stop_sign_stop_duration);
-DECLARE_double(stop_sign_min_pass_distance);
-DECLARE_double(stop_sign_stop_distance);
-DECLARE_double(stop_sign_watch_vehicle_max_stop_speed);
-DECLARE_double(stop_sign_watch_vehicle_max_stop_distance);
 DECLARE_double(sidepass_wait_time_sec);
 
 /// destination
