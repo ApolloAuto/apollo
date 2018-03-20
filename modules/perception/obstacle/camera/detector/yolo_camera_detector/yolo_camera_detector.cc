@@ -134,7 +134,7 @@ void YoloCameraDetector::load_intrinsic(
   // inference input shape
   if (options.intrinsic == nullptr) {
     AWARN << "YoloCameraDetector options.intrinsic is nullptr. Use default";
-    image_height_ = 1208;
+    image_height_ = 1080;
     image_width_ = 1920;
   } else {
     image_height_ = options.intrinsic->get_height();
