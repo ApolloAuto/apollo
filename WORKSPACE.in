@@ -189,10 +189,3 @@ http_archive(
     strip_prefix = "protobuf-3.3.0",
     url = "https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.tar.gz",
 )
-
-# perception cuda util
-new_local_repository(
-    name = "perception_cuda",
-    build_file = "third_party/perception_cuda.BUILD",
-    path = "/home/tmp/perception_cuda",
-)

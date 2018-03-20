@@ -22,7 +22,7 @@
 
 #include "caffe/caffe.hpp"
 
-#include "include/util.h"
+#include "modules/perception/cuda_util/util.h"
 
 namespace apollo {
 namespace perception {
