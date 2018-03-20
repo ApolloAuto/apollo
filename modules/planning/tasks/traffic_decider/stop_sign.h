@@ -66,6 +66,7 @@ class StopSign : public TrafficRule {
                          const double stop_buffer);
 
  private:
+  static constexpr char const* const STOP_SIGN_VO_ID_PREFIX = "SS_";
   hdmap::PathOverlap* next_stop_sign_overlap_ = nullptr;
   hdmap::StopSignInfo* next_stop_sign_ = nullptr;
   StopSignStatus::Status stop_status_;

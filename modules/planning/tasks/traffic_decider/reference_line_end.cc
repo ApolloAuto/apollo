@@ -58,8 +58,7 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
 
   // create avirtual stop wall at the end of reference line to stop the adc
   std::string virtual_obstacle_id =
-      FLAGS_reference_line_end_obstacle_id_prefix +
-      reference_line_info->Lanes().Id();
+      REF_LINE_END_VO_ID_PREFIX + reference_line_info->Lanes().Id();
   double obstacle_start_s =
       reference_line.Length() - FLAGS_virtual_stop_wall_length;
   auto* obstacle = frame->CreateVirtualStopObstacle(
