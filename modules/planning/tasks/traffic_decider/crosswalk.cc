@@ -221,8 +221,7 @@ bool Crosswalk::BuildStopDecision(Frame* const frame,
 
   // create virtual stop wall
   std::string virtual_obstacle_id =
-      FLAGS_crosswalk_virtual_obstacle_id_prefix +
-      crosswalk_overlap->object_id;
+      CROSSWALK_VO_ID_PREFIX + crosswalk_overlap->object_id;
   auto* obstacle = frame->CreateVirtualStopObstacle(
       reference_line_info, virtual_obstacle_id, crosswalk_overlap->start_s);
   if (!obstacle) {
