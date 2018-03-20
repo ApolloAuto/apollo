@@ -37,6 +37,7 @@ class PlaneMotion {
   explicit PlaneMotion(int s, bool sync_time_stamp, float time_unit);
 
   ~PlaneMotion(void);
+  enum { ACCUM_MOTION = 0, ACCUM_PUSH_MOTION, PUSH_ACCUM_MOTION };
 
  private:
   MotionBufferPtr mot_buffer_;
@@ -48,6 +49,9 @@ class PlaneMotion {
   // motion matrix of accumulation through high sampling CAN+IMU input sequence
   void generate_motion_matrix(
       VehicleStatus *vehicledata);  // generate inverse motion
+  void accumulate_motion(VehicleStatus *vehicledata,
+                         float motion_time_dif);
+  void update_motion_buffer(VehicleStatus *vehicledata);
 
  public:
   void cleanbuffer() {
@@ -73,7 +77,7 @@ class PlaneMotion {
   // void init(int s) { set_buffer_size(s); }
 
   void add_new_motion(VehicleStatus *vehicledata, float motion_time_dif,
-                      bool image_read);
+                      int motion_operation_flag);
 
   MotionBufferPtr get_buffer() { return mot_buffer_; }
 };

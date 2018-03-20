@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+#include<limits>
 #include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/onboard/event_manager.h"
@@ -31,6 +31,13 @@ bool MotionService::InitInternal() {
   vehicle_planemotion_ = new PlaneMotion(motion_buffer_size_, false,
                                          1.0f / motion_sensor_frequency_);
 
+  CHECK(shared_data_manager_ != NULL);
+  camera_shared_data_ = dynamic_cast<CameraSharedData*>(
+    shared_data_manager_->GetSharedData("CameraSharedData"));
+    if (camera_shared_data_ == nullptr) {
+      AERROR << "Failed to get CameraSharedData.";
+      return false;
+    }
   AINFO << "init MotionService success.";
   return true;
 }
@@ -68,7 +75,20 @@ void MotionService::OnLocalization(
   pre_timestamp = localization.measurement_time();
 
   // add motion to buffer
-  vehicle_planemotion_->add_new_motion(&vehicle_status, timestamp_diff, false);
+  double camera_timestamp =
+    camera_shared_data_->GetLatestTimestamp();
+  if (std::abs(pre_timestamp-camera_timestamp) <
+        std::numeric_limits<double>::epsilon()) {
+      // exactly same timestamp
+      vehicle_planemotion_->add_new_motion(&vehicle_status,
+       timestamp_diff, PlaneMotion::ACCUM_PUSH_MOTION);
+  } else if (pre_timestamp < camera_timestamp) {
+      vehicle_planemotion_->add_new_motion(&vehicle_status,
+       timestamp_diff, PlaneMotion::ACCUM_MOTION);
+  } else {
+      vehicle_planemotion_->add_new_motion(&vehicle_status,
+       timestamp_diff, PlaneMotion::PUSH_ACCUM_MOTION);
+  }
 }
 
 void MotionService::GetVehicleInformation(
