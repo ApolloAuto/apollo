@@ -15,8 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
-#include <Eigen/LU>
-#include <map>
+
+#include "Eigen/LU"
+
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
 

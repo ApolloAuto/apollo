@@ -18,7 +18,6 @@
 #define MODULES_PERCEPTION_OBSTACLE_ONBORAD_CAMERA_PROCESS_SUBNODE_H_
 
 #include <algorithm>
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>

@@ -16,7 +16,7 @@
 
 #include "modules/perception/obstacle/onboard/fusion_subnode.h"
 
-#include <map>
+#include <unordered_map>
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/config_gflags.h"
@@ -82,7 +82,7 @@ bool FusionSubnode::InitOutputStream() {
   //       pub_driven_event_id:n
   //       lidar_output_stream : event_id=n&sink_type=m&sink_name=x
   //       radar_output_stream : event_id=n&sink_type=m&sink_name=x
-  std::map<std::string, std::string> reserve_field_map;
+  std::unordered_map<std::string, std::string> reserve_field_map;
   if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
     AERROR << "Failed to parse reserve string: " << reserve_;
     return false;

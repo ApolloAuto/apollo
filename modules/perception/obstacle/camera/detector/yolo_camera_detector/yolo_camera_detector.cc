@@ -17,7 +17,7 @@
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 
 #include <cmath>
-#include <map>
+#include <unordered_map>
 #include <utility>
 
 #include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
@@ -34,7 +34,7 @@ namespace perception {
 
 using std::string;
 using std::vector;
-using std::map;
+using std::unordered_map;
 
 bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
   ConfigManager *config_manager = ConfigManager::instance();
@@ -441,8 +441,8 @@ bool YoloCameraDetector::get_objects_cpu(
   const float *cpu_cls_data =
       static_cast<const float *>(res_cls_tensor_->cpu_data());
 
-  map<int, vector<int> > indices;
-  map<int, vector<float> > conf_scores;
+  unordered_map<int, vector<int> > indices;
+  unordered_map<int, vector<float> > conf_scores;
   int num_kept = 0;
   for (int k = 0; k < num_classes; k++) {
     apply_nms_gpu(static_cast<const float *>(res_box_tensor_->gpu_data()),

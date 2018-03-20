@@ -67,8 +67,11 @@ bool PolyFit(const std::vector<Eigen::Matrix<T, 2, 1>>& pos_vec,
   Eigen::Matrix<T, Eigen::Dynamic, 1> y(n);
   Eigen::Matrix<T, Eigen::Dynamic, 1> result;
   for (int i = 0; i < n; ++i) {
+    float base = is_x_axis ? pos_vec[i].x() : pos_vec[i].y();
+    float p_b_j = 1.0;
     for (int j = 0; j <= order; ++j) {
-      A(i, j) = std::pow(is_x_axis ? pos_vec[i].x() : pos_vec[i].y(), j);
+      A(i, j) = p_b_j;
+      p_b_j *= base;
     }
     y(i) = is_x_axis ? pos_vec[i].y() : pos_vec[i].x();
   }
@@ -97,8 +100,10 @@ T PolyEval(const T& x, const int& order,
   }
 
   T y = static_cast<T>(0);
+  float p_x_j = 1.0;
   for (int j = 0; j <= poly_order; ++j) {
-    y += coeff(j) * std::pow(x, j);
+    y += coeff(j) * p_x_j;
+    p_x_j *= x;
   }
 
   return y;

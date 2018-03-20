@@ -17,14 +17,14 @@
 #ifndef MODULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
 #define MODULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
 
-#include <map>
+#include <algorithm>
+#include <limits>
 #include <memory>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
-#include <algorithm>
-#include <limits>
 
 #include "boost/format.hpp"
 #include "gflags/gflags.h"
@@ -131,9 +131,9 @@ class CommonSharedData : public SharedData {
   CommonSharedDataStat GetStat() const { return stat_; }
 
  private:
-  typedef std::map<std::string, SharedDataPtr<M>> SharedDataMap;
+  typedef std::unordered_map<std::string, SharedDataPtr<M>> SharedDataMap;
   typedef std::pair<std::string, SharedDataPtr<M>> SharedDataPair;
-  typedef std::map<std::string, uint64_t>
+  typedef std::unordered_map<std::string, uint64_t>
       DataAddedTimeMap;  // precision in second
   typedef std::pair<std::string, uint64_t> DataKeyTimestampPair;
 

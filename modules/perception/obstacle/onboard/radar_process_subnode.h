@@ -87,7 +87,7 @@ class RadarProcessSubnode : public Subnode {
   boost::circular_buffer<LocalizationPair> localization_buffer_;
   ContiRadarIDExpansion conti_id_expansion_;
   std::unique_ptr<BaseRadarDetector> radar_detector_;
-  HDMapInput *hdmap_input_ = NULL;
+  HDMapInput *hdmap_input_ = nullptr;
   // here we use HdmapROIFilter
   std::unique_ptr<HdmapROIFilter> roi_filter_;
   Mutex mutex_;
