@@ -210,14 +210,21 @@ DEFINE_double(
 DEFINE_double(
     follow_min_time_sec, 0.1,
     "min following time in st region before considering a valid follow");
+DEFINE_double(stop_line_stop_distance, 1.0,
+              "stop distance from stop line");
+DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
+DEFINE_double(max_stop_deceleration, 6.0, "max deceleration");
+DEFINE_double(signal_light_min_pass_s_distance, 4.0,
+              "min s_distance for adc to be considered "
+              "have passed signal_light (stop_line_end_s)");
+DEFINE_double(signal_expire_time_sec, 5.0,
+              "consider the signal msg is expired if its timestamp over "
+              "this threshold (second)");
 
 DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
 DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
-DEFINE_double(signal_expire_time_sec, 5.0,
-              "consider the signal msg is expired if its timestamp over "
-              "this threshold (second)");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
@@ -228,21 +235,8 @@ DEFINE_bool(align_prediction_time, false,
 
 // Traffic decision
 /// common
-DEFINE_double(max_stop_distance_buffer, 4.0,
-              "distance buffer of passing stop line");
-DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
-DEFINE_double(max_stop_deceleration, 6.0, "max deceleration");
-DEFINE_double(max_valid_stop_distance, 3.0,
-              "max distance(m) to the stop line to be "
-              "considered as a valid stop");
 /// keep_clear
 /// traffic light
-DEFINE_double(max_stop_deacceleration_for_yellow_light, 3.0,
-              "treat yellow light as red when deceleration (abstract value"
-              " in m/s^2) is less than this threshold; otherwise treated"
-              " as green light");
-DEFINE_double(traffic_light_stop_distance, 1.0,
-              "stop distance from traffic light line");
 /// crosswalk
 /// stop_sign
 
