@@ -899,8 +899,7 @@ bool CCLanePostProcessor::CompensateLaneObjects(LaneObjectsPtr lane_objects) {
       return false;
     }
 
-    LaneObject virtual_ego_lane_left;
-    lane_objects->at(ego_lane_right_idx).CopyTo(&virtual_ego_lane_left);
+    LaneObject virtual_ego_lane_left = lane_objects->at(ego_lane_right_idx);
 
     virtual_ego_lane_left.spatial = SpatialLabelType::L_0;
     virtual_ego_lane_left.is_compensated = true;
@@ -922,8 +921,7 @@ bool CCLanePostProcessor::CompensateLaneObjects(LaneObjectsPtr lane_objects) {
       return false;
     }
 
-    LaneObject virtual_ego_lane_right;
-    lane_objects->at(ego_lane_left_idx).CopyTo(&virtual_ego_lane_right);
+    LaneObject virtual_ego_lane_right = lane_objects->at(ego_lane_left_idx);
 
     virtual_ego_lane_right.spatial = SpatialLabelType::R_0;
     virtual_ego_lane_right.is_compensated = true;
