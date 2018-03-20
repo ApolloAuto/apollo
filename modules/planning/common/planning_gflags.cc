@@ -235,9 +235,6 @@ DEFINE_double(max_stop_deceleration, 6.0, "max deceleration");
 DEFINE_double(max_valid_stop_distance, 3.0,
               "max distance(m) to the stop line to be "
               "considered as a valid stop");
-DEFINE_double(creep_stop_distance, 0.5,
-              "stop distance(m) to the stop line of next lane overlap "
-              "while creeping ");
 /// keep_clear
 /// traffic light
 DEFINE_double(max_stop_deacceleration_for_yellow_light, 3.0,
@@ -248,22 +245,6 @@ DEFINE_double(traffic_light_stop_distance, 1.0,
               "stop distance from traffic light line");
 /// crosswalk
 /// stop_sign
-DEFINE_bool(enable_stop_sign_creeping, false,
-            "enable stop_sign creeping forward at one way "
-            "or two way stop signs.");
-DEFINE_double(stop_sign_stop_duration, 1.0,
-              "min time(second) to stop at stop sign");
-DEFINE_double(stop_sign_min_pass_distance, 3.0,
-              "valid min distance(m) for vehicles to be considered as "
-              "have passed stop sign (stop_line_end_s)");
-DEFINE_double(stop_sign_stop_distance, 1.0,
-              "stop distance from stop line of stop sign");
-DEFINE_double(stop_sign_watch_vehicle_max_stop_speed, 0.5,
-              "max speed(m/s) for watch vehicles to be considered as "
-              " a valid stop.(this check is looser than adc)");
-DEFINE_double(stop_sign_watch_vehicle_max_stop_distance, 5.0,
-              "max stop distance for watch vehicles to be considered as "
-              " a valid stop.(this check is looser than adc)");
 
 DEFINE_double(sidepass_wait_time_sec, 30.0,
               "Waiting time in seconds before deciding to sidepass");
