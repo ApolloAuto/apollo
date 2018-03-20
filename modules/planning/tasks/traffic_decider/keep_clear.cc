@@ -24,7 +24,6 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/keep_clear.h"
 
 namespace apollo {
@@ -84,7 +83,7 @@ bool KeepClear::BuildKeepClearObstacle(
   // check
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   if (adc_front_edge_s - keep_clear_overlap->start_s >
-      FLAGS_keep_clear_min_pass_distance) {
+      config_.keep_clear().min_pass_s_distance()) {
     ADEBUG << "adc inside keep_clear zone[" << keep_clear_overlap->object_id
            << "] s[" << keep_clear_overlap->start_s << ", "
            << keep_clear_overlap->end_s << "] adc_front_edge_s["
