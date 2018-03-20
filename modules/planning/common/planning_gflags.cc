@@ -220,6 +220,13 @@ DEFINE_double(signal_light_min_pass_s_distance, 4.0,
 DEFINE_double(signal_expire_time_sec, 5.0,
               "consider the signal msg is expired if its timestamp over "
               "this threshold (second)");
+DEFINE_string(destination_obstacle_id, "DEST",
+              "obstacle id for converting destination to an obstacle");
+DEFINE_double(destination_check_distance, 5.0,
+              "if the distance between destination and ADC is less than this,"
+              " it is considered to reach destination");
+DEFINE_double(destination_stop_distance, 0.5,
+              "stop distance from destination line");
 
 DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
@@ -232,26 +239,6 @@ DEFINE_bool(align_prediction_time, false,
             "enable align prediction data based planning time");
 
 // Trajectory
-
-// Traffic decision
-/// common
-/// keep_clear
-/// traffic light
-/// crosswalk
-/// stop_sign
-
-DEFINE_double(sidepass_wait_time_sec, 30.0,
-              "Waiting time in seconds before deciding to sidepass");
-
-/// destination
-DEFINE_string(destination_obstacle_id, "DEST",
-              "obstacle id for converting destination to an obstacle");
-DEFINE_double(destination_check_distance, 5.0,
-              "if the distance between destination and ADC is less than this,"
-              " it is considered to reach destination");
-DEFINE_double(destination_stop_distance, 0.5,
-              "stop distance from destination line");
-/// reference_line end
 
 // according to DMV's rule, turn signal should be on within 200 ft from
 // intersection.

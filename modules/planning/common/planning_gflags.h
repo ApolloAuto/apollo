@@ -118,6 +118,9 @@ DECLARE_double(max_stop_speed);
 DECLARE_double(max_stop_deceleration);
 DECLARE_double(signal_light_min_pass_s_distance);
 DECLARE_double(signal_expire_time_sec);
+DECLARE_string(destination_obstacle_id);
+DECLARE_double(destination_check_distance);
+DECLARE_double(destination_stop_distance);
 
 DECLARE_double(virtual_stop_wall_length);
 DECLARE_double(virtual_stop_wall_height);
@@ -141,20 +144,6 @@ DECLARE_bool(right_turn_creep_forward);
 // QpSt optimizer
 DECLARE_double(slowdown_profile_deceleration);
 DECLARE_bool(enable_follow_accel_constraint);
-
-// traffic decision
-/// common
-/// keep_clear
-/// traffic light
-/// crosswalk
-/// stop_sign
-DECLARE_double(sidepass_wait_time_sec);
-
-/// destination
-DECLARE_string(destination_obstacle_id);
-DECLARE_double(destination_check_distance);
-DECLARE_double(destination_stop_distance);
-/// reference_line end
 
 DECLARE_bool(enable_sqp_solver);
 

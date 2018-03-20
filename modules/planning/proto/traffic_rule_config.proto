@@ -43,6 +43,8 @@ message CrosswalkConfig {
 }
 
 message DestinationConfig {
+  // stop distance from destination line
+  optional double stop_distance = 1 [ default=0.5 ]; // meter
 }
 
 message KeepClearConfig {
@@ -60,7 +62,9 @@ message ReroutingConfig {
   optional double cooldown_time = 1 [default = 0.6];  // seconds
 }
 
-message SidePassConfig {
+message SidePassVehicleConfig {
+  // Waiting time(sec) before starting sidepass vehicle
+  optional double wait_time = 1 [ default=30.0]; // second
 }
 
 message SignalLightConfig {
@@ -119,7 +123,7 @@ message TrafficRuleConfig {
     KeepClearConfig keep_clear = 8;
     ReferenceLineEndConfig reference_line_end = 9;
     ReroutingConfig rerouting = 10;
-    SidePassConfig side_pass = 11;
+    SidePassVehicleConfig side_pass_vehicle = 11;
     SignalLightConfig signal_light = 12;
     StopSignConfig stop_sign = 13;
   }
