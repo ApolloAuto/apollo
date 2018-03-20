@@ -55,6 +55,9 @@ int main(int argc, char **argv) {
 
 void OnPerception(const PerceptionObstacles &obstacles) {
   // TODO(all): add debug into perception debug pb and draw on image.
+  if (g_cached_images.empty()) {
+    return;
+  }
   g_cached_images.back()->GenerateMat();
   cv::Mat img = g_cached_images.back()->mat();
 
@@ -69,7 +72,7 @@ void OnImage(CameraId camera_id, const sensor_msgs::ImagePtr &msg) {
   boost::shared_ptr<const sensor_msgs::Image> img_msg(img);
   std::shared_ptr<Image> image(new Image);
   if (!image->Init(img_msg->header.stamp.toSec(), camera_id, img_msg)) {
-    std::cerr << "tl_visualizer load image failed.";
+    std::cerr << "camera_visualizer load image failed.";
   }
   g_cached_images.push_back(image);
 
