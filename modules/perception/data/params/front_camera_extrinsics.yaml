@@ -1,0 +1,21 @@
+header:
+    seq: 0
+    stamp:
+        secs: 0
+        nsecs: 0
+    frame_id: white_mkz
+child_frame_id: onsemi_obstacle
+transform:
+    rotation:
+        y: -0.5079853786432498
+        x: 0.516129505674271
+        z: 0.4847175164537079
+        w: -0.4905202170628467
+    rotation_L3:
+        roll: 0.002
+        yaw: -0.024
+        pitch: 0.058
+    translation:
+        x: -0.804
+        y: 0.005
+        z: 1.227
