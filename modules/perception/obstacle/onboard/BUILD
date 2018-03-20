@@ -111,6 +111,7 @@ cc_library(
         ":perception_obstacle_shared_data",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
+        "//modules/perception/common",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/converter",
         "//modules/perception/obstacle/camera/detector/yolo_camera_detector",
