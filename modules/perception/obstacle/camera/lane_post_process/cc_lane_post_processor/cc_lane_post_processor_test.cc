@@ -92,12 +92,12 @@ TEST_F(CCLanePostProcessorTest, test_lane_post_process_vis) {
   ConfigManager *config_manager = ConfigManager::instance();
   const ModelConfig *model_config
       = config_manager->GetModelConfig(cc_lane_post_processor_->name());
-  //<< "not found model: " << cc_lane_post_processor_->name();
 
   float lane_map_conf_thresh = 0.5f;
   CHECK(model_config->GetValue("lane_map_confidence_thresh",
                                &lane_map_conf_thresh))
   << "the confidence threshold of label map not found.";
+  AINFO << "lane_map_conf_thresh = " << lane_map_conf_thresh;
 
   LaneObjectsPtr lane_objects = std::make_shared<LaneObjects>();
   CameraLanePostProcessOptions lane_post_process_options;
