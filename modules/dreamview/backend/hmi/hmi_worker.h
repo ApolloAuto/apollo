@@ -19,6 +19,9 @@
 
 #include <string>
 
+#include "boost/thread/locks.hpp"
+#include "boost/thread/shared_mutex.hpp"
+
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/macro.h"
 #include "modules/dreamview/backend/map/map_service.h"
@@ -67,10 +70,15 @@ class HMIWorker {
   // Get current config and status.
   inline const HMIConfig& GetConfig() const { return config_; }
   inline const HMIStatus& GetStatus() const { return status_; }
+  // HMIStatus is updated frequently by multiple threads, including web workers
+  // and ROS message callback. Please apply proper read/write lock when
+  // accessing it.
+  inline boost::shared_mutex& GetStatusMutex() { return status_mutex_; }
 
  private:
   HMIConfig config_;
   HMIStatus status_;
+  mutable boost::shared_mutex status_mutex_;
 
   DECLARE_SINGLETON(HMIWorker);
 };
