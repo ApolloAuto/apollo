@@ -32,8 +32,9 @@ bool UnityRecognize::Init() {
     return false;
   }
 
-  const ModelConfig *model_config_night = nullptr;
-  if (!config_manager->GetModelConfig(name() + "Night", &model_config_night)) {
+  const ModelConfig *model_config_night =
+      config_manager->GetModelConfig(name() + "Night");
+  if (model_config_night == nullptr) {
     AERROR << "not found model config: " << name() + "Night";
     return false;
   }
@@ -42,8 +43,8 @@ bool UnityRecognize::Init() {
     return false;
   }
 
-  const ModelConfig *model_config_day = nullptr;
-  if (!config_manager->GetModelConfig(name(), &model_config_day)) {
+  const ModelConfig *model_config_day = config_manager->GetModelConfig(name());
+  if (model_config_day == nullptr) {
     AERROR << "not found model config: " << name();
     return false;
   }

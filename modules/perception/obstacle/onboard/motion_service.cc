@@ -26,8 +26,7 @@ using apollo::common::adapter::AdapterManager;
 
 bool MotionService::InitInternal() {
   CHECK(AdapterManager::GetLocalization()) << "Localiztion is not initialized.";
-  AdapterManager::AddLocalizationCallback(&MotionService::OnLocalization,
-                                          this);
+  AdapterManager::AddLocalizationCallback(&MotionService::OnLocalization, this);
   AINFO << "start to init MotionService.";
   vehicle_planemotion_ = new PlaneMotion(motion_buffer_size_, false,
                                          1.0f / motion_sensor_frequency_);
@@ -37,7 +36,7 @@ bool MotionService::InitInternal() {
 }
 
 void MotionService::OnLocalization(
-    const apollo::localization::LocalizationEstimate& localization) {
+    const localization::LocalizationEstimate& localization) {
   const auto& velocity = localization.pose().linear_velocity();
   // Get VehicleStatus
   VehicleStatus vehicle_status;
@@ -56,10 +55,52 @@ void MotionService::OnLocalization(
     timestamp_diff = localization.measurement_time() - pre_timestamp;
   }
 
+  VehicleInformation vehicle_information;
+  vehicle_information.timestamp = localization.measurement_time();
+  vehicle_information.velocity = vehicle_status.velocity;
+  vehicle_information.yaw_rate = vehicle_status.yaw_rate;
+  vehicle_information.time_diff = timestamp_diff;
+
+  {
+    MutexLock lock(&mutex_);
+    vehicle_information_buffer_.push_back(vehicle_information);
+  }
   pre_timestamp = localization.measurement_time();
 
   // add motion to buffer
   vehicle_planemotion_->add_new_motion(&vehicle_status, timestamp_diff, false);
+}
+
+void MotionService::GetVehicleInformation(
+    float timestamp, VehicleInformation* vehicle_information) {
+  MutexLock lock(&mutex_);
+  if (vehicle_information_buffer_.empty()) {
+    return;
+  }
+  std::list<VehicleInformation>::iterator iter =
+      vehicle_information_buffer_.begin();
+  std::list<VehicleInformation>::iterator vehicle_information_iter1 = iter;
+  ++iter;
+  if (vehicle_information_iter1->timestamp >= timestamp) {
+    *vehicle_information = *vehicle_information_iter1;
+    return;
+  }
+  std::list<VehicleInformation>::iterator vehicle_information_iter2;
+  while (iter != vehicle_information_buffer_.end()) {
+    vehicle_information_iter2 = iter;
+    ++iter;
+    if (vehicle_information_iter1->timestamp <= timestamp &&
+        vehicle_information_iter2->timestamp >= timestamp) {
+      *vehicle_information =
+          fabs(vehicle_information_iter1->timestamp - timestamp) <
+                  fabs(vehicle_information_iter2->timestamp - timestamp)
+              ? *vehicle_information_iter1
+              : *vehicle_information_iter2;
+      break;
+    }
+    vehicle_information_buffer_.erase(vehicle_information_iter1);
+    vehicle_information_iter1 = vehicle_information_iter2;
+  }
 }
 
 REGISTER_SUBNODE(MotionService);

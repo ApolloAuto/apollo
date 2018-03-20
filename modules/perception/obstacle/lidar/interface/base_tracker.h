@@ -58,8 +58,8 @@
 #include <vector>
 
 #include "modules/common/macro.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/lib/base/registerer.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/onboard/hdmap_input.h"

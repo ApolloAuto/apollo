@@ -26,8 +26,8 @@
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
-#include "modules/perception/lib/base/time_util.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/common/time/time_util.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
@@ -91,6 +91,9 @@ struct alignas(16) Object {
   // noise covariance matrix for uncertainty of position and velocity
   Eigen::Matrix3d position_uncertainty;
   Eigen::Matrix3d velocity_uncertainty;
+
+  // modeling uncertainty from sensor level tracker
+  Eigen::Matrix<double, 4, 4> uncertainty;
 
   // CIPV
   bool b_cipv = false;

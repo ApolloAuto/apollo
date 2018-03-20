@@ -27,6 +27,7 @@
 #include <utility>
 
 #include "modules/common/log.h"
+#include "modules/common/math/path_matcher.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker1d.h"
 #include "modules/planning/lattice/trajectory1d/piecewise_acceleration_trajectory1d.h"
@@ -35,17 +36,22 @@ namespace apollo {
 namespace planning {
 
 using Trajectory1d = Curve1d;
+using apollo::common::PathPoint;
 
 TrajectoryEvaluator::TrajectoryEvaluator(
     const std::array<double, 3>& init_s, const PlanningTarget& planning_target,
     const std::vector<std::shared_ptr<Trajectory1d>>& lon_trajectories,
     const std::vector<std::shared_ptr<Trajectory1d>>& lat_trajectories,
-    std::shared_ptr<PathTimeGraph> path_time_graph)
-    : path_time_graph_(path_time_graph), init_s_(init_s) {
+    std::shared_ptr<PathTimeGraph> path_time_graph,
+    std::shared_ptr<std::vector<PathPoint>> reference_line)
+    : path_time_graph_(path_time_graph), reference_line_(reference_line),
+      init_s_(init_s) {
   const double start_time = 0.0;
   const double end_time = FLAGS_trajectory_time_length;
   path_time_intervals_ = path_time_graph_->GetPathBlockingIntervals(
       start_time, end_time, FLAGS_trajectory_time_resolution);
+
+  reference_s_dot_ = ComputeLongitudinalGuideVelocity(planning_target);
 
   // if we have a stop point along the reference line,
   // filter out the lon. trajectories that pass the stop point.
@@ -146,14 +152,15 @@ double TrajectoryEvaluator::Evaluate(
   // 5. Cost of lateral comfort
 
   // Longitudinal costs
-  auto reference_s_dot = ComputeLongitudinalGuideVelocity(planning_target);
-
   double lon_objective_cost = LonObjectiveCost(lon_trajectory, planning_target,
-      reference_s_dot);
+      reference_s_dot_);
 
   double lon_jerk_cost = LonComfortCost(lon_trajectory);
 
   double lon_collision_cost = LonCollisionCost(lon_trajectory);
+
+  double centripetal_acc_cost =
+      CentripetalAccelerationCost(lon_trajectory);
 
   // decides the longitudinal evaluation horizon for lateral trajectories.
   double evaluation_horizon =
@@ -180,6 +187,7 @@ double TrajectoryEvaluator::Evaluate(
   return lon_objective_cost * FLAGS_weight_lon_travel +
          lon_jerk_cost * FLAGS_weight_lon_jerk +
          lon_collision_cost * FLAGS_weight_lon_collision +
+         centripetal_acc_cost * FLAGS_weight_centripetal_acceleration +
          lat_offset_cost * FLAGS_weight_lat_offset +
          lat_comfort_cost * FLAGS_weight_lat_comfort;
 }
@@ -289,6 +297,31 @@ double TrajectoryEvaluator::LonCollisionCost(
   return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
 }
 
+double TrajectoryEvaluator::CentripetalAccelerationCost(
+    const std::shared_ptr<Trajectory1d>& lon_trajectory) const {
+  double centripetal_acc_sum = 0.0;
+  double centripetal_acc_sqr_sum = 0.0;
+  for (double t = 0.0; t < FLAGS_trajectory_time_length;
+       t += FLAGS_trajectory_time_resolution) {
+    double s = lon_trajectory->Evaluate(0, t);
+    double v = lon_trajectory->Evaluate(1, t);
+    PathPoint ref_point = PathMatcher::MatchToPath(*reference_line_, s);
+    double kappa = 0.0;
+    if (ref_point.has_kappa()) {
+      kappa = ref_point.kappa();
+    } else {
+      AERROR << "Reference point has no kappa at s = " << s
+             << ", use zero kappa instead.";
+    }
+    double centripetal_acc = v * v * kappa;
+    centripetal_acc_sum += std::abs(centripetal_acc);
+    centripetal_acc_sqr_sum += centripetal_acc * centripetal_acc;
+  }
+
+  return centripetal_acc_sqr_sum /
+         (centripetal_acc_sum + FLAGS_lattice_epsilon);
+}
+
 std::vector<double> TrajectoryEvaluator::evaluate_per_lonlat_trajectory(
     const PlanningTarget& planning_target,
     const std::vector<apollo::common::SpeedPoint> st_points,
@@ -307,23 +340,26 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
   ConstantAccelerationTrajectory1d lon_traj(init_s_[0], cruise_s_dot);
 
   if (!planning_target.has_stop_point()) {
-    lon_traj.AppendSgment(0.0, FLAGS_trajectory_time_length);
+    lon_traj.AppendSegment(0.0, FLAGS_trajectory_time_length);
   } else {
+    double stop_a = FLAGS_longitudinal_acceleration_lower_bound;
     double stop_s = planning_target.stop_point().s();
     double dist = stop_s - init_s_[0];
-    double stop_a = -cruise_s_dot * cruise_s_dot * 0.5 / dist;
+    if (dist > FLAGS_lattice_epsilon) {
+      stop_a = -cruise_s_dot * cruise_s_dot * 0.5 / dist;
+    }
     if (stop_a > comfort_a) {
       double stop_t = cruise_s_dot / (-comfort_a);
       double stop_dist = cruise_s_dot * stop_t * 0.5;
       double cruise_t = (dist - stop_dist) / cruise_s_dot;
-      lon_traj.AppendSgment(0.0, cruise_t);
-      lon_traj.AppendSgment(comfort_a, stop_t);
+      lon_traj.AppendSegment(0.0, cruise_t);
+      lon_traj.AppendSegment(comfort_a, stop_t);
     } else {
       double stop_t = cruise_s_dot / (-stop_a);
-      lon_traj.AppendSgment(stop_a, stop_t);
+      lon_traj.AppendSegment(stop_a, stop_t);
     }
     if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
-      lon_traj.AppendSgment(
+      lon_traj.AppendSegment(
           0.0, FLAGS_trajectory_time_length - lon_traj.ParamLength());
     }
   }

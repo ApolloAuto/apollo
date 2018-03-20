@@ -19,11 +19,14 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <Eigen/Dense>
-#include <opencv2/opencv.hpp>
-#include <vector>
-#include <string>
+
 #include <memory>
+#include <string>
+#include <vector>
+
+#include "Eigen/Dense"
+#include "opencv2/opencv.hpp"
+
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
@@ -43,8 +46,6 @@ typedef struct {
   GLfloat y;
   GLfloat z;
 } vec3;
-
-using ::apollo::perception::FrameContent;
 
 template <typename T = float>
 T get_poly_value(T a, T b, T c, T d, T x) {
@@ -83,9 +84,7 @@ class GLFWFusionViewer {
   void set_camera_para(Eigen::Vector3d i_position, Eigen::Vector3d i_scn_center,
                        Eigen::Vector3d i_up_vector);
 
-  void set_forward_dir(Eigen::Vector3d forward) {
-    forward_dir_ = forward;
-  }
+  void set_forward_dir(Eigen::Vector3d forward) { forward_dir_ = forward; }
 
   void set_main_car(const std::vector<Eigen::Vector3d> &main_car) {
     main_car_ = main_car;
@@ -146,9 +145,8 @@ class GLFWFusionViewer {
   // for drawing camera 2d results
  protected:
   // @brief Get camera intrinsics with distortion coefficients from file
-  bool get_camera_distort_intrinsics(
-      const std::string &file_name,
-      ::apollo::perception::CameraDistort<double> *camera_distort);
+  bool get_camera_distort_intrinsics(const std::string &file_name,
+                                     CameraDistort<double> *camera_distort);
 
   // @brief Project 3D point to 2D image using pin-hole camera model with
   // distortion
@@ -231,7 +229,6 @@ class GLFWFusionViewer {
   bool show_polygon;
   bool show_text;
 
-
   void get_class_color(int cls, float rgb[3]);
 
   enum { circle, cube, cloud, polygon, NumVAOs_typs };  // {0, 1, 2, 3, 4}
@@ -289,8 +286,7 @@ class GLFWFusionViewer {
   std::shared_ptr<GLRasterText> raster_text_;
 
   // pin-hole camera model with distortion
-  std::shared_ptr<::apollo::perception::CameraDistort<double>>
-      distort_camera_intrinsic_;
+  std::shared_ptr<CameraDistort<double>> distort_camera_intrinsic_;
 
   // frame count
   int frame_count_;

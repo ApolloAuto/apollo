@@ -15,6 +15,7 @@ proto_library(
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
         "//modules/planning/proto:planning_internal_proto_lib",
+        "//modules/routing/proto:routing_proto_lib",
     ],
 )
 
@@ -55,4 +56,16 @@ proto_library(
     deps = [
         "//modules/monitor/proto:system_status_proto_lib",
     ],
+)
+
+cc_proto_library(
+    name = "voice_detection_proto",
+    deps = [
+        ":voice_detection_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "voice_detection_proto_lib",
+    srcs = ["voice_detection.proto"],
 )

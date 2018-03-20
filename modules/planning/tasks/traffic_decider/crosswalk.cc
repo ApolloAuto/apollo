@@ -49,10 +49,6 @@ bool Crosswalk::ApplyRule(Frame* frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (!FLAGS_enable_crosswalk) {
-    return true;
-  }
-
   if (!FindCrosswalks(reference_line_info)) {
     return true;
   }

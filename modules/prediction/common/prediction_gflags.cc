@@ -61,8 +61,7 @@ DEFINE_double(r_var, 0.25, "Measurement noise covariance");
 DEFINE_double(p_var, 0.1, "Error covariance");
 DEFINE_double(go_approach_rate, 0.995,
               "The rate to approach to the reference line of going straight");
-DEFINE_double(cutin_approach_rate, 0.9,
-              "The rate to approach to the reference line of lane change");
+
 DEFINE_int32(still_obstacle_history_length, 10,
              "Min # historical frames for still obstacles");
 DEFINE_double(still_obstacle_speed_threshold, 2.0,
@@ -106,8 +105,6 @@ DEFINE_bool(enable_adjust_velocity_heading, false,
 DEFINE_double(heading_filter_param, 0.99, "heading filter parameter");
 
 // Cost evaluator
-DEFINE_double(cost_exp_coeff, 1.5,
-              "Coefficient of the exponential term in cost evaluator.");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,

@@ -15,16 +15,20 @@ limitations under the License.
 
 #include "modules/canbus/vehicle/%(car_type_lower)s/%(car_type_lower)s_controller.h"
 
-#include "modules/common/log.h"
+#include "modules/common/proto/vehicle_signal.pb.h"
 
-#include "modules/canbus/can_comm/can_sender.h"
 #include "modules/canbus/vehicle/%(car_type_lower)s/%(car_type_lower)s_message_manager.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/drivers/canbus/can_comm/can_sender.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace %(car_type_lower)s {
 
+using ::apollo::drivers::canbus::ProtocolData;
 using ::apollo::common::ErrorCode;
 using ::apollo::control::ControlCommand;
 
@@ -35,9 +39,10 @@ const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 }
 
-ErrorCode %(car_type_cap)sController::Init(const VehicleParameter& params,
-                                  CanSender* const can_sender,
-                                  MessageManager* const message_manager) {
+ErrorCode %(car_type_cap)sController::Init(
+	const VehicleParameter& params,
+	CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
+    MessageManager<::apollo::canbus::ChassisDetail> *const message_manager) {
   if (is_initialized_) {
     AINFO << "%(car_type_cap)sController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
@@ -101,7 +106,7 @@ Chassis %(car_type_cap)sController::chassis() {
   chassis_.Clear();
 
   ChassisDetail chassis_detail;
-  message_manager_->GetChassisDetail(&chassis_detail);
+  message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
   if (driving_mode() == Chassis::EMERGENCY_MODE) {

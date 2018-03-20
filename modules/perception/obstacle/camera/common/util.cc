@@ -29,14 +29,6 @@
 namespace apollo {
 namespace perception {
 
-DEFINE_string(onsemi_obstacle_extrinsics,
-              "./conf/params/onsemi_obstacle_extrinsics.yaml",
-              "onsemi_obstacle_extrinsics name");
-DEFINE_string(onsemi_obstacle_intrinsics,
-              "./conf/params/onsemi_obstacle_intrinsics.yaml",
-              "onsemi_obstacle_intrinsics name");
-DEFINE_bool(onboard_undistortion, false, "do undistortion");
-
 std::vector<cv::Scalar> color_table = {
     cv::Scalar(0, 0, 0),       cv::Scalar(128, 0, 0),
     cv::Scalar(255, 0, 0),     cv::Scalar(0, 128, 0),
@@ -76,7 +68,7 @@ bool LoadVisualObjectFromFile(const std::string &file_name,
     double x2 = 0.0;
     double y2 = 0.0;
     int ret = fscanf(fp,
-                     "%s %lf %lf %f %lf %lf %lf %lf %f %f %f %f %f %f %f %f "
+                     "%256s %lf %lf %f %lf %lf %lf %lf %f %f %f %f %f %f %f %f "
                      "%f %f",
                      type, &trash, &trash, &obj->alpha, &x1, &y1, &x2, &y2,
                      &obj->height, &obj->width, &obj->length, &obj->center.x(),

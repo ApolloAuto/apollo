@@ -46,6 +46,8 @@ class CameraSharedData : public CommonSharedData<CameraItem> {
   DISALLOW_COPY_AND_ASSIGN(CameraSharedData);
 };
 
+REGISTER_SHAREDDATA(CameraSharedData);
+
 }  // namespace perception
 }  // namespace apollo
 

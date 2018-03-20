@@ -79,8 +79,9 @@ Status Prediction::Init() {
   EvaluatorManager::instance()->Init(prediction_conf_);
   PredictorManager::instance()->Init(prediction_conf_);
 
-  CHECK(AdapterManager::GetLocalization()) << "Localization is not ready.";
-  CHECK(AdapterManager::GetPerceptionObstacles()) << "Perception is not ready.";
+  CHECK(AdapterManager::GetLocalization()) << "Localization is not registered.";
+  CHECK(AdapterManager::GetPerceptionObstacles())
+      << "Perception is not registered.";
 
   // Set localization callback function
   AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
@@ -89,7 +90,7 @@ Status Prediction::Init() {
   // Set perception obstacle callback function
   AdapterManager::AddPerceptionObstaclesCallback(&Prediction::RunOnce, this);
 
-  if (!PredictionMap::Ready()) {
+  if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     return OnError("Map cannot be loaded.");
   }
 
@@ -137,6 +138,13 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
     ros::shutdown();
+  }
+
+  AdapterManager::Observe();
+
+  if (FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
+    AERROR << "Relative map is empty.";
+    return;
   }
 
   double start_timestamp = Clock::NowInSeconds();

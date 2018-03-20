@@ -18,10 +18,11 @@
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_MOTION_SERVICE_H_
 
 #include <Eigen/Core>
+#include <list>
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/lib/base/mutex.h"
-#include "modules/perception/obstacle/camera/motion/vehicleplanemotion.h"
+#include "modules/perception/obstacle/camera/motion/plane_motion.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
 
@@ -38,20 +39,18 @@ struct VehicleInformation {
 class MotionService : public Subnode {
  public:
   MotionService() = default;
-  virtual ~MotionService() {
-    delete vehicle_planemotion_;
-  }
+  virtual ~MotionService() { delete vehicle_planemotion_; }
 
-  apollo::common::Status ProcEvents() override {
-    return apollo::common::Status::OK();
-  }
+  common::Status ProcEvents() override { return common::Status::OK(); }
+
+  void GetVehicleInformation(float timestamp,
+                             VehicleInformation *vehicle_informatino);
 
  protected:
   bool InitInternal() override;
 
  private:
-  void OnLocalization(
-      const apollo::localization::LocalizationEstimate &localization);
+  void OnLocalization(const localization::LocalizationEstimate &localization);
   PlaneMotion *vehicle_planemotion_ = nullptr;
   double pre_azimuth = 0;  // a invalid value
   double pre_timestamp = 0;
@@ -59,6 +58,7 @@ class MotionService : public Subnode {
   const int motion_buffer_size_ = 6000;
   const int motion_sensor_frequency_ = 100;
   Mutex mutex_;
+  std::list<VehicleInformation> vehicle_information_buffer_;
 
   DISALLOW_COPY_AND_ASSIGN(MotionService);
 };
@@ -66,4 +66,4 @@ class MotionService : public Subnode {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_ONBOARD_MOTION_SERVICE_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_ONBOARD_MOTION_SERVICE_H_

@@ -26,6 +26,7 @@
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/data/proto/static_info.pb.h"
+#include "modules/dreamview/proto/voice_detection.pb.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
@@ -104,6 +105,10 @@ using LocalizationMsfStatusAdapter =
     Adapter<apollo::localization::LocalizationStatus>;
 using RelativeMapAdapter = Adapter<apollo::relative_map::MapMsg>;
 using NavigationAdapter = Adapter<apollo::relative_map::NavigationInfo>;
+using VoiceDetectionRequestAdapter =
+    Adapter<apollo::dreamview::VoiceDetectionRequest>;
+using VoiceDetectionResponseAdapter =
+    Adapter<apollo::dreamview::VoiceDetectionResponse>;
 
 }  // namespace adapter
 }  // namespace common

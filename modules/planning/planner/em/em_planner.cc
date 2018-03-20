@@ -232,6 +232,9 @@ Status EMPlanner::PlanOnReferenceLine(
 
   for (const auto* path_obstacle :
        reference_line_info->path_decision()->path_obstacles().Items()) {
+    if (path_obstacle->obstacle()->IsVirtual()) {
+      continue;
+    }
     if (!path_obstacle->obstacle()->IsStatic()) {
       continue;
     }

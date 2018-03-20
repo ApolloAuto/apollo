@@ -18,7 +18,7 @@
 #define MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/dreamview/backend/handlers/websocket.h"
+#include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
 
 /**

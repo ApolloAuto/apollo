@@ -190,10 +190,9 @@ http_archive(
     url = "https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.tar.gz",
 )
 
-# camera undistort for perception
+# perception cuda util
 new_local_repository(
-    name = "undistort",
-    build_file = "third_party/undistort.BUILD",
-    path = "/usr/local/apollo/undistort",
+    name = "perception_cuda",
+    build_file = "third_party/perception_cuda.BUILD",
+    path = "/home/tmp/perception_cuda",
 )
-

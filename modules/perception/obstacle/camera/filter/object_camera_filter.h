@@ -31,9 +31,9 @@
 #include "opencv2/opencv.hpp"
 #include "yaml-cpp/yaml.h"
 
+#include "modules/common/math/kalman_filter_1d.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
-#include "modules/perception/obstacle/camera/filter/kalman_filter_1d.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_filter.h"
 
 namespace apollo {
@@ -59,14 +59,14 @@ class ObjectCameraFilter : public BaseCameraFilter {
     int lost_frame_cnt_ = 0;
     float last_timestamp_ = 0.0f;
 
-    KalmanFilter1D x_;
-    KalmanFilter1D y_;
-    KalmanFilter1D z_;
-    KalmanFilter1D alpha_;
-    KalmanFilter1D theta_;
-    KalmanFilter1D l_;
-    KalmanFilter1D w_;
-    KalmanFilter1D h_;
+    common::math::KalmanFilter1D x_;
+    common::math::KalmanFilter1D y_;
+    common::math::KalmanFilter1D z_;
+    common::math::KalmanFilter1D alpha_;
+    common::math::KalmanFilter1D theta_;
+    common::math::KalmanFilter1D l_;
+    common::math::KalmanFilter1D w_;
+    common::math::KalmanFilter1D h_;
   };
 
   std::map<int, ObjectFilter> tracked_filters_;

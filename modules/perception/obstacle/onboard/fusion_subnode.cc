@@ -18,6 +18,8 @@
 
 #include <map>
 
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/onboard/event_manager.h"
@@ -27,11 +29,19 @@
 namespace apollo {
 namespace perception {
 
+using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
 
 bool FusionSubnode::InitInternal() {
   RegistAllAlgorithm();
+
+  AdapterManager::Init(FLAGS_perception_adapter_config_filename);
+
+  CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
+  AdapterManager::AddChassisCallback(&FusionSubnode::OnChassis, this);
+
   CHECK(shared_data_manager_ != nullptr);
   fusion_.reset(BaseFusionRegisterer::GetInstanceByName(FLAGS_onboard_fusion));
   if (fusion_ == nullptr) {
@@ -51,6 +61,11 @@ bool FusionSubnode::InitInternal() {
       shared_data_manager_->GetSharedData("LidarObjectData"));
   if (lidar_object_data_ == nullptr) {
     AWARN << "Failed to get LidarObjectData.";
+  }
+  camera_object_data_ = dynamic_cast<CameraObjectData *>(
+      shared_data_manager_->GetSharedData("CameraObjectData"));
+  if (camera_object_data_ == nullptr) {
+    AWARN << "Failed to get CameraObjectData.";
   }
 
   if (!InitOutputStream()) {
@@ -96,10 +111,21 @@ bool FusionSubnode::InitOutputStream() {
   } else {
     radar_event_id_ = static_cast<EventID>(atoi((radar_iter->second).c_str()));
   }
+
+  auto camera_iter = reserve_field_map.find("camera_event_id");
+  if (camera_iter == reserve_field_map.end()) {
+    AWARN << "Failed to find camera_event_id:" << reserve_;
+    AINFO << "camera_event_id will be set -1";
+    camera_event_id_ = -1;
+  } else {
+    camera_event_id_ =
+        static_cast<EventID>(atoi((camera_iter->second).c_str()));
+  }
   return true;
 }
 
 Status FusionSubnode::ProcEvents() {
+  std::lock_guard<std::mutex> lock(fusion_subnode_mutex_);
   for (auto event_meta : sub_meta_events_) {
     std::vector<Event> events;
     if (!SubscribeEvents(event_meta, &events)) {
@@ -119,9 +145,17 @@ Status FusionSubnode::ProcEvents() {
              << " fused_obj_cnt:" << objects_.size();
       continue;
     }
+
     // public obstacle message
     PerceptionObstacles obstacles;
     if (GeneratePbMsg(&obstacles)) {
+      // Assume FLU coordinate system
+      if (FLAGS_use_navigation_mode) {
+        for (auto obstacle : obstacles.perception_obstacle()) {
+          obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
+                                             chassis_.speed_mps());
+        }
+      }
       common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
     }
     AINFO << "Publish 3d perception fused msg. timestamp:"
@@ -152,6 +186,8 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     PERF_BLOCK_END("fusion_lidar");
   } else if (event_meta.event_id == radar_event_id_) {
     PERF_BLOCK_END("fusion_radar");
+  } else if (event_meta.event_id == camera_event_id_) {
+    PERF_BLOCK_END("fusion_camera");
   }
   timestamp_ = sensor_objs[0].timestamp;
   error_code_ = common::OK;
@@ -182,6 +218,8 @@ bool FusionSubnode::BuildSensorObjs(
       sensor_objects->sensor_type = SensorType::VELODYNE_64;
     } else if (event.event_id == radar_event_id_) {
       sensor_objects->sensor_type = SensorType::RADAR;
+    } else if (event.event_id == camera_event_id_) {
+      sensor_objects->sensor_type = SensorType::CAMERA;
     } else {
       AERROR << "Event id is not supported. event:" << event.to_string();
       return false;
@@ -209,6 +247,9 @@ bool FusionSubnode::GetSharedData(const Event &event,
   } else if (event.event_id == radar_event_id_ &&
              radar_object_data_ != nullptr) {
     get_data_succ = radar_object_data_->Get(data_key, objs);
+  } else if (event.event_id == camera_event_id_ &&
+             camera_object_data_ != nullptr) {
+    get_data_succ = camera_object_data_->Get(data_key, objs);
   } else {
     AERROR << "Event id is not supported. event:" << event.to_string();
     return false;
@@ -241,6 +282,12 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
 
 void FusionSubnode::RegistAllAlgorithm() {
   RegisterFactoryProbabilisticFusion();
+}
+
+void FusionSubnode::OnChassis(const Chassis &chassis) {
+  ADEBUG << "Received chassis data: run chassis callback.";
+  std::lock_guard<std::mutex> lock(fusion_subnode_mutex_);
+  chassis_.CopyFrom(chassis);
 }
 
 }  // namespace perception

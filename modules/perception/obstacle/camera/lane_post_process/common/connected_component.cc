@@ -617,7 +617,7 @@ void ConnectedComponent::SplitContour(int split_len) {
     }
 
   } else {
-    AFATAL << "unknown bounding box split type: " << bbox_.split;
+    AERROR << "unknown bounding box split type: " << bbox_.split;
   }
 }
 
@@ -635,10 +635,10 @@ void ConnectedComponent::Process(ScalarType split_siz, int split_len) {
 /** split a CC into several smaller ones **/
 vector<int> ConnectedComponent::GetSplitRanges(int siz, int len_split) {
   if (siz <= 0) {
-    AFATAL << "siz should be a positive number: " << siz;
+    AERROR << "siz should be a positive number: " << siz;
   }
   if (len_split <= 0) {
-    AFATAL << "len_split should be a positive number: " << len_split;
+    AERROR << "len_split should be a positive number: " << len_split;
   }
 
   int num_split = siz / len_split;
@@ -696,17 +696,17 @@ ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
       roi_x_max_(roi.x + roi.width - 1),
       roi_y_max_(roi.y + roi.height - 1) {
   if (roi_x_min_ < 0) {
-    AFATAL << "x_min is less than zero: " << roi_x_min_;
+    AERROR << "x_min is less than zero: " << roi_x_min_;
   }
   if (roi_y_min_ < 0) {
-    AFATAL << "y_min is less than zero: " << roi_y_min_;
+    AERROR << "y_min is less than zero: " << roi_y_min_;
   }
   if (roi_x_max_ >= image_width_) {
-    AFATAL << "x_max is larger than image width: " << roi_x_max_ << "|"
+    AERROR << "x_max is larger than image width: " << roi_x_max_ << "|"
            << image_width_;
   }
   if (roi_y_max_ >= image_height_) {
-    AFATAL << "y_max is larger than image height: " << roi_y_max_ << "|"
+    AERROR << "y_max is larger than image height: " << roi_y_max_ << "|"
            << image_height_;
   }
   total_pix_ = static_cast<size_t>(width_) * static_cast<size_t>(height_);
@@ -723,7 +723,7 @@ ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
 
   cudaError_t cuda_err = cudaGetLastError();
   if (cuda_err != cudaSuccess) {
-    AFATAL << "failed to initialize 'img_array' and 'label_array' with CUDA: "
+    AERROR << "failed to initialize 'img_array' and 'label_array' with CUDA: "
            << cudaGetErrorString(cuda_err);
   }
 

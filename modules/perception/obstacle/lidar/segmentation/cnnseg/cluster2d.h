@@ -19,16 +19,22 @@
 
 #include <algorithm>
 #include <vector>
+
 #include "caffe/caffe.hpp"
+
 #include "modules/common/log.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/common/util/disjoint_set.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
-#include "modules/perception/obstacle/common/disjoint_set.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/util.h"
 
 namespace apollo {
 namespace perception {
 namespace cnnseg {
+
+using apollo::common::util::DisjointSetMakeSet;
+using apollo::common::util::DisjointSetFind;
+using apollo::common::util::DisjointSetUnion;
 
 enum class MetaType {
   META_UNKNOWN,
@@ -148,7 +154,7 @@ class Cluster2D {
             if ((row2 == row || col2 == col) && IsValidRowCol(row2, col2)) {
               Node* node2 = &nodes[row2][col2];
               if (node2->is_center) {
-                apollo::perception::DisjointSetUnion(node, node2);
+                DisjointSetUnion(node, node2);
               }
             }
           }
@@ -165,7 +171,7 @@ class Cluster2D {
         if (!node->is_object) {
           continue;
         }
-        Node* root = apollo::perception::DisjointSetFind(node);
+        Node* root = DisjointSetFind(node);
         if (root->obstacle_id < 0) {
           root->obstacle_id = count_obstacles++;
           CHECK_EQ(static_cast<int>(obstacles_.size()), count_obstacles - 1);

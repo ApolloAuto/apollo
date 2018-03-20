@@ -19,7 +19,5 @@
 namespace apollo {
 namespace perception {
 
-REGISTER_SHAREDDATA(CameraSharedData);
-
 }  // namespace perception
 }  // namespace apollo

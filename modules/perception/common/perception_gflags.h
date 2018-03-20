@@ -18,7 +18,7 @@
 #define MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
 
 #include "gflags/gflags.h"
-
+#include "modules/common/configs/config_gflags.h"
 DECLARE_string(perception_adapter_config_filename);
 
 /// lib/config_manager/config_manager.cc
@@ -82,23 +82,21 @@ DECLARE_int32(obs_camera_detector_gpu);
 DECLARE_string(onboard_lane_post_processor);
 
 /// visualization
-DECLARE_bool(show_front_radar_raw);
+
 DECLARE_bool(show_camera_objects);
 DECLARE_bool(show_radar_objects);
-DECLARE_bool(show_front_radar_objects);
+
 DECLARE_bool(show_fused_objects);
 DECLARE_bool(show_fusion_association);
 DECLARE_bool(capture_screen);
 DECLARE_string(screen_output_dir);
 
-DECLARE_double(car_length);
-DECLARE_double(car_width);
-
-DECLARE_bool(show_front_radar_objects);
-DECLARE_bool(show_back_radar_objects);
 DECLARE_bool(show_camera_objects2d);
 DECLARE_bool(show_camera_parsing);
 DECLARE_string(frame_visualizer);
 
-#endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
+// async fusion using imf
+DECLARE_bool(async_fusion);
+DECLARE_bool(use_distance_angle_fusion);
 
+#endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_

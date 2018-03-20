@@ -236,6 +236,8 @@ function release() {
   # modules data and conf
   CONFS=$(find modules/ -name "conf")
   DATAS=$(find modules/ -name "data")
+  OTHER=("modules/tools"
+         "modules/perception/model")
   rm -rf test/*
   for conf in $CONFS; do
     mkdir -p $APOLLO_RELEASE_DIR/$conf
@@ -246,6 +248,11 @@ function release() {
     if [ $data != "modules/map/data" ]; then
       rsync -a $data/* $APOLLO_RELEASE_DIR/$data
     fi
+  done
+  # Other
+  for path in "${OTHER[@]}"; do
+    mkdir -p $APOLLO_RELEASE_DIR/$path
+    rsync -a $path/* $APOLLO_RELEASE_DIR/$path
   done
 
   # dreamview frontend
@@ -269,6 +276,7 @@ function release() {
   fi
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
+  cp /home/tmp/perception_cuda/lib/* $LIB_DIR
 
   # doc
   cp -r docs "${APOLLO_RELEASE_DIR}"
@@ -329,7 +337,7 @@ function run_test() {
     echo -e "${RED}Need GPU to run the tests.${NO_COLOR}"
     echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   else
-    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | grep -v "yolo_camera_detector_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   fi
   if [ $? -ne 0 ]; then
     fail 'Test failed!'

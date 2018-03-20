@@ -36,6 +36,7 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion {
 
+using apollo::canbus::Chassis;
 using apollo::drivers::ContiRadar;
 using apollo::drivers::DelphiESR;
 using apollo::drivers::Mobileye;
@@ -54,7 +55,8 @@ std::map<std::int32_t, ::apollo::hdmap::LaneBoundaryType_Type>
                            {6, apollo::hdmap::LaneBoundaryType::UNKNOWN}};
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
-    const Mobileye& mobileye, const LocalizationEstimate& localization) {
+    const Mobileye& mobileye, const LocalizationEstimate& localization,
+    const Chassis& chassis) {
   PerceptionObstacles obstacles;
   // retrieve position and velocity of the main vehicle from the localization
   // position
@@ -80,12 +82,25 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
     double mob_vel_x = data_739.obstacle_rel_vel_x();
     int mob_type = data_739.obstacle_type();
 
-    double mob_l = GetDefaultObjectLength(mob_type);
+    double mob_l = 0.0;
     double mob_w = 0.0;
     if (mobileye.details_73a_size() <= index) {
+      mob_l = GetDefaultObjectLength(mob_type);
       mob_w = GetDefaultObjectWidth(mob_type);
     } else {
-      mob_w = mobileye.details_73a(index).obstacle_width();
+      if (mobileye.details_73a(index).obstacle_length() >
+          FLAGS_max_mobileye_obstacle_length) {
+        mob_l = GetDefaultObjectLength(mob_type);
+      } else {
+        mob_l = mobileye.details_73a(index).obstacle_length();
+      }
+
+      if (mobileye.details_73a(index).obstacle_width() >
+          FLAGS_max_mobileye_obstacle_width) {
+        mob_w = GetDefaultObjectWidth(mob_type);
+      } else {
+        mob_w = mobileye.details_73a(index).obstacle_width();
+      }
     }
 
     mob_x += FLAGS_mobileye_pos_adjust;  // offset: imu <-> mobileye
@@ -108,12 +123,19 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
       converted_vx = converted_speed * std::cos(mob->theta());
       converted_vy = converted_speed * std::sin(mob->theta());
     } else {
-      converted_x = xy_point.x();
-      converted_y = xy_point.y();
-      mob->set_theta(mobileye.details_73b(index).obstacle_angle());
-      converted_speed = mob_vel_x;
-      converted_vx = converted_speed * std::cos(mob->theta());
-      converted_vy = converted_speed * std::sin(mob->theta());
+      // TODO(QiL) : need to load configs from mobileye for offset
+      // 2.5 is a temp estimated value
+      converted_x = mobileye.details_739(index).obstacle_pos_x() + 2.5;
+      converted_y = mobileye.details_739(index).obstacle_pos_y();
+      if (mobileye.details_73b_size() <= index) {
+        mob->set_theta(0.0);
+      } else {
+        mob->set_theta(mobileye.details_73b(index).obstacle_angle() / 180 *
+                       M_PI);
+      }
+
+      converted_vx = mob_vel_x + chassis.speed_mps();
+      converted_vy = 0.0;
     }
 
     mob->set_id(mob_id);
@@ -212,7 +234,7 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
 RadarObstacles ContiToRadarObstacles(
     const apollo::drivers::ContiRadar& conti_radar,
     const apollo::localization::LocalizationEstimate& localization,
-    const RadarObstacles& last_radar_obstacles) {
+    const RadarObstacles& last_radar_obstacles, const Chassis& chassis) {
   RadarObstacles obstacles;
 
   const double last_timestamp = last_radar_obstacles.header().timestamp_sec();
@@ -235,6 +257,8 @@ RadarObstacles ContiToRadarObstacles(
     rob.set_height(3.0);
 
     Point relative_pos_sl;
+
+    // TODO(QiL): load the radar configs here
     relative_pos_sl.set_x(contiobs.longitude_dist());
     relative_pos_sl.set_y(contiobs.lateral_dist());
     rob.mutable_relative_position()->CopyFrom(relative_pos_sl);
@@ -261,7 +285,7 @@ RadarObstacles ContiToRadarObstacles(
       absolute_vel.set_x(0.0);
       absolute_vel.set_y(0.0);
       absolute_vel.set_z(0.0);
-    } else {
+    } else if (!FLAGS_use_navigation_mode) {
       rob.set_count(iter->second.count() + 1);
       rob.set_movable(iter->second.movable());
       absolute_vel.set_x(
@@ -279,6 +303,22 @@ RadarObstacles ContiToRadarObstacles(
         rob.set_moving_frames_count(iter->second.moving_frames_count() + 1);
       } else {
         rob.set_moving_frames_count(0);
+      }
+    } else {
+      rob.set_count(iter->second.count() + 1);
+      rob.set_movable(iter->second.movable());
+      absolute_vel.set_x(contiobs.longitude_vel() + chassis.speed_mps());
+      absolute_vel.set_y(contiobs.lateral_vel());
+      absolute_vel.set_z(0.0);
+
+      // Overwrite heading here with relative headings
+      // TODO(QiL) : refind the logic here.
+      if (contiobs.clusterortrack() == 0) {
+        rob.set_theta(contiobs.oritation_angle() / 180 * M_PI);
+      } else {
+        // in FLU
+        rob.set_theta(std::atan2(rob.relative_position().x(),
+                                 rob.relative_position().y()));
       }
     }
 

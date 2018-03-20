@@ -90,3 +90,9 @@ DEFINE_string(localization_msf_status, "/apollo/localization/msf_status",
               "msf localization status");
 DEFINE_string(relative_map_topic, "/apollo/relative_map", "relative map");
 DEFINE_string(navigation_topic, "/apollo/navigation", "navigation");
+DEFINE_string(voice_detection_request_topic,
+              "/apollo/hmi/voice_detection_request",
+              "Voice detetection request topic name.");
+DEFINE_string(voice_detection_response_topic,
+              "/apollo/hmi/voice_detection_response",
+              "Voice detetection response topic name.");

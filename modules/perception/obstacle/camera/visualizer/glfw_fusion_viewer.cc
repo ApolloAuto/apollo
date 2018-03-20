@@ -37,8 +37,8 @@ namespace apollo {
 namespace perception {
 namespace lowcostvisualizer {
 
-using ::apollo::perception::CalibrationConfigManager;
-using ::apollo::perception::CameraCalibrationPtr;
+using apollo::perception::CalibrationConfigManager;
+using apollo::perception::CameraCalibrationPtr;
 
 const double pace_zoom = 15;
 const double My_PI = 3.14159265359;
@@ -184,11 +184,13 @@ bool GLFWFusionViewer::initialize() {
   CameraCalibrationPtr calibrator = config_manager->get_camera_calibration();
   camera_intrinsic_ = calibrator->get_camera_intrinsic();
   distort_camera_intrinsic_ = calibrator->get_camera_model();
+  AINFO << " GLFWFusionViewer::initialize() config_manager" << std::endl;
 
   // Init Raster Text
   raster_text_ = std::make_shared<GLRasterText>();
   raster_text_->init();
 
+  AINFO << " GLFWFusionViewer::initialize() Finished" << std::endl;
   init_ = true;
   return true;
 }
@@ -203,11 +205,12 @@ void GLFWFusionViewer::spin() {
 }
 
 void GLFWFusionViewer::spin_once() {
-  if (!frame_content_) {  // if frame_content_ may be always guarantteed, remove
-                          // this line.
+  if (!frame_content_) {
+    AWARN << "GLFWFusionViewer::spin_once : No frame content";
     return;
   }
 
+  AINFO << "GLFWFusionViewer::spin_once()";
   glfwPollEvents();
   render();
   glfwSwapBuffers(window_);
@@ -851,8 +854,10 @@ GLuint GLFWFusionViewer::image_to_gl_texture(const cv::Mat& mat,
 }
 
 void GLFWFusionViewer::draw_camera_frame(FrameContent* content) {
+  AINFO << "GLFWFusionViewer::draw_camera_frame";
   cv::Mat image_mat_src = content->get_camera_image().clone();
   if (image_mat_src.empty()) {
+    AWARN << "GLFWFusionViewer::draw_camera_frame : No image found";
     return;
   }
   int image_width = image_mat_src.cols;

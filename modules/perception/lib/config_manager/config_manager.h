@@ -141,8 +141,7 @@ class ConfigManager {
   // thread-safe interface.
   bool Reset();
 
-  bool GetModelConfig(const std::string& model_name,
-                      const ModelConfig** model_config);
+  const ModelConfig* GetModelConfig(const std::string& model_name);
 
   size_t NumModels() const { return model_config_map_.size(); }
 

@@ -17,10 +17,10 @@
 
 #include "modules/perception/obstacle/onboard/cipv_subnode.h"
 
-#include <vector>
-#include <string>
 #include <map>
 #include <memory>
+#include <string>
+#include <vector>
 #include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/onboard/dag_streaming.h"
 #include "modules/perception/onboard/event_manager.h"
@@ -47,150 +47,160 @@ using std::map;
 // using std_msgs::String;
 
 bool CIPVSubnode::InitInternal() {
-    CHECK(shared_data_manager_ != nullptr);
-    // init camera object data
-    _camera_object_data = dynamic_cast<CameraObjectData*>(
-        shared_data_manager_->GetSharedData("CameraObjectData"));
-    if (_camera_object_data == nullptr) {
-      AERROR << "Failed to get CameraObjectData.";
-      return false;
-    }
-    // init camera object data
-    _lane_shared_data = dynamic_cast<LaneSharedData*>(
-        shared_data_manager_->GetSharedData("LaneSharedData"));
-    if (_lane_shared_data == nullptr) {
-      AERROR << "Failed to get LaneSharedData.";
-      return false;
-    }
+  CHECK(shared_data_manager_ != nullptr);
+  // init camera object data
+  camera_object_data_ = dynamic_cast<CameraObjectData *>(
+      shared_data_manager_->GetSharedData("CameraObjectData"));
+  if (camera_object_data_ == nullptr) {
+    AERROR << "Failed to get CameraObjectData.";
+    return false;
+  }
+  // init camera object data
+  lane_shared_data_ = dynamic_cast<LaneSharedData *>(
+      shared_data_manager_->GetSharedData("LaneSharedData"));
+  if (lane_shared_data_ == nullptr) {
+    AERROR << "Failed to get LaneSharedData.";
+    return false;
+  }
 
-    _cipv_object_data = dynamic_cast<CIPVObjectData*>(
-            shared_data_manager_->GetSharedData("CIPVObjectData"));
-    if (_cipv_object_data == nullptr) {
-        AERROR << "Failed to get CIPVObjectData";
-        return false;
-    }
+  cipv_object_data_ = dynamic_cast<CIPVObjectData *>(
+      shared_data_manager_->GetSharedData("CIPVObjectData"));
+  if (cipv_object_data_ == nullptr) {
+    AERROR << "Failed to get CIPVObjectData";
+    return false;
+  }
 
-    AINFO << "Init shared datas successfully";
+  AINFO << "Init shared datas successfully";
 
-    string _reserve;
-    map<string, string> reserve_field_map;
-    if (!SubnodeHelper::ParseReserveField(_reserve, &reserve_field_map)) {
-        AERROR << "Failed to parse reserve string: " << _reserve;
-        return false;
-    }
+  string reserve_;
+  map<string, string> reserve_field_map;
+  if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
+    AERROR << "Failed to parse reserve string: " << reserve_;
+    return false;
+  }
 
-    if (!InitOutputStream(reserve_field_map)) {
-        AERROR << "Failed to init output or input stream.";
-        return false;
-    }
-    // init Cipv
-    _cipv.Init();
+  if (!InitOutputStream(reserve_field_map)) {
+    AERROR << "Failed to init output or input stream.";
+    return false;
+  }
+  // init Cipv
+  cipv_.Init();
 
-    AINFO << "Init CIPVSubnode succ.";
-    return true;
+  AINFO << "Init CIPVSubnode succ.";
+  return true;
 }
 
 apollo::common::Status CIPVSubnode::ProcEvents() {
-    Event event;
-    if (!SubscribeEvents(&event)) {
-        return Status(ErrorCode::PERCEPTION_ERROR,
-                      "Failed to subscribe events.");
-    }
+  Event event;
+  if (!SubscribeEvents(&event)) {
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to subscribe events.");
+  }
 
-    std::shared_ptr<SensorObjects> sensor_objs;
-    if (!GetSharedData(event, &sensor_objs)) {
-        return Status(ErrorCode::PERCEPTION_ERROR,
-                      "Failed to get shared data.");
-    }
-    CipvOptions cipv_options;
-    // *** To Do *** use motion manager
-    // MotionService* motion_service =
-    //   dynamic_cast<MotionService*>
-    //     (DAGStreaming::GetSubnodeByName("MotionService"));
-    // double timestamp = event.timestamp;
-    // VehicleInformation vehicle_information;
-    // motion_service->get_vehicle_information(timestamp,
-    //                                                &vehicle_information);
-    // cipv_options.yaw_angle = vehicle_information.yaw_angle;
-    // cipv_options.velocity = vehicle_information.velocity;
-    // cipv_options.yaw_rate = vehicle_information.yaw_rate;
-    cipv_options.yaw_angle = 0.0f;  // ***** fill in the value *****
-    cipv_options.velocity = 5.0f;  // ***** fill in the value *****
-    cipv_options.yaw_rate = 0.0f;  // ***** fill in the value *****
-    AINFO << "[CIPVSubnode] velocity " << cipv_options.velocity
-              << ", yaw rate: " << cipv_options.yaw_rate
-              << ", yaw angle: " << cipv_options.yaw_angle;
+  std::shared_ptr<SensorObjects> sensor_objs;
+  if (!GetSharedData(event, &sensor_objs)) {
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to get shared data.");
+  }
+  CipvOptions cipv_options;
+  // Retrieve motion manager information and pass them to cipv_options
+  MotionService *motion_service = dynamic_cast<MotionService *>(
+      DAGStreaming::GetSubnodeByName("MotionService"));
+  VehicleInformation vehicle_information;
+  motion_service->GetVehicleInformation(event.timestamp, &vehicle_information);
+  cipv_options.velocity = vehicle_information.velocity;
+  cipv_options.yaw_rate = vehicle_information.yaw_rate;
+  cipv_options.yaw_angle =
+      vehicle_information.yaw_rate * vehicle_information.time_diff;
+  // cipv_options.yaw_angle = 0.0f;  // ***** fill in the value *****
+  // cipv_options.velocity = 5.0f;  // ***** fill in the value *****
+  // cipv_options.yaw_rate = 0.0f;  // ***** fill in the value *****
+  AINFO << "[CIPVSubnode] velocity " << cipv_options.velocity
+        << ", yaw rate: " << cipv_options.yaw_rate
+        << ", yaw angle: " << cipv_options.yaw_angle;
 
-    // call cipv module
-    if (_cipv.DetermineCipv(sensor_objs, &cipv_options)) {
-      // *** To Do *** when camera_detector_subnode.cpp is included, add this
-      // publish_data_and_event(event.timestamp, event.reserve,
-      //                        sensor_objs, _cipv_object_data);
-    }
+  // call cipv module
+  if (cipv_.DetermineCipv(sensor_objs, &cipv_options)) {
+    PublishDataAndEvent(event.timestamp, sensor_objs, cipv_object_data_);
+  }
 
-    return Status::OK();
+  return Status::OK();
 }
 
-bool CIPVSubnode::InitOutputStream(const map<string, string>& fields) {
-    auto camera_iter = fields.find("camera_event_id");
-    if (camera_iter == fields.end()) {
-       AERROR << "Failed to find camera_event_id";
-       _camera_event_id = -1;
-    } else {
-       _camera_event_id =
-         static_cast<EventID>(atoi((camera_iter->second).c_str()));
-       AINFO << "camera event id is " << _camera_event_id;
-    }
+bool CIPVSubnode::InitOutputStream(const map<string, string> &fields) {
+  auto camera_iter = fields.find("camera_event_id");
+  if (camera_iter == fields.end()) {
+    AERROR << "Failed to find camera_event_id";
+    camera_event_id_ = -1;
+  } else {
+    camera_event_id_ =
+        static_cast<EventID>(atoi((camera_iter->second).c_str()));
+    AINFO << "camera event id is " << camera_event_id_;
+  }
 
-    auto lane_iter = fields.find("lane_event_id");
-    if (lane_iter == fields.end()) {
-       AERROR << "Failed to find lane_event_id";
-       _lane_event_id = -1;
-    } else {
-       _lane_event_id =
-         static_cast<EventID>(atoi((lane_iter->second).c_str()));
-       AINFO << "lane event id is " << _lane_event_id;
-    }
+  auto lane_iter = fields.find("lane_event_id");
+  if (lane_iter == fields.end()) {
+    AERROR << "Failed to find lane_event_id";
+    lane_event_id_ = -1;
+  } else {
+    lane_event_id_ = static_cast<EventID>(atoi((lane_iter->second).c_str()));
+    AINFO << "lane event id is " << lane_event_id_;
+  }
 
-    AINFO << "Init output stream succ";
-    return true;
+  AINFO << "Init output stream succ";
+  return true;
 }
 
 bool CIPVSubnode::SubscribeEvents(Event *event) const {
-    if (!event_manager_->Subscribe(_camera_event_id, event)) {
-        AERROR << "Failed to subscribe event: " << _camera_event_id;
-        return false;
-    }
-    if (!event_manager_->Subscribe(_lane_event_id, event)) {
-        AERROR << "Failed to subscribe event: " << _lane_event_id;
-        return false;
-    }
-    return true;
+  if (!event_manager_->Subscribe(camera_event_id_, event)) {
+    AERROR << "Failed to subscribe event: " << camera_event_id_;
+    return false;
+  }
+  if (!event_manager_->Subscribe(lane_event_id_, event)) {
+    AERROR << "Failed to subscribe event: " << lane_event_id_;
+    return false;
+  }
+  return true;
 }
 
-bool CIPVSubnode::GetSharedData(const Event& event,
-                                std::shared_ptr<SensorObjects>* objs) const {
+bool CIPVSubnode::GetSharedData(const Event &event,
+                                std::shared_ptr<SensorObjects> *objs) {
   double timestamp = event.timestamp;
-  const string& device_id = event.reserve;
+  device_id_ = event.reserve;
   string data_key;
-  if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id,
-                                              &data_key)) {
+  if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &data_key)) {
     AERROR << "Failed to produce shared data key. EventID:" << event.event_id
-           << " timestamp:" << timestamp << " device_id:" << device_id;
+           << " timestamp:" << timestamp << " device_id_:" << device_id_;
     return false;
   }
   bool get_data_succ = false;
   // *** To DO *** uncomment
-//  get_data_succ = _camera_object_data->get(data_key, objs);
-//  std::shared_ptr<lane_post_process::LaneObjects> lane_objects;
-//  get_data_succ = _lane_shared_data->get(data_key, &lane_objects);
-//  (*objs)->lane_objects = lane_objects;
+  get_data_succ = camera_object_data_->Get(data_key, objs);
+  std::shared_ptr<LaneObjects> lane_objects;
+  get_data_succ = lane_shared_data_->Get(data_key, &lane_objects);
+  (*objs)->lane_objects = lane_objects;
 
   if (!get_data_succ) {
     AERROR << "Failed to get shared data. event:" << event.to_string();
     return false;
   }
   return true;
+}
+
+void CIPVSubnode::PublishDataAndEvent(
+    const float &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
+    CIPVObjectData *cipv_object_data) {
+  std::string key = "";
+  SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
+
+  cipv_object_data->Add(key, sensor_objects);
+
+  for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
+    const EventMeta &event_meta = pub_meta_events_[idx];
+    Event event;
+    event.event_id = event_meta.event_id;
+    event.timestamp = timestamp;
+    event.reserve = device_id_;
+    event_manager_->Publish(event);
+  }
 }
 
 REGISTER_SUBNODE(CIPVSubnode);
