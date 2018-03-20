@@ -53,8 +53,8 @@
 #ifndef MODULES_PERCEPTION_LIB_BASE_REGISTERER_H_
 #define MODULES_PERCEPTION_LIB_BASE_REGISTERER_H_
 
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "gtest/gtest_prod.h"
@@ -68,23 +68,21 @@ namespace perception {
 // idea from boost any but make it more simple and don't use type_info.
 class Any {
  public:
-  Any() : content_(NULL) {}
+  Any() : content_(nullptr) {}
 
   template <typename ValueType>
-  Any(const ValueType &value)  // NOLINT
+  explicit Any(const ValueType &value)
       : content_(new Holder<ValueType>(value)) {}
 
   Any(const Any &other)
-      : content_(other.content_ ? other.content_->clone() : NULL) {}
+      : content_(other.content_ ? other.content_->clone() : nullptr) {}
 
-  ~Any() {
-    delete content_;
-  }
+  ~Any() { delete content_; }
 
   template <typename ValueType>
   ValueType *AnyCast() {
     return content_ ? &(static_cast<Holder<ValueType> *>(content_)->held_)
-                    : NULL;  // NOLINT
+                    : nullptr;
   }
 
  private:
@@ -99,9 +97,7 @@ class Any {
    public:
     explicit Holder(const ValueType &value) : held_(value) {}
     virtual ~Holder() {}
-    virtual PlaceHolder *clone() const {
-      return new Holder(held_);
-    }
+    virtual PlaceHolder *clone() const { return new Holder(held_); }
 
     ValueType held_;
   };
@@ -115,16 +111,14 @@ class ObjectFactory {
  public:
   ObjectFactory() {}
   virtual ~ObjectFactory() {}
-  virtual Any NewInstance() {
-    return Any();
-  }
+  virtual Any NewInstance() { return Any(); }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(ObjectFactory);
 };
 
-typedef std::map<std::string, ObjectFactory *> FactoryMap;
-typedef std::map<std::string, FactoryMap> BaseClassMap;
+typedef std::unordered_map<std::string, ObjectFactory *> FactoryMap;
+typedef std::unordered_map<std::string, FactoryMap> BaseClassMap;
 BaseClassMap &GlobalFactoryMap();
 
 bool GetRegisteredClasses(
@@ -148,7 +142,7 @@ bool GetRegisteredClasses(
           AERROR << "Instance:" << c.first;                           \
         }                                                             \
         AERROR << "Get instance " << name << " failed.";              \
-        return NULL;                                                  \
+        return nullptr;                                               \
       }                                                               \
       Any object = iter->second->NewInstance();                       \
       return *(object.AnyCast<base_class *>());                       \

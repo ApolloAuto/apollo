@@ -16,7 +16,7 @@
 
 #include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
 
-#include <map>
+#include <unordered_map>
 
 #include "eigen_conversions/eigen_msg.h"
 #include "pcl_conversions/pcl_conversions.h"
@@ -66,7 +66,7 @@ bool LidarProcessSubnode::InitInternal() {
     return false;
   }
   // parse reserve fileds
-  std::map<std::string, std::string> reserve_field_map;
+  std::unordered_map<std::string, std::string> reserve_field_map;
   if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
     AERROR << "Failed to parse reserve filed: " << reserve_;
     return false;

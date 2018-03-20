@@ -16,6 +16,8 @@
 
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 
+#include <unordered_map>
+
 #include "modules/perception/traffic_light/util/color_space.h"
 
 namespace apollo {
@@ -25,7 +27,7 @@ using apollo::common::adapter::AdapterManager;
 
 bool CameraProcessSubnode::InitInternal() {
   // Subnode config in DAG streaming
-  std::map<std::string, std::string> fields;
+  std::unordered_map<std::string, std::string> fields;
   SubnodeHelper::ParseReserveField(reserve_, &fields);
   device_id_ = fields["device_id"];
 
@@ -92,7 +94,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   double timestamp = msg.header.stamp.toSec();
   AINFO << "CameraProcessSubnode ImgCallback: "
-        << " frame: "<< ++seq_num_ << " timestamp: ";
+        << " frame: " << ++seq_num_ << " timestamp: ";
   AINFO << std::fixed << std::setprecision(20) << timestamp;
 
   cv::Mat img;
