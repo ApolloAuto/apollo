@@ -276,7 +276,7 @@ function release() {
   fi
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
-  cp /home/tmp/perception_cuda/lib/* $LIB_DIR
+  cp ./modules/perception/cuda_util/build/libcuda_util.so $LIB_DIR
 
   # doc
   cp -r docs "${APOLLO_RELEASE_DIR}"
