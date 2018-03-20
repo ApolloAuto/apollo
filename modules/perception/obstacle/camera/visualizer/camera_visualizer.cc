@@ -35,11 +35,10 @@ std::map<std::string, cv::Scalar> kColorTable = {
     {std::string("debug_roi"), cv::Scalar(255, 169, 255)}};
 
 std::vector<std::shared_ptr<Image>> g_cached_images;
-const int kMaxCachedImageNum = 100;
+const int kMaxCachedImageNum = 10;
 
 void OnPerception(const PerceptionObstacles &);
 void OnImageShort(const sensor_msgs::ImagePtr &);
-void OnImageLong(const sensor_msgs::ImagePtr &);
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "camera_visualizer");
@@ -47,8 +46,6 @@ int main(int argc, char **argv) {
 
   ros::Subscriber sub_perception_debug =
       n.subscribe(FLAGS_perception_obstacle_topic, 1000, OnPerception);
-  ros::Subscriber sub_tl_image_long =
-      n.subscribe(FLAGS_image_long_topic, 1000, OnImageLong);
   ros::Subscriber sub_tl_image_short =
       n.subscribe(FLAGS_image_short_topic, 1000, OnImageShort);
 
@@ -79,9 +76,6 @@ void OnImage(CameraId camera_id, const sensor_msgs::ImagePtr &msg) {
   while (g_cached_images.size() > kMaxCachedImageNum) {
     g_cached_images.erase(g_cached_images.begin());
   }
-}
-void OnImageLong(const sensor_msgs::ImagePtr &msg) {
-  OnImage(CameraId::LONG_FOCUS, msg);
 }
 
 void OnImageShort(const sensor_msgs::ImagePtr &msg) {
