@@ -79,6 +79,10 @@ class ReferenceLine {
   const std::vector<ReferencePoint>& reference_points() const;
 
   ReferencePoint GetReferencePoint(const double s) const;
+  std::vector<ReferencePoint> GetReferencePoints(double start_s,
+                                                 double end_s) const;
+
+  std::size_t GetNearestReferenceIndex(const double s) const;
 
   ReferencePoint GetNearestReferencePoint(const common::math::Vec2d& xy) const;
 

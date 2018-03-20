@@ -44,10 +44,13 @@ class CostEvaluator : public Evaluator {
   void Evaluate(Obstacle* obstacle_ptr) override;
 
  private:
-  double ComputeProbability(
-      const double obstacle_length,
-      const double obstacle_width,
-      const LaneSequence& lane_sequence);
+  double ComputeProbability(const double obstacle_length,
+                            const double obstacle_width,
+                            const LaneSequence& lane_sequence);
+
+  double FrontLateralDistanceCost(const double obstacle_length,
+                                  const double obstacle_width,
+                                  const LaneSequence& lane_sequence);
 };
 
 }  // namespace prediction

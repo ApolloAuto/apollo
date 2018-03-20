@@ -43,7 +43,6 @@ class MapNavigator {
 
     reset() {
         this.routingPaths.forEach(path => {
-            console.log(path);
             this.mapAdapter.removePolyline(path);
         });
         this.routingPaths = [];
@@ -72,7 +71,7 @@ class MapNavigator {
 
     createControls() {
         this.mapAdapter.createControl({
-            text: "Center Vehicle is ON",
+            text: "CarView ON",
             tip: "Click to recenter the vehicle",
             color: "#FFFFFF",
             offsetX: 430,
@@ -80,18 +79,18 @@ class MapNavigator {
             onClickHandler: textElementDiv => {
                 if (this.centerVehicle) {
                     this.centerVehicle = false;
-                    textElementDiv.innerHTML = "Center Vehicle is OFF";
-                    this.mapAdapter.setZoom(15);
+                    textElementDiv.innerHTML = "CarView OFF";
+                    this.mapAdapter.setZoom(18);
                 } else {
                     this.centerVehicle = true;
-                    textElementDiv.innerHTML = "Center Vehicle is ON";
+                    textElementDiv.innerHTML = "CarView ON";
                     this.mapAdapter.setZoom(20);
                 }
             },
         });
 
         this.mapAdapter.createControl({
-            text: "Routing Request",
+            text: "Route",
             tip: "Click to send routing request",
             color: "#CD5C5C",
             offsetX: 298,

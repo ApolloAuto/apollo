@@ -98,7 +98,7 @@ int RunComponentCommand(const Map<std::string, Component> &components,
 
 template <class FlagType, class ValueType>
 void SetGlobalFlag(const std::string &flag_name, const ValueType &value,
-                   FlagType* flag) {
+                   FlagType *flag) {
   static constexpr char kGlobalFlagfile[] =
       "/apollo/modules/common/data/global_flagfile.txt";
   if (*flag != value) {
@@ -133,6 +133,7 @@ HMIWorker::HMIWorker() {
   *config_.mutable_available_maps() = ListDirAsDict(FLAGS_map_data_path);
   *config_.mutable_available_vehicles() =
       ListDirAsDict(FLAGS_vehicle_data_path);
+  config_.set_utm_zone_id(FLAGS_local_utm_zone_id);
   ADEBUG << "Loaded HMI config: " << config_.DebugString();
 
   // Init HMIStatus.
@@ -160,8 +161,19 @@ HMIWorker::HMIWorker() {
 
 bool HMIWorker::Trigger(const HMIAction action) {
   AINFO << "HMIAction " << HMIAction_Name(action) << " was triggered!";
-  // TODO(xiaoxq): Do the action.
-  return false;
+  switch (action) {
+    case HMIAction::SETUP:
+      RunModeCommand("start");
+      break;
+    case HMIAction::AUTO_MODE:
+      return ChangeToDrivingMode(Chassis::COMPLETE_AUTO_DRIVE);
+    case HMIAction::DISENGAGE:
+      return ChangeToDrivingMode(Chassis::COMPLETE_MANUAL);
+    default:
+      AERROR << "HMIAction not implemented, yet!";
+      return false;
+  }
+  return true;
 }
 
 int HMIWorker::RunModuleCommand(const std::string &module,

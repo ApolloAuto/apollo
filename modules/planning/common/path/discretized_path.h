@@ -34,11 +34,9 @@ class DiscretizedPath {
 
   explicit DiscretizedPath(const std::vector<common::PathPoint>& path_points);
 
-  void set_path_points(const std::vector<common::PathPoint>& path_points);
-
   virtual ~DiscretizedPath() = default;
 
-  common::PathPoint Evaluate(const double path_s) const;
+  void set_path_points(const std::vector<common::PathPoint>& path_points);
 
   double Length() const;
 

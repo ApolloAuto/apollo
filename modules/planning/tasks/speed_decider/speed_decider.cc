@@ -68,18 +68,25 @@ apollo::common::Status SpeedDecider::Execute(
 SpeedDecider::StPosition SpeedDecider::GetStPosition(
     const SpeedData& speed_profile, const StBoundary& st_boundary) const {
   StPosition st_position = BELOW;
+  if (st_boundary.IsEmpty()) {
+    return st_position;
+  }
   const double start_t = st_boundary.min_t();
   const double end_t = st_boundary.max_t();
-  for (const auto& speed_point : speed_profile.speed_vector()) {
-    if (speed_point.t() < start_t) {
+  for (size_t i = 0; i + 1 < speed_profile.speed_vector().size(); ++i) {
+    const STPoint curr_st(speed_profile.speed_vector()[i].s(),
+                          speed_profile.speed_vector()[i].t());
+    const STPoint next_st(speed_profile.speed_vector()[i + 1].s(),
+                          speed_profile.speed_vector()[i + 1].t());
+    if (curr_st.t() < start_t && next_st.t() < start_t) {
       continue;
     }
-    if (speed_point.t() > end_t) {
+    if (curr_st.t() > end_t) {
       break;
     }
 
-    STPoint st_point(speed_point.s(), speed_point.t());
-    if (st_boundary.IsPointInBoundary(st_point)) {
+    common::math::LineSegment2d speed_line(curr_st, next_st);
+    if (st_boundary.HasOverlap(speed_line)) {
       const std::string msg =
           "dp_st_graph failed: speed profile cross st_boundaries.";
       AERROR << msg;
@@ -87,15 +94,15 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
       return st_position;
     }
 
-    double s_upper = reference_line_info_->reference_line().Length() -
-                     reference_line_info_->AdcSlBoundary().end_s();
-    double s_lower = 0.0;
-    if (st_boundary.GetBoundarySRange(speed_point.t(), &s_upper, &s_lower)) {
-      if (s_lower > speed_point.s()) {
-        st_position = BELOW;
-      } else if (s_upper < speed_point.s()) {
+    if (start_t < next_st.t() && curr_st.t() < end_t) {
+      STPoint bd_point_front = st_boundary.upper_points().front();
+      double side = common::math::CrossProd(bd_point_front, curr_st, next_st);
+      if (side < 0.0) {
         st_position = ABOVE;
+      } else {
+        st_position = BELOW;
       }
+      break;
     }
   }
   return st_position;

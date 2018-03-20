@@ -16,8 +16,12 @@
 
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 
+#include "modules/perception/traffic_light/util/color_space.h"
+
 namespace apollo {
 namespace perception {
+
+using apollo::common::adapter::AdapterManager;
 
 bool CameraProcessSubnode::InitInternal() {
   // Subnode config in DAG streaming
@@ -35,8 +39,8 @@ bool CameraProcessSubnode::InitInternal() {
 
   InitModules();
 
-  apollo::common::adapter::AdapterManager::AddImageShortCallback(
-      &CameraProcessSubnode::ImgCallback, this);
+  AdapterManager::AddImageShortCallback(&CameraProcessSubnode::ImgCallback,
+                                        this);
 
   return true;
 }
@@ -52,6 +56,12 @@ bool CameraProcessSubnode::InitCalibration() {
 }
 
 bool CameraProcessSubnode::InitModules() {
+  RegisterFactoryYoloCameraDetector();
+  RegisterFactoryGeometryCameraConverter();
+  RegisterFactoryCascadedCameraTracker();
+  RegisterFactoryFlatCameraTransformer();
+  RegisterFactoryObjectCameraFilter();
+
   detector_.reset(
       BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector"));
   detector_->Init();
@@ -77,14 +87,19 @@ bool CameraProcessSubnode::InitModules() {
 }
 
 void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
-  ++seq_num_;
-  float timestamp = message.header.stamp.toSec();
+  AdapterManager::Observe();
+  sensor_msgs::Image msg = AdapterManager::GetImageShort()->GetLatestObserved();
+
+  double timestamp = msg.header.stamp.toSec();
+  AINFO << "CameraProcessSubnode ImgCallback: "
+        << " frame: "<< ++seq_num_ << " timestamp: ";
+  AINFO << std::fixed << std::setprecision(20) << timestamp;
 
   cv::Mat img;
-  MessageToMat(message, &img);
-
+  MessageToMat(msg, &img);
   std::vector<VisualObjectPtr> objects;
   cv::Mat mask = cv::Mat::zeros(img.rows, img.cols, CV_32FC1);
+
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
   converter_->Convert(&objects);
   tracker_->Associate(img, timestamp, &objects);
@@ -101,15 +116,22 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   PublishDataAndEvent(timestamp, out_objs, camera_item_ptr);
 }
 
-bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &message,
-                                        cv::Mat *mat) {
-  sensor_msgs::ImageConstPtr ptr(&message);
-  cv_bridge::CvImageConstPtr cv_ptr =
-      cv_bridge::toCvShare(ptr, sensor_msgs::image_encodings::BGR8);
-  cv::Mat img = cv_ptr->image;
+bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
+                                        cv::Mat *img) {
+  cv::Mat cv_img;
+  if (msg.encoding.compare("yuyv") == 0) {
+    unsigned char *yuv = (unsigned char *)&(msg.data[0]);
+    cv_img = cv::Mat(msg.height, msg.width, CV_8UC3);
+    traffic_light::Yuyv2rgb(yuv, cv_img.data, msg.height * msg.width);
+    cv::cvtColor(cv_img, cv_img, CV_RGB2BGR);
+  } else {
+    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
+    cv_img = cv_ptr->image;
+  }
 
-  mat->create(img.rows, img.cols, CV_8UC3);
-  undistortion_handler_->handle(img.data, mat->data);
+  img->create(cv_img.rows, cv_img.cols, CV_8UC3);
+  undistortion_handler_->handle(cv_img.data, img->data);
+
   return true;
 }
 
@@ -153,7 +175,7 @@ void CameraProcessSubnode::VisualObjToSensorObj(
 }
 
 void CameraProcessSubnode::PublishDataAndEvent(
-    const float &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
+    const double &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
     const SharedDataPtr<CameraItem> &camera_item) {
   std::string key = "";
   SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);

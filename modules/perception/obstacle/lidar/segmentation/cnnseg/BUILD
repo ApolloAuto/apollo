@@ -9,9 +9,9 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/pcl_util",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/lidar/interface",
         "//modules/perception/obstacle/lidar/segmentation/cnnseg:cnnseg_cluster2d",
@@ -33,7 +33,7 @@ cc_library(
     hdrs = ["feature_generator.h"],
     deps = [
         "//modules/common:log",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/lidar/segmentation/cnnseg:cnnseg_util",
         "//modules/perception/obstacle/lidar/segmentation/cnnseg/proto:cnnseg_proto",
         "@caffe//:lib",
@@ -47,7 +47,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/util:disjoint_set",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/lidar/segmentation/cnnseg:cnnseg_util",
@@ -70,7 +70,7 @@ cc_test(
         "cnnseg",
         "//modules/common:log",
         "//modules/perception/common",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/obstacle/base",
         "@caffe//:lib",
         "@gtest//:main",

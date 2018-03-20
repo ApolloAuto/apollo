@@ -6,7 +6,6 @@ import ModuleController from "components/ModuleController";
 import Menu from "components/SideBar/Menu";
 import POI from "components/SideBar/POI";
 import Tasks from "components/Tasks";
-import MAP_NAVIGATOR from "components/Navigation/MapNavigator";
 
 @inject("store") @observer
 export default class ToolView extends React.Component {

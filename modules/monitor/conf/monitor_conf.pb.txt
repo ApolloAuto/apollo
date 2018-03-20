@@ -26,15 +26,6 @@ modules {
   }
 }
 modules {
-  name: "localization"
-  process_conf {
-    process_cmd_keywords: "modules/localization/localization"
-  }
-  topic_conf {
-    type: LOCALIZATION
-  }
-}
-modules {
   name: "navigation_control"
   process_conf {
     process_cmd_keywords: "modules/control/control"
@@ -44,12 +35,21 @@ modules {
   }
 }
 modules {
-  name: "navigation_prediction"
+  name: "localization"
   process_conf {
-    process_cmd_keywords: "modules/prediction/prediction"
+    process_cmd_keywords: "modules/localization/localization"
   }
   topic_conf {
-    type: PREDICTION
+    type: LOCALIZATION
+  }
+}
+modules {
+  name: "navigation_localization"
+  process_conf {
+    process_cmd_keywords: "modules/localization/localization"
+  }
+  topic_conf {
+    type: LOCALIZATION
   }
 }
 modules {
@@ -77,7 +77,31 @@ modules {
   }
 }
 modules {
+  name: "navigation_planning"
+  process_conf {
+    process_cmd_keywords: "modules/planning/planning"
+  }
+  topic_conf {
+    type: PLANNING_TRAJECTORY
+  }
+}
+modules {
   name: "prediction"
+  process_conf {
+    process_cmd_keywords: "modules/prediction/prediction"
+  }
+  topic_conf {
+    type: PREDICTION
+  }
+}
+modules {
+  name: "mobileye"
+  process_conf {
+    process_cmd_keywords: "modules/drivers/mobileye/mobileye"
+  }
+}
+modules {
+  name: "navigation_prediction"
   process_conf {
     process_cmd_keywords: "modules/prediction/prediction"
   }

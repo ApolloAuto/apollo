@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_VEHICLEPLANEMOTION_H_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_VEHICLEPLANEMOTION_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_PLANE_MOTION_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_PLANE_MOTION_H_
 
 #include <cmath>
 #include <cstdio>
@@ -81,4 +81,4 @@ class PlaneMotion {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_VEHICLEPLANEMOTION_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_PLANE_MOTION_H_

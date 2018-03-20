@@ -21,8 +21,8 @@
  * currently our assumption is that every timestamp will be of a
  * precision at 1us.
  */
-#ifndef MODULES_COMMON_TIME_TIME_H_
-#define MODULES_COMMON_TIME_TIME_H_
+#ifndef MODULES_COMMON_TIME_CLOCK_H_
+#define MODULES_COMMON_TIME_CLOCK_H_
 
 #include <atomic>
 #include <chrono>
@@ -271,4 +271,4 @@ inline Clock::Clock()
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_TIME_TIME_H_
+#endif  // MODULES_COMMON_TIME_CLOCK_H_

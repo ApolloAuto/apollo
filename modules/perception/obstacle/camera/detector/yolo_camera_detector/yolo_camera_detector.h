@@ -25,10 +25,12 @@
 
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/proto/yolo.pb.h"
 
+#include "include/region_output.h"
+#include "include/util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/common/cnn_adapter.h"
 #include "modules/perception/obstacle/camera/detector/common/feature_extractor.h"
-#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/region_output.h"
 #include "modules/perception/obstacle/camera/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_detector.h"
 
@@ -42,14 +44,12 @@ class YoloCameraDetector : public BaseCameraDetector {
   virtual ~YoloCameraDetector() {}
 
   bool Init(const CameraDetectorInitOptions &options =
-            CameraDetectorInitOptions()) override;
+                CameraDetectorInitOptions()) override;
 
-  bool Detect(const cv::Mat &frame,
-              const CameraDetectorOptions &options,
+  bool Detect(const cv::Mat &frame, const CameraDetectorOptions &options,
               std::vector<VisualObjectPtr> *objects) override;
 
-  bool Multitask(const cv::Mat &frame,
-                 const CameraDetectorOptions &options,
+  bool Multitask(const cv::Mat &frame, const CameraDetectorOptions &options,
                  std::vector<VisualObjectPtr> *objects, cv::Mat *mask);
 
   bool Extract(std::vector<VisualObjectPtr> *objects) {
@@ -62,8 +62,6 @@ class YoloCameraDetector : public BaseCameraDetector {
   std::string Name() const override;
 
  protected:
-  bool get_objects_gpu(std::vector<VisualObjectPtr> *objects);
-
   bool init_cnn(const std::string &yolo_root);
 
   void load_intrinsic(const CameraDetectorInitOptions &options);
@@ -72,11 +70,21 @@ class YoloCameraDetector : public BaseCameraDetector {
 
   void init_anchor(const std::string &yolo_root);
 
+  bool get_objects_cpu(std::vector<VisualObjectPtr> *objects);
+
+  void get_object_helper(int idx, const float *loc_data, const float *obj_data,
+                         const float *cls_data, const float *ori_data,
+                         const float *dim_data, const float *lof_data,
+                         const float *lor_data, int width, int height,
+                         int num_classes, bool with_ori, bool with_dim,
+                         bool with_lof, bool with_lor);
+
  private:
   std::shared_ptr<CNNAdapter> cnnadapter_;
 
-  // boost::shared_ptr<anakin::Tensor<float>> res_cls_tensor_ = nullptr;
-  // boost::shared_ptr<anakin::Tensor<float>> res_box_tensor_ = nullptr;
+  std::shared_ptr<SyncedMemory> res_cls_tensor_ = nullptr;
+  std::shared_ptr<SyncedMemory> res_box_tensor_ = nullptr;
+
   std::shared_ptr<SyncedMemory> image_data_ = nullptr;
   std::shared_ptr<SyncedMemory> overlapped_ = nullptr;
   std::shared_ptr<SyncedMemory> idx_sm_ = nullptr;

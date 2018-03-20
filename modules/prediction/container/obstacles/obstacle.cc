@@ -23,10 +23,10 @@
 #include <unordered_set>
 #include <utility>
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/map_util.h"
-#include "modules/common/configs/config_gflags.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
@@ -99,6 +99,13 @@ const KalmanFilter<double, 6, 2, 0>& Obstacle::kf_motion_tracker() const {
 
 const KalmanFilter<double, 2, 2, 4>& Obstacle::kf_pedestrian_tracker() const {
   return kf_pedestrian_tracker_;
+}
+
+bool Obstacle::IsStill() {
+  if (feature_history_.size() > 0) {
+    return feature_history_.front().is_still();
+  }
+  return true;
 }
 
 bool Obstacle::IsOnLane() {
@@ -365,8 +372,8 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
   double speed = std::hypot(velocity_x, velocity_y);
   double velocity_heading = perception_obstacle.theta();
 
-  if (!FLAGS_use_navigation_mode &&
-      FLAGS_enable_adjust_velocity_heading && history_size() > 0) {
+  if (!FLAGS_use_navigation_mode && FLAGS_enable_adjust_velocity_heading &&
+      history_size() > 0) {
     double diff_x =
         feature->position().x() - feature_history_.front().position().x();
     double diff_y =
@@ -393,7 +400,7 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
     }
     double filtered_heading = heading_filter_.Filter(velocity_heading);
     if (type_ == PerceptionObstacle::BICYCLE ||
-      type_ == PerceptionObstacle::PEDESTRIAN) {
+        type_ == PerceptionObstacle::PEDESTRIAN) {
       velocity_heading = filtered_heading;
     }
     velocity_x = speed * std::cos(velocity_heading);
@@ -854,7 +861,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature,
 }
 
 void Obstacle::SetLanePoints(Feature* feature) {
-  if (feature == nullptr || !feature->velocity_heading()) {
+  if (feature == nullptr || !feature->has_velocity_heading()) {
     AERROR << "Null feature or no velocity heading.";
     return;
   }

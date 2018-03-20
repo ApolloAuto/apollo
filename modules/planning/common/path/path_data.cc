@@ -22,11 +22,12 @@
 
 #include <algorithm>
 #include <limits>
+#include <vector>
 
 #include "modules/common/log.h"
+#include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
-#include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 

@@ -29,14 +29,6 @@
 namespace apollo {
 namespace perception {
 
-DEFINE_string(onsemi_obstacle_extrinsics,
-              "./conf/params/onsemi_obstacle_extrinsics.yaml",
-              "onsemi_obstacle_extrinsics name");
-DEFINE_string(onsemi_obstacle_intrinsics,
-              "./conf/params/onsemi_obstacle_intrinsics.yaml",
-              "onsemi_obstacle_intrinsics name");
-DEFINE_bool(onboard_undistortion, false, "do undistortion");
-
 std::vector<cv::Scalar> color_table = {
     cv::Scalar(0, 0, 0),       cv::Scalar(128, 0, 0),
     cv::Scalar(255, 0, 0),     cv::Scalar(0, 128, 0),

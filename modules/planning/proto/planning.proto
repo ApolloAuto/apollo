@@ -2,11 +2,12 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/common/proto/header.proto";
-import "modules/common/proto/vehicle_signal.proto";
-import "modules/common/proto/drive_state.proto";
-import "modules/common/proto/pnc_point.proto";
 import "modules/canbus/proto/chassis.proto";
+import "modules/common/proto/drive_state.proto";
+import "modules/common/proto/geometry.proto";
+import "modules/common/proto/header.proto";
+import "modules/common/proto/pnc_point.proto";
+import "modules/common/proto/vehicle_signal.proto";
 import "modules/map/proto/map_id.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_internal.proto";
@@ -72,7 +73,7 @@ message LatencyStats {
   optional double init_frame_time_ms = 3;
 }
 
-// next id: 20
+// next id: 21
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
 
@@ -118,4 +119,12 @@ message ADCTrajectory {
   // set the engage advice for based on current planning result.
   optional apollo.common.EngageAdvice engage_advice = 19;
 
+  // the region where planning cares most
+  message CriticalRegion {
+    repeated apollo.common.Polygon region = 1;
+  }
+
+  // critial region will be empty when planning is NOT sure which region is critical
+  // critial regions may or may not overlap
+  optional CriticalRegion critical_region = 20;
 }

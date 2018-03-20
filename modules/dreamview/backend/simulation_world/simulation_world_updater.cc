@@ -146,10 +146,10 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         // Publish monitor message.
         if (succeed) {
           sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
-                                                   "Routing request Sent");
+                                                   "Routing request sent.");
         } else {
           sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::ERROR, "Failed to send routing request");
+              MonitorMessageItem::ERROR, "Failed to send a routing request.");
         }
       });
 

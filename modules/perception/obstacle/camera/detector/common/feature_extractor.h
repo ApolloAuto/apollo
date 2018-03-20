@@ -28,7 +28,7 @@
 #include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
 
 #include "modules/common/log.h"
-#include "modules/perception/lib/base/noncopyable.h"
+#include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
 
@@ -66,7 +66,7 @@ class ReorgFeatureExtractor : public BaseFeatureExtractor {
   std::vector<caffe::Blob<float> *> top_vec_;
   boost::shared_ptr<caffe::Blob<float>> reorg_feat_blob_;
   boost::shared_ptr<caffe::Layer<float>> reorg_layer_ = nullptr;
-  bool skip_reorg_;
+  bool skip_reorg_ = false;
   int ref_height_ = 0;
   int ref_width_ = 0;
 };

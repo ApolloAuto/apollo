@@ -27,8 +27,8 @@ namespace traffic_light {
 bool MultiCamerasProjection::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
   std::string model_name = "MultiCamerasProjection";
-  const ModelConfig *model_config = nullptr;
-  if (!config_manager->GetModelConfig(model_name, &model_config)) {
+  const ModelConfig *model_config = config_manager->GetModelConfig(model_name);
+  if (config_manager == nullptr) {
     AERROR << "not found model: " << model_name;
     return false;
   }
@@ -54,9 +54,9 @@ bool MultiCamerasProjection::Init() {
   std::map<std::string, CameraCoeffient> camera_coeffients;
   for (size_t i = 0; i < camera_names.size(); ++i) {
     const auto &camera_model_name = camera_names[i];
-    const ModelConfig *camera_model_config = nullptr;
-    if (!config_manager->GetModelConfig(camera_model_name,
-                                        &camera_model_config)) {
+    const ModelConfig *camera_model_config =
+        config_manager->GetModelConfig(camera_model_name);
+    if (camera_model_config == nullptr) {
       AERROR << "not found camera model: " << camera_model_name;
       return false;
     }

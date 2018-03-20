@@ -43,8 +43,9 @@ bool CCLanePostProcessor::Init() {
   // 1. get model config
   ConfigManager *config_manager = ConfigManager::instance();
 
-  const ModelConfig *model_config = NULL;
-  if (!config_manager->GetModelConfig(this->name(), &model_config)) {
+  const ModelConfig *model_config =
+      config_manager->GetModelConfig(this->name());
+  if (model_config == nullptr) {
     AERROR << "not found model: " << this->name();
     return false;
   }
@@ -61,7 +62,7 @@ bool CCLanePostProcessor::Init() {
     AINFO << "using image space to generate lane instances ...";
     options_.space_type = SpaceType::IMAGE;
   } else {
-    AFATAL << "invalid space type" << space_type;
+    AERROR << "invalid space type" << space_type;
     return false;
   }
   options_.frame.space_type = options_.space_type;
@@ -256,7 +257,7 @@ bool CCLanePostProcessor::Init() {
       return false;
     }
   } else {
-    AFATAL << "invalid marker association method.";
+    AERROR << "invalid marker association method.";
     return false;
   }
 
@@ -310,7 +311,7 @@ bool CCLanePostProcessor::Init() {
   } else if (options_.space_type == SpaceType::IMAGE) {
     is_x_longitude_ = false;
   } else {
-    AFATAL << "invalid space type" << space_type;
+    AERROR << "invalid space type" << space_type;
     return false;
   }
 
@@ -524,10 +525,8 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
   }
 
   float time_cur_frame = 0.0f;
-  Timer timer;
 
   // 1. get binary lane label mask
-  timer.tic();
   cv::Mat lane_mask;
   if (lane_map.type() == CV_32FC1) {
     // confidence heatmap
@@ -550,21 +549,14 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
     AERROR << "invalid input lane map type: " << lane_map.type();
     return false;
   }
-  float time_lane_mask = static_cast<float>(timer.toc());
-  time_cur_frame += time_lane_mask;
 
   // 2. find connected components from lane label mask
-  timer.tic();
   vector<ConnectedComponentPtr> cc_list;
   cc_generator_->FindConnectedComponents(lane_mask, &cc_list);
 
-  float time_find_cc = static_cast<float>(timer.toc());
-  AINFO << "time to find connected components: " << time_find_cc << " ms";
   AINFO << "number of connected components = " << cc_list.size();
-  time_cur_frame += time_find_cc;
 
   // 3. split CC and find inner edges
-  timer.tic();
   int tot_inner_edge_count = 0;
   for (int i = 0; i < static_cast<int>(cc_list.size()); ++i) {
     auto it_cc = cc_list[i];
@@ -578,13 +570,8 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
     }
     tot_inner_edge_count += static_cast<int>(it_cc->GetInnerEdges()->size());
   }
-  float time_find_inner_edges = static_cast<float>(timer.toc());
-  time_cur_frame += time_find_inner_edges;
-  AINFO << "time to find inner edges: " << time_find_inner_edges << " ms";
-  AINFO << "number of inner edge = " << tot_inner_edge_count;
 
   /// 4. do lane marker association and determine lane instance labels
-  timer.tic();
   cur_frame_.reset(new LaneFrame);
 
   if (options_.frame.space_type == SpaceType::IMAGE) {
@@ -598,9 +585,6 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
 
   cur_frame_->Process(cur_lane_instances_);
 
-  float time_lane_frame = static_cast<float>(timer.toc());
-  time_cur_frame += time_lane_frame;
-  AINFO << "time for frame processing: " << time_lane_frame << " ms";
   AINFO << "number of lane instances = " << cur_lane_instances_->size();
 
   AINFO << "lane post-processing runtime for current frame: " << time_cur_frame
@@ -643,7 +627,6 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
             LaneInstance::CompareSiz);
 
   /// generate lane objects
-  Timer timer;
   if (options_.space_type == SpaceType::IMAGE) {
     /// for image space coordinate
     AINFO << "generate lane objects in image space ...";
@@ -880,8 +863,6 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     }
   }
   EnrichLaneInfo(lane_objects);
-  float time_generate_lane_objects = static_cast<float>(timer.toc());
-  AINFO << "runtime of generating lane objects: " << time_generate_lane_objects;
 
   return true;
 }

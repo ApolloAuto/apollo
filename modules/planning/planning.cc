@@ -105,7 +105,7 @@ Status Planning::Init() {
   CHECK_ADAPTER_IF(FLAGS_use_navigation_mode && FLAGS_enable_prediction,
                    PerceptionObstacles);
   CHECK_ADAPTER_IF(FLAGS_enable_prediction, Prediction);
-  CHECK_ADAPTER_IF(FLAGS_enable_traffic_light, TrafficLightDetection);
+  CHECK_ADAPTER(TrafficLightDetection);
 
   if (!FLAGS_use_navigation_mode) {
     hdmap_ = HDMapUtil::BaseMapPtr();
@@ -291,7 +291,7 @@ void Planning::RunOnce() {
       PublishPlanningPb(&not_ready_pb, start_timestamp);
       return;
     }
-    stitching_trajectory = TrajectoryStitcher::StitchToReferenceLine(
+    stitching_trajectory = TrajectoryStitcher::CalculateInitPoint(
         vehicle_state, reference_lines.front());
   } else {
     stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(

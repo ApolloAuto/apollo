@@ -17,13 +17,14 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GLFW_FUSION_VIEWER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GLFW_FUSION_VIEWER_H_
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "Eigen/Dense"
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
 #include "opencv2/opencv.hpp"
 
 #include "modules/perception/common/perception_gflags.h"
@@ -45,8 +46,6 @@ typedef struct {
   GLfloat y;
   GLfloat z;
 } vec3;
-
-using apollo::perception::FrameContent;
 
 template <typename T = float>
 T get_poly_value(T a, T b, T c, T d, T x) {

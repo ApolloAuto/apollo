@@ -7,6 +7,28 @@ message ReroutingConfig {
   optional double cooldown_time = 1 [default = 0.6];  // seconds
 }
 
+message BacksideVehicleConfig {
+  // a vehicle is considered within current lane if it is behind the ADC and its lateral difference is less than this number.
+  optional double backside_lane_width = 1 [default=4.0];
+}
+
+message ChangeLaneConfig {
+    optional double min_overtake_distance = 1 [default=10.0];
+    optional double min_overtake_time = 2 [default=2.0];
+    optional bool  enable_guard_obstacle = 3[default=false];
+    optional double guard_distance = 4 [default=100.0];
+    optional double min_guard_speed = 5 [default=1.0];
+}
+
+message StopSignConfig {
+    optional double boundary_min_t = 1 [ default=6.0 ];
+}
+
+message ReferenceLineEndConfig {
+    optional double stop_acc_to_max_deceleration_ratio = 1 [ default=3.0 ];
+    optional double min_reference_line_remain_length = 2 [ default=10.0 ];
+}
+
 // TODO(all) migrate all other traffic rules to pb config
 message TrafficRuleConfig {
   enum RuleId {
@@ -24,8 +46,13 @@ message TrafficRuleConfig {
     CIPV = 12;
   }
   optional RuleId rule_id = 1;
+  optional bool enabled = 2;
   oneof config {
-    ReroutingConfig rerouting = 2;
+    ReroutingConfig rerouting = 3;
+    BacksideVehicleConfig backside_vehicle = 4;
+    ChangeLaneConfig change_lane = 5;
+    StopSignConfig stop_sign = 6;
+    ReferenceLineEndConfig reference_line_end = 7;
   }
 }
 

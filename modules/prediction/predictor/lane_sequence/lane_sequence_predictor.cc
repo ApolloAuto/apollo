@@ -41,10 +41,6 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   CHECK_GT(obstacle->history_size(), 0);
 
   const Feature& feature = obstacle->latest_feature();
-  if (feature.is_still()) {
-    ADEBUG << "Obstacle [" << obstacle->id() << "] is still.";
-    return;
-  }
 
   if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << " has no lane graph.";

@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <limits>
 #include <string>
+#include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
 
@@ -112,9 +113,12 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
       SpeedPoint speed_point;
       speed_point.set_s(s);
       speed_point.set_t(t);
-      speed_profile.emplace_back(speed_point);
+      const double v_default = unit_s_ / unit_t_;
+      speed_point.set_v(v_default);
+      speed_point.set_a(0.0);
+      speed_profile.emplace_back(std::move(speed_point));
     }
-    speed_data->set_speed_vector(speed_profile);
+    speed_data->set_speed_vector(std::move(speed_profile));
     return Status::OK();
   }
 
