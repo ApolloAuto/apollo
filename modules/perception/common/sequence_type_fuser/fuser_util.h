@@ -18,8 +18,8 @@
 
 #include <fstream>
 #include <iostream>
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "Eigen/Dense"
@@ -106,8 +106,9 @@ bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix);
  * @param matrices The loaded Matrices
  * @return True if load successfully, false otherwise
  */
-bool LoadMultipleMatricesFile(const std::string& filename,
-                              std::map<std::string, Matrixd>* matrices);
+bool LoadMultipleMatricesFile(
+    const std::string& filename,
+    std::unordered_map<std::string, Matrixd>* matrices);
 
 }  // namespace fuser_util
 }  // namespace perception

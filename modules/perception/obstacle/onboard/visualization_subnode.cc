@@ -16,9 +16,9 @@
 
 #include "modules/perception/obstacle/onboard/visualization_subnode.h"
 
-#include <vector>
 #include <string>
-#include <map>
+#include <unordered_map>
+#include <vector>
 #include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/camera/common/util.h"
@@ -81,8 +81,8 @@ bool VisualizationSubnode::InitInternal() {
 
   // init motion service
   if (FLAGS_show_motion) {
-    MotionService *motion_service = dynamic_cast<MotionService *>(
-       DAGStreaming::GetSubnodeByName("MotionService"));
+    MotionService* motion_service = dynamic_cast<MotionService*>(
+        DAGStreaming::GetSubnodeByName("MotionService"));
     motion_service->GetMotionBuffer(motion_buffer_);
   }
   // init fusion data
@@ -117,7 +117,7 @@ bool VisualizationSubnode::InitInternal() {
 }
 
 bool VisualizationSubnode::InitStream() {
-  std::map<std::string, std::string> reserve_field_map;
+  std::unordered_map<std::string, std::string> reserve_field_map;
   if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
     AERROR << "Failed to parse reserve string: " << reserve_;
     return false;
@@ -202,23 +202,23 @@ void VisualizationSubnode::GetFrameData(const Event& event,
                                         const double timestamp,
                                         FrameContent* content) {
   if (event.event_id == camera_event_id_) {
-      std::shared_ptr<CameraItem> camera_item;
-      if (!camera_shared_data_->Get(data_key, &camera_item) ||
-          camera_item == nullptr) {
-        AERROR << "Failed to get shared data: " << camera_shared_data_->name();
-        return;
-      }
-      cv::Mat image = camera_item->image_src_mat.clone();
-      content->set_image_content(timestamp, image);
+    std::shared_ptr<CameraItem> camera_item;
+    if (!camera_shared_data_->Get(data_key, &camera_item) ||
+        camera_item == nullptr) {
+      AERROR << "Failed to get shared data: " << camera_shared_data_->name();
+      return;
+    }
+    cv::Mat image = camera_item->image_src_mat.clone();
+    content->set_image_content(timestamp, image);
 
-      std::shared_ptr<SensorObjects> objs;
-      if (!camera_object_data_->Get(data_key, &objs) || objs == nullptr) {
-        AERROR << "Failed to get shared data: " << camera_object_data_->name();
-        return;
-      }
+    std::shared_ptr<SensorObjects> objs;
+    if (!camera_object_data_->Get(data_key, &objs) || objs == nullptr) {
+      AERROR << "Failed to get shared data: " << camera_object_data_->name();
+      return;
+    }
 
-      content->set_camera_content(timestamp, objs->sensor2world_pose,
-                                  objs->objects);
+    content->set_camera_content(timestamp, objs->sensor2world_pose,
+                                objs->objects);
   } else if (event.event_id == motion_event_id_) {
     if (FLAGS_show_motion) {
       content->set_motion_content(timestamp, motion_buffer_);
@@ -307,7 +307,7 @@ apollo::common::Status VisualizationSubnode::ProcEvents() {
         return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
       }
       AINFO << "event: " << events[j].event_id << " device_id:" << device_id
-           << " timestamp: ";
+            << " timestamp: ";
       AINFO << std::fixed << std::setprecision(20) << timestamp;
 
       GetFrameData(events[j], device_id, data_key, timestamp, &content_);

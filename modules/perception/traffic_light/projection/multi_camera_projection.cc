@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/traffic_light/projection/multi_camera_projection.h"
 
+#include <unordered_map>
+
 #include "Eigen/Core"
 #include "Eigen/Dense"
 
@@ -51,7 +53,7 @@ bool MultiCamerasProjection::Init() {
   // Read each camera's config
   std::string camera_extrinsic_file;
   std::string camera_intrinsic_file;
-  std::map<std::string, CameraCoeffient> camera_coeffients;
+  std::unordered_map<std::string, CameraCoeffient> camera_coeffients;
   for (size_t i = 0; i < camera_names.size(); ++i) {
     const auto &camera_model_name = camera_names[i];
     const ModelConfig *camera_model_config =
