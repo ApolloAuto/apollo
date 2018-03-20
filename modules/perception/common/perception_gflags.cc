@@ -72,6 +72,11 @@ DEFINE_string(short_camera_extrinsic_file,
               "modules/perception/data/params/short_camera_extrinsics.yaml",
               "short_camera extrinsic file");
 
+/// obstacle/onboard/camera_process_subnode.cc
+// Ex: /apollo/modules/perception/data/yolo_camera_detector_test/test.jpg
+DEFINE_string(image_file_path, "", "Debug image file");
+DEFINE_bool(image_file_debug, false, "Debug ROS to CV image");
+
 DEFINE_string(front_camera_extrinsics_file,
               "modules/perception/data/params/front_camera_extrinsics.yaml",
               "front_camera extrinsic file");
@@ -132,4 +137,3 @@ DEFINE_bool(use_distance_angle_fusion, true,
 
 DEFINE_bool(show_motion, false,
         "visualize motion and object trajectories");
-
