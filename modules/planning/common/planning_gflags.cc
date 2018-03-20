@@ -239,9 +239,6 @@ DEFINE_double(creep_stop_distance, 0.5,
               "stop distance(m) to the stop line of next lane overlap "
               "while creeping ");
 /// keep_clear
-DEFINE_double(keep_clear_min_pass_distance, 2.0,
-              "valid min distance(m) for vehicles to be considered as "
-              "have passed keep_clear zone (stop_line_end_s)");
 /// traffic light
 DEFINE_double(max_stop_deacceleration_for_yellow_light, 3.0,
               "treat yellow light as red when deceleration (abstract value"

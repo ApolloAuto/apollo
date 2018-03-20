@@ -29,7 +29,6 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/util.h"
 
 namespace apollo {
