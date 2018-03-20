@@ -22,7 +22,7 @@
 #include "gtest/gtest.h"
 #include "opencv2/opencv.hpp"
 
-#include "include/region_output.h"
+#include "modules/perception/cuda_util/region_output.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
