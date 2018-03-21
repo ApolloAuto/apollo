@@ -118,9 +118,9 @@ DECLARE_double(max_stop_speed);
 DECLARE_double(max_stop_deceleration);
 DECLARE_double(signal_light_min_pass_s_distance);
 DECLARE_double(signal_expire_time_sec);
+
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(destination_check_distance);
-DECLARE_double(destination_stop_distance);
 
 DECLARE_double(virtual_stop_wall_length);
 DECLARE_double(virtual_stop_wall_height);

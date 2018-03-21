@@ -48,7 +48,7 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
       config_.reference_line_end().stop_acc_to_max_deceleration_ratio();
   const double stop_s = velocity * velocity / (2.0 * stop_acc) +
                         FLAGS_virtual_stop_wall_length +
-                        FLAGS_destination_stop_distance;
+                        config_.reference_line_end().stop_distance();
   if (stop_s < remain_s &&
       remain_s >
           config_.reference_line_end().min_reference_line_remain_length()) {
@@ -75,13 +75,13 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
 
   // build stop decision
   auto stop_point = reference_line.GetReferencePoint(
-      obstacle_start_s - FLAGS_destination_stop_distance);
+      obstacle_start_s - config_.reference_line_end().stop_distance());
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
   stop_decision->set_reason_code(StopReasonCode::STOP_REASON_DESTINATION);
-  stop_decision->set_distance_s(-FLAGS_destination_stop_distance);
+  stop_decision->set_distance_s(-config_.reference_line_end().stop_distance());
   stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
   stop_decision->mutable_stop_point()->set_y(stop_point.y());
