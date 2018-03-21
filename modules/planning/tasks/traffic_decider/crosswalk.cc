@@ -44,7 +44,7 @@ using apollo::perception::PerceptionObstacle;
 
 Crosswalk::Crosswalk(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
-bool Crosswalk::ApplyRule(Frame* frame,
+bool Crosswalk::ApplyRule(Frame* const frame,
                           ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -222,7 +222,7 @@ bool Crosswalk::BuildStopDecision(Frame* const frame,
   // create virtual stop wall
   std::string virtual_obstacle_id =
       CROSSWALK_VO_ID_PREFIX + crosswalk_overlap->object_id;
-  auto* obstacle = frame->CreateVirtualStopObstacle(
+  auto* obstacle = frame->CreateStopObstacle(
       reference_line_info, virtual_obstacle_id, crosswalk_overlap->start_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle[" << virtual_obstacle_id << "]";

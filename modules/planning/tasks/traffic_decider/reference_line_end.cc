@@ -61,7 +61,7 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
       REF_LINE_END_VO_ID_PREFIX + reference_line_info->Lanes().Id();
   double obstacle_start_s =
       reference_line.Length() - FLAGS_virtual_stop_wall_length;
-  auto* obstacle = frame->CreateVirtualStopObstacle(
+  auto* obstacle = frame->CreateStopObstacle(
       reference_line_info, virtual_obstacle_id, obstacle_start_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle[" << virtual_obstacle_id << "]";

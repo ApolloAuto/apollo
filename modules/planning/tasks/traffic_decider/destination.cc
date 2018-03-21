@@ -17,47 +17,117 @@
 /**
  * @file
  **/
+#include <algorithm>
 
 #include "modules/planning/tasks/traffic_decider/destination.h"
 
-#include "modules/common/proto/pnc_point.pb.h"
-
-#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::adapter::AdapterManager;
+using apollo::hdmap::HDMapUtil;
+
 Destination::Destination(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
-bool Destination::ApplyRule(Frame* const,
+bool Destination::ApplyRule(Frame* frame,
                             ReferenceLineInfo* const reference_line_info) {
-  const auto& path_decision = reference_line_info->path_decision();
-  auto* destination = path_decision->Find(FLAGS_destination_obstacle_id);
-  if (!destination) {  // no destination in current reference line.
-    return true;
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
+  MakeDecisions(frame, reference_line_info);
+
+  return true;
+}
+
+/**
+ * @brief: make decision
+ */
+void Destination::MakeDecisions(
+    Frame* const frame,
+    ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
+  if (FLAGS_use_navigation_mode) {
+    return;
   }
 
-  const auto& box = destination->obstacle()->PerceptionBoundingBox();
-  if (!reference_line_info->reference_line().IsOnRoad(box.center())) {
-    return true;
+  if (!frame->is_near_destination()) {
+    return;
   }
 
-  auto stop_point = reference_line_info->reference_line().GetReferencePoint(
-      destination->PerceptionSLBoundary().start_s() -
-      FLAGS_destination_stop_distance);
+  BuildStopDecision(frame, reference_line_info);
+
+  return;
+}
+
+/**
+ * @brief: build stop decision
+ */
+bool Destination::BuildStopDecision(
+    Frame* frame,
+    ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
+  const auto& reference_line = reference_line_info->reference_line();
+
+  const auto &routing =
+      AdapterManager::GetRoutingResponse()->GetLatestObserved();
+  if (routing.routing_request().waypoint_size() < 2) {
+    ADEBUG << "routing_request has no end";
+    return false;
+  }
+
+  const auto &routing_end = *routing.routing_request().waypoint().rbegin();
+
+  // create virtual stop wall
+  std::string virtual_obstacle_id = DESTINATION_VO_ID;
+  double dest_lane_s =
+      std::max(0.0, routing_end.s() -
+               FLAGS_virtual_stop_wall_length -
+               config_.destination().stop_distance());
+  auto* obstacle = frame->CreateStopObstacle(
+      virtual_obstacle_id, routing_end.id(), dest_lane_s);
+  if (!obstacle) {
+    AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
+    return false;
+  }
+
+  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  if (!stop_wall) {
+    AERROR << "Failed to create path_obstacle for: " << virtual_obstacle_id;
+    return false;
+  }
+
+  // build stop decision
+  const auto stop_wall_box = stop_wall->obstacle()->PerceptionBoundingBox();
+  if (!reference_line.IsOnRoad(stop_wall_box.center())) {
+    AERROR << "destination point is not on road";
+    return true;
+  }
+  auto stop_point = reference_line.GetReferencePoint(
+      stop_wall->PerceptionSLBoundary().start_s() -
+      config_.destination().stop_distance());
+
   ObjectDecisionType stop;
-  stop.mutable_stop();
-  stop.mutable_stop()->set_distance_s(-FLAGS_destination_stop_distance);
-  stop.mutable_stop()->set_reason_code(StopReasonCode::STOP_REASON_DESTINATION);
-  stop.mutable_stop()->set_stop_heading(stop_point.heading());
-  stop.mutable_stop()->mutable_stop_point()->set_x(stop_point.x());
-  stop.mutable_stop()->mutable_stop_point()->set_y(stop_point.y());
-  stop.mutable_stop()->mutable_stop_point()->set_z(0.0);
+  auto stop_decision = stop.mutable_stop();
+  stop_decision->set_reason_code(StopReasonCode::STOP_REASON_DESTINATION);
+  stop_decision->set_distance_s(-config_.destination().stop_distance());
+  stop_decision->set_stop_heading(stop_point.heading());
+  stop_decision->mutable_stop_point()->set_x(stop_point.x());
+  stop_decision->mutable_stop_point()->set_y(stop_point.y());
+  stop_decision->mutable_stop_point()->set_z(0.0);
+
+  auto* path_decision = reference_line_info->path_decision();
   path_decision->AddLongitudinalDecision(
-      TrafficRuleConfig::RuleId_Name(config_.rule_id()), destination->Id(),
-      stop);
+      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+
   return true;
 }
 
