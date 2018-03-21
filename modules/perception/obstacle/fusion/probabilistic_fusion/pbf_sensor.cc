@@ -1,4 +1,3 @@
-
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
@@ -36,7 +35,7 @@ void PbfSensor::QueryLatestFrames(double time_stamp,
     return;
   }
   frames->clear();
-  for (size_t i = 0; i < frames_.size(); i++) {
+  for (size_t i = 0; i < frames_.size(); ++i) {
     if (frames_[i]->timestamp > latest_query_timestamp_ &&
         frames_[i]->timestamp <= time_stamp) {
       (*frames).push_back(frames_[i]);
@@ -47,7 +46,7 @@ void PbfSensor::QueryLatestFrames(double time_stamp,
 
 PbfSensorFramePtr PbfSensor::QueryLatestFrame(double time_stamp) {
   PbfSensorFramePtr latest_frame = nullptr;
-  for (size_t i = 0; i < frames_.size(); i++) {
+  for (size_t i = 0; i < frames_.size(); ++i) {
     if (frames_[i]->timestamp > latest_query_timestamp_ &&
         frames_[i]->timestamp <= time_stamp) {
       latest_frame = frames_[i];
@@ -67,7 +66,7 @@ void PbfSensor::AddFrame(const SensorObjects &frame) {
   pbf_frame->seq_num = frame.seq_num;
 
   pbf_frame->objects.resize(frame.objects.size());
-  for (size_t i = 0; i < frame.objects.size(); i++) {
+  for (size_t i = 0; i < frame.objects.size(); ++i) {
     PbfSensorObjectPtr obj(new PbfSensorObject());
     obj->timestamp = frame.timestamp;
     obj->sensor_type = frame.sensor_type;

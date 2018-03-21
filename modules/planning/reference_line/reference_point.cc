@@ -63,29 +63,10 @@ double ReferencePoint::kappa() const { return kappa_; }
 
 double ReferencePoint::dkappa() const { return dkappa_; }
 
-double ReferencePoint::lower_bound() const { return lower_bound_; }
-
-double ReferencePoint::upper_bound() const { return upper_bound_; }
-
 std::string ReferencePoint::DebugString() const {
-  // StrCat supports 9 arguments at most.
-  return StrCat(StrCat("{x: ", x(),
-                       ", "
-                       "y: ",
-                       y(),
-                       ", "
-                       "theta: ",
-                       heading(),
-                       ", "
-                       "kappa: ",
-                       kappa(), ", "),
-                StrCat("dkappa: ", dkappa(),
-                       ", "
-                       "upper_bound: ",
-                       upper_bound(),
-                       ", "
-                       "lower_bound: ",
-                       lower_bound(), "}"));
+  // StrCat only support 9 parameters
+  return StrCat("{x: ", x(), ", y: ", y(), ", theta: ", heading()) +
+         StrCat(", kappa: ", kappa(), ", dkappa: ", dkappa(), "}");
 }
 
 void ReferencePoint::RemoveDuplicates(std::vector<ReferencePoint>* points) {
