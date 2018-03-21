@@ -16,5 +16,3 @@ set (CMAKE_CXX_FLAGS "-std=c++11 -g -O2 -DNDEBUG -fopenmp -Wall" CACHE STRING ""
 SET(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS};-cudart=static")
 
 set(BUILD_SHARED_LIBS         OFF)       # add_library(...) -> .os/.a
-
-
