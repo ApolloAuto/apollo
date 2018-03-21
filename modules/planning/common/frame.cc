@@ -241,8 +241,6 @@ const Obstacle *Frame::CreateStopObstacle(
 
   double dest_lane_s = std::max(0.0, lane_s);
   auto dest_point = lane->GetSmoothPoint(dest_lane_s);
-  AERROR << "---111 dest_lane_s[" << dest_lane_s << "] x[" << dest_point.x()
-      << "] y[" << dest_point.y() << "]";
 
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;

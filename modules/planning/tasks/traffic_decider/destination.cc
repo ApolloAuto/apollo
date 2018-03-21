@@ -108,7 +108,7 @@ bool Destination::BuildStopDecision(
   // build stop decision
   const auto stop_wall_box = stop_wall->obstacle()->PerceptionBoundingBox();
   if (!reference_line.IsOnRoad(stop_wall_box.center())) {
-    AERROR << "destination point is not on road";
+    ADEBUG << "destination point is not on road";
     return true;
   }
   auto stop_point = reference_line.GetReferencePoint(
