@@ -14,11 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H_ // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H_ // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H_  // NOLINT
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H_  // NOLINT
+
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
@@ -29,7 +31,7 @@ namespace perception {
 typedef std::pair<int, int> TrackObjectPair;
 
 struct TrackObjectMatcherOptions {
-  Eigen::Vector3d *ref_point = nullptr;
+  const Eigen::Vector3d *ref_point = nullptr;
 };
 
 class PbfBaseTrackObjectMatcher {
