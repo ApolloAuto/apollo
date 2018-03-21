@@ -46,18 +46,6 @@ bool VisualizationSubnode::InitInternal() {
     return false;
   }
 
-  // init radar object data
-  if (FLAGS_show_radar_objects) {
-    radar_object_data_ = dynamic_cast<RadarObjectData*>(
-        shared_data_manager_->GetSharedData("RadarObjectData"));
-    if (radar_object_data_ == nullptr) {
-      AERROR << "Failed to get RadarObjectData.";
-      return false;
-    }
-    AINFO << "Init shared datas successfully, data: "
-          << radar_object_data_->name();
-  }
-
   // init camera object data
   if (camera_event_id_ != -1) {
     camera_object_data_ = dynamic_cast<CameraObjectData*>(
@@ -79,14 +67,20 @@ bool VisualizationSubnode::InitInternal() {
           << camera_shared_data_->name();
   }
 
-  // init motion service
-  if (FLAGS_show_motion) {
-    MotionService* motion_service = dynamic_cast<MotionService*>(
-        DAGStreaming::GetSubnodeByName("MotionService"));
-    motion_service->GetMotionBuffer(motion_buffer_);
+  // init radar object data
+  if (radar_event_id_ != -1) {
+    radar_object_data_ = dynamic_cast<RadarObjectData*>(
+        shared_data_manager_->GetSharedData("RadarObjectData"));
+    if (radar_object_data_ == nullptr) {
+      AERROR << "Failed to get RadarObjectData.";
+      return false;
+    }
+    AINFO << "Init shared datas successfully, data: "
+          << radar_object_data_->name();
   }
+
   // init fusion data
-  if (FLAGS_show_fused_objects) {
+  if (fusion_event_id_ != -1) {
     fusion_data_ = dynamic_cast<FusionSharedData*>(
         shared_data_manager_->GetSharedData("FusionSharedData"));
     if (fusion_data_ == nullptr) {
@@ -94,6 +88,13 @@ bool VisualizationSubnode::InitInternal() {
       return false;
     }
     AINFO << "Init shared datas successfully, data: " << fusion_data_->name();
+  }
+
+  // init motion service
+  if (motion_event_id_ != -1) {
+    MotionService *motion_service = dynamic_cast<MotionService *>(
+       DAGStreaming::GetSubnodeByName("MotionService"));
+    motion_service->GetMotionBuffer(motion_buffer_);
   }
 
   // init frame_visualizer
@@ -130,14 +131,6 @@ bool VisualizationSubnode::InitStream() {
   }
   vis_driven_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
 
-  iter = reserve_field_map.find("radar_event_id");
-  if (iter == reserve_field_map.end()) {
-    AWARN << "Failed to find radar_event_id_: " << reserve_;
-    radar_event_id_ = -1;
-  } else {
-    radar_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
-  }
-
   iter = reserve_field_map.find("camera_event_id");
   if (iter == reserve_field_map.end()) {
     AWARN << "Failed to find camera_event_id_: " << reserve_;
@@ -146,12 +139,12 @@ bool VisualizationSubnode::InitStream() {
     camera_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
   }
 
-  iter = reserve_field_map.find("cipv_event_id");
+  iter = reserve_field_map.find("radar_event_id");
   if (iter == reserve_field_map.end()) {
-    AWARN << "Failed to find cipv_event_id_: " << reserve_;
-    cipv_event_id_ = -1;
+    AWARN << "Failed to find radar_event_id_: " << reserve_;
+    radar_event_id_ = -1;
   } else {
-    cipv_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
+    radar_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
   }
 
   iter = reserve_field_map.find("fusion_event_id");
@@ -160,6 +153,14 @@ bool VisualizationSubnode::InitStream() {
     fusion_event_id_ = -1;
   } else {
     fusion_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
+  }
+
+  iter = reserve_field_map.find("cipv_event_id");
+  if (iter == reserve_field_map.end()) {
+    AWARN << "Failed to find cipv_event_id_: " << reserve_;
+    cipv_event_id_ = -1;
+  } else {
+    cipv_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
   }
 
   iter = reserve_field_map.find("motion_event_id");
@@ -177,13 +178,6 @@ bool VisualizationSubnode::SubscribeEvents(const EventMeta& event_meta,
                                            std::vector<Event>* events) const {
   Event event;
   if (event_meta.event_id == vis_driven_event_id_) {
-    // blocking
-    //        if (!event_manager_->subscribe(event_meta.event_id, &event, true))
-    //        {
-    //            // AERROR << "Failed to subscribe event: " <<
-    //            event_meta.event_id;
-    //            // return false;
-    //        }
     event_manager_->Subscribe(event_meta.event_id, &event);
     events->push_back(event);
   } else {
@@ -196,11 +190,11 @@ bool VisualizationSubnode::SubscribeEvents(const EventMeta& event_meta,
   return true;
 }
 
-void VisualizationSubnode::GetFrameData(const Event& event,
-                                        const std::string& device_id,
-                                        const std::string& data_key,
-                                        const double timestamp,
-                                        FrameContent* content) {
+void VisualizationSubnode::SetFrameContent(const Event& event,
+                                           const std::string& device_id,
+                                           const std::string& data_key,
+                                           const double timestamp,
+                                           FrameContent* content) {
   if (event.event_id == camera_event_id_) {
     std::shared_ptr<CameraItem> camera_item;
     if (!camera_shared_data_->Get(data_key, &camera_item) ||
@@ -281,7 +275,6 @@ void VisualizationSubnode::GetFrameData(const Event& event,
   }
 
   if (event.event_id == vis_driven_event_id_) {
-    // vis_driven_event_id_ fusion -> visualization
     content->update_timestamp(timestamp);
   }
 }
@@ -292,9 +285,8 @@ apollo::common::Status VisualizationSubnode::ProcEvents() {
     if (!SubscribeEvents(event_meta, &events)) {
       return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
     }
-    if (events.empty()) {
-      continue;
-    }
+    if (events.empty()) continue;
+
     for (size_t j = 0; j < events.size(); j++) {
       double timestamp = events[j].timestamp;
       const std::string& device_id = events[j].reserve;
@@ -307,24 +299,20 @@ apollo::common::Status VisualizationSubnode::ProcEvents() {
         return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
       }
       AINFO << "event: " << events[j].event_id << " device_id:" << device_id
-            << " timestamp: ";
-      AINFO << std::fixed << std::setprecision(20) << timestamp;
+           << " timestamp: ";
+      AINFO << std::fixed << std::setprecision(64) << timestamp;
 
-      GetFrameData(events[j], device_id, data_key, timestamp, &content_);
-      if (event_meta.event_id == vis_driven_event_id_) {
-        // Init of frame_visualizer must be in one thread with render,
-        // so you must move it from init_internal.
-        if (!init_) {
-          frame_visualizer_->init();
-          init_ = true;
-        }
-        frame_visualizer_->update_camera_system(&content_);
-        frame_visualizer_->render(&content_);
-        //                frame_visualizer_->set_motion_buffer(motion_buffer_);
-        // if (camera_visualizer_) {
-        //     camera_visualizer_->render(content_);
-        // }
+      SetFrameContent(events[j], device_id, data_key, timestamp, &content_);
+    }
+
+    if (event_meta.event_id == vis_driven_event_id_) {
+      // Init of frame_visualizer must be in one thread with render,
+      if (!init_) {
+        frame_visualizer_->init();
+        init_ = true;
       }
+      frame_visualizer_->update_camera_system(&content_);
+      frame_visualizer_->render(&content_);
     }
   }
   return Status::OK();
