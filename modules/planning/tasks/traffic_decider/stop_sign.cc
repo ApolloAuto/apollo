@@ -690,8 +690,7 @@ bool StopSign::BuildStopDecision(Frame* frame,
   }
 
   // create virtual stop wall
-  std::string virtual_obstacle_id =
-      STOP_SIGN_VO_ID_PREFIX + overlap->object_id;
+  std::string virtual_obstacle_id = STOP_SIGN_VO_ID_PREFIX + overlap->object_id;
   auto* obstacle = frame->CreateStopObstacle(
       reference_line_info, virtual_obstacle_id, overlap->start_s);
   if (!obstacle) {
