@@ -85,13 +85,11 @@ class Frame {
 
   const Obstacle *CreateStopObstacle(
       ReferenceLineInfo *const reference_line_info,
-      const std::string &obstacle_id,
-      const double obstacle_s);
+      const std::string &obstacle_id, const double obstacle_s);
 
-  const Obstacle *CreateStopObstacle(
-      const std::string &obstacle_id,
-      const std::string &lane_id,
-      const double lane_s);
+  const Obstacle *CreateStopObstacle(const std::string &obstacle_id,
+                                     const std::string &lane_id,
+                                     const double lane_s);
 
   const Obstacle *CreateStaticObstacle(
       ReferenceLineInfo *const reference_line_info,
