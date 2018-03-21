@@ -34,7 +34,8 @@ class Crosswalk : public TrafficRule {
   explicit Crosswalk(const TrafficRuleConfig& config);
   virtual ~Crosswalk() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 
  private:
   void MakeDecisions(Frame* const frame,

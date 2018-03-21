@@ -57,7 +57,7 @@ using apollo::planning::util::GetPlanningStatus;
 
 StopSign::StopSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
-bool StopSign::ApplyRule(Frame* frame,
+bool StopSign::ApplyRule(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -677,7 +677,7 @@ int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
 bool StopSign::BuildStopDecision(Frame* frame,
                                  ReferenceLineInfo* const reference_line_info,
                                  PathOverlap* const overlap,
-                                 const double stop_buffer) {
+                                 const double stop_distance) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
   CHECK_NOTNULL(overlap);
@@ -690,8 +690,9 @@ bool StopSign::BuildStopDecision(Frame* frame,
   }
 
   // create virtual stop wall
-  std::string virtual_obstacle_id = STOP_SIGN_VO_ID_PREFIX + overlap->object_id;
-  auto* obstacle = frame->CreateVirtualStopObstacle(
+  std::string virtual_obstacle_id =
+      STOP_SIGN_VO_ID_PREFIX + overlap->object_id;
+  auto* obstacle = frame->CreateStopObstacle(
       reference_line_info, virtual_obstacle_id, overlap->start_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
@@ -704,14 +705,14 @@ bool StopSign::BuildStopDecision(Frame* frame,
   }
 
   // build stop decision
-  const double stop_s = overlap->start_s - stop_buffer;
+  const double stop_s = overlap->start_s - stop_distance;
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
   stop_decision->set_reason_code(StopReasonCode::STOP_REASON_STOP_SIGN);
-  stop_decision->set_distance_s(-stop_buffer);
+  stop_decision->set_distance_s(-stop_distance);
   stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
   stop_decision->mutable_stop_point()->set_y(stop_point.y());

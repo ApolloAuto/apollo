@@ -83,9 +83,15 @@ class Frame {
 
   const std::vector<const Obstacle *> obstacles() const;
 
-  const Obstacle *CreateVirtualStopObstacle(
+  const Obstacle *CreateStopObstacle(
       ReferenceLineInfo *const reference_line_info,
-      const std::string &obstacle_id, const double obstacle_s);
+      const std::string &obstacle_id,
+      const double obstacle_s);
+
+  const Obstacle *CreateStopObstacle(
+      const std::string &obstacle_id,
+      const std::string &lane_id,
+      const double lane_s);
 
   const Obstacle *CreateStaticObstacle(
       ReferenceLineInfo *const reference_line_info,
@@ -104,6 +110,8 @@ class Frame {
 
   const ADCTrajectory &trajectory() const { return trajectory_; }
 
+  const bool is_near_destination() const { return is_near_destination_; }
+
  private:
   bool CreateReferenceLineInfo();
 
@@ -115,14 +123,6 @@ class Frame {
    * @return false if no colliding obstacle.
    */
   const Obstacle *FindCollisionObstacle() const;
-
-  /**
-   * @brief create destination obstacle when needed.
-   * @return < 0 if error happend;
-   * @return 0 if destination obstacle is created
-   * @return > 0 if destination obstacle should not be created now.
-   */
-  int CreateDestinationObstacle();
 
   /**
    * @brief create a static virtual obstacle
@@ -139,6 +139,7 @@ class Frame {
   const double start_time_;
   common::VehicleState vehicle_state_;
   std::list<ReferenceLineInfo> reference_line_info_;
+  bool is_near_destination_ = false;
 
   /**
    * the reference line info that the vehicle finally choose to drive

@@ -152,22 +152,18 @@ bool Frame::CreateReferenceLineInfo() {
   }
 
   reference_line_info_.clear();
-  bool near_destination = false;
   auto ref_line_iter = reference_lines.begin();
   auto segments_iter = segments.begin();
   while (ref_line_iter != reference_lines.end()) {
     if (segments_iter->StopForDestination()) {
-      near_destination = true;
+      is_near_destination_ = true;
     }
     reference_line_info_.emplace_back(vehicle_state_, planning_start_point_,
                                       *ref_line_iter, *segments_iter);
     ++ref_line_iter;
     ++segments_iter;
   }
-  if (near_destination && CreateDestinationObstacle() < 0) {
-    AERROR << "Failed to create the destination obstacle";
-    return false;
-  }
+
   if (FLAGS_enable_change_lane_decider &&
       !change_lane_decider_.Apply(&reference_line_info_)) {
     AERROR << "Failed to apply change lane decider";
@@ -207,9 +203,10 @@ bool Frame::CreateReferenceLineInfo() {
  * @brief: create static virtual object with lane width,
  *         mainly used for virtual stop wall
  */
-const Obstacle *Frame::CreateVirtualStopObstacle(
+const Obstacle *Frame::CreateStopObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id, const double obstacle_s) {
+    const std::string &obstacle_id,
+    const double obstacle_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
     return nullptr;
@@ -224,6 +221,37 @@ const Obstacle *Frame::CreateVirtualStopObstacle(
   reference_line.GetLaneWidth(obstacle_s, &lane_left_width, &lane_right_width);
   Box2d stop_wall_box{box_center, heading, FLAGS_virtual_stop_wall_length,
                       lane_left_width + lane_right_width};
+
+  return CreateStaticVirtualObstacle(obstacle_id, stop_wall_box);
+}
+
+/**
+ * @brief: create static virtual object with lane width,
+ *         mainly used for virtual stop wall
+ */
+const Obstacle *Frame::CreateStopObstacle(
+    const std::string &obstacle_id,
+    const std::string &lane_id,
+    const double lane_s) {
+  const auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(lane_id));
+  if (!lane) {
+    AERROR << "Failed to find lane[" << lane_id << "]";
+    return nullptr;
+  }
+
+  double dest_lane_s = std::max(0.0, lane_s);
+  auto dest_point = lane->GetSmoothPoint(dest_lane_s);
+  AERROR << "---111 dest_lane_s[" << dest_lane_s << "] x[" << dest_point.x()
+      << "] y[" << dest_point.y() << "]";
+
+  double lane_left_width = 0.0;
+  double lane_right_width = 0.0;
+  lane->GetWidth(dest_lane_s, &lane_left_width, &lane_right_width);
+
+  Box2d stop_wall_box{{dest_point.x(), dest_point.y()},
+                        lane->Heading(dest_lane_s),
+                        FLAGS_virtual_stop_wall_length,
+                        lane_left_width + lane_right_width};
 
   return CreateStaticVirtualObstacle(obstacle_id, stop_wall_box);
 }
@@ -289,41 +317,6 @@ const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
     AERROR << "Failed to create virtual obstacle " << id;
   }
   return ptr;
-}
-
-int Frame::CreateDestinationObstacle() {
-  if (FLAGS_use_navigation_mode) {
-    return 0;
-  }
-  const auto &routing =
-      AdapterManager::GetRoutingResponse()->GetLatestObserved();
-  if (routing.routing_request().waypoint_size() < 2) {
-    ADEBUG << "routing_request has no end";
-    return -1;
-  }
-  const auto &routing_end = *routing.routing_request().waypoint().rbegin();
-  const auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(routing_end.id()));
-  if (!lane) {
-    AERROR << "Failed to find lane for destination : "
-           << routing_end.ShortDebugString();
-    return -2;
-  }
-
-  double dest_lane_s =
-      std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
-                        FLAGS_destination_stop_distance);
-  auto dest_point = lane->GetSmoothPoint(dest_lane_s);
-  double left_width = 0.0;
-  double right_width = 0.0;
-  lane->GetWidth(dest_lane_s, &left_width, &right_width);
-  // check if destination point is in planning range
-  Box2d destination_box{{dest_point.x(), dest_point.y()},
-                        lane->Heading(dest_lane_s),
-                        FLAGS_virtual_stop_wall_length,
-                        left_width + right_width};
-  // add destination's projection to each reference line info
-  CreateStaticVirtualObstacle(FLAGS_destination_obstacle_id, destination_box);
-  return 0;
 }
 
 Status Frame::Init() {
