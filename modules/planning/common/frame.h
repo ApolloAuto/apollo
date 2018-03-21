@@ -140,23 +140,16 @@ class Frame {
   bool is_near_destination_ = false;
 
   /**
-   * the reference line info that the vehicle finally choose to drive
-   *on.
+   * the reference line info that the vehicle finally choose to drive on
    **/
   const ReferenceLineInfo *drive_reference_line_info_ = nullptr;
 
   prediction::PredictionObstacles prediction_;
-
   ThreadSafeIndexedObstacles obstacles_;
-
   perception::CIPVInfo cipv_info_;
-
   ChangeLaneDecider change_lane_decider_;
-
   ADCTrajectory trajectory_;  // last published trajectory
-
   std::unique_ptr<LagPrediction> lag_predictor_;
-
   ReferenceLineProvider *reference_line_provider_ = nullptr;
 };
 
