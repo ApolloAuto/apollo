@@ -47,9 +47,8 @@ bool Destination::ApplyRule(Frame* frame,
 /**
  * @brief: make decision
  */
-void Destination::MakeDecisions(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info) {
+void Destination::MakeDecisions(Frame* const frame,
+                                ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -70,30 +69,28 @@ void Destination::MakeDecisions(
  * @brief: build stop decision
  */
 bool Destination::BuildStopDecision(
-    Frame* frame,
-    ReferenceLineInfo* const reference_line_info) {
+    Frame* frame, ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
   const auto& reference_line = reference_line_info->reference_line();
 
-  const auto &routing =
+  const auto& routing =
       AdapterManager::GetRoutingResponse()->GetLatestObserved();
   if (routing.routing_request().waypoint_size() < 2) {
     ADEBUG << "routing_request has no end";
     return false;
   }
 
-  const auto &routing_end = *routing.routing_request().waypoint().rbegin();
+  const auto& routing_end = *routing.routing_request().waypoint().rbegin();
 
   // create virtual stop wall
   std::string virtual_obstacle_id = DESTINATION_VO_ID;
   double dest_lane_s =
-      std::max(0.0, routing_end.s() -
-               FLAGS_virtual_stop_wall_length -
-               config_.destination().stop_distance());
-  auto* obstacle = frame->CreateStopObstacle(
-      virtual_obstacle_id, routing_end.id(), dest_lane_s);
+      std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
+                        config_.destination().stop_distance());
+  auto* obstacle = frame->CreateStopObstacle(virtual_obstacle_id,
+                                             routing_end.id(), dest_lane_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
     return false;
