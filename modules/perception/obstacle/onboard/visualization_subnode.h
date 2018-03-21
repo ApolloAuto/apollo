@@ -47,15 +47,13 @@ class VisualizationSubnode : public Subnode {
 
  private:
   bool InitStream();
+
   bool SubscribeEvents(const EventMeta& event_meta,
                        std::vector<Event>* events) const;
 
-  // void get_frame_data(const std::string& device_id,
-  //                     const std::string& data_key,
-  //                     FrameContent* content, double timestamp);
-  void GetFrameData(const Event& event, const std::string& device_id,
-                    const std::string& data_key, const double timestamp,
-                    FrameContent* content);
+  void SetFrameContent(const Event& event, const std::string& device_id,
+                       const std::string& data_key, const double timestamp,
+                       FrameContent* content);
 
   RadarObjectData* radar_object_data_ = nullptr;
   CameraObjectData* camera_object_data_ = nullptr;

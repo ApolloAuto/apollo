@@ -98,4 +98,22 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "obstacle_clusters_test",
+    size = "small",
+    srcs = [
+        "obstacle_clusters_test.cc",
+    ],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/common:prediction_map",
+        "//modules/prediction/container/obstacles:obstacle_clusters",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
