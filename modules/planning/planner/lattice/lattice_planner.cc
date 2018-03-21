@@ -281,11 +281,14 @@ Status LatticePlanner::PlanOnReferenceLine(
                  << "from future trajectory to lon-lat";
         }
         // 3. evaluate cost
+        // TODO(All): complete the following code
+        /*
         std::vector<double> future_trajectory_component_cost =
             trajectory_evaluator.evaluate_per_lonlat_trajectory(
                 planning_target, lon_future_trajectory, lat_future_trajectory);
-
+        */
         // 4. emit
+        // TODO(All): complete the following code
       }
     }
 
@@ -334,7 +337,6 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   ADEBUG << "Trajectory_Evaluation_Time = "
          << (Clock::NowInSeconds() - current_time) * 1000;
-  current_time = Clock::NowInSeconds();
 
   ADEBUG << "Step CombineTrajectory Succeeded";
 
