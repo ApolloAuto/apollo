@@ -65,10 +65,11 @@ void PlaneMotion::update_motion_buffer(VehicleStatus *vehicledata) {
   for (int k = 0; k < static_cast<int>(mot_buffer_->size()); k++) {
     (*mot_buffer_)[k].motion *= mat_motion_2d_image_;
   }
-
+  // update motion from accumulated buffer
   vehicledata->time_d = time_difference_;
   vehicledata->motion = mat_motion_2d_image_;
-  mot_buffer_->push_back(*vehicledata);  // a new image frame is added
+  mot_buffer_->push_back(*vehicledata);  // a new motion between images
+  // reset motion buffer
   mat_motion_2d_image_ =
       Eigen::Matrix3f::Identity();  // reset image accumulated motion
   time_difference_ = 0;             // reset the accumulated time difference
