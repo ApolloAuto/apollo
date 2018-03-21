@@ -91,7 +91,7 @@ TEST_F(YoloCameraDetectorTest, yolo_camera_detector_roipooling_test) {
   CHECK(camera_detector->Detect(frame, options, &objects));
   AINFO << "#objects detected = " << objects.size();
 
-  CHECK_EQ(objects.size(), 3);
+  CHECK_EQ(objects.size(), 2);
 
   int obj_idx = 0;
   for (const auto &obj : objects) {
@@ -126,7 +126,7 @@ TEST_F(YoloCameraDetectorTest, multi_task_test) {
   CHECK(camera_detector->Multitask(frame, options, &objects, &lane_map));
   AINFO << "#objects detected = " << objects.size();
 
-  CHECK_EQ(objects.size(), 3);
+  CHECK_EQ(objects.size(), 2);
 
   const std::string lane_map_result_file = FLAGS_test_dir + "lane_map.jpg";
   lane_map.convertTo(lane_map, CV_8UC3, 255.0f);

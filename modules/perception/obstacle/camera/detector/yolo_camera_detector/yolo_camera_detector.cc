@@ -87,15 +87,12 @@ void YoloCameraDetector::init_anchor(const string &yolo_root) {
   string types_file = apollo::common::util::GetAbsolutePath(
       model_root, model_param.types_file());
   yolo::load_types(types_file, &types_);
-  // res_box_tensor_.reset(new anakin::Tensor<float>());
-  // res_box_tensor_->Reshape(1, 1, obj_size_, s_box_block_size);
+
   res_box_tensor_.reset(
       new SyncedMemory(obj_size_ * s_box_block_size * sizeof(float)));
   res_box_tensor_->cpu_data();
   res_box_tensor_->gpu_data();
 
-  // res_cls_tensor_.reset(new anakin::Tensor<float>());
-  // res_cls_tensor_->Reshape(1, 1, types_.size(), obj_size_);
   res_cls_tensor_.reset(
       new SyncedMemory(types_.size() * obj_size_ * sizeof(float)));
   res_cls_tensor_->cpu_data();
@@ -156,6 +153,10 @@ void YoloCameraDetector::load_intrinsic(
 
   int roi_w = image_width_;
   int roi_h = image_height_ - offset_y_;
+
+  AINFO << "roi_w=" << roi_w << ", "
+        << "roi_h=" << roi_h;
+
   int channel = 3;
   image_data_.reset(
       new SyncedMemory(roi_w * roi_h * channel * sizeof(unsigned char)));
