@@ -133,18 +133,15 @@ bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
     traffic_light::Yuyv2rgb(yuv, cv_img.data, msg.height * msg.width);
     cv::cvtColor(cv_img, cv_img, CV_RGB2BGR);
   } else {
-    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
+    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg,
+       sensor_msgs::image_encodings::BGR8);
     cv_img = cv_ptr->image;
   }
 
-  AINFO << "cv_img:\t" << cv_img.rows << " " << cv_img.cols;
-  AINFO << "required:\t" << image_height_ << " " << image_width_;
   if (cv_img.rows != image_height_ || cv_img.cols != image_width_) {
-    cv::resize(cv_img, *img, cv::Size(image_width_, image_height_));
-  } else {
-    *img = cv_img.clone();
+    cv::resize(cv_img, cv_img, cv::Size(image_width_, image_height_));
   }
-
+  *img = cv_img.clone();
   return true;
 }
 
