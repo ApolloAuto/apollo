@@ -126,8 +126,7 @@ void StopSign::MakeDecisions(Frame* frame,
   } else {
     // stop decision
     double stop_deceleration = util::GetADCStopDeceleration(
-        reference_line_info,
-        next_stop_sign_overlap_->start_s,
+        reference_line_info, next_stop_sign_overlap_->start_s,
         config_.stop_sign().min_pass_s_distance());
     if (stop_deceleration < FLAGS_max_stop_deceleration) {
       BuildStopDecision(frame, reference_line_info,
@@ -152,7 +151,7 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
   double min_start_s = std::numeric_limits<double>::max();
   for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
     if (adc_front_edge_s - stop_sign_overlap.end_s <=
-        config_.stop_sign().min_pass_s_distance() &&
+            config_.stop_sign().min_pass_s_distance() &&
         stop_sign_overlap.start_s < min_start_s) {
       min_start_s = stop_sign_overlap.start_s;
       next_stop_sign_overlap_ = const_cast<PathOverlap*>(&stop_sign_overlap);
@@ -691,8 +690,7 @@ bool StopSign::BuildStopDecision(Frame* frame,
   }
 
   // create virtual stop wall
-  std::string virtual_obstacle_id =
-      STOP_SIGN_VO_ID_PREFIX + overlap->object_id;
+  std::string virtual_obstacle_id = STOP_SIGN_VO_ID_PREFIX + overlap->object_id;
   auto* obstacle = frame->CreateVirtualStopObstacle(
       reference_line_info, virtual_obstacle_id, overlap->start_s);
   if (!obstacle) {

@@ -95,7 +95,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   double timestamp = msg.header.stamp.toSec();
   AINFO << "CameraProcessSubnode ImgCallback: "
-        << " frame: "<< ++seq_num_ << " timestamp: ";
+        << " frame: " << ++seq_num_ << " timestamp: ";
   AINFO << std::fixed << std::setprecision(64) << timestamp;
 
   cv::Mat img;

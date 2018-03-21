@@ -50,9 +50,9 @@ cc_test(
     deps = [
         ":cc_lane_post_processor",
         "//modules/common/util",
+        "@gtest//:main",
         "@opencv2//:core",
         "@opencv2//:highgui",
-        "@gtest//:main",
     ],
 )
 

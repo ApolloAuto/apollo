@@ -92,8 +92,8 @@ bool VisualizationSubnode::InitInternal() {
 
   // init motion service
   if (motion_event_id_ != -1) {
-    MotionService *motion_service = dynamic_cast<MotionService *>(
-       DAGStreaming::GetSubnodeByName("MotionService"));
+    MotionService* motion_service = dynamic_cast<MotionService*>(
+        DAGStreaming::GetSubnodeByName("MotionService"));
     motion_service->GetMotionBuffer(motion_buffer_);
   }
 
@@ -299,7 +299,7 @@ apollo::common::Status VisualizationSubnode::ProcEvents() {
         return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
       }
       AINFO << "event: " << events[j].event_id << " device_id:" << device_id
-           << " timestamp: ";
+            << " timestamp: ";
       AINFO << std::fixed << std::setprecision(64) << timestamp;
 
       SetFrameContent(events[j], device_id, data_key, timestamp, &content_);
