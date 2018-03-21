@@ -68,6 +68,15 @@ modules {
   }
 }
 modules {
+  name: "navigation_perception"
+  process_conf {
+    process_cmd_keywords: "modules/perception/perception"
+  }
+  topic_conf {
+    type: PERCEPTION_OBSTACLES
+  }
+}
+modules {
   name: "planning"
   process_conf {
     process_cmd_keywords: "modules/planning/planning"
