@@ -49,8 +49,7 @@ class PlaneMotion {
   // motion matrix of accumulation through high sampling CAN+IMU input sequence
   void generate_motion_matrix(
       VehicleStatus *vehicledata);  // generate inverse motion
-  void accumulate_motion(VehicleStatus *vehicledata,
-                         float motion_time_dif);
+  void accumulate_motion(VehicleStatus *vehicledata, float motion_time_dif);
   void update_motion_buffer(VehicleStatus *vehicledata);
 
  public:
