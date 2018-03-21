@@ -60,7 +60,7 @@ export default class ControlData {
         // clean up data if needed
         const removeAllPoints = graph.error.length > 0 &&
             currentTimestamp < graph.error[graph.error.length - 1].x;
-        const removeOldestPoint = (graph.length >= MAX_HISTORY_POINTS);
+        const removeOldestPoint = (graph.error.length >= MAX_HISTORY_POINTS);
         if (removeAllPoints) {
             graph.error = [];
         } else if (removeOldestPoint) {
