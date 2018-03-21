@@ -68,7 +68,7 @@ bool LoadVisualObjectFromFile(const std::string &file_name,
     double x2 = 0.0;
     double y2 = 0.0;
     int ret = fscanf(fp,
-                     "%256s %lf %lf %f %lf %lf %lf %lf %f %f %f %f %f %f %f %f "
+                     "%254s %lf %lf %f %lf %lf %lf %lf %f %f %f %f %f %f %f %f "
                      "%f %f",
                      type, &trash, &trash, &obj->alpha, &x1, &y1, &x2, &y2,
                      &obj->height, &obj->width, &obj->length, &obj->center.x(),
