@@ -51,6 +51,7 @@ bool CameraProcessSubnode::InitCalibration() {
   auto ccm = Singleton<CalibrationConfigManager>::get();
   CameraCalibrationPtr calibrator = ccm->get_camera_calibration();
 
+  // calibrator->get_image_height_width(&image_height_, &image_width_);
   camera_to_car_ = calibrator->get_camera_extrinsics();
   intrinsics_ = calibrator->get_camera_intrinsic();
   undistortion_handler_ = calibrator->get_camera_undistort_handler();
@@ -94,8 +95,8 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   double timestamp = msg.header.stamp.toSec();
   AINFO << "CameraProcessSubnode ImgCallback: "
-        << " frame: " << ++seq_num_ << " timestamp: ";
-  AINFO << std::fixed << std::setprecision(20) << timestamp;
+        << " frame: "<< ++seq_num_ << " timestamp: ";
+  AINFO << std::fixed << std::setprecision(64) << timestamp;
 
   cv::Mat img;
   if (!FLAGS_image_file_debug) {
@@ -132,17 +133,17 @@ bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
     traffic_light::Yuyv2rgb(yuv, cv_img.data, msg.height * msg.width);
     cv::cvtColor(cv_img, cv_img, CV_RGB2BGR);
   } else {
-    // cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
-    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg,
-      sensor_msgs::image_encodings::BGR8);
+    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
     cv_img = cv_ptr->image;
   }
-  AINFO << "cv_img: " << cv_img.rows << " " << cv_img.cols;
-  *img = cv_img.clone();
 
-  // TODO(later): This undistortion is buggy, maybe due to resolution
-  // img->create(cv_img.rows, cv_img.cols, CV_8UC3);
-  // undistortion_handler_->handle(cv_img.data, img->data);
+  AINFO << "cv_img:\t" << cv_img.rows << " " << cv_img.cols;
+  AINFO << "required:\t" << image_height_ << " " << image_width_;
+  if (cv_img.rows != image_height_ || cv_img.cols != image_width_) {
+    cv::resize(cv_img, *img, cv::Size(image_width_, image_height_));
+  } else {
+    *img = cv_img.clone();
+  }
 
   return true;
 }
