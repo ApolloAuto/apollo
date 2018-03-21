@@ -50,7 +50,7 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
 
   log_table_.resize(256);
   for (size_t i = 0; i < log_table_.size(); ++i) {
-    log_table_[i] = std::log(static_cast<Dtype>(1 + i));
+    log_table_[i] = std::log1p(static_cast<Dtype>(i));
   }
 
   Dtype* out_blob_data = nullptr;

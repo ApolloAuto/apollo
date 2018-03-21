@@ -46,7 +46,7 @@ using hdmap::MapPathPoint;
 
 class SmootherUtil {
  public:
-  explicit SmootherUtil(const std::string& filename) {
+  explicit SmootherUtil(const std::string& filename) : filename_(filename) {
     filename_ = filename;
     std::ifstream ifs(filename.c_str(), std::ifstream::in);
     std::string point_str;
