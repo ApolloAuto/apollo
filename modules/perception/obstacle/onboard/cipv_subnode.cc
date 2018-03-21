@@ -1,4 +1,3 @@
-
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
@@ -17,9 +16,9 @@
 
 #include "modules/perception/obstacle/onboard/cipv_subnode.h"
 
-#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/onboard/dag_streaming.h"
@@ -35,7 +34,7 @@ using apollo::common::Status;
 
 using std::vector;
 using std::string;
-using std::map;
+using std::unordered_map;
 // using Event;
 // using EventID;
 // using EventMeta;
@@ -73,7 +72,7 @@ bool CIPVSubnode::InitInternal() {
   AINFO << "Init shared datas successfully";
 
   string reserve_;
-  map<string, string> reserve_field_map;
+  unordered_map<string, string> reserve_field_map;
   if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
     AERROR << "Failed to parse reserve string: " << reserve_;
     return false;
@@ -125,7 +124,8 @@ apollo::common::Status CIPVSubnode::ProcEvents() {
   return Status::OK();
 }
 
-bool CIPVSubnode::InitOutputStream(const map<string, string> &fields) {
+bool CIPVSubnode::InitOutputStream(
+    const unordered_map<string, string> &fields) {
   auto camera_iter = fields.find("camera_event_id");
   if (camera_iter == fields.end()) {
     AERROR << "Failed to find camera_event_id";
@@ -171,11 +171,9 @@ bool CIPVSubnode::GetSharedData(const Event &event,
            << " timestamp:" << timestamp << " device_id_:" << device_id_;
     return false;
   }
-  bool get_data_succ = false;
-  // *** To DO *** uncomment
-  get_data_succ = camera_object_data_->Get(data_key, objs);
+  camera_object_data_->Get(data_key, objs);
   std::shared_ptr<LaneObjects> lane_objects;
-  get_data_succ = lane_shared_data_->Get(data_key, &lane_objects);
+  bool get_data_succ = lane_shared_data_->Get(data_key, &lane_objects);
   (*objs)->lane_objects = lane_objects;
 
   if (!get_data_succ) {

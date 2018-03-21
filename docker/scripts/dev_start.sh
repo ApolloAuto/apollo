@@ -20,7 +20,7 @@ INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20180315_1337"
+VERSION_X86_64="dev-x86_64-20180320_1118"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 
@@ -175,7 +175,7 @@ function main(){
     YOLO3D_VOLUME=apollo_yolo3d_volume
     docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
 
-    YOLO3D_VOLUME_IMAGE=apolloauto/apollo:yolo3d_volume-${ARCH}-latest
+    YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
     docker pull ${YOLO3D_VOLUME_IMAGE}
     docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
 

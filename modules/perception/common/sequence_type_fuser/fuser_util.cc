@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/util.h"
+#include "modules/perception/common/sequence_type_fuser/fuser_util.h"
 
 #include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
-namespace sequence_type_fuser {
+namespace fuser_util {
 
 void FromStdVector(const std::vector<float>& src_prob, Vectord* dst_prob) {
   (*dst_prob)(0) = src_prob[0];
@@ -107,8 +107,9 @@ bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix) {
   return true;
 }
 
-bool LoadMultipleMatricesFile(const std::string& filename,
-                              std::map<std::string, Matrixd>* matrices) {
+bool LoadMultipleMatricesFile(
+    const std::string& filename,
+    std::unordered_map<std::string, Matrixd>* matrices) {
   if (matrices == nullptr) {
     return false;
   }
@@ -131,6 +132,6 @@ bool LoadMultipleMatricesFile(const std::string& filename,
   return true;
 }
 
-}  // namespace sequence_type_fuser
+}  // namespace fuser_util
 }  // namespace perception
 }  // namespace apollo

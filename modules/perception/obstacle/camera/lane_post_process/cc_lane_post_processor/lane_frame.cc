@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <boost/filesystem.hpp>
+#include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/lane_frame.h"
 
 #include <algorithm>
 #include <limits>
 
-#include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/lane_frame.h"
+#include "boost/filesystem.hpp"
 
 namespace apollo {
 namespace perception {
@@ -83,7 +83,7 @@ ScalarType LaneFrame::ComputeMarkerPairDistance(const Marker& ref,
       displacement = tar.start_pos - ref.pos;
       break;
     }
-    default: { AFATAL << "unknown marker shape type."; }
+    default: { AERROR << "unknown marker shape type."; }
   }
 
   ScalarType pos_dist = static_cast<ScalarType>(displacement.norm());
@@ -426,7 +426,7 @@ vector<int> LaneFrame::ComputeMarkerEdges(
     cc_idx_.clear();
     cc_idx_.reserve(tot_marker_num);
     cc_marker_lut_.clear();
-    for (int i = 0; i < static_cast<int>(tot_marker_num); ++i) {
+    for (size_t i = 0; i < tot_marker_num; ++i) {
       cc_idx_.push_back(markers_[i].cc_id);
       if (cc_marker_lut_.find(markers_[i].cc_id) == cc_marker_lut_.end()) {
         cc_marker_lut_[markers_[i].cc_id] = vector<int>();
@@ -443,7 +443,7 @@ vector<int> LaneFrame::ComputeMarkerEdges(
   edges->clear();  // candidate edges for each marker
   edges->resize(tot_marker_num);
   int tot_num_edges = 0;
-  for (int i = 0; i < static_cast<int>(tot_marker_num); ++i) {
+  for (size_t i = 0; i < tot_marker_num; ++i) {
     edges->at(i).clear();
 
     ADEBUG << "marker " << i << " cc " << markers_[i].cc_id << " ("
@@ -483,10 +483,10 @@ vector<int> LaneFrame::ComputeMarkerEdges(
         y_thresh = markers_[i].pos(0) - opts_.min_y_search_offset;
         break;
       }
-      default: { AFATAL << "Error: unknown space type " << opts_.space_type; }
+      default: { AERROR << "Error: unknown space type " << opts_.space_type; }
     }
 
-    for (int j = 0; j < static_cast<int>(tot_marker_num); ++j) {
+    for (size_t j = 0; j < tot_marker_num; ++j) {
       // ignore the markers below marker i or itself
       if (j == i) {
         continue;
@@ -563,7 +563,7 @@ bool LaneFrame::GreedyGroupConnectAssociation() {
   vector<Group> groups;
   groups.reserve(max_cc_num_);
   unordered_map<int, int> hash_cc_idx(max_cc_num_);
-  for (int i = 0; i < static_cast<int>(markers_.size()); ++i) {
+  for (size_t i = 0; i < markers_.size(); ++i) {
     if (hash_cc_idx.find(markers_[i].cc_id) == hash_cc_idx.end()) {
       hash_cc_idx[markers_[i].cc_id] = static_cast<int>(groups.size());
       groups.push_back(Group());
@@ -642,7 +642,7 @@ bool LaneFrame::GreedyGroupConnectAssociation() {
         y_thresh = cur_group->end_pos(0) - opts_.min_y_search_offset;
         break;
       }
-      default: { AFATAL << "unknown space type " << cur_group->space_type; }
+      default: { AERROR << "unknown space type " << cur_group->space_type; }
     }
 
     to_group_idx[k].reserve(n);
@@ -916,7 +916,7 @@ bool LaneFrame::Process(LaneInstancesPtr instances) {
       }
       break;
     }
-    default: { AFATAL << "unknown marker association method."; }
+    default: { AERROR << "unknown marker association method."; }
   }
   AINFO << "number of lane instance candidates = " << graphs_.size();
 

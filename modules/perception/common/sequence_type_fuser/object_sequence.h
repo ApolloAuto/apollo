@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_COMMON_OBJECT_SEQUENCE_H_
-#define MODULES_PERCEPTION_OBSTACLE_COMMON_OBJECT_SEQUENCE_H_
+#ifndef MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_OBJECT_SEQUENCE_H_
+#define MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_OBJECT_SEQUENCE_H_
 
 #include <map>
 #include <mutex>
@@ -82,4 +82,4 @@ class ObjectSequence {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_COMMON_OBJECT_SEQUENCE_H_
+#endif  // MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_OBJECT_SEQUENCE_H_

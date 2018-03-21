@@ -39,9 +39,6 @@ class GLFusionVisualizer : public BaseVisualizer {
   std::string name() const override {
     return name_;
   }
-  //    void set_motion_buffer(MotionBuffer &motion_buffer) override {
-  //        motion_buffer_ = motion_buffer;
-  //    }
 
   void update_camera_system(FrameContent *content) override;
 

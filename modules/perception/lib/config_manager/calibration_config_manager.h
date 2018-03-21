@@ -52,9 +52,9 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
-#include "include/undistortion.h"
 #include "modules/common/macro.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/cuda_util/undistortion.h"
 #include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/lib/base/singleton.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
@@ -150,9 +150,7 @@ class CameraCalibration {
     return undistort_handler_;
   }
 
-  inline CameraDistortPtr get_camera_model() {
-    return camera_model_;
-  }
+  inline CameraDistortPtr get_camera_model() { return camera_model_; }
 
   //
   Eigen::Matrix<double, 3, 3> get_camera2car_homography_mat() {
@@ -205,4 +203,4 @@ class RadarCalibration {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // APOLLO_PERCEPTION_LIB_CONFIG_MANAGER_H
+#endif  // MODULES_PERCEPTION_LIB_CALIBRATION_CONFIG_MANAGER_H_

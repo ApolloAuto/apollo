@@ -72,6 +72,11 @@ DEFINE_string(short_camera_extrinsic_file,
               "modules/perception/data/params/short_camera_extrinsics.yaml",
               "short_camera extrinsic file");
 
+/// obstacle/onboard/camera_process_subnode.cc
+// Ex: /apollo/modules/perception/data/yolo_camera_detector_test/test.jpg
+DEFINE_string(image_file_path, "", "Debug image file");
+DEFINE_bool(image_file_debug, false, "Debug ROS to CV image");
+
 DEFINE_string(front_camera_extrinsics_file,
               "modules/perception/data/params/front_camera_extrinsics.yaml",
               "front_camera extrinsic file");
@@ -123,11 +128,8 @@ DEFINE_string(screen_output_dir, "./", "");
 
 DEFINE_string(frame_visualizer, "GLFusionVisualizer", "");
 
-DEFINE_double(car_length, 3.564, "car_length");
-DEFINE_double(car_width, 1.620, "car_width");
-
 DEFINE_bool(async_fusion, false, "use distance angle ");
 DEFINE_bool(use_distance_angle_fusion, true,
-        "use distance angle prob distance in fusion");
+            "use distance angle prob distance in fusion");
 
-
+DEFINE_bool(show_motion, false, "visualize motion and object trajectories");

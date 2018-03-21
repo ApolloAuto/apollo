@@ -235,11 +235,11 @@ export default class RosWebSocketEndpoint {
         }));
     }
 
-    submitDriveEvent(event_time_ms, event_msg) {
+    submitDriveEvent(eventTimeMs, eventMessage) {
     	this.websocket.send(JSON.stringify({
             type: "SubmitDriveEvent",
-            event_time_ms: event_time_ms,
-            event_msg: event_msg,
+            event_time_ms: eventTimeMs,
+            event_msg: eventMessage,
         }));
     }
 

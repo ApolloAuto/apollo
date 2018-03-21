@@ -16,6 +16,10 @@
 
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 
+#include <unordered_map>
+
+#include "modules/perception/traffic_light/util/color_space.h"
+
 namespace apollo {
 namespace perception {
 
@@ -23,7 +27,7 @@ using apollo::common::adapter::AdapterManager;
 
 bool CameraProcessSubnode::InitInternal() {
   // Subnode config in DAG streaming
-  std::map<std::string, std::string> fields;
+  std::unordered_map<std::string, std::string> fields;
   SubnodeHelper::ParseReserveField(reserve_, &fields);
   device_id_ = fields["device_id"];
 
@@ -47,6 +51,7 @@ bool CameraProcessSubnode::InitCalibration() {
   auto ccm = Singleton<CalibrationConfigManager>::get();
   CameraCalibrationPtr calibrator = ccm->get_camera_calibration();
 
+  // calibrator->get_image_height_width(&image_height_, &image_width_);
   camera_to_car_ = calibrator->get_camera_extrinsics();
   intrinsics_ = calibrator->get_camera_intrinsic();
   undistortion_handler_ = calibrator->get_camera_undistort_handler();
@@ -54,17 +59,14 @@ bool CameraProcessSubnode::InitCalibration() {
 }
 
 bool CameraProcessSubnode::InitModules() {
-  // RegisterFactoryYoloCameraDetector();
-  RegisterFactoryDummyCameraDetector();
+  RegisterFactoryYoloCameraDetector();
   RegisterFactoryGeometryCameraConverter();
   RegisterFactoryCascadedCameraTracker();
   RegisterFactoryFlatCameraTransformer();
   RegisterFactoryObjectCameraFilter();
 
-  // detector_.reset(
-  //     BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector"));
   detector_.reset(
-      BaseCameraDetectorRegisterer::GetInstanceByName("DummyCameraDetector"));
+      BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector"));
   detector_->Init();
 
   converter_.reset(BaseCameraConverterRegisterer::GetInstanceByName(
@@ -93,11 +95,16 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   double timestamp = msg.header.stamp.toSec();
   AINFO << "CameraProcessSubnode ImgCallback: "
-        << " frame: "<< ++seq_num_ << " timestamp: ";
-  AINFO << std::fixed << std::setprecision(20) << timestamp;
+        << " frame: " << ++seq_num_ << " timestamp: ";
+  AINFO << std::fixed << std::setprecision(64) << timestamp;
 
   cv::Mat img;
-  MessageToMat(msg, &img);
+  if (!FLAGS_image_file_debug) {
+    MessageToMat(msg, &img);
+  } else {
+    img = cv::imread(FLAGS_image_file_path, CV_LOAD_IMAGE_COLOR);
+  }
+
   std::vector<VisualObjectPtr> objects;
   cv::Mat mask = cv::Mat::zeros(img.rows, img.cols, CV_32FC1);
 
@@ -119,12 +126,22 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
 bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
                                         cv::Mat *img) {
-  cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
-  cv::Mat cv_img = cv_ptr->image;
+  cv::Mat cv_img;
+  if (msg.encoding.compare("yuyv") == 0) {
+    unsigned char *yuv = (unsigned char *)&(msg.data[0]);
+    cv_img = cv::Mat(msg.height, msg.width, CV_8UC3);
+    traffic_light::Yuyv2rgb(yuv, cv_img.data, msg.height * msg.width);
+    cv::cvtColor(cv_img, cv_img, CV_RGB2BGR);
+  } else {
+    cv_bridge::CvImagePtr cv_ptr =
+        cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+    cv_img = cv_ptr->image;
+  }
 
-  img->create(cv_img.rows, cv_img.cols, CV_8UC3);
-  undistortion_handler_->handle(cv_img.data, img->data);
-
+  if (cv_img.rows != image_height_ || cv_img.cols != image_width_) {
+    cv::resize(cv_img, cv_img, cv::Size(image_width_, image_height_));
+  }
+  *img = cv_img.clone();
   return true;
 }
 

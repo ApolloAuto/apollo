@@ -22,8 +22,8 @@ namespace apollo {
 namespace perception {
 
 PbfIMFFusion::PbfIMFFusion() {
-  _initialized = false;
-  _name = "PbfInformationMotionFusion";
+  initialized_ = false;
+  name_ = "PbfInformationMotionFusion";
 }
 
 PbfIMFFusion::~PbfIMFFusion() {}
@@ -46,7 +46,7 @@ void PbfIMFFusion::Initialize(const PbfSensorObjectPtr new_object) {
 
   _belief_anchor_point = new_object->object->anchor_point;
   _belief_velocity = new_object->object->velocity;
-  _initialized = true;
+  initialized_ = true;
 
   // initialize states to the states of the detected obstacle
   _posteriori_state(0) = _belief_anchor_point(0);
@@ -62,7 +62,7 @@ void PbfIMFFusion::Initialize(const PbfSensorObjectPtr new_object) {
   // _omega_matrix.block<2, 2>(4, 4) =
   // new_object->object->acceleration_uncertainty.topLeftCorner(2, 2);
   _omega_matrix = new_object->object->uncertainty;
-  _omega_matrix = _omega_matrix.inverse();
+  _omega_matrix = _omega_matrix.inverse().eval();
   _xi = _omega_matrix * _posteriori_state;
   _a_matrix.setIdentity();
   _a_matrix(0, 2) = 0.05;
@@ -72,7 +72,7 @@ void PbfIMFFusion::Initialize(const PbfSensorObjectPtr new_object) {
   _q_matrix = _q_matrix * 0.05;
   _r_matrix_inverse.setIdentity();
   _r_matrix_inverse = new_object->object->uncertainty;
-  _r_matrix_inverse = _r_matrix_inverse.inverse();
+  _r_matrix_inverse = _r_matrix_inverse.inverse().eval();
   CacheSensorObjects(new_object);
 }
 
@@ -104,7 +104,7 @@ void PbfIMFFusion::UpdateWithObject(const PbfSensorObjectPtr new_object,
   _priori_state = _a_matrix * _posteriori_state;
   _omega_matrix =
       (_a_matrix * _omega_matrix.inverse() * _a_matrix.transpose() + _q_matrix);
-  _omega_matrix = _omega_matrix.inverse();
+  _omega_matrix = _omega_matrix.inverse().eval();
   _xi = _omega_matrix * _priori_state;
   if (new_object->sensor_type == SensorType::VELODYNE_64) {
     _belief_anchor_point = new_object->object->center;
@@ -131,7 +131,7 @@ void PbfIMFFusion::UpdateWithObject(const PbfSensorObjectPtr new_object,
   // updated covariance matrix at sensor level ki
   _r_matrix_inverse.setIdentity();
   _r_matrix_inverse = new_object->object->uncertainty;
-  _r_matrix_inverse = _r_matrix_inverse.inverse();
+  _r_matrix_inverse = _r_matrix_inverse.inverse().eval();
   const PbfSensorObjectPtr sensor_object =
       GetSensorLatestCache(new_object->sensor_type);
 

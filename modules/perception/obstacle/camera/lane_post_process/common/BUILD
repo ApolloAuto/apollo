@@ -7,6 +7,7 @@ cc_library(
     hdrs = ["type.h"],
     deps = [
         "//modules/common:log",
+        "//modules/perception/proto:perception_proto",
         "@eigen",
         "@opencv2//:core",
     ],

@@ -38,7 +38,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/network/rnn_model",
         "//modules/prediction/proto:feature_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -95,6 +95,24 @@ cc_library(
         "//modules/map/hdmap:hdmap_util",
         "//modules/prediction/common:road_graph",
         "//modules/prediction/proto:lane_graph_proto",
+    ],
+)
+
+cc_test(
+    name = "obstacle_clusters_test",
+    size = "small",
+    srcs = [
+        "obstacle_clusters_test.cc",
+    ],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/common:prediction_map",
+        "//modules/prediction/container/obstacles:obstacle_clusters",
+        "@gtest//:main",
     ],
 )
 

@@ -16,12 +16,12 @@ cc_library(
         "//modules/common:log",
         "//modules/common/util",
         "//modules/perception/common",
+        "//modules/perception/cuda_util",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager/proto:config_proto",
         "//modules/perception/obstacle/camera/common",
         "@cuda",
         "@opencv2//:imgproc",
-        "@undistort",
         "@yaml_cpp//:yaml",
     ],
 )

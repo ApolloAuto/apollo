@@ -18,7 +18,6 @@
 #define MODULES_PERCEPTION_OBSTACLE_ONBORAD_CAMERA_PROCESS_SUBNODE_H_
 
 #include <algorithm>
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -31,11 +30,13 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/singleton.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/converter/geometry_camera_converter.h"
+#include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 #include "modules/perception/obstacle/camera/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/camera/filter/object_camera_filter.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_converter.h"
@@ -89,6 +90,8 @@ class CameraProcessSubnode : public Subnode {
   CameraSharedData* cam_shared_data_;
 
   // Calibration
+  int32_t image_height_ = 1080;
+  int32_t image_width_ = 1920;
   Eigen::Matrix4d camera_to_car_;
   Eigen::Matrix<double, 3, 4> intrinsics_;
   CameraUndistortionPtr undistortion_handler_;

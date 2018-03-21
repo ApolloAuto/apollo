@@ -17,13 +17,12 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_VISUALIZATION_SUBNODE_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_VISUALIZATION_SUBNODE_H_
 
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
-#include "modules/perception/obstacle/camera/visualizer/gl_fusion_visualizer.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
+#include "modules/perception/obstacle/camera/visualizer/gl_fusion_visualizer.h"
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
@@ -48,15 +47,13 @@ class VisualizationSubnode : public Subnode {
 
  private:
   bool InitStream();
+
   bool SubscribeEvents(const EventMeta& event_meta,
                        std::vector<Event>* events) const;
 
-  // void get_frame_data(const std::string& device_id,
-  //                     const std::string& data_key,
-  //                     FrameContent* content, double timestamp);
-  void GetFrameData(const Event& event, const std::string& device_id,
-                    const std::string& data_key, const double timestamp,
-                    FrameContent* content);
+  void SetFrameContent(const Event& event, const std::string& device_id,
+                       const std::string& data_key, const double timestamp,
+                       FrameContent* content);
 
   RadarObjectData* radar_object_data_ = nullptr;
   CameraObjectData* camera_object_data_ = nullptr;
@@ -64,6 +61,7 @@ class VisualizationSubnode : public Subnode {
   CameraSharedData* camera_shared_data_ = nullptr;
   FusionSharedData* fusion_data_ = nullptr;
   std::unique_ptr<BaseVisualizer> frame_visualizer_;
+  MotionBufferPtr motion_buffer_;
   FrameContent content_;
 
   EventID vis_driven_event_id_;

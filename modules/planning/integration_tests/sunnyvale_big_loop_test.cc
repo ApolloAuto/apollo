@@ -48,9 +48,9 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_big_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
 
-    FLAGS_enable_stop_sign = false;
-    FLAGS_enable_crosswalk = false;
-    FLAGS_enable_keep_clear = false;
+    ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+    ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
+    ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   }
 };
 
@@ -60,7 +60,7 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
  *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
-  FLAGS_enable_stop_sign = true;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
   std::string seq_num = "1";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
@@ -81,7 +81,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
  *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
-  FLAGS_enable_stop_sign = true;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
@@ -102,13 +102,14 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 }
 
 /*
- * stop_sign: adc stopped + wait_time < FLAGS_stop_sign_stop_duration
+ * stop_sign: adc stopped + wait_time < STOP_DURATION
  *   adc status: STOPPING => STOPPING
  *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
-  FLAGS_enable_stop_sign = true;
-  double wait_time = FLAGS_stop_sign_stop_duration - 1;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
+  constexpr double STOP_DURATION = 1;
+  double wait_time = STOP_DURATION - 0.5;
 
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
@@ -131,13 +132,14 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 }
 
 /*
- * stop_sign: adc stopped + wait time > FLAGS_stop_sign_stop_duration
+ * stop_sign: adc stopped + wait time > STOP_DURATION
  *   adc status: STOPPING => STOP_DONE
  *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
-  FLAGS_enable_stop_sign = true;
-  double wait_time = FLAGS_stop_sign_stop_duration + 1;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
+  constexpr double STOP_DURATION = 1;
+  double wait_time = STOP_DURATION + 0.5;
 
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
@@ -165,14 +167,15 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
  * step 1:
  *   adc decision: STOP
  * step 2:
- *   wait_time > FLAGS_stop_sign_stop_duration,
+ *   wait_time > stop_duration(1)
  *      other vehicles arrived at other stop sign later than adc
  *   adc status: STOPPING => STOP_DONE
  *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
-  FLAGS_enable_stop_sign = true;
-  double wait_time = FLAGS_stop_sign_stop_duration + 1;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
+  double stop_duration = 1;
+  double wait_time = stop_duration + 1;
 
   std::string seq_num = "3";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -201,19 +204,20 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
  * step 1:
  *   adc decision: STOP
  * step 2:
- *   wait_time > FLAGS_stop_sign_stop_duration,
+ *   wait_time > stop_duration(1),
  *      other vehicles arrived at other stop sign earlier than adc
  *   adc status: STOPPING => STOPPING (i.e. waiting)
  *   decision: STOP
  * step 3:
- *   wait_time > FLAGS_stop_sign_stop_duration,
+ *   wait_time > STOP_DURATION,
  *     and other vehicles arrived at other stop sign earlier than adc GONE
  *   adc status: STOPPING => STOPPING => STOP_DONE
  *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
-  FLAGS_enable_stop_sign = true;
-  double wait_time = FLAGS_stop_sign_stop_duration + 1;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
+  constexpr double STOP_DURATION = 1;
+  double wait_time = STOP_DURATION + 0.5;
 
   std::string seq_num = "5";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -281,7 +285,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
  *   adc decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
-  FLAGS_enable_stop_sign = true;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
   std::string seq_num = "12";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -325,9 +329,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
  * decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
-  FLAGS_enable_crosswalk = true;
-  FLAGS_enable_traffic_light = false;
-
+  ENABLE_RULE(TrafficRuleConfig::CROSSWALK, true);
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   std::string seq_num = "8";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
@@ -335,7 +338,6 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
-  FLAGS_enable_traffic_light = true;
 }
 
 /*
@@ -344,10 +346,9 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
  * decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
-  FLAGS_enable_keep_clear = true;
-  FLAGS_enable_traffic_light = false;
-
   std::string seq_num = "9";
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
@@ -358,9 +359,9 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
 
 TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   std::string seq_num = "10";
-  FLAGS_enable_traffic_light = true;
   FLAGS_enable_prediction = false;
-  FLAGS_enable_keep_clear = false;
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, true);
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
 
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
@@ -373,8 +374,8 @@ TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
 
 TEST_F(SunnyvaleBigLoopTest, abort_change_lane_for_fast_back_vehicle) {
   std::string seq_num = "11";
-  FLAGS_enable_traffic_light = true;
-  FLAGS_enable_keep_clear = false;
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, true);
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
 
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";

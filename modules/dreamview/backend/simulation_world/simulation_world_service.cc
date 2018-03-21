@@ -212,9 +212,7 @@ void DownsampleCurve(Curve *curve) {
   }
 }
 
-inline double SecToMs(const double sec) {
-  return sec * 1000.0;
-}
+inline double SecToMs(const double sec) { return sec * 1000.0; }
 
 }  // namespace
 
@@ -223,7 +221,8 @@ constexpr int SimulationWorldService::kMaxMonitorItems;
 SimulationWorldService::SimulationWorldService(const MapService *map_service,
                                                bool routing_from_file)
     : map_service_(map_service),
-      monitor_logger_(apollo::common::monitor::MonitorMessageItem::SIMULATOR) {
+      monitor_logger_(MonitorMessageItem::SIMULATOR),
+      ready_to_push_(false) {
   RegisterMessageCallbacks();
   if (routing_from_file) {
     ReadRoutingFromFile(FLAGS_routing_response_file);
@@ -401,6 +400,8 @@ void SimulationWorldService::UpdateSimulationWorld(
   // message header. It is done on both the SimulationWorld object
   // itself and its auto_driving_car() field.
   auto_driving_car->set_timestamp_sec(localization.header().timestamp_sec());
+
+  ready_to_push_.store(true);
 }
 
 template <>
@@ -987,12 +988,29 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   if (control_command.has_debug()) {
     auto &debug = control_command.debug();
-    if (debug.has_simple_lon_debug() &&
-        debug.simple_lon_debug().has_station_error()) {
-      control_data->set_station_error(debug.simple_lon_debug().station_error());
-    } else if (debug.has_simple_mpc_debug() &&
-               debug.simple_mpc_debug().has_station_error()) {
-      control_data->set_station_error(debug.simple_mpc_debug().station_error());
+    if (debug.has_simple_lon_debug() && debug.has_simple_lat_debug()) {
+      auto &simple_lon = debug.simple_lon_debug();
+      if (simple_lon.has_station_error()) {
+        control_data->set_station_error(simple_lon.station_error());
+      }
+      auto &simple_lat = debug.simple_lat_debug();
+      if (simple_lat.has_heading_error()) {
+        control_data->set_heading_error(simple_lat.heading_error());
+      }
+      if (simple_lat.has_lateral_error()) {
+        control_data->set_lateral_error(simple_lat.lateral_error());
+      }
+    } else if (debug.has_simple_mpc_debug()) {
+      auto &simple_mpc = debug.simple_mpc_debug();
+      if (simple_mpc.has_station_error()) {
+        control_data->set_station_error(simple_mpc.station_error());
+      }
+      if (simple_mpc.has_heading_error()) {
+        control_data->set_heading_error(simple_mpc.heading_error());
+      }
+      if (simple_mpc.has_lateral_error()) {
+        control_data->set_lateral_error(simple_mpc.lateral_error());
+      }
     }
   }
 }

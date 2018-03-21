@@ -72,9 +72,7 @@ class SimulationWorldService {
    * @brief Get a read-only view of the SimulationWorld.
    * @return Constant reference to the SimulationWorld object.
    */
-  inline const SimulationWorld &world() const {
-    return world_;
-  }
+  inline const SimulationWorld &world() const { return world_; }
 
   /**
    * @brief Returns the json representation of the SimulationWorld object.
@@ -112,20 +110,14 @@ class SimulationWorldService {
   /**
    * @brief Sets the flag to clear the owned simulation world object.
    */
-  void SetToClear() {
-    to_clear_ = true;
-  }
+  void SetToClear() { to_clear_ = true; }
 
   /**
    * @brief Check whether the SimulationWorld object has enough information.
    * The backend won't push the SimulationWorld to frontend if it is not ready.
    * @return True if the object is ready to push.
    */
-  bool ReadyToPush() const {
-    return world_.has_auto_driving_car() &&
-           world_.auto_driving_car().has_position_x() &&
-           world_.auto_driving_car().has_position_y();
-  }
+  bool ReadyToPush() const { return ready_to_push_.load(); }
 
   /**
    * @brief Publish message to the monitor
@@ -236,6 +228,9 @@ class SimulationWorldService {
 
   // Relative map used/retrieved in navigation mode
   apollo::hdmap::Map relative_map_;
+
+  // Whether the sim_world is ready to push to frontend
+  std::atomic<bool> ready_to_push_;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);

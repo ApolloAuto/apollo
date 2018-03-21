@@ -17,13 +17,16 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GLFW_FUSION_VIEWER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GLFW_FUSION_VIEWER_H_
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
+#include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "Eigen/Dense"
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
 #include "opencv2/opencv.hpp"
 
 #include "modules/perception/common/perception_gflags.h"
@@ -141,6 +144,8 @@ class GLFWFusionViewer {
   // capture screen
   void capture_screen(const std::string &file_name);
 
+  void draw_car_trajectory(FrameContent *content);
+  void draw_trajectories(FrameContent *content);
   // for drawing camera 2d results
  protected:
   // @brief Get camera intrinsics with distortion coefficients from file
@@ -289,6 +294,9 @@ class GLFWFusionViewer {
 
   // frame count
   int frame_count_;
+  // object_trajectories
+  std::map<int, std::vector<std::pair<float, float>>> object_trackjectories_;
+  std::map<int, std::vector<double>> object_timestamps_;
 };
 
 }  // namespace lowcostvisualizer

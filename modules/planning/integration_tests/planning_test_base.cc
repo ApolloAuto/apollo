@@ -101,6 +101,12 @@ void PlanningTestBase::SetUp() {
     CHECK(common::util::GetProtoFromFile(prev_planning_file, &prev_planning));
     planning_.SetLastPublishableTrajectory(prev_planning);
   }
+  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+    auto iter = rule_enabled_.find(config.rule_id());
+    if (iter != rule_enabled_.end()) {
+      config.set_enabled(iter->second);
+    }
+  }
 }
 
 void PlanningTestBase::TrimPlanning(ADCTrajectory* origin) {

@@ -74,10 +74,12 @@ class FusionSubnode : public Subnode {
   std::unique_ptr<BaseFusion> fusion_;
   LidarObjectData *lidar_object_data_ = nullptr;
   RadarObjectData *radar_object_data_ = nullptr;
+  CameraObjectData *camera_object_data_ = nullptr;
   // lidar perception subnode event controls the publishing behavior
   EventID pub_driven_event_id_;
   EventID lidar_event_id_;
   EventID radar_event_id_;
+  EventID camera_event_id_;
   std::mutex fusion_subnode_mutex_;
   apollo::canbus::Chassis chassis_;
   DISALLOW_COPY_AND_ASSIGN(FusionSubnode);
