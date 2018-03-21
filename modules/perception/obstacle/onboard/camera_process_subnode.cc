@@ -133,8 +133,8 @@ bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
     traffic_light::Yuyv2rgb(yuv, cv_img.data, msg.height * msg.width);
     cv::cvtColor(cv_img, cv_img, CV_RGB2BGR);
   } else {
-    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg,
-       sensor_msgs::image_encodings::BGR8);
+    cv_bridge::CvImagePtr cv_ptr =
+        cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     cv_img = cv_ptr->image;
   }
 
