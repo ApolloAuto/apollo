@@ -87,7 +87,7 @@ bool Destination::BuildStopDecision(
   const auto &routing_end = *routing.routing_request().waypoint().rbegin();
 
   // create virtual stop wall
-  std::string virtual_obstacle_id = DESTINATION_VO_ID;
+  std::string virtual_obstacle_id = FLAGS_destination_obstacle_id;
   double dest_lane_s =
       std::max(0.0, routing_end.s() -
                FLAGS_virtual_stop_wall_length -

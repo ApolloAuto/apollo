@@ -45,9 +45,6 @@ class Destination : public TrafficRule {
                      ReferenceLineInfo* const reference_line_info);
   bool BuildStopDecision(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info);
-
- private:
-  static constexpr char const* const DESTINATION_VO_ID = "DEST";
 };
 
 }  // namespace planning

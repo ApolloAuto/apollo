@@ -219,13 +219,12 @@ DEFINE_double(signal_light_min_pass_s_distance, 4.0,
 DEFINE_double(signal_expire_time_sec, 5.0,
               "consider the signal msg is expired if its timestamp over "
               "this threshold (second)");
+
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
 DEFINE_double(destination_check_distance, 5.0,
               "if the distance between destination and ADC is less than this,"
               " it is considered to reach destination");
-DEFINE_double(destination_stop_distance, 0.5,
-              "stop distance from destination line");
 
 DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
