@@ -136,10 +136,8 @@ DECLARE_double(perception_confidence_threshold);
 
 DECLARE_bool(enable_record_debug);
 DECLARE_bool(enable_prediction);
-DECLARE_bool(enable_traffic_light_detection);
 
 DECLARE_double(turn_signal_distance);
-DECLARE_bool(right_turn_creep_forward);
 
 // QpSt optimizer
 DECLARE_double(slowdown_profile_deceleration);

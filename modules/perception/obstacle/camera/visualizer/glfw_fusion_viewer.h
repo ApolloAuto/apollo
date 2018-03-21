@@ -20,11 +20,11 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <map>
 #include <memory>
 #include <string>
-#include <vector>
 #include <utility>
-#include <map>
+#include <vector>
 
 #include "Eigen/Dense"
 #include "opencv2/opencv.hpp"
@@ -144,8 +144,8 @@ class GLFWFusionViewer {
   // capture screen
   void capture_screen(const std::string &file_name);
 
-  void draw_car_trajectory(FrameContent* content);
-  void draw_trajectories(FrameContent* content);
+  void draw_car_trajectory(FrameContent *content);
+  void draw_trajectories(FrameContent *content);
   // for drawing camera 2d results
  protected:
   // @brief Get camera intrinsics with distortion coefficients from file
@@ -295,7 +295,7 @@ class GLFWFusionViewer {
   // frame count
   int frame_count_;
   // object_trajectories
-  std::map<int, std::vector<std::pair<float, float> > > object_trackjectories_;
+  std::map<int, std::vector<std::pair<float, float>>> object_trackjectories_;
   std::map<int, std::vector<double>> object_timestamps_;
 };
 

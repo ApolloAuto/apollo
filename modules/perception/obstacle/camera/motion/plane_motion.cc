@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/motion/plane_motion.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -54,7 +54,7 @@ void PlaneMotion::generate_motion_matrix(VehicleStatus *vehicledata) {
 }
 
 void PlaneMotion::accumulate_motion(VehicleStatus *vehicledata,
-                                        float motion_time_dif) {
+                                    float motion_time_dif) {
   generate_motion_matrix(vehicledata);  // compute vehicledata.motion
   // accumulate CAN+IMU / Localization motion
   mat_motion_2d_image_ *= vehicledata->motion;
@@ -78,19 +78,19 @@ void PlaneMotion::add_new_motion(VehicleStatus *vehicledata,
                                  int motion_operation_flag) {
   switch (motion_operation_flag) {
     case ACCUM_MOTION:
-        accumulate_motion(vehicledata, motion_time_dif);
-        break;
+      accumulate_motion(vehicledata, motion_time_dif);
+      break;
     case ACCUM_PUSH_MOTION:
-        accumulate_motion(vehicledata, motion_time_dif);
-        update_motion_buffer(vehicledata);
-        break;
+      accumulate_motion(vehicledata, motion_time_dif);
+      update_motion_buffer(vehicledata);
+      break;
     case PUSH_ACCUM_MOTION:
-        update_motion_buffer(vehicledata);
-        accumulate_motion(vehicledata, motion_time_dif);
-        break;
+      update_motion_buffer(vehicledata);
+      accumulate_motion(vehicledata, motion_time_dif);
+      break;
     default:
-        AERROR << "motion operation flag:wrong type";
-        return;
+      AERROR << "motion operation flag:wrong type";
+      return;
   }
 }
 

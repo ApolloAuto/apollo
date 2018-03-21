@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/perception/common:pcl_util",
+        "//modules/perception/cuda_util",
         "//modules/perception/lib/base",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common:util",
@@ -18,7 +19,6 @@ cc_library(
         "@eigen",
         "@opencv2//:core",
         "@opencv2//:imgproc",
-        "//modules/perception/cuda_util",
     ],
 )
 

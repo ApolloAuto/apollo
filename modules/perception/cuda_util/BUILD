@@ -18,17 +18,17 @@ genrule(
 )
 
 cc_library(
-   name = "cuda_util",
-   srcs = [
-       "build/libcuda_util.so",
-   ],
-   hdrs = glob([
-       "*.h",
-   ]),
-   deps = [
-       "@caffe//:lib",
-       "@cuda",
-   ],
+    name = "cuda_util",
+    srcs = [
+        "build/libcuda_util.so",
+    ],
+    hdrs = glob([
+        "*.h",
+    ]),
+    deps = [
+        "@caffe//:lib",
+        "@cuda",
+    ],
 )
 
 cpplint()
