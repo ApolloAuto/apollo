@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 
 #include <string>
@@ -22,7 +23,7 @@
 #include "gtest/gtest.h"
 #include "opencv2/opencv.hpp"
 
-#include "include/region_output.h"
+#include "modules/perception/cuda_util/region_output.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -90,7 +91,7 @@ TEST_F(YoloCameraDetectorTest, yolo_camera_detector_roipooling_test) {
   CHECK(camera_detector->Detect(frame, options, &objects));
   AINFO << "#objects detected = " << objects.size();
 
-  CHECK_EQ(objects.size(), 3);
+  CHECK_EQ(objects.size(), 2);
 
   int obj_idx = 0;
   for (const auto &obj : objects) {
@@ -125,11 +126,10 @@ TEST_F(YoloCameraDetectorTest, multi_task_test) {
   CHECK(camera_detector->Multitask(frame, options, &objects, &lane_map));
   AINFO << "#objects detected = " << objects.size();
 
-  CHECK_EQ(objects.size(), 3);
+  CHECK_EQ(objects.size(), 2);
 
   const std::string lane_map_result_file = FLAGS_test_dir + "lane_map.jpg";
   lane_map.convertTo(lane_map, CV_8UC3, 255.0f);
-  cv::imwrite("result.jpg", lane_map);
   cv::imwrite(lane_map_result_file, lane_map);
 }
 

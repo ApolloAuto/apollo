@@ -102,13 +102,14 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 }
 
 /*
- * stop_sign: adc stopped + wait_time < FLAGS_stop_sign_stop_duration
+ * stop_sign: adc stopped + wait_time < STOP_DURATION
  *   adc status: STOPPING => STOPPING
  *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
-  double wait_time = FLAGS_stop_sign_stop_duration - 1;
+  constexpr double STOP_DURATION = 1;
+  double wait_time = STOP_DURATION - 0.5;
 
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
@@ -131,13 +132,14 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 }
 
 /*
- * stop_sign: adc stopped + wait time > FLAGS_stop_sign_stop_duration
+ * stop_sign: adc stopped + wait time > STOP_DURATION
  *   adc status: STOPPING => STOP_DONE
  *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
-  double wait_time = FLAGS_stop_sign_stop_duration + 1;
+  constexpr double STOP_DURATION = 1;
+  double wait_time = STOP_DURATION + 0.5;
 
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
@@ -165,14 +167,15 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
  * step 1:
  *   adc decision: STOP
  * step 2:
- *   wait_time > FLAGS_stop_sign_stop_duration,
+ *   wait_time > stop_duration(1)
  *      other vehicles arrived at other stop sign later than adc
  *   adc status: STOPPING => STOP_DONE
  *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
-  double wait_time = FLAGS_stop_sign_stop_duration + 1;
+  double stop_duration = 1;
+  double wait_time = stop_duration + 1;
 
   std::string seq_num = "3";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -201,19 +204,20 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
  * step 1:
  *   adc decision: STOP
  * step 2:
- *   wait_time > FLAGS_stop_sign_stop_duration,
+ *   wait_time > stop_duration(1),
  *      other vehicles arrived at other stop sign earlier than adc
  *   adc status: STOPPING => STOPPING (i.e. waiting)
  *   decision: STOP
  * step 3:
- *   wait_time > FLAGS_stop_sign_stop_duration,
+ *   wait_time > STOP_DURATION,
  *     and other vehicles arrived at other stop sign earlier than adc GONE
  *   adc status: STOPPING => STOPPING => STOP_DONE
  *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
-  double wait_time = FLAGS_stop_sign_stop_duration + 1;
+  constexpr double STOP_DURATION = 1;
+  double wait_time = STOP_DURATION + 0.5;
 
   std::string seq_num = "5";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";

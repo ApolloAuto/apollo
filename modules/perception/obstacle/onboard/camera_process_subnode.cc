@@ -16,6 +16,8 @@
 
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 
+#include <unordered_map>
+
 #include "modules/perception/traffic_light/util/color_space.h"
 
 namespace apollo {
@@ -25,7 +27,7 @@ using apollo::common::adapter::AdapterManager;
 
 bool CameraProcessSubnode::InitInternal() {
   // Subnode config in DAG streaming
-  std::map<std::string, std::string> fields;
+  std::unordered_map<std::string, std::string> fields;
   SubnodeHelper::ParseReserveField(reserve_, &fields);
   device_id_ = fields["device_id"];
 
@@ -92,11 +94,16 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   double timestamp = msg.header.stamp.toSec();
   AINFO << "CameraProcessSubnode ImgCallback: "
-        << " frame: "<< ++seq_num_ << " timestamp: ";
+        << " frame: " << ++seq_num_ << " timestamp: ";
   AINFO << std::fixed << std::setprecision(20) << timestamp;
 
   cv::Mat img;
-  MessageToMat(msg, &img);
+  if (!FLAGS_image_file_debug) {
+    MessageToMat(msg, &img);
+  } else {
+    img = cv::imread(FLAGS_image_file_path, CV_LOAD_IMAGE_COLOR);
+  }
+
   std::vector<VisualObjectPtr> objects;
   cv::Mat mask = cv::Mat::zeros(img.rows, img.cols, CV_32FC1);
 
@@ -125,12 +132,17 @@ bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
     traffic_light::Yuyv2rgb(yuv, cv_img.data, msg.height * msg.width);
     cv::cvtColor(cv_img, cv_img, CV_RGB2BGR);
   } else {
-    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
+    // cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
+    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg,
+      sensor_msgs::image_encodings::BGR8);
     cv_img = cv_ptr->image;
   }
+  AINFO << "cv_img: " << cv_img.rows << " " << cv_img.cols;
+  *img = cv_img.clone();
 
-  img->create(cv_img.rows, cv_img.cols, CV_8UC3);
-  undistortion_handler_->handle(cv_img.data, img->data);
+  // TODO(later): This undistortion is buggy, maybe due to resolution
+  // img->create(cv_img.rows, cv_img.cols, CV_8UC3);
+  // undistortion_handler_->handle(cv_img.data, img->data);
 
   return true;
 }

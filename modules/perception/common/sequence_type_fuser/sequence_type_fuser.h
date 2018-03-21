@@ -16,8 +16,8 @@
 #ifndef MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_SEQUENCE_TYPE_FUSER_H_
 #define MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_SEQUENCE_TYPE_FUSER_H_
 
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "modules/perception/common/sequence_type_fuser/base_type_fuser.h"
@@ -103,7 +103,7 @@ class SequenceTypeFuser : public BaseTypeFuser {
 
   Matrixd transition_matrix_;
   Matrixd confidence_smooth_matrix_;
-  std::map<std::string, Matrixd> smooth_matrices_;
+  std::unordered_map<std::string, Matrixd> smooth_matrices_;
 
   // Note all probabilities are in the log space
   std::vector<Vectord> fused_oneshot_probs_;

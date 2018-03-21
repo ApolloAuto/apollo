@@ -16,14 +16,17 @@
 
 #include "modules/perception/obstacle/onboard/visualization_subnode.h"
 
-#include <vector>
 #include <string>
-#include <map>
+#include <unordered_map>
+#include <vector>
 #include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
+#include "modules/perception/onboard/dag_streaming.h"
+
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/subnode_helper.h"
@@ -37,6 +40,12 @@ using apollo::common::Status;
 
 bool VisualizationSubnode::InitInternal() {
   CHECK(shared_data_manager_ != NULL);
+  // init stream
+  if (!InitStream()) {
+    AERROR << "Failed to init stream.";
+    return false;
+  }
+
   // init radar object data
   if (FLAGS_show_radar_objects) {
     radar_object_data_ = dynamic_cast<RadarObjectData*>(
@@ -50,24 +59,32 @@ bool VisualizationSubnode::InitInternal() {
   }
 
   // init camera object data
-  if (FLAGS_show_camera_objects || FLAGS_show_camera_objects2d ||
-      FLAGS_show_camera_parsing) {
+  if (camera_event_id_ != -1) {
     camera_object_data_ = dynamic_cast<CameraObjectData*>(
         shared_data_manager_->GetSharedData("CameraObjectData"));
     if (camera_object_data_ == nullptr) {
       AERROR << "Failed to get CameraObjectData.";
       return false;
     }
-    cipv_object_data_ = dynamic_cast<CIPVObjectData*>(
-        shared_data_manager_->GetSharedData("CIPVObjectData"));
-    if (cipv_object_data_ == nullptr) {
-      AERROR << "Failed to get CIPVObjectData.";
+    AINFO << "Init shared datas successfully, data: "
+          << camera_object_data_->name();
+
+    camera_shared_data_ = dynamic_cast<CameraSharedData*>(
+        shared_data_manager_->GetSharedData("CameraSharedData"));
+    if (camera_shared_data_ == nullptr) {
+      AERROR << "Failed to get CameraSharedData.";
       return false;
     }
     AINFO << "Init shared datas successfully, data: "
-          << camera_object_data_->name();
+          << camera_shared_data_->name();
   }
 
+  // init motion service
+  if (FLAGS_show_motion) {
+    MotionService* motion_service = dynamic_cast<MotionService*>(
+        DAGStreaming::GetSubnodeByName("MotionService"));
+    motion_service->GetMotionBuffer(motion_buffer_);
+  }
   // init fusion data
   if (FLAGS_show_fused_objects) {
     fusion_data_ = dynamic_cast<FusionSharedData*>(
@@ -79,18 +96,6 @@ bool VisualizationSubnode::InitInternal() {
     AINFO << "Init shared datas successfully, data: " << fusion_data_->name();
   }
 
-  // init camera shared data
-  if (FLAGS_show_camera_objects || FLAGS_show_camera_objects2d ||
-      FLAGS_show_camera_parsing) {
-    camera_shared_data_ = dynamic_cast<CameraSharedData*>(
-        shared_data_manager_->GetSharedData("CameraSharedData"));
-    if (camera_shared_data_ == nullptr) {
-      AERROR << "Failed to get CameraSharedData.";
-      return false;
-    }
-    AINFO << "Init shared datas successfully, data: "
-          << camera_shared_data_->name();
-  }
   // init frame_visualizer
   RegisterFactoryGLFusionVisualizer();
   frame_visualizer_.reset(
@@ -101,11 +106,6 @@ bool VisualizationSubnode::InitInternal() {
   }
   content_.set_pose_type(FrameContent::IMAGE_CONTINUOUS);
   AINFO << "visualize according to continuous image: ";
-  // init stream
-  if (!InitStream()) {
-    AERROR << "Failed to init stream.";
-    return false;
-  }
 
   CalibrationConfigManager* config_manager =
       Singleton<CalibrationConfigManager>::get();
@@ -117,7 +117,7 @@ bool VisualizationSubnode::InitInternal() {
 }
 
 bool VisualizationSubnode::InitStream() {
-  std::map<std::string, std::string> reserve_field_map;
+  std::unordered_map<std::string, std::string> reserve_field_map;
   if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
     AERROR << "Failed to parse reserve string: " << reserve_;
     return false;
@@ -202,52 +202,27 @@ void VisualizationSubnode::GetFrameData(const Event& event,
                                         const double timestamp,
                                         FrameContent* content) {
   if (event.event_id == camera_event_id_) {
-    if (FLAGS_show_camera_objects || FLAGS_show_camera_objects2d ||
-        FLAGS_show_camera_parsing) {
-      std::shared_ptr<CameraItem> camera_item;
-      if (!camera_shared_data_->Get(data_key, &camera_item) ||
-          camera_item == nullptr) {
-        AERROR << "Failed to get shared data: " << camera_shared_data_->name();
-        return;
-      }
-      cv::Mat clone_image = camera_item->image_src_mat;
-      cv::Mat image = camera_item->image_src_mat.clone();
-      content->set_image_content(timestamp, image);
-
-      std::shared_ptr<SensorObjects> objs;
-      if (!camera_object_data_->Get(data_key, &objs) || objs == nullptr) {
-        AERROR << "Failed to get shared data: " << camera_object_data_->name();
-        return;
-      }
-
-      LOG(INFO) << objs->objects.size() << timestamp;
-
-      //   content->set_camera2velo_pose(_camera_to_velo64_pose);
-
-      if (FLAGS_show_camera_parsing) {
-        // content->set_camera_content(timestamp, objs->sensor2world_pose,
-        //                            objs->objects,
-        //                            (*(objs->camera_frame_supplement)));
-      } else {
-        content->set_camera_content(timestamp, objs->sensor2world_pose,
-                                    objs->objects);
-      }
-    }
-  } else if (event.event_id == motion_event_id_) {
-    /*std::shared_ptr<CameraItem> camera_item;
-    AERROR << "Motion_Visualization key: in Motion Visualization: " << data_key;
+    std::shared_ptr<CameraItem> camera_item;
     if (!camera_shared_data_->Get(data_key, &camera_item) ||
         camera_item == nullptr) {
-      AERROR << "Failed to get shared data in Motion Visualization: "
-             << camera_shared_data_->name() << " " << data_key;
+      AERROR << "Failed to get shared data: " << camera_shared_data_->name();
       return;
-    }*/
+    }
+    cv::Mat image = camera_item->image_src_mat.clone();
+    content->set_image_content(timestamp, image);
 
-    // content->set_motion_content(timestamp, camera_item->motion_buffer);
+    std::shared_ptr<SensorObjects> objs;
+    if (!camera_object_data_->Get(data_key, &objs) || objs == nullptr) {
+      AERROR << "Failed to get shared data: " << camera_object_data_->name();
+      return;
+    }
 
-    //        std::cout<< "motion_buffer.size(): " <<
-    //        camera_item->motion_buffer->size() << std::endl;
-
+    content->set_camera_content(timestamp, objs->sensor2world_pose,
+                                objs->objects);
+  } else if (event.event_id == motion_event_id_) {
+    if (FLAGS_show_motion) {
+      content->set_motion_content(timestamp, motion_buffer_);
+    }
   } else if (event.event_id == radar_event_id_) {
     if (device_id == "radar_front" && FLAGS_show_radar_objects) {
       std::shared_ptr<SensorObjects> objs;
@@ -331,8 +306,9 @@ apollo::common::Status VisualizationSubnode::ProcEvents() {
                << " device_id:" << device_id;
         return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
       }
-      AINFO << "event: " << events[j].event_id << " timestamp: "
-            << timestamp << " device_id:" << device_id;
+      AINFO << "event: " << events[j].event_id << " device_id:" << device_id
+            << " timestamp: ";
+      AINFO << std::fixed << std::setprecision(20) << timestamp;
 
       GetFrameData(events[j], device_id, data_key, timestamp, &content_);
       if (event_meta.event_id == vis_driven_event_id_) {
@@ -340,9 +316,6 @@ apollo::common::Status VisualizationSubnode::ProcEvents() {
         // so you must move it from init_internal.
         if (!init_) {
           frame_visualizer_->init();
-          // if (camera_visualizer_) {
-          //     camera_visualizer_->init();
-          // }
           init_ = true;
         }
         frame_visualizer_->update_camera_system(&content_);

@@ -107,8 +107,9 @@ bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix) {
   return true;
 }
 
-bool LoadMultipleMatricesFile(const std::string& filename,
-                              std::map<std::string, Matrixd>* matrices) {
+bool LoadMultipleMatricesFile(
+    const std::string& filename,
+    std::unordered_map<std::string, Matrixd>* matrices) {
   if (matrices == nullptr) {
     return false;
   }

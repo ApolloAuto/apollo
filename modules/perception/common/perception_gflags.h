@@ -54,6 +54,10 @@ DECLARE_string(radar_tf2_child_frame_id);
 DECLARE_string(radar_extrinsic_file);
 DECLARE_string(short_camera_extrinsic_file);
 
+/// obstacle/onboard/camera_process_subnode.cc
+DECLARE_string(image_file_path);
+DECLARE_bool(image_file_debug);
+
 /// camera config
 DECLARE_string(front_camera_extrinsics_file);
 DECLARE_string(front_camera_intrinsics_file);
@@ -82,7 +86,6 @@ DECLARE_int32(obs_camera_detector_gpu);
 DECLARE_string(onboard_lane_post_processor);
 
 /// visualization
-
 DECLARE_bool(show_camera_objects);
 DECLARE_bool(show_radar_objects);
 
@@ -95,6 +98,7 @@ DECLARE_bool(show_camera_objects2d);
 DECLARE_bool(show_camera_parsing);
 DECLARE_string(frame_visualizer);
 
+DECLARE_bool(show_motion);
 // async fusion using imf
 DECLARE_bool(async_fusion);
 DECLARE_bool(use_distance_angle_fusion);

@@ -111,6 +111,7 @@ cc_library(
         ":perception_obstacle_shared_data",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
+        "//modules/perception/common",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/converter",
         "//modules/perception/obstacle/camera/detector/yolo_camera_detector",
@@ -159,6 +160,7 @@ cc_library(
         "motion_service.h",
     ],
     deps = [
+        ":perception_obstacle_shared_data",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/motion",
@@ -245,7 +247,9 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common:util",
+        "//modules/perception/obstacle/camera/motion",
         "//modules/perception/obstacle/camera/visualizer",
+        "//modules/perception/obstacle/onboard:motion_subnode",
         "//modules/perception/onboard",
     ],
 )

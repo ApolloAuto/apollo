@@ -10,5 +10,7 @@ list(APPEND CUDA_NVCC_FLAGS -std=c++11)
 set(cuda_file undistortion.cu util.cu region_output.cu network.cu)
 cuda_compile(cuda_obj ${cuda_file} SHARED)
 
+include_directories(/usr/local/cuda/targets/x86_64-linux/include/)
+
 add_library(${PROJECT_NAME} SHARED ${cuda_obj} ${_SRCS})
 target_link_libraries(${PROJECT_NAME})

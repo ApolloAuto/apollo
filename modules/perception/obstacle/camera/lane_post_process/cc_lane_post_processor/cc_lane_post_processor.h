@@ -64,7 +64,7 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   bool Process(const cv::Mat &lane_map,
                const CameraLanePostProcessOptions &options,
-               LaneObjectsPtr lane_instances) override;
+               LaneObjectsPtr* lane_instances) override;
 
   void set_max_distance_to_see(ScalarType max_distance_to_see) {
     max_distance_to_see_ = max_distance_to_see;

@@ -17,7 +17,7 @@
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 
 #include <cmath>
-#include <map>
+#include <unordered_map>
 #include <utility>
 
 #include "modules/perception/obstacle/camera/detector/common/proto/tracking_feature.pb.h"
@@ -34,7 +34,7 @@ namespace perception {
 
 using std::string;
 using std::vector;
-using std::map;
+using std::unordered_map;
 
 bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
   ConfigManager *config_manager = ConfigManager::instance();
@@ -87,15 +87,12 @@ void YoloCameraDetector::init_anchor(const string &yolo_root) {
   string types_file = apollo::common::util::GetAbsolutePath(
       model_root, model_param.types_file());
   yolo::load_types(types_file, &types_);
-  // res_box_tensor_.reset(new anakin::Tensor<float>());
-  // res_box_tensor_->Reshape(1, 1, obj_size_, s_box_block_size);
+
   res_box_tensor_.reset(
       new SyncedMemory(obj_size_ * s_box_block_size * sizeof(float)));
   res_box_tensor_->cpu_data();
   res_box_tensor_->gpu_data();
 
-  // res_cls_tensor_.reset(new anakin::Tensor<float>());
-  // res_cls_tensor_->Reshape(1, 1, types_.size(), obj_size_);
   res_cls_tensor_.reset(
       new SyncedMemory(types_.size() * obj_size_ * sizeof(float)));
   res_cls_tensor_->cpu_data();
@@ -134,7 +131,7 @@ void YoloCameraDetector::load_intrinsic(
   // inference input shape
   if (options.intrinsic == nullptr) {
     AWARN << "YoloCameraDetector options.intrinsic is nullptr. Use default";
-    image_height_ = 1208;
+    image_height_ = 1080;
     image_width_ = 1920;
   } else {
     image_height_ = options.intrinsic->get_height();
@@ -156,6 +153,10 @@ void YoloCameraDetector::load_intrinsic(
 
   int roi_w = image_width_;
   int roi_h = image_height_ - offset_y_;
+
+  AINFO << "roi_w=" << roi_w << ", "
+        << "roi_h=" << roi_h;
+
   int channel = 3;
   image_data_.reset(
       new SyncedMemory(roi_w * roi_h * channel * sizeof(unsigned char)));
@@ -440,8 +441,8 @@ bool YoloCameraDetector::get_objects_cpu(
   const float *cpu_cls_data =
       static_cast<const float *>(res_cls_tensor_->cpu_data());
 
-  map<int, vector<int> > indices;
-  map<int, vector<float> > conf_scores;
+  unordered_map<int, vector<int> > indices;
+  unordered_map<int, vector<float> > conf_scores;
   int num_kept = 0;
   for (int k = 0; k < num_classes; k++) {
     apply_nms_gpu(static_cast<const float *>(res_box_tensor_->gpu_data()),

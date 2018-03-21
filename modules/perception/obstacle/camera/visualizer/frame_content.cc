@@ -15,8 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
-#include <Eigen/LU>
-#include <map>
+
+#include "Eigen/LU"
+
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
 
@@ -272,8 +273,16 @@ Eigen::Matrix4d FrameContent::get_camera_to_world_pose() {
 }
 
 cv::Mat FrameContent::get_camera_image() {
+  // TODO(later): Hotfix now. Check timestamp key correctness later
+  if (!image_caches_.empty()) {
+    auto it = image_caches_.rbegin();
+    return it->second.image_mat_src_;
+  }
+
   auto it = image_caches_.find(DoubleToMapKey(current_image_timestamp_));
   if (it == image_caches_.end()) {
+    AWARN << "FrameContent::get_camera_image() : No image found";
+    AWARN << "Key: " << DoubleToMapKey(current_image_timestamp_);
     cv::Mat mat = cv::Mat::zeros(1080, 1920, CV_8UC3);
     return mat;
   }

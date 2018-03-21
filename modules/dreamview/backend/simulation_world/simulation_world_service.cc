@@ -223,7 +223,8 @@ constexpr int SimulationWorldService::kMaxMonitorItems;
 SimulationWorldService::SimulationWorldService(const MapService *map_service,
                                                bool routing_from_file)
     : map_service_(map_service),
-      monitor_logger_(apollo::common::monitor::MonitorMessageItem::SIMULATOR) {
+      monitor_logger_(MonitorMessageItem::SIMULATOR),
+      ready_to_push_(false) {
   RegisterMessageCallbacks();
   if (routing_from_file) {
     ReadRoutingFromFile(FLAGS_routing_response_file);
@@ -401,6 +402,8 @@ void SimulationWorldService::UpdateSimulationWorld(
   // message header. It is done on both the SimulationWorld object
   // itself and its auto_driving_car() field.
   auto_driving_car->set_timestamp_sec(localization.header().timestamp_sec());
+
+  ready_to_push_.store(true);
 }
 
 template <>

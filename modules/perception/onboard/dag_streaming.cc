@@ -28,7 +28,7 @@ namespace apollo {
 namespace perception {
 
 using std::string;
-using std::map;
+using std::unordered_map;
 using std::vector;
 
 using google::protobuf::TextFormat;
@@ -123,13 +123,13 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
   const DAGConfig::SubnodeConfig& subnode_config = dag_config.subnode_config();
   const DAGConfig::EdgeConfig& edge_config = dag_config.edge_config();
 
-  map<SubnodeID, DAGConfig::Subnode> subnode_config_map;
-  map<SubnodeID, vector<EventID>> subnode_sub_events_map;
-  map<SubnodeID, vector<EventID>> subnode_pub_events_map;
+  unordered_map<SubnodeID, DAGConfig::Subnode> subnode_config_map;
+  unordered_map<SubnodeID, vector<EventID>> subnode_sub_events_map;
+  unordered_map<SubnodeID, vector<EventID>> subnode_pub_events_map;
 
   for (auto& subnode_proto : subnode_config.subnodes()) {
-    std::pair<map<SubnodeID, DAGConfig::Subnode>::iterator, bool> result =
-        subnode_config_map.insert(
+    std::pair<unordered_map<SubnodeID, DAGConfig::Subnode>::iterator, bool>
+        result = subnode_config_map.insert(
             std::make_pair(subnode_proto.id(), subnode_proto));
     if (!result.second) {
       AERROR << "duplicate SubnodeID: " << subnode_proto.id();
