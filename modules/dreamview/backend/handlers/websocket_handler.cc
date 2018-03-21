@@ -112,6 +112,7 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
       return false;
     } else {
       connection_lock->lock();  // Block to acquire the lock.
+      std::unique_lock<std::mutex> lock(mutex_);
       if (!ContainsKey(connections_, conn)) {
         return false;
       }
