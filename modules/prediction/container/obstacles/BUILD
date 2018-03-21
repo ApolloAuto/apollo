@@ -38,7 +38,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/network/rnn_model",
         "//modules/prediction/proto:feature_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

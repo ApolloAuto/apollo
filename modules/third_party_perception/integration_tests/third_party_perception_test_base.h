@@ -36,11 +36,10 @@
   }
 
 DECLARE_string(test_localization_file);
-DECLARE_string(test_mobileye_file);
+
 DECLARE_string(test_chassis_file);
 DECLARE_string(test_data_dir);
 DECLARE_string(test_monitor_file);
-DECLARE_string(test_radar_file);
 
 /**
  * @namespace apollo::third_party_perception

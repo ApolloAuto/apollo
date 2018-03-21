@@ -140,8 +140,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
              << "] is_path_cross[" << is_path_cross << "]";
 
       bool stop = false;
-      if (obstacle_l_distance >=
-          config_.crosswalk().stop_loose_l_distance()) {
+      if (obstacle_l_distance >= config_.crosswalk().stop_loose_l_distance()) {
         // (1) when obstacle_l_distance is big enough(>= loose_l_distance),
         //     STOP only if path crosses
         if (is_path_cross) {
@@ -151,7 +150,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
                  << "]";
         }
       } else if (obstacle_l_distance <=
-          config_.crosswalk().stop_strick_l_distance()) {
+                 config_.crosswalk().stop_strick_l_distance()) {
         // (2) when l_distance <= strick_l_distance + on_road(not on sideway),
         //     always STOP
         // (3) when l_distance <= strick_l_distance + not on_road(on sideway),
@@ -178,8 +177,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
 
       // stop decision
       double stop_deceleration = util::GetADCStopDeceleration(
-          reference_line_info,
-          crosswalk_overlap->start_s,
+          reference_line_info, crosswalk_overlap->start_s,
           config_.crosswalk().min_pass_s_distance());
       if (stop_deceleration < FLAGS_max_stop_deceleration) {
         crosswalks_to_stop.push_back(crosswalk_overlap);

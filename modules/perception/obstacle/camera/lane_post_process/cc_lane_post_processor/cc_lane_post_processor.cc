@@ -595,7 +595,7 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
 
 bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
                                   const CameraLanePostProcessOptions &options,
-                                  LaneObjectsPtr* lane_objects) {
+                                  LaneObjectsPtr *lane_objects) {
   if (!is_init_) {
     AERROR << "lane post-processor is not initialized";
     return false;
@@ -821,8 +821,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       valid_lane_objects.push_back(object_id);
 
       AINFO << " lane object "
-            << (*lane_objects)->at(object_id).GetSpatialLabel()
-            << " has "
+            << (*lane_objects)->at(object_id).GetSpatialLabel() << " has "
             << (*lane_objects)->at(object_id).pos.size() << " points: "
             << "lateral distance="
             << (*lane_objects)->at(object_id).lateral_distance;
@@ -841,9 +840,8 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       valid_lane_objects.push_back(object_id);
 
       AINFO << " lane object "
-            << (*lane_objects)->at(object_id).GetSpatialLabel()
-            << " has " << (*lane_objects)->at(object_id).pos.size()
-            << " points: "
+            << (*lane_objects)->at(object_id).GetSpatialLabel() << " has "
+            << (*lane_objects)->at(object_id).pos.size() << " points: "
             << "lateral distance="
             << (*lane_objects)->at(object_id).lateral_distance;
     }

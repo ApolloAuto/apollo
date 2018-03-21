@@ -210,8 +210,7 @@ DEFINE_double(
 DEFINE_double(
     follow_min_time_sec, 0.1,
     "min following time in st region before considering a valid follow");
-DEFINE_double(stop_line_stop_distance, 1.0,
-              "stop distance from stop line");
+DEFINE_double(stop_line_stop_distance, 1.0, "stop distance from stop line");
 DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
 DEFINE_double(max_stop_deceleration, 6.0, "max deceleration");
 DEFINE_double(signal_light_min_pass_s_distance, 4.0,
@@ -245,9 +244,6 @@ DEFINE_bool(align_prediction_time, false,
 DEFINE_double(
     turn_signal_distance, 100.00,
     "In meters. If there is a turn within this distance, use turn signal");
-DEFINE_bool(right_turn_creep_forward, false,
-            "Creep forward at right turn when the signal is red and traffic "
-            "rule is not violated.");
 
 // planning config file
 DEFINE_string(planning_config_file,
@@ -260,8 +256,6 @@ DEFINE_int32(trajectory_point_num_for_debug, 10,
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug into debug protobuf.");
 DEFINE_bool(enable_prediction, true, "True to enable prediction input.");
-DEFINE_bool(enable_traffic_light_detection, true,
-            "True to enable traffic light detection input.");
 
 DEFINE_bool(enable_lag_prediction, true,
             "Enable lagged prediction, which is more tolerant to obstacles "

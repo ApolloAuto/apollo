@@ -105,8 +105,7 @@ void SignalLight::MakeDecisions(Frame* const frame,
   for (auto& signal_light : signal_lights_from_path_) {
     const TrafficLight signal = GetSignal(signal_light.object_id);
     double stop_deceleration = util::GetADCStopDeceleration(
-        reference_line_info,
-        signal_light.start_s,
+        reference_line_info, signal_light.start_s,
         config_.signal_light().min_pass_s_distance());
 
     planning_internal::SignalLightDebug::SignalDebug* signal_debug =
@@ -120,8 +119,9 @@ void SignalLight::MakeDecisions(Frame* const frame,
          stop_deceleration < FLAGS_max_stop_deceleration) ||
         (signal.color() == TrafficLight::UNKNOWN &&
          stop_deceleration < FLAGS_max_stop_deceleration) ||
-        (signal.color() == TrafficLight::YELLOW && stop_deceleration <
-            config_.signal_light().max_stop_deacceleration_yellow_light())) {
+        (signal.color() == TrafficLight::YELLOW &&
+         stop_deceleration <
+             config_.signal_light().max_stop_deacceleration_yellow_light())) {
       if (config_.signal_light().righ_turn_creep().enabled() &&
           reference_line_info->IsRightTurnPath()) {
         SetCreepForwardSignalDecision(reference_line_info, &signal_light);
@@ -166,7 +166,8 @@ void SignalLight::SetCreepForwardSignalDecision(
     }
   }
   signal_light->start_s = reference_line_info->AdcSlBoundary().end_s() +
-      config_.signal_light().stop_distance() + creep_s_buffer;
+                          config_.signal_light().stop_distance() +
+                          creep_s_buffer;
   ADEBUG << "Creep forward s = " << signal_light->start_s;
 }
 

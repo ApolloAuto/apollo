@@ -72,9 +72,7 @@ class SimulationWorldService {
    * @brief Get a read-only view of the SimulationWorld.
    * @return Constant reference to the SimulationWorld object.
    */
-  inline const SimulationWorld &world() const {
-    return world_;
-  }
+  inline const SimulationWorld &world() const { return world_; }
 
   /**
    * @brief Returns the json representation of the SimulationWorld object.
@@ -112,18 +110,14 @@ class SimulationWorldService {
   /**
    * @brief Sets the flag to clear the owned simulation world object.
    */
-  void SetToClear() {
-    to_clear_ = true;
-  }
+  void SetToClear() { to_clear_ = true; }
 
   /**
    * @brief Check whether the SimulationWorld object has enough information.
    * The backend won't push the SimulationWorld to frontend if it is not ready.
    * @return True if the object is ready to push.
    */
-  bool ReadyToPush() const {
-    return ready_to_push_.load();
-  }
+  bool ReadyToPush() const { return ready_to_push_.load(); }
 
   /**
    * @brief Publish message to the monitor

@@ -128,12 +128,8 @@ DEFINE_string(screen_output_dir, "./", "");
 
 DEFINE_string(frame_visualizer, "GLFusionVisualizer", "");
 
-DEFINE_double(car_length, 3.564, "car_length");
-DEFINE_double(car_width, 1.620, "car_width");
-
 DEFINE_bool(async_fusion, false, "use distance angle ");
 DEFINE_bool(use_distance_angle_fusion, true,
-        "use distance angle prob distance in fusion");
+            "use distance angle prob distance in fusion");
 
-DEFINE_bool(show_motion, false,
-        "visualize motion and object trajectories");
+DEFINE_bool(show_motion, false, "visualize motion and object trajectories");
