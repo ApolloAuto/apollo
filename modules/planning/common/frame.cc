@@ -205,8 +205,7 @@ bool Frame::CreateReferenceLineInfo() {
  */
 const Obstacle *Frame::CreateStopObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id,
-    const double obstacle_s) {
+    const std::string &obstacle_id, const double obstacle_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
     return nullptr;
@@ -229,10 +228,9 @@ const Obstacle *Frame::CreateStopObstacle(
  * @brief: create static virtual object with lane width,
  *         mainly used for virtual stop wall
  */
-const Obstacle *Frame::CreateStopObstacle(
-    const std::string &obstacle_id,
-    const std::string &lane_id,
-    const double lane_s) {
+const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
+                                          const std::string &lane_id,
+                                          const double lane_s) {
   const auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(lane_id));
   if (!lane) {
     AERROR << "Failed to find lane[" << lane_id << "]";
@@ -242,16 +240,16 @@ const Obstacle *Frame::CreateStopObstacle(
   double dest_lane_s = std::max(0.0, lane_s);
   auto dest_point = lane->GetSmoothPoint(dest_lane_s);
   AERROR << "---111 dest_lane_s[" << dest_lane_s << "] x[" << dest_point.x()
-      << "] y[" << dest_point.y() << "]";
+         << "] y[" << dest_point.y() << "]";
 
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
   lane->GetWidth(dest_lane_s, &lane_left_width, &lane_right_width);
 
   Box2d stop_wall_box{{dest_point.x(), dest_point.y()},
-                        lane->Heading(dest_lane_s),
-                        FLAGS_virtual_stop_wall_length,
-                        lane_left_width + lane_right_width};
+                      lane->Heading(dest_lane_s),
+                      FLAGS_virtual_stop_wall_length,
+                      lane_left_width + lane_right_width};
 
   return CreateStaticVirtualObstacle(obstacle_id, stop_wall_box);
 }
