@@ -254,7 +254,7 @@ struct LaneObject {
     lane_marker.set_c2_curvature(model(2, 0));
     lane_marker.set_c3_curvature_derivative(model(3, 0));
     lane_marker.set_view_range(longitude_end - longitude_start);
-    return std::move(lane_marker);
+    return lane_marker;
   }
 
   std::string GetSpatialLabel() const {
