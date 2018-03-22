@@ -80,7 +80,7 @@ class LonControllerTest : public ::testing::Test, LonController {
     CHECK(apollo::common::util::GetProtoFromFile(filename, &localization))
         << "Failed to open file " << filename;
     localization.mutable_header()->set_timestamp_sec(timestamp_);
-    return std::move(localization);
+    return localization;
   }
 
   ChassisPb LoadChassisPb(const std::string &filename) {
@@ -88,7 +88,7 @@ class LonControllerTest : public ::testing::Test, LonController {
     CHECK(apollo::common::util::GetProtoFromFile(filename, &chassis_pb))
         << "Failed to open file " << filename;
     chassis_pb.mutable_header()->set_timestamp_sec(timestamp_);
-    return std::move(chassis_pb);
+    return chassis_pb;
   }
 
   TrajectoryPb LoadPlanningTrajectoryPb(const std::string &filename) {

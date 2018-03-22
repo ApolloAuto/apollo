@@ -27,7 +27,7 @@ bool FlatCameraTransformer::Transform(std::vector<VisualObjectPtr> *objects) {
   for (auto obj_ptr : *objects) {
     // Get 2D distance
     float d = obj_ptr->distance;
-    float d_v = abs(kCameraHeight - obj_ptr->height / 2.0f);
+    float d_v = std::abs(kCameraHeight - obj_ptr->height / 2.0f);
     float d_flat = sqrt(d * d - d_v * d_v);
 
     // Get 2D vector
