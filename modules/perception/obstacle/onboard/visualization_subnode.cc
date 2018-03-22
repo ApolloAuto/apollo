@@ -84,7 +84,7 @@ bool VisualizationSubnode::InitInternal() {
     fusion_data_ = dynamic_cast<FusionSharedData*>(
         shared_data_manager_->GetSharedData("FusionSharedData"));
     if (fusion_data_ == nullptr) {
-      AERROR << "Failed to get FusionSharedDataData.";
+      AERROR << "Failed to get FusionSharedData.";
       return false;
     }
     AINFO << "Init shared datas successfully, data: " << fusion_data_->name();
@@ -95,6 +95,17 @@ bool VisualizationSubnode::InitInternal() {
     MotionService* motion_service = dynamic_cast<MotionService*>(
         DAGStreaming::GetSubnodeByName("MotionService"));
     motion_service->GetMotionBuffer(motion_buffer_);
+  }
+
+  if (lane_event_id_ != -1) {
+    lane_shared_data_ = dynamic_cast<LaneSharedData*>(
+        shared_data_manager_->GetSharedData("LaneSharedData"));
+    if (lane_shared_data_ == nullptr) {
+      AERROR << "Failed to get LaneSharedData.";
+      return false;
+    }
+    AINFO << "Init shared data successfully, data: "
+          << lane_shared_data_->name();
   }
 
   // init frame_visualizer
@@ -171,6 +182,15 @@ bool VisualizationSubnode::InitStream() {
     motion_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
   }
 
+  iter = reserve_field_map.find("lane_event_id");
+  if (iter == reserve_field_map.end()) {
+    AWARN << "Failed to find lane_event_id_: " << reserve_;
+    lane_event_id_ = -1;
+  } else {
+    lane_event_id_
+        = static_cast<EventID>(atoi((iter->second).c_str()));
+  }
+
   return true;
 }
 
@@ -210,9 +230,17 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
       AERROR << "Failed to get shared data: " << camera_object_data_->name();
       return;
     }
-
     content->set_camera_content(timestamp, objs->sensor2world_pose,
-                                objs->objects);
+                                objs->objects,
+                                (*(objs->camera_frame_supplement)));
+
+    LaneObjectsPtr lane_objs;
+    if (!lane_shared_data_->Get(data_key, &lane_objs) ||
+        lane_objs == nullptr) {
+      AERROR << "Failed to get shared data: " << lane_shared_data_->name();
+      return;
+    }
+    content->set_lane_content(timestamp, *lane_objs);
   } else if (event.event_id == motion_event_id_) {
     if (FLAGS_show_motion) {
       content->set_motion_content(timestamp, motion_buffer_);
@@ -272,6 +300,15 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
                                     objs->objects);
       }
     }
+  } else if (event.event_id == lane_event_id_) {
+    LaneObjectsPtr lane_objs;
+    if (!lane_shared_data_->Get(data_key, &lane_objs) ||
+        lane_objs == nullptr) {
+      AERROR << "Failed to get shared data: " << lane_shared_data_->name();
+      return;
+    }
+
+    content->set_lane_content(timestamp, *lane_objs);
   }
 
   if (event.event_id == vis_driven_event_id_) {

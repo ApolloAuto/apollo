@@ -989,8 +989,5 @@ bool CCLanePostProcessor::EnrichLaneInfo(LaneObjectsPtr lane_objects) {
   return true;
 }
 
-// Register plugin.
-REGISTER_CAMERA_LANE_POST_PROCESSOR(CCLanePostProcessor);
-
 }  // namespace perception
 }  // namespace apollo
