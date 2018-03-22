@@ -25,9 +25,7 @@ if __name__ == '__main__':
     fdata = sys.argv[1]
     rospy.init_node("navigator3", anonymous=True)
     navigation_pub = rospy.Publisher(
-        "/apollo/navigation",
-        navigation_pb2.NavigationInfo,
-        queue_size=1)
+        "/apollo/navigation", navigation_pb2.NavigationInfo, queue_size=1)
 
     navigation_info = navigation_pb2.NavigationInfo()
     navigation_path = navigation_info.navigation_path.add()
