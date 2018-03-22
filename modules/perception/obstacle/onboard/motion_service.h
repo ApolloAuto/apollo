@@ -39,13 +39,9 @@ struct VehicleInformation {
 class MotionService : public Subnode {
  public:
   MotionService() = default;
-  virtual ~MotionService() {
-    delete vehicle_planemotion_;
-  }
+  virtual ~MotionService() { delete vehicle_planemotion_; }
 
-  common::Status ProcEvents() override {
-    return common::Status::OK();
-  }
+  common::Status ProcEvents() override { return common::Status::OK(); }
 
   void GetVehicleInformation(float timestamp,
                              VehicleInformation *vehicle_informatino);
