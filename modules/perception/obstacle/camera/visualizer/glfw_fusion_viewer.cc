@@ -1663,9 +1663,6 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
           proj_pt[1] = 2 * pt[1] - proj_pt[1];
 
           glVertex2f(proj_pt[0], proj_pt[1]);
-          //                  drawHollowCircle(proj_pt[0], proj_pt[1], 0.7);
-          //                  drawHollowCircle(2*pt[0]-proj_pt[0],
-          //                    2*pt[1]-proj_pt[1], 0.4);
         }
         glEnd();
         glLineWidth(1);
@@ -1678,6 +1675,9 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
 void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
                                                bool show_fusion) {
   Eigen::Matrix4d c2v = content->get_camera_to_world_pose();
+  draw_objects(content->get_camera_objects(), c2v,
+               true, true, Eigen::Vector3f(1, 1, 0),
+               use_class_color_);
 
   if (show_fusion) {
     if (!FLAGS_show_fused_objects) {

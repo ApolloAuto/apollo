@@ -23,7 +23,9 @@ DEFINE_string(perception_adapter_config_filename,
 /// lib/config_manager/config_manager.cc
 DEFINE_string(config_manager_path, "./conf/config_manager.config",
               "The ModelConfig config paths file.");
-DEFINE_string(work_root, "modules/perception", "Project work root direcotry.");
+DEFINE_string(work_root,
+              "/apollo/modules/perception/",
+              "perception work root direcotry.");
 
 /// obstacle/base/object.cc
 DEFINE_bool(is_serialize_point_cloud, false,
@@ -77,11 +79,12 @@ DEFINE_string(short_camera_extrinsic_file,
 DEFINE_string(image_file_path, "", "Debug image file");
 DEFINE_bool(image_file_debug, false, "Debug ROS to CV image");
 
+/// modules/perception/lib/config_manager/calibration_config_manager.cc
 DEFINE_string(front_camera_extrinsics_file,
-              "modules/perception/data/params/front_camera_extrinsics.yaml",
+              "/data/params/front_camera_extrinsics.yaml",
               "front_camera extrinsic file");
 DEFINE_string(front_camera_intrinsics_file,
-              "modules/perception/data/params/front_camera_intrinsics.yaml",
+              "/data/params/front_camera_intrinsics.yaml",
               "front_camera intrinsic file");
 
 /// obstacle/onboard/fusion_subnode.cc
