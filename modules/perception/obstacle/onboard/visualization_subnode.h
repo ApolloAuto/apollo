@@ -25,8 +25,8 @@
 #include "modules/perception/obstacle/camera/visualizer/gl_fusion_visualizer.h"
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
-#include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/obstacle/onboard/lane_shared_data.h"
+#include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
 
