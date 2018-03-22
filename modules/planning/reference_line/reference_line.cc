@@ -59,8 +59,7 @@ ReferenceLine::ReferenceLine(const MapPath& hdmap_path)
     DCHECK(!point.lane_waypoints().empty());
     const auto& lane_waypoint = point.lane_waypoints()[0];
     reference_points_.emplace_back(
-        hdmap::MapPathPoint(point, point.heading(), lane_waypoint), 0.0, 0.0,
-        0.0, 0.0);
+        hdmap::MapPathPoint(point, point.heading(), lane_waypoint), 0.0, 0.0);
   }
   CHECK_EQ(map_path_.num_points(), reference_points_.size());
 }
@@ -358,15 +357,10 @@ ReferencePoint ReferenceLine::InterpolateWithMatchedIndex(
   DCHECK_LE(s, s1 + 1.0e-6) << "s: " << s << " is larger than s1: " << s1;
 
   auto map_path_point = map_path_.GetSmoothPoint(index);
-  double upper_bound = 0.0;
-  double lower_bound = 0.0;
-  map_path_.GetWidth(s, &upper_bound, &lower_bound);
-
   const double kappa = common::math::lerp(p0.kappa(), s0, p1.kappa(), s1, s);
   const double dkappa = common::math::lerp(p0.dkappa(), s0, p1.dkappa(), s1, s);
 
-  return ReferencePoint(map_path_point, kappa, dkappa, lower_bound,
-                        upper_bound);
+  return ReferencePoint(map_path_point, kappa, dkappa);
 }
 
 ReferencePoint ReferenceLine::Interpolate(const ReferencePoint& p0,
@@ -386,30 +380,25 @@ ReferencePoint ReferenceLine::Interpolate(const ReferencePoint& p0,
   const double kappa = common::math::lerp(p0.kappa(), s0, p1.kappa(), s1, s);
   const double dkappa = common::math::lerp(p0.dkappa(), s0, p1.dkappa(), s1, s);
   std::vector<hdmap::LaneWaypoint> waypoints;
-  double upper_bound = 0.0;
-  double lower_bound = 0.0;
   if (!p0.lane_waypoints().empty() && !p1.lane_waypoints().empty()) {
     const auto& p0_waypoint = p0.lane_waypoints()[0];
     if ((s - s0) + p0_waypoint.s <= p0_waypoint.lane->total_length()) {
       const double lane_s = p0_waypoint.s + s - s0;
       waypoints.emplace_back(p0_waypoint.lane, lane_s);
-      p0_waypoint.lane->GetWidth(lane_s, &upper_bound, &lower_bound);
     }
     const auto& p1_waypoint = p1.lane_waypoints()[0];
     if (p1_waypoint.lane->id().id() != p0_waypoint.lane->id().id() &&
         p1_waypoint.s - (s1 - s) >= 0) {
       const double lane_s = p1_waypoint.s - (s1 - s);
       waypoints.emplace_back(p1_waypoint.lane, lane_s);
-      p1_waypoint.lane->GetWidth(lane_s, &upper_bound, &lower_bound);
     }
     if (waypoints.empty()) {
       const double lane_s = p0_waypoint.s;
       waypoints.emplace_back(p0_waypoint.lane, lane_s);
-      p0_waypoint.lane->GetWidth(lane_s, &upper_bound, &lower_bound);
     }
   }
   return ReferencePoint(hdmap::MapPathPoint({x, y}, heading, waypoints), kappa,
-                        dkappa, lower_bound, upper_bound);
+                        dkappa);
 }
 
 const std::vector<ReferencePoint>& ReferenceLine::reference_points() const {

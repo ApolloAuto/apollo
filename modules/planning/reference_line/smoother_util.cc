@@ -77,7 +77,7 @@ class SmootherUtil {
       for (; s < FLAGS_smooth_length && i < raw_points_.size(); ++i) {
         LineSegment2d segment(raw_points_[i - 1], raw_points_[i]);
         ref_points.emplace_back(MapPathPoint(raw_points_[i], segment.heading()),
-                                0.0, 0.0, 0.0, 0.0);
+                                0.0, 0.0);
         s += segment.length();
       }
       ReferenceLine init_ref(ref_points);
@@ -115,7 +115,7 @@ class SmootherUtil {
         Vec2d vec = raw_points_[j + 1] - raw_points_[j];
         s += vec.Length();
         ref_points.emplace_back(MapPathPoint(raw_points_[j], vec.Angle()), 0.0,
-                                0.0, 0.0, 0.0);
+                                0.0);
         ++j;
       }
       i = j;
