@@ -28,8 +28,8 @@ message NetworkParam {
 
 message FeatureParam {
     optional uint32 point_cloud_range = 26 [default = 60];
-    optional uint32 width = 27 [default = 512];
-    optional uint32 height = 28 [default = 512];
+    optional uint32 width = 27 [default = 640];
+    optional uint32 height = 28 [default = 640];
 
     optional float min_height = 31 [default = -5.0];
     optional float max_height = 32 [default = 5.0];
