@@ -53,11 +53,11 @@ bool DpStSpeedOptimizer::Init(const PlanningConfig& config) {
   return true;
 }
 
-bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
-                                       const PathData& path_data,
-                                       SpeedData* speed_data,
-                                       PathDecision* path_decision,
-                                       STGraphDebug* st_graph_debug) const {
+bool DpStSpeedOptimizer::SearchStGraph(
+    const StBoundaryMapper& boundary_mapper,
+    const SpeedLimitDecider& speed_limit_decider, const PathData& path_data,
+    SpeedData* speed_data, PathDecision* path_decision,
+    STGraphDebug* st_graph_debug) const {
   std::vector<const StBoundary*> boundaries;
   for (auto* obstacle : path_decision->path_obstacles().Items()) {
     auto id = obstacle->Id();
@@ -102,7 +102,7 @@ bool DpStSpeedOptimizer::SearchStGraph(const StBoundaryMapper& boundary_mapper,
 
   // step 2 perform graph search
   SpeedLimit speed_limit;
-  if (!boundary_mapper
+  if (!speed_limit_decider
            .GetSpeedLimits(path_decision->path_obstacles(), &speed_limit)
            .ok()) {
     AERROR << "Getting speed limits for dp st speed optimizer failed!";
@@ -163,8 +163,14 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  if (!SearchStGraph(boundary_mapper, path_data, speed_data, path_decision,
-                     st_graph_debug)) {
+
+  SpeedLimitDecider speed_limit_decider(
+      adc_sl_boundary, st_boundary_config_, *reference_line_, path_data,
+      dp_st_speed_config_.total_path_length(), dp_st_speed_config_.total_time(),
+      reference_line_info_->IsChangeLanePath());
+
+  if (!SearchStGraph(boundary_mapper, speed_limit_decider, path_data,
+                     speed_data, path_decision, st_graph_debug)) {
     const std::string msg(Name() +
                           ":Failed to search graph with dynamic programming.");
     AERROR << msg;

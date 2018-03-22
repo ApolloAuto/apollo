@@ -20,9 +20,11 @@ cc_library(
 cc_library(
     name = "st_boundary_mapper",
     srcs = [
+        "speed_limit_decider.cc",
         "st_boundary_mapper.cc",
     ],
     hdrs = [
+        "speed_limit_decider.h",
         "st_boundary_mapper.h",
     ],
     deps = [
