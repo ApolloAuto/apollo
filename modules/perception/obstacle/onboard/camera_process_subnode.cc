@@ -134,7 +134,6 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
 void CameraProcessSubnode::ChassisCallback(
   const apollo::canbus::Chassis& message) {
-  AINFO << "Camera received chassis data: run chassis callback.";
   std::lock_guard<std::mutex> lock(camera_mutex_);
   chassis_.CopyFrom(message);
 }
@@ -174,6 +173,7 @@ void CameraProcessSubnode::VisualObjToSensorObj(
     ObjectPtr obj(new Object());
 
     obj->id = vobj->id;
+    obj->score = vobj->score;
     obj->direction = vobj->direction.cast<double>();
     obj->theta = vobj->theta;
     obj->center = vobj->center.cast<double>();
@@ -241,7 +241,6 @@ void CameraProcessSubnode::PublishPerceptionPb(
   }
 
   // Relative speed of objects + latest ego car speed in X
-  AINFO << "Chassis Speed: " << chassis_.speed_mps();
   for (auto obstacle : obstacles.perception_obstacle()) {
     obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
                                        chassis_.speed_mps());

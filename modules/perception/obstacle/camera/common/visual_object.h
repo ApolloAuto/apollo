@@ -91,9 +91,9 @@ struct alignas(16) VisualObject {
   // globally unique tracking id for camera visual objects
   int track_id = 0;
   // [second] age of the tracked object
-  float track_age = 0.0f;
+  double track_age = 0.0;
   // [second] the last observed timestamp
-  float last_track_timestamp = 0.0f;
+  double last_track_timestamp = 0.0;
 };
 
 typedef std::shared_ptr<VisualObject> VisualObjectPtr;
