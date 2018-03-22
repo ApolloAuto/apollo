@@ -25,6 +25,9 @@ namespace apollo {
 namespace perception {
 namespace lowcostvisualizer {
 
+using apollo::perception::LaneObjectsPtr;
+using apollo::perception::LaneObjects;
+
 FrameContent::FrameContent() : global_offset_initialized_(false) {
   continuous_type_ = PC_CONTINUOUS;
 }
@@ -117,6 +120,22 @@ void FrameContent::set_fusion_content(double timestamp,
   fusion_caches_[DoubleToMapKey(timestamp)] = content;
 }
 
+void FrameContent::set_lane_content(double timestamp,
+                                    const LaneObjects& objects) {
+  auto key = DoubleToMapKey(timestamp);
+  if (lane_caches_.count(key)) return;
+
+  LaneContent content;
+  content.timestamp_ = timestamp;
+
+  content.lane_objects_.resize(objects.size());
+  for (size_t i = 0; i < objects.size(); ++i) {
+    content.lane_objects_[i] = objects[i];
+  }
+
+  lane_caches_[key] = content;
+}
+
 void FrameContent::set_gt_content(double timestamp,
                                   const std::vector<ObjectPtr>& objects) {
   GroundTruthContent content;
@@ -168,6 +187,20 @@ void FrameContent::update_timestamp(double ref) {
   current_camera_timestamp_ = MapKeyToDouble(camera_caches_.begin()->first);
   AINFO << "FrameContent::update_timestamp() : current_camera_timestamp_";
   AINFO << std::fixed << std::setprecision(64) << current_camera_timestamp_;
+
+  // get lane object timestamp
+  if (lane_caches_.size() > 1) {
+    auto it = lane_caches_.lower_bound(key);
+    if (it != lane_caches_.end()) {
+      lane_caches_.erase(lane_caches_.begin(), it);
+    } else {
+      lane_caches_.erase(lane_caches_.begin(),
+                         std::prev(lane_caches_.end()));
+    }
+  }
+  current_lane_timestamp_ = MapKeyToDouble(lane_caches_.begin()->first);
+  AINFO << "FrameContent::update_timestamp() : current_lane_timestamp_";
+  AINFO << std::fixed << std::setprecision(64) << current_lane_timestamp_;
 
   float best_delta = FLT_MAX;
   int best_ts = -1;
@@ -245,6 +278,7 @@ void FrameContent::update_timestamp(double ref) {
 
   AINFO << " | radar caches num: " << radar_caches_.size()
         << " | camera caches num: " << camera_caches_.size()
+        << " | lane caches num: " << lane_caches_.size()
         << " | fusion caches num: " << fusion_caches_.size()
         << " | image caches num: " << image_caches_.size();
 }
@@ -346,6 +380,15 @@ std::vector<ObjectPtr> FrameContent::get_gt_objects() {
   }
   GroundTruthContent content = it->second;
   return content.gt_objects_;
+}
+
+LaneObjects FrameContent::get_lane_objects() {
+  auto it = lane_caches_.find(DoubleToMapKey(current_lane_timestamp_));
+  if (it == lane_caches_.end()) {
+    return LaneObjects();
+  }
+  LaneContent content = it->second;
+  return content.lane_objects_;
 }
 
 void FrameContent::offset_object(ObjectPtr object,
