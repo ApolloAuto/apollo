@@ -74,7 +74,7 @@ class Routing : public apollo::common::ApolloApp {
   apollo::common::monitor::MonitorLogger monitor_logger_;
 
   RoutingConfig routing_conf_;
-  const hdmap::HDMap* hdmap_ = nullptr;
+  const hdmap::HDMap *hdmap_ = nullptr;
 };
 
 }  // namespace routing
