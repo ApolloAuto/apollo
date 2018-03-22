@@ -27,9 +27,13 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "gflags/gflags.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
+#include "modules/perception/obstacle/base/object_supplement.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 #include "modules/perception/obstacle/camera/visualizer/common/bmp.h"
 #include "modules/perception/obstacle/camera/visualizer/common/gl_raster_text.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
@@ -44,6 +48,9 @@ using apollo::perception::CameraCalibrationPtr;
 const double pace_zoom = 15;
 const double My_PI = 3.14159265359;
 DEFINE_bool(show_motion_track, false, "visualize motion/track info");
+
+DEFINE_double(car_length, 3.564, "car_length");
+DEFINE_double(car_width, 1.620, "car_width");
 
 std::vector<std::vector<int>> GLFWFusionViewer::s_color_table = {
     std::vector<int>{0, 0, 128},   std::vector<int>{0, 0, 255},
@@ -80,6 +87,7 @@ GLFWFusionViewer::GLFWFusionViewer()
       scene_height_(720),
       image_width_(1280),
       image_height_(720),
+      lane_map_threshold_(0.5),
       frame_count_(0) {
   mode_mat_ = Eigen::Matrix4d::Identity();
 }
@@ -180,12 +188,35 @@ bool GLFWFusionViewer::initialize() {
   show_fusion_pc_ = false;
   show_associate_color_ = false;
   show_type_id_label_ = true;
+  show_lane_ = true;
+  draw_lane_objects_ = true;
 
-  CalibrationConfigManager* config_manager =
+  CalibrationConfigManager* calibration_config_manager =
       Singleton<CalibrationConfigManager>::get();
-  CameraCalibrationPtr calibrator = config_manager->get_camera_calibration();
+  CameraCalibrationPtr calibrator
+      = calibration_config_manager->get_camera_calibration();
   camera_intrinsic_ = calibrator->get_camera_intrinsic();
   distort_camera_intrinsic_ = calibrator->get_camera_model();
+
+  if (show_lane_) {
+    ConfigManager *config_manager = ConfigManager::instance();
+    const ModelConfig *lane_post_process_model_config =
+        config_manager->GetModelConfig(FLAGS_onboard_lane_post_processor);
+    if (lane_post_process_model_config == nullptr) {
+      AERROR << "Unknown lane post-processing model: "
+             << FLAGS_onboard_lane_post_processor;
+      return false;
+    }
+    if (!lane_post_process_model_config->GetValue("lane_map_confidence_thresh",
+                                                  &lane_map_threshold_)) {
+      AERROR << "The confidence threshold of label map not found.";
+      return false;
+    }
+    AINFO << "onboard lane post-processor: "
+          << FLAGS_onboard_lane_post_processor;
+    AINFO << "lane map confidence threshold = " << lane_map_threshold_;
+  }
+
   AINFO << " GLFWFusionViewer::initialize() config_manager" << std::endl;
 
   // Init Raster Text
@@ -218,7 +249,9 @@ void GLFWFusionViewer::spin_once() {
   glfwSwapBuffers(window_);
 }
 
-void GLFWFusionViewer::close() { glfwTerminate(); }
+void GLFWFusionViewer::close() {
+  glfwTerminate();
+}
 
 void GLFWFusionViewer::set_camera_para(Eigen::Vector3d i_position,
                                        Eigen::Vector3d i_scn_center,
@@ -559,6 +592,14 @@ void GLFWFusionViewer::render() {
   glTranslatef(vao_trans_y_, vao_trans_x_, vao_trans_z_);
   glRotatef(_Rotate_x, 1, 0, 0);
   glRotatef(_Rotate_y, 0, 1, 0);
+
+  if (show_lane_) {
+    lane_objects_ =
+        std::make_shared<LaneObjects>(frame_content_->get_lane_objects());
+    if (draw_lane_objects_) {
+      draw_lane_objects_ground();
+    }
+  }
   glPopMatrix();
 
   // 2. Bottom right
@@ -567,6 +608,10 @@ void GLFWFusionViewer::render() {
   glTranslatef(vao_trans_y_, vao_trans_x_, vao_trans_z_);
   glRotatef(_Rotate_x, 1, 0, 0);
   glRotatef(_Rotate_y, 0, 1, 0);
+
+  if (show_lane_) {
+    draw_lane_objects_image();
+  }
   glPopMatrix();
 
   // 3. Top left, draw 2d camera detection and classification results
@@ -725,9 +770,13 @@ void GLFWFusionViewer::mouse_move(double xpos, double ypos) {
   mouse_prev_y_ = ypos;
 }
 
-void GLFWFusionViewer::mouse_wheel(double delta) { mode_mat_(2, 3) -= delta; }
+void GLFWFusionViewer::mouse_wheel(double delta) {
+  mode_mat_(2, 3) -= delta;
+}
 
-void GLFWFusionViewer::reset() { mode_mat_ = Eigen::Matrix4d::Identity(); }
+void GLFWFusionViewer::reset() {
+  mode_mat_ = Eigen::Matrix4d::Identity();
+}
 
 void GLFWFusionViewer::keyboard(int key) {
   switch (key) {
@@ -982,6 +1031,292 @@ void GLFWFusionViewer::draw_camera_frame(FrameContent* content,
     draw_camera_box3d(camera_objects, fused_objects, v2c, offset_x, offset_y,
                       image_width, image_height);
   }
+}
+
+void GLFWFusionViewer::draw_lane_objects_ground() {
+  glPointSize(1);
+  glLineWidth(1);
+
+  for (size_t k = 0; k < lane_objects_->size(); ++k) {
+    // draw markers
+    switch (lane_objects_->at(k).spatial) {
+      case apollo::perception::SpatialLabelType::L_0: {
+        glColor3f(1.0f, 0.0f, 0.0f);  // red
+        break;
+      }
+      case apollo::perception::SpatialLabelType::L_1: {
+        glColor3f(1.0f, 0.0f, 1.0f);  // magenta
+        break;
+      }
+      case apollo::perception::SpatialLabelType::L_2: {
+        glColor3f(0.6f, 0.25f, 1.0f);  // purple
+        break;
+      }
+      case apollo::perception::SpatialLabelType::R_0: {
+        glColor3f(0.0f, 0.0f, 1.0f);  // blue
+        break;
+      }
+      case apollo::perception::SpatialLabelType::R_1: {
+        glColor3f(0.0f, 1.0f, 1.0f);  // cyan
+        break;
+      }
+      case apollo::perception::SpatialLabelType::R_2: {
+        glColor3f(0.75f, 1.0f, 0.25f);  // greenyellow
+        break;
+      }
+      default: {
+        AERROR << "unknown lane object spatial label: "
+               << static_cast<int>(lane_objects_->at(k).spatial);
+      }
+    }
+
+    for (auto p = lane_objects_->at(k).pos.begin();
+         p != lane_objects_->at(k).pos.end(); ++p) {
+      drawHollowCircle(static_cast<GLfloat>(p->x()),
+                       static_cast<GLfloat>(p->y()), static_cast<GLfloat>(0.4));
+    }
+
+    // draw polynomial curve
+    float a = lane_objects_->at(k).pos_curve.a;
+    float b = lane_objects_->at(k).pos_curve.b;
+    float c = lane_objects_->at(k).pos_curve.c;
+    float d = lane_objects_->at(k).pos_curve.d;
+    float x_start = lane_objects_->at(k).pos_curve.x_start;
+    float x_end = lane_objects_->at(k).pos_curve.x_end;
+
+    const GLfloat x_step = 0.01;
+    GLfloat x_lb = std::min(x_start, 0.0f);
+    GLfloat x_ub = x_end;
+    bool is_dotted_line = true;
+
+    GLfloat x1 = x_lb;
+    GLfloat x2 = x1 + x_step;
+    while (x2 <= x_ub) {
+      if (x1 >= x_start) {
+        is_dotted_line = false;
+      } else if (x1 > x_end) {
+        is_dotted_line = true;
+      }
+
+      GLfloat y1 = GetPolyValue(a, b, c, d, x1);
+      if (is_dotted_line) {
+        glBegin(GL_POINTS);
+        glVertex2f(x1, y1);
+        glEnd();
+      } else {
+        GLfloat y2 = GetPolyValue(a, b, c, d, x2);
+        glBegin(GL_LINES);
+        glVertex2f(x1, y1);
+        glVertex2f(x2, y2);
+        glEnd();
+      }
+
+      if (is_dotted_line) {
+        x1 += 50.0 * x_step;
+        x2 = x1;
+      } else {
+        x1 = x2;
+        x2 = x1 + x_step;
+      }
+    }
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);  // reset the color to white
+  }
+
+  // draw ego car boundry
+  // 1  _______  2
+  //   |       |
+  //   |   ^   |
+  // 3 | _ | _ | 4
+  //
+
+  Eigen::Vector2d left_1(FLAGS_car_length / 2, FLAGS_car_width / 2);
+  Eigen::Vector2d right_2(FLAGS_car_length / 2, -FLAGS_car_width / 2);
+  Eigen::Vector2d left_3(-FLAGS_car_length / 2, FLAGS_car_width / 2);
+  Eigen::Vector2d right_4(-FLAGS_car_length / 2, -FLAGS_car_width / 2);
+
+  glColor3f(0.0f, 1.0f, 0.0f);
+  glLineWidth(3);
+  glBegin(GL_LINE_STRIP);
+  glVertex2f(static_cast<GLfloat>(left_1.x()),
+             static_cast<GLfloat>(left_1.y()));
+  glVertex2f(static_cast<GLfloat>(right_2.x()),
+             static_cast<GLfloat>(right_2.y()));
+  glVertex2f(static_cast<GLfloat>(right_4.x()),
+             static_cast<GLfloat>(right_4.y()));
+  glVertex2f(static_cast<GLfloat>(left_3.x()),
+             static_cast<GLfloat>(left_3.y()));
+  glVertex2f(static_cast<GLfloat>(left_1.x()),
+             static_cast<GLfloat>(left_1.y()));
+  glEnd();
+  glFlush();
+
+  glLineWidth(1);
+  glPointSize(1);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);  // reset the color to white
+}
+
+bool GLFWFusionViewer::draw_lane_objects_image() {
+  cv::Mat show_mat = frame_content_->get_camera_image().clone();
+  if (show_mat.empty()) {
+    AERROR << "Get NULL original image from camera frame supplement.";
+    return false;
+  }
+
+  CameraFrameSupplementPtr camera_frame_supplement =
+      frame_content_->get_camera_frame_supplement();
+  const cv::Mat& lane_map = camera_frame_supplement->lane_map;
+  if (lane_map.empty()) {
+    AERROR << "Get NULL lane_map from camera frame supplement.";
+    return false;
+  }
+  cv::Mat lane_mask;
+  if (lane_map.type() == CV_8UC1) {
+    // binary label map
+    lane_mask = lane_map;
+  } else if (lane_map.type() == CV_32FC1) {
+    // heatmap
+    lane_mask.create(lane_map.rows, lane_map.cols, CV_8UC1);
+    lane_mask.setTo(cv::Scalar(0));
+    ADEBUG << "confidence threshold of lane map = " << lane_map_threshold_;
+    for (int h = 0; h < lane_mask.rows; ++h) {
+      for (int w = 0; w < lane_mask.cols; ++w) {
+        if (lane_map.at<float>(h, w) >= lane_map_threshold_) {
+          lane_mask.at<unsigned char>(h, w) = 1;
+        }
+      }
+    }
+  } else {
+    AERROR << "invalid type of input lane map: " << lane_map.type();
+    return false;
+  }
+
+  if (lane_mask.size() != show_mat.size()) {
+    AERROR << "lane mask size should be equal to original image size.";
+    return false;
+  }
+
+  // draw lane pixels
+  cv::Scalar lane_mask_color(0, 255, 255);  // yellow
+  int x0 = 0;
+  int y0 = 0;
+  int x1 = show_mat.cols - 1;
+  int y1 = show_mat.rows - 1;
+  for (int h = y0; h <= y1; ++h) {
+    for (int w = x0; w <= x1; ++w) {
+      if (lane_mask.at<unsigned char>(h, w) > 0) {
+        show_mat.at<cv::Vec3b>(h, w)[0] =
+            static_cast<unsigned char>(lane_mask_color[0]);
+        show_mat.at<cv::Vec3b>(h, w)[1] =
+            static_cast<unsigned char>(lane_mask_color[1]);
+        show_mat.at<cv::Vec3b>(h, w)[2] =
+            static_cast<unsigned char>(lane_mask_color[2]);
+      }
+    }
+  }
+
+  // draw lane objects
+  for (size_t k = 0; k < lane_objects_->size(); ++k) {
+    // do not show the compensated virtual lanes
+    if (lane_objects_->at(k).is_compensated) {
+      continue;
+    }
+
+    cv::Scalar lane_object_color;
+    switch (lane_objects_->at(k).spatial) {
+      case apollo::perception::SpatialLabelType::L_0: {
+        lane_object_color = cv::Scalar(0, 0, 255);  // red
+        break;
+      }
+      case apollo::perception::SpatialLabelType::L_1: {
+        lane_object_color = cv::Scalar(255, 0, 255);  // magenta
+        break;
+      }
+      case apollo::perception::SpatialLabelType::L_2: {
+        lane_object_color = cv::Scalar(255, 63, 153);  // purple
+        break;
+      }
+      case apollo::perception::SpatialLabelType::R_0: {
+        lane_object_color = cv::Scalar(255, 0, 0);  // blue
+        break;
+      }
+      case apollo::perception::SpatialLabelType::R_1: {
+        lane_object_color = cv::Scalar(255, 255, 0);  // cyan
+        break;
+      }
+      case apollo::perception::SpatialLabelType::R_2: {
+        lane_object_color = cv::Scalar(63, 255, 192);  // greenyellow
+        break;
+      }
+      default: {
+        AERROR << "unknown lane spatial label: "
+               << static_cast<int>(lane_objects_->at(k).spatial);
+      }
+    }
+
+    // Besides the fitted polynomial curves we draw lane markers as well
+    for (auto p = lane_objects_->at(k).image_pos.begin();
+         p != lane_objects_->at(k).image_pos.end(); ++p) {
+      cv::circle(show_mat,
+                 cv::Point(static_cast<int>(p->x()), static_cast<int>(p->y())),
+                 4, lane_object_color, -1);
+    }
+
+    // draw polynomial curve
+    float img_y_start =
+        static_cast<float>(lane_objects_->at(k).img_curve.x_start);
+    float img_y_end = static_cast<float>(lane_objects_->at(k).img_curve.x_end);
+    float start = std::min(img_y_start, img_y_end);
+    float end = std::max(img_y_start, img_y_end);
+    float a = lane_objects_->at(k).img_curve.a;
+    float b = lane_objects_->at(k).img_curve.b;
+    float c = lane_objects_->at(k).img_curve.c;
+    float d = lane_objects_->at(k).img_curve.d;
+
+    for (float l = start; l <= end; l++) {
+      cv::circle(show_mat,
+                 cv::Point(static_cast<int>(GetPolyValue(a, b, c, d, l)),
+                           static_cast<int>(l)),
+                 2, lane_object_color, -1);
+    }
+  }
+
+  // Operate on projection matrix
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(scene_width_, scene_width_ + image_width_, image_height_, 0.0, 0.0,
+          100.0);
+
+  // Operate on model-view matrix
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+
+  glEnable(GL_TEXTURE_2D);
+  GLuint image_tex = image_to_gl_texture(show_mat, GL_LINEAR_MIPMAP_LINEAR,
+                                         GL_LINEAR, GL_CLAMP);
+
+  /* Draw a quad */
+  glBegin(GL_QUADS);
+  glTexCoord2i(0, 0);
+  glVertex2i(scene_width_, 0);
+  glTexCoord2i(0, 1);
+  glVertex2i(scene_width_, image_height_);
+  glTexCoord2i(1, 1);
+  glVertex2i(scene_width_ + image_width_, image_height_);
+  glTexCoord2i(1, 0);
+  glVertex2i(scene_width_ + image_width_, 0);
+  glEnd();
+
+  glDeleteTextures(1, &image_tex);
+  glDisable(GL_TEXTURE_2D);
+
+  // set the color to white
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+  std::string frame_id_str = "frame: " + std::to_string(frame_count_);
+  glRasterPos2i(scene_width_ + 10, image_height_ - 200);
+  raster_text_->print_string(frame_id_str.c_str());
+
+  return true;
 }
 
 bool GLFWFusionViewer::project_point_undistort(Eigen::Matrix4d v2c,
@@ -1514,6 +1849,7 @@ bool GLFWFusionViewer::draw_objects(FrameContent* content, bool draw_cube,
   return true;
 }
 
+/*
 void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
   int i = 0;
   int lineAmount = 100;  // # of triangles used to draw circle
@@ -1529,6 +1865,21 @@ void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
                (y + (radius * sin(i * twicePi / lineAmount))));
   }
   glColor4f(1.0, 1.0, 1.0, 1.0);
+  glEnd();
+}
+*/
+
+void GLFWFusionViewer::drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
+  // number of triangles used to draw circle
+  GLfloat lineAmount = 100.0f;
+
+  GLfloat twicePi = 2.0f * My_PI;
+
+  glBegin(GL_LINE_LOOP);
+  for (GLfloat i = 0.0f; i <= lineAmount; i++) {
+    glVertex2f(x + (radius * cos(i * twicePi / lineAmount)),
+               y + (radius * sin(i * twicePi / lineAmount)));
+  }
   glEnd();
 }
 

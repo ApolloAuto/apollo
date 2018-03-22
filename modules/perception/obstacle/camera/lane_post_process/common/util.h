@@ -109,6 +109,19 @@ T PolyEval(const T& x, const int& order,
   return y;
 }
 
+// @brief: evaluating y value of given x for a third-order polynomial function
+template <typename T = float>
+T GetPolyValue(T a, T b, T c, T d, T x) {
+  T y = d;
+  T v = x;
+  y += (c * v);
+  v *= x;
+  y += (b * v);
+  v *= x;
+  y += (a * v);
+  return y;
+}
+
 }  // namespace perception
 }  // namespace apollo
 
