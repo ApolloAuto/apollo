@@ -35,15 +35,14 @@ if __name__ == '__main__':
     navigation_path.path.name = "navigation"
     f = open(fdata, 'r')
     for line in f:
-        seg = json.loads(line)
-        for i in range(len(seg['s'])):
-            point = navigation_path.path.path_point.add()
-            point.x = seg['x'][i]
-            point.y = seg['y'][i]
-            point.s = seg['s'][i]
-            point.theta = seg['theta'][i]
-            point.kappa = seg['kappa'][i]
-            point.dkappa = seg['dkappa'][i]
+        json_point = json.loads(line)
+        point = navigation_path.path.path_point.add()
+        point.x = json_point['x']
+        point.y = json_point['y']
+        point.s = json_point['s']
+        point.theta = json_point['theta']
+        point.kappa = json_point['kappa']
+        point.dkappa = json_point['dkappa']
     f.close()
     print navigation_info
     r = rospy.Rate(1)  # 1hz
