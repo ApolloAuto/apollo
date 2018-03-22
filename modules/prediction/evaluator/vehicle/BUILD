@@ -11,7 +11,7 @@ cc_library(
         "mlp_evaluator.h",
     ],
     deps = [
-        "//modules/common/math:math_utils",
+        "//modules/common/math:geometry",
         "//modules/common/util",
         "//modules/map/proto:map_proto",
         "//modules/prediction/common:feature_output",
@@ -61,7 +61,7 @@ cc_library(
         "//modules/prediction/evaluator",
         "//modules/prediction/network/rnn_model",
         "//modules/prediction/proto:network_model_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -93,7 +93,7 @@ cc_library(
         "cost_evaluator.h",
     ],
     deps = [
-        "//modules/common/math:math_utils",
+        "//modules/common/math:geometry",
         "//modules/common/util",
         "//modules/map/proto:map_proto",
         "//modules/prediction/common:feature_output",

@@ -7,7 +7,7 @@ cc_library(
     srcs = ["obstacles_container.cc"],
     hdrs = ["obstacles_container.h"],
     deps = [
-        "//modules/common/math:math_utils",
+        "//modules/common/math:geometry",
         "//modules/common/util:lru_cache",
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_gflags",
@@ -26,8 +26,8 @@ cc_library(
         "//modules/common:log",
         "//modules/common/configs:config_gflags",
         "//modules/common/filters:digital_filter",
+        "//modules/common/math:geometry",
         "//modules/common/math:kalman_filter",
-        "//modules/common/math:math_utils",
         "//modules/common/proto:error_code_proto",
         "//modules/common/util:map_util",
         "//modules/map/hdmap",
