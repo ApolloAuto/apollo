@@ -1675,9 +1675,8 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
 void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
                                                bool show_fusion) {
   Eigen::Matrix4d c2v = content->get_camera_to_world_pose();
-  draw_objects(content->get_camera_objects(), c2v,
-               true, true, Eigen::Vector3f(1, 1, 0),
-               use_class_color_);
+  draw_objects(content->get_camera_objects(), c2v, true, true,
+               Eigen::Vector3f(1, 1, 0), use_class_color_);
 
   if (show_fusion) {
     if (!FLAGS_show_fused_objects) {

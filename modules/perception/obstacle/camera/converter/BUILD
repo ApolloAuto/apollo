@@ -12,7 +12,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/common",
         "//modules/perception/obstacle/camera/interface",
-        "@eigen//:eigen",
+        "@eigen",
         "@opencv2//:core",
         "@yaml_cpp//:yaml",
     ],
