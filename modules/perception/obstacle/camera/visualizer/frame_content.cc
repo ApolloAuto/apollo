@@ -194,8 +194,7 @@ void FrameContent::update_timestamp(double ref) {
     if (it != lane_caches_.end()) {
       lane_caches_.erase(lane_caches_.begin(), it);
     } else {
-      lane_caches_.erase(lane_caches_.begin(),
-                         std::prev(lane_caches_.end()));
+      lane_caches_.erase(lane_caches_.begin(), std::prev(lane_caches_.end()));
     }
   }
   current_lane_timestamp_ = MapKeyToDouble(lane_caches_.begin()->first);

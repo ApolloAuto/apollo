@@ -200,8 +200,8 @@ cc_library(
     ],
     hdrs = [
         "camera_shared_data.h",
-        "lane_shared_data.h",
         "fusion_shared_data.h",
+        "lane_shared_data.h",
     ],
     deps = [
         "//modules/perception/obstacle/base",
@@ -228,7 +228,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/interface",
-        "//modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor:cc_lane_post_processor",
+        "//modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor",
         "@eigen",
         "@opencv2//:core",
     ],
