@@ -39,9 +39,13 @@ struct VehicleInformation {
 class MotionService : public Subnode {
  public:
   MotionService() = default;
-  virtual ~MotionService() { delete vehicle_planemotion_; }
+  virtual ~MotionService() {
+    delete vehicle_planemotion_;
+  }
 
-  common::Status ProcEvents() override { return common::Status::OK(); }
+  common::Status ProcEvents() override {
+    return common::Status::OK();
+  }
 
   void GetVehicleInformation(float timestamp,
                              VehicleInformation *vehicle_informatino);
@@ -54,7 +58,7 @@ class MotionService : public Subnode {
   void OnLocalization(const localization::LocalizationEstimate &localization);
   PlaneMotion *vehicle_planemotion_ = nullptr;
   double pre_azimuth = 0;  // a invalid value
-  double pre_timestamp = 0;
+  double pre_timestamp_ = 0;
   // double pre_camera_timestamp = 0;
   bool start_flag_ = false;
   const int motion_buffer_size_ = 6000;
