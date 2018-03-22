@@ -87,7 +87,7 @@ void ThirdPartyPerception::Stop() {
 }
 
 void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
-  AINFO << "Received mobileye data: run mobileye callback.";
+  ADEBUG << "Received mobileye data: run mobileye callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   if (FLAGS_enable_mobileye) {
     mobileye_obstacles_ = conversion::MobileyeToPerceptionObstacles(
@@ -96,13 +96,13 @@ void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
 }
 
 void ThirdPartyPerception::OnChassis(const Chassis& message) {
-  AINFO << "Received chassis data: run chassis callback.";
+  ADEBUG << "Received chassis data: run chassis callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   chassis_.CopyFrom(message);
 }
 
 void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
-  AINFO << "Received delphi esr data: run delphi esr callback.";
+  ADEBUG << "Received delphi esr data: run delphi esr callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
   current_radar_obstacles_ = conversion::DelphiToRadarObstacles(
@@ -116,7 +116,7 @@ void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
 }
 
 void ThirdPartyPerception::OnContiRadar(const ContiRadar& message) {
-  AINFO << "Received delphi esr data: run continental radar callback.";
+  ADEBUG << "Received delphi esr data: run continental radar callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
   current_radar_obstacles_ = conversion::ContiToRadarObstacles(
@@ -130,13 +130,13 @@ void ThirdPartyPerception::OnContiRadar(const ContiRadar& message) {
 }
 
 void ThirdPartyPerception::OnLocalization(const LocalizationEstimate& message) {
-  AINFO << "Received localization data: run localization callback.";
+  ADEBUG << "Received localization data: run localization callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   localization_.CopyFrom(message);
 }
 
 void ThirdPartyPerception::OnTimer(const ros::TimerEvent&) {
-  AINFO << "Timer is triggered: publish PerceptionObstacles";
+  ADEBUG << "Timer is triggered: publish PerceptionObstacles";
 
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
 
