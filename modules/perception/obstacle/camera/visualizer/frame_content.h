@@ -83,6 +83,11 @@ class FusionContent : public BaseContent {
   std::vector<ObjectPtr> fused_objects_;
 };
 
+class LaneContent : public BaseContent {
+ public:
+  LaneObjects lane_objects_;
+};
+
 class GroundTruthContent : public BaseContent {
  public:
   std::vector<ObjectPtr> gt_objects_;
@@ -122,6 +127,9 @@ class FrameContent {
                          const std::vector<ObjectPtr>& objects);
   void set_fusion_content(double timestamp,
                           const std::vector<ObjectPtr>& objects);
+  void set_lane_content(double timestamp,
+                        const apollo::perception::LaneObjects& objects);
+
   void set_gt_content(double timestamp, const std::vector<ObjectPtr>& objects);
   void set_camera2car_pose(Eigen::Matrix4d pose_cam2velo);
 
@@ -152,6 +160,8 @@ class FrameContent {
   std::vector<ObjectPtr> get_fused_objects();
   // gt
   std::vector<ObjectPtr> get_gt_objects();
+  // lane objects
+  apollo::perception::LaneObjects get_lane_objects();
 
   const MotionBuffer get_motion_buffer();
 
@@ -192,6 +202,10 @@ class FrameContent {
   // 6.motion
   std::map<int64_t, MotionContent> motion_caches_;
   double current_motion_timestamp_;
+
+  // 7.lane lines
+  std::map<int64_t, LaneContent> lane_caches_;
+  double current_lane_timestamp_;
 
   Eigen::Vector3d global_offset_;
   bool global_offset_initialized_;

@@ -26,6 +26,7 @@
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
+#include "modules/perception/obstacle/onboard/lane_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
 
@@ -59,6 +60,7 @@ class VisualizationSubnode : public Subnode {
   CameraObjectData* camera_object_data_ = nullptr;
   CIPVObjectData* cipv_object_data_ = nullptr;
   CameraSharedData* camera_shared_data_ = nullptr;
+  LaneSharedData* lane_shared_data_ = nullptr;
   FusionSharedData* fusion_data_ = nullptr;
   std::unique_ptr<BaseVisualizer> frame_visualizer_;
   MotionBufferPtr motion_buffer_;
@@ -70,6 +72,7 @@ class VisualizationSubnode : public Subnode {
   EventID fusion_event_id_;
   EventID motion_event_id_;
   EventID cipv_event_id_;
+  EventID lane_event_id_;
 
   //    MotionBufferPtr motion_buffer_;
   Eigen::Matrix4d camera_to_car_pose_;
