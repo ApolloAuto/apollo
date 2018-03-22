@@ -63,13 +63,9 @@ class DisjointSet {
   }
 
   // get the number of subsets (root nodes)
-  int Size() const {
-    return subset_num_;
-  }
+  int Size() const { return subset_num_; }
   // get the total number of elements
-  size_t Num() const {
-    return disjoint_array_.size();
-  }
+  size_t Num() const { return disjoint_array_.size(); }
   // add a new element
   int Add();
   // find the root element of x
@@ -107,13 +103,9 @@ class ConnectedComponent {
           len(0.0),
           orie(0.0) {}
 
-    int get_start_vertex_id() const {
-      return start_vertex_id;
-    }
+    int get_start_vertex_id() const { return start_vertex_id; }
 
-    int get_end_vertex_id() const {
-      return end_vertex_id;
-    }
+    int get_end_vertex_id() const { return end_vertex_id; }
   };
 
   struct BoundingBox {
@@ -154,13 +146,9 @@ class ConnectedComponent {
       down_contour = std::make_shared<std::vector<int>>();
     }
 
-    int width() const {
-      return x_max - x_min + 1;
-    }
+    int width() const { return x_max - x_min + 1; }
 
-    int height() const {
-      return y_max - y_min + 1;
-    }
+    int height() const { return y_max - y_min + 1; }
   };
 
   ConnectedComponent() : pixel_count_(0), bbox_() {
@@ -198,29 +186,17 @@ class ConnectedComponent {
 
   // CC pixels
   void AddPixel(int x, int y);
-  int GetPixelCount() const {
-    return pixel_count_;
-  }
+  int GetPixelCount() const { return pixel_count_; }
   std::shared_ptr<const std::vector<cv::Point2i>> GetPixels() const {
     return pixels_;
   }
 
   // bounding box
-  const BoundingBox* bbox() const {
-    return &bbox_;
-  }
-  int x_min() const {
-    return bbox_.x_min;
-  }
-  int y_min() const {
-    return bbox_.y_min;
-  }
-  int x_max() const {
-    return bbox_.x_max;
-  }
-  int y_max() const {
-    return bbox_.y_max;
-  }
+  const BoundingBox* bbox() const { return &bbox_; }
+  int x_min() const { return bbox_.x_min; }
+  int y_min() const { return bbox_.y_min; }
+  int x_max() const { return bbox_.x_max; }
+  int y_max() const { return bbox_.y_max; }
 
   cv::Rect GetBoundingBox() const {
     return cv::Rect(bbox_.x_min, bbox_.y_min, bbox_.x_max - bbox_.x_min + 1,
@@ -258,9 +234,7 @@ class ConnectedComponent {
     return vertices_->at(vertex_id);
   }
 
-  int GetVertexCount() const {
-    return static_cast<int>(vertices_->size());
-  }
+  int GetVertexCount() const { return static_cast<int>(vertices_->size()); }
 
   // edges
   bool IsValidEdgeVertices(int i, int j) {
@@ -269,21 +243,15 @@ class ConnectedComponent {
   }
 
   void FindEdges();
-  int GetEdgeCount() const {
-    return static_cast<int>(edges_->size());
-  }
-  const Edge* GetMaxLenthEdge() const {
-    return &edges_->at(max_len_edge_id_);
-  }
+  int GetEdgeCount() const { return static_cast<int>(edges_->size()); }
+  const Edge* GetMaxLenthEdge() const { return &edges_->at(max_len_edge_id_); }
   std::shared_ptr<const Edge> GetClockWiseEdge() const {
     return clockwise_edge_;
   }
   std::shared_ptr<const Edge> GetAntiClockWiseEdge() const {
     return anticlockwise_edge_;
   }
-  std::shared_ptr<const Edge> GetInnerEdge() const {
-    return inner_edge_;
-  }
+  std::shared_ptr<const Edge> GetInnerEdge() const { return inner_edge_; }
 
   void SplitContour(int split_len);
   std::shared_ptr<std::vector<Edge>> GetClockWiseEdges() const {
@@ -299,9 +267,7 @@ class ConnectedComponent {
   void Process(ScalarType split_siz, int split_len);
 
  private:
-  int Sub2Ind(int row, int col, int width) {
-    return row * width + col;
-  }
+  int Sub2Ind(int row, int col, int width) { return row * width + col; }
 
   void SplitContourVertical(int start_vertex_id, int end_vertex_id,
                             int len_split, bool is_clockwise);

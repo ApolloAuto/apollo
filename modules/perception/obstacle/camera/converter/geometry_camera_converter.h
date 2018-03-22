@@ -25,10 +25,11 @@
 #include <string>
 #include <vector>
 
-#include "yaml-cpp/yaml.h"
 #include "Eigen/Geometry"
 #include "opencv2/opencv.hpp"
+#include "yaml-cpp/yaml.h"
 
+#include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"

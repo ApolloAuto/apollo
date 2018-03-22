@@ -40,7 +40,8 @@ class StopSign : public TrafficRule {
   explicit StopSign(const TrafficRuleConfig& config);
   virtual ~StopSign() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 
  private:
   void MakeDecisions(Frame* const frame,
@@ -63,7 +64,7 @@ class StopSign : public TrafficRule {
   bool BuildStopDecision(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info,
                          hdmap::PathOverlap* const overlap,
-                         const double stop_buffer);
+                         const double stop_distance);
 
  private:
   static constexpr char const* const STOP_SIGN_VO_ID_PREFIX = "SS_";

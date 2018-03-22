@@ -18,7 +18,7 @@ cc_library(
         ":pcl_util",
         "//modules/common",
         "//modules/common/configs:config_gflags",
-        "//modules/common/math:math_utils",
+        "//modules/common/math:geometry",
         "@eigen",
     ],
 )

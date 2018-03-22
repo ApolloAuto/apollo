@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/planning/math:polynomial_xd",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -26,7 +26,7 @@ cc_library(
     ],
     deps = [
         "//modules/planning/math:polynomial_xd",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -42,7 +42,7 @@ cc_library(
         ":affine_constraint",
         ":spline_1d_seg",
         "//modules/planning/math:polynomial_xd",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -58,7 +58,7 @@ cc_library(
         ":affine_constraint",
         ":spline_1d",
         "//modules/common:log",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -72,7 +72,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:macro",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -89,7 +89,7 @@ cc_library(
         ":spline_1d",
         ":spline_seg_kernel",
         "//modules/common:macro",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -109,7 +109,7 @@ cc_library(
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "//modules/common/time",
         "//modules/planning/common:planning_gflags",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -123,7 +123,7 @@ cc_library(
     ],
     deps = [
         "//modules/planning/math:polynomial_xd",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -138,7 +138,7 @@ cc_library(
     deps = [
         ":spline_2d_seg",
         "//modules/planning/math:polynomial_xd",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -153,9 +153,8 @@ cc_library(
     deps = [
         ":affine_constraint",
         ":spline_2d",
-        "//modules/common/math:math_utils",
-        "//modules/common/math:vec2d",
-        "@eigen//:eigen",
+        "//modules/common/math:geometry",
+        "@eigen",
     ],
 )
 
@@ -170,8 +169,8 @@ cc_library(
     deps = [
         ":spline_2d",
         ":spline_seg_kernel",
-        "//modules/common/math:vec2d",
-        "@eigen//:eigen",
+        "//modules/common/math:geometry",
+        "@eigen",
     ],
 )
 
@@ -187,12 +186,12 @@ cc_library(
         ":spline_2d",
         ":spline_2d_constraint",
         ":spline_2d_kernel",
-        "//modules/common/math:vec2d",
+        "//modules/common/math:geometry",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "//modules/common/time",
         "//modules/planning/common:planning_gflags",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -206,7 +205,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -220,7 +219,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -237,7 +236,7 @@ cc_library(
         ":piecewise_linear_kernel",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

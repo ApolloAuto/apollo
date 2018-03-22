@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -28,9 +29,6 @@
 
 namespace apollo {
 namespace perception {
-
-AsyncFusion::AsyncFusion()
-    : started_(false), matcher_(nullptr), track_manager_(nullptr) {}
 
 AsyncFusion::~AsyncFusion() {
   if (matcher_) {
@@ -142,15 +140,15 @@ void AsyncFusion::FuseFrame(const PbfSensorFramePtr &frame) {
   DecomposeFrameObjects(objects, &foreground_objects, &background_objects);
 
   Eigen::Vector3d ref_point = frame->sensor2world_pose.topRightCorner(3, 1);
-  FuseForegroundObjects(&foreground_objects, ref_point, frame->sensor_type,
-                        frame->sensor_id, frame->timestamp);
+  FuseForegroundObjects(ref_point, frame->sensor_type, frame->sensor_id,
+                        frame->timestamp, &foreground_objects);
   track_manager_->RemoveLostTracks();
 }
 
 void AsyncFusion::CreateNewTracks(
     const std::vector<PbfSensorObjectPtr> &sensor_objects,
     const std::vector<int> &unassigned_ids) {
-  for (size_t i = 0; i < unassigned_ids.size(); i++) {
+  for (size_t i = 0; i < unassigned_ids.size(); ++i) {
     int id = unassigned_ids[i];
     PbfTrackPtr track(new PbfTrack(sensor_objects[id]));
     track_manager_->AddTrack(track);
@@ -158,10 +156,10 @@ void AsyncFusion::CreateNewTracks(
 }
 
 void AsyncFusion::UpdateAssignedTracks(
-    std::vector<PbfTrackPtr> *tracks,
     const std::vector<PbfSensorObjectPtr> &sensor_objects,
     const std::vector<TrackObjectPair> &assignments,
-    const std::vector<double> &track_object_dist) {
+    const std::vector<double> &track_object_dist,
+    std::vector<PbfTrackPtr> const *tracks) {
   for (size_t i = 0; i < assignments.size(); i++) {
     int local_track_index = assignments[i].first;
     int local_obj_index = assignments[i].second;
@@ -225,9 +223,9 @@ void AsyncFusion::DecomposeFrameObjects(
 }
 
 void AsyncFusion::FuseForegroundObjects(
-    std::vector<PbfSensorObjectPtr> *foreground_objects,
-    Eigen::Vector3d ref_point, const SensorType &sensor_type,
-    const std::string &sensor_id, double timestamp) {
+    const Eigen::Vector3d &ref_point, const SensorType &sensor_type,
+    const std::string &sensor_id, const double timestamp,
+    std::vector<PbfSensorObjectPtr> *foreground_objects) {
   std::vector<int> unassigned_tracks;
   std::vector<int> unassigned_objects;
   std::vector<TrackObjectPair> assignments;
@@ -249,8 +247,8 @@ void AsyncFusion::FuseForegroundObjects(
         << ", unassigned_track_cnt = " << unassigned_tracks.size()
         << ", unassigned_obj_cnt = " << unassigned_objects.size();
 
-  UpdateAssignedTracks(&tracks, *foreground_objects, assignments,
-                       track2measurements_dist);
+  UpdateAssignedTracks(*foreground_objects, assignments,
+                       track2measurements_dist, &tracks);
 
   UpdateUnassignedTracks(&tracks, unassigned_tracks, track2measurements_dist,
                          sensor_type, sensor_id, timestamp);

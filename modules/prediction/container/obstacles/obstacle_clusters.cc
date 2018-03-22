@@ -21,9 +21,9 @@
 namespace apollo {
 namespace prediction {
 
-std::unordered_map<std::string, LaneGraph> ObstacleClusters::lane_graphs_;
+using ::apollo::hdmap::LaneInfo;
 
-using apollo::hdmap::LaneInfo;
+std::unordered_map<std::string, LaneGraph> ObstacleClusters::lane_graphs_;
 
 void ObstacleClusters::Clear() { lane_graphs_.clear(); }
 

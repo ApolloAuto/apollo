@@ -90,6 +90,8 @@ class CameraProcessSubnode : public Subnode {
   CameraSharedData* cam_shared_data_;
 
   // Calibration
+  int32_t image_height_ = 1080;
+  int32_t image_width_ = 1920;
   Eigen::Matrix4d camera_to_car_;
   Eigen::Matrix<double, 3, 4> intrinsics_;
   CameraUndistortionPtr undistortion_handler_;

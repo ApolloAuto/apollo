@@ -57,7 +57,7 @@ using apollo::planning::util::GetPlanningStatus;
 
 StopSign::StopSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
-bool StopSign::ApplyRule(Frame* frame,
+bool StopSign::ApplyRule(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -126,8 +126,7 @@ void StopSign::MakeDecisions(Frame* frame,
   } else {
     // stop decision
     double stop_deceleration = util::GetADCStopDeceleration(
-        reference_line_info,
-        next_stop_sign_overlap_->start_s,
+        reference_line_info, next_stop_sign_overlap_->start_s,
         config_.stop_sign().min_pass_s_distance());
     if (stop_deceleration < FLAGS_max_stop_deceleration) {
       BuildStopDecision(frame, reference_line_info,
@@ -152,7 +151,7 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
   double min_start_s = std::numeric_limits<double>::max();
   for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
     if (adc_front_edge_s - stop_sign_overlap.end_s <=
-        config_.stop_sign().min_pass_s_distance() &&
+            config_.stop_sign().min_pass_s_distance() &&
         stop_sign_overlap.start_s < min_start_s) {
       min_start_s = stop_sign_overlap.start_s;
       next_stop_sign_overlap_ = const_cast<PathOverlap*>(&stop_sign_overlap);
@@ -364,11 +363,11 @@ int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
   watch_vehicles->clear();
 
   StopSignStatus stop_sign_status = GetPlanningStatus()->stop_sign();
-  for (int i = 0; i < stop_sign_status.lane_watch_vehicles_size(); i++) {
+  for (int i = 0; i < stop_sign_status.lane_watch_vehicles_size(); ++i) {
     auto lane_watch_vehicles = stop_sign_status.lane_watch_vehicles(i);
     std::string associated_lane_id = lane_watch_vehicles.lane_id();
     std::string s;
-    for (int j = 0; j < lane_watch_vehicles.watch_vehicles_size(); j++) {
+    for (int j = 0; j < lane_watch_vehicles.watch_vehicles_size(); ++j) {
       std::string vehicle = lane_watch_vehicles.watch_vehicles(j);
       s = s.empty() ? vehicle : s + "," + vehicle;
       (*watch_vehicles)[associated_lane_id].push_back(vehicle);
@@ -389,11 +388,10 @@ int StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->clear_lane_watch_vehicles();
 
-  for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
-       it != watch_vehicles->end(); ++it) {
+  for (auto it = watch_vehicles->begin(); it != watch_vehicles->end(); ++it) {
     auto* lane_watch_vehicles = stop_sign_status->add_lane_watch_vehicles();
     lane_watch_vehicles->set_lane_id(it->first);
-    for (size_t i = 0; i < it->second.size(); i++) {
+    for (size_t i = 0; i < it->second.size(); ++i) {
       lane_watch_vehicles->add_watch_vehicles(it->second[i]);
     }
   }
@@ -678,7 +676,7 @@ int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
 bool StopSign::BuildStopDecision(Frame* frame,
                                  ReferenceLineInfo* const reference_line_info,
                                  PathOverlap* const overlap,
-                                 const double stop_buffer) {
+                                 const double stop_distance) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
   CHECK_NOTNULL(overlap);
@@ -691,9 +689,8 @@ bool StopSign::BuildStopDecision(Frame* frame,
   }
 
   // create virtual stop wall
-  std::string virtual_obstacle_id =
-      STOP_SIGN_VO_ID_PREFIX + overlap->object_id;
-  auto* obstacle = frame->CreateVirtualStopObstacle(
+  std::string virtual_obstacle_id = STOP_SIGN_VO_ID_PREFIX + overlap->object_id;
+  auto* obstacle = frame->CreateStopObstacle(
       reference_line_info, virtual_obstacle_id, overlap->start_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
@@ -706,14 +703,14 @@ bool StopSign::BuildStopDecision(Frame* frame,
   }
 
   // build stop decision
-  const double stop_s = overlap->start_s - stop_buffer;
+  const double stop_s = overlap->start_s - stop_distance;
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
   stop_decision->set_reason_code(StopReasonCode::STOP_REASON_STOP_SIGN);
-  stop_decision->set_distance_s(-stop_buffer);
+  stop_decision->set_distance_s(-stop_distance);
   stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
   stop_decision->mutable_stop_point()->set_y(stop_point.y());

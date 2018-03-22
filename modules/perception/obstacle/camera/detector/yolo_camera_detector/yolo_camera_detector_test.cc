@@ -23,10 +23,10 @@
 #include "gtest/gtest.h"
 #include "opencv2/opencv.hpp"
 
-#include "modules/perception/cuda_util/region_output.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/cuda_util/region_output.h"
 #include "modules/perception/obstacle/camera/detector/common/feature_extractor.h"
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/proto/yolo.pb.h"
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/util.h"
