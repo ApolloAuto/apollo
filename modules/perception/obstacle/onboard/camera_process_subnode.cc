@@ -29,7 +29,9 @@ bool CameraProcessSubnode::InitInternal() {
   // Subnode config in DAG streaming
   std::unordered_map<std::string, std::string> fields;
   SubnodeHelper::ParseReserveField(reserve_, &fields);
-  device_id_ = fields["device_id"];
+
+  if (fields.count("device_id")) device_id_ = fields["device_id"];
+  if (fields.count("publish") && stoi(fields["publish"])) publish_ = true;
 
   // Shared Data
   cam_obj_data_ = static_cast<CameraObjectData *>(
@@ -43,6 +45,8 @@ bool CameraProcessSubnode::InitInternal() {
 
   AdapterManager::AddImageShortCallback(&CameraProcessSubnode::ImgCallback,
                                         this);
+  if (publish_) AdapterManager::AddChassisCallback(
+    &CameraProcessSubnode::ChassisCallback, this);
 
   return true;
 }
@@ -97,6 +101,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   AINFO << "CameraProcessSubnode ImgCallback: "
         << " frame: " << ++seq_num_ << " timestamp: ";
   AINFO << std::fixed << std::setprecision(64) << timestamp;
+  timestamp_ns_ = timestamp * 1e9;
 
   cv::Mat img;
   if (!FLAGS_image_file_debug) {
@@ -123,6 +128,15 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   camera_item_ptr->image_src_mat = img.clone();
   mask.copyTo(out_objs->camera_frame_supplement->lane_map);
   PublishDataAndEvent(timestamp, out_objs, camera_item_ptr);
+
+  if (publish_) PublishPerceptionPb(out_objs);
+}
+
+void CameraProcessSubnode::ChassisCallback(
+  const apollo::canbus::Chassis& message) {
+  AINFO << "Camera received chassis data: run chassis callback.";
+  std::lock_guard<std::mutex> lock(camera_mutex_);
+  chassis_.CopyFrom(message);
 }
 
 bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
@@ -202,6 +216,39 @@ void CameraProcessSubnode::PublishDataAndEvent(
     event.reserve = device_id_;
     event_manager_->Publish(event);
   }
+}
+
+void CameraProcessSubnode::PublishPerceptionPb(
+    const SharedDataPtr<SensorObjects>& sensor_objects) {
+  AINFO << "Camera publish perception pb data";
+  std::lock_guard<std::mutex> lock(camera_mutex_);
+
+  PerceptionObstacles obstacles;
+
+  // Header
+  common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
+    "perception_obstacle", &obstacles);
+  common::Header *header = obstacles.mutable_header();
+  header->set_lidar_timestamp(0);
+  header->set_camera_timestamp(timestamp_ns_);
+  header->set_radar_timestamp(0);
+  obstacles.set_error_code(sensor_objects->error_code);
+
+  // Serialize each Object
+  for (const auto &obj : sensor_objects->objects) {
+    PerceptionObstacle *obstacle = obstacles.add_perception_obstacle();
+    obj->Serialize(obstacle);
+  }
+
+  // Relative speed of objects + latest ego car speed in X
+  AINFO << "Chassis Speed: " << chassis_.speed_mps();
+  for (auto obstacle : obstacles.perception_obstacle()) {
+    obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
+                                       chassis_.speed_mps());
+  }
+
+  common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
+  AINFO << "Camera Obstacles: " << obstacles.ShortDebugString();
 }
 
 }  // namespace perception
