@@ -54,8 +54,9 @@ void ManageTrackerAndID(
     const std::unordered_map<int, int> &local_matching,
     const std::unordered_set<int> &local_matched_detected,
     const std::vector<Detected> &detected, const int &frame_idx,
-    const float &timestamp, std::vector<Tracked> *tracked, int *next_tracked_id,
-    std::unordered_map<int, std::pair<int, float>> *id_mapping);
+    const double &timestamp, std::vector<Tracked> *tracked,
+    int *next_tracked_id,
+    std::unordered_map<int, std::pair<int, double>> *id_mapping);
 
 void PrintAffinityMatrix(const std::vector<std::vector<float>> &affinity_matrix,
                          const std::vector<Tracked> &tracked,
