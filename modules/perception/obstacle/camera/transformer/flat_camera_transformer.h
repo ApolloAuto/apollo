@@ -35,6 +35,7 @@
 #include "opencv2/opencv.hpp"
 #include "yaml-cpp/yaml.h"
 
+#include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
@@ -54,7 +55,7 @@ class FlatCameraTransformer : public BaseCameraTransformer {
   bool Transform(std::vector<VisualObjectPtr> *objects) override;
 
   // @brief Set static extrinsic matrix for camera space to car space
-  bool SetExtrinsics(const Eigen::Matrix<double, 4, 4> &extrinsics);
+  bool SetExtrinsics(const Eigen::Matrix<double, 4, 4> &extrinsics) override;
 
   std::string Name() const override;
 
