@@ -46,7 +46,7 @@ common::PathPoint ReferencePoint::ToPathPoint(double s) const {
   common::PathPoint path_point = common::util::MakePathPoint(
       x(), y(), 0.0, heading(), kappa_, dkappa_, 0.0);
   path_point.set_s(s);
-  return std::move(path_point);
+  return path_point;
 }
 
 double ReferencePoint::kappa() const { return kappa_; }
