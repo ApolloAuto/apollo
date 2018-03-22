@@ -67,10 +67,11 @@ class LatticePlanner : public Planner {
  private:
   DiscretizedTrajectory GetFutureTrajectory() const;
 
-  bool MapFutureTrajectoryToSL(const DiscretizedTrajectory& future_trajectory,
-                               std::vector<common::SpeedPoint>* st_points,
-                               std::vector<common::FrenetFramePoint>* sl_points,
-                               ReferenceLineInfo* reference_line_info);
+  bool MapFutureTrajectoryToSL(
+      const DiscretizedTrajectory& future_trajectory,
+      const std::vector<apollo::common::PathPoint>& discretized_reference_line,
+      std::vector<common::SpeedPoint>* st_points,
+      std::vector<common::FrenetFramePoint>* sl_points);
 };
 
 }  // namespace planning
