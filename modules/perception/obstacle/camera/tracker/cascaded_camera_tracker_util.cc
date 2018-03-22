@@ -167,8 +167,9 @@ void ManageTrackerAndID(
     const std::unordered_map<int, int> &local_matching,
     const std::unordered_set<int> &local_matched_detected,
     const std::vector<Detected> &detected, const int &frame_idx,
-    const float &timestamp, std::vector<Tracked> *tracked, int *next_tracked_id,
-    std::unordered_map<int, std::pair<int, float>> *id_mapping) {
+    const double &timestamp, std::vector<Tracked> *tracked,
+    int *next_tracked_id,
+    std::unordered_map<int, std::pair<int, double>> *id_mapping) {
   id_mapping->clear();
   std::vector<Tracked> new_tracked;
   const int kMaxKeptFrame = 10;
@@ -191,7 +192,7 @@ void ManageTrackerAndID(
   for (const auto &item : tracked_id_local_index) {
     int track_id =
         (*tracked)[item.second.first].track_id_;  // The same as item.first
-    float first_timestamp = (*tracked)[item.second.first].first_timestamp_;
+    double first_timestamp = (*tracked)[item.second.first].first_timestamp_;
     int d_id = detected[item.second.second].detect_id_;
 
     Tracked curr_tracked;

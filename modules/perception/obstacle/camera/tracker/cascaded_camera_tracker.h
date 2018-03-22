@@ -51,7 +51,7 @@ class CascadedCameraTracker : public BaseCameraTracker {
 
   bool Init() override;
 
-  bool Associate(const cv::Mat& img, const float& timestamp,
+  bool Associate(const cv::Mat& img, const double& timestamp,
                  std::vector<VisualObjectPtr>* objects) override;
 
   std::string Name() const override;
