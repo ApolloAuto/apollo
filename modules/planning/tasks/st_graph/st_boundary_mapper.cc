@@ -663,7 +663,7 @@ Status StBoundaryMapper::GetSpeedLimits(
     }
 
     double curr_speed_limit = 0.0;
-    if (FLAGS_enable_nudge_slowdown) {
+    if (FLAGS_enable_nudge_slowdown && !FLAGS_use_navigation_mode) {
       curr_speed_limit =
           std::fmax(st_boundary_config_.lowest_speed(),
                     common::util::MinElement(std::vector<double>{
