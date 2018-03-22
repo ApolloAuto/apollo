@@ -1571,6 +1571,10 @@ cheerio@^0.19.0:
     htmlparser2 "~3.8.1"
     lodash "^3.2.0"
 
+chncrs@^0.1.6:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/chncrs/-/chncrs-0.1.6.tgz#e1d13bff09e770d5d0d9a8fd40b9316b0763500a"
+
 chokidar@^1.0.0, chokidar@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-1.7.0.tgz#798e689778151c8076b4b360e5edd28cda2bb468"
