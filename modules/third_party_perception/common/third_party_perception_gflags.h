@@ -60,5 +60,6 @@ DECLARE_int32(keep_radar_frames);
 DECLARE_bool(use_conti_radar);
 DECLARE_double(max_mobileye_obstacle_length);
 DECLARE_double(max_mobileye_obstacle_width);
+DECLARE_bool(overwrite_mobileye_theta);
 
 #endif

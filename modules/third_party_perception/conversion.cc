@@ -60,6 +60,56 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
   PerceptionObstacles obstacles;
   // retrieve position and velocity of the main vehicle from the localization
   // position
+
+  obstacles.mutable_header()->CopyFrom(mobileye.header());
+
+  // Fullfill lane_type information
+  std::int32_t mob_left_lane_type = mobileye.lka_766().lane_type();
+  std::int32_t mob_right_lane_type = mobileye.lka_768().lane_type();
+
+  obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_lane_type(
+      lane_conversion_map[mob_left_lane_type]);
+  obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_lane_type(
+      lane_conversion_map[mob_right_lane_type]);
+
+  obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_quality(
+      mobileye.lka_766().quality() / 4.0);
+  obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_model_degree(
+      mobileye.lka_766().model_degree());
+
+  // Convert everything to FLU
+  obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_c0_position(
+      -mobileye.lka_766().position());
+  obstacles.mutable_lane_marker()
+      ->mutable_left_lane_marker()
+      ->set_c1_heading_angle(-mobileye.lka_767().heading_angle());
+  obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_c2_curvature(
+      -mobileye.lka_766().curvature());
+  obstacles.mutable_lane_marker()
+      ->mutable_left_lane_marker()
+      ->set_c3_curvature_derivative(-mobileye.lka_766().curvature_derivative());
+  obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_view_range(
+      mobileye.lka_767().view_range());
+
+  obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_quality(
+      mobileye.lka_768().quality() / 4.0);
+  obstacles.mutable_lane_marker()
+      ->mutable_right_lane_marker()
+      ->set_model_degree(mobileye.lka_768().model_degree());
+  obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_c0_position(
+      -mobileye.lka_768().position());
+  obstacles.mutable_lane_marker()
+      ->mutable_right_lane_marker()
+      ->set_c1_heading_angle(-mobileye.lka_769().heading_angle());
+  obstacles.mutable_lane_marker()
+      ->mutable_right_lane_marker()
+      ->set_c2_curvature(-mobileye.lka_768().curvature());
+  obstacles.mutable_lane_marker()
+      ->mutable_right_lane_marker()
+      ->set_c3_curvature_derivative(-mobileye.lka_768().curvature_derivative());
+  obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_view_range(
+      mobileye.lka_769().view_range());
+
   double adc_x = localization.pose().position().x();
   double adc_y = localization.pose().position().y();
   double adc_z = localization.pose().position().z();
@@ -115,6 +165,22 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
     double converted_vx = 0.0;
     double converted_vy = 0.0;
 
+    double path_c1 = 0.0;
+    double path_c2 = 0.0;
+    double path_c3 = 0.0;
+
+    if (obstacles.lane_marker().left_lane_marker().quality() >=
+        obstacles.lane_marker().right_lane_marker().quality()) {
+      path_c1 = obstacles.lane_marker().left_lane_marker().c1_heading_angle();
+      path_c2 = obstacles.lane_marker().left_lane_marker().c2_curvature();
+      path_c3 =
+          obstacles.lane_marker().left_lane_marker().c3_curvature_derivative();
+    } else {
+      path_c1 = obstacles.lane_marker().right_lane_marker().c1_heading_angle();
+      path_c2 = obstacles.lane_marker().right_lane_marker().c2_curvature();
+      path_c3 = obstacles.lane_marker().right_lane_marker().c2_curvature();
+    }
+
     if (!FLAGS_use_navigation_mode) {
       converted_x = adc_x + xy_point.x();
       converted_y = adc_y + xy_point.y();
@@ -123,20 +189,27 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
       converted_vx = converted_speed * std::cos(mob->theta());
       converted_vy = converted_speed * std::sin(mob->theta());
     } else {
-      // TODO(QiL) : need to load configs from mobileye for offset
-      // 2.5 is a temp estimated value
       converted_x = mobileye.details_739(index).obstacle_pos_x() +
                     FLAGS_mobileye_pos_adjust;
       converted_y = mobileye.details_739(index).obstacle_pos_y();
+      converted_vx = mob_vel_x + chassis.speed_mps();
+      converted_vy = 0.0;
+
       if (mobileye.details_73b_size() <= index) {
         mob->set_theta(0.0);
       } else {
-        mob->set_theta(mobileye.details_73b(index).obstacle_angle() / 180 *
-                       M_PI);
+        if (!FLAGS_overwrite_mobileye_theta) {
+          mob->set_theta(mobileye.details_73b(index).obstacle_angle() / 180 *
+                         M_PI);
+        } else {
+          double nearest_lane_heading =
+              std::copysign(std::atan2(3 * path_c3 * converted_x * converted_x +
+                                           2 * path_c2 * converted_x + path_c1,
+                                       1),
+                            converted_vx);
+          mob->set_theta(nearest_lane_heading);
+        }
       }
-
-      converted_vx = mob_vel_x + chassis.speed_mps();
-      converted_vy = 0.0;
     }
 
     mob->set_id(mob_id);
@@ -179,55 +252,6 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
 
     mob->set_confidence(0.5);
   }
-
-  obstacles.mutable_header()->CopyFrom(mobileye.header());
-
-  // Fullfill lane_type information
-  std::int32_t mob_left_lane_type = mobileye.lka_766().lane_type();
-  std::int32_t mob_right_lane_type = mobileye.lka_768().lane_type();
-
-  obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_lane_type(
-      lane_conversion_map[mob_left_lane_type]);
-  obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_lane_type(
-      lane_conversion_map[mob_right_lane_type]);
-
-  obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_quality(
-      mobileye.lka_766().quality() / 4.0);
-  obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_model_degree(
-      mobileye.lka_766().model_degree());
-
-  // Convert everything to FLU
-  obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_c0_position(
-      -mobileye.lka_766().position());
-  obstacles.mutable_lane_marker()
-      ->mutable_left_lane_marker()
-      ->set_c1_heading_angle(-mobileye.lka_767().heading_angle());
-  obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_c2_curvature(
-      -mobileye.lka_766().curvature());
-  obstacles.mutable_lane_marker()
-      ->mutable_left_lane_marker()
-      ->set_c3_curvature_derivative(-mobileye.lka_766().curvature_derivative());
-  obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_view_range(
-      mobileye.lka_767().view_range());
-
-  obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_quality(
-      mobileye.lka_768().quality() / 4.0);
-  obstacles.mutable_lane_marker()
-      ->mutable_right_lane_marker()
-      ->set_model_degree(mobileye.lka_768().model_degree());
-  obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_c0_position(
-      -mobileye.lka_768().position());
-  obstacles.mutable_lane_marker()
-      ->mutable_right_lane_marker()
-      ->set_c1_heading_angle(-mobileye.lka_769().heading_angle());
-  obstacles.mutable_lane_marker()
-      ->mutable_right_lane_marker()
-      ->set_c2_curvature(-mobileye.lka_768().curvature());
-  obstacles.mutable_lane_marker()
-      ->mutable_right_lane_marker()
-      ->set_c3_curvature_derivative(-mobileye.lka_768().curvature_derivative());
-  obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_view_range(
-      mobileye.lka_769().view_range());
 
   return obstacles;
 }
