@@ -45,7 +45,7 @@ class BaseCameraTransformer {
   // which get transformed into targeted 3D space
   virtual bool Transform(std::vector<VisualObjectPtr>* objects) = 0;
 
-  virtual bool SetExtrinsics(const Eigen::Matrix<double, 4, 4> &extrinsics) = 0;
+  virtual bool SetExtrinsics(const Eigen::Matrix<double, 4, 4>& extrinsics) = 0;
 
   virtual std::string Name() const = 0;
 
