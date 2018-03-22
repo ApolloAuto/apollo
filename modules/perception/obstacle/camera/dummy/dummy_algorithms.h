@@ -104,7 +104,7 @@ class DummyCameraTransformer : public BaseCameraTransformer {
     return true;
   }
 
-  bool SetExtrinsics(const Eigen::Matrix<double, 4, 4> &extrinsics) override {
+  bool SetExtrinsics(const Eigen::Matrix<double, 4, 4>& extrinsics) override {
     return true;
   }
 
