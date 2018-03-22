@@ -13,6 +13,7 @@
     },
     "dependencies": {
         "chart.js": "^2.7.0",
+        "chncrs": "^0.1.6",
         "classnames": "^2.2.5",
         "compute-polynomial": "^1.1.0",
         "font-awesome": "^4.7.0",
