@@ -59,7 +59,7 @@ void MotionService::OnLocalization(
     timestamp_diff = 0;
   } else {
     vehicle_status.yaw_rate = localization.pose().angular_velocity_vrf().z();
-    timestamp_diff = localization.measurement_time() - pre_timestamp;
+    timestamp_diff = localization.measurement_time() - pre_timestamp_;
   }
 
   VehicleInformation vehicle_information;
@@ -72,16 +72,16 @@ void MotionService::OnLocalization(
     MutexLock lock(&mutex_);
     vehicle_information_buffer_.push_back(vehicle_information);
   }
-  pre_timestamp = localization.measurement_time();
+  pre_timestamp_ = localization.measurement_time();
 
   // add motion to buffer
   double camera_timestamp = camera_shared_data_->GetLatestTimestamp();
-  if (std::abs(pre_timestamp - camera_timestamp) <
+  if (std::abs(pre_timestamp_ - camera_timestamp) <
       std::numeric_limits<double>::epsilon()) {
     // exactly same timestamp
     vehicle_planemotion_->add_new_motion(&vehicle_status, timestamp_diff,
                                          PlaneMotion::ACCUM_PUSH_MOTION);
-  } else if (pre_timestamp < camera_timestamp) {
+  } else if (pre_timestamp_ < camera_timestamp) {
     vehicle_planemotion_->add_new_motion(&vehicle_status, timestamp_diff,
                                          PlaneMotion::ACCUM_MOTION);
   } else {
