@@ -111,7 +111,7 @@ bool QpSplineReferenceLineSmoother::Smooth(
     ref_points.emplace_back(ReferencePoint(
         hdmap::MapPathPoint(common::math::Vec2d(xy.first, xy.second), heading,
                             new_lane_waypoints),
-        kappa, dkappa, 0.0, 0.0));
+        kappa, dkappa));
   }
 
   ReferencePoint::RemoveDuplicates(&ref_points);
