@@ -28,10 +28,10 @@
 #include "modules/common/time/time_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/cc_lane_post_processor.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/types.h"
-#include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/cc_lane_post_processor.h"
 
 namespace apollo {
 namespace perception {
@@ -73,7 +73,7 @@ bool LanePostProcessingSubnode::InitSharedData() {
   }
 
   // init preprocess_data
-  camera_object_data_ = dynamic_cast<CameraObjectData*>(
+  camera_object_data_ = dynamic_cast<CameraObjectData *>(
       shared_data_manager_->GetSharedData("CameraObjectData"));
   if (camera_object_data_ == nullptr) {
     AERROR << "failed to get shared data instance: CameraObjectData ";
