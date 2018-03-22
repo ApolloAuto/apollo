@@ -30,13 +30,12 @@ bool CascadedCameraTracker::Init() {
 }
 
 bool CascadedCameraTracker::Associate(const cv::Mat& img,
-                                      const float& timestamp,
+                                      const double& timestamp,
                                       std::vector<VisualObjectPtr>* objects) {
   if (!objects) return false;
   frame_idx_++;
 
-  // detect id to (track id, first_timestamp) mapping
-  std::unordered_map<int, std::pair<int, float>> id_mapping;
+
 
   float scale = 1.0f;
   std::vector<Detected> detected;
@@ -83,7 +82,8 @@ bool CascadedCameraTracker::Associate(const cv::Mat& img,
   std::unordered_set<int> local_matched_detected;
   MatrixMatching(affinity_matrix, &local_matching, &local_matched_detected);
 
-  // Tracker and ID management
+  // Tracker and ID: detect id to (track id, first_timestamp) mapping
+  std::unordered_map<int, std::pair<int, double>> id_mapping;
   ManageTrackerAndID(local_matching, local_matched_detected, detected,
                      frame_idx_, timestamp, &tracks_, &next_track_id_,
                      &id_mapping);
