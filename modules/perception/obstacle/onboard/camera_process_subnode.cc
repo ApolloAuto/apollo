@@ -80,7 +80,7 @@ bool CameraProcessSubnode::InitModules() {
   transformer_.reset(BaseCameraTransformerRegisterer::GetInstanceByName(
       "FlatCameraTransformer"));
   transformer_->Init();
-  // transformer_->SetExtrinsics(camera_to_car_);
+  transformer_->SetExtrinsics(camera_to_car_);
 
   filter_.reset(
       BaseCameraFilterRegisterer::GetInstanceByName("ObjectCameraFilter"));
@@ -112,7 +112,8 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   converter_->Convert(&objects);
   tracker_->Associate(img, timestamp, &objects);
   transformer_->Transform(&objects);
-  filter_->Filter(timestamp, &objects);
+  // TODO(bug): fix later
+  // filter_->Filter(timestamp, &objects);
 
   std::shared_ptr<SensorObjects> out_objs(new SensorObjects);
   out_objs->timestamp = timestamp;
