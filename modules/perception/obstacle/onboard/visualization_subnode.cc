@@ -187,8 +187,7 @@ bool VisualizationSubnode::InitStream() {
     AWARN << "Failed to find lane_event_id_: " << reserve_;
     lane_event_id_ = -1;
   } else {
-    lane_event_id_
-        = static_cast<EventID>(atoi((iter->second).c_str()));
+    lane_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
   }
 
   return true;
@@ -235,8 +234,7 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
                                 (*(objs->camera_frame_supplement)));
 
     LaneObjectsPtr lane_objs;
-    if (!lane_shared_data_->Get(data_key, &lane_objs) ||
-        lane_objs == nullptr) {
+    if (!lane_shared_data_->Get(data_key, &lane_objs) || lane_objs == nullptr) {
       AERROR << "Failed to get shared data: " << lane_shared_data_->name();
       return;
     }
@@ -302,8 +300,7 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
     }
   } else if (event.event_id == lane_event_id_) {
     LaneObjectsPtr lane_objs;
-    if (!lane_shared_data_->Get(data_key, &lane_objs) ||
-        lane_objs == nullptr) {
+    if (!lane_shared_data_->Get(data_key, &lane_objs) || lane_objs == nullptr) {
       AERROR << "Failed to get shared data: " << lane_shared_data_->name();
       return;
     }
