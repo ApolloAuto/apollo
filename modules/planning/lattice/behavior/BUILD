@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
-        "//modules/common/math:box2d",
+        "//modules/common/math:geometry",
         "//modules/common/proto:common_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:frame",

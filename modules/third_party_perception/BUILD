@@ -41,11 +41,11 @@ cc_library(
         "conversion.h",
     ],
     deps = [
+        "//modules/canbus/proto:canbus_proto",
         "//modules/common/configs:config_gflags",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
-        "//modules/canbus/proto:canbus_proto",
         "//modules/third_party_perception/common:third_party_perception_gflags",
         "//modules/third_party_perception/common:third_party_perception_util",
         "//modules/third_party_perception/proto:third_party_perception_proto",
@@ -61,8 +61,7 @@ cc_library(
         "fusion.h",
     ],
     deps = [
-        "//modules/common/math:polygon2d",
-        "//modules/common/math:vec2d",
+        "//modules/common/math:geometry",
         "//modules/perception/proto:perception_proto",
         "//modules/third_party_perception/common:third_party_perception_gflags",
         "//modules/third_party_perception/common:third_party_perception_util",

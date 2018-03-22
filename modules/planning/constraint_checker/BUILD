@@ -48,7 +48,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/math:box2d",
+        "//modules/common/math:geometry",
         "//modules/common/math:path_matcher",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
