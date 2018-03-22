@@ -84,3 +84,6 @@ DEFINE_double(max_mobileye_obstacle_length, 31.2,
 
 DEFINE_double(max_mobileye_obstacle_width, 12.7,
               "maximum mobileye obstacle length");
+
+DEFINE_bool(overwrite_mobileye_theta, true,
+            "overrite mobileye raw theta output");
