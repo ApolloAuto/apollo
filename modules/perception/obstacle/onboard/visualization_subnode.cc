@@ -232,13 +232,6 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
     content->set_camera_content(timestamp, objs->sensor2world_pose,
                                 objs->objects,
                                 (*(objs->camera_frame_supplement)));
-
-    LaneObjectsPtr lane_objs;
-    if (!lane_shared_data_->Get(data_key, &lane_objs) || lane_objs == nullptr) {
-      AERROR << "Failed to get shared data: " << lane_shared_data_->name();
-      return;
-    }
-    content->set_lane_content(timestamp, *lane_objs);
   } else if (event.event_id == motion_event_id_) {
     if (FLAGS_show_motion) {
       content->set_motion_content(timestamp, motion_buffer_);
@@ -304,7 +297,6 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
       AERROR << "Failed to get shared data: " << lane_shared_data_->name();
       return;
     }
-
     content->set_lane_content(timestamp, *lane_objs);
   }
 
