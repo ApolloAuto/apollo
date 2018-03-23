@@ -77,7 +77,7 @@ class GeometryCameraConverter : public BaseCameraConverter {
 
   Eigen::Matrix<float, 3, 1> MakeUnit(
       const Eigen::Matrix<float, 3, 1> &v) const;
-  
+
   // Physical Size sanity check based on type
   void CheckSizeSanity(VisualObjectPtr obj) const;
 
