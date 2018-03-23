@@ -25,6 +25,7 @@
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 #include "modules/perception/obstacle/onboard/fusion_subnode.h"
+#include "modules/perception/obstacle/onboard/async_fusion_subnode.h"
 #include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
 #include "modules/perception/obstacle/onboard/lane_shared_data.h"
 #include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
@@ -86,6 +87,7 @@ void Perception::RegistAllOnboardClass() {
   RegisterFactoryRadarProcessSubnode();
   RegisterFactoryCameraProcessSubnode();
   RegisterFactoryLanePostProcessingSubnode();
+  RegisterFactoryAsyncFusionSubnode();
   RegisterFactoryFusionSubnode();
   lowcostvisualizer::RegisterFactoryVisualizationSubnode();
   traffic_light::RegisterFactoryTLPreprocessorSubnode();
