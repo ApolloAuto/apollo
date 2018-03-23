@@ -51,6 +51,14 @@ data_files {
   dest_path: "modules/perception/data/params"
 }
 data_files {
+  source_path: "camera_params/start_leopard.launch"
+  dest_path: "<ros>/share/usb_cam/launch/start_leopard.launch"
+}
+data_files {
+  source_path: "camera_params/start_obstacle_camera.launch"
+  dest_path: "<ros>/share/usb_cam/launch/start_obstacle_camera.launch"
+}
+data_files {
   source_path: "radar_params"
   dest_path: "modules/perception/data/params"
 }
