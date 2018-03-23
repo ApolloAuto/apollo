@@ -422,12 +422,26 @@ PbfSensorObjectPtr PbfTrack::GetLatestRadarObject() {
   return radar_object;
 }
 
+PbfSensorObjectPtr PbfTrack::GetLatestCameraObject() {
+  PbfSensorObjectPtr camera_object;
+  for (auto it = camera_objects_.begin(); it != camera_objects_.end(); ++it) {
+    if (camera_object == nullptr) {
+      camera_object = it->second;
+    } else if (camera_object->timestamp < it->second->timestamp) {
+      camera_object = it->second;
+    }
+  }
+  return camera_object;
+}
+
 PbfSensorObjectPtr PbfTrack::GetSensorObject(const SensorType &sensor_type,
                                              const std::string &sensor_id) {
   if (is_lidar(sensor_type)) {
     return GetLidarObject(sensor_id);
   } else if (is_radar(sensor_type)) {
     return GetRadarObject(sensor_id);
+  } else if (is_camera(sensor_type)) {
+    return GetCameraObject(sensor_id);
   } else {
     AERROR << "Unsupported sensor type.";
     return nullptr;
