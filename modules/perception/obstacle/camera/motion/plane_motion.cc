@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <list>
 #include "modules/perception/obstacle/camera/motion/plane_motion.h"
 #include "modules/common/log.h"
-
 namespace apollo {
 namespace perception {
 
@@ -49,25 +49,24 @@ void PlaneMotion::generate_motion_matrix(VehicleStatus *vehicledata) {
   vehicledata->motion = motion_2d;
 }
 
-void PlaneMotion::accumulate_motion(double start_time, double end_time){
-
+void PlaneMotion::accumulate_motion(double start_time, double end_time) {
   std::list<VehicleStatus>::iterator iter_1 = raw_motion_queue_.begin();
   // locate starting motion
   while (iter_1 != raw_motion_queue_.end()
         && iter_1->time_ts < start_time) {
-    iter_1++; // iter_1 : ts >= start_time
+    iter_1++;  // iter_1 : ts >= start_time
   }
   // locate ending motion
   std::list<VehicleStatus>::iterator iter_2 = iter_1;
   while (iter_2 != raw_motion_queue_.end()
         && iter_2->time_ts <= end_time) {
-    iter_2++; // iter_2: ts > end_time
+    iter_2++;  // iter_2: ts > end_time
   }
-  // accumulate CAN+IMU / Localization motion 
+  // accumulate CAN+IMU / Localization motion
   for (auto iter = iter_1; iter != iter_2; iter++) {
     mat_motion_2d_image_ *= iter->motion;
     time_difference_ += iter->time_d;
-  } 
+  }
   // clean raw_motion_queue useless history
   while (raw_motion_queue_.begin() != iter_2) {
     raw_motion_queue_.pop_front();
@@ -84,7 +83,7 @@ void PlaneMotion::update_motion_buffer(VehicleStatus vehicledata,
   // set time_diff as image_time_diff
   time_difference_ = image_timestamp - pre_image_timestamp;
   vehicledata.time_d = time_difference_;
-  // update motion 
+  // update motion
   vehicledata.motion = mat_motion_2d_image_;
   vehicledata.time_ts = image_timestamp;
   mot_buffer_->push_back(vehicledata);  // a new motion between images
@@ -99,8 +98,8 @@ void PlaneMotion::add_new_motion(VehicleStatus *vehicledata,
                                  int motion_operation_flag) {
   generate_motion_matrix(vehicledata);
   raw_motion_queue_.push_back(*vehicledata);
-  if (static_cast<int>(raw_motion_queue_.size()) > buffer_size_ * 10 ) {
-    AWARN << "raw_motion_queue size is too large, try sync motion/image timestep";
+  if (static_cast<int>(raw_motion_queue_.size()) > buffer_size_ * 10) {
+    AWARN << "MmotionQueue is too large, try sync motion/image timestep";
   }
 
   switch (motion_operation_flag) {
@@ -115,7 +114,7 @@ void PlaneMotion::add_new_motion(VehicleStatus *vehicledata,
       AERROR << "motion operation flag:wrong type";
       return;
   }
-} 
+}
 // void PlaneMotion::add_new_motion(VehicleStatus *vehicledata,
 //                                  float motion_time_dif,
 //                                  int motion_operation_flag) {

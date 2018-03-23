@@ -160,9 +160,8 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
     const SubnodeID subnode_id = pair.first;
     Subnode* inst = SubnodeRegisterer::GetInstanceByName(subnode_config.name());
 
-    AINFO << "subnode_name: " << subnode_config.name();
-    AINFO << "subnode_id: " << subnode_id;
-   
+//    AINFO << "subnode_name: " << subnode_config.name();
+//    AINFO << "subnode_id: " << subnode_id;
     if (inst == NULL) {
       AERROR << "failed to get subnode instance. name: "
              << subnode_config.name();

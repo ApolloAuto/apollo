@@ -19,6 +19,7 @@
 
 #include <Eigen/Core>
 #include <list>
+#include <string>
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/lib/base/mutex.h"
@@ -46,6 +47,7 @@ class MotionService : public Subnode {
   void GetVehicleInformation(float timestamp,
                              VehicleInformation *vehicle_information);
   MotionBufferPtr GetMotionBuffer();
+
  protected:
   bool InitInternal() override;
 

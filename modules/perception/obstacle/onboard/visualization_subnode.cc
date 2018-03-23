@@ -95,7 +95,7 @@ bool VisualizationSubnode::InitInternal() {
       motion_service_ = dynamic_cast<MotionService*>(
         DAGStreaming::GetSubnodeByName("MotionService"));
     if (motion_service_ == NULL) {
-      AERROR<<"motion service not inited";
+      AERROR << "motion service not inited";
       return false;
     }
   }

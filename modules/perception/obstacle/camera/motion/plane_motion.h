@@ -19,7 +19,7 @@
 
 #include <cmath>
 #include <cstdio>
-
+#include <list>
 #include <memory>
 
 #include "Eigen/Dense"
@@ -49,7 +49,7 @@ class PlaneMotion {
   void generate_motion_matrix(
       VehicleStatus *vehicledata);  // generate inverse motion
   void accumulate_motion(double start_time, double end_time);
-  void update_motion_buffer(VehicleStatus vehicledata, 
+  void update_motion_buffer(VehicleStatus vehicledata,
         double pre_image_timestamp, double image_timestamp);
 
  public:
@@ -82,7 +82,7 @@ class PlaneMotion {
                       double pre_image_timestamp,
                       double image_timestamp,
                       int motion_operation_flag);
- 
+
   MotionBufferPtr get_buffer() { return mot_buffer_; }
 };
 

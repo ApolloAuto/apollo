@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/obstacle/onboard/motion_service.h"
+#include <string>
 #include <limits>
 #include <unordered_map>
 #include "modules/perception/lib/base/mutex.h"
@@ -104,7 +105,7 @@ void MotionService::OnLocalization(
             pre_camera_timestamp_,
             camera_timestamp,
             PlaneMotion::ACCUM_MOTION);
-    } else if(camera_timestamp > pre_camera_timestamp_) {
+    } else if (camera_timestamp > pre_camera_timestamp_) {
           AINFO << "Motion_status: accum_push";
           vehicle_planemotion_->add_new_motion(&vehicle_status,
             pre_camera_timestamp_,
@@ -113,7 +114,7 @@ void MotionService::OnLocalization(
             PublishEvent(camera_timestamp);
     } else {
           AERROR << "camera timestamp should arrive in order";
-          return; 
+          return;
     }
   }
   pre_camera_timestamp_ = camera_timestamp;
@@ -139,7 +140,7 @@ void MotionService::OnLocalization(
 
 //  AINFO << "Motion Matrix: ";
 //  auto motion_buffer_ptr = vehicle_planemotion_->get_buffer();
-//  int motion_size = motion_buffer_ptr->size(); 
+//  int motion_size = motion_buffer_ptr->size();
 //  AINFO << (*motion_buffer_ptr)[motion_size-1].motion;
 //  AINFO << "Motion Matrix end";
 }
