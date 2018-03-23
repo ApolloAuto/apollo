@@ -578,6 +578,7 @@ void GLFWFusionViewer::render() {
     bool show_fusion = false;
     draw_3d_classifications(frame_content_, show_fusion);
     draw_car_forward_dir();
+//    AINFO << "GLFWFusionViewer::motion_render()" << frame_content_->get_motion_buffer().size();
     if (FLAGS_show_motion_track &&
         frame_content_->get_motion_buffer().size() > 0) {
       draw_car_trajectory(frame_content_);
@@ -1881,11 +1882,11 @@ void GLFWFusionViewer::draw_car_trajectory(FrameContent* content) {
   const MotionBuffer& motion_buffer = content->get_motion_buffer();
   // Eigen::Vector3d center_d = pers_camera_->scene_center();
   Eigen::Vector3f center;
-  //    center << center_d(0,0),
-  //              center_d(1,0),
-  //              1.0;
+      center << 0, // center_d(0,0),
+                0, // center_d(1,0),
+                1.0;
 
-  center << 10, 10, 1.0;
+//  center << 10, 10, 1.0;
 
   //    std::cout << "GLViewer motion_buffer.size() : "
   //              << motion_buffer.size() << std::endl;
@@ -1903,11 +1904,15 @@ void GLFWFusionViewer::draw_car_trajectory(FrameContent* content) {
     point = tmp * center;
 
     point[0] = 2 * center[0] - point[0];
-    point[1] = 2 * center[1] - point[1];
+//    point[1] = 2 * center[1] - point[1];
     //        point = 2*center - point;
     //        std::cout << "trajectory points: (" << point(0,0) << ", "
     //                  << point(1,0) << ", " << point(2,0)
     //                  << "); ";
+//    AINFO << "trajectory points: (" << point(0,0) << ", "
+//                      << point(1,0) << ", " << point(2,0)
+//                      << "); ";
+
     drawHollowCircle(point(0), point(1), 1);
     glFlush();
   }
