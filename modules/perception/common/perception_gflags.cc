@@ -62,7 +62,8 @@ DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
 //               "DAG config for camera and visualization");
 
 /* dag streaming config for both camera object and lane output */
-// DEFINE_string(dag_config_path, "./conf/dag_camera_obstacle_lane_offline.config",
+// DEFINE_string(dag_config_path,
+//               "./conf/dag_camera_obstacle_lane_offline.config",
 //               "DAG config for camera and visualization");
 
 /// obstacle/onboard/radar_process_subnode.cc
