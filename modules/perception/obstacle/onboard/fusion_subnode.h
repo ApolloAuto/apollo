@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
-
+#include "modules/perception/obstacle/fusion/async_fusion/async_fusion.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
