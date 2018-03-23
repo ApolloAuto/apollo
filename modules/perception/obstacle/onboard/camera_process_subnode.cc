@@ -247,7 +247,7 @@ void CameraProcessSubnode::PublishPerceptionPb(
   }
 
   common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
-  AINFO << "Camera Obstacles: " << obstacles.ShortDebugString();
+  ADEBUG << "Camera Obstacles: " << obstacles.ShortDebugString();
 }
 
 }  // namespace perception
