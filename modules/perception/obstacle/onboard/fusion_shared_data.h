@@ -29,8 +29,6 @@ struct FusionItem {
   std::vector<ObjectPtr> obstacles;
   SeqId seq_num = 0u;
   double timestamp = 0.0;
-  // common::perception::PerceptionErrorCode error_code =
-  // common::perception::ERROR_NONE;
 };
 
 class FusionSharedData : public CommonSharedData<FusionItem> {
@@ -45,6 +43,8 @@ class FusionSharedData : public CommonSharedData<FusionItem> {
  private:
   DISALLOW_COPY_AND_ASSIGN(FusionSharedData);
 };
+
+REGISTER_SHAREDDATA(FusionSharedData);
 
 }  // namespace perception
 }  // namespace apollo
