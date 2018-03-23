@@ -131,9 +131,11 @@ cc_library(
     name = "fusion_subnode",
     srcs = [
         "fusion_subnode.cc",
+        "async_fusion_subnode.cc",
     ],
     hdrs = [
         "fusion_subnode.h",
+        "async_fusion_subnode.h",
         "object_shared_data.h",
     ],
     deps = [
