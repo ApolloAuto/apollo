@@ -53,9 +53,16 @@ DEFINE_string(obstacle_module_name, "perception_obstacle",
 DEFINE_bool(enable_visualization, false, "enable visualization for debug");
 
 /// obstacle/perception.cc
+/* dag streaming config for Apollo 2.0 */
 DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
               "Onboard DAG Streaming config.");
+
+/* dag streaming config for camera object output only */
 // DEFINE_string(dag_config_path, "./conf/dag_camera_obstacle_offline.config",
+//               "DAG config for camera and visualization");
+
+/* dag streaming config for both camera object and lane output */
+// DEFINE_string(dag_config_path, "./conf/dag_camera_obstacle_lane_offline.config",
 //               "DAG config for camera and visualization");
 
 /// obstacle/onboard/radar_process_subnode.cc
