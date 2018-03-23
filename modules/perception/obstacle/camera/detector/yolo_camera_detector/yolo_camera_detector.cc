@@ -382,12 +382,13 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
     projector_->project(&(obj->object_feature));
 
     // Assign detection id per box and score
-    obj->id = det_id++;
+    obj->id = det_id;
     for (auto prob : obj->type_probs) {
       obj->score = std::max(obj->score, prob);
     }
 
     AINFO << "obj-" << det_id << ": " << obj->object_feature.size();
+    det_id++;
   }
 
   return true;
