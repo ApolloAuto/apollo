@@ -55,8 +55,6 @@ DEFINE_bool(enable_visualization, false, "enable visualization for debug");
 /// obstacle/perception.cc
 DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
               "Onboard DAG Streaming config.");
-// DEFINE_string(dag_config_path, "./conf/dag_camera_obstacle_offline.config",
-//               "DAG config for camera and visualization");
 
 /// obstacle/onboard/radar_process_subnode.cc
 DEFINE_string(onboard_radar_detector, "DummyRadarDetector",

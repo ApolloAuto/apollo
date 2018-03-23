@@ -31,6 +31,7 @@
 
 #include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_converter.h"
@@ -76,6 +77,9 @@ class GeometryCameraConverter : public BaseCameraConverter {
 
   Eigen::Matrix<float, 3, 1> MakeUnit(
       const Eigen::Matrix<float, 3, 1> &v) const;
+
+  // Physical Size sanity check based on type
+  void CheckSizeSanity(VisualObjectPtr obj) const;
 
   CameraModel<float> camera_model_;
   std::vector<Eigen::Vector3f> corners_;
