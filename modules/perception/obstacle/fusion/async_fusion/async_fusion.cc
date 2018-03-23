@@ -30,6 +30,12 @@
 namespace apollo {
 namespace perception {
 
+AsyncFusion::AsyncFusion()
+        : matcher_(nullptr),
+          track_manager_(nullptr)
+{}
+
+
 AsyncFusion::~AsyncFusion() {
   if (matcher_) {
     delete matcher_;
