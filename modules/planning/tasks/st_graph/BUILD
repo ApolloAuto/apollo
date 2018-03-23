@@ -52,6 +52,25 @@ cc_library(
 )
 
 cc_test(
+    name = "speed_limit_decider_test",
+    size = "small",
+    srcs = [
+        "speed_limit_decider_test.cc",
+    ],
+    data = [
+        "//modules/map:map_data",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":st_boundary_mapper",
+        "//modules/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "st_boundary_mapper_test",
     size = "small",
     srcs = [

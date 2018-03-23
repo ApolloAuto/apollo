@@ -57,21 +57,14 @@ constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
 }  // namespace
 
-SpeedLimitDecider::SpeedLimitDecider(const SLBoundary& adc_sl_boundary,
-                                     const StBoundaryConfig& config,
+SpeedLimitDecider::SpeedLimitDecider(const StBoundaryConfig& config,
                                      const ReferenceLine& reference_line,
-                                     const PathData& path_data,
-                                     const double planning_distance,
-                                     const double planning_time,
-                                     bool is_change_lane)
-    : adc_sl_boundary_(adc_sl_boundary),
-      st_boundary_config_(config),
+                                     const PathData& path_data)
+    : st_boundary_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
-      vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()),
-      planning_distance_(planning_distance),
-      planning_time_(planning_time),
-      is_change_lane_(is_change_lane) {}
+      vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()) {
+}
 
 void SpeedLimitDecider::GetAvgKappa(
     const std::vector<common::PathPoint>& path_points,
