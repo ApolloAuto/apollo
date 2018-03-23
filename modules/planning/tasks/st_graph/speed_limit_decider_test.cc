@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/tasks/st_graph/st_boundary_mapper.h"
+#include "modules/planning/tasks/st_graph/speed_limit_decider.h"
 
 #include <algorithm>
 #include <cmath>
@@ -26,12 +26,11 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
-#include "modules/planning/tasks/st_graph/speed_limit_decider.h"
 
 namespace apollo {
 namespace planning {
 
-class StBoundaryMapperTest : public ::testing::Test {
+class SpeedLimitDeciderTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     hdmap_.LoadMapFromFile(map_file);
@@ -80,19 +79,26 @@ class StBoundaryMapperTest : public ::testing::Test {
   FrenetFramePath frenet_frame_path_;
 };
 
-TEST_F(StBoundaryMapperTest, check_overlap_test) {
+TEST_F(SpeedLimitDeciderTest, get_centric_acc_limit) {
   StBoundaryConfig config;
-  double planning_distance = 70.0;
-  double planning_time = 10.0;
-  SLBoundary adc_sl_boundary;
-  StBoundaryMapper mapper(adc_sl_boundary, config, *reference_line_, path_data_,
-                          planning_distance, planning_time, false);
-  common::PathPoint path_point;
-  path_point.set_x(1.0);
-  path_point.set_y(1.0);
-  common::math::Box2d box(common::math::Vec2d(1.0, 1.0), 0.0, 5.0, 3.0);
-  EXPECT_TRUE(mapper.CheckOverlap(path_point, box, 0.0));
-}
+  SpeedLimitDecider speed_limit_decider(config, *reference_line_, path_data_);
 
+  double kappa = 0.0001;
+  while (kappa < 0.2) {
+    const double acc_limit = speed_limit_decider.GetCentricAccLimit(kappa);
+    const double v = std::sqrt(acc_limit / kappa);
+    if (v > config.high_speed_threshold()) {
+      EXPECT_DOUBLE_EQ(acc_limit,
+                       config.high_speed_centric_acceleration_limit());
+    } else if (v < config.low_speed_threshold()) {
+      EXPECT_DOUBLE_EQ(acc_limit,
+                       config.low_speed_centric_acceleration_limit());
+    } else {
+      EXPECT_LE(acc_limit, config.low_speed_centric_acceleration_limit());
+      EXPECT_GE(acc_limit, config.high_speed_centric_acceleration_limit());
+    }
+    kappa += 0.0001;
+  }
+}
 }  // namespace planning
 }  // namespace apollo

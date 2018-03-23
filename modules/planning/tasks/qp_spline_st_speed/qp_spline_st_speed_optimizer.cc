@@ -135,10 +135,8 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     }
   }
 
-  SpeedLimitDecider speed_limit_decider(
-      adc_sl_boundary, st_boundary_config_, reference_line, path_data,
-      qp_st_speed_config_.total_path_length(), qp_st_speed_config_.total_time(),
-      reference_line_info_->IsChangeLanePath());
+  SpeedLimitDecider speed_limit_decider(st_boundary_config_, reference_line,
+                                        path_data);
   SpeedLimit speed_limits;
   if (speed_limit_decider.GetSpeedLimits(path_decision->path_obstacles(),
                                          &speed_limits) != Status::OK()) {
