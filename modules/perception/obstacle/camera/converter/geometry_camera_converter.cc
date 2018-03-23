@@ -48,7 +48,8 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
   if (!objects) return false;
 
   for (auto &obj : *objects) {
-    // TODO(cheni-kuei) Physical Size sanity check based on type
+    CheckSizeSanity(obj);
+
     float deg_alpha = obj->alpha * 180.0f / M_PI;
 
     Eigen::Vector2f upper_left(obj->upper_left.x(), obj->upper_left.y());
@@ -305,6 +306,26 @@ Eigen::Matrix<float, 3, 1> GeometryCameraConverter::MakeUnit(
                 unit_v.z() * unit_v.z());
   unit_v /= to_unit_scale;
   return unit_v;
+}
+
+void GeometryCameraConverter::CheckSizeSanity(VisualObjectPtr obj) const {
+  if (obj->type == ObjectType::VEHICLE) {
+    obj->length = std::max(obj->length, 3.6f);
+    obj->width = std::max(obj->width, 1.6f);
+    obj->height = std::max(obj->height, 1.5f);
+  } else if (obj->type == ObjectType::PEDESTRIAN) {
+    obj->length = std::max(obj->length, 0.5f);
+    obj->width = std::max(obj->width, 0.5f);
+    obj->height = std::max(obj->height, 1.7f);
+  } else if (obj->type == ObjectType::BICYCLE) {
+    obj->length = std::max(obj->length, 1.8f);
+    obj->width = std::max(obj->width, 1.2f);
+    obj->height = std::max(obj->height, 1.5f);
+  } else {
+    obj->length = std::max(obj->length, 0.5f);
+    obj->width = std::max(obj->width, 0.5f);
+    obj->height = std::max(obj->height, 1.5f);
+  }
 }
 
 }  // namespace perception
