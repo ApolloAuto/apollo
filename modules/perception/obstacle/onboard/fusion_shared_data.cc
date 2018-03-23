@@ -19,7 +19,5 @@
 namespace apollo {
 namespace perception {
 
-REGISTER_SHAREDDATA(FusionSharedData);
-
 }  // namespace perception
 }  // namespace apollo
