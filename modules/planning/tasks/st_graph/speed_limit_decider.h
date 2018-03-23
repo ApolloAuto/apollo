@@ -39,11 +39,9 @@ namespace planning {
 
 class SpeedLimitDecider {
  public:
-  SpeedLimitDecider(const SLBoundary& adc_sl_boundary,
-                    const StBoundaryConfig& config,
+  SpeedLimitDecider(const StBoundaryConfig& config,
                     const ReferenceLine& reference_line,
-                    const PathData& path_data, const double planning_distance,
-                    const double planning_time, const bool is_change_lane);
+                    const PathData& path_data);
 
   virtual ~SpeedLimitDecider() = default;
 
@@ -52,21 +50,17 @@ class SpeedLimitDecider {
       SpeedLimit* const speed_limit_data) const;
 
  private:
-  FRIEND_TEST(StBoundaryMapperTest, get_centric_acc_limit);
+  FRIEND_TEST(SpeedLimitDeciderTest, get_centric_acc_limit);
   double GetCentricAccLimit(const double kappa) const;
 
   void GetAvgKappa(const std::vector<common::PathPoint>& path_points,
                    std::vector<double>* kappa) const;
 
  private:
-  const SLBoundary& adc_sl_boundary_;
   const StBoundaryConfig& st_boundary_config_;
   const ReferenceLine& reference_line_;
   const PathData& path_data_;
   const apollo::common::VehicleParam& vehicle_param_;
-  const double planning_distance_;
-  const double planning_time_;
-  bool is_change_lane_ = false;
 };
 
 }  // namespace planning
