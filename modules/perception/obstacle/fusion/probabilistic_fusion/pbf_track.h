@@ -58,6 +58,8 @@ class PbfTrack {
   PbfSensorObjectPtr GetLatestLidarObject();
   /**@brief get latest lidar measurement for multi radar sensors*/
   PbfSensorObjectPtr GetLatestRadarObject();
+  /**@brief get latest camera measurement for multi camera sensors*/
+  PbfSensorObjectPtr GetLatestCameraObject();
 
   int GetTrackId() const;
 
