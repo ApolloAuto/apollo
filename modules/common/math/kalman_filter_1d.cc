@@ -49,7 +49,7 @@ bool KalmanFilter1D::Predict(const float& time_diff) {
 }
 
 bool KalmanFilter1D::Update(const float& z) {
-  z_ = Eigen::Matrix<float, 1, 1>(z);
+  z_.x() = z;
 
   y_ = z_ - H_ * x_;
 
