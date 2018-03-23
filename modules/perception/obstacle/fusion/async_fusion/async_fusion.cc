@@ -141,6 +141,8 @@ void AsyncFusion::FuseFrame(const PbfSensorFramePtr &frame) {
   std::vector<PbfSensorObjectPtr> background_objects;
   std::vector<PbfSensorObjectPtr> foreground_objects;
   DecomposeFrameObjects(objects, &foreground_objects, &background_objects);
+  AINFO << "There are " << foreground_objects.size() << " foreground objects "
+        << "\n " << background_objects.size() << " background objects";
 
   Eigen::Vector3d ref_point = frame->sensor2world_pose.topRightCorner(3, 1);
   FuseForegroundObjects(ref_point, frame->sensor_type, frame->sensor_id,
@@ -193,7 +195,6 @@ void AsyncFusion::CollectFusedObjects(double timestamp,
   int fg_obj_num = 0;
   std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
   for (size_t i = 0; i < tracks.size(); i++) {
-    if (tracks[i]->AbleToPublish()) {
       PbfSensorObjectPtr fused_object = tracks[i]->GetFusedObject();
       ObjectPtr obj(new Object());
       obj->clone(*(fused_object->object));
@@ -202,7 +203,6 @@ void AsyncFusion::CollectFusedObjects(double timestamp,
       obj->tracking_time = tracks[i]->GetTrackingPeriod();
       fused_objects->push_back(obj);
       fg_obj_num++;
-    }
   }
 
   AINFO << "fg_track_cnt = " << tracks.size();

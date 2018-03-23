@@ -172,6 +172,7 @@ bool AsyncFusionSubnode::SubscribeEvents(const EventMeta &event_meta,
   Event event;
   // blocking call for each of these events
   while (event_manager_->Subscribe(event_meta.event_id, &event, true)) {
+    AINFO << "starting subscribing event " << event_meta.event_id;
     events->push_back(event);
   }
   return true;
