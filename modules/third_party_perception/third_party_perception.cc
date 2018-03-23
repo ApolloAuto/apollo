@@ -43,9 +43,7 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::perception::Point;
 
-std::string ThirdPartyPerception::Name() const {
-  return FLAGS_module_name;
-}
+std::string ThirdPartyPerception::Name() const { return FLAGS_module_name; }
 
 Status ThirdPartyPerception::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
@@ -82,9 +80,7 @@ Status ThirdPartyPerception::Start() {
   return Status::OK();
 }
 
-void ThirdPartyPerception::Stop() {
-  timer_.stop();
-}
+void ThirdPartyPerception::Stop() { timer_.stop(); }
 
 void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
   ADEBUG << "Received mobileye data: run mobileye callback.";

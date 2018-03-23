@@ -19,6 +19,7 @@
 #include <yaml-cpp/yaml.h>
 #include <boost/shared_ptr.hpp>
 
+#include <algorithm>
 #include <cfloat>
 #include <fstream>
 #include <iomanip>
@@ -27,11 +28,10 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 #include "gflags/gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 #include "modules/perception/obstacle/camera/visualizer/common/bmp.h"
@@ -193,14 +193,14 @@ bool GLFWFusionViewer::initialize() {
 
   CalibrationConfigManager* calibration_config_manager =
       Singleton<CalibrationConfigManager>::get();
-  CameraCalibrationPtr calibrator
-      = calibration_config_manager->get_camera_calibration();
+  CameraCalibrationPtr calibrator =
+      calibration_config_manager->get_camera_calibration();
   camera_intrinsic_ = calibrator->get_camera_intrinsic();
   distort_camera_intrinsic_ = calibrator->get_camera_model();
 
   if (show_lane_) {
-    ConfigManager *config_manager = ConfigManager::instance();
-    const ModelConfig *lane_post_process_model_config =
+    ConfigManager* config_manager = ConfigManager::instance();
+    const ModelConfig* lane_post_process_model_config =
         config_manager->GetModelConfig(FLAGS_onboard_lane_post_processor);
     if (lane_post_process_model_config == nullptr) {
       AERROR << "Unknown lane post-processing model: "
@@ -249,9 +249,7 @@ void GLFWFusionViewer::spin_once() {
   glfwSwapBuffers(window_);
 }
 
-void GLFWFusionViewer::close() {
-  glfwTerminate();
-}
+void GLFWFusionViewer::close() { glfwTerminate(); }
 
 void GLFWFusionViewer::set_camera_para(Eigen::Vector3d i_position,
                                        Eigen::Vector3d i_scn_center,
@@ -770,13 +768,9 @@ void GLFWFusionViewer::mouse_move(double xpos, double ypos) {
   mouse_prev_y_ = ypos;
 }
 
-void GLFWFusionViewer::mouse_wheel(double delta) {
-  mode_mat_(2, 3) -= delta;
-}
+void GLFWFusionViewer::mouse_wheel(double delta) { mode_mat_(2, 3) -= delta; }
 
-void GLFWFusionViewer::reset() {
-  mode_mat_ = Eigen::Matrix4d::Identity();
-}
+void GLFWFusionViewer::reset() { mode_mat_ = Eigen::Matrix4d::Identity(); }
 
 void GLFWFusionViewer::keyboard(int key) {
   switch (key) {
