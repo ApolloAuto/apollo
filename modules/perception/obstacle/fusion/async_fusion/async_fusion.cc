@@ -109,27 +109,24 @@ PbfSensorFramePtr AsyncFusion::ConstructFrame(const SensorObjects &frame) {
 bool AsyncFusion::Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
                        std::vector<ObjectPtr> *fused_objects) {
   ACHECK(fused_objects != nullptr) << "parameter fused_objects is nullptr";
-  ACHECK(multi_sensor_objects.size() == 1);
 
-  // async fusion only process one fusion objects per time
-  const SensorObjects &obj = multi_sensor_objects[0];
+  // process all the frames from one of the sensors
+  for (auto obj : multi_sensor_objects) {
+      double fusion_time = obj.timestamp;
+      AINFO << "get sensor data " << GetSensorType(obj.sensor_type)
+            << ", obj_cnt : " << obj.objects.size() << ", " << std::fixed
+            << std::setprecision(12) << obj.timestamp;
 
-  double fusion_time = obj.timestamp;
-  AINFO << "get sensor data " << GetSensorType(obj.sensor_type)
-        << ", obj_cnt : " << obj.objects.size() << ", " << std::fixed
-        << std::setprecision(12) << obj.timestamp;
+      PbfSensorFramePtr frame = ConstructFrame(obj);
 
-  PbfSensorFramePtr frame = ConstructFrame(obj);
-
-  {
-    fusion_mutex_.lock();
-    FuseFrame(frame);
-    // 4.collect results, we don't need to collect fused_objects unless we have
-    // to
-    CollectFusedObjects(fusion_time, fused_objects);
-    fusion_mutex_.unlock();
+      {
+          fusion_mutex_.lock();
+          FuseFrame(frame);
+          // 4.collect results
+          CollectFusedObjects(fusion_time, fused_objects);
+          fusion_mutex_.unlock();
+      }
   }
-
   return true;
 }
 
