@@ -34,10 +34,17 @@ namespace planning {
  */
 class Destination : public TrafficRule {
  public:
-  explicit Destination(const RuleConfig& config);
+  explicit Destination(const TrafficRuleConfig& config);
   virtual ~Destination() = default;
 
-  bool ApplyRule(Frame* const, ReferenceLineInfo* const reference_line_info);
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
+
+ private:
+  void MakeDecisions(Frame* const frame,
+                     ReferenceLineInfo* const reference_line_info);
+  bool BuildStopDecision(Frame* const frame,
+                         ReferenceLineInfo* const reference_line_info);
 };
 
 }  // namespace planning

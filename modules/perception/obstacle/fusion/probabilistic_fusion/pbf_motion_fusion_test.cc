@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_imf_fusion.h"
 
 #include <algorithm>
 #include <functional>
@@ -32,18 +34,21 @@ class PbfMotionFusionTest : public testing::Test {
   ~PbfMotionFusionTest() {}
   void SetUp() override {
     PbfBaseMotionFusion *kalman_motion_fusion = new PbfKalmanMotionFusion();
-    _motion_fusion_algs.push_back(kalman_motion_fusion);
+    PbfIMFFusion *imf_motion_fusion = new PbfIMFFusion();
+    motion_fusion_algs_.push_back(kalman_motion_fusion);
+    motion_fusion_algs_.push_back(imf_motion_fusion);
   }
   void TearDown() override {
-    for (auto &seg_alg : _motion_fusion_algs) {
+    for (auto &seg_alg : motion_fusion_algs_) {
       delete seg_alg;
     }
-    std::vector<PbfBaseMotionFusion *>().swap(_motion_fusion_algs);
+    std::vector<PbfBaseMotionFusion *>().swap(motion_fusion_algs_);
   }
 
  protected:
-  std::vector<PbfBaseMotionFusion *> _motion_fusion_algs;
+  std::vector<PbfBaseMotionFusion *> motion_fusion_algs_;
 };
+
 TEST_F(PbfMotionFusionTest, test_initialize_with_lidar_object) {
   ObjectPtr lidar_object(new Object());
   double lidar_timestamp = 1234567891.012;
@@ -52,9 +57,10 @@ TEST_F(PbfMotionFusionTest, test_initialize_with_lidar_object) {
   lidar_object->center = lidar_position;
   lidar_object->anchor_point = lidar_position;
   lidar_object->velocity = lidar_velocity;
+  lidar_object->uncertainty.setIdentity();
   PbfSensorObjectPtr pbf_lidar_object(new PbfSensorObject(
       lidar_object, SensorType::VELODYNE_64, lidar_timestamp));
-  for (auto motion_fusion_alg : _motion_fusion_algs) {
+  for (auto motion_fusion_alg : motion_fusion_algs_) {
     motion_fusion_alg->Initialize(pbf_lidar_object);
     CHECK_EQ(motion_fusion_alg->Initialized(), true);
     Eigen::Vector3d location;
@@ -74,7 +80,7 @@ TEST_F(PbfMotionFusionTest, test_initialize_with_radar_object) {
   radar_object->velocity = radar_velocity;
   PbfSensorObjectPtr pbf_radar_object(
       new PbfSensorObject(radar_object, SensorType::RADAR, radar_timestamp));
-  for (auto motion_fusion_alg : _motion_fusion_algs) {
+  for (auto motion_fusion_alg : motion_fusion_algs_) {
     motion_fusion_alg->Initialize(pbf_radar_object);
     CHECK_EQ(motion_fusion_alg->Initialized(), true);
     Eigen::Vector3d location;
@@ -104,7 +110,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement) {
   lidar_object->velocity = lidar_velocity;
   PbfSensorObjectPtr pbf_lidar_object(new PbfSensorObject(
       lidar_object, SensorType::VELODYNE_64, lidar_timestamp));
-  for (auto motion_fusion_alg : _motion_fusion_algs) {
+  for (auto motion_fusion_alg : motion_fusion_algs_) {
     motion_fusion_alg->Initialize(pbf_radar_object);
     motion_fusion_alg->UpdateWithObject(pbf_lidar_object,
                                         lidar_timestamp - radar_timestamp);
@@ -131,7 +137,7 @@ TEST_F(PbfMotionFusionTest, test_update_without_measurement) {
   double time_diff = 0.1;
   Eigen::Vector3d expected_position =
       lidar_position + lidar_velocity * time_diff;
-  for (auto motion_fusion_alg : _motion_fusion_algs) {
+  for (auto motion_fusion_alg : motion_fusion_algs_) {
     motion_fusion_alg->Initialize(pbf_lidar_object);
     motion_fusion_alg->UpdateWithoutObject(time_diff);
     Eigen::Vector3d location;

@@ -29,7 +29,7 @@ export default class PerceptionObstacles {
     }
 
     update(world, coordinates, scene) {
-        // Id meshes need to be recreated everytime.
+        // Id meshes need to be recreated every time.
         // Each text mesh needs to be removed from the scene,
         // and its char meshes need to be hidden for reuse purpose.
         if (!_.isEmpty(this.ids)) {
@@ -61,7 +61,7 @@ export default class PerceptionObstacles {
         for (let i = 0; i < objects.length; i++) {
             const obstacle = objects[i];
             if (!STORE.options['showObstacles' + _.upperFirst(_.camelCase(obstacle.type))]
-                || !obstacle.positionX || !obstacle.positionY) {
+                || !_.isNumber(obstacle.positionX) || !_.isNumber(obstacle.positionY)) {
                 continue;
             }
             const position = coordinates.applyOffset(
@@ -143,7 +143,7 @@ export default class PerceptionObstacles {
             const solidFaceMesh = this.getFace(extrusionFaceIdx + i, scene, true);
             const dashedFaceMesh = this.getFace(extrusionFaceIdx + i, scene, false);
 
-            // Get the adjecent point.
+            // Get the adjacent point.
             const next = (i === points.length - 1) ? 0 : i + 1;
             const v = new THREE.Vector3(points[i].x, points[i].y, points[i].z);
             const vNext = new THREE.Vector3(points[next].x, points[next].y, points[next].z);

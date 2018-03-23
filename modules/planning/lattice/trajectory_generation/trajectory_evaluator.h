@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_EVALUATOR_H_
 #define MODULES_PLANNING_LATTICE_TRAJECTORY_GENERATION_TRAJECTORY_EVALUATOR_H_
 
+#include <array>
 #include <functional>
 #include <memory>
 #include <queue>
@@ -49,10 +50,12 @@ class TrajectoryEvaluator {
 
  public:
   explicit TrajectoryEvaluator(
+      const std::array<double, 3>& init_s,
       const PlanningTarget& planning_target,
       const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,
       const std::vector<std::shared_ptr<Curve1d>>& lat_trajectories,
-      std::shared_ptr<PathTimeGraph> path_time_graph);
+      std::shared_ptr<PathTimeGraph> path_time_graph,
+      std::shared_ptr<std::vector<apollo::common::PathPoint>> reference_line);
 
   virtual ~TrajectoryEvaluator() = default;
 
@@ -67,10 +70,11 @@ class TrajectoryEvaluator {
 
   std::vector<double> top_trajectory_pair_component_cost() const;
 
-  std::vector<double> evaluate_per_lonlat_trajectory(
+  double EvaluateDiscreteTrajectory(
       const PlanningTarget& planning_target,
-      const std::vector<common::SpeedPoint> st_points,
-      const std::vector<common::FrenetFramePoint> sl_points);
+      const std::vector<apollo::common::SpeedPoint>& st_points,
+      const std::vector<apollo::common::FrenetFramePoint>& sl_points,
+      std::vector<double>* cost_components);
 
  private:
   double Evaluate(const PlanningTarget& planning_target,
@@ -81,15 +85,46 @@ class TrajectoryEvaluator {
   double LatOffsetCost(const std::shared_ptr<Curve1d>& lat_trajectory,
                        const std::vector<double>& s_values) const;
 
+  double LatOffsetCost(
+      const std::vector<apollo::common::FrenetFramePoint> sl_points) const;
+
   double LatComfortCost(const std::shared_ptr<Curve1d>& lon_trajectory,
                         const std::shared_ptr<Curve1d>& lat_trajectory) const;
 
+  double LatComfortCost(
+      const std::vector<apollo::common::FrenetFramePoint>& sl_points) const;
+
   double LonComfortCost(const std::shared_ptr<Curve1d>& lon_trajectory) const;
+
+  double LonComfortCost(
+      const std::vector<apollo::common::SpeedPoint>& st_points) const;
 
   double LonCollisionCost(const std::shared_ptr<Curve1d>& lon_trajectory) const;
 
+  double LonCollisionCost(
+      const std::vector<apollo::common::SpeedPoint>& st_points) const;
+
   double LonObjectiveCost(const std::shared_ptr<Curve1d>& lon_trajectory,
-                          const PlanningTarget& planning_target) const;
+                          const PlanningTarget& planning_target,
+                          const std::vector<double>& ref_s_dot) const;
+
+  double LonObjectiveCost(
+      const std::vector<apollo::common::SpeedPoint>& st_points,
+      const PlanningTarget& planning_target,
+      const std::vector<double>& ref_s_dots) const;
+
+  double CentripetalAccelerationCost(
+      const std::shared_ptr<Curve1d>& lon_trajectory) const;
+
+  double CentripetalAccelerationCost(
+      const std::vector<apollo::common::SpeedPoint>& st_points) const;
+
+  std::vector<double> ComputeLongitudinalGuideVelocity(
+      const PlanningTarget& planning_target) const;
+
+  bool InterpolateDenseStPoints(
+      const std::vector<apollo::common::SpeedPoint>& st_points,
+      double t, double *traj_s) const;
 
   struct CostComparator
       : public std::binary_function<const PairCost&, const PairCost&, bool> {
@@ -117,7 +152,13 @@ class TrajectoryEvaluator {
 
   std::shared_ptr<PathTimeGraph> path_time_graph_;
 
+  std::shared_ptr<std::vector<apollo::common::PathPoint>> reference_line_;
+
   std::vector<std::vector<std::pair<double, double>>> path_time_intervals_;
+
+  std::array<double, 3> init_s_;
+
+  std::vector<double> reference_s_dot_;
 };
 
 }  // namespace planning

@@ -83,6 +83,7 @@ cc_library(
         "//modules/common/proto:drive_event_proto",
         "//modules/control/proto:control_proto",
         "//modules/data/proto:static_info_proto",
+        "//modules/dreamview/proto:voice_detection_proto",
         "//modules/drivers/gnss/proto:gnss_best_pose_proto",
         "//modules/drivers/gnss/proto:gnss_raw_observation_proto",
         "//modules/drivers/gnss/proto:gnss_status_proto",

@@ -32,8 +32,9 @@ bool UnityRecognize::Init() {
     return false;
   }
 
-  const ModelConfig *model_config_night = nullptr;
-  if (!config_manager->GetModelConfig(name() + "Night", &model_config_night)) {
+  const ModelConfig *model_config_night =
+      config_manager->GetModelConfig(name() + "Night");
+  if (model_config_night == nullptr) {
     AERROR << "not found model config: " << name() + "Night";
     return false;
   }
@@ -42,8 +43,8 @@ bool UnityRecognize::Init() {
     return false;
   }
 
-  const ModelConfig *model_config_day = nullptr;
-  if (!config_manager->GetModelConfig(name(), &model_config_day)) {
+  const ModelConfig *model_config_day = config_manager->GetModelConfig(name());
+  if (model_config_day == nullptr) {
     AERROR << "not found model config: " << name();
     return false;
   }
@@ -66,12 +67,12 @@ bool UnityRecognize::InitModel(const ConfigManager *config_manager,
     AERROR << "classify_model not found." << name();
     return false;
   }
-  classify_model = GetAbsolutePath(config_manager->work_root(), classify_model);
+  classify_model = GetAbsolutePath(config_manager->WorkRoot(), classify_model);
   if (!model_config->GetValue("classify_net", &classify_net)) {
     AERROR << "classify_net not found." << name();
     return false;
   }
-  classify_net = GetAbsolutePath(config_manager->work_root(), classify_net);
+  classify_net = GetAbsolutePath(config_manager->WorkRoot(), classify_net);
 
   float classify_threshold = 0.0;
   int classify_resize_width = 0;

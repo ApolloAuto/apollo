@@ -11,8 +11,8 @@ cc_library(
         "net_util.h",
     ],
     deps = [
-        "//modules/prediction/proto:network_model_proto",
         "//modules/common:log",
+        "//modules/prediction/proto:network_model_proto",
         "@eigen//:eigen",
     ],
 )
@@ -26,9 +26,9 @@ cc_library(
         "net_layer.h",
     ],
     deps = [
-        "//modules/prediction/proto:network_model_proto",
-        "//modules/prediction/network:net_util",
         "//modules/common:log",
+        "//modules/prediction/network:net_util",
+        "//modules/prediction/proto:network_model_proto",
         "@eigen//:eigen",
     ],
 )
@@ -37,17 +37,17 @@ cc_library(
     name = "net_model",
     srcs = [
         "net_model.cc",
-    ],  
+    ],
     hdrs = [
         "net_model.h",
-    ],  
+    ],
     deps = [
-        "//modules/prediction/proto:network_model_proto",
-        "//modules/prediction/network:net_layer",
         "//modules/common:log",
         "//modules/common/util",
+        "//modules/prediction/network:net_layer",
+        "//modules/prediction/proto:network_model_proto",
         "@eigen//:eigen",
-    ],  
+    ],
 )
 
 cc_test(
@@ -71,8 +71,8 @@ cc_test(
         "net_layer_test.cc",
     ],
     deps = [
-        "//modules/prediction/network:net_util",
         "//modules/prediction/network:net_layer",
+        "//modules/prediction/network:net_util",
         "//modules/prediction/proto:network_model_proto",
         "@eigen//:eigen",
         "@gtest//:main",

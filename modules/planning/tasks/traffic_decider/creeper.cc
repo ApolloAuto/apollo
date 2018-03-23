@@ -26,7 +26,6 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/util.h"
 
 namespace apollo {
@@ -39,11 +38,10 @@ Creeper::Creeper() {}
 
 bool Creeper::Run(Frame* frame, ReferenceLineInfo* reference_line_info) {
   if (!in_use_) {
-    AINFO << "Creeper is not in use, skipped.";
+    ADEBUG << "Creeper is not in use, skipped.";
     return true;
   }
 
-  AINFO << "Creeper is running.";
   // find next overlap
   auto* next_overlap =
       reference_line_info->reference_line().map_path().NextLaneOverlap(
@@ -54,9 +52,10 @@ bool Creeper::Run(Frame* frame, ReferenceLineInfo* reference_line_info) {
   }
 
   constexpr double kMaxCreepTargetDistance = 5.0;
+  constexpr double kCreepStopDistance = 0.5;  // TODO(all): move to config
   return BuildStopDecision(*const_cast<PathOverlap*>(next_overlap),
-                           FLAGS_creep_stop_distance, kMaxCreepTargetDistance,
-                           frame, reference_line_info);
+                           kCreepStopDistance, kMaxCreepTargetDistance, frame,
+                           reference_line_info);
 }
 
 bool Creeper::BuildStopDecision(const PathOverlap& overlap,
@@ -75,7 +74,7 @@ bool Creeper::BuildStopDecision(const PathOverlap& overlap,
 
   // create virtual stop wall
   std::string virtual_obstacle_id = "CREEPER_" + overlap.object_id;
-  auto* obstacle = frame->CreateVirtualStopObstacle(
+  auto* obstacle = frame->CreateStopObstacle(
       reference_line_info, virtual_obstacle_id, overlap.start_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";

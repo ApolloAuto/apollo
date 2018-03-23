@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 
 #include "modules/common/util/file.h"
@@ -35,8 +36,8 @@ bool UnityRectify::Init() {
     return false;
   }
 
-  const ModelConfig *model_config = nullptr;
-  if (!config_manager->GetModelConfig(name(), &model_config)) {
+  const ModelConfig *model_config = config_manager->GetModelConfig(name());
+  if (model_config == nullptr) {
     AERROR << "not found model config: " << name();
     return false;
   }
@@ -77,13 +78,13 @@ bool UnityRectify::InitDetection(const ConfigManager *config_manager,
     AERROR << "detection_model not found." << model_config->name();
     return false;
   }
-  detection_model = GetAbsolutePath(config_manager->work_root(),
-                                    detection_model);
+  detection_model =
+      GetAbsolutePath(config_manager->WorkRoot(), detection_model);
   if (!model_config->GetValue("detection_net", &detection_net)) {
     AERROR << "detection_net not found." << model_config->name();
     return false;
   }
-  detection_net = GetAbsolutePath(config_manager->work_root(), detection_net);
+  detection_net = GetAbsolutePath(config_manager->WorkRoot(), detection_net);
 
   switch (crop_method) {
     default:

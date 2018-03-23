@@ -30,22 +30,21 @@ namespace apollo {
 namespace planning {
 
 EndConditionSampler::EndConditionSampler(
-    const std::array<double, 3>& init_s,
-    const std::array<double, 3>& init_d,
+    const std::array<double, 3>& init_s, const std::array<double, 3>& init_d,
     const double s_dot_limit,
     std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
     std::shared_ptr<PredictionQuerier> ptr_prediction_querier)
-    : init_s_(init_s), init_d_(init_d),
+    : init_s_(init_s),
+      init_d_(init_d),
       feasible_region_(init_s, s_dot_limit),
       ptr_path_time_graph_(ptr_path_time_graph),
-      ptr_prediction_querier_(ptr_prediction_querier) {
-}
+      ptr_prediction_querier_(ptr_prediction_querier) {}
 
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLatEndConditions() const {
   std::vector<std::pair<std::array<double, 3>, double>> end_d_conditions;
   std::array<double, 5> end_d_candidates = {0.0, -0.25, 0.25, -0.5, 0.5};
-  std::array<double, 4> end_s_candidates = {10.0, 20.0, 30.0, 40.0};
+  std::array<double, 4> end_s_candidates = {10.0, 20.0, 40.0, 80.0};
 
   for (const auto& s : end_s_candidates) {
     for (const auto& d : end_d_candidates) {
@@ -65,7 +64,7 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
   for (std::size_t i = 0; i + 1 < num_time_section; ++i) {
     time_sections[i] = FLAGS_trajectory_time_length - i;
   }
-  time_sections[num_time_section - 1] = 0.01;
+  time_sections[num_time_section - 1] = FLAGS_polynomial_minimal_param;
 
   // velocity samples consists of 10 equally distributed samples plus ego's
   // current velocity
@@ -95,7 +94,6 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
   return end_s_conditions;
 }
 
-
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLonEndConditionsForStopping(
     const double ref_stop_point) const {
@@ -105,16 +103,19 @@ EndConditionSampler::SampleLonEndConditionsForStopping(
   for (std::size_t i = 0; i + 1 < num_time_section; ++i) {
     time_sections[i] = FLAGS_trajectory_time_length - i;
   }
-  time_sections[num_time_section - 1] = 0.01;
+  time_sections[num_time_section - 1] = FLAGS_polynomial_minimal_param;
 
   constexpr std::size_t num_stop_section = 3;
   std::array<double, num_stop_section> s_offsets;
   for (std::size_t i = 0; i < num_stop_section; ++i) {
-    s_offsets[i] = -1 * i;
+    s_offsets[i] = -static_cast<double>(i);
   }
 
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
   for (const auto& time : time_sections) {
+    if (time < FLAGS_polynomial_minimal_param) {
+      continue;
+    }
     for (const auto& s_offset : s_offsets) {
       std::array<double, 3> end_s;
       end_s[0] = std::max(init_s_[0], ref_stop_point + s_offset);
@@ -131,11 +132,13 @@ EndConditionSampler::SampleLonEndConditionsForPathTimePoints() const {
   std::vector<SamplePoint> sample_points = QueryPathTimeObstacleSamplePoints();
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
   for (const SamplePoint& sample_point : sample_points) {
+    if (sample_point.path_time_point().t() < FLAGS_polynomial_minimal_param) {
+      continue;
+    }
     double s = sample_point.path_time_point().s();
     double v = sample_point.ref_v();
     double t = sample_point.path_time_point().t();
-    if (s > feasible_region_.SUpper(t) ||
-        s < feasible_region_.SLower(t)) {
+    if (s > feasible_region_.SUpper(t) || s < feasible_region_.SLower(t)) {
       continue;
     }
     std::array<double, 3> end_state = {s, v, 0.0};

@@ -18,8 +18,8 @@
 #include <numeric>
 
 #include "modules/common/log.h"
+#include "modules/perception/common/geometry_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/feature_descriptor.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hungarian_matcher.h"
@@ -37,8 +37,9 @@ bool HmObjectTracker::Init() {
   using apollo::perception::ConfigManager;
   using apollo::perception::ModelConfig;
 
-  const ModelConfig* model_config = nullptr;
-  if (!ConfigManager::instance()->GetModelConfig(name(), &model_config)) {
+  const ModelConfig* model_config =
+      ConfigManager::instance()->GetModelConfig(name());
+  if (model_config == nullptr) {
     AERROR << "not found model config: " << name();
     return false;
   }

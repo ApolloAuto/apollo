@@ -75,29 +75,19 @@ void RemoveDuplicates(std::vector<MapPathPoint> *points) {
 
 PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
 
-const hdmap::HDMap *PncMap::hdmap() const {
-  return hdmap_;
-}
+const hdmap::HDMap *PncMap::hdmap() const { return hdmap_; }
 
 LaneWaypoint PncMap::ToLaneWaypoint(
     const routing::LaneWaypoint &waypoint) const {
   auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(waypoint.id()));
-  if (lane) {
-    return LaneWaypoint(lane, waypoint.s());
-  } else {
-    AERROR << "Invalid waypoint lane id: " << waypoint.id();
-    return LaneWaypoint();
-  }
+  CHECK(lane) << "invalid lane id: " << waypoint.id();
+  return LaneWaypoint(lane, waypoint.s());
 }
 
 LaneSegment PncMap::ToLaneSegment(const routing::LaneSegment &segment) const {
   auto lane = hdmap_->GetLaneById(hdmap::MakeMapId(segment.id()));
-  if (lane) {
-    return LaneSegment(lane, segment.start_s(), segment.end_s());
-  } else {
-    AERROR << "Invalid waypoint lane id: " << segment.id();
-    return LaneSegment();
-  }
+  CHECK(lane) << "invalid lane id: " << segment.id();
+  return LaneSegment(lane, segment.start_s(), segment.end_s());
 }
 
 void PncMap::UpdateNextRoutingWaypointIndex(int cur_index) {
@@ -204,6 +194,11 @@ bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
   adc_route_index_ = route_index;
   UpdateRoutingRange(adc_route_index_);
 
+  if (routing_waypoint_index_.empty()) {
+    AERROR << "No routing waypoint index";
+    return false;
+  }
+
   int last_index = GetWaypointIndex(routing_waypoint_index_.back().waypoint);
   if (next_routing_waypoint_index_ == routing_waypoint_index_.size() - 1 ||
       (!stop_for_destination_ &&
@@ -259,6 +254,10 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
   routing_waypoint_index_.clear();
   int i = 0;
   const auto &request_waypoints = routing.routing_request().waypoint();
+  if (request_waypoints.empty()) {
+    AERROR << "Invalid routing: no request waypoints";
+    return false;
+  }
   for (std::size_t j = 0; j < route_indices_.size(); ++j) {
     while (i < request_waypoints.size() &&
            RouteSegments::WithinLaneSegment(route_indices_[j].segment,
@@ -314,8 +313,9 @@ int PncMap::SearchForwardWaypointIndex(int start,
 int PncMap::SearchBackwardWaypointIndex(int start,
                                         const LaneWaypoint &waypoint) const {
   int i = std::min(static_cast<int>(route_indices_.size() - 1), start);
-  while (i >= 0 && !RouteSegments::WithinLaneSegment(route_indices_[i].segment,
-                                                     waypoint)) {
+  while (
+      i >= 0 &&
+      !RouteSegments::WithinLaneSegment(route_indices_[i].segment, waypoint)) {
     --i;
   }
   return i;
@@ -722,9 +722,10 @@ void PncMap::AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
       const auto &segment = lane->segments()[i];
       const double next_accumulate_s = accumulate_s + segment.length();
       if (start_s > accumulate_s && start_s < next_accumulate_s) {
-        points->emplace_back(segment.start() + segment.unit_direction() *
-                                                   (start_s - accumulate_s),
-                             lane->headings()[i], LaneWaypoint(lane, start_s));
+        points->emplace_back(
+            segment.start() +
+                segment.unit_direction() * (start_s - accumulate_s),
+            lane->headings()[i], LaneWaypoint(lane, start_s));
       }
       if (end_s > accumulate_s && end_s < next_accumulate_s) {
         points->emplace_back(

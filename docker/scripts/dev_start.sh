@@ -20,7 +20,7 @@ INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20180130_1338"
+VERSION_X86_64="dev-x86_64-20180320_1118"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 
@@ -36,6 +36,23 @@ OPTIONS:
 EOF
 exit 0
 }
+
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+
+if [ ! -e /apollo ]; then
+    sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
+fi
+
+echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
+
+source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
+
+VOLUME_VERSION="latest"
+DEFAULT_MAPS=(
+  sunnyvale_big_loop
+  sunnyvale_loop
+)
+MAP_VOLUME_CONF=""
 
 while [ $# -gt 0 ]
 do
@@ -67,6 +84,12 @@ do
     -l|--local)
         LOCAL_IMAGE="yes"
         ;;
+    --map)
+        map_name=$2
+        shift
+        source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh \
+            "${map_name}" "${VOLUME_VERSION}"
+    ;;
     *)
         echo -e "\033[93mWarning\033[0m: Unknown option: $1"
         exit 2
@@ -94,16 +117,12 @@ if [ "$INCHINA" == "yes" ]; then
     DOCKER_REPO=registry.docker-cn.com/apolloauto/apollo
 fi
 
+# Included default maps.
+for map_name in ${DEFAULT_MAPS[@]}; do
+    source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+done
+
 IMG=${DOCKER_REPO}:$VERSION
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
-
-if [ ! -e /apollo ]; then
-    sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
-fi
-
-echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
-
-source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
 function main(){
 
@@ -149,16 +168,25 @@ function main(){
     LOCALIZATION_VOLUME=apollo_localization_volume
     docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
 
-    LOCALIZATION_VOLUME_IMAGE=apolloauto/apollo:localization_volume-${ARCH}-latest
+    LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
     docker pull ${LOCALIZATION_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
+
+    YOLO3D_VOLUME=apollo_yolo3d_volume
+    docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
+
+    YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
+    docker pull ${YOLO3D_VOLUME_IMAGE}
+    docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
 
     info "Starting docker container \"apollo_dev\" ..."
     docker run -it \
         -d \
         --privileged \
         --name apollo_dev \
+        ${MAP_VOLUME_CONF} \
         --volumes-from ${LOCALIZATION_VOLUME} \
+        --volumes-from ${YOLO3D_VOLUME} \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
         -e USER=$USER \

@@ -43,8 +43,8 @@ class SunnyvaleLoopTest : public PlanningTestBase {
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
     FLAGS_use_multi_thread_to_add_obstacles = false;
-    FLAGS_enable_crosswalk = false;
-    FLAGS_enable_stop_sign = false;
+    ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
+    ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
   }
 };
 
@@ -156,7 +156,7 @@ TEST_F(SunnyvaleLoopTest, rightturn_01) {
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_enable_traffic_light = false;
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }

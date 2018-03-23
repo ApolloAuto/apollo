@@ -1,0 +1,31 @@
+syntax = "proto2";
+
+package apollo.perception;
+
+message FeatureParam {
+    optional int32 feat_stride = 1 [default = 32];
+    repeated ExtractorParam extractor = 2;
+    optional string remap_model = 3;
+}
+
+message ExtractorParam {
+    enum FeatureType {
+        Reorg = 0;
+        ROIPooling = 1;
+    }
+    optional string feat_blob = 1;
+    optional FeatureType feat_type = 2 [default = Reorg];
+    optional ROIPoolingParam roi_pooling_param = 3;
+    optional ReorgParam reorg_param = 4;
+}
+
+message ROIPoolingParam {
+    optional int32 pooled_h = 1 [default = 3];
+    optional int32 pooled_w = 2 [default = 3];
+    optional bool use_floor = 3 [default = false];
+}
+
+message ReorgParam {
+    optional int32 ref_height = 1 [default = 0];
+    optional int32 ref_width = 2 [default = 0];
+}

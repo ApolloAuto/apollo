@@ -78,6 +78,17 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         }
       });
 
+  map_ws_->RegisterMessageHandler(
+      "RetrieveRelativeMapData",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        std::string to_send;
+        {
+          boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+          to_send = relative_map_string_;
+        }
+        map_ws_->SendBinaryData(conn, to_send, true);
+      });
+
   websocket_->RegisterMessageHandler(
       "Binary",
       [this](const std::string &data, WebSocketHandler::Connection *conn) {
@@ -135,10 +146,10 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         // Publish monitor message.
         if (succeed) {
           sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
-                                                   "Routing request Sent");
+                                                   "Routing request sent.");
         } else {
           sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::ERROR, "Failed to send routing request");
+              MonitorMessageItem::ERROR, "Failed to send a routing request.");
         }
       });
 
@@ -222,9 +233,17 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       "Dump", [this](const Json &json, WebSocketHandler::Connection *conn) {
         DumpMessage(AdapterManager::GetChassis(), "Chassis");
         DumpMessage(AdapterManager::GetPrediction(), "Prediction");
+        DumpMessage(AdapterManager::GetRoutingRequest(), "RoutingRequest");
         DumpMessage(AdapterManager::GetRoutingResponse(), "RoutingResponse");
         DumpMessage(AdapterManager::GetLocalization(), "Localization");
         DumpMessage(AdapterManager::GetPlanning(), "Planning");
+        DumpMessage(AdapterManager::GetControlCommand(), "Control");
+        DumpMessage(AdapterManager::GetPerceptionObstacles(), "Perception");
+        DumpMessage(AdapterManager::GetTrafficLightDetection(), "TrafficLight");
+        DumpMessage(AdapterManager::GetRelativeMap(), "RelativeMap");
+        DumpMessage(AdapterManager::GetNavigation(), "Navigation");
+        DumpMessage(AdapterManager::GetContiRadar(), "ContiRadar");
+        DumpMessage(AdapterManager::GetMobileye(), "Mobileye");
       });
 
   websocket_->RegisterMessageHandler(
@@ -331,6 +350,8 @@ void SimulationWorldUpdater::OnTimer(const ros::TimerEvent &event) {
     sim_world_service_.GetWireFormatString(
         FLAGS_sim_map_radius, &simulation_world_,
         &simulation_world_with_planning_data_);
+    sim_world_service_.GetRelativeMap().SerializeToString(
+        &relative_map_string_);
   }
 }
 

@@ -19,16 +19,17 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_CONVERTER_GEOMETRY_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_CONVERTER_GEOMETRY_H_
 
-#include <yaml-cpp/yaml.h>
-#include <Eigen/Geometry>
-#include <opencv2/opencv.hpp>
-
 #include <algorithm>
 #include <cmath>
 #include <limits>
 #include <string>
 #include <vector>
 
+#include "Eigen/Geometry"
+#include "opencv2/opencv.hpp"
+#include "yaml-cpp/yaml.h"
+
+#include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
@@ -76,7 +77,7 @@ class GeometryCameraConverter : public BaseCameraConverter {
   Eigen::Matrix<float, 3, 1> MakeUnit(
       const Eigen::Matrix<float, 3, 1> &v) const;
 
-  Camera<float> camera_model_;
+  CameraModel<float> camera_model_;
   std::vector<Eigen::Vector3f> corners_;
   static const int kMaxDistanceSearchDepth_ = 20;
   static const int kMaxCenterDirectionSearchDepth_ = 10;

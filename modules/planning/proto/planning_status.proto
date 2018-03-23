@@ -1,0 +1,84 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/proto/decision.proto";
+import "modules/common/proto/drive_state.proto";
+import "modules/planning/proto/planning.proto";
+
+/*
+  This file defines the data types that represents the internal state of the planning module.
+  It will not be refreshed in each planning cycle.
+*/
+
+message ReroutingStatus {
+  optional double last_rerouting_time = 1;
+}
+
+message SidePassStatus {
+  // a sidepass sequence includes:
+  // driving -> wait -> sidepass -> driving
+  enum Status {
+    UNKNOWN = 0;
+    DRIVING = 1;
+    WAIT = 2;
+    SIDEPASS = 3;
+  }
+  optional Status status = 1;
+  optional double wait_start_time = 2;
+  optional string pass_obstacle_id = 3;
+  optional apollo.planning.ObjectSidePass.Type pass_side = 4;
+}
+
+message StopSignStatus {
+  enum Status {
+    UNKNOWN = 0;
+    TO_STOP = 1;
+    STOPPING = 2;
+    CREEPING = 3;
+    STOP_DONE = 4;
+  }
+  message LaneWatchVehicles {
+    required string lane_id = 1;
+    repeated string watch_vehicles = 2;
+  }
+
+  optional string stop_sign_id = 1;
+  optional Status status = 2;
+  optional double stop_start_time = 3;
+  repeated LaneWatchVehicles lane_watch_vehicles = 4;
+}
+
+message ChangeLaneStatus {
+   enum Status {
+       IN_CHANGE_LANE = 1; // during change lane state
+       CHANGE_LANE_FAILED = 2; // change lane failed
+       CHANGE_LANE_SUCCESS = 3; // change lane failed
+   }
+   optional Status status = 1;
+   // the id of the route segment that the vehicle is driving on
+   optional string path_id = 2;
+   // the time stamp when the state started.
+   optional double timestamp = 3;
+}
+
+message RightOfWayStatus {
+    // whether the vehicle has right of way in junction
+    map<string, bool> junction = 1;
+}
+
+message PlanningStatus {
+  optional ReroutingStatus rerouting = 1;
+  optional SidePassStatus side_pass = 2;
+  optional StopSignStatus stop_sign = 3;
+  optional ChangeLaneStatus change_lane = 4;
+  optional RightOfWayStatus right_of_way = 5;
+  optional apollo.common.EngageAdvice engage_advice = 6;
+  optional SpecialStatus special_status = 7;
+}
+
+message SpecialStatus {
+    // special status for test purpose
+  optional int32 trajectory_index = 1;
+  repeated apollo.planning.ADCTrajectory trajectory = 2;
+}

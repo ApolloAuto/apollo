@@ -22,3 +22,29 @@ DEFINE_string(relative_map_adapter_config_filename,
 DEFINE_string(relative_map_config_filename,
               "modules/map/relative_map/conf/relative_map_config.pb.txt",
               "Relative map configuration file");
+
+DEFINE_int32(relative_map_loop_rate, 10, "Loop rate for relative_map node");
+
+DEFINE_double(max_len_from_navigation_line, 250.0,
+              "max navigation path length from navigation line");
+
+DEFINE_double(min_len_for_navigation_lane, 150.0,
+              "min generated navigation lane length");
+
+DEFINE_double(max_len_for_navigation_lane, 250.0,
+              "max generated navigation lane length");
+
+DEFINE_double(ratio_navigation_lane_len_to_speed, 8.0,
+              "navigation lane length to adv speed ratio");
+
+DEFINE_double(max_distance_to_navigation_line, 6.0,
+              "max distance to navigation line in navigation mode");
+
+DEFINE_double(min_view_range_to_use_lane_marker, 0.5,
+              "min view range to use lane_marker");
+
+DEFINE_double(min_lane_half_width, 1.1, "min lane half width in meters");
+
+DEFINE_bool(
+    enable_navigation_line, true,
+    "True to consider navigation line info into generate navigation path");

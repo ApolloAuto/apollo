@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/planning/proto/planning_status.pb.h"
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
 namespace apollo {
@@ -36,18 +37,11 @@ class StopSign : public TrafficRule {
       StopSignLaneVehicles;
 
  public:
-  explicit StopSign(const RuleConfig& config);
+  explicit StopSign(const TrafficRuleConfig& config);
   virtual ~StopSign() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
-
-  enum class StopSignStopStatus {
-    UNKNOWN = 0,
-    TO_STOP = 1,
-    STOPPING = 2,
-    CREEPING = 3,
-    STOP_DONE = 4,
-  };
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 
  private:
   void MakeDecisions(Frame* const frame,
@@ -70,24 +64,13 @@ class StopSign : public TrafficRule {
   bool BuildStopDecision(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info,
                          hdmap::PathOverlap* const overlap,
-                         const double stop_buffer);
-  void ClearOtherStopSignDropbox(ReferenceLineInfo* const reference_line_info);
-  void ClearDropbox(const std::string& stop_sign_id);
-  void ClearDropboxWatchvehicles(const std::string& stop_sign_id);
+                         const double stop_distance);
 
  private:
-  constexpr static char const* const db_key_stop_sign_stop_status_prefix_ =
-      "kStopSignStopStatus_";
-  constexpr static char const* const db_key_stop_sign_stop_starttime_prefix_ =
-      "kStopSignStopStarttime_";
-  constexpr static char const* const db_key_stop_sign_watch_vehicle_prefix_ =
-      "kStopSignWatchVehicle_";
-  constexpr static char const* const db_key_stop_sign_associated_lanes_prefix_ =
-      "kStopSignAssociateLane_";
-
+  static constexpr char const* const STOP_SIGN_VO_ID_PREFIX = "SS_";
   hdmap::PathOverlap* next_stop_sign_overlap_ = nullptr;
   hdmap::StopSignInfo* next_stop_sign_ = nullptr;
-  StopSignStopStatus stop_status_;
+  StopSignStatus::Status stop_status_;
   std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
       associated_lanes_;
 };

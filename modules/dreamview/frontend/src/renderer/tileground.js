@@ -24,7 +24,7 @@ export default class TileGround {
         this.currentTiles = {};
         this.initialized = false;
 
-        this.range = PARAMETERS.ground.tileRange;
+        this.range = PARAMETERS.ground.defaults.tileRange;
         this.metadata = null;
         this.mapId = null;
         this.mapUrlPrefix = null;

@@ -41,19 +41,19 @@ bool TLPreprocessorSubnode::InitInternal() {
 
   ConfigManager *config_manager = ConfigManager::instance();
   std::string model_name("TLPreprocessorSubnode");
-  const ModelConfig *model_config(nullptr);
-  if (!config_manager->GetModelConfig(model_name, &model_config)) {
+  const ModelConfig *model_config = config_manager->GetModelConfig(model_name);
+  if (model_config == nullptr) {
     AERROR << "TLPreprocessorSubnode not found model: " << model_name;
     return false;
   }
-  float _max_process_image_fps;
+  float max_process_image_fps_;
   if (!model_config->GetValue("max_process_image_fps",
-                              &_max_process_image_fps)) {
+                              &max_process_image_fps_)) {
     AERROR << "TLPreprocessorSubnode Failed to find Conf: "
            << "max_process_image_fps.";
     return false;
   }
-  proc_interval_seconds_ = 1.0f / _max_process_image_fps;
+  proc_interval_seconds_ = 1.0f / max_process_image_fps_;
 
   if (!model_config->GetValue("query_tf_inverval_seconds",
                               &query_tf_inverval_seconds_)) {
@@ -189,14 +189,14 @@ void TLPreprocessorSubnode::SubCameraImage(
 
   AINFO << "sub_camera_image_start_ts: "
         << GLOG_TIMESTAMP(sub_camera_image_start_ts)
-        << " , _last_proc_image_ts: " << GLOG_TIMESTAMP(last_proc_image_ts_)
+        << " , last_proc_image_ts_: " << GLOG_TIMESTAMP(last_proc_image_ts_)
         << " , diff: "
         << GLOG_TIMESTAMP(sub_camera_image_start_ts - last_proc_image_ts_);
   if (last_proc_image_ts_ > 0.0 &&
       sub_camera_image_start_ts - last_proc_image_ts_ <
           proc_interval_seconds_) {
     AINFO << "skip current image, img_ts: " << GLOG_TIMESTAMP(timestamp)
-          << " ,because _proc_interval_seconds: "
+          << " ,because proc_interval_seconds_: "
           << GLOG_TIMESTAMP(proc_interval_seconds_);
     return;
   }
@@ -323,7 +323,7 @@ bool TLPreprocessorSubnode::VerifyLightsProjection(
   if (!preprocessor_.ProjectLights(pose, signals, image_lights->camera_id,
                                    image_lights->lights.get(),
                                    image_lights->lights_outside_image.get())) {
-    AINFO << "_preprocessor.select_camera_by_lights_projection failed";
+    AINFO << "preprocessor_.select_camera_by_lights_projection failed";
     return false;
   }
 

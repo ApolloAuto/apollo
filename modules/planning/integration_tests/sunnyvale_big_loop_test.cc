@@ -20,9 +20,9 @@
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/dropbox.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_util.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
 #include "modules/planning/planning.h"
 #include "modules/planning/tasks/traffic_decider/stop_sign.h"
@@ -31,8 +31,8 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::time::Clock;
-using apollo::common::util::Dropbox;
 using apollo::planning::StopSign;
+using apollo::planning::util::GetPlanningStatus;
 
 /**
  * @class SunnyvaleBigLoopTest
@@ -48,9 +48,9 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_big_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
 
-    FLAGS_enable_stop_sign = false;
-    FLAGS_enable_crosswalk = false;
-    FLAGS_enable_keep_clear = false;
+    ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+    ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
+    ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   }
 };
 
@@ -60,7 +60,7 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
  *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
-  FLAGS_enable_stop_sign = true;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
   std::string seq_num = "1";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
@@ -69,13 +69,10 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 
-  // check dropbox value
-  StopSign::StopSignStopStatus* status =
-      Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
-          "kStopSignStopStatus_1017");
-  StopSign::StopSignStopStatus stop_status =
-      (status == nullptr) ? StopSign::StopSignStopStatus::UNKNOWN : *status;
-  EXPECT_EQ(StopSign::StopSignStopStatus::TO_STOP, stop_status);
+  // check PlanningStatus value
+  auto stop_sign_status = GetPlanningStatus()->stop_sign();
+  EXPECT_TRUE(stop_sign_status.has_status() &&
+              stop_sign_status.status() == StopSignStatus::TO_STOP);
 }
 
 /*
@@ -84,11 +81,12 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
  *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
-  FLAGS_enable_stop_sign = true;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
-  // set dropbox
-  Dropbox<StopSign::StopSignStopStatus>::Open()->Set(
-      "kStopSignStopStatus_1017", StopSign::StopSignStopStatus::TO_STOP);
+  // set PlanningStatus
+  auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  stop_sign_status->set_stop_sign_id("1017");
+  stop_sign_status->set_status(StopSignStatus::TO_STOP);
 
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -98,28 +96,28 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 
-  // check dropbox value
-  StopSign::StopSignStopStatus* status =
-      Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
-          "kStopSignStopStatus_1017");
-  StopSign::StopSignStopStatus stop_status =
-      (status == nullptr) ? StopSign::StopSignStopStatus::UNKNOWN : *status;
-  EXPECT_EQ(StopSign::StopSignStopStatus::STOPPING, stop_status);
+  // check PlanningStatus value
+  EXPECT_TRUE(stop_sign_status->has_status() &&
+              stop_sign_status->status() == StopSignStatus::STOPPING);
 }
 
 /*
- * stop_sign: adc stopped + wait_time < 3sec
+ * stop_sign: adc stopped + wait_time < STOP_DURATION
  *   adc status: STOPPING => STOPPING
  *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
-  FLAGS_enable_stop_sign = true;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
+  constexpr double STOP_DURATION = 1;
+  double wait_time = STOP_DURATION - 0.5;
 
-  // set dropbox
-  Dropbox<StopSign::StopSignStopStatus>::Open()->Set(
-      "kStopSignStopStatus_1017", StopSign::StopSignStopStatus::STOPPING);
-  double stop_start_time = Clock::NowInSeconds() - 2;
-  Dropbox<double>::Open()->Set("kStopSignStopStarttime_1017", stop_start_time);
+  // set PlanningStatus
+  auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  stop_sign_status->set_stop_sign_id("1017");
+  stop_sign_status->set_status(StopSignStatus::STOPPING);
+  double stop_start_time = Clock::NowInSeconds() - wait_time;
+  stop_sign_status->set_stop_start_time(stop_start_time);
+
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
@@ -128,28 +126,28 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 
-  // check dropbox value
-  StopSign::StopSignStopStatus* status =
-      Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
-          "kStopSignStopStatus_1017");
-  StopSign::StopSignStopStatus stop_status =
-      (status == nullptr) ? StopSign::StopSignStopStatus::UNKNOWN : *status;
-  EXPECT_EQ(StopSign::StopSignStopStatus::STOPPING, stop_status);
+  // check PlanningStatus value
+  EXPECT_TRUE(stop_sign_status->has_status() &&
+              stop_sign_status->status() == StopSignStatus::STOPPING);
 }
 
 /*
- * stop_sign: adc stopped + wait time > 3
+ * stop_sign: adc stopped + wait time > STOP_DURATION
  *   adc status: STOPPING => STOP_DONE
  *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
-  FLAGS_enable_stop_sign = true;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
+  constexpr double STOP_DURATION = 1;
+  double wait_time = STOP_DURATION + 0.5;
 
-  // set dropbox
-  Dropbox<StopSign::StopSignStopStatus>::Open()->Set(
-      "kStopSignStopStatus_1017", StopSign::StopSignStopStatus::STOPPING);
-  double stop_start_time = Clock::NowInSeconds() - 4;
-  Dropbox<double>::Open()->Set("kStopSignStopStarttime_1017", stop_start_time);
+  // set PlanningStatus
+  auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  stop_sign_status->set_stop_sign_id("1017");
+  stop_sign_status->set_status(StopSignStatus::STOPPING);
+  double stop_start_time = Clock::NowInSeconds() - wait_time;
+  stop_sign_status->set_stop_start_time(stop_start_time);
+
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
@@ -158,13 +156,9 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 
-  // check dropbox value
-  StopSign::StopSignStopStatus* status =
-      Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
-          "kStopSignStopStatus_1017");
-  StopSign::StopSignStopStatus stop_status =
-      (status == nullptr) ? StopSign::StopSignStopStatus::UNKNOWN : *status;
-  EXPECT_EQ(StopSign::StopSignStopStatus::STOP_DONE, stop_status);
+  // check PlanningStatus value
+  EXPECT_TRUE(stop_sign_status->has_status() &&
+              stop_sign_status->status() == StopSignStatus::STOP_DONE);
 }
 
 /*
@@ -173,12 +167,15 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
  * step 1:
  *   adc decision: STOP
  * step 2:
- *   wait_time = 4, other vehicles arrived at other stop sign later than adc
+ *   wait_time > stop_duration(1)
+ *      other vehicles arrived at other stop sign later than adc
  *   adc status: STOPPING => STOP_DONE
  *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
-  FLAGS_enable_stop_sign = true;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
+  double stop_duration = 1;
+  double wait_time = stop_duration + 1;
 
   std::string seq_num = "3";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -188,9 +185,10 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 
-  // set dropbox
-  double stop_start_time = Clock::NowInSeconds() - 4;
-  Dropbox<double>::Open()->Set("kStopSignStopStarttime_9762", stop_start_time);
+  // set PlanningStatus
+  auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  double stop_start_time = Clock::NowInSeconds() - wait_time;
+  stop_sign_status->set_stop_start_time(stop_start_time);
 
   seq_num = "4";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
@@ -202,21 +200,24 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
 
 /*
  * stop_sign:
- * bag: 2018-01-24-11-36-55/2018-01-24-11-36-55
+ * bag: 2018-01-24-11-36-55/2018-01-24-11-36-57_0.bag
  * step 1:
  *   adc decision: STOP
  * step 2:
- *   wait_time = 4, other vehicles arrived at other stop sign earlier than adc
+ *   wait_time > stop_duration(1),
+ *      other vehicles arrived at other stop sign earlier than adc
  *   adc status: STOPPING => STOPPING (i.e. waiting)
  *   decision: STOP
  * step 3:
- *   wait_time = 4,
+ *   wait_time > STOP_DURATION,
  *     and other vehicles arrived at other stop sign earlier than adc GONE
  *   adc status: STOPPING => STOPPING => STOP_DONE
  *   decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
-  FLAGS_enable_stop_sign = true;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
+  constexpr double STOP_DURATION = 1;
+  double wait_time = STOP_DURATION + 0.5;
 
   std::string seq_num = "5";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -230,9 +231,10 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   // wait time is enough
   // but vehicles are still there (use the same data as previous test)
 
-  // set dropbox
-  double stop_start_time = Clock::NowInSeconds() - 4;
-  Dropbox<double>::Open()->Set("kStopSignStopStarttime_1022", stop_start_time);
+  // set PlanningStatus
+  auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  double stop_start_time = Clock::NowInSeconds() - wait_time;
+  stop_sign_status->set_stop_start_time(stop_start_time);
 
   seq_num = "6";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
@@ -241,20 +243,25 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(1);
 
-  // check dropbox value on watch vehicles
+  // check PlanningStatus value on watch vehicles
   // waiting for vehicle 4059 on lane 868_1_-1
-  std::string db_key_watch_vehicle = "kStopSignWatchVehicle_868_1_-1";
-  std::vector<std::string>* value =
-      Dropbox<std::vector<std::string>>::Open()->Get(db_key_watch_vehicle);
-  EXPECT_TRUE(value != nullptr && (*value)[0] == "4059");
+  EXPECT_EQ(2, stop_sign_status->lane_watch_vehicles_size());
+  auto lane_watch_vehicles = stop_sign_status->lane_watch_vehicles(0);
+  EXPECT_EQ("868_1_-1", lane_watch_vehicles.lane_id());
+  EXPECT_TRUE(lane_watch_vehicles.watch_vehicles_size() == 1 &&
+              lane_watch_vehicles.watch_vehicles(0) == "4059");
+  lane_watch_vehicles = stop_sign_status->lane_watch_vehicles(1);
+  EXPECT_EQ("459_1_-1", lane_watch_vehicles.lane_id());
+  EXPECT_TRUE(lane_watch_vehicles.watch_vehicles_size() == 1 &&
+              lane_watch_vehicles.watch_vehicles(0) == "4096");
 
   // step 3:
   // wait time is enough
   // previously watch vehicles are gone
 
-  // set dropbox
-  stop_start_time = Clock::NowInSeconds() - 4;
-  Dropbox<double>::Open()->Set("kStopSignStopStarttime_1022", stop_start_time);
+  // set PlanningStatus
+  stop_start_time = Clock::NowInSeconds() - wait_time;
+  stop_sign_status->set_stop_start_time(stop_start_time);
 
   seq_num = "7";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
@@ -278,7 +285,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
  *   adc decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
-  FLAGS_enable_stop_sign = true;
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
   std::string seq_num = "12";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -288,20 +295,12 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 
-  // check dropbox value to make sure they are set
-  std::string db_key_stop_status = "kStopSignStopStatus_9762";
-  StopSign::StopSignStopStatus* status =
-      Dropbox<StopSign::StopSignStopStatus>::Open()->Get(db_key_stop_status);
-  EXPECT_TRUE(status != nullptr);
-
-  std::string db_key_stop_starttime = "kStopSignStopStarttime_9762";
-  double* start_time = Dropbox<double>::Open()->Get(db_key_stop_starttime);
-  EXPECT_TRUE(start_time != nullptr);
-
-  std::string db_key_associated_lanes = "kStopSignAssociateLane_9762";
-  std::vector<std::string>* associated_lanes =
-      Dropbox<std::vector<std::string>>::Open()->Get(db_key_associated_lanes);
-  EXPECT_TRUE(associated_lanes != nullptr);
+  // check PlanningStatus value to make sure they are set
+  auto stop_sign_status = GetPlanningStatus()->stop_sign();
+  EXPECT_EQ("9762", stop_sign_status.stop_sign_id());
+  EXPECT_TRUE(stop_sign_status.has_status() &&
+              stop_sign_status.status() == StopSignStatus::TO_STOP);
+  EXPECT_FALSE(stop_sign_status.has_stop_start_time());
 
   // step 2: pass stop sign
   seq_num = "13";
@@ -311,31 +310,9 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(1);
 
-  // check dropbox value to make sure everything is cleared for that stop sign
-  db_key_stop_status = "kStopSignStopStatus_9762";
-  status = Dropbox<StopSign::StopSignStopStatus>::Open()->Get(
-      db_key_stop_status);
-  EXPECT_TRUE(status == nullptr);
-
-  db_key_stop_starttime = "kStopSignStopStarttime_9762";
-  start_time = Dropbox<double>::Open()->Get(db_key_stop_starttime);
-  EXPECT_TRUE(start_time == nullptr);
-
-  std::string db_key_watch_vehicle = "kStopSignWatchVehicle_743_1_-2";
-  std::vector<std::string>* value =
-      Dropbox<std::vector<std::string>>::Open()->Get(db_key_watch_vehicle);
-  EXPECT_TRUE(value == nullptr);
-  db_key_watch_vehicle = "kStopSignWatchVehicle_743_1_-1";
-  value = Dropbox<std::vector<std::string>>::Open()->Get(db_key_watch_vehicle);
-  EXPECT_TRUE(value == nullptr);
-  db_key_watch_vehicle = "kStopSignWatchVehicle_868_1_-1";
-  value = Dropbox<std::vector<std::string>>::Open()->Get(db_key_watch_vehicle);
-  EXPECT_TRUE(value == nullptr);
-
-  db_key_associated_lanes = "kStopSignAssociateLane_9762";
-  associated_lanes =
-      Dropbox<std::vector<std::string>>::Open()->Get(db_key_associated_lanes);
-  EXPECT_TRUE(associated_lanes == nullptr);
+  // check PlanningStatus value
+  // to make sure everything is cleared for that stop sign
+  EXPECT_FALSE(GetPlanningStatus()->has_stop_sign());
 
   // step 3: 2nd round
   seq_num = "12";
@@ -352,9 +329,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
  * decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
-  FLAGS_enable_crosswalk = true;
-  FLAGS_enable_traffic_light = false;
-
+  ENABLE_RULE(TrafficRuleConfig::CROSSWALK, true);
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   std::string seq_num = "8";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
@@ -362,7 +338,6 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
-  FLAGS_enable_traffic_light = true;
 }
 
 /*
@@ -371,10 +346,9 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
  * decision: CRUISE
  */
 TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
-  FLAGS_enable_keep_clear = true;
-  FLAGS_enable_traffic_light = false;
-
   std::string seq_num = "9";
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
@@ -385,9 +359,9 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
 
 TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   std::string seq_num = "10";
-  FLAGS_enable_traffic_light = true;
   FLAGS_enable_prediction = false;
-  FLAGS_enable_keep_clear = false;
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, true);
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
 
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
@@ -400,8 +374,8 @@ TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
 
 TEST_F(SunnyvaleBigLoopTest, abort_change_lane_for_fast_back_vehicle) {
   std::string seq_num = "11";
-  FLAGS_enable_traffic_light = true;
-  FLAGS_enable_keep_clear = false;
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, true);
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
 
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";

@@ -29,8 +29,10 @@ std::unique_ptr<VehicleController>
   return std::unique_ptr<VehicleController>(new %(car_type_lower)s::%(car_type_cap)sController());
 }
 
-std::unique_ptr<MessageManager> %(car_type_cap)sVehicleFactory::CreateMessageManager() {
-  return std::unique_ptr<MessageManager>(new %(car_type_lower)s::%(car_type_cap)sMessageManager());
+std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
+%(car_type_cap)sVehicleFactory::CreateMessageManager() {
+  return std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>(
+	new %(car_type_lower)s::%(car_type_cap)sMessageManager());
 }
 
 }  // namespace canbus

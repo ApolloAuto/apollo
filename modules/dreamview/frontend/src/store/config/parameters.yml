@@ -46,6 +46,7 @@ options:
     showModuleController: false
     showMenu: false
     showPOI: false
+    enableVoiceCommand: false
     showPNCMonitor: false
     showRouteEditingBar: false
     showDataRecorder: false
@@ -74,7 +75,17 @@ options:
     showPointCloud: false
     showPositionGps: false
     showPositionLocalization: true
+    showMapCrosswalk: true
+    showMapClearArea: true
+    showMapJunction: false
+    showMapLane: true
+    showMapRoad: false
+    showMapSignal: true
+    showMapStopSign: true
     cameraAngle: Default
+navigation:
+  # possible options: BaiduMap or GoogleMap
+  map: "GoogleMap"
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false

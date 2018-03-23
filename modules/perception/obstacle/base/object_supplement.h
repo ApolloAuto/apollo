@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,12 @@ namespace apollo {
 namespace perception {
 
 struct alignas(16) RadarSupplement {
+  RadarSupplement();
+  ~RadarSupplement();
+  RadarSupplement(const RadarSupplement& rhs);
+  RadarSupplement& operator = (const RadarSupplement& rhs);
+  void clone(const RadarSupplement& rhs);
+
   // distance
   float range = 0.0f;
   // x -> forward, y -> left
@@ -39,6 +45,18 @@ struct alignas(16) RadarSupplement {
 };
 typedef std::shared_ptr<RadarSupplement> RadarSupplementPtr;
 typedef std::shared_ptr<const RadarSupplement> RadarSupplementConstPtr;
+
+struct alignas(16) RadarFrameSupplement {
+    RadarFrameSupplement();
+    ~RadarFrameSupplement();
+    RadarFrameSupplement(const RadarFrameSupplement& rhs);
+    RadarFrameSupplement& operator = (const RadarFrameSupplement& rhs);
+    void clone(const RadarFrameSupplement& rhs);
+};
+
+typedef std::shared_ptr<RadarFrameSupplement> RadarFrameSupplementPtr;
+typedef std::shared_ptr<const RadarFrameSupplement>
+        RadarFrameSupplementConstPtr;
 
 struct alignas(16) CameraFrameSupplement {
   CameraFrameSupplement();

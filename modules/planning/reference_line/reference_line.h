@@ -79,7 +79,15 @@ class ReferenceLine {
   const std::vector<ReferencePoint>& reference_points() const;
 
   ReferencePoint GetReferencePoint(const double s) const;
-  ReferencePoint GetNearestReferencepoint(const double s) const;
+  std::vector<ReferencePoint> GetReferencePoints(double start_s,
+                                                 double end_s) const;
+
+  std::size_t GetNearestReferenceIndex(const double s) const;
+
+  ReferencePoint GetNearestReferencePoint(const common::math::Vec2d& xy) const;
+
+  ReferencePoint GetNearestReferencePoint(const double s) const;
+
   ReferencePoint GetReferencePoint(const double x, const double y) const;
 
   bool GetApproximateSLBoundary(const common::math::Box2d& box,

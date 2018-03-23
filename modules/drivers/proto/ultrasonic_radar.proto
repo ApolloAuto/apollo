@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package apollo.drivers;
+
+import "modules/common/proto/header.proto";
+
+message Ultrasonic{
+//
+//               x axis
+//		       ^
+//                     |
+//                  *  |  *                           
+//               *     |     *                
+//        \    *       |       *    /
+//          \ *     range(i)    * /   
+//            \        |        /   
+//              \      |      /
+//                \    |    /
+//       y axis     \  |  / 
+//      <---------------
+//        ooooooooooooo   //ulrasonic radar front surface
+//
+// In erery working cycle, each radar of the ultrasonic system 
+// return a range to form a range array, 'ranges'. 
+
+  optional apollo.common.Header header = 1;
+  repeated float ranges = 2;
+}
+

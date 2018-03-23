@@ -28,6 +28,10 @@ DEFINE_string(planning_adapter_config_filename,
               "modules/planning/conf/adapter.conf",
               "The adapter configuration file");
 
+DEFINE_string(traffic_rule_config_filename,
+              "modules/planning/conf/traffic_rule_config.pb.txt",
+              "Traffic rule config filename");
+
 DEFINE_string(smoother_config_filename,
               "modules/planning/conf/smoother_config.pb.txt",
               "The configuration file for qp sline smoother");
@@ -72,10 +76,6 @@ DEFINE_double(reference_line_lateral_buffer, 0.5,
 DEFINE_double(prepare_rerouting_time, 2.0,
               "If there are this amount of seconds left to finish driving on "
               "current route, and there is no routing, do rerouting");
-
-DEFINE_double(rerouting_cooldown_time, 0.6,
-              "Wait for at least this amount of seconds before send another "
-              "rerouting request");
 
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
@@ -210,16 +210,26 @@ DEFINE_double(
 DEFINE_double(
     follow_min_time_sec, 0.1,
     "min following time in st region before considering a valid follow");
-DEFINE_double(within_lane_bound, 4.0,
-              "distance to be considered within current lane");
+DEFINE_double(stop_line_stop_distance, 1.0, "stop distance from stop line");
+DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
+DEFINE_double(max_stop_deceleration, 6.0, "max deceleration");
+DEFINE_double(signal_light_min_pass_s_distance, 4.0,
+              "min s_distance for adc to be considered "
+              "have passed signal_light (stop_line_end_s)");
+DEFINE_double(signal_expire_time_sec, 5.0,
+              "consider the signal msg is expired if its timestamp over "
+              "this threshold (second)");
+
+DEFINE_string(destination_obstacle_id, "DEST",
+              "obstacle id for converting destination to an obstacle");
+DEFINE_double(destination_check_distance, 5.0,
+              "if the distance between destination and ADC is less than this,"
+              " it is considered to reach destination");
 
 DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
 DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
-DEFINE_double(signal_expire_time_sec, 5.0,
-              "consider the signal msg is expired if its timestamp over "
-              "this threshold (second)");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
@@ -227,103 +237,12 @@ DEFINE_bool(align_prediction_time, false,
             "enable align prediction data based planning time");
 
 // Trajectory
-DEFINE_bool(enable_rule_layer, true,
-            "enable rule for trajectory before model computation");
-
-// Traffic decision
-/// common
-DEFINE_double(max_stop_distance_buffer, 4.0,
-              "distance buffer of passing stop line");
-DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
-DEFINE_double(max_stop_deceleration, 6.0, "max deceleration");
-DEFINE_double(max_valid_stop_distance, 3.0,
-              "max distance(m) to the stop line to be "
-              "considered as a valid stop");
-DEFINE_double(creep_stop_distance, 0.5,
-              "stop distance(m) to the stop line of next lane overlap "
-              "while creeping ");
-/// keep_clear
-DEFINE_bool(enable_keep_clear, false, "enable keep clear zone");
-DEFINE_string(keep_clear_virtual_obstacle_id_prefix, "KC_",
-              "prefix for converting keep_clear id to virtual obstacle id");
-DEFINE_string(keep_clear_junction_virtual_obstacle_id_prefix, "KC_JC_",
-              "prefix for converting keep_clear(junction) id "
-              "to virtual obstacle id");
-DEFINE_double(keep_clear_min_pass_distance, 2.0,
-              "valid min distance(m) for vehicles to be considered as "
-              "have passed keep_clear zone (stop_line_end_s)");
-/// traffic light
-DEFINE_bool(enable_traffic_light, true, "True to enable traffic light input.");
-DEFINE_string(signal_light_virtual_obstacle_id_prefix, "SL_",
-              "prefix for converting signal id to virtual obstacle id");
-DEFINE_double(max_stop_deacceleration_for_yellow_light, 3.0,
-              "treat yellow light as red when deceleration (abstract value"
-              " in m/s^2) is less than this threshold; otherwise treated"
-              " as green light");
-DEFINE_double(traffic_light_stop_distance, 1.0,
-              "stop distance from traffic light line");
-/// crosswalk
-DEFINE_bool(enable_crosswalk, true, "enable crosswalk");
-DEFINE_string(crosswalk_virtual_obstacle_id_prefix, "CW_",
-              "prefix for converting crosswalk id to virtual obstacle id");
-DEFINE_double(crosswalk_expand_distance, 2.0,
-              "crosswalk expand distance(meter) "
-              "for pedestrian/bicycle detection");
-DEFINE_double(crosswalk_strick_l_distance, 4.0,
-              "strick stop rule within this l_distance");
-DEFINE_double(crosswalk_loose_l_distance, 5.0,
-              "loose stop rule beyond this l_distance");
-DEFINE_double(crosswalk_min_pass_distance, 1.0,
-              "valid min distance(m) for vehicles to be considered as "
-              "have passed crosswalk (stop_line_end_s)");
-DEFINE_double(crosswalk_stop_distance, 1.0,
-              "stop distance from stop line of crosswalk");
-/// stop_sign
-DEFINE_bool(enable_stop_sign, true, "enable stop_sign");
-DEFINE_bool(enable_stop_sign_creeping, false,
-            "enable stop_sign creeping forward at one way "
-            "or two way stop signs.");
-DEFINE_string(stop_sign_virtual_obstacle_id_prefix, "SS_",
-              "prefix for converting stop_sign id to virtual obstacle id");
-DEFINE_double(stop_sign_stop_duration, 3.0,
-              "min time(second) to stop at stop sign");
-DEFINE_double(stop_sign_min_pass_distance, 3.0,
-              "valid min distance(m) for vehicles to be considered as "
-              "have passed stop sign (stop_line_end_s)");
-DEFINE_double(stop_sign_stop_distance, 1.0,
-              "stop distance from stop line of stop sign");
-DEFINE_double(stop_sign_watch_vehicle_max_stop_speed, 0.5,
-              "max speed(m/s) for watch vehicles to be considered as "
-              " a valid stop.(this check is looser than adc)");
-DEFINE_double(stop_sign_watch_vehicle_max_stop_distance, 5.0,
-              "max stop distance for watch vehicles to be considered as "
-              " a valid stop.(this check is looser than adc)");
-
-DEFINE_bool(enable_sidepass, true,
-            "True to enable side pass long stopping obstacles");
-DEFINE_double(sidepass_wait_time_sec, 30.0,
-              "Waiting time in seconds before deciding to sidepass");
-
-/// destination
-DEFINE_string(destination_obstacle_id, "DEST",
-              "obstacle id for converting destination to an obstacle");
-DEFINE_double(destination_check_distance, 5.0,
-              "if the distance between destination and ADC is less than this,"
-              " it is considered to reach destination");
-DEFINE_double(destination_stop_distance, 0.5,
-              "stop distance from destination line");
-/// reference_line end
-DEFINE_string(reference_line_end_obstacle_id_prefix, "REF_END_",
-              "Obstacle id for the end of reference line obstacle");
 
 // according to DMV's rule, turn signal should be on within 200 ft from
 // intersection.
 DEFINE_double(
     turn_signal_distance, 100.00,
     "In meters. If there is a turn within this distance, use turn signal");
-DEFINE_bool(right_turn_creep_forward, false,
-            "Creep forward at right turn when the signal is red and traffic "
-            "rule is not violated.");
 
 // planning config file
 DEFINE_string(planning_config_file,
@@ -375,17 +294,14 @@ DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
 /// Lattice Planner
 DEFINE_double(lattice_epsilon, 1e-6, "Epsilon in lattice planner.");
 DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
-DEFINE_bool(enable_lattice_st_image_dump, false,
-            "enable sending the lattice st image");
+
 DEFINE_bool(enable_auto_tuning, false, "enable auto tuning data emission");
 
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
-DEFINE_double(collision_buffer_expansion_ratio, 0.0,
-              "The ratio w.r.t. the vehicle dimension "
-              "to expand in collision checking");
+
 DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
 DEFINE_bool(enable_backup_trajectory, false,
@@ -400,6 +316,8 @@ DEFINE_double(weight_lon_collision, 2.0,
               "Weight of logitudinal collision cost");
 DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
 DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");
+DEFINE_double(weight_centripetal_acceleration, 5.0,
+              "Weight of centripetal acceleration");
 DEFINE_double(priority_cost_gap, 5.0,
               "Gap to increase the priority cost of reference line.");
 DEFINE_double(weight_same_side_offset, 1.0,
@@ -419,3 +337,11 @@ DEFINE_double(default_lon_buffer, 5.0,
               "Default longitudinal buffer to sample path-time points.");
 DEFINE_double(time_min_density, 1.0,
               "Minimal time density to search sample points.");
+DEFINE_double(comfort_acceleration_factor, 0.5,
+              "Factor for comfort acceleration.");
+DEFINE_double(polynomial_minimal_param, 0.01,
+              "Minimal time parameter in polynomials.");
+
+// navigation mode
+DEFINE_double(navigation_fallback_cruise_time, 8.0,
+              "The time range of fallback cruise under navigation mode.");

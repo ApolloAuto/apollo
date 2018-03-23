@@ -12,6 +12,7 @@ filegroup(
     srcs = [
         "config_manager.config",
         "dag_streaming.config",
-        "perception.conf",
+        "dag_camera_obstacle_offline.config",
+        "perception.conf"
     ],
 )

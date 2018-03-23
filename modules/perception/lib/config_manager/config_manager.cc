@@ -55,18 +55,9 @@ bool ConfigManager::InitInternal() {
       GetAbsolutePath(work_root_, FLAGS_config_manager_path);
 
   AINFO << "WORK_ROOT: " << work_root_ << " config_manager_path: " << path;
-
-  std::string content;
-  if (!GetContent(path, &content)) {
-    AERROR << "failed to get ConfigManager config path: " << path;
-    return false;
-  }
-
   ModelConfigFileListProto file_list_proto;
-
-  if (!TextFormat::ParseFromString(content, &file_list_proto)) {
-    AERROR << "invalid ModelConfigFileListProto file: "
-           << FLAGS_config_manager_path;
+  if (!apollo::common::util::GetProtoFromASCIIFile(path, &file_list_proto)) {
+    AERROR << "failed to parse ConfigManager config: " << path;
     return false;
   }
 
@@ -121,19 +112,19 @@ bool ConfigManager::Reset() {
   return InitInternal();
 }
 
-bool ConfigManager::GetModelConfig(const std::string& model_name,
-                                   const ModelConfig** model_config) {
+const ModelConfig* ConfigManager::GetModelConfig(
+    const std::string& model_name) {
   if (!inited_ && !Init()) {
-    return false;
+    AERROR << "ConfigManager is not initiated.";
+    return nullptr;
   }
 
   ModelConfigMapConstIterator citer = model_config_map_.find(model_name);
 
   if (citer == model_config_map_.end()) {
-    return false;
+    return nullptr;
   }
-  *model_config = citer->second;
-  return true;
+  return citer->second;
 }
 
 ConfigManager::~ConfigManager() {

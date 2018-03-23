@@ -23,12 +23,14 @@
 #include <unordered_set>
 #include <utility>
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/map_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
+#include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/network/rnn_model/rnn_model.h"
 
 namespace apollo {
@@ -100,6 +102,13 @@ const KalmanFilter<double, 2, 2, 4>& Obstacle::kf_pedestrian_tracker() const {
   return kf_pedestrian_tracker_;
 }
 
+bool Obstacle::IsStill() {
+  if (feature_history_.size() > 0) {
+    return feature_history_.front().is_still();
+  }
+  return true;
+}
+
 bool Obstacle::IsOnLane() {
   if (feature_history_.size() > 0) {
     if (feature_history_.front().has_lane() &&
@@ -124,8 +133,7 @@ bool Obstacle::IsNearJunction() {
 }
 
 void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
-                      const double timestamp,
-                      ObstacleClusters* const obstacle_clusters) {
+                      const double timestamp) {
   if (feature_history_.size() > 0 &&
       timestamp <= feature_history_.front().timestamp()) {
     AERROR << "Obstacle [" << id_ << "] received an older frame ["
@@ -168,13 +176,17 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   // Set obstacle lane features
   SetCurrentLanes(&feature);
   SetNearbyLanes(&feature);
-  SetLaneGraphFeature(&feature, obstacle_clusters);
+  SetLaneGraphFeature(&feature);
 
   // Insert obstacle feature to history
   InsertFeatureToHistory(feature);
 
   // Set obstacle motion status
-  SetMotionStatus();
+  if (FLAGS_use_navigation_mode) {
+    SetMotionStatusBySpeed();
+  } else {
+    SetMotionStatus();
+  }
 
   // Trim historical features
   Trim();
@@ -360,7 +372,8 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
   double speed = std::hypot(velocity_x, velocity_y);
   double velocity_heading = perception_obstacle.theta();
 
-  if (FLAGS_enable_adjust_velocity_heading && history_size() > 0) {
+  if (!FLAGS_use_navigation_mode && FLAGS_enable_adjust_velocity_heading &&
+      history_size() > 0) {
     double diff_x =
         feature->position().x() - feature_history_.front().position().x();
     double diff_y =
@@ -387,7 +400,7 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
     }
     double filtered_heading = heading_filter_.Filter(velocity_heading);
     if (type_ == PerceptionObstacle::BICYCLE ||
-      type_ == PerceptionObstacle::PEDESTRIAN) {
+        type_ == PerceptionObstacle::PEDESTRIAN) {
       velocity_heading = filtered_heading;
     }
     velocity_x = speed * std::cos(velocity_heading);
@@ -782,8 +795,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   }
 }
 
-void Obstacle::SetLaneGraphFeature(Feature* feature,
-                                   ObstacleClusters* const obstacle_clusters) {
+void Obstacle::SetLaneGraphFeature(Feature* feature) {
   double speed = feature->speed();
   double acc = feature->acc();
   double road_graph_distance =
@@ -796,7 +808,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature,
   for (auto& lane : feature->lane().current_lane_feature()) {
     std::shared_ptr<const LaneInfo> lane_info =
         PredictionMap::LaneById(lane.lane_id());
-    const LaneGraph& lane_graph = obstacle_clusters->GetLaneGraph(
+    const LaneGraph& lane_graph = ObstacleClusters::GetLaneGraph(
         lane.lane_s(), road_graph_distance, lane_info);
     if (lane_graph.lane_sequence_size() > 0) {
       ++curr_lane_count;
@@ -820,7 +832,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature,
   for (auto& lane : feature->lane().nearby_lane_feature()) {
     std::shared_ptr<const LaneInfo> lane_info =
         PredictionMap::LaneById(lane.lane_id());
-    const LaneGraph& lane_graph = obstacle_clusters->GetLaneGraph(
+    const LaneGraph& lane_graph = ObstacleClusters::GetLaneGraph(
         lane.lane_s(), road_graph_distance, lane_info);
     if (lane_graph.lane_sequence_size() > 0) {
       ++nearby_lane_count;
@@ -848,7 +860,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature,
 }
 
 void Obstacle::SetLanePoints(Feature* feature) {
-  if (feature == nullptr || !feature->velocity_heading()) {
+  if (feature == nullptr || !feature->has_velocity_heading()) {
     AERROR << "Null feature or no velocity heading.";
     return;
   }
@@ -971,6 +983,29 @@ void Obstacle::SetMotionStatus() {
     } else {
       ADEBUG << "Obstacle [" << id_ << "] is stationary.";
       feature_history_.front().set_is_still(true);
+    }
+  }
+}
+
+void Obstacle::SetMotionStatusBySpeed() {
+  int history_size = static_cast<int>(feature_history_.size());
+  if (history_size < 2) {
+    ADEBUG << "Obstacle [" << id_ << "] has no history and "
+           << "is considered moving.";
+    if (history_size > 0) {
+      feature_history_.front().set_is_still(false);
+    }
+    return;
+  }
+
+  double speed_threshold = FLAGS_still_obstacle_speed_threshold;
+  double speed = feature_history_.front().speed();
+
+  if (FLAGS_use_navigation_mode) {
+    if (speed < speed_threshold) {
+      feature_history_.front().set_is_still(true);
+    } else {
+      feature_history_.front().set_is_still(false);
     }
   }
 }

@@ -4,14 +4,25 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "config_manager",
-    srcs = ["config_manager.cc"],
-    hdrs = ["config_manager.h"],
+    srcs = [
+        "calibration_config_manager.cc",
+        "config_manager.cc",
+    ],
+    hdrs = [
+        "calibration_config_manager.h",
+        "config_manager.h",
+    ],
     deps = [
         "//modules/common:log",
         "//modules/common/util",
-        "//modules/perception/common:perception_common",
+        "//modules/perception/common",
+        "//modules/perception/cuda_util",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager/proto:config_proto",
+        "//modules/perception/obstacle/camera/common",
+        "@cuda",
+        "@opencv2//:imgproc",
+        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -22,7 +33,7 @@ cc_test(
     data = ["//modules/perception:perception_data"],
     deps = [
         ":config_manager",
-        "//modules/perception/common:perception_common",
+        "//modules/perception/common",
         "@gtest//:main",
     ],
 )

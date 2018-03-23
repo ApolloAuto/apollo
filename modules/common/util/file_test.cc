@@ -121,6 +121,16 @@ TEST_F(FileTest, GetAbsolutePath) {
   EXPECT_EQ("/home/work/./xx.txt", GetAbsolutePath("/home/work", "./xx.txt"));
 }
 
+TEST_F(FileTest, GetFileNamesInFolderById) {
+  std::string data_path = "modules/perception/data/hm_tracker_test/";
+  std::vector<std::string> seg_filenames;
+  GetFileNamesInFolderById(data_path, ".seg", &seg_filenames);
+  std::vector<std::string> pose_filenames;
+  GetFileNamesInFolderById(data_path, ".pose", &pose_filenames);
+  EXPECT_EQ(seg_filenames.size(), 8);
+  EXPECT_EQ(pose_filenames.size(), 8);
+}
+
 }  // namespace util
 }  // namespace common
 }  // namespace apollo

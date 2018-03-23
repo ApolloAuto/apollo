@@ -23,10 +23,16 @@
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 #include "modules/perception/obstacle/onboard/fusion_subnode.h"
+#include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
+#include "modules/perception/obstacle/onboard/lane_shared_data.h"
 #include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
+#include "modules/perception/obstacle/onboard/camera_shared_data.h"
+#include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 #include "modules/perception/obstacle/onboard/radar_process_subnode.h"
+#include "modules/perception/obstacle/onboard/visualization_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_preprocessor_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_proc_subnode.h"
 
@@ -50,7 +56,7 @@ Status Perception::Init() {
     return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init ConfigManager.");
   }
   AINFO << "Init config manager successfully, work_root: "
-        << config_manager->work_root();
+        << config_manager->WorkRoot();
 
   const std::string dag_config_path = apollo::common::util::GetAbsolutePath(
       FLAGS_work_root, FLAGS_dag_config_path);
@@ -69,11 +75,19 @@ void Perception::RegistAllOnboardClass() {
   /// regist sharedata
   RegisterFactoryLidarObjectData();
   RegisterFactoryRadarObjectData();
+  RegisterFactoryCameraObjectData();
+  RegisterFactoryCameraSharedData();
+  RegisterFactoryLaneSharedData();
+  RegisterFactoryFusionSharedData();
   traffic_light::RegisterFactoryTLPreprocessingData();
+
   /// regist subnode
   RegisterFactoryLidarProcessSubnode();
   RegisterFactoryRadarProcessSubnode();
+  RegisterFactoryCameraProcessSubnode();
+  RegisterFactoryLanePostProcessingSubnode();
   RegisterFactoryFusionSubnode();
+  lowcostvisualizer::RegisterFactoryVisualizationSubnode();
   traffic_light::RegisterFactoryTLPreprocessorSubnode();
   traffic_light::RegisterFactoryTLProcSubnode();
 }

@@ -135,6 +135,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::CONTI_RADAR:
         EnableContiRadar(FLAGS_conti_radar_topic, config);
         break;
+      case AdapterConfig::ULTRASONIC_RADAR:
+        EnableUltrasonic(FLAGS_ultrasonic_radar_topic, config);
+        break;
       case AdapterConfig::COMPRESSED_IMAGE:
         EnableCompressedImage(FLAGS_compressed_image_topic, config);
         break;
@@ -173,6 +176,14 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::NAVIGATION:
         EnableNavigation(FLAGS_navigation_topic, config);
+        break;
+      case AdapterConfig::VOICE_DETECTION_REQUEST:
+        EnableVoiceDetectionRequest(FLAGS_voice_detection_request_topic,
+                                    config);
+        break;
+      case AdapterConfig::VOICE_DETECTION_RESPONSE:
+        EnableVoiceDetectionResponse(FLAGS_voice_detection_response_topic,
+                                     config);
         break;
       default:
         AERROR << "Unknown adapter config type!";

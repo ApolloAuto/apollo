@@ -22,6 +22,7 @@
 #include "Eigen/Core"
 
 #include "modules/perception/lib/base/registerer.h"
+#include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/traffic_light/base/light.h"
 #include "modules/perception/traffic_light/base/pose.h"
 
@@ -29,35 +30,10 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-DECLARE_string(traffic_light_projection);
-
 struct ProjectOption {
   explicit ProjectOption(const CameraId &id) : camera_id(id) {}
 
   CameraId camera_id;
-};
-
-/**
- * @brief The Basic Camera Coefficient
- */
-struct CameraCoeffient {
- public:
-  bool init(const std::string &camera_type,
-            const std::string &camera_extrinsic_file_name,
-            const std::string &camera_intrinsic_matrix_file);
-
- private:
-  bool init_camera_extrinsic_matrix(const std::string &matrix_file);
-  bool init_camera_intrinsic_matrix_and_distort_params(
-      const std::string &camera_intrinsic_file);
-
- public:
-  std::string camera_type_str;
-  Eigen::Matrix4d camera_extrinsic;
-  Eigen::Matrix<double, 3, 4> camera_intrinsic;
-  Eigen::Matrix<double, 5, 1> distort_params;
-  size_t image_height;
-  size_t image_width;
 };
 
 /**

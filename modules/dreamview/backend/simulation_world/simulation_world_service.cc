@@ -47,6 +47,7 @@ namespace dreamview {
 using apollo::canbus::Chassis;
 using apollo::common::PathPoint;
 using apollo::common::Point3D;
+using apollo::common::PointENU;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
@@ -58,6 +59,8 @@ using apollo::common::time::millis;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::GetProtoFromFile;
 using apollo::control::ControlCommand;
+using apollo::hdmap::Curve;
+using apollo::hdmap::Map;
 using apollo::hdmap::Path;
 using apollo::localization::Gps;
 using apollo::localization::LocalizationEstimate;
@@ -70,11 +73,15 @@ using apollo::planning::StopReasonCode;
 using apollo::planning_internal::PlanningData;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
+using apollo::relative_map::MapMsg;
 using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingResponse;
 
 using Json = nlohmann::json;
 using ::google::protobuf::util::MessageToJsonString;
+
+// Angle threshold is about 5.72 degree.
+static constexpr double kAngleThreshold = 0.1;
 
 namespace {
 
@@ -190,9 +197,22 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
   }
 }
 
-inline double SecToMs(const double sec) {
-  return sec * 1000.0;
+void DownsampleCurve(Curve *curve) {
+  auto *line_segment = curve->mutable_segment(0)->mutable_line_segment();
+  std::vector<PointENU> points(line_segment->point().begin(),
+                               line_segment->point().end());
+  line_segment->clear_point();
+
+  // Downsample points by angle then by distance.
+  std::vector<int> sampled_indices = DownsampleByAngle(points, kAngleThreshold);
+  for (int index : sampled_indices) {
+    auto *point = line_segment->add_point();
+    point->set_x(points[index].x());
+    point->set_y(points[index].y());
+  }
 }
+
+inline double SecToMs(const double sec) { return sec * 1000.0; }
 
 }  // namespace
 
@@ -201,7 +221,8 @@ constexpr int SimulationWorldService::kMaxMonitorItems;
 SimulationWorldService::SimulationWorldService(const MapService *map_service,
                                                bool routing_from_file)
     : map_service_(map_service),
-      monitor_logger_(apollo::common::monitor::MonitorMessageItem::SIMULATOR) {
+      monitor_logger_(MonitorMessageItem::SIMULATOR),
+      ready_to_push_(false) {
   RegisterMessageCallbacks();
   if (routing_from_file) {
     ReadRoutingFromFile(FLAGS_routing_response_file);
@@ -213,7 +234,6 @@ SimulationWorldService::SimulationWorldService(const MapService *map_service,
   auto_driving_car->set_height(vehicle_param.height());
   auto_driving_car->set_width(vehicle_param.width());
   auto_driving_car->set_length(vehicle_param.length());
-  auto_driving_car->set_steering_ratio(vehicle_param.steer_ratio());
 }
 
 void SimulationWorldService::Update() {
@@ -259,6 +279,8 @@ void SimulationWorldService::Update() {
   UpdateWithLatestObserved("ControlCommand",
                            AdapterManager::GetControlCommand());
   UpdateWithLatestObserved("Navigation", AdapterManager::GetNavigation());
+  UpdateWithLatestObserved("RelativeMap", AdapterManager::GetRelativeMap());
+
   for (const auto &kv : obj_map_) {
     *world_.add_object() = kv.second;
   }
@@ -281,6 +303,8 @@ void SimulationWorldService::UpdateDelays() {
       SecToMs(AdapterManager::GetPrediction()->GetDelaySec()));
   delays->set_traffic_light(
       SecToMs(AdapterManager::GetTrafficLightDetection()->GetDelaySec()));
+  delays->set_control(
+      SecToMs(AdapterManager::GetControlCommand()->GetDelaySec()));
 }
 
 void SimulationWorldService::GetWireFormatString(
@@ -321,6 +345,10 @@ void SimulationWorldService::PopulateMapInfo(double radius) {
   GetMapElementIds(radius, world_.mutable_map_element_ids());
   world_.set_map_hash(map_service_->CalculateMapHash(world_.map_element_ids()));
   world_.set_map_radius(radius);
+}
+
+const Map &SimulationWorldService::GetRelativeMap() const {
+  return relative_map_;
 }
 
 template <>
@@ -372,6 +400,8 @@ void SimulationWorldService::UpdateSimulationWorld(
   // message header. It is done on both the SimulationWorld object
   // itself and its auto_driving_car() field.
   auto_driving_car->set_timestamp_sec(localization.header().timestamp_sec());
+
+  ready_to_push_.store(true);
 }
 
 template <>
@@ -538,12 +568,12 @@ void SimulationWorldService::UpdatePlanningTrajectory(
   }
 }
 
-void SimulationWorldService::UpdateMainDecision(
+void SimulationWorldService::UpdateMainStopDecision(
     const apollo::planning::MainDecision &main_decision,
-    double update_timestamp_sec, Object *world_main_stop) {
+    double update_timestamp_sec, Object *world_main_decision) {
   apollo::common::math::Vec2d stop_pt;
   double stop_heading = 0.0;
-  auto decision = world_main_stop->add_decision();
+  auto decision = world_main_decision->add_decision();
   decision->set_type(Decision::STOP);
   if (main_decision.has_not_ready()) {
     // The car is not ready!
@@ -570,10 +600,31 @@ void SimulationWorldService::UpdateMainDecision(
       SetStopReason(stop.reason_code(), decision);
     }
   }
-  world_main_stop->set_position_x(stop_pt.x() + map_service_->GetXOffset());
-  world_main_stop->set_position_y(stop_pt.y() + map_service_->GetYOffset());
-  world_main_stop->set_heading(stop_heading);
-  world_main_stop->set_timestamp_sec(update_timestamp_sec);
+
+  decision->set_position_x(stop_pt.x() + map_service_->GetXOffset());
+  decision->set_position_y(stop_pt.y() + map_service_->GetYOffset());
+  decision->set_heading(stop_heading);
+
+  world_main_decision->set_position_x(decision->position_x());
+  world_main_decision->set_position_y(decision->position_y());
+  world_main_decision->set_heading(decision->heading());
+  world_main_decision->set_timestamp_sec(update_timestamp_sec);
+}
+
+template <typename MainDecision>
+void SimulationWorldService::UpdateMainChangeLaneDecision(
+    const MainDecision &decision, Object *world_main_decision) {
+  if (decision.has_change_lane_type() &&
+      (decision.change_lane_type() == apollo::routing::ChangeLaneType::LEFT ||
+       decision.change_lane_type() == apollo::routing::ChangeLaneType::RIGHT)) {
+    auto *change_lane_decision = world_main_decision->add_decision();
+    change_lane_decision->set_change_lane_type(decision.change_lane_type());
+    change_lane_decision->set_position_x(
+        world_.auto_driving_car().position_x() + map_service_->GetXOffset());
+    change_lane_decision->set_position_y(
+        world_.auto_driving_car().position_y() + map_service_->GetYOffset());
+    change_lane_decision->set_heading(world_.auto_driving_car().heading());
+  }
 }
 
 bool SimulationWorldService::LocateMarker(
@@ -634,19 +685,24 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   UpdateTurnSignal(decision_res.vehicle_signal(),
                    world_.mutable_auto_driving_car());
 
-  apollo::planning::MainDecision main_decision = decision_res.main_decision();
+  const auto &main_decision = decision_res.main_decision();
 
   // Update speed limit.
   if (main_decision.target_lane_size() > 0) {
     world_.set_speed_limit(main_decision.target_lane(0).speed_limit());
   }
 
-  // Update relevant main stop with reason.
-  world_.clear_main_stop();
+  // Update relevant main stop with reason and change lane.
+  world_.clear_main_decision();
+  Object *world_main_decision = world_.mutable_main_decision();
   if (main_decision.has_not_ready() || main_decision.has_estop() ||
       main_decision.has_stop()) {
-    Object *world_main_stop = world_.mutable_main_stop();
-    UpdateMainDecision(main_decision, header_time, world_main_stop);
+    UpdateMainStopDecision(main_decision, header_time, world_main_decision);
+  }
+  if (main_decision.has_stop()) {
+    UpdateMainChangeLaneDecision(main_decision.stop(), world_main_decision);
+  } else if (main_decision.has_cruise()) {
+    UpdateMainChangeLaneDecision(main_decision.cruise(), world_main_decision);
   }
 
   // Update obstacle decision.
@@ -690,8 +746,8 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
   }
 }
 
-void SimulationWorldService::DownsamplePath(
-    const apollo::common::Path &path, apollo::common::Path *downsampled_path) {
+void SimulationWorldService::DownsamplePath(const common::Path &path,
+                                            common::Path *downsampled_path) {
   auto sampled_indices = DownsampleByAngle(path.path_point(), kAngleThreshold);
 
   downsampled_path->set_name(path.name());
@@ -932,12 +988,29 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   if (control_command.has_debug()) {
     auto &debug = control_command.debug();
-    if (debug.has_simple_lon_debug() &&
-        debug.simple_lon_debug().has_station_error()) {
-      control_data->set_station_error(debug.simple_lon_debug().station_error());
-    } else if (debug.has_simple_mpc_debug() &&
-               debug.simple_mpc_debug().has_station_error()) {
-      control_data->set_station_error(debug.simple_mpc_debug().station_error());
+    if (debug.has_simple_lon_debug() && debug.has_simple_lat_debug()) {
+      auto &simple_lon = debug.simple_lon_debug();
+      if (simple_lon.has_station_error()) {
+        control_data->set_station_error(simple_lon.station_error());
+      }
+      auto &simple_lat = debug.simple_lat_debug();
+      if (simple_lat.has_heading_error()) {
+        control_data->set_heading_error(simple_lat.heading_error());
+      }
+      if (simple_lat.has_lateral_error()) {
+        control_data->set_lateral_error(simple_lat.lateral_error());
+      }
+    } else if (debug.has_simple_mpc_debug()) {
+      auto &simple_mpc = debug.simple_mpc_debug();
+      if (simple_mpc.has_station_error()) {
+        control_data->set_station_error(simple_mpc.station_error());
+      }
+      if (simple_mpc.has_heading_error()) {
+        control_data->set_heading_error(simple_mpc.heading_error());
+      }
+      if (simple_mpc.has_lateral_error()) {
+        control_data->set_lateral_error(simple_mpc.lateral_error());
+      }
     }
   }
 }
@@ -949,6 +1022,24 @@ void SimulationWorldService::UpdateSimulationWorld(
   for (auto &navigation_path : navigation_info.navigation_path()) {
     if (navigation_path.has_path()) {
       DownsamplePath(navigation_path.path(), world_.add_navigation_path());
+    }
+  }
+}
+
+template <>
+void SimulationWorldService::UpdateSimulationWorld(const MapMsg &map_msg) {
+  if (map_msg.has_hdmap()) {
+    relative_map_.CopyFrom(map_msg.hdmap());
+    for (int i = 0; i < relative_map_.lane_size(); ++i) {
+      auto *lane = relative_map_.mutable_lane(i);
+      lane->clear_left_sample();
+      lane->clear_right_sample();
+      lane->clear_left_road_sample();
+      lane->clear_right_road_sample();
+
+      DownsampleCurve(lane->mutable_central_curve());
+      DownsampleCurve(lane->mutable_left_boundary()->mutable_curve());
+      DownsampleCurve(lane->mutable_right_boundary()->mutable_curve());
     }
   }
 }

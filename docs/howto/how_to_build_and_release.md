@@ -48,7 +48,7 @@ The command will push your most recent release docker image to the docker hub.
 
 ## <span id="build_in_vscode">Build in Visual Studio Code</span>
 ### Install VSCode
-The easiest way to install for Debian/Ubuntu based distributions is to download in https://code.visualstudio.com and install the .deb package (64-bit) either through the graphical software center if it's available or through the command line with:
+The easiest way to install for Debian/Ubuntu based distributions is to download from  https://code.visualstudio.com and install the .deb package (64-bit) either through the graphical software center if it's available or through the command line with:
 ```bash
 sudo dpkg -i <file>.deb
 sudo apt-get install -f # Install dependencies
@@ -62,8 +62,14 @@ code
 Use the keyboard shortcut (Ctrl+K Ctrl+O) to open the Apollo project. 
 ### Build the Apollo project in VSCode
 Use the keyboard shortcut (Ctrl+Shift+B) to build the Apollo project. 
+### Run all unit tests for the Apollo project in VSCode
+Select the "Tasks->Run Tasks..." menu command and click "run all unit tests for the apollo project" from a popup menu to check the code style for the Apollo project. 
+### Run a code style check task for the Apollo project in VSCode
+Select the "Tasks->Run Tasks..." menu command and click "code style check for the apollo project" from a popup menu to check the code style for the Apollo project. 
+### Clean the Apollo project in VSCode
+Select the "Tasks->Run Tasks..." menu command and click "clean the apollo project" from a popup menu to clean the Apollo project. 
 ### Change the building option
- you can change the "build" option to an other one such as "build_gpu" (refer to the "apollo.sh" file for details) in ".vscode/tasks.json"
+ You can change the "build" option to another one such as "build_gpu" (refer to the "apollo.sh" file for details) in ".vscode/tasks.json"
 
 ## <span id="test">Test</span>
 ```bash

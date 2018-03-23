@@ -48,6 +48,16 @@ TEST(StringUtilTest, IterPrinter) {
   EXPECT_EQ("1", PrintIter(data + 1, data + 2, ", "));
 }
 
+TEST(StringUtilTest, Base64Decode) {
+  EXPECT_EQ("", Base64Decode(""));
+  EXPECT_EQ("f", Base64Decode("Zg=="));
+  EXPECT_EQ("fo", Base64Decode("Zm8="));
+  EXPECT_EQ("foo", Base64Decode("Zm9v"));
+  EXPECT_EQ("foob", Base64Decode("Zm9vYg=="));
+  EXPECT_EQ("fooba", Base64Decode("Zm9vYmE="));
+  EXPECT_EQ("foobar", Base64Decode("Zm9vYmFy"));
+}
+
 }  // namespace util
 }  // namespace common
 }  // namespace apollo

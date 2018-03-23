@@ -28,7 +28,7 @@ namespace apollo {
 namespace perception {
 
 using std::string;
-using std::map;
+using std::unordered_map;
 using std::vector;
 
 using google::protobuf::TextFormat;
@@ -39,6 +39,9 @@ DEFINE_int32(max_allowed_congestion_value, 0,
              "(default is 0, disable this feature.)");
 DEFINE_bool(enable_timing_remove_stale_data, true,
             "whether timing clean shared data");
+
+SubnodeMap DAGStreaming::subnode_map_;
+std::unordered_map<std::string, SubnodeID> DAGStreaming::subnode_name_map_;
 
 DAGStreaming::DAGStreaming()
     : Thread(true, "DAGStreamingThread"),
@@ -120,13 +123,13 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
   const DAGConfig::SubnodeConfig& subnode_config = dag_config.subnode_config();
   const DAGConfig::EdgeConfig& edge_config = dag_config.edge_config();
 
-  map<SubnodeID, DAGConfig::Subnode> subnode_config_map;
-  map<SubnodeID, vector<EventID>> subnode_sub_events_map;
-  map<SubnodeID, vector<EventID>> subnode_pub_events_map;
+  unordered_map<SubnodeID, DAGConfig::Subnode> subnode_config_map;
+  unordered_map<SubnodeID, vector<EventID>> subnode_sub_events_map;
+  unordered_map<SubnodeID, vector<EventID>> subnode_pub_events_map;
 
   for (auto& subnode_proto : subnode_config.subnodes()) {
-    std::pair<map<SubnodeID, DAGConfig::Subnode>::iterator, bool> result =
-        subnode_config_map.insert(
+    std::pair<unordered_map<SubnodeID, DAGConfig::Subnode>::iterator, bool>
+        result = subnode_config_map.insert(
             std::make_pair(subnode_proto.id(), subnode_proto));
     if (!result.second) {
       AERROR << "duplicate SubnodeID: " << subnode_proto.id();
@@ -163,15 +166,15 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
       return false;
     }
 
-    bool result = inst->Init(
-        subnode_config, &event_manager_, &shared_data_manager_,
-        subnode_sub_events_map[subnode_id], subnode_pub_events_map[subnode_id]);
+    bool result = inst->Init(subnode_config, subnode_sub_events_map[subnode_id],
+                             subnode_pub_events_map[subnode_id],
+                             &event_manager_, &shared_data_manager_);
     if (!result) {
       AERROR << "failed to Init subnode. name: " << inst->name();
       return false;
     }
     subnode_map_.emplace(subnode_id, std::unique_ptr<Subnode>(inst));
-
+    subnode_name_map_[subnode_config.name()] = subnode_id;
     AINFO << "Init subnode succ. " << inst->DebugString();
   }
 
@@ -223,6 +226,15 @@ void DAGStreamingMonitor::Run() {
     }
     sleep(1);
   }
+}
+
+Subnode* DAGStreaming::GetSubnodeByName(std::string name) {
+  std::unordered_map<std::string, SubnodeID>::iterator iter =
+      subnode_name_map_.find(name);
+  if (iter != subnode_name_map_.end()) {
+    return subnode_map_[iter->second].get();
+  }
+  return nullptr;
 }
 
 }  // namespace perception

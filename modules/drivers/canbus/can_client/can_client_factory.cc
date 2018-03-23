@@ -33,9 +33,11 @@ namespace canbus {
 CanClientFactory::CanClientFactory() {}
 
 void CanClientFactory::RegisterCanClients() {
+  AINFO << "CanClientFactory::RegisterCanClients";
   Register(CANCardParameter::FAKE_CAN,
            []() -> CanClient* { return new can::FakeCanClient(); });
 #if USE_ESD_CAN
+  AINFO << "register can: " << CANCardParameter::ESD_CAN;
   Register(CANCardParameter::ESD_CAN,
            []() -> CanClient* { return new can::EsdCanClient(); });
 #endif

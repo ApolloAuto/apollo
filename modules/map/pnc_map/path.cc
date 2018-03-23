@@ -27,6 +27,9 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/string_util.h"
 
+// https://nacto.org/publication/urban-street-design-guide/street-design-elements/lane-width/
+DEFINE_double(default_lane_width, 3.048, "default lane width is about 10 feet");
+
 namespace apollo {
 namespace hdmap {
 
@@ -322,9 +325,9 @@ void Path::InitWidth() {
   for (int i = 0; i < num_sample_points_; ++i) {
     const MapPathPoint point = GetSmoothPoint(s);
     if (point.lane_waypoints().empty()) {
-      left_width_.push_back(0.0);
-      right_width_.push_back(0.0);
-      AERROR << "path point:" << point.DebugString() << " has invalid width.";
+      left_width_.push_back(FLAGS_default_lane_width / 2.0);
+      right_width_.push_back(FLAGS_default_lane_width / 2.0);
+      AWARN << "path point:" << point.DebugString() << " has invalid width.";
     } else {
       const LaneWaypoint waypoint = point.lane_waypoints()[0];
       CHECK_NOTNULL(waypoint.lane);

@@ -21,7 +21,7 @@
 #include "modules/common/util/string_util.h"
 
 DEFINE_string(vehicle_data_config_filename,
-              "modules/dreamview/conf/vehicle_data.pb.txt",
+              "/apollo/modules/dreamview/conf/vehicle_data.pb.txt",
               "Vehicle data config file.");
 
 namespace apollo {

@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 
 namespace apollo {
 namespace perception {
@@ -32,6 +32,16 @@ enum class ObjectType {
   BICYCLE = 4,
   VEHICLE = 5,
   MAX_OBJECT_TYPE = 6,
+};
+
+enum InternalObjectType {
+  INT_BACKGROUND = 0,
+  INT_SMALLMOT = 1,
+  INT_PEDESTRIAN = 2,
+  INT_NONMOT = 3,
+  INT_BIGMOT = 4,
+  INT_UNKNOWN = 5,
+  INT_MAX_OBJECT_TYPE = 6,
 };
 
 enum class SensorType {
@@ -53,10 +63,13 @@ typedef pcl_util::PointDCloud PolygonDType;
 
 using SeqId = uint32_t;
 
+std::string GetObjectName(const ObjectType& obj_type);
+
 std::string GetSensorType(SensorType sensor_type);
 
 bool is_lidar(SensorType sensor_type);
 bool is_radar(SensorType sensor_type);
+bool is_camera(SensorType sensor_type);
 
 }  // namespace perception
 }  // namespace apollo

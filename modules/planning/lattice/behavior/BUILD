@@ -12,15 +12,15 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
-        "//modules/common/math:box2d",
+        "//modules/common/math:geometry",
         "//modules/common/proto:common_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/lattice/behavior:path_time_graph",
-        "//modules/planning/lattice/behavior:scenario_manager",
         "//modules/planning/lattice/behavior:prediction_querier",
+        "//modules/planning/lattice/behavior:scenario_manager",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
@@ -59,10 +59,10 @@ cc_library(
     ],
     deps = [
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/proto:common_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util:map_util",
-        "//modules/common/configs:vehicle_config_helper",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
@@ -88,11 +88,11 @@ cc_library(
 
 cc_library(
     name = "path_time_graph",
-    hdrs = [
-        "path_time_graph.h",
-    ],
     srcs = [
         "path_time_graph.cc",
+    ],
+    hdrs = [
+        "path_time_graph.h",
     ],
     deps = [
         "//modules/common",
@@ -117,7 +117,7 @@ cc_library(
         "prediction_querier.h",
     ],
     deps = [
-        "//modules/common/math:math",
+        "//modules/common/math",
         "//modules/common/math:path_matcher",
         "//modules/planning/common:obstacle",
         "//modules/planning/proto:lattice_structure_proto",

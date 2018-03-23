@@ -33,6 +33,7 @@ Object::Object() {
   type_probs.resize(static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0);
   position_uncertainty << 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01;
   velocity_uncertainty << 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01;
+  uncertainty << 0.01, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0.01;
 }
 
 void Object::clone(const Object& rhs) {
@@ -41,6 +42,11 @@ void Object::clone(const Object& rhs) {
   radar_supplement = nullptr;
   if (rhs.radar_supplement != nullptr) {
     radar_supplement.reset(new RadarSupplement(*rhs.radar_supplement));
+  }
+  camera_supplement = nullptr;
+  if (rhs.camera_supplement != nullptr) {
+    camera_supplement.reset(new CameraSupplement());
+    camera_supplement->clone(*(rhs.camera_supplement));
   }
 }
 

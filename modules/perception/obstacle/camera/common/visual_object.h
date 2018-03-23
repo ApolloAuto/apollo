@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H_
 
-#include <Eigen/Core>
 #include <memory>
 #include <vector>
+
+#include "Eigen/Core"
 
 #include "modules/perception/obstacle/base/types.h"
 
@@ -38,6 +39,16 @@ struct alignas(16) VisualObject {
   // lower-right corner: x2, y2
   Eigen::Vector2f lower_right;
 
+  // front box upper-left corner: x1, y1
+  Eigen::Vector2d front_upper_left;
+  // front box  lower-right corner: x2, y2
+  Eigen::Vector2d front_lower_right;
+
+  // front box upper-left corner: x1, y1
+  Eigen::Vector2d back_upper_left;
+  // front box  lower-right corner: x2, y2
+  Eigen::Vector2d back_lower_right;
+
   // 2D bounding box truncation ratio, for out-of-image objects
   float trunc_width = 0.0f;
   float trunc_height = 0.0f;
@@ -48,7 +59,12 @@ struct alignas(16) VisualObject {
   std::vector<float> type_probs;
 
   // ROI pooling feature from layers of deep learning detection model
-  std::vector<float> dl_roi_feature;
+  std::vector<float> object_feature;
+
+  // Internal object classification type.
+  InternalObjectType internal_type;
+  // Internal probability of each type, used for track type.
+  float internal_type_probs[INT_MAX_OBJECT_TYPE];
 
   // [meter] physical size of 3D oriented bounding box
   // length is the size in the main direction
@@ -58,13 +74,14 @@ struct alignas(16) VisualObject {
 
   // [radian] observation angle of object, ranging as [-pi, pi]
   float alpha = 0.0f;
+
   // [radian] Rotation around the vertical axis, ranging as [-pi, pi]
   // the yaw angle, theta = 0.0f means direction = (1, 0, 0)
   float theta = 0.0f;
   // main direction
   Eigen::Vector3f direction = Eigen::Vector3f(1.0f, 0.0f, 0.0f);
 
-  // [meter] physical center of the object, (cx, cy, cz)
+  // [meter] center of the object
   Eigen::Vector3f center = Eigen::Vector3f::Zero();
   // [meter] distance to object physical center from camera origin
   float distance = 0.0f;
@@ -74,9 +91,9 @@ struct alignas(16) VisualObject {
   // globally unique tracking id for camera visual objects
   int track_id = 0;
   // [second] age of the tracked object
-  float track_age = 0.0f;
+  double track_age = 0.0;
   // [second] the last observed timestamp
-  float last_track_timestamp = 0.0f;
+  double last_track_timestamp = 0.0;
 };
 
 typedef std::shared_ptr<VisualObject> VisualObjectPtr;
@@ -85,4 +102,4 @@ typedef std::shared_ptr<const VisualObject> VisualObjectConstPtr;
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_COMMON_VISUAL_OBJECT_H_

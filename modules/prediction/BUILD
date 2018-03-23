@@ -16,7 +16,7 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/adapters/proto:adapter_config_proto",
-        "//modules/common/math:vec2d",
+        "//modules/common/math:geometry",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/time",
         "//modules/common/util",

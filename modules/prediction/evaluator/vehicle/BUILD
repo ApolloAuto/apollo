@@ -11,13 +11,12 @@ cc_library(
         "mlp_evaluator.h",
     ],
     deps = [
-        "//modules/common/configs:config_gflags",
-        "//modules/common/math:math_utils",
+        "//modules/common/math:geometry",
         "//modules/common/util",
         "//modules/map/proto:map_proto",
+        "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
-        "//modules/prediction/common:feature_output",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/evaluator",
         "//modules/prediction/proto:fnn_vehicle_model_proto",
@@ -57,12 +56,12 @@ cc_library(
     deps = [
         "//modules/common/util",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_map",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/evaluator",
+        "//modules/prediction/network/rnn_model",
         "//modules/prediction/proto:network_model_proto",
-        "//modules/prediction/common:prediction_map",
-        "//modules/prediction/network/rnn_model:rnn_model",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -85,5 +84,26 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "cost_evaluator",
+    srcs = [
+        "cost_evaluator.cc",
+    ],
+    hdrs = [
+        "cost_evaluator.h",
+    ],
+    deps = [
+        "//modules/common/math:geometry",
+        "//modules/common/util",
+        "//modules/map/proto:map_proto",
+        "//modules/prediction/common:feature_output",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_util",
+        "//modules/prediction/container/obstacles:obstacle",
+        "//modules/prediction/evaluator",
+        "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/proto:lane_graph_proto",
+    ],
+)
 
 cpplint()

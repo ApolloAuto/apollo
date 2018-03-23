@@ -27,7 +27,6 @@
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/pose/pose_container.h"
-#include "modules/prediction/container/obstacles/obstacle_clusters.h"
 
 namespace apollo {
 namespace prediction {
@@ -81,7 +80,6 @@ class ObstaclesContainer : public Container {
 
  private:
   double timestamp_ = -1.0;
-  ObstacleClusters clusters_;
   common::util::LRUCache<int, Obstacle> obstacles_;
 };
 

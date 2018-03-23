@@ -79,21 +79,14 @@ Status Prediction::Init() {
   EvaluatorManager::instance()->Init(prediction_conf_);
   PredictorManager::instance()->Init(prediction_conf_);
 
-  CHECK(AdapterManager::GetLocalization()) << "Localization is not ready.";
-  CHECK(AdapterManager::GetPerceptionObstacles()) << "Perception is not ready.";
-  if (FLAGS_use_navigation_mode) {
-    CHECK(AdapterManager::GetRelativeMap());
-  }
+  CHECK(AdapterManager::GetLocalization()) << "Localization is not registered.";
+  CHECK(AdapterManager::GetPerceptionObstacles())
+      << "Perception is not registered.";
 
-  if (FLAGS_use_navigation_mode) {
-    // Set relative map callback function
-    AdapterManager::AddRelativeMapCallback(&Prediction::OnRelativeMap, this);
-  } else {
-    // Set localization callback function
-    AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
-    // Set planning callback function
-    AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
-  }
+  // Set localization callback function
+  AdapterManager::AddLocalizationCallback(&Prediction::OnLocalization, this);
+  // Set planning callback function
+  AdapterManager::AddPlanningCallback(&Prediction::OnPlanning, this);
   // Set perception obstacle callback function
   AdapterManager::AddPerceptionObstaclesCallback(&Prediction::RunOnce, this);
 
@@ -140,15 +133,18 @@ void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
          << "].";
 }
 
-void Prediction::OnRelativeMap(const relative_map::MapMsg& relative_map) {
-  // TODO(kechxu): implement
-}
-
 void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0 &&
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
     ros::shutdown();
+  }
+
+  AdapterManager::Observe();
+
+  if (FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
+    AERROR << "Relative map is empty.";
+    return;
   }
 
   double start_timestamp = Clock::NowInSeconds();
@@ -215,11 +211,6 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   }
 
   Publish(&prediction_obstacles);
-}
-
-void Prediction::PredictOnNavigation(
-    const PerceptionObstacles& perception_obstacles) {
-  // TODO(kechxu): implement
 }
 
 Status Prediction::OnError(const std::string& error_msg) {

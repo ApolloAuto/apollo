@@ -117,6 +117,7 @@ proto_library(
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/localization/proto:localization_proto_lib",
+        "//modules/map/relative_map/proto:navigation_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
         "//modules/prediction/proto:prediction_proto_lib",
         "//modules/routing/proto:routing_proto_lib",
@@ -200,6 +201,20 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "traffic_rule_config_proto",
+    deps = [
+        ":traffic_rule_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "traffic_rule_config_proto_lib",
+    srcs = [
+        "traffic_rule_config.proto",
+    ],
+)
+
+cc_proto_library(
     name = "spiral_curve_config_proto",
     deps = [
         ":spiral_curve_config_proto_lib",
@@ -228,16 +243,21 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "planning_state_proto",
+    name = "planning_status_proto",
     deps = [
-        ":planning_state_proto_lib",
+        ":planning_status_proto_lib",
     ],
 )
 
 proto_library(
-    name = "planning_state_proto_lib",
+    name = "planning_status_proto_lib",
     srcs = [
-        "planning_state.proto",
+        "planning_status.proto",
+    ],
+    deps = [
+        ":decision_proto_lib",
+        ":planning_proto_lib",
+        "//modules/common/proto:drive_state_proto_lib",
     ],
 )
 

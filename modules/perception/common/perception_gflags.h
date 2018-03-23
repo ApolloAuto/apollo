@@ -18,7 +18,7 @@
 #define MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
 
 #include "gflags/gflags.h"
-
+#include "modules/common/configs/config_gflags.h"
 DECLARE_string(perception_adapter_config_filename);
 
 /// lib/config_manager/config_manager.cc
@@ -54,6 +54,14 @@ DECLARE_string(radar_tf2_child_frame_id);
 DECLARE_string(radar_extrinsic_file);
 DECLARE_string(short_camera_extrinsic_file);
 
+/// obstacle/onboard/camera_process_subnode.cc
+DECLARE_string(image_file_path);
+DECLARE_bool(image_file_debug);
+
+/// camera config
+DECLARE_string(front_camera_extrinsics_file);
+DECLARE_string(front_camera_intrinsics_file);
+
 /// obstacle/onboard/fusion_subnode.cc
 DECLARE_string(onboard_fusion);
 
@@ -70,5 +78,29 @@ DECLARE_double(r_matrix_amplifier);
 DECLARE_double(p_matrix_amplifier);
 DECLARE_double(a_matrix_covariance_coeffcient_1);
 DECLARE_double(a_matrix_covariance_coeffcient_2);
+
+/// calibration_config_manager.cc
+DECLARE_int32(obs_camera_detector_gpu);
+
+// obstacle/onboard/lane_post_processing_subnode.cc
+DECLARE_string(onboard_lane_post_processor);
+
+/// visualization
+DECLARE_bool(show_camera_objects);
+DECLARE_bool(show_radar_objects);
+
+DECLARE_bool(show_fused_objects);
+DECLARE_bool(show_fusion_association);
+DECLARE_bool(capture_screen);
+DECLARE_string(screen_output_dir);
+
+DECLARE_bool(show_camera_objects2d);
+DECLARE_bool(show_camera_parsing);
+DECLARE_string(frame_visualizer);
+
+DECLARE_bool(show_motion);
+// async fusion using imf
+DECLARE_bool(async_fusion);
+DECLARE_bool(use_distance_angle_fusion);
 
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_

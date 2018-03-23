@@ -32,7 +32,7 @@ namespace planning {
 
 class CIPV : public TrafficRule {
  public:
-  explicit CIPV(const RuleConfig& config);
+  explicit CIPV(const TrafficRuleConfig& config);
   ~CIPV() = default;
 
   bool ApplyRule(Frame* frame, ReferenceLineInfo* reference_line_info);
