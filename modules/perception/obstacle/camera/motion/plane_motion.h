@@ -19,7 +19,7 @@
 
 #include <cmath>
 #include <cstdio>
-
+#include <list>
 #include <memory>
 
 #include "Eigen/Dense"
@@ -34,23 +34,23 @@ namespace perception {
 class PlaneMotion {
  public:
   explicit PlaneMotion(int s);
-  explicit PlaneMotion(int s, bool sync_time_stamp, float time_unit);
 
   ~PlaneMotion(void);
   enum { ACCUM_MOTION = 0, ACCUM_PUSH_MOTION, PUSH_ACCUM_MOTION };
 
  private:
+  std::list<VehicleStatus> raw_motion_queue_;
   MotionBufferPtr mot_buffer_;
   int buffer_size_;
-  float time_unit_;
   int time_increment_;     // the time increment units in motion input
   float time_difference_;  // the time difference for each buffer input
   Eigen::Matrix3f mat_motion_2d_image_ = Eigen::Matrix3f::Identity();
   // motion matrix of accumulation through high sampling CAN+IMU input sequence
   void generate_motion_matrix(
       VehicleStatus *vehicledata);  // generate inverse motion
-  void accumulate_motion(VehicleStatus *vehicledata, float motion_time_dif);
-  void update_motion_buffer(VehicleStatus *vehicledata);
+  void accumulate_motion(double start_time, double end_time);
+  void update_motion_buffer(VehicleStatus vehicledata,
+        double pre_image_timestamp, double image_timestamp);
 
  public:
   void cleanbuffer() {
@@ -75,7 +75,12 @@ class PlaneMotion {
 
   // void init(int s) { set_buffer_size(s); }
 
-  void add_new_motion(VehicleStatus *vehicledata, float motion_time_dif,
+//   void add_new_motion(VehicleStatus *vehicledata, float motion_time_dif,
+//                      int motion_operation_flag);
+
+  void add_new_motion(VehicleStatus *vehicledata,
+                      double pre_image_timestamp,
+                      double image_timestamp,
                       int motion_operation_flag);
 
   MotionBufferPtr get_buffer() { return mot_buffer_; }
