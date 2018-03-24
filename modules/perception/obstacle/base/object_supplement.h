@@ -17,8 +17,8 @@
 #define MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_SUPPLEMENT_H_
 
 #include <boost/circular_buffer.hpp>
-#include <opencv2/opencv.hpp>
 #include <memory>
+#include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
 #include "Eigen/Core"
@@ -32,7 +32,7 @@ struct alignas(16) RadarSupplement {
   RadarSupplement();
   ~RadarSupplement();
   RadarSupplement(const RadarSupplement& rhs);
-  RadarSupplement& operator = (const RadarSupplement& rhs);
+  RadarSupplement& operator=(const RadarSupplement& rhs);
   void clone(const RadarSupplement& rhs);
 
   // distance
@@ -47,16 +47,16 @@ typedef std::shared_ptr<RadarSupplement> RadarSupplementPtr;
 typedef std::shared_ptr<const RadarSupplement> RadarSupplementConstPtr;
 
 struct alignas(16) RadarFrameSupplement {
-    RadarFrameSupplement();
-    ~RadarFrameSupplement();
-    RadarFrameSupplement(const RadarFrameSupplement& rhs);
-    RadarFrameSupplement& operator = (const RadarFrameSupplement& rhs);
-    void clone(const RadarFrameSupplement& rhs);
+  RadarFrameSupplement();
+  ~RadarFrameSupplement();
+  RadarFrameSupplement(const RadarFrameSupplement& rhs);
+  RadarFrameSupplement& operator=(const RadarFrameSupplement& rhs);
+  void clone(const RadarFrameSupplement& rhs);
 };
 
 typedef std::shared_ptr<RadarFrameSupplement> RadarFrameSupplementPtr;
 typedef std::shared_ptr<const RadarFrameSupplement>
-        RadarFrameSupplementConstPtr;
+    RadarFrameSupplementConstPtr;
 
 struct alignas(16) CameraFrameSupplement {
   CameraFrameSupplement();
@@ -117,8 +117,8 @@ typedef std::shared_ptr<const CameraSupplement> CameraSupplementConstPtr;
 struct alignas(16) VehicleStatus {
   float yaw_rate;
   float velocity;
-  double time_ts;            // time stamp
-  double time_d;            // time stamp difference in image
+  double time_ts;          // time stamp
+  double time_d;           // time stamp difference in image
   Eigen::Matrix3f motion;  // Motion Matrix
 };
 

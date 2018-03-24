@@ -92,7 +92,7 @@ bool VisualizationSubnode::InitInternal() {
 
   // init motion service
   if (motion_event_id_ != -1) {
-      motion_service_ = dynamic_cast<MotionService*>(
+    motion_service_ = dynamic_cast<MotionService*>(
         DAGStreaming::GetSubnodeByName("MotionService"));
     if (motion_service_ == NULL) {
       AERROR << "motion service not inited";
@@ -236,7 +236,7 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
                                 objs->objects,
                                 (*(objs->camera_frame_supplement)));
   } else if (event.event_id == motion_event_id_) {
-//    AINFO << "Vis_subnode: motion_event_id_" << motion_event_id_;
+    //    AINFO << "Vis_subnode: motion_event_id_" << motion_event_id_;
     MotionBufferPtr motion_buffer = motion_service_->GetMotionBuffer();
     if (motion_buffer == nullptr) {
       AINFO << "motion_buffer is null";
@@ -314,7 +314,7 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
 
 apollo::common::Status VisualizationSubnode::ProcEvents() {
   for (auto event_meta : sub_meta_events_) {
-//    AINFO <<"Vis_sub: event_meta id: " << event_meta.event_id;
+    //    AINFO <<"Vis_sub: event_meta id: " << event_meta.event_id;
     std::vector<Event> events;
     if (!SubscribeEvents(event_meta, &events)) {
       return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");

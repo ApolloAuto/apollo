@@ -139,7 +139,7 @@ Status AsyncFusionSubnode::ProcEvents() {
 }
 
 Status AsyncFusionSubnode::Process(const EventMeta &event_meta,
-                              const std::vector<Event> &events) {
+                                   const std::vector<Event> &events) {
   std::vector<SensorObjects> sensor_objs;
   if (!BuildSensorObjs(events, &sensor_objs)) {
     AERROR << "Failed to build_sensor_objs";
@@ -168,7 +168,7 @@ Status AsyncFusionSubnode::Process(const EventMeta &event_meta,
 }
 
 bool AsyncFusionSubnode::SubscribeEvents(const EventMeta &event_meta,
-                                    std::vector<Event> *events) const {
+                                         std::vector<Event> *events) const {
   Event event;
   // blocking call for each of these events
   while (event_manager_->Subscribe(event_meta.event_id, &event, true)) {
@@ -205,8 +205,8 @@ bool AsyncFusionSubnode::BuildSensorObjs(
   return true;
 }
 
-bool AsyncFusionSubnode::GetSharedData(const Event &event,
-                                  std::shared_ptr<SensorObjects> *objs) const {
+bool AsyncFusionSubnode::GetSharedData(
+    const Event &event, std::shared_ptr<SensorObjects> *objs) const {
   double timestamp = event.timestamp;
   const std::string &device_id = event.reserve;
   std::string data_key;
@@ -217,12 +217,11 @@ bool AsyncFusionSubnode::GetSharedData(const Event &event,
   }
   bool get_data_succ = false;
 
-  if (event.event_id == radar_event_id_ &&
-      radar_object_data_ != nullptr) {
-      get_data_succ = radar_object_data_->Get(data_key, objs);
+  if (event.event_id == radar_event_id_ && radar_object_data_ != nullptr) {
+    get_data_succ = radar_object_data_->Get(data_key, objs);
   } else if (event.event_id == camera_event_id_ &&
-      camera_object_data_ != nullptr) {
-      get_data_succ = camera_object_data_->Get(data_key, objs);
+             camera_object_data_ != nullptr) {
+    get_data_succ = camera_object_data_->Get(data_key, objs);
   } else {
     AERROR << "Event id is not supported. event:" << event.to_string();
     return false;
@@ -255,9 +254,7 @@ bool AsyncFusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   return true;
 }
 
-void AsyncFusionSubnode::RegistAllAlgorithm() {
-  RegisterFactoryAsyncFusion();
-}
+void AsyncFusionSubnode::RegistAllAlgorithm() { RegisterFactoryAsyncFusion(); }
 
 void AsyncFusionSubnode::OnChassis(const Chassis &chassis) {
   ADEBUG << "Received chassis data: run chassis callback.";

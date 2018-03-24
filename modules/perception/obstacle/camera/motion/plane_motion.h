@@ -50,7 +50,7 @@ class PlaneMotion {
       VehicleStatus *vehicledata);  // generate inverse motion
   void accumulate_motion(double start_time, double end_time);
   void update_motion_buffer(VehicleStatus vehicledata,
-        double pre_image_timestamp, double image_timestamp);
+                            double pre_image_timestamp, double image_timestamp);
 
  public:
   void cleanbuffer() {
@@ -75,13 +75,11 @@ class PlaneMotion {
 
   // void init(int s) { set_buffer_size(s); }
 
-//   void add_new_motion(VehicleStatus *vehicledata, float motion_time_dif,
-//                      int motion_operation_flag);
+  //   void add_new_motion(VehicleStatus *vehicledata, float motion_time_dif,
+  //                      int motion_operation_flag);
 
-  void add_new_motion(VehicleStatus *vehicledata,
-                      double pre_image_timestamp,
-                      double image_timestamp,
-                      int motion_operation_flag);
+  void add_new_motion(VehicleStatus *vehicledata, double pre_image_timestamp,
+                      double image_timestamp, int motion_operation_flag);
 
   MotionBufferPtr get_buffer() { return mot_buffer_; }
 };

@@ -130,12 +130,12 @@ cc_library(
 cc_library(
     name = "fusion_subnode",
     srcs = [
-        "fusion_subnode.cc",
         "async_fusion_subnode.cc",
+        "fusion_subnode.cc",
     ],
     hdrs = [
-        "fusion_subnode.h",
         "async_fusion_subnode.h",
+        "fusion_subnode.h",
         "object_shared_data.h",
     ],
     deps = [
@@ -145,8 +145,8 @@ cc_library(
         "//modules/common/configs:config_gflags",
         "//modules/common/time",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/obstacle/fusion/probabilistic_fusion",
         "//modules/perception/obstacle/fusion/async_fusion",
+        "//modules/perception/obstacle/fusion/probabilistic_fusion",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
         "//modules/perception/onboard",
@@ -185,8 +185,8 @@ cc_library(
         ":hdmapinput",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/obstacle/fusion/probabilistic_fusion",
         "//modules/perception/obstacle/fusion/async_fusion",
+        "//modules/perception/obstacle/fusion/probabilistic_fusion",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
         "//modules/perception/obstacle/onboard:lidar_process",
