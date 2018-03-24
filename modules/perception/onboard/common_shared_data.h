@@ -51,8 +51,8 @@ struct CommonSharedDataKey {
       : timestamp(ts), device_id(id) {}
   virtual std::string ToString() const {
     return device_id +
-           (boost::format("%d") %
-            static_cast<int>(timestamp * FLAGS_stamp_enlarge_factor))
+           (boost::format("%ld") %
+            static_cast<int64_t>(timestamp * FLAGS_stamp_enlarge_factor))
                .str();
   }
   double timestamp = 0.0;
@@ -203,6 +203,7 @@ bool CommonSharedData<M>::Add(const CommonSharedDataKey &key,
                               const SharedDataPtr<M> &data) {
   // update latest_timestamp for SharedData
   latest_timestamp_ = std::max(latest_timestamp_, key.timestamp);
+  // latest_timestamp_ = key.timestamp;
   return Add(key.ToString(), data);
 }
 

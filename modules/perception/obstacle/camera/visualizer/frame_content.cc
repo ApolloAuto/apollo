@@ -155,6 +155,7 @@ void FrameContent::set_motion_content(double timestamp,
   MotionContent motion_content;
   motion_content.motion_frame_content_ = *motion_buffer;
   motion_caches_[DoubleToMapKey(timestamp)] = motion_content;
+  AINFO << "Motion_caches size: "<< motion_caches_.size();
 }
 
 void FrameContent::update_timestamp(double ref) {
@@ -201,8 +202,8 @@ void FrameContent::update_timestamp(double ref) {
   AINFO << "FrameContent::update_timestamp() : current_lane_timestamp_";
   AINFO << std::fixed << std::setprecision(64) << current_lane_timestamp_;
 
-  float best_delta = FLT_MAX;
-  int best_ts = -1;
+  double best_delta = FLT_MAX;
+  double best_ts = -1;
 
   for (std::map<int64_t, RadarContent>::iterator it = radar_caches_.begin();
        it != radar_caches_.end(); ++it) {
@@ -224,7 +225,7 @@ void FrameContent::update_timestamp(double ref) {
   best_delta = FLT_MAX;
   best_ts = -1;
   for (auto it = fusion_caches_.begin(); it != fusion_caches_.end(); ++it) {
-    double it_ts = it->first;
+    double it_ts = MapKeyToDouble(it->first);
     double delta = fabs(it_ts - ref);
 
     if (delta < best_delta) {
@@ -242,7 +243,7 @@ void FrameContent::update_timestamp(double ref) {
   best_delta = FLT_MAX;
   best_ts = -1;
   for (auto it = gt_caches_.begin(); it != gt_caches_.end(); ++it) {
-    double it_ts = it->first;
+    double it_ts = MapKeyToDouble(it->first);
     double delta = fabs(it_ts - ref);
     if (delta < best_delta) {
       best_delta = delta;
@@ -260,7 +261,7 @@ void FrameContent::update_timestamp(double ref) {
   best_delta = FLT_MAX;
   best_ts = -1;
   for (auto it = motion_caches_.begin(); it != motion_caches_.end(); ++it) {
-    double it_ts = it->first;
+    double it_ts = MapKeyToDouble(it->first);
     double delta = fabs(it_ts - ref);
 
     if (delta < best_delta) {
@@ -279,7 +280,8 @@ void FrameContent::update_timestamp(double ref) {
         << " | camera caches num: " << camera_caches_.size()
         << " | lane caches num: " << lane_caches_.size()
         << " | fusion caches num: " << fusion_caches_.size()
-        << " | image caches num: " << image_caches_.size();
+        << " | image caches num: " << image_caches_.size()
+        << " | motion caches num: " << motion_caches_.size();
 }
 
 Eigen::Matrix4d FrameContent::get_camera_to_world_pose() {
@@ -316,6 +318,12 @@ std::vector<ObjectPtr> FrameContent::get_camera_objects() {
 const MotionBuffer FrameContent::get_motion_buffer() {
   auto it = motion_caches_.find(DoubleToMapKey(current_motion_timestamp_));
   if (it == motion_caches_.end()) {
+//    AINFO << "no motion available: " << motion_caches_.size();
+//    AINFO << "no motion available: " << current_motion_timestamp_;
+    AINFO << "no motion available: "
+          << DoubleToMapKey(current_motion_timestamp_);
+//    for (auto &iter : motion_caches_)
+//      AINFO << "motion_caches data: " << iter.first;
     return MotionBuffer(0);
   }
   MotionContent content = it->second;
