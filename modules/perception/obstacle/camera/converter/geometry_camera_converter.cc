@@ -49,9 +49,9 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
 
   for (auto &obj : *objects) {
     CheckSizeSanity(obj);
+    CheckTruncation(obj);
 
     float deg_alpha = obj->alpha * 180.0f / M_PI;
-
     Eigen::Vector2f upper_left(obj->upper_left.x(), obj->upper_left.y());
     Eigen::Vector2f lower_right(obj->lower_right.x(), obj->lower_right.y());
     float distance_w = 0.0;
@@ -60,28 +60,15 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
     ConvertSingle(obj->height, obj->width, obj->length, deg_alpha, upper_left,
                   lower_right, &distance_w, &distance_h, &mass_center_pixel);
 
-    // TODO(cheni-kuei) Choose distance_h or distance_w, considering
-    // truncation, type, longer side, or strategy
-    obj->distance = distance_h;  // distance_h, distance_w
+    obj->distance = DecideDistance(distance_h, distance_w, obj);
     Eigen::Vector3f camera_ray = camera_model_.unproject(mass_center_pixel);
-
-    // Angles
-    float beta = std::atan2(camera_ray.x(), camera_ray.z());
-    // double beta = std::atan2(camera_ray.z(), camera_ray.x());
-    float theta = obj->alpha + beta;
-    if (theta > M_PI) {
-      theta -= 2 * M_PI;
-    } else if (theta < -M_PI) {
-      theta += 2 * M_PI;
-    }
-    obj->theta = theta;
+    DecideAngle(camera_ray, obj);
 
     // Center (3D Mass Center of 3D BBox)
     float scale = obj->distance / sqrt(camera_ray.x() * camera_ray.x() +
                                        camera_ray.y() * camera_ray.y() +
                                        camera_ray.z() * camera_ray.z());
-    obj->center = Eigen::Vector3f(
-        camera_ray.x() * scale, camera_ray.y() * scale, camera_ray.z() * scale);
+    obj->center = camera_ray * scale;
   }
 
   return true;
@@ -325,6 +312,82 @@ void GeometryCameraConverter::CheckSizeSanity(VisualObjectPtr obj) const {
     obj->length = std::max(obj->length, 0.5f);
     obj->width = std::max(obj->width, 0.5f);
     obj->height = std::max(obj->height, 1.5f);
+  }
+}
+
+void GeometryCameraConverter::CheckTruncation(VisualObjectPtr obj) const {
+  auto width = camera_model_.get_width();
+  auto height = camera_model_.get_height();
+
+  // Ad-hoc 2D box truncation binary determination
+  if (obj->upper_left.x() < 20.0f || width - 20.0f < obj->lower_right.x()) {
+    obj->trunc_width = 0.5f;
+  }
+
+  if (obj->upper_left.y() < 20.0f || height - 20.0f < obj->lower_right.y()) {
+    obj->trunc_height = 0.5f;
+  }
+}
+
+float GeometryCameraConverter::DecideDistance(const float &distance_h,
+                                              const float &distance_w,
+                                              VisualObjectPtr obj) const {
+  float distance = distance_h; // default
+
+  if (obj->type == ObjectType::PEDESTRIAN) {
+    distance = distance_h;
+  }
+  else if (obj->type == ObjectType::VEHICLE
+           || obj->type == ObjectType::BICYCLE){
+    if (obj->trunc_width > 0.25f) {
+      distance = distance_h;
+    }
+    else if (obj->trunc_height > 0.25f) {
+      distance = distance_w;
+    }
+    else {
+      int pixel_width = static_cast<int>(obj->lower_right.x()
+                                         - obj->upper_left.x());
+      int pixel_height = static_cast<int>(obj->lower_right.y()
+                                          - obj->upper_left.y());
+      if (pixel_width > pixel_height
+          && (distance_w < 40.0f || distance_h < 40.0f)) {
+        distance = distance_w;
+      }
+      else {
+        distance = distance_h;
+      }
+    }
+  }
+  else { // Other types
+    distance = distance_h;
+  }
+
+  return distance;
+}
+
+void GeometryCameraConverter::DecideAngle(const Eigen::Vector3f &camera_ray,
+                                          VisualObjectPtr obj) const {
+  float beta = std::atan2(camera_ray.x(), camera_ray.z());
+
+  // Orientation is not reliable in these cases (DL model specific issue)
+  if (obj->distance > 50.0f || obj->trunc_width > 0.25f) {
+    obj->theta = -1.0f * M_PI_2;
+    obj->alpha = obj->theta - beta;
+    if (obj->alpha > M_PI) {
+      obj->alpha -= 2 * M_PI;
+    } else if (obj->alpha < -M_PI) {
+      obj->alpha += 2 * M_PI;
+    }
+  }
+  else { // Normal cases
+    float theta = obj->alpha + beta;
+    if (theta > M_PI) {
+      theta -= 2 * M_PI;
+    } else if (theta < -M_PI) {
+      theta += 2 * M_PI;
+    }
+    obj->theta = theta;
   }
 }
 

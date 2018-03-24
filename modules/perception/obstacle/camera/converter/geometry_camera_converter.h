@@ -81,6 +81,17 @@ class GeometryCameraConverter : public BaseCameraConverter {
   // Physical Size sanity check based on type
   void CheckSizeSanity(VisualObjectPtr obj) const;
 
+  // Check truncation based on 2D box position
+  void CheckTruncation(VisualObjectPtr obj) const;
+
+  // Choose distance based on 2D box width or height, considering
+  // truncation, type, longer side, and strategy
+  float DecideDistance(const float &distance_h, const float &distance_w,
+                       VisualObjectPtr obj) const;
+
+  void DecideAngle(const Eigen::Vector3f &camera_ray,
+                   VisualObjectPtr obj) const;
+
   CameraModel<float> camera_model_;
   std::vector<Eigen::Vector3f> corners_;
   static const int kMaxDistanceSearchDepth_ = 20;
