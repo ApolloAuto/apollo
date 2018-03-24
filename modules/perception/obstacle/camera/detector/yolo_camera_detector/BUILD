@@ -9,10 +9,10 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/perception/obstacle/base",
-        "//modules/perception/obstacle/camera/common:common",
+        "//modules/perception/obstacle/camera/common",
         "@caffe//:lib",
-        "@opencv2//:core",
         "@eigen",
+        "@opencv2//:core",
     ],
 )
 
@@ -24,9 +24,10 @@ cc_library(
         ":util",
         "//modules/common:log",
         "//modules/perception/common",
+        "//modules/perception/cuda_util",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/obstacle/base:base",
+        "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/common:cnn_adapter",
         "//modules/perception/obstacle/camera/detector/common:feature_extractor",
         "//modules/perception/obstacle/camera/detector/common/proto:tracking_feature_proto",
@@ -35,7 +36,6 @@ cc_library(
         "//modules/perception/obstacle/camera/interface",
         "@caffe//:lib",
         "@eigen",
-        "//modules/perception/cuda_util",
     ],
 )
 

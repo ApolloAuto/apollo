@@ -16,9 +16,9 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 
-#include <map>
-#include <string>
 #include <numeric>
+#include <string>
+#include <unordered_map>
 
 namespace apollo {
 namespace perception {
@@ -46,8 +46,7 @@ void PbfBaseTrackObjectMatcher::IdAssign(
     unassigned_fusion_tracks->resize(num_track);
     unassigned_sensor_objects->resize(num_obj);
     std::iota(unassigned_fusion_tracks->begin(),
-      unassigned_fusion_tracks->end(),
-      0);
+              unassigned_fusion_tracks->end(), 0);
     std::iota(unassigned_sensor_objects->begin(),
               unassigned_sensor_objects->end(), 0);
     return;
@@ -56,8 +55,8 @@ void PbfBaseTrackObjectMatcher::IdAssign(
   const SensorType &sensor_type = sensor_objects[0]->sensor_type;
   const std::string &sensor_id = sensor_objects[0]->sensor_id;
 
-  std::map<int, int> sensor_id_2_track_ind;
-  for (size_t i = 0; i < num_track; i++) {
+  std::unordered_map<int, int> sensor_id_2_track_ind;
+  for (size_t i = 0; i < num_track; ++i) {
     PbfSensorObjectPtr obj =
         fusion_tracks[i]->GetSensorObject(sensor_type, sensor_id);
     if (obj == nullptr) {
@@ -68,7 +67,7 @@ void PbfBaseTrackObjectMatcher::IdAssign(
 
   std::vector<bool> fusion_used(num_track, false);
   std::vector<bool> sensor_used(num_obj, false);
-  for (size_t i = 0; i < num_obj; i++) {
+  for (size_t i = 0; i < num_obj; ++i) {
     int track_id = sensor_objects[i]->object->track_id;
     auto it = sensor_id_2_track_ind.find(track_id);
     if (it != sensor_id_2_track_ind.end()) {

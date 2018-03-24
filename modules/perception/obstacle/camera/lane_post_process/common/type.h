@@ -224,10 +224,10 @@ struct LaneObject {
   }
 
   size_t point_num = 0;
-  std::vector <Vector2D> pos;
-  std::vector <Vector2D> orie;
-  std::vector <Vector2D> image_pos;
-  std::vector <ScalarType> confidence;
+  std::vector<Vector2D> pos;
+  std::vector<Vector2D> orie;
+  std::vector<Vector2D> image_pos;
+  std::vector<ScalarType> confidence;
   SpatialLabelType spatial = SpatialLabelType::L_0;
   SemanticLabelType semantic = SemanticLabelType::UNKNOWN;
   bool is_compensated = false;
@@ -254,18 +254,25 @@ struct LaneObject {
     lane_marker.set_c2_curvature(model(2, 0));
     lane_marker.set_c3_curvature_derivative(model(3, 0));
     lane_marker.set_view_range(longitude_end - longitude_start);
-    return std::move(lane_marker);
+    return lane_marker;
   }
 
   std::string GetSpatialLabel() const {
     switch (spatial) {
-      case SpatialLabelType::L_0:return "L0";
-      case SpatialLabelType::L_1:return "L1";
-      case SpatialLabelType::L_2:return "L2";
-      case SpatialLabelType::R_0:return "R0";
-      case SpatialLabelType::R_1:return "R1";
-      case SpatialLabelType::R_2:return "R2";
-      default:AERROR << "unknown lane spatial label.";
+      case SpatialLabelType::L_0:
+        return "L0";
+      case SpatialLabelType::L_1:
+        return "L1";
+      case SpatialLabelType::L_2:
+        return "L2";
+      case SpatialLabelType::R_0:
+        return "R0";
+      case SpatialLabelType::R_1:
+        return "R1";
+      case SpatialLabelType::R_2:
+        return "R2";
+      default:
+        AERROR << "unknown lane spatial label.";
         return "unknown spatial label";
     }
   }

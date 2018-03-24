@@ -46,13 +46,14 @@ cc_test(
         "//modules/perception:perception_data",
         "//modules/perception:perception_model",
         "//modules/perception/conf:perception_config",
+        "//modules/perception/obstacle/camera/lane_post_process/common:util",
     ],
     deps = [
         ":cc_lane_post_processor",
         "//modules/common/util",
+        "@gtest//:main",
         "@opencv2//:core",
         "@opencv2//:highgui",
-        "@gtest//:main",
     ],
 )
 

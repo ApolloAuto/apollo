@@ -53,12 +53,12 @@ bool CNNSegmentation::Init() {
   if (feature_param.has_width()) {
     width_ = static_cast<int>(feature_param.width());
   } else {
-    width_ = 512;
+    width_ = 640;
   }
   if (feature_param.has_height()) {
     height_ = static_cast<int>(feature_param.height());
   } else {
-    height_ = 512;
+    height_ = 640;
   }
 
 /// Instantiate Caffe net

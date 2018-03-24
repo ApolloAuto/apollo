@@ -26,6 +26,7 @@
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 
 using std::shared_ptr;
 using std::string;
@@ -39,18 +40,6 @@ DEFINE_string(test_dir,
               "test data directory");
 
 static const cv::Scalar lane_mask_color(0, 255, 255);  // yellow
-
-template<typename T = float>
-T GetPolyValue(T a, T b, T c, T d, T x) {
-  T y = d;
-  T v = x;
-  y += (c * v);
-  v *= x;
-  y += (b * v);
-  v *= x;
-  y += (a * v);
-  return y;
-}
 
 class CCLanePostProcessorTest : public ::testing::Test {
  protected:
@@ -88,21 +77,20 @@ TEST_F(CCLanePostProcessorTest, test_lane_post_process_vis) {
   cv::Mat lane_map;
   lane_map_ori.convertTo(lane_map, CV_32FC1, 1.0f / 255.0f, 0.0f);
 
-
   ConfigManager *config_manager = ConfigManager::instance();
-  const ModelConfig *model_config
-      = config_manager->GetModelConfig(cc_lane_post_processor_->name());
+  const ModelConfig *model_config =
+      config_manager->GetModelConfig(cc_lane_post_processor_->name());
 
   float lane_map_conf_thresh = 0.5f;
   CHECK(model_config->GetValue("lane_map_confidence_thresh",
                                &lane_map_conf_thresh))
-  << "the confidence threshold of label map not found.";
+      << "the confidence threshold of label map not found.";
   AINFO << "lane_map_conf_thresh = " << lane_map_conf_thresh;
 
   LaneObjectsPtr lane_objects = std::make_shared<LaneObjects>();
   CameraLanePostProcessOptions lane_post_process_options;
-  cc_lane_post_processor_->Process(
-    lane_map, lane_post_process_options, &lane_objects);
+  cc_lane_post_processor_->Process(lane_map, lane_post_process_options,
+                                   &lane_objects);
 
   AINFO << "#lane objects = " << lane_objects->size();
 
@@ -162,16 +150,15 @@ TEST_F(CCLanePostProcessorTest, test_lane_post_process_vis) {
     // Besides the fitted polynomial curves we draw lane markers as well
     for (auto p = lane_objects->at(k).image_pos.begin();
          p != lane_objects->at(k).image_pos.end(); ++p) {
-      cv::circle(vis_lane_objects_image, cv::Point(static_cast<int>(p->x()),
-                                                   static_cast<int>(p->y())),
-                                                   4, lane_object_color, -1);
+      cv::circle(vis_lane_objects_image,
+                 cv::Point(static_cast<int>(p->x()), static_cast<int>(p->y())),
+                 4, lane_object_color, -1);
     }
 
     // draw polynomial curve
     float img_y_start =
         static_cast<float>(lane_objects->at(k).img_curve.x_start);
-    float img_y_end =
-        static_cast<float>(lane_objects->at(k).img_curve.x_end);
+    float img_y_end = static_cast<float>(lane_objects->at(k).img_curve.x_end);
     float start = std::min(img_y_start, img_y_end);
     float end = std::max(img_y_start, img_y_end);
     float a = lane_objects->at(k).img_curve.a;

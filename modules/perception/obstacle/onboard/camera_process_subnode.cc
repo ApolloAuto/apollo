@@ -29,7 +29,9 @@ bool CameraProcessSubnode::InitInternal() {
   // Subnode config in DAG streaming
   std::unordered_map<std::string, std::string> fields;
   SubnodeHelper::ParseReserveField(reserve_, &fields);
-  device_id_ = fields["device_id"];
+
+  if (fields.count("device_id")) device_id_ = fields["device_id"];
+  if (fields.count("publish") && stoi(fields["publish"])) publish_ = true;
 
   // Shared Data
   cam_obj_data_ = static_cast<CameraObjectData *>(
@@ -43,6 +45,8 @@ bool CameraProcessSubnode::InitInternal() {
 
   AdapterManager::AddImageShortCallback(&CameraProcessSubnode::ImgCallback,
                                         this);
+  if (publish_) AdapterManager::AddChassisCallback(
+    &CameraProcessSubnode::ChassisCallback, this);
 
   return true;
 }
@@ -80,7 +84,7 @@ bool CameraProcessSubnode::InitModules() {
   transformer_.reset(BaseCameraTransformerRegisterer::GetInstanceByName(
       "FlatCameraTransformer"));
   transformer_->Init();
-  // transformer_->SetExtrinsics(camera_to_car_);
+  transformer_->SetExtrinsics(camera_to_car_);
 
   filter_.reset(
       BaseCameraFilterRegisterer::GetInstanceByName("ObjectCameraFilter"));
@@ -95,8 +99,9 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   double timestamp = msg.header.stamp.toSec();
   AINFO << "CameraProcessSubnode ImgCallback: "
-        << " frame: "<< ++seq_num_ << " timestamp: ";
+        << " frame: " << ++seq_num_ << " timestamp: ";
   AINFO << std::fixed << std::setprecision(64) << timestamp;
+  timestamp_ns_ = timestamp * 1e9;
 
   cv::Mat img;
   if (!FLAGS_image_file_debug) {
@@ -122,6 +127,14 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   camera_item_ptr->image_src_mat = img.clone();
   mask.copyTo(out_objs->camera_frame_supplement->lane_map);
   PublishDataAndEvent(timestamp, out_objs, camera_item_ptr);
+
+  if (publish_) PublishPerceptionPb(out_objs);
+}
+
+void CameraProcessSubnode::ChassisCallback(
+  const apollo::canbus::Chassis& message) {
+  std::lock_guard<std::mutex> lock(camera_mutex_);
+  chassis_.CopyFrom(message);
 }
 
 bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
@@ -133,18 +146,15 @@ bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
     traffic_light::Yuyv2rgb(yuv, cv_img.data, msg.height * msg.width);
     cv::cvtColor(cv_img, cv_img, CV_RGB2BGR);
   } else {
-    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, msg.encoding);
+    cv_bridge::CvImagePtr cv_ptr =
+        cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     cv_img = cv_ptr->image;
   }
 
-  AINFO << "cv_img:\t" << cv_img.rows << " " << cv_img.cols;
-  AINFO << "required:\t" << image_height_ << " " << image_width_;
   if (cv_img.rows != image_height_ || cv_img.cols != image_width_) {
-    cv::resize(cv_img, *img, cv::Size(image_width_, image_height_));
-  } else {
-    *img = cv_img.clone();
+    cv::resize(cv_img, cv_img, cv::Size(image_width_, image_height_));
   }
-
+  *img = cv_img.clone();
   return true;
 }
 
@@ -162,6 +172,7 @@ void CameraProcessSubnode::VisualObjToSensorObj(
     ObjectPtr obj(new Object());
 
     obj->id = vobj->id;
+    obj->score = vobj->score;
     obj->direction = vobj->direction.cast<double>();
     obj->theta = vobj->theta;
     obj->center = vobj->center.cast<double>();
@@ -190,9 +201,9 @@ void CameraProcessSubnode::VisualObjToSensorObj(
 void CameraProcessSubnode::PublishDataAndEvent(
     const double &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
     const SharedDataPtr<CameraItem> &camera_item) {
-  std::string key = "";
-  SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
-
+//   std::string key = "";
+//   SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
+  CommonSharedDataKey key(timestamp, device_id_);
   cam_obj_data_->Add(key, sensor_objects);
   cam_shared_data_->Add(key, camera_item);
 
@@ -204,6 +215,38 @@ void CameraProcessSubnode::PublishDataAndEvent(
     event.reserve = device_id_;
     event_manager_->Publish(event);
   }
+}
+
+void CameraProcessSubnode::PublishPerceptionPb(
+    const SharedDataPtr<SensorObjects>& sensor_objects) {
+  AINFO << "Camera publish perception pb data";
+  std::lock_guard<std::mutex> lock(camera_mutex_);
+
+  PerceptionObstacles obstacles;
+
+  // Header
+  common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
+    "perception_obstacle", &obstacles);
+  common::Header *header = obstacles.mutable_header();
+  header->set_lidar_timestamp(0);
+  header->set_camera_timestamp(timestamp_ns_);
+  header->set_radar_timestamp(0);
+  obstacles.set_error_code(sensor_objects->error_code);
+
+  // Serialize each Object
+  for (const auto &obj : sensor_objects->objects) {
+    PerceptionObstacle *obstacle = obstacles.add_perception_obstacle();
+    obj->Serialize(obstacle);
+  }
+
+  // Relative speed of objects + latest ego car speed in X
+  for (auto obstacle : obstacles.perception_obstacle()) {
+    obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
+                                       chassis_.speed_mps());
+  }
+
+  common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
+  ADEBUG << "Camera Obstacles: " << obstacles.ShortDebugString();
 }
 
 }  // namespace perception

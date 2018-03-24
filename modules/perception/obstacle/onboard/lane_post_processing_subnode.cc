@@ -28,6 +28,7 @@
 #include "modules/common/time/time_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/cc_lane_post_processor.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/types.h"
@@ -46,6 +47,8 @@ bool LanePostProcessingSubnode::InitInternal() {
     AERROR << "failed to init shared data.";
     return false;
   }
+
+  RegistAllAlgorithms();
 
   // init plugins
   if (!InitAlgorithmPlugin()) {
@@ -87,6 +90,10 @@ bool LanePostProcessingSubnode::InitSharedData() {
         << camera_object_data_->name() << " and " << lane_shared_data_->name();
 
   return true;
+}
+
+void LanePostProcessingSubnode::RegistAllAlgorithms() {
+  RegisterFactoryCCLanePostProcessor();
 }
 
 bool LanePostProcessingSubnode::InitAlgorithmPlugin() {
@@ -142,6 +149,11 @@ Status LanePostProcessingSubnode::ProcEvents() {
   }
 
   cv::Mat lane_map = objs->camera_frame_supplement->lane_map;
+  if (lane_map.empty()) {
+    AERROR << "Get NULL lane_map from camera frame supplement";
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
+  }
+
   LaneObjectsPtr lane_instances(new LaneObjects());
   CameraLanePostProcessOptions options;
   options.timestamp = event.timestamp;
@@ -205,8 +217,6 @@ void LanePostProcessingSubnode::PublishDataAndEvent(
   }
   AINFO << "succeed to publish data and event.";
 }
-
-REGISTER_SUBNODE(LanePostProcessingSubnode);
 
 }  // namespace perception
 }  // namespace apollo

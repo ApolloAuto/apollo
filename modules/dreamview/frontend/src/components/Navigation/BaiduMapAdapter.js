@@ -1,3 +1,5 @@
+import { WGS84ToBD09LL } from "utils/coordinate_converter";
+
 export default class BaiduMapAdapter {
     constructor() {
         this.map = null;
@@ -112,12 +114,16 @@ export default class BaiduMapAdapter {
     removePolyline(polyline) {
         this.map.removeOverlay(polyline);
     }
+
+    applyCoordinateOffset([lng, lat]) {
+        return WGS84ToBD09LL(lng, lat);
+    }
 }
 
 class NavigationControl extends BMap.Control {
     constructor(text, tip, color, offset, onClickHandler, ...args) {
         super(...args);
-        this.defaultAnchor = BMAP_ANCHOR_TOP_RIGHT;
+        this.defaultAnchor = BMAP_ANCHOR_TOP_LEFT;
         this.defaultOffset = offset;
         this.onClickHandler = onClickHandler;
         this.title = tip;

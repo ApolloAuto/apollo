@@ -21,7 +21,7 @@ namespace perception {
 
 bool ObjectCameraFilter::Init() { return true; }
 
-bool ObjectCameraFilter::Filter(const float &timestamp,
+bool ObjectCameraFilter::Filter(const double&timestamp,
                                 std::vector<VisualObjectPtr> *objects) {
   if (!objects) return false;
 
@@ -48,7 +48,7 @@ bool ObjectCameraFilter::Filter(const float &timestamp,
 
 std::string ObjectCameraFilter::Name() const { return "ObjectCameraFilter"; }
 
-void ObjectCameraFilter::Create(const int &track_id, const float &timestamp,
+void ObjectCameraFilter::Create(const int &track_id, const double &timestamp,
                                 const VisualObjectPtr &obj_ptr) {
   tracked_filters_[track_id] = ObjectFilter();
   tracked_filters_[track_id].track_id_ = track_id;
@@ -63,19 +63,20 @@ void ObjectCameraFilter::Create(const int &track_id, const float &timestamp,
   tracked_filters_[track_id].h_.Init(obj_ptr->height);
 }
 
-void ObjectCameraFilter::Predict(const int &track_id, const float &timestamp) {
+void ObjectCameraFilter::Predict(const int &track_id, const double &timestamp) {
+  double time_diff = timestamp - tracked_filters_[track_id].last_timestamp_;
+  float diff = static_cast<float>(time_diff);
+
+  tracked_filters_[track_id].x_.Predict(diff);
+  tracked_filters_[track_id].y_.Predict(diff);
+  tracked_filters_[track_id].z_.Predict(diff);
+  tracked_filters_[track_id].alpha_.Predict(diff);
+  tracked_filters_[track_id].theta_.Predict(diff);
+  tracked_filters_[track_id].l_.Predict(diff);
+  tracked_filters_[track_id].w_.Predict(diff);
+  tracked_filters_[track_id].h_.Predict(diff);
+
   tracked_filters_[track_id].lost_frame_cnt_ = 0;
-
-  float time_diff = timestamp - tracked_filters_[track_id].last_timestamp_;
-  tracked_filters_[track_id].x_.Predict(time_diff);
-  tracked_filters_[track_id].y_.Predict(time_diff);
-  tracked_filters_[track_id].z_.Predict(time_diff);
-  tracked_filters_[track_id].alpha_.Predict(time_diff);
-  tracked_filters_[track_id].theta_.Predict(time_diff);
-  tracked_filters_[track_id].l_.Predict(time_diff);
-  tracked_filters_[track_id].w_.Predict(time_diff);
-  tracked_filters_[track_id].h_.Predict(time_diff);
-
   tracked_filters_[track_id].last_timestamp_ = timestamp;
 }
 
@@ -94,14 +95,15 @@ void ObjectCameraFilter::Update(const int &track_id,
 void ObjectCameraFilter::GetState(const int &track_id,
                                   VisualObjectPtr obj_ptr) {
   auto x_state = tracked_filters_[track_id].x_.GetState();
+  auto y_state = tracked_filters_[track_id].y_.GetState();
+  auto z_state = tracked_filters_[track_id].z_.GetState();
+
   obj_ptr->center.x() = x_state.x();
   obj_ptr->velocity.x() = x_state.y();
 
-  auto y_state = tracked_filters_[track_id].y_.GetState();
   obj_ptr->center.y() = y_state.x();
   obj_ptr->velocity.y() = y_state.y();
 
-  auto z_state = tracked_filters_[track_id].z_.GetState();
   obj_ptr->center.z() = z_state.x();
   obj_ptr->velocity.z() = z_state.y();
 

@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_IMF_FUSION_ASYNC_FUSION_H_  // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_IMF_FUSION_ASYNC_FUSION_H_  // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_IMF_FUSION_ASYNC_FUSION_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_IMF_FUSION_ASYNC_FUSION_H_
 
 #include <mutex>
 #include <string>
 #include <vector>
+
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"
@@ -55,10 +56,10 @@ class AsyncFusion : public BaseFusion {
 
   /**@brief update current tracks with matched objects*/
   void UpdateAssignedTracks(
-      std::vector<PbfTrackPtr> *tracks,
       const std::vector<PbfSensorObjectPtr> &sensor_objects,
       const std::vector<TrackObjectPair> &assignments,
-      const std::vector<double> &track_objects_dist);
+      const std::vector<double> &track_objects_dist,
+      std::vector<PbfTrackPtr> const *tracks);
 
   /**@brief update current tracks which cannot find matched objects*/
   void UpdateUnassignedTracks(std::vector<PbfTrackPtr> *tracks,
@@ -76,16 +77,16 @@ class AsyncFusion : public BaseFusion {
       std::vector<PbfSensorObjectPtr> *background_objects);
 
   void FuseForegroundObjects(
-      std::vector<PbfSensorObjectPtr> *foreground_objects,
-      Eigen::Vector3d ref_point, const SensorType &sensor_type,
-      const std::string &sensor_id, double timestamp);
+      const Eigen::Vector3d &ref_point, const SensorType &sensor_type,
+      const std::string &sensor_id, const double timestamp,
+      std::vector<PbfSensorObjectPtr> *foreground_objects);
 
   PbfSensorFramePtr ConstructFrame(const SensorObjects &obj);
 
  protected:
-  bool started_;
-  PbfBaseTrackObjectMatcher *matcher_;
-  PbfTrackManager *track_manager_;
+  bool started_ = false;
+  PbfBaseTrackObjectMatcher *matcher_ = nullptr;
+  PbfTrackManager *track_manager_ = nullptr;
   std::mutex sensor_data_rw_mutex_;
   std::mutex fusion_mutex_;
 
@@ -98,4 +99,5 @@ REGISTER_FUSION(AsyncFusion);
 
 }  // namespace perception
 }  // namespace apollo
+
 #endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_IMF_FUSION_ASYNC_FUSION_H_
