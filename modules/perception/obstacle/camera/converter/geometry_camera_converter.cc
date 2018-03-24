@@ -372,8 +372,7 @@ void GeometryCameraConverter::DecideAngle(const Eigen::Vector3f &camera_ray,
     } else if (obj->alpha < -M_PI) {
       obj->alpha += 2 * M_PI;
     }
-  }
-  else { // Normal cases
+  } else {  // Normal cases
     float theta = obj->alpha + beta;
     if (theta > M_PI) {
       theta -= 2 * M_PI;
