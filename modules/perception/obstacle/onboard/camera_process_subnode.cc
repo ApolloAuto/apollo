@@ -189,10 +189,7 @@ void CameraProcessSubnode::VisualObjToSensorObj(
     obj->camera_supplement->upper_left = vobj->upper_left.cast<double>();
     obj->camera_supplement->lower_right = vobj->lower_right.cast<double>();
     obj->camera_supplement->alpha = vobj->alpha;
-    // obj->type_probs.assign(vobj->type_probs,
-    //                        vobj->type_probs + MAX_OBJECT_TYPE);
-    // obj->camera_supplement->pts8.assign(vobj->pts8,
-    //                                     vobj->pts8 + 16);
+    obj->camera_supplement->pts8 = vobj->pts8;
 
     ((*sensor_objects)->objects).emplace_back(obj);
   }

@@ -42,8 +42,11 @@ bool FlatCameraTransformer::Transform(std::vector<VisualObjectPtr> *objects) {
     obj_ptr->center = pos_ground + kCamera2CarFlatOffset;
 
     // Orientation
+    // Camera space
     float theta = obj_ptr->theta;
     Eigen::Vector4f dir(cos(theta), 0.0f, -sin(theta), 0.0f);
+
+    // Ego car space
     dir = camera2car_ * dir;
     obj_ptr->direction = dir.head(3);
     obj_ptr->theta = atan2(dir[1], dir[0]);
