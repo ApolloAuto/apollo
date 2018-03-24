@@ -14,15 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <list>
 #include "modules/perception/obstacle/camera/motion/plane_motion.h"
+#include <list>
 #include "modules/common/log.h"
 namespace apollo {
 namespace perception {
 
-PlaneMotion::PlaneMotion(int s) {
-  set_buffer_size(s);
-}
+PlaneMotion::PlaneMotion(int s) { set_buffer_size(s); }
 
 PlaneMotion::~PlaneMotion(void) {
   if (mot_buffer_ != nullptr) {
@@ -52,14 +50,12 @@ void PlaneMotion::generate_motion_matrix(VehicleStatus *vehicledata) {
 void PlaneMotion::accumulate_motion(double start_time, double end_time) {
   std::list<VehicleStatus>::iterator iter_1 = raw_motion_queue_.begin();
   // locate starting motion
-  while (iter_1 != raw_motion_queue_.end()
-        && iter_1->time_ts < start_time) {
+  while (iter_1 != raw_motion_queue_.end() && iter_1->time_ts < start_time) {
     iter_1++;  // iter_1 : ts >= start_time
   }
   // locate ending motion
   std::list<VehicleStatus>::iterator iter_2 = iter_1;
-  while (iter_2 != raw_motion_queue_.end()
-        && iter_2->time_ts <= end_time) {
+  while (iter_2 != raw_motion_queue_.end() && iter_2->time_ts <= end_time) {
     iter_2++;  // iter_2: ts > end_time
   }
   // accumulate CAN+IMU / Localization motion

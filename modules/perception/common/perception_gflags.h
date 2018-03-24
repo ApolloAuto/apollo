@@ -98,7 +98,6 @@ DECLARE_bool(show_camera_objects2d);
 DECLARE_bool(show_camera_parsing);
 DECLARE_string(frame_visualizer);
 
-DECLARE_bool(show_motion);
 // async fusion using imf
 DECLARE_bool(async_fusion);
 DECLARE_bool(use_distance_angle_fusion);
