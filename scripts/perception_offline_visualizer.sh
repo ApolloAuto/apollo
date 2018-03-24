@@ -22,4 +22,5 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${DIR}/apollo_base.sh"
 # run function from apollo_base.sh
 # run command_name module_name
-$APOLLO_BIN_PREFIX/modules/perception/perception --flagfile=/apollo/modules/perception/conf/perception_lowcost.conf --dag_config_path=/apollo/modules/perception/conf/dag_camera_obstacle_offline.config
+run perception "$@" --dag_config_path="./conf/dag_camera_obstacle_vis.config"
+# --flagfile="./conf/perception_lowcost.conf"
