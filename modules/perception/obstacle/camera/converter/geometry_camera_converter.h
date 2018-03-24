@@ -68,7 +68,7 @@ class GeometryCameraConverter : public BaseCameraConverter {
               std::vector<Eigen::Vector3f> *corners) const;
 
   float SearchDistance(const int &pixel_length, const bool &use_width,
-                       const Eigen::Matrix<float, 3, 1> &mass_center_v) const;
+                       const Eigen::Matrix<float, 3, 1> &mass_center_v);
 
   void SearchCenterDirection(
       const Eigen::Matrix<float, 2, 1> &box_center_pixel, const float &curr_d,
@@ -84,8 +84,7 @@ class GeometryCameraConverter : public BaseCameraConverter {
   // Check truncation based on 2D box position
   void CheckTruncation(VisualObjectPtr obj) const;
 
-  // Choose distance based on 2D box width or height, considering
-  // truncation, type, longer side, and strategy
+  // Choose distance based on 2D box width or height
   float DecideDistance(const float &distance_h, const float &distance_w,
                        VisualObjectPtr obj) const;
 
@@ -94,6 +93,7 @@ class GeometryCameraConverter : public BaseCameraConverter {
 
   CameraModel<float> camera_model_;
   std::vector<Eigen::Vector3f> corners_;
+  std::vector<Eigen::Vector2f> pixel_corners_;
   static const int kMaxDistanceSearchDepth_ = 20;
   static const int kMaxCenterDirectionSearchDepth_ = 10;
   bool debug_ = false;

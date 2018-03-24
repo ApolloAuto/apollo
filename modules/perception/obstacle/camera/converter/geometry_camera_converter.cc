@@ -60,6 +60,15 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
     ConvertSingle(obj->height, obj->width, obj->length, deg_alpha, upper_left,
                   lower_right, &distance_w, &distance_h, &mass_center_pixel);
 
+    // Reset alpha angle and redo again (Model dependent issue)
+    if (distance_w > 50.0f || distance_h > 50.0f || obj->trunc_width > 0.25f) {
+      obj->distance = DecideDistance(distance_h, distance_w, obj);
+      DecideAngle(camera_model_.unproject(mass_center_pixel), obj);
+      deg_alpha = obj->alpha * 180.0f / M_PI;
+      ConvertSingle(obj->height, obj->width, obj->length, deg_alpha, upper_left,
+                    lower_right, &distance_w, &distance_h, &mass_center_pixel);
+    }
+
     obj->distance = DecideDistance(distance_h, distance_w, obj);
     Eigen::Vector3f camera_ray = camera_model_.unproject(mass_center_pixel);
     DecideAngle(camera_ray, obj);
@@ -69,6 +78,13 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
                                        camera_ray.y() * camera_ray.y() +
                                        camera_ray.z() * camera_ray.z());
     obj->center = camera_ray * scale;
+
+    // Set 8 corner pixels
+    obj->pts8.resize(16);
+    for (int i = 0; i < 8; i++) {
+      obj->pts8[i * 2] = pixel_corners_[i].x();
+      obj->pts8[i * 2 + 1] = pixel_corners_[i].y();
+    }
   }
 
   return true;
@@ -131,6 +147,8 @@ bool GeometryCameraConverter::ConvertSingle(
   corners[7] = Eigen::Vector3f(-l_half, -h_half, w_half);
   Rotate(deg_alpha, &corners);
   corners_ = corners;
+  pixel_corners_.clear();
+  pixel_corners_.resize(8);
 
   // Try to get an initial Mass center pixel and vector
   Eigen::Matrix<float, 3, 1> middle_v(0.0f, 0.0f, 20.0f);
@@ -198,7 +216,7 @@ void GeometryCameraConverter::Rotate(
 
 float GeometryCameraConverter::SearchDistance(
     const int &pixel_length, const bool &use_width,
-    const Eigen::Matrix<float, 3, 1> &mass_center_v) const {
+    const Eigen::Matrix<float, 3, 1> &mass_center_v) {
   float close_d = 0.1f;
   float far_d = 200.0f;
   float curr_d = 0.0f;
@@ -211,6 +229,7 @@ float GeometryCameraConverter::SearchDistance(
     float max_p = 0.0f;
     for (size_t i = 0; i < corners_.size(); ++i) {
       Eigen::Vector2f point_2d = camera_model_.project(corners_[i] + curr_p);
+      pixel_corners_[i] = point_2d;
 
       float curr_pixel = 0.0f;
       if (use_width) {
@@ -332,35 +351,9 @@ void GeometryCameraConverter::CheckTruncation(VisualObjectPtr obj) const {
 float GeometryCameraConverter::DecideDistance(const float &distance_h,
                                               const float &distance_w,
                                               VisualObjectPtr obj) const {
-  float distance = distance_h; // default
-
-  if (obj->type == ObjectType::PEDESTRIAN) {
-    distance = distance_h;
-  }
-  else if (obj->type == ObjectType::VEHICLE
-           || obj->type == ObjectType::BICYCLE){
-    if (obj->trunc_width > 0.25f) {
-      distance = distance_h;
-    }
-    else if (obj->trunc_height > 0.25f) {
-      distance = distance_w;
-    }
-    else {
-      int pixel_width = static_cast<int>(obj->lower_right.x()
-                                         - obj->upper_left.x());
-      int pixel_height = static_cast<int>(obj->lower_right.y()
-                                          - obj->upper_left.y());
-      if (pixel_width > pixel_height
-          && (distance_w < 40.0f || distance_h < 40.0f)) {
-        distance = distance_w;
-      }
-      else {
-        distance = distance_h;
-      }
-    }
-  }
-  else { // Other types
-    distance = distance_h;
+  float distance = distance_h;
+  if (obj->trunc_height > 0.25f) {
+    distance = distance_w;
   }
 
   return distance;

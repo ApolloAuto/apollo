@@ -2085,10 +2085,12 @@ void GLFWFusionViewer::draw_camera_box(const std::vector<ObjectPtr>& objects,
 
     std::vector<Eigen::Vector2d> points;
     points.resize(8);
-    Eigen::Vector3d tc =
-        (v2c * Eigen::Vector4d(center[0], center[1], center[2], 1)).head(3);
-    get_boundingbox(tc, v2c, width, height, length, obj->direction, theta,
-                    &points);
+    if (obj->camera_supplement != nullptr) {
+      for (int i = 0; i < 8; i++) {
+        points[i].x() = obj->camera_supplement->pts8[i * 2 + 0];
+        points[i].y() = obj->camera_supplement->pts8[i * 2 + 1];
+      }
+    }
 
     auto box3d_color = s_color_table[0];
     if (obj->camera_supplement != nullptr) {
