@@ -1780,7 +1780,7 @@ void GLFWFusionViewer::draw_objects(const std::vector<ObjectPtr>& objects,
     }
   }
 
-  draw_velocity = false;
+  draw_velocity = true;
   if (draw_velocity) {
     int i = 0;
     vec3 velocity_src;
