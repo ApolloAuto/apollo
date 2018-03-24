@@ -117,8 +117,8 @@ typedef std::shared_ptr<const CameraSupplement> CameraSupplementConstPtr;
 struct alignas(16) VehicleStatus {
   float yaw_rate;
   float velocity;
-  float time_t;            // time stamp
-  float time_d;            // time stamp difference in image
+  double time_ts;            // time stamp
+  double time_d;            // time stamp difference in image
   Eigen::Matrix3f motion;  // Motion Matrix
 };
 
