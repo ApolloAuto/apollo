@@ -49,6 +49,9 @@ struct alignas(16) VisualObject {
   // front box  lower-right corner: x2, y2
   Eigen::Vector2d back_lower_right;
 
+  // 2Dto3D, pts8.resize(16), x, y...
+  std::vector<float> pts8;
+
   // 2D bounding box truncation ratio, for out-of-image objects
   float trunc_width = 0.0f;
   float trunc_height = 0.0f;

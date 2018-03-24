@@ -49,9 +49,9 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
 
   for (auto &obj : *objects) {
     CheckSizeSanity(obj);
+    CheckTruncation(obj);
 
     float deg_alpha = obj->alpha * 180.0f / M_PI;
-
     Eigen::Vector2f upper_left(obj->upper_left.x(), obj->upper_left.y());
     Eigen::Vector2f lower_right(obj->lower_right.x(), obj->lower_right.y());
     float distance_w = 0.0;
@@ -60,28 +60,31 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
     ConvertSingle(obj->height, obj->width, obj->length, deg_alpha, upper_left,
                   lower_right, &distance_w, &distance_h, &mass_center_pixel);
 
-    // TODO(cheni-kuei) Choose distance_h or distance_w, considering
-    // truncation, type, longer side, or strategy
-    obj->distance = distance_h;  // distance_h, distance_w
-    Eigen::Vector3f camera_ray = camera_model_.unproject(mass_center_pixel);
-
-    // Angles
-    float beta = std::atan2(camera_ray.x(), camera_ray.z());
-    // double beta = std::atan2(camera_ray.z(), camera_ray.x());
-    float theta = obj->alpha + beta;
-    if (theta > M_PI) {
-      theta -= 2 * M_PI;
-    } else if (theta < -M_PI) {
-      theta += 2 * M_PI;
+    // Reset alpha angle and redo again (Model dependent issue)
+    if (distance_w > 50.0f || distance_h > 50.0f || obj->trunc_width > 0.25f) {
+      obj->distance = DecideDistance(distance_h, distance_w, obj);
+      DecideAngle(camera_model_.unproject(mass_center_pixel), obj);
+      deg_alpha = obj->alpha * 180.0f / M_PI;
+      ConvertSingle(obj->height, obj->width, obj->length, deg_alpha, upper_left,
+                    lower_right, &distance_w, &distance_h, &mass_center_pixel);
     }
-    obj->theta = theta;
+
+    obj->distance = DecideDistance(distance_h, distance_w, obj);
+    Eigen::Vector3f camera_ray = camera_model_.unproject(mass_center_pixel);
+    DecideAngle(camera_ray, obj);
 
     // Center (3D Mass Center of 3D BBox)
     float scale = obj->distance / sqrt(camera_ray.x() * camera_ray.x() +
                                        camera_ray.y() * camera_ray.y() +
                                        camera_ray.z() * camera_ray.z());
-    obj->center = Eigen::Vector3f(
-        camera_ray.x() * scale, camera_ray.y() * scale, camera_ray.z() * scale);
+    obj->center = camera_ray * scale;
+
+    // Set 8 corner pixels
+    obj->pts8.resize(16);
+    for (int i = 0; i < 8; i++) {
+      obj->pts8[i * 2] = pixel_corners_[i].x();
+      obj->pts8[i * 2 + 1] = pixel_corners_[i].y();
+    }
   }
 
   return true;
@@ -144,6 +147,8 @@ bool GeometryCameraConverter::ConvertSingle(
   corners[7] = Eigen::Vector3f(-l_half, -h_half, w_half);
   Rotate(deg_alpha, &corners);
   corners_ = corners;
+  pixel_corners_.clear();
+  pixel_corners_.resize(8);
 
   // Try to get an initial Mass center pixel and vector
   Eigen::Matrix<float, 3, 1> middle_v(0.0f, 0.0f, 20.0f);
@@ -211,7 +216,7 @@ void GeometryCameraConverter::Rotate(
 
 float GeometryCameraConverter::SearchDistance(
     const int &pixel_length, const bool &use_width,
-    const Eigen::Matrix<float, 3, 1> &mass_center_v) const {
+    const Eigen::Matrix<float, 3, 1> &mass_center_v) {
   float close_d = 0.1f;
   float far_d = 200.0f;
   float curr_d = 0.0f;
@@ -224,6 +229,7 @@ float GeometryCameraConverter::SearchDistance(
     float max_p = 0.0f;
     for (size_t i = 0; i < corners_.size(); ++i) {
       Eigen::Vector2f point_2d = camera_model_.project(corners_[i] + curr_p);
+      pixel_corners_[i] = point_2d;
 
       float curr_pixel = 0.0f;
       if (use_width) {
@@ -325,6 +331,55 @@ void GeometryCameraConverter::CheckSizeSanity(VisualObjectPtr obj) const {
     obj->length = std::max(obj->length, 0.5f);
     obj->width = std::max(obj->width, 0.5f);
     obj->height = std::max(obj->height, 1.5f);
+  }
+}
+
+void GeometryCameraConverter::CheckTruncation(VisualObjectPtr obj) const {
+  auto width = camera_model_.get_width();
+  auto height = camera_model_.get_height();
+
+  // Ad-hoc 2D box truncation binary determination
+  if (obj->upper_left.x() < 20.0f || width - 20.0f < obj->lower_right.x()) {
+    obj->trunc_width = 0.5f;
+  }
+
+  if (obj->upper_left.y() < 20.0f || height - 20.0f < obj->lower_right.y()) {
+    obj->trunc_height = 0.5f;
+  }
+}
+
+float GeometryCameraConverter::DecideDistance(const float &distance_h,
+                                              const float &distance_w,
+                                              VisualObjectPtr obj) const {
+  float distance = distance_h;
+  if (obj->trunc_height > 0.25f) {
+    distance = distance_w;
+  }
+
+  return distance;
+}
+
+void GeometryCameraConverter::DecideAngle(const Eigen::Vector3f &camera_ray,
+                                          VisualObjectPtr obj) const {
+  float beta = std::atan2(camera_ray.x(), camera_ray.z());
+
+  // Orientation is not reliable in these cases (DL model specific issue)
+  if (obj->distance > 50.0f || obj->trunc_width > 0.25f) {
+    obj->theta = -1.0f * M_PI_2;
+    obj->alpha = obj->theta - beta;
+    if (obj->alpha > M_PI) {
+      obj->alpha -= 2 * M_PI;
+    } else if (obj->alpha < -M_PI) {
+      obj->alpha += 2 * M_PI;
+    }
+  } else {  // Normal cases
+    float theta = obj->alpha + beta;
+    if (theta > M_PI) {
+      theta -= 2 * M_PI;
+    } else if (theta < -M_PI) {
+      theta += 2 * M_PI;
+    }
+    obj->theta = theta;
   }
 }
 
