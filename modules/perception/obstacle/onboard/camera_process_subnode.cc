@@ -45,8 +45,9 @@ bool CameraProcessSubnode::InitInternal() {
 
   AdapterManager::AddImageShortCallback(&CameraProcessSubnode::ImgCallback,
                                         this);
-  if (publish_) AdapterManager::AddChassisCallback(
-    &CameraProcessSubnode::ChassisCallback, this);
+  if (publish_)
+    AdapterManager::AddChassisCallback(&CameraProcessSubnode::ChassisCallback,
+                                       this);
 
   return true;
 }
@@ -132,7 +133,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 }
 
 void CameraProcessSubnode::ChassisCallback(
-  const apollo::canbus::Chassis& message) {
+    const apollo::canbus::Chassis &message) {
   std::lock_guard<std::mutex> lock(camera_mutex_);
   chassis_.CopyFrom(message);
 }
@@ -198,8 +199,8 @@ void CameraProcessSubnode::VisualObjToSensorObj(
 void CameraProcessSubnode::PublishDataAndEvent(
     const double &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
     const SharedDataPtr<CameraItem> &camera_item) {
-//   std::string key = "";
-//   SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
+  //   std::string key = "";
+  //   SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
   CommonSharedDataKey key(timestamp, device_id_);
   cam_obj_data_->Add(key, sensor_objects);
   cam_shared_data_->Add(key, camera_item);
@@ -215,7 +216,7 @@ void CameraProcessSubnode::PublishDataAndEvent(
 }
 
 void CameraProcessSubnode::PublishPerceptionPb(
-    const SharedDataPtr<SensorObjects>& sensor_objects) {
+    const SharedDataPtr<SensorObjects> &sensor_objects) {
   AINFO << "Camera publish perception pb data";
   std::lock_guard<std::mutex> lock(camera_mutex_);
 
@@ -223,7 +224,7 @@ void CameraProcessSubnode::PublishPerceptionPb(
 
   // Header
   common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
-    "perception_obstacle", &obstacles);
+      "perception_obstacle", &obstacles);
   common::Header *header = obstacles.mutable_header();
   header->set_lidar_timestamp(0);
   header->set_camera_timestamp(timestamp_ns_);

@@ -34,8 +34,8 @@ int main(int32_t argc, char** argv) {
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  apollo::common::math::EulerAnglesZXY<double> euler(
-      FLAGS_qw, FLAGS_qx, FLAGS_qy, FLAGS_qz);
+  apollo::common::math::EulerAnglesZXY<double> euler(FLAGS_qw, FLAGS_qx,
+                                                     FLAGS_qy, FLAGS_qz);
   AINFO << "roll: " << euler.roll() << " pitch:" << euler.pitch()
         << " yaw:" << euler.yaw();
   AINFO << "heading: " << apollo::common::math::QuaternionToHeading(
