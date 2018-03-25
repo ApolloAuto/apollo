@@ -46,6 +46,7 @@ cc_test(
         "//modules/perception:perception_data",
         "//modules/perception:perception_model",
         "//modules/perception/conf:perception_config",
+        "//modules/perception/obstacle/camera/lane_post_process/common:util",
     ],
     deps = [
         ":cc_lane_post_processor",

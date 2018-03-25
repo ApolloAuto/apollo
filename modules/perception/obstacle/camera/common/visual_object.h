@@ -49,6 +49,9 @@ struct alignas(16) VisualObject {
   // front box  lower-right corner: x2, y2
   Eigen::Vector2d back_lower_right;
 
+  // 2Dto3D, pts8.resize(16), x, y...
+  std::vector<float> pts8;
+
   // 2D bounding box truncation ratio, for out-of-image objects
   float trunc_width = 0.0f;
   float trunc_height = 0.0f;
@@ -91,9 +94,9 @@ struct alignas(16) VisualObject {
   // globally unique tracking id for camera visual objects
   int track_id = 0;
   // [second] age of the tracked object
-  float track_age = 0.0f;
+  double track_age = 0.0;
   // [second] the last observed timestamp
-  float last_track_timestamp = 0.0f;
+  double last_track_timestamp = 0.0;
 };
 
 typedef std::shared_ptr<VisualObject> VisualObjectPtr;

@@ -48,6 +48,7 @@ class LanePostProcessingSubnode : public Subnode {
 
  private:
   bool InitSharedData();
+  void RegistAllAlgorithms();
   bool InitAlgorithmPlugin();
   bool InitWorkRoot();
   bool GetSharedData(const Event& event, std::shared_ptr<SensorObjects>* objs);
@@ -63,6 +64,8 @@ class LanePostProcessingSubnode : public Subnode {
 
   DISALLOW_COPY_AND_ASSIGN(LanePostProcessingSubnode);
 };
+
+REGISTER_SUBNODE(LanePostProcessingSubnode);
 
 }  // namespace perception
 }  // namespace apollo

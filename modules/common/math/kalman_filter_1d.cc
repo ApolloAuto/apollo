@@ -27,13 +27,13 @@ bool KalmanFilter1D::Init(const float& x) {
 
   // TODO(later) tune and put in config
   P_.setIdentity();
-  P_ *= 10.0f;
+  P_ *= 20.0f;
 
   Q_.setIdentity();
-  Q_ *= 10.0f;
+  Q_ *= 20.0f;
 
   R_.setIdentity();
-  R_ *= 10.0f;
+  R_ *= 20.0f;
 
   return true;
 }
@@ -49,7 +49,7 @@ bool KalmanFilter1D::Predict(const float& time_diff) {
 }
 
 bool KalmanFilter1D::Update(const float& z) {
-  z_ = Eigen::Matrix<float, 1, 1>(z);
+  z_.x() = z;
 
   y_ = z_ - H_ * x_;
 

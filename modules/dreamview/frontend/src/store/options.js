@@ -67,6 +67,7 @@ export default class Options {
         'planningQpOptimizer': true,
         'planningDpOptimizer': true,
         'planningReference': true,
+        'perceptionPointCloud': OFFLINE_PLAYBACK,
     };
 
 
@@ -99,7 +100,9 @@ export default class Options {
 
         if (option === "showPNCMonitor") {
             Object.keys(this.hideOptionToggle).map((toggle) => {
-                this.hideOptionToggle[toggle] = !this[option];
+                if (toggle.startsWith("planning")) {
+                    this.hideOptionToggle[toggle] = !this[option];
+                }
             });
         }
     }

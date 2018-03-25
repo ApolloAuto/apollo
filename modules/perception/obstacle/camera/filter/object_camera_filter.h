@@ -47,7 +47,7 @@ class ObjectCameraFilter : public BaseCameraFilter {
 
   bool Init() override;
 
-  bool Filter(const float &timestamp,
+  bool Filter(const double&timestamp,
               std::vector<VisualObjectPtr> *objects) override;
 
   std::string Name() const override;
@@ -57,7 +57,7 @@ class ObjectCameraFilter : public BaseCameraFilter {
    public:
     int track_id_ = -1;
     int lost_frame_cnt_ = 0;
-    float last_timestamp_ = 0.0f;
+    double last_timestamp_ = 0.0f;
 
     common::math::KalmanFilter1D x_;
     common::math::KalmanFilter1D y_;
@@ -73,11 +73,11 @@ class ObjectCameraFilter : public BaseCameraFilter {
   const int kMaxKeptFrameCnt = 10;
 
   // @brief Create filters for new track ids
-  void Create(const int &track_id, const float &timestamp,
+  void Create(const int &track_id, const double &timestamp,
               const VisualObjectPtr &obj_ptr);
 
   // @brief Predict step
-  void Predict(const int &track_id, const float &timestamp);
+  void Predict(const int &track_id, const double &timestamp);
 
   // @brief Update step
   void Update(const int &track_id, const VisualObjectPtr &obj_ptr);

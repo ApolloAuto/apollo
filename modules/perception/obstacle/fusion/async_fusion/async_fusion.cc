@@ -30,6 +30,12 @@
 namespace apollo {
 namespace perception {
 
+AsyncFusion::AsyncFusion()
+        : matcher_(nullptr),
+          track_manager_(nullptr)
+{}
+
+
 AsyncFusion::~AsyncFusion() {
   if (matcher_) {
     delete matcher_;
@@ -103,27 +109,24 @@ PbfSensorFramePtr AsyncFusion::ConstructFrame(const SensorObjects &frame) {
 bool AsyncFusion::Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
                        std::vector<ObjectPtr> *fused_objects) {
   ACHECK(fused_objects != nullptr) << "parameter fused_objects is nullptr";
-  ACHECK(multi_sensor_objects.size() == 1);
 
-  // async fusion only process one fusion objects per time
-  const SensorObjects &obj = multi_sensor_objects[0];
+  // process all the frames from one of the sensors
+  for (auto obj : multi_sensor_objects) {
+      double fusion_time = obj.timestamp;
+      AINFO << "get sensor data " << GetSensorType(obj.sensor_type)
+            << ", obj_cnt : " << obj.objects.size() << ", " << std::fixed
+            << std::setprecision(12) << obj.timestamp;
 
-  double fusion_time = obj.timestamp;
-  AINFO << "get sensor data " << GetSensorType(obj.sensor_type)
-        << ", obj_cnt : " << obj.objects.size() << ", " << std::fixed
-        << std::setprecision(12) << obj.timestamp;
+      PbfSensorFramePtr frame = ConstructFrame(obj);
 
-  PbfSensorFramePtr frame = ConstructFrame(obj);
-
-  {
-    fusion_mutex_.lock();
-    FuseFrame(frame);
-    // 4.collect results, we don't need to collect fused_objects unless we have
-    // to
-    CollectFusedObjects(fusion_time, fused_objects);
-    fusion_mutex_.unlock();
+      {
+          fusion_mutex_.lock();
+          FuseFrame(frame);
+          // 4.collect results
+          CollectFusedObjects(fusion_time, fused_objects);
+          fusion_mutex_.unlock();
+      }
   }
-
   return true;
 }
 
@@ -138,6 +141,8 @@ void AsyncFusion::FuseFrame(const PbfSensorFramePtr &frame) {
   std::vector<PbfSensorObjectPtr> background_objects;
   std::vector<PbfSensorObjectPtr> foreground_objects;
   DecomposeFrameObjects(objects, &foreground_objects, &background_objects);
+  AINFO << "There are " << foreground_objects.size() << " foreground objects "
+        << "\n " << background_objects.size() << " background objects";
 
   Eigen::Vector3d ref_point = frame->sensor2world_pose.topRightCorner(3, 1);
   FuseForegroundObjects(ref_point, frame->sensor_type, frame->sensor_id,
@@ -190,7 +195,6 @@ void AsyncFusion::CollectFusedObjects(double timestamp,
   int fg_obj_num = 0;
   std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
   for (size_t i = 0; i < tracks.size(); i++) {
-    if (tracks[i]->AbleToPublish()) {
       PbfSensorObjectPtr fused_object = tracks[i]->GetFusedObject();
       ObjectPtr obj(new Object());
       obj->clone(*(fused_object->object));
@@ -199,7 +203,6 @@ void AsyncFusion::CollectFusedObjects(double timestamp,
       obj->tracking_time = tracks[i]->GetTrackingPeriod();
       fused_objects->push_back(obj);
       fg_obj_num++;
-    }
   }
 
   AINFO << "fg_track_cnt = " << tracks.size();

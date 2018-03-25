@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "modules/common/configs/config_gflags.h"
+#include "modules/common/log.h"
 
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 #include "modules/third_party_perception/common/third_party_perception_util.h"
@@ -203,10 +204,15 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
                          M_PI);
         } else {
           double nearest_lane_heading =
-              std::copysign(std::atan2(3 * path_c3 * converted_x * converted_x +
-                                           2 * path_c2 * converted_x + path_c1,
-                                       1),
-                            converted_vx);
+              converted_vx > 0
+                  ? std::atan2(3 * path_c3 * converted_x * converted_x +
+                                   2 * path_c2 * converted_x + path_c1,
+                               1)
+                  : std::atan2(3 * path_c3 * converted_x * converted_x +
+                                   2 * path_c2 * converted_x + path_c1,
+                               1) +
+                        M_PI;
+          AINFO << "nearest lane heading is" << nearest_lane_heading;
           mob->set_theta(nearest_lane_heading);
         }
       }
@@ -294,9 +300,6 @@ RadarObstacles ContiToRadarObstacles(
     absolute_pos.set_y(adc_pos.y() + relative_pos_xy.y());
     absolute_pos.set_z(adc_pos.z());
     rob.mutable_absolute_position()->CopyFrom(absolute_pos);
-
-    double theta = GetNearestLaneHeading(rob.absolute_position());
-    rob.set_theta(theta);
 
     rob.mutable_relative_velocity()->set_x(contiobs.longitude_vel());
     rob.mutable_relative_velocity()->set_y(contiobs.lateral_vel());

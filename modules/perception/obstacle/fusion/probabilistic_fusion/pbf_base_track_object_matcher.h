@@ -84,5 +84,6 @@ class PbfBaseTrackObjectMatcher {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H_
-        // // NOLINT
+// clang-format off
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_TRACK_OBJECT_MATCHER_H_ // NOLINT
+// clang-format on

@@ -25,6 +25,9 @@ namespace apollo {
 namespace perception {
 namespace lowcostvisualizer {
 
+using apollo::perception::LaneObjectsPtr;
+using apollo::perception::LaneObjects;
+
 FrameContent::FrameContent() : global_offset_initialized_(false) {
   continuous_type_ = PC_CONTINUOUS;
 }
@@ -117,6 +120,22 @@ void FrameContent::set_fusion_content(double timestamp,
   fusion_caches_[DoubleToMapKey(timestamp)] = content;
 }
 
+void FrameContent::set_lane_content(double timestamp,
+                                    const LaneObjects& objects) {
+  auto key = DoubleToMapKey(timestamp);
+  if (lane_caches_.count(key)) return;
+
+  LaneContent content;
+  content.timestamp_ = timestamp;
+
+  content.lane_objects_.resize(objects.size());
+  for (size_t i = 0; i < objects.size(); ++i) {
+    content.lane_objects_[i] = objects[i];
+  }
+
+  lane_caches_[key] = content;
+}
+
 void FrameContent::set_gt_content(double timestamp,
                                   const std::vector<ObjectPtr>& objects) {
   GroundTruthContent content;
@@ -136,6 +155,7 @@ void FrameContent::set_motion_content(double timestamp,
   MotionContent motion_content;
   motion_content.motion_frame_content_ = *motion_buffer;
   motion_caches_[DoubleToMapKey(timestamp)] = motion_content;
+  AINFO << "Motion_caches size: "<< motion_caches_.size();
 }
 
 void FrameContent::update_timestamp(double ref) {
@@ -169,8 +189,21 @@ void FrameContent::update_timestamp(double ref) {
   AINFO << "FrameContent::update_timestamp() : current_camera_timestamp_";
   AINFO << std::fixed << std::setprecision(64) << current_camera_timestamp_;
 
-  float best_delta = FLT_MAX;
-  int best_ts = -1;
+  // get lane object timestamp
+  if (lane_caches_.size() > 1) {
+    auto it = lane_caches_.lower_bound(key);
+    if (it != lane_caches_.end()) {
+      lane_caches_.erase(lane_caches_.begin(), it);
+    } else {
+      lane_caches_.erase(lane_caches_.begin(), std::prev(lane_caches_.end()));
+    }
+  }
+  current_lane_timestamp_ = MapKeyToDouble(lane_caches_.begin()->first);
+  AINFO << "FrameContent::update_timestamp() : current_lane_timestamp_";
+  AINFO << std::fixed << std::setprecision(64) << current_lane_timestamp_;
+
+  double best_delta = FLT_MAX;
+  double best_ts = -1;
 
   for (std::map<int64_t, RadarContent>::iterator it = radar_caches_.begin();
        it != radar_caches_.end(); ++it) {
@@ -192,7 +225,7 @@ void FrameContent::update_timestamp(double ref) {
   best_delta = FLT_MAX;
   best_ts = -1;
   for (auto it = fusion_caches_.begin(); it != fusion_caches_.end(); ++it) {
-    double it_ts = it->first;
+    double it_ts = MapKeyToDouble(it->first);
     double delta = fabs(it_ts - ref);
 
     if (delta < best_delta) {
@@ -210,7 +243,7 @@ void FrameContent::update_timestamp(double ref) {
   best_delta = FLT_MAX;
   best_ts = -1;
   for (auto it = gt_caches_.begin(); it != gt_caches_.end(); ++it) {
-    double it_ts = it->first;
+    double it_ts = MapKeyToDouble(it->first);
     double delta = fabs(it_ts - ref);
     if (delta < best_delta) {
       best_delta = delta;
@@ -228,7 +261,7 @@ void FrameContent::update_timestamp(double ref) {
   best_delta = FLT_MAX;
   best_ts = -1;
   for (auto it = motion_caches_.begin(); it != motion_caches_.end(); ++it) {
-    double it_ts = it->first;
+    double it_ts = MapKeyToDouble(it->first);
     double delta = fabs(it_ts - ref);
 
     if (delta < best_delta) {
@@ -245,8 +278,10 @@ void FrameContent::update_timestamp(double ref) {
 
   AINFO << " | radar caches num: " << radar_caches_.size()
         << " | camera caches num: " << camera_caches_.size()
+        << " | lane caches num: " << lane_caches_.size()
         << " | fusion caches num: " << fusion_caches_.size()
-        << " | image caches num: " << image_caches_.size();
+        << " | image caches num: " << image_caches_.size()
+        << " | motion caches num: " << motion_caches_.size();
 }
 
 Eigen::Matrix4d FrameContent::get_camera_to_world_pose() {
@@ -283,6 +318,12 @@ std::vector<ObjectPtr> FrameContent::get_camera_objects() {
 const MotionBuffer FrameContent::get_motion_buffer() {
   auto it = motion_caches_.find(DoubleToMapKey(current_motion_timestamp_));
   if (it == motion_caches_.end()) {
+//    AINFO << "no motion available: " << motion_caches_.size();
+//    AINFO << "no motion available: " << current_motion_timestamp_;
+    AINFO << "no motion available: "
+          << DoubleToMapKey(current_motion_timestamp_);
+//    for (auto &iter : motion_caches_)
+//      AINFO << "motion_caches data: " << iter.first;
     return MotionBuffer(0);
   }
   MotionContent content = it->second;
@@ -346,6 +387,15 @@ std::vector<ObjectPtr> FrameContent::get_gt_objects() {
   }
   GroundTruthContent content = it->second;
   return content.gt_objects_;
+}
+
+LaneObjects FrameContent::get_lane_objects() {
+  auto it = lane_caches_.find(DoubleToMapKey(current_lane_timestamp_));
+  if (it == lane_caches_.end()) {
+    return LaneObjects();
+  }
+  LaneContent content = it->second;
+  return content.lane_objects_;
 }
 
 void FrameContent::offset_object(ObjectPtr object,

@@ -1,31 +1,59 @@
 header {
-  timestamp_sec: 1516909119.7016306
+  timestamp_sec: 1521774803.633992
   module_name: "routing"
-  sequence_num: 1
+  sequence_num: 552
 }
 road {
-  id: "447-446-867-459-828"
+  id: "828"
   passage {
     segment {
       id: "828_1_-1"
       start_s: 91.683969660332181
       end_s: 188.836
     }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "459"
+  passage {
     segment {
       id: "459_1_-1"
       start_s: 0
       end_s: 61.3722
     }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "867"
+  passage {
     segment {
       id: "867_1_-1"
       start_s: 0
       end_s: 36.5162
     }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "446"
+  passage {
     segment {
       id: "446_1_-1"
       start_s: 0
       end_s: 50.5431
     }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "447"
+  passage {
     segment {
       id: "447_1_-1"
       start_s: 0
@@ -40,8 +68,8 @@ measurement {
 }
 routing_request {
   header {
-    timestamp_sec: 1516909114.35002
-    module_name: "dreamview"
+    timestamp_sec: 1521774803.6327136
+    module_name: "routing"
     sequence_num: 1
   }
   waypoint {
@@ -61,7 +89,7 @@ routing_request {
     }
   }
 }
-map_version: "1.000000"
+map_version: "1.500000"
 status {
   error_code: OK
   msg: "Success!"

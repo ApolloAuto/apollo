@@ -2327,6 +2327,10 @@
                 "relativeMap": {
                   "type": "apollo.relative_map.MapMsg",
                   "id": 22
+                },
+                "autoTuningTrainingData": {
+                  "type": "AutoTuningTrainingData",
+                  "id": 23
                 }
               }
             },
@@ -2384,6 +2388,30 @@
                 "tResolution": {
                   "type": "double",
                   "id": 7
+                }
+              }
+            },
+            "CostComponents": {
+              "fields": {
+                "costComponent": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "packed": false
+                  }
+                }
+              }
+            },
+            "AutoTuningTrainingData": {
+              "fields": {
+                "teacherComponent": {
+                  "type": "CostComponents",
+                  "id": 1
+                },
+                "studentComponent": {
+                  "type": "CostComponents",
+                  "id": 2
                 }
               }
             },

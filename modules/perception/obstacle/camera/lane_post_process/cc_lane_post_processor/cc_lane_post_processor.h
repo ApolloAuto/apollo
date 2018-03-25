@@ -123,6 +123,9 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
   DISALLOW_COPY_AND_ASSIGN(CCLanePostProcessor);
 };
 
+// Register plugin.
+REGISTER_CAMERA_LANE_POST_PROCESSOR(CCLanePostProcessor);
+
 }  // namespace perception
 }  // namespace apollo
 

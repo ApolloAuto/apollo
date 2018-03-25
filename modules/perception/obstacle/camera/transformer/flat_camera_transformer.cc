@@ -27,7 +27,7 @@ bool FlatCameraTransformer::Transform(std::vector<VisualObjectPtr> *objects) {
   for (auto obj_ptr : *objects) {
     // Get 2D distance
     float d = obj_ptr->distance;
-    float d_v = abs(kCameraHeight - obj_ptr->height / 2.0f);
+    float d_v = std::abs(kCameraHeight - obj_ptr->height / 2.0f);
     float d_flat = sqrt(d * d - d_v * d_v);
 
     // Get 2D vector
@@ -42,8 +42,11 @@ bool FlatCameraTransformer::Transform(std::vector<VisualObjectPtr> *objects) {
     obj_ptr->center = pos_ground + kCamera2CarFlatOffset;
 
     // Orientation
+    // Camera space
     float theta = obj_ptr->theta;
     Eigen::Vector4f dir(cos(theta), 0.0f, -sin(theta), 0.0f);
+
+    // Ego car space
     dir = camera2car_ * dir;
     obj_ptr->direction = dir.head(3);
     obj_ptr->theta = atan2(dir[1], dir[0]);
