@@ -78,7 +78,6 @@ void ProcessMonitor::UpdateModule(
       status->mutable_process_status()->set_running(true);
       ADEBUG << "Module " << module_name
              << " is running on process " << proc.first;
-      return;
     }
   }
 
