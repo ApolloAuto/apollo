@@ -39,15 +39,13 @@ The Docker container is the simplest way to set up the build environment for Apo
 
 For more information, see the detailed Docker tutorial [here](https://docs.docker.com/).
 
-1. Run the following command to install Docker:
+1. Please follow the
+[official guide to install the docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu).
 
-    ```
-    cd $APOLLO_HOME
-    bash docker/scripts/install_docker.sh
-    ```
+Don't forget the
+[post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
 
-2. After the script completes, log out and then log back into the system to enable Docker.
-
+2. After the installation, log out and then log back into the system to enable Docker.
 
 3. (Optional) If you already have Docker installed (before you installed the Apollo Kernel), add the following line in `/etc/default/docker`:
 
