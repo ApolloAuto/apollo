@@ -78,6 +78,14 @@ class PbfTrack {
     return s_max_lidar_invisible_period_;
   }
 
+  static void SetMaxCameraInvisiblePeriod(double period) {
+    s_max_camera_invisible_period_ = period;
+  }
+
+  static double GetMaxCameraInvisiblePeriod() {
+    return s_max_camera_invisible_period_;
+  }
+
   static void SetMaxRadarInvisiblePeriod(double period) {
     s_max_radar_invisible_period_ = period;
   }
@@ -113,7 +121,7 @@ class PbfTrack {
 
   void PerformMotionFusion(PbfSensorObjectPtr obj);
 
-  void PerformMotionFusionLowCost(PbfSensorObjectPtr obj);
+  void PerformMotionFusionAsync(PbfSensorObjectPtr obj);
 
   void UpdateMeasurementsLifeWithMeasurement(
       std::map<std::string, PbfSensorObjectPtr> *objects,
