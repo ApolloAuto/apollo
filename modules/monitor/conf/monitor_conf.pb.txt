@@ -26,6 +26,12 @@ modules {
   }
 }
 modules {
+  name: "navigation_camera"
+  process_conf {
+    process_cmd_keywords: "camera_nodelet_manager"
+  }
+}
+modules {
   name: "navigation_control"
   process_conf {
     process_cmd_keywords: "modules/control/control"
