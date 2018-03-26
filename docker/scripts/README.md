@@ -1,3 +1,15 @@
+# Docker environment
+
+## Install docker
+
+Please follow the
+[official guide to install the docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu).
+
+Don't forget the
+[post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
+
+## Use docker image
+
 We define two Docker images: build and release.
 The build image provides an environment where
 `bash apollo.sh build` runs successfully,
