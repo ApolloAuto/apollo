@@ -45,8 +45,9 @@ bool CameraProcessSubnode::InitInternal() {
 
   AdapterManager::AddImageShortCallback(&CameraProcessSubnode::ImgCallback,
                                         this);
-  if (publish_) AdapterManager::AddChassisCallback(
-    &CameraProcessSubnode::ChassisCallback, this);
+  if (publish_)
+    AdapterManager::AddChassisCallback(&CameraProcessSubnode::ChassisCallback,
+                                       this);
 
   return true;
 }
@@ -132,7 +133,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 }
 
 void CameraProcessSubnode::ChassisCallback(
-  const apollo::canbus::Chassis& message) {
+    const apollo::canbus::Chassis &message) {
   std::lock_guard<std::mutex> lock(camera_mutex_);
   chassis_.CopyFrom(message);
 }
@@ -167,6 +168,18 @@ void CameraProcessSubnode::VisualObjToSensorObj(
   (*sensor_objects)->sensor2world_pose = camera_to_car_;
   ((*sensor_objects)->camera_frame_supplement).reset(new CameraFrameSupplement);
 
+  if (!CameraFrameSupplement::state_vars.initialized_) {
+    CameraFrameSupplement::state_vars.process_noise *= 10;
+    // CameraFrameSupplement::state_vars.measurement_noise *=10;
+    CameraFrameSupplement::state_vars.trans_matrix.block(0, 0, 1, 4) << 1.0f,
+        0.0f, 0.33f, 0.0f;
+    CameraFrameSupplement::state_vars.trans_matrix.block(1, 0, 1, 4) << 0.0f,
+        1.0f, 0.0f, 0.33f;
+    std::cout << "state trans matrix in CameraFrameSupplement is \n"
+              << CameraFrameSupplement::state_vars.trans_matrix << std::endl;
+    CameraFrameSupplement::state_vars.initialized_ = true;
+  }
+
   for (size_t i = 0; i < objects.size(); ++i) {
     VisualObjectPtr vobj = objects[i];
     ObjectPtr obj(new Object());
@@ -190,6 +203,11 @@ void CameraProcessSubnode::VisualObjToSensorObj(
     obj->camera_supplement->lower_right = vobj->lower_right.cast<double>();
     obj->camera_supplement->alpha = vobj->alpha;
     obj->camera_supplement->pts8 = vobj->pts8;
+    obj->state_uncertainty = vobj->state_uncertainty;
+    // obj->type_probs.assign(vobj->type_probs,
+    //                        vobj->type_probs + MAX_OBJECT_TYPE);
+    // obj->camera_supplement->pts8.assign(vobj->pts8,
+    //                                     vobj->pts8 + 16);
 
     ((*sensor_objects)->objects).emplace_back(obj);
   }
@@ -215,7 +233,7 @@ void CameraProcessSubnode::PublishDataAndEvent(
 }
 
 void CameraProcessSubnode::PublishPerceptionPb(
-    const SharedDataPtr<SensorObjects>& sensor_objects) {
+    const SharedDataPtr<SensorObjects> &sensor_objects) {
   AINFO << "Camera publish perception pb data";
   std::lock_guard<std::mutex> lock(camera_mutex_);
 
@@ -223,7 +241,7 @@ void CameraProcessSubnode::PublishPerceptionPb(
 
   // Header
   common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
-    "perception_obstacle", &obstacles);
+      "perception_obstacle", &obstacles);
   common::Header *header = obstacles.mutable_header();
   header->set_lidar_timestamp(0);
   header->set_camera_timestamp(timestamp_ns_);

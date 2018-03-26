@@ -90,7 +90,10 @@ struct alignas(16) VisualObject {
   float distance = 0.0f;
   // [meter / second] physical velocity of the object, (vx, vy, vz)
   Eigen::Vector3f velocity = Eigen::Vector3f::Zero();
-
+  // kalman filter state uncertainty set by different sensor type
+  // each sensor need to model individually
+  Eigen::Matrix<double, 4, 4> state_uncertainty =
+      Eigen::Matrix<double, 4, 4>::Identity();
   // globally unique tracking id for camera visual objects
   int track_id = 0;
   // [second] age of the tracked object

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_imf_fusion.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
 
 #include <algorithm>
 #include <functional>
@@ -37,6 +37,12 @@ class PbfMotionFusionTest : public testing::Test {
     PbfIMFFusion *imf_motion_fusion = new PbfIMFFusion();
     motion_fusion_algs_.push_back(kalman_motion_fusion);
     motion_fusion_algs_.push_back(imf_motion_fusion);
+    LidarFrameSupplement::state_vars.initialized_ = true;
+    RadarFrameSupplement::state_vars.initialized_ = true;
+    CameraFrameSupplement::state_vars.initialized_ = true;
+    PbfTrack::SetMaxLidarInvisiblePeriod(10);
+    PbfTrack::SetMaxRadarInvisiblePeriod(10);
+    PbfTrack::SetMaxCameraInvisiblePeriod(10);
   }
   void TearDown() override {
     for (auto &seg_alg : motion_fusion_algs_) {
@@ -57,7 +63,7 @@ TEST_F(PbfMotionFusionTest, test_initialize_with_lidar_object) {
   lidar_object->center = lidar_position;
   lidar_object->anchor_point = lidar_position;
   lidar_object->velocity = lidar_velocity;
-  lidar_object->uncertainty.setIdentity();
+  lidar_object->state_uncertainty.setIdentity();
   PbfSensorObjectPtr pbf_lidar_object(new PbfSensorObject(
       lidar_object, SensorType::VELODYNE_64, lidar_timestamp));
   for (auto motion_fusion_alg : motion_fusion_algs_) {
@@ -90,7 +96,7 @@ TEST_F(PbfMotionFusionTest, test_initialize_with_radar_object) {
     EXPECT_TRUE((velocity - radar_velocity).norm() < 1.0e-6);
   }
 }
-TEST_F(PbfMotionFusionTest, test_update_with_measurement) {
+TEST_F(PbfMotionFusionTest, test_update_with_measurement_kalman) {
   ObjectPtr radar_object(new Object());
   double radar_timestamp = 1234567891.012;
   Eigen::Vector3d radar_position(30, 0, 0);
@@ -111,18 +117,69 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement) {
   PbfSensorObjectPtr pbf_lidar_object(new PbfSensorObject(
       lidar_object, SensorType::VELODYNE_64, lidar_timestamp));
   for (auto motion_fusion_alg : motion_fusion_algs_) {
+    if (motion_fusion_alg->name() != "PbfKalmanMotionFusion") {
+      continue;
+    }
+    motion_fusion_alg->setCurrentFuseTS(radar_timestamp + 0.2);
     motion_fusion_alg->Initialize(pbf_radar_object);
+    motion_fusion_alg->setLastFuseTS(radar_timestamp + 0.2);
+    motion_fusion_alg->setCurrentFuseTS(lidar_timestamp + 0.2);
     motion_fusion_alg->UpdateWithObject(pbf_lidar_object,
                                         lidar_timestamp - radar_timestamp);
     Eigen::Vector3d location;
     Eigen::Vector3d velocity;
     motion_fusion_alg->GetState(&location, &velocity);
-    AINFO << "algorithm " << motion_fusion_alg->name() << ": " << location
-          << lidar_position << (location - lidar_position).norm();
+    std::cout << "algorithm " << motion_fusion_alg->name() << ": " << location
+              << lidar_position << (location - lidar_position).norm();
     EXPECT_TRUE((location - lidar_position).norm() < 2.0e-1);
     EXPECT_TRUE((velocity - lidar_velocity).norm() < 1.0e-1);
   }
 }
+
+TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf) {
+  ObjectPtr radar_object(new Object());
+  double radar_timestamp = 1234567891.012;
+  Eigen::Vector3d radar_position(30, 0, 0);
+  Eigen::Vector3d radar_velocity(10.01, 0, 0);
+  radar_object->center = radar_position;
+  radar_object->anchor_point = radar_position;
+  radar_object->velocity = radar_velocity;
+  PbfSensorObjectPtr pbf_radar_object(
+      new PbfSensorObject(radar_object, SensorType::RADAR, radar_timestamp));
+
+  ObjectPtr lidar_object(new Object());
+  double lidar_timestamp = 1234567891.112;
+  Eigen::Vector3d lidar_position(31.01, 0, 0);
+  Eigen::Vector3d lidar_velocity(10, 0, 0);
+  lidar_object->center = lidar_position;
+  lidar_object->anchor_point = lidar_position;
+  lidar_object->velocity = lidar_velocity;
+  PbfSensorObjectPtr pbf_lidar_object(new PbfSensorObject(
+      lidar_object, SensorType::VELODYNE_64, lidar_timestamp));
+
+  for (auto motion_fusion_alg : motion_fusion_algs_) {
+    if (motion_fusion_alg->name() != "PbfInformationMotionFusion") continue;
+
+    motion_fusion_alg->setCurrentFuseTS(radar_timestamp);
+    motion_fusion_alg->Initialize(pbf_radar_object);
+    motion_fusion_alg->setLastFuseTS(radar_timestamp);
+    motion_fusion_alg->setCurrentFuseTS(lidar_timestamp + 0.2);
+    motion_fusion_alg->UpdateWithObject(
+        pbf_lidar_object, lidar_timestamp - radar_timestamp + 0.2);
+    Eigen::Vector3d location;
+    Eigen::Vector3d velocity;
+    motion_fusion_alg->GetState(&location, &velocity);
+    double time_diff = 0.2;
+    AINFO << "algorithm " << motion_fusion_alg->name() << ": " << location
+          << lidar_position + time_diff * lidar_velocity << velocity
+          << lidar_velocity;
+    EXPECT_TRUE(
+        (location - (lidar_position + time_diff * lidar_velocity)).norm() <
+        2.0e-1);
+    EXPECT_TRUE((velocity - lidar_velocity).norm() < 1.0e-1);
+  }
+}
+
 TEST_F(PbfMotionFusionTest, test_update_without_measurement) {
   ObjectPtr lidar_object(new Object());
   double lidar_timestamp = 1234567891.012;

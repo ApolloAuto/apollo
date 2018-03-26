@@ -20,6 +20,7 @@
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/macro.h"
+#include "modules/common/time/time_util.h"
 #include "modules/perception/common/geometry_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -41,6 +42,8 @@ double PbfTrack::s_min_radar_confident_distance_ = 40;
 
 bool PbfTrack::s_publish_if_has_lidar_ = true;
 bool PbfTrack::s_publish_if_has_radar_ = true;
+
+using apollo::common::time::TimeUtil;
 
 PbfTrack::PbfTrack(PbfSensorObjectPtr obj)
     : s_motion_fusion_method_("PbfKalmanMotionFusion") {
@@ -95,7 +98,11 @@ void PbfTrack::UpdateWithSensorObject(PbfSensorObjectPtr obj,
                                       double match_dist) {
   const SensorType &sensor_type = obj->sensor_type;
   const std::string sensor_id = obj->sensor_id;
-  PerformMotionFusion(obj);
+  if (FLAGS_async_fusion) {
+    PerformMotionFusionAsync(obj);
+  } else {
+    PerformMotionFusion(obj);
+  }
 
   if (is_lidar(sensor_type)) {
     lidar_objects_[sensor_id] = obj;
@@ -192,34 +199,37 @@ PbfSensorObjectPtr PbfTrack::GetCameraObject(const std::string &sensor_id) {
   return obj;
 }
 
-void PbfTrack::PerformMotionFusionLowCost(PbfSensorObjectPtr obj) {
+void PbfTrack::PerformMotionFusionAsync(PbfSensorObjectPtr obj) {
   if (motion_fusion_ == nullptr) {
     AERROR << "Skip motion fusion becuase motion_fusion_ is nullptr.";
     return;
   }
-
+  AINFO << "perform motion fusion asynchrounously!";
   const SensorType &sensor_type = obj->sensor_type;
-  double time_diff = obj->timestamp - fused_object_->timestamp;
+  // double time_diff = obj->timestamp - fused_object_->timestamp;
+  double current_time = TimeUtil::GetCurrentTime();
 
   // for low cost, we only consider radar and camera fusion for now
   if (is_camera(sensor_type) || is_radar(sensor_type)) {
+    Eigen::Vector3d velocity = Eigen::Vector3d::Zero();
+
+    motion_fusion_->setCurrentFuseTS(current_time);
     if (motion_fusion_->Initialized()) {
+      double time_diff = motion_fusion_->getFuseTimeDiff();
       motion_fusion_->UpdateWithObject(obj, time_diff);
-      Eigen::Vector3d anchor_point;
-      Eigen::Vector3d velocity;
-      Eigen::Vector3d pre_anchor_point;
-      Eigen::Vector3d pre_velocity;
-      motion_fusion_->GetState(&pre_anchor_point, &pre_velocity);
-      motion_fusion_->UpdateWithObject(obj, time_diff);
-      motion_fusion_->GetState(&anchor_point, &velocity);
-      fused_object_->object->velocity = velocity;
-      Eigen::Vector3d translation = anchor_point - pre_anchor_point;
-      fused_object_->object->anchor_point = anchor_point;
-      fused_object_->object->center += translation;
-      fused_object_->object->velocity = velocity;
     } else {
       motion_fusion_->Initialize(obj);
+      current_time = obj->timestamp;  // for initialize, we set fusion time to
+                                      // sensor timestamp
     }
+    Eigen::Vector3d anchor_point;
+    motion_fusion_->GetState(&anchor_point, &velocity);
+    fused_object_->object->velocity = velocity;
+    fused_object_->object->anchor_point = anchor_point;
+    fused_object_->object->center = anchor_point;
+    // updated by arrival time of sensor object
+    fused_object_->timestamp = current_time;
+    motion_fusion_->setLastFuseTS(current_time);
   }
 }
 

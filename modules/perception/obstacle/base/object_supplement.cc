@@ -19,6 +19,10 @@
 namespace apollo {
 namespace perception {
 
+TrackStateVars LidarFrameSupplement::state_vars;
+TrackStateVars RadarFrameSupplement::state_vars;
+TrackStateVars CameraFrameSupplement::state_vars;
+
 /**RadarFrameSupplement implementation*/
 RadarFrameSupplement::RadarFrameSupplement() {}
 
