@@ -1,195 +1,15 @@
 header {
-  timestamp_sec: 1521773903.2859628
+  timestamp_sec: 1522096299.304265
   module_name: "routing"
-  sequence_num: 365
-}
-road {
-  id: "1737a"
-  passage {
-    segment {
-      id: "1737a_1_-1"
-      start_s: 4.79543630780488
-      end_s: 30.3986
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "773"
-  passage {
-    segment {
-      id: "773_1_-1"
-      start_s: 0
-      end_s: 78.6525
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "775"
-  passage {
-    segment {
-      id: "775_1_-1"
-      start_s: 0
-      end_s: 14.3568
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "774"
-  passage {
-    segment {
-      id: "774_1_-1"
-      start_s: 0
-      end_s: 8.68002
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2955"
-  passage {
-    segment {
-      id: "2955_1_-1"
-      start_s: 0
-      end_s: 10.6996
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2956"
-  passage {
-    segment {
-      id: "2956_1_-1"
-      start_s: 0
-      end_s: 45.0378
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2959"
-  passage {
-    segment {
-      id: "2959_1_-1"
-      start_s: 0
-      end_s: 11.5759
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2960"
-  passage {
-    segment {
-      id: "2960_1_-1"
-      start_s: 0
-      end_s: 34.7844
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "343"
-  passage {
-    segment {
-      id: "343_1_-1"
-      start_s: 0
-      end_s: 24.944
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "378"
-  passage {
-    segment {
-      id: "378_1_-1"
-      start_s: 0
-      end_s: 58.8707
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2964"
-  passage {
-    segment {
-      id: "2964_1_-1"
-      start_s: 0
-      end_s: 15.5177
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "379"
-  passage {
-    segment {
-      id: "379_1_-1"
-      start_s: 0
-      end_s: 6.06045
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2965"
-  passage {
-    segment {
-      id: "2965_1_-1"
-      start_s: 0
-      end_s: 38.4422
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "380"
-  passage {
-    segment {
-      id: "380_1_-1"
-      start_s: 0
-      end_s: 99.1375
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2971"
-  passage {
-    segment {
-      id: "2971_1_-1"
-      start_s: 0
-      end_s: 10.5341
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
+  sequence_num: 1
 }
 road {
   id: "2972"
   passage {
     segment {
       id: "2972_1_-1"
-      start_s: 0
-      end_s: 86.7733
+      start_s: 34.393144893029579
+      end_s: 85.3534
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -201,7 +21,7 @@ road {
     segment {
       id: "2974_1_-1"
       start_s: 0
-      end_s: 10.4853
+      end_s: 11.3993
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -213,7 +33,31 @@ road {
     segment {
       id: "2975_1_-1"
       start_s: 0
-      end_s: 16.631
+      end_s: 4.35141
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "11181"
+  passage {
+    segment {
+      id: "11181_1_-1"
+      start_s: 0
+      end_s: 7.29303
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "11180"
+  passage {
+    segment {
+      id: "11180_1_-1"
+      start_s: 0
+      end_s: 4.07289
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -225,7 +69,7 @@ road {
     segment {
       id: "812_1_-1"
       start_s: 0
-      end_s: 26.8009
+      end_s: 25.6336
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -237,7 +81,31 @@ road {
     segment {
       id: "204_1_-1"
       start_s: 0
-      end_s: 18.3654
+      end_s: 4.23033
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "11042"
+  passage {
+    segment {
+      id: "11042_1_-1"
+      start_s: 0
+      end_s: 3.79788
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "11041"
+  passage {
+    segment {
+      id: "11041_1_-1"
+      start_s: 0
+      end_s: 11.5049
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -297,7 +165,31 @@ road {
     segment {
       id: "458_1_-1"
       start_s: 0
-      end_s: 57.836
+      end_s: 29.5715
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10735"
+  passage {
+    segment {
+      id: "10735_1_-1"
+      start_s: 0
+      end_s: 4.38651
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10780"
+  passage {
+    segment {
+      id: "10780_1_-1"
+      start_s: 0
+      end_s: 23.879
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -441,7 +333,19 @@ road {
     segment {
       id: "1872_1_-1"
       start_s: 0
-      end_s: 15.8705
+      end_s: 6.87984
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "11203"
+  passage {
+    segment {
+      id: "11203_1_-1"
+      start_s: 0
+      end_s: 8.99068
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -453,7 +357,19 @@ road {
     segment {
       id: "1871_1_-1"
       start_s: 0
-      end_s: 10.6939
+      end_s: 10.8403
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "11222"
+  passage {
+    segment {
+      id: "11222_1_-1"
+      start_s: 0
+      end_s: 1.58273
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -465,7 +381,7 @@ road {
     segment {
       id: "597_1_-1"
       start_s: 0
-      end_s: 16.9234
+      end_s: 15.1954
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -477,7 +393,7 @@ road {
     segment {
       id: "519_1_-2"
       start_s: 0
-      end_s: 3.37796
+      end_s: 3.37727
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -520,10 +436,10 @@ road {
   }
 }
 road {
-  id: "52"
+  id: "102"
   passage {
     segment {
-      id: "52_1_-1"
+      id: "102_1_-1"
       start_s: 0
       end_s: 5.90927
     }
@@ -532,10 +448,10 @@ road {
   }
 }
 road {
-  id: "53"
+  id: "103"
   passage {
     segment {
-      id: "53_1_-1"
+      id: "103_1_-1"
       start_s: 0
       end_s: 23.1426
     }
@@ -544,10 +460,10 @@ road {
   }
 }
 road {
-  id: "57"
+  id: "105"
   passage {
     segment {
-      id: "57_1_-1"
+      id: "105_1_-1"
       start_s: 0
       end_s: 3.72415
     }
@@ -561,19 +477,19 @@ road {
     segment {
       id: "2147_1_-1"
       start_s: 0
-      end_s: 11.9317
+      end_s: 11.9742
     }
     can_exit: true
     change_lane_type: FORWARD
   }
 }
 road {
-  id: "2146"
+  id: "10866"
   passage {
     segment {
-      id: "2146_1_-1"
+      id: "10866_1_-1"
       start_s: 0
-      end_s: 25.9902
+      end_s: 26.5863
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -585,7 +501,31 @@ road {
     segment {
       id: "1851_1_-1"
       start_s: 0
-      end_s: 91.4233
+      end_s: 30.8955
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "11027"
+  passage {
+    segment {
+      id: "11027_1_-1"
+      start_s: 0
+      end_s: 45.3613
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "11055"
+  passage {
+    segment {
+      id: "11055_1_-1"
+      start_s: 0
+      end_s: 13.0003
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -597,7 +537,7 @@ road {
     segment {
       id: "1862_1_-1"
       start_s: 0
-      end_s: 11.5187
+      end_s: 15.4008
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -609,7 +549,19 @@ road {
     segment {
       id: "1861_1_-1"
       start_s: 0
-      end_s: 28.9878
+      end_s: 23.3489
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10192"
+  passage {
+    segment {
+      id: "10192_1_-1"
+      start_s: 0
+      end_s: 3.2845
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -633,7 +585,31 @@ road {
     segment {
       id: "1859_1_-1"
       start_s: 0
-      end_s: 75.3014
+      end_s: 5.72639
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10184"
+  passage {
+    segment {
+      id: "10184_1_-1"
+      start_s: 0
+      end_s: 29.3155
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10856"
+  passage {
+    segment {
+      id: "10856_1_-1"
+      start_s: 0
+      end_s: 36.7952
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -645,7 +621,19 @@ road {
     segment {
       id: "1856_1_-1"
       start_s: 0
-      end_s: 31.8025
+      end_s: 21.2457
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10199"
+  passage {
+    segment {
+      id: "10199_1_-1"
+      start_s: 0
+      end_s: 18.0019
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -657,7 +645,31 @@ road {
     segment {
       id: "1855_1_-1"
       start_s: 0
-      end_s: 68.3164
+      end_s: 27.8647
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10307"
+  passage {
+    segment {
+      id: "10307_1_-1"
+      start_s: 0
+      end_s: 17.5194
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10308"
+  passage {
+    segment {
+      id: "10308_1_-1"
+      start_s: 0
+      end_s: 15.6473
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -669,7 +681,19 @@ road {
     segment {
       id: "1854_1_-1"
       start_s: 0
-      end_s: 40.0975
+      end_s: 17.9815
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10216"
+  passage {
+    segment {
+      id: "10216_1_-1"
+      start_s: 0
+      end_s: 19.7482
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -681,7 +705,7 @@ road {
     segment {
       id: "1853_1_-1"
       start_s: 0
-      end_s: 9.95527
+      end_s: 20.7487
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -693,7 +717,7 @@ road {
     segment {
       id: "1852_1_-1"
       start_s: 0
-      end_s: 29.6546
+      end_s: 24.5329
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -717,7 +741,19 @@ road {
     segment {
       id: "1270_1_-1"
       start_s: 0
-      end_s: 16.9229
+      end_s: 5.5177
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "11056"
+  passage {
+    segment {
+      id: "11056_1_-1"
+      start_s: 0
+      end_s: 8.34797
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -729,7 +765,7 @@ road {
     segment {
       id: "1848_1_-1"
       start_s: 0
-      end_s: 9.61716
+      end_s: 15.4382
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -741,7 +777,7 @@ road {
     segment {
       id: "1847_1_-1"
       start_s: 0
-      end_s: 18.8422
+      end_s: 16.0796
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -789,7 +825,31 @@ road {
     segment {
       id: "687_1_-1"
       start_s: 0
-      end_s: 75.8955
+      end_s: 16.2611
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10268"
+  passage {
+    segment {
+      id: "10268_1_-1"
+      start_s: 0
+      end_s: 20.6385
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10269"
+  passage {
+    segment {
+      id: "10269_1_-1"
+      start_s: 0
+      end_s: 36.7768
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -801,7 +861,19 @@ road {
     segment {
       id: "1838_1_-1"
       start_s: 0
-      end_s: 9.7439
+      end_s: 12.5749
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "11187"
+  passage {
+    segment {
+      id: "11187_1_-1"
+      start_s: 0
+      end_s: 3.39131
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -813,7 +885,7 @@ road {
     segment {
       id: "1837_1_-1"
       start_s: 0
-      end_s: 11.0469
+      end_s: 7.04383
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -832,22 +904,34 @@ road {
   }
 }
 road {
-  id: "69"
+  id: "116"
   passage {
     segment {
-      id: "69_1_-1"
+      id: "116_1_-1"
       start_s: 0
-      end_s: 39.0273
+      end_s: 17.4694
     }
     can_exit: true
     change_lane_type: FORWARD
   }
 }
 road {
-  id: "68"
+  id: "11049"
   passage {
     segment {
-      id: "68_1_-1"
+      id: "11049_1_-1"
+      start_s: 0
+      end_s: 21.558
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "115"
+  passage {
+    segment {
+      id: "115_1_-1"
       start_s: 0
       end_s: 16.5147
     }
@@ -856,24 +940,12 @@ road {
   }
 }
 road {
-  id: "3146a"
+  id: "10825a"
   passage {
     segment {
-      id: "3146a_1_-1"
+      id: "10825a_1_-1"
       start_s: 0
-      end_s: 40.4436
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "3142"
-  passage {
-    segment {
-      id: "3142_1_-1"
-      start_s: 0
-      end_s: 5.06111
+      end_s: 47.5674
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -909,7 +981,7 @@ road {
     segment {
       id: "42_1_-1"
       start_s: 0
-      end_s: 16.1103
+      end_s: 16.1159
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -921,31 +993,31 @@ road {
     segment {
       id: "2414_1_-1"
       start_s: 0
-      end_s: 11.3162
+      end_s: 10.7096
     }
     can_exit: true
     change_lane_type: FORWARD
   }
 }
 road {
-  id: "10084a"
+  id: "10761a"
   passage {
     segment {
-      id: "10084a_1_-1"
+      id: "10761a_1_-1"
       start_s: 0
-      end_s: 25.1162
+      end_s: 24.3978
     }
     can_exit: true
     change_lane_type: FORWARD
   }
 }
 road {
-  id: "160"
+  id: "162"
   passage {
     segment {
-      id: "160_1_-3"
+      id: "162_1_-3"
       start_s: 0
-      end_s: 6.08098
+      end_s: 5.36246
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -957,7 +1029,7 @@ road {
     segment {
       id: "9760_1_-3"
       start_s: 0
-      end_s: 4.31703
+      end_s: 4.31319
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -969,7 +1041,7 @@ road {
     segment {
       id: "1771_1_-3"
       start_s: 0
-      end_s: 45.6667
+      end_s: 45.6703
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -1012,20 +1084,20 @@ road {
   }
 }
 measurement {
-  distance: 3603.8945116194382
+  distance: 3085.2126430342146
 }
 routing_request {
   header {
-    timestamp_sec: 1521773903.2837176
+    timestamp_sec: 1522096299.2993808
     module_name: "routing"
-    sequence_num: 2
+    sequence_num: 1
   }
   waypoint {
-    id: "1737a_1_-1"
-    s: 4.79543630780488
+    id: "2972_1_-1"
+    s: 34.393144893029579
     pose {
-      x: 586426.57203504466
-      y: 4140773.1189641636
+      x: 586415
+      y: 4140270
     }
   }
   waypoint {
