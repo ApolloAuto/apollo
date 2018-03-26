@@ -316,7 +316,7 @@ DEFINE_double(weight_lon_collision, 2.0,
               "Weight of logitudinal collision cost");
 DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
 DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");
-DEFINE_double(weight_centripetal_acceleration, 5.0,
+DEFINE_double(weight_centripetal_acceleration, 2.0,
               "Weight of centripetal acceleration");
 DEFINE_double(priority_cost_gap, 5.0,
               "Gap to increase the priority cost of reference line.");
