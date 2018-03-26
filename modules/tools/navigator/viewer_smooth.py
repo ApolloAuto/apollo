@@ -31,7 +31,11 @@ def get_s_xy_kappa(fn, ax, ax2):
     ks = []
     theta = []
     s = []
+    cnt = 0
     for line in f:
+        cnt += 1
+        if cnt < 3:
+            continue
         line = line.replace("\n", '')
         data = json.loads(line)
         ks.append(data['kappa'])

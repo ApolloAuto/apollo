@@ -32,7 +32,11 @@ if __name__ == '__main__':
     navigation_path.path_priority = 0
     navigation_path.path.name = "navigation"
     f = open(fdata, 'r')
+    cnt = 0
     for line in f:
+        cnt += 1
+        if cnt < 3:
+            continue
         json_point = json.loads(line)
         point = navigation_path.path.path_point.add()
         point.x = json_point['x']
