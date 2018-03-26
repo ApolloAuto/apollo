@@ -218,7 +218,7 @@ void Obstacle::UpdateStatus(Feature* feature) {
   double velocity_y = state(3, 0);
   double speed = std::hypot(velocity_x, velocity_y);
   double velocity_heading = std::atan2(velocity_y, velocity_x);
-  if (FLAGS_enable_adjust_velocity_heading) {
+  if (FLAGS_adjust_velocity_by_position_shift) {
     UpdateVelocity(feature->theta(), &velocity_x, &velocity_y,
                    &velocity_heading, &speed);
   }
@@ -370,9 +370,13 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
   }
 
   double speed = std::hypot(velocity_x, velocity_y);
-  double velocity_heading = perception_obstacle.theta();
+  double velocity_heading = std::atan2(velocity_y, velocity_x);
+  if (FLAGS_adjust_velocity_by_obstacle_heading) {
+    velocity_heading = perception_obstacle.theta();
+  }
 
-  if (!FLAGS_use_navigation_mode && FLAGS_enable_adjust_velocity_heading &&
+  if (!FLAGS_use_navigation_mode &&
+      FLAGS_adjust_velocity_by_position_shift &&
       history_size() > 0) {
     double diff_x =
         feature->position().x() - feature_history_.front().position().x();

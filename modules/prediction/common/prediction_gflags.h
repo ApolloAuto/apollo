@@ -75,7 +75,8 @@ DECLARE_double(valid_position_diff_threshold);
 DECLARE_double(valid_position_diff_rate_threshold);
 DECLARE_double(split_rate);
 DECLARE_double(rnn_min_lane_relatice_s);
-DECLARE_bool(enable_adjust_velocity_heading);
+DECLARE_bool(adjust_velocity_by_obstacle_heading);
+DECLARE_bool(adjust_velocity_by_position_shift);
 DECLARE_double(heading_filter_param);
 
 // Cost evaluator
