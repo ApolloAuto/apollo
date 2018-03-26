@@ -100,7 +100,9 @@ DEFINE_double(valid_position_diff_rate_threshold, 0.075,
 DEFINE_double(split_rate, 0.5, "obstacle split rate for adjusting velocity");
 DEFINE_double(rnn_min_lane_relatice_s, 5.0,
               "Minimal relative s for RNN model.");
-DEFINE_bool(enable_adjust_velocity_heading, false,
+DEFINE_bool(adjust_velocity_by_obstacle_heading, false,
+             "Use obstacle heading for velocity.");
+DEFINE_bool(adjust_velocity_by_position_shift, false,
             "adjust velocity heading to lane heading");
 DEFINE_double(heading_filter_param, 0.99, "heading filter parameter");
 
