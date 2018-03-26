@@ -69,6 +69,18 @@ class PbfBaseMotionFusion {
   virtual void GetState(Eigen::Vector3d* anchor_point,
                         Eigen::Vector3d* velocity) = 0;
 
+  void setCurrentFuseTS(double ts) {
+      fuse_timestamp = ts;
+  }
+
+  void setLastFuseTS(double ts) {
+    last_fuse_timestamp = ts;
+  }
+
+  double getFuseTimeDiff() {
+    return (fuse_timestamp - last_fuse_timestamp);
+  }
+
   std::string name() {
     return name_;
   }
@@ -82,6 +94,10 @@ class PbfBaseMotionFusion {
  protected:
   std::string name_;
   bool initialized_;
+
+  // last fusion time
+  double last_fuse_timestamp = 0;
+  double fuse_timestamp = 0;
 };
 
 }  // namespace perception
