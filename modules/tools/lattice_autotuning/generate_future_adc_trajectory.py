@@ -78,6 +78,7 @@ def generate_future_traj(rosbag_in, rosbag_out, future_pose_list):
                 augment_future_traj(new_localization, ptr_start, ptr_end,
                                     future_pose_list)
                 bag_out.write(topic, new_localization, t)
+                print "Write to bag start =", ptr_start, "end =", ptr_end
                 ptr_start += 1
                 ptr_end += 1
             else:
@@ -99,7 +100,7 @@ def augment_future_traj(new_localization, ptr_start, ptr_end, pose_list):
             (pose2.position.y - pose1.position.y) + \
             (pose2.position.x - pose1.position.x) * \
             (pose2.position.x - pose1.position.x))
-        trajectory_point.path_point.kappa =
+        trajectory_point.path_point.kappa = \
             (pose2.heading - pose1.heading) / ds;
         trajectory_point.path_point.s = sum_s
         sum_s += ds
@@ -126,7 +127,7 @@ def augment_future_traj(new_localization, ptr_start, ptr_end, pose_list):
     last_trajectory_point.path_point.theta = last_pose.heading
     # kappa is from previous trajectory_point
     last_idx = len(new_localization.trajectory_point) - 1
-    last_trajectory_point.path_point.kappa =
+    last_trajectory_point.path_point.kappa = \
         new_localization.trajectory_point[last_idx].path_point.kappa
     last_trajectory_point.path_point.s = sum_s
     trajectory_point.relative_time = relative_time
