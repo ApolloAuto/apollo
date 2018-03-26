@@ -160,8 +160,8 @@ void PbfIMFFusion::UpdateWithObject(const PbfSensorObjectPtr new_object,
       return;
     }
 
-    std::cout << "state sensor " << state_sensor << std::endl;
-    std::cout << "state sensor prev " << state_sensor_prev << std::endl;
+    std::cout<<"state sensor " <<state_sensor<<std::endl;
+    std::cout<<"state sensor prev "<<state_sensor_prev<<std::endl;
 
     _omega_matrix =
         _omega_matrix + (cov_sensor.inverse() - cov_sensor_prev.inverse());
