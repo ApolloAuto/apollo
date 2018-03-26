@@ -30,20 +30,25 @@ struct UTMCoor {
   double x;
   double y;
 };
-/**@brief the WGS84 coordinate struct including log(longitude) and lat(latitude). */
+
+/**@brief the WGS84 coordinate struct */
+/* including log(longitude) and lat(latitude). */
 struct WGS84Corr {
-  double log;      //longitude
-  double lat;      //latitude
+  double log;      // longitude
+  double lat;      // latitude
 };
 
 void latlon_to_utmxy(double lon, double lat, UTMCoor *xy);
+
 void utmxy_to_latlon(double x, double y, int zone,
                      bool southhemi, WGS84Corr *latlon);
+
 void xyz_to_blh(const Eigen::Vector3d &xyz, Eigen::Vector3d *blh);
+
 void blh_to_xyz(const Eigen::Vector3d &blh, Eigen::Vector3d *xyz);
 
-} // msf
-} // localization
-} // apollo
+}   // namespace msf
+}   // namespace localization
+}   // namespace apollo
 
-#endif // MODULES_LOCALIZATION_MSF_COMMON_FRAME_TRANSFORM_H_
+#endif  // MODULES_LOCALIZATION_MSF_COMMON_FRAME_TRANSFORM_H_

@@ -117,7 +117,8 @@ Status MSFLocalization::Stop() { return Status::OK(); }
 Status MSFLocalization::Init() {
   InitParams();
 
-  msf::LocalizationState &&state = localization_integ_.Init(localizaiton_param_);
+  msf::LocalizationState &&state =
+      localization_integ_.Init(localizaiton_param_);
   switch (state.error_code()) {
     case msf::LocalizationErrorCode::INTEG_ERROR:
       return Status(common::LOCALIZATION_ERROR_INTEG, state.error_msg());
@@ -266,7 +267,7 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
 
   if (FLAGS_lidar_debug_log_flag) {
     std::list<msf::LocalizationResult> lidar_localization_list;
-    localization_integ_.GetLidarLocalizationList(lidar_localization_list);
+    localization_integ_.GetLidarLocalizationList(&lidar_localization_list);
 
     auto itr = lidar_localization_list.begin();
     auto itr_end = lidar_localization_list.end();
@@ -292,7 +293,7 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
   }
 
   std::list<msf::LocalizationResult> integ_localization_list;
-  localization_integ_.GetIntegLocalizationList(integ_localization_list);
+  localization_integ_.GetIntegLocalizationList(&integ_localization_list);
 
   auto itr = integ_localization_list.begin();
   auto itr_end = integ_localization_list.end();
@@ -351,7 +352,8 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
   return;
 }  // namespace localization
 
-void MSFLocalization::OnGnssBestPose(const drivers::gnss::GnssBestPose &bestgnsspos_msg) {
+void MSFLocalization::OnGnssBestPose(
+    const drivers::gnss::GnssBestPose &bestgnsspos_msg) {
   if ((localization_state_ == msf::LocalizationMeasureState::OK ||
        localization_state_ == msf::LocalizationMeasureState::VALID) &&
       FLAGS_gnss_only_init) {
@@ -362,7 +364,7 @@ void MSFLocalization::OnGnssBestPose(const drivers::gnss::GnssBestPose &bestgnss
 
   if (FLAGS_gnss_debug_log_flag) {
     std::list<msf::LocalizationResult> gnss_localization_list;
-    localization_integ_.GetGnssLocalizationList(gnss_localization_list);
+    localization_integ_.GetGnssLocalizationList(&gnss_localization_list);
 
     auto itr = gnss_localization_list.begin();
     auto itr_end = gnss_localization_list.end();
@@ -379,7 +381,8 @@ void MSFLocalization::OnGnssBestPose(const drivers::gnss::GnssBestPose &bestgnss
   return;
 }
 
-void MSFLocalization::OnGnssRtkObs(const drivers::gnss::EpochObservation &raw_obs_msg) {
+void MSFLocalization::OnGnssRtkObs(
+    const drivers::gnss::EpochObservation &raw_obs_msg) {
   if ((localization_state_ == msf::LocalizationMeasureState::OK ||
        localization_state_ == msf::LocalizationMeasureState::VALID) &&
       FLAGS_gnss_only_init) {
@@ -390,7 +393,7 @@ void MSFLocalization::OnGnssRtkObs(const drivers::gnss::EpochObservation &raw_ob
 
   if (FLAGS_gnss_debug_log_flag) {
     std::list<msf::LocalizationResult> gnss_localization_list;
-    localization_integ_.GetGnssLocalizationList(gnss_localization_list);
+    localization_integ_.GetGnssLocalizationList(&gnss_localization_list);
 
     auto itr = gnss_localization_list.begin();
     auto itr_end = gnss_localization_list.end();
@@ -407,7 +410,8 @@ void MSFLocalization::OnGnssRtkObs(const drivers::gnss::EpochObservation &raw_ob
   return;
 }
 
-void MSFLocalization::OnGnssRtkEph(const drivers::gnss::GnssEphemeris &gnss_orbit_msg) {
+void MSFLocalization::OnGnssRtkEph(
+    const drivers::gnss::GnssEphemeris &gnss_orbit_msg) {
   if ((localization_state_ == msf::LocalizationMeasureState::OK ||
        localization_state_ == msf::LocalizationMeasureState::VALID) &&
       FLAGS_gnss_only_init) {

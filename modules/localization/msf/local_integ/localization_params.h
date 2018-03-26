@@ -27,8 +27,6 @@
 #include <utility>
 #include <vector>
 #include "modules/localization/proto/localization.pb.h"
-// #include "modules/localization/proto/measure.pb.h"
-// #include "modules/localization/proto/sins_pva.pb.h"
 
 /**
  * @namespace apollo::localization
@@ -58,7 +56,7 @@ struct LocalizationIntegParam {
       is_using_raw_gnsspos(true), enable_ins_aid_rtk(false),
       enable_auto_save_eph_file(true), eph_buffer_path(""),
       imu_to_ant_offset(), gnss_debug_log_flag(true), map_path(""),
-      lidar_extrinsic_file(""), lidar_height_file(""), 
+      lidar_extrinsic_file(""), lidar_height_file(""),
       lidar_height_default(1.7), lidar_debug_log_flag(true),
       localization_mode(2), lidar_yaw_align_mode(1),
       lidar_filter_size(17), lidar_thread_num(1), map_coverage_theshold(0.8),
@@ -143,7 +141,7 @@ class LocalizationState {
 };
 
 struct LidarFrame {
-  double measurement_time; // unix time
+  double measurement_time;  // unix time
   std::vector<double> pt_xs;
   std::vector<double> pt_ys;
   std::vector<double> pt_zs;
@@ -170,8 +168,8 @@ class LocalizationResult {
   LocalizationEstimate localization_;
 };
 
-} // namespace msf
-} // namespace localization
-} // namespace apollo
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo
 
 #endif  // MODULES_LOCALIZATION_MSF_LOCALIZATION_PARAMS_H_

@@ -72,20 +72,16 @@ class MeasureRepublishProcess {
 
   // GNSS message process
   bool NovatelBestgnssposProcess(const GnssBestPose& bestgnsspos_msg,
-                                 MeasureData& measure);
+                                 MeasureData *measure);
   void GnssLocalProcess(const MeasureData& gnss_local_msg,
-                        MeasureData& measure);
+                        MeasureData *measure);
 
   // integrated message process
   void IntegPvaProcess(const InsPva& inspva_msg);
 
   // lidar message process
   int LidarLocalProcess(const LocalizationEstimate& lidar_local_msg,
-                        MeasureData& measure);
-
- private:
-  // void TranferToIntegMeasureData(const MeasureData& measure_data,
-  //                                IntegMeasure& measure);
+                        MeasureData *measure);
 
  private:
   MeasureData pre_bestgnsspose_;

@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #include "modules/localization/msf/local_integ/gnss_msg_transfer.h"
 
 namespace apollo {
@@ -140,22 +156,22 @@ void GnssMagTransfer::transfer(
   }
   if (in.has_iode()) {
     out->set_iode(in.iode());
-  }    
+  }
   if (in.has_deltan()) {
     out->set_deltan(in.deltan());
-  }    
+  }
   if (in.has_m0()) {
     out->set_m0(in.m0());
-  }    
+  }
   if (in.has_e()) {
     out->set_e(in.e());
-  }  
+  }
   if (in.has_roota()) {
     out->set_roota(in.roota());
-  }     
+  }
   if (in.has_toe()) {
     out->set_toe(in.toe());
-  }       
+  }
   if (in.has_toc()) {
     out->set_toc(in.toc());
   }
@@ -173,7 +189,7 @@ void GnssMagTransfer::transfer(
   }
   if (in.has_cuc()) {
     out->set_cuc(in.cuc());
-  }   
+  }
   if (in.has_cus()) {
     out->set_cus(in.cus());
   }
@@ -255,31 +271,31 @@ void GnssMagTransfer::transfer(
   }
   if (in.has_week_second_s()) {
     out->set_week_second_s(in.week_second_s());
-  } 
+  }
   if (in.has_tk()) {
     out->set_tk(in.tk());
-  } 
+  }
   if (in.has_clock_offset()) {
     out->set_clock_offset(in.clock_offset());
-  }     
+  }
   if (in.has_clock_drift()) {
     out->set_clock_drift(in.clock_drift());
-  }  
+  }
   if (in.has_health()) {
     out->set_health(in.health());
-  }  
+  }
   if (in.has_position_x()) {
     out->set_position_x(in.position_x());
-  }  
+  }
   if (in.has_position_y()) {
     out->set_position_y(in.position_y());
-  }  
+  }
   if (in.has_position_z()) {
     out->set_position_z(in.position_z());
-  }  
+  }
   if (in.has_velocity_x()) {
     out->set_velocity_x(in.velocity_x());
-  }    
+  }
   if (in.has_velocity_y()) {
     out->set_velocity_y(in.velocity_y());
   }
@@ -314,12 +330,12 @@ void GnssMagTransfer::transfer(
   }
   if (in.has_glonass_orbit()) {
     auto tmp = out->mutable_glonass_orbit();
-    transfer(in.glonass_orbit(), tmp);        
+    transfer(in.glonass_orbit(), tmp);
   }
 
   return;
 }
 
-} // msf
-} // localization
-} // apollo
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo

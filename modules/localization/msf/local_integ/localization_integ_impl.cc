@@ -1,8 +1,25 @@
-#include "localization_integ_impl.h"
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
+#include "modules/localization/msf/local_integ/localization_integ_impl.h"
+#include <list>
+#include <queue>
 #include "modules/localization/msf/common/util/time_conversion.h"
 #include "modules/localization/msf/common/util/timer.h"
-#include "glog/logging.h"
-#include "glog/raw_logging.h"
+#include "modules/common/log.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 
 namespace apollo {
@@ -80,7 +97,7 @@ LocalizationState LocalizationIntegImpl::Init(
     return state;
   }
 
-  if (params.gnss_mode == int(GnssMode::SELF)) {
+  if (params.gnss_mode == static_cast<int>(GnssMode::SELF)) {
     state = gnss_process_->Init(params);
     is_use_gnss_bestpose_ = false;
     if (!state.ok()) {
@@ -91,9 +108,12 @@ LocalizationState LocalizationIntegImpl::Init(
   }
 
   if (params.is_using_raw_gnsspos) {
-    gnss_antenna_extrinsic_.translation()(0) = params.imu_to_ant_offset.offset_x;
-    gnss_antenna_extrinsic_.translation()(1) = params.imu_to_ant_offset.offset_y;
-    gnss_antenna_extrinsic_.translation()(2) = params.imu_to_ant_offset.offset_z;
+    gnss_antenna_extrinsic_.translation()(0) =
+        params.imu_to_ant_offset.offset_x;
+    gnss_antenna_extrinsic_.translation()(1) =
+        params.imu_to_ant_offset.offset_y;
+    gnss_antenna_extrinsic_.translation()(2) =
+        params.imu_to_ant_offset.offset_z;
   } else {
     gnss_antenna_extrinsic_ = Eigen::Affine3d::Identity();
   }
@@ -101,10 +121,6 @@ LocalizationState LocalizationIntegImpl::Init(
             << gnss_antenna_extrinsic_.translation()(0) << " "
             << gnss_antenna_extrinsic_.translation()(1) << " "
             << gnss_antenna_extrinsic_.translation()(2);
-
-  // LocalOnlineVisualizer::instance()->Init(params.is_use_visualize);
-  // LocalOnlineVisualizer::instance()->SetFilterSize(params.lidar_filter_size,
-  //                                                  params.lidar_filter_size);
 
   return LocalizationState::OK();
 }
@@ -147,35 +163,34 @@ void LocalizationIntegImpl::PcdThreadLoop() {
     }
 
     if (waiting_num > 2) {
-      LOG(WARNING) << waiting_num << " point cloud msg are waiting to process.";
-    } 
-    // else {
-    //   LOG(INFO) << waiting_num << " point cloud msg are waiting to process.";
-    // }
+      LOG(WARNING) << waiting_num
+                   << " point cloud msg are waiting to process.";
+    }
 
     PcdProcessImpl(lidar_frame);
   }
   LOG(INFO) << "Exited pcd data process thread";
 }
 
-void LocalizationIntegImpl::PcdProcessImpl(LidarFrame& pcd_data) {
+void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
   // lidar -> republish -> integ
   lidar_process_->PcdProcess(pcd_data);
 
   int state = 0;
   LocalizationEstimate lidar_localization;
 
-  state = lidar_process_->GetResult(lidar_localization);
+  state = lidar_process_->GetResult(&lidar_localization);
   //   lidar_localization_state_ = LocalizationMeasureState(state);
 
   MeasureData lidar_measure;
-  if (state == 2) { // only state OK republish lidar msg
-    // TODO republish refactoring
+  if (state == 2) {  // only state OK republish lidar msg
+    // TODO(zhouyao): republish refactoring
 
-    republish_process_->LidarLocalProcess(lidar_localization, lidar_measure);
+    republish_process_->LidarLocalProcess(lidar_localization, &lidar_measure);
     integ_process_->MeasureDataProcess(lidar_measure);
 
-    imu_altitude_from_lidar_localization_ = lidar_localization.pose().position().z();
+    imu_altitude_from_lidar_localization_ =
+        lidar_localization.pose().position().z();
     imu_altitude_from_lidar_localization_available_ = true;
 
     // LocalOnlineVisualizer::instance()->push_lidar_measure(lidar_measure);
@@ -194,23 +209,6 @@ void LocalizationIntegImpl::PcdProcessImpl(LidarFrame& pcd_data) {
 
 void LocalizationIntegImpl::RawImuProcessRfu(
     const ImuData& imu_data) {
-  // ImuData imu_data = {0.0};
-  // // double header_time = imu_msg.header().timestamp_sec();
-  // double measurement_time = util::GpsToUnixSeconds(imu_msg.measurement_time());
-  // // std::cerr << "imu time diff: " << header_time - measurement_time <<
-  // // std::endl; std::cerr << std::setprecision(16) << "imu time: " <<
-  // // measurement_time << std::endl; imu_data.time =
-  // // imu_msg.header().timestamp_sec(); imu_data.time =
-  // // util::GpsToUnixSeconds(imu_msg.measurement_time());
-  // imu_data.time = measurement_time;
-  // imu_data.fb[0] = imu_msg.linear_acceleration().x();
-  // imu_data.fb[1] = imu_msg.linear_acceleration().y();
-  // imu_data.fb[2] = imu_msg.linear_acceleration().z();
-
-  // imu_data.wibb[0] = imu_msg.angular_velocity().x();  // * imu_rate_;
-  // imu_data.wibb[1] = imu_msg.angular_velocity().y();  // * imu_rate_;
-  // imu_data.wibb[2] = imu_msg.angular_velocity().z();  // * imu_rate_;
-
   // push to imu_data_queue
   imu_data_queue_mutex_.lock();
   imu_data_queue_.push(imu_data);
@@ -246,9 +244,6 @@ void LocalizationIntegImpl::ImuThreadLoop() {
     if (waiting_num > 10) {
       LOG(WARNING) << waiting_num << " imu msg are waiting to process.";
     }
-    // else {
-    //   LOG(INFO) << waiting_num << " imu msg are waiting to process.";
-    // }
 
     ImuProcessImpl(imu_data);
   }
@@ -277,15 +272,18 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   InsPva integ_sins_pva;
 
   integ_localization_mutex_.lock();
-  integ_process_->GetResult(state, integ_sins_pva, integ_localization);
+  integ_process_->GetResult(&state, &integ_sins_pva, &integ_localization);
 
   // push integ pose to PoseQuery
   auto pose_qurey = integ_localization.pose().position();
   auto orien_qurey = integ_localization.pose().orientation();
   double time_qurey = integ_localization.measurement_time();
-  integ_pose_query_.add_pose(time_qurey, 
-      Eigen::Vector3d(pose_qurey.x(), pose_qurey.y(), pose_qurey.z()), 
-      Eigen::Quaterniond(orien_qurey.qw(), orien_qurey.qx(), orien_qurey.qy(), orien_qurey.qz()));
+  integ_pose_query_.AddPose(time_qurey,
+      Eigen::Vector3d(pose_qurey.x(), pose_qurey.y(), pose_qurey.z()),
+      Eigen::Quaterniond(orien_qurey.qw(),
+                         orien_qurey.qx(),
+                         orien_qurey.qy(),
+                         orien_qurey.qz()));
 
   apollo::localization::Pose* posepb_loc = integ_localization.mutable_pose();
 
@@ -303,7 +301,7 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
                                        orientation.qy(), orientation.qz());
   Eigen::Vector3d vec_acceleration =
       quaternion.toRotationMatrix() * orig_acceleration;
-  
+
   apollo::common::Point3D* linear_acceleration =
       posepb_loc->mutable_linear_acceleration();
   linear_acceleration->set_x(vec_acceleration(0));
@@ -335,7 +333,7 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
 
   // integ_localization_state_ = LocalizationMeasureState(int(state));
   integ_localization_list_.push_back(LocalizationResult(
-      LocalizationMeasureState(int(state)), integ_localization));
+      LocalizationMeasureState(static_cast<int>(state)), integ_localization));
   if (integ_localization_list_.size() > integ_localization_list_max_size_) {
     integ_localization_list_.pop_front();
   }
@@ -343,7 +341,7 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
 
   // update republish
   republish_process_->IntegPvaProcess(integ_sins_pva);
-  
+
   if (state != IntegState::NOT_INIT) {
     // update lidar
     if (enable_lidar_localization_) {
@@ -356,7 +354,7 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
     if (!is_use_gnss_bestpose_) {
       // update gnssW
       MeasureData measure_data = {0.0};
-      integ_process_->GetResult(measure_data);
+      integ_process_->GetResult(&measure_data);
       gnss_process_->IntegSinsPvaProcess(integ_sins_pva, measure_data);
     }
   }
@@ -443,7 +441,7 @@ void LocalizationIntegImpl::GnssThreadLoop() {
 
     if (waiting_num > 2) {
       LOG(WARNING) << waiting_num << " gnss function are waiting to process.";
-    } 
+    }
     // else {
     //   LOG(INFO) << waiting_num << " gnss function are waiting to process.";
     // }
@@ -459,18 +457,18 @@ void LocalizationIntegImpl::RawObservationProcessImpl(
   gnss_process_->RawObservationProcess(raw_obs_msg);
 
   MeasureData gnss_measure;
-  LocalizationMeasureState state = gnss_process_->GetResult(gnss_measure);
+  LocalizationMeasureState state = gnss_process_->GetResult(&gnss_measure);
 
   MeasureData measure;
-  if (state == LocalizationMeasureState::OK 
+  if (state == LocalizationMeasureState::OK
       || state == LocalizationMeasureState::VALID) {
-    republish_process_->GnssLocalProcess(gnss_measure, measure);
+    republish_process_->GnssLocalProcess(gnss_measure, &measure);
     integ_process_->MeasureDataProcess(measure);
     // LocalOnlineVisualizer::instance()->push_gnss_measure(measure);
   }
 
   LocalizationEstimate gnss_localization;
-  TransferGnssMeasureToLocalization(measure, gnss_localization);
+  TransferGnssMeasureToLocalization(measure, &gnss_localization);
 
   gnss_localization_mutex_.lock();
   // gnss_localization_state_ = state;
@@ -491,14 +489,15 @@ void LocalizationIntegImpl::RawEphemerisProcessImpl(
 
 void LocalizationIntegImpl::GnssBestPoseProcessImpl(
     const drivers::gnss::GnssBestPose& bestgnsspos_msg) {
-  // TODO use GnssInfoType to on/of callback
+  // TODO(zhouyao): use GnssInfoType to on/of callback
   MeasureData measure;
-  if (republish_process_->NovatelBestgnssposProcess(bestgnsspos_msg, measure)) {
+  if (republish_process_->NovatelBestgnssposProcess(
+      bestgnsspos_msg, &measure)) {
     integ_process_->MeasureDataProcess(measure);
     // LocalOnlineVisualizer::instance()->push_gnss_measure(measure);
 
     LocalizationEstimate gnss_localization;
-    TransferGnssMeasureToLocalization(measure, gnss_localization);
+    TransferGnssMeasureToLocalization(measure, &gnss_localization);
 
     gnss_localization_mutex_.lock();
     // gnss_localization_state_ = LocalizationMeasureState::OK;
@@ -513,25 +512,30 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
 }
 
 void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
-    const MeasureData& measure, LocalizationEstimate& localization) {
-  apollo::common::Header* headerpb = localization.mutable_header();
-  apollo::localization::Pose* posepb = localization.mutable_pose();
+    const MeasureData& measure, LocalizationEstimate *localization) {
+  apollo::common::Header* headerpb = localization->mutable_header();
+  apollo::localization::Pose* posepb = localization->mutable_pose();
 
   double timestamp = measure.time;
-  localization.set_measurement_time(timestamp);
+  localization->set_measurement_time(timestamp);
   headerpb->set_timestamp_sec(timestamp);
 
-  // get quat to trans 
-  Eigen::Vector3d gnss_antenna_diff(gnss_antenna_extrinsic_.translation()(0),
-      gnss_antenna_extrinsic_.translation()(1), gnss_antenna_extrinsic_.translation()(2));
+  // get quat to trans
+  Eigen::Vector3d gnss_antenna_diff(
+      gnss_antenna_extrinsic_.translation()(0),
+      gnss_antenna_extrinsic_.translation()(1),
+      gnss_antenna_extrinsic_.translation()(2));
   Eigen::Quaterniond quat(1, 0, 0, 0);
-  if (!integ_pose_query_.query_quaternion(timestamp, quat)) {
-    LOG(WARNING) << std::setprecision(20) << "Can't query integ pose, time: " << timestamp;
+  if (!integ_pose_query_.QueryQuaternion(timestamp, &quat)) {
+    LOG(WARNING) << std::setprecision(20)
+                 << "Can't query integ pose, time: " << timestamp;
   }
   gnss_antenna_diff = quat * gnss_antenna_diff;
 
   UTMCoor utm_xy;
-  latlon_to_utmxy(measure.gnss_pos.longitude, measure.gnss_pos.latitude, &utm_xy);
+  latlon_to_utmxy(measure.gnss_pos.longitude,
+                  measure.gnss_pos.latitude,
+                  &utm_xy);
 
   apollo::common::PointENU* position = posepb->mutable_position();
   position->set_x(utm_xy.x - gnss_antenna_diff[0]);
@@ -545,7 +549,7 @@ void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
   quaternion->set_qw(quat.w());
 
   apollo::localization::Uncertainty* uncertainty =
-      localization.mutable_uncertainty();
+      localization->mutable_uncertainty();
 
   apollo::common::Point3D* position_std_dev =
       uncertainty->mutable_position_std_dev();
@@ -569,15 +573,16 @@ void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
 }
 
 void LocalizationIntegImpl::GetLastestLidarLocalization(
-    LocalizationMeasureState& state, LocalizationEstimate& lidar_localization) {
+    LocalizationMeasureState *state,
+    LocalizationEstimate *lidar_localization) {
   lidar_localization_mutex_.lock();
 
   if (lidar_localization_list_.size()) {
-    state = lidar_localization_list_.front().state();
-    lidar_localization = lidar_localization_list_.front().localization();
+    *state = lidar_localization_list_.front().state();
+    *lidar_localization = lidar_localization_list_.front().localization();
     lidar_localization_list_.clear();
   } else {
-    state = LocalizationMeasureState::NOT_VALID;
+    *state = LocalizationMeasureState::NOT_VALID;
   }
   // state = lidar_localization_state_;
   // lidar_localization = lidar_localization_;
@@ -586,223 +591,62 @@ void LocalizationIntegImpl::GetLastestLidarLocalization(
 }
 
 void LocalizationIntegImpl::GetLastestIntegLocalization(
-    LocalizationMeasureState& state, LocalizationEstimate& integ_localization) {
+    LocalizationMeasureState *state,
+    LocalizationEstimate *integ_localization) {
   integ_localization_mutex_.lock();
 
   if (integ_localization_list_.size()) {
-    state = integ_localization_list_.front().state();
-    integ_localization = integ_localization_list_.front().localization();
+    *state = integ_localization_list_.front().state();
+    *integ_localization = integ_localization_list_.front().localization();
     integ_localization_list_.clear();
   } else {
-    state = LocalizationMeasureState::NOT_VALID;
+    *state = LocalizationMeasureState::NOT_VALID;
   }
-  // state = integ_localization_state_;
-  // sins_pva = integ_sins_pva_;  //IntegSinsPva(integ_sins_pva_);
-  // integ_localization = integ_localization_;
-  // //LocalizationEstimate(integ_localization_);
+
   integ_localization_mutex_.unlock();
   return;
 }
 
 void LocalizationIntegImpl::GetLastestGnssLocalization(
-    LocalizationMeasureState& state, LocalizationEstimate& gnss_localization) {
+    LocalizationMeasureState *state,
+    LocalizationEstimate *gnss_localization) {
   gnss_localization_mutex_.lock();
 
   if (gnss_localization_list_.size()) {
-    state = gnss_localization_list_.front().state();
-    gnss_localization = gnss_localization_list_.front().localization();
+    *state = gnss_localization_list_.front().state();
+    *gnss_localization = gnss_localization_list_.front().localization();
     gnss_localization_list_.clear();
   } else {
-    state = LocalizationMeasureState::NOT_VALID;
+    *state = LocalizationMeasureState::NOT_VALID;
   }
-  // state = gnss_localization_state_;
-  // gnss_localization = gnss_localization_;
+
   gnss_localization_mutex_.unlock();
   return;
 }
 
 void LocalizationIntegImpl::GetLidarLocalizationList(
-    std::list<LocalizationResult>& results) {
+    std::list<LocalizationResult> *results) {
   lidar_localization_mutex_.lock();
-  results = lidar_localization_list_;
+  *results = lidar_localization_list_;
   lidar_localization_list_.clear();
   lidar_localization_mutex_.unlock();
 }
 
 void LocalizationIntegImpl::GetIntegLocalizationList(
-    std::list<LocalizationResult>& results) {
+    std::list<LocalizationResult> *results) {
   integ_localization_mutex_.lock();
-  results = integ_localization_list_;
+  *results = integ_localization_list_;
   integ_localization_list_.clear();
   integ_localization_mutex_.unlock();
 }
 
 void LocalizationIntegImpl::GetGnssLocalizationList(
-    std::list<LocalizationResult>& results) {
+    std::list<LocalizationResult> *results) {
   gnss_localization_mutex_.lock();
-  results = gnss_localization_list_;
+  *results = gnss_localization_list_;
   gnss_localization_list_.clear();
   gnss_localization_mutex_.unlock();
 }
-
-// void LocalizationIntegImpl::ParseLidarFrame(
-//     const sensor_msgs::PointCloud2& lidar_data, LidarFrame& lidar_frame) const {
-//   int total = lidar_data.width * lidar_data.height;
-//   int x_offset = -1;
-//   int y_offset = -1;
-//   int z_offset = -1;
-//   int t_offset = -1;
-//   int i_offset = -1;
-//   int8_t x_datatype;
-//   int8_t y_datatype;
-//   int8_t z_datatype;
-//   int x_count = 0;
-//   int y_count = 0;
-//   int z_count = 0;
-//   for (std::size_t i = 0; i < lidar_data.fields.size(); ++i) {
-//     const sensor_msgs::PointField& f = lidar_data.fields[i];
-//     if (f.name == "x") {
-//       x_offset = f.offset;
-//       x_datatype = f.datatype;
-//       x_count = f.count;
-//     } else if (f.name == "y") {
-//       y_offset = f.offset;
-//       y_datatype = f.datatype;
-//       y_count = f.count;
-//     } else if (f.name == "z") {
-//       z_offset = f.offset;
-//       z_datatype = f.datatype;
-//       z_count = f.count;
-//     } else if (f.name == "timestamp") {
-//       t_offset = f.offset;
-//     } else if (f.name == "intensity") {
-//       i_offset = f.offset;
-//     }
-//   }
-//   assert(x_offset != -1 && y_offset != -1 && z_offset != -1 && t_offset != -1);
-//   assert(x_datatype == y_datatype && y_datatype == z_datatype);
-//   assert(x_datatype == 7 || x_datatype == 8);
-//   assert(x_count == 1 && y_count == 1 && z_count == 1);
-
-//   int num_cached = 0;
-//   std::map<double, TransformD> transform_cache;
-//   if (lidar_data.height > 1 && lidar_data.width > 1) {
-//     if (x_datatype == sensor_msgs::PointField::FLOAT32) {
-//       for (int i = 0; i < lidar_data.height; ++i) {
-//         for (int j = 0; j < lidar_data.width; j += 2) {
-//           int index = i * lidar_data.width + j;
-//           Vector3D pt3d;
-//           int offset = index * lidar_data.point_step;
-//           pt3d[0] = static_cast<const double>(*reinterpret_cast<const float*>(
-//               &lidar_data.data[offset + x_offset]));
-//           pt3d[1] = static_cast<const double>(*reinterpret_cast<const float*>(
-//               &lidar_data.data[offset + y_offset]));
-//           pt3d[2] = static_cast<const double>(*reinterpret_cast<const float*>(
-//               &lidar_data.data[offset + z_offset]));
-//           if (!std::isnan(pt3d[0])) {
-//             unsigned char intensity = *reinterpret_cast<const unsigned char*>(
-//                 &lidar_data.data[offset + i_offset]);
-//             lidar_frame.pt3ds.push_back(pt3d);
-//             lidar_frame.intensities.push_back(intensity);
-//             lidar_frame.laser_ids.push_back(j);
-//           }
-//         }
-//       }
-//     } else if (x_datatype == sensor_msgs::PointField::FLOAT64) {
-//       for (int i = 0; i < lidar_data.height; ++i) {
-//         for (int j = 0; j < lidar_data.width; j += 2) {
-//           int index = i * lidar_data.width + j;
-//           Vector3D pt3d;
-//           int offset = index * lidar_data.point_step;
-//           pt3d[0] = *reinterpret_cast<const double*>(
-//               &lidar_data.data[offset + x_offset]);
-//           pt3d[1] = *reinterpret_cast<const double*>(
-//               &lidar_data.data[offset + y_offset]);
-//           pt3d[2] = *reinterpret_cast<const double*>(
-//               &lidar_data.data[offset + z_offset]);
-//           if (!std::isnan(pt3d[0])) {
-//             unsigned char intensity = *reinterpret_cast<const unsigned char*>(
-//                 &lidar_data.data[offset + i_offset]);
-//             lidar_frame.pt3ds.push_back(pt3d);
-//             lidar_frame.intensities.push_back(intensity);
-//             lidar_frame.laser_ids.push_back(j);
-//           }
-//         }
-//       }
-//     } else {
-//       LOG(ERROR) << "The point cloud data type is not right!";
-//     }
-//   } else {
-//     LOG(INFO) << "Receiving un-origanized-point-cloud, width "
-//               << lidar_data.width << " height " << lidar_data.height;
-//     if (x_datatype == sensor_msgs::PointField::FLOAT32) {
-//       for (int i = 0; i < lidar_data.height; ++i) {
-//         for (int j = 0; j < lidar_data.width; j += 2) {
-//           int index = i * lidar_data.width + j;
-//           Vector3D pt3d;
-//           int offset = index * lidar_data.point_step;
-//           pt3d[0] = static_cast<const double>(*reinterpret_cast<const float*>(
-//               &lidar_data.data[offset + x_offset]));
-//           pt3d[1] = static_cast<const double>(*reinterpret_cast<const float*>(
-//               &lidar_data.data[offset + y_offset]));
-//           pt3d[2] = static_cast<const double>(*reinterpret_cast<const float*>(
-//               &lidar_data.data[offset + z_offset]));
-//           if (!std::isnan(pt3d[0])) {
-//             unsigned char intensity = *reinterpret_cast<const unsigned char*>(
-//                 &lidar_data.data[offset + i_offset]);
-//             lidar_frame.pt3ds.push_back(pt3d);
-//             lidar_frame.intensities.push_back(intensity);
-//             lidar_frame.laser_ids.push_back(j);
-//           }
-//         }
-//       }
-//     } else if (x_datatype == sensor_msgs::PointField::FLOAT64) {
-//       for (int i = 0; i < lidar_data.height; ++i) {
-//         for (int j = 0; j < lidar_data.width; j += 2) {
-//           int index = i * lidar_data.width + j;
-//           Vector3D pt3d;
-//           int offset = index * lidar_data.point_step;
-//           pt3d[0] = *reinterpret_cast<const double*>(
-//               &lidar_data.data[offset + x_offset]);
-//           pt3d[1] = *reinterpret_cast<const double*>(
-//               &lidar_data.data[offset + y_offset]);
-//           pt3d[2] = *reinterpret_cast<const double*>(
-//               &lidar_data.data[offset + z_offset]);
-//           if (!std::isnan(pt3d[0])) {
-//             unsigned char intensity = *reinterpret_cast<const unsigned char*>(
-//                 &lidar_data.data[offset + i_offset]);
-//             lidar_frame.pt3ds.push_back(pt3d);
-//             lidar_frame.intensities.push_back(intensity);
-//             lidar_frame.laser_ids.push_back(j);
-//           }
-//         }
-//       }
-//     } else {
-//       LOG(ERROR) << "The point cloud data type is not right!";
-//     }
-//   }
-//   lidar_frame.time = lidar_data.header.stamp.toSec();
-//   if (debug_log_flag_) {
-//     LOG(INFO) << std::setprecision(16)
-//               << "Localization10Hz Debug Log: lidar msg. "
-//               << "[time:" << lidar_frame.time << "]"
-//               << "[height:" << lidar_data.height << "]"
-//               << "[width:" << lidar_data.width << "]"
-//               << "[point_step:" << lidar_data.point_step << "]"
-//               << "[data_type:" << x_datatype << "]"
-//               << "[point_cnt:"
-//               << static_cast<unsigned int>(lidar_frame.pt3ds.size()) << "]"
-//               << "[intensity_cnt:"
-//               << static_cast<unsigned int>(lidar_frame.intensities.size())
-//               << "]";
-//     // if (lidar_frame.pt3ds.size() > 0) {
-//     //   LOG(INFO) << "Localization10Hz Debug Log: lidar msg first point info. "
-//     //             << "[x:" << lidar_frame.pt3ds[0][0] << "]"
-//     //             << "[y:" << lidar_frame.pt3ds[0][1] << "]"
-//     //             << "[z:" << lidar_frame.pt3ds[0][2] << "]";
-//     // }
-//   }
-// }
 
 }  // namespace msf
 }  // namespace localization

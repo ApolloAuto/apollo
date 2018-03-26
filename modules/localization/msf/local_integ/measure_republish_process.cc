@@ -1,11 +1,26 @@
-#include "measure_republish_process.h"
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
+#include "modules/localization/msf/local_integ/measure_republish_process.h"
 #include <yaml-cpp/yaml.h>
 #include <iostream>
 #include <iomanip>
 #include "modules/localization/msf/common/util/time_conversion.h"
-#include "glog/logging.h"
-#include "glog/raw_logging.h"
-#include "math_util.h"
+#include "modules/common/math/euler_angles_zxy.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace localization {
@@ -20,7 +35,8 @@ MeasureRepublishProcess::~MeasureRepublishProcess() {
   pthread_mutex_destroy(&height_mutex_);
 }
 
-LocalizationState MeasureRepublishProcess::Init(const LocalizationIntegParam& params) {
+LocalizationState MeasureRepublishProcess::Init(
+    const LocalizationIntegParam& params) {
   local_utm_zone_id_ = params.utm_zone_id;
   debug_log_flag_ = params.integ_debug_log_flag;
   is_trans_gpstime_to_utctime_ = params.is_trans_gpstime_to_utctime;
@@ -38,13 +54,13 @@ LocalizationState MeasureRepublishProcess::Init(const LocalizationIntegParam& pa
 }
 
 bool MeasureRepublishProcess::NovatelBestgnssposProcess(
-    const GnssBestPose& bestgnsspos_msg, MeasureData& measure) {
+    const GnssBestPose& bestgnsspos_msg, MeasureData *measure) {
   if (gnss_mode_ != GnssMode::NOVATEL) {
     return false;
   }
 
-  int gnss_solution_status = (int)bestgnsspos_msg.sol_status();
-  int gnss_position_type = (int)bestgnsspos_msg.sol_type();
+  int gnss_solution_status = static_cast<int>(bestgnsspos_msg.sol_status());
+  int gnss_position_type = static_cast<int>(bestgnsspos_msg.sol_type());
   LOG(INFO) << "the gnss solution_status and position_type: "
             << gnss_solution_status << " " << gnss_position_type;
 
@@ -53,8 +69,11 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
               << gnss_solution_status;
     return false;
   }
-  if ((gnss_position_type == 0) || (gnss_position_type == 1) || (gnss_position_type == 2)) {
-    LOG(INFO) << "novatel gnsspos's solution_type is invalid or xy fixed or height fixed: "
+  if (gnss_position_type == 0
+      || gnss_position_type == 1
+      || gnss_position_type == 2) {
+    LOG(INFO) << "novatel gnsspos's solution_type is invalid "
+              << "or xy fixed or height fixed: "
               << gnss_position_type;
     return false;
   }
@@ -82,7 +101,8 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
 
   pthread_mutex_lock(&integ_pva_mutex_);
   bool is_sins_align =
-      integ_pva_list_.back().init_and_alignment && (integ_pva_list_.size() > 1);
+      integ_pva_list_.back().init_and_alignment
+      && (integ_pva_list_.size() > 1);
   pthread_mutex_unlock(&integ_pva_mutex_);
 
   if (is_sins_align) {
@@ -105,10 +125,9 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
       measure_data.gnss_vel.ve = 0.0;
       measure_data.gnss_vel.vn = 0.0;
       measure_data.gnss_vel.vu = 0.0;
-      LOG(INFO) << "Novatel bestgnsspose publish: send sins init position using novatel bestgnsspos!";
-      // _component->publish_integ_measure_data(&measure_data);
-      // TranferToIntegMeasureData(measure_data, measure);
-      measure = measure_data;
+      LOG(INFO) << "Novatel bestgnsspose publish: "
+                << "send sins init position using novatel bestgnsspos!";
+      *measure = measure_data;
       return true;
     }
 
@@ -153,8 +172,8 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
 
       pre_bestgnsspose_ = measure_data;
       LOG(INFO) << "novatel bestgnsspos velocity: "
-                << measure_data.gnss_vel.ve << " " 
-                << measure_data.gnss_vel.vn << " " 
+                << measure_data.gnss_vel.ve << " "
+                << measure_data.gnss_vel.vn << " "
                 << measure_data.gnss_vel.vu;
 
       static double pre_yaw_from_vel = 0.0;
@@ -172,7 +191,8 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
           delta_yaw = delta_yaw + 6.2832;
         }
 
-        LOG(INFO) << "yaw from position difference: " << yaw_from_vel * 57.2958;
+        LOG(INFO) << "yaw from position difference: "
+                  << yaw_from_vel * 57.2958;
         // 0.0872rad = 5deg
         if ((delta_yaw > 0.0872) || (delta_yaw < -0.0872)) {
           LOG(WARNING) << "novatel bestgnsspos delta yaw is large! "
@@ -193,14 +213,16 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
 
   // _component->publish_integ_measure_data(&measure_data);
   // TranferToIntegMeasureData(measure_data, measure);
-  measure = measure_data;
+  *measure = measure_data;
 
   if (debug_log_flag_) {
     LOG(INFO) << std::setprecision(16)
               << "MeasureDataRepublish Debug Log: bestgnsspos msg: "
               << "[time:" << measure_data.time << "]"
-              << "[x:" << measure_data.gnss_pos.longitude * 57.295779513082323 << "]"
-              << "[y:" << measure_data.gnss_pos.latitude * 57.295779513082323 << "]"
+              << "[x:" << measure_data.gnss_pos.longitude * 57.295779513082323
+              << "]"
+              << "[y:" << measure_data.gnss_pos.latitude * 57.295779513082323
+              << "]"
               << "[z:" << measure_data.gnss_pos.height << "]"
               << "[std_x:" << bestgnsspos_msg.longitude_std_dev() << "]"
               << "[std_y:" << bestgnsspos_msg.latitude_std_dev() << "]"
@@ -211,7 +233,7 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
 }
 
 void MeasureRepublishProcess::GnssLocalProcess(
-    const MeasureData& gnss_local_msg, MeasureData& measure) {
+    const MeasureData& gnss_local_msg, MeasureData *measure) {
   if (gnss_mode_ != GnssMode::SELF) {
     return;
   }
@@ -270,7 +292,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
       LOG(INFO) << "send sins init position using rtk-gnss position!";
       // _component->publish_integ_measure_data(&measure_data);
       // TranferToIntegMeasureData(measure_data, measure);
-      measure = measure_data;
+      *measure = measure_data;
       return;
     }
 
@@ -280,10 +302,11 @@ void MeasureRepublishProcess::GnssLocalProcess(
       return;
     }
 
-    if (gnss_local_msg.measure_type != MeasureType::GNSS_POS_VEL 
+    if (gnss_local_msg.measure_type != MeasureType::GNSS_POS_VEL
         && gnss_local_msg.measure_type != MeasureType::ENU_VEL_ONLY) {
-      LOG(ERROR) << "gnss does not have velocity," << "the gnss velocity std: " << ve_std << " " << vn_std << " "
-            << vu_std;
+      LOG(ERROR) << "gnss does not have velocity,"
+                 << "the gnss velocity std: "
+                 << ve_std << " " << vn_std << " " << vu_std;
       return;
     }
     if (!gnss_local_msg.is_have_variance) {
@@ -336,14 +359,16 @@ void MeasureRepublishProcess::GnssLocalProcess(
   }
   // _component->publish_integ_measure_data(&measure_data);
   // TranferToIntegMeasureData(measure_data, measure);
-  measure = measure_data;
+  *measure = measure_data;
 
   if (debug_log_flag_) {
     LOG(INFO) << std::setprecision(16)
               << "MeasureDataRepublish Debug Log: rtkgnss msg: "
               << "[time:" << measure_data.time << "]"
-              << "[x:" << measure_data.gnss_pos.longitude * 57.295779513082323 << "]"
-              << "[y:" << measure_data.gnss_pos.latitude * 57.295779513082323 << "]"
+              << "[x:" << measure_data.gnss_pos.longitude * 57.295779513082323
+              << "]"
+              << "[y:" << measure_data.gnss_pos.latitude * 57.295779513082323
+              << "]"
               << "[z:" << measure_data.gnss_pos.height << "]"
               << "[std_x:" << measure_data.variance[0][0] << "]"
               << "[std_y:" << measure_data.variance[1][1] << "]"
@@ -379,14 +404,14 @@ void MeasureRepublishProcess::IntegPvaProcess(const InsPva& inspva_msg) {
 }
 
 int MeasureRepublishProcess::LidarLocalProcess(
-    const LocalizationEstimate& lidar_local_msg, MeasureData& measure) {
+    const LocalizationEstimate& lidar_local_msg, MeasureData *measure) {
   MeasureData measure_data = {0.0};
   measure_data.time = lidar_local_msg.measurement_time();
 
   apollo::localization::msf::WGS84Corr temp_wgs = {0.0};
   apollo::localization::msf::utmxy_to_latlon(
       lidar_local_msg.pose().position().x(),
-      lidar_local_msg.pose().position().y(), 
+      lidar_local_msg.pose().position().y(),
       local_utm_zone_id_, false, &temp_wgs);
   measure_data.gnss_pos.longitude = temp_wgs.log;
   measure_data.gnss_pos.latitude = temp_wgs.lat;
@@ -397,27 +422,22 @@ int MeasureRepublishProcess::LidarLocalProcess(
                               lidar_local_msg.pose().orientation().qy(),
                               lidar_local_msg.pose().orientation().qz());
 
-  // Vector3D euler = temp_quaternion.toRotationMatrix().eulerAngles(0, 1, 2);
-  double quaternion[4] = {0.0};
-  quaternion[0] = temp_quaternion.w();
-  quaternion[1] = temp_quaternion.x();
-  quaternion[2] = temp_quaternion.y();
-  quaternion[3] = temp_quaternion.z();
-  double euler[3] = {0.0};
-  math::quaternion_to_euler(quaternion, euler);
-  euler[2] = -euler[2];
+  common::math::EulerAnglesZXYd euler(temp_quaternion.w(),
+                                      temp_quaternion.x(),
+                                      temp_quaternion.y(),
+                                      temp_quaternion.z());
 
   pthread_mutex_lock(&height_mutex_);
   Eigen::Vector3d trans(lidar_local_msg.pose().position().x(),
                         lidar_local_msg.pose().position().y(),
                         lidar_local_msg.pose().position().z());
   lidar_pose_ = Eigen::Translation3d(trans) * temp_quaternion;
-  
+
   map_height_ = measure_data.gnss_pos.height;
   map_height_time_ = measure_data.time;
   pthread_mutex_unlock(&height_mutex_);
 
-  measure_data.gnss_att.yaw = -euler[2];
+  measure_data.gnss_att.yaw = -euler.yaw();
   measure_data.measure_type = MeasureType::POINT_CLOUD_POS;
   measure_data.frame_type = FrameType::UTM;
 
@@ -447,7 +467,7 @@ int MeasureRepublishProcess::LidarLocalProcess(
   //   _output->publish_integ_measure_data(&measure_data);
 
   // TranferToIntegMeasureData(measure_data, measure);
-  measure = measure_data;
+  *measure = measure_data;
 
   //   if (_stop_gnss_with_pointcloud) {
   //     static int lidar_local_counter = 0;
@@ -460,10 +480,13 @@ int MeasureRepublishProcess::LidarLocalProcess(
     LOG(INFO) << std::setprecision(16)
               << "MeasureDataRepublish Debug Log: lidarLocal msg: "
               << "[time:" << measure_data.time << "]"
-              << "[x:" << measure_data.gnss_pos.longitude * 57.295779513082323 << "]"
-              << "[y:" << measure_data.gnss_pos.latitude * 57.295779513082323 << "]"
+              << "[x:" << measure_data.gnss_pos.longitude * 57.295779513082323
+              << "]"
+              << "[y:" << measure_data.gnss_pos.latitude * 57.295779513082323
+              << "]"
               << "[z:" << measure_data.gnss_pos.height << "]"
-              << "[yaw:" << measure_data.gnss_att.yaw * 57.295779513082323 << "]"
+              << "[yaw:" << measure_data.gnss_att.yaw * 57.295779513082323
+              << "]"
               << "[std_x:" << std::sqrt(longitude_var) << "]"
               << "[std_y:" << std::sqrt(latitude_var) << "]"
               << "[std_z:" << 0.03 << "]";
@@ -471,62 +494,6 @@ int MeasureRepublishProcess::LidarLocalProcess(
 
   return 1;
 }
-
-// void MeasureRepublishProcess::TranferToIntegMeasureData(
-//     const MeasureData& measure_data, IntegMeasure& measure) {
-//   apollo::common::Header* headerpb = measure.mutable_header();
-//   apollo::common::Point3D* position = measure.mutable_position();
-//   apollo::common::Point3D* velocity = measure.mutable_velocity();
-
-//   headerpb->set_timestamp_sec(measure_data.time);
-
-//   measure.set_measure_type(
-//       (IntegMeasure::MeasureType) int(measure_data.measure_type));
-//   measure.set_frame_type(
-//       (IntegMeasure::FrameType) int(measure_data.frame_type));
-//   measure.set_is_have_variance(measure_data.is_have_variance);
-
-//   position->set_x(measure_data.gnss_pos.longitude);
-//   position->set_y(measure_data.gnss_pos.latitude);
-//   position->set_z(measure_data.gnss_pos.height);
-
-//   velocity->set_x(measure_data.gnss_vel.ve);
-//   velocity->set_y(measure_data.gnss_vel.vn);
-//   velocity->set_z(measure_data.gnss_vel.vu);
-
-//   measure.set_yaw(measure_data.gnss_att.yaw);
-
-//   measure.clear_measure_covar();
-//   if (measure.is_have_variance()) {
-//     for (int i = 0; i < 9; ++i) {
-//       for (int j = 0; j < 9; ++j) {
-//         measure.add_measure_covar(measure_data.variance[i][j]);
-//       }
-//     }
-//   }
-
-//   // if (debug_log_flag_) {
-//   //   LOG(INFO) << "IntegratedLocalization Debug Log: measure data: "
-//   //             << "[time:" << measure_data.time << "]"
-//   //             << "[x:" << measure_data.gnss_pos.longitude * 57.295779513082323
-//   //             << "]"
-//   //             << "[y:" << measure_data.gnss_pos.latitude * 57.295779513082323
-//   //             << "]"
-//   //             << "[z:" << measure_data.gnss_pos.height << "]"
-//   //             << "[ve:" << measure_data.gnss_vel.ve << "]"
-//   //             << "[vn:" << measure_data.gnss_vel.vn << "]"
-//   //             << "[vu:" << measure_data.gnss_vel.vu << "]"
-//   //             << "[pitch:" << measure_data.gnss_att.pitch * 57.295779513082323
-//   //             << "]"
-//   //             << "[roll:" << measure_data.gnss_att.roll * 57.295779513082323
-//   //             << "]"
-//   //             << "[yaw:" << measure_data.gnss_att.yaw * 57.295779513082323
-//   //             << "]"
-//   //             << "[measure type:" << int(measure_data.measure_type) << "]";
-//   // }
-
-//   return;
-// }
 
 }  // namespace msf
 }  // namespace localization

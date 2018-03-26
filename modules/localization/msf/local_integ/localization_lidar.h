@@ -1,6 +1,22 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #pragma once
 
-#include "include/lidar_locator.h"
+#include <string>
 #include "modules/common/log.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_2d.h"
@@ -8,7 +24,7 @@
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_matrix_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_node_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_pool_2d.h"
-#include "localization_params.h"
+#include "modules/localization/msf/local_integ/localization_params.h"
 #include "include/lidar_locator.h"
 
 namespace apollo {
@@ -51,6 +67,7 @@ typedef apollo::localization::msf::LossyMapNodePool2D LossyMapNodePool;
 typedef apollo::localization::msf::LossyMapMatrix2D LossyMapMatrix;
 typedef apollo::localization::msf::LossyMapCell2D LossyMapCell;
 typedef apollo::localization::msf::LossyMapConfig2D LossyMapConfig;
+
  public:
   /**@brief The constructor. */
   LocalizationLidar();
@@ -70,7 +87,7 @@ typedef apollo::localization::msf::LossyMapConfig2D LossyMapConfig;
   void SetImageAlignMode(int mode);
 
   void SetLocalizationMode(int mode);
-  
+
   void SetDeltaYawLimit(double limit);
 
   void SetDeltaPitchRollLimit(double limit);
@@ -84,7 +101,7 @@ typedef apollo::localization::msf::LossyMapConfig2D LossyMapConfig;
 
  protected:
   void ComposeMapNode(const Eigen::Vector3d& trans);
- 
+
   void RefineAltitudeFromMap(Eigen::Affine3d *pose);
 
  protected:
@@ -110,6 +127,6 @@ typedef apollo::localization::msf::LossyMapConfig2D LossyMapConfig;
   Eigen::Affine3d _velodyne_extrinsic;
 };
 
-} // msf
-} // localization
-} // apollo
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo

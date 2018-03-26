@@ -31,8 +31,8 @@ const double sins_deg_to_rad = 0.01745329252;
 
 const double sins_pi = 3.1415926535897932;
 const double sins_r0 = 6378137.0;
-const double sins_e = 0.08181919108425; 
-const double sins_e2 = 0.00669437999013; 
+const double sins_e = 0.08181919108425;
+const double sins_e2 = 0.00669437999013;
 
 /*
  * arclength0f_meridian
@@ -62,33 +62,33 @@ static double arclength0f_meridian(double phi) {
     double epsilon = 0.0;
     double n = 0.0;
     double result = 0.0;
-    
+
     /* Precalculate n */
     n = (sm_a - sm_b) / (sm_a + sm_b);
-    
+
     /* Precalculate alpha */
     alpha = ((sm_a + sm_b) / 2.0) * (1.0 + (pow(n, 2.0) / 4.0)
             + (pow(n, 4.0) / 64.0));
-    
+
     /* Precalculate beta */
     beta = (-3.0 * n / 2.0)
            + (9.0 * pow(n, 3.0) / 16.0)
            + (-3.0 * pow(n, 5.0) / 32.0);
-    
+
     /* Precalculate gamma */
     gamma = (15.0 * pow(n, 2.0) / 16.0) + (-15.0 * pow(n, 4.0) / 32.0);
-    
+
     /* Precalculate delta */
     delta = (-35.0 * pow(n, 3.0) / 48.0) + (105.0 * pow(n, 5.0) / 256.0);
-    
+
     /* Precalculate epsilon */
     epsilon = (315.0 * pow(n, 4.0) / 512.0);
-    
+
     /* Now calculate the sum of the series and return */
     result = alpha * (phi + (beta * sin(2.0 * phi))
              + (gamma * sin(4.0 * phi))
              + (delta * sin(6.0 * phi)) + (epsilon * sin(8.0 * phi)));
-    
+
     return result;
 }
 
@@ -135,35 +135,35 @@ double footpoint_latitude(double y) {
     double epsilon_ = 0.0;
     double n = 0.0;
     double result = 0.0;
-    
+
     /* Precalculate n (Eq. 10.18) */
     n = (sm_a - sm_b) / (sm_a + sm_b);
-    
+
     /* Precalculate alpha_ (Eq. 10.22) */
     /* (Same as alpha in Eq. 10.17) */
     alpha_ = ((sm_a + sm_b) / 2.0) * (1 + (pow(n, 2.0) / 4)
              + (pow(n, 4.0) / 64));
-    
+
     /* Precalculate y_ (Eq. 10.23) */
     y_ = y / alpha_;
-    
+
     /* Precalculate beta_ (Eq. 10.22) */
     beta_ = (3.0 * n / 2.0)
             + (-27.0 * pow(n, 3.0) / 32.0) + (269.0 * pow(n, 5.0) / 512.0);
-    
+
     /* Precalculate gamma_ (Eq. 10.22) */
     gamma_ = (21.0 * pow(n, 2.0) / 16.0) + (-55.0 * pow(n, 4.0) / 32.0);
-    
+
     /* Precalculate delta_ (Eq. 10.22) */
     delta_ = (151.0 * pow(n, 3.0) / 96.0)   + (-417.0 * pow(n, 5.0) / 128.0);
-    
+
     /* Precalculate epsilon_ (Eq. 10.22) */
     epsilon_ = (1097.0 * pow(n, 4.0) / 512.0);
-    
+
     /* Now calculate the sum of the series (Eq. 10.21) */
     result = y_ + (beta_ * sin(2.0 * y_)) + (gamma_ * sin(4.0 * y_))
              + (delta_ * sin(6.0 * y_)) + (epsilon_ * sin(8.0 * y_));
-    
+
     return result;
 }
 
@@ -205,46 +205,46 @@ void maplatlon_to_xy(double phi, double lambda,
     double l7coef = 0.0;
     double l8coef = 0.0;
     double tmp = 0.0;
-    
+
     /* Precalculate ep2 */
     ep2 = (pow(sm_a, 2.0) - pow(sm_b, 2.0)) / pow(sm_b, 2.0);
-    
+
     /* Precalculate nu2 */
     nu2 = ep2 * pow(cos(phi), 2.0);
-    
+
     /* Precalculate nn */
     nn = pow(sm_a, 2.0) / (sm_b * sqrt(1 + nu2));
-    
+
     /* Precalculate t */
     t = tan(phi);
     t2 = t * t;
     tmp = (t2 * t2 * t2) - pow(t, 6.0);
-    
+
     /* Precalculate l */
     l = lambda - lambda0;
-    
+
     /* Precalculate coefficients for l**nn in the equations below
      so a normal human being can read the expressions for easting
      and northing
      -- l**1 and l**2 have coefficients of 1.0 */
     l3coef = 1.0 - t2 + nu2;
-    
+
     l4coef = 5.0 - t2 + 9 * nu2 + 4.0 * (nu2 * nu2);
-    
+
     l5coef = 5.0 - 18.0 * t2 + (t2 * t2) + 14.0 * nu2 - 58.0 * t2 * nu2;
-    
+
     l6coef = 61.0 - 58.0 * t2 + (t2 * t2) + 270.0 * nu2 - 330.0 * t2 * nu2;
-    
+
     l7coef = 61.0 - 479.0 * t2 + 179.0 * (t2 * t2) - (t2 * t2 * t2);
-    
+
     l8coef = 1385.0 - 3111.0 * t2 + 543.0 * (t2 * t2) - (t2 * t2 * t2);
-    
+
     /* Calculate easting (x) */
     xy->x = nn * cos(phi) * l
            + (nn / 6.0 * pow(cos(phi), 3.0) * l3coef * pow(l, 3.0))
            + (nn / 120.0 * pow(cos(phi), 5.0) * l5coef * pow(l, 5.0))
            + (nn / 5040.0 * pow(cos(phi), 7.0) * l7coef * pow(l, 7.0));
-    
+
     /* Calculate northing (y) */
     xy->y = arclength0f_meridian(phi)
            + (t / 2.0 * nn * pow(cos(phi), 2.0) * pow(l, 2.0))
@@ -311,78 +311,78 @@ void mapxy_to_latlon(double x, double y, double lambda0, WGS84Corr *philambda) {
     double x6poly = 0.0;
     double x7poly = 0.0;
     double x8poly = 0.0;
-    
+
     /* Get the value of phif, the footpoint latitude. */
     phif = footpoint_latitude(y);
-    
+
     /* Precalculate ep2 */
     ep2 = (pow(sm_a, 2.0) - pow(sm_b, 2.0)) / pow(sm_b, 2.0);
-    
+
     /* Precalculate cos (phif) */
     cf = cos(phif);
-    
+
     /* Precalculate nuf2 */
     nuf2 = ep2 * pow(cf, 2.0);
-    
+
     /* Precalculate nf and initialize nfpow */
     nf = pow(sm_a, 2.0) / (sm_b * sqrt(1 + nuf2));
     nfpow = nf;
-    
+
     /* Precalculate tf */
     tf = tan(phif);
     tf2 = tf * tf;
     tf4 = tf2 * tf2;
-    
+
     /* Precalculate fractional coefficients for x**n in the equations
      below to simplify the expressions for latitude and longitude. */
     x1frac = 1.0 / (nfpow * cf);
-    
+
     nfpow *= nf;   /* now equals nf**2) */
     x2frac = tf / (2.0 * nfpow);
-    
+
     nfpow *= nf;   /* now equals nf**3) */
     x3frac = 1.0 / (6.0 * nfpow * cf);
-    
+
     nfpow *= nf;   /* now equals nf**4) */
     x4frac = tf / (24.0 * nfpow);
-    
+
     nfpow *= nf;   /* now equals nf**5) */
     x5frac = 1.0 / (120.0 * nfpow * cf);
-    
+
     nfpow *= nf;   /* now equals nf**6) */
     x6frac = tf / (720.0 * nfpow);
-    
+
     nfpow *= nf;   /* now equals nf**7) */
     x7frac = 1.0 / (5040.0 * nfpow * cf);
-    
+
     nfpow *= nf;   /* now equals nf**8) */
     x8frac = tf / (40320.0 * nfpow);
-    
+
     /* Precalculate polynomial coefficients for x**n.
      -- x**1 does not have a polynomial coefficient. */
     x2poly = -1.0 - nuf2;
-    
+
     x3poly = -1.0 - 2 * tf2 - nuf2;
-    
-    x4poly = 5.0 + 3.0 * tf2 + 6.0 * nuf2 
+
+    x4poly = 5.0 + 3.0 * tf2 + 6.0 * nuf2
              - 6.0 * tf2 * nuf2 - 3.0 * (nuf2 *nuf2)
              - 9.0 * tf2 * (nuf2 * nuf2);
-    
+
     x5poly = 5.0 + 28.0 * tf2 + 24.0 * tf4 + 6.0 * nuf2 + 8.0 * tf2 * nuf2;
-    
+
     x6poly = -61.0 - 90.0 * tf2 - 45.0 * tf4
              - 107.0 * nuf2 + 162.0 * tf2 * nuf2;
-    
+
     x7poly = -61.0 - 662.0 * tf2 - 1320.0 * tf4 - 720.0 * (tf4 * tf2);
-    
+
     x8poly = 1385.0 + 3633.0 * tf2 + 4095.0 * tf4 + 1575 * (tf4 * tf2);
-    
+
     /* Calculate latitude */
     philambda->lat = phif + x2frac * x2poly * (x * x)
                     + x4frac * x4poly * pow(x, 4.0)
                     + x6frac * x6poly * pow(x, 6.0)
                     + x8frac * x8poly * pow(x, 8.0);
-    
+
     /* Calculate longitude */
     philambda->log = lambda0 + x1frac * x + x3frac * x3poly * pow(x, 3.0)
                     + x5frac * x5poly * pow(x, 5.0)
@@ -411,10 +411,10 @@ void mapxy_to_latlon(double x, double y, double lambda0, WGS84Corr *philambda) {
  */
 void latlon_to_utmxy(double lon_rad, double lat_rad, UTMCoor *xy) {
     int zone = 0;
-    zone = int((lon_rad * sins_rad_to_deg + 180) / 6) + 1;
-    
+    zone = static_cast<int>((lon_rad * sins_rad_to_deg + 180) / 6) + 1;
+
     maplatlon_to_xy(lat_rad, lon_rad, utm_central_meridian(zone), xy);
-    
+
     /* Adjust easting and northing for UTM system. */
     xy->x = xy->x * utm_scale_factor + 500000.0;
     xy->y = xy->y * utm_scale_factor;
@@ -447,22 +447,21 @@ void latlon_to_utmxy(double lon_rad, double lat_rad, UTMCoor *xy) {
 void utmxy_to_latlon(double x, double y, int zone,
                      bool southhemi, WGS84Corr *latlon) {
     double cmeridian = 0.0;
-    
+
     x -= 500000.0;
     x /= utm_scale_factor;
-    
+
     /* If in southern hemisphere, adjust y accordingly. */
     if (southhemi) {
         y -= 10000000.0;
     }
-    
+
     y /= utm_scale_factor;
-    
+
     cmeridian = utm_central_meridian(zone);
     mapxy_to_latlon(x, y, cmeridian, latlon);
 }
-    
-    
+
 void xyz_to_blh(const Eigen::Vector3d &xyz, Eigen::Vector3d *blh) {
     //    double e2=FE_WGS84*(2.0-FE_WGS84);
     double r2 = xyz[0] * xyz[0] + xyz[1] * xyz[1];
@@ -470,7 +469,7 @@ void xyz_to_blh(const Eigen::Vector3d &xyz, Eigen::Vector3d *blh) {
     double zk = 0.0;
     double v = sins_r0;
     double sinp = 0.0;
-        
+
     for (z = xyz[2], zk = 0.0; fabs(z - zk) >= 1E-4;) {
         zk = z;
         sinp = z / sqrt(r2 + z * z);
@@ -490,19 +489,19 @@ void blh_to_xyz(const Eigen::Vector3d &blh, Eigen::Vector3d *xyz) {
     double temp_a = sqrt(1.0 - sins_e2 * sin_lati_2);
     double rn = sins_r0 / temp_a;
     // double rm = rn * (1.0 - sins_e2) / (1.0 - sins_e2 * sin_lati_2);
-    
+
     double cos_lat = cos(blh[1]);
     double sin_lat = sin(blh[1]);
     double cos_long = cos(blh[0]);
     double sin_long = sin(blh[0]);
-        
+
     (*xyz)[0] = (rn + blh[2]) * cos_lat * cos_long;
     (*xyz)[1] = (rn + blh[2]) * cos_lat * sin_long;
     (*xyz)[2] = ((1 - sins_e2) * rn + blh[2]) * sin_lat;
-    
+
     return;
 }
 
-}
-}
-}
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo

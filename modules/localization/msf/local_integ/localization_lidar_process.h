@@ -27,6 +27,7 @@
 #include <Eigen/Geometry>
 #include <list>
 #include <string>
+#include <cstdint>
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -58,7 +59,7 @@ enum class ForcastState {
     INCREMENT
 };
 
-enum class LidarState { 
+enum class LidarState {
   NOT_VALID = 0,
   NOT_STABLE,
   OK
@@ -109,10 +110,9 @@ class LocalizationLidarProcess {
   // Initialization.
   LocalizationState Init(const LocalizationIntegParam& params);
   // Lidar pcd process and get result.
-  void PcdProcess(LidarFrame& lidar_frame);
-  void GetResult(int& lidar_status, TransformD& location, Matrix3D& covariance);
-  // int GetResult(IntegMeasure& lidar_msg);
-  int GetResult(LocalizationEstimate& lidar_local_msg);
+  void PcdProcess(const LidarFrame& lidar_frame);
+  void GetResult(int *lidar_status, TransformD *location, Matrix3D *covariance);
+  int GetResult(LocalizationEstimate *lidar_local_msg);
   // Integrated navagation pva process.
   void IntegPvaProcess(const InsPva& sins_pva_msg);
   // Raw Imu process.
@@ -129,16 +129,15 @@ class LocalizationLidarProcess {
 
   // Load lidar-imu extrinsic parameter.
   bool LoadLidarExtrinsic(const std::string& file_path,
-                          TransformD& lidar_extrinsic);
+                          TransformD *lidar_extrinsic);
   // Load lidar height (the distance between lidar and ground).
-  bool LoadLidarHeight(const std::string& file_path, LidarHeight& height);
+  bool LoadLidarHeight(const std::string& file_path, LidarHeight *height);
   // // Parse lidar frame.
   // void ParseLidarFrame(sensor_msgs::PointCloud2::Ptr& lidar_msg,
   //                      LidarFrame& lidar_frame) const;
 
-  double ComputeDeltaYaw(long long index_cur, long long index_stable,
+  double ComputeDeltaYaw(int64_t index_cur, int64_t index_stable,
             double limit_min, double limit_max);
-  // void CheckDeltaYaw(int ret, const TransformD& locate, const TransformD& predict);
 
  private:
   // Lidar localization.
@@ -215,7 +214,7 @@ class LocalizationLidarProcess {
 
   /**@brief forcast integ pose, use to limit output of yaw */
   ForcastState forcast_integ_state_;
-  long long forcast_timer_;
+  int64_t forcast_timer_;
 };
 
 }  // namespace msf

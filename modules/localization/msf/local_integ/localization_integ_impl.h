@@ -24,15 +24,15 @@
 
 #include <atomic>
 #include <functional>
+#include <queue>
+#include <list>
 
-#include "localization_gnss_process.h"
-#include "localization_integ_process.h"
-#include "localization_lidar_process.h"
-#include "measure_republish_process.h"
-
-#include "localization_integ.h"
-
-#include "pose_query.h"
+#include "modules/localization/msf/local_integ/localization_gnss_process.h"
+#include "modules/localization/msf/local_integ/localization_integ_process.h"
+#include "modules/localization/msf/local_integ/localization_lidar_process.h"
+#include "modules/localization/msf/local_integ/measure_republish_process.h"
+#include "modules/localization/msf/local_integ/localization_integ.h"
+#include "modules/localization/msf/local_integ/pose_query.h"
 
 /**
  * @namespace apollo::localization
@@ -66,44 +66,48 @@ class LocalizationIntegImpl {
   void RawImuProcessRfu(const ImuData& imu_data);
 
   // Gnss Info process.
-  void RawObservationProcess(const drivers::gnss::EpochObservation& raw_obs_msg);
+  void RawObservationProcess(
+      const drivers::gnss::EpochObservation& raw_obs_msg);
   void RawEphemerisProcess(const drivers::gnss::GnssEphemeris& gnss_orbit_msg);
 
   // gnss best pose process
   void GnssBestPoseProcess(const drivers::gnss::GnssBestPose& bestgnsspos_msg);
 
-  void GetLastestLidarLocalization(LocalizationMeasureState& state,
-                                   LocalizationEstimate& lidar_localization);
+  void GetLastestLidarLocalization(LocalizationMeasureState *state,
+                                   LocalizationEstimate *lidar_localization);
 
-  void GetLastestIntegLocalization(LocalizationMeasureState& state,
-                                   LocalizationEstimate& integ_localization);
+  void GetLastestIntegLocalization(LocalizationMeasureState *state,
+                                   LocalizationEstimate *integ_localization);
 
-  void GetLastestGnssLocalization(LocalizationMeasureState& state,
-                                  LocalizationEstimate& gnss_localization);
+  void GetLastestGnssLocalization(LocalizationMeasureState *state,
+                                  LocalizationEstimate *gnss_localization);
 
-  void GetLidarLocalizationList(std::list<LocalizationResult>& results);
+  void GetLidarLocalizationList(std::list<LocalizationResult> *results);
 
-  void GetIntegLocalizationList(std::list<LocalizationResult>& results);
+  void GetIntegLocalizationList(std::list<LocalizationResult> *results);
 
-  void GetGnssLocalizationList(std::list<LocalizationResult>& results);
+  void GetGnssLocalizationList(std::list<LocalizationResult> *results);
 
  private:
   void PcdThreadLoop();
-  void PcdProcessImpl(LidarFrame& pcd_data);
+  void PcdProcessImpl(const LidarFrame& pcd_data);
 
   void ImuThreadLoop();
   void ImuProcessImpl(const ImuData& imu_data);
 
   void GnssThreadLoop();
-  void RawObservationProcessImpl(const drivers::gnss::EpochObservation& raw_obs_msg);
-  void RawEphemerisProcessImpl(const drivers::gnss::GnssEphemeris& gnss_orbit_msg);
-  void GnssBestPoseProcessImpl(const drivers::gnss::GnssBestPose& bestgnsspos_msg);
+  void RawObservationProcessImpl(
+      const drivers::gnss::EpochObservation& raw_obs_msg);
+  void RawEphemerisProcessImpl(
+      const drivers::gnss::GnssEphemeris& gnss_orbit_msg);
+  void GnssBestPoseProcessImpl(
+      const drivers::gnss::GnssBestPose& bestgnsspos_msg);
 
   // void ParseLidarFrame(const sensor_msgs::PointCloud2& lidar_data,
   //                      LidarFrame& lidar_frame) const;
 
   void TransferGnssMeasureToLocalization(const MeasureData& measure,
-                                         LocalizationEstimate& localization);
+                                         LocalizationEstimate *localization);
 
  private:
   MeasureRepublishProcess* republish_process_;

@@ -1,12 +1,26 @@
-#include "localization_gnss_process.h"
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
+#include "modules/localization/msf/local_integ/localization_gnss_process.h"
 #include <yaml-cpp/yaml.h>
-// #include "boost/filesystem.hpp"
-#include "glog/logging.h"
-#include "glog/raw_logging.h"
-// #include "local_gnss/rinex_io.h"
+#include <string>
+#include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/localization/msf/common/util/sleep.h"
-#include "gnss_msg_transfer.h"
+#include "modules/localization/msf/local_integ/gnss_msg_transfer.h"
 
 namespace apollo {
 namespace localization {
@@ -35,13 +49,14 @@ LocalizationGnssProcess::~LocalizationGnssProcess() {
   double_antenna_solver_ = NULL;
 }
 
-LocalizationState LocalizationGnssProcess::Init(const LocalizationIntegParam &param) {
+LocalizationState LocalizationGnssProcess::Init(
+    const LocalizationIntegParam &param) {
   // set launch parameter
   enable_ins_aid_rtk_ = param.enable_ins_aid_rtk;
   gnss_solver_->set_enable_external_prediction(enable_ins_aid_rtk_);
   enable_auto_save_eph_file_ = param.enable_auto_save_eph_file;
   eph_buffer_path_ = param.eph_buffer_path;
-  // LoadGnssAntennaExtrinsic(param.extrinsic_imu_gnss_file, gnss_lever_arm_);
+
   gnss_lever_arm_.arm_x = param.imu_to_ant_offset.offset_x;
   gnss_lever_arm_.arm_y = param.imu_to_ant_offset.offset_y;
   gnss_lever_arm_.arm_z = param.imu_to_ant_offset.offset_z;
@@ -55,7 +70,7 @@ LocalizationState LocalizationGnssProcess::Init(const LocalizationIntegParam &pa
   bool b_exist = LoadHistoryEph(eph_full_path);
   if (enable_auto_save_eph_file_) {
     LOG(INFO) << "Begin to write eph file!";
-    fp_eph_ = fopen((char *)eph_full_path.data(), "a+");
+    fp_eph_ = fopen(static_cast<const char *>(eph_full_path.data()), "a+");
     if (!b_exist) {
       // no existing file
       if (fp_eph_ != NULL) {
@@ -71,9 +86,9 @@ LocalizationState LocalizationGnssProcess::Init(const LocalizationIntegParam &pa
   }
 #ifdef _ENABLE_SAVE_PURE_RTK_
   std::string pos_full_path = eph_buffer_path_ + "pos.txt";
-  gnss_solver_->set_rtk_result_file((char *)pos_full_path.data());
+  gnss_solver_->set_rtk_result_file(static_cast<char *>(pos_full_path.data()));
   std::string amb_full_path = eph_buffer_path_ + "amb.txt";
-  gnss_solver_->set_ambiguity_file((char *)amb_full_path.data());
+  gnss_solver_->set_ambiguity_file(static_cast<char *>(amb_full_path.data()));
 #endif
   return LocalizationState::OK();
 }
@@ -90,9 +105,10 @@ void LocalizationGnssProcess::RawObservationProcess(
   leap_second_s = gnss_solver_->get_leap_second(raw_obs.gnss_week(),
                                                raw_obs.gnss_second_s());
 
-  //double sys_secs_to_gnss = ros::Time::now().toSec()\
+  // double sys_secs_to_gnss = ros::Time::now().toSec()
+  //    - unix_to_gps + leap_second_s;
+  double sys_secs_to_gnss = common::time::Clock::NowInSeconds()
       - unix_to_gps + leap_second_s;
-  double sys_secs_to_gnss = common::time::Clock::NowInSeconds() - unix_to_gps + leap_second_s;
   double obs_secs =
       raw_obs.gnss_second_s() + raw_obs.gnss_week() * sec_per_week;
   double obs_delay = sys_secs_to_gnss - obs_secs;
@@ -129,7 +145,7 @@ void LocalizationGnssProcess::RawObservationProcess(
     return;
   }
   current_obs_time_ = new_obs_time;
-  GnssPosition(raw_obs_msg);
+  GnssPosition(&raw_obs_msg);
 }
 
 void LocalizationGnssProcess::RawEphemerisProcess(
@@ -165,8 +181,9 @@ void LocalizationGnssProcess::RawEphemerisProcess(
   if (gnss_solver_->save_gnss_ephemris(gnss_orbit_msg)) {
     // save to file only when new arriving eph is truely NEW!
     if (enable_auto_save_eph_file_ && fp_eph_ != NULL) {
-      // TODO
-      // apollo::localization::msf::RinexNav::write_eph(false, fp_eph_, gnss_orbit);
+      // TODO(zhouyao): add write_eph
+      // apollo::localization::msf::RinexNav::write_eph(
+      //     false, fp_eph_, gnss_orbit);
       // fflush(fp_eph_);
     }
   }
@@ -210,37 +227,38 @@ void LocalizationGnssProcess::IntegSinsPvaProcess(
   return;
 }
 
-bool LocalizationGnssProcess::LoadGnssAntennaExtrinsic(
-    const std::string &para_path, LeverArm &lever_arm) {
-  YAML::Node confige = YAML::LoadFile(para_path);
-  if (confige["leverarm"]) {
-    if (confige["leverarm"]["primary"]["offset"]) {
-      lever_arm.arm_x =
-          confige["leverarm"]["primary"]["offset"]["x"].as<double>();
-      lever_arm.arm_y =
-          confige["leverarm"]["primary"]["offset"]["y"].as<double>();
-      lever_arm.arm_z =
-          confige["leverarm"]["primary"]["offset"]["z"].as<double>();
-      return true;
-    }
-  }
-  return false;
-}
+// bool LocalizationGnssProcess::LoadGnssAntennaExtrinsic(
+//     const std::string &para_path, LeverArm &lever_arm) {
+//   YAML::Node confige = YAML::LoadFile(para_path);
+//   if (confige["leverarm"]) {
+//     if (confige["leverarm"]["primary"]["offset"]) {
+//       lever_arm.arm_x =
+//           confige["leverarm"]["primary"]["offset"]["x"].as<double>();
+//       lever_arm.arm_y =
+//           confige["leverarm"]["primary"]["offset"]["y"].as<double>();
+//       lever_arm.arm_z =
+//           confige["leverarm"]["primary"]["offset"]["z"].as<double>();
+//       return true;
+//     }
+//   }
+//   return false;
+// }
 
-LocalizationMeasureState LocalizationGnssProcess::GetResult(MeasureData &gnss_msg) {
+LocalizationMeasureState LocalizationGnssProcess::GetResult(
+    MeasureData *gnss_msg) {
   // convert GnssPntResult to IntegMeasure
   // double sec_s = Clock::NowInSeconds(); // ros::Time::now().toSec();
   const unsigned int second_per_week = 604800;
   double sec_s = gnss_pnt_result_.gnss_week() * second_per_week +
           gnss_pnt_result_.gnss_second_s();
-  gnss_msg.time = sec_s;
-  gnss_msg.frame_type = FrameType::ECEF;
+  gnss_msg->time = sec_s;
+  gnss_msg->frame_type = FrameType::ECEF;
 
   // velocity must be in ENU frame and position in frame WGS84
   const int dim = 9;
   for (int i = 0; i < dim; ++i) {
     for (int j = 0; j < dim; ++j) {
-      gnss_msg.variance[i][j] = 0.0;
+      gnss_msg->variance[i][j] = 0.0;
     }
   }
 
@@ -249,34 +267,40 @@ LocalizationMeasureState LocalizationGnssProcess::GetResult(MeasureData &gnss_ms
   if (gnss_pnt_result_.has_pos_x_m() && gnss_pnt_result_.has_pos_y_m() &&
       gnss_pnt_result_.has_pos_z_m()) {
     b_pos = true;
-    gnss_msg.gnss_pos.longitude = gnss_pnt_result_.pos_x_m();
-    gnss_msg.gnss_pos.latitude = gnss_pnt_result_.pos_y_m();
-    gnss_msg.gnss_pos.height = gnss_pnt_result_.pos_z_m();
-    gnss_msg.measure_type = MeasureType::GNSS_POS_ONLY;
+    gnss_msg->gnss_pos.longitude = gnss_pnt_result_.pos_x_m();
+    gnss_msg->gnss_pos.latitude = gnss_pnt_result_.pos_y_m();
+    gnss_msg->gnss_pos.height = gnss_pnt_result_.pos_z_m();
+    gnss_msg->measure_type = MeasureType::GNSS_POS_ONLY;
 
-    gnss_msg.is_have_variance = true;
+    gnss_msg->is_have_variance = true;
     // std
-    gnss_msg.variance[0][0] = gnss_pnt_result_.std_pos_x_m() * gnss_pnt_result_.std_pos_x_m();
-    gnss_msg.variance[1][1] = gnss_pnt_result_.std_pos_y_m() * gnss_pnt_result_.std_pos_y_m();
-    gnss_msg.variance[2][2] = gnss_pnt_result_.std_pos_z_m() * gnss_pnt_result_.std_pos_z_m();
+    gnss_msg->variance[0][0] =
+        gnss_pnt_result_.std_pos_x_m() * gnss_pnt_result_.std_pos_x_m();
+    gnss_msg->variance[1][1] =
+        gnss_pnt_result_.std_pos_y_m() * gnss_pnt_result_.std_pos_y_m();
+    gnss_msg->variance[2][2] =
+        gnss_pnt_result_.std_pos_z_m() * gnss_pnt_result_.std_pos_z_m();
   }
   bool b_vel = false;
   if (gnss_pnt_result_.has_vel_x_m() && gnss_pnt_result_.has_vel_y_m() &&
       gnss_pnt_result_.has_vel_z_m()) {
     // output velocity whenever possible.
     b_vel = true;
-    gnss_msg.gnss_vel.ve = gnss_pnt_result_.vel_x_m();
-    gnss_msg.gnss_vel.vn = gnss_pnt_result_.vel_y_m();
-    gnss_msg.gnss_vel.vu = gnss_pnt_result_.vel_z_m();
-    gnss_msg.measure_type = MeasureType::ENU_VEL_ONLY;
-    gnss_msg.is_have_variance = true;
+    gnss_msg->gnss_vel.ve = gnss_pnt_result_.vel_x_m();
+    gnss_msg->gnss_vel.vn = gnss_pnt_result_.vel_y_m();
+    gnss_msg->gnss_vel.vu = gnss_pnt_result_.vel_z_m();
+    gnss_msg->measure_type = MeasureType::ENU_VEL_ONLY;
+    gnss_msg->is_have_variance = true;
     // std
-    gnss_msg.variance[3][3] = gnss_pnt_result_.std_vel_x_m() * gnss_pnt_result_.std_vel_x_m();
-    gnss_msg.variance[4][4] = gnss_pnt_result_.std_vel_y_m() * gnss_pnt_result_.std_vel_y_m();
-    gnss_msg.variance[5][5] = gnss_pnt_result_.std_vel_z_m() * gnss_pnt_result_.std_vel_z_m();
+    gnss_msg->variance[3][3] =
+        gnss_pnt_result_.std_vel_x_m() * gnss_pnt_result_.std_vel_x_m();
+    gnss_msg->variance[4][4] =
+        gnss_pnt_result_.std_vel_y_m() * gnss_pnt_result_.std_vel_y_m();
+    gnss_msg->variance[5][5] =
+        gnss_pnt_result_.std_vel_z_m() * gnss_pnt_result_.std_vel_z_m();
   }
   if (b_pos && b_vel) {
-    gnss_msg.measure_type = MeasureType::GNSS_POS_VEL;
+    gnss_msg->measure_type = MeasureType::GNSS_POS_VEL;
   }
 
   return gnss_state_;
@@ -300,7 +324,10 @@ void LocalizationGnssProcess::SetDefaultOption() {
   } else {
     time_t time_p;
     time(&time_p);
-    struct tm *p_tm = localtime(&time_p);
+    struct tm now_time;
+    struct tm *p_tm = &now_time;
+    // struct tm *p_tm = localtime(&time_p);
+    localtime_r(&time_p, p_tm);
     unsigned int day_of_year = p_tm->tm_yday;
     unsigned int year = 1900 + p_tm->tm_year;
     unsigned int year_2000 = year - 2000;
@@ -312,37 +339,6 @@ void LocalizationGnssProcess::SetDefaultOption() {
   }
 }
 
-bool LocalizationGnssProcess::LoadDoubleAntennaExtrinsic(
-    const std::string &para_path, LeverArm &primary_lever_arm,
-    LeverArm &secondary_lever_arm) {
-  YAML::Node confige = YAML::LoadFile(para_path);
-  int num_ant = 0;
-  if (confige["leverarm"]) {
-    if (confige["leverarm"]["primary"]["offset"]) {
-      primary_lever_arm.arm_x =
-          confige["leverarm"]["primary"]["offset"]["x"].as<double>();
-      primary_lever_arm.arm_y =
-          confige["leverarm"]["primary"]["offset"]["y"].as<double>();
-      primary_lever_arm.arm_z =
-          confige["leverarm"]["primary"]["offset"]["z"].as<double>();
-      ++num_ant;
-    }
-    if (confige["leverarm"]["secondary"]["offset"]) {
-      secondary_lever_arm.arm_x =
-          confige["leverarm"]["secondary"]["offset"]["x"].as<double>();
-      secondary_lever_arm.arm_y =
-          confige["leverarm"]["secondary"]["offset"]["y"].as<double>();
-      secondary_lever_arm.arm_z =
-          confige["leverarm"]["secondary"]["offset"]["z"].as<double>();
-      ++num_ant;
-    }
-  }
-  if (num_ant == 2) {
-    return true;
-  }
-  return false;
-}
-
 bool LocalizationGnssProcess::LoadHistoryEph(const std::string &nav_file) {
   return false;
 
@@ -350,7 +346,8 @@ bool LocalizationGnssProcess::LoadHistoryEph(const std::string &nav_file) {
   // if (file == NULL) {
   //   return false;
   // }
-  // apollo::localization::msf::RinexNav mix_v_302(file, apollo::localization::msf::VERSION_3);
+  // apollo::localization::msf::RinexNav mix_v_302(file,
+  // apollo::localization::msf::VERSION_3);
   // if (mix_v_302.is_file_open() == false) {
   //   Print("fail to load ephemeris!\n", 1);
   //   return false;
@@ -359,9 +356,10 @@ bool LocalizationGnssProcess::LoadHistoryEph(const std::string &nav_file) {
   // return true;
 }
 
-bool LocalizationGnssProcess::DuplicateEph(const drivers::gnss::GnssEphemeris &raw_eph) {
+bool LocalizationGnssProcess::DuplicateEph(
+    const drivers::gnss::GnssEphemeris &raw_eph) {
   drivers::gnss::GnssType t_type = raw_eph.gnss_type();
-  if (t_type != drivers::gnss::GnssType::GPS_SYS && 
+  if (t_type != drivers::gnss::GnssType::GPS_SYS &&
       t_type != drivers::gnss::GnssType::BDS_SYS &&
       t_type != drivers::gnss::GnssType::GLO_SYS) {
     return true;
@@ -383,32 +381,10 @@ bool LocalizationGnssProcess::DuplicateEph(const drivers::gnss::GnssEphemeris &r
     return true;
   }
   map_gnss_eph_.insert(
-      std::map<EphKey, drivers::gnss::GnssEphemeris>::value_type(temp, raw_eph));
+      std::map<EphKey, drivers::gnss::GnssEphemeris>::
+      value_type(temp, raw_eph));
   return false;
 }
-
-// void LocalizationGnssProcess::VarianceImu2Gnss(const Eigen::Matrix3d &var_enu,
-//                                                const PointThreeDim &pos,
-//                                                double std_pos[3][3]) {
-//   Eigen::Matrix3d temp_var = var_enu;
-//   Eigen::Matrix3d t = apollo::localization::msf::gnss_utility::dcm_e2n(pos);
-//   temp_var = t.transpose() * temp_var * t;
-
-//   double lat = 0;
-//   double lon = 0;
-//   double alt = 0;
-//   apollo::localization::msf::gnss_utility::xyz2blh(pos, lat, lon, alt);
-//   const double earth_long_semi = 6378137.0;
-//   const double prime_vertical = earth_long_semi * cos(lat);
-
-//   std_pos[0][0] = temp_var(0, 0) * prime_vertical * prime_vertical;
-//   std_pos[0][1] = std_pos[1][0] =
-//       temp_var(0, 1) * prime_vertical * earth_long_semi;
-//   std_pos[0][2] = std_pos[2][0] = temp_var(0, 2) * prime_vertical;
-//   std_pos[1][1] = temp_var(1, 1) * earth_long_semi * earth_long_semi;
-//   std_pos[1][2] = std_pos[2][1] = temp_var(1, 2) * earth_long_semi;
-//   std_pos[2][2] = temp_var(2, 2);
-// }
 
 inline void LocalizationGnssProcess::LogPnt(const GnssPntResultMsg &rover_pnt,
                                             double ratio) {
@@ -417,27 +393,28 @@ inline void LocalizationGnssProcess::LogPnt(const GnssPntResultMsg &rover_pnt,
            "%6d%12.3f%4d%16.3f%16.3f%16.3f%4d%4.1f%6.1f%8.3f%8.3f%8.3f%8.3f%8."
            "3f%8.3f\n",
            rover_pnt.gnss_week(), rover_pnt.gnss_second_s(),
-           (int)rover_pnt.pnt_type(), rover_pnt.pos_x_m(), rover_pnt.pos_y_m(),
+           static_cast<int>(rover_pnt.pnt_type()),
+           rover_pnt.pos_x_m(), rover_pnt.pos_y_m(),
            rover_pnt.pos_z_m(), rover_pnt.sovled_sat_num(), rover_pnt.pdop(),
-           ratio, rover_pnt.vel_x_m(), rover_pnt.vel_y_m(), rover_pnt.vel_z_m(),
-           rover_pnt.std_pos_x_m(), rover_pnt.std_pos_y_m(),
-           rover_pnt.std_pos_z_m());
+           ratio, rover_pnt.vel_x_m(), rover_pnt.vel_y_m(),
+           rover_pnt.vel_z_m(), rover_pnt.std_pos_x_m(),
+           rover_pnt.std_pos_y_m(), rover_pnt.std_pos_z_m());
   LOG(INFO) << print_infor;
 }
 
-bool LocalizationGnssProcess::GnssPosition(EpochObservationMsg &raw_rover_obs) {
+bool LocalizationGnssProcess::GnssPosition(
+    EpochObservationMsg *raw_rover_obs) {
   gnss_state_ = LocalizationMeasureState::NOT_VALID;
-  if (raw_rover_obs.receiver_id() != 0) {
+  if (raw_rover_obs->receiver_id() != 0) {
     LOG(INFO) << "Wrong Rover Obs Data!";
     return false;
   }
   // debug
-  int b_solved = gnss_solver_->solve(&raw_rover_obs, &gnss_pnt_result_);
+  int b_solved = gnss_solver_->solve(raw_rover_obs, &gnss_pnt_result_);
   if (b_solved < 0) {
     return false;
   }
   LogPnt(gnss_pnt_result_, gnss_solver_->get_ratio());
-  // std::cout << gnss_pnt_result_.DebugString() << std::endl;
   if (!sins_align_finish_) {
     LOG(INFO) << "Sins-ekf has not converged or finished its aligment!";
   }

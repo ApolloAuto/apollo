@@ -1,4 +1,21 @@
-#include "localization_lidar.h"
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
+#include "modules/localization/msf/local_integ/localization_lidar.h"
+#include <string>
 
 namespace apollo {
 namespace localization {
@@ -97,8 +114,10 @@ void LocalizationLidar::SetDeltaPitchRollLimit(double limit) {
   _lidar_locator.SetDeltaPitchRollLimit(limit);
 }
 
-int LocalizationLidar::Update(unsigned int frame_idx, const Eigen::Affine3d& pose,
-    const Eigen::Vector3d velocity, const LidarFrame& lidar_frame) {
+int LocalizationLidar::Update(unsigned int frame_idx,
+                              const Eigen::Affine3d& pose,
+                              const Eigen::Vector3d velocity,
+                              const LidarFrame& lidar_frame) {
   // check whether loaded map
   if (_is_map_loaded == false) {
     _map.LoadMapArea(pose.translation(), _resolution_id,
@@ -131,7 +150,8 @@ int LocalizationLidar::Update(unsigned int frame_idx, const Eigen::Affine3d& pos
   _lidar_locator.SetMapNodeData(node_width, node_height, node_level_num,
       &(_lidar_map_node->intensities), &(_lidar_map_node->intensities_var),
       &(_lidar_map_node->altitudes), &(_lidar_map_node->count));
-  _lidar_locator.SetMapNodeLeftTopCorner(_map_left_top_corner(0), _map_left_top_corner(1));
+  _lidar_locator.SetMapNodeLeftTopCorner(_map_left_top_corner(0),
+                                         _map_left_top_corner(1));
 
   // pass lidar points to locator
   int size = lidar_frame.pt_xs.size();
@@ -140,13 +160,19 @@ int LocalizationLidar::Update(unsigned int frame_idx, const Eigen::Affine3d& pos
       lidar_frame.pt_zs.data(), lidar_frame.intensities.data());
 
   // compute
-  int error = _lidar_locator.Compute(pose_trans(0), pose_trans(1), pose_trans(2),
-      pose_quat.x(), pose_quat.y(), pose_quat.z(), pose_quat.w());
+  int error = _lidar_locator.Compute(pose_trans(0),
+                                     pose_trans(1),
+                                     pose_trans(2),
+                                     pose_quat.x(),
+                                     pose_quat.y(),
+                                     pose_quat.z(),
+                                     pose_quat.w());
 
   return error;
 }
 
-void LocalizationLidar::GetResult(Eigen::Affine3d *location, Eigen::Matrix3d *covariance) {
+void LocalizationLidar::GetResult(Eigen::Affine3d *location,
+                                  Eigen::Matrix3d *covariance) {
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
@@ -175,7 +201,8 @@ void LocalizationLidar::GetResult(Eigen::Affine3d *location, Eigen::Matrix3d *co
   return;
 }
 
-void LocalizationLidar::GetLocalizationDistribution(Eigen::MatrixXd *distribution) {
+void LocalizationLidar::GetLocalizationDistribution(
+    Eigen::MatrixXd *distribution) {
   int width = 0;
   int height = 0;
   const double *data = NULL;
@@ -211,14 +238,13 @@ void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d *pose) {
     _is_pre_ground_height_valid = true;
     _pre_vehicle_ground_height = lidar_pose.translation()(2) - height_diff;
   }
-  
+
   float vehicle_ground_alt = 0.0;
   unsigned int count = matrix[y][x].count;
   if (count > 0) {
     if (matrix[y][x].is_ground_useful) {
-      vehicle_ground_alt = matrix[y][x].altitude_ground;  
-    }
-    else {
+      vehicle_ground_alt = matrix[y][x].altitude_ground;
+    } else {
       vehicle_ground_alt = matrix[y][x].altitude;
     }
   } else {
@@ -235,9 +261,9 @@ void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d *pose) {
 void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
   Eigen::Vector2d center(trans(0), trans(1));
   Eigen::Vector2d left_top_corner(
-      center(0) - _node_size_x * _resolution / 2.0, 
+      center(0) - _node_size_x * _resolution / 2.0,
       center(1) - _node_size_y * _resolution / 2.0);
-    
+
   // get map node index 2x2
   MapNodeIndex map_node_idx[2][2];
   // top left corner
@@ -270,25 +296,27 @@ void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
       left_top_corner, &coord_x, &coord_y);
   _map_left_top_corner = map_node[0][0]->GetCoordinate(coord_x, coord_y);
 
+  int coord_xi = coord_x;
+  int coord_yi = coord_y;
   int range_xs[2][2] = {0};
   int range_ys[2][2] = {0};
-  range_xs[0][0] = _node_size_x - int(coord_x);
-  range_xs[1][0] = _node_size_x - int(coord_x);
-  range_xs[0][1] = int(coord_x);
-  range_xs[1][1] = int(coord_x);
-  range_ys[0][0] = _node_size_y - int(coord_y);
-  range_ys[0][1] = _node_size_y - int(coord_y);
-  range_ys[1][0] = int(coord_y);
-  range_ys[1][1] = int(coord_y);
+  range_xs[0][0] = _node_size_x - coord_xi;
+  range_xs[1][0] = _node_size_x - coord_xi;
+  range_xs[0][1] = coord_xi;
+  range_xs[1][1] = coord_xi;
+  range_ys[0][0] = _node_size_y - coord_yi;
+  range_ys[0][1] = _node_size_y - coord_yi;
+  range_ys[1][0] = coord_yi;
+  range_ys[1][1] = coord_yi;
 
   int src_xs[2][2] = {0};
   int src_ys[2][2] = {0};
-  src_xs[0][0] = int(coord_x);
-  src_xs[1][0] = int(coord_x);
+  src_xs[0][0] = coord_xi;
+  src_xs[1][0] = coord_xi;
   src_xs[0][1] = 0;
   src_xs[1][1] = 0;
-  src_ys[0][0] = int(coord_y);
-  src_ys[0][1] = int(coord_y);
+  src_ys[0][0] = coord_yi;
+  src_ys[0][1] = coord_yi;
   src_ys[1][0] = 0;
   src_ys[1][1] = 0;
 
@@ -296,14 +324,14 @@ void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
   int dst_ys[2][2] = {0};
   dst_xs[0][0] = 0;
   dst_xs[1][0] = 0;
-  dst_xs[0][1] = _node_size_x - int(coord_x);
-  dst_xs[1][1] = _node_size_x - int(coord_x);
+  dst_xs[0][1] = _node_size_x - coord_xi;
+  dst_xs[1][1] = _node_size_x - coord_xi;
   dst_ys[0][0] = 0;
   dst_ys[0][1] = 0;
-  dst_ys[1][0] = _node_size_y - int(coord_y);
-  dst_ys[1][1] = _node_size_y - int(coord_y);
+  dst_ys[1][0] = _node_size_y - coord_yi;
+  dst_ys[1][1] = _node_size_y - coord_yi;
 
-  for(int i = 0; i < 2; ++i) {
+  for (int i = 0; i < 2; ++i) {
     for (int j = 0; j < 2; ++j) {
       int range_x = range_xs[i][j];
       int range_y = range_ys[i][j];
@@ -329,6 +357,6 @@ void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
   return;
 }
 
-} // msf
-} // localization
-} // apollo
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo

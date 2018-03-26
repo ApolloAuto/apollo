@@ -1,5 +1,23 @@
-#include "localization_integ.h"
-#include "localization_integ_impl.h"
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
+#include "modules/localization/msf/local_integ/localization_integ.h"
+#include <map>
+#include <list>
+#include "modules/localization/msf/local_integ/localization_integ_impl.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 #include "modules/localization/msf/common/util/time_conversion.h"
 #include "modules/localization/common/localization_gflags.h"
@@ -16,7 +34,8 @@ LocalizationInteg::~LocalizationInteg() {
   delete localization_integ_impl_;
 }
 
-LocalizationState LocalizationInteg::Init(const LocalizationIntegParam& params) {
+LocalizationState LocalizationInteg::Init(
+    const LocalizationIntegParam& params) {
   return localization_integ_impl_->Init(params);
 }
 
@@ -59,41 +78,49 @@ void LocalizationInteg::GnssBestPoseProcess(
   return;
 }
 
-void LocalizationInteg::GetLastestLidarLocalization(LocalizationMeasureState& state,
-                                        LocalizationEstimate& lidar_localization) {
-  localization_integ_impl_->GetLastestLidarLocalization(state, lidar_localization);
+void LocalizationInteg::GetLastestLidarLocalization(
+    LocalizationMeasureState *state,
+    LocalizationEstimate *lidar_localization) {
+  localization_integ_impl_->GetLastestLidarLocalization(
+      state, lidar_localization);
   return;
 }
 
 void LocalizationInteg::GetLastestIntegLocalization(
-    LocalizationMeasureState& state,
-    LocalizationEstimate& integ_localization) {
-  localization_integ_impl_->GetLastestIntegLocalization(state, integ_localization);
+    LocalizationMeasureState *state,
+    LocalizationEstimate *integ_localization) {
+  localization_integ_impl_->GetLastestIntegLocalization(
+      state, integ_localization);
   return;
 }
 
-void LocalizationInteg::GetLastestGnssLocalization(LocalizationMeasureState& state,
-                                       LocalizationEstimate& gnss_localization) {
-  localization_integ_impl_->GetLastestGnssLocalization(state, gnss_localization);
+void LocalizationInteg::GetLastestGnssLocalization(
+    LocalizationMeasureState *state,
+    LocalizationEstimate *gnss_localization) {
+  localization_integ_impl_->GetLastestGnssLocalization(
+      state, gnss_localization);
   return;
 }
 
-void LocalizationInteg::GetLidarLocalizationList(std::list<LocalizationResult>& results) {
+void LocalizationInteg::GetLidarLocalizationList(
+    std::list<LocalizationResult> *results) {
   localization_integ_impl_->GetLidarLocalizationList(results);
   return;
 }
 
-void LocalizationInteg::GetIntegLocalizationList(std::list<LocalizationResult>& results) {
+void LocalizationInteg::GetIntegLocalizationList(
+    std::list<LocalizationResult> *results) {
   localization_integ_impl_->GetIntegLocalizationList(results);
   return;
 }
 
-void LocalizationInteg::GetGnssLocalizationList(std::list<LocalizationResult>& results) {
+void LocalizationInteg::GetGnssLocalizationList(
+    std::list<LocalizationResult> *results) {
   localization_integ_impl_->GetGnssLocalizationList(results);
   return;
 }
 
-void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg, 
+void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg,
                                        ImuData *imu_rfu) {
   double measurement_time = util::GpsToUnixSeconds(imu_msg.measurement_time());
   imu_rfu->measurement_time = measurement_time;
@@ -106,8 +133,8 @@ void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg,
   imu_rfu->wibb[2] = imu_msg.angular_velocity().z();  // * imu_rate_;
   return;
 }
-  
-void LocalizationInteg::TransferImuFlu(const drivers::gnss::Imu &imu_msg, 
+
+void LocalizationInteg::TransferImuFlu(const drivers::gnss::Imu &imu_msg,
                                        ImuData *imu_flu) {
   double measurement_time = util::GpsToUnixSeconds(imu_msg.measurement_time());
   imu_flu->measurement_time = measurement_time;
@@ -120,9 +147,10 @@ void LocalizationInteg::TransferImuFlu(const drivers::gnss::Imu &imu_msg,
   imu_flu->wibb[2] = imu_msg.angular_velocity().z();   // * imu_rate_;
   return;
 }
-  
-void LocalizationInteg::TransferPointCloud(const sensor_msgs::PointCloud2 &lidar_data, 
-                          LidarFrame *lidar_frame) {
+
+void LocalizationInteg::TransferPointCloud(
+    const sensor_msgs::PointCloud2 &lidar_data,
+    LidarFrame *lidar_frame) {
   int total = lidar_data.width * lidar_data.height;
   int width = lidar_data.width;
   int height = lidar_data.height;
@@ -286,7 +314,6 @@ void LocalizationInteg::TransferPointCloud(const sensor_msgs::PointCloud2 &lidar
   }
   return;
 }
-  
 
 }  // namespace msf
 }  // namespace localization

@@ -62,21 +62,19 @@ class LocalizationIntegProcess {
 
   // Raw Imu process.
   void RawImuProcess(const ImuData &imu_msg);
-  void GetState(IntegState& state);
-  void GetResult(IntegState& state, InsPva& sins_pva,
-                 LocalizationEstimate& localization);
-  void GetResult(MeasureData& measure_data);
+  void GetState(IntegState *state);
+  void GetResult(IntegState *state, InsPva *sins_pva,
+                 LocalizationEstimate *localization);
+  void GetResult(MeasureData *measure_data);
 
   // itegration measure data process
   void MeasureDataProcess(const MeasureData& measure_msg);
 
  private:
-//   bool GetIntegMeasureData(const MeasureData& measure_msg,
-//                            MeasureData* measure_data);
   bool CheckIntegMeasureData(const MeasureData& measure_data);
 
   bool LoadGnssAntennaExtrinsic(std::string file_path,
-                                TransformD& extrinsic) const;
+                                TransformD *extrinsic) const;
 
   void MeasureDataProcessImpl(const MeasureData& measure_msg);
   void MeasureDataThreadLoop();
