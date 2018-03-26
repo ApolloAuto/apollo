@@ -254,9 +254,7 @@ bool AsyncFusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   return true;
 }
 
-void AsyncFusionSubnode::RegistAllAlgorithm() {
-  RegisterFactoryAsyncFusion();
-}
+void AsyncFusionSubnode::RegistAllAlgorithm() { RegisterFactoryAsyncFusion(); }
 
 void AsyncFusionSubnode::OnChassis(const Chassis &chassis) {
   ADEBUG << "Received chassis data: run chassis callback.";
