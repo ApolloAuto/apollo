@@ -23,6 +23,7 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <random>
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
 
@@ -206,24 +207,25 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf_seq) {
     AINFO << "algorithm " << motion_fusion_alg->name() << " long sequence test";
     double mutable_radar_timestamp = radar_timestamp;
     Eigen::Vector3d ground_truth_location = radar_position;
-    for (int i = 0; i < steps; ++i) {
+    for (int i=0;i<steps; ++i) {
       mutable_radar_timestamp += 0.1;
       double measure_position_noise = distribution(generator);
       Eigen::Vector3d measure_position_noise_vec;
-      // measure_position_noise_vec << measure_position_noise, 0, 0;
-      measure_position_noise_vec << 0, 0, 0;
+      //measure_position_noise_vec << measure_position_noise, 0, 0;
+      measure_position_noise_vec << 0,0,0;
       ground_truth_location += radar_velocity * 0.1;
       ObjectPtr radar_object(new Object());
-      radar_object->center = ground_truth_location + measure_position_noise_vec;
-      AINFO << "radar object center is " << radar_object->center(0);
+      radar_object->center = ground_truth_location +
+                             measure_position_noise_vec;
+      AINFO<<"radar object center is "<<radar_object->center(0);
       radar_object->anchor_point = radar_object->center;
       radar_object->velocity = radar_velocity;
-      PbfSensorObjectPtr pbf_radar_object(new PbfSensorObject(
-          radar_object, SensorType::RADAR, mutable_radar_timestamp));
+      PbfSensorObjectPtr pbf_radar_object(
+          new PbfSensorObject(radar_object, SensorType::RADAR, mutable_radar_timestamp));
       pbf_radar_object->timestamp = mutable_radar_timestamp;
       motion_fusion_alg->setCurrentFuseTS(mutable_radar_timestamp + 0.2);
-      motion_fusion_alg->UpdateWithObject(pbf_radar_object,
-                                          motion_fusion_alg->getFuseTimeDiff());
+      motion_fusion_alg->UpdateWithObject(
+            pbf_radar_object, motion_fusion_alg->getFuseTimeDiff());
       motion_fusion_alg->setLastFuseTS(mutable_radar_timestamp + 0.2);
       Eigen::Vector3d location;
       Eigen::Vector3d velocity;
