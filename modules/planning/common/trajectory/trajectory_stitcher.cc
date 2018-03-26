@@ -52,8 +52,13 @@ TrajectoryStitcher::ComputeReinitStitchingTrajectory(
   return std::vector<TrajectoryPoint>(1, init_point);
 }
 
+// only used in navigation mode
 std::vector<TrajectoryPoint> TrajectoryStitcher::CalculateInitPoint(
-    const VehicleState& vehicle_state, const ReferenceLine& reference_line) {
+    const VehicleState& vehicle_state, const ReferenceLine& reference_line,
+    bool* is_replan) {
+  CHECK_NOTNULL(is_replan);
+  *is_replan = false;
+
   Vec2d adc_pose(vehicle_state.x(), vehicle_state.y());
   auto ref_point = reference_line.GetNearestReferencePoint(adc_pose);
   double distance = DistanceXY(ref_point, adc_pose);
@@ -63,6 +68,8 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::CalculateInitPoint(
     shift_direction.Normalize();
     ref_point +=
         shift_direction * (distance - FLAGS_replan_lateral_distance_threshold);
+    *is_replan = true;
+    AWARN << "Replan is triggered. distance = " << distance;
   }
   std::vector<TrajectoryPoint> trajectory_points;
   trajectory_points.emplace_back();
