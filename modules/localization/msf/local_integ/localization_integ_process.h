@@ -44,13 +44,6 @@ typedef Eigen::Vector3d Vector3D;
 typedef Eigen::Translation3d Translation3D;
 typedef Eigen::Matrix3d Matrix3D;
 typedef Eigen::Quaterniond QuaternionD;
-// typedef adu::localization::integrated_navigation::InsPva InsPva;
-// typedef adu::localization::integrated_navigation::MeasureData MeasureData;
-// typedef adu::localization::integrated_navigation::IntegratedNavigation
-//     IntegratedNavigation;
-// typedef adu::localization::integrated_navigation::SinsImuData SinsImuData;
-// typedef adu::localization::integrated_navigation::MeasureType MeasureType;
-// typedef adu::localization::integrated_navigation::FrameType FrameType;
 
 enum class IntegState { NOT_INIT = 0, NOT_STABLE, OK, VALID };
 

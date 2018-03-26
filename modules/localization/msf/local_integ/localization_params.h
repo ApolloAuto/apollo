@@ -26,18 +26,9 @@
 #include <string>
 #include <utility>
 #include <vector>
-// #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
-// #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
-// #include "modules/drivers/gnss/proto/imu.pb.h"
-// #include "modules/localization/proto/gnss_pnt_result.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 // #include "modules/localization/proto/measure.pb.h"
 // #include "modules/localization/proto/sins_pva.pb.h"
-
-// #include <list>
-// #include "localization_struct.h"
-// #include "localization_gnss_pnt_result.h"
-// #include "localization_gnss_raw_observation.h"
 
 /**
  * @namespace apollo::localization

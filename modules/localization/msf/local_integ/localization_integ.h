@@ -95,53 +95,9 @@ class LocalizationInteg {
   void TransferPointCloud(const sensor_msgs::PointCloud2 &message, 
                           LidarFrame *lidar_frame);
   
-  // void TransferGnssBestPose(const drivers::gnss::GnssBestPose &bestgnsspos_msg,
-  //                           GnssBestPose *bestgnsspos_data);
-
-  // void TransferLocalization(const msf::LocalizationEstimate &data,
-  //                           LocalizationEstimate* msg);
-
  private:
   LocalizationIntegImpl* localization_integ_impl_;
 };
-
-// class LocalizationInteg {
-//  public:
-//   LocalizationInteg();
-//   ~LocalizationInteg();
-//   // Initialization.
-//   LocalizationState Init(const LocalizationIntegParam& params);
-
-//   // Lidar pcd process.
-//   void PcdProcess(const LidarFrame& message);
-//   // Raw Imu process.
-//   void RawImuProcessRfu(const ImuData& imu_msg);
- 
-//   // Gnss Info process.
-//   void RawObservationProcess(const EpochObservation& raw_obs_msg);
-//   void RawEphemerisProcess(const GnssEphemeris& gnss_orbit_msg);
- 
-//   // gnss best pose process
-//   void GnssBestPoseProcess(const GnssBestPose& bestgnsspos_msg);
-
-//   void GetLastestLidarLocalization(LocalizationMeasureState& state,
-//                                    LocalizationEstimate& lidar_localization);
-
-//   void GetLastestIntegLocalization(LocalizationMeasureState& state,
-//                                    LocalizationEstimate& integ_localization);
-
-//   void GetLastestGnssLocalization(LocalizationMeasureState& state,
-//                                   LocalizationEstimate& gnss_localization);
-
-//   void GetLidarLocalizationList(std::list<LocalizationResult>& results);
-
-//   void GetIntegLocalizationList(std::list<LocalizationResult>& results);
-
-//   void GetGnssLocalizationList(std::list<LocalizationResult>& results);
-
-//  private:
-//   LocalizationIntegImpl* localization_integ_impl_;
-// };
 
 } // namespace msf
 } // namespace localization
