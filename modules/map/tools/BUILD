@@ -70,4 +70,15 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "quaternion_euler",
+    srcs = ["quaternion_euler.cc"],
+    deps = [
+        "//external:gflags",
+        "//modules/common",
+        "//modules/common/math",
+        "//modules/common/util",
+    ],
+)
+
 cpplint()
