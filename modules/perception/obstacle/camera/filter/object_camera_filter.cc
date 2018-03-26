@@ -19,9 +19,11 @@
 namespace apollo {
 namespace perception {
 
-bool ObjectCameraFilter::Init() { return true; }
+bool ObjectCameraFilter::Init() {
+  return true;
+}
 
-bool ObjectCameraFilter::Filter(const double&timestamp,
+bool ObjectCameraFilter::Filter(const double &timestamp,
                                 std::vector<VisualObjectPtr> *objects) {
   if (!objects) return false;
 
@@ -46,7 +48,9 @@ bool ObjectCameraFilter::Filter(const double&timestamp,
   return true;
 }
 
-std::string ObjectCameraFilter::Name() const { return "ObjectCameraFilter"; }
+std::string ObjectCameraFilter::Name() const {
+  return "ObjectCameraFilter";
+}
 
 void ObjectCameraFilter::Create(const int &track_id, const double &timestamp,
                                 const VisualObjectPtr &obj_ptr) {
@@ -97,6 +101,8 @@ void ObjectCameraFilter::GetState(const int &track_id,
   auto x_state = tracked_filters_[track_id].x_.GetState();
   auto y_state = tracked_filters_[track_id].y_.GetState();
   auto z_state = tracked_filters_[track_id].z_.GetState();
+  auto x_state_cov = tracked_filters_[track_id].x_.GetCov();
+  auto y_state_cov = tracked_filters_[track_id].y_.GetCov();
 
   obj_ptr->center.x() = x_state.x();
   obj_ptr->velocity.x() = x_state.y();
@@ -106,6 +112,19 @@ void ObjectCameraFilter::GetState(const int &track_id,
 
   obj_ptr->center.z() = z_state.x();
   obj_ptr->velocity.z() = z_state.y();
+
+  obj_ptr->state_uncertainty.block(0, 0, 2, 2) << x_state_cov(0, 0), 0, 0,
+      y_state_cov(0, 0);
+  obj_ptr->state_uncertainty.block(2, 2, 2, 2) << x_state_cov(1, 1), 0, 0,
+      y_state_cov(1, 1);
+  obj_ptr->state_uncertainty.block(0, 2, 2, 2) << x_state_cov(0, 1), 0, 0,
+      y_state_cov(0, 1);
+  obj_ptr->state_uncertainty.block(2, 0, 2, 2) << x_state_cov(1, 0), 0, 0,
+      y_state_cov(1, 0);
+
+  std::cout << "state uncertainty\n" << obj_ptr->state_uncertainty << std::endl;
+  std::cout << "x state cov\n" << x_state_cov << std::endl;
+  std::cout << "y state cov\n" << y_state_cov << std::endl;
 
   obj_ptr->alpha = tracked_filters_[track_id].alpha_.GetState().x();
   obj_ptr->theta = tracked_filters_[track_id].theta_.GetState().x();
