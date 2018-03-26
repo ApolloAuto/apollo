@@ -30,11 +30,7 @@
 namespace apollo {
 namespace perception {
 
-AsyncFusion::AsyncFusion()
-        : matcher_(nullptr),
-          track_manager_(nullptr)
-{}
-
+AsyncFusion::AsyncFusion() : matcher_(nullptr), track_manager_(nullptr) {}
 
 AsyncFusion::~AsyncFusion() {
   if (matcher_) {
@@ -115,20 +111,20 @@ bool AsyncFusion::Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
 
   // process all the frames from one of the sensors
   for (auto obj : multi_sensor_objects) {
-      double fusion_time = obj.timestamp;
-      AINFO << "get sensor data " << GetSensorType(obj.sensor_type)
-            << ", obj_cnt : " << obj.objects.size() << ", " << std::fixed
-            << std::setprecision(12) << obj.timestamp;
+    double fusion_time = obj.timestamp;
+    AINFO << "get sensor data " << GetSensorType(obj.sensor_type)
+          << ", obj_cnt : " << obj.objects.size() << ", " << std::fixed
+          << std::setprecision(12) << obj.timestamp;
 
-      PbfSensorFramePtr frame = ConstructFrame(obj);
+    PbfSensorFramePtr frame = ConstructFrame(obj);
 
-      {
-          fusion_mutex_.lock();
-          FuseFrame(frame);
-          // 4.collect results
-          CollectFusedObjects(fusion_time, fused_objects);
-          fusion_mutex_.unlock();
-      }
+    {
+      fusion_mutex_.lock();
+      FuseFrame(frame);
+      // 4.collect results
+      CollectFusedObjects(fusion_time, fused_objects);
+      fusion_mutex_.unlock();
+    }
   }
   return true;
 }
@@ -198,14 +194,14 @@ void AsyncFusion::CollectFusedObjects(double timestamp,
   int fg_obj_num = 0;
   std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
   for (size_t i = 0; i < tracks.size(); i++) {
-      PbfSensorObjectPtr fused_object = tracks[i]->GetFusedObject();
-      ObjectPtr obj(new Object());
-      obj->clone(*(fused_object->object));
-      obj->track_id = tracks[i]->GetTrackId();
-      obj->latest_tracked_time = timestamp;
-      obj->tracking_time = tracks[i]->GetTrackingPeriod();
-      fused_objects->push_back(obj);
-      fg_obj_num++;
+    PbfSensorObjectPtr fused_object = tracks[i]->GetFusedObject();
+    ObjectPtr obj(new Object());
+    obj->clone(*(fused_object->object));
+    obj->track_id = tracks[i]->GetTrackId();
+    obj->latest_tracked_time = timestamp;
+    obj->tracking_time = tracks[i]->GetTrackingPeriod();
+    fused_objects->push_back(obj);
+    fg_obj_num++;
   }
 
   AINFO << "collect objects : fg_track_cnt = " << tracks.size()

@@ -375,8 +375,7 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
     velocity_heading = perception_obstacle.theta();
   }
 
-  if (!FLAGS_use_navigation_mode &&
-      FLAGS_adjust_velocity_by_position_shift &&
+  if (!FLAGS_use_navigation_mode && FLAGS_adjust_velocity_by_position_shift &&
       history_size() > 0) {
     double diff_x =
         feature->position().x() - feature_history_.front().position().x();

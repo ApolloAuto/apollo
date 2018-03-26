@@ -94,10 +94,10 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
                       Eigen::Matrix3d* velocity_uncertainty);
 
   bool ObtainSensorPrediction(ObjectPtr obj, double sensor_timestamp,
-                               const Eigen::Matrix4d &process_noise,
-                               const Eigen::Matrix4d &trans_matrix,
-                               Eigen::Vector4d *state_pre,
-                               Eigen::Matrix4d *cov_pre);
+                              const Eigen::Matrix4d& process_noise,
+                              const Eigen::Matrix4d& trans_matrix,
+                              Eigen::Vector4d* state_pre,
+                              Eigen::Matrix4d* cov_pre);
   // global
   Eigen::Vector3d _belief_anchor_point;
   Eigen::Vector3d _belief_velocity;
