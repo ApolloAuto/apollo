@@ -38,14 +38,10 @@ Docker容器是设置Apollo构建环境的最简单方法。
 
 有关更多信息，请参阅Docker详细教程 [here](https://docs.docker.com/).
 
-1. 运行以下命令来安装Docker：
+1. 请参考[Ubuntu安装docker-ce指南](https://docs.docker.com/install/linux/docker-ce/ubuntu)
+以及[Linux安装后续](https://docs.docker.com/install/linux/linux-postinstall).
 
-    ```
-    cd $APOLLO_HOME
-    bash docker/scripts/install_docker.sh
-    ```
-
-2. 脚本完成后，注销并重新登录系统以启用Docker。
+2. 安装完成后，注销并重新登录系统以启用Docker。
 
 3. （可选）如果您已经安装了Docker（在安装Apollo内核之前），请在其中添加以下行 `/etc/default/docker`:
 
