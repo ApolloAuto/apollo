@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -83,8 +83,8 @@ double CostEvaluator::FrontLateralDistanceCost(
   }
   const LanePoint& lane_point = lane_sequence.lane_segment(0).lane_point(0);
   double lane_l = -lane_point.relative_l();
-  double distance = std::abs(lane_l -
-      obstacle_length / 2.0 * std::sin(lane_point.angle_diff()));
+  double distance = std::abs(
+      lane_l - obstacle_length / 2.0 * std::sin(lane_point.angle_diff()));
   double half_lane_width = lane_point.width() / 2.0;
   return half_lane_width - distance;
 }
