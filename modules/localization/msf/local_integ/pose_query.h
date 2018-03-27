@@ -26,6 +26,7 @@
 #include <Eigen/Geometry>
 #include <mutex>
 #include <iostream>
+#include <list>
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -87,8 +88,8 @@ class PoseQuery {
 
     // query time is too old
     if (time < itr_last->measure_time) {
-      LOG(WARNING) << std::setprecision(20) 
-                  << "query time is too old, query time: " << time;
+      LOG(WARNING) << std::setprecision(20)
+                   << "query time is too old, query time: " << time;
       return false;
     }
 
@@ -98,7 +99,7 @@ class PoseQuery {
       double time0 = itr_last->measure_time;
       double time1 = itr->measure_time;
       if (time0 <= time && time <= time1) {
-        double ratio = (time - time0) / (time1 - time0); // add_pose avoid /0
+        double ratio = (time - time0) / (time1 - time0);  // add_pose avoid /0
         *quat = itr_last->quaternion.slerp(ratio, itr->quaternion);
         return true;
       }
@@ -109,12 +110,12 @@ class PoseQuery {
         *quat = itr_last->quaternion;
     }
 
-    LOG(WARNING) << std::setprecision(20) 
+    LOG(WARNING) << std::setprecision(20)
                  << "query time is too new, query time: " << time;
     return false;
   }
 
-protected:
+ protected:
     std::list<PoseForQuery> pose_buffer_;
     int buffer_size_;
     int buffer_max_size_;
