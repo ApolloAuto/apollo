@@ -80,7 +80,9 @@ std::string Object::ToString() const {
                        static_cast<int>(type),
                        ", "
                        "is_background: ",
-                       is_background, "]"));
+                       is_background),
+                StrCat(", is_cipv: ",
+                       b_cipv, "]"));
 }
 
 void Object::Serialize(PerceptionObstacle* pb_obj) const {
