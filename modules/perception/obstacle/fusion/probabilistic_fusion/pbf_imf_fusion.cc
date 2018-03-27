@@ -54,25 +54,13 @@ void PbfIMFFusion::Initialize(const PbfSensorObjectPtr new_object) {
   _posteriori_state(2) = _belief_velocity(0);
   _posteriori_state(3) = _belief_velocity(1);
   _priori_state = _posteriori_state;
-  _omega_matrix.setIdentity();
-  // _omega_matrix.topLeftCorner(2, 2) =
-  //     new_object->object->position_uncertainty.topLeftCorner(2, 2);
-  // _omega_matrix.block<2, 2>(2, 2) =
-  // new_object->object->velocity_uncertainty.topLeftCorner(2, 2);
-  // _omega_matrix.block<2, 2>(4, 4) =
-  // new_object->object->acceleration_uncertainty.topLeftCorner(2, 2);
-  _omega_matrix = new_object->object->uncertainty;
+  _omega_matrix = new_object->object->state_uncertainty;
   _omega_matrix = _omega_matrix.inverse().eval();
   _xi = _omega_matrix * _posteriori_state;
   _a_matrix.setIdentity();
   _a_matrix(0, 2) = 0.05;
   _a_matrix(1, 3) = 0.05;
-  _c_matrix.setIdentity();
   _q_matrix.setIdentity();
-  _q_matrix = _q_matrix * 0.05;
-  _r_matrix_inverse.setIdentity();
-  _r_matrix_inverse = new_object->object->uncertainty;
-  _r_matrix_inverse = _r_matrix_inverse.inverse().eval();
   CacheSensorObjects(new_object);
 }
 
@@ -92,88 +80,107 @@ void PbfIMFFusion::UpdateWithObject(const PbfSensorObjectPtr new_object,
     AERROR << "update PbfInformationMotionFusion with null object";
     return;
   }
-  const double timestamp = new_object->timestamp;
-  RemoveOutdatedSensorObjects(timestamp);
+
+  // remove outdated object
+  RemoveOutdatedSensorObjects(new_object->timestamp);
+
   // compute priori
   _a_matrix.setIdentity();
   _a_matrix(0, 2) = time_diff;
   _a_matrix(1, 3) = time_diff;
-
   _q_matrix.setIdentity();
-  _q_matrix = _q_matrix * 0.1 * time_diff;
+  _q_matrix = _q_matrix * time_diff;
   _priori_state = _a_matrix * _posteriori_state;
   _omega_matrix =
       (_a_matrix * _omega_matrix.inverse() * _a_matrix.transpose() + _q_matrix);
   _omega_matrix = _omega_matrix.inverse().eval();
   _xi = _omega_matrix * _priori_state;
-  if (new_object->sensor_type == SensorType::VELODYNE_64) {
+
+  // sensor level processor noise matrix and trans matrix
+  const Eigen::Matrix4d* sensor_processor_noise;
+  const Eigen::Matrix4d* sensor_transition_matrix;
+
+  if (new_object->sensor_type == SensorType::CAMERA) {
     _belief_anchor_point = new_object->object->center;
     _belief_velocity = new_object->object->velocity;
+    if (!CameraFrameSupplement::state_vars.initialized_) {
+      AERROR << "process noise and trans matrix not initialized for camera";
+      return;
+    }
+    sensor_processor_noise = &(CameraFrameSupplement::state_vars.process_noise);
+    sensor_transition_matrix =
+        &(CameraFrameSupplement::state_vars.trans_matrix);
   } else if (new_object->sensor_type == SensorType::RADAR) {
-    _belief_anchor_point(0) = new_object->object->center(0);
-    _belief_anchor_point(1) = new_object->object->center(1);
-    _belief_velocity(0) = new_object->object->velocity(0);
-    _belief_velocity(1) = new_object->object->velocity(1);
-  } else if (new_object->sensor_type == SensorType::CAMERA) {
     _belief_anchor_point = new_object->object->center;
     _belief_velocity = new_object->object->velocity;
+    if (!RadarFrameSupplement::state_vars.initialized_) {
+      AERROR << "process noise and trans matrix not initialized for camera";
+      return;
+    }
+    sensor_processor_noise = &(RadarFrameSupplement::state_vars.process_noise);
+    sensor_transition_matrix = &(RadarFrameSupplement::state_vars.trans_matrix);
+  } else if (new_object->sensor_type == SensorType::VELODYNE_64) {
+    _belief_anchor_point = new_object->object->center;
+    _belief_velocity = new_object->object->velocity;
+    if (!LidarFrameSupplement::state_vars.initialized_) {
+      AERROR << "process noise and trans matrix not initialized for camera";
+      return;
+    }
+    sensor_processor_noise = &(LidarFrameSupplement::state_vars.process_noise);
+    sensor_transition_matrix = &(LidarFrameSupplement::state_vars.trans_matrix);
   } else {
-    AERROR << "unsupported sensor type";
+    AERROR << "unsupported sensor type, setting using default value";
     return;
   }
-  // compute posteriori
-  Eigen::Matrix<double, 4, 1> measurement;
-  measurement(0) = _belief_anchor_point(0);
-  measurement(1) = _belief_anchor_point(1);
-  measurement(2) = _belief_velocity(0);
-  measurement(3) = _belief_velocity(1);
 
-  // updated covariance matrix at sensor level ki
-  _r_matrix_inverse.setIdentity();
-  _r_matrix_inverse = new_object->object->uncertainty;
-  _r_matrix_inverse = _r_matrix_inverse.inverse().eval();
   const PbfSensorObjectPtr sensor_object =
       GetSensorLatestCache(new_object->sensor_type);
 
   if (sensor_object != nullptr) {
-    // if (false) {
-    // Not first time.
-    Eigen::Matrix<double, 4, 4> p_pre;
-    p_pre.setIdentity();
-    p_pre = sensor_object->object->uncertainty;
-    Eigen::Matrix<double, 4, 1> state_pre;
-    state_pre(0) = sensor_object->object->center(0);
-    state_pre(1) = sensor_object->object->center(1);
-    state_pre(2) = sensor_object->object->velocity(0);
-    state_pre(3) = sensor_object->object->velocity(1);
+    Eigen::Matrix4d cov_sensor_prev = Eigen::Matrix4d::Identity();
+    Eigen::Vector4d state_sensor_prev = Eigen::Vector4d::Zero();
+    double timestamp_sensor_prev = sensor_object->timestamp;
 
-    double time_diff_pre = new_object->timestamp - sensor_object->timestamp;
-    Eigen::Matrix<double, 4, 4> trans_matrix;
-    trans_matrix.setIdentity();
-    trans_matrix(0, 2) = time_diff_pre;
-    trans_matrix(1, 3) = time_diff_pre;
-    // TODO(zhangweide): use sensor process noise is more reasonable.
-    Eigen::Matrix<double, 4, 4> q_matrix_pre;
-    q_matrix_pre.setIdentity();
-    q_matrix_pre = q_matrix_pre * 0.1 * time_diff_pre;
+    if (!ObtainSensorPrediction(sensor_object->object, timestamp_sensor_prev,
+                                *sensor_processor_noise,
+                                *sensor_transition_matrix, &state_sensor_prev,
+                                &cov_sensor_prev)) {
+      AERROR << "obtain previous sensor prediction fails";
+      return;
+    }
 
-    // trans_matrix is F matrix for state transition
-    // p_pre is sensor level covariance prediction P(ki|ki-1)
-    // state_pre is sensor level state prediction x(ki|ki-1)
+    Eigen::Matrix4d cov_sensor = Eigen::Matrix4d::Identity();
+    Eigen::Vector4d state_sensor = Eigen::Vector4d::Zero();
+    double timestamp_sensor = new_object->timestamp;
 
-    state_pre = trans_matrix * state_pre;
-    p_pre = trans_matrix * p_pre * trans_matrix.transpose() + q_matrix_pre;
+    if (!ObtainSensorPrediction(
+            new_object->object, timestamp_sensor, *sensor_processor_noise,
+            *sensor_transition_matrix, &state_sensor, &cov_sensor)) {
+      AERROR << "obtain current sensor prediction fails";
+      return;
+    }
 
-    _omega_matrix = _c_matrix.transpose() * _omega_matrix +
-                    (_c_matrix.transpose() * _r_matrix_inverse * _c_matrix -
-                     _c_matrix.transpose() * p_pre.inverse() * _c_matrix);
-    _xi = _xi + (_c_matrix.transpose() * _r_matrix_inverse * measurement -
-                 _c_matrix.transpose() * p_pre.inverse() * state_pre);
-  } else {
-    // First time.
     _omega_matrix =
-        _omega_matrix + _c_matrix.transpose() * _r_matrix_inverse * _c_matrix;
-    _xi = _xi + _c_matrix.transpose() * _r_matrix_inverse * measurement;
+        _omega_matrix + (cov_sensor.inverse() - cov_sensor_prev.inverse());
+
+    _xi = _xi + (cov_sensor.inverse() * state_sensor -
+                 cov_sensor_prev.inverse() * state_sensor_prev);
+  } else {
+    // this case is weird, might lead to unexpected situation
+    Eigen::Matrix4d cov_sensor = Eigen::Matrix4d::Identity();
+    Eigen::Vector4d state_sensor = Eigen::Vector4d::Zero();
+    double timestamp_sensor = new_object->timestamp;
+
+    if (!ObtainSensorPrediction(
+            new_object->object, timestamp_sensor, *sensor_processor_noise,
+            *sensor_transition_matrix, &state_sensor, &cov_sensor)) {
+      AERROR << "obtain current sensor prediction fails";
+      return;
+    }
+    AWARN
+        << "Sensor data deprecation in Fusion, should not see this many times";
+    _omega_matrix = 0.5 * _omega_matrix + 0.5 * cov_sensor.inverse();
+    _xi = 0.5 * _xi + 0.5 * cov_sensor.inverse() * state_sensor;
   }
   _posteriori_state = _omega_matrix.inverse() * _xi;
   _belief_anchor_point(0) = _posteriori_state(0);
@@ -181,6 +188,45 @@ void PbfIMFFusion::UpdateWithObject(const PbfSensorObjectPtr new_object,
   _belief_velocity(0) = _posteriori_state(2);
   _belief_velocity(1) = _posteriori_state(3);
   CacheSensorObjects(new_object);
+}
+
+/**
+ * obtain sensor level prediction to global fusion arrival time
+ * @param obj
+ * @param sensor_timestamp
+ * @param process_noise
+ * @param trans_matrix
+ * @param state_pre
+ * @param cov_pre
+ */
+bool PbfIMFFusion::ObtainSensorPrediction(ObjectPtr object,
+                                          double sensor_timestamp,
+                                          const Eigen::Matrix4d& process_noise,
+                                          const Eigen::Matrix4d& trans_matrix,
+                                          Eigen::Vector4d* state_pre,
+                                          Eigen::Matrix4d* cov_pre) {
+  Eigen::Matrix<double, 4, 4>& cov = object->state_uncertainty;
+  Eigen::Matrix<double, 4, 1> state;
+
+  // state: x,y,vx,vy
+  state(0) = object->center(0);
+  state(1) = object->center(1);
+  state(2) = object->velocity(0);
+  state(3) = object->velocity(1);
+
+  double time_diff = fuse_timestamp - sensor_timestamp;
+  Eigen::Matrix4d process_noise_time = process_noise * time_diff;
+
+  // trans_matrix is F matrix for state transition
+  // p_pre is sensor level covariance prediction P(ki|ki-1)
+  // state_pre is sensor level state prediction x(ki|ki-1)
+  Eigen::Matrix4d trans_matrix_time = trans_matrix;
+  trans_matrix_time(0, 2) = time_diff;
+  trans_matrix_time(1, 3) = time_diff;
+  (*state_pre) = trans_matrix_time * state;
+  (*cov_pre) = trans_matrix_time * cov * trans_matrix_time.transpose() +
+               process_noise_time;
+  return true;
 }
 
 void PbfIMFFusion::UpdateWithoutObject(const double time_diff) {
@@ -219,15 +265,17 @@ void PbfIMFFusion::RemoveOutdatedSensorObjects(const double timestamp) {
   auto it = _cached_sensor_objects.begin();
   for (; it != _cached_sensor_objects.end(); ++it) {
     double time_invisible = 0.0;
-    /*if (it->first == SensorType::VELODYNE_64) {
-        time_invisible = PbfTrack::get_max_lidar_invisible_period();
+
+    if (it->first == SensorType::VELODYNE_64) {
+      time_invisible = PbfTrack::GetMaxLidarInvisiblePeriod();
     } else if (it->first == SensorType::RADAR) {
-        time_invisible = PbfTrack::get_max_radar_invisible_period();
+      time_invisible = PbfTrack::GetMaxRadarInvisiblePeriod();
     } else if (it->first == SensorType::CAMERA) {
-        time_invisible = PbfTrack::get_max_camera_invisible_period();
+      time_invisible = PbfTrack::GetMaxCameraInvisiblePeriod();
     } else {
-        AERROR << "Unexpected sensor type!";
-    }*/
+      AERROR << "Unexpected sensor type!";
+    }
+
     auto& objects = it->second;
     while (!objects.empty()) {
       const auto& object = objects.front();

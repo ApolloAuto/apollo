@@ -66,6 +66,8 @@ bool KalmanFilter1D::Update(const float& z) {
 
 Eigen::Vector2f KalmanFilter1D::GetState() { return x_; }
 
+Eigen::Matrix2f KalmanFilter1D::GetCov() { return P_; }
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo

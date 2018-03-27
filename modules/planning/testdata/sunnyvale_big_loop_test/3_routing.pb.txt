@@ -1,7 +1,7 @@
 header {
-  timestamp_sec: 1521774803.633992
+  timestamp_sec: 1522098262.7042248
   module_name: "routing"
-  sequence_num: 552
+  sequence_num: 449
 }
 road {
   id: "828"
@@ -21,7 +21,31 @@ road {
     segment {
       id: "459_1_-1"
       start_s: 0
-      end_s: 61.3722
+      end_s: 13.4416
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10779"
+  passage {
+    segment {
+      id: "10779_1_-1"
+      start_s: 0
+      end_s: 13.6541
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10778"
+  passage {
+    segment {
+      id: "10778_1_-1"
+      start_s: 0
+      end_s: 34.2779
     }
     can_exit: true
     change_lane_type: FORWARD
@@ -64,13 +88,13 @@ road {
   }
 }
 measurement {
-  distance: 288.51772371693437
+  distance: 288.51912371693436
 }
 routing_request {
   header {
-    timestamp_sec: 1521774803.6327136
+    timestamp_sec: 1522098262.70257
     module_name: "routing"
-    sequence_num: 1
+    sequence_num: 2
   }
   waypoint {
     id: "828_1_-1"

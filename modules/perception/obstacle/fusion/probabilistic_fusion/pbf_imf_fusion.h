@@ -92,6 +92,12 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
 
   void GetUncertainty(Eigen::Matrix3d* position_uncertainty,
                       Eigen::Matrix3d* velocity_uncertainty);
+
+  bool ObtainSensorPrediction(ObjectPtr obj, double sensor_timestamp,
+                               const Eigen::Matrix4d &process_noise,
+                               const Eigen::Matrix4d &trans_matrix,
+                               Eigen::Vector4d *state_pre,
+                               Eigen::Matrix4d *cov_pre);
   // global
   Eigen::Vector3d _belief_anchor_point;
   Eigen::Vector3d _belief_velocity;
@@ -102,7 +108,7 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
 
   // the omega matrix
   Eigen::Matrix<double, 4, 4> _omega_matrix;
-  // the state vector
+  // the state vector is information matrix: cov.inverse() * state
   Eigen::Matrix<double, 4, 1> _xi;
   // the state-transition matrix
   Eigen::Matrix<double, 4, 4> _a_matrix;
@@ -110,8 +116,6 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   Eigen::Matrix<double, 4, 4> _c_matrix;
   // the covariance of the process noise
   Eigen::Matrix<double, 4, 4> _q_matrix;
-  // the covariance of the observation noise
-  Eigen::Matrix<double, 4, 4> _r_matrix_inverse;
 };
 
 }  // namespace perception
