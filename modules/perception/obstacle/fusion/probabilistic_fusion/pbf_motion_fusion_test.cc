@@ -208,7 +208,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf_seq) {
     Eigen::Vector3d ground_truth_location = radar_position;
     for (int i = 0; i < steps; ++i) {
       mutable_radar_timestamp += 0.1;
-      double measure_position_noise = distribution(generator);
+      // double measure_position_noise = distribution(generator);
       Eigen::Vector3d measure_position_noise_vec;
       // measure_position_noise_vec << measure_position_noise, 0, 0;
       measure_position_noise_vec << 0, 0, 0;

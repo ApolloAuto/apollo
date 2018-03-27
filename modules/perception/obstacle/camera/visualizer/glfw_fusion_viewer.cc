@@ -249,9 +249,7 @@ void GLFWFusionViewer::spin_once() {
   glfwSwapBuffers(window_);
 }
 
-void GLFWFusionViewer::close() {
-  glfwTerminate();
-}
+void GLFWFusionViewer::close() { glfwTerminate(); }
 
 void GLFWFusionViewer::set_camera_para(Eigen::Vector3d i_position,
                                        Eigen::Vector3d i_scn_center,
@@ -770,13 +768,9 @@ void GLFWFusionViewer::mouse_move(double xpos, double ypos) {
   mouse_prev_y_ = ypos;
 }
 
-void GLFWFusionViewer::mouse_wheel(double delta) {
-  mode_mat_(2, 3) -= delta;
-}
+void GLFWFusionViewer::mouse_wheel(double delta) { mode_mat_(2, 3) -= delta; }
 
-void GLFWFusionViewer::reset() {
-  mode_mat_ = Eigen::Matrix4d::Identity();
-}
+void GLFWFusionViewer::reset() { mode_mat_ = Eigen::Matrix4d::Identity(); }
 
 void GLFWFusionViewer::keyboard(int key) {
   switch (key) {
@@ -2039,17 +2033,13 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
     bool draw_velocity = true;
     std::vector<ObjectPtr> objects = content->get_fused_objects();
     AINFO << "fused object size in glfw viewer is " << objects.size();
-    if (objects.size() > 0) {
-        for (auto obj : objects) {
-            AINFO << "object in fuse: " << obj->ToString();
-        }
+    for (auto obj : objects) {
+      AINFO << "object in fuse: " << obj->ToString();
     }
     std::vector<ObjectPtr> objects_cam = content->get_camera_objects();
-    AINFO <<" camera object size is " << objects_cam.size();
-    if (objects_cam.size() > 0) {
-      for (auto obj : objects_cam) {
-          AINFO << "object in cam: " << obj->ToString();
-      }
+    AINFO << " camera object size is " << objects_cam.size();
+    for (auto obj : objects_cam) {
+      AINFO << "object in cam: " << obj->ToString();
     }
     draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color,
                  use_class_color_);
@@ -2097,10 +2087,12 @@ void GLFWFusionViewer::draw_camera_box(const std::vector<ObjectPtr>& objects,
     AINFO << "camera obj " << obj->track_id << " center: " << center[0] << " "
           << center[1];
 
+    /*
     float theta = obj->theta;
     float width = obj->width;
     float height = obj->height;
     float length = obj->length;
+    */
 
     std::vector<Eigen::Vector2d> points;
     points.resize(8);
