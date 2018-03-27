@@ -92,7 +92,7 @@ bool CameraProcessSubnode::InitModules() {
 
 void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   AdapterManager::Observe();
-  sensor_msgs::Image msg = AdapterManager::GetImageShort()->GetLatestObserved();
+  sensor_msgs::Image msg = AdapterManager::GetImageFront()->GetLatestObserved();
 
   double timestamp = msg.header.stamp.toSec();
   AINFO << "CameraProcessSubnode ImgCallback: "

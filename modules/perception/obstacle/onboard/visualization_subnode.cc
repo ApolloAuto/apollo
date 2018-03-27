@@ -253,7 +253,8 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
       content->set_radar_content(timestamp, objs->objects);
     }
   } else if (event.event_id == fusion_event_id_) {
-    if (FLAGS_show_fused_objects) {
+    bool show_fused_objects = true;
+    if (show_fused_objects) {
       AINFO << "vis_driven_event data_key = " << data_key;
       SharedDataPtr<FusionItem> fusion_item;
       if (!fusion_data_->Get(data_key, &fusion_item) ||

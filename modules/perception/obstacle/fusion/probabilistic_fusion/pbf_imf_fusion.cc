@@ -160,14 +160,16 @@ void PbfIMFFusion::UpdateWithObject(const PbfSensorObjectPtr new_object,
       return;
     }
 
+    Eigen::Matrix4d cov_sensor_inverse = cov_sensor.inverse();
+    Eigen::Matrix4d cov_sensor_prev_inverse = cov_sensor_prev.inverse();
     std::cout << "state sensor " << state_sensor << std::endl;
     std::cout << "state sensor prev " << state_sensor_prev << std::endl;
 
     _omega_matrix =
-        _omega_matrix + (cov_sensor.inverse() - cov_sensor_prev.inverse());
+        _omega_matrix + (cov_sensor_inverse - cov_sensor_prev_inverse);
 
-    _xi = _xi + (cov_sensor.inverse() * state_sensor -
-                 cov_sensor_prev.inverse() * state_sensor_prev);
+    _xi = _xi + (cov_sensor_inverse * state_sensor -
+                 cov_sensor_prev_inverse * state_sensor_prev);
   } else {
     // this case is weird, might lead to unexpected situation
     Eigen::Matrix4d cov_sensor = Eigen::Matrix4d::Identity();

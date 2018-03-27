@@ -2039,6 +2039,18 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
     bool draw_velocity = true;
     std::vector<ObjectPtr> objects = content->get_fused_objects();
     AINFO << "fused object size in glfw viewer is " << objects.size();
+    if (objects.size() > 0) {
+        for (auto obj : objects) {
+            AINFO << "object in fuse: " << obj->ToString();
+        }
+    }
+    std::vector<ObjectPtr> objects_cam = content->get_camera_objects();
+    AINFO <<" camera object size is " << objects_cam.size();
+    if (objects_cam.size() > 0) {
+      for (auto obj : objects_cam) {
+          AINFO << "object in cam: " << obj->ToString();
+      }
+    }
     draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color,
                  use_class_color_);
 
