@@ -169,6 +169,12 @@ modules {
     process_cmd_keywords: "velodyne_nodelet_manager"
   }
 }
+modules {
+  name: "velodyne_16"
+  process_conf {
+    process_cmd_keywords: "velodyne_nodelet_manager"
+  }
+}
 hardware {
   name: "velodyne"
   topic_conf {
