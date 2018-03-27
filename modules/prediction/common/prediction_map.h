@@ -58,6 +58,14 @@ class PredictionMap {
                               const double s);
 
   /**
+   * @brief Get the curvature of a point on a specific distance along a lane.
+   * @param lane_iid The id of the lane to get a curvature.
+   * @param s The distance along the lane.
+   * @return The curvature of the point.
+   */
+  static double CurvatureOnLane(const std::string& lane_id, const double s);
+
+  /**
    * @brief Get the width on a specified distance on a lane.
    * @param lane_info The lane to get the width.
    * @param s The distance along the lane.
