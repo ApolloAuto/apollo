@@ -53,6 +53,12 @@ double PredictionMap::HeadingOnLane(std::shared_ptr<const LaneInfo> lane_info,
   return lane_info->Heading(s);
 }
 
+double PredictionMap::CurvatureOnLane(
+    const std::string& lane_id, const double s) {
+  std::shared_ptr<const hdmap::LaneInfo> lane_info = LaneById(lane_id);
+  return lane_info->Curvature(s);
+}
+
 double PredictionMap::LaneTotalWidth(
     std::shared_ptr<const hdmap::LaneInfo> lane_info, const double s) {
   double left = 0.0;
