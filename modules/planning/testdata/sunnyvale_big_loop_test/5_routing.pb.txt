@@ -1,7 +1,7 @@
 header {
-  timestamp_sec: 1521775546.5052612
+  timestamp_sec: 1522098578.2984788
   module_name: "routing"
-  sequence_num: 772
+  sequence_num: 541
 }
 road {
   id: "2996"
@@ -596,9 +596,9 @@ measurement {
 }
 routing_request {
   header {
-    timestamp_sec: 1521775546.5040905
+    timestamp_sec: 1522098578.2964153
     module_name: "routing"
-    sequence_num: 5
+    sequence_num: 2
   }
   waypoint {
     id: "2996_1_-1"
