@@ -249,7 +249,9 @@ void GLFWFusionViewer::spin_once() {
   glfwSwapBuffers(window_);
 }
 
-void GLFWFusionViewer::close() { glfwTerminate(); }
+void GLFWFusionViewer::close() {
+  glfwTerminate();
+}
 
 void GLFWFusionViewer::set_camera_para(Eigen::Vector3d i_position,
                                        Eigen::Vector3d i_scn_center,
@@ -575,7 +577,7 @@ void GLFWFusionViewer::render() {
     glTranslatef(vao_trans_y_, vao_trans_x_, vao_trans_z_);
     glRotatef(_Rotate_x, 1, 0, 0);
     glRotatef(_Rotate_y, 0, 1, 0);
-    bool show_fusion = false;
+    bool show_fusion = true;
     draw_3d_classifications(frame_content_, show_fusion);
     draw_car_forward_dir();
     if (FLAGS_show_motion_track &&
@@ -768,9 +770,13 @@ void GLFWFusionViewer::mouse_move(double xpos, double ypos) {
   mouse_prev_y_ = ypos;
 }
 
-void GLFWFusionViewer::mouse_wheel(double delta) { mode_mat_(2, 3) -= delta; }
+void GLFWFusionViewer::mouse_wheel(double delta) {
+  mode_mat_(2, 3) -= delta;
+}
 
-void GLFWFusionViewer::reset() { mode_mat_ = Eigen::Matrix4d::Identity(); }
+void GLFWFusionViewer::reset() {
+  mode_mat_ = Eigen::Matrix4d::Identity();
+}
 
 void GLFWFusionViewer::keyboard(int key) {
   switch (key) {
@@ -1882,10 +1888,10 @@ void GLFWFusionViewer::draw_car_trajectory(FrameContent* content) {
   // Eigen::Vector3d center_d = pers_camera_->scene_center();
   Eigen::Vector3f center;
   center << 0,  // center_d(0,0),
-            0,  // center_d(1,0),
-            1.0;
+      0,        // center_d(1,0),
+      1.0;
 
-//  center << 10, 10, 1.0;
+  //  center << 10, 10, 1.0;
 
   //    std::cout << "GLViewer motion_buffer.size() : "
   //              << motion_buffer.size() << std::endl;
@@ -1903,14 +1909,14 @@ void GLFWFusionViewer::draw_car_trajectory(FrameContent* content) {
     point = tmp * center;
 
     point[0] = 2 * center[0] - point[0];
-//    point[1] = 2 * center[1] - point[1];
+    //    point[1] = 2 * center[1] - point[1];
     //        point = 2*center - point;
     //        std::cout << "trajectory points: (" << point(0,0) << ", "
     //                  << point(1,0) << ", " << point(2,0)
     //                  << "); ";
-//    AINFO << "trajectory points: (" << point(0,0) << ", "
-//                      << point(1,0) << ", " << point(2,0)
-//                      << "); ";
+    //    AINFO << "trajectory points: (" << point(0,0) << ", "
+    //                      << point(1,0) << ", " << point(2,0)
+    //                      << "); ";
 
     drawHollowCircle(point(0), point(1), 1);
     glFlush();
@@ -2028,16 +2034,13 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
                Eigen::Vector3f(1, 1, 0), use_class_color_);
 
   if (show_fusion) {
-    if (!FLAGS_show_fused_objects) {
-      return;
-    } else {
-      Eigen::Vector3f fused_color(1, 0, 1);
-      bool draw_cube = true;
-      bool draw_velocity = true;
-      std::vector<ObjectPtr> objects = content->get_fused_objects();
-      draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color,
-                   use_class_color_);
-    }
+    Eigen::Vector3f fused_color(1, 0, 1);
+    bool draw_cube = true;
+    bool draw_velocity = true;
+    std::vector<ObjectPtr> objects = content->get_fused_objects();
+    AINFO << "fused object size in glfw viewer is " << objects.size();
+    draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color,
+                 use_class_color_);
 
     if (FLAGS_show_fusion_association) {
       draw_fusion_association(content);
