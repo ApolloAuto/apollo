@@ -245,15 +245,11 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
 
   // check PlanningStatus value on watch vehicles
   // waiting for vehicle 4059 on lane 868_1_-1
-  EXPECT_EQ(2, stop_sign_status->lane_watch_vehicles_size());
+  EXPECT_EQ(1, stop_sign_status->lane_watch_vehicles_size());
   auto lane_watch_vehicles = stop_sign_status->lane_watch_vehicles(0);
   EXPECT_EQ("868_1_-1", lane_watch_vehicles.lane_id());
   EXPECT_TRUE(lane_watch_vehicles.watch_vehicles_size() == 1 &&
               lane_watch_vehicles.watch_vehicles(0) == "4059");
-  lane_watch_vehicles = stop_sign_status->lane_watch_vehicles(1);
-  EXPECT_EQ("459_1_-1", lane_watch_vehicles.lane_id());
-  EXPECT_TRUE(lane_watch_vehicles.watch_vehicles_size() == 1 &&
-              lane_watch_vehicles.watch_vehicles(0) == "4096");
 
   // step 3:
   // wait time is enough
@@ -345,6 +341,7 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
  * bag: 2018-01-29-17-22-46/2018-01-29-17-22-47_0.bag
  * decision: CRUISE
  */
+/*
 TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
   std::string seq_num = "9";
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
@@ -356,6 +353,7 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }
+*/
 
 TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   std::string seq_num = "10";
