@@ -16,10 +16,6 @@
 
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 
-#include <unordered_map>
-
-#include "modules/perception/traffic_light/util/color_space.h"
-
 namespace apollo {
 namespace perception {
 
@@ -43,7 +39,7 @@ bool CameraProcessSubnode::InitInternal() {
 
   InitModules();
 
-  AdapterManager::AddImageShortCallback(&CameraProcessSubnode::ImgCallback,
+  AdapterManager::AddImageFrontCallback(&CameraProcessSubnode::ImgCallback,
                                         this);
   if (publish_)
     AdapterManager::AddChassisCallback(&CameraProcessSubnode::ChassisCallback,

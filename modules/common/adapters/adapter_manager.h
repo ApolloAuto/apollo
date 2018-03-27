@@ -254,6 +254,7 @@ class AdapterManager {
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(PointCloud);
+  REGISTER_ADAPTER(ImageFront);
   REGISTER_ADAPTER(ImageShort);
   REGISTER_ADAPTER(ImageLong);
   REGISTER_ADAPTER(Prediction);
