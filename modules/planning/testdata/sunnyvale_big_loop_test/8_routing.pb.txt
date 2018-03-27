@@ -1,7 +1,7 @@
 header {
-  timestamp_sec: 1521776563.9388056
+  timestamp_sec: 1522099749.8459234
   module_name: "routing"
-  sequence_num: 1072
+  sequence_num: 887
 }
 road {
   id: "2726"
@@ -21,31 +21,29 @@ road {
     segment {
       id: "382_1_-1"
       start_s: 0
-      end_s: 3.24273
+      end_s: 3.47013
     }
     can_exit: true
     change_lane_type: FORWARD
   }
 }
 road {
-  id: "1378a"
+  id: "10898"
   passage {
     segment {
-      id: "1378a_1_-1"
+      id: "10898_1_-1"
       start_s: 0
-      end_s: 45.4356
+      end_s: 45.1067
     }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "300"
-  passage {
     segment {
       id: "300_1_-1"
       start_s: 0
-      end_s: 24.7345
+      end_s: 7.51243
+    }
+    segment {
+      id: "10771_1_-1"
+      start_s: 0
+      end_s: 18.0915
     }
     segment {
       id: "201_1_-1"
@@ -57,9 +55,19 @@ road {
   }
   passage {
     segment {
+      id: "10898_1_-2"
+      start_s: 0
+      end_s: 49.0307
+    }
+    segment {
       id: "300_1_-2"
       start_s: 0
-      end_s: 25.9976
+      end_s: 8.0333
+    }
+    segment {
+      id: "10771_1_-2"
+      start_s: 0
+      end_s: 18.3168
     }
     segment {
       id: "201_1_-2"
@@ -71,11 +79,11 @@ road {
   }
 }
 measurement {
-  distance: 152.11831411489231
+  distance: 152.88624411489229
 }
 routing_request {
   header {
-    timestamp_sec: 1521776563.9375067
+    timestamp_sec: 1522099749.8439622
     module_name: "routing"
     sequence_num: 2
   }

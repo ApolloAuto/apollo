@@ -41,6 +41,8 @@ class KalmanFilter1D {
 
   Eigen::Vector2f GetState();
 
+  Eigen::Matrix2f GetCov();
+
  private:
   Eigen::Matrix<float, 2, 1> x_;
   Eigen::Matrix<float, 2, 2> P_;
