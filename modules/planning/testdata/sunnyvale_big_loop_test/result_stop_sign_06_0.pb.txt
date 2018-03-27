@@ -1759,9 +1759,9 @@ decision {
   }
 }
 routing_header {
-  timestamp_sec: 1521775546.5052612
+  timestamp_sec: 1522098578.2984788
   module_name: "routing"
-  sequence_num: 772
+  sequence_num: 541
 }
 right_of_way_status: PROTECTED
 lane_id {
