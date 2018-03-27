@@ -1750,7 +1750,7 @@ void GLFWFusionViewer::draw_objects(const std::vector<ObjectPtr>& objects,
       }
 
       if (objects[i]->b_cipv) {
-        AINFO << "objects[i]->track_id: " << objects[i]->track_id;
+        AINFO << "cipv objects[i]->track_id: " << objects[i]->track_id;
         rgb[0] = 1;
         rgb[1] = 0;
         rgb[2] = 0;
@@ -2087,13 +2087,6 @@ void GLFWFusionViewer::draw_camera_box(const std::vector<ObjectPtr>& objects,
     AINFO << "camera obj " << obj->track_id << " center: " << center[0] << " "
           << center[1];
 
-    /*
-    float theta = obj->theta;
-    float width = obj->width;
-    float height = obj->height;
-    float length = obj->length;
-    */
-
     std::vector<Eigen::Vector2d> points;
     points.resize(8);
     if (obj->camera_supplement != nullptr) {
@@ -2104,7 +2097,13 @@ void GLFWFusionViewer::draw_camera_box(const std::vector<ObjectPtr>& objects,
     }
 
     auto box3d_color = s_color_table[0];
-    if (obj->camera_supplement != nullptr) {
+    if (obj->b_cipv) {
+      AINFO << "draw_camera_box2d This is CIPV, obj->track_id: "
+            << obj->track_id;
+      box3d_color[0] = 255;
+      box3d_color[1] = 0;
+      box3d_color[2] = 0;
+    } else if (obj->camera_supplement != nullptr) {
       box3d_color = s_color_table[obj->track_id % s_color_table.size()];
     }
 
@@ -2196,7 +2195,7 @@ void GLFWFusionViewer::draw_objects2d(const std::vector<ObjectPtr>& objects,
       float y2 = y + radius;
 
       if (obj->b_cipv) {
-        AINFO << "draw_objects2d This is CIPV, obj->track_id: "
+        AINFO << "radar draw_objects2d This is CIPV, obj->track_id: "
               << obj->track_id;
         glColor3ub(255, 0, 0);
       } else {
