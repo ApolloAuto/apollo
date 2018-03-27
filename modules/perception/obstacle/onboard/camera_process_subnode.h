@@ -21,6 +21,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "Eigen/Core"
@@ -53,6 +54,7 @@
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/traffic_light/util/color_space.h"
 
 namespace apollo {
 namespace perception {

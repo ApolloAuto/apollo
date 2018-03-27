@@ -49,6 +49,7 @@ message AdapterConfig {
     ULTRASONIC_RADAR = 42;
     VOICE_DETECTION_REQUEST = 43;
     VOICE_DETECTION_RESPONSE = 44;
+    IMAGE_FRONT = 45;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
