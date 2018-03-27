@@ -18,6 +18,7 @@
 
 #include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
 
+#include <unordered_map>
 #include <cfloat>
 
 #include "Eigen/Dense"
