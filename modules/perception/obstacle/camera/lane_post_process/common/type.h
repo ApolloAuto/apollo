@@ -244,17 +244,16 @@ struct LaneObject {
   double timestamp = 0.0;
   int32_t seq_num = 0;
 
-  LaneMarker ToLaneMarkerProto() {
-    LaneMarker lane_marker;
-    // TODO(All): calculate confidence for all points
-    lane_marker.set_quality(confidence.front());
-    lane_marker.set_model_degree(MAX_POLY_ORDER);
-    lane_marker.set_c0_position(model(0, 0));
-    lane_marker.set_c1_heading_angle(model(1, 0));
-    lane_marker.set_c2_curvature(model(2, 0));
-    lane_marker.set_c3_curvature_derivative(model(3, 0));
-    lane_marker.set_view_range(longitude_end - longitude_start);
-    return lane_marker;
+  // @brief: write to LaneMarker protobuf message API
+  void ToLaneMarkerProto(LaneMarker* lane_marker) const {
+    // set a constant quality value 1.0 as temporary use
+    lane_marker->set_quality(1.0);
+    lane_marker->set_model_degree(MAX_POLY_ORDER);
+    lane_marker->set_c0_position(model(0));
+    lane_marker->set_c1_heading_angle(model(1));
+    lane_marker->set_c2_curvature(model(2));
+    lane_marker->set_c3_curvature_derivative(model(3));
+    lane_marker->set_view_range(longitude_end - longitude_start);
   }
 
   std::string GetSpatialLabel() const {
@@ -301,6 +300,8 @@ typedef std::vector<LaneInstance> LaneInstances;
 typedef std::shared_ptr<LaneInstances> LaneInstancesPtr;
 typedef const std::shared_ptr<LaneInstances> LaneInstancesConstPtr;
 
+void LaneObjectsToLaneMarkerProto(const LaneObjects& lane_objects,
+                                  LaneMarkers* lane_markers);
 }  // namespace perception
 }  // namespace apollo
 
