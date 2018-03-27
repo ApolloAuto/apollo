@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <functional>
 #include <map>
+#include <random>
 #include <string>
 #include <vector>
 #include "gtest/gtest.h"
@@ -177,6 +178,61 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf) {
         (location - (lidar_position + time_diff * lidar_velocity)).norm() <
         2.0e-1);
     EXPECT_TRUE((velocity - lidar_velocity).norm() < 1.0e-1);
+  }
+}
+
+TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf_seq) {
+  ObjectPtr radar_object(new Object());
+  double radar_timestamp = 1234567891.012;
+  Eigen::Vector3d radar_position(30, 0, 0);
+  Eigen::Vector3d radar_velocity(10.01, 0, 0);
+  radar_object->center = radar_position;
+  radar_object->anchor_point = radar_position;
+  radar_object->velocity = radar_velocity;
+  PbfSensorObjectPtr pbf_radar_object(
+      new PbfSensorObject(radar_object, SensorType::RADAR, radar_timestamp));
+  pbf_radar_object->timestamp = radar_timestamp;
+  std::default_random_engine generator;
+  std::normal_distribution<double> distribution(0, 2);
+
+  int steps = 10;
+
+  for (auto motion_fusion_alg : motion_fusion_algs_) {
+    if (motion_fusion_alg->name() != "PbfInformationMotionFusion") continue;
+
+    motion_fusion_alg->setCurrentFuseTS(radar_timestamp);
+    motion_fusion_alg->Initialize(pbf_radar_object);
+    motion_fusion_alg->setLastFuseTS(radar_timestamp);
+    AINFO << "algorithm " << motion_fusion_alg->name() << " long sequence test";
+    double mutable_radar_timestamp = radar_timestamp;
+    Eigen::Vector3d ground_truth_location = radar_position;
+    for (int i = 0; i < steps; ++i) {
+      mutable_radar_timestamp += 0.1;
+      double measure_position_noise = distribution(generator);
+      Eigen::Vector3d measure_position_noise_vec;
+      // measure_position_noise_vec << measure_position_noise, 0, 0;
+      measure_position_noise_vec << 0, 0, 0;
+      ground_truth_location += radar_velocity * 0.1;
+      ObjectPtr radar_object(new Object());
+      radar_object->center = ground_truth_location + measure_position_noise_vec;
+      AINFO << "radar object center is " << radar_object->center(0);
+      radar_object->anchor_point = radar_object->center;
+      radar_object->velocity = radar_velocity;
+      PbfSensorObjectPtr pbf_radar_object(new PbfSensorObject(
+          radar_object, SensorType::RADAR, mutable_radar_timestamp));
+      pbf_radar_object->timestamp = mutable_radar_timestamp;
+      motion_fusion_alg->setCurrentFuseTS(mutable_radar_timestamp + 0.2);
+      motion_fusion_alg->UpdateWithObject(pbf_radar_object,
+                                          motion_fusion_alg->getFuseTimeDiff());
+      motion_fusion_alg->setLastFuseTS(mutable_radar_timestamp + 0.2);
+      Eigen::Vector3d location;
+      Eigen::Vector3d velocity;
+      ground_truth_location += 0.2 * radar_velocity;
+      motion_fusion_alg->GetState(&location, &velocity);
+      AINFO << "ground truth:" << ground_truth_location(0) << " "
+            << radar_velocity(0);
+      AINFO << "filtered value:" << location(0) << " " << velocity(0);
+    }
   }
 }
 
