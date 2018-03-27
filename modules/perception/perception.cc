@@ -35,6 +35,7 @@
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 #include "modules/perception/obstacle/onboard/radar_process_subnode.h"
 #include "modules/perception/obstacle/onboard/visualization_subnode.h"
+#include "modules/perception/obstacle/onboard/cipv_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_preprocessor_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_proc_subnode.h"
 
@@ -79,6 +80,7 @@ void Perception::RegistAllOnboardClass() {
   RegisterFactoryRadarObjectData();
   RegisterFactoryCameraObjectData();
   RegisterFactoryCameraSharedData();
+  RegisterFactoryCIPVObjectData();
   RegisterFactoryLaneSharedData();
   RegisterFactoryFusionSharedData();
   traffic_light::RegisterFactoryTLPreprocessingData();
@@ -87,6 +89,7 @@ void Perception::RegistAllOnboardClass() {
   RegisterFactoryLidarProcessSubnode();
   RegisterFactoryRadarProcessSubnode();
   RegisterFactoryCameraProcessSubnode();
+  RegisterFactoryCIPVSubnode();
   RegisterFactoryLanePostProcessingSubnode();
   RegisterFactoryAsyncFusionSubnode();
   RegisterFactoryFusionSubnode();
