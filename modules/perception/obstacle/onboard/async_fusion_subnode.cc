@@ -143,7 +143,7 @@ Status AsyncFusionSubnode::ProcEvents() {
     apollo::common::time::Timer timer;
     timer.Start();
     Process(event_meta, events);
-    AINFO << "time elapsed for async fusion process " << timer.End("");
+    ADEBUG << "time elapsed for async fusion process " << timer.End("");
 
     // public obstacle message
     PerceptionObstacles obstacles;
@@ -220,8 +220,46 @@ Status AsyncFusionSubnode::Process(const EventMeta &event_meta,
     PublishDataAndEvent(fusion_item_ptr->timestamp, device_id, fusion_item_ptr);
   }
 
+  // publishing result to pnc
+  for (auto sensor_obj : sensor_objs) {
+    PublishPerceptionPb(sensor_obj);
+  }
+
   error_code_ = common::OK;
   return Status::OK();
+}
+
+void AsyncFusionSubnode::PublishPerceptionPb(
+    const SensorObjects &sensor_objects) {
+  AINFO << "Camera publish perception pb data";
+  PerceptionObstacles obstacles;
+  // Header
+  common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
+      "perception_obstacle", &obstacles);
+  common::Header *header = obstacles.mutable_header();
+  header->set_lidar_timestamp(0);
+  // use timestamp in nanoseconds
+  header->set_camera_timestamp(sensor_objects.timestamp * 1e9);
+  header->set_radar_timestamp(0);
+  obstacles.set_error_code(sensor_objects.error_code);
+
+  // generate lane marker protobuf messages
+  LaneMarkers *lane_markers = obstacles.mutable_lane_marker();
+  LaneObjectsToLaneMarkerProto(*(sensor_objects.lane_objects), lane_markers);
+  // Serialize each Object
+  for (const auto &obj : sensor_objects.objects) {
+    PerceptionObstacle *obstacle = obstacles.add_perception_obstacle();
+    obj->Serialize(obstacle);
+  }
+
+  // Relative speed of objects + latest ego car speed in X
+  for (auto obstacle : obstacles.perception_obstacle()) {
+    obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
+                                       chassis_.speed_mps());
+  }
+
+  common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
+  ADEBUG << "Camera Obstacles: " << obstacles.ShortDebugString();
 }
 
 bool AsyncFusionSubnode::SubscribeEvents(const EventMeta &event_meta,
@@ -282,7 +320,8 @@ bool AsyncFusionSubnode::GetSharedData(const Event &event,
     // trying to get lane shared data as well
     Event lane_event;
     if (event_manager_->Subscribe(lane_event_id_, &lane_event, false)) {
-      get_data_succ = lane_shared_data_->Get(data_key, &lane_objects_);
+      get_data_succ =
+          lane_shared_data_->Get(data_key, &((*objs)->lane_objects));
       AINFO << "getting lane data successfully for data key " << data_key;
     }
   } else {

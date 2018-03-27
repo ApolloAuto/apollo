@@ -75,6 +75,8 @@ class AsyncFusionSubnode : public Subnode {
                            const std::string &device_id,
                            const SharedDataPtr<FusionItem> &data);
 
+  void PublishPerceptionPb(const SensorObjects &sensor_objects);
+
   double timestamp_;
   std::vector<ObjectPtr> objects_;
   common::ErrorCode error_code_ = common::OK;

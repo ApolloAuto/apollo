@@ -83,6 +83,7 @@ bool AsyncFusion::Init() {
   }
   AINFO << "async_fusion max_match_distance: " << max_match_distance;
   PbfBaseTrackObjectMatcher::SetMaxMatchDistance(max_match_distance);
+  PbfTrack::SetMotionFusionMethod("PbfIMFFusion");
   return true;
 }
 

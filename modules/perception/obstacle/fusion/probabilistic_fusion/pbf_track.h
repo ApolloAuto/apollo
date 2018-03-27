@@ -113,7 +113,7 @@ class PbfTrack {
     s_publish_if_has_radar_ = enabled;
   }
 
-  void SetMotionFusionMethod(const std::string motion_fusion_method);
+  static void SetMotionFusionMethod(const std::string motion_fusion_method);
 
  protected:
   /**@brief use obj's velocity to update obj's location to input timestamp*/
@@ -172,7 +172,7 @@ class PbfTrack {
   // radar confidant regions
   static double s_max_radar_confident_angle_;
   static double s_min_radar_confident_distance_;
-  std::string s_motion_fusion_method_;
+  static std::string s_motion_fusion_method_; // NOLINT
 
   // publish conditions
   static bool s_publish_if_has_lidar_;
