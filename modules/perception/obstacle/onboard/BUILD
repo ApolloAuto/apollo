@@ -137,6 +137,8 @@ cc_library(
         "fusion_subnode.h",
         "async_fusion_subnode.h",
         "object_shared_data.h",
+        "fusion_shared_data.h",
+        "lane_shared_data.h",
     ],
     deps = [
         ":hdmapinput",

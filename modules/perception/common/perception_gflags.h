@@ -102,5 +102,6 @@ DECLARE_bool(show_motion);
 // async fusion using imf
 DECLARE_bool(async_fusion);
 DECLARE_bool(use_distance_angle_fusion);
-
+DECLARE_bool(publish_fusion_event);
+DECLARE_bool(bag_mode);
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_

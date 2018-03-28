@@ -292,7 +292,7 @@ void Planning::RunOnce() {
       return;
     }
     stitching_trajectory = TrajectoryStitcher::CalculateInitPoint(
-        vehicle_state, reference_lines.front());
+        vehicle_state, reference_lines.front(), &is_replan);
   } else {
     stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
         vehicle_state, start_timestamp, planning_cycle_time,

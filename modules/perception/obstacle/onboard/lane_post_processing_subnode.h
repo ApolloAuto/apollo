@@ -26,6 +26,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
 #include "modules/perception/obstacle/camera/interface/base_lane_post_processor.h"
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
@@ -54,13 +55,17 @@ class LanePostProcessingSubnode : public Subnode {
   bool GetSharedData(const Event& event, std::shared_ptr<SensorObjects>* objs);
   void PublishDataAndEvent(const double timestamp,
                            const SharedDataPtr<LaneObjects>& lane_objects);
+  void PublishPerceptionPb(const LaneObjectsPtr &lane_objects);
+
+  std::string device_id_ = "camera";
+  uint64_t seq_num_ = 0;
+  double timestamp_ns_ = 0.0;
 
   std::unique_ptr<BaseCameraLanePostProcessor> lane_post_processor_;
   CameraObjectData* camera_object_data_ = nullptr;
-  std::string device_id_;
-  std::string work_root_dir_;
+
+  bool publish_ = false;
   LaneSharedData* lane_shared_data_ = nullptr;
-  uint64_t seq_num_ = 0;
 
   DISALLOW_COPY_AND_ASSIGN(LanePostProcessingSubnode);
 };

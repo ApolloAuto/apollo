@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/visualizer/gl_fusion_visualizer.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
