@@ -26,6 +26,7 @@
 #include "yaml-cpp/yaml.h"
 
 #include "modules/common/log.h"
+#include "modules/common/time/timer.h"
 #include "modules/common/time/time_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -43,6 +44,7 @@ using std::unordered_map;
 using std::shared_ptr;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::time::Timer;
 
 bool LanePostProcessingSubnode::InitInternal() {
   // get Subnode config in DAG streaming
@@ -194,6 +196,9 @@ Status LanePostProcessingSubnode::ProcEvents() {
     return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
   }
 
+  Timer timer;
+  timer.Start();
+
   cv::Mat lane_map = objs->camera_frame_supplement->lane_map;
   if (lane_map.empty()) {
     AERROR << "Get NULL lane_map from camera frame supplement";
@@ -213,6 +218,15 @@ Status LanePostProcessingSubnode::ProcEvents() {
   AINFO << "Before publish lane objects, objects num: "
         << lane_objects->size();
 
+  uint64_t t = timer.End("lane post-processing");
+  min_processing_time_ = std::min(min_processing_time_, t);
+  max_processing_time_ = std::max(max_processing_time_, t);
+  tot_processing_time_ += t;
+  AINFO << "Lane Post Processing Runtime: "
+        << "MIN (" << min_processing_time_ << " ms), "
+        << "MAX (" << max_processing_time_ << " ms), "
+        << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";
+
   PublishDataAndEvent(event.timestamp, lane_objects);
 
   if (publish_) {
@@ -225,7 +239,7 @@ Status LanePostProcessingSubnode::ProcEvents() {
 
 void LanePostProcessingSubnode::PublishPerceptionPb(
     const LaneObjectsPtr &lane_objects) {
-  AINFO << "Lane post-processor publish lane object pb data";
+  ADEBUG << "Lane post-processor publish lane object pb data";
 
   PerceptionObstacles obstacles;
 
@@ -243,6 +257,8 @@ void LanePostProcessingSubnode::PublishPerceptionPb(
 
   common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
   ADEBUG << "Lane Markers: " << obstacles.ShortDebugString();
+
+  ADEBUG << "Succeed to publish lane object pb data.";
 }
 
 }  // namespace perception

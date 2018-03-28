@@ -21,6 +21,7 @@
 
 #include <memory>
 #include <string>
+#include <cstdint>
 
 #include "Eigen/Core"
 
@@ -66,6 +67,10 @@ class LanePostProcessingSubnode : public Subnode {
 
   bool publish_ = false;
   LaneSharedData* lane_shared_data_ = nullptr;
+
+  uint64_t min_processing_time_ = UINT64_MAX;
+  uint64_t max_processing_time_ = 0;
+  uint64_t tot_processing_time_ = 0;
 
   DISALLOW_COPY_AND_ASSIGN(LanePostProcessingSubnode);
 };
