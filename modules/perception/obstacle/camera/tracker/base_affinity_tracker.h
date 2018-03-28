@@ -21,6 +21,8 @@
 #include <limits>
 #include <vector>
 
+#include "Eigen/Core"
+
 namespace apollo {
 namespace perception {
 
@@ -36,6 +38,9 @@ class Tracked {
   // DLF: Deep Learning ROI Pooling features from detection
   std::vector<float> features_;
 
+  // 3D position observed in camera space
+  Eigen::Vector3f center_ = Eigen::Vector3f::Zero();
+
   // KCF
   bool kcf_set_ = false;
   std::vector<cv::Mat> x_f_;
@@ -49,6 +54,9 @@ class Detected {
 
   // DLF: Deep Learning ROI Pooling features from detection
   std::vector<float> features_;
+
+  // 3D position observed in camera space
+  Eigen::Vector3f center_ = Eigen::Vector3f::Zero();
 };
 
 class BaseAffinityTracker {
