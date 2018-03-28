@@ -20,6 +20,7 @@
 
 #include <unordered_map>
 #include <cfloat>
+#include <algorithm>
 
 #include "Eigen/Dense"
 #include "opencv2/opencv.hpp"
