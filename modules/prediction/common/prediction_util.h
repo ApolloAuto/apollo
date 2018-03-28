@@ -19,6 +19,7 @@
 
 #include <utility>
 #include <vector>
+#include <array>
 
 #include "Eigen/Dense"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -58,6 +59,26 @@ double Relu(const double value);
  */
 int SolveQuadraticEquation(const std::vector<double>& coefficients,
                            std::pair<double, double>* roots);
+
+/**
+ * @brief Evaluate quintic polynomial.
+ * @param coefficients of the quintic polynomial, lower to higher.
+ * @param parameter of the quintic polynomial.
+ * @return order of derivative to evaluate.
+ */
+double EvaluateQuinticPolynomial(
+    const std::array<double, 6>& coeffs,
+    const double t, const uint32_t order);
+
+/**
+ * @brief Evaluate quartic polynomial.
+ * @param coefficients of the quartic polynomial, lower to higher.
+ * @param parameter of the quartic polynomial.
+ * @return order of derivative to evaluate.
+ */
+double EvaluateQuarticPolynomial(
+    const std::array<double, 5>& coeffs,
+    const double t, const uint32_t order);
 
 }  // namespace math_util
 
