@@ -524,8 +524,6 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
     return false;
   }
 
-  float time_cur_frame = 0.0f;
-
   // 1. get binary lane label mask
   cv::Mat lane_mask;
   if (lane_map.type() == CV_32FC1) {
@@ -586,9 +584,6 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
   cur_frame_->Process(cur_lane_instances_);
 
   AINFO << "number of lane instances = " << cur_lane_instances_->size();
-
-  AINFO << "lane post-processing runtime for current frame: " << time_cur_frame
-        << " ms";
 
   return true;
 }
