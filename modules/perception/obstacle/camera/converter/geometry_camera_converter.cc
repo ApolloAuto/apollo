@@ -60,8 +60,13 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
     ConvertSingle(obj->height, obj->width, obj->length, deg_alpha, upper_left,
                   lower_right, &distance_w, &distance_h, &mass_center_pixel);
 
-    // Reset alpha angle and redo again (Model dependent issue)
-    if (distance_w > 50.0f || distance_h > 50.0f || obj->trunc_width > 0.25f) {
+    if (obj->trunc_width > 0.25f && obj->trunc_height > 0.25f) {
+      // Give fix values for detected box with both side and bottom truncation
+      distance_w = distance_h = 8.0f;
+      obj->distance = DecideDistance(distance_h, distance_w, obj);
+    } else if (distance_w > 40.0f || distance_h > 40.0f
+               || obj->trunc_width > 0.25f) {
+      // Reset alpha angle and redo again (Model dependent issue)
       obj->distance = DecideDistance(distance_h, distance_w, obj);
       DecideAngle(camera_model_.unproject(mass_center_pixel), obj);
       deg_alpha = obj->alpha * 180.0f / M_PI;
@@ -108,9 +113,15 @@ bool GeometryCameraConverter::LoadCameraIntrinsics(
     }
   }
 
+  Eigen::Matrix<float, 5, 1> intrinsic_d;
+  for (int i = 0; i < 5; i++) {
+    intrinsic_d(i, 0) = node["D"][i].as<float>();
+  }
+
   float height = node["height"].as<float>();
   float width = node["width"].as<float>();
   camera_model_.set(intrinsic_k, width, height);
+  camera_model_.set_distort_params(intrinsic_d);
 
   return true;
 }
@@ -339,11 +350,11 @@ void GeometryCameraConverter::CheckTruncation(VisualObjectPtr obj) const {
   auto height = camera_model_.get_height();
 
   // Ad-hoc 2D box truncation binary determination
-  if (obj->upper_left.x() < 20.0f || width - 20.0f < obj->lower_right.x()) {
+  if (obj->upper_left.x() < 30.0f || width - 30.0f < obj->lower_right.x()) {
     obj->trunc_width = 0.5f;
   }
 
-  if (obj->upper_left.y() < 20.0f || height - 20.0f < obj->lower_right.y()) {
+  if (obj->upper_left.y() < 30.0f || height - 30.0f < obj->lower_right.y()) {
     obj->trunc_height = 0.5f;
   }
 }
@@ -352,9 +363,8 @@ float GeometryCameraConverter::DecideDistance(const float &distance_h,
                                               const float &distance_w,
                                               VisualObjectPtr obj) const {
   float distance = distance_h;
-  if (obj->trunc_height > 0.25f) {
-    distance = distance_w;
-  }
+
+  // TODO(later): Deal with truncation
 
   return distance;
 }
