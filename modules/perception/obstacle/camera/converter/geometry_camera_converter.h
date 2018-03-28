@@ -91,7 +91,7 @@ class GeometryCameraConverter : public BaseCameraConverter {
   void DecideAngle(const Eigen::Vector3f &camera_ray,
                    VisualObjectPtr obj) const;
 
-  CameraModel<float> camera_model_;
+  CameraDistort<float> camera_model_;
   std::vector<Eigen::Vector3f> corners_;
   std::vector<Eigen::Vector2f> pixel_corners_;
   static const int kMaxDistanceSearchDepth_ = 20;

@@ -35,8 +35,6 @@ bool CascadedCameraTracker::Associate(const cv::Mat& img,
   if (!objects) return false;
   frame_idx_++;
 
-
-
   float scale = 1.0f;
   std::vector<Detected> detected;
   GetDetectedFromVO(img.size(), scale, *objects, &detected);

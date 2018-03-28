@@ -59,11 +59,6 @@ class MoveSequencePredictor : public SequencePredictor {
       const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
-  void DrawManeuverTrajectoryPoints(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const double total_time, const double period,
-      std::vector<apollo::common::TrajectoryPoint>* points);
-
   void GetLongitudinalPolynomial(const Obstacle& obstacle,
                                  const LaneSequence& lane_sequence,
                                  const double time_to_lane_center,
@@ -73,12 +68,6 @@ class MoveSequencePredictor : public SequencePredictor {
                             const LaneSequence& lane_sequence,
                             const double time_to_lane_center,
                             std::array<double, 6>* coefficients);
-
-  double EvaluateLateralPolynomial(const std::array<double, 6>& coeffs,
-                                   const double t, const uint32_t order);
-
-  double EvaluateLongitudinalPolynomial(const std::array<double, 5>& coeffs,
-                                        const double t, const uint32_t order);
 
   double ComputeTimeToLaneCenterBySampling(const Obstacle& obstacle,
                                            const LaneSequence& lane_sequence);
