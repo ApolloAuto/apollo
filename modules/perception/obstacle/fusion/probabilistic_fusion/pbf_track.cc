@@ -15,8 +15,11 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
+
 #include <algorithm>
+
 #include "boost/format.hpp"
+
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/macro.h"
 #include "modules/common/time/time_util.h"
@@ -42,7 +45,9 @@ double PbfTrack::s_min_radar_confident_distance_ = 40;
 bool PbfTrack::s_publish_if_has_lidar_ = true;
 bool PbfTrack::s_publish_if_has_radar_ = true;
 
+// clang-format off
 std::string PbfTrack::s_motion_fusion_method_ = "PbfKalmanMotionFusion";  // NOLINT
+// clang-format on
 
 using apollo::common::time::TimeUtil;
 
@@ -158,17 +163,11 @@ void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
   }
 }
 
-int PbfTrack::GetTrackId() const {
-  return idx_;
-}
+int PbfTrack::GetTrackId() const { return idx_; }
 
-PbfSensorObjectPtr PbfTrack::GetFusedObject() {
-  return fused_object_;
-}
+PbfSensorObjectPtr PbfTrack::GetFusedObject() { return fused_object_; }
 
-double PbfTrack::GetFusedTimestamp() const {
-  return fused_timestamp_;
-}
+double PbfTrack::GetFusedTimestamp() const { return fused_timestamp_; }
 
 PbfSensorObjectPtr PbfTrack::GetLidarObject(const std::string &sensor_id) {
   PbfSensorObjectPtr obj = nullptr;
