@@ -160,6 +160,7 @@ DECLARE_double(trajectory_time_resolution);
 DECLARE_double(trajectory_space_resolution);
 DECLARE_double(lateral_acceleration_bound);
 DECLARE_double(decision_horizon);
+DECLARE_uint32(num_velocity_sample);
 DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);
 
