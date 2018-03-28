@@ -51,8 +51,8 @@ class KCFAffinityTracker : public BaseAffinityTracker {
   // z_f for all detected objects
   std::unordered_map<int, std::vector<cv::Mat>> detected_features_;
 
-  const float kKeepThreshold_ = 0.5f;
-  const float kScale_ = 1.5f;
+  const float kKeepThreshold_ = 0.3f;
+  const float kScale_ = 2.5f;
 };
 
 }  // namespace perception
