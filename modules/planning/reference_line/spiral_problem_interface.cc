@@ -300,27 +300,25 @@ bool SpiralProblemInterface::eval_grad_f(int n, const double* x, bool new_x,
       double dkappa = spiral_curve.Evaluate(2, s_segment * j);
       grad_f[index0] +=
           2.0 * dkappa *
-          spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::THETA0, ratio);
+          spiral_curve.DeriveDKappaDerivative(QuinticSpiralPath::THETA0, ratio);
       grad_f[index0 + 1] +=
           2.0 * dkappa *
-          spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::KAPPA0, ratio);
-      grad_f[index0 + 2] +=
-          2.0 * dkappa *
-          spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::DKAPPA0, ratio);
+          spiral_curve.DeriveDKappaDerivative(QuinticSpiralPath::KAPPA0, ratio);
+      grad_f[index0 + 2] += 2.0 * dkappa * spiral_curve.DeriveDKappaDerivative(
+          QuinticSpiralPath::DKAPPA0, ratio);
 
       grad_f[index1] +=
           2.0 * dkappa *
-          spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::THETA1, ratio);
+          spiral_curve.DeriveDKappaDerivative(QuinticSpiralPath::THETA1, ratio);
       grad_f[index1 + 1] +=
           2.0 * dkappa *
-          spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::KAPPA1, ratio);
-      grad_f[index1 + 2] +=
-          2.0 * dkappa *
-          spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::DKAPPA1, ratio);
+          spiral_curve.DeriveDKappaDerivative(QuinticSpiralPath::KAPPA1, ratio);
+      grad_f[index1 + 2] += 2.0 * dkappa * spiral_curve.DeriveDKappaDerivative(
+          QuinticSpiralPath::DKAPPA1, ratio);
 
-      grad_f[variable_offset + i] +=
-          2.0 * dkappa *
-          spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::DELTA_S, ratio);
+      grad_f[variable_offset + i] += 2.0 * dkappa *
+          spiral_curve.DeriveDKappaDerivative(
+              QuinticSpiralPath::DELTA_S, ratio);
     }
   }
   return true;
