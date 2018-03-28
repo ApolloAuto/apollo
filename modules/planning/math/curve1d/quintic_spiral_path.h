@@ -99,8 +99,8 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
     return cartesian_deviation;
   }
 
-  double DeriveKappaDerivative(const std::size_t param_index,
-                               const double ratio) const;
+  double DeriveDKappaDerivative(const std::size_t param_index,
+                                const double ratio) const;
 
   static const std::size_t THETA0 = 0;
   static const std::size_t KAPPA0 = 1;

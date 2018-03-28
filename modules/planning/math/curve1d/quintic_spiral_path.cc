@@ -168,8 +168,8 @@ double QuinticSpiralPath::DeriveTheta(const std::size_t param_index,
   return derivative;
 }
 
-double QuinticSpiralPath::DeriveKappaDerivative(const std::size_t param_index,
-                                                const double r) const {
+double QuinticSpiralPath::DeriveDKappaDerivative(const std::size_t param_index,
+                                                 const double r) const {
   double s = param_ * r;
   double s2 = s * s;
   double s3 = s2 * s;
