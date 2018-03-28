@@ -184,6 +184,7 @@ DECLARE_double(default_lon_buffer);
 DECLARE_double(time_min_density);
 DECLARE_double(comfort_acceleration_factor);
 DECLARE_double(polynomial_minimal_param);
+DECLARE_double(lattice_stop_buffer);
 
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);
