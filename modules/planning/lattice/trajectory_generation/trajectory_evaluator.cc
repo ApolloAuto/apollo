@@ -63,7 +63,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(
   }
   for (const auto lon_trajectory : lon_trajectories) {
     double lon_end_s = lon_trajectory->Evaluate(0, end_time);
-    if (lon_end_s > stop_point) {
+    if (lon_end_s + FLAGS_lattice_stop_buffer > stop_point) {
       continue;
     }
 
