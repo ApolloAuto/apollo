@@ -134,5 +134,6 @@ DEFINE_bool(async_fusion, false, "use distance angle ");
 DEFINE_bool(use_distance_angle_fusion, true,
             "use distance angle prob distance in fusion");
 DEFINE_bool(publish_fusion_event, false, "publish fusion event");
+DEFINE_bool(bag_mode, false, "run perception in bag mode");
 
 DEFINE_bool(show_motion, false, "visualize motion and object trajectories");

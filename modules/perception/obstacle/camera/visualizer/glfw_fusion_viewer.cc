@@ -182,10 +182,11 @@ bool GLFWFusionViewer::initialize() {
   }
 
   // for camera visualization
-  _show_camera_box2d = true;
-  _show_camera_box3d = true;
+  show_camera_box2d_ = true;
+  show_camera_box3d_ = true;
+  show_camera_bdv_ = true;
   show_radar_pc_ = false;
-  show_fusion_pc_ = false;
+  show_fusion_ = false;
   show_associate_color_ = false;
   show_type_id_label_ = true;
   show_lane_ = true;
@@ -802,16 +803,19 @@ void GLFWFusionViewer::keyboard(int key) {
     case GLFW_KEY_E:  // E
       draw_lane_objects_ = !draw_lane_objects_;
     case GLFW_KEY_F:  // F
-      show_fusion_pc_ = !show_fusion_pc_;
+      show_fusion_ = !show_fusion_;
       break;
     case GLFW_KEY_D:  // D
       show_radar_pc_ = !show_radar_pc_;
       break;
+    case GLFW_KEY_O:
+      show_camera_bdv_ = !show_camera_bdv_;
+      break;
     case GLFW_KEY_2:  // 2
-      _show_camera_box2d = !_show_camera_box2d;
+      show_camera_box2d_ = !show_camera_box2d_;
       break;
     case GLFW_KEY_3:  // 3
-      _show_camera_box3d = !_show_camera_box3d;
+      show_camera_box3d_ = !show_camera_box3d_;
       break;
     case GLFW_KEY_0:  // 3
       show_associate_color_ = !show_associate_color_;
@@ -947,18 +951,11 @@ void GLFWFusionViewer::draw_camera_frame(FrameContent* content) {
 
   int offset_x = scene_width_;
   int offset_y = 0;
-  if (_show_camera_box2d || _show_camera_box3d) {
+  if (show_camera_box2d_ || show_camera_box3d_) {
     std::vector<ObjectPtr> camera_objects;
     camera_objects = content->get_camera_objects();
     draw_camera_box(camera_objects, v2c, offset_x, offset_y, image_width,
                     image_height);
-  }
-
-  if (show_fusion_pc_) {
-    std::vector<ObjectPtr> objects;
-    objects = content->get_fused_objects();
-    draw_objects2d(objects, v2c, "fusion", offset_x, offset_y, image_width,
-                   image_height);
   }
 
   if (show_radar_pc_) {
@@ -1441,7 +1438,7 @@ void GLFWFusionViewer::draw_camera_box2d(const std::vector<ObjectPtr>& objects,
     //             offset_x, offset_y, image_width, image_height);
     // }
 
-    if (_show_camera_box2d) {
+    if (show_camera_box2d_) {
       if (obj->camera_supplement != nullptr) {
         // use class color
         float rgb[3];
@@ -1572,7 +1569,7 @@ void GLFWFusionViewer::draw_camera_box3d(
         box3d_color[i] = static_cast<int>(255 * rgb[i]);
       }
 
-      if (_show_camera_box3d) {
+      if (show_camera_box3d_) {
         draw_8pts_box(points, Eigen::Vector3f(box3d_color[0], box3d_color[1],
                                               box3d_color[2]),
                       offset_x, offset_y, image_width, image_height);
@@ -2024,10 +2021,13 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
 void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
                                                bool show_fusion) {
   Eigen::Matrix4d c2v = content->get_camera_to_world_pose();
-  draw_objects(content->get_camera_objects(), c2v, true, true,
-               Eigen::Vector3f(1, 1, 0), use_class_color_);
 
-  if (show_fusion) {
+  if (show_camera_bdv_) {
+      draw_objects(content->get_camera_objects(), c2v, true, true,
+                   Eigen::Vector3f(1, 1, 0), use_class_color_);
+  }
+
+  if (show_fusion_) {
     Eigen::Vector3f fused_color(1, 0, 1);
     bool draw_cube = true;
     bool draw_velocity = true;
@@ -2042,7 +2042,7 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
       AINFO << "object in cam: " << obj->ToString();
     }
     draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color,
-                 use_class_color_);
+                 false);
 
     if (FLAGS_show_fusion_association) {
       draw_fusion_association(content);
@@ -2108,7 +2108,7 @@ void GLFWFusionViewer::draw_camera_box(const std::vector<ObjectPtr>& objects,
       box3d_color = s_color_table[obj->track_id % s_color_table.size()];
     }
 
-    if (_show_camera_box3d) {
+    if (show_camera_box3d_) {
       draw_8pts_box(points, Eigen::Vector3f(box3d_color[0], box3d_color[1],
                                             box3d_color[2]),
                     offset_x, offset_y, image_width, image_height);
