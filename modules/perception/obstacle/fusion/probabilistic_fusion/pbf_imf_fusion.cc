@@ -46,7 +46,12 @@ void PbfIMFFusion::Initialize(const PbfSensorObjectPtr new_object) {
 
   _belief_anchor_point = new_object->object->anchor_point;
   _belief_velocity = new_object->object->velocity;
-  initialized_ = true;
+
+  AINFO << "pbf imf fusion intialized state";
+  AINFO << "belief anchor point " << _belief_anchor_point(0) << " "
+        << _belief_anchor_point(1);
+  AINFO << "belief velocity " << _belief_velocity(0) << " "
+        << _belief_velocity(1);
 
   // initialize states to the states of the detected obstacle
   _posteriori_state(0) = _belief_anchor_point(0);
@@ -62,6 +67,7 @@ void PbfIMFFusion::Initialize(const PbfSensorObjectPtr new_object) {
   _a_matrix(1, 3) = 0.05;
   _q_matrix.setIdentity();
   CacheSensorObjects(new_object);
+  initialized_ = true;
 }
 
 void PbfIMFFusion::Predict(Eigen::Vector3d* anchor_point,
@@ -83,6 +89,13 @@ void PbfIMFFusion::UpdateWithObject(const PbfSensorObjectPtr new_object,
 
   // remove outdated object
   RemoveOutdatedSensorObjects(new_object->timestamp);
+
+  // print some debug information for debugging
+  AINFO << "WEIDE: previous state: " << _belief_anchor_point(0) << " "
+        << _belief_anchor_point(1) << " " << _belief_velocity(0) << " "
+        << _belief_velocity(1);
+  AINFO << "WEIDE: new object information: " << new_object->object->ToString();
+  AINFO << "time diff is " << time_diff;
 
   // compute priori
   _a_matrix.setIdentity();

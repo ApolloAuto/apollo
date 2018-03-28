@@ -77,6 +77,14 @@ class PbfBaseMotionFusion {
     last_fuse_timestamp = ts;
   }
 
+  double getLastFuseTS() {
+    return last_fuse_timestamp;
+  }
+
+  double getCurrentFuseTS() {
+    return fuse_timestamp;
+  }
+
   double getFuseTimeDiff() {
     return (fuse_timestamp - last_fuse_timestamp);
   }
