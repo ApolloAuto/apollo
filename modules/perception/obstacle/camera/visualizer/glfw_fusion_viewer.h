@@ -285,10 +285,11 @@ class GLFWFusionViewer {
 
   Eigen::Matrix<double, 3, 4> camera_intrinsic_;  // camera intrinsic
 
-  bool show_fusion_pc_;
+  bool show_fusion_;
   bool show_radar_pc_;
-  bool _show_camera_box2d;     // show 2d bbox in camera frame
-  bool _show_camera_box3d;     // show 3d bbox in camera frame
+  bool show_camera_box2d_;     // show 2d bbox in camera frame
+  bool show_camera_box3d_;     // show 3d bbox in camera frame
+  bool show_camera_bdv_;
   bool show_associate_color_;  // show same color for both 3d pc bbox and camera
                                // bbox
   bool show_type_id_label_;
