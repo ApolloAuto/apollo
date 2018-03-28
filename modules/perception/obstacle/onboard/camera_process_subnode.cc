@@ -112,8 +112,8 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
   converter_->Convert(&objects);
-  tracker_->Associate(img, timestamp, &objects);
   transformer_->Transform(&objects);
+  tracker_->Associate(img, timestamp, &objects);
   filter_->Filter(timestamp, &objects);
 
   std::shared_ptr<SensorObjects> out_objs(new SensorObjects);
