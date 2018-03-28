@@ -15,9 +15,8 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
-
+#include <algorithm>
 #include "boost/format.hpp"
-
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/macro.h"
 #include "modules/common/time/time_util.h"
@@ -56,9 +55,9 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
   invisible_in_camera_ = true;
 
   if (s_motion_fusion_method_ == "PbfKalmanMotionFusion") {
-      motion_fusion_.reset(new PbfKalmanMotionFusion());
+    motion_fusion_.reset(new PbfKalmanMotionFusion());
   } else {
-      motion_fusion_.reset(new PbfIMFFusion());
+    motion_fusion_.reset(new PbfIMFFusion());
   }
   if (is_lidar(sensor_type)) {
     lidar_objects_[sensor_id] = obj;
@@ -205,8 +204,13 @@ void PbfTrack::PerformMotionFusionAsync(PbfSensorObjectPtr obj) {
   }
   AINFO << "perform motion fusion asynchrounously!";
   const SensorType &sensor_type = obj->sensor_type;
-  // double time_diff = obj->timestamp - fused_object_->timestamp;
+
   double current_time = TimeUtil::GetCurrentTime();
+  if (FLAGS_bag_mode) {
+    // if running in bag, we can't estimate fusion arrival time correctly
+    current_time =
+        std::max(motion_fusion_->getLastFuseTS(), obj->timestamp) + 0.1;
+  }
 
   // for low cost, we only consider radar and camera fusion for now
   if (is_camera(sensor_type) || is_radar(sensor_type)) {
