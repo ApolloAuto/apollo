@@ -47,7 +47,7 @@ class DLFAffinityTracker : public BaseAffinityTracker {
  private:
   //  Thresholds are fine-tuned and detector-dependant
   const float kConfThreshold_ = 0.9f;
-  const float kFilterThreshold_ = 0.3f;
+  const float kFilterThreshold_ = 0.1f;
 };
 
 }  // namespace perception
