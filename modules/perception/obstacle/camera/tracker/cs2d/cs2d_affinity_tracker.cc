@@ -28,14 +28,10 @@ bool CS2DAffinityTracker::GetAffinityMatrix(
     const std::vector<Detected> &detected,
     std::vector<std::vector<float>> *affinity_matrix) {
   affinity_matrix->clear();
-
-  // Return if empty
-  if (tracked.empty() || detected.empty()) {
-    return true;
-  }
+  if (tracked.empty() || detected.empty()) return true;
 
   // Construct output. Default as 0.0 for not selected entries
-  affinity_matrix = new std::vector<std::vector<float>>(
+  *affinity_matrix = std::vector<std::vector<float>>(
       tracked.size(), std::vector<float>(detected.size(), 0.0f));
 
   for (size_t i = 0; i < selected_entry_matrix_.size(); ++i) {
@@ -65,34 +61,25 @@ bool CS2DAffinityTracker::GetAffinityMatrix(
 
       // 2D size change limits
       float ratio_w = w_d / w;
-      if (ratio_w > (1.0f + sz_lim_) || ratio_w < (1.0f - sz_lim_)) {
-        related = false;
-      }
+      if (ratio_w > (1.0f + sz_lim_)) related = false;
+      if (ratio_w < (1.0f - sz_lim_)) related = false;
+
       float ratio_h = h_d / h;
-      if (ratio_h > (1.0f + sz_lim_) || ratio_h < (1.0f - sz_lim_)) {
-        related = false;
-      }
+      if (ratio_h > (1.0f + sz_lim_)) related = false;
+      if (ratio_h < (1.0f - sz_lim_)) related = false;
 
       // 2D center position change limits
-      if (c_x_d > x_max || c_x_d < x_min) {
-        related = false;
-      }
-      if (c_y_d > y_max || c_y_d < y_min) {
-        related = false;
-      }
+      if (c_x_d > x_max || c_x_d < x_min) related = false;
+      if (c_y_d > y_max || c_y_d < y_min) related = false;
 
       // 3D camera space range limit
       auto d_c = detected[j].center_;
       float dist = sqrt(pow(fabs(t_c.x() - d_c.x()), 2.0f)
                         + pow(fabs(t_c.y() - d_c.y()), 2.0f)
                         + pow(fabs(t_c.z() - d_c.z()), 2.0f));
-      if (dist > center_range_) {
-        related = false;
-      }
+      if (dist > center_range_) related = false;
 
-      if (related) {
-        (*affinity_matrix)[i][j] = 1.0f;
-      }
+      if (related) (*affinity_matrix)[i][j] = 1.0f;
     }
   }
 
