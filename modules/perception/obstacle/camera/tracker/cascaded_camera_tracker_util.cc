@@ -171,7 +171,7 @@ void ManageTrackerAndID(
     std::unordered_map<int, std::pair<int, double>> *id_mapping) {
   id_mapping->clear();
   std::vector<Tracked> new_tracked;
-  const int kMaxKeptFrame = 1;
+  const int kMaxKeptFrame = 3;
 
   // Sort local matching output based on tracked_id for easier debugging
   std::map<int, std::pair<int, int>> tracked_id_local_index;
