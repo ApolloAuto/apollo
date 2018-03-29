@@ -126,9 +126,7 @@ apollo::common::Status RelativeMap::Start() {
   return Status::OK();
 }
 
-void RelativeMap::OnTimer(const ros::TimerEvent&) {
-  RunOnce();
-}
+void RelativeMap::OnTimer(const ros::TimerEvent&) { RunOnce(); }
 
 void RelativeMap::RunOnce() {
   AdapterManager::Observe();
@@ -137,7 +135,6 @@ void RelativeMap::RunOnce() {
   CreateMapFromNavigationLane(&map_msg);
   Publish(&map_msg);
 }
-
 
 void RelativeMap::OnReceiveNavigationInfo(
     const NavigationInfo& navigation_info) {

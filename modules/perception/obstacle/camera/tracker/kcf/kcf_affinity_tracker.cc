@@ -46,7 +46,7 @@ bool KCFAffinityTracker::GetAffinityMatrix(
       if (selected_entry_matrix_[i][j]) {
         // Get detected box KCF stuff
         if (!detected_features_.count(j)) {
-          // Enlarge detected search window to 2.5 times
+          // Enlarge detected search window
           cv::Rect box = detected[j].box_;
           box = EnlargeBox(img.size(), kScale_, box);
 
@@ -82,7 +82,7 @@ bool KCFAffinityTracker::UpdateTracked(const cv::Mat &img,
       kcf_component_.Train(img, &tracked_obj);
 
     } else if (!tracked_obj.kcf_set_) {
-      // Enlarge detected search window to 2.5 times
+      // Enlarge detected search window
       cv::Rect box = tracked_obj.box_;
       box = EnlargeBox(img.size(), kScale_, box);
 

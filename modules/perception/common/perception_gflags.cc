@@ -55,7 +55,8 @@ DEFINE_bool(enable_visualization, false, "enable visualization for debug");
 /// obstacle/perception.cc
 /* dag streaming config for Apollo 2.0 */
 DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
-              "Onboard DAG Streaming config.");
+             "Onboard DAG Streaming config.");
+
 
 
 /// obstacle/onboard/radar_process_subnode.cc

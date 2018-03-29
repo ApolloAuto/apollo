@@ -160,6 +160,7 @@ DECLARE_double(trajectory_time_resolution);
 DECLARE_double(trajectory_space_resolution);
 DECLARE_double(lateral_acceleration_bound);
 DECLARE_double(decision_horizon);
+DECLARE_uint32(num_velocity_sample);
 DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);
 
@@ -183,6 +184,7 @@ DECLARE_double(default_lon_buffer);
 DECLARE_double(time_min_density);
 DECLARE_double(comfort_acceleration_factor);
 DECLARE_double(polynomial_minimal_param);
+DECLARE_double(lattice_stop_buffer);
 
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);

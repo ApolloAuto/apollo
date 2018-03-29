@@ -152,7 +152,7 @@ DEFINE_double(
 DEFINE_bool(enable_trajectory_check, false,
             "Enable sanity check for planning trajectory.");
 
-DEFINE_double(speed_lower_bound, -0.02, "The lowest speed allowed.");
+DEFINE_double(speed_lower_bound, -0.1, "The lowest speed allowed.");
 DEFINE_double(speed_upper_bound, 40.0, "The highest speed allowed.");
 
 DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
@@ -294,16 +294,15 @@ DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
 /// Lattice Planner
 DEFINE_double(lattice_epsilon, 1e-6, "Epsilon in lattice planner.");
 DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
-
 DEFINE_bool(enable_auto_tuning, false, "enable auto tuning data emission");
-
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
-
 DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
+DEFINE_uint32(num_velocity_sample, 6,
+              "The number of velocity samples in end condition sampler.");
 DEFINE_bool(enable_backup_trajectory, false,
             "If generate backup trajectory when planning fail");
 DEFINE_double(backup_trajectory_cost, 1000.0,
@@ -341,6 +340,8 @@ DEFINE_double(comfort_acceleration_factor, 0.5,
               "Factor for comfort acceleration.");
 DEFINE_double(polynomial_minimal_param, 0.01,
               "Minimal time parameter in polynomials.");
+DEFINE_double(lattice_stop_buffer, 0.02,
+              "The bufffer before the stop s to check trajectories.");
 
 // navigation mode
 DEFINE_double(navigation_fallback_cruise_time, 8.0,

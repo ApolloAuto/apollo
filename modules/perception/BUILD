@@ -21,6 +21,7 @@ cc_library(
         "//modules/perception/obstacle/onboard:perception_obstacle_shared_data",
         "//modules/perception/obstacle/onboard:radar_subnode",
         "//modules/perception/obstacle/onboard:visualization_subnode",
+        "//modules/perception/obstacle/onboard:cipv_subnode",
         "//modules/perception/onboard",
         "//modules/perception/proto:perception_proto",
         "//modules/perception/traffic_light/onboard",

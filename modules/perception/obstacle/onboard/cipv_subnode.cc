@@ -48,6 +48,7 @@ using std::unordered_map;
 bool CIPVSubnode::InitInternal() {
   CHECK(shared_data_manager_ != nullptr);
   // init camera object data
+  RegisterFactoryCIPVSubnode();
   camera_object_data_ = dynamic_cast<CameraObjectData *>(
       shared_data_manager_->GetSharedData("CameraObjectData"));
   if (camera_object_data_ == nullptr) {
@@ -71,7 +72,6 @@ bool CIPVSubnode::InitInternal() {
 
   AINFO << "Init shared datas successfully";
 
-  string reserve_;
   unordered_map<string, string> reserve_field_map;
   if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
     AERROR << "Failed to parse reserve string: " << reserve_;
@@ -91,27 +91,32 @@ bool CIPVSubnode::InitInternal() {
 
 apollo::common::Status CIPVSubnode::ProcEvents() {
   Event event;
+
   if (!SubscribeEvents(&event)) {
+    AERROR << "[CIPVSubnode::ProcEvents] Failed to subscribe events";
     return Status(ErrorCode::PERCEPTION_ERROR, "Failed to subscribe events.");
   }
 
   std::shared_ptr<SensorObjects> sensor_objs;
   if (!GetSharedData(event, &sensor_objs)) {
+    AERROR << "[CIPVSubnode::ProcEvents] Failed to get shared data";
     return Status(ErrorCode::PERCEPTION_ERROR, "Failed to get shared data.");
   }
+
   CipvOptions cipv_options;
-  // Retrieve motion manager information and pass them to cipv_options
-  MotionService *motion_service = dynamic_cast<MotionService *>(
-      DAGStreaming::GetSubnodeByName("MotionService"));
-  VehicleInformation vehicle_information;
-  motion_service->GetVehicleInformation(event.timestamp, &vehicle_information);
-  cipv_options.velocity = vehicle_information.velocity;
-  cipv_options.yaw_rate = vehicle_information.yaw_rate;
-  cipv_options.yaw_angle =
-      vehicle_information.yaw_rate * vehicle_information.time_diff;
-  // cipv_options.yaw_angle = 0.0f;  // ***** fill in the value *****
-  // cipv_options.velocity = 5.0f;  // ***** fill in the value *****
-  // cipv_options.yaw_rate = 0.0f;  // ***** fill in the value *****
+  // // Retrieve motion manager information and pass them to cipv_options
+  // MotionService *motion_service = dynamic_cast<MotionService *>(
+  //     DAGStreaming::GetSubnodeByName("MotionService"));
+  // VehicleInformation vehicle_information;
+  // motion_service->GetVehicleInformation(event.timestamp,
+  //                                       &vehicle_information);
+  // cipv_options.velocity = vehicle_information.velocity;
+  // cipv_options.yaw_rate = vehicle_information.yaw_rate;
+  // cipv_options.yaw_angle =
+  //     vehicle_information.yaw_rate * vehicle_information.time_diff;
+  cipv_options.yaw_angle = 0.0f;  // ***** fill in the value *****
+  cipv_options.velocity = 5.0f;  // ***** fill in the value *****
+  cipv_options.yaw_rate = 0.0f;  // ***** fill in the value *****
   AINFO << "[CIPVSubnode] velocity " << cipv_options.velocity
         << ", yaw rate: " << cipv_options.yaw_rate
         << ", yaw angle: " << cipv_options.yaw_angle;
@@ -120,7 +125,6 @@ apollo::common::Status CIPVSubnode::ProcEvents() {
   if (cipv_.DetermineCipv(sensor_objs, &cipv_options)) {
     PublishDataAndEvent(event.timestamp, sensor_objs, cipv_object_data_);
   }
-
   return Status::OK();
 }
 
@@ -154,7 +158,8 @@ bool CIPVSubnode::SubscribeEvents(Event *event) const {
     AERROR << "Failed to subscribe event: " << camera_event_id_;
     return false;
   }
-  if (!event_manager_->Subscribe(lane_event_id_, event)) {
+  // Subscribe only lane
+  if (!event_manager_->Subscribe(lane_event_id_, event, false)) {
     AERROR << "Failed to subscribe event: " << lane_event_id_;
     return false;
   }
@@ -173,6 +178,7 @@ bool CIPVSubnode::GetSharedData(const Event &event,
   }
   camera_object_data_->Get(data_key, objs);
   std::shared_ptr<LaneObjects> lane_objects;
+
   bool get_data_succ = lane_shared_data_->Get(data_key, &lane_objects);
   (*objs)->lane_objects = lane_objects;
 
@@ -200,8 +206,6 @@ void CIPVSubnode::PublishDataAndEvent(
     event_manager_->Publish(event);
   }
 }
-
-REGISTER_SUBNODE(CIPVSubnode);
 
 }  // namespace perception
 }  // namespace apollo
