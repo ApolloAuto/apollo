@@ -63,15 +63,15 @@ std::vector<std::vector<int>> GLFWFusionViewer::s_color_table = {
 
 GLFWFusionViewer::GLFWFusionViewer()
     : init_(false),
-      window_(NULL),
-      pers_camera_(NULL),
+      window_(nullptr),
+      pers_camera_(nullptr),
       bg_color_(0.0, 0.0, 0.0),
       win_width_(2560),
       win_height_(1440),
       mouse_prev_x_(0),
       mouse_prev_y_(0),
-      frame_content_(NULL),
-      rgba_buffer_(NULL),
+      frame_content_(nullptr),
+      rgba_buffer_(nullptr),
       vao_trans_x_(0.0),
       vao_trans_y_(0.0),
       vao_trans_z_(0.0),
@@ -641,7 +641,7 @@ void GLFWFusionViewer::render() {
 void GLFWFusionViewer::framebuffer_size_callback(GLFWwindow* window, int width,
                                                  int height) {
   void* user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL) {
+  if (user_data == nullptr) {
     return;
   }
 
@@ -652,7 +652,7 @@ void GLFWFusionViewer::framebuffer_size_callback(GLFWwindow* window, int width,
 void GLFWFusionViewer::window_size_callback(GLFWwindow* window, int width,
                                             int height) {
   void* user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL) {
+  if (user_data == nullptr) {
     return;
   }
 
@@ -663,7 +663,7 @@ void GLFWFusionViewer::window_size_callback(GLFWwindow* window, int width,
 void GLFWFusionViewer::key_callback(GLFWwindow* window, int key, int scancode,
                                     int action, int mods) {
   void* user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL) {
+  if (user_data == nullptr) {
     return;
   }
   if (action == GLFW_PRESS) {
@@ -680,7 +680,7 @@ void GLFWFusionViewer::mouse_cursor_position_callback(GLFWwindow* window,
                                                       double xpos,
                                                       double ypos) {
   void* user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL) {
+  if (user_data == nullptr) {
     return;
   }
 
@@ -691,7 +691,7 @@ void GLFWFusionViewer::mouse_cursor_position_callback(GLFWwindow* window,
 void GLFWFusionViewer::mouse_scroll_callback(GLFWwindow* window, double xoffset,
                                              double yoffset) {
   void* user_data = glfwGetWindowUserPointer(window);
-  if (user_data == NULL) {
+  if (user_data == nullptr) {
     return;
   }
 
@@ -1149,7 +1149,7 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
 bool GLFWFusionViewer::draw_lane_objects_image() {
   cv::Mat show_mat = frame_content_->get_camera_image().clone();
   if (show_mat.empty()) {
-    AERROR << "Get NULL original image from camera frame supplement.";
+    AERROR << "Get nullptr original image from camera frame supplement.";
     return false;
   }
 
@@ -1157,7 +1157,7 @@ bool GLFWFusionViewer::draw_lane_objects_image() {
       frame_content_->get_camera_frame_supplement();
   const cv::Mat& lane_map = camera_frame_supplement->lane_map;
   if (lane_map.empty()) {
-    AERROR << "Get NULL lane_map from camera frame supplement.";
+    AERROR << "Get nullptr lane_map from camera frame supplement.";
     return false;
   }
   cv::Mat lane_mask;
@@ -2023,8 +2023,8 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
   Eigen::Matrix4d c2v = content->get_camera_to_world_pose();
 
   if (show_camera_bdv_) {
-      draw_objects(content->get_camera_objects(), c2v, true, true,
-                   Eigen::Vector3f(1, 1, 0), use_class_color_);
+    draw_objects(content->get_camera_objects(), c2v, true, true,
+                 Eigen::Vector3f(1, 1, 0), use_class_color_);
   }
 
   if (show_fusion_) {
@@ -2041,8 +2041,7 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
     for (auto obj : objects_cam) {
       AINFO << "object in cam: " << obj->ToString();
     }
-    draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color,
-                 false);
+    draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color, false);
 
     if (FLAGS_show_fusion_association) {
       draw_fusion_association(content);
