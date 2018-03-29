@@ -179,8 +179,7 @@ void ManageTrackerAndID(
     int track_id = (*tracked)[pair.first].track_id_;
 
     if (tracked_id_local_index.find(track_id) == tracked_id_local_index.end()) {
-      tracked_id_local_index[track_id] =
-          std::make_pair(pair.first, pair.second);
+      tracked_id_local_index[track_id] = pair;
     } else {
       AWARN << "Should not contain duplicated tracked id";
     }
@@ -189,10 +188,12 @@ void ManageTrackerAndID(
   // Update tracked, which is sorted by track_id
   std::unordered_map<int, int> trackedID_to_detectedID;
   for (const auto &item : tracked_id_local_index) {
-    int track_id =
-        (*tracked)[item.second.first].track_id_;  // The same as item.first
-    double first_timestamp = (*tracked)[item.second.first].first_timestamp_;
-    int d_id = detected[item.second.second].detect_id_;
+    int row = item.second.first;
+    int col = item.second.second;
+
+    int track_id = item.first;
+    int d_id = detected[col].detect_id_;
+    double first_timestamp = (*tracked)[row].first_timestamp_;
 
     Tracked curr_tracked;
     curr_tracked.last_frame_idx_ = frame_idx;
@@ -200,8 +201,8 @@ void ManageTrackerAndID(
     curr_tracked.last_timestamp_ = timestamp;
     curr_tracked.track_id_ = track_id;
     curr_tracked.detect_id_ = d_id;
-    curr_tracked.box_ = detected[item.second.second].box_;
-    curr_tracked.center_ = detected[item.second.second].center_;
+    curr_tracked.box_ = detected[col].box_;
+    curr_tracked.center_ = detected[col].center_;
     new_tracked.emplace_back(curr_tracked);
 
     (*id_mapping)[d_id] = std::make_pair(track_id, first_timestamp);
@@ -210,7 +211,7 @@ void ManageTrackerAndID(
 
   // Create new tracked based on unmatched detected
   for (size_t i = 0; i < detected.size(); ++i) {
-    if (local_matched_detected.find(i) == local_matched_detected.end()) {
+    if (!local_matched_detected.count(i)) {
       int d_id = detected[i].detect_id_;
 
       Tracked curr_tracked;
