@@ -340,6 +340,8 @@ DEFINE_double(comfort_acceleration_factor, 0.5,
               "Factor for comfort acceleration.");
 DEFINE_double(polynomial_minimal_param, 0.01,
               "Minimal time parameter in polynomials.");
+DEFINE_double(lattice_stop_buffer, 0.02,
+              "The bufffer before the stop s to check trajectories.");
 
 // navigation mode
 DEFINE_double(navigation_fallback_cruise_time, 8.0,
