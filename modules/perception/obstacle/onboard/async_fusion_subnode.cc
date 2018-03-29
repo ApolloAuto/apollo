@@ -197,7 +197,8 @@ Status AsyncFusionSubnode::Process(const EventMeta &event_meta,
   //         << "] event_cnt:" << events.size() << " event_0: ["
   //         << events[0].to_string() << "]";
   //   error_code_ = common::PERCEPTION_ERROR_PROCESS;
-  //   return Status(ErrorCode::PERCEPTION_ERROR, "Failed to call fusion plugin.");
+  //   return Status(ErrorCode::PERCEPTION_ERROR,
+  //                 "Failed to call fusion plugin.");
   // }
 
   if (event_meta.event_id == radar_event_id_) {
