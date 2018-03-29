@@ -47,6 +47,10 @@ LocalizationLidarProcess::LocalizationLidarProcess() {
   init_delta_yaw_limit_ = 1.5 * 3.14159 / 180.0;
   compensate_pitch_roll_limit_ = 0.035;  // tan(2)
 
+  unstable_count_  = 0;
+  unstable_threshold_ = 0.08;
+  is_unstable_reset_ = true;
+
   locator_ = new LocalizationLidar();
   pose_forcastor_ = new PoseForcast();
 
@@ -95,6 +99,9 @@ LocalizationState LocalizationLidarProcess::Init(
 
   lidar_filter_size_ = params.lidar_filter_size;
   lidar_thread_number_ = params.lidar_thread_num;
+
+  is_unstable_reset_ = params.is_lidar_unstable_reset;
+  unstable_threshold_ = params.unstable_reset_threshold;
 
   lidar_status_ = LidarState::NOT_VALID;
 
@@ -287,7 +294,7 @@ bool LocalizationLidarProcess::GetPredictPose(double lidar_time,
 
   Pose forcast_pose;
   int state = -1;
-  if (lidar_status_ == LidarState::NOT_VALID) {
+  if (lidar_status_ != LidarState::OK) {
     Pose init_pose;
     state = pose_forcastor_->GetBestForcastPose(lidar_time, -1,
                                                 init_pose, &forcast_pose);
@@ -352,11 +359,34 @@ void LocalizationLidarProcess::UpdateState(int ret, double time) {
   if (ret == 0) {  // OK
     locator_->GetResult(&location_, &location_covariance_);
     lidar_status_ = LidarState::OK;
+
+    // check covariance
+    double cur_location_std_area =
+        std::sqrt(location_covariance_(0, 0))
+        * std::sqrt(location_covariance_(1, 1));
+    if (cur_location_std_area > unstable_threshold_) {
+      // std::cout << "covariance too big trueeee" << std::endl; // TEST
+      ++unstable_count_;
+    } else {
+      unstable_count_ = 0;
+    }
+
+    // check if lidar need reset
+    if (unstable_count_ >= 2 && is_unstable_reset_) {
+      unstable_count_ = 2;
+      reinit_flag_ = true;
+      LOG(WARNING) << "Reinit lidar localization due to big covariance";
+      // std::cout << "reinit_flag_ trueeee" << std::endl; // TEST
+      lidar_status_ = LidarState::NOT_STABLE;
+    } else {
+      lidar_status_ = LidarState::OK;
+      if (out_map_count_ > 0) {
+        --out_map_count_;
+      }
+    }
     pre_location_ = location_;
     pre_location_time_ = time;
-    if (out_map_count_ > 0) {
-      --out_map_count_;
-    }
+
   } else if (ret == -2) {  // out of map
     locator_->GetResult(&location_, &location_covariance_);
     lidar_status_ = LidarState::NOT_STABLE;

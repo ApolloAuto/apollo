@@ -269,10 +269,7 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   // integ
   IntegState state;
   LocalizationEstimate integ_localization;
-  InsPva integ_sins_pva;
-
-  integ_localization_mutex_.lock();
-  integ_process_->GetResult(&state, &integ_sins_pva, &integ_localization);
+  integ_process_->GetResult(&state, &integ_localization);
 
   // push integ pose to PoseQuery
   auto pose_qurey = integ_localization.pose().position();
@@ -331,6 +328,7 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   angular_velocity_vrf->set_y(imu_data.wibb[1]);
   angular_velocity_vrf->set_z(imu_data.wibb[2]);
 
+  integ_localization_mutex_.lock();
   // integ_localization_state_ = LocalizationMeasureState(int(state));
   integ_localization_list_.push_back(LocalizationResult(
       LocalizationMeasureState(static_cast<int>(state)), integ_localization));
@@ -338,6 +336,10 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
     integ_localization_list_.pop_front();
   }
   integ_localization_mutex_.unlock();
+
+  InsPva integ_sins_pva;
+  double covariance[9][9];
+  integ_process_->GetResult(&state, &integ_sins_pva, covariance);
 
   // update republish
   republish_process_->IntegPvaProcess(integ_sins_pva);
@@ -353,9 +355,9 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
 
     if (!is_use_gnss_bestpose_) {
       // update gnssW
-      MeasureData measure_data = {0.0};
-      integ_process_->GetResult(&measure_data);
-      gnss_process_->IntegSinsPvaProcess(integ_sins_pva, measure_data);
+      // MeasureData measure_data = {0.0};
+      // integ_process_->GetResult(&measure_data);
+      gnss_process_->IntegSinsPvaProcess(integ_sins_pva, covariance);
     }
   }
 

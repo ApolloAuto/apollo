@@ -177,13 +177,12 @@ void LocalizationIntegProcess::GetState(IntegState *state) {
 }
 
 void LocalizationIntegProcess::GetResult(IntegState *state,
-                                         InsPva *sins_pva,
                                          LocalizationEstimate *localization) {
   // state
   *state = integ_state_;
 
-  // IntegSinsPva
-  *sins_pva = ins_pva_;
+  // // IntegSinsPva
+  // *sins_pva = ins_pva_;
 
   if (debug_log_flag_ && *state != IntegState::NOT_INIT) {
     LOG(INFO) << std::setprecision(16)
@@ -230,9 +229,9 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   apollo::common::Point3D *eulerangles = posepb_loc->mutable_euler_angles();
   eulerangles->set_x(ins_pva_.att.pitch);
   eulerangles->set_y(ins_pva_.att.roll);
-  eulerangles->set_z(-ins_pva_.att.yaw);
+  eulerangles->set_z(ins_pva_.att.yaw);
 
-  posepb_loc->set_heading(-ins_pva_.att.yaw);
+  posepb_loc->set_heading(ins_pva_.att.yaw);
 
   apollo::localization::Uncertainty *uncertainty =
       localization->mutable_uncertainty();
@@ -256,28 +255,37 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   return;
 }
 
-void LocalizationIntegProcess::GetResult(MeasureData *measure_data) {
-  measure_data->time = ins_pva_.time;
-  measure_data->gnss_pos.longitude = ins_pva_.pos.longitude;
-  measure_data->gnss_pos.latitude = ins_pva_.pos.latitude;
-  measure_data->gnss_pos.height = ins_pva_.pos.height;
-  measure_data->gnss_vel.ve = ins_pva_.vel.ve;
-  measure_data->gnss_vel.vn = ins_pva_.vel.vn;
-  measure_data->gnss_vel.vu = ins_pva_.vel.vu;
-  measure_data->gnss_att.pitch = ins_pva_.att.pitch;
-  measure_data->gnss_att.roll = ins_pva_.att.roll;
-  measure_data->gnss_att.yaw = ins_pva_.att.yaw;
-
-  measure_data->is_have_variance = true;
-
-  for (int i = 0; i < 9; ++i) {
-    for (int j = 0; j < 9; ++j) {
-      measure_data->variance[i][j] = pva_covariance_[i][j];
-    }
-  }
-
+void LocalizationIntegProcess::GetResult(IntegState *state,
+               InsPva *sins_pva,
+               double pva_covariance[9][9]) {
+  *state = integ_state_;
+  *sins_pva = ins_pva_;
+  memcpy(pva_covariance, pva_covariance_, sizeof(double) * 9 * 9);
   return;
 }
+
+// void LocalizationIntegProcess::GetResult(MeasureData *measure_data) {
+//   measure_data->time = ins_pva_.time;
+//   measure_data->gnss_pos.longitude = ins_pva_.pos.longitude;
+//   measure_data->gnss_pos.latitude = ins_pva_.pos.latitude;
+//   measure_data->gnss_pos.height = ins_pva_.pos.height;
+//   measure_data->gnss_vel.ve = ins_pva_.vel.ve;
+//   measure_data->gnss_vel.vn = ins_pva_.vel.vn;
+//   measure_data->gnss_vel.vu = ins_pva_.vel.vu;
+//   measure_data->gnss_att.pitch = ins_pva_.att.pitch;
+//   measure_data->gnss_att.roll = ins_pva_.att.roll;
+//   measure_data->gnss_att.yaw = ins_pva_.att.yaw;
+
+//   measure_data->is_have_variance = true;
+
+//   for (int i = 0; i < 9; ++i) {
+//     for (int j = 0; j < 9; ++j) {
+//       measure_data->variance[i][j] = pva_covariance_[i][j];
+//     }
+//   }
+
+//   return;
+// }
 
 void LocalizationIntegProcess::MeasureDataProcess(
     const MeasureData &measure_msg) {

@@ -122,7 +122,7 @@ class LocalizationGnssProcess {
   void RawObservationProcess(const drivers::gnss::EpochObservation &raw_obs);
   void RawEphemerisProcess(const drivers::gnss::GnssEphemeris &gnss_orbit);
   void IntegSinsPvaProcess(const InsPva &sins_pva,
-                           const MeasureData &measure_data);
+                           const double variance[9][9]);
   LocalizationMeasureState GetResult(MeasureData *gnss_measure);
 
  private:

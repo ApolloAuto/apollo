@@ -63,9 +63,10 @@ class LocalizationIntegProcess {
   // Raw Imu process.
   void RawImuProcess(const ImuData &imu_msg);
   void GetState(IntegState *state);
-  void GetResult(IntegState *state, InsPva *sins_pva,
-                 LocalizationEstimate *localization);
-  void GetResult(MeasureData *measure_data);
+  void GetResult(IntegState *state, LocalizationEstimate *localization);
+  void GetResult(IntegState *state,
+                 InsPva *sins_pva,
+                 double pva_covariance[9][9]);
 
   // itegration measure data process
   void MeasureDataProcess(const MeasureData& measure_msg);
@@ -126,9 +127,6 @@ class LocalizationIntegProcess {
   int measure_data_queue_size_;
   std::mutex measure_data_queue_mutex_;
 
-  // bool is_sins_state_check_;
-  // double sins_state_span_time_;
-  // double sins_state_pos_std_;
   int delay_output_counter_;
 };
 

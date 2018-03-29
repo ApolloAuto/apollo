@@ -61,7 +61,9 @@ struct LocalizationIntegParam {
       localization_mode(2), lidar_yaw_align_mode(1),
       lidar_filter_size(17), lidar_thread_num(1), map_coverage_theshold(0.8),
       imu_lidar_max_delay_time(0.4), utm_zone_id(50), imu_rate(1.0),
-      enable_lidar_localization(true), is_use_visualize(false) {}
+      enable_lidar_localization(true), is_use_visualize(false),
+      is_lidar_unstable_reset(true),
+      unstable_reset_threshold(0.08) {}
 
   // integration module
   bool is_ins_can_self_align;
@@ -102,6 +104,9 @@ struct LocalizationIntegParam {
   bool enable_lidar_localization;
 
   bool is_use_visualize;
+
+  bool is_lidar_unstable_reset;
+  double unstable_reset_threshold;
 };
 
 enum class LocalizationErrorCode {

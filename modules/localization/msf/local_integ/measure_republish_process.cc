@@ -379,17 +379,6 @@ void MeasureRepublishProcess::GnssLocalProcess(
 
 void MeasureRepublishProcess::IntegPvaProcess(const InsPva& inspva_msg) {
   const InsPva& integ_pva = inspva_msg;
-  // integ_pva.time = inspva_msg.header().timestamp_sec();
-  // integ_pva.pos.longitude = inspva_msg.position().lon();
-  // integ_pva.pos.latitude = inspva_msg.position().lat();
-  // integ_pva.pos.height = inspva_msg.position().height();
-  // integ_pva.vel.ve = inspva_msg.velocity().x();
-  // integ_pva.vel.vn = inspva_msg.velocity().y();
-  // integ_pva.vel.vu = inspva_msg.velocity().z();
-  // integ_pva.att.pitch = inspva_msg.attitude().x();
-  // integ_pva.att.roll = inspva_msg.attitude().y();
-  // integ_pva.att.yaw = inspva_msg.attitude().z();
-  // integ_pva.init_and_alignment = inspva_msg.init_and_alignment();
 
   pthread_mutex_lock(&integ_pva_mutex_);
   if (integ_pva_list_.size() < pva_buffer_size_) {
@@ -437,7 +426,7 @@ int MeasureRepublishProcess::LidarLocalProcess(
   map_height_time_ = measure_data.time;
   pthread_mutex_unlock(&height_mutex_);
 
-  measure_data.gnss_att.yaw = -euler.yaw();
+  measure_data.gnss_att.yaw = euler.yaw();
   measure_data.measure_type = MeasureType::POINT_CLOUD_POS;
   measure_data.frame_type = FrameType::UTM;
 

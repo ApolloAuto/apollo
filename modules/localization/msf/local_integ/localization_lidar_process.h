@@ -212,6 +212,10 @@ class LocalizationLidarProcess {
 
   int out_map_count_;
 
+  int unstable_count_;
+  double unstable_threshold_;
+  bool is_unstable_reset_;
+
   /**@brief forcast integ pose, use to limit output of yaw */
   ForcastState forcast_integ_state_;
   int64_t forcast_timer_;

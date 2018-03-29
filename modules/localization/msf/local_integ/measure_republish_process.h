@@ -49,12 +49,7 @@ typedef Eigen::Vector3d Vector3D;
 typedef Eigen::Translation3d Translation3D;
 typedef Eigen::Matrix3d Matrix3D;
 typedef Eigen::Quaterniond QuaternionD;
-// typedef adu::localization::integrated_navigation::InsPva InsPva;
-// typedef adu::localization::integrated_navigation::MeasureData MeasureData;
-// typedef drivers::gnss::DatumId DatumId;
 typedef drivers::gnss::GnssBestPose GnssBestPose;
-// typedef drivers::gnss::SolutionType SolutionType;
-// typedef drivers::gnss::SolutionStatus SolutionStatus;
 
 enum class GnssMode { NOVATEL = 0, SELF };
 

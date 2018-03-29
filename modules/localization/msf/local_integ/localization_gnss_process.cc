@@ -190,7 +190,7 @@ void LocalizationGnssProcess::RawEphemerisProcess(
 }
 
 void LocalizationGnssProcess::IntegSinsPvaProcess(
-    const InsPva &sins_pva_msg, const MeasureData &measure_data) {
+    const InsPva &sins_pva_msg, const double variance[9][9]) {
   if (!sins_pva_msg.init_and_alignment) {
     return;
   }
@@ -216,8 +216,8 @@ void LocalizationGnssProcess::IntegSinsPvaProcess(
   // const unsigned int dim = 9;
   for (unsigned int i = 0; i < 3; ++i) {
     for (unsigned int j = 0; j < 3; ++j) {
-      std_pos[i][j] = measure_data.variance[i][j];
-      std_vel[i][j] = measure_data.variance[i + 3][j + 3];
+      std_pos[i][j] = variance[i][j];
+      std_vel[i][j] = variance[i + 3][j + 3];
     }
   }
 
