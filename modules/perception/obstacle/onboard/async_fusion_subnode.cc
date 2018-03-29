@@ -129,6 +129,10 @@ bool AsyncFusionSubnode::InitOutputStream() {
 Status AsyncFusionSubnode::ProcEvents() {
   for (auto event_meta : sub_meta_events_) {
     std::vector<Event> events;
+    if (event_meta.event_id == lane_event_id_) {
+        continue;
+    }
+
     if (!SubscribeEvents(event_meta, &events)) {
       AERROR << "event meta id:" << event_meta.event_id << " "
              << event_meta.from_node << " " << event_meta.to_node;
@@ -167,7 +171,13 @@ void AsyncFusionSubnode::PublishDataAndEvent(
     const double &timestamp, const std::string &device_id,
     const SharedDataPtr<FusionItem> &data) {
   CommonSharedDataKey key(timestamp, device_id);
-  fusion_data_->Add(key, data);
+  bool fusion_succ = fusion_data_->Add(key, data);
+  if (!fusion_succ) {
+      AERROR <<"fusion shared data addkey failure";
+  }
+
+  ADEBUG << "adding key in fusion shared data " << key.ToString();
+
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
     const EventMeta &event_meta = pub_meta_events_[idx];
     Event event;
@@ -191,15 +201,15 @@ Status AsyncFusionSubnode::Process(const EventMeta &event_meta,
   }
   PERF_BLOCK_START();
   objects_.clear();
-  // if (!fusion_->Fuse(sensor_objs, &objects_)) {
-  //   AWARN << "Failed to call fusion plugin."
-  //         << " event_meta: [" << event_meta.to_string()
-  //         << "] event_cnt:" << events.size() << " event_0: ["
-  //         << events[0].to_string() << "]";
-  //   error_code_ = common::PERCEPTION_ERROR_PROCESS;
-  //   return Status(ErrorCode::PERCEPTION_ERROR,
-  //                 "Failed to call fusion plugin.");
-  // }
+  /*
+  if (!fusion_->Fuse(sensor_objs, &objects_)) {
+    AWARN << "Failed to call fusion plugin."
+          << " event_meta: [" << event_meta.to_string()
+          << "] event_cnt:" << events.size() << " event_0: ["
+          << events[0].to_string() << "]";
+    error_code_ = common::PERCEPTION_ERROR_PROCESS;
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to call fusion plugin.");
+  }*/
 
   if (event_meta.event_id == radar_event_id_) {
     PERF_BLOCK_END("fusion_radar");
@@ -222,8 +232,10 @@ Status AsyncFusionSubnode::Process(const EventMeta &event_meta,
   }
 
   // publishing result to pnc
-  for (auto sensor_obj : sensor_objs) {
-    PublishPerceptionPb(sensor_obj);
+  if (event_meta.event_id == camera_event_id_) {
+      for (auto sensor_obj : sensor_objs) {
+          PublishPerceptionPb(sensor_obj);
+      }
   }
 
   error_code_ = common::OK;
@@ -268,8 +280,13 @@ bool AsyncFusionSubnode::SubscribeEvents(const EventMeta &event_meta,
   Event event;
   // blocking call for each of these events
   while (event_manager_->Subscribe(event_meta.event_id, &event, true)) {
-    AINFO << "starting subscribing event " << event_meta.event_id;
-    events->push_back(event);
+    ADEBUG << "starting subscribing event " << event_meta.event_id;
+    // events->push_back(event);
+  }
+
+  // only obtain latest event from a sensor queue
+  if (event.event_id !=0 && event.timestamp !=0.0) {
+      events->push_back(event);
   }
   return true;
 }
