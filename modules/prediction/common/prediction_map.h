@@ -129,7 +129,8 @@ class PredictionMap {
   static void OnLane(
       const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& prev_lanes,
       const Eigen::Vector2d& point, const double heading, const double radius,
-      const bool on_lane,
+      const bool on_lane, const int max_num_lane,
+      const double max_lane_angle_diff,
       std::vector<std::shared_ptr<const hdmap::LaneInfo>>* lanes);
 
   /**
@@ -140,6 +141,14 @@ class PredictionMap {
    * @return If any junctions exist.
    */
   static bool NearJunction(const Eigen::Vector2d& point, const double radius);
+
+   /**
+   * @brief Check if the obstacle is in a junction.
+   * @param point position
+   * @param radius the radius to search candidate junctions
+   * @return If the obstacle is in a junction.
+   */
+  static bool InJunction(const Eigen::Vector2d& point, const double radius);
 
   /**
    * @brief Get a list of junctions given a point and a search radius
@@ -183,6 +192,7 @@ class PredictionMap {
   static void NearbyLanesByCurrentLanes(
       const Eigen::Vector2d& point, const double heading, const double radius,
       const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes,
+      const int max_num_lane,
       std::vector<std::shared_ptr<const hdmap::LaneInfo>>* nearby_lanes);
 
   /**
