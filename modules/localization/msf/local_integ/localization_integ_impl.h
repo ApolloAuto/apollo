@@ -88,7 +88,7 @@ class LocalizationIntegImpl {
 
   void GetGnssLocalizationList(std::list<LocalizationResult> *results);
 
- private:
+ protected:
   void PcdThreadLoop();
   void PcdProcessImpl(const LidarFrame& pcd_data);
 
@@ -103,8 +103,8 @@ class LocalizationIntegImpl {
   void GnssBestPoseProcessImpl(
       const drivers::gnss::GnssBestPose& bestgnsspos_msg);
 
-  // void ParseLidarFrame(const sensor_msgs::PointCloud2& lidar_data,
-  //                      LidarFrame& lidar_frame) const;
+//   void CompensateGnssLocalization(const Eigen::Quaterniond &quat,
+//                                   LocalizationEstimate* compensate_local);
 
   void TransferGnssMeasureToLocalization(const MeasureData& measure,
                                          LocalizationEstimate *localization);
@@ -165,7 +165,7 @@ class LocalizationIntegImpl {
   bool debug_log_flag_;
   bool enable_lidar_localization_;
 
-  PoseQuery integ_pose_query_;
+//   PoseQuery integ_pose_query_;
 
   Eigen::Affine3d gnss_antenna_extrinsic_;
 };

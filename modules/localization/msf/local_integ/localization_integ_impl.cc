@@ -271,16 +271,19 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   LocalizationEstimate integ_localization;
   integ_process_->GetResult(&state, &integ_localization);
 
-  // push integ pose to PoseQuery
-  auto pose_qurey = integ_localization.pose().position();
-  auto orien_qurey = integ_localization.pose().orientation();
-  double time_qurey = integ_localization.measurement_time();
-  integ_pose_query_.AddPose(time_qurey,
-      Eigen::Vector3d(pose_qurey.x(), pose_qurey.y(), pose_qurey.z()),
-      Eigen::Quaterniond(orien_qurey.qw(),
-                         orien_qurey.qx(),
-                         orien_qurey.qy(),
-                         orien_qurey.qz()));
+  // // push integ pose to PoseQuery
+  // if (state != IntegState::NOT_INIT
+  //     && state != IntegState::NOT_STABLE) {
+  //   auto pose_qurey = integ_localization.pose().position();
+  //   auto orien_qurey = integ_localization.pose().orientation();
+  //   double time_qurey = integ_localization.measurement_time();
+  //   integ_pose_query_.AddPose(time_qurey,
+  //       Eigen::Vector3d(pose_qurey.x(), pose_qurey.y(), pose_qurey.z()),
+  //       Eigen::Quaterniond(orien_qurey.qw(),
+  //                          orien_qurey.qx(),
+  //                          orien_qurey.qy(),
+  //                          orien_qurey.qz()));
+  // }
 
   apollo::localization::Pose* posepb_loc = integ_localization.mutable_pose();
 
@@ -522,33 +525,21 @@ void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
   localization->set_measurement_time(timestamp);
   headerpb->set_timestamp_sec(timestamp);
 
-  // get quat to trans
-  Eigen::Vector3d gnss_antenna_diff(
-      gnss_antenna_extrinsic_.translation()(0),
-      gnss_antenna_extrinsic_.translation()(1),
-      gnss_antenna_extrinsic_.translation()(2));
-  Eigen::Quaterniond quat(1, 0, 0, 0);
-  if (!integ_pose_query_.QueryQuaternion(timestamp, &quat)) {
-    LOG(WARNING) << std::setprecision(20)
-                 << "Can't query integ pose, time: " << timestamp;
-  }
-  gnss_antenna_diff = quat * gnss_antenna_diff;
-
   UTMCoor utm_xy;
   latlon_to_utmxy(measure.gnss_pos.longitude,
                   measure.gnss_pos.latitude,
                   &utm_xy);
 
   apollo::common::PointENU* position = posepb->mutable_position();
-  position->set_x(utm_xy.x - gnss_antenna_diff[0]);
-  position->set_y(utm_xy.y - gnss_antenna_diff[1]);
-  position->set_z(measure.gnss_pos.height - gnss_antenna_diff[2]);
+  position->set_x(utm_xy.x);
+  position->set_y(utm_xy.y);
+  position->set_z(measure.gnss_pos.height);
 
   apollo::common::Quaternion* quaternion = posepb->mutable_orientation();
-  quaternion->set_qx(quat.x());
-  quaternion->set_qy(quat.y());
-  quaternion->set_qz(quat.z());
-  quaternion->set_qw(quat.w());
+  quaternion->set_qx(0.0);
+  quaternion->set_qy(0.0);
+  quaternion->set_qz(0.0);
+  quaternion->set_qw(1.0);
 
   apollo::localization::Uncertainty* uncertainty =
       localization->mutable_uncertainty();
@@ -648,7 +639,54 @@ void LocalizationIntegImpl::GetGnssLocalizationList(
   *results = gnss_localization_list_;
   gnss_localization_list_.clear();
   gnss_localization_mutex_.unlock();
+  return;
 }
+
+// void LocalizationIntegImpl::GetGnssLocalizationList(
+//     std::list<LocalizationResult> *results) {
+//   results->clear();
+//   gnss_localization_mutex_.lock();
+//   while (gnss_localization_list_.size() > 0) {
+//     auto state = gnss_localization_list_.front().state();
+//     auto local = gnss_localization_list_.front().localization();
+//     Eigen::Quaterniond quat(1, 0, 0, 0);
+//     int err_code =
+//         integ_pose_query_.QueryQuaternion(local.measurement_time(), &quat);
+
+//     if (err_code < 0) { // too old
+//       gnss_localization_list_.pop_front();
+//     } else if (err_code > 0) { // OK
+//       CompensateGnssLocalization(quat, &local);
+//       results->push_back(LocalizationResult(state, local));
+//       gnss_localization_list_.pop_front();
+//     } else { // too new
+//       break;
+//     }    
+//   }
+//   gnss_localization_mutex_.unlock();
+// }
+
+// void LocalizationIntegImpl::CompensateGnssLocalization(
+//     const Eigen::Quaterniond &quat,
+//     LocalizationEstimate* compensate_local) {
+//   Eigen::Vector3d gnss_antenna_diff(gnss_antenna_extrinsic_.translation()(0),
+//                                     gnss_antenna_extrinsic_.translation()(1),
+//                                     gnss_antenna_extrinsic_.translation()(2));
+//   gnss_antenna_diff = quat * gnss_antenna_diff;
+
+//   apollo::localization::Pose* posepb = compensate_local->mutable_pose();
+//   apollo::common::PointENU* position = posepb->mutable_position();
+//   position->set_x(position->x() - gnss_antenna_diff[0]);
+//   position->set_y(position->y() - gnss_antenna_diff[1]);
+//   position->set_z(position->z() - gnss_antenna_diff[2]);
+
+//   apollo::common::Quaternion* quaternion = posepb->mutable_orientation();
+//   quaternion->set_qx(quat.x());
+//   quaternion->set_qy(quat.y());
+//   quaternion->set_qz(quat.z());
+//   quaternion->set_qw(quat.w());
+//   return;
+// }
 
 }  // namespace msf
 }  // namespace localization

@@ -60,7 +60,7 @@ class PoseQuery {
   void AddPose(double time, const Vector3D &trans, const QuaternionD &quat) {
     std::unique_lock<std::mutex> lock(pose_mutex_);
 
-    if (time < pose_buffer_.back().measure_time + 1e-6) {
+    if (buffer_size_ == 0 || time < pose_buffer_.back().measure_time + 1e-6) {
       return;
     }
 
@@ -77,8 +77,9 @@ class PoseQuery {
   bool QueryQuaternion(double time, QuaternionD *quat) {
     std::unique_lock<std::mutex> lock(pose_mutex_);
 
+    // not init
     if (buffer_size_ < 2) {
-      return false;
+      return -1;
     }
 
     auto itr_last = pose_buffer_.begin();
@@ -88,9 +89,9 @@ class PoseQuery {
 
     // query time is too old
     if (time < itr_last->measure_time) {
-      LOG(WARNING) << std::setprecision(20)
+      LOG(WARNING) << std::setprecision(20) 
                    << "query time is too old, query time: " << time;
-      return false;
+      return -2;
     }
 
     // query time is OK
@@ -99,20 +100,15 @@ class PoseQuery {
       double time0 = itr_last->measure_time;
       double time1 = itr->measure_time;
       if (time0 <= time && time <= time1) {
-        double ratio = (time - time0) / (time1 - time0);  // add_pose avoid /0
+        double ratio = (time - time0) / (time1 - time0); // add_pose avoid /0
         *quat = itr_last->quaternion.slerp(ratio, itr->quaternion);
-        return true;
+        return 1;
       }
     }
 
-    // query time is too new
-    if (time < itr_last->measure_time + 0.02) {
-        *quat = itr_last->quaternion;
-    }
-
-    LOG(WARNING) << std::setprecision(20)
+    LOG(WARNING) << std::setprecision(20) 
                  << "query time is too new, query time: " << time;
-    return false;
+    return 0;
   }
 
  protected:
