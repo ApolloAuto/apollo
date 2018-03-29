@@ -680,9 +680,18 @@ void Obstacle::UpdateKFPedestrianTracker(const Feature& feature) {
 void Obstacle::SetCurrentLanes(Feature* feature) {
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
   double heading = feature->velocity_heading();
+  int max_num_lane = FLAGS_max_num_current_lane;
+  double max_angle_diff = FLAGS_max_lane_angle_diff;
+  double lane_search_radius = FLAGS_lane_search_radius;
+  if (PredictionMap::InJunction(point, FLAGS_junction_search_radius)) {
+    max_num_lane = FLAGS_max_num_current_lane_in_junction;
+    max_angle_diff = FLAGS_max_lane_angle_diff_in_junction;
+    lane_search_radius = FLAGS_lane_search_radius_in_junction;
+  }
   std::vector<std::shared_ptr<const LaneInfo>> current_lanes;
   PredictionMap::OnLane(current_lanes_, point, heading,
-                        FLAGS_lane_search_radius, true, &current_lanes);
+                        lane_search_radius, true, max_num_lane,
+                        max_angle_diff, &current_lanes);
   current_lanes_ = current_lanes;
   if (current_lanes_.empty()) {
     ADEBUG << "Obstacle [" << id_ << "] has no current lanes.";
@@ -743,10 +752,15 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
 
 void Obstacle::SetNearbyLanes(Feature* feature) {
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
+  int max_num_lane = FLAGS_max_num_nearby_lane;
+  if (PredictionMap::InJunction(point, FLAGS_junction_search_radius)) {
+    max_num_lane = FLAGS_max_num_nearby_lane_in_junction;
+  }
   double theta = feature->velocity_heading();
   std::vector<std::shared_ptr<const LaneInfo>> nearby_lanes;
   PredictionMap::NearbyLanesByCurrentLanes(
-      point, theta, FLAGS_lane_search_radius, current_lanes_, &nearby_lanes);
+      point, theta, FLAGS_lane_search_radius, current_lanes_,
+      max_num_lane, &nearby_lanes);
   if (nearby_lanes.empty()) {
     ADEBUG << "Obstacle [" << id_ << "] has no nearby lanes.";
     return;
