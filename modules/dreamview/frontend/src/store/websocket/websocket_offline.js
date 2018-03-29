@@ -53,12 +53,14 @@ export default class OfflinePlaybackWebSocketEndpoint {
                     this.checkMessage(message);
                     STORE.setInitializationStatus(true);
 
+                    const world = (typeof message.world) === "string"
+                        ? JSON.parse(message.world): message.world;
                     if (STORE.playback.isSeeking) {
-                        this.processSimWorld(message);
+                        this.processSimWorld(world);
                     }
 
-                    if (message.timestamp && !(message.timestamp in this.frameData)) {
-                        this.frameData[message.timestamp] = message;
+                    if (world.sequenceNum && !(world.sequenceNum in this.frameData)) {
+                        this.frameData[world.sequenceNum] = world;
                     }
 
                     break;
@@ -101,9 +103,9 @@ export default class OfflinePlaybackWebSocketEndpoint {
         clearInterval(this.processTimer);
         this.processTimer = setInterval(() => {
             if (STORE.playback.initialized()) {
-                const timestamp = STORE.playback.seekingFrame * 100;
-                if (timestamp in this.frameData) {
-                    this.processSimWorld(this.frameData[timestamp]);
+                const frameId = STORE.playback.seekingFrame;
+                if (frameId in this.frameData) {
+                    this.processSimWorld(this.frameData[frameId]);
                 }
 
                 if (STORE.playback.replayComplete) {
@@ -128,15 +130,13 @@ export default class OfflinePlaybackWebSocketEndpoint {
         }));
     }
 
-    processSimWorld(message) {
-        const world = (typeof message.world) === "string"
-                        ? JSON.parse(message.world): message.world;
+    processSimWorld(world) {
         if (STORE.playback.shouldProcessFrame(world)) {
-            STORE.updateTimestamp(message.timestamp);
+            STORE.updateTimestamp(world.timestamp);
             RENDERER.maybeInitializeOffest(
                 world.autoDrivingCar.positionX,
                 world.autoDrivingCar.positionY);
-            RENDERER.updateWorld(world, message.planningData);
+            RENDERER.updateWorld(world);
             STORE.meters.update(world);
             STORE.monitor.update(world);
             STORE.trafficSignal.update(world);
@@ -150,15 +150,14 @@ export default class OfflinePlaybackWebSocketEndpoint {
     }
 
     requestSimulationWorld(jobId, frameId) {
-        const timestamp = frameId * 100;
-        if (!(timestamp in this.frameData)) {
+        if (!(frameId in this.frameData)) {
             this.websocket.send(JSON.stringify({
                 type : "RequestSimulationWorld",
                 jobId: jobId,
                 frameId: frameId,
             }));
         } else if (STORE.playback.isSeeking) {
-            this.processSimWorld(this.frameData[timestamp]);
+            this.processSimWorld(this.frameData[frameId]);
         }
     }
 }
