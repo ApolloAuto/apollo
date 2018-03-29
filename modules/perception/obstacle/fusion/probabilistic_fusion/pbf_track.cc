@@ -45,11 +45,10 @@ double PbfTrack::s_min_radar_confident_distance_ = 40;
 bool PbfTrack::s_publish_if_has_lidar_ = true;
 bool PbfTrack::s_publish_if_has_radar_ = true;
 
-// clang-format off
-std::string PbfTrack::s_motion_fusion_method_ = "PbfKalmanMotionFusion";  // NOLINT
-// clang-format on
-
 using apollo::common::time::TimeUtil;
+
+PbfTrack::MotionFusionMethod PbfTrack::s_motion_fusion_method_ =
+    PbfTrack::MotionFusionMethod::PBF_KALMAN;
 
 PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
   idx_ = GetNextTrackId();
@@ -59,7 +58,7 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
   invisible_in_radar_ = true;
   invisible_in_camera_ = true;
 
-  if (s_motion_fusion_method_ == "PbfKalmanMotionFusion") {
+  if (s_motion_fusion_method_ == MotionFusionMethod::PBF_KALMAN) {
     motion_fusion_.reset(new PbfKalmanMotionFusion());
   } else {
     motion_fusion_.reset(new PbfIMFFusion());
@@ -91,8 +90,14 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
   is_dead_ = false;
 }
 
-void PbfTrack::SetMotionFusionMethod(const std::string motion_fusion_method) {
-  s_motion_fusion_method_ = motion_fusion_method;
+void PbfTrack::SetMotionFusionMethod(const std::string &motion_fusion_method) {
+  if (motion_fusion_method == "PbfKalmanMotionFusion") {
+    s_motion_fusion_method_ = MotionFusionMethod::PBF_KALMAN;
+  } else if (motion_fusion_method == "PbfIMFFusion") {
+    s_motion_fusion_method_ = MotionFusionMethod::PBF_IMF;
+  } else {
+    AERROR << "Unknown motion fusion method.";
+  }
 }
 
 PbfTrack::~PbfTrack() {}
