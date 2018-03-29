@@ -40,7 +40,7 @@ struct alignas(16) Object {
   // deep copy
   void clone(const Object& rhs);
   std::string ToString() const;
-
+  void AddFourCorners(PerceptionObstacle* pb_obj) const;
   void Serialize(PerceptionObstacle* pb_obj) const;
   void Deserialize(const PerceptionObstacle& pb_obs);
 
