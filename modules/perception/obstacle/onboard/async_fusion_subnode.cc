@@ -191,14 +191,14 @@ Status AsyncFusionSubnode::Process(const EventMeta &event_meta,
   }
   PERF_BLOCK_START();
   objects_.clear();
-  if (!fusion_->Fuse(sensor_objs, &objects_)) {
-    AWARN << "Failed to call fusion plugin."
-          << " event_meta: [" << event_meta.to_string()
-          << "] event_cnt:" << events.size() << " event_0: ["
-          << events[0].to_string() << "]";
-    error_code_ = common::PERCEPTION_ERROR_PROCESS;
-    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to call fusion plugin.");
-  }
+  // if (!fusion_->Fuse(sensor_objs, &objects_)) {
+  //   AWARN << "Failed to call fusion plugin."
+  //         << " event_meta: [" << event_meta.to_string()
+  //         << "] event_cnt:" << events.size() << " event_0: ["
+  //         << events[0].to_string() << "]";
+  //   error_code_ = common::PERCEPTION_ERROR_PROCESS;
+  //   return Status(ErrorCode::PERCEPTION_ERROR, "Failed to call fusion plugin.");
+  // }
 
   if (event_meta.event_id == radar_event_id_) {
     PERF_BLOCK_END("fusion_radar");
