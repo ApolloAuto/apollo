@@ -363,11 +363,11 @@ int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
   watch_vehicles->clear();
 
   StopSignStatus stop_sign_status = GetPlanningStatus()->stop_sign();
-  for (int i = 0; i < stop_sign_status.lane_watch_vehicles_size(); i++) {
+  for (int i = 0; i < stop_sign_status.lane_watch_vehicles_size(); ++i) {
     auto lane_watch_vehicles = stop_sign_status.lane_watch_vehicles(i);
     std::string associated_lane_id = lane_watch_vehicles.lane_id();
     std::string s;
-    for (int j = 0; j < lane_watch_vehicles.watch_vehicles_size(); j++) {
+    for (int j = 0; j < lane_watch_vehicles.watch_vehicles_size(); ++j) {
       std::string vehicle = lane_watch_vehicles.watch_vehicles(j);
       s = s.empty() ? vehicle : s + "," + vehicle;
       (*watch_vehicles)[associated_lane_id].push_back(vehicle);
@@ -388,11 +388,10 @@ int StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->clear_lane_watch_vehicles();
 
-  for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
-       it != watch_vehicles->end(); ++it) {
+  for (auto it = watch_vehicles->begin(); it != watch_vehicles->end(); ++it) {
     auto* lane_watch_vehicles = stop_sign_status->add_lane_watch_vehicles();
     lane_watch_vehicles->set_lane_id(it->first);
-    for (size_t i = 0; i < it->second.size(); i++) {
+    for (size_t i = 0; i < it->second.size(); ++i) {
       lane_watch_vehicles->add_watch_vehicles(it->second[i]);
     }
   }

@@ -19,7 +19,9 @@
 
 #include <algorithm>
 #include <memory>
+#include <mutex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "Eigen/Core"
@@ -28,6 +30,7 @@
 #include "sensor_msgs/Image.h"
 #include "yaml-cpp/yaml.h"
 
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -51,6 +54,7 @@
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/traffic_light/util/color_space.h"
 
 namespace apollo {
 namespace perception {
@@ -73,6 +77,8 @@ class CameraProcessSubnode : public Subnode {
 
   void ImgCallback(const sensor_msgs::Image& message);
 
+  void ChassisCallback(const apollo::canbus::Chassis& message);
+
   bool MessageToMat(const sensor_msgs::Image& msg, cv::Mat* img);
 
   void VisualObjToSensorObj(const std::vector<VisualObjectPtr>& objects,
@@ -82,8 +88,17 @@ class CameraProcessSubnode : public Subnode {
                            const SharedDataPtr<SensorObjects>& sensor_objects,
                            const SharedDataPtr<CameraItem>& camera_item);
 
+  void PublishPerceptionPb(const SharedDataPtr<SensorObjects>& sensor_objects);
+
+  // General
+  std::string device_id_ = "camera";
   SeqId seq_num_ = 0;
-  std::string device_id_;
+  double timestamp_ns_ = 0.0;
+
+  // Publish Peception Pb
+  std::mutex camera_mutex_;
+  bool publish_ = false;
+  apollo::canbus::Chassis chassis_;
 
   // Shared Data
   CameraObjectData* cam_obj_data_;

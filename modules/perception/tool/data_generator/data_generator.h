@@ -48,7 +48,7 @@ namespace data_generator {
 class DataGenerator : public apollo::common::ApolloApp {
  public:
   DataGenerator() = default;
-  ~DataGenerator() = default;
+  ~DataGenerator() { delete data_file_; }
 
   std::string Name() const override;
   apollo::common::Status Init() override;

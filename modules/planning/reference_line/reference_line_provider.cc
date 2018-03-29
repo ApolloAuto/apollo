@@ -290,7 +290,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
           MapPathPoint{Vec2d{path_point.x(), path_point.y()},
                        path_point.theta(),
                        LaneWaypoint(lane_ptr, path_point.s())},
-          path_point.kappa(), path_point.dkappa(), 0.0, 0.0);
+          path_point.kappa(), path_point.dkappa());
     }
     reference_line->emplace_back(ref_points.begin(), ref_points.end());
   }
@@ -541,7 +541,7 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
 
   // shift to left (or right) on wide lanes
   if (!(waypoint.lane->lane().left_boundary().virtual_() ||
-        waypoint.lane->lane().left_boundary().virtual_()) &&
+        waypoint.lane->lane().right_boundary().virtual_()) &&
       total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
     if (smoother_config_.driving_side() == ReferenceLineSmootherConfig::RIGHT) {
       shifted_left_width =

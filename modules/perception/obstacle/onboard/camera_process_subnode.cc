@@ -16,10 +16,6 @@
 
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 
-#include <unordered_map>
-
-#include "modules/perception/traffic_light/util/color_space.h"
-
 namespace apollo {
 namespace perception {
 
@@ -29,7 +25,9 @@ bool CameraProcessSubnode::InitInternal() {
   // Subnode config in DAG streaming
   std::unordered_map<std::string, std::string> fields;
   SubnodeHelper::ParseReserveField(reserve_, &fields);
-  device_id_ = fields["device_id"];
+
+  if (fields.count("device_id")) device_id_ = fields["device_id"];
+  if (fields.count("publish") && stoi(fields["publish"])) publish_ = true;
 
   // Shared Data
   cam_obj_data_ = static_cast<CameraObjectData *>(
@@ -41,8 +39,11 @@ bool CameraProcessSubnode::InitInternal() {
 
   InitModules();
 
-  AdapterManager::AddImageShortCallback(&CameraProcessSubnode::ImgCallback,
+  AdapterManager::AddImageFrontCallback(&CameraProcessSubnode::ImgCallback,
                                         this);
+  if (publish_)
+    AdapterManager::AddChassisCallback(&CameraProcessSubnode::ChassisCallback,
+                                       this);
 
   return true;
 }
@@ -80,7 +81,7 @@ bool CameraProcessSubnode::InitModules() {
   transformer_.reset(BaseCameraTransformerRegisterer::GetInstanceByName(
       "FlatCameraTransformer"));
   transformer_->Init();
-  // transformer_->SetExtrinsics(camera_to_car_);
+  transformer_->SetExtrinsics(camera_to_car_);
 
   filter_.reset(
       BaseCameraFilterRegisterer::GetInstanceByName("ObjectCameraFilter"));
@@ -91,12 +92,13 @@ bool CameraProcessSubnode::InitModules() {
 
 void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   AdapterManager::Observe();
-  sensor_msgs::Image msg = AdapterManager::GetImageShort()->GetLatestObserved();
+  sensor_msgs::Image msg = AdapterManager::GetImageFront()->GetLatestObserved();
 
   double timestamp = msg.header.stamp.toSec();
   AINFO << "CameraProcessSubnode ImgCallback: "
         << " frame: " << ++seq_num_ << " timestamp: ";
   AINFO << std::fixed << std::setprecision(64) << timestamp;
+  timestamp_ns_ = timestamp * 1e9;
 
   cv::Mat img;
   if (!FLAGS_image_file_debug) {
@@ -110,8 +112,8 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
   converter_->Convert(&objects);
-  tracker_->Associate(img, timestamp, &objects);
   transformer_->Transform(&objects);
+  tracker_->Associate(img, timestamp, &objects);
   filter_->Filter(timestamp, &objects);
 
   std::shared_ptr<SensorObjects> out_objs(new SensorObjects);
@@ -122,6 +124,14 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   camera_item_ptr->image_src_mat = img.clone();
   mask.copyTo(out_objs->camera_frame_supplement->lane_map);
   PublishDataAndEvent(timestamp, out_objs, camera_item_ptr);
+
+  if (publish_) PublishPerceptionPb(out_objs);
+}
+
+void CameraProcessSubnode::ChassisCallback(
+    const apollo::canbus::Chassis &message) {
+  std::lock_guard<std::mutex> lock(camera_mutex_);
+  chassis_.CopyFrom(message);
 }
 
 bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
@@ -154,11 +164,24 @@ void CameraProcessSubnode::VisualObjToSensorObj(
   (*sensor_objects)->sensor2world_pose = camera_to_car_;
   ((*sensor_objects)->camera_frame_supplement).reset(new CameraFrameSupplement);
 
+  if (!CameraFrameSupplement::state_vars.initialized_) {
+    CameraFrameSupplement::state_vars.process_noise *= 10;
+    // CameraFrameSupplement::state_vars.measurement_noise *=10;
+    CameraFrameSupplement::state_vars.trans_matrix.block(0, 0, 1, 4) << 1.0f,
+        0.0f, 0.33f, 0.0f;
+    CameraFrameSupplement::state_vars.trans_matrix.block(1, 0, 1, 4) << 0.0f,
+        1.0f, 0.0f, 0.33f;
+    std::cout << "state trans matrix in CameraFrameSupplement is \n"
+              << CameraFrameSupplement::state_vars.trans_matrix << std::endl;
+    CameraFrameSupplement::state_vars.initialized_ = true;
+  }
+
   for (size_t i = 0; i < objects.size(); ++i) {
     VisualObjectPtr vobj = objects[i];
     ObjectPtr obj(new Object());
 
     obj->id = vobj->id;
+    obj->score = vobj->score;
     obj->direction = vobj->direction.cast<double>();
     obj->theta = vobj->theta;
     obj->center = vobj->center.cast<double>();
@@ -175,6 +198,8 @@ void CameraProcessSubnode::VisualObjToSensorObj(
     obj->camera_supplement->upper_left = vobj->upper_left.cast<double>();
     obj->camera_supplement->lower_right = vobj->lower_right.cast<double>();
     obj->camera_supplement->alpha = vobj->alpha;
+    obj->camera_supplement->pts8 = vobj->pts8;
+    obj->state_uncertainty = vobj->state_uncertainty;
     // obj->type_probs.assign(vobj->type_probs,
     //                        vobj->type_probs + MAX_OBJECT_TYPE);
     // obj->camera_supplement->pts8.assign(vobj->pts8,
@@ -187,9 +212,9 @@ void CameraProcessSubnode::VisualObjToSensorObj(
 void CameraProcessSubnode::PublishDataAndEvent(
     const double &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
     const SharedDataPtr<CameraItem> &camera_item) {
-  std::string key = "";
-  SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
-
+//   std::string key = "";
+//   SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
+  CommonSharedDataKey key(timestamp, device_id_);
   cam_obj_data_->Add(key, sensor_objects);
   cam_shared_data_->Add(key, camera_item);
 
@@ -201,6 +226,38 @@ void CameraProcessSubnode::PublishDataAndEvent(
     event.reserve = device_id_;
     event_manager_->Publish(event);
   }
+}
+
+void CameraProcessSubnode::PublishPerceptionPb(
+    const SharedDataPtr<SensorObjects> &sensor_objects) {
+  AINFO << "Camera publish perception pb data";
+  std::lock_guard<std::mutex> lock(camera_mutex_);
+
+  PerceptionObstacles obstacles;
+
+  // Header
+  common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
+      "perception_obstacle", &obstacles);
+  common::Header *header = obstacles.mutable_header();
+  header->set_lidar_timestamp(0);
+  header->set_camera_timestamp(timestamp_ns_);
+  header->set_radar_timestamp(0);
+  obstacles.set_error_code(sensor_objects->error_code);
+
+  // Serialize each Object
+  for (const auto &obj : sensor_objects->objects) {
+    PerceptionObstacle *obstacle = obstacles.add_perception_obstacle();
+    obj->Serialize(obstacle);
+  }
+
+  // Relative speed of objects + latest ego car speed in X
+  for (auto obstacle : obstacles.perception_obstacle()) {
+    obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
+                                       chassis_.speed_mps());
+  }
+
+  common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
+  ADEBUG << "Camera Obstacles: " << obstacles.ShortDebugString();
 }
 
 }  // namespace perception

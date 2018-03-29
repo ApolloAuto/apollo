@@ -49,3 +49,19 @@ landmark {
         }
     }
 }
+
+landmark {
+    name: "Route: Highway Offline Test Only",
+    waypoint {
+        pose {
+            x: 584972.585167,
+            y: 4139873.621994,
+        }
+    }
+   waypoint {
+        pose {
+            x: 583547.686763,
+            y: 4140272.112975,
+        }
+    }
+}

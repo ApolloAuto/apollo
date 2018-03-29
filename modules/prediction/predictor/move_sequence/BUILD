@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/adapters/proto:adapter_config_proto",
-        "//modules/common/math:math_utils",
+        "//modules/common/math:geometry",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
@@ -19,7 +19,7 @@ cc_library(
         "//modules/prediction/container/pose:pose_container",
         "//modules/prediction/predictor/sequence:sequence_predictor",
         "//modules/prediction/proto:lane_graph_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

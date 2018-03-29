@@ -85,7 +85,7 @@ bool Destination::BuildStopDecision(
   const auto& routing_end = *routing.routing_request().waypoint().rbegin();
 
   // create virtual stop wall
-  std::string virtual_obstacle_id = DESTINATION_VO_ID;
+  std::string virtual_obstacle_id = FLAGS_destination_obstacle_id;
   double dest_lane_s =
       std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
                         config_.destination().stop_distance());
@@ -105,7 +105,7 @@ bool Destination::BuildStopDecision(
   // build stop decision
   const auto stop_wall_box = stop_wall->obstacle()->PerceptionBoundingBox();
   if (!reference_line.IsOnRoad(stop_wall_box.center())) {
-    AERROR << "destination point is not on road";
+    ADEBUG << "destination point is not on road";
     return true;
   }
   auto stop_point = reference_line.GetReferencePoint(

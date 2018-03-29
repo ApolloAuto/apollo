@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -30,7 +31,10 @@ namespace apollo {
 namespace perception {
 
 AsyncFusion::AsyncFusion()
-    : started_(false), matcher_(nullptr), track_manager_(nullptr) {}
+        : matcher_(nullptr),
+          track_manager_(nullptr)
+{}
+
 
 AsyncFusion::~AsyncFusion() {
   if (matcher_) {
@@ -79,6 +83,7 @@ bool AsyncFusion::Init() {
   }
   AINFO << "async_fusion max_match_distance: " << max_match_distance;
   PbfBaseTrackObjectMatcher::SetMaxMatchDistance(max_match_distance);
+  PbfTrack::SetMotionFusionMethod("PbfIMFFusion");
   return true;
 }
 
@@ -105,27 +110,27 @@ PbfSensorFramePtr AsyncFusion::ConstructFrame(const SensorObjects &frame) {
 bool AsyncFusion::Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
                        std::vector<ObjectPtr> *fused_objects) {
   ACHECK(fused_objects != nullptr) << "parameter fused_objects is nullptr";
-  ACHECK(multi_sensor_objects.size() == 1);
 
-  // async fusion only process one fusion objects per time
-  const SensorObjects &obj = multi_sensor_objects[0];
+  AINFO << "number of sensor objects in async fusion is "
+        << multi_sensor_objects.size();
 
-  double fusion_time = obj.timestamp;
-  AINFO << "get sensor data " << GetSensorType(obj.sensor_type)
-        << ", obj_cnt : " << obj.objects.size() << ", " << std::fixed
-        << std::setprecision(12) << obj.timestamp;
+  // process all the frames from one of the sensors
+  for (auto obj : multi_sensor_objects) {
+      double fusion_time = obj.timestamp;
+      AINFO << "get sensor data " << GetSensorType(obj.sensor_type)
+            << ", obj_cnt : " << obj.objects.size() << ", " << std::fixed
+            << std::setprecision(12) << obj.timestamp;
 
-  PbfSensorFramePtr frame = ConstructFrame(obj);
+      PbfSensorFramePtr frame = ConstructFrame(obj);
 
-  {
-    fusion_mutex_.lock();
-    FuseFrame(frame);
-    // 4.collect results, we don't need to collect fused_objects unless we have
-    // to
-    CollectFusedObjects(fusion_time, fused_objects);
-    fusion_mutex_.unlock();
+      {
+          fusion_mutex_.lock();
+          FuseFrame(frame);
+          // 4.collect results
+          CollectFusedObjects(fusion_time, fused_objects);
+          fusion_mutex_.unlock();
+      }
   }
-
   return true;
 }
 
@@ -140,17 +145,19 @@ void AsyncFusion::FuseFrame(const PbfSensorFramePtr &frame) {
   std::vector<PbfSensorObjectPtr> background_objects;
   std::vector<PbfSensorObjectPtr> foreground_objects;
   DecomposeFrameObjects(objects, &foreground_objects, &background_objects);
+  AINFO << "There are " << foreground_objects.size() << " foreground objects "
+        << "\n " << background_objects.size() << " background objects";
 
   Eigen::Vector3d ref_point = frame->sensor2world_pose.topRightCorner(3, 1);
-  FuseForegroundObjects(&foreground_objects, ref_point, frame->sensor_type,
-                        frame->sensor_id, frame->timestamp);
+  FuseForegroundObjects(ref_point, frame->sensor_type, frame->sensor_id,
+                        frame->timestamp, &foreground_objects);
   track_manager_->RemoveLostTracks();
 }
 
 void AsyncFusion::CreateNewTracks(
     const std::vector<PbfSensorObjectPtr> &sensor_objects,
     const std::vector<int> &unassigned_ids) {
-  for (size_t i = 0; i < unassigned_ids.size(); i++) {
+  for (size_t i = 0; i < unassigned_ids.size(); ++i) {
     int id = unassigned_ids[i];
     PbfTrackPtr track(new PbfTrack(sensor_objects[id]));
     track_manager_->AddTrack(track);
@@ -158,10 +165,10 @@ void AsyncFusion::CreateNewTracks(
 }
 
 void AsyncFusion::UpdateAssignedTracks(
-    std::vector<PbfTrackPtr> *tracks,
     const std::vector<PbfSensorObjectPtr> &sensor_objects,
     const std::vector<TrackObjectPair> &assignments,
-    const std::vector<double> &track_object_dist) {
+    const std::vector<double> &track_object_dist,
+    std::vector<PbfTrackPtr> const *tracks) {
   for (size_t i = 0; i < assignments.size(); i++) {
     int local_track_index = assignments[i].first;
     int local_obj_index = assignments[i].second;
@@ -192,7 +199,6 @@ void AsyncFusion::CollectFusedObjects(double timestamp,
   int fg_obj_num = 0;
   std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
   for (size_t i = 0; i < tracks.size(); i++) {
-    if (tracks[i]->AbleToPublish()) {
       PbfSensorObjectPtr fused_object = tracks[i]->GetFusedObject();
       ObjectPtr obj(new Object());
       obj->clone(*(fused_object->object));
@@ -201,11 +207,9 @@ void AsyncFusion::CollectFusedObjects(double timestamp,
       obj->tracking_time = tracks[i]->GetTrackingPeriod();
       fused_objects->push_back(obj);
       fg_obj_num++;
-    }
   }
 
-  AINFO << "fg_track_cnt = " << tracks.size();
-  AINFO << "collect objects : fg_obj_cnt = "
+  AINFO << "collect objects : fg_track_cnt = " << tracks.size()
         << ", timestamp = " << GLOG_TIMESTAMP(timestamp);
 }
 
@@ -225,9 +229,9 @@ void AsyncFusion::DecomposeFrameObjects(
 }
 
 void AsyncFusion::FuseForegroundObjects(
-    std::vector<PbfSensorObjectPtr> *foreground_objects,
-    Eigen::Vector3d ref_point, const SensorType &sensor_type,
-    const std::string &sensor_id, double timestamp) {
+    const Eigen::Vector3d &ref_point, const SensorType &sensor_type,
+    const std::string &sensor_id, const double timestamp,
+    std::vector<PbfSensorObjectPtr> *foreground_objects) {
   std::vector<int> unassigned_tracks;
   std::vector<int> unassigned_objects;
   std::vector<TrackObjectPair> assignments;
@@ -249,8 +253,8 @@ void AsyncFusion::FuseForegroundObjects(
         << ", unassigned_track_cnt = " << unassigned_tracks.size()
         << ", unassigned_obj_cnt = " << unassigned_objects.size();
 
-  UpdateAssignedTracks(&tracks, *foreground_objects, assignments,
-                       track2measurements_dist);
+  UpdateAssignedTracks(*foreground_objects, assignments,
+                       track2measurements_dist, &tracks);
 
   UpdateUnassignedTracks(&tracks, unassigned_tracks, track2measurements_dist,
                          sensor_type, sensor_id, timestamp);

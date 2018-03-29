@@ -282,6 +282,7 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
 
 void FusionSubnode::RegistAllAlgorithm() {
   RegisterFactoryProbabilisticFusion();
+  RegisterFactoryAsyncFusion();
 }
 
 void FusionSubnode::OnChassis(const Chassis &chassis) {

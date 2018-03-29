@@ -16,10 +16,13 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 
+#include <algorithm>
+
 #include "boost/format.hpp"
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/macro.h"
+#include "modules/common/time/time_util.h"
 #include "modules/perception/common/geometry_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -42,8 +45,12 @@ double PbfTrack::s_min_radar_confident_distance_ = 40;
 bool PbfTrack::s_publish_if_has_lidar_ = true;
 bool PbfTrack::s_publish_if_has_radar_ = true;
 
-PbfTrack::PbfTrack(PbfSensorObjectPtr obj)
-    : s_motion_fusion_method_("PbfKalmanMotionFusion") {
+using apollo::common::time::TimeUtil;
+
+PbfTrack::MotionFusionMethod PbfTrack::s_motion_fusion_method_ =
+    PbfTrack::MotionFusionMethod::PBF_KALMAN;
+
+PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
   idx_ = GetNextTrackId();
   SensorType sensor_type = obj->sensor_type;
   std::string sensor_id = obj->sensor_id;
@@ -51,9 +58,11 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj)
   invisible_in_radar_ = true;
   invisible_in_camera_ = true;
 
-  // TODO(Perception): fix the duplicated if - else.
-  SetMotionFusionMethod(s_motion_fusion_method_);
-
+  if (s_motion_fusion_method_ == MotionFusionMethod::PBF_KALMAN) {
+    motion_fusion_.reset(new PbfKalmanMotionFusion());
+  } else {
+    motion_fusion_.reset(new PbfIMFFusion());
+  }
   if (is_lidar(sensor_type)) {
     lidar_objects_[sensor_id] = obj;
     motion_fusion_->Initialize(obj);
@@ -64,12 +73,14 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj)
     invisible_in_radar_ = false;
   } else if (is_camera(sensor_type)) {
     camera_objects_[sensor_id] = obj;
+    motion_fusion_->Initialize(obj);
     invisible_in_camera_ = false;
   } else {
     AERROR << "Unsupported sensor type : " << static_cast<int>(sensor_type)
            << ", sensor id : " << sensor_id;
   }
 
+  motion_fusion_->setLastFuseTS(obj->timestamp);
   fused_timestamp_ = obj->timestamp;
   fused_object_.reset(new PbfSensorObject());
   fused_object_->clone(*obj);
@@ -79,13 +90,13 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj)
   is_dead_ = false;
 }
 
-void PbfTrack::SetMotionFusionMethod(const std::string motion_fusion_method) {
-  s_motion_fusion_method_ = motion_fusion_method;
-
+void PbfTrack::SetMotionFusionMethod(const std::string &motion_fusion_method) {
   if (motion_fusion_method == "PbfKalmanMotionFusion") {
-    motion_fusion_.reset(new PbfKalmanMotionFusion());
+    s_motion_fusion_method_ = MotionFusionMethod::PBF_KALMAN;
+  } else if (motion_fusion_method == "PbfIMFFusion") {
+    s_motion_fusion_method_ = MotionFusionMethod::PBF_IMF;
   } else {
-    motion_fusion_.reset(new PbfIMFFusion());
+    AERROR << "Unknown motion fusion method.";
   }
 }
 
@@ -95,7 +106,11 @@ void PbfTrack::UpdateWithSensorObject(PbfSensorObjectPtr obj,
                                       double match_dist) {
   const SensorType &sensor_type = obj->sensor_type;
   const std::string sensor_id = obj->sensor_id;
-  PerformMotionFusion(obj);
+  if (FLAGS_async_fusion) {
+    PerformMotionFusionAsync(obj);
+  } else {
+    PerformMotionFusion(obj);
+  }
 
   if (is_lidar(sensor_type)) {
     lidar_objects_[sensor_id] = obj;
@@ -153,17 +168,11 @@ void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
   }
 }
 
-int PbfTrack::GetTrackId() const {
-  return idx_;
-}
+int PbfTrack::GetTrackId() const { return idx_; }
 
-PbfSensorObjectPtr PbfTrack::GetFusedObject() {
-  return fused_object_;
-}
+PbfSensorObjectPtr PbfTrack::GetFusedObject() { return fused_object_; }
 
-double PbfTrack::GetFusedTimestamp() const {
-  return fused_timestamp_;
-}
+double PbfTrack::GetFusedTimestamp() const { return fused_timestamp_; }
 
 PbfSensorObjectPtr PbfTrack::GetLidarObject(const std::string &sensor_id) {
   PbfSensorObjectPtr obj = nullptr;
@@ -192,34 +201,44 @@ PbfSensorObjectPtr PbfTrack::GetCameraObject(const std::string &sensor_id) {
   return obj;
 }
 
-void PbfTrack::PerformMotionFusionLowCost(PbfSensorObjectPtr obj) {
+void PbfTrack::PerformMotionFusionAsync(PbfSensorObjectPtr obj) {
   if (motion_fusion_ == nullptr) {
     AERROR << "Skip motion fusion becuase motion_fusion_ is nullptr.";
     return;
   }
-
+  AINFO << "perform motion fusion asynchrounously!";
   const SensorType &sensor_type = obj->sensor_type;
-  double time_diff = obj->timestamp - fused_object_->timestamp;
+
+  double current_time = TimeUtil::GetCurrentTime();
+  if (FLAGS_bag_mode) {
+    // if running in bag, we can't estimate fusion arrival time correctly
+    current_time =
+        std::max(motion_fusion_->getLastFuseTS(), obj->timestamp) + 0.1;
+  }
 
   // for low cost, we only consider radar and camera fusion for now
   if (is_camera(sensor_type) || is_radar(sensor_type)) {
+    Eigen::Vector3d velocity = Eigen::Vector3d::Zero();
+
+    motion_fusion_->setCurrentFuseTS(current_time);
     if (motion_fusion_->Initialized()) {
+      double time_diff = motion_fusion_->getFuseTimeDiff();
       motion_fusion_->UpdateWithObject(obj, time_diff);
-      Eigen::Vector3d anchor_point;
-      Eigen::Vector3d velocity;
-      Eigen::Vector3d pre_anchor_point;
-      Eigen::Vector3d pre_velocity;
-      motion_fusion_->GetState(&pre_anchor_point, &pre_velocity);
-      motion_fusion_->UpdateWithObject(obj, time_diff);
-      motion_fusion_->GetState(&anchor_point, &velocity);
-      fused_object_->object->velocity = velocity;
-      Eigen::Vector3d translation = anchor_point - pre_anchor_point;
-      fused_object_->object->anchor_point = anchor_point;
-      fused_object_->object->center += translation;
-      fused_object_->object->velocity = velocity;
     } else {
       motion_fusion_->Initialize(obj);
+      current_time = obj->timestamp;  // for initialize, we set fusion time to
+                                      // sensor timestamp
     }
+    Eigen::Vector3d anchor_point;
+    motion_fusion_->GetState(&anchor_point, &velocity);
+    fused_object_->object->velocity = velocity;
+    fused_object_->object->anchor_point = anchor_point;
+    fused_object_->object->center = anchor_point;
+    // updated by arrival time of sensor object
+    fused_object_->timestamp = current_time;
+    ADEBUG << "fused object in pbftrack is "
+           << fused_object_->object->ToString();
+    motion_fusion_->setLastFuseTS(current_time);
   }
 }
 
@@ -422,12 +441,26 @@ PbfSensorObjectPtr PbfTrack::GetLatestRadarObject() {
   return radar_object;
 }
 
+PbfSensorObjectPtr PbfTrack::GetLatestCameraObject() {
+  PbfSensorObjectPtr camera_object;
+  for (auto it = camera_objects_.begin(); it != camera_objects_.end(); ++it) {
+    if (camera_object == nullptr) {
+      camera_object = it->second;
+    } else if (camera_object->timestamp < it->second->timestamp) {
+      camera_object = it->second;
+    }
+  }
+  return camera_object;
+}
+
 PbfSensorObjectPtr PbfTrack::GetSensorObject(const SensorType &sensor_type,
                                              const std::string &sensor_id) {
   if (is_lidar(sensor_type)) {
     return GetLidarObject(sensor_id);
   } else if (is_radar(sensor_type)) {
     return GetRadarObject(sensor_id);
+  } else if (is_camera(sensor_type)) {
+    return GetCameraObject(sensor_id);
   } else {
     AERROR << "Unsupported sensor type.";
     return nullptr;

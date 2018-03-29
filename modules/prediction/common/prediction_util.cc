@@ -59,6 +59,62 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
   return 0;
 }
 
+double EvaluateQuinticPolynomial(
+    const std::array<double, 6>& coeffs,
+    const double t, const uint32_t order) {
+  switch (order) {
+    case 0: {
+      return ((((coeffs[5] * t + coeffs[4]) * t + coeffs[3]) * t +
+               coeffs[2]) * t + coeffs[1]) * t + coeffs[0];
+    }
+    case 1: {
+      return (((5.0 * coeffs[5] * t + 4.0 * coeffs[4]) * t +
+               3.0 * coeffs[3]) * t + 2.0 * coeffs[2]) * t + coeffs[1];
+    }
+    case 2: {
+      return (((20.0 * coeffs[5] * t + 12.0 * coeffs[4]) * t) +
+              6.0 * coeffs[3]) * t + 2.0 * coeffs[2];
+    }
+    case 3: {
+      return (60.0 * coeffs[5] * t + 24.0 * coeffs[4]) * t + 6.0 * coeffs[3];
+    }
+    case 4: {
+      return 120.0 * coeffs[5] * t + 24.0 * coeffs[4];
+    }
+    case 5: {
+      return 120.0 * coeffs[5];
+    }
+    default:
+      return 0.0;
+  }
+}
+
+double EvaluateQuarticPolynomial(
+    const std::array<double, 5>& coeffs,
+    const double t, const uint32_t order) {
+  switch (order) {
+    case 0: {
+      return (((coeffs[4] * t + coeffs[3]) * t + coeffs[2]) * t +
+              coeffs[1]) * t + coeffs[0];
+    }
+    case 1: {
+      return ((4.0 * coeffs[4] * t + 3.0 * coeffs[3]) * t +
+              2.0 * coeffs[2]) * t + coeffs[1];
+    }
+    case 2: {
+      return (12.0 * coeffs[4] * t + 6.0 * coeffs[3]) * t + 2.0 * coeffs[2];
+    }
+    case 3: {
+      return 24.0 * coeffs[4] * t + 6.0 * coeffs[3];
+    }
+    case 4: {
+      return 24.0 * coeffs[4];
+    }
+    default:
+      return 0.0;
+  }
+}
+
 }  // namespace math_util
 
 namespace predictor_util {

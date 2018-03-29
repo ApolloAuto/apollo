@@ -146,6 +146,9 @@ class GLFWFusionViewer {
 
   void draw_car_trajectory(FrameContent *content);
   void draw_trajectories(FrameContent *content);
+
+  void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius);
+
   // for drawing camera 2d results
  protected:
   // @brief Get camera intrinsics with distortion coefficients from file
@@ -264,6 +267,12 @@ class GLFWFusionViewer {
   // @brief, draw 2d camera frame, show 2d or 3d classification
   void draw_camera_frame(FrameContent *content, bool show_3d_class);
 
+  // @brief: draw lane objects in ego-car ground (vehicle) space
+  void draw_lane_objects_ground();
+
+  // @brief: draw lane objects in image space
+  bool draw_lane_objects_image();
+
   bool use_class_color_ = true;
 
   bool capture_screen_ = false;
@@ -276,10 +285,11 @@ class GLFWFusionViewer {
 
   Eigen::Matrix<double, 3, 4> camera_intrinsic_;  // camera intrinsic
 
-  bool show_fusion_pc_;
+  bool show_fusion_;
   bool show_radar_pc_;
-  bool _show_camera_box2d;     // show 2d bbox in camera frame
-  bool _show_camera_box3d;     // show 3d bbox in camera frame
+  bool show_camera_box2d_;     // show 2d bbox in camera frame
+  bool show_camera_box3d_;     // show 3d bbox in camera frame
+  bool show_camera_bdv_;
   bool show_associate_color_;  // show same color for both 3d pc bbox and camera
                                // bbox
   bool show_type_id_label_;
@@ -288,6 +298,9 @@ class GLFWFusionViewer {
 
   static std::vector<std::vector<int>> s_color_table;
   std::shared_ptr<GLRasterText> raster_text_;
+
+  LaneObjectsPtr lane_objects_;
+  float lane_map_threshold_;
 
   // pin-hole camera model with distortion
   std::shared_ptr<CameraDistort<double>> distort_camera_intrinsic_;

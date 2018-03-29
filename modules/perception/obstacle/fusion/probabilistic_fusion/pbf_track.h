@@ -58,6 +58,8 @@ class PbfTrack {
   PbfSensorObjectPtr GetLatestLidarObject();
   /**@brief get latest lidar measurement for multi radar sensors*/
   PbfSensorObjectPtr GetLatestRadarObject();
+  /**@brief get latest camera measurement for multi camera sensors*/
+  PbfSensorObjectPtr GetLatestCameraObject();
 
   int GetTrackId() const;
 
@@ -74,6 +76,14 @@ class PbfTrack {
 
   static double GetMaxLidarInvisiblePeriod() {
     return s_max_lidar_invisible_period_;
+  }
+
+  static void SetMaxCameraInvisiblePeriod(double period) {
+    s_max_camera_invisible_period_ = period;
+  }
+
+  static double GetMaxCameraInvisiblePeriod() {
+    return s_max_camera_invisible_period_;
   }
 
   static void SetMaxRadarInvisiblePeriod(double period) {
@@ -103,7 +113,7 @@ class PbfTrack {
     s_publish_if_has_radar_ = enabled;
   }
 
-  void SetMotionFusionMethod(const std::string motion_fusion_method);
+  static void SetMotionFusionMethod(const std::string &motion_fusion_method);
 
  protected:
   /**@brief use obj's velocity to update obj's location to input timestamp*/
@@ -111,7 +121,7 @@ class PbfTrack {
 
   void PerformMotionFusion(PbfSensorObjectPtr obj);
 
-  void PerformMotionFusionLowCost(PbfSensorObjectPtr obj);
+  void PerformMotionFusionAsync(PbfSensorObjectPtr obj);
 
   void UpdateMeasurementsLifeWithMeasurement(
       std::map<std::string, PbfSensorObjectPtr> *objects,
@@ -162,7 +172,13 @@ class PbfTrack {
   // radar confidant regions
   static double s_max_radar_confident_angle_;
   static double s_min_radar_confident_distance_;
-  std::string s_motion_fusion_method_;
+
+  enum class MotionFusionMethod {
+    PBF_KALMAN = 1,
+    PBF_IMF = 2,
+    UNKNOWN = 3,
+  };
+  static MotionFusionMethod s_motion_fusion_method_;
 
   // publish conditions
   static bool s_publish_if_has_lidar_;

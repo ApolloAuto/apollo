@@ -68,16 +68,15 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
 
   // velocity samples consists of 10 equally distributed samples plus ego's
   // current velocity
-  constexpr std::size_t num_velocity_section = 6;
 
   double velocity_upper = std::max(ref_cruise_speed, init_s_[1]);
   double velocity_lower = 0.0;
   double velocity_seg =
-      (velocity_upper - velocity_lower) / (num_velocity_section - 2);
+      (velocity_upper - velocity_lower) / (FLAGS_num_velocity_sample - 2);
 
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
   for (const auto& time : time_sections) {
-    for (std::size_t i = 0; i + 1 < num_velocity_section; ++i) {  // velocity
+    for (std::size_t i = 0; i + 1 < FLAGS_num_velocity_sample; ++i) {
       std::array<double, 3> end_s;
       end_s[0] = 0.0;  // this will not be used in QuarticPolynomial
       end_s[1] = velocity_seg * i;
@@ -88,8 +87,9 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
       }
       end_s_conditions.emplace_back(end_s, time);
     }
-    std::array<double, 3> end_s = {0.0, init_s_[1], 0.0};
-    end_s_conditions.emplace_back(end_s, time);
+    // Add cruise as current speed
+    std::array<double, 3> end_s_as_current_speed{0.0, init_s_[1], 0.0};
+    end_s_conditions.emplace_back(end_s_as_current_speed, time);
   }
   return end_s_conditions;
 }

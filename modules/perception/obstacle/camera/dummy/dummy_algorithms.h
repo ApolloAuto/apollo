@@ -82,7 +82,7 @@ class DummyCameraTracker : public BaseCameraTracker {
   }
   */
 
-  bool Associate(const cv::Mat& img, const float& timestamp,
+  bool Associate(const cv::Mat& img, const double& timestamp,
                  std::vector<VisualObjectPtr>* objects) override {
     return true;
   }
@@ -101,6 +101,10 @@ class DummyCameraTransformer : public BaseCameraTransformer {
   bool Init() override { return true; }
 
   bool Transform(std::vector<VisualObjectPtr>* objects) override {
+    return true;
+  }
+
+  bool SetExtrinsics(const Eigen::Matrix<double, 4, 4>& extrinsics) override {
     return true;
   }
 

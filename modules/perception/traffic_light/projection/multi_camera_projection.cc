@@ -30,7 +30,7 @@ bool MultiCamerasProjection::Init() {
   ConfigManager *config_manager = ConfigManager::instance();
   std::string model_name = "MultiCamerasProjection";
   const ModelConfig *model_config = config_manager->GetModelConfig(model_name);
-  if (config_manager == nullptr) {
+  if (model_config == nullptr) {
     AERROR << "not found model: " << model_name;
     return false;
   }

@@ -24,7 +24,7 @@ cc_library(
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/math:vec2d",
+        "//modules/common/math:geometry",
         "//modules/common/monitor_log",
         "//modules/common/status",
         "//modules/common/util",

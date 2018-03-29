@@ -74,7 +74,7 @@ class MapNavigator {
             text: "CarView ON",
             tip: "Click to recenter the vehicle",
             color: "#FFFFFF",
-            offsetX: 430,
+            offsetX: 130,
             offsetY: 0,
             onClickHandler: textElementDiv => {
                 if (this.centerVehicle) {
@@ -93,7 +93,7 @@ class MapNavigator {
             text: "Route",
             tip: "Click to send routing request",
             color: "#CD5C5C",
-            offsetX: 298,
+            offsetX: 235,
             offsetY: 0,
             onClickHandler: textElementDiv => {
                 if (!this.destinationMarker) {
@@ -137,7 +137,9 @@ class MapNavigator {
         const y = autoDrivingCar.positionY;
         const heading = autoDrivingCar.heading;
 
-        const [longitude, latitude] = UTMToWGS84(x, y);
+        const [longitude, latitude] = this.mapAdapter.applyCoordinateOffset(
+            UTMToWGS84(x, y)
+        );
         const latLng = this.mapAdapter.createPoint({
             lat: latitude,
             lng: longitude,
@@ -169,7 +171,9 @@ class MapNavigator {
             const y = polyval(markerCoef, x);
             const newX = x * Math.cos(heading) - y * Math.sin(heading);
             const newY = y * Math.cos(heading) + x * Math.sin(heading);
-            const [plon, plat] = UTMToWGS84(adcX + newX, adcY + newY);
+            const [plon, plat] = this.mapAdapter.applyCoordinateOffset(
+                UTMToWGS84(adcX + newX, adcY + newY)
+            );
             lane.push(this.mapAdapter.createPoint({ lat: plat, lng: plon }));
         }
         return lane;
@@ -209,7 +213,9 @@ class MapNavigator {
             const y = point.positionY;
             const newX = x * Math.cos(heading) - y * Math.sin(heading);
             const newY = y * Math.cos(heading) + x * Math.sin(heading);
-            const [plon, plat] = UTMToWGS84(adcX + newX, adcY + newY);
+            const [plon, plat] = this.mapAdapter.applyCoordinateOffset(
+                UTMToWGS84(adcX + newX, adcY + newY)
+            );
             return this.mapAdapter.createPoint({ lat: plat, lng: plon });
         });
 
@@ -227,7 +233,9 @@ class MapNavigator {
 
         const paths = navigationPaths.map(navigationPath => {
             return navigationPath.pathPoint.map(point => {
-                const [lng, lat] = UTMToWGS84(point.x, point.y);
+                const [lng, lat] = this.mapAdapter.applyCoordinateOffset(
+                    UTMToWGS84(point.x, point.y)
+                );
                 return this.mapAdapter.createPoint({ lat: lat, lng: lng });
             });
         });
@@ -297,7 +305,9 @@ class MapNavigator {
 
     addDefaultEndPoint(points) {
         points.forEach(point => {
-            const [lng, lat] = UTMToWGS84(point.x, point.y);
+            const [lng, lat] = this.mapAdapter.applyCoordinateOffset(
+                UTMToWGS84(point.x, point.y)
+            );
             this.routingRequestPoints.push({ lat: lat, lng: lng });
         });
     }

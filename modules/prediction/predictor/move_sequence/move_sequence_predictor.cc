@@ -45,6 +45,8 @@ using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::adapter::AdapterConfig;
 using ::apollo::common::math::KalmanFilter;
 using ::apollo::hdmap::LaneInfo;
+using ::apollo::prediction::math_util::EvaluateQuinticPolynomial;
+using ::apollo::prediction::math_util::EvaluateQuarticPolynomial;
 
 void MoveSequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
@@ -104,14 +106,6 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
     const double total_time, const double period,
     std::vector<TrajectoryPoint>* points) {
   points->clear();
-  DrawManeuverTrajectoryPoints(obstacle, lane_sequence, total_time, period,
-                               points);
-}
-
-void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
-    const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double total_time, const double period,
-    std::vector<TrajectoryPoint>* points) {
   const Feature& feature = obstacle.latest_feature();
   if (!feature.has_position() || !feature.has_velocity() ||
       !feature.position().has_x() || !feature.position().has_y()) {
@@ -152,14 +146,14 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
     Eigen::Vector2d point;
     double theta = M_PI;
     if (i < num_to_center) {
-      lane_l = EvaluateLateralPolynomial(lateral_coeffs, relative_time, 0);
+      lane_l = EvaluateQuinticPolynomial(lateral_coeffs, relative_time, 0);
     } else {
       lane_l = 0.0;
     }
     double curr_s =
-        EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 0);
+        EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 0);
     double prev_s = (i > 0)
-                        ? EvaluateLongitudinalPolynomial(
+                        ? EvaluateQuarticPolynomial(
                               longitudinal_coeffs, relative_time - period, 0)
                         : 0.0;
     lane_s += std::max(0.0, (curr_s - prev_s));
@@ -175,9 +169,9 @@ void MoveSequencePredictor::DrawManeuverTrajectoryPoints(
 
     prev_lane_l = lane_l;
     double lane_speed =
-        EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 1);
+        EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 1);
     double lane_acc =
-        EvaluateLongitudinalPolynomial(longitudinal_coeffs, relative_time, 2);
+        EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 2);
 
     TrajectoryPoint trajectory_point;
     PathPoint path_point;
@@ -280,70 +274,6 @@ void MoveSequencePredictor::GetLateralPolynomial(
   coefficients->operator[](5) = (6.0 * c0 - 3.0 * c1 + 0.5 * c2) / p2;
 }
 
-double MoveSequencePredictor::EvaluateLateralPolynomial(
-    const std::array<double, 6>& coeffs, const double t, const uint32_t order) {
-  switch (order) {
-    case 0: {
-      return ((((coeffs[5] * t + coeffs[4]) * t + coeffs[3]) * t + coeffs[2]) *
-                  t +
-              coeffs[1]) *
-                 t +
-             coeffs[0];
-    }
-    case 1: {
-      return (((5.0 * coeffs[5] * t + 4.0 * coeffs[4]) * t + 3.0 * coeffs[3]) *
-                  t +
-              2.0 * coeffs[2]) *
-                 t +
-             coeffs[1];
-    }
-    case 2: {
-      return (((20.0 * coeffs[5] * t + 12.0 * coeffs[4]) * t) +
-              6.0 * coeffs[3]) *
-                 t +
-             2.0 * coeffs[2];
-    }
-    case 3: {
-      return (60.0 * coeffs[5] * t + 24.0 * coeffs[4]) * t + 6.0 * coeffs[3];
-    }
-    case 4: {
-      return 120.0 * coeffs[5] * t + 24.0 * coeffs[4];
-    }
-    case 5: {
-      return 120.0 * coeffs[5];
-    }
-    default:
-      return 0.0;
-  }
-}
-
-double MoveSequencePredictor::EvaluateLongitudinalPolynomial(
-    const std::array<double, 5>& coeffs, const double t, const uint32_t order) {
-  switch (order) {
-    case 0: {
-      return (((coeffs[4] * t + coeffs[3]) * t + coeffs[2]) * t + coeffs[1]) *
-                 t +
-             coeffs[0];
-    }
-    case 1: {
-      return ((4.0 * coeffs[4] * t + 3.0 * coeffs[3]) * t + 2.0 * coeffs[2]) *
-                 t +
-             coeffs[1];
-    }
-    case 2: {
-      return (12.0 * coeffs[4] * t + 6.0 * coeffs[3]) * t + 2.0 * coeffs[2];
-    }
-    case 3: {
-      return 24.0 * coeffs[4] * t + 6.0 * coeffs[3];
-    }
-    case 4: {
-      return 24.0 * coeffs[4];
-    }
-    default:
-      return 0.0;
-  }
-}
-
 double MoveSequencePredictor::ComputeTimeToLaneCenterBySampling(
     const Obstacle& obstacle, const LaneSequence& lane_sequence) {
   std::vector<double> candidate_times;
@@ -394,8 +324,8 @@ double MoveSequencePredictor::Cost(
     const std::array<double, 5>& longitudinal_coeffs) {
   double alpha = FLAGS_cost_alpha;
   double left_end =
-      std::fabs(EvaluateLateralPolynomial(lateral_coeffs, 0.0, 2));
-  double right_end = std::fabs(EvaluateLateralPolynomial(lateral_coeffs, t, 2));
+      std::fabs(EvaluateQuinticPolynomial(lateral_coeffs, 0.0, 2));
+  double right_end = std::fabs(EvaluateQuinticPolynomial(lateral_coeffs, t, 2));
   double normal_min_acc = std::min(left_end, right_end);
   std::pair<double, double> mid_t_pair;
   int solved = apollo::prediction::math_util::SolveQuadraticEquation(
@@ -406,9 +336,9 @@ double MoveSequencePredictor::Cost(
     return alpha * normal_min_acc + t;
   }
   double mid_0 =
-      std::fabs(EvaluateLateralPolynomial(lateral_coeffs, mid_t_pair.first, 2));
+      std::fabs(EvaluateQuinticPolynomial(lateral_coeffs, mid_t_pair.first, 2));
   double mid_1 = std::fabs(
-      EvaluateLateralPolynomial(lateral_coeffs, mid_t_pair.second, 2));
+      EvaluateQuinticPolynomial(lateral_coeffs, mid_t_pair.second, 2));
   normal_min_acc = std::max(normal_min_acc, std::max(mid_0, mid_1));
   return normal_min_acc + alpha * t;
 }

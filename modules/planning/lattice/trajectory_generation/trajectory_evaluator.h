@@ -70,10 +70,11 @@ class TrajectoryEvaluator {
 
   std::vector<double> top_trajectory_pair_component_cost() const;
 
-  std::vector<double> evaluate_per_lonlat_trajectory(
+  double EvaluateDiscreteTrajectory(
       const PlanningTarget& planning_target,
-      const std::vector<common::SpeedPoint> st_points,
-      const std::vector<common::FrenetFramePoint> sl_points);
+      const std::vector<apollo::common::SpeedPoint>& st_points,
+      const std::vector<apollo::common::FrenetFramePoint>& sl_points,
+      std::vector<double>* cost_components);
 
  private:
   double Evaluate(const PlanningTarget& planning_target,
@@ -84,22 +85,46 @@ class TrajectoryEvaluator {
   double LatOffsetCost(const std::shared_ptr<Curve1d>& lat_trajectory,
                        const std::vector<double>& s_values) const;
 
+  double LatOffsetCost(
+      const std::vector<apollo::common::FrenetFramePoint> sl_points) const;
+
   double LatComfortCost(const std::shared_ptr<Curve1d>& lon_trajectory,
                         const std::shared_ptr<Curve1d>& lat_trajectory) const;
 
+  double LatComfortCost(
+      const std::vector<apollo::common::FrenetFramePoint>& sl_points) const;
+
   double LonComfortCost(const std::shared_ptr<Curve1d>& lon_trajectory) const;
 
+  double LonComfortCost(
+      const std::vector<apollo::common::SpeedPoint>& st_points) const;
+
   double LonCollisionCost(const std::shared_ptr<Curve1d>& lon_trajectory) const;
+
+  double LonCollisionCost(
+      const std::vector<apollo::common::SpeedPoint>& st_points) const;
 
   double LonObjectiveCost(const std::shared_ptr<Curve1d>& lon_trajectory,
                           const PlanningTarget& planning_target,
                           const std::vector<double>& ref_s_dot) const;
 
+  double LonObjectiveCost(
+      const std::vector<apollo::common::SpeedPoint>& st_points,
+      const PlanningTarget& planning_target,
+      const std::vector<double>& ref_s_dots) const;
+
   double CentripetalAccelerationCost(
       const std::shared_ptr<Curve1d>& lon_trajectory) const;
 
+  double CentripetalAccelerationCost(
+      const std::vector<apollo::common::SpeedPoint>& st_points) const;
+
   std::vector<double> ComputeLongitudinalGuideVelocity(
       const PlanningTarget& planning_target) const;
+
+  bool InterpolateDenseStPoints(
+      const std::vector<apollo::common::SpeedPoint>& st_points,
+      double t, double *traj_s) const;
 
   struct CostComparator
       : public std::binary_function<const PairCost&, const PairCost&, bool> {

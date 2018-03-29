@@ -26,6 +26,7 @@
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 
 using std::shared_ptr;
 using std::string;
@@ -39,18 +40,6 @@ DEFINE_string(test_dir,
               "test data directory");
 
 static const cv::Scalar lane_mask_color(0, 255, 255);  // yellow
-
-template <typename T = float>
-T GetPolyValue(T a, T b, T c, T d, T x) {
-  T y = d;
-  T v = x;
-  y += (c * v);
-  v *= x;
-  y += (b * v);
-  v *= x;
-  y += (a * v);
-  return y;
-}
 
 class CCLanePostProcessorTest : public ::testing::Test {
  protected:

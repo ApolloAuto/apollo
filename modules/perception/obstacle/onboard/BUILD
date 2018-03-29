@@ -131,10 +131,14 @@ cc_library(
     name = "fusion_subnode",
     srcs = [
         "fusion_subnode.cc",
+        "async_fusion_subnode.cc",
     ],
     hdrs = [
         "fusion_subnode.h",
+        "async_fusion_subnode.h",
         "object_shared_data.h",
+        "fusion_shared_data.h",
+        "lane_shared_data.h",
     ],
     deps = [
         ":hdmapinput",
@@ -144,6 +148,7 @@ cc_library(
         "//modules/common/time",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/fusion/probabilistic_fusion",
+        "//modules/perception/obstacle/fusion/async_fusion",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
         "//modules/perception/onboard",
@@ -183,6 +188,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/fusion/probabilistic_fusion",
+        "//modules/perception/obstacle/fusion/async_fusion",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
         "//modules/perception/obstacle/onboard:lidar_process",
@@ -201,9 +207,11 @@ cc_library(
     hdrs = [
         "camera_shared_data.h",
         "fusion_shared_data.h",
+        "lane_shared_data.h",
     ],
     deps = [
         "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/lane_post_process/common:type",
         "//modules/perception/onboard",
     ],
 )
@@ -217,6 +225,7 @@ cc_library(
         "object_shared_data.h",
     ],
     deps = [
+        ":perception_obstacle_shared_data",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/time",
@@ -225,8 +234,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/interface",
-        "//modules/perception/obstacle/onboard:perception_obstacle_shared_data",
-        "//modules/perception/onboard",
+        "//modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor",
         "@eigen",
         "@opencv2//:core",
     ],

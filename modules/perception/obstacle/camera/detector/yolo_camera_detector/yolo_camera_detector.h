@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_CAMERA_DETECTOR_H_
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>

@@ -63,6 +63,8 @@ class CIPVSubnode : public Subnode {
   DISALLOW_COPY_AND_ASSIGN(CIPVSubnode);
 };
 
+REGISTER_SUBNODE(CIPVSubnode);
+
 }  // namespace perception
 }  // namespace apollo
 

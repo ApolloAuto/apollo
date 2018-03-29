@@ -57,6 +57,7 @@ void GetDetectedFromVO(const cv::Size &sz, const float &scale,
     obj.detect_id_ = i;
     obj.box_ = cv::Rect(x, y, width, height);
     obj.features_ = obj_ptr->object_feature;
+    obj.center_ = obj_ptr->center;
     detected->emplace_back(obj);
     ++i;
   }
@@ -130,9 +131,8 @@ void FilterAffinityMatrix(float high_threshold, float other_threshold,
 void MatrixMatching(const std::vector<std::vector<float>> &affinity_matrix,
                     std::unordered_map<int, int> *local_matching,
                     std::unordered_set<int> *local_matched_detected) {
-  if (affinity_matrix.empty()) {
-    return;
-  }
+  if (affinity_matrix.empty()) return;
+  const float kMinAcceptThreshold = 0.05f;
 
   // Matching with one stage affinity matrix (Maximize the affinity)
   std::vector<std::vector<double>> affinity(
@@ -151,12 +151,11 @@ void MatrixMatching(const std::vector<std::vector<float>> &affinity_matrix,
   // !! Cautious about corner cases when the entry in affinity matrix is 0
   // This Hungarian method implementation will still give matching for the
   // remaining with 0
-
   local_matching->clear();
   local_matched_detected->clear();
   for (size_t i = 0; i < agent.size(); ++i) {
     // Ignore 0-matching
-    if (affinity_matrix[agent[i]][task[i]] > 0.0f) {
+    if (affinity_matrix[agent[i]][task[i]] > kMinAcceptThreshold) {
       (*local_matching)[agent[i]] = task[i];
       local_matched_detected->emplace(task[i]);
     }
@@ -167,11 +166,12 @@ void ManageTrackerAndID(
     const std::unordered_map<int, int> &local_matching,
     const std::unordered_set<int> &local_matched_detected,
     const std::vector<Detected> &detected, const int &frame_idx,
-    const float &timestamp, std::vector<Tracked> *tracked, int *next_tracked_id,
-    std::unordered_map<int, std::pair<int, float>> *id_mapping) {
+    const double &timestamp, std::vector<Tracked> *tracked,
+    int *next_tracked_id,
+    std::unordered_map<int, std::pair<int, double>> *id_mapping) {
   id_mapping->clear();
   std::vector<Tracked> new_tracked;
-  const int kMaxKeptFrame = 10;
+  const int kMaxKeptFrame = 3;
 
   // Sort local matching output based on tracked_id for easier debugging
   std::map<int, std::pair<int, int>> tracked_id_local_index;
@@ -179,8 +179,7 @@ void ManageTrackerAndID(
     int track_id = (*tracked)[pair.first].track_id_;
 
     if (tracked_id_local_index.find(track_id) == tracked_id_local_index.end()) {
-      tracked_id_local_index[track_id] =
-          std::make_pair(pair.first, pair.second);
+      tracked_id_local_index[track_id] = pair;
     } else {
       AWARN << "Should not contain duplicated tracked id";
     }
@@ -189,10 +188,12 @@ void ManageTrackerAndID(
   // Update tracked, which is sorted by track_id
   std::unordered_map<int, int> trackedID_to_detectedID;
   for (const auto &item : tracked_id_local_index) {
-    int track_id =
-        (*tracked)[item.second.first].track_id_;  // The same as item.first
-    float first_timestamp = (*tracked)[item.second.first].first_timestamp_;
-    int d_id = detected[item.second.second].detect_id_;
+    int row = item.second.first;
+    int col = item.second.second;
+
+    int track_id = item.first;
+    int d_id = detected[col].detect_id_;
+    double first_timestamp = (*tracked)[row].first_timestamp_;
 
     Tracked curr_tracked;
     curr_tracked.last_frame_idx_ = frame_idx;
@@ -200,7 +201,8 @@ void ManageTrackerAndID(
     curr_tracked.last_timestamp_ = timestamp;
     curr_tracked.track_id_ = track_id;
     curr_tracked.detect_id_ = d_id;
-    curr_tracked.box_ = detected[item.second.second].box_;
+    curr_tracked.box_ = detected[col].box_;
+    curr_tracked.center_ = detected[col].center_;
     new_tracked.emplace_back(curr_tracked);
 
     (*id_mapping)[d_id] = std::make_pair(track_id, first_timestamp);
@@ -209,7 +211,7 @@ void ManageTrackerAndID(
 
   // Create new tracked based on unmatched detected
   for (size_t i = 0; i < detected.size(); ++i) {
-    if (local_matched_detected.find(i) == local_matched_detected.end()) {
+    if (!local_matched_detected.count(i)) {
       int d_id = detected[i].detect_id_;
 
       Tracked curr_tracked;
@@ -219,6 +221,7 @@ void ManageTrackerAndID(
       curr_tracked.track_id_ = *next_tracked_id;
       curr_tracked.detect_id_ = d_id;
       curr_tracked.box_ = detected[i].box_;
+      curr_tracked.center_ = detected[i].center_;
       new_tracked.emplace_back(curr_tracked);
 
       (*id_mapping)[d_id] = std::make_pair(*next_tracked_id, timestamp);

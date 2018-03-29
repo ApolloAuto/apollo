@@ -23,13 +23,19 @@
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 #include "modules/perception/obstacle/onboard/fusion_subnode.h"
+#include "modules/perception/obstacle/onboard/async_fusion_subnode.h"
+#include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
+#include "modules/perception/obstacle/onboard/lane_shared_data.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
+#include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 #include "modules/perception/obstacle/onboard/radar_process_subnode.h"
-#include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 #include "modules/perception/obstacle/onboard/visualization_subnode.h"
+#include "modules/perception/obstacle/onboard/cipv_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_preprocessor_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_proc_subnode.h"
 
@@ -74,12 +80,20 @@ void Perception::RegistAllOnboardClass() {
   RegisterFactoryRadarObjectData();
   RegisterFactoryCameraObjectData();
   RegisterFactoryCameraSharedData();
+  RegisterFactoryCIPVObjectData();
+  RegisterFactoryLaneSharedData();
+  RegisterFactoryFusionSharedData();
   traffic_light::RegisterFactoryTLPreprocessingData();
+
   /// regist subnode
   RegisterFactoryLidarProcessSubnode();
   RegisterFactoryRadarProcessSubnode();
   RegisterFactoryCameraProcessSubnode();
+  RegisterFactoryCIPVSubnode();
+  RegisterFactoryLanePostProcessingSubnode();
+  RegisterFactoryAsyncFusionSubnode();
   RegisterFactoryFusionSubnode();
+  RegisterFactoryMotionService();
   lowcostvisualizer::RegisterFactoryVisualizationSubnode();
   traffic_light::RegisterFactoryTLPreprocessorSubnode();
   traffic_light::RegisterFactoryTLProcSubnode();

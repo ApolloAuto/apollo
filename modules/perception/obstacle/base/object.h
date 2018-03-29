@@ -40,7 +40,7 @@ struct alignas(16) Object {
   // deep copy
   void clone(const Object& rhs);
   std::string ToString() const;
-
+  void AddFourCorners(PerceptionObstacle* pb_obj) const;
   void Serialize(PerceptionObstacle* pb_obj) const;
   void Deserialize(const PerceptionObstacle& pb_obs);
 
@@ -93,7 +93,7 @@ struct alignas(16) Object {
   Eigen::Matrix3d velocity_uncertainty;
 
   // modeling uncertainty from sensor level tracker
-  Eigen::Matrix<double, 4, 4> uncertainty;
+  Eigen::Matrix4d state_uncertainty = Eigen::Matrix4d::Identity();
 
   // CIPV
   bool b_cipv = false;

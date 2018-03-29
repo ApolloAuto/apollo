@@ -169,8 +169,8 @@ Status DpStGraph::CalculateTotalCost() {
   uint32_t next_lowest_row = 0;
 
   for (size_t c = 0; c < cost_table_.size(); ++c) {
-    uint32_t highest_row = 0;
-    uint32_t lowest_row = cost_table_.back().size() - 1;
+    int highest_row = 0;
+    int lowest_row = cost_table_.back().size() - 1;
 
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
       if (FLAGS_enable_multi_thread_in_dp_st_graph) {
@@ -187,23 +187,22 @@ Status DpStGraph::CalculateTotalCost() {
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
       const auto& cost_cr = cost_table_[c][r];
       if (cost_cr.total_cost() < std::numeric_limits<double>::infinity()) {
-        uint32_t h_r = 0;
-        uint32_t l_r = 0;
+        int h_r = 0;
+        int l_r = 0;
         GetRowRange(cost_cr, &h_r, &l_r);
         highest_row = std::max(highest_row, h_r);
         lowest_row = std::min(lowest_row, l_r);
       }
     }
     next_highest_row = highest_row;
-    next_lowest_row = std::max(next_lowest_row, lowest_row);
+    next_lowest_row = lowest_row;
   }
 
   return Status::OK();
 }
 
-void DpStGraph::GetRowRange(const StGraphPoint& point,
-                            uint32_t* next_highest_row,
-                            uint32_t* next_lowest_row) {
+void DpStGraph::GetRowRange(const StGraphPoint& point, int* next_highest_row,
+                            int* next_lowest_row) {
   double v0 = 0.0;
   if (!point.pre_point()) {
     v0 = init_point_.v();
@@ -211,23 +210,26 @@ void DpStGraph::GetRowRange(const StGraphPoint& point,
     v0 = (point.index_s() - point.pre_point()->index_s()) * unit_s_ / unit_t_;
   }
 
-  const size_t max_s_size = cost_table_.back().size() - 1;
+  const int max_s_size = cost_table_.back().size() - 1;
 
   const double speed_coeff = unit_t_ * unit_t_;
 
   const double delta_s_upper_bound =
       v0 * unit_t_ + vehicle_param_.max_acceleration() * speed_coeff;
   *next_highest_row =
-      point.index_s() + static_cast<uint32_t>(delta_s_upper_bound / unit_s_);
+      point.index_s() + static_cast<int>(delta_s_upper_bound / unit_s_);
   if (*next_highest_row >= max_s_size) {
     *next_highest_row = max_s_size;
   }
 
   const double delta_s_lower_bound = std::fmax(
       0.0, v0 * unit_t_ + vehicle_param_.max_deceleration() * speed_coeff);
-  *next_lowest_row += static_cast<int32_t>(delta_s_lower_bound / unit_s_);
+  *next_lowest_row =
+      point.index_s() - static_cast<int>(delta_s_lower_bound / unit_s_);
   if (*next_lowest_row > max_s_size) {
     *next_lowest_row = max_s_size;
+  } else if (*next_lowest_row < 0) {
+    *next_lowest_row = 0;
   }
 }
 

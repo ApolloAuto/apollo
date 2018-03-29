@@ -85,8 +85,10 @@ bool Rerouting::ChangeLaneFailRerouting() {
   }
   // 6. Check if we have done rerouting before
   auto* rerouting = GetPlanningStatus()->mutable_rerouting();
-  const std::string last_rerouting_time_key =
-      "kLastReroutingTime_" + segments.Id();
+  if (rerouting == nullptr) {
+    AERROR << "rerouting is nullptr.";
+    return false;
+  }
   double current_time = Clock::NowInSeconds();
   if (rerouting->has_last_rerouting_time() &&
       (current_time - rerouting->last_rerouting_time() <

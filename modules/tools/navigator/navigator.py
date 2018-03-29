@@ -25,25 +25,26 @@ if __name__ == '__main__':
     fdata = sys.argv[1]
     rospy.init_node("navigator3", anonymous=True)
     navigation_pub = rospy.Publisher(
-        "/apollo/navigation",
-        navigation_pb2.NavigationInfo,
-        queue_size=1)
+        "/apollo/navigation", navigation_pb2.NavigationInfo, queue_size=1)
 
     navigation_info = navigation_pb2.NavigationInfo()
     navigation_path = navigation_info.navigation_path.add()
     navigation_path.path_priority = 0
     navigation_path.path.name = "navigation"
     f = open(fdata, 'r')
+    cnt = 0
     for line in f:
-        seg = json.loads(line)
-        for i in range(len(seg['s'])):
-            point = navigation_path.path.path_point.add()
-            point.x = seg['x'][i]
-            point.y = seg['y'][i]
-            point.s = seg['s'][i]
-            point.theta = seg['theta'][i]
-            point.kappa = seg['kappa'][i]
-            point.dkappa = seg['dkappa'][i]
+        cnt += 1
+        if cnt < 3:
+            continue
+        json_point = json.loads(line)
+        point = navigation_path.path.path_point.add()
+        point.x = json_point['x']
+        point.y = json_point['y']
+        point.s = json_point['s']
+        point.theta = json_point['theta']
+        point.kappa = json_point['kappa']
+        point.dkappa = json_point['dkappa']
     f.close()
     print navigation_info
     r = rospy.Rate(1)  # 1hz
