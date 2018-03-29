@@ -85,6 +85,39 @@ std::string Object::ToString() const {
                        b_cipv, "]"));
 }
 
+// Add 4 corners in the polygon
+void Object::AddFourCorners(PerceptionObstacle* pb_obj) const {
+  double cos_theta = cos(theta);
+  double sin_theta = sin(theta);
+
+  double half_width = width / 2;
+  double minus_half_width = -half_width;
+  double half_length = length / 2;
+  double minus_half_length = -half_length;
+
+  Point* p1 = pb_obj->add_polygon_point();
+  p1->set_x(minus_half_width * cos_theta + half_length * sin_theta + center(0));
+  p1->set_y(half_length * cos_theta - minus_half_width * sin_theta + center(1));
+  p1->set_z(0.0);
+
+  Point* p2 = pb_obj->add_polygon_point();
+  p2->set_x(minus_half_width * cos_theta + minus_half_length * sin_theta
+            + center(0));
+  p2->set_y(minus_half_length * cos_theta - minus_half_width * sin_theta
+            + center(1));
+  p2->set_z(0.0);
+
+  Point* p3 = pb_obj->add_polygon_point();
+  p3->set_x(half_width * cos_theta + half_length * sin_theta + center(0));
+  p3->set_y(half_length * cos_theta - half_width * sin_theta + center(1));
+  p3->set_z(0.0);
+
+  Point* p4 = pb_obj->add_polygon_point();
+  p4->set_x(half_width * cos_theta + minus_half_length * sin_theta + center(0));
+  p4->set_y(minus_half_length * cos_theta - half_width * sin_theta + center(1));
+  p4->set_z(0.0);
+}
+
 void Object::Serialize(PerceptionObstacle* pb_obj) const {
   CHECK(pb_obj != nullptr);
   pb_obj->set_id(track_id);
@@ -104,11 +137,17 @@ void Object::Serialize(PerceptionObstacle* pb_obj) const {
   pb_obj->set_width(width);
   pb_obj->set_height(height);
 
-  for (auto point : polygon.points) {
-    Point* p = pb_obj->add_polygon_point();
-    p->set_x(point.x);
-    p->set_y(point.y);
-    p->set_z(point.z);
+  if (polygon.size() /*pb_obs.polygon_point_size() */ >= 4) {
+    for (auto point : polygon.points) {
+      Point* p = pb_obj->add_polygon_point();
+      p->set_x(point.x);
+      p->set_y(point.y);
+      p->set_z(point.z);
+    }
+  } else {  // if polygon size is less than 4
+    // Generate polygon from center position, width, height
+    // and orientation of the object
+    AddFourCorners(pb_obj);
   }
 
   if (FLAGS_is_serialize_point_cloud) {
