@@ -24,6 +24,7 @@
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_hm_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -35,7 +36,9 @@ ProbabilisticFusion::ProbabilisticFusion()
       sensor_manager_(nullptr),
       track_manager_(nullptr),
       use_radar_(true),
-      use_lidar_(true) {}
+      use_lidar_(true),
+      use_camera_(true)
+      {}
 
 ProbabilisticFusion::~ProbabilisticFusion() {
   if (matcher_) {
@@ -143,9 +146,12 @@ bool ProbabilisticFusion::Init() {
   if (!model_config->GetValue("publish_sensor", &publish_sensor_id_)) {
     AERROR << "publish_sensor not found";
   }
-  if (publish_sensor_id_ != "velodyne_64" && publish_sensor_id_ != "radar") {
+  if (publish_sensor_id_ != "velodyne_64" &&
+      publish_sensor_id_ != "radar" &&
+      publish_sensor_id_ != "camera") {
     AERROR << "Invalid publish_sensor value: " << publish_sensor_id_;
   }
+
   AINFO << "publish_sensor: " << publish_sensor_id_;
 
   if (!model_config->GetValue("use_radar", &use_radar_)) {
@@ -181,6 +187,9 @@ bool ProbabilisticFusion::Fuse(
         continue;
       }
       if (is_radar(sensor_type) && !use_radar_) {
+        continue;
+      }
+      if (is_camera(sensor_type) && !use_camera_) {
         continue;
       }
 
@@ -297,7 +306,7 @@ void ProbabilisticFusion::CollectFusedObjects(
   }
 
   AINFO << "fg_track_cnt = " << tracks.size();
-  AINFO << "collect objects : fg_obj_cnt = "
+  AINFO << "collect objects : fg_obj_cnt = " << fg_obj_num
         << ", timestamp = " << GLOG_TIMESTAMP(timestamp);
 }
 
@@ -347,7 +356,13 @@ void ProbabilisticFusion::FuseForegroundObjects(
   UpdateUnassignedTracks(&tracks, unassigned_tracks, track2measurements_dist,
                          sensor_type, sensor_id, timestamp);
 
-  CreateNewTracks(*foreground_objects, unassigned_objects);
+  if (FLAGS_use_navigation_mode) {
+     if (is_camera(sensor_type)) {
+         CreateNewTracks(*foreground_objects, unassigned_objects);
+     }
+  } else {
+      CreateNewTracks(*foreground_objects, unassigned_objects);
+  }
 }
 
 }  // namespace perception
