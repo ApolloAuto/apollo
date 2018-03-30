@@ -51,6 +51,11 @@ void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
     belief_velocity_ = new_object->object->velocity;
     belief_acceleration_ = Eigen::Vector3d(0, 0, 0);
     initialized_ = true;
+  } else if (is_camera(new_object->sensor_type)) {
+    belief_anchor_point_ = new_object->object->anchor_point;
+    belief_velocity_ = new_object->object->velocity;
+    belief_acceleration_ = Eigen::Vector3d(0, 0, 0);
+    initialized_ = true;
   }
 
   a_matrix_.setIdentity();
@@ -151,6 +156,14 @@ void PbfKalmanMotionFusion::UpdateWithObject(
     history_velocity_.push_back(belief_velocity_);
     history_time_diff_.push_back(new_object->timestamp);
     history_velocity_is_radar_.push_back(true);
+  } else if (new_object->sensor_type == SensorType::CAMERA) {
+    belief_anchor_point_(0) = new_object->object->center(0);
+    belief_anchor_point_(1) = new_object->object->center(1);
+    belief_velocity_(0) = new_object->object->velocity(0);
+    belief_velocity_(1) = new_object->object->velocity(1);
+    history_velocity_.push_back(belief_velocity_);
+    history_time_diff_.push_back(new_object->timestamp);
+    history_velocity_is_radar_.push_back(false);
   } else {
     AERROR << "unsupported sensor type for PbfKalmanMotionFusion: "
            << static_cast<int>(new_object->sensor_type);
