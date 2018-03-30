@@ -49,6 +49,8 @@ DEFINE_double(replay_timestamp_gap, 10.0,
 
 // Map
 DEFINE_double(lane_search_radius, 3.0, "Search radius for a candidate lane");
+DEFINE_double(lane_search_radius_in_junction, 15.0,
+              "Search radius for a candidate lane");
 DEFINE_double(junction_search_radius, 1.0, "Search radius for a junction");
 
 // Obstacle features
@@ -77,6 +79,12 @@ DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
 DEFINE_int32(max_num_current_lane, 2, "Max number to search current lanes");
 DEFINE_int32(max_num_nearby_lane, 2, "Max number to search nearby lanes");
 DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
+              "Max angle difference for a candiate lane");
+DEFINE_int32(max_num_current_lane_in_junction, 1,
+             "Max number to search current lanes");
+DEFINE_int32(max_num_nearby_lane_in_junction, 0,
+             "Max number to search nearby lanes");
+DEFINE_double(max_lane_angle_diff_in_junction, M_PI / 6.0,
               "Max angle difference for a candiate lane");
 DEFINE_bool(enable_pedestrian_acc, false, "Enable calculating speed by acc");
 DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
