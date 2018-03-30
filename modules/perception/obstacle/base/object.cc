@@ -18,6 +18,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
+#include "modules/common/math/box2d.h"
 #include "modules/common/util/string_util.h"
 #include "modules/perception/common/perception_gflags.h"
 
@@ -27,6 +28,8 @@ namespace perception {
 using Eigen::Vector3d;
 using apollo::common::util::Print;
 using apollo::common::util::StrCat;
+using apollo::common::math::Vec2d;
+using apollo::common::math::Box2d;
 
 Object::Object() {
   cloud.reset(new pcl_util::PointCloud);
@@ -81,51 +84,23 @@ std::string Object::ToString() const {
                        ", "
                        "is_background: ",
                        is_background),
-                StrCat(", is_cipv: ",
-                       b_cipv, "]"));
+                StrCat(", is_cipv: ", b_cipv, "]"));
 }
 
 // Add 4 corners in the polygon
 void Object::AddFourCorners(PerceptionObstacle* pb_obj) const {
-  double cos_theta = cos(theta);
-  double sin_theta = sin(theta);
+  Box2d object_bounding_box = {{center(0), center(1)}, theta, length, width};
+  std::vector<Vec2d> corners;
+  object_bounding_box.GetAllCorners(&corners);
 
-  double half_width = width / 2;
-  double minus_half_width = -half_width;
-  double half_length = length / 2;
-  double minus_half_length = -half_length;
-
-  Point* p1 = pb_obj->add_polygon_point();
-  p1->set_x(minus_half_length * cos_theta + half_width * sin_theta + center(0));
-  p1->set_y(half_width * cos_theta - minus_half_length * sin_theta + center(1));
-  p1->set_z(0.0);
-
-  Point* p2 = pb_obj->add_polygon_point();
-  p2->set_x(minus_half_length * cos_theta + minus_half_width * sin_theta
-            + center(0));
-  p2->set_y(minus_half_width * cos_theta - minus_half_length * sin_theta
-            + center(1));
-  p2->set_z(0.0);
-
-  Point* p3 = pb_obj->add_polygon_point();
-  p3->set_x(half_length * cos_theta + minus_half_width * sin_theta + center(0));
-  p3->set_y(minus_half_width * cos_theta - half_length * sin_theta + center(1));
-  p3->set_z(0.0);
-
-  Point* p4 = pb_obj->add_polygon_point();
-  p4->set_x(half_length * cos_theta + half_width * sin_theta + center(0));
-  p4->set_y(half_width * cos_theta - half_length * sin_theta + center(1));
-  p4->set_z(0.0);
-
-  // AINFO << "center : [" << center(0) << ", " << center(1) << ", "
-  //       << center(2) << "]";
-  // AINFO << "width: " << width << ", length: " << length;
-  // AINFO << "theta: " << theta;
-
-  // AINFO << "p1: [" << p1->x() << ", " << p1->y() << ", " << p1->z() << "]" ;
-  // AINFO << "p2: [" << p2->x() << ", " << p2->y() << ", " << p2->z() << "]" ;
-  // AINFO << "p3: [" << p3->x() << ", " << p3->y() << ", " << p3->z() << "]" ;
-  // AINFO << "p4: [" << p4->x() << ", " << p4->y() << ", " << p4->z() << "]" ;
+  for (const auto& corner : corners) {
+    Point* p = pb_obj->add_polygon_point();
+    p->set_x(corner.x());
+    p->set_y(corner.y());
+    p->set_z(0.0);
+  }
+  ADEBUG << "PerceptionObstacle bounding box is : "
+         << object_bounding_box.DebugString();
 }
 
 void Object::Serialize(PerceptionObstacle* pb_obj) const {
