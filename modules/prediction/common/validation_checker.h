@@ -36,7 +36,15 @@ class ValidationChecker {
    * @return The validity of trajectory's centripedal acceleration
    */
   static bool ValidCentripedalAcceleration(
-      const std::vector<apollo::common::TrajectoryPoint>& trajectory_points);
+      const std::vector<::apollo::common::TrajectoryPoint>& trajectory_points);
+
+  /**
+   * @brief Check if a trajectory point is valid
+   * @param A trajectory point
+   * @return True if the trajectory point is valid
+   */
+  static bool ValidTrajectoryPoint(
+      const ::apollo::common::TrajectoryPoint& trajectory_point);
 
  private:
   ValidationChecker() = delete;
