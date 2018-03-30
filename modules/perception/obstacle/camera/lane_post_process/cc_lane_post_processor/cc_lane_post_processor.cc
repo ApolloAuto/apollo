@@ -105,8 +105,6 @@ bool CCLanePostProcessor::Init() {
     return false;
   }
 
-  AINFO << "[Debug] non_mask_polygon_points.size() = " << non_mask_polygon_points.size();
-
   if (non_mask_polygon_points.size() % 2 != 0) {
     AERROR << "the number of point coordinate values should be even.";
     return false;
