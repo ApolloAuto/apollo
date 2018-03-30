@@ -60,6 +60,10 @@ namespace perception {
 
 typedef float ScalarType;
 
+#ifndef INF_NON_MASK_POINT_X
+#define INF_NON_MASK_POINT_X 10000
+#endif
+
 constexpr ScalarType kEpsilon = 1e-5;
 
 // define colors for visualization (Blue, Green, Red)
@@ -253,7 +257,9 @@ struct LaneObject {
     lane_marker->set_c1_heading_angle(model(1));
     lane_marker->set_c2_curvature(model(2));
     lane_marker->set_c3_curvature_derivative(model(3));
-    lane_marker->set_view_range(longitude_end - longitude_start);
+    lane_marker->set_view_range(std::max(longitude_end, 0));
+    lane_marker->set_longitude_start(longitude_start);
+    lane_marker->set_longitude_end(longitude_end);
   }
 
   std::string GetSpatialLabel() const {
