@@ -53,9 +53,9 @@ struct CCLanePostProcessorOptions {
 class CCLanePostProcessor : public BaseCameraLanePostProcessor {
  public:
   CCLanePostProcessor() : BaseCameraLanePostProcessor() {
-    max_distance_to_see_ = 200.0;
-    vis_ = false;
-    is_init_ = false;
+    //max_distance_to_see_ = 200.0;
+    //vis_ = false;
+    //is_init_ = false;
   }
 
   ~CCLanePostProcessor() {}
@@ -102,23 +102,25 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
  private:
   CCLanePostProcessorOptions options_;
 
-  double time_stamp_;
-  int frame_id_;
+  std::shared_ptr<NonMask> non_mask_;
+
+  double time_stamp_ = 0.0;
+  int frame_id_ = -1;
   std::shared_ptr<ConnectedComponentGenerator> cc_generator_;
   std::shared_ptr<LaneFrame> cur_frame_;
   LaneInstancesPtr cur_lane_instances_;
 
-  ScalarType max_distance_to_see_;
-  int image_width_;
-  int image_height_;
+  ScalarType max_distance_to_see_ = 500.0;
+  int image_width_ = 1080;
+  int image_height_ = 1920;
   cv::Rect roi_;
 
-  bool is_x_longitude_;
+  bool is_x_longitude_ = true;
 
   std::shared_ptr<Projector<ScalarType>> projector_;
 
-  bool is_init_;
-  bool vis_;
+  bool is_init_ = false;
+  bool vis_ = false;
 
   DISALLOW_COPY_AND_ASSIGN(CCLanePostProcessor);
 };

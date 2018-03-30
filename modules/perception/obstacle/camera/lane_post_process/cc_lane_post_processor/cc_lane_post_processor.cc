@@ -94,6 +94,31 @@ bool CCLanePostProcessor::Init() {
           << roi_.x + roi_.width - 1 << ", " << roi_.y + roi_.height - 1 << "]";
   }
 
+  if (!model_config->GetValue("use_non_mask", &options_.frame.use_non_mask)) {
+    AERROR << "the use_non_mask parameter not found.";
+    return false;
+  }
+
+  std::vector<float> non_mask_polygon_points;
+  if (!model_config->GetValue("non_mask", &non_mask_polygon_points)) {
+    AERROR << "non_mask points not found.";
+    return false;
+  }
+
+  AINFO << "[Debug] non_mask_polygon_points.size() = " << non_mask_polygon_points.size();
+
+  if (non_mask_polygon_points.size() % 2 != 0) {
+    AERROR << "the number of point coordinate values should be even.";
+    return false;
+  }
+  size_t non_mask_polygon_point_num = non_mask_polygon_points.size() / 2;
+
+  non_mask_.reset(new NonMask(non_mask_polygon_point_num));
+  for (size_t i = 0; i < non_mask_polygon_point_num; ++i) {
+    non_mask_->AddPolygonPoint(non_mask_polygon_points.at(2 * i),
+                               non_mask_polygon_points.at(2 * i + 1));
+  }
+
   if (!model_config->GetValue("lane_map_confidence_thresh",
                               &options_.lane_map_conf_thresh)) {
     AERROR << "the confidence threshold of label map not found.";
@@ -573,9 +598,9 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
   cur_frame_.reset(new LaneFrame);
 
   if (options_.frame.space_type == SpaceType::IMAGE) {
-    cur_frame_->Init(cc_list, options_.frame);
+    cur_frame_->Init(cc_list, non_mask_, options_.frame);
   } else if (options_.frame.space_type == SpaceType::VEHICLE) {
-    cur_frame_->Init(cc_list, projector_, options_.frame);
+    cur_frame_->Init(cc_list, non_mask_, projector_, options_.frame);
   } else {
     AERROR << "unknown space type: " << options_.frame.space_type;
     return false;

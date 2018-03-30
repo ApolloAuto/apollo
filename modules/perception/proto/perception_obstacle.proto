@@ -68,6 +68,8 @@ message LaneMarker {
   optional double c2_curvature = 6;
   optional double c3_curvature_derivative = 7;
   optional double view_range = 8;
+  optional double longitude_start = 9;
+  optional double longitude_end = 10;
 }
 
 message LaneMarkers {
