@@ -206,6 +206,10 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
   }
 
   ptop->set_end_point_position(fixed_end_x_, fixed_end_y_);
+  ptop->set_element_weight_curve_length(0.0);
+  ptop->set_element_weight_kappa(1.0);
+  ptop->set_element_weight_dkappa(1.0);
+  ptop->set_element_weight_d2kappa(0.0);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
@@ -214,7 +218,6 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
 
   app->Options()->SetStringValue("hessian_approximation", "limited-memory");
   //  app->Options()->SetStringValue("derivative_test", "first-order");
-  //  app->Options()->SetNumericValue("derivative_test_perturbation", 1.0e-7);
   //  app->Options()->SetStringValue("derivative_test", "second-order");
   app->Options()->SetIntegerValue("print_level", 0);
   int num_iterations = FLAGS_spiral_smoother_num_iteration;
