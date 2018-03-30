@@ -86,7 +86,9 @@ class GLFWFusionViewer {
   void set_camera_para(Eigen::Vector3d i_position, Eigen::Vector3d i_scn_center,
                        Eigen::Vector3d i_up_vector);
 
-  void set_forward_dir(Eigen::Vector3d forward) { forward_dir_ = forward; }
+  void set_forward_dir(Eigen::Vector3d forward) {
+    forward_dir_ = forward;
+  }
 
   void set_main_car(const std::vector<Eigen::Vector3d> &main_car) {
     main_car_ = main_car;
@@ -195,8 +197,8 @@ class GLFWFusionViewer {
   void draw_objects(const std::vector<ObjectPtr> &objects,
                     const Eigen::Matrix4d &w2c, bool draw_cube,
                     bool draw_velocity, const Eigen::Vector3f &color,
-                    bool use_class_color);
-  bool draw_objects(FrameContent *content, bool draw_cube, bool draw_velocity);
+                    bool use_class_color, bool use_track_color = true);
+
   void draw_3d_classifications(FrameContent *content, bool show_fusion);
   void draw_camera_box(const std::vector<ObjectPtr> &objects,
                        Eigen::Matrix4d w2c, int offset_x, int offset_y,
@@ -287,8 +289,8 @@ class GLFWFusionViewer {
 
   bool show_fusion_;
   bool show_radar_pc_;
-  bool show_camera_box2d_;     // show 2d bbox in camera frame
-  bool show_camera_box3d_;     // show 3d bbox in camera frame
+  bool show_camera_box2d_;  // show 2d bbox in camera frame
+  bool show_camera_box3d_;  // show 3d bbox in camera frame
   bool show_camera_bdv_;
   bool show_associate_color_;  // show same color for both 3d pc bbox and camera
                                // bbox

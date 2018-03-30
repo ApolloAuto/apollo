@@ -83,6 +83,9 @@ bool PbfHmTrackObjectMatcher::Match(
   for (size_t i = 0; i < assignments->size(); i++) {
     int track_ind = (*assignments)[i].first;
     int measurement_ind = (*assignments)[i].second;
+    ADEBUG << "track_ind is matched to measurement_ind for sensor "
+          << sensor_objects[0]->sensor_id << " "
+          << track_ind << " " << measurement_ind;
     int track_ind_loc = track_ind_g2l[track_ind];
     int measurement_ind_loc = measurement_ind_g2l[measurement_ind];
     if (track_ind_loc >= 0 && measurement_ind_loc >= 0) {
