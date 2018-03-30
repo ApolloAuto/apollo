@@ -184,8 +184,6 @@ void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
 
   MeasureData lidar_measure;
   if (state == 2) {  // only state OK republish lidar msg
-    // TODO(zhouyao): republish refactoring
-
     republish_process_->LidarLocalProcess(lidar_localization, &lidar_measure);
     integ_process_->MeasureDataProcess(lidar_measure);
 
@@ -349,7 +347,8 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
 
   if (state != IntegState::NOT_INIT) {
     // update lidar
-    if (enable_lidar_localization_) {
+    if (enable_lidar_localization_
+        && state != IntegState::NOT_STABLE) {
       lidar_process_->IntegPvaProcess(integ_sins_pva);
     }
 
