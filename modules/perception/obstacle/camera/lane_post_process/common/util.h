@@ -31,20 +31,13 @@ namespace apollo {
 namespace perception {
 
 // @brief: convert angle from the range of [-pi, pi] to [0, 2*pi]
-inline void RectAngle(ScalarType* theta) {
-  if (theta == NULL) {
-    return;
-  }
-  if (*theta < 0) {
-    (*theta) += static_cast<ScalarType>(2 * M_PI);
-  }
-}
+void RectAngle(ScalarType *theta);
 
 // @brief: fit polynomial function with QR decomposition (using Eigen 3)
 template <typename T = ScalarType>
-bool PolyFit(const std::vector<Eigen::Matrix<T, 2, 1>>& pos_vec,
-             const int& order, Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1>* coeff,
-             const bool& is_x_axis = true) {
+bool PolyFit(const std::vector<Eigen::Matrix<T, 2, 1>> &pos_vec,
+             const int &order, Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1> *coeff,
+             const bool &is_x_axis = true) {
   if (coeff == NULL) {
     AERROR << "The coefficient pointer is NULL.";
     return false;
@@ -89,8 +82,8 @@ bool PolyFit(const std::vector<Eigen::Matrix<T, 2, 1>>& pos_vec,
 
 // @brief: evaluate y value of given x for a polynomial function
 template <typename T = ScalarType>
-T PolyEval(const T& x, const int& order,
-           const Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1>& coeff) {
+T PolyEval(const T &x, const int &order,
+           const Eigen::Matrix<T, MAX_POLY_ORDER + 1, 1> &coeff) {
   int poly_order = order;
   if (order > MAX_POLY_ORDER) {
     AERROR << "the order of polynomial function must be smaller than "
@@ -121,6 +114,32 @@ T GetPolyValue(T a, T b, T c, T d, T x) {
   y += (a * v);
   return y;
 }
+
+// @brief: non mask class which is used for filtering out the markers inside the
+// polygon mask
+class NonMask {
+ public:
+  NonMask() {}
+  NonMask(size_t n) {
+    polygon_.reserve(n);
+  }
+
+  void AddPolygonPoint(const ScalarType &x, const ScalarType &y);
+  bool IsInsideMask(const Vector2D &p) const;
+
+ protected:
+  int ComputeOrientation(const Vector2D &p1, const Vector2D &p2,
+                         const Vector2D &q) const;
+  bool IsColinear(const Vector2D &p1, const Vector2D &p2,
+                  const Vector2D &q) const;
+  bool IsOnLineSegmentWhenColinear(const Vector2D &p1, const Vector2D &p2,
+                                   const Vector2D &q) const;
+  bool IsLineSegmentIntersect(const Vector2D &p1, const Vector2D &p2,
+                              const Vector2D &p3, const Vector2D &p4) const;
+
+ private:
+  std::vector<Vector2D> polygon_;
+};
 
 }  // namespace perception
 }  // namespace apollo
