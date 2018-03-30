@@ -18,7 +18,7 @@
 
 #include <string>
 #include <unordered_map>
-
+#include <algorithm>
 #include "Eigen/Core"
 #include "eigen_conversions/eigen_msg.h"
 #include "pcl_conversions/pcl_conversions.h"
@@ -135,6 +135,9 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
 
   // 1. get radar pose
   std::shared_ptr<Matrix4d> velodyne2world_pose = std::make_shared<Matrix4d>();
+
+  ADEBUG << "use navigation mode " << FLAGS_use_navigation_mode;
+
   if (!GetVelodyneTrans(timestamp, velodyne2world_pose.get()) &&
       !FLAGS_use_navigation_mode) {
     AERROR << "Failed to get trans at timestamp: " << GLOG_TIMESTAMP(timestamp);
@@ -153,6 +156,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
     CalibrationConfigManager *config_manager =
         Singleton<CalibrationConfigManager>::get();
     CameraCalibrationPtr calibrator = config_manager->get_camera_calibration();
+    Eigen::Matrix4d camera_to_car = calibrator->get_camera_extrinsics();
     *radar2car_pose = radar_extrinsic_;
     AINFO << "get radar trans pose succ. pose: \n" << *radar2car_pose;
   }
@@ -267,8 +271,10 @@ bool RadarProcessSubnode::GetCarLinearSpeed(double timestamp,
     }
     distance = temp_distance;
   }
-  const auto &velocity =
-      localization_buffer_[idx].second.pose().linear_velocity();
+
+  idx = std::max(0, idx);
+  auto velocity =
+          localization_buffer_[idx].second.pose().linear_velocity();
   (*car_linear_speed)[0] = velocity.x();
   (*car_linear_speed)[1] = velocity.y();
   (*car_linear_speed)[2] = velocity.z();
