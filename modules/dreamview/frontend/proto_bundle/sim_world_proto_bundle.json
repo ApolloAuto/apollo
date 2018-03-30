@@ -2721,6 +2721,14 @@
                 "viewRange": {
                   "type": "double",
                   "id": 8
+                },
+                "longitudeStart": {
+                  "type": "double",
+                  "id": 9
+                },
+                "longitudeEnd": {
+                  "type": "double",
+                  "id": 10
                 }
               }
             },
