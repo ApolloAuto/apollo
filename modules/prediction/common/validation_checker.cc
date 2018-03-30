@@ -24,7 +24,7 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::TrajectoryPoint;
+using ::apollo::common::TrajectoryPoint;
 
 bool ValidationChecker::ValidCentripedalAcceleration(
     const std::vector<TrajectoryPoint>& trajectory_points) {
@@ -48,6 +48,17 @@ bool ValidationChecker::ValidCentripedalAcceleration(
     max_centripedal_acc = std::max(max_centripedal_acc, centripedal_acc);
   }
   return max_centripedal_acc < FLAGS_centripedal_acc_threshold;
+}
+
+bool ValidationChecker::ValidTrajectoryPoint(
+    const TrajectoryPoint& trajectory_point) {
+  return trajectory_point.has_path_point() &&
+         (!std::isnan(trajectory_point.path_point().x())) &&
+         (!std::isnan(trajectory_point.path_point().y())) &&
+         (!std::isnan(trajectory_point.path_point().theta())) &&
+         (!std::isnan(trajectory_point.v())) &&
+         (!std::isnan(trajectory_point.a())) &&
+         (!std::isnan(trajectory_point.relative_time()));
 }
 
 }  // namespace prediction
