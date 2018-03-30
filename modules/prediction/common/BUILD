@@ -136,4 +136,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "validation_checker_test",
+    size = "small",
+    srcs = ["validation_checker_test.cc"],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        ":validation_checker",
+        "@gtest//:main",
+    ]
+)
+
 cpplint()

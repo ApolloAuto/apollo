@@ -22,10 +22,10 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
-#include "modules/map/relative_map/relative_map.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
+#include "modules/prediction/common/validation_checker.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -200,7 +200,7 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
          prediction_obstacles.prediction_obstacle()) {
       for (auto const& trajectory : prediction_obstacle.trajectory()) {
         for (auto const& trajectory_point : trajectory.trajectory_point()) {
-          if (!IsValidTrajectoryPoint(trajectory_point)) {
+          if (!ValidationChecker::ValidTrajectoryPoint(trajectory_point)) {
             AERROR << "Invalid trajectory point ["
                    << trajectory_point.ShortDebugString() << "]";
             return;
@@ -215,17 +215,6 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
 
 Status Prediction::OnError(const std::string& error_msg) {
   return Status(ErrorCode::PREDICTION_ERROR, error_msg);
-}
-
-bool Prediction::IsValidTrajectoryPoint(
-    const TrajectoryPoint& trajectory_point) {
-  return trajectory_point.has_path_point() &&
-         (!std::isnan(trajectory_point.path_point().x())) &&
-         (!std::isnan(trajectory_point.path_point().y())) &&
-         (!std::isnan(trajectory_point.path_point().theta())) &&
-         (!std::isnan(trajectory_point.v())) &&
-         (!std::isnan(trajectory_point.a())) &&
-         (!std::isnan(trajectory_point.relative_time()));
 }
 
 }  // namespace prediction

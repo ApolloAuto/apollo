@@ -23,12 +23,11 @@
 #include "ros/include/ros/ros.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/control/proto/control_cmd.pb.h"
-
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/common/time/time.h"
+#include "modules/control/proto/control_cmd.pb.h"
 
 // gflags
 DEFINE_double(throttle_inc_delta, 2.0,
@@ -38,10 +37,10 @@ DEFINE_double(steer_inc_delta, 2.0, "steer delta percentage");
 
 namespace {
 
+using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::control::ControlCommand;
-using apollo::canbus::Chassis;
 using apollo::control::PadMessage;
 
 const uint32_t KEYCODE_O = 0x4F;  // '0'
