@@ -52,11 +52,7 @@ struct CCLanePostProcessorOptions {
 
 class CCLanePostProcessor : public BaseCameraLanePostProcessor {
  public:
-  CCLanePostProcessor() : BaseCameraLanePostProcessor() {
-    //max_distance_to_see_ = 200.0;
-    //vis_ = false;
-    //is_init_ = false;
-  }
+  CCLanePostProcessor() : BaseCameraLanePostProcessor() {}
 
   ~CCLanePostProcessor() {}
 

@@ -120,9 +120,7 @@ T GetPolyValue(T a, T b, T c, T d, T x) {
 class NonMask {
  public:
   NonMask() {}
-  NonMask(size_t n) {
-    polygon_.reserve(n);
-  }
+  explicit NonMask(const size_t n) { polygon_.reserve(n); }
 
   void AddPolygonPoint(const ScalarType &x, const ScalarType &y);
   bool IsInsideMask(const Vector2D &p) const;
