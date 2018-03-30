@@ -223,6 +223,8 @@ class Obstacle {
 
   void SetLanePoints(Feature* feature);
 
+  void SetLaneSequencePath(LaneGraph* const lane_graph);
+
   void InitKFPedestrianTracker(const Feature& feature);
 
   void UpdateKFPedestrianTracker(const Feature& feature);

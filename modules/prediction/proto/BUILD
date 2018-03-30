@@ -53,6 +53,7 @@ proto_library(
     ],
     deps = [
         "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:pnc_point_proto_lib",
     ],
 )
 
