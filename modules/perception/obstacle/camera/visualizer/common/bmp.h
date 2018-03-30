@@ -31,16 +31,16 @@ struct BMPHeader {
   int bi_size;             /* Size of BITMAPINFOHEADER, in bytes (= 40) */
   int bi_width;            /* Width of image, in pixels */
   int bi_height;           /* Height of images, in pixels */
-  int bi_planes;         /* Number of planes in target device (set to 1) */
-  int bi_bit_count;      /* Bits per pixel (24 in this case) */
+  int bi_planes;           /* Number of planes in target device (set to 1) */
+  int bi_bit_count;        /* Bits per pixel (24 in this case) */
   int bi_compression;      /* Type of compression (0 if no compression) */
   int bi_size_image;       /* Image size, in bytes (0 if no compression) */
   int bi_x_pels_per_meter; /* Resolution in pixels/meter of display device */
   int bi_y_pels_per_meter; /* Resolution in pixels/meter of display device */
   int bi_clr_used;         /* Number of colors in the color table (if 0, use */
-                            /* maximum allowed by bi_bit_count) */
+                           /* maximum allowed by bi_bit_count) */
   int bi_clr_important;    /* Number of important colors.  If 0, all colors */
-                           /*are important */
+                           /* are important */
 };
 
 template <typename Type>
@@ -109,8 +109,8 @@ void save_rgba_image_to_bmp(const unsigned char* rgba_image, int w, int h,
 
   unsigned char* ref_rgba = (unsigned char*)(rgba_image);
 
-  for (int i = 0; i < height; i++) {
-    for (int j = 0; j < width; j++) {
+  for (int i = 0; i < height; ++i) {
+    for (int j = 0; j < width; ++j) {
       line[3 * j] = ref_rgba[0];
       line[3 * j + 1] = ref_rgba[1];
       line[3 * j + 2] = ref_rgba[2];

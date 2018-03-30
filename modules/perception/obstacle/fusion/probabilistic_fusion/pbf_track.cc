@@ -15,8 +15,11 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
+
 #include <algorithm>
+
 #include "boost/format.hpp"
+
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/macro.h"
 #include "modules/common/time/time_util.h"
@@ -42,9 +45,10 @@ double PbfTrack::s_min_radar_confident_distance_ = 40;
 bool PbfTrack::s_publish_if_has_lidar_ = true;
 bool PbfTrack::s_publish_if_has_radar_ = true;
 
-std::string PbfTrack::s_motion_fusion_method_ = "PbfKalmanMotionFusion";  // NOLINT
-
 using apollo::common::time::TimeUtil;
+
+PbfTrack::MotionFusionMethod PbfTrack::s_motion_fusion_method_ =
+    PbfTrack::MotionFusionMethod::PBF_KALMAN;
 
 PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
   idx_ = GetNextTrackId();
@@ -54,7 +58,7 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
   invisible_in_radar_ = true;
   invisible_in_camera_ = true;
 
-  if (s_motion_fusion_method_ == "PbfKalmanMotionFusion") {
+  if (s_motion_fusion_method_ == MotionFusionMethod::PBF_KALMAN) {
     motion_fusion_.reset(new PbfKalmanMotionFusion());
   } else {
     motion_fusion_.reset(new PbfIMFFusion());
@@ -86,8 +90,14 @@ PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
   is_dead_ = false;
 }
 
-void PbfTrack::SetMotionFusionMethod(const std::string motion_fusion_method) {
-  s_motion_fusion_method_ = motion_fusion_method;
+void PbfTrack::SetMotionFusionMethod(const std::string &motion_fusion_method) {
+  if (motion_fusion_method == "PbfKalmanMotionFusion") {
+    s_motion_fusion_method_ = MotionFusionMethod::PBF_KALMAN;
+  } else if (motion_fusion_method == "PbfIMFFusion") {
+    s_motion_fusion_method_ = MotionFusionMethod::PBF_IMF;
+  } else {
+    AERROR << "Unknown motion fusion method.";
+  }
 }
 
 PbfTrack::~PbfTrack() {}
@@ -158,17 +168,11 @@ void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
   }
 }
 
-int PbfTrack::GetTrackId() const {
-  return idx_;
-}
+int PbfTrack::GetTrackId() const { return idx_; }
 
-PbfSensorObjectPtr PbfTrack::GetFusedObject() {
-  return fused_object_;
-}
+PbfSensorObjectPtr PbfTrack::GetFusedObject() { return fused_object_; }
 
-double PbfTrack::GetFusedTimestamp() const {
-  return fused_timestamp_;
-}
+double PbfTrack::GetFusedTimestamp() const { return fused_timestamp_; }
 
 PbfSensorObjectPtr PbfTrack::GetLidarObject(const std::string &sensor_id) {
   PbfSensorObjectPtr obj = nullptr;
