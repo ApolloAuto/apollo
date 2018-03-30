@@ -168,11 +168,17 @@ void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
   }
 }
 
-int PbfTrack::GetTrackId() const { return idx_; }
+int PbfTrack::GetTrackId() const {
+  return idx_;
+}
 
-PbfSensorObjectPtr PbfTrack::GetFusedObject() { return fused_object_; }
+PbfSensorObjectPtr PbfTrack::GetFusedObject() {
+  return fused_object_;
+}
 
-double PbfTrack::GetFusedTimestamp() const { return fused_timestamp_; }
+double PbfTrack::GetFusedTimestamp() const {
+  return fused_timestamp_;
+}
 
 PbfSensorObjectPtr PbfTrack::GetLidarObject(const std::string &sensor_id) {
   PbfSensorObjectPtr obj = nullptr;
@@ -195,7 +201,7 @@ PbfSensorObjectPtr PbfTrack::GetRadarObject(const std::string &sensor_id) {
 PbfSensorObjectPtr PbfTrack::GetCameraObject(const std::string &sensor_id) {
   PbfSensorObjectPtr obj = nullptr;
   auto it = camera_objects_.find(sensor_id);
-  if (it != radar_objects_.end()) {
+  if (it != camera_objects_.end()) {
     obj = it->second;
   }
   return obj;
@@ -214,12 +220,17 @@ void PbfTrack::PerformMotionFusionAsync(PbfSensorObjectPtr obj) {
     // if running in bag, we can't estimate fusion arrival time correctly
     current_time =
         std::max(motion_fusion_->getLastFuseTS(), obj->timestamp) + 0.1;
+    AINFO << "last fuse ts " << std::fixed << std::setprecision(15)
+          << motion_fusion_->getLastFuseTS();
+    AINFO << "obj timestamp " << std::fixed << std::setprecision(15)
+          << obj->timestamp;
+    AINFO << "current fuse ts is " << std::fixed << std::setprecision(15)
+          << current_time;
   }
 
   // for low cost, we only consider radar and camera fusion for now
   if (is_camera(sensor_type) || is_radar(sensor_type)) {
     Eigen::Vector3d velocity = Eigen::Vector3d::Zero();
-
     motion_fusion_->setCurrentFuseTS(current_time);
     if (motion_fusion_->Initialized()) {
       double time_diff = motion_fusion_->getFuseTimeDiff();
@@ -253,51 +264,73 @@ void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
   PbfSensorObjectPtr lidar_object = GetLatestLidarObject();
   PbfSensorObjectPtr radar_object = GetLatestRadarObject();
 
-  if (is_lidar(sensor_type)) {
-    fused_object_->clone(*obj);
-    if (motion_fusion_->Initialized() &&
-        (lidar_object != nullptr || radar_object != nullptr)) {
-      motion_fusion_->UpdateWithObject(obj, time_diff);
-      Eigen::Vector3d anchor_point;
-      Eigen::Vector3d velocity;
-      motion_fusion_->GetState(&anchor_point, &velocity);
-      fused_object_->object->velocity = velocity;
-    } else {
-      motion_fusion_->Initialize(obj);
-    }
-  } else if (is_radar(sensor_type)) {
-    if (motion_fusion_->Initialized() &&
-        (lidar_object != nullptr || radar_object != nullptr)) {
-      Eigen::Vector3d pre_anchor_point;
-      Eigen::Vector3d pre_velocity;
-      motion_fusion_->GetState(&pre_anchor_point, &pre_velocity);
-      motion_fusion_->UpdateWithObject(obj, time_diff);
-      Eigen::Vector3d anchor_point;
-      Eigen::Vector3d velocity;
-      motion_fusion_->GetState(&anchor_point, &velocity);
-      if (lidar_object == nullptr) {
-        PbfSensorObject fused_obj_bk;
-        fused_obj_bk.clone(*fused_object_);
-        fused_object_->clone(*obj);
+  if (FLAGS_use_navigation_mode) {
+    if (is_camera(sensor_type) || is_radar(sensor_type)) {
+      if (motion_fusion_->Initialized()) {
+        motion_fusion_->UpdateWithObject(obj, time_diff);
+        Eigen::Vector3d anchor_point;
+        Eigen::Vector3d velocity;
+        motion_fusion_->GetState(&anchor_point, &velocity);
         fused_object_->object->velocity = velocity;
-      } else {
-        // if has lidar, use lidar shape
-        Eigen::Vector3d translation = anchor_point - pre_anchor_point;
         fused_object_->object->anchor_point = anchor_point;
-        fused_object_->object->center += translation;
-        for (auto point : fused_object_->object->polygon.points) {
-          point.x += translation[0];
-          point.y += translation[1];
-          point.z += translation[2];
+        fused_object_->object->center = anchor_point;
+        if (is_camera(sensor_type)) {
+          fused_object_->object->theta = obj->object->theta;
+          fused_object_->object->direction = obj->object->direction;
         }
-        fused_object_->object->velocity = velocity;
+      } else {
+        if (is_camera(sensor_type)) {
+          motion_fusion_->Initialize(obj);
+        }
       }
-    } else {
-      AERROR << "Something must be wrong.";
     }
   } else {
-    AERROR << "Unsupport sensor type " << static_cast<int>(sensor_type);
-    return;
+    if (is_lidar(sensor_type)) {
+      fused_object_->clone(*obj);
+      if (motion_fusion_->Initialized() &&
+          (lidar_object != nullptr || radar_object != nullptr)) {
+        motion_fusion_->UpdateWithObject(obj, time_diff);
+        Eigen::Vector3d anchor_point;
+        Eigen::Vector3d velocity;
+        motion_fusion_->GetState(&anchor_point, &velocity);
+        fused_object_->object->velocity = velocity;
+      } else {
+        motion_fusion_->Initialize(obj);
+      }
+    } else if (is_radar(sensor_type)) {
+      if (motion_fusion_->Initialized() &&
+          (lidar_object != nullptr || radar_object != nullptr)) {
+        Eigen::Vector3d pre_anchor_point;
+        Eigen::Vector3d pre_velocity;
+        motion_fusion_->GetState(&pre_anchor_point, &pre_velocity);
+        motion_fusion_->UpdateWithObject(obj, time_diff);
+        Eigen::Vector3d anchor_point;
+        Eigen::Vector3d velocity;
+        motion_fusion_->GetState(&anchor_point, &velocity);
+        if (lidar_object == nullptr) {
+          PbfSensorObject fused_obj_bk;
+          fused_obj_bk.clone(*fused_object_);
+          fused_object_->clone(*obj);
+          fused_object_->object->velocity = velocity;
+        } else {
+          // if has lidar, use lidar shape
+          Eigen::Vector3d translation = anchor_point - pre_anchor_point;
+          fused_object_->object->anchor_point = anchor_point;
+          fused_object_->object->center += translation;
+          for (auto point : fused_object_->object->polygon.points) {
+            point.x += translation[0];
+            point.y += translation[1];
+            point.z += translation[2];
+          }
+          fused_object_->object->velocity = velocity;
+        }
+      } else {
+        AERROR << "Something must be wrong.";
+      }
+    } else {
+      AERROR << "Unsupport sensor type " << static_cast<int>(sensor_type);
+      return;
+    }
   }
 }
 
@@ -343,6 +376,10 @@ int PbfTrack::GetNextTrackId() {
 }
 
 bool PbfTrack::AbleToPublish() {
+  if (FLAGS_use_navigation_mode) {
+    return true;
+  }
+
   ADEBUG << s_publish_if_has_lidar_ << " " << invisible_in_lidar_ << " "
          << lidar_objects_.size();
   double invisible_period_threshold = 0.001;

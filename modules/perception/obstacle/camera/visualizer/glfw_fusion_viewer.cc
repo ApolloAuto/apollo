@@ -170,17 +170,6 @@ bool GLFWFusionViewer::initialize() {
     return false;
   }
 
-  if (FLAGS_show_radar_objects) {
-    show_box = 1;
-    show_velocity = 1;
-    show_text = 1;
-  }
-  if (FLAGS_show_fused_objects) {
-    show_box = 1;
-    show_velocity = 1;
-    show_text = 1;
-  }
-
   // for camera visualization
   show_camera_box2d_ = true;
   show_camera_box3d_ = true;
@@ -1663,7 +1652,8 @@ void GLFWFusionViewer::draw_objects(const std::vector<ObjectPtr>& objects,
                                     const Eigen::Matrix4d& c2w, bool draw_cube,
                                     bool draw_velocity,
                                     const Eigen::Vector3f& color,
-                                    bool use_class_color) {
+                                    bool use_class_color,
+                                    bool use_track_color) {
   if (show_associate_color_) {
     use_class_color = false;
   }
@@ -1740,11 +1730,14 @@ void GLFWFusionViewer::draw_objects(const std::vector<ObjectPtr>& objects,
       verts[4][2] = verts[5][2] = verts[6][2] = verts[7][2] = 0.0;
 
       // draw same color with 2d camera bbox
-      auto tmp_color =
-          s_color_table[objects[i]->track_id % s_color_table.size()];
-      rgb[0] = tmp_color[0];
-      rgb[1] = tmp_color[1];
-      rgb[2] = tmp_color[2];
+      if (use_track_color) {
+          auto tmp_color =
+                  s_color_table[objects[i]->track_id % s_color_table.size()];
+          rgb[0] = tmp_color[0];
+          rgb[1] = tmp_color[1];
+          rgb[2] = tmp_color[2];
+      }
+
       if (use_class_color) {
         get_class_color(static_cast<unsigned>(objects[i]->type), rgb);
       }
@@ -1810,34 +1803,6 @@ void GLFWFusionViewer::draw_objects(const std::vector<ObjectPtr>& objects,
     }
   }
   glColor4f(1.0, 1.0, 1.0, 1.0);  // reset to white color
-}
-
-bool GLFWFusionViewer::draw_objects(FrameContent* content, bool draw_cube,
-                                    bool draw_velocity) {
-  Eigen::Matrix4d c2v = content->get_camera_to_world_pose();
-
-  if (FLAGS_show_camera_objects) {
-    Eigen::Vector3f cam_color(1, 1, 0);
-    std::vector<ObjectPtr> objects = content->get_camera_objects();
-    draw_objects(objects, c2v, draw_cube, draw_velocity, cam_color,
-                 use_class_color_);
-  }
-  if (FLAGS_show_radar_objects) {
-    Eigen::Vector3f radar_color(0, 1, 0);
-    std::vector<ObjectPtr> objects = content->get_radar_objects();
-    draw_objects(objects, c2v, draw_cube, draw_velocity, radar_color, false);
-  }
-  if (FLAGS_show_fused_objects) {
-    Eigen::Vector3f fused_color(1, 0, 1);
-    std::vector<ObjectPtr> objects = content->get_fused_objects();
-    draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color,
-                 use_class_color_);
-  }
-
-  if (FLAGS_show_fusion_association) {
-    draw_fusion_association(content);
-  }
-  return true;
 }
 
 /*
@@ -2028,7 +1993,7 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
   }
 
   if (show_fusion_) {
-    Eigen::Vector3f fused_color(1, 0, 1);
+    Eigen::Vector3f fused_color(1, 1, 0);
     bool draw_cube = true;
     bool draw_velocity = true;
     std::vector<ObjectPtr> objects = content->get_fused_objects();
@@ -2041,37 +2006,26 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
     for (auto obj : objects_cam) {
       AINFO << "object in cam: " << obj->ToString();
     }
-    draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color, false);
+    draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color,
+                 false, false);
 
     if (FLAGS_show_fusion_association) {
       draw_fusion_association(content);
     }
-  } else {
-    if (!FLAGS_show_camera_objects && !FLAGS_show_radar_objects) {
-      return;
-    } else {
-      if (FLAGS_show_camera_objects) {
-        Eigen::Vector3f cam_color(1, 1, 0);
-        bool draw_cube = true;
-        bool draw_velocity = true;
-        std::vector<ObjectPtr> objects = content->get_camera_objects();
-        if (FLAGS_show_motion_track &&
-            content->get_motion_buffer().size() > 0) {
-          draw_trajectories(content);
-        }
+  }
 
-        draw_objects(objects, c2v, draw_cube, draw_velocity, cam_color,
-                     use_class_color_);
-      }
-      if (FLAGS_show_radar_objects) {
-        Eigen::Vector3f radar_color(1, 1, 1);
-        bool draw_cube = true;
-        bool draw_velocity = true;
-        std::vector<ObjectPtr> objects = content->get_radar_objects();
-        draw_objects(objects, c2v, draw_cube, draw_velocity, radar_color,
-                     false);
-      }
-    }
+  if (FLAGS_show_motion_track &&
+      content->get_motion_buffer().size() > 0) {
+    draw_trajectories(content);
+  }
+
+  if (show_radar_pc_) {
+    Eigen::Vector3f radar_color(1, 1, 1);
+    bool draw_cube = true;
+    bool draw_velocity = true;
+    std::vector<ObjectPtr> objects = content->get_radar_objects();
+    draw_objects(objects, c2v, draw_cube, draw_velocity, radar_color,
+                 false, false);
   }
 }
 
