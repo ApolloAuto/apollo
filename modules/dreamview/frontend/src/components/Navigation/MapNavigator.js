@@ -3,6 +3,7 @@ import { UTMToWGS84 } from "utils/coordinate_converter";
 
 class MapNavigator {
     constructor() {
+        this.mapAPILoaded = false;
         this.WS = null;
         this.mapAdapter = null;
 

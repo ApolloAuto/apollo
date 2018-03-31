@@ -209,5 +209,21 @@ double QuinticSpiralPath::DeriveDKappaDerivative(const std::size_t param_index,
   return derivative;
 }
 
+double QuinticSpiralPath::DeriveD2KappaDerivative(const std::size_t param_index,
+                                                 const double r) const {
+  double s = param_ * r;
+  double s2 = s * s;
+
+  double derivative = 60.0 * coef_deriv_[5][param_index] * s2 +
+                      24.0 * coef_deriv_[4][param_index] * s +
+                      6.0 * coef_deriv_[3][param_index];
+
+  if (param_index == DELTA_S) {
+    derivative += 60.0 * coef_[5] * 2.0 * s * r +
+                  24.0 * coef_[4] * r;
+  }
+  return derivative;
+}
+
 }  // namespace planning
 }  // namespace apollo
