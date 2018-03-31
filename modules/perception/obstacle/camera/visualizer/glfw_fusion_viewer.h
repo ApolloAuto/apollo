@@ -304,6 +304,11 @@ class GLFWFusionViewer {
   LaneObjectsPtr lane_objects_;
   float lane_map_threshold_;
 
+  LaneObjectsPtr lane_history_;
+//  std::vector<LaneObjects> Lane_history_buffer_;
+  const int lane_history_buffer_size_ = 400;
+  const int object_history_size_ = 5;
+  Eigen::Matrix3f motion_matrix_;
   // pin-hole camera model with distortion
   std::shared_ptr<CameraDistort<double>> distort_camera_intrinsic_;
 

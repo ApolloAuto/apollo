@@ -61,8 +61,7 @@ class MotionService : public Subnode {
   double pre_camera_timestamp_ = 0;
   // double pre_camera_timestamp = 0;
   bool start_flag_ = false;
-  const int motion_buffer_size_ = 6000;
-  const int motion_sensor_frequency_ = 100;
+  const int motion_buffer_size_ = 600;
   Mutex mutex_;
   std::list<VehicleInformation> vehicle_information_buffer_;
   CameraSharedData *camera_shared_data_ = nullptr;

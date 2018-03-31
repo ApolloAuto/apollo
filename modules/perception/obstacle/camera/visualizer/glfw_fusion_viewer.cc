@@ -214,6 +214,9 @@ bool GLFWFusionViewer::initialize() {
   raster_text_->init();
 
   AINFO << " GLFWFusionViewer::initialize() Finished" << std::endl;
+
+  lane_history_ = std::make_shared<LaneObjects>();
+//  lane_history_buffer_.resize(lane_history_buffer_size_);
   init_ = true;
   return true;
 }
@@ -568,13 +571,19 @@ void GLFWFusionViewer::render() {
     bool show_fusion = true;
     draw_3d_classifications(frame_content_, show_fusion);
     draw_car_forward_dir();
-    if (FLAGS_show_motion_track &&
-        frame_content_->get_motion_buffer().size() > 0) {
-      draw_car_trajectory(frame_content_);
-    }
+//    if (FLAGS_show_motion_track &&
+//        frame_content_->get_motion_buffer().size() > 0) {
+//      draw_car_trajectory(frame_content_);
+//    }
     glPopMatrix();
   }
 
+  if (FLAGS_show_motion_track &&
+      frame_content_->get_motion_buffer().size() > 0) {
+      motion_matrix_ =
+         frame_content_->get_motion_buffer().back().motion;
+//      AINFO <<motion_matrix_;
+  }
   glViewport(0, 0, image_width_, image_height_);
   glPushMatrix();
   glTranslatef(vao_trans_y_, vao_trans_x_, vao_trans_z_);
@@ -1017,7 +1026,55 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
   glPointSize(1);
   glLineWidth(1);
 
+  if (FLAGS_show_motion_track) {
+//    if (lane_history_buffer_.size() > lane_history_buffer_size_) {
+//      lane_history_buffer_.erase(lane_history_buffer_.begin());
+//      lane_history_buffer_.push_back(*lane_objects);
+//    }
+    while (lane_history_->size() < lane_objects_->size()) {
+      lane_history_->push_back(LaneObject());
+    }
+  }
   for (size_t k = 0; k < lane_objects_->size(); ++k) {
+    const float a = lane_objects_->at(k).pos_curve.a;
+    const float b = lane_objects_->at(k).pos_curve.b;
+    const float c = lane_objects_->at(k).pos_curve.c;
+    const float d = lane_objects_->at(k).pos_curve.d;
+
+    if (FLAGS_show_motion_track) {
+        auto &lane_history_pos = lane_history_->at(k).pos;
+        // update lane history by projecting motion
+        for (auto &p : lane_history_pos) {
+          Eigen::Vector3f point_h;
+          point_h << p[0], p[1], 1;
+          point_h = motion_matrix_ * point_h;
+          p[0] = point_h[0];
+          p[1] = point_h[1];
+        }
+        // add new point
+        for (auto p = lane_objects_->at(k).pos.begin();
+            p != lane_objects_->at(k).pos.end(); ++p) {
+          auto point_poly = *p;
+          point_poly[1] = GetPolyValue(a, b, c, d, point_poly[0]);
+
+          lane_history_pos.push_back(point_poly);
+          if (lane_history_pos.size() > lane_history_buffer_size_) {
+            lane_history_pos.erase(lane_history_pos.begin());
+          }
+        }
+
+        glColor3f(1.0f, 0.0f, 0.0f);  // red
+        glLineWidth(1);
+        glBegin(GL_LINE_STRIP);
+        for (auto p : lane_history_pos) {
+//          glVertex2f(p[0], p[1]);
+          drawHollowCircle(p[0], p[1], 0.2);
+        }
+        glEnd();
+        glFlush();
+        glLineWidth(1);
+    }
+
     // draw markers
     switch (lane_objects_->at(k).spatial) {
       case apollo::perception::SpatialLabelType::L_0: {
@@ -1049,7 +1106,9 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
                << static_cast<int>(lane_objects_->at(k).spatial);
       }
     }
-
+    if (FLAGS_show_motion_track) {
+            glColor3f(1.0f, 0.0f, 0.0f);  // red
+    }
     for (auto p = lane_objects_->at(k).pos.begin();
          p != lane_objects_->at(k).pos.end(); ++p) {
       drawHollowCircle(static_cast<GLfloat>(p->x()),
@@ -1057,13 +1116,9 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
     }
 
     // draw polynomial curve
-    float a = lane_objects_->at(k).pos_curve.a;
-    float b = lane_objects_->at(k).pos_curve.b;
-    float c = lane_objects_->at(k).pos_curve.c;
-    float d = lane_objects_->at(k).pos_curve.d;
+
     float x_start = lane_objects_->at(k).pos_curve.x_start;
     float x_end = lane_objects_->at(k).pos_curve.x_end;
-
     const GLfloat x_step = 0.01;
     GLfloat x_lb = std::min(x_start, 0.0f);
     GLfloat x_ub = x_end;
@@ -1841,68 +1896,27 @@ void GLFWFusionViewer::drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
 
 void GLFWFusionViewer::draw_car_trajectory(FrameContent* content) {
   const MotionBuffer& motion_buffer = content->get_motion_buffer();
-  // Eigen::Vector3d center_d = pers_camera_->scene_center();
   Eigen::Vector3f center;
-  center << 0,  // center_d(0,0),
-      0,        // center_d(1,0),
-      1.0;
-
-  //  center << 10, 10, 1.0;
-
-  //    std::cout << "GLViewer motion_buffer.size() : "
-  //              << motion_buffer.size() << std::endl;
+  center << 0,
+            0,
+            1.0;
 
   Eigen::Vector3f point = center;
   for (int i = motion_buffer.size() - 1; i >= 0; i--) {
     Eigen::Matrix3f tmp = motion_buffer[i].motion;
-    Eigen::Matrix2f rotat2d = tmp.block(0, 0, 2, 2);
-    Eigen::Vector2f trans = tmp.block(0, 2, 2, 1);
-
-    // [R, T]^-1 = [R^t, -R^t*T]
-    tmp.block(0, 0, 2, 2) = rotat2d.transpose();
-    tmp.block(0, 2, 2, 1) = -rotat2d.transpose() * trans;
-
     point = tmp * center;
-
-    point[0] = 2 * center[0] - point[0];
-    //    point[1] = 2 * center[1] - point[1];
-    //        point = 2*center - point;
-    //        std::cout << "trajectory points: (" << point(0,0) << ", "
-    //                  << point(1,0) << ", " << point(2,0)
-    //                  << "); ";
-    //    AINFO << "trajectory points: (" << point(0,0) << ", "
-    //                      << point(1,0) << ", " << point(2,0)
-    //                      << "); ";
-
-    drawHollowCircle(point(0), point(1), 1);
+    drawHollowCircle(point(0), point(1), 0.2);
     glFlush();
   }
-  //    std::cout <<  std::endl;
 }
 
 void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
   std::vector<ObjectPtr> objects = content->get_camera_objects();
   double time_stamp = frame_content_->get_visualization_timestamp();
 
-  //    double camera_timestamp = content->get_camera_timestamp();
-  //    double content_motion_timestamp = content->get_motion_timestamp();
-  //    std::cout << "content object and motion timestamp: " <<
-  //        std::to_string(camera_timestamp) << " "
-  //              << std::to_string(content_motion_timestamp) <<std::endl;
-
   const MotionBuffer& motion_buffer = content->get_motion_buffer();
   int motion_size = motion_buffer.size();
   if (motion_size > 0) {
-    // auto &motion_mat = motion_buffer[motion_buffer.size() - 1].motion;
-    //        Eigen::Matrix3f tmp = motion_mat;
-    //        Eigen::Matrix2f rotat2d = tmp.block(0, 0, 2, 2);
-    //        Eigen::Vector2f trans   = tmp.block(0, 2, 2, 1);
-    //        //[R, T]^-1 = [R^t, -R^t*T]
-    //        tmp.block(0, 0, 2, 2) = rotat2d.transpose();
-    //        tmp.block(0, 2, 2, 1) = -rotat2d.transpose() * trans;
-    //        std::cout << "current motion :" << tmp <<std::endl;
-    //        std::cout << "inversed by: " << motion_mat<<std::endl;
-
     std::map<int, std::vector<std::pair<float, float>>>
         tmp_object_trackjectories;
     std::map<int, std::vector<double>> tmp_object_timestamps;
@@ -1918,7 +1932,7 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
         object_timestamps_[cur_id].push_back(ts);
       }
       object_trackjectories_[cur_id].push_back(
-          std::make_pair(obj->center[2], -obj->center[0]));
+          std::make_pair(obj->center[0], obj->center[1]));
       object_timestamps_[cur_id].push_back(time_stamp);
     }
 
@@ -1927,52 +1941,22 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
       if (trackjectory.second.size() > 1) {
         glLineWidth(1);
         glBegin(GL_LINE_STRIP);
-        ////                logging
-        // int cur_id = trackjectory.first;
-        //                auto &timestamps = object_timestamps[cur_id];
-        //                std::cout<< "track: " << cur_id << " with size " <<
-        //                  trackjectory.second.size() <<": ";
-
-        //                std::cout<<"motion time: ";
-        //              for(int it = motion_buffer.size()-1, count=0;
-        //                  it >= 0; it--, count++) {
-        //                    if(count>=10) {
-        //                        break;
-        //                    }
-        //                    std::cout<<std::to_string(motion_buffer[it].time_t)
-        //                    <<" ";
-        ////                    std::cout<<motion_buffer[it].motion<<std::endl;
-        //                }
-        //                std::cout<<std::endl;
-
-        //                std::cout <<"object time: ";
-        //                for(int it = timestamps.size() - 1, count = 0;
-        //                      it > 0; it--, count++) {
-        //                    if (count>=10 ) {
-        //                        break;
-        //                    }
-        //                    std::cout<<std::to_string(timestamps[it]) <<" ";
-        //                }
-        //                std::cout<<std::endl;
-        for (std::size_t it = trackjectory.second.size() - 1, count = 0; it > 0;
-             it--, count++) {
-          if (count >= 10 || count > motion_buffer.size()) {
-            continue;
+        for (std::size_t it = trackjectory.second.size() - 1, count = 0;
+              it > 0; it--, count++) {
+          if (count >= object_history_size_ || count > motion_buffer.size()) {
+            break;
           }
 
           Eigen::Vector3f pt, proj_pt;
-          pt << trackjectory.second[it].first, trackjectory.second[it].second,
-              1.0;
+          pt << trackjectory.second[it].first,
+                trackjectory.second[it].second,
+                1.0;
           if (it == trackjectory.second.size() - 1) {
             proj_pt = pt;
           } else {
             auto& motion_mat = motion_buffer[motion_size - count].motion;
-            auto tmp = motion_mat.inverse();
-            proj_pt = tmp * pt;
+            proj_pt = motion_mat * pt;
           }
-          proj_pt[0] = 2 * pt[0] - proj_pt[0];
-          proj_pt[1] = 2 * pt[1] - proj_pt[1];
-
           glVertex2f(proj_pt[0], proj_pt[1]);
         }
         glEnd();
