@@ -22,7 +22,7 @@ not because they are easy, but because they are hard.
 
 ### 设置Docker环境请运行如下命令
 
-首先，你需要(正确地安装Docker-ce)[https://github.com/ApolloAuto/apollo/blob/master/docker/scripts/README.md#install-docker].
+首先，你需要[正确地安装Docker-ce](https://github.com/ApolloAuto/apollo/blob/master/docker/scripts/README.md#install-docker).
 
 以下命令会将你带入Docker容器中。
 ```

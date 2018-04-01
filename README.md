@@ -31,7 +31,7 @@ More instructions are below
 
 ### The docker environment can be set by the commands below.
 
-First, you need to (install docker-ce properly)[https://github.com/ApolloAuto/apollo/blob/master/docker/scripts/README.md#install-docker].
+First, you need to [install docker-ce properly](https://github.com/ApolloAuto/apollo/blob/master/docker/scripts/README.md#install-docker).
 The following scripts will get you into the container
 
 ```
