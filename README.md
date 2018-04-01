@@ -31,15 +31,11 @@ More instructions are below
 
 ### The docker environment can be set by the commands below.
 
-Running a docker container from a linux system is done with this sequence. At the end, the `dev_into.sh`
-script will get you into the container
+First, you need to (install docker-ce properly)[https://github.com/ApolloAuto/apollo/blob/master/docker/scripts/README.md#install-docker].
+The following scripts will get you into the container
 
 ```
-bash docker/scripts/install_docker.sh
-# logout and login back in the system to make sure to run docker command without sudo
 docker ps  # to verify docker works without sudo
-# in case you forgot to logout and login back, do so, remove ~/.docker/config.json
-# and check again with `docker ps`
 bash docker/scripts/dev_start.sh
 bash docker/scripts/dev_into.sh
 
