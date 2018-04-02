@@ -15,8 +15,8 @@
  * 编译，执行bash apollo.sh build。
  * 然后执行bash script/hmi.sh。
  * 打开ip:8887，在选择地图的下拉框中就可以看到新加入的hd map了。
- * 注1：由于暂时还不确定hd map如何生成，所以我是直接copy new_garage 重命名为new_garage_2测试的，测试通过。
- * 注2：编译的时候，应该相当于将/apollo/modules/map/data/new_map注册到系统中去，以便启动hmi时，前端网页可以定位到/apollo/modules/map/data/new_map目录，进而加载其中的文件。也因此，可以有第二个方法加入hd map。
+ * 直接copy new_garage 重命名为new_garage_2测试的，测试通过。
+ * 注1：编译的时候，应该相当于将/apollo/modules/map/data/new_map注册到系统中去，以便启动hmi时，前端网页可以定位到/apollo/modules/map/data/new_map目录，进而加载其中的文件。也因此，可以有第二个方法加入hd map。
 
 ### 利用现有的地图目录，加入地图：
  * 假设apollo1.5中，已经添加了new_map，此时只需要替换目录下的hd map所有的文件，这样不需要编译，即可使用新的hd map。
