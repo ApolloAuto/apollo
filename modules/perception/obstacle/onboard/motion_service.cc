@@ -40,6 +40,7 @@ bool MotionService::InitInternal() {
 
   CHECK(AdapterManager::GetLocalization()) << "Localiztion is not initialized.";
   AdapterManager::AddLocalizationCallback(&MotionService::OnLocalization, this);
+  AINFO << "start to init MotionService.";
   vehicle_planemotion_ = new PlaneMotion(motion_buffer_size_);
 
   CHECK(shared_data_manager_ != NULL);

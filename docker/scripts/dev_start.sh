@@ -117,6 +117,10 @@ if [ "$INCHINA" == "yes" ]; then
     DOCKER_REPO=registry.docker-cn.com/apolloauto/apollo
 fi
 
+if [ "$LOCAL_IMAGE" == "yes" ]; then
+    VERSION="local_dev"
+fi
+
 # Included default maps.
 for map_name in ${DEFAULT_MAPS[@]}; do
     source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
