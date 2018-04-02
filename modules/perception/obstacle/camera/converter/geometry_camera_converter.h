@@ -82,7 +82,8 @@ class GeometryCameraConverter : public BaseCameraConverter {
   void CheckSizeSanity(VisualObjectPtr obj) const;
 
   // Check truncation based on 2D box position
-  void CheckTruncation(VisualObjectPtr obj) const;
+  void CheckTruncation(VisualObjectPtr obj,
+                       Eigen::Matrix<float, 2, 1> *trunc_center_pixel) const;
 
   // Choose distance based on 2D box width or height
   float DecideDistance(const float &distance_h, const float &distance_w,
