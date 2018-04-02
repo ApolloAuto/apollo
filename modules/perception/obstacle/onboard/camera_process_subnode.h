@@ -33,6 +33,7 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/singleton.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"

@@ -110,6 +110,7 @@ cc_library(
     deps = [
         ":perception_obstacle_shared_data",
         "//modules/common:log",
+        "//modules/common/time:time",
         "//modules/common/adapters:adapter_manager",
         "//modules/perception/common",
         "//modules/perception/lib/config_manager",
