@@ -32,7 +32,7 @@ GemVehicleFactory::CreateVehicleController() {
 std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
 GemVehicleFactory::CreateMessageManager() {
   return std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>(
-	new gem::GemMessageManager());
+      new gem::GemMessageManager());
 }
 
 }  // namespace canbus

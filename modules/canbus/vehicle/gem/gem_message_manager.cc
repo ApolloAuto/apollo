@@ -15,8 +15,6 @@ limitations under the License.
 
 #include "modules/canbus/vehicle/gem/gem_message_manager.h"
 
-
-
 #include "modules/canbus/vehicle/gem/protocol/accel_cmd_67.h"
 #include "modules/canbus/vehicle/gem/protocol/accel_rpt_68.h"
 #include "modules/canbus/vehicle/gem/protocol/brake_cmd_6b.h"
@@ -54,7 +52,6 @@ namespace gem {
 
 GemMessageManager::GemMessageManager() {
   // Control Messages
-
 
   // Report Messages
   AddRecvProtocolData<Accelcmd67, true>();

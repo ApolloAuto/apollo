@@ -31,16 +31,23 @@ Headlightcmd76::Headlightcmd76() {}
 const int32_t Headlightcmd76::ID = 0x76;
 
 void Headlightcmd76::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_headlight_cmd_76()->set_headlight_cmd(headlight_cmd(bytes, length));
+                           ChassisDetail* chassis) const {
+  chassis->mutable_gem()->mutable_headlight_cmd_76()->set_headlight_cmd(
+      headlight_cmd(bytes, length));
 }
 
-// config detail: {'name': 'headlight_cmd', 'enum': {0: 'HEADLIGHT_CMD_HEADLIGHTS_OFF', 1: 'HEADLIGHT_CMD_LOW_BEAMS', 2: 'HEADLIGHT_CMD_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Headlight_cmd_76::Headlight_cmdType Headlightcmd76::headlight_cmd(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'headlight_cmd', 'enum': {0:
+// 'HEADLIGHT_CMD_HEADLIGHTS_OFF', 1: 'HEADLIGHT_CMD_LOW_BEAMS', 2:
+// 'HEADLIGHT_CMD_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
+// False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 7, 'type': 'enum',
+// 'order': 'motorola', 'physical_unit': ''}
+Headlight_cmd_76::Headlight_cmdType Headlightcmd76::headlight_cmd(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Headlight_cmd_76::Headlight_cmdType ret =  static_cast<Headlight_cmd_76::Headlight_cmdType>(x);
+  Headlight_cmd_76::Headlight_cmdType ret =
+      static_cast<Headlight_cmd_76::Headlight_cmdType>(x);
   return ret;
 }
 }  // namespace gem

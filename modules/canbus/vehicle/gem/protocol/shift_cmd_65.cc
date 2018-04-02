@@ -31,16 +31,23 @@ Shiftcmd65::Shiftcmd65() {}
 const int32_t Shiftcmd65::ID = 0x65;
 
 void Shiftcmd65::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_shift_cmd_65()->set_shift_cmd(shift_cmd(bytes, length));
+                       ChassisDetail* chassis) const {
+  chassis->mutable_gem()->mutable_shift_cmd_65()->set_shift_cmd(
+      shift_cmd(bytes, length));
 }
 
-// config detail: {'description': 'FORWARD_is_also_LOW_on_vehicles_with_LOW/HIGH,_PARK_and_HIGH_only_available_on_certain_Vehicles', 'enum': {0: 'SHIFT_CMD_PARK', 1: 'SHIFT_CMD_REVERSE', 2: 'SHIFT_CMD_NEUTRAL', 3: 'SHIFT_CMD_FORWARD', 4: 'SHIFT_CMD_LOW'}, 'precision': 1.0, 'len': 8, 'name': 'shift_cmd', 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|4]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Shift_cmd_65::Shift_cmdType Shiftcmd65::shift_cmd(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'description':
+// 'FORWARD_is_also_LOW_on_vehicles_with_LOW/HIGH,_PARK_and_HIGH_only_available_on_certain_Vehicles',
+// 'enum': {0: 'SHIFT_CMD_PARK', 1: 'SHIFT_CMD_REVERSE', 2: 'SHIFT_CMD_NEUTRAL',
+// 3: 'SHIFT_CMD_FORWARD', 4: 'SHIFT_CMD_LOW'}, 'precision': 1.0, 'len': 8,
+// 'name': 'shift_cmd', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
+// '[0|4]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+Shift_cmd_65::Shift_cmdType Shiftcmd65::shift_cmd(const std::uint8_t* bytes,
+                                                  int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Shift_cmd_65::Shift_cmdType ret =  static_cast<Shift_cmd_65::Shift_cmdType>(x);
+  Shift_cmd_65::Shift_cmdType ret = static_cast<Shift_cmd_65::Shift_cmdType>(x);
   return ret;
 }
 }  // namespace gem

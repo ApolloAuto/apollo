@@ -29,23 +29,21 @@
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
-
-
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class GemController final : public VehicleController {
  public:
-
-  explicit GemController() {};
+  GemController() {}
 
   virtual ~GemController();
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail> *const message_manager) override;
+      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
+      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      override;
 
   bool Start() override;
 
@@ -109,7 +107,6 @@ class GemController final : public VehicleController {
 
  private:
   // control protocol
-
 
   Chassis chassis_;
   std::unique_ptr<std::thread> thread_;
