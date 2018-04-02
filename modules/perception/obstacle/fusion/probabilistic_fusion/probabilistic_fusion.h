@@ -91,6 +91,7 @@ class ProbabilisticFusion : public BaseFusion {
   std::mutex fusion_mutex_;
   bool use_radar_;
   bool use_lidar_;
+  bool use_camera_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(ProbabilisticFusion);

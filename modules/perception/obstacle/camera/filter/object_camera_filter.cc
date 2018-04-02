@@ -122,9 +122,10 @@ void ObjectCameraFilter::GetState(const int &track_id,
   obj_ptr->state_uncertainty.block(2, 0, 2, 2) << x_state_cov(1, 0), 0, 0,
       y_state_cov(1, 0);
 
-  std::cout << "state uncertainty\n" << obj_ptr->state_uncertainty << std::endl;
-  std::cout << "x state cov\n" << x_state_cov << std::endl;
-  std::cout << "y state cov\n" << y_state_cov << std::endl;
+  // std::cerr << "PBFIMF:state uncertainty" << obj_ptr->state_uncertainty <<
+  // std::endl;
+  // std::cerr << "PBFIMF:x state cov" << x_state_cov << std::endl;
+  // std::cerr << "PBFIMF:y state cov" << y_state_cov << std::endl;
 
   obj_ptr->alpha = tracked_filters_[track_id].alpha_.GetState().x();
   obj_ptr->theta = tracked_filters_[track_id].theta_.GetState().x();
