@@ -31,16 +31,23 @@ Turncmd63::Turncmd63() {}
 const int32_t Turncmd63::ID = 0x63;
 
 void Turncmd63::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_turn_cmd_63()->set_turn_signal_cmd(turn_signal_cmd(bytes, length));
+                      ChassisDetail* chassis) const {
+  chassis->mutable_gem()->mutable_turn_cmd_63()->set_turn_signal_cmd(
+      turn_signal_cmd(bytes, length));
 }
 
-// config detail: {'name': 'turn_signal_cmd', 'enum': {0: 'TURN_SIGNAL_CMD_RIGHT', 1: 'TURN_SIGNAL_CMD_NONE', 2: 'TURN_SIGNAL_CMD_LEFT', 3: 'TURN_SIGNAL_CMD_HAZARD'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Turn_cmd_63::Turn_signal_cmdType Turncmd63::turn_signal_cmd(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'turn_signal_cmd', 'enum': {0:
+// 'TURN_SIGNAL_CMD_RIGHT', 1: 'TURN_SIGNAL_CMD_NONE', 2:
+// 'TURN_SIGNAL_CMD_LEFT', 3: 'TURN_SIGNAL_CMD_HAZARD'}, 'precision': 1.0,
+// 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
+// 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+Turn_cmd_63::Turn_signal_cmdType Turncmd63::turn_signal_cmd(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Turn_cmd_63::Turn_signal_cmdType ret =  static_cast<Turn_cmd_63::Turn_signal_cmdType>(x);
+  Turn_cmd_63::Turn_signal_cmdType ret =
+      static_cast<Turn_cmd_63::Turn_signal_cmdType>(x);
   return ret;
 }
 }  // namespace gem

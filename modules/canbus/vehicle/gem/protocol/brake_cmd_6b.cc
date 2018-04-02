@@ -31,11 +31,14 @@ Brakecmd6b::Brakecmd6b() {}
 const int32_t Brakecmd6b::ID = 0x6B;
 
 void Brakecmd6b::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_brake_cmd_6b()->set_brake_cmd(brake_cmd(bytes, length));
+                       ChassisDetail* chassis) const {
+  chassis->mutable_gem()->mutable_brake_cmd_6b()->set_brake_cmd(
+      brake_cmd(bytes, length));
 }
 
-// config detail: {'name': 'brake_cmd', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+// config detail: {'name': 'brake_cmd', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7,
+// 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
 double Brakecmd6b::brake_cmd(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
