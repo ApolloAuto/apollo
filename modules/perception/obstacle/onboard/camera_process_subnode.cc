@@ -95,15 +95,14 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   sensor_msgs::Image msg = AdapterManager::GetImageFront()->GetLatestObserved();
 
   double timestamp = msg.header.stamp.toSec();
-  AINFO << "CameraProcessSubnode ImgCallback: "
-        << " frame: " << ++seq_num_ << " timestamp: ";
-  AINFO << std::fixed << std::setprecision(64) << timestamp;
+
 
   if (FLAGS_skip_camera_frame) {
       if (timestamp_ns_ > 0.0) {
         double curr_timestamp = timestamp * 1e9;
 
         if ((curr_timestamp - timestamp_ns_) < (1e9 / FLAGS_camera_hz)) {
+            AINFO << "CameraProcessSubnode Skip frame";
             return;
         }
         timestamp_ns_ = curr_timestamp;
@@ -114,21 +113,36 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
         timestamp_ns_ = timestamp * 1e9;
   }
 
+  AINFO << "CameraProcessSubnode ImgCallback: "
+        << " frame: " << ++seq_num_ << " timestamp: ";
+  AINFO << std::fixed << std::setprecision(64) << timestamp;
+  PERF_FUNCTION("CameraProcessSubnode");
+  PERF_BLOCK_START();
+
   cv::Mat img;
   if (!FLAGS_image_file_debug) {
     MessageToMat(msg, &img);
   } else {
     img = cv::imread(FLAGS_image_file_path, CV_LOAD_IMAGE_COLOR);
   }
-
   std::vector<VisualObjectPtr> objects;
   cv::Mat mask = cv::Mat::zeros(img.rows, img.cols, CV_32FC1);
+  PERF_BLOCK_END("CameraProcessSubnode Image Preprocess");
 
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
+  PERF_BLOCK_END("CameraProcessSubnode detector_");
+
   converter_->Convert(&objects);
+  PERF_BLOCK_END("CameraProcessSubnode converter_");
+
   transformer_->Transform(&objects);
+  PERF_BLOCK_END("CameraProcessSubnode transformer_");
+
   tracker_->Associate(img, timestamp, &objects);
+  PERF_BLOCK_END("CameraProcessSubnode tracker_");
+
   filter_->Filter(timestamp, &objects);
+  PERF_BLOCK_END("CameraProcessSubnode filter_");
 
   std::shared_ptr<SensorObjects> out_objs(new SensorObjects);
   out_objs->timestamp = timestamp;
@@ -138,6 +152,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   camera_item_ptr->image_src_mat = img.clone();
   mask.copyTo(out_objs->camera_frame_supplement->lane_map);
   PublishDataAndEvent(timestamp, out_objs, camera_item_ptr);
+  PERF_BLOCK_END("CameraProcessSubnode publish in DAG");
 
   if (publish_) PublishPerceptionPb(out_objs);
 }
