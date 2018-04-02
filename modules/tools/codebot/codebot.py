@@ -97,5 +97,5 @@ def format_recent_files():
 
 if __name__ == "__main__":
     git_helper= GitHelper(g_apollo_root, remote="upstream")
-    clean_gflags()
+    #clean_gflags()
     format_recent_files()
