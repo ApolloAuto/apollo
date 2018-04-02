@@ -45,6 +45,7 @@ cc_library(
     ],
     deps = [
         "//modules/canbus/vehicle/lincoln:lincoln_vehicle_factory",
+        "//modules/canbus/vehicle/gem:gem_vehicle_factory",
         "//modules/common/util:factory",
     ],
 )
