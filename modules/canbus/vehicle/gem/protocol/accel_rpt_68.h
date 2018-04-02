@@ -17,30 +17,35 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_ACCEL_RPT_68_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_ACCEL_RPT_68_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Accelrpt68 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                       ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Accelrpt68();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
-
-  // config detail: {'name': 'MANUAL_INPUT', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+  // config detail: {'name': 'MANUAL_INPUT', 'offset': 0.0, 'precision': 0.001,
+  // 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7,
+  // 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
   double manual_input(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'COMMANDED_VALUE', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+  // config detail: {'name': 'COMMANDED_VALUE', 'offset': 0.0, 'precision':
+  // 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit':
+  // 23, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
   double commanded_value(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'OUTPUT_VALUE', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+  // config detail: {'name': 'OUTPUT_VALUE', 'offset': 0.0, 'precision': 0.001,
+  // 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 39,
+  // 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
   double output_value(const std::uint8_t* bytes, const int32_t length) const;
 };
 

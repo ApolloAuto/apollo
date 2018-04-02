@@ -44,8 +44,8 @@ namespace canbus {
 class GemVehicleFactory : public AbstractVehicleFactory {
  public:
   /**
-  * @brief destructor
-  */
+   * @brief destructor
+   */
   virtual ~GemVehicleFactory() = default;
 
   /**
@@ -58,7 +58,7 @@ class GemVehicleFactory : public AbstractVehicleFactory {
    * @brief create gem message manager
    * @returns a unique_ptr that points to the created message manager
    */
-  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>> 
+  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
   CreateMessageManager() override;
 };
 

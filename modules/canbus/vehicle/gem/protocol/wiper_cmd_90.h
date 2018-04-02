@@ -17,25 +17,31 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_WIPER_CMD_90_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_WIPER_CMD_90_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Wipercmd90 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                       ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Wipercmd90();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
-
-  // config detail: {'name': 'WIPER_CMD', 'enum': {0: 'WIPER_CMD_WIPERS_OFF', 1: 'WIPER_CMD_INTERMITTENT_1', 2: 'WIPER_CMD_INTERMITTENT_2', 3: 'WIPER_CMD_INTERMITTENT_3', 4: 'WIPER_CMD_INTERMITTENT_4', 5: 'WIPER_CMD_INTERMITTENT_5', 6: 'WIPER_CMD_LOW', 7: 'WIPER_CMD_HIGH'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|7]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Wiper_cmd_90::Wiper_cmdType wiper_cmd(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'name': 'WIPER_CMD', 'enum': {0: 'WIPER_CMD_WIPERS_OFF', 1:
+  // 'WIPER_CMD_INTERMITTENT_1', 2: 'WIPER_CMD_INTERMITTENT_2', 3:
+  // 'WIPER_CMD_INTERMITTENT_3', 4: 'WIPER_CMD_INTERMITTENT_4', 5:
+  // 'WIPER_CMD_INTERMITTENT_5', 6: 'WIPER_CMD_LOW', 7: 'WIPER_CMD_HIGH'},
+  // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
+  // 'physical_range': '[0|7]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
+  // 'physical_unit': ''}
+  Wiper_cmd_90::Wiper_cmdType wiper_cmd(const std::uint8_t* bytes,
+                                        const int32_t length) const;
 };
 
 }  // namespace gem
