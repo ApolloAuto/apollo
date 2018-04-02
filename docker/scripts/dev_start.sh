@@ -117,7 +117,7 @@ if [ "$INCHINA" == "yes" ]; then
     DOCKER_REPO=registry.docker-cn.com/apolloauto/apollo
 fi
 
-if [ "$LOCAL_IMAGE" == "yes" ]; then
+if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
     VERSION="local_dev"
 fi
 
