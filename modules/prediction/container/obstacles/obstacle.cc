@@ -41,6 +41,7 @@ using ::apollo::common::Point3D;
 using ::apollo::common::math::KalmanFilter;
 using ::apollo::common::util::FindOrDie;
 using ::apollo::common::util::FindOrNull;
+using ::apollo::common::PathPoint;
 using ::apollo::hdmap::LaneInfo;
 using ::apollo::perception::PerceptionObstacle;
 
@@ -942,6 +943,24 @@ void Obstacle::SetLanePoints(Feature* feature) {
     }
   }
   ADEBUG << "Obstacle [" << id_ << "] has lane segments and points.";
+}
+
+void Obstacle::SetLaneSequencePath(LaneGraph* const lane_graph) {
+  for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
+    LaneSequence* lane_sequence = lane_graph->mutable_lane_sequence(i);
+    double lane_segment_s = 0.0;
+    for (int j = 0; j < lane_sequence->lane_segment_size(); ++j) {
+      LaneSegment* lane_segment = lane_sequence->mutable_lane_segment(j);
+      for (int k = 0; k < lane_segment->lane_point_size(); ++k) {
+        LanePoint* lane_point = lane_segment->mutable_lane_point(k);
+        PathPoint path_point;
+        path_point.set_s(lane_segment_s + lane_point->relative_s());
+        path_point.set_theta(lane_point->heading());
+        lane_sequence->add_path_point()->CopyFrom(path_point);
+      }
+      lane_segment_s += lane_segment->total_length();
+    }
+  }
 }
 
 void Obstacle::SetMotionStatus() {
