@@ -143,9 +143,11 @@ bool ProbabilisticFusion::Init() {
         << (publish_if_has_radar ? "true" : "false");
 
   /**publish driven*/
-  if (!model_config->GetValue("publish_sensor", &publish_sensor_id_)) {
+  /*if (!model_config->GetValue("publish_sensor", &publish_sensor_id_)) {
     AERROR << "publish_sensor not found";
-  }
+  }*/
+  publish_sensor_id_ = FLAGS_fusion_publish_sensor_id;
+
   if (publish_sensor_id_ != "velodyne_64" &&
       publish_sensor_id_ != "radar" &&
       publish_sensor_id_ != "camera") {

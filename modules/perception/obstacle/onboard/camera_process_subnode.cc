@@ -114,6 +114,8 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
         timestamp_ns_ = timestamp * 1e9;
   }
 
+  AINFO << "CameraProcessSubnode process frame";
+
   cv::Mat img;
   if (!FLAGS_image_file_debug) {
     MessageToMat(msg, &img);

@@ -70,6 +70,13 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @return nothing
   void GetState(Eigen::Vector3d *anchor_point, Eigen::Vector3d *velocity);
 
+  // @brief set current state of the filter
+  // @params[IN] anchor_point: updated anchor_point
+  // @params[IN] velocity: updated velocity
+  // @return nothing
+  void SetState(const Eigen::Vector3d& anchor_point,
+                const Eigen::Vector3d& velocity);
+
  protected:
   int GetRadarHistoryLength();
 
