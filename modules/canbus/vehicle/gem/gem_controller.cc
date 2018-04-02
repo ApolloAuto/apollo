@@ -28,21 +28,21 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
-using ::apollo::drivers::canbus::ProtocolData;
 using ::apollo::common::ErrorCode;
 using ::apollo::control::ControlCommand;
+using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
 
 const int32_t kMaxFailAttempt = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
-}
+}  // namespace
 
 ErrorCode GemController::Init(
-	const VehicleParameter& params,
-	CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail> *const message_manager) {
+    const VehicleParameter& params,
+    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
+    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
     AINFO << "GemController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
@@ -66,8 +66,6 @@ ErrorCode GemController::Init(
   message_manager_ = message_manager;
 
   // sender part
-
-
 
   // need sleep to ensure all messages received
   AINFO << "GemController is initialized.";
@@ -119,7 +117,7 @@ Chassis GemController::chassis() {
   // 3
   chassis_.set_engine_started(true);
   /* ADD YOUR OWN CAR CHASSIS OPERATION
-  */
+   */
   return chassis_;
 }
 
@@ -272,7 +270,7 @@ void GemController::Gear(Chassis::GearPosition gear_position) {
 // -> pedal
 void GemController::Brake(double pedal) {
   // double real_value = params_.max_acc() * acceleration / 100;
-  // TODO Update brake value based on mode
+  // TODO(QiL) Update brake value based on mode
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
     AINFO << "The current drive mode does not need to set acceleration.";
@@ -378,7 +376,7 @@ void GemController::ResetProtocol() {
 
 bool GemController::CheckChassisError() {
   /* ADD YOUR OWN CAR CHASSIS OPERATION
-  */
+   */
   return false;
 }
 
@@ -444,16 +442,15 @@ void GemController::SecurityDogThreadFunc() {
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
     } else {
-      AERROR
-          << "Too much time consumption in GemController looping process:"
-          << elapsed.count();
+      AERROR << "Too much time consumption in GemController looping process:"
+             << elapsed.count();
     }
   }
 }
 
 bool GemController::CheckResponse(const int32_t flags, bool need_wait) {
   /* ADD YOUR OWN CAR CHASSIS OPERATION
-  */
+   */
   return false;
 }
 
