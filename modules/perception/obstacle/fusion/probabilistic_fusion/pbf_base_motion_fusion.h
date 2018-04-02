@@ -69,6 +69,13 @@ class PbfBaseMotionFusion {
   virtual void GetState(Eigen::Vector3d* anchor_point,
                         Eigen::Vector3d* velocity) = 0;
 
+  // @brief set current state of the filter
+  // @params[IN] anchor_point: updated anchor_point
+  // @params[IN] velocity: updated velocity
+  // @return nothing
+  virtual void SetState(const Eigen::Vector3d& anchor_point,
+                        const Eigen::Vector3d& velocity) = 0;
+
   void setCurrentFuseTS(double ts) {
       fuse_timestamp = ts;
   }
