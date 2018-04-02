@@ -98,7 +98,21 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   AINFO << "CameraProcessSubnode ImgCallback: "
         << " frame: " << ++seq_num_ << " timestamp: ";
   AINFO << std::fixed << std::setprecision(64) << timestamp;
-  timestamp_ns_ = timestamp * 1e9;
+
+  if (FLAGS_skip_camera_frame) {
+      if (timestamp_ns_ > 0.0) {
+        double curr_timestamp = timestamp * 1e9;
+
+        if ((curr_timestamp - timestamp_ns_) < (1e9 / FLAGS_camera_hz)) {
+            return;
+        }
+        timestamp_ns_ = curr_timestamp;
+      } else {
+        timestamp_ns_ = timestamp * 1e9;
+      }
+  } else {
+        timestamp_ns_ = timestamp * 1e9;
+  }
 
   cv::Mat img;
   if (!FLAGS_image_file_debug) {
