@@ -21,7 +21,7 @@
    * 区域引动：障碍物只能在一定的区域移动。
 
 ## 源码架构：
- * main.c: 启动/prediction节点。
+ * main.cc: 启动/prediction节点。
  * prediction.cc和prediction.h:
 	  * Name()函数：返回节点名字prediction。
 	  * Init()函数：

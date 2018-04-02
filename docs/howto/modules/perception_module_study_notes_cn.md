@@ -16,7 +16,7 @@
  * 带航向和速度，障碍物的 3D 轨道消息：/apollo/perception/obstacles。
 
 ## 代码分析：
-### main.c：
+### main.cc：
  * 主节点文件。
  * 通过apollo顶层宏APOLLO_MAIN，创建ros 节点Perception。
 

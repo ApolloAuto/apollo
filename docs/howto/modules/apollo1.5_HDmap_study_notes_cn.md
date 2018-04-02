@@ -10,7 +10,7 @@
 ## 将HD map加入apollo1.5：
 有两个方法，一个是通过添加一个新的目录，使用apollo系统；一个是替换原有目录下的地图文件。
 ### 新加一个hd map：
- * 在/apollo/modules/map/data目录下，创建一个目录new_map；
+ * 在/apollo/modules/map/data目录下，创建一个目录new_map。
  * 将生成的hd map放入new_map中，如有配置文件，可以参考sunnyvale_office目录下的配置文件。
  * 编译，执行bash apollo.sh build。
  * 然后执行bash script/hmi.sh。
