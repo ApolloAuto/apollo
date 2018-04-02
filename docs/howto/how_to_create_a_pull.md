@@ -11,6 +11,12 @@ git config user.name "XXX"
 git config user.email "XXX@[XXX.com]"
 ```
 
+- Clone your fork (Please replace "USERNAME" with your GitHub user name.)
+
+```
+git clone git@github.com:USERNAME/apollo.git
+```
+
 - Add Apollo repository as upstream
 
 ```
@@ -38,5 +44,4 @@ git push -f -u origin "my_dev"
 - Generate a new pull request between "Apolloauto/apollo:master" and "forked repo:my_dev"
 - Collaborators will review and merge the commit.
 
-Thanks a lot for your contributions! 
-
+Thanks a lot for your contributions!
