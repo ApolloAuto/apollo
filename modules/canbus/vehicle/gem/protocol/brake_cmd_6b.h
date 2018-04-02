@@ -17,24 +17,25 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_BRAKE_CMD_6B_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_BRAKE_CMD_6B_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Brakecmd6b : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                       ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Brakecmd6b();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
-
-  // config detail: {'name': 'BRAKE_CMD', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+  // config detail: {'name': 'BRAKE_CMD', 'offset': 0.0, 'precision': 0.001,
+  // 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7,
+  // 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
   double brake_cmd(const std::uint8_t* bytes, const int32_t length) const;
 };
 

@@ -17,25 +17,31 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_SHIFT_CMD_65_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_SHIFT_CMD_65_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Shiftcmd65 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                       ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Shiftcmd65();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
-
-  // config detail: {'description': 'FORWARD_is_also_LOW_on_vehicles_with_LOW/HIGH,_PARK_and_HIGH_only_available_on_certain_Vehicles', 'enum': {0: 'SHIFT_CMD_PARK', 1: 'SHIFT_CMD_REVERSE', 2: 'SHIFT_CMD_NEUTRAL', 3: 'SHIFT_CMD_FORWARD', 4: 'SHIFT_CMD_LOW'}, 'precision': 1.0, 'len': 8, 'name': 'SHIFT_CMD', 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|4]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Shift_cmd_65::Shift_cmdType shift_cmd(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'description':
+  // 'FORWARD_is_also_LOW_on_vehicles_with_LOW/HIGH,_PARK_and_HIGH_only_available_on_certain_Vehicles',
+  // 'enum': {0: 'SHIFT_CMD_PARK', 1: 'SHIFT_CMD_REVERSE', 2:
+  // 'SHIFT_CMD_NEUTRAL', 3: 'SHIFT_CMD_FORWARD', 4: 'SHIFT_CMD_LOW'},
+  // 'precision': 1.0, 'len': 8, 'name': 'SHIFT_CMD', 'is_signed_var': False,
+  // 'offset': 0.0, 'physical_range': '[0|4]', 'bit': 7, 'type': 'enum',
+  // 'order': 'motorola', 'physical_unit': ''}
+  Shift_cmd_65::Shift_cmdType shift_cmd(const std::uint8_t* bytes,
+                                        const int32_t length) const;
 };
 
 }  // namespace gem
