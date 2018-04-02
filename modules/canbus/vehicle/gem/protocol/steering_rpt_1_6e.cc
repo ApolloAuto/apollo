@@ -31,14 +31,20 @@ Steeringrpt16e::Steeringrpt16e() {}
 const int32_t Steeringrpt16e::ID = 0x6E;
 
 void Steeringrpt16e::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_steering_rpt_1_6e()->set_manual_input(manual_input(bytes, length));
-  chassis->mutable_gem()->mutable_steering_rpt_1_6e()->set_commanded_value(commanded_value(bytes, length));
-  chassis->mutable_gem()->mutable_steering_rpt_1_6e()->set_output_value(output_value(bytes, length));
+                           ChassisDetail* chassis) const {
+  chassis->mutable_gem()->mutable_steering_rpt_1_6e()->set_manual_input(
+      manual_input(bytes, length));
+  chassis->mutable_gem()->mutable_steering_rpt_1_6e()->set_commanded_value(
+      commanded_value(bytes, length));
+  chassis->mutable_gem()->mutable_steering_rpt_1_6e()->set_output_value(
+      output_value(bytes, length));
 }
 
-// config detail: {'name': 'manual_input', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
-double Steeringrpt16e::manual_input(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'manual_input', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]',
+// 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
+double Steeringrpt16e::manual_input(const std::uint8_t* bytes,
+                                    int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
@@ -54,8 +60,11 @@ double Steeringrpt16e::manual_input(const std::uint8_t* bytes, int32_t length) c
   return ret;
 }
 
-// config detail: {'name': 'commanded_value', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]', 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
-double Steeringrpt16e::commanded_value(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'commanded_value', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]',
+// 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
+double Steeringrpt16e::commanded_value(const std::uint8_t* bytes,
+                                       int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
@@ -71,8 +80,11 @@ double Steeringrpt16e::commanded_value(const std::uint8_t* bytes, int32_t length
   return ret;
 }
 
-// config detail: {'name': 'output_value', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
-double Steeringrpt16e::output_value(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'output_value', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': True, 'physical_range': '[-32.768|32.767]',
+// 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
+double Steeringrpt16e::output_value(const std::uint8_t* bytes,
+                                    int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 

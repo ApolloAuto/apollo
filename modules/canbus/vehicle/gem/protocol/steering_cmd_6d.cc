@@ -31,13 +31,19 @@ Steeringcmd6d::Steeringcmd6d() {}
 const int32_t Steeringcmd6d::ID = 0x6D;
 
 void Steeringcmd6d::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_steering_cmd_6d()->set_position_value(position_value(bytes, length));
-  chassis->mutable_gem()->mutable_steering_cmd_6d()->set_speed_limit(speed_limit(bytes, length));
+                          ChassisDetail* chassis) const {
+  chassis->mutable_gem()->mutable_steering_cmd_6d()->set_position_value(
+      position_value(bytes, length));
+  chassis->mutable_gem()->mutable_steering_cmd_6d()->set_speed_limit(
+      speed_limit(bytes, length));
 }
 
-// config detail: {'name': 'position_value', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': True, 'physical_range': '[-2147483.648|2147483.647]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'radians'}
-double Steeringcmd6d::position_value(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'position_value', 'offset': 0.0, 'precision': 0.001,
+// 'len': 32, 'is_signed_var': True, 'physical_range':
+// '[-2147483.648|2147483.647]', 'bit': 7, 'type': 'double', 'order':
+// 'motorola', 'physical_unit': 'radians'}
+double Steeringcmd6d::position_value(const std::uint8_t* bytes,
+                                     int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
@@ -63,8 +69,11 @@ double Steeringcmd6d::position_value(const std::uint8_t* bytes, int32_t length) 
   return ret;
 }
 
-// config detail: {'name': 'speed_limit', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65.535]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
-double Steeringcmd6d::speed_limit(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'speed_limit', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65.535]', 'bit': 39,
+// 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
+double Steeringcmd6d::speed_limit(const std::uint8_t* bytes,
+                                  int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 

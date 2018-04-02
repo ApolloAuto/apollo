@@ -31,11 +31,14 @@ Accelcmd67::Accelcmd67() {}
 const int32_t Accelcmd67::ID = 0x67;
 
 void Accelcmd67::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_accel_cmd_67()->set_accel_cmd(accel_cmd(bytes, length));
+                       ChassisDetail* chassis) const {
+  chassis->mutable_gem()->mutable_accel_cmd_67()->set_accel_cmd(
+      accel_cmd(bytes, length));
 }
 
-// config detail: {'name': 'accel_cmd', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+// config detail: {'name': 'accel_cmd', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7,
+// 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
 double Accelcmd67::accel_cmd(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
