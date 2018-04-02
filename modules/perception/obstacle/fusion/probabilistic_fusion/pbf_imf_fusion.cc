@@ -349,5 +349,11 @@ PbfSensorObjectPtr PbfIMFFusion::GetSensorLatestCache(const SensorType type) {
   return nullptr;
 }
 
+void PbfIMFFusion::SetState(const Eigen::Vector3d& anchor_point,
+                                          const Eigen::Vector3d& velocity) {
+  _belief_anchor_point = anchor_point;
+  _belief_velocity = velocity;
+}
+
 }  // namespace perception
 }  // namespace apollo

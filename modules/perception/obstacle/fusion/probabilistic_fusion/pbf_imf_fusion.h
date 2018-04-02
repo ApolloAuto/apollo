@@ -74,6 +74,9 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   virtual void GetState(Eigen::Vector3d* anchor_point,
                         Eigen::Vector3d* velocity);
 
+  void SetState(const Eigen::Vector3d& anchor_point,
+                  const Eigen::Vector3d& velocity);
+
  protected:
   // @brief cache sensor objects in history
   // @param[IN] new object: new object for current update
