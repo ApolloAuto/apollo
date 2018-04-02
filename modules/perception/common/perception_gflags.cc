@@ -138,3 +138,5 @@ DEFINE_bool(publish_fusion_event, false, "publish fusion event");
 DEFINE_bool(bag_mode, false, "run perception in bag mode");
 
 DEFINE_bool(show_motion, false, "visualize motion and object trajectories");
+DEFINE_bool(skip_camera_frame, false, "skip camera frame");
+DEFINE_int32(camera_hz, 30, "camera hz");

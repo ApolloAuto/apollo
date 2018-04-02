@@ -104,4 +104,6 @@ DECLARE_bool(async_fusion);
 DECLARE_bool(use_distance_angle_fusion);
 DECLARE_bool(publish_fusion_event);
 DECLARE_bool(bag_mode);
+DECLARE_bool(skip_camera_frame);
+DECLARE_int32(camera_hz);
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
