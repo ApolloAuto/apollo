@@ -1,5 +1,5 @@
 vehicle_parameter {
-  brand: LINCOLN_MKZ
+  brand: GEM
   max_steer_angle: 470.0
   max_steer_angle_spd: 500.0
   min_steer_angle_spd: 100.0
