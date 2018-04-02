@@ -270,10 +270,15 @@ void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
         motion_fusion_->UpdateWithObject(obj, time_diff);
         Eigen::Vector3d anchor_point;
         Eigen::Vector3d velocity;
+        // use radar position and velocity
+        if (is_radar(sensor_type)) {
+          motion_fusion_->SetState(obj->object->center, obj->object->velocity);
+        }
         motion_fusion_->GetState(&anchor_point, &velocity);
         fused_object_->object->velocity = velocity;
         fused_object_->object->anchor_point = anchor_point;
         fused_object_->object->center = anchor_point;
+
         if (is_camera(sensor_type)) {
           fused_object_->object->theta = obj->object->theta;
           fused_object_->object->direction = obj->object->direction;
