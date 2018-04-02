@@ -48,8 +48,9 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
   if (!objects) return false;
 
   for (auto &obj : *objects) {
+    Eigen::Vector2f trunc_center_pixel = Eigen::Vector2f::Zero();
+    CheckTruncation(obj, &trunc_center_pixel);
     CheckSizeSanity(obj);
-    CheckTruncation(obj);
 
     float deg_alpha = obj->alpha * 180.0f / M_PI;
     Eigen::Vector2f upper_left(obj->upper_left.x(), obj->upper_left.y());
@@ -62,8 +63,10 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
 
     if (obj->trunc_width > 0.25f && obj->trunc_height > 0.25f) {
       // Give fix values for detected box with both side and bottom truncation
-      distance_w = distance_h = 8.0f;
+      distance_w = distance_h = 10.0f;
       obj->distance = DecideDistance(distance_h, distance_w, obj);
+      // Estimation of center pixel due to unknown truncation ratio
+      if (obj->trunc_width > 0.25f) mass_center_pixel = trunc_center_pixel;
     } else if (distance_w > 40.0f || distance_h > 40.0f
                || obj->trunc_width > 0.25f) {
       // Reset alpha angle and redo again (Model dependent issue)
@@ -86,9 +89,11 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
 
     // Set 8 corner pixels
     obj->pts8.resize(16);
-    for (int i = 0; i < 8; i++) {
-      obj->pts8[i * 2] = pixel_corners_[i].x();
-      obj->pts8[i * 2 + 1] = pixel_corners_[i].y();
+    if (obj->trunc_width < 0.25f && obj->trunc_height < 0.25f) {
+      for (int i = 0; i < 8; i++) {
+        obj->pts8[i * 2] = pixel_corners_[i].x();
+        obj->pts8[i * 2 + 1] = pixel_corners_[i].y();
+      }
     }
   }
 
@@ -345,13 +350,21 @@ void GeometryCameraConverter::CheckSizeSanity(VisualObjectPtr obj) const {
   }
 }
 
-void GeometryCameraConverter::CheckTruncation(VisualObjectPtr obj) const {
+void GeometryCameraConverter::CheckTruncation(VisualObjectPtr obj,
+  Eigen::Matrix<float, 2, 1> *trunc_center_pixel) const {
   auto width = camera_model_.get_width();
   auto height = camera_model_.get_height();
 
   // Ad-hoc 2D box truncation binary determination
   if (obj->upper_left.x() < 30.0f || width - 30.0f < obj->lower_right.x()) {
     obj->trunc_width = 0.5f;
+    trunc_center_pixel->y() = (obj->upper_left.y()
+                               + obj->lower_right.y()) / 2.0f;
+    if (obj->upper_left.x() < 30.0f) {
+      trunc_center_pixel->x() = obj->upper_left.x();
+    } else {
+      trunc_center_pixel->x() = obj->lower_right.x();
+    }
   }
 
   if (obj->upper_left.y() < 30.0f || height - 30.0f < obj->lower_right.y()) {
