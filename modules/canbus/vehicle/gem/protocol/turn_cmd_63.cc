@@ -16,10 +16,7 @@
 
 #include "modules/canbus/vehicle/gem/protocol/turn_cmd_63.h"
 
-#include "glog/logging.h"
-
 #include "modules/drivers/canbus/common/byte.h"
-#include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
 namespace canbus {
@@ -27,29 +24,41 @@ namespace gem {
 
 using ::apollo::drivers::canbus::Byte;
 
-Turncmd63::Turncmd63() {}
 const int32_t Turncmd63::ID = 0x63;
 
-void Turncmd63::Parse(const std::uint8_t* bytes, int32_t length,
-                      ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_turn_cmd_63()->set_turn_signal_cmd(
-      turn_signal_cmd(bytes, length));
+// public
+Turncmd63::Turncmd63() { Reset(); }
+
+uint32_t Turncmd63::GetPeriod() const {
+  // TODO modify every protocol's period manually
+  static const uint32_t PERIOD = 20 * 1000;
+  return PERIOD;
 }
 
-// config detail: {'name': 'turn_signal_cmd', 'enum': {0:
-// 'TURN_SIGNAL_CMD_RIGHT', 1: 'TURN_SIGNAL_CMD_NONE', 2:
-// 'TURN_SIGNAL_CMD_LEFT', 3: 'TURN_SIGNAL_CMD_HAZARD'}, 'precision': 1.0,
-// 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
-// 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Turn_cmd_63::Turn_signal_cmdType Turncmd63::turn_signal_cmd(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
-  int32_t x = t0.get_byte(0, 8);
-
-  Turn_cmd_63::Turn_signal_cmdType ret =
-      static_cast<Turn_cmd_63::Turn_signal_cmdType>(x);
-  return ret;
+void Turncmd63::UpdateData(uint8_t* data) {
+  set_p_turn_signal_cmd(data, turn_signal_cmd_);
 }
+
+void Turncmd63::Reset() {
+  // TODO you should check this manually
+  turn_signal_cmd_ = Turn_cmd_63::TURN_SIGNAL_CMD_RIGHT;
+}
+
+Turncmd63* Turncmd63::set_turn_signal_cmd(
+    Turn_cmd_63::Turn_signal_cmdType turn_signal_cmd) {
+  turn_signal_cmd_ = turn_signal_cmd;
+  return this;
+ }
+
+// config detail: {'name': 'TURN_SIGNAL_CMD', 'enum': {0: 'TURN_SIGNAL_CMD_RIGHT', 1: 'TURN_SIGNAL_CMD_NONE', 2: 'TURN_SIGNAL_CMD_LEFT', 3: 'TURN_SIGNAL_CMD_HAZARD'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+void Turncmd63::set_p_turn_signal_cmd(uint8_t* data,
+    Turn_cmd_63::Turn_signal_cmdType turn_signal_cmd) {
+  int x = turn_signal_cmd;
+
+  Byte to_set(data + 0);
+  to_set.set_value(x, 0, 8);
+}
+
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
