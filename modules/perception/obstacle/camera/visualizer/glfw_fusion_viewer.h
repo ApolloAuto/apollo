@@ -86,9 +86,7 @@ class GLFWFusionViewer {
   void set_camera_para(Eigen::Vector3d i_position, Eigen::Vector3d i_scn_center,
                        Eigen::Vector3d i_up_vector);
 
-  void set_forward_dir(Eigen::Vector3d forward) {
-    forward_dir_ = forward;
-  }
+  void set_forward_dir(Eigen::Vector3d forward) { forward_dir_ = forward; }
 
   void set_main_car(const std::vector<Eigen::Vector3d> &main_car) {
     main_car_ = main_car;
@@ -305,7 +303,7 @@ class GLFWFusionViewer {
   float lane_map_threshold_;
 
   LaneObjectsPtr lane_history_;
-//  std::vector<LaneObjects> Lane_history_buffer_;
+  //  std::vector<LaneObjects> Lane_history_buffer_;
   const std::size_t lane_history_buffer_size_ = 400;
   const std::size_t object_history_size_ = 5;
   Eigen::Matrix3f motion_matrix_;

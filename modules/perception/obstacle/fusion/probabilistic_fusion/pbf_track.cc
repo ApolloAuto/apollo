@@ -168,17 +168,11 @@ void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
   }
 }
 
-int PbfTrack::GetTrackId() const {
-  return idx_;
-}
+int PbfTrack::GetTrackId() const { return idx_; }
 
-PbfSensorObjectPtr PbfTrack::GetFusedObject() {
-  return fused_object_;
-}
+PbfSensorObjectPtr PbfTrack::GetFusedObject() { return fused_object_; }
 
-double PbfTrack::GetFusedTimestamp() const {
-  return fused_timestamp_;
-}
+double PbfTrack::GetFusedTimestamp() const { return fused_timestamp_; }
 
 PbfSensorObjectPtr PbfTrack::GetLidarObject(const std::string &sensor_id) {
   PbfSensorObjectPtr obj = nullptr;
