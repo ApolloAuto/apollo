@@ -66,37 +66,42 @@ ErrorCode GemController::Init(
   message_manager_ = message_manager;
 
   // sender part
-
-  brake_cmd_6b_ = dynamic_cast<Brakecmd6b*>(
+  brake_cmd_6b_ = dynamic_cast<Brakecmd6b *>(
       message_manager_->GetMutableProtocolDataById(Brakecmd6b::ID));
   if (brake_cmd_6b_ == nullptr) {
     AERROR << "Brakecmd6b does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  accel_cmd_67_ = dynamic_cast<Accelcmd67*>(
+  accel_cmd_67_ = dynamic_cast<Accelcmd67 *>(
       message_manager_->GetMutableProtocolDataById(Accelcmd67::ID));
   if (accel_cmd_67_ == nullptr) {
     AERROR << "Accelcmd67 does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  steering_cmd_6d_ = dynamic_cast<Steeringcmd6d*>(
+  steering_cmd_6d_ = dynamic_cast<Steeringcmd6d *>(
       message_manager_->GetMutableProtocolDataById(Steeringcmd6d::ID));
   if (steering_cmd_6d_ == nullptr) {
     AERROR << "Steeringcmd6d does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  shift_cmd_65_ = dynamic_cast<Shiftcmd65*>(
+  shift_cmd_65_ = dynamic_cast<Shiftcmd65 *>(
       message_manager_->GetMutableProtocolDataById(Shiftcmd65::ID));
   if (shift_cmd_65_ == nullptr) {
     AERROR << "Shiftcmd65 does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
-  turn_cmd_63_ = dynamic_cast<Turncmd63*>(
+  turn_cmd_63_ = dynamic_cast<Turncmd63 *>(
       message_manager_->GetMutableProtocolDataById(Turncmd63::ID));
   if (turn_cmd_63_ == nullptr) {
+    AERROR << "Turncmd63 does not exist in the GemMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
+  }
+  global_cmd_63_ = dynamic_cast<Globalcmd69 *>(
+      message_manager_->GetMutableProtocolDataById(Globalcmd69::ID));
+  if (global_cmd_63_ == nullptr) {
     AERROR << "Turncmd63 does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
@@ -106,6 +111,7 @@ ErrorCode GemController::Init(
   can_sender_->AddMessage(Steeringcmd6d::ID, steering_cmd_6d_, false);
   can_sender_->AddMessage(Shiftcmd65::ID, shift_cmd_65_, false);
   can_sender_->AddMessage(Turncmd63::ID, turn_cmd_63_, false);
+  can_sender_->AddMessage(Globalcmd69::ID, global_cmd_69_, false);
 
   // need sleep to ensure all messages received
   AINFO << "GemController is initialized.";
@@ -169,10 +175,10 @@ Chassis GemController::chassis() {
   // 7
   chassis_.set_fuel_range_m(0);
   // 8
-  if (chassis_detail.gem().has_accel_cmd_67() &&
-      chassis_detail.gem().accel_cmd_67().has_accel_cmd()) {
+  if (chassis_detail.gem().has_accel_rpt_68() &&
+      chassis_detail.gem().accel_rpt_68().has_accel_rpt()) {
     chassis_.set_throttle_percentage(
-        chassis_detail.gem().accel_cmd_67().accel_cmd());
+        chassis_detail.gem().accel_rpt_68().accel_rpt());
   } else {
     chassis_.set_throttle_percentage(0);
   }
@@ -187,7 +193,7 @@ Chassis GemController::chassis() {
 
   // 23, previously 10
   // TODO(QiL): refine here.
-  /*
+
   if (chassis_detail.gem().has_shift_rpt_66() &&
       chassis_detail.gem().shift_rpt_66().has_output_value()) {
     chassis_.set_gear_location(
@@ -195,7 +201,6 @@ Chassis GemController::chassis() {
   } else {
     chassis_.set_gear_location(Chassis::GEAR_NONE);
   }
-  */
 
   // 11
   // TODO(QiL): verify the unit here.
@@ -208,28 +213,41 @@ Chassis GemController::chassis() {
     chassis_.set_steering_percentage(0);
   }
 
+  if (chassis_detail.gem().has_global_rpt_6a() &&
+	  chassis_detail.gem().global_rpt_6a().has_pacmod_status()) {
+	if (chassis_detail.gem().global_rpt_6a().pacmod_status() ==
+		Global_rpt_6a::PACMOD_STATUS_CONTROL_ENABLED) {
+	  chassis_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+	}
+	else {
+	  chassis_.set_driving_mode(Chassis::COMPLETE_MANUAL);
+	}
+  } else {
+    chassis_.set_driving_mode(Chassis::COMPLETE_MANUAL);
+  }
+
   // TODO(QiL): implement the turn light signal here
-  /*
-    // 16, 17
-    if (chassis_detail.has_light() &&
-        chassis_detail.light().has_turn_light_type() &&
-        chassis_detail.light().turn_light_type() != Light::TURN_LIGHT_OFF) {
-      if (chassis_detail.light().turn_light_type() == Light::TURN_LEFT_ON) {
-        chassis_.mutable_signal()->set_turn_signal(
-            common::VehicleSignal::TURN_LEFT);
-      } else if (chassis_detail.light().turn_light_type() ==
-                 Light::TURN_RIGHT_ON) {
-        chassis_.mutable_signal()->set_turn_signal(
-            common::VehicleSignal::TURN_RIGHT);
-      } else {
-        chassis_.mutable_signal()->set_turn_signal(
-            common::VehicleSignal::TURN_NONE);
-      }
+
+  // 16, 17
+  if (chassis_detail.has_light() &&
+	  chassis_detail.light().has_turn_light_type() &&
+	  chassis_detail.light().turn_light_type() != Light::TURN_LIGHT_OFF) {
+    if (chassis_detail.light().turn_light_type() == Light::TURN_LEFT_ON) {
+	  chassis_.mutable_signal()->set_turn_signal(
+		  common::VehicleSignal::TURN_LEFT);
+    } else if (chassis_detail.light().turn_light_type() ==
+			   Light::TURN_RIGHT_ON) {
+	  chassis_.mutable_signal()->set_turn_signal(
+		  common::VehicleSignal::TURN_RIGHT);
     } else {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_NONE);
+	  chassis_.mutable_signal()->set_turn_signal(
+		  common::VehicleSignal::TURN_NONE);
     }
-  */
+  } else {
+    chassis_.mutable_signal()->set_turn_signal(
+	    common::VehicleSignal::TURN_NONE);
+  }
+
   // TODO(all): implement the rest here/
   // 26
   if (chassis_error_mask_) {
@@ -263,15 +281,8 @@ ErrorCode GemController::EnableAutoMode() {
     AINFO << "already in COMPLETE_AUTO_DRIVE mode";
     return ErrorCode::OK;
   }
-  return ErrorCode::OK;
 
-  /*
-    brake_cmd_6b_->set_enable();
-    accel_cmd_67_->set_enable();
-    steering_cmd_6d_->set_enable();
-    shift_cmd_65_->set_enable();
-    turn_cmd_63_->set_enable();
-  */
+  global_cmd_69_->set_pacmod_enable(Global_rpt_6a::PACMOD_STATUS_CONTROL_ENABLED);
 
   can_sender_->Update();
   const int32_t flag =
@@ -298,60 +309,13 @@ ErrorCode GemController::DisableAutoMode() {
 }
 
 ErrorCode GemController::EnableSteeringOnlyMode() {
-  if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-      driving_mode() == Chassis::AUTO_STEER_ONLY) {
-    set_driving_mode(Chassis::AUTO_STEER_ONLY);
-    AINFO << "Already in AUTO_STEER_ONLY mode";
+    AFATAL << "Not supported!";
     return ErrorCode::OK;
-  }
-
-  /*
-    brake_cmd_6b_->set_disable();
-    accel_cmd_67_->set_disable();
-    steering_cmd_6d_->set_enable();
-    shift_cmd_65_->set_enable();
-  */
-
-  can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true) == false) {
-    AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
-    Emergency();
-    set_chassis_error_code(Chassis::CHASSIS_ERROR);
-    return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::AUTO_STEER_ONLY);
-    AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
-    return ErrorCode::OK;
-  }
 }
 
 ErrorCode GemController::EnableSpeedOnlyMode() {
-  if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-      driving_mode() == Chassis::AUTO_SPEED_ONLY) {
-    set_driving_mode(Chassis::AUTO_SPEED_ONLY);
-    AINFO << "Already in AUTO_SPEED_ONLY mode";
+    AFATAL << "Not supported!";
     return ErrorCode::OK;
-  }
-  return ErrorCode::OK;
-
-  /*
-    brake_cmd_6b_->set_enable();
-    accel_cmd_67_->set_enable();
-    steering_cmd_6d_->set_disable();
-    shift_cmd_65_->set_enable();
-  */
-
-  can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
-    AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
-    Emergency();
-    set_chassis_error_code(Chassis::CHASSIS_ERROR);
-    return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::AUTO_SPEED_ONLY);
-    AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
-    return ErrorCode::OK;
-  }
 }
 
 // NEUTRAL, REVERSE, DRIVE
@@ -362,43 +326,29 @@ void GemController::Gear(Chassis::GearPosition gear_position) {
     return;
   }
 
-  /*
     switch (gear_position) {
       case Chassis::GEAR_NEUTRAL: {
-        shift_cmd_65_->set_gear_neutral();
+        shift_cmd_65_->set_shift_cmd(Shift_cmd_65::SHIFT_CMD_NEUTRAL);
         break;
       }
       case Chassis::GEAR_REVERSE: {
-        shift_cmd_65_->set_gear_reverse();
+        shift_cmd_65_->set_shift_cmd(Shift_cmd_65::SHIFT_CMD_REVERSE);
         break;
       }
       case Chassis::GEAR_DRIVE: {
-        shift_cmd_65_->set_gear_drive();
-        break;
-      }
-      case Chassis::GEAR_PARKING: {
-        shift_cmd_65_->set_gear_park();
-        break;
-      }
-      case Chassis::GEAR_LOW: {
-        shift_cmd_65_->set_gear_low();
-        break;
-      }
-      case Chassis::GEAR_NONE: {
-        shift_cmd_65_->set_gear_none();
+        shift_cmd_65_->set_shift_cmd(Shift_cmd_65::SHIFT_CMD_FORWARD);
         break;
       }
       case Chassis::GEAR_INVALID: {
         AERROR << "Gear command is invalid!";
-        shift_cmd_65_->set_gear_none();
+        shift_cmd_65_->set_shift_cmd(Shift_cmd_65::SHIFT_CMD_NEUTRAL);
         break;
       }
       default: {
-        shift_cmd_65_->set_gear_none();
+        shift_cmd_65_->set_shift_cmd(Shift_cmd_65::SHIFT_CMD_NEUTRAL);
         break;
       }
     }
-    */
 }
 
 // brake with new acceleration
@@ -414,9 +364,8 @@ void GemController::Brake(double pedal) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
-  /*
-  brake_cmd_6b_->set_pedal(pedal);
-  */
+
+  brake_cmd_6b_->set_brake_cmd(pedal);
 }
 
 // drive with old acceleration
@@ -427,9 +376,8 @@ void GemController::Throttle(double pedal) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
-  /*
-  accel_cmd_67_->set_pedal(pedal);
-  */
+
+  accel_cmd_67_->set_accel_cmd(pedal);
 }
 
 // gem default, -470 ~ 470, left:+, right:-
@@ -444,10 +392,9 @@ void GemController::Steer(double angle) {
   }
   const double real_angle = params_.max_steer_angle() * angle / 100.0;
   // reverse sign
-  /*
-    steering_cmd_6d_->set_steering_angle(real_angle)
-        ->set_steering_angle_speed(200);
-        */
+
+  steering_cmd_6d_->set_position_value(real_angle)
+        ->set_speed_limit(200);
 }
 
 // steering with new angle speed
@@ -460,13 +407,12 @@ void GemController::Steer(double angle, double angle_spd) {
     return;
   }
   const double real_angle = params_.max_steer_angle() * angle / 100.0;
-  /*
+
   const double real_angle_spd = (
       params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
       params_.max_steer_angle_spd() * angle_spd / 100.0);
-  steering_cmd_6d_->set_steering_angle(real_angle)
-      ->set_steering_angle_speed(real_angle_spd);
-      */
+  steering_cmd_6d_->set_position_value(real_angle)
+      ->set_speed_limit(real_angle_spd);
 }
 
 void GemController::SetEpbBreak(const ControlCommand& command) {
@@ -496,7 +442,15 @@ void GemController::SetHorn(const ControlCommand& command) {
 }
 
 void GemController::SetTurningSignal(const ControlCommand& command) {
-  // TODO(QiL) : implement it here
+  // Set Turn Signal
+  auto signal = command.signal().turn_signal();
+  if (signal == common::VehicleSignal::TURN_LEFT) {
+	turn_cmd_63_->set_turn_signal_cmd(Turn_cmd_63::TURN_SIGNAL_CMD_LEFT);
+  } else if (signal == common::VehicleSignal::TURN_RIGHT) {
+	turn_cmd_63_->set_turn_signal_cmd(Turn_cmd_63::TURN_SIGNAL_CMD_RIGHT);
+  } else {
+	turn_cmd_63_->set_turn_signal_cmd(Turn_cmd_63::TURN_SIGNAL_CMD_NONE);
+  }
 }
 
 void GemController::ResetProtocol() {
