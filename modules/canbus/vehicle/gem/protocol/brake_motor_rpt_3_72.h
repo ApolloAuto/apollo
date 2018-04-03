@@ -17,32 +17,27 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_BRAKE_MOTOR_RPT_3_72_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_BRAKE_MOTOR_RPT_3_72_H_
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Brakemotorrpt372 : public ::apollo::drivers::canbus::ProtocolData<
-                             ::apollo::canbus::ChassisDetail> {
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Brakemotorrpt372();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+                     ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'name': 'TORQUE_OUTPUT', 'offset': 0.0, 'precision': 0.001,
-  // 'len': 32, 'is_signed_var': True, 'physical_range':
-  // '[-2147483.648|2147483.647]', 'bit': 7, 'type': 'double', 'order':
-  // 'motorola', 'physical_unit': 'N-m'}
+
+  // config detail: {'name': 'TORQUE_OUTPUT', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': True, 'physical_range': '[-2147483.648|2147483.647]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'N-m'}
   double torque_output(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'TORQUE_INPUT', 'offset': 0.0, 'precision': 0.001,
-  // 'len': 32, 'is_signed_var': True, 'physical_range':
-  // '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order':
-  // 'motorola', 'physical_unit': 'N-m'}
+  // config detail: {'name': 'TORQUE_INPUT', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': True, 'physical_range': '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'N-m'}
   double torque_input(const std::uint8_t* bytes, const int32_t length) const;
 };
 

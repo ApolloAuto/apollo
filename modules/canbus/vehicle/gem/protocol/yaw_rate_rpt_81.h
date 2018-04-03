@@ -17,25 +17,24 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_YAW_RATE_RPT_81_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_YAW_RATE_RPT_81_H_
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Yawraterpt81 : public ::apollo::drivers::canbus::ProtocolData<
-                         ::apollo::canbus::ChassisDetail> {
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Yawraterpt81();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+                     ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'name': 'YAW_RATE', 'offset': 0.0, 'precision': 0.01,
-  // 'len': 16, 'is_signed_var': True, 'physical_range': '[-327.68|327.67]',
-  // 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
+
+  // config detail: {'name': 'YAW_RATE', 'offset': 0.0, 'precision': 0.01, 'len': 16, 'is_signed_var': True, 'physical_range': '[-327.68|327.67]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
   double yaw_rate(const std::uint8_t* bytes, const int32_t length) const;
 };
 

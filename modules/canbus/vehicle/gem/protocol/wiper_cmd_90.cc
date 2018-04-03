@@ -16,10 +16,7 @@
 
 #include "modules/canbus/vehicle/gem/protocol/wiper_cmd_90.h"
 
-#include "glog/logging.h"
-
 #include "modules/drivers/canbus/common/byte.h"
-#include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
 namespace canbus {
@@ -27,30 +24,41 @@ namespace gem {
 
 using ::apollo::drivers::canbus::Byte;
 
-Wipercmd90::Wipercmd90() {}
 const int32_t Wipercmd90::ID = 0x90;
 
-void Wipercmd90::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_wiper_cmd_90()->set_wiper_cmd(
-      wiper_cmd(bytes, length));
+// public
+Wipercmd90::Wipercmd90() { Reset(); }
+
+uint32_t Wipercmd90::GetPeriod() const {
+  // TODO modify every protocol's period manually
+  static const uint32_t PERIOD = 20 * 1000;
+  return PERIOD;
 }
 
-// config detail: {'name': 'wiper_cmd', 'enum': {0: 'WIPER_CMD_WIPERS_OFF', 1:
-// 'WIPER_CMD_INTERMITTENT_1', 2: 'WIPER_CMD_INTERMITTENT_2', 3:
-// 'WIPER_CMD_INTERMITTENT_3', 4: 'WIPER_CMD_INTERMITTENT_4', 5:
-// 'WIPER_CMD_INTERMITTENT_5', 6: 'WIPER_CMD_LOW', 7: 'WIPER_CMD_HIGH'},
-// 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
-// 'physical_range': '[0|7]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
-// 'physical_unit': ''}
-Wiper_cmd_90::Wiper_cmdType Wipercmd90::wiper_cmd(const std::uint8_t* bytes,
-                                                  int32_t length) const {
-  Byte t0(bytes + 0);
-  int32_t x = t0.get_byte(0, 8);
-
-  Wiper_cmd_90::Wiper_cmdType ret = static_cast<Wiper_cmd_90::Wiper_cmdType>(x);
-  return ret;
+void Wipercmd90::UpdateData(uint8_t* data) {
+  set_p_wiper_cmd(data, wiper_cmd_);
 }
+
+void Wipercmd90::Reset() {
+  // TODO you should check this manually
+  wiper_cmd_ = Wiper_cmd_90::WIPER_CMD_WIPERS_OFF;
+}
+
+Wipercmd90* Wipercmd90::set_wiper_cmd(
+    Wiper_cmd_90::Wiper_cmdType wiper_cmd) {
+  wiper_cmd_ = wiper_cmd;
+  return this;
+ }
+
+// config detail: {'name': 'WIPER_CMD', 'enum': {0: 'WIPER_CMD_WIPERS_OFF', 1: 'WIPER_CMD_INTERMITTENT_1', 2: 'WIPER_CMD_INTERMITTENT_2', 3: 'WIPER_CMD_INTERMITTENT_3', 4: 'WIPER_CMD_INTERMITTENT_4', 5: 'WIPER_CMD_INTERMITTENT_5', 6: 'WIPER_CMD_LOW', 7: 'WIPER_CMD_HIGH'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|7]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+void Wipercmd90::set_p_wiper_cmd(uint8_t* data,
+    Wiper_cmd_90::Wiper_cmdType wiper_cmd) {
+  int x = wiper_cmd;
+
+  Byte to_set(data + 0);
+  to_set.set_value(x, 0, 8);
+}
+
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
