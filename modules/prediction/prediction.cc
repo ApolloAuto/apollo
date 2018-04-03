@@ -140,8 +140,8 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
     ros::shutdown();
   }
 
+  // Update relative map if needed
   AdapterManager::Observe();
-
   if (FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     AERROR << "Relative map is empty.";
     return;
