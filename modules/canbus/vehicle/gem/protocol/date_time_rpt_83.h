@@ -17,50 +17,39 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_DATE_TIME_RPT_83_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_DATE_TIME_RPT_83_H_
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Datetimerpt83 : public ::apollo::drivers::canbus::ProtocolData<
-                          ::apollo::canbus::ChassisDetail> {
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Datetimerpt83();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+                     ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'name': 'TIME_SECOND', 'offset': 0.0, 'precision': 1.0,
-  // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|60]', 'bit': 47,
-  // 'type': 'int', 'order': 'motorola', 'physical_unit': 'sec'}
+
+  // config detail: {'name': 'TIME_SECOND', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|60]', 'bit': 47, 'type': 'int', 'order': 'motorola', 'physical_unit': 'sec'}
   int time_second(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'TIME_MINUTE', 'offset': 0.0, 'precision': 1.0,
-  // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|60]', 'bit': 39,
-  // 'type': 'int', 'order': 'motorola', 'physical_unit': 'min'}
+  // config detail: {'name': 'TIME_MINUTE', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|60]', 'bit': 39, 'type': 'int', 'order': 'motorola', 'physical_unit': 'min'}
   int time_minute(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'TIME_HOUR', 'offset': 0.0, 'precision': 1.0,
-  // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|23]', 'bit': 31,
-  // 'type': 'int', 'order': 'motorola', 'physical_unit': 'hr'}
+  // config detail: {'name': 'TIME_HOUR', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[0|23]', 'bit': 31, 'type': 'int', 'order': 'motorola', 'physical_unit': 'hr'}
   int time_hour(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'DATE_DAY', 'offset': 1.0, 'precision': 1.0, 'len':
-  // 8, 'is_signed_var': False, 'physical_range': '[1|31]', 'bit': 23, 'type':
-  // 'int', 'order': 'motorola', 'physical_unit': 'dy'}
+  // config detail: {'name': 'DATE_DAY', 'offset': 1.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[1|31]', 'bit': 23, 'type': 'int', 'order': 'motorola', 'physical_unit': 'dy'}
   int date_day(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'DATE_MONTH', 'offset': 1.0, 'precision': 1.0,
-  // 'len': 8, 'is_signed_var': False, 'physical_range': '[1|12]', 'bit': 15,
-  // 'type': 'int', 'order': 'motorola', 'physical_unit': 'mon'}
+  // config detail: {'name': 'DATE_MONTH', 'offset': 1.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[1|12]', 'bit': 15, 'type': 'int', 'order': 'motorola', 'physical_unit': 'mon'}
   int date_month(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'DATE_YEAR', 'offset': 2000.0, 'precision': 1.0,
-  // 'len': 8, 'is_signed_var': False, 'physical_range': '[2000|2255]', 'bit':
-  // 7, 'type': 'int', 'order': 'motorola', 'physical_unit': 'yr'}
+  // config detail: {'name': 'DATE_YEAR', 'offset': 2000.0, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range': '[2000|2255]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': 'yr'}
   int date_year(const std::uint8_t* bytes, const int32_t length) const;
 };
 

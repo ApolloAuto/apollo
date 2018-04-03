@@ -31,19 +31,13 @@ Brakemotorrpt372::Brakemotorrpt372() {}
 const int32_t Brakemotorrpt372::ID = 0x72;
 
 void Brakemotorrpt372::Parse(const std::uint8_t* bytes, int32_t length,
-                             ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_brake_motor_rpt_3_72()->set_torque_output(
-      torque_output(bytes, length));
-  chassis->mutable_gem()->mutable_brake_motor_rpt_3_72()->set_torque_input(
-      torque_input(bytes, length));
+                         ChassisDetail* chassis) const {
+  chassis->mutable_gem()->mutable_brake_motor_rpt_3_72()->set_torque_output(torque_output(bytes, length));
+  chassis->mutable_gem()->mutable_brake_motor_rpt_3_72()->set_torque_input(torque_input(bytes, length));
 }
 
-// config detail: {'name': 'torque_output', 'offset': 0.0, 'precision': 0.001,
-// 'len': 32, 'is_signed_var': True, 'physical_range':
-// '[-2147483.648|2147483.647]', 'bit': 7, 'type': 'double', 'order':
-// 'motorola', 'physical_unit': 'N-m'}
-double Brakemotorrpt372::torque_output(const std::uint8_t* bytes,
-                                       int32_t length) const {
+// config detail: {'name': 'torque_output', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': True, 'physical_range': '[-2147483.648|2147483.647]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'N-m'}
+double Brakemotorrpt372::torque_output(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
@@ -69,12 +63,8 @@ double Brakemotorrpt372::torque_output(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'name': 'torque_input', 'offset': 0.0, 'precision': 0.001,
-// 'len': 32, 'is_signed_var': True, 'physical_range':
-// '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order':
-// 'motorola', 'physical_unit': 'N-m'}
-double Brakemotorrpt372::torque_input(const std::uint8_t* bytes,
-                                      int32_t length) const {
+// config detail: {'name': 'torque_input', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': True, 'physical_range': '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'N-m'}
+double Brakemotorrpt372::torque_input(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
