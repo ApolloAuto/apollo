@@ -69,7 +69,7 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
       if (obj->trunc_width > 0.25f) mass_center_pixel = trunc_center_pixel;
     } else if (distance_w > 40.0f || distance_h > 40.0f ||
                obj->trunc_width > 0.25f) {
-      // Reset alpha angle and redo again (Model dependent issue)
+      // Reset alpha angle and do steps again
       obj->distance = DecideDistance(distance_h, distance_w, obj);
       DecideAngle(camera_model_.unproject(mass_center_pixel), obj);
       deg_alpha = obj->alpha * 180.0f / M_PI;
@@ -88,19 +88,11 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
     obj->center = camera_ray * scale;
 
     // Set 8 corner pixels
-    obj->pts8.resize(16);
-    if (obj->trunc_width < 0.25f && obj->trunc_height < 0.25f) {
-      for (int i = 0; i < 8; i++) {
-        obj->pts8[i * 2] = pixel_corners_[i].x();
-        obj->pts8[i * 2 + 1] = pixel_corners_[i].y();
-      }
-    }
+    SetBoxProjection(obj);
   }
 
   return true;
 }
-
-void GeometryCameraConverter::SetDebug(bool flag) { debug_ = flag; }
 
 std::string GeometryCameraConverter::Name() const {
   return "GeometryCameraConverter";
@@ -194,7 +186,7 @@ bool GeometryCameraConverter::ConvertSingle(
       camera_model_.unproject(*mass_center_pixel);
   mass_center_v = MakeUnit(mass_center_v);
 
-  // Binary search
+  // Distance search
   *distance_w = SearchDistance(pixel_width, true, mass_center_v);
   *distance_h = SearchDistance(pixel_height, false, mass_center_v);
 
@@ -202,8 +194,7 @@ bool GeometryCameraConverter::ConvertSingle(
     // Mass center search
     SearchCenterDirection(box_center_pixel, *distance_h, &mass_center_v,
                           mass_center_pixel);
-
-    // Binary search
+    // Distance search
     *distance_w = SearchDistance(pixel_width, true, mass_center_v);
     *distance_h = SearchDistance(pixel_height, false, mass_center_v);
   }
@@ -376,9 +367,6 @@ float GeometryCameraConverter::DecideDistance(const float &distance_h,
                                               const float &distance_w,
                                               VisualObjectPtr obj) const {
   float distance = distance_h;
-
-  // TODO(later): Deal with truncation
-
   return distance;
 }
 
@@ -403,6 +391,16 @@ void GeometryCameraConverter::DecideAngle(const Eigen::Vector3f &camera_ray,
       theta += 2 * M_PI;
     }
     obj->theta = theta;
+  }
+}
+
+void GeometryCameraConverter::SetBoxProjection(VisualObjectPtr obj) const {
+  obj->pts8.resize(16);
+  if (obj->trunc_width < 0.25f && obj->trunc_height < 0.25f) {
+    for (int i = 0; i < 8; i++) {
+      obj->pts8[i * 2] = pixel_corners_[i].x();
+      obj->pts8[i * 2 + 1] = pixel_corners_[i].y();
+    }
   }
 }
 
