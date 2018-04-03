@@ -50,7 +50,7 @@ bool LoadVisualObjectFromFile(const std::string &file_name,
                               std::vector<VisualObjectPtr> *visual_objects) {
   FILE *fp = fopen(file_name.c_str(), "r");
   if (!fp) {
-    std::cout << "load file: " << file_name << " error!" << std::endl;
+    AERROR << "load file: " << file_name << " error!";
     return false;
   }
 
@@ -94,7 +94,7 @@ bool WriteVisualObjectToFile(const std::string &file_name,
                              std::vector<VisualObjectPtr> *visual_objects) {
   FILE *fp = fopen(file_name.c_str(), "w");
   if (!fp) {
-    std::cout << "write file: " << file_name << " error!" << std::endl;
+    AERROR << "write file: " << file_name << " error!";
     return false;
   }
 

@@ -153,8 +153,11 @@ Status SpeedLimitDecider::GetSpeedLimits(
       if (!const_path_obstacle->LateralDecision().has_nudge()) {
         continue;
       }
-      if (path_s < const_path_obstacle->PerceptionSLBoundary().start_s() ||
-          path_s > const_path_obstacle->PerceptionSLBoundary().end_s()) {
+
+      if (path_s + adc_sl_boundary_.end_s() <
+              const_path_obstacle->PerceptionSLBoundary().start_s() ||
+          path_s + adc_sl_boundary_.start_s() >
+              const_path_obstacle->PerceptionSLBoundary().end_s()) {
         continue;
       }
       constexpr double kRange = 1.0;  // meters
