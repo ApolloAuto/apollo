@@ -190,4 +190,14 @@ DECLARE_double(lattice_stop_buffer);
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);
 
+// Spiral reference line smoother
+DECLARE_double(spiral_opt_tol);
+DECLARE_double(spiral_opt_acceptable_tol);
+DECLARE_double(spiral_opt_acceptable_iter);
+
+DECLARE_double(spiral_opt_weight_curve_length);
+DECLARE_double(spiral_opt_weight_kappa);
+DECLARE_double(spiral_opt_weight_dkappa);
+DECLARE_double(spiral_opt_weight_d2kappa);
+
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
