@@ -198,8 +198,8 @@ void CameraProcessSubnode::VisualObjToSensorObj(
         0.0f, 0.33f, 0.0f;
     CameraFrameSupplement::state_vars.trans_matrix.block(1, 0, 1, 4) << 0.0f,
         1.0f, 0.0f, 0.33f;
-    std::cout << "state trans matrix in CameraFrameSupplement is \n"
-              << CameraFrameSupplement::state_vars.trans_matrix << std::endl;
+    ADEBUG << "state trans matrix in CameraFrameSupplement is \n"
+           << CameraFrameSupplement::state_vars.trans_matrix;
     CameraFrameSupplement::state_vars.initialized_ = true;
   }
 

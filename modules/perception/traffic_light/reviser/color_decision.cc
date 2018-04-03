@@ -58,7 +58,7 @@ bool ColorReviser::Revise(const ReviseOption &option,
 
   for (size_t i = 0; i < lights_ref.size(); ++i) {
     std::string id = lights_ref[i]->info.id().id();
-    std::cout << "light " << i << " id: " << id << std::endl;
+    ADEBUG << "light " << i << " id: " << id << std::endl;
     switch (lights_ref[i]->status.color) {
       default:
       case BLACK:
