@@ -30,35 +30,25 @@
 namespace apollo {
 namespace perception {
 
-AsyncFusion::AsyncFusion()
-        : matcher_(nullptr),
-          track_manager_(nullptr)
-{}
-
-
-AsyncFusion::~AsyncFusion() {
-  if (matcher_) {
-    delete matcher_;
-    matcher_ = nullptr;
-  }
-}
-
 bool AsyncFusion::Init() {
   track_manager_ = PbfTrackManager::instance();
-  ACHECK(track_manager_ != nullptr) << "Failed to get PbfTrackManager instance";
+  CHECK_NOTNULL(track_manager_);
   const ModelConfig *model_config =
       ConfigManager::instance()->GetModelConfig(name());
   if (model_config == nullptr) {
     AERROR << "not found model config: " << name();
     return false;
   }
-  /**matching parameters*/
+  /* matching parameters */
+  // TODO(All): match_method is set to hm_matcher, so that line 56 - 65 is
+  // redundant. We should either make match_method configurable or remove those
+  // redundant code.
   std::string match_method = "hm_matcher";
   if (!model_config->GetValue("match_method", &match_method)) {
     AERROR << "match_method not found";
   }
   if (match_method == "hm_matcher") {
-    matcher_ = new PbfHmTrackObjectMatcher();
+    matcher_.reset(new PbfHmTrackObjectMatcher());
     if (matcher_->Init()) {
       AINFO << "Initialize " << matcher_->name() << " successfully!";
     } else {
@@ -68,7 +58,7 @@ bool AsyncFusion::Init() {
   } else {
     AERROR << "undefined match_method " << match_method
            << " and use default hm_matcher";
-    matcher_ = new PbfHmTrackObjectMatcher();
+    matcher_.reset(new PbfHmTrackObjectMatcher());
     if (matcher_->Init()) {
       AINFO << "Initialize " << matcher_->name() << " successfully!";
     } else {
@@ -115,21 +105,21 @@ bool AsyncFusion::Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
         << multi_sensor_objects.size();
 
   // process all the frames from one of the sensors
-  for (auto obj : multi_sensor_objects) {
-      double fusion_time = obj.timestamp;
-      AINFO << "get sensor data " << GetSensorType(obj.sensor_type)
-            << ", obj_cnt : " << obj.objects.size() << ", " << std::fixed
-            << std::setprecision(12) << obj.timestamp;
+  for (const auto &obj : multi_sensor_objects) {
+    double fusion_time = obj.timestamp;
+    AINFO << "get sensor data " << GetSensorType(obj.sensor_type)
+          << ", obj_cnt : " << obj.objects.size() << ", " << std::fixed
+          << std::setprecision(12) << obj.timestamp;
 
-      PbfSensorFramePtr frame = ConstructFrame(obj);
+    PbfSensorFramePtr frame = ConstructFrame(obj);
 
-      {
-          fusion_mutex_.lock();
-          FuseFrame(frame);
-          // 4.collect results
-          CollectFusedObjects(fusion_time, fused_objects);
-          fusion_mutex_.unlock();
-      }
+    {
+      fusion_mutex_.lock();
+      FuseFrame(frame);
+      // 4.collect results
+      CollectFusedObjects(fusion_time, fused_objects);
+      fusion_mutex_.unlock();
+    }
   }
   return true;
 }
@@ -169,23 +159,26 @@ void AsyncFusion::UpdateAssignedTracks(
     const std::vector<TrackObjectPair> &assignments,
     const std::vector<double> &track_object_dist,
     std::vector<PbfTrackPtr> const *tracks) {
-  for (size_t i = 0; i < assignments.size(); i++) {
+  for (size_t i = 0; i < assignments.size(); ++i) {
     int local_track_index = assignments[i].first;
     int local_obj_index = assignments[i].second;
-    (*tracks)[local_track_index]->UpdateWithSensorObject(
-        sensor_objects[local_obj_index], track_object_dist[local_track_index]);
+    tracks->at(local_track_index)
+        ->UpdateWithSensorObject(sensor_objects[local_obj_index],
+                                 track_object_dist[local_track_index]);
   }
 }
 
 void AsyncFusion::UpdateUnassignedTracks(
-    std::vector<PbfTrackPtr> *tracks, const std::vector<int> &unassigned_tracks,
+    const std::vector<int> &unassigned_tracks,
     const std::vector<double> &track_object_dist, const SensorType &sensor_type,
-    const std::string &sensor_id, double timestamp) {
-  for (size_t i = 0; i < unassigned_tracks.size(); i++) {
+    const std::string &sensor_id, const double timestamp,
+    std::vector<PbfTrackPtr> *tracks) {
+  for (size_t i = 0; i < unassigned_tracks.size(); ++i) {
     int local_track_index = unassigned_tracks[i];
-    (*tracks)[local_track_index]->UpdateWithoutSensorObject(
-        sensor_type, sensor_id, track_object_dist[local_track_index],
-        timestamp);
+    tracks->at(local_track_index)
+        ->UpdateWithoutSensorObject(sensor_type, sensor_id,
+                                    track_object_dist[local_track_index],
+                                    timestamp);
   }
 }
 
@@ -199,14 +192,14 @@ void AsyncFusion::CollectFusedObjects(double timestamp,
   int fg_obj_num = 0;
   std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
   for (size_t i = 0; i < tracks.size(); i++) {
-      PbfSensorObjectPtr fused_object = tracks[i]->GetFusedObject();
-      ObjectPtr obj(new Object());
-      obj->clone(*(fused_object->object));
-      obj->track_id = tracks[i]->GetTrackId();
-      obj->latest_tracked_time = timestamp;
-      obj->tracking_time = tracks[i]->GetTrackingPeriod();
-      fused_objects->push_back(obj);
-      fg_obj_num++;
+    PbfSensorObjectPtr fused_object = tracks[i]->GetFusedObject();
+    ObjectPtr obj(new Object());
+    obj->clone(*(fused_object->object));
+    obj->track_id = tracks[i]->GetTrackId();
+    obj->latest_tracked_time = timestamp;
+    obj->tracking_time = tracks[i]->GetTrackingPeriod();
+    fused_objects->push_back(obj);
+    fg_obj_num++;
   }
 
   AINFO << "collect objects : fg_track_cnt = " << tracks.size()
@@ -256,8 +249,8 @@ void AsyncFusion::FuseForegroundObjects(
   UpdateAssignedTracks(*foreground_objects, assignments,
                        track2measurements_dist, &tracks);
 
-  UpdateUnassignedTracks(&tracks, unassigned_tracks, track2measurements_dist,
-                         sensor_type, sensor_id, timestamp);
+  UpdateUnassignedTracks(unassigned_tracks, track2measurements_dist,
+                         sensor_type, sensor_id, timestamp, &tracks);
 
   // fixme:zhangweide only create new track if it is camera sensor
   if (is_camera(sensor_type)) {
