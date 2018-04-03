@@ -52,8 +52,6 @@ class GeometryCameraConverter : public BaseCameraConverter {
   // orientation
   bool Convert(std::vector<VisualObjectPtr> *objects) override;
 
-  void SetDebug(bool flag);
-
   std::string Name() const override;
 
  private:
@@ -92,12 +90,13 @@ class GeometryCameraConverter : public BaseCameraConverter {
   void DecideAngle(const Eigen::Vector3f &camera_ray,
                    VisualObjectPtr obj) const;
 
+  void SetBoxProjection(VisualObjectPtr obj) const;
+
   CameraDistort<float> camera_model_;
   std::vector<Eigen::Vector3f> corners_;
   std::vector<Eigen::Vector2f> pixel_corners_;
   static const int kMaxDistanceSearchDepth_ = 20;
   static const int kMaxCenterDirectionSearchDepth_ = 10;
-  bool debug_ = false;
 
   DISALLOW_COPY_AND_ASSIGN(GeometryCameraConverter);
 };
