@@ -67,8 +67,8 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
       obj->distance = DecideDistance(distance_h, distance_w, obj);
       // Estimation of center pixel due to unknown truncation ratio
       if (obj->trunc_width > 0.25f) mass_center_pixel = trunc_center_pixel;
-    } else if (distance_w > 40.0f || distance_h > 40.0f
-               || obj->trunc_width > 0.25f) {
+    } else if (distance_w > 40.0f || distance_h > 40.0f ||
+               obj->trunc_width > 0.25f) {
       // Reset alpha angle and redo again (Model dependent issue)
       obj->distance = DecideDistance(distance_h, distance_w, obj);
       DecideAngle(camera_model_.unproject(mass_center_pixel), obj);
@@ -350,16 +350,16 @@ void GeometryCameraConverter::CheckSizeSanity(VisualObjectPtr obj) const {
   }
 }
 
-void GeometryCameraConverter::CheckTruncation(VisualObjectPtr obj,
-  Eigen::Matrix<float, 2, 1> *trunc_center_pixel) const {
+void GeometryCameraConverter::CheckTruncation(
+    VisualObjectPtr obj, Eigen::Matrix<float, 2, 1> *trunc_center_pixel) const {
   auto width = camera_model_.get_width();
   auto height = camera_model_.get_height();
 
   // Ad-hoc 2D box truncation binary determination
   if (obj->upper_left.x() < 30.0f || width - 30.0f < obj->lower_right.x()) {
     obj->trunc_width = 0.5f;
-    trunc_center_pixel->y() = (obj->upper_left.y()
-                               + obj->lower_right.y()) / 2.0f;
+    trunc_center_pixel->y() =
+        (obj->upper_left.y() + obj->lower_right.y()) / 2.0f;
     if (obj->upper_left.x() < 30.0f) {
       trunc_center_pixel->x() = obj->upper_left.x();
     } else {
