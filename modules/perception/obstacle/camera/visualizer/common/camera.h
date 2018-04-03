@@ -159,7 +159,7 @@ class Camera {
 
   double distance_to_scene_center() const;
 
-  void setscene_radius(double radius);
+  void setscene_radius(const double radius);
 
   void setscene_center(const Eigen::Vector3d &center);
 
