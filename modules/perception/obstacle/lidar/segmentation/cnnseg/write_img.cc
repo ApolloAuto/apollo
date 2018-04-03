@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
   int rows, cols;
   std::istringstream iss(line);
   iss >> rows >> cols;
-  std::cout << "#rows = " << rows << ", #cols = " << cols << endl;
+  ADEBUG << "#rows = " << rows << ", #cols = " << cols;
 
   cv::Mat img(rows, cols, CV_8UC3, cv::Scalar(0.0));
   int grid = 0;
