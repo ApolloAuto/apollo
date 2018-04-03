@@ -144,18 +144,18 @@ void YoloCameraDetector::load_intrinsic(
            aligned_pixel;
   height_ = static_cast<int>(width_ * roi_ratio + aligned_pixel / 2) /
             aligned_pixel * aligned_pixel;
-  AINFO << "image_height=" << image_height_ << ", "
-        << "image_width=" << image_width_ << ", "
-        << "roi_ratio=" << roi_ratio;
-  AINFO << "offset_y=" << offset_y_ << ", height=" << height_
-        << ", width=" << width_;
+  ADEBUG << "image_height=" << image_height_ << ", "
+         << "image_width=" << image_width_ << ", "
+         << "roi_ratio=" << roi_ratio;
+  ADEBUG << "offset_y=" << offset_y_ << ", height=" << height_
+         << ", width=" << width_;
   _min_2d_height /= height_;
 
   int roi_w = image_width_;
   int roi_h = image_height_ - offset_y_;
 
-  AINFO << "roi_w=" << roi_w << ", "
-        << "roi_h=" << roi_h;
+  ADEBUG << "roi_w=" << roi_w << ", "
+         << "roi_h=" << roi_h;
 
   int channel = 3;
   image_data_.reset(
@@ -204,7 +204,7 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   }
 
   // init Net
-  AINFO << "model_type=" << model_type;
+  ADEBUG << "model_type=" << model_type;
   switch (model_type) {
     case obstacle::yolo::ModelType::Caffe:
       cnnadapter_.reset(new CNNCaffe);
@@ -239,10 +239,10 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
     string track_model = feat_param.remap_model();
     track_model =
         apollo::common::util::GetAbsolutePath(model_root, track_model);
-    AINFO << "Using tracking model: " << track_model;
+    ADEBUG << "Using tracking model: " << track_model;
     projector_.reset(new MatrixProjector(track_model));
   } else {
-    AINFO << "Using DummyProjector for tracking!";
+    ADEBUG << "Using DummyProjector for tracking!";
     projector_.reset(new DummyProjector);
   }
   extractors_.resize(feat_param.extractor_size());
@@ -323,13 +323,13 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
     resize(frame(roi), input_blob.get(), image_data_, 0);
   }
   pre_time.Stop();
-  AINFO << "Pre-processing: " << pre_time.MilliSeconds() << " ms";
+  ADEBUG << "Pre-processing: " << pre_time.MilliSeconds() << " ms";
 
   /////////////////////////// detection part ///////////////////////////
   caffe::Timer det_time;
   det_time.Start();
   cnnadapter_->forward();
-  AINFO << "Running detection: " << det_time.MilliSeconds() << " ms";
+  ADEBUG << "Running detection: " << det_time.MilliSeconds() << " ms";
   caffe::Timer post_time;
   post_time.Start();
 
@@ -337,16 +337,16 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
 
   get_objects_cpu(&temp_objects);
 
-  AINFO << "object size = " << temp_objects.size();
+  ADEBUG << "object size = " << temp_objects.size();
   for (int i = 0; i < static_cast<int>(temp_objects.size()); ++i) {
     VisualObjectPtr obj = (temp_objects)[i];
-    AINFO << "type prob size for object" << i << " is "
-          << sizeof(obj->type_probs) << " (" << obj << ")";
-    AINFO << "prob: " << obj->type_probs[static_cast<int>(obj->type)];
-    AINFO << "object feature size for object" << i << " is "
-          << obj->object_feature.size();
-    AINFO << "internal type probs size for object" << i << " is "
-          << sizeof(obj->internal_type_probs);
+    ADEBUG << "type prob size for object" << i << " is "
+           << sizeof(obj->type_probs) << " (" << obj << ")";
+    ADEBUG << "prob: " << obj->type_probs[static_cast<int>(obj->type)];
+    ADEBUG << "object feature size for object" << i << " is "
+           << obj->object_feature.size();
+    ADEBUG << "internal type probs size for object" << i << " is "
+           << sizeof(obj->internal_type_probs);
   }
 
   auto ori_blob =
@@ -365,14 +365,14 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
       }
       ++total_obj_idx;
     }
-    AINFO << valid_obj_idx << " of " << total_obj_idx << " obstacles kept";
+    ADEBUG << valid_obj_idx << " of " << total_obj_idx << " obstacles kept";
   }
   for (size_t i = 0; i < temp_objects.size(); ++i) {
     temp_objects[i].reset();
   }
   temp_objects.clear();
-  AINFO << "Post-processing: " << post_time.MilliSeconds() << " ms";
-  AINFO << "Number of detected obstacles: " << objects->size();
+  ADEBUG << "Post-processing: " << post_time.MilliSeconds() << " ms";
+  ADEBUG << "Number of detected obstacles: " << objects->size();
 
   Extract(objects);
   yolo::recover_bbox(roi_w, roi_h, offset_y_, objects);
@@ -387,7 +387,7 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
       obj->score = std::max(obj->score, prob);
     }
 
-    AINFO << "obj-" << det_id << ": " << obj->object_feature.size();
+    ADEBUG << "obj-" << det_id << ": " << obj->object_feature.size();
     det_id++;
   }
 
@@ -460,7 +460,7 @@ bool YoloCameraDetector::get_objects_cpu(
     conf_scores.insert(std::make_pair(static_cast<int>(types_[k]), conf_score));
   }
   if (num_kept == 0) {
-    AINFO << "Couldn't find any detections";
+    ADEBUG << "Couldn't find any detections";
     return true;
   }
 
