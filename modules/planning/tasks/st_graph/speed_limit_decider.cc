@@ -57,10 +57,12 @@ constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
 }  // namespace
 
-SpeedLimitDecider::SpeedLimitDecider(const StBoundaryConfig& config,
+SpeedLimitDecider::SpeedLimitDecider(const SLBoundary& adc_sl_boundary,
+                                     const StBoundaryConfig& config,
                                      const ReferenceLine& reference_line,
                                      const PathData& path_data)
-    : st_boundary_config_(config),
+    : adc_sl_boundary_(adc_sl_boundary),
+      st_boundary_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()) {

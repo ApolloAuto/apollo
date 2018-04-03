@@ -164,8 +164,8 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  SpeedLimitDecider speed_limit_decider(st_boundary_config_, *reference_line_,
-                                        path_data);
+  SpeedLimitDecider speed_limit_decider(adc_sl_boundary, st_boundary_config_,
+                                        *reference_line_, path_data);
 
   if (!SearchStGraph(boundary_mapper, speed_limit_decider, path_data,
                      speed_data, path_decision, st_graph_debug)) {
