@@ -266,16 +266,17 @@ bool SpiralProblemInterface::eval_f(int n, const double* x, bool new_x,
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
     const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
     double delta_s = spiral_curve.ParamLength();
-    double s_segment = delta_s / num_of_internal_points_;
 
     for (std::size_t j = 0; j < num_of_internal_points_; ++j) {
-      double kappa = spiral_curve.Evaluate(1, s_segment * j);
+      double ratio = static_cast<double>(j) / num_of_internal_points_;
+      double s = ratio * delta_s;
+      double kappa = spiral_curve.Evaluate(1, s);
       obj_value += kappa * kappa * weight_kappa_;
 
-      double dkappa = spiral_curve.Evaluate(2, s_segment * j);
+      double dkappa = spiral_curve.Evaluate(2, s);
       obj_value += dkappa * dkappa * weight_dkappa_;
 
-      double d2kappa = spiral_curve.Evaluate(3, s_segment * j);
+      double d2kappa = spiral_curve.Evaluate(3, s);
       obj_value += d2kappa * d2kappa * weight_d2kappa_;
     }
   }
