@@ -96,21 +96,20 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   double timestamp = msg.header.stamp.toSec();
 
-
   if (FLAGS_skip_camera_frame) {
-      if (timestamp_ns_ > 0.0) {
-        double curr_timestamp = timestamp * 1e9;
+    if (timestamp_ns_ > 0.0) {
+      double curr_timestamp = timestamp * 1e9;
 
-        if ((curr_timestamp - timestamp_ns_) < (1e9 / FLAGS_camera_hz)) {
-            AINFO << "CameraProcessSubnode Skip frame";
-            return;
-        }
-        timestamp_ns_ = curr_timestamp;
-      } else {
-        timestamp_ns_ = timestamp * 1e9;
+      if ((curr_timestamp - timestamp_ns_) < (1e9 / FLAGS_camera_hz)) {
+        AINFO << "CameraProcessSubnode Skip frame";
+        return;
       }
+      timestamp_ns_ = curr_timestamp;
+    } else {
+      timestamp_ns_ = timestamp * 1e9;
+    }
   } else {
-        timestamp_ns_ = timestamp * 1e9;
+    timestamp_ns_ = timestamp * 1e9;
   }
 
   AINFO << "CameraProcessSubnode ImgCallback: "
@@ -241,8 +240,8 @@ void CameraProcessSubnode::VisualObjToSensorObj(
 void CameraProcessSubnode::PublishDataAndEvent(
     const double &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
     const SharedDataPtr<CameraItem> &camera_item) {
-//   std::string key = "";
-//   SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
+  //   std::string key = "";
+  //   SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);
   CommonSharedDataKey key(timestamp, device_id_);
   cam_obj_data_->Add(key, sensor_objects);
   cam_shared_data_->Add(key, camera_item);

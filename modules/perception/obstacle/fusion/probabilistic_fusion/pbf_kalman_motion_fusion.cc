@@ -223,8 +223,8 @@ void PbfKalmanMotionFusion::GetState(Eigen::Vector3d *anchor_point,
   *velocity = belief_velocity_;
 }
 
-void PbfKalmanMotionFusion::SetState(const Eigen::Vector3d& anchor_point,
-                  const Eigen::Vector3d& velocity) {
+void PbfKalmanMotionFusion::SetState(const Eigen::Vector3d &anchor_point,
+                                     const Eigen::Vector3d &velocity) {
   belief_anchor_point_ = anchor_point;
   belief_velocity_ = velocity;
 }

@@ -21,14 +21,16 @@ import subprocess
 import os
 import glob
 import time
-from git_helper import GitHelper;
-from file_editor import FileEditor;
+from git_helper import GitHelper
+from file_editor import FileEditor
 
 g_args = None
 
-g_apollo_root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../")
+g_apollo_root = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), "../../../")
 
-git_helper= None
+git_helper = None
+
 
 def glob_files(path, pattern):
     matches = []
@@ -40,14 +42,14 @@ def glob_files(path, pattern):
 
 
 def clean_gflags():
-    header_files = [] 
+    header_files = []
     modules = os.path.join(g_apollo_root, "modules")
     header_files.extend(glob_files(modules, ".h"))
     header_files.extend(glob_files(modules, ".hpp"))
 
     src_files = []
-    src_files.extend(glob_files(modules, ".cpp"));
-    src_files.extend(glob_files(modules, ".cc"));
+    src_files.extend(glob_files(modules, ".cpp"))
+    src_files.extend(glob_files(modules, ".cc"))
 
     code_files = header_files + src_files
     flag_declares = {}
@@ -59,15 +61,15 @@ def clean_gflags():
         f = FileEditor(filename)
         for flag in f.declared_gflags():
             if flag not in flag_declares:
-                flag_declares[flag]= []
+                flag_declares[flag] = []
             flag_declares[flag].append(filename)
         for flag in f.defined_gflags():
             if flag not in flag_defines:
                 flag_defines[flag] = []
             flag_defines[flag].append(filename)
         flag_used.extend(f.used_gflags())
-        
-    flag_used=set(flag_used)
+
+    flag_used = set(flag_used)
 
     for flag in flag_declares:
         if flag not in flag_used:
@@ -82,9 +84,11 @@ def clean_gflags():
                 fhandle.delete_gflag(flag)
                 fhandle.save()
 
+
 def format_recent_files():
-    oneday = 24 * 60 * 60;
-    commits = git_helper.get_commit_since_date("codebot", int(time.time()) - oneday)
+    oneday = 24 * 60 * 60
+    commits = git_helper.get_commit_since_date("codebot",
+                                               int(time.time()) - oneday)
     if len(commits) == 0:
         return
     files = git_helper.get_changed_files_since_commit(commits[-1])
@@ -95,7 +99,8 @@ def format_recent_files():
         file_editor.delete_doxygen_file()
         file_editor.save(format=True)
 
+
 if __name__ == "__main__":
-    git_helper= GitHelper(g_apollo_root, remote="upstream")
+    git_helper = GitHelper(g_apollo_root, remote="upstream")
     #clean_gflags()
     format_recent_files()
