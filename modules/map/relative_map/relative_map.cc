@@ -164,8 +164,10 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
 
   // update navigation_lane from perception_obstacles (lane marker)
   if (!AdapterManager::GetPerceptionObstacles()->Empty()) {
-    navigation_lane_.UpdatePerception(
-        AdapterManager::GetPerceptionObstacles()->GetLatestObserved());
+    const auto& perception =
+        AdapterManager::GetPerceptionObstacles()->GetLatestObserved();
+    navigation_lane_.UpdatePerception(perception);
+    map_msg->mutable_lane_marker()->CopyFrom(perception.lane_marker());
   }
 
   if (!navigation_lane_.GeneratePath()) {
