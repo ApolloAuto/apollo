@@ -206,10 +206,10 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
   }
 
   ptop->set_end_point_position(fixed_end_x_, fixed_end_y_);
-  ptop->set_element_weight_curve_length(0.0);
-  ptop->set_element_weight_kappa(1.0);
-  ptop->set_element_weight_dkappa(1.0);
-  ptop->set_element_weight_d2kappa(0.0);
+  ptop->set_element_weight_curve_length(FLAGS_spiral_opt_weight_curve_length);
+  ptop->set_element_weight_kappa(FLAGS_spiral_opt_weight_kappa);
+  ptop->set_element_weight_dkappa(FLAGS_spiral_opt_weight_dkappa);
+  ptop->set_element_weight_d2kappa(FLAGS_spiral_opt_weight_d2kappa);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
@@ -217,14 +217,14 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
   app->Options()->SetStringValue("hessian_approximation", "limited-memory");
-  //  app->Options()->SetStringValue("derivative_test", "first-order");
-  //  app->Options()->SetStringValue("derivative_test", "second-order");
   app->Options()->SetIntegerValue("print_level", 0);
-  int num_iterations = FLAGS_spiral_smoother_num_iteration;
-  app->Options()->SetIntegerValue("max_iter", num_iterations);
-  app->Options()->SetIntegerValue("acceptable_iter", 5);
-  app->Options()->SetNumericValue("tol", 1.0e-4);
-  app->Options()->SetNumericValue("acceptable_tol", 1.0e-5);
+  app->Options()->SetIntegerValue("max_iter",
+      FLAGS_spiral_smoother_num_iteration);
+  app->Options()->SetIntegerValue("acceptable_iter",
+      FLAGS_spiral_opt_acceptable_iter);
+  app->Options()->SetNumericValue("tol", FLAGS_spiral_opt_tol);
+  app->Options()->SetNumericValue("acceptable_tol",
+      FLAGS_spiral_opt_acceptable_tol);
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
