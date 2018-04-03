@@ -6,12 +6,12 @@ We provide a step-by-step instruction on running perception module with Nvidia G
 
 1. Modify the script `./docker/scripts/dev_start.sh` to mount the library and source code of linux kernel from the host machine, by adding two option lines in command `docker run -it`:
 ```
--v /usr/src:/usr/src 
+-v /usr/src:/usr/src
 -v /lib/modules:/lib/modules
 ```
 
-2. Start the released docker image and get into docker with root authority: 
-``` 
+2. Start the released docker image and get into docker with root authority:
+```
 ./docker/scripts/dev_start.sh
 docker exec -it apollo_dev /bin/bash
 ```
@@ -47,7 +47,7 @@ docker commit CONTAINER_ID apolloauto/apollo:NEW_DOCKER_IMAGE_TAG
 
 7. Start the new docker image (in host) and get into docker:
 ```
-./docker/scripts/dev_start.sh NEW_DOCKER_IMAGE_TAG
+./docker/scripts/dev_start.sh -l -t NEW_DOCKER_IMAGE_TAG
 ./docker/scripts/dev_into.sh
 ```
 
@@ -55,7 +55,7 @@ docker commit CONTAINER_ID apolloauto/apollo:NEW_DOCKER_IMAGE_TAG
 ```
 ./apollo.sh build_gpu
 ```
-or 
+or
 ```
 ./apollo.sh build_opt_gpu
 ```
