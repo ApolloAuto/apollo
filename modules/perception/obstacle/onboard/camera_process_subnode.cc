@@ -91,17 +91,16 @@ bool CameraProcessSubnode::InitModules() {
 }
 
 void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
-  AdapterManager::Observe();
-  sensor_msgs::Image msg = AdapterManager::GetImageFront()->GetLatestObserved();
-
-  double timestamp = msg.header.stamp.toSec();
+  double timestamp = message.header.stamp.toSec();
+  ADEBUG << "CameraProcessSubnode ImgCallback: "
+         << " frame: " << seq_num_ << " timestamp: ";
+  ADEBUG << std::fixed << std::setprecision(64) << timestamp;
 
   if (FLAGS_skip_camera_frame) {
     if (timestamp_ns_ > 0.0) {
       double curr_timestamp = timestamp * 1e9;
-
       if ((curr_timestamp - timestamp_ns_) < (1e9 / FLAGS_camera_hz)) {
-        AINFO << "CameraProcessSubnode Skip frame";
+        ADEBUG << "CameraProcessSubnode Skip frame";
         return;
       }
       timestamp_ns_ = curr_timestamp;
@@ -112,15 +111,15 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
     timestamp_ns_ = timestamp * 1e9;
   }
 
-  AINFO << "CameraProcessSubnode ImgCallback: "
-        << " frame: " << ++seq_num_ << " timestamp: ";
-  AINFO << std::fixed << std::setprecision(64) << timestamp;
+  ADEBUG << "CameraProcessSubnode ImgCallback: "
+         << " frame: " << ++seq_num_ << " timestamp: ";
+  ADEBUG << std::fixed << std::setprecision(64) << timestamp;
   PERF_FUNCTION("CameraProcessSubnode");
   PERF_BLOCK_START();
 
   cv::Mat img;
   if (!FLAGS_image_file_debug) {
-    MessageToMat(msg, &img);
+    MessageToMat(message, &img);
   } else {
     img = cv::imread(FLAGS_image_file_path, CV_LOAD_IMAGE_COLOR);
   }
