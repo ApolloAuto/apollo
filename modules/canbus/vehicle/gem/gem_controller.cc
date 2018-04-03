@@ -66,6 +66,8 @@ ErrorCode GemController::Init(
   message_manager_ = message_manager;
 
   // sender part
+
+  /*
   brake_cmd_6b_ = dynamic_cast<Brakecmd6b *>(
       message_manager_->GetMutableProtocolDataById(Brakecmd6b::ID));
   if (brake_cmd_6b_ == nullptr) {
@@ -105,7 +107,7 @@ ErrorCode GemController::Init(
   can_sender_->AddMessage(Steeringcmd6d::ID, steering_cmd_6d_, false);
   can_sender_->AddMessage(Shiftcmd65::ID, shift_cmd_65_, false);
   can_sender_->AddMessage(Turncmd63::ID, turn_cmd_63_, false);
-
+*/
   // need sleep to ensure all messages received
   AINFO << "GemController is initialized.";
 
@@ -171,13 +173,13 @@ ErrorCode GemController::EnableAutoMode() {
     return ErrorCode::OK;
   }
   return ErrorCode::OK;
-
-  brake_cmd_6b_->set_enable();
-  accel_cmd_67_->set_enable();
-  steering_cmd_6d_->set_enable();
-  shift_cmd_65_->set_enable();
-  turn_cmd_63_->set_enable();
-
+  /*
+    brake_cmd_6b_->set_enable();
+    accel_cmd_67_->set_enable();
+    steering_cmd_6d_->set_enable();
+    shift_cmd_65_->set_enable();
+    turn_cmd_63_->set_enable();
+*/
   can_sender_->Update();
   const int32_t flag =
       CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
@@ -191,7 +193,6 @@ ErrorCode GemController::EnableAutoMode() {
     AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
     return ErrorCode::OK;
   }
-
 }
 
 ErrorCode GemController::DisableAutoMode() {
