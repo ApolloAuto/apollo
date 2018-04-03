@@ -25,6 +25,11 @@
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/canbus/vehicle/gem/protocol/accel_cmd_67.h"
+#include "modules/canbus/vehicle/gem/protocol/brake_cmd_6b.h"
+#include "modules/canbus/vehicle/gem/protocol/shift_cmd_65.h"
+#include "modules/canbus/vehicle/gem/protocol/steering_cmd_6d.h"
+#include "modules/canbus/vehicle/gem/protocol/turn_cmd_63.h"
 #include "modules/common/macro.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
@@ -107,6 +112,11 @@ class GemController final : public VehicleController {
 
  private:
   // control protocol
+  Accelcmd67* accel_cmd_67_ = nullptr;
+  Brakecmd6b* brake_cmd_6b_ = nullptr;
+  Shiftcmd65* shift_cmd_65_ = nullptr;
+  Steeringcmd6d* steering_cmd_6d_ = nullptr;
+  Turncmd63* turn_cmd_63_ = nullptr;
 
   Chassis chassis_;
   std::unique_ptr<std::thread> thread_;
