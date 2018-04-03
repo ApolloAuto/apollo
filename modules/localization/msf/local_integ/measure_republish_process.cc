@@ -42,7 +42,7 @@ LocalizationState MeasureRepublishProcess::Init(
   is_trans_gpstime_to_utctime_ = params.is_trans_gpstime_to_utctime;
   gnss_mode_ = GnssMode(params.gnss_mode);
 
-  pre_bestgnsspose_ = {0.0};
+  // pre_bestgnsspose_ = {0.0};
   pva_buffer_size_ = 150;
   pthread_mutex_init(&integ_pva_mutex_, NULL);
   pthread_mutex_init(&height_mutex_, NULL);
@@ -78,7 +78,7 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
     return false;
   }
 
-  MeasureData measure_data = {0.0};
+  MeasureData measure_data;
 
   measure_data.time = bestgnsspos_msg.measurement_time();
   if (is_trans_gpstime_to_utctime_) {
@@ -394,7 +394,7 @@ void MeasureRepublishProcess::IntegPvaProcess(const InsPva& inspva_msg) {
 
 int MeasureRepublishProcess::LidarLocalProcess(
     const LocalizationEstimate& lidar_local_msg, MeasureData *measure) {
-  MeasureData measure_data = {0.0};
+  MeasureData measure_data;  // = {0.0};
   measure_data.time = lidar_local_msg.measurement_time();
 
   apollo::localization::msf::WGS84Corr temp_wgs = {0.0};
