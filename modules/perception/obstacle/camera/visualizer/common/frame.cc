@@ -16,7 +16,7 @@
 
 #include "modules/perception/obstacle/camera/visualizer/common/frame.h"
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 namespace apollo {
@@ -56,9 +56,7 @@ Frame &Frame::operator=(const Frame &frame) {
   return *this;
 }
 
-Frame::Frame(const Frame &frame) {
-  (*this) = frame;
-}
+Frame::Frame(const Frame &frame) { (*this) = frame; }
 
 const double *Frame::matrix() const {
   static double m[4][4];
@@ -196,9 +194,7 @@ void Frame::translate(const Eigen::Vector3d &t) {
   translate(tbis);
 }
 
-void Frame::translate_t(const Eigen::Vector3d &t) {
-  t_ += t;
-}
+void Frame::translate_t(const Eigen::Vector3d &t) { t_ += t; }
 
 void Frame::translate(double x, double y, double z) {
   Eigen::Vector3d t(x, y, z);
@@ -323,7 +319,8 @@ Eigen::Quaterniond Frame::orientation() const {
 void Frame::set_reference_frame(const Frame *const refFrame) {
   if (setting_asreference_frame_will_create_a_loop(refFrame)) {
     std::cerr
-        << "Frame::set_reference_frame would create a loop in Frame hierarchy";
+        << "Frame::set_reference_frame would create a loop in Frame hierarchy"
+        << std::endl;
   } else {
     reference_frame_ = refFrame;
   }
