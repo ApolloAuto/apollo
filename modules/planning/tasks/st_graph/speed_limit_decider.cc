@@ -57,10 +57,12 @@ constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
 }  // namespace
 
-SpeedLimitDecider::SpeedLimitDecider(const StBoundaryConfig& config,
+SpeedLimitDecider::SpeedLimitDecider(const SLBoundary& adc_sl_boundary,
+                                     const StBoundaryConfig& config,
                                      const ReferenceLine& reference_line,
                                      const PathData& path_data)
-    : st_boundary_config_(config),
+    : adc_sl_boundary_(adc_sl_boundary),
+      st_boundary_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()) {
@@ -151,8 +153,11 @@ Status SpeedLimitDecider::GetSpeedLimits(
       if (!const_path_obstacle->LateralDecision().has_nudge()) {
         continue;
       }
-      if (path_s < const_path_obstacle->PerceptionSLBoundary().start_s() ||
-          path_s > const_path_obstacle->PerceptionSLBoundary().end_s()) {
+
+      if (path_s + adc_sl_boundary_.end_s() <
+              const_path_obstacle->PerceptionSLBoundary().start_s() ||
+          path_s + adc_sl_boundary_.start_s() >
+              const_path_obstacle->PerceptionSLBoundary().end_s()) {
         continue;
       }
       constexpr double kRange = 1.0;  // meters
