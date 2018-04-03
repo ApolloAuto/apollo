@@ -31,22 +31,14 @@ Brakemotorrpt271::Brakemotorrpt271() {}
 const int32_t Brakemotorrpt271::ID = 0x71;
 
 void Brakemotorrpt271::Parse(const std::uint8_t* bytes, int32_t length,
-                             ChassisDetail* chassis) const {
-  chassis->mutable_gem()
-      ->mutable_brake_motor_rpt_2_71()
-      ->set_encoder_temperature(encoder_temperature(bytes, length));
-  chassis->mutable_gem()->mutable_brake_motor_rpt_2_71()->set_motor_temperature(
-      motor_temperature(bytes, length));
-  chassis->mutable_gem()->mutable_brake_motor_rpt_2_71()->set_angular_speed(
-      angular_speed(bytes, length));
+                         ChassisDetail* chassis) const {
+  chassis->mutable_gem()->mutable_brake_motor_rpt_2_71()->set_encoder_temperature(encoder_temperature(bytes, length));
+  chassis->mutable_gem()->mutable_brake_motor_rpt_2_71()->set_motor_temperature(motor_temperature(bytes, length));
+  chassis->mutable_gem()->mutable_brake_motor_rpt_2_71()->set_angular_speed(angular_speed(bytes, length));
 }
 
-// config detail: {'name': 'encoder_temperature', 'offset': -40.0,
-// 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range':
-// '[-32808|32727]', 'bit': 7, 'type': 'int', 'order': 'motorola',
-// 'physical_unit': 'deg C'}
-int Brakemotorrpt271::encoder_temperature(const std::uint8_t* bytes,
-                                          int32_t length) const {
+// config detail: {'name': 'encoder_temperature', 'offset': -40.0, 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32808|32727]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': 'deg C'}
+int Brakemotorrpt271::encoder_temperature(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
@@ -62,12 +54,8 @@ int Brakemotorrpt271::encoder_temperature(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'name': 'motor_temperature', 'offset': -40.0,
-// 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range':
-// '[-32808|32727]', 'bit': 23, 'type': 'int', 'order': 'motorola',
-// 'physical_unit': 'deg C'}
-int Brakemotorrpt271::motor_temperature(const std::uint8_t* bytes,
-                                        int32_t length) const {
+// config detail: {'name': 'motor_temperature', 'offset': -40.0, 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32808|32727]', 'bit': 23, 'type': 'int', 'order': 'motorola', 'physical_unit': 'deg C'}
+int Brakemotorrpt271::motor_temperature(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
@@ -83,11 +71,8 @@ int Brakemotorrpt271::motor_temperature(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'name': 'angular_speed', 'offset': 0.0, 'precision': 0.001,
-// 'len': 32, 'is_signed_var': False, 'physical_range': '[0|4294967.295]',
-// 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rev/s'}
-double Brakemotorrpt271::angular_speed(const std::uint8_t* bytes,
-                                       int32_t length) const {
+// config detail: {'name': 'angular_speed', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': False, 'physical_range': '[0|4294967.295]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rev/s'}
+double Brakemotorrpt271::angular_speed(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 

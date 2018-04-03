@@ -31,18 +31,13 @@ Brakemotorrpt170::Brakemotorrpt170() {}
 const int32_t Brakemotorrpt170::ID = 0x70;
 
 void Brakemotorrpt170::Parse(const std::uint8_t* bytes, int32_t length,
-                             ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_brake_motor_rpt_1_70()->set_motor_current(
-      motor_current(bytes, length));
-  chassis->mutable_gem()->mutable_brake_motor_rpt_1_70()->set_shaft_position(
-      shaft_position(bytes, length));
+                         ChassisDetail* chassis) const {
+  chassis->mutable_gem()->mutable_brake_motor_rpt_1_70()->set_motor_current(motor_current(bytes, length));
+  chassis->mutable_gem()->mutable_brake_motor_rpt_1_70()->set_shaft_position(shaft_position(bytes, length));
 }
 
-// config detail: {'name': 'motor_current', 'offset': 0.0, 'precision': 0.001,
-// 'len': 32, 'is_signed_var': False, 'physical_range': '[0|4294967.295]',
-// 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'amps'}
-double Brakemotorrpt170::motor_current(const std::uint8_t* bytes,
-                                       int32_t length) const {
+// config detail: {'name': 'motor_current', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': False, 'physical_range': '[0|4294967.295]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'amps'}
+double Brakemotorrpt170::motor_current(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
@@ -65,12 +60,8 @@ double Brakemotorrpt170::motor_current(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'name': 'shaft_position', 'offset': 0.0, 'precision': 0.001,
-// 'len': 32, 'is_signed_var': True, 'physical_range':
-// '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order':
-// 'motorola', 'physical_unit': 'radians'}
-double Brakemotorrpt170::shaft_position(const std::uint8_t* bytes,
-                                        int32_t length) const {
+// config detail: {'name': 'shaft_position', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': True, 'physical_range': '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'radians'}
+double Brakemotorrpt170::shaft_position(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
