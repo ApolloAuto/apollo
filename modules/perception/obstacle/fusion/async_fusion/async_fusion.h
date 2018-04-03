@@ -14,9 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_IMF_FUSION_ASYNC_FUSION_H_
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_IMF_FUSION_ASYNC_FUSION_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_ASYNC_FUSION_ASYNC_FUSION_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_ASYNC_FUSION_ASYNC_FUSION_H_
 
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -33,8 +34,8 @@ namespace perception {
 
 class AsyncFusion : public BaseFusion {
  public:
-  AsyncFusion();
-  ~AsyncFusion();
+  AsyncFusion() = default;
+  ~AsyncFusion() = default;
 
   virtual bool Init();
 
@@ -62,11 +63,12 @@ class AsyncFusion : public BaseFusion {
       std::vector<PbfTrackPtr> const *tracks);
 
   /**@brief update current tracks which cannot find matched objects*/
-  void UpdateUnassignedTracks(std::vector<PbfTrackPtr> *tracks,
-                              const std::vector<int> &unassigned_tracks,
+  void UpdateUnassignedTracks(const std::vector<int> &unassigned_tracks,
                               const std::vector<double> &track_object_dist,
                               const SensorType &sensor_type,
-                              const std::string &sensor_id, double timestamp);
+                              const std::string &sensor_id,
+                              const double timestamp,
+                              std::vector<PbfTrackPtr> *tracks);
 
   void CollectFusedObjects(double timestamp,
                            std::vector<ObjectPtr> *fused_objects);
@@ -85,9 +87,8 @@ class AsyncFusion : public BaseFusion {
 
  protected:
   bool started_ = false;
-  PbfBaseTrackObjectMatcher *matcher_ = nullptr;
+  std::unique_ptr<PbfBaseTrackObjectMatcher> matcher_;
   PbfTrackManager *track_manager_ = nullptr;
-  std::mutex sensor_data_rw_mutex_;
   std::mutex fusion_mutex_;
 
  private:
@@ -100,4 +101,4 @@ REGISTER_FUSION(AsyncFusion);
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_IMF_FUSION_ASYNC_FUSION_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_ASYNC_FUSION_ASYNC_FUSION_H_
