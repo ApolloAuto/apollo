@@ -43,19 +43,10 @@ RUN apt-get update && apt-get install -y \
 RUN ln -rs /usr/lib/libprofiler.so.0 /usr/lib/libprofiler.so
 RUN ln -rs /usr/lib/libtcmalloc_and_profiler.so.4 /usr/lib/libtcmalloc_and_profiler.so
 
-RUN add-apt-repository -y ppa:webupd8team/java
-RUN add-apt-repository -y ppa:gluster/glusterfs-3.10
-RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
-RUN curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
-RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
-
-RUN apt-get update && apt-get install -y \
-    glusterfs-client \
-    oracle-java8-installer
-
-WORKDIR /tmp
-RUN wget https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh
-RUN bash bazel-0.5.3-installer-linux-x86_64.sh
+# Run installers.
+COPY installers /tmp/installers
+RUN bash /tmp/installers/install_bazel.sh
+RUN bash /tmp/installers/install_glusterfs.sh
 
 RUN apt-get clean autoclean && apt-get autoremove -y
 RUN rm -fr /var/lib/apt/lists/*
@@ -77,8 +68,7 @@ RUN make install
 RUN n 8.0.0
 
 # Install required python packages.
-COPY docker/py27_requirements.txt /tmp/
-RUN pip install -r /tmp/py27_requirements.txt
+RUN pip install -r /tmp/installers/py27_requirements.txt
 
 # Install yarn
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
