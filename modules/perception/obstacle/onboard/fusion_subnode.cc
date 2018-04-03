@@ -77,8 +77,7 @@ bool FusionSubnode::InitInternal() {
   lane_shared_data_ = dynamic_cast<LaneSharedData *>(
       shared_data_manager_->GetSharedData("LaneSharedData"));
   if (lane_shared_data_ == nullptr) {
-    AERROR << "failed to get shared data instance: LaneSharedData ";
-    return false;
+    AWARN << "failed to get shared data instance: LaneSharedData ";
   }
 
   lane_objects_.reset(new LaneObjects());

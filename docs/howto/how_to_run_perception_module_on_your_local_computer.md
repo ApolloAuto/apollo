@@ -6,12 +6,12 @@ We provide a step-by-step instruction on running perception module with Nvidia G
 
 1. Modify the script `./docker/scripts/dev_start.sh` to mount the library and source code of linux kernel from the host machine, by adding two option lines in command `docker run -it`:
 ```
--v /usr/src:/usr/src 
+-v /usr/src:/usr/src
 -v /lib/modules:/lib/modules
 ```
 
-2. Start the released docker image and get into docker with root authority: 
-``` 
+2. Start the released docker image and get into docker with root authority:
+```
 ./docker/scripts/dev_start.sh
 docker exec -it apollo_dev /bin/bash
 ```
@@ -31,22 +31,31 @@ source /apollo/scripts/recover_gcc.sh
 rm /usr/bin/cc1
 ```
 
-5. Commit a new docker image (in host):
+5. Install cuDNN
+Download cudnn from the following link. You may need to create an Nvidia developer account to proceed.
+[cuDNN v7.1.1 Developer Library for Ubuntu14.04 (Deb)](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.1.1/prod/8.0_20180214/Ubuntu14_04-x64/libcudnn7-dev_7.1.1.5-1+cuda8.0_amd64)
+
+After download, install cuDNN by
+```
+sudo dpkg -i libcudnn7*.deb
+```
+
+6. Commit a new docker image (in host):
 ```
 docker commit CONTAINER_ID apolloauto/apollo:NEW_DOCKER_IMAGE_TAG
 ```
 
-6. Start the new docker image (in host) and get into docker:
+7. Start the new docker image (in host) and get into docker:
 ```
-./docker/scripts/dev_start.sh NEW_DOCKER_IMAGE_TAG
+./docker/scripts/dev_start.sh -l -t NEW_DOCKER_IMAGE_TAG
 ./docker/scripts/dev_into.sh
 ```
 
-7. Build Apollo with GPU option (in docker):
+8. Build Apollo with GPU option (in docker):
 ```
 ./apollo.sh build_gpu
 ```
-or 
+or
 ```
 ./apollo.sh build_opt_gpu
 ```
