@@ -16,10 +16,7 @@
 
 #include "modules/canbus/vehicle/gem/protocol/brake_cmd_6b.h"
 
-#include "glog/logging.h"
-
 #include "modules/drivers/canbus/common/byte.h"
-#include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
 namespace canbus {
@@ -27,30 +24,49 @@ namespace gem {
 
 using ::apollo::drivers::canbus::Byte;
 
-Brakecmd6b::Brakecmd6b() {}
 const int32_t Brakecmd6b::ID = 0x6B;
 
-void Brakecmd6b::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_brake_cmd_6b()->set_brake_cmd(
-      brake_cmd(bytes, length));
+// public
+Brakecmd6b::Brakecmd6b() { Reset(); }
+
+uint32_t Brakecmd6b::GetPeriod() const {
+  // TODO modify every protocol's period manually
+  static const uint32_t PERIOD = 20 * 1000;
+  return PERIOD;
 }
 
-// config detail: {'name': 'brake_cmd', 'offset': 0.0, 'precision': 0.001,
-// 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7,
-// 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
-double Brakecmd6b::brake_cmd(const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 0);
-  int32_t x = t0.get_byte(0, 8);
-
-  Byte t1(bytes + 1);
-  int32_t t = t1.get_byte(0, 8);
-  x <<= 8;
-  x |= t;
-
-  double ret = x * 0.001000;
-  return ret;
+void Brakecmd6b::UpdateData(uint8_t* data) {
+  set_p_brake_cmd(data, brake_cmd_);
 }
+
+void Brakecmd6b::Reset() {
+  // TODO you should check this manually
+  brake_cmd_ = 0.0;
+}
+
+Brakecmd6b* Brakecmd6b::set_brake_cmd(
+    double brake_cmd) {
+  brake_cmd_ = brake_cmd;
+  return this;
+ }
+
+// config detail: {'name': 'BRAKE_CMD', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+void Brakecmd6b::set_p_brake_cmd(uint8_t* data,
+    double brake_cmd) {
+  brake_cmd = ProtocolData::BoundedValue(0.0, 1.0, brake_cmd);
+  int x = brake_cmd / 0.001000;
+  uint8_t t = 0;
+
+  t = x & 0xFF;
+  Byte to_set0(data + 1);
+  to_set0.set_value(t, 0, 8);
+  x >>= 8;
+
+  t = x & 0xFF;
+  Byte to_set1(data + 0);
+  to_set1.set_value(t, 0, 8);
+}
+
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
