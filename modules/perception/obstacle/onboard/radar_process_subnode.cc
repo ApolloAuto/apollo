@@ -39,9 +39,9 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::adapter::AdapterManager;
 using Eigen::Affine3d;
 using Eigen::Matrix4d;
-using apollo::common::adapter::AdapterManager;
 using pcl_util::Point;
 using pcl_util::PointD;
 using std::string;
