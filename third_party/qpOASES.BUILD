@@ -4,10 +4,12 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
-exports_files(["googletest/LICENSE"])
+exports_files(["qpOASES/LICENSE"])
 
 cc_library(
     name = "qpOASES",
+    linkstatic = False,
+    tags = ["manual"],
     srcs = [
         "src/BLASReplacement.cpp",
         "src/Bounds.cpp",

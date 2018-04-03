@@ -36,6 +36,7 @@ cc_library(
     hdrs = [
         "active_set_qp_solver.h",
     ],
+    linkstatic = False,
     deps = [
         ":qp_solver",
         "//modules/common:log",
