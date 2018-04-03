@@ -24,7 +24,7 @@ cc_library(
         "qp_solver.h",
     ],
     deps = [
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -41,8 +41,8 @@ cc_library(
         ":qp_solver",
         "//modules/common:log",
         "//modules/common/math/qp_solver:qp_solver_gflags",
-        "@eigen//:eigen",
-        "@qpOASES//:qpOASES",
+        "@eigen",
+        "@qpOASES",
     ],
 )
 
