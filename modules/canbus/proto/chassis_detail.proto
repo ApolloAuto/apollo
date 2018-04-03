@@ -530,6 +530,9 @@ message Surround {
 }
 
 
+// Gem vehicle starts from here
+// TODO(QiL) : Re-factor needed here
+
 message Global_rpt_6a {
 // Report Message
   enum Pacmod_statusType {
