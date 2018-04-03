@@ -66,6 +66,45 @@ ErrorCode GemController::Init(
   message_manager_ = message_manager;
 
   // sender part
+  brake_cmd_6b_ = dynamic_cast<Brakecmd6b *>(
+      message_manager_->GetMutableProtocolDataById(Brakecmd6b::ID));
+  if (brake_cmd_6b_ == nullptr) {
+    AERROR << "Brakecmd6b does not exist in the GemMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
+  }
+
+  accel_cmd_67_ = dynamic_cast<Accelcmd67 *>(
+      message_manager_->GetMutableProtocolDataById(Accelcmd67::ID));
+  if (accel_cmd_67_ == nullptr) {
+    AERROR << "Accelcmd67 does not exist in the GemMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
+  }
+
+  steering_cmd_6d_ = dynamic_cast<Steeringcmd6d *>(
+      message_manager_->GetMutableProtocolDataById(Steeringcmd6d::ID));
+  if (steering_cmd_6d_ == nullptr) {
+    AERROR << "Steeringcmd6d does not exist in the GemMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
+  }
+
+  shift_cmd_65_ = dynamic_cast<Shiftcmd65 *>(
+      message_manager_->GetMutableProtocolDataById(Shiftcmd65::ID));
+  if (shift_cmd_65_ == nullptr) {
+    AERROR << "Shiftcmd65 does not exist in the GemMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
+  }
+  turn_cmd_63_ = dynamic_cast<Turncmd63 *>(
+      message_manager_->GetMutableProtocolDataById(Turncmd63::ID));
+  if (turn_cmd_63_ == nullptr) {
+    AERROR << "Turncmd63 does not exist in the GemMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
+  }
+
+  can_sender_->AddMessage(Brakecmd6b::ID, brake_cmd_6b_, false);
+  can_sender_->AddMessage(Accelcmd67::ID, accel_cmd_67_, false);
+  can_sender_->AddMessage(Steeringcmd6d::ID, steering_cmd_6d_, false);
+  can_sender_->AddMessage(Shiftcmd65::ID, shift_cmd_65_, false);
+  can_sender_->AddMessage(Turncmd63::ID, turn_cmd_63_, false);
 
   // need sleep to ensure all messages received
   AINFO << "GemController is initialized.";
@@ -132,10 +171,12 @@ ErrorCode GemController::EnableAutoMode() {
     return ErrorCode::OK;
   }
   return ErrorCode::OK;
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  brake_60_->set_enable();
-  throttle_62_->set_enable();
-  steering_64_->set_enable();
+
+  brake_cmd_6b_->set_enable();
+  accel_cmd_67_->set_enable();
+  steering_cmd_6d_->set_enable();
+  shift_cmd_65_->set_enable();
+  turn_cmd_63_->set_enable();
 
   can_sender_->Update();
   const int32_t flag =
@@ -150,7 +191,7 @@ ErrorCode GemController::EnableAutoMode() {
     AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
     return ErrorCode::OK;
   }
-  */
+
 }
 
 ErrorCode GemController::DisableAutoMode() {
