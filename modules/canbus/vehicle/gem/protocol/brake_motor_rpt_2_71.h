@@ -17,38 +17,30 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_BRAKE_MOTOR_RPT_2_71_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_BRAKE_MOTOR_RPT_2_71_H_
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Brakemotorrpt271 : public ::apollo::drivers::canbus::ProtocolData<
-                             ::apollo::canbus::ChassisDetail> {
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Brakemotorrpt271();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+                     ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'name': 'ENCODER_TEMPERATURE', 'offset': -40.0,
-  // 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range':
-  // '[-32808|32727]', 'bit': 7, 'type': 'int', 'order': 'motorola',
-  // 'physical_unit': 'deg C'}
-  int encoder_temperature(const std::uint8_t* bytes,
-                          const int32_t length) const;
 
-  // config detail: {'name': 'MOTOR_TEMPERATURE', 'offset': -40.0,
-  // 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range':
-  // '[-32808|32727]', 'bit': 23, 'type': 'int', 'order': 'motorola',
-  // 'physical_unit': 'deg C'}
+  // config detail: {'name': 'ENCODER_TEMPERATURE', 'offset': -40.0, 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32808|32727]', 'bit': 7, 'type': 'int', 'order': 'motorola', 'physical_unit': 'deg C'}
+  int encoder_temperature(const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'name': 'MOTOR_TEMPERATURE', 'offset': -40.0, 'precision': 1.0, 'len': 16, 'is_signed_var': True, 'physical_range': '[-32808|32727]', 'bit': 23, 'type': 'int', 'order': 'motorola', 'physical_unit': 'deg C'}
   int motor_temperature(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'ANGULAR_SPEED', 'offset': 0.0, 'precision': 0.001,
-  // 'len': 32, 'is_signed_var': False, 'physical_range': '[0|4294967.295]',
-  // 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rev/s'}
+  // config detail: {'name': 'ANGULAR_SPEED', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': False, 'physical_range': '[0|4294967.295]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rev/s'}
   double angular_speed(const std::uint8_t* bytes, const int32_t length) const;
 };
 

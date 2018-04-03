@@ -16,10 +16,7 @@
 
 #include "modules/canbus/vehicle/gem/protocol/horn_cmd_78.h"
 
-#include "glog/logging.h"
-
 #include "modules/drivers/canbus/common/byte.h"
-#include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
 namespace canbus {
@@ -27,27 +24,41 @@ namespace gem {
 
 using ::apollo::drivers::canbus::Byte;
 
-Horncmd78::Horncmd78() {}
 const int32_t Horncmd78::ID = 0x78;
 
-void Horncmd78::Parse(const std::uint8_t* bytes, int32_t length,
-                      ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_horn_cmd_78()->set_horn_cmd(
-      horn_cmd(bytes, length));
+// public
+Horncmd78::Horncmd78() { Reset(); }
+
+uint32_t Horncmd78::GetPeriod() const {
+  // TODO modify every protocol's period manually
+  static const uint32_t PERIOD = 20 * 1000;
+  return PERIOD;
 }
 
-// config detail: {'name': 'horn_cmd', 'enum': {0: 'HORN_CMD_OFF', 1:
-// 'HORN_CMD_ON'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset':
-// 0.0, 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order':
-// 'motorola', 'physical_unit': ''}
-Horn_cmd_78::Horn_cmdType Horncmd78::horn_cmd(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 0);
-  int32_t x = t0.get_byte(0, 8);
-
-  Horn_cmd_78::Horn_cmdType ret = static_cast<Horn_cmd_78::Horn_cmdType>(x);
-  return ret;
+void Horncmd78::UpdateData(uint8_t* data) {
+  set_p_horn_cmd(data, horn_cmd_);
 }
+
+void Horncmd78::Reset() {
+  // TODO you should check this manually
+  horn_cmd_ = Horn_cmd_78::HORN_CMD_OFF;
+}
+
+Horncmd78* Horncmd78::set_horn_cmd(
+    Horn_cmd_78::Horn_cmdType horn_cmd) {
+  horn_cmd_ = horn_cmd;
+  return this;
+ }
+
+// config detail: {'name': 'HORN_CMD', 'enum': {0: 'HORN_CMD_OFF', 1: 'HORN_CMD_ON'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+void Horncmd78::set_p_horn_cmd(uint8_t* data,
+    Horn_cmd_78::Horn_cmdType horn_cmd) {
+  int x = horn_cmd;
+
+  Byte to_set(data + 0);
+  to_set.set_value(x, 0, 8);
+}
+
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo

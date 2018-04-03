@@ -17,26 +17,36 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_BRAKE_CMD_6B_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_BRAKE_CMD_6B_H_
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Brakecmd6b : public ::apollo::drivers::canbus::ProtocolData<
-                       ::apollo::canbus::ChassisDetail> {
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
+
   Brakecmd6b();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+
+  uint32_t GetPeriod() const override;
+
+  void UpdateData(uint8_t* data) override;
+
+  void Reset() override;
+
+  // config detail: {'name': 'BRAKE_CMD', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+  Brakecmd6b* set_brake_cmd(double brake_cmd);
 
  private:
-  // config detail: {'name': 'BRAKE_CMD', 'offset': 0.0, 'precision': 0.001,
-  // 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7,
-  // 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
-  double brake_cmd(const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'name': 'BRAKE_CMD', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+  void set_p_brake_cmd(uint8_t* data, double brake_cmd);
+
+ private:
+  double brake_cmd_;
 };
 
 }  // namespace gem

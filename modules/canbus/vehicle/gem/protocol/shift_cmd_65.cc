@@ -16,10 +16,7 @@
 
 #include "modules/canbus/vehicle/gem/protocol/shift_cmd_65.h"
 
-#include "glog/logging.h"
-
 #include "modules/drivers/canbus/common/byte.h"
-#include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
 namespace canbus {
@@ -27,29 +24,41 @@ namespace gem {
 
 using ::apollo::drivers::canbus::Byte;
 
-Shiftcmd65::Shiftcmd65() {}
 const int32_t Shiftcmd65::ID = 0x65;
 
-void Shiftcmd65::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_shift_cmd_65()->set_shift_cmd(
-      shift_cmd(bytes, length));
+// public
+Shiftcmd65::Shiftcmd65() { Reset(); }
+
+uint32_t Shiftcmd65::GetPeriod() const {
+  // TODO modify every protocol's period manually
+  static const uint32_t PERIOD = 20 * 1000;
+  return PERIOD;
 }
 
-// config detail: {'description':
-// 'FORWARD_is_also_LOW_on_vehicles_with_LOW/HIGH,_PARK_and_HIGH_only_available_on_certain_Vehicles',
-// 'enum': {0: 'SHIFT_CMD_PARK', 1: 'SHIFT_CMD_REVERSE', 2: 'SHIFT_CMD_NEUTRAL',
-// 3: 'SHIFT_CMD_FORWARD', 4: 'SHIFT_CMD_LOW'}, 'precision': 1.0, 'len': 8,
-// 'name': 'shift_cmd', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
-// '[0|4]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Shift_cmd_65::Shift_cmdType Shiftcmd65::shift_cmd(const std::uint8_t* bytes,
-                                                  int32_t length) const {
-  Byte t0(bytes + 0);
-  int32_t x = t0.get_byte(0, 8);
-
-  Shift_cmd_65::Shift_cmdType ret = static_cast<Shift_cmd_65::Shift_cmdType>(x);
-  return ret;
+void Shiftcmd65::UpdateData(uint8_t* data) {
+  set_p_shift_cmd(data, shift_cmd_);
 }
+
+void Shiftcmd65::Reset() {
+  // TODO you should check this manually
+  shift_cmd_ = Shift_cmd_65::SHIFT_CMD_PARK;
+}
+
+Shiftcmd65* Shiftcmd65::set_shift_cmd(
+    Shift_cmd_65::Shift_cmdType shift_cmd) {
+  shift_cmd_ = shift_cmd;
+  return this;
+ }
+
+// config detail: {'description': 'FORWARD_is_also_LOW_on_vehicles_with_LOW/HIGH,_PARK_and_HIGH_only_available_on_certain_Vehicles', 'enum': {0: 'SHIFT_CMD_PARK', 1: 'SHIFT_CMD_REVERSE', 2: 'SHIFT_CMD_NEUTRAL', 3: 'SHIFT_CMD_FORWARD', 4: 'SHIFT_CMD_LOW'}, 'precision': 1.0, 'len': 8, 'name': 'SHIFT_CMD', 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|4]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+void Shiftcmd65::set_p_shift_cmd(uint8_t* data,
+    Shift_cmd_65::Shift_cmdType shift_cmd) {
+  int x = shift_cmd;
+
+  Byte to_set(data + 0);
+  to_set.set_value(x, 0, 8);
+}
+
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo

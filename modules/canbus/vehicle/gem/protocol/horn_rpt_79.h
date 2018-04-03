@@ -17,42 +17,31 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_HORN_RPT_79_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_HORN_RPT_79_H_
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Hornrpt79 : public ::apollo::drivers::canbus::ProtocolData<
-                      ::apollo::canbus::ChassisDetail> {
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Hornrpt79();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+                     ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'name': 'OUTPUT_VALUE', 'enum': {0: 'OUTPUT_VALUE_OFF', 1:
-  // 'OUTPUT_VALUE_ON'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False,
-  // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 23, 'type': 'enum',
-  // 'order': 'motorola', 'physical_unit': ''}
-  Horn_rpt_79::Output_valueType output_value(const std::uint8_t* bytes,
-                                             const int32_t length) const;
 
-  // config detail: {'name': 'COMMANDED_VALUE', 'enum': {0:
-  // 'COMMANDED_VALUE_OFF', 1: 'COMMANDED_VALUE_ON'}, 'precision': 1.0, 'len':
-  // 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit':
-  // 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Horn_rpt_79::Commanded_valueType commanded_value(const std::uint8_t* bytes,
-                                                   const int32_t length) const;
+  // config detail: {'name': 'OUTPUT_VALUE', 'enum': {0: 'OUTPUT_VALUE_OFF', 1: 'OUTPUT_VALUE_ON'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 23, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  Horn_rpt_79::Output_valueType output_value(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'MANUAL_INPUT', 'enum': {0: 'MANUAL_INPUT_OFF', 1:
-  // 'MANUAL_INPUT_ON'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False,
-  // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum',
-  // 'order': 'motorola', 'physical_unit': ''}
-  Horn_rpt_79::Manual_inputType manual_input(const std::uint8_t* bytes,
-                                             const int32_t length) const;
+  // config detail: {'name': 'COMMANDED_VALUE', 'enum': {0: 'COMMANDED_VALUE_OFF', 1: 'COMMANDED_VALUE_ON'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 15, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  Horn_rpt_79::Commanded_valueType commanded_value(const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'name': 'MANUAL_INPUT', 'enum': {0: 'MANUAL_INPUT_OFF', 1: 'MANUAL_INPUT_ON'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  Horn_rpt_79::Manual_inputType manual_input(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace gem

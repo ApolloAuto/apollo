@@ -17,29 +17,36 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_HEADLIGHT_CMD_76_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_HEADLIGHT_CMD_76_H_
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Headlightcmd76 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
+
   Headlightcmd76();
-  void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+
+  uint32_t GetPeriod() const override;
+
+  void UpdateData(uint8_t* data) override;
+
+  void Reset() override;
+
+  // config detail: {'name': 'HEADLIGHT_CMD', 'enum': {0: 'HEADLIGHT_CMD_HEADLIGHTS_OFF', 1: 'HEADLIGHT_CMD_LOW_BEAMS', 2: 'HEADLIGHT_CMD_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  Headlightcmd76* set_headlight_cmd(Headlight_cmd_76::Headlight_cmdType headlight_cmd);
 
  private:
-  // config detail: {'name': 'HEADLIGHT_CMD', 'enum': {0:
-  // 'HEADLIGHT_CMD_HEADLIGHTS_OFF', 1: 'HEADLIGHT_CMD_LOW_BEAMS', 2:
-  // 'HEADLIGHT_CMD_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
-  // False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 7, 'type': 'enum',
-  // 'order': 'motorola', 'physical_unit': ''}
-  Headlight_cmd_76::Headlight_cmdType headlight_cmd(const std::uint8_t* bytes,
-                                                    const int32_t length) const;
+
+  // config detail: {'name': 'HEADLIGHT_CMD', 'enum': {0: 'HEADLIGHT_CMD_HEADLIGHTS_OFF', 1: 'HEADLIGHT_CMD_LOW_BEAMS', 2: 'HEADLIGHT_CMD_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  void set_p_headlight_cmd(uint8_t* data, Headlight_cmd_76::Headlight_cmdType headlight_cmd);
+
+ private:
+  Headlight_cmd_76::Headlight_cmdType headlight_cmd_;
 };
 
 }  // namespace gem
