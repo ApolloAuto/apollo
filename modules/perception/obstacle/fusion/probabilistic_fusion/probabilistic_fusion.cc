@@ -20,11 +20,11 @@
 #include <string>
 #include <vector>
 #include "modules/common/macro.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_hm_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
-#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
@@ -37,8 +37,7 @@ ProbabilisticFusion::ProbabilisticFusion()
       track_manager_(nullptr),
       use_radar_(true),
       use_lidar_(true),
-      use_camera_(true)
-      {}
+      use_camera_(true) {}
 
 ProbabilisticFusion::~ProbabilisticFusion() {
   if (matcher_) {
@@ -148,8 +147,7 @@ bool ProbabilisticFusion::Init() {
   }*/
   publish_sensor_id_ = FLAGS_fusion_publish_sensor_id;
 
-  if (publish_sensor_id_ != "velodyne_64" &&
-      publish_sensor_id_ != "radar" &&
+  if (publish_sensor_id_ != "velodyne_64" && publish_sensor_id_ != "radar" &&
       publish_sensor_id_ != "camera") {
     AERROR << "Invalid publish_sensor value: " << publish_sensor_id_;
   }
@@ -359,11 +357,11 @@ void ProbabilisticFusion::FuseForegroundObjects(
                          sensor_type, sensor_id, timestamp);
 
   if (FLAGS_use_navigation_mode) {
-     if (is_camera(sensor_type)) {
-         CreateNewTracks(*foreground_objects, unassigned_objects);
-     }
-  } else {
+    if (is_camera(sensor_type)) {
       CreateNewTracks(*foreground_objects, unassigned_objects);
+    }
+  } else {
+    CreateNewTracks(*foreground_objects, unassigned_objects);
   }
 }
 
