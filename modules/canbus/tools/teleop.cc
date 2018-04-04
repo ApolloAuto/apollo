@@ -236,6 +236,7 @@ class Teleop {
           GetPadMessage(&pad_msg, level);
           control_command_.mutable_pad_msg()->CopyFrom(pad_msg);
           sleep(1);
+          control_command_.clear_pad_msg();
           break;
         case KEYCODE_HELP:
         case KEYCODE_HELP2:
