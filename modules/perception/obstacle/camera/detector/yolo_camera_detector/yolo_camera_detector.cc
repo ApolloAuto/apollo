@@ -125,8 +125,8 @@ void YoloCameraDetector::load_intrinsic(
   int resized_width = model_param.resized_width();
   int aligned_pixel = model_param.aligned_pixel();
   confidence_threshold_ = model_param.confidence_threshold();
-  _min_2d_height = model_param.min_2d_height();
-  _min_3d_height = model_param.min_3d_height();
+  min_2d_height_ = model_param.min_2d_height();
+  min_3d_height_ = model_param.min_3d_height();
 
   // inference input shape
   if (options.intrinsic == nullptr) {
@@ -149,7 +149,7 @@ void YoloCameraDetector::load_intrinsic(
          << "roi_ratio=" << roi_ratio;
   ADEBUG << "offset_y=" << offset_y_ << ", height=" << height_
          << ", width=" << width_;
-  _min_2d_height /= height_;
+  min_2d_height_ /= height_;
 
   int roi_w = image_width_;
   int roi_h = image_height_ - offset_y_;
@@ -363,8 +363,8 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
     int total_obj_idx = 0;
     while (total_obj_idx < static_cast<int>(temp_objects.size())) {
       const auto &obj = temp_objects[total_obj_idx];
-      if ((obj->lower_right[1] - obj->upper_left[1]) >= _min_2d_height &&
-          (_min_3d_height <= 0 || obj->height >= _min_3d_height)) {
+      if ((obj->lower_right[1] - obj->upper_left[1]) >= min_2d_height_ &&
+          (min_3d_height_ <= 0 || obj->height >= min_3d_height_)) {
         objects->push_back(temp_objects[total_obj_idx]);
         ++valid_obj_idx;
       }
@@ -399,9 +399,7 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
   return true;
 }
 
-string YoloCameraDetector::Name() const {
-  return "YoloCameraDetector";
-}
+string YoloCameraDetector::Name() const { return "YoloCameraDetector"; }
 
 bool YoloCameraDetector::get_objects_cpu(
     std::vector<VisualObjectPtr> *objects) {
@@ -665,6 +663,7 @@ bool YoloCameraDetector::get_objects_gpu(
       objects->push_back(obj);
     }
   }
+  return true;
 }
 
 void YoloCameraDetector::get_object_helper(
