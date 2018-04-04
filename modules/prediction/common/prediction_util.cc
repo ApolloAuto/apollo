@@ -21,6 +21,7 @@
 #include <string>
 
 #include "modules/common/log.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 
@@ -208,6 +209,16 @@ void GenerateFreeMoveTrajectoryPoints(
     acc_x = (*state)(4, 0);
     acc_y = (*state)(5, 0);
   }
+}
+
+double AdjustSpeedByCurvature(const double speed, const double curvature) {
+  if (std::abs(curvature) < 0.02) {
+    return speed;
+  }
+  if (std::abs(curvature) > 0.14) {
+    return 3.0;
+  }
+  return apollo::common::math::lerp(8.5, 0.02, 3.0, 0.14, curvature);
 }
 
 }  // namespace predictor_util

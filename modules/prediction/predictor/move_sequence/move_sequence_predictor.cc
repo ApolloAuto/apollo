@@ -115,15 +115,15 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
   }
 
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
-  double time_to_lane_center =
-      std::max(FLAGS_default_time_to_lane_center,
+  double time_to_end_state =
+      std::max(FLAGS_default_time_to_end_state,
                ComputeTimeToLaneCenterByVelocity(obstacle, lane_sequence));
 
   std::array<double, 6> lateral_coeffs;
   std::array<double, 5> longitudinal_coeffs;
-  GetLateralPolynomial(obstacle, lane_sequence, time_to_lane_center,
+  GetLateralPolynomial(obstacle, lane_sequence, time_to_end_state,
                        &lateral_coeffs);
-  GetLongitudinalPolynomial(obstacle, lane_sequence, time_to_lane_center,
+  GetLongitudinalPolynomial(obstacle, lane_sequence, time_to_end_state,
                             &longitudinal_coeffs);
 
   int lane_segment_index = 0;
@@ -140,7 +140,7 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
   double prev_lane_l = lane_l;
 
   size_t total_num = static_cast<size_t>(total_time / period);
-  size_t num_to_center = static_cast<size_t>(time_to_lane_center / period);
+  size_t num_to_center = static_cast<size_t>(time_to_end_state / period);
   for (size_t i = 0; i < total_num; ++i) {
     double relative_time = static_cast<double>(i) * period;
     Eigen::Vector2d point;
@@ -197,7 +197,7 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
 
 void MoveSequencePredictor::GetLongitudinalPolynomial(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double time_to_lane_center, std::array<double, 5>* coefficients) {
+    const double time_to_end_state, std::array<double, 5>* coefficients) {
   CHECK_GT(obstacle.history_size(), 0);
   CHECK_GT(lane_sequence.lane_segment_size(), 0);
   CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
@@ -215,9 +215,9 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double ds0 = v * std::cos(theta - lane_heading);
   double dds0 = a * std::cos(theta - lane_heading);
   double min_end_speed = std::min(FLAGS_still_obstacle_speed_threshold, ds0);
-  double ds1 = std::max(min_end_speed, ds0 + dds0 * time_to_lane_center);
+  double ds1 = std::max(min_end_speed, ds0 + dds0 * time_to_end_state);
   double dds1 = 0.0;
-  double p = time_to_lane_center;
+  double p = time_to_end_state;
 
   coefficients->operator[](0) = s0;
   coefficients->operator[](1) = ds0;
@@ -232,7 +232,7 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
 
 void MoveSequencePredictor::GetLateralPolynomial(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double time_to_lane_center, std::array<double, 6>* coefficients) {
+    const double time_to_end_state, std::array<double, 6>* coefficients) {
   CHECK_GT(obstacle.history_size(), 0);
   CHECK_GT(lane_sequence.lane_segment_size(), 0);
   CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
@@ -262,7 +262,7 @@ void MoveSequencePredictor::GetLateralPolynomial(
   coefficients->operator[](0) = l0;
   coefficients->operator[](1) = dl0;
   coefficients->operator[](2) = ddl0 / 2.0;
-  double p = time_to_lane_center;
+  double p = time_to_end_state;
   double p2 = p * p;
   double p3 = p2 * p;
   double c0 = (l1 - 0.5 * p2 * ddl0 - dl0 * p - l0) / p3;
@@ -280,7 +280,7 @@ double MoveSequencePredictor::ComputeTimeToLaneCenterBySampling(
   GenerateCandidateTimes(&candidate_times);
   if (candidate_times.empty()) {
     AWARN << "No candidate times found, use default value.";
-    return FLAGS_default_time_to_lane_center;
+    return FLAGS_default_time_to_end_state;
   }
   double t_best = candidate_times[0];
   double cost_min = std::numeric_limits<double>::max();
