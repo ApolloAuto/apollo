@@ -62,6 +62,14 @@ Map<std::string, std::string> LoadFiles(
 
 InfoCollector::InfoCollector() {
   CHECK(GetProtoFromASCIIFile(FLAGS_static_info_conf_file, &config_));
+
+  // Translate file paths if they contain placeholder such as "<ros>".
+  for (auto& conf_file : *config_.mutable_hardware_configs()) {
+    conf_file = apollo::common::util::TranslatePath(conf_file);
+  }
+  for (auto& conf_file : *config_.mutable_software_configs()) {
+    conf_file = apollo::common::util::TranslatePath(conf_file);
+  }
 }
 
 const StaticInfo &InfoCollector::GetStaticInfo() {
