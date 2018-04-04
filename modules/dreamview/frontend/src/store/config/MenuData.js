@@ -23,6 +23,7 @@ export default [
             perceptionUnknownMovable: 'Unknown Movable',
             perceptionUnknownUnmovable: 'Unknown Stationary',
             perceptionUnknown: 'Unknown',
+            perceptionCipv: 'Closest In-Path Vehicle',
             perceptionVelocity: 'Velocity',
             perceptionHeading: 'Heading',
             perceptionId: 'Id'

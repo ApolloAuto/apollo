@@ -40,6 +40,8 @@ export default class Options {
         PARAMETERS.options.defaults.showObstaclesUnknown;
     @observable showObstaclesVirtual =
         PARAMETERS.options.defaults.showObstaclesVirtual;
+    @observable showObstaclesCipv =
+        PARAMETERS.options.defaults.showObstaclesCipv;
     @observable showObstaclesVelocity =
         PARAMETERS.options.defaults.showObstaclesVelocity;
     @observable showObstaclesHeading =
