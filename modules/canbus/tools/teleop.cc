@@ -139,7 +139,7 @@ class Teleop {
         perror("read():");
         exit(-1);
       }
-
+      printf("control command [%s]", control_command_.ShortDebugString().c_str());
       switch (c) {
         case KEYCODE_UP1:  // accelerate
         case KEYCODE_UP2:
@@ -236,7 +236,6 @@ class Teleop {
           GetPadMessage(&pad_msg, level);
           control_command_.mutable_pad_msg()->CopyFrom(pad_msg);
           sleep(1);
-          control_command_.mutable_pad_msg()->Clear();
           break;
         case KEYCODE_HELP:
         case KEYCODE_HELP2:
@@ -246,6 +245,7 @@ class Teleop {
           // printf("%X\n", c);
           break;
       }
+      printf("control command after switch [%s].", control_command_.ShortDebugString().c_str());
     }  // keyboard_loop big while
     tcsetattr(kfd_, TCSANOW, &cooked_);
     printf("keyboard_loop thread quited.\n");

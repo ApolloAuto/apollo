@@ -99,9 +99,9 @@ ErrorCode GemController::Init(
     AERROR << "Turncmd63 does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
-  global_cmd_63_ = dynamic_cast<Globalcmd69 *>(
+  global_cmd_69_ = dynamic_cast<Globalcmd69 *>(
       message_manager_->GetMutableProtocolDataById(Globalcmd69::ID));
-  if (global_cmd_63_ == nullptr) {
+  if (global_cmd_69_ == nullptr) {
     AERROR << "Turncmd63 does not exist in the GemMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
@@ -176,9 +176,9 @@ Chassis GemController::chassis() {
   chassis_.set_fuel_range_m(0);
   // 8
   if (chassis_detail.gem().has_accel_rpt_68() &&
-      chassis_detail.gem().accel_rpt_68().has_accel_rpt()) {
+      chassis_detail.gem().accel_rpt_68().has_output_value()) {
     chassis_.set_throttle_percentage(
-        chassis_detail.gem().accel_rpt_68().accel_rpt());
+        chassis_detail.gem().accel_rpt_68().output_value());
   } else {
     chassis_.set_throttle_percentage(0);
   }
@@ -192,12 +192,24 @@ Chassis GemController::chassis() {
   }
 
   // 23, previously 10
-  // TODO(QiL): refine here.
-
   if (chassis_detail.gem().has_shift_rpt_66() &&
       chassis_detail.gem().shift_rpt_66().has_output_value()) {
-    chassis_.set_gear_location(
-        chassis_detail.gem().shift_rpt_66().output_value());
+    Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
+
+    if (chassis_detail.gem().shift_rpt_66().output_value() == 
+        Shift_cmd_65::SHIFT_CMD_NEUTRAL) {
+      gear_pos = Chassis::GEAR_NEUTRAL;
+    }
+    if (chassis_detail.gem().shift_rpt_66().output_value() == 
+        Shift_cmd_65::SHIFT_CMD_REVERSE) {
+      gear_pos = Chassis::GEAR_REVERSE;
+    }
+    if (chassis_detail.gem().shift_rpt_66().output_value() == 
+        Shift_cmd_65::SHIFT_CMD_FORWARD) {
+      gear_pos = Chassis::GEAR_DRIVE;
+    }
+
+    chassis_.set_gear_location(gear_pos);
   } else {
     chassis_.set_gear_location(Chassis::GEAR_NONE);
   }
@@ -255,8 +267,12 @@ Chassis GemController::chassis() {
   }
 
   // give engage_advice based on error_code and canbus feedback
+  AERROR << "error_mask: " << chassis_error_mask_ << "\n"
+         << "parking_brake: " << chassis_.parking_brake() << "\n"
+         << "throttle_percentage: " << chassis_.throttle_percentage() << "\n"
+         << "brake_percentage: " << chassis_.brake_percentage();
   if (!chassis_error_mask_ && !chassis_.parking_brake() &&
-      (chassis_.throttle_percentage() != 0.0) &&
+      (chassis_.throttle_percentage() == 0.0) &&
       (chassis_.brake_percentage() != 0.0)) {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::READY_TO_ENGAGE);
@@ -282,7 +298,7 @@ ErrorCode GemController::EnableAutoMode() {
     return ErrorCode::OK;
   }
 
-  global_cmd_69_->set_pacmod_enable(Global_rpt_6a::PACMOD_STATUS_CONTROL_ENABLED);
+  global_cmd_69_->set_pacmod_enable(Global_cmd_69::PACMOD_ENABLE_CONTROL_ENABLED);
 
   can_sender_->Update();
   const int32_t flag =
@@ -533,7 +549,7 @@ void GemController::SecurityDogThreadFunc() {
 bool GemController::CheckResponse(const int32_t flags, bool need_wait) {
   /* ADD YOUR OWN CAR CHASSIS OPERATION
    */
-  return false;
+  return true;
 }
 
 void GemController::set_chassis_error_mask(const int32_t mask) {
