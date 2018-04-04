@@ -1,11 +1,12 @@
 import * as THREE from "three";
+import _ from 'lodash';
 
 import STORE from "store";
 import Text3D from "renderer/text3d";
-import { copyProperty, hideArrayObjects } from "utils/misc";
+import { copyProperty, hideArrayObjects, calculateLaneMarkerPoints } from "utils/misc";
 import { drawSegmentsFromPoints, drawDashedLineFromPoints,
          drawBox, drawDashedBox, drawArrow } from "utils/draw";
-const _ = require('lodash');
+
 
 const DEFAULT_HEIGHT = 1.5;
 export const DEFAULT_COLOR = 0xFF00FC;
@@ -14,7 +15,7 @@ export const ObstacleColorMapping = {
         BICYCLE: 0x00DCEB,
         VEHICLE: 0x00FF3C,
         VIRTUAL: 0x800000,
-        CIPV: 0xff9966
+        CIPV: 0xFF9966
 };
 const LINE_THICKNESS = 1.5;
 
@@ -27,9 +28,15 @@ export default class PerceptionObstacles {
         this.dashedCubes = []; // for obstacles with only length/width/height
         this.extrusionSolidFaces = []; // for obstacles with polygon points
         this.extrusionDashedFaces = []; // for obstacles with polygon points
+        this.laneMarkers = []; // for lane markers
     }
 
     update(world, coordinates, scene) {
+        this.updateObjects(world, coordinates, scene);
+        this.updateLaneMarkers(world, coordinates, scene);
+    }
+
+    updateObjects(world, coordinates, scene) {
         // Id meshes need to be recreated every time.
         // Each text mesh needs to be removed from the scene,
         // and its char meshes need to be hidden for reuse purpose.
@@ -242,5 +249,31 @@ export default class PerceptionObstacles {
         cubes.push(cubeMesh);
         scene.add(cubeMesh);
         return cubeMesh;
+    }
+
+    updateLaneMarkers(world, coordinates, scene) {
+        if (!_.isEmpty(this.laneMarkers)) {
+            this.laneMarkers.forEach((laneMesh) => {
+                scene.remove(laneMesh);
+                laneMesh.geometry.dispose();
+                laneMesh.material.dispose();
+            });
+            this.laneMarkers = [];
+        }
+
+        if (STORE.options.showPerceptionLaneMarker) {
+            const adc = world.autoDrivingCar;
+            for (const name in world.laneMarker) {
+                const absolutePoints = calculateLaneMarkerPoints(adc, world.laneMarker[name]);
+                if (absolutePoints.length) {
+                    const offsetPoints = absolutePoints.map((point) => {
+                        return coordinates.applyOffset(point);
+                    });
+                    const mesh = drawSegmentsFromPoints(offsetPoints, 0x006AFF, 2, 4, false);
+                    scene.add(mesh);
+                    this.laneMarkers.push(mesh);
+                }
+            }
+        }
     }
 }
