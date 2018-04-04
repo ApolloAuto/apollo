@@ -55,7 +55,7 @@ bool NavigationLane::GeneratePath() {
   const auto &lane_marker = perception_obstacles_.lane_marker();
 
   // priority: merge > navigation line > perception lane marker
-  if (FLAGS_enable_navigation_line &&
+  if (config_.lane_source() == NavigationLaneConfig::PERCEPTION &&
       navigation_info_.navigation_path_size() > 0) {
     ConvertNavigationLineToPath(path);
     if (path->path_point().size() <= 0) {
