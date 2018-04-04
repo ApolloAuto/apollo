@@ -26,7 +26,8 @@ export default [
             perceptionCipv: 'Closest In-Path Vehicle',
             perceptionVelocity: 'Velocity',
             perceptionHeading: 'Heading',
-            perceptionId: 'Id'
+            perceptionId: 'Id',
+            perceptionLaneMarker: 'Lane Marker',
         },
         supportInOfflineView: true,
     }, {
