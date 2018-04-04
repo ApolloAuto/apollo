@@ -216,7 +216,7 @@ bool GLFWFusionViewer::initialize() {
   AINFO << " GLFWFusionViewer::initialize() Finished" << std::endl;
 
   lane_history_ = std::make_shared<LaneObjects>();
-//  lane_history_buffer_.resize(lane_history_buffer_size_);
+  //  lane_history_buffer_.resize(lane_history_buffer_size_);
   init_ = true;
   return true;
 }
@@ -571,18 +571,17 @@ void GLFWFusionViewer::render() {
     bool show_fusion = true;
     draw_3d_classifications(frame_content_, show_fusion);
     draw_car_forward_dir();
-//    if (FLAGS_show_motion_track &&
-//        frame_content_->get_motion_buffer().size() > 0) {
-//      draw_car_trajectory(frame_content_);
-//    }
+    //    if (FLAGS_show_motion_track &&
+    //        frame_content_->get_motion_buffer().size() > 0) {
+    //      draw_car_trajectory(frame_content_);
+    //    }
     glPopMatrix();
   }
 
   if (FLAGS_show_motion_track &&
       frame_content_->get_motion_buffer().size() > 0) {
-      motion_matrix_ =
-         frame_content_->get_motion_buffer().back().motion;
-//      AINFO <<motion_matrix_;
+    motion_matrix_ = frame_content_->get_motion_buffer().back().motion;
+    //      AINFO <<motion_matrix_;
   }
   glViewport(0, 0, image_width_, image_height_);
   glPushMatrix();
@@ -833,8 +832,7 @@ void GLFWFusionViewer::capture_screen(const std::string& file_name) {
   glReadPixels(0, 0, win_width_, win_height_, GL_BGRA, GL_UNSIGNED_BYTE,
                rgba_buffer_);
 
-  save_rgba_image_to_bmp<unsigned char>(rgba_buffer_, win_width_, win_height_,
-                                        file_name.c_str());
+  save_rgba_image_to_bmp(rgba_buffer_, win_width_, win_height_, file_name);
 }
 
 GLuint GLFWFusionViewer::image_to_gl_texture(const cv::Mat& mat,
@@ -1027,10 +1025,10 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
   glLineWidth(1);
 
   if (FLAGS_show_motion_track) {
-//    if (lane_history_buffer_.size() > lane_history_buffer_size_) {
-//      lane_history_buffer_.erase(lane_history_buffer_.begin());
-//      lane_history_buffer_.push_back(*lane_objects);
-//    }
+    //    if (lane_history_buffer_.size() > lane_history_buffer_size_) {
+    //      lane_history_buffer_.erase(lane_history_buffer_.begin());
+    //      lane_history_buffer_.push_back(*lane_objects);
+    //    }
     while (lane_history_->size() < lane_objects_->size()) {
       lane_history_->push_back(LaneObject());
     }
@@ -1042,37 +1040,37 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
     const float d = lane_objects_->at(k).pos_curve.d;
 
     if (FLAGS_show_motion_track) {
-        auto &lane_history_pos = lane_history_->at(k).pos;
-        // update lane history by projecting motion
-        for (auto &p : lane_history_pos) {
-          Eigen::Vector3f point_h;
-          point_h << p[0], p[1], 1;
-          point_h = motion_matrix_ * point_h;
-          p[0] = point_h[0];
-          p[1] = point_h[1];
-        }
-        // add new point
-        for (auto p = lane_objects_->at(k).pos.begin();
-            p != lane_objects_->at(k).pos.end(); ++p) {
-          auto point_poly = *p;
-          point_poly[1] = GetPolyValue(a, b, c, d, point_poly[0]);
+      auto& lane_history_pos = lane_history_->at(k).pos;
+      // update lane history by projecting motion
+      for (auto& p : lane_history_pos) {
+        Eigen::Vector3f point_h;
+        point_h << p[0], p[1], 1;
+        point_h = motion_matrix_ * point_h;
+        p[0] = point_h[0];
+        p[1] = point_h[1];
+      }
+      // add new point
+      for (auto p = lane_objects_->at(k).pos.begin();
+           p != lane_objects_->at(k).pos.end(); ++p) {
+        auto point_poly = *p;
+        point_poly[1] = GetPolyValue(a, b, c, d, point_poly[0]);
 
-          lane_history_pos.push_back(point_poly);
-          if (lane_history_pos.size() > lane_history_buffer_size_) {
-            lane_history_pos.erase(lane_history_pos.begin());
-          }
+        lane_history_pos.push_back(point_poly);
+        if (lane_history_pos.size() > lane_history_buffer_size_) {
+          lane_history_pos.erase(lane_history_pos.begin());
         }
+      }
 
-        glColor3f(1.0f, 0.0f, 0.0f);  // red
-        glLineWidth(1);
-        glBegin(GL_LINE_STRIP);
-        for (auto p : lane_history_pos) {
-//          glVertex2f(p[0], p[1]);
-          drawHollowCircle(p[0], p[1], 0.2);
-        }
-        glEnd();
-        glFlush();
-        glLineWidth(1);
+      glColor3f(1.0f, 0.0f, 0.0f);  // red
+      glLineWidth(1);
+      glBegin(GL_LINE_STRIP);
+      for (auto p : lane_history_pos) {
+        //          glVertex2f(p[0], p[1]);
+        drawHollowCircle(p[0], p[1], 0.2);
+      }
+      glEnd();
+      glFlush();
+      glLineWidth(1);
     }
 
     // draw markers
@@ -1107,7 +1105,7 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
       }
     }
     if (FLAGS_show_motion_track) {
-            glColor3f(1.0f, 0.0f, 0.0f);  // red
+      glColor3f(1.0f, 0.0f, 0.0f);  // red
     }
     for (auto p = lane_objects_->at(k).pos.begin();
          p != lane_objects_->at(k).pos.end(); ++p) {
@@ -1786,11 +1784,11 @@ void GLFWFusionViewer::draw_objects(const std::vector<ObjectPtr>& objects,
 
       // draw same color with 2d camera bbox
       if (use_track_color) {
-          auto tmp_color =
-                  s_color_table[objects[i]->track_id % s_color_table.size()];
-          rgb[0] = tmp_color[0];
-          rgb[1] = tmp_color[1];
-          rgb[2] = tmp_color[2];
+        auto tmp_color =
+            s_color_table[objects[i]->track_id % s_color_table.size()];
+        rgb[0] = tmp_color[0];
+        rgb[1] = tmp_color[1];
+        rgb[2] = tmp_color[2];
       }
 
       if (use_class_color) {
@@ -1897,9 +1895,7 @@ void GLFWFusionViewer::drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
 void GLFWFusionViewer::draw_car_trajectory(FrameContent* content) {
   const MotionBuffer& motion_buffer = content->get_motion_buffer();
   Eigen::Vector3f center;
-  center << 0,
-            0,
-            1.0;
+  center << 0, 0, 1.0;
 
   Eigen::Vector3f point = center;
   for (int i = motion_buffer.size() - 1; i >= 0; i--) {
@@ -1941,16 +1937,15 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
       if (trackjectory.second.size() > 1) {
         glLineWidth(1);
         glBegin(GL_LINE_STRIP);
-        for (std::size_t it = trackjectory.second.size() - 1, count = 0;
-              it > 0; it--, count++) {
+        for (std::size_t it = trackjectory.second.size() - 1, count = 0; it > 0;
+             it--, count++) {
           if (count >= object_history_size_ || count > motion_buffer.size()) {
             break;
           }
 
           Eigen::Vector3f pt, proj_pt;
-          pt << trackjectory.second[it].first,
-                trackjectory.second[it].second,
-                1.0;
+          pt << trackjectory.second[it].first, trackjectory.second[it].second,
+              1.0;
           if (it == trackjectory.second.size() - 1) {
             proj_pt = pt;
           } else {
@@ -1990,16 +1985,15 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
     for (auto obj : objects_cam) {
       AINFO << "object in cam: " << obj->ToString();
     }
-    draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color,
-                 false, false);
+    draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color, false,
+                 false);
 
     if (FLAGS_show_fusion_association) {
       draw_fusion_association(content);
     }
   }
 
-  if (FLAGS_show_motion_track &&
-      content->get_motion_buffer().size() > 0) {
+  if (FLAGS_show_motion_track && content->get_motion_buffer().size() > 0) {
     draw_trajectories(content);
   }
 
@@ -2008,8 +2002,8 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
     bool draw_cube = true;
     bool draw_velocity = true;
     std::vector<ObjectPtr> objects = content->get_radar_objects();
-    draw_objects(objects, c2v, draw_cube, draw_velocity, radar_color,
-                 false, false);
+    draw_objects(objects, c2v, draw_cube, draw_velocity, radar_color, false,
+                 false);
   }
 }
 
