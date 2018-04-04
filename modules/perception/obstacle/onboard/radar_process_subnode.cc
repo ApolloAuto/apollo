@@ -39,9 +39,9 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::adapter::AdapterManager;
 using Eigen::Affine3d;
 using Eigen::Matrix4d;
-using apollo::common::adapter::AdapterManager;
 using pcl_util::Point;
 using pcl_util::PointD;
 using std::string;
@@ -139,8 +139,8 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
 
   ADEBUG << "use navigation mode " << FLAGS_use_navigation_mode;
 
-  if (!GetVelodyneTrans(timestamp, velodyne2world_pose.get()) &&
-      !FLAGS_use_navigation_mode) {
+  if (!FLAGS_use_navigation_mode &&
+      !GetVelodyneTrans(timestamp, velodyne2world_pose.get())) {
     AERROR << "Failed to get trans at timestamp: " << GLOG_TIMESTAMP(timestamp);
     error_code_ = common::PERCEPTION_ERROR_TF;
     return;
