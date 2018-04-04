@@ -514,42 +514,74 @@ double TrajectoryEvaluator::CentripetalAccelerationCost(
 
 std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
     const PlanningTarget& planning_target) const {
-  double comfort_a = FLAGS_longitudinal_acceleration_lower_bound *
-                     FLAGS_comfort_acceleration_factor;
+  std::vector<double> reference_s_dot;
 
-  double cruise_s_dot = planning_target.cruise_speed();
+  double brake_a = FLAGS_longitudinal_acceleration_lower_bound *
+      FLAGS_comfort_acceleration_factor;
 
-  ConstantAccelerationTrajectory1d lon_traj(init_s_[0], cruise_s_dot);
+  double cruise_v = planning_target.cruise_speed();
 
   if (!planning_target.has_stop_point()) {
+    ConstantAccelerationTrajectory1d lon_traj(init_s_[0], cruise_v);
     lon_traj.AppendSegment(0.0, FLAGS_trajectory_time_length);
-  } else {
-    double stop_a = FLAGS_longitudinal_acceleration_lower_bound;
-    double stop_s = planning_target.stop_point().s();
-    double dist = stop_s - init_s_[0];
-    if (dist > FLAGS_lattice_epsilon) {
-      stop_a = -cruise_s_dot * cruise_s_dot * 0.5 / dist;
-    }
-    if (stop_a > comfort_a) {
-      double stop_t = cruise_s_dot / (-comfort_a);
-      double stop_dist = cruise_s_dot * stop_t * 0.5;
-      double cruise_t = (dist - stop_dist) / cruise_s_dot;
-      lon_traj.AppendSegment(0.0, cruise_t);
-      lon_traj.AppendSegment(comfort_a, stop_t);
-    } else {
-      double stop_t = cruise_s_dot / (-stop_a);
-      lon_traj.AppendSegment(stop_a, stop_t);
-    }
-    if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
-      lon_traj.AppendSegment(
-          0.0, FLAGS_trajectory_time_length - lon_traj.ParamLength());
-    }
-  }
 
-  std::vector<double> reference_s_dot;
-  for (double t = 0.0; t < FLAGS_trajectory_time_length;
-       t += FLAGS_trajectory_time_resolution) {
-    reference_s_dot.push_back(lon_traj.Evaluate(1, t));
+    for (double t = 0.0; t < FLAGS_trajectory_time_length;
+         t += FLAGS_trajectory_time_resolution) {
+      reference_s_dot.push_back(lon_traj.Evaluate(1, t));
+    }
+  } else {
+    double dist_s = planning_target.stop_point().s() - init_s_[0];
+    if (dist_s < FLAGS_lattice_epsilon) {
+      ConstantAccelerationTrajectory1d lon_traj(init_s_[0], init_s_[1]);
+      CHECK(init_s_[1] > -FLAGS_lattice_epsilon);
+      double brake_t = -std::abs(init_s_[1]) /
+          FLAGS_longitudinal_acceleration_lower_bound;
+      lon_traj.AppendSegment(
+          FLAGS_longitudinal_acceleration_lower_bound, brake_t);
+
+      if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
+        lon_traj.AppendSegment(0.0,
+            FLAGS_trajectory_time_length - lon_traj.ParamLength());
+      }
+      for (double t = 0.0; t < FLAGS_trajectory_time_length;
+           t += FLAGS_trajectory_time_resolution) {
+        reference_s_dot.push_back(lon_traj.Evaluate(1, t));
+      }
+      return reference_s_dot;
+    }
+
+    double max_v = std::sqrt(2.0 * (-brake_a) * dist_s);
+
+    if (max_v < cruise_v) {
+      ConstantAccelerationTrajectory1d lon_traj(init_s_[0], max_v);
+      double brake_t = max_v / (-brake_a);
+      lon_traj.AppendSegment(brake_a, brake_t);
+      if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
+        lon_traj.AppendSegment(0.0,
+            FLAGS_trajectory_time_length - lon_traj.ParamLength());
+      }
+      for (double t = 0.0; t < FLAGS_trajectory_time_length;
+           t += FLAGS_trajectory_time_resolution) {
+        reference_s_dot.push_back(lon_traj.Evaluate(1, t));
+      }
+    } else {
+      double brake_s = -cruise_v * cruise_v * 0.5 / brake_a;
+      double brake_t = -cruise_v / brake_a;
+      double cruise_s = dist_s - brake_s;
+      double cruise_t = cruise_s / cruise_v;
+
+      ConstantAccelerationTrajectory1d lon_traj(init_s_[0], cruise_v);
+      lon_traj.AppendSegment(0.0, cruise_t);
+      lon_traj.AppendSegment(brake_a, brake_t);
+      if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
+        lon_traj.AppendSegment(0.0,
+            FLAGS_trajectory_time_length - lon_traj.ParamLength());
+      }
+      for (double t = 0.0; t < FLAGS_trajectory_time_length;
+           t += FLAGS_trajectory_time_resolution) {
+        reference_s_dot.push_back(lon_traj.Evaluate(1, t));
+      }
+    }
   }
   return reference_s_dot;
 }
