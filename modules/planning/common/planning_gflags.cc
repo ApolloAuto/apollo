@@ -348,3 +348,21 @@ DEFINE_double(lattice_stop_buffer, 0.02,
 // navigation mode
 DEFINE_double(navigation_fallback_cruise_time, 8.0,
               "The time range of fallback cruise under navigation mode.");
+
+// spiral reference line smoother
+DEFINE_double(spiral_opt_tol, 1.0e-8,
+              "The desired convergence tol for spiral opt");
+DEFINE_double(spiral_opt_acceptable_tol, 1.0e-6,
+              "The acceptable convergence tol for spiral opt");
+DEFINE_double(spiral_opt_acceptable_iter, 15,
+              "The number of acceptable iters "
+              "before termination for spiral opt");
+
+DEFINE_double(spiral_opt_weight_curve_length, 0.0,
+              "The weight of curve length term in objective function");
+DEFINE_double(spiral_opt_weight_kappa, 1.5,
+              "The weight of kappa term in objective function");
+DEFINE_double(spiral_opt_weight_dkappa, 1.0,
+              "The weight of dkappa term in objective function");
+DEFINE_double(spiral_opt_weight_d2kappa, 0.0,
+              "The weight of d2kappa term in objective function");
