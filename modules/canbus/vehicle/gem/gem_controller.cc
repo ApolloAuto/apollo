@@ -268,6 +268,10 @@ Chassis GemController::chassis() {
   }
 
   // give engage_advice based on error_code and canbus feedback
+  AERROR << "error_mask: " << chassis_error_mask_ << "\n"
+         << "parking_brake: " << chassis_.parking_brake() << "\n"
+         << "throttle_percentage: " << chassis_.throttle_percentage() << "\n"
+         << "brake_percentage: " << chassis_.brake_percentage();
   if (!chassis_error_mask_ && !chassis_.parking_brake() &&
       (chassis_.throttle_percentage() == 0.0) &&
       (chassis_.brake_percentage() != 0.0)) {
