@@ -107,6 +107,16 @@ void GenerateFreeMoveTrajectoryPoints(
     const size_t num, const double period,
     std::vector<apollo::common::TrajectoryPoint>* points);
 
+/**
+ * @brief Adjust a speed value according to a curvature. If the input speed
+ *        is okay on the input curvature, return the original speed, otherwise,
+ *        adjust the speed.
+ * @param speed The original speed value.
+ * @param curvature The curvature value.
+ * @return The adjusted speed according to the curvature.
+ */
+double AdjustSpeedByCurvature(const double speed, const double curvature);
+
 }  // namespace predictor_util
 }  // namespace prediction
 }  // namespace apollo

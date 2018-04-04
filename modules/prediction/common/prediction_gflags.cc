@@ -147,5 +147,5 @@ DEFINE_double(sample_time_gap, 0.2,
               "Gap of time to sample time to get to the lane center");
 DEFINE_double(cost_alpha, 100.0,
               "The coefficient of lateral acceleration in cost function");
-DEFINE_double(default_time_to_lane_center, 5.0,
+DEFINE_double(default_time_to_end_state, 5.0,
               "The default time to lane center");
