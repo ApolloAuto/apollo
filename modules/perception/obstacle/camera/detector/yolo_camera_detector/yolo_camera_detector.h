@@ -26,8 +26,8 @@
 
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/proto/yolo.pb.h"
 
-#include "modules/perception/cuda_util/region_output.h"
 #include "modules/perception/cuda_util/network.h"
+#include "modules/perception/cuda_util/region_output.h"
 #include "modules/perception/cuda_util/util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -94,8 +94,8 @@ class YoloCameraDetector : public BaseCameraDetector {
   std::shared_ptr<SyncedMemory> anchor_ = nullptr;
   int height_ = 0;
   int width_ = 0;
-  float _min_2d_height = 0;
-  float _min_3d_height = 0;
+  float min_2d_height_ = 0;
+  float min_3d_height_ = 0;
   float top_k_ = 1000;
   int obj_size_ = 0;
   int output_height_ = 0;
