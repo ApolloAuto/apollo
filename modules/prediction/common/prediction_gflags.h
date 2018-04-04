@@ -102,6 +102,6 @@ DECLARE_double(time_upper_bound_to_lane_center);
 DECLARE_double(time_lower_bound_to_lane_center);
 DECLARE_double(sample_time_gap);
 DECLARE_double(cost_alpha);
-DECLARE_double(default_time_to_lane_center);
+DECLARE_double(default_time_to_end_state);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
