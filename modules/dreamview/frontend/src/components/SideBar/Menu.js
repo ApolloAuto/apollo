@@ -36,6 +36,7 @@ const MenuIdOptionMapping = {
         perceptionUnknownUnmovable: 'showObstaclesUnknownUnmovable',
         perceptionUnknown: 'showObstaclesUnknown',
         perceptionVirtual: 'showObstaclesVirtual',
+        perceptionCipv: 'showObstaclesCipv',
         perceptionVelocity: 'showObstaclesVelocity',
         perceptionHeading: 'showObstaclesHeading',
         perceptionId: 'showObstaclesId',
