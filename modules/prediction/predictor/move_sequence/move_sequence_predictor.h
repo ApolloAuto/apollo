@@ -61,12 +61,12 @@ class MoveSequencePredictor : public SequencePredictor {
 
   void GetLongitudinalPolynomial(const Obstacle& obstacle,
                                  const LaneSequence& lane_sequence,
-                                 const double time_to_lane_center,
+                                 const double time_to_end_state,
                                  std::array<double, 5>* coefficients);
 
   void GetLateralPolynomial(const Obstacle& obstacle,
                             const LaneSequence& lane_sequence,
-                            const double time_to_lane_center,
+                            const double time_to_end_state,
                             std::array<double, 6>* coefficients);
 
   double ComputeTimeToLaneCenterBySampling(const Obstacle& obstacle,
