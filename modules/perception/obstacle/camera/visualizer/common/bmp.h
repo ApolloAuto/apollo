@@ -17,8 +17,10 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_VISUALIZER_COMMON_BMP_H_
 #define MODULES_PERCEPTION_OBSTACLE_VISUALIZER_COMMON_BMP_H_
 
-#include <stdio.h>
+#include <cstdio>
 #include <iostream>
+#include <string>
+#include <vector>
 
 namespace apollo {
 namespace perception {
@@ -43,13 +45,10 @@ struct BMPHeader {
                            /* are important */
 };
 
-template <typename Type>
-void save_rgba_image_to_bmp(const unsigned char* rgba_image, int w, int h,
-                            const char* fileName) {
+inline void save_rgba_image_to_bmp(const unsigned char* rgba_image, const int w,
+                                   const int h, const std::string& fileName) {
   int bytes_per_line = 0;
-  unsigned char* line = NULL;
 
-  FILE* file;
   struct BMPHeader bmph;
 
   /* The length of each line must be a multiple of 4 bytes */
@@ -62,7 +61,6 @@ void save_rgba_image_to_bmp(const unsigned char* rgba_image, int w, int h,
     bytes_per_line = 3 * width + 4 - mod4;
   }
 
-  // strcpy(bmph.bf_type, "BM");
   bmph.bf_type[0] = 'B';
   bmph.bf_type[1] = 'M';
   bmph.bf_off_bits = 54;
@@ -80,51 +78,41 @@ void save_rgba_image_to_bmp(const unsigned char* rgba_image, int w, int h,
   bmph.bi_clr_used = 0;
   bmph.bi_clr_important = 0;
 
-  file = fopen(fileName, "wb");
-  if (file == NULL) {
-    return;
-  }
+  std::fstream fs;
+  fs.open(fileName, std::fstream::in | std::fstream::binary);
 
-  fwrite(&bmph.bf_type, 2, 1, file);
-  fwrite(&bmph.bf_size, 4, 1, file);
-  fwrite(&bmph.bf_reserved, 4, 1, file);
-  fwrite(&bmph.bf_off_bits, 4, 1, file);
-  fwrite(&bmph.bi_size, 4, 1, file);
-  fwrite(&bmph.bi_width, 4, 1, file);
-  fwrite(&bmph.bi_height, 4, 1, file);
-  fwrite(&bmph.bi_planes, 2, 1, file);
-  fwrite(&bmph.bi_bit_count, 2, 1, file);
-  fwrite(&bmph.bi_compression, 4, 1, file);
-  fwrite(&bmph.bi_size_image, 4, 1, file);
-  fwrite(&bmph.bi_x_pels_per_meter, 4, 1, file);
-  fwrite(&bmph.bi_y_pels_per_meter, 4, 1, file);
-  fwrite(&bmph.bi_clr_used, 4, 1, file);
-  fwrite(&bmph.bi_clr_important, 4, 1, file);
+  fs << bmph.bf_type;
+  fs << bmph.bf_size;
+  fs << bmph.bf_reserved;
+  fs << bmph.bf_off_bits;
+  fs << bmph.bi_size;
+  fs << bmph.bi_width;
+  fs << bmph.bi_height;
+  fs << bmph.bi_planes;
+  fs << bmph.bi_bit_count;
+  fs << bmph.bi_compression;
+  fs << bmph.bi_size_image;
+  fs << bmph.bi_x_pels_per_meter;
+  fs << bmph.bi_y_pels_per_meter;
+  fs << bmph.bi_clr_used;
+  fs << bmph.bi_clr_important;
 
-  line = new unsigned char[bytes_per_line];
-  if (line == NULL) {
-    fprintf(stderr, "Can't allocate memory for BMP file.\n");
-    return;
-  }
+  std::vector<unsigned char> line(bytes_per_line);
 
-  unsigned char* ref_rgba = (unsigned char*)(rgba_image);
-
+  int index = 0;
   for (int i = 0; i < height; ++i) {
     for (int j = 0; j < width; ++j) {
-      line[3 * j] = ref_rgba[0];
-      line[3 * j + 1] = ref_rgba[1];
-      line[3 * j + 2] = ref_rgba[2];
-      ref_rgba += 4;
+      fs << rgba_image[index];
+      fs << rgba_image[index + 1];
+      fs << rgba_image[index + 2];
+      index += 4;
     }
-    fwrite(line, bytes_per_line, 1, file);
   }
 
-  delete[] line;
-  line = NULL;
-  fclose(file);
+  fs.close();
 }
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // BMP_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_VISUALIZER_COMMON_BMP_H_
