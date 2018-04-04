@@ -230,6 +230,7 @@ Chassis GemController::chassis() {
 	if (chassis_detail.gem().global_rpt_6a().pacmod_status() ==
 		Global_rpt_6a::PACMOD_STATUS_CONTROL_ENABLED) {
 	  chassis_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+   	  global_cmd_69_->set_clear_override(Global_cmd_69::CLEAR_OVERRIDE_DON_T_CLEAR_ACTIVE_OVERRIDES);
 	}
 	else {
 	  chassis_.set_driving_mode(Chassis::COMPLETE_MANUAL);
@@ -267,10 +268,6 @@ Chassis GemController::chassis() {
   }
 
   // give engage_advice based on error_code and canbus feedback
-  AERROR << "error_mask: " << chassis_error_mask_ << "\n"
-         << "parking_brake: " << chassis_.parking_brake() << "\n"
-         << "throttle_percentage: " << chassis_.throttle_percentage() << "\n"
-         << "brake_percentage: " << chassis_.brake_percentage();
   if (!chassis_error_mask_ && !chassis_.parking_brake() &&
       (chassis_.throttle_percentage() == 0.0) &&
       (chassis_.brake_percentage() != 0.0)) {
@@ -299,6 +296,7 @@ ErrorCode GemController::EnableAutoMode() {
   }
 
   global_cmd_69_->set_pacmod_enable(Global_cmd_69::PACMOD_ENABLE_CONTROL_ENABLED);
+  global_cmd_69_->set_clear_override(Global_cmd_69::CLEAR_OVERRIDE_CLEAR_ACTIVE_OVERRIDES);
 
   can_sender_->Update();
   const int32_t flag =
@@ -381,7 +379,7 @@ void GemController::Brake(double pedal) {
     return;
   }
 
-  brake_cmd_6b_->set_brake_cmd(pedal);
+  brake_cmd_6b_->set_brake_cmd(pedal/100.0);
 }
 
 // drive with old acceleration
@@ -393,7 +391,7 @@ void GemController::Throttle(double pedal) {
     return;
   }
 
-  accel_cmd_67_->set_accel_cmd(pedal);
+  accel_cmd_67_->set_accel_cmd(pedal/100.0);
 }
 
 // gem default, -470 ~ 470, left:+, right:-
@@ -406,11 +404,12 @@ void GemController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle = params_.max_steer_angle() * angle / 100.0;
+  // convert to radians
+  const double real_angle = params_.max_steer_angle() * angle / 100.0 * 3.1415 / 180.0;
   // reverse sign
 
   steering_cmd_6d_->set_position_value(real_angle)
-        ->set_speed_limit(200);
+        ->set_speed_limit(9.0);
 }
 
 // steering with new angle speed
@@ -422,9 +421,9 @@ void GemController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle = params_.max_steer_angle() * angle / 100.0;
+  const double real_angle = params_.max_steer_angle() * angle / 100.0 * 3.1415/180.0;
 
-  const double real_angle_spd = (
+  const double real_angle_spd = 3.1415 / 180.0 * (
       params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
       params_.max_steer_angle_spd() * angle_spd / 100.0);
   steering_cmd_6d_->set_position_value(real_angle)
