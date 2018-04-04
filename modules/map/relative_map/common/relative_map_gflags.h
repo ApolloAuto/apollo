@@ -23,11 +23,11 @@ DECLARE_string(relative_map_adapter_config_filename);
 DECLARE_string(relative_map_config_filename);
 DECLARE_int32(relative_map_loop_rate);
 DECLARE_double(max_len_from_navigation_line);
-DECLARE_bool(enable_navigation_line);
 DECLARE_double(min_len_for_navigation_lane);
 DECLARE_double(max_len_for_navigation_lane);
 DECLARE_double(ratio_navigation_lane_len_to_speed);
 DECLARE_double(max_distance_to_navigation_line);
 DECLARE_double(min_view_range_to_use_lane_marker);
 DECLARE_double(min_lane_half_width);
+
 #endif  // MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_GFLAGS_H_
