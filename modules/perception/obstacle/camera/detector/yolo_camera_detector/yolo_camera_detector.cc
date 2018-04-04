@@ -337,7 +337,7 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
 
   if (FLAGS_obs_camera_detector_gpu >= 0) {
     ADEBUG << "Get objects by GPU";
-    get_objects_gpu(&temp_objects);  
+    get_objects_gpu(&temp_objects);
   } else {
     get_objects_cpu(&temp_objects);
   }
@@ -399,7 +399,9 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
   return true;
 }
 
-string YoloCameraDetector::Name() const { return "YoloCameraDetector"; }
+string YoloCameraDetector::Name() const {
+  return "YoloCameraDetector";
+}
 
 bool YoloCameraDetector::get_objects_cpu(
     std::vector<VisualObjectPtr> *objects) {
@@ -450,8 +452,8 @@ bool YoloCameraDetector::get_objects_cpu(
   const float *cpu_cls_data =
       static_cast<const float *>(res_cls_tensor_->cpu_data());
 
-  unordered_map<int, vector<int> > indices;
-  unordered_map<int, vector<float> > conf_scores;
+  unordered_map<int, vector<int>> indices;
+  unordered_map<int, vector<float>> conf_scores;
   int num_kept = 0;
   for (int k = 0; k < num_classes; k++) {
     apply_nms_gpu(static_cast<const float *>(res_box_tensor_->gpu_data()),
@@ -538,7 +540,7 @@ bool YoloCameraDetector::get_objects_cpu(
 bool YoloCameraDetector::get_objects_gpu(
     std::vector<VisualObjectPtr> *objects) {
   auto loc_blob =
-        cnnadapter_->get_blob_by_name(yolo_param_.net_param().loc_blob());
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().loc_blob());
   auto obj_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().obj_blob());
   auto cls_blob =
@@ -569,17 +571,20 @@ bool YoloCameraDetector::get_objects_gpu(
       overlapped_ == nullptr) {
     return false;
   }
-  GetObjectsGPU(obj_size_, (const float *)loc_blob->gpu_data(), 
-      (const float *)obj_blob->gpu_data(), (const float *)cls_blob->gpu_data(), 
-      ori_data, dim_data, lof_data, lor_data,
-      anchor_data, obj_width, obj_height, num_anchors_, num_classes, confidence_threshold_, with_ori, 
-      with_dim, with_lof, with_lor, (float *)res_box_tensor_->mutable_gpu_data(), 
-      (float *)res_cls_tensor_->mutable_gpu_data(), s_box_block_size);
+  GetObjectsGPU(obj_size_, (const float *)loc_blob->gpu_data(),
+                (const float *)obj_blob->gpu_data(),
+                (const float *)cls_blob->gpu_data(), ori_data, dim_data,
+                lof_data, lor_data, anchor_data, obj_width, obj_height,
+                num_anchors_, num_classes, confidence_threshold_, with_ori,
+                with_dim, with_lof, with_lor,
+                static_cast<float *>(res_box_tensor_->mutable_gpu_data()),
+                static_cast<float *>(res_cls_tensor_->mutable_gpu_data()),
+                s_box_block_size);
   const float *cpu_cls_data =
       static_cast<const float *>(res_cls_tensor_->cpu_data());
 
-  unordered_map<int, vector<int> > indices;
-  unordered_map<int, vector<float> > conf_scores;
+  unordered_map<int, vector<int>> indices;
+  unordered_map<int, vector<float>> conf_scores;
   int num_kept = 0;
   for (int k = 0; k < num_classes; k++) {
     apply_nms_gpu(static_cast<const float *>(res_box_tensor_->gpu_data()),
@@ -660,7 +665,6 @@ bool YoloCameraDetector::get_objects_gpu(
       objects->push_back(obj);
     }
   }
-
 }
 
 void YoloCameraDetector::get_object_helper(
