@@ -28,9 +28,9 @@
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/common/status/status.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
-#include "modules/planning/common/path_decision.h"
-#include "modules/planning/common/speed/st_boundary.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed_limit.h"
 #include "modules/planning/reference_line/reference_line.h"
 
@@ -39,7 +39,8 @@ namespace planning {
 
 class SpeedLimitDecider {
  public:
-  SpeedLimitDecider(const StBoundaryConfig& config,
+  SpeedLimitDecider(const SLBoundary& adc_sl_boundary,
+                    const StBoundaryConfig& config,
                     const ReferenceLine& reference_line,
                     const PathData& path_data);
 
@@ -57,6 +58,7 @@ class SpeedLimitDecider {
                    std::vector<double>* kappa) const;
 
  private:
+  const SLBoundary& adc_sl_boundary_;
   const StBoundaryConfig& st_boundary_config_;
   const ReferenceLine& reference_line_;
   const PathData& path_data_;

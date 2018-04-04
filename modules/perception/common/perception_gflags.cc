@@ -55,9 +55,7 @@ DEFINE_bool(enable_visualization, false, "enable visualization for debug");
 /// obstacle/perception.cc
 /* dag streaming config for Apollo 2.0 */
 DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
-             "Onboard DAG Streaming config.");
-
-
+              "Onboard DAG Streaming config.");
 
 /// obstacle/onboard/radar_process_subnode.cc
 DEFINE_string(onboard_radar_detector, "DummyRadarDetector",
@@ -141,4 +139,3 @@ DEFINE_bool(show_motion, false, "visualize motion and object trajectories");
 DEFINE_bool(skip_camera_frame, false, "skip camera frame");
 DEFINE_int32(camera_hz, 30, "camera hz");
 DEFINE_string(fusion_publish_sensor_id, "velodyne_64", "fusion publish id");
-

@@ -7,6 +7,8 @@
     <arg name="max_range_16" default="70.0" />
     <arg name="rpm" default="600"/>
     <arg name="model" default="VLP16" />
+    <arg name="firing_data_port" default="2369"/>
+    <arg name="positioning_data_port" default="8309"/>
     <!-- 100ms -->
     <arg name="tf_query_timeout" default="0.1"/>
 
@@ -20,6 +22,8 @@
     <arg name="rpm" value="$(arg rpm)"/>
     <arg name="frame_id" value="$(arg velodyne16_frame_id)"/>
     <arg name="topic" value="/apollo/sensor/velodyne16/VelodyneScanUnified"/>    
+    <arg name="firing_data_port" value="$(arg firing_data_port)"/>
+    <arg name="positioning_data_port" value="$(arg positioning_data_port)"/>
   </include>
   
   <!-- start cloud nodelet using test calibration file -->

@@ -27,13 +27,14 @@
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/traffic_rule_config.pb.h"
 
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/apollo_app.h"
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
-#include "modules/planning/planning_interface.h"
 
 /**
  * @namespace apollo::planning
@@ -48,7 +49,7 @@ namespace planning {
  * @brief Planning module main class. It processes GPS and IMU as input,
  * to generate planning info.
  */
-class Planning : public PlanningInterface {
+class Planning : public apollo::common::ApolloApp {
  public:
   /**
    * @brief module name
@@ -77,7 +78,7 @@ class Planning : public PlanningInterface {
    * @brief main logic of the planning module, runs periodically triggered by
    * timer.
    */
-  void RunOnce() override;
+  void RunOnce();
 
   /**
    * @brief record last planning trajectory
@@ -89,6 +90,15 @@ class Planning : public PlanningInterface {
   void OnTimer(const ros::TimerEvent&);
 
   void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
+
+  /**
+   * @brief Fill the header and publish the planning message.
+   */
+  void Publish(planning::ADCTrajectory* trajectory) {
+    using apollo::common::adapter::AdapterManager;
+    AdapterManager::FillPlanningHeader(Name(), trajectory);
+    AdapterManager::PublishPlanning(*trajectory);
+  }
 
   void RegisterPlanners();
 

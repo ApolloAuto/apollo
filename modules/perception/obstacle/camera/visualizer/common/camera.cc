@@ -347,9 +347,9 @@ void Camera::get_model_view_projection_matrix(GLdouble m[16]) const {
   }
 }
 
-void Camera::setscene_radius(double radius) {
+void Camera::setscene_radius(const double radius) {
   if (radius <= 0.0) {
-    std::cout << "Scene radius must be positive - Ignoring value";
+    std::cout << "Scene radius must be positive - Ignoring value" << std::endl;
     return;
   }
 

@@ -350,7 +350,7 @@ PbfSensorObjectPtr PbfIMFFusion::GetSensorLatestCache(const SensorType type) {
 }
 
 void PbfIMFFusion::SetState(const Eigen::Vector3d& anchor_point,
-                                          const Eigen::Vector3d& velocity) {
+                            const Eigen::Vector3d& velocity) {
   _belief_anchor_point = anchor_point;
   _belief_velocity = velocity;
 }
