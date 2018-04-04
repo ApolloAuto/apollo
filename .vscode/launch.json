@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+    {
+        "name": "C++ Launch",
+        "type": "cppdbg",
+        "request": "launch",
+        // you can change the "planning" to your module name.  
+        "program": "${workspaceRoot}/bazel-bin/modules/planning/planning",
+        // you can change "localhost:1111" to another "IP:port" name. 
+        "miDebuggerServerAddress": "localhost:1111",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceRoot}",
+        "environment": [],
+        "externalConsole": true,
+        "linux": {
+            "MIMode": "gdb"
+        },
+        "osx": {
+            "MIMode": "gdb"
+        },
+        "windows": {
+            "MIMode": "gdb"
+        }
+    }
+    ]
+}
