@@ -30,6 +30,7 @@
 #include "modules/canbus/vehicle/gem/protocol/shift_cmd_65.h"
 #include "modules/canbus/vehicle/gem/protocol/steering_cmd_6d.h"
 #include "modules/canbus/vehicle/gem/protocol/turn_cmd_63.h"
+#include "modules/canbus/vehicle/gem/protocol/global_cmd_69.h"
 #include "modules/common/macro.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
@@ -117,6 +118,7 @@ class GemController final : public VehicleController {
   Shiftcmd65* shift_cmd_65_ = nullptr;
   Steeringcmd6d* steering_cmd_6d_ = nullptr;
   Turncmd63* turn_cmd_63_ = nullptr;
+  Globalcmd69* global_cmd_69_ = nullptr;
 
   Chassis chassis_;
   std::unique_ptr<std::thread> thread_;
