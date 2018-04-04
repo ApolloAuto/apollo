@@ -6,4 +6,5 @@ map_param {
 
 navigation_lane {
   min_lane_marker_quality: 0.49
+  lane_source: PERCEPTION
 }
