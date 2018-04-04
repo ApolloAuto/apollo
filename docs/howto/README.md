@@ -40,3 +40,4 @@
 ## Others
 - [how to install ubuntu](how_to_install_ubuntu.md)
 - [how to use IRC client on ubuntu](how_to_use_IRC_client_on_ubuntu.md)
+- [how to solve slow pull from cn](how_to_solve_slow_pull_from_cn.md)
