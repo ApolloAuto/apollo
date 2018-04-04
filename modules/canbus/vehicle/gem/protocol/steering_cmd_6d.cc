@@ -94,13 +94,23 @@ void Steeringcmd6d::set_p_speed_limit(uint8_t* data,
   uint8_t t = 0;
 
   t = x & 0xFF;
-  Byte to_set0(data + 5);
+  Byte to_set0(data + 7);
   to_set0.set_value(t, 0, 8);
   x >>= 8;
 
   t = x & 0xFF;
-  Byte to_set1(data + 4);
+  Byte to_set1(data + 6);
   to_set1.set_value(t, 0, 8);
+  x >>= 8;
+
+  t = x & 0xFF;
+  Byte to_set2(data + 5);
+  to_set2.set_value(t, 0, 8);
+  x >>= 8;
+
+  t = x & 0xFF;
+  Byte to_set3(data + 4);
+  to_set3.set_value(t, 0, 8);
 }
 
 }  // namespace gem
