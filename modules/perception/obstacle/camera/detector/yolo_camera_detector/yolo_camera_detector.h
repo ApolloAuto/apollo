@@ -27,6 +27,7 @@
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/proto/yolo.pb.h"
 
 #include "modules/perception/cuda_util/region_output.h"
+#include "modules/perception/cuda_util/network.h"
 #include "modules/perception/cuda_util/util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -72,6 +73,7 @@ class YoloCameraDetector : public BaseCameraDetector {
   void init_anchor(const std::string &yolo_root);
 
   bool get_objects_cpu(std::vector<VisualObjectPtr> *objects);
+  bool get_objects_gpu(std::vector<VisualObjectPtr> *objects);
 
   void get_object_helper(int idx, const float *loc_data, const float *obj_data,
                          const float *cls_data, const float *ori_data,
