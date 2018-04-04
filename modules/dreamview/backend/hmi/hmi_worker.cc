@@ -155,6 +155,7 @@ HMIWorker::HMIWorker() {
       // entry is (map_name, map_path)
       if (entry.second == FLAGS_map_dir) {
         status_.set_current_map(entry.first);
+        apollo::common::KVDB::Put("apollo:dreamview:map", entry.first);
         break;
       }
     }
