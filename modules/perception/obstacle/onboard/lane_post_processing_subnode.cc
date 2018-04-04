@@ -181,7 +181,7 @@ void LanePostProcessingSubnode::PublishDataAndEvent(
     event.reserve = device_id_;
     event_manager_->Publish(event);
   }
-  AINFO << "succeed to publish data and event.";
+  ADEBUG << "succeed to publish data and event.";
 }
 
 Status LanePostProcessingSubnode::ProcEvents() {
@@ -216,14 +216,14 @@ Status LanePostProcessingSubnode::ProcEvents() {
     (*lane_objects)[i].timestamp = event.timestamp;
     (*lane_objects)[i].seq_num = seq_num_;
   }
-  AINFO << "Before publish lane objects, objects num: "
+  ADEBUG << "Before publish lane objects, objects num: "
         << lane_objects->size();
 
   uint64_t t = timer.End("lane post-processing");
   min_processing_time_ = std::min(min_processing_time_, t);
   max_processing_time_ = std::max(max_processing_time_, t);
   tot_processing_time_ += t;
-  AINFO << "Lane Post Processing Runtime: "
+  ADEBUG << "Lane Post Processing Runtime: "
         << "MIN (" << min_processing_time_ << " ms), "
         << "MAX (" << max_processing_time_ << " ms), "
         << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";
@@ -234,7 +234,7 @@ Status LanePostProcessingSubnode::ProcEvents() {
     PublishPerceptionPb(lane_objects);
   }
 
-  AINFO << "Successfully finished lane post processing";
+  ADEBUG << "Successfully finished lane post processing";
   return Status::OK();
 }
 
