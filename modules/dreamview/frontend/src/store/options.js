@@ -27,6 +27,7 @@ export default class Options {
     @observable showPlanningDpOptimizer = PARAMETERS.options.defaults.showPlanningDpOptimizer;
     @observable showPlanningQpOptimizer = PARAMETERS.options.defaults.showPlanningQpOptimizer;
     @observable showRouting = PARAMETERS.options.defaults.showRouting;
+    @observable showPerceptionLaneMarker = PARAMETERS.options.defaults.showPerceptionLaneMarker;
     @observable showPredictionMajor = PARAMETERS.options.defaults.showPredictionMajor;
     @observable showPredictionMinor = PARAMETERS.options.defaults.showPredictionMinor;
     @observable showObstaclesVehicle = PARAMETERS.options.defaults.showObstaclesVehicle;
@@ -70,6 +71,7 @@ export default class Options {
         'planningDpOptimizer': true,
         'planningReference': true,
         'perceptionPointCloud': OFFLINE_PLAYBACK,
+        'perceptionLaneMarker': OFFLINE_PLAYBACK,
     };
 
 

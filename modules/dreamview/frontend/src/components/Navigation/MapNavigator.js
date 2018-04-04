@@ -1,5 +1,5 @@
-import polyval from "compute-polynomial";
 import { UTMToWGS84 } from "utils/coordinate_converter";
+import { calculateLaneMarkerPoints } from "utils/misc";
 
 class MapNavigator {
     constructor() {
@@ -138,9 +138,7 @@ class MapNavigator {
         const y = autoDrivingCar.positionY;
         const heading = autoDrivingCar.heading;
 
-        const [longitude, latitude] = this.mapAdapter.applyCoordinateOffset(
-            UTMToWGS84(x, y)
-        );
+        const [longitude, latitude] = this.mapAdapter.applyCoordinateOffset(UTMToWGS84(x, y));
         const latLng = this.mapAdapter.createPoint({
             lat: latitude,
             lng: longitude,
@@ -152,32 +150,13 @@ class MapNavigator {
     }
 
     calculateLaneMarkerPath(autoDrivingCar, laneMarkerData) {
-        if (!autoDrivingCar || !laneMarkerData) {
-            return;
-        }
-
-        const adcX = autoDrivingCar.positionX;
-        const adcY = autoDrivingCar.positionY;
-        const heading = autoDrivingCar.heading;
-
-        const c0 = laneMarkerData.c0Position;
-        const c1 = laneMarkerData.c1HeadingAngle;
-        const c2 = laneMarkerData.c2Curvature;
-        const c3 = laneMarkerData.c3CurvatureDerivative;
-        const markerRange = laneMarkerData.viewRange;
-        const markerCoef = [c3, c2, c1, c0];
-
-        const lane = [];
-        for (let x = 0; x < markerRange; ++x) {
-            const y = polyval(markerCoef, x);
-            const newX = x * Math.cos(heading) - y * Math.sin(heading);
-            const newY = y * Math.cos(heading) + x * Math.sin(heading);
+        const path = calculateLaneMarkerPoints(autoDrivingCar, laneMarkerData);
+        return path.map(point => {
             const [plon, plat] = this.mapAdapter.applyCoordinateOffset(
-                UTMToWGS84(adcX + newX, adcY + newY)
+                UTMToWGS84(point.x, point.y)
             );
-            lane.push(this.mapAdapter.createPoint({ lat: plat, lng: plon }));
-        }
-        return lane;
+            return this.mapAdapter.createPoint({ lat: plat, lng: plon });
+        });
     }
 
     updateLaneMarkers(autoDrivingCar, laneMarker) {
@@ -306,9 +285,7 @@ class MapNavigator {
 
     addDefaultEndPoint(points) {
         points.forEach(point => {
-            const [lng, lat] = this.mapAdapter.applyCoordinateOffset(
-                UTMToWGS84(point.x, point.y)
-            );
+            const [lng, lat] = this.mapAdapter.applyCoordinateOffset(UTMToWGS84(point.x, point.y));
             this.routingRequestPoints.push({ lat: lat, lng: lng });
         });
     }

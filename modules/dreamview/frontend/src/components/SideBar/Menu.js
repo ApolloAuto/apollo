@@ -40,6 +40,7 @@ const MenuIdOptionMapping = {
         perceptionVelocity: 'showObstaclesVelocity',
         perceptionHeading: 'showObstaclesHeading',
         perceptionId: 'showObstaclesId',
+        perceptionLaneMarker: 'showPerceptionLaneMarker',
         predictionMajor: 'showPredictionMajor',
         predictionMinor: 'showPredictionMinor',
         routing: 'showRouting',

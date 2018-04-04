@@ -60,6 +60,7 @@ options:
     showDecisionMain: true
     showDecisionObstacle: true
     showRouting: true
+    showPerceptionLaneMarker: false
     showPredictionMajor: true
     showPredictionMinor: true
     showObstaclesVehicle: true
