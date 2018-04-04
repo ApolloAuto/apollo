@@ -48,13 +48,9 @@ std::vector<cv::Scalar> color_table = {
 
 bool LoadVisualObjectFromFile(const std::string &file_name,
                               std::vector<VisualObjectPtr> *visual_objects) {
-  FILE *fp = fopen(file_name.c_str(), "r");
-  if (!fp) {
-    AERROR << "load file: " << file_name << " error!";
-    return false;
-  }
+  std::fstream fs(file_name, std::fstream::out);
 
-  while (!feof(fp)) {
+  while (!fs.eof()) {
     VisualObjectPtr obj(new VisualObject());
     std::fill(
         obj->type_probs.begin(),
@@ -67,26 +63,24 @@ bool LoadVisualObjectFromFile(const std::string &file_name,
     double y1 = 0.0;
     double x2 = 0.0;
     double y2 = 0.0;
-    int ret = fscanf(fp,
-                     "%254s %lf %lf %f %lf %lf %lf %lf %f %f %f %f %f %f %f %f "
-                     "%f %f",
-                     type, &trash, &trash, &obj->alpha, &x1, &y1, &x2, &y2,
-                     &obj->height, &obj->width, &obj->length, &obj->center.x(),
-                     &obj->center.y(), &obj->center.z(), &obj->theta,
-                     &obj->score, &obj->trunc_height, &obj->trunc_width);
-    obj->upper_left[0] = x1 > 0 ? x1 : 0;
-    obj->upper_left[1] = y1 > 0 ? y1 : 0;
-    obj->lower_right[0] = x2 < 1920 ? x2 : 1920;
-    obj->lower_right[1] = y2 < 1080 ? y2 : 1080;
-    obj->type = GetObjectType(std::string(type));
-    obj->type_probs[static_cast<int>(obj->type)] =
-        static_cast<float>(obj->score);
 
-    if (ret >= 15) {
+    if (fs.get(type, 255) && fs >> trash && fs >> trash && fs >> obj->alpha &&
+        fs >> x1 && fs >> y1 && fs >> x2 && fs >> y2 && fs >> obj->height &&
+        fs >> obj->width && fs >> obj->length && fs >> obj->center.x() &&
+        fs >> obj->center.y() && fs >> obj->center.z() && fs >> obj->theta &&
+        fs >> obj->score && fs >> obj->trunc_height && fs >> obj->trunc_width) {
+      obj->upper_left[0] = x1 > 0 ? x1 : 0;
+      obj->upper_left[1] = y1 > 0 ? y1 : 0;
+      obj->lower_right[0] = x2 < 1920 ? x2 : 1920;
+      obj->lower_right[1] = y2 < 1080 ? y2 : 1080;
+      obj->type = GetObjectType(std::string(type));
+      obj->type_probs[static_cast<int>(obj->type)] =
+          static_cast<float>(obj->score);
+    } else {
       visual_objects->push_back(obj);
     }
   }
-  fclose(fp);
+  fs.close();
   return true;
 }
 
