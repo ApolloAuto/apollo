@@ -512,7 +512,11 @@ template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const PerceptionObstacles &obstacles) {
   for (const auto &obstacle : obstacles.perception_obstacle()) {
-    CreateWorldObjectIfAbsent(obstacle);
+    auto &world_obj = CreateWorldObjectIfAbsent(obstacle);
+    if (obstacles.has_cipv_info() &&
+        (obstacles.cipv_info().cipv_id() == obstacle.id())) {
+      world_obj.set_type(Object_Type_CIPV);
+    }
   }
 
   if (obstacles.has_lane_marker()) {

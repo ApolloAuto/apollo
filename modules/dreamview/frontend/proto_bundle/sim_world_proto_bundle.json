@@ -292,7 +292,8 @@
                     "PEDESTRIAN": 3,
                     "BICYCLE": 4,
                     "VEHICLE": 5,
-                    "VIRTUAL": 6
+                    "VIRTUAL": 6,
+                    "CIPV": 7
                   }
                 }
               }
