@@ -22,6 +22,20 @@ export function WGS84ToGCJ02(longitude, latitude) {
 }
 
 export function WGS84ToBD09LL(longitude, latitude) {
-    const GCJ02 = WGS84ToGCJ02(longitude, latitude);
-    return ChineseCoordinateConverter.transform(GCJ02, "GCJ02", "BD09LL");
+    if (outOfChina(longitude, latitude)) {
+        return [longitude, latitude];
+    } else {
+        const GCJ02 = WGS84ToGCJ02(longitude, latitude);
+        return ChineseCoordinateConverter.transform(GCJ02, "GCJ02", "BD09LL");
+    }
+}
+
+function outOfChina(longitude, latitude) {
+    if (longitude < 72.004 || longitude > 137.8347) {
+        return true;
+    }
+    if (latitude < 0.8293 || latitude > 55.8271) {
+        return true;
+    }
+    return false;
 }
