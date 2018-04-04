@@ -13,7 +13,8 @@ export const ObstacleColorMapping = {
         PEDESTRIAN: 0xFFEA00,
         BICYCLE: 0x00DCEB,
         VEHICLE: 0x00FF3C,
-        VIRTUAL: 0x800000
+        VIRTUAL: 0x800000,
+        CIPV: 0xff9966
 };
 const LINE_THICKNESS = 1.5;
 

@@ -69,6 +69,7 @@ options:
     showObstaclesUnknownUnmovable: true
     showObstaclesUnknown: true
     showObstaclesVirtual: false
+    showObstaclesCipv: true
     showObstaclesVelocity: true
     showObstaclesHeading: true
     showObstaclesId: true
