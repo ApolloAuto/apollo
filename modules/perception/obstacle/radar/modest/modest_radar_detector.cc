@@ -174,7 +174,7 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
     AERROR << "Objects is nullptr";
     return false;
   }
-  AINFO << "Modest radar detector.";
+  ADEBUG << "Modest radar detector.";
   Eigen::Matrix4d radar_pose;
   if (options.radar2world_pose == nullptr) {
     AERROR << "radar2world_pose is nullptr.";
@@ -204,9 +204,9 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
   RoiFilter(map_polygons, &filter_objects);
   // treatment
   radar_tracker_->Process(radar_objects);
-  AINFO << "After process, object size: " << radar_objects.objects.size();
+  ADEBUG << "After process, object size: " << radar_objects.objects.size();
   CollectRadarResult(objects);
-  AINFO << "radar object size: " << objects->size();
+  ADEBUG << "radar object size: " << objects->size();
   return true;
 }
 
@@ -234,7 +234,7 @@ bool ModestRadarDetector::CollectRadarResult(std::vector<ObjectPtr> *objects) {
 void ModestRadarDetector::RoiFilter(
     const std::vector<PolygonDType> &map_polygons,
     std::vector<ObjectPtr> *filter_objects) {
-  AINFO << "Before using hdmap, object size:" << filter_objects->size();
+  ADEBUG << "Before using hdmap, object size:" << filter_objects->size();
   // use new hdmap
   if (use_had_map_) {
     if (!map_polygons.empty()) {
@@ -251,12 +251,12 @@ void ModestRadarDetector::RoiFilter(
         }
       }
       filter_objects->resize(obs_number);
-      AINFO << "query hdmap sucessfully!";
+      ADEBUG << "query hdmap sucessfully!";
     } else {
-      AINFO << "query hdmap unsuccessfully!";
+      ADEBUG << "query hdmap unsuccessfully!";
     }
   }
-  AINFO << "After using hdmap, object size:" << filter_objects->size();
+  ADEBUG << "After using hdmap, object size:" << filter_objects->size();
 }
 
 }  // namespace perception

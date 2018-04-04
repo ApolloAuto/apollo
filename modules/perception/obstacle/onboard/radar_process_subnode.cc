@@ -232,7 +232,7 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
 void RadarProcessSubnode::OnLocalization(
     const apollo::localization::LocalizationEstimate &localization) {
   double timestamp = localization.header().timestamp_sec();
-  AINFO << "localization timestamp:" << GLOG_TIMESTAMP(timestamp);
+  ADEBUG << "localization timestamp:" << GLOG_TIMESTAMP(timestamp);
   LocalizationPair localization_pair;
   localization_pair.first = timestamp;
   localization_pair.second = localization;

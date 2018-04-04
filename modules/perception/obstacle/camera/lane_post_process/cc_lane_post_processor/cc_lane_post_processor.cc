@@ -575,7 +575,7 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
   vector<ConnectedComponentPtr> cc_list;
   cc_generator_->FindConnectedComponents(lane_mask, &cc_list);
 
-  AINFO << "number of connected components = " << cc_list.size();
+  ADEBUG << "number of connected components = " << cc_list.size();
 
   // 3. split CC and find inner edges
   int tot_inner_edge_count = 0;
@@ -606,7 +606,7 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
 
   cur_frame_->Process(cur_lane_instances_);
 
-  AINFO << "number of lane instances = " << cur_lane_instances_->size();
+  ADEBUG << "number of lane instances = " << cur_lane_instances_->size();
 
   return true;
 }
@@ -683,7 +683,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
         is_right_lane_found = true;
       }
 
-      AINFO << " lane object " << (*lane_objects)->back().GetSpatialLabel()
+      ADEBUG << " lane object " << (*lane_objects)->back().GetSpatialLabel()
             << " has " << (*lane_objects)->back().pos.size() << " points: "
             << "lateral distance = "
             << (*lane_objects)->back().lateral_distance;
@@ -692,7 +692,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
   } else {
     /// for vehicle space coordinate
     // select lane instances with non-overlap assumption
-    AINFO << "generate lane objects ...";
+    ADEBUG << "generate lane objects ...";
     lane_objects->reset(new LaneObjects());
     (*lane_objects)->reserve(2 * MAX_LANE_SPATIAL_LABELS);
     vector<pair<ScalarType, int>> origin_lateral_dist_object_id;
@@ -838,7 +838,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
           static_cast<SpatialLabelType>(spatial_index);
       valid_lane_objects.push_back(object_id);
 
-      AINFO << " lane object "
+      ADEBUG << " lane object "
             << (*lane_objects)->at(object_id).GetSpatialLabel() << " has "
             << (*lane_objects)->at(object_id).pos.size() << " points: "
             << "lateral distance="
@@ -876,7 +876,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     (*lane_objects)->resize(valid_lane_objects.size());
   }
 
-  AINFO << "number of lane objects = " << (*lane_objects)->size();
+  ADEBUG << "number of lane objects = " << (*lane_objects)->size();
   if (options_.space_type != SpaceType::IMAGE) {
     if (!CompensateLaneObjects((*lane_objects))) {
       AERROR << "fail to compensate lane objects.";
@@ -936,7 +936,7 @@ bool CCLanePostProcessor::CompensateLaneObjects(LaneObjectsPtr lane_objects) {
   }
 
   if (!has_ego_lane_right) {
-    AINFO << "add virtual lane R_0 ...";
+    ADEBUG << "add virtual lane R_0 ...";
     if (ego_lane_left_idx == -1) {
       AERROR << "failed to compensate right ego lane due to no left ego lane.";
       return false;
