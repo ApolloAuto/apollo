@@ -47,25 +47,13 @@ RUN ln -rs /usr/lib/libtcmalloc_and_profiler.so.4 /usr/lib/libtcmalloc_and_profi
 COPY installers /tmp/installers
 RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_glusterfs.sh
+RUN bash /tmp/installers/install_protobuf.sh
+RUN bash /tmp/installers/install_node.sh
 
 RUN apt-get clean autoclean && apt-get autoremove -y
 RUN rm -fr /var/lib/apt/lists/*
 
 WORKDIR /tmp
-# install protobuf 3.3.0
-RUN wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.tar.gz
-RUN tar xzf protobuf-cpp-3.3.0.tar.gz
-WORKDIR /tmp/protobuf-3.3.0
-RUN ./configure --prefix=/usr && make && make install
-RUN chmod 755 /usr/bin/protoc
-
-# Set up node v8.0.0
-WORKDIR /tmp
-RUN wget https://github.com/tj/n/archive/v2.1.0.tar.gz
-RUN tar xzf v2.1.0.tar.gz
-WORKDIR /tmp/n-2.1.0
-RUN make install
-RUN n 8.0.0
 
 # Install required python packages.
 RUN pip install -r /tmp/installers/py27_requirements.txt
