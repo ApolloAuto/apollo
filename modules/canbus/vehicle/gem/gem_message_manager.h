@@ -26,7 +26,7 @@ namespace gem {
 using ::apollo::drivers::canbus::MessageManager;
 
 class GemMessageManager
-	: public MessageManager<::apollo::canbus::ChassisDetail> {
+    : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   GemMessageManager();
   virtual ~GemMessageManager();

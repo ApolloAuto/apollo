@@ -17,15 +17,15 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_ACCEL_CMD_67_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_ACCEL_CMD_67_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Accelcmd67 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                       ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -37,12 +37,15 @@ class Accelcmd67 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
-  // config detail: {'name': 'ACCEL_CMD', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+  // config detail: {'name': 'ACCEL_CMD', 'offset': 0.0, 'precision': 0.001,
+  // 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7,
+  // 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
   Accelcmd67* set_accel_cmd(double accel_cmd);
 
  private:
-
-  // config detail: {'name': 'ACCEL_CMD', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+  // config detail: {'name': 'ACCEL_CMD', 'offset': 0.0, 'precision': 0.001,
+  // 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7,
+  // 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
   void set_p_accel_cmd(uint8_t* data, double accel_cmd);
 
  private:
