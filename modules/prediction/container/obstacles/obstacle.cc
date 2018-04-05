@@ -968,7 +968,8 @@ void Obstacle::SetLaneSequencePath(LaneGraph* const lane_graph) {
     for (int j = 0; j + 1 < num_path_point; ++j) {
       PathPoint* first_point = lane_sequence->mutable_path_point(j);
       PathPoint* second_point = lane_sequence->mutable_path_point(j + 1);
-      double delta_theta = second_point->theta() - first_point->theta();
+      double delta_theta = apollo::common::math::AngleDiff(
+          second_point->theta(), first_point->theta());
       double delta_s = second_point->s() - first_point->s();
       double kappa = std::abs(delta_theta / (delta_s + FLAGS_double_precision));
       lane_sequence->mutable_path_point(j)->set_kappa(kappa);
