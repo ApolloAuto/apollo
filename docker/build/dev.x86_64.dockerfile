@@ -19,7 +19,6 @@ RUN bash /tmp/installers/install_protobuf.sh
 RUN bash /tmp/installers/install_python_modules.sh
 RUN bash /tmp/installers/install_qp_oases.sh
 RUN bash /tmp/installers/install_ros.sh
-RUN bash /tmp/installers/install_shellcheck.sh
 RUN bash /tmp/installers/install_supervisor.sh
 RUN bash /tmp/installers/install_undistort.sh
 RUN bash /tmp/installers/install_yarn.sh
@@ -40,9 +39,9 @@ RUN apt-get install -y \
    libcurl4-openssl-dev \
    libfreetype6-dev \
    liblapack-dev \
-   libleveldb-dev \
    lsof \
    realpath \
+   shellcheck \
    vim \
    v4l-utils \
    nfs-common \
