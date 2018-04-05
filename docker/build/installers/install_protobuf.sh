@@ -16,10 +16,12 @@
 # limitations under the License.
 ###############################################################################
 
+# Fail on first error.
+set -e
+
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.tar.gz
 tar xzf protobuf-cpp-3.3.0.tar.gz
 cd protobuf-3.3.0
 ./configure --prefix=/usr && make && make install
-

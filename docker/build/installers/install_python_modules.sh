@@ -19,6 +19,12 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
-apt-get update -y
-apt-get install -y glusterfs-client
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+apt-get install -y \
+   python-matplotlib \
+   python-pip \
+   python-scipy \
+   python-software-properties
+
+pip install -r py27_requirements.txt

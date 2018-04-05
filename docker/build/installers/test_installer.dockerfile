@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -16,9 +14,14 @@
 # limitations under the License.
 ###############################################################################
 
-# Fail on first error.
-set -e
+FROM ubuntu:14.04
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
-apt-get update -y
-apt-get install -y glusterfs-client
+# Basic tools.
+COPY pre_install.sh /tmp/pre_install.sh
+RUN bash /tmp/pre_install.sh
+
+# Set it with "--build-arg INSTALLER=<your installer>" when building.
+ARG INSTALLER=not_exist
+
+COPY ${INSTALLER} /tmp/installer.sh
+RUN bash /tmp/installer.sh

@@ -19,6 +19,9 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
-apt-get update -y
-apt-get install -y glusterfs-client
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+apt-get install -y supervisor
+
+# Add supervisord config file
+echo_supervisord_conf > /etc/supervisord.conf
