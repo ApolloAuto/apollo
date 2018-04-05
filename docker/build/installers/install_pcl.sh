@@ -19,6 +19,11 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
-apt-get update -y
-apt-get install -y glusterfs-client
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+wget https://apollocache.blob.core.windows.net/apollo-docker/pcl-1.7_x86.tar.gz
+tar xzf pcl-1.7_x86.tar.gz
+mv pcl-1.7_x86/include/pcl /usr/local/include/pcl-1.7/
+mv pcl-1.7_x86/lib/* /usr/local/lib/
+mv pcl-1.7_x86/share/pcl-1.7 /usr/local/share/
+ldconfig

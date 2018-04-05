@@ -19,6 +19,9 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
-apt-get update -y
-apt-get install -y glusterfs-client
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+wget https://apollocache.blob.core.windows.net/apollo-docker/ota_security.tar.gz
+tar xzf ota_security.tar.gz
+cd ota_security
+bash ota_server_deploy.sh root

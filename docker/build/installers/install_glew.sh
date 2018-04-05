@@ -19,6 +19,21 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+# Install OpenGL
+echo "deb http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | \
+    sudo tee -a /etc/apt/sources.list.d/fillwave_ext.list
+echo "deb-src http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | \
+    sudo tee -a /etc/apt/sources.list.d/fillwave_ext.list
 apt-get update -y
-apt-get install -y glusterfs-client
+apt-get install -y --force-yes libglfw3 libglfw3-dev freeglut3-dev
+
+# Install GLEW
+wget https://github.com/nigels-com/glew/releases/download/glew-2.0.0/glew-2.0.0.zip
+unzip glew-2.0.0.zip
+cd glew-2.0.0
+make && make install
+
+ln -s /usr/lib64/libGLEW.so /usr/lib/libGLEW.so
+ln -s /usr/lib64/libGLEW.so.2.0 /usr/lib/libGLEW.so.2.0
