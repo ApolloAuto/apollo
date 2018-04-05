@@ -139,3 +139,7 @@ DEFINE_bool(show_motion, false, "visualize motion and object trajectories");
 DEFINE_bool(skip_camera_frame, false, "skip camera frame");
 DEFINE_int32(camera_hz, 30, "camera hz");
 DEFINE_string(fusion_publish_sensor_id, "velodyne_64", "fusion publish id");
+
+DEFINE_string(cc_lane_post_processor_config_file,
+              "modules/perception/model/camera/lane_post_process_config.pb.txt",
+              "The config file of cc_lane_post_processor.");

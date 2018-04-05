@@ -107,4 +107,7 @@ DECLARE_bool(bag_mode);
 DECLARE_bool(skip_camera_frame);
 DECLARE_int32(camera_hz);
 DECLARE_string(fusion_publish_sensor_id);
+
+DECLARE_string(cc_lane_post_processor_config_file);
+
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_

@@ -20,3 +20,17 @@ proto_library(
         "//modules/map/proto:map_proto_lib",
     ],
 )
+
+cc_proto_library(
+    name = "lane_post_process_config_lib_proto",
+    deps = [
+        ":lane_post_process_config_lib",
+    ],
+)
+
+proto_library(
+    name = "lane_post_process_config_lib",
+    srcs = [
+        "lane_post_process_config.proto",
+    ],
+)
