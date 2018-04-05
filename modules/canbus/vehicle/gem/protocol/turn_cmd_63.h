@@ -17,15 +17,15 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_TURN_CMD_63_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_TURN_CMD_63_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Turncmd63 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                      ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -37,13 +37,22 @@ class Turncmd63 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
-  // config detail: {'name': 'TURN_SIGNAL_CMD', 'enum': {0: 'TURN_SIGNAL_CMD_RIGHT', 1: 'TURN_SIGNAL_CMD_NONE', 2: 'TURN_SIGNAL_CMD_LEFT', 3: 'TURN_SIGNAL_CMD_HAZARD'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Turncmd63* set_turn_signal_cmd(Turn_cmd_63::Turn_signal_cmdType turn_signal_cmd);
+  // config detail: {'name': 'TURN_SIGNAL_CMD', 'enum': {0:
+  // 'TURN_SIGNAL_CMD_RIGHT', 1: 'TURN_SIGNAL_CMD_NONE', 2:
+  // 'TURN_SIGNAL_CMD_LEFT', 3: 'TURN_SIGNAL_CMD_HAZARD'}, 'precision': 1.0,
+  // 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
+  // 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  Turncmd63* set_turn_signal_cmd(
+      Turn_cmd_63::Turn_signal_cmdType turn_signal_cmd);
 
  private:
-
-  // config detail: {'name': 'TURN_SIGNAL_CMD', 'enum': {0: 'TURN_SIGNAL_CMD_RIGHT', 1: 'TURN_SIGNAL_CMD_NONE', 2: 'TURN_SIGNAL_CMD_LEFT', 3: 'TURN_SIGNAL_CMD_HAZARD'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_turn_signal_cmd(uint8_t* data, Turn_cmd_63::Turn_signal_cmdType turn_signal_cmd);
+  // config detail: {'name': 'TURN_SIGNAL_CMD', 'enum': {0:
+  // 'TURN_SIGNAL_CMD_RIGHT', 1: 'TURN_SIGNAL_CMD_NONE', 2:
+  // 'TURN_SIGNAL_CMD_LEFT', 3: 'TURN_SIGNAL_CMD_HAZARD'}, 'precision': 1.0,
+  // 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
+  // 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  void set_p_turn_signal_cmd(uint8_t* data,
+                             Turn_cmd_63::Turn_signal_cmdType turn_signal_cmd);
 
  private:
   Turn_cmd_63::Turn_signal_cmdType turn_signal_cmd_;

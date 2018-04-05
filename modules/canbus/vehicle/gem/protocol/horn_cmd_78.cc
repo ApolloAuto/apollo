@@ -30,29 +30,29 @@ const int32_t Horncmd78::ID = 0x78;
 Horncmd78::Horncmd78() { Reset(); }
 
 uint32_t Horncmd78::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) :modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
 
-void Horncmd78::UpdateData(uint8_t* data) {
-  set_p_horn_cmd(data, horn_cmd_);
-}
+void Horncmd78::UpdateData(uint8_t* data) { set_p_horn_cmd(data, horn_cmd_); }
 
 void Horncmd78::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) :you should check this manually
   horn_cmd_ = Horn_cmd_78::HORN_CMD_OFF;
 }
 
-Horncmd78* Horncmd78::set_horn_cmd(
-    Horn_cmd_78::Horn_cmdType horn_cmd) {
+Horncmd78* Horncmd78::set_horn_cmd(Horn_cmd_78::Horn_cmdType horn_cmd) {
   horn_cmd_ = horn_cmd;
   return this;
- }
+}
 
-// config detail: {'name': 'HORN_CMD', 'enum': {0: 'HORN_CMD_OFF', 1: 'HORN_CMD_ON'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+// config detail: {'name': 'HORN_CMD', 'enum': {0: 'HORN_CMD_OFF', 1:
+// 'HORN_CMD_ON'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset':
+// 0.0, 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order':
+// 'motorola', 'physical_unit': ''}
 void Horncmd78::set_p_horn_cmd(uint8_t* data,
-    Horn_cmd_78::Horn_cmdType horn_cmd) {
+                               Horn_cmd_78::Horn_cmdType horn_cmd) {
   int x = horn_cmd;
 
   Byte to_set(data + 0);
