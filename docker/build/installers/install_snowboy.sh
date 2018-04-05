@@ -19,6 +19,15 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+# First we need to upgrade libstdc++.so.6.0.19 to libstdc++.so.6.0.24 to be
+# compatible with the library.
+add-apt-repository -y ppa:ubuntu-toolchain-r/test
 apt-get update -y
-apt-get install -y glusterfs-client
+apt-get install -y --only-upgrade libstdc++
+
+wget https://apollocache.blob.core.windows.net/apollo-docker/snowboy.tar.gz
+tar xzf snowboy.tar.gz
+mkdir -p /usr/local/apollo
+mv snowboy /usr/local/apollo/

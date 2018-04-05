@@ -19,6 +19,21 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
-apt-get update -y
-apt-get install -y glusterfs-client
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+# Install gflags.
+wget https://github.com/gflags/gflags/archive/v2.2.0.tar.gz
+tar xzf v2.2.0.tar.gz
+mkdir gflags-2.2.0/build
+cd gflags-2.2.0/build
+CXXFLAGS="-fPIC" cmake ..
+make
+make install
+
+# Install glog which also depends on gflags.
+wget https://github.com/google/glog/archive/v0.3.5.tar.gz
+tar xzf v0.3.5.tar.gz
+cd glog-0.3.5
+./configure
+make CXXFLAGS='-Wno-sign-compare -Wno-unused-local-typedefs -D_START_GOOGLE_NAMESPACE_="namespace google {" -D_END_GOOGLE_NAMESPACE_="}" -DGOOGLE_NAMESPACE="google" -DHAVE_PTHREAD -DHAVE_SYS_UTSNAME_H -DHAVE_SYS_SYSCALL_H -DHAVE_SYS_TIME_H -DHAVE_STDINT_H -DHAVE_STRING_H -DHAVE_PREAD -DHAVE_FCNTL -DHAVE_SYS_TYPES_H -DHAVE_SYSLOG_H -DHAVE_LIB_GFLAGS -DHAVE_UNISTD_H'
+make install

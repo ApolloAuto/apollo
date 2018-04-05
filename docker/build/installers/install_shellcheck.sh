@@ -19,6 +19,6 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
+add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu trusty-backports universe"
 apt-get update -y
-apt-get install -y glusterfs-client
+apt-get install -y shellcheck

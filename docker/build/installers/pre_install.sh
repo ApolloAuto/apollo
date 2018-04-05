@@ -19,6 +19,13 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
+# Install common tools.
 apt-get update -y
-apt-get install -y glusterfs-client
+apt-get install -y \
+    apt-transport-https \
+    build-essential \
+    cmake \
+    curl \
+    software-properties-common \
+    wget \
+    zip
