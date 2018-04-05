@@ -62,7 +62,18 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
 
 double EvaluateQuinticPolynomial(
     const std::array<double, 6>& coeffs,
-    const double t, const uint32_t order) {
+    const double t, const uint32_t order,
+    const double end_t, const double end_value) {
+  if (t >= end_t) {
+    switch(order) {
+      case 0: {
+        return end_value;
+      }
+      default: {
+        return 0.0;
+      }
+    }
+  }
   switch (order) {
     case 0: {
       return ((((coeffs[5] * t + coeffs[4]) * t + coeffs[3]) * t +
@@ -92,7 +103,18 @@ double EvaluateQuinticPolynomial(
 
 double EvaluateQuarticPolynomial(
     const std::array<double, 5>& coeffs,
-    const double t, const uint32_t order) {
+    const double t, const uint32_t order,
+    const double end_t, const double end_value) {
+  if (t >= end_t) {
+    switch(order) {
+      case 0: {
+        return end_value;
+      }
+      default: {
+        return 0.0;
+      }
+    }
+  }
   switch (order) {
     case 0: {
       return (((coeffs[4] * t + coeffs[3]) * t + coeffs[2]) * t +
@@ -212,6 +234,7 @@ void GenerateFreeMoveTrajectoryPoints(
 }
 
 double AdjustSpeedByCurvature(const double speed, const double curvature) {
+  // TODO(kechxu) move some values to gflags
   if (std::abs(curvature) < 0.02) {
     return speed;
   }

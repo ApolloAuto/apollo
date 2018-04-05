@@ -117,14 +117,14 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   double time_to_lat_end_state = std::max(FLAGS_default_time_to_lat_end_state,
       ComputeTimeToLatEndConditionByVelocity(obstacle, lane_sequence));
-  // double time_to_lon_end_state =
-  //     ComputeTimeToLonEndCondition(obstacle, lane_sequence);
 
   std::array<double, 6> lateral_coeffs;
   std::array<double, 5> longitudinal_coeffs;
+  std::pair<double, double> lon_end_vt;
   GetLateralPolynomial(obstacle, lane_sequence, time_to_lat_end_state,
                        &lateral_coeffs);
-  GetLongitudinalPolynomial(obstacle, lane_sequence, &longitudinal_coeffs);
+  GetLongitudinalPolynomial(obstacle, lane_sequence,
+      &lon_end_vt, &longitudinal_coeffs);
 
   int lane_segment_index = 0;
   std::string lane_id =
@@ -140,21 +140,20 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
   double prev_lane_l = lane_l;
 
   size_t total_num = static_cast<size_t>(total_time / period);
-  size_t num_to_lat_end = static_cast<size_t>(time_to_lat_end_state / period);
   for (size_t i = 0; i < total_num; ++i) {
     double relative_time = static_cast<double>(i) * period;
     Eigen::Vector2d point;
     double theta = M_PI;
-    if (i < num_to_lat_end) {
-      lane_l = EvaluateQuinticPolynomial(lateral_coeffs, relative_time, 0);
-    } else {
-      lane_l = 0.0;
-    }
+    lane_l = EvaluateQuinticPolynomial(lateral_coeffs, relative_time, 0,
+        time_to_lat_end_state, 0.0);
+
     double curr_s =
-        EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 0);
+        EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 0,
+            lon_end_vt.second, lon_end_vt.first);
     double prev_s = (i > 0)
                         ? EvaluateQuarticPolynomial(
-                              longitudinal_coeffs, relative_time - period, 0)
+                              longitudinal_coeffs, relative_time - period, 0,
+                              lon_end_vt.second, lon_end_vt.first)
                         : 0.0;
     lane_s += std::max(0.0, (curr_s - prev_s));
     if (curr_s + FLAGS_double_precision < prev_s) {
@@ -169,9 +168,11 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
 
     prev_lane_l = lane_l;
     double lane_speed =
-        EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 1);
+        EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 1,
+            lon_end_vt.second, lon_end_vt.first);
     double lane_acc =
-        EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 2);
+        EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 2,
+            lon_end_vt.second, lon_end_vt.first);
 
     TrajectoryPoint trajectory_point;
     PathPoint path_point;
@@ -197,17 +198,15 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
 
 void MoveSequencePredictor::GetLongitudinalPolynomial(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
+    std::pair<double, double>* lon_end_vt,
     std::array<double, 5>* coefficients) {
   CHECK_GT(obstacle.history_size(), 0);
   CHECK_GT(lane_sequence.lane_segment_size(), 0);
   CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
-  std::pair<double, double> lon_end_state =
-      ComputeLonEndState(obstacle, lane_sequence);
-  double time_to_end_state = lon_end_state.second;
   const Feature& feature = obstacle.latest_feature();
   double theta = feature.velocity_heading();
   double v = feature.speed();
-  double a = feature.acc();
+  double a = 0.0;
 
   if (FLAGS_enable_lane_sequence_acc && lane_sequence.has_acceleration()) {
     a = lane_sequence.acceleration();
@@ -217,11 +216,13 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double s0 = 0.0;
   double ds0 = v * std::cos(theta - lane_heading);
   double dds0 = a * std::cos(theta - lane_heading);
-  double min_end_speed = std::min(FLAGS_still_obstacle_speed_threshold, ds0);
+  // double min_end_speed = std::min(FLAGS_still_obstacle_speed_threshold, ds0);
   // double ds1 = std::max(min_end_speed, ds0 + dds0 * time_to_end_state);
+  std::pair<double, double> lon_end_state =
+      ComputeLonEndState({s0, ds0, dds0}, lane_sequence);
   double ds1 = lon_end_state.first;
   double dds1 = 0.0;
-  double p = time_to_end_state;
+  double p = lon_end_state.second;  // time to lon end state
 
   coefficients->operator[](0) = s0;
   coefficients->operator[](1) = ds0;
@@ -232,6 +233,8 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   double p3 = p2 * p;
   coefficients->operator[](3) = b0 / p2 - b1 / 3.0 / p;
   coefficients->operator[](4) = -0.5 / p3 * b0 + 0.25 / p2 * b1;
+  lon_end_vt->first = lon_end_state.first;
+  lon_end_vt->second = lon_end_state.second;
 }
 
 void MoveSequencePredictor::GetLateralPolynomial(
@@ -278,30 +281,6 @@ void MoveSequencePredictor::GetLateralPolynomial(
   coefficients->operator[](5) = (6.0 * c0 - 3.0 * c1 + 0.5 * c2) / p2;
 }
 
-double MoveSequencePredictor::ComputeTimeToLatEndConditionBySampling(
-    const Obstacle& obstacle, const LaneSequence& lane_sequence) {
-  std::vector<double> candidate_times;
-  GenerateCandidateTimes(&candidate_times);
-  if (candidate_times.empty()) {
-    AWARN << "No candidate times found, use default value.";
-    return FLAGS_default_time_to_lat_end_state;
-  }
-  double t_best = candidate_times[0];
-  double cost_min = std::numeric_limits<double>::max();
-  for (double t : candidate_times) {
-    std::array<double, 6> lateral_coeffs;
-    std::array<double, 5> longitudinal_coeffs;
-    GetLateralPolynomial(obstacle, lane_sequence, t, &lateral_coeffs);
-    GetLongitudinalPolynomial(obstacle, lane_sequence, &longitudinal_coeffs);
-    double cost = Cost(t, lateral_coeffs, longitudinal_coeffs);
-    if (cost < cost_min) {
-      t_best = t;
-      cost_min = cost;
-    }
-  }
-  return t_best;
-}
-
 double MoveSequencePredictor::ComputeTimeToLatEndConditionByVelocity(
     const Obstacle& obstacle, const LaneSequence& lane_sequence) {
   CHECK_GT(obstacle.history_size(), 0);
@@ -324,34 +303,42 @@ double MoveSequencePredictor::ComputeTimeToLatEndConditionByVelocity(
 }
 
 std::pair<double, double> MoveSequencePredictor::ComputeLonEndState(
-    const Obstacle& obstacle, const LaneSequence& lane_sequence) {
+    const std::array<double, 3>& init_s, const LaneSequence& lane_sequence) {
   // TODO(kechxu) implement
-  double t = 5.0;
-  return {0.0, t};
-}
-
-double MoveSequencePredictor::Cost(
-    const double t, const std::array<double, 6>& lateral_coeffs,
-    const std::array<double, 5>& longitudinal_coeffs) {
-  double alpha = FLAGS_cost_alpha;
-  double left_end =
-      std::fabs(EvaluateQuinticPolynomial(lateral_coeffs, 0.0, 2));
-  double right_end = std::fabs(EvaluateQuinticPolynomial(lateral_coeffs, t, 2));
-  double normal_min_acc = std::min(left_end, right_end);
-  std::pair<double, double> mid_t_pair;
-  int solved = apollo::prediction::math_util::SolveQuadraticEquation(
-      {60.0 * lateral_coeffs[5], 24.0 * lateral_coeffs[4],
-       6.0 * lateral_coeffs[3]},
-      &mid_t_pair);
-  if (solved != 0) {
-    return alpha * normal_min_acc + t;
+  double max_kappa = 0.0;
+  double s_at_max_kappa = 0.0;
+  for (int i = 0; i < lane_sequence.path_point_size(); ++i) {
+    const PathPoint& path_point = lane_sequence.path_point(i);
+    if (path_point.s() < init_s[0] + FLAGS_double_precision) {
+      continue;
+    }
+    if (max_kappa < path_point.kappa()) {
+      max_kappa = path_point.kappa();
+      s_at_max_kappa = path_point.s();
+    }
   }
-  double mid_0 =
-      std::fabs(EvaluateQuinticPolynomial(lateral_coeffs, mid_t_pair.first, 2));
-  double mid_1 = std::fabs(
-      EvaluateQuinticPolynomial(lateral_coeffs, mid_t_pair.second, 2));
-  normal_min_acc = std::max(normal_min_acc, std::max(mid_0, mid_1));
-  return normal_min_acc + alpha * t;
+  double v_init = init_s[1];
+  if (max_kappa < 0.02) {
+    // Predict the obstacle will keep current speed
+    return {v_init, FLAGS_prediction_duration};
+  }
+  double v_end = apollo::prediction::predictor_util::AdjustSpeedByCurvature(
+      init_s[1], max_kappa);
+  if (v_end + FLAGS_double_precision > v_init) {
+    // Predict the obstacle will keep current speed
+    return {v_init, FLAGS_prediction_duration};
+  }
+  double s_offset = s_at_max_kappa - init_s[0];
+  double t = 2.0 * s_offset / (v_init + v_end);
+  if (t < FLAGS_double_precision) {
+    // constant deceleration
+  }
+  double acc = (v_end - v_init) / t;
+  if (acc < FLAGS_min_acc) {
+    t = v_init / FLAGS_min_acc;
+    return {FLAGS_still_obstacle_speed_threshold, t};
+  }
+  return {v_end, t};
 }
 
 void MoveSequencePredictor::GenerateCandidateTimes(

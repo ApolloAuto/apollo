@@ -68,7 +68,8 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
  */
 double EvaluateQuinticPolynomial(
     const std::array<double, 6>& coeffs,
-    const double t, const uint32_t order);
+    const double t, const uint32_t order,
+    const double end_t, const double end_value);
 
 /**
  * @brief Evaluate quartic polynomial.
@@ -78,7 +79,8 @@ double EvaluateQuinticPolynomial(
  */
 double EvaluateQuarticPolynomial(
     const std::array<double, 5>& coeffs,
-    const double t, const uint32_t order);
+    const double t, const uint32_t order,
+    const double end_t, const double end_value);
 
 }  // namespace math_util
 
