@@ -30,7 +30,7 @@ const int32_t Steeringcmd6d::ID = 0x6D;
 Steeringcmd6d::Steeringcmd6d() { Reset(); }
 
 uint32_t Steeringcmd6d::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) :modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -41,21 +41,23 @@ void Steeringcmd6d::UpdateData(uint8_t* data) {
 }
 
 void Steeringcmd6d::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) :you should check this manually
   position_value_ = 0.0;
   speed_limit_ = 0.0;
 }
 
-Steeringcmd6d* Steeringcmd6d::set_position_value(
-    double position_value) {
+Steeringcmd6d* Steeringcmd6d::set_position_value(double position_value) {
   position_value_ = position_value;
   return this;
- }
+}
 
-// config detail: {'name': 'POSITION_VALUE', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': True, 'physical_range': '[-2147483.648|2147483.647]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'radians'}
-void Steeringcmd6d::set_p_position_value(uint8_t* data,
-    double position_value) {
-  position_value = ProtocolData::BoundedValue(-2147483.648, 2147483.647, position_value);
+// config detail: {'name': 'POSITION_VALUE', 'offset': 0.0, 'precision': 0.001,
+// 'len': 32, 'is_signed_var': True, 'physical_range':
+// '[-2147483.648|2147483.647]', 'bit': 7, 'type': 'double', 'order':
+// 'motorola', 'physical_unit': 'radians'}
+void Steeringcmd6d::set_p_position_value(uint8_t* data, double position_value) {
+  position_value =
+      ProtocolData::BoundedValue(-2147483.648, 2147483.647, position_value);
   int x = position_value / 0.001000;
   uint8_t t = 0;
 
@@ -79,16 +81,15 @@ void Steeringcmd6d::set_p_position_value(uint8_t* data,
   to_set3.set_value(t, 0, 8);
 }
 
-
-Steeringcmd6d* Steeringcmd6d::set_speed_limit(
-    double speed_limit) {
+Steeringcmd6d* Steeringcmd6d::set_speed_limit(double speed_limit) {
   speed_limit_ = speed_limit;
   return this;
- }
+}
 
-// config detail: {'name': 'SPEED_LIMIT', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65.535]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
-void Steeringcmd6d::set_p_speed_limit(uint8_t* data,
-    double speed_limit) {
+// config detail: {'name': 'SPEED_LIMIT', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65.535]', 'bit': 39,
+// 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
+void Steeringcmd6d::set_p_speed_limit(uint8_t* data, double speed_limit) {
   speed_limit = ProtocolData::BoundedValue(0.0, 65.535, speed_limit);
   int x = speed_limit / 0.001000;
   uint8_t t = 0;

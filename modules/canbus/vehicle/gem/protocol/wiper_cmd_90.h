@@ -17,15 +17,15 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_WIPER_CMD_90_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_WIPER_CMD_90_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Wipercmd90 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                       ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -37,12 +37,23 @@ class Wipercmd90 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
-  // config detail: {'name': 'WIPER_CMD', 'enum': {0: 'WIPER_CMD_WIPERS_OFF', 1: 'WIPER_CMD_INTERMITTENT_1', 2: 'WIPER_CMD_INTERMITTENT_2', 3: 'WIPER_CMD_INTERMITTENT_3', 4: 'WIPER_CMD_INTERMITTENT_4', 5: 'WIPER_CMD_INTERMITTENT_5', 6: 'WIPER_CMD_LOW', 7: 'WIPER_CMD_HIGH'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|7]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'WIPER_CMD', 'enum': {0: 'WIPER_CMD_WIPERS_OFF', 1:
+  // 'WIPER_CMD_INTERMITTENT_1', 2: 'WIPER_CMD_INTERMITTENT_2', 3:
+  // 'WIPER_CMD_INTERMITTENT_3', 4: 'WIPER_CMD_INTERMITTENT_4', 5:
+  // 'WIPER_CMD_INTERMITTENT_5', 6: 'WIPER_CMD_LOW', 7: 'WIPER_CMD_HIGH'},
+  // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
+  // 'physical_range': '[0|7]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
+  // 'physical_unit': ''}
   Wipercmd90* set_wiper_cmd(Wiper_cmd_90::Wiper_cmdType wiper_cmd);
 
  private:
-
-  // config detail: {'name': 'WIPER_CMD', 'enum': {0: 'WIPER_CMD_WIPERS_OFF', 1: 'WIPER_CMD_INTERMITTENT_1', 2: 'WIPER_CMD_INTERMITTENT_2', 3: 'WIPER_CMD_INTERMITTENT_3', 4: 'WIPER_CMD_INTERMITTENT_4', 5: 'WIPER_CMD_INTERMITTENT_5', 6: 'WIPER_CMD_LOW', 7: 'WIPER_CMD_HIGH'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|7]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'name': 'WIPER_CMD', 'enum': {0: 'WIPER_CMD_WIPERS_OFF', 1:
+  // 'WIPER_CMD_INTERMITTENT_1', 2: 'WIPER_CMD_INTERMITTENT_2', 3:
+  // 'WIPER_CMD_INTERMITTENT_3', 4: 'WIPER_CMD_INTERMITTENT_4', 5:
+  // 'WIPER_CMD_INTERMITTENT_5', 6: 'WIPER_CMD_LOW', 7: 'WIPER_CMD_HIGH'},
+  // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
+  // 'physical_range': '[0|7]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
+  // 'physical_unit': ''}
   void set_p_wiper_cmd(uint8_t* data, Wiper_cmd_90::Wiper_cmdType wiper_cmd);
 
  private:

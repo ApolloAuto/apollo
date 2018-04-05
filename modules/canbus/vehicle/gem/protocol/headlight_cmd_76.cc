@@ -30,7 +30,7 @@ const int32_t Headlightcmd76::ID = 0x76;
 Headlightcmd76::Headlightcmd76() { Reset(); }
 
 uint32_t Headlightcmd76::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) :modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -40,7 +40,7 @@ void Headlightcmd76::UpdateData(uint8_t* data) {
 }
 
 void Headlightcmd76::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) :you should check this manually
   headlight_cmd_ = Headlight_cmd_76::HEADLIGHT_CMD_HEADLIGHTS_OFF;
 }
 
@@ -48,11 +48,15 @@ Headlightcmd76* Headlightcmd76::set_headlight_cmd(
     Headlight_cmd_76::Headlight_cmdType headlight_cmd) {
   headlight_cmd_ = headlight_cmd;
   return this;
- }
+}
 
-// config detail: {'name': 'HEADLIGHT_CMD', 'enum': {0: 'HEADLIGHT_CMD_HEADLIGHTS_OFF', 1: 'HEADLIGHT_CMD_LOW_BEAMS', 2: 'HEADLIGHT_CMD_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-void Headlightcmd76::set_p_headlight_cmd(uint8_t* data,
-    Headlight_cmd_76::Headlight_cmdType headlight_cmd) {
+// config detail: {'name': 'HEADLIGHT_CMD', 'enum': {0:
+// 'HEADLIGHT_CMD_HEADLIGHTS_OFF', 1: 'HEADLIGHT_CMD_LOW_BEAMS', 2:
+// 'HEADLIGHT_CMD_HIGH_BEAMS'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
+// False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 7, 'type': 'enum',
+// 'order': 'motorola', 'physical_unit': ''}
+void Headlightcmd76::set_p_headlight_cmd(
+    uint8_t* data, Headlight_cmd_76::Headlight_cmdType headlight_cmd) {
   int x = headlight_cmd;
 
   Byte to_set(data + 0);

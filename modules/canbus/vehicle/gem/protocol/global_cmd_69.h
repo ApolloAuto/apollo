@@ -17,15 +17,15 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_GLOBAL_CMD_69_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_GLOBAL_CMD_69_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Globalcmd69 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                        ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -37,25 +37,54 @@ class Globalcmd69 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
-  // config detail: {'name': 'PACMOD_ENABLE', 'enum': {0: 'PACMOD_ENABLE_CONTROL_DISABLED', 1: 'PACMOD_ENABLE_CONTROL_ENABLED'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Globalcmd69* set_pacmod_enable(Global_cmd_69::Pacmod_enableType pacmod_enable);
+  // config detail: {'name': 'PACMOD_ENABLE', 'enum': {0:
+  // 'PACMOD_ENABLE_CONTROL_DISABLED', 1: 'PACMOD_ENABLE_CONTROL_ENABLED'},
+  // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0,
+  // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola',
+  // 'physical_unit': ''}
+  Globalcmd69* set_pacmod_enable(
+      Global_cmd_69::Pacmod_enableType pacmod_enable);
 
-  // config detail: {'name': 'CLEAR_OVERRIDE', 'enum': {0: 'CLEAR_OVERRIDE_DON_T_CLEAR_ACTIVE_OVERRIDES', 1: 'CLEAR_OVERRIDE_CLEAR_ACTIVE_OVERRIDES'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 1, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Globalcmd69* set_clear_override(Global_cmd_69::Clear_overrideType clear_override);
+  // config detail: {'name': 'CLEAR_OVERRIDE', 'enum': {0:
+  // 'CLEAR_OVERRIDE_DON_T_CLEAR_ACTIVE_OVERRIDES', 1:
+  // 'CLEAR_OVERRIDE_CLEAR_ACTIVE_OVERRIDES'}, 'precision': 1.0, 'len': 1,
+  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 1,
+  // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  Globalcmd69* set_clear_override(
+      Global_cmd_69::Clear_overrideType clear_override);
 
-  // config detail: {'name': 'IGNORE_OVERRIDE', 'enum': {0: 'IGNORE_OVERRIDE_DON_T_IGNORE_USER_OVERRIDES', 1: 'IGNORE_OVERRIDE_IGNORE_USER_OVERRIDES'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 2, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  Globalcmd69* set_ignore_override(Global_cmd_69::Ignore_overrideType ignore_override);
+  // config detail: {'name': 'IGNORE_OVERRIDE', 'enum': {0:
+  // 'IGNORE_OVERRIDE_DON_T_IGNORE_USER_OVERRIDES', 1:
+  // 'IGNORE_OVERRIDE_IGNORE_USER_OVERRIDES'}, 'precision': 1.0, 'len': 1,
+  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 2,
+  // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  Globalcmd69* set_ignore_override(
+      Global_cmd_69::Ignore_overrideType ignore_override);
 
  private:
+  // config detail: {'name': 'PACMOD_ENABLE', 'enum': {0:
+  // 'PACMOD_ENABLE_CONTROL_DISABLED', 1: 'PACMOD_ENABLE_CONTROL_ENABLED'},
+  // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0,
+  // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola',
+  // 'physical_unit': ''}
+  void set_p_pacmod_enable(uint8_t* data,
+                           Global_cmd_69::Pacmod_enableType pacmod_enable);
 
-  // config detail: {'name': 'PACMOD_ENABLE', 'enum': {0: 'PACMOD_ENABLE_CONTROL_DISABLED', 1: 'PACMOD_ENABLE_CONTROL_ENABLED'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_pacmod_enable(uint8_t* data, Global_cmd_69::Pacmod_enableType pacmod_enable);
+  // config detail: {'name': 'CLEAR_OVERRIDE', 'enum': {0:
+  // 'CLEAR_OVERRIDE_DON_T_CLEAR_ACTIVE_OVERRIDES', 1:
+  // 'CLEAR_OVERRIDE_CLEAR_ACTIVE_OVERRIDES'}, 'precision': 1.0, 'len': 1,
+  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 1,
+  // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  void set_p_clear_override(uint8_t* data,
+                            Global_cmd_69::Clear_overrideType clear_override);
 
-  // config detail: {'name': 'CLEAR_OVERRIDE', 'enum': {0: 'CLEAR_OVERRIDE_DON_T_CLEAR_ACTIVE_OVERRIDES', 1: 'CLEAR_OVERRIDE_CLEAR_ACTIVE_OVERRIDES'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 1, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_clear_override(uint8_t* data, Global_cmd_69::Clear_overrideType clear_override);
-
-  // config detail: {'name': 'IGNORE_OVERRIDE', 'enum': {0: 'IGNORE_OVERRIDE_DON_T_IGNORE_USER_OVERRIDES', 1: 'IGNORE_OVERRIDE_IGNORE_USER_OVERRIDES'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 2, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_ignore_override(uint8_t* data, Global_cmd_69::Ignore_overrideType ignore_override);
+  // config detail: {'name': 'IGNORE_OVERRIDE', 'enum': {0:
+  // 'IGNORE_OVERRIDE_DON_T_IGNORE_USER_OVERRIDES', 1:
+  // 'IGNORE_OVERRIDE_IGNORE_USER_OVERRIDES'}, 'precision': 1.0, 'len': 1,
+  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 2,
+  // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  void set_p_ignore_override(
+      uint8_t* data, Global_cmd_69::Ignore_overrideType ignore_override);
 
  private:
   Global_cmd_69::Pacmod_enableType pacmod_enable_;
