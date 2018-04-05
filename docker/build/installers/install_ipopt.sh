@@ -19,6 +19,13 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
-apt-get update -y
-apt-get install -y glusterfs-client
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+apt-get install -y libblas-dev liblapack-dev gfortran
+
+wget https://www.coin-or.org/download/source/Ipopt/Ipopt-3.12.8.zip -O Ipopt-3.12.8.zip
+unzip Ipopt-3.12.8.zip
+cd Ipopt-3.12.8/ThirdParty/Mumps && bash get.Mumps
+cd ../..
+./configure --build=x86_64 && make all && make install && mkdir -p /usr/local/ipopt
+cp -r include /usr/local/ipopt/ && cp -r lib /usr/local/ipopt/

@@ -16,11 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
-if [[ -z $(which curl) ]]; then
-  echo "Install missing tools ..."
-  apt-get update -y
-  apt-get install -y curl
-fi
+# Fail on first error.
+set -e
 
 # Install Java8.
 add-apt-repository -y ppa:webupd8team/java

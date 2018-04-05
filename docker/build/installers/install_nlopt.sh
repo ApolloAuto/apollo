@@ -19,6 +19,13 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
-apt-get update -y
-apt-get install -y glusterfs-client
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2.tar.gz
+tar xzf nlopt-2.4.2.tar.gz
+cd nlopt-2.4.2
+./configure --enable-shared && make && make install
+
+# Remove unwanted libraries.
+rm /usr/local/lib/libnlopt.a
+rm /usr/local/lib/libnlopt.la
