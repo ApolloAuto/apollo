@@ -16,9 +16,10 @@
 # limitations under the License.
 ###############################################################################
 
-# Fail on first error.
-set -e
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
-apt-get update -y
-apt-get install -y glusterfs-client
+for installer in "$@"; do
+  echo "Start testing ${installer}"
+  docker build --build-arg INSTALLER=${installer} -f test_installer.dockerfile . \
+      2>&1 | tee ${installer}.log
+done
