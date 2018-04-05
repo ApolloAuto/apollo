@@ -29,13 +29,13 @@
 //         string model_name = "FrameClassifier";
 //         const ModelConfig* model_config = NULL;
 //         if (!config_manager->get_model_config(model_name, &model_config)) {
-//            XLOG(ERROR) << "not found model: " << model_name;
+//            AERROR << "not found model: " << model_name;
 //            return false;
 //         }
 //
 //         int int_value = 0;
 //         if (!model_config->get_value("my_param_name", &int_value)) {
-//             XLOG(ERROR) << "my_param_name not found."
+//             AERROR << "my_param_name not found."
 //             return false;
 //         }
 //         using int_value....
