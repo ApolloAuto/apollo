@@ -14,7 +14,9 @@
 # limitations under the License.
 ###############################################################################
 
-FROM ubuntu:14.04
+FROM nvidia/cuda:8.0-cudnn7-devel-ubuntu14.04
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Basic tools.
 COPY pre_install.sh /tmp/pre_install.sh

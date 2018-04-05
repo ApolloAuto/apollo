@@ -29,5 +29,7 @@ TIME=$(date +%Y%m%d_%H%M)
 
 TAG="${REPO}:dev-${ARCH}-${TIME}"
 
+# Fail on first error.
+set -e
 docker build -t ${TAG} -f ${DOCKERFILE} ${CONTEXT}
 echo "Built new image ${TAG}"
