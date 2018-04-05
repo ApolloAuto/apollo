@@ -17,27 +17,31 @@
 #ifndef MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_BRAKE_MOTOR_RPT_1_70_H_
 #define MODULES_CANBUS_VEHICLE_GEM_PROTOCOL_BRAKE_MOTOR_RPT_1_70_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace gem {
 
 class Brakemotorrpt170 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                             ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Brakemotorrpt170();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
-
-  // config detail: {'name': 'MOTOR_CURRENT', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': False, 'physical_range': '[0|4294967.295]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'amps'}
+  // config detail: {'name': 'MOTOR_CURRENT', 'offset': 0.0, 'precision': 0.001,
+  // 'len': 32, 'is_signed_var': False, 'physical_range': '[0|4294967.295]',
+  // 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'amps'}
   double motor_current(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'SHAFT_POSITION', 'offset': 0.0, 'precision': 0.001, 'len': 32, 'is_signed_var': True, 'physical_range': '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'radians'}
+  // config detail: {'name': 'SHAFT_POSITION', 'offset': 0.0, 'precision':
+  // 0.001, 'len': 32, 'is_signed_var': True, 'physical_range':
+  // '[-2147483.648|2147483.647]', 'bit': 39, 'type': 'double', 'order':
+  // 'motorola', 'physical_unit': 'radians'}
   double shaft_position(const std::uint8_t* bytes, const int32_t length) const;
 };
 

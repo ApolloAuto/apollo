@@ -31,16 +31,25 @@ Parkingbrakestatusrpt80::Parkingbrakestatusrpt80() {}
 const int32_t Parkingbrakestatusrpt80::ID = 0x80;
 
 void Parkingbrakestatusrpt80::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_parking_brake_status_rpt_80()->set_parking_brake_enabled(parking_brake_enabled(bytes, length));
+                                    ChassisDetail* chassis) const {
+  chassis->mutable_gem()
+      ->mutable_parking_brake_status_rpt_80()
+      ->set_parking_brake_enabled(parking_brake_enabled(bytes, length));
 }
 
-// config detail: {'name': 'parking_brake_enabled', 'enum': {0: 'PARKING_BRAKE_ENABLED_OFF', 1: 'PARKING_BRAKE_ENABLED_ON'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-Parking_brake_status_rpt_80::Parking_brake_enabledType Parkingbrakestatusrpt80::parking_brake_enabled(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'parking_brake_enabled', 'enum': {0:
+// 'PARKING_BRAKE_ENABLED_OFF', 1: 'PARKING_BRAKE_ENABLED_ON'},
+// 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0,
+// 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'motorola',
+// 'physical_unit': ''}
+Parking_brake_status_rpt_80::Parking_brake_enabledType
+Parkingbrakestatusrpt80::parking_brake_enabled(const std::uint8_t* bytes,
+                                               int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
-  Parking_brake_status_rpt_80::Parking_brake_enabledType ret =  static_cast<Parking_brake_status_rpt_80::Parking_brake_enabledType>(x);
+  Parking_brake_status_rpt_80::Parking_brake_enabledType ret =
+      static_cast<Parking_brake_status_rpt_80::Parking_brake_enabledType>(x);
   return ret;
 }
 }  // namespace gem

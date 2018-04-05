@@ -30,7 +30,7 @@ const int32_t Brakecmd6b::ID = 0x6B;
 Brakecmd6b::Brakecmd6b() { Reset(); }
 
 uint32_t Brakecmd6b::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) :modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -40,19 +40,19 @@ void Brakecmd6b::UpdateData(uint8_t* data) {
 }
 
 void Brakecmd6b::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) :you should check this manually
   brake_cmd_ = 0.0;
 }
 
-Brakecmd6b* Brakecmd6b::set_brake_cmd(
-    double brake_cmd) {
+Brakecmd6b* Brakecmd6b::set_brake_cmd(double brake_cmd) {
   brake_cmd_ = brake_cmd;
   return this;
- }
+}
 
-// config detail: {'name': 'BRAKE_CMD', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
-void Brakecmd6b::set_p_brake_cmd(uint8_t* data,
-    double brake_cmd) {
+// config detail: {'name': 'BRAKE_CMD', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7,
+// 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+void Brakecmd6b::set_p_brake_cmd(uint8_t* data, double brake_cmd) {
   brake_cmd = ProtocolData::BoundedValue(0.0, 1.0, brake_cmd);
   int x = brake_cmd / 0.001000;
   uint8_t t = 0;

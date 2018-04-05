@@ -30,7 +30,7 @@ const int32_t Accelcmd67::ID = 0x67;
 Accelcmd67::Accelcmd67() { Reset(); }
 
 uint32_t Accelcmd67::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) :modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -40,19 +40,19 @@ void Accelcmd67::UpdateData(uint8_t* data) {
 }
 
 void Accelcmd67::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) :you should check this manually
   accel_cmd_ = 0.0;
 }
 
-Accelcmd67* Accelcmd67::set_accel_cmd(
-    double accel_cmd) {
+Accelcmd67* Accelcmd67::set_accel_cmd(double accel_cmd) {
   accel_cmd_ = accel_cmd;
   return this;
- }
+}
 
-// config detail: {'name': 'ACCEL_CMD', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
-void Accelcmd67::set_p_accel_cmd(uint8_t* data,
-    double accel_cmd) {
+// config detail: {'name': 'ACCEL_CMD', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7,
+// 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+void Accelcmd67::set_p_accel_cmd(uint8_t* data, double accel_cmd) {
   accel_cmd = ProtocolData::BoundedValue(0.0, 1.0, accel_cmd);
   int x = accel_cmd / 0.001000;
   uint8_t t = 0;

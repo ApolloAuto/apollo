@@ -30,7 +30,7 @@ const int32_t Shiftcmd65::ID = 0x65;
 Shiftcmd65::Shiftcmd65() { Reset(); }
 
 uint32_t Shiftcmd65::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) :modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -40,19 +40,23 @@ void Shiftcmd65::UpdateData(uint8_t* data) {
 }
 
 void Shiftcmd65::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) :you should check this manually
   shift_cmd_ = Shift_cmd_65::SHIFT_CMD_PARK;
 }
 
-Shiftcmd65* Shiftcmd65::set_shift_cmd(
-    Shift_cmd_65::Shift_cmdType shift_cmd) {
+Shiftcmd65* Shiftcmd65::set_shift_cmd(Shift_cmd_65::Shift_cmdType shift_cmd) {
   shift_cmd_ = shift_cmd;
   return this;
- }
+}
 
-// config detail: {'description': 'FORWARD_is_also_LOW_on_vehicles_with_LOW/HIGH,_PARK_and_HIGH_only_available_on_certain_Vehicles', 'enum': {0: 'SHIFT_CMD_PARK', 1: 'SHIFT_CMD_REVERSE', 2: 'SHIFT_CMD_NEUTRAL', 3: 'SHIFT_CMD_FORWARD', 4: 'SHIFT_CMD_LOW'}, 'precision': 1.0, 'len': 8, 'name': 'SHIFT_CMD', 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|4]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+// config detail: {'description':
+// 'FORWARD_is_also_LOW_on_vehicles_with_LOW/HIGH,_PARK_and_HIGH_only_available_on_certain_Vehicles',
+// 'enum': {0: 'SHIFT_CMD_PARK', 1: 'SHIFT_CMD_REVERSE', 2: 'SHIFT_CMD_NEUTRAL',
+// 3: 'SHIFT_CMD_FORWARD', 4: 'SHIFT_CMD_LOW'}, 'precision': 1.0, 'len': 8,
+// 'name': 'SHIFT_CMD', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
+// '[0|4]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
 void Shiftcmd65::set_p_shift_cmd(uint8_t* data,
-    Shift_cmd_65::Shift_cmdType shift_cmd) {
+                                 Shift_cmd_65::Shift_cmdType shift_cmd) {
   int x = shift_cmd;
 
   Byte to_set(data + 0);
