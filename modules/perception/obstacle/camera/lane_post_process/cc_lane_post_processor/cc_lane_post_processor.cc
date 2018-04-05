@@ -834,15 +834,11 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
               origin_lateral_dist_object_id.end(),
               CompOriginLateralDistObjectID);
     int index_closest_left = -1;
-    int index_closest_right = -1;
     for (int k = 0; k < count_lane_objects; ++k) {
       if (origin_lateral_dist_object_id[k].first >= 0) {
         index_closest_left = k;
-        if (k < count_lane_objects - 1) {
-          index_closest_right = k + 1;
-        }
       } else {
-        continue;
+        break;
       }
     }
 
@@ -860,7 +856,9 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       float lateral_distance = origin_lateral_dist_object_id.at(i_l).first;
 
       int index = floor(lateral_distance * INVERSE_AVEAGE_LANE_WIDTH_METER);
-
+      if (index < 0) {
+        continue;
+      }
       // (*lane_objects)->at(object_id).spatial =
       //     static_cast<SpatialLabelType>(spatial_index);
       (*lane_objects)->at(object_id).spatial =
@@ -875,7 +873,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     }
 
     // for right-side lanes
-    int i_r = index_closest_right;
+    int i_r = index_closest_left+1;
     for (int spatial_index = 0; spatial_index < MAX_LANE_SPATIAL_LABELS;
          ++spatial_index, ++i_r) {
       if (i_r >= count_lane_objects) {
@@ -885,7 +883,9 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       float lateral_distance = -origin_lateral_dist_object_id.at(i_r).first;
 
       int index = floor(lateral_distance * INVERSE_AVEAGE_LANE_WIDTH_METER);
-
+      if (index < 0) {
+        continue;
+      }
       (*lane_objects)->at(object_id).spatial = static_cast<SpatialLabelType>(
           MAX_LANE_SPATIAL_LABELS + index);
 //      (*lane_objects)->at(object_id).spatial = static_cast<SpatialLabelType>(
