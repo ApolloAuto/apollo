@@ -139,7 +139,8 @@ class Teleop {
         perror("read():");
         exit(-1);
       }
-      printf("control command [%s]", control_command_.ShortDebugString().c_str());
+      AINFO << "control command : "
+            << control_command_.ShortDebugString().c_str();
       switch (c) {
         case KEYCODE_UP1:  // accelerate
         case KEYCODE_UP2:
@@ -152,8 +153,8 @@ class Teleop {
             throttle = GetCommand(throttle, FLAGS_throttle_inc_delta);
             control_command_.set_throttle(throttle);
           }
-          printf("Throttle = %.2f, Brake = %.2f\n", control_command_.throttle(),
-                 control_command_.brake());
+          AINFO << "Throttle = " << control_command_.throttle()
+                << ", Brake = " << control_command_.brake();
           break;
         case KEYCODE_DN1:  // decelerate
         case KEYCODE_DN2:
@@ -166,31 +167,31 @@ class Teleop {
             brake = GetCommand(brake, FLAGS_brake_inc_delta);
             control_command_.set_brake(brake);
           }
-          printf("Throttle = %.2f, Brake = %.2f\n", control_command_.throttle(),
-                 control_command_.brake());
+          AINFO << "Throttle = " << control_command_.throttle()
+                << ", Brake = " << control_command_.brake();
           break;
         case KEYCODE_LF1:  // left
         case KEYCODE_LF2:
           steering = control_command_.steering_target();
           steering = GetCommand(steering, FLAGS_steer_inc_delta);
           control_command_.set_steering_target(steering);
-          printf("Steering Target = %.2f\n", steering);
+          AINFO << "Steering Target = " << steering;
           break;
         case KEYCODE_RT1:  // right
         case KEYCODE_RT2:
           steering = control_command_.steering_target();
           steering = GetCommand(steering, -FLAGS_steer_inc_delta);
           control_command_.set_steering_target(steering);
-          printf("Steering Target = %.2f\n", steering);
+          AINFO << "Steering Target = " << steering;
           break;
         case KEYCODE_PKBK:  // hand brake
           parking_brake = !control_command_.parking_brake();
           control_command_.set_parking_brake(parking_brake);
-          printf("Parking Brake Toggled:%d\n", parking_brake);
+          AINFO << "Parking Brake Toggled: " << parking_brake;
           break;
         case KEYCODE_ESTOP:
           control_command_.set_brake(50.0);
-          printf("Estop Brake:%.2f\n", control_command_.brake());
+          AINFO << "Estop Brake : " << control_command_.brake();
           break;
         case KEYCODE_SETT1:  // set throttle
         case KEYCODE_SETT2:
@@ -201,8 +202,8 @@ class Teleop {
           level = c - KEYCODE_ZERO;
           control_command_.set_throttle(level * 10.0);
           control_command_.set_brake(0.0);
-          printf("Throttle = %.2f, Brake = %.2f\n", control_command_.throttle(),
-                 control_command_.brake());
+          AINFO << "Throttle = " << control_command_.throttle()
+                << ", Brake = " << control_command_.brake();
           break;
         case KEYCODE_SETG1:
         case KEYCODE_SETG2:
@@ -213,7 +214,7 @@ class Teleop {
           level = c - KEYCODE_ZERO;
           gear = GetGear(level);
           control_command_.set_gear_location(gear);
-          printf("Gear set to %d.\n", level);
+          AINFO << "Gear set to : " << level;
           break;
         case KEYCODE_SETB1:
         case KEYCODE_SETB2:
@@ -224,8 +225,8 @@ class Teleop {
           level = c - KEYCODE_ZERO;
           control_command_.set_throttle(0.0);
           control_command_.set_brake(level * 10.0);
-          printf("Throttle = %.2f, Brake = %.2f\n", control_command_.throttle(),
-                 control_command_.brake());
+          AINFO << "Throttle = " << control_command_.throttle()
+                << ", Brake = " << control_command_.brake();
           break;
         case KEYCODE_MODE:
           // read keyboard again
@@ -246,14 +247,17 @@ class Teleop {
           // printf("%X\n", c);
           break;
       }
-      printf("control command after switch [%s].", control_command_.ShortDebugString().c_str());
+      AINFO << "control command after switch : "
+            << control_command_.ShortDebugString().c_str();
     }  // keyboard_loop big while
     tcsetattr(kfd_, TCSANOW, &cooked_);
-    printf("keyboard_loop thread quited.\n");
+    AINFO << "keyboard_loop thread quited.";
     return;
   }  // end of keyboard loop thread
 
-  ControlCommand &control_command() { return control_command_; }
+  ControlCommand &control_command() {
+    return control_command_;
+  }
 
   Chassis::GearPosition GetGear(int32_t gear) {
     switch (gear) {
@@ -282,14 +286,14 @@ class Teleop {
     switch (int_action) {
       case 0:
         action = apollo::control::DrivingAction::RESET;
-        printf("SET Action RESET\n");
+        AINFO << "SET Action RESET";
         break;
       case 1:
         action = apollo::control::DrivingAction::START;
-        printf("SET Action START\n");
+        AINFO << "SET Action START";
         break;
       default:
-        printf("unknown action:%d, use default RESET\n", int_action);
+        AINFO << "unknown action: " << int_action << " use default RESET";
         break;
     }
     pad_msg->set_action(action);
@@ -327,7 +331,9 @@ class Teleop {
     control_command_.set_gear_location(Chassis::GEAR_INVALID);
   }
 
-  void OnChassis(const Chassis &chassis) { Send(); }
+  void OnChassis(const Chassis &chassis) {
+    Send();
+  }
 
   int32_t Start() {
     if (is_running_) {
@@ -356,7 +362,9 @@ class Teleop {
     }
   }
 
-  bool IsRunning() const { return is_running_; }
+  bool IsRunning() const {
+    return is_running_;
+  }
 
  private:
   std::unique_ptr<std::thread> keyboard_thread_;
@@ -364,7 +372,9 @@ class Teleop {
   bool is_running_ = false;
 };
 
-Teleop::Teleop() { ResetControlCommand(); }
+Teleop::Teleop() {
+  ResetControlCommand();
+}
 
 void signal_handler(int32_t signal_num) {
   if (signal_num != SIGINT) {
