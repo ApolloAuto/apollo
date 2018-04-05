@@ -850,7 +850,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     valid_lane_objects.reserve((*lane_objects)->size());
 
     // for left-side lanes
-    for (int spatial_index = 0; spatial_index <= index_closest_left; 
+    for (int spatial_index = 0; spatial_index <= index_closest_left;
            ++spatial_index) {
       if (spatial_index >= MAX_LANE_SPATIAL_LABELS) {
         break;
