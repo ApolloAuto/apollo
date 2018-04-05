@@ -25,6 +25,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <utility>
 #include "Eigen/Dense"
 
 #include "modules/common/math/kalman_filter.h"
@@ -61,7 +62,6 @@ class MoveSequencePredictor : public SequencePredictor {
 
   void GetLongitudinalPolynomial(const Obstacle& obstacle,
                                  const LaneSequence& lane_sequence,
-                                 const double time_to_end_state,
                                  std::array<double, 5>* coefficients);
 
   void GetLateralPolynomial(const Obstacle& obstacle,
@@ -69,11 +69,14 @@ class MoveSequencePredictor : public SequencePredictor {
                             const double time_to_end_state,
                             std::array<double, 6>* coefficients);
 
-  double ComputeTimeToLaneCenterBySampling(const Obstacle& obstacle,
-                                           const LaneSequence& lane_sequence);
+  double ComputeTimeToLatEndConditionBySampling(
+      const Obstacle& obstacle, const LaneSequence& lane_sequence);
 
-  double ComputeTimeToLaneCenterByVelocity(const Obstacle& obstacle,
-                                           const LaneSequence& lane_sequence);
+  double ComputeTimeToLatEndConditionByVelocity(
+      const Obstacle& obstacle, const LaneSequence& lane_sequence);
+
+  std::pair<double, double> ComputeLonEndState(
+      const Obstacle& obstacle, const LaneSequence& lane_sequence);
 
   double Cost(const double t, const std::array<double, 6>& lateral_coeffs,
               const std::array<double, 5>& longitudinal_coeffs);
