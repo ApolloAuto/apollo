@@ -58,7 +58,17 @@ namespace perception {
 #define MIN_BETWEEN_LANE_DISTANCE 2.5
 #endif
 
+#ifndef AVEAGE_LANE_WIDTH_METER
+#define AVEAGE_LANE_WIDTH_METER 3.7
+#endif
+
+
+
 typedef float ScalarType;
+
+
+constexpr ScalarType INVERSE_AVEAGE_LANE_WIDTH_METER
+                     = 1.0 / AVEAGE_LANE_WIDTH_METER;
 
 #ifndef INF_NON_MASK_POINT_X
 #define INF_NON_MASK_POINT_X 10000
