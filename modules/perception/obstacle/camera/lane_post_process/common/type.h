@@ -210,17 +210,6 @@ struct CubicCurve {
   float d;
 };
 
-/*
-struct L3LaneInfo {
-  int lane_id;
-  int left_idx;
-  int right_idx;
-  float lane_width;
-  int carleft_idx;
-  int carright_idx;
-};
-*/
-
 struct LaneObject {
   LaneObject() {
     model.setZero();
@@ -286,23 +275,6 @@ struct LaneObject {
     }
   }
 };
-
-/*
-// struct for L3 Lane information
-struct L3LaneLine {
-  SpatialLabelType spatial;
-  SemanticLabelType semantic;
-  L3CubicCurve pos_curve;
-  L3CubicCurve img_curve;
-};
-
-struct RoadInfo {
-  double timestamp = 0.0;
-  int32_t seq_num = 0;
-  std::vector<L3LaneLine> lane_line_vec;
-  std::vector<L3LaneInfo> lane_vec;
-};
-*/
 
 typedef std::vector<LaneObject> LaneObjects;
 typedef std::shared_ptr<LaneObjects> LaneObjectsPtr;
