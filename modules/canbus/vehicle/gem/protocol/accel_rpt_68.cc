@@ -31,14 +31,20 @@ Accelrpt68::Accelrpt68() {}
 const int32_t Accelrpt68::ID = 0x68;
 
 void Accelrpt68::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_accel_rpt_68()->set_manual_input(manual_input(bytes, length));
-  chassis->mutable_gem()->mutable_accel_rpt_68()->set_commanded_value(commanded_value(bytes, length));
-  chassis->mutable_gem()->mutable_accel_rpt_68()->set_output_value(output_value(bytes, length));
+                       ChassisDetail* chassis) const {
+  chassis->mutable_gem()->mutable_accel_rpt_68()->set_manual_input(
+      manual_input(bytes, length));
+  chassis->mutable_gem()->mutable_accel_rpt_68()->set_commanded_value(
+      commanded_value(bytes, length));
+  chassis->mutable_gem()->mutable_accel_rpt_68()->set_output_value(
+      output_value(bytes, length));
 }
 
-// config detail: {'name': 'manual_input', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
-double Accelrpt68::manual_input(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'manual_input', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 7,
+// 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+double Accelrpt68::manual_input(const std::uint8_t* bytes,
+                                int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
@@ -51,8 +57,11 @@ double Accelrpt68::manual_input(const std::uint8_t* bytes, int32_t length) const
   return ret;
 }
 
-// config detail: {'name': 'commanded_value', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
-double Accelrpt68::commanded_value(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'commanded_value', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 23,
+// 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+double Accelrpt68::commanded_value(const std::uint8_t* bytes,
+                                   int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
@@ -65,8 +74,11 @@ double Accelrpt68::commanded_value(const std::uint8_t* bytes, int32_t length) co
   return ret;
 }
 
-// config detail: {'name': 'output_value', 'offset': 0.0, 'precision': 0.001, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
-double Accelrpt68::output_value(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'name': 'output_value', 'offset': 0.0, 'precision': 0.001,
+// 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 39,
+// 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+double Accelrpt68::output_value(const std::uint8_t* bytes,
+                                int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
