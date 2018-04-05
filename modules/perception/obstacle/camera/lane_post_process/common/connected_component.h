@@ -39,8 +39,6 @@ namespace perception {
 #define NUM_RESERVE_EDGES 6
 #endif
 
-#define CUDA_CC false
-
 class DisjointSet {
  public:
   DisjointSet() : subset_num_(0) {}
@@ -302,29 +300,9 @@ class ConnectedComponentGenerator {
   ConnectedComponentGenerator(int image_width, int image_height);
   ConnectedComponentGenerator(int image_width, int image_height, cv::Rect roi);
 
-  ~ConnectedComponentGenerator() {
-#if CUDA_CC
-    cudaFree(label_array_);
-    cudaFreeArray(img_array_);
-
-    cudaError_t cuda_err = cudaGetLastError();
-    if (cuda_err != cudaSuccess) {
-      AERROR << "failed to release label_array and img_array with CUDA: "
-             << cudaGetErrorString(cuda_err);
-    }
-
-    free(labels_);
-#endif
-  }
-
   bool FindConnectedComponents(
       const cv::Mat& lane_map,
       std::vector<std::shared_ptr<ConnectedComponent>>* cc);
-
- private:
-#if CUDA_CC
-  bool BlockUnionFind(const unsigned char* img);
-#endif
 
  private:
   size_t total_pix_;
@@ -338,14 +316,8 @@ class ConnectedComponentGenerator {
   int roi_x_max_;
   int roi_y_max_;
 
-#if CUDA_CC
-  int* labels_;
-  cudaArray* img_array_;
-  int* label_array_;
-#else
   DisjointSet labels_;
   std::vector<int> frame_label_;
-#endif
   std::vector<int> root_map_;
 };
 

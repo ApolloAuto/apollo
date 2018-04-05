@@ -34,14 +34,6 @@
 namespace apollo {
 namespace perception {
 
-#ifndef UF_BLOCK_WIDTH
-#define UF_BLOCK_WIDTH 32
-#endif
-
-#ifndef UF_BLOCK_HEIGHT
-#define UF_BLOCK_HEIGHT 16
-#endif
-
 #ifndef MAX_GROUP_PREDICTION_MARKER_NUM
 #define MAX_GROUP_PREDICTION_MARKER_NUM 10
 #endif

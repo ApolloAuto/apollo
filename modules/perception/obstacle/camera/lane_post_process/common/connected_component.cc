@@ -584,7 +584,6 @@ void ConnectedComponent::SplitContourHorizontal(int len_split,
   }
 }
 
-// version 2
 void ConnectedComponent::SplitContour(int split_len) {
   if (bbox_.split == BoundingBoxSplitType::NONE) {
     return;
@@ -631,7 +630,6 @@ void ConnectedComponent::Process(ScalarType split_siz, int split_len) {
   }
 }
 
-/** split a CC into several smaller ones **/
 vector<int> ConnectedComponent::GetSplitRanges(int siz, int len_split) {
   if (siz <= 0) {
     AERROR << "siz should be a positive number: " << siz;
@@ -654,7 +652,7 @@ vector<int> ConnectedComponent::GetSplitRanges(int siz, int len_split) {
   return lens;
 }
 
-/* connected component generator */
+/** connected component generator **/
 ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
                                                          int image_height)
     : image_width_(image_width),
@@ -667,19 +665,8 @@ ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
       roi_y_max_(image_height - 1) {
   total_pix_ =
       static_cast<size_t>(image_width_) * static_cast<size_t>(image_height_);
-#if CUDA_CC
-  cudaChannelFormatDesc uchar_desc = cudaCreateChannelDesc<unsigned char>();
-  cudaMallocArray(&img_array_, &uchar_desc, static_cast<size_t>(width_),
-                  static_cast<size_t>(height_));
-  cudaBindTextureToArray(img_tex, img_array_, uchar_desc);
-  cudaMalloc(
-      reinterpret_cast<void**>(&label_array_),
-      static_cast<size_t>(width_) * static_cast<size_t>(height_) * sizeof(int));
-  labels_ = static_cast<int*>(malloc(total_pix_ * sizeof(int)));
-#else
   labels_.Init(total_pix_);
   frame_label_.resize(total_pix_, -1);
-#endif
   root_map_.reserve(total_pix_);
 }
 
@@ -709,28 +696,8 @@ ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
            << image_height_;
   }
   total_pix_ = static_cast<size_t>(width_) * static_cast<size_t>(height_);
-#if _CUDA_CC
-  cudaChannelFormatDesc uchar_desc = cudaCreateChannelDesc<unsigned char>();
-  img_array_ = NULL;
-  cudaMallocArray(&img_array_, &uchar_desc, static_cast<size_t>(width_),
-                  static_cast<size_t>(height_));
-  cudaBindTextureToArray(img_tex, img_array_, uchar_desc);
-
-  cudaMalloc(
-      reinterpret_cast<void**>(&label_array_),
-      static_cast<size_t>(width_) * static_cast<size_t>(height_) * sizeof(int));
-
-  cudaError_t cuda_err = cudaGetLastError();
-  if (cuda_err != cudaSuccess) {
-    AERROR << "failed to initialize 'img_array' and 'label_array' with CUDA: "
-           << cudaGetErrorString(cuda_err);
-  }
-
-  labels_ = static_cast<int*>(malloc(total_pix_ * sizeof(int)));
-#else
   labels_.Init(total_pix_);
   frame_label_.resize(total_pix_, -1);
-#endif
   root_map_.reserve(total_pix_);
 }
 
@@ -853,7 +820,7 @@ bool ConnectedComponentGenerator::FindConnectedComponents(
       }
     }  // end for x
   }    // end for y
-  AINFO << "cc number = " << cc_count;
+  AINFO << "The number of cc = " << cc_count;
 
   return true;
 }

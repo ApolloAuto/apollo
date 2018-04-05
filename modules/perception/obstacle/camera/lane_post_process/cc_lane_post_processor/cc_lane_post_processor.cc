@@ -208,8 +208,15 @@ bool CCLanePostProcessor::Init() {
 
   time_stamp_ = 0.0;
   frame_id_ = 0;
+
+#if CUDA_CC
+  cc_generator_.reset(
+      new ConnectedComponentGeneratorGPU(image_width_, image_height_, roi_));
+#else
   cc_generator_.reset(
       new ConnectedComponentGenerator(image_width_, image_height_, roi_));
+#endif
+
   cur_frame_.reset(new LaneFrame);
 
   is_init_ = true;

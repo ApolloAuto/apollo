@@ -38,6 +38,8 @@
 namespace apollo {
 namespace perception {
 
+#define CUDA_CC false
+
 struct CCLanePostProcessorOptions {
   SpaceType space_type;
   ScalarType lane_map_conf_thresh;
@@ -104,7 +106,13 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   double time_stamp_ = 0.0;
   int frame_id_ = -1;
+
+#if CUDA_CC
+  std::shared_ptr<ConnectedComponentGeneratorGPU> cc_generator_;
+#else
   std::shared_ptr<ConnectedComponentGenerator> cc_generator_;
+#endif
+
   std::shared_ptr<LaneFrame> cur_frame_;
   LaneInstancesPtr cur_lane_instances_;
 
