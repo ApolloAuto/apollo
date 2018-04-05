@@ -28,4 +28,4 @@ apt-get install -y \
     curl \
     software-properties-common \
     wget \
-    zip
+    unzip
