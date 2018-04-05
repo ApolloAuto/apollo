@@ -19,6 +19,14 @@
 # Fail on first error.
 set -e
 
-apt-get install -y supervisor
-# Add supervisord config file
-echo_supervisord_conf > /etc/supervisord.conf
+# Create required soft links.
+ln -rs /usr/lib/libprofiler.so.0 /usr/lib/libprofiler.so
+ln -rs /usr/lib/libtcmalloc_and_profiler.so.4 /usr/lib/libtcmalloc_and_profiler.so
+# https://stackoverflow.com/questions/25193161/chfn-pam-system-error-intermittently-in-docker-hub-builds
+ln -s -f /bin/true /usr/bin/chfn
+
+# Clean up.
+apt-get clean autoclean
+apt-get autoremove -y
+rm -fr /var/lib/apt/lists/*
+rm -rf /tmp/*
