@@ -198,15 +198,15 @@ Chassis GemController::chassis() {
     Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
 
     if (chassis_detail.gem().shift_rpt_66().output_value() ==
-        Shift_cmd_65::SHIFT_CMD_NEUTRAL) {
+        Shift_rpt_66::OUTPUT_VALUE_NEUTRAL) {
       gear_pos = Chassis::GEAR_NEUTRAL;
     }
     if (chassis_detail.gem().shift_rpt_66().output_value() ==
-        Shift_cmd_65::SHIFT_CMD_REVERSE) {
+        Shift_rpt_66::OUTPUT_VALUE_REVERSE) {
       gear_pos = Chassis::GEAR_REVERSE;
     }
     if (chassis_detail.gem().shift_rpt_66().output_value() ==
-        Shift_cmd_65::SHIFT_CMD_FORWARD) {
+        Shift_rpt_66::OUTPUT_VALUE_FORWARD) {
       gear_pos = Chassis::GEAR_DRIVE;
     }
 
@@ -474,7 +474,9 @@ void GemController::SetTurningSignal(const ControlCommand& command) {
   }
 }
 
-void GemController::ResetProtocol() { message_manager_->ResetSendMessages(); }
+void GemController::ResetProtocol() {
+  message_manager_->ResetSendMessages();
+}
 
 bool GemController::CheckChassisError() {
   // TODO(QiL) : implement it here
