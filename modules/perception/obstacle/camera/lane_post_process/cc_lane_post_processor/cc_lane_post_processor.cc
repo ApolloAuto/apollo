@@ -768,7 +768,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
         ADEBUG << "Lane " << cross_over_lane_object_id
                << "crosses over cur_lane. Eliminated.";
         for (size_t i = 0; i < cur_object.pos.size(); ++i) {
-          ADEBUG << "[" << cur_object.pos[i].x() 
+          ADEBUG << "[" << cur_object.pos[i].x()
                  << ", " << cur_object.pos[i].y()
                  << "]";
         }
@@ -786,8 +786,6 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
           }
         }
       }
-      // right most point - C0 < 2.5
-      // *** TO DO *** use C0 or closest_x point for the distance measure.
       if ((left_lane_id >= 0) &&
           (origin_lateral_dist_object_id.at(left_lane_id).first -
                cur_object.lateral_distance <
@@ -810,8 +808,6 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
           }
         }
       }
-      // left most point - C0 < 2.5
-      // *** TO DO *** use C0 or closest_x point for the distance measure.
       if ((right_lane_id >= 0) &&
           (cur_object.lateral_distance -
                origin_lateral_dist_object_id.at(right_lane_id).first <
@@ -825,7 +821,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
 
       // accept the new lane object
       (*lane_objects)->push_back(cur_object);
-      // AINFO << "Lane ID: " << count_lane_objects 
+      // AINFO << "Lane ID: " << count_lane_objects
       //       << ", C0: " << cur_object.lateral_distance;
       origin_lateral_dist_object_id.push_back(
           std::make_pair(cur_object.lateral_distance, count_lane_objects++));
@@ -833,7 +829,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     }
 
     // determine spatial label of lane object
-    // Sort lanes with C0 
+    // Sort lanes with C0
     std::sort(origin_lateral_dist_object_id.begin(),
               origin_lateral_dist_object_id.end(),
               CompOriginLateralDistObjectID);
@@ -842,8 +838,8 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     for (int k = 0; k < count_lane_objects; ++k) {
       if (origin_lateral_dist_object_id[k].first >= 0) {
         index_closest_left = k;
-        if (k > 0) {
-          index_closest_right = k+1;
+        if (k < count_lane_objects - 1) {
+          index_closest_right = k + 1;
         }
       } else {
         continue;
@@ -854,7 +850,8 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     valid_lane_objects.reserve((*lane_objects)->size());
 
     // for left-side lanes
-    for (int spatial_index = 0; spatial_index <= index_closest_left; ++spatial_index) {
+    for (int spatial_index = 0; spatial_index <= index_closest_left; 
+           ++spatial_index) {
       if (spatial_index >= MAX_LANE_SPATIAL_LABELS) {
         break;
       }
