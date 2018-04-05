@@ -130,12 +130,11 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <SyncedMemor
             int start_axis) {
     int origin_width = frame.cols;
     int origin_height = frame.rows;
-    
+
     const dim3 block(32, 8);
     int width = dst->height();
     int height = dst->channels();
     int channel = dst->width();
-    ADEBUG << width << "|" << height << "|" << channel;
     float fx = (float) origin_width / (float) width;
     float fy = (float) origin_height / (float) height;
     const dim3 grid(divup(width, block.x), divup(height, block.y));
@@ -154,7 +153,7 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <SyncedMemor
             const float scale) {
     int origin_width = frame.cols;
     int origin_height = frame.rows;
-    
+
     const dim3 block(32, 8);
     int width = dst->height();
     int height = dst->channels();
