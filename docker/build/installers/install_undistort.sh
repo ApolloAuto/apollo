@@ -19,6 +19,9 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
-apt-get update -y
-apt-get install -y glusterfs-client
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+wget https://apollocache.blob.core.windows.net/apollo-docker/undistort.tar.gz
+tar xzf undistort.tar.gz
+mkdir -p /usr/local/apollo
+mv undistort /usr/local/apollo/

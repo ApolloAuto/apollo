@@ -19,6 +19,9 @@
 # Fail on first error.
 set -e
 
-add-apt-repository -y ppa:gluster/glusterfs-3.10
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 apt-get update -y
-apt-get install -y glusterfs-client
+apt-get install -y yarn
