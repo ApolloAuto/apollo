@@ -141,15 +141,16 @@ void YoloCameraDetector::load_intrinsic(
 
   offset_y_ = static_cast<int>(offset_ratio * image_height_ + .5);
   float roi_ratio = cropped_ratio * image_height_ / image_width_;
-  width_ = static_cast<int>(resized_width + aligned_pixel / 2) / aligned_pixel *
-           aligned_pixel;
+  width_ = static_cast<int>(resized_width + aligned_pixel / 2) /
+      aligned_pixel * aligned_pixel;
   height_ = static_cast<int>(width_ * roi_ratio + aligned_pixel / 2) /
-            aligned_pixel * aligned_pixel;
+      aligned_pixel * aligned_pixel;
   ADEBUG << "image_height=" << image_height_ << ", "
          << "image_width=" << image_width_ << ", "
          << "roi_ratio=" << roi_ratio;
   ADEBUG << "offset_y=" << offset_y_ << ", height=" << height_
          << ", width=" << width_;
+
   min_2d_height_ /= height_;
 
   int roi_w = image_width_;
@@ -186,8 +187,6 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
 
   vector<string> input_names;
   vector<string> output_names;
-  // init Net
-
   input_names.push_back(net_param.input_blob());
   output_names.push_back(net_param.loc_blob());
   output_names.push_back(net_param.obj_blob());

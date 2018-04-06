@@ -25,8 +25,8 @@
 #include "opencv2/opencv.hpp"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "modules/common/log.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/base_type.h"
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_TYPE_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_TYPE_H_
@@ -36,14 +36,6 @@ namespace perception {
 
 #ifndef MAX_LANE_HISTORY
 #define MAX_LANE_HISTORY 10
-#endif
-
-#ifndef UF_BLOCK_WIDTH
-#define UF_BLOCK_WIDTH 32
-#endif
-
-#ifndef UF_BLOCK_HEIGHT
-#define UF_BLOCK_HEIGHT 16
 #endif
 
 #ifndef MAX_GROUP_PREDICTION_MARKER_NUM
@@ -65,11 +57,6 @@ namespace perception {
 #ifndef AVEAGE_LANE_WIDTH_METER
 #define AVEAGE_LANE_WIDTH_METER 3.7
 #endif
-
-
-
-typedef float ScalarType;
-
 
 constexpr ScalarType INVERSE_AVEAGE_LANE_WIDTH_METER
                      = 1.0 / AVEAGE_LANE_WIDTH_METER;
@@ -214,7 +201,7 @@ struct LaneInstance {
   }
 };
 
-struct L3CubicCurve {
+struct CubicCurve {
   float x_start;
   float x_end;
   float a;
@@ -223,6 +210,7 @@ struct L3CubicCurve {
   float d;
 };
 
+/*
 struct L3LaneInfo {
   int lane_id;
   int left_idx;
@@ -231,6 +219,7 @@ struct L3LaneInfo {
   int carleft_idx;
   int carright_idx;
 };
+*/
 
 struct LaneObject {
   LaneObject() {
@@ -256,9 +245,9 @@ struct LaneObject {
   PolyModel model;
   ScalarType lateral_distance = 0.0;
 
-  L3CubicCurve pos_curve;
-  L3CubicCurve img_curve;
-  L3LaneInfo lane_info;
+  CubicCurve pos_curve;
+  CubicCurve img_curve;
+  // L3LaneInfo lane_info;
   double timestamp = 0.0;
   int32_t seq_num = 0;
 
@@ -298,6 +287,7 @@ struct LaneObject {
   }
 };
 
+/*
 // struct for L3 Lane information
 struct L3LaneLine {
   SpatialLabelType spatial;
@@ -312,6 +302,7 @@ struct RoadInfo {
   std::vector<L3LaneLine> lane_line_vec;
   std::vector<L3LaneInfo> lane_vec;
 };
+*/
 
 typedef std::vector<LaneObject> LaneObjects;
 typedef std::shared_ptr<LaneObjects> LaneObjectsPtr;
