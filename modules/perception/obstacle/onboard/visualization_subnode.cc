@@ -104,7 +104,7 @@ bool VisualizationSubnode::InitInternal() {
   if (motion_event_id_ != -1) {
       motion_service_ = dynamic_cast<MotionService*>(
         DAGStreaming::GetSubnodeByName("MotionService"));
-    if (motion_service_ == NULL) {
+    if (motion_service_ == nullptr) {
       AERROR << "motion service not inited";
       return false;
     }
@@ -247,6 +247,7 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
                                 (*(objs->camera_frame_supplement)));
   } else if (event.event_id == motion_event_id_) {
 //    AINFO << "Vis_subnode: motion_event_id_" << motion_event_id_;
+    // TODO(gchen-apollo): add lock to read motion_buffer
     MotionBufferPtr motion_buffer = motion_service_->GetMotionBuffer();
     if (motion_buffer == nullptr) {
       AINFO << "motion_buffer is null";
