@@ -43,6 +43,9 @@ class DiscretizedTrajectory : public Trajectory {
   explicit DiscretizedTrajectory(
       const std::vector<common::TrajectoryPoint>& trajectory_points);
 
+  void SetTrajectoryPoints(
+      const std::vector<common::TrajectoryPoint>& trajectory_points);
+
   virtual ~DiscretizedTrajectory() = default;
 
   common::TrajectoryPoint Evaluate(const double relative_time) const override;

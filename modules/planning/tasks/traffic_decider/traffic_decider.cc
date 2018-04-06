@@ -151,7 +151,7 @@ Status TrafficDecider::Execute(Frame *frame,
 
   for (const auto &rule_config : rule_configs_.config()) {
     if (!rule_config.enabled()) {
-      AINFO << "Rule " << rule_config.rule_id() << " not enabled";
+      ADEBUG << "Rule " << rule_config.rule_id() << " not enabled";
       continue;
     }
     auto rule = s_rule_factory.CreateObject(rule_config.rule_id(), rule_config);
