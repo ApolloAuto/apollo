@@ -149,3 +149,8 @@ DEFINE_string(cc_lane_post_processor_config_file,
 DEFINE_string(probabilistic_fusion_config_file,
               "modules/perception/model/probabilistic_fusion_config.pb.txt",
               "The config file of probabilistic_fusion.");
+DEFINE_string(yolo_config_filename, "config.pt", "Yolo config filename.");
+DEFINE_string(
+    yolo_camera_detector_config,
+    "modules/perception/model/camera/yolo_camera_detector_config.pb.txt",
+    "Yolo camera detector config filename.");
