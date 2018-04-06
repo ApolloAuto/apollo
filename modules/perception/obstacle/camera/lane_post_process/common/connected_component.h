@@ -24,9 +24,10 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <iostream>
 
-#include "modules/common/log.h"
-#include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
+// #include "modules/common/log.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/base_type.h"
 
 namespace apollo {
 namespace perception {
@@ -184,6 +185,35 @@ class ConnectedComponent {
 
   // CC pixels
   void AddPixel(int x, int y);
+  /*
+  void AddPixel(int x, int y) {
+    if (pixel_count_ == 0) {
+      // new bounding box
+      bbox_.x_min = x;  // x_min
+      bbox_.y_min = y;  // y_min
+      bbox_.x_max = x;  // x_max
+      bbox_.y_max = y;  // y_max
+    } else {
+      // extend bounding box if necessary
+      if (x < bbox_.x_min) {
+        bbox_.x_min = x;
+      }
+      if (x > bbox_.x_max) {
+        bbox_.x_max = x;
+      }
+      if (y < bbox_.y_min) {
+        bbox_.y_min = y;
+      }
+      if (y > bbox_.y_max) {
+        bbox_.y_max = y;
+      }
+    }
+
+    pixels_->push_back(cv::Point(x, y));
+    pixel_count_++;
+  }
+  */
+
   int GetPixelCount() const { return pixel_count_; }
   std::shared_ptr<const std::vector<cv::Point2i>> GetPixels() const {
     return pixels_;

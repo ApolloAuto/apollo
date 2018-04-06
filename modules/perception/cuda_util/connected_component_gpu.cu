@@ -16,13 +16,15 @@
 
 #include "connected_component_gpu.h"
 
-#include <iostream>
-
 #include "texture.h"
 #include "block_uf.h"
 
 namespace apollo {
 namespace perception {
+
+using std::shared_ptr;
+using std::unordered_set;
+using std::vector;
 
 ConnectedComponentGeneratorGPU::ConnectedComponentGeneratorGPU(int image_width,
                                                                int image_height)
@@ -181,7 +183,7 @@ bool ConnectedComponentGeneratorGPU::FindConnectedComponents(
   cc->clear();
 
   const unsigned char* img =
-      lane_map.data + _roi_y_min * _image_width + _roi_x_min;
+      lane_map.data + roi_y_min_ * image_width_ + roi_x_min_;
 
   BlockUnionFind(img);
 
@@ -200,9 +202,9 @@ bool ConnectedComponentGeneratorGPU::FindConnectedComponents(
           return false;
         }
         if (root_map_[curt_label] != -1) {
-          cc[root_map_[curt_label]]->addPixel(x, y);
+          cc->at(root_map_[curt_label])->AddPixel(x, y);
         } else {
-          cc.push_back(std::make_shared<ConnectedComponent>(x, y));
+          cc->push_back(std::make_shared<ConnectedComponent>(x, y));
           root_map_[curt_label] = cc_count++;
         }
       }

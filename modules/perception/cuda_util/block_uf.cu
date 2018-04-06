@@ -40,6 +40,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <iostream>
+
 #include "block_uf.h"
 #include "texture.h"
 

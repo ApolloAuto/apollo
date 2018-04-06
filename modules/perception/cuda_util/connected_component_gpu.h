@@ -19,9 +19,11 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-
-#include <vector>
 #include <opencv2/core/core.hpp>
+
+#include <memory>
+#include <vector>
+#include <iostream>
 
 #include "modules/perception/obstacle/camera/lane_post_process/common/connected_component.h"
 

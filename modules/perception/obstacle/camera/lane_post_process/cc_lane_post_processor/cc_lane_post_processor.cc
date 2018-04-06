@@ -795,6 +795,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
   //     return false;
   //   }
   // }
+
   EnrichLaneInfo((*lane_objects));
 
   return true;
