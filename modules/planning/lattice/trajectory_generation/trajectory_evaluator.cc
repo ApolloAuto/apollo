@@ -63,7 +63,8 @@ TrajectoryEvaluator::TrajectoryEvaluator(
   }
   for (const auto lon_trajectory : lon_trajectories) {
     double lon_end_s = lon_trajectory->Evaluate(0, end_time);
-    if (lon_end_s + FLAGS_lattice_stop_buffer > stop_point) {
+    if (init_s[0] < stop_point &&
+        lon_end_s + FLAGS_lattice_stop_buffer > stop_point) {
       continue;
     }
 
@@ -72,6 +73,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     }
     for (const auto lat_trajectory : lat_trajectories) {
       /**
+       * The validity of the code needs to be verified.
       if (!ConstraintChecker1d::IsValidLateralTrajectory(*lat_trajectory,
                                                          *lon_trajectory)) {
         continue;
