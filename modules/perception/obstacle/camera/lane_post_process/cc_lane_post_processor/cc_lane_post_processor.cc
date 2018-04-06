@@ -509,6 +509,9 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
   }
 
   time_stamp_ = options.timestamp;
+  if (options.use_lane_history && !use_history_) {
+    InitLaneHistory();
+  }
 
   cur_lane_instances_.reset(new vector<LaneInstance>);
   if (!GenerateLaneInstances(lane_map)) {
@@ -788,9 +791,62 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
   //     return false;
   //   }
   // }
-  EnrichLaneInfo((*lane_objects));
 
+  EnrichLaneInfo((*lane_objects));
+  ADEBUG << "use_lane_history_: " << use_history_;
+  if (use_history_) {
+    FilterWithLaneHistory(*lane_objects);
+    auto vs = options.vehicle_status;
+    vs.motion = vs.motion.inverse();
+    motion_buffer_->push_back(vs);
+    lane_history_.push_back(*(*lane_objects));
+  }
   return true;
+}
+
+void CCLanePostProcessor::InitLaneHistory() {
+  use_history_ = true;
+  lane_history_.set_capacity(MAX_LANE_HISTORY);
+  motion_buffer_ = std::make_shared<MotionBuffer>(MAX_LANE_HISTORY);
+}
+
+void CCLanePostProcessor::FilterWithLaneHistory(LaneObjectsPtr lane_objects) {
+  std::vector<int> erase_idx;
+  for (size_t i = 0; i < lane_objects->size(); i++) {
+    Eigen::Vector3f start_pos;
+    start_pos <<  lane_objects->at(i).pos[0].x(),
+                  lane_objects->at(i).pos[0].y(),
+                  1.0;
+
+    for (size_t j = 0; j < lane_history_.size(); j++) {
+      // iter to find corresponding lane
+      size_t k;
+      for (k = 0; k < lane_history_[j].size(); k++) {
+        if (lane_history_[j][k].spatial == lane_objects->at(i).spatial) {
+          break;
+        }
+      }
+      // if not exist, skip
+      if (k == lane_history_[j].size()) {
+        continue;
+      }
+      // project start_pos to history, check lane stability
+      auto project_pos = motion_buffer_->at(j).motion * start_pos;
+      auto &lane_object =  lane_history_[j][k];
+      ScalarType delta_y =
+        project_pos.y() -PolyEval(project_pos.x(),
+                                  lane_object.order,
+                                  lane_object.model);
+      // delete if too far from polyline
+      if (std::abs(delta_y) > 3.7) {
+        erase_idx.push_back(i);
+        break;
+      }
+    }
+  }
+  for (size_t i = erase_idx.size()-1; i >= 0; i--) {
+    lane_objects->erase(lane_objects->begin() + erase_idx[i]);
+  }
 }
 
 bool CCLanePostProcessor::CompensateLaneObjects(LaneObjectsPtr lane_objects) {

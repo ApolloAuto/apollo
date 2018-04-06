@@ -19,6 +19,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_CC_LANE_POST_PROCESSOR_H_
 
+#include <boost/circular_buffer.hpp>
+
 #include <memory>
 #include <string>
 #include <utility>
@@ -34,6 +36,7 @@
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/interface/base_lane_post_processor.h"
 #include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/lane_frame.h"
+#include "modules/perception/obstacle/base/object_supplement.h"
 
 namespace apollo {
 namespace perception {
@@ -97,6 +100,10 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   bool EnrichLaneInfo(LaneObjectsPtr lane_objects);
 
+  void InitLaneHistory();
+
+  void FilterWithLaneHistory(LaneObjectsPtr lane_objects);
+
  private:
   CCLanePostProcessorOptions options_;
 
@@ -122,6 +129,9 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   lane_post_process_config::ModelConfigs config_;
 
+  bool use_history_ = false;
+  boost::circular_buffer<LaneObjects> lane_history_;
+  MotionBufferPtr motion_buffer_ = nullptr;
   DISALLOW_COPY_AND_ASSIGN(CCLanePostProcessor);
 };
 
