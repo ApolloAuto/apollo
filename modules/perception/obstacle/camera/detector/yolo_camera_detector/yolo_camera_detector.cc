@@ -27,32 +27,19 @@
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/util.h"
 
-DEFINE_string(yolo_config_filename, "config.pt", "Yolo config filename.");
-
 namespace apollo {
 namespace perception {
 
 using std::string;
 using std::vector;
 using std::unordered_map;
+using apollo::common::util::GetProtoFromFile;
 
 bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
-  ConfigManager *config_manager = ConfigManager::instance();
-  string model_name = this->Name();
-  const ModelConfig *model_config = config_manager->GetModelConfig(model_name);
-  if (model_config == nullptr) {
-    AERROR << "not found model: " << model_name;
-    return false;
-  }
-  string work_root = config_manager->WorkRoot();
+  // load yolo camera detector config file to proto
+  CHECK(GetProtoFromFile(FLAGS_yolo_camera_detector_config, &config_));
 
-  string yolo_root;
-  if (!model_config->GetValue("yolo_root", &yolo_root)) {
-    AERROR << "yolo_root not found.";
-    return false;
-  }
-  yolo_root = apollo::common::util::GetAbsolutePath(work_root, yolo_root);
-
+  const string &yolo_root = config_.yolo_root();
   const string yolo_config = apollo::common::util::GetAbsolutePath(
       yolo_root, FLAGS_yolo_config_filename);
 
@@ -141,15 +128,16 @@ void YoloCameraDetector::load_intrinsic(
 
   offset_y_ = static_cast<int>(offset_ratio * image_height_ + .5);
   float roi_ratio = cropped_ratio * image_height_ / image_width_;
-  width_ = static_cast<int>(resized_width + aligned_pixel / 2) / aligned_pixel *
-           aligned_pixel;
+  width_ = static_cast<int>(resized_width + aligned_pixel / 2) /
+      aligned_pixel * aligned_pixel;
   height_ = static_cast<int>(width_ * roi_ratio + aligned_pixel / 2) /
-            aligned_pixel * aligned_pixel;
+      aligned_pixel * aligned_pixel;
   ADEBUG << "image_height=" << image_height_ << ", "
          << "image_width=" << image_width_ << ", "
          << "roi_ratio=" << roi_ratio;
   ADEBUG << "offset_y=" << offset_y_ << ", height=" << height_
          << ", width=" << width_;
+
   min_2d_height_ /= height_;
 
   int roi_w = image_width_;
@@ -186,8 +174,6 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
 
   vector<string> input_names;
   vector<string> output_names;
-  // init Net
-
   input_names.push_back(net_param.input_blob());
   output_names.push_back(net_param.loc_blob());
   output_names.push_back(net_param.obj_blob());
