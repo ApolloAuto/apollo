@@ -3,6 +3,8 @@
 The installers should be standalone, which means it can finish successfully with
 minimum assumption of the base image.
 
+It's also recommended to do clean up so that the layer size will be reduced.
+
 ## Minimum assumption
 
 The only thing you can assume is that we have run the `pre_install.sh`. All

@@ -24,7 +24,12 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2.tar.gz
 tar xzf nlopt-2.4.2.tar.gz
 cd nlopt-2.4.2
-./configure --enable-shared && make && make install
+./configure --enable-shared
+make -j8
+make install
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
+rm -fr nlopt-2.4.2.tar.gz nlopt-2.4.2
 
 # Remove unwanted libraries.
 rm /usr/local/lib/libnlopt.a

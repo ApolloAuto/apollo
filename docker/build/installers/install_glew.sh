@@ -33,7 +33,11 @@ apt-get install -y --force-yes libglfw3 libglfw3-dev freeglut3-dev
 wget https://github.com/nigels-com/glew/releases/download/glew-2.0.0/glew-2.0.0.zip
 unzip glew-2.0.0.zip
 cd glew-2.0.0
-make && make install
+make -j8
+make install
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
+rm -fr glew-2.0.0.zip glew-2.0.0
 
 ln -s /usr/lib64/libGLEW.so /usr/lib/libGLEW.so
 ln -s /usr/lib64/libGLEW.so.2.0 /usr/lib/libGLEW.so.2.0
