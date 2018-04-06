@@ -29,6 +29,7 @@
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
 
+
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2d);
 
 DECLARE_bool(async_fusion);
@@ -140,8 +141,7 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
   static float weight_x = 0.8;
   static float weight_y = 0.2;
   static float speed_diff = 5;
-  // static float weight_range = 0.7;
-  // static float weight_angle = 0.3;
+  static float epislon = 0.1;
   static float angle_tolerance = 10;
 
   const ObjectPtr &fobj = fused_object->object;
@@ -157,15 +157,29 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
   float range_distance_ratio = (std::numeric_limits<float>::max)();
   float angle_distance_diff = 0;
 
-  if (fcenter(0) > 0.1 && std::abs(fcenter(1)) > 0.1) {
-    range_distance_ratio =
-        weight_x * std::abs(fcenter(0) - scenter(0)) / fcenter(0) +
-        weight_y * std::abs(fcenter(1) - scenter(1)) / std::abs(fcenter(1));
-  } else if (fcenter(0) > 0.1) {
-    range_distance_ratio = std::abs(fcenter(0) - scenter(0)) / fcenter(0);
-  } else if (std::abs(fcenter(1)) > 0.1) {
-    range_distance_ratio =
-            std::abs(fcenter(1) - scenter(1)) / std::abs(fcenter(1));
+  if (fcenter(0) > epislon && std::abs(fcenter(1)) > epislon) {
+    float x_ratio = std::abs(fcenter(0) - scenter(0)) / fcenter(0);
+    float y_ratio = std::abs(fcenter(1) - scenter(1)) / std::abs(fcenter(1));
+
+    if (x_ratio < FLAGS_pbf_fusion_assoc_distance_percent &&
+        y_ratio < FLAGS_pbf_fusion_assoc_distance_percent) {
+      range_distance_ratio =
+              weight_x * x_ratio +
+              weight_y * y_ratio;
+    }
+
+  } else if (fcenter(0) > epislon) {
+    float x_ratio = std::abs(fcenter(0) - scenter(0)) / fcenter(0);
+
+    if (x_ratio < FLAGS_pbf_fusion_assoc_distance_percent) {
+      range_distance_ratio = x_ratio;
+    }
+  } else if (std::abs(fcenter(1)) > epislon) {
+    float y_ratio = std::abs(fcenter(1) - scenter(1)) / std::abs(fcenter(1));
+
+    if (y_ratio < FLAGS_pbf_fusion_assoc_distance_percent) {
+      range_distance_ratio = y_ratio;
+    }
   }
 
   float sangle = GetAngle(sobj);
