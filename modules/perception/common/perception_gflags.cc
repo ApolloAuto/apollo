@@ -144,4 +144,4 @@ DEFINE_string(cc_lane_post_processor_config_file,
               "modules/perception/model/camera/lane_post_process_config.pb.txt",
               "The config file of cc_lane_post_processor.");
 DEFINE_int32(pbf_fusion_assoc_distance_percent, 20, "fusion distance percent");
-
+DEFINE_double(pbf_distance_speed_cos_diff, 0.5, "fusion velocity cosine diff");
