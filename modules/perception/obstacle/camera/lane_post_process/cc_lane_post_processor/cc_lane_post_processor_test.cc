@@ -24,16 +24,18 @@
 #include "opencv2/opencv.hpp"
 
 #include "modules/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 
+namespace apollo {
+namespace perception {
+
 using std::shared_ptr;
 using std::string;
 using std::vector;
-
-namespace apollo {
-namespace perception {
+using apollo::common::util::GetProtoFromFile;
 
 DEFINE_string(test_dir,
               "/apollo/modules/perception/data/cc_lane_post_processor_test/",
@@ -51,12 +53,13 @@ class CCLanePostProcessorTest : public ::testing::Test {
 
  protected:
   shared_ptr<CCLanePostProcessor> cc_lane_post_processor_;
+  lane_post_process_config::ModelConfigs config_;
 };
 
 TEST_F(CCLanePostProcessorTest, test_lane_post_process_vis) {
   FLAGS_work_root = "modules/perception";
-  FLAGS_config_manager_path = "conf/config_manager.config";
-  CHECK(ConfigManager::instance()->Init()) << "failed to Init ConfigManager";
+
+  CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file, &config_));
 
   cc_lane_post_processor_->set_vis(true);
   EXPECT_TRUE(cc_lane_post_processor_->Init());
@@ -77,15 +80,10 @@ TEST_F(CCLanePostProcessorTest, test_lane_post_process_vis) {
   cv::Mat lane_map;
   lane_map_ori.convertTo(lane_map, CV_32FC1, 1.0f / 255.0f, 0.0f);
 
-  ConfigManager *config_manager = ConfigManager::instance();
-  const ModelConfig *model_config =
-      config_manager->GetModelConfig(cc_lane_post_processor_->name());
-
   float lane_map_conf_thresh = 0.5f;
-  CHECK(model_config->GetValue("lane_map_confidence_thresh",
-                               &lane_map_conf_thresh))
-      << "the confidence threshold of label map not found.";
-  AINFO << "lane_map_conf_thresh = " << lane_map_conf_thresh;
+  CHECK(config_.has_lane_map_confidence_thresh());
+  lane_map_conf_thresh = config_.lane_map_confidence_thresh();
+  ADEBUG << "lane_map_conf_thresh = " << lane_map_conf_thresh;
 
   LaneObjectsPtr lane_objects = std::make_shared<LaneObjects>();
   CameraLanePostProcessOptions lane_post_process_options;
