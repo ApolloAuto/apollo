@@ -48,3 +48,17 @@ proto_library(
         "probabilistic_fusion_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "yolo_camera_detector_config_lib_proto",
+    deps = [
+        ":yolo_camera_detector_config_lib",
+    ],
+)
+
+proto_library(
+    name = "yolo_camera_detector_config_lib",
+    srcs = [
+        "yolo_camera_detector_config.proto",
+    ],
+)
