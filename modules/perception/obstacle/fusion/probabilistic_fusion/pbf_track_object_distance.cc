@@ -192,6 +192,15 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
   if (is_radar(sensor_object->sensor_type)) {
       double svelocity = sobj->velocity.norm();
       double fvelocity = fobj->velocity.norm();
+      if (svelocity > 0 && fvelocity > 0) {
+        float cos_distance = sobj->velocity.dot(fobj->velocity)
+                             / (svelocity*fvelocity);
+        if (cos_distance > FLAGS_pbf_distance_speed_cos_diff) {
+            ADEBUG << "ignore radar data for fusing" << cos_distance;
+            distance = (std::numeric_limits<float>::max)();
+        }
+      }
+
       if (std::abs(svelocity - fvelocity) > speed_diff ||
           angle_distance_diff > angle_tolerance) {
           ADEBUG << "ignore radar data for fusing" << speed_diff;

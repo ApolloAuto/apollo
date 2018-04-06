@@ -110,4 +110,5 @@ DECLARE_string(fusion_publish_sensor_id);
 
 DECLARE_string(cc_lane_post_processor_config_file);
 DECLARE_int32(pbf_fusion_assoc_distance_percent);
+DECLARE_double(pbf_distance_speed_cos_diff);
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
