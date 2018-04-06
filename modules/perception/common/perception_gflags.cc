@@ -143,3 +143,5 @@ DEFINE_string(fusion_publish_sensor_id, "velodyne_64", "fusion publish id");
 DEFINE_string(cc_lane_post_processor_config_file,
               "modules/perception/model/camera/lane_post_process_config.pb.txt",
               "The config file of cc_lane_post_processor.");
+DEFINE_int32(pbf_fusion_assoc_distance_percent, 20, "fusion distance percent");
+
