@@ -37,6 +37,8 @@ RUN apt-get install -y \
    libboost-all-dev \
    libcurl4-openssl-dev \
    libfreetype6-dev \
+   libgflags-dev \
+   libgoogle-glog-dev \
    liblapack-dev \
    lsof \
    realpath \

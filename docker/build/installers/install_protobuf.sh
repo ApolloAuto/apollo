@@ -24,4 +24,9 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.tar.gz
 tar xzf protobuf-cpp-3.3.0.tar.gz
 cd protobuf-3.3.0
-./configure --prefix=/usr && make && make install
+./configure --prefix=/usr
+make -j8
+make install
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
+rm -fr protobuf-cpp-3.3.0.tar.gz protobuf-3.3.0

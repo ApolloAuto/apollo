@@ -24,5 +24,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 wget https://github.com/tj/n/archive/v2.1.0.tar.gz
 tar xzf v2.1.0.tar.gz
 cd n-2.1.0
-make install
+make -j8 install
 n 8.0.0
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
+rm -fr v2.1.0.tar.gz n-2.1.0
