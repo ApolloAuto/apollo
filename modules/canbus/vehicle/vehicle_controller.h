@@ -29,6 +29,7 @@
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
@@ -91,10 +92,10 @@ class VehicleController {
   virtual common::ErrorCode Update(const control::ControlCommand &command);
 
   /**
-    * @brief set vehicle to appointed driving mode.
-    * @param driving mode to be appointed.
-    * @return error_code
-    */
+   * @brief set vehicle to appointed driving mode.
+   * @param driving mode to be appointed.
+   * @return error_code
+   */
   virtual common::ErrorCode SetDrivingMode(
       const Chassis::DrivingMode &driving_mode);
 
@@ -152,6 +153,7 @@ class VehicleController {
 
  protected:
   canbus::VehicleParameter params_;
+  common::VehicleParam vehicle_params_;
   CanSender<::apollo::canbus::ChassisDetail> *can_sender_ = nullptr;
   MessageManager<::apollo::canbus::ChassisDetail> *message_manager_ = nullptr;
   bool is_initialized_ = false;  // own by derviative concrete controller

@@ -12,6 +12,7 @@ vehicle_param {
   max_deceleration: -4.5
   max_steer_angle: 10.935
   max_steer_angle_rate: 4
+  min_steer_angle_rate: 0
   steer_ratio: 23
   wheel_base: 2.565
   wheel_rolling_radius: 0.275

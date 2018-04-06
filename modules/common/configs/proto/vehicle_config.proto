@@ -39,18 +39,20 @@ message VehicleParam {
   optional double max_acceleration = 9;
   optional double max_deceleration = 10;
 
-  // The following items are used to compute trajectory constraints in planning.
+  // The following items are used to compute trajectory constraints in planning/control/canbus,
   // vehicle max steer angle
   optional double max_steer_angle = 11;
   // vehicle max steer rate; how fast can the steering wheel turn.
   optional double max_steer_angle_rate = 12;
+  // vehicle min steer rate;
+  optional double min_steer_angle_rate = 13;
   // ratio between the turn of steering wheel and the turn of wheels
-  optional double steer_ratio = 13;
+  optional double steer_ratio = 14;
   // the distance between the front and back wheels
-  optional double wheel_base = 14;
+  optional double wheel_base = 15;
   // Tire effective rolling radius (vertical distance between the wheel center
   // and the ground).
-  optional double wheel_rolling_radius = 15;
+  optional double wheel_rolling_radius = 16;
 }
 
 message VehicleConfig {
