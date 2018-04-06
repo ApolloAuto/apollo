@@ -35,6 +35,8 @@
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
+#include "modules/perception/onboard/dag_streaming.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
 
 namespace apollo {
 namespace perception {
@@ -71,7 +73,10 @@ class LanePostProcessingSubnode : public Subnode {
   uint64_t min_processing_time_ = UINT64_MAX;
   uint64_t max_processing_time_ = 0;
   uint64_t tot_processing_time_ = 0;
+  CameraLanePostProcessOptions options_;
 
+  MotionService* motion_service_ = nullptr;
+  EventID motion_event_id_;
   DISALLOW_COPY_AND_ASSIGN(LanePostProcessingSubnode);
 };
 

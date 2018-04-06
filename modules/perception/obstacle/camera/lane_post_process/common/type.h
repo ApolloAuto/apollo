@@ -34,6 +34,10 @@
 namespace apollo {
 namespace perception {
 
+#ifndef MAX_LANE_HISTORY
+#define MAX_LANE_HISTORY 10
+#endif
+
 #ifndef UF_BLOCK_WIDTH
 #define UF_BLOCK_WIDTH 32
 #endif
