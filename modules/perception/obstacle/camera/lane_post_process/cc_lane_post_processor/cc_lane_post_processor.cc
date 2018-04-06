@@ -22,24 +22,21 @@
 #include <cmath>
 #include <limits>
 #include <numeric>
-#include <unordered_map>
+
+#include "modules/common/util/file.h"
 
 namespace apollo {
 namespace perception {
 
 using std::pair;
-using std::shared_ptr;
 using std::string;
-using std::to_string;
-using std::unordered_map;
 using std::vector;
-
-bool CompOriginLateralDistObjectID(const pair<ScalarType, int> &a,
-                                   const pair<ScalarType, int> &b) {
-  return a.first > b.first;
-}
+using apollo::common::util::GetProtoFromFile;
 
 bool CCLanePostProcessor::Init() {
+  // get model config from proto file
+  CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file, &config_));
+
   // 1. get model config
   ConfigManager *config_manager = ConfigManager::instance();
 
@@ -76,7 +73,7 @@ bool CCLanePostProcessor::Init() {
     return false;
   }
 
-  std::vector<float> roi;
+  vector<float> roi;
   if (!model_config->GetValue("roi", &roi)) {
     AERROR << "roi not found.";
     return false;
@@ -690,9 +687,9 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       }
 
       ADEBUG << " lane object " << (*lane_objects)->back().GetSpatialLabel()
-            << " has " << (*lane_objects)->back().pos.size() << " points: "
-            << "lateral distance = "
-            << (*lane_objects)->back().lateral_distance;
+             << " has " << (*lane_objects)->back().pos.size() << " points: "
+             << "lateral distance = "
+             << (*lane_objects)->back().lateral_distance;
     }
 
   } else {
@@ -768,9 +765,8 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
         ADEBUG << "Lane " << cross_over_lane_object_id
                << "crosses over cur_lane. Eliminated.";
         for (size_t i = 0; i < cur_object.pos.size(); ++i) {
-          ADEBUG << "[" << cur_object.pos[i].x()
-                 << ", " << cur_object.pos[i].y()
-                 << "]";
+          ADEBUG << "[" << cur_object.pos[i].x() << ", "
+                 << cur_object.pos[i].y() << "]";
         }
         continue;
       }
@@ -832,7 +828,9 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     // Sort lanes with C0
     std::sort(origin_lateral_dist_object_id.begin(),
               origin_lateral_dist_object_id.end(),
-              CompOriginLateralDistObjectID);
+              [](const pair<ScalarType, int> &a,
+                 const pair<ScalarType, int> &b) { return a.first > b.first; });
+
     int index_closest_left = -1;
     for (int k = 0; k < count_lane_objects; ++k) {
       if (origin_lateral_dist_object_id[k].first >= 0) {
@@ -847,7 +845,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
 
     // for left-side lanes
     for (int spatial_index = 0; spatial_index <= index_closest_left;
-           ++spatial_index) {
+         ++spatial_index) {
       if (spatial_index >= MAX_LANE_SPATIAL_LABELS) {
         break;
       }
@@ -873,7 +871,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     }
 
     // for right-side lanes
-    int i_r = index_closest_left+1;
+    int i_r = index_closest_left + 1;
     for (int spatial_index = 0; spatial_index < MAX_LANE_SPATIAL_LABELS;
          ++spatial_index, ++i_r) {
       if (i_r >= count_lane_objects) {
@@ -886,10 +884,11 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       if (index < 0) {
         continue;
       }
-      (*lane_objects)->at(object_id).spatial = static_cast<SpatialLabelType>(
-          MAX_LANE_SPATIAL_LABELS + index);
-//      (*lane_objects)->at(object_id).spatial = static_cast<SpatialLabelType>(
-//          MAX_LANE_SPATIAL_LABELS + spatial_index);
+      (*lane_objects)->at(object_id).spatial =
+          static_cast<SpatialLabelType>(MAX_LANE_SPATIAL_LABELS + index);
+      //      (*lane_objects)->at(object_id).spatial =
+      //      static_cast<SpatialLabelType>(
+      //          MAX_LANE_SPATIAL_LABELS + spatial_index);
       valid_lane_objects.push_back(object_id);
 
       // AINFO << " lane object "
@@ -924,7 +923,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
 }
 
 bool CCLanePostProcessor::CompensateLaneObjects(LaneObjectsPtr lane_objects) {
-  if (lane_objects == NULL) {
+  if (lane_objects == nullptr) {
     AERROR << "lane_objects is a null pointer.";
     return false;
   }
@@ -996,7 +995,7 @@ bool CCLanePostProcessor::CompensateLaneObjects(LaneObjectsPtr lane_objects) {
 }
 
 bool CCLanePostProcessor::EnrichLaneInfo(LaneObjectsPtr lane_objects) {
-  if (lane_objects == NULL) {
+  if (lane_objects == nullptr) {
     AERROR << "lane_objects is a null pointer.";
     return false;
   }

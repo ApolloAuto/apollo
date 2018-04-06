@@ -31,6 +31,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/common:util",
         "//modules/perception/obstacle/camera/interface",
+        "//modules/perception/proto:lane_post_process_config_lib_proto",
         "@eigen",
         "@opencv2//:core",
     ],
