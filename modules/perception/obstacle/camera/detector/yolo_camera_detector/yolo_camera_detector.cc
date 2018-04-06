@@ -55,6 +55,7 @@ bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
 
   const string yolo_config = apollo::common::util::GetAbsolutePath(
       yolo_root, FLAGS_yolo_config_filename);
+
   CHECK(apollo::common::util::GetProtoFromASCIIFile(yolo_config, &yolo_param_));
   load_intrinsic(options);
   if (!init_cnn(yolo_root)) {

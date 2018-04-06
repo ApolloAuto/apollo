@@ -140,8 +140,12 @@ DEFINE_bool(skip_camera_frame, false, "skip camera frame");
 DEFINE_int32(camera_hz, 30, "camera hz");
 DEFINE_string(fusion_publish_sensor_id, "velodyne_64", "fusion publish id");
 
+DEFINE_int32(pbf_fusion_assoc_distance_percent, 20, "fusion distance percent");
+DEFINE_double(pbf_distance_speed_cos_diff, 0.5, "fusion velocity cosine diff");
+
 DEFINE_string(cc_lane_post_processor_config_file,
               "modules/perception/model/camera/lane_post_process_config.pb.txt",
               "The config file of cc_lane_post_processor.");
-DEFINE_int32(pbf_fusion_assoc_distance_percent, 20, "fusion distance percent");
-DEFINE_double(pbf_distance_speed_cos_diff, 0.5, "fusion velocity cosine diff");
+DEFINE_string(probabilistic_fusion_config_file,
+              "modules/perception/model/probabilistic_fusion_config.pb.txt",
+              "The config file of probabilistic_fusion.");
