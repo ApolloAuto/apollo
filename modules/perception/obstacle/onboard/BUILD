@@ -236,6 +236,8 @@ cc_library(
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/camera/interface",
         "//modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor",
+        "//modules/perception/obstacle/camera/motion",
+        "//modules/perception/obstacle/onboard:motion_subnode",
         "@eigen",
         "@opencv2//:core",
     ],

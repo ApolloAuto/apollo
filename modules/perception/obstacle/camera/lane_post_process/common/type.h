@@ -34,6 +34,10 @@
 namespace apollo {
 namespace perception {
 
+#ifndef MAX_LANE_HISTORY
+#define MAX_LANE_HISTORY 10
+#endif
+
 #ifndef MAX_GROUP_PREDICTION_MARKER_NUM
 #define MAX_GROUP_PREDICTION_MARKER_NUM 10
 #endif
