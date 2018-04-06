@@ -130,12 +130,13 @@ struct alignas(16) CameraSupplement {
 typedef std::shared_ptr<CameraSupplement> CameraSupplementPtr;
 typedef std::shared_ptr<const CameraSupplement> CameraSupplementConstPtr;
 
+typedef Eigen::Matrix3f MotionType;
 struct alignas(16) VehicleStatus {
   float yaw_rate;
   float velocity;
   double time_ts;            // time stamp
   double time_d;            // time stamp difference in image
-  Eigen::Matrix3f motion;  // Motion Matrix
+  MotionType motion;  // Motion Matrix
 };
 
 typedef boost::circular_buffer<VehicleStatus> MotionBuffer;
