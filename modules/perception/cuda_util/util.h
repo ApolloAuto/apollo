@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H_
+#define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H_
+
 #include <cuda_runtime.h>
 #include <caffe/caffe.hpp>
 #include <memory>
@@ -110,6 +111,7 @@ class SyncedMemory {
   int gpu_device_;
   DISABLE_COPY_AND_ASSIGN(SyncedMemory);
 };  // class SyncedMemory
+
 int divup(int a, int b);
 
 void resize(cv::Mat frame, caffe::Blob<float> *dst,
@@ -123,4 +125,4 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_UTIL_H_

@@ -24,9 +24,10 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <iostream>
 
-#include "modules/common/log.h"
-#include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
+// #include "modules/common/log.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/base_type.h"
 
 namespace apollo {
 namespace perception {
@@ -38,8 +39,6 @@ namespace perception {
 #ifndef NUM_RESERVE_EDGES
 #define NUM_RESERVE_EDGES 6
 #endif
-
-#define CUDA_CC false
 
 class DisjointSet {
  public:
@@ -186,6 +185,35 @@ class ConnectedComponent {
 
   // CC pixels
   void AddPixel(int x, int y);
+  /*
+  void AddPixel(int x, int y) {
+    if (pixel_count_ == 0) {
+      // new bounding box
+      bbox_.x_min = x;  // x_min
+      bbox_.y_min = y;  // y_min
+      bbox_.x_max = x;  // x_max
+      bbox_.y_max = y;  // y_max
+    } else {
+      // extend bounding box if necessary
+      if (x < bbox_.x_min) {
+        bbox_.x_min = x;
+      }
+      if (x > bbox_.x_max) {
+        bbox_.x_max = x;
+      }
+      if (y < bbox_.y_min) {
+        bbox_.y_min = y;
+      }
+      if (y > bbox_.y_max) {
+        bbox_.y_max = y;
+      }
+    }
+
+    pixels_->push_back(cv::Point(x, y));
+    pixel_count_++;
+  }
+  */
+
   int GetPixelCount() const { return pixel_count_; }
   std::shared_ptr<const std::vector<cv::Point2i>> GetPixels() const {
     return pixels_;
@@ -302,29 +330,9 @@ class ConnectedComponentGenerator {
   ConnectedComponentGenerator(int image_width, int image_height);
   ConnectedComponentGenerator(int image_width, int image_height, cv::Rect roi);
 
-  ~ConnectedComponentGenerator() {
-#if CUDA_CC
-    cudaFree(label_array_);
-    cudaFreeArray(img_array_);
-
-    cudaError_t cuda_err = cudaGetLastError();
-    if (cuda_err != cudaSuccess) {
-      AERROR << "failed to release label_array and img_array with CUDA: "
-             << cudaGetErrorString(cuda_err);
-    }
-
-    free(labels_);
-#endif
-  }
-
   bool FindConnectedComponents(
       const cv::Mat& lane_map,
       std::vector<std::shared_ptr<ConnectedComponent>>* cc);
-
- private:
-#if CUDA_CC
-  bool BlockUnionFind(const unsigned char* img);
-#endif
 
  private:
   size_t total_pix_;
@@ -338,14 +346,8 @@ class ConnectedComponentGenerator {
   int roi_x_max_;
   int roi_y_max_;
 
-#if CUDA_CC
-  int* labels_;
-  cudaArray* img_array_;
-  int* label_array_;
-#else
   DisjointSet labels_;
   std::vector<int> frame_label_;
-#endif
   std::vector<int> root_map_;
 };
 
