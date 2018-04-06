@@ -34,25 +34,11 @@ using std::vector;
 using apollo::common::util::GetProtoFromFile;
 
 bool CCLanePostProcessor::Init() {
-  // get model config from proto file
+  // 1. get model config
   CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file, &config_));
 
-  // 1. get model config
-  ConfigManager *config_manager = ConfigManager::instance();
-
-  const ModelConfig *model_config =
-      config_manager->GetModelConfig(this->name());
-  if (model_config == nullptr) {
-    AERROR << "not found model: " << this->name();
-    return false;
-  }
-
   // 2. get parameters
-  string space_type;
-  if (!model_config->GetValue("space_type", &space_type)) {
-    AERROR << "space type not found.";
-    return false;
-  }
+  string space_type = config_.space_type();
   if (space_type == "vehicle") {
     options_.space_type = SpaceType::VEHICLE;
   } else if (space_type == "image") {
@@ -64,97 +50,56 @@ bool CCLanePostProcessor::Init() {
   }
   options_.frame.space_type = options_.space_type;
 
-  if (!model_config->GetValue("image_width", &image_width_)) {
-    AERROR << "image width not found.";
+  if (!config_.has_image_width() || !config_.has_image_height()) {
+    AERROR << "image width or height not found.";
     return false;
   }
-  if (!model_config->GetValue("image_height", &image_height_)) {
-    AERROR << "image height not found.";
-    return false;
-  }
+  image_width_ = config_.image_width();
+  image_height_ = config_.image_height();
 
   vector<float> roi;
-  if (!model_config->GetValue("roi", &roi)) {
-    AERROR << "roi not found.";
-    return false;
-  }
-  if (static_cast<int>(roi.size()) != 4) {
-    AERROR << "roi format error.";
+  if (config_.roi_size() != 4) {
+    AERROR << "roi format error. size = " << config_.roi_size();
     return false;
   } else {
-    roi_.x = static_cast<int>(roi[0]);
-    roi_.y = static_cast<int>(roi[1]);
-    roi_.width = static_cast<int>(roi[2]);
-    roi_.height = static_cast<int>(roi[3]);
+    roi_.x = config_.roi(0);
+    roi_.y = config_.roi(1);
+    roi_.width = config_.roi(2);
+    roi_.height = config_.roi(3);
     options_.frame.image_roi = roi_;
-    AINFO << "project ROI = [" << roi_.x << ", " << roi_.y << ", "
-          << roi_.x + roi_.width - 1 << ", " << roi_.y + roi_.height - 1 << "]";
+    ADEBUG << "project ROI = [" << roi_.x << ", " << roi_.y << ", "
+           << roi_.x + roi_.width - 1 << ", " << roi_.y + roi_.height - 1
+           << "]";
   }
 
-  if (!model_config->GetValue("use_non_mask", &options_.frame.use_non_mask)) {
-    AERROR << "the use_non_mask parameter not found.";
-    return false;
-  }
+  options_.frame.use_non_mask = config_.use_non_mask();
 
-  std::vector<float> non_mask_polygon_points;
-  if (!model_config->GetValue("non_mask", &non_mask_polygon_points)) {
-    AERROR << "non_mask points not found.";
-    return false;
-  }
-
-  if (non_mask_polygon_points.size() % 2 != 0) {
+  if (config_.non_mask_size() % 2 != 0) {
     AERROR << "the number of point coordinate values should be even.";
     return false;
   }
-  size_t non_mask_polygon_point_num = non_mask_polygon_points.size() / 2;
+  size_t non_mask_polygon_point_num = config_.non_mask_size() / 2;
 
   non_mask_.reset(new NonMask(non_mask_polygon_point_num));
   for (size_t i = 0; i < non_mask_polygon_point_num; ++i) {
-    non_mask_->AddPolygonPoint(non_mask_polygon_points.at(2 * i),
-                               non_mask_polygon_points.at(2 * i + 1));
+    non_mask_->AddPolygonPoint(config_.non_mask(2 * i),
+                               config_.non_mask(2 * i + 1));
   }
 
-  if (!model_config->GetValue("lane_map_confidence_thresh",
-                              &options_.lane_map_conf_thresh)) {
-    AERROR << "the confidence threshold of label map not found.";
-    return false;
-  }
-
-  if (!model_config->GetValue("cc_split_siz", &options_.cc_split_siz)) {
-    AERROR << "maximum bounding-box size for splitting CC not found.";
-    return false;
-  }
-  if (!model_config->GetValue("cc_split_len", &options_.cc_split_len)) {
-    AERROR << "unit length for splitting CC not found.";
-    return false;
-  }
+  options_.lane_map_conf_thresh = config_.lane_map_confidence_thresh();
+  options_.cc_split_siz = config_.cc_split_siz();
+  options_.cc_split_len = config_.cc_split_len();
 
   // parameters on generating markers
-  if (!model_config->GetValue("min_cc_pixel_num",
-                              &options_.frame.min_cc_pixel_num)) {
-    AERROR << "minimum CC pixel number not found.";
-    return false;
-  }
-
-  if (!model_config->GetValue("min_cc_size", &options_.frame.min_cc_size)) {
-    AERROR << "minimum CC size not found.";
-    return false;
-  }
-
-  if (!model_config->GetValue(options_.frame.space_type == SpaceType::IMAGE
-                                  ? "min_y_search_offset_image"
-                                  : "min_y_search_offset",
-                              &options_.frame.min_y_search_offset)) {
-    AERROR << "minimum verticle offset used for marker association not found.";
-    return false;
-  }
+  options_.frame.min_cc_pixel_num = config_.min_cc_pixel_num();
+  options_.frame.min_cc_size = config_.min_cc_size();
+  options_.frame.min_y_search_offset =
+      (options_.frame.space_type == SpaceType::IMAGE
+           ? config_.min_y_search_offset_image()
+           : config_.min_y_search_offset());
 
   // parameters on marker association
-  string assoc_method;
-  if (!model_config->GetValue("assoc_method", &assoc_method)) {
-    AERROR << "marker association method not found.";
-    return false;
-  }
+  string assoc_method = config_.assoc_method();
   if (assoc_method == "greedy_group_connect") {
     options_.frame.assoc_param.method = AssociationMethod::GREEDY_GROUP_CONNECT;
   } else {
@@ -162,167 +107,93 @@ bool CCLanePostProcessor::Init() {
     return false;
   }
 
-  if (!model_config->GetValue(options_.frame.space_type == SpaceType::IMAGE
-                                  ? "assoc_min_distance_image"
-                                  : "assoc_min_distance",
-                              &options_.frame.assoc_param.min_distance)) {
-    AERROR << "minimum distance threshold for marker association not found.";
-    return false;
-  }
-  AINFO << "assoc_min_distance = " << options_.frame.assoc_param.min_distance;
+  options_.frame.assoc_param.min_distance =
+      (options_.frame.space_type == SpaceType::IMAGE
+           ? config_.assoc_min_distance_image()
+           : config_.assoc_min_distance());
+  ADEBUG << "assoc_min_distance = " << options_.frame.assoc_param.min_distance;
 
-  if (!model_config->GetValue(options_.frame.space_type == SpaceType::IMAGE
-                                  ? "assoc_max_distance_image"
-                                  : "assoc_max_distance",
-                              &options_.frame.assoc_param.max_distance)) {
-    AERROR << "maximum distance threshold for marker association not found.";
-    return false;
-  }
-  AINFO << "assoc_max_distance = " << options_.frame.assoc_param.max_distance;
+  options_.frame.assoc_param.max_distance =
+      (options_.frame.space_type == SpaceType::IMAGE
+           ? config_.assoc_max_distance_image()
+           : config_.assoc_max_distance());
+  ADEBUG << "assoc_max_distance = " << options_.frame.assoc_param.max_distance;
 
-  if (!model_config->GetValue("assoc_distance_weight",
-                              &options_.frame.assoc_param.distance_weight)) {
-    AERROR << "distance weight for marker association not found.";
-    return false;
-  }
-  AINFO << "assoc_distance_weight = "
-        << options_.frame.assoc_param.distance_weight;
+  options_.frame.assoc_param.distance_weight = config_.assoc_distance_weight();
+  ADEBUG << "assoc_distance_weight = "
+         << options_.frame.assoc_param.distance_weight;
 
-  if (!model_config->GetValue(
-          options_.frame.space_type == SpaceType::IMAGE
-              ? "assoc_max_deviation_angle_image"
-              : "assoc_max_deviation_angle",
-          &options_.frame.assoc_param.max_deviation_angle)) {
-    AERROR << "max deviation angle threshold "
-           << "for marker association not found.";
-    return false;
-  }
-  AINFO << "assoc_max_deviation_angle = "
-        << options_.frame.assoc_param.max_deviation_angle;
+  options_.frame.assoc_param.max_deviation_angle =
+      (options_.frame.space_type == SpaceType::IMAGE
+           ? config_.assoc_max_deviation_angle_image()
+           : config_.assoc_max_deviation_angle());
+  ADEBUG << "assoc_max_deviation_angle = "
+         << options_.frame.assoc_param.max_deviation_angle;
   options_.frame.assoc_param.max_deviation_angle *= (M_PI / 180.0);
 
-  if (!model_config->GetValue(
-          "assoc_deviation_angle_weight",
-          &options_.frame.assoc_param.deviation_angle_weight)) {
-    AERROR << "deviation angle weight "
-           << "for marker association not found.";
-    return false;
-  }
-  AINFO << "assoc_deviation_angle_weight = "
-        << options_.frame.assoc_param.deviation_angle_weight;
+  options_.frame.assoc_param.deviation_angle_weight =
+      config_.assoc_deviation_angle_weight();
+  ADEBUG << "assoc_deviation_angle_weight = "
+         << options_.frame.assoc_param.deviation_angle_weight;
 
-  if (!model_config->GetValue(options_.frame.space_type == SpaceType::IMAGE
-                                  ? "assoc_max_relative_orie_image"
-                                  : "assoc_max_relative_orie",
-                              &options_.frame.assoc_param.max_relative_orie)) {
-    AERROR << "max relative orientation threshold "
-           << "for marker association not found.";
-    return false;
-  }
-  AINFO << "assoc_max_relative_orie = "
-        << options_.frame.assoc_param.max_relative_orie;
+  options_.frame.assoc_param.max_relative_orie =
+      (options_.frame.space_type == SpaceType::IMAGE
+           ? config_.assoc_max_relative_orie_image()
+           : config_.assoc_max_relative_orie());
+  ADEBUG << "assoc_max_relative_orie = "
+         << options_.frame.assoc_param.max_relative_orie;
   options_.frame.assoc_param.max_relative_orie *= (M_PI / 180.0);
 
-  if (!model_config->GetValue(
-          "assoc_relative_orie_weight",
-          &options_.frame.assoc_param.relative_orie_weight)) {
-    AERROR << "relative orientation weight "
-           << "for marker association not found.";
-    return false;
-  }
-  AINFO << "assoc_relative_orie_weight = "
-        << options_.frame.assoc_param.relative_orie_weight;
+  options_.frame.assoc_param.relative_orie_weight =
+      config_.assoc_relative_orie_weight();
+  ADEBUG << "assoc_relative_orie_weight = "
+         << options_.frame.assoc_param.relative_orie_weight;
 
-  if (!model_config->GetValue(
-          options_.frame.space_type == SpaceType::IMAGE
-              ? "assoc_max_departure_distance_image"
-              : "assoc_max_departure_distance",
-          &options_.frame.assoc_param.max_departure_distance)) {
-    AERROR << "max departure distance threshold "
-           << "for marker association not found.";
-    return false;
-  }
-  AINFO << "assoc_max_departure_distance = "
-        << options_.frame.assoc_param.max_departure_distance;
+  options_.frame.assoc_param.max_departure_distance =
+      (options_.frame.space_type == SpaceType::IMAGE
+           ? config_.assoc_max_departure_distance_image()
+           : config_.assoc_max_departure_distance());
+  ADEBUG << "assoc_max_departure_distance = "
+         << options_.frame.assoc_param.max_departure_distance;
 
-  if (!model_config->GetValue(
-          "assoc_departure_distance_weight",
-          &options_.frame.assoc_param.departure_distance_weight)) {
-    AERROR << "departure distance weight "
-           << "for marker association not found.";
-    return false;
-  }
-  AINFO << "assoc_departure_distance_weight = "
-        << options_.frame.assoc_param.departure_distance_weight;
+  options_.frame.assoc_param.departure_distance_weight =
+      config_.assoc_departure_distance_weight();
+  ADEBUG << "assoc_departure_distance_weight = "
+         << options_.frame.assoc_param.departure_distance_weight;
 
-  if (!model_config->GetValue(
-          options_.frame.space_type == SpaceType::IMAGE
-              ? "assoc_min_orientation_estimation_size_image"
-              : "assoc_min_orientation_estimation_size",
-          &options_.frame.assoc_param.min_orientation_estimation_size)) {
-    AERROR << "minimum size threshold used for orientation estimation"
-           << " in marker association not found.";
-    return false;
-  }
-  AINFO << "assoc_min_orientation_estimation_size = "
-        << options_.frame.assoc_param.min_orientation_estimation_size;
+  options_.frame.assoc_param.min_orientation_estimation_size =
+      (options_.frame.space_type == SpaceType::IMAGE
+           ? config_.assoc_min_orientation_estimation_size_image()
+           : config_.assoc_min_orientation_estimation_size());
+  ADEBUG << "assoc_min_orientation_estimation_size = "
+         << options_.frame.assoc_param.min_orientation_estimation_size;
 
   if (options_.frame.assoc_param.method ==
       AssociationMethod::GREEDY_GROUP_CONNECT) {
-    if (!model_config->GetValue(
-            "max_group_prediction_marker_num",
-            &options_.frame.group_param.max_group_prediction_marker_num)) {
-      AERROR << "maximum number of markers used for orientation estimation"
-             << " in greed group connect association not found.";
-      return false;
-    }
+    options_.frame.group_param.max_group_prediction_marker_num =
+        config_.max_group_prediction_marker_num();
   } else {
     AERROR << "invalid marker association method.";
     return false;
   }
-
-  if (!model_config->GetValue(
-          "orientation_estimation_skip_marker_num",
-          &options_.frame.orientation_estimation_skip_marker_num)) {
-    AERROR << "skip marker number used for orientation estimation in "
-           << "marker association";
-    return false;
-  }
+  options_.frame.orientation_estimation_skip_marker_num =
+      config_.orientation_estimation_skip_marker_num();
 
   // parameters on finding lane objects
-  if (!model_config->GetValue("lane_interval_distance",
-                              &options_.frame.lane_interval_distance)) {
-    AERROR << "The predefined lane interval distance is not found.";
-    return false;
-  }
-
-  if (!model_config->GetValue(options_.frame.space_type == SpaceType::IMAGE
-                                  ? "min_instance_size_prefiltered_image"
-                                  : "min_instance_size_prefiltered",
-                              &options_.frame.min_instance_size_prefiltered)) {
-    AERROR << "The minimum size of lane instances "
-           << "to be prefiltered is not found.";
-    return false;
-  }
-
-  if (!model_config->GetValue(options_.frame.space_type == SpaceType::IMAGE
-                                  ? "max_size_to_fit_straight_line_image"
-                                  : "max_size_to_fit_straight_line",
-                              &options_.frame.max_size_to_fit_straight_line)) {
-    AERROR << "The maximum size used for fitting straight lines "
-           << "on lane instances is not found.";
-    return false;
-  }
+  options_.frame.lane_interval_distance = config_.lane_interval_distance();
+  options_.frame.min_instance_size_prefiltered =
+      (options_.frame.space_type == SpaceType::IMAGE
+           ? config_.min_instance_size_prefiltered_image()
+           : config_.min_instance_size_prefiltered());
+  options_.frame.max_size_to_fit_straight_line =
+      (options_.frame.space_type == SpaceType::IMAGE
+           ? config_.max_size_to_fit_straight_line_image()
+           : config_.max_size_to_fit_straight_line());
 
   // 3. initialize projector
-  if (!model_config->GetValue("max_distance_to_see_for_transformer",
-                              &max_distance_to_see_)) {
-    AERROR << "maximum perception distance for transformer is not found, "
-              "use default value";
-    return false;
-  }
-  AINFO << "initial max_distance_to_see: " << max_distance_to_see_
-        << " (meters)";
+  max_distance_to_see_ = config_.max_distance_to_see_for_transformer();
+  ADEBUG << "initial max_distance_to_see: " << max_distance_to_see_
+         << " (meters)";
 
   if (options_.space_type == SpaceType::VEHICLE) {
     projector_.reset(new Projector<ScalarType>());
