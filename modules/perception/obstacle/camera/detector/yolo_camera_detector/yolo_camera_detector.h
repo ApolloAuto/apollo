@@ -25,6 +25,7 @@
 #include "caffe/caffe.hpp"
 
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/proto/yolo.pb.h"
+#include "modules/perception/proto/yolo_camera_detector_config.pb.h"
 
 #include "modules/perception/cuda_util/network.h"
 #include "modules/perception/cuda_util/region_output.h"
@@ -115,6 +116,8 @@ class YoloCameraDetector : public BaseCameraDetector {
   obstacle::yolo::YoloParam yolo_param_;
   int image_height_ = 0;
   int image_width_ = 0;
+
+  yolo_camera_detector_config::ModelConfigs config_;
 };
 
 REGISTER_CAMERA_DETECTOR(YoloCameraDetector);

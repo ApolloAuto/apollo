@@ -34,6 +34,7 @@ cc_library(
         "//modules/perception/obstacle/camera/detector/yolo_camera_detector/proto:yolo_camera_proto",
         "//modules/perception/obstacle/camera/dummy",
         "//modules/perception/obstacle/camera/interface",
+        "//modules/perception/proto:yolo_camera_detector_config_lib_proto",
         "@caffe//:lib",
         "@eigen",
     ],
