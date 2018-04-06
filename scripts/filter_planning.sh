@@ -41,7 +41,9 @@ perfect_control_topic="$perception_topic  \
 
 planning_deps="$perfect_control_topic \
     or topic == '/apollo/canbus/chassis' \
-    or topic == '/apollo/localization/pose'"
+    or topic == '/apollo/localization/pose' \
+    or topic == '/apollo/navigation' \
+    or topic == '/apollo/relative_map'"
 
 planning_topic="topic == '/apollo/planning'"
 prediction_topic="topic == '/apollo/prediction'"
