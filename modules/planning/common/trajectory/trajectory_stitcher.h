@@ -45,6 +45,9 @@ class TrajectoryStitcher {
       const common::VehicleState& vehicle_state,
       const ReferenceLine& reference_line, bool* is_replan);
 
+  static void TransformLastPublishedTrajectory(
+      const double planning_cycle_time, PublishableTrajectory* prev_trajectory);
+
   static std::vector<common::TrajectoryPoint> ComputeStitchingTrajectory(
       const common::VehicleState& vehicle_state, const double current_timestamp,
       const double planning_cycle_time,
