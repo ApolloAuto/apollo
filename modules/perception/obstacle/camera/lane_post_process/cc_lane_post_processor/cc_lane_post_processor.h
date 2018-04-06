@@ -27,6 +27,8 @@
 #include "Eigen/Core"
 #include "opencv2/opencv.hpp"
 
+#include "modules/perception/proto/lane_post_process_config.pb.h"
+
 #include "modules/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/common/util.h"
@@ -117,6 +119,8 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   bool is_init_ = false;
   bool vis_ = false;
+
+  lane_post_process_config::ModelConfigs config_;
 
   DISALLOW_COPY_AND_ASSIGN(CCLanePostProcessor);
 };
