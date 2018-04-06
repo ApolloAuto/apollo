@@ -14,11 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_ // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_ // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_  // NOLINT
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_  // NOLINT
+
 #include <mutex>
 #include <string>
 #include <vector>
+
+#include "modules/perception/proto/probabilistic_fusion_config.pb.h"
+
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
@@ -54,10 +58,11 @@ class ProbabilisticFusion : public BaseFusion {
                        const std::vector<int> &unassigned_ids);
 
   /**@brief update current tracks with matched objects*/
-  void UpdateAssignedTracks(std::vector<PbfTrackPtr> *tracks,
-    const std::vector<PbfSensorObjectPtr> &sensor_objects,
-    const std::vector<TrackObjectPair> &assignments,
-    const std::vector<double> &track_objects_dist);
+  void UpdateAssignedTracks(
+      std::vector<PbfTrackPtr> *tracks,
+      const std::vector<PbfSensorObjectPtr> &sensor_objects,
+      const std::vector<TrackObjectPair> &assignments,
+      const std::vector<double> &track_objects_dist);
 
   /**@brief update current tracks which cannot find matched objects*/
   void UpdateUnassignedTracks(std::vector<PbfTrackPtr> *tracks,
@@ -93,6 +98,8 @@ class ProbabilisticFusion : public BaseFusion {
   bool use_lidar_;
   bool use_camera_;
 
+  probabilistic_fusion_config::ModelConfigs config_;
+
  private:
   DISALLOW_COPY_AND_ASSIGN(ProbabilisticFusion);
 };
@@ -102,4 +109,7 @@ REGISTER_FUSION(ProbabilisticFusion);
 
 }  // namespace perception
 }  // namespace apollo
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_  // NOLINT
+
+// clang-format off
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_ // NOLINT
+// clang-format on
