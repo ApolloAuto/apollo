@@ -54,7 +54,21 @@ bool LanePostProcessingSubnode::InitInternal() {
   if (fields.count("publish") && stoi(fields["publish"]) != 0) {
     publish_ = true;
   }
-
+  auto iter = fields.find("motion_event_id");
+  if (iter == fields.end()) {
+    motion_event_id_ = -1;
+    AWARN << "Failed to find motion_event_id_:" << reserve_;
+    AWARN << "Unable to project lane history information";
+  } else {
+    motion_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
+    motion_service_ = dynamic_cast<MotionService*>(
+          DAGStreaming::GetSubnodeByName("MotionService"));
+    if (motion_service_ == nullptr) {
+      AWARN << "motion service should initialize before LanePostProcessing";
+    }
+    options_.use_lane_history = true;
+//    options_.ConfigLaneHistory(FLAGS_lane_history_size);
+  }
   // init shared data
   if (!InitSharedData()) {
     AERROR << "failed to init shared data.";
@@ -210,7 +224,19 @@ Status LanePostProcessingSubnode::ProcEvents() {
   CameraLanePostProcessOptions options;
   options.timestamp = event.timestamp;
   timestamp_ns_ = event.timestamp * 1e9;
+  if (motion_event_id_ != -1) {
+    if (motion_service_ == nullptr) {
+      motion_service_ = dynamic_cast<MotionService*>(
+          DAGStreaming::GetSubnodeByName("MotionService"));
+      if (motion_service_ == nullptr) {
+        AERROR << "motion service must initialize before LanePostProcessing";
+        return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
+      }
+    }
 
+    // TODO(gchen-apollo): add lock to read motion_buffer
+    options_.SetMotion(motion_service_->GetMotionBuffer()->back());
+  }
   lane_post_processor_->Process(lane_map, options, &lane_objects);
   for (size_t i = 0; i < lane_objects->size(); ++i) {
     (*lane_objects)[i].timestamp = event.timestamp;
