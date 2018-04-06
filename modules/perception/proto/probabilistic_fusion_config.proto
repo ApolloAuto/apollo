@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+package apollo.perception.probabilistic_fusion_config;
+
+message ModelConfigs {
+  optional string name = 1 [ default = "ProbabilisticFusion" ];
+  optional string version = 2 [ default = "1.0.0" ];
+  optional string match_method = 3 [ default = "hm_matcher" ];
+  optional float max_match_distance = 4 [ default = 4.0 ];
+  optional float max_lidar_invisible_period = 5 [ default = 0.25 ];
+  optional float max_radar_invisible_period = 6 [ default = 0.25 ];
+  optional float max_radar_confident_angle = 7 [ default = 30 ];
+  optional float min_radar_confident_distance = 8 [ default = 40 ];
+  optional bool publish_if_has_lidar = 9 [ default = true ];
+  optional bool publish_if_has_radar = 10 [ default = true ];
+  // candidate values: "velodyne_64", "radar", "camera_front_short"
+  optional string publish_sensor = 11 [ default = "velodyne_64" ];
+  optional bool use_radar = 12 [ default = true ];
+  optional bool use_lidar = 13 [ default = true ];
+}

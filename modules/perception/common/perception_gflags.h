@@ -99,6 +99,7 @@ DECLARE_bool(show_camera_parsing);
 DECLARE_string(frame_visualizer);
 
 DECLARE_bool(show_motion);
+
 // async fusion using imf
 DECLARE_bool(async_fusion);
 DECLARE_bool(use_distance_angle_fusion);
@@ -108,7 +109,10 @@ DECLARE_bool(skip_camera_frame);
 DECLARE_int32(camera_hz);
 DECLARE_string(fusion_publish_sensor_id);
 
-DECLARE_string(cc_lane_post_processor_config_file);
 DECLARE_int32(pbf_fusion_assoc_distance_percent);
 DECLARE_double(pbf_distance_speed_cos_diff);
+
+DECLARE_string(cc_lane_post_processor_config_file);
+DECLARE_string(probabilistic_fusion_config_file);
+
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
