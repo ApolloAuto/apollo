@@ -25,6 +25,7 @@
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
+#include "modules/common/math/quaternion.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -50,6 +51,44 @@ TrajectoryStitcher::ComputeReinitStitchingTrajectory(
   init_point.set_relative_time(0.0);
 
   return std::vector<TrajectoryPoint>(1, init_point);
+}
+
+void TrajectoryStitcher::TransformLastPublishedTrajectory(
+    const double current_time, PublishableTrajectory* prev_trajectory) {
+  if (!prev_trajectory) {
+    return;
+  }
+  std::size_t prev_trajectory_size = prev_trajectory->NumOfPoints();
+  if (prev_trajectory_size <= 1) {
+    return;
+  }
+  const double time_diff = current_time - prev_trajectory->header_time();
+  auto matched_point =
+      prev_trajectory->EvaluateUsingLinearApproximation(time_diff);
+  if (!matched_point.has_path_point()) {
+    return;
+  }
+  const double cos_theta = std::cos(-matched_point.path_point().theta());
+  const double sin_theta = std::sin(-matched_point.path_point().theta());
+  std::vector<TrajectoryPoint> transformed_points;
+  for (const auto& old_point : prev_trajectory->trajectory_points()) {
+    TrajectoryPoint point = old_point;
+    Eigen::Vector3d before_rotate(
+        old_point.path_point().x() - matched_point.path_point().x(),
+        old_point.path_point().y() - matched_point.path_point().y(),
+        old_point.path_point().z() - matched_point.path_point().z());
+    const double after_rotate_x =
+        before_rotate.x() * cos_theta - before_rotate.y() * sin_theta;
+    const double after_rotate_y =
+        before_rotate.x() * sin_theta + before_rotate.y() * cos_theta;
+    point.mutable_path_point()->set_x(after_rotate_x);
+    point.mutable_path_point()->set_y(after_rotate_y);
+    point.mutable_path_point()->set_z(before_rotate.z());
+    point.mutable_path_point()->set_theta(common::math::WrapAngle(
+        old_point.path_point().theta() - matched_point.path_point().theta()));
+    transformed_points.emplace_back(point);
+  }
+  prev_trajectory->SetTrajectoryPoints(transformed_points);
 }
 
 // only used in navigation mode
@@ -134,8 +173,6 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
       Vec2d(vehicle_state.x(), vehicle_state.y()));
   auto nearest_point = prev_trajectory->TrajectoryPointAt(nearest_point_index);
 
-  DCHECK(nearest_point.has_path_point());
-  DCHECK(matched_point.has_path_point());
   const double lat_diff =
       std::hypot(nearest_point.path_point().x() - vehicle_state.x(),
                  nearest_point.path_point().y() - vehicle_state.y());
