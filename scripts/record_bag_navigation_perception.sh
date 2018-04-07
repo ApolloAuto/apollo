@@ -49,6 +49,8 @@ function start() {
         /apollo/control/pad \
         /apollo/perception/obstacles \
         /apollo/perception/traffic_light \
+        /apollo/navigation \
+        /apollo/relative_map \
         /apollo/planning \
         /apollo/prediction \
         /apollo/routing_request \
