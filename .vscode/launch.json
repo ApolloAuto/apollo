@@ -6,14 +6,14 @@
         "type": "cppdbg",
         "request": "launch",
         // You can change the "planning" to your module name, but it should be 
-        // same as in gdbserver of the docker container. 
+        // same as those in gdbserver of the docker container. 
         "program": "${workspaceRoot}/bazel-bin/modules/planning/planning",
         // You can change "localhost:1111" to another "IP:port" name, but it 
-        // should be same as in gdbserver of the docker container.  
+        // should be same as those in gdbserver of the docker container.  
         "miDebuggerServerAddress": "localhost:1111",
         // You can change the task to meet your demands in the 
         // ".vscode/tasks.json" file (search the label:  
-        // "start the gdbserver in the ocker", but the module name and the port 
+        // "start gdbserver", but the module name and the port 
         // number should be consistent with this file.        
         "preLaunchTask": "start gdbserver",
         "args": [],

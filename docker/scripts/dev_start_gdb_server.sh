@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,7 +52,6 @@ check_docker_open
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "${DIR}/../.."
-pwd
 
 xhost +local:root 1>/dev/null 2>&1
 #echo $@
