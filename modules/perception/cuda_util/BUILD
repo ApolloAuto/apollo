@@ -26,6 +26,7 @@ cc_library(
         "*.h",
     ]),
     deps = [
+        "//modules/perception/obstacle/camera/lane_post_process/common:connected_component",
         "@caffe//:lib",
         "@cuda",
     ],

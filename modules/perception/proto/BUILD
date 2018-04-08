@@ -34,3 +34,31 @@ proto_library(
         "lane_post_process_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "probabilistic_fusion_config_lib_proto",
+    deps = [
+        ":probabilistic_fusion_config_lib",
+    ],
+)
+
+proto_library(
+    name = "probabilistic_fusion_config_lib",
+    srcs = [
+        "probabilistic_fusion_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "yolo_camera_detector_config_lib_proto",
+    deps = [
+        ":yolo_camera_detector_config_lib",
+    ],
+)
+
+proto_library(
+    name = "yolo_camera_detector_config_lib",
+    srcs = [
+        "yolo_camera_detector_config.proto",
+    ],
+)
