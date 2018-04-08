@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/obstacle/camera/lane_post_process/common/connected_component.h"
+
 #include <algorithm>
 #include <cmath>
 #include <limits>
 #include <utility>
-
-#include "modules/perception/obstacle/camera/lane_post_process/common/connected_component.h"
 
 namespace apollo {
 namespace perception {
@@ -244,9 +244,9 @@ void ConnectedComponent::FindVertices() {
           vertices_->push_back(Vertex(p->x, p->y));
         }
       } else {
-        AERROR << "the point "
-               << "(" << p->x << ", " << p->y << ")"
-               << " is not on bounding box.";
+        std::cerr << "the point "
+                  << "(" << p->x << ", " << p->y << ")"
+                  << " is not on bounding box." << std::endl;
       }
     }
   }
@@ -584,7 +584,6 @@ void ConnectedComponent::SplitContourHorizontal(int len_split,
   }
 }
 
-// version 2
 void ConnectedComponent::SplitContour(int split_len) {
   if (bbox_.split == BoundingBoxSplitType::NONE) {
     return;
@@ -616,7 +615,8 @@ void ConnectedComponent::SplitContour(int split_len) {
     }
 
   } else {
-    AERROR << "unknown bounding box split type: " << bbox_.split;
+    std::cerr << "unknown bounding box split type: "
+              << bbox_.split << std::endl;
   }
 }
 
@@ -631,13 +631,14 @@ void ConnectedComponent::Process(ScalarType split_siz, int split_len) {
   }
 }
 
-/** split a CC into several smaller ones **/
 vector<int> ConnectedComponent::GetSplitRanges(int siz, int len_split) {
   if (siz <= 0) {
-    AERROR << "siz should be a positive number: " << siz;
+    std::cerr << "siz should be a positive number: "
+              << siz << std::endl;
   }
   if (len_split <= 0) {
-    AERROR << "len_split should be a positive number: " << len_split;
+    std::cerr << "len_split should be a positive number: "
+              << len_split << std::endl;
   }
 
   int num_split = siz / len_split;
@@ -654,7 +655,7 @@ vector<int> ConnectedComponent::GetSplitRanges(int siz, int len_split) {
   return lens;
 }
 
-/* connected component generator */
+/** connected component generator **/
 ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
                                                          int image_height)
     : image_width_(image_width),
@@ -667,19 +668,8 @@ ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
       roi_y_max_(image_height - 1) {
   total_pix_ =
       static_cast<size_t>(image_width_) * static_cast<size_t>(image_height_);
-#if CUDA_CC
-  cudaChannelFormatDesc uchar_desc = cudaCreateChannelDesc<unsigned char>();
-  cudaMallocArray(&img_array_, &uchar_desc, static_cast<size_t>(width_),
-                  static_cast<size_t>(height_));
-  cudaBindTextureToArray(img_tex, img_array_, uchar_desc);
-  cudaMalloc(
-      reinterpret_cast<void**>(&label_array_),
-      static_cast<size_t>(width_) * static_cast<size_t>(height_) * sizeof(int));
-  labels_ = static_cast<int*>(malloc(total_pix_ * sizeof(int)));
-#else
   labels_.Init(total_pix_);
   frame_label_.resize(total_pix_, -1);
-#endif
   root_map_.reserve(total_pix_);
 }
 
@@ -695,67 +685,48 @@ ConnectedComponentGenerator::ConnectedComponentGenerator(int image_width,
       roi_x_max_(roi.x + roi.width - 1),
       roi_y_max_(roi.y + roi.height - 1) {
   if (roi_x_min_ < 0) {
-    AERROR << "x_min is less than zero: " << roi_x_min_;
+    std::cerr << "x_min is less than zero: " << roi_x_min_ << std::endl;
   }
   if (roi_y_min_ < 0) {
-    AERROR << "y_min is less than zero: " << roi_y_min_;
+    std::cerr << "y_min is less than zero: " << roi_y_min_ << std::endl;
   }
   if (roi_x_max_ >= image_width_) {
-    AERROR << "x_max is larger than image width: " << roi_x_max_ << "|"
-           << image_width_;
+    std::cerr << "x_max is larger than image width: " << roi_x_max_ << "|"
+              << image_width_ << std::endl;
   }
   if (roi_y_max_ >= image_height_) {
-    AERROR << "y_max is larger than image height: " << roi_y_max_ << "|"
-           << image_height_;
+    std::cerr << "y_max is larger than image height: " << roi_y_max_ << "|"
+              << image_height_ << std::endl;
   }
   total_pix_ = static_cast<size_t>(width_) * static_cast<size_t>(height_);
-#if _CUDA_CC
-  cudaChannelFormatDesc uchar_desc = cudaCreateChannelDesc<unsigned char>();
-  img_array_ = NULL;
-  cudaMallocArray(&img_array_, &uchar_desc, static_cast<size_t>(width_),
-                  static_cast<size_t>(height_));
-  cudaBindTextureToArray(img_tex, img_array_, uchar_desc);
-
-  cudaMalloc(
-      reinterpret_cast<void**>(&label_array_),
-      static_cast<size_t>(width_) * static_cast<size_t>(height_) * sizeof(int));
-
-  cudaError_t cuda_err = cudaGetLastError();
-  if (cuda_err != cudaSuccess) {
-    AERROR << "failed to initialize 'img_array' and 'label_array' with CUDA: "
-           << cudaGetErrorString(cuda_err);
-  }
-
-  labels_ = static_cast<int*>(malloc(total_pix_ * sizeof(int)));
-#else
   labels_.Init(total_pix_);
   frame_label_.resize(total_pix_, -1);
-#endif
   root_map_.reserve(total_pix_);
 }
 
 bool ConnectedComponentGenerator::FindConnectedComponents(
     const cv::Mat& lane_map, vector<shared_ptr<ConnectedComponent>>* cc) {
   if (lane_map.empty()) {
-    AERROR << "input lane map is empty";
+    std::cerr << "input lane map is empty" << std::endl;
     return false;
   }
   if (lane_map.type() != CV_8UC1) {
-    AERROR << "input lane map type is not CV_8UC1";
+    std::cerr << "input lane map type is not CV_8UC1" << std::endl;
     return false;
   }
 
   if (lane_map.cols != image_width_) {
-    AERROR << "The width of input lane map does not match";
+    std::cerr << "The width of input lane map does not match" << std::endl;
     return false;
   }
   if (lane_map.rows != image_height_) {
-    AERROR << "The height of input lane map does not match";
+    std::cerr << "The height of input lane map does not match" << std::endl;
     return false;
   }
 
   if (cc == NULL) {
-    AERROR << "the pointer of output connected components is null.";
+    std::cerr << "the pointer of output connected components is null."
+              << std::endl;
     return false;
   }
 
@@ -820,10 +791,10 @@ bool ConnectedComponentGenerator::FindConnectedComponents(
     prev_p = cur_p;
   }  // end for y
   if (root_map_.size() != labels_.Num()) {
-    AERROR << "the size of root map and labels are not equal.";
+    std::cerr << "the size of root map and labels are not equal." << std::endl;
     return false;
   }
-  AINFO << "subset number = " << labels_.Size();
+  std::cout << "subset number = " << labels_.Size() << std::endl;
 
   // second loop logic
   cur_idx = 0;
@@ -834,14 +805,14 @@ bool ConnectedComponentGenerator::FindConnectedComponents(
       curt_label = frame_label_[cur_idx];
       if (curt_label >= 0) {
         if (curt_label >= static_cast<int>(labels_.Num())) {
-          AERROR << "curt_label should be smaller than labels.num(): "
-                 << curt_label << " vs. " << labels_.Num();
+          std::cerr << "curt_label should be smaller than labels.num(): "
+                    << curt_label << " vs. " << labels_.Num() << std::endl;
           return false;
         }
         curt_label = labels_.Find(curt_label);
         if (curt_label >= static_cast<int>(root_map_.size())) {
-          AERROR << "curt_label should be smaller than root_map.size() "
-                 << curt_label << " vs. " << root_map_.size();
+          std::cerr << "curt_label should be smaller than root_map.size() "
+                    << curt_label << " vs. " << root_map_.size() << std::endl;
           return false;
         }
         if (root_map_[curt_label] != -1) {
@@ -853,7 +824,7 @@ bool ConnectedComponentGenerator::FindConnectedComponents(
       }
     }  // end for x
   }    // end for y
-  AINFO << "cc number = " << cc_count;
+  std::cout << "The number of cc = " << cc_count << std::endl;
 
   return true;
 }

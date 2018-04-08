@@ -17,17 +17,18 @@
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 
 #include <iomanip>
-#include <string>
-#include <vector>
+
 #include "modules/common/macro.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_hm_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
 
 namespace apollo {
 namespace perception {
+
+using apollo::common::util::GetProtoFromFile;
 
 ProbabilisticFusion::ProbabilisticFusion()
     : publish_sensor_id_("velodyne_64"),
@@ -47,24 +48,16 @@ ProbabilisticFusion::~ProbabilisticFusion() {
 }
 
 bool ProbabilisticFusion::Init() {
-  using apollo::perception::ConfigManager;
-  using apollo::perception::ModelConfig;
   sensor_manager_ = PbfSensorManager::Instance();
   ACHECK(sensor_manager_ != nullptr)
       << "Failed to get PbfSensorManager instance";
   track_manager_ = PbfTrackManager::instance();
   ACHECK(track_manager_ != nullptr) << "Failed to get PbfTrackManager instance";
-  const ModelConfig *model_config =
-      ConfigManager::instance()->GetModelConfig(name());
-  if (model_config == nullptr) {
-    AERROR << "not found model config: " << name();
-    return false;
-  }
-  /**matching parameters*/
-  std::string match_method = "hm_matcher";
-  if (!model_config->GetValue("match_method", &match_method)) {
-    AERROR << "match_method not found";
-  }
+
+  CHECK(GetProtoFromFile(FLAGS_probabilistic_fusion_config_file, &config_));
+
+  // matching parameters
+  std::string match_method = config_.match_method();
   if (match_method == "hm_matcher") {
     matcher_ = new PbfHmTrackObjectMatcher();
     if (matcher_->Init()) {
@@ -85,84 +78,51 @@ bool ProbabilisticFusion::Init() {
     }
   }
 
-  float max_match_distance = 4.0;
-  if (!model_config->GetValue("max_match_distance", &max_match_distance)) {
-    AERROR << "max_match_distance not found";
-  }
-  AINFO << "Probabilistic_fusion max_match_distance: " << max_match_distance;
+  float max_match_distance = config_.max_match_distance();
+  ADEBUG << "Probabilistic_fusion max_match_distance: " << max_match_distance;
   PbfBaseTrackObjectMatcher::SetMaxMatchDistance(max_match_distance);
 
-  /**track related parameters*/
-  float max_lidar_invisible_period = 0.25;
-  float max_radar_invisible_period = 0.25;
-  if (!model_config->GetValue("max_lidar_invisible_period",
-                              &max_lidar_invisible_period)) {
-    AERROR << "max_lidar_invisible_period not found";
-  }
+  // track related parameters
+  float max_lidar_invisible_period = config_.max_lidar_invisible_period();
   PbfTrack::SetMaxLidarInvisiblePeriod(max_lidar_invisible_period);
-  AINFO << "max_lidar_invisible_period: " << max_lidar_invisible_period;
+  ADEBUG << "max_lidar_invisible_period: " << max_lidar_invisible_period;
 
-  if (!model_config->GetValue("max_radar_invisible_period",
-                              &max_radar_invisible_period)) {
-    AERROR << "max_radar_invisible_period not found";
-  }
+  float max_radar_invisible_period = config_.max_radar_invisible_period();
   PbfTrack::SetMaxRadarInvisiblePeriod(max_radar_invisible_period);
-  AINFO << "max_radar_invisible_period: " << max_radar_invisible_period;
+  ADEBUG << "max_radar_invisible_period: " << max_radar_invisible_period;
 
-  float max_radar_confident_angle = 30;
-  float min_radar_confident_distance = 40;
-  if (!model_config->GetValue("max_radar_confident_angle",
-                              &max_radar_confident_angle)) {
-    AERROR << "max_radar_confident_angle not found";
-  }
+  float max_radar_confident_angle = config_.max_radar_confident_angle();
   PbfTrack::SetMaxRadarConfidentAngle(max_radar_confident_angle);
-  AINFO << "max_radar_confident_angle: " << max_radar_confident_angle;
+  ADEBUG << "max_radar_confident_angle: " << max_radar_confident_angle;
 
-  if (!model_config->GetValue("min_radar_confident_distance",
-                              &min_radar_confident_distance)) {
-    AERROR << "min_radar_confident_distance not found";
-  }
+  float min_radar_confident_distance = config_.min_radar_confident_distance();
   PbfTrack::SetMinRadarConfidentDistance(min_radar_confident_distance);
   AINFO << "min_radar_confident_distance: " << min_radar_confident_distance;
 
-  bool publish_if_has_lidar = true;
-  if (!model_config->GetValue("publish_if_has_lidar", &publish_if_has_lidar)) {
-    AERROR << "publish_if_has_lidar not found";
-  }
+  bool publish_if_has_lidar = config_.publish_if_has_lidar();
   PbfTrack::SetPublishIfHasLidar(publish_if_has_lidar);
-  AINFO << "publish_if_has_lidar: "
-        << (publish_if_has_lidar ? "true" : "false");
+  ADEBUG << "publish_if_has_lidar: "
+         << (publish_if_has_lidar ? "true" : "false");
 
-  bool publish_if_has_radar = true;
-  if (!model_config->GetValue("publish_if_has_radar", &publish_if_has_radar)) {
-    AERROR << "publish_if_has_radar not found";
-  }
+  bool publish_if_has_radar = config_.publish_if_has_radar();
   PbfTrack::SetPublishIfHasRadar(publish_if_has_radar);
-  AINFO << "publish_if_has_radar: "
-        << (publish_if_has_radar ? "true" : "false");
+  ADEBUG << "publish_if_has_radar: "
+         << (publish_if_has_radar ? "true" : "false");
 
-  /**publish driven*/
-  /*if (!model_config->GetValue("publish_sensor", &publish_sensor_id_)) {
-    AERROR << "publish_sensor not found";
-  }*/
+  // publish driven
   publish_sensor_id_ = FLAGS_fusion_publish_sensor_id;
-
   if (publish_sensor_id_ != "velodyne_64" && publish_sensor_id_ != "radar" &&
       publish_sensor_id_ != "camera") {
     AERROR << "Invalid publish_sensor value: " << publish_sensor_id_;
   }
+  ADEBUG << "publish_sensor: " << publish_sensor_id_;
 
-  AINFO << "publish_sensor: " << publish_sensor_id_;
+  use_radar_ = config_.use_radar();
+  ADEBUG << "use_radar :" << use_radar_;
+  use_lidar_ = config_.use_lidar();
+  ADEBUG << "use_lidar:" << use_lidar_;
 
-  if (!model_config->GetValue("use_radar", &use_radar_)) {
-    AERROR << "use_radar not found";
-  }
-  AINFO << "use_radar :" << use_radar_;
-  if (!model_config->GetValue("use_lidar", &use_lidar_)) {
-    AERROR << "use_lidar not found";
-  }
-  AINFO << "use_lidar:" << use_lidar_;
-  AINFO << "ProbabilisticFusion initialize successfully";
+  ADEBUG << "ProbabilisticFusion initialize successfully";
   return true;
 }
 

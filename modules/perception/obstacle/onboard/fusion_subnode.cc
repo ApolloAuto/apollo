@@ -138,8 +138,8 @@ bool FusionSubnode::InitOutputStream() {
 
   auto lane_iter = reserve_field_map.find("lane_event_id");
   if (lane_iter == reserve_field_map.end()) {
-    AWARN << "Failed to find camera_event_id:" << reserve_;
-    AINFO << "camera_event_id will be set -1";
+    AWARN << "Failed to find lane_event_id_:" << reserve_;
+    AINFO << "lane_event_id_ will be set -1";
     lane_event_id_ = -1;
   } else {
     lane_event_id_ = static_cast<EventID>(atoi((lane_iter->second).c_str()));
@@ -150,8 +150,7 @@ bool FusionSubnode::InitOutputStream() {
 
 Status FusionSubnode::ProcEvents() {
   for (auto event_meta : sub_meta_events_) {
-    // ignore lane event from polling
-    if (event_meta.event_id == lane_event_id_) continue;
+    if (event_meta.event_id == lane_event_id_) continue;  // ignore lane event
 
     std::vector<Event> events;
     if (!SubscribeEvents(event_meta, &events)) {
@@ -305,11 +304,13 @@ bool FusionSubnode::GetSharedData(const Event &event,
   } else if (event.event_id == camera_event_id_ &&
              camera_object_data_ != nullptr) {
     get_data_succ = camera_object_data_->Get(data_key, objs);
-    // trying to get lane shared data as well
-    Event lane_event;
-    if (event_manager_->Subscribe(lane_event_id_, &lane_event, false)) {
-      get_data_succ = lane_shared_data_->Get(data_key, &lane_objects_);
-      ADEBUG << "getting lane data successfully for data key " << data_key;
+
+    if (lane_shared_data_ != nullptr && lane_event_id_ != -1) {
+      Event lane_event;
+      if (event_manager_->Subscribe(lane_event_id_, &lane_event, false)) {
+        get_data_succ = lane_shared_data_->Get(data_key, &lane_objects_);
+        ADEBUG << "getting lane data successfully for data key " << data_key;
+      }
     }
   } else {
     AERROR << "Event id is not supported. event:" << event.to_string();
@@ -344,14 +345,16 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   }
 
   if (FLAGS_use_navigation_mode) {
-    // generate lane marker protobuf messages
-    LaneMarkers *lane_markers = obstacles->mutable_lane_marker();
-    LaneObjectsToLaneMarkerProto(*(lane_objects_), lane_markers);
-
     // Relative speed of objects + latest ego car speed in X
     for (auto obstacle : obstacles->perception_obstacle()) {
       obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
                                          chassis_speed_mps_);
+    }
+
+    // generate lane marker protobuf messages
+    if (lane_shared_data_ != nullptr && lane_event_id_ != -1) {
+      LaneMarkers *lane_markers = obstacles->mutable_lane_marker();
+      LaneObjectsToLaneMarkerProto(*(lane_objects_), lane_markers);
     }
   }
 
