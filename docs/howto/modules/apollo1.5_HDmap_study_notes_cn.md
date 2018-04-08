@@ -13,7 +13,7 @@
  * 在/apollo/modules/map/data目录下，创建一个目录new_map。
  * 将生成的hd map放入new_map中，如有配置文件，可以参考sunnyvale_office目录下的配置文件。
  * 编译，执行bash apollo.sh build。
- * 然后执行bash script/hmi.sh。
+ * 然后执行bash scripts/hmi.sh。
  * 打开ip:8887，在选择地图的下拉框中就可以看到新加入的hd map了。
  * 直接copy new_garage 重命名为new_garage_2测试的，测试通过。
  * 注1：编译的时候，应该相当于将/apollo/modules/map/data/new_map注册到系统中去，以便启动hmi时，前端网页可以定位到/apollo/modules/map/data/new_map目录，进而加载其中的文件。也因此，可以有第二个方法加入hd map。
