@@ -8,6 +8,7 @@ cc_library(
         "compression.cc",
         "system_utility.cc",
         "timer.cc",
+        "frame_transform.cc",
     ],
     hdrs = [
         "compression.h",
@@ -18,6 +19,8 @@ cc_library(
         "time_conversion.h",
         "timer.h",
         "voxel_grid_covariance_hdmap.h",
+        "frame_transform.h",
+        "sleep.h",
     ],
     linkopts = [
         "-lboost_filesystem",
