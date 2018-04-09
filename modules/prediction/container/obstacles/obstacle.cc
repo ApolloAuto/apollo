@@ -955,7 +955,7 @@ void Obstacle::SetLaneSequencePath(LaneGraph* const lane_graph) {
       for (int k = 0; k < lane_segment->lane_point_size(); ++k) {
         LanePoint* lane_point = lane_segment->mutable_lane_point(k);
         PathPoint path_point;
-        path_point.set_s(lane_segment_s + lane_point->relative_s());
+        path_point.set_s(lane_point->relative_s());
         path_point.set_theta(lane_point->heading());
         lane_sequence->add_path_point()->CopyFrom(path_point);
       }
