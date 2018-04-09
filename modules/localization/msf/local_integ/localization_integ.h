@@ -96,9 +96,6 @@ class LocalizationInteg {
   void TransferImuRfu(const drivers::gnss::Imu &imu_msg,
                       ImuData *imu_rfu);
 
-//   void TransferPointCloud(const sensor_msgs::PointCloud2 &message,
-//                           LidarFrame *lidar_frame);
-
  private:
   LocalizationIntegImpl* localization_integ_impl_;
 };
