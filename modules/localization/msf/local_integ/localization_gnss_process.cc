@@ -29,6 +29,7 @@ namespace msf {
 using apollo::common::Status;
 
 LocalizationGnssProcess::LocalizationGnssProcess() {
+  fp_eph_ = NULL;
   gnss_solver_ = new GnssSolver();
   double_antenna_solver_ = new GnssSolver();
 
