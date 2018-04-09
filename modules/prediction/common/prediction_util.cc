@@ -65,7 +65,7 @@ double EvaluateQuinticPolynomial(
     const double t, const uint32_t order,
     const double end_t, const double end_value) {
   if (t >= end_t) {
-    switch(order) {
+    switch (order) {
       case 0: {
         return end_value;
       }
@@ -106,7 +106,7 @@ double EvaluateQuarticPolynomial(
     const double t, const uint32_t order,
     const double end_t, const double end_value) {
   if (t >= end_t) {
-    switch(order) {
+    switch (order) {
       case 0: {
         return end_value;
       }
@@ -234,14 +234,17 @@ void GenerateFreeMoveTrajectoryPoints(
 }
 
 double AdjustSpeedByCurvature(const double speed, const double curvature) {
-  // TODO(kechxu) move some values to gflags
-  if (std::abs(curvature) < 0.02) {
+  if (std::abs(curvature) < FLAGS_turning_curvature_lower_bound) {
     return speed;
   }
-  if (std::abs(curvature) > 0.14) {
+  if (std::abs(curvature) > FLAGS_turning_curvature_upper_bound) {
     return 3.0;
   }
-  return apollo::common::math::lerp(8.5, 0.02, 3.0, 0.14, curvature);
+  return apollo::common::math::lerp(FLAGS_speed_at_lower_curvature,
+                                    FLAGS_turning_curvature_lower_bound,
+                                    FLAGS_speed_at_upper_curvature,
+                                    FLAGS_turning_curvature_upper_bound,
+                                    curvature);
 }
 
 }  // namespace predictor_util
