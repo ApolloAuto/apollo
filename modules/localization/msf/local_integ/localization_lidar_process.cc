@@ -26,15 +26,14 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
+using apollo::common::Status;
+
 LocalizationLidarProcess::LocalizationLidarProcess() {
   wheelspeed_state_ = WheelspeedState::NOT_INIT;
   imu_state_ = ImuState::NOT_INIT;
-  // predict_location_state_ = PredictLocationState::NOT_VALID;
   inspva_state_ = INSPVAState::NOT_INIT;
-  // imu_rate_ = 1.0;
 
   lidar_filter_size_ = 11;
-  lidar_thread_number_ = 2;
   out_map_count_ = 0;
   reinit_flag_ = false;
 
@@ -66,16 +65,9 @@ LocalizationLidarProcess::LocalizationLidarProcess() {
 
   non_zero_odometry_cnt_ = 0;
   max_nan_zero_odemetry_ = 10;
-
-  pthread_mutex_init(&pva_mutex_, NULL);
-  pthread_mutex_init(&imu_mutex_, NULL);
 }
 
 LocalizationLidarProcess::~LocalizationLidarProcess() {
-  pthread_mutex_destroy(&pva_mutex_);
-  pthread_mutex_destroy(&imu_mutex_);
-  // pthread_mutex_destroy(&wheelspeed_mutex_);
-
   delete locator_;
   locator_ = NULL;
 
@@ -83,7 +75,7 @@ LocalizationLidarProcess::~LocalizationLidarProcess() {
   pose_forcastor_ = NULL;
 }
 
-LocalizationState LocalizationLidarProcess::Init(
+Status LocalizationLidarProcess::Init(
     const LocalizationIntegParam& params) {
   // initial_success_ = false;
   map_path_ = params.map_path;
@@ -95,10 +87,8 @@ LocalizationState LocalizationLidarProcess::Init(
   utm_zone_id_ = params.utm_zone_id;
   map_coverage_theshold_ = params.map_coverage_theshold;
   imu_lidar_max_delay_time_ = params.imu_lidar_max_delay_time;
-  // imu_rate_ = params.imu_rate;
 
   lidar_filter_size_ = params.lidar_filter_size;
-  lidar_thread_number_ = params.lidar_thread_num;
 
   is_unstable_reset_ = params.is_lidar_unstable_reset;
   unstable_threshold_ = params.unstable_reset_threshold;
@@ -113,8 +103,6 @@ LocalizationState LocalizationLidarProcess::Init(
 
   // buffer
   out_map_count_ = 0;
-  imu_buffer_size_ = 200;
-  pva_buffer_size_ = 200;
 
   is_pre_state_init_ = false;
   cur_predict_location_ = TransformD::Identity();
@@ -129,8 +117,8 @@ LocalizationState LocalizationLidarProcess::Init(
     LOG(ERROR) << "LocalizationLidar: Fail to access the lidar"
                   " extrinsic file: "
                << lidar_extrinsic_file_;
-    return LocalizationState(LocalizationErrorCode::LIDAR_ERROR,
-                             "Fail to access the lidar extrinsic file");
+    return Status(common::LOCALIZATION_ERROR_LIDAR,
+        "Fail to access the lidar extrinsic file");
   }
 
   sucess = LoadLidarHeight(lidar_height_file_, &lidar_height_);
@@ -143,8 +131,8 @@ LocalizationState LocalizationLidarProcess::Init(
 
   if (!locator_->Init(map_path_, lidar_filter_size_,
                      lidar_filter_size_, utm_zone_id_)) {
-    return LocalizationState(LocalizationErrorCode::LIDAR_ERROR,
-                             "Fail to load localization map!");
+    return Status(common::LOCALIZATION_ERROR_LIDAR,
+        "Fail to load localization map!");
   }
 
   locator_->SetVelodyneExtrinsic(lidar_extrinsic_);
@@ -159,10 +147,10 @@ LocalizationState LocalizationLidarProcess::Init(
   pose_forcastor_->SetMaxGyroInput(200 * 0.017453292519943);
   pose_forcastor_->SetZoneId(utm_zone_id_);
 
-  return LocalizationState::OK();
+  return Status::OK();
 }
 
-double LocalizationLidarProcess::ComputeDeltaYaw(
+double LocalizationLidarProcess::ComputeDeltaYawLimit(
       int64_t index_cur, int64_t index_stable,
       double limit_min, double limit_max) {
   if (index_cur > index_stable) {
@@ -196,9 +184,9 @@ void LocalizationLidarProcess::PcdProcess(const LidarFrame& lidar_frame) {
   }
   ++forcast_timer_;
 
-  locator_->SetDeltaYawLimit(ComputeDeltaYaw(forcast_timer_, 10,
-                                             delta_yaw_limit_,
-                                             init_delta_yaw_limit_));
+  locator_->SetDeltaYawLimit(ComputeDeltaYawLimit(forcast_timer_, 10,
+                                                  delta_yaw_limit_,
+                                                  init_delta_yaw_limit_));
 
   if (!is_pre_state_init_) {
     pre_predict_location_ = cur_predict_location_;
@@ -240,7 +228,7 @@ int LocalizationLidarProcess::GetResult(
   position->set_y(location_.translation()(1));
   position->set_z(location_.translation()(2));
 
-  QuaternionD quat(location_.linear());
+  Eigen::Quaterniond quat(location_.linear());
   quaternion->set_qx(quat.x());
   quaternion->set_qy(quat.y());
   quaternion->set_qz(quat.z());

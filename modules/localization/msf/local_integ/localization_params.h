@@ -59,7 +59,7 @@ struct LocalizationIntegParam {
       lidar_extrinsic_file(""), lidar_height_file(""),
       lidar_height_default(1.7), lidar_debug_log_flag(true),
       localization_mode(2), lidar_yaw_align_mode(1),
-      lidar_filter_size(17), lidar_thread_num(1), map_coverage_theshold(0.8),
+      lidar_filter_size(17), map_coverage_theshold(0.8),
       imu_lidar_max_delay_time(0.4), utm_zone_id(50), imu_rate(1.0),
       enable_lidar_localization(true), is_use_visualize(false),
       is_lidar_unstable_reset(true),
@@ -107,50 +107,6 @@ struct LocalizationIntegParam {
 
   bool is_lidar_unstable_reset;
   double unstable_reset_threshold;
-};
-
-enum class LocalizationErrorCode {
-  INTEG_ERROR = 0,
-  LIDAR_ERROR,
-  GNSS_ERROR,
-  OK
-};
-
-class LocalizationState {
- public:
-  LocalizationState()
-      : error_code_(LocalizationErrorCode::OK), error_msg_("") {}
-
-  LocalizationState(LocalizationErrorCode code, const std::string& msg)
-      : error_code_(code), error_msg_(msg) {}
-
-  static LocalizationState OK() {
-    return LocalizationState();
-  }
-
-  LocalizationErrorCode error_code() const {
-    return error_code_;
-  }
-
-  std::string error_msg() const {
-    return error_msg_;
-  }
-
-  bool ok() {
-    return error_code_ == LocalizationErrorCode::OK;
-  }
-
- private:
-  LocalizationErrorCode error_code_;
-  std::string error_msg_;
-};
-
-struct LidarFrame {
-  double measurement_time;  // unix time
-  std::vector<double> pt_xs;
-  std::vector<double> pt_ys;
-  std::vector<double> pt_zs;
-  std::vector<unsigned char> intensities;
 };
 
 enum class LocalizationMeasureState { NOT_VALID = 0, NOT_STABLE, OK, VALID };

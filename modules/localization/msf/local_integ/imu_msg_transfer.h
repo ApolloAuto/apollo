@@ -15,12 +15,12 @@
  *****************************************************************************/
 
 /**
- * @file gnss_msg_transfer.h
- * @brief The class of GnssMsgTransfer
+ * @file imu_msg_transfer.h
+ * @brief The class of ImuMsgTransfer
  */
 
-#ifndef MODULES_LOCALIZATION_MSF_GNSS_MSG_TRANSFER_H_
-#define MODULES_LOCALIZATION_MSF_GNSS_MSG_TRANSFER_H_
+#ifndef MODULES_LOCALIZATION_MSF_IMU_MSG_TRANSFER_H_
+#define MODULES_LOCALIZATION_MSF_IMU_MSG_TRANSFER_H_
 
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "include/gnss_struct.h"

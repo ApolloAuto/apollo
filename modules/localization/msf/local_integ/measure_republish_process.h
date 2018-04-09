@@ -27,6 +27,7 @@
 #include <Eigen/Geometry>
 #include <list>
 #include <string>
+#include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
@@ -63,7 +64,7 @@ class MeasureRepublishProcess {
   MeasureRepublishProcess();
   ~MeasureRepublishProcess();
   // Initialization.
-  LocalizationState Init(const LocalizationIntegParam& params);
+  common::Status Init(const LocalizationIntegParam& params);
 
   // GNSS message process
   bool NovatelBestgnssposProcess(const GnssBestPose& bestgnsspos_msg,
@@ -90,8 +91,6 @@ class MeasureRepublishProcess {
   bool debug_log_flag_;
 
   double map_height_time_;
-  double map_height_;
-  TransformD lidar_pose_;
   pthread_mutex_t height_mutex_;
 
   GnssMode gnss_mode_;

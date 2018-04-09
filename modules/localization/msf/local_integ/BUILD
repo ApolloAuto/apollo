@@ -6,8 +6,6 @@ cc_library(
     name = "localization_msf_local_integ",
     srcs = glob(["*.cc",]),
     hdrs = glob(["*.h",]),
-#    defines = ["VIS_USE_OPENCV"],
-#    copts = ["-fopenmp"],
     linkopts = [
         "-lboost_system",
         "-lboost_thread",
@@ -18,6 +16,7 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
+        "//modules/common/status",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:pose_proto",
         "//modules/localization/proto:sins_pva_proto",

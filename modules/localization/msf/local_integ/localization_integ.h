@@ -28,11 +28,13 @@
 #include <vector>
 #include <list>
 #include "sensor_msgs/PointCloud2.h"
+#include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
+#include "modules/localization/msf/local_integ/localization_lidar.h"
 #include "include/sins_struct.h"
 #include "include/gnss_struct.h"
 
@@ -57,7 +59,7 @@ class LocalizationInteg {
   LocalizationInteg();
   ~LocalizationInteg();
   // Initialization.
-  LocalizationState Init(const LocalizationIntegParam& params);
+  common::Status Init(const LocalizationIntegParam& params);
 
   // Lidar pcd process.
   void PcdProcess(const sensor_msgs::PointCloud2& message);
@@ -94,8 +96,8 @@ class LocalizationInteg {
   void TransferImuRfu(const drivers::gnss::Imu &imu_msg,
                       ImuData *imu_rfu);
 
-  void TransferPointCloud(const sensor_msgs::PointCloud2 &message,
-                          LidarFrame *lidar_frame);
+//   void TransferPointCloud(const sensor_msgs::PointCloud2 &message,
+//                           LidarFrame *lidar_frame);
 
  private:
   LocalizationIntegImpl* localization_integ_impl_;

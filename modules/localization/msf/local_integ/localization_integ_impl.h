@@ -27,12 +27,12 @@
 #include <queue>
 #include <list>
 
+#include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_gnss_process.h"
 #include "modules/localization/msf/local_integ/localization_integ_process.h"
 #include "modules/localization/msf/local_integ/localization_lidar_process.h"
 #include "modules/localization/msf/local_integ/measure_republish_process.h"
 #include "modules/localization/msf/local_integ/localization_integ.h"
-#include "modules/localization/msf/local_integ/pose_query.h"
 
 /**
  * @namespace apollo::localization
@@ -58,7 +58,7 @@ class LocalizationIntegImpl {
   LocalizationIntegImpl();
   ~LocalizationIntegImpl();
   // Initialization.
-  LocalizationState Init(const LocalizationIntegParam& params);
+  common::Status Init(const LocalizationIntegParam& params);
 
   // Lidar pcd process.
   void PcdProcess(const LidarFrame& lidar_frame);

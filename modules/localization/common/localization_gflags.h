@@ -58,7 +58,6 @@ DECLARE_double(lidar_height_default);
 DECLARE_int32(lidar_localization_mode);
 DECLARE_int32(lidar_yaw_align_mode);
 DECLARE_int32(lidar_filter_size);
-DECLARE_int32(lidar_thread_num);
 DECLARE_double(lidar_imu_max_delay_time);
 DECLARE_double(lidar_map_coverage_theshold);
 DECLARE_bool(lidar_debug_log_flag);

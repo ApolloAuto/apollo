@@ -26,6 +26,8 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
+using common::Status;
+
 MeasureRepublishProcess::MeasureRepublishProcess() {
   gnss_mode_ = GnssMode::NOVATEL;
 }
@@ -35,7 +37,7 @@ MeasureRepublishProcess::~MeasureRepublishProcess() {
   pthread_mutex_destroy(&height_mutex_);
 }
 
-LocalizationState MeasureRepublishProcess::Init(
+Status MeasureRepublishProcess::Init(
     const LocalizationIntegParam& params) {
   local_utm_zone_id_ = params.utm_zone_id;
   debug_log_flag_ = params.integ_debug_log_flag;
@@ -47,10 +49,8 @@ LocalizationState MeasureRepublishProcess::Init(
   pthread_mutex_init(&integ_pva_mutex_, NULL);
   pthread_mutex_init(&height_mutex_, NULL);
 
-  map_height_ = 0.0;
-  lidar_pose_ = TransformD::Identity();
   map_height_time_ = 0.0;
-  return LocalizationState::OK();
+  return Status::OK();
 }
 
 bool MeasureRepublishProcess::NovatelBestgnssposProcess(
@@ -420,9 +420,9 @@ int MeasureRepublishProcess::LidarLocalProcess(
   Eigen::Vector3d trans(lidar_local_msg.pose().position().x(),
                         lidar_local_msg.pose().position().y(),
                         lidar_local_msg.pose().position().z());
-  lidar_pose_ = Eigen::Translation3d(trans) * temp_quaternion;
+  // lidar_pose_ = Eigen::Translation3d(trans) * temp_quaternion;
 
-  map_height_ = measure_data.gnss_pos.height;
+  // map_height_ = measure_data.gnss_pos.height;
   map_height_time_ = measure_data.time;
   pthread_mutex_unlock(&height_mutex_);
 
@@ -453,18 +453,9 @@ int MeasureRepublishProcess::LidarLocalProcess(
     measure_data.variance[8][8] = yaw_var;
   }
 
-  //   _output->publish_integ_measure_data(&measure_data);
-
   // TranferToIntegMeasureData(measure_data, measure);
   *measure = measure_data;
 
-  //   if (_stop_gnss_with_pointcloud) {
-  //     static int lidar_local_counter = 0;
-  //     ++lidar_local_counter;
-  //     if (lidar_local_counter == 10) {
-  //       _stop_gnss = true;
-  //     }
-  //   }
   if (debug_log_flag_) {
     LOG(INFO) << std::setprecision(16)
               << "MeasureDataRepublish Debug Log: lidarLocal msg: "

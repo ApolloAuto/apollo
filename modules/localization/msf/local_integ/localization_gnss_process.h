@@ -25,13 +25,10 @@
 #include <Eigen/Eigen>
 #include <map>
 #include <string>
+#include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "include/gnss_solver.h"
-// #include "local_gnss/gnss_positioning.h"
-// #include "local_sins/navigation_struct.hpp"
-// #include "localization_gnss_raw_observation.h"
-// #include "localization_gnss_pnt_result.h"
 
 /**
  * @namespace apollo::localization::msf
@@ -40,14 +37,6 @@
 namespace apollo {
 namespace localization {
 namespace msf {
-
-// typedef apollo::drivers::gnss::EpochObservation EpochObservation;
-// typedef apollo::drivers::gnss::GnssEphemeris GnssEphemeris;
-
-// typedef apollo::localization::msf::GnssPntSolver GnssPntSolver;
-// typedef apollo::localization::msf::GnssPntResult GnssPntResult;
-// typedef apollo::localization::msf::PointThreeDim PointThreeDim;
-// typedef apollo::localization::msf::EphKey EphKey;
 
 union LeverArm {
   double arm[3];
@@ -116,7 +105,7 @@ class LocalizationGnssProcess {
  public:
   LocalizationGnssProcess();
   ~LocalizationGnssProcess();
-  LocalizationState Init(const LocalizationIntegParam &param);
+  apollo::common::Status Init(const LocalizationIntegParam &param);
   // callback function for rostopic
   // raw data' field "receiver_id" differs rover (= 0) from baser (= 1)
   void RawObservationProcess(const drivers::gnss::EpochObservation &raw_obs);

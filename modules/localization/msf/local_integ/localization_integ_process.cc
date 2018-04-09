@@ -26,12 +26,11 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
+using apollo::common::Status;
+
 LocalizationIntegProcess::LocalizationIntegProcess() {
   integ_state_ = IntegState::NOT_INIT;
   memset(pva_covariance_, 0, sizeof(double) * 9 * 9);
-  // is_sins_state_check_ = true;
-  // sins_state_span_time_ = 60.0;
-  // sins_state_pos_std_ = 1.0;
   delay_output_counter_ = 0;
 
   keep_running_ = true;
@@ -47,22 +46,16 @@ LocalizationIntegProcess::~LocalizationIntegProcess() {
   new_measure_data_signal_.notify_one();
   measure_data_thread_.join();
 
-  // pthread_mutex_destroy(&imu_mutex_);
-  // pthread_mutex_destroy(&integ_time_update_mutex_);
-  // pthread_mutex_destroy(&measure_callback_mutex_);
-
   delete sins_;
   sins_ = NULL;
 }
 
-LocalizationState LocalizationIntegProcess::Init(
+Status LocalizationIntegProcess::Init(
     const LocalizationIntegParam &param) {
-  // sins_state_span_time_
-
+  // sins init
   sins_->Init(param.is_ins_can_self_align);
   sins_->SetSinsAlignFromVel(param.is_sins_align_with_vel);
 
-  // sins_->SetSinsStateCheck(param.is_sins_state_check);
   sins_->SetResetSinsPoseStd(param.sins_state_pos_std);
   sins_->SetResetSinsMeasSpanTime(param.sins_state_span_time);
 
@@ -84,10 +77,10 @@ LocalizationState LocalizationIntegProcess::Init(
 
   sins_->SetVelThresholdGetYaw(param.vel_threshold_get_yaw);
 
-  imu_rate_ = param.imu_rate;
+  // imu_rate_ = param.imu_rate;
   debug_log_flag_ = param.integ_debug_log_flag;
 
-  return LocalizationState::OK();
+  return Status::OK();
 }
 
 void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
@@ -139,19 +132,6 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
   }
 
   pre_imu_time = cur_imu_time;
-
-  // if (debug_log_flag_) {
-  //   std::cerr << std::setprecision(16)
-  //             << "IntegratedLocalization Debug Log: RawImu msg: "
-  //             << "[time:" << cur_imu_time << "]" << std::endl;
-  //   std::cerr << std::setprecision(6)
-  //             << "[acc_x:" << imu_data.fb[0] << "]"
-  //             << "[acc_y:" << imu_data.fb[1] << "]"
-  //             << "[acc_z:" << imu_data.fb[2] << "]"
-  //             << "[w_x:" << imu_data.wibb[0] << "]"
-  //             << "[w_y:" << imu_data.wibb[1] << "]"
-  //             << "[w_z:" << imu_data.wibb[2] << "]" << std::endl;
-  // }
 
   return;
 }
@@ -263,29 +243,6 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   memcpy(pva_covariance, pva_covariance_, sizeof(double) * 9 * 9);
   return;
 }
-
-// void LocalizationIntegProcess::GetResult(MeasureData *measure_data) {
-//   measure_data->time = ins_pva_.time;
-//   measure_data->gnss_pos.longitude = ins_pva_.pos.longitude;
-//   measure_data->gnss_pos.latitude = ins_pva_.pos.latitude;
-//   measure_data->gnss_pos.height = ins_pva_.pos.height;
-//   measure_data->gnss_vel.ve = ins_pva_.vel.ve;
-//   measure_data->gnss_vel.vn = ins_pva_.vel.vn;
-//   measure_data->gnss_vel.vu = ins_pva_.vel.vu;
-//   measure_data->gnss_att.pitch = ins_pva_.att.pitch;
-//   measure_data->gnss_att.roll = ins_pva_.att.roll;
-//   measure_data->gnss_att.yaw = ins_pva_.att.yaw;
-
-//   measure_data->is_have_variance = true;
-
-//   for (int i = 0; i < 9; ++i) {
-//     for (int j = 0; j < 9; ++j) {
-//       measure_data->variance[i][j] = pva_covariance_[i][j];
-//     }
-//   }
-
-//   return;
-// }
 
 void LocalizationIntegProcess::MeasureDataProcess(
     const MeasureData &measure_msg) {

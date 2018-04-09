@@ -17,6 +17,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include "modules/common/log.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_2d.h"
@@ -30,6 +31,14 @@
 namespace apollo {
 namespace localization {
 namespace msf {
+
+struct LidarFrame {
+  double measurement_time;  // unix time
+  std::vector<double> pt_xs;
+  std::vector<double> pt_ys;
+  std::vector<double> pt_zs;
+  std::vector<unsigned char> intensities;
+};
 
 struct MapNodeData {
   MapNodeData(int w, int h) {

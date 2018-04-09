@@ -117,18 +117,7 @@ Status MSFLocalization::Stop() { return Status::OK(); }
 Status MSFLocalization::Init() {
   InitParams();
 
-  msf::LocalizationState &&state =
-      localization_integ_.Init(localizaiton_param_);
-  switch (state.error_code()) {
-    case msf::LocalizationErrorCode::INTEG_ERROR:
-      return Status(common::LOCALIZATION_ERROR_INTEG, state.error_msg());
-    case msf::LocalizationErrorCode::LIDAR_ERROR:
-      return Status(common::LOCALIZATION_ERROR_LIDAR, state.error_msg());
-    case msf::LocalizationErrorCode::GNSS_ERROR:
-      return Status(common::LOCALIZATION_ERROR_GNSS, state.error_msg());
-    default:
-      return Status::OK();
-  }
+  return localization_integ_.Init(localizaiton_param_);
 }
 
 void MSFLocalization::InitParams() {
@@ -160,7 +149,6 @@ void MSFLocalization::InitParams() {
   localizaiton_param_.localization_mode = FLAGS_lidar_localization_mode;
   localizaiton_param_.lidar_yaw_align_mode = FLAGS_lidar_yaw_align_mode;
   localizaiton_param_.lidar_filter_size = FLAGS_lidar_filter_size;
-  localizaiton_param_.lidar_thread_num = FLAGS_lidar_thread_num;
   localizaiton_param_.map_coverage_theshold = FLAGS_lidar_map_coverage_theshold;
   localizaiton_param_.imu_lidar_max_delay_time = FLAGS_lidar_imu_max_delay_time;
 

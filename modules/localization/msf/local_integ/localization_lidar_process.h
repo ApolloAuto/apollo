@@ -28,6 +28,7 @@
 #include <list>
 #include <string>
 #include <cstdint>
+#include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -43,15 +44,6 @@
 namespace apollo {
 namespace localization {
 namespace msf {
-
-typedef Eigen::Affine3d TransformD;
-typedef Eigen::Vector3d Vector3D;
-typedef Eigen::Translation3d Translation3D;
-typedef Eigen::Matrix3d Matrix3D;
-typedef Eigen::Quaterniond QuaternionD;
-// typedef adu::localization::integrated_navigation::InsPva InsPva;
-
-// typedef ::LocalizationMode LocalizationMode;
 
 enum class ForcastState {
     NOT_VALID = 0,
@@ -105,10 +97,15 @@ struct LidarHeight {
  */
 class LocalizationLidarProcess {
  public:
+  typedef Eigen::Affine3d TransformD;
+  typedef Eigen::Vector3d Vector3D;
+  typedef Eigen::Matrix3d Matrix3D;
+
   LocalizationLidarProcess();
   ~LocalizationLidarProcess();
+
   // Initialization.
-  LocalizationState Init(const LocalizationIntegParam& params);
+  apollo::common::Status Init(const LocalizationIntegParam& params);
   // Lidar pcd process and get result.
   void PcdProcess(const LidarFrame& lidar_frame);
   void GetResult(int *lidar_status, TransformD *location, Matrix3D *covariance);
@@ -132,11 +129,8 @@ class LocalizationLidarProcess {
                           TransformD *lidar_extrinsic);
   // Load lidar height (the distance between lidar and ground).
   bool LoadLidarHeight(const std::string& file_path, LidarHeight *height);
-  // // Parse lidar frame.
-  // void ParseLidarFrame(sensor_msgs::PointCloud2::Ptr& lidar_msg,
-  //                      LidarFrame& lidar_frame) const;
 
-  double ComputeDeltaYaw(int64_t index_cur, int64_t index_stable,
+  double ComputeDeltaYawLimit(int64_t index_cur, int64_t index_stable,
             double limit_min, double limit_max);
 
  private:
@@ -150,6 +144,7 @@ class LocalizationLidarProcess {
   bool debug_log_flag_;
   int localization_mode_;
   int yaw_align_mode_;
+  int lidar_filter_size_;
   double delta_yaw_limit_;
   double init_delta_yaw_limit_;
   double compensate_pitch_roll_limit_;
@@ -170,31 +165,7 @@ class LocalizationLidarProcess {
   Matrix3D location_covariance_;
   LidarState lidar_status_;
 
-  // bool is_get_pose_from_imu_;
-  // double imu_rate_;
-
-  // bool initial_success_;
-  // bool reload_map_flag_;
   bool reinit_flag_;
-
-  /**@brief list to store integrated navigation pva. */
-  std::list<InsPva> pva_forcast_list_;
-  /**@brief the list size of pva list. */
-  int pva_buffer_size_;
-  pthread_mutex_t pva_mutex_;
-  /**@brief list to store raw imu data. */
-  std::list<ImuData> imu_data_list_;
-  /**@brief the list size of raw imu list. */
-  int imu_buffer_size_;
-  pthread_mutex_t imu_mutex_;
-
-  // /**@brief list to store wheelspeed data. */
-  // std::list<WheelspeedData> wheelspeed_list_;
-  // /**@brief the list size of wheelspeed data. */
-  // int wheelspeed_buffer_size_;
-  // /**@brief level arm between wheelspeed and imu. */
-  // TransformD wheel_extrinsic_;
-  // pthread_mutex_t wheelspeed_mutex_;
 
   // imu and lidar max delay time
   double imu_lidar_max_delay_time_;
@@ -205,10 +176,6 @@ class LocalizationLidarProcess {
   WheelspeedState wheelspeed_state_;
   ImuState imu_state_;
   INSPVAState inspva_state_;
-  // PredictLocationState predict_location_state_;
-
-  int lidar_filter_size_;
-  int lidar_thread_number_;
 
   int out_map_count_;
 

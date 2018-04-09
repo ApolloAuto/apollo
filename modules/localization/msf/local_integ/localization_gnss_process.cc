@@ -26,6 +26,8 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
+using apollo::common::Status;
+
 LocalizationGnssProcess::LocalizationGnssProcess() {
   gnss_solver_ = new GnssSolver();
   double_antenna_solver_ = new GnssSolver();
@@ -49,7 +51,7 @@ LocalizationGnssProcess::~LocalizationGnssProcess() {
   double_antenna_solver_ = NULL;
 }
 
-LocalizationState LocalizationGnssProcess::Init(
+Status LocalizationGnssProcess::Init(
     const LocalizationIntegParam &param) {
   // set launch parameter
   enable_ins_aid_rtk_ = param.enable_ins_aid_rtk;
@@ -90,7 +92,7 @@ LocalizationState LocalizationGnssProcess::Init(
   std::string amb_full_path = eph_buffer_path_ + "amb.txt";
   gnss_solver_->set_ambiguity_file(static_cast<char *>(amb_full_path.data()));
 #endif
-  return LocalizationState::OK();
+  return Status::OK();
 }
 
 void LocalizationGnssProcess::RawObservationProcess(
@@ -130,7 +132,7 @@ void LocalizationGnssProcess::RawObservationProcess(
   LOG(INFO) << message;
 
   EpochObservationMsg raw_obs_msg;
-  GnssMagTransfer::transfer(raw_obs, &raw_obs_msg);
+  GnssMagTransfer::Transfer(raw_obs, &raw_obs_msg);
   if (raw_obs.receiver_id() != 0) {
     // Notice: the baser coordinate should be binded with obs together anytime.
     gnss_solver_->save_baser_observation(raw_obs_msg);
@@ -177,7 +179,7 @@ void LocalizationGnssProcess::RawEphemerisProcess(
   }
 
   GnssEphemerisMsg gnss_orbit_msg;
-  GnssMagTransfer::transfer(gnss_orbit, &gnss_orbit_msg);
+  GnssMagTransfer::Transfer(gnss_orbit, &gnss_orbit_msg);
   if (gnss_solver_->save_gnss_ephemris(gnss_orbit_msg)) {
     // save to file only when new arriving eph is truely NEW!
     if (enable_auto_save_eph_file_ && fp_eph_ != NULL) {
@@ -226,23 +228,6 @@ void LocalizationGnssProcess::IntegSinsPvaProcess(
                               euler, lever_arm);
   return;
 }
-
-// bool LocalizationGnssProcess::LoadGnssAntennaExtrinsic(
-//     const std::string &para_path, LeverArm &lever_arm) {
-//   YAML::Node confige = YAML::LoadFile(para_path);
-//   if (confige["leverarm"]) {
-//     if (confige["leverarm"]["primary"]["offset"]) {
-//       lever_arm.arm_x =
-//           confige["leverarm"]["primary"]["offset"]["x"].as<double>();
-//       lever_arm.arm_y =
-//           confige["leverarm"]["primary"]["offset"]["y"].as<double>();
-//       lever_arm.arm_z =
-//           confige["leverarm"]["primary"]["offset"]["z"].as<double>();
-//       return true;
-//     }
-//   }
-//   return false;
-// }
 
 LocalizationMeasureState LocalizationGnssProcess::GetResult(
     MeasureData *gnss_msg) {

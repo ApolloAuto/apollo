@@ -27,6 +27,7 @@
 #include <string>
 #include <thread>
 #include <atomic>
+#include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "include/sins.h"
@@ -39,12 +40,6 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-typedef Eigen::Affine3d TransformD;
-typedef Eigen::Vector3d Vector3D;
-typedef Eigen::Translation3d Translation3D;
-typedef Eigen::Matrix3d Matrix3D;
-typedef Eigen::Quaterniond QuaternionD;
-
 enum class IntegState { NOT_INIT = 0, NOT_STABLE, OK, VALID };
 
 /**
@@ -55,10 +50,13 @@ enum class IntegState { NOT_INIT = 0, NOT_STABLE, OK, VALID };
 
 class LocalizationIntegProcess {
  public:
+  typedef Eigen::Affine3d TransformD;
+
   LocalizationIntegProcess();
   ~LocalizationIntegProcess();
+
   // Initialization.
-  LocalizationState Init(const LocalizationIntegParam& params);
+  apollo::common::Status Init(const LocalizationIntegParam& params);
 
   // Raw Imu process.
   void RawImuProcess(const ImuData &imu_msg);
@@ -85,36 +83,11 @@ class LocalizationIntegProcess {
  private:
   Sins *sins_;
 
-  // // integration
-  // IntegratedNavigation integ_nav_sins_update_;
-  // IntegratedNavigation integ_nav_measure_update_;
-  // pthread_mutex_t integ_time_update_mutex_;
-
-  // // imu msg
-  // std::list<SinsImuData> rawimu_list_;
-  // std::list<SinsImuData> rawimu_list_measure_update_;
-  // pthread_mutex_t imu_mutex_;
-
-  // // measure data
-  // std::list<MeasureData> measure_data_list_;
-  // pthread_mutex_t measure_callback_mutex_;
-
   // config
   TransformD gnss_antenna_extrinsic_;
-  // TransformD velodyne_extrinsic_;
-  // TransformD wheelspeed_extrinsic_;
-
-  // bool is_sins_align_with_vel_;
-  // double vel_threshold_get_yaw_;
 
   bool debug_log_flag_;
-  double imu_rate_;
-
-  // // temporary variable
-  // double pre_measure_update_time_;
-  // bool measure_callback_execute_;
-
-  // bool is_using_raw_gnsspos_;
+  // double imu_rate_;
 
   IntegState integ_state_;
   InsPva ins_pva_;

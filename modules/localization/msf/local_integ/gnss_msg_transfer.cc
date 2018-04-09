@@ -20,7 +20,7 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-void GnssMagTransfer::transfer(
+void GnssMagTransfer::Transfer(
     const apollo::drivers::gnss::BandObservation &in,
     BandObservationMsg* out) {
   if (in.has_band_id()) {
@@ -50,7 +50,7 @@ void GnssMagTransfer::transfer(
   return;
 }
 
-void GnssMagTransfer::transfer(
+void GnssMagTransfer::Transfer(
     const apollo::drivers::gnss::SatelliteObservation &in,
     SatelliteObservationMsg* out) {
   if (in.has_sat_prn()) {
@@ -65,13 +65,13 @@ void GnssMagTransfer::transfer(
   out->clear_band_obs();
   for (int idx = 0; idx < in.band_obs_size(); ++idx) {
     auto tmp = out->add_band_obs();
-    transfer(in.band_obs(idx), tmp);
+    Transfer(in.band_obs(idx), tmp);
   }
 
   return;
 }
 
-void GnssMagTransfer::transfer(
+void GnssMagTransfer::Transfer(
     const apollo::drivers::gnss::EpochObservation &in,
     EpochObservationMsg* out) {
   if (in.has_receiver_id()) {
@@ -104,12 +104,12 @@ void GnssMagTransfer::transfer(
   out->clear_sat_obs();
   for (int idx = 0; idx < in.sat_obs_size(); ++idx) {
     auto tmp = out->add_sat_obs();
-    transfer(in.sat_obs(idx), tmp);
+    Transfer(in.sat_obs(idx), tmp);
   }
   return;
 }
 
-void GnssMagTransfer::transfer(
+void GnssMagTransfer::Transfer(
     const apollo::drivers::gnss::KepplerOrbit &in,
     KepplerOrbitMsg* out) {
   if (in.has_gnss_type()) {
@@ -230,7 +230,7 @@ void GnssMagTransfer::transfer(
   return;
 }
 
-void GnssMagTransfer::transfer(
+void GnssMagTransfer::Transfer(
     const apollo::drivers::gnss::GlonassOrbit &in,
     GlonassOrbitMsg* out) {
   if (in.has_gnss_type()) {
@@ -318,7 +318,7 @@ void GnssMagTransfer::transfer(
   return;
 }
 
-void GnssMagTransfer::transfer(
+void GnssMagTransfer::Transfer(
     const apollo::drivers::gnss::GnssEphemeris &in,
     GnssEphemerisMsg* out) {
   if (in.has_gnss_type()) {
@@ -326,11 +326,11 @@ void GnssMagTransfer::transfer(
   }
   if (in.has_keppler_orbit()) {
     auto tmp = out->mutable_keppler_orbit();
-    transfer(in.keppler_orbit(), tmp);
+    Transfer(in.keppler_orbit(), tmp);
   }
   if (in.has_glonass_orbit()) {
     auto tmp = out->mutable_glonass_orbit();
-    transfer(in.glonass_orbit(), tmp);
+    Transfer(in.glonass_orbit(), tmp);
   }
 
   return;
