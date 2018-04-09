@@ -107,7 +107,7 @@ ErrorCode VehicleController::Update(const ControlCommand &command) {
     Chassis::DrivingMode mode = Chassis::COMPLETE_MANUAL;
     switch (control_command.pad_msg().action()) {
       case control::DrivingAction::START: {
-        mode = params_.driving_mode();
+        mode = Chassis::COMPLETE_AUTO_DRIVE;
         break;
       }
       case control::DrivingAction::STOP:
