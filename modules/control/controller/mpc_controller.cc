@@ -155,7 +155,7 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_a_(1, 2) = (cf_ + cr_) / mass_;
   matrix_a_(2, 3) = 1.0;
   matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
-  matrix_a_(4, 4) = 1.0;
+  matrix_a_(4, 5) = 1.0;
   matrix_a_(5, 5) = 0.0;
   // TODO(QiL): expand the model to accomendate more combined states.
 
