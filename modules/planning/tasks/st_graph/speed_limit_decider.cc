@@ -146,10 +146,14 @@ Status SpeedLimitDecider::GetSpeedLimits(
       const auto& nudge = const_path_obstacle->LateralDecision().nudge();
       bool is_close_on_left =
           (nudge.type() == ObjectNudge::LEFT_NUDGE) &&
-          (const_path_obstacle->PerceptionSLBoundary().end_l() > -kRange);
+          (adc_sl_boundary_.start_l() -
+               const_path_obstacle->PerceptionSLBoundary().end_l() <
+           kRange);
       bool is_close_on_right =
           (nudge.type() == ObjectNudge::RIGHT_NUDGE) &&
-          (const_path_obstacle->PerceptionSLBoundary().start_l() < kRange);
+          (const_path_obstacle->PerceptionSLBoundary().start_l() -
+               adc_sl_boundary_.end_l() <
+           kRange);
       if (is_close_on_left || is_close_on_right) {
         double nudge_speed_ratio = 1.0;
         if (const_path_obstacle->obstacle()->IsStatic()) {
