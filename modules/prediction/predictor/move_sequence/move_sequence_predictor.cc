@@ -317,7 +317,7 @@ std::pair<double, double> MoveSequencePredictor::ComputeLonEndState(
     }
   }
   double v_init = init_s[1];
-  if (max_kappa < 0.02) {
+  if (max_kappa < FLAGS_turning_curvature_lower_bound) {
     // Predict the obstacle will keep current speed
     return {v_init, FLAGS_prediction_duration};
   }
@@ -330,11 +330,11 @@ std::pair<double, double> MoveSequencePredictor::ComputeLonEndState(
   double s_offset = s_at_max_kappa - init_s[0];
   double t = 2.0 * s_offset / (v_init + v_end);
   if (t < FLAGS_double_precision) {
-    // constant deceleration
+    return {v_end, FLAGS_prediction_duration};
   }
   double acc = (v_end - v_init) / t;
   if (acc < FLAGS_min_acc) {
-    t = v_init / FLAGS_min_acc;
+    t = v_init / (-FLAGS_min_acc);
     return {FLAGS_still_obstacle_speed_threshold, t};
   }
   return {v_end, t};
