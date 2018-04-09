@@ -103,5 +103,9 @@ DECLARE_double(time_lower_bound_to_lane_center);
 DECLARE_double(sample_time_gap);
 DECLARE_double(cost_alpha);
 DECLARE_double(default_time_to_lat_end_state);
+DECLARE_double(turning_curvature_lower_bound);
+DECLARE_double(turning_curvature_upper_bound);
+DECLARE_double(speed_at_lower_curvature);
+DECLARE_double(speed_at_upper_curvature);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_
