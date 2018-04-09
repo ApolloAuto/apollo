@@ -149,3 +149,11 @@ DEFINE_double(cost_alpha, 100.0,
               "The coefficient of lateral acceleration in cost function");
 DEFINE_double(default_time_to_lat_end_state, 5.0,
               "The default time to lane center");
+DEFINE_double(turning_curvature_lower_bound, 0.02,
+              "The curvature lower bound of turning lane");
+DEFINE_double(turning_curvature_upper_bound, 0.14,
+              "The curvature upper bound of turning lane");
+DEFINE_double(speed_at_lower_curvature, 8.5,
+              "The speed at turning lane with lower bound curvature");
+DEFINE_double(speed_at_upper_curvature, 3.0,
+              "The speed at turning lane with upper bound curvature");

@@ -304,7 +304,6 @@ double MoveSequencePredictor::ComputeTimeToLatEndConditionByVelocity(
 
 std::pair<double, double> MoveSequencePredictor::ComputeLonEndState(
     const std::array<double, 3>& init_s, const LaneSequence& lane_sequence) {
-  // TODO(kechxu) implement
   double max_kappa = 0.0;
   double s_at_max_kappa = 0.0;
   for (int i = 0; i < lane_sequence.path_point_size(); ++i) {
