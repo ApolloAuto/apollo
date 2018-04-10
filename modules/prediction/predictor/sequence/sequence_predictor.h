@@ -69,7 +69,7 @@ class SequencePredictor : public Predictor {
    * @param Current lane id
    * @param Vector of boolean indicating if a lane sequence is disqualified
    */
-  void FilterLaneSequences(const LaneGraph& lane_graph,
+  void FilterLaneSequences(const Feature& feature,
                            const std::string& lane_id,
                            std::vector<bool>* enable_lane_sequence);
 

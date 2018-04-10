@@ -114,7 +114,9 @@ DEFINE_bool(adjust_velocity_by_position_shift, false,
             "adjust velocity heading to lane heading");
 DEFINE_double(heading_filter_param, 0.99, "heading filter parameter");
 
-// Cost evaluator
+// Validation checker
+DEFINE_double(centripetal_acc_coeff, 0.5,
+              "Coefficient of centripetal acceleration probability");
 
 // Obstacle trajectory
 DEFINE_double(lane_sequence_threshold, 0.5,

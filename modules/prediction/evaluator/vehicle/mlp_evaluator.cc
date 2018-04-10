@@ -26,6 +26,7 @@
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/common/validation_checker.h"
 
 namespace apollo {
 namespace prediction {
@@ -68,6 +69,8 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
+  double speed = latest_feature_ptr->speed();
+
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
   CHECK_NOTNULL(lane_graph_ptr);
@@ -82,6 +85,11 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     std::vector<double> feature_values;
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
     double probability = ComputeProbability(feature_values);
+
+    double centripetal_acc_probability =
+        ValidationChecker::ProbabilityByCentripedalAcceleration(
+            *lane_sequence_ptr, speed);
+    probability *= centripetal_acc_probability;
     lane_sequence_ptr->set_probability(probability);
   }
 

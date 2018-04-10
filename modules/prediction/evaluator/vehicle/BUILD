@@ -17,6 +17,7 @@ cc_library(
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
+        "//modules/prediction/common:validation_checker",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/evaluator",
         "//modules/prediction/proto:fnn_vehicle_model_proto",
