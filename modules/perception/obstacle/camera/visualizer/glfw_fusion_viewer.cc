@@ -33,7 +33,6 @@
 #include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/proto/lane_post_process_config.pb.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 #include "modules/perception/obstacle/camera/visualizer/common/bmp.h"
