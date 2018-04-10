@@ -58,7 +58,7 @@ bool NavigationLane::GeneratePath() {
   if (config_.lane_source() == NavigationLaneConfig::OFFLINE_GENERATED &&
       navigation_info_.navigation_path_size() > 0) {
     ConvertNavigationLineToPath(path);
-    if (path->path_point().size() <= 0) {
+    if (path->path_point().size() == 0) {
       ConvertLaneMarkerToPath(lane_marker, path);
     }
   } else {
@@ -186,15 +186,6 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
       break;
     }
   }
-
-  const perception::LaneMarkers &lane_marker =
-      perception_obstacles_.lane_marker();
-  const auto &left_lane = lane_marker.left_lane_marker();
-  const auto &right_lane = lane_marker.right_lane_marker();
-  left_width_ = (std::fabs(left_lane.c0_position()) +
-                 std::fabs(right_lane.c0_position())) /
-                2.0;
-  right_width_ = left_width_;
 }
 
 // project adc_state_ onto path
@@ -344,12 +335,18 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
       perception_obstacles_.lane_marker().right_lane_marker().lane_type());
   auto *right_segment =
       right_boundary->mutable_curve()->add_segment()->mutable_line_segment();
-  const double lane_left_width = left_width_ > FLAGS_min_lane_half_width
-                                     ? left_width_
-                                     : map_config.default_left_width();
-  const double lane_right_width = right_width_ > FLAGS_min_lane_half_width
-                                      ? right_width_
-                                      : map_config.default_right_width();
+
+  const double lane_left_width =
+      left_width_ < 0.0
+          ? map_config.default_left_width()
+          : common::math::Clamp(left_width_, FLAGS_min_lane_half_width,
+                                FLAGS_max_lane_half_width);
+  const double lane_right_width =
+      right_width_ < 0.0
+          ? map_config.default_right_width()
+          : common::math::Clamp(right_width_, FLAGS_min_lane_half_width,
+                                FLAGS_max_lane_half_width);
+
   for (const auto &path_point : path.path_point()) {
     auto *point = line_segment->add_point();
     point->set_x(path_point.x());

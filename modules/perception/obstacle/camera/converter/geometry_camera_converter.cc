@@ -55,29 +55,26 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
     float deg_alpha = obj->alpha * 180.0f / M_PI;
     Eigen::Vector2f upper_left(obj->upper_left.x(), obj->upper_left.y());
     Eigen::Vector2f lower_right(obj->lower_right.x(), obj->lower_right.y());
-    float distance_w = 0.0;
-    float distance_h = 0.0;
-    Eigen::Vector2f mass_center_pixel = Eigen::Vector2f::Zero();
-    ConvertSingle(obj->height, obj->width, obj->length, deg_alpha, upper_left,
-                  lower_right, &distance_w, &distance_h, &mass_center_pixel);
 
-    if (obj->trunc_width > 0.25f && obj->trunc_height > 0.25f) {
-      // Give fix values for detected box with both side and bottom truncation
-      distance_w = distance_h = 10.0f;
-      obj->distance = DecideDistance(distance_h, distance_w, obj);
-      // Estimation of center pixel due to unknown truncation ratio
-      if (obj->trunc_width > 0.25f) mass_center_pixel = trunc_center_pixel;
-    } else if (distance_w > 40.0f || distance_h > 40.0f ||
-               obj->trunc_width > 0.25f) {
-      // Reset alpha angle and do steps again
-      obj->distance = DecideDistance(distance_h, distance_w, obj);
-      DecideAngle(camera_model_.unproject(mass_center_pixel), obj);
-      deg_alpha = obj->alpha * 180.0f / M_PI;
+    float distance = 0.0;
+    Eigen::Vector2f mass_center_pixel = Eigen::Vector2f::Zero();
+    if (obj->trunc_height < 0.25f) {
+      // No truncation on 2D height
       ConvertSingle(obj->height, obj->width, obj->length, deg_alpha, upper_left,
-                    lower_right, &distance_w, &distance_h, &mass_center_pixel);
+                    lower_right, false, &distance, &mass_center_pixel);
+    } else if (obj->trunc_width < 0.25f && obj->trunc_height > 0.25f) {
+      // 2D height truncation and no width truncation
+      ConvertSingle(obj->height, obj->width, obj->length, deg_alpha, upper_left,
+                    lower_right, true, &distance, &mass_center_pixel);
+    } else {
+      // truncation on both sides
+      // Give fix values for detected box with both side and bottom truncation
+      distance = 10.0f;;
+      // Estimation of center pixel due to unknown truncation ratio
+      mass_center_pixel = trunc_center_pixel;
     }
 
-    obj->distance = DecideDistance(distance_h, distance_w, obj);
+    obj->distance = distance;
     Eigen::Vector3f camera_ray = camera_model_.unproject(mass_center_pixel);
     DecideAngle(camera_ray, obj);
 
@@ -126,10 +123,12 @@ bool GeometryCameraConverter::LoadCameraIntrinsics(
 bool GeometryCameraConverter::ConvertSingle(
     const float &h, const float &w, const float &l, const float &alpha_deg,
     const Eigen::Vector2f &upper_left, const Eigen::Vector2f &lower_right,
-    float *distance_w, float *distance_h, Eigen::Vector2f *mass_center_pixel) {
+    bool use_width, float *distance, Eigen::Vector2f *mass_center_pixel) {
   // Target Goals: Projection target
   int pixel_width = static_cast<int>(lower_right.x() - upper_left.x());
   int pixel_height = static_cast<int>(lower_right.y() - upper_left.y());
+  int pixel_length = pixel_height;
+  if (use_width) pixel_length = pixel_width;
 
   // Target Goals: Box center pixel
   Eigen::Matrix<float, 2, 1> box_center_pixel;
@@ -187,16 +186,14 @@ bool GeometryCameraConverter::ConvertSingle(
   mass_center_v = MakeUnit(mass_center_v);
 
   // Distance search
-  *distance_w = SearchDistance(pixel_width, true, mass_center_v);
-  *distance_h = SearchDistance(pixel_height, false, mass_center_v);
+  *distance = SearchDistance(pixel_length, use_width, mass_center_v);
 
-  for (size_t i = 0; i < 2; ++i) {
+  for (size_t i = 0; i < 1; ++i) {
     // Mass center search
-    SearchCenterDirection(box_center_pixel, *distance_h, &mass_center_v,
+    SearchCenterDirection(box_center_pixel, *distance, &mass_center_v,
                           mass_center_pixel);
     // Distance search
-    *distance_w = SearchDistance(pixel_width, true, mass_center_v);
-    *distance_h = SearchDistance(pixel_height, false, mass_center_v);
+    *distance = SearchDistance(pixel_length, use_width, mass_center_v);
   }
 
   return true;
@@ -349,8 +346,7 @@ void GeometryCameraConverter::CheckTruncation(
   // Ad-hoc 2D box truncation binary determination
   if (obj->upper_left.x() < 30.0f || width - 30.0f < obj->lower_right.x()) {
     obj->trunc_width = 0.5f;
-    trunc_center_pixel->y() =
-        (obj->upper_left.y() + obj->lower_right.y()) / 2.0f;
+
     if (obj->upper_left.x() < 30.0f) {
       trunc_center_pixel->x() = obj->upper_left.x();
     } else {
@@ -360,7 +356,11 @@ void GeometryCameraConverter::CheckTruncation(
 
   if (obj->upper_left.y() < 30.0f || height - 30.0f < obj->lower_right.y()) {
     obj->trunc_height = 0.5f;
+    trunc_center_pixel->x() =
+     (obj->upper_left.x() + obj->lower_right.x()) / 2.0f;
   }
+
+  trunc_center_pixel->y() = (obj->upper_left.y() + obj->lower_right.y()) / 2.0f;
 }
 
 float GeometryCameraConverter::DecideDistance(const float &distance_h,
