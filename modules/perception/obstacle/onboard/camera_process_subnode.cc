@@ -98,6 +98,10 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   if (FLAGS_skip_camera_frame && timestamp_ns_ > 0.0) {
     if ((curr_timestamp - timestamp_ns_) < (1e9 / FLAGS_camera_hz)) {
+      if((curr_timestamp - timestamp_ns_) < 0)
+      {
+        timestamp_ns_ = curr_timestamp;
+      }
       ADEBUG << "CameraProcessSubnode Skip frame";
       return;
     }
