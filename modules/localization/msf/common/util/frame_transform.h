@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 #ifndef MODULES_LOCALIZATION_MSF_COMMON_FRAME_TRANSFORM_H_
 #define MODULES_LOCALIZATION_MSF_COMMON_FRAME_TRANSFORM_H_
 
-#include <stdio.h>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <cstdio>
 
 namespace apollo {
 namespace localization {
@@ -27,6 +27,7 @@ namespace msf {
 
 /**@brief the UTM coordinate struct including x and y. */
 struct UTMCoor {
+  UTMCoor() : x(0.0), y(0.0) {}
   double x;
   double y;
 };
@@ -34,18 +35,19 @@ struct UTMCoor {
 /**@brief the WGS84 coordinate struct */
 /* including log(longitude) and lat(latitude). */
 struct WGS84Corr {
+  WGS84Corr() : log(0.0), lat(0.0) {}
   double log;      // longitude
   double lat;      // latitude
 };
 
-void latlon_to_utmxy(double lon, double lat, UTMCoor *xy);
+void LatlonToUtmXY(const double lon, const double lat, UTMCoor *xy);
 
-void utmxy_to_latlon(double x, double y, int zone,
-                     bool southhemi, WGS84Corr *latlon);
+void UtmXYToLatlon(const double x, const double y, const int zone,
+                     const bool southhemi, WGS84Corr *latlon);
 
-void xyz_to_blh(const Eigen::Vector3d &xyz, Eigen::Vector3d *blh);
+void XYZToBlh(const Eigen::Vector3d &xyz, Eigen::Vector3d *blh);
 
-void blh_to_xyz(const Eigen::Vector3d &blh, Eigen::Vector3d *xyz);
+void BlhToXYZ(const Eigen::Vector3d &blh, Eigen::Vector3d *xyz);
 
 }   // namespace msf
 }   // namespace localization

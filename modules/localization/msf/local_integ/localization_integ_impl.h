@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,9 @@ class LocalizationIntegImpl {
   void GetGnssLocalizationList(std::list<LocalizationResult> *results);
 
  protected:
+  void StartThreadLoop();
+  void StopThreadLoop();
+
   void PcdThreadLoop();
   void PcdProcessImpl(const LidarFrame& pcd_data);
 
@@ -103,9 +106,6 @@ class LocalizationIntegImpl {
   void GnssBestPoseProcessImpl(
       const drivers::gnss::GnssBestPose& bestgnsspos_msg);
 
-//   void CompensateGnssLocalization(const Eigen::Quaterniond &quat,
-//                                   LocalizationEstimate* compensate_local);
-
   void TransferGnssMeasureToLocalization(const MeasureData& measure,
                                          LocalizationEstimate *localization);
 
@@ -115,24 +115,19 @@ class LocalizationIntegImpl {
   LocalizationGnssProcess* gnss_process_;
   LocalizationLidarProcess* lidar_process_;
 
-  // sensor states
-  // LocalizationMeasureState lidar_localization_state_;
-  // LocalizationEstimate lidar_localization_;
+  // lidar localizaiton result list
   std::list<LocalizationResult> lidar_localization_list_;
-  int lidar_localization_list_max_size_;
+  size_t lidar_localization_list_max_size_;
   std::mutex lidar_localization_mutex_;
 
-  // LocalizationMeasureState integ_localization_state_;
-  // LocalizationEstimate integ_localization_;
+  // integration localization result list
   std::list<LocalizationResult> integ_localization_list_;
-  int integ_localization_list_max_size_;
-  // IntegSinsPva integ_sins_pva_;
+  size_t integ_localization_list_max_size_;
   std::mutex integ_localization_mutex_;
 
-  // LocalizationMeasureState gnss_localization_state_;
-  // LocalizationEstimate gnss_localization_;
+  // gnss localization result list
   std::list<LocalizationResult> gnss_localization_list_;
-  int gnss_localization_list_max_size_;
+  size_t gnss_localization_list_max_size_;
   std::mutex gnss_localization_mutex_;
   bool is_use_gnss_bestpose_;
 
@@ -141,7 +136,7 @@ class LocalizationIntegImpl {
   std::thread lidar_data_thread_;
   std::condition_variable lidar_data_signal_;
   std::queue<LidarFrame> lidar_data_queue_;
-  int lidar_queue_max_size_;
+  size_t lidar_queue_max_size_;
   std::mutex lidar_data_queue_mutex_;
   double imu_altitude_from_lidar_localization_;
   bool imu_altitude_from_lidar_localization_available_;
@@ -151,7 +146,7 @@ class LocalizationIntegImpl {
   std::thread imu_data_thread_;
   std::condition_variable imu_data_signal_;
   std::queue<ImuData> imu_data_queue_;
-  int imu_queue_max_size_;
+  size_t imu_queue_max_size_;
   std::mutex imu_data_queue_mutex_;
 
   // gnss process thread
@@ -159,13 +154,11 @@ class LocalizationIntegImpl {
   std::thread gnss_function_thread_;
   std::condition_variable gnss_function_signal_;
   std::queue<std::function<void()>> gnss_function_queue_;
-  int gnss_queue_max_size_;
+  size_t gnss_queue_max_size_;
   std::mutex gnss_function_queue_mutex_;
 
   bool debug_log_flag_;
   bool enable_lidar_localization_;
-
-//   PoseQuery integ_pose_query_;
 
   Eigen::Affine3d gnss_antenna_extrinsic_;
 };

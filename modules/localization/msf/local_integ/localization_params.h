@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,24 +48,26 @@ struct ImuToAntOffset {
 };
 
 struct LocalizationIntegParam {
-  LocalizationIntegParam() : is_ins_can_self_align(false),
+  LocalizationIntegParam() : enable_lidar_localization(true),
+      gnss_mode(0), is_ins_can_self_align(false),
       is_sins_align_with_vel(true), is_sins_state_check(false),
       sins_state_span_time(60.0), sins_state_pos_std(1.0),
       vel_threshold_get_yaw(5.0), integ_debug_log_flag(true),
-      is_trans_gpstime_to_utctime(true), gnss_mode(0),
+      is_trans_gpstime_to_utctime(true),
       is_using_raw_gnsspos(true), enable_ins_aid_rtk(false),
-      enable_auto_save_eph_file(true), eph_buffer_path(""),
       imu_to_ant_offset(), gnss_debug_log_flag(true), map_path(""),
       lidar_extrinsic_file(""), lidar_height_file(""),
       lidar_height_default(1.7), lidar_debug_log_flag(true),
       localization_mode(2), lidar_yaw_align_mode(1),
       lidar_filter_size(17), map_coverage_theshold(0.8),
-      imu_lidar_max_delay_time(0.4), utm_zone_id(50), imu_rate(1.0),
-      enable_lidar_localization(true), is_use_visualize(false),
+      imu_lidar_max_delay_time(0.4), utm_zone_id(50),
       is_lidar_unstable_reset(true),
       unstable_reset_threshold(0.08) {}
+  // localization mode
+  bool enable_lidar_localization;
+  int gnss_mode;
 
-  // integration module
+  // sins module
   bool is_ins_can_self_align;
   bool is_sins_align_with_vel;
   bool is_sins_state_check;
@@ -74,14 +76,10 @@ struct LocalizationIntegParam {
   double vel_threshold_get_yaw;
   bool integ_debug_log_flag;
   bool is_trans_gpstime_to_utctime;
-  int gnss_mode;
   bool is_using_raw_gnsspos;
 
   // gnss module
   bool enable_ins_aid_rtk;
-  bool enable_auto_save_eph_file;
-
-  std::string eph_buffer_path;
   ImuToAntOffset imu_to_ant_offset;
   bool gnss_debug_log_flag;
 
@@ -94,17 +92,9 @@ struct LocalizationIntegParam {
   int localization_mode;
   int lidar_yaw_align_mode;
   int lidar_filter_size;
-  int lidar_thread_num;
   double map_coverage_theshold;
   double imu_lidar_max_delay_time;
-
-  // common
   int utm_zone_id;
-  double imu_rate;
-  bool enable_lidar_localization;
-
-  bool is_use_visualize;
-
   bool is_lidar_unstable_reset;
   double unstable_reset_threshold;
 };

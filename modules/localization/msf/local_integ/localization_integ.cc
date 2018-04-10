@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,10 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_integ/localization_integ.h"
+
 #include <map>
 #include <list>
+
 #include "modules/localization/msf/local_integ/localization_integ_impl.h"
 #include "modules/localization/msf/local_integ/lidar_msg_transfer.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
@@ -29,12 +31,12 @@ namespace msf {
 
 using common::Status;
 
-LocalizationInteg::LocalizationInteg() {
-  localization_integ_impl_ = new LocalizationIntegImpl;
-}
+LocalizationInteg::LocalizationInteg()
+    : localization_integ_impl_(new LocalizationIntegImpl()) {}
 
 LocalizationInteg::~LocalizationInteg() {
   delete localization_integ_impl_;
+  localization_integ_impl_ = nullptr;
 }
 
 Status LocalizationInteg::Init(
@@ -127,13 +129,13 @@ void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg,
                                        ImuData *imu_rfu) {
   double measurement_time = util::GpsToUnixSeconds(imu_msg.measurement_time());
   imu_rfu->measurement_time = measurement_time;
-  imu_rfu->fb[0] = imu_msg.linear_acceleration().x();
-  imu_rfu->fb[1] = imu_msg.linear_acceleration().y();
-  imu_rfu->fb[2] = imu_msg.linear_acceleration().z();
+  imu_rfu->fb[0] = imu_msg.linear_acceleration().x() * FLAGS_imu_rate;
+  imu_rfu->fb[1] = imu_msg.linear_acceleration().y() * FLAGS_imu_rate;
+  imu_rfu->fb[2] = imu_msg.linear_acceleration().z() * FLAGS_imu_rate;
 
-  imu_rfu->wibb[0] = imu_msg.angular_velocity().x();
-  imu_rfu->wibb[1] = imu_msg.angular_velocity().y();
-  imu_rfu->wibb[2] = imu_msg.angular_velocity().z();
+  imu_rfu->wibb[0] = imu_msg.angular_velocity().x() * FLAGS_imu_rate;
+  imu_rfu->wibb[1] = imu_msg.angular_velocity().y() * FLAGS_imu_rate;
+  imu_rfu->wibb[2] = imu_msg.angular_velocity().z() * FLAGS_imu_rate;
   return;
 }
 
@@ -141,13 +143,13 @@ void LocalizationInteg::TransferImuFlu(const drivers::gnss::Imu &imu_msg,
                                        ImuData *imu_flu) {
   double measurement_time = util::GpsToUnixSeconds(imu_msg.measurement_time());
   imu_flu->measurement_time = measurement_time;
-  imu_flu->fb[0] = -imu_msg.linear_acceleration().y();
-  imu_flu->fb[1] = imu_msg.linear_acceleration().x();
-  imu_flu->fb[2] = imu_msg.linear_acceleration().z();
+  imu_flu->fb[0] = -imu_msg.linear_acceleration().y() * FLAGS_imu_rate;
+  imu_flu->fb[1] = imu_msg.linear_acceleration().x() * FLAGS_imu_rate;
+  imu_flu->fb[2] = imu_msg.linear_acceleration().z() * FLAGS_imu_rate;
 
-  imu_flu->wibb[0] = -imu_msg.angular_velocity().y();
-  imu_flu->wibb[1] = imu_msg.angular_velocity().x();
-  imu_flu->wibb[2] = imu_msg.angular_velocity().z();
+  imu_flu->wibb[0] = -imu_msg.angular_velocity().y() * FLAGS_imu_rate;
+  imu_flu->wibb[1] = imu_msg.angular_velocity().x() * FLAGS_imu_rate;
+  imu_flu->wibb[2] = imu_msg.angular_velocity().z() * FLAGS_imu_rate;
   return;
 }
 

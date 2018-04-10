@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,26 +64,6 @@ enum class PredictLocationState {
   INSPVA_IMU_WHEEL
 };
 
-enum class WheelspeedState {
-  NOT_INIT = 0,
-  TOO_NEW,
-  NEED_WAIT,
-  WAIT_TOO_LONG,
-  HALF_OK,
-  OK
-};
-
-enum class ImuState {
-  NOT_INIT = 0,
-  TOO_NEW,
-  NEED_WAIT,
-  WAIT_TOO_LONG,
-  HALF_OK,
-  OK
-};
-
-enum class INSPVAState { NOT_INIT = 0, TOO_NEW, WAIT_TOO_LONG, OK };
-
 struct LidarHeight {
   LidarHeight() : height(0.0), height_var(0.0) {}
   double height;
@@ -108,7 +88,9 @@ class LocalizationLidarProcess {
   apollo::common::Status Init(const LocalizationIntegParam& params);
   // Lidar pcd process and get result.
   void PcdProcess(const LidarFrame& lidar_frame);
-  void GetResult(int *lidar_status, TransformD *location, Matrix3D *covariance);
+  void GetResult(int *lidar_status,
+                 TransformD *location,
+                 Matrix3D *covariance) const;
   int GetResult(LocalizationEstimate *lidar_local_msg);
   // Integrated navagation pva process.
   void IntegPvaProcess(const InsPva& sins_pva_msg);
@@ -117,12 +99,12 @@ class LocalizationLidarProcess {
 
  private:
   // Sub-functions for process.
-  bool GetPredictPose(double lidar_time,
+  bool GetPredictPose(const double lidar_time,
                       TransformD *inspva_pose,
                       ForcastState *forcast_state);
   bool CheckState();
   bool CheckDelta(const LidarFrame& frame, const TransformD& inspva_pose);
-  void UpdateState(int ret, double time);
+  void UpdateState(const int ret, const double time);
 
   // Load lidar-imu extrinsic parameter.
   bool LoadLidarExtrinsic(const std::string& file_path,
@@ -153,7 +135,7 @@ class LocalizationLidarProcess {
   TransformD lidar_extrinsic_;
   LidarHeight lidar_height_;
 
-  bool is_pre_state_init_;
+  bool is_get_first_lidar_msg_;
   TransformD cur_predict_location_;
   TransformD pre_predict_location_;
   Vector3D velocity_;
@@ -173,15 +155,11 @@ class LocalizationLidarProcess {
   int non_zero_odometry_cnt_;
   int max_nan_zero_odemetry_;
 
-  WheelspeedState wheelspeed_state_;
-  ImuState imu_state_;
-  INSPVAState inspva_state_;
-
-  int out_map_count_;
-
+  bool is_unstable_reset_;
   int unstable_count_;
   double unstable_threshold_;
-  bool is_unstable_reset_;
+
+  int out_map_count_;
 
   /**@brief forcast integ pose, use to limit output of yaw */
   ForcastState forcast_integ_state_;

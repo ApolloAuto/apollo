@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,12 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_integ/localization_integ_process.h"
+
 #include <yaml-cpp/yaml.h>
+
 #include "modules/common/time/time.h"
 #include "modules/common/time/timer.h"
 #include "modules/common/log.h"
-#include "modules/localization/msf/common/util/sleep.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 
 namespace apollo {
@@ -28,26 +29,19 @@ namespace msf {
 
 using apollo::common::Status;
 
-LocalizationIntegProcess::LocalizationIntegProcess() {
-  integ_state_ = IntegState::NOT_INIT;
-  memset(pva_covariance_, 0, sizeof(double) * 9 * 9);
-  delay_output_counter_ = 0;
-
-  keep_running_ = true;
-  measure_data_thread_ =
-      std::thread(&LocalizationIntegProcess::MeasureDataThreadLoop, this);
-  measure_data_queue_size_ = 150;
-
-  sins_ = new Sins();
+LocalizationIntegProcess::LocalizationIntegProcess()
+    : sins_(new Sins()), gnss_antenna_extrinsic_(TransformD::Identity()),
+      debug_log_flag_(true), integ_state_(IntegState::NOT_INIT),
+      ins_pva_(), pva_covariance_{0.0}, keep_running_(false),
+      measure_data_thread_(), measure_data_queue_size_(150),
+      delay_output_counter_(0) {
 }
 
 LocalizationIntegProcess::~LocalizationIntegProcess() {
-  keep_running_ = false;
-  new_measure_data_signal_.notify_one();
-  measure_data_thread_.join();
+  StopThreadLoop();
 
   delete sins_;
-  sins_ = NULL;
+  sins_ = nullptr;
 }
 
 Status LocalizationIntegProcess::Init(
@@ -66,7 +60,7 @@ Status LocalizationIntegProcess::Init(
   } else {
     gnss_antenna_extrinsic_ = TransformD::Identity();
   }
-  LOG(INFO) << "gnss and imu lever arm: "
+  AINFO << "gnss and imu lever arm: "
             << gnss_antenna_extrinsic_.translation()(0) << " "
             << gnss_antenna_extrinsic_.translation()(1) << " "
             << gnss_antenna_extrinsic_.translation()(2);
@@ -80,6 +74,8 @@ Status LocalizationIntegProcess::Init(
   // imu_rate_ = param.imu_rate;
   debug_log_flag_ = param.integ_debug_log_flag;
 
+  StartThreadLoop();
+
   return Status::OK();
 }
 
@@ -88,19 +84,19 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
   double cur_imu_time = imu_msg.measurement_time;
 
   if (cur_imu_time < 3000) {
-    LOG(INFO) << "the imu time is error: " << cur_imu_time;
+    AINFO << "the imu time is error: " << cur_imu_time;
     return;
   }
 
   static double pre_imu_time = cur_imu_time;
   double delta_time = cur_imu_time - pre_imu_time;
   if (delta_time > 0.1) {
-    LOG(INFO)
+    AINFO
         << std::setprecision(16)
         << "the imu message loss more than 10, the pre time and current time: "
         << pre_imu_time << " " << cur_imu_time;
   } else if (delta_time < 0.0) {
-    LOG(INFO) << std::setprecision(16)
+    AINFO << std::setprecision(16)
               << "received imu message's time is eary than last imu message, "
               << "the pre time and current time: " << pre_imu_time << " "
               << cur_imu_time;
@@ -141,7 +137,7 @@ void LocalizationIntegProcess::GetValidFromOK() {
     return;
   }
 
-  // LOG(ERROR) << pva_covariance_[0][0] << " " << pva_covariance_[1][1]
+  // AERROR << pva_covariance_[0][0] << " " << pva_covariance_[1][1]
   //     << " " << pva_covariance_[2][2] << " " << pva_covariance_[8][8];
   if (pva_covariance_[0][0] < 0.3 * 0.3
       && pva_covariance_[1][1] < 0.3 * 0.3
@@ -165,7 +161,7 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   // *sins_pva = ins_pva_;
 
   if (debug_log_flag_ && *state != IntegState::NOT_INIT) {
-    LOG(INFO) << std::setprecision(16)
+    AINFO << std::setprecision(16)
               << "IntegratedLocalization Debug Log: integ_pose msg: "
               << "[time:" << ins_pva_.time << "]"
               << "[x:" << ins_pva_.pos.longitude * 57.295779513082323 << "]"
@@ -190,7 +186,7 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   apollo::common::PointENU *position_loc = posepb_loc->mutable_position();
   apollo::common::Quaternion *quaternion = posepb_loc->mutable_orientation();
   UTMCoor utm_xy;
-  latlon_to_utmxy(ins_pva_.pos.longitude, ins_pva_.pos.latitude, &utm_xy);
+  LatlonToUtmXY(ins_pva_.pos.longitude, ins_pva_.pos.latitude, &utm_xy);
   position_loc->set_x(utm_xy.x);
   position_loc->set_y(utm_xy.y);
   position_loc->set_z(ins_pva_.pos.height);
@@ -252,8 +248,23 @@ void LocalizationIntegProcess::MeasureDataProcess(
   measure_data_queue_mutex_.unlock();
 }
 
+void LocalizationIntegProcess::StartThreadLoop() {
+  keep_running_ = true;
+  measure_data_queue_size_ = 150;
+  const auto& loop_func = [this] { MeasureDataThreadLoop(); };
+  measure_data_thread_ = std::thread(loop_func);
+}
+
+void LocalizationIntegProcess::StopThreadLoop() {
+  if (keep_running_.load()) {
+    keep_running_ = false;
+    new_measure_data_signal_.notify_one();
+    measure_data_thread_.join();
+  }
+}
+
 void LocalizationIntegProcess::MeasureDataThreadLoop() {
-  LOG(INFO) << "Started measure data process thread";
+  AINFO << "Started measure data process thread";
   while (keep_running_.load()) {
     {
       std::unique_lock<std::mutex> lock(measure_data_queue_mutex_);
@@ -276,7 +287,7 @@ void LocalizationIntegProcess::MeasureDataThreadLoop() {
     }
     MeasureDataProcessImpl(measure);
   }
-  LOG(INFO) << "Exited measure data process thread";
+  AINFO << "Exited measure data process thread";
 }
 
 void LocalizationIntegProcess::MeasureDataProcessImpl(
@@ -297,11 +308,11 @@ void LocalizationIntegProcess::MeasureDataProcessImpl(
 bool LocalizationIntegProcess::CheckIntegMeasureData(
     const MeasureData& measure_data) {
   if (measure_data.measure_type == MeasureType::ODOMETER_VEL_ONLY) {
-    LOG(ERROR) << "receive a new odometry measurement!!!\n";
+    AERROR << "receive a new odometry measurement!!!\n";
   }
 
   if (debug_log_flag_) {
-    LOG(INFO) << std::setprecision(16)
+    AINFO << std::setprecision(16)
               << "IntegratedLocalization Debug Log: measure data: "
               << "[time:" << measure_data.time << "]"
               << "[x:" << measure_data.gnss_pos.longitude * 57.295779513082323

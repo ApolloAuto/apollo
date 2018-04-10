@@ -75,7 +75,6 @@ DECLARE_bool(integ_debug_log_flag);
 
 // gnss module
 DECLARE_bool(enable_ins_aid_rtk);
-DECLARE_bool(enable_auto_save_eph_file);
 DECLARE_string(eph_buffer_path);
 DECLARE_string(ant_imu_leverarm_file);
 DECLARE_bool(gnss_debug_log_flag);
@@ -103,9 +102,6 @@ DECLARE_double(imu_vehicle_qx);
 DECLARE_double(imu_vehicle_qy);
 DECLARE_double(imu_vehicle_qz);
 DECLARE_double(imu_vehicle_qw);
-
-// Debug
-DECLARE_bool(use_visualize);
 
 // visualization
 DECLARE_string(map_visual_dir);

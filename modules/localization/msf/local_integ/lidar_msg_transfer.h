@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 
 #ifndef MODULES_LOCALIZATION_MSF_LIDAR_MSG_TRANSFER_H_
 #define MODULES_LOCALIZATION_MSF_LIDAR_MSG_TRANSFER_H_
+
+#include <cstdint>
 
 #include "sensor_msgs/PointCloud2.h"
 #include "modules/localization/msf/local_integ/localization_lidar.h"
@@ -54,19 +56,19 @@ class LidarMsgTransfer {
       const sensor_msgs::PointCloud2 &message, LidarFrame *lidar_frame);
 
  protected:
-  int width_;
-  int height_;
-  int x_offset_;
-  int y_offset_;
-  int z_offset_;
-  int t_offset_;
-  int i_offset_;
-  int8_t x_datatype_;
-  int8_t y_datatype_;
-  int8_t z_datatype_;
-  int x_count_;
-  int y_count_;
-  int z_count_;
+  uint32_t width_;
+  uint32_t height_;
+  uint32_t x_offset_;
+  uint32_t y_offset_;
+  uint32_t z_offset_;
+  uint32_t t_offset_;
+  uint32_t i_offset_;
+  uint8_t x_datatype_;
+  uint8_t y_datatype_;
+  uint8_t z_datatype_;
+  uint32_t x_count_;
+  uint32_t y_count_;
+  uint32_t z_count_;
 };
 
 }  // namespace msf

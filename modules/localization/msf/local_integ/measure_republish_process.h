@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,13 @@
 #ifndef MODULES_LOCALIZATION_MSF_MEASURE_REPUBLISH_PROCESS_H_
 #define MODULES_LOCALIZATION_MSF_MEASURE_REPUBLISH_PROCESS_H_
 
-#include <pthread.h>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
 #include <list>
 #include <string>
+#include <mutex>
+
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -83,15 +85,15 @@ class MeasureRepublishProcess {
   MeasureData pre_bestgnsspose_;
 
   std::list<InsPva> integ_pva_list_;
-  int pva_buffer_size_;
-  pthread_mutex_t integ_pva_mutex_;
+  size_t pva_buffer_size_;
+  std::mutex integ_pva_mutex_;
 
   int local_utm_zone_id_;
   bool is_trans_gpstime_to_utctime_;
   bool debug_log_flag_;
 
   double map_height_time_;
-  pthread_mutex_t height_mutex_;
+  std::mutex height_mutex_;
 
   GnssMode gnss_mode_;
 };

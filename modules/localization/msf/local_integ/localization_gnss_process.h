@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,28 +116,19 @@ class LocalizationGnssProcess {
 
  private:
   void SetDefaultOption();
-  bool LoadHistoryEph(const std::string &nav_file);
+  // bool LoadHistoryEph(const std::string &nav_file);
   bool DuplicateEph(const drivers::gnss::GnssEphemeris &raw_eph);
 
   inline void LogPnt(const GnssPntResultMsg &rover_pnt, double ratio);
   bool GnssPosition(EpochObservationMsg *raw_rover_obs);
 
-  bool Print(const char *print_infor, const int print_times);
-
  private:
-  bool enable_ins_aid_rtk_;
-  bool enable_auto_save_eph_file_;
-  std::string eph_buffer_path_;
-
-  std::string history_eph_file_;
-  bool eph_header_writed_;
   GnssSolver *gnss_solver_;
   GnssPntResultMsg gnss_pnt_result_;
 
-  std::map<EphKey, drivers::gnss::GnssEphemeris> map_gnss_eph_;
+  bool enable_ins_aid_rtk_;
 
-  // eph buffer file ptr
-  FILE *fp_eph_;
+  std::map<EphKey, drivers::gnss::GnssEphemeris> map_gnss_eph_;
 
   // from imu to gnss antenna
   LeverArm gnss_lever_arm_;

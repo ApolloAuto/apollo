@@ -136,9 +136,6 @@ void MSFLocalization::InitParams() {
 
   // gnss module
   localizaiton_param_.enable_ins_aid_rtk = FLAGS_enable_ins_aid_rtk;
-  localizaiton_param_.enable_auto_save_eph_file =
-      FLAGS_enable_auto_save_eph_file;
-  localizaiton_param_.eph_buffer_path = FLAGS_eph_buffer_path;
 
   // lidar module
   localizaiton_param_.map_path = FLAGS_map_dir + "/" + FLAGS_local_map_name;
@@ -199,11 +196,8 @@ void MSFLocalization::InitParams() {
         << imu_vehicle_quat_.w();
 
   // common
-  localizaiton_param_.imu_rate = FLAGS_imu_rate;
   localizaiton_param_.enable_lidar_localization =
       FLAGS_enable_lidar_localization;
-
-  localizaiton_param_.is_use_visualize = FLAGS_use_visualize;
 
   if (!FLAGS_if_imuant_from_file) {
     localizaiton_param_.imu_to_ant_offset.offset_x = FLAGS_imu_to_ant_offset_x;

@@ -101,7 +101,6 @@ DEFINE_bool(integ_debug_log_flag, false, "");
 
 // gnss module
 DEFINE_bool(enable_ins_aid_rtk, false, "");
-DEFINE_bool(enable_auto_save_eph_file, true, "");
 DEFINE_string(eph_buffer_path, "", "");
 DEFINE_string(
     ant_imu_leverarm_file,
@@ -139,9 +138,6 @@ DEFINE_double(imu_vehicle_qx, 0.0, "Vehicle imu quaternion qx");
 DEFINE_double(imu_vehicle_qy, 0.0, "Vehicle imu quaternion qy");
 DEFINE_double(imu_vehicle_qz, 0.0, "Vehicle imu quaternion qz");
 DEFINE_double(imu_vehicle_qw, 1.0, "Vehicle imu quaternion qw");
-
-// debug
-DEFINE_bool(use_visualize, false, "");
 
 // visualization
 DEFINE_string(map_visual_dir, "data/map_visual",

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_integ/lidar_msg_transfer.h"
+
 #include "modules/common/log.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -23,10 +24,9 @@ namespace localization {
 namespace msf {
 
 LidarMsgTransfer::LidarMsgTransfer()
-    : width_(0), height_(0), x_offset_(-1), y_offset_(-1), z_offset_(-1),
-      t_offset_(-1), i_offset_(-1), x_datatype_(-1), y_datatype_(-1),
-      z_datatype_(-1), x_count_(0), y_count_(0), z_count_(0) {
-}
+    : width_(0), height_(0), x_offset_(0), y_offset_(0), z_offset_(0),
+      t_offset_(0), i_offset_(0), x_datatype_(0), y_datatype_(0),
+      z_datatype_(0), x_count_(0), y_count_(0), z_count_(0) {}
 
 void LidarMsgTransfer::Transfer(
     const sensor_msgs::PointCloud2 &message, LidarFrame *lidar_frame) {
@@ -37,6 +37,9 @@ void LidarMsgTransfer::Transfer(
 
 void LidarMsgTransfer::TransferCloud(
     const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
+  if (lidar_frame == nullptr) {
+    return;
+  }
   ParseCloudField(lidar_data);
   // organized point cloud
   if (lidar_data.height > 1 && lidar_data.width > 1) {
@@ -66,8 +69,7 @@ void LidarMsgTransfer::TransferCloud(
           << "[width:" << lidar_data.width << "]"
           << "[point_step:" << lidar_data.point_step << "]"
           << "[data_type:" << x_datatype_ << "]"
-          << "[point_cnt:"
-          << static_cast<unsigned int>(lidar_frame->pt_xs.size()) << "]"
+          << "[point_cnt:" << x_count_ << "]"
           << "[intensity_cnt:"
           << static_cast<unsigned int>(lidar_frame->intensities.size())
           << "]";
@@ -80,7 +82,7 @@ void LidarMsgTransfer::ParseCloudField(
   width_ = lidar_data.width;
   height_ = lidar_data.height;
 
-  for (std::size_t i = 0; i < lidar_data.fields.size(); ++i) {
+  for (size_t i = 0; i < lidar_data.fields.size(); ++i) {
     const sensor_msgs::PointField& f = lidar_data.fields[i];
     if (f.name == "x") {
       x_offset_ = f.offset;
@@ -100,22 +102,24 @@ void LidarMsgTransfer::ParseCloudField(
       i_offset_ = f.offset;
     }
   }
-  assert(x_offset_ != -1 && y_offset_ != -1
-         && z_offset_ != -1 && t_offset_ != -1);
-  assert(x_datatype_ == y_datatype_ && y_datatype_ == z_datatype_);
-  assert(x_datatype_ == 7 || x_datatype_ == 8);
-  assert(x_count_ == 1 && y_count_ == 1 && z_count_ == 1);
+
+  CHECK(x_datatype_ == y_datatype_ && y_datatype_ == z_datatype_);
+  CHECK(x_datatype_ == 7 || x_datatype_ == 8);
+  CHECK(x_count_ > 0 && y_count_ > 0 && z_count_ >0);
 
   return;
 }
 
 void LidarMsgTransfer::TransferOrganizedCloud32(
     const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  for (int i = 0; i < lidar_data.height; ++i) {
-    for (int j = 0; j < lidar_data.width; ++j) {
-      int index = i * lidar_data.width + j;
+  if (lidar_frame == nullptr) {
+    return;
+  }
+  for (uint32_t i = 0; i < lidar_data.height; ++i) {
+    for (uint32_t j = 0; j < lidar_data.width; ++j) {
+      uint32_t index = i * lidar_data.width + j;
       Eigen::Vector3d pt3d;
-      int offset = index * lidar_data.point_step;
+      uint32_t offset = index * lidar_data.point_step;
       pt3d[0] = static_cast<const double>(*reinterpret_cast<const float*>(
           &lidar_data.data[offset + x_offset_]));
       pt3d[1] = static_cast<const double>(*reinterpret_cast<const float*>(
@@ -137,11 +141,14 @@ void LidarMsgTransfer::TransferOrganizedCloud32(
 
 void LidarMsgTransfer::TransferOrganizedCloud64(
     const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  for (int i = 0; i < lidar_data.height; ++i) {
-    for (int j = 0; j < lidar_data.width; ++j) {
-      int index = i * lidar_data.width + j;
+  if (lidar_frame == nullptr) {
+    return;
+  }
+  for (uint32_t i = 0; i < lidar_data.height; ++i) {
+    for (uint32_t j = 0; j < lidar_data.width; ++j) {
+      uint32_t index = i * lidar_data.width + j;
       Eigen::Vector3d pt3d;
-      int offset = index * lidar_data.point_step;
+      uint32_t offset = index * lidar_data.point_step;
       pt3d[0] = *reinterpret_cast<const double*>(
           &lidar_data.data[offset + x_offset_]);
       pt3d[1] = *reinterpret_cast<const double*>(
@@ -163,11 +170,14 @@ void LidarMsgTransfer::TransferOrganizedCloud64(
 
 void LidarMsgTransfer::TransferUnorganizedCloud32(
     const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  for (int i = 0; i < lidar_data.height; ++i) {
-    for (int j = 0; j < lidar_data.width; ++j) {
-      int index = i * lidar_data.width + j;
+  if (lidar_frame == nullptr) {
+    return;
+  }
+  for (uint32_t i = 0; i < lidar_data.height; ++i) {
+    for (uint32_t j = 0; j < lidar_data.width; ++j) {
+      uint32_t index = i * lidar_data.width + j;
       Eigen::Vector3d pt3d;
-      int offset = index * lidar_data.point_step;
+      uint32_t offset = index * lidar_data.point_step;
       pt3d[0] = static_cast<const double>(*reinterpret_cast<const float*>(
           &lidar_data.data[offset + x_offset_]));
       pt3d[1] = static_cast<const double>(*reinterpret_cast<const float*>(
@@ -189,11 +199,14 @@ void LidarMsgTransfer::TransferUnorganizedCloud32(
 
 void LidarMsgTransfer::TransferUnorganizedCloud64(
     const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  for (int i = 0; i < lidar_data.height; ++i) {
-    for (int j = 0; j < lidar_data.width; ++j) {
-      int index = i * lidar_data.width + j;
+  if (lidar_frame == nullptr) {
+    return;
+  }
+  for (uint32_t i = 0; i < lidar_data.height; ++i) {
+    for (uint32_t j = 0; j < lidar_data.width; ++j) {
+      uint32_t index = i * lidar_data.width + j;
       Eigen::Vector3d pt3d;
-      int offset = index * lidar_data.point_step;
+      uint32_t offset = index * lidar_data.point_step;
       pt3d[0] = *reinterpret_cast<const double*>(
           &lidar_data.data[offset + x_offset_]);
       pt3d[1] = *reinterpret_cast<const double*>(

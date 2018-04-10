@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,10 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_integ/localization_integ_impl.h"
+
 #include <list>
 #include <queue>
+
 #include "modules/localization/msf/common/util/time_conversion.h"
 #include "modules/localization/msf/common/util/timer.h"
 #include "modules/common/log.h"
@@ -28,50 +30,24 @@ namespace msf {
 
 using common::Status;
 
-LocalizationIntegImpl::LocalizationIntegImpl() {
-  republish_process_ = new MeasureRepublishProcess;
-  integ_process_ = new LocalizationIntegProcess;
-  gnss_process_ = new LocalizationGnssProcess;
-  lidar_process_ = new LocalizationLidarProcess;
-
-  lidar_localization_list_max_size_ = 10;
-  integ_localization_list_max_size_ = 50;
-  gnss_localization_list_max_size_ = 10;
-
-  is_use_gnss_bestpose_ = true;
-
-  debug_log_flag_ = true;
-
-  // run process thread
-  keep_lidar_running_ = true;
-  lidar_queue_max_size_ = 5;
-  lidar_data_thread_ = std::thread(&LocalizationIntegImpl::PcdThreadLoop, this);
-
-  keep_imu_running_ = true;
-  imu_queue_max_size_ = 200;
-  imu_data_thread_ = std::thread(&LocalizationIntegImpl::ImuThreadLoop, this);
-
-  keep_gnss_running_ = true;
-  gnss_queue_max_size_ = 100;
-  gnss_function_thread_ =
-      std::thread(&LocalizationIntegImpl::GnssThreadLoop, this);
-
-  imu_altitude_from_lidar_localization_ = 0;
-  imu_altitude_from_lidar_localization_available_ = false;
-}
+LocalizationIntegImpl::LocalizationIntegImpl()
+    : republish_process_(new MeasureRepublishProcess()),
+      integ_process_(new LocalizationIntegProcess()),
+      gnss_process_(new LocalizationGnssProcess()),
+      lidar_process_(new LocalizationLidarProcess()),
+      lidar_localization_list_max_size_(10),
+      integ_localization_list_max_size_(50),
+      gnss_localization_list_max_size_(10),
+      is_use_gnss_bestpose_(true), keep_lidar_running_(false),
+      lidar_queue_max_size_(5), imu_altitude_from_lidar_localization_(0.0),
+      imu_altitude_from_lidar_localization_available_(false),
+      keep_imu_running_(false), imu_queue_max_size_(200),
+      keep_gnss_running_(false), gnss_queue_max_size_(100),
+      debug_log_flag_(true), enable_lidar_localization_(true),
+      gnss_antenna_extrinsic_(Eigen::Affine3d::Identity()) {}
 
 LocalizationIntegImpl::~LocalizationIntegImpl() {
-  keep_lidar_running_ = false;
-  lidar_data_signal_.notify_one();
-  lidar_data_thread_.join();
-
-  keep_imu_running_ = false;
-  imu_data_signal_.notify_one();
-  imu_data_thread_.join();
-
-  keep_gnss_running_ = false;
-  gnss_function_signal_.notify_one();
-  gnss_function_thread_.join();
+  StopThreadLoop();
 
   delete republish_process_;
   delete lidar_process_;
@@ -119,19 +95,56 @@ Status LocalizationIntegImpl::Init(
   } else {
     gnss_antenna_extrinsic_ = Eigen::Affine3d::Identity();
   }
-  LOG(INFO) << "gnss and imu lever arm: "
+  AINFO << "gnss and imu lever arm: "
             << gnss_antenna_extrinsic_.translation()(0) << " "
             << gnss_antenna_extrinsic_.translation()(1) << " "
             << gnss_antenna_extrinsic_.translation()(2);
 
+  StartThreadLoop();
+
   return Status::OK();
+}
+
+void LocalizationIntegImpl::StartThreadLoop() {
+  // run process thread
+  keep_lidar_running_ = true;
+  lidar_queue_max_size_ = 5;
+  const auto &pcd_loop_func = [this] { PcdThreadLoop(); };
+  lidar_data_thread_ = std::thread(pcd_loop_func);
+
+  keep_imu_running_ = true;
+  imu_queue_max_size_ = 200;
+  const auto &imu_loop_func = [this] { ImuThreadLoop(); };
+  imu_data_thread_ = std::thread(imu_loop_func);
+
+  keep_gnss_running_ = true;
+  gnss_queue_max_size_ = 100;
+  const auto gnss_loop_func = [this] { GnssThreadLoop(); };
+  gnss_function_thread_ = std::thread(gnss_loop_func);
+}
+
+void LocalizationIntegImpl::StopThreadLoop() {
+  if (keep_lidar_running_.load()) {
+    keep_lidar_running_ = false;
+    lidar_data_signal_.notify_one();
+    lidar_data_thread_.join();
+  }
+
+  if (keep_imu_running_.load()) {
+    keep_imu_running_ = false;
+    imu_data_signal_.notify_one();
+    imu_data_thread_.join();
+  }
+
+  if (keep_gnss_running_.load()) {
+    keep_gnss_running_ = false;
+    gnss_function_signal_.notify_one();
+    gnss_function_thread_.join();
+  }
 }
 
 void LocalizationIntegImpl::PcdProcess(
     const LidarFrame& lidar_frame) {
-  // LidarFrame lidar_frame;
-  // ParseLidarFrame(message, lidar_frame);
-
   lidar_data_queue_mutex_.lock();
   lidar_data_queue_.push(lidar_frame);
   lidar_data_signal_.notify_one();
@@ -140,11 +153,11 @@ void LocalizationIntegImpl::PcdProcess(
 }
 
 void LocalizationIntegImpl::PcdThreadLoop() {
-  LOG(INFO) << "Started pcd data process thread";
+  AINFO << "Started pcd data process thread";
   while (keep_lidar_running_.load()) {
     {
       std::unique_lock<std::mutex> lock(lidar_data_queue_mutex_);
-      int size = lidar_data_queue_.size();
+      size_t size = lidar_data_queue_.size();
       while (size > lidar_queue_max_size_) {
         lidar_data_queue_.pop();
         --size;
@@ -165,13 +178,13 @@ void LocalizationIntegImpl::PcdThreadLoop() {
     }
 
     if (waiting_num > 2) {
-      LOG(WARNING) << waiting_num
+      AWARN << waiting_num
                    << " point cloud msg are waiting to process.";
     }
 
     PcdProcessImpl(lidar_frame);
   }
-  LOG(INFO) << "Exited pcd data process thread";
+  AINFO << "Exited pcd data process thread";
 }
 
 void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
@@ -182,7 +195,6 @@ void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
   LocalizationEstimate lidar_localization;
 
   state = lidar_process_->GetResult(&lidar_localization);
-  //   lidar_localization_state_ = LocalizationMeasureState(state);
 
   MeasureData lidar_measure;
   if (state == 2) {  // only state OK republish lidar msg
@@ -192,8 +204,6 @@ void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
     imu_altitude_from_lidar_localization_ =
         lidar_localization.pose().position().z();
     imu_altitude_from_lidar_localization_available_ = true;
-
-    // LocalOnlineVisualizer::instance()->push_lidar_measure(lidar_measure);
   }
 
   lidar_localization_mutex_.lock();
@@ -202,8 +212,6 @@ void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
   if (lidar_localization_list_.size() > lidar_localization_list_max_size_) {
     lidar_localization_list_.pop_front();
   }
-  // lidar_localization_state_ = LocalizationMeasureState(state);
-  // lidar_localization_ = lidar_localization;
   lidar_localization_mutex_.unlock();
 }
 
@@ -217,11 +225,11 @@ void LocalizationIntegImpl::RawImuProcessRfu(
 }
 
 void LocalizationIntegImpl::ImuThreadLoop() {
-  LOG(INFO) << "Started imu data process thread";
+  AINFO << "Started imu data process thread";
   while (keep_imu_running_.load()) {
     {
       std::unique_lock<std::mutex> lock(imu_data_queue_mutex_);
-      int size = imu_data_queue_.size();
+      size_t size = imu_data_queue_.size();
       while (size > imu_queue_max_size_) {
         imu_data_queue_.pop();
         --size;
@@ -242,12 +250,12 @@ void LocalizationIntegImpl::ImuThreadLoop() {
     }
 
     if (waiting_num > 10) {
-      LOG(WARNING) << waiting_num << " imu msg are waiting to process.";
+      AWARN << waiting_num << " imu msg are waiting to process.";
     }
 
     ImuProcessImpl(imu_data);
   }
-  LOG(INFO) << "Exited imu data process thread";
+  AINFO << "Exited imu data process thread";
 }
 
 void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
@@ -398,11 +406,11 @@ void LocalizationIntegImpl::GnssBestPoseProcess(
 }
 
 void LocalizationIntegImpl::GnssThreadLoop() {
-  LOG(INFO) << "Started gnss process thread";
+  AINFO << "Started gnss process thread";
   while (keep_gnss_running_.load()) {
     {
       std::unique_lock<std::mutex> lock(gnss_function_queue_mutex_);
-      int size = gnss_function_queue_.size();
+      size_t size = gnss_function_queue_.size();
       while (size > gnss_queue_max_size_) {
         gnss_function_queue_.pop();
         --size;
@@ -423,12 +431,12 @@ void LocalizationIntegImpl::GnssThreadLoop() {
     }
 
     if (waiting_num > 2) {
-      LOG(WARNING) << waiting_num << " gnss function are waiting to process.";
+      AWARN << waiting_num << " gnss function are waiting to process.";
     }
 
     gnss_func();
   }
-  LOG(INFO) << "Exited gnss process thread";
+  AINFO << "Exited gnss process thread";
   return;
 }
 
@@ -496,7 +504,7 @@ void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
   headerpb->set_timestamp_sec(timestamp);
 
   UTMCoor utm_xy;
-  latlon_to_utmxy(measure.gnss_pos.longitude,
+  LatlonToUtmXY(measure.gnss_pos.longitude,
                   measure.gnss_pos.latitude,
                   &utm_xy);
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_integ/localization_gnss_process.h"
+
 #include <yaml-cpp/yaml.h>
+
 #include <string>
+
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
-#include "modules/localization/msf/common/util/sleep.h"
 #include "modules/localization/msf/local_integ/gnss_msg_transfer.h"
 
 namespace apollo {
@@ -28,28 +30,23 @@ namespace msf {
 
 using apollo::common::Status;
 
-LocalizationGnssProcess::LocalizationGnssProcess() {
-  fp_eph_ = NULL;
-  gnss_solver_ = new GnssSolver();
-  double_antenna_solver_ = new GnssSolver();
-
-  current_obs_time_ = 0.0;
-  gnss_state_ = LocalizationMeasureState::NOT_VALID;
+LocalizationGnssProcess::LocalizationGnssProcess()
+    : gnss_solver_(new GnssSolver()),
+      enable_ins_aid_rtk_(true), gnss_lever_arm_{0.0, 0.0, 0.0},
+      sins_align_finish_(false),
+      double_antenna_solver_(new GnssSolver()),
+      current_obs_time_(0.0),
+      gnss_state_(LocalizationMeasureState::NOT_VALID) {
   SetDefaultOption();
 }
 
 LocalizationGnssProcess::~LocalizationGnssProcess() {
   map_gnss_eph_.clear();
-  if (fp_eph_ != NULL) {
-    fflush(fp_eph_);
-    fclose(fp_eph_);
-    fp_eph_ = NULL;
-  }
 
   delete gnss_solver_;
-  gnss_solver_ = NULL;
+  gnss_solver_ = nullptr;
   delete double_antenna_solver_;
-  double_antenna_solver_ = NULL;
+  double_antenna_solver_ = nullptr;
 }
 
 Status LocalizationGnssProcess::Init(
@@ -57,49 +54,34 @@ Status LocalizationGnssProcess::Init(
   // set launch parameter
   enable_ins_aid_rtk_ = param.enable_ins_aid_rtk;
   gnss_solver_->set_enable_external_prediction(enable_ins_aid_rtk_);
-  enable_auto_save_eph_file_ = param.enable_auto_save_eph_file;
-  eph_buffer_path_ = param.eph_buffer_path;
 
   gnss_lever_arm_.arm_x = param.imu_to_ant_offset.offset_x;
   gnss_lever_arm_.arm_y = param.imu_to_ant_offset.offset_y;
   gnss_lever_arm_.arm_z = param.imu_to_ant_offset.offset_z;
 
-  // load buffer
-  eph_header_writed_ = false;
   map_gnss_eph_.clear();
   sins_align_finish_ = false;
-  std::string eph_full_path = eph_buffer_path_ + history_eph_file_;
-  LOG(INFO) << "Eph File path: " << eph_full_path;
-  bool b_exist = LoadHistoryEph(eph_full_path);
-  if (enable_auto_save_eph_file_) {
-    LOG(INFO) << "Begin to write eph file!";
-    fp_eph_ = fopen(static_cast<const char *>(eph_full_path.data()), "a+");
-    if (!b_exist) {
-      // no existing file
-      if (fp_eph_ != NULL) {
-        fprintf(fp_eph_, "END OF HEADER\n");
-        fflush(fp_eph_);
-        eph_header_writed_ = true;
-      }
-    } else {
-      eph_header_writed_ = true;
-    }
-  } else {
-    fp_eph_ = NULL;
-  }
-#ifdef _ENABLE_SAVE_PURE_RTK_
-  std::string pos_full_path = eph_buffer_path_ + "pos.txt";
-  gnss_solver_->set_rtk_result_file(static_cast<char *>(pos_full_path.data()));
-  std::string amb_full_path = eph_buffer_path_ + "amb.txt";
-  gnss_solver_->set_ambiguity_file(static_cast<char *>(amb_full_path.data()));
-#endif
+
   return Status::OK();
+}
+
+void LocalizationGnssProcess::SetDefaultOption() {
+  // set default process modes
+  gnss_solver_->set_position_option(3);
+  gnss_solver_->set_tropsphere_option(0);
+  gnss_solver_->enable_cycle_slip_fix();
+  enable_ins_aid_rtk_ = false;
+
+  gnss_lever_arm_.arm_x = -0.030;
+  gnss_lever_arm_.arm_y = 0.338;
+  gnss_lever_arm_.arm_z = 1.291;
+  return;
 }
 
 void LocalizationGnssProcess::RawObservationProcess(
     const drivers::gnss::EpochObservation &raw_obs) {
   if (!raw_obs.has_receiver_id()) {
-    LOG(INFO) << "Obs data being invalid if without receiver id!";
+    AINFO << "Obs data being invalid if without receiver id!";
     return;
   }
   double leap_second_s = 18.0;
@@ -130,7 +112,7 @@ void LocalizationGnssProcess::RawObservationProcess(
       "user %u time:%12.3f sat_num:%d obs_delay:%12.3f%16.3f%16.3f%16.3f\n",
       raw_obs.receiver_id(), raw_obs.gnss_second_s(), raw_obs.sat_obs_num(),
       obs_delay, obs_xyz[0], obs_xyz[1], obs_xyz[2]);
-  LOG(INFO) << message;
+  AINFO << message;
 
   EpochObservationMsg raw_obs_msg;
   GnssMagTransfer::Transfer(raw_obs, &raw_obs_msg);
@@ -153,11 +135,10 @@ void LocalizationGnssProcess::RawObservationProcess(
 
 void LocalizationGnssProcess::RawEphemerisProcess(
     const drivers::gnss::GnssEphemeris &msg) {
-  auto gnss_orbit = msg;
-  // GnssEphemeris gnss_orbit(gnss_orbit_msg);
-  if (!gnss_orbit.has_gnss_type()) {
+  if (!msg.has_gnss_type()) {
     return;
   }
+  auto gnss_orbit = msg;
   if (gnss_orbit.gnss_type() == drivers::gnss::GnssType::GLO_SYS) {
     /* caros driver (derived from rtklib src) set glonass eph toe as the GPST,
      * and here convert it back to UTC(+0), so leap seconds shoudl be in
@@ -175,21 +156,14 @@ void LocalizationGnssProcess::RawEphemerisProcess(
   ++eph_counter;
   // printf("received a gnss ephemeris: %d!\n", eph_counter);
   if (DuplicateEph(gnss_orbit)) {
-    LOG(INFO) << "received an existed gnss ephemeris!";
+    AINFO << "received an existed gnss ephemeris!";
     return;
   }
 
   GnssEphemerisMsg gnss_orbit_msg;
   GnssMagTransfer::Transfer(gnss_orbit, &gnss_orbit_msg);
-  if (gnss_solver_->save_gnss_ephemris(gnss_orbit_msg)) {
-    // save to file only when new arriving eph is truely NEW!
-    if (enable_auto_save_eph_file_ && fp_eph_ != NULL) {
-      // TODO(zhouyao): add write_eph
-      // apollo::localization::msf::RinexNav::write_eph(
-      //     false, fp_eph_, gnss_orbit);
-      // fflush(fp_eph_);
-    }
-  }
+  gnss_solver_->save_gnss_ephemris(gnss_orbit_msg);
+  return;
 }
 
 void LocalizationGnssProcess::IntegSinsPvaProcess(
@@ -249,7 +223,6 @@ LocalizationMeasureState LocalizationGnssProcess::GetResult(
   }
 
   bool b_pos = false;
-  unsigned int index = 0;
   if (gnss_pnt_result_.has_pos_x_m() && gnss_pnt_result_.has_pos_y_m() &&
       gnss_pnt_result_.has_pos_z_m()) {
     b_pos = true;
@@ -290,56 +263,6 @@ LocalizationMeasureState LocalizationGnssProcess::GetResult(
   }
 
   return gnss_state_;
-}
-
-void LocalizationGnssProcess::SetDefaultOption() {
-  // set default process modes
-  gnss_solver_->set_position_option(3);
-  gnss_solver_->set_tropsphere_option(0);
-  gnss_solver_->enable_cycle_slip_fix();
-  enable_ins_aid_rtk_ = false;
-  enable_auto_save_eph_file_ = true;
-  eph_buffer_path_ = std::string("/home/idl/test_ros/params/");
-
-  gnss_lever_arm_.arm_x = -0.030;
-  gnss_lever_arm_.arm_y = 0.338;
-  gnss_lever_arm_.arm_z = 1.291;
-  const int time_based = 1;
-  if (!time_based) {
-    history_eph_file_ = "brdm.17p";
-  } else {
-    time_t time_p;
-    time(&time_p);
-    struct tm now_time;
-    struct tm *p_tm = &now_time;
-    // struct tm *p_tm = localtime(&time_p);
-    localtime_r(&time_p, p_tm);
-    unsigned int day_of_year = p_tm->tm_yday;
-    unsigned int year = 1900 + p_tm->tm_year;
-    unsigned int year_2000 = year - 2000;
-
-    const unsigned int len = 64;
-    char eph_file[len] = {'\0'};
-    snprintf(eph_file, len, "brdx%03d%1d.%2dp", day_of_year, 0, year_2000);
-    history_eph_file_ = eph_file;
-  }
-}
-
-bool LocalizationGnssProcess::LoadHistoryEph(const std::string &nav_file) {
-  return false;
-
-  // char *file = (char *)(std::string(nav_file).data());
-  // if (file == NULL) {
-  //   return false;
-  // }
-  // apollo::localization::msf::RinexNav mix_v_302(file,
-  // apollo::localization::msf::VERSION_3);
-  // if (mix_v_302.is_file_open() == false) {
-  //   Print("fail to load ephemeris!\n", 1);
-  //   return false;
-  // }
-
-  // return true;
 }
 
 bool LocalizationGnssProcess::DuplicateEph(
@@ -385,14 +308,14 @@ inline void LocalizationGnssProcess::LogPnt(const GnssPntResultMsg &rover_pnt,
            ratio, rover_pnt.vel_x_m(), rover_pnt.vel_y_m(),
            rover_pnt.vel_z_m(), rover_pnt.std_pos_x_m(),
            rover_pnt.std_pos_y_m(), rover_pnt.std_pos_z_m());
-  LOG(INFO) << print_infor;
+  AINFO << print_infor;
 }
 
 bool LocalizationGnssProcess::GnssPosition(
     EpochObservationMsg *raw_rover_obs) {
   gnss_state_ = LocalizationMeasureState::NOT_VALID;
   if (raw_rover_obs->receiver_id() != 0) {
-    LOG(INFO) << "Wrong Rover Obs Data!";
+    AINFO << "Wrong Rover Obs Data!";
     return false;
   }
   // debug
@@ -402,7 +325,7 @@ bool LocalizationGnssProcess::GnssPosition(
   }
   LogPnt(gnss_pnt_result_, gnss_solver_->get_ratio());
   if (!sins_align_finish_) {
-    LOG(INFO) << "Sins-ekf has not converged or finished its aligment!";
+    AINFO << "Sins-ekf has not converged or finished its aligment!";
   }
   if (gnss_pnt_result_.has_std_pos_x_m() &&
       gnss_pnt_result_.has_std_pos_y_m() &&
@@ -413,22 +336,13 @@ bool LocalizationGnssProcess::GnssPosition(
         gnss_pnt_result_.std_pos_z_m() * gnss_pnt_result_.std_pos_z_m();
     sigma = std::sqrt(fabs(sigma));
     if (fabs(sigma) > 10.0) {
-      LOG(INFO) << "Position std exceeds the threshold 10.0!";
+      AINFO << "Position std exceeds the threshold 10.0!";
       return false;
     }
   }
 
   gnss_state_ = LocalizationMeasureState::OK;
 
-  return true;
-}
-
-bool LocalizationGnssProcess::Print(const char *print_infor,
-                                    const int print_times) {
-  for (int i = 0; i < print_times; ++i) {
-    printf("%s", print_infor);
-  }
-  LOG(INFO) << print_infor;
   return true;
 }
 
