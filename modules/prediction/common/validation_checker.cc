@@ -24,7 +24,25 @@
 namespace apollo {
 namespace prediction {
 
+using ::apollo::common::PathPoint;
 using ::apollo::common::TrajectoryPoint;
+
+double ValidationChecker::ProbabilityByCentripedalAcceleration(
+      const LaneSequence& lane_sequence, const double speed) {
+  double centripetal_acc_cost_sum = 0.0;
+  double centripetal_acc_cost_sqr_sum = 0.0;
+  for (int i = 0; i < lane_sequence.path_point_size(); ++i) {
+    const PathPoint& path_point = lane_sequence.path_point(i);
+    double centripetal_acc = speed * speed * path_point.kappa();
+    double centripetal_acc_cost = centripetal_acc /
+                                  FLAGS_centripedal_acc_threshold;
+    centripetal_acc_cost_sum += centripetal_acc_cost;
+    centripetal_acc_cost_sqr_sum += centripetal_acc_cost * centripetal_acc_cost;
+  }
+  double mean_cost = centripetal_acc_cost_sqr_sum /
+                     (centripetal_acc_cost_sum + FLAGS_double_precision);
+  return std::exp(-FLAGS_centripetal_acc_coeff * mean_cost);
+}
 
 bool ValidationChecker::ValidCentripedalAcceleration(
     const std::vector<TrajectoryPoint>& trajectory_points) {
