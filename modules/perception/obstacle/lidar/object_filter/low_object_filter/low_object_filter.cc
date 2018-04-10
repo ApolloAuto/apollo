@@ -17,10 +17,10 @@
 #include <algorithm>
 #include <limits>
 
-#include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
 #include "modules/perception/common/pcl_types.h"
-#include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
 
 namespace apollo {
 namespace perception {
@@ -29,45 +29,44 @@ using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
 
 bool LowObjectFilter::Init() {
-    ConfigManager* config_manager = ConfigManager::instance();
-    if (!config_manager->Init()) {
-        AERROR << "failed to init ConfigManager.";
-        return false;
-    }
+  ConfigManager* config_manager = ConfigManager::instance();
+  if (!config_manager->Init()) {
+    AERROR << "failed to init ConfigManager.";
+    return false;
+  }
 
-    std::string model_name = "LowObjectFilter";
-    const ModelConfig* model_config = config_manager->GetModelConfig(model_name);
-    if (model_config == nullptr) {
-        AERROR << " not found model: " << model_name;
-        return false;
-    }
+  std::string model_name = "LowObjectFilter";
+  const ModelConfig* model_config = config_manager->GetModelConfig(model_name);
+  if (model_config == nullptr) {
+    AERROR << " not found model: " << model_name;
+    return false;
+  }
 
-    if (!model_config->GetValue("object_height_threshold",
-                                &object_height_threshold_)) {
-        AERROR << "object_height_threshold not found.";
-        object_height_threshold_ = 0.10;
-    }
+  if (!model_config->GetValue("object_height_threshold",
+                              &object_height_threshold_)) {
+    AERROR << "object_height_threshold not found.";
+    object_height_threshold_ = 0.10;
+  }
 
-    if (!model_config->GetValue("object_position_height_threshold",
-                                &object_position_height_threshold_)) {
-        AERROR << "object_position_height_threshold not found.";
-        object_position_height_threshold_ = -1.6;
-    }
+  if (!model_config->GetValue("object_position_height_threshold",
+                              &object_position_height_threshold_)) {
+    AERROR << "object_position_height_threshold not found.";
+    object_position_height_threshold_ = -1.6;
+  }
 
-    return true;
+  return true;
 }
 
 bool LowObjectFilter::Filter(const ObjectFilterOptions& obj_filter_options,
-        std::vector<ObjectPtr>* objects) {
-    
-    FilterLowObject(obj_filter_options, objects);
+                             std::vector<ObjectPtr>* objects) {
+  FilterLowObject(obj_filter_options, objects);
 
-    return true;
+  return true;
 }
 
 void LowObjectFilter::FilterLowObject(
-        const ObjectFilterOptions& obj_filter_options,
-        std::vector<ObjectPtr>* objects) {
+    const ObjectFilterOptions& obj_filter_options,
+    std::vector<ObjectPtr>* objects) {
   int object_number = objects->size();
   int valid_objects_num = 0;
   for (std::size_t i = 0; i < objects->size(); ++i) {
@@ -78,8 +77,7 @@ void LowObjectFilter::FilterLowObject(
       auto pt = obj->cloud->points[pi];
       if (pt.z < min_height) {
         min_height = pt.z;
-      }
-      else if (pt.z > max_height) {
+      } else if (pt.z > max_height) {
         max_height = pt.z;
       }
     }
@@ -95,10 +93,9 @@ void LowObjectFilter::FilterLowObject(
     valid_objects_num++;
   }
   objects->resize(valid_objects_num);
-  AINFO << "low_object_filter: object number "
-      << object_number << " -> " << valid_objects_num << "\n";
+  AINFO << "low_object_filter: object number " << object_number << " -> "
+        << valid_objects_num << "\n";
 }
-
 
 }  // namespace perception
 }  // namespace apollo

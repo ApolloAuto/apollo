@@ -20,40 +20,41 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/obstacle/lidar/interface/base_object_filter.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/obstacle/lidar/interface/base_object_filter.h"
 
 namespace apollo {
 namespace perception {
 
 class LowObjectFilter : public BaseObjectFilter {
  private:
-    // config params
-    double object_height_threshold_ = 0.10;
-    double object_position_height_threshold_ = -1.6;
+  // config params
+  double object_height_threshold_ = 0.10;
+  double object_position_height_threshold_ = -1.6;
 
  public:
-    LowObjectFilter() : BaseObjectFilter() {}
-    virtual ~LowObjectFilter() {}
+  LowObjectFilter() : BaseObjectFilter() {}
+  virtual ~LowObjectFilter() {}
 
-    bool Init();
+  bool Init();
 
-    std::string name() const {return "LowObjectFilter";}
+  std::string name() const {
+    return "LowObjectFilter";
+  }
 
-    bool Filter(const ObjectFilterOptions& obj_filter_options,
-                std::vector<ObjectPtr>* objects);
+  bool Filter(const ObjectFilterOptions& obj_filter_options,
+              std::vector<ObjectPtr>* objects);
 
  protected:
-    void FilterLowObject(
-                const ObjectFilterOptions& obj_filter_options,
-                std::vector<ObjectPtr>* objects);
+  void FilterLowObject(const ObjectFilterOptions& obj_filter_options,
+                       std::vector<ObjectPtr>* objects);
 
  private:
-    DISALLOW_COPY_AND_ASSIGN(LowObjectFilter);
+  DISALLOW_COPY_AND_ASSIGN(LowObjectFilter);
 };
 
 // Register plugin.
 REGISTER_OBJECTFILTER(LowObjectFilter);
 }  // namespace perception
 }  // namespace apollo
-#endif // MODULES_PERCEPTION_OBSTACLE_LIDAR_OBJECT_FILTER_LOW_OBJECT_FILTER_H_ 
+#endif  // MODULES_PERCEPTION_OBSTACLE_LIDAR_OBJECT_FILTER_LOW_OBJECT_FILTER_H_

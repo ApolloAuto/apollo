@@ -37,7 +37,9 @@ class Camera {
   enum Type { PERSPECTIVE, ORTHOGRAPHIC };
 
  public:
-  Eigen::Vector3d position() const { return frame()->position(); }
+  Eigen::Vector3d position() const {
+    return frame()->position();
+  }
 
   Eigen::Vector3d up_vector() const {
     return frame()->inverse_transform_of(Eigen::Vector3d(0.0, 1.0, 0.0));
@@ -51,13 +53,17 @@ class Camera {
     return frame()->inverse_transform_of(Eigen::Vector3d(1.0, 0.0, 0.0));
   }
 
-  Eigen::Quaterniond orientation() const { return frame()->orientation(); }
+  Eigen::Quaterniond orientation() const {
+    return frame()->orientation();
+  }
 
   void set_from_model_view_matrix(const double *const modelViewMatrix);
 
   void set_from_projection_matrix(const double matrix[12]);
 
-  void set_position(const Eigen::Vector3d &pos) { frame()->set_position(pos); }
+  void set_position(const Eigen::Vector3d &pos) {
+    frame()->set_position(pos);
+  }
 
   void set_orientation(const Eigen::Quaterniond &q);
 
@@ -96,9 +102,13 @@ class Camera {
 
   void rotate(Eigen::Vector3d i_axis, double i_angle);
 
-  Type type() const { return type_; }
+  Type type() const {
+    return type_;
+  }
 
-  double field_of_view() const { return field_of_view_; }
+  double field_of_view() const {
+    return field_of_view_;
+  }
 
   double horizontalfield_of_view() const {
     return 2.0 * atan(tan(field_of_view() / 2.0) * aspect_ratio());
@@ -109,17 +119,25 @@ class Camera {
            static_cast<double>(screen_height_);
   }
 
-  int screen_width() const { return screen_width_; }
+  int screen_width() const {
+    return screen_width_;
+  }
 
-  int screen_height() const { return screen_height_; }
+  int screen_height() const {
+    return screen_height_;
+  }
 
   void get_viewport(GLint viewport[4]) const;
 
   double pixelgl_ratio(const Eigen::Vector3d &position) const;
 
-  double znear_coefficient() const { return znear_coef_; }
+  double znear_coefficient() const {
+    return znear_coef_;
+  }
 
-  double zclipping_coefficient() const { return zclipping_coef_; }
+  double zclipping_coefficient() const {
+    return zclipping_coef_;
+  }
 
   virtual double znear() const;
 
@@ -149,13 +167,21 @@ class Camera {
 
   void setscreen_widthandheight(int width, int height);
 
-  void setznear_coefficient(double coef) { znear_coef_ = coef; }
+  void setznear_coefficient(double coef) {
+    znear_coef_ = coef;
+  }
 
-  void setzclipping_coefficient(double coef) { zclipping_coef_ = coef; }
+  void setzclipping_coefficient(double coef) {
+    zclipping_coef_ = coef;
+  }
 
-  double scene_radius() const { return scene_radius_; }
+  double scene_radius() const {
+    return scene_radius_;
+  }
 
-  Eigen::Vector3d scene_center() const { return scene_center_; }
+  Eigen::Vector3d scene_center() const {
+    return scene_center_;
+  }
 
   double distance_to_scene_center() const;
 
@@ -172,9 +198,13 @@ class Camera {
 
   bool set_revolve_around_point_from_pixel(const Eigen::Vector2i &pixel);
 
-  Eigen::Vector3d revolve_around_point() const { return revolve_around_point_; }
+  Eigen::Vector3d revolve_around_point() const {
+    return revolve_around_point_;
+  }
 
-  Frame *frame() const { return frame_; }
+  Frame *frame() const {
+    return frame_;
+  }
 
   void set_frame(Frame *const mcf);
 
@@ -225,25 +255,37 @@ class Camera {
   Eigen::Vector3d point_under_pixel(const Eigen::Vector2i &pixel,
                                     bool *found) const;
 
-  double io_distance() const { return io_distance_; }
+  double io_distance() const {
+    return io_distance_;
+  }
 
   double physical_distance_to_screen() const {
     return physical_distance_to_screen_;
   }
 
-  double physicalscreen_width() const { return physicalscreen_width_; }
+  double physicalscreen_width() const {
+    return physicalscreen_width_;
+  }
 
-  double focus_distance() const { return focus_distance_; }
+  double focus_distance() const {
+    return focus_distance_;
+  }
 
-  void setio_distance(double distance) { io_distance_ = distance; }
+  void setio_distance(double distance) {
+    io_distance_ = distance;
+  }
 
   void setphysical_distance_to_screen(double distance) {
     physical_distance_to_screen_ = distance;
   }
 
-  void set_physicalscreen_width(double width) { physicalscreen_width_ = width; }
+  void set_physicalscreen_width(double width) {
+    physicalscreen_width_ = width;
+  }
 
-  void setfocus_distance(double distance) { focus_distance_ = distance; }
+  void setfocus_distance(double distance) {
+    focus_distance_ = distance;
+  }
 
  private:
   // Frame
