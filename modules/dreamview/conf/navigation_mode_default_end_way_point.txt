@@ -65,3 +65,19 @@ landmark {
         }
     }
 }
+
+landmark {
+    name: "Route: 101 South",
+    waypoint {
+        pose {
+            x: 616702.340007,
+            y: 4116135.948553,
+        }
+    }
+   waypoint {
+        pose {
+            x: 617114.727457,
+            y: 4115057.070031,
+        }
+    }
+}
