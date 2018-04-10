@@ -63,9 +63,7 @@ class ReferenceLineProvider {
    */
   ~ReferenceLineProvider();
 
-  ReferenceLineProvider(
-      const hdmap::HDMap* base_map,
-      PlanningConfig::ReferenceLineSmootherType smoother_type);
+  explicit ReferenceLineProvider(const hdmap::HDMap* base_map);
 
   bool UpdateRoutingResponse(const routing::RoutingResponse& routing);
 
@@ -143,8 +141,6 @@ class ReferenceLineProvider {
       std::list<ReferenceLine>* reference_line,
       std::list<hdmap::RouteSegments>* segments);
 
-  static void RegisterSmoothers();
-
  private:
   bool is_initialized_ = false;
   bool is_stop_ = false;
@@ -167,11 +163,6 @@ class ReferenceLineProvider {
   std::list<ReferenceLine> reference_lines_;
   std::list<hdmap::RouteSegments> route_segments_;
   double last_calculation_time_ = 0.0;
-
-  static apollo::common::util::Factory<
-      PlanningConfig::ReferenceLineSmootherType, ReferenceLineSmoother,
-      ReferenceLineSmoother* (*)(const ReferenceLineSmootherConfig& config)>
-      s_smoother_factory_;
 };
 
 }  // namespace planning

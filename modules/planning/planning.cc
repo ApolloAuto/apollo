@@ -111,7 +111,7 @@ Status Planning::Init() {
     hdmap_ = HDMapUtil::BaseMapPtr();
     CHECK(hdmap_) << "Failed to load map";
     reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
-        new ReferenceLineProvider(hdmap_, config_.smoother_type()));
+        new ReferenceLineProvider(hdmap_));
   }
 
   RegisterPlanners();
@@ -215,7 +215,7 @@ void Planning::RunOnce() {
     // recreate reference line provider in every cycle
     hdmap_ = HDMapUtil::BaseMapPtr();
     reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
-        new ReferenceLineProvider(hdmap_, config_.smoother_type()));
+        new ReferenceLineProvider(hdmap_));
   }
 
   // localization

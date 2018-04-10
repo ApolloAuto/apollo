@@ -41,7 +41,7 @@ using apollo::common::time::Clock;
 SpiralReferenceLineSmoother::SpiralReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
     : ReferenceLineSmoother(config) {
-  default_max_point_deviation_ = FLAGS_spiral_smoother_max_deviation;
+  default_max_point_deviation_ = config.spiral().max_deviation();
 }
 
 bool SpiralReferenceLineSmoother::Smooth(
@@ -56,7 +56,7 @@ bool SpiralReferenceLineSmoother::Smooth(
   std::vector<double> opt_s;
 
   if (anchor_points_.empty()) {
-    const double piecewise_length = FLAGS_spiral_smoother_piecewise_length;
+    const double piecewise_length = config_.spiral().piecewise_length();
     const double length = raw_reference_line.Length();
     ADEBUG << "Length = " << length;
     uint32_t num_of_pieces =
@@ -152,7 +152,7 @@ bool SpiralReferenceLineSmoother::Smooth(
 
   std::vector<common::PathPoint> smoothed_point2d =
       Interpolate(opt_theta, opt_kappa, opt_dkappa, opt_s, opt_x, opt_y,
-                  FLAGS_spiral_reference_line_resolution);
+                  config_.resolution());
 
   std::vector<ReferencePoint> ref_points;
   for (const auto& p : smoothed_point2d) {
@@ -206,10 +206,11 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
   }
 
   ptop->set_end_point_position(fixed_end_x_, fixed_end_y_);
-  ptop->set_element_weight_curve_length(FLAGS_spiral_opt_weight_curve_length);
-  ptop->set_element_weight_kappa(FLAGS_spiral_opt_weight_kappa);
-  ptop->set_element_weight_dkappa(FLAGS_spiral_opt_weight_dkappa);
-  ptop->set_element_weight_d2kappa(FLAGS_spiral_opt_weight_d2kappa);
+  ptop->set_element_weight_curve_length(
+      config_.spiral().opt_weight_curve_length());
+  ptop->set_element_weight_kappa(config_.spiral().opt_weight_kappa());
+  ptop->set_element_weight_dkappa(config_.spiral().opt_weight_dkappa());
+  ptop->set_element_weight_d2kappa(config_.spiral().opt_weight_d2kappa());
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
@@ -218,13 +219,12 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
 
   app->Options()->SetStringValue("hessian_approximation", "limited-memory");
   app->Options()->SetIntegerValue("print_level", 0);
-  app->Options()->SetIntegerValue("max_iter",
-      FLAGS_spiral_smoother_num_iteration);
+  app->Options()->SetIntegerValue("max_iter", config_.spiral().max_iteration());
   app->Options()->SetIntegerValue("acceptable_iter",
-      FLAGS_spiral_opt_acceptable_iter);
-  app->Options()->SetNumericValue("tol", FLAGS_spiral_opt_tol);
+                                  config_.spiral().opt_acceptable_iteration());
+  app->Options()->SetNumericValue("tol", config_.spiral().opt_tol());
   app->Options()->SetNumericValue("acceptable_tol",
-      FLAGS_spiral_opt_acceptable_tol);
+                                  config_.spiral().opt_acceptable_tol());
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
