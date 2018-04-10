@@ -54,7 +54,9 @@ Camera::Camera() : field_of_view_(M_PI / 4.0f) {
   compute_projection_matrix();
 }
 
-Camera::~Camera() { delete frame_; }
+Camera::~Camera() {
+  delete frame_;
+}
 
 Camera::Camera(const Camera &camera) {
   set_frame(new Frame());
@@ -389,7 +391,7 @@ bool Camera::setscene_center_from_pixel(const Eigen::Vector2i &pixel) {
 }
 
 /*! Changes the revolve_around_point() to \p rap (defined in the world
-* coordinate system). */
+ * coordinate system). */
 void Camera::set_revolve_around_point(const Eigen::Vector3d &rap) {
   const double prevDist = fabs(cameracoordinates_of(revolve_around_point())(2));
 
@@ -450,7 +452,9 @@ Eigen::Vector3d Camera::point_under_pixel(const Eigen::Vector2i &pixel,
   return point;
 }
 
-void Camera::show_entire_scene() { fit_sphere(scene_center(), scene_radius()); }
+void Camera::show_entire_scene() {
+  fit_sphere(scene_center(), scene_radius());
+}
 
 void Camera::center_scene() {
   frame()->project_on_line(scene_center(), view_direction());
@@ -574,8 +578,8 @@ void Camera::setup_vector(const Eigen::Vector3d &up, bool noMove) {
   if (!noMove) {
     frame()->set_position(
         revolve_around_point() -
-        (frame()->orientation() *
-         q)._transformVector(frame()->coordinates_of(revolve_around_point())));
+        (frame()->orientation() * q)
+            ._transformVector(frame()->coordinates_of(revolve_around_point())));
   }
 
   frame()->rotate(q);
