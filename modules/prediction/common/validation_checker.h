@@ -24,12 +24,22 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
 
 class ValidationChecker {
  public:
+  /**
+   * @brief Compute the probability by centripedal acceleration
+   * @param lane sequence
+   * @param current speed of obstacle
+   * @return probability
+   */
+  static double ProbabilityByCentripedalAcceleration(
+      const LaneSequence& lane_sequence, const double speed);
+
   /**
    * @brief Check the validity of trajectory's centripedal acceleration
    * @param trajectory_points The input trajectory points
