@@ -31,6 +31,7 @@ cc_library(
         "//modules/perception/obstacle/camera/visualizer/common",
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/radar/interface",
+        "//modules/perception/proto:lane_post_process_config_lib_proto",
         "@eigen",
         "@glew",
         "@glfw",
