@@ -16,12 +16,14 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_SUPPLEMENT_H_
 #define MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_SUPPLEMENT_H_
 
-#include <boost/circular_buffer.hpp>
-#include <memory>
-#include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
+#include <memory>
+
+#include "boost/circular_buffer.hpp"
 #include "Eigen/Core"
+#include "opencv2/opencv.hpp"
+
 #include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
