@@ -1,0 +1,39 @@
+<package>
+
+  <name>pandora_pointcloud</name>
+  <version>1.0.0</version>
+  <description>Point cloud conversions for Pandora 3D LIDARs.</description>
+  <maintainer email="info@apollo.auto">car-os</maintainer>
+  <license>Licensed under the Apache License, Version 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>angles</build_depend>
+  <build_depend>pcl_conversions</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>pcl_ros</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>yaml-cpp</build_depend>
+  <build_depend>eigen_conversions</build_depend>
+
+  <!-- these build dependencies are only needed for unit testing -->
+  <build_depend>roslaunch</build_depend>
+  <build_depend>rostest</build_depend>
+
+  <run_depend>angles</run_depend>
+  <run_depend>pluginlib</run_depend>
+  <run_depend>python-yaml</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>roslib</run_depend>
+  <run_depend>pcl_ros</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>yaml-cpp</run_depend>
+  <run_depend>eigen_conversions</run_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelets.xml"/>
+  </export>
+
+</package>
