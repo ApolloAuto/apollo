@@ -70,10 +70,13 @@ bool CascadedCameraTracker::Associate(const cv::Mat& img,
   }
 
   // kcf
-  std::vector<std::vector<float>> kcf_affinity_matrix;
-  kcf_tracker_.SelectEntries(affinity_matrix);
-  kcf_tracker_.GetAffinityMatrix(img, tracks_, detected, &kcf_affinity_matrix);
-  MergeAffinityMatrix(kcf_affinity_matrix, &affinity_matrix);
+  if (use_kcf_) {
+    std::vector<std::vector<float>> kcf_affinity_matrix;
+    kcf_tracker_.SelectEntries(affinity_matrix);
+    kcf_tracker_.GetAffinityMatrix(img, tracks_, detected,
+                                   &kcf_affinity_matrix);
+    MergeAffinityMatrix(kcf_affinity_matrix, &affinity_matrix);
+  }
 
   // Matching
   std::unordered_map<int, int> local_matching;
@@ -89,7 +92,7 @@ bool CascadedCameraTracker::Associate(const cv::Mat& img,
   // Update information used in tracks for the next frame
   cs2d_tracker_.UpdateTracked(img, detected, &tracks_);
   if (dl_feature_) dlf_tracker_.UpdateTracked(img, detected, &tracks_);
-  kcf_tracker_.UpdateTracked(img, detected, &tracks_);
+  if (use_kcf_) kcf_tracker_.UpdateTracked(img, detected, &tracks_);
 
   for (auto obj_ptr : *objects) {
     obj_ptr->last_track_timestamp = timestamp;
