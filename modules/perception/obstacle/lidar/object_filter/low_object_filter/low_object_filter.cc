@@ -68,7 +68,7 @@ void LowObjectFilter::FilterLowObject(
     const ObjectFilterOptions& obj_filter_options,
     std::vector<ObjectPtr>* objects) {
   int object_number = objects->size();
-  int valid_objects_num = 0;
+  std::size_t valid_objects_num = 0;
   for (std::size_t i = 0; i < objects->size(); ++i) {
     ObjectPtr obj = objects->at(i);
     float max_height = -100.0;
@@ -86,7 +86,7 @@ void LowObjectFilter::FilterLowObject(
       continue;
     }
 
-    if (int(i) != valid_objects_num) {
+    if (i != valid_objects_num) {
       (*objects)[valid_objects_num] = (*objects)[i];
     }
 

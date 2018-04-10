@@ -18,10 +18,10 @@
 
 #include <boost/circular_buffer.hpp>
 #include <memory>
-#include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
 #include "Eigen/Core"
+#include "opencv2/opencv.hpp"
 #include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
