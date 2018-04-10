@@ -873,6 +873,7 @@ void Obstacle::SetLaneGraphFeature(Feature* feature) {
 
   if (feature->has_lane() && feature->lane().has_lane_graph()) {
     SetLanePoints(feature);
+    SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph());
   }
 
   ADEBUG << "Obstacle [" << id_ << "] set lane graph features.";
@@ -954,12 +955,26 @@ void Obstacle::SetLaneSequencePath(LaneGraph* const lane_graph) {
       for (int k = 0; k < lane_segment->lane_point_size(); ++k) {
         LanePoint* lane_point = lane_segment->mutable_lane_point(k);
         PathPoint path_point;
-        path_point.set_s(lane_segment_s + lane_point->relative_s());
+        path_point.set_s(lane_point->relative_s());
         path_point.set_theta(lane_point->heading());
         lane_sequence->add_path_point()->CopyFrom(path_point);
       }
       lane_segment_s += lane_segment->total_length();
     }
+    int num_path_point = lane_sequence->path_point_size();
+    if (num_path_point <= 0) {
+      continue;
+    }
+    for (int j = 0; j + 1 < num_path_point; ++j) {
+      PathPoint* first_point = lane_sequence->mutable_path_point(j);
+      PathPoint* second_point = lane_sequence->mutable_path_point(j + 1);
+      double delta_theta = apollo::common::math::AngleDiff(
+          second_point->theta(), first_point->theta());
+      double delta_s = second_point->s() - first_point->s();
+      double kappa = std::abs(delta_theta / (delta_s + FLAGS_double_precision));
+      lane_sequence->mutable_path_point(j)->set_kappa(kappa);
+    }
+    lane_sequence->mutable_path_point(num_path_point - 1)->set_kappa(0.0);
   }
 }
 

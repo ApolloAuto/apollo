@@ -11,7 +11,7 @@ em_planner_config {
     task : QP_SPLINE_ST_SPEED_OPTIMIZER
 
     dp_poly_path_config {
-        sample_points_num_each_level: 7
+        sample_points_num_each_level: 1
         step_length_max: 40.0
         step_length_min: 20.0
         lateral_sample_offset: 0.5

@@ -192,16 +192,17 @@ bool GLFWFusionViewer::initialize() {
     ConfigManager* config_manager = ConfigManager::instance();
     const ModelConfig* lane_post_process_model_config =
         config_manager->GetModelConfig(FLAGS_onboard_lane_post_processor);
+
     if (lane_post_process_model_config == nullptr) {
-      AERROR << "Unknown lane post-processing model: "
+      AWARN << "Unknown lane post-processing model: "
              << FLAGS_onboard_lane_post_processor;
-      return false;
+    } else {
+      if (!lane_post_process_model_config
+        ->GetValue("lane_map_confidence_thresh", &lane_map_threshold_)) {
+        AWARN << "The confidence threshold of label map not found.";
+      }
     }
-    if (!lane_post_process_model_config->GetValue("lane_map_confidence_thresh",
-                                                  &lane_map_threshold_)) {
-      AERROR << "The confidence threshold of label map not found.";
-      return false;
-    }
+
     AINFO << "onboard lane post-processor: "
           << FLAGS_onboard_lane_post_processor;
     AINFO << "lane map confidence threshold = " << lane_map_threshold_;
