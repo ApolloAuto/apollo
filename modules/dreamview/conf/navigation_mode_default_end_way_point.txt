@@ -26,7 +26,7 @@ landmark {
             y: 4141569.560433219,
         }
     }
-   waypoint {
+    waypoint {
         pose {
             x: 587537.6809338385,
             y: 4140715.096199132,
@@ -42,7 +42,7 @@ landmark {
             y: 4140715.939279582,
         }
     }
-   waypoint {
+    waypoint {
         pose {
             x: 587065.2253807376,
             y: 4141581.9434267264,
@@ -58,7 +58,7 @@ landmark {
             y: 4139873.621994,
         }
     }
-   waypoint {
+    waypoint {
         pose {
             x: 583547.686763,
             y: 4140272.112975,
@@ -74,10 +74,27 @@ landmark {
             y: 4116135.948553,
         }
     }
-   waypoint {
+    waypoint {
         pose {
             x: 617114.727457,
             y: 4115057.070031,
+        }
+    }
+}
+
+
+landmark {
+    name: "Route: 101 North",
+    waypoint {
+        pose {
+            x: 628816.327126,
+            y: 629254.820304,
+        }
+    }
+    waypoint {
+        pose {
+            x: 629254.820304,
+            y: 4086492.543297,
         }
     }
 }
