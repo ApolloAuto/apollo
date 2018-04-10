@@ -23,7 +23,7 @@ namespace apollo {
 namespace perception {
 
 TEST(PbfSensorManagerTest, pbf_sensor_frame_manage_test) {
-  PbfSensorManager *sensor_manager = PbfSensorManager::Instance();
+  PbfSensorManager *sensor_manager = PbfSensorManager::instance();
   EXPECT_TRUE(sensor_manager != nullptr);
   SensorObjects lidar_frame;
   lidar_frame.timestamp = 1234567891.01;
