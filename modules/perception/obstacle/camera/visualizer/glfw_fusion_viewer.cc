@@ -193,7 +193,7 @@ bool GLFWFusionViewer::initialize() {
 
   if (show_lane_) {
     lane_post_process_config::ModelConfigs config;
-    CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file, 
+    CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file,
                            &config));
     lane_map_threshold_ = config.lane_map_confidence_thresh();
     AINFO << "onboard lane post-processor: "
