@@ -828,7 +828,7 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(LaneObjectsPtr lane_objects) {
     lane.longitude_start = std::numeric_limits<ScalarType>::max();
     lane.longitude_end = 0;
     lane.order = 0;
-    for (int i = 0; i < lane_history_.size(); i++) {
+    for (std::size_t i = 0; i < lane_history_.size(); i++) {
       int j = 0;
       if (!FindLane(lane_history_[i], lane.spatial, &j))
         continue;
@@ -895,13 +895,14 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(LaneObjectsPtr lane_objects) {
       }
     }
   }
-  for (int l = 0; l < generated_lanes_->size(); l++) {
+  for (std::size_t l = 0; l < generated_lanes_->size(); l++) {
     if (is_valid[l]) return true;
   }
   return false;
 }
+
 bool CCLanePostProcessor::FindLane(const LaneObjects &lane_objects,
-                                  int spatial_label, int *index) {
+                                   int spatial_label, int *index) {
   size_t k = 0;
   while (k < lane_objects.size() &&
     lane_objects.at(k).spatial != spatial_label) {
@@ -921,7 +922,7 @@ void CCLanePostProcessor::InitLaneHistory() {
   motion_buffer_ = std::make_shared<MotionBuffer>(MAX_LANE_HISTORY);
   generated_lanes_ = std::make_shared<LaneObjects>(interested_labels_.size(),
                                                   LaneObject());
-  for (int i = 0; i < generated_lanes_->size(); i++) {
+  for (std::size_t i = 0; i < generated_lanes_->size(); i++) {
     generated_lanes_->at(i).spatial = interested_labels_[i];
   }
 }
