@@ -86,7 +86,9 @@ class GLFWFusionViewer {
   void set_camera_para(Eigen::Vector3d i_position, Eigen::Vector3d i_scn_center,
                        Eigen::Vector3d i_up_vector);
 
-  void set_forward_dir(Eigen::Vector3d forward) { forward_dir_ = forward; }
+  void set_forward_dir(Eigen::Vector3d forward) {
+    forward_dir_ = forward;
+  }
 
   void set_main_car(const std::vector<Eigen::Vector3d> &main_car) {
     main_car_ = main_car;

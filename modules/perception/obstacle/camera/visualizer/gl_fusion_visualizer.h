@@ -16,10 +16,10 @@
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GL_FUSION_VISUALIZER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GL_FUSION_VISUALIZER_H_
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <memory>
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
 #include "modules/perception/obstacle/camera/visualizer/glfw_fusion_viewer.h"
