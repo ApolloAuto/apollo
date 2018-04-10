@@ -251,9 +251,8 @@ void MSFLocalization::OnPointCloud(const sensor_msgs::PointCloud2 &message) {
     std::list<msf::LocalizationResult> lidar_localization_list;
     localization_integ_.GetLidarLocalizationList(&lidar_localization_list);
 
-    auto itr = lidar_localization_list.begin();
-    auto itr_end = lidar_localization_list.end();
-    for (; itr != itr_end; ++itr) {
+    for (auto itr = lidar_localization_list.begin();
+         itr != lidar_localization_list.end(); ++itr) {
       latest_lidar_localization_status_ =
           static_cast<MeasureState>(itr->state());
       if (itr->state() == msf::LocalizationMeasureState::OK ||
@@ -277,9 +276,8 @@ void MSFLocalization::OnRawImu(const drivers::gnss::Imu &imu_msg) {
   std::list<msf::LocalizationResult> integ_localization_list;
   localization_integ_.GetIntegLocalizationList(&integ_localization_list);
 
-  auto itr = integ_localization_list.begin();
-  auto itr_end = integ_localization_list.end();
-  for (; itr != itr_end; ++itr) {
+  for (auto itr = integ_localization_list.begin();
+       itr != integ_localization_list.end(); ++itr) {
     // compose localization status
     LocalizationStatus status;
     apollo::common::Header *status_headerpb = status.mutable_header();
@@ -348,9 +346,8 @@ void MSFLocalization::OnGnssBestPose(
     std::list<msf::LocalizationResult> gnss_localization_list;
     localization_integ_.GetGnssLocalizationList(&gnss_localization_list);
 
-    auto itr = gnss_localization_list.begin();
-    auto itr_end = gnss_localization_list.end();
-    for (; itr != itr_end; ++itr) {
+    for (auto itr = gnss_localization_list.begin();
+         itr != gnss_localization_list.end(); ++itr) {
       latest_gnss_localization_status_ =
           static_cast<MeasureState>(itr->state());
       if (itr->state() == msf::LocalizationMeasureState::OK ||
@@ -377,9 +374,8 @@ void MSFLocalization::OnGnssRtkObs(
     std::list<msf::LocalizationResult> gnss_localization_list;
     localization_integ_.GetGnssLocalizationList(&gnss_localization_list);
 
-    auto itr = gnss_localization_list.begin();
-    auto itr_end = gnss_localization_list.end();
-    for (; itr != itr_end; ++itr) {
+    for (auto itr = gnss_localization_list.begin();
+         itr != gnss_localization_list.end(); ++itr) {
       latest_gnss_localization_status_ =
           static_cast<MeasureState>(itr->state());
       if (itr->state() == msf::LocalizationMeasureState::OK ||

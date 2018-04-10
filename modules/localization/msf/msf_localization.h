@@ -38,10 +38,7 @@
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-// #include "modules/localization/proto/measure.pb.h"
-// #include "modules/localization/proto/sins_pva.pb.h"
 
-// #include "include/localization_integ.h"
 #include "modules/common/log.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"

@@ -73,7 +73,7 @@ class LocalizationIntegProcess {
  private:
   bool CheckIntegMeasureData(const MeasureData& measure_data);
 
-  bool LoadGnssAntennaExtrinsic(std::string file_path,
+  bool LoadGnssAntennaExtrinsic(const std::string &file_path,
                                 TransformD *extrinsic) const;
 
   void MeasureDataProcessImpl(const MeasureData& measure_msg);

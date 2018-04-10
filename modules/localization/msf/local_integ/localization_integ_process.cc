@@ -116,13 +116,13 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
     }
 
     if (cur_imu_time - 0.5 > pre_imu_time) {
-      std::cout << "SINS has completed alignment!" << std::endl;
+      AINFO << "SINS has completed alignment!" << std::endl;
       pre_imu_time = cur_imu_time;
     }
   } else {
     delay_output_counter_ = 0;
     if (cur_imu_time - 0.5 > pre_imu_time) {
-      std::cout << "SINS is aligning!" << std::endl;
+      AINFO << "SINS is aligning!" << std::endl;
       pre_imu_time = cur_imu_time;
     }
   }
@@ -149,11 +149,19 @@ void LocalizationIntegProcess::GetValidFromOK() {
 }
 
 void LocalizationIntegProcess::GetState(IntegState *state) {
+  if (!state) {
+    return;
+  }
   *state = integ_state_;
+  return;
 }
 
 void LocalizationIntegProcess::GetResult(IntegState *state,
                                          LocalizationEstimate *localization) {
+  if (!state || !localization) {
+    return;
+  }
+
   // state
   *state = integ_state_;
 
@@ -234,6 +242,9 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
 void LocalizationIntegProcess::GetResult(IntegState *state,
                InsPva *sins_pva,
                double pva_covariance[9][9]) {
+  if (!state || !sins_pva || !pva_covariance) {
+    return;
+  }
   *state = integ_state_;
   *sins_pva = ins_pva_;
   memcpy(pva_covariance, pva_covariance_, sizeof(double) * 9 * 9);
@@ -336,7 +347,10 @@ bool LocalizationIntegProcess::CheckIntegMeasureData(
 }
 
 bool LocalizationIntegProcess::LoadGnssAntennaExtrinsic(
-    std::string file_path, TransformD *extrinsic) const {
+    const std::string &file_path, TransformD *extrinsic) const {
+  if (!extrinsic) {
+    return false;
+  }
   YAML::Node confige = YAML::LoadFile(file_path);
   if (confige["leverarm"]) {
     if (confige["leverarm"]["primary"]["offset"]) {

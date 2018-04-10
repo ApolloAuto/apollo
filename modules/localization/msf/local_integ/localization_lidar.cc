@@ -175,6 +175,9 @@ int LocalizationLidar::Update(const unsigned int frame_idx,
 
 void LocalizationLidar::GetResult(Eigen::Affine3d *location,
                                   Eigen::Matrix3d *covariance) {
+  if (!location || !covariance) {
+    return;
+  }
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
@@ -227,6 +230,9 @@ void LocalizationLidar::GetLocalizationDistribution(
 }
 
 void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d *pose) {
+  if (!pose) {
+    return;
+  }
   Eigen::Affine3d lidar_pose = *pose * velodyne_extrinsic_;
   Eigen::Vector3d lidar_trans = lidar_pose.translation();
 

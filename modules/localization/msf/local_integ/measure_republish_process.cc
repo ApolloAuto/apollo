@@ -73,7 +73,6 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
 
   // check sins status
   bool is_sins_align = IsSinsAlign();
-  std::cerr << "is_sins_align: " << is_sins_align << std::endl;
 
   // If sins is align, we only need measure of xyz from bestgnsspos.
   // If sins is not align, in order to init sins, we need
@@ -116,6 +115,10 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
 void MeasureRepublishProcess::GnssLocalProcess(
     const MeasureData& gnss_local_msg, MeasureData *measure) {
   if (gnss_mode_ != GnssMode::SELF) {
+    return;
+  }
+
+  if (!measure) {
     return;
   }
 
@@ -275,6 +278,9 @@ void MeasureRepublishProcess::IntegPvaProcess(const InsPva& inspva_msg) {
 
 bool MeasureRepublishProcess::LidarLocalProcess(
     const LocalizationEstimate& lidar_local_msg, MeasureData *measure) {
+  if (!measure) {
+    return false;
+  }
   MeasureData measure_data;
   measure_data.time = lidar_local_msg.measurement_time();
 
@@ -354,6 +360,9 @@ bool MeasureRepublishProcess::IsSinsAlign() {
 
 void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
     const GnssBestPose& bestgnsspos_msg, MeasureData *measure) {
+  if (!measure) {
+    return;
+  }
   measure->time = bestgnsspos_msg.measurement_time();
   if (is_trans_gpstime_to_utctime_) {
     measure->time = util::GpsToUnixSeconds(measure->time);
@@ -386,6 +395,9 @@ void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
 
 void MeasureRepublishProcess::TransferFirstMeasureFromBestgnsspose(
     const GnssBestPose& bestgnsspos_msg, MeasureData *measure) {
+  if (!measure) {
+    return;
+  }
   TransferXYZFromBestgnsspose(bestgnsspos_msg, measure);
 
   measure->measure_type = MeasureType::GNSS_POS_VEL;
@@ -402,6 +414,9 @@ void MeasureRepublishProcess::TransferFirstMeasureFromBestgnsspose(
 
 bool MeasureRepublishProcess::CalculateVelFromBestgnsspose(
     const GnssBestPose& bestgnsspos_msg, MeasureData *measure) {
+  if (!measure) {
+    return false;
+  }
   TransferXYZFromBestgnsspose(bestgnsspos_msg, measure);
 
   measure->measure_type = MeasureType::GNSS_POS_VEL;

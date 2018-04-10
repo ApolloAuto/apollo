@@ -204,6 +204,9 @@ void LocalizationGnssProcess::IntegSinsPvaProcess(
 
 LocalizationMeasureState LocalizationGnssProcess::GetResult(
     MeasureData *gnss_msg) {
+  if (!gnss_msg) {
+    return LocalizationMeasureState::NOT_VALID;
+  }
   // convert GnssPntResult to IntegMeasure
   // double sec_s = Clock::NowInSeconds(); // ros::Time::now().toSec();
   const unsigned int second_per_week = 604800;
@@ -311,6 +314,9 @@ inline void LocalizationGnssProcess::LogPnt(const GnssPntResultMsg &rover_pnt,
 
 bool LocalizationGnssProcess::GnssPosition(
     EpochObservationMsg *raw_rover_obs) {
+  if (!raw_rover_obs) {
+    return false;
+  }
   gnss_state_ = LocalizationMeasureState::NOT_VALID;
   if (raw_rover_obs->receiver_id() != 0) {
     AINFO << "Wrong Rover Obs Data!";

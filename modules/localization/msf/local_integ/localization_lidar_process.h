@@ -113,8 +113,10 @@ class LocalizationLidarProcess {
   // Load lidar height (the distance between lidar and ground).
   bool LoadLidarHeight(const std::string& file_path, LidarHeight *height);
 
-  double ComputeDeltaYawLimit(int64_t index_cur, int64_t index_stable,
-            double limit_min, double limit_max);
+  double ComputeDeltaYawLimit(const int64_t index_cur,
+                              const int64_t index_stable,
+                              const double limit_min,
+                              const double limit_max);
 
  private:
   // Lidar localization.

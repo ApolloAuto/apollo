@@ -133,8 +133,8 @@ Status LocalizationLidarProcess::Init(
 }
 
 double LocalizationLidarProcess::ComputeDeltaYawLimit(
-      int64_t index_cur, int64_t index_stable,
-      double limit_min, double limit_max) {
+      const int64_t index_cur, const int64_t index_stable,
+      const double limit_min, const double limit_max) {
   if (index_cur > index_stable) {
     return limit_min;
   }
@@ -194,9 +194,13 @@ void LocalizationLidarProcess::PcdProcess(const LidarFrame& lidar_frame) {
 void LocalizationLidarProcess::GetResult(int *lidar_status,
                                          TransformD *location,
                                          Matrix3D *covariance) const {
+  if (!lidar_status || !location || !covariance) {
+    return;
+  }
   *lidar_status = static_cast<int>(lidar_status_);
   *location = location_;
   *covariance = location_covariance_;
+  return;
 }
 
 int LocalizationLidarProcess::GetResult(
@@ -256,6 +260,9 @@ void LocalizationLidarProcess::RawImuProcess(const ImuData& imu_msg) {
 bool LocalizationLidarProcess::GetPredictPose(const double lidar_time,
                                               TransformD *predict_pose,
                                               ForcastState *forcast_state) {
+  if (!predict_pose || !forcast_state) {
+    return false;
+  }
   double latest_imu_time = pose_forcastor_->GetLastestImuTime();
   if (latest_imu_time - lidar_time > imu_lidar_max_delay_time_) {
     AERROR << std::setprecision(16)
@@ -333,7 +340,6 @@ void LocalizationLidarProcess::UpdateState(const int ret, const double time) {
         std::sqrt(location_covariance_(0, 0))
         * std::sqrt(location_covariance_(1, 1));
     if (cur_location_std_area > unstable_threshold_) {
-      // std::cout << "covariance too big trueeee" << std::endl; // TEST
       ++unstable_count_;
     } else {
       unstable_count_ = 0;
@@ -344,7 +350,6 @@ void LocalizationLidarProcess::UpdateState(const int ret, const double time) {
       unstable_count_ = 2;
       reinit_flag_ = true;
       AWARN << "Reinit lidar localization due to big covariance";
-      // std::cout << "reinit_flag_ trueeee" << std::endl; // TEST
       lidar_status_ = LidarState::NOT_STABLE;
     } else {
       lidar_status_ = LidarState::OK;
@@ -373,6 +378,9 @@ void LocalizationLidarProcess::UpdateState(const int ret, const double time) {
 
 bool LocalizationLidarProcess::LoadLidarExtrinsic(
     const std::string& file_path, TransformD *lidar_extrinsic) {
+  if (!lidar_extrinsic) {
+    return false;
+  }
   YAML::Node config = YAML::LoadFile(file_path);
   if (config["transform"]) {
     if (config["transform"]["translation"]) {
@@ -398,6 +406,9 @@ bool LocalizationLidarProcess::LoadLidarExtrinsic(
 
 bool LocalizationLidarProcess::LoadLidarHeight(const std::string& file_path,
                                                LidarHeight *height) {
+  if (!height) {
+    return false;
+  }
   if (!common::util::PathExists(file_path)) {
     return false;
   }
