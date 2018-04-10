@@ -44,7 +44,7 @@ namespace lowcostvisualizer {
 
 using apollo::perception::CalibrationConfigManager;
 using apollo::perception::CameraCalibrationPtr;
-using apollo::common::util::GetProtoFromFile;    
+using apollo::common::util::GetProtoFromFile;
 
 const double pace_zoom = 15;
 const double My_PI = 3.14159265359;
@@ -191,9 +191,9 @@ bool GLFWFusionViewer::initialize() {
 
   if (show_lane_) {
     lane_post_process_config::ModelConfigs config;
-    CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file, &config));  
+    CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file, 
+                           &config));
     lane_map_threshold_ = config.lane_map_confidence_thresh();
-      
     AINFO << "onboard lane post-processor: "
           << FLAGS_onboard_lane_post_processor;
     AINFO << "lane map confidence threshold = " << lane_map_threshold_;
