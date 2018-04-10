@@ -32,6 +32,7 @@
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
+#include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/onboard/transform_input.h"
@@ -181,6 +182,23 @@ void LidarProcessSubnode::OnPointCloud(
   ADEBUG << "call segmentation succ. The num of objects is: " << objects.size();
   PERF_BLOCK_END("lidar_segmentation");
 
+  /// call object filter
+  if (object_filter_ != nullptr) {
+    ObjectFilterOptions object_filter_options;
+    object_filter_options.velodyne_trans.reset(new Eigen::Matrix4d);
+    object_filter_options.velodyne_trans = velodyne_trans;
+    //object_filter_options.hdmap_struct_ptr = hdmap;
+
+    if (!object_filter_->Filter(object_filter_options, &objects)) {
+      AERROR << "failed to call object filter.";
+      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
+      PublishDataAndEvent(timestamp_, out_sensor_objects);
+      return;
+    }
+  }
+  ADEBUG << "call object filter succ. The num of objects is: " << objects.size();
+  PERF_BLOCK_END("lidar_object_filter");
+
   /// call object builder
   if (object_builder_ != nullptr) {
     ObjectBuilderOptions object_builder_options;
@@ -238,6 +256,7 @@ void LidarProcessSubnode::RegistAllAlgorithm() {
   RegisterFactoryDummyTypeFuser();
 
   RegisterFactoryHdmapROIFilter();
+  RegisterFactoryLowObjectFilter();
   RegisterFactoryCNNSegmentation();
   RegisterFactoryMinBoxObjectBuilder();
   RegisterFactoryHmObjectTracker();
@@ -317,6 +336,20 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
   }
   AINFO << "Init algorithm plugin successfully, object builder: "
         << object_builder_->name();
+
+  /// init pre object filter
+  object_filter_.reset(BaseObjectFilterRegisterer::GetInstanceByName(
+      "LowObjectFilter"));
+  if (!object_filter_) {
+    AERROR << "Failed to get instance: ExtHdmapObjectFilter";
+    return false;
+  }
+  if (!object_filter_->Init()) {
+    AERROR << "Failed to Init object filter: " << object_filter_->name();
+    return false;
+  }
+  AINFO << "Init algorithm plugin successfully, object filter: "
+        << object_filter_->name();
 
   /// init tracker
   tracker_.reset(
