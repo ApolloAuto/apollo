@@ -22,12 +22,14 @@
 #ifndef MODULES_LOCALIZATION_MSF_MEASURE_REPUBLISH_PROCESS_H_
 #define MODULES_LOCALIZATION_MSF_MEASURE_REPUBLISH_PROCESS_H_
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-
 #include <list>
 #include <string>
 #include <mutex>
+#include <cmath>
+#include <cstdint>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
@@ -36,23 +38,13 @@
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "include/sins_struct.h"
 
-// #include "local_sins/frame_transform.hpp"
-// #include "local_sins/integrated_navigation.hpp"
-
 /**
- * @namespace apollo::localization
- * @brief apollo::localization
+ * @namespace apollo::localization::msf
+ * @brief apollo::localization::msf
  */
 namespace apollo {
 namespace localization {
 namespace msf {
-
-typedef Eigen::Affine3d TransformD;
-typedef Eigen::Vector3d Vector3D;
-typedef Eigen::Translation3d Translation3D;
-typedef Eigen::Matrix3d Matrix3D;
-typedef Eigen::Quaterniond QuaternionD;
-typedef drivers::gnss::GnssBestPose GnssBestPose;
 
 enum class GnssMode { NOVATEL = 0, SELF };
 
@@ -63,6 +55,8 @@ enum class GnssMode { NOVATEL = 0, SELF };
  */
 class MeasureRepublishProcess {
  public:
+  typedef drivers::gnss::GnssBestPose GnssBestPose;
+
   MeasureRepublishProcess();
   ~MeasureRepublishProcess();
   // Initialization.
@@ -78,11 +72,24 @@ class MeasureRepublishProcess {
   void IntegPvaProcess(const InsPva& inspva_msg);
 
   // lidar message process
-  int LidarLocalProcess(const LocalizationEstimate& lidar_local_msg,
-                        MeasureData *measure);
+  bool LidarLocalProcess(const LocalizationEstimate& lidar_local_msg,
+                         MeasureData *measure);
+
+ protected:
+  bool IsSinsAlign();
+  bool CheckBestgnssposeStatus(const GnssBestPose& bestgnsspos_msg);
+  bool CheckBestgnssPoseXYStd(const GnssBestPose& bestgnsspos_msg);
+  void TransferXYZFromBestgnsspose(
+      const GnssBestPose& bestgnsspos_msg, MeasureData *measure);
+  void TransferFirstMeasureFromBestgnsspose(
+      const GnssBestPose& bestgnsspos_msg, MeasureData *measure);
+  bool CalculateVelFromBestgnsspose(
+      const GnssBestPose& bestgnsspos_msg, MeasureData *measure);
 
  private:
   MeasureData pre_bestgnsspose_;
+  bool pre_bestgnsspose_valid_;
+  bool send_init_bestgnsspose_;
 
   std::list<InsPva> integ_pva_list_;
   size_t pva_buffer_size_;
@@ -96,6 +103,12 @@ class MeasureRepublishProcess {
   std::mutex height_mutex_;
 
   GnssMode gnss_mode_;
+
+  static constexpr double DEG_TO_RAD = 0.017453292519943;
+  static constexpr double RAD_TO_DEG = 57.295779513082323;
+  static constexpr double GNSS_XY_STD_THRESHOLD = 5.0;
+  static constexpr double BESTPOSE_TIME_MAX_INTERVAL = 1.05;
+  static constexpr int BESTPOSE_GOOD_COUNT = 10;
 };
 
 }  // namespace msf

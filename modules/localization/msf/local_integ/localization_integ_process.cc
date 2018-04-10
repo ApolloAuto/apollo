@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/local_integ/localization_integ_process.h"
 
-#include <yaml-cpp/yaml.h>
+#include "yaml-cpp/yaml.h"
 
 #include "modules/common/time/time.h"
 #include "modules/common/time/timer.h"

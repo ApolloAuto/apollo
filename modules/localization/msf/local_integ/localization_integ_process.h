@@ -17,16 +17,17 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_IMU_PROCESS_H_
 #define MODULES_LOCALIZATION_MSF_LOCALIZATION_IMU_PROCESS_H_
 
-#include <pthread.h>
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-#include <condition_variable>
 #include <list>
 #include <mutex>
 #include <queue>
 #include <string>
 #include <thread>
 #include <atomic>
+#include <condition_variable>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
+
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/proto/localization.pb.h"

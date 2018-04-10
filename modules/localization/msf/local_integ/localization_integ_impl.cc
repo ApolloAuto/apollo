@@ -320,7 +320,6 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   angular_velocity_vrf->set_z(imu_data.wibb[2]);
 
   integ_localization_mutex_.lock();
-  // integ_localization_state_ = LocalizationMeasureState(int(state));
   integ_localization_list_.push_back(LocalizationResult(
       LocalizationMeasureState(static_cast<int>(state)), integ_localization));
   if (integ_localization_list_.size() > integ_localization_list_max_size_) {
@@ -336,22 +335,17 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   republish_process_->IntegPvaProcess(integ_sins_pva);
 
   if (state != IntegState::NOT_INIT) {
-    // update lidar
+    // pass result of integration localization to lidar process module
     if (enable_lidar_localization_
         && state != IntegState::NOT_STABLE) {
       lidar_process_->IntegPvaProcess(integ_sins_pva);
     }
 
     if (!is_use_gnss_bestpose_) {
-      // update gnssW
-      // MeasureData measure_data = {0.0};
-      // integ_process_->GetResult(&measure_data);
+      // pass localization result to gnss process module
       gnss_process_->IntegSinsPvaProcess(integ_sins_pva, covariance);
     }
   }
-
-  // timer.End("imu Process");
-
   return;
 }
 

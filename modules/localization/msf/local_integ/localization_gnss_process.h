@@ -22,9 +22,12 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_GNSS_PROCESS_H_
 #define MODULES_LOCALIZATION_MSF_LOCALIZATION_GNSS_PROCESS_H_
 
-#include <Eigen/Eigen>
 #include <map>
 #include <string>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
+
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/localization/msf/local_integ/localization_params.h"

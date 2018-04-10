@@ -27,6 +27,7 @@
 #include <utility>
 #include <vector>
 #include <list>
+
 #include "sensor_msgs/PointCloud2.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"

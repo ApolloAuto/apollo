@@ -22,12 +22,13 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_LIDAR_PROCESS_H_
 #define MODULES_LOCALIZATION_MSF_LOCALIZATION_LIDAR_PROCESS_H_
 
-#include <pthread.h>
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 #include <list>
 #include <string>
 #include <cstdint>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
+
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
@@ -152,9 +153,6 @@ class LocalizationLidarProcess {
   // imu and lidar max delay time
   double imu_lidar_max_delay_time_;
 
-  int non_zero_odometry_cnt_;
-  int max_nan_zero_odemetry_;
-
   bool is_unstable_reset_;
   int unstable_count_;
   double unstable_threshold_;
@@ -164,6 +162,9 @@ class LocalizationLidarProcess {
   /**@brief forcast integ pose, use to limit output of yaw */
   ForcastState forcast_integ_state_;
   int64_t forcast_timer_;
+
+  static constexpr double DEG_TO_RAD = 0.017453292519943;
+  static constexpr double DEG_TO_RAD2 = DEG_TO_RAD * DEG_TO_RAD;
 };
 
 }  // namespace msf

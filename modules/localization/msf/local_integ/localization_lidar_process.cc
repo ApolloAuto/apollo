@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/local_integ/localization_lidar_process.h"
 
-#include <yaml-cpp/yaml.h>
+#include "yaml-cpp/yaml.h"
 
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
@@ -45,7 +45,6 @@ LocalizationLidarProcess::LocalizationLidarProcess()
       location_covariance_(Matrix3D::Zero()),
       lidar_status_(LidarState::NOT_VALID),
       reinit_flag_(false), imu_lidar_max_delay_time_(0.5),
-      non_zero_odometry_cnt_(0), max_nan_zero_odemetry_(10),
       is_unstable_reset_(true), unstable_count_(0), unstable_threshold_(0.08),
       out_map_count_(0), forcast_integ_state_(ForcastState::NOT_VALID),
       forcast_timer_(-1) {}
@@ -122,9 +121,11 @@ Status LocalizationLidarProcess::Init(
   locator_->SetVehicleHeight(lidar_height_.height);
   locator_->SetDeltaPitchRollLimit(compensate_pitch_roll_limit_);
 
-  const double max_gyro_input = 200 * 0.017453292519943;
+  const double deg_to_rad = 0.017453292519943;
+  const double max_gyro_input = 200 * deg_to_rad;  // 200 degree
+  const double max_acc_input = 5.0;  // 5.0 m/s^2
   pose_forcastor_->SetMaxListNum(400);
-  pose_forcastor_->SetMaxAccelInput(5.0);
+  pose_forcastor_->SetMaxAccelInput(max_acc_input);
   pose_forcastor_->SetMaxGyroInput(max_gyro_input);
   pose_forcastor_->SetZoneId(utm_zone_id_);
 
@@ -231,7 +232,7 @@ int LocalizationLidarProcess::GetResult(
   position_std_dev->set_y(location_covariance_(1, 1));
   position_std_dev->set_z(0.0);
 
-  const double yaw_covariance = 0.15 * 0.15 * 3.0461742e-04;
+  constexpr double yaw_covariance = 0.15 * 0.15 * DEG_TO_RAD2;
   apollo::common::Point3D* orientation_std_dev =
       uncertainty->mutable_orientation_std_dev();
   orientation_std_dev->set_x(0.0);
@@ -297,12 +298,6 @@ bool LocalizationLidarProcess::GetPredictPose(const double lidar_time,
     AERROR << "LocalizationLidar Fatal Error: invalid pose!";
     return false;
   }
-
-  // if (non_zero_odometry_cnt_ < max_nan_zero_odemetry_) {
-  //   AINFO << "LocalizationLidar: Abort several initial lidar frame.";
-  //   ++non_zero_odometry_cnt_;
-  //   return false;
-  // }
 
   Eigen::Quaterniond quatd(forcast_pose.qw, forcast_pose.qx,
                            forcast_pose.qy, forcast_pose.qz);

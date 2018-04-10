@@ -16,9 +16,9 @@
 
 #include "modules/localization/msf/local_integ/localization_gnss_process.h"
 
-#include <yaml-cpp/yaml.h>
-
 #include <string>
+
+#include "yaml-cpp/yaml.h"
 
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
@@ -90,8 +90,6 @@ void LocalizationGnssProcess::RawObservationProcess(
   leap_second_s = gnss_solver_->get_leap_second(raw_obs.gnss_week(),
                                                raw_obs.gnss_second_s());
 
-  // double sys_secs_to_gnss = ros::Time::now().toSec()
-  //    - unix_to_gps + leap_second_s;
   double sys_secs_to_gnss = common::time::Clock::NowInSeconds()
       - unix_to_gps + leap_second_s;
   double obs_secs =
@@ -318,7 +316,6 @@ bool LocalizationGnssProcess::GnssPosition(
     AINFO << "Wrong Rover Obs Data!";
     return false;
   }
-  // debug
   int b_solved = gnss_solver_->solve(raw_rover_obs, &gnss_pnt_result_);
   if (b_solved < 0) {
     return false;
@@ -335,8 +332,9 @@ bool LocalizationGnssProcess::GnssPosition(
         gnss_pnt_result_.std_pos_y_m() * gnss_pnt_result_.std_pos_y_m() +
         gnss_pnt_result_.std_pos_z_m() * gnss_pnt_result_.std_pos_z_m();
     sigma = std::sqrt(fabs(sigma));
-    if (fabs(sigma) > 10.0) {
-      AINFO << "Position std exceeds the threshold 10.0!";
+    const double sigma_threshold = 10.0;
+    if (fabs(sigma) > sigma_threshold) {
+      AINFO << "Position std exceeds the threshold " << sigma_threshold << "!";
       return false;
     }
   }

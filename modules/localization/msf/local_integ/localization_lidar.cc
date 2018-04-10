@@ -78,7 +78,6 @@ bool LocalizationLidar::Init(const std::string& map_path,
 }
 
 void LocalizationLidar::SetVelodyneExtrinsic(const Eigen::Affine3d& pose) {
-  // (double x, double y, double z, double qx, double qy, double qz, double qw)
   velodyne_extrinsic_ = pose;
   Eigen::Vector3d trans = pose.translation();
   Eigen::Quaterniond quat = Eigen::Quaterniond(pose.linear());
