@@ -94,7 +94,7 @@ enum SpaceType {
 };
 
 typedef Eigen::Matrix<ScalarType, 2, 1> Vector2D;
-
+typedef Eigen::Matrix<ScalarType, 3, 1> Vector3D;
 enum AssociationMethod {
   GREEDY_GROUP_CONNECT = 0,
 };
