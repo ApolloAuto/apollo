@@ -41,10 +41,6 @@ DECLARE_double(reference_line_lateral_buffer);
 DECLARE_double(prepare_rerouting_time);
 
 DECLARE_bool(enable_smooth_reference_line);
-DECLARE_double(spiral_smoother_max_deviation);
-DECLARE_int32(spiral_smoother_num_iteration);
-DECLARE_double(spiral_smoother_piecewise_length);
-DECLARE_double(spiral_reference_line_resolution);
 
 DECLARE_bool(prioritize_change_lane);
 DECLARE_bool(reckless_change_lane);
@@ -189,15 +185,5 @@ DECLARE_double(lattice_stop_buffer);
 
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);
-
-// Spiral reference line smoother
-DECLARE_double(spiral_opt_tol);
-DECLARE_double(spiral_opt_acceptable_tol);
-DECLARE_double(spiral_opt_acceptable_iter);
-
-DECLARE_double(spiral_opt_weight_curve_length);
-DECLARE_double(spiral_opt_weight_kappa);
-DECLARE_double(spiral_opt_weight_dkappa);
-DECLARE_double(spiral_opt_weight_d2kappa);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_
