@@ -142,6 +142,9 @@ function build() {
   python modules/tools/common/kv_db.py put \
       "apollo:data:commit_id" "$(git rev-parse HEAD)"
 
+  # build pandora_driver
+  build_pandora
+
   if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
     cd /apollo-simulator && bash build.sh build
     if [ $? -ne 0 ]; then
@@ -499,6 +502,35 @@ function build_gnss() {
   rm -rf modules/devel_isolated/
 }
 
+function build_pandora() {
+  CURRENT_PATH=$(pwd)
+  if [ -d "${ROS_ROOT}" ]; then
+    ROS_PATH="${ROS_ROOT}/../.."
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
+
+  # install pcap
+  apt-get -y install libpcap-dev
+  source "${ROS_PATH}/setup.bash"
+
+  cd modules
+  catkin_make_isolated --install --source drivers/pandora/pandora_driver \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  if [ $? -ne 0 ]; then exit 1; fi
+  catkin_make_isolated --install --source drivers/pandora/pandora_pointcloud \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
+
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
+}
+
 function build_velodyne() {
   CURRENT_PATH=$(pwd)
   if [ -d "${ROS_ROOT}" ]; then
@@ -564,6 +596,7 @@ function print_usage() {
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_gnss${NONE}: build gnss driver
   ${BLUE}build_velodyne${NONE}: build velodyne driver
+  ${BLUE}build_pandora${NONE}: build pandora driver
   ${BLUE}build_usbcam${NONE}: build usb camera driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
@@ -652,6 +685,9 @@ function main() {
       ;;
     build_velodyne)
       build_velodyne
+      ;;
+    build_pandora)
+      build_pandora
       ;;
     build_usbcam)
       build_usbcam
