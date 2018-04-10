@@ -47,5 +47,6 @@ class PbfTrackManager {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_
-        // // NOLINT
+/* clang-format off */
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_ // NOLINT
+/* clang-format on */
