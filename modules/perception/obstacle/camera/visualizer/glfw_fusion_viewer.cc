@@ -30,8 +30,10 @@
 #include <vector>
 
 #include "gflags/gflags.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/proto/lane_post_process_config.pb.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 #include "modules/perception/obstacle/camera/visualizer/common/bmp.h"
@@ -44,6 +46,7 @@ namespace lowcostvisualizer {
 
 using apollo::perception::CalibrationConfigManager;
 using apollo::perception::CameraCalibrationPtr;
+using apollo::common::util::GetProtoFromFile;
 
 const double pace_zoom = 15;
 const double My_PI = 3.14159265359;
@@ -189,20 +192,10 @@ bool GLFWFusionViewer::initialize() {
   distort_camera_intrinsic_ = calibrator->get_camera_model();
 
   if (show_lane_) {
-    ConfigManager* config_manager = ConfigManager::instance();
-    const ModelConfig* lane_post_process_model_config =
-        config_manager->GetModelConfig(FLAGS_onboard_lane_post_processor);
-
-    if (lane_post_process_model_config == nullptr) {
-      AWARN << "Unknown lane post-processing model: "
-             << FLAGS_onboard_lane_post_processor;
-    } else {
-      if (!lane_post_process_model_config
-        ->GetValue("lane_map_confidence_thresh", &lane_map_threshold_)) {
-        AWARN << "The confidence threshold of label map not found.";
-      }
-    }
-
+    lane_post_process_config::ModelConfigs config;
+    CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file,
+                           &config));
+    lane_map_threshold_ = config.lane_map_confidence_thresh();
     AINFO << "onboard lane post-processor: "
           << FLAGS_onboard_lane_post_processor;
     AINFO << "lane map confidence threshold = " << lane_map_threshold_;
