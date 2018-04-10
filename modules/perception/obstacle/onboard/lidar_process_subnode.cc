@@ -30,9 +30,9 @@
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
+#include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
-#include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/onboard/transform_input.h"
@@ -187,7 +187,7 @@ void LidarProcessSubnode::OnPointCloud(
     ObjectFilterOptions object_filter_options;
     object_filter_options.velodyne_trans.reset(new Eigen::Matrix4d);
     object_filter_options.velodyne_trans = velodyne_trans;
-    //object_filter_options.hdmap_struct_ptr = hdmap;
+    // object_filter_options.hdmap_struct_ptr = hdmap;
 
     if (!object_filter_->Filter(object_filter_options, &objects)) {
       AERROR << "failed to call object filter.";
@@ -196,7 +196,8 @@ void LidarProcessSubnode::OnPointCloud(
       return;
     }
   }
-  ADEBUG << "call object filter succ. The num of objects is: " << objects.size();
+  ADEBUG << "call object filter succ. The num of objects is: "
+         << objects.size();
   PERF_BLOCK_END("lidar_object_filter");
 
   /// call object builder
@@ -338,8 +339,8 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
         << object_builder_->name();
 
   /// init pre object filter
-  object_filter_.reset(BaseObjectFilterRegisterer::GetInstanceByName(
-      "LowObjectFilter"));
+  object_filter_.reset(
+      BaseObjectFilterRegisterer::GetInstanceByName("LowObjectFilter"));
   if (!object_filter_) {
     AERROR << "Failed to get instance: ExtHdmapObjectFilter";
     return false;
