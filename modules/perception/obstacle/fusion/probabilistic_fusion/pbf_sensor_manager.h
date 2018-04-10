@@ -30,7 +30,6 @@ namespace perception {
 
 class PbfSensorManager {
  public:
-  static PbfSensorManager *Instance();
   ~PbfSensorManager();
 
   void AddSensorMeasurements(const SensorObjects &objects);
@@ -55,14 +54,11 @@ class PbfSensorManager {
  protected:
   bool Init();
 
- private:
-  PbfSensorManager();
-
   /**@brief sensor_id based key*/
   std::map<std::string, PbfSensor *> sensors_;
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(PbfSensorManager);
+  DECLARE_SINGLETON(PbfSensorManager);
 };
 
 }  // namespace perception
