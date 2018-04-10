@@ -86,13 +86,13 @@ class YoloCameraDetector : public BaseCameraDetector {
  private:
   std::shared_ptr<CNNAdapter> cnnadapter_;
 
-  std::shared_ptr<SyncedMemory> res_cls_tensor_ = nullptr;
-  std::shared_ptr<SyncedMemory> res_box_tensor_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> res_cls_tensor_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> res_box_tensor_ = nullptr;
 
-  std::shared_ptr<SyncedMemory> image_data_ = nullptr;
-  std::shared_ptr<SyncedMemory> overlapped_ = nullptr;
-  std::shared_ptr<SyncedMemory> idx_sm_ = nullptr;
-  std::shared_ptr<SyncedMemory> anchor_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> image_data_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> overlapped_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> idx_sm_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> anchor_ = nullptr;
   int height_ = 0;
   int width_ = 0;
   float min_2d_height_ = 0.0f;
