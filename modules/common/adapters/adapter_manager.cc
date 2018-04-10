@@ -188,6 +188,31 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableVoiceDetectionResponse(FLAGS_voice_detection_response_topic,
                                      config);
         break;
+      // for pandora
+      case AdapterConfig::PANDORA_POINT_CLOUD:
+        EnablePandoraPointCloud(FLAGS_pandora_pointcloud_topic, 
+                                    config);
+        break;
+      case AdapterConfig::PANDORA_CAMERA_FRONT_COLOR:
+        EnablePandoraCameraFrontColor(FLAGS_pandora_camera_front_color_topic, 
+                                    config);
+        break;
+      case AdapterConfig::PANDORA_CAMERA_RIGHT_GRAY:
+        EnablePandoraCameraRightGray(FLAGS_pandora_camera_right_gray_topic, 
+                                    config);
+        break;
+      case AdapterConfig::PANDORA_CAMERA_LEFT_GRAY:
+        EnablePandoraCameraLeftGray(FLAGS_pandora_camera_left_gray_topic, 
+                                    config);
+        break;
+      case AdapterConfig::PANDORA_CAMERA_FRONT_GRAY:
+        EnablePandoraCameraFrontGray(FLAGS_pandora_camera_front_gray_topic, 
+                                    config);
+        break;
+      case AdapterConfig::PANDORA_CAMERA_BACK_GRAY:
+        EnablePandoraCameraBackGray(FLAGS_pandora_camera_back_gray_topic, 
+                                    config);
+        break;
       default:
         AERROR << "Unknown adapter config type!";
         break;
