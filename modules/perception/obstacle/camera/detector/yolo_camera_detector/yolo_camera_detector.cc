@@ -66,7 +66,7 @@ void YoloCameraDetector::init_anchor(const string &yolo_root) {
   yolo::load_anchors(anchors_file, &anchors);
   num_anchors_ = anchors.size() / 2;
   obj_size_ = output_height_ * output_width_ * anchors.size() / 2;
-  anchor_.reset(new SyncedMemory(anchors.size() * sizeof(float)));
+  anchor_.reset(new caffe::SyncedMemory(anchors.size() * sizeof(float)));
 
   auto anchor_cpu_data = anchor_->mutable_cpu_data();
   memcpy(anchor_cpu_data, anchors.data(), anchors.size() * sizeof(float));
@@ -77,20 +77,20 @@ void YoloCameraDetector::init_anchor(const string &yolo_root) {
   yolo::load_types(types_file, &types_);
 
   res_box_tensor_.reset(
-      new SyncedMemory(obj_size_ * s_box_block_size * sizeof(float)));
+      new caffe::SyncedMemory(obj_size_ * s_box_block_size * sizeof(float)));
   res_box_tensor_->cpu_data();
   res_box_tensor_->gpu_data();
 
   res_cls_tensor_.reset(
-      new SyncedMemory(types_.size() * obj_size_ * sizeof(float)));
+      new caffe::SyncedMemory(types_.size() * obj_size_ * sizeof(float)));
   res_cls_tensor_->cpu_data();
   res_cls_tensor_->gpu_data();
 
-  overlapped_.reset(new SyncedMemory(top_k_ * top_k_ * sizeof(bool)));
+  overlapped_.reset(new caffe::SyncedMemory(top_k_ * top_k_ * sizeof(bool)));
   overlapped_->cpu_data();
   overlapped_->gpu_data();
 
-  idx_sm_.reset(new SyncedMemory(top_k_ * sizeof(int)));
+  idx_sm_.reset(new caffe::SyncedMemory(top_k_ * sizeof(int)));
   idx_sm_->cpu_data();
   idx_sm_->gpu_data();
 }
@@ -148,7 +148,7 @@ void YoloCameraDetector::load_intrinsic(
 
   int channel = 3;
   image_data_.reset(
-      new SyncedMemory(roi_w * roi_h * channel * sizeof(unsigned char)));
+      new caffe::SyncedMemory(roi_w * roi_h * channel * sizeof(unsigned char)));
 }
 
 bool YoloCameraDetector::init_cnn(const string &yolo_root) {
@@ -310,13 +310,13 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
     resize(frame(roi), input_blob.get(), image_data_, 0);
   }
   pre_time.Stop();
-  ADEBUG << "Pre-processing: " << pre_time.MilliSeconds() << " ms";
+  AINFO << "Pre-processing: " << pre_time.MilliSeconds() << " ms";
 
   /////////////////////////// detection part ///////////////////////////
   caffe::Timer det_time;
   det_time.Start();
   cnnadapter_->forward();
-  ADEBUG << "Running detection: " << det_time.MilliSeconds() << " ms";
+  AINFO << "Running detection: " << det_time.MilliSeconds() << " ms";
   caffe::Timer post_time;
   post_time.Start();
 
@@ -363,8 +363,8 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
     temp_objects[i].reset();
   }
   temp_objects.clear();
-  ADEBUG << "Post-processing: " << post_time.MilliSeconds() << " ms";
-  ADEBUG << "Number of detected obstacles: " << objects->size();
+  AINFO << "Post-processing: " << post_time.MilliSeconds() << " ms";
+  AINFO << "Number of detected obstacles: " << objects->size();
 
   Extract(objects);
   yolo::recover_bbox(roi_w, roi_h, offset_y_, objects);

@@ -55,71 +55,14 @@ inline void PerceptionFreeHost(void *ptr, bool use_cuda) {
   return;
 }
 
-class SyncedMemory {
- public:
-  SyncedMemory()
-      : cpu_ptr_(NULL),
-        gpu_ptr_(NULL),
-        size_(0),
-        head_(UNINITIALIZED),
-        own_cpu_data_(false),
-        cpu_malloc_use_cuda_(false),
-        own_gpu_data_(false),
-        gpu_device_(-1) {}
-  explicit SyncedMemory(size_t size)
-      : cpu_ptr_(NULL),
-        gpu_ptr_(NULL),
-        size_(size),
-        head_(UNINITIALIZED),
-        own_cpu_data_(false),
-        cpu_malloc_use_cuda_(false),
-        own_gpu_data_(false),
-        gpu_device_(-1) {}
-
-  ~SyncedMemory();
-
-  const void *cpu_data();
-
-  void set_cpu_data(void *data);
-
-  const void *gpu_data();
-
-  void set_gpu_data(void *data);
-
-  void *mutable_cpu_data();
-
-  void *mutable_gpu_data();
-
-  enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };
-  SyncedHead head() { return head_; }
-  size_t size() { return size_; }
-
-  void async_gpu_push(const cudaStream_t &stream);
-
- private:
-  void to_cpu();
-
-  void to_gpu();
-
-  void *cpu_ptr_;
-  void *gpu_ptr_;
-  size_t size_;
-  SyncedHead head_;
-  bool own_cpu_data_;
-  bool cpu_malloc_use_cuda_;
-  bool own_gpu_data_;
-  int gpu_device_;
-  DISABLE_COPY_AND_ASSIGN(SyncedMemory);
-};  // class SyncedMemory
-
 int divup(int a, int b);
 
 void resize(cv::Mat frame, caffe::Blob<float> *dst,
-            std::shared_ptr<SyncedMemory> src_gpu, int start_axis);
+            std::shared_ptr<caffe::SyncedMemory> src_gpu, int start_axis);
 
 // resize with mean and scale
 void resize(cv::Mat frame, caffe::Blob<float> *dst,
-            std::shared_ptr<SyncedMemory> src_gpu, int start_axis,
+            std::shared_ptr<caffe::SyncedMemory> src_gpu, int start_axis,
             const float mean_b, const float mean_g, const float mean_r,
             const float scale);
 }  // namespace perception
