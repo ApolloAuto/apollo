@@ -63,5 +63,12 @@ DECLARE_string(relative_map_topic);
 DECLARE_string(navigation_topic);
 DECLARE_string(voice_detection_request_topic);
 DECLARE_string(voice_detection_response_topic);
+// for pandora
+DECLARE_string(pandora_pointcloud_topic);
+DECLARE_string(pandora_camera_front_color_topic);
+DECLARE_string(pandora_camera_right_gray_topic);
+DECLARE_string(pandora_camera_left_gray_topic);
+DECLARE_string(pandora_camera_front_gray_topic);
+DECLARE_string(pandora_camera_back_gray_topic);
 
 #endif  // MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_
