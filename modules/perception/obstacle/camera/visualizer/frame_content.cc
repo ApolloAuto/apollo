@@ -25,8 +25,8 @@ namespace apollo {
 namespace perception {
 namespace lowcostvisualizer {
 
-using apollo::perception::LaneObjectsPtr;
 using apollo::perception::LaneObjects;
+using apollo::perception::LaneObjectsPtr;
 
 FrameContent::FrameContent() : global_offset_initialized_(false) {
   continuous_type_ = PC_CONTINUOUS;
@@ -155,7 +155,7 @@ void FrameContent::set_motion_content(double timestamp,
   MotionContent motion_content;
   motion_content.motion_frame_content_ = *motion_buffer;
   motion_caches_[DoubleToMapKey(timestamp)] = motion_content;
-  AINFO << "Motion_caches size: "<< motion_caches_.size();
+  AINFO << "Motion_caches size: " << motion_caches_.size();
 }
 
 void FrameContent::update_timestamp(double ref) {
@@ -318,12 +318,12 @@ std::vector<ObjectPtr> FrameContent::get_camera_objects() {
 const MotionBuffer FrameContent::get_motion_buffer() {
   auto it = motion_caches_.find(DoubleToMapKey(current_motion_timestamp_));
   if (it == motion_caches_.end()) {
-//    AINFO << "no motion available: " << motion_caches_.size();
-//    AINFO << "no motion available: " << current_motion_timestamp_;
+    //    AINFO << "no motion available: " << motion_caches_.size();
+    //    AINFO << "no motion available: " << current_motion_timestamp_;
     AINFO << "no motion available: "
           << DoubleToMapKey(current_motion_timestamp_);
-//    for (auto &iter : motion_caches_)
-//      AINFO << "motion_caches data: " << iter.first;
+    //    for (auto &iter : motion_caches_)
+    //      AINFO << "motion_caches data: " << iter.first;
     return MotionBuffer(0);
   }
   MotionContent content = it->second;

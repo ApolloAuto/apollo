@@ -20,9 +20,9 @@
 #include "ros/ros.h"
 #include "sensor_msgs/Image.h"
 
-using apollo::perception::traffic_light::Image;
-using apollo::perception::traffic_light::CameraId;
 using apollo::perception::PerceptionObstacles;
+using apollo::perception::traffic_light::CameraId;
+using apollo::perception::traffic_light::Image;
 
 std::map<std::string, cv::Scalar> kColorTable = {
     {std::string("red_light_box"), cv::Scalar(0, 0, 255)},
