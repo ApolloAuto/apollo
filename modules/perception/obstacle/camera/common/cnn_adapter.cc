@@ -50,7 +50,9 @@ bool CNNCaffe::init(const std::vector<std::string> &input_names,
   return true;
 }
 
-void CNNCaffe::forward() { net_->Forward(); }
+void CNNCaffe::forward() {
+  net_->Forward();
+}
 
 boost::shared_ptr<caffe::Blob<float>> CNNCaffe::get_blob_by_name(
     const std::string &name) {

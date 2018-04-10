@@ -30,20 +30,25 @@
 #include <vector>
 
 #include "gflags/gflags.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/proto/lane_post_process_config.pb.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 #include "modules/perception/obstacle/camera/visualizer/common/bmp.h"
 #include "modules/perception/obstacle/camera/visualizer/common/gl_raster_text.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
+#include "modules/perception/proto/lane_post_process_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lowcostvisualizer {
 
+using apollo::common::util::GetProtoFromFile;
 using apollo::perception::CalibrationConfigManager;
 using apollo::perception::CameraCalibrationPtr;
+using apollo::common::util::GetProtoFromFile;
 
 const double pace_zoom = 15;
 const double My_PI = 3.14159265359;
@@ -189,20 +194,10 @@ bool GLFWFusionViewer::initialize() {
   distort_camera_intrinsic_ = calibrator->get_camera_model();
 
   if (show_lane_) {
-    ConfigManager* config_manager = ConfigManager::instance();
-    const ModelConfig* lane_post_process_model_config =
-        config_manager->GetModelConfig(FLAGS_onboard_lane_post_processor);
-
-    if (lane_post_process_model_config == nullptr) {
-      AWARN << "Unknown lane post-processing model: "
-             << FLAGS_onboard_lane_post_processor;
-    } else {
-      if (!lane_post_process_model_config
-        ->GetValue("lane_map_confidence_thresh", &lane_map_threshold_)) {
-        AWARN << "The confidence threshold of label map not found.";
-      }
-    }
-
+    lane_post_process_config::ModelConfigs config;
+    CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file,
+                           &config));
+    lane_map_threshold_ = config.lane_map_confidence_thresh();
     AINFO << "onboard lane post-processor: "
           << FLAGS_onboard_lane_post_processor;
     AINFO << "lane map confidence threshold = " << lane_map_threshold_;
@@ -243,7 +238,9 @@ void GLFWFusionViewer::spin_once() {
   glfwSwapBuffers(window_);
 }
 
-void GLFWFusionViewer::close() { glfwTerminate(); }
+void GLFWFusionViewer::close() {
+  glfwTerminate();
+}
 
 void GLFWFusionViewer::set_camera_para(Eigen::Vector3d i_position,
                                        Eigen::Vector3d i_scn_center,
@@ -767,9 +764,13 @@ void GLFWFusionViewer::mouse_move(double xpos, double ypos) {
   mouse_prev_y_ = ypos;
 }
 
-void GLFWFusionViewer::mouse_wheel(double delta) { mode_mat_(2, 3) -= delta; }
+void GLFWFusionViewer::mouse_wheel(double delta) {
+  mode_mat_(2, 3) -= delta;
+}
 
-void GLFWFusionViewer::reset() { mode_mat_ = Eigen::Matrix4d::Identity(); }
+void GLFWFusionViewer::reset() {
+  mode_mat_ = Eigen::Matrix4d::Identity();
+}
 
 void GLFWFusionViewer::keyboard(int key) {
   switch (key) {
@@ -1613,9 +1614,10 @@ void GLFWFusionViewer::draw_camera_box3d(
       }
 
       if (show_camera_box3d_) {
-        draw_8pts_box(points, Eigen::Vector3f(box3d_color[0], box3d_color[1],
-                                              box3d_color[2]),
-                      offset_x, offset_y, image_width, image_height);
+        draw_8pts_box(
+            points,
+            Eigen::Vector3f(box3d_color[0], box3d_color[1], box3d_color[2]),
+            offset_x, offset_y, image_width, image_height);
       }
     }
   }
@@ -2040,9 +2042,10 @@ void GLFWFusionViewer::draw_camera_box(const std::vector<ObjectPtr>& objects,
     }
 
     if (show_camera_box3d_) {
-      draw_8pts_box(points, Eigen::Vector3f(box3d_color[0], box3d_color[1],
-                                            box3d_color[2]),
-                    offset_x, offset_y, image_width, image_height);
+      draw_8pts_box(
+          points,
+          Eigen::Vector3f(box3d_color[0], box3d_color[1], box3d_color[2]),
+          offset_x, offset_y, image_width, image_height);
     }
 
     // TODO(All) fix the code after continue

@@ -534,17 +534,9 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
   } else {
     double dist_s = planning_target.stop_point().s() - init_s_[0];
     if (dist_s < FLAGS_lattice_epsilon) {
-      ConstantAccelerationTrajectory1d lon_traj(init_s_[0], init_s_[1]);
-      CHECK(init_s_[1] > -FLAGS_lattice_epsilon);
-      double brake_t = -std::abs(init_s_[1]) /
-          FLAGS_longitudinal_acceleration_lower_bound;
-      lon_traj.AppendSegment(
-          FLAGS_longitudinal_acceleration_lower_bound, brake_t);
+      ConstantAccelerationTrajectory1d lon_traj(init_s_[0], 0.0);
+      lon_traj.AppendSegment(0.0, FLAGS_trajectory_time_length);
 
-      if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
-        lon_traj.AppendSegment(0.0,
-            FLAGS_trajectory_time_length - lon_traj.ParamLength());
-      }
       for (double t = 0.0; t < FLAGS_trajectory_time_length;
            t += FLAGS_trajectory_time_resolution) {
         reference_s_dot.push_back(lon_traj.Evaluate(1, t));
@@ -552,12 +544,14 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
       return reference_s_dot;
     }
 
-    double max_v = std::sqrt(2.0 * (-brake_a) * dist_s);
-
-    if (max_v < cruise_v) {
-      ConstantAccelerationTrajectory1d lon_traj(init_s_[0], max_v);
-      double brake_t = max_v / (-brake_a);
+    double brake_s = -cruise_v * cruise_v * 0.5 / brake_a;
+    // need more distance to brake
+    if (brake_s > dist_s) {
+      double desired_v = std::sqrt(-2.0 * brake_a * dist_s);
+      double brake_t = -desired_v / brake_a;
+      ConstantAccelerationTrajectory1d lon_traj(init_s_[0], desired_v);
       lon_traj.AppendSegment(brake_a, brake_t);
+
       if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
         lon_traj.AppendSegment(0.0,
             FLAGS_trajectory_time_length - lon_traj.ParamLength());
@@ -567,7 +561,6 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
         reference_s_dot.push_back(lon_traj.Evaluate(1, t));
       }
     } else {
-      double brake_s = -cruise_v * cruise_v * 0.5 / brake_a;
       double brake_t = -cruise_v / brake_a;
       double cruise_s = dist_s - brake_s;
       double cruise_t = cruise_s / cruise_v;

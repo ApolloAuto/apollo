@@ -58,6 +58,7 @@ class CascadedCameraTracker : public BaseCameraTracker {
 
  private:
   bool dl_feature_ = true;
+  bool use_kcf_ = false;
 
   // Trackers for different stages
   CS2DAffinityTracker cs2d_tracker_;

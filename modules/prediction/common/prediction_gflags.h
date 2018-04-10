@@ -83,7 +83,8 @@ DECLARE_bool(adjust_velocity_by_obstacle_heading);
 DECLARE_bool(adjust_velocity_by_position_shift);
 DECLARE_double(heading_filter_param);
 
-// Cost evaluator
+// Validation checker
+DECLARE_double(centripetal_acc_coeff);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
