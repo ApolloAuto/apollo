@@ -51,44 +51,28 @@ using apollo::hdmap::LaneWaypoint;
 using apollo::hdmap::MapPathPoint;
 using apollo::hdmap::RouteSegments;
 
-apollo::common::util::Factory<
-    PlanningConfig::ReferenceLineSmootherType, ReferenceLineSmoother,
-    ReferenceLineSmoother *(*)(const ReferenceLineSmootherConfig &config)>
-    ReferenceLineProvider::s_smoother_factory_;
-
 ReferenceLineProvider::~ReferenceLineProvider() {
   if (thread_ && thread_->joinable()) {
     thread_->join();
   }
 }
 
-void ReferenceLineProvider::RegisterSmoothers() {
-  s_smoother_factory_.Register(
-      PlanningConfig::SPIRAL_SMOOTHER,
-      [](const ReferenceLineSmootherConfig &config) -> ReferenceLineSmoother * {
-        return new SpiralReferenceLineSmoother(config);
-      });
-  s_smoother_factory_.Register(
-      PlanningConfig::QP_SPLINE_SMOOTHER,
-      [](const ReferenceLineSmootherConfig &config) -> ReferenceLineSmoother * {
-        return new QpSplineReferenceLineSmoother(config);
-      });
-}
-
-ReferenceLineProvider::ReferenceLineProvider(
-    const hdmap::HDMap *base_map,
-    PlanningConfig::ReferenceLineSmootherType smoother_type) {
+ReferenceLineProvider::ReferenceLineProvider(const hdmap::HDMap *base_map) {
   if (!FLAGS_use_navigation_mode) {
     pnc_map_.reset(new hdmap::PncMap(base_map));
-  }
-  if (s_smoother_factory_.Empty()) {
-    RegisterSmoothers();
   }
   CHECK(common::util::GetProtoFromFile(FLAGS_smoother_config_filename,
                                        &smoother_config_))
       << "Failed to load smoother config file "
       << FLAGS_smoother_config_filename;
-  smoother_ = s_smoother_factory_.CreateObject(smoother_type, smoother_config_);
+  if (smoother_config_.has_qp_spline()) {
+    smoother_.reset(new QpSplineReferenceLineSmoother(smoother_config_));
+  } else if (smoother_config_.has_spiral()) {
+    smoother_.reset(new SpiralReferenceLineSmoother(smoother_config_));
+  } else {
+    CHECK(false) << "unknown smoother config "
+                 << smoother_config_.DebugString();
+  }
   is_initialized_ = true;
 }  // namespace planning
 
