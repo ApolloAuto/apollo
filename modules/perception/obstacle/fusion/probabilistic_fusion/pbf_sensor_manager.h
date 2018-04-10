@@ -35,19 +35,22 @@ class PbfSensorManager {
 
   void AddSensorMeasurements(const SensorObjects &objects);
 
-  void GetLatestSensorFrames(double time_stamp, const std::string &sensor_id,
+  void GetLatestSensorFrames(const double time_stamp,
+                             const std::string &sensor_id,
                              std::vector<PbfSensorFramePtr> *frames);
 
-  /**@brief query one closest sensor frame for each sensor between last query
-     timestamp and
-     current timestamp, stored in ascending order of the frame timestamp */
+  /*
+   * @brief query one closest sensor frame for each sensor between last query
+   * timestamp and current timestamp, stored in ascending order of the frame
+   * timestamp
+   */
   void GetLatestFrames(const double time_stamp,
                        std::vector<PbfSensorFramePtr> *frames);
 
   PbfSensor *GetSensor(const std::string &sensor_id);
 
   bool GetPose(const std::string &sensor_id, double time_stamp,
-               Eigen::Matrix4d *pose);
+               const double time_range, Eigen::Matrix4d *pose);
 
  protected:
   bool Init();
@@ -65,4 +68,6 @@ class PbfSensorManager {
 }  // namespace perception
 }  // namespace apollo
 
+/* clang-format off */
 #endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_MANAGER_H_ // NOLINT
+/* clang-format on */
