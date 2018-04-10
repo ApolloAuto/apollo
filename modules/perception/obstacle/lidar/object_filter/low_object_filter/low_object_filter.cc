@@ -86,7 +86,7 @@ void LowObjectFilter::FilterLowObject(
       continue;
     }
 
-    if (int(i) != valid_objects_num) {
+    if (static_cast<int>(i) != valid_objects_num) {
       (*objects)[valid_objects_num] = (*objects)[i];
     }
 
