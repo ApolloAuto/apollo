@@ -21,6 +21,7 @@
 #include <string>
 
 #include "modules/common/log.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 
@@ -61,7 +62,18 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
 
 double EvaluateQuinticPolynomial(
     const std::array<double, 6>& coeffs,
-    const double t, const uint32_t order) {
+    const double t, const uint32_t order,
+    const double end_t, const double end_value) {
+  if (t >= end_t) {
+    switch (order) {
+      case 0: {
+        return end_value;
+      }
+      default: {
+        return 0.0;
+      }
+    }
+  }
   switch (order) {
     case 0: {
       return ((((coeffs[5] * t + coeffs[4]) * t + coeffs[3]) * t +
@@ -91,7 +103,18 @@ double EvaluateQuinticPolynomial(
 
 double EvaluateQuarticPolynomial(
     const std::array<double, 5>& coeffs,
-    const double t, const uint32_t order) {
+    const double t, const uint32_t order,
+    const double end_t, const double end_value) {
+  if (t >= end_t) {
+    switch (order) {
+      case 0: {
+        return end_value;
+      }
+      default: {
+        return 0.0;
+      }
+    }
+  }
   switch (order) {
     case 0: {
       return (((coeffs[4] * t + coeffs[3]) * t + coeffs[2]) * t +
@@ -208,6 +231,20 @@ void GenerateFreeMoveTrajectoryPoints(
     acc_x = (*state)(4, 0);
     acc_y = (*state)(5, 0);
   }
+}
+
+double AdjustSpeedByCurvature(const double speed, const double curvature) {
+  if (std::abs(curvature) < FLAGS_turning_curvature_lower_bound) {
+    return speed;
+  }
+  if (std::abs(curvature) > FLAGS_turning_curvature_upper_bound) {
+    return 3.0;
+  }
+  return apollo::common::math::lerp(FLAGS_speed_at_lower_curvature,
+                                    FLAGS_turning_curvature_lower_bound,
+                                    FLAGS_speed_at_upper_curvature,
+                                    FLAGS_turning_curvature_upper_bound,
+                                    curvature);
 }
 
 }  // namespace predictor_util

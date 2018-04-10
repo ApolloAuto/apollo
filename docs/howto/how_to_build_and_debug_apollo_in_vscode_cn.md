@@ -1,7 +1,7 @@
 ﻿# 使用VSCode构建、调试Apollo项目
 
-Apollo项目以其优异的系统架构、完整的模块功能、良好的开源生态及规范的代码风格，受到众多开发者的喜爱和好评。然而，该项目使用命令行编译和调试，不能使用IDE开发，既不直观，也不利于提高效率。我有点追求完美，必须想办法让Apollo项目能在IDE中编译、调试。 
-Visual Studio Code（以下简称VSCode）是微软第一款支持Linux的轻量级代码编辑器，其功能介于编辑器与IDE之间，但更倾向于一个编辑器。优点是运行速度快，占用内存少，使用方法与Visual Stuio类似。缺点在于，与Visual Studio、QT等IDE相比，功能还不够强大。我认为，Windows中最强大的C++ IDE为Visual Studio，Linux中最强大的C++ IDE为QT。Apollo项目目前只支持Ubuntu系统（Mac OS系统部分支持），Windows系统中的Visual Studio自然排除在外；此外，Apollo项目使用Bazel编译，而QT目前只支持QMake和CMake工程，因此只能忍痛割爱。在无法使用上述两种IDE的前提下，退而求次选用VSCode。我写了几个配置文件，允许使用VSCode编译、调试Apollo项目，下面对其进行具体阐述，希望能给广大开发者带来一定的帮助。
+Apollo项目以其优异的系统架构、完整的模块功能、良好的开源生态及规范的代码风格，受到众多开发者的喜爱和好评。然而，该项目使用命令行编译和调试，不能使用IDE开发，既不直观，也不利于提高效率。我有点追求完美，必须想办法让Apollo项目能在IDE中编译、调试。       
+Visual Studio Code（以下简称VSCode）是微软第一款支持Linux的轻量级代码编辑器，其功能介于编辑器与IDE之间，但更倾向于一个编辑器。优点是运行速度快，占用内存少，使用方法与Visual Stuio类似。缺点在于，与Visual Studio、QT等IDE相比，功能还不够强大。我认为，Windows中最强大的C++ IDE为Visual Studio，Linux中最强大的C++ IDE为QT。Apollo项目目前只支持Ubuntu系统（Mac OS系统部分支持），Windows系统中的Visual Studio自然排除在外；此外，Apollo项目使用Bazel编译，而QT目前只支持QMake和CMake工程，因此只能忍痛割爱。在无法使用上述两种IDE的前提下，退而求次选用VSCode。我写了几个配置文件，允许使用VSCode编译、调试Apollo项目，下面对其进行具体阐述，希望能给广大开发者带来一定的帮助。     
 ## 一、使用VSCode编译Apollo项目
 首先从[GitHub网站](https://github.com/ApolloAuto/apollo)下载Apollo源代码，可以使用git命令下载，也可以直接通过网页下载压缩包。源代码下载完成后，将其放置到合适的目录。使用VSCode编译Apollo项目有一个前提，就是在你的机器上已经顺利安装了Docker。Apollo之前版本提供了一个“install_docker.sh”脚本文件，因为很多开发者反映可能出错，Apollo项目组已将该文件移除。现在要安装Docker就只能参考[Docker官方网站](https://www.docker.com/)的帮助文档了。
 ### 1.1 编译方法
@@ -151,7 +151,7 @@ top
 exit
 ```
 按快捷键“Ctrl+Shift+B”，重新执行构建任务。
-## 二、使用VSCode调试Apollo项目
+## 二、使用VSCode本地调试Apollo项目
 Apollo项目运行于Docker中，不能在宿主机（所谓宿主机就是运行Docker的主机，因为Docker服务像寄宿于主机中，故有此称呼）中直接使用GDB调试，而必须先在Docker中借助GDBServer创建调试服务进程，再在宿主机中使用GDB连接Docker中的调试服务进程来完成。下面介绍具体操作方法：
 ### 2.1 前提条件
 #### 2.1.1 编译Apollo项目需带调试信息
@@ -349,12 +349,6 @@ docker exec \
     /bin/bash scripts/start_gdb_server.sh $@
 xhost -local:root 1>/dev/null 2>&1
 ```
-#### 2.2.6 使用SSH命令远程登录车内工控机操作
-还可使用SSH命令远程登录车辆工控机操作。首先使用如下命令远程登录车内工控机：
-``` bash
-ssh username@your_vehicle_computer_ip
-```
-接下来在工控机内按照**步骤2.2.1-2.2.5**的操作方法附加调试“Planning”进程。
 ### 2.3 宿主机上VSCode内部的操作
 在宿主机上使用VSCode打开Apollo项目（必须是你刚才构建的版本），打开需要调试的文件，在指定位置设置断点，按“F5”键启动调试。注意：**由于VSCode使用脚本语言编写，因此启动过程会较慢，若加上网速不够快，甚至出现一分钟等待也有可能**。调试方法和Visual Studio类似，此处不再赘述。如下图所示：
 ![14](images/vscode/vscode_debug_interface.png)
@@ -424,9 +418,41 @@ ssh username@your_vehicle_computer_ip
             }                           
         }
 ```
-
 ### 2.5 可能碰到的问题及解决方法
 调试过程中，可能会碰到以下问题：
-一是Docker内部待调试进程崩溃，无法在VSCode中调试，解决办法是：重启Docker内部的调试进程；
-二是网络连接不畅，无法在VSCode中调试，解决办法是：确保网络畅通，并停用代理工具；
-三是在VSCode内部关闭调试后，会同时将Docker内部的调试服务进程关闭，可能会出现无法直接在VSCode再次启动调试服务里程的情形，解决办法是：在Docker内部重启调试服务进程，再在VSCode中按“F5”键启动调试。
+一是Docker内部待调试进程崩溃，无法在VSCode中调试（如下图所示），解决办法是：重启Docker内部的调试进程；     
+![15](images/vscode/failed_to_connect_gdbserver.png)     
+二是网络连接不畅，无法在VSCode中调试，解决办法是：确保网络畅通，并停用代理工具；     
+三是在VSCode内部关闭调试后，会同时将Docker内部的调试服务进程关闭，可能会出现无法直接在VSCode再次启动调试服务里程的情形，解决办法是：在Docker内部重启调试服务进程，再在VSCode中按“F5”键启动调试。     
+## 三、使用VSCode远程调试Apollo项目
+研发过程中，我们还需远程调试车内工控机上的Apollo项目，即在调试电脑上借助SSH服务连接车内工控机，启动工控机内相关进程，然后在调试电脑上进行远程调试。下面以调试`planning`模块为例进行具体阐述：
+### 3.1 查看车内工控机IP地址
+在车内工控机上，通过如下命令查看本机IP：
+``` bash
+ifconfig
+```
+如下图所示，白色选中部分：`192.168.3.137`即为车内工控机的**局域网IP地址**。
+![16](images/vscode/view_ipc_ip.png)
+### 3.2 在调试电脑的浏览器中打开Dreamview并启动待调试模块
+假设车内工控机局域网IP地址为：`192.168.3.137`，打开Chrome或Firefox浏览器，输入如下网址：[http://192.168.3.137:8888/](http://192.168.3.137:8888/)，按照**2.2.2**节中的方法，启动待调试的`planning`及其依赖的`routing`模块。
+![17](images/vscode/remote_show_dreamview.png)
+### 3.3 使用SSH命令远程登录车内工控机并启动工控机的gdbserver服务
+假设车内工控机的用户名为：`davidhopper`，局域网IP地址为：`192.168.3.137`，使用如下命令远程登录车内工控机：
+``` bash
+ssh davidhopper@192.168.3.137
+```
+![18](images/vscode/ssh_remote_login_192_168_3_137.png)
+成功进入工控机后，假设需调试`planning`模块，端口号为`1111`，使用如下命令启动车内工控机的gdbserver服务：
+``` bash
+# 切换到工控机上Apollo项目根目录
+cd ~/code/apollo
+# 在Docker外部启动gdbserver服务
+bash docker/scripts/dev_start_gdb_server.sh planning 1111
+```
+如下图所示，如看到类似`Listening on port 1111`的提示，表示`gdbserver`服务顺利启动。
+![19](images/vscode/remote_start_gdbserver.png)
+### 3.4 在调试电脑上使用VSCode远程调试工控机上的`planning`模块
+在调试电脑上使用VSCode打开Apollo项目，注意项目版本应与工控机上的版本一致，否则调试起来会输出许多不一致的信息。首先，将配置文件`.vscode/launch.json`中的调试前加载任务：`"preLaunchTask": "start gdbserver",`注释掉，再将远程调试服务地址修改为：`"miDebuggerServerAddress": "192.168.3.137:1111",`，如下图所示：
+![20](images/vscode/config_launch_json_for_remote_debug.png)
+在需要的位置设置断点，按`F5`键启动调试，因为是远程连接，**启动等待的时间会更长，甚至会超过1分钟**。下图是远程调试界面。**注意：每次在VSCode中中止调试后，需再次启动调试时，一定要再次在命令行终端执行3.3节的操作，重启工控机内的gdbserver服务进程。**在本机调试时，因为我配置了一个`preLaunchTask`任务，就可省略此步骤。
+![21](images/vscode/remote_debug_planning_module.png)

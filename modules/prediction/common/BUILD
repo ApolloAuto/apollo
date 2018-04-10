@@ -19,6 +19,7 @@ cc_library(
         ":prediction_gflags",
         ":prediction_map",
         "//modules/common:log",
+        "//modules/common/math:math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/proto:lane_graph_proto",
         "@eigen",
