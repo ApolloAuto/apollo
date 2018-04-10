@@ -107,6 +107,10 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   void FilterWithLaneHistory(LaneObjectsPtr lane_objects);
 
+  bool CorrectWithLaneHistory(LaneObjectsPtr lane_objects);
+  bool FindLane(const LaneObjects &lane_objects,
+                int spatial_label, int *index);
+
  private:
   CCLanePostProcessorOptions options_;
 
@@ -114,13 +118,11 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   double time_stamp_ = 0.0;
   int frame_id_ = -1;
-
 #if CUDA_CC
   std::shared_ptr<ConnectedComponentGeneratorGPU> cc_generator_;
 #else
   std::shared_ptr<ConnectedComponentGenerator> cc_generator_;
 #endif
-
   std::shared_ptr<LaneFrame> cur_frame_;
   LaneInstancesPtr cur_lane_instances_;
 
@@ -141,6 +143,9 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
   bool use_history_ = false;
   boost::circular_buffer<LaneObjects> lane_history_;
   MotionBufferPtr motion_buffer_ = nullptr;
+  const std::vector<SpatialLabelType> interested_labels_ =
+    {SpatialLabelType::L_0, SpatialLabelType::R_0};
+  LaneObjectsPtr generated_lanes_ = nullptr;
   DISALLOW_COPY_AND_ASSIGN(CCLanePostProcessor);
 };
 
