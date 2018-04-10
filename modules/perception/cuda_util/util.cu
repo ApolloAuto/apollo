@@ -126,7 +126,7 @@ void gpu_memcpy(const size_t N, const void *X, void *Y) {
     }
 }
 
-void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <SyncedMemory> src_gpu,
+void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <caffe::SyncedMemory> src_gpu,
             int start_axis) {
     int origin_width = frame.cols;
     int origin_height = frame.rows;
@@ -140,7 +140,7 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <SyncedMemor
     const dim3 grid(divup(width, block.x), divup(height, block.y));
     if (src_gpu == nullptr) {
         src_gpu.reset(
-                new SyncedMemory(origin_width * origin_height * channel * sizeof(unsigned char)));
+                new caffe::SyncedMemory(origin_width * origin_height * channel * sizeof(unsigned char)));
     }
     src_gpu->set_cpu_data(frame.data);
     resize_linear_kernel << < grid, block >> > ((const unsigned char *) src_gpu->gpu_data(), dst
@@ -148,7 +148,7 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <SyncedMemor
 
 }
 
-void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <SyncedMemory> src_gpu,
+void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <caffe::SyncedMemory> src_gpu,
             int start_axis, const float mean_b, const float mean_g, const float mean_r, 
             const float scale) {
     int origin_width = frame.cols;
@@ -163,7 +163,7 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <SyncedMemor
     const dim3 grid(divup(width, block.x), divup(height, block.y));
     if (src_gpu == nullptr) {
         src_gpu.reset(
-                new SyncedMemory(origin_width * origin_height * channel * sizeof(unsigned char)));
+                new caffe::SyncedMemory(origin_width * origin_height * channel * sizeof(unsigned char)));
     }
     src_gpu->set_cpu_data(frame.data);
     resize_linear_with_mean_scale_kernel << < grid, block >> > ((const unsigned char *) src_gpu
