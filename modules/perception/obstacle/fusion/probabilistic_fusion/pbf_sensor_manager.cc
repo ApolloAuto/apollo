@@ -23,10 +23,12 @@
 namespace apollo {
 namespace perception {
 
+/*
 PbfSensorManager *PbfSensorManager::Instance() {
-  static PbfSensorManager sensor_manager;
-  return &sensor_manager;
+static PbfSensorManager sensor_manager;
+return &sensor_manager;
 }
+*/
 
 PbfSensorManager::PbfSensorManager() {}
 
@@ -70,7 +72,7 @@ void PbfSensorManager::AddSensorMeasurements(const SensorObjects &objects) {
   std::string sensor_id = GetSensorType(objects.sensor_type);
   SensorType type = objects.sensor_type;
 
-  std::map<std::string, PbfSensor *>::iterator it = sensors_.find(sensor_id);
+  auto it = sensors_.find(sensor_id);
   PbfSensor *sensor = nullptr;
   if (it == sensors_.end()) {
     AWARN << "Cannot find sensor " << sensor_id
