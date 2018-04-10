@@ -1,0 +1,33 @@
+<launch>
+	<arg name="pandora_ip" default="192.168.20.51"/>
+	<arg name="lidar_recv_port"  default="2368"/>
+	<arg name="gps_recv_port"  default="10110"/>
+	<arg name="start_angle"  default="135"/>
+	<arg name="pandora_camera_port"  default="9870"/>
+	<arg name="enable_camera"  default="true"/>
+	<arg name="timezone"  default="8"/>
+	<arg name="frame_id"  default="hesai40"/>
+	<arg name="lidar_topic"  default="/apollo/sensor/pandora/hesai40/PointCloud2"/>
+	<arg name="camera0_topic"  default="/apollo/sensor/pandora/camera/front_color"/>
+	<arg name="camera1_topic"  default="/apollo/sensor/pandora/camera/front_gray"/>
+	<arg name="camera2_topic"  default="/apollo/sensor/pandora/camera/right_gray"/>
+	<arg name="camera3_topic"  default="/apollo/sensor/pandora/camera/back_gray"/>
+	<arg name="camera4_topic"  default="/apollo/sensor/pandora/camera/left_gray"/>
+
+	<node pkg="pandora_driver" name="pandora_driver" type="pandora_node" output="screen" >
+		<param name="pandora_ip" type="string" value="$(arg pandora_ip)"/>
+		<param name="lidar_recv_port"  type="int" value="$(arg lidar_recv_port)"/>
+		<param name="gps_recv_port"  type="int" value="$(arg gps_recv_port)"/>
+		<param name="start_angle"  type="double" value="$(arg start_angle)"/>
+		<param name="pandora_camera_port"  type="int" value="$(arg pandora_camera_port)"/>
+		<param name="enable_camera"  type="boolean" value="$(arg enable_camera)"/>
+		<param name="timezone"  type="int" value="$(arg timezone)"/>
+		<param name="frame_id"  type="string" value="$(arg frame_id)"/>
+		<param name="lidar_topic"  type="string" value="$(arg lidar_topic)"/>
+		<param name="camera0_topic"  type="string" value="$(arg camera0_topic)"/>
+		<param name="camera1_topic"  type="string" value="$(arg camera1_topic)"/>
+		<param name="camera2_topic"  type="string" value="$(arg camera2_topic)"/>
+		<param name="camera3_topic"  type="string" value="$(arg camera3_topic)"/>
+		<param name="camera4_topic"  type="string" value="$(arg camera4_topic)"/>
+	</node>
+</launch>
