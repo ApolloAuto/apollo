@@ -28,10 +28,10 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::util::GetProtoFromFile;
 using std::pair;
 using std::string;
 using std::vector;
-using apollo::common::util::GetProtoFromFile;
 
 bool CCLanePostProcessor::Init() {
   // 1. get model config
@@ -516,13 +516,13 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
   }
 
   time_stamp_ = options.timestamp;
-//  AINFO << "use history: " << options.use_lane_history;
-//  AINFO << "use history: " << use_history_;
+  //  AINFO << "use history: " << options.use_lane_history;
+  //  AINFO << "use history: " << use_history_;
 
   if (options.use_lane_history && !use_history_) {
     InitLaneHistory();
   }
-//  AINFO << "use history: " << use_history_;
+  //  AINFO << "use history: " << use_history_;
 
   cur_lane_instances_.reset(new vector<LaneInstance>);
   if (!GenerateLaneInstances(lane_map)) {
@@ -816,7 +816,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
   EnrichLaneInfo((*lane_objects));
   ADEBUG << "use_lane_history_: " << use_history_;
   if (use_history_) {
-//    FilterWithLaneHistory(*lane_objects);
+    //    FilterWithLaneHistory(*lane_objects);
 
     if (CorrectWithLaneHistory(*lane_objects)) {
       lane_history_.push_back(*(*lane_objects));
@@ -845,8 +845,7 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(LaneObjectsPtr lane_objects) {
     lane.order = 0;
     for (std::size_t i = 0; i < lane_history_.size(); i++) {
       int j = 0;
-      if (!FindLane(lane_history_[i], lane.spatial, &j))
-        continue;
+      if (!FindLane(lane_history_[i], lane.spatial, &j)) continue;
 
       lane.order = std::max(lane.order, lane_history_[i][j].order);
       Vector3D p;
@@ -855,8 +854,7 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(LaneObjectsPtr lane_objects) {
         p << pos.x(), pos.y(), 1.0;
         p = motion_buffer_->at(i).motion * p;
         project_p << p.x(), p.y();
-        if (p.x() <= 0)
-          continue;
+        if (p.x() <= 0) continue;
 
         lane.longitude_start = std::min(p.x(), lane.longitude_start);
         lane.longitude_end = std::max(p.x(), lane.longitude_end);
@@ -875,10 +873,8 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(LaneObjectsPtr lane_objects) {
       lane.order = 2;
     }
     AINFO << "history size: " << lane.point_num;
-    if (lane.point_num < 2 ||
-        !PolyFit(lane.pos, lane.order, &(lane.model))) {
-       AWARN  << "failed to fit " << lane.order
-              << " order polynomial curve.";
+    if (lane.point_num < 2 || !PolyFit(lane.pos, lane.order, &(lane.model))) {
+      AWARN << "failed to fit " << lane.order << " order polynomial curve.";
       is_valid[l] = true;
       continue;
     }
@@ -894,17 +890,15 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(LaneObjectsPtr lane_objects) {
       int count = 0;
 
       for (auto &pos : lane_objects->at(idx).pos) {
-        if (pos.x() > lane.longitude_end)
-          continue;
+        if (pos.x() > lane.longitude_end) continue;
 
-        ave_delta += std::abs(pos.y() - PolyEval(pos.x(),
-                              lane.order,
-                              lane.model));
+        ave_delta +=
+            std::abs(pos.y() - PolyEval(pos.x(), lane.order, lane.model));
         count++;
       }
       AINFO << "lane average delta: " << ave_delta << " / " << count;
-      if (count == 0 || ave_delta/count > AVEAGE_LANE_WIDTH_METER/2.0) {
-        if (count > 0) AINFO << "ave_delta is: " << ave_delta/count;
+      if (count == 0 || ave_delta / count > AVEAGE_LANE_WIDTH_METER / 2.0) {
+        if (count > 0) AINFO << "ave_delta is: " << ave_delta / count;
         lane_objects->erase(lane_objects->begin() + idx);
         lane_objects->push_back(lane);
       } else {
@@ -922,7 +916,7 @@ bool CCLanePostProcessor::FindLane(const LaneObjects &lane_objects,
                                    int spatial_label, int *index) {
   size_t k = 0;
   while (k < lane_objects.size() &&
-    lane_objects.at(k).spatial != spatial_label) {
+         lane_objects.at(k).spatial != spatial_label) {
     k++;
   }
   if (k == lane_objects.size()) {
@@ -938,8 +932,8 @@ void CCLanePostProcessor::InitLaneHistory() {
   AINFO << "Init Lane History Start;";
   lane_history_.set_capacity(MAX_LANE_HISTORY);
   motion_buffer_ = std::make_shared<MotionBuffer>(MAX_LANE_HISTORY);
-  generated_lanes_ = std::make_shared<LaneObjects>(interested_labels_.size(),
-                                                  LaneObject());
+  generated_lanes_ =
+      std::make_shared<LaneObjects>(interested_labels_.size(), LaneObject());
   for (std::size_t i = 0; i < generated_lanes_->size(); i++) {
     generated_lanes_->at(i).spatial = interested_labels_[i];
   }
@@ -950,9 +944,8 @@ void CCLanePostProcessor::FilterWithLaneHistory(LaneObjectsPtr lane_objects) {
   std::vector<int> erase_idx;
   for (size_t i = 0; i < lane_objects->size(); i++) {
     Eigen::Vector3f start_pos;
-    start_pos <<  lane_objects->at(i).pos[0].x(),
-                  lane_objects->at(i).pos[0].y(),
-                  1.0;
+    start_pos << lane_objects->at(i).pos[0].x(), lane_objects->at(i).pos[0].y(),
+        1.0;
 
     for (size_t j = 0; j < lane_history_.size(); j++) {
       // iter to find corresponding lane
@@ -968,11 +961,10 @@ void CCLanePostProcessor::FilterWithLaneHistory(LaneObjectsPtr lane_objects) {
       }
       // project start_pos to history, check lane stability
       auto project_pos = motion_buffer_->at(j).motion * start_pos;
-      auto &lane_object =  lane_history_[j][k];
+      auto &lane_object = lane_history_[j][k];
       ScalarType delta_y =
-        project_pos.y() -PolyEval(project_pos.x(),
-                                  lane_object.order,
-                                  lane_object.model);
+          project_pos.y() -
+          PolyEval(project_pos.x(), lane_object.order, lane_object.model);
       // delete if too far from polyline
       if (std::abs(delta_y) > 3.7) {
         erase_idx.push_back(i);
@@ -980,7 +972,7 @@ void CCLanePostProcessor::FilterWithLaneHistory(LaneObjectsPtr lane_objects) {
       }
     }
   }
-  for (size_t i = erase_idx.size()-1; i >= 0; i--) {
+  for (size_t i = erase_idx.size() - 1; i >= 0; i--) {
     lane_objects->erase(lane_objects->begin() + erase_idx[i]);
   }
 }

@@ -69,7 +69,7 @@ bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
     } else {
       // truncation on both sides
       // Give fix values for detected box with both side and bottom truncation
-      distance = 10.0f;;
+      distance = 10.0f;
       // Estimation of center pixel due to unknown truncation ratio
       mass_center_pixel = trunc_center_pixel;
     }
@@ -357,7 +357,7 @@ void GeometryCameraConverter::CheckTruncation(
   if (obj->upper_left.y() < 30.0f || height - 30.0f < obj->lower_right.y()) {
     obj->trunc_height = 0.5f;
     trunc_center_pixel->x() =
-     (obj->upper_left.x() + obj->lower_right.x()) / 2.0f;
+        (obj->upper_left.x() + obj->lower_right.x()) / 2.0f;
   }
 
   trunc_center_pixel->y() = (obj->upper_left.y() + obj->lower_right.y()) / 2.0f;

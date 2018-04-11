@@ -36,8 +36,8 @@ namespace apollo {
 namespace planning {
 
 using Trajectory1d = Curve1d;
-using apollo::common::PathPoint;
 using apollo::common::FrenetFramePoint;
+using apollo::common::PathPoint;
 using apollo::common::SpeedPoint;
 
 TrajectoryEvaluator::TrajectoryEvaluator(
@@ -46,7 +46,8 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     const std::vector<std::shared_ptr<Trajectory1d>>& lat_trajectories,
     std::shared_ptr<PathTimeGraph> path_time_graph,
     std::shared_ptr<std::vector<PathPoint>> reference_line)
-    : path_time_graph_(path_time_graph), reference_line_(reference_line),
+    : path_time_graph_(path_time_graph),
+      reference_line_(reference_line),
       init_s_(init_s) {
   const double start_time = 0.0;
   const double end_time = FLAGS_trajectory_time_length;
@@ -156,15 +157,14 @@ double TrajectoryEvaluator::Evaluate(
   // 5. Cost of lateral comfort
 
   // Longitudinal costs
-  double lon_objective_cost = LonObjectiveCost(lon_trajectory, planning_target,
-      reference_s_dot_);
+  double lon_objective_cost =
+      LonObjectiveCost(lon_trajectory, planning_target, reference_s_dot_);
 
   double lon_jerk_cost = LonComfortCost(lon_trajectory);
 
   double lon_collision_cost = LonCollisionCost(lon_trajectory);
 
-  double centripetal_acc_cost =
-      CentripetalAccelerationCost(lon_trajectory);
+  double centripetal_acc_cost = CentripetalAccelerationCost(lon_trajectory);
 
   // decides the longitudinal evaluation horizon for lateral trajectories.
   double evaluation_horizon =
@@ -197,10 +197,10 @@ double TrajectoryEvaluator::Evaluate(
 }
 
 double TrajectoryEvaluator::EvaluateDiscreteTrajectory(
-      const PlanningTarget& planning_target,
-      const std::vector<SpeedPoint>& st_points,
-      const std::vector<FrenetFramePoint>& sl_points,
-      std::vector<double>* cost_components) {
+    const PlanningTarget& planning_target,
+    const std::vector<SpeedPoint>& st_points,
+    const std::vector<FrenetFramePoint>& sl_points,
+    std::vector<double>* cost_components) {
   CHECK_NOTNULL(cost_components);
 
   double lat_offset_cost = LatOffsetCost(sl_points);
@@ -294,8 +294,9 @@ double TrajectoryEvaluator::LatComfortCost(
   double max_cost = 0.0;
   for (std::size_t i = 1; i + 1 < sl_points.size(); ++i) {
     double s_dot = (sl_points[i + 1].s() - sl_points[i].s()) / dt;
-    double s_dotdot = (sl_points[i + 1].s() - 2.0 * sl_points[i].s() +
-        sl_points[i - 1].s()) / (dt * dt);
+    double s_dotdot =
+        (sl_points[i + 1].s() - 2.0 * sl_points[i].s() + sl_points[i - 1].s()) /
+        (dt * dt);
     double l_prime = sl_points[i].dl();
     double l_primeprime = sl_points[i].ddl();
     double cost = l_primeprime * s_dot * s_dot + l_prime * s_dotdot;
@@ -333,7 +334,7 @@ double TrajectoryEvaluator::LonComfortCost(
     if (std::abs(t1 - t2) <= FLAGS_lattice_epsilon) {
       continue;
     }
-    double jerk =  (dds2 - dds1) / (t2 - t1);
+    double jerk = (dds2 - dds1) / (t2 - t1);
     double cost = jerk / FLAGS_longitudinal_jerk_upper_bound;
     cost_sqr_sum += cost * cost;
     cost_abs_sum += std::abs(cost);
@@ -346,8 +347,8 @@ double TrajectoryEvaluator::LonObjectiveCost(
     const PlanningTarget& planning_target,
     const std::vector<double>& ref_s_dots) const {
   double t_max = lon_trajectory->ParamLength();
-  double dist_s = lon_trajectory->Evaluate(0, t_max)
-      - lon_trajectory->Evaluate(0, 0.0);
+  double dist_s =
+      lon_trajectory->Evaluate(0, t_max) - lon_trajectory->Evaluate(0, 0.0);
 
   double speed_cost_sqr_sum = 0.0;
   double speed_cost_weight_sum = 0.0;
@@ -372,8 +373,7 @@ double TrajectoryEvaluator::LonObjectiveCost(
   if (st_points.size() < 1) {
     return 0.0;
   }
-  double dist_s =
-    st_points[st_points.size() - 1].s() - st_points[0].s();
+  double dist_s = st_points[st_points.size() - 1].s() - st_points[0].s();
   double speed_cost_sqr_sum = 0.0;
   double speed_cost_weight_sum = 0.0;
   std::size_t point_idx = 0;
@@ -392,11 +392,11 @@ double TrajectoryEvaluator::LonObjectiveCost(
     speed_cost_sqr_sum += t * t * std::abs(cost);
     speed_cost_weight_sum += t * t;
   }
-  double speed_cost = speed_cost_sqr_sum /
-                      (speed_cost_weight_sum + FLAGS_lattice_epsilon);
+  double speed_cost =
+      speed_cost_sqr_sum / (speed_cost_weight_sum + FLAGS_lattice_epsilon);
   double dist_travelled_cost = 1.0 / (1.0 + dist_s);
   return (speed_cost * FLAGS_weight_target_speed +
-            dist_travelled_cost * FLAGS_weight_dist_travelled) /
+          dist_travelled_cost * FLAGS_weight_dist_travelled) /
          (FLAGS_weight_target_speed + FLAGS_weight_dist_travelled);
 }
 
@@ -519,7 +519,7 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
   std::vector<double> reference_s_dot;
 
   double brake_a = FLAGS_longitudinal_acceleration_lower_bound *
-      FLAGS_comfort_acceleration_factor;
+                   FLAGS_comfort_acceleration_factor;
 
   double cruise_v = planning_target.cruise_speed();
 
@@ -553,8 +553,8 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
       lon_traj.AppendSegment(brake_a, brake_t);
 
       if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
-        lon_traj.AppendSegment(0.0,
-            FLAGS_trajectory_time_length - lon_traj.ParamLength());
+        lon_traj.AppendSegment(
+            0.0, FLAGS_trajectory_time_length - lon_traj.ParamLength());
       }
       for (double t = 0.0; t < FLAGS_trajectory_time_length;
            t += FLAGS_trajectory_time_resolution) {
@@ -569,8 +569,8 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
       lon_traj.AppendSegment(0.0, cruise_t);
       lon_traj.AppendSegment(brake_a, brake_t);
       if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
-        lon_traj.AppendSegment(0.0,
-            FLAGS_trajectory_time_length - lon_traj.ParamLength());
+        lon_traj.AppendSegment(
+            0.0, FLAGS_trajectory_time_length - lon_traj.ParamLength());
       }
       for (double t = 0.0; t < FLAGS_trajectory_time_length;
            t += FLAGS_trajectory_time_resolution) {
@@ -582,10 +582,9 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
 }
 
 bool TrajectoryEvaluator::InterpolateDenseStPoints(
-  const std::vector<SpeedPoint>& st_points,
-  double t, double *traj_s) const {
+    const std::vector<SpeedPoint>& st_points, double t, double* traj_s) const {
   CHECK_GT(st_points.size(), 1);
-  if (t < st_points[0].t() || t > st_points[st_points.size()-1].t()) {
+  if (t < st_points[0].t() || t > st_points[st_points.size() - 1].t()) {
     AERROR << "AutoTuning InterpolateDenseStPoints Error";
     return false;
   }
