@@ -31,3 +31,6 @@ wget https://apollocache.blob.core.windows.net/apollo-docker/snowboy.tar.gz
 tar xzf snowboy.tar.gz
 mkdir -p /usr/local/apollo
 mv snowboy /usr/local/apollo/
+
+# Clean up.
+rm -fr snowboy.tar.gz
