@@ -36,7 +36,7 @@ namespace perception {
 
 class ProbabilisticFusion : public BaseFusion {
  public:
-  ProbabilisticFusion();
+  ProbabilisticFusion() = default;
   ~ProbabilisticFusion();
 
   virtual bool Init();
@@ -87,16 +87,16 @@ class ProbabilisticFusion : public BaseFusion {
  protected:
   /**@brief produce fusion result for PNC only when fusing sensor with
    * publish_sensor_id_*/
-  std::string publish_sensor_id_;
-  bool started_;
-  PbfBaseTrackObjectMatcher *matcher_;
-  PbfSensorManager *sensor_manager_;
-  PbfTrackManager *track_manager_;
+  std::string publish_sensor_id_ = "velodyne_64";
+  bool started_ = false;
+  PbfBaseTrackObjectMatcher *matcher_ = nullptr;
+  PbfSensorManager *sensor_manager_ = nullptr;
+  PbfTrackManager *track_manager_ = nullptr;
   std::mutex sensor_data_rw_mutex_;
   std::mutex fusion_mutex_;
-  bool use_radar_;
-  bool use_lidar_;
-  bool use_camera_;
+  bool use_radar_ = true;
+  bool use_lidar_ = true;
+  bool use_camera_ = true;
 
   probabilistic_fusion_config::ModelConfigs config_;
 

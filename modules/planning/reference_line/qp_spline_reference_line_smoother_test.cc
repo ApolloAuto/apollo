@@ -36,7 +36,7 @@ namespace planning {
 class QpSplineReferenceLineSmootherTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_spline_order(5);
+    config_.mutable_qp_spline()->set_spline_order(5);
     smoother_.reset(new QpSplineReferenceLineSmoother(config_));
     hdmap_.LoadMapFromFile(map_file);
     const std::string lane_id = "1_-1";

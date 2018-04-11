@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_ // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_ // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_  // NOLINT
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_  // NOLINT
 
 #include <vector>
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track.h"
 
@@ -26,31 +27,26 @@ namespace perception {
 
 class PbfTrackManager {
  public:
-  static PbfTrackManager *instance();
-  ~PbfTrackManager();
+  ~PbfTrackManager() = default;
 
-  inline std::vector<PbfTrackPtr> &GetTracks() {
-    return tracks_;
-  }
+  std::vector<PbfTrackPtr> &GetTracks() { return tracks_; }
 
-  inline const std::vector<PbfTrackPtr> &GetTracks() const {
-    return tracks_;
-  }
+  const std::vector<PbfTrackPtr> &GetTracks() const { return tracks_; }
 
-  void AddTrack(const PbfTrackPtr &track) {
-    tracks_.push_back(track);
-  }
+  void AddTrack(const PbfTrackPtr &track) { tracks_.push_back(track); }
 
   int RemoveLostTracks();
 
  protected:
   std::vector<PbfTrackPtr> tracks_;
+
  private:
-  PbfTrackManager();
-  DISALLOW_COPY_AND_ASSIGN(PbfTrackManager);
+  DECLARE_SINGLETON(PbfTrackManager);
 };
 
 }  // namespace perception
 }  // namespace apollo
 
+/* clang-format off */
 #endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_MANAGER_H_ // NOLINT
+/* clang-format on */

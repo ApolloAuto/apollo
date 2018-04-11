@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,24 +16,10 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
-import datetime
-import rosbag
 
-if __name__ == '__main__':
-    fbags = sys.argv[1:]
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-    fbag = fbags[0]
-    now = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
-    f = open("path_" + fbag.split('/')[-1] + ".txt", 'w')
-
-    for fbag in fbags:
-        print fbag
-        bag = rosbag.Bag(fbag)
-        for topic, localization_pb, t in bag.read_messages(
-                topics=['/apollo/localization/pose']):
-            x = localization_pb.pose.position.x
-            y = localization_pb.pose.position.y
-            f.write(str(x) + "," + str(y) + "\n")
-        bag.close()
-    f.close()
+source "${DIR}/apollo_base.sh"
+# run function from apollo_base.sh
+# run command_name module_name
+run perception "$@" --flagfile=modules/perception/conf/perception_lowcost_vis.conf
