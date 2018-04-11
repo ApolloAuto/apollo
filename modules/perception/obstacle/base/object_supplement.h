@@ -16,12 +16,12 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_SUPPLEMENT_H_
 #define MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_SUPPLEMENT_H_
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
-#include "boost/circular_buffer.hpp"
 #include "Eigen/Core"
+#include "boost/circular_buffer.hpp"
 #include "opencv2/opencv.hpp"
 
 #include "modules/perception/obstacle/base/types.h"

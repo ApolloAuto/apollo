@@ -54,9 +54,7 @@ Camera::Camera() : field_of_view_(M_PI / 4.0f) {
   compute_projection_matrix();
 }
 
-Camera::~Camera() {
-  delete frame_;
-}
+Camera::~Camera() { delete frame_; }
 
 Camera::Camera(const Camera &camera) {
   set_frame(new Frame());
@@ -452,9 +450,7 @@ Eigen::Vector3d Camera::point_under_pixel(const Eigen::Vector2i &pixel,
   return point;
 }
 
-void Camera::show_entire_scene() {
-  fit_sphere(scene_center(), scene_radius());
-}
+void Camera::show_entire_scene() { fit_sphere(scene_center(), scene_radius()); }
 
 void Camera::center_scene() {
   frame()->project_on_line(scene_center(), view_direction());
