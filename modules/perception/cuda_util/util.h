@@ -59,7 +59,7 @@ int divup(int a, int b);
 
 void resize(cv::Mat frame, caffe::Blob<float> *dst,
             std::shared_ptr<caffe::SyncedMemory> src_gpu, int start_axis);
-
+void yuyv2bgr(const uint8_t *yuv, uint8_t *rgb, const int pixel_num);
 // resize with mean and scale
 void resize(cv::Mat frame, caffe::Blob<float> *dst,
             std::shared_ptr<caffe::SyncedMemory> src_gpu, int start_axis,
