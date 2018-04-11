@@ -59,9 +59,7 @@ class LidarProcessSubnode : public Subnode {
 
   void OnPointCloud(const sensor_msgs::PointCloud2& message);
 
-  pcl_util::PointIndicesPtr GetROIIndices() {
-    return roi_indices_;
-  }
+  pcl_util::PointIndicesPtr GetROIIndices() { return roi_indices_; }
 
   void RegistAllAlgorithm();
   bool InitFrameDependence();

@@ -30,10 +30,10 @@
 namespace apollo {
 namespace perception {
 
-using std::string;
-using std::vector;
-using std::unordered_map;
 using apollo::common::util::GetProtoFromFile;
+using std::string;
+using std::unordered_map;
+using std::vector;
 
 bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
   // load yolo camera detector config file to proto
@@ -128,10 +128,10 @@ void YoloCameraDetector::load_intrinsic(
 
   offset_y_ = static_cast<int>(offset_ratio * image_height_ + .5);
   float roi_ratio = cropped_ratio * image_height_ / image_width_;
-  width_ = static_cast<int>(resized_width + aligned_pixel / 2) /
-      aligned_pixel * aligned_pixel;
+  width_ = static_cast<int>(resized_width + aligned_pixel / 2) / aligned_pixel *
+           aligned_pixel;
   height_ = static_cast<int>(width_ * roi_ratio + aligned_pixel / 2) /
-      aligned_pixel * aligned_pixel;
+            aligned_pixel * aligned_pixel;
   ADEBUG << "image_height=" << image_height_ << ", "
          << "image_width=" << image_width_ << ", "
          << "roi_ratio=" << roi_ratio;

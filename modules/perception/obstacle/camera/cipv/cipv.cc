@@ -734,9 +734,7 @@ bool Cipv::DetermineCipv(std::shared_ptr<SensorObjects> sensor_objects,
   return true;
 }
 
-std::string Cipv::Name() const {
-  return "Cipv";
-}
+std::string Cipv::Name() const { return "Cipv"; }
 
 // Register plugin.
 // REGISTER_CIPV(Cipv);

@@ -12,12 +12,11 @@ cc_library(
         "//modules/perception/common",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
+        "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/lidar/interface",
-        "//modules/perception/lib/config_manager:config_manager",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
-
 
 cpplint()
