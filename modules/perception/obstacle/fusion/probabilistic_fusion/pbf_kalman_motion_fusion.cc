@@ -37,7 +37,8 @@ void PbfKalmanMotionFusion::Initialize(const Eigen::Vector3d &anchor_point,
   belief_acceleration_ = Eigen::Vector3d(0, 0, 0);
 }
 
-void PbfKalmanMotionFusion::Initialize(const PbfSensorObjectPtr new_object) {
+void PbfKalmanMotionFusion::Initialize(
+    const std::shared_ptr<PbfSensorObject> new_object) {
   ACHECK(new_object != nullptr && new_object->object != nullptr)
       << "Initialize PbfKalmanMotionFusion with null sensor object";
 
@@ -97,7 +98,7 @@ void PbfKalmanMotionFusion::Predict(Eigen::Vector3d *anchor_point,
 }
 
 void PbfKalmanMotionFusion::UpdateWithObject(
-    const PbfSensorObjectPtr new_object, const double time_diff) {
+    const std::shared_ptr<PbfSensorObject> new_object, const double time_diff) {
   ACHECK(new_object != nullptr && new_object->object != nullptr)
       << "update PbfKalmanMotionFusion with null sensor object";
 

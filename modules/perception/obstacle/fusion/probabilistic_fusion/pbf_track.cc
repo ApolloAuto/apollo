@@ -50,7 +50,7 @@ using apollo::common::time::TimeUtil;
 PbfTrack::MotionFusionMethod PbfTrack::s_motion_fusion_method_ =
     PbfTrack::MotionFusionMethod::PBF_KALMAN;
 
-PbfTrack::PbfTrack(PbfSensorObjectPtr obj) {
+PbfTrack::PbfTrack(std::shared_ptr<PbfSensorObject> obj) {
   idx_ = GetNextTrackId();
   SensorType sensor_type = obj->sensor_type;
   std::string sensor_id = obj->sensor_id;
@@ -102,7 +102,7 @@ void PbfTrack::SetMotionFusionMethod(const std::string &motion_fusion_method) {
 
 PbfTrack::~PbfTrack() {}
 
-void PbfTrack::UpdateWithSensorObject(PbfSensorObjectPtr obj,
+void PbfTrack::UpdateWithSensorObject(std::shared_ptr<PbfSensorObject> obj,
                                       double match_dist) {
   const SensorType &sensor_type = obj->sensor_type;
   const std::string sensor_id = obj->sensor_id;
@@ -170,12 +170,15 @@ void PbfTrack::UpdateWithoutSensorObject(const SensorType &sensor_type,
 
 int PbfTrack::GetTrackId() const { return idx_; }
 
-PbfSensorObjectPtr PbfTrack::GetFusedObject() { return fused_object_; }
+std::shared_ptr<PbfSensorObject> PbfTrack::GetFusedObject() {
+  return fused_object_;
+}
 
 double PbfTrack::GetFusedTimestamp() const { return fused_timestamp_; }
 
-PbfSensorObjectPtr PbfTrack::GetLidarObject(const std::string &sensor_id) {
-  PbfSensorObjectPtr obj = nullptr;
+std::shared_ptr<PbfSensorObject> PbfTrack::GetLidarObject(
+    const std::string &sensor_id) {
+  std::shared_ptr<PbfSensorObject> obj = nullptr;
   auto it = lidar_objects_.find(sensor_id);
   if (it != lidar_objects_.end()) {
     obj = it->second;
@@ -183,8 +186,9 @@ PbfSensorObjectPtr PbfTrack::GetLidarObject(const std::string &sensor_id) {
   return obj;
 }
 
-PbfSensorObjectPtr PbfTrack::GetRadarObject(const std::string &sensor_id) {
-  PbfSensorObjectPtr obj = nullptr;
+std::shared_ptr<PbfSensorObject> PbfTrack::GetRadarObject(
+    const std::string &sensor_id) {
+  std::shared_ptr<PbfSensorObject> obj = nullptr;
   auto it = radar_objects_.find(sensor_id);
   if (it != radar_objects_.end()) {
     obj = it->second;
@@ -192,8 +196,9 @@ PbfSensorObjectPtr PbfTrack::GetRadarObject(const std::string &sensor_id) {
   return obj;
 }
 
-PbfSensorObjectPtr PbfTrack::GetCameraObject(const std::string &sensor_id) {
-  PbfSensorObjectPtr obj = nullptr;
+std::shared_ptr<PbfSensorObject> PbfTrack::GetCameraObject(
+    const std::string &sensor_id) {
+  std::shared_ptr<PbfSensorObject> obj = nullptr;
   auto it = camera_objects_.find(sensor_id);
   if (it != camera_objects_.end()) {
     obj = it->second;
@@ -201,7 +206,7 @@ PbfSensorObjectPtr PbfTrack::GetCameraObject(const std::string &sensor_id) {
   return obj;
 }
 
-void PbfTrack::PerformMotionFusionAsync(PbfSensorObjectPtr obj) {
+void PbfTrack::PerformMotionFusionAsync(std::shared_ptr<PbfSensorObject> obj) {
   if (motion_fusion_ == nullptr) {
     AERROR << "Skip motion fusion becuase motion_fusion_ is nullptr.";
     return;
@@ -247,7 +252,7 @@ void PbfTrack::PerformMotionFusionAsync(PbfSensorObjectPtr obj) {
   }
 }
 
-void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
+void PbfTrack::PerformMotionFusion(std::shared_ptr<PbfSensorObject> obj) {
   if (motion_fusion_ == nullptr) {
     AERROR << "Skip motion fusion becuase motion_fusion_ is nullptr.";
     return;
@@ -255,8 +260,8 @@ void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
   const SensorType &sensor_type = obj->sensor_type;
   double time_diff = obj->timestamp - fused_object_->timestamp;
 
-  PbfSensorObjectPtr lidar_object = GetLatestLidarObject();
-  PbfSensorObjectPtr radar_object = GetLatestRadarObject();
+  std::shared_ptr<PbfSensorObject> lidar_object = GetLatestLidarObject();
+  std::shared_ptr<PbfSensorObject> radar_object = GetLatestRadarObject();
 
   if (FLAGS_use_navigation_mode) {
     if (is_camera(sensor_type) || is_radar(sensor_type)) {
@@ -333,7 +338,7 @@ void PbfTrack::PerformMotionFusion(PbfSensorObjectPtr obj) {
   }
 }
 
-void PbfTrack::PerformMotionCompensation(PbfSensorObjectPtr obj,
+void PbfTrack::PerformMotionCompensation(std::shared_ptr<PbfSensorObject> obj,
                                          double timestamp) {
   double time_diff = timestamp - obj->timestamp;
   if (time_diff < 0) {
@@ -393,7 +398,7 @@ bool PbfTrack::AbleToPublish() {
     return true;
   }
 
-  PbfSensorObjectPtr radar_object = GetLatestRadarObject();
+  std::shared_ptr<PbfSensorObject> radar_object = GetLatestRadarObject();
   if (s_publish_if_has_radar_ && !invisible_in_radar_ &&
       radar_object != nullptr) {
     if (radar_object->sensor_type == SensorType::RADAR) {
@@ -414,7 +419,7 @@ bool PbfTrack::AbleToPublish() {
 }
 
 void PbfTrack::UpdateMeasurementsLifeWithMeasurement(
-    std::map<std::string, PbfSensorObjectPtr> *objects,
+    std::map<std::string, std::shared_ptr<PbfSensorObject>> *objects,
     const std::string &sensor_id, double timestamp, double max_invisible_time) {
   for (auto it = objects->begin(); it != objects->end();) {
     if (sensor_id != it->first) {
@@ -432,7 +437,7 @@ void PbfTrack::UpdateMeasurementsLifeWithMeasurement(
 }
 
 void PbfTrack::UpdateMeasurementsLifeWithoutMeasurement(
-    std::map<std::string, PbfSensorObjectPtr> *objects,
+    std::map<std::string, std::shared_ptr<PbfSensorObject>> *objects,
     const std::string &sensor_id, double timestamp, double max_invisible_time,
     bool *invisible_state) {
   *invisible_state = true;
@@ -453,8 +458,8 @@ void PbfTrack::UpdateMeasurementsLifeWithoutMeasurement(
   }
 }
 
-PbfSensorObjectPtr PbfTrack::GetLatestLidarObject() {
-  PbfSensorObjectPtr lidar_object;
+std::shared_ptr<PbfSensorObject> PbfTrack::GetLatestLidarObject() {
+  std::shared_ptr<PbfSensorObject> lidar_object;
   for (auto it = lidar_objects_.begin(); it != lidar_objects_.end(); ++it) {
     if (lidar_object == nullptr) {
       lidar_object = it->second;
@@ -465,8 +470,8 @@ PbfSensorObjectPtr PbfTrack::GetLatestLidarObject() {
   return lidar_object;
 }
 
-PbfSensorObjectPtr PbfTrack::GetLatestRadarObject() {
-  PbfSensorObjectPtr radar_object;
+std::shared_ptr<PbfSensorObject> PbfTrack::GetLatestRadarObject() {
+  std::shared_ptr<PbfSensorObject> radar_object;
   for (auto it = radar_objects_.begin(); it != radar_objects_.end(); ++it) {
     if (radar_object == nullptr) {
       radar_object = it->second;
@@ -477,8 +482,8 @@ PbfSensorObjectPtr PbfTrack::GetLatestRadarObject() {
   return radar_object;
 }
 
-PbfSensorObjectPtr PbfTrack::GetLatestCameraObject() {
-  PbfSensorObjectPtr camera_object;
+std::shared_ptr<PbfSensorObject> PbfTrack::GetLatestCameraObject() {
+  std::shared_ptr<PbfSensorObject> camera_object;
   for (auto it = camera_objects_.begin(); it != camera_objects_.end(); ++it) {
     if (camera_object == nullptr) {
       camera_object = it->second;
@@ -489,8 +494,8 @@ PbfSensorObjectPtr PbfTrack::GetLatestCameraObject() {
   return camera_object;
 }
 
-PbfSensorObjectPtr PbfTrack::GetSensorObject(const SensorType &sensor_type,
-                                             const std::string &sensor_id) {
+std::shared_ptr<PbfSensorObject> PbfTrack::GetSensorObject(
+    const SensorType &sensor_type, const std::string &sensor_id) {
   if (is_lidar(sensor_type)) {
     return GetLidarObject(sensor_id);
   } else if (is_radar(sensor_type)) {

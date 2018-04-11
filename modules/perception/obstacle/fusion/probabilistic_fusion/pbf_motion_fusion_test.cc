@@ -65,7 +65,7 @@ TEST_F(PbfMotionFusionTest, test_initialize_with_lidar_object) {
   lidar_object->anchor_point = lidar_position;
   lidar_object->velocity = lidar_velocity;
   lidar_object->state_uncertainty.setIdentity();
-  PbfSensorObjectPtr pbf_lidar_object(new PbfSensorObject(
+  std::shared_ptr<PbfSensorObject> pbf_lidar_object(new PbfSensorObject(
       lidar_object, SensorType::VELODYNE_64, lidar_timestamp));
   for (auto motion_fusion_alg : motion_fusion_algs_) {
     motion_fusion_alg->Initialize(pbf_lidar_object);
@@ -85,7 +85,7 @@ TEST_F(PbfMotionFusionTest, test_initialize_with_radar_object) {
   radar_object->center = radar_position;
   radar_object->anchor_point = radar_position;
   radar_object->velocity = radar_velocity;
-  PbfSensorObjectPtr pbf_radar_object(
+  std::shared_ptr<PbfSensorObject> pbf_radar_object(
       new PbfSensorObject(radar_object, SensorType::RADAR, radar_timestamp));
   for (auto motion_fusion_alg : motion_fusion_algs_) {
     motion_fusion_alg->Initialize(pbf_radar_object);
@@ -105,7 +105,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_kalman) {
   radar_object->center = radar_position;
   radar_object->anchor_point = radar_position;
   radar_object->velocity = radar_velocity;
-  PbfSensorObjectPtr pbf_radar_object(
+  std::shared_ptr<PbfSensorObject> pbf_radar_object(
       new PbfSensorObject(radar_object, SensorType::RADAR, radar_timestamp));
 
   ObjectPtr lidar_object(new Object());
@@ -115,7 +115,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_kalman) {
   lidar_object->center = lidar_position;
   lidar_object->anchor_point = lidar_position;
   lidar_object->velocity = lidar_velocity;
-  PbfSensorObjectPtr pbf_lidar_object(new PbfSensorObject(
+  std::shared_ptr<PbfSensorObject> pbf_lidar_object(new PbfSensorObject(
       lidar_object, SensorType::VELODYNE_64, lidar_timestamp));
   for (auto motion_fusion_alg : motion_fusion_algs_) {
     if (motion_fusion_alg->name() != "PbfKalmanMotionFusion") {
@@ -145,7 +145,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf) {
   radar_object->center = radar_position;
   radar_object->anchor_point = radar_position;
   radar_object->velocity = radar_velocity;
-  PbfSensorObjectPtr pbf_radar_object(
+  std::shared_ptr<PbfSensorObject> pbf_radar_object(
       new PbfSensorObject(radar_object, SensorType::RADAR, radar_timestamp));
 
   ObjectPtr lidar_object(new Object());
@@ -155,7 +155,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf) {
   lidar_object->center = lidar_position;
   lidar_object->anchor_point = lidar_position;
   lidar_object->velocity = lidar_velocity;
-  PbfSensorObjectPtr pbf_lidar_object(new PbfSensorObject(
+  std::shared_ptr<PbfSensorObject> pbf_lidar_object(new PbfSensorObject(
       lidar_object, SensorType::VELODYNE_64, lidar_timestamp));
 
   for (auto motion_fusion_alg : motion_fusion_algs_) {
@@ -189,7 +189,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf_seq) {
   radar_object->center = radar_position;
   radar_object->anchor_point = radar_position;
   radar_object->velocity = radar_velocity;
-  PbfSensorObjectPtr pbf_radar_object(
+  std::shared_ptr<PbfSensorObject> pbf_radar_object(
       new PbfSensorObject(radar_object, SensorType::RADAR, radar_timestamp));
   pbf_radar_object->timestamp = radar_timestamp;
   std::default_random_engine generator;
@@ -218,7 +218,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf_seq) {
       AINFO << "radar object center is " << radar_object->center(0);
       radar_object->anchor_point = radar_object->center;
       radar_object->velocity = radar_velocity;
-      PbfSensorObjectPtr pbf_radar_object(new PbfSensorObject(
+      std::shared_ptr<PbfSensorObject> pbf_radar_object(new PbfSensorObject(
           radar_object, SensorType::RADAR, mutable_radar_timestamp));
       pbf_radar_object->timestamp = mutable_radar_timestamp;
       motion_fusion_alg->setCurrentFuseTS(mutable_radar_timestamp + 0.2);
@@ -244,7 +244,7 @@ TEST_F(PbfMotionFusionTest, test_update_without_measurement) {
   lidar_object->center = lidar_position;
   lidar_object->anchor_point = lidar_position;
   lidar_object->velocity = lidar_velocity;
-  PbfSensorObjectPtr pbf_lidar_object(new PbfSensorObject(
+  std::shared_ptr<PbfSensorObject> pbf_lidar_object(new PbfSensorObject(
       lidar_object, SensorType::VELODYNE_64, lidar_timestamp));
 
   double time_diff = 0.1;
