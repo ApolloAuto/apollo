@@ -19,7 +19,7 @@ cc_library(
         ":prediction_gflags",
         ":prediction_map",
         "//modules/common:log",
-        "//modules/common/math:math",
+        "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/proto:lane_graph_proto",
         "@eigen",
@@ -133,8 +133,8 @@ cc_library(
     hdrs = ["validation_checker.h"],
     deps = [
         "//modules/common/proto:pnc_point_proto",
-        "//modules/prediction/proto:lane_graph_proto",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/proto:lane_graph_proto",
     ],
 )
 
@@ -149,7 +149,7 @@ cc_test(
     deps = [
         ":validation_checker",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cpplint()
