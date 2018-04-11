@@ -16,10 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
+# Fail on first error.
+set -e
 
-for installer in "$@"; do
-  echo "Start testing ${installer}"
-  docker build --build-arg INSTALLER=${installer} -f test_installer.dockerfile . \
-      2>&1 | tee ${installer}.log
-done
+mkdir -p /home/tmp
+wget -O /home/tmp/opencv-2.4.13.2.zip https://github.com/opencv/opencv/archive/2.4.13.2.zip
