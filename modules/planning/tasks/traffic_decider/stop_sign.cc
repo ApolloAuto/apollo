@@ -288,8 +288,9 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
       auto* path_overlap =
           reference_line_info->reference_line().map_path().NextLaneOverlap(
               reference_line_info->AdcSlBoundary().end_s());
-      if (path_overlap->start_s - reference_line_info->AdcSlBoundary().end_s() >
-          kDeltaS) {
+      if (path_overlap != nullptr &&
+          path_overlap->start_s - reference_line_info->AdcSlBoundary().end_s() >
+              kDeltaS) {
         // keep in CREEPING status
       } else {
         bool all_far_away = true;
