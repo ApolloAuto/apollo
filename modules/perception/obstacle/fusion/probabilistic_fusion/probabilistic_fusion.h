@@ -19,6 +19,7 @@
 
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "modules/perception/proto/probabilistic_fusion_config.pb.h"
@@ -61,7 +62,7 @@ class ProbabilisticFusion : public BaseFusion {
   void UpdateAssignedTracks(
       std::vector<PbfTrackPtr> *tracks,
       const std::vector<PbfSensorObjectPtr> &sensor_objects,
-      const std::vector<TrackObjectPair> &assignments,
+      const std::vector<std::pair<int, int>> &assignments,
       const std::vector<double> &track_objects_dist);
 
   /**@brief update current tracks which cannot find matched objects*/

@@ -14,7 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "util.h"
+#include "modules/perception/cuda_util/util.h"
+#include <thrust/host_vector.h>
+#include <thrust/sequence.h>
+#include <thrust/device_vector.h>
 
 namespace apollo {
 namespace perception {
@@ -171,6 +174,88 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <caffe::Sync
             width, fx, fy, mean_b, mean_g, mean_r, scale);
 
 }
+/******************/
+struct index_functor : public thrust::unary_function<int, int> {
+    int div_;
+    int mul_;
+    int offset_;
+    index_functor(int div, int mul, int offset)
+        : div_(div), mul_(mul), offset_(offset) {}
+
+    __host__ __device__
+    int operator()(const int &index) {
+        return (index / div_) * mul_ + offset_;
+    }
+};
+
+struct yuv2bgr_functor {
+    template <typename Tuple>
+    __host__ __device__
+    void operator()(Tuple t) {
+        const uint8_t &y = thrust::get<0>(t);
+        const uint8_t &u = thrust::get<1>(t);
+        const uint8_t &v = thrust::get<2>(t);
+        uint8_t &b = thrust::get<3>(t);
+        uint8_t &g = thrust::get<4>(t);
+        uint8_t &r = thrust::get<5>(t);
+
+        const int y2 = (int)y;
+        const int u2 = (int)u - 128;
+        const int v2 = (int)v - 128;
+
+        float r2 = y2 + (1.4065 * v2);
+        float g2 = y2 - (0.3455 * u2) - (0.7169 * v2);
+        float b2 = y2 + (2.041 * u2);
+
+        // Cap the values.
+        r = clip_value(r2);
+        g = clip_value(g2);
+        b = clip_value(b2);
+    }
+
+    __host__ __device__
+    inline uint8_t clip_value(float v) {
+        v = v < 0 ? 0 : v;
+        return v > 255 ? 255 : v;
+    }
+};
+typedef thrust::device_vector<int>::iterator IntegerIterator;
+void yuyv2bgr(const uint8_t *yuv_data, uint8_t *bgr_data, const int pixel_num) {
+    thrust::device_vector<uint8_t> bgr(pixel_num * 3);
+    thrust::device_vector<uint8_t> yuv(yuv_data, yuv_data + pixel_num * 2);
+    thrust::counting_iterator<int> first(0);
+    thrust::counting_iterator<int> last(yuv.size() / 2);
+    thrust::for_each(
+        thrust::make_zip_iterator(thrust::make_tuple(
+                thrust::make_permutation_iterator(yuv.begin(),
+                    thrust::make_transform_iterator(first, index_functor(1, 2, 0))),
+                thrust::make_permutation_iterator(yuv.begin(),
+                    thrust::make_transform_iterator(first, index_functor(2, 4, 1))),
+                thrust::make_permutation_iterator(yuv.begin(),
+                    thrust::make_transform_iterator(first, index_functor(2, 4, 3))),
+                thrust::make_permutation_iterator(bgr.begin(),
+                    thrust::make_transform_iterator(first, index_functor(1, 3, 0))),
+                thrust::make_permutation_iterator(bgr.begin(),
+                    thrust::make_transform_iterator(first, index_functor(1, 3, 1))),
+                thrust::make_permutation_iterator(bgr.begin(),
+                    thrust::make_transform_iterator(first, index_functor(1, 3, 2))))),
+        thrust::make_zip_iterator(thrust::make_tuple(
+                thrust::make_permutation_iterator(yuv.begin(),
+                    thrust::make_transform_iterator(last, index_functor(1, 2, 0))),
+                thrust::make_permutation_iterator(yuv.begin(),
+                    thrust::make_transform_iterator(last, index_functor(2, 4, 1))),
+                thrust::make_permutation_iterator(yuv.begin(),
+                    thrust::make_transform_iterator(last, index_functor(2, 4, 3))),
+                thrust::make_permutation_iterator(bgr.begin(),
+                    thrust::make_transform_iterator(last, index_functor(1, 3, 0))),
+                thrust::make_permutation_iterator(bgr.begin(),
+                    thrust::make_transform_iterator(last, index_functor(1, 3, 1))),
+                thrust::make_permutation_iterator(bgr.begin(),
+                    thrust::make_transform_iterator(last, index_functor(1, 3, 2))))),
+        yuv2bgr_functor());
+    cudaMemcpy(bgr_data, thrust::raw_pointer_cast(bgr.data()), pixel_num * 3, cudaMemcpyDeviceToHost);
+}
+
 
 }
 }

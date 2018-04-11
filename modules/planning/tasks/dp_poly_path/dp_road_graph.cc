@@ -238,7 +238,6 @@ void DPRoadGraph::UpdateNode(const std::list<DPRoadGraphNode> &prev_nodes,
     cur_node->UpdateCost(&prev_dp_node, curve, cost);
 
     // try to connect the current point with the first point directly
-    // only do this at lane change
     if (level >= 2) {
       init_dl = init_frenet_frame_point_.dl();
       init_ddl = init_frenet_frame_point_.ddl();

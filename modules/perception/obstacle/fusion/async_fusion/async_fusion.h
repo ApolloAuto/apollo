@@ -20,6 +20,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -58,7 +59,7 @@ class AsyncFusion : public BaseFusion {
   /**@brief update current tracks with matched objects*/
   void UpdateAssignedTracks(
       const std::vector<PbfSensorObjectPtr> &sensor_objects,
-      const std::vector<TrackObjectPair> &assignments,
+      const std::vector<std::pair<int, int>> &assignments,
       const std::vector<double> &track_objects_dist,
       std::vector<PbfTrackPtr> const *tracks);
 

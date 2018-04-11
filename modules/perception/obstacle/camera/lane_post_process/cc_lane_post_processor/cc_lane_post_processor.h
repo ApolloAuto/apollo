@@ -32,12 +32,12 @@
 #include "modules/perception/proto/lane_post_process_config.pb.h"
 
 #include "modules/common/log.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/cuda_util/connected_component_gpu.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/obstacle/base/object_supplement.h"
+#include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/interface/base_lane_post_processor.h"
 #include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/lane_frame.h"
-#include "modules/perception/obstacle/base/object_supplement.h"
 
 namespace apollo {
 namespace perception {
@@ -108,8 +108,7 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
   void FilterWithLaneHistory(LaneObjectsPtr lane_objects);
 
   bool CorrectWithLaneHistory(LaneObjectsPtr lane_objects);
-  bool FindLane(const LaneObjects &lane_objects,
-                int spatial_label, int *index);
+  bool FindLane(const LaneObjects &lane_objects, int spatial_label, int *index);
 
  private:
   CCLanePostProcessorOptions options_;
@@ -143,8 +142,8 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
   bool use_history_ = false;
   boost::circular_buffer<LaneObjects> lane_history_;
   MotionBufferPtr motion_buffer_ = nullptr;
-  const std::vector<SpatialLabelType> interested_labels_ =
-    {SpatialLabelType::L_0, SpatialLabelType::R_0};
+  const std::vector<SpatialLabelType> interested_labels_ = {
+      SpatialLabelType::L_0, SpatialLabelType::R_0};
   LaneObjectsPtr generated_lanes_ = nullptr;
   DISALLOW_COPY_AND_ASSIGN(CCLanePostProcessor);
 };

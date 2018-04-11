@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,12 +16,20 @@
 # limitations under the License.
 ###############################################################################
 
-USER=apollo
+# Usage:
+#   ./build_dev.sh ./dev.x86_64.dockerfile
+DOCKERFILE=$1
 
-# Get docker environment variables.
-eval $(docker-machine env apollo)
 
-docker exec \
-    -u $USER \
-    -it apollo_dev \
-    /bin/bash
+CONTEXT="$(dirname "${BASH_SOURCE[0]}")"
+
+REPO=apolloauto/apollo
+ARCH=$(uname -m)
+TIME=$(date +%Y%m%d_%H%M)
+
+TAG="${REPO}:dev-${ARCH}-${TIME}"
+
+# Fail on first error.
+set -e
+docker build -t ${TAG} -f ${DOCKERFILE} ${CONTEXT}
+echo "Built new image ${TAG}"

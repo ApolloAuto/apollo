@@ -38,9 +38,7 @@ class LowObjectFilter : public BaseObjectFilter {
 
   bool Init();
 
-  std::string name() const {
-    return "LowObjectFilter";
-  }
+  std::string name() const { return "LowObjectFilter"; }
 
   bool Filter(const ObjectFilterOptions& obj_filter_options,
               std::vector<ObjectPtr>* objects);

@@ -23,12 +23,15 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 wget https://github.com/startcode/qp-oases/archive/v3.2.1-1.tar.gz
 tar xzf v3.2.1-1.tar.gz
-cd qp-oases-3.2.1-1
 
+pushd qp-oases-3.2.1-1
 mkdir bin
-make CPPFLAGS="-Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion \
-               -Wsign-conversion -fPIC -DLINUX -DSOLVER_NONE -D__NO_COPYRIGHT__"
-
+make -j8 CPPFLAGS="-Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion \
+                   -Wsign-conversion -fPIC -DLINUX -DSOLVER_NONE \
+                   -D__NO_COPYRIGHT__"
 cp bin/libqpOASES.so /usr/local/lib
 cp -r include/* /usr/local/include
-ldconfig
+popd
+
+# Clean up.
+rm -fr v3.2.1-1.tar.gz qp-oases-3.2.1-1
