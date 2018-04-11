@@ -375,7 +375,7 @@ int PbfTrack::GetNextTrackId() {
 }
 
 bool PbfTrack::AbleToPublish() {
-  if (FLAGS_use_navigation_mode) {
+  if (FLAGS_use_navigation_mode && !camera_objects_.empty()) {
     return true;
   }
 
