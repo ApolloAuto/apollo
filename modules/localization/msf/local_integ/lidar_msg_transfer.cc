@@ -37,9 +37,8 @@ void LidarMsgTransfer::Transfer(
 
 void LidarMsgTransfer::TransferCloud(
     const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  if (lidar_frame == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(lidar_frame);
+
   ParseCloudField(lidar_data);
   // organized point cloud
   if (lidar_data.height > 1 && lidar_data.width > 1) {
@@ -112,9 +111,8 @@ void LidarMsgTransfer::ParseCloudField(
 
 void LidarMsgTransfer::TransferOrganizedCloud32(
     const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  if (lidar_frame == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(lidar_frame);
+
   for (uint32_t i = 0; i < lidar_data.height; ++i) {
     for (uint32_t j = 0; j < lidar_data.width; ++j) {
       uint32_t index = i * lidar_data.width + j;
@@ -141,9 +139,8 @@ void LidarMsgTransfer::TransferOrganizedCloud32(
 
 void LidarMsgTransfer::TransferOrganizedCloud64(
     const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  if (lidar_frame == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(lidar_frame);
+
   for (uint32_t i = 0; i < lidar_data.height; ++i) {
     for (uint32_t j = 0; j < lidar_data.width; ++j) {
       uint32_t index = i * lidar_data.width + j;
@@ -170,9 +167,8 @@ void LidarMsgTransfer::TransferOrganizedCloud64(
 
 void LidarMsgTransfer::TransferUnorganizedCloud32(
     const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  if (lidar_frame == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(lidar_frame);
+
   for (uint32_t i = 0; i < lidar_data.height; ++i) {
     for (uint32_t j = 0; j < lidar_data.width; ++j) {
       uint32_t index = i * lidar_data.width + j;
@@ -199,9 +195,8 @@ void LidarMsgTransfer::TransferUnorganizedCloud32(
 
 void LidarMsgTransfer::TransferUnorganizedCloud64(
     const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
-  if (lidar_frame == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(lidar_frame);
+
   for (uint32_t i = 0; i < lidar_data.height; ++i) {
     for (uint32_t j = 0; j < lidar_data.width; ++j) {
       uint32_t index = i * lidar_data.width + j;

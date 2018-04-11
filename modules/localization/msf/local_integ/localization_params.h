@@ -49,55 +49,40 @@ struct ImuToAntOffset {
 };
 
 struct LocalizationIntegParam {
-  LocalizationIntegParam() : enable_lidar_localization(true),
-      gnss_mode(0), is_ins_can_self_align(false),
-      is_sins_align_with_vel(true), is_sins_state_check(false),
-      sins_state_span_time(60.0), sins_state_pos_std(1.0),
-      vel_threshold_get_yaw(5.0), integ_debug_log_flag(true),
-      is_trans_gpstime_to_utctime(true),
-      is_using_raw_gnsspos(true), enable_ins_aid_rtk(false),
-      imu_to_ant_offset(), gnss_debug_log_flag(true), map_path(""),
-      lidar_extrinsic_file(""), lidar_height_file(""),
-      lidar_height_default(1.7), lidar_debug_log_flag(true),
-      localization_mode(2), lidar_yaw_align_mode(1),
-      lidar_filter_size(17), map_coverage_theshold(0.8),
-      imu_lidar_max_delay_time(0.4), utm_zone_id(50),
-      is_lidar_unstable_reset(true),
-      unstable_reset_threshold(0.08) {}
   // localization mode
-  bool enable_lidar_localization;
-  int gnss_mode;
+  bool enable_lidar_localization = true;
+  int gnss_mode = 0;
 
   // sins module
-  bool is_ins_can_self_align;
-  bool is_sins_align_with_vel;
-  bool is_sins_state_check;
-  double sins_state_span_time;
-  double sins_state_pos_std;
-  double vel_threshold_get_yaw;
-  bool integ_debug_log_flag;
-  bool is_trans_gpstime_to_utctime;
-  bool is_using_raw_gnsspos;
+  bool is_ins_can_self_align = false;
+  bool is_sins_align_with_vel = true;
+  bool is_sins_state_check = false;
+  double sins_state_span_time = 60.0;
+  double sins_state_pos_std = 1.0;
+  double vel_threshold_get_yaw = 5.0;
+  bool integ_debug_log_flag = true;
+  bool is_trans_gpstime_to_utctime = true;
+  bool is_using_raw_gnsspos = true;
 
   // gnss module
-  bool enable_ins_aid_rtk;
+  bool enable_ins_aid_rtk = false;
   ImuToAntOffset imu_to_ant_offset;
-  bool gnss_debug_log_flag;
+  bool gnss_debug_log_flag = true;
 
   // lidar module
-  std::string map_path;
-  std::string lidar_extrinsic_file;
-  std::string lidar_height_file;
-  double lidar_height_default;
-  bool lidar_debug_log_flag;
-  int localization_mode;
-  int lidar_yaw_align_mode;
-  int lidar_filter_size;
-  double map_coverage_theshold;
-  double imu_lidar_max_delay_time;
-  int utm_zone_id;
-  bool is_lidar_unstable_reset;
-  double unstable_reset_threshold;
+  std::string map_path = "";
+  std::string lidar_extrinsic_file = "";
+  std::string lidar_height_file = "";
+  double lidar_height_default = 1.7;
+  bool lidar_debug_log_flag = true;
+  int localization_mode = 2;
+  int lidar_yaw_align_mode = 2;
+  int lidar_filter_size = 17;
+  double map_coverage_theshold = 0.8;
+  double imu_lidar_max_delay_time = 0.4;
+  int utm_zone_id = 50;
+  bool is_lidar_unstable_reset = true;
+  double unstable_reset_threshold = 0.08;
 };
 
 enum class LocalizationMeasureState { NOT_VALID = 0, NOT_STABLE, OK, VALID };

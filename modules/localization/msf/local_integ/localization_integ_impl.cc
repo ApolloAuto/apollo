@@ -96,9 +96,9 @@ Status LocalizationIntegImpl::Init(
     gnss_antenna_extrinsic_ = Eigen::Affine3d::Identity();
   }
   AINFO << "gnss and imu lever arm: "
-            << gnss_antenna_extrinsic_.translation()(0) << " "
-            << gnss_antenna_extrinsic_.translation()(1) << " "
-            << gnss_antenna_extrinsic_.translation()(2);
+        << gnss_antenna_extrinsic_.translation()(0) << " "
+        << gnss_antenna_extrinsic_.translation()(1) << " "
+        << gnss_antenna_extrinsic_.translation()(2);
 
   StartThreadLoop();
 
@@ -179,7 +179,7 @@ void LocalizationIntegImpl::PcdThreadLoop() {
 
     if (waiting_num > 2) {
       AWARN << waiting_num
-                   << " point cloud msg are waiting to process.";
+            << " point cloud msg are waiting to process.";
     }
 
     PcdProcessImpl(lidar_frame);
@@ -488,9 +488,8 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
 
 void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
     const MeasureData& measure, LocalizationEstimate *localization) {
-  if (!localization) {
-    return;
-  }
+  CHECK_NOTNULL(localization);
+
   apollo::common::Header* headerpb = localization->mutable_header();
   apollo::localization::Pose* posepb = localization->mutable_pose();
 
@@ -541,9 +540,8 @@ void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
 void LocalizationIntegImpl::GetLastestLidarLocalization(
     LocalizationMeasureState *state,
     LocalizationEstimate *lidar_localization) {
-  if (!state || !lidar_localization) {
-    return;
-  }
+  CHECK_NOTNULL(state);
+  CHECK_NOTNULL(lidar_localization);
 
   lidar_localization_mutex_.lock();
   if (lidar_localization_list_.size()) {
@@ -560,9 +558,8 @@ void LocalizationIntegImpl::GetLastestLidarLocalization(
 void LocalizationIntegImpl::GetLastestIntegLocalization(
     LocalizationMeasureState *state,
     LocalizationEstimate *integ_localization) {
-  if (!state || !integ_localization) {
-    return;
-  }
+  CHECK_NOTNULL(state);
+  CHECK_NOTNULL(integ_localization);
 
   integ_localization_mutex_.lock();
   if (integ_localization_list_.size()) {
@@ -579,9 +576,8 @@ void LocalizationIntegImpl::GetLastestIntegLocalization(
 void LocalizationIntegImpl::GetLastestGnssLocalization(
     LocalizationMeasureState *state,
     LocalizationEstimate *gnss_localization) {
-  if (!state || !gnss_localization) {
-    return;
-  }
+  CHECK_NOTNULL(state);
+  CHECK_NOTNULL(gnss_localization);
 
   gnss_localization_mutex_.lock();
   if (gnss_localization_list_.size()) {
@@ -597,9 +593,8 @@ void LocalizationIntegImpl::GetLastestGnssLocalization(
 
 void LocalizationIntegImpl::GetLidarLocalizationList(
     std::list<LocalizationResult> *results) {
-  if (!results) {
-    return;
-  }
+  CHECK_NOTNULL(results);
+
   lidar_localization_mutex_.lock();
   *results = lidar_localization_list_;
   lidar_localization_list_.clear();
@@ -608,9 +603,8 @@ void LocalizationIntegImpl::GetLidarLocalizationList(
 
 void LocalizationIntegImpl::GetIntegLocalizationList(
     std::list<LocalizationResult> *results) {
-  if (!results) {
-    return;
-  }
+  CHECK_NOTNULL(results);
+
   integ_localization_mutex_.lock();
   *results = integ_localization_list_;
   integ_localization_list_.clear();
@@ -619,9 +613,8 @@ void LocalizationIntegImpl::GetIntegLocalizationList(
 
 void LocalizationIntegImpl::GetGnssLocalizationList(
     std::list<LocalizationResult> *results) {
-  if (!results) {
-    return;
-  }
+  CHECK_NOTNULL(results);
+
   gnss_localization_mutex_.lock();
   *results = gnss_localization_list_;
   gnss_localization_list_.clear();

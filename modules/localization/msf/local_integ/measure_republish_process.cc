@@ -60,13 +60,10 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
   if (gnss_mode_ != GnssMode::NOVATEL) {
     return false;
   }
-
-  if (measure == nullptr) {
-    return false;
-  }
+  CHECK_NOTNULL(measure);
 
   if (!CheckBestgnssposeStatus(bestgnsspos_msg)) {
-    AINFO << "Discard a bestgnsspose msg. "
+    AWARN << "Discard a bestgnsspose msg. "
           << "The status of this msg is not OK.";
     return false;
   }
@@ -118,9 +115,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
     return;
   }
 
-  if (!measure) {
-    return;
-  }
+  CHECK_NOTNULL(measure);
 
   MeasureData measure_data = gnss_local_msg;
   if (is_trans_gpstime_to_utctime_) {
@@ -193,7 +188,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
       return;
     } else {
       if ((ve_std > 0.1) || (vn_std > 0.1)) {
-        AINFO << "gnss velocity variance is large: " << ve_std << " "
+        AWARN << "gnss velocity variance is large: " << ve_std << " "
                   << vn_std;
         return;
       }
@@ -228,7 +223,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
       // 0.0872rad = 5deg
       constexpr double rad_5deg = 5 * DEG_TO_RAD;
       if ((yaw_incr > rad_5deg) || (yaw_incr < -rad_5deg)) {
-        AINFO << "yaw velocity is large! pre, "
+        AWARN << "yaw velocity is large! pre, "
               << "cur yaw from vel and velocity: "
               << pre_yaw_from_vel * RAD_TO_DEG << " "
               << yaw_from_vel * RAD_TO_DEG << " "
@@ -241,8 +236,6 @@ void MeasureRepublishProcess::GnssLocalProcess(
       pre_yaw_from_vel = yaw_from_vel;
     }
   }
-  // _component->publish_integ_measure_data(&measure_data);
-  // TranferToIntegMeasureData(measure_data, measure);
   *measure = measure_data;
 
   if (debug_log_flag_) {
@@ -278,9 +271,8 @@ void MeasureRepublishProcess::IntegPvaProcess(const InsPva& inspva_msg) {
 
 bool MeasureRepublishProcess::LidarLocalProcess(
     const LocalizationEstimate& lidar_local_msg, MeasureData *measure) {
-  if (!measure) {
-    return false;
-  }
+  CHECK_NOTNULL(measure);
+
   MeasureData measure_data;
   measure_data.time = lidar_local_msg.measurement_time();
 
@@ -360,9 +352,8 @@ bool MeasureRepublishProcess::IsSinsAlign() {
 
 void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
     const GnssBestPose& bestgnsspos_msg, MeasureData *measure) {
-  if (!measure) {
-    return;
-  }
+  CHECK_NOTNULL(measure);
+
   measure->time = bestgnsspos_msg.measurement_time();
   if (is_trans_gpstime_to_utctime_) {
     measure->time = util::GpsToUnixSeconds(measure->time);
@@ -395,9 +386,8 @@ void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
 
 void MeasureRepublishProcess::TransferFirstMeasureFromBestgnsspose(
     const GnssBestPose& bestgnsspos_msg, MeasureData *measure) {
-  if (!measure) {
-    return;
-  }
+  CHECK_NOTNULL(measure);
+
   TransferXYZFromBestgnsspose(bestgnsspos_msg, measure);
 
   measure->measure_type = MeasureType::GNSS_POS_VEL;
@@ -414,9 +404,8 @@ void MeasureRepublishProcess::TransferFirstMeasureFromBestgnsspose(
 
 bool MeasureRepublishProcess::CalculateVelFromBestgnsspose(
     const GnssBestPose& bestgnsspos_msg, MeasureData *measure) {
-  if (!measure) {
-    return false;
-  }
+  CHECK_NOTNULL(measure);
+
   TransferXYZFromBestgnsspose(bestgnsspos_msg, measure);
 
   measure->measure_type = MeasureType::GNSS_POS_VEL;

@@ -81,7 +81,7 @@ void LocalizationGnssProcess::SetDefaultOption() {
 void LocalizationGnssProcess::RawObservationProcess(
     const drivers::gnss::EpochObservation &raw_obs) {
   if (!raw_obs.has_receiver_id()) {
-    AINFO << "Obs data being invalid if without receiver id!";
+    AERROR << "Obs data being invalid if without receiver id!";
     return;
   }
   double leap_second_s = 18.0;
@@ -204,9 +204,8 @@ void LocalizationGnssProcess::IntegSinsPvaProcess(
 
 LocalizationMeasureState LocalizationGnssProcess::GetResult(
     MeasureData *gnss_msg) {
-  if (!gnss_msg) {
-    return LocalizationMeasureState::NOT_VALID;
-  }
+  CHECK_NOTNULL(gnss_msg);
+
   // convert GnssPntResult to IntegMeasure
   // double sec_s = Clock::NowInSeconds(); // ros::Time::now().toSec();
   const unsigned int second_per_week = 604800;
@@ -314,12 +313,11 @@ inline void LocalizationGnssProcess::LogPnt(const GnssPntResultMsg &rover_pnt,
 
 bool LocalizationGnssProcess::GnssPosition(
     EpochObservationMsg *raw_rover_obs) {
-  if (!raw_rover_obs) {
-    return false;
-  }
+  CHECK_NOTNULL(raw_rover_obs);
+
   gnss_state_ = LocalizationMeasureState::NOT_VALID;
   if (raw_rover_obs->receiver_id() != 0) {
-    AINFO << "Wrong Rover Obs Data!";
+    AERROR << "Wrong Rover Obs Data!";
     return false;
   }
   int b_solved = gnss_solver_->solve(raw_rover_obs, &gnss_pnt_result_);
@@ -328,7 +326,7 @@ bool LocalizationGnssProcess::GnssPosition(
   }
   LogPnt(gnss_pnt_result_, gnss_solver_->get_ratio());
   if (!sins_align_finish_) {
-    AINFO << "Sins-ekf has not converged or finished its aligment!";
+    AWARN << "Sins-ekf has not converged or finished its aligment!";
   }
   if (gnss_pnt_result_.has_std_pos_x_m() &&
       gnss_pnt_result_.has_std_pos_y_m() &&
@@ -340,7 +338,7 @@ bool LocalizationGnssProcess::GnssPosition(
     sigma = std::sqrt(fabs(sigma));
     const double sigma_threshold = 10.0;
     if (fabs(sigma) > sigma_threshold) {
-      AINFO << "Position std exceeds the threshold " << sigma_threshold << "!";
+      AWARN << "Position std exceeds the threshold " << sigma_threshold << "!";
       return false;
     }
   }

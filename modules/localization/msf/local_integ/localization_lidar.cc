@@ -210,9 +210,8 @@ void LocalizationLidar::GetResult(Eigen::Affine3d *location,
 
 void LocalizationLidar::GetLocalizationDistribution(
     Eigen::MatrixXd *distribution) {
-  if (distribution == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(distribution);
+
   int width = 0;
   int height = 0;
   const double *data = nullptr;
@@ -230,9 +229,8 @@ void LocalizationLidar::GetLocalizationDistribution(
 }
 
 void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d *pose) {
-  if (!pose) {
-    return;
-  }
+  CHECK_NOTNULL(pose);
+
   Eigen::Affine3d lidar_pose = *pose * velodyne_extrinsic_;
   Eigen::Vector3d lidar_trans = lidar_pose.translation();
 

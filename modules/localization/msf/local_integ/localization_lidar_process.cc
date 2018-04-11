@@ -194,9 +194,10 @@ void LocalizationLidarProcess::PcdProcess(const LidarFrame& lidar_frame) {
 void LocalizationLidarProcess::GetResult(int *lidar_status,
                                          TransformD *location,
                                          Matrix3D *covariance) const {
-  if (!lidar_status || !location || !covariance) {
-    return;
-  }
+  CHECK_NOTNULL(lidar_status);
+  CHECK_NOTNULL(location);
+  CHECK_NOTNULL(covariance);
+
   *lidar_status = static_cast<int>(lidar_status_);
   *location = location_;
   *covariance = location_covariance_;
@@ -260,9 +261,9 @@ void LocalizationLidarProcess::RawImuProcess(const ImuData& imu_msg) {
 bool LocalizationLidarProcess::GetPredictPose(const double lidar_time,
                                               TransformD *predict_pose,
                                               ForcastState *forcast_state) {
-  if (!predict_pose || !forcast_state) {
-    return false;
-  }
+  CHECK_NOTNULL(predict_pose);
+  CHECK_NOTNULL(forcast_state);
+
   double latest_imu_time = pose_forcastor_->GetLastestImuTime();
   if (latest_imu_time - lidar_time > imu_lidar_max_delay_time_) {
     AERROR << std::setprecision(16)
@@ -317,10 +318,10 @@ bool LocalizationLidarProcess::GetPredictPose(const double lidar_time,
   } else {
     *forcast_state = ForcastState::INCREMENT;
     AINFO << "The delta translation input lidar localization: "
-              << lidar_time << " "
-              << forcast_pose.x - pre_location_.translation()(0) << " "
-              << forcast_pose.y - pre_location_.translation()(1) << " "
-              << forcast_pose.z - pre_location_.translation()(2);
+          << lidar_time << " "
+          << forcast_pose.x - pre_location_.translation()(0) << " "
+          << forcast_pose.y - pre_location_.translation()(1) << " "
+          << forcast_pose.z - pre_location_.translation()(2);
   }
 
   return true;
@@ -378,9 +379,8 @@ void LocalizationLidarProcess::UpdateState(const int ret, const double time) {
 
 bool LocalizationLidarProcess::LoadLidarExtrinsic(
     const std::string& file_path, TransformD *lidar_extrinsic) {
-  if (!lidar_extrinsic) {
-    return false;
-  }
+  CHECK_NOTNULL(lidar_extrinsic);
+
   YAML::Node config = YAML::LoadFile(file_path);
   if (config["transform"]) {
     if (config["transform"]["translation"]) {
@@ -406,9 +406,8 @@ bool LocalizationLidarProcess::LoadLidarExtrinsic(
 
 bool LocalizationLidarProcess::LoadLidarHeight(const std::string& file_path,
                                                LidarHeight *height) {
-  if (!height) {
-    return false;
-  }
+  CHECK_NOTNULL(height);
+
   if (!common::util::PathExists(file_path)) {
     return false;
   }

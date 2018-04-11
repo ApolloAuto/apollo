@@ -16,6 +16,7 @@
 
 #include "modules/localization/msf/common/util/frame_transform.h"
 #include <cmath>
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace localization {
@@ -175,9 +176,7 @@ double FootpointLatitude(const double y) {
  */
 void MaplatlonToXY(const double phi, const double lambda,
                    double lambda0, UTMCoor *xy) {
-  if (xy == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(xy);
 
   /* Precalculate ep2 */
   double ep2 = (pow(kSmA, 2.0) - pow(kSmB, 2.0)) / pow(kSmB, 2.0);
@@ -261,9 +260,7 @@ void MaplatlonToXY(const double phi, const double lambda,
  */
 void MapXYToLatlon(const double x, const double y,
                    const double lambda0, WGS84Corr *philambda) {
-  if (philambda == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(philambda);
 
   /* Get the value of phif, the footpoint latitude. */
   double phif = FootpointLatitude(y);
@@ -365,9 +362,8 @@ void MapXYToLatlon(const double x, const double y,
  *
  */
 void LatlonToUtmXY(const double lon_rad, const double lat_rad, UTMCoor *xy) {
-  if (xy == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(xy);
+
   int zone = 0;
   zone = static_cast<int>((lon_rad * kSinsRadToDeg + 180) / 6) + 1;
 
@@ -405,9 +401,8 @@ void LatlonToUtmXY(const double lon_rad, const double lat_rad, UTMCoor *xy) {
  */
 void UtmXYToLatlon(const double x, const double y, const int zone,
                    const bool southhemi, WGS84Corr *latlon) {
-  if (latlon == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(latlon);
+
   double xx = x;
   xx -= 500000.0;
   xx /= kUtmScaleFactor;
@@ -426,9 +421,8 @@ void UtmXYToLatlon(const double x, const double y, const int zone,
 }
 
 void XYZToBlh(const Eigen::Vector3d &xyz, Eigen::Vector3d *blh) {
-  if (blh == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(blh);
+
   //    double e2=FE_WGS84*(2.0-FE_WGS84);
   double r2 = xyz[0] * xyz[0] + xyz[1] * xyz[1];
   double z = 0.0;
@@ -450,9 +444,8 @@ void XYZToBlh(const Eigen::Vector3d &xyz, Eigen::Vector3d *blh) {
 }
 
 void BlhToXYZ(const Eigen::Vector3d &blh, Eigen::Vector3d *xyz) {
-  if (xyz == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(xyz);
+
   double sin_lati_2 = sin(blh[1]) * sin(blh[1]);
   double temp_a = sqrt(1.0 - kSinsE2 * sin_lati_2);
   double rn = kSinsR0 / temp_a;

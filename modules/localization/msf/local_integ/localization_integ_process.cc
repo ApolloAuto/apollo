@@ -84,22 +84,22 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
   double cur_imu_time = imu_msg.measurement_time;
 
   if (cur_imu_time < 3000) {
-    AINFO << "the imu time is error: " << cur_imu_time;
+    AERROR << "the imu time is error: " << cur_imu_time;
     return;
   }
 
   static double pre_imu_time = cur_imu_time;
   double delta_time = cur_imu_time - pre_imu_time;
   if (delta_time > 0.1) {
-    AINFO
-        << std::setprecision(16)
-        << "the imu message loss more than 10, the pre time and current time: "
-        << pre_imu_time << " " << cur_imu_time;
+    ADEBUG << std::setprecision(16)
+           << "the imu message loss more than 10, "
+           << "the pre time and current time: "
+           << pre_imu_time << " " << cur_imu_time;
   } else if (delta_time < 0.0) {
-    AINFO << std::setprecision(16)
-              << "received imu message's time is eary than last imu message, "
-              << "the pre time and current time: " << pre_imu_time << " "
-              << cur_imu_time;
+    ADEBUG << std::setprecision(16)
+           << "received imu message's time is eary than last imu message, "
+           << "the pre time and current time: " << pre_imu_time << " "
+           << cur_imu_time;
   }
 
   // add imu msg and get current predict pose
@@ -149,18 +149,16 @@ void LocalizationIntegProcess::GetValidFromOK() {
 }
 
 void LocalizationIntegProcess::GetState(IntegState *state) {
-  if (!state) {
-    return;
-  }
+  CHECK_NOTNULL(state);
+
   *state = integ_state_;
   return;
 }
 
 void LocalizationIntegProcess::GetResult(IntegState *state,
                                          LocalizationEstimate *localization) {
-  if (!state || !localization) {
-    return;
-  }
+  CHECK_NOTNULL(state);
+  CHECK_NOTNULL(localization);
 
   // state
   *state = integ_state_;
@@ -242,9 +240,10 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
 void LocalizationIntegProcess::GetResult(IntegState *state,
                InsPva *sins_pva,
                double pva_covariance[9][9]) {
-  if (!state || !sins_pva || !pva_covariance) {
-    return;
-  }
+  CHECK_NOTNULL(state);
+  CHECK_NOTNULL(sins_pva);
+  CHECK_NOTNULL(pva_covariance);
+
   *state = integ_state_;
   *sins_pva = ins_pva_;
   memcpy(pva_covariance, pva_covariance_, sizeof(double) * 9 * 9);
@@ -348,9 +347,8 @@ bool LocalizationIntegProcess::CheckIntegMeasureData(
 
 bool LocalizationIntegProcess::LoadGnssAntennaExtrinsic(
     const std::string &file_path, TransformD *extrinsic) const {
-  if (!extrinsic) {
-    return false;
-  }
+  CHECK_NOTNULL(extrinsic);
+
   YAML::Node confige = YAML::LoadFile(file_path);
   if (confige["leverarm"]) {
     if (confige["leverarm"]["primary"]["offset"]) {

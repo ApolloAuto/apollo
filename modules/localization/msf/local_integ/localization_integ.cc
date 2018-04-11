@@ -127,9 +127,8 @@ void LocalizationInteg::GetGnssLocalizationList(
 
 void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg,
                                        ImuData *imu_rfu) {
-  if (!imu_rfu) {
-    return;
-  }
+  CHECK_NOTNULL(imu_rfu);
+
   double measurement_time = util::GpsToUnixSeconds(imu_msg.measurement_time());
   imu_rfu->measurement_time = measurement_time;
   imu_rfu->fb[0] = imu_msg.linear_acceleration().x() * FLAGS_imu_rate;
@@ -144,9 +143,8 @@ void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg,
 
 void LocalizationInteg::TransferImuFlu(const drivers::gnss::Imu &imu_msg,
                                        ImuData *imu_flu) {
-  if (!imu_flu) {
-    return;
-  }
+  CHECK_NOTNULL(imu_flu);
+
   double measurement_time = util::GpsToUnixSeconds(imu_msg.measurement_time());
   imu_flu->measurement_time = measurement_time;
   imu_flu->fb[0] = -imu_msg.linear_acceleration().y() * FLAGS_imu_rate;
