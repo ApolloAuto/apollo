@@ -52,17 +52,17 @@ PbfTrack::MotionFusionMethod PbfTrack::s_motion_fusion_method_ =
 
 PbfTrack::PbfTrack(std::shared_ptr<PbfSensorObject> obj) {
   idx_ = GetNextTrackId();
-  SensorType sensor_type = obj->sensor_type;
-  std::string sensor_id = obj->sensor_id;
-  invisible_in_lidar_ = true;
-  invisible_in_radar_ = true;
-  invisible_in_camera_ = true;
-
   if (s_motion_fusion_method_ == MotionFusionMethod::PBF_KALMAN) {
     motion_fusion_.reset(new PbfKalmanMotionFusion());
   } else {
     motion_fusion_.reset(new PbfIMFFusion());
   }
+
+  invisible_in_lidar_ = true;
+  invisible_in_radar_ = true;
+  invisible_in_camera_ = true;
+  SensorType sensor_type = obj->sensor_type;
+  std::string sensor_id = obj->sensor_id;
   if (is_lidar(sensor_type)) {
     lidar_objects_[sensor_id] = obj;
     motion_fusion_->Initialize(obj);
@@ -374,7 +374,7 @@ int PbfTrack::GetNextTrackId() {
   if (s_track_idx_ == INT_MAX) {
     s_track_idx_ = 0;
   } else {
-    s_track_idx_++;
+    ++s_track_idx_;
   }
   return ret_track_id;
 }
