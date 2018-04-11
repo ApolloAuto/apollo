@@ -30,7 +30,7 @@ class ObjectSequenceTest : public testing::Test {
 
  protected:
   ObjectSequence sequence_;
-  std::vector<std::vector<ObjectPtr>> objects_;
+  std::vector<std::vector<std::shared_ptr<Object>>> objects_;
   std::vector<double> timestamps_;
 };
 
@@ -59,7 +59,7 @@ TEST_F(ObjectSequenceTest, TestAddAndGet) {
   }
 
   double window_time = 5.0;
-  ObjectSequence::TrackedObjects tracked_objects;
+  std::map<int64_t, std::shared_ptr<Object>> tracked_objects;
   sequence_.GetTrackInTemporalWindow(0, &tracked_objects, window_time);
   EXPECT_EQ(tracked_objects.size(), 9);
   sequence_.GetTrackInTemporalWindow(1, &tracked_objects, window_time);

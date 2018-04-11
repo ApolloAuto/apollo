@@ -32,7 +32,7 @@
 //              const pcl_util::PointCloudPtr& cloud,
 //              const pcl_util::PointIndices& non_ground_indices,
 //              const SegmentationOptions& options,
-//              std::vector<ObjectPtr>* objects) override {
+//              std::vector<std::shared_ptr<Object>>* objects) override {
 //
 //          // Do something.
 //          return true;
@@ -54,6 +54,7 @@
 // using segmentation to do somethings.
 // ////////////////////////////////////////////////////
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -89,7 +90,7 @@ class BaseSegmentation {
   virtual bool Segment(const pcl_util::PointCloudPtr &cloud,
                        const pcl_util::PointIndices &valid_indices,
                        const SegmentationOptions &options,
-                       std::vector<ObjectPtr> *objects) = 0;
+                       std::vector<std::shared_ptr<Object>> *objects) = 0;
 
   virtual std::string name() const = 0;
 

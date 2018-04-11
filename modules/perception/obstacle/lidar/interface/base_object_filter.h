@@ -30,7 +30,7 @@
 //
 //     virtual bool filter(
 //             const ObjectFilterOptions& obj_filter_options,
-//             std::vector<ObjectPtr>& objects) override {
+//             std::vector<std::shared_ptr<Object>>& objects) override {
 //
 //          // Do something.
 //          return true;
@@ -81,7 +81,7 @@ class BaseObjectFilter {
   virtual bool Init() = 0;
 
   virtual bool Filter(const ObjectFilterOptions &obj_filter_options,
-                      std::vector<ObjectPtr> *objects) = 0;
+                      std::vector<std::shared_ptr<Object>> *objects) = 0;
 
   virtual std::string name() const = 0;
 

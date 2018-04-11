@@ -60,7 +60,7 @@ class FusionSubnode : public Subnode {
   bool BuildSensorObjs(const std::vector<Event> &events,
                        std::vector<SensorObjects> *multi_sensor_objs);
   bool ProducePbMsg(double timestamp, SeqId seq_num,
-                    const std::vector<ObjectPtr> &fused_objs,
+                    const std::vector<std::shared_ptr<Object>> &fused_objs,
                     std::string *pb_msg) const;
   bool GetSharedData(const Event &event,
                      std::shared_ptr<SensorObjects> *sensor_objects);
@@ -74,7 +74,7 @@ class FusionSubnode : public Subnode {
                            const std::string &device_id,
                            const SharedDataPtr<FusionItem> &data);
   double timestamp_;
-  std::vector<ObjectPtr> objects_;
+  std::vector<std::shared_ptr<Object>> objects_;
   common::ErrorCode error_code_ = common::OK;
   std::unique_ptr<BaseFusion> fusion_;
   LidarObjectData *lidar_object_data_ = nullptr;

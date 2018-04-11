@@ -17,10 +17,12 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_VISUALIZER_GLFW_VIEWER_H_
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <memory>
 
 #include "Eigen/Dense"
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
+
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/camera.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 
@@ -80,8 +82,8 @@ class GLFWViewer {
   void DrawCircle();
   void DrawCarForwardDir();
   void DrawObstacles();
-  void DrawObstacle(const ObjectPtr obj, bool show_cloud, bool show_polygon,
-                    bool show_velocity, bool show_direction);
+  void DrawObstacle(const std::shared_ptr<Object> obj, bool show_cloud,
+                    bool show_polygon, bool show_velocity, bool show_direction);
   void DrawOffsetVolumn(Eigen::Vector3d *polygon_points, double h,
                         int polygon_size);
 

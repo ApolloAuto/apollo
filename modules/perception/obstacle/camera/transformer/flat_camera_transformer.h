@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -52,7 +53,7 @@ class FlatCameraTransformer : public BaseCameraTransformer {
 
   bool Init() override;
 
-  bool Transform(std::vector<VisualObjectPtr> *objects) override;
+  bool Transform(std::vector<std::shared_ptr<VisualObject>> *objects) override;
 
   // @brief Set static extrinsic matrix for camera space to car space
   bool SetExtrinsics(const Eigen::Matrix<double, 4, 4> &extrinsics) override;

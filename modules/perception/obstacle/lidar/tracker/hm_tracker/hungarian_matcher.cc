@@ -39,12 +39,12 @@ bool HungarianMatcher::SetMatchDistanceMaximum(
   return false;
 }
 
-void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
-                             const std::vector<ObjectTrackPtr>& tracks,
-                             const std::vector<Eigen::VectorXf>& tracks_predict,
-                             std::vector<std::pair<int, int>>* assignments,
-                             std::vector<int>* unassigned_tracks,
-                             std::vector<int>* unassigned_objects) {
+void HungarianMatcher::Match(
+    std::vector<std::shared_ptr<TrackedObject>>* objects,
+    const std::vector<ObjectTrackPtr>& tracks,
+    const std::vector<Eigen::VectorXf>& tracks_predict,
+    std::vector<std::pair<int, int>>* assignments,
+    std::vector<int>* unassigned_tracks, std::vector<int>* unassigned_objects) {
   // A. computing association matrix
   Eigen::MatrixXf association_mat(tracks.size(), objects->size());
   ComputeAssociateMatrix(tracks, tracks_predict, (*objects), &association_mat);
@@ -166,7 +166,7 @@ void HungarianMatcher::MatchInComponents(
 void HungarianMatcher::ComputeAssociateMatrix(
     const std::vector<ObjectTrackPtr>& tracks,
     const std::vector<Eigen::VectorXf>& tracks_predict,
-    const std::vector<TrackedObjectPtr>& new_objects,
+    const std::vector<std::shared_ptr<TrackedObject>>& new_objects,
     Eigen::MatrixXf* association_mat) {
   // Compute matrix of association distance
   for (size_t i = 0; i < tracks.size(); ++i) {

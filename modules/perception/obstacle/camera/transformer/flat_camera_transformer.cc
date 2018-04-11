@@ -21,7 +21,8 @@ namespace perception {
 
 bool FlatCameraTransformer::Init() { return true; }
 
-bool FlatCameraTransformer::Transform(std::vector<VisualObjectPtr> *objects) {
+bool FlatCameraTransformer::Transform(
+    std::vector<std::shared_ptr<VisualObject>> *objects) {
   if (!objects) return false;
 
   for (auto obj_ptr : *objects) {
@@ -59,7 +60,7 @@ bool FlatCameraTransformer::SetExtrinsics(
     const Eigen::Matrix<double, 4, 4> &extrinsics) {
   camera2car_ = extrinsics.cast<float>();
   camera2car_flat_offset_ =
-   Eigen::Matrix<float, 3, 1>(camera2car_(0, 3), camera2car_(1, 3), 0.0f);
+      Eigen::Matrix<float, 3, 1>(camera2car_(0, 3), camera2car_(1, 3), 0.0f);
   return true;
 }
 

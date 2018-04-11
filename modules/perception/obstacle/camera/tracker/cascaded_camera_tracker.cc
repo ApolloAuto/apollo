@@ -29,9 +29,9 @@ bool CascadedCameraTracker::Init() {
   return init_flag;
 }
 
-bool CascadedCameraTracker::Associate(const cv::Mat& img,
-                                      const double& timestamp,
-                                      std::vector<VisualObjectPtr>* objects) {
+bool CascadedCameraTracker::Associate(
+    const cv::Mat& img, const double& timestamp,
+    std::vector<std::shared_ptr<VisualObject>>* objects) {
   if (!objects) return false;
   frame_idx_++;
 

@@ -41,10 +41,10 @@ void FrameContent::set_image_content(double timestamp, cv::Mat image) {
   image_caches_[DoubleToMapKey(timestamp)] = image_content;
 }
 
-void FrameContent::set_camera_content(double timestamp,
-                                      Eigen::Matrix4d pose_c2w,
-                                      const std::vector<ObjectPtr>& objects,
-                                      const CameraFrameSupplement& supplement) {
+void FrameContent::set_camera_content(
+    double timestamp, Eigen::Matrix4d pose_c2w,
+    const std::vector<std::shared_ptr<Object>>& objects,
+    const CameraFrameSupplement& supplement) {
   auto key = DoubleToMapKey(timestamp);
   if (camera_caches_.count(key)) return;
 
@@ -61,9 +61,9 @@ void FrameContent::set_camera_content(double timestamp,
   camera_caches_[key] = content;
 }
 
-void FrameContent::set_camera_content(double timestamp,
-                                      Eigen::Matrix4d pose_c2w,
-                                      const std::vector<ObjectPtr>& objects) {
+void FrameContent::set_camera_content(
+    double timestamp, Eigen::Matrix4d pose_c2w,
+    const std::vector<std::shared_ptr<Object>>& objects) {
   auto key = DoubleToMapKey(timestamp);
   if (camera_caches_.count(key)) return;
 
@@ -92,8 +92,8 @@ void FrameContent::set_camera_content(double timestamp,
   camera_caches_[key] = content;
 }
 
-void FrameContent::set_radar_content(double timestamp,
-                                     const std::vector<ObjectPtr>& objects) {
+void FrameContent::set_radar_content(
+    double timestamp, const std::vector<std::shared_ptr<Object>>& objects) {
   RadarContent content;
   content.timestamp_ = timestamp;
 
@@ -106,8 +106,8 @@ void FrameContent::set_radar_content(double timestamp,
   radar_caches_[DoubleToMapKey(timestamp)] = content;
 }
 
-void FrameContent::set_fusion_content(double timestamp,
-                                      const std::vector<ObjectPtr>& objects) {
+void FrameContent::set_fusion_content(
+    double timestamp, const std::vector<std::shared_ptr<Object>>& objects) {
   FusionContent content;
   content.timestamp_ = timestamp;
 
@@ -136,8 +136,8 @@ void FrameContent::set_lane_content(double timestamp,
   lane_caches_[key] = content;
 }
 
-void FrameContent::set_gt_content(double timestamp,
-                                  const std::vector<ObjectPtr>& objects) {
+void FrameContent::set_gt_content(
+    double timestamp, const std::vector<std::shared_ptr<Object>>& objects) {
   GroundTruthContent content;
   content.timestamp_ = timestamp;
 
@@ -304,14 +304,14 @@ cv::Mat FrameContent::get_camera_image() {
   }
 }
 
-std::vector<ObjectPtr> FrameContent::get_camera_objects() {
+std::vector<std::shared_ptr<Object>> FrameContent::get_camera_objects() {
   if (!camera_caches_.empty()) {
     auto it = camera_caches_.begin();
     return it->second.camera_objects_;
   } else {
     AWARN << "FrameContent::get_camera_objects() : No Objects found";
     AWARN << "current_camera_timestamp_ : " << current_camera_timestamp_;
-    return std::vector<ObjectPtr>();
+    return std::vector<std::shared_ptr<Object>>();
   }
 }
 
@@ -343,10 +343,10 @@ Eigen::Matrix4d FrameContent::get_opengl_camera_system_pose() {
   return pose;
 }
 
-std::vector<ObjectPtr> FrameContent::get_radar_objects() {
+std::vector<std::shared_ptr<Object>> FrameContent::get_radar_objects() {
   auto it = radar_caches_.find(DoubleToMapKey(current_radar_timestamp_));
   if (it == radar_caches_.end()) {
-    return std::vector<ObjectPtr>();
+    return std::vector<std::shared_ptr<Object>>();
   }
   RadarContent content = it->second;
   return content.radar_objects_;
@@ -371,19 +371,19 @@ double FrameContent::get_visualization_timestamp() {
   return timestamp;
 }
 
-std::vector<ObjectPtr> FrameContent::get_fused_objects() {
+std::vector<std::shared_ptr<Object>> FrameContent::get_fused_objects() {
   auto it = fusion_caches_.find(DoubleToMapKey(current_fusion_timestamp_));
   if (it == fusion_caches_.end()) {
-    return std::vector<ObjectPtr>();
+    return std::vector<std::shared_ptr<Object>>();
   }
   FusionContent content = it->second;
   return content.fused_objects_;
 }
 
-std::vector<ObjectPtr> FrameContent::get_gt_objects() {
+std::vector<std::shared_ptr<Object>> FrameContent::get_gt_objects() {
   auto it = gt_caches_.find(DoubleToMapKey(current_gt_timestamp_));
   if (it == gt_caches_.end()) {
-    return std::vector<ObjectPtr>();
+    return std::vector<std::shared_ptr<Object>>();
   }
   GroundTruthContent content = it->second;
   return content.gt_objects_;
@@ -398,7 +398,7 @@ LaneObjects FrameContent::get_lane_objects() {
   return content.lane_objects_;
 }
 
-void FrameContent::offset_object(ObjectPtr object,
+void FrameContent::offset_object(std::shared_ptr<Object> object,
                                  const Eigen::Vector3d& offset) {
   object->center[0] += offset[0];
   object->center[1] += offset[1];

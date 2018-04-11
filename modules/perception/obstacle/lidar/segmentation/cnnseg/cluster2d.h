@@ -18,6 +18,7 @@
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CLUSTER2D_H_
 
 #include <algorithm>
+#include <memory>
 #include <vector>
 
 #include "caffe/caffe.hpp"
@@ -230,7 +231,8 @@ class Cluster2D {
   }
 
   void GetObjects(const float confidence_thresh, const float height_thresh,
-                  const int min_pts_num, std::vector<ObjectPtr>* objects) {
+                  const int min_pts_num,
+                  std::vector<std::shared_ptr<Object>>* objects) {
     CHECK(valid_indices_in_pc_ != nullptr);
 
     for (size_t i = 0; i < point2grid_.size(); ++i) {
@@ -263,7 +265,7 @@ class Cluster2D {
       if (static_cast<int>(obs->cloud->size()) < min_pts_num) {
         continue;
       }
-      apollo::perception::ObjectPtr out_obj(new apollo::perception::Object);
+      std::shared_ptr<Object> out_obj(new apollo::perception::Object);
       out_obj->cloud = obs->cloud;
       out_obj->score = obs->score;
       out_obj->score_type = ScoreType::SCORE_CNN;
