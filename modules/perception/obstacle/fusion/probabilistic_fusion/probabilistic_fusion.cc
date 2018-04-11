@@ -209,7 +209,7 @@ void ProbabilisticFusion::CreateNewTracks(
 void ProbabilisticFusion::UpdateAssignedTracks(
     std::vector<PbfTrackPtr> *tracks,
     const std::vector<PbfSensorObjectPtr> &sensor_objects,
-    const std::vector<TrackObjectPair> &assignments,
+    const std::vector<std::pair<int, int>> &assignments,
     const std::vector<double> &track_object_dist) {
   for (size_t i = 0; i < assignments.size(); i++) {
     int local_track_index = assignments[i].first;
@@ -279,7 +279,7 @@ void ProbabilisticFusion::FuseForegroundObjects(
     const std::string &sensor_id, double timestamp) {
   std::vector<int> unassigned_tracks;
   std::vector<int> unassigned_objects;
-  std::vector<TrackObjectPair> assignments;
+  std::vector<std::pair<int, int>> assignments;
 
   std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
 
@@ -292,11 +292,11 @@ void ProbabilisticFusion::FuseForegroundObjects(
                   &unassigned_tracks, &unassigned_objects,
                   &track2measurements_dist, &measurement2tracks_dist);
 
-  AINFO << "fg_track_cnt = " << tracks.size()
-        << ", fg_obj_cnt = " << foreground_objects->size()
-        << ", assignement = " << assignments.size()
-        << ", unassigned_track_cnt = " << unassigned_tracks.size()
-        << ", unassigned_obj_cnt = " << unassigned_objects.size();
+  ADEBUG << "fg_track_cnt = " << tracks.size()
+         << ", fg_obj_cnt = " << foreground_objects->size()
+         << ", assignement = " << assignments.size()
+         << ", unassigned_track_cnt = " << unassigned_tracks.size()
+         << ", unassigned_obj_cnt = " << unassigned_objects.size();
 
   UpdateAssignedTracks(&tracks, *foreground_objects, assignments,
                        track2measurements_dist);
