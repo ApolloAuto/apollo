@@ -38,11 +38,12 @@ namespace apollo {
 namespace perception {
 
 float PbfTrackObjectDistance::Compute(
-    const PbfTrackPtr &fused_track, const PbfSensorObjectPtr &sensor_object,
+    const PbfTrackPtr &fused_track,
+    const std::shared_ptr<PbfSensorObject> &sensor_object,
     const TrackObjectDistanceOptions &options) {
   const SensorType &sensor_type = sensor_object->sensor_type;
   ADEBUG << "sensor type: " << static_cast<int>(sensor_type);
-  PbfSensorObjectPtr fused_object = fused_track->GetFusedObject();
+  std::shared_ptr<PbfSensorObject> fused_object = fused_track->GetFusedObject();
   if (fused_object == nullptr) {
     ADEBUG << "fused object is nullptr";
     return std::numeric_limits<float>::max();
@@ -55,8 +56,10 @@ float PbfTrackObjectDistance::Compute(
   }
 
   float distance = std::numeric_limits<float>::max();
-  const PbfSensorObjectPtr &lidar_object = fused_track->GetLatestLidarObject();
-  const PbfSensorObjectPtr &radar_object = fused_track->GetLatestRadarObject();
+  const std::shared_ptr<PbfSensorObject> &lidar_object =
+      fused_track->GetLatestLidarObject();
+  const std::shared_ptr<PbfSensorObject> &radar_object =
+      fused_track->GetLatestRadarObject();
 
   if (FLAGS_use_navigation_mode) {
     if (FLAGS_use_distance_angle_fusion) {
@@ -94,9 +97,9 @@ float PbfTrackObjectDistance::Compute(
 }
 
 float PbfTrackObjectDistance::ComputeVelodyne64Velodyne64(
-    const PbfSensorObjectPtr &fused_object,
-    const PbfSensorObjectPtr &sensor_object, const Eigen::Vector3d &ref_pos,
-    int range) {
+    const std::shared_ptr<PbfSensorObject> &fused_object,
+    const std::shared_ptr<PbfSensorObject> &sensor_object,
+    const Eigen::Vector3d &ref_pos, int range) {
   float distance =
       ComputeDistance3D(fused_object, sensor_object, ref_pos, range);
   ADEBUG << "compute_velodyne64_velodyne64 distance: " << distance;
@@ -104,9 +107,9 @@ float PbfTrackObjectDistance::ComputeVelodyne64Velodyne64(
 }
 
 float PbfTrackObjectDistance::ComputeVelodyne64Radar(
-    const PbfSensorObjectPtr &fused_object,
-    const PbfSensorObjectPtr &sensor_object, const Eigen::Vector3d &ref_pos,
-    int range) {
+    const std::shared_ptr<PbfSensorObject> &fused_object,
+    const std::shared_ptr<PbfSensorObject> &sensor_object,
+    const Eigen::Vector3d &ref_pos, int range) {
   float distance =
       ComputeDistance3D(fused_object, sensor_object, ref_pos, range);
   ADEBUG << "compute_velodyne64_radar distance " << distance;
@@ -114,9 +117,9 @@ float PbfTrackObjectDistance::ComputeVelodyne64Radar(
 }
 
 float PbfTrackObjectDistance::ComputeRadarRadar(
-    const PbfSensorObjectPtr &fused_object,
-    const PbfSensorObjectPtr &sensor_object, const Eigen::Vector3d &ref_pos,
-    int range) {
+    const std::shared_ptr<PbfSensorObject> &fused_object,
+    const std::shared_ptr<PbfSensorObject> &sensor_object,
+    const Eigen::Vector3d &ref_pos, int range) {
   float distance =
       ComputeDistance3D(fused_object, sensor_object, ref_pos, range);
   ADEBUG << "compute_radar_radar distance " << distance;
@@ -135,8 +138,8 @@ float PbfTrackObjectDistance::GetAngle(const ObjectPtr &obj) {
 }
 
 float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
-    const PbfSensorObjectPtr &fused_object,
-    const PbfSensorObjectPtr &sensor_object) {
+    const std::shared_ptr<PbfSensorObject> &fused_object,
+    const std::shared_ptr<PbfSensorObject> &sensor_object) {
   static float weight_x = 0.8f;
   static float weight_y = 0.2f;
   static float speed_diff = 5.0f;
@@ -205,9 +208,9 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
 }
 
 float PbfTrackObjectDistance::ComputeDistance3D(
-    const PbfSensorObjectPtr &fused_object,
-    const PbfSensorObjectPtr &sensor_object, const Eigen::Vector3d &ref_pos,
-    const int range) {
+    const std::shared_ptr<PbfSensorObject> &fused_object,
+    const std::shared_ptr<PbfSensorObject> &sensor_object,
+    const Eigen::Vector3d &ref_pos, const int range) {
   const ObjectPtr &obj = fused_object->object;
   if (obj == nullptr) {
     AERROR << "Object is nullptr.";
