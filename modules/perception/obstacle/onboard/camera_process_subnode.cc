@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
+#include "modules/perception/cuda_util/util.h"
 
 namespace apollo {
 namespace perception {
@@ -155,22 +156,17 @@ void CameraProcessSubnode::ChassisCallback(
 
 bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
                                         cv::Mat *img) {
-  cv::Mat cv_img;
+  *img = cv::Mat(msg.height, msg.width, CV_8UC3);
+  int pixel_num = msg.width * msg.height;
   if (msg.encoding.compare("yuyv") == 0) {
     unsigned char *yuv = (unsigned char *)&(msg.data[0]);
-    cv_img = cv::Mat(msg.height, msg.width, CV_8UC3);
-    traffic_light::Yuyv2rgb(yuv, cv_img.data, msg.height * msg.width);
-    cv::cvtColor(cv_img, cv_img, CV_RGB2BGR);
+    yuyv2bgr(yuv, img->data, pixel_num);
   } else {
     cv_bridge::CvImagePtr cv_ptr =
         cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-    cv_img = cv_ptr->image;
+    *img = cv_ptr->image;
   }
 
-  if (cv_img.rows != image_height_ || cv_img.cols != image_width_) {
-    cv::resize(cv_img, cv_img, cv::Size(image_width_, image_height_));
-  }
-  *img = cv_img.clone();
   return true;
 }
 
