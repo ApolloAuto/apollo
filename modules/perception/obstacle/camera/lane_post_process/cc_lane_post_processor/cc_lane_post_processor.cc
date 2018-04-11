@@ -516,6 +516,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
   if (options.use_lane_history && !use_history_) {
     InitLaneHistory();
   }
+//  AINFO << "use history: " << use_history_;
 
   cur_lane_instances_.reset(new vector<LaneInstance>);
   if (!GenerateLaneInstances(lane_map)) {
@@ -813,6 +814,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     if (CorrectWithLaneHistory(*lane_objects)) {
       lane_history_.push_back(*(*lane_objects));
     } else {
+      AINFO << "use history instead of current lane detection";
       lane_history_.pop_front();
     }
     auto vs = options.vehicle_status;
@@ -863,8 +865,12 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(LaneObjectsPtr lane_objects) {
       // fit a 2nd-order polynomial curve;
       lane.order = 2;
     }
-    if (lane.point_num < 2 || !PolyFit(lane.pos, lane.order, &(lane.model))) {
-      AWARN << "failed to fit " << lane.order << " order polynomial curve.";
+
+    AINFO << "history size: " << lane.point_num;
+    if (lane.point_num < 2 ||
+        !PolyFit(lane.pos, lane.order, &(lane.model))) {
+       AWARN  << "failed to fit " << lane.order
+              << " order polynomial curve.";
       is_valid[l] = true;
       continue;
     }
@@ -919,6 +925,7 @@ bool CCLanePostProcessor::FindLane(const LaneObjects &lane_objects,
 
 void CCLanePostProcessor::InitLaneHistory() {
   use_history_ = true;
+  AINFO << "Init Lane History Start;";
   lane_history_.set_capacity(MAX_LANE_HISTORY);
   motion_buffer_ = std::make_shared<MotionBuffer>(MAX_LANE_HISTORY);
   generated_lanes_ =

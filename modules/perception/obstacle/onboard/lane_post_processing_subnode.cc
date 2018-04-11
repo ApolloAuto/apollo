@@ -68,7 +68,6 @@ bool LanePostProcessingSubnode::InitInternal() {
     }
     options_.use_lane_history = true;
     AINFO << "options_.use_lane_history: " << options_.use_lane_history;
-    //    options_.ConfigLaneHistory(FLAGS_lane_history_size);
   }
   // init shared data
   if (!InitSharedData()) {
@@ -236,8 +235,8 @@ Status LanePostProcessingSubnode::ProcEvents() {
 
     // TODO(gchen-apollo): add lock to read motion_buffer
     options_.SetMotion(motion_service_->GetMotionBuffer()->back());
-    AINFO << "options_.vehicle_status.motion:  "
-          << options_.vehicle_status.motion;
+    AINFO  << "options_.vehicle_status.motion:  "
+           << options_.vehicle_status.motion;
   }
   lane_post_processor_->Process(lane_map, options_, &lane_objects);
   for (size_t i = 0; i < lane_objects->size(); ++i) {
