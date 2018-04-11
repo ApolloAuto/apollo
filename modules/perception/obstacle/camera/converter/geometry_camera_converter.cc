@@ -402,7 +402,7 @@ void GeometryCameraConverter::DecideAngle(const Eigen::Vector3f &camera_ray,
 
 void GeometryCameraConverter::SetBoxProjection(VisualObjectPtr obj) const {
   obj->pts8.resize(16);
-  if (obj->trunc_width < 0.25f && obj->trunc_height < 0.25f) { // No truncation
+  if (obj->trunc_width < 0.25f && obj->trunc_height < 0.25f) {  // No truncation
     for (int i = 0; i < 8; i++) {
       obj->pts8[i * 2] = pixel_corners_[i].x();
       obj->pts8[i * 2 + 1] = pixel_corners_[i].y();
