@@ -43,7 +43,9 @@ if [ ! -e /apollo ]; then
     sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
 fi
 
-echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
+if [ -e /proc/sys/kernel ]; then
+    echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
+fi
 
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
@@ -128,6 +130,27 @@ done
 
 IMG=${DOCKER_REPO}:$VERSION
 
+function local_volumes() {
+    # Apollo root and bazel cache dirs are required.
+    volumes="-v $APOLLO_ROOT_DIR:/apollo \
+             -v $HOME/.cache:${DOCKER_HOME}/.cache"
+    case "$(uname -s)" in
+        Linux)
+            volumes="${volumes} -v /dev:/dev \
+                                -v /media:/media \
+                                -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+                                -v /etc/localtime:/etc/localtime:ro \
+                                -v /usr/src:/usr/src \
+                                -v /lib/modules:/lib/modules"
+            ;;
+        Darwin)
+            # MacOS has strict limitations on mapping volumes.
+            chmod -R a+wr ~/.cache/bazel
+            ;;
+    esac
+    echo "${volumes}"
+}
+
 function main(){
 
     if [ "$LOCAL_IMAGE" = "yes" ];then
@@ -154,8 +177,6 @@ function main(){
     fi
 
     setup_device
-
-    local devices=" -v /dev:/dev"
 
     USER_ID=$(id -u)
     GRP=$(id -g -n)
@@ -198,16 +219,9 @@ function main(){
         -e DOCKER_GRP=$GRP \
         -e DOCKER_GRP_ID=$GRP_ID \
         -e DOCKER_IMG=$IMG \
-        -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-        -v $APOLLO_ROOT_DIR:/apollo \
-        -v /media:/media \
-        -v $HOME/.cache:${DOCKER_HOME}/.cache \
-        -v /etc/localtime:/etc/localtime:ro \
-        -v /usr/src:/usr/src \
-        -v /lib/modules:/lib/modules \
+        $(local_volumes) \
         --net host \
         -w /apollo \
-        ${devices} \
         --add-host in_dev_docker:127.0.0.1 \
         --add-host ${LOCAL_HOST}:127.0.0.1 \
         --hostname in_dev_docker \
