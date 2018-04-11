@@ -49,8 +49,10 @@ echo 'ROSCONSOLE_FORMAT=${file}:${line} ${function}() [${severity}] [${time}]: $
 VERSION=2.1.1
 FILENAME=ros-indigo-apollo-${VERSION}-x86_64.tar.gz
 
-mkdir /home/tmp
+mkdir -p /home/tmp
 cd /home/tmp
 wget https://github.com/ApolloAuto/apollo-platform/releases/download/${VERSION}/${FILENAME}
 tar xzf ${FILENAME}
-rm ${FILENAME}
+
+# Clean up.
+rm -fr ${FILENAME} /etc/apt/sources.list.d/ros-latest.list
