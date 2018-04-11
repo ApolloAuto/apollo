@@ -23,8 +23,8 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "Eigen/Geometry"
@@ -61,16 +61,11 @@ class ObjectCameraFilter : public BaseCameraFilter {
 
     common::math::KalmanFilter1D x_;
     common::math::KalmanFilter1D y_;
-    common::math::KalmanFilter1D z_;
-    common::math::KalmanFilter1D alpha_;
     common::math::KalmanFilter1D theta_;
-    common::math::KalmanFilter1D l_;
-    common::math::KalmanFilter1D w_;
-    common::math::KalmanFilter1D h_;
   };
 
-  std::map<int, ObjectFilter> tracked_filters_;
-  const int kMaxKeptFrameCnt = 10;
+  std::unordered_map<int, ObjectFilter> tracked_filters_;
+  const int kMaxKeptFrameCnt = 5;
 
   // @brief Create filters for new track ids
   void Create(const int &track_id, const double &timestamp,
