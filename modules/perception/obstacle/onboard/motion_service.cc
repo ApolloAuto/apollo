@@ -101,12 +101,12 @@ void MotionService::OnLocalization(
   if (start_flag_) {
     if (std::abs(camera_timestamp - pre_camera_timestamp_) <
         std::numeric_limits<double>::epsilon()) {
-      AINFO << "Motion_status: accum";
+      ADEBUG << "Motion_status: accum";
       vehicle_planemotion_->add_new_motion(
           &vehicle_status, pre_camera_timestamp_, camera_timestamp,
           PlaneMotion::ACCUM_MOTION);
     } else if (camera_timestamp > pre_camera_timestamp_) {
-      AINFO << "Motion_status: accum_push";
+      ADEBUG << "Motion_status: accum_push";
       vehicle_planemotion_->add_new_motion(
           &vehicle_status, pre_camera_timestamp_, camera_timestamp,
           PlaneMotion::ACCUM_PUSH_MOTION);
