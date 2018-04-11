@@ -52,7 +52,7 @@ class PbfTrackObjectDistance {
 
   float ComputeDistance3D(const PbfSensorObjectPtr &fused_object,
                           const PbfSensorObjectPtr &sensor_object,
-                          const Eigen::Vector3d &ref_pos, int range);
+                          const Eigen::Vector3d &ref_pos, const int range);
   float ComputeEuclideanDistance(const Eigen::Vector3d &des,
                                  const Eigen::Vector3d &src);
   bool ComputePolygonCenter(const PolygonDType &polygon,
