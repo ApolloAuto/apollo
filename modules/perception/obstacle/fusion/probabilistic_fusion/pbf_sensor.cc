@@ -16,8 +16,7 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor.h"
 
-#include <string>
-#include <vector>
+#include <memory>
 
 namespace apollo {
 namespace perception {
@@ -65,7 +64,7 @@ void PbfSensor::AddFrame(const SensorObjects &frame) {
 
   pbf_frame->objects.resize(frame.objects.size());
   for (size_t i = 0; i < frame.objects.size(); ++i) {
-    PbfSensorObjectPtr obj(new PbfSensorObject());
+    std::shared_ptr<PbfSensorObject> obj(new PbfSensorObject());
     obj->timestamp = frame.timestamp;
     obj->sensor_type = frame.sensor_type;
     obj->object->clone(*(frame.objects[i]));

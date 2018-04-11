@@ -30,36 +30,38 @@ namespace perception {
 
 class PbfTrack {
  public:
-  explicit PbfTrack(PbfSensorObjectPtr obj);
+  explicit PbfTrack(std::shared_ptr<PbfSensorObject> obj);
 
   ~PbfTrack();
 
   /**@brief Update track with sensor object */
-  void UpdateWithSensorObject(PbfSensorObjectPtr obj, double match_dist);
+  void UpdateWithSensorObject(std::shared_ptr<PbfSensorObject> obj,
+                              double match_dist);
 
   void UpdateWithoutSensorObject(const SensorType &sensor_type,
                                  const std::string &sensor_id,
                                  double min_match_dist, double timestamp);
 
-  PbfSensorObjectPtr GetFusedObject();
+  std::shared_ptr<PbfSensorObject> GetFusedObject();
 
   double GetFusedTimestamp() const;
 
-  PbfSensorObjectPtr GetLidarObject(const std::string &sensor_id);
+  std::shared_ptr<PbfSensorObject> GetLidarObject(const std::string &sensor_id);
 
-  PbfSensorObjectPtr GetRadarObject(const std::string &sensor_id);
+  std::shared_ptr<PbfSensorObject> GetRadarObject(const std::string &sensor_id);
 
-  PbfSensorObjectPtr GetCameraObject(const std::string &sensor_id);
+  std::shared_ptr<PbfSensorObject> GetCameraObject(
+      const std::string &sensor_id);
 
-  PbfSensorObjectPtr GetSensorObject(const SensorType &sensor_type,
-                                     const std::string &sensor_id);
+  std::shared_ptr<PbfSensorObject> GetSensorObject(
+      const SensorType &sensor_type, const std::string &sensor_id);
 
   /**@brief get latest lidar measurement for multi lidar sensors*/
-  PbfSensorObjectPtr GetLatestLidarObject();
+  std::shared_ptr<PbfSensorObject> GetLatestLidarObject();
   /**@brief get latest lidar measurement for multi radar sensors*/
-  PbfSensorObjectPtr GetLatestRadarObject();
+  std::shared_ptr<PbfSensorObject> GetLatestRadarObject();
   /**@brief get latest camera measurement for multi camera sensors*/
-  PbfSensorObjectPtr GetLatestCameraObject();
+  std::shared_ptr<PbfSensorObject> GetLatestCameraObject();
 
   int GetTrackId() const;
 
@@ -117,24 +119,25 @@ class PbfTrack {
 
  protected:
   /**@brief use obj's velocity to update obj's location to input timestamp*/
-  void PerformMotionCompensation(PbfSensorObjectPtr obj, double timestamp);
+  void PerformMotionCompensation(std::shared_ptr<PbfSensorObject> obj,
+                                 double timestamp);
 
-  void PerformMotionFusion(PbfSensorObjectPtr obj);
+  void PerformMotionFusion(std::shared_ptr<PbfSensorObject> obj);
 
-  void PerformMotionFusionAsync(PbfSensorObjectPtr obj);
+  void PerformMotionFusionAsync(std::shared_ptr<PbfSensorObject> obj);
 
   void UpdateMeasurementsLifeWithMeasurement(
-      std::map<std::string, PbfSensorObjectPtr> *objects,
+      std::map<std::string, std::shared_ptr<PbfSensorObject>> *objects,
       const std::string &sensor_id, double timestamp,
       double max_invisible_time);
 
   void UpdateMeasurementsLifeWithoutMeasurement(
-      std::map<std::string, PbfSensorObjectPtr> *objects,
+      std::map<std::string, std::shared_ptr<PbfSensorObject>> *objects,
       const std::string &sensor_id, double timestamp, double max_invisible_time,
       bool *invisible_state);
 
  protected:
-  PbfSensorObjectPtr fused_object_;
+  std::shared_ptr<PbfSensorObject> fused_object_;
 
   /**@brief time stamp of the track*/
   double fused_timestamp_;
@@ -153,9 +156,9 @@ class PbfTrack {
   std::shared_ptr<PbfBaseMotionFusion> motion_fusion_;
 
   /**@brief one object instance per sensor, might be more later*/
-  std::map<std::string, PbfSensorObjectPtr> lidar_objects_;
-  std::map<std::string, PbfSensorObjectPtr> radar_objects_;
-  std::map<std::string, PbfSensorObjectPtr> camera_objects_;
+  std::map<std::string, std::shared_ptr<PbfSensorObject>> lidar_objects_;
+  std::map<std::string, std::shared_ptr<PbfSensorObject>> radar_objects_;
+  std::map<std::string, std::shared_ptr<PbfSensorObject>> camera_objects_;
 
   bool is_dead_;
 

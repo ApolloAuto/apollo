@@ -18,6 +18,7 @@
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_  // NOLINT
 
 #include <deque>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -44,7 +45,7 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @brief initialize state of the filter
   // @params[IN] new_object: initial object for filtering
   // @return nothing
-  void Initialize(const PbfSensorObjectPtr new_object);
+  void Initialize(const std::shared_ptr<PbfSensorObject> new_object);
 
   // @brief predict the state of filter
   // @params[OUT] anchor_point:  predicted anchor point for filtering
@@ -58,7 +59,7 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @params[IN] new_object: new object for current update
   // @params[IN] time_diff: time interval from last update;
   // @return nothing
-  void UpdateWithObject(const PbfSensorObjectPtr new_object,
+  void UpdateWithObject(const std::shared_ptr<PbfSensorObject> new_object,
                         const double time_diff);
 
   // @brief update without measurements
@@ -123,4 +124,6 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_  // NOLINT
+// clang-format off
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_ // NOLINT
+// clang-format on
