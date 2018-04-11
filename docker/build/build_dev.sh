@@ -17,7 +17,7 @@
 ###############################################################################
 
 # Usage:
-#   ./build.sh ./dev.x86_64.dockerfile
+#   ./build_dev.sh ./dev.x86_64.dockerfile
 DOCKERFILE=$1
 
 
