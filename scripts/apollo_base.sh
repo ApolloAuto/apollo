@@ -109,8 +109,6 @@ function set_lib_path() {
     PY_LIB_PATH=/apollo/lib
     PY_TOOLS_PATH=/apollo/modules/tools
   else
-    local MD5=`echo -n $APOLLO_ROOT_DIR | md5sum | cut -d' ' -f1`
-    #local ROS_SETUP="${HOME}/.cache/bazel/_bazel_${USER}/${MD5}/external/ros/setup.bash"
     local ROS_SETUP="/home/tmp/ros/setup.bash"
     if [ -e "${ROS_SETUP}" ]; then
       source "${ROS_SETUP}"
@@ -136,17 +134,10 @@ function create_data_dir() {
   else
     DATA_DIR="${HOME}/data"
   fi
-  if [ ! -e "${DATA_DIR}/log" ]; then
-    mkdir -p "${DATA_DIR}/log"
-  fi
 
-  if [ ! -e "${DATA_DIR}/bag" ]; then
-    mkdir -p "${DATA_DIR}/bag"
-  fi
-
-  if [ ! -e "${DATA_DIR}/core" ]; then
-    mkdir -p "${DATA_DIR}/core"
-  fi
+  mkdir -p "${DATA_DIR}/log"
+  mkdir -p "${DATA_DIR}/bag"
+  mkdir -p "${DATA_DIR}/core"
 }
 
 function determine_bin_prefix() {
@@ -173,12 +164,17 @@ function find_device() {
 }
 
 function setup_device() {
+  if [ $(uname -s) != "Linux" ]; then
+    echo "Not on Linux, skip mapping devices."
+    return
+  fi
+
   # setup CAN device
   for INDEX in `seq 0 3`
   do
-      if [ ! -e /dev/can${INDEX} ]; then
-          sudo mknod --mode=a+rw /dev/can${INDEX} c 52 $INDEX
-      fi
+    if [ ! -e /dev/can${INDEX} ]; then
+      sudo mknod --mode=a+rw /dev/can${INDEX} c 52 $INDEX
+    fi
   done
 
   MACHINE_ARCH=$(uname -m)

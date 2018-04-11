@@ -8,6 +8,19 @@ Please follow the
 Don't forget the
 [post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
 
+### Mac Support
+
+We always recommend to run Apollo container on Ubuntu with the same version of
+the base image, but in case you want to do code development on a Mac, you can
+still try the latest
+[Docker-for-Mac](https://docs.docker.com/docker-for-mac/install)
+
+It runs on a virtual kernel which is similar to use Docker Toolkit + VirtualBox.
+Make sure you understand the [difference](https://docs.docker.com/docker-for-mac/docker-toolbox).
+
+With Mac, lots of Linux bindings are not available, which could cause problems.
+So it's basicly just an environment for code development, while not production.
+
 ## Use docker image
 
 We define two Docker images: build and release.
