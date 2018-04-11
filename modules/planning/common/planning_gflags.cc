@@ -80,14 +80,6 @@ DEFINE_double(prepare_rerouting_time, 2.0,
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
 
-DEFINE_double(spiral_smoother_max_deviation, 0.1,
-              "The max deviation of spiral reference line smoother.");
-DEFINE_int32(spiral_smoother_num_iteration, 1000,
-             "The iteration num of spiral reference line smoother.");
-DEFINE_double(spiral_smoother_piecewise_length, 10.0,
-              "The piecewise length of spiral smoother.");
-DEFINE_double(spiral_reference_line_resolution, 0.02,
-              "The output resolution for reference line.");
 DEFINE_bool(prioritize_change_lane, false,
             "change lane strategy has higher priority, always use a valid "
             "change lane path if such path exists");
@@ -348,21 +340,3 @@ DEFINE_double(lattice_stop_buffer, 0.02,
 // navigation mode
 DEFINE_double(navigation_fallback_cruise_time, 8.0,
               "The time range of fallback cruise under navigation mode.");
-
-// spiral reference line smoother
-DEFINE_double(spiral_opt_tol, 1.0e-8,
-              "The desired convergence tol for spiral opt");
-DEFINE_double(spiral_opt_acceptable_tol, 1.0e-6,
-              "The acceptable convergence tol for spiral opt");
-DEFINE_double(spiral_opt_acceptable_iter, 15,
-              "The number of acceptable iters "
-              "before termination for spiral opt");
-
-DEFINE_double(spiral_opt_weight_curve_length, 0.0,
-              "The weight of curve length term in objective function");
-DEFINE_double(spiral_opt_weight_kappa, 1.5,
-              "The weight of kappa term in objective function");
-DEFINE_double(spiral_opt_weight_dkappa, 1.0,
-              "The weight of dkappa term in objective function");
-DEFINE_double(spiral_opt_weight_d2kappa, 0.0,
-              "The weight of d2kappa term in objective function");

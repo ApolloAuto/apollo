@@ -23,7 +23,7 @@ namespace apollo {
 namespace perception {
 
 TEST(PbfSensorManagerTest, pbf_sensor_frame_manage_test) {
-  PbfSensorManager *sensor_manager = PbfSensorManager::Instance();
+  PbfSensorManager *sensor_manager = PbfSensorManager::instance();
   EXPECT_TRUE(sensor_manager != nullptr);
   SensorObjects lidar_frame;
   lidar_frame.timestamp = 1234567891.01;
@@ -40,8 +40,9 @@ TEST(PbfSensorManagerTest, pbf_sensor_frame_manage_test) {
   sensor_manager->AddSensorMeasurements(lidar_frame);
   EXPECT_TRUE(sensor_manager->GetSensor(lidar_name) != nullptr);
   Eigen::Matrix4d pose;
-  EXPECT_TRUE(
-      sensor_manager->GetPose(lidar_name, lidar_frame.timestamp, &pose));
+  const double kEpsilon = 1e-3;
+  EXPECT_TRUE(sensor_manager->GetPose(lidar_name, lidar_frame.timestamp,
+                                      kEpsilon, &pose));
   sensor_manager->AddSensorMeasurements(radar_frame);
   std::vector<PbfSensorFramePtr> frames;
   sensor_manager->GetLatestFrames(radar_frame.timestamp, &frames);
