@@ -725,6 +725,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       }
     }
 
+    std::vector<bool> b_left_index_list(MAX_LANE_SPATIAL_LABELS, false);
     vector<int> valid_lane_objects;
     valid_lane_objects.reserve((*lane_objects)->size());
 
@@ -739,9 +740,13 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       float lateral_distance = origin_lateral_dist_object_id.at(i_l).first;
 
       int index = floor(lateral_distance * INVERSE_AVEAGE_LANE_WIDTH_METER);
-      if (index < 0) {
+      if (index < 0 || index > MAX_LANE_SPATIAL_LABELS - 1) {
         continue;
       }
+      if (b_left_index_list[index] == true) {
+        continue;
+      }
+      b_left_index_list[index] = true;
       // (*lane_objects)->at(object_id).spatial =
       //     static_cast<SpatialLabelType>(spatial_index);
       (*lane_objects)->at(object_id).spatial =
@@ -756,6 +761,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     }
 
     // for right-side lanes
+    std::vector<bool> b_right_index_list(MAX_LANE_SPATIAL_LABELS, false);
     int i_r = index_closest_left + 1;
     for (int spatial_index = 0; spatial_index < MAX_LANE_SPATIAL_LABELS;
          ++spatial_index, ++i_r) {
@@ -766,9 +772,13 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       float lateral_distance = -origin_lateral_dist_object_id.at(i_r).first;
 
       int index = floor(lateral_distance * INVERSE_AVEAGE_LANE_WIDTH_METER);
-      if (index < 0) {
+      if (index < 0 || index > MAX_LANE_SPATIAL_LABELS - 1) {
         continue;
       }
+      if (b_right_index_list[index] == true) {
+        continue;
+      }
+      b_right_index_list[index] = true;
       (*lane_objects)->at(object_id).spatial =
           static_cast<SpatialLabelType>(MAX_LANE_SPATIAL_LABELS + index);
       //      (*lane_objects)->at(object_id).spatial =
