@@ -18,6 +18,7 @@
 #define MODULES_PERCEPTION_LIDAR_TRACKER_HM_TRACKER_HUNGARIAN_MATCHER_H_
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/base_matcher.h"
@@ -46,7 +47,7 @@ class HungarianMatcher : public BaseMatcher {
   void Match(std::vector<TrackedObjectPtr>* objects,
              const std::vector<ObjectTrackPtr>& tracks,
              const std::vector<Eigen::VectorXf>& tracks_predict,
-             std::vector<TrackObjectPair>* assignments,
+             std::vector<std::pair<int, int>>* assignments,
              std::vector<int>* unassigned_tracks,
              std::vector<int>* unassigned_objects);
 
@@ -61,7 +62,7 @@ class HungarianMatcher : public BaseMatcher {
   void MatchInComponents(const Eigen::MatrixXf& association_mat,
                          const std::vector<int>& track_component,
                          const std::vector<int>& obj_component,
-                         std::vector<TrackObjectPair>* sub_assignments,
+                         std::vector<std::pair<int, int>>* sub_assignments,
                          std::vector<int>* sub_unassigned_tracks,
                          std::vector<int>* sub_unassigned_objects);
 
@@ -100,7 +101,7 @@ class HungarianMatcher : public BaseMatcher {
   // @return nothing
   void AssignObjectsToTracks(const Eigen::MatrixXf& association_mat,
                              const double& assign_distance_maximum,
-                             std::vector<TrackObjectPair>* assignments,
+                             std::vector<std::pair<int, int>>* assignments,
                              std::vector<int>* unassigned_tracks,
                              std::vector<int>* unassigned_objects);
 

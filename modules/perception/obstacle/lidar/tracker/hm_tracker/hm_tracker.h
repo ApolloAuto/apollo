@@ -35,8 +35,6 @@ namespace perception {
 
 class HmObjectTracker : public BaseTracker {
  public:
-  typedef std::pair<int, int> TrackObjectPair;
-
   HmObjectTracker();
   virtual ~HmObjectTracker() = default;
 
@@ -144,7 +142,7 @@ class HmObjectTracker : public BaseTracker {
   // @return nothing
   void UpdateAssignedTracks(std::vector<Eigen::VectorXf>* tracks_predict,
                             std::vector<TrackedObjectPtr>* new_objects,
-                            const std::vector<TrackObjectPair>& assignments,
+                            const std::vector<std::pair<int, int>>& assignments,
                             const double& time_diff);
 
   // @brief update tracks without matched objects

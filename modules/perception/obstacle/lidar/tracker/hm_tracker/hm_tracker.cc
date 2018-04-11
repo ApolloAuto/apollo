@@ -378,7 +378,7 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
   ComputeTracksPredict(&tracks_predict, time_diff);
 
   // D. match objects to tracks
-  std::vector<TrackObjectPair> assignments;
+  std::vector<std::pair<int, int>> assignments;
   std::vector<int> unassigned_objects;
   std::vector<int> unassigned_tracks;
   std::vector<ObjectTrackPtr>& tracks = object_tracks_.GetTracks();
@@ -541,7 +541,8 @@ void HmObjectTracker::ComputeTracksPredict(
 void HmObjectTracker::UpdateAssignedTracks(
     std::vector<Eigen::VectorXf>* tracks_predict,
     std::vector<TrackedObjectPtr>* new_objects,
-    const std::vector<TrackObjectPair>& assignments, const double& time_diff) {
+    const std::vector<std::pair<int, int>>& assignments,
+    const double& time_diff) {
   // Update assigned tracks
   std::vector<ObjectTrackPtr>& tracks = object_tracks_.GetTracks();
   for (size_t i = 0; i < assignments.size(); i++) {
