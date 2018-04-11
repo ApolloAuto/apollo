@@ -170,7 +170,8 @@ EndConditionSampler::QueryPathTimeObstacleSamplePoints() const {
           obstacle_id, path_time_point.s(), path_time_point.t());
       SamplePoint sample_point;
       sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
-      sample_point.mutable_path_time_point()->set_s(FLAGS_default_lon_buffer);
+      sample_point.mutable_path_time_point()->set_s(
+          path_time_point.s() + FLAGS_default_lon_buffer);
       sample_point.set_ref_v(v);
       sample_points.push_back(std::move(sample_point));
     }
@@ -183,7 +184,8 @@ EndConditionSampler::QueryPathTimeObstacleSamplePoints() const {
           obstacle_id, path_time_point.s(), path_time_point.t());
       SamplePoint sample_point;
       sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
-      sample_point.mutable_path_time_point()->set_s(-FLAGS_default_lon_buffer);
+      sample_point.mutable_path_time_point()->set_s(
+          path_time_point.s() - FLAGS_default_lon_buffer);
       sample_point.set_ref_v(v);
       sample_points.push_back(std::move(sample_point));
     }

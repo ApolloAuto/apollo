@@ -21,24 +21,12 @@
 #include "modules/common/macro.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_hm_track_object_matcher.h"
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
 
 namespace apollo {
 namespace perception {
 
 using apollo::common::util::GetProtoFromFile;
-
-ProbabilisticFusion::ProbabilisticFusion()
-    : publish_sensor_id_("velodyne_64"),
-      started_(false),
-      matcher_(nullptr),
-      sensor_manager_(nullptr),
-      track_manager_(nullptr),
-      use_radar_(true),
-      use_lidar_(true),
-      use_camera_(true) {}
 
 ProbabilisticFusion::~ProbabilisticFusion() {
   if (matcher_) {
@@ -48,7 +36,7 @@ ProbabilisticFusion::~ProbabilisticFusion() {
 }
 
 bool ProbabilisticFusion::Init() {
-  sensor_manager_ = PbfSensorManager::Instance();
+  sensor_manager_ = PbfSensorManager::instance();
   ACHECK(sensor_manager_ != nullptr)
       << "Failed to get PbfSensorManager instance";
   track_manager_ = PbfTrackManager::instance();
