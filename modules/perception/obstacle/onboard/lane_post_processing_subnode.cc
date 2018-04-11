@@ -67,6 +67,7 @@ bool LanePostProcessingSubnode::InitInternal() {
       AWARN << "motion service should initialize before LanePostProcessing";
     }
     options_.use_lane_history = true;
+    AINFO << "options_.use_lane_history: " << options_.use_lane_history;
 //    options_.ConfigLaneHistory(FLAGS_lane_history_size);
   }
   // init shared data
@@ -221,8 +222,7 @@ Status LanePostProcessingSubnode::ProcEvents() {
   }
 
   LaneObjectsPtr lane_objects(new LaneObjects());
-  CameraLanePostProcessOptions options;
-  options.timestamp = event.timestamp;
+  options_.timestamp = event.timestamp;
   timestamp_ns_ = event.timestamp * 1e9;
   if (motion_event_id_ != -1) {
     if (motion_service_ == nullptr) {
@@ -236,8 +236,10 @@ Status LanePostProcessingSubnode::ProcEvents() {
 
     // TODO(gchen-apollo): add lock to read motion_buffer
     options_.SetMotion(motion_service_->GetMotionBuffer()->back());
+    AINFO  << "options_.vehicle_status.motion:  "
+           << options_.vehicle_status.motion;
   }
-  lane_post_processor_->Process(lane_map, options, &lane_objects);
+  lane_post_processor_->Process(lane_map, options_, &lane_objects);
   for (size_t i = 0; i < lane_objects->size(); ++i) {
     (*lane_objects)[i].timestamp = event.timestamp;
     (*lane_objects)[i].seq_num = seq_num_;
