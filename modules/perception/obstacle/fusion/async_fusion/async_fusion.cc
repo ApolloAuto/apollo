@@ -17,8 +17,6 @@
 #include "modules/perception/obstacle/fusion/async_fusion/async_fusion.h"
 
 #include <iomanip>
-#include <string>
-#include <vector>
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
@@ -156,7 +154,7 @@ void AsyncFusion::CreateNewTracks(
 
 void AsyncFusion::UpdateAssignedTracks(
     const std::vector<PbfSensorObjectPtr> &sensor_objects,
-    const std::vector<TrackObjectPair> &assignments,
+    const std::vector<std::pair<int, int>> &assignments,
     const std::vector<double> &track_object_dist,
     std::vector<PbfTrackPtr> const *tracks) {
   for (size_t i = 0; i < assignments.size(); ++i) {
@@ -227,7 +225,7 @@ void AsyncFusion::FuseForegroundObjects(
     std::vector<PbfSensorObjectPtr> *foreground_objects) {
   std::vector<int> unassigned_tracks;
   std::vector<int> unassigned_objects;
-  std::vector<TrackObjectPair> assignments;
+  std::vector<std::pair<int, int>> assignments;
 
   std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
 
