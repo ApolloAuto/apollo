@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_  // NOLINT
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_  // NOLINT
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -42,7 +43,8 @@ class PbfBaseMotionFusion {
   // @brief initialize the state of the filter
   // @params[IN] new_object: initial object for filtering
   // @return nothing
-  virtual void Initialize(const PbfSensorObjectPtr new_object) = 0;
+  virtual void Initialize(
+      const std::shared_ptr<PbfSensorObject> new_object) = 0;
 
   // @brief predict the state of filter
   // @params[OUT] anchor_point:  predicted anchor point for filtering
@@ -56,8 +58,9 @@ class PbfBaseMotionFusion {
   // @params[IN] new_object: new object for current update
   // @params[IN] time_diff: time interval from last update;
   // @return nothing
-  virtual void UpdateWithObject(const PbfSensorObjectPtr new_object,
-                                const double time_diff) = 0;
+  virtual void UpdateWithObject(
+      const std::shared_ptr<PbfSensorObject> new_object,
+      const double time_diff) = 0;
 
   // @brief update without measurements
   // @params[IN] time_diff: time interval from last update

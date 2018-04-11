@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_  // NOLINT
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_  // NOLINT
 
+#include <memory>
 #include <mutex>
 #include <string>
 #include <utility>
@@ -55,13 +56,14 @@ class ProbabilisticFusion : public BaseFusion {
   void FuseFrame(const PbfSensorFramePtr &frame);
 
   /**@brief create new tracks for objects not assigned to current tracks*/
-  void CreateNewTracks(const std::vector<PbfSensorObjectPtr> &sensor_objects,
-                       const std::vector<int> &unassigned_ids);
+  void CreateNewTracks(
+      const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
+      const std::vector<int> &unassigned_ids);
 
   /**@brief update current tracks with matched objects*/
   void UpdateAssignedTracks(
       std::vector<PbfTrackPtr> *tracks,
-      const std::vector<PbfSensorObjectPtr> &sensor_objects,
+      const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
       const std::vector<std::pair<int, int>> &assignments,
       const std::vector<double> &track_objects_dist);
 
@@ -76,12 +78,12 @@ class ProbabilisticFusion : public BaseFusion {
                            std::vector<ObjectPtr> *fused_objects);
 
   void DecomposeFrameObjects(
-      const std::vector<PbfSensorObjectPtr> &frame_objects,
-      std::vector<PbfSensorObjectPtr> *foreground_objects,
-      std::vector<PbfSensorObjectPtr> *background_objects);
+      const std::vector<std::shared_ptr<PbfSensorObject>> &frame_objects,
+      std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
+      std::vector<std::shared_ptr<PbfSensorObject>> *background_objects);
 
   void FuseForegroundObjects(
-      std::vector<PbfSensorObjectPtr> *foreground_objects,
+      std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
       Eigen::Vector3d ref_point, const SensorType &sensor_type,
       const std::string &sensor_id, double timestamp);
 
