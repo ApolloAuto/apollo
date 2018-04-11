@@ -186,14 +186,15 @@ bool GeometryCameraConverter::ConvertSingle(
   mass_center_v = MakeUnit(mass_center_v);
 
   // Distance search
-  *distance = SearchDistance(pixel_length, use_width, mass_center_v);
-
+  *distance = SearchDistance(pixel_length, use_width, mass_center_v,
+                             0.1f, 150.0f);
   for (size_t i = 0; i < 1; ++i) {
     // Mass center search
     SearchCenterDirection(box_center_pixel, *distance, &mass_center_v,
                           mass_center_pixel);
     // Distance search
-    *distance = SearchDistance(pixel_length, use_width, mass_center_v);
+    *distance = SearchDistance(pixel_length, use_width, mass_center_v,
+                               0.9f * (*distance), 1.1f * (*distance));
   }
 
   return true;
@@ -220,9 +221,8 @@ void GeometryCameraConverter::Rotate(
 
 float GeometryCameraConverter::SearchDistance(
     const int &pixel_length, const bool &use_width,
-    const Eigen::Matrix<float, 3, 1> &mass_center_v) {
-  float close_d = 0.1f;
-  float far_d = 200.0f;
+    const Eigen::Matrix<float, 3, 1> &mass_center_v,
+    float close_d, float far_d) {
   float curr_d = 0.0f;
   int depth = 0;
   while (close_d <= far_d && depth < kMaxDistanceSearchDepth_) {
@@ -233,7 +233,6 @@ float GeometryCameraConverter::SearchDistance(
     float max_p = 0.0f;
     for (size_t i = 0; i < corners_.size(); ++i) {
       Eigen::Vector2f point_2d = camera_model_.project(corners_[i] + curr_p);
-      pixel_corners_[i] = point_2d;
 
       float curr_pixel = 0.0f;
       if (use_width) {
@@ -250,18 +249,25 @@ float GeometryCameraConverter::SearchDistance(
     if (curr_pixel_length == pixel_length) {
       break;
     } else if (pixel_length < curr_pixel_length) {
-      close_d = curr_d + 0.01f;
+      close_d = curr_d + 0.1f;
     } else {  // pixel_length > curr_pixel_length
-      far_d = curr_d - 0.01f;
+      far_d = curr_d - 0.1f;
     }
 
-    // Early break for 0.01m accuracy
+    // Early break for 0.1m accuracy
     float next_d = (far_d + close_d) / 2.0f;
-    if (std::abs(next_d - curr_d) < 0.01f) {
+    if (std::abs(next_d - curr_d) < 0.1f) {
       break;
     }
 
     ++depth;
+  }
+
+  // Only copy the last projection out
+  Eigen::Vector3f curr_p = mass_center_v * curr_d;
+  for (size_t i = 0; i < corners_.size(); ++i) {
+    Eigen::Vector2f point_2d = camera_model_.project(corners_[i] + curr_p);
+    pixel_corners_[i] = point_2d;
   }
 
   return curr_d;
@@ -396,7 +402,7 @@ void GeometryCameraConverter::DecideAngle(const Eigen::Vector3f &camera_ray,
 
 void GeometryCameraConverter::SetBoxProjection(VisualObjectPtr obj) const {
   obj->pts8.resize(16);
-  if (obj->trunc_width < 0.25f && obj->trunc_height < 0.25f) {
+  if (obj->trunc_width < 0.25f && obj->trunc_height < 0.25f) {  // No truncation
     for (int i = 0; i < 8; i++) {
       obj->pts8[i * 2] = pixel_corners_[i].x();
       obj->pts8[i * 2 + 1] = pixel_corners_[i].y();

@@ -59,12 +59,7 @@ void ObjectCameraFilter::Create(const int &track_id, const double &timestamp,
   tracked_filters_[track_id].last_timestamp_ = timestamp;
   tracked_filters_[track_id].x_.Init(obj_ptr->center.x());
   tracked_filters_[track_id].y_.Init(obj_ptr->center.y());
-  tracked_filters_[track_id].z_.Init(obj_ptr->center.z());
-  tracked_filters_[track_id].alpha_.Init(obj_ptr->alpha);
   tracked_filters_[track_id].theta_.Init(obj_ptr->theta);
-  tracked_filters_[track_id].l_.Init(obj_ptr->length);
-  tracked_filters_[track_id].w_.Init(obj_ptr->width);
-  tracked_filters_[track_id].h_.Init(obj_ptr->height);
 }
 
 void ObjectCameraFilter::Predict(const int &track_id, const double &timestamp) {
@@ -73,12 +68,7 @@ void ObjectCameraFilter::Predict(const int &track_id, const double &timestamp) {
 
   tracked_filters_[track_id].x_.Predict(diff);
   tracked_filters_[track_id].y_.Predict(diff);
-  tracked_filters_[track_id].z_.Predict(diff);
-  tracked_filters_[track_id].alpha_.Predict(diff);
   tracked_filters_[track_id].theta_.Predict(diff);
-  tracked_filters_[track_id].l_.Predict(diff);
-  tracked_filters_[track_id].w_.Predict(diff);
-  tracked_filters_[track_id].h_.Predict(diff);
 
   tracked_filters_[track_id].lost_frame_cnt_ = 0;
   tracked_filters_[track_id].last_timestamp_ = timestamp;
@@ -88,19 +78,13 @@ void ObjectCameraFilter::Update(const int &track_id,
                                 const VisualObjectPtr &obj_ptr) {
   tracked_filters_[track_id].x_.Update(obj_ptr->center.x());
   tracked_filters_[track_id].y_.Update(obj_ptr->center.y());
-  tracked_filters_[track_id].z_.Update(obj_ptr->center.z());
-  tracked_filters_[track_id].alpha_.Update(obj_ptr->alpha);
   tracked_filters_[track_id].theta_.Update(obj_ptr->theta);
-  tracked_filters_[track_id].l_.Update(obj_ptr->length);
-  tracked_filters_[track_id].w_.Update(obj_ptr->width);
-  tracked_filters_[track_id].h_.Update(obj_ptr->height);
 }
 
 void ObjectCameraFilter::GetState(const int &track_id,
                                   VisualObjectPtr obj_ptr) {
   auto x_state = tracked_filters_[track_id].x_.GetState();
   auto y_state = tracked_filters_[track_id].y_.GetState();
-  auto z_state = tracked_filters_[track_id].z_.GetState();
   auto x_state_cov = tracked_filters_[track_id].x_.GetCov();
   auto y_state_cov = tracked_filters_[track_id].y_.GetCov();
 
@@ -110,8 +94,8 @@ void ObjectCameraFilter::GetState(const int &track_id,
   obj_ptr->center.y() = y_state.x();
   obj_ptr->velocity.y() = y_state.y();
 
-  obj_ptr->center.z() = z_state.x();
-  obj_ptr->velocity.z() = z_state.y();
+  obj_ptr->center.z() = 0.0f;
+  obj_ptr->velocity.z() = 0.0f;
 
   obj_ptr->state_uncertainty.block(0, 0, 2, 2) << x_state_cov(0, 0), 0, 0,
       y_state_cov(0, 0);
@@ -122,16 +106,9 @@ void ObjectCameraFilter::GetState(const int &track_id,
   obj_ptr->state_uncertainty.block(2, 0, 2, 2) << x_state_cov(1, 0), 0, 0,
       y_state_cov(1, 0);
 
-  // std::cerr << "PBFIMF:state uncertainty" << obj_ptr->state_uncertainty <<
-  // std::endl;
-  // std::cerr << "PBFIMF:x state cov" << x_state_cov << std::endl;
-  // std::cerr << "PBFIMF:y state cov" << y_state_cov << std::endl;
-
-  obj_ptr->alpha = tracked_filters_[track_id].alpha_.GetState().x();
   obj_ptr->theta = tracked_filters_[track_id].theta_.GetState().x();
-  obj_ptr->length = tracked_filters_[track_id].l_.GetState().x();
-  obj_ptr->width = tracked_filters_[track_id].w_.GetState().x();
-  obj_ptr->height = tracked_filters_[track_id].h_.GetState().x();
+  obj_ptr->direction = Eigen::Vector3f(cos(obj_ptr->theta),
+                                       0.0f, -sin(obj_ptr->theta));
 }
 
 void ObjectCameraFilter::Destroy() {
