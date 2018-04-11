@@ -28,8 +28,6 @@
 namespace apollo {
 namespace perception {
 
-typedef std::pair<int, int> TrackObjectPair;
-
 struct TrackObjectMatcherOptions {
   const Eigen::Vector3d *ref_point = nullptr;
 };
@@ -37,7 +35,7 @@ struct TrackObjectMatcherOptions {
 class PbfBaseTrackObjectMatcher {
  public:
   PbfBaseTrackObjectMatcher() {}
-  virtual ~PbfBaseTrackObjectMatcher() {}
+  virtual ~PbfBaseTrackObjectMatcher() = default;
 
   // @brief match sensor objects to global tracks build previously
   // @params[IN] fusion_tracks: global tracks
@@ -54,7 +52,7 @@ class PbfBaseTrackObjectMatcher {
   virtual bool Match(const std::vector<PbfTrackPtr> &fusion_tracks,
                      const std::vector<PbfSensorObjectPtr> &sensor_objects,
                      const TrackObjectMatcherOptions &options,
-                     std::vector<TrackObjectPair> *assignments,
+                     std::vector<std::pair<int, int>> *assignments,
                      std::vector<int> *unassigned_fusion_tracks,
                      std::vector<int> *unassigned_sensor_tracks,
                      std::vector<double> *track2measurements_dist,
@@ -66,11 +64,11 @@ class PbfBaseTrackObjectMatcher {
 
   void IdAssign(const std::vector<PbfTrackPtr> &fusion_tracks,
                 const std::vector<PbfSensorObjectPtr> &sensor_objects,
-                std::vector<TrackObjectPair> *assignments,
+                std::vector<std::pair<int, int>> *assignments,
                 std::vector<int> *unassigned_fusion_tracks,
                 std::vector<int> *unassigned_sensor_objects);
 
-  static void SetMaxMatchDistance(double dist);
+  static void SetMaxMatchDistance(const double dist);
 
   static double GetMaxMatchDistance();
 
