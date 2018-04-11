@@ -28,6 +28,13 @@ function source_apollo_base() {
 }
 
 function apollo_check_system_config() {
+  # check docker environment
+  if [ ${MACHINE_ARCH} == "x86_64" ] && [ $(hostname) != "in_dev_docker" ] &&
+       [ $(hostname) != "in_release_docker" ]; then
+    echo -e "${RED}Must run $0 in dev docker or release docker${NO_COLOR}"
+    exit 0
+  fi
+
   # check operating system
   OP_SYSTEM=$(uname -s)
   case $OP_SYSTEM in
@@ -111,6 +118,7 @@ function generate_build_targets() {
 
 function build() {
   START_TIME=$(get_now)
+
 
   info "Start building, please wait ..."
   generate_build_targets
@@ -577,8 +585,8 @@ function print_usage() {
 
 function main() {
   source_apollo_base
-  apollo_check_system_config
   check_machine_arch
+  apollo_check_system_config
   check_esd_files
 
   DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
