@@ -516,9 +516,13 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
   }
 
   time_stamp_ = options.timestamp;
+//  AINFO << "use history: " << options.use_lane_history;
+//  AINFO << "use history: " << use_history_;
+
   if (options.use_lane_history && !use_history_) {
     InitLaneHistory();
   }
+//  AINFO << "use history: " << use_history_;
 
   cur_lane_instances_.reset(new vector<LaneInstance>);
   if (!GenerateLaneInstances(lane_map)) {
@@ -807,6 +811,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     if (CorrectWithLaneHistory(*lane_objects)) {
       lane_history_.push_back(*(*lane_objects));
     } else {
+      AINFO << "use history instead of current lane detection";
       lane_history_.pop_front();
     }
     auto vs = options.vehicle_status;
@@ -859,7 +864,7 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(LaneObjectsPtr lane_objects) {
       // fit a 2nd-order polynomial curve;
       lane.order = 2;
     }
-
+    AINFO << "history size: " << lane.point_num;
     if (lane.point_num < 2 ||
         !PolyFit(lane.pos, lane.order, &(lane.model))) {
        AWARN  << "failed to fit " << lane.order
@@ -887,7 +892,9 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(LaneObjectsPtr lane_objects) {
                               lane.model));
         count++;
       }
+      AINFO << "lane average delta: " << ave_delta << " / " << count;
       if (count == 0 || ave_delta/count > AVEAGE_LANE_WIDTH_METER/2.0) {
+        if (count > 0) AINFO << "ave_delta is: " << ave_delta/count;
         lane_objects->erase(lane_objects->begin() + idx);
         lane_objects->push_back(lane);
       } else {
@@ -918,6 +925,7 @@ bool CCLanePostProcessor::FindLane(const LaneObjects &lane_objects,
 
 void CCLanePostProcessor::InitLaneHistory() {
   use_history_ = true;
+  AINFO << "Init Lane History Start;";
   lane_history_.set_capacity(MAX_LANE_HISTORY);
   motion_buffer_ = std::make_shared<MotionBuffer>(MAX_LANE_HISTORY);
   generated_lanes_ = std::make_shared<LaneObjects>(interested_labels_.size(),
@@ -925,6 +933,7 @@ void CCLanePostProcessor::InitLaneHistory() {
   for (std::size_t i = 0; i < generated_lanes_->size(); i++) {
     generated_lanes_->at(i).spatial = interested_labels_[i];
   }
+  AINFO << "Init Lane History Done;";
 }
 
 void CCLanePostProcessor::FilterWithLaneHistory(LaneObjectsPtr lane_objects) {
