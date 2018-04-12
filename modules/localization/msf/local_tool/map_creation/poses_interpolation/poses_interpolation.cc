@@ -79,9 +79,10 @@ void PosesInterpolation::LoadPCDTimestamp() {
 void PosesInterpolation::WritePCDPoses() {
   std::ofstream fout;
   fout.open(out_poses_path_.c_str(), std::ofstream::out);
-  fout.setf(std::ios::fixed, std::ios::floatfield);
 
   if (fout.is_open()) {
+    fout.setf(std::ios::fixed, std::ios::floatfield);
+    fout.precision(6);
     for (size_t i = 0; i < out_poses_.size(); i++) {
       double timestamp = out_timestamps_[i];
 
@@ -93,11 +94,11 @@ void PosesInterpolation::WritePCDPoses() {
       double qz = quatd.z();
       double qr = quatd.w();
 
-      fout.precision(6);
       fout << out_indexes_[i] << " " << timestamp << " " << transd.x() << " "
            << transd.y() << " " << transd.z() << " " << qx << " " << qy << " "
            << qz << " " << qr << "\n";
     }
+
     fout.close();
   } else {
     std::cerr << "Can't open file to write: " << out_poses_path_ << std::endl;
