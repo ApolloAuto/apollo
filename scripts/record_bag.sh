@@ -30,6 +30,7 @@ function start() {
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     nohup rosbag record --split --duration=1m -b 2048  \
+        /apollo/sensor/camera/obstacle/front_6mm \
         /apollo/sensor/conti_radar \
         /apollo/sensor/delphi_esr \
         /apollo/sensor/gnss/best_pose \
