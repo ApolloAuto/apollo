@@ -117,14 +117,6 @@ bool MapService::ReloadMap(bool force_reload) {
   if (force_reload) {
     ret = HDMapUtil::ReloadMaps();
   }
-  hdmap_ = HDMapUtil::BaseMapPtr();
-  sim_map_ = use_sim_map_ ? HDMapUtil::SimMapPtr() : HDMapUtil::BaseMapPtr();
-  if (hdmap_ == nullptr || sim_map_ == nullptr) {
-    pending_ = true;
-    AWARN << "No map data available yet.";
-  } else {
-    pending_ = false;
-  }
 
   // Update the x,y-offsets if present.
   UpdateOffsets();
@@ -177,39 +169,49 @@ void MapService::UpdateOffsets() {
         << y_offset_;
 }
 
+const hdmap::HDMap *MapService::HDMap() const {
+  return HDMapUtil::BaseMapPtr();
+}
+
+const hdmap::HDMap *MapService::SimMap() const {
+  return use_sim_map_ ? HDMapUtil::SimMapPtr() : HDMapUtil::BaseMapPtr();
+}
+
+bool MapService::MapReady() const { return HDMap() && SimMap(); }
+
 void MapService::CollectMapElementIds(const PointENU &point, double radius,
                                       MapElementIds *ids) const {
-  if (pending_) {
+  if (!MapReady()) {
     return;
   }
   boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
   std::vector<LaneInfoConstPtr> lanes;
-  if (sim_map_->GetLanes(point, radius, &lanes) != 0) {
+  if (SimMap()->GetLanes(point, radius, &lanes) != 0) {
     AERROR << "Fail to get lanes from sim_map.";
   }
   ExtractRoadAndLaneIds(lanes, ids->mutable_lane(), ids->mutable_road());
 
   std::vector<ClearAreaInfoConstPtr> clear_areas;
-  if (sim_map_->GetClearAreas(point, radius, &clear_areas) != 0) {
+  if (SimMap()->GetClearAreas(point, radius, &clear_areas) != 0) {
     AERROR << "Fail to get clear areas from sim_map.";
   }
   ExtractIds(clear_areas, ids->mutable_clear_area());
 
   std::vector<CrosswalkInfoConstPtr> crosswalks;
-  if (sim_map_->GetCrosswalks(point, radius, &crosswalks) != 0) {
+  if (SimMap()->GetCrosswalks(point, radius, &crosswalks) != 0) {
     AERROR << "Fail to get crosswalks from sim_map.";
   }
   ExtractIds(crosswalks, ids->mutable_crosswalk());
 
   std::vector<JunctionInfoConstPtr> junctions;
-  if (sim_map_->GetJunctions(point, radius, &junctions) != 0) {
+  if (SimMap()->GetJunctions(point, radius, &junctions) != 0) {
     AERROR << "Fail to get junctions from sim_map.";
   }
   ExtractIds(junctions, ids->mutable_junction());
 
   std::vector<SignalInfoConstPtr> signals;
-  if (sim_map_->GetSignals(point, radius, &signals) != 0) {
+  if (SimMap()->GetSignals(point, radius, &signals) != 0) {
     AERROR << "Failed to get signals from sim_map.";
   }
 
@@ -217,14 +219,14 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
   ExtractOverlapIds(signals, ids->mutable_overlap());
 
   std::vector<StopSignInfoConstPtr> stop_signs;
-  if (sim_map_->GetStopSigns(point, radius, &stop_signs) != 0) {
+  if (SimMap()->GetStopSigns(point, radius, &stop_signs) != 0) {
     AERROR << "Failed to get stop signs from sim_map.";
   }
   ExtractIds(stop_signs, ids->mutable_stop_sign());
   ExtractOverlapIds(stop_signs, ids->mutable_overlap());
 
   std::vector<YieldSignInfoConstPtr> yield_signs;
-  if (sim_map_->GetYieldSigns(point, radius, &yield_signs) != 0) {
+  if (SimMap()->GetYieldSigns(point, radius, &yield_signs) != 0) {
     AERROR << "Failed to get yield signs from sim_map.";
   }
   ExtractIds(yield_signs, ids->mutable_yield());
@@ -234,14 +236,14 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
   boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
   Map result;
-  if (pending_) {
+  if (!MapReady()) {
     return result;
   }
   Id map_id;
 
   for (const auto &id : ids.lane()) {
     map_id.set_id(id);
-    auto element = sim_map_->GetLaneById(map_id);
+    auto element = SimMap()->GetLaneById(map_id);
     if (element) {
       auto lane = element->lane();
       lane.clear_left_sample();
@@ -254,7 +256,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.clear_area()) {
     map_id.set_id(id);
-    auto element = sim_map_->GetClearAreaById(map_id);
+    auto element = SimMap()->GetClearAreaById(map_id);
     if (element) {
       *result.add_clear_area() = element->clear_area();
     }
@@ -262,7 +264,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.crosswalk()) {
     map_id.set_id(id);
-    auto element = sim_map_->GetCrosswalkById(map_id);
+    auto element = SimMap()->GetCrosswalkById(map_id);
     if (element) {
       *result.add_crosswalk() = element->crosswalk();
     }
@@ -270,7 +272,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.junction()) {
     map_id.set_id(id);
-    auto element = sim_map_->GetJunctionById(map_id);
+    auto element = SimMap()->GetJunctionById(map_id);
     if (element) {
       *result.add_junction() = element->junction();
     }
@@ -278,7 +280,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.signal()) {
     map_id.set_id(id);
-    auto element = sim_map_->GetSignalById(map_id);
+    auto element = SimMap()->GetSignalById(map_id);
     if (element) {
       *result.add_signal() = element->signal();
     }
@@ -286,7 +288,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.stop_sign()) {
     map_id.set_id(id);
-    auto element = sim_map_->GetStopSignById(map_id);
+    auto element = SimMap()->GetStopSignById(map_id);
     if (element) {
       *result.add_stop_sign() = element->stop_sign();
     }
@@ -294,7 +296,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.yield()) {
     map_id.set_id(id);
-    auto element = sim_map_->GetYieldSignById(map_id);
+    auto element = SimMap()->GetYieldSignById(map_id);
     if (element) {
       *result.add_yield() = element->yield_sign();
     }
@@ -302,7 +304,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.road()) {
     map_id.set_id(id);
-    auto element = sim_map_->GetRoadById(map_id);
+    auto element = SimMap()->GetRoadById(map_id);
     if (element) {
       *result.add_road() = element->road();
     }
@@ -310,7 +312,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 
   for (const auto &id : ids.overlap()) {
     map_id.set_id(id);
-    auto element = sim_map_->GetOverlapById(map_id);
+    auto element = SimMap()->GetOverlapById(map_id);
     if (element) {
       *result.add_overlap() = element->overlap();
     }
@@ -327,8 +329,8 @@ bool MapService::GetNearestLane(const double x, const double y,
   PointENU point;
   point.set_x(x);
   point.set_y(y);
-  if (pending_ ||
-      hdmap_->GetNearestLane(point, nearest_lane, nearest_s, nearest_l) < 0) {
+  if (!MapReady() ||
+      HDMap()->GetNearestLane(point, nearest_lane, nearest_s, nearest_l) < 0) {
     AERROR << "Failed to get nearest lane!";
     return false;
   }
@@ -400,14 +402,14 @@ bool MapService::CreatePathsFromRouting(const RoutingResponse &routing,
 
 bool MapService::AddPathFromPassageRegion(
     const routing::Passage &passage_region, std::vector<Path> *paths) const {
-  if (pending_) {
+  if (!MapReady()) {
     return false;
   }
   boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
   RouteSegments segments;
   for (const auto &segment : passage_region.segment()) {
-    auto lane_ptr = hdmap_->GetLaneById(hdmap::MakeMapId(segment.id()));
+    auto lane_ptr = HDMap()->GetLaneById(hdmap::MakeMapId(segment.id()));
     if (!lane_ptr) {
       AERROR << "Failed to find lane: " << segment.id();
       return false;
