@@ -270,9 +270,9 @@ int main(int argc, char** argv) {
       const Eigen::Affine3d& pcd_pose = poses[trial_frame_idx];
       apollo::localization::msf::velodyne::LoadPcds(
           pcd_file_path, trial_frame_idx, pcd_pose, &velodyne_frame, false);
-      std::cout << "Loaded " << velodyne_frame.pt3ds.size()
-                << "3D Points at Trial: " << trial
-                << " Frame: " << trial_frame_idx << "." << std::endl;
+      AERROR << "Loaded " << velodyne_frame.pt3ds.size()
+             << "3D Points at Trial: " << trial << " Frame: " << trial_frame_idx
+             << ".";
 
       for (size_t i = 0; i < velodyne_frame.pt3ds.size(); ++i) {
         Eigen::Vector3d& pt3d_local = velodyne_frame.pt3ds[i];
@@ -325,14 +325,14 @@ int main(int argc, char** argv) {
         std::vector<unsigned int> layer_counts;
         map.GetCountSafe(pt3d, zone_id, resolution_id, &layer_counts);
         if (layer_counts.size() == 0) {
-          std::cout << "No ground layer, skip." << std::endl;
+          AERROR << "No ground layer, skip.";
           continue;
         }
         if (layer_counts[layer_id] > 0) {
           std::vector<float> layer_alts;
           map.GetAltSafe(pt3d, zone_id, resolution_id, &layer_alts);
-          if (layer_alts.size() == 0) {
-            std::cout << "No ground points, skip." << std::cout;
+          if (layer_alts.empty()) {
+            AERROR << "No ground points, skip.";
             continue;
           }
           float alt = layer_alts[layer_id];
@@ -356,8 +356,6 @@ int main(int argc, char** argv) {
   map.GetConfig().map_ground_height_offset_ = mean_height_diff;
   std::string config_path = map.GetConfig().map_folder_path_ + "/config.xml";
   map.GetConfig().Save(config_path);
-  std::cout << "Mean: " << mean_height_diff << ", Var: " << var_height_diff
-            << "." << std::endl;
-
+  ADEBUG << "Mean: " << mean_height_diff << ", Var: " << var_height_diff << ".";
   return 0;
 }
