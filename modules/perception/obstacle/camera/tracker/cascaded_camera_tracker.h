@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <map>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -53,7 +54,7 @@ class CascadedCameraTracker : public BaseCameraTracker {
   bool Init() override;
 
   bool Associate(const cv::Mat& img, const double& timestamp,
-                 std::vector<VisualObjectPtr>* objects) override;
+                 std::vector<std::shared_ptr<VisualObject>>* objects) override;
 
   std::string Name() const override;
 

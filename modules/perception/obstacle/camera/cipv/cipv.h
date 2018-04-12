@@ -78,12 +78,12 @@ class Cipv {
                        EgoLane *egolane_image, EgoLane *egolane_ground);
 
   // Get closest edge of an object in image cooridnate
-  bool FindClosestEdgeOfObjectImage(const ObjectPtr &object,
+  bool FindClosestEdgeOfObjectImage(const std::shared_ptr<Object> &object,
                                     const EgoLane &egolane_image,
                                     LineSegment2Df *closted_object_edge);
 
   // Get closest edge of an object in ground cooridnate
-  bool FindClosestEdgeOfObjectGround(const ObjectPtr &object,
+  bool FindClosestEdgeOfObjectGround(const std::shared_ptr<Object> &object,
                                      const EgoLane &egolane_ground,
                                      LineSegment2Df *closted_object_edge);
 
@@ -94,7 +94,7 @@ class Cipv {
                         const float distance_end_point_to_left_lane);
 
   // Check if the object is in the lane in image space
-  bool IsObjectInTheLaneImage(const ObjectPtr &object,
+  bool IsObjectInTheLaneImage(const std::shared_ptr<Object> &object,
                               const EgoLane &egolane_image);
   // Check if the object is in the lane in ego-ground space
   //  |           |
@@ -104,11 +104,12 @@ class Cipv {
   // *+------*    |
   //  |           |
   // l_lane     r_lane
-  bool IsObjectInTheLaneGround(const ObjectPtr &object,
+  bool IsObjectInTheLaneGround(const std::shared_ptr<Object> &object,
                                const EgoLane &egolane_ground);
 
   // Check if the object is in the lane in ego-ground space
-  bool IsObjectInTheLane(const ObjectPtr &object, const EgoLane &egolane_image,
+  bool IsObjectInTheLane(const std::shared_ptr<Object> &object,
+                         const EgoLane &egolane_image,
                          const EgoLane &egolane_ground);
 
   // Check if a point is left of a line segment

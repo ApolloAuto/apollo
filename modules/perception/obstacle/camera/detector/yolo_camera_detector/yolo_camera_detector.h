@@ -50,12 +50,13 @@ class YoloCameraDetector : public BaseCameraDetector {
                 CameraDetectorInitOptions()) override;
 
   bool Detect(const cv::Mat &frame, const CameraDetectorOptions &options,
-              std::vector<VisualObjectPtr> *objects) override;
+              std::vector<std::shared_ptr<VisualObject>> *objects) override;
 
   bool Multitask(const cv::Mat &frame, const CameraDetectorOptions &options,
-                 std::vector<VisualObjectPtr> *objects, cv::Mat *mask);
+                 std::vector<std::shared_ptr<VisualObject>> *objects,
+                 cv::Mat *mask);
 
-  bool Extract(std::vector<VisualObjectPtr> *objects) {
+  bool Extract(std::vector<std::shared_ptr<VisualObject>> *objects) {
     for (auto &extractor : extractors_) {
       extractor->extract(objects);
     }
@@ -73,8 +74,8 @@ class YoloCameraDetector : public BaseCameraDetector {
 
   void init_anchor(const std::string &yolo_root);
 
-  bool get_objects_cpu(std::vector<VisualObjectPtr> *objects);
-  bool get_objects_gpu(std::vector<VisualObjectPtr> *objects);
+  bool get_objects_cpu(std::vector<std::shared_ptr<VisualObject>> *objects);
+  bool get_objects_gpu(std::vector<std::shared_ptr<VisualObject>> *objects);
 
   void get_object_helper(int idx, const float *loc_data, const float *obj_data,
                          const float *cls_data, const float *ori_data,

@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <numeric>
-
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
+
+#include <numeric>
 
 #include "modules/perception/common/geometry_util.h"
 
@@ -56,12 +56,12 @@ bool DummyGroundDetector::Detect(const GroundDetectorOptions &options,
 bool DummySegmentation::Segment(const PointCloudPtr &cloud,
                                 const PointIndices &non_ground_indices,
                                 const SegmentationOptions &options,
-                                std::vector<ObjectPtr> *objects) {
+                                std::vector<std::shared_ptr<Object>> *objects) {
   return result_segment_;
 }
 
 void DummyObjectBuilder::BuildObject(const ObjectBuilderOptions &options,
-                                     ObjectPtr obj) {
+                                     std::shared_ptr<Object> obj) {
   Eigen::Vector4f min_pt;
   Eigen::Vector4f max_pt;
   PointCloudPtr cloud = obj->cloud;
@@ -89,7 +89,7 @@ void DummyObjectBuilder::BuildObject(const ObjectBuilderOptions &options,
 }
 
 bool DummyObjectBuilder::Build(const ObjectBuilderOptions &options,
-                               std::vector<ObjectPtr> *objects) {
+                               std::vector<std::shared_ptr<Object>> *objects) {
   if (objects == NULL) {
     return false;
   }
@@ -105,13 +105,14 @@ bool DummyObjectBuilder::Build(const ObjectBuilderOptions &options,
 }
 
 bool DummyObjectFilter::Filter(const ObjectFilterOptions &obj_filter_options,
-                               std::vector<ObjectPtr> *objects) {
+                               std::vector<std::shared_ptr<Object>> *objects) {
   return result_object_filter_;
 }
 
-bool DummyTracker::Track(const std::vector<ObjectPtr> &objects,
-                         double timestamp, const TrackerOptions &options,
-                         std::vector<ObjectPtr> *tracked_objects) {
+bool DummyTracker::Track(
+    const std::vector<std::shared_ptr<Object>> &objects, double timestamp,
+    const TrackerOptions &options,
+    std::vector<std::shared_ptr<Object>> *tracked_objects) {
   if (tracked_objects == nullptr || options.velodyne_trans == nullptr) {
     return result_track_;
   }
@@ -120,7 +121,7 @@ bool DummyTracker::Track(const std::vector<ObjectPtr> &objects,
   // transform objects
   (*tracked_objects).resize(objects.size());
   for (size_t i = 0; i < objects.size(); i++) {
-    ObjectPtr obj(new Object());
+    std::shared_ptr<Object> obj(new Object());
     obj->clone(*objects[i]);
     const Eigen::Vector3d &dir = obj->direction;
     obj->direction =
@@ -148,7 +149,7 @@ bool DummyTracker::Track(const std::vector<ObjectPtr> &objects,
 }
 
 bool DummyTypeFuser::FuseType(const TypeFuserOptions &options,
-                              std::vector<ObjectPtr> *objects) {
+                              std::vector<std::shared_ptr<Object>> *objects) {
   return result_type_fuser_;
 }
 

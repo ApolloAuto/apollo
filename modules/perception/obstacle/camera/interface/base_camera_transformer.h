@@ -20,6 +20,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_TRANSFORMER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_TRANSFORMER_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -43,7 +44,8 @@ class BaseCameraTransformer {
   // @brief: Transform 3D position of objects into targeted space
   // @param [in/out] objects : object lists with 3D positions in camera space,
   // which get transformed into targeted 3D space
-  virtual bool Transform(std::vector<VisualObjectPtr>* objects) = 0;
+  virtual bool Transform(
+      std::vector<std::shared_ptr<VisualObject>>* objects) = 0;
 
   virtual bool SetExtrinsics(const Eigen::Matrix<double, 4, 4>& extrinsics) = 0;
 

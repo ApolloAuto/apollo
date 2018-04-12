@@ -17,8 +17,10 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_TRACK_H_
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_RADAR_TRACK_H_
 
-#include <Eigen/Core>
 #include <memory>
+
+#include "Eigen/Core"
+
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -40,15 +42,16 @@ class RadarTrack {
   ~RadarTrack() {}
 
   // update the object after association with a radar obervation
-  void UpdataObsRadar(ObjectPtr obs_radar, const double timestamp);
+  void UpdataObsRadar(std::shared_ptr<Object> obs_radar,
+                      const double timestamp);
 
-  void SetObsRadar(ObjectPtr obs_radar);
+  void SetObsRadar(std::shared_ptr<Object> obs_radar);
 
   void IncreaseTrackedTimes();
 
   int GetObsId() const;
 
-  ObjectPtr GetObsRadar();
+  std::shared_ptr<Object> GetObsRadar();
 
   double GetTimestamp();
 
@@ -63,7 +66,7 @@ class RadarTrack {
   static int s_tracked_times_threshold_;
   int obs_id_;
   double timestamp_;
-  ObjectPtr obs_radar_;  // observation from radar
+  std::shared_ptr<Object> obs_radar_;  // observation from radar
   int tracked_times_;
   double tracking_time_;
   bool id_tracked_;

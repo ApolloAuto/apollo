@@ -44,7 +44,8 @@ bool GeometryCameraConverter::Init() {
   return true;
 }
 
-bool GeometryCameraConverter::Convert(std::vector<VisualObjectPtr> *objects) {
+bool GeometryCameraConverter::Convert(
+    std::vector<std::shared_ptr<VisualObject>> *objects) {
   if (!objects) return false;
 
   for (auto &obj : *objects) {
@@ -324,7 +325,8 @@ Eigen::Matrix<float, 3, 1> GeometryCameraConverter::MakeUnit(
   return unit_v;
 }
 
-void GeometryCameraConverter::CheckSizeSanity(VisualObjectPtr obj) const {
+void GeometryCameraConverter::CheckSizeSanity(
+    std::shared_ptr<VisualObject> obj) const {
   if (obj->type == ObjectType::VEHICLE) {
     obj->length = std::max(obj->length, 3.6f);
     obj->width = std::max(obj->width, 1.6f);
@@ -345,7 +347,8 @@ void GeometryCameraConverter::CheckSizeSanity(VisualObjectPtr obj) const {
 }
 
 void GeometryCameraConverter::CheckTruncation(
-    VisualObjectPtr obj, Eigen::Matrix<float, 2, 1> *trunc_center_pixel) const {
+    std::shared_ptr<VisualObject> obj,
+    Eigen::Matrix<float, 2, 1> *trunc_center_pixel) const {
   auto width = camera_model_.get_width();
   auto height = camera_model_.get_height();
 
@@ -369,15 +372,16 @@ void GeometryCameraConverter::CheckTruncation(
   trunc_center_pixel->y() = (obj->upper_left.y() + obj->lower_right.y()) / 2.0f;
 }
 
-float GeometryCameraConverter::DecideDistance(const float &distance_h,
-                                              const float &distance_w,
-                                              VisualObjectPtr obj) const {
+float GeometryCameraConverter::DecideDistance(
+    const float &distance_h, const float &distance_w,
+    std::shared_ptr<VisualObject> obj) const {
   float distance = distance_h;
   return distance;
 }
 
-void GeometryCameraConverter::DecideAngle(const Eigen::Vector3f &camera_ray,
-                                          VisualObjectPtr obj) const {
+void GeometryCameraConverter::DecideAngle(
+    const Eigen::Vector3f &camera_ray,
+    std::shared_ptr<VisualObject> obj) const {
   float beta = std::atan2(camera_ray.x(), camera_ray.z());
 
   // Orientation is not reliable in these cases (DL model specific issue)
@@ -400,7 +404,8 @@ void GeometryCameraConverter::DecideAngle(const Eigen::Vector3f &camera_ray,
   }
 }
 
-void GeometryCameraConverter::SetBoxProjection(VisualObjectPtr obj) const {
+void GeometryCameraConverter::SetBoxProjection(
+    std::shared_ptr<VisualObject> obj) const {
   obj->pts8.resize(16);
   if (obj->trunc_width < 0.25f && obj->trunc_height < 0.25f) {  // No truncation
     for (int i = 0; i < 8; i++) {

@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
+
 #include <map>
 #include <numeric>
 
@@ -21,7 +23,6 @@
 #include "modules/perception/common/geometry_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/feature_descriptor.h"
-#include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hungarian_matcher.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/kalman_filter.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/track_object_distance.h"
@@ -345,9 +346,10 @@ const std::vector<ObjectTrackPtr>& HmObjectTracker::GetObjectTracks() const {
   return object_tracks_.GetTracks();
 }
 
-bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
-                            double timestamp, const TrackerOptions& options,
-                            std::vector<ObjectPtr>* tracked_objects) {
+bool HmObjectTracker::Track(
+    const std::vector<std::shared_ptr<Object>>& objects, double timestamp,
+    const TrackerOptions& options,
+    std::vector<std::shared_ptr<Object>>* tracked_objects) {
   // A. track setup
   if (tracked_objects == nullptr) return false;
   if (!valid_) {
@@ -369,7 +371,7 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
   TransformPoseGlobal2Local(&velo2world_pose);
   ADEBUG << "velo2local_pose\n" << velo2world_pose;
   // B.2 construct objects for tracking
-  std::vector<TrackedObjectPtr> transformed_objects;
+  std::vector<std::shared_ptr<TrackedObject>> transformed_objects;
   ConstructTrackedObjects(objects, &transformed_objects, velo2world_pose,
                           options);
 
@@ -409,10 +411,10 @@ bool HmObjectTracker::Track(const std::vector<ObjectPtr>& objects,
   return true;
 }
 
-bool HmObjectTracker::Initialize(const std::vector<ObjectPtr>& objects,
-                                 const double& timestamp,
-                                 const TrackerOptions& options,
-                                 std::vector<ObjectPtr>* tracked_objects) {
+bool HmObjectTracker::Initialize(
+    const std::vector<std::shared_ptr<Object>>& objects,
+    const double& timestamp, const TrackerOptions& options,
+    std::vector<std::shared_ptr<Object>>* tracked_objects) {
   // A. track setup
   Eigen::Matrix4d velo2world_pose = Eigen::Matrix4d::Identity();
   if (options.velodyne_trans != nullptr) {
@@ -429,7 +431,7 @@ bool HmObjectTracker::Initialize(const std::vector<ObjectPtr>& objects,
   TransformPoseGlobal2Local(&velo2world_pose);
   ADEBUG << "velo2local_pose\n" << velo2world_pose;
   // B.2 construct tracked objects
-  std::vector<TrackedObjectPtr> transformed_objects;
+  std::vector<std::shared_ptr<TrackedObject>> transformed_objects;
   ConstructTrackedObjects(objects, &transformed_objects, velo2world_pose,
                           options);
 
@@ -452,14 +454,14 @@ void HmObjectTracker::TransformPoseGlobal2Local(Eigen::Matrix4d* pose) {
 }
 
 void HmObjectTracker::ConstructTrackedObjects(
-    const std::vector<ObjectPtr>& objects,
-    std::vector<TrackedObjectPtr>* tracked_objects, const Eigen::Matrix4d& pose,
-    const TrackerOptions& options) {
+    const std::vector<std::shared_ptr<Object>>& objects,
+    std::vector<std::shared_ptr<TrackedObject>>* tracked_objects,
+    const Eigen::Matrix4d& pose, const TrackerOptions& options) {
   int num_objects = objects.size();
   tracked_objects->clear();
   tracked_objects->resize(num_objects);
   for (int i = 0; i < num_objects; ++i) {
-    ObjectPtr obj(new Object());
+    std::shared_ptr<Object> obj(new Object());
     obj->clone(*objects[i]);
     (*tracked_objects)[i].reset(new TrackedObject(obj));
     // Computing shape featrue
@@ -486,15 +488,16 @@ void HmObjectTracker::ConstructTrackedObjects(
   }
 }
 
-void HmObjectTracker::ComputeShapeFeatures(TrackedObjectPtr* obj) {
+void HmObjectTracker::ComputeShapeFeatures(
+    std::shared_ptr<TrackedObject>* obj) {
   // Compute object's shape feature
-  ObjectPtr& temp_object = (*obj)->object_ptr;
+  std::shared_ptr<Object>& temp_object = (*obj)->object_ptr;
   FeatureDescriptor fd(temp_object->cloud);
   fd.ComputeHistogram(histogram_bin_size_, &temp_object->shape_features);
 }
 
-void HmObjectTracker::TransformTrackedObject(TrackedObjectPtr* obj,
-                                             const Eigen::Matrix4d& pose) {
+void HmObjectTracker::TransformTrackedObject(
+    std::shared_ptr<TrackedObject>* obj, const Eigen::Matrix4d& pose) {
   // Transform tracked object with given pose
   TransformObject(&((*obj)->object_ptr), pose);
   // transform direction
@@ -514,7 +517,7 @@ void HmObjectTracker::TransformTrackedObject(TrackedObjectPtr* obj,
           .cast<float>();
 }
 
-void HmObjectTracker::TransformObject(ObjectPtr* obj,
+void HmObjectTracker::TransformObject(std::shared_ptr<Object>* obj,
                                       const Eigen::Matrix4d& pose) {
   // Transform object with given pose
   Eigen::Vector3d& dir = (*obj)->direction;
@@ -540,7 +543,7 @@ void HmObjectTracker::ComputeTracksPredict(
 
 void HmObjectTracker::UpdateAssignedTracks(
     std::vector<Eigen::VectorXf>* tracks_predict,
-    std::vector<TrackedObjectPtr>* new_objects,
+    std::vector<std::shared_ptr<TrackedObject>>* new_objects,
     const std::vector<std::pair<int, int>>& assignments,
     const double& time_diff) {
   // Update assigned tracks
@@ -564,7 +567,7 @@ void HmObjectTracker::UpdateUnassignedTracks(
 }
 
 void HmObjectTracker::CreateNewTracks(
-    const std::vector<TrackedObjectPtr>& new_objects,
+    const std::vector<std::shared_ptr<TrackedObject>>& new_objects,
     const std::vector<int>& unassigned_objects) {
   // Create new tracks for objects without matched tracks
   for (size_t i = 0; i < unassigned_objects.size(); i++) {
@@ -580,7 +583,7 @@ void HmObjectTracker::DeleteLostTracks() {
 }
 
 void HmObjectTracker::CollectTrackedResults(
-    std::vector<ObjectPtr>* tracked_objects) {
+    std::vector<std::shared_ptr<Object>>* tracked_objects) {
   // Collect tracked results for reporting include objects may be occluded
   // temporaryly
   const std::vector<ObjectTrackPtr>& tracks = object_tracks_.GetTracks();
@@ -592,8 +595,8 @@ void HmObjectTracker::CollectTrackedResults(
         collect_consecutive_invisible_maximum_)
       continue;
     if (tracks[i]->age_ < collect_age_minimum_) continue;
-    ObjectPtr obj(new Object);
-    TrackedObjectPtr result_obj = tracks[i]->current_object_;
+    std::shared_ptr<Object> obj(new Object);
+    std::shared_ptr<TrackedObject> result_obj = tracks[i]->current_object_;
     obj->clone(*(result_obj->object_ptr));
     // fill tracked information of object
     obj->direction = result_obj->direction.cast<double>();
