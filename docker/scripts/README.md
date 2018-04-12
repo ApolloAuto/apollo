@@ -13,13 +13,21 @@ Don't forget the
 We always recommend to run Apollo container on Ubuntu with the same version of
 the base image, but in case you want to do code development on a Mac, you can
 still try the latest
-[Docker-for-Mac](https://docs.docker.com/docker-for-mac/install)
+[Docker-for-Mac](https://docs.docker.com/docker-for-mac/install).
 
-It runs on a virtual kernel which is similar to use Docker Toolkit + VirtualBox.
-Make sure you understand the [difference](https://docs.docker.com/docker-for-mac/docker-toolbox).
+It runs a virtual Linux kernel which is similar to use Docker Toolkit +
+VirtualBox. Make sure you understand the
+[difference](https://docs.docker.com/docker-for-mac/docker-toolbox).
 
 With Mac, lots of Linux bindings are not available, which could cause problems.
 So it's basicly just an environment for code development, while not production.
+
+### Windows Support
+
+Similar to Mac, you need to install
+[Docker-for-Windows](https://docs.docker.com/docker-for-windows/install), which
+runs a virtual Linux kernel. Currently it only works on Windows 10 Pro,
+Enterprise and Education editions.
 
 ## Use docker image
 
