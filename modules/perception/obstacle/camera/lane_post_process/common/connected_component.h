@@ -263,7 +263,7 @@ class ConnectedComponent {
     ver_pnt[0] = static_cast<int>(ver_pnt[0] * scale);
     ver_pnt[1] = static_cast<int>(ver_pnt[1] * scale + start_y_pos);
     return ver_pnt;
-    //return vertices_->at(vertex_id);
+    // return vertices_->at(vertex_id);
   }
   int GetVertexCount() const { return static_cast<int>(vertices_->size()); }
 

@@ -215,10 +215,8 @@ bool CCLanePostProcessor::Init() {
   cc_generator_.reset(
       new ConnectedComponentGeneratorGPU(image_width_, image_height_, roi_));
 #else
-  //cc_generator_.reset(
-  //    new ConnectedComponentGenerator(image_width_, image_height_, roi_));
   cc_generator_.reset(
-      new ConnectedComponentGenerator(lane_map_width, lane_map_height, 
+      new ConnectedComponentGenerator(lane_map_width, lane_map_height,
       cv::Rect(0, 0, lane_map_width, lane_map_height)));
 #endif
 
@@ -486,7 +484,8 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
   if (options_.frame.space_type == SpaceType::IMAGE) {
     cur_frame_->Init(cc_list, non_mask_, options_.frame, scale_, start_y_pos_);
   } else if (options_.frame.space_type == SpaceType::VEHICLE) {
-    cur_frame_->Init(cc_list, non_mask_, projector_, options_.frame, scale_, start_y_pos_);
+    cur_frame_->Init(cc_list, non_mask_, projector_,
+      options_.frame, scale_, start_y_pos_);
   } else {
     AERROR << "unknown space type: " << options_.frame.space_type;
     return false;

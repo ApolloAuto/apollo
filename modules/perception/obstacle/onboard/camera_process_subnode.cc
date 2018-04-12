@@ -96,7 +96,8 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   double timestamp = message.header.stamp.toSec();
   ADEBUG << "CameraProcessSubnode ImgCallback: timestamp: ";
   ADEBUG << std::fixed << std::setprecision(64) << timestamp;
-  AINFO << "camera received image : "<< GLOG_TIMESTAMP(timestamp) << " at time: " <<GLOG_TIMESTAMP( TimeUtil::GetCurrentTime());
+  AINFO << "camera received image : "<< GLOG_TIMESTAMP(timestamp)
+        << " at time: " <<GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
   double curr_timestamp = timestamp * 1e9;
 
   if (FLAGS_skip_camera_frame && timestamp_ns_ > 0.0) {
