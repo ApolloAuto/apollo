@@ -32,7 +32,8 @@ using apollo::common::Status;
 
 LocalizationGnssProcess::LocalizationGnssProcess()
     : gnss_solver_(new GnssSolver()),
-      enable_ins_aid_rtk_(true), gnss_lever_arm_{0.0, 0.0, 0.0},
+      enable_ins_aid_rtk_(true),
+      gnss_lever_arm_{0.0, 0.0, 0.0},
       sins_align_finish_(false),
       double_antenna_solver_(new GnssSolver()),
       current_obs_time_(0.0),
@@ -49,8 +50,7 @@ LocalizationGnssProcess::~LocalizationGnssProcess() {
   double_antenna_solver_ = nullptr;
 }
 
-Status LocalizationGnssProcess::Init(
-    const LocalizationIntegParam &param) {
+Status LocalizationGnssProcess::Init(const LocalizationIntegParam &param) {
   // set launch parameter
   enable_ins_aid_rtk_ = param.enable_ins_aid_rtk;
   gnss_solver_->set_enable_external_prediction(enable_ins_aid_rtk_);
@@ -84,14 +84,13 @@ void LocalizationGnssProcess::RawObservationProcess(
     AERROR << "Obs data being invalid if without receiver id!";
     return;
   }
-  double leap_second_s = 18.0;
   const double unix_to_gps = 315964800;
   const double sec_per_week = 604800;
-  leap_second_s = gnss_solver_->get_leap_second(raw_obs.gnss_week(),
-                                               raw_obs.gnss_second_s());
+  double leap_second_s = gnss_solver_->get_leap_second(raw_obs.gnss_week(),
+                                                       raw_obs.gnss_second_s());
 
-  double sys_secs_to_gnss = common::time::Clock::NowInSeconds()
-      - unix_to_gps + leap_second_s;
+  double sys_secs_to_gnss =
+      common::time::Clock::NowInSeconds() - unix_to_gps + leap_second_s;
   double obs_secs =
       raw_obs.gnss_second_s() + raw_obs.gnss_week() * sec_per_week;
   double obs_delay = sys_secs_to_gnss - obs_secs;
@@ -142,10 +141,9 @@ void LocalizationGnssProcess::RawEphemerisProcess(
      * and here convert it back to UTC(+0), so leap seconds shoudl be in
      * accordance with the GNSS-Driver
      */
-    double leap_sec = 18.0;
-    leap_sec =
+    double leap_sec =
         gnss_solver_->get_leap_second(gnss_orbit.glonass_orbit().week_num(),
-                                     gnss_orbit.glonass_orbit().toe());
+                                      gnss_orbit.glonass_orbit().toe());
     double toe = gnss_orbit.glonass_orbit().toe() - leap_sec;
     gnss_orbit.mutable_glonass_orbit()->set_toe(toe);
     gnss_orbit.mutable_glonass_orbit()->set_week_second_s(toe);
@@ -164,8 +162,8 @@ void LocalizationGnssProcess::RawEphemerisProcess(
   return;
 }
 
-void LocalizationGnssProcess::IntegSinsPvaProcess(
-    const InsPva &sins_pva_msg, const double variance[9][9]) {
+void LocalizationGnssProcess::IntegSinsPvaProcess(const InsPva &sins_pva_msg,
+                                                  const double variance[9][9]) {
   if (!sins_pva_msg.init_and_alignment) {
     return;
   }
@@ -174,16 +172,13 @@ void LocalizationGnssProcess::IntegSinsPvaProcess(
 
   // feed into GNSS-RTK Engine
   double sec_s = sins_pva_msg.time;
-  double llh[3] = {sins_pva_msg.pos.longitude,
-                   sins_pva_msg.pos.latitude,
+  double llh[3] = {sins_pva_msg.pos.longitude, sins_pva_msg.pos.latitude,
                    sins_pva_msg.pos.height};
   double velocity[3] = {sins_pva_msg.vel.ve, sins_pva_msg.vel.vn,
                         sins_pva_msg.vel.vu};
-  double lever_arm[3] = {gnss_lever_arm_.arm_x,
-                         gnss_lever_arm_.arm_y,
+  double lever_arm[3] = {gnss_lever_arm_.arm_x, gnss_lever_arm_.arm_y,
                          gnss_lever_arm_.arm_z};
-  double euler[3] = {sins_pva_msg.att.pitch,
-                     sins_pva_msg.att.roll,
+  double euler[3] = {sins_pva_msg.att.pitch, sins_pva_msg.att.roll,
                      sins_pva_msg.att.yaw};
 
   double std_pos[3][3] = {0.0};
@@ -196,9 +191,8 @@ void LocalizationGnssProcess::IntegSinsPvaProcess(
     }
   }
 
-  gnss_solver_->motion_update(sec_s, llh, std_pos,
-                              velocity, std_vel,
-                              euler, lever_arm);
+  gnss_solver_->motion_update(sec_s, llh, std_pos, velocity, std_vel, euler,
+                              lever_arm);
   return;
 }
 
@@ -210,7 +204,7 @@ LocalizationMeasureState LocalizationGnssProcess::GetResult(
   // double sec_s = Clock::NowInSeconds(); // ros::Time::now().toSec();
   const unsigned int second_per_week = 604800;
   double sec_s = gnss_pnt_result_.gnss_week() * second_per_week +
-          gnss_pnt_result_.gnss_second_s();
+                 gnss_pnt_result_.gnss_second_s();
   gnss_msg->time = sec_s;
   gnss_msg->frame_type = FrameType::ECEF;
 
@@ -290,8 +284,8 @@ bool LocalizationGnssProcess::DuplicateEph(
     return true;
   }
   map_gnss_eph_.insert(
-      std::map<EphKey, drivers::gnss::GnssEphemeris>::
-      value_type(temp, raw_eph));
+      std::map<EphKey, drivers::gnss::GnssEphemeris>::value_type(temp,
+                                                                 raw_eph));
   return false;
 }
 
@@ -302,17 +296,15 @@ inline void LocalizationGnssProcess::LogPnt(const GnssPntResultMsg &rover_pnt,
            "%6d%12.3f%4d%16.3f%16.3f%16.3f%4d%4.1f%6.1f%8.3f%8.3f%8.3f%8.3f%8."
            "3f%8.3f\n",
            rover_pnt.gnss_week(), rover_pnt.gnss_second_s(),
-           static_cast<int>(rover_pnt.pnt_type()),
-           rover_pnt.pos_x_m(), rover_pnt.pos_y_m(),
-           rover_pnt.pos_z_m(), rover_pnt.sovled_sat_num(), rover_pnt.pdop(),
-           ratio, rover_pnt.vel_x_m(), rover_pnt.vel_y_m(),
+           static_cast<int>(rover_pnt.pnt_type()), rover_pnt.pos_x_m(),
+           rover_pnt.pos_y_m(), rover_pnt.pos_z_m(), rover_pnt.sovled_sat_num(),
+           rover_pnt.pdop(), ratio, rover_pnt.vel_x_m(), rover_pnt.vel_y_m(),
            rover_pnt.vel_z_m(), rover_pnt.std_pos_x_m(),
            rover_pnt.std_pos_y_m(), rover_pnt.std_pos_z_m());
   AINFO << print_infor;
 }
 
-bool LocalizationGnssProcess::GnssPosition(
-    EpochObservationMsg *raw_rover_obs) {
+bool LocalizationGnssProcess::GnssPosition(EpochObservationMsg *raw_rover_obs) {
   CHECK_NOTNULL(raw_rover_obs);
 
   gnss_state_ = LocalizationMeasureState::NOT_VALID;
