@@ -33,10 +33,9 @@
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/object.h"
 
-#define VISUALIZE
+// #define VISUALIZE
 
 using apollo::perception::CNNSegmentation;
-using apollo::perception::ObjectPtr;
 using apollo::perception::pcl_util::PointCloud;
 using apollo::perception::pcl_util::PointCloudPtr;
 using apollo::perception::pcl_util::PointIndices;
@@ -123,7 +122,7 @@ bool GetPointCloudFromFile(const string &pcd_file, PointCloudPtr cloud) {
 
 void DrawDetection(const PointCloudPtr &pc_ptr, const PointIndices &valid_idx,
                    int rows, int cols, float range,
-                   const vector<ObjectPtr> &objects,
+                   const vector<std::shared_ptr<Object>> &objects,
                    const string &result_file) {
   // create a new image for visualization
   cv::Mat img(rows, cols, CV_8UC3, cv::Scalar(0.0));
@@ -176,7 +175,7 @@ void DrawDetection(const PointCloudPtr &pc_ptr, const PointIndices &valid_idx,
   const cv::Vec3b segm_color(0, 0, 255);  // red
 
   for (size_t i = 0; i < objects.size(); ++i) {
-    const ObjectPtr &obj = objects[i];
+    const std::shared_ptr<Object> &obj = objects[i];
     CHECK_GT(obj->cloud->size(), 0);
 
     int x_min = INT_MAX;
@@ -237,7 +236,7 @@ TEST_F(CNNSegmentationTest, test_cnnseg_det) {
   SegmentationOptions options;
   options.origin_cloud = in_pc;
 
-  std::vector<ObjectPtr> out_objects;
+  std::vector<std::shared_ptr<Object>> out_objects;
 
   // testing initialization function
   EXPECT_TRUE(cnn_segmentor_->Init());

@@ -230,7 +230,7 @@ bool Cipv::ElongateEgoLane(const LaneObjectsPtr lane_objects,
 }
 
 // Get closest edge of an object in image cooridnate
-bool Cipv::FindClosestEdgeOfObjectImage(const ObjectPtr &object,
+bool Cipv::FindClosestEdgeOfObjectImage(const std::shared_ptr<Object> &object,
                                         const EgoLane &egolane_image,
                                         LineSegment2Df *closted_object_edge) {
   float size_x = object->length;
@@ -313,7 +313,7 @@ bool Cipv::FindClosestEdgeOfObjectImage(const ObjectPtr &object,
 // Get closest edge of an object in ground cooridnate
 // *** TO DO *** This funcion should be changed to find min-y and max-y edges
 // to determine CIPV.
-bool Cipv::FindClosestEdgeOfObjectGround(const ObjectPtr &object,
+bool Cipv::FindClosestEdgeOfObjectGround(const std::shared_ptr<Object> &object,
                                          const EgoLane &egolane_ground,
                                          LineSegment2Df *closted_object_edge) {
   if (debug_level_ >= 2) {
@@ -501,7 +501,7 @@ bool Cipv::IsPointLeftOfLine(const Point2Df &point,
   }
 }
 // Check if the object is in the lane in image space
-bool Cipv::IsObjectInTheLaneImage(const ObjectPtr &object,
+bool Cipv::IsObjectInTheLaneImage(const std::shared_ptr<Object> &object,
                                   const EgoLane &egolane_image) {
   return true;
 }
@@ -514,7 +514,7 @@ bool Cipv::IsObjectInTheLaneImage(const ObjectPtr &object,
 // *+------*    |
 //  |           |
 // l_lane     r_lane
-bool Cipv::IsObjectInTheLaneGround(const ObjectPtr &object,
+bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<Object> &object,
                                    const EgoLane &egolane_ground) {
   LineSegment2Df closted_object_edge;
   bool b_left_lane_clear = false;
@@ -635,7 +635,7 @@ bool Cipv::IsObjectInTheLaneGround(const ObjectPtr &object,
 }
 
 // Check if the object is in the lane in ego-ground space
-bool Cipv::IsObjectInTheLane(const ObjectPtr &object,
+bool Cipv::IsObjectInTheLane(const std::shared_ptr<Object> &object,
                              const EgoLane &egolane_image,
                              const EgoLane &egolane_ground) {
   if (b_image_based_cipv_ == true) {

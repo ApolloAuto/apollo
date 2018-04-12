@@ -99,7 +99,8 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   void GetUncertainty(Eigen::Matrix3d* position_uncertainty,
                       Eigen::Matrix3d* velocity_uncertainty);
 
-  bool ObtainSensorPrediction(ObjectPtr obj, double sensor_timestamp,
+  bool ObtainSensorPrediction(std::shared_ptr<Object> obj,
+                              double sensor_timestamp,
                               const Eigen::Matrix4d& process_noise,
                               const Eigen::Matrix4d& trans_matrix,
                               Eigen::Vector4d* state_pre,
@@ -128,5 +129,6 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_
-        // // NOLINT
+// clang-format off
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_ // NOLINT
+// clang-format on

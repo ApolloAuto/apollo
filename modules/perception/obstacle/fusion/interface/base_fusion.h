@@ -30,7 +30,7 @@
  *
  *     virtual bool Fuse(
  *              const std::vector<SensorObjects>& multi_sensor_objects,
- *              std::vector<ObjectPtr>* fused_objects) override {
+ *              std::vector<std::shared_ptr<Object>>* fused_objects) override {
  *
  *          // Do something.
  *          return true;
@@ -52,6 +52,7 @@
  * using fusion to do somethings.
  * </pre>
  **/
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -74,7 +75,7 @@ class BaseFusion {
   // @param [out]: fused objects.
   // @return true if fuse successfully, otherwise return false
   virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                    std::vector<ObjectPtr> *fused_objects) = 0;
+                    std::vector<std::shared_ptr<Object>> *fused_objects) = 0;
   virtual std::string name() const = 0;
 
  private:

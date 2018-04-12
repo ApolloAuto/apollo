@@ -96,7 +96,7 @@ PbfSensorFramePtr AsyncFusion::ConstructFrame(const SensorObjects &frame) {
 }
 
 bool AsyncFusion::Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                       std::vector<ObjectPtr> *fused_objects) {
+                       std::vector<std::shared_ptr<Object>> *fused_objects) {
   ACHECK(fused_objects != nullptr) << "parameter fused_objects is nullptr";
 
   AINFO << "number of sensor objects in async fusion is "
@@ -180,8 +180,8 @@ void AsyncFusion::UpdateUnassignedTracks(
   }
 }
 
-void AsyncFusion::CollectFusedObjects(double timestamp,
-                                      std::vector<ObjectPtr> *fused_objects) {
+void AsyncFusion::CollectFusedObjects(
+    double timestamp, std::vector<std::shared_ptr<Object>> *fused_objects) {
   if (fused_objects == nullptr) {
     return;
   }
@@ -191,7 +191,7 @@ void AsyncFusion::CollectFusedObjects(double timestamp,
   std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
   for (size_t i = 0; i < tracks.size(); i++) {
     std::shared_ptr<PbfSensorObject> fused_object = tracks[i]->GetFusedObject();
-    ObjectPtr obj(new Object());
+    std::shared_ptr<Object> obj(new Object());
     obj->clone(*(fused_object->object));
     obj->track_id = tracks[i]->GetTrackId();
     obj->latest_tracked_time = timestamp;

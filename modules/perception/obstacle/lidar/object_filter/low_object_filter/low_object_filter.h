@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_OBJECT_FILTER_LOW_OBJECT_FILTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_OBJECT_FILTER_LOW_OBJECT_FILTER_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -41,11 +42,11 @@ class LowObjectFilter : public BaseObjectFilter {
   std::string name() const { return "LowObjectFilter"; }
 
   bool Filter(const ObjectFilterOptions& obj_filter_options,
-              std::vector<ObjectPtr>* objects);
+              std::vector<std::shared_ptr<Object>>* objects);
 
  protected:
   void FilterLowObject(const ObjectFilterOptions& obj_filter_options,
-                       std::vector<ObjectPtr>* objects);
+                       std::vector<std::shared_ptr<Object>>* objects);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(LowObjectFilter);

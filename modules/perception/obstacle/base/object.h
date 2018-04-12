@@ -102,9 +102,6 @@ struct alignas(16) Object {
   CameraSupplementPtr camera_supplement = nullptr;
 };
 
-typedef std::shared_ptr<Object> ObjectPtr;
-typedef std::shared_ptr<const Object> ObjectConstPtr;
-
 // Sensor single frame objects.
 struct SensorObjects {
   SensorObjects() { sensor2world_pose = Eigen::Matrix4d::Zero(); }
@@ -118,7 +115,7 @@ struct SensorObjects {
   std::string sensor_id;
   double timestamp = 0.0;
   SeqId seq_num = 0;
-  std::vector<ObjectPtr> objects;
+  std::vector<std::shared_ptr<Object>> objects;
   Eigen::Matrix4d sensor2world_pose;
   LaneObjectsPtr lane_objects;
 

@@ -32,14 +32,14 @@ struct TrackedObject {
    * the states of tracked object. Thus, update tracked object's state when you
    * update the state of track !!! */
   TrackedObject() = default;
-  explicit TrackedObject(ObjectPtr obj_ptr);
+  explicit TrackedObject(std::shared_ptr<Object> obj_ptr);
 
   // deep copy (copy point clonds)
   void clone(const TrackedObject& rhs);
 
   // cloud
   // store transformed object before tracking
-  ObjectPtr object_ptr;
+  std::shared_ptr<Object> object_ptr;
 
   Eigen::Vector3f barycenter;
 
@@ -62,9 +62,6 @@ struct TrackedObject {
   // range from 0 to association_score_maximum
   float association_score = 0.0f;
 };  // struct TrackedObject
-
-typedef std::shared_ptr<TrackedObject> TrackedObjectPtr;
-typedef std::shared_ptr<const TrackedObject> TrackedObjectConstPtr;
 
 }  // namespace perception
 }  // namespace apollo

@@ -142,7 +142,7 @@ bool CNNSegmentation::Init() {
 bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
                               const pcl_util::PointIndices& valid_indices,
                               const SegmentationOptions& options,
-                              vector<ObjectPtr>* objects) {
+                              vector<std::shared_ptr<Object>>* objects) {
   objects->clear();
   int num_pts = static_cast<int>(pc_ptr->points.size());
   if (num_pts == 0) {

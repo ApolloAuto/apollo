@@ -102,9 +102,6 @@ struct alignas(16) VisualObject {
   double last_track_timestamp = 0.0;
 };
 
-typedef std::shared_ptr<VisualObject> VisualObjectPtr;
-typedef std::shared_ptr<const VisualObject> VisualObjectConstPtr;
-
 }  // namespace perception
 }  // namespace apollo
 

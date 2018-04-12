@@ -20,6 +20,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -44,14 +45,16 @@ const cv::Scalar COLOR_YELLOW = cv::Scalar(0, 255, 255);
 const cv::Scalar COLOR_RED = cv::Scalar(0, 0, 255);
 const cv::Scalar COLOR_BLACK = cv::Scalar(0, 0, 0);
 
-bool LoadVisualObjectFromFile(const std::string &file_name,
-                              std::vector<VisualObjectPtr> *visual_objects);
+bool LoadVisualObjectFromFile(
+    const std::string &file_name,
+    std::vector<std::shared_ptr<VisualObject>> *visual_objects);
 
-bool WriteVisualObjectToFile(const std::string &file_name,
-                             std::vector<VisualObjectPtr> *visual_objects);
+bool WriteVisualObjectToFile(
+    const std::string &file_name,
+    std::vector<std::shared_ptr<VisualObject>> *visual_objects);
 
 bool LoadGTfromFile(const std::string &gt_path,
-                    std::vector<VisualObjectPtr> *visual_objects);
+                    std::vector<std::shared_ptr<VisualObject>> *visual_objects);
 
 std::string GetTypeText(ObjectType type);
 
