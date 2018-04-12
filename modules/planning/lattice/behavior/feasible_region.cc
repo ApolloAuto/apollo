@@ -28,15 +28,8 @@
 namespace apollo {
 namespace planning {
 
-FeasibleRegion::FeasibleRegion(const std::array<double, 3>& init_s,
-                               const double speed_limit) {
-  Setup(init_s, speed_limit);
-}
-
-void FeasibleRegion::Setup(const std::array<double, 3>& init_s,
-                           const double speed_limit) {
+FeasibleRegion::FeasibleRegion(const std::array<double, 3>& init_s) {
   init_s_ = init_s;
-  speed_limit_ = speed_limit;
 
   double v = init_s[1];
   CHECK_GE(v, 0.0);
@@ -44,34 +37,12 @@ void FeasibleRegion::Setup(const std::array<double, 3>& init_s,
   const double max_deceleration = -FLAGS_longitudinal_acceleration_lower_bound;
   t_at_zero_speed_ = v / max_deceleration;
   s_at_zero_speed_ = init_s[0] + v * v / (2.0 * max_deceleration);
-
-  double delta_v = speed_limit - v;
-  if (delta_v < 0.0) {
-    t_at_speed_limit_ = delta_v / FLAGS_longitudinal_acceleration_lower_bound;
-    s_at_speed_limit_ = init_s_[0] + v * t_at_speed_limit_ +
-                        0.5 * FLAGS_longitudinal_acceleration_lower_bound *
-                            t_at_speed_limit_ * t_at_speed_limit_;
-  } else {
-    t_at_speed_limit_ = delta_v / FLAGS_longitudinal_acceleration_upper_bound;
-    s_at_speed_limit_ = init_s_[0] + v * t_at_speed_limit_ +
-                        0.5 * FLAGS_longitudinal_acceleration_upper_bound *
-                            t_at_speed_limit_ * t_at_speed_limit_;
-  }
 }
 
 double FeasibleRegion::SUpper(const double t) const {
   CHECK(t >= 0.0);
-
-  if (init_s_[1] < speed_limit_) {
-    if (t < t_at_speed_limit_) {
-      return init_s_[0] + init_s_[1] * t +
-             0.5 * FLAGS_longitudinal_acceleration_upper_bound * t * t;
-    } else {
-      return s_at_speed_limit_ + speed_limit_ * (t - t_at_speed_limit_);
-    }
-  } else {
-    return init_s_[0] + init_s_[1] * t;
-  }
+  return init_s_[0] + init_s_[1] * t +
+         0.5 * FLAGS_longitudinal_acceleration_upper_bound * t * t;
 }
 
 double FeasibleRegion::SLower(const double t) const {
@@ -83,10 +54,7 @@ double FeasibleRegion::SLower(const double t) const {
 }
 
 double FeasibleRegion::VUpper(const double t) const {
-  return std::max(
-      init_s_[1],
-      std::min(init_s_[1] + FLAGS_longitudinal_acceleration_upper_bound * t,
-               speed_limit_));
+  return init_s_[1] + FLAGS_longitudinal_acceleration_upper_bound * t;
 }
 
 double FeasibleRegion::VLower(const double t) const {
@@ -98,19 +66,11 @@ double FeasibleRegion::VLower(const double t) const {
 double FeasibleRegion::TLower(const double s) const {
   CHECK(s >= init_s_[0]);
 
-  if (init_s_[1] < speed_limit_) {
-    if (s < s_at_speed_limit_) {
-      double delta =
-          init_s_[1] * init_s_[1] -
-          2.0 * FLAGS_longitudinal_acceleration_upper_bound * (init_s_[0] - s);
-      return (std::sqrt(delta) - init_s_[1]) /
-             FLAGS_longitudinal_acceleration_upper_bound;
-    } else {
-      return t_at_speed_limit_ + (s - s_at_speed_limit_) / speed_limit_;
-    }
-  } else {
-    return (s - init_s_[0]) / init_s_[1];
-  }
+  double delta_s = s - init_s_[0];
+  double v = init_s_[1];
+  double a = FLAGS_longitudinal_acceleration_upper_bound;
+  double t = (std::sqrt(v * v + 2.0 * a * delta_s) - v) / a;
+  return t;
 }
 
 }  // namespace planning
