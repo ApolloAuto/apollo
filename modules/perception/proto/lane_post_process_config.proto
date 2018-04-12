@@ -49,4 +49,8 @@ message ModelConfigs {
   optional float online_pitch_angle = 44 [ default = -2.5 ];
   optional float ground_height = 45 [ default = 1.6 ];
   optional float max_distance_to_see_for_transformer = 46 [ default = 500.0 ];
+  optional float lane_map_scale = 47 [ default = 2.0];
+  optional int32 start_y_pos = 48 [ default = 312];
+  optional int32 lane_map_width = 49 [ default = 960];
+  optional int32 lane_map_height = 50 [ default = 384];
 }
