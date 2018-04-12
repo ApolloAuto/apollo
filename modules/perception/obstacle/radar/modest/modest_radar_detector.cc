@@ -16,8 +16,6 @@
 
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 
-#include <memory>
-
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/radar/modest/conti_radar_util.h"
@@ -166,10 +164,11 @@ bool ModestRadarDetector::Init() {
   return true;
 }
 
-bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
-                                 const std::vector<PolygonDType> &map_polygons,
-                                 const RadarDetectorOptions &options,
-                                 std::vector<ObjectPtr> *objects) {
+bool ModestRadarDetector::Detect(
+    const ContiRadar &raw_obstacles,
+    const std::vector<PolygonDType> &map_polygons,
+    const RadarDetectorOptions &options,
+    std::vector<std::shared_ptr<Object>> *objects) {
   if (objects == nullptr) {
     AERROR << "Objects is nullptr";
     return false;
@@ -210,15 +209,17 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
   return true;
 }
 
-bool ModestRadarDetector::CollectRadarResult(std::vector<ObjectPtr> *objects) {
+bool ModestRadarDetector::CollectRadarResult(
+    std::vector<std::shared_ptr<Object>> *objects) {
   std::vector<RadarTrack> &obs_track = radar_tracker_->GetTracks();
   if (objects == nullptr) {
     AERROR << "objects is nullptr";
     return false;
   }
   for (size_t i = 0; i < obs_track.size(); ++i) {
-    ObjectPtr object_ptr = ObjectPtr(new Object());
-    const ObjectPtr &object_radar_ptr = obs_track[i].GetObsRadar();
+    std::shared_ptr<Object> object_ptr = std::shared_ptr<Object>(new Object());
+    const std::shared_ptr<Object> &object_radar_ptr =
+        obs_track[i].GetObsRadar();
     if (use_fp_filter_ && object_radar_ptr->is_background) {
       continue;
     }
@@ -233,7 +234,7 @@ bool ModestRadarDetector::CollectRadarResult(std::vector<ObjectPtr> *objects) {
 
 void ModestRadarDetector::RoiFilter(
     const std::vector<PolygonDType> &map_polygons,
-    std::vector<ObjectPtr> *filter_objects) {
+    std::vector<std::shared_ptr<Object>> *filter_objects) {
   ADEBUG << "Before using hdmap, object size:" << filter_objects->size();
   // use new hdmap
   if (use_had_map_) {

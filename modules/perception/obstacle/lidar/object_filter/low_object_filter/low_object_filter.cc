@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
+
 #include <algorithm>
 #include <limits>
 
 #include "modules/perception/common/pcl_types.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/types.h"
-#include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
 
 namespace apollo {
 namespace perception {
@@ -58,7 +59,7 @@ bool LowObjectFilter::Init() {
 }
 
 bool LowObjectFilter::Filter(const ObjectFilterOptions& obj_filter_options,
-                             std::vector<ObjectPtr>* objects) {
+                             std::vector<std::shared_ptr<Object>>* objects) {
   FilterLowObject(obj_filter_options, objects);
 
   return true;
@@ -66,11 +67,11 @@ bool LowObjectFilter::Filter(const ObjectFilterOptions& obj_filter_options,
 
 void LowObjectFilter::FilterLowObject(
     const ObjectFilterOptions& obj_filter_options,
-    std::vector<ObjectPtr>* objects) {
+    std::vector<std::shared_ptr<Object>>* objects) {
   int object_number = objects->size();
   int valid_objects_num = 0;
   for (std::size_t i = 0; i < objects->size(); ++i) {
-    ObjectPtr obj = objects->at(i);
+    std::shared_ptr<Object> obj = objects->at(i);
     float max_height = -100.0;
     float min_height = 100.0;
     for (std::size_t pi = 0; pi < obj->cloud->points.size(); ++pi) {

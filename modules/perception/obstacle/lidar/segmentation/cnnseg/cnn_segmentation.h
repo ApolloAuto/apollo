@@ -46,7 +46,7 @@ class CNNSegmentation : public BaseSegmentation {
   bool Segment(const pcl_util::PointCloudPtr& pc_ptr,
                const pcl_util::PointIndices& valid_indices,
                const SegmentationOptions& options,
-               std::vector<ObjectPtr>* objects) override;
+               std::vector<std::shared_ptr<Object>>* objects) override;
 
   std::string name() const override { return "CNNSegmentation"; }
 

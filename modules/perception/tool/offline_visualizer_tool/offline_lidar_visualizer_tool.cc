@@ -108,7 +108,8 @@ class OfflineLidarPerceptionTool {
       auto velodyne_trans = std::make_shared<Eigen::Matrix4d>(pose);
       lidar_process_->Process(time_stamp, cloud, velodyne_trans);
 
-      std::vector<ObjectPtr> result_objects = lidar_process_->GetObjects();
+      std::vector<std::shared_ptr<Object>> result_objects =
+          lidar_process_->GetObjects();
       const pcl_util::PointIndicesPtr roi_indices =
           lidar_process_->GetROIIndices();
 
@@ -140,7 +141,7 @@ class OfflineLidarPerceptionTool {
     }
   }
 
-  void SaveTrackingInformation(std::vector<ObjectPtr>* objects,
+  void SaveTrackingInformation(std::vector<std::shared_ptr<Object>>* objects,
                                const Eigen::Matrix4d& pose_v2w,
                                const int& frame_id,
                                const pcl_util::PointCloudPtr& cloud,

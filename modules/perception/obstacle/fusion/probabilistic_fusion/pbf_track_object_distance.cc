@@ -126,7 +126,7 @@ float PbfTrackObjectDistance::ComputeRadarRadar(
   return distance;
 }
 
-float PbfTrackObjectDistance::GetAngle(const ObjectPtr &obj) {
+float PbfTrackObjectDistance::GetAngle(const std::shared_ptr<Object> &obj) {
   if (obj->center[0] == 0) {
     if (obj->center[1] > 0) {
       return M_PI / 2;
@@ -146,8 +146,8 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
   static float epislon = 0.1f;
   static float angle_tolerance = 10.0f;
 
-  const ObjectPtr &fobj = fused_object->object;
-  const ObjectPtr &sobj = sensor_object->object;
+  const std::shared_ptr<Object> &fobj = fused_object->object;
+  const std::shared_ptr<Object> &sobj = sensor_object->object;
 
   if (fobj == nullptr || sobj == nullptr) {
     AERROR << "Object is nullptr.";
@@ -211,7 +211,7 @@ float PbfTrackObjectDistance::ComputeDistance3D(
     const std::shared_ptr<PbfSensorObject> &fused_object,
     const std::shared_ptr<PbfSensorObject> &sensor_object,
     const Eigen::Vector3d &ref_pos, const int range) {
-  const ObjectPtr &obj = fused_object->object;
+  const std::shared_ptr<Object> &obj = fused_object->object;
   if (obj == nullptr) {
     AERROR << "Object is nullptr.";
     return std::numeric_limits<float>::max();
@@ -226,7 +226,7 @@ float PbfTrackObjectDistance::ComputeDistance3D(
     return std::numeric_limits<float>::max();
   }
 
-  const ObjectPtr obj2 = sensor_object->object;
+  const std::shared_ptr<Object> obj2 = sensor_object->object;
   if (obj2 == nullptr) {
     AERROR << "Object is nullptr.";
     return std::numeric_limits<float>::max();

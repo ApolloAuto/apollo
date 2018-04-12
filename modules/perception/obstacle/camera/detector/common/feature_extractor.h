@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_FEATURE_EXTRACTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_COMMON_FEATURE_EXTRACTOR_H_
 
+#include <memory>
 #include <vector>
 
 #include "caffe/caffe.hpp"
@@ -45,7 +46,7 @@ class BaseFeatureExtractor {
 
   // @brief: extract feature for each detected object
   // @param [in/out]: objects with bounding boxes and feature vector.
-  virtual bool extract(std::vector<VisualObjectPtr> *objects) = 0;
+  virtual bool extract(std::vector<std::shared_ptr<VisualObject>> *objects) = 0;
 
  protected:
   boost::shared_ptr<caffe::Blob<float>> feat_blob_ = nullptr;
@@ -59,7 +60,7 @@ class ReorgFeatureExtractor : public BaseFeatureExtractor {
   bool init(const ExtractorParam &param,
             const boost::shared_ptr<caffe::Blob<float>> feat_blob,
             int input_width = 0, int input_height = 0) override;
-  virtual bool extract(std::vector<VisualObjectPtr> *objects);
+  virtual bool extract(std::vector<std::shared_ptr<VisualObject>> *objects);
 
  protected:
   std::vector<caffe::Blob<float> *> bottom_vec_;
@@ -76,7 +77,7 @@ class ROIPoolingFeatureExtractor : public BaseFeatureExtractor {
   bool init(const ExtractorParam &param,
             const boost::shared_ptr<caffe::Blob<float>> feat_blob,
             int input_width = 0, int input_height = 0) override;
-  virtual bool extract(std::vector<VisualObjectPtr> *objects);
+  virtual bool extract(std::vector<std::shared_ptr<VisualObject>> *objects);
 
  protected:
   std::vector<caffe::Blob<float> *> bottom_vec_;

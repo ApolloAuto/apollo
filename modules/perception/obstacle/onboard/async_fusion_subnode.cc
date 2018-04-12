@@ -221,7 +221,7 @@ Status AsyncFusionSubnode::Process(const EventMeta &event_meta,
     SharedDataPtr<FusionItem> fusion_item_ptr(new FusionItem);
     fusion_item_ptr->timestamp = objects_[0]->latest_tracked_time;
     for (auto obj : objects_) {
-      ObjectPtr objclone(new Object());
+      std::shared_ptr<Object> objclone(new Object());
       objclone->clone(*obj);
       fusion_item_ptr->obstacles.push_back(objclone);
     }

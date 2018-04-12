@@ -135,7 +135,7 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
   PERF_BLOCK_END("lidar_roi_filter");
 
   /// call segmentor
-  std::vector<ObjectPtr> objects;
+  std::vector<std::shared_ptr<Object>> objects;
   if (segmentor_ != nullptr) {
     SegmentationOptions segmentation_options;
     segmentation_options.origin_cloud = point_cloud;

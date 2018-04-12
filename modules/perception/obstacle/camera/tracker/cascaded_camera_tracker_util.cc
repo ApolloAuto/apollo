@@ -14,18 +14,20 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/obstacle/camera/tracker/cascaded_camera_tracker_util.h"
+
 #include <algorithm>
 #include <utility>
 
 #include "modules/common/log.h"
-#include "modules/perception/obstacle/camera/tracker/cascaded_camera_tracker_util.h"
 
 namespace apollo {
 namespace perception {
 
-void GetDetectedFromVO(const cv::Size &sz, const float &scale,
-                       const std::vector<VisualObjectPtr> &objects,
-                       std::vector<Detected> *detected) {
+void GetDetectedFromVO(
+    const cv::Size &sz, const float &scale,
+    const std::vector<std::shared_ptr<VisualObject>> &objects,
+    std::vector<Detected> *detected) {
   int i = 0;
   detected->clear();
   for (auto obj_ptr : objects) {

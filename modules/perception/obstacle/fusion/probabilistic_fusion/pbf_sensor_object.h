@@ -27,7 +27,8 @@ namespace perception {
 
 struct PbfSensorObject {
   PbfSensorObject();
-  explicit PbfSensorObject(ObjectPtr obj3d, SensorType type, double time);
+  explicit PbfSensorObject(std::shared_ptr<Object> obj3d, SensorType type,
+                           double time);
   ~PbfSensorObject();
   PbfSensorObject(const PbfSensorObject &rhs);
   PbfSensorObject &operator=(const PbfSensorObject &rhs);
@@ -36,7 +37,7 @@ struct PbfSensorObject {
   SensorType sensor_type;
   std::string sensor_id;
   double timestamp;
-  ObjectPtr object;
+  std::shared_ptr<Object> object;
   double invisible_period;
 };
 
@@ -56,4 +57,6 @@ typedef std::shared_ptr<PbfSensorFrame> PbfSensorFramePtr;
 }  // namespace perception
 }  // namespace apollo
 
+// clang-format off
 #endif  // MODUELS_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_OBJECT_H_ // NOLINT
+// clang-format on

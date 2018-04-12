@@ -17,9 +17,6 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GLFW_FUSION_VIEWER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GLFW_FUSION_VIEWER_H_
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
 #include <map>
 #include <memory>
 #include <string>
@@ -27,6 +24,8 @@
 #include <vector>
 
 #include "Eigen/Dense"
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
 #include "opencv2/opencv.hpp"
 
 #include "modules/perception/common/perception_gflags.h"
@@ -139,7 +138,7 @@ class GLFWFusionViewer {
   void render();
 
  protected:
-  vec3 get_velocity_src_position(const ObjectPtr &object);
+  vec3 get_velocity_src_position(const std::shared_ptr<Object> &object);
 
   // capture screen
   void capture_screen(const std::string &file_name);
@@ -174,14 +173,15 @@ class GLFWFusionViewer {
                    int line_width, int r, int g, int b, int offset_x,
                    int offset_y, int raw_image_width, int raw_image_height);
 
-  void draw_camera_box2d(const std::vector<ObjectPtr> &objects,
+  void draw_camera_box2d(const std::vector<std::shared_ptr<Object>> &objects,
                          Eigen::Matrix4d w2c, int offset_x, int offset_y,
                          int image_width, int image_height);
 
-  void draw_camera_box3d(const std::vector<ObjectPtr> &camera_objects,
-                         const std::vector<ObjectPtr> &segmented_objects,
-                         Eigen::Matrix4d w2c, int offset_x, int offset_y,
-                         int image_width, int image_height);
+  void draw_camera_box3d(
+      const std::vector<std::shared_ptr<Object>> &camera_objects,
+      const std::vector<std::shared_ptr<Object>> &segmented_objects,
+      Eigen::Matrix4d w2c, int offset_x, int offset_y, int image_width,
+      int image_height);
 
   void draw_rect2d(const Eigen::Vector2d &p1, const Eigen::Vector2d &p2,
                    int line_width, int r, int g, int b, int offset_x,
@@ -192,17 +192,17 @@ class GLFWFusionViewer {
                      int image_width, int image_height);
 
   bool draw_car_forward_dir();
-  void draw_objects(const std::vector<ObjectPtr> &objects,
+  void draw_objects(const std::vector<std::shared_ptr<Object>> &objects,
                     const Eigen::Matrix4d &w2c, bool draw_cube,
                     bool draw_velocity, const Eigen::Vector3f &color,
                     bool use_class_color, bool use_track_color = true);
 
   void draw_3d_classifications(FrameContent *content, bool show_fusion);
-  void draw_camera_box(const std::vector<ObjectPtr> &objects,
+  void draw_camera_box(const std::vector<std::shared_ptr<Object>> &objects,
                        Eigen::Matrix4d w2c, int offset_x, int offset_y,
                        int image_width, int image_height);
 
-  void draw_objects2d(const std::vector<ObjectPtr> &objects,
+  void draw_objects2d(const std::vector<std::shared_ptr<Object>> &objects,
                       Eigen::Matrix4d w2c, std::string name, int offset_x,
                       int offset_y, int image_width, int image_height);
 
