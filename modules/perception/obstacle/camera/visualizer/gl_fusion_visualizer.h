@@ -36,9 +36,7 @@ class GLFusionVisualizer : public BaseVisualizer {
 
   bool init() override;
 
-  std::string name() const override {
-    return name_;
-  }
+  std::string name() const override { return name_; }
 
   void update_camera_system(FrameContent *content) override;
 

@@ -138,6 +138,10 @@ class SmootherUtil {
 
   void Export(const std::string& filename) {
     std::ofstream ofs(filename.c_str());
+    if (ofs.fail()) {
+      AERROR << "Fail to open file " << filename;
+      return;
+    }
     ofs.precision(6);
     double s = 0.0;
     // skip the first point and the last point

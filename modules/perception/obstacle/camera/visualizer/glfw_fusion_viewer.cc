@@ -47,7 +47,6 @@ namespace lowcostvisualizer {
 using apollo::common::util::GetProtoFromFile;
 using apollo::perception::CalibrationConfigManager;
 using apollo::perception::CameraCalibrationPtr;
-using apollo::common::util::GetProtoFromFile;
 
 const double pace_zoom = 15;
 const double My_PI = 3.14159265359;
@@ -194,8 +193,7 @@ bool GLFWFusionViewer::initialize() {
 
   if (show_lane_) {
     lane_post_process_config::ModelConfigs config;
-    CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file,
-                           &config));
+    CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file, &config));
     lane_map_threshold_ = config.lane_map_confidence_thresh();
     AINFO << "onboard lane post-processor: "
           << FLAGS_onboard_lane_post_processor;
@@ -237,9 +235,7 @@ void GLFWFusionViewer::spin_once() {
   glfwSwapBuffers(window_);
 }
 
-void GLFWFusionViewer::close() {
-  glfwTerminate();
-}
+void GLFWFusionViewer::close() { glfwTerminate(); }
 
 void GLFWFusionViewer::set_camera_para(Eigen::Vector3d i_position,
                                        Eigen::Vector3d i_scn_center,
@@ -763,13 +759,9 @@ void GLFWFusionViewer::mouse_move(double xpos, double ypos) {
   mouse_prev_y_ = ypos;
 }
 
-void GLFWFusionViewer::mouse_wheel(double delta) {
-  mode_mat_(2, 3) -= delta;
-}
+void GLFWFusionViewer::mouse_wheel(double delta) { mode_mat_(2, 3) -= delta; }
 
-void GLFWFusionViewer::reset() {
-  mode_mat_ = Eigen::Matrix4d::Identity();
-}
+void GLFWFusionViewer::reset() { mode_mat_ = Eigen::Matrix4d::Identity(); }
 
 void GLFWFusionViewer::keyboard(int key) {
   switch (key) {
