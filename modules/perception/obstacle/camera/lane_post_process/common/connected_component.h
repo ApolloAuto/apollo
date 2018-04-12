@@ -257,11 +257,14 @@ class ConnectedComponent {
     return vertices_;
   }
 
-  Vertex GetVertex(int vertex_id) const {
+  Vertex GetVertex(int vertex_id, double scale, double start_y_pos) const {
     // assert(vertex_id >= 0 && vertex_id < this->getVertexCount());
-    return vertices_->at(vertex_id);
+    Vertex ver_pnt = vertices_->at(vertex_id);
+    ver_pnt[0] = static_cast<int>(ver_pnt[0] * scale);
+    ver_pnt[1] = static_cast<int>(ver_pnt[1] * scale + start_y_pos);
+    return ver_pnt;
+    // return vertices_->at(vertex_id);
   }
-
   int GetVertexCount() const { return static_cast<int>(vertices_->size()); }
 
   // edges

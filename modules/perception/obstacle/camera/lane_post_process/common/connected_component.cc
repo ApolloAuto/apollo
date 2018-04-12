@@ -815,6 +815,7 @@ bool ConnectedComponentGenerator::FindConnectedComponents(
                     << curt_label << " vs. " << root_map_.size() << std::endl;
           return false;
         }
+
         if (root_map_[curt_label] != -1) {
           cc->at(root_map_[curt_label])->AddPixel(x, y);
         } else {

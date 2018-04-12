@@ -16,6 +16,7 @@
 
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 #include "modules/perception/cuda_util/util.h"
+#include "modules/common/time/time_util.h"
 
 namespace apollo {
 namespace perception {
@@ -95,6 +96,8 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   double timestamp = message.header.stamp.toSec();
   ADEBUG << "CameraProcessSubnode ImgCallback: timestamp: ";
   ADEBUG << std::fixed << std::setprecision(64) << timestamp;
+  AINFO << "camera received image : "<< GLOG_TIMESTAMP(timestamp)
+        << " at time: " <<GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
   double curr_timestamp = timestamp * 1e9;
 
   if (FLAGS_skip_camera_frame && timestamp_ns_ > 0.0) {
@@ -118,23 +121,23 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
     img = cv::imread(FLAGS_image_file_path, CV_LOAD_IMAGE_COLOR);
   }
   std::vector<VisualObjectPtr> objects;
-  cv::Mat mask = cv::Mat::zeros(img.rows, img.cols, CV_32FC1);
-  PERF_BLOCK_END("CameraProcessSubnode Image Preprocess");
+  cv::Mat mask;
+  PERF_BLOCK_END("CameraProcessSubnode_Image_Preprocess");
 
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
-  PERF_BLOCK_END("CameraProcessSubnode detector_");
+  PERF_BLOCK_END("CameraProcessSubnode_detector_");
 
   converter_->Convert(&objects);
-  PERF_BLOCK_END("CameraProcessSubnode converter_");
+  PERF_BLOCK_END("CameraProcessSubnode_converter_");
 
   transformer_->Transform(&objects);
-  PERF_BLOCK_END("CameraProcessSubnode transformer_");
+  PERF_BLOCK_END("CameraProcessSubnode_transformer_");
 
   tracker_->Associate(img, timestamp, &objects);
-  PERF_BLOCK_END("CameraProcessSubnode tracker_");
+  PERF_BLOCK_END("CameraProcessSubnode_tracker_");
 
   filter_->Filter(timestamp, &objects);
-  PERF_BLOCK_END("CameraProcessSubnode filter_");
+  PERF_BLOCK_END("CameraProcessSubnode_filter_");
 
   std::shared_ptr<SensorObjects> out_objs(new SensorObjects);
   out_objs->timestamp = timestamp;

@@ -81,12 +81,16 @@ class LaneFrame {
  public:
   bool Init(const std::vector<ConnectedComponentPtr>& input_cc,
             const std::shared_ptr<NonMask>& non_mask,
-            const LaneFrameOptions& options);
+            const LaneFrameOptions& options,
+            const double scale,
+            const int start_y_pos);
 
   bool Init(const std::vector<ConnectedComponentPtr>& input_cc,
             const std::shared_ptr<NonMask>& non_mask,
             const std::shared_ptr<Projector<ScalarType>>& projector,
-            const LaneFrameOptions& options);
+            const LaneFrameOptions& options,
+            const double scale,
+            const int start_y_pos);
 
   void SetTransformer(const std::shared_ptr<Projector<ScalarType>>& projector) {
     projector_ = projector;
@@ -147,6 +151,8 @@ class LaneFrame {
   std::vector<Graph> graphs_;
   // tight bounding boxes of lane clusters
   std::vector<Bbox> boxes_;
+  double scale_;
+  double start_y_pos_;
 };
 
 }  // namespace perception
