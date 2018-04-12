@@ -205,6 +205,13 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   } else if (event_meta.event_id == radar_event_id_) {
     PERF_BLOCK_END("fusion_radar");
   } else if (event_meta.event_id == camera_event_id_) {
+    for (auto &obj : sensor_objs) {
+        if (obj.sensor_type == SensorType::CAMERA) {
+            AINFO << "fusion received image : "<< GLOG_TIMESTAMP(obj.timestamp)
+                  << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
+            break;
+        }
+    }
     PERF_BLOCK_END("fusion_camera");
   }
 

@@ -130,6 +130,8 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
   int image_height_ = 1920;
   cv::Rect roi_;
 
+  double scale_;
+  int start_y_pos_;
   bool is_x_longitude_ = true;
 
   std::shared_ptr<Projector<ScalarType>> projector_;

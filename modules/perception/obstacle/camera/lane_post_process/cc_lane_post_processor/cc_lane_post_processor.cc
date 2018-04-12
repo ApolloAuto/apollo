@@ -209,14 +209,19 @@ bool CCLanePostProcessor::Init() {
   time_stamp_ = 0.0;
   frame_id_ = 0;
 
+  int lane_map_width = config_.lane_map_width();
+  int lane_map_height = config_.lane_map_height();
 #if CUDA_CC
   cc_generator_.reset(
       new ConnectedComponentGeneratorGPU(image_width_, image_height_, roi_));
 #else
   cc_generator_.reset(
-      new ConnectedComponentGenerator(image_width_, image_height_, roi_));
+      new ConnectedComponentGenerator(lane_map_width, lane_map_height,
+      cv::Rect(0, 0, lane_map_width, lane_map_height)));
 #endif
 
+  scale_ = config_.lane_map_scale();
+  start_y_pos_ = config_.start_y_pos();
   cur_frame_.reset(new LaneFrame);
 
   is_init_ = true;
@@ -477,9 +482,10 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
   cur_frame_.reset(new LaneFrame);
 
   if (options_.frame.space_type == SpaceType::IMAGE) {
-    cur_frame_->Init(cc_list, non_mask_, options_.frame);
+    cur_frame_->Init(cc_list, non_mask_, options_.frame, scale_, start_y_pos_);
   } else if (options_.frame.space_type == SpaceType::VEHICLE) {
-    cur_frame_->Init(cc_list, non_mask_, projector_, options_.frame);
+    cur_frame_->Init(cc_list, non_mask_, projector_,
+      options_.frame, scale_, start_y_pos_);
   } else {
     AERROR << "unknown space type: " << options_.frame.space_type;
     return false;
@@ -502,16 +508,6 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
 
   if (lane_map.empty()) {
     AERROR << "input lane map is empty";
-    return false;
-  }
-  if (lane_map.cols != image_width_) {
-    AERROR << "input lane map width does not match: "
-           << "(" << lane_map.cols << " vs. " << image_width_ << ")";
-    return false;
-  }
-  if (lane_map.rows != image_height_) {
-    AERROR << "input lane map height does not match: "
-           << "(" << lane_map.rows << " vs. " << image_height_ << ")";
     return false;
   }
 
