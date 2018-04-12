@@ -66,7 +66,8 @@ class GeometryCameraConverter : public BaseCameraConverter {
               std::vector<Eigen::Vector3f> *corners) const;
 
   float SearchDistance(const int &pixel_length, const bool &use_width,
-                       const Eigen::Matrix<float, 3, 1> &mass_center_v);
+                       const Eigen::Matrix<float, 3, 1> &mass_center_v,
+                       float close_d, float far_d);
 
   void SearchCenterDirection(
       const Eigen::Matrix<float, 2, 1> &box_center_pixel, const float &curr_d,
@@ -95,8 +96,8 @@ class GeometryCameraConverter : public BaseCameraConverter {
   CameraDistort<float> camera_model_;
   std::vector<Eigen::Vector3f> corners_;
   std::vector<Eigen::Vector2f> pixel_corners_;
-  static const int kMaxDistanceSearchDepth_ = 20;
-  static const int kMaxCenterDirectionSearchDepth_ = 10;
+  static const int kMaxDistanceSearchDepth_ = 10;
+  static const int kMaxCenterDirectionSearchDepth_ = 5;
 
   DISALLOW_COPY_AND_ASSIGN(GeometryCameraConverter);
 };

@@ -40,8 +40,6 @@ struct PbfSensorObject {
   double invisible_period;
 };
 
-typedef std::shared_ptr<PbfSensorObject> PbfSensorObjectPtr;
-
 struct PbfSensorFrame {
   PbfSensorFrame() { sensor2world_pose = Eigen::Matrix4d::Identity(); }
   SensorType sensor_type = SensorType::UNKNOWN_SENSOR_TYPE;
@@ -50,7 +48,7 @@ struct PbfSensorFrame {
   double timestamp = 0.0;
   int seq_num = 0;
   Eigen::Matrix4d sensor2world_pose;
-  std::vector<PbfSensorObjectPtr> objects;
+  std::vector<std::shared_ptr<PbfSensorObject>> objects;
 };
 
 typedef std::shared_ptr<PbfSensorFrame> PbfSensorFramePtr;

@@ -185,9 +185,9 @@ void ProbabilisticFusion::FuseFrame(const PbfSensorFramePtr &frame) {
         << "object_number: " << frame->objects.size() << ","
         << "timestamp: " << std::fixed << std::setprecision(12)
         << frame->timestamp;
-  std::vector<PbfSensorObjectPtr> &objects = frame->objects;
-  std::vector<PbfSensorObjectPtr> background_objects;
-  std::vector<PbfSensorObjectPtr> foreground_objects;
+  std::vector<std::shared_ptr<PbfSensorObject>> &objects = frame->objects;
+  std::vector<std::shared_ptr<PbfSensorObject>> background_objects;
+  std::vector<std::shared_ptr<PbfSensorObject>> foreground_objects;
   DecomposeFrameObjects(objects, &foreground_objects, &background_objects);
 
   Eigen::Vector3d ref_point = frame->sensor2world_pose.topRightCorner(3, 1);
@@ -197,7 +197,7 @@ void ProbabilisticFusion::FuseFrame(const PbfSensorFramePtr &frame) {
 }
 
 void ProbabilisticFusion::CreateNewTracks(
-    const std::vector<PbfSensorObjectPtr> &sensor_objects,
+    const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
     const std::vector<int> &unassigned_ids) {
   for (size_t i = 0; i < unassigned_ids.size(); i++) {
     int id = unassigned_ids[i];
@@ -208,8 +208,8 @@ void ProbabilisticFusion::CreateNewTracks(
 
 void ProbabilisticFusion::UpdateAssignedTracks(
     std::vector<PbfTrackPtr> *tracks,
-    const std::vector<PbfSensorObjectPtr> &sensor_objects,
-    const std::vector<TrackObjectPair> &assignments,
+    const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
+    const std::vector<std::pair<int, int>> &assignments,
     const std::vector<double> &track_object_dist) {
   for (size_t i = 0; i < assignments.size(); i++) {
     int local_track_index = assignments[i].first;
@@ -242,7 +242,8 @@ void ProbabilisticFusion::CollectFusedObjects(
   std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
   for (size_t i = 0; i < tracks.size(); i++) {
     if (tracks[i]->AbleToPublish()) {
-      PbfSensorObjectPtr fused_object = tracks[i]->GetFusedObject();
+      std::shared_ptr<PbfSensorObject> fused_object =
+          tracks[i]->GetFusedObject();
       ObjectPtr obj(new Object());
       obj->clone(*(fused_object->object));
       obj->track_id = tracks[i]->GetTrackId();
@@ -259,9 +260,9 @@ void ProbabilisticFusion::CollectFusedObjects(
 }
 
 void ProbabilisticFusion::DecomposeFrameObjects(
-    const std::vector<PbfSensorObjectPtr> &frame_objects,
-    std::vector<PbfSensorObjectPtr> *foreground_objects,
-    std::vector<PbfSensorObjectPtr> *background_objects) {
+    const std::vector<std::shared_ptr<PbfSensorObject>> &frame_objects,
+    std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
+    std::vector<std::shared_ptr<PbfSensorObject>> *background_objects) {
   foreground_objects->clear();
   background_objects->clear();
   for (size_t i = 0; i < frame_objects.size(); i++) {
@@ -274,12 +275,12 @@ void ProbabilisticFusion::DecomposeFrameObjects(
 }
 
 void ProbabilisticFusion::FuseForegroundObjects(
-    std::vector<PbfSensorObjectPtr> *foreground_objects,
+    std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
     Eigen::Vector3d ref_point, const SensorType &sensor_type,
     const std::string &sensor_id, double timestamp) {
   std::vector<int> unassigned_tracks;
   std::vector<int> unassigned_objects;
-  std::vector<TrackObjectPair> assignments;
+  std::vector<std::pair<int, int>> assignments;
 
   std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
 
@@ -292,11 +293,11 @@ void ProbabilisticFusion::FuseForegroundObjects(
                   &unassigned_tracks, &unassigned_objects,
                   &track2measurements_dist, &measurement2tracks_dist);
 
-  AINFO << "fg_track_cnt = " << tracks.size()
-        << ", fg_obj_cnt = " << foreground_objects->size()
-        << ", assignement = " << assignments.size()
-        << ", unassigned_track_cnt = " << unassigned_tracks.size()
-        << ", unassigned_obj_cnt = " << unassigned_objects.size();
+  ADEBUG << "fg_track_cnt = " << tracks.size()
+         << ", fg_obj_cnt = " << foreground_objects->size()
+         << ", assignement = " << assignments.size()
+         << ", unassigned_track_cnt = " << unassigned_tracks.size()
+         << ", unassigned_obj_cnt = " << unassigned_objects.size();
 
   UpdateAssignedTracks(&tracks, *foreground_objects, assignments,
                        track2measurements_dist);

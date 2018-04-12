@@ -45,8 +45,8 @@ using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::adapter::AdapterConfig;
 using ::apollo::common::math::KalmanFilter;
 using ::apollo::hdmap::LaneInfo;
-using ::apollo::prediction::math_util::EvaluateQuinticPolynomial;
 using ::apollo::prediction::math_util::EvaluateQuarticPolynomial;
+using ::apollo::prediction::math_util::EvaluateQuinticPolynomial;
 
 void MoveSequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
@@ -114,16 +114,17 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
   }
 
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
-  double time_to_lat_end_state = std::max(FLAGS_default_time_to_lat_end_state,
-      ComputeTimeToLatEndConditionByVelocity(obstacle, lane_sequence));
+  double time_to_lat_end_state =
+      std::max(FLAGS_default_time_to_lat_end_state,
+               ComputeTimeToLatEndConditionByVelocity(obstacle, lane_sequence));
 
   std::array<double, 6> lateral_coeffs;
   std::array<double, 5> longitudinal_coeffs;
   std::pair<double, double> lon_end_vt;
   GetLateralPolynomial(obstacle, lane_sequence, time_to_lat_end_state,
                        &lateral_coeffs);
-  GetLongitudinalPolynomial(obstacle, lane_sequence,
-      &lon_end_vt, &longitudinal_coeffs);
+  GetLongitudinalPolynomial(obstacle, lane_sequence, &lon_end_vt,
+                            &longitudinal_coeffs);
 
   int lane_segment_index = 0;
   std::string lane_id =
@@ -144,16 +145,15 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
     Eigen::Vector2d point;
     double theta = M_PI;
     lane_l = EvaluateQuinticPolynomial(lateral_coeffs, relative_time, 0,
-        time_to_lat_end_state, 0.0);
+                                       time_to_lat_end_state, 0.0);
 
     double curr_s =
         EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 0,
-            lon_end_vt.second, lon_end_vt.first);
-    double prev_s = (i > 0)
-                        ? EvaluateQuarticPolynomial(
-                              longitudinal_coeffs, relative_time - period, 0,
-                              lon_end_vt.second, lon_end_vt.first)
-                        : 0.0;
+                                  lon_end_vt.second, lon_end_vt.first);
+    double prev_s = (i > 0) ? EvaluateQuarticPolynomial(
+                                  longitudinal_coeffs, relative_time - period,
+                                  0, lon_end_vt.second, lon_end_vt.first)
+                            : 0.0;
     lane_s += std::max(0.0, (curr_s - prev_s));
     if (curr_s + FLAGS_double_precision < prev_s) {
       lane_l = prev_lane_l;
@@ -168,10 +168,10 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
     prev_lane_l = lane_l;
     double lane_speed =
         EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 1,
-            lon_end_vt.second, lon_end_vt.first);
+                                  lon_end_vt.second, lon_end_vt.first);
     double lane_acc =
         EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 2,
-            lon_end_vt.second, lon_end_vt.first);
+                                  lon_end_vt.second, lon_end_vt.first);
 
     TrajectoryPoint trajectory_point;
     PathPoint path_point;
