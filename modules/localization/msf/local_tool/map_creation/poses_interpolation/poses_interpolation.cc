@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_tool/map_creation/poses_interpolation/poses_interpolation.h"
 #include <fstream>
 #include <iomanip>
 #include "modules/localization/msf/common/io/velodyne_utility.h"
+#include "modules/localization/msf/local_tool/map_creation/poses_interpolation/poses_interpolation.h"
 
 namespace apollo {
 namespace localization {
@@ -120,8 +120,8 @@ void PosesInterpolation::PoseInterpolationByTime(
     double ref_timestamp = ref_timestamps[i];
     unsigned int ref_index = ref_indexes[i];
 
-    while (in_timestamps[index] < ref_timestamp &&
-           index < in_timestamps.size()) {
+    while (index < in_timestamps.size() &&
+           in_timestamps.at(index) < ref_timestamp) {
       ++index;
     }
 
