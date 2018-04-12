@@ -8,7 +8,7 @@ Please follow the
 Don't forget the
 [post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
 
-### Mac Support
+### Mac support
 
 We always recommend to run Apollo container on Ubuntu with the same version of
 the base image, but in case you want to do code development on a Mac, you can
@@ -21,21 +21,31 @@ Make sure you understand the [difference](https://docs.docker.com/docker-for-mac
 With Mac, lots of Linux bindings are not available, which could cause problems.
 So it's basicly just an environment for code development, while not production.
 
-## Use docker image
+## Development container
 
-We define two Docker images: build and release.
-The build image provides an environment where
-`bash apollo.sh build` runs successfully,
-the release image provides an environment where
-`bash scripts/<module_name>.sh start` runs successfully.
+We provide development environment where you can build Apollo from code.
 
-The standard workflow for getting these containers
-running is (from the main apollo directory):
 ```bash
-bash docker/scripts/{dev/release}_start.sh
-bash docker/scripts/{dev/release}_into.sh
+cd /path/to/apollo
+bash docker/scripts/dev_start.sh
+bash docker/scripts/dev_into.sh
 ```
-Note that, within the scripts in this directory,
-only standard tools that are expected
-to be available in most Linux distributions
-should be used (e.g., don't use realpath).
+
+The scripts to build the dev-image are also available at docker/build.
+
+Note that, within the scripts in this directory, only standard tools that are
+expected to be available in most Linux distributions should be used (e.g., don't
+use realpath).
+
+## Release container
+
+We also distribute release images with runtime environment and pre-compiled
+binaries.
+
+Simply run
+```bash
+cd /path/to/apollo
+bash docker/scripts/release_start.sh
+```
+
+And then you should be able to see Dreamview at http://localhost:8888.
