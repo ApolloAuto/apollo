@@ -18,6 +18,7 @@
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_KALMAN_FILTER_H_
 
 #include <deque>
+#include <memory>
 #include <vector>
 
 #include "modules/perception/obstacle/base/object.h"
@@ -76,8 +77,8 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] old_object: old object for last updating
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  void UpdateWithObject(const TrackedObjectPtr& new_object,
-                        const TrackedObjectPtr& old_object,
+  void UpdateWithObject(const std::shared_ptr<TrackedObject>& new_object,
+                        const std::shared_ptr<TrackedObject>& old_object,
                         const double& time_diff);
 
   // @brief update filter without object
@@ -112,9 +113,10 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] old_object: old object for last updating
   // @params[IN] time_diff: time interval from last updating
   // @return measured velocity
-  Eigen::VectorXf ComputeMeasuredVelocity(const TrackedObjectPtr& new_object,
-                                          const TrackedObjectPtr& old_object,
-                                          const double& time_diff);
+  Eigen::VectorXf ComputeMeasuredVelocity(
+      const std::shared_ptr<TrackedObject>& new_object,
+      const std::shared_ptr<TrackedObject>& old_object,
+      const double& time_diff);
 
   // @brief compute measured anchor point velocity
   // @params[IN] new_object: new object for current updating
@@ -122,7 +124,8 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] time_diff: time interval from last updating
   // @return measured anchor point elocity
   Eigen::VectorXf ComputeMeasuredAnchorPointVelocity(
-      const TrackedObjectPtr& new_object, const TrackedObjectPtr& old_object,
+      const std::shared_ptr<TrackedObject>& new_object,
+      const std::shared_ptr<TrackedObject>& old_object,
       const double& time_diff);
 
   // @brief compute measured bbox center velocity
@@ -131,7 +134,8 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] time_diff: time interval from last updating
   // @return measured bbox center velocity
   Eigen::VectorXf ComputeMeasuredBboxCenterVelocity(
-      const TrackedObjectPtr& new_object, const TrackedObjectPtr& old_object,
+      const std::shared_ptr<TrackedObject>& new_object,
+      const std::shared_ptr<TrackedObject>& old_object,
       const double& time_diff);
 
   // @brief compute measured bbox corner velocity
@@ -140,7 +144,8 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] time_diff: time interval from last updating
   // @return measured bbox corner velocity
   Eigen::VectorXf ComputeMeasuredBboxCornerVelocity(
-      const TrackedObjectPtr& new_object, const TrackedObjectPtr& old_object,
+      const std::shared_ptr<TrackedObject>& new_object,
+      const std::shared_ptr<TrackedObject>& old_object,
       const double& time_diff);
 
   // @brief select measured velocity among candidates
@@ -169,21 +174,22 @@ class KalmanFilter : public BaseFilter {
   // @params[IN] new_object: new object for current updating
   // @params[IN] old_object: old object for last updating
   // @reutrn nothing
-  void ComputeUpdateQuality(const TrackedObjectPtr& new_object,
-                            const TrackedObjectPtr& old_object);
+  void ComputeUpdateQuality(const std::shared_ptr<TrackedObject>& new_object,
+                            const std::shared_ptr<TrackedObject>& old_object);
 
   // @brief compute update quality by using association score
   // @params[IN] new_object: new object for current updating
   // @return upate quality according association score
   float ComputeUpdateQualityAccordingAssociationScore(
-      const TrackedObjectPtr& new_object);
+      const std::shared_ptr<TrackedObject>& new_object);
 
   // @brief compute update quality by using association score
   // @params[IN] old_object: old object for last updaitng
   // @params[IN] new_object: new object for current updating
   // @return update quality according point number change
   float ComputeUpdateQualityAccordingPointNumChange(
-      const TrackedObjectPtr& new_object, const TrackedObjectPtr& old_object);
+      const std::shared_ptr<TrackedObject>& new_object,
+      const std::shared_ptr<TrackedObject>& old_object);
 
   // @brief compute breakdown threshold
   // @return nothing

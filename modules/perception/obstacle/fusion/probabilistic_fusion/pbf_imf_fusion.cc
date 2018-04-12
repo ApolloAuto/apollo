@@ -242,7 +242,7 @@ void PbfIMFFusion::UpdateWithObject(
  * @param state_pre
  * @param cov_pre
  */
-bool PbfIMFFusion::ObtainSensorPrediction(ObjectPtr object,
+bool PbfIMFFusion::ObtainSensorPrediction(std::shared_ptr<Object> object,
                                           double sensor_timestamp,
                                           const Eigen::Matrix4d& process_noise,
                                           const Eigen::Matrix4d& trans_matrix,

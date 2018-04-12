@@ -116,7 +116,7 @@ bool ProbabilisticFusion::Init() {
 
 bool ProbabilisticFusion::Fuse(
     const std::vector<SensorObjects> &multi_sensor_objects,
-    std::vector<ObjectPtr> *fused_objects) {
+    std::vector<std::shared_ptr<Object>> *fused_objects) {
   ACHECK(fused_objects != nullptr) << "parameter fused_objects is nullptr";
 
   std::vector<PbfSensorFramePtr> frames;
@@ -232,7 +232,7 @@ void ProbabilisticFusion::UpdateUnassignedTracks(
 }
 
 void ProbabilisticFusion::CollectFusedObjects(
-    double timestamp, std::vector<ObjectPtr> *fused_objects) {
+    double timestamp, std::vector<std::shared_ptr<Object>> *fused_objects) {
   if (fused_objects == nullptr) {
     return;
   }
@@ -244,7 +244,7 @@ void ProbabilisticFusion::CollectFusedObjects(
     if (tracks[i]->AbleToPublish()) {
       std::shared_ptr<PbfSensorObject> fused_object =
           tracks[i]->GetFusedObject();
-      ObjectPtr obj(new Object());
+      std::shared_ptr<Object> obj(new Object());
       obj->clone(*(fused_object->object));
       obj->track_id = tracks[i]->GetTrackId();
       obj->latest_tracked_time = timestamp;

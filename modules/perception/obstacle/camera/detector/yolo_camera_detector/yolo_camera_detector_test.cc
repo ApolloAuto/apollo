@@ -87,7 +87,7 @@ TEST_F(YoloCameraDetectorTest, yolo_camera_detector_roipooling_test) {
   CameraDetectorOptions options;
   CHECK_EQ(camera_detector->Detect(frame, options, NULL), false);
 
-  std::vector<VisualObjectPtr> objects;
+  std::vector<std::shared_ptr<VisualObject>> objects;
   CHECK(camera_detector->Detect(frame, options, &objects));
   ADEBUG << "#objects detected = " << objects.size();
 
@@ -121,7 +121,7 @@ TEST_F(YoloCameraDetectorTest, multi_task_test) {
   CameraDetectorOptions options;
   CHECK_EQ(camera_detector->Multitask(frame, options, NULL, NULL), false);
 
-  std::vector<VisualObjectPtr> objects;
+  std::vector<std::shared_ptr<VisualObject>> objects;
   cv::Mat lane_map(frame.rows, frame.cols, CV_32FC1);
   CHECK(camera_detector->Multitask(frame, options, &objects, &lane_map));
   ADEBUG << "#objects detected = " << objects.size();

@@ -19,8 +19,8 @@
 
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
-#include "modules/perception/common/perception_gflags.h"
 #include "modules/common/time/timer.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 #include "modules/perception/obstacle/radar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
@@ -109,8 +109,8 @@ void ObstaclePerception::RegistAllAlgorithm() {
   RegisterFactoryProbabilisticFusion();
 }
 
-bool ObstaclePerception::Process(SensorRawFrame* frame,
-                                 std::vector<ObjectPtr>* out_objects) {
+bool ObstaclePerception::Process(
+    SensorRawFrame* frame, std::vector<std::shared_ptr<Object>>* out_objects) {
   if (frame == nullptr || out_objects == nullptr) {
     return false;
   }
@@ -146,7 +146,7 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
     RadarDetectorOptions options;
     options.radar2world_pose = &(radar_frame->pose_);
     options.car_linear_speed = radar_frame->car_linear_speed_;
-    std::vector<ObjectPtr> objects;
+    std::vector<std::shared_ptr<Object>> objects;
     std::vector<PolygonDType> map_polygons;
     if (!radar_detector_->Detect(radar_frame->raw_obstacles_, map_polygons,
                                  options, &objects)) {
@@ -173,7 +173,7 @@ bool ObstaclePerception::Process(SensorRawFrame* frame,
   /// fusion
   std::vector<SensorObjects> multi_sensor_objs;
   multi_sensor_objs.push_back(*sensor_objects);
-  std::vector<ObjectPtr> fused_objects;
+  std::vector<std::shared_ptr<Object>> fused_objects;
   if (!fusion_->Fuse(multi_sensor_objs, &fused_objects)) {
     AERROR << "Failed to fusion";
     return false;

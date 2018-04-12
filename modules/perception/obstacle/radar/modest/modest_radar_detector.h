@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_MODEST_RADAR_DETECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_MODEST_RADAR_DETECTOR_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -43,18 +44,18 @@ class ModestRadarDetector : public BaseRadarDetector {
   bool Detect(const ContiRadar &raw_obstacles,
               const std::vector<PolygonDType> &map_polygons,
               const RadarDetectorOptions &options,
-              std::vector<ObjectPtr> *objects) override;
+              std::vector<std::shared_ptr<Object>> *objects) override;
 
   // @brief: collect radar result
   // @param [out]: radar objects
   // @return collection state
-  bool CollectRadarResult(std::vector<ObjectPtr> *objects);
+  bool CollectRadarResult(std::vector<std::shared_ptr<Object>> *objects);
 
   std::string name() const override { return "ModestRadarDetector"; }
 
  private:
   void RoiFilter(const std::vector<PolygonDType> &map_polygons,
-                 std::vector<ObjectPtr> *filter_objects);
+                 std::vector<std::shared_ptr<Object>> *filter_objects);
 
   // for unit test
   bool result_init_ = true;

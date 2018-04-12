@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_LIDAR_TRACKER_HM_TRACKER_HUNGARIAN_MATCHER_H_
 #define MODULES_PERCEPTION_LIDAR_TRACKER_HM_TRACKER_HUNGARIAN_MATCHER_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -44,7 +45,7 @@ class HungarianMatcher : public BaseMatcher {
   // @params[OUT] unassigned_tracks: tracks without matched object
   // @params[OUT] unassigned_objects: objects without matched track
   // @return nothing
-  void Match(std::vector<TrackedObjectPtr>* objects,
+  void Match(std::vector<std::shared_ptr<TrackedObject>>* objects,
              const std::vector<ObjectTrackPtr>& tracks,
              const std::vector<Eigen::VectorXf>& tracks_predict,
              std::vector<std::pair<int, int>>* assignments,
@@ -78,7 +79,7 @@ class HungarianMatcher : public BaseMatcher {
   void ComputeAssociateMatrix(
       const std::vector<ObjectTrackPtr>& tracks,
       const std::vector<Eigen::VectorXf>& tracks_predict,
-      const std::vector<TrackedObjectPtr>& new_objects,
+      const std::vector<std::shared_ptr<TrackedObject>>& new_objects,
       Eigen::MatrixXf* association_mat);
 
   // @brief compute connected components within given threshold

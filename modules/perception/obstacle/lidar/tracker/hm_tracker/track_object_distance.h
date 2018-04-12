@@ -17,9 +17,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_TRACK_OBJECT_DISTANCE_H_
 #define MODULES_PERCEPTION_OBSTACLE_TRACK_OBJECT_DISTANCE_H_
 
+#include <memory>
 #include <string>
 
 #include "Eigen/Core"
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/object_track.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/tracked_object.h"
@@ -66,13 +68,11 @@ class TrackObjectDistance {
   // @params[IN] track_predict: predicted state of given track
   // @params[IN] new_object: recently detected object
   // @return computed <track, object> distance
-  static float ComputeDistance(const ObjectTrackPtr& track,
-                               const Eigen::VectorXf& track_predict,
-                               const TrackedObjectPtr& new_object);
+  static float ComputeDistance(
+      const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+      const std::shared_ptr<TrackedObject>& new_object);
 
-  std::string Name() const {
-    return "TrackObjectDistance";
-  }
+  std::string Name() const { return "TrackObjectDistance"; }
 
  private:
   // @brief compute location distance for given track & object
@@ -80,39 +80,42 @@ class TrackObjectDistance {
   // @params[IN] track_predict: predicted state of given track
   // @params[IN] new_object: recently detected object
   // @return location distacne of given <track, object>
-  static float ComputeLocationDistance(const ObjectTrackPtr& track,
-                                       const Eigen::VectorXf& track_predict,
-                                       const TrackedObjectPtr& new_object);
+  static float ComputeLocationDistance(
+      const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+      const std::shared_ptr<TrackedObject>& new_object);
 
   // @brief compute direction distance for given track & object
   // @params[IN] track: track for <track, object> distance computing
   // @params[IN] track_predict: predicted state of given track
   // @params[IN] new_object: recently detected object
   // @return direction distance of given <track, object>
-  static float ComputeDirectionDistance(const ObjectTrackPtr& track,
-                                        const Eigen::VectorXf& track_predict,
-                                        const TrackedObjectPtr& new_object);
+  static float ComputeDirectionDistance(
+      const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+      const std::shared_ptr<TrackedObject>& new_object);
 
   // @brief compute bbox size distance for given track & object
   // @params[IN] track: track for <track, object> distance computing
   // @params[IN] new_object: recently detected object
   // @return bbox size distance of given <track, object>
-  static float ComputeBboxSizeDistance(const ObjectTrackPtr& track,
-                                       const TrackedObjectPtr& new_object);
+  static float ComputeBboxSizeDistance(
+      const ObjectTrackPtr& track,
+      const std::shared_ptr<TrackedObject>& new_object);
 
   // @brief compute point num distance for given track & object
   // @params[IN] track: track for <track, object> distance computing
   // @params[IN] new_object: recently detected object
   // @return point num distance of given <track, object>
-  static float ComputePointNumDistance(const ObjectTrackPtr& track,
-                                       const TrackedObjectPtr& new_object);
+  static float ComputePointNumDistance(
+      const ObjectTrackPtr& track,
+      const std::shared_ptr<TrackedObject>& new_object);
 
   // @brief compute histogram distance for given track & object
   // @params[IN] track: track for <track, object> distance computing
   // @params[IN] new_object: recently detected object
   // @return histogram distance of given <track, object>
-  static float ComputeHistogramDistance(const ObjectTrackPtr& track,
-                                        const TrackedObjectPtr& new_object);
+  static float ComputeHistogramDistance(
+      const ObjectTrackPtr& track,
+      const std::shared_ptr<TrackedObject>& new_object);
 
  protected:
   // distance weights
