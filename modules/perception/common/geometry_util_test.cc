@@ -191,9 +191,9 @@ TEST_F(GeometryUtilTest, GetCloudMinMax3D) {
 }
 
 TEST_F(GeometryUtilTest, ComputeBboxSizeCenter) {
-  std::vector<ObjectPtr> objects;
+  std::vector<std::shared_ptr<Object>> objects;
   for (size_t i = 0; i < clouds_.size(); ++i) {
-    ObjectPtr object(new Object);
+    std::shared_ptr<Object> object(new Object);
     object->cloud = clouds_[i];
     objects.push_back(object);
   }

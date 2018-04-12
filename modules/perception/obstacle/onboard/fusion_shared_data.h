@@ -17,8 +17,10 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_FUSION_SHARED_DATA_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_FUSION_SHARED_DATA_H_
 
+#include <memory>
 #include <string>
 #include <vector>
+
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/onboard/common_shared_data.h"
 
@@ -26,7 +28,7 @@ namespace apollo {
 namespace perception {
 
 struct FusionItem {
-  std::vector<ObjectPtr> obstacles;
+  std::vector<std::shared_ptr<Object>> obstacles;
   SeqId seq_num = 0u;
   double timestamp = 0.0;
 };
@@ -36,9 +38,7 @@ class FusionSharedData : public CommonSharedData<FusionItem> {
   FusionSharedData() = default;
   virtual ~FusionSharedData() = default;
 
-  std::string name() const override {
-    return "FusionSharedData";
-  }
+  std::string name() const override { return "FusionSharedData"; }
 
  private:
   DISALLOW_COPY_AND_ASSIGN(FusionSharedData);

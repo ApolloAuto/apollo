@@ -57,7 +57,7 @@ class PbfMotionFusionTest : public testing::Test {
 };
 
 TEST_F(PbfMotionFusionTest, test_initialize_with_lidar_object) {
-  ObjectPtr lidar_object(new Object());
+  std::shared_ptr<Object> lidar_object(new Object());
   double lidar_timestamp = 1234567891.012;
   Eigen::Vector3d lidar_position(30, 0, 0);
   Eigen::Vector3d lidar_velocity(10, 0, 0);
@@ -78,7 +78,7 @@ TEST_F(PbfMotionFusionTest, test_initialize_with_lidar_object) {
   }
 }
 TEST_F(PbfMotionFusionTest, test_initialize_with_radar_object) {
-  ObjectPtr radar_object(new Object());
+  std::shared_ptr<Object> radar_object(new Object());
   double radar_timestamp = 1234567891.112;
   Eigen::Vector3d radar_position(31.1, 0, 0);
   Eigen::Vector3d radar_velocity(10.01, 0, 0);
@@ -98,7 +98,7 @@ TEST_F(PbfMotionFusionTest, test_initialize_with_radar_object) {
   }
 }
 TEST_F(PbfMotionFusionTest, test_update_with_measurement_kalman) {
-  ObjectPtr radar_object(new Object());
+  std::shared_ptr<Object> radar_object(new Object());
   double radar_timestamp = 1234567891.012;
   Eigen::Vector3d radar_position(30, 0, 0);
   Eigen::Vector3d radar_velocity(10.01, 0, 0);
@@ -108,7 +108,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_kalman) {
   std::shared_ptr<PbfSensorObject> pbf_radar_object(
       new PbfSensorObject(radar_object, SensorType::RADAR, radar_timestamp));
 
-  ObjectPtr lidar_object(new Object());
+  std::shared_ptr<Object> lidar_object(new Object());
   double lidar_timestamp = 1234567891.112;
   Eigen::Vector3d lidar_position(31.01, 0, 0);
   Eigen::Vector3d lidar_velocity(10, 0, 0);
@@ -138,7 +138,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_kalman) {
 }
 
 TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf) {
-  ObjectPtr radar_object(new Object());
+  std::shared_ptr<Object> radar_object(new Object());
   double radar_timestamp = 1234567891.012;
   Eigen::Vector3d radar_position(30, 0, 0);
   Eigen::Vector3d radar_velocity(10.01, 0, 0);
@@ -148,7 +148,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf) {
   std::shared_ptr<PbfSensorObject> pbf_radar_object(
       new PbfSensorObject(radar_object, SensorType::RADAR, radar_timestamp));
 
-  ObjectPtr lidar_object(new Object());
+  std::shared_ptr<Object> lidar_object(new Object());
   double lidar_timestamp = 1234567891.112;
   Eigen::Vector3d lidar_position(31.01, 0, 0);
   Eigen::Vector3d lidar_velocity(10, 0, 0);
@@ -182,7 +182,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf) {
 }
 
 TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf_seq) {
-  ObjectPtr radar_object(new Object());
+  std::shared_ptr<Object> radar_object(new Object());
   double radar_timestamp = 1234567891.012;
   Eigen::Vector3d radar_position(30, 0, 0);
   Eigen::Vector3d radar_velocity(10.01, 0, 0);
@@ -213,7 +213,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf_seq) {
       // measure_position_noise_vec << measure_position_noise, 0, 0;
       measure_position_noise_vec << 0, 0, 0;
       ground_truth_location += radar_velocity * 0.1;
-      ObjectPtr radar_object(new Object());
+      std::shared_ptr<Object> radar_object(new Object());
       radar_object->center = ground_truth_location + measure_position_noise_vec;
       AINFO << "radar object center is " << radar_object->center(0);
       radar_object->anchor_point = radar_object->center;
@@ -237,7 +237,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf_seq) {
 }
 
 TEST_F(PbfMotionFusionTest, test_update_without_measurement) {
-  ObjectPtr lidar_object(new Object());
+  std::shared_ptr<Object> lidar_object(new Object());
   double lidar_timestamp = 1234567891.012;
   Eigen::Vector3d lidar_position(30, 0, 0);
   Eigen::Vector3d lidar_velocity(10, 0, 0);

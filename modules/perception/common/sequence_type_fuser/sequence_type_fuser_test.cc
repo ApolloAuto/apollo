@@ -46,7 +46,7 @@ class SequenceTypeFuserTest : public testing::Test {
 
  protected:
   std::shared_ptr<SequenceTypeFuser> fuser_;
-  std::vector<std::vector<ObjectPtr>> objects_;
+  std::vector<std::vector<std::shared_ptr<Object>>> objects_;
   std::vector<double> timestamps_;
   static const std::size_t s_sequence_length_;
   static const std::size_t s_object_num_;

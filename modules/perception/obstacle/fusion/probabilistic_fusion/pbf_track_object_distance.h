@@ -67,7 +67,7 @@ class PbfTrackObjectDistance {
       const std::shared_ptr<PbfSensorObject> &fused_object,
       const std::shared_ptr<PbfSensorObject> &sensor_object);
 
-  float GetAngle(const ObjectPtr &obj);
+  float GetAngle(const std::shared_ptr<Object> &obj);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(PbfTrackObjectDistance);

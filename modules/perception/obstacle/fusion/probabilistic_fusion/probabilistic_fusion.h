@@ -48,7 +48,7 @@ class ProbabilisticFusion : public BaseFusion {
   // @param [out]: fused objects.
   // @return true if fuse successfully, otherwise return false
   virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                    std::vector<ObjectPtr> *fused_objects);
+                    std::vector<std::shared_ptr<Object>> *fused_objects);
 
   virtual std::string name() const;
 
@@ -75,7 +75,7 @@ class ProbabilisticFusion : public BaseFusion {
                               const std::string &sensor_id, double timestamp);
 
   void CollectFusedObjects(double timestamp,
-                           std::vector<ObjectPtr> *fused_objects);
+                           std::vector<std::shared_ptr<Object>> *fused_objects);
 
   void DecomposeFrameObjects(
       const std::vector<std::shared_ptr<PbfSensorObject>> &frame_objects,

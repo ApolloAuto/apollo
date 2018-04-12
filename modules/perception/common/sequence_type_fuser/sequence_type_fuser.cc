@@ -99,14 +99,15 @@ bool SequenceTypeFuser::Init() {
   return true;
 }
 
-bool SequenceTypeFuser::FuseType(const TypeFuserOptions& options,
-                                 std::vector<ObjectPtr>* objects) {
+bool SequenceTypeFuser::FuseType(
+    const TypeFuserOptions& options,
+    std::vector<std::shared_ptr<Object>>* objects) {
   if (objects == nullptr) {
     return false;
   }
   if (options.timestamp > 0.0) {
     sequence_.AddTrackedFrameObjects(*objects, options.timestamp);
-    ObjectSequence::TrackedObjects tracked_objects;
+    std::map<int64_t, std::shared_ptr<Object>> tracked_objects;
     for (auto& object : *objects) {
       if (object->is_background) {
         object->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
@@ -134,7 +135,8 @@ bool SequenceTypeFuser::FuseType(const TypeFuserOptions& options,
   return true;
 }
 
-bool SequenceTypeFuser::FuseWithCCRF(TrackedObjects* tracked_objects) {
+bool SequenceTypeFuser::FuseWithCCRF(
+    std::map<int64_t, std::shared_ptr<Object>>* tracked_objects) {
   if (tracked_objects == nullptr || tracked_objects->size() == 0) {
     return false;
   }
@@ -143,7 +145,7 @@ bool SequenceTypeFuser::FuseWithCCRF(TrackedObjects* tracked_objects) {
   fused_oneshot_probs_.resize(tracked_objects->size());
   std::size_t i = 0;
   for (auto& pair : *tracked_objects) {
-    ObjectPtr& object = pair.second;
+    std::shared_ptr<Object>& object = pair.second;
     if (!RectifyObjectType(object, &fused_oneshot_probs_[i++])) {
       AERROR << "Failed to fuse one shot probs in sequence.";
       return false;
@@ -174,14 +176,14 @@ bool SequenceTypeFuser::FuseWithCCRF(TrackedObjects* tracked_objects) {
       state_back_trace_[i](right) = id;
     }
   }
-  ObjectPtr object = tracked_objects->rbegin()->second;
+  std::shared_ptr<Object> object = tracked_objects->rbegin()->second;
   RecoverFromLogProb(&fused_sequence_probs_.back(), &object->type_probs,
                      &object->type);
 
   return true;
 }
 
-bool SequenceTypeFuser::RectifyObjectType(const ObjectPtr& object,
+bool SequenceTypeFuser::RectifyObjectType(const std::shared_ptr<Object>& object,
                                           Vectord* log_prob) {
   if (object == nullptr || log_prob == nullptr) {
     return false;
