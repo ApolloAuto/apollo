@@ -58,6 +58,8 @@ EndConditionSampler::SampleLatEndConditions() const {
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLonEndConditionsForCruising(
     const double ref_cruise_speed) const {
+  CHECK_GT(FLAGS_num_velocity_sample, 1);
+
   // time interval is one second plus the last one 0.01
   constexpr std::size_t num_time_section = 9;
   std::array<double, num_time_section> time_sections;
@@ -65,41 +67,33 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
     time_sections[i] = FLAGS_trajectory_time_length - i;
   }
   time_sections[num_time_section - 1] = FLAGS_polynomial_minimal_param;
-  CHECK_GT(FLAGS_num_velocity_sample, 1);
 
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
   for (const auto& time : time_sections) {
-    // Add velocity sample as current speed
-    std::array<double, 3> end_s_as_current_speed{0.0, init_s_[1], 0.0};
-    end_s_conditions.emplace_back(end_s_as_current_speed, time);
-    // Number of sample velocities besides current speed
-    std::size_t num_mid_point = FLAGS_num_velocity_sample - 1;
-
-    double v_upper = feasible_region_.VUpper(time);
+    double v_upper = std::min(feasible_region_.VUpper(time),
+        ref_cruise_speed);
     double v_lower = feasible_region_.VLower(time);
-    if (v_lower + FLAGS_min_velocity_sample_gap > v_upper) {
-      ADEBUG << "Too small velocity range, skip sampling";
-      continue;
-    }
-    double v_range = v_upper - v_lower;
-    std::size_t max_num_mid_point =
-        static_cast<std::size_t>(v_range / FLAGS_min_velocity_sample_gap);
-    if (num_mid_point > max_num_mid_point) {
-      num_mid_point = max_num_mid_point;
-    }
 
     std::array<double, 3> lower_end_s = {0.0, v_lower, 0.0};
     end_s_conditions.emplace_back(lower_end_s, time);
 
-    double velocity_seg = v_range / num_mid_point;
-
-    for (std::size_t i = 1; i <= num_mid_point; ++i) {
-      std::array<double, 3> end_s =
-          {0.0, v_lower + velocity_seg * i, 0.0};
-      end_s_conditions.emplace_back(end_s, time);
-    }
     std::array<double, 3> upper_end_s = {0.0, v_upper, 0.0};
     end_s_conditions.emplace_back(upper_end_s, time);
+
+    double v_range = v_upper - v_lower;
+    // Number of sample velocities
+    std::size_t num_of_mid_points = std::min(
+        static_cast<std::size_t>(FLAGS_num_velocity_sample - 2),
+        static_cast<std::size_t>(v_range / FLAGS_min_velocity_sample_gap));
+
+    if (num_of_mid_points > 0) {
+      double velocity_seg = v_range / (num_of_mid_points + 1);
+      for (std::size_t i = 1; i <= num_of_mid_points; ++i) {
+        std::array<double, 3> end_s =
+            {0.0, v_lower + velocity_seg * i, 0.0};
+        end_s_conditions.emplace_back(end_s, time);
+      }
+    }
   }
   return end_s_conditions;
 }
