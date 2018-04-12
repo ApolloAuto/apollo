@@ -271,19 +271,10 @@ bool YoloCameraDetector::Multitask(const cv::Mat &frame,
     return false;
   }
 
-  cv::Mat local_mask(lane_output_height_, lane_output_width_, CV_32FC1);
-  memcpy(local_mask.data,
+  *mask = cv::Mat(lane_output_height_, lane_output_width_, CV_32FC1);
+  memcpy(mask->data,
          seg_blob->cpu_data() + lane_output_width_ * lane_output_height_,
          lane_output_width_ * lane_output_height_ * sizeof(float));
-
-  int roi_w = image_width_;
-  int roi_h = image_height_ - offset_y_;
-  cv::Rect roi(0, offset_y_, roi_w, roi_h);
-  if (roi_w == lane_output_width_ && roi_h == lane_output_height_) {
-    local_mask.copyTo((*mask)(roi));
-  } else {
-    cv::resize(local_mask, (*mask)(roi), cv::Size(roi_w, roi_h));
-  }
 
   return true;
 }
