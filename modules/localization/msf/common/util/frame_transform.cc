@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/common/util/frame_transform.h"
 #include <cmath>
 #include "modules/common/log.h"
+#include "modules/localization/msf/common/util/frame_transform.h"
 
 namespace apollo {
 namespace localization {
@@ -58,13 +58,12 @@ static double Arclength0fMeridian(const double phi) {
   double n = (kSmA - kSmB) / (kSmA + kSmB);
 
   /* Precalculate alpha */
-  double alpha = ((kSmA + kSmB) / 2.0) * (1.0 + (pow(n, 2.0) / 4.0)
-                 + (pow(n, 4.0) / 64.0));
+  double alpha = ((kSmA + kSmB) / 2.0) *
+                 (1.0 + (pow(n, 2.0) / 4.0) + (pow(n, 4.0) / 64.0));
 
   /* Precalculate beta */
-  double beta = (-3.0 * n / 2.0)
-         + (9.0 * pow(n, 3.0) / 16.0)
-         + (-3.0 * pow(n, 5.0) / 32.0);
+  double beta = (-3.0 * n / 2.0) + (9.0 * pow(n, 3.0) / 16.0) +
+                (-3.0 * pow(n, 5.0) / 32.0);
 
   /* Precalculate gamma */
   double gamma = (15.0 * pow(n, 2.0) / 16.0) + (-15.0 * pow(n, 4.0) / 32.0);
@@ -76,9 +75,9 @@ static double Arclength0fMeridian(const double phi) {
   double epsilon = (315.0 * pow(n, 4.0) / 512.0);
 
   /* Now calculate the sum of the series and return */
-  double result = alpha * (phi + (beta * sin(2.0 * phi))
-                  + (gamma * sin(4.0 * phi))
-                  + (delta * sin(6.0 * phi)) + (epsilon * sin(8.0 * phi)));
+  double result =
+      alpha * (phi + (beta * sin(2.0 * phi)) + (gamma * sin(4.0 * phi)) +
+               (delta * sin(6.0 * phi)) + (epsilon * sin(8.0 * phi)));
 
   return result;
 }
@@ -123,30 +122,28 @@ double FootpointLatitude(const double y) {
 
   /* Precalculate alpha (Eq. 10.22) */
   /* (Same as alpha in Eq. 10.17) */
-  double alpha = ((kSmA + kSmB) / 2.0) * (1 + (pow(n, 2.0) / 4)
-                  + (pow(n, 4.0) / 64));
+  double alpha =
+      ((kSmA + kSmB) / 2.0) * (1 + (pow(n, 2.0) / 4) + (pow(n, 4.0) / 64));
 
   /* Precalculate yy (Eq. 10.23) */
   double yy = y / alpha;
 
   /* Precalculate beta (Eq. 10.22) */
-  double beta = (3.0 * n / 2.0)
-                 + (-27.0 * pow(n, 3.0) / 32.0)
-                 + (269.0 * pow(n, 5.0) / 512.0);
+  double beta = (3.0 * n / 2.0) + (-27.0 * pow(n, 3.0) / 32.0) +
+                (269.0 * pow(n, 5.0) / 512.0);
 
   /* Precalculate gamma (Eq. 10.22) */
   double gamma = (21.0 * pow(n, 2.0) / 16.0) + (-55.0 * pow(n, 4.0) / 32.0);
 
   /* Precalculate delta (Eq. 10.22) */
-  double delta = (151.0 * pow(n, 3.0) / 96.0)
-                  + (-417.0 * pow(n, 5.0) / 128.0);
+  double delta = (151.0 * pow(n, 3.0) / 96.0) + (-417.0 * pow(n, 5.0) / 128.0);
 
   /* Precalculate epsilon (Eq. 10.22) */
   double epsilon = (1097.0 * pow(n, 4.0) / 512.0);
 
   /* Now calculate the sum of the series (Eq. 10.21) */
-  double result = yy + (beta * sin(2.0 * yy)) + (gamma * sin(4.0 * yy))
-           + (delta * sin(6.0 * yy)) + (epsilon * sin(8.0 * yy));
+  double result = yy + (beta * sin(2.0 * yy)) + (gamma * sin(4.0 * yy)) +
+                  (delta * sin(6.0 * yy)) + (epsilon * sin(8.0 * yy));
 
   return result;
 }
@@ -174,8 +171,8 @@ double FootpointLatitude(const double y) {
  *    The function does not return a value.
  *
  */
-void MaplatlonToXY(const double phi, const double lambda,
-                   double lambda0, UTMCoor *xy) {
+void MaplatlonToXY(const double phi, const double lambda, double lambda0,
+                   UTMCoor *xy) {
   CHECK_NOTNULL(xy);
 
   /* Precalculate ep2 */
@@ -205,25 +202,24 @@ void MaplatlonToXY(const double phi, const double lambda,
 
   double l5coef = 5.0 - 18.0 * t2 + (t2 * t2) + 14.0 * nu2 - 58.0 * t2 * nu2;
 
-  double l6coef = 61.0 - 58.0 * t2 + (t2 * t2)
-                  + 270.0 * nu2 - 330.0 * t2 * nu2;
+  double l6coef = 61.0 - 58.0 * t2 + (t2 * t2) + 270.0 * nu2 - 330.0 * t2 * nu2;
 
   double l7coef = 61.0 - 479.0 * t2 + 179.0 * (t2 * t2) - (t2 * t2 * t2);
 
   double l8coef = 1385.0 - 3111.0 * t2 + 543.0 * (t2 * t2) - (t2 * t2 * t2);
 
   /* Calculate easting (x) */
-  xy->x = nn * cos(phi) * l
-          + (nn / 6.0 * pow(cos(phi), 3.0) * l3coef * pow(l, 3.0))
-          + (nn / 120.0 * pow(cos(phi), 5.0) * l5coef * pow(l, 5.0))
-          + (nn / 5040.0 * pow(cos(phi), 7.0) * l7coef * pow(l, 7.0));
+  xy->x = nn * cos(phi) * l +
+          (nn / 6.0 * pow(cos(phi), 3.0) * l3coef * pow(l, 3.0)) +
+          (nn / 120.0 * pow(cos(phi), 5.0) * l5coef * pow(l, 5.0)) +
+          (nn / 5040.0 * pow(cos(phi), 7.0) * l7coef * pow(l, 7.0));
 
   /* Calculate northing (y) */
-  xy->y = Arclength0fMeridian(phi)
-          + (t / 2.0 * nn * pow(cos(phi), 2.0) * pow(l, 2.0))
-          + (t / 24.0 * nn * pow(cos(phi), 4.0) * l4coef * pow(l, 4.0))
-          + (t / 720.0 * nn * pow(cos(phi), 6.0) * l6coef * pow(l, 6.0))
-          + (t / 40320.0 * nn * pow(cos(phi), 8.0) * l8coef * pow(l, 8.0));
+  xy->y = Arclength0fMeridian(phi) +
+          (t / 2.0 * nn * pow(cos(phi), 2.0) * pow(l, 2.0)) +
+          (t / 24.0 * nn * pow(cos(phi), 4.0) * l4coef * pow(l, 4.0)) +
+          (t / 720.0 * nn * pow(cos(phi), 6.0) * l6coef * pow(l, 6.0)) +
+          (t / 40320.0 * nn * pow(cos(phi), 8.0) * l8coef * pow(l, 8.0));
   return;
 }
 
@@ -258,8 +254,8 @@ void MaplatlonToXY(const double phi, const double lambda,
  *   to optimize computations.
  *
  */
-void MapXYToLatlon(const double x, const double y,
-                   const double lambda0, WGS84Corr *philambda) {
+void MapXYToLatlon(const double x, const double y, const double lambda0,
+                   WGS84Corr *philambda) {
   CHECK_NOTNULL(philambda);
 
   /* Get the value of phif, the footpoint latitude. */
@@ -287,25 +283,25 @@ void MapXYToLatlon(const double x, const double y,
    below to simplify the expressions for latitude and longitude. */
   double x1frac = 1.0 / (nfpow * cf);
 
-  nfpow *= nf;   /* now equals nf**2) */
+  nfpow *= nf; /* now equals nf**2) */
   double x2frac = tf / (2.0 * nfpow);
 
-  nfpow *= nf;   /* now equals nf**3) */
+  nfpow *= nf; /* now equals nf**3) */
   double x3frac = 1.0 / (6.0 * nfpow * cf);
 
-  nfpow *= nf;   /* now equals nf**4) */
+  nfpow *= nf; /* now equals nf**4) */
   double x4frac = tf / (24.0 * nfpow);
 
-  nfpow *= nf;   /* now equals nf**5) */
+  nfpow *= nf; /* now equals nf**5) */
   double x5frac = 1.0 / (120.0 * nfpow * cf);
 
-  nfpow *= nf;   /* now equals nf**6) */
+  nfpow *= nf; /* now equals nf**6) */
   double x6frac = tf / (720.0 * nfpow);
 
-  nfpow *= nf;   /* now equals nf**7) */
+  nfpow *= nf; /* now equals nf**7) */
   double x7frac = 1.0 / (5040.0 * nfpow * cf);
 
-  nfpow *= nf;   /* now equals nf**8) */
+  nfpow *= nf; /* now equals nf**8) */
   double x8frac = tf / (40320.0 * nfpow);
 
   /* Precalculate polynomial coefficients for x**n.
@@ -314,30 +310,27 @@ void MapXYToLatlon(const double x, const double y,
 
   double x3poly = -1.0 - 2 * tf2 - nuf2;
 
-  double x4poly = 5.0 + 3.0 * tf2 + 6.0 * nuf2
-                  - 6.0 * tf2 * nuf2 - 3.0 * (nuf2 *nuf2)
-                  - 9.0 * tf2 * (nuf2 * nuf2);
+  double x4poly = 5.0 + 3.0 * tf2 + 6.0 * nuf2 - 6.0 * tf2 * nuf2 -
+                  3.0 * (nuf2 * nuf2) - 9.0 * tf2 * (nuf2 * nuf2);
 
-  double x5poly = 5.0 + 28.0 * tf2 + 24.0 * tf4
-                  + 6.0 * nuf2 + 8.0 * tf2 * nuf2;
+  double x5poly = 5.0 + 28.0 * tf2 + 24.0 * tf4 + 6.0 * nuf2 + 8.0 * tf2 * nuf2;
 
-  double x6poly = -61.0 - 90.0 * tf2 - 45.0 * tf4
-                  - 107.0 * nuf2 + 162.0 * tf2 * nuf2;
+  double x6poly =
+      -61.0 - 90.0 * tf2 - 45.0 * tf4 - 107.0 * nuf2 + 162.0 * tf2 * nuf2;
 
   double x7poly = -61.0 - 662.0 * tf2 - 1320.0 * tf4 - 720.0 * (tf4 * tf2);
 
   double x8poly = 1385.0 + 3633.0 * tf2 + 4095.0 * tf4 + 1575 * (tf4 * tf2);
 
   /* Calculate latitude */
-  philambda->lat = phif + x2frac * x2poly * (x * x)
-                   + x4frac * x4poly * pow(x, 4.0)
-                   + x6frac * x6poly * pow(x, 6.0)
-                   + x8frac * x8poly * pow(x, 8.0);
+  philambda->lat =
+      phif + x2frac * x2poly * (x * x) + x4frac * x4poly * pow(x, 4.0) +
+      x6frac * x6poly * pow(x, 6.0) + x8frac * x8poly * pow(x, 8.0);
 
   /* Calculate longitude */
-  philambda->log = lambda0 + x1frac * x + x3frac * x3poly * pow(x, 3.0)
-                   + x5frac * x5poly * pow(x, 5.0)
-                   + x7frac * x7poly * pow(x, 7.0);
+  philambda->log = lambda0 + x1frac * x + x3frac * x3poly * pow(x, 3.0) +
+                   x5frac * x5poly * pow(x, 5.0) +
+                   x7frac * x7poly * pow(x, 7.0);
   return;
 }
 
@@ -414,8 +407,7 @@ void UtmXYToLatlon(const double x, const double y, const int zone,
   }
   yy /= kUtmScaleFactor;
 
-  double cmeridian = 0.0;
-  cmeridian = UtmCentralMeridian(zone);
+  double cmeridian = UtmCentralMeridian(zone);
   MapXYToLatlon(xx, yy, cmeridian, latlon);
   return;
 }
@@ -428,18 +420,17 @@ void XYZToBlh(const Eigen::Vector3d &xyz, Eigen::Vector3d *blh) {
   double z = 0.0;
   double zk = 0.0;
   double v = kSinsR0;
-  double sinp = 0.0;
 
   for (z = xyz[2], zk = 0.0; fabs(z - zk) >= 1E-4;) {
     zk = z;
-    sinp = z / sqrt(r2 + z * z);
+    const double sinp = z / sqrt(r2 + z * z);
     v = kSinsR0 / sqrt(1.0 - kSinsE2 * sinp * sinp);
     z = xyz[2] + v * kSinsE2 * sinp;
   }
   (*blh)[0] = r2 > 1E-12 ? atan2(xyz[1], xyz[0]) : 0.0;
   (*blh)[1] = r2 > 1E-12 ? atan(z / sqrt(r2))
-              : (xyz[2] > 0.0 ? M_PI / 2.0: - M_PI / 2.0);
-  (*blh)[2]= sqrt(r2 + z * z) - v;
+                         : (xyz[2] > 0.0 ? M_PI / 2.0 : -M_PI / 2.0);
+  (*blh)[2] = sqrt(r2 + z * z) - v;
   return;
 }
 
