@@ -39,7 +39,7 @@ void FeasibleRegion::Setup(const std::array<double, 3>& init_s,
   speed_limit_ = speed_limit;
 
   double v = init_s[1];
-  CHECK(v >= 0.0);
+  CHECK_GE(v, 0.0);
 
   const double max_deceleration = -FLAGS_longitudinal_acceleration_lower_bound;
   t_at_zero_speed_ = v / max_deceleration;
