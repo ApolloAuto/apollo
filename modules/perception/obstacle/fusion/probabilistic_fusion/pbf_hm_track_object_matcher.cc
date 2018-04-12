@@ -26,7 +26,7 @@ namespace perception {
 
 bool PbfHmTrackObjectMatcher::Match(
     const std::vector<PbfTrackPtr> &fusion_tracks,
-    const std::vector<PbfSensorObjectPtr> &sensor_objects,
+    const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
     const TrackObjectMatcherOptions &options,
     std::vector<std::pair<int, int>> *assignments,
     std::vector<int> *unassigned_fusion_tracks,
@@ -121,7 +121,7 @@ std::string PbfHmTrackObjectMatcher::name() const {
 
 void PbfHmTrackObjectMatcher::ComputeAssociationMat(
     const std::vector<PbfTrackPtr> &fusion_tracks,
-    const std::vector<PbfSensorObjectPtr> &sensor_objects,
+    const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
     const std::vector<int> &unassigned_fusion_tracks,
     const std::vector<int> &unassigned_sensor_objects,
     const Eigen::Vector3d &ref_point,
@@ -139,7 +139,8 @@ void PbfHmTrackObjectMatcher::ComputeAssociationMat(
     const PbfTrackPtr &fusion_track = fusion_tracks[fusion_idx];
     for (size_t j = 0; j < unassigned_sensor_objects.size(); ++j) {
       int sensor_idx = unassigned_sensor_objects[j];
-      const PbfSensorObjectPtr &sensor_object = sensor_objects[sensor_idx];
+      const std::shared_ptr<PbfSensorObject> &sensor_object =
+          sensor_objects[sensor_idx];
       double distance =
           pbf_distance.Compute(fusion_track, sensor_object, options);
       ADEBUG << "sensor distance:" << distance;

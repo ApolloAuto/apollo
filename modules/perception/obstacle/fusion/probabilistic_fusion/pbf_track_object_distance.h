@@ -17,6 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PBF_PBF_TRACK_OBJECT_DISTANCE_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PBF_PBF_TRACK_OBJECT_DISTANCE_H_
 
+#include <memory>
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
@@ -35,23 +37,24 @@ class PbfTrackObjectDistance {
   virtual ~PbfTrackObjectDistance() = default;
 
   float Compute(const PbfTrackPtr &fused_track,
-                const PbfSensorObjectPtr &sensor_object,
+                const std::shared_ptr<PbfSensorObject> &sensor_object,
                 const TrackObjectDistanceOptions &options);
 
  protected:
-  float ComputeVelodyne64Velodyne64(const PbfSensorObjectPtr &fused_object,
-                                    const PbfSensorObjectPtr &sensor_object,
-                                    const Eigen::Vector3d &ref_pos,
-                                    int range = 3);
-  float ComputeVelodyne64Radar(const PbfSensorObjectPtr &fused_object,
-                               const PbfSensorObjectPtr &sensor_object,
-                               const Eigen::Vector3d &ref_pos, int range = 3);
-  float ComputeRadarRadar(const PbfSensorObjectPtr &fused_object,
-                          const PbfSensorObjectPtr &sensor_object,
+  float ComputeVelodyne64Velodyne64(
+      const std::shared_ptr<PbfSensorObject> &fused_object,
+      const std::shared_ptr<PbfSensorObject> &sensor_object,
+      const Eigen::Vector3d &ref_pos, int range = 3);
+  float ComputeVelodyne64Radar(
+      const std::shared_ptr<PbfSensorObject> &fused_object,
+      const std::shared_ptr<PbfSensorObject> &sensor_object,
+      const Eigen::Vector3d &ref_pos, int range = 3);
+  float ComputeRadarRadar(const std::shared_ptr<PbfSensorObject> &fused_object,
+                          const std::shared_ptr<PbfSensorObject> &sensor_object,
                           const Eigen::Vector3d &ref_pos, int range = 3);
 
-  float ComputeDistance3D(const PbfSensorObjectPtr &fused_object,
-                          const PbfSensorObjectPtr &sensor_object,
+  float ComputeDistance3D(const std::shared_ptr<PbfSensorObject> &fused_object,
+                          const std::shared_ptr<PbfSensorObject> &sensor_object,
                           const Eigen::Vector3d &ref_pos, const int range);
   float ComputeEuclideanDistance(const Eigen::Vector3d &des,
                                  const Eigen::Vector3d &src);
@@ -60,8 +63,9 @@ class PbfTrackObjectDistance {
   bool ComputePolygonCenter(const PolygonDType &polygon,
                             const Eigen::Vector3d &ref_pos, int range,
                             Eigen::Vector3d *center);
-  float ComputeDistanceAngleMatchProb(const PbfSensorObjectPtr &fused_object,
-                                      const PbfSensorObjectPtr &sensor_object);
+  float ComputeDistanceAngleMatchProb(
+      const std::shared_ptr<PbfSensorObject> &fused_object,
+      const std::shared_ptr<PbfSensorObject> &sensor_object);
 
   float GetAngle(const ObjectPtr &obj);
 

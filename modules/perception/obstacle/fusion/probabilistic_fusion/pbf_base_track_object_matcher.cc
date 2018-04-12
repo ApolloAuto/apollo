@@ -17,7 +17,6 @@
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 
 #include <numeric>
-#include <string>
 #include <unordered_map>
 
 namespace apollo {
@@ -35,7 +34,7 @@ double PbfBaseTrackObjectMatcher::GetMaxMatchDistance() {
 
 void PbfBaseTrackObjectMatcher::IdAssign(
     const std::vector<PbfTrackPtr> &fusion_tracks,
-    const std::vector<PbfSensorObjectPtr> &sensor_objects,
+    const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
     std::vector<std::pair<int, int>> *assignments,
     std::vector<int> *unassigned_fusion_tracks,
     std::vector<int> *unassigned_sensor_objects) {
@@ -61,7 +60,7 @@ void PbfBaseTrackObjectMatcher::IdAssign(
 
   std::unordered_map<int, int> track_id_2_sensor_id;
   for (size_t i = 0; i < num_track; ++i) {
-    PbfSensorObjectPtr obj =
+    std::shared_ptr<PbfSensorObject> obj =
         fusion_tracks[i]->GetSensorObject(sensor_type, sensor_id);
     if (obj == nullptr) {
       continue;
