@@ -36,7 +36,7 @@ EndConditionSampler::EndConditionSampler(
     std::shared_ptr<PredictionQuerier> ptr_prediction_querier)
     : init_s_(init_s),
       init_d_(init_d),
-      feasible_region_(init_s, s_dot_limit),
+      feasible_region_(init_s),
       ptr_path_time_graph_(ptr_path_time_graph),
       ptr_prediction_querier_(ptr_prediction_querier) {}
 
