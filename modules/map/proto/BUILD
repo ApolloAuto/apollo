@@ -20,6 +20,7 @@ proto_library(
         "map_junction.proto",
         "map_lane.proto",
         "map_overlap.proto",
+        "map_parking.proto",
         "map_road.proto",
         "map_signal.proto",
         "map_speed_bump.proto",
