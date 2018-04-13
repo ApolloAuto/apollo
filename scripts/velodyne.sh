@@ -26,14 +26,14 @@ source "${DIR}/apollo_base.sh"
 function start() {
     LOG="${APOLLO_ROOT_DIR}/data/log/velodyne.out"
     CMD="roslaunch velodyne start_velodyne.launch"
-    NUM_PROCESSES="$(pgrep -c -f "velodyne_nodelet_manager")"
+    NUM_PROCESSES="$(pgrep -c -f "sensor_velodyne64")"
     if [ "${NUM_PROCESSES}" -eq 0 ]; then
        eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
     fi
 }
 
 function stop() {
-    pkill -f start_velodyne
+    pkill -f sensor_velodyne64
 }
 
 # run command_name module_name
