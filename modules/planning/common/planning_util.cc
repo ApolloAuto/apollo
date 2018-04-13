@@ -81,7 +81,7 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
 
 TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
                             const TrajectoryPoint &tp1, const double t) {
-  if (std::abs(tp0.path_point().s() - tp0.path_point().s()) < 1.0e-4) {
+  if (std::fabs(tp0.path_point().s() - tp0.path_point().s()) < 1.0e-4) {
     return tp1;
   }
 
@@ -101,7 +101,7 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
   double s1 = common::math::IntegrateByGaussLegendre<5>(func_v, t0, t1);
   double s = common::math::IntegrateByGaussLegendre<5>(func_v, t0, t);
 
-  if (std::abs(tp0.path_point().s() - s1) < 1.0e-4) {
+  if (std::fabs(tp0.path_point().s() - s1) < 1.0e-4) {
     return tp1;
   }
 
