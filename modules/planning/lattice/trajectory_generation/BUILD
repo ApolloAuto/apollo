@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/behavior:feasible_region",
         "//modules/planning/lattice/behavior:path_time_graph",
