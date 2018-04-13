@@ -27,6 +27,7 @@
 #include <memory>
 #include <string>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/lattice/behavior/feasible_region.h"
 #include "modules/planning/lattice/behavior/path_time_graph.h"
 #include "modules/planning/lattice/behavior/prediction_querier.h"
@@ -61,6 +62,16 @@ class EndConditionSampler {
 
  private:
   std::vector<SamplePoint> QueryPathTimeObstacleSamplePoints() const;
+
+  void QueryFollowPathTimePoints(
+      const apollo::common::VehicleConfig& vehicle_config,
+      const std::string& obstacle_id,
+      std::vector<SamplePoint>* sample_points) const;
+
+  void QueryOvertakePathTimePoints(
+      const apollo::common::VehicleConfig& vehicle_config,
+      const std::string& obstacle_id,
+      std::vector<SamplePoint>* sample_points) const;
 
  private:
   std::array<double, 3> init_s_;

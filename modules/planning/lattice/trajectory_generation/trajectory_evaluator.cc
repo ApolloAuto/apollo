@@ -188,7 +188,7 @@ double TrajectoryEvaluator::Evaluate(
     cost_components->push_back(lat_offset_cost);
   }
 
-  return lon_objective_cost * FLAGS_weight_lon_travel +
+  return lon_objective_cost * FLAGS_weight_lon_objective +
          lon_jerk_cost * FLAGS_weight_lon_jerk +
          lon_collision_cost * FLAGS_weight_lon_collision +
          centripetal_acc_cost * FLAGS_weight_centripetal_acceleration +
@@ -218,7 +218,7 @@ double TrajectoryEvaluator::EvaluateDiscreteTrajectory(
   cost_components->push_back(lon_objective_cost);
   cost_components->push_back(centripetal_acc_cost);
 
-  return lon_objective_cost * FLAGS_weight_lon_travel +
+  return lon_objective_cost * FLAGS_weight_lon_objective +
          lon_comfort_cost * FLAGS_weight_lon_jerk +
          lon_collision_cost * FLAGS_weight_lon_collision +
          centripetal_acc_cost * FLAGS_weight_centripetal_acceleration +
