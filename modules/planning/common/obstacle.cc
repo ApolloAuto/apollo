@@ -155,7 +155,7 @@ common::TrajectoryPoint Obstacle::GetPointAtTime(
     } else if (it_lower == points.end()) {
       return *points.rbegin();
     }
-    return util::interpolate(*(it_lower - 1), *it_lower, relative_time);
+    return util::Interpolate(*(it_lower - 1), *it_lower, relative_time);
   }
 }
 
