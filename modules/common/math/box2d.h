@@ -233,6 +233,12 @@ class Box2d {
   void Shift(const Vec2d &shift_vec);
 
   /**
+   * @brief Extend the box longitudinally
+   * @param extension_length the length to extend
+   */
+  void LongitudinalExtend(const double extension_length);
+
+  /**
    * @brief Gets a human-readable description of the box
    * @return A debug-string
    */
