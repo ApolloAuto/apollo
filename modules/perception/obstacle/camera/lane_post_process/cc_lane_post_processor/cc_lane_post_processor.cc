@@ -641,9 +641,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       (*lane_objects)->at(object_id).spatial =
           static_cast<SpatialLabelType>(index);
       valid_lane_objects.push_back(object_id);
-
     }
-
     // for right-side lanes
     std::vector<bool> b_right_index_list(MAX_LANE_SPATIAL_LABELS, false);
     int i_r = index_closest_left + 1;
