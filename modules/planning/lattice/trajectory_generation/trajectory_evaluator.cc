@@ -237,10 +237,10 @@ double TrajectoryEvaluator::LatOffsetCost(
     double cost = lat_offset / FLAGS_lat_offset_bound;
     if (lat_offset * lat_offset_start < 0.0) {
       cost_sqr_sum += cost * cost * FLAGS_weight_opposite_side_offset;
-      cost_abs_sum += std::abs(cost) * FLAGS_weight_opposite_side_offset;
+      cost_abs_sum += std::fabs(cost) * FLAGS_weight_opposite_side_offset;
     } else {
       cost_sqr_sum += cost * cost * FLAGS_weight_same_side_offset;
-      cost_abs_sum += std::abs(cost) * FLAGS_weight_same_side_offset;
+      cost_abs_sum += std::fabs(cost) * FLAGS_weight_same_side_offset;
     }
   }
   return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
@@ -259,10 +259,10 @@ double TrajectoryEvaluator::LatOffsetCost(
     double cost = lat_offset / FLAGS_lat_offset_bound;
     if (lat_offset * lat_offset_start < 0.0) {
       cost_sqr_sum += cost * cost * FLAGS_weight_opposite_side_offset;
-      cost_abs_sum += std::abs(cost) * FLAGS_weight_opposite_side_offset;
+      cost_abs_sum += std::fabs(cost) * FLAGS_weight_opposite_side_offset;
     } else {
       cost_sqr_sum += cost * cost * FLAGS_weight_same_side_offset;
-      cost_abs_sum += std::abs(cost) * FLAGS_weight_same_side_offset;
+      cost_abs_sum += std::fabs(cost) * FLAGS_weight_same_side_offset;
     }
   }
   return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
@@ -280,7 +280,7 @@ double TrajectoryEvaluator::LatComfortCost(
     double l_prime = lat_trajectory->Evaluate(1, s);
     double l_primeprime = lat_trajectory->Evaluate(2, s);
     double cost = l_primeprime * s_dot * s_dot + l_prime * s_dotdot;
-    max_cost = std::max(max_cost, std::abs(cost));
+    max_cost = std::max(max_cost, std::fabs(cost));
   }
   return max_cost;
 }
@@ -300,7 +300,7 @@ double TrajectoryEvaluator::LatComfortCost(
     double l_prime = sl_points[i].dl();
     double l_primeprime = sl_points[i].ddl();
     double cost = l_primeprime * s_dot * s_dot + l_prime * s_dotdot;
-    max_cost = std::max(max_cost, std::abs(cost));
+    max_cost = std::max(max_cost, std::fabs(cost));
   }
   return max_cost;
 }
@@ -314,7 +314,7 @@ double TrajectoryEvaluator::LonComfortCost(
     double jerk = lon_trajectory->Evaluate(3, t);
     double cost = jerk / FLAGS_longitudinal_jerk_upper_bound;
     cost_sqr_sum += cost * cost;
-    cost_abs_sum += std::abs(cost);
+    cost_abs_sum += std::fabs(cost);
   }
   return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
 }
@@ -331,13 +331,13 @@ double TrajectoryEvaluator::LonComfortCost(
     double dds2 = st_points[i + 1].a();
     double t1 = st_points[i].t();
     double t2 = st_points[i].t();
-    if (std::abs(t1 - t2) <= FLAGS_lattice_epsilon) {
+    if (std::fabs(t1 - t2) <= FLAGS_lattice_epsilon) {
       continue;
     }
     double jerk = (dds2 - dds1) / (t2 - t1);
     double cost = jerk / FLAGS_longitudinal_jerk_upper_bound;
     cost_sqr_sum += cost * cost;
-    cost_abs_sum += std::abs(cost);
+    cost_abs_sum += std::fabs(cost);
   }
   return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
 }
@@ -355,7 +355,7 @@ double TrajectoryEvaluator::LonObjectiveCost(
   for (std::size_t i = 0; i < ref_s_dots.size(); ++i) {
     double t = i * FLAGS_trajectory_time_resolution;
     double cost = ref_s_dots[i] - lon_trajectory->Evaluate(1, t);
-    speed_cost_sqr_sum += t * t * std::abs(cost);
+    speed_cost_sqr_sum += t * t * std::fabs(cost);
     speed_cost_weight_sum += t * t;
   }
   double speed_cost =
@@ -389,7 +389,7 @@ double TrajectoryEvaluator::LonObjectiveCost(
       speed = 0.5 * (st_points[point_idx].v() + st_points[point_idx + 1].v());
     }
     double cost = ref_s_dots[i] - speed;
-    speed_cost_sqr_sum += t * t * std::abs(cost);
+    speed_cost_sqr_sum += t * t * std::fabs(cost);
     speed_cost_weight_sum += t * t;
   }
   double speed_cost =
@@ -459,7 +459,7 @@ double TrajectoryEvaluator::LonCollisionCost(
         cost = std::exp(-dist * dist / (2.0 * sigma * sigma));
       }
       cost_sqr_sum += cost * cost;
-      cost_abs_sum += std::abs(cost);
+      cost_abs_sum += std::fabs(cost);
     }
   }
   return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
@@ -482,7 +482,7 @@ double TrajectoryEvaluator::CentripetalAccelerationCost(
              << ", use zero kappa instead.";
     }
     double centripetal_acc = v * v * kappa;
-    centripetal_acc_sum += std::abs(centripetal_acc);
+    centripetal_acc_sum += std::fabs(centripetal_acc);
     centripetal_acc_sqr_sum += centripetal_acc * centripetal_acc;
   }
 
@@ -506,7 +506,7 @@ double TrajectoryEvaluator::CentripetalAccelerationCost(
              << ", use zero kappa instead.";
     }
     double centripetal_acc = v * v * kappa;
-    centripetal_acc_sum += std::abs(centripetal_acc);
+    centripetal_acc_sum += std::fabs(centripetal_acc);
     centripetal_acc_sqr_sum += centripetal_acc * centripetal_acc;
   }
 
