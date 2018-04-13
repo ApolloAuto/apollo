@@ -37,7 +37,7 @@ using common::SpeedPoint;
 using common::TrajectoryPoint;
 using common::adapter::AdapterManager;
 
-PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
+PathPoint Interpolate(const PathPoint &p0, const PathPoint &p1,
                       const double s) {
   double s0 = p0.s();
   double s1 = p1.s();
@@ -79,9 +79,9 @@ PathPoint interpolate(const PathPoint &p0, const PathPoint &p1,
   return p;
 }
 
-TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
+TrajectoryPoint Interpolate(const TrajectoryPoint &tp0,
                             const TrajectoryPoint &tp1, const double t) {
-  if (std::fabs(tp0.path_point().s() - tp0.path_point().s()) < 1.0e-4) {
+  if (std::fabs(tp1.path_point().s() - tp0.path_point().s()) < 1.0e-4) {
     return tp1;
   }
 
@@ -132,6 +132,7 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
   TrajectoryPoint tp;
   tp.set_v(v);
   tp.set_a(a);
+  tp.set_relative_time(t);
 
   PathPoint *path_point = tp.mutable_path_point();
   path_point->set_x(x);
@@ -146,7 +147,7 @@ TrajectoryPoint interpolate(const TrajectoryPoint &tp0,
   return tp;
 }
 
-common::SLPoint interpolate(const common::SLPoint &start,
+common::SLPoint Interpolate(const common::SLPoint &start,
                             const common::SLPoint &end, const double weight) {
   common::SLPoint point;
   double s = start.s() * (1 - weight) + end.s() * weight;
