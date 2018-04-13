@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file planning_util.h
+ * @file
  */
 
 #ifndef MODULES_PLANNING_UTIL_PLANNING_UTIL_H_
@@ -24,6 +24,7 @@
 #include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/planning/proto/planning_status.pb.h"
 
 /**
@@ -34,13 +35,13 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-common::SLPoint interpolate(const common::SLPoint &start,
+common::SLPoint Interpolate(const common::SLPoint &start,
                             const common::SLPoint &end, const double weight);
 
-common::PathPoint interpolate(const common::PathPoint &p0,
+common::PathPoint Interpolate(const common::PathPoint &p0,
                               const common::PathPoint &p1, const double s);
 
-common::TrajectoryPoint interpolate(const common::TrajectoryPoint &tp0,
+common::TrajectoryPoint Interpolate(const common::TrajectoryPoint &tp0,
                                     const common::TrajectoryPoint &tp1,
                                     const double t);
 /**

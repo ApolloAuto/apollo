@@ -339,8 +339,8 @@ std::pair<double, double> QpFrenetFrame::MapLateralConstraint(
     weight_front = (s_front - start.s()) / (end.s() - start.s());
   }
 
-  common::SLPoint front = util::interpolate(start, end, weight_front);
-  common::SLPoint back = util::interpolate(start, end, weight_back);
+  common::SLPoint front = util::Interpolate(start, end, weight_front);
+  common::SLPoint back = util::Interpolate(start, end, weight_back);
 
   if (nudge_type == ObjectNudge::RIGHT_NUDGE) {
     result.second = std::min(front.l(), back.l());
