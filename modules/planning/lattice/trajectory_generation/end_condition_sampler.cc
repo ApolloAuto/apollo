@@ -150,40 +150,64 @@ EndConditionSampler::SampleLonEndConditionsForPathTimePoints() const {
 
 std::vector<SamplePoint>
 EndConditionSampler::QueryPathTimeObstacleSamplePoints() const {
+  const auto& vehicle_config =
+      common::VehicleConfigHelper::instance()->GetConfig();
   std::vector<SamplePoint> sample_points;
   for (const auto& path_time_obstacle :
        ptr_path_time_graph_->GetPathTimeObstacles()) {
     std::string obstacle_id = path_time_obstacle.obstacle_id();
-
-    std::vector<PathTimePoint> overtake_path_time_points =
-        ptr_path_time_graph_->GetObstacleSurroundingPoints(
-            obstacle_id, FLAGS_lattice_epsilon, FLAGS_time_min_density);
-    for (const PathTimePoint& path_time_point : overtake_path_time_points) {
-      double v = ptr_prediction_querier_->ProjectVelocityAlongReferenceLine(
-          obstacle_id, path_time_point.s(), path_time_point.t());
-      SamplePoint sample_point;
-      sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
-      sample_point.mutable_path_time_point()->set_s(
-          path_time_point.s() + FLAGS_default_lon_buffer);
-      sample_point.set_ref_v(v);
-      sample_points.push_back(std::move(sample_point));
-    }
-
-    std::vector<PathTimePoint> follow_path_time_points =
-        ptr_path_time_graph_->GetObstacleSurroundingPoints(
-            obstacle_id, -FLAGS_lattice_epsilon, FLAGS_time_min_density);
-    for (const PathTimePoint& path_time_point : follow_path_time_points) {
-      double v = ptr_prediction_querier_->ProjectVelocityAlongReferenceLine(
-          obstacle_id, path_time_point.s(), path_time_point.t());
-      SamplePoint sample_point;
-      sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
-      sample_point.mutable_path_time_point()->set_s(
-          path_time_point.s() - FLAGS_default_lon_buffer);
-      sample_point.set_ref_v(v);
-      sample_points.push_back(std::move(sample_point));
-    }
+    QueryFollowPathTimePoints(vehicle_config, obstacle_id, &sample_points);
+    QueryOvertakePathTimePoints(vehicle_config, obstacle_id, &sample_points);
   }
   return sample_points;
+}
+
+void EndConditionSampler::QueryFollowPathTimePoints(
+    const apollo::common::VehicleConfig& vehicle_config,
+    const std::string& obstacle_id,
+    std::vector<SamplePoint>* const sample_points) const {
+  std::vector<PathTimePoint> follow_path_time_points =
+      ptr_path_time_graph_->GetObstacleSurroundingPoints(
+          obstacle_id, -FLAGS_lattice_epsilon, FLAGS_time_min_density);
+  for (const PathTimePoint& path_time_point : follow_path_time_points) {
+    double v = ptr_prediction_querier_->ProjectVelocityAlongReferenceLine(
+        obstacle_id, path_time_point.s(), path_time_point.t());
+    // Generate candidate s
+    double s_upper = path_time_point.s() -
+                     vehicle_config.vehicle_param().front_edge_to_center();
+    double s_lower = s_upper - FLAGS_default_lon_buffer;
+    CHECK_GE(FLAGS_num_sample_follow_per_timestamp, 2);
+    double s_gap = FLAGS_default_lon_buffer /
+                   static_cast<double>(FLAGS_num_sample_follow_per_timestamp);
+    std::vector<double> sample_s;
+    for (std::size_t i = 0; i < FLAGS_num_sample_follow_per_timestamp; ++i) {
+      double s = s_lower + s_gap * static_cast<double>(i);
+      SamplePoint sample_point;
+      sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
+      sample_point.mutable_path_time_point()->set_s(s);
+      sample_point.set_ref_v(v);
+      sample_points->push_back(std::move(sample_point));
+    }
+  }
+}
+
+void EndConditionSampler::QueryOvertakePathTimePoints(
+    const apollo::common::VehicleConfig& vehicle_config,
+    const std::string& obstacle_id,
+    std::vector<SamplePoint>* sample_points) const {
+  std::vector<PathTimePoint> overtake_path_time_points =
+      ptr_path_time_graph_->GetObstacleSurroundingPoints(
+          obstacle_id, FLAGS_lattice_epsilon, FLAGS_time_min_density);
+  for (const PathTimePoint& path_time_point : overtake_path_time_points) {
+    double v = ptr_prediction_querier_->ProjectVelocityAlongReferenceLine(
+        obstacle_id, path_time_point.s(), path_time_point.t());
+    SamplePoint sample_point;
+    sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
+    sample_point.mutable_path_time_point()->set_s(
+        path_time_point.s() + FLAGS_default_lon_buffer);
+    sample_point.set_ref_v(v);
+    sample_points->push_back(std::move(sample_point));
+  }
 }
 
 }  // namespace planning
