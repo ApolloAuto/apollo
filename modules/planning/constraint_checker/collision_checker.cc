@@ -114,7 +114,7 @@ void CollisionChecker::BuildPredictedEnvironment(
 }
 
 bool CollisionChecker::IsEgoVehicleInLane(const double ego_vehicle_d) {
-  return std::abs(ego_vehicle_d) < FLAGS_default_reference_line_width * 0.5;
+  return std::fabs(ego_vehicle_d) < FLAGS_default_reference_line_width * 0.5;
 }
 
 bool CollisionChecker::ShouldIgnore(
@@ -127,7 +127,7 @@ bool CollisionChecker::ShouldIgnore(
       point.path_point().y());
 
   if (obstacle_reference_line_position.first < ego_vehicle_s &&
-      std::abs(obstacle_reference_line_position.second) < half_lane_width) {
+      std::fabs(obstacle_reference_line_position.second) < half_lane_width) {
     ADEBUG << "Ignore obstacle [" << obstacle->Id() << "]";
     return true;
   }

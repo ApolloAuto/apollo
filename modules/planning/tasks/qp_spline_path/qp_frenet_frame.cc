@@ -283,7 +283,7 @@ bool QpFrenetFrame::MapNudgeLine(
 
   DCHECK_GT(constraint->size(), impact_index.second);
   for (uint32_t i = impact_index.first; i <= impact_index.second; ++i) {
-    double weight = std::abs((evaluated_s_[i] - near_point.s())) / distance;
+    double weight = std::fabs((evaluated_s_[i] - near_point.s())) / distance;
     weight = std::min(1.0, std::max(weight, 0.0));
     double boundary =
         near_point.l() * (1 - weight) + further_point.l() * weight;
