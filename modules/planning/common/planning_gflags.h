@@ -160,6 +160,7 @@ DECLARE_uint32(num_velocity_sample);
 DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);
 DECLARE_double(min_velocity_sample_gap);
+DECLARE_double(lon_collision_buffer);
 
 // Lattice Evaluate Parameters
 DECLARE_double(weight_lon_travel);

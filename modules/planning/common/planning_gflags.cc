@@ -301,6 +301,8 @@ DEFINE_double(backup_trajectory_cost, 1000.0,
               "Default cost of backup trajectory");
 DEFINE_double(min_velocity_sample_gap, 1.0,
               "Minimal sampling gap for velocity");
+DEFINE_double(lon_collision_buffer, 1.0,
+              "The longitudinal buffer to keep distance to other vehicles");
 
 // Lattice Evaluate Parameters
 DEFINE_double(weight_lon_travel, 6.0, "Weight of longitudinal travel cost");
