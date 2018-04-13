@@ -53,16 +53,19 @@ class MotionService : public Subnode {
 
  private:
   void OnLocalization(const localization::LocalizationEstimate &localization);
+  void ImageCallback(const sensor_msgs::Image &message);
   void PublishEvent(double timestamp);
   PlaneMotion *vehicle_planemotion_ = nullptr;
   std::string device_id_;
   double pre_azimuth = 0;  // a invalid value
   double pre_timestamp_ = 0;
   double pre_camera_timestamp_ = 0;
+  double camera_timestamp_ = 0;
   // double pre_camera_timestamp = 0;
   bool start_flag_ = false;
-  const int motion_buffer_size_ = 600;
+  const int motion_buffer_size_ = 60;
   Mutex mutex_;
+  Mutex image_mutex_;
   std::list<VehicleInformation> vehicle_information_buffer_;
   CameraSharedData *camera_shared_data_ = nullptr;
   // MotionBufferPtr motion_buffer_;
