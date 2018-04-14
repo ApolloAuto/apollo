@@ -98,22 +98,22 @@ DEFINE_string(voice_detection_request_topic,
 DEFINE_string(voice_detection_response_topic,
               "/apollo/hmi/voice_detection_response",
               "Voice detetection response topic name.");
-// pandora
-DEFINE_string(pandora_pointcloud_topic, 
+// For pandora.
+DEFINE_string(pandora_pointcloud_topic,
               "/apollo/sensor/pandora/hesai40/PointCloud2",
               "pandora pointcloud topic name");
-DEFINE_string(pandora_camera_front_color_topic, 
+DEFINE_string(pandora_camera_front_color_topic,
               "/apollo/sensor/pandora/camera/front_color",
               "pandora front color camera topic name");
-DEFINE_string(pandora_camera_right_gray_topic, 
+DEFINE_string(pandora_camera_right_gray_topic,
               "/apollo/sensor/pandora/camera/right_gray",
               "pandora right gray camera topic name");
-DEFINE_string(pandora_camera_left_gray_topic, 
+DEFINE_string(pandora_camera_left_gray_topic,
               "/apollo/sensor/pandora/camera/left_gray",
               "pandora left gray camera topic name");
-DEFINE_string(pandora_camera_front_gray_topic, 
+DEFINE_string(pandora_camera_front_gray_topic,
               "/apollo/sensor/pandora/camera/front_gray",
               "pandora front gray camera topic name");
-DEFINE_string(pandora_camera_back_gray_topic, 
+DEFINE_string(pandora_camera_back_gray_topic,
               "/apollo/sensor/pandora/camera/back_gray",
               "pandora back gray camera topic name");
