@@ -68,9 +68,9 @@ struct LaneFrameOptions {
   ScalarType lane_interval_distance = 4.0;
 
   // for fitting curve
-  // minimum size of lane instance to
+  // minimum size of lane instance in meter to
   // be prefiltered
-  ScalarType min_instance_size_prefiltered = 3.0;
+  ScalarType min_instance_size_prefiltered = 0.5;
 
   // maximum size of instance to fit
   // a straight line
