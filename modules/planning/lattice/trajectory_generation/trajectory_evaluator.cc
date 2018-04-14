@@ -39,6 +39,9 @@ using Trajectory1d = Curve1d;
 using apollo::common::FrenetFramePoint;
 using apollo::common::PathPoint;
 using apollo::common::SpeedPoint;
+using Trajectory1dPair =
+    std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>;
+using CostComponentsPair = std::pair<std::vector<double>, double>;
 
 TrajectoryEvaluator::TrajectoryEvaluator(
     const std::array<double, 3>& init_s, const PlanningTarget& planning_target,
@@ -82,14 +85,19 @@ TrajectoryEvaluator::TrajectoryEvaluator(
       */
       if (!FLAGS_enable_auto_tuning) {
         double cost = Evaluate(planning_target, lon_trajectory, lat_trajectory);
-        // Use more efficient "emplace" member fucntion.
-        cost_queue_.emplace(PairCost({lon_trajectory, lat_trajectory}, cost));
+        // Use the "emplace" member fucntion to eliminate the call
+        // to a move constructor.
+        cost_queue_.emplace(Trajectory1dPair(lon_trajectory, lat_trajectory),
+                            cost);
       } else {
         std::vector<double> cost_components;
         double cost = Evaluate(planning_target, lon_trajectory, lat_trajectory,
                                &cost_components);
-        cost_queue_with_components_.emplace(PairCostWithComponents(
-            {lon_trajectory, lat_trajectory}, {cost_components, cost}));
+        // Use the "emplace" member fucntion to eliminate the call
+        // to a move constructor.
+        cost_queue_with_components_.emplace(
+            Trajectory1dPair(lon_trajectory, lat_trajectory),
+            CostComponentsPair(cost_components, cost));
       }
     }
   }
