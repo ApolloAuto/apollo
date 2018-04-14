@@ -79,10 +79,10 @@ DEFINE_bool(image_file_debug, false, "Debug ROS to CV image");
 
 /// modules/perception/lib/config_manager/calibration_config_manager.cc
 DEFINE_string(front_camera_extrinsics_file,
-              "/data/params/front_camera_extrinsics.yaml",
+              "modules/perception/data/params/front_camera_extrinsics.yaml",
               "front_camera extrinsic file");
 DEFINE_string(front_camera_intrinsics_file,
-              "/data/params/front_camera_intrinsics.yaml",
+              "modules/perception/data/params/front_camera_intrinsics.yaml",
               "front_camera intrinsic file");
 
 /// obstacle/onboard/fusion_subnode.cc
