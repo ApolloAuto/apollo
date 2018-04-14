@@ -10,7 +10,7 @@ bazel-testlogs
 WORKSPACE
 # temporary files
 *.swp
-
+*.swo
 # generated files
 generated_data_warehouse.conf
 modules/common/data/ssl_keys

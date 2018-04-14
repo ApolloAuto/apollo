@@ -15,9 +15,10 @@
  *****************************************************************************/
 
 // @brief: lane_post_processing_subnode source file
-
 #include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
 
+#include <chrono>
+#include <thread>
 #include <algorithm>
 #include <cfloat>
 #include <unordered_map>
@@ -68,7 +69,6 @@ bool LanePostProcessingSubnode::InitInternal() {
     }
     options_.use_lane_history = true;
     AINFO << "options_.use_lane_history: " << options_.use_lane_history;
-    //    options_.ConfigLaneHistory(FLAGS_lane_history_size);
   }
   // init shared data
   if (!InitSharedData()) {
@@ -235,7 +235,14 @@ Status LanePostProcessingSubnode::ProcEvents() {
     }
 
     // TODO(gchen-apollo): add lock to read motion_buffer
+    while (options_.vehicle_status.time_ts != event.timestamp) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    mutex_.lock();
     options_.SetMotion(motion_service_->GetMotionBuffer()->back());
+    mutex_.unlock();
+    }
+    AINFO << "object ts : motion ts   " << std::to_string(event.timestamp)
+          << "  " << std::to_string(options_.vehicle_status.time_ts);
     AINFO << "options_.vehicle_status.motion:  "
           << options_.vehicle_status.motion;
   }
