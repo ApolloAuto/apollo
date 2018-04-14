@@ -43,7 +43,7 @@ namespace apollo {
 namespace perception {
 
 #define CUDA_CC false
-
+#define USE_HISTORY_TO_EXTEND_LANE false
 struct CCLanePostProcessorOptions {
   SpaceType space_type;
   ScalarType lane_map_conf_thresh;
@@ -107,8 +107,11 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   void FilterWithLaneHistory(LaneObjectsPtr lane_objects);
 
-  bool CorrectWithLaneHistory(LaneObjectsPtr lane_objects);
+  bool CorrectWithLaneHistory(int l, LaneObjectsPtr lane_objects,
+                              std::vector<bool> *is_valid);
   bool FindLane(const LaneObjects &lane_objects, int spatial_label, int *index);
+
+  void ExtendLaneWithHistory(const LaneObject &history, LaneObject *lane);
 
  private:
   CCLanePostProcessorOptions options_;
