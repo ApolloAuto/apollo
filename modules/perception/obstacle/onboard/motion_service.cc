@@ -56,9 +56,8 @@ bool MotionService::InitInternal() {
   return true;
 }
 void MotionService::ImageCallback(const sensor_msgs::Image &message) {
-   // MutexLock(&image_mutex_);
-   camera_timestamp_ = message.header.stamp.toSec();
-
+    // MutexLock(&image_mutex_);
+    camera_timestamp_ = message.header.stamp.toSec();
 }
 
 void MotionService::OnLocalization(
@@ -111,7 +110,6 @@ void MotionService::OnLocalization(
   //   MutexLock lock(&image_mutex_);
   //   camera_timestamp = camera_timestamp_;
   // }
-  
   if (start_flag_) {
     if (std::abs(camera_timestamp - pre_camera_timestamp_) <
         std::numeric_limits<double>::epsilon()) {

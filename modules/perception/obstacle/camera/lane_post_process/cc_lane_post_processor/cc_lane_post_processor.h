@@ -107,7 +107,7 @@ class CCLanePostProcessor : public BaseCameraLanePostProcessor {
 
   void FilterWithLaneHistory(LaneObjectsPtr lane_objects);
 
-  bool CorrectWithLaneHistory(LaneObjectsPtr lane_objects,
+  bool CorrectWithLaneHistory(int l, LaneObjectsPtr lane_objects,
                               std::vector<bool> *is_valid);
   bool FindLane(const LaneObjects &lane_objects, int spatial_label, int *index);
 

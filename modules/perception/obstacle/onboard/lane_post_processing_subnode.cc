@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 // @brief: lane_post_processing_subnode source file
-#include <chrono>
-#include <thread>
 #include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
 
+#include <chrono>
+#include <thread>
 #include <algorithm>
 #include <cfloat>
 #include <unordered_map>
@@ -241,8 +241,8 @@ Status LanePostProcessingSubnode::ProcEvents() {
     options_.SetMotion(motion_service_->GetMotionBuffer()->back());
     mutex_.unlock();
     }
-    AINFO << "object ts : motion ts   " << std::to_string(event.timestamp)  << "  "
-          << std::to_string(options_.vehicle_status.time_ts);
+    AINFO << "object ts : motion ts   " << std::to_string(event.timestamp)
+          << "  " << std::to_string(options_.vehicle_status.time_ts);
     AINFO << "options_.vehicle_status.motion:  "
           << options_.vehicle_status.motion;
   }
