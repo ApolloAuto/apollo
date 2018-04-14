@@ -82,7 +82,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(
       */
       if (!FLAGS_enable_auto_tuning) {
         double cost = Evaluate(planning_target, lon_trajectory, lat_trajectory);
-        // Use more efficient "emplace" member fucntion. 
+        // Use more efficient "emplace" member fucntion.
         cost_queue_.emplace(PairCost({lon_trajectory, lat_trajectory}, cost));
       } else {
         std::vector<double> cost_components;
@@ -183,7 +183,6 @@ double TrajectoryEvaluator::Evaluate(
   double lat_comfort_cost = LatComfortCost(lon_trajectory, lat_trajectory);
 
   if (cost_components != nullptr) {
-    // Use more efficient "emplace_back" member fucntion.
     cost_components->emplace_back(lon_objective_cost);
     cost_components->emplace_back(lon_jerk_cost);
     cost_components->emplace_back(lon_collision_cost);
