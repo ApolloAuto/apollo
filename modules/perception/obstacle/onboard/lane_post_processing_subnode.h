@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <cstdint>
+#include <mutex>
 
 #include "Eigen/Core"
 
@@ -76,6 +77,7 @@ class LanePostProcessingSubnode : public Subnode {
   CameraLanePostProcessOptions options_;
 
   MotionService* motion_service_ = nullptr;
+  std::mutex mutex_;
   EventID motion_event_id_;
   DISALLOW_COPY_AND_ASSIGN(LanePostProcessingSubnode);
 };
