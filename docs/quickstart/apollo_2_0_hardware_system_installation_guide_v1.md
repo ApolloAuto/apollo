@@ -11,10 +11,12 @@
         * [IPC Front and Rear Views](#ipc-front-and-rear-views)
     * [Controller Area Network (CAN) Card](#controller-area-network-(can)-card)
     * [Global Positioning System (GPS) and Inertial Measurement Unit (IMU)](#global-positioning-system-(gps)-and-inertial-measurement-unit-(imu))
-
         * [Option 1: The NovAtel SPAN-IGM-A1](#option-1:-the-novatel-span-igm-a1)
         * [Option 2: The NovAtel SPAN ProPak6 and NovAtel IMU-IGM-A1](#option-2:-the-novatel-span-propak6-and-novatel-imu-igm-a1)
     * [The GPS Receiver/Antenna](#the-gps-receiver/antenna)
+    * [Light Detection and Ranging System (LiDAR)](#light-detection-and-ranging-system)
+        * [Option 1: The Velodyne HDL-64E S3](#option-1:-the-velodyne-hdl-64E-S3)
+        * [Option 2: The Hesai Pandora](#option-2:-the-hesai-pandora) 
 * [Overview of the Installation Tasks](#overview-of-the-installation-tasks)
 * [Steps for the Installation Tasks](#steps-for-the-installation-tasks)
     * [At the Office](#at-the-office)
@@ -91,7 +93,9 @@ The key hardware components to install include:
   You can select one of the following options:
   - NovAtel SPAN-IGM-A1
   - NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1
-- Light Detection and Ranging System (LiDAR) ─ Velodyne HDL-64E S3
+- Light Detection and Ranging System (LiDAR) ─ You can select one of the following options:
+  - Velodyne HDL-64E S3
+  - Hesai Pandora
 - Cameras — Leopard Imaging LI-USB30-AR023ZWDR with USB 3.0 case
 - Radar — Continental ARS408-21
 
@@ -214,6 +218,13 @@ For more information about the NovAtel GPS-703-GGG-HV, see:
 [https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/](https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/)
 
 ## Light Detection and Ranging System (LiDAR)
+There are **two** LiDAR **options** available and the choice depends upon the one that most fits your needs:
+
+- **Option 1: Velodyne HDL-64E S3**
+- **Option 2: Hesai Pandora**
+
+### Option 1: Velodyne HDL-64E S3
+
 The 64 line LiDAR system **HDL-64E S3** is available from Velodyne LiDAR, Inc.
 
 ![lidar_image](images/lidar_pic.png)
@@ -233,6 +244,28 @@ The 64 line LiDAR system **HDL-64E S3** is available from Velodyne LiDAR, Inc.
 
 ![online](images/online_icon.png)Webpage for Velodyne HDL-64E S3:
 [http://velodynelidar.com/hdl-64e.html](http://velodynelidar.com/hdl-64e.html)
+
+### Option 2: Hesai Pandora
+
+The 40 line LiDAR system **Pandora** is available from Hesai Photonics Technology Co., Ltd.
+
+![pandora_image](images/hesai_pandora.png)
+
+**Key Features:**
+
+- 40 Channels
+- 200m range (20% reflectivity)
+- 720 kHz measuring frequency
+- 360° Horizontal FOV
+- 23° Vertical FOV (-16° to 7°)
+- 0.2° angular resolution (azimuth)
+- <2cm accuracy
+- Vertical Resolution: 0.33° ( from -6° to +2°); 1° (from -16° to -6°, +2° to +7°)
+- User selectable frame rate
+- 360° surrounding view with 4 mono cameras and long disatance front view with 1 color camera
+
+![online](images/online_icon.png)Webpage for Hesai Pandora:
+[http://www.hesaitech.com](http://www.hesaitech.com) (coming soon)
 
 ## Cameras
 
@@ -634,18 +667,22 @@ For more information about the NovAtel SPAN ProPak6, see:
 
 [https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf](https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf)
 
-
-
 ### Installing the Light Detection and Ranging System (LiDAR)
+
+This section provides general information about installing **one** of two choices:
+
+- **Option 1:** LiDAR: **Velodyne HDL-64E S3**
+- **Option 2:** LiDAR: **Hesai Pandora**
+
+#### Option 1: Installing Velodyne HDL-64E S3
 
 This section provides descriptions on the installation procedure of HDL-64E S3 LiDAR
 
-#### Mounting
+##### Mounting
 
 A customized mounting structure is required to successfully mount an HDL64E S3 LiDAR on top of a vehicle. This structure must provide rigid support to the LiDAR system while raising the LiDAR to a certain height above the ground. This height avoids the laser beams from the LiDAR being blocked by the front and/or rear of the vehicle. The actual height needed for the LiDAR depends on the design of the vehicle and the mounting point of the LiDAR relative to the vehicle. The vertical tilt angle of the lasers normally ranges from +2~-24.8 degrees relative to the horizon. To fully use the angle range for detection, on a Lincoln MKZ, it is recommended that you mount the LiDAR at a minimum height of 1.8 meters (from ground to the base of the LiDAR).
 
-
-#### Wiring
+##### Wiring
 
 Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power supply, the computer (Ethernet for data transfer, and serial port for LiDAR configuration) and the GPS timesync source. 
 
@@ -655,7 +692,7 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
 
    Connect the power and signal cable to the matching ports on the LiDAR
 
-   ![HDL64_Cabling](images/HDL64_Cabling.JPG)
+   ![HDL64_Cabling](images/HDL64_Cabling.JPG)    
 
 2. Connection to Power Source
 
@@ -665,7 +702,7 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
 
 3. Conection to IPC
 
-   The connection to the IPC is through an ethernet cable. Plug the ethernet connector in the cable bundle into an ethernet port on the IPC
+   The connection to the IPC is through an ethernet cable. Plug the ethernet connector in the cable bundle into an ethernet port on the IPC.
 
 4. Connection to GPS:
 
@@ -689,7 +726,7 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
 
    ![pinout_table](images/pinout_table.png)
 
-   #### Configuration
+##### Configuration
 
    By default, the HDL-64E S3 has the network IP address setting as 192.168.0.1. However, when you set up for Apollo, change the network IP address to 192.168.20.13 . You can use the terminal application with Termite3.2 and enter the network setting command. The IP address of the HDL-64E S3 can be configured using the following steps:
 
@@ -728,6 +765,59 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
       ![online_icon](images/online_icon.png)HDL-64E S3 Manual can be found on this webpage:
 
       [http://velodynelidar.com/hdl-64e.html](http://velodynelidar.com/hdl-64e.html)
+
+#### Option 2: Installing Hesai Pandora
+
+This section provides descriptions on the installation procedure of Hesai Pandora
+
+##### Mounting
+
+A customized mounting structure is required to successfully mount an Hesai Pandora on top of a vehicle. This structure must provide rigid support to the LiDAR system while raising the LiDAR to a certain height above the ground. This height avoids the laser beams from the LiDAR being blocked by the front and/or rear of the vehicle. The actual height needed for the LiDAR depends on the design of the vehicle and the mounting point of the LiDAR relative to the vehicle. The vertical tilt angle of the lasers normally ranges from +7~-16 degrees relative to the horizon. To fully use the angle range for detection, on a Lincoln MKZ, it is recommended that you mount the LiDAR at a minimum height of 1.7 meters (from ground to the base of the LiDAR).
+
+##### Wiring
+
+Each Pandora includes a cable bundle to connect the LiDAR to the power supply, the computer (Ethernet for data transfer) and the GPS timesync source. 
+
+   ![Pandora_cable](images/pandora_cable.png)
+
+1. Connection to the Pandora
+
+   Connect the power and signal cable to the matching ports on the Pandora interface box.
+
+   ![Power_Cabling](images/interface_box_connection.jpg) 
+
+
+2. Connection to Power Source
+
+   The Pandora requires about 3A at 12V. To connect the power source, make full contact with the wires and tighten the screws. 
+
+   ![Pandora_Power_Cable](images/Pandora_PowerCable.png)
+
+3. Conection to IPC
+
+   The connection to the IPC is through an ethernet cable. Plug the ethernet connector in the cable bundle into an ethernet port on the IPC.
+
+4. Connection to GPS:
+
+   The Pandora requires the Recommended minimum specific GPS/Transit data (GPRMC) and pulse per second (PPS)signal to synchronize to the GPS time. A customized connection is needed to establish the communication between the GPS receiver and the LiDAR:
+
+   a. SPAN-IGM-A1
+
+   If you configured the SPAN-IGM-A1 as specified in [Configuring the GPS and IMU](#configuring-the-gps-and-imu), the GPRMC signal is sent from the GPS receiver via the User Port cable from the Main port. The PPS signal is sent through the wire cables labeled as “PPS” and “PPS dgnd” from the Aux port. The dash-line boxes in the figure below show the available connections that come with the Pandora and the SPAN-IGM-A1 GPS receiver. The remaining connections must be made by the user.
+
+   ![Wiring_Schematics_pandora1](images/Pandora_A1_wiring.png)
+   
+   b. Propak 6 and IMU-IGM-A1
+
+   If you configured the Propak 6 as specified in [Configuring the GPS and IMU](#configuring-the-gps-and-imu), the GPRMC signal is sent from the GPS receiver via COM2 port. The PPS signal is sent through the IO port. The dash-line boxes in the figure below are available connections that comes with the Pandora and the Propak 6 GPS receiver. The remaining connections need to be made by the user. 
+
+   ![Wiring_Schematics_pandora2](images/Pandora_PP6_wiring.png)
+
+   The pinout table for Pandora is shown below.
+   ![Pandora_pin](images/Pandora_pinout_table.png)
+
+ ![online_icon](images/online_icon.png)Pandora Manual can be found on this webpage:
+[http://www.hesaitech.com](http://www.hesaitech.com) (coming soon)
 
 ### Installing the Cameras
 
