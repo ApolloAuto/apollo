@@ -206,11 +206,11 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     PERF_BLOCK_END("fusion_radar");
   } else if (event_meta.event_id == camera_event_id_) {
     for (auto &obj : sensor_objs) {
-        if (obj.sensor_type == SensorType::CAMERA) {
-            AINFO << "fusion received image : "<< GLOG_TIMESTAMP(obj.timestamp)
-                  << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
-            break;
-        }
+      if (obj.sensor_type == SensorType::CAMERA) {
+        AINFO << "fusion received image : " << GLOG_TIMESTAMP(obj.timestamp)
+              << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
+        break;
+      }
     }
     PERF_BLOCK_END("fusion_camera");
   }
@@ -377,6 +377,7 @@ void FusionSubnode::RegistAllAlgorithm() {
 void FusionSubnode::OnChassis(const Chassis &chassis) {
   ADEBUG << "Received chassis data: run chassis callback.";
   chassis_.CopyFrom(chassis);
+  ADEBUG << "Received chassis information " << chassis_.ShortDebugString();
   chassis_speed_mps_ = chassis_.speed_mps();
 }
 
