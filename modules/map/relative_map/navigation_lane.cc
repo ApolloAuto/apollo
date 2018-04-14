@@ -337,12 +337,12 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
       right_boundary->mutable_curve()->add_segment()->mutable_line_segment();
 
   const double lane_left_width =
-      left_width_ < 0.0
+      left_width_ <= 0.0
           ? map_config.default_left_width()
           : common::math::Clamp(left_width_, FLAGS_min_lane_half_width,
                                 FLAGS_max_lane_half_width);
   const double lane_right_width =
-      right_width_ < 0.0
+      right_width_ <= 0.0
           ? map_config.default_right_width()
           : common::math::Clamp(right_width_, FLAGS_min_lane_half_width,
                                 FLAGS_max_lane_half_width);
