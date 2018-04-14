@@ -82,8 +82,9 @@ class CameraProcessSubnode : public Subnode {
 
   bool MessageToMat(const sensor_msgs::Image& msg, cv::Mat* img);
 
-  void VisualObjToSensorObj(const std::vector<VisualObjectPtr>& objects,
-                            SharedDataPtr<SensorObjects>* sensor_objects);
+  void VisualObjToSensorObj(
+      const std::vector<std::shared_ptr<VisualObject>>& objects,
+      SharedDataPtr<SensorObjects>* sensor_objects);
 
   void PublishDataAndEvent(const double& timestamp,
                            const SharedDataPtr<SensorObjects>& sensor_objects,

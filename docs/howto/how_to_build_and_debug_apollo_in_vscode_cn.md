@@ -6,7 +6,7 @@ Visual Studio Code（以下简称VSCode）是微软第一款支持Linux的轻量
 首先从[GitHub网站](https://github.com/ApolloAuto/apollo)下载Apollo源代码，可以使用git命令下载，也可以直接通过网页下载压缩包。源代码下载完成后，将其放置到合适的目录。使用VSCode编译Apollo项目有一个前提，就是在你的机器上已经顺利安装了Docker。Apollo之前版本提供了一个“install_docker.sh”脚本文件，因为很多开发者反映可能出错，Apollo项目组已将该文件移除。现在要安装Docker就只能参考[Docker官方网站](https://www.docker.com/)的帮助文档了。
 ### 1.1 编译方法
 打开“Visual Studio Code”，执行菜单命令“文件->打开文件夹”，在弹出的对话框中，选择“Apollo”项目源文件夹，点击“确定”，如下图所示：
-![1](images/vscode/open_directory.jpg)
+![1](images/vscode/open_directory.png)
 ![2](images/vscode/choose_apollo_root_directory.png)
 之后，执行菜单命令“任务->运行生成任务”或直接按快捷键“Ctrl+Shift+B”（与Visual Studio和QT的快捷键一致）构建工程，若之前没有启动过Docker，则编译时会启动Docker，需在底部终端窗口输入超级用户密码，如下图所示：
 ![3](images/vscode/vscode_call_for_password.png)
@@ -14,7 +14,7 @@ Visual Studio Code（以下简称VSCode）是微软第一款支持Linux的轻量
 ![4](images/vscode/vscode_build_complete.png)
 ### 1.2 配置文件解析
 我在`.vscode/tasks.json`文件中总共配置了四个常见的任务：`build the apollo project`（构建Apollo项目）、`run all unit tests for the apollo project`（运行Apollo项目的所有单元测试）、`code style check for the apollo project`（Apollo项目的代码风格检查）、`clean the apollo project`（清理Apollo项目）。其中第一个任务是默认生成任务，可以直接按快捷键“Ctr+Shift+B”调用，其他任务可通过执行菜单命令：任务->运行任务(R)…，在弹出的窗口中，选择对应选项即可，如下图所示：
-![5](images/vscode/run_normal_build_task.jpeg)
+![5](images/vscode/run_normal_build_task.png)
 ![6](images/vscode/selete_build_task.png)
 下面是具体的配置内容，请参考里面的注释来调整编译任务以满足你的构建需求：
 ```

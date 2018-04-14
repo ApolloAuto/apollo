@@ -19,7 +19,6 @@
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <string>
 
 #include "opencv2/opencv.hpp"
 
@@ -95,7 +94,7 @@ bool load_anchors(const string &path, vector<float> *anchors) {
 }
 
 void recover_bbox(int roi_w, int roi_h, int offset_y,
-                  std::vector<VisualObjectPtr> *objects) {
+                  std::vector<std::shared_ptr<VisualObject>> *objects) {
   for (auto &obj : *objects) {
     float xmin = obj->upper_left[0];
     float ymin = obj->upper_left[1];

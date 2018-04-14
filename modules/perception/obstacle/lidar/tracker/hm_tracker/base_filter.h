@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_BASE_FILTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_BASE_FILTER_H_
 
+#include <memory>
 #include <string>
 
 #include "Eigen/Core"
@@ -34,9 +35,7 @@ class BaseFilter {
  public:
   typedef Object ObjectType;
 
-  BaseFilter() {
-    name_ = "BaseFilter";
-  }
+  BaseFilter() { name_ = "BaseFilter"; }
   virtual ~BaseFilter() {}
 
   // @brief initialize the state of filter
@@ -56,9 +55,10 @@ class BaseFilter {
   // @params[IN] old_object: last detected object for last updating
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  virtual void UpdateWithObject(const TrackedObjectPtr& new_object,
-                                const TrackedObjectPtr& old_object,
-                                const double& time_diff) = 0;
+  virtual void UpdateWithObject(
+      const std::shared_ptr<TrackedObject>& new_object,
+      const std::shared_ptr<TrackedObject>& old_object,
+      const double& time_diff) = 0;
 
   // @brief update filter without object
   // @params[IN] time_diff: time interval from last updating
@@ -90,9 +90,7 @@ class BaseFilter {
 
   // @brief get name of filter
   // @return name of filter
-  std::string Name() {
-    return name_;
-  }
+  std::string Name() { return name_; }
 
  protected:
   std::string name_;

@@ -27,6 +27,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/path_matcher.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
@@ -36,6 +37,7 @@ namespace planning {
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
+using apollo::common::math::Vec2d;
 
 CollisionChecker::CollisionChecker(
     const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
@@ -56,9 +58,15 @@ bool CollisionChecker::InCollision(
 
   for (std::size_t i = 0; i < discretized_trajectory.NumOfPoints(); ++i) {
     const auto& trajectory_point = discretized_trajectory.TrajectoryPointAt(i);
+    double ego_theta = trajectory_point.path_point().theta();
     Box2d ego_box(
         {trajectory_point.path_point().x(), trajectory_point.path_point().y()},
-        trajectory_point.path_point().theta(), ego_length, ego_width);
+         ego_theta, ego_length, ego_width);
+    double shift_distance =
+        ego_length / 2.0 - vehicle_config.vehicle_param().back_edge_to_center();
+    Vec2d shift_vec{shift_distance * std::cos(ego_theta),
+                    shift_distance * std::sin(ego_theta)};
+    ego_box.Shift(shift_vec);
 
     for (const auto& obstacle_box : predicted_bounding_rectangles_[i]) {
       if (ego_box.HasOverlap(obstacle_box)) {
@@ -98,6 +106,7 @@ void CollisionChecker::BuildPredictedEnvironment(
       // Obstacle::GetPointAtTime has handled this case.
       TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       Box2d box = obstacle->GetBoundingBox(point);
+      box.LongitudinalExtend(2.0 * FLAGS_lon_collision_buffer);
       predicted_env.push_back(std::move(box));
     }
     predicted_bounding_rectangles_.push_back(std::move(predicted_env));
@@ -106,7 +115,7 @@ void CollisionChecker::BuildPredictedEnvironment(
 }
 
 bool CollisionChecker::IsEgoVehicleInLane(const double ego_vehicle_d) {
-  return std::abs(ego_vehicle_d) < FLAGS_default_reference_line_width * 0.5;
+  return std::fabs(ego_vehicle_d) < FLAGS_default_reference_line_width * 0.5;
 }
 
 bool CollisionChecker::ShouldIgnore(
@@ -119,7 +128,7 @@ bool CollisionChecker::ShouldIgnore(
       point.path_point().y());
 
   if (obstacle_reference_line_position.first < ego_vehicle_s &&
-      std::abs(obstacle_reference_line_position.second) < half_lane_width) {
+      std::fabs(obstacle_reference_line_position.second) < half_lane_width) {
     ADEBUG << "Ignore obstacle [" << obstacle->Id() << "]";
     return true;
   }

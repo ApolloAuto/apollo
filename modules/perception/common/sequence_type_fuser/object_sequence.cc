@@ -23,13 +23,14 @@ namespace apollo {
 namespace perception {
 
 bool ObjectSequence::AddTrackedFrameObjects(
-    const std::vector<ObjectPtr>& objects, double timestamp) {
+    const std::vector<std::shared_ptr<Object>>& objects, double timestamp) {
   std::lock_guard<std::mutex> lock(mutex_);
   for (const auto& obj : objects) {
     int& track_id = obj->track_id;
     auto iter = sequence_.find(track_id);
     if (iter == sequence_.end()) {
-      auto res = sequence_.insert(std::make_pair(track_id, TrackedObjects()));
+      auto res = sequence_.insert(std::make_pair(
+          track_id, std::map<int64_t, std::shared_ptr<Object>>()));
       if (!res.second) {
         AERROR << "Fail to insert track.";
         return false;
@@ -48,9 +49,9 @@ bool ObjectSequence::AddTrackedFrameObjects(
   return true;
 }
 
-bool ObjectSequence::GetTrackInTemporalWindow(int track_id,
-                                              TrackedObjects* track,
-                                              double window_time) {
+bool ObjectSequence::GetTrackInTemporalWindow(
+    int track_id, std::map<int64_t, std::shared_ptr<Object>>* track,
+    double window_time) {
   if (track == nullptr) {
     return false;
   }

@@ -50,12 +50,13 @@ class YoloCameraDetector : public BaseCameraDetector {
                 CameraDetectorInitOptions()) override;
 
   bool Detect(const cv::Mat &frame, const CameraDetectorOptions &options,
-              std::vector<VisualObjectPtr> *objects) override;
+              std::vector<std::shared_ptr<VisualObject>> *objects) override;
 
   bool Multitask(const cv::Mat &frame, const CameraDetectorOptions &options,
-                 std::vector<VisualObjectPtr> *objects, cv::Mat *mask);
+                 std::vector<std::shared_ptr<VisualObject>> *objects,
+                 cv::Mat *mask);
 
-  bool Extract(std::vector<VisualObjectPtr> *objects) {
+  bool Extract(std::vector<std::shared_ptr<VisualObject>> *objects) {
     for (auto &extractor : extractors_) {
       extractor->extract(objects);
     }
@@ -73,8 +74,8 @@ class YoloCameraDetector : public BaseCameraDetector {
 
   void init_anchor(const std::string &yolo_root);
 
-  bool get_objects_cpu(std::vector<VisualObjectPtr> *objects);
-  bool get_objects_gpu(std::vector<VisualObjectPtr> *objects);
+  bool get_objects_cpu(std::vector<std::shared_ptr<VisualObject>> *objects);
+  bool get_objects_gpu(std::vector<std::shared_ptr<VisualObject>> *objects);
 
   void get_object_helper(int idx, const float *loc_data, const float *obj_data,
                          const float *cls_data, const float *ori_data,
@@ -86,13 +87,13 @@ class YoloCameraDetector : public BaseCameraDetector {
  private:
   std::shared_ptr<CNNAdapter> cnnadapter_;
 
-  std::shared_ptr<SyncedMemory> res_cls_tensor_ = nullptr;
-  std::shared_ptr<SyncedMemory> res_box_tensor_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> res_cls_tensor_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> res_box_tensor_ = nullptr;
 
-  std::shared_ptr<SyncedMemory> image_data_ = nullptr;
-  std::shared_ptr<SyncedMemory> overlapped_ = nullptr;
-  std::shared_ptr<SyncedMemory> idx_sm_ = nullptr;
-  std::shared_ptr<SyncedMemory> anchor_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> image_data_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> overlapped_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> idx_sm_ = nullptr;
+  std::shared_ptr<caffe::SyncedMemory> anchor_ = nullptr;
   int height_ = 0;
   int width_ = 0;
   float min_2d_height_ = 0.0f;

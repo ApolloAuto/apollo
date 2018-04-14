@@ -16,6 +16,8 @@
 #ifndef MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_SEQUENCE_TYPE_FUSER_H_
 #define MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_SEQUENCE_TYPE_FUSER_H_
 
+#include <map>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -29,8 +31,6 @@ namespace perception {
 
 class SequenceTypeFuser : public BaseTypeFuser {
  public:
-  typedef ObjectSequence::TrackedObjects TrackedObjects;
-
   /**
    * @brief Constructor
    */
@@ -54,7 +54,7 @@ class SequenceTypeFuser : public BaseTypeFuser {
    * @return True if fuse type successfully, false otherwise
    */
   bool FuseType(const TypeFuserOptions& options,
-                std::vector<ObjectPtr>* objects) override;
+                std::vector<std::shared_ptr<Object>>* objects) override;
 
   /**
    * @brief Get module name
@@ -75,7 +75,8 @@ class SequenceTypeFuser : public BaseTypeFuser {
    * @param tracked_objects The tracked objects as a sequence
    * @return True if fuse successfully, false otherwise
    */
-  bool FuseWithCCRF(TrackedObjects* tracked_objects);
+  bool FuseWithCCRF(
+      std::map<int64_t, std::shared_ptr<Object>>* tracked_objects);
 
   /**
    * @brief Rectify the initial object type based on smooth matrices
@@ -83,7 +84,8 @@ class SequenceTypeFuser : public BaseTypeFuser {
    * @param log_prob The output rectified type probabilities
    * @return True if rectify successfully, false otherwise
    */
-  bool RectifyObjectType(const ObjectPtr& object, Vectord* log_prob);
+  bool RectifyObjectType(const std::shared_ptr<Object>& object,
+                         Vectord* log_prob);
 
   /**
    * @brief Recover type probabilities and object type from the input

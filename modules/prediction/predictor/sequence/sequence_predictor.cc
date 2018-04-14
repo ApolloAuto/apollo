@@ -61,8 +61,12 @@ std::string SequencePredictor::ToString(const LaneSequence& sequence) {
 }
 
 void SequencePredictor::FilterLaneSequences(
-    const LaneGraph& lane_graph, const std::string& lane_id,
+    const Feature& feature, const std::string& lane_id,
     std::vector<bool>* enable_lane_sequence) {
+  if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
+    return;
+  }
+  const LaneGraph& lane_graph = feature.lane().lane_graph();
   int num_lane_sequence = lane_graph.lane_sequence_size();
   std::vector<LaneChangeType> lane_change_type(num_lane_sequence,
                                                LaneChangeType::INVALID);

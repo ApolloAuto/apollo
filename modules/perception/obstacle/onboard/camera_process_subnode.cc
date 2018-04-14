@@ -16,6 +16,9 @@
 
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 
+#include "modules/common/time/time_util.h"
+#include "modules/perception/cuda_util/util.h"
+
 namespace apollo {
 namespace perception {
 
@@ -94,18 +97,21 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   double timestamp = message.header.stamp.toSec();
   ADEBUG << "CameraProcessSubnode ImgCallback: timestamp: ";
   ADEBUG << std::fixed << std::setprecision(64) << timestamp;
+  AINFO << "camera received image : " << GLOG_TIMESTAMP(timestamp)
+        << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
   double curr_timestamp = timestamp * 1e9;
 
   if (FLAGS_skip_camera_frame && timestamp_ns_ > 0.0) {
     if ((curr_timestamp - timestamp_ns_) < (1e9 / FLAGS_camera_hz) &&
-       curr_timestamp > timestamp_ns_) {
+        curr_timestamp > timestamp_ns_) {
       ADEBUG << "CameraProcessSubnode Skip frame";
       return;
     }
   }
 
   timestamp_ns_ = curr_timestamp;
-  ADEBUG << "CameraProcessSubnode Process: " << " frame: " << ++seq_num_;
+  ADEBUG << "CameraProcessSubnode Process: "
+         << " frame: " << ++seq_num_;
   PERF_FUNCTION("CameraProcessSubnode");
   PERF_BLOCK_START();
 
@@ -115,24 +121,24 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   } else {
     img = cv::imread(FLAGS_image_file_path, CV_LOAD_IMAGE_COLOR);
   }
-  std::vector<VisualObjectPtr> objects;
-  cv::Mat mask = cv::Mat::zeros(img.rows, img.cols, CV_32FC1);
-  PERF_BLOCK_END("CameraProcessSubnode Image Preprocess");
+  std::vector<std::shared_ptr<VisualObject>> objects;
+  cv::Mat mask;
+  PERF_BLOCK_END("CameraProcessSubnode_Image_Preprocess");
 
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
-  PERF_BLOCK_END("CameraProcessSubnode detector_");
+  PERF_BLOCK_END("CameraProcessSubnode_detector_");
 
   converter_->Convert(&objects);
-  PERF_BLOCK_END("CameraProcessSubnode converter_");
+  PERF_BLOCK_END("CameraProcessSubnode_converter_");
 
   transformer_->Transform(&objects);
-  PERF_BLOCK_END("CameraProcessSubnode transformer_");
+  PERF_BLOCK_END("CameraProcessSubnode_transformer_");
 
   tracker_->Associate(img, timestamp, &objects);
-  PERF_BLOCK_END("CameraProcessSubnode tracker_");
+  PERF_BLOCK_END("CameraProcessSubnode_tracker_");
 
   filter_->Filter(timestamp, &objects);
-  PERF_BLOCK_END("CameraProcessSubnode filter_");
+  PERF_BLOCK_END("CameraProcessSubnode_filter_");
 
   std::shared_ptr<SensorObjects> out_objs(new SensorObjects);
   out_objs->timestamp = timestamp;
@@ -155,27 +161,22 @@ void CameraProcessSubnode::ChassisCallback(
 
 bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
                                         cv::Mat *img) {
-  cv::Mat cv_img;
+  *img = cv::Mat(msg.height, msg.width, CV_8UC3);
+  int pixel_num = msg.width * msg.height;
   if (msg.encoding.compare("yuyv") == 0) {
     unsigned char *yuv = (unsigned char *)&(msg.data[0]);
-    cv_img = cv::Mat(msg.height, msg.width, CV_8UC3);
-    traffic_light::Yuyv2rgb(yuv, cv_img.data, msg.height * msg.width);
-    cv::cvtColor(cv_img, cv_img, CV_RGB2BGR);
+    yuyv2bgr(yuv, img->data, pixel_num);
   } else {
     cv_bridge::CvImagePtr cv_ptr =
         cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-    cv_img = cv_ptr->image;
+    *img = cv_ptr->image;
   }
 
-  if (cv_img.rows != image_height_ || cv_img.cols != image_width_) {
-    cv::resize(cv_img, cv_img, cv::Size(image_width_, image_height_));
-  }
-  *img = cv_img.clone();
   return true;
 }
 
 void CameraProcessSubnode::VisualObjToSensorObj(
-    const std::vector<VisualObjectPtr> &objects,
+    const std::vector<std::shared_ptr<VisualObject>> &objects,
     SharedDataPtr<SensorObjects> *sensor_objects) {
   (*sensor_objects)->sensor_type = SensorType::CAMERA;
   (*sensor_objects)->sensor_id = device_id_;
@@ -195,8 +196,8 @@ void CameraProcessSubnode::VisualObjToSensorObj(
   }
 
   for (size_t i = 0; i < objects.size(); ++i) {
-    VisualObjectPtr vobj = objects[i];
-    ObjectPtr obj(new Object());
+    std::shared_ptr<VisualObject> vobj = objects[i];
+    std::shared_ptr<Object> obj(new Object());
 
     obj->id = vobj->id;
     obj->score = vobj->score;

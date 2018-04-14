@@ -52,3 +52,7 @@ max_size_to_fit_straight_line_image: 300.0
 online_pitch_angle: -2.5
 ground_height: 1.6
 max_distance_to_see_for_transformer: 500.0
+lane_map_scale: 2.0
+start_y_pos: 312
+lane_map_width: 960
+lane_map_height: 384

@@ -32,10 +32,10 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::util::GetProtoFromFile;
 using std::shared_ptr;
 using std::string;
 using std::vector;
-using apollo::common::util::GetProtoFromFile;
 
 DEFINE_string(test_dir,
               "/apollo/modules/perception/data/cc_lane_post_processor_test/",
@@ -172,9 +172,9 @@ TEST_F(CCLanePostProcessorTest, test_lane_post_process_vis) {
     }
   }
 
-  string lane_objects_image_file =
-      FLAGS_test_dir + "test_lane_objects_image.jpg";
-  cv::imwrite(lane_objects_image_file, vis_lane_objects_image);
+  // string lane_objects_image_file =
+  //     FLAGS_test_dir + "test_lane_objects_image.jpg";
+  // cv::imwrite(lane_objects_image_file, vis_lane_objects_image);
 }
 
 }  // namespace perception

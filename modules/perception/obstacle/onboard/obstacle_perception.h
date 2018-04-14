@@ -64,7 +64,8 @@ class ObstaclePerception {
    * @param out_objects The obstacle perception results
    * @return True if process successfully, false otherwise
    */
-  bool Process(SensorRawFrame* frame, std::vector<ObjectPtr>* out_objects);
+  bool Process(SensorRawFrame* frame,
+               std::vector<std::shared_ptr<Object>>* out_objects);
 
  private:
   /**
