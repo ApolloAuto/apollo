@@ -16,7 +16,7 @@
 
 #include "pandar40p/pandar40p.h"
 
-using namespace apollo::drivers::hesai;
+using apollo::drivers::hesai;
 
 FILE* lidarTimestampFile = fopen("lidar-timestamp.txt", "w");
 
@@ -27,8 +27,10 @@ void gpsCallback(int timestamp) {
   struct timeval ts;
   gettimeofday(&ts, NULL);
   gpsTimestamp = timestamp;
-  pandoraToSysTimeGap =
-      (double)ts.tv_sec + ((double)ts.tv_usec / 1000000.0) - (double)timestamp;
+  double sec = static_cast<double>(ts.tv_sec);
+  double usec = static_cast<double>(ts.tv_usec);
+  double t = static_cast<timestamp>(timestamp);
+  pandoraToSysTimeGap = tv_sec + (tv_usec / 1000000.0) - timestamp;
   printf("gps: %d, gap: %f\n", timestamp, pandoraToSysTimeGap);
 }
 
@@ -36,9 +38,9 @@ void lidarCallback(boost::shared_ptr<PPointCloud> cld, double timestamp) {
   struct timeval ts;
   gettimeofday(&ts, NULL);
   printf("lidar: %lf\n", timestamp);
+  double usec = static_cast<double>(ts.tv_usec);
   fprintf(lidarTimestampFile, "%d, %f,%f\n", gpsTimestamp, timestamp,
-          ts.tv_sec + (double)ts.tv_usec / 1000000 - pandoraToSysTimeGap -
-              timestamp);
+          ts.tv_sec + tv_usec / 1000000 - pandoraToSysTimeGap - timestamp);
 }
 
 int main(int argc, char** argv) {
@@ -49,3 +51,4 @@ int main(int argc, char** argv) {
     sleep(100);
   }
 }
+
