@@ -17,6 +17,8 @@
 #ifndef SRC_PANDORA_CAMERA_H_
 #define SRC_PANDORA_CAMERA_H_
 
+#include <boost/function.hpp>
+#include <opencv2/opencv.hpp>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pthread.h>
@@ -25,9 +27,6 @@
 #include <list>
 #include <string>
 #include <vector>
-
-#include <boost/function.hpp>
-#include <opencv2/opencv.hpp>
 
 #include "src/pandora_client.h"
 

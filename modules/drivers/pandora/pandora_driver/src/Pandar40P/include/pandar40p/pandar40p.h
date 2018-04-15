@@ -17,14 +17,13 @@
 #ifndef INCLUDE_PANDAR40P_H_
 #define INCLUDE_PANDAR40P_H_
 
+#include <boost/function.hpp>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pthread.h>
 #include <semaphore.h>
 
 #include <string>
-
-#include <boost/function.hpp>
 
 #include "pandar40p/point_types.h"
 

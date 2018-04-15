@@ -17,6 +17,8 @@
 #ifndef INCLUDE_PANDORA_PANDORA_H_
 #define INCLUDE_PANDORA_PANDORA_H_
 
+#include <boost/function.hpp>
+#include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui_c.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
@@ -25,9 +27,6 @@
 
 #include <string>
 #include <vector>
-
-#include <boost/function.hpp>
-#include <opencv2/opencv.hpp>
 
 #include "pandar40p/pandar40p.h"
 #include "pandar40p/point_types.h"
