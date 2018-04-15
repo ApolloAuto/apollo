@@ -1,3 +1,17 @@
+# Release 2.5
+This release allows the vehicle to autonomously run on geo-fenced highways. Vehicles are able to do lane keeping cruise and avoid collisions with the leading vehicles.
+
+## Major Features And Improvements
+* Upgrade MSF localization
+* Upgrade DreamView with more visualization features
+* Add HD map data collection tool
+* Add vision based perception with obstacle and lane mark detections
+* Add relative map to support ACC and lane keeping for planning and control
+* Make dockerfile available
+
+## Autonomous Drive Capabilities
+Vehicles with this version can drive autonomously on highways at higher speed without HD map support. The highway needs to have clear white painted lane marks with minimum curvatures. The performance of vision based perception will degrade significantly at night or with strong light flares. **BE CAUTIOUS WHEN DRIVING AUTONOMOUSLY, ESPECIALLY AT NIGHT OR IN POOR VISION ENVIRONMENT**.
+
 # Release 2.0
 This release supports that vehicles autonomously drive on simple urban roads. Vehicles are able to cruise and avoid collisions with obstacles, stop at traffic lights and change lanes if needed to reach the destination.
 
