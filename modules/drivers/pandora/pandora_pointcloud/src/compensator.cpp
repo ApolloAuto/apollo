@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <limits>
+#include <string>
 #include "pandora_pointcloud/compensator.h"
 #include "ros/this_node.h"
 
@@ -30,18 +32,21 @@ Compensator::Compensator(ros::NodeHandle node, ros::NodeHandle private_nh)
       timestamp_data_size_(0) {
   private_nh.param("child_frame_id", child_frame_id_,
                    std::string("hesai40"));
-  private_nh.param("topic_compensated_pointcloud",
-                   topic_compensated_pointcloud_, TOPIC_COMPENSATED_POINTCLOUD);
-  private_nh.param("topic_pointcloud", topic_pointcloud_, TOPIC_POINTCLOUD);
+  private_nh.param(
+      "topic_compensated_pointcloud", topic_compensated_pointcloud_,
+      std::string("/apollo/sensor/pandora/hesai40/compensator/PointCloud2"));
+  private_nh.param("topic_pointcloud", topic_pointcloud_,
+                   std::string("/apollo/sensor/pandora/hesai40/PointCloud2"));
   private_nh.param("queue_size", queue_size_, 10);
-  private_nh.param("tf_query_timeout", tf_timeout_, float(0.1));
+  private_nh.param("tf_query_timeout", tf_timeout_, 0.1f);
 
   // advertise output point cloud (before subscribing to input data)
   compensation_pub_ = node.advertise<sensor_msgs::PointCloud2>(
       topic_compensated_pointcloud_, queue_size_);
   pointcloud_sub_ =
       node.subscribe(topic_pointcloud_, queue_size_,
-                     &Compensator::pointcloud_callback, (Compensator*)this);
+                     &Compensator::pointcloud_callback,
+                     reinterpret_cast<Compensator*>(this));
 }
 
 void Compensator::pointcloud_callback(
@@ -56,11 +61,11 @@ void Compensator::pointcloud_callback(
 
   double timestamp_min = 0;
   double timestamp_max = 0;
-  get_timestamp_interval(msg, timestamp_min, timestamp_max);
+  get_timestamp_interval(msg, &timestamp_min, &timestamp_max);
 
   // compensate point cloud, remove nan point
-  if (query_pose_affine_from_tf2(timestamp_min, pose_min_time) &&
-      query_pose_affine_from_tf2(timestamp_max, pose_max_time)) {
+  if (query_pose_affine_from_tf2(timestamp_min, &pose_min_time) &&
+      query_pose_affine_from_tf2(timestamp_max, &pose_max_time)) {
     // we change message after motion compesation
     sensor_msgs::PointCloud2::Ptr q_msg(new sensor_msgs::PointCloud2());
     *q_msg = *msg;
@@ -72,10 +77,10 @@ void Compensator::pointcloud_callback(
 }
 
 inline void Compensator::get_timestamp_interval(
-    const sensor_msgs::PointCloud2ConstPtr& msg, double& timestamp_min,
-    double& timestamp_max) {
-  timestamp_max = 0.0;
-  timestamp_min = std::numeric_limits<double>::max();
+    const sensor_msgs::PointCloud2ConstPtr& msg, double* timestamp_min,
+    double* timestamp_max) {
+  *timestamp_max = 0.0;
+  *timestamp_min = std::numeric_limits<double>::max();
   int total = msg->width * msg->height;
 
   // get min time and max time
@@ -84,16 +89,16 @@ inline void Compensator::get_timestamp_interval(
     memcpy(&timestamp, &msg->data[i * msg->point_step + timestamp_offset_],
            timestamp_data_size_);
 
-    if (timestamp < timestamp_min) {
-      timestamp_min = timestamp;
+    if (timestamp < *timestamp_min) {
+      *timestamp_min = timestamp;
     }
-    if (timestamp > timestamp_max) {
-      timestamp_max = timestamp;
+    if (timestamp > *timestamp_max) {
+      *timestamp_max = timestamp;
     }
   }
 }
 
-// TODO: if point type is always float, and timestamp is always double?
+// TODO(a): if point type is always float, and timestamp is always double?
 inline bool Compensator::check_message(
     const sensor_msgs::PointCloud2ConstPtr& msg) {
   // check msg width and height
@@ -105,7 +110,7 @@ inline bool Compensator::check_message(
   int y_data_type = 0;
   int z_data_type = 0;
 
-  // TODO: will use a new datastruct with interface to get offset,
+  // TODO(a): will use a new datastruct with interface to get offset,
   // datatype,datasize...
   for (size_t i = 0; i < msg->fields.size(); ++i) {
     const sensor_msgs::PointField& f = msg->fields[i];
@@ -152,7 +157,7 @@ inline bool Compensator::check_message(
 }
 
 bool Compensator::query_pose_affine_from_tf2(const double& timestamp,
-                                             Eigen::Affine3d& pose) {
+                                             Eigen::Affine3d* pose) {
   ros::Time query_time(timestamp);
   std::string err_string;
   if (!tf2_buffer_.canTransform("world", child_frame_id_, query_time,
@@ -173,7 +178,7 @@ bool Compensator::query_pose_affine_from_tf2(const double& timestamp,
     return false;
   }
 
-  tf::transformMsgToEigen(stamped_transform.transform, pose);
+  tf::transformMsgToEigen(stamped_transform.transform, *pose);
   // ROS_DEBUG_STREAM("pose matrix : " << pose);
   return true;
 }
@@ -206,7 +211,7 @@ inline uint Compensator::get_field_size(const int datatype) {
 }
 
 template <typename Scalar>
-void Compensator::motion_compensation(sensor_msgs::PointCloud2::Ptr& msg,
+void Compensator::motion_compensation(const sensor_msgs::PointCloud2::Ptr& msg,
                                       const double timestamp_min,
                                       const double timestamp_max,
                                       const Eigen::Affine3d& pose_min_time,
