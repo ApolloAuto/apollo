@@ -16,7 +16,7 @@
 
 #include "pandora/pandora.h"
 
-using namespace apollo::drivers::hesai;
+using apollo::drivers::hesai::Pandora;
 
 FILE* lidarTimestampFile = fopen("lidar-timestamp.txt", "w");
 
@@ -27,8 +27,10 @@ void gpsCallback(int timestamp) {
   struct timeval ts;
   gettimeofday(&ts, NULL);
   gpsTimestamp = timestamp;
-  pandoraToSysTimeGap =
-      (double)ts.tv_sec + ((double)ts.tv_usec / 1000000.0) - (double)timestamp;
+  double tv_sec = static_cast<double>(ts.tv_sec);
+  double tv_usec = static_cast<double>(ts.tv_usec);
+  double t = static_cast<double>(timestamp);
+  pandoraToSysTimeGap = tv_sec + (tv_usec / 1000000.0) - timestamp;
   printf("gps: %d, gap: %f\n", timestamp, pandoraToSysTimeGap);
 }
 
@@ -56,3 +58,4 @@ int main(int argc, char** argv) {
     sleep(100);
   }
 }
+

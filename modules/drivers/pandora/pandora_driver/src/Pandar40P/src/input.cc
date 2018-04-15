@@ -143,9 +143,6 @@ int Input::getPacket(PandarPacket *pkt) {
       return -1;
     }
   }
-  //if (nbytes == 512) {
-  //  printf("GSP\n");
-  //}
   pkt->size = nbytes;
 
   return 0;

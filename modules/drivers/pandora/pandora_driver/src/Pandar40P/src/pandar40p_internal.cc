@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <algorithm>
 #include <sstream>
 
 #include "src/input.h"
@@ -292,9 +293,9 @@ void Pandar40P_Internal::ProcessLiarPacket() {
                 packetIndex > PACKETS_PER_ROUND + 1) {
           // ok
           if (pcl_callback_ && outMsg->points.size() > 0) {
-            std::cout << std::fixed << std::setprecision(18) 
-                << "Size: " << packetIndex << ", current: " << current_azimuth 
-                << ", timestamp_: " << timestamp_ << std::endl;
+            // std::cout << std::fixed << std::setprecision(18)
+            //    << "Size: " << packetIndex << ", current: " << current_azimuth
+            //    << ", timestamp_: " << timestamp_ << std::endl;
             pcl_callback_(outMsg, timestamp_);
             outMsg.reset(new PPointCloud());
             // reset
