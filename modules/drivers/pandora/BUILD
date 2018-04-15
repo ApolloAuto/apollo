@@ -7,8 +7,8 @@ licenses(["notice"])
 genrule(
     name = "pandora_genrule",
     srcs = glob([
-        "pandora_driver/**",
-        "pandora_pointcloud/**",
+        "**/*.cc",
+        "**/*.h",
         "build_and_install.sh",
     ]),
     outs = ["pandora_genrule.log"],
