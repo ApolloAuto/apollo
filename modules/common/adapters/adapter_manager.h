@@ -284,6 +284,13 @@ class AdapterManager {
   REGISTER_ADAPTER(Navigation);
   REGISTER_ADAPTER(VoiceDetectionRequest);
   REGISTER_ADAPTER(VoiceDetectionResponse);
+  // for pandora
+  REGISTER_ADAPTER(PandoraPointCloud);
+  REGISTER_ADAPTER(PandoraCameraFrontColor);
+  REGISTER_ADAPTER(PandoraCameraRightGray);
+  REGISTER_ADAPTER(PandoraCameraLeftGray);
+  REGISTER_ADAPTER(PandoraCameraFrontGray);
+  REGISTER_ADAPTER(PandoraCameraBackGray);
 
   DECLARE_SINGLETON(AdapterManager);
 };
