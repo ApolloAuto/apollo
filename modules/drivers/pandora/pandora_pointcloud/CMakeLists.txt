@@ -30,7 +30,7 @@ catkin_package()
 ######################
 #     compensator    #
 ######################
-add_executable(compensator_node src/compensator_node.cpp src/compensator.cpp)
+add_executable(compensator_node src/compensator_node.cc src/compensator.cc)
 target_link_libraries(compensator_node 
 	${catkin_LIBRARIES}
     ${PCL_LIBRARIES})
