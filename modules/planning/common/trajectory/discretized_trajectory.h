@@ -48,8 +48,6 @@ class DiscretizedTrajectory : public Trajectory {
 
   virtual ~DiscretizedTrajectory() = default;
 
-  common::TrajectoryPoint Evaluate(const double relative_time) const override;
-
   common::TrajectoryPoint StartPoint() const override;
 
   double GetTemporalLength() const override;
