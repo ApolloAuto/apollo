@@ -782,7 +782,7 @@ Follow these steps:
 
 2.   Place the onboard computer system, the 6108GC, inside the trunk (recommended).
 
-     For example, Apollo 2.0 uses 4x4 self-tapping screws to bolt the 6108GC to the carpeted floor of the trunk. ![IPC-bolt_down-936x720](images/Mount_ipc_on_carpet.JPG)
+     For example, Apollo 2.5 uses 4x4 self-tapping screws to bolt the 6108GC to the carpeted floor of the trunk. ![IPC-bolt_down-936x720](images/Mount_ipc_on_carpet.JPG)
 
 3. Mount the IPC so that its front and back sides(where all ports are located) face the right side (passenger) or the left side(driver) of the trunk.
 
