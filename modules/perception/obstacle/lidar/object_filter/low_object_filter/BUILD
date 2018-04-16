@@ -19,4 +19,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "low_object_filter_test",
+    size = "small",
+    srcs = [
+        "low_object_filter_test.cc",
+    ],
+    deps = [
+        ":low_object_filter",
+        "//modules/perception/common",
+        "//modules/perception/common:pcl_util",
+        "//modules/perception/obstacle/common",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

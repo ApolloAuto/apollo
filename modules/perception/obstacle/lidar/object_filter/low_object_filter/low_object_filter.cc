@@ -83,6 +83,7 @@ void LowObjectFilter::FilterLowObject(
       }
     }
 
+    // object is low and flat
     if (max_height - min_height < 0.10 && max_height < -1.6) {
       continue;
     }
