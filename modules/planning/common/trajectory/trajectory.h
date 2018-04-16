@@ -32,9 +32,6 @@ class Trajectory {
 
   virtual ~Trajectory() = default;
 
-  virtual common::TrajectoryPoint Evaluate(
-      const double relative_time) const = 0;
-
   virtual common::TrajectoryPoint StartPoint() const = 0;
 
   virtual double GetTemporalLength() const = 0;
