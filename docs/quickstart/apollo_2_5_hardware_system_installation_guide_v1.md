@@ -746,7 +746,7 @@ The Apollo reference design recommends using three cameras with different focal 
 
   ![Cameras_lock_screw](./images/LI-Camera-LockScrew.png)
 
-- Use USB 3.0 Cables to connect the cameras (USB 3.0 Micro-B) and the IPC(USB 3.0 type A), and then use the screws to secure the connection.
+- Use USB 3.0 Cables to connect the cameras (USB 3.0 Micro-B) and the IPC(USB 3.0 type A), and then use screws to secure the connection.
 
 
 
