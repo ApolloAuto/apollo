@@ -265,7 +265,7 @@ The 40 line LiDAR system **Pandora** is available from Hesai Photonics Technolog
 - 360° surrounding view with 4 mono cameras and long disatance front view with 1 color camera
 
 ![online](images/online_icon.png)Webpage for Hesai Pandora:
-[http://www.hesaitech.com](http://www.hesaitech.com) (coming soon)
+[http://www.hesaitech.com](http://www.hesaitech.com/pandora.html)
 
 ## Cameras
 
@@ -817,7 +817,7 @@ Each Pandora includes a cable bundle to connect the LiDAR to the power supply, t
    ![Pandora_pin](images/Pandora_pinout_table.png)
 
  ![online_icon](images/online_icon.png)Pandora Manual can be found on this webpage:
-[http://www.hesaitech.com](http://www.hesaitech.com) (coming soon)
+[http://www.hesaitech.com](http://www.hesaitech.com/pandora.html)
 
 ### Installing the Cameras
 
