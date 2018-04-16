@@ -21,4 +21,26 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "single_lane_predictor_test",
+    size = "small",
+    srcs = [
+        "single_lane_predictor_test.cc",
+    ],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/common/util",
+        "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/evaluator/vehicle:cost_evaluator",
+        "//modules/prediction/predictor/single_lane:single_lane_predictor",
+        "//modules/prediction/proto:prediction_proto",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
