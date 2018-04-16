@@ -14,7 +14,7 @@ for Sensor Calibration.
 
 
 ## Data Collection Steps
-1、Enter Into Map Collection Mode
+1、Enter Into Map Collection Mode.
 Please refer to
 [Apollo 2.5 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_quick_start_cn.md)
 for launching the Apollo 2.0 software and hardware stack on vehicle.
@@ -39,4 +39,4 @@ we should ensure the same road can be covered more than five times in the speed 
 
 5、Data Upload
 
-The collected map data is placed in the /apollo/data/bag directory by default, package them as tar.gz compressed file and uploaded to the [Apollo Data Official Website](http://apollo.baidu.com:8800/hd_map_intro?locale=en-us).
+The collected map data is placed in the /apollo/data/bag directory by default, package them as tar.gz compressed file and upload them to the [Apollo Data Official Website](http://apollo.baidu.com:8800/hd_map_intro?locale=en-us).
