@@ -1,5 +1,10 @@
 # Quick Start Guides
 
+## Apollo 2.5
+
+- [apollo 2.5 quick start](apollo_2_5_quick_start.md)
+- [apollo 2.5 quick start cn](apollo_2_5_quick_start_cn.md)
+
 ## Apollo 2.0
 
 - [Apollo 2.0 quick start](apollo_2_0_quick_start.md)
