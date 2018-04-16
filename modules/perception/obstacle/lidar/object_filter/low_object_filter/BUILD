@@ -1,7 +1,6 @@
 load("//tools:cpplint.bzl", "cpplint")
 
-_library(
-
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "low_object_filter",
