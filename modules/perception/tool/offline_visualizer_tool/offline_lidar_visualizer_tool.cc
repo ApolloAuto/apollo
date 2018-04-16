@@ -23,10 +23,10 @@
 
 #include "pcl/io/pcd_io.h"
 
-#include "modules/perception/common/file_system_util.h"
+#include "modules/common/util/file.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
@@ -75,8 +75,9 @@ class OfflineLidarPerceptionTool {
     std::vector<std::string> pcd_file_names;
     std::vector<std::string> pose_file_names;
     AINFO << "starting to run";
-    GetFileNamesInFolderById(pose_folder, ".pose", &pose_file_names);
-    GetFileNamesInFolderById(pcd_folder, ".pcd", &pcd_file_names);
+    common::util::GetFileNamesInFolderById(pose_folder, ".pose",
+                                           &pose_file_names);
+    common::util::GetFileNamesInFolderById(pcd_folder, ".pcd", &pcd_file_names);
     AINFO << " pose size " << pose_file_names.size();
     AINFO << " pcd size " << pcd_file_names.size();
     if (pose_file_names.size() != pcd_file_names.size()) {
@@ -107,7 +108,8 @@ class OfflineLidarPerceptionTool {
       auto velodyne_trans = std::make_shared<Eigen::Matrix4d>(pose);
       lidar_process_->Process(time_stamp, cloud, velodyne_trans);
 
-      std::vector<ObjectPtr> result_objects = lidar_process_->GetObjects();
+      std::vector<std::shared_ptr<Object>> result_objects =
+          lidar_process_->GetObjects();
       const pcl_util::PointIndicesPtr roi_indices =
           lidar_process_->GetROIIndices();
 
@@ -139,7 +141,7 @@ class OfflineLidarPerceptionTool {
     }
   }
 
-  void SaveTrackingInformation(std::vector<ObjectPtr>* objects,
+  void SaveTrackingInformation(std::vector<std::shared_ptr<Object>>* objects,
                                const Eigen::Matrix4d& pose_v2w,
                                const int& frame_id,
                                const pcl_util::PointCloudPtr& cloud,

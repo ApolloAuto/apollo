@@ -63,7 +63,7 @@ TrajectoryPoint DiscretizedTrajectory::Evaluate(
   if (it_lower == trajectory_points_.begin()) {
     return trajectory_points_.front();
   }
-  return util::interpolate(*(it_lower - 1), *it_lower, relative_time);
+  return util::Interpolate(*(it_lower - 1), *it_lower, relative_time);
 }
 
 TrajectoryPoint DiscretizedTrajectory::EvaluateUsingLinearApproximation(
@@ -160,6 +160,11 @@ std::uint32_t DiscretizedTrajectory::NumOfPoints() const {
 const std::vector<TrajectoryPoint>& DiscretizedTrajectory::trajectory_points()
     const {
   return trajectory_points_;
+}
+
+void DiscretizedTrajectory::SetTrajectoryPoints(
+    const std::vector<common::TrajectoryPoint>& trajectory_points) {
+  trajectory_points_ = trajectory_points;
 }
 
 void DiscretizedTrajectory::Clear() { trajectory_points_.clear(); }

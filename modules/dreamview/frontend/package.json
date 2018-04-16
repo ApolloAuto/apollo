@@ -6,13 +6,14 @@
     "author": "adu-sim",
     "license": "Apache 2.0",
     "scripts": {
-        "build": "./gen_pbjs.sh; node_modules/.bin/webpack -p --progress",
-        "start": "./gen_pbjs.sh; node_modules/.bin/webpack-dev-server --watch-poll",
-        "build_offline": "node_modules/.bin/webpack -p --progress --config webpack.offline.config.js",
-        "start_offline": "node_modules/.bin/webpack-dev-server --watch-poll --config webpack.offline.config.js"
+        "build": "./setup.sh; node_modules/.bin/webpack -p --progress",
+        "start": "./setup.sh; node_modules/.bin/webpack-dev-server --watch-poll",
+        "build_offline": "./setup.sh; node_modules/.bin/webpack -p --progress --config webpack.offline.config.js",
+        "start_offline": "./setup.sh; node_modules/.bin/webpack-dev-server --watch-poll --config webpack.offline.config.js"
     },
     "dependencies": {
         "chart.js": "^2.7.0",
+        "chncrs": "^0.1.6",
         "classnames": "^2.2.5",
         "compute-polynomial": "^1.1.0",
         "font-awesome": "^4.7.0",
@@ -23,9 +24,11 @@
         "protobufjs": "^6.8.4",
         "react": "^16.0.0",
         "react-dom": "^16.0.0",
+        "react-loadable": "^5.3.1",
         "react-rangeslider": "^2.2.0",
         "react-split-pane": "^0.1.66",
         "react-tabs": "^2.2.1",
+        "recorder-js": "^1.0.7",
         "stats.js": "^0.17.0",
         "three": "~0.84.0",
         "three-line-2d": "^1.1.6"

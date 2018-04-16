@@ -14,16 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/obstacle/lidar/tracker/hm_tracker/object_track.h"
+
 #include <algorithm>
-#include <string>
-#include <vector>
 
 #include "modules/common/log.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
+#include "modules/perception/common/geometry_util.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/kalman_filter.h"
-#include "modules/perception/obstacle/lidar/tracker/hm_tracker/object_track.h"
 
 namespace apollo {
 namespace perception {
@@ -92,7 +91,7 @@ int ObjectTrack::GetNextTrackId() {
   return ret_track_id;
 }
 
-ObjectTrack::ObjectTrack(TrackedObjectPtr obj) {
+ObjectTrack::ObjectTrack(std::shared_ptr<TrackedObject> obj) {
   // Initialize filter
   Eigen::Vector3f initial_anchor_point = obj->anchor_point;
   Eigen::Vector3f initial_velocity = Eigen::Vector3f::Zero();
@@ -118,7 +117,7 @@ ObjectTrack::ObjectTrack(TrackedObjectPtr obj) {
   belief_velocity_ = initial_velocity;
   const double uncertainty_factor = 5.0;
   belief_velocity_uncertainty_ =
-    Eigen::Matrix3f::Identity() * uncertainty_factor;
+      Eigen::Matrix3f::Identity() * uncertainty_factor;
   belief_velocity_accelaration_ = Eigen::Vector3f::Zero();
   // NEED TO NOTICE: All the states would be collected mainly based on states
   // of tracked object. Thus, update tracked object when you update the state
@@ -151,7 +150,7 @@ Eigen::VectorXf ObjectTrack::Predict(const double& time_diff) {
   return track_predict;
 }
 
-void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
+void ObjectTrack::UpdateWithObject(std::shared_ptr<TrackedObject>* new_object,
                                    const double& time_diff) {
   ACHECK(new_object != nullptr) << "Update object with nullptr object";
   // A. update object track
@@ -190,7 +189,7 @@ void ObjectTrack::UpdateWithObject(TrackedObjectPtr* new_object,
 
 void ObjectTrack::UpdateWithoutObject(const double& time_diff) {
   // A. update object of track
-  TrackedObjectPtr new_obj(new TrackedObject());
+  std::shared_ptr<TrackedObject> new_obj(new TrackedObject());
   new_obj->clone(*current_object_);
   Eigen::Vector3f predicted_shift = belief_velocity_ * time_diff;
   new_obj->anchor_point = current_object_->anchor_point + predicted_shift;
@@ -239,7 +238,7 @@ void ObjectTrack::UpdateWithoutObject(const double& time_diff) {
 void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
                                       const double& time_diff) {
   // A. update object of track
-  TrackedObjectPtr new_obj(new TrackedObject());
+  std::shared_ptr<TrackedObject> new_obj(new TrackedObject());
   new_obj->clone(*current_object_);
   Eigen::Vector3f predicted_shift = predict_state.tail(3) * time_diff;
   new_obj->anchor_point = current_object_->anchor_point + predicted_shift;
@@ -285,8 +284,8 @@ void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
   current_object_ = new_obj;
 }
 
-void ObjectTrack::SmoothTrackVelocity(const TrackedObjectPtr& new_object,
-                                      const double& time_diff) {
+void ObjectTrack::SmoothTrackVelocity(
+    const std::shared_ptr<TrackedObject>& new_object, const double& time_diff) {
   // A. keep motion if accelaration of filter is greater than a threshold
   Eigen::Vector3f filter_acceleration_gain = Eigen::Vector3f::Zero();
   filter_->GetAccelerationGain(&filter_acceleration_gain);
@@ -340,8 +339,8 @@ void ObjectTrack::SmoothTrackOrientation() {
   current_object_->size = new_size.cast<float>();
 }
 
-bool ObjectTrack::CheckTrackStaticHypothesis(const ObjectPtr& new_object,
-                                             const double& time_diff) {
+bool ObjectTrack::CheckTrackStaticHypothesis(
+    const std::shared_ptr<Object>& new_object, const double& time_diff) {
   // A. check whether track velocity angle changed obviously
   bool is_velocity_angle_change =
       CheckTrackStaticHypothesisByVelocityAngleChange(new_object, time_diff);
@@ -364,7 +363,7 @@ bool ObjectTrack::CheckTrackStaticHypothesis(const ObjectPtr& new_object,
 }
 
 bool ObjectTrack::CheckTrackStaticHypothesisByVelocityAngleChange(
-    const ObjectPtr& new_object, const double& time_diff) {
+    const std::shared_ptr<Object>& new_object, const double& time_diff) {
   Eigen::Vector3f previous_velocity =
       history_objects_[history_objects_.size() - 1]->velocity;
   Eigen::Vector3f current_velocity = current_object_->velocity;
@@ -377,13 +376,9 @@ bool ObjectTrack::CheckTrackStaticHypothesisByVelocityAngleChange(
 }
 
 /*class ObjectTrackSet*/
-ObjectTrackSet::ObjectTrackSet() {
-  tracks_.reserve(1000);
-}
+ObjectTrackSet::ObjectTrackSet() { tracks_.reserve(1000); }
 
-ObjectTrackSet::~ObjectTrackSet() {
-  Clear();
-}
+ObjectTrackSet::~ObjectTrackSet() { Clear(); }
 
 bool ObjectTrackSet::SetTrackConsecutiveInvisibleMaximum(
     const int& track_consecutive_invisible_maximum) {

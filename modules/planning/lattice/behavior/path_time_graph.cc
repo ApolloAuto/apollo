@@ -43,11 +43,8 @@ using apollo::common::math::lerp;
 
 PathTimeGraph::PathTimeGraph(
     const std::vector<const Obstacle*>& obstacles,
-    const std::vector<PathPoint>& discretized_ref_points,
-    const double s_start,
-    const double s_end,
-    const double t_start,
-    const double t_end,
+    const std::vector<PathPoint>& discretized_ref_points, const double s_start,
+    const double s_end, const double t_start, const double t_end,
     const double path_width) {
   CHECK(s_start < s_end);
   CHECK(t_start < t_end);
@@ -75,8 +72,8 @@ SLBoundary PathTimeGraph::ComputeObstacleBoundary(
   box.GetAllCorners(&corners);
 
   for (const auto& point : corners) {
-    auto sl_point = PathMatcher::GetPathFrenetCoordinate(
-        discretized_ref_points, point.x(), point.y());
+    auto sl_point = PathMatcher::GetPathFrenetCoordinate(discretized_ref_points,
+                                                         point.x(), point.y());
     start_s = std::fmin(start_s, sl_point.first);
     end_s = std::fmax(end_s, sl_point.first);
     start_l = std::fmin(start_l, sl_point.second);
@@ -96,6 +93,9 @@ void PathTimeGraph::SetupObstacles(
     const std::vector<const Obstacle*>& obstacles,
     const std::vector<PathPoint>& discretized_ref_points) {
   for (const Obstacle* obstacle : obstacles) {
+    if (obstacle->IsVirtual()) {
+      continue;
+    }
     if (!obstacle->HasTrajectory()) {
       SetStaticObstacle(obstacle, discretized_ref_points);
       continue;
@@ -229,15 +229,13 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetPathBlockingIntervals(
     if (t > pt_obstacle.time_upper() || t < pt_obstacle.time_lower()) {
       continue;
     }
-    double s_upper = lerp(pt_obstacle.upper_left().s(),
-                          pt_obstacle.upper_left().t(),
-                          pt_obstacle.upper_right().s(),
-                          pt_obstacle.upper_right().t(), t);
+    double s_upper =
+        lerp(pt_obstacle.upper_left().s(), pt_obstacle.upper_left().t(),
+             pt_obstacle.upper_right().s(), pt_obstacle.upper_right().t(), t);
 
-    double s_lower = lerp(pt_obstacle.bottom_left().s(),
-                          pt_obstacle.bottom_left().t(),
-                          pt_obstacle.bottom_right().s(),
-                          pt_obstacle.bottom_right().t(), t);
+    double s_lower =
+        lerp(pt_obstacle.bottom_left().s(), pt_obstacle.bottom_left().t(),
+             pt_obstacle.bottom_right().s(), pt_obstacle.bottom_right().t(), t);
 
     intervals.emplace_back(s_lower, s_upper);
   }
@@ -263,10 +261,9 @@ std::pair<double, double> PathTimeGraph::get_time_range() const {
   return time_range_;
 }
 
-std::vector<PathTimePoint>
-PathTimeGraph::GetObstacleSurroundingPoints(const std::string& obstacle_id,
-                                             const double s_dist,
-                                             const double t_min_density) const {
+std::vector<PathTimePoint> PathTimeGraph::GetObstacleSurroundingPoints(
+    const std::string& obstacle_id, const double s_dist,
+    const double t_min_density) const {
   CHECK(t_min_density > 0.0);
   std::vector<PathTimePoint> pt_pairs;
   if (path_time_obstacle_map_.find(obstacle_id) ==
@@ -297,7 +294,7 @@ PathTimeGraph::GetObstacleSurroundingPoints(const std::string& obstacle_id,
 
   double time_gap = t1 - t0;
   CHECK(time_gap > -FLAGS_lattice_epsilon);
-  time_gap = std::abs(time_gap);
+  time_gap = std::fabs(time_gap);
 
   std::size_t num_sections = std::size_t(time_gap / t_min_density) + 1;
   double t_interval = time_gap / num_sections;

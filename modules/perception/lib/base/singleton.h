@@ -39,9 +39,7 @@ class Singleton {
   ~Singleton();
 
   // @brief Construct the singleton instance
-  static void new_() {
-    instance_ = new T();
-  }
+  static void new_() { instance_ = new T(); }
 
   // @brief  Destruct the singleton instance
   // @note Only work with gcc
@@ -59,7 +57,7 @@ template <typename T>
 pthread_once_t Singleton<T>::p_once_ = PTHREAD_ONCE_INIT;
 
 template <typename T>
-T* Singleton<T>::instance_ = NULL;
+T* Singleton<T>::instance_ = nullptr;
 
 }  // namespace perception
 }  // namespace apollo

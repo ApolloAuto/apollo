@@ -29,13 +29,13 @@
 //         string model_name = "FrameClassifier";
 //         const ModelConfig* model_config = NULL;
 //         if (!config_manager->get_model_config(model_name, &model_config)) {
-//            XLOG(ERROR) << "not found model: " << model_name;
+//            AERROR << "not found model: " << model_name;
 //            return false;
 //         }
 //
 //         int int_value = 0;
 //         if (!model_config->get_value("my_param_name", &int_value)) {
-//             XLOG(ERROR) << "my_param_name not found."
+//             AERROR << "my_param_name not found."
 //             return false;
 //         }
 //         using int_value....
@@ -52,9 +52,9 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
-#include "include/undistortion.h"
 #include "modules/common/macro.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/cuda_util/undistortion.h"
 #include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/lib/base/singleton.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
@@ -150,9 +150,7 @@ class CameraCalibration {
     return undistort_handler_;
   }
 
-  inline CameraDistortPtr get_camera_model() {
-    return camera_model_;
-  }
+  inline CameraDistortPtr get_camera_model() { return camera_model_; }
 
   //
   Eigen::Matrix<double, 3, 3> get_camera2car_homography_mat() {
@@ -205,4 +203,4 @@ class RadarCalibration {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // APOLLO_PERCEPTION_LIB_CONFIG_MANAGER_H
+#endif  // MODULES_PERCEPTION_LIB_CALIBRATION_CONFIG_MANAGER_H_

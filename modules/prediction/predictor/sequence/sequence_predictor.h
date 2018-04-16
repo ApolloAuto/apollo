@@ -22,9 +22,9 @@
 #ifndef MODULES_PREDICTION_PREDICTOR_SEQUENCE_SEQUENCE_PREDICTOR_H_
 #define MODULES_PREDICTION_PREDICTOR_SEQUENCE_SEQUENCE_PREDICTOR_H_
 
-#include <vector>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 #include "Eigen/Dense"
 
@@ -69,8 +69,7 @@ class SequencePredictor : public Predictor {
    * @param Current lane id
    * @param Vector of boolean indicating if a lane sequence is disqualified
    */
-  void FilterLaneSequences(const LaneGraph& lane_graph,
-                           const std::string& lane_id,
+  void FilterLaneSequences(const Feature& feature, const std::string& lane_id,
                            std::vector<bool>* enable_lane_sequence);
 
   /**

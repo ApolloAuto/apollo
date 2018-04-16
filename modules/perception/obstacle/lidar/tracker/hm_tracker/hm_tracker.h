@@ -35,8 +35,6 @@ namespace perception {
 
 class HmObjectTracker : public BaseTracker {
  public:
-  typedef std::pair<int, int> TrackObjectPair;
-
   HmObjectTracker();
   virtual ~HmObjectTracker() = default;
 
@@ -72,9 +70,9 @@ class HmObjectTracker : public BaseTracker {
   // @params[IN] options: tracker options with necessary information
   // @params[OUT] tracked_objects: tracked objects with tracking information
   // @return true if track successfully, otherwise return false
-  bool Track(const std::vector<ObjectPtr>& objects, double timestamp,
-             const TrackerOptions& options,
-             std::vector<ObjectPtr>* tracked_objects);
+  bool Track(const std::vector<std::shared_ptr<Object>>& objects,
+             double timestamp, const TrackerOptions& options,
+             std::vector<std::shared_ptr<Object>>* tracked_objects);
 
   // @brief get object tracks of tracker
   // @return object tracks maintained in tracker
@@ -89,9 +87,9 @@ class HmObjectTracker : public BaseTracker {
   // @params[IN] options: tracker options with necessary information
   // @params[OUT] tracked_objects: tracked objects with tracking information
   // @return true if initialize successfully, otherwise return false
-  bool Initialize(const std::vector<ObjectPtr>& objects,
+  bool Initialize(const std::vector<std::shared_ptr<Object>>& objects,
                   const double& timestamp, const TrackerOptions& options,
-                  std::vector<ObjectPtr>* tracked_objects);
+                  std::vector<std::shared_ptr<Object>>* tracked_objects);
 
   // @brief transform v2world pose to v2local pose intend to avoid huge value
   // float computing
@@ -106,28 +104,29 @@ class HmObjectTracker : public BaseTracker {
   // @params[IN] pose: pose using for coordinate transformation
   // @params[IN] options: tracker options with necessary information
   // @return nothing
-  void ConstructTrackedObjects(const std::vector<ObjectPtr>& objects,
-                               std::vector<TrackedObjectPtr>* tracked_objects,
-                               const Eigen::Matrix4d& pose,
-                               const TrackerOptions& options);
+  void ConstructTrackedObjects(
+      const std::vector<std::shared_ptr<Object>>& objects,
+      std::vector<std::shared_ptr<TrackedObject>>* tracked_objects,
+      const Eigen::Matrix4d& pose, const TrackerOptions& options);
 
   // @brief compute objects' shape feature
   // @params[OUT] object: object for computing shape feature
   // @return nothing
-  void ComputeShapeFeatures(TrackedObjectPtr* obj);
+  void ComputeShapeFeatures(std::shared_ptr<TrackedObject>* obj);
 
   // @brief transform tracked object with given pose
   // @params[OUT] obj: tracked object for transfromation
   // @params[IN] pose: pose using for coordinate transformation
   // @return nothing
-  void TransformTrackedObject(TrackedObjectPtr* obj,
+  void TransformTrackedObject(std::shared_ptr<TrackedObject>* obj,
                               const Eigen::Matrix4d& pose);
 
   // @brief transform object with given pose
   // @params[OUT] obj: object for transfromation
   // @params[IN] pose: pose using for coordinate transformation
   // @return nothing
-  void TransformObject(ObjectPtr* obj, const Eigen::Matrix4d& pose);
+  void TransformObject(std::shared_ptr<Object>* obj,
+                       const Eigen::Matrix4d& pose);
 
   // @brief compute predicted states of maintained tracks
   // @params[OUT] tracks_predict: predicted states of maintained tracks
@@ -142,10 +141,11 @@ class HmObjectTracker : public BaseTracker {
   // @params[IN] assignments: assignment pair of <track, object>
   // @params[IN] time_diff: time interval for updating
   // @return nothing
-  void UpdateAssignedTracks(std::vector<Eigen::VectorXf>* tracks_predict,
-                            std::vector<TrackedObjectPtr>* new_objects,
-                            const std::vector<TrackObjectPair>& assignments,
-                            const double& time_diff);
+  void UpdateAssignedTracks(
+      std::vector<Eigen::VectorXf>* tracks_predict,
+      std::vector<std::shared_ptr<TrackedObject>>* new_objects,
+      const std::vector<std::pair<int, int>>& assignments,
+      const double& time_diff);
 
   // @brief update tracks without matched objects
   // @params[IN] tracks_predict: predicted states of maintained tracks
@@ -160,8 +160,9 @@ class HmObjectTracker : public BaseTracker {
   // @params[IN] new_objects: recently detected objects
   // @params[IN] unassigned_objects: index of unassigned objects
   // @return nothing
-  void CreateNewTracks(const std::vector<TrackedObjectPtr>& new_objects,
-                       const std::vector<int>& unassigned_objects);
+  void CreateNewTracks(
+      const std::vector<std::shared_ptr<TrackedObject>>& new_objects,
+      const std::vector<int>& unassigned_objects);
 
   // @brief delete lost tracks
   // @return nothing
@@ -170,7 +171,8 @@ class HmObjectTracker : public BaseTracker {
   // @brief collect tracked results
   // @params[OUT] tracked_objects: tracked objects with tracking information
   // @return nothing
-  void CollectTrackedResults(std::vector<ObjectPtr>* tracked_objects);
+  void CollectTrackedResults(
+      std::vector<std::shared_ptr<Object>>* tracked_objects);
 
  private:
   // algorithm setup

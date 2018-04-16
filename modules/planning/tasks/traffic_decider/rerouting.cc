@@ -37,7 +37,7 @@ using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 using apollo::planning::util::GetPlanningStatus;
 
-Rerouting::Rerouting(const RuleConfig& config) : TrafficRule(config) {}
+Rerouting::Rerouting(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool Rerouting::ChangeLaneFailRerouting() {
   const auto& segments = reference_line_info_->Lanes();
@@ -85,12 +85,14 @@ bool Rerouting::ChangeLaneFailRerouting() {
   }
   // 6. Check if we have done rerouting before
   auto* rerouting = GetPlanningStatus()->mutable_rerouting();
-  const std::string last_rerouting_time_key =
-      "kLastReroutingTime_" + segments.Id();
+  if (rerouting == nullptr) {
+    AERROR << "rerouting is nullptr.";
+    return false;
+  }
   double current_time = Clock::NowInSeconds();
   if (rerouting->has_last_rerouting_time() &&
       (current_time - rerouting->last_rerouting_time() <
-       FLAGS_rerouting_cooldown_time)) {
+       config_.rerouting().cooldown_time())) {
     ADEBUG << "Skip rerouting and wait for previous rerouting result";
     return true;
   }

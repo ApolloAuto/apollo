@@ -49,6 +49,7 @@ DECLARE_string(delphi_esr_topic);
 DECLARE_string(conti_radar_topic);
 DECLARE_string(ultrasonic_radar_topic);
 DECLARE_string(compressed_image_topic);
+DECLARE_string(image_front_topic);
 DECLARE_string(image_short_topic);
 DECLARE_string(image_long_topic);
 DECLARE_string(gnss_rtk_obs_topic);
@@ -60,5 +61,14 @@ DECLARE_string(localization_sins_pva_topic);
 DECLARE_string(localization_msf_status);
 DECLARE_string(relative_map_topic);
 DECLARE_string(navigation_topic);
+DECLARE_string(voice_detection_request_topic);
+DECLARE_string(voice_detection_response_topic);
+// For pandora.
+DECLARE_string(pandora_pointcloud_topic);
+DECLARE_string(pandora_camera_front_color_topic);
+DECLARE_string(pandora_camera_right_gray_topic);
+DECLARE_string(pandora_camera_left_gray_topic);
+DECLARE_string(pandora_camera_front_gray_topic);
+DECLARE_string(pandora_camera_back_gray_topic);
 
 #endif  // MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_

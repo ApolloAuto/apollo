@@ -18,17 +18,24 @@
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CLUSTER2D_H_
 
 #include <algorithm>
+#include <memory>
 #include <vector>
+
 #include "caffe/caffe.hpp"
+
 #include "modules/common/log.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/common/util/disjoint_set.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
-#include "modules/perception/obstacle/common/disjoint_set.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/util.h"
 
 namespace apollo {
 namespace perception {
 namespace cnnseg {
+
+using apollo::common::util::DisjointSetMakeSet;
+using apollo::common::util::DisjointSetFind;
+using apollo::common::util::DisjointSetUnion;
 
 enum class MetaType {
   META_UNKNOWN,
@@ -148,7 +155,7 @@ class Cluster2D {
             if ((row2 == row || col2 == col) && IsValidRowCol(row2, col2)) {
               Node* node2 = &nodes[row2][col2];
               if (node2->is_center) {
-                apollo::perception::DisjointSetUnion(node, node2);
+                DisjointSetUnion(node, node2);
               }
             }
           }
@@ -165,7 +172,7 @@ class Cluster2D {
         if (!node->is_object) {
           continue;
         }
-        Node* root = apollo::perception::DisjointSetFind(node);
+        Node* root = DisjointSetFind(node);
         if (root->obstacle_id < 0) {
           root->obstacle_id = count_obstacles++;
           CHECK_EQ(static_cast<int>(obstacles_.size()), count_obstacles - 1);
@@ -224,7 +231,8 @@ class Cluster2D {
   }
 
   void GetObjects(const float confidence_thresh, const float height_thresh,
-                  const int min_pts_num, std::vector<ObjectPtr>* objects) {
+                  const int min_pts_num,
+                  std::vector<std::shared_ptr<Object>>* objects) {
     CHECK(valid_indices_in_pc_ != nullptr);
 
     for (size_t i = 0; i < point2grid_.size(); ++i) {
@@ -257,7 +265,7 @@ class Cluster2D {
       if (static_cast<int>(obs->cloud->size()) < min_pts_num) {
         continue;
       }
-      apollo::perception::ObjectPtr out_obj(new apollo::perception::Object);
+      std::shared_ptr<Object> out_obj(new apollo::perception::Object);
       out_obj->cloud = obs->cloud;
       out_obj->score = obs->score;
       out_obj->score_type = ScoreType::SCORE_CNN;

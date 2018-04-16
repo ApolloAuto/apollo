@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+enum HMIAction {
+  NONE = 0;
+  SETUP = 1;
+  AUTO_MODE = 2;
+  DISENGAGE = 3;
+}
+
+message VoiceDetectionConf {
+  optional string snowboy_resource = 1
+      [default = "/usr/local/apollo/snowboy/resources/common.res"];
+  optional float audio_gain = 2 [default = 1];
+  optional float sensitivity = 3 [default = 0.75];
+
+  message SnowboyModel {
+    optional string path = 1;
+
+    message Hotword {
+      optional string word = 1;
+      optional HMIAction action = 2;
+      optional string response_message = 3;
+    }
+    repeated Hotword hotwords = 2;
+  }
+
+  repeated SnowboyModel snowboy_models = 4;
+}
+
+message VoiceDetectionRequest {
+  optional uint64 id = 1;
+  optional bytes wav_stream = 2;
+}
+message VoiceDetectionResponse {
+  optional uint64 id = 1;
+  optional HMIAction action = 2;
+}

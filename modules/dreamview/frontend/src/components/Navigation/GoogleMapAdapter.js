@@ -1,3 +1,5 @@
+import { WGS84ToGCJ02 } from "utils/coordinate_converter";
+
 export default class GoogleMapAdapter {
     constructor() {
         this.map = null;
@@ -90,7 +92,7 @@ export default class GoogleMapAdapter {
             onClickHandler(controlText);
         });
 
-        this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(controlDiv);
+        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlDiv);
         this.controls.push(controlDiv);
     }
 
@@ -117,5 +119,9 @@ export default class GoogleMapAdapter {
 
     removePolyline(polyline) {
         polyline.setMap(null);
+    }
+
+    applyCoordinateOffset([lng, lat]) {
+        return WGS84ToGCJ02(lng, lat);
     }
 }

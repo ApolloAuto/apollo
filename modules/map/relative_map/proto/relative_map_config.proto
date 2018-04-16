@@ -10,6 +10,11 @@ message MapGenerationParam {
 
 message NavigationLaneConfig {
     optional double min_lane_marker_quality = 1 [default=0.5];
+    enum LaneSource {
+      PERCEPTION = 1;
+      OFFLINE_GENERATED = 2;
+    }
+    optional LaneSource lane_source = 2;
 }
 
 message RelativeMapConfig {

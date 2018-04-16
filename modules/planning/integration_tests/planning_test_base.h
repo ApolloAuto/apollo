@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -21,12 +22,15 @@
 
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
+#include "modules/planning/proto/traffic_rule_config.pb.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
+
+#define private public
 #include "modules/planning/planning.h"
 
 namespace apollo {
@@ -48,6 +52,8 @@ using common::adapter::AdapterManager;
     ::google::ParseCommandLineFlags(&argc, &argv, true); \
     return RUN_ALL_TESTS();                              \
   }
+
+#define ENABLE_RULE(RULE_ID, ENABLED) this->rule_enabled_[RULE_ID] = ENABLED
 
 DECLARE_string(test_routing_response_file);
 DECLARE_string(test_localization_file);
@@ -77,6 +83,7 @@ class PlanningTestBase : public ::testing::Test {
   bool IsValidTrajectory(const ADCTrajectory& trajectory);
 
   Planning planning_;
+  std::map<TrafficRuleConfig::RuleId, bool> rule_enabled_;
   ADCTrajectory adc_trajectory_;
 };
 

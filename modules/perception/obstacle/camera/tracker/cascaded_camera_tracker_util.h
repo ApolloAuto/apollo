@@ -20,11 +20,12 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
@@ -34,9 +35,10 @@
 namespace apollo {
 namespace perception {
 
-void GetDetectedFromVO(const cv::Size &sz, const float &scale,
-                       const std::vector<VisualObjectPtr> &objects,
-                       std::vector<Detected> *detected);
+void GetDetectedFromVO(
+    const cv::Size &sz, const float &scale,
+    const std::vector<std::shared_ptr<VisualObject>> &objects,
+    std::vector<Detected> *detected);
 
 void MergeAffinityMatrix(const std::vector<std::vector<float>> &to_merge,
                          std::vector<std::vector<float>> *affinity_matrix);
@@ -54,8 +56,9 @@ void ManageTrackerAndID(
     const std::unordered_map<int, int> &local_matching,
     const std::unordered_set<int> &local_matched_detected,
     const std::vector<Detected> &detected, const int &frame_idx,
-    const float &timestamp, std::vector<Tracked> *tracked, int *next_tracked_id,
-    std::unordered_map<int, std::pair<int, float>> *id_mapping);
+    const double &timestamp, std::vector<Tracked> *tracked,
+    int *next_tracked_id,
+    std::unordered_map<int, std::pair<int, double>> *id_mapping);
 
 void PrintAffinityMatrix(const std::vector<std::vector<float>> &affinity_matrix,
                          const std::vector<Tracked> &tracked,

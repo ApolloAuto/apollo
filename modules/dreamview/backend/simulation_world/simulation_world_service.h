@@ -60,9 +60,6 @@ class SimulationWorldService {
   // SimulationWorld.
   static constexpr int kMaxMonitorItems = 30;
 
-  // Angle threshold is about 5.72 degree.
-  static constexpr double kAngleThreshold = 0.1;
-
   /**
    * @brief Constructor of SimulationWorldService.
    * @param map_service the pointer of MapService.
@@ -75,9 +72,7 @@ class SimulationWorldService {
    * @brief Get a read-only view of the SimulationWorld.
    * @return Constant reference to the SimulationWorld object.
    */
-  inline const SimulationWorld &world() const {
-    return world_;
-  }
+  inline const SimulationWorld &world() const { return world_; }
 
   /**
    * @brief Returns the json representation of the SimulationWorld object.
@@ -115,20 +110,14 @@ class SimulationWorldService {
   /**
    * @brief Sets the flag to clear the owned simulation world object.
    */
-  void SetToClear() {
-    to_clear_ = true;
-  }
+  void SetToClear() { to_clear_ = true; }
 
   /**
    * @brief Check whether the SimulationWorld object has enough information.
    * The backend won't push the SimulationWorld to frontend if it is not ready.
    * @return True if the object is ready to push.
    */
-  bool ReadyToPush() const {
-    return world_.has_auto_driving_car() &&
-           world_.auto_driving_car().has_position_x() &&
-           world_.auto_driving_car().has_position_y();
-  }
+  bool ReadyToPush() const { return ready_to_push_.load(); }
 
   /**
    * @brief Publish message to the monitor
@@ -172,8 +161,13 @@ class SimulationWorldService {
                        const Object &world_obj, Decision *world_decision);
   void UpdateDecision(const apollo::planning::DecisionResult &decision_res,
                       double header_time);
-  void UpdateMainDecision(const apollo::planning::MainDecision &main_decision,
-                          double update_timestamp_sec, Object *world_main_stop);
+  void UpdateMainStopDecision(
+      const apollo::planning::MainDecision &main_decision,
+      double update_timestamp_sec, Object *world_main_stop);
+  template <typename MainDecision>
+  void UpdateMainChangeLaneDecision(const MainDecision &decision,
+                                    Object *world_main_decision);
+
   void CreatePredictionTrajectory(
       const apollo::prediction::PredictionObstacle &obstacle,
       Object *world_object);
@@ -234,6 +228,9 @@ class SimulationWorldService {
 
   // Relative map used/retrieved in navigation mode
   apollo::hdmap::Map relative_map_;
+
+  // Whether the sim_world is ready to push to frontend
+  std::atomic<bool> ready_to_push_;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);

@@ -94,6 +94,7 @@ void RoadGraph::ComputeLaneSequence(
   } else {
     lane_segment.set_end_s(lane_info_ptr->total_length());
   }
+  lane_segment.set_total_length(lane_info_ptr->total_length());
 
   lane_segments->push_back(std::move(lane_segment));
 

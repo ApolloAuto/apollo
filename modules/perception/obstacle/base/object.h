@@ -26,8 +26,8 @@
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
-#include "modules/perception/lib/base/time_util.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/common/time/time_util.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
@@ -40,7 +40,7 @@ struct alignas(16) Object {
   // deep copy
   void clone(const Object& rhs);
   std::string ToString() const;
-
+  void AddFourCorners(PerceptionObstacle* pb_obj) const;
   void Serialize(PerceptionObstacle* pb_obj) const;
   void Deserialize(const PerceptionObstacle& pb_obs);
 
@@ -92,15 +92,15 @@ struct alignas(16) Object {
   Eigen::Matrix3d position_uncertainty;
   Eigen::Matrix3d velocity_uncertainty;
 
+  // modeling uncertainty from sensor level tracker
+  Eigen::Matrix4d state_uncertainty = Eigen::Matrix4d::Identity();
+
   // CIPV
   bool b_cipv = false;
   // sensor particular suplplements, default nullptr
   RadarSupplementPtr radar_supplement = nullptr;
   CameraSupplementPtr camera_supplement = nullptr;
 };
-
-typedef std::shared_ptr<Object> ObjectPtr;
-typedef std::shared_ptr<const Object> ObjectConstPtr;
 
 // Sensor single frame objects.
 struct SensorObjects {
@@ -115,7 +115,7 @@ struct SensorObjects {
   std::string sensor_id;
   double timestamp = 0.0;
   SeqId seq_num = 0;
-  std::vector<ObjectPtr> objects;
+  std::vector<std::shared_ptr<Object>> objects;
   Eigen::Matrix4d sensor2world_pose;
   LaneObjectsPtr lane_objects;
 

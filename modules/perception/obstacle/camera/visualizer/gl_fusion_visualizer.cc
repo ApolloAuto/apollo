@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/log.h"
 #include "modules/perception/obstacle/camera/visualizer/gl_fusion_visualizer.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -48,7 +48,6 @@ void GLFusionVisualizer::render(FrameContent *content) {
   opengl_vs_->set_forward_dir(forward_world_);
   opengl_vs_->set_main_car(main_car_world_);
   opengl_vs_->set_frame_content(content);
-  //    opengl_vs_->set_motion_content(motion_buffer_);
   opengl_vs_->spin_once();
 
   AINFO << "GLFusionVisualizer spin_once";
@@ -135,8 +134,6 @@ void GLFusionVisualizer::update_camera_system(FrameContent *content) {
     main_car_world_[i][2] = main_car_w[2];
   }
 }
-
-REGISTER_VISUALIZER(GLFusionVisualizer);
 
 }  // namespace lowcostvisualizer
 }  // namespace perception

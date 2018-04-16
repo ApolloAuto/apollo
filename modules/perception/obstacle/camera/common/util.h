@@ -20,6 +20,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -44,56 +45,16 @@ const cv::Scalar COLOR_YELLOW = cv::Scalar(0, 255, 255);
 const cv::Scalar COLOR_RED = cv::Scalar(0, 0, 255);
 const cv::Scalar COLOR_BLACK = cv::Scalar(0, 0, 0);
 
-class Timer {
- public:
-  Timer() {
-    scale_ = 1.0 / (static_cast<double>(cvGetTickFrequency()) * 1000.);
-    tic();
-  }
-  void tic() { start_ = static_cast<double>(cv::getTickCount()); }
-  double toc(bool reset = false) {
-    double time = (static_cast<double>(cvGetTickCount()) - start_) * scale_;
-    if (reset) {
-      tic();
-    }
-    return time;
-  }
+bool LoadVisualObjectFromFile(
+    const std::string &file_name,
+    std::vector<std::shared_ptr<VisualObject>> *visual_objects);
 
- private:
-  double start_ = 0.0;
-  double scale_ = 0.0;
-};
-
-inline void l2norm(float *feat_data, int feat_dim) {
-  if (feat_dim == 0) {
-    return;
-  }
-  // feature normalization
-  float l2norm = 0.0;
-  for (int i = 0; i < feat_dim; ++i) {
-    l2norm += feat_data[i] * feat_data[i];
-  }
-  if (l2norm == 0) {
-    float val = 1.0 / sqrt(feat_dim);
-    for (int i = 0; i < feat_dim; ++i) {
-      feat_data[i] = val;
-    }
-  } else {
-    l2norm = sqrt(l2norm);
-    for (int i = 0; i < feat_dim; ++i) {
-      feat_data[i] /= l2norm;
-    }
-  }
-}
-
-bool LoadVisualObjectFromFile(const std::string &file_name,
-                                  std::vector<VisualObjectPtr> *visual_objects);
-
-bool WriteVisualObjectToFile(const std::string &file_name,
-                                 std::vector<VisualObjectPtr> *visual_objects);
+bool WriteVisualObjectToFile(
+    const std::string &file_name,
+    std::vector<std::shared_ptr<VisualObject>> *visual_objects);
 
 bool LoadGTfromFile(const std::string &gt_path,
-                       std::vector<VisualObjectPtr> *visual_objects);
+                    std::vector<std::shared_ptr<VisualObject>> *visual_objects);
 
 std::string GetTypeText(ObjectType type);
 

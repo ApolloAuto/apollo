@@ -19,6 +19,7 @@ cc_library(
         ":prediction_gflags",
         ":prediction_map",
         "//modules/common:log",
+        "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/proto:lane_graph_proto",
         "@eigen",
@@ -41,8 +42,8 @@ cc_library(
     hdrs = ["prediction_map.h"],
     deps = [
         ":prediction_gflags",
+        "//modules/common/math:geometry",
         "//modules/common/math:linear_interpolation",
-        "//modules/common/math:vec2d",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "@eigen",
@@ -133,6 +134,21 @@ cc_library(
     deps = [
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/proto:lane_graph_proto",
+    ],
+)
+
+cc_test(
+    name = "validation_checker_test",
+    size = "small",
+    srcs = ["validation_checker_test.cc"],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        ":validation_checker",
+        "@gtest//:main",
     ],
 )
 

@@ -347,9 +347,9 @@ void Camera::get_model_view_projection_matrix(GLdouble m[16]) const {
   }
 }
 
-void Camera::setscene_radius(double radius) {
+void Camera::setscene_radius(const double radius) {
   if (radius <= 0.0) {
-    std::cout << "Scene radius must be positive - Ignoring value";
+    std::cout << "Scene radius must be positive - Ignoring value" << std::endl;
     return;
   }
 
@@ -389,7 +389,7 @@ bool Camera::setscene_center_from_pixel(const Eigen::Vector2i &pixel) {
 }
 
 /*! Changes the revolve_around_point() to \p rap (defined in the world
-* coordinate system). */
+ * coordinate system). */
 void Camera::set_revolve_around_point(const Eigen::Vector3d &rap) {
   const double prevDist = fabs(cameracoordinates_of(revolve_around_point())(2));
 
@@ -574,8 +574,8 @@ void Camera::setup_vector(const Eigen::Vector3d &up, bool noMove) {
   if (!noMove) {
     frame()->set_position(
         revolve_around_point() -
-        (frame()->orientation() *
-         q)._transformVector(frame()->coordinates_of(revolve_around_point())));
+        (frame()->orientation() * q)
+            ._transformVector(frame()->coordinates_of(revolve_around_point())));
   }
 
   frame()->rotate(q);

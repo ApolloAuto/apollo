@@ -16,11 +16,13 @@
 
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 
-#include <gflags/gflags.h>
-#include <math.h>
+#include <cmath>
+
 #include "Eigen/Eigen"
-#include "modules/common/log.h"
+#include "gflags/gflags.h"
 #include "yaml-cpp/yaml.h"
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -210,8 +212,9 @@ bool CameraCoeffient::init_camera_intrinsic_matrix_and_distort_params(
 CalibrationConfigManager::CalibrationConfigManager()
     : camera_calibration_(new CameraCalibration()) {
   work_root_ = FLAGS_work_root;
-  camera_extrinsic_path_ = work_root_ + FLAGS_front_camera_extrinsics_file;
-  camera_intrinsic_path_ = work_root_ + FLAGS_front_camera_intrinsics_file;
+  camera_extrinsic_path_ = FLAGS_front_camera_extrinsics_file;
+  camera_intrinsic_path_ = FLAGS_front_camera_intrinsics_file;
+  init();
 }
 
 bool CalibrationConfigManager::init() {
@@ -255,7 +258,7 @@ CameraCalibration::~CameraCalibration() {}
 
 bool CameraCalibration::init(const std::string &intrinsic_path,
                              const std::string &extrinsic_path) {
-  if (!camera_coefficient_.init("", intrinsic_path, extrinsic_path)) {
+  if (!camera_coefficient_.init("", extrinsic_path, intrinsic_path)) {
     AERROR << "init camera coefficient failed";
     return false;
   }
@@ -266,10 +269,11 @@ bool CameraCalibration::init(const std::string &intrinsic_path,
   *_camera2car_pose = camera_coefficient_.camera_extrinsic;
   *_car2camera_pose = _camera2car_pose->inverse();
 
-  if (!init_undistortion(intrinsic_path)) {
-    AERROR << "init undistortion failed";
-    return false;
-  }
+  // TODO(later): BUGGY. Crash
+  // if (!init_undistortion(intrinsic_path)) {
+  //   AERROR << "init undistortion failed";
+  //   return false;
+  // }
 
   init_camera_model();
   calculate_homographic();

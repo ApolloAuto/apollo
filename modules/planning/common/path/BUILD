@@ -16,6 +16,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "discretized_path_test",
+    size = "small",
+    srcs = [
+        "discretized_path_test.cc",
+    ],
+    deps = [
+        ":discretized_path",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "frenet_frame_path",
     srcs = [

@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { loadTexture } from "utils/models";
 import gridGround from "assets/images/ground.png";
 import PARAMETERS from "store/config/parameters.yml";
+import STORE from "store";
 
 export default class Ground {
     constructor() {
@@ -12,6 +13,8 @@ export default class Ground {
         this.mesh = null;
         this.geometry = null;
         this.initialized = false;
+        this.inNaviMode = null;
+
         loadTexture(gridGround, texture => {
             this.geometry = new THREE.PlaneGeometry(1, 1);
             this.mesh = new THREE.Mesh(
@@ -33,30 +36,50 @@ export default class Ground {
         return true;
     }
 
+    loadGrid(coordinates) {
+        loadTexture(gridGround, texture => {
+            console.log("using grid as ground image...");
+            this.mesh.material.map = texture;
+            this.mesh.type = "grid";
+            this.render(coordinates);
+        });
+    }
+
     update(world, coordinates, scene) {
-        if (this.initialized === true && this.loadedMap !== this.updateMap) {
+        if (this.initialized !== true) {
+            return;
+        }
+        const modeChanged = this.inNaviMode !== STORE.hmi.inNavigationMode;
+        this.inNaviMode = STORE.hmi.inNavigationMode;
+        if (this.inNaviMode) {
+            this.mesh.type = "grid";
+            if (modeChanged) {
+                this.loadGrid(coordinates);
+            }
+        } else {
+            this.mesh.type = "refelction";
+        }
+
+        if (this.mesh.type === "grid") {
+            const adc = world.autoDrivingCar;
+            const position = coordinates.applyOffset({x: adc.positionX, y: adc.positionY});
+            this.mesh.position.set(position.x, position.y, 0);
+        } else if (this.loadedMap !== this.updateMap || modeChanged) {
+            // Only reload reflection map upon map/mode change.
             const dir = this.titleCaseToSnakeCase(this.updateMap);
             const host = window.location;
-            const server = `${host.protocol}//${host.hostname}:${PARAMETERS.server.port}`;
-            const imgUrl = server + '/assets/map_data/' + dir + '/background.jpg';
+            const port = PARAMETERS.server.port;
+            const server = `${host.protocol}//${host.hostname}:${port}`;
+            const imgUrl = `${server}/assets/map_data/${dir}/background.jpg`;
             loadTexture(imgUrl, texture => {
                 console.log("updating ground image with " + dir);
                 this.mesh.material.map = texture;
                 this.mesh.type = "reflection";
                 this.render(coordinates, dir);
             }, err => {
-                console.log("using grid as ground image...");
-                loadTexture(gridGround, texture => {
-                    this.mesh.material.map = texture;
-                    this.mesh.type = "grid";
-                    this.render(coordinates);
-                });
+                this.loadGrid(coordinates);
             });
             this.loadedMap = this.updateMap;
-        } else if (this.initialized && this.mesh.type === "grid") {
-            const adc = world.autoDrivingCar;
-            const position = coordinates.applyOffset({x: adc.positionX, y: adc.positionY});
-            this.mesh.position.set(position.x, position.y, 0);
         }
     }
 

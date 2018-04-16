@@ -33,7 +33,7 @@ namespace planning {
  */
 class KeepClear : public TrafficRule {
  public:
-  explicit KeepClear(const RuleConfig& config);
+  explicit KeepClear(const TrafficRuleConfig& config);
   virtual ~KeepClear() = default;
 
   bool ApplyRule(Frame* const frame,
@@ -44,6 +44,10 @@ class KeepClear : public TrafficRule {
                               ReferenceLineInfo* const reference_line_info,
                               hdmap::PathOverlap* const keep_clear_overlap,
                               const std::string& virtual_obstacle_id);
+ private:
+  static constexpr char const* const KEEP_CLEAR_VO_ID_PREFIX = "KC_";
+  static constexpr char const* const KEEP_CLEAR_JUNCTION_VO_ID_PREFIX =
+      "KC_JC_";
 };
 
 }  // namespace planning

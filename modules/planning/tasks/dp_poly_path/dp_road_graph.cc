@@ -21,9 +21,6 @@
 #include "modules/planning/tasks/dp_poly_path/dp_road_graph.h"
 
 #include <algorithm>
-#include <limits>
-#include <string>
-#include <unordered_map>
 #include <utility>
 
 #include "modules/common/proto/error_code.pb.h"
@@ -32,8 +29,8 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
-#include "modules/common/util/util.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
+#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -241,7 +238,6 @@ void DPRoadGraph::UpdateNode(const std::list<DPRoadGraphNode> &prev_nodes,
     cur_node->UpdateCost(&prev_dp_node, curve, cost);
 
     // try to connect the current point with the first point directly
-    // only do this at lane change
     if (level >= 2) {
       init_dl = init_frenet_frame_point_.dl();
       init_ddl = init_frenet_frame_point_.ddl();
@@ -309,7 +305,9 @@ bool DPRoadGraph::SamplePathWaypoints(
     double sample_right_boundary = -eff_right_width;
     double sample_left_boundary = eff_left_width;
 
-    if (reference_line_info_.IsChangeLanePath()) {
+    const double kLargeDeviationL = 1.75;
+    if (reference_line_info_.IsChangeLanePath() ||
+        std::fabs(init_sl_point_.l()) > kLargeDeviationL) {
       sample_right_boundary = std::fmin(-eff_right_width, init_sl_point_.l());
       sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
 

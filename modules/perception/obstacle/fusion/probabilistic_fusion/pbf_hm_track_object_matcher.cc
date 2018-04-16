@@ -16,7 +16,7 @@
 
 #include <iomanip>
 #include <sstream>
-#include <string>
+
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_hm_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track_object_distance.h"
@@ -24,20 +24,21 @@
 namespace apollo {
 namespace perception {
 
-PbfHmTrackObjectMatcher::PbfHmTrackObjectMatcher() {}
-
-PbfHmTrackObjectMatcher::~PbfHmTrackObjectMatcher() {}
-
 bool PbfHmTrackObjectMatcher::Match(
     const std::vector<PbfTrackPtr> &fusion_tracks,
-    const std::vector<PbfSensorObjectPtr> &sensor_objects,
+    const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
     const TrackObjectMatcherOptions &options,
-    std::vector<TrackObjectPair> *assignments,
+    std::vector<std::pair<int, int>> *assignments,
     std::vector<int> *unassigned_fusion_tracks,
     std::vector<int> *unassigned_sensor_objects,
     std::vector<double> *track2measurements_dist,
     std::vector<double> *measurement2track_dist) {
-  std::vector<std::vector<double>> association_mat;
+  CHECK_NOTNULL(assignments);
+  CHECK_NOTNULL(unassigned_fusion_tracks);
+  CHECK_NOTNULL(unassigned_sensor_objects);
+  CHECK_NOTNULL(track2measurements_dist);
+  CHECK_NOTNULL(measurement2track_dist);
+
   if (options.ref_point == nullptr) {
     AERROR << "reference points is nullptr!";
     return false;
@@ -45,32 +46,26 @@ bool PbfHmTrackObjectMatcher::Match(
 
   IdAssign(fusion_tracks, sensor_objects, assignments, unassigned_fusion_tracks,
            unassigned_sensor_objects);
-  AINFO << "local_track_id_assign: " << fusion_tracks.size() << ","
-        << sensor_objects.size() << "," << assignments->size();
+  ADEBUG << "Num of fusion tracks = " << fusion_tracks.size()
+         << ", num of sensor objects = " << sensor_objects.size()
+         << ", num of assignments = " << assignments->size();
 
-  const Eigen::Vector3d &ref_point = *(options.ref_point);
+  std::vector<std::vector<double>> association_mat;
   ComputeAssociationMat(fusion_tracks, sensor_objects,
                         *unassigned_fusion_tracks, *unassigned_sensor_objects,
-                        ref_point, &association_mat);
+                        *(options.ref_point), &association_mat);
 
-  int num_track = fusion_tracks.size();
-  int num_measurement = sensor_objects.size();
+  track2measurements_dist->assign(fusion_tracks.size(), 0);
+  measurement2track_dist->assign(sensor_objects.size(), 0);
 
-  track2measurements_dist->assign(num_track, 0);
-  measurement2track_dist->assign(num_measurement, 0);
-  std::vector<int> track_ind_g2l;
-  track_ind_g2l.resize(num_track, -1);
-  for (size_t i = 0; i < unassigned_fusion_tracks->size(); i++) {
-    track_ind_g2l[(*unassigned_fusion_tracks)[i]] = i;
+  std::vector<int> track_ind_g2l(fusion_tracks.size(), -1);
+  for (size_t i = 0; i < unassigned_fusion_tracks->size(); ++i) {
+    track_ind_g2l[unassigned_fusion_tracks->at(i)] = i;
   }
-  std::vector<int> measurement_ind_g2l;
-  measurement_ind_g2l.resize(num_measurement, -1);
 
-  // TODO(Perception): remove this line or use the variable
-  // std::vector<int> measurement_ind_l2g = *unassigned_sensor_objects;
-
-  for (size_t i = 0; i < unassigned_sensor_objects->size(); i++) {
-    measurement_ind_g2l[(*unassigned_sensor_objects)[i]] = i;
+  std::vector<int> measurement_ind_g2l(sensor_objects.size(), -1);
+  for (size_t i = 0; i < unassigned_sensor_objects->size(); ++i) {
+    measurement_ind_g2l[unassigned_sensor_objects->at(i)] = i;
   }
 
   if (unassigned_fusion_tracks->empty() || unassigned_sensor_objects->empty()) {
@@ -80,50 +75,43 @@ bool PbfHmTrackObjectMatcher::Match(
   bool state = HmAssign(association_mat, assignments, unassigned_fusion_tracks,
                         unassigned_sensor_objects);
 
-  for (size_t i = 0; i < assignments->size(); i++) {
-    int track_ind = (*assignments)[i].first;
-    int measurement_ind = (*assignments)[i].second;
-    int track_ind_loc = track_ind_g2l[track_ind];
-    int measurement_ind_loc = measurement_ind_g2l[measurement_ind];
+  for (const auto &track_measurement_pair : *assignments) {
+    const int track_ind = track_measurement_pair.first;
+    const int measurement_ind = track_measurement_pair.second;
+    ADEBUG << "track_ind is matched to measurement_ind for sensor "
+           << sensor_objects[0]->sensor_id << " " << track_ind << " "
+           << measurement_ind;
+    const int track_ind_loc = track_ind_g2l[track_ind];
+    const int measurement_ind_loc = measurement_ind_g2l[measurement_ind];
     if (track_ind_loc >= 0 && measurement_ind_loc >= 0) {
-      (*track2measurements_dist)[track_ind] =
+      track2measurements_dist->at(track_ind) =
           association_mat[track_ind_loc][measurement_ind_loc];
-      (*measurement2track_dist)[measurement_ind] =
+      measurement2track_dist->at(measurement_ind) =
           association_mat[track_ind_loc][measurement_ind_loc];
     }
   }
-  for (size_t i = 0; i < unassigned_fusion_tracks->size(); i++) {
-    int track_ind = (*unassigned_fusion_tracks)[i];
-    int track_ind_loc = track_ind_g2l[track_ind];
-    (*track2measurements_dist)[track_ind] = association_mat[track_ind_loc][0];
-    for (size_t j = 1; j < association_mat[track_ind_loc].size(); j++) {
-      if ((*track2measurements_dist)[track_ind] >
+  for (size_t i = 0; i < unassigned_fusion_tracks->size(); ++i) {
+    const int track_ind = unassigned_fusion_tracks->at(i);
+    const int track_ind_loc = track_ind_g2l[track_ind];
+    track2measurements_dist->at(track_ind) = association_mat[track_ind_loc][0];
+    for (size_t j = 1; j < association_mat[track_ind_loc].size(); ++j) {
+      if (track2measurements_dist->at(track_ind) >
           association_mat[track_ind_loc][j]) {
-        (*track2measurements_dist)[track_ind] =
+        track2measurements_dist->at(track_ind) =
             association_mat[track_ind_loc][j];
       }
     }
   }
 
-  for (size_t i = 0; i < unassigned_sensor_objects->size(); i++) {
-    int m_ind = (*unassigned_sensor_objects)[i];
-    int m_ind_loc = measurement_ind_g2l[m_ind];
-    (*measurement2track_dist)[m_ind] = association_mat[0][m_ind_loc];
-    for (size_t j = 1; j < association_mat.size(); j++) {
-      if ((*measurement2track_dist)[m_ind] > association_mat[j][m_ind_loc]) {
-        (*measurement2track_dist)[m_ind] = association_mat[j][m_ind_loc];
+  for (const int m_ind : *unassigned_sensor_objects) {
+    const int m_ind_loc = measurement_ind_g2l[m_ind];
+    measurement2track_dist->at(m_ind) = association_mat[0][m_ind_loc];
+    for (const auto &asso_mat_row : association_mat) {
+      if (measurement2track_dist->at(m_ind) > asso_mat_row[m_ind_loc]) {
+        measurement2track_dist->at(m_ind) = asso_mat_row[m_ind_loc];
       }
     }
   }
-
-  // AINFO << "track2measurements:";
-  // for (size_t i = 0; i < track2measurements_dist->size(); i++) {
-  //     AINFO << (*track2measurements_dist)[i];
-  // }
-  // AINFO << "measurement2track_dist";
-  // for (size_t i = 0; i < measurement2track_dist->size(); i++) {
-  //     AINFO << (*measurement2track_dist)[i];
-  // }
   return state;
 }
 
@@ -133,11 +121,13 @@ std::string PbfHmTrackObjectMatcher::name() const {
 
 void PbfHmTrackObjectMatcher::ComputeAssociationMat(
     const std::vector<PbfTrackPtr> &fusion_tracks,
-    const std::vector<PbfSensorObjectPtr> &sensor_objects,
+    const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
     const std::vector<int> &unassigned_fusion_tracks,
     const std::vector<int> &unassigned_sensor_objects,
     const Eigen::Vector3d &ref_point,
     std::vector<std::vector<double>> *association_mat) {
+  CHECK_NOTNULL(association_mat);
+
   PbfTrackObjectDistance pbf_distance;
   Eigen::Vector3d local_ref_point = ref_point;
   TrackObjectDistanceOptions options;
@@ -149,32 +139,19 @@ void PbfHmTrackObjectMatcher::ComputeAssociationMat(
     const PbfTrackPtr &fusion_track = fusion_tracks[fusion_idx];
     for (size_t j = 0; j < unassigned_sensor_objects.size(); ++j) {
       int sensor_idx = unassigned_sensor_objects[j];
-      const PbfSensorObjectPtr &sensor_object = sensor_objects[sensor_idx];
+      const std::shared_ptr<PbfSensorObject> &sensor_object =
+          sensor_objects[sensor_idx];
       double distance =
           pbf_distance.Compute(fusion_track, sensor_object, options);
       ADEBUG << "sensor distance:" << distance;
       (*association_mat)[i][j] = distance;
     }
   }
-
-  // AINFO << "association matrix :";
-  // for (size_t i = 0; i < association_mat->size(); i++) {
-  //     if ((*association_mat)[i].empty()) {
-  //         continue;
-  //     }
-  //     std::ostringstream oss_str;
-  //     oss_str.precision(3);
-  //     oss_str << std::fixed;
-  //     for (size_t j = 0; j < (*association_mat)[i].size(); j++) {
-  //         oss_str << (*association_mat)[i][j] << "  ";
-  //     }
-  //     AINFO << oss_str.str();
-  // }
 }
 
 bool PbfHmTrackObjectMatcher::HmAssign(
     const std::vector<std::vector<double>> &association_mat,
-    std::vector<TrackObjectPair> *assignments,
+    std::vector<std::pair<int, int>> *assignments,
     std::vector<int> *unassigned_fusion_tracks,
     std::vector<int> *unassigned_sensor_objects) {
   double max_dist = s_max_match_distance_;
@@ -195,11 +172,11 @@ bool PbfHmTrackObjectMatcher::HmAssign(
       int idx_f = fusion_components[i][0];
       int idx_s = sensor_components[i][0];
       if (association_mat[idx_f][idx_s] < max_dist) {
-        auto assignment = std::make_pair((*unassigned_fusion_tracks)[idx_f],
-                                         (*unassigned_sensor_objects)[idx_s]);
+        auto assignment = std::make_pair(unassigned_fusion_tracks->at(idx_f),
+                                         unassigned_sensor_objects->at(idx_s));
         assignments->push_back(assignment);
-        (*unassigned_fusion_tracks)[idx_f] = -1;
-        (*unassigned_sensor_objects)[idx_s] = -1;
+        unassigned_fusion_tracks->at(idx_f) = -1;
+        unassigned_sensor_objects->at(idx_s) = -1;
       }
       continue;
     }
@@ -282,7 +259,8 @@ bool PbfHmTrackObjectMatcher::Init() { return true; }
 
 void PbfHmTrackObjectMatcher::ComputeConnectedComponents(
     const std::vector<std::vector<double>> &association_mat,
-    float connected_threshold, std::vector<std::vector<int>> *track_components,
+    const float connected_threshold,
+    std::vector<std::vector<int>> *track_components,
     std::vector<std::vector<int>> *obj_components) {
   int no_track = association_mat.size();
   int no_obj = 0;

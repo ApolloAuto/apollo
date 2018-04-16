@@ -10,7 +10,7 @@ import Tasks from "components/Tasks";
 @inject("store") @observer
 export default class ToolView extends React.Component {
     render() {
-        const { options, routeEditingManager } = this.props.store;
+        const { options, routeEditingManager, hmi } = this.props.store;
 
         return (
             <div className="tools">
@@ -18,7 +18,8 @@ export default class ToolView extends React.Component {
                 {options.showModuleController && <ModuleController />}
                 {options.showMenu && <Menu options={options} /> }
                 {options.showPOI && <POI routeEditingManager={routeEditingManager}
-                                         options={options}/>}
+                                         options={options}
+                                         inNavigationMode={hmi.inNavigationMode} />}
                 {options.showDataRecorder && <DataRecorder />}
             </div>
         );

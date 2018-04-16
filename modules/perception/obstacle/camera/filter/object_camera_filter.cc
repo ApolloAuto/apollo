@@ -21,8 +21,9 @@ namespace perception {
 
 bool ObjectCameraFilter::Init() { return true; }
 
-bool ObjectCameraFilter::Filter(const float &timestamp,
-                                std::vector<VisualObjectPtr> *objects) {
+bool ObjectCameraFilter::Filter(
+    const double &timestamp,
+    std::vector<std::shared_ptr<VisualObject>> *objects) {
   if (!objects) return false;
 
   // update lost_frame_count
@@ -48,68 +49,63 @@ bool ObjectCameraFilter::Filter(const float &timestamp,
 
 std::string ObjectCameraFilter::Name() const { return "ObjectCameraFilter"; }
 
-void ObjectCameraFilter::Create(const int &track_id, const float &timestamp,
-                                const VisualObjectPtr &obj_ptr) {
+void ObjectCameraFilter::Create(const int &track_id, const double &timestamp,
+                                const std::shared_ptr<VisualObject> &obj_ptr) {
   tracked_filters_[track_id] = ObjectFilter();
   tracked_filters_[track_id].track_id_ = track_id;
   tracked_filters_[track_id].last_timestamp_ = timestamp;
   tracked_filters_[track_id].x_.Init(obj_ptr->center.x());
   tracked_filters_[track_id].y_.Init(obj_ptr->center.y());
-  tracked_filters_[track_id].z_.Init(obj_ptr->center.z());
-  tracked_filters_[track_id].alpha_.Init(obj_ptr->alpha);
   tracked_filters_[track_id].theta_.Init(obj_ptr->theta);
-  tracked_filters_[track_id].l_.Init(obj_ptr->length);
-  tracked_filters_[track_id].w_.Init(obj_ptr->width);
-  tracked_filters_[track_id].h_.Init(obj_ptr->height);
 }
 
-void ObjectCameraFilter::Predict(const int &track_id, const float &timestamp) {
+void ObjectCameraFilter::Predict(const int &track_id, const double &timestamp) {
+  double time_diff = timestamp - tracked_filters_[track_id].last_timestamp_;
+  float diff = static_cast<float>(time_diff);
+
+  tracked_filters_[track_id].x_.Predict(diff);
+  tracked_filters_[track_id].y_.Predict(diff);
+  tracked_filters_[track_id].theta_.Predict(diff);
+
   tracked_filters_[track_id].lost_frame_cnt_ = 0;
-
-  float time_diff = timestamp - tracked_filters_[track_id].last_timestamp_;
-  tracked_filters_[track_id].x_.Predict(time_diff);
-  tracked_filters_[track_id].y_.Predict(time_diff);
-  tracked_filters_[track_id].z_.Predict(time_diff);
-  tracked_filters_[track_id].alpha_.Predict(time_diff);
-  tracked_filters_[track_id].theta_.Predict(time_diff);
-  tracked_filters_[track_id].l_.Predict(time_diff);
-  tracked_filters_[track_id].w_.Predict(time_diff);
-  tracked_filters_[track_id].h_.Predict(time_diff);
-
   tracked_filters_[track_id].last_timestamp_ = timestamp;
 }
 
 void ObjectCameraFilter::Update(const int &track_id,
-                                const VisualObjectPtr &obj_ptr) {
+                                const std::shared_ptr<VisualObject> &obj_ptr) {
   tracked_filters_[track_id].x_.Update(obj_ptr->center.x());
   tracked_filters_[track_id].y_.Update(obj_ptr->center.y());
-  tracked_filters_[track_id].z_.Update(obj_ptr->center.z());
-  tracked_filters_[track_id].alpha_.Update(obj_ptr->alpha);
   tracked_filters_[track_id].theta_.Update(obj_ptr->theta);
-  tracked_filters_[track_id].l_.Update(obj_ptr->length);
-  tracked_filters_[track_id].w_.Update(obj_ptr->width);
-  tracked_filters_[track_id].h_.Update(obj_ptr->height);
 }
 
 void ObjectCameraFilter::GetState(const int &track_id,
-                                  VisualObjectPtr obj_ptr) {
+                                  std::shared_ptr<VisualObject> obj_ptr) {
   auto x_state = tracked_filters_[track_id].x_.GetState();
+  auto y_state = tracked_filters_[track_id].y_.GetState();
+  auto x_state_cov = tracked_filters_[track_id].x_.GetCov();
+  auto y_state_cov = tracked_filters_[track_id].y_.GetCov();
+
   obj_ptr->center.x() = x_state.x();
   obj_ptr->velocity.x() = x_state.y();
 
-  auto y_state = tracked_filters_[track_id].y_.GetState();
   obj_ptr->center.y() = y_state.x();
   obj_ptr->velocity.y() = y_state.y();
 
-  auto z_state = tracked_filters_[track_id].z_.GetState();
-  obj_ptr->center.z() = z_state.x();
-  obj_ptr->velocity.z() = z_state.y();
+  obj_ptr->center.z() = 0.0f;
+  obj_ptr->velocity.z() = 0.0f;
 
-  obj_ptr->alpha = tracked_filters_[track_id].alpha_.GetState().x();
+  obj_ptr->state_uncertainty.block(0, 0, 2, 2) << x_state_cov(0, 0), 0, 0,
+      y_state_cov(0, 0);
+  obj_ptr->state_uncertainty.block(2, 2, 2, 2) << x_state_cov(1, 1), 0, 0,
+      y_state_cov(1, 1);
+  obj_ptr->state_uncertainty.block(0, 2, 2, 2) << x_state_cov(0, 1), 0, 0,
+      y_state_cov(0, 1);
+  obj_ptr->state_uncertainty.block(2, 0, 2, 2) << x_state_cov(1, 0), 0, 0,
+      y_state_cov(1, 0);
+
   obj_ptr->theta = tracked_filters_[track_id].theta_.GetState().x();
-  obj_ptr->length = tracked_filters_[track_id].l_.GetState().x();
-  obj_ptr->width = tracked_filters_[track_id].w_.GetState().x();
-  obj_ptr->height = tracked_filters_[track_id].h_.GetState().x();
+  obj_ptr->direction =
+      Eigen::Vector3f(cos(obj_ptr->theta), 0.0f, -sin(obj_ptr->theta));
 }
 
 void ObjectCameraFilter::Destroy() {

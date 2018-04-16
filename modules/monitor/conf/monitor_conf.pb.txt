@@ -26,12 +26,9 @@ modules {
   }
 }
 modules {
-  name: "localization"
+  name: "navigation_camera"
   process_conf {
-    process_cmd_keywords: "modules/localization/localization"
-  }
-  topic_conf {
-    type: LOCALIZATION
+    process_cmd_keywords: "camera_nodelet_manager"
   }
 }
 modules {
@@ -44,12 +41,21 @@ modules {
   }
 }
 modules {
-  name: "navigation_prediction"
+  name: "localization"
   process_conf {
-    process_cmd_keywords: "modules/prediction/prediction"
+    process_cmd_keywords: "modules/localization/localization"
   }
   topic_conf {
-    type: PREDICTION
+    type: LOCALIZATION
+  }
+}
+modules {
+  name: "navigation_localization"
+  process_conf {
+    process_cmd_keywords: "modules/localization/localization"
+  }
+  topic_conf {
+    type: LOCALIZATION
   }
 }
 modules {
@@ -68,6 +74,15 @@ modules {
   }
 }
 modules {
+  name: "navigation_perception"
+  process_conf {
+    process_cmd_keywords: "modules/perception/perception"
+  }
+  topic_conf {
+    type: PERCEPTION_OBSTACLES
+  }
+}
+modules {
   name: "planning"
   process_conf {
     process_cmd_keywords: "modules/planning/planning"
@@ -77,7 +92,31 @@ modules {
   }
 }
 modules {
+  name: "navigation_planning"
+  process_conf {
+    process_cmd_keywords: "modules/planning/planning"
+  }
+  topic_conf {
+    type: PLANNING_TRAJECTORY
+  }
+}
+modules {
   name: "prediction"
+  process_conf {
+    process_cmd_keywords: "modules/prediction/prediction"
+  }
+  topic_conf {
+    type: PREDICTION
+  }
+}
+modules {
+  name: "mobileye"
+  process_conf {
+    process_cmd_keywords: "modules/drivers/mobileye/mobileye"
+  }
+}
+modules {
+  name: "navigation_prediction"
   process_conf {
     process_cmd_keywords: "modules/prediction/prediction"
   }
@@ -127,7 +166,13 @@ modules {
 modules {
   name: "velodyne"
   process_conf {
-    process_cmd_keywords: "velodyne_nodelet_manager"
+    process_cmd_keywords: "sensor_velodyne64_driver"
+  }
+}
+modules {
+  name: "velodyne_16"
+  process_conf {
+    process_cmd_keywords: "sensor_velodyne16_driver"
   }
 }
 hardware {

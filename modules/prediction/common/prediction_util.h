@@ -19,6 +19,7 @@
 
 #include <utility>
 #include <vector>
+#include <array>
 
 #include "Eigen/Dense"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -59,6 +60,28 @@ double Relu(const double value);
 int SolveQuadraticEquation(const std::vector<double>& coefficients,
                            std::pair<double, double>* roots);
 
+/**
+ * @brief Evaluate quintic polynomial.
+ * @param coefficients of the quintic polynomial, lower to higher.
+ * @param parameter of the quintic polynomial.
+ * @return order of derivative to evaluate.
+ */
+double EvaluateQuinticPolynomial(
+    const std::array<double, 6>& coeffs,
+    const double t, const uint32_t order,
+    const double end_t, const double end_value);
+
+/**
+ * @brief Evaluate quartic polynomial.
+ * @param coefficients of the quartic polynomial, lower to higher.
+ * @param parameter of the quartic polynomial.
+ * @return order of derivative to evaluate.
+ */
+double EvaluateQuarticPolynomial(
+    const std::array<double, 5>& coeffs,
+    const double t, const uint32_t order,
+    const double end_t, const double end_value);
+
 }  // namespace math_util
 
 namespace predictor_util {
@@ -85,6 +108,16 @@ void GenerateFreeMoveTrajectoryPoints(
     const Eigen::Matrix<double, 6, 6>& transition, double theta,
     const size_t num, const double period,
     std::vector<apollo::common::TrajectoryPoint>* points);
+
+/**
+ * @brief Adjust a speed value according to a curvature. If the input speed
+ *        is okay on the input curvature, return the original speed, otherwise,
+ *        adjust the speed.
+ * @param speed The original speed value.
+ * @param curvature The curvature value.
+ * @return The adjusted speed according to the curvature.
+ */
+double AdjustSpeedByCurvature(const double speed, const double curvature);
 
 }  // namespace predictor_util
 }  // namespace prediction

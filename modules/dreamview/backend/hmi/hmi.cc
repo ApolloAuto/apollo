@@ -42,6 +42,7 @@ using apollo::common::util::FindLinkedPtrOrNull;
 using apollo::common::util::JsonUtil;
 using apollo::common::util::make_unique;
 using Json = WebSocketHandler::Json;
+using RLock = boost::shared_lock<boost::shared_mutex>;
 
 HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
     : websocket_(websocket),
@@ -58,12 +59,32 @@ void HMI::RegisterMessageHandlers() {
   websocket_->RegisterConnectionReadyHandler(
       [this](WebSocketHandler::Connection *conn) {
         const auto &config = HMIWorker::instance()->GetConfig();
-        const auto &status = HMIWorker::instance()->GetStatus();
         websocket_->SendData(
             conn, JsonUtil::ProtoToTypedJson("HMIConfig", config).dump());
-        websocket_->SendData(
-            conn, JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
+
+        {
+          RLock rlock(HMIWorker::instance()->GetStatusMutex());
+          const auto &status = HMIWorker::instance()->GetStatus();
+          websocket_->SendData(
+              conn, JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
+        }
         SendVehicleParam(conn);
+      });
+
+  // HMI client sends voice data.
+  websocket_->RegisterMessageHandler(
+      "VoicePiece",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // json should contain {data: "<base64 encoded audio/wav piece>"}.
+        std::string data;
+        if (JsonUtil::GetStringFromJson(json, "data", &data)) {
+          VoiceDetectionRequest request;
+          request.set_id(reinterpret_cast<uint64_t>(conn));
+          request.set_wav_stream(apollo::common::util::Base64Decode(data));
+          AdapterManager::PublishVoiceDetectionRequest(request);
+        } else {
+          AERROR << "Truncated voice piece.";
+        }
       });
 
   // HMI client asks for executing module command.
@@ -185,12 +206,15 @@ void HMI::RegisterMessageHandlers() {
         // json should contain event_time_ms and event_msg.
         uint64_t event_time_ms;
         std::string event_msg;
+        apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
         if (JsonUtil::GetNumberFromJson(json, "event_time_ms",
                                         &event_time_ms) &&
             JsonUtil::GetStringFromJson(json, "event_msg", &event_msg)) {
           HMIWorker::SubmitDriveEvent(event_time_ms, event_msg);
+          log_buffer.INFO("Drive event added.");
         } else {
           AERROR << "Truncated SubmitDriveEvent request.";
+          log_buffer.WARN("Failed to submit a drive event.");
         }
       });
 
@@ -203,10 +227,20 @@ void HMI::RegisterMessageHandlers() {
           BroadcastHMIStatus();
         }
       });
+
+  // Received VoiceDetection response.
+  AdapterManager::AddVoiceDetectionResponseCallback(
+      [this](const VoiceDetectionResponse &response) {
+        apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
+        log_buffer.INFO() << "Triggered action by voice: "
+                          << HMIAction_Name(response.action());
+        HMIWorker::instance()->Trigger(response.action());
+      });
 }
 
 void HMI::BroadcastHMIStatus() {
   // In unit tests, we may leave websocket_ as NULL and skip broadcasting.
+  RLock rlock(HMIWorker::instance()->GetStatusMutex());
   const auto &status = HMIWorker::instance()->GetStatus();
   if (websocket_) {
     websocket_->BroadcastData(

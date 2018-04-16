@@ -29,14 +29,6 @@
 namespace apollo {
 namespace perception {
 
-DEFINE_string(onsemi_obstacle_extrinsics,
-              "./conf/params/onsemi_obstacle_extrinsics.yaml",
-              "onsemi_obstacle_extrinsics name");
-DEFINE_string(onsemi_obstacle_intrinsics,
-              "./conf/params/onsemi_obstacle_intrinsics.yaml",
-              "onsemi_obstacle_intrinsics name");
-DEFINE_bool(onboard_undistortion, false, "do undistortion");
-
 std::vector<cv::Scalar> color_table = {
     cv::Scalar(0, 0, 0),       cv::Scalar(128, 0, 0),
     cv::Scalar(255, 0, 0),     cv::Scalar(0, 128, 0),
@@ -54,16 +46,13 @@ std::vector<cv::Scalar> color_table = {
     cv::Scalar(255, 255, 255),
 };
 
-bool LoadVisualObjectFromFile(const std::string &file_name,
-                              std::vector<VisualObjectPtr> *visual_objects) {
-  FILE *fp = fopen(file_name.c_str(), "r");
-  if (!fp) {
-    std::cout << "load file: " << file_name << " error!" << std::endl;
-    return false;
-  }
+bool LoadVisualObjectFromFile(
+    const std::string &file_name,
+    std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
+  std::fstream fs(file_name, std::fstream::out);
 
-  while (!feof(fp)) {
-    VisualObjectPtr obj(new VisualObject());
+  while (!fs.eof()) {
+    std::shared_ptr<VisualObject> obj(new VisualObject());
     std::fill(
         obj->type_probs.begin(),
         obj->type_probs.begin() + static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
@@ -75,34 +64,33 @@ bool LoadVisualObjectFromFile(const std::string &file_name,
     double y1 = 0.0;
     double x2 = 0.0;
     double y2 = 0.0;
-    int ret = fscanf(fp,
-                     "%s %lf %lf %f %lf %lf %lf %lf %f %f %f %f %f %f %f %f "
-                     "%f %f",
-                     type, &trash, &trash, &obj->alpha, &x1, &y1, &x2, &y2,
-                     &obj->height, &obj->width, &obj->length, &obj->center.x(),
-                     &obj->center.y(), &obj->center.z(), &obj->theta,
-                     &obj->score, &obj->trunc_height, &obj->trunc_width);
-    obj->upper_left[0] = x1 > 0 ? x1 : 0;
-    obj->upper_left[1] = y1 > 0 ? y1 : 0;
-    obj->lower_right[0] = x2 < 1920 ? x2 : 1920;
-    obj->lower_right[1] = y2 < 1080 ? y2 : 1080;
-    obj->type = GetObjectType(std::string(type));
-    obj->type_probs[static_cast<int>(obj->type)] =
-        static_cast<float>(obj->score);
 
-    if (ret >= 15) {
+    if (fs.get(type, 255) && fs >> trash && fs >> trash && fs >> obj->alpha &&
+        fs >> x1 && fs >> y1 && fs >> x2 && fs >> y2 && fs >> obj->height &&
+        fs >> obj->width && fs >> obj->length && fs >> obj->center.x() &&
+        fs >> obj->center.y() && fs >> obj->center.z() && fs >> obj->theta &&
+        fs >> obj->score && fs >> obj->trunc_height && fs >> obj->trunc_width) {
+      obj->upper_left[0] = x1 > 0 ? x1 : 0;
+      obj->upper_left[1] = y1 > 0 ? y1 : 0;
+      obj->lower_right[0] = x2 < 1920 ? x2 : 1920;
+      obj->lower_right[1] = y2 < 1080 ? y2 : 1080;
+      obj->type = GetObjectType(std::string(type));
+      obj->type_probs[static_cast<int>(obj->type)] =
+          static_cast<float>(obj->score);
+    } else {
       visual_objects->push_back(obj);
     }
   }
-  fclose(fp);
+  fs.close();
   return true;
 }
 
-bool WriteVisualObjectToFile(const std::string &file_name,
-                             std::vector<VisualObjectPtr> *visual_objects) {
+bool WriteVisualObjectToFile(
+    const std::string &file_name,
+    std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
   FILE *fp = fopen(file_name.c_str(), "w");
   if (!fp) {
-    std::cout << "write file: " << file_name << " error!" << std::endl;
+    AERROR << "write file: " << file_name << " error!";
     return false;
   }
 
@@ -122,8 +110,9 @@ bool WriteVisualObjectToFile(const std::string &file_name,
   return true;
 }
 
-bool LoadGTfromFile(const std::string &gt_path,
-                    std::vector<VisualObjectPtr> *visual_objects) {
+bool LoadGTfromFile(
+    const std::string &gt_path,
+    std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
   std::ifstream gt_file(gt_path);
 
   std::string line;
@@ -138,7 +127,7 @@ bool LoadGTfromFile(const std::string &gt_path,
     // TODO(All) Decide where to Eliminate -99 2D only cases, since they don't
     // have 3d (2409 test)
     if (tokens.size() == 16 && tokens[3].compare("-99") != 0) {
-      VisualObjectPtr obj(new VisualObject());
+      std::shared_ptr<VisualObject> obj(new VisualObject());
 
       // TODO(All) Why the 2409 test data ground truth has exchanged alpha and
       // theta
@@ -187,8 +176,9 @@ bool LoadGTfromFile(const std::string &gt_path,
   return true;
 }
 
-void DrawVisualObejcts(const std::vector<VisualObjectPtr> &visual_objects,
-                       cv::Mat *img) {
+void DrawVisualObejcts(
+    const std::vector<std::shared_ptr<VisualObject>> &visual_objects,
+    cv::Mat *img) {
   for (const auto &obj : visual_objects) {
 // 3D BBox
 #if 0
@@ -259,8 +249,9 @@ void DrawVisualObejcts(const std::vector<VisualObjectPtr> &visual_objects,
   }
 }
 
-void DrawGTObjectsText(const std::vector<VisualObjectPtr> &visual_objects,
-                       cv::Mat *img) {
+void DrawGTObjectsText(
+    const std::vector<std::shared_ptr<VisualObject>> &visual_objects,
+    cv::Mat *img) {
   for (const auto &obj : visual_objects) {
     // 2D BBox
     int x1 = static_cast<int>(obj->upper_left[0]);

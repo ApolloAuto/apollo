@@ -41,10 +41,6 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   CHECK_GT(obstacle->history_size(), 0);
 
   const Feature& feature = obstacle->latest_feature();
-  if (feature.is_still()) {
-    ADEBUG << "Obstacle [" << obstacle->id() << "] is still.";
-    return;
-  }
 
   if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << " has no lane graph.";
@@ -57,8 +53,7 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   }
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
   std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
-  FilterLaneSequences(feature.lane().lane_graph(), lane_id,
-                      &enable_lane_sequence);
+  FilterLaneSequences(feature, lane_id, &enable_lane_sequence);
 
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = feature.lane().lane_graph().lane_sequence(i);

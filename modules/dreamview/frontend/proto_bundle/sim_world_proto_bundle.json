@@ -94,6 +94,10 @@
                 "stopReason": {
                   "type": "StopReasonCode",
                   "id": 11
+                },
+                "changeLaneType": {
+                  "type": "apollo.routing.ChangeLaneType",
+                  "id": 12
                 }
               },
               "nested": {
@@ -288,7 +292,8 @@
                     "PEDESTRIAN": 3,
                     "BICYCLE": 4,
                     "VEHICLE": 5,
-                    "VIRTUAL": 6
+                    "VIRTUAL": 6,
+                    "CIPV": 7
                   }
                 }
               }
@@ -318,6 +323,10 @@
                 "trafficLight": {
                   "type": "double",
                   "id": 8
+                },
+                "control": {
+                  "type": "double",
+                  "id": 9
                 }
               }
             },
@@ -396,6 +405,14 @@
                 "stationError": {
                   "type": "double",
                   "id": 2
+                },
+                "lateralError": {
+                  "type": "double",
+                  "id": 3
+                },
+                "headingError": {
+                  "type": "double",
+                  "id": 4
                 }
               }
             },
@@ -438,7 +455,14 @@
                 },
                 "mainStop": {
                   "type": "Object",
-                  "id": 9
+                  "id": 9,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "mainDecision": {
+                  "type": "Object",
+                  "id": 24
                 },
                 "speedLimit": {
                   "type": "double",
@@ -717,6 +741,15 @@
                   "options": {
                     "default": null
                   }
+                }
+              }
+            },
+            "Polygon": {
+              "fields": {
+                "point": {
+                  "rule": "repeated",
+                  "type": "Point3D",
+                  "id": 1
                 }
               }
             },
@@ -1455,7 +1488,9 @@
                 "STOP_REASON_YIELD_SIGN": 102,
                 "STOP_REASON_CLEAR_ZONE": 103,
                 "STOP_REASON_CROSSWALK": 104,
-                "STOP_REASON_CREEPER": 105
+                "STOP_REASON_CREEPER": 105,
+                "STOP_REASON_REFERENCE_END": 106,
+                "STOP_REASON_YELLOW_SIGNAL": 107
               }
             },
             "ObjectStop": {
@@ -2203,31 +2238,6 @@
                 }
               }
             },
-            "ChangeLaneState": {
-              "fields": {
-                "state": {
-                  "type": "State",
-                  "id": 1
-                },
-                "pathId": {
-                  "type": "string",
-                  "id": 2
-                },
-                "timestamp": {
-                  "type": "double",
-                  "id": 3
-                }
-              },
-              "nested": {
-                "State": {
-                  "values": {
-                    "IN_CHANGE_LANE": 1,
-                    "CHANGE_LANE_FAILED": 2,
-                    "CHANGE_LANE_SUCCESS": 3
-                  }
-                }
-              }
-            },
             "SampleLayerDebug": {
               "fields": {
                 "slPoint": {
@@ -2314,6 +2324,14 @@
                 "latticeStImage": {
                   "type": "LatticeStTraining",
                   "id": 21
+                },
+                "relativeMap": {
+                  "type": "apollo.relative_map.MapMsg",
+                  "id": 22
+                },
+                "autoTuningTrainingData": {
+                  "type": "AutoTuningTrainingData",
+                  "id": 23
                 }
               }
             },
@@ -2371,6 +2389,30 @@
                 "tResolution": {
                   "type": "double",
                   "id": 7
+                }
+              }
+            },
+            "CostComponents": {
+              "fields": {
+                "costComponent": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "packed": false
+                  }
+                }
+              }
+            },
+            "AutoTuningTrainingData": {
+              "fields": {
+                "teacherComponent": {
+                  "type": "CostComponents",
+                  "id": 1
+                },
+                "studentComponent": {
+                  "type": "CostComponents",
+                  "id": 2
                 }
               }
             },
@@ -2680,6 +2722,14 @@
                 "viewRange": {
                   "type": "double",
                   "id": 8
+                },
+                "longitudeStart": {
+                  "type": "double",
+                  "id": 9
+                },
+                "longitudeEnd": {
+                  "type": "double",
+                  "id": 10
                 }
               }
             },
@@ -3670,6 +3720,108 @@
                   "rule": "repeated",
                   "type": "Id",
                   "id": 3
+                }
+              }
+            }
+          }
+        },
+        "relative_map": {
+          "nested": {
+            "NavigationPath": {
+              "fields": {
+                "path": {
+                  "type": "apollo.common.Path",
+                  "id": 1
+                },
+                "pathPriority": {
+                  "type": "uint32",
+                  "id": 2
+                }
+              }
+            },
+            "NavigationInfo": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "navigationPath": {
+                  "rule": "repeated",
+                  "type": "NavigationPath",
+                  "id": 2
+                }
+              }
+            },
+            "MapMsg": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "hdmap": {
+                  "type": "apollo.hdmap.Map",
+                  "id": 2
+                },
+                "navigationPath": {
+                  "keyType": "string",
+                  "type": "NavigationPath",
+                  "id": 3
+                },
+                "laneMarker": {
+                  "type": "apollo.perception.LaneMarkers",
+                  "id": 4
+                },
+                "localization": {
+                  "type": "apollo.localization.LocalizationEstimate",
+                  "id": 5
+                }
+              }
+            },
+            "MapGenerationParam": {
+              "fields": {
+                "defaultLeftWidth": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 1.75
+                  }
+                },
+                "defaultRightWidth": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1.75
+                  }
+                },
+                "defaultSpeedLimit": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 29.0576
+                  }
+                }
+              }
+            },
+            "NavigationLaneConfig": {
+              "fields": {
+                "minLaneMarkerQuality": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 0.5
+                  }
+                }
+              }
+            },
+            "RelativeMapConfig": {
+              "fields": {
+                "mapParam": {
+                  "type": "MapGenerationParam",
+                  "id": 1
+                },
+                "navigationLane": {
+                  "type": "NavigationLaneConfig",
+                  "id": 2
                 }
               }
             }

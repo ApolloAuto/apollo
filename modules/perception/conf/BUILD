@@ -13,5 +13,10 @@ filegroup(
         "config_manager.config",
         "dag_streaming.config",
         "perception.conf",
+        "dag_streaming_lowcost.config",
+        "dag_camera_obstacle.config",
+        "dag_camera_obstacle_vis.config",
+        "dag_camera_obstacle_lane_vis.config",
+        "perception_lowcost.conf"
     ],
 )

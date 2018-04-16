@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_DUMMY_DUMMY_ALGORITHMS_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DUMMY_DUMMY_ALGORITHMS_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -39,11 +40,19 @@ class DummyCameraDetector : public BaseCameraDetector {
   }
 
   bool Detect(const cv::Mat& frame, const CameraDetectorOptions& options,
-              std::vector<VisualObjectPtr>* objects) override {
+              std::vector<std::shared_ptr<VisualObject>>* objects) override {
     return true;
   }
 
-  bool Extract(std::vector<VisualObjectPtr>* objects) override { return true; }
+  bool Multitask(const cv::Mat& frame, const CameraDetectorOptions& options,
+                 std::vector<std::shared_ptr<VisualObject>>* objects,
+                 cv::Mat* mask) override {
+    return true;
+  }
+
+  bool Extract(std::vector<std::shared_ptr<VisualObject>>* objects) override {
+    return true;
+  }
 
   std::string Name() const override { return "DummyCameraDetector"; }
 
@@ -60,24 +69,26 @@ class DummyCameraTracker : public BaseCameraTracker {
 
   /*
   bool predict_velocity(
-      const cv::Mat &frame, const std::vector<VisualObjectPtr> &objects,
+      const cv::Mat &frame, const std::vector<std::shared_ptr<VisualObject>>
+  &objects,
       double timestamp, const CameraTrackerOptions &options,
-      std::vector<VisualObjectPtr> *tracked_objects) override {
+      std::vector<std::shared_ptr<VisualObject>> *tracked_objects) override {
     *tracked_objects = objects;
     this->trans_object_to_world(options, tracked_objects);
     return true;
   }
 
   bool predict_shape(
-      const cv::Mat &frame, const std::vector<VisualObjectPtr> &objects,
+      const cv::Mat &frame, const std::vector<std::shared_ptr<VisualObject>>
+  &objects,
       double timestamp, const CameraTrackerOptions &options,
-      std::vector<VisualObjectPtr> *tracked_objects) override {
+      std::vector<std::shared_ptr<VisualObject>> *tracked_objects) override {
     return true;
   }
   */
 
-  bool Associate(const cv::Mat& img, const float& timestamp,
-                 std::vector<VisualObjectPtr>* objects) override {
+  bool Associate(const cv::Mat& img, const double& timestamp,
+                 std::vector<std::shared_ptr<VisualObject>>* objects) override {
     return true;
   }
 
@@ -94,7 +105,11 @@ class DummyCameraTransformer : public BaseCameraTransformer {
 
   bool Init() override { return true; }
 
-  bool Transform(std::vector<VisualObjectPtr>* objects) override {
+  bool Transform(std::vector<std::shared_ptr<VisualObject>>* objects) override {
+    return true;
+  }
+
+  bool SetExtrinsics(const Eigen::Matrix<double, 4, 4>& extrinsics) override {
     return true;
   }
 
@@ -108,6 +123,10 @@ class DummyProjector : public BaseProjector {
  public:
   bool project(std::vector<float>* feature) override { return true; }
 };
+
+REGISTER_CAMERA_DETECTOR(DummyCameraDetector);
+REGISTER_CAMERA_TRACKER(DummyCameraTracker);
+REGISTER_CAMERA_TRANSFORMER(DummyCameraTransformer);
 
 }  // namespace perception
 }  // namespace apollo

@@ -16,16 +16,17 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_DUMMY_DUMMY_ALGORITHMS_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_DUMMY_DUMMY_ALGORITHMS_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
+#include "modules/perception/common/sequence_type_fuser/base_type_fuser.h"
 #include "modules/perception/obstacle/lidar/interface/base_ground_detector.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_builder.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
-#include "modules/perception/obstacle/lidar/interface/base_type_fuser.h"
 
 namespace apollo {
 namespace perception {
@@ -82,7 +83,7 @@ class DummySegmentation : public BaseSegmentation {
   bool Segment(const pcl_util::PointCloudPtr &cloud,
                const pcl_util::PointIndices &non_ground_indices,
                const SegmentationOptions &options,
-               std::vector<ObjectPtr> *objects) override;
+               std::vector<std::shared_ptr<Object>> *objects) override;
 
   std::string name() const override { return "DummySegmentation"; }
 
@@ -101,12 +102,13 @@ class DummyObjectBuilder : public BaseObjectBuilder {
   bool Init() override { return result_init_; }
 
   bool Build(const ObjectBuilderOptions &options,
-             std::vector<ObjectPtr> *objects) override;
+             std::vector<std::shared_ptr<Object>> *objects) override;
 
   std::string name() const override { return "DummyObjectBuilder"; }
 
  protected:
-  void BuildObject(const ObjectBuilderOptions &options, ObjectPtr object);
+  void BuildObject(const ObjectBuilderOptions &options,
+                   std::shared_ptr<Object> object);
 
  private:
   bool result_init_ = true;
@@ -123,7 +125,7 @@ class DummyObjectFilter : public BaseObjectFilter {
   bool Init() override { return result_init_; }
 
   bool Filter(const ObjectFilterOptions &obj_filter_options,
-              std::vector<ObjectPtr> *objects) override;
+              std::vector<std::shared_ptr<Object>> *objects) override;
 
   std::string name() const override { return "DummyObjectFilter"; }
 
@@ -141,9 +143,9 @@ class DummyTracker : public BaseTracker {
 
   bool Init() override { return result_init_; }
 
-  bool Track(const std::vector<ObjectPtr> &objects, double timestamp,
-             const TrackerOptions &options,
-             std::vector<ObjectPtr> *tracked_objects) override;
+  bool Track(const std::vector<std::shared_ptr<Object>> &objects,
+             double timestamp, const TrackerOptions &options,
+             std::vector<std::shared_ptr<Object>> *tracked_objects) override;
 
   std::string name() const override { return "DummyTracker"; }
 
@@ -162,7 +164,7 @@ class DummyTypeFuser : public BaseTypeFuser {
   bool Init() override { return result_init_; }
 
   bool FuseType(const TypeFuserOptions &options,
-                std::vector<ObjectPtr> *objects) override;
+                std::vector<std::shared_ptr<Object>> *objects) override;
 
   std::string name() const override { return "DummyTypeFuser"; }
 

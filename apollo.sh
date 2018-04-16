@@ -28,6 +28,13 @@ function source_apollo_base() {
 }
 
 function apollo_check_system_config() {
+  # check docker environment
+  if [ ${MACHINE_ARCH} == "x86_64" ] && [ $(hostname) != "in_dev_docker" ] &&
+       [ $(hostname) != "in_release_docker" ]; then
+    echo -e "${RED}Must run $0 in dev docker or release docker${NO_COLOR}"
+    exit 0
+  fi
+
   # check operating system
   OP_SYSTEM=$(uname -s)
   case $OP_SYSTEM in
@@ -111,6 +118,7 @@ function generate_build_targets() {
 
 function build() {
   START_TIME=$(get_now)
+
 
   info "Start building, please wait ..."
   generate_build_targets
@@ -236,6 +244,8 @@ function release() {
   # modules data and conf
   CONFS=$(find modules/ -name "conf")
   DATAS=$(find modules/ -name "data")
+  OTHER=("modules/tools"
+         "modules/perception/model")
   rm -rf test/*
   for conf in $CONFS; do
     mkdir -p $APOLLO_RELEASE_DIR/$conf
@@ -246,6 +256,11 @@ function release() {
     if [ $data != "modules/map/data" ]; then
       rsync -a $data/* $APOLLO_RELEASE_DIR/$data
     fi
+  done
+  # Other
+  for path in "${OTHER[@]}"; do
+    mkdir -p $APOLLO_RELEASE_DIR/$path
+    rsync -a $path/* $APOLLO_RELEASE_DIR/$path
   done
 
   # dreamview frontend
@@ -269,6 +284,7 @@ function release() {
   fi
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
+  cp /apollo/modules/perception/cuda_util/cmake_build/libcuda_util.so $LIB_DIR
 
   # doc
   cp -r docs "${APOLLO_RELEASE_DIR}"
@@ -329,7 +345,7 @@ function run_test() {
     echo -e "${RED}Need GPU to run the tests.${NO_COLOR}"
     echo "$BUILD_TARGETS" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   else
-    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | grep -v "yolo_camera_detector_test" | xargs bazel test $DEFINES --config=unit_test -c dbg --test_verbose_timeout_warnings $@
   fi
   if [ $? -ne 0 ]; then
     fail 'Test failed!'
@@ -548,7 +564,7 @@ function print_usage() {
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_gnss${NONE}: build gnss driver
   ${BLUE}build_velodyne${NONE}: build velodyne driver
-  ${BLUE}build_usbcam${NONE}: build velodyne driver
+  ${BLUE}build_usbcam${NONE}: build usb camera driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
   ${BLUE}build_no_perception [dbg|opt]${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
@@ -569,8 +585,8 @@ function print_usage() {
 
 function main() {
   source_apollo_base
-  apollo_check_system_config
   check_machine_arch
+  apollo_check_system_config
   check_esd_files
 
   DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"

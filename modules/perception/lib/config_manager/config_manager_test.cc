@@ -54,23 +54,21 @@ TEST_F(ConfigManagerTest, test_Reset) {
 
 TEST_F(ConfigManagerTest, test_GetModelConfig) {
   std::string model_name = "ROIFilterTest";
-  const ModelConfig* model_config = NULL;
-  EXPECT_TRUE(config_manager_->GetModelConfig(model_name, &model_config));
-  ASSERT_TRUE(model_config != NULL);
+  const ModelConfig* model_config = config_manager_->GetModelConfig(model_name);
+  EXPECT_TRUE(model_config != nullptr);
   EXPECT_EQ(model_config->name(), model_name);
 
   // not exist model.
-  model_config = NULL;
-  EXPECT_FALSE(config_manager_->GetModelConfig("noexist", &model_config));
-  EXPECT_TRUE(model_config == NULL);
+  model_config = config_manager_->GetModelConfig("noexist");
+  EXPECT_EQ(model_config, nullptr);
 }
 
 TEST_F(ConfigManagerTest, test_ModelConfig) {
   std::string model_name = "ROIFilterTest";
   ASSERT_TRUE(config_manager_->Init());
   ASSERT_EQ(config_manager_->NumModels(), 3u);
-  const ModelConfig* model_config = NULL;
-  ASSERT_TRUE(config_manager_->GetModelConfig(model_name, &model_config));
+  const ModelConfig* model_config = config_manager_->GetModelConfig(model_name);
+  ASSERT_TRUE(model_config != nullptr);
   ASSERT_EQ(model_config->name(), model_name);
   // Check ROIFilterTest param map.
 

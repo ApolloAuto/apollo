@@ -46,6 +46,7 @@ options:
     showModuleController: false
     showMenu: false
     showPOI: false
+    enableVoiceCommand: false
     showPNCMonitor: false
     showRouteEditingBar: false
     showDataRecorder: false
@@ -59,6 +60,7 @@ options:
     showDecisionMain: true
     showDecisionObstacle: true
     showRouting: true
+    showPerceptionLaneMarker: false
     showPredictionMajor: true
     showPredictionMinor: true
     showObstaclesVehicle: true
@@ -68,6 +70,7 @@ options:
     showObstaclesUnknownUnmovable: true
     showObstaclesUnknown: true
     showObstaclesVirtual: false
+    showObstaclesCipv: true
     showObstaclesVelocity: true
     showObstaclesHeading: true
     showObstaclesId: true
@@ -82,9 +85,15 @@ options:
     showMapSignal: true
     showMapStopSign: true
     cameraAngle: Default
+
 navigation:
   # possible options: BaiduMap or GoogleMap
-  map: "GoogleMap"
+  map: "BaiduMap"
+
+  # Google Map API: "https://maps.google.com/maps/api/js"
+  # Baidu Map API: "https://api.map.baidu.com/api?v=3.0&ak=0kKZnWWhXEPfzIkklmzAa3dZ&callback=initMap"
+  mapAPiUrl: "https://api.map.baidu.com/api?v=3.0&ak=0kKZnWWhXEPfzIkklmzAa3dZ&callback=initMap"
+
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false

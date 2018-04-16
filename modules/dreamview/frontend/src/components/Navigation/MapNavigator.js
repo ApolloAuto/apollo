@@ -1,8 +1,9 @@
-import polyval from "compute-polynomial";
 import { UTMToWGS84 } from "utils/coordinate_converter";
+import { calculateLaneMarkerPoints } from "utils/misc";
 
 class MapNavigator {
     constructor() {
+        this.mapAPILoaded = false;
         this.WS = null;
         this.mapAdapter = null;
 
@@ -13,6 +14,8 @@ class MapNavigator {
         this.leftLaneMarker = null;
         this.destinationMarker = null;
         this.centerVehicle = true;
+
+        this.routingRequestPoints = [];
     }
 
     initialize(WS, mapAdapter) {
@@ -40,8 +43,7 @@ class MapNavigator {
     }
 
     reset() {
-        this.routingPaths.forEach((path) => {
-            console.log(path);
+        this.routingPaths.forEach(path => {
             this.mapAdapter.removePolyline(path);
         });
         this.routingPaths = [];
@@ -70,29 +72,29 @@ class MapNavigator {
 
     createControls() {
         this.mapAdapter.createControl({
-            text: "Center Vehicle is ON",
+            text: "CarView ON",
             tip: "Click to recenter the vehicle",
             color: "#FFFFFF",
-            offsetX: 430,
+            offsetX: 130,
             offsetY: 0,
             onClickHandler: textElementDiv => {
                 if (this.centerVehicle) {
                     this.centerVehicle = false;
-                    textElementDiv.innerHTML = "Center Vehicle is OFF";
-                    this.mapAdapter.setZoom(15);
+                    textElementDiv.innerHTML = "CarView OFF";
+                    this.mapAdapter.setZoom(18);
                 } else {
                     this.centerVehicle = true;
-                    textElementDiv.innerHTML = "Center Vehicle is ON";
+                    textElementDiv.innerHTML = "CarView ON";
                     this.mapAdapter.setZoom(20);
                 }
             },
         });
 
         this.mapAdapter.createControl({
-            text: "Routing Request",
+            text: "Route",
             tip: "Click to send routing request",
             color: "#CD5C5C",
-            offsetX: 298,
+            offsetX: 235,
             offsetY: 0,
             onClickHandler: textElementDiv => {
                 if (!this.destinationMarker) {
@@ -102,35 +104,7 @@ class MapNavigator {
 
                 const start = this.mapAdapter.getMarkerPosition(this.vehicleMarker);
                 const end = this.mapAdapter.getMarkerPosition(this.destinationMarker);
-                this.requestRouting(start.lat, start.lng, end.lat, end.lng);
-            },
-        });
-
-        this.mapAdapter.createControl({
-            text: "TO Cananda West",
-            tip: "Click to send routing request",
-            color: "#FF8C00",
-            offsetX: 152,
-            offsetY: 0,
-            onClickHandler: textElementDiv => {
-                const start = this.mapAdapter.getMarkerPosition(this.vehicleMarker);
-                const endLat = 37.50582457077844;
-                const endLng = -122.34000922633726;
-                this.requestRouting(start.lat, start.lng, endLat, endLng);
-            },
-        });
-
-        this.mapAdapter.createControl({
-            text: "TO Cananda East",
-            tip: "Click to send routing request",
-            color: "#00BFFF",
-            offsetX: 10,
-            offsetY: 0,
-            onClickHandler: textElementDiv => {
-                const start = this.mapAdapter.getMarkerPosition(this.vehicleMarker);
-                const endLat = 37.464198;
-                const endLng = -122.298453;
-                this.requestRouting(start.lat, start.lng, endLat, endLng);
+                this.requestRoute(start.lat, start.lng, end.lat, end.lng);
             },
         });
     }
@@ -164,7 +138,7 @@ class MapNavigator {
         const y = autoDrivingCar.positionY;
         const heading = autoDrivingCar.heading;
 
-        const [longitude, latitude] = UTMToWGS84(x, y);
+        const [longitude, latitude] = this.mapAdapter.applyCoordinateOffset(UTMToWGS84(x, y));
         const latLng = this.mapAdapter.createPoint({
             lat: latitude,
             lng: longitude,
@@ -176,30 +150,13 @@ class MapNavigator {
     }
 
     calculateLaneMarkerPath(autoDrivingCar, laneMarkerData) {
-        if (!autoDrivingCar || !laneMarkerData) {
-            return;
-        }
-
-        const adcX = autoDrivingCar.positionX;
-        const adcY = autoDrivingCar.positionY;
-        const heading = autoDrivingCar.heading;
-
-        const c0 = laneMarkerData.c0Position;
-        const c1 = laneMarkerData.c1HeadingAngle;
-        const c2 = laneMarkerData.c2Curvature;
-        const c3 = laneMarkerData.c3CurvatureDerivative;
-        const markerRange = laneMarkerData.viewRange;
-        const markerCoef = [c3, c2, c1, c0];
-
-        const lane = [];
-        for (let x = 0; x < markerRange; ++x) {
-            const y = polyval(markerCoef, x);
-            const newX = x * Math.cos(heading) - y * Math.sin(heading);
-            const newY = y * Math.cos(heading) + x * Math.sin(heading);
-            const [plon, plat] = UTMToWGS84(adcX + newX, adcY + newY);
-            lane.push(this.mapAdapter.createPoint({ lat: plat, lng: plon }));
-        }
-        return lane;
+        const path = calculateLaneMarkerPoints(autoDrivingCar, laneMarkerData);
+        return path.map(point => {
+            const [plon, plat] = this.mapAdapter.applyCoordinateOffset(
+                UTMToWGS84(point.x, point.y)
+            );
+            return this.mapAdapter.createPoint({ lat: plat, lng: plon });
+        });
     }
 
     updateLaneMarkers(autoDrivingCar, laneMarker) {
@@ -236,7 +193,9 @@ class MapNavigator {
             const y = point.positionY;
             const newX = x * Math.cos(heading) - y * Math.sin(heading);
             const newY = y * Math.cos(heading) + x * Math.sin(heading);
-            const [plon, plat] = UTMToWGS84(adcX + newX, adcY + newY);
+            const [plon, plat] = this.mapAdapter.applyCoordinateOffset(
+                UTMToWGS84(adcX + newX, adcY + newY)
+            );
             return this.mapAdapter.createPoint({ lat: plat, lng: plon });
         });
 
@@ -254,7 +213,9 @@ class MapNavigator {
 
         const paths = navigationPaths.map(navigationPath => {
             return navigationPath.pathPoint.map(point => {
-                const [lng, lat] = UTMToWGS84(point.x, point.y);
+                const [lng, lat] = this.mapAdapter.applyCoordinateOffset(
+                    UTMToWGS84(point.x, point.y)
+                );
                 return this.mapAdapter.createPoint({ lat: lat, lng: lng });
             });
         });
@@ -277,7 +238,7 @@ class MapNavigator {
         });
     }
 
-    requestRouting(startLat, startLng, endLat, endLng) {
+    requestRoute(startLat, startLng, endLat, endLng) {
         if (!startLat || !startLng || !endLat || !endLng) {
             return;
         }
@@ -302,6 +263,30 @@ class MapNavigator {
             this.WS.publishNavigationInfo(response);
         }).catch(error => {
             console.error("Failed to retrieve navigation data:", error);
+        });
+    }
+
+    sendRoutingRequest() {
+        if (this.routingRequestPoints) {
+            const start =
+                this.routingRequestPoints.length > 1
+                    ? this.routingRequestPoints[0]
+                    : this.mapAdapter.getMarkerPosition(this.vehicleMarker);
+            const end = this.routingRequestPoints[this.routingRequestPoints.length - 1];
+            this.routingRequestPoints = [];
+
+            this.requestRoute(start.lat, start.lng, end.lat, end.lng);
+            return true;
+        } else {
+            alert("Please select a route");
+            return false;
+        }
+    }
+
+    addDefaultEndPoint(points) {
+        points.forEach(point => {
+            const [lng, lat] = this.mapAdapter.applyCoordinateOffset(UTMToWGS84(point.x, point.y));
+            this.routingRequestPoints.push({ lat: lat, lng: lng });
         });
     }
 }

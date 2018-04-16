@@ -226,9 +226,9 @@ Status LonController::ComputeControlCommand(
       acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
       FLAGS_enable_slope_offset * debug->slope_offset_compensation();
   debug->set_is_full_stop(false);
-  if (std::abs(debug->preview_acceleration_reference()) <=
+  if (std::fabs(debug->preview_acceleration_reference()) <=
           FLAGS_max_acceleration_when_stopped &&
-      std::abs(debug->preview_speed_reference()) <=
+      std::fabs(debug->preview_speed_reference()) <=
           FLAGS_max_abs_speed_when_stopped) {
     acceleration_cmd = lon_controller_conf.standstill_acceleration();
     AINFO << "Stop location reached";
@@ -284,7 +284,7 @@ Status LonController::ComputeControlCommand(
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
 
-  if (std::abs(VehicleStateProvider::instance()->linear_velocity()) <=
+  if (std::fabs(VehicleStateProvider::instance()->linear_velocity()) <=
           FLAGS_max_abs_speed_when_stopped ||
       chassis->gear_location() == trajectory_message_->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {

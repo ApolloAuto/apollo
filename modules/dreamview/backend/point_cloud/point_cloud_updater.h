@@ -28,7 +28,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
-#include "modules/dreamview/backend/handlers/websocket.h"
+#include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/proto/point_cloud.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "sensor_msgs/PointCloud2.h"

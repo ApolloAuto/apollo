@@ -104,7 +104,7 @@ double PredictionQuerier::ProjectVelocityAlongReferenceLine(
   double x_next = trajectory.trajectory_point(next_index).path_point().x();
   double y_next = trajectory.trajectory_point(next_index).path_point().y();
   double v = apollo::common::math::lerp(v_curr, t_curr, v_next, t_next, t);
-  if (std::abs(x_next - x_curr) > 0.1 && std::abs(y_next - y_curr) > 0.1) {
+  if (std::fabs(x_next - x_curr) > 0.1 && std::fabs(y_next - y_curr) > 0.1) {
     heading = std::atan2(y_next - y_curr, x_next - x_curr);
   }
   double v_x = v * std::cos(heading);

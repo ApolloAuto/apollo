@@ -35,10 +35,6 @@ DEFINE_string(map_data_path, "/apollo/modules/map/data", "Path to map data.");
 DEFINE_string(vehicle_data_path, "/apollo/modules/calibration/data",
               "Path to vehicle data.");
 
-DEFINE_string(global_flagfile,
-              "/apollo/modules/common/data/global_flagfile.txt",
-              "Global flagfile shared by all modules.");
-
 namespace apollo {
 namespace dreamview {
 namespace {
@@ -50,6 +46,10 @@ using apollo::common::util::FindOrNull;
 using apollo::common::util::StringTokenizer;
 using apollo::control::DrivingAction;
 using google::protobuf::Map;
+using RLock = boost::shared_lock<boost::shared_mutex>;
+using WLock = boost::unique_lock<boost::shared_mutex>;
+
+constexpr char kNavigationModeName[] = "Navigation";
 
 // Convert a string to be title-like. E.g.: "hello_world" -> "Hello World".
 std::string TitleCase(const std::string &origin,
@@ -78,9 +78,9 @@ Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
 }
 
 // Run a supported command of some component, return the ret code.
-int RunComponentCommand(
-    const google::protobuf::Map<std::string, Component> &components,
-    const std::string &component_name, const std::string &command_name) {
+int RunComponentCommand(const Map<std::string, Component> &components,
+                        const std::string &component_name,
+                        const std::string &command_name) {
   const auto *component = FindOrNull(components, component_name);
   if (component == nullptr) {
     AERROR << "Cannot find component " << component_name;
@@ -96,6 +96,20 @@ int RunComponentCommand(
 
   AERROR_IF(ret != 0) << "Command returns " << ret << ": " << *cmd;
   return ret;
+}
+
+template <class FlagType, class ValueType>
+void SetGlobalFlag(const std::string &flag_name, const ValueType &value,
+                   FlagType *flag) {
+  static constexpr char kGlobalFlagfile[] =
+      "/apollo/modules/common/data/global_flagfile.txt";
+  if (*flag != value) {
+    *flag = value;
+    // Overwrite global flagfile.
+    std::ofstream fout(kGlobalFlagfile, std::ios_base::app);
+    CHECK(fout) << "Fail to open global flagfile " << kGlobalFlagfile;
+    fout << "\n--" << flag_name << "=" << value << std::endl;
+  }
 }
 
 }  // namespace
@@ -121,21 +135,48 @@ HMIWorker::HMIWorker() {
   *config_.mutable_available_maps() = ListDirAsDict(FLAGS_map_data_path);
   *config_.mutable_available_vehicles() =
       ListDirAsDict(FLAGS_vehicle_data_path);
+  config_.set_utm_zone_id(FLAGS_local_utm_zone_id);
   ADEBUG << "Loaded HMI config: " << config_.DebugString();
 
   // Init HMIStatus.
-  // If the default mode is unavailable, select the first one.
   const auto &modes = config_.modes();
-  if (!ContainsKey(modes, status_.current_mode())) {
-    CHECK(!modes.empty());
+  if (FLAGS_use_navigation_mode && ContainsKey(modes, kNavigationModeName)) {
+    // If the FLAG_use_navigation_mode is set, set it in HMIStatus.
+    status_.set_current_mode(kNavigationModeName);
+  } else if (!ContainsKey(modes, status_.current_mode())) {
+    CHECK(!modes.empty()) << "No available modes to run vehicle.";
+    // If the default mode is unavailable, select the first one.
     status_.set_current_mode(modes.begin()->first);
+  }
+
+  // If the FLAGS_map_dir is set, set it in HMIStatus.
+  if (!FLAGS_map_dir.empty()) {
+    for (const auto &entry : config_.available_maps()) {
+      // entry is (map_name, map_path)
+      if (entry.second == FLAGS_map_dir) {
+        status_.set_current_map(entry.first);
+        apollo::common::KVDB::Put("apollo:dreamview:map", entry.first);
+        break;
+      }
+    }
   }
 }
 
 bool HMIWorker::Trigger(const HMIAction action) {
   AINFO << "HMIAction " << HMIAction_Name(action) << " was triggered!";
-  // TODO(xiaoxq): Do the action.
-  return false;
+  switch (action) {
+    case HMIAction::SETUP:
+      RunModeCommand("start");
+      break;
+    case HMIAction::AUTO_MODE:
+      return ChangeToDrivingMode(Chassis::COMPLETE_AUTO_DRIVE);
+    case HMIAction::DISENGAGE:
+      return ChangeToDrivingMode(Chassis::COMPLETE_MANUAL);
+    default:
+      AERROR << "HMIAction not implemented, yet!";
+      return false;
+  }
+  return true;
 }
 
 int HMIWorker::RunModuleCommand(const std::string &module,
@@ -207,7 +248,12 @@ bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
 }
 
 void HMIWorker::RunModeCommand(const std::string &command_name) {
-  const Mode &mode_conf = config_.modes().at(status_.current_mode());
+  std::string current_mode;
+  {
+    RLock rlock(status_mutex_);
+    current_mode = status_.current_mode();
+  }
+  const Mode &mode_conf = config_.modes().at(current_mode);
   if (command_name == "start" || command_name == "stop") {
     // Run the command on all live modules.
     for (const auto &module : mode_conf.live_modules()) {
@@ -218,37 +264,43 @@ void HMIWorker::RunModeCommand(const std::string &command_name) {
 
 void HMIWorker::ChangeToMap(const std::string &map_name,
                             MapService *map_service) {
-  if (status_.current_map() == map_name) {
-    return;
-  }
   const auto *map_dir = FindOrNull(config_.available_maps(), map_name);
   if (map_dir == nullptr) {
     AERROR << "Unknown map " << map_name;
     return;
   }
-  status_.set_current_map(map_name);
+
+  {
+    // Update current_map status.
+    WLock wlock(status_mutex_);
+    if (status_.current_map() == map_name) {
+      return;
+    }
+    status_.set_current_map(map_name);
+  }
   apollo::common::KVDB::Put("apollo:dreamview:map", map_name);
 
-  FLAGS_map_dir = *map_dir;
-  // Append new map_dir flag to global flagfile.
-  std::ofstream fout(FLAGS_global_flagfile, std::ios_base::app);
-  CHECK(fout) << "Fail to open " << FLAGS_global_flagfile;
-  fout << "\n--map_dir=" << *map_dir << std::endl;
+  SetGlobalFlag("map_dir", *map_dir, &FLAGS_map_dir);
   // Also reload simulation map.
   CHECK(map_service->ReloadMap(true)) << "Failed to load map from " << *map_dir;
   RunModeCommand("stop");
 }
 
 void HMIWorker::ChangeToVehicle(const std::string &vehicle_name) {
-  if (status_.current_vehicle() == vehicle_name) {
-    return;
-  }
   const auto *vehicle = FindOrNull(config_.available_vehicles(), vehicle_name);
   if (vehicle == nullptr) {
     AERROR << "Unknown vehicle " << vehicle_name;
     return;
   }
-  status_.set_current_vehicle(vehicle_name);
+
+  {
+    // Update current_vehicle status.
+    WLock wlock(status_mutex_);
+    if (status_.current_vehicle() == vehicle_name) {
+      return;
+    }
+    status_.set_current_vehicle(vehicle_name);
+  }
   apollo::common::KVDB::Put("apollo:dreamview:vehicle", vehicle_name);
 
   CHECK(VehicleManager::instance()->UseVehicle(*vehicle));
@@ -256,18 +308,27 @@ void HMIWorker::ChangeToVehicle(const std::string &vehicle_name) {
 }
 
 void HMIWorker::ChangeToMode(const std::string &mode_name) {
-  const std::string &old_mode = status_.current_mode();
-  if (old_mode == mode_name) {
-    return;
-  }
   if (!ContainsKey(config_.modes(), mode_name)) {
     AERROR << "Unknown mode " << mode_name;
     return;
   }
-  const auto &old_modules = config_.modes().at(old_mode).live_modules();
-  status_.set_current_mode(mode_name);
+
+  std::string old_mode;
+  {
+    // Update current_mode status.
+    WLock wlock(status_mutex_);
+    old_mode = status_.current_mode();
+    if (old_mode == mode_name) {
+      return;
+    }
+    status_.set_current_mode(mode_name);
+  }
   apollo::common::KVDB::Put("apollo:dreamview:mode", mode_name);
 
+  const auto &old_modules = config_.modes().at(old_mode).live_modules();
+  const bool use_navigation_mode = (mode_name == kNavigationModeName);
+  SetGlobalFlag("use_navigation_mode", use_navigation_mode,
+                &FLAGS_use_navigation_mode);
   // Now stop all old modules.
   for (const auto &module : old_modules) {
     RunModuleCommand(module, "stop");
@@ -275,6 +336,7 @@ void HMIWorker::ChangeToMode(const std::string &mode_name) {
 }
 
 void HMIWorker::UpdateSystemStatus(const monitor::SystemStatus &system_status) {
+  WLock wlock(status_mutex_);
   *status_.mutable_system_status() = system_status;
 }
 

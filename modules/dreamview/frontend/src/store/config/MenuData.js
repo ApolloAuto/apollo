@@ -8,7 +8,8 @@ export default [
             2: 'Near',
             3: 'Overhead',
             4: 'Map'
-        }
+        },
+        supportInOfflineView: true,
     },
     {
         id: 'perception',
@@ -22,10 +23,13 @@ export default [
             perceptionUnknownMovable: 'Unknown Movable',
             perceptionUnknownUnmovable: 'Unknown Stationary',
             perceptionUnknown: 'Unknown',
+            perceptionCipv: 'Closest In-Path Vehicle',
             perceptionVelocity: 'Velocity',
             perceptionHeading: 'Heading',
-            perceptionId: 'Id'
-        }
+            perceptionId: 'Id',
+            perceptionLaneMarker: 'Lane Marker',
+        },
+        supportInOfflineView: true,
     }, {
         id: 'prediction',
         title: 'Prediction',
@@ -33,14 +37,16 @@ export default [
         data: {
             predictionMajor: 'Major Prediction Line',
             predictionMinor: 'Minor Prediction Line'
-        }
+        },
+        supportInOfflineView: true,
     }, {
         id: 'routing',
         title: 'Routing',
         type: 'checkbox',
         data: {
             routing: 'Routing Line'
-        }
+        },
+        supportInOfflineView: true,
     }, {
         id: 'decision',
         title: 'Decision',
@@ -48,7 +54,8 @@ export default [
         data: {
             decisionMain: 'Main Decision',
             decisionObstacle: 'Obstacle Decision',
-        }
+        },
+        supportInOfflineView: true,
     }, {
         id: 'planning',
         title: 'Planning',
@@ -59,7 +66,8 @@ export default [
             planningQpOptimizer: 'Qp Optimizer Line',
             planningDpOptimizer: 'Dp Optimizer Line',
             planningReference: 'Reference Line',
-        }
+        },
+        supportInOfflineView: true,
     }, {
         id: 'position',
         title: 'Position',
@@ -67,7 +75,8 @@ export default [
         data: {
             positionLocalization: 'Localization',
             positionGps: 'GPS',
-        }
+        },
+        supportInOfflineView: false,
     }, {
         id: 'map',
         title: 'Map',
@@ -80,6 +89,7 @@ export default [
             mapRoad: 'Road',
             mapSignal: 'Signal',
             mapStopSign: 'Stop Sign',
-        }
+        },
+        supportInOfflineView: false,
     },
 ];
