@@ -36,8 +36,12 @@ function start() {
         /apollo/sensor/gnss/imu \
         /apollo/sensor/gnss/odometry \
         /apollo/sensor/gnss/raw_data \
-        /apollo/sensor/velodyne64/VelodyneScanUnified \
         /apollo/sensor/velodyne16/VelodyneScanUnified \
+        /apollo/sensor/velodyne16/PointCloud2 \
+        /apollo/sensor/velodyne16/compensator/PointCloud2 \
+        /apollo/sensor/velodyne64/VelodyneScanUnified \
+        /apollo/sensor/velodyne64/PointCloud2 \
+        /apollo/sensor/velodyne64/compensator/PointCloud2 \
         /apollo/monitor/static_info </dev/null >"${LOG}" 2>&1 &
     fi
 }
