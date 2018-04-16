@@ -37,7 +37,7 @@
 
 # About This Guide
 
-The *Apollo 2.0 Hardware and System Installation Guide* provides the instructions to install all of the hardware components and system software for the **Apollo Project **. The system installation information included pertains to the procedures to download and install the Apollo Linux Kernel.
+The *Apollo 2.0 Hardware and System Installation Guide* provides the instructions to install all of the hardware components and system software for the **Apollo Project**. The system installation information included pertains to the procedures to download and install the Apollo Linux Kernel.
 
 ## Document Conventions
 
@@ -207,7 +207,7 @@ For more information about the NovAtel SPAN ProPak6 and the IMU-IGM-A1, see:
 
 The GPS Receiver/Antenna used with the GPS-IMU component is the **NovAtel GPS-703-GGG-HV**.
 
-**NOTE: **The GPS NovAtelGPS-703-GGG-HV works with either model of the two GPS-IMU options that are described in the previous section, Global Positioning System (GPS) and Inertial Measurement Unit (IMU).
+**NOTE:**The GPS NovAtelGPS-703-GGG-HV works with either model of the two GPS-IMU options that are described in the previous section, Global Positioning System (GPS) and Inertial Measurement Unit (IMU).
 
 ![gps_receiver](images/gps_receiver.png)
 
