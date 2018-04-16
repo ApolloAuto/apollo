@@ -20,14 +20,16 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_CASCADED_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_CASCADED_H_
 
-#include <opencv2/opencv.hpp>
 #include <algorithm>
 #include <map>
+#include <memory>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 #include <utility>
-#include <string>
+#include <vector>
+
+#include "opencv2/opencv.hpp"
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
@@ -52,12 +54,13 @@ class CascadedCameraTracker : public BaseCameraTracker {
   bool Init() override;
 
   bool Associate(const cv::Mat& img, const double& timestamp,
-                 std::vector<VisualObjectPtr>* objects) override;
+                 std::vector<std::shared_ptr<VisualObject>>* objects) override;
 
   std::string Name() const override;
 
  private:
   bool dl_feature_ = true;
+  bool use_kcf_ = false;
 
   // Trackers for different stages
   CS2DAffinityTracker cs2d_tracker_;

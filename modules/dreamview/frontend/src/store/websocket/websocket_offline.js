@@ -47,7 +47,9 @@ export default class OfflinePlaybackWebSocketEndpoint {
                     break;
                 case "FrameCount":
                     STORE.playback.setNumFrames(message.data);
-                    this.requestSimulationWorld(STORE.playback.jobId, STORE.playback.next());
+                    if (STORE.playback.hasNext()) {
+                        this.requestSimulationWorld(STORE.playback.jobId, STORE.playback.next());
+                    }
                     break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);

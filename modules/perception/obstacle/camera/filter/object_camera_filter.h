@@ -24,7 +24,9 @@
 #include <cmath>
 #include <limits>
 #include <map>
+#include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "Eigen/Geometry"
@@ -47,8 +49,8 @@ class ObjectCameraFilter : public BaseCameraFilter {
 
   bool Init() override;
 
-  bool Filter(const double&timestamp,
-              std::vector<VisualObjectPtr> *objects) override;
+  bool Filter(const double &timestamp,
+              std::vector<std::shared_ptr<VisualObject>> *objects) override;
 
   std::string Name() const override;
 
@@ -61,29 +63,25 @@ class ObjectCameraFilter : public BaseCameraFilter {
 
     common::math::KalmanFilter1D x_;
     common::math::KalmanFilter1D y_;
-    common::math::KalmanFilter1D z_;
-    common::math::KalmanFilter1D alpha_;
     common::math::KalmanFilter1D theta_;
-    common::math::KalmanFilter1D l_;
-    common::math::KalmanFilter1D w_;
-    common::math::KalmanFilter1D h_;
   };
 
-  std::map<int, ObjectFilter> tracked_filters_;
-  const int kMaxKeptFrameCnt = 10;
+  std::unordered_map<int, ObjectFilter> tracked_filters_;
+  const int kMaxKeptFrameCnt = 5;
 
   // @brief Create filters for new track ids
   void Create(const int &track_id, const double &timestamp,
-              const VisualObjectPtr &obj_ptr);
+              const std::shared_ptr<VisualObject> &obj_ptr);
 
   // @brief Predict step
   void Predict(const int &track_id, const double &timestamp);
 
   // @brief Update step
-  void Update(const int &track_id, const VisualObjectPtr &obj_ptr);
+  void Update(const int &track_id,
+              const std::shared_ptr<VisualObject> &obj_ptr);
 
   // @brief Get output of estimated state
-  void GetState(const int &track_id, VisualObjectPtr obj_ptr);
+  void GetState(const int &track_id, std::shared_ptr<VisualObject> obj_ptr);
 
   // @brief Destroy old filters
   void Destroy();

@@ -20,6 +20,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -44,7 +45,7 @@ class AsyncFusion : public BaseFusion {
   // @param [out]: fused objects.
   // @return true if fuse successfully, otherwise return false
   virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                    std::vector<ObjectPtr> *fused_objects);
+                    std::vector<std::shared_ptr<Object>> *fused_objects);
 
   virtual std::string name() const;
 
@@ -52,13 +53,14 @@ class AsyncFusion : public BaseFusion {
   void FuseFrame(const PbfSensorFramePtr &frame);
 
   /**@brief create new tracks for objects not assigned to current tracks*/
-  void CreateNewTracks(const std::vector<PbfSensorObjectPtr> &sensor_objects,
-                       const std::vector<int> &unassigned_ids);
+  void CreateNewTracks(
+      const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
+      const std::vector<int> &unassigned_ids);
 
   /**@brief update current tracks with matched objects*/
   void UpdateAssignedTracks(
-      const std::vector<PbfSensorObjectPtr> &sensor_objects,
-      const std::vector<TrackObjectPair> &assignments,
+      const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
+      const std::vector<std::pair<int, int>> &assignments,
       const std::vector<double> &track_objects_dist,
       std::vector<PbfTrackPtr> const *tracks);
 
@@ -71,17 +73,17 @@ class AsyncFusion : public BaseFusion {
                               std::vector<PbfTrackPtr> *tracks);
 
   void CollectFusedObjects(double timestamp,
-                           std::vector<ObjectPtr> *fused_objects);
+                           std::vector<std::shared_ptr<Object>> *fused_objects);
 
   void DecomposeFrameObjects(
-      const std::vector<PbfSensorObjectPtr> &frame_objects,
-      std::vector<PbfSensorObjectPtr> *foreground_objects,
-      std::vector<PbfSensorObjectPtr> *background_objects);
+      const std::vector<std::shared_ptr<PbfSensorObject>> &frame_objects,
+      std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
+      std::vector<std::shared_ptr<PbfSensorObject>> *background_objects);
 
   void FuseForegroundObjects(
       const Eigen::Vector3d &ref_point, const SensorType &sensor_type,
       const std::string &sensor_id, const double timestamp,
-      std::vector<PbfSensorObjectPtr> *foreground_objects);
+      std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects);
 
   PbfSensorFramePtr ConstructFrame(const SensorObjects &obj);
 

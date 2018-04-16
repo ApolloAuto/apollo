@@ -22,25 +22,25 @@ namespace perception {
 std::string GetObjectName(const ObjectType& obj_type) {
   std::string obj_name;
   switch (obj_type) {
-    case ObjectType::UNKNOWN :
+    case ObjectType::UNKNOWN:
       obj_name = "unknown";
       break;
-    case ObjectType::UNKNOWN_MOVABLE :
+    case ObjectType::UNKNOWN_MOVABLE:
       obj_name = "unknown_movable";
       break;
-    case ObjectType::UNKNOWN_UNMOVABLE :
+    case ObjectType::UNKNOWN_UNMOVABLE:
       obj_name = "unknown_unmovable";
       break;
-    case ObjectType::PEDESTRIAN :
+    case ObjectType::PEDESTRIAN:
       obj_name = "pedestrian";
       break;
-    case ObjectType::BICYCLE :
+    case ObjectType::BICYCLE:
       obj_name = "bicycle";
       break;
-    case ObjectType::VEHICLE :
+    case ObjectType::VEHICLE:
       obj_name = "vehicle";
       break;
-    default :
+    default:
       obj_name = "error";
       break;
   }

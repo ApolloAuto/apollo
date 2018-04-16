@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/obstacle/lidar/tracker/hm_tracker/kalman_filter.h"
+
 #include <algorithm>
 
 #include "modules/common/log.h"
 #include "modules/perception/common/geometry_util.h"
-#include "modules/perception/obstacle/lidar/tracker/hm_tracker/kalman_filter.h"
 
 namespace apollo {
 namespace perception {
@@ -138,9 +139,9 @@ Eigen::VectorXf KalmanFilter::Predict(const double& time_diff) {
   return predicted_state;
 }
 
-void KalmanFilter::UpdateWithObject(const TrackedObjectPtr& new_object,
-                                    const TrackedObjectPtr& old_object,
-                                    const double& time_diff) {
+void KalmanFilter::UpdateWithObject(
+    const std::shared_ptr<TrackedObject>& new_object,
+    const std::shared_ptr<TrackedObject>& old_object, const double& time_diff) {
   if (time_diff <= DBL_EPSILON) {
     AWARN << "Time diff is too limited to updating KalmanFilter!";
     return;
@@ -211,8 +212,8 @@ void KalmanFilter::Propagate(const double& time_diff) {
 }
 
 Eigen::VectorXf KalmanFilter::ComputeMeasuredVelocity(
-    const TrackedObjectPtr& new_object, const TrackedObjectPtr& old_object,
-    const double& time_diff) {
+    const std::shared_ptr<TrackedObject>& new_object,
+    const std::shared_ptr<TrackedObject>& old_object, const double& time_diff) {
   // Compute 2D velocity measurment for filtering
   // Obtain robust measurment via observation redundency
 
@@ -236,8 +237,8 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredVelocity(
 }
 
 Eigen::VectorXf KalmanFilter::ComputeMeasuredAnchorPointVelocity(
-    const TrackedObjectPtr& new_object, const TrackedObjectPtr& old_object,
-    const double& time_diff) {
+    const std::shared_ptr<TrackedObject>& new_object,
+    const std::shared_ptr<TrackedObject>& old_object, const double& time_diff) {
   // Compute 2D anchor point velocity measurment
   Eigen::Vector3f measured_anchor_point_velocity =
       new_object->anchor_point - old_object->anchor_point;
@@ -247,8 +248,8 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredAnchorPointVelocity(
 }
 
 Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCenterVelocity(
-    const TrackedObjectPtr& new_object, const TrackedObjectPtr& old_object,
-    const double& time_diff) {
+    const std::shared_ptr<TrackedObject>& new_object,
+    const std::shared_ptr<TrackedObject>& old_object, const double& time_diff) {
   // Compute 2D bbox center velocity measurment
   Eigen::Vector3d old_dir = old_object->direction.cast<double>();
   Eigen::Vector3d old_size = old_object->size.cast<double>();
@@ -272,8 +273,8 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCenterVelocity(
 }
 
 Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCornerVelocity(
-    const TrackedObjectPtr& new_object, const TrackedObjectPtr& old_object,
-    const double& time_diff) {
+    const std::shared_ptr<TrackedObject>& new_object,
+    const std::shared_ptr<TrackedObject>& old_object, const double& time_diff) {
   // Compute 2D bbox corner velocity measurment
   Eigen::Vector3f project_dir =
       new_object->anchor_point - old_object->anchor_point;
@@ -418,8 +419,9 @@ void KalmanFilter::UpdateVelocity(const Eigen::VectorXf& measured_anchor_point,
       (Eigen::Matrix3d::Identity() - mat_k * mat_c) * velocity_covariance_;
 }
 
-void KalmanFilter::ComputeUpdateQuality(const TrackedObjectPtr& new_object,
-                                        const TrackedObjectPtr& old_object) {
+void KalmanFilter::ComputeUpdateQuality(
+    const std::shared_ptr<TrackedObject>& new_object,
+    const std::shared_ptr<TrackedObject>& old_object) {
   // Compute update quality for adaptive filtering
   // Strategy A: according to association score
   float update_quality_according_association_score =
@@ -436,7 +438,7 @@ void KalmanFilter::ComputeUpdateQuality(const TrackedObjectPtr& new_object,
 }
 
 float KalmanFilter::ComputeUpdateQualityAccordingAssociationScore(
-    const TrackedObjectPtr& new_object) {
+    const std::shared_ptr<TrackedObject>& new_object) {
   // Compute update quality according association score
   float association_score = new_object->association_score;
   float update_quality = 1;
@@ -451,7 +453,8 @@ float KalmanFilter::ComputeUpdateQualityAccordingAssociationScore(
 }
 
 float KalmanFilter::ComputeUpdateQualityAccordingPointNumChange(
-    const TrackedObjectPtr& new_object, const TrackedObjectPtr& old_object) {
+    const std::shared_ptr<TrackedObject>& new_object,
+    const std::shared_ptr<TrackedObject>& old_object) {
   // Compute updaet quality according point number change
   int new_pt_num = new_object->object_ptr->cloud->size();
   int old_pt_num = old_object->object_ptr->cloud->size();

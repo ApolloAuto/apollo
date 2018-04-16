@@ -151,7 +151,9 @@ ScalarType LaneFrame::ComputeMarkerPairDistance(const Marker& ref,
 
 bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
                      const shared_ptr<NonMask>& non_mask,
-                     const LaneFrameOptions& options) {
+                     const LaneFrameOptions& options,
+                     const double scale,
+                     const int start_y_pos) {
   if (options.space_type != SpaceType::IMAGE) {
     AERROR << "the space type is not IMAGE.";
     return false;
@@ -174,7 +176,8 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
         marker.shape_type = MarkerShapeType::LINE_SEGMENT;
         marker.space_type = opts_.space_type;
 
-        marker.pos = cc_ptr->GetVertex(edge_ptr->end_vertex_id);
+        marker.pos = cc_ptr->GetVertex(edge_ptr->end_vertex_id,
+          scale, start_y_pos);
         marker.image_pos = marker.pos;
         if (opts_.use_non_mask &&
             non_mask->IsInsideMask(marker.image_pos)) {
@@ -186,7 +189,8 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
         marker.vis_pos = cv::Point(static_cast<int>(marker.pos.x()),
                                    static_cast<int>(marker.pos.y()));
 
-        marker.start_pos = cc_ptr->GetVertex(edge_ptr->start_vertex_id);
+        marker.start_pos = cc_ptr->GetVertex(edge_ptr->start_vertex_id,
+          scale, start_y_pos);
         marker.image_start_pos = marker.start_pos;
         if (opts_.use_non_mask &&
             non_mask->IsInsideMask(marker.image_start_pos)) {
@@ -296,7 +300,9 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
 bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
                      const shared_ptr<NonMask>& non_mask,
                      const shared_ptr<Projector<ScalarType>>& projector,
-                     const LaneFrameOptions& options) {
+                     const LaneFrameOptions& options,
+                     const double scale,
+                     const int start_y_pos) {
   if (options.space_type != SpaceType::VEHICLE) {
     AERROR << "the space type is not VEHICLE.";
     return false;
@@ -318,8 +324,10 @@ bool LaneFrame::Init(const vector<ConnectedComponentPtr>& input_cc,
       int n = 0;
       for (int j = 0; j < static_cast<int>(inner_edges->size()); ++j) {
         const ConnectedComponent::Edge* edge_ptr = &(inner_edges->at(j));
-        Vector2D pos = cc_ptr->GetVertex(edge_ptr->end_vertex_id);
-        Vector2D start_pos = cc_ptr->GetVertex(edge_ptr->start_vertex_id);
+        Vector2D pos = cc_ptr->GetVertex(edge_ptr->end_vertex_id,
+          scale, start_y_pos);
+        Vector2D start_pos = cc_ptr->GetVertex(edge_ptr->start_vertex_id,
+          scale, start_y_pos);
 
         Marker marker;
         marker.shape_type = MarkerShapeType::LINE_SEGMENT;

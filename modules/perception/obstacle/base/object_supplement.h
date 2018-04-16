@@ -16,12 +16,14 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_SUPPLEMENT_H_
 #define MODULES_PERCEPTION_OBSTACLE_BASE_OBJECT_SUPPLEMENT_H_
 
-#include <boost/circular_buffer.hpp>
-#include <opencv2/opencv.hpp>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
+
 #include "Eigen/Core"
+#include "boost/circular_buffer.hpp"
+#include "opencv2/opencv.hpp"
+
 #include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
@@ -134,8 +136,8 @@ typedef Eigen::Matrix3f MotionType;
 struct alignas(16) VehicleStatus {
   float yaw_rate;
   float velocity;
-  double time_ts;            // time stamp
-  double time_d;            // time stamp difference in image
+  double time_ts;     // time stamp
+  double time_d;      // time stamp difference in image
   MotionType motion;  // Motion Matrix
 };
 

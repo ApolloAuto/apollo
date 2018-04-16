@@ -75,7 +75,8 @@ bool ReorgFeatureExtractor::init(
   return true;
 }
 
-bool ReorgFeatureExtractor::extract(std::vector<VisualObjectPtr> *objects) {
+bool ReorgFeatureExtractor::extract(
+    std::vector<std::shared_ptr<VisualObject>> *objects) {
   CHECK_NOTNULL(objects);
   if (objects->empty()) {
     return true;
@@ -141,7 +142,7 @@ bool ROIPoolingFeatureExtractor::init(
 }
 
 bool ROIPoolingFeatureExtractor::extract(
-    std::vector<VisualObjectPtr> *objects) {
+    std::vector<std::shared_ptr<VisualObject>> *objects) {
   CHECK_NOTNULL(objects);
   if (objects->empty()) {
     return true;

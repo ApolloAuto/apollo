@@ -28,6 +28,13 @@ function source_apollo_base() {
 }
 
 function apollo_check_system_config() {
+  # check docker environment
+  if [ ${MACHINE_ARCH} == "x86_64" ] && [ $(hostname) != "in_dev_docker" ] &&
+       [ $(hostname) != "in_release_docker" ]; then
+    echo -e "${RED}Must run $0 in dev docker or release docker${NO_COLOR}"
+    exit 0
+  fi
+
   # check operating system
   OP_SYSTEM=$(uname -s)
   case $OP_SYSTEM in
@@ -112,6 +119,7 @@ function generate_build_targets() {
 function build() {
   START_TIME=$(get_now)
 
+
   info "Start building, please wait ..."
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
@@ -133,9 +141,6 @@ function build() {
   rm -fr data/kv_db
   python modules/tools/common/kv_db.py put \
       "apollo:data:commit_id" "$(git rev-parse HEAD)"
-
-  # build pandora_driver
-  build_pandora
 
   if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
     cd /apollo-simulator && bash build.sh build
@@ -279,7 +284,7 @@ function release() {
   fi
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
-  cp ./modules/perception/cuda_util/build/libcuda_util.so $LIB_DIR
+  cp /apollo/modules/perception/cuda_util/cmake_build/libcuda_util.so $LIB_DIR
 
   # doc
   cp -r docs "${APOLLO_RELEASE_DIR}"
@@ -494,35 +499,6 @@ function build_gnss() {
   rm -rf modules/devel_isolated/
 }
 
-function build_pandora() {
-  CURRENT_PATH=$(pwd)
-  if [ -d "${ROS_ROOT}" ]; then
-    ROS_PATH="${ROS_ROOT}/../.."
-  else
-    warning "ROS not found. Run apolllo.sh build first."
-    exit 1
-  fi
-
-  # install pcap
-  apt-get -y install libpcap-dev
-  source "${ROS_PATH}/setup.bash"
-
-  cd modules
-  catkin_make_isolated --install --source drivers/pandora/pandora_driver \
-    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
-    --cmake-args --no-warn-unused-cli
-  if [ $? -ne 0 ]; then exit 1; fi
-  catkin_make_isolated --install --source drivers/pandora/pandora_pointcloud \
-    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
-    --cmake-args --no-warn-unused-cli
-  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
-  cd -
-
-  rm -rf modules/.catkin_workspace
-  rm -rf modules/build_isolated/
-  rm -rf modules/devel_isolated/
-}
-
 function build_velodyne() {
   CURRENT_PATH=$(pwd)
   if [ -d "${ROS_ROOT}" ]; then
@@ -588,7 +564,6 @@ function print_usage() {
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_gnss${NONE}: build gnss driver
   ${BLUE}build_velodyne${NONE}: build velodyne driver
-  ${BLUE}build_pandora${NONE}: build pandora driver
   ${BLUE}build_usbcam${NONE}: build usb camera driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
@@ -610,8 +585,8 @@ function print_usage() {
 
 function main() {
   source_apollo_base
-  apollo_check_system_config
   check_machine_arch
+  apollo_check_system_config
   check_esd_files
 
   DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
@@ -677,9 +652,6 @@ function main() {
       ;;
     build_velodyne)
       build_velodyne
-      ;;
-    build_pandora)
-      build_pandora
       ;;
     build_usbcam)
       build_usbcam

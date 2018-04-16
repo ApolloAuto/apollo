@@ -30,10 +30,10 @@
 namespace apollo {
 namespace perception {
 
-using std::string;
-using std::vector;
-using std::unordered_map;
 using apollo::common::util::GetProtoFromFile;
+using std::string;
+using std::unordered_map;
+using std::vector;
 
 bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
   // load yolo camera detector config file to proto
@@ -66,7 +66,7 @@ void YoloCameraDetector::init_anchor(const string &yolo_root) {
   yolo::load_anchors(anchors_file, &anchors);
   num_anchors_ = anchors.size() / 2;
   obj_size_ = output_height_ * output_width_ * anchors.size() / 2;
-  anchor_.reset(new SyncedMemory(anchors.size() * sizeof(float)));
+  anchor_.reset(new caffe::SyncedMemory(anchors.size() * sizeof(float)));
 
   auto anchor_cpu_data = anchor_->mutable_cpu_data();
   memcpy(anchor_cpu_data, anchors.data(), anchors.size() * sizeof(float));
@@ -77,20 +77,20 @@ void YoloCameraDetector::init_anchor(const string &yolo_root) {
   yolo::load_types(types_file, &types_);
 
   res_box_tensor_.reset(
-      new SyncedMemory(obj_size_ * s_box_block_size * sizeof(float)));
+      new caffe::SyncedMemory(obj_size_ * s_box_block_size * sizeof(float)));
   res_box_tensor_->cpu_data();
   res_box_tensor_->gpu_data();
 
   res_cls_tensor_.reset(
-      new SyncedMemory(types_.size() * obj_size_ * sizeof(float)));
+      new caffe::SyncedMemory(types_.size() * obj_size_ * sizeof(float)));
   res_cls_tensor_->cpu_data();
   res_cls_tensor_->gpu_data();
 
-  overlapped_.reset(new SyncedMemory(top_k_ * top_k_ * sizeof(bool)));
+  overlapped_.reset(new caffe::SyncedMemory(top_k_ * top_k_ * sizeof(bool)));
   overlapped_->cpu_data();
   overlapped_->gpu_data();
 
-  idx_sm_.reset(new SyncedMemory(top_k_ * sizeof(int)));
+  idx_sm_.reset(new caffe::SyncedMemory(top_k_ * sizeof(int)));
   idx_sm_->cpu_data();
   idx_sm_->gpu_data();
 }
@@ -128,10 +128,10 @@ void YoloCameraDetector::load_intrinsic(
 
   offset_y_ = static_cast<int>(offset_ratio * image_height_ + .5);
   float roi_ratio = cropped_ratio * image_height_ / image_width_;
-  width_ = static_cast<int>(resized_width + aligned_pixel / 2) /
-      aligned_pixel * aligned_pixel;
+  width_ = static_cast<int>(resized_width + aligned_pixel / 2) / aligned_pixel *
+           aligned_pixel;
   height_ = static_cast<int>(width_ * roi_ratio + aligned_pixel / 2) /
-      aligned_pixel * aligned_pixel;
+            aligned_pixel * aligned_pixel;
   ADEBUG << "image_height=" << image_height_ << ", "
          << "image_width=" << image_width_ << ", "
          << "roi_ratio=" << roi_ratio;
@@ -148,7 +148,7 @@ void YoloCameraDetector::load_intrinsic(
 
   int channel = 3;
   image_data_.reset(
-      new SyncedMemory(roi_w * roi_h * channel * sizeof(unsigned char)));
+      new caffe::SyncedMemory(roi_w * roi_h * channel * sizeof(unsigned char)));
 }
 
 bool YoloCameraDetector::init_cnn(const string &yolo_root) {
@@ -249,10 +249,9 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   return true;
 }
 
-bool YoloCameraDetector::Multitask(const cv::Mat &frame,
-                                   const CameraDetectorOptions &options,
-                                   vector<VisualObjectPtr> *objects,
-                                   cv::Mat *mask) {
+bool YoloCameraDetector::Multitask(
+    const cv::Mat &frame, const CameraDetectorOptions &options,
+    vector<std::shared_ptr<VisualObject>> *objects, cv::Mat *mask) {
   if (objects == nullptr) {
     AERROR << "'objects' is a null pointer.";
     return false;
@@ -271,26 +270,17 @@ bool YoloCameraDetector::Multitask(const cv::Mat &frame,
     return false;
   }
 
-  cv::Mat local_mask(lane_output_height_, lane_output_width_, CV_32FC1);
-  memcpy(local_mask.data,
+  *mask = cv::Mat(lane_output_height_, lane_output_width_, CV_32FC1);
+  memcpy(mask->data,
          seg_blob->cpu_data() + lane_output_width_ * lane_output_height_,
          lane_output_width_ * lane_output_height_ * sizeof(float));
-
-  int roi_w = image_width_;
-  int roi_h = image_height_ - offset_y_;
-  cv::Rect roi(0, offset_y_, roi_w, roi_h);
-  if (roi_w == lane_output_width_ && roi_h == lane_output_height_) {
-    local_mask.copyTo((*mask)(roi));
-  } else {
-    cv::resize(local_mask, (*mask)(roi), cv::Size(roi_w, roi_h));
-  }
 
   return true;
 }
 
-bool YoloCameraDetector::Detect(const cv::Mat &frame,
-                                const CameraDetectorOptions &options,
-                                vector<VisualObjectPtr> *objects) {
+bool YoloCameraDetector::Detect(
+    const cv::Mat &frame, const CameraDetectorOptions &options,
+    vector<std::shared_ptr<VisualObject>> *objects) {
   if (objects == nullptr) {
     return false;
   }
@@ -310,17 +300,17 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
     resize(frame(roi), input_blob.get(), image_data_, 0);
   }
   pre_time.Stop();
-  ADEBUG << "Pre-processing: " << pre_time.MilliSeconds() << " ms";
+  AINFO << "Pre-processing: " << pre_time.MilliSeconds() << " ms";
 
   /////////////////////////// detection part ///////////////////////////
   caffe::Timer det_time;
   det_time.Start();
   cnnadapter_->forward();
-  ADEBUG << "Running detection: " << det_time.MilliSeconds() << " ms";
+  AINFO << "Running detection: " << det_time.MilliSeconds() << " ms";
   caffe::Timer post_time;
   post_time.Start();
 
-  vector<VisualObjectPtr> temp_objects;
+  vector<std::shared_ptr<VisualObject>> temp_objects;
 
   if (FLAGS_obs_camera_detector_gpu >= 0) {
     ADEBUG << "Get objects by GPU";
@@ -331,7 +321,7 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
 
   ADEBUG << "object size = " << temp_objects.size();
   for (int i = 0; i < static_cast<int>(temp_objects.size()); ++i) {
-    VisualObjectPtr obj = (temp_objects)[i];
+    std::shared_ptr<VisualObject> obj = (temp_objects)[i];
     ADEBUG << "type prob size for object" << i << " is "
            << sizeof(obj->type_probs) << " (" << obj << ")";
     ADEBUG << "prob: " << obj->type_probs[static_cast<int>(obj->type)];
@@ -363,8 +353,8 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
     temp_objects[i].reset();
   }
   temp_objects.clear();
-  ADEBUG << "Post-processing: " << post_time.MilliSeconds() << " ms";
-  ADEBUG << "Number of detected obstacles: " << objects->size();
+  AINFO << "Post-processing: " << post_time.MilliSeconds() << " ms";
+  AINFO << "Number of detected obstacles: " << objects->size();
 
   Extract(objects);
   yolo::recover_bbox(roi_w, roi_h, offset_y_, objects);
@@ -389,7 +379,7 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
 string YoloCameraDetector::Name() const { return "YoloCameraDetector"; }
 
 bool YoloCameraDetector::get_objects_cpu(
-    std::vector<VisualObjectPtr> *objects) {
+    std::vector<std::shared_ptr<VisualObject>> *objects) {
   int num_classes = types_.size();
   auto loc_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().loc_blob());
@@ -478,7 +468,7 @@ bool YoloCameraDetector::get_objects_cpu(
         continue;
       }
 
-      VisualObjectPtr obj(new VisualObject);
+      std::shared_ptr<VisualObject> obj(new VisualObject);
       obj->type = static_cast<ObjectType>(label);
       obj->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
                              0.0f);
@@ -523,7 +513,7 @@ bool YoloCameraDetector::get_objects_cpu(
   return true;
 }
 bool YoloCameraDetector::get_objects_gpu(
-    std::vector<VisualObjectPtr> *objects) {
+    std::vector<std::shared_ptr<VisualObject>> *objects) {
   auto loc_blob =
       cnnadapter_->get_blob_by_name(yolo_param_.net_param().loc_blob());
   auto obj_blob =
@@ -609,7 +599,7 @@ bool YoloCameraDetector::get_objects_gpu(
         continue;
       }
 
-      VisualObjectPtr obj(new VisualObject);
+      std::shared_ptr<VisualObject> obj(new VisualObject);
       obj->type = static_cast<ObjectType>(label);
       obj->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
                              0.0f);

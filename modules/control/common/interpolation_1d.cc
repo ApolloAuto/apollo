@@ -63,7 +63,7 @@ double Interpolation1D::Interpolate(double x) const {
 }
 
 double Interpolation1D::ScaledValue(double x) const {
-  if (std::abs(x_max_ - x_min_) < kDoubleEpsilon) {
+  if (std::fabs(x_max_ - x_min_) < kDoubleEpsilon) {
     return x_min_;
   }
   return (x - x_min_) / (x_max_ - x_min_);

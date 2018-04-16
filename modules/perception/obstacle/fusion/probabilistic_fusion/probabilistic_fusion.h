@@ -17,8 +17,10 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_  // NOLINT
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PROBABILISTIC_FUSION_H_  // NOLINT
 
+#include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "modules/perception/proto/probabilistic_fusion_config.pb.h"
@@ -36,7 +38,7 @@ namespace perception {
 
 class ProbabilisticFusion : public BaseFusion {
  public:
-  ProbabilisticFusion();
+  ProbabilisticFusion() = default;
   ~ProbabilisticFusion();
 
   virtual bool Init();
@@ -46,7 +48,7 @@ class ProbabilisticFusion : public BaseFusion {
   // @param [out]: fused objects.
   // @return true if fuse successfully, otherwise return false
   virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                    std::vector<ObjectPtr> *fused_objects);
+                    std::vector<std::shared_ptr<Object>> *fused_objects);
 
   virtual std::string name() const;
 
@@ -54,14 +56,15 @@ class ProbabilisticFusion : public BaseFusion {
   void FuseFrame(const PbfSensorFramePtr &frame);
 
   /**@brief create new tracks for objects not assigned to current tracks*/
-  void CreateNewTracks(const std::vector<PbfSensorObjectPtr> &sensor_objects,
-                       const std::vector<int> &unassigned_ids);
+  void CreateNewTracks(
+      const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
+      const std::vector<int> &unassigned_ids);
 
   /**@brief update current tracks with matched objects*/
   void UpdateAssignedTracks(
       std::vector<PbfTrackPtr> *tracks,
-      const std::vector<PbfSensorObjectPtr> &sensor_objects,
-      const std::vector<TrackObjectPair> &assignments,
+      const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
+      const std::vector<std::pair<int, int>> &assignments,
       const std::vector<double> &track_objects_dist);
 
   /**@brief update current tracks which cannot find matched objects*/
@@ -72,31 +75,31 @@ class ProbabilisticFusion : public BaseFusion {
                               const std::string &sensor_id, double timestamp);
 
   void CollectFusedObjects(double timestamp,
-                           std::vector<ObjectPtr> *fused_objects);
+                           std::vector<std::shared_ptr<Object>> *fused_objects);
 
   void DecomposeFrameObjects(
-      const std::vector<PbfSensorObjectPtr> &frame_objects,
-      std::vector<PbfSensorObjectPtr> *foreground_objects,
-      std::vector<PbfSensorObjectPtr> *background_objects);
+      const std::vector<std::shared_ptr<PbfSensorObject>> &frame_objects,
+      std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
+      std::vector<std::shared_ptr<PbfSensorObject>> *background_objects);
 
   void FuseForegroundObjects(
-      std::vector<PbfSensorObjectPtr> *foreground_objects,
+      std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
       Eigen::Vector3d ref_point, const SensorType &sensor_type,
       const std::string &sensor_id, double timestamp);
 
  protected:
   /**@brief produce fusion result for PNC only when fusing sensor with
    * publish_sensor_id_*/
-  std::string publish_sensor_id_;
-  bool started_;
-  PbfBaseTrackObjectMatcher *matcher_;
-  PbfSensorManager *sensor_manager_;
-  PbfTrackManager *track_manager_;
+  std::string publish_sensor_id_ = "velodyne_64";
+  bool started_ = false;
+  PbfBaseTrackObjectMatcher *matcher_ = nullptr;
+  PbfSensorManager *sensor_manager_ = nullptr;
+  PbfTrackManager *track_manager_ = nullptr;
   std::mutex sensor_data_rw_mutex_;
   std::mutex fusion_mutex_;
-  bool use_radar_;
-  bool use_lidar_;
-  bool use_camera_;
+  bool use_radar_ = true;
+  bool use_lidar_ = true;
+  bool use_camera_ = true;
 
   probabilistic_fusion_config::ModelConfigs config_;
 

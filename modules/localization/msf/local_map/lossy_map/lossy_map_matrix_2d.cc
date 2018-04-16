@@ -428,9 +428,9 @@ unsigned int LossyMapMatrix2D::GetBinarySize() const {
   unsigned int target_size =
       sizeof(unsigned int) * 2 + sizeof(float) * 4;  // rows and cols and alts
   // count, intensity, intensity_var, altitude_avg, altitude_ground
-  target_size += rows_ * cols_ *
-                 (sizeof(unsigned char) + sizeof(unsigned char) +
-                  sizeof(uint16_t) + sizeof(uint16_t) + sizeof(uint16_t));
+  target_size +=
+      rows_ * cols_ * (sizeof(unsigned char) + sizeof(unsigned char) +
+                       sizeof(uint16_t) + sizeof(uint16_t) + sizeof(uint16_t));
   return target_size;
 }
 
