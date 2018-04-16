@@ -349,11 +349,11 @@ bool CCLanePostProcessor::AddInstanceIntoLaneObjectImage(
         lane_object->longitude_end =
             std::max(lane_object->pos.back().y(), lane_object->longitude_end);
 
-        // ADEBUG << " point " << lane_object->point_num << " = "
-        //        << "(" << lane_object->pos.back()(0) << ", "
-        //        << lane_object->pos.back()(1) << "), "
-        //        << "(" << lane_object->image_pos.back()(0) << ", "
-        //        << lane_object->image_pos.back()(1) << ")";
+        ADEBUG << " point " << lane_object->point_num << " = "
+               << "(" << lane_object->pos.back()(0) << ", "
+               << lane_object->pos.back()(1) << "), "
+               << "(" << lane_object->image_pos.back()(0) << ", "
+               << lane_object->image_pos.back()(1) << ")";
 
         lane_object->point_num++;
       }
@@ -370,17 +370,17 @@ bool CCLanePostProcessor::AddInstanceIntoLaneObjectImage(
     lane_object->longitude_end =
         std::max(lane_object->pos.back().y(), lane_object->longitude_end);
 
-    // ADEBUG << " point " << lane_object->point_num << " = "
-    //        << "(" << lane_object->pos.back()(0) << ", "
-    //        << lane_object->pos.back()(1) << "), "
-    //        << "(" << lane_object->image_pos.back()(0) << ", "
-    //        << lane_object->image_pos.back()(1) << ")";
+    ADEBUG << " point " << lane_object->point_num << " = "
+           << "(" << lane_object->pos.back()(0) << ", "
+           << lane_object->pos.back()(1) << "), "
+           << "(" << lane_object->image_pos.back()(0) << ", "
+           << lane_object->image_pos.back()(1) << ")";
 
     lane_object->point_num++;
     i_prev = i;
   }
-  // ADEBUG << "longitude_start = " << lane_object->longitude_start;
-  // ADEBUG << "longitude_end = " << lane_object->longitude_end;
+  ADEBUG << "longitude_start = " << lane_object->longitude_start;
+  ADEBUG << "longitude_end = " << lane_object->longitude_end;
 
   if (lane_object->point_num != lane_object->pos.size() ||
       lane_object->point_num != lane_object->orie.size() ||
@@ -396,8 +396,8 @@ bool CCLanePostProcessor::AddInstanceIntoLaneObjectImage(
   }
 
   // fit polynomial model and compute lateral distance for lane object
-  // ADEBUG << "max_size_to_fit_straight_line = "
-  //        << options_.frame.max_size_to_fit_straight_line;
+  ADEBUG << "max_size_to_fit_straight_line = "
+         << options_.frame.max_size_to_fit_straight_line;
   if (lane_object->point_num < 3 ||
       lane_object->longitude_end - lane_object->longitude_start <
           options_.frame.max_size_to_fit_straight_line) {
@@ -437,9 +437,9 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
   cv::Mat lane_mask;
   if (lane_map.type() == CV_32FC1) {
     // confidence heatmap
-    // ADEBUG << "confidence threshold = " << options_.lane_map_conf_thresh;
-    // ADEBUG << "lane map size = "
-    //        << "(" << lane_map.cols << ", " << lane_map.rows << ")";
+    ADEBUG << "confidence threshold = " << options_.lane_map_conf_thresh;
+    ADEBUG << "lane map size = "
+           << "(" << lane_map.cols << ", " << lane_map.rows << ")";
     lane_mask.create(lane_map.rows, lane_map.cols, CV_8UC1);
     lane_mask.setTo(cv::Scalar(0));
     for (int h = 0; h < lane_mask.rows; ++h) {
@@ -461,7 +461,7 @@ bool CCLanePostProcessor::GenerateLaneInstances(const cv::Mat &lane_map) {
   vector<ConnectedComponentPtr> cc_list;
   cc_generator_->FindConnectedComponents(lane_mask, &cc_list);
 
-  // ADEBUG << "number of connected components = " << cc_list.size();
+  ADEBUG << "number of connected components = " << cc_list.size();
 
   // 3. split CC and find inner edges
   int tot_inner_edge_count = 0;
@@ -537,7 +537,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     bool is_right_lane_found = false;
     for (auto it = cur_lane_instances_->begin();
          it != cur_lane_instances_->end(); ++it) {
-      // ADEBUG << "for lane instance " << it - cur_lane_instances_->begin();
+      ADEBUG << "for lane instance " << it - cur_lane_instances_->begin();
 
       if (is_left_lane_found && is_right_lane_found) {
         break;
@@ -564,10 +564,10 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
         is_right_lane_found = true;
       }
 
-      // ADEBUG << " lane object " << (*lane_objects)->back().GetSpatialLabel()
-      //        << " has " << (*lane_objects)->back().pos.size() << " points: "
-      //        << "lateral distance = "
-      //        << (*lane_objects)->back().lateral_distance;
+      ADEBUG << " lane object " << (*lane_objects)->back().GetSpatialLabel()
+             << " has " << (*lane_objects)->back().pos.size() << " points: "
+             << "lateral distance = "
+             << (*lane_objects)->back().lateral_distance;
     }
 
   } else {
@@ -798,7 +798,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     (*lane_objects)->resize(valid_lane_objects.size());
   }
 
-//  ADEBUG << "number of lane objects = " << (*lane_objects)->size();
+  ADEBUG << "number of lane objects = " << (*lane_objects)->size();
   // if (options_.space_type != SpaceType::IMAGE) {
   //   if (!CompensateLaneObjects((*lane_objects))) {
   //     AERROR << "fail to compensate lane objects.";
@@ -807,7 +807,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
   // }
 
   EnrichLaneInfo((*lane_objects));
-//  ADEBUG << "use_lane_history_: " << use_history_;
+  ADEBUG << "use_lane_history_: " << use_history_;
   if (use_history_) {
     //    FilterWithLaneHistory(*lane_objects);
     std::vector<bool> is_valid(generated_lanes_->size(), false);
@@ -1098,7 +1098,7 @@ bool CCLanePostProcessor::CompensateLaneObjects(LaneObjectsPtr lane_objects) {
   }
 
   if (!has_ego_lane_right) {
-//    ADEBUG << "add virtual lane R_0 ...";
+    ADEBUG << "add virtual lane R_0 ...";
     if (ego_lane_left_idx == -1) {
       AERROR << "failed to compensate right ego lane due to no left ego lane.";
       return false;
