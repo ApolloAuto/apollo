@@ -59,7 +59,11 @@ const common::FrenetFramePoint& FrenetFramePath::PointAt(
 
 common::FrenetFramePoint FrenetFramePath::EvaluateByS(const double s) const {
   CHECK_GT(points_.size(), 1);
-  CHECK(s < points_.back().s() + 1.0e-6 && s > points_.front().s() - 1.0e-6);
+  if (s < points_.front().s()) {
+    return points_.front();
+  } else if (s > points_.back().s()) {
+    return points_.back();
+  }
   auto func = [](const common::FrenetFramePoint& p, const double s) {
     return p.s() < s;
   };
