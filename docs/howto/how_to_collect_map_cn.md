@@ -3,19 +3,19 @@
 本文档主要用来说明如何在Apollo2.5中使用地图数据采集的功能.重点介绍了数据采集所需的软硬件环境,数据采集的流程和注意事项.
 
 ## 软硬件环境准备
-硬件安装方法参见[Apollo 2.5硬件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_hardware_system_installation_guide_v1.md)
+硬件安装方法参见[Apollo 2.5硬件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_hardware_system_installation_guide_v1.md)
 
 
-软件安装方法参见[Apollo 2.5软件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide_cn.md)
+软件安装方法参见[Apollo 软件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide_cn.md)
 
 
-传感器标定方法参见[Apollo 2.5传感器标定方法使用指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_sensor_calibration_guide_cn.md)
+传感器标定方法参见[Apollo 传感器标定方法使用指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/multiple_lidar_gnss_calibration_guide.md)
 
 
 ## 数据采集流程
 
 1、启动地图采集模式
-Apollo环境启动参见[Apollo 2.5快速上手指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_quick_start_cn.md)
+Apollo环境启动参见[Apollo 2.5快速上手指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_quick_start_cn.md)
 
 选择[Module Controller]、[Map Collection],打开[GPS]、[Camera]、[Velodyne]、[Velodyne16]开关。
 
