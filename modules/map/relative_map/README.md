@@ -1,11 +1,7 @@
 # Relative Map
 
 ## Introduction
-The relative map module receives navigation line, perception information, and location inforamtion from dreamview, perception, and localization module respectively. It generates realtime relative map (~10Hz), in which ADV location is always at (0,0) with heading of zero. 
-
-The relative map is constructed in two ways: 
-  * When navigation line is available: navigation line is used to generate lane central line and lane boundary is created based on lane marker information.
-  * When navigation line is not available: lane markers are used to build lane boundaries and central line is calculated based on the boundaries. 
+Relative map module is a middle layer connects HDMap/Perception module and planning module. This module generates real-time relative map in the body coordinate system (FLU) and a reference line for planning. The inputs for relative map module have two parts: offline and online. The offline part is navigation line (human driving path) and the HDMap information on and near navigation line. And the online part is the traffic sign related information from perception module, e.g., lane marker, corsswalk, traffice light and etc. The generation of relative map leverages both online and offline part. It also works with either online or offline part only.    
 
 ## Inputs
   * NavigationInfo from dreamview module
