@@ -128,7 +128,7 @@ bool PathDecider::MakeStaticObstacleDecision(
       continue;
     }
 
-    const auto frenet_point = frenet_path.EvaluateByS(sl_boundary.start_s());
+    const auto frenet_point = frenet_path.GetNearestPoint(sl_boundary);
     const double curr_l = frenet_point.l();
     if (curr_l - lateral_radius > sl_boundary.end_l() ||
         curr_l + lateral_radius < sl_boundary.start_l()) {
