@@ -108,6 +108,7 @@ void CollisionChecker::BuildPredictedEnvironment(
       TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       Box2d box = obstacle->GetBoundingBox(point);
       box.LongitudinalExtend(2.0 * FLAGS_lon_collision_buffer);
+      box.LateralExtend(2.0 * FLAGS_lat_collision_buffer);
       predicted_env.push_back(std::move(box));
     }
     predicted_bounding_rectangles_.push_back(std::move(predicted_env));
