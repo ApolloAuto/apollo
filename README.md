@@ -37,6 +37,7 @@ The following scripts will get you into the container
 ```
 docker ps  # to verify docker works without sudo
 bash docker/scripts/dev_start.sh
+#if you are in China, you had better use:bash docker/scripts/dev_start.sh -C
 bash docker/scripts/dev_into.sh
 
 ```
