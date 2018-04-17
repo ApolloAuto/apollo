@@ -25,6 +25,8 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::math::CartesianFrenetConverter;
+using apollo::common::math::PathMatcher;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 
@@ -57,8 +59,7 @@ DiscretizedTrajectory TrajectoryCombiner::Combine(
     double d_prime = lat_trajectory.Evaluate(1, s_param);
     double d_pprime = lat_trajectory.Evaluate(2, s_param);
 
-    PathPoint matched_ref_point =
-        PathMatcher::MatchToPath(reference_line, s);
+    PathPoint matched_ref_point = PathMatcher::MatchToPath(reference_line, s);
 
     double x = 0.0;
     double y = 0.0;

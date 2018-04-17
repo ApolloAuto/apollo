@@ -42,6 +42,7 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::math::CartesianFrenetConverter;
 
 DPRoadGraph::DPRoadGraph(const DpPolyPathConfig &config,
                          const ReferenceLineInfo &reference_line_info,
