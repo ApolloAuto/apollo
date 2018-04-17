@@ -63,8 +63,7 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
     return;
   }
   const double time_diff = current_time - prev_trajectory->header_time();
-  auto matched_point =
-      prev_trajectory->EvaluateUsingLinearApproximation(time_diff);
+  auto matched_point = prev_trajectory->Evaluate(time_diff);
   if (!matched_point.has_path_point()) {
     return;
   }
@@ -163,8 +162,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
-  auto matched_point =
-      prev_trajectory->EvaluateUsingLinearApproximation(veh_rel_time);
+  auto matched_point = prev_trajectory->Evaluate(veh_rel_time);
 
   if (!matched_point.has_path_point()) {
     return ComputeReinitStitchingTrajectory(vehicle_state);

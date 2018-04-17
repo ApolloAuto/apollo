@@ -46,23 +46,22 @@ TEST(DiscretizedPathTest, basic_test) {
 
   EXPECT_DOUBLE_EQ(discretized_path.Length(), std::sqrt(1.0 + 1.0) * 3.0);
 
-  auto eval_p1 = discretized_path.EvaluateUsingLinearApproximation(0.0);
+  auto eval_p1 = discretized_path.Evaluate(0.0);
   EXPECT_DOUBLE_EQ(eval_p1.s(), 0.0);
   EXPECT_DOUBLE_EQ(eval_p1.x(), 0.0);
   EXPECT_DOUBLE_EQ(eval_p1.y(), 0.0);
 
-  auto eval_p2 =
-      discretized_path.EvaluateUsingLinearApproximation(0.3 * std::sqrt(2.0));
+  auto eval_p2 = discretized_path.Evaluate(0.3 * std::sqrt(2.0));
   EXPECT_DOUBLE_EQ(eval_p2.s(), 0.3 * std::sqrt(2.0));
   EXPECT_DOUBLE_EQ(eval_p2.x(), 0.3);
   EXPECT_DOUBLE_EQ(eval_p2.y(), 0.3);
 
-  auto eval_p3 = discretized_path.EvaluateUsingLinearApproximation(1.8);
+  auto eval_p3 = discretized_path.Evaluate(1.8);
   EXPECT_DOUBLE_EQ(eval_p3.s(), 1.8);
   EXPECT_DOUBLE_EQ(eval_p3.x(), (1.0 + 0.8) / std::sqrt(2));
   EXPECT_DOUBLE_EQ(eval_p3.y(), (1.0 + 0.8) / std::sqrt(2));
 
-  auto eval_p4 = discretized_path.EvaluateUsingLinearApproximation(2.5);
+  auto eval_p4 = discretized_path.Evaluate(2.5);
   EXPECT_DOUBLE_EQ(eval_p4.s(), 2.5);
   EXPECT_DOUBLE_EQ(eval_p4.x(), (2.0 + 0.5) / std::sqrt(2));
   EXPECT_DOUBLE_EQ(eval_p4.y(), (2.0 + 0.5) / std::sqrt(2));

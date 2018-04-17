@@ -25,9 +25,6 @@ namespace apollo {
 namespace common {
 namespace math {
 
-using apollo::common::PathPoint;
-using apollo::common::TrajectoryPoint;
-
 double slerp(const double a0, const double t0, const double a1, const double t1,
              const double t) {
   if (std::abs(t1 - t0) <= kMathEpsilon) {
@@ -48,12 +45,22 @@ double slerp(const double a0, const double t0, const double a1, const double t1,
   return NormalizeAngle(a);
 }
 
+SLPoint InterpolateUsingLinearApproximation(const SLPoint &p0,
+                                            const SLPoint &p1, const double w) {
+  CHECK_GE(w, 0.0);
+
+  SLPoint p;
+  p.set_s((1 - w) * p0.s() + w * p1.s());
+  p.set_l((1 - w) * p0.l() + w * p1.l());
+  return p;
+}
+
 PathPoint InterpolateUsingLinearApproximation(const PathPoint &p0,
                                               const PathPoint &p1,
                                               const double s) {
   double s0 = p0.s();
   double s1 = p1.s();
-  CHECK(s0 < s1);
+  CHECK_LE(s0, s1);
 
   PathPoint path_point;
   double weight = (s - s0) / (s1 - s0);
@@ -91,22 +98,18 @@ TrajectoryPoint InterpolateUsingLinearApproximation(const TrajectoryPoint &tp0,
   double t1 = tp1.relative_time();
 
   TrajectoryPoint tp;
-  tp.set_v(common::math::lerp(tp0.v(), t0, tp1.v(), t1, t));
-  tp.set_a(common::math::lerp(tp0.a(), t0, tp1.a(), t1, t));
+  tp.set_v(lerp(tp0.v(), t0, tp1.v(), t1, t));
+  tp.set_a(lerp(tp0.a(), t0, tp1.a(), t1, t));
   tp.set_relative_time(t);
 
   PathPoint *path_point = tp.mutable_path_point();
-  path_point->set_x(common::math::lerp(pp0.x(), t0, pp1.x(), t1, t));
-  path_point->set_y(common::math::lerp(pp0.y(), t0, pp1.y(), t1, t));
-  path_point->set_theta(
-      common::math::lerp(pp0.theta(), t0, pp1.theta(), t1, t));
-  path_point->set_kappa(
-      common::math::lerp(pp0.kappa(), t0, pp1.kappa(), t1, t));
-  path_point->set_dkappa(
-      common::math::lerp(pp0.dkappa(), t0, pp1.dkappa(), t1, t));
-  path_point->set_ddkappa(
-      common::math::lerp(pp0.ddkappa(), t0, pp1.ddkappa(), t1, t));
-  path_point->set_s(common::math::lerp(pp0.s(), t0, pp1.s(), t1, t));
+  path_point->set_x(lerp(pp0.x(), t0, pp1.x(), t1, t));
+  path_point->set_y(lerp(pp0.y(), t0, pp1.y(), t1, t));
+  path_point->set_theta(lerp(pp0.theta(), t0, pp1.theta(), t1, t));
+  path_point->set_kappa(lerp(pp0.kappa(), t0, pp1.kappa(), t1, t));
+  path_point->set_dkappa(lerp(pp0.dkappa(), t0, pp1.dkappa(), t1, t));
+  path_point->set_ddkappa(lerp(pp0.ddkappa(), t0, pp1.ddkappa(), t1, t));
+  path_point->set_s(lerp(pp0.s(), t0, pp1.s(), t1, t));
 
   return tp;
 }

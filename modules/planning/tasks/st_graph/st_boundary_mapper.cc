@@ -397,9 +397,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       const double step_length = vehicle_param_.front_edge_to_center();
       for (double path_s = 0.0; path_s < discretized_path.Length();
            path_s += step_length) {
-        const auto curr_adc_path_point =
-            discretized_path.EvaluateUsingLinearApproximation(
-                path_s + discretized_path.StartPoint().s());
+        const auto curr_adc_path_point = discretized_path.Evaluate(
+            path_s + discretized_path.StartPoint().s());
         if (CheckOverlap(curr_adc_path_point, obs_box,
                          st_boundary_config_.boundary_buffer())) {
           // found overlap, start searching with higher resolution
@@ -422,9 +421,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
               break;
             }
             if (!find_low) {
-              const auto& point_low =
-                  discretized_path.EvaluateUsingLinearApproximation(
-                      low_s + discretized_path.StartPoint().s());
+              const auto& point_low = discretized_path.Evaluate(
+                  low_s + discretized_path.StartPoint().s());
               if (!CheckOverlap(point_low, obs_box,
                                 st_boundary_config_.boundary_buffer())) {
                 low_s += fine_tuning_step_length;
@@ -433,9 +431,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
               }
             }
             if (!find_high) {
-              const auto& point_high =
-                  discretized_path.EvaluateUsingLinearApproximation(
-                      high_s + discretized_path.StartPoint().s());
+              const auto& point_high = discretized_path.Evaluate(
+                  high_s + discretized_path.StartPoint().s());
               if (!CheckOverlap(point_high, obs_box,
                                 st_boundary_config_.boundary_buffer())) {
                 high_s -= fine_tuning_step_length;
