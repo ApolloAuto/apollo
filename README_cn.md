@@ -27,7 +27,7 @@ not because they are easy, but because they are hard.
 以下命令会将你带入Docker容器中。
 ```
 docker ps  # 确认Docker可以非sudo运行
-bash docker/scripts/dev_start.sh
+bash docker/scripts/dev_start.sh -C   # -C表示从docker中国的镜像服务器下载，速度较快
 bash docker/scripts/dev_into.sh
 ```
 
