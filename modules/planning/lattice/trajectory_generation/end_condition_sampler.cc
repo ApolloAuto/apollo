@@ -69,8 +69,7 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
 
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
   for (const auto& time : time_samples) {
-    double v_upper = std::min(feasible_region_.VUpper(time),
-        ref_cruise_speed);
+    double v_upper = std::min(feasible_region_.VUpper(time), ref_cruise_speed);
     double v_lower = feasible_region_.VLower(time);
 
     std::array<double, 3> lower_end_s = {0.0, v_lower, 0.0};
@@ -88,8 +87,7 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
     if (num_of_mid_points > 0) {
       double velocity_seg = v_range / (num_of_mid_points + 1);
       for (std::size_t i = 1; i <= num_of_mid_points; ++i) {
-        std::array<double, 3> end_s =
-            {0.0, v_lower + velocity_seg * i, 0.0};
+        std::array<double, 3> end_s = {0.0, v_lower + velocity_seg * i, 0.0};
         end_s_conditions.emplace_back(end_s, time);
       }
     }
@@ -120,8 +118,8 @@ EndConditionSampler::SampleLonEndConditionsForStopping(
       continue;
     }
     for (const auto& s_offset : s_offsets) {
-      std::array<double, 3> end_s =
-          {std::max(init_s_[0], ref_stop_point + s_offset), 0.0, 0.0};
+      std::array<double, 3> end_s = {
+          std::max(init_s_[0], ref_stop_point + s_offset), 0.0, 0.0};
       end_s_conditions.emplace_back(end_s, time);
     }
   }
@@ -179,7 +177,6 @@ void EndConditionSampler::QueryFollowPathTimePoints(
     CHECK_GE(FLAGS_num_sample_follow_per_timestamp, 2);
     double s_gap = FLAGS_default_lon_buffer /
                    static_cast<double>(FLAGS_num_sample_follow_per_timestamp);
-    std::vector<double> sample_s;
     for (std::size_t i = 0; i < FLAGS_num_sample_follow_per_timestamp; ++i) {
       double s = s_lower + s_gap * static_cast<double>(i);
       SamplePoint sample_point;
@@ -203,8 +200,8 @@ void EndConditionSampler::QueryOvertakePathTimePoints(
         obstacle_id, path_time_point.s(), path_time_point.t());
     SamplePoint sample_point;
     sample_point.mutable_path_time_point()->CopyFrom(path_time_point);
-    sample_point.mutable_path_time_point()->set_s(
-        path_time_point.s() + FLAGS_default_lon_buffer);
+    sample_point.mutable_path_time_point()->set_s(path_time_point.s() +
+                                                  FLAGS_default_lon_buffer);
     sample_point.set_ref_v(v);
     sample_points->push_back(std::move(sample_point));
   }

@@ -35,11 +35,12 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::math::lerp;
+using apollo::common::math::Box2d;
+using apollo::common::math::PathMatcher;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
-using apollo::common::math::Box2d;
 using apollo::perception::PerceptionObstacle;
-using apollo::common::math::lerp;
 
 PathTimeGraph::PathTimeGraph(
     const std::vector<const Obstacle*>& obstacles,

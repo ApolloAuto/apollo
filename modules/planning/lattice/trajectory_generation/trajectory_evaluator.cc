@@ -36,6 +36,7 @@ namespace apollo {
 namespace planning {
 
 using Trajectory1d = Curve1d;
+using apollo::common::math::PathMatcher;
 using apollo::common::FrenetFramePoint;
 using apollo::common::PathPoint;
 using apollo::common::SpeedPoint;
