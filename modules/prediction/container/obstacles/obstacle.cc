@@ -816,11 +816,10 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 
 void Obstacle::SetLaneGraphFeature(Feature* feature) {
   double speed = feature->speed();
-  double acc = feature->acc();
-  double road_graph_distance =
+  double road_graph_distance = std::max(
       speed * FLAGS_prediction_duration +
-      0.5 * acc * FLAGS_prediction_duration * FLAGS_prediction_duration +
-      FLAGS_min_prediction_length;
+      0.5 * FLAGS_max_acc * FLAGS_prediction_duration *
+      FLAGS_prediction_duration, FLAGS_min_prediction_length);
 
   int seq_id = 0;
   int curr_lane_count = 0;
