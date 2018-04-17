@@ -36,8 +36,8 @@ EndConditionSampler::EndConditionSampler(
     : init_s_(init_s),
       init_d_(init_d),
       feasible_region_(init_s),
-      ptr_path_time_graph_(ptr_path_time_graph),
-      ptr_prediction_querier_(ptr_prediction_querier) {}
+      ptr_path_time_graph_(std::move(ptr_path_time_graph)),
+      ptr_prediction_querier_(std::move(ptr_prediction_querier)) {}
 
 std::vector<std::pair<std::array<double, 3>, double>>
 EndConditionSampler::SampleLatEndConditions() const {
@@ -60,15 +60,15 @@ EndConditionSampler::SampleLonEndConditionsForCruising(
   CHECK_GT(FLAGS_num_velocity_sample, 1);
 
   // time interval is one second plus the last one 0.01
-  constexpr std::size_t num_time_section = 9;
-  std::array<double, num_time_section> time_sections;
-  for (std::size_t i = 0; i + 1 < num_time_section; ++i) {
-    time_sections[i] = FLAGS_trajectory_time_length - i;
+  constexpr std::size_t num_of_time_samples = 9;
+  std::array<double, num_of_time_samples> time_samples;
+  for (std::size_t i = 0; i + 1 < num_of_time_samples; ++i) {
+    time_samples[i] = FLAGS_trajectory_time_length - i;
   }
-  time_sections[num_time_section - 1] = FLAGS_polynomial_minimal_param;
+  time_samples[num_of_time_samples - 1] = FLAGS_polynomial_minimal_param;
 
   std::vector<std::pair<std::array<double, 3>, double>> end_s_conditions;
-  for (const auto& time : time_sections) {
+  for (const auto& time : time_samples) {
     double v_upper = std::min(feasible_region_.VUpper(time),
         ref_cruise_speed);
     double v_lower = feasible_region_.VLower(time);
