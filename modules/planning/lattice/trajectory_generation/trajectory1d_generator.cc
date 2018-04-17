@@ -66,6 +66,9 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForCruising(
   ADEBUG << "cruise speed is  " << target_speed;
   auto end_conditions =
       end_condition_sampler_.SampleLonEndConditionsForCruising(target_speed);
+  if (end_conditions.empty()) {
+    return;
+  }
 
   // For the cruising case, We use the "QuarticPolynomialCurve1d" class (not the
   // "QuinticPolynomialCurve1d" class) to generate curves. Therefore, we can't
@@ -80,6 +83,9 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForStopping(
   ADEBUG << "stop point is " << stop_point;
   auto end_conditions =
       end_condition_sampler_.SampleLonEndConditionsForStopping(stop_point);
+  if (end_conditions.empty()) {
+    return;
+  }
 
   // Use the common function to generate trajectory bundles.
   GenerateTrajectory1DBundle<5>(init_lon_state_, end_conditions,
@@ -90,6 +96,9 @@ void Trajectory1dGenerator::GenerateSpeedProfilesForPathTimeObstacles(
     Trajectory1DBundle* ptr_lon_trajectory_bundle) const {
   auto end_conditions =
       end_condition_sampler_.SampleLonEndConditionsForPathTimePoints();
+  if (end_conditions.empty()) {
+    return;
+  }
 
   // Use the common function to generate trajectory bundles.
   GenerateTrajectory1DBundle<5>(init_lon_state_, end_conditions,
