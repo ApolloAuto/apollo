@@ -83,8 +83,10 @@ class FeatureXYPlane {
     std::clock_t plane_time;
     plane_time = std::clock();
     int total_plane_num = 0;
+    double power2 = 0.5;  // 2^-1
     for (int iter = 0; iter <= iter_num; ++iter) {
-      double grid_size = max_grid_size_ / Power2(iter);
+      power2 *= 2;
+      double grid_size = max_grid_size_ / power2;
       VoxelGridCovariance<PointT> vgc;
       vgc.setInputCloud(pointcloud_ptr);
       vgc.SetMinPointPerVoxel(min_planepoints_number_);
@@ -179,31 +181,6 @@ class FeatureXYPlane {
     }
     return true;
   }
-
-  double Power2(int x) {
-    if (power2_map_.find(x) != power2_map_.end()) {
-      return power2_map_[x];
-    }
-    if (x < 0) {
-      const double res = 1.0 / Power2(-x);
-      power2_map_[x] = res;
-      return res;
-    } else if (x == 0) {
-      return 1.0;
-    }
-
-    const double d = Power2(x / 2);
-    double res = 0.0;
-    if (x % 2 == 0) {
-      res = d * d;
-    } else {
-      res = 2 * d * d;
-    }
-    power2_map_[x] = res;
-    return res;
-  }
-
-  std::unordered_map<int, double> power2_map_;
 
  private:
   // parameters
