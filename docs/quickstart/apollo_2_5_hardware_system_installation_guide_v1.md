@@ -716,7 +716,7 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
 
    5. Use the serial cable connection for COM port between the HDL-64E S3 and the laptop:
 
-      ![Serial cable connected to laptop.png](images/Serial cable connected to laptop.png)
+      ![Serial cable connected to laptop.png](images/Serial_cable_connected_to_laptop.png)
 
    6. Launch **Termite 3.2** from laptop 
 
