@@ -383,6 +383,22 @@ TEST_F(SunnyvaleBigLoopTest, abort_change_lane_for_fast_back_vehicle) {
   RUN_GOLDEN_TEST(0);
 }
 
+TEST_F(SunnyvaleBigLoopTest, bypass_parked_bus) {
+  std::string seq_num = "14";
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
+  double acc_lower_bound = FLAGS_longitudinal_acceleration_lower_bound;
+  FLAGS_longitudinal_acceleration_lower_bound = -5.0;
+
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(0);
+  FLAGS_longitudinal_acceleration_lower_bound = acc_lower_bound;
+}
+
 }  // namespace planning
 }  // namespace apollo
 
