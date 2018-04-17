@@ -137,9 +137,6 @@ cc_library(
     deps = [
         ":planning_gflags",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/math",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/math:hermite_spline",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planning_status_proto",
     ],
