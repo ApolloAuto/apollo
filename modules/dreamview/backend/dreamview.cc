@@ -106,9 +106,9 @@ Status Dreamview::Init() {
   server_.reset(new CivetServer(options));
 
   image_.reset(new ImageHandler());
-  websocket_.reset(new WebSocketHandler());
-  map_ws_.reset(new WebSocketHandler());
-  point_cloud_ws_.reset(new WebSocketHandler());
+  websocket_.reset(new WebSocketHandler("SimWorld"));
+  map_ws_.reset(new WebSocketHandler("Map"));
+  point_cloud_ws_.reset(new WebSocketHandler("PointCloud"));
   map_service_.reset(new MapService());
   sim_control_.reset(new SimControl(map_service_.get()));
 
