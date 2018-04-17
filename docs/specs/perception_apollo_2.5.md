@@ -23,7 +23,7 @@ Apollo 2.5 *does not* support a high curvature road, a road without lane marks i
 ## Perception modules
 The flow chart of each module is shown below.
 
-![Image](perception_flow_chart_apollo_2.5.png)
+![Image](images/perception_flow_chart_apollo_2.5.png)
 
 **Figure 1: Flow diagram of lane keeping system**
 
