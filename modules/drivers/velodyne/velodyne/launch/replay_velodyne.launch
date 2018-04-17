@@ -10,6 +10,7 @@
     <arg name="rpm" default="600"/>
     <arg name="tf_query_timeout" default="0.1"/>
     <arg name="velodyne64_frame_id" default="velodyne64"/> 
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
 
     <!-- start rosbag replay -->
   <include file="$(find velodyne_pointcloud)/launch/rosbag_replay.launch">
@@ -19,6 +20,7 @@
   </include> 
 
   <include file="$(find velodyne_pointcloud)/launch/nodelet_manager.launch">
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
   </include>
     <!--  HDL64E -->  
   <!-- start cloud nodelet using test calibration file -->
@@ -32,6 +34,7 @@
     <arg name="topic_pointcloud" default="/apollo/sensor/velodyne64/PointCloud2"/>
     <arg name="topic_packets" default="/apollo/sensor/velodyne64/VelodyneScanUnified"/>
     <arg name="node_name" value="sensor_velodyne64_convert"/>
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
   </include>
 
    <!-- start 64 compensator nodelet -->
@@ -45,9 +48,10 @@
 
   <node pkg="velodyne_pointcloud" type="extrinsics_broadcaster.py"
     args="$(arg extrinsics_velodyne64)" name="static_transform_velodyne64" />
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
   
   <node pkg="nodelet" type="nodelet" name="tf_broadcaster_nodelet"
-        args="load gnss_driver/TFBroadcasterNodelet velodyne_nodelet_manager" output="screen">
+        args="load gnss_driver/TFBroadcasterNodelet $(arg nodelet_manager_name)" output="screen">
   </node>
 
 </launch>
