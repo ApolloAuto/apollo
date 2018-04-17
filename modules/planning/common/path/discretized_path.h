@@ -44,7 +44,7 @@ class DiscretizedPath {
 
   const common::PathPoint& EndPoint() const;
 
-  common::PathPoint EvaluateUsingLinearApproximation(const double path_s) const;
+  common::PathPoint Evaluate(const double path_s) const;
 
   const std::vector<common::PathPoint>& path_points() const;
 

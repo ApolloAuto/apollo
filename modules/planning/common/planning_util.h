@@ -35,15 +35,6 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-common::SLPoint Interpolate(const common::SLPoint &start,
-                            const common::SLPoint &end, const double weight);
-
-common::PathPoint Interpolate(const common::PathPoint &p0,
-                              const common::PathPoint &p1, const double s);
-
-common::TrajectoryPoint Interpolate(const common::TrajectoryPoint &tp0,
-                                    const common::TrajectoryPoint &tp1,
-                                    const double t);
 /**
  * This function returns the run-time state of the planning module.
  * @Warnning: this function is not thread safe.
