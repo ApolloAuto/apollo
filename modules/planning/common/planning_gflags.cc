@@ -303,6 +303,8 @@ DEFINE_double(min_velocity_sample_gap, 1.0,
               "Minimal sampling gap for velocity");
 DEFINE_double(lon_collision_buffer, 1.0,
               "The longitudinal buffer to keep distance to other vehicles");
+DEFINE_double(lat_collision_buffer, 0.2,
+              "The lateral buffer to keep distance to other vehicles");
 DEFINE_uint32(num_sample_follow_per_timestamp, 3,
              "The number of sample points for each timestamp to follow");
 

@@ -335,6 +335,12 @@ void Box2d::LongitudinalExtend(const double extension_length) {
   InitCorners();
 }
 
+void Box2d::LateralExtend(const double extension_length) {
+  width_ += extension_length;
+  half_width_ += extension_length / 2.0;
+  InitCorners();
+}
+
 std::string Box2d::DebugString() const {
   return util::StrCat("box2d ( center = ", center_.DebugString(),
                       "  heading = ", heading_, "  length = ", length_,
