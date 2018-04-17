@@ -94,7 +94,7 @@ void PathData::SetReferenceLine(const ReferenceLine *reference_line) {
 
 bool PathData::GetPathPointWithPathS(
     const double s, common::PathPoint *const path_point) const {
-  *path_point = discretized_path_.EvaluateUsingLinearApproximation(s);
+  *path_point = discretized_path_.Evaluate(s);
   return true;
 }
 
@@ -135,8 +135,7 @@ bool PathData::GetPathPointWithRefS(const double ref_s,
       discretized_path_.path_points().at(index).s() +
       r * (discretized_path_.path_points().at(index + 1).s() -
            discretized_path_.path_points().at(index).s());
-  path_point->CopyFrom(
-      discretized_path_.EvaluateUsingLinearApproximation(discretized_path_s));
+  path_point->CopyFrom(discretized_path_.Evaluate(discretized_path_s));
 
   return true;
 }

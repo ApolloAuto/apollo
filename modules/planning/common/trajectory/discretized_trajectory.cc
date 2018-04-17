@@ -45,7 +45,7 @@ DiscretizedTrajectory::DiscretizedTrajectory(const ADCTrajectory& trajectory) {
                             trajectory.trajectory_point().end());
 }
 
-TrajectoryPoint DiscretizedTrajectory::EvaluateUsingLinearApproximation(
+TrajectoryPoint DiscretizedTrajectory::Evaluate(
     const double relative_time) const {
   auto comp = [](const TrajectoryPoint& p, const double relative_time) {
     return p.relative_time() < relative_time;
