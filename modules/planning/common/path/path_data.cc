@@ -34,8 +34,9 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::SLPoint;
+using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::math::Vec2d;
+using apollo::common::SLPoint;
 
 bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
   if (reference_line_ == nullptr) {

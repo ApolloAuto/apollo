@@ -51,6 +51,8 @@ using apollo::common::PathPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterManager;
+using apollo::common::math::PathMatcher;
+using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::time::Clock;
 
 namespace {
@@ -275,7 +277,8 @@ Status LatticePlanner::PlanOnReferenceLine(
       std::vector<common::SpeedPoint> lon_future_trajectory;
       std::vector<common::FrenetFramePoint> lat_future_trajectory;
       if (!MapFutureTrajectoryToSL(future_trajectory, *ptr_reference_line,
-              &lon_future_trajectory, &lat_future_trajectory)) {
+                                   &lon_future_trajectory,
+                                   &lat_future_trajectory)) {
         AERROR << "Auto tuning failed since no mapping "
                << "from future trajectory to lon-lat";
       }
@@ -287,22 +290,22 @@ Status LatticePlanner::PlanOnReferenceLine(
 
       // 4. emit
       planning_internal::PlanningData* ptr_debug =
-        reference_line_info->mutable_debug()->mutable_planning_data();
+          reference_line_info->mutable_debug()->mutable_planning_data();
 
       apollo::planning_internal::AutoTuningTrainingData auto_tuning_data;
 
       for (double student_cost_component : trajectory_pair_cost_components) {
-        auto_tuning_data.mutable_student_component()
-          ->add_cost_component(student_cost_component);
+        auto_tuning_data.mutable_student_component()->add_cost_component(
+            student_cost_component);
       }
 
       for (double teacher_cost_component : future_traj_component_cost) {
-        auto_tuning_data.mutable_teacher_component()
-          ->add_cost_component(teacher_cost_component);
+        auto_tuning_data.mutable_teacher_component()->add_cost_component(
+            teacher_cost_component);
       }
 
-      ptr_debug->mutable_auto_tuning_training_data()
-        ->CopyFrom(auto_tuning_data);
+      ptr_debug->mutable_auto_tuning_training_data()->CopyFrom(
+          auto_tuning_data);
     }
 
     // Print the chosen end condition and start condition
@@ -413,10 +416,10 @@ bool LatticePlanner::MapFutureTrajectoryToSL(
     return false;
   }
   for (const common::TrajectoryPoint& trajectory_point :
-    future_trajectory.trajectory_points()) {
+       future_trajectory.trajectory_points()) {
     const PathPoint& path_point = trajectory_point.path_point();
     PathPoint matched_point = PathMatcher::MatchToPath(
-      discretized_reference_line, path_point.x(), path_point.y());
+        discretized_reference_line, path_point.x(), path_point.y());
     std::array<double, 3> pose_s;
     std::array<double, 3> pose_d;
     ComputeInitFrenetState(matched_point, trajectory_point, &pose_s, &pose_d);

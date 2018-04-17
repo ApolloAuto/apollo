@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file collision_checker.cpp
+ * @file
  **/
 
 #include "modules/planning/constraint_checker/collision_checker.h"
@@ -34,10 +34,11 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::math::Box2d;
+using apollo::common::math::PathMatcher;
+using apollo::common::math::Vec2d;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
-using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
 
 CollisionChecker::CollisionChecker(
     const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
@@ -61,7 +62,7 @@ bool CollisionChecker::InCollision(
     double ego_theta = trajectory_point.path_point().theta();
     Box2d ego_box(
         {trajectory_point.path_point().x(), trajectory_point.path_point().y()},
-         ego_theta, ego_length, ego_width);
+        ego_theta, ego_length, ego_width);
     double shift_distance =
         ego_length / 2.0 - vehicle_config.vehicle_param().back_edge_to_center();
     Vec2d shift_vec{shift_distance * std::cos(ego_theta),

@@ -41,11 +41,8 @@ class PathTimeGraph {
  public:
   PathTimeGraph(const std::vector<const Obstacle*>& obstacles,
                 const std::vector<common::PathPoint>& discretized_ref_points,
-                const double s_start,
-                const double s_end,
-                const double t_start,
-                const double t_end,
-                const double path_width);
+                const double s_start, const double s_end, const double t_start,
+                const double t_end, const double path_width);
 
   const std::vector<PathTimeObstacle>& GetPathTimeObstacles() const;
 
