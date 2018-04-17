@@ -22,7 +22,8 @@
 #include "gtest/gtest.h"
 
 namespace apollo {
-namespace planning {
+namespace common {
+namespace math {
 
 TEST(TestCartesianFrenetConversion, cartesian_to_frenet_test) {
   double rs = 10.0;
@@ -64,5 +65,6 @@ TEST(TestCartesianFrenetConversion, cartesian_to_frenet_test) {
   EXPECT_NEAR(a, a_out, 1.0e-6);
 }
 
-}  // namespace planning
+}  // namespace math
+}  // namespace common
 }  // namespace apollo
