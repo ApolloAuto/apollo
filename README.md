@@ -37,7 +37,7 @@ The following scripts will get you into the container
 ```
 docker ps  # to verify docker works without sudo
 bash docker/scripts/dev_start.sh
-# if in China, you had better use:'''bash docker/scripts/dev_start.sh -C''' to download from  server of docker in china.
+# if in China, you had better use:_bash docker/scripts/dev_start.sh -C_ to download from  server of docker in china.
 bash docker/scripts/dev_into.sh
 
 ```
