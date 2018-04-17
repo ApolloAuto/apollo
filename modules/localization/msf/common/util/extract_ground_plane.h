@@ -19,6 +19,7 @@
 
 #include <cmath>
 #include <map>
+#include <unordered_map>
 #include <vector>
 
 #include "pcl/sample_consensus/impl/ransac.hpp"
@@ -49,29 +50,17 @@ class FeatureXYPlane {
     non_xy_plane_cloud_ = PointCloudPtrT(new PointCloudT);
   }
 
-  void SetMinGridSize(double d) {
-    min_grid_size_ = d;
-  }
+  void SetMinGridSize(double d) { min_grid_size_ = d; }
 
-  void SetMaxGridSize(double d) {
-    max_grid_size_ = d;
-  }
+  void SetMaxGridSize(double d) { max_grid_size_ = d; }
 
-  void SetPlaneInlierDistance(double d) {
-    plane_inlier_distance_ = d;
-  }
+  void SetPlaneInlierDistance(double d) { plane_inlier_distance_ = d; }
 
-  void SetMinPlanepointsNumber(double d) {
-    min_planepoints_number_ = d;
-  }
+  void SetMinPlanepointsNumber(double d) { min_planepoints_number_ = d; }
 
-  void SetPlaneTypeDegree(double d) {
-    plane_type_degree_ = d;
-  }
+  void SetPlaneTypeDegree(double d) { plane_type_degree_ = d; }
 
-  void SetBelowLidarHeight(double d) {
-    below_lidar_height_ = d;
-  }
+  void SetBelowLidarHeight(double d) { below_lidar_height_ = d; }
 
   float CalculateDegree(const Eigen::Vector3f& tmp0,
                         const Eigen::Vector3f& tmp1) {
@@ -79,13 +68,9 @@ class FeatureXYPlane {
     return std::acos(cos_theta) * 180.0 / M_PI;
   }
 
-  PointCloudPtrT& GetXYPlaneCloud() {
-    return xy_plane_cloud_;
-  }
+  PointCloudPtrT& GetXYPlaneCloud() { return xy_plane_cloud_; }
 
-  PointCloudPtrT& GetNonXYPlaneCloud() {
-    return non_xy_plane_cloud_;
-  }
+  PointCloudPtrT& GetNonXYPlaneCloud() { return non_xy_plane_cloud_; }
 
   void ExtractXYPlane(const PointCloudPtrT& cloud) {
     xy_plane_cloud_.reset(new PointCloudT);
@@ -196,12 +181,29 @@ class FeatureXYPlane {
   }
 
   double Power2(int x) {
-    double result = 1.0;
-    for (int i = 0; i < x; ++i) {
-      result *= 2.0;
+    if (power2_map_.find(x) != power2_map_.end()) {
+      return power2_map_[x];
     }
-    return result;
+    if (x < 0) {
+      const double res = 1.0 / Power2(-x);
+      power2_map_[x] = res;
+      return res;
+    } else if (x == 0) {
+      return 1.0;
+    }
+
+    const double d = Power2(x / 2);
+    double res = 0.0;
+    if (x % 2 == 0) {
+      res = d * d;
+    } else {
+      res = 2 * d * d;
+    }
+    power2_map_[x] = res;
+    return res;
   }
+
+  std::unordered_map<int, double> power2_map_;
 
  private:
   // parameters
