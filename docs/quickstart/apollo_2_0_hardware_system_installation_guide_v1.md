@@ -11,12 +11,12 @@
         * [IPC Front and Rear Views](#ipc-front-and-rear-views)
     * [Controller Area Network (CAN) Card](#controller-area-network-(can)-card)
     * [Global Positioning System (GPS) and Inertial Measurement Unit (IMU)](#global-positioning-system-(gps)-and-inertial-measurement-unit-(imu))
-        * [Option 1: The NovAtel SPAN-IGM-A1](#option-1:-the-novatel-span-igm-a1)
-        * [Option 2: The NovAtel SPAN ProPak6 and NovAtel IMU-IGM-A1](#option-2:-the-novatel-span-propak6-and-novatel-imu-igm-a1)
+        * [Option 1: The NovAtel SPAN-IGM-A1](#option-1-the-novatel-span-igm-a1)
+        * [Option 2: The NovAtel SPAN ProPak6 and NovAtel IMU-IGM-A1](#option-2-the-novatel-span-propak6-and-novatel-imu-igm-a1)
     * [The GPS Receiver/Antenna](#the-gps-receiver/antenna)
     * [Light Detection and Ranging System (LiDAR)](#light-detection-and-ranging-system)
-        * [Option 1: The Velodyne HDL-64E S3](#option-1:-the-velodyne-hdl-64E-S3)
-        * [Option 2: The Hesai Pandora](#option-2:-the-hesai-pandora) 
+        * [Option 1: Velodyne HDL-64E S3](#option-1-velodyne-hdl-64e-s3)
+        * [Option 2: Hesai Pandora](#option-2-hesai-pandora) 
 * [Overview of the Installation Tasks](#overview-of-the-installation-tasks)
 * [Steps for the Installation Tasks](#steps-for-the-installation-tasks)
     * [At the Office](#at-the-office)
@@ -752,7 +752,7 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
 
    5. Use the serial cable connection for COM port between the HDL-64E S3 and the laptop:
 
-      ![Serial cable connected to laptop.png](images/Serial cable connected to laptop.png)
+      ![Serial cable connected to laptop.png](images/Serial_cable_connected_to_laptop.png)
 
    6. Launch **Termite 3.2** from laptop 
 
