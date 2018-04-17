@@ -119,7 +119,7 @@ bool PathDecider::MakeStaticObstacleDecision(
 
     const auto &sl_boundary = path_obstacle->PerceptionSLBoundary();
 
-    if (sl_boundary.start_s() < frenet_points.front().s() ||
+    if (sl_boundary.end_s() < frenet_points.front().s() ||
         sl_boundary.start_s() > frenet_points.back().s()) {
       path_decision->AddLongitudinalDecision("PathDecider/not-in-s",
                                              obstacle.Id(), object_decision);
