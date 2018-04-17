@@ -21,56 +21,35 @@
 namespace apollo {
 namespace planning {
 
-TEST(ComparableCost, simple) {
-  ComparableCost cc;
-  EXPECT_DOUBLE_EQ(cc.safety_cost, 0.0);
-  EXPECT_DOUBLE_EQ(cc.smoothness_cost, 0.0);
-  EXPECT_FALSE(cc.cost_items[ComparableCost::HAS_COLLISION]);
-  EXPECT_FALSE(cc.cost_items[ComparableCost::OUT_OF_BOUNDARY]);
-  EXPECT_FALSE(cc.cost_items[ComparableCost::OUT_OF_LANE]);
-}
+TEST(AllTrajectoryTests, GetCostFromObsSL) {
+  // left nudge
+  TrajectoryCost tc;
+  SLBoundary obs_sl_boundary;
+  obs_sl_boundary.set_start_s(20.0);
+  obs_sl_boundary.set_end_s(25.0);
+  obs_sl_boundary.set_start_l(-1.5);
+  obs_sl_boundary.set_end_l(-0.2);
+  auto cost = tc.GetCostFromObsSL(5.0, 0.5, obs_sl_boundary);
+  EXPECT_DOUBLE_EQ(cost.safety_cost, 240.48911372030088);
+  EXPECT_DOUBLE_EQ(cost.smoothness_cost, 0.0);
+  EXPECT_FALSE(cost.cost_items.at(0));
+  EXPECT_FALSE(cost.cost_items.at(1));
+  EXPECT_FALSE(cost.cost_items.at(2));
 
-TEST(ComparableCost, add_cost) {
-  ComparableCost cc1(true, false, false, 10.12, 2.51);
-  ComparableCost cc2(false, false, true, 6.1, 3.45);
+  // collisioned obstacle
+  TrajectoryCost tc1;
+  SLBoundary obs_sl_boundary1;
+  obs_sl_boundary1.set_start_s(20.0);
+  obs_sl_boundary1.set_end_s(25.0);
+  obs_sl_boundary1.set_start_l(-1.5);
+  obs_sl_boundary1.set_end_l(-0.2);
+  auto cost1 = tc.GetCostFromObsSL(21.0, -0.5, obs_sl_boundary1);
 
-  ComparableCost cc = cc1 + cc2;
-
-  EXPECT_TRUE(cc.cost_items[ComparableCost::HAS_COLLISION]);
-  EXPECT_FALSE(cc.cost_items[ComparableCost::OUT_OF_BOUNDARY]);
-  EXPECT_TRUE(cc.cost_items[ComparableCost::OUT_OF_LANE]);
-  EXPECT_DOUBLE_EQ(cc.safety_cost, 16.22);
-  EXPECT_DOUBLE_EQ(cc.smoothness_cost, 5.96);
-
-  EXPECT_TRUE(cc1 > cc2);
-
-  cc1 += cc2;
-
-  EXPECT_TRUE(cc1.cost_items[ComparableCost::HAS_COLLISION]);
-  EXPECT_FALSE(cc1.cost_items[ComparableCost::OUT_OF_BOUNDARY]);
-  EXPECT_TRUE(cc1.cost_items[ComparableCost::OUT_OF_LANE]);
-  EXPECT_DOUBLE_EQ(cc1.safety_cost, 16.22);
-  EXPECT_DOUBLE_EQ(cc1.smoothness_cost, 5.96);
-
-  ComparableCost cc3(true, false, false, 10.12, 2.51);
-  ComparableCost cc4(false, true, true, 6.1, 3.45);
-
-  EXPECT_TRUE(cc3 > cc4);
-
-  ComparableCost cc5(false, false, false, 10.12, 2.51);
-  ComparableCost cc6(false, true, true, 6.1, 3.45);
-
-  EXPECT_TRUE(cc5 < cc6);
-
-  ComparableCost cc7 = cc5 + cc6;
-
-  EXPECT_FALSE(cc7.cost_items[ComparableCost::HAS_COLLISION]);
-  EXPECT_TRUE(cc7.cost_items[ComparableCost::OUT_OF_BOUNDARY]);
-  EXPECT_TRUE(cc7.cost_items[ComparableCost::OUT_OF_LANE]);
-  EXPECT_DOUBLE_EQ(cc7.safety_cost, 16.22);
-  EXPECT_DOUBLE_EQ(cc7.smoothness_cost, 5.96);
-
-  EXPECT_TRUE(cc5 < cc6);
+  EXPECT_DOUBLE_EQ(cost1.safety_cost, 676.73517161369182);
+  EXPECT_DOUBLE_EQ(cost1.smoothness_cost, 0.0);
+  EXPECT_TRUE(cost1.cost_items.at(0));
+  EXPECT_FALSE(cost1.cost_items.at(1));
+  EXPECT_FALSE(cost1.cost_items.at(2));
 }
 
 }  // namespace planning
