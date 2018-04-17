@@ -73,6 +73,7 @@ using PadAdapter = Adapter<control::PadMessage>;
 using PerceptionObstaclesAdapter = Adapter<perception::PerceptionObstacles>;
 using PlanningAdapter = Adapter<planning::ADCTrajectory>;
 using PointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
+using ImageFrontAdapter = Adapter<::sensor_msgs::Image>;
 using ImageShortAdapter = Adapter<::sensor_msgs::Image>;
 using ImageLongAdapter = Adapter<::sensor_msgs::Image>;
 using PredictionAdapter = Adapter<prediction::PredictionObstacles>;

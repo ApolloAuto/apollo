@@ -29,6 +29,7 @@
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
 
 namespace apollo {
 namespace perception {
@@ -63,7 +64,7 @@ class VisualizationSubnode : public Subnode {
   LaneSharedData* lane_shared_data_ = nullptr;
   FusionSharedData* fusion_data_ = nullptr;
   std::unique_ptr<BaseVisualizer> frame_visualizer_;
-  MotionBufferPtr motion_buffer_;
+  MotionService* motion_service_ = nullptr;
   FrameContent content_;
 
   EventID vis_driven_event_id_;

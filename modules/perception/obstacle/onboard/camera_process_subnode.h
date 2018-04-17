@@ -21,6 +21,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "Eigen/Core"
@@ -32,6 +33,7 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/singleton.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
@@ -53,6 +55,7 @@
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/traffic_light/util/color_space.h"
 
 namespace apollo {
 namespace perception {
@@ -107,7 +110,6 @@ class CameraProcessSubnode : public Subnode {
   int32_t image_width_ = 1920;
   Eigen::Matrix4d camera_to_car_;
   Eigen::Matrix<double, 3, 4> intrinsics_;
-  CameraUndistortionPtr undistortion_handler_;
 
   // Modules
   std::unique_ptr<BaseCameraDetector> detector_;

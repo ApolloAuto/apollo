@@ -29,6 +29,7 @@
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
 
+
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2d);
 
 DECLARE_bool(async_fusion);
@@ -58,21 +59,27 @@ float PbfTrackObjectDistance::Compute(
   const PbfSensorObjectPtr &lidar_object = fused_track->GetLatestLidarObject();
   const PbfSensorObjectPtr &radar_object = fused_track->GetLatestRadarObject();
 
-  if (!FLAGS_async_fusion) {
+  if (FLAGS_use_navigation_mode) {
+    if (FLAGS_use_distance_angle_fusion) {
+      distance = ComputeDistanceAngleMatchProb(fused_object, sensor_object);
+    } else {
+      AERROR << "other distance method not supported for async fusion";
+    }
+  } else {
     if (is_lidar(sensor_type)) {
       if (lidar_object != nullptr) {
         distance = ComputeVelodyne64Velodyne64(fused_object, sensor_object,
                                                *ref_point);
       } else if (radar_object != nullptr) {
         distance =
-            ComputeVelodyne64Radar(sensor_object, fused_object, *ref_point);
+                ComputeVelodyne64Radar(sensor_object, fused_object, *ref_point);
       } else {
         AWARN << "All of the objects are nullptr";
       }
     } else if (is_radar(sensor_type)) {
       if (lidar_object != nullptr) {
         distance =
-            ComputeVelodyne64Radar(fused_object, sensor_object, *ref_point);
+                ComputeVelodyne64Radar(fused_object, sensor_object, *ref_point);
       } else if (radar_object != nullptr) {
         distance = std::numeric_limits<float>::max();
         //    distance = compute_radar_radar(fused_object, sensor_object,
@@ -82,12 +89,6 @@ float PbfTrackObjectDistance::Compute(
       }
     } else {
       AERROR << "fused sensor type is not support";
-    }
-  } else {
-    if (FLAGS_use_distance_angle_fusion) {
-      distance = ComputeDistanceAngleMatchProb(fused_object, sensor_object);
-    } else {
-      AERROR << "other distance method not supported for async fusion";
     }
   }
   return distance;
@@ -137,11 +138,11 @@ float PbfTrackObjectDistance::GetAngle(const ObjectPtr &obj) {
 float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
     const PbfSensorObjectPtr &fused_object,
     const PbfSensorObjectPtr &sensor_object) {
-  static float weight_x = 0.7;
-  static float weight_y = 0.3;
-  static float weight_range = 0.5;
-  static float weight_angle = 0.5;
-  static float angle_tolerance = 30;
+  static float weight_x = 0.8;
+  static float weight_y = 0.2;
+  static float speed_diff = 5;
+  static float epislon = 0.1;
+  static float angle_tolerance = 10;
 
   const ObjectPtr &fobj = fused_object->object;
   const ObjectPtr &sobj = sensor_object->object;
@@ -153,27 +154,59 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
 
   Eigen::Vector3d &fcenter = fobj->center;
   Eigen::Vector3d &scenter = sobj->center;
-  float range_distance_ratio = 0;
-  float angle_distance_ratio = 0;
+  float range_distance_ratio = (std::numeric_limits<float>::max)();
+  float angle_distance_diff = 0;
 
-  if (fcenter[0] > 0 && fcenter[1] > 0) {
-    range_distance_ratio =
-        weight_x * std::abs(fcenter[0] - scenter[0]) / fcenter[0] +
-        weight_y * std::abs(fcenter[1] - scenter[1]) / fcenter[1];
-  } else if (fcenter[0] > 0) {
-    range_distance_ratio = std::abs(fcenter[0] - scenter[0]) / fcenter[0];
-  } else if (fcenter[1] > 0) {
-    range_distance_ratio = std::abs(fcenter[1] - scenter[1]) / fcenter[1];
+  if (fcenter(0) > epislon && std::abs(fcenter(1)) > epislon) {
+    float x_ratio = std::abs(fcenter(0) - scenter(0)) / fcenter(0);
+    float y_ratio = std::abs(fcenter(1) - scenter(1)) / std::abs(fcenter(1));
+
+    if (x_ratio < FLAGS_pbf_fusion_assoc_distance_percent &&
+        y_ratio < FLAGS_pbf_fusion_assoc_distance_percent) {
+      range_distance_ratio =
+              weight_x * x_ratio +
+              weight_y * y_ratio;
+    }
+
+  } else if (fcenter(0) > epislon) {
+    float x_ratio = std::abs(fcenter(0) - scenter(0)) / fcenter(0);
+
+    if (x_ratio < FLAGS_pbf_fusion_assoc_distance_percent) {
+      range_distance_ratio = x_ratio;
+    }
+  } else if (std::abs(fcenter(1)) > epislon) {
+    float y_ratio = std::abs(fcenter(1) - scenter(1)) / std::abs(fcenter(1));
+
+    if (y_ratio < FLAGS_pbf_fusion_assoc_distance_percent) {
+      range_distance_ratio = y_ratio;
+    }
   }
 
   float sangle = GetAngle(sobj);
   float fangle = GetAngle(fobj);
+  angle_distance_diff =
+      (std::abs(sangle - fangle) * 180) / M_PI;
 
-  angle_distance_ratio =
-      (std::abs(sangle - fangle) * 180) / (angle_tolerance * M_PI);
+  float distance = range_distance_ratio;
 
-  float distance =
-      weight_range * range_distance_ratio + weight_angle * angle_distance_ratio;
+  if (is_radar(sensor_object->sensor_type)) {
+      double svelocity = sobj->velocity.norm();
+      double fvelocity = fobj->velocity.norm();
+      if (svelocity > 0 && fvelocity > 0) {
+        float cos_distance = sobj->velocity.dot(fobj->velocity)
+                             / (svelocity*fvelocity);
+        if (cos_distance > FLAGS_pbf_distance_speed_cos_diff) {
+            ADEBUG << "ignore radar data for fusing" << cos_distance;
+            distance = (std::numeric_limits<float>::max)();
+        }
+      }
+
+      if (std::abs(svelocity - fvelocity) > speed_diff ||
+          angle_distance_diff > angle_tolerance) {
+          ADEBUG << "ignore radar data for fusing" << speed_diff;
+          distance = (std::numeric_limits<float>::max)();
+      }
+  }
 
   return distance;
 }

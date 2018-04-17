@@ -16,5 +16,11 @@
 # limitations under the License.
 ###############################################################################
 
+# Get the absolute path.
+dir=$(cd "$(dirname "$1" )" && pwd)
+filename=$(basename $1)
+pathname="${dir}/${filename}" 
+#echo ${pathname}
 cd /apollo
-./bazel-bin/modules/planning/reference_line/smoother_util --input_file $1 --smooth_length $2
+./bazel-bin/modules/planning/reference_line/smoother_util --input_file ${pathname} --smooth_length $2
+

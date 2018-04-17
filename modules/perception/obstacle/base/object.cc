@@ -18,6 +18,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
+#include "modules/common/math/box2d.h"
 #include "modules/common/util/string_util.h"
 #include "modules/perception/common/perception_gflags.h"
 
@@ -27,13 +28,14 @@ namespace perception {
 using Eigen::Vector3d;
 using apollo::common::util::Print;
 using apollo::common::util::StrCat;
+using apollo::common::math::Vec2d;
+using apollo::common::math::Box2d;
 
 Object::Object() {
   cloud.reset(new pcl_util::PointCloud);
   type_probs.resize(static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0);
   position_uncertainty << 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01;
   velocity_uncertainty << 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01;
-  uncertainty << 0.01, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0.01;
 }
 
 void Object::clone(const Object& rhs) {
@@ -81,7 +83,24 @@ std::string Object::ToString() const {
                        static_cast<int>(type),
                        ", "
                        "is_background: ",
-                       is_background, "]"));
+                       is_background),
+                StrCat(", is_cipv: ", b_cipv, "]"));
+}
+
+// Add 4 corners in the polygon
+void Object::AddFourCorners(PerceptionObstacle* pb_obj) const {
+  Box2d object_bounding_box = {{center(0), center(1)}, theta, length, width};
+  std::vector<Vec2d> corners;
+  object_bounding_box.GetAllCorners(&corners);
+
+  for (const auto& corner : corners) {
+    Point* p = pb_obj->add_polygon_point();
+    p->set_x(corner.x());
+    p->set_y(corner.y());
+    p->set_z(0.0);
+  }
+  ADEBUG << "PerceptionObstacle bounding box is : "
+         << object_bounding_box.DebugString();
 }
 
 void Object::Serialize(PerceptionObstacle* pb_obj) const {
@@ -103,11 +122,17 @@ void Object::Serialize(PerceptionObstacle* pb_obj) const {
   pb_obj->set_width(width);
   pb_obj->set_height(height);
 
-  for (auto point : polygon.points) {
-    Point* p = pb_obj->add_polygon_point();
-    p->set_x(point.x);
-    p->set_y(point.y);
-    p->set_z(point.z);
+  if (polygon.size() /*pb_obs.polygon_point_size() */ >= 4) {
+    for (auto point : polygon.points) {
+      Point* p = pb_obj->add_polygon_point();
+      p->set_x(point.x);
+      p->set_y(point.y);
+      p->set_z(point.z);
+    }
+  } else {  // if polygon size is less than 4
+    // Generate polygon from center position, width, height
+    // and orientation of the object
+    AddFourCorners(pb_obj);
   }
 
   if (FLAGS_is_serialize_point_cloud) {

@@ -26,8 +26,8 @@ int HDMap::LoadMapFromFile(const std::string& map_filename) {
 }
 
 int HDMap::LoadMapFromProto(const Map& map_proto) {
-  AINFO << "Loading HDMap with header: "
-        << map_proto.header().ShortDebugString();
+  ADEBUG << "Loading HDMap with header: "
+         << map_proto.header().ShortDebugString();
   return impl_.LoadMapFromProto(map_proto);
 }
 

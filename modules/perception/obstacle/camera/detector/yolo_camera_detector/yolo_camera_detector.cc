@@ -27,34 +27,22 @@
 #include "modules/perception/obstacle/camera/common/util.h"
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/util.h"
 
-DEFINE_string(yolo_config_filename, "config.pt", "Yolo config filename.");
-
 namespace apollo {
 namespace perception {
 
 using std::string;
 using std::vector;
 using std::unordered_map;
+using apollo::common::util::GetProtoFromFile;
 
 bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
-  ConfigManager *config_manager = ConfigManager::instance();
-  string model_name = this->Name();
-  const ModelConfig *model_config = config_manager->GetModelConfig(model_name);
-  if (model_config == nullptr) {
-    AERROR << "not found model: " << model_name;
-    return false;
-  }
-  string work_root = config_manager->WorkRoot();
+  // load yolo camera detector config file to proto
+  CHECK(GetProtoFromFile(FLAGS_yolo_camera_detector_config, &config_));
 
-  string yolo_root;
-  if (!model_config->GetValue("yolo_root", &yolo_root)) {
-    AERROR << "yolo_root not found.";
-    return false;
-  }
-  yolo_root = apollo::common::util::GetAbsolutePath(work_root, yolo_root);
-
+  const string &yolo_root = config_.yolo_root();
   const string yolo_config = apollo::common::util::GetAbsolutePath(
       yolo_root, FLAGS_yolo_config_filename);
+
   CHECK(apollo::common::util::GetProtoFromASCIIFile(yolo_config, &yolo_param_));
   load_intrinsic(options);
   if (!init_cnn(yolo_root)) {
@@ -125,8 +113,8 @@ void YoloCameraDetector::load_intrinsic(
   int resized_width = model_param.resized_width();
   int aligned_pixel = model_param.aligned_pixel();
   confidence_threshold_ = model_param.confidence_threshold();
-  _min_2d_height = model_param.min_2d_height();
-  _min_3d_height = model_param.min_3d_height();
+  min_2d_height_ = model_param.min_2d_height();
+  min_3d_height_ = model_param.min_3d_height();
 
   // inference input shape
   if (options.intrinsic == nullptr) {
@@ -140,22 +128,23 @@ void YoloCameraDetector::load_intrinsic(
 
   offset_y_ = static_cast<int>(offset_ratio * image_height_ + .5);
   float roi_ratio = cropped_ratio * image_height_ / image_width_;
-  width_ = static_cast<int>(resized_width + aligned_pixel / 2) / aligned_pixel *
-           aligned_pixel;
+  width_ = static_cast<int>(resized_width + aligned_pixel / 2) /
+      aligned_pixel * aligned_pixel;
   height_ = static_cast<int>(width_ * roi_ratio + aligned_pixel / 2) /
-            aligned_pixel * aligned_pixel;
-  AINFO << "image_height=" << image_height_ << ", "
-        << "image_width=" << image_width_ << ", "
-        << "roi_ratio=" << roi_ratio;
-  AINFO << "offset_y=" << offset_y_ << ", height=" << height_
-        << ", width=" << width_;
-  _min_2d_height /= height_;
+      aligned_pixel * aligned_pixel;
+  ADEBUG << "image_height=" << image_height_ << ", "
+         << "image_width=" << image_width_ << ", "
+         << "roi_ratio=" << roi_ratio;
+  ADEBUG << "offset_y=" << offset_y_ << ", height=" << height_
+         << ", width=" << width_;
+
+  min_2d_height_ /= height_;
 
   int roi_w = image_width_;
   int roi_h = image_height_ - offset_y_;
 
-  AINFO << "roi_w=" << roi_w << ", "
-        << "roi_h=" << roi_h;
+  ADEBUG << "roi_w=" << roi_w << ", "
+         << "roi_h=" << roi_h;
 
   int channel = 3;
   image_data_.reset(
@@ -185,8 +174,6 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
 
   vector<string> input_names;
   vector<string> output_names;
-  // init Net
-
   input_names.push_back(net_param.input_blob());
   output_names.push_back(net_param.loc_blob());
   output_names.push_back(net_param.obj_blob());
@@ -204,7 +191,7 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   }
 
   // init Net
-  AINFO << "model_type=" << model_type;
+  ADEBUG << "model_type=" << model_type;
   switch (model_type) {
     case obstacle::yolo::ModelType::Caffe:
       cnnadapter_.reset(new CNNCaffe);
@@ -239,10 +226,10 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
     string track_model = feat_param.remap_model();
     track_model =
         apollo::common::util::GetAbsolutePath(model_root, track_model);
-    AINFO << "Using tracking model: " << track_model;
+    ADEBUG << "Using tracking model: " << track_model;
     projector_.reset(new MatrixProjector(track_model));
   } else {
-    AINFO << "Using DummyProjector for tracking!";
+    ADEBUG << "Using DummyProjector for tracking!";
     projector_.reset(new DummyProjector);
   }
   extractors_.resize(feat_param.extractor_size());
@@ -323,30 +310,35 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
     resize(frame(roi), input_blob.get(), image_data_, 0);
   }
   pre_time.Stop();
-  AINFO << "Pre-processing: " << pre_time.MilliSeconds() << " ms";
+  ADEBUG << "Pre-processing: " << pre_time.MilliSeconds() << " ms";
 
   /////////////////////////// detection part ///////////////////////////
   caffe::Timer det_time;
   det_time.Start();
   cnnadapter_->forward();
-  AINFO << "Running detection: " << det_time.MilliSeconds() << " ms";
+  ADEBUG << "Running detection: " << det_time.MilliSeconds() << " ms";
   caffe::Timer post_time;
   post_time.Start();
 
   vector<VisualObjectPtr> temp_objects;
 
-  get_objects_cpu(&temp_objects);
+  if (FLAGS_obs_camera_detector_gpu >= 0) {
+    ADEBUG << "Get objects by GPU";
+    get_objects_gpu(&temp_objects);
+  } else {
+    get_objects_cpu(&temp_objects);
+  }
 
-  AINFO << "object size = " << temp_objects.size();
+  ADEBUG << "object size = " << temp_objects.size();
   for (int i = 0; i < static_cast<int>(temp_objects.size()); ++i) {
     VisualObjectPtr obj = (temp_objects)[i];
-    AINFO << "type prob size for object" << i << " is "
-          << sizeof(obj->type_probs) << " (" << obj << ")";
-    AINFO << "prob: " << obj->type_probs[static_cast<int>(obj->type)];
-    AINFO << "object feature size for object" << i << " is "
-          << obj->object_feature.size();
-    AINFO << "internal type probs size for object" << i << " is "
-          << sizeof(obj->internal_type_probs);
+    ADEBUG << "type prob size for object" << i << " is "
+           << sizeof(obj->type_probs) << " (" << obj << ")";
+    ADEBUG << "prob: " << obj->type_probs[static_cast<int>(obj->type)];
+    ADEBUG << "object feature size for object" << i << " is "
+           << obj->object_feature.size();
+    ADEBUG << "internal type probs size for object" << i << " is "
+           << sizeof(obj->internal_type_probs);
   }
 
   auto ori_blob =
@@ -358,21 +350,21 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
     int total_obj_idx = 0;
     while (total_obj_idx < static_cast<int>(temp_objects.size())) {
       const auto &obj = temp_objects[total_obj_idx];
-      if ((obj->lower_right[1] - obj->upper_left[1]) >= _min_2d_height &&
-          (_min_3d_height <= 0 || obj->height >= _min_3d_height)) {
+      if ((obj->lower_right[1] - obj->upper_left[1]) >= min_2d_height_ &&
+          (min_3d_height_ <= 0 || obj->height >= min_3d_height_)) {
         objects->push_back(temp_objects[total_obj_idx]);
         ++valid_obj_idx;
       }
       ++total_obj_idx;
     }
-    AINFO << valid_obj_idx << " of " << total_obj_idx << " obstacles kept";
+    ADEBUG << valid_obj_idx << " of " << total_obj_idx << " obstacles kept";
   }
   for (size_t i = 0; i < temp_objects.size(); ++i) {
     temp_objects[i].reset();
   }
   temp_objects.clear();
-  AINFO << "Post-processing: " << post_time.MilliSeconds() << " ms";
-  AINFO << "Number of detected obstacles: " << objects->size();
+  ADEBUG << "Post-processing: " << post_time.MilliSeconds() << " ms";
+  ADEBUG << "Number of detected obstacles: " << objects->size();
 
   Extract(objects);
   yolo::recover_bbox(roi_w, roi_h, offset_y_, objects);
@@ -387,7 +379,7 @@ bool YoloCameraDetector::Detect(const cv::Mat &frame,
       obj->score = std::max(obj->score, prob);
     }
 
-    AINFO << "obj-" << det_id << ": " << obj->object_feature.size();
+    ADEBUG << "obj-" << det_id << ": " << obj->object_feature.size();
     det_id++;
   }
 
@@ -445,8 +437,139 @@ bool YoloCameraDetector::get_objects_cpu(
   const float *cpu_cls_data =
       static_cast<const float *>(res_cls_tensor_->cpu_data());
 
-  unordered_map<int, vector<int> > indices;
-  unordered_map<int, vector<float> > conf_scores;
+  unordered_map<int, vector<int>> indices;
+  unordered_map<int, vector<float>> conf_scores;
+  int num_kept = 0;
+  for (int k = 0; k < num_classes; k++) {
+    apply_nms_gpu(static_cast<const float *>(res_box_tensor_->gpu_data()),
+                  cpu_cls_data + k * obj_size_, obj_size_,
+                  confidence_threshold_, top_k_, nms_.threshold,
+                  &(indices[static_cast<int>(types_[k])]), overlapped_,
+                  idx_sm_);
+    num_kept += indices[static_cast<int>(types_[k])].size();
+    vector<float> conf_score(cpu_cls_data + k * obj_size_,
+                             cpu_cls_data + (k + 1) * obj_size_);
+    conf_scores.insert(std::make_pair(static_cast<int>(types_[k]), conf_score));
+  }
+  if (num_kept == 0) {
+    ADEBUG << "Couldn't find any detections";
+    return true;
+  }
+
+  objects->clear();
+  objects->reserve(num_kept);
+  const float *cpu_box_data =
+      static_cast<const float *>(res_box_tensor_->cpu_data());
+
+  for (auto it = indices.begin(); it != indices.end(); ++it) {
+    int label = it->first;
+    if (conf_scores.find(label) == conf_scores.end()) {
+      // Something bad happened if there are no predictions for current label.
+      AERROR << "Could not find confidence predictions for " << label;
+      continue;
+    }
+
+    const vector<float> &scores = conf_scores.find(label)->second;
+    vector<int> &indice = it->second;
+    for (int j = 0; j < static_cast<int>(indice.size()); ++j) {
+      int idx = indice[j];
+      const float *bbox = cpu_box_data + idx * s_box_block_size;
+      if (scores[idx] < confidence_threshold_) {
+        continue;
+      }
+
+      VisualObjectPtr obj(new VisualObject);
+      obj->type = static_cast<ObjectType>(label);
+      obj->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
+                             0.0f);
+      for (int k = 0; k < num_classes; ++k) {
+        int type_k = static_cast<int>(types_[k]);
+        obj->type_probs[type_k] = conf_scores[type_k][idx];
+      }
+      obj->upper_left[0] = bbox[0];
+      obj->upper_left[1] = bbox[1];
+      obj->lower_right[0] = bbox[2];
+      obj->lower_right[1] = bbox[3];
+
+      if (with_ori) {
+        obj->alpha = bbox[4];
+      }
+
+      if (with_dim) {
+        obj->height = bbox[5];
+        obj->width = bbox[6];
+        obj->length = bbox[7];
+      }
+
+      if (with_lof) {
+        obj->front_upper_left[0] = bbox[8];
+        obj->front_upper_left[1] = bbox[9];
+        obj->front_lower_right[0] = bbox[10];
+        obj->front_lower_right[1] = bbox[11];
+      }
+
+      if (with_lor) {
+        obj->back_upper_left[0] = bbox[12];
+        obj->back_upper_left[1] = bbox[13];
+        obj->back_lower_right[0] = bbox[14];
+        obj->back_lower_right[1] = bbox[15];
+      }
+
+      obj->object_feature.clear();
+      objects->push_back(obj);
+    }
+  }
+
+  return true;
+}
+bool YoloCameraDetector::get_objects_gpu(
+    std::vector<VisualObjectPtr> *objects) {
+  auto loc_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().loc_blob());
+  auto obj_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().obj_blob());
+  auto cls_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().cls_blob());
+  auto dim_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().dim_blob());
+  auto ori_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().ori_blob());
+  auto lof_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().lof_blob());
+  auto lor_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().lor_blob());
+  const float *anchor_data = static_cast<const float *>(anchor_->gpu_data());
+  int num_classes = types_.size();
+  int obj_batch = obj_blob->num();
+  int obj_height = obj_blob->channels();
+  int obj_width = obj_blob->height();
+  CHECK_EQ(obj_batch, 1) << "batch size should be 1!";
+  bool with_lof = lof_blob != nullptr;
+  bool with_lor = lor_blob != nullptr;
+  bool with_ori = ori_blob != nullptr;
+  bool with_dim = dim_blob != nullptr;
+  const float *ori_data = with_ori ? ori_blob->gpu_data() : nullptr;
+  const float *dim_data = with_dim ? dim_blob->gpu_data() : nullptr;
+  const float *lof_data = with_lof ? lof_blob->gpu_data() : nullptr;
+  const float *lor_data = with_lor ? lor_blob->gpu_data() : nullptr;
+  if (res_box_tensor_ == nullptr || res_cls_tensor_ == nullptr ||
+      overlapped_ == nullptr) {
+    return false;
+  }
+  GetObjectsGPU(obj_size_, (const float *)loc_blob->gpu_data(),
+                (const float *)obj_blob->gpu_data(),
+                (const float *)cls_blob->gpu_data(), ori_data, dim_data,
+                lof_data, lor_data, anchor_data, obj_width, obj_height,
+                num_anchors_, num_classes, confidence_threshold_, with_ori,
+                with_dim, with_lof, with_lor,
+                static_cast<float *>(res_box_tensor_->mutable_gpu_data()),
+                static_cast<float *>(res_cls_tensor_->mutable_gpu_data()),
+                s_box_block_size);
+  const float *cpu_cls_data =
+      static_cast<const float *>(res_cls_tensor_->cpu_data());
+
+  unordered_map<int, vector<int>> indices;
+  unordered_map<int, vector<float>> conf_scores;
   int num_kept = 0;
   for (int k = 0; k < num_classes; k++) {
     apply_nms_gpu(static_cast<const float *>(res_box_tensor_->gpu_data()),
@@ -527,7 +650,6 @@ bool YoloCameraDetector::get_objects_cpu(
       objects->push_back(obj);
     }
   }
-
   return true;
 }
 

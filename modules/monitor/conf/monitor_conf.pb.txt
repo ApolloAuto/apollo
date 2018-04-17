@@ -26,6 +26,12 @@ modules {
   }
 }
 modules {
+  name: "navigation_camera"
+  process_conf {
+    process_cmd_keywords: "camera_nodelet_manager"
+  }
+}
+modules {
   name: "navigation_control"
   process_conf {
     process_cmd_keywords: "modules/control/control"
@@ -159,6 +165,12 @@ modules {
 }
 modules {
   name: "velodyne"
+  process_conf {
+    process_cmd_keywords: "velodyne_nodelet_manager"
+  }
+}
+modules {
+  name: "velodyne_16"
   process_conf {
     process_cmd_keywords: "velodyne_nodelet_manager"
   }

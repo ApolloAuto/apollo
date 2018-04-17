@@ -27,6 +27,7 @@ export default class Options {
     @observable showPlanningDpOptimizer = PARAMETERS.options.defaults.showPlanningDpOptimizer;
     @observable showPlanningQpOptimizer = PARAMETERS.options.defaults.showPlanningQpOptimizer;
     @observable showRouting = PARAMETERS.options.defaults.showRouting;
+    @observable showPerceptionLaneMarker = PARAMETERS.options.defaults.showPerceptionLaneMarker;
     @observable showPredictionMajor = PARAMETERS.options.defaults.showPredictionMajor;
     @observable showPredictionMinor = PARAMETERS.options.defaults.showPredictionMinor;
     @observable showObstaclesVehicle = PARAMETERS.options.defaults.showObstaclesVehicle;
@@ -40,6 +41,8 @@ export default class Options {
         PARAMETERS.options.defaults.showObstaclesUnknown;
     @observable showObstaclesVirtual =
         PARAMETERS.options.defaults.showObstaclesVirtual;
+    @observable showObstaclesCipv =
+        PARAMETERS.options.defaults.showObstaclesCipv;
     @observable showObstaclesVelocity =
         PARAMETERS.options.defaults.showObstaclesVelocity;
     @observable showObstaclesHeading =
@@ -67,6 +70,8 @@ export default class Options {
         'planningQpOptimizer': true,
         'planningDpOptimizer': true,
         'planningReference': true,
+        'perceptionPointCloud': OFFLINE_PLAYBACK,
+        'perceptionLaneMarker': OFFLINE_PLAYBACK,
     };
 
 
@@ -99,7 +104,9 @@ export default class Options {
 
         if (option === "showPNCMonitor") {
             Object.keys(this.hideOptionToggle).map((toggle) => {
-                this.hideOptionToggle[toggle] = !this[option];
+                if (toggle.startsWith("planning")) {
+                    this.hideOptionToggle[toggle] = !this[option];
+                }
             });
         }
     }

@@ -25,8 +25,8 @@
 #include "opencv2/opencv.hpp"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "modules/common/log.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/base_type.h"
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_TYPE_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_TYPE_H_
@@ -34,12 +34,8 @@
 namespace apollo {
 namespace perception {
 
-#ifndef UF_BLOCK_WIDTH
-#define UF_BLOCK_WIDTH 32
-#endif
-
-#ifndef UF_BLOCK_HEIGHT
-#define UF_BLOCK_HEIGHT 16
+#ifndef MAX_LANE_HISTORY
+#define MAX_LANE_HISTORY 10
 #endif
 
 #ifndef MAX_GROUP_PREDICTION_MARKER_NUM
@@ -58,7 +54,16 @@ namespace perception {
 #define MIN_BETWEEN_LANE_DISTANCE 2.5
 #endif
 
-typedef float ScalarType;
+#ifndef AVEAGE_LANE_WIDTH_METER
+#define AVEAGE_LANE_WIDTH_METER 3.7
+#endif
+
+constexpr ScalarType INVERSE_AVEAGE_LANE_WIDTH_METER
+                     = 1.0 / AVEAGE_LANE_WIDTH_METER;
+
+#ifndef INF_NON_MASK_POINT_X
+#define INF_NON_MASK_POINT_X 10000
+#endif
 
 constexpr ScalarType kEpsilon = 1e-5;
 
@@ -196,22 +201,13 @@ struct LaneInstance {
   }
 };
 
-struct L3CubicCurve {
+struct CubicCurve {
   float x_start;
   float x_end;
   float a;
   float b;
   float c;
   float d;
-};
-
-struct L3LaneInfo {
-  int lane_id;
-  int left_idx;
-  int right_idx;
-  float lane_width;
-  int carleft_idx;
-  int carright_idx;
 };
 
 struct LaneObject {
@@ -238,23 +234,25 @@ struct LaneObject {
   PolyModel model;
   ScalarType lateral_distance = 0.0;
 
-  L3CubicCurve pos_curve;
-  L3CubicCurve img_curve;
-  L3LaneInfo lane_info;
+  CubicCurve pos_curve;
+  CubicCurve img_curve;
+  // L3LaneInfo lane_info;
   double timestamp = 0.0;
   int32_t seq_num = 0;
 
-  LaneMarker ToLaneMarkerProto() {
-    LaneMarker lane_marker;
-    // TODO(All): calculate confidence for all points
-    lane_marker.set_quality(confidence.front());
-    lane_marker.set_model_degree(MAX_POLY_ORDER);
-    lane_marker.set_c0_position(model(0, 0));
-    lane_marker.set_c1_heading_angle(model(1, 0));
-    lane_marker.set_c2_curvature(model(2, 0));
-    lane_marker.set_c3_curvature_derivative(model(3, 0));
-    lane_marker.set_view_range(longitude_end - longitude_start);
-    return lane_marker;
+  // @brief: write to LaneMarker protobuf message API
+  void ToLaneMarkerProto(LaneMarker* lane_marker) const {
+    // set a constant quality value 1.0 as temporary use
+    lane_marker->set_quality(1.0);
+    lane_marker->set_model_degree(MAX_POLY_ORDER);
+    lane_marker->set_c0_position(model(0));
+    lane_marker->set_c1_heading_angle(model(1));
+    lane_marker->set_c2_curvature(model(2));
+    lane_marker->set_c3_curvature_derivative(model(3));
+    lane_marker->set_view_range(std::max(longitude_end,
+                                         static_cast<ScalarType>(0)));
+    lane_marker->set_longitude_start(longitude_start);
+    lane_marker->set_longitude_end(longitude_end);
   }
 
   std::string GetSpatialLabel() const {
@@ -278,21 +276,6 @@ struct LaneObject {
   }
 };
 
-// struct for L3 Lane information
-struct L3LaneLine {
-  SpatialLabelType spatial;
-  SemanticLabelType semantic;
-  L3CubicCurve pos_curve;
-  L3CubicCurve img_curve;
-};
-
-struct RoadInfo {
-  double timestamp = 0.0;
-  int32_t seq_num = 0;
-  std::vector<L3LaneLine> lane_line_vec;
-  std::vector<L3LaneInfo> lane_vec;
-};
-
 typedef std::vector<LaneObject> LaneObjects;
 typedef std::shared_ptr<LaneObjects> LaneObjectsPtr;
 typedef const std::shared_ptr<LaneObjects> LaneObjectsConstPtr;
@@ -301,6 +284,8 @@ typedef std::vector<LaneInstance> LaneInstances;
 typedef std::shared_ptr<LaneInstances> LaneInstancesPtr;
 typedef const std::shared_ptr<LaneInstances> LaneInstancesConstPtr;
 
+void LaneObjectsToLaneMarkerProto(const LaneObjects& lane_objects,
+                                  LaneMarkers* lane_markers);
 }  // namespace perception
 }  // namespace apollo
 

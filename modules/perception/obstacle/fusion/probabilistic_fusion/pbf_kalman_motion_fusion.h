@@ -14,11 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_ // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_ // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_  // NOLINT
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_  // NOLINT
+
+#include <deque>
 #include <utility>
 #include <vector>
-#include <deque>
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
@@ -70,6 +72,13 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @return nothing
   void GetState(Eigen::Vector3d *anchor_point, Eigen::Vector3d *velocity);
 
+  // @brief set current state of the filter
+  // @params[IN] anchor_point: updated anchor_point
+  // @params[IN] velocity: updated velocity
+  // @return nothing
+  void SetState(const Eigen::Vector3d &anchor_point,
+                const Eigen::Vector3d &velocity);
+
  protected:
   int GetRadarHistoryLength();
 
@@ -114,4 +123,4 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_ // NOLINT
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_  // NOLINT

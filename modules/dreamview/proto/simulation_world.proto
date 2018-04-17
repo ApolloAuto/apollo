@@ -134,6 +134,7 @@ message Object {
     BICYCLE = 4;  // bike, motor bike.
     VEHICLE = 5;  // passenger car or truck.
     VIRTUAL = 6; // virtual object created by decision module.
+    CIPV = 7; // closest in-path vehicle determined by perception module.
   };
 
   optional Type type = 29;  // obstacle type

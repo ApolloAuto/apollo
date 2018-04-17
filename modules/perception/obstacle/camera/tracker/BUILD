@@ -6,7 +6,10 @@ cc_library(
     name = "base_affinity",
     srcs = [],
     hdrs = ["base_affinity_tracker.h"],
-    deps = ["@opencv2//:core"],
+    deps = [
+        "@opencv2//:core",
+        "@eigen",
+    ],
 )
 
 cc_library(

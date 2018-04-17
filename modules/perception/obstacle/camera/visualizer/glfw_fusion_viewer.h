@@ -195,8 +195,8 @@ class GLFWFusionViewer {
   void draw_objects(const std::vector<ObjectPtr> &objects,
                     const Eigen::Matrix4d &w2c, bool draw_cube,
                     bool draw_velocity, const Eigen::Vector3f &color,
-                    bool use_class_color);
-  bool draw_objects(FrameContent *content, bool draw_cube, bool draw_velocity);
+                    bool use_class_color, bool use_track_color = true);
+
   void draw_3d_classifications(FrameContent *content, bool show_fusion);
   void draw_camera_box(const std::vector<ObjectPtr> &objects,
                        Eigen::Matrix4d w2c, int offset_x, int offset_y,
@@ -285,10 +285,11 @@ class GLFWFusionViewer {
 
   Eigen::Matrix<double, 3, 4> camera_intrinsic_;  // camera intrinsic
 
-  bool show_fusion_pc_;
+  bool show_fusion_;
   bool show_radar_pc_;
-  bool _show_camera_box2d;     // show 2d bbox in camera frame
-  bool _show_camera_box3d;     // show 3d bbox in camera frame
+  bool show_camera_box2d_;  // show 2d bbox in camera frame
+  bool show_camera_box3d_;  // show 3d bbox in camera frame
+  bool show_camera_bdv_;
   bool show_associate_color_;  // show same color for both 3d pc bbox and camera
                                // bbox
   bool show_type_id_label_;
@@ -301,6 +302,11 @@ class GLFWFusionViewer {
   LaneObjectsPtr lane_objects_;
   float lane_map_threshold_;
 
+  LaneObjectsPtr lane_history_;
+  //  std::vector<LaneObjects> Lane_history_buffer_;
+  const std::size_t lane_history_buffer_size_ = 400;
+  const std::size_t object_history_size_ = 5;
+  Eigen::Matrix3f motion_matrix_;
   // pin-hole camera model with distortion
   std::shared_ptr<CameraDistort<double>> distort_camera_intrinsic_;
 

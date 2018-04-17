@@ -40,6 +40,7 @@ DECLARE_double(replay_timestamp_gap);
 
 // Map
 DECLARE_double(lane_search_radius);
+DECLARE_double(lane_search_radius_in_junction);
 DECLARE_double(junction_search_radius);
 
 // Obstacle features
@@ -62,6 +63,9 @@ DECLARE_double(target_lane_gap);
 DECLARE_int32(max_num_current_lane);
 DECLARE_int32(max_num_nearby_lane);
 DECLARE_double(max_lane_angle_diff);
+DECLARE_int32(max_num_current_lane_in_junction);
+DECLARE_int32(max_num_nearby_lane_in_junction);
+DECLARE_double(max_lane_angle_diff_in_junction);
 DECLARE_bool(enable_pedestrian_acc);
 DECLARE_double(coeff_mul_sigma);
 DECLARE_double(pedestrian_max_speed);
@@ -75,7 +79,8 @@ DECLARE_double(valid_position_diff_threshold);
 DECLARE_double(valid_position_diff_rate_threshold);
 DECLARE_double(split_rate);
 DECLARE_double(rnn_min_lane_relatice_s);
-DECLARE_bool(enable_adjust_velocity_heading);
+DECLARE_bool(adjust_velocity_by_obstacle_heading);
+DECLARE_bool(adjust_velocity_by_position_shift);
 DECLARE_double(heading_filter_param);
 
 // Cost evaluator

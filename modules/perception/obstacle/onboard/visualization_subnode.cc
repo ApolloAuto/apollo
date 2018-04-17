@@ -66,8 +66,18 @@ bool VisualizationSubnode::InitInternal() {
     AINFO << "Init shared datas successfully, data: "
           << camera_shared_data_->name();
   }
-
-  // init radar object data
+  // init cipv object data
+  if (cipv_event_id_ != -1) {
+    cipv_object_data_ = dynamic_cast<CIPVObjectData*>(
+          shared_data_manager_->GetSharedData("CIPVObjectData"));
+    if (cipv_object_data_ == nullptr) {
+            AERROR << "Failed to get CIPVObjectData.";
+            return false;
+    }
+    AINFO << "Init shared datas successfully, data: "
+          << cipv_object_data_->name();
+  }
+  //  init radar object data
   if (radar_event_id_ != -1) {
     radar_object_data_ = dynamic_cast<RadarObjectData*>(
         shared_data_manager_->GetSharedData("RadarObjectData"));
@@ -92,9 +102,12 @@ bool VisualizationSubnode::InitInternal() {
 
   // init motion service
   if (motion_event_id_ != -1) {
-    MotionService* motion_service = dynamic_cast<MotionService*>(
+      motion_service_ = dynamic_cast<MotionService*>(
         DAGStreaming::GetSubnodeByName("MotionService"));
-    motion_service->GetMotionBuffer(motion_buffer_);
+    if (motion_service_ == nullptr) {
+      AERROR << "motion service not inited";
+      return false;
+    }
   }
 
   if (lane_event_id_ != -1) {
@@ -232,16 +245,14 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
     content->set_camera_content(timestamp, objs->sensor2world_pose,
                                 objs->objects,
                                 (*(objs->camera_frame_supplement)));
-
-    LaneObjectsPtr lane_objs;
-    if (!lane_shared_data_->Get(data_key, &lane_objs) || lane_objs == nullptr) {
-      AERROR << "Failed to get shared data: " << lane_shared_data_->name();
-      return;
-    }
-    content->set_lane_content(timestamp, *lane_objs);
   } else if (event.event_id == motion_event_id_) {
-    if (FLAGS_show_motion) {
-      content->set_motion_content(timestamp, motion_buffer_);
+//    AINFO << "Vis_subnode: motion_event_id_" << motion_event_id_;
+    // TODO(gchen-apollo): add lock to read motion_buffer
+    MotionBufferPtr motion_buffer = motion_service_->GetMotionBuffer();
+    if (motion_buffer == nullptr) {
+      AINFO << "motion_buffer is null";
+    } else {
+      content->set_motion_content(timestamp, motion_buffer);
     }
   } else if (event.event_id == radar_event_id_) {
     if (device_id == "radar_front" && FLAGS_show_radar_objects) {
@@ -253,7 +264,8 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
       content->set_radar_content(timestamp, objs->objects);
     }
   } else if (event.event_id == fusion_event_id_) {
-    if (FLAGS_show_fused_objects) {
+    bool show_fused_objects = true;
+    if (show_fused_objects) {
       AINFO << "vis_driven_event data_key = " << data_key;
       SharedDataPtr<FusionItem> fusion_item;
       if (!fusion_data_->Get(data_key, &fusion_item) ||
@@ -304,7 +316,6 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
       AERROR << "Failed to get shared data: " << lane_shared_data_->name();
       return;
     }
-
     content->set_lane_content(timestamp, *lane_objs);
   }
 
@@ -315,6 +326,7 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
 
 apollo::common::Status VisualizationSubnode::ProcEvents() {
   for (auto event_meta : sub_meta_events_) {
+//    AINFO <<"Vis_sub: event_meta id: " << event_meta.event_id;
     std::vector<Event> events;
     if (!SubscribeEvents(event_meta, &events)) {
       return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");

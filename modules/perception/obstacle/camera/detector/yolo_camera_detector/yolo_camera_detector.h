@@ -25,7 +25,9 @@
 #include "caffe/caffe.hpp"
 
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/proto/yolo.pb.h"
+#include "modules/perception/proto/yolo_camera_detector_config.pb.h"
 
+#include "modules/perception/cuda_util/network.h"
 #include "modules/perception/cuda_util/region_output.h"
 #include "modules/perception/cuda_util/util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -72,6 +74,7 @@ class YoloCameraDetector : public BaseCameraDetector {
   void init_anchor(const std::string &yolo_root);
 
   bool get_objects_cpu(std::vector<VisualObjectPtr> *objects);
+  bool get_objects_gpu(std::vector<VisualObjectPtr> *objects);
 
   void get_object_helper(int idx, const float *loc_data, const float *obj_data,
                          const float *cls_data, const float *ori_data,
@@ -92,9 +95,9 @@ class YoloCameraDetector : public BaseCameraDetector {
   std::shared_ptr<SyncedMemory> anchor_ = nullptr;
   int height_ = 0;
   int width_ = 0;
-  float _min_2d_height = 0;
-  float _min_3d_height = 0;
-  float top_k_ = 1000;
+  float min_2d_height_ = 0.0f;
+  float min_3d_height_ = 0.0f;
+  int top_k_ = 1000;
   int obj_size_ = 0;
   int output_height_ = 0;
   int output_width_ = 0;
@@ -106,13 +109,15 @@ class YoloCameraDetector : public BaseCameraDetector {
   std::vector<ObjectType> types_;
   int offset_y_ = 0;
   NMSParam nms_;
-  float inter_cls_nms_thresh_ = 1;
-  float cross_class_merge_threshold_ = 1;
-  float confidence_threshold_ = 0.1;
+  float inter_cls_nms_thresh_ = 1.0f;
+  float cross_class_merge_threshold_ = 1.0f;
+  float confidence_threshold_ = 0.1f;
   std::shared_ptr<BaseProjector> projector_;
   obstacle::yolo::YoloParam yolo_param_;
   int image_height_ = 0;
   int image_width_ = 0;
+
+  yolo_camera_detector_config::ModelConfigs config_;
 };
 
 REGISTER_CAMERA_DETECTOR(YoloCameraDetector);

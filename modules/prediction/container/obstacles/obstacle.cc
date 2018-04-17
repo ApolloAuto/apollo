@@ -41,6 +41,7 @@ using ::apollo::common::Point3D;
 using ::apollo::common::math::KalmanFilter;
 using ::apollo::common::util::FindOrDie;
 using ::apollo::common::util::FindOrNull;
+using ::apollo::common::PathPoint;
 using ::apollo::hdmap::LaneInfo;
 using ::apollo::perception::PerceptionObstacle;
 
@@ -218,7 +219,7 @@ void Obstacle::UpdateStatus(Feature* feature) {
   double velocity_y = state(3, 0);
   double speed = std::hypot(velocity_x, velocity_y);
   double velocity_heading = std::atan2(velocity_y, velocity_x);
-  if (FLAGS_enable_adjust_velocity_heading) {
+  if (FLAGS_adjust_velocity_by_position_shift) {
     UpdateVelocity(feature->theta(), &velocity_x, &velocity_y,
                    &velocity_heading, &speed);
   }
@@ -370,9 +371,13 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
   }
 
   double speed = std::hypot(velocity_x, velocity_y);
-  double velocity_heading = perception_obstacle.theta();
+  double velocity_heading = std::atan2(velocity_y, velocity_x);
+  if (FLAGS_adjust_velocity_by_obstacle_heading) {
+    velocity_heading = perception_obstacle.theta();
+  }
 
-  if (!FLAGS_use_navigation_mode && FLAGS_enable_adjust_velocity_heading &&
+  if (!FLAGS_use_navigation_mode &&
+      FLAGS_adjust_velocity_by_position_shift &&
       history_size() > 0) {
     double diff_x =
         feature->position().x() - feature_history_.front().position().x();
@@ -676,9 +681,18 @@ void Obstacle::UpdateKFPedestrianTracker(const Feature& feature) {
 void Obstacle::SetCurrentLanes(Feature* feature) {
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
   double heading = feature->velocity_heading();
+  int max_num_lane = FLAGS_max_num_current_lane;
+  double max_angle_diff = FLAGS_max_lane_angle_diff;
+  double lane_search_radius = FLAGS_lane_search_radius;
+  if (PredictionMap::InJunction(point, FLAGS_junction_search_radius)) {
+    max_num_lane = FLAGS_max_num_current_lane_in_junction;
+    max_angle_diff = FLAGS_max_lane_angle_diff_in_junction;
+    lane_search_radius = FLAGS_lane_search_radius_in_junction;
+  }
   std::vector<std::shared_ptr<const LaneInfo>> current_lanes;
   PredictionMap::OnLane(current_lanes_, point, heading,
-                        FLAGS_lane_search_radius, true, &current_lanes);
+                        lane_search_radius, true, max_num_lane,
+                        max_angle_diff, &current_lanes);
   current_lanes_ = current_lanes;
   if (current_lanes_.empty()) {
     ADEBUG << "Obstacle [" << id_ << "] has no current lanes.";
@@ -739,10 +753,15 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
 
 void Obstacle::SetNearbyLanes(Feature* feature) {
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
+  int max_num_lane = FLAGS_max_num_nearby_lane;
+  if (PredictionMap::InJunction(point, FLAGS_junction_search_radius)) {
+    max_num_lane = FLAGS_max_num_nearby_lane_in_junction;
+  }
   double theta = feature->velocity_heading();
   std::vector<std::shared_ptr<const LaneInfo>> nearby_lanes;
   PredictionMap::NearbyLanesByCurrentLanes(
-      point, theta, FLAGS_lane_search_radius, current_lanes_, &nearby_lanes);
+      point, theta, FLAGS_lane_search_radius, current_lanes_,
+      max_num_lane, &nearby_lanes);
   if (nearby_lanes.empty()) {
     ADEBUG << "Obstacle [" << id_ << "] has no nearby lanes.";
     return;
@@ -924,6 +943,24 @@ void Obstacle::SetLanePoints(Feature* feature) {
     }
   }
   ADEBUG << "Obstacle [" << id_ << "] has lane segments and points.";
+}
+
+void Obstacle::SetLaneSequencePath(LaneGraph* const lane_graph) {
+  for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
+    LaneSequence* lane_sequence = lane_graph->mutable_lane_sequence(i);
+    double lane_segment_s = 0.0;
+    for (int j = 0; j < lane_sequence->lane_segment_size(); ++j) {
+      LaneSegment* lane_segment = lane_sequence->mutable_lane_segment(j);
+      for (int k = 0; k < lane_segment->lane_point_size(); ++k) {
+        LanePoint* lane_point = lane_segment->mutable_lane_point(k);
+        PathPoint path_point;
+        path_point.set_s(lane_segment_s + lane_point->relative_s());
+        path_point.set_theta(lane_point->heading());
+        lane_sequence->add_path_point()->CopyFrom(path_point);
+      }
+      lane_segment_s += lane_segment->total_length();
+    }
+  }
 }
 
 void Obstacle::SetMotionStatus() {

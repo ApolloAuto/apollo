@@ -48,6 +48,8 @@ struct LaneFrameOptions {
   int min_cc_pixel_num = 10;  // minimum number of pixels of CC
   int min_cc_size = 5;        // minimum size of CC
 
+  bool use_non_mask = false;  // indicating whether use non_mask or not
+
   // used for greedy search association method
   // maximum number of markers used for matching for each CC
   int max_cc_marker_match_num = 1;
@@ -78,9 +80,11 @@ struct LaneFrameOptions {
 class LaneFrame {
  public:
   bool Init(const std::vector<ConnectedComponentPtr>& input_cc,
+            const std::shared_ptr<NonMask>& non_mask,
             const LaneFrameOptions& options);
 
   bool Init(const std::vector<ConnectedComponentPtr>& input_cc,
+            const std::shared_ptr<NonMask>& non_mask,
             const std::shared_ptr<Projector<ScalarType>>& projector,
             const LaneFrameOptions& options);
 

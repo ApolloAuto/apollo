@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_ // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_ // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_  // NOLINT
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_  // NOLINT
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 
@@ -34,8 +34,8 @@ class PbfBaseMotionFusion {
   // @params[IN] anchor_point: initial anchor point for filtering
   // @params[IN] velocity: initial velocity for filtering
   // @return nothing
-  virtual void Initialize(const Eigen::Vector3d &anchor_point,
-                          const Eigen::Vector3d &velocity) = 0;
+  virtual void Initialize(const Eigen::Vector3d& anchor_point,
+                          const Eigen::Vector3d& velocity) = 0;
 
   // @brief initialize state of the filter
   // @params[IN] new_object: initial object for filtering
@@ -47,7 +47,7 @@ class PbfBaseMotionFusion {
   // @params[OUT] velocity: predicted velocity
   // @params[IN] time_diff: time interval from last update
   // @return nothing
-  virtual void Predict(Eigen::Vector3d *anchor_point, Eigen::Vector3d *velocity,
+  virtual void Predict(Eigen::Vector3d* anchor_point, Eigen::Vector3d* velocity,
                        const double time_diff) = 0;
 
   // @brief update with measurements
@@ -69,22 +69,39 @@ class PbfBaseMotionFusion {
   virtual void GetState(Eigen::Vector3d* anchor_point,
                         Eigen::Vector3d* velocity) = 0;
 
-  std::string name() {
-    return name_;
-  }
+  // @brief set current state of the filter
+  // @params[IN] anchor_point: updated anchor_point
+  // @params[IN] velocity: updated velocity
+  // @return nothing
+  virtual void SetState(const Eigen::Vector3d& anchor_point,
+                        const Eigen::Vector3d& velocity) = 0;
+
+  void setCurrentFuseTS(double ts) { fuse_timestamp = ts; }
+
+  void setLastFuseTS(double ts) { last_fuse_timestamp = ts; }
+
+  double getLastFuseTS() { return last_fuse_timestamp; }
+
+  double getCurrentFuseTS() { return fuse_timestamp; }
+
+  double getFuseTimeDiff() { return (fuse_timestamp - last_fuse_timestamp); }
+
+  std::string name() { return name_; }
 
   // @brief check if filter has been initialized
   // @return initialization status
-  bool Initialized() const {
-    return initialized_;
-  }
+  bool Initialized() const { return initialized_; }
 
  protected:
   std::string name_;
   bool initialized_;
+
+  // last fusion time
+  double last_fuse_timestamp = 0;
+  double fuse_timestamp = 0;
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H // NOLINT
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_  // NOLINT

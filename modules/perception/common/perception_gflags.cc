@@ -53,10 +53,9 @@ DEFINE_string(obstacle_module_name, "perception_obstacle",
 DEFINE_bool(enable_visualization, false, "enable visualization for debug");
 
 /// obstacle/perception.cc
+/* dag streaming config for Apollo 2.0 */
 DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
               "Onboard DAG Streaming config.");
-// DEFINE_string(dag_config_path, "./conf/dag_camera_obstacle_offline.config",
-//               "DAG config for camera and visualization");
 
 /// obstacle/onboard/radar_process_subnode.cc
 DEFINE_string(onboard_radar_detector, "DummyRadarDetector",
@@ -133,5 +132,25 @@ DEFINE_string(frame_visualizer, "GLFusionVisualizer", "");
 DEFINE_bool(async_fusion, false, "use distance angle ");
 DEFINE_bool(use_distance_angle_fusion, true,
             "use distance angle prob distance in fusion");
+DEFINE_bool(publish_fusion_event, false, "publish fusion event");
+DEFINE_bool(bag_mode, false, "run perception in bag mode");
 
 DEFINE_bool(show_motion, false, "visualize motion and object trajectories");
+DEFINE_bool(skip_camera_frame, false, "skip camera frame");
+DEFINE_int32(camera_hz, 30, "camera hz");
+DEFINE_string(fusion_publish_sensor_id, "velodyne_64", "fusion publish id");
+
+DEFINE_int32(pbf_fusion_assoc_distance_percent, 20, "fusion distance percent");
+DEFINE_double(pbf_distance_speed_cos_diff, 0.5, "fusion velocity cosine diff");
+
+DEFINE_string(cc_lane_post_processor_config_file,
+              "modules/perception/model/camera/lane_post_process_config.pb.txt",
+              "The config file of cc_lane_post_processor.");
+DEFINE_string(probabilistic_fusion_config_file,
+              "modules/perception/model/probabilistic_fusion_config.pb.txt",
+              "The config file of probabilistic_fusion.");
+DEFINE_string(yolo_config_filename, "config.pt", "Yolo config filename.");
+DEFINE_string(
+    yolo_camera_detector_config,
+    "modules/perception/model/camera/yolo_camera_detector_config.pb.txt",
+    "Yolo camera detector config filename.");

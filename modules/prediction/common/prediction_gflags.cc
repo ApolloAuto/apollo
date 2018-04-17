@@ -49,6 +49,8 @@ DEFINE_double(replay_timestamp_gap, 10.0,
 
 // Map
 DEFINE_double(lane_search_radius, 3.0, "Search radius for a candidate lane");
+DEFINE_double(lane_search_radius_in_junction, 15.0,
+              "Search radius for a candidate lane");
 DEFINE_double(junction_search_radius, 1.0, "Search radius for a junction");
 
 // Obstacle features
@@ -78,6 +80,12 @@ DEFINE_int32(max_num_current_lane, 2, "Max number to search current lanes");
 DEFINE_int32(max_num_nearby_lane, 2, "Max number to search nearby lanes");
 DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
               "Max angle difference for a candiate lane");
+DEFINE_int32(max_num_current_lane_in_junction, 1,
+             "Max number to search current lanes");
+DEFINE_int32(max_num_nearby_lane_in_junction, 0,
+             "Max number to search nearby lanes");
+DEFINE_double(max_lane_angle_diff_in_junction, M_PI / 6.0,
+              "Max angle difference for a candiate lane");
 DEFINE_bool(enable_pedestrian_acc, false, "Enable calculating speed by acc");
 DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
 DEFINE_double(pedestrian_max_speed, 10.0, "speed upper bound for pedestrian");
@@ -100,7 +108,9 @@ DEFINE_double(valid_position_diff_rate_threshold, 0.075,
 DEFINE_double(split_rate, 0.5, "obstacle split rate for adjusting velocity");
 DEFINE_double(rnn_min_lane_relatice_s, 5.0,
               "Minimal relative s for RNN model.");
-DEFINE_bool(enable_adjust_velocity_heading, false,
+DEFINE_bool(adjust_velocity_by_obstacle_heading, false,
+            "Use obstacle heading for velocity.");
+DEFINE_bool(adjust_velocity_by_position_shift, false,
             "adjust velocity heading to lane heading");
 DEFINE_double(heading_filter_param, 0.99, "heading filter parameter");
 

@@ -160,8 +160,10 @@ DECLARE_double(trajectory_time_resolution);
 DECLARE_double(trajectory_space_resolution);
 DECLARE_double(lateral_acceleration_bound);
 DECLARE_double(decision_horizon);
+DECLARE_uint32(num_velocity_sample);
 DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);
+DECLARE_double(min_velocity_sample_gap);
 
 // Lattice Evaluate Parameters
 DECLARE_double(weight_lon_travel);
@@ -183,8 +185,19 @@ DECLARE_double(default_lon_buffer);
 DECLARE_double(time_min_density);
 DECLARE_double(comfort_acceleration_factor);
 DECLARE_double(polynomial_minimal_param);
+DECLARE_double(lattice_stop_buffer);
 
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);
+
+// Spiral reference line smoother
+DECLARE_double(spiral_opt_tol);
+DECLARE_double(spiral_opt_acceptable_tol);
+DECLARE_double(spiral_opt_acceptable_iter);
+
+DECLARE_double(spiral_opt_weight_curve_length);
+DECLARE_double(spiral_opt_weight_kappa);
+DECLARE_double(spiral_opt_weight_dkappa);
+DECLARE_double(spiral_opt_weight_d2kappa);
 
 #endif  // MODULES_PLANNING_COMMON_PLANNING_GFLAGS_H_

@@ -4,7 +4,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "type",
-    hdrs = ["type.h"],
+    srcs = ["type.cc"],
+    hdrs = [
+        "type.h",
+        "base_type.h",
+    ],
     deps = [
         "//modules/common:log",
         "//modules/perception/proto:perception_proto",
@@ -15,6 +19,7 @@ cc_library(
 
 cc_library(
     name = "util",
+    srcs = ["util.cc"],
     hdrs = ["util.h"],
     deps = [
         ":type",
@@ -25,10 +30,12 @@ cc_library(
 cc_library(
     name = "connected_component",
     srcs = ["connected_component.cc"],
-    hdrs = ["connected_component.h"],
+    hdrs = [
+        "connected_component.h",
+        "base_type.h",
+    ],
     deps = [
-        ":type",
-        "//modules/common:log",
+        #"//modules/common:log",
         "@eigen",
         "@opencv2//:core",
     ],

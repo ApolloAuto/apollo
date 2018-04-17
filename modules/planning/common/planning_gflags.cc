@@ -152,7 +152,7 @@ DEFINE_double(
 DEFINE_bool(enable_trajectory_check, false,
             "Enable sanity check for planning trajectory.");
 
-DEFINE_double(speed_lower_bound, -0.02, "The lowest speed allowed.");
+DEFINE_double(speed_lower_bound, -0.1, "The lowest speed allowed.");
 DEFINE_double(speed_upper_bound, 40.0, "The highest speed allowed.");
 
 DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
@@ -294,20 +294,21 @@ DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
 /// Lattice Planner
 DEFINE_double(lattice_epsilon, 1e-6, "Epsilon in lattice planner.");
 DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
-
 DEFINE_bool(enable_auto_tuning, false, "enable auto tuning data emission");
-
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
-
 DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
+DEFINE_uint32(num_velocity_sample, 6,
+              "The number of velocity samples in end condition sampler.");
 DEFINE_bool(enable_backup_trajectory, false,
             "If generate backup trajectory when planning fail");
 DEFINE_double(backup_trajectory_cost, 1000.0,
               "Default cost of backup trajectory");
+DEFINE_double(min_velocity_sample_gap, 1.0,
+              "Minimal sampling gap for velocity");
 
 // Lattice Evaluate Parameters
 DEFINE_double(weight_lon_travel, 6.0, "Weight of longitudinal travel cost");
@@ -316,7 +317,7 @@ DEFINE_double(weight_lon_collision, 2.0,
               "Weight of logitudinal collision cost");
 DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
 DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");
-DEFINE_double(weight_centripetal_acceleration, 5.0,
+DEFINE_double(weight_centripetal_acceleration, 2.0,
               "Weight of centripetal acceleration");
 DEFINE_double(priority_cost_gap, 5.0,
               "Gap to increase the priority cost of reference line.");
@@ -341,7 +342,27 @@ DEFINE_double(comfort_acceleration_factor, 0.5,
               "Factor for comfort acceleration.");
 DEFINE_double(polynomial_minimal_param, 0.01,
               "Minimal time parameter in polynomials.");
+DEFINE_double(lattice_stop_buffer, 0.02,
+              "The bufffer before the stop s to check trajectories.");
 
 // navigation mode
 DEFINE_double(navigation_fallback_cruise_time, 8.0,
               "The time range of fallback cruise under navigation mode.");
+
+// spiral reference line smoother
+DEFINE_double(spiral_opt_tol, 1.0e-8,
+              "The desired convergence tol for spiral opt");
+DEFINE_double(spiral_opt_acceptable_tol, 1.0e-6,
+              "The acceptable convergence tol for spiral opt");
+DEFINE_double(spiral_opt_acceptable_iter, 15,
+              "The number of acceptable iters "
+              "before termination for spiral opt");
+
+DEFINE_double(spiral_opt_weight_curve_length, 0.0,
+              "The weight of curve length term in objective function");
+DEFINE_double(spiral_opt_weight_kappa, 1.5,
+              "The weight of kappa term in objective function");
+DEFINE_double(spiral_opt_weight_dkappa, 1.0,
+              "The weight of dkappa term in objective function");
+DEFINE_double(spiral_opt_weight_d2kappa, 0.0,
+              "The weight of d2kappa term in objective function");

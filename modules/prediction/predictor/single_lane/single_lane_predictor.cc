@@ -42,7 +42,7 @@ void SingleLanePredictor::Predict(Obstacle* obstacle) {
   const Feature& feature = obstacle->latest_feature();
 
   if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
-    AERROR << "Obstacle [" << obstacle->id() << " has no lane graph.";
+    AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
     return;
   }
 

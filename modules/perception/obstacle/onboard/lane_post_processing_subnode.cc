@@ -18,13 +18,16 @@
 
 #include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
 
+#include <unordered_map>
 #include <cfloat>
+#include <algorithm>
 
 #include "Eigen/Dense"
 #include "opencv2/opencv.hpp"
 #include "yaml-cpp/yaml.h"
 
 #include "modules/common/log.h"
+#include "modules/common/time/timer.h"
 #include "modules/common/time/time_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -32,16 +35,40 @@
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/types.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {
 
 using std::string;
+using std::unordered_map;
 using std::shared_ptr;
 using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::time::Timer;
 
 bool LanePostProcessingSubnode::InitInternal() {
+  // get Subnode config in DAG streaming
+  unordered_map<string, string> fields;
+  SubnodeHelper::ParseReserveField(reserve_, &fields);
+  if (fields.count("publish") && stoi(fields["publish"]) != 0) {
+    publish_ = true;
+  }
+  auto iter = fields.find("motion_event_id");
+  if (iter == fields.end()) {
+    motion_event_id_ = -1;
+    AWARN << "Failed to find motion_event_id_:" << reserve_;
+    AWARN << "Unable to project lane history information";
+  } else {
+    motion_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
+    motion_service_ = dynamic_cast<MotionService*>(
+          DAGStreaming::GetSubnodeByName("MotionService"));
+    if (motion_service_ == nullptr) {
+      AWARN << "motion service should initialize before LanePostProcessing";
+    }
+    options_.use_lane_history = true;
+//    options_.ConfigLaneHistory(FLAGS_lane_history_size);
+  }
   // init shared data
   if (!InitSharedData()) {
     AERROR << "failed to init shared data.";
@@ -53,12 +80,6 @@ bool LanePostProcessingSubnode::InitInternal() {
   // init plugins
   if (!InitAlgorithmPlugin()) {
     AERROR << "failed to init algorithm plugins.";
-    return false;
-  }
-
-  // init work_root
-  if (!InitWorkRoot()) {
-    AERROR << "failed to init work root.";
     return false;
   }
 
@@ -127,49 +148,8 @@ bool LanePostProcessingSubnode::InitWorkRoot() {
     AERROR << "failed to init ConfigManager";
     return false;
   }
-  // get work root dir
-  work_root_dir_ = config_manager->WorkRoot();
 
-  AINFO << "init config manager successfully, work_root: " << work_root_dir_;
   return true;
-}
-
-Status LanePostProcessingSubnode::ProcEvents() {
-  // fusion output subnode only subcribe the fusion subnode
-  CHECK_EQ(sub_meta_events_.size(), 1u) << "only subcribe one event.";
-  const EventMeta &event_meta = sub_meta_events_[0];
-  Event event;
-  event_manager_->Subscribe(event_meta.event_id, &event);
-  // PERF_FUNCTION();
-  ++seq_num_;
-  shared_ptr<SensorObjects> objs;
-  if (!GetSharedData(event, &objs)) {
-    AERROR << "Failed to get shared data. event:" << event.to_string();
-    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
-  }
-
-  cv::Mat lane_map = objs->camera_frame_supplement->lane_map;
-  if (lane_map.empty()) {
-    AERROR << "Get NULL lane_map from camera frame supplement";
-    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
-  }
-
-  LaneObjectsPtr lane_instances(new LaneObjects());
-  CameraLanePostProcessOptions options;
-  options.timestamp = event.timestamp;
-
-  lane_post_processor_->Process(lane_map, options, &lane_instances);
-  for (size_t i = 0; i < lane_instances->size(); ++i) {
-    (*lane_instances)[i].timestamp = event.timestamp;
-    (*lane_instances)[i].seq_num = seq_num_;
-  }
-  AINFO << "Before publish lane objects, objects num: "
-        << lane_instances->size();
-
-  PublishDataAndEvent(event.timestamp, lane_instances);
-
-  AINFO << "Successfully finished lane post processing";
-  return Status::OK();
 }
 
 bool LanePostProcessingSubnode::GetSharedData(const Event &event,
@@ -215,7 +195,97 @@ void LanePostProcessingSubnode::PublishDataAndEvent(
     event.reserve = device_id_;
     event_manager_->Publish(event);
   }
-  AINFO << "succeed to publish data and event.";
+  ADEBUG << "succeed to publish data and event.";
+}
+
+Status LanePostProcessingSubnode::ProcEvents() {
+  // fusion output subnode only subcribe the fusion subnode
+  CHECK_EQ(sub_meta_events_.size(), 1u) << "only subcribe one event.";
+  const EventMeta &event_meta = sub_meta_events_[0];
+  Event event;
+  event_manager_->Subscribe(event_meta.event_id, &event);
+  ++seq_num_;
+  shared_ptr<SensorObjects> objs;
+  if (!GetSharedData(event, &objs)) {
+    AERROR << "Failed to get shared data. event:" << event.to_string();
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
+  }
+
+  Timer timer;
+  timer.Start();
+
+  cv::Mat lane_map = objs->camera_frame_supplement->lane_map;
+  if (lane_map.empty()) {
+    AERROR << "Get NULL lane_map from camera frame supplement";
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
+  }
+
+  LaneObjectsPtr lane_objects(new LaneObjects());
+  CameraLanePostProcessOptions options;
+  options.timestamp = event.timestamp;
+  timestamp_ns_ = event.timestamp * 1e9;
+  if (motion_event_id_ != -1) {
+    if (motion_service_ == nullptr) {
+      motion_service_ = dynamic_cast<MotionService*>(
+          DAGStreaming::GetSubnodeByName("MotionService"));
+      if (motion_service_ == nullptr) {
+        AERROR << "motion service must initialize before LanePostProcessing";
+        return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
+      }
+    }
+
+    // TODO(gchen-apollo): add lock to read motion_buffer
+    options_.SetMotion(motion_service_->GetMotionBuffer()->back());
+  }
+  lane_post_processor_->Process(lane_map, options, &lane_objects);
+  for (size_t i = 0; i < lane_objects->size(); ++i) {
+    (*lane_objects)[i].timestamp = event.timestamp;
+    (*lane_objects)[i].seq_num = seq_num_;
+  }
+  ADEBUG << "Before publish lane objects, objects num: "
+        << lane_objects->size();
+
+  uint64_t t = timer.End("lane post-processing");
+  min_processing_time_ = std::min(min_processing_time_, t);
+  max_processing_time_ = std::max(max_processing_time_, t);
+  tot_processing_time_ += t;
+  ADEBUG << "Lane Post Processing Runtime: "
+        << "MIN (" << min_processing_time_ << " ms), "
+        << "MAX (" << max_processing_time_ << " ms), "
+        << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";
+
+  PublishDataAndEvent(event.timestamp, lane_objects);
+
+  if (publish_) {
+    PublishPerceptionPb(lane_objects);
+  }
+
+  ADEBUG << "Successfully finished lane post processing";
+  return Status::OK();
+}
+
+void LanePostProcessingSubnode::PublishPerceptionPb(
+    const LaneObjectsPtr &lane_objects) {
+  ADEBUG << "Lane post-processor publish lane object pb data";
+
+  PerceptionObstacles obstacles;
+
+  // Header
+  common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
+      "perception_obstacle", &obstacles);
+  common::Header *header = obstacles.mutable_header();
+  header->set_lidar_timestamp(0);
+  header->set_camera_timestamp(timestamp_ns_);
+  header->set_radar_timestamp(0);
+
+  // generate lane marker protobuf messages
+  LaneMarkers* lane_markers = obstacles.mutable_lane_marker();
+  LaneObjectsToLaneMarkerProto(*lane_objects, lane_markers);
+
+  common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
+  ADEBUG << "Lane Markers: " << obstacles.ShortDebugString();
+
+  ADEBUG << "Succeed to publish lane object pb data.";
 }
 
 }  // namespace perception
