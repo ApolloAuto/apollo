@@ -4,8 +4,10 @@
   <arg name="node_name" default="compensator_nodelet"/>
   <arg name="child_frame_id" default="velodyne64"/>
   <arg name="tf_query_timeout" default="0.1"/>
+  <arg name="nodelet_manager_name" default="velodyne_nodelet_manager" />
+
   <node pkg="nodelet" type="nodelet" name="$(arg node_name)"
-        args="load velodyne_pointcloud/CompensatorNodelet velodyne_nodelet_manager" output="screen">
+        args="load velodyne_pointcloud/CompensatorNodelet $(arg nodelet_manager_name)" output="screen">
     <param name="topic_pointcloud" value="$(arg topic_pointcloud)"/>
     <param name="topic_compensated_pointcloud" value="$(arg topic_compensated_pointcloud)"/>
     <param name="child_frame_id" value="$(arg child_frame_id)"/>

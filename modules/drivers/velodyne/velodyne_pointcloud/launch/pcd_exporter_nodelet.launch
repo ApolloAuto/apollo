@@ -6,9 +6,10 @@
     <arg name="pose_file" default="$(arg pcd_folder)/pose.txt"/>
     <arg name="topic_pointcloud" default="/apollo/sensor/velodyne64/PointCloud2"/>
     <arg name="queue_size" default="10"/>
+    <arg name="nodelet_manager_name" default="velodyne_nodelet_manager" />
     
     <node pkg="nodelet" type="nodelet" name="pcd_exporter_nodelet" 
-                args="load velodyne_pointcloud/PCDExporterNodelet velodyne_nodelet_manager">
+                args="load velodyne_pointcloud/PCDExporterNodelet $(arg nodelet_manager_name)">
         <param name="pcd_folder" value="$(arg pcd_folder)"/>
         <param name="skip_static_frames" value="$(arg skip_static_frames)"/>
         <param name="child_frame_id" value="$(arg child_frame_id)"/>
