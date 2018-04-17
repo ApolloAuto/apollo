@@ -56,7 +56,7 @@ class WebSocketHandler : public CivetWebSocketHandler {
   using MessageHandler = std::function<void(const Json &, Connection *)>;
   using ConnectionReadyHandler = std::function<void(Connection *)>;
 
-  WebSocketHandler(const std::string &name) : name_(name) {}
+  explicit WebSocketHandler(const std::string &name) : name_(name) {}
 
   /**
    * @brief Callback method for when the client intends to establish a websocket
