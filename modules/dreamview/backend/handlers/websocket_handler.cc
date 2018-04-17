@@ -34,7 +34,8 @@ void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
   {
     std::unique_lock<std::mutex> lock(mutex_);
     connections_.emplace(conn, std::make_shared<std::mutex>());
-    AINFO << "Accepted connection. Total connections: " << connections_.size();
+    AINFO << name_ << ": Accepted connection. Total connections: "
+          << connections_.size();
   }
 
   // Trigger registered new connection handlers.
@@ -56,7 +57,8 @@ void WebSocketHandler::handleClose(CivetServer *server,
       std::unique_lock<std::mutex> lock(*connection_lock);
       connections_.erase(connection);
     }
-    AINFO << "Connection closed. Total connections: " << connections_.size();
+    AINFO << name_
+          << ": Connection closed. Total connections: " << connections_.size();
   }
 }
 
@@ -94,7 +96,8 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
   {
     std::unique_lock<std::mutex> lock(mutex_);
     if (!ContainsKey(connections_, conn)) {
-      AERROR << "Trying to send to an uncached connection, skipping.";
+      AERROR << name_
+             << ": Trying to send to an uncached connection, skipping.";
       return false;
     }
     // Copy the lock so that it still exists if the connection is closed after
@@ -122,8 +125,9 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
   // Note that while we are holding the connection lock, the connection won't be
   // closed and removed.
   int ret;
-  PERF_BLOCK(StrCat("Writing ", data.size(), " bytes via websocket took"),
-             0.1) {
+  PERF_BLOCK(
+      StrCat(name_, ": Writing ", data.size(), " bytes via websocket took"),
+      0.1) {
     ret = mg_websocket_write(conn, op_code, data.c_str(), data.size());
   }
   connection_lock->unlock();
@@ -144,7 +148,8 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
       msg = StrCat("Expect to send ", data.size(), " bytes. But sent ", ret,
                    " bytes");
     }
-    AWARN << "Failed to send data via websocket connection. Reason: " << msg;
+    AWARN << name_
+          << ": Failed to send data via websocket connection. Reason: " << msg;
     return false;
   }
 
@@ -181,7 +186,7 @@ bool WebSocketHandler::handleData(CivetServer *server, Connection *conn,
         result = handleBinaryData(conn, data_.str());
         break;
       default:
-        AERROR << "Unknown WebSocket bits flag: " << bits;
+        AERROR << name_ << ": Unknown WebSocket bits flag: " << bits;
         break;
     }
 
