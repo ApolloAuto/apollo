@@ -16,25 +16,13 @@
 
 #include "modules/planning/common/planning_util.h"
 
-#include <array>
-#include <cmath>
-#include <memory>
-#include <utility>
-
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/math/integral.h"
-#include "modules/common/math/linear_interpolation.h"
-#include "modules/common/math/math_utils.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/math/hermite_spline.h"
 
 namespace apollo {
 namespace planning {
 namespace util {
 
-using common::PathPoint;
-using common::SpeedPoint;
-using common::TrajectoryPoint;
 using common::adapter::AdapterManager;
 
 PlanningStatus *GetPlanningStatus() {

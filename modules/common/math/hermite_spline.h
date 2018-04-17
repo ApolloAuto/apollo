@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_MATH_HERMITE_SPLINE_H_
-#define MODULES_PLANNING_MATH_HERMITE_SPLINE_H_
+#ifndef MODULES_COMMON_MATH_HERMITE_SPLINE_H_
+#define MODULES_COMMON_MATH_HERMITE_SPLINE_H_
 
 #include <array>
 #include <utility>
@@ -27,7 +27,8 @@
 #include "modules/common/log.h"
 
 namespace apollo {
-namespace planning {
+namespace common {
+namespace math {
 
 // Hermite spline implementation that works for 1d and 2d space interpolation.
 // Valid input type T: double, Eigen::Vector2d
@@ -200,7 +201,8 @@ inline T HermiteSpline<T, N>::Evaluate(const std::uint32_t order,
   return T();
 }
 
-}  // namespace planning
+}  // namespace math
+}  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_MATH_HERMITE_SPLINE_H_
+#endif  // MODULES_COMMON_MATH_HERMITE_SPLINE_H_

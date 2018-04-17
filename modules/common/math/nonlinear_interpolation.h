@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,32 @@
 
 /**
  * @file
- * @brief Linear interpolation functions.
+ * @brief Nonlinear interpolation functions.
  */
 
-#ifndef MODULES_COMMON_MATH_LINEAR_INTERPOLATION_H_
-#define MODULES_COMMON_MATH_LINEAR_INTERPOLATION_H_
+#ifndef MODULES_COMMON_MATH_NONLINEAR_INTERPOLATION_H_
+#define MODULES_COMMON_MATH_NONLINEAR_INTERPOLATION_H_
 
-#include <cmath>
-
-#include "modules/common/log.h"
 #include "modules/common/proto/pnc_point.pb.h"
 
 /**
  * @namespace apollo::common::math
  * @brief apollo::common::math
  */
+
 namespace apollo {
 namespace common {
 namespace math {
 
-SLPoint PolynomialInterpolate(const SLPoint &start, const SLPoint &end,
-                              const double weight);
+PathPoint SplineInterpolate(const PathPoint &p0, const PathPoint &p1,
+                            const double s);
 
-PathPoint PolynomialInterpolate(const PathPoint &p0, const PathPoint &p1,
-                                const double s);
+TrajectoryPoint SplineInterpolate(const TrajectoryPoint &tp0,
+                                  const TrajectoryPoint &tp1,
+                                  const double t);
 
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_MATH_LINEAR_INTERPOLATION_H_
+#endif  // MODULES_COMMON_MATH_NONLINEAR_INTERPOLATION_H_
