@@ -66,11 +66,7 @@ PathPoint InterpolateUsingLinearApproximation(const PathPoint &p0,
   double weight = (s - s0) / (s1 - s0);
   double x = (1 - weight) * p0.x() + weight * p1.x();
   double y = (1 - weight) * p0.y() + weight * p1.y();
-  double cos_heading =
-      (1 - weight) * std::cos(p0.theta()) + weight * std::cos(p1.theta());
-  double sin_heading =
-      (1 - weight) * std::sin(p0.theta()) + weight * std::sin(p1.theta());
-  double theta = std::atan2(sin_heading, cos_heading);
+  double theta = slerp(p0.theta(), p0.s(), p1.theta(), p1.s(), s);
   double kappa = (1 - weight) * p0.kappa() + weight * p1.kappa();
   double dkappa = (1 - weight) * p0.dkappa() + weight * p1.dkappa();
   double ddkappa = (1 - weight) * p0.ddkappa() + weight * p1.ddkappa();
@@ -105,7 +101,7 @@ TrajectoryPoint InterpolateUsingLinearApproximation(const TrajectoryPoint &tp0,
   PathPoint *path_point = tp.mutable_path_point();
   path_point->set_x(lerp(pp0.x(), t0, pp1.x(), t1, t));
   path_point->set_y(lerp(pp0.y(), t0, pp1.y(), t1, t));
-  path_point->set_theta(lerp(pp0.theta(), t0, pp1.theta(), t1, t));
+  path_point->set_theta(slerp(pp0.theta(), t0, pp1.theta(), t1, t));
   path_point->set_kappa(lerp(pp0.kappa(), t0, pp1.kappa(), t1, t));
   path_point->set_dkappa(lerp(pp0.dkappa(), t0, pp1.dkappa(), t1, t));
   path_point->set_ddkappa(lerp(pp0.ddkappa(), t0, pp1.ddkappa(), t1, t));
