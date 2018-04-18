@@ -13,7 +13,7 @@ Welcome to the Apollo GitHub.
 [Apollo](http://apollo.auto) is an open autonomous driving platform. It is a high performance flexible architecture which supports fully autonomous driving capabilities.
 For business contact, please visit http://apollo.auto
 
-**Apollo Team now proudly presents to you the latest [version 2.0](https://github.com/ApolloAuto/apollo/releases/tag/v2.0.0).**
+**Apollo Team now proudly presents to you the latest [version 2.5](https://github.com/ApolloAuto/apollo/releases/tag/v2.5.0).**
 
 ## Installation
 
@@ -85,8 +85,12 @@ bash scripts/bootstrap.sh
 Access Dreamview by opening your favorite browser, e.g. Chrome, go to http://localhost:8888 and you should see this screen
 However, there will be nothing running in the system.
 
-
 ![Access Dreamview](docs/demo_guide/images/apollo_bootstrap_screen.png)
+
+### Select Drive Mode
+From the dropdown box selet "Navigation" mode.
+
+![Navigation Mode](docs/demo_guide/images/dreamview_2_5_setup_profile.png)
 
 
 ### Replay demo rosbag
@@ -98,12 +102,12 @@ To see if the system works, use the demo 'bag' which feeds the system.
 bash ./docs/demo_guide/rosbag_helper.sh download
 
 # You can now replay this demo "bag" in a loop with the '-l' flag
-rosbag play -l ./docs/demo_guide/demo_2.0.bag
+rosbag play -l ./docs/demo_guide/demo_2.5.bag
 ```
 
 Dreamview should show a running vehicle now. (The following image might be different due to changes in frontend.)
 
-![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory.png)
+![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory_2.5.png)
 
 ## Documents
 
