@@ -146,7 +146,6 @@ class Frame {
 
   prediction::PredictionObstacles prediction_;
   ThreadSafeIndexedObstacles obstacles_;
-  perception::CIPVInfo cipv_info_;
   ChangeLaneDecider change_lane_decider_;
   ADCTrajectory trajectory_;  // last published trajectory
   std::unique_ptr<LagPrediction> lag_predictor_;

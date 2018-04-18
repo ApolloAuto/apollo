@@ -19,11 +19,6 @@ config: {
 }
 
 config: {
-  rule_id: CIPV
-  enabled: true
-}
-
-config: {
   rule_id: CROSSWALK
   enabled: true
   crosswalk {

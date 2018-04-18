@@ -15,9 +15,6 @@ message ChangeLaneConfig {
   optional double min_guard_speed = 5 [default=1.0];
 }
 
-message CIPVConfig {
-}
-
 message CreepConfig {
   optional bool enabled = 1;
   // stop distance(m) to the stop line of next lane overlap while creeping
@@ -64,6 +61,9 @@ message ReroutingConfig {
   optional double cooldown_time = 1 [default = 0.6];  // seconds
 }
 
+message FrontVehicleConfig {
+}
+
 message SidePassVehicleConfig {
   // Waiting time(sec) before starting sidepass vehicle
   optional double wait_time = 1 [ default=30.0]; // second
@@ -106,30 +106,30 @@ message TrafficRuleConfig {
   enum RuleId {
     BACKSIDE_VEHICLE = 1;
     CHANGE_LANE = 2;
-    CIPV = 3;
-    CROSSWALK = 4;
-    DESTINATION = 5;
-    KEEP_CLEAR = 6;
-    REFERENCE_LINE_END = 7;
-    REROUTING = 8;
-    SIDE_PASS_VEHICLE = 9;
-    SIGNAL_LIGHT = 10;
-    STOP_SIGN = 11;
+    CROSSWALK = 3;
+    DESTINATION = 4;
+    KEEP_CLEAR = 5;
+    REFERENCE_LINE_END = 6;
+    REROUTING = 7;
+    SIDE_PASS_VEHICLE = 8;
+    SIGNAL_LIGHT = 9;
+    STOP_SIGN = 10;
+    FRONT_VEHICLE = 11;
   }
   optional RuleId rule_id = 1;
   optional bool enabled = 2;
   oneof config {
     BacksideVehicleConfig backside_vehicle = 3;
     ChangeLaneConfig change_lane = 4;
-    CIPVConfig cipv = 5;
-    CrosswalkConfig crosswalk = 6;
-    DestinationConfig destination = 7;
-    KeepClearConfig keep_clear = 8;
-    ReferenceLineEndConfig reference_line_end = 9;
-    ReroutingConfig rerouting = 10;
-    SidePassVehicleConfig side_pass_vehicle = 11;
-    SignalLightConfig signal_light = 12;
-    StopSignConfig stop_sign = 13;
+    CrosswalkConfig crosswalk = 5;
+    DestinationConfig destination = 6;
+    KeepClearConfig keep_clear = 7;
+    ReferenceLineEndConfig reference_line_end = 8;
+    ReroutingConfig rerouting = 9;
+    SidePassVehicleConfig side_pass_vehicle = 10;
+    SignalLightConfig signal_light = 11;
+    StopSignConfig stop_sign = 12;
+    FrontVehicleConfig front_vehicle = 13;
   }
 }
 
