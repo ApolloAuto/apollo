@@ -37,4 +37,4 @@ Apollo环境启动参见[Apollo 2.5快速上手指南](https://github.com/Apollo
 
 5、数据上传
 
-采集的数据放置在/apollo/data/bag目录，把该目录下的数据打包为tar.gz压缩文件，到[Apollo数据官网](http://apollo.baidu.com:8800/hd_map_intro?locale=zh-cn)进行数据上传。
+采集的数据放置在/apollo/data/bag目录，把该目录下的数据打包为tar.gz压缩文件，到[Apollo数据官网](http://data.apollo.auto/hd_map_intro)进行数据上传。

@@ -39,4 +39,4 @@ we should ensure the same road can be covered more than five times in the speed 
 
 5、Data Upload
 
-The collected map data is placed in the /apollo/data/bag directory by default, package them as tar.gz compressed file and upload them to the [Apollo Data Official Website](http://apollo.baidu.com:8800/hd_map_intro?locale=en-us).
+The collected map data is placed in the /apollo/data/bag directory by default, package them as tar.gz compressed file and upload them to the [Apollo Data Official Website](http://data.apollo.auto/hd_map_intro).
