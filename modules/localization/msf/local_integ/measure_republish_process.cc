@@ -21,15 +21,16 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "modules/localization/msf/common/util/time_conversion.h"
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/log.h"
+#include "modules/common/time/time_util.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
 using common::Status;
+using common::time::TimeUtil;
 
 MeasureRepublishProcess::MeasureRepublishProcess()
     : pre_bestgnsspose_(), pre_bestgnsspose_valid_(false),
@@ -119,7 +120,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
 
   MeasureData measure_data = gnss_local_msg;
   if (is_trans_gpstime_to_utctime_) {
-    measure_data.time = util::GpsToUnixSeconds(measure_data.time);
+    measure_data.time = TimeUtil::Gps2unix(measure_data.time);
   }
 
   AINFO << "the gnss velocity: " << measure_data.gnss_vel.ve << " "
@@ -356,7 +357,7 @@ void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
 
   measure->time = bestgnsspos_msg.measurement_time();
   if (is_trans_gpstime_to_utctime_) {
-    measure->time = util::GpsToUnixSeconds(measure->time);
+    measure->time = TimeUtil::Gps2unix(measure->time);
   }
 
   measure->gnss_pos.longitude =
