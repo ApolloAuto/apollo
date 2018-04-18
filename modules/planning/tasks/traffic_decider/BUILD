@@ -7,10 +7,10 @@ cc_library(
     srcs = [
         "backside_vehicle.cc",
         "change_lane.cc",
-        "cipv.cc",
         "creeper.cc",
         "crosswalk.cc",
         "destination.cc",
+        "front_vehicle.cc",
         "keep_clear.cc",
         "object_priority.cc",
         "reference_line_end.cc",
@@ -23,10 +23,10 @@ cc_library(
     hdrs = [
         "backside_vehicle.h",
         "change_lane.h",
-        "cipv.h",
         "creeper.h",
         "crosswalk.h",
         "destination.h",
+        "front_vehicle.h",
         "keep_clear.h",
         "object_priority.h",
         "reference_line_end.h",
