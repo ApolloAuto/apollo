@@ -235,6 +235,25 @@ The 64 line LiDAR system **HDL-64E S3** is available from Velodyne LiDAR, Inc.
 ![online](images/online_icon.png)Webpage for Velodyne HDL-64E S3:
 [http://velodynelidar.com/hdl-64e.html](http://velodynelidar.com/hdl-64e.html)
 
+
+
+The 16 line LiDAR system VLP-16 is available from Velodyne LiDAR, Inc.
+
+![lidar_image](/Users/hanyang07/apollo/docs/quickstart/images/lidar_pic_16.png)
+
+**Key Features:**
+
+- 16 Channels
+- 100m range
+- 600,000 Points per Second
+- 360° Horizontal FOV
+- ±15° Vertical FOV
+- Low Power Consumption
+- Protective Design
+
+![online](/Users/hanyang07/apollo/docs/quickstart/images/online_icon.png)Webpage for Velodyne VLP-16:
+[http://velodynelidar.com/vlp-16.html](http://velodynelidar.com/vlp-16.html)
+
 ## Cameras
 
 The cameras used are LI-USB30-AR023ZWDR with standard USB 3.0 case manufactured by Leopard Imaging Inc. We recommend using two cameras with 6 mm lens and one with 25 mm lens to achieve the required performance.
@@ -358,7 +377,6 @@ Follow these steps:
     - Go to [Advanced] => [Smart Fan Setting]
     - Set [Fan Max. Trip Temp] to 50
     - Set [Fan Start Trip Temp] to 20
-
 
 ![tip_icon](images/tip_icon.png)It is recommended that you use a Digital Visual Interface (DVI) connector on the graphic card for the monitor. To set the display to the DVI port on the motherboard, following is the setting procedure:
 
@@ -496,7 +514,7 @@ Perform these tasks:
     - GPS Antenna
     - IPC
     - GPS Receiver and IMU
-    - LiDAR
+    - LiDAR's
     - Cameras
     - Radar
 
@@ -509,7 +527,7 @@ The list of prerequisites are as follows:
 
 - The vehicle must be modified for “drive-by-wire” technology by a professional service company. Also, a CAN interface hookup must be provided in the trunk where the IPC will be mounted.
 - A power panel must be installed in the trunk to provide power to the IPC and the GPS-IMU. The power panel would also service other devices in the vehicle such as a 4G LTE router. The power panel should be hooked up to the power system in the vehicle.
-- A custom-made rack must be installed to mount the GPS-IMU Antenna, the cameras and the LiDAR on top of the vehicle.
+- A custom-made rack must be installed to mount the GPS-IMU Antenna, the cameras and the LiDAR's on top of the vehicle.
 - A custom-made rack must be installed to mount the GPS-IMU in the trunk.
 - A custom-made rack must be installed in front of the vehicle to mount the front-facing radar.
 - A 4G LTE router must be mounted in the trunk to provide Internet access for the IPC. The router must have built-in Wi-Fi access point (AP) capability to connect to other devices, such as an iPad, to interface with the autonomous driving (AD) system. A user would be able to use the mobile device to start AD mode or monitor AD status, for example.
@@ -730,6 +748,16 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
 
       [http://velodynelidar.com/hdl-64e.html](http://velodynelidar.com/hdl-64e.html)
 
+#### (Optional) Installation of VLP-16 lidar
+
+In Apollo 2.5, map creation service has been opened to the public. To acquire the data necessary for map creation, one would need to install an additional VLP-16 LiDAR on the vehicle. The purpose of this LiDAR is to collect point cloud information for objects above the FOV of the HDL-64 S3 Lidar, such as traffic lights and signs. It requires a customized rack to mount the VLP-16 Lidar on top of the vehicle. The figure below shows one of the possible configurations. ![VLP_16_installation](images/VLP16_install_configuration.jpg)
+
+In this specific configuration, the VLP-16 LiDAR is mounted with an upward tilt of 20±2°. The power cable of the VLP-16 is connected to the DataSpeed power panel. The ethernet connection is connected to the IPC (possibly through an ethernet switch). Similar to HDL-64 S3 LiDAR, the VLP-16 GPRMC and PPS input from the GPS receiver. Ideally, additional hardware should be installed to duplicate the GPRMC and PPS signal from the GPS receiver send to HDL-64 and VLP-16 respectively. However, a simple Y-split cable may also provide adequate signal for both LiDAR's. To distingush from the HDL-64 S3 LiDAR, please follow the VLP-16 manual and use the webpage interface to configure the IP of VLP-16 to 192.168.20.14, the data port to 2369, and the telemetry port to 8309. The pinout for the signal input from GPS receiver can also be found in the manual if you need customized cable.
+
+![online_icon](images/online_icon.png)VLP-16 Manual can be found on this webpage:
+
+[http://velodynelidar.com/vlp-16.html](http://velodynelidar.com/vlp-16.htmll)
+
 ### Installing the Cameras
 
 This section provides guidelines for the camera installation procedure.
@@ -877,27 +905,27 @@ EVENTOUTCONTROL MARK1 ENABLE POSITIVE 500000000 500000000
 
 
 LOG COM2 GPRMC ONTIME 1.0 0.25
-LOG GPGGA ONTIME 1.0
+LOG USB1 GPGGA ONTIME 1.0
 
-log bestgnssposb ontime 1
-log bestgnssvelb ontime 1
-log bestposb ontime 1
-log INSPVAXB ontime 1
-log INSPVASB ontime 0.01
-log CORRIMUDATASB ontime 0.01
-log RAWIMUSXB onnew 0 0
-log mark1pvab onnew
+log USB1 bestgnssposb ontime 1
+log USB1 bestgnssvelb ontime 1
+log USB1 bestposb ontime 1
+log USB1 INSPVAXB ontime 1
+log USB1 INSPVASB ontime 0.01
+log USB1 CORRIMUDATASB ontime 0.01
+log USB1 RAWIMUSXB onnew 0 0
+log USB1 mark1pvab onnew
 
-log rangeb ontime 1
-log bdsephemerisb
-log gpsephemb
-log gloephemerisb
-log bdsephemerisb ontime 15
-log gpsephemb ontime 15
-log gloephemerisb ontime 15
+log USB1 rangeb ontime 1
+log USB1 bdsephemerisb
+log USB1 gpsephemb
+log USB1 gloephemerisb
+log USB1 bdsephemerisb ontime 15
+log USB1 gpsephemb ontime 15
+log USB1 gloephemerisb ontime 15
 
-log imutoantoffsetsb once
-log vehiclebodyrotationb onchanged
+log USB1 imutoantoffsetsb once
+log USB1 vehiclebodyrotationb onchanged
  
 SAVECONFIG
 
@@ -930,27 +958,27 @@ EVENTOUTCONTROL MARK1 ENABLE POSITIVE 500000000 500000000
 
 
 LOG COM2 GPRMC ONTIME 1.0 0.25
-LOG GPGGA ONTIME 1.0
+LOG USB1 GPGGA ONTIME 1.0
 
-log bestgnssposb ontime 1
-log bestgnssvelb ontime 1
-log bestposb ontime 1
-log INSPVAXB ontime 1
-log INSPVASB ontime 0.01
-log CORRIMUDATASB ontime 0.01
-log RAWIMUSXB onnew 0 0
-log mark1pvab onnew
+log USB1 bestgnssposb ontime 1
+log USB1 bestgnssvelb ontime 1
+log USB1 bestposb ontime 1
+log USB1 INSPVAXB ontime 1
+log USB1 INSPVASB ontime 0.01
+log USB1 CORRIMUDATASB ontime 0.01
+log USB1 RAWIMUSXB onnew 0 0
+log USB1 mark1pvab onnew
 
-log rangeb ontime 1
-log bdsephemerisb
-log gpsephemb
-log gloephemerisb
-log bdsephemerisb ontime 15
-log gpsephemb ontime 15
-log gloephemerisb ontime 15
+log USB1 rangeb ontime 1
+log USB1 bdsephemerisb
+log USB1 gpsephemb
+log USB1 gloephemerisb
+log USB1 bdsephemerisb ontime 15
+log USB1 gpsephemb ontime 15
+log USB1 gloephemerisb ontime 15
 
-log imutoantoffsetsb once
-log vehiclebodyrotationb onchanged
+log USB1 imutoantoffsetsb once
+log USB1 vehiclebodyrotationb onchanged
  
 SAVECONFIG
 ```
