@@ -238,6 +238,8 @@ class Box2d {
    */
   void LongitudinalExtend(const double extension_length);
 
+  void LateralExtend(const double extension_length);
+
   /**
    * @brief Gets a human-readable description of the box
    * @return A debug-string

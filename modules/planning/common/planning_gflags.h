@@ -161,6 +161,7 @@ DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);
 DECLARE_double(min_velocity_sample_gap);
 DECLARE_double(lon_collision_buffer);
+DECLARE_double(lat_collision_buffer);
 DECLARE_uint32(num_sample_follow_per_timestamp);
 
 // Lattice Evaluate Parameters
