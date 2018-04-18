@@ -96,13 +96,10 @@ void MotionService::OnLocalization(
     timestamp_diff = localization.measurement_time() - pre_timestamp_;
     vehicle_status.time_d = timestamp_diff;
     vehicle_status.time_ts = localization.measurement_time();
-    //    timestamp_diff = localization.header().timestamp_sec() -
-    //    pre_timestamp_;
   }
 
   VehicleInformation vehicle_information;
   vehicle_information.timestamp = localization.measurement_time();
-  //  vehicle_information.timestamp = localization.header().timestamp_sec();
 
   vehicle_information.velocity = vehicle_status.velocity;
   vehicle_information.yaw_rate = vehicle_status.yaw_rate;
@@ -113,7 +110,6 @@ void MotionService::OnLocalization(
     vehicle_information_buffer_.push_back(vehicle_information);
   }
   pre_timestamp_ = localization.measurement_time();
-  //  pre_timestamp_ = localization.header().timestamp_sec();
 
   // add motion to buffer
   // double camera_timestamp = camera_shared_data_->GetLatestTimestamp();
@@ -122,7 +118,7 @@ void MotionService::OnLocalization(
      MutexLock lock(&image_mutex_);
      camera_timestamp = camera_timestamp_;
   }
-   AINFO << "motion timestamp: " << std::to_string(camera_timestamp);
+  AINFO << "motion timestamp: " << std::to_string(camera_timestamp);
 
   if (start_flag_) {
     if (std::abs(camera_timestamp - pre_camera_timestamp_) <
@@ -142,39 +138,13 @@ void MotionService::OnLocalization(
       vehicle_planemotion_->add_new_motion(
           &vehicle_status, pre_camera_timestamp_, camera_timestamp,
           PlaneMotion::RESET);
-
-      // AERROR << "camera timestamp should arrive in order";
-      // return;
     }
   }
+
   {
     MutexLock lock(&image_mutex_);
     pre_camera_timestamp_ = camera_timestamp;
   }
-  //  AINFO << "pre_timestamp_:" <<std::to_string(pre_timestamp_);
-  //  AINFO << "cam_timestamp_:" <<std::to_string(camera_timestamp);
-
-  //   if (std::abs(pre_timestamp - camera_timestamp) <
-  //       std::numeric_limits<double>::epsilon()) {
-  //     // exactly same timestamp
-  //     vehicle_planemotion_->add_new_motion(&vehicle_status, timestamp_diff,
-  //                                          PlaneMotion::ACCUM_PUSH_MOTION);
-  //     AINFO << "Motion_status: accum_push";
-  //   } else if (pre_timestamp < camera_timestamp) {
-  //     vehicle_planemotion_->add_new_motion(&vehicle_status, timestamp_diff,
-  //                                          PlaneMotion::ACCUM_MOTION);
-  //     AINFO << "Motion_status: acuum";
-  //   } else {
-  //     vehicle_planemotion_->add_new_motion(&vehicle_status, timestamp_diff,
-  //                                          PlaneMotion::PUSH_ACCUM_MOTION);
-  //     AINFO << "Motion_status: push_accum";
-  //   }
-
-  //  AINFO << "Motion Matrix: ";
-  //  auto motion_buffer_ptr = vehicle_planemotion_->get_buffer();
-  //  int motion_size = motion_buffer_ptr->size();
-  //  AINFO << (*motion_buffer_ptr)[motion_size-1].motion;
-  //  AINFO << "Motion Matrix end";
 }
 
 void MotionService::GetVehicleInformation(

@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <limits>
 #include <list>
 #include "modules/perception/obstacle/camera/motion/plane_motion.h"
 #include "modules/common/log.h"
@@ -76,6 +77,7 @@ void PlaneMotion::accumulate_motion(double start_time, double end_time) {
 void PlaneMotion::update_motion_buffer(VehicleStatus vehicledata,
                                        double pre_image_timestamp,
                                        double image_timestamp) {
+  MutexLock lock(&mutex_);
   for (int k = 0; k < static_cast<int>(mot_buffer_->size()); k++) {
     (*mot_buffer_)[k].motion *= mat_motion_2d_image_;
   }
@@ -92,49 +94,64 @@ void PlaneMotion::update_motion_buffer(VehicleStatus vehicledata,
       Eigen::Matrix3f::Identity();  // reset image accumulated motion
   time_difference_ = 0;             // reset the accumulated time difference
 }
+
+bool PlaneMotion::find_motion_with_timestamp(double timestamp,
+                                             VehicleStatus *vs) {
+  MutexLock lock(&mutex_);
+  size_t i = mot_buffer_->size()-1;
+  for (; i >= 0; i--) {
+    if (std::abs(mot_buffer_->at(i).time_ts - timestamp) <
+      std::numeric_limits<double>::epsilon()) {
+      *vs = mot_buffer_->at(i);
+      break;
+    }
+  }
+  return (i >= 0);
+}
+
 void PlaneMotion::add_new_motion(VehicleStatus *vehicledata,
                                  double pre_image_timestamp,
                                  double image_timestamp,
                                  int motion_operation_flag) {
-  generate_motion_matrix(vehicledata);
-  raw_motion_queue_.push_back(*vehicledata);
-  if (static_cast<int>(raw_motion_queue_.size()) > buffer_size_ * 10) {
-    AWARN << "MmotionQueue is too large, try sync motion/image timestep";
-  }
+  while (!raw_motion_queue_.empty() &&
+      vehicledata->time_ts < raw_motion_queue_.back().time_ts) {
+      raw_motion_queue_.pop_back();
+      ADEBUG << "pop ts : back ts" << std::to_string(vehicledata->time_ts)
+             << " " << std::to_string(raw_motion_queue_.back().time_ts)
+             << " " << raw_motion_queue_.size();
+    }
 
-  switch (motion_operation_flag) {
-    case ACCUM_MOTION:
-      // do nothing
-      break;
-    case ACCUM_PUSH_MOTION:
-      accumulate_motion(pre_image_timestamp, image_timestamp);
-      update_motion_buffer(*vehicledata, pre_image_timestamp, image_timestamp);
-      break;
-    default:
-      AERROR << "motion operation flag:wrong type";
-      return;
+  if (motion_operation_flag != RESET) {
+    generate_motion_matrix(vehicledata);
+    raw_motion_queue_.push_back(*vehicledata);
+    if (static_cast<int>(raw_motion_queue_.size()) > buffer_size_ * 10) {
+      AWARN << "MotionQueue is too large, try sync motion/image timestep";
+    }
+
+    switch (motion_operation_flag) {
+      case ACCUM_MOTION:
+        // do nothing
+        break;
+      case ACCUM_PUSH_MOTION:
+        accumulate_motion(pre_image_timestamp,
+                          image_timestamp);
+        update_motion_buffer(*vehicledata,
+                            pre_image_timestamp,
+                            image_timestamp);
+        break;
+      default:
+        AERROR << "motion operation flag:wrong type";
+        return;
+    }
+  } else {
+    mot_buffer_->clear();
+    vehicledata->time_d = 0;
+    vehicledata->time_ts = image_timestamp;
+    vehicledata->motion =  Eigen::Matrix3f::Identity();
+    mot_buffer_->push_back(*vehicledata);
+    ADEBUG << "pop and rest raw_buffer, mot_buffer: "
+            << raw_motion_queue_.size();
   }
 }
-// void PlaneMotion::add_new_motion(VehicleStatus *vehicledata,
-//                                  float motion_time_dif,
-//                                  int motion_operation_flag) {
-//   switch (motion_operation_flag) {
-//     case ACCUM_MOTION:
-//       accumulate_motion(vehicledata, motion_time_dif);
-//       break;
-//     case ACCUM_PUSH_MOTION:
-//       accumulate_motion(vehicledata, motion_time_dif);
-//       update_motion_buffer(vehicledata);
-//       break;
-//     case PUSH_ACCUM_MOTION:
-//       update_motion_buffer(vehicledata);
-//       accumulate_motion(vehicledata, motion_time_dif);
-//       break;
-//     default:
-//       AERROR << "motion operation flag:wrong type";
-//       return;
-//   }
-// }
-
 }  // namespace perception
 }  // namespace apollo

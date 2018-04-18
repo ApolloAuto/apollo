@@ -50,6 +50,7 @@ class MotionService : public Subnode {
   bool GetMotionInformation(double timestamp, VehicleStatus *vs);
   MotionBufferPtr GetMotionBuffer();
   double GetLatestTimestamp();
+
  protected:
   bool InitInternal() override;
 
@@ -63,14 +64,12 @@ class MotionService : public Subnode {
   double pre_timestamp_ = 0;
   double pre_camera_timestamp_ = 0;
   double camera_timestamp_ = 0;
-  // double pre_camera_timestamp = 0;
   bool start_flag_ = false;
   const int motion_buffer_size_ = 60;
   Mutex mutex_;
   Mutex image_mutex_;
   std::list<VehicleInformation> vehicle_information_buffer_;
   CameraSharedData *camera_shared_data_ = nullptr;
-  // MotionBufferPtr motion_buffer_;
   DISALLOW_COPY_AND_ASSIGN(MotionService);
 };
 
