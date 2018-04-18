@@ -20,7 +20,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "${DIR}"
 
-DEMO_BAG_URL="https://github.com/ApolloAuto/apollo/releases/download/v2.0.0/demo_2.0.bag";
+DEMO_BAG_URL="https://github.com/ApolloAuto/apollo/releases/download/v2.5.0/demo_2.5.bag";
 
 function print_usage() {
     echo "bash rosbag_helper.sh download: retrieve rosbag file from remote"
@@ -31,7 +31,7 @@ function main() {
     shift
     case $cmd in
         download)
-            wget -v $DEMO_BAG_URL -O ${DIR}/demo_2.0.bag
+            wget -v $DEMO_BAG_URL -O ${DIR}/demo_2.5.bag
             ;;
             *)
             print_usage
