@@ -46,7 +46,7 @@ apt-get update -y && apt-get install -y \
 echo 'ROSCONSOLE_FORMAT=${file}:${line} ${function}() [${severity}] [${time}]: ${message}' >> /etc/profile
 
 # Download apollo-ros.
-VERSION=2.1.1
+VERSION=2.1.2
 FILENAME=ros-indigo-apollo-${VERSION}-x86_64.tar.gz
 
 mkdir -p /home/tmp
