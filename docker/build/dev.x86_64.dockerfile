@@ -7,6 +7,7 @@ COPY installers /tmp/installers
 RUN bash /tmp/installers/pre_install.sh
 RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_bazel_packages.sh
+RUN bash /tmp/installers/install_ceres_solver.sh
 RUN bash /tmp/installers/install_gflags_glog.sh
 RUN bash /tmp/installers/install_glew.sh
 RUN bash /tmp/installers/install_glusterfs.sh
