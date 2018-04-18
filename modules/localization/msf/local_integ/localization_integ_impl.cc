@@ -19,8 +19,7 @@
 #include <list>
 #include <queue>
 
-#include "modules/localization/msf/common/util/time_conversion.h"
-#include "modules/localization/msf/common/util/timer.h"
+#include "modules/common/time/timer.h"
 #include "modules/common/log.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 
