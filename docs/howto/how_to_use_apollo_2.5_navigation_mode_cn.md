@@ -1,11 +1,19 @@
 # Apollo 2.5版导航模式的使用方法
 
 
-`Apollo`项目以其优异的系统架构、完整的模块功能、良好的开源生态及规范的代码风格，受到众多开发者的喜爱和好评。不过在`Apollo`之前的版本中，感知、预测、导航、规划模块均依赖于高精地图，而高精地图的制作方法繁琐且不透明，对于很多开发者而言，这是一个难以逾越的障碍。因为没有高精地图，很多人只能使用`Apollo`提供的模拟数据包进行走马观花式的观赏，而无法在测试道路上完成真枪实弹式的实车调试，这极大降低了`Apollo`项目带来的便利，也不利于自动驾驶开源社区的发展和壮大。显然，`Apollo`项目组已注意到该问题，经过他们几个月的艰苦努力，终于在2.5版(`low cost edition`)中开发了一种新的导航模式(`navigation mode`)，利用该模式可顺利实施测试道路上的实车调试。
+`Apollo`项目以其优异的系统架构、完整的模块功能、良好的开源生态及规范的代码风格，受到众多开发者的喜爱和好评。不过在`Apollo`之前的版本中，感知、预测、导航、规划模块均依赖于高精地图，而高精地图的制作方法繁琐且不透明，对于很多开发者而言，这是一个难以逾越的障碍。因为没有高精地图，很多人只能使用`Apollo`提供的模拟数据包进行走马观花式的观赏，而无法在测试道路上完成真枪实弹式的实车调试，这极大降低了`Apollo`项目带来的便利，也不利于自动驾驶开源社区的发展和壮大。显然，`Apollo`项目组已注意到该问题，经过他们几个月的艰苦努力，终于在2.5版开发了一种新的基于相对地图(`relative map`)的导航模式(`navigation mode`)，利用该模式可顺利实施测试道路上的实车调试。
 
-导航模式的基本思路是：首先通过人工驾驶方式录制测试道路上的行驶轨迹，之后利用`Apollo`工具对原始轨迹进行处理得到平滑轨迹，该轨迹既用于替代导航(`routing`)模块输出的全局路径，也是规划(`planning`)模块用到的参考线（或称指引线、中心线，`reference line`），还是生成相对地图（`relative map`）的基准线。此外，该轨迹还可与高精地图（`HDMap`）结合使用，用来替换高精地图中某一车道的参考线（默认情况下，高精地图将车道的中心线作为参考线，特殊情形下这种处理方式可能并不合适，这时将车辆实际驾驶轨迹作为车道参考线就能有效解决该问题，当然本文不讨论该项内容）。接下来，驾驶员将车辆行驶到测试道路起点，在`Dreamview`中打开导航(`Navigation`)选项，切换到自动驾驶模式，感知（`perception`）模块的相机（`camera`）动态检测道路边界及障碍物，地图（`map`）模块下的相对地图（`relative map`）子模块基于录制轨迹及道路边界实时地生成相对地图（使用以车辆当前位置为原点的相对坐标系），规划（`planning`）模块依据地图模块输出的相对地图和感知模块输出的障碍物信息，动态输出局部行驶路径给控制(`control`)模块执行。目前，导航模式仅支持单车道行驶，可完成加减速、跟车、遇障碍物减速停车或在车道宽度允许的情形下对障碍物绕行等功能，后续版本将会进一步完善以支持多车道行驶、交通信号标志和红绿灯检测等。
+相对地图是Apollo2.5引入的新特性。从架构层面，相对地图模块是连接高精地图(`HD Map`)、感知(`Perception`)模块和规划(`Planning`)模块的中间层。相对地图模块会实时生成基于车身坐标系的地图（格式与高精地图一致），并且输出供规划模块使用的参考线。更多信息，可以参考[相对地图的说明文档](https://github.com/ApolloAuto/apollo/blob/master/modules/map/relative_map/README.md)。从开发者友好性角度看，基于相对地图的导航模式，让开发者可以不依赖高精地图便可实施测试道路的实车调试，极大降低了开发者的使用门槛。
 
-本文对`Apollo2.5`版的构建、轨迹数据采集制作、`Dreamview`前端编译配置、导航模式使用等内容进行全面阐述，希望能给各位开发者正常使用`Apollo 2.5`版带来一定的便利。
+导航模式的基本思路是：
+
+1. 通过人工驾驶方式录制测试道路上的行驶轨迹；
+2. 利用`Apollo`工具对原始轨迹进行处理得到平滑轨迹，该轨迹既用于替代路由(`routing`)模块输出的导航路径，也是规划(`planning`)模块用到的参考线（或称指引线、中心线，`reference line`），还是生成相对地图（`relative map`）的基准线。此外，平滑轨迹还可用于替换高精地图内某些车道的参考线（默认情况下，高精地图将车道中心线作为参考线，在道路临时施工等特殊情形下该方式很不合适，需使用人工录制并平滑处理的轨迹替换特殊路段的车道参考线，当然本文不讨论该项内容）；
+3. 驾驶员将车辆行驶到测试道路起点，在`Dreamview`中打开导航(`Navigation`)选项及相关功能模块，切换到自动驾驶模式并启动车辆；
+4. 自动驾驶过程中，感知（`perception`）模块的相机（`camera`）动态检测道路边界及障碍物，地图（`map`）模块下的相对地图（`relative map`）子模块基于参考线及道路边界实时地生成相对地图（使用以车辆当前位置为原点的相对坐标系），规划（`planning`）模块依据地图模块输出的相对地图和感知模块输出的障碍物信息，动态输出局部行驶路径给控制(`control`)模块执行。
+5. 目前，导航模式仅支持单车道行驶，可完成加减速、跟车、遇障碍物减速停车或在车道宽度允许的情形下对障碍物绕行等功能，后续版本的导航模式将会进一步完善以支持多车道行驶、交通标志和红绿灯检测等。
+
+本文对`Apollo2.5`版的构建、参考线数据采集与制作、`Dreamview`前端编译配置、导航模式使用等内容进行全面阐述，希望能给各位开发者正常使用`Apollo 2.5`版带来一定的便利。
 
 ## 一、Apollo 2.5版的构建
 
@@ -28,8 +36,7 @@
 按快捷键`Ctrl + Alt + T`打开命令行终端，输入如下命令启动`Docker`：
 ``` bash
 cd your_apollo_project_root_dir
-# 国内因为墙的原因，需要加“-C”选项，国外则不需要
-​``` bash
+# 从中国大陆访问，最好加上“-C”选项，直接访问中国大陆镜像服务器以获取更快的下载速度
 bash docker/scripts/dev_start.sh -C
 ```
 输入如下命令进入`Docker`：
@@ -46,15 +53,15 @@ bash apollo.sh build
 
 ### 1.3 修改定位模块UTM区域ID
 
-`Apollo`项目定位(`localization`)模块默认使用美国西部UTM坐标，在国内需要修改该值。打开文件`[你的apollo根目录]/modules/localization/conf/localization.conf`，将下述内容：
+`Apollo`项目定位(`localization`)模块默认使用美国西部UTM坐标，在国内需要修改该值。在`Docker`外部，使用`vi`或其他文本编辑器，打开文件`[apollo项目根目录]/modules/localization/conf/localization.conf`，将下述内容：
 ``` bash
 --local_utm_zone_id=10
 ```
-修改为下述内容（这是长沙地区的UTM区域ID，中国UTM分区可参考[该网页](http://www.360doc.com/content/14/0729/10/3046928_397828751.shtml)：
+修改为下述内容（这是长沙地区的UTM区域ID，中国UTM分区可参考[该网页](http://www.360doc.com/content/14/0729/10/3046928_397828751.shtml)）：
 ``` bash
 --local_utm_zone_id=49
 ```
-**注意：**如果录制数据时未修改上述内容，则线下模拟测试回放数据包时只能将错就错，千万不能再修改该值，否则地图上的参考线定位会出错！有一次我采集数据时，忘了修改该值，回放数据时又修改该值，结果导致参考线定位到了美国西海岸！我取消修改，按`F5`键刷新浏览器后显示后就正常了。
+**注意：**如果录制数据时未修改上述内容，则线下模拟测试回放数据包时只能将错就错，千万不能再修改该值，否则地图上的参考线定位会出错！有一次我采集数据时，忘了修改该值，回放数据时又进行修改，结果导致参考线定位到了美国西海岸！我取消修改，按`F5`键刷新浏览器后显示就恢复正常了。
 
 ## 二、参考线原始数据的采集
 
@@ -66,15 +73,15 @@ bash scripts/bootstrap.sh
 
 ![img](images/navigation_mode/dreamview_interface.png) 
 
-**2.1**  驾驶员将车辆驶入待测试路段起点；
+**1**  驾驶员将车辆驶入待测试路段起点；
 
-**2.2**  操作员点击`Dreamview`界面左侧工具栏中的`Module Controller`按钮，进入模块控制页面，选中`GPS`、`Localization`、`Record Bag`选项（如下图所示，图中显示空白文本的模块是`Mobileye`模块，需安装配置好相关硬件后才可见）。**注意：如果采集的数据包需用于线下模拟测试，还需加上`CAN Bus`选项。**
+**2**  操作员点击`Dreamview`界面左侧工具栏中的`Module Controller`按钮，进入模块控制页面，选中`GPS`、`Localization`、`Record Bag`选项，**注意：如果采集的数据包需用于线下模拟测试，还需加上`CAN Bus`选项。**
 
 ![img](images/navigation_mode/options_for_data_recording.png) 
 
-**2.3**  驾驶员从起点启动车辆并按预定路线行驶至终点；
+**3**  驾驶员从起点启动车辆并按预定路线行驶至终点；
 
-**2.4**  操作员关闭`Dreamview`界面中的`Record Bag`选项，此时会在`/apollo/data/bag`目录（这是`Docker`中的目录，宿主机上对应的目录为`[你的apollo根目录]/data/bag`）中生成一个类似于`2018-04-01-09-58-00`的目录，该目录中保存着类似于`2018-04-01-09-58-00.bag`的数据包。这就是我们所需的数据包，请记住它的路径及名称。**注意：**单个数据包文件的默认录制时长为1分钟，默认文件大小为2048MB，可通过修改文件`/apollo/scripts/record_bag.sh`来改变默认值。
+**4**  操作员关闭`Dreamview`界面中的`Record Bag`选项，此时会在`/apollo/data/bag`目录（这是`Docker`中的目录，宿主机上对应的目录为`[你的apollo根目录]/data/bag`）中生成一个类似于`2018-04-01-09-58-00`的目录，该目录中保存着类似于`2018-04-01-09-58-00.bag`的数据包。这就是我们所需的数据包，请记住它的路径及名称。**注意：**单个数据包文件的默认录制时长为1分钟，默认文件大小为2048MB，可通过修改文件`/apollo/scripts/record_bag.sh`来改变默认值。
 
 为后文阐述方便起见，我假设数据包`2018-04-01-09-58-00.bag`直接存放于`/apollo/data/bag`目录。
 
@@ -117,21 +124,11 @@ python viewer_smooth.py ./path_2018-04-01-09-58-00.bag.txt ./path_2018-04-01-09-
 
 ## 四、Dreamview前端的编译及配置
 
-`Apollo`项目在美国研发，`Dreamview`前端默认使用`Google`地图。国内由于墙的原因无法正常访问`Google`地图，因此要将其修改为百度地图，重新编译`Dreamview`前端，并正确设置UTM区域（`Apollo`最新代码似乎已将默认地图设置为百度地图，若确实如此，可忽略**4.1-4.2**步，但仍需执行**4.3**步），具体方法如下：
+`Dreamview`前端默认使用`Baidu`地图，也可修改为`Google`地图，但需重新编译`Dreamview`前端，并正确设置UTM区域，具体方法如下（**注意**：如不需修改地图设置，可忽略**4.1-4.2**步，直接执行**4.3**步）：
 
 ### 4.1 更改导航地图
 
-打开文件`[你的apollo根目录]/modules/dreamview/frontend/src/store/config/ parameters.yml`，将下述内容： 
-``` bash
-navigation:
-  # possible options: BaiduMap or GoogleMap
-  map: "GoogleMap"
-
-  # Google Map API: "https://maps.google.com/maps/api/js"
-  # Baidu Map API: "https://api.map.baidu.com/api?v=3.0&ak=0kKZnWWhXEPfzIkklmzAa3dZ&callback=initMap"
-  mapAPiUrl: "https://maps.google.com/maps/api/js"
-```
-替换为：
+打开文件`[apollo项目根目录]/modules/dreamview/frontend/src/store/config/ parameters.yml`，根据需要将下述内容替换为`Google`地图或`Baidu`地图： 
 ``` bash
 navigation:
   # possible options: BaiduMap or GoogleMap
@@ -171,7 +168,7 @@ bash apollo.sh build_fe
 ```
 ### 4.3 配置UTM区域ID
 
-打开文件`[你的apollo根目录]/modules/common/data/global_flagfile.txt`，在最后一行添加如下语句（这是长沙地区的UTM区域ID，中国UTM分区可参考[该网页](http://www.360doc.com/content/14/0729/10/3046928_397828751.shtml)：
+打开文件`[apollo项目根目录]/modules/common/data/global_flagfile.txt`，在最后一行添加如下语句（这是长沙地区的UTM区域ID，中国UTM分区可参考[该网页](http://www.360doc.com/content/14/0729/10/3046928_397828751.shtml)）：
 ```
 --local_utm_zone_id=49
 ```
@@ -200,11 +197,11 @@ rosbag play -l /apollo/data/bag/2018-04-01-09-58-00.bag
 
 ### 5.2 打开Dreamview导航模式选项
 
-点击`Dreamview`界面左侧工具栏中的`Module Controller`按钮，进入模块控制页面。**若是线下模拟测试**，选中`Relative Map`、`Navi Planning`选项，其他模块根据需要开启，如下图所示：
+点击`Dreamview`界面左侧工具栏中的`Module Controller`按钮，进入模块控制页面。**若是线下模拟测试**，选中`Relative Map`、`Navi Planning`选项，其他模块根据需要开启，如下图所示（图中显示空白文本的模块是`Mobileye`模块，需安装配置好相关硬件后才可见））：
 
 ![img](images/navigation_mode/test_in_navigation_mode.png) 
 
-**若是实车调试**，建议除`Record Bag`、`Mobileye`和`Third Party Perception`模块外，其余模块全部开启，如下图所示：
+**若是实车调试**，建议除`Record Bag`、`Mobileye`（若`Mobileye`硬件未安装，则会显示为空白文本）和`Third Party Perception`模块外，其余模块全部开启，如下图所示：
 
 ![img](images/navigation_mode/drive_car_in_navigation_mode.png) 
 
