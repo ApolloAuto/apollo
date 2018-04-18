@@ -22,6 +22,7 @@
 #include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
+#include "modules/common/time/time_util.h"
 
 namespace apollo {
 namespace perception {
@@ -56,8 +57,20 @@ bool MotionService::InitInternal() {
   return true;
 }
 void MotionService::ImageCallback(const sensor_msgs::Image &message) {
-    // MutexLock(&image_mutex_);
-    camera_timestamp_ = message.header.stamp.toSec();
+  double curr_timestamp = message.header.stamp.toSec();
+  ADEBUG << "motion received image : " << GLOG_TIMESTAMP(curr_timestamp)
+        << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
+
+  if (FLAGS_skip_camera_frame && camera_timestamp_ > 0.0) {
+    if ((curr_timestamp - camera_timestamp_) < (1.0 / FLAGS_camera_hz) &&
+        curr_timestamp > camera_timestamp_) {
+      ADEBUG << "MotionService Skip frame";
+      return;
+    }
+  }
+
+  MutexLock lock(&image_mutex_);
+  camera_timestamp_ = curr_timestamp;
 }
 
 void MotionService::OnLocalization(
@@ -103,13 +116,14 @@ void MotionService::OnLocalization(
   //  pre_timestamp_ = localization.header().timestamp_sec();
 
   // add motion to buffer
-  double camera_timestamp = camera_shared_data_->GetLatestTimestamp();
-  AINFO << "motion timestamp: " << std::to_string(camera_timestamp);
-  // double camera_timestamp = 0;
-  // {
-  //   MutexLock lock(&image_mutex_);
-  //   camera_timestamp = camera_timestamp_;
-  // }
+  // double camera_timestamp = camera_shared_data_->GetLatestTimestamp();
+  double camera_timestamp = 0;
+  {
+     MutexLock lock(&image_mutex_);
+     camera_timestamp = camera_timestamp_;
+  }
+   AINFO << "motion timestamp: " << std::to_string(camera_timestamp);
+
   if (start_flag_) {
     if (std::abs(camera_timestamp - pre_camera_timestamp_) <
         std::numeric_limits<double>::epsilon()) {
@@ -124,12 +138,19 @@ void MotionService::OnLocalization(
           PlaneMotion::ACCUM_PUSH_MOTION);
       PublishEvent(camera_timestamp);
     } else {
-      AERROR << "camera timestamp should arrive in order";
-      return;
+      ADEBUG << "Motion_status: pop";
+      vehicle_planemotion_->add_new_motion(
+          &vehicle_status, pre_camera_timestamp_, camera_timestamp,
+          PlaneMotion::RESET);
+
+      // AERROR << "camera timestamp should arrive in order";
+      // return;
     }
   }
-  pre_camera_timestamp_ = camera_timestamp;
-
+  {
+    MutexLock lock(&image_mutex_);
+    pre_camera_timestamp_ = camera_timestamp;
+  }
   //  AINFO << "pre_timestamp_:" <<std::to_string(pre_timestamp_);
   //  AINFO << "cam_timestamp_:" <<std::to_string(camera_timestamp);
 
@@ -206,5 +227,14 @@ MotionBufferPtr MotionService::GetMotionBuffer() {
   return vehicle_planemotion_->get_buffer();
 }
 
+double MotionService::GetLatestTimestamp() {
+  MutexLock lock(&image_mutex_);
+  double rst = pre_camera_timestamp_;
+  return rst;
+}
+
+bool MotionService::GetMotionInformation(double timestamp, VehicleStatus *vs) {
+  return vehicle_planemotion_->find_motion_with_timestamp(timestamp, vs);
+}
 }  // namespace perception
 }  // namespace apollo

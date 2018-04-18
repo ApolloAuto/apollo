@@ -22,6 +22,7 @@
 #include <string>
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/obstacle/camera/motion/plane_motion.h"
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
@@ -46,8 +47,9 @@ class MotionService : public Subnode {
 
   void GetVehicleInformation(float timestamp,
                              VehicleInformation *vehicle_information);
+  bool GetMotionInformation(double timestamp, VehicleStatus *vs);
   MotionBufferPtr GetMotionBuffer();
-
+  double GetLatestTimestamp();
  protected:
   bool InitInternal() override;
 
