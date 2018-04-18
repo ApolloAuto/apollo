@@ -19,21 +19,21 @@ Apollo环境启动参见[Apollo 2.5快速上手指南](https://github.com/Apollo
 
 选择[Module Controller]、[Map Collection],打开[GPS]、[Camera]、[Velodyne]、[Velodyne16]开关。
 
-![](images/map_collection_mode/map_collection_sensor_open.png)
+![](images/map_collection_sensor_open.png)
 
 确认各个传感器状态是否OK.
 
-![](images/map_collection_mode/map_collection_sensor_check.png)
+![](images/map_collection_sensor_check.png)
 
 2、待确认各个传感器状态OK后，打开[Record Bag]开关，开始录制地图数据。
 
-![](images/map_collection_mode/map_collection_sensor_start_record.png)
+![](images/map_collection_sensor_start_record.png)
 
 采集过程中需要保证双向车道全覆盖采集五圈以上，车速60KM/h以下，尽量每圈走不同的车道，覆盖完全。在路口区域无需刻意停留，慢速通过即可。
 
 4、数据采集完成后，关闭[Record Bag]开关结束采集，然后关闭[GPS]、[Camera]、[Velodyne]、[Velodyne16]开关。
 
-![](images/map_collection_mode/map_collection_sensor_stop_record.png)
+![](images/map_collection_sensor_stop_record.png)
 
 5、数据上传
 
