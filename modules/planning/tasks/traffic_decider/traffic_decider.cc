@@ -87,6 +87,10 @@ void TrafficDecider::RegisterRules() {
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new KeepClear(config);
                           });
+  s_rule_factory.Register(TrafficRuleConfig::FRONT_VEHICLE,
+                          [](const TrafficRuleConfig &config) -> TrafficRule * {
+                            return new FrontVehicle(config);
+                          });
 }
 
 bool TrafficDecider::Init(const TrafficRuleConfigs &config) {
