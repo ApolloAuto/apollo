@@ -19,6 +19,12 @@ config: {
 }
 
 config: {
+  rule_id: FRONT_VEHICLE
+  enabled: true
+  front_vehicle {
+  }
+}
+config: {
   rule_id: CROSSWALK
   enabled: true
   crosswalk {
