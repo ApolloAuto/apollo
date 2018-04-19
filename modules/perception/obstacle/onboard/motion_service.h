@@ -22,6 +22,7 @@
 #include <string>
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/obstacle/camera/motion/plane_motion.h"
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
@@ -46,7 +47,9 @@ class MotionService : public Subnode {
 
   void GetVehicleInformation(float timestamp,
                              VehicleInformation *vehicle_information);
+  bool GetMotionInformation(double timestamp, VehicleStatus *vs);
   MotionBufferPtr GetMotionBuffer();
+  double GetLatestTimestamp();
 
  protected:
   bool InitInternal() override;
@@ -61,14 +64,12 @@ class MotionService : public Subnode {
   double pre_timestamp_ = 0;
   double pre_camera_timestamp_ = 0;
   double camera_timestamp_ = 0;
-  // double pre_camera_timestamp = 0;
   bool start_flag_ = false;
   const int motion_buffer_size_ = 60;
   Mutex mutex_;
   Mutex image_mutex_;
   std::list<VehicleInformation> vehicle_information_buffer_;
   CameraSharedData *camera_shared_data_ = nullptr;
-  // MotionBufferPtr motion_buffer_;
   DISALLOW_COPY_AND_ASSIGN(MotionService);
 };
 

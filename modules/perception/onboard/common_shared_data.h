@@ -202,8 +202,7 @@ template <class M>
 bool CommonSharedData<M>::Add(const CommonSharedDataKey &key,
                               const SharedDataPtr<M> &data) {
   // update latest_timestamp for SharedData
-  latest_timestamp_ = std::max(latest_timestamp_, key.timestamp);
-  // latest_timestamp_ = key.timestamp;
+  latest_timestamp_ = key.timestamp;
   return Add(key.ToString(), data);
 }
 

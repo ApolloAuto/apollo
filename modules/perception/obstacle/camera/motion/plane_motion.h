@@ -25,7 +25,7 @@
 #include "Eigen/Dense"
 #include "Eigen/Eigen"
 #include "Eigen/Geometry"
-
+#include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 
 namespace apollo {
@@ -36,11 +36,12 @@ class PlaneMotion {
   explicit PlaneMotion(int s);
 
   ~PlaneMotion(void);
-  enum { ACCUM_MOTION = 0, ACCUM_PUSH_MOTION, PUSH_ACCUM_MOTION };
+  enum { ACCUM_MOTION = 0, ACCUM_PUSH_MOTION, PUSH_ACCUM_MOTION, RESET};
 
  private:
   std::list<VehicleStatus> raw_motion_queue_;
   MotionBufferPtr mot_buffer_;
+  Mutex mutex_;
   int buffer_size_;
   int time_increment_;     // the time increment units in motion input
   float time_difference_;  // the time difference for each buffer input
@@ -84,6 +85,7 @@ class PlaneMotion {
                       int motion_operation_flag);
 
   MotionBufferPtr get_buffer() { return mot_buffer_; }
+  bool find_motion_with_timestamp(double timestamp, VehicleStatus *vs);
 };
 
 }  // namespace perception
