@@ -816,10 +816,9 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       CorrectWithLaneHistory(l, *lane_objects, &is_valid);
     }
 
-    for (l = 0; l < is_valid.size(); l++) {
-      if (is_valid[l]) {
-        break;
-      }
+    l = 0;
+    while (l < is_valid.size() && !is_valid[l]) {
+      l++;
     }
     if (l < is_valid.size()) {
       lane_history_.push_back(*(*lane_objects));
@@ -836,18 +835,18 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
         AINFO << generated_lanes_->at(l).model;
       }
     }
-// #if USE_HISTORY_TO_EXTEND_LANE
-//       for (size_t i = 0; i < generated_lanes_->size(); i++) {
-//         if (is_valid[i]) {
-//           int j = 0;
-//           if (FindLane(*(*lane_objects),
-//                  generated_lanes_->at(i).spatial, &j)) {
-//             ExtendLaneWithHistory(generated_lanes_->at(i),
-//                                   &((*lane_objects)->at(j)));
-//           }
-//         }
-//       }
-// #endif //USE_HISTORY_TO_EXTEND_LANE
+#if USE_HISTORY_TO_EXTEND_LANE
+    for (size_t i = 0; i < generated_lanes_->size(); i++) {
+      if (is_valid[i]) {
+        int j = 0;
+        if (FindLane(*(*lane_objects),
+            generated_lanes_->at(i).spatial, &j)) {
+          ExtendLaneWithHistory(generated_lanes_->at(i),
+                                &((*lane_objects)->at(j)));
+        }
+      }
+    }
+#endif  // USE_HISTORY_TO_EXTEND_LANE
     auto vs = options.vehicle_status;
     for (auto &m : *motion_buffer_) {
       m.motion *= vs.motion;

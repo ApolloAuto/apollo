@@ -271,7 +271,7 @@ Status LanePostProcessingSubnode::ProcEvents() {
       options_.SetMotion(motion_service_->GetMotionBuffer()->back());
       mutex_.unlock();
     }
-    ADBEUG << "options_.vehicle_status.motion:  "
+    ADEBUG << "options_.vehicle_status.motion:  "
           << options_.vehicle_status.motion;
   }
   lane_post_processor_->Process(lane_map, options_, &lane_objects);
