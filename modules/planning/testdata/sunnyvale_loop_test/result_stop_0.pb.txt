@@ -1844,6 +1844,39 @@ decision {
           stop_point {
             x: 587047.7726976322
             y: 4141552.3894532588
+            z: 0
+          }
+          stop_heading: 1.145870363339262
+        }
+      }
+    }
+    decision {
+      id: "401_1"
+      perception_id: 401
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_OBSTACLE
+          distance_s: -6
+          stop_point {
+            x: 587047.7726976322
+            y: 4141552.3894532588
+            z: 0
+          }
+          stop_heading: 1.145870363339262
+        }
+      }
+    }
+    decision {
+      id: "401_2"
+      perception_id: 401
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_OBSTACLE
+          distance_s: -6
+          stop_point {
+            x: 587047.7726976322
+            y: 4141552.3894532588
+            z: 0
           }
           stop_heading: 1.145870363339262
         }
@@ -1862,6 +1895,21 @@ decision {
             z: 0
           }
           stop_heading: 0.95481037513067379
+        }
+      }
+    }
+    decision {
+      id: "SL_1076"
+      perception_id: -992862322
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_OBSTACLE
+          distance_s: -6
+          stop_point {
+            x: 587048.648302786
+            y: 4141554.2274172986
+          }
+          stop_heading: 1.1102040297563296
         }
       }
     }
