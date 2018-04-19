@@ -511,12 +511,12 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
     return false;
   }
 
-  time_stamp_ = options.timestamp;
-
-  if (options.use_lane_history && !use_history_) {
+  if (options.use_lane_history &&
+      (!use_history_ || time_stamp_ > options.timestamp)) {
     InitLaneHistory();
   }
-//  AINFO << "use history: " << use_history_;
+
+  time_stamp_ = options.timestamp;
 
   cur_lane_instances_.reset(new vector<LaneInstance>);
   if (!GenerateLaneInstances(lane_map)) {
@@ -816,10 +816,9 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       CorrectWithLaneHistory(l, *lane_objects, &is_valid);
     }
 
-    for (l = 0; l < is_valid.size(); l++) {
-      if (is_valid[l]) {
-        break;
-      }
+    l = 0;
+    while (l < is_valid.size() && !is_valid[l]) {
+      l++;
     }
     if (l < is_valid.size()) {
       lane_history_.push_back(*(*lane_objects));
@@ -829,7 +828,6 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
       }
     }
 
-//    AINFO << "History buffer size: " << lane_history_.size();
     for (l = 0; l < is_valid.size(); l++) {
       if (!is_valid[l]) {
         (*lane_objects)->push_back(generated_lanes_->at(l));
@@ -837,28 +835,19 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
         AINFO << generated_lanes_->at(l).model;
       }
     }
-//    if (CorrectWithLaneHistory(*lane_objects, &is_valid)) {
-
-//     if (0) {
-//       lane_history_.push_back(*(*lane_objects));
-// #if USE_HISTORY_TO_EXTEND_LANE
-//       for (size_t i = 0; i < generated_lanes_->size(); i++) {
-//         if (is_valid[i]) {
-//           int j = 0;
-//           if (FindLane(*(*lane_objects),
-//                  generated_lanes_->at(i).spatial, &j)) {
-//             ExtendLaneWithHistory(generated_lanes_->at(i),
-//                                   &((*lane_objects)->at(j)));
-//           }
-//         }
-//       }
-// #endif //USE_HISTORY_TO_EXTEND_LANE
-//    } else {
-//      AINFO << "use history instead of current lane detection";
-//      lane_history_.pop_front();
-//    }
+#if USE_HISTORY_TO_EXTEND_LANE
+    for (size_t i = 0; i < generated_lanes_->size(); i++) {
+      if (is_valid[i]) {
+        int j = 0;
+        if (FindLane(*(*lane_objects),
+            generated_lanes_->at(i).spatial, &j)) {
+          ExtendLaneWithHistory(generated_lanes_->at(i),
+                                &((*lane_objects)->at(j)));
+        }
+      }
+    }
+#endif  // USE_HISTORY_TO_EXTEND_LANE
     auto vs = options.vehicle_status;
-    // vs.motion = vs.motion.inverse();
     for (auto &m : *motion_buffer_) {
       m.motion *= vs.motion;
     }
@@ -869,8 +858,7 @@ bool CCLanePostProcessor::Process(const cv::Mat &lane_map,
 
 bool CCLanePostProcessor::CorrectWithLaneHistory(int l,
         LaneObjectsPtr lane_objects, std::vector<bool> *is_valid) {
-  // trust current lane or not
-//  for (size_t l = 0; l < generated_lanes_->size(); l++) {
+    // trust current lane or not
     auto &lane = generated_lanes_->at(l);
     lane.pos.clear();
     lane.longitude_start = std::numeric_limits<ScalarType>::max();
@@ -908,9 +896,7 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(int l,
       // fit a 2nd-order polynomial curve;
       lane.order = 2;
     }
-//    std::sort(lane.pos.begin(), lane.pos.end(),
-//      [&](Vector2D a, Vector2D b) {return a.x() < b.x();});
-//    AINFO << "history size: " << lane.point_num;
+    ADEBUG << "history size: " << lane.point_num;
     if (lane_accum_num < 2 ||lane.point_num < 2 ||
         lane.longitude_end - lane.longitude_start < 4.0) {
       AWARN << "Failed to use history: " << lane_accum_num
@@ -953,20 +939,12 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(int l,
         count++;
       }
       if (count > 0 && ave_delta / count > AVEAGE_LANE_WIDTH_METER / 4.0) {
-        AINFO << "ave_delta is: " << ave_delta / count;
+        ADEBUG << "ave_delta is: " << ave_delta / count;
         lane_objects->erase(lane_objects->begin() + idx);
-//        for (auto &pos : lane.pos) {
-//          pos.y() = PolyEval(pos.x(), lane.order, lane.model);
-//        }
-      //  lane_objects->push_back(lane);
       } else {
         (*is_valid)[l] = true;
       }
     }
-//  }
-//  for (std::size_t l = 0; l < generated_lanes_->size(); l++) {
-//    if ((*is_valid)[l]) return true;
-//  }
   return (*is_valid)[l];
 }
 
@@ -1004,10 +982,23 @@ bool CCLanePostProcessor::FindLane(const LaneObjects &lane_objects,
 void CCLanePostProcessor::InitLaneHistory() {
   use_history_ = true;
   AINFO << "Init Lane History Start;";
-  lane_history_.set_capacity(MAX_LANE_HISTORY);
-  motion_buffer_ = std::make_shared<MotionBuffer>(MAX_LANE_HISTORY);
-  generated_lanes_ =
+  if (!lane_history_.empty()) {
+    lane_history_.clear();
+  } else {
+    lane_history_.set_capacity(MAX_LANE_HISTORY);
+  }
+  if (motion_buffer_ != nullptr) {
+    motion_buffer_->clear();
+  } else {
+    motion_buffer_ = std::make_shared<MotionBuffer>(MAX_LANE_HISTORY);
+  }
+  if (generated_lanes_ != nullptr) {
+    generated_lanes_->clear();
+    generated_lanes_->resize(interested_labels_.size(), LaneObject());
+  } else {
+    generated_lanes_ =
       std::make_shared<LaneObjects>(interested_labels_.size(), LaneObject());
+  }
   for (std::size_t i = 0; i < generated_lanes_->size(); i++) {
     generated_lanes_->at(i).spatial = interested_labels_[i];
   }
