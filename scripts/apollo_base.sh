@@ -327,7 +327,7 @@ function start_fe_customized_path() {
 
   eval "${APOLLO_BIN_PREFIX}/modules/${MODULE_PATH}/${MODULE} \
       --flagfile=modules/${MODULE_PATH}/conf/${MODULE}.conf \
-      --log_dir=${APOLLO_ROOT_DIR}/data/log $@"
+      --alsologtostderr --log_dir=${APOLLO_ROOT_DIR}/data/log $@"
 }
 
 function start_fe() {

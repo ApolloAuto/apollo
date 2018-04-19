@@ -94,8 +94,9 @@ Status Dreamview::Init() {
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
   std::vector<std::string> options = {
-      "document_root",    FLAGS_static_file_dir,  "listening_ports",
-      FLAGS_server_ports, "websocket_timeout_ms", FLAGS_websocket_timeout_ms};
+      "document_root",      FLAGS_static_file_dir,   "listening_ports",
+      FLAGS_server_ports,   "websocket_timeout_ms",  FLAGS_websocket_timeout_ms,
+      "request_timeout_ms", FLAGS_request_timeout_ms};
   if (PathExists(FLAGS_ssl_certificate)) {
     options.push_back("ssl_certificate");
     options.push_back(FLAGS_ssl_certificate);
