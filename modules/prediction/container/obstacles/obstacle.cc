@@ -899,7 +899,9 @@ void Obstacle::SetLanePoints(Feature* feature) {
     double start_s = lane_sequence->lane_segment(lane_index).start_s();
     double total_s = 0.0;
     double lane_seg_s = start_s;
-    while (lane_index < lane_sequence->lane_segment_size()) {
+    std::size_t count_point = 0;
+    while (lane_index < lane_sequence->lane_segment_size() &&
+           count_point < FLAGS_max_num_lane_point) {
       if (lane_seg_s > lane_segment->end_s()) {
         start_s = lane_seg_s - lane_segment->end_s();
         lane_seg_s = start_s;
@@ -937,6 +939,7 @@ void Obstacle::SetLanePoints(Feature* feature) {
         lane_point.set_angle_diff(lane_point_angle_diff);
         lane_segment->set_lane_turn_type(PredictionMap::LaneTurnType(lane_id));
         lane_segment->add_lane_point()->CopyFrom(lane_point);
+        ++count_point;
         total_s += FLAGS_target_lane_gap;
         lane_seg_s += FLAGS_target_lane_gap;
       }
