@@ -71,7 +71,7 @@ const uint32_t KEYCODE_SETQ2 = 0x71;  // 'q'
 
 // change action
 const uint32_t KEYCODE_MODE = 0x6D;  // 'm'
-  
+
 // emergency stop
 const uint32_t KEYCODE_ESTOP = 0x45;  // 'E'
 
@@ -246,16 +246,14 @@ class Teleop {
           if (cnt == 0) {
             control_command_.mutable_signal()->
               set_turn_signal(VehicleSignal::TURN_NONE);
-          }
-          else if (cnt == 1) {
+          } else if (cnt == 1) {
             control_command_.mutable_signal()->
               set_turn_signal(VehicleSignal::TURN_LEFT);
-          }
-          else if (cnt == 2) {
+          } else if (cnt == 2) {
             control_command_.mutable_signal()->
               set_turn_signal(VehicleSignal::TURN_RIGHT);
           }
-         
+
           break;
         case KEYCODE_MODE:
           // read keyboard again
