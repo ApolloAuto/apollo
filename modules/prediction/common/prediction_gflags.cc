@@ -113,6 +113,8 @@ DEFINE_bool(adjust_velocity_by_obstacle_heading, false,
 DEFINE_bool(adjust_velocity_by_position_shift, false,
             "adjust velocity heading to lane heading");
 DEFINE_double(heading_filter_param, 0.99, "heading filter parameter");
+DEFINE_uint32(max_num_lane_point, 20,
+              "The maximal number of lane points to store");
 
 // Validation checker
 DEFINE_double(centripetal_acc_coeff, 0.5,
