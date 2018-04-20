@@ -18,8 +18,8 @@
  * @file
  **/
 
-#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CIPV_H_
-#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CIPV_H_
+#ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_FRONT_VEHICLE_H_
+#define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_FRONT_VEHICLE_H_
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
@@ -30,20 +30,17 @@
 namespace apollo {
 namespace planning {
 
-class CIPV : public TrafficRule {
+class FrontVehicle : public TrafficRule {
  public:
-  explicit CIPV(const TrafficRuleConfig& config);
-  ~CIPV() = default;
+  explicit FrontVehicle(const TrafficRuleConfig& config);
+  ~FrontVehicle() = default;
 
   bool ApplyRule(Frame* frame, ReferenceLineInfo* reference_line_info);
 
  private:
-  bool CreateFollowDecision(const PathObstacle& path_obstacle,
-                            const ReferenceLineInfo* reference_line_info,
-                            ObjectDecisionType* const follow_decision);
+  void StopForStaticCrossLaneObstacles(ReferenceLineInfo* reference_line_info);
 };
-
 }  // namespace planning
 }  // namespace apollo
 
-#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_CIPV_H_
+#endif  // MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_FRONT_VEHICLE_H_

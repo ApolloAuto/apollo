@@ -27,8 +27,8 @@
 #include "modules/common/macro.h"
 
 /**
- * @namespace apollo::common::config
- * @brief apollo::common::config
+ * @namespace apollo::common
+ * @brief apollo::common
  */
 namespace apollo {
 namespace common {
