@@ -74,3 +74,7 @@ DEFINE_uint32(max_update_size, 1000000,
 
 DEFINE_bool(sim_world_with_routing_path, false,
             "Whether the routing_path is included in sim_world proto.");
+
+DEFINE_string(
+    request_timeout_ms, "2000",
+    "Timeout for network read and network write operations, in milliseconds.");

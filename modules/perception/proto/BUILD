@@ -62,3 +62,17 @@ proto_library(
         "yolo_camera_detector_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "modest_radar_detector_config_lib_proto",
+    deps = [
+        ":modest_radar_detector_config_lib",
+    ],
+)
+
+proto_library(
+    name = "modest_radar_detector_config_lib",
+    srcs = [
+        "modest_radar_detector_config.proto",
+    ],
+)

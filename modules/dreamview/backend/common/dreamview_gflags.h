@@ -51,4 +51,6 @@ DECLARE_uint32(max_update_size);
 
 DECLARE_bool(sim_world_with_routing_path);
 
+DECLARE_string(request_timeout_ms);
+
 #endif  // MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_

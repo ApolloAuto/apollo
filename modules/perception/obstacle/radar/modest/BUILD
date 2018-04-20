@@ -28,6 +28,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/radar/interface",
+        "//modules/perception/proto:modest_radar_detector_config_lib_proto",
         "@eigen",
         "@pcl",
     ],
