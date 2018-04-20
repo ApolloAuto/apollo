@@ -116,5 +116,6 @@ DECLARE_string(cc_lane_post_processor_config_file);
 DECLARE_string(probabilistic_fusion_config_file);
 DECLARE_string(yolo_config_filename);
 DECLARE_string(yolo_camera_detector_config);
+DECLARE_string(modest_radar_detector_config);
 
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
