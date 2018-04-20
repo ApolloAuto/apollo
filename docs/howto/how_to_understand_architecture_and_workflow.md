@@ -101,7 +101,7 @@ output observed Obstacles info. In the latest version of the codes, different ha
 different parallel locations, which consists of *Lidar, Radar, Traffic lights and GPS*.
 
 1. Lidar:
-   - Hadmap: get transformation matrix convert point world coordinates to local coordinates and build map polygons
+   - Hdmap: get transformation matrix convert point world coordinates to local coordinates and build map polygons
    - ROI filter: get ROI and perform Kalman Filter on input data
    - Segmentation: A U-Net based \(a lot of variants\) caffemodel will be loaded and perform forward computation based on data from Hdmap and ROI filtering results
    - Object Building: Lidar return points \(x, y, z\). Hence you need to group them into "Obstacles" \(vector or set\)
