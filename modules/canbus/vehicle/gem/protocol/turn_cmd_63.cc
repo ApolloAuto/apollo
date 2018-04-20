@@ -41,7 +41,7 @@ void Turncmd63::UpdateData(uint8_t* data) {
 
 void Turncmd63::Reset() {
   // TODO(QiL) :you should check this manually
-  turn_signal_cmd_ = Turn_cmd_63::TURN_SIGNAL_CMD_RIGHT;
+  turn_signal_cmd_ = Turn_cmd_63::TURN_SIGNAL_CMD_NONE;
 }
 
 Turncmd63* Turncmd63::set_turn_signal_cmd(
