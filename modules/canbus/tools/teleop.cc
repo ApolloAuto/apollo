@@ -40,6 +40,7 @@ namespace {
 using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
+using apollo::common::VehicleSignal;
 using apollo::control::ControlCommand;
 using apollo::control::PadMessage;
 
@@ -64,6 +65,9 @@ const uint32_t KEYCODE_SETG2 = 0x67;  // 'g'
 const uint32_t KEYCODE_SETB1 = 0x42;  // 'B'
 const uint32_t KEYCODE_SETB2 = 0x62;  // 'b'
 const uint32_t KEYCODE_ZERO = 0x30;   // '0'
+
+const uint32_t KEYCODE_SETQ1 = 0x51;  // 'Q'
+const uint32_t KEYCODE_SETQ2 = 0x71;  // 'q'
 
 // change action
 const uint32_t KEYCODE_MODE = 0x6D;  // 'm'
@@ -228,6 +232,29 @@ class Teleop {
           AINFO << "Throttle = " << control_command_.throttle()
                 << ", Brake = " << control_command_.brake();
           break;
+        case KEYCODE_SETQ1:
+        case KEYCODE_SETQ2:
+          if (read(kfd_, &c, 1) < 0) {
+            exit(-1);
+          }
+          static int cnt = 0;
+          ++cnt;
+          if (cnt > 2) {
+            cnt = 0;
+          }
+
+          if (cnt == 0) {
+            control_command_.mutable_signal()->
+              set_turn_signal(VehicleSignal::TURN_NONE);
+          } else if (cnt == 1) {
+            control_command_.mutable_signal()->
+              set_turn_signal(VehicleSignal::TURN_LEFT);
+          } else if (cnt == 2) {
+            control_command_.mutable_signal()->
+              set_turn_signal(VehicleSignal::TURN_RIGHT);
+          }
+
+          break;
         case KEYCODE_MODE:
           // read keyboard again
           if (read(kfd_, &c, 1) < 0) {
@@ -329,6 +356,8 @@ class Teleop {
     control_command_.set_engine_on_off(false);
     control_command_.set_driving_mode(Chassis::COMPLETE_MANUAL);
     control_command_.set_gear_location(Chassis::GEAR_INVALID);
+    control_command_.mutable_signal()->
+      set_turn_signal(VehicleSignal::TURN_NONE);
   }
 
   void OnChassis(const Chassis &chassis) {
