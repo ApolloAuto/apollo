@@ -82,6 +82,7 @@ DECLARE_double(rnn_min_lane_relatice_s);
 DECLARE_bool(adjust_velocity_by_obstacle_heading);
 DECLARE_bool(adjust_velocity_by_position_shift);
 DECLARE_double(heading_filter_param);
+DECLARE_uint32(max_num_lane_point);
 
 // Validation checker
 DECLARE_double(centripetal_acc_coeff);
