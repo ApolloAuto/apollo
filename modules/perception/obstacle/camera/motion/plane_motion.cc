@@ -98,7 +98,8 @@ void PlaneMotion::update_motion_buffer(VehicleStatus vehicledata,
 bool PlaneMotion::find_motion_with_timestamp(double timestamp,
                                              VehicleStatus *vs) {
   MutexLock lock(&mutex_);
-  size_t i = mot_buffer_->size()-1;
+  ADEBUG << "mot_buffer_->size(): " << mot_buffer_->size();
+  int i = static_cast<int>(mot_buffer_->size()) - 1;
   for (; i >= 0; i--) {
     if (std::abs(mot_buffer_->at(i).time_ts - timestamp) <
       std::numeric_limits<double>::epsilon()) {
