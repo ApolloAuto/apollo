@@ -67,10 +67,17 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
 
   Matrix matrix_k =
       Matrix::Zero(matrix_b.rows() * horizon, matrix_b.cols() * horizon);
-  for (unsigned int r = 0; r < horizon; ++r) {
+  matrix_k.block(0, 0, matrix_b.rows(), matrix_b.cols()) = matrix_b;
+  for (unsigned int r = 1; r < horizon; ++r) {
     for (unsigned int c = 0; c <= r; ++c) {
-      matrix_k.block(r * matrix_b.rows(), c * matrix_b.cols(), matrix_b.rows(),
-                     matrix_b.cols()) = matrix_a_power[r - c] * matrix_b;
+      if (c < r) {
+        matrix_k.block(r * matrix_b.rows(), c * matrix_b.cols(),
+                       matrix_b.rows(), matrix_b.cols()) =
+            matrix_a_power[r - c - 1] * matrix_b;
+      } else if (c == r) {
+        matrix_k.block(r * matrix_b.rows(), c * matrix_b.cols(),
+                       matrix_b.rows(), matrix_b.cols()) = matrix_b;
+      }
     }
   }
   // Initialize matrix_k, matrix_m, matrix_t and matrix_v, matrix_qq, matrix_rr,
@@ -80,15 +87,23 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
   Matrix matrix_rr = Matrix::Zero(matrix_k.cols(), matrix_k.cols());
   Matrix matrix_ll = Matrix::Zero(horizon * matrix_lower.rows(), 1);
   Matrix matrix_uu = Matrix::Zero(horizon * matrix_upper.rows(), 1);
+  Matrix matrix_cc = Matrix::Zero(horizon * matrix_c.rows(), 1);
+  Matrix matrix_aa = Matrix::Zero(horizon * matrix_a.rows(), matrix_a.cols());
+  matrix_aa.block(0, 0, matrix_a.rows(), matrix_a.cols()) = matrix_a;
+
+  for (unsigned int i = 1; i < horizon; ++i) {
+    matrix_aa.block(i * matrix_a.rows(), 0, matrix_a.rows(), matrix_a.cols()) =
+        matrix_a *
+        matrix_aa.block((i - 1) * matrix_a.rows(), 0, matrix_a.rows(),
+                        matrix_a.cols());
+  }
 
   // Compute matrix_m
-  matrix_m.block(0, 0, matrix_a.rows(), 1) =
-      matrix_a * matrix_initial_state + matrix_c;
+  matrix_m.block(0, 0, matrix_a.rows(), 1) = matrix_a * matrix_initial_state;
   for (unsigned int i = 1; i < horizon; ++i) {
     matrix_m.block(i * matrix_a.rows(), 0, matrix_a.rows(), 1) =
         matrix_a *
-            matrix_m.block((i - 1) * matrix_a.rows(), 0, matrix_a.rows(), 1) +
-        matrix_c;
+        matrix_m.block((i - 1) * matrix_a.rows(), 0, matrix_a.rows(), 1);
   }
 
   // Compute matrix_ll, matrix_uu, matrix_qq, matrix_rr
@@ -103,9 +118,19 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
                     matrix_r.cols()) = matrix_r;
   }
 
+  matrix_cc.block(0, 0, matrix_c.rows(), 1) = matrix_c;
+  for (unsigned int i = 1; i < horizon; ++i) {
+    matrix_cc.block(i * matrix_c.rows(), 0, matrix_c.rows(), 1) =
+        matrix_cc.block((i - 1) * matrix_c.rows(), 0, matrix_c.rows(), 1) +
+        matrix_aa.block((i - 1) * matrix_a.rows(), 0, matrix_a.rows(),
+                        matrix_a.cols()) *
+            matrix_c;
+  }
+
   // Update matrix_m1, matrix_m2, convert MPC problem to QP problem done
   Matrix matrix_m1 = matrix_k.transpose() * matrix_qq * matrix_k + matrix_rr;
-  Matrix matrix_m2 = matrix_k.transpose() * matrix_qq * (matrix_m - matrix_t);
+  Matrix matrix_m2 =
+      matrix_k.transpose() * matrix_qq * (matrix_m + matrix_cc - matrix_t);
 
   // Format in qp_solver
   /**
