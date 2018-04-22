@@ -70,14 +70,9 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
   matrix_k.block(0, 0, matrix_b.rows(), matrix_b.cols()) = matrix_b;
   for (unsigned int r = 1; r < horizon; ++r) {
     for (unsigned int c = 0; c <= r; ++c) {
-      if (c < r) {
-        matrix_k.block(r * matrix_b.rows(), c * matrix_b.cols(),
-                       matrix_b.rows(), matrix_b.cols()) =
-            matrix_a_power[r - c - 1] * matrix_b;
-      } else if (c == r) {
-        matrix_k.block(r * matrix_b.rows(), c * matrix_b.cols(),
-                       matrix_b.rows(), matrix_b.cols()) = matrix_b;
-      }
+      matrix_k.block(r * matrix_b.rows(), c * matrix_b.cols(), matrix_b.rows(),
+                     matrix_b.cols()) =
+          (c == r ? matrix_b : matrix_a_power[r - c - 1] * matrix_b);
     }
   }
   // Initialize matrix_k, matrix_m, matrix_t and matrix_v, matrix_qq, matrix_rr,
