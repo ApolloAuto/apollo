@@ -18,7 +18,6 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/constraint_checker",
         "//modules/planning/constraint_checker:collision_checker",
-        "//modules/planning/lattice/behavior:behavior_decider",
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/trajectory1d:lattice_trajectory1d",
         "//modules/planning/lattice/trajectory_generation:backup_trajectory_generator",
