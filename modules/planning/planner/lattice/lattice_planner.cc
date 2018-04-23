@@ -101,7 +101,8 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
   std::size_t index = 0;
   for (auto& reference_line_info : frame->reference_line_info()) {
     if (index != 0) {
-      reference_line_info.SetPriorityCost(FLAGS_priority_cost_gap);
+      reference_line_info.SetPriorityCost(
+          FLAGS_cost_non_priority_reference_line);
     } else {
       reference_line_info.SetPriorityCost(0.0);
     }
@@ -218,8 +219,6 @@ Status LatticePlanner::PlanOnReferenceLine(
   std::size_t constraint_failure_count = 0;
   std::size_t collision_failure_count = 0;
   std::size_t combined_constraint_failure_count = 0;
-
-  // planning_internal::Debug* ptr_debug = reference_line_info->mutable_debug();
 
   std::size_t num_lattice_traj = 0;
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
