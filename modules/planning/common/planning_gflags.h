@@ -171,7 +171,7 @@ DECLARE_double(weight_lon_collision);
 DECLARE_double(weight_lat_offset);
 DECLARE_double(weight_lat_comfort);
 DECLARE_double(weight_centripetal_acceleration);
-DECLARE_double(priority_cost_gap);
+DECLARE_double(cost_non_priority_reference_line);
 DECLARE_double(weight_same_side_offset);
 DECLARE_double(weight_opposite_side_offset);
 DECLARE_double(weight_dist_travelled);
