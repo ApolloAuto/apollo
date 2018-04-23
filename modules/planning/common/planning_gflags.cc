@@ -318,8 +318,8 @@ DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
 DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");
 DEFINE_double(weight_centripetal_acceleration, 1.5,
               "Weight of centripetal acceleration");
-DEFINE_double(priority_cost_gap, 5.0,
-              "Gap to increase the priority cost of reference line.");
+DEFINE_double(cost_non_priority_reference_line, 5.0,
+              "The cost of planning on non-priority reference line.");
 DEFINE_double(weight_same_side_offset, 1.0,
               "Weight of same side lateral offset cost");
 DEFINE_double(weight_opposite_side_offset, 10.0,
