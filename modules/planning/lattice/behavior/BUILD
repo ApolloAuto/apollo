@@ -3,51 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "scenario_manager",
-    srcs = [
-        "scenario_manager.cc",
-    ],
-    hdrs = [
-        "scenario_manager.h",
-    ],
-    deps = [
-        ":scenarios",
-        "//modules/common/proto:common_proto",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/common:frame",
-        "//modules/planning/common:reference_line_info",
-        "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/planning/proto:lattice_sampling_config_proto",
-    ],
-)
-
-cc_library(
-    name = "scenarios",
-    srcs = [
-        "ego_vehicle_scenario.cc",
-        "signal_light_scenario.cc",
-    ],
-    hdrs = [
-        "ego_vehicle_scenario.h",
-        "scenario.h",
-        "signal_light_scenario.h",
-    ],
-    deps = [
-        "//modules/common/adapters:adapter_manager",
-        "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/proto:common_proto",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/common/util:map_util",
-        "//modules/perception/proto:perception_proto",
-        "//modules/planning/common:frame",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/common:reference_line_info",
-        "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/planning/proto:lattice_structure_proto",
-    ],
-)
-
-cc_library(
     name = "feasible_region",
     srcs = [
         "feasible_region.cc",
