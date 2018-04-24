@@ -234,7 +234,10 @@ class GLFWFusionViewer {
   bool show_box;
   bool show_velocity;
   bool show_polygon;
-  bool show_text;
+  bool show_text; // ???
+  bool show_help_text;
+  std::string help_str;
+
 
   void get_class_color(int cls, float rgb[3]);
 
