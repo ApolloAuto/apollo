@@ -671,10 +671,11 @@ def main():
     poi = POI()
     landmark = poi.landmark.add()
     landmark.name = "default"
-    landmark.waypoint.id = last_central_lane.id.id
-    landmark.waypoint.s = last_central_lane.length
-    landmark.waypoint.pose.x = last_central_lane.central_curve.segment[0].line_segment.point[-1].x
-    landmark.waypoint.pose.y = last_central_lane.central_curve.segment[0].line_segment.point[-1].y
+    waypoint = landmark.waypoint.add()
+    waypoint.id = last_central_lane.id.id
+    waypoint.s = last_central_lane.length
+    waypoint.pose.x = last_central_lane.central_curve.segment[0].line_segment.point[-1].x
+    waypoint.pose.y = last_central_lane.central_curve.segment[0].line_segment.point[-1].y
 
     # Output default end_way_point
     with open(waypoint_file_name, "w") as f:
