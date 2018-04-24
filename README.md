@@ -99,10 +99,10 @@ To see if the system works, use the demo 'bag' which feeds the system.
 
 ```
 # get rosbag note that the command download is required
-bash ./docs/demo_guide/rosbag_helper.sh download
+python ./docs/demo_guide/rosbag_helper.py demo_2.5.bag
 
 # You can now replay this demo "bag" in a loop with the '-l' flag
-rosbag play -l ./docs/demo_guide/demo_2.5.bag
+rosbag play -l demo_2.5.bag
 ```
 
 Dreamview should show a running vehicle now. (The following image might be different due to changes in frontend.)
