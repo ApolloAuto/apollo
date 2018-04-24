@@ -24,6 +24,32 @@ VERSION_X86_64="dev-x86_64-20180419_1510"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 
+# Check whether user has agreed license agreement
+function check_agreement() {
+  agreement_record="${HOME}/.apollo_agreement.txt"
+  if [ -e "$agreement_record" ]; then
+    return
+  fi
+
+  AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
+  if [ ! -e "$AGREEMENT_FILE" ]; then
+    error "AGREEMENT $AGREEMENT_FILE does not exist."
+    exit 1
+  fi
+
+  cat $AGREEMENT_FILE
+  tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
+  echo $tip
+  read -n 1 user_agreed
+  if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
+    cp $AGREEMENT_FILE $agreement_record
+    echo "$tip" >> $agreement_record
+    echo "$user_agreed" >> $agreement_record
+  else
+    exit 1
+  fi
+}
+
 function show_usage()
 {
 cat <<EOF
@@ -48,6 +74,7 @@ if [ -e /proc/sys/kernel ]; then
 fi
 
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
+check_agreement
 
 VOLUME_VERSION="latest"
 DEFAULT_MAPS=(
