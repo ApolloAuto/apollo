@@ -84,6 +84,7 @@ GLFWFusionViewer::GLFWFusionViewer()
       show_box(1),
       show_velocity(1),
       show_text(0),
+      show_help_text(0),
       capture_screen_(false),
       capture_video_(FLAGS_capture_screen),
       scene_width_(1280),
@@ -172,6 +173,7 @@ bool GLFWFusionViewer::initialize() {
     AERROR << " Failed to initialize opengl !" << std::endl;
     return false;
   }
+  help_str = "H: show help";
 
   // for camera visualization
   show_camera_box2d_ = true;
@@ -626,6 +628,16 @@ void GLFWFusionViewer::render() {
     }
   }
 
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0, scene_width_+image_width_,  scene_height_+image_height_, 0.0, 0.0,100.0);
+  glViewport(0, 0, scene_width_+image_width_, scene_height_+image_height_);
+  glColor4f(1.0f, 1.0f, 1.0f, 0.7f);
+  int text_startx = 10;
+  int text_starty = 40;
+  glRasterPos2i(text_startx,text_starty);
+  raster_text_->print_multiline(help_str.c_str(),text_startx,text_starty);
+
   no_frame++;
 }
 
@@ -812,9 +824,45 @@ void GLFWFusionViewer::keyboard(int key) {
       break;
     case GLFW_KEY_0:  // 3
       show_associate_color_ = !show_associate_color_;
+      break;
+    case GLFW_KEY_H:  // H
+      show_help_text = !show_help_text;
+      break;
     default:
       break;
   }
+
+  help_str = "H: show help";
+  if(show_help_text)
+  {
+    help_str += " (ON)";
+    help_str += "\nR: reset matrxi\nB: show box";
+    if(show_box) help_str += "(ON)";
+    help_str += "\nV: show velocity";
+    if(show_velocity) help_str += " (ON)";
+    help_str += "\nC: use class color";
+    if(use_class_color_) help_str += " (ON)";
+    help_str += "\nS: capture screen";
+    help_str += "\nA: capture video";
+    help_str += "\nI: show type id label";
+    if(show_type_id_label_) help_str += " (ON)";  
+    help_str += "\nQ: show lane";
+    if(show_lane_) help_str += " (ON)";
+    help_str += "\nE: draw lane objects";
+    if(draw_lane_objects_) help_str += " (ON)";
+    help_str += "\nF: show fusion";
+    if(show_fusion_) help_str += " (ON)";
+    help_str += "\nD: show radar pc";
+    if(show_radar_pc_) help_str += " (ON)";  
+    help_str += "\nO: show camera bdv";
+    if(show_camera_bdv_) help_str += " (ON)";  
+    help_str += "\n2: show camera box2d";
+    if(show_camera_box2d_) help_str += " (ON)";  
+    help_str += "\n3: show camera box3d";
+    if(show_camera_box3d_) help_str += " (ON)";
+    help_str += "\n0: show associate color";
+    if(show_associate_color_) help_str += " (ON)";
+  } 
 }
 
 void GLFWFusionViewer::capture_screen(const std::string& file_name) {
