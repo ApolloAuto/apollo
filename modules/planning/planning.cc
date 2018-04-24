@@ -47,6 +47,8 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 
+Planning::~Planning() { Stop(); }
+
 std::string Planning::Name() const { return "planning"; }
 
 #define CHECK_ADAPTER(NAME)                                              \
@@ -433,6 +435,7 @@ void Planning::Stop() {
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
+  FrameHistory::instance()->Clear();
 }
 
 void Planning::SetLastPublishableTrajectory(
