@@ -42,7 +42,7 @@ class PlanningThreadPool {
   void Init();
   void Stop() {
     if (thread_pool_) {
-      thread_pool_->Stop(false);
+      thread_pool_->Stop(true);
     }
   }
   template <typename F, typename... Rest>
