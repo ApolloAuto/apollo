@@ -340,15 +340,15 @@ void GLRasterText::print_string(const char *s) {
 }
 
 void GLRasterText::print_multiline(
-    const char *s, 
-    int top_left_x, 
+    const char *s,
+    int top_left_x,
     int top_left_y) {
   glPushAttrib(GL_LIST_BIT);
   int line_count = 1;
   for (uint i = 0; i < strlen(s); i++) {
     if (s[i] == '\n') {
       // 18: varies to font size
-      glRasterPos2i(top_left_x, top_left_y+18*line_count);  
+      glRasterPos2i(top_left_x, top_left_y+18*line_count);
       line_count++;
     }
     glCallList(s_font_offset_+s[i]);
