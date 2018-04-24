@@ -26,7 +26,7 @@ Setup steps:
 3. Now you can play the rosbag:
 
     ```
-    sudo python docs/demo_guide/rosbag_helper.python demo_2.0.bag #download rosbag
+    sudo python docs/demo_guide/rosbag_helper.py demo_2.0.bag #download rosbag
     rosbag play demo_2.0.bag --loop
     ```
 
