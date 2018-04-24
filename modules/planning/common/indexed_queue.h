@@ -62,6 +62,14 @@ class IndexedQueue {
     return true;
   }
 
+  void Clear() {
+    capacity_ = 0;
+    while (!queue_.empty()) {
+      queue_.pop();
+    }
+    map_.clear();
+  }
+
  public:
   std::size_t capacity_ = 0;
   std::queue<std::pair<I, const T *>> queue_;
