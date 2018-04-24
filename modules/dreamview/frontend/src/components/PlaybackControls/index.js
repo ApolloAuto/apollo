@@ -78,7 +78,7 @@ export default class PlaybackControls extends React.Component {
 
         playback.seekFrame(frame);
         if (!this.state.isPlaying) {
-            WS.requestSimulationWorld(playback.jobId, frame);
+            WS.requestSimulationWorld(playback.recordId, frame);
         } else if (!WS.requestTimer) {
             WS.startPlayback(playback.msPerFrame);
         }
