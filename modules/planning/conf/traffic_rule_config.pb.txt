@@ -43,6 +43,7 @@ config: {
   enabled: true
   front_vehicle {
     side_pass_wait_time: 30.0
+    nudge_l_buffer: 0.5
   }
 }
 
