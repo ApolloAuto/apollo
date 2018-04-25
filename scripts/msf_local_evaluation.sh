@@ -85,4 +85,4 @@ done
 
 python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py compare_fusion_odometry_all.txt
 python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py compare_lidar_odometry_all.txt
-python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py compare_gnss_odometry_all.txt
+# python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py compare_gnss_odometry_all.txt
