@@ -41,11 +41,10 @@ class FrontVehicle : public TrafficRule {
  private:
   void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
+
   bool MakeSidePassDecision(ReferenceLineInfo* const reference_line_info);
-
   bool ProcessSidePass(ReferenceLineInfo* const reference_line_info);
-
-  std::string& FindBlockedObstacle(
+  std::string FindPassableObstacle(
       ReferenceLineInfo* const reference_line_info);
 
   void MakeStopDecision(ReferenceLineInfo* reference_line_info);

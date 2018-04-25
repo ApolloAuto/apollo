@@ -108,7 +108,7 @@ bool FrontVehicle::ProcessSidePass(
   CHECK_NOTNULL(reference_line_info);
 
   // find obstacle being blocked, to process SIDEPASS
-  std::string blocked_obstacle_id = FindBlockedObstacle(reference_line_info);
+  std::string passable_obstacle_id = FindPassableObstacle(reference_line_info);
 
   auto* sidepass_status = GetPlanningStatus()->mutable_side_pass();
   if (!sidepass_status->has_status()) {
@@ -125,7 +125,7 @@ bool FrontVehicle::ProcessSidePass(
     case SidePassStatus::DRIVING: {
       constexpr double kAdcStopSpeedThreshold = 0.1;  // unit: m/s
       const auto& adc_planning_point = reference_line_info->AdcPlanningPoint();
-      if (!blocked_obstacle_id.empty() &&
+      if (!passable_obstacle_id.empty() &&
           adc_planning_point.v() < kAdcStopSpeedThreshold) {
         sidepass_status->set_status(SidePassStatus::WAIT);
         sidepass_status->set_wait_start_time(Clock::NowInSeconds());
@@ -136,7 +136,7 @@ bool FrontVehicle::ProcessSidePass(
       const auto& reference_line = reference_line_info->reference_line();
       const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
 
-      if (blocked_obstacle_id.empty()) {
+      if (passable_obstacle_id.empty()) {
         sidepass_status->set_status(SidePassStatus::DRIVING);
         sidepass_status->clear_wait_start_time();
       } else {
@@ -197,7 +197,7 @@ bool FrontVehicle::ProcessSidePass(
           }
           if (enter_sidepass_mode) {
             sidepass_status->set_status(SidePassStatus::SIDEPASS);
-            sidepass_status->set_pass_obstacle_id(blocked_obstacle_id);
+            sidepass_status->set_pass_obstacle_id(passable_obstacle_id);
             sidepass_status->clear_wait_start_time();
             sidepass_status->set_pass_side(side);
           }
@@ -206,7 +206,7 @@ bool FrontVehicle::ProcessSidePass(
       break;
     }
     case SidePassStatus::SIDEPASS: {
-      if (blocked_obstacle_id.empty()) {
+      if (passable_obstacle_id.empty()) {
         sidepass_status->set_status(SidePassStatus::DRIVING);
       }
       break;
@@ -219,13 +219,13 @@ bool FrontVehicle::ProcessSidePass(
 
 /**
  * @brief: a blocked obstacle is a static obstacle being blocked by
- *         other obstacles or traffic rules
+ *         other obstacles or traffic rules => not passable
  */
-std::string& FrontVehicle::FindBlockedObstacle(
+std::string FrontVehicle::FindPassableObstacle(
     ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(reference_line_info);
 
-  std::string blocked_obstacle_id;
+  std::string passable_obstacle_id;
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   auto* path_decision = reference_line_info->path_decision();
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
@@ -292,10 +292,11 @@ std::string& FrontVehicle::FindBlockedObstacle(
       }
     }
     if (!is_blocked_by_others) {
-      blocked_obstacle_id = path_obstacle->Id();
+      passable_obstacle_id = path_obstacle->Id();
+      break;
     }
   }
-  return blocked_obstacle_id;
+  return passable_obstacle_id;
 }
 
 void FrontVehicle::MakeStopDecision(
@@ -342,9 +343,9 @@ void FrontVehicle::MakeStopDecision(
     reference_line.GetLaneWidth(sl.start_s(), &left_width, &right_width);
 
     double left_driving_width =
-        left_width - sl.end_l() - FLAGS_static_decision_nudge_l_buffer;
+        left_width - sl.end_l() - config_.front_vehicle().nudge_l_buffer();
     double right_driving_width =
-        right_width + sl.start_l() - FLAGS_static_decision_nudge_l_buffer;
+        right_width + sl.start_l() - config_.front_vehicle().nudge_l_buffer();
 
     ADEBUG << "obstacle_id[" << obstacle_id
         << "] type[" << obstacle_type_name
