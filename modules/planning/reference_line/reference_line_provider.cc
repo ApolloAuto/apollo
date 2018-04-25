@@ -255,7 +255,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     return false;
   }
   auto *hdmap = HDMapUtil::BaseMapPtr();
-  for (const auto path_pair : relative_map.navigation_path()) {
+  for (const auto &path_pair : relative_map.navigation_path()) {
     const auto &lane_id = path_pair.first;
     const auto &path_points = path_pair.second.path().path_point();
     auto lane_ptr = hdmap->GetLaneById(hdmap::MakeMapId(lane_id));
