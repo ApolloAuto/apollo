@@ -58,6 +58,32 @@ usage() {
 }
 
 start() {
+  # Get car ID.
+  CARID=$(python modules/tools/common/kv_db.py get "apollo:dreamview:vehicle" \
+      | tr '[a-z]' '[A-Z]')
+  if [ ${CARID} = "NONE" ]; then
+    echo "Please select vehicle first."
+    exit 1
+  fi
+  export CARID=${CARID}
+  sed -i "s/vehicle_id:\(.*\)/vehicle_id: ${CARID}/g" \
+      modules/data/conf/recorder.global.yaml
+
+  # Get disk.
+  DISK=""
+  if [ -d /media/${DOCKER_USER} ]; then
+    sudo chown ${DOCKER_GRP}:${DOCKER_USER} /media/${DOCKER_USER}/*
+    DISK=$(ls /media/${DOCKER_USER} | head -n 1)
+  fi
+  if [ -z ${DISK} ]; then
+    echo "Cannot find portable disk."
+    echo "Please make sure your container was started AFTER inserting the disk."
+    exit 1
+  fi
+  echo "Use portable disk: /media/${DOCKER_USER}/${DISK}"
+  sed -i "s/output_path:\(.*\)/output_path: \/media\/${DOCKER_USER}\/${DISK}/g" \
+      modules/data/conf/recorder.global.yaml
+
   local task_purpose=$1
   ps -ef | grep 'data_recorder_manager' | grep -v 'data_recorder_control' | \
       grep -v 'grep' &>/dev/null
