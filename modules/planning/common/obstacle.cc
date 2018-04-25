@@ -24,11 +24,12 @@
 #include <cmath>
 #include <string>
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
@@ -49,11 +50,16 @@ Obstacle::Obstacle(const std::string& id,
                                perception_obstacle_.theta(),
                                perception_obstacle_.length(),
                                perception_obstacle_.width()) {
-  CHECK(perception_obstacle.polygon_point_size() > 2)
-      << "object " << id << "has less than 3 polygon points";
   std::vector<common::math::Vec2d> polygon_points;
-  for (const auto& point : perception_obstacle.polygon_point()) {
-    polygon_points.emplace_back(point.x(), point.y());
+  if (FLAGS_use_navigation_mode ||
+      perception_obstacle.polygon_point_size() <= 2) {
+    perception_bounding_box_.GetAllCorners(&polygon_points);
+  } else {
+    CHECK(perception_obstacle.polygon_point_size() > 2)
+        << "object " << id << "has less than 3 polygon points";
+    for (const auto& point : perception_obstacle.polygon_point()) {
+      polygon_points.emplace_back(point.x(), point.y());
+    }
   }
   CHECK(common::math::Polygon2d::ComputeConvexHull(polygon_points,
                                                    &perception_polygon_))
@@ -149,7 +155,8 @@ common::TrajectoryPoint Obstacle::GetPointAtTime(
     } else if (it_lower == points.end()) {
       return *points.rbegin();
     }
-    return util::interpolate(*(it_lower - 1), *it_lower, relative_time);
+    return common::math::InterpolateUsingLinearApproximation(
+        *(it_lower - 1), *it_lower, relative_time);
   }
 }
 
@@ -231,7 +238,10 @@ std::unique_ptr<Obstacle> Obstacle::CreateStaticVirtualObstacles(
   // create a "virtual" perception_obstacle
   perception::PerceptionObstacle perception_obstacle;
   // simulator needs a valid integer
-  perception_obstacle.set_id(-(std::hash<std::string>{}(id) >> 1));
+  int32_t negative_id = std::hash<std::string>{}(id);
+  // set the first bit to 1 so negative_id became negative number
+  negative_id |= (0x1 << 31);
+  perception_obstacle.set_id(negative_id);
   perception_obstacle.mutable_position()->set_x(obstacle_box.center().x());
   perception_obstacle.mutable_position()->set_y(obstacle_box.center().y());
   perception_obstacle.set_theta(obstacle_box.heading());
@@ -251,7 +261,9 @@ std::unique_ptr<Obstacle> Obstacle::CreateStaticVirtualObstacles(
     point->set_x(corner_point.x());
     point->set_y(corner_point.y());
   }
-  return std::unique_ptr<Obstacle>(new Obstacle(id, perception_obstacle));
+  auto* obstacle = new Obstacle(id, perception_obstacle);
+  obstacle->is_virtual_ = true;
+  return std::unique_ptr<Obstacle>(obstacle);
 }
 
 }  // namespace planning

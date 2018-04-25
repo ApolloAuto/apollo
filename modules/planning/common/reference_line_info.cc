@@ -97,16 +97,8 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
     }
   }
 
-  if (FLAGS_use_navigation_mode &&
-      !AdapterManager::GetPerceptionObstacles()->Empty()) {
-    const auto& cipv_info = AdapterManager::GetPerceptionObstacles()
-                                ->GetLatestObserved()
-                                .cipv_info();
-    path_decision_.SetCIPVInfo(cipv_info);
-  }
   // set lattice planning target speed limit;
-  double cruise_speed = FLAGS_speed_upper_bound;
-  SetCruiseSpeed(std::min(FLAGS_default_cruise_speed, cruise_speed));
+  SetCruiseSpeed(FLAGS_default_cruise_speed);
   is_inited_ = true;
   return true;
 }

@@ -39,6 +39,19 @@ struct alignas(16) VisualObject {
   // lower-right corner: x2, y2
   Eigen::Vector2f lower_right;
 
+  // front box upper-left corner: x1, y1
+  Eigen::Vector2d front_upper_left;
+  // front box  lower-right corner: x2, y2
+  Eigen::Vector2d front_lower_right;
+
+  // front box upper-left corner: x1, y1
+  Eigen::Vector2d back_upper_left;
+  // front box  lower-right corner: x2, y2
+  Eigen::Vector2d back_lower_right;
+
+  // 2Dto3D, pts8.resize(16), x, y...
+  std::vector<float> pts8;
+
   // 2D bounding box truncation ratio, for out-of-image objects
   float trunc_width = 0.0f;
   float trunc_height = 0.0f;
@@ -77,17 +90,17 @@ struct alignas(16) VisualObject {
   float distance = 0.0f;
   // [meter / second] physical velocity of the object, (vx, vy, vz)
   Eigen::Vector3f velocity = Eigen::Vector3f::Zero();
-
+  // kalman filter state uncertainty set by different sensor type
+  // each sensor need to model individually
+  Eigen::Matrix<double, 4, 4> state_uncertainty =
+      Eigen::Matrix<double, 4, 4>::Identity();
   // globally unique tracking id for camera visual objects
   int track_id = 0;
   // [second] age of the tracked object
-  float track_age = 0.0f;
+  double track_age = 0.0;
   // [second] the last observed timestamp
-  float last_track_timestamp = 0.0f;
+  double last_track_timestamp = 0.0;
 };
-
-typedef std::shared_ptr<VisualObject> VisualObjectPtr;
-typedef std::shared_ptr<const VisualObject> VisualObjectConstPtr;
 
 }  // namespace perception
 }  // namespace apollo

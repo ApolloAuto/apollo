@@ -19,7 +19,10 @@
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
+#include <algorithm>
 #include <fstream>
+
+#include "boost/filesystem.hpp"
 
 #include "modules/common/util/string_util.h"
 
@@ -226,6 +229,57 @@ std::vector<std::string> ListSubDirectories(const std::string &directory_path) {
   }
   closedir(directory);
   return result;
+}
+
+std::string GetFileName(const std::string &path) {
+  std::string filename;
+  std::string::size_type loc = path.rfind('/');
+  if (loc == std::string::npos) {
+    filename = path;
+  } else {
+    filename = path.substr(loc + 1);
+  }
+  return filename;
+}
+
+void GetFileNamesInFolderById(const std::string &folder, const std::string &ext,
+                              std::vector<std::string> *ret) {
+  std::vector<double> ret_id;
+  ret->clear();
+  namespace fs = boost::filesystem;
+  if (!fs::exists(folder) || !fs::is_directory(folder)) {
+    return;
+  }
+
+  fs::directory_iterator it(folder);
+  fs::directory_iterator endit;
+
+  while (it != endit) {
+    if (fs::is_regular_file(*it) && it->path().extension() == ext) {
+      std::string temp_path = it->path().filename().string();
+      ret->push_back(temp_path);
+      std::string temp_id_str =
+          temp_path.substr(temp_path.rfind('_') + 1,
+                           temp_path.rfind('.') - temp_path.rfind('_') - 1);
+      double temp_id = std::atof(temp_id_str.c_str());
+      ret_id.push_back(temp_id);
+    }
+    ++it;
+  }
+  // sort
+  int ret_size = ret->size();
+  for (int i = 0; i < ret_size; ++i) {
+    for (int j = i; j < ret_size; ++j) {
+      if (ret_id[i] > ret_id[j]) {
+        double temp_id = ret_id[i];
+        ret_id[i] = ret_id[j];
+        ret_id[j] = temp_id;
+        std::string temp_path = (*ret)[i];
+        (*ret)[i] = (*ret)[j];
+        (*ret)[j] = temp_path;
+      }
+    }
+  }
 }
 
 }  // namespace util

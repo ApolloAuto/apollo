@@ -7,6 +7,10 @@ data_files {
   dest_path: "modules/control/conf/lincoln.pb.txt"
 }
 data_files {
+  source_path: "navigation_lincoln.pb.txt"
+  dest_path: "modules/control/conf/navigation_lincoln.pb.txt"
+}
+data_files {
   source_path: "start_velodyne.launch"
   dest_path: "<ros>/share/velodyne/launch/start_velodyne.launch"
 }
@@ -47,6 +51,14 @@ data_files {
   dest_path: "modules/perception/data/params"
 }
 data_files {
+  source_path: "camera_params/start_leopard.launch"
+  dest_path: "<ros>/share/usb_cam/launch/start_leopard.launch"
+}
+data_files {
+  source_path: "camera_params/start_obstacle_camera.launch"
+  dest_path: "<ros>/share/usb_cam/launch/start_obstacle_camera.launch"
+}
+data_files {
   source_path: "radar_params"
   dest_path: "modules/perception/data/params"
 }
@@ -61,6 +73,10 @@ data_files {
 data_files {
   source_path: "gnss_params/ant_imu_leverarm.yaml"
   dest_path: "modules/localization/msf/params/gnss_params/ant_imu_leverarm.yaml"
+}
+data_files {
+  source_path: "vehicle_params"
+  dest_path: "modules/localization/msf/params/vehicle_params"
 }
 data_files {
   source_path: "vehicle_info.pb.txt"

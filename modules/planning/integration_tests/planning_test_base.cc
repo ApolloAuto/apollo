@@ -45,7 +45,7 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_planning_adapter_config_filename =
       "modules/planning/testdata/conf/adapter.conf";
   FLAGS_smoother_config_filename =
-      "modules/planning/conf/smoother_config.pb.txt";
+      "modules/planning/conf/qp_spline_smoother_config.pb.txt";
   FLAGS_map_dir = "modules/planning/testdata";
   FLAGS_test_localization_file = "";
   FLAGS_test_chassis_file = "";
@@ -100,6 +100,12 @@ void PlanningTestBase::SetUp() {
     ADCTrajectory prev_planning;
     CHECK(common::util::GetProtoFromFile(prev_planning_file, &prev_planning));
     planning_.SetLastPublishableTrajectory(prev_planning);
+  }
+  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+    auto iter = rule_enabled_.find(config.rule_id());
+    if (iter != rule_enabled_.end()) {
+      config.set_enabled(iter->second);
+    }
   }
 }
 

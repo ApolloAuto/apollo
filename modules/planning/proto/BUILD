@@ -201,6 +201,20 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "traffic_rule_config_proto",
+    deps = [
+        ":traffic_rule_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "traffic_rule_config_proto_lib",
+    srcs = [
+        "traffic_rule_config.proto",
+    ],
+)
+
+cc_proto_library(
     name = "spiral_curve_config_proto",
     deps = [
         ":spiral_curve_config_proto_lib",
@@ -242,6 +256,7 @@ proto_library(
     ],
     deps = [
         ":decision_proto_lib",
+        ":planning_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
     ],
 )

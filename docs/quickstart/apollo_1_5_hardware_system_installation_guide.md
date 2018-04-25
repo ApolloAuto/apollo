@@ -488,7 +488,7 @@ The following two diagrams indicate the locations of where the three major compo
 
 
 
-![major_compoment_side_view](images/Car_Sideview.png)
+![major_component_side_view](images/Car_Sideview.png)
 
 
 
@@ -683,7 +683,7 @@ Each HDL-64E S3 LiDAR includes a cablebundle to connect the LiDAR to power suppl
 
    5. Serial cable connection for COM port between HDL-64E S3 and Laptop
 
-      ![Serial cable connected to laptop.png](images/Serial cable connected to laptop.png)
+      ![Serial cable connected to laptop.png](images/Serial_cable_connected_to_laptop.png)
 
    6. Launch **Termite 3.2** from laptop 
 

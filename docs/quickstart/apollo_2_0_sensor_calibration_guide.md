@@ -5,6 +5,7 @@ This guide introduces the Apollo Sensor Calibration Service and describes the th
 - Camera-to-Camera Calibration
 - Camera-to-LiDAR Calibration
 - Radar-to-Camera Calibration
+- IMU-to-Vehicle Calibration
 
 ## About This Guide
 
@@ -18,13 +19,11 @@ This guide provides the following information:
 
 ## Overview
 
-The new calibration tools in Apollo 2.0 (Camera-to-Camera Calibration, Camera-to-LiDAR Calibration, and Radar-to-Camera Calibration) are provided by an onboard executable program.
-
-These new calibration tools replace the LiDAR-to-IMU Calibration feature in Apollo 1.5.
-
+The new calibration tools in Apollo 2.0 (Camera-to-Camera Calibration, Camera-to-LiDAR Calibration, and Radar-to-Camera Calibration) are provided by an onboard executable program.For LiDAR-GNSS calibration, please refer to the LiDAR-GNSS calibration guide. Velodyne HDL-64 users can also use the calibration service in Apollo 1.5.
 The benefit in using these tools is that they reduce the amount of work that the user must do. The user only has to start the corresponding calibration program, and the calibration work is performed and completes in real time. The user can then verify the calibration results, which are provided as `.yaml` files.
 
 ## Preparation
+Download [calibration tools](https://github.com/ApolloAuto/apollo/releases/download/v2.0.0/calibration.tar.gz), and extract files to `$APOLLO_HOME/modules/calibration`. APOLLO_HOME is the root directory of apollo repository.
 
 ### Well Calibrated Intrinsics of Camera
 
@@ -61,7 +60,7 @@ The following is an example of a camera intrinsic file:
       do_rectify: False
 ```
 
-Baidu recommends that you perform the intrinsic calibration for every single camera instead of using unified intrinsic parameters for every camera. If you follow this practice, you can improve the accuracy of the extrinsic calibration results.
+It is recommended that you perform the intrinsic calibration for every single camera instead of using unified intrinsic parameters for every camera. If you follow this practice, you can improve the accuracy of the extrinsic calibration results.
 
 ### Initial Extrinsic File
 
@@ -93,7 +92,7 @@ The following is an example of an initial extrinsic file of Camera-to-LiDAR, whe
 
 ### Calibration Site
 
-Because the Camera-to-LiDAR Calibration method is based on an actual scene, an ideal real-world location can significantly improve the accuracy of the calibration. It is recommended that you select a calibration site that includes objects such as trees, poles, street lights, traffic signs, stationary objects, and clear traffic lines. 
+Because the Camera-to-LiDAR Calibration method is used in natual environment, a good location can significantly improve the accuracy of the calibration. It is recommended that you select a calibration site that includes objects such as trees, poles, street lights, traffic signs, stationary objects, and clear traffic lines. 
 
 Figure 1 is an example of a good choice for a calibration site: 
 
@@ -120,7 +119,7 @@ The sensor topics that the on-board program requires are listed in Tables 1, 2, 
 | Sensor         | Topic Name                               | Topic Feq. (Hz) |
 | -------------- | ---------------------------------------- | --------------- |
 | Short_Camera   | /apollo/sensor/camera/traffic/image_short | 9               |
-| Velodyne HDL64 | /apollo/sensor/velodyne64/compensator/PointCloud2 | 10              |
+| LiDAR | /apollo/sensor/velodyne64/compensator/PointCloud2 | 10              |
 | INS            | /apollo/sensor/gnss/odometry             | 100             |
 | INS            | /apollo/sensor/gnss/ins_stat             | 2               |
 
@@ -207,7 +206,7 @@ bash sensor_calibration.sh lidar_camera
 
   * Because the two cameras have different timestamps, they cannot be completely synchronized, so it is important to drive the vehicle very slowly when recording the data. The slow speed of the vehicle can effectively alleviate the image mismatch that is caused by the different timestamps.
 
-  * Make sure that there are a certain number of (over 500) projection points in the camera image, or the tool ***cannot*** perform the extrinsic calibration operation. For this reason, the recommendation is to use a short focus length camera as the calibration target.
+  * Make sure that there are a certain number of (over 500) projection points in the camera image, or the tool ***cannot*** perform the extrinsic calibration operation. For this reason, this tool is only for wide angle cameras.
 
 3. Note the location of the saved configuration file: 
 
@@ -224,8 +223,8 @@ bash sensor_calibration.sh lidar_camera
 | -------------------------- | ---------------------------------------- |
 | camera_topic               | wide-angle camera image topic            |
 | lidar_topic                | LiDAR point cloud topic                  |
-| odometry_topic             | vehicle vodometry topic                  |
-| ins_stat_topic             | vehicle locolization status topic        |
+| odometry_topic             | vehicle odometry topic                  |
+| ins_stat_topic             | vehicle localization status topic        |
 | camera_intrinsics_filename | intrinsic file of camera                 |
 | init_extrinsics_filename   | initial extrinsic file                   |
 | output_path                | calibration results output path          |
@@ -265,8 +264,8 @@ bash sensor_calibration.sh radar_camera
 
 | Configuration              | Description                              |
 | -------------------------- | ---------------------------------------- |
-| camera_topic               | telephoto camera image topic             |
-| odometry_topic             | vehicle vodometry topic                  |
+| camera_topic               | wide angle camera image topic             |
+| odometry_topic             | vehicle odometry topic                  |
 | ins_stat_topic             | vehicle locolization status topic        |
 | camera_intrinsics_filename | intrinsic file of camera                 |
 | init_extrinsics_filename   | initial extrinsic file                   |
@@ -279,6 +278,44 @@ bash sensor_calibration.sh radar_camera
   * A validation image that includes the projection result from Radar-to-LiDAR.
     You need to run the `radar_lidar_visualizer` tool to generate the image. 
     See [Radar LiDAR Visualizer Projection Tool](####Radar LiDAR Visualizer Projection Tool) for more information.
+
+## IMU-to-Vehicle Calibration
+1.	Download the [calibration tool](https://apollocache.blob.core.windows.net/apollo-cache/imu_car_calibrator.zip).
+2. Start the vehicle to move before calibration. The vehicle should keep going straight at speed of 3m/s for 10s at least.  There is no need to provide the intrinsic and initial extrinsic.
+3. Required topic: INS /apollo/sensors/gnss/odemetry 100Hz
+
+4. Run the IMU-to-Vehicle Calibration using these commands:
+
+```bash
+cd /apollo
+bash scripts/sensor_calibration.sh imu_vehicle
+```
+4. The result is saved as vehicle_imu_extrinsics.yaml in current path. Here is an example:
+```bash
+    header
+      seq: 0
+      stamp:
+        secs: 1522137131
+        nsecs: 319999933
+      frame_id: imu
+    transform:
+      translation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      rotation:
+        x: -0.008324888458427
+        y: -0.000229845441991
+        z: 0.027597957866274
+        w: 0.999584411705604
+    child_frame_id: vehicle
+
+    #pitch install error: -0.954337
+    #roll install error: 0.000000
+    #yaw install error: 3.163004
+```
+
+
 
 ### (Optional) Run All Calibration Tools
 

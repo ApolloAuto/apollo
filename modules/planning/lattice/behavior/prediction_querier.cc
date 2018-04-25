@@ -22,8 +22,8 @@
 
 #include <string>
 
-#include "modules/common/math/path_matcher.h"
 #include "modules/common/math/linear_interpolation.h"
+#include "modules/common/math/path_matcher.h"
 
 namespace apollo {
 namespace planning {
@@ -75,9 +75,7 @@ std::vector<const Obstacle*> PredictionQuerier::GetObstacles() const {
 }
 
 double PredictionQuerier::ProjectVelocityAlongReferenceLine(
-    const std::string& obstacle_id,
-    const double s,
-    const double t) const {
+    const std::string& obstacle_id, const double s, const double t) const {
   CHECK(id_obstacle_map_.find(obstacle_id) != id_obstacle_map_.end());
 
   const auto& trajectory = id_obstacle_map_.at(obstacle_id)->Trajectory();
@@ -104,13 +102,13 @@ double PredictionQuerier::ProjectVelocityAlongReferenceLine(
   double x_next = trajectory.trajectory_point(next_index).path_point().x();
   double y_next = trajectory.trajectory_point(next_index).path_point().y();
   double v = apollo::common::math::lerp(v_curr, t_curr, v_next, t_next, t);
-  if (std::abs(x_next - x_curr) > 0.1 && std::abs(y_next - y_curr) > 0.1) {
+  if (std::fabs(x_next - x_curr) > 0.1 && std::fabs(y_next - y_curr) > 0.1) {
     heading = std::atan2(y_next - y_curr, x_next - x_curr);
   }
   double v_x = v * std::cos(heading);
   double v_y = v * std::sin(heading);
   common::PathPoint obstacle_point_on_ref_line =
-      PathMatcher::MatchToPath(*ptr_reference_line_, s);
+      common::math::PathMatcher::MatchToPath(*ptr_reference_line_, s);
   double ref_theta = obstacle_point_on_ref_line.theta();
 
   return std::cos(ref_theta) * v_x + std::sin(ref_theta) * v_y;

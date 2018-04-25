@@ -16,11 +16,13 @@
 
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 
-#include <gflags/gflags.h>
-#include <math.h>
+#include <cmath>
+
 #include "Eigen/Eigen"
-#include "modules/common/log.h"
+#include "gflags/gflags.h"
 #include "yaml-cpp/yaml.h"
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -208,68 +210,70 @@ bool CameraCoeffient::init_camera_intrinsic_matrix_and_distort_params(
 }
 
 CalibrationConfigManager::CalibrationConfigManager()
-    : _camera_calibration(new CameraCalibration()) {
-  _work_root = FLAGS_work_root;
-  _camera_extrinsic_path = _work_root + FLAGS_front_camera_extrinsics_file;
-  _camera_intrinsic_path = _work_root + FLAGS_front_camera_intrinsics_file;
+    : camera_calibration_(new CameraCalibration()) {
+  work_root_ = FLAGS_work_root;
+  camera_extrinsic_path_ = FLAGS_front_camera_extrinsics_file;
+  camera_intrinsic_path_ = FLAGS_front_camera_intrinsics_file;
+  init();
 }
 
 bool CalibrationConfigManager::init() {
-  MutexLock lock(&_mutex);
+  MutexLock lock(&mutex_);
   return init_internal();
 }
 
 bool CalibrationConfigManager::reset() {
-  MutexLock lock(&_mutex);
-  _inited = false;
+  MutexLock lock(&mutex_);
+  inited_ = false;
   return init_internal();
 }
 
 CalibrationConfigManager::~CalibrationConfigManager() {}
 
 bool CalibrationConfigManager::init_internal() {
-  if (_inited) {
+  if (inited_) {
     return true;
   }
 
-  if (!_camera_calibration->init(_camera_intrinsic_path,
-                                 _camera_extrinsic_path)) {
-    AERROR << "init intrinsics failure: " << _camera_intrinsic_path << " "
-           << _camera_extrinsic_path;
+  if (!camera_calibration_->init(camera_intrinsic_path_,
+                                 camera_extrinsic_path_)) {
+    AERROR << "init intrinsics failure: " << camera_intrinsic_path_ << " "
+           << camera_extrinsic_path_;
     return false;
   }
 
   AINFO << "finish to load Calibration Configs.";
 
-  _inited = true;
-  return _inited;
+  inited_ = true;
+  return inited_;
 }
 
 CameraCalibration::CameraCalibration()
     : _camera2car_pose(new Eigen::Matrix<double, 4, 4>()),
       _car2camera_pose(new Eigen::Matrix<double, 4, 4>()),
-      _undistort_handler(new ImageGpuPreprocessHandler()),
-      _camera_model(new CameraDistort<double>()) {}
+      undistort_handler_(new ImageGpuPreprocessHandler()),
+      camera_model_(new CameraDistort<double>()) {}
 
 CameraCalibration::~CameraCalibration() {}
 
 bool CameraCalibration::init(const std::string &intrinsic_path,
                              const std::string &extrinsic_path) {
-  if (!_camera_coefficient.init("", intrinsic_path, extrinsic_path)) {
+  if (!camera_coefficient_.init("", extrinsic_path, intrinsic_path)) {
     AERROR << "init camera coefficient failed";
     return false;
   }
 
-  _camera_intrinsic = _camera_coefficient.camera_intrinsic;
-  _image_height = _camera_coefficient.image_height;
-  _image_width = _camera_coefficient.image_width;
-  *_camera2car_pose = _camera_coefficient.camera_extrinsic;
+  camera_intrinsic_ = camera_coefficient_.camera_intrinsic;
+  image_height_ = camera_coefficient_.image_height;
+  image_width_ = camera_coefficient_.image_width;
+  *_camera2car_pose = camera_coefficient_.camera_extrinsic;
   *_car2camera_pose = _camera2car_pose->inverse();
 
-  if (!init_undistortion(intrinsic_path)) {
-    AERROR << "init undistortion failed";
-    return false;
-  }
+  // TODO(later): BUGGY. Crash
+  // if (!init_undistortion(intrinsic_path)) {
+  //   AERROR << "init undistortion failed";
+  //   return false;
+  // }
 
   init_camera_model();
   calculate_homographic();
@@ -278,31 +282,31 @@ bool CameraCalibration::init(const std::string &intrinsic_path,
 }
 
 void CameraCalibration::calculate_homographic() {
-  auto camera_intrinsic_inverse = _camera_intrinsic.block(0, 0, 3, 3).inverse();
+  auto camera_intrinsic_inverse = camera_intrinsic_.block(0, 0, 3, 3).inverse();
   auto car2camera_3_4 = (*_car2camera_pose).block(0, 0, 3, 4);
   Eigen::Matrix3d camera_2car_stripped;
   camera_2car_stripped.col(0) = car2camera_3_4.col(0);
   camera_2car_stripped.col(1) = car2camera_3_4.col(1);
   camera_2car_stripped.col(2) = car2camera_3_4.col(3);
-  _homography_mat = camera_2car_stripped.inverse() * camera_intrinsic_inverse;
-  _homography_mat_inverse = _homography_mat.inverse();
+  homography_mat_ = camera_2car_stripped.inverse() * camera_intrinsic_inverse;
+  homography_mat_inverse_ = homography_mat_.inverse();
 }
 
 void CameraCalibration::init_camera_model() {
-  _camera_model->set(_camera_intrinsic.block(0, 0, 3, 3), _image_width,
-                     _image_height);
+  camera_model_->set(camera_intrinsic_.block(0, 0, 3, 3), image_width_,
+                     image_height_);
 }
 
 bool CameraCalibration::init_undistortion(const std::string &intrinsics_path) {
   AINFO << "Loading intrinsics: " << intrinsics_path;
   int err =
-      _undistort_handler->init(intrinsics_path, FLAGS_obs_camera_detector_gpu);
+      undistort_handler_->init(intrinsics_path, FLAGS_obs_camera_detector_gpu);
 
   if (err != 0) {
     AERROR << "Undistortion initialization failed wiht error code: " << err;
     return false;
   }
-  _undistort_handler->set_device(FLAGS_obs_camera_detector_gpu);
+  undistort_handler_->set_device(FLAGS_obs_camera_detector_gpu);
   return true;
 }
 

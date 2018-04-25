@@ -31,7 +31,7 @@ namespace planning {
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 
-ReferenceLineEnd::ReferenceLineEnd(const RuleConfig& config)
+ReferenceLineEnd::ReferenceLineEnd(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
 bool ReferenceLineEnd::ApplyRule(Frame* frame,
@@ -41,26 +41,27 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
   double remain_s =
       reference_line.Length() - reference_line_info->AdcSlBoundary().end_s();
   const double& velocity = frame->vehicle_state().linear_velocity();
-  const double stop_acc = std::fabs(common::VehicleConfigHelper::GetConfig()
-                                        .vehicle_param()
-                                        .max_deceleration() /
-                                    3.0);
+  const double stop_acc =
+      std::fabs(common::VehicleConfigHelper::GetConfig()
+                    .vehicle_param()
+                    .max_deceleration()) *
+      config_.reference_line_end().stop_acc_to_max_deceleration_ratio();
   const double stop_s = velocity * velocity / (2.0 * stop_acc) +
                         FLAGS_virtual_stop_wall_length +
-                        FLAGS_destination_stop_distance;
-  constexpr double kMinReferenceLineRemainLength = 10.0;
-  if (stop_s < remain_s && remain_s > kMinReferenceLineRemainLength) {
+                        config_.reference_line_end().stop_distance();
+  if (stop_s < remain_s &&
+      remain_s >
+          config_.reference_line_end().min_reference_line_remain_length()) {
     ADEBUG << "have enough reference line to drive on";
     return true;
   }
 
   // create avirtual stop wall at the end of reference line to stop the adc
   std::string virtual_obstacle_id =
-      FLAGS_reference_line_end_obstacle_id_prefix +
-      reference_line_info->Lanes().Id();
+      REF_LINE_END_VO_ID_PREFIX + reference_line_info->Lanes().Id();
   double obstacle_start_s =
       reference_line.Length() - FLAGS_virtual_stop_wall_length;
-  auto* obstacle = frame->CreateVirtualStopObstacle(
+  auto* obstacle = frame->CreateStopObstacle(
       reference_line_info, virtual_obstacle_id, obstacle_start_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle[" << virtual_obstacle_id << "]";
@@ -74,13 +75,13 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
 
   // build stop decision
   auto stop_point = reference_line.GetReferencePoint(
-      obstacle_start_s - FLAGS_destination_stop_distance);
+      obstacle_start_s - config_.reference_line_end().stop_distance());
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
   stop_decision->set_reason_code(StopReasonCode::STOP_REASON_DESTINATION);
-  stop_decision->set_distance_s(-FLAGS_destination_stop_distance);
+  stop_decision->set_distance_s(-config_.reference_line_end().stop_distance());
   stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
   stop_decision->mutable_stop_point()->set_y(stop_point.y());
@@ -88,7 +89,7 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
 
   auto* path_decision = reference_line_info->path_decision();
   path_decision->AddLongitudinalDecision(
-      RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 
   return true;
 }

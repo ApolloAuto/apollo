@@ -1,5 +1,4 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -8,6 +7,7 @@ cc_library(
     srcs = [
         "pbf_base_track_object_matcher.cc",
         "pbf_hm_track_object_matcher.cc",
+        "pbf_imf_fusion.cc",
         "pbf_kalman_motion_fusion.cc",
         "pbf_sensor.cc",
         "pbf_sensor_manager.cc",
@@ -22,6 +22,7 @@ cc_library(
         "pbf_base_motion_fusion.h",
         "pbf_base_track_object_matcher.h",
         "pbf_hm_track_object_matcher.h",
+        "pbf_imf_fusion.h",
         "pbf_kalman_motion_fusion.h",
         "pbf_sensor.h",
         "pbf_sensor_manager.h",
@@ -38,11 +39,14 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:log",
+        "//modules/common/configs:config_gflags",
+        "//modules/perception/common",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/fusion/interface",
         "//modules/perception/obstacle/onboard:hdmapinput",
+        "//modules/perception/proto:probabilistic_fusion_config_lib_proto",
         "@eigen",
         "@pcl",
     ],
@@ -63,7 +67,7 @@ cc_test(
         ":probabilistic_fusion",
         "//external:gflags",
         "//modules/common:log",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "@gtest",
         "@gtest//:main",
     ],
@@ -84,7 +88,7 @@ cc_test(
         ":probabilistic_fusion",
         "//external:gflags",
         "//modules/common:log",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "@gtest",
         "@gtest//:main",
     ],
@@ -105,7 +109,7 @@ cc_test(
         ":probabilistic_fusion",
         "//external:gflags",
         "//modules/common:log",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "@gtest",
         "@gtest//:main",
     ],
@@ -126,7 +130,7 @@ cc_test(
         ":probabilistic_fusion",
         "//external:gflags",
         "//modules/common:log",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "@gtest",
         "@gtest//:main",
     ],

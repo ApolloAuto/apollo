@@ -23,18 +23,7 @@ namespace perception {
 
 HungarianOptimizer::HungarianOptimizer(
     const std::vector<std::vector<double>>& costs)
-    : matrix_size_(0),
-      costs_(),
-      max_cost_(0),
-      rows_covered_(),
-      cols_covered_(),
-      marks_(),
-      stars_in_col_(),
-      preimage_(),
-      image_(),
-      width_(0),
-      height_(0),
-      state_(NULL) {
+    : state_(nullptr) {
   width_ = costs.size();
 
   if (width_ > 0) {

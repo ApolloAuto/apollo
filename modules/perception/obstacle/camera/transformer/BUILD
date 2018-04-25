@@ -3,10 +3,11 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "flat_transformer",
+    name = "transformer",
     srcs = ["flat_camera_transformer.cc"],
     hdrs = ["flat_camera_transformer.h"],
     deps = [
+        "//modules/common:log",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/common",

@@ -43,9 +43,10 @@ class DiscretizedTrajectory : public Trajectory {
   explicit DiscretizedTrajectory(
       const std::vector<common::TrajectoryPoint>& trajectory_points);
 
-  virtual ~DiscretizedTrajectory() = default;
+  void SetTrajectoryPoints(
+      const std::vector<common::TrajectoryPoint>& trajectory_points);
 
-  common::TrajectoryPoint Evaluate(const double relative_time) const override;
+  virtual ~DiscretizedTrajectory() = default;
 
   common::TrajectoryPoint StartPoint() const override;
 
@@ -53,8 +54,7 @@ class DiscretizedTrajectory : public Trajectory {
 
   double GetSpatialLength() const override;
 
-  virtual common::TrajectoryPoint EvaluateUsingLinearApproximation(
-      const double relative_time) const;
+  common::TrajectoryPoint Evaluate(const double relative_time) const override;
 
   virtual uint32_t QueryNearestPoint(const double relative_time) const;
 

@@ -34,10 +34,10 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
                ? static_cast<int>(feature_param.point_cloud_range())
                : 60;
   width_ =
-      feature_param.has_width() ? static_cast<int>(feature_param.width()) : 512;
+      feature_param.has_width() ? static_cast<int>(feature_param.width()) : 640;
   height_ = feature_param.has_height()
                 ? static_cast<int>(feature_param.height())
-                : 512;
+                : 640;
   min_height_ =
       feature_param.has_min_height() ? feature_param.min_height() : -5.0;
   max_height_ =
@@ -50,7 +50,7 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
 
   log_table_.resize(256);
   for (size_t i = 0; i < log_table_.size(); ++i) {
-    log_table_[i] = std::log(static_cast<Dtype>(1 + i));
+    log_table_[i] = std::log1p(static_cast<Dtype>(i));
   }
 
   Dtype* out_blob_data = nullptr;

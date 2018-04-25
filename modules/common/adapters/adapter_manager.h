@@ -254,6 +254,7 @@ class AdapterManager {
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(PointCloud);
+  REGISTER_ADAPTER(ImageFront);
   REGISTER_ADAPTER(ImageShort);
   REGISTER_ADAPTER(ImageLong);
   REGISTER_ADAPTER(Prediction);
@@ -281,6 +282,15 @@ class AdapterManager {
   REGISTER_ADAPTER(DriveEvent);
   REGISTER_ADAPTER(RelativeMap);
   REGISTER_ADAPTER(Navigation);
+  REGISTER_ADAPTER(VoiceDetectionRequest);
+  REGISTER_ADAPTER(VoiceDetectionResponse);
+  // for pandora
+  REGISTER_ADAPTER(PandoraPointCloud);
+  REGISTER_ADAPTER(PandoraCameraFrontColor);
+  REGISTER_ADAPTER(PandoraCameraRightGray);
+  REGISTER_ADAPTER(PandoraCameraLeftGray);
+  REGISTER_ADAPTER(PandoraCameraFrontGray);
+  REGISTER_ADAPTER(PandoraCameraBackGray);
 
   DECLARE_SINGLETON(AdapterManager);
 };

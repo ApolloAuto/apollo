@@ -43,6 +43,7 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
 using apollo::common::util::StrCat;
 using Matrix = Eigen::MatrixXd;
+using apollo::common::time::Clock;
 
 namespace {
 
@@ -85,9 +86,7 @@ LatController::LatController() : name_("LQR-based Lateral Controller") {
   AINFO << "Using " << name_;
 }
 
-LatController::~LatController() {
-  CloseLogFile();
-}
+LatController::~LatController() { CloseLogFile(); }
 
 bool LatController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
@@ -122,6 +121,8 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 
   lqr_eps_ = control_conf->lat_controller_conf().eps();
   lqr_max_iteration_ = control_conf->lat_controller_conf().max_iteration();
+
+  query_relative_time_ = control_conf->query_relative_time();
 
   return true;
 }
@@ -255,13 +256,9 @@ void LatController::LoadLatGainScheduler(
       << "Fail to load heading error gain scheduler";
 }
 
-void LatController::Stop() {
-  CloseLogFile();
-}
+void LatController::Stop() { CloseLogFile(); }
 
-std::string LatController::Name() const {
-  return name_;
-}
+std::string LatController::Name() const { return name_; }
 
 Status LatController::ComputeControlCommand(
     const localization::LocalizationEstimate *localization,
@@ -500,8 +497,9 @@ void LatController::ComputeLateralErrors(
   // TODO(QiL): change this to conf.
   TrajectoryPoint target_point;
   if (FLAGS_use_navigation_mode) {
-    target_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
-        FLAGS_query_relative_time);
+    const double current_timestamp = Clock::NowInSeconds();
+    target_point = trajectory_analyzer.QueryNearestPointByAbsoluteTime(
+        current_timestamp + query_relative_time_);
   } else {
     target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
   }
@@ -510,8 +508,7 @@ void LatController::ComputeLateralErrors(
   const double dy = y - target_point.path_point().y();
 
   ADEBUG << "x point: " << x << " y point: " << y;
-  ADEBUG << "match point x: " << target_point.path_point().x()
-         << " y point: " << target_point.path_point().y();
+  ADEBUG << "match point information : " << target_point.ShortDebugString();
 
   const double cos_matched_theta = std::cos(target_point.path_point().theta());
   const double sin_matched_theta = std::sin(target_point.path_point().theta());

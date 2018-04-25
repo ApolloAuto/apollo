@@ -20,16 +20,14 @@
 #include <Eigen/Core>
 #include <opencv2/core/core.hpp>
 
-// #include <cuda.h>
-// #include <cuda_runtime.h>
-
 #include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <iostream>
 
-#include "modules/common/log.h"
-#include "modules/perception/obstacle/camera/lane_post_process/common/type.h"
+// #include "modules/common/log.h"
+#include "modules/perception/obstacle/camera/lane_post_process/common/base_type.h"
 
 namespace apollo {
 namespace perception {
@@ -41,8 +39,6 @@ namespace perception {
 #ifndef NUM_RESERVE_EDGES
 #define NUM_RESERVE_EDGES 6
 #endif
-
-#define CUDA_CC false
 
 class DisjointSet {
  public:
@@ -66,13 +62,9 @@ class DisjointSet {
   }
 
   // get the number of subsets (root nodes)
-  int Size() const {
-    return subset_num_;
-  }
+  int Size() const { return subset_num_; }
   // get the total number of elements
-  size_t Num() const {
-    return disjoint_array_.size();
-  }
+  size_t Num() const { return disjoint_array_.size(); }
   // add a new element
   int Add();
   // find the root element of x
@@ -110,13 +102,9 @@ class ConnectedComponent {
           len(0.0),
           orie(0.0) {}
 
-    int get_start_vertex_id() const {
-      return start_vertex_id;
-    }
+    int get_start_vertex_id() const { return start_vertex_id; }
 
-    int get_end_vertex_id() const {
-      return end_vertex_id;
-    }
+    int get_end_vertex_id() const { return end_vertex_id; }
   };
 
   struct BoundingBox {
@@ -157,13 +145,9 @@ class ConnectedComponent {
       down_contour = std::make_shared<std::vector<int>>();
     }
 
-    int width() const {
-      return x_max - x_min + 1;
-    }
+    int width() const { return x_max - x_min + 1; }
 
-    int height() const {
-      return y_max - y_min + 1;
-    }
+    int height() const { return y_max - y_min + 1; }
   };
 
   ConnectedComponent() : pixel_count_(0), bbox_() {
@@ -201,29 +185,46 @@ class ConnectedComponent {
 
   // CC pixels
   void AddPixel(int x, int y);
-  int GetPixelCount() const {
-    return pixel_count_;
+  /*
+  void AddPixel(int x, int y) {
+    if (pixel_count_ == 0) {
+      // new bounding box
+      bbox_.x_min = x;  // x_min
+      bbox_.y_min = y;  // y_min
+      bbox_.x_max = x;  // x_max
+      bbox_.y_max = y;  // y_max
+    } else {
+      // extend bounding box if necessary
+      if (x < bbox_.x_min) {
+        bbox_.x_min = x;
+      }
+      if (x > bbox_.x_max) {
+        bbox_.x_max = x;
+      }
+      if (y < bbox_.y_min) {
+        bbox_.y_min = y;
+      }
+      if (y > bbox_.y_max) {
+        bbox_.y_max = y;
+      }
+    }
+
+    pixels_->push_back(cv::Point(x, y));
+    pixel_count_++;
   }
+  */
+
+  int GetPixelCount() const { return pixel_count_; }
   std::shared_ptr<const std::vector<cv::Point2i>> GetPixels() const {
     return pixels_;
   }
 
   // bounding box
-  const BoundingBox* bbox() const {
-    return &bbox_;
-  }
-  int x_min() const {
-    return bbox_.x_min;
-  }
-  int y_min() const {
-    return bbox_.y_min;
-  }
-  int x_max() const {
-    return bbox_.x_max;
-  }
-  int y_max() const {
-    return bbox_.y_max;
-  }
+  const BoundingBox* bbox() const { return &bbox_; }
+  int x_min() const { return bbox_.x_min; }
+  int y_min() const { return bbox_.y_min; }
+  int x_max() const { return bbox_.x_max; }
+  int y_max() const { return bbox_.y_max; }
 
   cv::Rect GetBoundingBox() const {
     return cv::Rect(bbox_.x_min, bbox_.y_min, bbox_.x_max - bbox_.x_min + 1,
@@ -256,14 +257,15 @@ class ConnectedComponent {
     return vertices_;
   }
 
-  Vertex GetVertex(int vertex_id) const {
+  Vertex GetVertex(int vertex_id, double scale, double start_y_pos) const {
     // assert(vertex_id >= 0 && vertex_id < this->getVertexCount());
-    return vertices_->at(vertex_id);
+    Vertex ver_pnt = vertices_->at(vertex_id);
+    ver_pnt[0] = static_cast<int>(ver_pnt[0] * scale);
+    ver_pnt[1] = static_cast<int>(ver_pnt[1] * scale + start_y_pos);
+    return ver_pnt;
+    // return vertices_->at(vertex_id);
   }
-
-  int GetVertexCount() const {
-    return static_cast<int>(vertices_->size());
-  }
+  int GetVertexCount() const { return static_cast<int>(vertices_->size()); }
 
   // edges
   bool IsValidEdgeVertices(int i, int j) {
@@ -272,21 +274,15 @@ class ConnectedComponent {
   }
 
   void FindEdges();
-  int GetEdgeCount() const {
-    return static_cast<int>(edges_->size());
-  }
-  const Edge* GetMaxLenthEdge() const {
-    return &edges_->at(max_len_edge_id_);
-  }
+  int GetEdgeCount() const { return static_cast<int>(edges_->size()); }
+  const Edge* GetMaxLenthEdge() const { return &edges_->at(max_len_edge_id_); }
   std::shared_ptr<const Edge> GetClockWiseEdge() const {
     return clockwise_edge_;
   }
   std::shared_ptr<const Edge> GetAntiClockWiseEdge() const {
     return anticlockwise_edge_;
   }
-  std::shared_ptr<const Edge> GetInnerEdge() const {
-    return inner_edge_;
-  }
+  std::shared_ptr<const Edge> GetInnerEdge() const { return inner_edge_; }
 
   void SplitContour(int split_len);
   std::shared_ptr<std::vector<Edge>> GetClockWiseEdges() const {
@@ -302,9 +298,7 @@ class ConnectedComponent {
   void Process(ScalarType split_siz, int split_len);
 
  private:
-  int Sub2Ind(int row, int col, int width) {
-    return row * width + col;
-  }
+  int Sub2Ind(int row, int col, int width) { return row * width + col; }
 
   void SplitContourVertical(int start_vertex_id, int end_vertex_id,
                             int len_split, bool is_clockwise);
@@ -339,29 +333,9 @@ class ConnectedComponentGenerator {
   ConnectedComponentGenerator(int image_width, int image_height);
   ConnectedComponentGenerator(int image_width, int image_height, cv::Rect roi);
 
-  ~ConnectedComponentGenerator() {
-#if CUDA_CC
-    cudaFree(label_array_);
-    cudaFreeArray(img_array_);
-
-    cudaError_t cuda_err = cudaGetLastError();
-    if (cuda_err != cudaSuccess) {
-      AERROR << "failed to release label_array and img_array with CUDA: "
-             << cudaGetErrorString(cuda_err);
-    }
-
-    free(labels_);
-#endif
-  }
-
   bool FindConnectedComponents(
       const cv::Mat& lane_map,
       std::vector<std::shared_ptr<ConnectedComponent>>* cc);
-
- private:
-#if CUDA_CC
-  bool BlockUnionFind(const unsigned char* img);
-#endif
 
  private:
   size_t total_pix_;
@@ -375,14 +349,8 @@ class ConnectedComponentGenerator {
   int roi_x_max_;
   int roi_y_max_;
 
-#if CUDA_CC
-  int* labels_;
-  cudaArray* img_array_;
-  int* label_array_;
-#else
   DisjointSet labels_;
   std::vector<int> frame_label_;
-#endif
   std::vector<int> root_map_;
 };
 

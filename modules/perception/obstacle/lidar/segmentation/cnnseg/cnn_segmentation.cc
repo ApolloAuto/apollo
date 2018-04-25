@@ -53,12 +53,12 @@ bool CNNSegmentation::Init() {
   if (feature_param.has_width()) {
     width_ = static_cast<int>(feature_param.width());
   } else {
-    width_ = 512;
+    width_ = 640;
   }
   if (feature_param.has_height()) {
     height_ = static_cast<int>(feature_param.height());
   } else {
-    height_ = 512;
+    height_ = 640;
   }
 
 /// Instantiate Caffe net
@@ -142,7 +142,7 @@ bool CNNSegmentation::Init() {
 bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
                               const pcl_util::PointIndices& valid_indices,
                               const SegmentationOptions& options,
-                              vector<ObjectPtr>* objects) {
+                              vector<std::shared_ptr<Object>>* objects) {
   objects->clear();
   int num_pts = static_cast<int>(pc_ptr->points.size());
   if (num_pts == 0) {
@@ -207,8 +207,9 @@ bool CNNSegmentation::GetConfigs(string* config_file, string* proto_file,
                                  string* weight_file) {
   ConfigManager* config_manager = ConfigManager::instance();
 
-  const ModelConfig* model_config = nullptr;
-  if (!config_manager->GetModelConfig("CNNSegmentation", &model_config)) {
+  const ModelConfig* model_config =
+      config_manager->GetModelConfig("CNNSegmentation");
+  if (model_config == nullptr) {
     AERROR << "Failed to get model config for CNNSegmentation";
     return false;
   }

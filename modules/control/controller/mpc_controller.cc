@@ -69,9 +69,7 @@ MPCController::MPCController() : name_("MPC Controller") {
   AINFO << "Using " << name_;
 }
 
-MPCController::~MPCController() {
-  CloseLogFile();
-}
+MPCController::~MPCController() { CloseLogFile(); }
 
 bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
@@ -88,7 +86,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   wheelbase_ = vehicle_param.wheel_base();
   steer_transmission_ratio_ = vehicle_param.steer_ratio();
   steer_single_direction_max_degree_ =
-      vehicle_param.max_steer_angle() / M_PI * 180;
+      vehicle_param.max_steer_angle() / steer_transmission_ratio_ / 180 * M_PI;
   max_lat_acc_ = control_conf->mpc_controller_conf().max_lateral_acceleration();
   max_acceleration_ = vehicle_param.max_acceleration();
   max_deceleration_ = vehicle_param.max_deceleration();
@@ -155,7 +153,7 @@ Status MPCController::Init(const ControlConf *control_conf) {
   matrix_a_(1, 2) = (cf_ + cr_) / mass_;
   matrix_a_(2, 3) = 1.0;
   matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
-  matrix_a_(4, 4) = 1.0;
+  matrix_a_(4, 5) = 1.0;
   matrix_a_(5, 5) = 0.0;
   // TODO(QiL): expand the model to accomendate more combined states.
 
@@ -220,13 +218,9 @@ void MPCController::CloseLogFile() {
   }
 }
 
-void MPCController::Stop() {
-  CloseLogFile();
-}
+void MPCController::Stop() { CloseLogFile(); }
 
-std::string MPCController::Name() const {
-  return name_;
-}
+std::string MPCController::Name() const { return name_; }
 
 void MPCController::LoadMPCGainScheduler(
     const MPCControllerConf &mpc_controller_conf) {
@@ -393,9 +387,9 @@ Status MPCController::ComputeControlCommand(
   // TODO(QiL): add pitch angle feedforward to accomendate for 3D control
 
   debug->set_is_full_stop(false);
-  if (std::abs(debug->acceleration_reference()) <=
+  if (std::fabs(debug->acceleration_reference()) <=
           FLAGS_max_acceleration_when_stopped &&
-      std::abs(debug->speed_reference()) <= FLAGS_max_abs_speed_when_stopped) {
+      std::fabs(debug->speed_reference()) <= FLAGS_max_abs_speed_when_stopped) {
     acceleration_cmd = standstill_acceleration_;
     AINFO << "Stop location reached";
     debug->set_is_full_stop(true);
@@ -437,7 +431,7 @@ Status MPCController::ComputeControlCommand(
   debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steering_position(chassis->steering_percentage());
 
-  if (std::abs(VehicleStateProvider::instance()->linear_velocity()) <=
+  if (std::fabs(VehicleStateProvider::instance()->linear_velocity()) <=
           FLAGS_max_abs_speed_when_stopped ||
       chassis->gear_location() == planning_published_trajectory->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {

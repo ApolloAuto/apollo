@@ -55,6 +55,7 @@ using common::time::Clock;
 namespace {
 constexpr double kPathOptimizationFallbackClost = 2e4;
 constexpr double kSpeedOptimizationFallbackClost = 2e4;
+constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
 void EMPlanner::RegisterTasks() {
@@ -157,7 +158,8 @@ Status EMPlanner::Plan(const TrajectoryPoint& planning_start_point,
     if (cur_status.ok() && reference_line_info.IsDrivable()) {
       has_drivable_reference_line = true;
       if (FLAGS_prioritize_change_lane &&
-          reference_line_info.IsChangeLanePath()) {
+          reference_line_info.IsChangeLanePath() &&
+          reference_line_info.Cost() < kStraightForwardLineCost) {
         disable_low_priority_path = true;
       }
     } else {
@@ -171,7 +173,6 @@ Status EMPlanner::PlanOnReferenceLine(
     const TrajectoryPoint& planning_start_point, Frame* frame,
     ReferenceLineInfo* reference_line_info) {
   if (!reference_line_info->IsChangeLanePath()) {
-    const double kStraightForwardLineCost = 10.0;
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
@@ -231,6 +232,9 @@ Status EMPlanner::PlanOnReferenceLine(
 
   for (const auto* path_obstacle :
        reference_line_info->path_decision()->path_obstacles().Items()) {
+    if (path_obstacle->obstacle()->IsVirtual()) {
+      continue;
+    }
     if (!path_obstacle->obstacle()->IsStatic()) {
       continue;
     }

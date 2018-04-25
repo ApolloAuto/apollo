@@ -12,9 +12,9 @@ cc_library(
         "visual_object.h",
     ],
     deps = [
+        "//modules/perception/cuda_util",
         "//modules/perception/obstacle/base",
         "@eigen",
-        "@undistort",
     ],
 )
 
@@ -28,10 +28,10 @@ cc_library(
         "visual_object.h",
     ],
     deps = [
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
+        "//modules/perception/cuda_util",
         "//modules/perception/obstacle/base",
         "@eigen",
-        "@undistort",
     ],
 )
 
@@ -50,8 +50,8 @@ cc_library(
     srcs = ["cnn_adapter.cc"],
     hdrs = ["cnn_adapter.h"],
     deps = [
+        "//modules/perception/cuda_util",
         "//modules/perception/obstacle/camera/common:util",
-        "//modules/perception/obstacle/camera/detector/common:util",
     ],
 )
 

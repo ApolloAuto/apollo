@@ -28,7 +28,7 @@ DEFINE_double(
 DEFINE_string(dreamview_adapter_config_filename,
               "modules/dreamview/conf/adapter.conf", "The adapter config file");
 
-DEFINE_string(hmi_config_filename, "modules/dreamview/conf/hmi.conf",
+DEFINE_string(hmi_config_filename, "/apollo/modules/dreamview/conf/hmi.conf",
               "The HMI config file");
 
 DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
@@ -74,3 +74,7 @@ DEFINE_uint32(max_update_size, 1000000,
 
 DEFINE_bool(sim_world_with_routing_path, false,
             "Whether the routing_path is included in sim_world proto.");
+
+DEFINE_string(
+    request_timeout_ms, "2000",
+    "Timeout for network read and network write operations, in milliseconds.");

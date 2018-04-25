@@ -30,8 +30,6 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-DECLARE_string(traffic_light_projection);
-
 struct ProjectOption {
   explicit ProjectOption(const CameraId &id) : camera_id(id) {}
 

@@ -13,7 +13,7 @@ not because they are easy, but because they are hard.
 
 [Apollo](http://apollo.auto)(阿波罗)是一个开放的、完整的、安全的自动驾驶平台，以灵活和高性能的技术架构，为全自动驾驶提供支持。
 
-**我们非常骄傲地宣布，[Apollo 2.0](https://github.com/ApolloAuto/apollo/releases/tag/v2.0.0)如约而至。**
+**我们非常骄傲地宣布，[Apollo 2.5](https://github.com/ApolloAuto/apollo/releases/tag/v2.5.0)如约而至。**
 
 ## 安装
 
@@ -22,11 +22,12 @@ not because they are easy, but because they are hard.
 
 ### 设置Docker环境请运行如下命令
 
+首先，你需要[正确地安装Docker-ce](https://github.com/ApolloAuto/apollo/blob/master/docker/scripts/README.md#install-docker).
+
+以下命令会将你带入Docker容器中。
 ```
-bash docker/scripts/install_docker.sh
-# 退出并重新登录，这样可以非sudo运行Docker
 docker ps  # 确认Docker可以非sudo运行
-bash docker/scripts/dev_start.sh
+bash docker/scripts/dev_start.sh -C   # -C表示从docker中国的镜像服务器下载，速度较快
 bash docker/scripts/dev_into.sh
 ```
 
@@ -38,6 +39,7 @@ bash apollo.sh build
 
 ## 运行Apollo
 请按照如下步骤启动Apollo。
+
 ### 启动Apollo
 ```
 # 启动人机交互界面(HMI)
@@ -47,14 +49,18 @@ bash scripts/bootstrap.sh
 可使用您常用的浏览器，比如Chrome, 打开人机交互界面(HMI), 地址是：http://localhost:8888。
 ![Enable bootstrap](docs/demo_guide/images/apollo_bootstrap_screen.png)
 
+### 选择Navigation模式
+从下拉框里选择Navigation模式
+![Navigation Mode](docs/demo_guide/images/dreamview_2_5_setup_profile.png)
+
 ### 播放演示rosbag
 ```
 bash ./docs/demo_guide/rosbag_helper.sh download # download rosbag
-rosbag play -l ./docs/demo_guide/demo_2.0.bag
+rosbag play -l ./docs/demo_guide/demo_2.5.bag
 ```
 
 这时，Dreamview会播放一辆带着预测轨迹的行驶中的汽车。
-![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory.png)
+![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory_2.5.png)
 
 ## 文档
 Apollo文档可以在[docs](https://github.com/ApolloAuto/apollo/blob/master/docs/)目录下找到。

@@ -24,6 +24,7 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/common/validation_checker.h"
 
 namespace apollo {
 namespace prediction {
@@ -40,10 +41,6 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   CHECK_GT(obstacle->history_size(), 0);
 
   const Feature& feature = obstacle->latest_feature();
-  if (feature.is_still()) {
-    ADEBUG << "Obstacle [" << obstacle->id() << "] is still.";
-    return;
-  }
 
   if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << " has no lane graph.";
@@ -56,8 +53,7 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   }
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
   std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
-  FilterLaneSequences(feature.lane().lane_graph(), lane_id,
-                      &enable_lane_sequence);
+  FilterLaneSequences(feature, lane_id, &enable_lane_sequence);
 
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = feature.lane().lane_graph().lane_sequence(i);
@@ -78,9 +74,18 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
            << "] with probability [" << sequence.probability() << "].";
 
     std::vector<TrajectoryPoint> points;
-    DrawLaneSequenceTrajectoryPoints(
-        *obstacle, sequence, FLAGS_prediction_duration,
-        FLAGS_prediction_period, &points);
+    DrawLaneSequenceTrajectoryPoints(*obstacle, sequence,
+                                     FLAGS_prediction_duration,
+                                     FLAGS_prediction_period, &points);
+
+    if (points.empty()) {
+      continue;
+    }
+
+    if (FLAGS_enable_trajectory_validation_check &&
+        !ValidationChecker::ValidCentripedalAcceleration(points)) {
+      continue;
+    }
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());

@@ -55,11 +55,10 @@ class NavigationLane {
                                  const double c2, const double c3,
                                  const double z) const;
 
-  double GetKappa(const double c1, const double c2,
-                  const double c3, const double x);
+  double GetKappa(const double c1, const double c2, const double c3,
+                  const double x);
 
-  void MergeNavigationLineAndLaneMarker(
-      const perception::LaneMarkers& lane_marker, common::Path* path);
+  void MergeNavigationLineAndLaneMarker(common::Path* path);
 
   common::PathPoint GetPathPointByS(const common::Path& path,
                                     const int start_index, const double s,
@@ -70,7 +69,7 @@ class NavigationLane {
 
   void ConvertNavigationLineToPath(common::Path* path);
 
-  bool UpdateProjectionIndex();
+  bool UpdateProjectionIndex(const common::Path& path);
 
   NavigationLaneConfig config_;
 

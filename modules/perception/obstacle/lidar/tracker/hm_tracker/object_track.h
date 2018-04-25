@@ -18,6 +18,7 @@
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_OBJECT_TRACK_H_
 
 #include <deque>
+#include <memory>
 #include <queue>
 #include <string>
 #include <vector>
@@ -35,7 +36,7 @@ namespace perception {
 
 class ObjectTrack {
  public:
-  explicit ObjectTrack(TrackedObjectPtr obj);
+  explicit ObjectTrack(std::shared_ptr<TrackedObject> obj);
   ~ObjectTrack();
 
   // @brief set filter method for all the object track objects
@@ -74,7 +75,8 @@ class ObjectTrack {
   // @params[IN] new_object: recent detected object for current updating
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  void UpdateWithObject(TrackedObjectPtr* new_object, const double& time_diff);
+  void UpdateWithObject(std::shared_ptr<TrackedObject>* new_object,
+                        const double& time_diff);
 
   // @brief update track without object
   // @params[IN] time_diff: time interval from last updating
@@ -93,7 +95,7 @@ class ObjectTrack {
   // @params[IN] new_object: new detected object for updating
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  void SmoothTrackVelocity(const TrackedObjectPtr& new_object,
+  void SmoothTrackVelocity(const std::shared_ptr<TrackedObject>& new_object,
                            const double& time_diff);
 
   // @brief smooth orientation over track history
@@ -104,7 +106,7 @@ class ObjectTrack {
   // @params[IN] new_object: new detected object just updated
   // @params[IN] time_diff: time interval between last two updating
   // @return true if track is static, otherwise return false
-  bool CheckTrackStaticHypothesis(const ObjectPtr& new_object,
+  bool CheckTrackStaticHypothesis(const std::shared_ptr<Object>& new_object,
                                   const double& time_diff);
 
   // @brief sub strategy of checking whether track is static or not via
@@ -113,7 +115,7 @@ class ObjectTrack {
   // @params[IN] time_diff: time interval between last two updating
   // @return true if track is static, otherwise return false
   bool CheckTrackStaticHypothesisByVelocityAngleChange(
-      const ObjectPtr& new_object, const double& time_diff);
+      const std::shared_ptr<Object>& new_object, const double& time_diff);
 
  private:
   ObjectTrack();
@@ -130,10 +132,10 @@ class ObjectTrack {
   int consecutive_invisible_count_;
   double period_;
 
-  TrackedObjectPtr current_object_;
+  std::shared_ptr<TrackedObject> current_object_;
 
   // history
-  std::deque<TrackedObjectPtr> history_objects_;
+  std::deque<std::shared_ptr<TrackedObject>> history_objects_;
 
   // states
   // NEED TO NOTICE: All the states would be collected mainly based on states
@@ -177,9 +179,7 @@ class ObjectTrackSet {
 
   // @brief get maintained tracks
   // @return maintained tracks
-  inline std::vector<ObjectTrackPtr>& GetTracks() {
-    return tracks_;
-  }
+  inline std::vector<ObjectTrackPtr>& GetTracks() { return tracks_; }
 
   // @brief get maintained tracks
   // @return maintained tracks
@@ -189,16 +189,12 @@ class ObjectTrackSet {
 
   // @brief get size of maintained tracks
   // @return size of maintained tracks
-  inline int Size() const {
-    return tracks_.size();
-  }
+  inline int Size() const { return tracks_.size(); }
 
   // @brief add track to current set of maintained tracks
   // @params[IN] track: adding track
   // @return nothing
-  void AddTrack(const ObjectTrackPtr& track) {
-    tracks_.push_back(track);
-  }
+  void AddTrack(const ObjectTrackPtr& track) { tracks_.push_back(track); }
 
   // @brief remove lost tracks
   // @return number of removed tracks

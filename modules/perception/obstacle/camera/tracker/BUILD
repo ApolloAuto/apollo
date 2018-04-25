@@ -6,7 +6,10 @@ cc_library(
     name = "base_affinity",
     srcs = [],
     hdrs = ["base_affinity_tracker.h"],
-    deps = ["@opencv2//:core"],
+    deps = [
+        "@opencv2//:core",
+        "@eigen",
+    ],
 )
 
 cc_library(
@@ -25,7 +28,7 @@ cc_library(
 )
 
 cc_library(
-    name = "cascaded",
+    name = "tracker",
     srcs = ["cascaded_camera_tracker.cc"],
     hdrs = ["cascaded_camera_tracker.h"],
     deps = [

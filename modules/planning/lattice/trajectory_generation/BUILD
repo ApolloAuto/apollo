@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/behavior:feasible_region",
         "//modules/planning/lattice/behavior:path_time_graph",
@@ -33,11 +34,11 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/behavior:prediction_querier",
-        "//modules/planning/lattice/trajectory1d:lattice_trajectory1d",
-        "//modules/planning/lattice/trajectory1d:standing_still_trajectory1d",
-        "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
         "//modules/planning/lattice/trajectory1d:constant_deceleration_trajectory1d",
+        "//modules/planning/lattice/trajectory1d:lattice_trajectory1d",
+        "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
         "//modules/planning/lattice/trajectory1d:piecewise_trajectory1d",
+        "//modules/planning/lattice/trajectory1d:standing_still_trajectory1d",
         "//modules/planning/lattice/trajectory_generation:end_condition_sampler",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
@@ -56,12 +57,13 @@ cc_library(
     ],
     deps = [
         "//modules/common",
+        "//modules/common/math:path_matcher",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/constraint_checker:constraint_checker1d",
+        "//modules/planning/lattice/behavior:path_time_graph",
+        "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
         "//modules/planning/math/curve1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
-        "//modules/planning/lattice/behavior:path_time_graph",
-        "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d"
     ],
 )
 
@@ -94,8 +96,8 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/common/math:path_matcher",
         "//modules/common/math:cartesian_frenet_conversion",
+        "//modules/common/math:path_matcher",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/math/curve1d",

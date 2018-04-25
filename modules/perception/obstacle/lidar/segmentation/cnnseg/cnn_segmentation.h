@@ -26,8 +26,8 @@
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/proto/cnnseg.pb.h"
 
 #include "modules/common/log.h"
-#include "modules/perception/lib/base/timer.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/common/time/timer.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cluster2d.h"
@@ -46,7 +46,7 @@ class CNNSegmentation : public BaseSegmentation {
   bool Segment(const pcl_util::PointCloudPtr& pc_ptr,
                const pcl_util::PointIndices& valid_indices,
                const SegmentationOptions& options,
-               std::vector<ObjectPtr>* objects) override;
+               std::vector<std::shared_ptr<Object>>* objects) override;
 
   std::string name() const override { return "CNNSegmentation"; }
 
@@ -92,7 +92,7 @@ class CNNSegmentation : public BaseSegmentation {
   std::shared_ptr<cnnseg::Cluster2D> cluster2d_;
 
   // timer
-  Timer timer_;
+  common::time::Timer timer_;
 
   DISALLOW_COPY_AND_ASSIGN(CNNSegmentation);
 };

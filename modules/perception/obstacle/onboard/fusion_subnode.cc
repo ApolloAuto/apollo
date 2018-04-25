@@ -16,8 +16,10 @@
 
 #include "modules/perception/obstacle/onboard/fusion_subnode.h"
 
-#include <map>
+#include <unordered_map>
 
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/onboard/event_manager.h"
@@ -27,11 +29,19 @@
 namespace apollo {
 namespace perception {
 
+using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
 
 bool FusionSubnode::InitInternal() {
   RegistAllAlgorithm();
+
+  AdapterManager::Init(FLAGS_perception_adapter_config_filename);
+
+  CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
+  AdapterManager::AddChassisCallback(&FusionSubnode::OnChassis, this);
+
   CHECK(shared_data_manager_ != nullptr);
   fusion_.reset(BaseFusionRegisterer::GetInstanceByName(FLAGS_onboard_fusion));
   if (fusion_ == nullptr) {
@@ -52,6 +62,25 @@ bool FusionSubnode::InitInternal() {
   if (lidar_object_data_ == nullptr) {
     AWARN << "Failed to get LidarObjectData.";
   }
+  camera_object_data_ = dynamic_cast<CameraObjectData *>(
+      shared_data_manager_->GetSharedData("CameraObjectData"));
+  if (camera_object_data_ == nullptr) {
+    AWARN << "Failed to get CameraObjectData.";
+  }
+
+  fusion_data_ = dynamic_cast<FusionSharedData *>(
+      shared_data_manager_->GetSharedData("FusionSharedData"));
+  if (fusion_data_ == nullptr) {
+    AWARN << "Failed to get FusionSharedData.";
+  }
+
+  lane_shared_data_ = dynamic_cast<LaneSharedData *>(
+      shared_data_manager_->GetSharedData("LaneSharedData"));
+  if (lane_shared_data_ == nullptr) {
+    AWARN << "failed to get shared data instance: LaneSharedData ";
+  }
+
+  lane_objects_.reset(new LaneObjects());
 
   if (!InitOutputStream()) {
     AERROR << "Failed to init output stream.";
@@ -63,11 +92,11 @@ bool FusionSubnode::InitInternal() {
 }
 
 bool FusionSubnode::InitOutputStream() {
-  // expect _reserve format:
+  // expect reserve_ format:
   //       pub_driven_event_id:n
   //       lidar_output_stream : event_id=n&sink_type=m&sink_name=x
   //       radar_output_stream : event_id=n&sink_type=m&sink_name=x
-  std::map<std::string, std::string> reserve_field_map;
+  std::unordered_map<std::string, std::string> reserve_field_map;
   if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
     AERROR << "Failed to parse reserve string: " << reserve_;
     return false;
@@ -96,11 +125,33 @@ bool FusionSubnode::InitOutputStream() {
   } else {
     radar_event_id_ = static_cast<EventID>(atoi((radar_iter->second).c_str()));
   }
+
+  auto camera_iter = reserve_field_map.find("camera_event_id");
+  if (camera_iter == reserve_field_map.end()) {
+    AWARN << "Failed to find camera_event_id:" << reserve_;
+    AINFO << "camera_event_id will be set -1";
+    camera_event_id_ = -1;
+  } else {
+    camera_event_id_ =
+        static_cast<EventID>(atoi((camera_iter->second).c_str()));
+  }
+
+  auto lane_iter = reserve_field_map.find("lane_event_id");
+  if (lane_iter == reserve_field_map.end()) {
+    AWARN << "Failed to find lane_event_id_:" << reserve_;
+    AINFO << "lane_event_id_ will be set -1";
+    lane_event_id_ = -1;
+  } else {
+    lane_event_id_ = static_cast<EventID>(atoi((lane_iter->second).c_str()));
+  }
+
   return true;
 }
 
 Status FusionSubnode::ProcEvents() {
   for (auto event_meta : sub_meta_events_) {
+    if (event_meta.event_id == lane_event_id_) continue;  // ignore lane event
+
     std::vector<Event> events;
     if (!SubscribeEvents(event_meta, &events)) {
       AERROR << "event meta id:" << event_meta.event_id << " "
@@ -119,6 +170,7 @@ Status FusionSubnode::ProcEvents() {
              << " fused_obj_cnt:" << objects_.size();
       continue;
     }
+
     // public obstacle message
     PerceptionObstacles obstacles;
     if (GeneratePbMsg(&obstacles)) {
@@ -152,10 +204,55 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     PERF_BLOCK_END("fusion_lidar");
   } else if (event_meta.event_id == radar_event_id_) {
     PERF_BLOCK_END("fusion_radar");
+  } else if (event_meta.event_id == camera_event_id_) {
+    for (auto &obj : sensor_objs) {
+      if (obj.sensor_type == SensorType::CAMERA) {
+        AINFO << "fusion received image : " << GLOG_TIMESTAMP(obj.timestamp)
+              << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
+        break;
+      }
+    }
+    PERF_BLOCK_END("fusion_camera");
   }
+
+  if (objects_.size() > 0 && FLAGS_publish_fusion_event) {
+    SharedDataPtr<FusionItem> fusion_item_ptr(new FusionItem);
+    fusion_item_ptr->timestamp = objects_[0]->latest_tracked_time;
+    const std::string &device_id = events[0].reserve;
+    for (auto obj : objects_) {
+      std::shared_ptr<Object> objclone(new Object());
+      objclone->clone(*obj);
+      fusion_item_ptr->obstacles.push_back(objclone);
+    }
+    AINFO << "publishing event for timestamp deviceid and size of fusion object"
+          << fusion_item_ptr->timestamp << " " << device_id << " "
+          << fusion_item_ptr->obstacles.size();
+    PublishDataAndEvent(fusion_item_ptr->timestamp, device_id, fusion_item_ptr);
+  }
+
   timestamp_ = sensor_objs[0].timestamp;
   error_code_ = common::OK;
   return Status::OK();
+}
+
+void FusionSubnode::PublishDataAndEvent(const double &timestamp,
+                                        const std::string &device_id,
+                                        const SharedDataPtr<FusionItem> &data) {
+  CommonSharedDataKey key(timestamp, device_id);
+  bool fusion_succ = fusion_data_->Add(key, data);
+  if (!fusion_succ) {
+    AERROR << "fusion shared data addkey failure";
+  }
+  AINFO << "adding key in fusion shared data " << key.ToString();
+
+  for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
+    const EventMeta &event_meta = pub_meta_events_[idx];
+    Event event;
+    event.event_id = event_meta.event_id;
+    event.timestamp = timestamp;
+    event.reserve = device_id;
+    event_manager_->Publish(event);
+  }
 }
 
 bool FusionSubnode::SubscribeEvents(const EventMeta &event_meta,
@@ -169,7 +266,7 @@ bool FusionSubnode::SubscribeEvents(const EventMeta &event_meta,
 }
 bool FusionSubnode::BuildSensorObjs(
     const std::vector<Event> &events,
-    std::vector<SensorObjects> *multi_sensor_objs) const {
+    std::vector<SensorObjects> *multi_sensor_objs) {
   PERF_FUNCTION();
   for (auto event : events) {
     std::shared_ptr<SensorObjects> sensor_objects;
@@ -182,6 +279,8 @@ bool FusionSubnode::BuildSensorObjs(
       sensor_objects->sensor_type = SensorType::VELODYNE_64;
     } else if (event.event_id == radar_event_id_) {
       sensor_objects->sensor_type = SensorType::RADAR;
+    } else if (event.event_id == camera_event_id_) {
+      sensor_objects->sensor_type = SensorType::CAMERA;
     } else {
       AERROR << "Event id is not supported. event:" << event.to_string();
       return false;
@@ -194,7 +293,7 @@ bool FusionSubnode::BuildSensorObjs(
 }
 
 bool FusionSubnode::GetSharedData(const Event &event,
-                                  std::shared_ptr<SensorObjects> *objs) const {
+                                  std::shared_ptr<SensorObjects> *objs) {
   double timestamp = event.timestamp;
   const std::string &device_id = event.reserve;
   std::string data_key;
@@ -209,6 +308,17 @@ bool FusionSubnode::GetSharedData(const Event &event,
   } else if (event.event_id == radar_event_id_ &&
              radar_object_data_ != nullptr) {
     get_data_succ = radar_object_data_->Get(data_key, objs);
+  } else if (event.event_id == camera_event_id_ &&
+             camera_object_data_ != nullptr) {
+    get_data_succ = camera_object_data_->Get(data_key, objs);
+
+    if (lane_shared_data_ != nullptr && lane_event_id_ != -1) {
+      Event lane_event;
+      if (event_manager_->Subscribe(lane_event_id_, &lane_event, false)) {
+        get_data_succ = lane_shared_data_->Get(data_key, &lane_objects_);
+        ADEBUG << "getting lane data successfully for data key " << data_key;
+      }
+    }
   } else {
     AERROR << "Event id is not supported. event:" << event.to_string();
     return false;
@@ -224,9 +334,15 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
       FLAGS_obstacle_module_name, obstacles);
   common::Header *header = obstacles->mutable_header();
-  header->set_lidar_timestamp(timestamp_ * 1e9);  // in ns
-  header->set_camera_timestamp(0);
-  header->set_radar_timestamp(0);
+  if (pub_driven_event_id_ == lidar_event_id_) {
+    header->set_lidar_timestamp(timestamp_ * 1e9);  // in ns
+    header->set_camera_timestamp(0);
+    header->set_radar_timestamp(0);
+  } else if (pub_driven_event_id_ == camera_event_id_) {
+    header->set_lidar_timestamp(0);  // in ns
+    header->set_camera_timestamp(timestamp_ * 1e9);
+    header->set_radar_timestamp(0);
+  }
 
   obstacles->set_error_code(error_code_);
 
@@ -235,12 +351,34 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
     obj->Serialize(obstacle);
   }
 
+  if (FLAGS_use_navigation_mode) {
+    // Relative speed of objects + latest ego car speed in X
+    for (auto obstacle : obstacles->perception_obstacle()) {
+      obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
+                                         chassis_speed_mps_);
+    }
+
+    // generate lane marker protobuf messages
+    if (lane_shared_data_ != nullptr && lane_event_id_ != -1) {
+      LaneMarkers *lane_markers = obstacles->mutable_lane_marker();
+      LaneObjectsToLaneMarkerProto(*(lane_objects_), lane_markers);
+    }
+  }
+
   ADEBUG << "PerceptionObstacles: " << obstacles->ShortDebugString();
   return true;
 }
 
 void FusionSubnode::RegistAllAlgorithm() {
   RegisterFactoryProbabilisticFusion();
+  RegisterFactoryAsyncFusion();
+}
+
+void FusionSubnode::OnChassis(const Chassis &chassis) {
+  ADEBUG << "Received chassis data: run chassis callback.";
+  chassis_.CopyFrom(chassis);
+  ADEBUG << "Received chassis information " << chassis_.ShortDebugString();
+  chassis_speed_mps_ = chassis_.speed_mps();
 }
 
 }  // namespace perception

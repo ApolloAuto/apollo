@@ -16,7 +16,7 @@
 
 #include "modules/perception/obstacle/camera/visualizer/common/frame.h"
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 namespace apollo {
@@ -41,11 +41,11 @@ double get_quaternion_angle(const Eigen::Quaterniond &quat) {
 }
 
 Frame::Frame()
-    : _t(0, 0, 0), _q(Eigen::Quaterniond(1, 0, 0, 0)), _reference_frame(NULL) {}
+    : t_(0, 0, 0), q_(Eigen::Quaterniond(1, 0, 0, 0)), reference_frame_(NULL) {}
 
 Frame::Frame(const Eigen::Vector3d &position,
              const Eigen::Quaterniond &orientation)
-    : _t(position), _q(orientation), _reference_frame(NULL) {}
+    : t_(position), q_(orientation), reference_frame_(NULL) {}
 
 Frame &Frame::operator=(const Frame &frame) {
   // Automatic compiler generated version would not emit the modified() signals
@@ -56,9 +56,7 @@ Frame &Frame::operator=(const Frame &frame) {
   return *this;
 }
 
-Frame::Frame(const Frame &frame) {
-  (*this) = frame;
-}
+Frame::Frame(const Frame &frame) { (*this) = frame; }
 
 const double *Frame::matrix() const {
   static double m[4][4];
@@ -67,7 +65,7 @@ const double *Frame::matrix() const {
 }
 
 void Frame::get_matrix(double m[4][4]) const {
-  Eigen::Matrix3d rotMat = _q.toRotationMatrix();
+  Eigen::Matrix3d rotMat = q_.toRotationMatrix();
   m[0][0] = rotMat(0, 0);
   m[0][1] = rotMat(1, 0);
   m[0][2] = rotMat(2, 0);
@@ -77,9 +75,9 @@ void Frame::get_matrix(double m[4][4]) const {
   m[2][0] = rotMat(0, 2);
   m[2][1] = rotMat(1, 2);
   m[2][2] = rotMat(2, 2);
-  m[3][0] = _t(0);
-  m[3][1] = _t(1);
-  m[3][2] = _t(2);
+  m[3][0] = t_(0);
+  m[3][1] = t_(1);
+  m[3][2] = t_(2);
   m[0][3] = 0;
   m[1][3] = 0;
   m[2][3] = 0;
@@ -87,7 +85,7 @@ void Frame::get_matrix(double m[4][4]) const {
 }
 
 void Frame::get_matrix(double m[16]) const {
-  Eigen::Matrix3d rotMat = _q.toRotationMatrix();
+  Eigen::Matrix3d rotMat = q_.toRotationMatrix();
   m[0] = rotMat(0, 0);
   m[1] = rotMat(1, 0);
   m[2] = rotMat(2, 0);
@@ -100,14 +98,14 @@ void Frame::get_matrix(double m[16]) const {
   m[9] = rotMat(1, 2);
   m[10] = rotMat(2, 2);
   m[11] = 0;
-  m[12] = _t(0);
-  m[13] = _t(1);
-  m[14] = _t(2);
+  m[12] = t_(0);
+  m[13] = t_(1);
+  m[14] = t_(2);
   m[15] = 1.0l;
 }
 
 Frame Frame::inverse() const {
-  Frame fr(-(_q.inverse()._transformVector(_t)), _q.inverse());
+  Frame fr(-(q_.inverse()._transformVector(t_)), q_.inverse());
   fr.set_reference_frame(reference_frame());
   return fr;
 }
@@ -150,12 +148,12 @@ void Frame::set_from_matrix(const double m[4][4]) {
 
   Eigen::Matrix3d rot;
   for (int i = 0; i < 3; ++i) {
-    _t[i] = m[3][i] / m[3][3];
+    t_[i] = m[3][i] / m[3][3];
     for (int j = 0; j < 3; ++j) {
       rot(i, j) = m[j][i] / m[3][3];
     }
   }
-  _q = Eigen::Quaterniond(rot);
+  q_ = Eigen::Quaterniond(rot);
 }
 
 void Frame::set_from_matrix(const double m[16]) {
@@ -196,9 +194,7 @@ void Frame::translate(const Eigen::Vector3d &t) {
   translate(tbis);
 }
 
-void Frame::translate_t(const Eigen::Vector3d &t) {
-  _t += t;
-}
+void Frame::translate_t(const Eigen::Vector3d &t) { t_ += t; }
 
 void Frame::translate(double x, double y, double z) {
   Eigen::Vector3d t(x, y, z);
@@ -215,12 +211,12 @@ void Frame::translate(double *x, double *y, double *z) {
 
 void Frame::rotate(const Eigen::Quaterniond &q) {
   Eigen::Quaterniond qbis = q;
-  rotate(qbis);
+  rotate_q(qbis);
 }
 
 void Frame::rotate_q(const Eigen::Quaterniond &q) {
-  _q *= q;
-  _q.normalize();  // Prevents numerical drift
+  q_ *= q;
+  q_.normalize();  // Prevents numerical drift
 }
 
 void Frame::rotate(double *q0, double *q1, double *q2, double *q3) {
@@ -239,8 +235,8 @@ void Frame::rotate(double q0, double q1, double q2, double q3) {
 
 void Frame::rotate_around_point(const Eigen::Quaterniond &rotation,
                                 const Eigen::Vector3d &point) {
-  _q *= rotation;
-  _q.normalize();  // Prevents numerical drift
+  q_ *= rotation;
+  q_.normalize();  // Prevents numerical drift
 
   Eigen::Vector3d rotAxis = get_quaternion_axis(rotation);
   Eigen::Vector3d resRotAxis = inverse_transform_of(rotAxis);
@@ -250,9 +246,9 @@ void Frame::rotate_around_point(const Eigen::Quaterniond &rotation,
 
   Eigen::Vector3d trans =
       point +
-      Eigen::Quaterniond(angleAxis)._transformVector(position() - point) - _t;
+      Eigen::Quaterniond(angleAxis)._transformVector(position() - point) - t_;
 
-  _t += trans;
+  t_ += trans;
 }
 
 void Frame::set_position(const Eigen::Vector3d &position) {
@@ -269,18 +265,18 @@ void Frame::set_position(double x, double y, double z) {
 void Frame::set_position_and_orientation(
     const Eigen::Vector3d &position, const Eigen::Quaterniond &orientation) {
   if (reference_frame()) {
-    _t = reference_frame()->coordinates_of(position);
-    _q = reference_frame()->orientation().inverse() * orientation;
+    t_ = reference_frame()->coordinates_of(position);
+    q_ = reference_frame()->orientation().inverse() * orientation;
   } else {
-    _t = position;
-    _q = orientation;
+    t_ = position;
+    q_ = orientation;
   }
 }
 
 void Frame::set_translation_and_rotation(const Eigen::Vector3d &translation,
                                          const Eigen::Quaterniond &rotation) {
-  _t = translation;
-  _q = rotation;
+  t_ = translation;
+  q_ = rotation;
 }
 
 void Frame::get_position(double *x, double *y, double *z) const {
@@ -323,9 +319,10 @@ Eigen::Quaterniond Frame::orientation() const {
 void Frame::set_reference_frame(const Frame *const refFrame) {
   if (setting_asreference_frame_will_create_a_loop(refFrame)) {
     std::cerr
-        << "Frame::set_reference_frame would create a loop in Frame hierarchy";
+        << "Frame::set_reference_frame would create a loop in Frame hierarchy"
+        << std::endl;
   } else {
-    _reference_frame = refFrame;
+    reference_frame_ = refFrame;
   }
 }
 

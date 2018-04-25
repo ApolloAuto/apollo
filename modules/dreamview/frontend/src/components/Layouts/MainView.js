@@ -1,12 +1,20 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
+import Loadable from 'react-loadable';
 
-import Navigation from "components/Navigation";
 import RouteEditingBar from "components/RouteEditingBar";
 import StatusBar from "components/StatusBar";
 import Scene from "components/Scene";
 import Loader from "components/common/Loader";
 import PlaybackControls from "components/PlaybackControls";
+
+const Navigation = Loadable({
+    loader: () => import("components/Navigation"),
+    loading() {
+      return <div>Loading...</div>;
+    }
+});
+
 
 class SensorCamera extends React.Component {
     render() {

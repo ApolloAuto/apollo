@@ -34,7 +34,7 @@
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/common/util/factory.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/tool/data_generator/sensor.h"
 
 /**
@@ -48,7 +48,7 @@ namespace data_generator {
 class DataGenerator : public apollo::common::ApolloApp {
  public:
   DataGenerator() = default;
-  ~DataGenerator() = default;
+  ~DataGenerator() { delete data_file_; }
 
   std::string Name() const override;
   apollo::common::Status Init() override;

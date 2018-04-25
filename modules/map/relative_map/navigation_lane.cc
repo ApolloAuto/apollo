@@ -31,6 +31,7 @@
 namespace apollo {
 namespace relative_map {
 
+using apollo::common::Path;
 using apollo::common::VehicleStateProvider;
 using apollo::common::math::Vec2d;
 using apollo::common::util::DistanceXY;
@@ -54,10 +55,10 @@ bool NavigationLane::GeneratePath() {
   const auto &lane_marker = perception_obstacles_.lane_marker();
 
   // priority: merge > navigation line > perception lane marker
-  if (FLAGS_enable_navigation_line &&
+  if (config_.lane_source() == NavigationLaneConfig::OFFLINE_GENERATED &&
       navigation_info_.navigation_path_size() > 0) {
     ConvertNavigationLineToPath(path);
-    if (path->path_point().size() <= 0) {
+    if (path->path_point().size() == 0) {
       ConvertLaneMarkerToPath(lane_marker, path);
     }
   } else {
@@ -72,8 +73,7 @@ double NavigationLane::EvaluateCubicPolynomial(const double c0, const double c1,
   return ((c3 * z + c2) * z + c1) * z + c0;
 }
 
-void NavigationLane::MergeNavigationLineAndLaneMarker(
-    const perception::LaneMarkers &lane_marker, common::Path *path) {
+void NavigationLane::MergeNavigationLineAndLaneMarker(common::Path *path) {
   CHECK_NOTNULL(path);
 
   common::Path navigation_path;
@@ -136,18 +136,22 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
     return;
   }
   path->set_name("Path from navigation.");
-  if (!UpdateProjectionIndex()) {
+  const auto &navigation_path = navigation_info_.navigation_path(0).path();
+  if (!UpdateProjectionIndex(navigation_path)) {
     return;
   }
 
   // TODO(All): support multiple navigation path
   // currently, only 1 navigation path is supported
-  const auto &navigation_path = navigation_info_.navigation_path(0).path();
   int curr_project_index = last_project_index_;
+  if (curr_project_index < 0 ||
+      curr_project_index >= navigation_path.path_point_size()) {
+    AERROR << "Invalid projection index " << curr_project_index;
+    return;
+  }
 
-  double dist =
-      navigation_path.path_point(navigation_path.path_point_size() - 1).s() -
-      navigation_path.path_point(curr_project_index).s();
+  double dist = navigation_path.path_point().rbegin()->s() -
+                navigation_path.path_point(curr_project_index).s();
   if (dist < 20) {
     return;
   }
@@ -182,22 +186,12 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
       break;
     }
   }
-
-  const perception::LaneMarkers &lane_marker =
-      perception_obstacles_.lane_marker();
-  const auto &left_lane = lane_marker.left_lane_marker();
-  const auto &right_lane = lane_marker.right_lane_marker();
-  left_width_ = (std::fabs(left_lane.c0_position()) +
-                 std::fabs(right_lane.c0_position())) /
-                2.0;
-  right_width_ = left_width_;
 }
 
 // project adc_state_ onto path
-bool NavigationLane::UpdateProjectionIndex() {
+bool NavigationLane::UpdateProjectionIndex(const common::Path &path) {
   // TODO(All): support multiple navigation path
   // currently, only 1 navigation path is supported
-  const auto &path = navigation_info_.navigation_path(0).path();
   int index = 0;
   double min_d = std::numeric_limits<double>::max();
   for (int i = last_project_index_; i + 1 < path.path_point_size(); ++i) {
@@ -219,7 +213,7 @@ bool NavigationLane::UpdateProjectionIndex() {
 }
 
 double NavigationLane::GetKappa(const double c1, const double c2,
-                const double c3, const double x) {
+                                const double c3, const double x) {
   const double dy = 3 * c3 * x * x + 2 * c2 * x + c1;
   const double d2y = 6 * c3 * x + 2 * c2;
   return std::fabs(d2y) / std::pow((1 + dy * dy), 1.5);
@@ -341,10 +335,18 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
       perception_obstacles_.lane_marker().right_lane_marker().lane_type());
   auto *right_segment =
       right_boundary->mutable_curve()->add_segment()->mutable_line_segment();
+
   const double lane_left_width =
-      left_width_ > 0 ? left_width_ : map_config.default_left_width();
+      left_width_ <= 0.0
+          ? map_config.default_left_width()
+          : common::math::Clamp(left_width_, FLAGS_min_lane_half_width,
+                                FLAGS_max_lane_half_width);
   const double lane_right_width =
-      right_width_ > 0 ? right_width_ : map_config.default_right_width();
+      right_width_ <= 0.0
+          ? map_config.default_right_width()
+          : common::math::Clamp(right_width_, FLAGS_min_lane_half_width,
+                                FLAGS_max_lane_half_width);
+
   for (const auto &path_point : path.path_point()) {
     auto *point = line_segment->add_point();
     point->set_x(path_point.x());

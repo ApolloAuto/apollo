@@ -3,10 +3,7 @@ syntax = "proto2";
 package apollo.perception.obstacle.yolo;
 
 enum ModelType{
-    Caffe=0;
-    Anakin=1;
-    TensorRT=2;
-    TensorRTInt8=3;
+    Caffe = 0;
 }
 message YoloParam {
     required ModelParam model_param = 1;

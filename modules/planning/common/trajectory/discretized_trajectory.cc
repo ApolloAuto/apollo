@@ -47,27 +47,6 @@ DiscretizedTrajectory::DiscretizedTrajectory(const ADCTrajectory& trajectory) {
 
 TrajectoryPoint DiscretizedTrajectory::Evaluate(
     const double relative_time) const {
-  CHECK_GE(trajectory_points_.size(), 2);
-  CHECK(trajectory_points_.front().relative_time() <= relative_time &&
-        trajectory_points_.back().relative_time() >= relative_time)
-      << "Invalid relative time input!";
-
-  auto comp = [](const TrajectoryPoint& p, const double relative_time) {
-    return p.relative_time() < relative_time;
-  };
-
-  auto it_lower =
-      std::lower_bound(trajectory_points_.begin(), trajectory_points_.end(),
-                       relative_time, comp);
-
-  if (it_lower == trajectory_points_.begin()) {
-    return trajectory_points_.front();
-  }
-  return util::interpolate(*(it_lower - 1), *it_lower, relative_time);
-}
-
-TrajectoryPoint DiscretizedTrajectory::EvaluateUsingLinearApproximation(
-    const double relative_time) const {
   auto comp = [](const TrajectoryPoint& p, const double relative_time) {
     return p.relative_time() < relative_time;
   };
@@ -160,6 +139,11 @@ std::uint32_t DiscretizedTrajectory::NumOfPoints() const {
 const std::vector<TrajectoryPoint>& DiscretizedTrajectory::trajectory_points()
     const {
   return trajectory_points_;
+}
+
+void DiscretizedTrajectory::SetTrajectoryPoints(
+    const std::vector<common::TrajectoryPoint>& trajectory_points) {
+  trajectory_points_ = trajectory_points;
 }
 
 void DiscretizedTrajectory::Clear() { trajectory_points_.clear(); }

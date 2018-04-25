@@ -55,3 +55,8 @@ message Quaternion {
   optional double qz = 3 [default = nan];
   optional double qw = 4 [default = nan];
 }
+
+// A general polygon, points are counter clockwise
+message Polygon {
+  repeated Point3D point = 1;
+}

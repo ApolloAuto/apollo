@@ -86,32 +86,6 @@ TrajectoryCost::TrajectoryCost(
       continue;
     } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception()) ||
                is_bycycle_or_pedestrian) {
-      double left_width = 0.0;
-      double right_width = 0.0;
-      reference_line_->GetLaneWidth(sl_boundary.start_s(), &left_width,
-                                    &right_width);
-
-      const double adc_width = vehicle_param_.width();
-
-      double left_driving_width = left_width - sl_boundary.end_l() -
-                                  FLAGS_static_decision_nudge_l_buffer;
-      double right_driving_width = right_width + sl_boundary.start_l() -
-                                   FLAGS_static_decision_nudge_l_buffer;
-
-      // should check hard boundary here
-      if (!ptr_path_obstacle->LateralDecision().has_sidepass() &&
-          left_driving_width < adc_width && right_driving_width < adc_width) {
-        // lane blocking obstacle
-        continue;
-      }
-
-      if (sl_boundary.start_l() <= 0.0 && sl_boundary.end_l() >= 0.0 &&
-          sl_boundary.start_l() > -right_width &&
-          sl_boundary.end_l() < left_width) {
-        // Do NOT pass if obstacle stays on the road (covers lane center)
-        continue;
-      }
-
       static_obstacle_sl_boundaries_.push_back(std::move(sl_boundary));
     } else {
       std::vector<Box2d> box_by_time;

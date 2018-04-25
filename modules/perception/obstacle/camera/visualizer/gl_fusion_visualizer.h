@@ -16,10 +16,10 @@
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GL_FUSION_VISUALIZER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GL_FUSION_VISUALIZER_H_
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <memory>
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
 #include "modules/perception/obstacle/camera/visualizer/glfw_fusion_viewer.h"
@@ -36,12 +36,7 @@ class GLFusionVisualizer : public BaseVisualizer {
 
   bool init() override;
 
-  std::string name() const override {
-    return _name;
-  }
-  //    void set_motion_buffer(MotionBuffer &motion_buffer) override {
-  //        _motion_buffer = motion_buffer;
-  //    }
+  std::string name() const override { return name_; }
 
   void update_camera_system(FrameContent *content) override;
 
@@ -54,25 +49,27 @@ class GLFusionVisualizer : public BaseVisualizer {
 
   void set_camera_position();
 
-  Eigen::Vector3d _camera_center_velodyne;
-  Eigen::Vector3d _view_point_velodyne;
-  Eigen::Vector3d _up_velodyne;
-  Eigen::Vector3d _forward_velodyne;
-  std::vector<Eigen::Vector3d> _main_car;
+  Eigen::Vector3d camera_center_velodyne_;
+  Eigen::Vector3d view_point_velodyne_;
+  Eigen::Vector3d up_velodyne_;
+  Eigen::Vector3d forward_velodyne_;
+  std::vector<Eigen::Vector3d> main_car_;
 
-  Eigen::Vector3d _camera_center_world;
-  Eigen::Vector3d _view_point_world;
-  Eigen::Vector3d _up_world;
-  Eigen::Vector3d _forward_world;
-  std::vector<Eigen::Vector3d> _main_car_world;
+  Eigen::Vector3d camera_center_world_;
+  Eigen::Vector3d view_point_world_;
+  Eigen::Vector3d up_world_;
+  Eigen::Vector3d forward_world_;
+  std::vector<Eigen::Vector3d> main_car_world_;
 
-  std::shared_ptr<GLFWFusionViewer> _opengl_vs;
-  std::string _name;
-  bool _init = false;
+  std::shared_ptr<GLFWFusionViewer> opengl_vs_;
+  std::string name_;
+  bool init_ = false;
   DISALLOW_COPY_AND_ASSIGN(GLFusionVisualizer);
 
-  //    boost::circular_buffer<VehicleStatus> _motion_buffer;
+  //    boost::circular_buffer<VehicleStatus> motion_buffer_;
 };
+
+REGISTER_VISUALIZER(GLFusionVisualizer);
 
 }  // namespace lowcostvisualizer
 }  // namespace perception

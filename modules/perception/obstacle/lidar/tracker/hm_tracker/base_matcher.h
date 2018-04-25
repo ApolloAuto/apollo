@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_BASE_MATCHER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_BASE_MATCHER_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -35,8 +36,6 @@ enum MatcherType {
 
 class BaseMatcher {
  public:
-  typedef std::pair<int, int> TrackObjectPair;
-
   BaseMatcher() {}
   virtual ~BaseMatcher() {}
 
@@ -48,10 +47,10 @@ class BaseMatcher {
   // @params[OUT] unassigned_tracks: unmatched tracks
   // @params[OUT] unassigned_objects: unmatched objects
   // @return nothing
-  virtual void Match(std::vector<TrackedObjectPtr>* objects,
+  virtual void Match(std::vector<std::shared_ptr<TrackedObject>>* objects,
                      const std::vector<ObjectTrackPtr>& tracks,
                      const std::vector<Eigen::VectorXf>& tracks_predict,
-                     std::vector<TrackObjectPair>* assignments,
+                     std::vector<std::pair<int, int>>* assignments,
                      std::vector<int>* unassigned_tracks,
                      std::vector<int>* unassigned_objects) = 0;
 

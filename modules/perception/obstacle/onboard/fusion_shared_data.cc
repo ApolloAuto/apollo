@@ -17,9 +17,5 @@
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 
 namespace apollo {
-namespace perception {
-
-REGISTER_SHAREDDATA(FusionSharedData);
-
-}  // namespace perception
+namespace perception {}  // namespace perception
 }  // namespace apollo

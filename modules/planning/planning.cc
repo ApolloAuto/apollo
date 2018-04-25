@@ -17,6 +17,7 @@
 #include "modules/planning/planning.h"
 
 #include <algorithm>
+#include <list>
 #include <vector>
 
 #include "google/protobuf/repeated_field.h"
@@ -45,6 +46,8 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
+
+Planning::~Planning() { Stop(); }
 
 std::string Planning::Name() const { return "planning"; }
 
@@ -85,6 +88,11 @@ Status Planning::Init() {
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
 
+  CHECK(apollo::common::util::GetProtoFromFile(
+      FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
+      << "Failed to load traffic rule config file "
+      << FLAGS_traffic_rule_config_filename;
+
   // initialize planning thread pool
   PlanningThreadPool::instance()->Init();
 
@@ -99,13 +107,13 @@ Status Planning::Init() {
   CHECK_ADAPTER_IF(FLAGS_use_navigation_mode && FLAGS_enable_prediction,
                    PerceptionObstacles);
   CHECK_ADAPTER_IF(FLAGS_enable_prediction, Prediction);
-  CHECK_ADAPTER_IF(FLAGS_enable_traffic_light, TrafficLightDetection);
+  CHECK_ADAPTER(TrafficLightDetection);
 
   if (!FLAGS_use_navigation_mode) {
     hdmap_ = HDMapUtil::BaseMapPtr();
     CHECK(hdmap_) << "Failed to load map";
     reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
-        new ReferenceLineProvider(hdmap_, config_.smoother_type()));
+        new ReferenceLineProvider(hdmap_));
   }
 
   RegisterPlanners();
@@ -209,7 +217,7 @@ void Planning::RunOnce() {
     // recreate reference line provider in every cycle
     hdmap_ = HDMapUtil::BaseMapPtr();
     reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
-        new ReferenceLineProvider(hdmap_, config_.smoother_type()));
+        new ReferenceLineProvider(hdmap_));
   }
 
   // localization
@@ -270,11 +278,40 @@ void Planning::RunOnce() {
   }
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
+
+  if (FLAGS_use_navigation_mode) {
+    TrajectoryStitcher::TransformLastPublishedTrajectory(
+        planning_cycle_time, last_publishable_trajectory_.get());
+  }
+
   bool is_replan = false;
-  const auto stitching_trajectory =
-      TrajectoryStitcher::ComputeStitchingTrajectory(
-          vehicle_state, start_timestamp, planning_cycle_time,
-          last_publishable_trajectory_.get(), &is_replan);
+  std::vector<TrajectoryPoint> stitching_trajectory;
+  stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
+      vehicle_state, start_timestamp, planning_cycle_time,
+      last_publishable_trajectory_.get(), &is_replan);
+
+  if (FLAGS_use_navigation_mode) {
+    std::list<ReferenceLine> reference_lines;
+    std::list<hdmap::RouteSegments> segments;
+    if (!reference_line_provider_->GetReferenceLines(&reference_lines,
+                                                     &segments) ||
+        reference_lines.empty()) {
+      std::string msg("Reference line is not ready");
+      AERROR << msg;
+      not_ready->set_reason(msg);
+      status.Save(not_ready_pb.mutable_header()->mutable_status());
+      PublishPlanningPb(&not_ready_pb, start_timestamp);
+      return;
+    }
+    const double init_point_v = stitching_trajectory.front().v();
+    const double init_point_a = stitching_trajectory.front().a();
+    stitching_trajectory = TrajectoryStitcher::CalculateInitPoint(
+        vehicle_state, reference_lines.front(), &is_replan);
+    if (!is_replan) {
+      stitching_trajectory.back().set_v(init_point_v);
+      stitching_trajectory.back().set_a(init_point_a);
+    }
+  }
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
@@ -324,7 +361,7 @@ void Planning::RunOnce() {
 
   for (auto& ref_line_info : frame_->reference_line_info()) {
     TrafficDecider traffic_decider;
-    traffic_decider.Init(config_);
+    traffic_decider.Init(traffic_rule_configs_);
     auto traffic_status = traffic_decider.Execute(frame_.get(), &ref_line_info);
     if (!traffic_status.ok() || !ref_line_info.IsDrivable()) {
       ref_line_info.SetDrivable(false);
@@ -398,6 +435,7 @@ void Planning::Stop() {
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
+  FrameHistory::instance()->Clear();
 }
 
 void Planning::SetLastPublishableTrajectory(

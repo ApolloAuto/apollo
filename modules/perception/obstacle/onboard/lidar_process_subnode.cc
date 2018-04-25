@@ -16,23 +16,24 @@
 
 #include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
 
-#include <map>
+#include <unordered_map>
 
 #include "eigen_conversions/eigen_msg.h"
 #include "pcl_conversions/pcl_conversions.h"
 #include "ros/include/ros/ros.h"
 
 #include "modules/common/log.h"
+#include "modules/common/time/time_util.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/base/time_util.h"
-#include "modules/perception/lib/base/timer.h"
+#include "modules/perception/common/sequence_type_fuser/sequence_type_fuser.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
+#include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
-#include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/sequence_type_fuser.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/onboard/transform_input.h"
 
@@ -48,8 +49,6 @@ using pcl_util::PointCloudPtr;
 using pcl_util::PointD;
 using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
-using std::map;
-using std::string;
 
 bool LidarProcessSubnode::InitInternal() {
   if (inited_) {
@@ -68,7 +67,7 @@ bool LidarProcessSubnode::InitInternal() {
     return false;
   }
   // parse reserve fileds
-  map<string, string> reserve_field_map;
+  std::unordered_map<std::string, std::string> reserve_field_map;
   if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
     AERROR << "Failed to parse reserve filed: " << reserve_;
     return false;
@@ -162,7 +161,7 @@ void LidarProcessSubnode::OnPointCloud(
   PERF_BLOCK_END("lidar_roi_filter");
 
   /// call segmentor
-  std::vector<ObjectPtr> objects;
+  std::vector<std::shared_ptr<Object>> objects;
   if (segmentor_ != nullptr) {
     SegmentationOptions segmentation_options;
     segmentation_options.origin_cloud = point_cloud;
@@ -182,6 +181,24 @@ void LidarProcessSubnode::OnPointCloud(
   }
   ADEBUG << "call segmentation succ. The num of objects is: " << objects.size();
   PERF_BLOCK_END("lidar_segmentation");
+
+  /// call object filter
+  if (object_filter_ != nullptr) {
+    ObjectFilterOptions object_filter_options;
+    object_filter_options.velodyne_trans.reset(new Eigen::Matrix4d);
+    object_filter_options.velodyne_trans = velodyne_trans;
+    // object_filter_options.hdmap_struct_ptr = hdmap;
+
+    if (!object_filter_->Filter(object_filter_options, &objects)) {
+      AERROR << "failed to call object filter.";
+      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
+      PublishDataAndEvent(timestamp_, out_sensor_objects);
+      return;
+    }
+  }
+  ADEBUG << "call object filter succ. The num of objects is: "
+         << objects.size();
+  PERF_BLOCK_END("lidar_object_filter");
 
   /// call object builder
   if (object_builder_ != nullptr) {
@@ -240,6 +257,7 @@ void LidarProcessSubnode::RegistAllAlgorithm() {
   RegisterFactoryDummyTypeFuser();
 
   RegisterFactoryHdmapROIFilter();
+  RegisterFactoryLowObjectFilter();
   RegisterFactoryCNNSegmentation();
   RegisterFactoryMinBoxObjectBuilder();
   RegisterFactoryHmObjectTracker();
@@ -250,7 +268,7 @@ bool LidarProcessSubnode::InitFrameDependence() {
   /// init share data
   CHECK(shared_data_manager_ != nullptr);
   // init preprocess_data
-  const string lidar_processing_data_name("LidarObjectData");
+  const std::string lidar_processing_data_name("LidarObjectData");
   processing_data_ = dynamic_cast<LidarObjectData*>(
       shared_data_manager_->GetSharedData(lidar_processing_data_name));
   if (processing_data_ == nullptr) {
@@ -319,6 +337,20 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
   }
   AINFO << "Init algorithm plugin successfully, object builder: "
         << object_builder_->name();
+
+  /// init pre object filter
+  object_filter_.reset(
+      BaseObjectFilterRegisterer::GetInstanceByName("LowObjectFilter"));
+  if (!object_filter_) {
+    AERROR << "Failed to get instance: ExtHdmapObjectFilter";
+    return false;
+  }
+  if (!object_filter_->Init()) {
+    AERROR << "Failed to Init object filter: " << object_filter_->name();
+    return false;
+  }
+  AINFO << "Init algorithm plugin successfully, object filter: "
+        << object_filter_->name();
 
   /// init tracker
   tracker_.reset(

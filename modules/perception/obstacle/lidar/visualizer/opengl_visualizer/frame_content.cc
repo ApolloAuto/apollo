@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
+
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -44,9 +45,7 @@ void FrameContent::SetLidarPose(const Eigen::Matrix4d &pose) {
   pose_v2w_(2, 3) += global_offset_[2];
 }
 
-Eigen::Matrix4d FrameContent::GetPoseV2w() {
-  return pose_v2w_;
-}
+Eigen::Matrix4d FrameContent::GetPoseV2w() { return pose_v2w_; }
 
 void FrameContent::SetLidarCloud(pcl_util::PointCloudPtr cloud) {
   pcl::transformPointCloud(*cloud, *(cloud_), pose_v2w_);
@@ -56,13 +55,9 @@ void FrameContent::SetLidarRoiCloud(pcl_util::PointCloudPtr cloud) {
   pcl::transformPointCloud(*cloud, *(roi_cloud_), pose_v2w_);
 }
 
-pcl_util::PointCloudPtr FrameContent::GetCloud() {
-  return cloud_;
-}
+pcl_util::PointCloudPtr FrameContent::GetCloud() { return cloud_; }
 
-pcl_util::PointCloudPtr FrameContent::GetRoiCloud() {
-  return roi_cloud_;
-}
+pcl_util::PointCloudPtr FrameContent::GetRoiCloud() { return roi_cloud_; }
 
 bool FrameContent::HasCloud() {
   if ((cloud_ == nullptr || cloud_->size() == 0)) {
@@ -89,7 +84,7 @@ void FrameContent::OffsetPointcloud(pcl_util::PointDCloud *cloud,
   }
 }
 
-void FrameContent::OffsetObject(ObjectPtr object,
+void FrameContent::OffsetObject(std::shared_ptr<Object> object,
                                 const Eigen::Vector3d &offset) {
   OffsetPointcloud(object->cloud.get(), offset);
   OffsetPointcloud(&(object->polygon), offset);
@@ -100,7 +95,7 @@ void FrameContent::OffsetObject(ObjectPtr object,
 }
 
 void FrameContent::SetTrackedObjects(
-    const std::vector<ObjectPtr> &objects) {
+    const std::vector<std::shared_ptr<Object>> &objects) {
   tracked_objects_.resize(objects.size());
   for (size_t i = 0; i < objects.size(); ++i) {
     tracked_objects_[i].reset(new Object);
@@ -109,7 +104,7 @@ void FrameContent::SetTrackedObjects(
   }
 }
 
-std::vector<ObjectPtr> FrameContent::GetTrackedObjects() {
+std::vector<std::shared_ptr<Object>> FrameContent::GetTrackedObjects() {
   return tracked_objects_;
 }
 

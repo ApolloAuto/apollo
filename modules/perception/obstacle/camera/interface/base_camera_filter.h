@@ -19,6 +19,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_FILTER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_FILTER_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -42,8 +43,8 @@ class BaseCameraFilter {
   // @brief: Run filtering on each tracked object to update measurements
   // @param [in/out] objects : tracked object lists, with updated 3D position,
   // 3D size, 3D velocity and orientation
-  virtual bool Filter(const float& timestamp,
-                      std::vector<VisualObjectPtr>* objects) = 0;
+  virtual bool Filter(const double& timestamp,
+                      std::vector<std::shared_ptr<VisualObject>>* objects) = 0;
 
   virtual std::string Name() const = 0;
 

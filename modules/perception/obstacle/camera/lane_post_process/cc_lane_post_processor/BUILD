@@ -30,9 +30,32 @@ cc_library(
         "//modules/common:log",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/common:util",
+        "//modules/perception/cuda_util",
         "//modules/perception/obstacle/camera/interface",
+        "//modules/perception/proto:lane_post_process_config_lib_proto",
         "@eigen",
         "@opencv2//:core",
+    ],
+)
+
+cc_test(
+    name = "cc_lane_post_processor_test",
+    size = "small",
+    srcs = [
+        "cc_lane_post_processor_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+        "//modules/perception:perception_model",
+        "//modules/perception/conf:perception_config",
+        "//modules/perception/obstacle/camera/lane_post_process/common:util",
+    ],
+    deps = [
+        ":cc_lane_post_processor",
+        "//modules/common/util",
+        "@gtest//:main",
+        "@opencv2//:core",
+        "@opencv2//:highgui",
     ],
 )
 

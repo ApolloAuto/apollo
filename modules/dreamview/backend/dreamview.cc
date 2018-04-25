@@ -37,9 +37,7 @@ using apollo::common::time::Clock;
 using apollo::common::util::PathExists;
 using apollo::hdmap::BaseMapFile;
 
-std::string Dreamview::Name() const {
-  return FLAGS_dreamview_module_name;
-}
+std::string Dreamview::Name() const { return FLAGS_dreamview_module_name; }
 
 void Dreamview::TerminateProfilingMode(const ros::TimerEvent& event) {
   Stop();
@@ -90,17 +88,15 @@ Status Dreamview::Init() {
       << "ImageShortAdapter is not initialized.";
   CHECK(AdapterManager::GetPointCloud())
       << "PointCloudAdapter is not initialized.";
-
-  if (FLAGS_use_navigation_mode) {
-    CHECK(AdapterManager::GetRelativeMap())
-        << "RelativeMapAdapter is not initialized.";
-  }
+  CHECK(AdapterManager::GetRelativeMap())
+      << "RelativeMapAdapter is not initialized.";
 
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
   std::vector<std::string> options = {
-      "document_root",    FLAGS_static_file_dir,  "listening_ports",
-      FLAGS_server_ports, "websocket_timeout_ms", FLAGS_websocket_timeout_ms};
+      "document_root",      FLAGS_static_file_dir,   "listening_ports",
+      FLAGS_server_ports,   "websocket_timeout_ms",  FLAGS_websocket_timeout_ms,
+      "request_timeout_ms", FLAGS_request_timeout_ms};
   if (PathExists(FLAGS_ssl_certificate)) {
     options.push_back("ssl_certificate");
     options.push_back(FLAGS_ssl_certificate);
@@ -111,9 +107,9 @@ Status Dreamview::Init() {
   server_.reset(new CivetServer(options));
 
   image_.reset(new ImageHandler());
-  websocket_.reset(new WebSocketHandler());
-  map_ws_.reset(new WebSocketHandler());
-  point_cloud_ws_.reset(new WebSocketHandler());
+  websocket_.reset(new WebSocketHandler("SimWorld"));
+  map_ws_.reset(new WebSocketHandler("Map"));
+  point_cloud_ws_.reset(new WebSocketHandler("PointCloud"));
   map_service_.reset(new MapService());
   sim_control_.reset(new SimControl(map_service_.get()));
 

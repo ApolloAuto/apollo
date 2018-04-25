@@ -76,12 +76,6 @@ export default class QuickStarter extends React.Component {
                 this.speechSynthesis('Start Auto');
             },
         };
-        this.version = {
-            "Version": () => {
-                // TODO(all): change to nice UI.
-                alert(this.props.store.hmi.dockerImage);
-            },
-        };
     }
 
     componentWillUpdate() {
@@ -105,7 +99,6 @@ export default class QuickStarter extends React.Component {
             <div className="card">
                 <div className="card-header"><span>Quick Start</span></div>
                 <div className="card-content-column">
-                    <CommandGroup disabled={false} commands={this.version} />
                     <CommandGroup disabled={tasksPanelLocked} commands={this.setup} />
                     <CommandGroup disabled={tasksPanelLocked} commands={this.reset} />
                     <CommandGroup disabled={!hmi.enableStartAuto || tasksPanelLocked}

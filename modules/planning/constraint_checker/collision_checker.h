@@ -34,8 +34,7 @@ namespace planning {
 class CollisionChecker {
  public:
   explicit CollisionChecker(
-      const std::vector<const Obstacle*>& obstacles,
-      const double ego_vehicle_s,
+      const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
       const double ego_vehicle_d,
       const std::vector<common::PathPoint>& discretized_reference_line);
 
@@ -43,8 +42,7 @@ class CollisionChecker {
 
  private:
   void BuildPredictedEnvironment(
-      const std::vector<const Obstacle*>& obstacles,
-      const double ego_vehicle_s,
+      const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
       const double ego_vehicle_d,
       const std::vector<common::PathPoint>& discretized_reference_line);
 

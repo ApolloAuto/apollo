@@ -35,7 +35,7 @@ namespace planning {
 using apollo::common::time::Clock;
 using apollo::planning::util::GetPlanningStatus;
 
-SidePassVehicle::SidePassVehicle(const RuleConfig& config)
+SidePassVehicle::SidePassVehicle(const TrafficRuleConfig& config)
     : TrafficRule(config), hdmap_(apollo::hdmap::HDMapUtil::BaseMapPtr()) {}
 
 bool SidePassVehicle::UpdateSidePassStatus(
@@ -70,7 +70,7 @@ bool SidePassVehicle::UpdateSidePassStatus(
       if (has_blocking_obstacle) {
         double wait_start_time = sidepass_state->wait_start_time();
         if (Clock::NowInSeconds() - wait_start_time >
-            FLAGS_sidepass_wait_time_sec) {
+            config_.side_pass_vehicle().wait_time()) {
           // calculate if the left/right lane exist
           std::vector<hdmap::LaneInfoConstPtr> lanes;
           reference_line_->GetLaneFromS(
@@ -226,10 +226,6 @@ bool SidePassVehicle::ApplyRule(Frame* const,
                                 ReferenceLineInfo* const reference_line_info) {
   if (FLAGS_use_navigation_mode) {
     // do not sidepass on highway.
-    return true;
-  }
-  if (!FLAGS_enable_sidepass) {
-    ADEBUG << "Side pass rule is disabled";
     return true;
   }
 

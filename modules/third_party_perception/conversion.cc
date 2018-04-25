@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "modules/common/configs/config_gflags.h"
+#include "modules/common/log.h"
 
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 #include "modules/third_party_perception/common/third_party_perception_util.h"
@@ -36,6 +37,7 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion {
 
+using apollo::canbus::Chassis;
 using apollo::drivers::ContiRadar;
 using apollo::drivers::DelphiESR;
 using apollo::drivers::Mobileye;
@@ -54,110 +56,11 @@ std::map<std::int32_t, ::apollo::hdmap::LaneBoundaryType_Type>
                            {6, apollo::hdmap::LaneBoundaryType::UNKNOWN}};
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
-    const Mobileye& mobileye, const LocalizationEstimate& localization) {
+    const Mobileye& mobileye, const LocalizationEstimate& localization,
+    const Chassis& chassis) {
   PerceptionObstacles obstacles;
   // retrieve position and velocity of the main vehicle from the localization
   // position
-  double adc_x = localization.pose().position().x();
-  double adc_y = localization.pose().position().y();
-  double adc_z = localization.pose().position().z();
-  // heading
-  auto adc_quaternion = localization.pose().orientation();
-  double adc_theta = GetAngleFromQuaternion(adc_quaternion);
-  // velocity
-  double adc_vx = localization.pose().linear_velocity().x();
-  double adc_vy = localization.pose().linear_velocity().y();
-  double adc_velocity = Speed(adc_vx, adc_vy);
-
-  for (int index = 0; index < mobileye.details_738().num_obstacles() &&
-                      index < mobileye.details_739_size();
-       ++index) {
-    auto* mob = obstacles.add_perception_obstacle();
-    const auto& data_739 = mobileye.details_739(index);
-    int mob_id = data_739.obstacle_id() + FLAGS_mobileye_id_offset;
-    double mob_x = data_739.obstacle_pos_x();
-    double mob_y = -data_739.obstacle_pos_y();
-    double mob_vel_x = data_739.obstacle_rel_vel_x();
-    int mob_type = data_739.obstacle_type();
-
-    double mob_l = GetDefaultObjectLength(mob_type);
-    double mob_w = 0.0;
-    if (mobileye.details_73a_size() <= index) {
-      mob_w = GetDefaultObjectWidth(mob_type);
-    } else {
-      mob_w = mobileye.details_73a(index).obstacle_width();
-    }
-
-    mob_x += FLAGS_mobileye_pos_adjust;  // offset: imu <-> mobileye
-    mob_x += mob_l / 2.0;  // make x the middle point of the vehicle.
-
-    Point xy_point = SLtoXY(mob_x, mob_y, adc_theta);
-
-    // TODO(QiL) : Clean this up after data collection and validation
-    double converted_x = 0.0;
-    double converted_y = 0.0;
-    double converted_speed = 0.0;
-    double converted_vx = 0.0;
-    double converted_vy = 0.0;
-
-    if (!FLAGS_use_navigation_mode) {
-      converted_x = adc_x + xy_point.x();
-      converted_y = adc_y + xy_point.y();
-      mob->set_theta(GetNearestLaneHeading(converted_x, converted_y, adc_z));
-      converted_speed = adc_velocity + mob_vel_x;
-      converted_vx = converted_speed * std::cos(mob->theta());
-      converted_vy = converted_speed * std::sin(mob->theta());
-    } else {
-      converted_x = xy_point.x();
-      converted_y = xy_point.y();
-
-      // TODO(QiL) : double verify the theta
-      mob->set_theta(GetNearestLaneHeading(converted_x, converted_y, adc_z));
-      converted_speed = mob_vel_x;
-      converted_vx = converted_speed * std::cos(mob->theta());
-      converted_vy = converted_speed * std::sin(mob->theta());
-    }
-
-    mob->set_id(mob_id);
-    mob->mutable_position()->set_x(converted_x);
-    mob->mutable_position()->set_y(converted_y);
-
-    switch (mob_type) {
-      case 0:
-      case 1: {
-        mob->set_type(PerceptionObstacle::VEHICLE);  // VEHICLE
-        break;
-      }
-      case 2:
-      case 4: {
-        mob->set_type(PerceptionObstacle::BICYCLE);  // BIKE
-        break;
-      }
-      case 3: {
-        mob->set_type(PerceptionObstacle::PEDESTRIAN);  // PED
-        break;
-      }
-      default: {
-        mob->set_type(PerceptionObstacle::UNKNOWN);  // UNKNOWN
-        break;
-      }
-    }
-
-    mob->mutable_velocity()->set_x(converted_vx);
-    mob->mutable_velocity()->set_y(converted_vy);
-    mob->set_length(mob_l);
-    mob->set_width(mob_w);
-    mob->set_height(FLAGS_default_height);
-
-    mob->clear_polygon_point();
-
-    // create polygon
-    FillPerceptionPolygon(mob, mob->position().x(), mob->position().y(),
-                          mob->position().z(), mob->length(), mob->width(),
-                          mob->height(), mob->theta());
-
-    mob->set_confidence(0.5);
-  }
 
   obstacles.mutable_header()->CopyFrom(mobileye.header());
 
@@ -208,13 +111,161 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
   obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_view_range(
       mobileye.lka_769().view_range());
 
+  double adc_x = localization.pose().position().x();
+  double adc_y = localization.pose().position().y();
+  double adc_z = localization.pose().position().z();
+  // heading
+  auto adc_quaternion = localization.pose().orientation();
+  double adc_theta = GetAngleFromQuaternion(adc_quaternion);
+  // velocity
+  double adc_vx = localization.pose().linear_velocity().x();
+  double adc_vy = localization.pose().linear_velocity().y();
+  double adc_velocity = Speed(adc_vx, adc_vy);
+
+  for (int index = 0; index < mobileye.details_738().num_obstacles() &&
+                      index < mobileye.details_739_size();
+       ++index) {
+    auto* mob = obstacles.add_perception_obstacle();
+    const auto& data_739 = mobileye.details_739(index);
+    int mob_id = data_739.obstacle_id() + FLAGS_mobileye_id_offset;
+    double mob_x = data_739.obstacle_pos_x();
+    double mob_y = -data_739.obstacle_pos_y();
+    double mob_vel_x = data_739.obstacle_rel_vel_x();
+    int mob_type = data_739.obstacle_type();
+
+    double mob_l = 0.0;
+    double mob_w = 0.0;
+    if (mobileye.details_73a_size() <= index) {
+      mob_l = GetDefaultObjectLength(mob_type);
+      mob_w = GetDefaultObjectWidth(mob_type);
+    } else {
+      if (mobileye.details_73a(index).obstacle_length() >
+          FLAGS_max_mobileye_obstacle_length) {
+        mob_l = GetDefaultObjectLength(mob_type);
+      } else {
+        mob_l = mobileye.details_73a(index).obstacle_length();
+      }
+
+      if (mobileye.details_73a(index).obstacle_width() >
+          FLAGS_max_mobileye_obstacle_width) {
+        mob_w = GetDefaultObjectWidth(mob_type);
+      } else {
+        mob_w = mobileye.details_73a(index).obstacle_width();
+      }
+    }
+
+    mob_x += FLAGS_mobileye_pos_adjust;  // offset: imu <-> mobileye
+    mob_x += mob_l / 2.0;  // make x the middle point of the vehicle.
+
+    Point xy_point = SLtoXY(mob_x, mob_y, adc_theta);
+
+    // TODO(QiL) : Clean this up after data collection and validation
+    double converted_x = 0.0;
+    double converted_y = 0.0;
+    double converted_speed = 0.0;
+    double converted_vx = 0.0;
+    double converted_vy = 0.0;
+
+    double path_c1 = 0.0;
+    double path_c2 = 0.0;
+    double path_c3 = 0.0;
+
+    if (obstacles.lane_marker().left_lane_marker().quality() >=
+        obstacles.lane_marker().right_lane_marker().quality()) {
+      path_c1 = obstacles.lane_marker().left_lane_marker().c1_heading_angle();
+      path_c2 = obstacles.lane_marker().left_lane_marker().c2_curvature();
+      path_c3 =
+          obstacles.lane_marker().left_lane_marker().c3_curvature_derivative();
+    } else {
+      path_c1 = obstacles.lane_marker().right_lane_marker().c1_heading_angle();
+      path_c2 = obstacles.lane_marker().right_lane_marker().c2_curvature();
+      path_c3 = obstacles.lane_marker().right_lane_marker().c2_curvature();
+    }
+
+    if (!FLAGS_use_navigation_mode) {
+      converted_x = adc_x + xy_point.x();
+      converted_y = adc_y + xy_point.y();
+      mob->set_theta(GetNearestLaneHeading(converted_x, converted_y, adc_z));
+      converted_speed = adc_velocity + mob_vel_x;
+      converted_vx = converted_speed * std::cos(mob->theta());
+      converted_vy = converted_speed * std::sin(mob->theta());
+    } else {
+      converted_x = mobileye.details_739(index).obstacle_pos_x() +
+                    FLAGS_mobileye_pos_adjust;
+      converted_y = mobileye.details_739(index).obstacle_pos_y();
+      converted_vx = mob_vel_x + chassis.speed_mps();
+      converted_vy = 0.0;
+
+      if (mobileye.details_73b_size() <= index) {
+        mob->set_theta(0.0);
+      } else {
+        if (!FLAGS_overwrite_mobileye_theta) {
+          mob->set_theta(mobileye.details_73b(index).obstacle_angle() / 180 *
+                         M_PI);
+        } else {
+          double nearest_lane_heading =
+              converted_vx > 0
+                  ? std::atan2(3 * path_c3 * converted_x * converted_x +
+                                   2 * path_c2 * converted_x + path_c1,
+                               1)
+                  : std::atan2(3 * path_c3 * converted_x * converted_x +
+                                   2 * path_c2 * converted_x + path_c1,
+                               1) +
+                        M_PI;
+          AINFO << "nearest lane heading is" << nearest_lane_heading;
+          mob->set_theta(nearest_lane_heading);
+        }
+      }
+    }
+
+    mob->set_id(mob_id);
+    mob->mutable_position()->set_x(converted_x);
+    mob->mutable_position()->set_y(converted_y);
+
+    switch (mob_type) {
+      case 0:
+      case 1: {
+        mob->set_type(PerceptionObstacle::VEHICLE);  // VEHICLE
+        break;
+      }
+      case 2:
+      case 4: {
+        mob->set_type(PerceptionObstacle::BICYCLE);  // BIKE
+        break;
+      }
+      case 3: {
+        mob->set_type(PerceptionObstacle::PEDESTRIAN);  // PED
+        break;
+      }
+      default: {
+        mob->set_type(PerceptionObstacle::UNKNOWN);  // UNKNOWN
+        break;
+      }
+    }
+
+    mob->mutable_velocity()->set_x(converted_vx);
+    mob->mutable_velocity()->set_y(converted_vy);
+    mob->set_length(mob_l);
+    mob->set_width(mob_w);
+    mob->set_height(FLAGS_default_height);
+
+    mob->clear_polygon_point();
+
+    // create polygon
+    FillPerceptionPolygon(mob, mob->position().x(), mob->position().y(),
+                          mob->position().z(), mob->length(), mob->width(),
+                          mob->height(), mob->theta());
+
+    mob->set_confidence(0.5);
+  }
+
   return obstacles;
 }
 
 RadarObstacles ContiToRadarObstacles(
     const apollo::drivers::ContiRadar& conti_radar,
     const apollo::localization::LocalizationEstimate& localization,
-    const RadarObstacles& last_radar_obstacles) {
+    const RadarObstacles& last_radar_obstacles, const Chassis& chassis) {
   RadarObstacles obstacles;
 
   const double last_timestamp = last_radar_obstacles.header().timestamp_sec();
@@ -237,6 +288,8 @@ RadarObstacles ContiToRadarObstacles(
     rob.set_height(3.0);
 
     Point relative_pos_sl;
+
+    // TODO(QiL): load the radar configs here
     relative_pos_sl.set_x(contiobs.longitude_dist());
     relative_pos_sl.set_y(contiobs.lateral_dist());
     rob.mutable_relative_position()->CopyFrom(relative_pos_sl);
@@ -247,9 +300,6 @@ RadarObstacles ContiToRadarObstacles(
     absolute_pos.set_y(adc_pos.y() + relative_pos_xy.y());
     absolute_pos.set_z(adc_pos.z());
     rob.mutable_absolute_position()->CopyFrom(absolute_pos);
-
-    double theta = GetNearestLaneHeading(rob.absolute_position());
-    rob.set_theta(theta);
 
     rob.mutable_relative_velocity()->set_x(contiobs.longitude_vel());
     rob.mutable_relative_velocity()->set_y(contiobs.lateral_vel());
@@ -263,7 +313,7 @@ RadarObstacles ContiToRadarObstacles(
       absolute_vel.set_x(0.0);
       absolute_vel.set_y(0.0);
       absolute_vel.set_z(0.0);
-    } else {
+    } else if (!FLAGS_use_navigation_mode) {
       rob.set_count(iter->second.count() + 1);
       rob.set_movable(iter->second.movable());
       absolute_vel.set_x(
@@ -281,6 +331,22 @@ RadarObstacles ContiToRadarObstacles(
         rob.set_moving_frames_count(iter->second.moving_frames_count() + 1);
       } else {
         rob.set_moving_frames_count(0);
+      }
+    } else {
+      rob.set_count(iter->second.count() + 1);
+      rob.set_movable(iter->second.movable());
+      absolute_vel.set_x(contiobs.longitude_vel() + chassis.speed_mps());
+      absolute_vel.set_y(contiobs.lateral_vel());
+      absolute_vel.set_z(0.0);
+
+      // Overwrite heading here with relative headings
+      // TODO(QiL) : refind the logic here.
+      if (contiobs.clusterortrack() == 0) {
+        rob.set_theta(contiobs.oritation_angle() / 180 * M_PI);
+      } else {
+        // in FLU
+        rob.set_theta(std::atan2(rob.relative_position().x(),
+                                 rob.relative_position().y()));
       }
     }
 

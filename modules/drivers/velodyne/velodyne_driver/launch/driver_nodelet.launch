@@ -4,19 +4,22 @@
   <arg name="model" default="64E_S3D_STRONGEST" />
   <arg name="ip" default=""/>
   <arg name="firing_data_port" default=""/>
+  <arg name="positioning_data_port" default=""/>
   <arg name="rpm" default="600.0" />
   <arg name="frame_id" default="velodyne64" />
   <arg name="topic" default="/apollo/sensor/velodyne64/VelodyneScanUnified" />
   <arg name="node_name" default="driver_nodelet"/>
+  <arg name="nodelet_manager_name" default="velodyne_nodelet_manager" />
 
   <node pkg="nodelet" type="nodelet" name="$(arg node_name)"
-        args="load velodyne_driver/DriverNodelet velodyne_nodelet_manager" output="screen" >
+        args="load velodyne_driver/DriverNodelet $(arg nodelet_manager_name)" output="screen" >
     <param name="model" value="$(arg model)"/>
     <param name="rpm" value="$(arg rpm)"/>
     <param name="frame_id" value="$(arg frame_id)"/>
     <param name="topic" value="$(arg topic)"/>    
     <param name="ip" value="$(arg ip)"/>
     <param name="firing_data_port" value="$(arg firing_data_port)"/>
+    <param name="positioning_data_port" value="$(arg positioning_data_port)"/>
   </node>    
 
 </launch>

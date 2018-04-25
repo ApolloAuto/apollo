@@ -30,7 +30,7 @@ namespace planning {
 
 class SidePassVehicle : public TrafficRule {
  public:
-  explicit SidePassVehicle(const RuleConfig& config);
+  explicit SidePassVehicle(const TrafficRuleConfig& config);
   virtual ~SidePassVehicle() = default;
 
   bool ApplyRule(Frame* const frame,

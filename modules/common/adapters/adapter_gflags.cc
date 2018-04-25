@@ -70,6 +70,8 @@ DEFINE_string(ultrasonic_radar_topic, "/apollo/sensor/ultrasonic_radar",
 // TODO(Authors): Change the topic name
 DEFINE_string(compressed_image_topic, "camera/image_raw",
               "CompressedImage topic name");
+DEFINE_string(image_front_topic, "/apollo/sensor/camera/obstacle/front_6mm",
+              "front camera image topic name for obstacles from camera");
 DEFINE_string(image_short_topic, "/apollo/sensor/camera/traffic/image_short",
               "short camera image topic name");
 DEFINE_string(image_long_topic, "/apollo/sensor/camera/traffic/image_long",
@@ -90,3 +92,28 @@ DEFINE_string(localization_msf_status, "/apollo/localization/msf_status",
               "msf localization status");
 DEFINE_string(relative_map_topic, "/apollo/relative_map", "relative map");
 DEFINE_string(navigation_topic, "/apollo/navigation", "navigation");
+DEFINE_string(voice_detection_request_topic,
+              "/apollo/hmi/voice_detection_request",
+              "Voice detetection request topic name.");
+DEFINE_string(voice_detection_response_topic,
+              "/apollo/hmi/voice_detection_response",
+              "Voice detetection response topic name.");
+// For pandora.
+DEFINE_string(pandora_pointcloud_topic,
+              "/apollo/sensor/pandora/hesai40/PointCloud2",
+              "pandora pointcloud topic name");
+DEFINE_string(pandora_camera_front_color_topic,
+              "/apollo/sensor/pandora/camera/front_color",
+              "pandora front color camera topic name");
+DEFINE_string(pandora_camera_right_gray_topic,
+              "/apollo/sensor/pandora/camera/right_gray",
+              "pandora right gray camera topic name");
+DEFINE_string(pandora_camera_left_gray_topic,
+              "/apollo/sensor/pandora/camera/left_gray",
+              "pandora left gray camera topic name");
+DEFINE_string(pandora_camera_front_gray_topic,
+              "/apollo/sensor/pandora/camera/front_gray",
+              "pandora front gray camera topic name");
+DEFINE_string(pandora_camera_back_gray_topic,
+              "/apollo/sensor/pandora/camera/back_gray",
+              "pandora back gray camera topic name");

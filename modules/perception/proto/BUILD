@@ -20,3 +20,59 @@ proto_library(
         "//modules/map/proto:map_proto_lib",
     ],
 )
+
+cc_proto_library(
+    name = "lane_post_process_config_lib_proto",
+    deps = [
+        ":lane_post_process_config_lib",
+    ],
+)
+
+proto_library(
+    name = "lane_post_process_config_lib",
+    srcs = [
+        "lane_post_process_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "probabilistic_fusion_config_lib_proto",
+    deps = [
+        ":probabilistic_fusion_config_lib",
+    ],
+)
+
+proto_library(
+    name = "probabilistic_fusion_config_lib",
+    srcs = [
+        "probabilistic_fusion_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "yolo_camera_detector_config_lib_proto",
+    deps = [
+        ":yolo_camera_detector_config_lib",
+    ],
+)
+
+proto_library(
+    name = "yolo_camera_detector_config_lib",
+    srcs = [
+        "yolo_camera_detector_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "modest_radar_detector_config_lib_proto",
+    deps = [
+        ":modest_radar_detector_config_lib",
+    ],
+)
+
+proto_library(
+    name = "modest_radar_detector_config_lib",
+    srcs = [
+        "modest_radar_detector_config.proto",
+    ],
+)

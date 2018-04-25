@@ -14,11 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_ // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_ // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_  // NOLINT
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_  // NOLINT
+
+#include <deque>
+#include <memory>
 #include <utility>
 #include <vector>
-#include <deque>
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
@@ -42,7 +45,7 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @brief initialize state of the filter
   // @params[IN] new_object: initial object for filtering
   // @return nothing
-  void Initialize(const PbfSensorObjectPtr new_object);
+  void Initialize(const std::shared_ptr<PbfSensorObject> new_object);
 
   // @brief predict the state of filter
   // @params[OUT] anchor_point:  predicted anchor point for filtering
@@ -56,7 +59,7 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @params[IN] new_object: new object for current update
   // @params[IN] time_diff: time interval from last update;
   // @return nothing
-  void UpdateWithObject(const PbfSensorObjectPtr new_object,
+  void UpdateWithObject(const std::shared_ptr<PbfSensorObject> new_object,
                         const double time_diff);
 
   // @brief update without measurements
@@ -69,6 +72,13 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
   // @params[OUT] velocity: current velocity
   // @return nothing
   void GetState(Eigen::Vector3d *anchor_point, Eigen::Vector3d *velocity);
+
+  // @brief set current state of the filter
+  // @params[IN] anchor_point: updated anchor_point
+  // @params[IN] velocity: updated velocity
+  // @return nothing
+  void SetState(const Eigen::Vector3d &anchor_point,
+                const Eigen::Vector3d &velocity);
 
  protected:
   int GetRadarHistoryLength();
@@ -114,4 +124,6 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
 }  // namespace perception
 }  // namespace apollo
 
+// clang-format off
 #endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_KALMAN_MOTION_FUSION_H_ // NOLINT
+// clang-format on

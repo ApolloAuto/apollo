@@ -27,6 +27,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:log",
+        "//modules/perception/common",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/common",
@@ -54,6 +55,7 @@ cc_test(
     deps = [
         ":hm_tracker",
         "//modules/common:log",
+        "//modules/common/util",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/lidar/object_builder/min_box",
         "@gtest//:main",

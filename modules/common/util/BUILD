@@ -14,6 +14,9 @@ cc_library(
         "string_tokenizer.h",
         "util.h",
     ],
+    linkopts = [
+        "-lboost_filesystem",
+    ],
     deps = [
         ":string_util",
         "//modules/common/math",
@@ -31,6 +34,24 @@ cc_test(
     ],
     deps = [
         ":util",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "disjoint_set",
+    hdrs = ["disjoint_set.h"],
+)
+
+cc_test(
+    name = "disjoint_set_test",
+    size = "small",
+    srcs = [
+        "disjoint_set_test.cc",
+    ],
+    deps = [
+        ":disjoint_set",
+        "//modules/common:log",
         "@gtest//:main",
     ],
 )
@@ -137,6 +158,9 @@ cc_test(
     srcs = [
         "file_test.cc",
     ],
+    data = [
+        "//modules/perception:perception_data",
+    ],
     tags = [
         "external",
     ],
@@ -166,7 +190,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common/math:vec2d",
+        "//modules/common/math:geometry",
     ],
 )
 
@@ -217,8 +241,9 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/status",
+        "//modules/common/util:string_util",
         "//third_party/json",
-        "@curlpp//:curlpp",
+        "@curlpp",
     ],
 )
 

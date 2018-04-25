@@ -15,34 +15,24 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_track_manager.h"
+
+#include <algorithm>
+
 #include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
 
-PbfTrackManager *PbfTrackManager::instance() {
-  static PbfTrackManager track_manager;
-  return &track_manager;
-}
-
 PbfTrackManager::PbfTrackManager() {}
 
-PbfTrackManager::~PbfTrackManager() {}
-
 int PbfTrackManager::RemoveLostTracks() {
-  size_t track_count = 0;
-  for (size_t i = 0; i < tracks_.size(); i++) {
-    if (!tracks_[i]->IsDead()) {
-      if (i != track_count) {
-        tracks_[track_count] = tracks_[i];
-      }
-      track_count++;
-    }
-  }
-  AINFO << "Remove " << tracks_.size() - track_count << " tracks";
-  tracks_.resize(track_count);
-
-  return track_count;
+  size_t original_size = tracks_.size();
+  tracks_.erase(
+      std::remove_if(tracks_.begin(), tracks_.end(),
+                     [](const PbfTrackPtr& p) { return p->IsDead(); }),
+      tracks_.end());
+  ADEBUG << "Removed " << original_size - tracks_.size() << " tracks";
+  return original_size - tracks_.size();
 }
 
 }  // namespace perception

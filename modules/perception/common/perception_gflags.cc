@@ -23,7 +23,8 @@ DEFINE_string(perception_adapter_config_filename,
 /// lib/config_manager/config_manager.cc
 DEFINE_string(config_manager_path, "./conf/config_manager.config",
               "The ModelConfig config paths file.");
-DEFINE_string(work_root, "modules/perception", "Project work root direcotry.");
+DEFINE_string(work_root, "/apollo/modules/perception/",
+              "perception work root direcotry.");
 
 /// obstacle/base/object.cc
 DEFINE_bool(is_serialize_point_cloud, false,
@@ -52,6 +53,7 @@ DEFINE_string(obstacle_module_name, "perception_obstacle",
 DEFINE_bool(enable_visualization, false, "enable visualization for debug");
 
 /// obstacle/perception.cc
+/* dag streaming config for Apollo 2.0 */
 DEFINE_string(dag_config_path, "./conf/dag_streaming.config",
               "Onboard DAG Streaming config.");
 
@@ -70,6 +72,12 @@ DEFINE_string(short_camera_extrinsic_file,
               "modules/perception/data/params/short_camera_extrinsics.yaml",
               "short_camera extrinsic file");
 
+/// obstacle/onboard/camera_process_subnode.cc
+// Ex: /apollo/modules/perception/data/yolo_camera_detector_test/test.jpg
+DEFINE_string(image_file_path, "", "Debug image file");
+DEFINE_bool(image_file_debug, false, "Debug ROS to CV image");
+
+/// modules/perception/lib/config_manager/calibration_config_manager.cc
 DEFINE_string(front_camera_extrinsics_file,
               "modules/perception/data/params/front_camera_extrinsics.yaml",
               "front_camera extrinsic file");
@@ -104,12 +112,8 @@ DEFINE_string(onboard_lane_post_processor, "CCLanePostProcessor",
               "onboard lane post-processing algorithm name");
 
 /// visualization
-DEFINE_bool(show_front_radar_raw, false, "");
-DEFINE_bool(show_back_radar_raw, false, "");
 
 DEFINE_bool(show_radar_objects, false, "");
-DEFINE_bool(show_front_radar_objects, false, "");
-DEFINE_bool(show_back_radar_objects, false, "");
 
 DEFINE_bool(show_camera_objects2d, false, "");
 DEFINE_bool(show_camera_objects, false, "");
@@ -125,5 +129,31 @@ DEFINE_string(screen_output_dir, "./", "");
 
 DEFINE_string(frame_visualizer, "GLFusionVisualizer", "");
 
-DEFINE_double(car_length, 3.564, "car_length");
-DEFINE_double(car_width, 1.620, "car_width");
+DEFINE_bool(async_fusion, false, "use distance angle ");
+DEFINE_bool(use_distance_angle_fusion, true,
+            "use distance angle prob distance in fusion");
+DEFINE_bool(publish_fusion_event, false, "publish fusion event");
+DEFINE_bool(bag_mode, false, "run perception in bag mode");
+
+DEFINE_bool(show_motion, false, "visualize motion and object trajectories");
+DEFINE_bool(skip_camera_frame, false, "skip camera frame");
+DEFINE_int32(camera_hz, 30, "camera hz");
+DEFINE_string(fusion_publish_sensor_id, "velodyne_64", "fusion publish id");
+
+DEFINE_int32(pbf_fusion_assoc_distance_percent, 20, "fusion distance percent");
+DEFINE_double(pbf_distance_speed_cos_diff, 0.5, "fusion velocity cosine diff");
+
+DEFINE_string(cc_lane_post_processor_config_file,
+              "modules/perception/model/camera/lane_post_process_config.pb.txt",
+              "The config file of cc_lane_post_processor.");
+DEFINE_string(probabilistic_fusion_config_file,
+              "modules/perception/model/probabilistic_fusion_config.pb.txt",
+              "The config file of probabilistic_fusion.");
+DEFINE_string(yolo_config_filename, "config.pt", "Yolo config filename.");
+DEFINE_string(
+    yolo_camera_detector_config,
+    "modules/perception/model/camera/yolo_camera_detector_config.pb.txt",
+    "Yolo camera detector config filename.");
+DEFINE_string(modest_radar_detector_config,
+              "modules/perception/model/modest_radar_detector_config.pb.txt",
+              "modest radar detector config filename.");

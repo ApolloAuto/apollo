@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/perception/common/sequence_type_fuser",
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/lidar/interface",
         "@eigen",

@@ -21,16 +21,17 @@ namespace perception {
 
 bool FlatCameraTransformer::Init() { return true; }
 
-bool FlatCameraTransformer::Transform(std::vector<VisualObjectPtr> *objects) {
+bool FlatCameraTransformer::Transform(
+    std::vector<std::shared_ptr<VisualObject>> *objects) {
   if (!objects) return false;
 
   for (auto obj_ptr : *objects) {
-    // Get 2D distance
+    // Get flat 2D distance in meter
     float d = obj_ptr->distance;
-    float d_v = abs(kCameraHeight - obj_ptr->height / 2.0f);
+    float d_v = std::abs(camera2car_(2, 3) - obj_ptr->height / 2.0f);
     float d_flat = sqrt(d * d - d_v * d_v);
 
-    // Get 2D vector
+    // Get 2D vector of top down view
     Eigen::Vector3f center = obj_ptr->center;
     Eigen::Vector4f center_v(center.x(), center.y(), center.z(), 0.0f);
     center_v = camera2car_ * center_v;
@@ -39,11 +40,14 @@ bool FlatCameraTransformer::Transform(std::vector<VisualObjectPtr> *objects) {
 
     // 2D position in top-down view of ego-car space
     Eigen::Vector3f pos_ground = unit_v_flat * d_flat;
-    obj_ptr->center = pos_ground + kCamera2CarFlatOffset;
+    obj_ptr->center = pos_ground + camera2car_flat_offset_;
 
     // Orientation
+    // Camera space
     float theta = obj_ptr->theta;
     Eigen::Vector4f dir(cos(theta), 0.0f, -sin(theta), 0.0f);
+
+    // Ego car space
     dir = camera2car_ * dir;
     obj_ptr->direction = dir.head(3);
     obj_ptr->theta = atan2(dir[1], dir[0]);
@@ -55,6 +59,8 @@ bool FlatCameraTransformer::Transform(std::vector<VisualObjectPtr> *objects) {
 bool FlatCameraTransformer::SetExtrinsics(
     const Eigen::Matrix<double, 4, 4> &extrinsics) {
   camera2car_ = extrinsics.cast<float>();
+  camera2car_flat_offset_ =
+      Eigen::Matrix<float, 3, 1>(camera2car_(0, 3), camera2car_(1, 3), 0.0f);
   return true;
 }
 

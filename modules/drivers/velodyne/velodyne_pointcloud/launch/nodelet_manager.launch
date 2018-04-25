@@ -1,4 +1,5 @@
 <launch>
-  <node pkg="nodelet" type="nodelet" name="velodyne_nodelet_manager" output="screen"
+  <arg name="nodelet_manager_name" default="velodyne_nodelet_manager" />
+  <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager_name)" output="screen"
         args="manager" />
 </launch>

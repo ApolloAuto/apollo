@@ -16,8 +16,8 @@
 #ifndef MODULES_PERCEPTION_TRFFIC_LIGHT_REVISER_COLOR_DECISION_H_
 #define MODULES_PERCEPTION_TRFFIC_LIGHT_REVISER_COLOR_DECISION_H_
 
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "modules/perception/traffic_light/interface/base_reviser.h"
@@ -59,8 +59,8 @@ class ColorReviser : public BaseReviser {
  private:
   float blink_time_ = 0.0;
   int enable_ = 0.0;
-  std::map<std::string, TLColor> color_map_;
-  std::map<std::string, double> time_map_;
+  std::unordered_map<std::string, TLColor> color_map_;
+  std::unordered_map<std::string, double> time_map_;
 };
 REGISTER_REVISER(ColorReviser);
 

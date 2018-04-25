@@ -17,20 +17,23 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_VISUALIZATION_SUBNODE_H_
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_VISUALIZATION_SUBNODE_H_
 
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
+#include "modules/perception/obstacle/camera/visualizer/gl_fusion_visualizer.h"
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
+#include "modules/perception/obstacle/onboard/lane_shared_data.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
 
 namespace apollo {
 namespace perception {
+namespace lowcostvisualizer {
 
 class VisualizationSubnode : public Subnode {
  public:
@@ -46,38 +49,42 @@ class VisualizationSubnode : public Subnode {
 
  private:
   bool InitStream();
+
   bool SubscribeEvents(const EventMeta& event_meta,
                        std::vector<Event>* events) const;
 
-  // void get_frame_data(const std::string& device_id,
-  //                     const std::string& data_key,
-  //                     FrameContent* content, double timestamp);
-  void GetFrameData(const Event& event, const std::string& device_id,
-                    const std::string& data_key, const double timestamp,
-                    FrameContent* content);
+  void SetFrameContent(const Event& event, const std::string& device_id,
+                       const std::string& data_key, const double timestamp,
+                       FrameContent* content);
 
-  RadarObjectData* _radar_object_data = nullptr;
-  CameraObjectData* _camera_object_data = nullptr;
-  CIPVObjectData* _cipv_object_data = nullptr;
-  CameraSharedData* _camera_shared_data = nullptr;
-  FusionSharedData* _fusion_data = nullptr;
-  std::unique_ptr<BaseVisualizer> _frame_visualizer;
-  FrameContent _content;
+  RadarObjectData* radar_object_data_ = nullptr;
+  CameraObjectData* camera_object_data_ = nullptr;
+  CIPVObjectData* cipv_object_data_ = nullptr;
+  CameraSharedData* camera_shared_data_ = nullptr;
+  LaneSharedData* lane_shared_data_ = nullptr;
+  FusionSharedData* fusion_data_ = nullptr;
+  std::unique_ptr<BaseVisualizer> frame_visualizer_;
+  MotionService* motion_service_ = nullptr;
+  FrameContent content_;
 
-  EventID _vis_driven_event_id;
-  EventID _radar_event_id;
-  EventID _camera_event_id;
-  EventID _fusion_event_id;
-  EventID _motion_event_id;
-  EventID _cipv_event_id;
+  EventID vis_driven_event_id_;
+  EventID radar_event_id_;
+  EventID camera_event_id_;
+  EventID fusion_event_id_;
+  EventID motion_event_id_;
+  EventID cipv_event_id_;
+  EventID lane_event_id_;
 
-  //    MotionBufferPtr _motion_buffer;
-  Eigen::Matrix4d _camera_to_car_pose;
+  //    MotionBufferPtr motion_buffer_;
+  Eigen::Matrix4d camera_to_car_pose_;
 
-  bool _init = false;
+  bool init_ = false;
   DISALLOW_COPY_AND_ASSIGN(VisualizationSubnode);
 };
 
+REGISTER_SUBNODE(VisualizationSubnode);
+
+}  // namespace lowcostvisualizer
 }  // namespace perception
 }  // namespace apollo
 

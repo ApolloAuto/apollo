@@ -24,8 +24,8 @@ cc_library(
     ],
     deps = [
         ":trajectory",
-        "//modules/common/proto:pnc_point_proto",
         "//modules/common/math:linear_interpolation",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_util",
         "@eigen//:eigen",
     ],
@@ -59,6 +59,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/reference_line",
     ],
 )
 

@@ -9,7 +9,6 @@ cc_library(
     ],
     hdrs = [
         "planning.h",
-        "planning_interface.h",
     ],
     deps = [
         "//modules/common",
@@ -27,6 +26,7 @@ cc_library(
         "//modules/planning/planner/lattice:lattice_planner",
         "//modules/planning/planner/rtk:rtk_planner",
         "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:traffic_rule_config_proto",
         "//modules/planning/reference_line:reference_line_provider",
         "//modules/planning/tasks/traffic_decider",
         "//modules/prediction/proto:prediction_proto",

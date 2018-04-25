@@ -25,11 +25,21 @@
       evaluator evaluates a path by outputing a probability for it (lane
       sequence) using the given model stored in _prediction/data/_.
 
+      Three types of evaluators will be provided including:
+
+      * Cost evaluator: probability is calculated by a set of cost functions
+
+      * MLP evaluator: probability is calculated with an MLP model
+
+      * RNN evaluator: probability is calculated with an RNN model
+
   * Predictor
 
       Predictor generates predicted trajectories for obstacles. Currently
       supported predictor includes:
 
+      * Empty: obstacles have no predicted trajectories
+      * Single lane: Obstacles move along a single lane in highway navigatio mode. Obstacles not on lane will be ignored.
       * Lane sequence: obstacle moves along the lanes
       * Move sequence: obstacle moves along the lanes by following its kinetic pattern
       * Free movement: obstacle moves freely

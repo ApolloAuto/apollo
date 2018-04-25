@@ -1,0 +1,112 @@
+config: {
+  rule_id: BACKSIDE_VEHICLE
+  enabled: true
+  backside_vehicle {
+    backside_lane_width: 4.0
+  }
+}
+
+config: {
+  rule_id: CHANGE_LANE
+  enabled: true
+  change_lane {
+    min_overtake_distance: 10.0
+    min_overtake_time: 2.0
+    enable_guard_obstacle: true
+    guard_distance: 100.0
+    min_guard_speed: 1.0
+  }
+}
+
+config: {
+  rule_id: FRONT_VEHICLE
+  enabled: true
+  front_vehicle {
+  }
+}
+config: {
+  rule_id: CROSSWALK
+  enabled: true
+  crosswalk {
+    stop_distance: 1.0
+    min_pass_s_distance: 1.0
+    expand_s_distance: 2.0
+    stop_strick_l_distance: 4.0
+    stop_loose_l_distance: 5.0
+  }
+}
+
+config: {
+  rule_id: DESTINATION
+  enabled: true
+  destination {
+    stop_distance: 0.5
+  }
+}
+
+config: {
+  rule_id: KEEP_CLEAR
+  enabled: false
+  keep_clear {
+    min_pass_s_distance: 2.0
+  }
+}
+
+config: {
+  rule_id: REFERENCE_LINE_END
+  enabled: true
+  reference_line_end {
+    stop_distance: 0.5
+    stop_acc_to_max_deceleration_ratio: 3.0
+    min_reference_line_remain_length: 10.0
+  }
+}
+
+config: {
+  rule_id: REROUTING
+  enabled: true
+}
+
+config: {
+  rule_id: SIDE_PASS_VEHICLE
+  enabled: true
+  side_pass_vehicle {
+    wait_time: 30.0
+  }
+}
+
+config: {
+  rule_id: SIGNAL_LIGHT
+  enabled: true
+  signal_light {
+    stop_distance: 1.0
+    min_pass_s_distance: 4.0
+    max_stop_deacceleration_yellow_light: 3.0
+    righ_turn_creep {
+      enabled: false
+      min_boundary_t: 6.0
+      stop_distance: 0.5
+      speed_limit: 1.0
+    }
+  }
+}
+
+config: {
+  rule_id: STOP_SIGN
+  enabled: true
+  stop_sign {
+    stop_distance: 1.0
+    min_pass_s_distance: 3.0
+    max_stop_speed: 0.3
+    max_valid_stop_distance: 3.0
+    stop_duration : 1.0
+    watch_vehicle_max_valid_stop_speed: 0.5
+    watch_vehicle_max_valid_stop_distance: 5.0
+    creep {
+      enabled: false
+      min_boundary_t: 6.0
+      stop_distance: 0.5
+      speed_limit: 1.0
+    }
+  }
+}

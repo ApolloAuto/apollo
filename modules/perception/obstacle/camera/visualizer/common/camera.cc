@@ -26,11 +26,11 @@ namespace perception {
 namespace lowcostvisualizer {
 
 // using namespace std;
-Camera::Camera() : _field_of_view(M_PI / 4.0f) {
+Camera::Camera() : field_of_view_(M_PI / 4.0f) {
   set_frame(new Frame());
 
   setscene_radius(1.0);
-  _ortho_coef = tan(field_of_view() / 2.0);
+  ortho_coef_ = tan(field_of_view() / 2.0);
   setscene_center(Eigen::Vector3d(0.0, 0.0, 0.0));
   set_type(PERSPECTIVE);
 
@@ -48,20 +48,20 @@ Camera::Camera() : _field_of_view(M_PI / 4.0f) {
   // focus_distance is set from setfield_of_view()
 
   for (int j = 0; j < 16; ++j) {
-    _model_view_matrix[j] = ((j % 5 == 0) ? 1.0 : 0.0);
-    _projection_matrix[j] = 0.0;
+    model_view_matrix_[j] = ((j % 5 == 0) ? 1.0 : 0.0);
+    projection_matrix_[j] = 0.0;
   }
   compute_projection_matrix();
 }
 
-Camera::~Camera() { delete _frame; }
+Camera::~Camera() { delete frame_; }
 
 Camera::Camera(const Camera &camera) {
   set_frame(new Frame());
 
   for (int j = 0; j < 16; ++j) {
-    _model_view_matrix[j] = ((j % 5 == 0) ? 1.0 : 0.0);
-    _projection_matrix[j] = 0.0;
+    model_view_matrix_[j] = ((j % 5 == 0) ? 1.0 : 0.0);
+    projection_matrix_[j] = 0.0;
   }
 
   (*this) = camera;
@@ -82,12 +82,12 @@ Camera &Camera::operator=(const Camera &camera) {
   set_physicalscreen_width(camera.physicalscreen_width());
   setphysical_distance_to_screen(camera.physical_distance_to_screen());
 
-  _ortho_coef = camera._ortho_coef;
+  ortho_coef_ = camera.ortho_coef_;
 
-  // _frame and interpolationKfi_ pointers are not shared.
-  _frame->set_reference_frame(NULL);
-  _frame->set_position(camera.position());
-  _frame->set_orientation(camera.orientation());
+  // frame_ and interpolationKfi_ pointers are not shared.
+  frame_->set_reference_frame(NULL);
+  frame_->set_position(camera.position());
+  frame_->set_orientation(camera.orientation());
 
   compute_projection_matrix();
   compute_model_view_matrix();
@@ -97,8 +97,8 @@ Camera &Camera::operator=(const Camera &camera) {
 
 void Camera::setscreen_widthandheight(int width, int height) {
   // Prevent negative and zero dimensions that would cause divisions by zero.
-  _screen_width = width > 0 ? width : 1;
-  _screen_height = height > 0 ? height : 1;
+  screen_width_ = width > 0 ? width : 1;
+  screen_height_ = height > 0 ? height : 1;
 }
 
 double Camera::znear() const {
@@ -133,12 +133,12 @@ double Camera::zfar() const {
 void Camera::set_type(Type type) {
   // make ORTHOGRAPHIC frustum fit PERSPECTIVE (at least in plane normal to
   // view_direction(), passing
-  // through RAP). Done only when CHANGING type since _ortho_coef may have been
+  // through RAP). Done only when CHANGING type since ortho_coef_ may have been
   // changed with a
   // set_revolve_around_point() in the meantime.
-  if ((type == Camera::ORTHOGRAPHIC) && (_type == Camera::PERSPECTIVE))
-    _ortho_coef = tan(field_of_view() / 2.0);
-  _type = type;
+  if ((type == Camera::ORTHOGRAPHIC) && (type_ == Camera::PERSPECTIVE))
+    ortho_coef_ = tan(field_of_view() / 2.0);
+  type_ = type;
 }
 
 void Camera::set_frame(Frame *const mcf) {
@@ -146,7 +146,7 @@ void Camera::set_frame(Frame *const mcf) {
     return;
   }
 
-  _frame = mcf;
+  frame_ = mcf;
 }
 
 double Camera::distance_to_scene_center() const {
@@ -159,7 +159,7 @@ double Camera::distance_to_scene_center() const {
 void Camera::get_ortho_width_height(GLdouble *halfWidth,
                                     GLdouble *halfHeight) const {
   const double dist =
-      _ortho_coef * fabs(cameracoordinates_of(revolve_around_point())(2));
+      ortho_coef_ * fabs(cameracoordinates_of(revolve_around_point())(2));
   // #CONNECTION# fit_screen_region
   *halfWidth = dist * ((aspect_ratio() < 1.0) ? 1.0 : aspect_ratio());
   *halfHeight = dist * ((aspect_ratio() < 1.0) ? 1.0 / aspect_ratio() : 1.0);
@@ -173,12 +173,12 @@ void Camera::compute_projection_matrix() const {
     case Camera::PERSPECTIVE: {
       // #CONNECTION# all non null coefficients were set to 0.0 in constructor.
       const double f = 1.0 / tan(field_of_view() / 2.0);
-      _projection_matrix[0] = f / aspect_ratio();
-      _projection_matrix[5] = f;
-      _projection_matrix[10] = (ZNear + ZFar) / (ZNear - ZFar);
-      _projection_matrix[11] = -1.0;
-      _projection_matrix[14] = 2.0 * ZNear * ZFar / (ZNear - ZFar);
-      _projection_matrix[15] = 0.0;
+      projection_matrix_[0] = f / aspect_ratio();
+      projection_matrix_[5] = f;
+      projection_matrix_[10] = (ZNear + ZFar) / (ZNear - ZFar);
+      projection_matrix_[11] = -1.0;
+      projection_matrix_[14] = 2.0 * ZNear * ZFar / (ZNear - ZFar);
+      projection_matrix_[15] = 0.0;
       // same as gluPerspective( 180.0*field_of_view()/M_PI, aspect_ratio(),
       // znear(), zfar() );
       break;
@@ -187,12 +187,12 @@ void Camera::compute_projection_matrix() const {
       GLdouble w = 0.0;
       GLdouble h = 0.0;
       get_ortho_width_height(&w, &h);
-      _projection_matrix[0] = 1.0 / w;
-      _projection_matrix[5] = 1.0 / h;
-      _projection_matrix[10] = -2.0 / (ZFar - ZNear);
-      _projection_matrix[11] = 0.0;
-      _projection_matrix[14] = -(ZFar + ZNear) / (ZFar - ZNear);
-      _projection_matrix[15] = 1.0;
+      projection_matrix_[0] = 1.0 / w;
+      projection_matrix_[5] = 1.0 / h;
+      projection_matrix_[10] = -2.0 / (ZFar - ZNear);
+      projection_matrix_[11] = 0.0;
+      projection_matrix_[14] = -(ZFar + ZNear) / (ZFar - ZNear);
+      projection_matrix_[15] = 1.0;
       // same as glOrtho( -w, w, -h, h, znear(), zfar() );
       break;
     }
@@ -203,27 +203,27 @@ void Camera::compute_model_view_matrix() const {
   const Eigen::Quaterniond q = frame()->orientation();
   Eigen::Matrix3d rotMat = q.toRotationMatrix();
 
-  _model_view_matrix[0] = rotMat(0, 0);
-  _model_view_matrix[1] = rotMat(0, 1);
-  _model_view_matrix[2] = rotMat(0, 2);
-  _model_view_matrix[3] = 0.0l;
+  model_view_matrix_[0] = rotMat(0, 0);
+  model_view_matrix_[1] = rotMat(0, 1);
+  model_view_matrix_[2] = rotMat(0, 2);
+  model_view_matrix_[3] = 0.0l;
 
-  _model_view_matrix[4] = rotMat(1, 0);
-  _model_view_matrix[5] = rotMat(1, 1);
-  _model_view_matrix[6] = rotMat(1, 2);
-  _model_view_matrix[7] = 0.0l;
+  model_view_matrix_[4] = rotMat(1, 0);
+  model_view_matrix_[5] = rotMat(1, 1);
+  model_view_matrix_[6] = rotMat(1, 2);
+  model_view_matrix_[7] = 0.0l;
 
-  _model_view_matrix[8] = rotMat(2, 0);
-  _model_view_matrix[9] = rotMat(2, 1);
-  _model_view_matrix[10] = rotMat(2, 2);
-  _model_view_matrix[11] = 0.0l;
+  model_view_matrix_[8] = rotMat(2, 0);
+  model_view_matrix_[9] = rotMat(2, 1);
+  model_view_matrix_[10] = rotMat(2, 2);
+  model_view_matrix_[11] = 0.0l;
 
   const Eigen::Vector3d t = q.inverse()._transformVector(frame()->position());
 
-  _model_view_matrix[12] = -t(0);
-  _model_view_matrix[13] = -t(1);
-  _model_view_matrix[14] = -t(2);
-  _model_view_matrix[15] = 1.0l;
+  model_view_matrix_[12] = -t(0);
+  model_view_matrix_[13] = -t(1);
+  model_view_matrix_[14] = -t(2);
+  model_view_matrix_[15] = 1.0l;
 }
 
 void Camera::load_projection_matrix(bool reset) const {
@@ -234,7 +234,7 @@ void Camera::load_projection_matrix(bool reset) const {
 
   compute_projection_matrix();
 
-  glMultMatrixd(_projection_matrix);
+  glMultMatrixd(projection_matrix_);
 }
 
 void Camera::load_model_view_matrix(bool reset) const {
@@ -242,9 +242,9 @@ void Camera::load_model_view_matrix(bool reset) const {
   glMatrixMode(GL_MODELVIEW);
   compute_model_view_matrix();
   if (reset)
-    glLoadMatrixd(_model_view_matrix);
+    glLoadMatrixd(model_view_matrix_);
   else
-    glMultMatrixd(_model_view_matrix);
+    glMultMatrixd(model_view_matrix_);
 }
 
 void Camera::load_projection_matrix_stereo(bool leftBuffer) const {
@@ -302,18 +302,18 @@ void Camera::load_model_view_matrix_stereo(bool leftBuffer) const {
 
   compute_model_view_matrix();
   if (leftBuffer) {
-    _model_view_matrix[12] -= shift;
+    model_view_matrix_[12] -= shift;
   } else {
-    _model_view_matrix[12] += shift;
+    model_view_matrix_[12] += shift;
   }
-  glLoadMatrixd(_model_view_matrix);
+  glLoadMatrixd(model_view_matrix_);
 }
 
 void Camera::get_projection_matrix(GLdouble m[16]) const {
   // May not be needed, but easier and more robust like this.
   compute_projection_matrix();
   for (int i = 0; i < 16; ++i) {
-    m[i] = _projection_matrix[i];
+    m[i] = projection_matrix_[i];
   }
 }
 
@@ -322,7 +322,7 @@ void Camera::get_model_view_matrix(GLdouble m[16]) const {
   // Prevents from retrieving matrix in stereo mode -> overwrites shifted value.
   compute_model_view_matrix();
   for (int i = 0; i < 16; ++i) {
-    m[i] = _model_view_matrix[i];
+    m[i] = model_view_matrix_[i];
   }
 }
 
@@ -347,13 +347,13 @@ void Camera::get_model_view_projection_matrix(GLdouble m[16]) const {
   }
 }
 
-void Camera::setscene_radius(double radius) {
+void Camera::setscene_radius(const double radius) {
   if (radius <= 0.0) {
-    std::cout << "Scene radius must be positive - Ignoring value";
+    std::cout << "Scene radius must be positive - Ignoring value" << std::endl;
     return;
   }
 
-  _scene_radius = radius;
+  scene_radius_ = radius;
 
   setfocus_distance(scene_radius() / tan(field_of_view() / 2.0));
 }
@@ -368,7 +368,7 @@ void Camera::set_scene_bounding_box(const Eigen::Vector3d &min,
 }
 
 void Camera::setscene_center(const Eigen::Vector3d &center) {
-  _scene_center = center;
+  scene_center_ = center;
   set_revolve_around_point(scene_center());
 }
 
@@ -389,19 +389,19 @@ bool Camera::setscene_center_from_pixel(const Eigen::Vector2i &pixel) {
 }
 
 /*! Changes the revolve_around_point() to \p rap (defined in the world
-* coordinate system). */
+ * coordinate system). */
 void Camera::set_revolve_around_point(const Eigen::Vector3d &rap) {
   const double prevDist = fabs(cameracoordinates_of(revolve_around_point())(2));
 
-  _revolve_around_point = rap;
+  revolve_around_point_ = rap;
 
-  // _ortho_coef is used to compensate for changes of the revolve_around_point,
+  // ortho_coef_ is used to compensate for changes of the revolve_around_point,
   // so that the image does
   // not change when the revolve_around_point is changed in ORTHOGRAPHIC mode.
   const double newDist = fabs(cameracoordinates_of(revolve_around_point())(2));
   // Prevents division by zero when rap is set to camera position
   if ((prevDist > 1E-9) && (newDist > 1E-9)) {
-    _ortho_coef *= prevDist / newDist;
+    ortho_coef_ *= prevDist / newDist;
   }
 }
 
@@ -471,7 +471,7 @@ void Camera::fit_sphere(const Eigen::Vector3d &center, double radius) {
     }
     case Camera::ORTHOGRAPHIC: {
       distance = (center - revolve_around_point()).dot(view_direction()) +
-                 (radius / _ortho_coef);
+                 (radius / ortho_coef_);
       break;
     }
   }
@@ -574,8 +574,8 @@ void Camera::setup_vector(const Eigen::Vector3d &up, bool noMove) {
   if (!noMove) {
     frame()->set_position(
         revolve_around_point() -
-        (frame()->orientation() *
-         q)._transformVector(frame()->coordinates_of(revolve_around_point())));
+        (frame()->orientation() * q)
+            ._transformVector(frame()->coordinates_of(revolve_around_point())));
   }
 
   frame()->rotate(q);
@@ -773,10 +773,10 @@ Eigen::Vector3d Camera::projectedcoordinates_of(const Eigen::Vector3d &src,
 
   if (frame) {
     const Eigen::Vector3d tmp = frame->inverse_coordinates_of(src);
-    gluProject(tmp(0), tmp(1), tmp(2), _model_view_matrix, _projection_matrix,
+    gluProject(tmp(0), tmp(1), tmp(2), model_view_matrix_, projection_matrix_,
                viewport, &x, &y, &z);
   } else {
-    gluProject(src(0), src(1), src(2), _model_view_matrix, _projection_matrix,
+    gluProject(src(0), src(1), src(2), model_view_matrix_, projection_matrix_,
                viewport, &x, &y, &z);
   }
   return Eigen::Vector3d(x, y, z);
@@ -789,7 +789,7 @@ Eigen::Vector3d Camera::unprojectedcoordinates_of(const Eigen::Vector3d &src,
   GLdouble z = 0.0;
   static GLint viewport[4];
   get_viewport(viewport);
-  gluUnProject(src(0), src(1), src(2), _model_view_matrix, _projection_matrix,
+  gluUnProject(src(0), src(1), src(2), model_view_matrix_, projection_matrix_,
                viewport, &x, &y, &z);
   if (frame) {
     return frame->coordinates_of(Eigen::Vector3d(x, y, z));

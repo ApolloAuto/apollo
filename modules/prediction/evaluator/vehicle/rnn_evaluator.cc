@@ -243,6 +243,7 @@ int RNNEvaluator::SetupObstacleFeature(
 int RNNEvaluator::SetupLaneFeature(const Feature& feature,
                                    const LaneSequence& lane_sequence,
                                    std::vector<float>* const feature_values) {
+  CHECK_LE(LENGTH_LANE_POINT_SEQUENCE, FLAGS_max_num_lane_point);
   feature_values->clear();
   feature_values->reserve(static_cast<size_t>(DIM_LANE_POINT_FEATURE) *
                           static_cast<size_t>(LENGTH_LANE_POINT_SEQUENCE));

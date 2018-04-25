@@ -29,14 +29,11 @@ bool CascadedCameraTracker::Init() {
   return init_flag;
 }
 
-bool CascadedCameraTracker::Associate(const cv::Mat& img,
-                                      const float& timestamp,
-                                      std::vector<VisualObjectPtr>* objects) {
+bool CascadedCameraTracker::Associate(
+    const cv::Mat& img, const double& timestamp,
+    std::vector<std::shared_ptr<VisualObject>>* objects) {
   if (!objects) return false;
   frame_idx_++;
-
-  // detect id to (track id, first_timestamp) mapping
-  std::unordered_map<int, std::pair<int, float>> id_mapping;
 
   float scale = 1.0f;
   std::vector<Detected> detected;
@@ -73,17 +70,21 @@ bool CascadedCameraTracker::Associate(const cv::Mat& img,
   }
 
   // kcf
-  std::vector<std::vector<float>> kcf_affinity_matrix;
-  kcf_tracker_.SelectEntries(affinity_matrix);
-  kcf_tracker_.GetAffinityMatrix(img, tracks_, detected, &kcf_affinity_matrix);
-  MergeAffinityMatrix(kcf_affinity_matrix, &affinity_matrix);
+  if (use_kcf_) {
+    std::vector<std::vector<float>> kcf_affinity_matrix;
+    kcf_tracker_.SelectEntries(affinity_matrix);
+    kcf_tracker_.GetAffinityMatrix(img, tracks_, detected,
+                                   &kcf_affinity_matrix);
+    MergeAffinityMatrix(kcf_affinity_matrix, &affinity_matrix);
+  }
 
   // Matching
   std::unordered_map<int, int> local_matching;
   std::unordered_set<int> local_matched_detected;
   MatrixMatching(affinity_matrix, &local_matching, &local_matched_detected);
 
-  // Tracker and ID management
+  // Tracker and ID: detect id to (track id, first_timestamp) mapping
+  std::unordered_map<int, std::pair<int, double>> id_mapping;
   ManageTrackerAndID(local_matching, local_matched_detected, detected,
                      frame_idx_, timestamp, &tracks_, &next_track_id_,
                      &id_mapping);
@@ -91,7 +92,7 @@ bool CascadedCameraTracker::Associate(const cv::Mat& img,
   // Update information used in tracks for the next frame
   cs2d_tracker_.UpdateTracked(img, detected, &tracks_);
   if (dl_feature_) dlf_tracker_.UpdateTracked(img, detected, &tracks_);
-  kcf_tracker_.UpdateTracked(img, detected, &tracks_);
+  if (use_kcf_) kcf_tracker_.UpdateTracked(img, detected, &tracks_);
 
   for (auto obj_ptr : *objects) {
     obj_ptr->last_track_timestamp = timestamp;
@@ -111,8 +112,6 @@ bool CascadedCameraTracker::Associate(const cv::Mat& img,
 std::string CascadedCameraTracker::Name() const {
   return "CascadedCameraTracker";
 }
-
-REGISTER_CAMERA_TRACKER(CascadedCameraTracker);
 
 }  // namespace perception
 }  // namespace apollo

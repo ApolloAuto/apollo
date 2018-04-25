@@ -31,7 +31,7 @@ namespace planning {
 
 class FeasibleRegion {
  public:
-  FeasibleRegion(const std::array<double, 3>& init_s, const double speed_limit);
+  explicit FeasibleRegion(const std::array<double, 3>& init_s);
 
   double SUpper(const double t) const;
 
@@ -44,19 +44,11 @@ class FeasibleRegion {
   double TLower(const double s) const;
 
  private:
-  void Setup(const std::array<double, 3>& init_s, const double speed_limit);
-
   std::array<double, 3> init_s_;
-
-  double speed_limit_;
 
   double t_at_zero_speed_;
 
   double s_at_zero_speed_;
-
-  double t_at_speed_limit_;
-
-  double s_at_speed_limit_;
 };
 
 }  // namespace planning

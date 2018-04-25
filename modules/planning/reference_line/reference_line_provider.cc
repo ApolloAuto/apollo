@@ -51,44 +51,28 @@ using apollo::hdmap::LaneWaypoint;
 using apollo::hdmap::MapPathPoint;
 using apollo::hdmap::RouteSegments;
 
-apollo::common::util::Factory<
-    PlanningConfig::ReferenceLineSmootherType, ReferenceLineSmoother,
-    ReferenceLineSmoother *(*)(const ReferenceLineSmootherConfig &config)>
-    ReferenceLineProvider::s_smoother_factory_;
-
 ReferenceLineProvider::~ReferenceLineProvider() {
   if (thread_ && thread_->joinable()) {
     thread_->join();
   }
 }
 
-void ReferenceLineProvider::RegisterSmoothers() {
-  s_smoother_factory_.Register(
-      PlanningConfig::SPIRAL_SMOOTHER,
-      [](const ReferenceLineSmootherConfig &config) -> ReferenceLineSmoother * {
-        return new SpiralReferenceLineSmoother(config);
-      });
-  s_smoother_factory_.Register(
-      PlanningConfig::QP_SPLINE_SMOOTHER,
-      [](const ReferenceLineSmootherConfig &config) -> ReferenceLineSmoother * {
-        return new QpSplineReferenceLineSmoother(config);
-      });
-}
-
-ReferenceLineProvider::ReferenceLineProvider(
-    const hdmap::HDMap *base_map,
-    PlanningConfig::ReferenceLineSmootherType smoother_type) {
+ReferenceLineProvider::ReferenceLineProvider(const hdmap::HDMap *base_map) {
   if (!FLAGS_use_navigation_mode) {
     pnc_map_.reset(new hdmap::PncMap(base_map));
-  }
-  if (s_smoother_factory_.Empty()) {
-    RegisterSmoothers();
   }
   CHECK(common::util::GetProtoFromFile(FLAGS_smoother_config_filename,
                                        &smoother_config_))
       << "Failed to load smoother config file "
       << FLAGS_smoother_config_filename;
-  smoother_ = s_smoother_factory_.CreateObject(smoother_type, smoother_config_);
+  if (smoother_config_.has_qp_spline()) {
+    smoother_.reset(new QpSplineReferenceLineSmoother(smoother_config_));
+  } else if (smoother_config_.has_spiral()) {
+    smoother_.reset(new SpiralReferenceLineSmoother(smoother_config_));
+  } else {
+    CHECK(false) << "unknown smoother config "
+                 << smoother_config_.DebugString();
+  }
   is_initialized_ = true;
 }  // namespace planning
 
@@ -290,7 +274,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
           MapPathPoint{Vec2d{path_point.x(), path_point.y()},
                        path_point.theta(),
                        LaneWaypoint(lane_ptr, path_point.s())},
-          path_point.kappa(), path_point.dkappa(), 0.0, 0.0);
+          path_point.kappa(), path_point.dkappa());
     }
     reference_line->emplace_back(ref_points.begin(), ref_points.end());
   }
@@ -541,7 +525,7 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
 
   // shift to left (or right) on wide lanes
   if (!(waypoint.lane->lane().left_boundary().virtual_() ||
-        waypoint.lane->lane().left_boundary().virtual_()) &&
+        waypoint.lane->lane().right_boundary().virtual_()) &&
       total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
     if (smoother_config_.driving_side() == ReferenceLineSmootherConfig::RIGHT) {
       shifted_left_width =
@@ -625,12 +609,11 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
     if (sl_point.s() < 0 || sl_point.s() > prefix_ref.Length()) {
       continue;
     }
-    auto prefix_ref_point = prefix_ref.GetNearestReferencepoint(sl_point.s());
+    auto prefix_ref_point = prefix_ref.GetNearestReferencePoint(sl_point.s());
     point.path_point.set_x(prefix_ref_point.x());
     point.path_point.set_y(prefix_ref_point.y());
     point.path_point.set_z(0.0);
     point.path_point.set_theta(prefix_ref_point.heading());
-    point.path_point.set_dkappa(prefix_ref_point.dkappa());
     point.longitudinal_bound = 1e-6;
     point.lateral_bound = 1e-6;
     point.enforced = true;

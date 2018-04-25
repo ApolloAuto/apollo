@@ -68,34 +68,9 @@ function fail() {
   exit -1
 }
 
-# Check whether user has agreed license agreement
-function check_agreement() {
-  agreement_record="$HOME/.cache/.apollo_agreement.txt"
-  if [ ! -e "$agreement_record" ]; then
-    AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
-    if [ ! -e "$AGREEMENT_FILE" ]; then
-      error "AGREEMENT $AGREEMENT_FILE does not exist."
-      exit 0
-    fi
-    cat $AGREEMENT_FILE
-    tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
-    echo $tip
-    read -n 1 user_agreed
-    if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
-      rm -rf $agreement_record
-      cat $AGREEMENT_FILE >> $agreement_record
-      echo "$tip" >> $agreement_record
-      echo "$user_agreed" >> $agreement_record
-    else
-      exit 0
-    fi
-  fi
-}
-
 function check_in_docker() {
   if [ -f /.dockerenv ]; then
     APOLLO_IN_DOCKER=true
-    check_agreement
   else
     APOLLO_IN_DOCKER=false
   fi
@@ -109,8 +84,6 @@ function set_lib_path() {
     PY_LIB_PATH=/apollo/lib
     PY_TOOLS_PATH=/apollo/modules/tools
   else
-    local MD5=`echo -n $APOLLO_ROOT_DIR | md5sum | cut -d' ' -f1`
-    #local ROS_SETUP="${HOME}/.cache/bazel/_bazel_${USER}/${MD5}/external/ros/setup.bash"
     local ROS_SETUP="/home/tmp/ros/setup.bash"
     if [ -e "${ROS_SETUP}" ]; then
       source "${ROS_SETUP}"
@@ -119,6 +92,7 @@ function set_lib_path() {
     PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/apollo/bazel-genfiles/external/caffe/lib:/home/caros/secure_upgrade/depend_lib
   fi
+  PY_LIB_PATH=${PY_LIB_PATH}:/usr/local/apollo/snowboy/Python
   export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
   if [ -e /usr/local/cuda-8.0/ ];then
     export PATH=/usr/local/cuda-8.0/bin:$PATH
@@ -135,17 +109,10 @@ function create_data_dir() {
   else
     DATA_DIR="${HOME}/data"
   fi
-  if [ ! -e "${DATA_DIR}/log" ]; then
-    mkdir -p "${DATA_DIR}/log"
-  fi
 
-  if [ ! -e "${DATA_DIR}/bag" ]; then
-    mkdir -p "${DATA_DIR}/bag"
-  fi
-
-  if [ ! -e "${DATA_DIR}/core" ]; then
-    mkdir -p "${DATA_DIR}/core"
-  fi
+  mkdir -p "${DATA_DIR}/log"
+  mkdir -p "${DATA_DIR}/bag"
+  mkdir -p "${DATA_DIR}/core"
 }
 
 function determine_bin_prefix() {
@@ -172,12 +139,17 @@ function find_device() {
 }
 
 function setup_device() {
+  if [ $(uname -s) != "Linux" ]; then
+    echo "Not on Linux, skip mapping devices."
+    return
+  fi
+
   # setup CAN device
   for INDEX in `seq 0 3`
   do
-      if [ ! -e /dev/can${INDEX} ]; then
-          sudo mknod --mode=a+rw /dev/can${INDEX} c 52 $INDEX
-      fi
+    if [ ! -e /dev/can${INDEX} ]; then
+      sudo mknod --mode=a+rw /dev/can${INDEX} c 52 $INDEX
+    fi
   done
 
   MACHINE_ARCH=$(uname -m)
@@ -205,6 +177,40 @@ function setup_device() {
   if [ ! -e /dev/nvidia-uvm-tools ];then
     sudo mknod -m 666 /dev/nvidia-uvm-tools c 243 1
   fi
+}
+
+function decide_task_dir() {
+  DISK=""
+  if [ "$1" = "--portable-disk" ]; then
+    # Try to find largest NVMe drive.
+    DISK="$(df | grep "^/dev/nvme" | sort -nr -k 4 | \
+        awk '{print substr($0, index($0, $6))}')"
+
+    # Try to find largest external drive.
+    if [ -z "${DISK}" ]; then
+      DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 | \
+          awk '{print substr($0, index($0, $6))}')"
+    fi
+
+    if [ -z "${DISK}" ]; then
+      echo "Cannot find portable disk."
+      echo "Please make sure your container was started AFTER inserting the disk."
+    fi
+  fi
+
+  # Default disk.
+  if [ -z "${DISK}" ]; then
+    DISK="/apollo"
+  fi
+
+  # Create task dir.
+  BAG_PATH="${DISK}/data/bag"
+  TASK_ID=$(date +%Y-%m-%d-%H-%M-%S)
+  TASK_DIR="${BAG_PATH}/${TASK_ID}"
+  mkdir -p "${TASK_DIR}"
+
+  echo "Record bag to ${TASK_DIR}..."
+  export TASK_DIR="${TASK_DIR}"
 }
 
 function is_stopped_customized_path() {
@@ -296,7 +302,7 @@ function start_fe_customized_path() {
 
   eval "${APOLLO_BIN_PREFIX}/modules/${MODULE_PATH}/${MODULE} \
       --flagfile=modules/${MODULE_PATH}/conf/${MODULE}.conf \
-      --log_dir=${APOLLO_ROOT_DIR}/data/log $@"
+      --alsologtostderr --log_dir=${APOLLO_ROOT_DIR}/data/log $@"
 }
 
 function start_fe() {

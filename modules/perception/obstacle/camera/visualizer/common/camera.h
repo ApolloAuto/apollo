@@ -96,30 +96,30 @@ class Camera {
 
   void rotate(Eigen::Vector3d i_axis, double i_angle);
 
-  Type type() const { return _type; }
+  Type type() const { return type_; }
 
-  double field_of_view() const { return _field_of_view; }
+  double field_of_view() const { return field_of_view_; }
 
   double horizontalfield_of_view() const {
     return 2.0 * atan(tan(field_of_view() / 2.0) * aspect_ratio());
   }
 
   double aspect_ratio() const {
-    return static_cast<double>(_screen_width) /
-           static_cast<double>(_screen_height);
+    return static_cast<double>(screen_width_) /
+           static_cast<double>(screen_height_);
   }
 
-  int screen_width() const { return _screen_width; }
+  int screen_width() const { return screen_width_; }
 
-  int screen_height() const { return _screen_height; }
+  int screen_height() const { return screen_height_; }
 
   void get_viewport(GLint viewport[4]) const;
 
   double pixelgl_ratio(const Eigen::Vector3d &position) const;
 
-  double znear_coefficient() const { return _znear_coef; }
+  double znear_coefficient() const { return znear_coef_; }
 
-  double zclipping_coefficient() const { return _zclipping_coef; }
+  double zclipping_coefficient() const { return zclipping_coef_; }
 
   virtual double znear() const;
 
@@ -133,7 +133,7 @@ class Camera {
   void set_type(Type type);
 
   void setfield_of_view(double fov) {
-    _field_of_view = fov;
+    field_of_view_ = fov;
     setfocus_distance(scene_radius() / tan(fov / 2.0));
   }
 
@@ -149,17 +149,17 @@ class Camera {
 
   void setscreen_widthandheight(int width, int height);
 
-  void setznear_coefficient(double coef) { _znear_coef = coef; }
+  void setznear_coefficient(double coef) { znear_coef_ = coef; }
 
-  void setzclipping_coefficient(double coef) { _zclipping_coef = coef; }
+  void setzclipping_coefficient(double coef) { zclipping_coef_ = coef; }
 
-  double scene_radius() const { return _scene_radius; }
+  double scene_radius() const { return scene_radius_; }
 
-  Eigen::Vector3d scene_center() const { return _scene_center; }
+  Eigen::Vector3d scene_center() const { return scene_center_; }
 
   double distance_to_scene_center() const;
 
-  void setscene_radius(double radius);
+  void setscene_radius(const double radius);
 
   void setscene_center(const Eigen::Vector3d &center);
 
@@ -172,9 +172,9 @@ class Camera {
 
   bool set_revolve_around_point_from_pixel(const Eigen::Vector2i &pixel);
 
-  Eigen::Vector3d revolve_around_point() const { return _revolve_around_point; }
+  Eigen::Vector3d revolve_around_point() const { return revolve_around_point_; }
 
-  Frame *frame() const { return _frame; }
+  Frame *frame() const { return frame_; }
 
   void set_frame(Frame *const mcf);
 
@@ -225,49 +225,49 @@ class Camera {
   Eigen::Vector3d point_under_pixel(const Eigen::Vector2i &pixel,
                                     bool *found) const;
 
-  double io_distance() const { return _io_distance; }
+  double io_distance() const { return io_distance_; }
 
   double physical_distance_to_screen() const {
-    return _physical_distance_to_screen;
+    return physical_distance_to_screen_;
   }
 
-  double physicalscreen_width() const { return _physicalscreen_width; }
+  double physicalscreen_width() const { return physicalscreen_width_; }
 
-  double focus_distance() const { return _focus_distance; }
+  double focus_distance() const { return focus_distance_; }
 
-  void setio_distance(double distance) { _io_distance = distance; }
+  void setio_distance(double distance) { io_distance_ = distance; }
 
   void setphysical_distance_to_screen(double distance) {
-    _physical_distance_to_screen = distance;
+    physical_distance_to_screen_ = distance;
   }
 
-  void set_physicalscreen_width(double width) { _physicalscreen_width = width; }
+  void set_physicalscreen_width(double width) { physicalscreen_width_ = width; }
 
-  void setfocus_distance(double distance) { _focus_distance = distance; }
+  void setfocus_distance(double distance) { focus_distance_ = distance; }
 
  private:
   // Frame
-  Frame *_frame;
+  Frame *frame_;
 
   // Camera parameters
-  int _screen_width;
-  int _screen_height;     // size of the window, in pixels
-  double _field_of_view;  // in radians
-  Eigen::Vector3d _scene_center;
-  Eigen::Vector3d _revolve_around_point;
-  double _scene_radius;  // OpenGL units
-  double _znear_coef;
-  double _zclipping_coef;
-  double _ortho_coef;
-  Type _type;                               // PERSPECTIVE or ORTHOGRAPHIC
-  mutable GLdouble _model_view_matrix[16];  // Buffered model view matrix.
-  mutable GLdouble _projection_matrix[16];  // Buffered projection matrix.
+  int screen_width_;
+  int screen_height_;     // size of the window, in pixels
+  double field_of_view_;  // in radians
+  Eigen::Vector3d scene_center_;
+  Eigen::Vector3d revolve_around_point_;
+  double scene_radius_;  // OpenGL units
+  double znear_coef_;
+  double zclipping_coef_;
+  double ortho_coef_;
+  Type type_;                               // PERSPECTIVE or ORTHOGRAPHIC
+  mutable GLdouble model_view_matrix_[16];  // Buffered model view matrix.
+  mutable GLdouble projection_matrix_[16];  // Buffered projection matrix.
 
   // Stereo parameters
-  double _io_distance;                  // inter-ocular distance, in meters
-  double _focus_distance;               // in scene units
-  double _physical_distance_to_screen;  // in meters
-  double _physicalscreen_width;         // in meters
+  double io_distance_;                  // inter-ocular distance, in meters
+  double focus_distance_;               // in scene units
+  double physical_distance_to_screen_;  // in meters
+  double physicalscreen_width_;         // in meters
 };
 
 }  // namespace lowcostvisualizer

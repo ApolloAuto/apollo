@@ -24,7 +24,6 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/traffic_decider/keep_clear.h"
 
 namespace apollo {
@@ -32,23 +31,19 @@ namespace planning {
 
 using apollo::hdmap::PathOverlap;
 
-KeepClear::KeepClear(const RuleConfig& config) : TrafficRule(config) {}
+KeepClear::KeepClear(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool KeepClear::ApplyRule(Frame* const frame,
                           ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (!FLAGS_enable_keep_clear) {
-    return true;
-  }
-
   // keep_clear zone
   const std::vector<PathOverlap>& keep_clear_overlaps =
       reference_line_info->reference_line().map_path().clear_area_overlaps();
   for (const auto& keep_clear_overlap : keep_clear_overlaps) {
-    const auto obstacle_id = FLAGS_keep_clear_virtual_obstacle_id_prefix +
-                             keep_clear_overlap.object_id;
+    const auto obstacle_id =
+        KEEP_CLEAR_VO_ID_PREFIX + keep_clear_overlap.object_id;
     if (BuildKeepClearObstacle(frame, reference_line_info,
                                const_cast<PathOverlap*>(&keep_clear_overlap),
                                obstacle_id)) {
@@ -64,8 +59,7 @@ bool KeepClear::ApplyRule(Frame* const frame,
       reference_line_info->reference_line().map_path().junction_overlaps();
   for (const auto& junction_overlap : junction_overlaps) {
     const auto obstacle_id =
-        FLAGS_keep_clear_junction_virtual_obstacle_id_prefix +
-        junction_overlap.object_id;
+        KEEP_CLEAR_JUNCTION_VO_ID_PREFIX + junction_overlap.object_id;
     if (BuildKeepClearObstacle(frame, reference_line_info,
                                const_cast<PathOverlap*>(&junction_overlap),
                                obstacle_id)) {
@@ -89,7 +83,7 @@ bool KeepClear::BuildKeepClearObstacle(
   // check
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   if (adc_front_edge_s - keep_clear_overlap->start_s >
-      FLAGS_keep_clear_min_pass_distance) {
+      config_.keep_clear().min_pass_s_distance()) {
     ADEBUG << "adc inside keep_clear zone[" << keep_clear_overlap->object_id
            << "] s[" << keep_clear_overlap->start_s << ", "
            << keep_clear_overlap->end_s << "] adc_front_edge_s["

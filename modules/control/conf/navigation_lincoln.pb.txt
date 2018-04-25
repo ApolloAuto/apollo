@@ -10,7 +10,8 @@ soft_estop_brake: 50.0
 active_controllers: LAT_CONTROLLER
 active_controllers: LON_CONTROLLER
 max_steering_percentage_allowed: 100
-minimum_speed_resolution: 0.2
+minimum_speed_resolution: 0.05
+query_relative_time: 0.2
 lat_controller_conf {
   ts: 0.01
   preview_window: 0
@@ -26,7 +27,7 @@ lat_controller_conf {
   matrix_q: 0.25
   matrix_q: 0.02
   cutoff_freq: 10
-  mean_filter_window_size: 15
+  mean_filter_window_size: 10
   max_iteration: 150
   max_lateral_acceleration: 5.0
   lat_err_gain_scheduler {
@@ -36,19 +37,23 @@ lat_controller_conf {
     }
     scheduler {
       speed: 8.0
-      ratio: 0.6
+      ratio: 0.66
     }
     scheduler {
       speed: 12.0
-      ratio: 0.2
+      ratio: 0.21
     }
     scheduler {
       speed: 20.0
-      ratio: 0.1
+      ratio: 0.05
     }
     scheduler {
-      speed: 25.0
+      speed: 22.0
       ratio: 0.05
+    }
+    scheduler {
+      speed: 24.6
+      ratio: 0.049
     }
   }
   heading_err_gain_scheduler {
@@ -66,11 +71,15 @@ lat_controller_conf {
     }
     scheduler {
       speed: 20.0
-      ratio: 0.2
+      ratio: 0.12
     }
     scheduler {
-      speed: 25.0
-      ratio: 0.1
+      speed: 24.0
+      ratio: 0.06
+    }
+    scheduler {
+      speed: 24.6
+      ratio: 0.06
     }
   }
 }

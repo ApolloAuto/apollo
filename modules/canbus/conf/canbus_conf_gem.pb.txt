@@ -1,0 +1,21 @@
+vehicle_parameter {
+  brand: GEM
+  max_steer_angle: 630.0
+  max_steer_angle_spd: 229.0
+  min_steer_angle_spd: 229.0
+  max_acc: 1.18
+  min_acc: -4.5
+  max_brake_pressure: 7.0
+  max_enable_fail_attempt: 5
+  driving_mode: COMPLETE_AUTO_DRIVE
+}
+
+can_card_parameter {
+  brand: SOCKET_CAN_RAW
+  type: PCI_CARD
+  channel_id: CHANNEL_ID_ZERO
+}
+
+enable_debug_mode: false
+enable_receiver_log: false
+enable_sender_log: false

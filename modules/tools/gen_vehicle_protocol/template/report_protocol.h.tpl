@@ -17,13 +17,15 @@
 #ifndef MODULES_CANBUS_VEHICLE_%(car_type_upper)s_PROTOCOL_%(protocol_name_upper)s_H_
 #define MODULES_CANBUS_VEHICLE_%(car_type_upper)s_PROTOCOL_%(protocol_name_upper)s_H_
 
-#include "modules/canbus/vehicle/protocol_data.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 namespace apollo {
 namespace canbus {
 namespace %(car_type_lower)s {
 
-class %(classname)s : public ProtocolData {
+class %(classname)s : public ::apollo::drivers::canbus::ProtocolData<
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   %(classname)s();
