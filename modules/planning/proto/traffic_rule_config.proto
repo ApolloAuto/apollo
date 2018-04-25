@@ -62,11 +62,8 @@ message ReroutingConfig {
 }
 
 message FrontVehicleConfig {
-}
-
-message SidePassVehicleConfig {
   // Waiting time(sec) before starting sidepass vehicle
-  optional double wait_time = 1 [ default=30.0]; // second
+  optional double side_pass_wait_time = 1 [ default=30.0]; // second
 }
 
 message SignalLightConfig {
@@ -108,13 +105,12 @@ message TrafficRuleConfig {
     CHANGE_LANE = 2;
     CROSSWALK = 3;
     DESTINATION = 4;
-    KEEP_CLEAR = 5;
-    REFERENCE_LINE_END = 6;
-    REROUTING = 7;
-    SIDE_PASS_VEHICLE = 8;
+    FRONT_VEHICLE = 5;
+    KEEP_CLEAR = 6;
+    REFERENCE_LINE_END = 7;
+    REROUTING = 8;
     SIGNAL_LIGHT = 9;
     STOP_SIGN = 10;
-    FRONT_VEHICLE = 11;
   }
   optional RuleId rule_id = 1;
   optional bool enabled = 2;
@@ -123,13 +119,12 @@ message TrafficRuleConfig {
     ChangeLaneConfig change_lane = 4;
     CrosswalkConfig crosswalk = 5;
     DestinationConfig destination = 6;
-    KeepClearConfig keep_clear = 7;
-    ReferenceLineEndConfig reference_line_end = 8;
-    ReroutingConfig rerouting = 9;
-    SidePassVehicleConfig side_pass_vehicle = 10;
+    FrontVehicleConfig front_vehicle = 7;
+    KeepClearConfig keep_clear = 8;
+    ReferenceLineEndConfig reference_line_end = 9;
+    ReroutingConfig rerouting = 10;
     SignalLightConfig signal_light = 11;
     StopSignConfig stop_sign = 12;
-    FrontVehicleConfig front_vehicle = 13;
   }
 }
 
