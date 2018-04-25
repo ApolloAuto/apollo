@@ -69,11 +69,12 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
       Matrix::Zero(matrix_b.rows() * horizon, matrix_b.cols() * horizon);
   matrix_k.block(0, 0, matrix_b.rows(), matrix_b.cols()) = matrix_b;
   for (unsigned int r = 1; r < horizon; ++r) {
-    for (unsigned int c = 0; c <= r; ++c) {
+    for (unsigned int c = 0; c < r; ++c) {
       matrix_k.block(r * matrix_b.rows(), c * matrix_b.cols(), matrix_b.rows(),
-                     matrix_b.cols()) =
-          (c == r ? matrix_b : matrix_a_power[r - c - 1] * matrix_b);
+                     matrix_b.cols()) = matrix_a_power[r - c - 1] * matrix_b;
     }
+    matrix_k.block(r * matrix_b.rows(), r * matrix_b.cols(), matrix_b.rows(),
+                   matrix_b.cols()) = matrix_b;
   }
   // Initialize matrix_k, matrix_m, matrix_t and matrix_v, matrix_qq, matrix_rr,
   // vector of matrix A power
@@ -88,9 +89,8 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
 
   for (unsigned int i = 1; i < horizon; ++i) {
     matrix_aa.block(i * matrix_a.rows(), 0, matrix_a.rows(), matrix_a.cols()) =
-        matrix_a *
-        matrix_aa.block((i - 1) * matrix_a.rows(), 0, matrix_a.rows(),
-                        matrix_a.cols());
+        matrix_a * matrix_aa.block((i - 1) * matrix_a.rows(), 0,
+                                   matrix_a.rows(), matrix_a.cols());
   }
 
   // Compute matrix_m
