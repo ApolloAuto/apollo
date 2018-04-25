@@ -638,7 +638,7 @@ void GLFWFusionViewer::render() {
   int text_startx = 10;
   int text_starty = 40;
   glRasterPos2i(text_startx, text_starty);
-  raster_text_->print_multiline(help_str.c_str(), text_startx, text_starty);
+  raster_text_->print_multiline(help_str, text_startx, text_starty);
 
   no_frame++;
 }
@@ -1392,7 +1392,7 @@ bool GLFWFusionViewer::draw_lane_objects_image() {
 
   std::string frame_id_str = "frame: " + std::to_string(frame_count_);
   glRasterPos2i(scene_width_ + 10, image_height_ - 200);
-  raster_text_->print_string(frame_id_str.c_str());
+  raster_text_->print_string(frame_id_str);
 
   return true;
 }
@@ -1572,7 +1572,7 @@ void GLFWFusionViewer::draw_camera_box2d(
           int yi_txt = offset_y + y_txt * image_height_ / image_height;
 
           glRasterPos2i(xi_txt, yi_txt);
-          raster_text_->print_string(c.c_str());
+          raster_text_->print_string(c);
           glColor4f(1.0f, 1.0f, 1.0f, 1.0f);  // reset the color to white
 
           // type
@@ -1599,7 +1599,7 @@ void GLFWFusionViewer::draw_camera_box2d(
           int yi_type = offset_y + y_type * image_height_ / image_height;
 
           glRasterPos2i(xi_type, yi_type);
-          raster_text_->print_string(obj_type_str.c_str());
+          raster_text_->print_string(obj_type_str);
         }
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);  // reset the color to white
       }
@@ -1856,11 +1856,11 @@ void GLFWFusionViewer::draw_objects(
       glFlush();
 
       glRasterPos2i(tc[0], tc[1]);
-      raster_text_->print_string(std::to_string(objects[i]->track_id).c_str());
+      raster_text_->print_string(std::to_string(objects[i]->track_id));
 
       if (objects[i]->b_cipv) {
         glRasterPos2i(tc[0] + 3, tc[1]);
-        raster_text_->print_string(std::string("cipv").c_str());
+        raster_text_->print_string(std::string("cipv"));
       }
       AINFO << objects[i]->ToString();
     }
