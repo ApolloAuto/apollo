@@ -331,21 +331,21 @@ void GLRasterText::init() {
   make_raster_font();
 }
 
-void GLRasterText::print_string(const char *s) {
+void GLRasterText::print_string(const std::string s) {
   glPushAttrib(GL_LIST_BIT);
   glListBase(s_font_offset_);
-  glCallLists(strlen(s), GL_UNSIGNED_BYTE,
-              reinterpret_cast<const GLubyte *>(s));
+  glCallLists(s.size, GL_UNSIGNED_BYTE,
+              reinterpret_cast<const GLubyte *>(s.c_str()));
   glPopAttrib();
 }
 
 void GLRasterText::print_multiline(
-    const char *s,
+    const std::string s,
     const int top_left_x,
     const int top_left_y) {
   glPushAttrib(GL_LIST_BIT);
   int line_count = 1;
-  for (uint i = 0; i < strlen(s); ++i) {
+  for (uint i = 0; i < s.size(); ++i) {
     if (s[i] == '\n') {
       // 18: varies to font size
       glRasterPos2i(top_left_x, top_left_y+18*line_count);
