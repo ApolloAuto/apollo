@@ -492,8 +492,8 @@ void MPCController::UpdateMatrix(SimpleMPCDebug *debug) {
   matrix_a_(3, 3) = matrix_a_coeff_(3, 3) / v;
 
   Matrix matrix_i = Matrix::Identity(matrix_a_.cols(), matrix_a_.cols());
-  matrix_ad_ = (matrix_i + ts_ * 0.5 * matrix_a_) *
-               (matrix_i - ts_ * 0.5 * matrix_a_).inverse();
+  matrix_ad_ = (matrix_i - ts_ * 0.5 * matrix_a_).inverse() *
+               (matrix_i + ts_ * 0.5 * matrix_a_);
 
   matrix_c_(1, 0) = (lr_ * cr_ - lf_ * cf_) / mass_ / v - v;
   matrix_c_(3, 0) = -(lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_ / v;
