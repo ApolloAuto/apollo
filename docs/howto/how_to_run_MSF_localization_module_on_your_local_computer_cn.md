@@ -8,11 +8,10 @@
  - 从[Apllo数据平台](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)下载多传感器融合定位数据（仅限美国地区）
 
 ## 2. 配置定位模块
-为了使定位模块正确运行，需要根据下载的定位数据对地图路径和传感器外参进行配置。
+为了使定位模块正确运行，需要对地图路径和传感器外参进行配置。假设下载的定位数据的所在路径为DATA_PATH。
 
 在进行以下步骤前，首先确定你在docker容器中。
 
-假设存放定位数据的路径为DATA_PATH。
 ### 2.1 配置传感器外参
 将定位数据中的传感器外参拷贝至指定文件夹下。
 
@@ -100,8 +99,10 @@ rosbag play *.bag
 
 (注意只有在GNSS信号良好，RTK定位模式运行良好的区域，这样的对比才是有意义的。)
 
-最终获得如下统计结果：
+获得如下统计结果：
+
 ![2](images/msf_localization/localization_result.png)
+
 可以看到两组统计结果，第一组是组合导航(输出频率200hz)的统计结果，第二组是点云定位(输出频率5hz)的统计结果。
 
 表格中各项的意义， 
