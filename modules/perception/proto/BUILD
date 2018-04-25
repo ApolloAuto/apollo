@@ -76,3 +76,17 @@ proto_library(
         "modest_radar_detector_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "tracker_config_lib_proto",
+    deps = [
+        ":tracker_config_lib",
+    ],
+)
+
+proto_library(
+    name = "tracker_config_lib",
+    srcs = [
+        "tracker_config.proto",
+    ],
+)
