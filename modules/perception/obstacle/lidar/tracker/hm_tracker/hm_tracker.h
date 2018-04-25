@@ -22,6 +22,8 @@
 #include <utility>
 #include <vector>
 
+#include "modules/perception/proto/tracker_config.pb.h"
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
@@ -193,6 +195,8 @@ class HmObjectTracker : public BaseTracker {
   Eigen::Vector3d global_to_local_offset_;
   double time_stamp_ = 0.0;
   bool valid_ = false;
+
+  tracker_config::ModelConfigs config_;
 
   DISALLOW_COPY_AND_ASSIGN(HmObjectTracker);
 };  // class HmObjectTracker
