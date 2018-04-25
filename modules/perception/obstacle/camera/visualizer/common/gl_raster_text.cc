@@ -334,7 +334,7 @@ void GLRasterText::init() {
 void GLRasterText::print_string(const std::string s) {
   glPushAttrib(GL_LIST_BIT);
   glListBase(s_font_offset_);
-  glCallLists(s.size, GL_UNSIGNED_BYTE,
+  glCallLists(s.size(), GL_UNSIGNED_BYTE,
               reinterpret_cast<const GLubyte *>(s.c_str()));
   glPopAttrib();
 }
