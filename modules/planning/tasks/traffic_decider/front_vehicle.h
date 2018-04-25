@@ -21,7 +21,7 @@
 #ifndef MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_FRONT_VEHICLE_H_
 #define MODULES_PLANNING_TASKS_TRAFFIC_DECIDER_FRONT_VEHICLE_H_
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include <string>
 
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
@@ -35,10 +35,20 @@ class FrontVehicle : public TrafficRule {
   explicit FrontVehicle(const TrafficRuleConfig& config);
   ~FrontVehicle() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* reference_line_info);
+  bool ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 
  private:
-  void StopForStaticCrossLaneObstacles(ReferenceLineInfo* reference_line_info);
+  void MakeDecisions(Frame* const frame,
+                     ReferenceLineInfo* const reference_line_info);
+  bool MakeSidePassDecision(ReferenceLineInfo* const reference_line_info);
+
+  bool ProcessSidePass(ReferenceLineInfo* const reference_line_info);
+
+  std::string& FindBlockedObstacle(
+      ReferenceLineInfo* const reference_line_info);
+
+  void MakeStopDecision(ReferenceLineInfo* reference_line_info);
 };
 }  // namespace planning
 }  // namespace apollo

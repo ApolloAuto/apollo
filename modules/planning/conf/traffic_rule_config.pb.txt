@@ -19,12 +19,6 @@ config: {
 }
 
 config: {
-  rule_id: FRONT_VEHICLE
-  enabled: true
-  front_vehicle {
-  }
-}
-config: {
   rule_id: CROSSWALK
   enabled: true
   crosswalk {
@@ -41,6 +35,14 @@ config: {
   enabled: true
   destination {
     stop_distance: 0.5
+  }
+}
+
+config: {
+  rule_id: FRONT_VEHICLE
+  enabled: true
+  front_vehicle {
+    side_pass_wait_time: 30.0
   }
 }
 
@@ -65,14 +67,6 @@ config: {
 config: {
   rule_id: REROUTING
   enabled: true
-}
-
-config: {
-  rule_id: SIDE_PASS_VEHICLE
-  enabled: true
-  side_pass_vehicle {
-    wait_time: 30.0
-  }
 }
 
 config: {
