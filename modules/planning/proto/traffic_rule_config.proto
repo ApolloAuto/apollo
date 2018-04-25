@@ -44,6 +44,12 @@ message DestinationConfig {
   optional double stop_distance = 1 [ default=0.5 ]; // meter
 }
 
+message FrontVehicleConfig {
+  // Waiting time(sec) before starting sidepass vehicle
+  optional double side_pass_wait_time = 1 [ default=30.0]; // second
+  optional double nudge_l_buffer = 2 [ default=0.5]; // meter
+}
+
 message KeepClearConfig {
   // min s_distance to be considered have passed keep_clear (stop_line_end_s)
   optional double min_pass_s_distance = 1 [ default=2.0 ]; // meter
@@ -59,11 +65,6 @@ message ReferenceLineEndConfig {
 message ReroutingConfig {
   // should not rerouting more frequent than this number
   optional double cooldown_time = 1 [default = 0.6];  // seconds
-}
-
-message FrontVehicleConfig {
-  // Waiting time(sec) before starting sidepass vehicle
-  optional double side_pass_wait_time = 1 [ default=30.0]; // second
 }
 
 message SignalLightConfig {
