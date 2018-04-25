@@ -278,8 +278,10 @@ void SimulationWorldService::Update() {
   UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
   UpdateWithLatestObserved("ControlCommand",
                            AdapterManager::GetControlCommand());
-  UpdateWithLatestObserved("Navigation", AdapterManager::GetNavigation());
-  UpdateWithLatestObserved("RelativeMap", AdapterManager::GetRelativeMap());
+  UpdateWithLatestObserved("Navigation", AdapterManager::GetNavigation(),
+                           FLAGS_use_navigation_mode);
+  UpdateWithLatestObserved("RelativeMap", AdapterManager::GetRelativeMap(),
+                           FLAGS_use_navigation_mode);
 
   for (const auto &kv : obj_map_) {
     *world_.add_object() = kv.second;
