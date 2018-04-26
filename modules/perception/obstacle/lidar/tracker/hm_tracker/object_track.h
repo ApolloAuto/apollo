@@ -26,6 +26,8 @@
 #include "Eigen/Core"
 #include "boost/shared_ptr.hpp"
 
+#include "modules/perception/proto/tracker_config.pb.h"
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/base_filter.h"
@@ -38,11 +40,6 @@ class ObjectTrack {
  public:
   explicit ObjectTrack(std::shared_ptr<TrackedObject> obj);
   ~ObjectTrack();
-
-  // @brief set filter method for all the object track objects
-  // @params[IN] filter_method: method name of filtering algorithm
-  // @return true if set successfully, otherwise return false
-  static bool SetFilterMethod(const std::string& filter_method_name);
 
   // @brief set track cached history size maximum
   // @params[IN] track_cached_history_size_maximum: track cached history size
@@ -122,7 +119,7 @@ class ObjectTrack {
 
  public:
   // algorithm setup
-  static FilterType s_filter_method_;
+  static tracker_config::ModelConfigs::FilterType s_filter_method_;
   BaseFilter* filter_;
 
   // basic info
@@ -179,17 +176,15 @@ class ObjectTrackSet {
 
   // @brief get maintained tracks
   // @return maintained tracks
-  inline std::vector<ObjectTrackPtr>& GetTracks() { return tracks_; }
+  std::vector<ObjectTrackPtr>& GetTracks() { return tracks_; }
 
   // @brief get maintained tracks
   // @return maintained tracks
-  inline const std::vector<ObjectTrackPtr>& GetTracks() const {
-    return tracks_;
-  }
+  const std::vector<ObjectTrackPtr>& GetTracks() const { return tracks_; }
 
   // @brief get size of maintained tracks
   // @return size of maintained tracks
-  inline int Size() const { return tracks_.size(); }
+  int Size() const { return tracks_.size(); }
 
   // @brief add track to current set of maintained tracks
   // @params[IN] track: adding track

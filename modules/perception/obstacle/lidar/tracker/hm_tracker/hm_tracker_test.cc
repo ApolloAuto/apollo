@@ -40,12 +40,6 @@ class HmObjectTrackerTest : public testing::Test {
   virtual ~HmObjectTrackerTest() {}
   void SetUp() {
     RegisterFactoryHmObjectTracker();
-    FLAGS_work_root = "modules/perception";
-    FLAGS_config_manager_path = "conf/config_manager.config";
-    if (!ConfigManager::instance()->Init()) {
-      AERROR << "failed to Init ConfigManager";
-      return;
-    }
     hm_tracker_ = new HmObjectTracker();
     object_builder_ = new MinBoxObjectBuilder();
     object_builder_->Init();
