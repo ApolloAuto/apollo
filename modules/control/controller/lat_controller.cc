@@ -435,8 +435,8 @@ void LatController::UpdateMatrix() {
   matrix_a_(3, 1) = matrix_a_coeff_(3, 1) / v;
   matrix_a_(3, 3) = matrix_a_coeff_(3, 3) / v;
   Matrix matrix_i = Matrix::Identity(matrix_a_.cols(), matrix_a_.cols());
-  matrix_ad_ = (matrix_i + ts_ * 0.5 * matrix_a_) *
-               (matrix_i - ts_ * 0.5 * matrix_a_).inverse();
+  matrix_ad_ = (matrix_i - ts_ * 0.5 * matrix_a_).inverse() *
+               (matrix_i + ts_ * 0.5 * matrix_a_);
 }
 
 void LatController::UpdateMatrixCompound() {
