@@ -5,8 +5,16 @@ package apollo.perception.tracker_config;
 message ModelConfigs {
   optional string name = 1 [ default = "HmObjectTracker" ];
   optional string version = 2 [ default = "1.1.0" ];
-  optional string matcher_method_name = 3 [ default = "hungarian_matcher" ];
-  optional string filter_method_name = 4 [ default = "kalman_filter" ];
+
+  enum MatcherType {
+    HUNGARIAN_MATCHER = 1;
+  }
+  optional MatcherType matcher_method = 3 [ default = HUNGARIAN_MATCHER ];
+
+  enum FilterType {
+    KALMAN_FILTER = 1;
+  }
+  optional FilterType filter_method = 4 [ default = KALMAN_FILTER ];
   optional int32 track_cached_history_size_maximum = 5 [ default = 5 ];
   optional int32 track_consecutive_invisible_maximum = 6 [ default = 1 ];
   optional float track_visible_ratio_minimum = 7 [ default = 0.6 ];
