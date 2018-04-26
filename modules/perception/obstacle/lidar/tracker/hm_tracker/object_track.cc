@@ -28,22 +28,13 @@ namespace apollo {
 namespace perception {
 
 int ObjectTrack::s_track_idx_ = 0;
-FilterType ObjectTrack::s_filter_method_ = KALMAN_FILTER;
+tracker_config::ModelConfigs::FilterType ObjectTrack::s_filter_method_ =
+    tracker_config::ModelConfigs::KALMAN_FILTER;
 int ObjectTrackSet::s_track_consecutive_invisible_maximum_ = 1;
 float ObjectTrackSet::s_track_visible_ratio_minimum_ = 0.6;
 int ObjectTrack::s_track_cached_history_size_maximum_ = 5;
 double ObjectTrack::s_acceleration_noise_maximum_ = 5;
 double ObjectTrack::s_speed_noise_maximum_ = 0.4;
-
-bool ObjectTrack::SetFilterMethod(const std::string& filter_method_name) {
-  if (filter_method_name == "kalman_filter") {
-    s_filter_method_ = KALMAN_FILTER;
-    AINFO << "filter method of object track is " << filter_method_name;
-    return true;
-  }
-  AERROR << "invalid filter method name of object track!";
-  return false;
-}
 
 bool ObjectTrack::SetTrackCachedHistorySizeMaximum(
     const int& track_cached_history_size_maximum) {
@@ -95,7 +86,7 @@ ObjectTrack::ObjectTrack(std::shared_ptr<TrackedObject> obj) {
   // Initialize filter
   Eigen::Vector3f initial_anchor_point = obj->anchor_point;
   Eigen::Vector3f initial_velocity = Eigen::Vector3f::Zero();
-  if (s_filter_method_ == KALMAN_FILTER) {
+  if (s_filter_method_ == tracker_config::ModelConfigs::KALMAN_FILTER) {
     filter_ = new KalmanFilter();
   } else {
     filter_ = new KalmanFilter();
