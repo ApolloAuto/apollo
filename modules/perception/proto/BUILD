@@ -104,3 +104,17 @@ proto_library(
         "sequence_type_fuser_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "async_fusion_config_lib_proto",
+    deps = [
+        ":async_fusion_config_lib",
+    ],
+)
+
+proto_library(
+    name = "async_fusion_config_lib",
+    srcs = [
+        "async_fusion_config.proto",
+    ],
+)

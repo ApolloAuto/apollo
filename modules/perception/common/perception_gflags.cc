@@ -162,3 +162,6 @@ DEFINE_string(tracker_config, "modules/perception/model/tracker_config.pb.txt",
 DEFINE_string(sequence_type_fuser_config,
               "modules/perception/model/sequence_type_fuser_config.pb.txt",
               "sequence_type_fuser config filename.");
+DEFINE_string(async_fusion_config,
+              "modules/perception/model/async_fusion_config.pb.txt",
+              "async_fuser config filename.");
