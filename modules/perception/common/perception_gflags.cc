@@ -159,3 +159,6 @@ DEFINE_string(modest_radar_detector_config,
               "modest radar detector config filename.");
 DEFINE_string(tracker_config, "modules/perception/model/tracker_config.pb.txt",
               "tracker config filename.");
+DEFINE_string(sequence_type_fuser_config,
+              "modules/perception/model/sequence_type_fuser_config.pb.txt",
+              "sequence_type_fuser config filename.");

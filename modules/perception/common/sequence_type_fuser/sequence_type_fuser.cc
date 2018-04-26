@@ -18,73 +18,55 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
 
 using apollo::common::util::GetAbsolutePath;
+using apollo::common::util::GetProtoFromFile;
 
 bool SequenceTypeFuser::Init() {
-  const ModelConfig* model_config =
-      ConfigManager::instance()->GetModelConfig(name());
-  if (model_config == nullptr) {
-    AERROR << "Failed to found model config: " << name();
-    return false;
-  }
-
-  if (!model_config->GetValue("temporal_window", &temporal_window_)) {
-    AERROR << "Failed to find temporal_window in config. ";
+  if (!GetProtoFromFile(FLAGS_sequence_type_fuser_config, &config_)) {
+    AERROR << "Cannot get config proto from file: " << FLAGS_tracker_config;
     return false;
   }
 
   // get the transition matrix
-  std::string transition_property_file_path;
-  if (!model_config->GetValue("transition_property_file_path",
-                              &transition_property_file_path)) {
-    AERROR << "Failed to find transition_property_file_path in config. ";
-    return false;
-  }
-  const std::string& work_root = ConfigManager::instance()->WorkRoot();
-  transition_property_file_path =
-      GetAbsolutePath(work_root, transition_property_file_path);
+  const std::string& transition_property_file_path =
+      config_.transition_property_file_path();
 
   if (!fuser_util::LoadSingleMatrixFile(transition_property_file_path,
                                         &transition_matrix_)) {
+    AERROR << "Fail to load single matrix file from: "
+           << transition_property_file_path;
     return false;
   }
   transition_matrix_ += Matrixd::Ones() * 1e-6;
   for (std::size_t i = 0; i < VALID_OBJECT_TYPE; ++i) {
     fuser_util::NormalizeRow(&transition_matrix_);
   }
-  AINFO << "transition matrix";
-  AINFO << std::endl << transition_matrix_;
+  ADEBUG << "transition matrix\n" << transition_matrix_;
   for (std::size_t i = 0; i < VALID_OBJECT_TYPE; ++i) {
     for (std::size_t j = 0; j < VALID_OBJECT_TYPE; ++j) {
       transition_matrix_(i, j) = log(transition_matrix_(i, j));
     }
   }
-  AINFO << std::endl << transition_matrix_;
+  ADEBUG << std::endl << transition_matrix_;
 
   // get classifier property
-  std::string classifiers_property_file_path;
-  if (!model_config->GetValue("classifiers_property_file_path",
-                              &classifiers_property_file_path)) {
-    AERROR << "Failed to find classifiers_property_file_path in config. ";
-    return false;
-  }
-  classifiers_property_file_path =
-      GetAbsolutePath(work_root, classifiers_property_file_path);
-
+  const std::string& classifiers_property_file_path =
+      config_.classifiers_property_file_path();
   if (!fuser_util::LoadMultipleMatricesFile(classifiers_property_file_path,
                                             &smooth_matrices_)) {
+    AERROR << "Fail to load multiple matrices from file: "
+           << classifiers_property_file_path;
     return false;
   }
   for (auto& pair : smooth_matrices_) {
     fuser_util::NormalizeRow(&pair.second);
     pair.second.transposeInPlace();
-    AINFO << "Source: " << pair.first;
-    AINFO << std::endl << pair.second;
+    ADEBUG << "Source: " << pair.first << "\n\n" << pair.second;
   }
 
   confidence_smooth_matrix_ = Matrixd::Identity();
@@ -93,9 +75,7 @@ bool SequenceTypeFuser::Init() {
     confidence_smooth_matrix_ = iter->second;
     smooth_matrices_.erase(iter);
   }
-  AINFO << "Confidence: ";
-  AINFO << std::endl << confidence_smooth_matrix_;
-
+  ADEBUG << "Confidence: \n" << confidence_smooth_matrix_;
   return true;
 }
 
@@ -117,7 +97,7 @@ bool SequenceTypeFuser::FuseType(
       }
       const int& track_id = object->track_id;
       sequence_.GetTrackInTemporalWindow(track_id, &tracked_objects,
-                                         temporal_window_);
+                                         config_.temporal_window());
       if (tracked_objects.size() == 0) {
         AERROR << "Find zero-length track, so skip.";
         continue;
