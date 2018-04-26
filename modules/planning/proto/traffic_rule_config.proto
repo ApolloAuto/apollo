@@ -4,15 +4,15 @@ package apollo.planning;
 
 message BacksideVehicleConfig {
   // a vehicle is considered within current lane if it is behind the ADC and its lateral difference is less than this number.
-  optional double backside_lane_width = 1 [default=4.0];
+  optional double backside_lane_width = 1 [ default=4.0 ];
 }
 
 message ChangeLaneConfig {
-  optional double min_overtake_distance = 1 [default=10.0];
-  optional double min_overtake_time = 2 [default=2.0];
-  optional bool  enable_guard_obstacle = 3 [default=false];
-  optional double guard_distance = 4 [default=100.0];
-  optional double min_guard_speed = 5 [default=1.0];
+  optional double min_overtake_distance = 1 [ default=10.0 ];
+  optional double min_overtake_time = 2 [ default=2.0 ];
+  optional bool  enable_guard_obstacle = 3 [ default=false ];
+  optional double guard_distance = 4 [ default=100.0 ];
+  optional double min_guard_speed = 5 [ default=1.0 ];
 }
 
 message CreepConfig {
@@ -46,8 +46,14 @@ message DestinationConfig {
 
 message FrontVehicleConfig {
   // Waiting time(sec) before starting sidepass vehicle
-  optional double side_pass_wait_time = 1 [ default=30.0]; // second
-  optional double nudge_l_buffer = 2 [ default=0.5]; // meter
+  optional bool enable_side_pass = 1 [ default=true ];
+  // within this s_distance to ADC to compute SIDEPASS
+  optional double side_pass_s_threshold = 2 [ default=15.0 ]; // meter
+  // within this l_distance(+/-) to ADC to considere SIDEPASS
+  optional double side_pass_l_threshold = 3 [ default=1.0 ];  // meter
+  optional double side_pass_wait_time = 4 [ default=30.0]; // second
+  optional double nudge_l_buffer = 5 [ default=0.5]; // meter
+  optional double stop_distance = 6 [ default=6.0 ]; // meter
 }
 
 message KeepClearConfig {
@@ -64,7 +70,7 @@ message ReferenceLineEndConfig {
 
 message ReroutingConfig {
   // should not rerouting more frequent than this number
-  optional double cooldown_time = 1 [default = 0.6];  // seconds
+  optional double cooldown_time = 1 [ default = 0.6 ];  // seconds
 }
 
 message SignalLightConfig {
