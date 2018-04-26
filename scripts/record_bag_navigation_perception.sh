@@ -65,7 +65,7 @@ function start() {
 }
 
 function stop() {
-  pkill -SIGINT -f record
+  pkill -SIGKILL -f record
 }
 
 function help() {

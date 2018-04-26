@@ -33,7 +33,7 @@ function start() {
 }
 
 function stop() {
-    pkill -f gnss_driver
+    pkill -SIGKILL -f gnss_driver
 }
 
 # run command_name module_name
