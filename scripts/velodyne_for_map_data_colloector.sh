@@ -33,7 +33,7 @@ function start() {
 }
 
 function stop() {
-    pkill -f start_velodyne
+    pkill -SIGKILL -f start_velodyne
 }
 
 # run command_name module_name

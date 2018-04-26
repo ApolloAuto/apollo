@@ -30,7 +30,7 @@ function start() {
 
 function stop() {
     echo "stop"
-    pkill -f navigation_planning.py
+    pkill -SIGKILL -f navigation_planning.py
 }
 
 case $1 in                                                                                          

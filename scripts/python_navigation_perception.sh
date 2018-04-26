@@ -30,7 +30,7 @@ function start() {
 
 function stop() {
     echo "stop"
-    pkill -f perception_adaper.py
+    pkill -SIGKILL -f perception_adaper.py
 }
 
 case $1 in                                                                                          
