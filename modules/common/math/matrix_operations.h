@@ -66,30 +66,15 @@ Eigen::Matrix<T, N, N> PseudoInverse(const Eigen::Matrix<T, N, N> &m,
  * @return Moore-Penrose pseudo-inverse of the given matrix.
  */
 template <typename T, unsigned int M, unsigned int N>
-Eigen::Matrix<T, N, M> PseudoInverse(const Eigen::Matrix<T, M, N>& m,
-        const double epsilon = 1.0e-6) {
-    Eigen::Matrix<T, M, M> t = m * m.transpose();
-    return m.transpose() * PseudoInverse<T, M>(t);
+Eigen::Matrix<T, N, M> PseudoInverse(const Eigen::Matrix<T, M, N> &m,
+                                     const double epsilon = 1.0e-6) {
+  Eigen::Matrix<T, M, M> t = m * m.transpose();
+  return m.transpose() * PseudoInverse<T, M>(t);
 }
 
 /**
- * @brief Implements Tustin's method for converting transfer functions from
- * continuous to discrete time domains.
- * https://en.wikipedia.org/wiki/Bilinear_transform
- *
- * @param m_c Matrix
- * @param ts Time interval
- *
- * @return Matrix
+ TODO(QiL) : Implement Bilinear_transform with pre-ward instead
  */
-template <typename T, unsigned int N>
-Eigen::Matrix<T, N, N> ContinuousToDiscrete(const Eigen::Matrix<T, N, N> &m_c,
-                                            const double ts) {
-  Eigen::Matrix<T, N, N> m_identity = Eigen::Matrix<T, N, N>::Identity();
-  Eigen::Matrix<T, N, N> m_d = (m_identity + ts * 0.5 * m_c) *
-                               PseudoInverse<T, N>(m_identity - ts * 0.5 * m_c);
-  return m_d;
-}
 
 }  // namespace math
 }  // namespace common
