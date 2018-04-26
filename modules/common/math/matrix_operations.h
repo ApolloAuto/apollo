@@ -22,6 +22,7 @@
 #ifndef MODULES_COMMON_MATH_MATRIX_OPERATIONS_H_
 #define MODULES_COMMON_MATH_MATRIX_OPERATIONS_H_
 
+#include <cmath>
 #include <utility>
 #include "Eigen/Dense"
 #include "Eigen/SVD"
@@ -73,8 +74,53 @@ Eigen::Matrix<T, N, M> PseudoInverse(const Eigen::Matrix<T, M, N> &m,
 }
 
 /**
- TODO(QiL) : Implement Bilinear_transform with pre-ward instead
+* @brief Computes bilinear transformation of the continuous to discrete form for
+state space representation
+*
+* @param m_a, m_b, m_c, m_d are the state space matrix control matrix
+*
+* @return true or false.
+
  */
+
+template <typename T, unsigned int L, unsigned int M, unsigned int N,
+          unsigned int O>
+bool ContinuousToDiscrete(const Eigen::Matrix<T, L, L> &m_a,
+                          const Eigen::Matrix<T, L, N> &m_b,
+                          const Eigen::Matrix<T, O, M> &m_c,
+                          const Eigen::Matrix<T, O, N> &m_d, const double ts,
+                          Eigen::Matrix<T, L, L> *ptr_a_d,
+                          Eigen::Matrix<T, L, N> *ptr_b_d,
+                          Eigen::Matrix<T, O, M> *ptr_c_d,
+                          Eigen::Matrix<T, O, N> *ptr_d_d) {
+  if (ts <= 0.0) {
+    AERROR << "ContinuousToDiscrete : ts is less than or equal to zero";
+    return false;
+  }
+
+  // Only matrix_a is mandatory to be non-zeros in matrix
+  // conversion.
+  if (m_a.rows() == 0) {
+    AERROR << "ContinuousToDiscrete: matrix_a size 0 ";
+    return false;
+  }
+
+  Eigen::Matrix<T, L, L> m_identity = Eigen::Matrix<T, L, L>::Identity();
+  Eigen::Matrix<T, L, L> *m_a_d =
+      PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a) *
+      (m_identity + ts * 0.5 * m_a);
+
+  Eigen::Matrix<T, L, N> *m_b_d =
+      std::sqrt(ts) * PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a) * m_b;
+
+  Eigen::Matrix<T, O, M> *m_c_d =
+      std::sqrt(ts) * m_c * PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a);
+
+  Eigen::Matrix<T, O, N> *m_d_d =
+      0.5 * m_c * PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a) * m_b + m_d;
+
+  return true;
+}
 
 }  // namespace math
 }  // namespace common
