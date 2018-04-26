@@ -266,9 +266,11 @@ bool DPRoadGraph::SamplePathWaypoints(
       reference_line_.Length());
 
   constexpr double kSamplePointLookForwardTime = 4.0;
-  const double level_distance =
+  const double step_length =
       common::math::Clamp(init_point.v() * kSamplePointLookForwardTime,
                           config_.step_length_min(), config_.step_length_max());
+  const double level_distance = (init_point.v() > FLAGS_max_stop_speed) ?
+      step_length : step_length / 2.0;
   double accumulated_s = init_sl_point_.s();
   double prev_s = accumulated_s;
   for (std::size_t i = 0; accumulated_s < total_length; ++i) {
