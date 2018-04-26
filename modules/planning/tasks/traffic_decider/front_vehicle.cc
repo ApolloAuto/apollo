@@ -73,6 +73,10 @@ bool FrontVehicle::MakeSidePassDecision(
     ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(reference_line_info);
 
+  if (!config_.front_vehicle().enable_side_pass()) {
+    return true;
+  }
+
   if (FLAGS_use_navigation_mode) {
     // no SIDE_PASS in navigation mode
     return true;
@@ -88,7 +92,8 @@ bool FrontVehicle::MakeSidePassDecision(
   }
 
   auto* sidepass_status = GetPlanningStatus()->mutable_side_pass();
-  if (sidepass_status->status() == SidePassStatus::SIDEPASS) {
+  if (sidepass_status->has_status() &&
+      sidepass_status->status() == SidePassStatus::SIDEPASS) {
     ADEBUG << "SIDEPASS: obstacle["
         << sidepass_status->pass_obstacle_id() << "]";
     ObjectDecisionType sidepass;
@@ -142,8 +147,8 @@ bool FrontVehicle::ProcessSidePass(
       } else {
         double wait_start_time = sidepass_status->wait_start_time();
         double wait_time = Clock::NowInSeconds() - wait_start_time;
-        ADEBUG << "wait_start_time: " << wait_start_time
-               << "; wait_time: " << wait_time << "]";
+        ADEBUG << "wait_start_time[" << wait_start_time
+               << "] wait_time[" << wait_time << "]";
 
         if (wait_time > config_.front_vehicle().side_pass_wait_time()) {
           // calculate if the left/right lane exist
@@ -244,27 +249,31 @@ std::string FrontVehicle::FindPassableObstacle(
       continue;
     }
 
-    if (path_obstacle->PerceptionSLBoundary().start_s() <=
-        adc_sl_boundary.end_s()) {  // such vehicles are behind the adc.
+    const auto& obstacle_sl = path_obstacle->PerceptionSLBoundary();
+    if (obstacle_sl.start_s() <= adc_sl_boundary.end_s()) {
       ADEBUG << "obstacle_id[" << obstacle_id
-          << "] type[" << obstacle_type_name << "] behind ADC. SKIP";
+          << "] type[" << obstacle_type_name
+          << "] behind ADC. SKIP";
       continue;
     }
 
-    constexpr double kAdcDistanceThreshold = 15.0;  // unit: m
-    if (path_obstacle->PerceptionSLBoundary().start_s() >
-        adc_sl_boundary.end_s() +
-            kAdcDistanceThreshold) {  // vehicles are far away
+    const double side_pass_s_threshold =
+        config_.front_vehicle().side_pass_s_threshold();
+    if (obstacle_sl.start_s() - adc_sl_boundary.end_s()
+        > side_pass_s_threshold) {
       ADEBUG << "obstacle_id[" << obstacle_id
-          << "] type[" << obstacle_type_name << "] too far. SKIP";
+          << "] type[" << obstacle_type_name
+          << "] outside of s_threshold. SKIP";
       continue;
     }
 
-    if (path_obstacle->PerceptionSLBoundary().start_l() > 1.0 ||
-        path_obstacle->PerceptionSLBoundary().end_l() < -1.0) {
-      // TODO(all)
+    const double side_pass_l_threshold =
+        config_.front_vehicle().side_pass_l_threshold();
+    if (obstacle_sl.start_l() > side_pass_l_threshold ||
+        obstacle_sl.end_l() < -side_pass_l_threshold) {
       ADEBUG << "obstacle_id[" << obstacle_id
-          << "] type[" << obstacle_type_name << "] nudgable. SKIP";
+          << "] type[" << obstacle_type_name
+          << "] outside of l_threshold. SKIP";
       continue;
     }
 
@@ -274,16 +283,16 @@ std::string FrontVehicle::FindPassableObstacle(
         continue;
       }
       if (other_obstacle->PerceptionSLBoundary().start_l() >
-              path_obstacle->PerceptionSLBoundary().end_l() ||
+              obstacle_sl.end_l() ||
           other_obstacle->PerceptionSLBoundary().end_l() <
-              path_obstacle->PerceptionSLBoundary().start_l()) {
+              obstacle_sl.start_l()) {
         // not blocking the backside vehicle
         continue;
       }
 
       double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
-                       path_obstacle->PerceptionSLBoundary().end_s();
-      if (delta_s < 0.0 || delta_s > kAdcDistanceThreshold) {
+          obstacle_sl.end_s();
+      if (delta_s < 0.0 || delta_s > side_pass_s_threshold) {
         continue;
       } else {
         // TODO(All): fixed the segmentation bug for large vehicles, otherwise
@@ -323,8 +332,9 @@ void FrontVehicle::MakeStopDecision(
       continue;
     }
 
-    if (path_obstacle->PerceptionSLBoundary().end_s() <=
-        adc_sl.start_s()) {  // skip backside vehicles
+    const auto& obstacle_sl = path_obstacle->PerceptionSLBoundary();
+    if (obstacle_sl.end_s() <= adc_sl.start_s()) {
+      // skip backside vehicles
       ADEBUG << "obstacle_id[" << obstacle_id
           << "] type[" << obstacle_type_name << "] behind ADC. SKIP";
       continue;
@@ -337,31 +347,30 @@ void FrontVehicle::MakeStopDecision(
       continue;
     }
 
-    const auto& sl = path_obstacle->PerceptionSLBoundary();
     double left_width = 0.0;
     double right_width = 0.0;
-    reference_line.GetLaneWidth(sl.start_s(), &left_width, &right_width);
+    reference_line.GetLaneWidth(obstacle_sl.start_s(),
+                                &left_width, &right_width);
 
-    double left_driving_width =
-        left_width - sl.end_l() - config_.front_vehicle().nudge_l_buffer();
-    double right_driving_width =
-        right_width + sl.start_l() - config_.front_vehicle().nudge_l_buffer();
+    double left_driving_width = left_width - obstacle_sl.end_l() -
+        config_.front_vehicle().nudge_l_buffer();
+    double right_driving_width = right_width + obstacle_sl.start_l() -
+        config_.front_vehicle().nudge_l_buffer();
 
     ADEBUG << "obstacle_id[" << obstacle_id
         << "] type[" << obstacle_type_name
         << "] left_driving_width[" << left_driving_width
         << "] right_driving_width[" << right_driving_width
-        << "] adc_width[" << adc_width
-        << "] left[" << left_width << "] right_width[" << right_width << "]";
+        << "] adc_width[" << adc_width << "]";
 
     // stop if not able to bypass or if obstacle crossed reference line
     if ((left_driving_width < adc_width && right_driving_width < adc_width) ||
-        (sl.start_l() <= 0.0 && sl.end_l() >= 0.0)) {
+        (obstacle_sl.start_l() <= 0.0 && obstacle_sl.end_l() >= 0.0)) {
       ADEBUG << "STOP: obstacle[" << obstacle_id << "]";
+
       // build stop decision
-      const double stop_distance =
-          path_obstacle->MinRadiusStopDistance(vehicle_param);
-      const double stop_s = sl.start_s() - stop_distance;
+      double stop_distance = config_.front_vehicle().stop_distance();
+      const double stop_s = obstacle_sl.start_s() - stop_distance;
       auto stop_point = reference_line.GetReferencePoint(stop_s);
       double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
