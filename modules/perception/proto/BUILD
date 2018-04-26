@@ -90,3 +90,17 @@ proto_library(
         "tracker_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "sequence_type_fuser_config_lib_proto",
+    deps = [
+        ":sequence_type_fuser_config_lib",
+    ],
+)
+
+proto_library(
+    name = "sequence_type_fuser_config_lib",
+    srcs = [
+        "sequence_type_fuser_config.proto",
+    ],
+)

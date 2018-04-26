@@ -22,6 +22,7 @@ cc_library(
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/common",
+        "//modules/perception/proto:sequence_type_fuser_config_lib_proto",
         "@eigen",
     ],
 )
