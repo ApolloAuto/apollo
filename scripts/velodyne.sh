@@ -33,7 +33,7 @@ function start() {
 }
 
 function stop() {
-    pkill -f sensor_velodyne64
+    pkill -SIGKILL -f sensor_velodyne64
 }
 
 # run command_name module_name
