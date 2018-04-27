@@ -369,7 +369,8 @@ void FrontVehicle::MakeStopDecision(
       ADEBUG << "STOP: obstacle[" << obstacle_id << "]";
 
       // build stop decision
-      double stop_distance = config_.front_vehicle().stop_distance();
+      double stop_distance =
+          path_obstacle->MinRadiusStopDistance(vehicle_param);
       const double stop_s = obstacle_sl.start_s() - stop_distance;
       auto stop_point = reference_line.GetReferencePoint(stop_s);
       double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
