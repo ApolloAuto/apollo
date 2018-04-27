@@ -148,6 +148,6 @@ case $1 in
     gen_docker
     ;;
   *)
-    docker exec -u $USER apollo_dev bash -c "./apollo.sh $@"
+    docker exec -u apollo apollo_dev bash -c "./apollo.sh $@"
     ;;
 esac
