@@ -132,13 +132,19 @@ void RelativeMap::RunOnce() {
   AdapterManager::Observe();
 
   MapMsg map_msg;
-  CreateMapFromNavigationLane(&map_msg);
+  {
+    std::lock_guard<std::mutex> lock(navigation_lane_mutex_);
+    CreateMapFromNavigationLane(&map_msg);
+  }
   Publish(&map_msg);
 }
 
 void RelativeMap::OnReceiveNavigationInfo(
     const NavigationInfo& navigation_info) {
-  navigation_lane_.UpdateNavigationInfo(navigation_info);
+  {
+    std::lock_guard<std::mutex> lock(navigation_lane_mutex_);
+    navigation_lane_.UpdateNavigationInfo(navigation_info);
+  }
 }
 
 bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
