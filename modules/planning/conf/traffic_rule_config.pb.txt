@@ -47,7 +47,6 @@ config: {
     side_pass_l_threshold: 1.0
     side_pass_wait_time: 30.0
     nudge_l_buffer: 0.5
-    stop_distance: 6.0
   }
 }
 
