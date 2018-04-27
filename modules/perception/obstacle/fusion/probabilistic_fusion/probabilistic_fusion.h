@@ -97,8 +97,6 @@ class ProbabilisticFusion : public BaseFusion {
   PbfTrackManager *track_manager_ = nullptr;
   std::mutex sensor_data_rw_mutex_;
   std::mutex fusion_mutex_;
-  bool use_radar_ = true;
-  bool use_lidar_ = true;
   bool use_camera_ = true;
 
   probabilistic_fusion_config::ModelConfigs config_;

@@ -45,57 +45,26 @@ bool ProbabilisticFusion::Init() {
   CHECK(GetProtoFromFile(FLAGS_probabilistic_fusion_config_file, &config_));
 
   // matching parameters
-  std::string match_method = config_.match_method();
-  if (match_method == "hm_matcher") {
-    matcher_ = new PbfHmTrackObjectMatcher();
-    if (matcher_->Init()) {
-      AINFO << "Initialize " << matcher_->name() << " successfully!";
-    } else {
-      AERROR << "Failed to initialize " << matcher_->name();
-      return false;
-    }
-  } else {
-    AERROR << "undefined match_method " << match_method
+  if (config_.match_method() != "hm_matcher") {
+    AERROR << "undefined match_method " << config_.match_method()
            << " and use default hm_matcher";
-    matcher_ = new PbfHmTrackObjectMatcher();
-    if (matcher_->Init()) {
-      AINFO << "Initialize " << matcher_->name() << " successfully!";
-    } else {
-      AERROR << "Failed to initialize " << matcher_->name();
-      return false;
-    }
+  }
+  matcher_ = new PbfHmTrackObjectMatcher();
+  if (!matcher_->Init()) {
+    AERROR << "Failed to initialize " << matcher_->name();
+    return false;
   }
 
-  float max_match_distance = config_.max_match_distance();
-  ADEBUG << "Probabilistic_fusion max_match_distance: " << max_match_distance;
-  PbfBaseTrackObjectMatcher::SetMaxMatchDistance(max_match_distance);
+  PbfBaseTrackObjectMatcher::SetMaxMatchDistance(config_.max_match_distance());
 
   // track related parameters
-  float max_lidar_invisible_period = config_.max_lidar_invisible_period();
-  PbfTrack::SetMaxLidarInvisiblePeriod(max_lidar_invisible_period);
-  ADEBUG << "max_lidar_invisible_period: " << max_lidar_invisible_period;
-
-  float max_radar_invisible_period = config_.max_radar_invisible_period();
-  PbfTrack::SetMaxRadarInvisiblePeriod(max_radar_invisible_period);
-  ADEBUG << "max_radar_invisible_period: " << max_radar_invisible_period;
-
-  float max_radar_confident_angle = config_.max_radar_confident_angle();
-  PbfTrack::SetMaxRadarConfidentAngle(max_radar_confident_angle);
-  ADEBUG << "max_radar_confident_angle: " << max_radar_confident_angle;
-
-  float min_radar_confident_distance = config_.min_radar_confident_distance();
-  PbfTrack::SetMinRadarConfidentDistance(min_radar_confident_distance);
-  AINFO << "min_radar_confident_distance: " << min_radar_confident_distance;
-
-  bool publish_if_has_lidar = config_.publish_if_has_lidar();
-  PbfTrack::SetPublishIfHasLidar(publish_if_has_lidar);
-  ADEBUG << "publish_if_has_lidar: "
-         << (publish_if_has_lidar ? "true" : "false");
-
-  bool publish_if_has_radar = config_.publish_if_has_radar();
-  PbfTrack::SetPublishIfHasRadar(publish_if_has_radar);
-  ADEBUG << "publish_if_has_radar: "
-         << (publish_if_has_radar ? "true" : "false");
+  PbfTrack::SetMaxLidarInvisiblePeriod(config_.max_lidar_invisible_period());
+  PbfTrack::SetMaxRadarInvisiblePeriod(config_.max_radar_invisible_period());
+  PbfTrack::SetMaxRadarConfidentAngle(config_.max_radar_confident_angle());
+  PbfTrack::SetMinRadarConfidentDistance(
+      config_.min_radar_confident_distance());
+  PbfTrack::SetPublishIfHasLidar(config_.publish_if_has_lidar());
+  PbfTrack::SetPublishIfHasRadar(config_.publish_if_has_radar());
 
   // publish driven
   publish_sensor_id_ = FLAGS_fusion_publish_sensor_id;
@@ -104,11 +73,6 @@ bool ProbabilisticFusion::Init() {
     AERROR << "Invalid publish_sensor value: " << publish_sensor_id_;
   }
   ADEBUG << "publish_sensor: " << publish_sensor_id_;
-
-  use_radar_ = config_.use_radar();
-  ADEBUG << "use_radar :" << use_radar_;
-  use_lidar_ = config_.use_lidar();
-  ADEBUG << "use_lidar:" << use_lidar_;
 
   ADEBUG << "ProbabilisticFusion initialize successfully";
   return true;
@@ -127,14 +91,14 @@ bool ProbabilisticFusion::Fuse(
     // 1. collect sensor objects data
     for (size_t i = 0; i < multi_sensor_objects.size(); ++i) {
       auto sensor_type = multi_sensor_objects[i].sensor_type;
-      AINFO << "add sensor measurement: " << GetSensorType(sensor_type)
-            << ", obj_cnt : " << multi_sensor_objects[i].objects.size() << ", "
-            << std::fixed << std::setprecision(12)
-            << multi_sensor_objects[i].timestamp;
-      if (is_lidar(sensor_type) && !use_lidar_) {
+      ADEBUG << "add sensor measurement: " << GetSensorType(sensor_type)
+             << ", obj_cnt : " << multi_sensor_objects[i].objects.size() << ", "
+             << std::fixed << std::setprecision(12)
+             << multi_sensor_objects[i].timestamp;
+      if (is_lidar(sensor_type) && !config_.use_lidar()) {
         continue;
       }
-      if (is_radar(sensor_type) && !use_radar_) {
+      if (is_radar(sensor_type) && !config_.use_radar()) {
         continue;
       }
       if (is_camera(sensor_type) && !use_camera_) {
