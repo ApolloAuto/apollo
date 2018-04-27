@@ -19,10 +19,10 @@
 #include <algorithm>
 
 #include "boost/format.hpp"
-
+#include "ros/include/ros/ros.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/macro.h"
-#include "modules/common/time/time_util.h"
+#include "modules/common/time/time.h"
 #include "modules/perception/common/geometry_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -34,6 +34,7 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::time::Clock;
 /*class PbfTrack*/
 int PbfTrack::s_track_idx_ = 0;
 double PbfTrack::s_max_lidar_invisible_period_ = 0.25;
@@ -211,21 +212,16 @@ void PbfTrack::PerformMotionFusionAsync(std::shared_ptr<PbfSensorObject> obj) {
     AERROR << "Skip motion fusion becuase motion_fusion_ is nullptr.";
     return;
   }
-  AINFO << "perform motion fusion asynchrounously!";
+  ADEBUG << "perform motion fusion asynchrounously!";
   const SensorType &sensor_type = obj->sensor_type;
 
-  double current_time = TimeUtil::GetCurrentTime();
-  if (FLAGS_bag_mode) {
-    // if running in bag, we can't estimate fusion arrival time correctly
-    current_time =
-        std::max(motion_fusion_->getLastFuseTS(), obj->timestamp) + 0.1;
-    AINFO << "last fuse ts " << std::fixed << std::setprecision(15)
-          << motion_fusion_->getLastFuseTS();
-    AINFO << "obj timestamp " << std::fixed << std::setprecision(15)
-          << obj->timestamp;
-    AINFO << "current fuse ts is " << std::fixed << std::setprecision(15)
-          << current_time;
-  }
+  double current_time = ros::Time::now().toSec();
+  ADEBUG << "last fuse ts " << std::fixed << std::setprecision(15)
+        << motion_fusion_->getLastFuseTS();
+  ADEBUG << "obj timestamp " << std::fixed << std::setprecision(15)
+        << obj->timestamp;
+  ADEBUG << "current fuse ts is " << std::fixed << std::setprecision(15)
+        << current_time;
 
   // for low cost, we only consider radar and camera fusion for now
   if (is_camera(sensor_type) || is_radar(sensor_type)) {
