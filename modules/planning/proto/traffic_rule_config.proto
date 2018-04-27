@@ -53,7 +53,6 @@ message FrontVehicleConfig {
   optional double side_pass_l_threshold = 3 [ default=1.0 ];  // meter
   optional double side_pass_wait_time = 4 [ default=30.0]; // second
   optional double nudge_l_buffer = 5 [ default=0.5]; // meter
-  optional double stop_distance = 6 [ default=6.0 ]; // meter
 }
 
 message KeepClearConfig {
