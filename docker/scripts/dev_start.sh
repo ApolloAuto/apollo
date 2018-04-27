@@ -76,6 +76,11 @@ fi
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 check_agreement
 
+if [ "${USER}" = "root" ]; then
+    error "Don't run Apollo as root! Please switch to a general user."
+    exit 1
+fi
+
 VOLUME_VERSION="latest"
 DEFAULT_MAPS=(
   sunnyvale_big_loop
@@ -158,9 +163,11 @@ done
 IMG=${DOCKER_REPO}:$VERSION
 
 function local_volumes() {
+    mkdir -p "$HOME/.cache"
+
     # Apollo root and bazel cache dirs are required.
     volumes="-v $APOLLO_ROOT_DIR:/apollo \
-             -v $HOME/.cache:${DOCKER_HOME}/.cache"
+             -v $HOME/.cache:/home/apollo/.cache"
     case "$(uname -s)" in
         Linux)
             volumes="${volumes} -v /dev:/dev \
@@ -206,16 +213,8 @@ function main(){
     setup_device
 
     USER_ID=$(id -u)
-    GRP=$(id -g -n)
     GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
-    DOCKER_HOME="/home/$USER"
-    if [ "$USER" == "root" ];then
-        DOCKER_HOME="/root"
-    fi
-    if [ ! -d "$HOME/.cache" ];then
-        mkdir "$HOME/.cache"
-    fi
 
     LOCALIZATION_VOLUME=apollo_localization_volume
     docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
@@ -241,9 +240,7 @@ function main(){
         --volumes-from ${YOLO3D_VOLUME} \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
-        -e USER=$USER \
         -e DOCKER_USER_ID=$USER_ID \
-        -e DOCKER_GRP=$GRP \
         -e DOCKER_GRP_ID=$GRP_ID \
         -e DOCKER_IMG=$IMG \
         $(local_volumes) \
@@ -261,9 +258,7 @@ function main(){
         exit 1
     fi
 
-    if [ "${USER}" != "root" ]; then
-        docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
-    fi
+    docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"
     ok "Enjoy!"

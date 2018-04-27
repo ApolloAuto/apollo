@@ -17,7 +17,7 @@ before_script:
 script:
     - ./docker/scripts/dev_start.sh
     - ./apollo_docker.sh ${JOB}
-    - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
+    - rm -rf "${HOME}/.cache/bazel/_bazel_apollo/install"
 notifications:
     email:
         on_success: change
