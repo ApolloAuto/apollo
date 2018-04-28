@@ -9,15 +9,15 @@ env:
     - JOB=lint
     - JOB=citest
 cache:
-  directories:
-  - $HOME/.cache/bazel
+    directories:
+        - /home/tmp/bazel_cache
 install: skip
 before_script:
     - cp scripts/AGREEMENT.txt ${HOME}/.apollo_agreement.txt
 script:
     - ./docker/scripts/dev_start.sh
     - ./apollo_docker.sh ${JOB}
-    - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
+    - rm -rf "/home/tmp/bazel_cache/install"
 notifications:
     email:
         on_success: change

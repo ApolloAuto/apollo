@@ -17,8 +17,5 @@
 ###############################################################################
 
 xhost +local:root 1>/dev/null 2>&1
-docker exec \
-    -u $USER \
-    -it apollo_dev \
-    /bin/bash
+docker exec -u apollo -it apollo_dev /bin/bash
 xhost -local:root 1>/dev/null 2>&1
