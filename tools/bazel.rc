@@ -1,7 +1,8 @@
 # +------------------------------------------------------------+
 # | Startup Options                                            |
 # +------------------------------------------------------------+
-startup --batch_cpu_scheduling
+startup --batch_cpu_scheduling \
+        --output_user_root=/home/tmp/bazel_cache
 
 # +------------------------------------------------------------+
 # | Test Configurations                                        |

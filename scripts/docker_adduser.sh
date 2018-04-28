@@ -16,18 +16,32 @@
 # limitations under the License.
 ###############################################################################
 
+USER=apollo
+GROUP=apollo
 
-addgroup --gid "$DOCKER_GRP_ID" "$DOCKER_GRP"
-adduser --disabled-password --force-badname --gecos '' "$DOCKER_USER" \
-    --uid "$DOCKER_USER_ID" --gid "$DOCKER_GRP_ID" 2>/dev/null
-usermod -aG sudo "$DOCKER_USER"
+# TODO(xiaoxq): It's in migration.
+# Currently we support either existing 'apollo' user or adding on the fly. In
+# the near future we'll add 'apollo' user directly in image.
+# In either situation, we set the GROUP ID and USER ID to be the same with the
+# docker user, so all the permissions are consistent.
+getent passwd ${USER} > /dev/null
+if [ $? -eq 0 ]; then
+  # User exists, update its ID.
+  usermod -u ${DOCKER_USER_ID} ${USER}
+  groupmod -g ${DOCKER_GRP_ID} ${GROUP}
+else
+  # Add new user.
+  addgroup --gid "${DOCKER_GRP_ID}" "${GROUP}"
+  adduser --disabled-password --force-badname --gecos '' "${USER}" \
+      --uid "${DOCKER_USER_ID}" --gid "${DOCKER_GRP_ID}" 2>/dev/null
+  usermod -aG sudo "${USER}"
+fi
+
 echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-cp -r /etc/skel/. /home/${DOCKER_USER}
-echo "export PATH=/apollo/scripts:$PATH" >> /home/${DOCKER_USER}/.bashrc
-echo 'if [ -e "/apollo/scripts/apollo_base.sh" ]; then source /apollo/scripts/apollo_base.sh; fi' >> "/home/${DOCKER_USER}/.bashrc"
-echo "ulimit -c unlimited" >> /home/${DOCKER_USER}/.bashrc
-
-chown -R ${DOCKER_USER}:${DOCKER_GRP} "/home/${DOCKER_USER}"
+cp -r /etc/skel/. /home/${USER}
+echo "export PATH=/apollo/scripts:$PATH" >> /home/${USER}/.bashrc
+echo 'if [ -e "/apollo/scripts/apollo_base.sh" ]; then source /apollo/scripts/apollo_base.sh; fi' >> "/home/${USER}/.bashrc"
+echo "ulimit -c unlimited" >> /home/${USER}/.bashrc
 
 # setup GPS device
 if [ -e /dev/novatel0 ]; then
@@ -53,7 +67,7 @@ if [ "$RELEASE_DOCKER" != "1" ];then
   # setup map data
   if [ -e /home/tmp/modules_data ]; then
     cp -r /home/tmp/modules_data/* /apollo/modules/
-    chown -R ${DOCKER_USER}:${DOCKER_GRP} "/apollo/modules"
+    chown -R ${USER}:${GROUP} "/apollo/modules"
   fi
 
   # setup ros package
