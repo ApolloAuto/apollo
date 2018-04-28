@@ -36,7 +36,7 @@ function start() {
 }
 
 function stop() {
-    pkill -SIGKILL -f sensor_velodyne16
+    pkill -SIGTERM -f start_velodyne_16.launch
 }
 
 # run command_name module_name
