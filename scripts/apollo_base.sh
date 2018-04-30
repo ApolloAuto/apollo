@@ -346,16 +346,20 @@ function stop() {
   stop_customized_path $MODULE $MODULE
 }
 
+# Note: This 'help' function here will overwrite the bash builtin command 'help'.
+# TODO: add a command to query known modules.
 function help() {
-  echo "Usage:
-  ./$0 [COMMAND]"
-  echo "COMMAND:
-  help: this help message
-  start: start the module in background
-  start_fe: start the module without putting in background
+cat <<EOF
+Invoke ". scripts/apollo_base.sh" within docker to add the following commands to the environment:
+Usage: COMMAND [<module_name>]
+
+COMMANDS:
+  help:      show this help message
+  start:     start the module in background
+  start_fe:  start the module without putting in background
   start_gdb: start the module with gdb
-  stop: stop the module
-  "
+  stop:      stop the module
+EOF
 }
 
 function run_customized_path() {
