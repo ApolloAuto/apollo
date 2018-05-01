@@ -118,3 +118,17 @@ proto_library(
         "async_fusion_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "geometry_camera_converter_config_lib_proto",
+    deps = [
+        ":geometry_camera_converter_config_lib",
+    ],
+)
+
+proto_library(
+    name = "geometry_camera_converter_config_lib",
+    srcs = [
+        "geometry_camera_converter_config.proto",
+    ],
+)

@@ -165,3 +165,7 @@ DEFINE_string(sequence_type_fuser_config,
 DEFINE_string(async_fusion_config,
               "modules/perception/model/async_fusion_config.pb.txt",
               "async_fuser config filename.");
+DEFINE_string(
+    geometry_camera_converter_config,
+    "modules/perception/model/geometry_camera_converter_config.pb.txt",
+    "geometry_camera_converter config filename.");
