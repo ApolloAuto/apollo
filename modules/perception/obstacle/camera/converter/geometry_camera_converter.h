@@ -30,8 +30,9 @@
 #include "opencv2/opencv.hpp"
 #include "yaml-cpp/yaml.h"
 
+#include "modules/perception/proto/geometry_camera_converter_config.pb.h"
+
 #include "modules/common/log.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
@@ -99,6 +100,8 @@ class GeometryCameraConverter : public BaseCameraConverter {
   std::vector<Eigen::Vector2f> pixel_corners_;
   static const int kMaxDistanceSearchDepth_ = 10;
   static const int kMaxCenterDirectionSearchDepth_ = 5;
+
+  geometry_camera_converter_config::ModelConfigs config_;
 
   DISALLOW_COPY_AND_ASSIGN(GeometryCameraConverter);
 };
