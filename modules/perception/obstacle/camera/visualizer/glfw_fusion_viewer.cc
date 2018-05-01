@@ -1035,11 +1035,16 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
       auto& lane_history_pos = lane_history_->at(k).pos;
       // update lane history by projecting motion
       for (auto& p : lane_history_pos) {
-        Eigen::Vector3f point_h;
-        point_h << p[0], p[1], 1;
-        point_h = motion_matrix_ * point_h;
-        p[0] = point_h[0];
-        p[1] = point_h[1];
+        Eigen::VectorXf point_h =
+          Eigen::VectorXf::Zero(motion_matrix_.cols());
+        point_h[0] = p[0];
+        point_h[1] = p[1];
+        point_h[motion_matrix_.cols()-1] = 1.0;
+
+        Eigen::Vector2f proj_h;
+        project_point(point_h, &proj_h, motion_matrix_);
+        p[0] = proj_h[0];
+        p[1] = proj_h[1];
       }
       // add new point
       for (auto p = lane_objects_->at(k).pos.begin();
@@ -1864,15 +1869,28 @@ void GLFWFusionViewer::drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
   glEnd();
 }
 
+void GLFWFusionViewer::project_point(const Eigen::VectorXf &in,
+                                    Eigen::Vector2f *out,
+                                    const MotionType &motion_matrix) {
+  CHECK(in.rows() == motion_matrix.cols());
+  CHECK_GT(in.rows(), 2);
+  Eigen::VectorXf proj = motion_matrix * in;
+  *out << proj[0], proj[1];
+}
+
 void GLFWFusionViewer::draw_car_trajectory(FrameContent* content) {
   const MotionBuffer& motion_buffer = content->get_motion_buffer();
-  Eigen::Vector3f center;
-  center << 0, 0, 1.0;
+  Eigen::VectorXf center;
+  if (motion_buffer.size() > 0) {
+    center = Eigen::VectorXf::Zero(motion_buffer[0].motion.cols());
+    center[motion_buffer[0].motion.cols()-1] = 1.0;
+  }
 
-  Eigen::Vector3f point = center;
   for (int i = motion_buffer.size() - 1; i >= 0; i--) {
-    Eigen::Matrix3f tmp = motion_buffer[i].motion;
-    point = tmp * center;
+    //  Eigen::Matrix3f tmp = motion_buffer[i].motion;
+    //  point = tmp * center;
+    Eigen::Vector2f point;
+    project_point(center, &point,  motion_buffer[i].motion);
     drawHollowCircle(point(0), point(1), 0.2);
     glFlush();
   }
@@ -1915,16 +1933,21 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
             break;
           }
 
-          Eigen::Vector3f pt, proj_pt;
-          pt << trackjectory.second[it].first, trackjectory.second[it].second,
-              1.0;
+          Eigen::VectorXf pt =
+            Eigen::VectorXf::Zero(motion_buffer[0].motion.cols());
+          pt[0] = trackjectory.second[it].first;
+          pt[1] = trackjectory.second[it].second;
+          pt[motion_buffer[0].motion.cols()-1] = 1.0;
+
           if (it == trackjectory.second.size() - 1) {
-            proj_pt = pt;
+            glVertex2f(pt[0], pt[1]);
           } else {
-            auto& motion_mat = motion_buffer[motion_size - count].motion;
-            proj_pt = motion_mat * pt;
+            Eigen::Vector2f proj_pt;
+            project_point(pt,
+                          &proj_pt,
+                          motion_buffer[motion_size - count].motion);
+            glVertex2f(proj_pt[0], proj_pt[1]);
           }
-          glVertex2f(proj_pt[0], proj_pt[1]);
         }
         glEnd();
         glLineWidth(1);
