@@ -210,13 +210,17 @@ VelodyneParser *VelodyneParserFactory::create_parser(Config config) {
   if (config.model == "VLP16") {
     config.calibration_online = false;
     return new Velodyne16Parser(config);
+  } else if (config.model == "HDL32E") {
+    config.calibration_online = false;
+    return new Velodyne32Parser(config);
   } else if (config.model == "64E_S2" || config.model == "64E_S3S" ||
              config.model == "64E_S3D_STRONGEST" ||
              config.model == "64E_S3D_LAST" || config.model == "64E_S3D_DUAL") {
     return new Velodyne64Parser(config);
   } else {
-    ROS_ERROR_STREAM("invalid model, must be 64E_S2|64E_S3S"
-                     << "|64E_S3D_STRONGEST|64E_S3D_LAST|64E_S3D_DUAL");
+    ROS_ERROR_STREAM(
+        "invalid model, must be 64E_S2|64E_S3S"
+        << "|64E_S3D_STRONGEST|64E_S3D_LAST|64E_S3D_DUAL|HDL32E|VLP16");
     return nullptr;
   }
 }

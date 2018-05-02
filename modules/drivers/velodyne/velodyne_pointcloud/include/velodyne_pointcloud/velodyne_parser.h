@@ -211,12 +211,8 @@ class VelodyneParser {
   // order point cloud fod IDL by velodyne model
   virtual void order(VPointCloud::Ptr &cloud) = 0;
 
-  const Calibration &get_calibration() {
-    return calibration_;
-  }
-  const double get_last_timestamp() {
-    return last_time_stamp_;
-  }
+  const Calibration &get_calibration() { return calibration_; }
+  const double get_last_timestamp() { return last_time_stamp_; }
 
  protected:
   const float (*inner_time_)[12][32];
@@ -288,6 +284,26 @@ class Velodyne64Parser : public VelodyneParser {
   OnlineCalibration online_calibration_;
 
 };  // class Velodyne64Parser
+
+class Velodyne32Parser : public VelodyneParser {
+ public:
+  Velodyne32Parser(Config config);
+  ~Velodyne32Parser() {}
+
+  void generate_pointcloud(
+      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      VPointCloud::Ptr &out_msg);
+  void order(VPointCloud::Ptr &cloud);
+
+ private:
+  double get_timestamp(double base_time, float time_offset,
+                       uint16_t laser_block_id);
+  void unpack(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
+  // Previous Velodyne packet time stamp. (offset to the top hour)
+  double previous_packet_stamp_;
+  uint64_t gps_base_usec_;  // full time
+
+};  // class Velodyne32Parser
 
 class Velodyne16Parser : public VelodyneParser {
  public:
