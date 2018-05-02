@@ -123,11 +123,14 @@ VelodyneDriver* VelodyneDriverFactory::create_driver(
       config.model == "64E_S3D_STRONGEST" || config.model == "64E_S3D_LAST" ||
       config.model == "64E_S3D_DUAL") {
     return new Velodyne64Driver(config);
+  } else if (config.model == "HDL32E") {
+    return new Velodyne32Driver(config);
   } else if (config.model == "VLP16") {
     return new Velodyne16Driver(config);
   } else {
-    ROS_ERROR_STREAM("invalid model, must be 64E_S2|64E_S3S"
-                     << "|64E_S3D_STRONGEST|64E_S3D_LAST|64E_S3D_DUAL|VLP16");
+    ROS_ERROR_STREAM(
+        "invalid model, must be 64E_S2|64E_S3S"
+        << "|64E_S3D_STRONGEST|64E_S3D_LAST|64E_S3D_DUAL|VLP16|HDL32E");
     return nullptr;
   }
 }
