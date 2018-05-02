@@ -242,8 +242,8 @@ Status LanePostProcessingSubnode::ProcEvents() {
     if (motion_timestamp > event.timestamp) {
       if (!motion_service_->GetMotionInformation(
           event.timestamp, &(options_.vehicle_status))) {
-        AERROR << "cannot find desired motion in motion buffer at: "
-               << std::to_string(event.timestamp);
+        AWARN << "cannot find desired motion in motion buffer at: "
+              << std::to_string(event.timestamp);
         options_.vehicle_status.time_ts = 0.0;  // signal to reset history
         // return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
       }

@@ -137,6 +137,9 @@ class GLFWFusionViewer {
 
   void render();
 
+  void project_point(const Eigen::VectorXf &in, Eigen::Vector2f *out,
+      const MotionType &motion_matrix);
+
  protected:
   vec3 get_velocity_src_position(const std::shared_ptr<Object> &object);
 
@@ -313,7 +316,7 @@ class GLFWFusionViewer {
   //  std::vector<LaneObjects> Lane_history_buffer_;
   const std::size_t lane_history_buffer_size_ = 400;
   const std::size_t object_history_size_ = 5;
-  Eigen::Matrix3f motion_matrix_;
+  MotionType motion_matrix_;
   // pin-hole camera model with distortion
   std::shared_ptr<CameraDistort<double>> distort_camera_intrinsic_;
 
