@@ -194,7 +194,23 @@ bool NavigationLane::UpdateProjectionIndex(const common::Path &path) {
   // currently, only 1 navigation path is supported
   int index = 0;
   double min_d = std::numeric_limits<double>::max();
-  for (int i = last_project_index_; i + 1 < path.path_point_size(); ++i) {
+  const int path_size = path.path_point_size();
+
+  // I create a condition here that sets the "last_project_index_" to 0,
+  // should the vehicle reach the end point of a cyclic/circular route. For
+  // cyclic/circular navigation lines where the distance between their starting
+  // and end points are very small, it is tedious and unnecessary to re-send
+  // navigation lines every time.
+  if (last_project_index_ == path_size - 2) {
+    const double d =
+        DistanceXY(original_pose_.position(), path.path_point(0));
+    if (d < FLAGS_max_distance_to_navigation_line) {
+      last_project_index_ = 0;
+      return true;
+    }
+  }
+
+  for (int i = last_project_index_; i + 1 < path_size; ++i) {
     const double d = DistanceXY(original_pose_.position(), path.path_point(i));
     if (d < min_d) {
       min_d = d;
