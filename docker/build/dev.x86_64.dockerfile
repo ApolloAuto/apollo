@@ -55,3 +55,5 @@ RUN apt-get install -y \
    v4l-utils \
    nfs-common \
    zip
+
+USER apollo
