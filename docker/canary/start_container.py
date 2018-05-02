@@ -67,12 +67,12 @@ class DockerHelper(object):
         return (ret == 0)
 
     def run(self, container, image, options='', entrypoint=''):
-        """Equals `docker run -d --name <container> <image>`"""
+        """Equals `docker run -it -d --name <container> <image>`"""
         # Stop existing container.
         cmd = 'docker rm -f "{}"'.format(container)
         DockerHelper.shell_cmd(cmd, False)
 
-        cmd = 'docker run -d {} --name "{}" "{}" {}'.format(
+        cmd = 'docker run -it -d {} --name "{}" "{}" {}'.format(
             options, container, image, entrypoint)
         ret, _, _ = DockerHelper.shell_cmd(cmd)
         return (ret == 0)
@@ -131,8 +131,6 @@ class DockerContainer(object):
         }
 
         self.other_options = [
-            '--name apollo_dev',
-            '-it',
             '--privileged',
             '--net host',
             '-w /apollo',
@@ -193,7 +191,28 @@ class DockerContainer(object):
             if not docker_helper.run(container, image):
                 return
 
-        print('TODO(xiaoxq): Looks good. Now bring up the main container.')
+        # Construct options and start container.
+        docker_volumes_option = ' '.join(
+            ['--volumes-from "{}"'.format(key)
+                for key in self.docker_volumes.keys()])
+        local_volumes_option = ' '.join(
+            ['-v "{}":"{}"'.format(key, val)
+                for key, val in self.local_volumes.items()])
+        env_vars_option = ' '.join(
+            ['-e "{}"="{}"'.format(key, val)
+                for key, val in self.env_vars.items()])
+        options = ' '.join([
+            docker_volumes_option,
+            local_volumes_option,
+            env_vars_option,
+            ' '.join(self.other_options),
+        ])
+        if docker_helper.run('apollo_dev', self.env_vars['DOCKER_IMG'], options,
+                             '/apollo/docker/canary/setup_container.sh'):
+            print('The container has been brought up, now you can run:')
+            print('  {}/docker/canary/dev_into.sh'.format(APOLLO_ROOT))
+            print('to play with it. Enjoy!')
+
 
 def main():
     """Main entry."""
