@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,31 +40,25 @@ fi
 sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-
 }
 
 function install_docker_x86() {
   sudo add-apt-repository \
-     "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-     $(lsb_release -cs) \
-     stable"
+     "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   sudo apt-get update
   sudo apt-get install -y docker-ce
   sudo groupadd docker
   sudo gpasswd -a $USER docker
   newgrp docker
-
 }
 
 function install_docker_arm() {
-
   sudo bash -c 'echo "deb [arch=arm64] https://download.docker.com/linux/ubuntu xenial edge" > /etc/apt/sources.list.d/docker.list'
   sudo apt-get update
   sudo apt-get install -y docker-ce
   sudo groupadd docker
   sudo gpasswd -a $USER docker
   newgrp docker
-  
 }
 
 function install() {
@@ -82,7 +76,7 @@ fi
 }
 
 case $1 in
-　　　install)
+　　install)
       install
       ;;
    uninstall)
@@ -93,7 +87,3 @@ case $1 in
       install
       ;;
 esac
-   
-
-
-    
