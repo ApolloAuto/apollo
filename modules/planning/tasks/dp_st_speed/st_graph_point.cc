@@ -33,11 +33,11 @@ const STPoint& StGraphPoint::point() const { return point_; }
 
 const StGraphPoint* StGraphPoint::pre_point() const { return pre_point_; }
 
-double StGraphPoint::reference_cost() const { return reference_cost_; }
+float StGraphPoint::reference_cost() const { return reference_cost_; }
 
-double StGraphPoint::obstacle_cost() const { return obstacle_cost_; }
+float StGraphPoint::obstacle_cost() const { return obstacle_cost_; }
 
-double StGraphPoint::total_cost() const { return total_cost_; }
+float StGraphPoint::total_cost() const { return total_cost_; }
 
 void StGraphPoint::Init(const std::uint32_t index_t,
                         const std::uint32_t index_s, const STPoint& st_point) {
@@ -46,15 +46,15 @@ void StGraphPoint::Init(const std::uint32_t index_t,
   point_ = st_point;
 }
 
-void StGraphPoint::SetReferenceCost(const double reference_cost) {
+void StGraphPoint::SetReferenceCost(const float reference_cost) {
   reference_cost_ = reference_cost;
 }
 
-void StGraphPoint::SetObstacleCost(const double obs_cost) {
+void StGraphPoint::SetObstacleCost(const float obs_cost) {
   obstacle_cost_ = obs_cost;
 }
 
-void StGraphPoint::SetTotalCost(const double total_cost) {
+void StGraphPoint::SetTotalCost(const float total_cost) {
   total_cost_ = total_cost;
 }
 

@@ -48,31 +48,31 @@ class TrajectoryCost {
                           const SpeedData &heuristic_speed_data,
                           const common::SLPoint &init_sl_point);
   ComparableCost Calculate(const QuinticPolynomialCurve1d &curve,
-                           const double start_s, const double end_s,
+                           const float start_s, const float end_s,
                            const uint32_t curr_level,
                            const uint32_t total_level);
 
  private:
   ComparableCost CalculatePathCost(const QuinticPolynomialCurve1d &curve,
-                                   const double start_s, const double end_s,
+                                   const float start_s, const float end_s,
                                    const uint32_t curr_level,
                                    const uint32_t total_level);
   ComparableCost CalculateStaticObstacleCost(
-      const QuinticPolynomialCurve1d &curve, const double start_s,
-      const double end_s);
+      const QuinticPolynomialCurve1d &curve, const float start_s,
+      const float end_s);
   ComparableCost CalculateDynamicObstacleCost(
-      const QuinticPolynomialCurve1d &curve, const double start_s,
-      const double end_s) const;
+      const QuinticPolynomialCurve1d &curve, const float start_s,
+      const float end_s) const;
   ComparableCost GetCostBetweenObsBoxes(
       const common::math::Box2d &ego_box,
       const common::math::Box2d &obstacle_box) const;
 
   FRIEND_TEST(AllTrajectoryTests, GetCostFromObsSL);
-  ComparableCost GetCostFromObsSL(const double adc_s, const double adc_l,
+  ComparableCost GetCostFromObsSL(const float adc_s, const float adc_l,
                                   const SLBoundary &obs_sl_boundary);
 
   common::math::Box2d GetBoxFromSLPoint(const common::SLPoint &sl,
-                                        const double dl) const;
+                                        const float dl) const;
 
   const DpPolyPathConfig config_;
   const ReferenceLine *reference_line_ = nullptr;
@@ -82,7 +82,7 @@ class TrajectoryCost {
   const common::SLPoint init_sl_point_;
   uint32_t num_of_time_stamps_ = 0;
   std::vector<std::vector<common::math::Box2d>> dynamic_obstacle_boxes_;
-  std::vector<double> obstacle_probabilities_;
+  std::vector<float> obstacle_probabilities_;
 
   std::vector<SLBoundary> static_obstacle_sl_boundaries_;
 };
