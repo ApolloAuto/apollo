@@ -23,8 +23,8 @@ namespace planning {
 
 TEST(ComparableCost, simple) {
   ComparableCost cc;
-  EXPECT_DOUBLE_EQ(cc.safety_cost, 0.0);
-  EXPECT_DOUBLE_EQ(cc.smoothness_cost, 0.0);
+  EXPECT_FLOAT_EQ(cc.safety_cost, 0.0);
+  EXPECT_FLOAT_EQ(cc.smoothness_cost, 0.0);
   EXPECT_FALSE(cc.cost_items[ComparableCost::HAS_COLLISION]);
   EXPECT_FALSE(cc.cost_items[ComparableCost::OUT_OF_BOUNDARY]);
   EXPECT_FALSE(cc.cost_items[ComparableCost::OUT_OF_LANE]);
@@ -39,8 +39,8 @@ TEST(ComparableCost, add_cost) {
   EXPECT_TRUE(cc.cost_items[ComparableCost::HAS_COLLISION]);
   EXPECT_FALSE(cc.cost_items[ComparableCost::OUT_OF_BOUNDARY]);
   EXPECT_TRUE(cc.cost_items[ComparableCost::OUT_OF_LANE]);
-  EXPECT_DOUBLE_EQ(cc.safety_cost, 16.22);
-  EXPECT_DOUBLE_EQ(cc.smoothness_cost, 5.96);
+  EXPECT_FLOAT_EQ(cc.safety_cost, 16.22);
+  EXPECT_FLOAT_EQ(cc.smoothness_cost, 5.96);
 
   EXPECT_TRUE(cc1 > cc2);
 
@@ -49,8 +49,8 @@ TEST(ComparableCost, add_cost) {
   EXPECT_TRUE(cc1.cost_items[ComparableCost::HAS_COLLISION]);
   EXPECT_FALSE(cc1.cost_items[ComparableCost::OUT_OF_BOUNDARY]);
   EXPECT_TRUE(cc1.cost_items[ComparableCost::OUT_OF_LANE]);
-  EXPECT_DOUBLE_EQ(cc1.safety_cost, 16.22);
-  EXPECT_DOUBLE_EQ(cc1.smoothness_cost, 5.96);
+  EXPECT_FLOAT_EQ(cc1.safety_cost, 16.22);
+  EXPECT_FLOAT_EQ(cc1.smoothness_cost, 5.96);
 
   ComparableCost cc3(true, false, false, 10.12, 2.51);
   ComparableCost cc4(false, true, true, 6.1, 3.45);
@@ -67,10 +67,32 @@ TEST(ComparableCost, add_cost) {
   EXPECT_FALSE(cc7.cost_items[ComparableCost::HAS_COLLISION]);
   EXPECT_TRUE(cc7.cost_items[ComparableCost::OUT_OF_BOUNDARY]);
   EXPECT_TRUE(cc7.cost_items[ComparableCost::OUT_OF_LANE]);
-  EXPECT_DOUBLE_EQ(cc7.safety_cost, 16.22);
-  EXPECT_DOUBLE_EQ(cc7.smoothness_cost, 5.96);
+  EXPECT_FLOAT_EQ(cc7.safety_cost, 16.22);
+  EXPECT_FLOAT_EQ(cc7.smoothness_cost, 5.96);
 
   EXPECT_TRUE(cc5 < cc6);
+}
+
+TEST(ComparableCost, compare_to) {
+  ComparableCost cc1(true, false, false, 10.12, 2.51);
+  ComparableCost cc2(false, false, true, 6.1, 3.45);
+  EXPECT_TRUE(cc1 > cc2);
+
+  ComparableCost cc3(false, true, false, 10.12, 2.51);
+  ComparableCost cc4(false, false, false, 6.1, 3.45);
+  EXPECT_TRUE(cc3 > cc4);
+
+  ComparableCost cc5(false, false, true, 10.12, 2.51);
+  ComparableCost cc6(false, false, false, 6.1, 3.45);
+  EXPECT_TRUE(cc5 > cc6);
+
+  ComparableCost cc7(false, false, false, 10.12, 2.51);
+  ComparableCost cc8(false, false, false, 6.1, 3.45);
+  EXPECT_TRUE(cc7 > cc8);
+
+  ComparableCost cc9(false, false, false, 0.12, 2.51);
+  ComparableCost cc10(false, false, false, 6.1, 3.45);
+  EXPECT_TRUE(cc9 < cc10);
 }
 
 }  // namespace planning
