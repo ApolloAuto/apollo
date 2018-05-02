@@ -82,7 +82,9 @@ void MotionService::OnLocalization(
   double vely = velocity.y();
   double velz = velocity.z();
   vehicle_status.velocity = sqrt(velx * velx + vely * vely + velz * velz);
-
+  vehicle_status.velocity_x = velx;
+  vehicle_status.velocity_y = vely;
+  vehicle_status.velocity_z = velz;
   double timestamp_diff = 0;
   if (!start_flag_) {
     start_flag_ = true;
@@ -92,6 +94,8 @@ void MotionService::OnLocalization(
     vehicle_status.time_ts = 0;
 
   } else {
+    vehicle_status.roll_rate = localization.pose().angular_velocity_vrf().x();
+    vehicle_status.pitch_rate = localization.pose().angular_velocity_vrf().y();
     vehicle_status.yaw_rate = localization.pose().angular_velocity_vrf().z();
     timestamp_diff = localization.measurement_time() - pre_timestamp_;
     vehicle_status.time_d = timestamp_diff;

@@ -45,8 +45,9 @@ class PlaneMotion {
   int buffer_size_;
   int time_increment_;     // the time increment units in motion input
   float time_difference_;  // the time difference for each buffer input
-  Eigen::Matrix3f mat_motion_2d_image_ = Eigen::Matrix3f::Identity();
+  MotionType mat_motion_sensor_ = MotionType::Identity();
   // motion matrix of accumulation through high sampling CAN+IMU input sequence
+  bool is_3d_motion_;
   void generate_motion_matrix(
       VehicleStatus *vehicledata);  // generate inverse motion
   void accumulate_motion(double start_time, double end_time);
@@ -60,7 +61,7 @@ class PlaneMotion {
       mot_buffer_ = nullptr;
     }
 
-    mat_motion_2d_image_ = Eigen::Matrix3f::Identity();
+    mat_motion_sensor_ = MotionType::Identity();
   }
 
   void set_buffer_size(int s) {
@@ -86,6 +87,7 @@ class PlaneMotion {
 
   MotionBufferPtr get_buffer() { return mot_buffer_; }
   bool find_motion_with_timestamp(double timestamp, VehicleStatus *vs);
+  bool is_3d_motion() const { return is_3d_motion_;}
 };
 
 }  // namespace perception
