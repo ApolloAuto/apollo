@@ -27,6 +27,19 @@ import sys
 APOLLO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 
 
+def shell_cmd(cmd, alert_on_failure=True):
+    """Execute shell command and return (ret-code, stdout, stderr)."""
+    print('SHELL > {}'.format(cmd))
+    proc = subprocess.Popen(cmd, shell=True, close_fds=True,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ret = proc.wait()
+    stdout = proc.stdout.read() if proc.stdout else None
+    stderr = proc.stderr.read() if proc.stderr else None
+    if alert_on_failure and stderr and ret != 0:
+        sys.stderr.write('{}\n'.format(stderr))
+    return (ret, stdout, stderr)
+
+
 class ArgManager(object):
     """Arguments manager."""
 
@@ -43,6 +56,11 @@ class ArgManager(object):
         self.parser.add_argument('-l', '--local_image', default=False,
                                  action="store_true",
                                  help='Whether to use local image.')
+        self.parser.add_argument('--map', action='append',
+                                 help='Optional maps. Make sure it is '
+                                 'available as docker volume image at '
+                                 '<REPO>:map_volume-<MAP>-latest.')
+
         self._args = None
 
     def args(self):
@@ -63,32 +81,20 @@ class DockerHelper(object):
         cmd = 'docker pull {}{}'.format(
             'registry.docker-cn.com/' if self.args.china_mirror else '',
             image)
-        ret, _, _ = DockerHelper.shell_cmd(cmd)
+        ret, _, _ = shell_cmd(cmd)
         return (ret == 0)
 
     def run(self, container, image, options='', entrypoint=''):
         """Equals `docker run -it -d --name <container> <image>`"""
         # Stop existing container.
         cmd = 'docker rm -f "{}"'.format(container)
-        DockerHelper.shell_cmd(cmd, False)
+        shell_cmd(cmd, False)
 
         cmd = 'docker run -it -d {} --name "{}" "{}" {}'.format(
             options, container, image, entrypoint)
-        ret, _, _ = DockerHelper.shell_cmd(cmd)
+        ret, _, _ = shell_cmd(cmd)
         return (ret == 0)
 
-    @staticmethod
-    def shell_cmd(cmd, alert_on_failure=True):
-        """Execute shell command and return (ret-code, stdout, stderr)."""
-        print('SHELL > {}'.format(cmd))
-        proc = subprocess.Popen(cmd, shell=True, close_fds=True,
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        ret = proc.wait()
-        stdout = proc.stdout.read() if proc.stdout else None
-        stderr = proc.stderr.read() if proc.stderr else None
-        if alert_on_failure and stderr and ret != 0:
-            sys.stderr.write('{}\n'.format(stderr))
-        return (ret, stdout, stderr)
 
 class DockerContainer(object):
     """Setup a docker container for development."""
@@ -103,9 +109,12 @@ class DockerContainer(object):
             'apollo_yolo3d_volume':
                 '{}:yolo3d_volume-x86_64-latest'.format(args.repo),
         }
-        # Required map volumes.
+        # Required and optional map volumes.
         self.add_map_volume(args.repo, 'sunnyvale_big_loop')
         self.add_map_volume(args.repo, 'sunnyvale_loop')
+        if args.map:
+            for optional_map in args.map:
+                self.add_map_volume(args.repo, optional_map)
 
         # Local volumes to be passed as '-v KEY:VALUE' to container.
         self.local_volumes = {
@@ -173,22 +182,22 @@ class DockerContainer(object):
     def run(self):
         """Run container."""
         if not self.check_env():
-            return
+            return False
 
         docker_helper = DockerHelper(self.args)
 
         # If --local_image is not set, try pulling all required images first.
         if not self.args.local_image:
             if not docker_helper.pull(self.env_vars['DOCKER_IMG']):
-                return
+                return False
             for volume_image in self.docker_volumes.values():
                 if not docker_helper.pull(volume_image):
-                    return
+                    return False
 
         # Start docker volumes.
         for container, image in self.docker_volumes.items():
             if not docker_helper.run(container, image):
-                return
+                return False
 
         # Construct options and start container.
         docker_volumes_option = ' '.join(
@@ -206,11 +215,15 @@ class DockerContainer(object):
             env_vars_option,
             ' '.join(self.other_options),
         ])
-        if docker_helper.run('apollo_dev', self.env_vars['DOCKER_IMG'], options,
-                             '/apollo/docker/canary/setup_container.sh'):
+
+        success = docker_helper.run(
+            'apollo_dev', self.env_vars['DOCKER_IMG'], options,
+            '/apollo/docker/canary/setup_container.sh')
+        if success:
             print('The container has been brought up, now you can run:')
             print('  {}/docker/canary/dev_into.sh'.format(APOLLO_ROOT))
             print('to play with it. Enjoy!')
+        return success
 
 
 def main():
