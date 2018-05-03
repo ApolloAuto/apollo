@@ -133,7 +133,6 @@ class DockerContainer(object):
         self.other_options = [
             '--privileged',
             '--net host',
-            '-w /apollo',
             '--add-host in_dev_docker:127.0.0.1',
             '--hostname in_dev_docker',
             '--shm-size 2G',
