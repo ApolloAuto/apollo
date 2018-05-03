@@ -56,4 +56,5 @@ RUN apt-get install -y \
    nfs-common \
    zip
 
+WORKDIR /apollo
 USER apollo
