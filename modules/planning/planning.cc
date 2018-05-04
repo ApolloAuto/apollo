@@ -141,7 +141,11 @@ bool Planning::IsVehicleStateValid(const VehicleState& vehicle_state) {
 Status Planning::Start() {
   timer_ = AdapterManager::CreateTimer(
       ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
-  reference_line_provider_->Start();
+  // The "reference_line_provider_" may not be created yet in navigation mode.
+  // It is necessary to check its existence.
+  if (reference_line_provider_) {
+    reference_line_provider_->Start();
+  }
   start_time_ = Clock::NowInSeconds();
   AINFO << "Planning started";
   return Status::OK();
