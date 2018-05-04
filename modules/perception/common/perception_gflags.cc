@@ -167,5 +167,5 @@ DEFINE_string(async_fusion_config,
               "async_fuser config filename.");
 DEFINE_string(
     geometry_camera_converter_config,
-    "modules/perception/model/geometry_camera_converter_config.pb.txt",
+    "modules/perception/model/camera/geometry_camera_converter_config.pb.txt",
     "geometry_camera_converter config filename.");
