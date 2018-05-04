@@ -38,8 +38,11 @@ function start() {
     supervisorctl start monitor > /dev/null
     # Start dreamview.
     bash scripts/voice_detector.sh start
-    supervisorctl start dreamview > /dev/null
-    echo "Dreamview is running at http://localhost:8888"
+    supervisorctl start dreamview
+    supervisorctl status dreamview | grep RUNNING > /dev/null
+    if [ $? == 0 ]; then
+        echo "Dreamview is running at http://localhost:8888"
+    fi
 }
 
 function stop() {
