@@ -19,4 +19,20 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "geometry_camera_converter_test",
+    size = "small",
+    srcs = [
+        "geometry_camera_converter_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+        "//modules/perception:perception_model",
+    ],
+    deps = [
+        "converter",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
