@@ -39,6 +39,8 @@ message HardwareStatus {
     UNDEF = -1;
   }
   optional Status status = 3 [default = UNDEF];
+  optional string detailed_msg = 6;
+
   optional double gps_unstable_start_time = 4;
 
   optional TopicStatus topic_status = 5;
