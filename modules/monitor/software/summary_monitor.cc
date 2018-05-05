@@ -18,6 +18,7 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/common/util/map_util.h"
 #include "modules/common/util/string_util.h"
 #include "modules/monitor/common/monitor_manager.h"
 
@@ -81,9 +82,14 @@ void SummaryCleaner::RunOnce(const double current_time) {
     module.second.set_summary(Summary::UNKNOWN);
     module.second.clear_msg();
   }
+
+  // Some components will update messages by themselves, don't clear in cleaner.
+  static const std::unordered_set<std::string> kKeepMsg({"GPS", "CAN"});
   for (auto &hardware : *MonitorManager::GetStatus()->mutable_hardware()) {
     hardware.second.set_summary(Summary::UNKNOWN);
-    hardware.second.clear_msg();
+    if (!apollo::common::util::ContainsKey(kKeepMsg, hardware.first)) {
+      hardware.second.clear_msg();
+    }
   }
 }
 
