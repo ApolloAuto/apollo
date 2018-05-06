@@ -8,6 +8,25 @@
    sudo bash ./docker/canary/setup_host.sh
    ```
 
+1. If you are going to use GPU (recommended), you need to install
+   [nvidia-driver](http://www.nvidia.com/Download/index.aspx) and
+   [nvidia-docker](https://github.com/NVIDIA/nvidia-docker/blob/master/README.md#quickstart)
+   on HOST.
+
+   Nvidia-driver provides access to GPU from HOST, which will make the following
+   command work properly:
+
+   ```bash
+   nvidia-smi
+   ```
+
+   Nvidia-docker provides access to GPU from docker container, which will make
+   the following command work properly:
+
+   ```bash
+   docker run --runtime=nvidia --rm nvidia/cuda nvidia-smi
+   ```
+
 1. Start Apollo dev container.
 
    ```bash
