@@ -60,6 +60,11 @@ class ArgManager(object):
                                  help='Optional maps. Make sure it is '
                                  'available as docker volume image at '
                                  '<REPO>:map_volume-<MAP>-latest.')
+        self.parser.add_argument('--without_gpu', default=False,
+                                 action="store_true",
+                                 help='Whether to use GPU. Note that without '
+                                 'GPU, it might be not efficient enough for '
+                                 'road testing.')
 
         self._args = None
 
@@ -146,6 +151,8 @@ class DockerContainer(object):
             '--hostname in_dev_docker',
             '--shm-size 2G',
         ]
+        if not args.without_gpu:
+            self.other_options.append('--runtime nvidia')
 
     def add_map_volume(self, repo, map_name, version='latest'):
         """Add map volume to apollo container."""
