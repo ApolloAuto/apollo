@@ -32,7 +32,6 @@ RUN bash /tmp/installers/post_install.sh
 RUN apt-get install -y \
    bc \
    cppcheck \
-   cuda \
    debconf-utils \
    doxygen \
    graphviz \

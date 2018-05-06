@@ -23,6 +23,7 @@ USER_NAME=apollo
 
 adduser --disabled-password --gecos '' ${USER_NAME}
 usermod -aG sudo ${USER_NAME}
+echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 echo """
 ulimit -c unlimited
