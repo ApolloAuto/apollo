@@ -132,3 +132,17 @@ proto_library(
         "geometry_camera_converter_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "cnn_segmentation_config_lib_proto",
+    deps = [
+        ":cnn_segmentation_config_lib",
+    ],
+)
+
+proto_library(
+    name = "cnn_segmentation_config_lib",
+    srcs = [
+        "cnn_segmentation_config.proto",
+    ],
+)

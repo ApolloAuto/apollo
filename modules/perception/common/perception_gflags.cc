@@ -169,3 +169,6 @@ DEFINE_string(
     geometry_camera_converter_config,
     "modules/perception/model/camera/geometry_camera_converter_config.pb.txt",
     "geometry_camera_converter config filename.");
+DEFINE_string(cnn_segmentation_config,
+              "modules/perception/model/cnn_segmentation_config.pb.txt",
+              "cnn segmentation config filename.");

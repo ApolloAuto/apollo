@@ -24,6 +24,7 @@
 #include "caffe/caffe.hpp"
 
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/proto/cnnseg.pb.h"
+#include "modules/perception/proto/cnn_segmentation_config.pb.h"
 
 #include "modules/common/log.h"
 #include "modules/common/time/timer.h"
@@ -65,7 +66,7 @@ class CNNSegmentation : public BaseSegmentation {
   int height_ = 0;
 
   // paramters of CNNSegmentation
-  apollo::perception::cnnseg::CNNSegParam cnnseg_param_;
+  cnnseg::CNNSegParam cnnseg_param_;
   // Caffe network object
   std::shared_ptr<caffe::Net<float>> caffe_net_;
 
@@ -93,6 +94,8 @@ class CNNSegmentation : public BaseSegmentation {
 
   // timer
   common::time::Timer timer_;
+
+  cnn_segmentation_config::ModelConfigs config_;
 
   DISALLOW_COPY_AND_ASSIGN(CNNSegmentation);
 };

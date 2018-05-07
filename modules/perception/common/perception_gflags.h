@@ -121,5 +121,6 @@ DECLARE_string(tracker_config);
 DECLARE_string(sequence_type_fuser_config);
 DECLARE_string(async_fusion_config);
 DECLARE_string(geometry_camera_converter_config);
+DECLARE_string(cnn_segmentation_config);
 
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
