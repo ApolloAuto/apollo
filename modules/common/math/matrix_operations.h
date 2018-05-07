@@ -27,6 +27,8 @@
 #include "Eigen/Dense"
 #include "Eigen/SVD"
 
+#include "modules/common/log.h"
+
 /**
  * @namespace apollo::common::math
  * @brief The math namespace deals with a number of useful mathematical objects.
