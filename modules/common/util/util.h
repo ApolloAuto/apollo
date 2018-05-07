@@ -38,6 +38,49 @@
 
 #include "modules/common/math/vec2d.h"
 
+// The helper function "std::make_unique()" is defined since C++14.
+// The definition of "std::make_unique()" borrowed from C++14 is given here
+// so that it can be used in C++11.
+#if __cplusplus == 201103L
+namespace std {
+
+template <typename _Tp>
+struct _MakeUniq {
+  typedef unique_ptr<_Tp> __single_object;
+};
+
+template <typename _Tp>
+struct _MakeUniq<_Tp[]> {
+  typedef unique_ptr<_Tp[]> __array;
+};
+
+template <typename _Tp, size_t _Bound>
+struct _MakeUniq<_Tp[_Bound]> {
+  struct __invalid_type {};
+};
+
+// std::make_unique for single objects
+template <typename _Tp, typename... _Args>
+inline typename _MakeUniq<_Tp>::__single_object make_unique(_Args&&... __args) {
+  return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+}
+
+// Alias template for remove_extent
+template <typename _Tp>
+using remove_extent_t = typename remove_extent<_Tp>::type;
+
+// std::make_unique for arrays of unknown bound
+template <typename _Tp>
+inline typename _MakeUniq<_Tp>::__array make_unique(size_t __num) {
+  return unique_ptr<_Tp>(new remove_extent_t<_Tp>[__num]());
+}
+
+// Disable std::make_unique for arrays of known bound
+template <typename _Tp, typename... _Args>
+inline typename _MakeUniq<_Tp>::__invalid_type make_unique(_Args&&...) = delete;
+}  // namespace std
+#endif
+
 /**
  * @namespace apollo::common::util
  * @brief apollo::common::util
@@ -45,12 +88,6 @@
 namespace apollo {
 namespace common {
 namespace util {
-
-template <typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args) {
-  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
 template <typename ProtoA, typename ProtoB>
 bool IsProtoEqual(const ProtoA& a, const ProtoB& b) {
   return google::protobuf::util::MessageDifferencer::Equals(a, b);
