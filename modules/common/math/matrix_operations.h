@@ -108,17 +108,16 @@ bool ContinuousToDiscrete(const Eigen::Matrix<T, L, L> &m_a,
   }
 
   Eigen::Matrix<T, L, L> m_identity = Eigen::Matrix<T, L, L>::Identity();
-  Eigen::Matrix<T, L, L> *m_a_d =
-      PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a) *
-      (m_identity + ts * 0.5 * m_a);
+  *ptr_a_d = PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a) *
+             (m_identity + ts * 0.5 * m_a);
 
-  Eigen::Matrix<T, L, N> *m_b_d =
+  *ptr_b_d =
       std::sqrt(ts) * PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a) * m_b;
 
-  Eigen::Matrix<T, O, M> *m_c_d =
+  *ptr_c_d =
       std::sqrt(ts) * m_c * PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a);
 
-  Eigen::Matrix<T, O, N> *m_d_d =
+  *ptr_d_d =
       0.5 * m_c * PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a) * m_b + m_d;
 
   return true;
