@@ -51,6 +51,7 @@ ps -e | grep localization
 cd DATA_PATH/bag
 rosbag play *.bag
 ```
+从播放数据到定位模块开始输出定位消息，大约需要30s左右。
 
 ## 5. 记录与可视化定位结果（可选）
 ### 记录定位结果
