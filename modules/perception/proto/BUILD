@@ -146,3 +146,17 @@ proto_library(
         "cnn_segmentation_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "hdmap_roi_filter_config_lib_proto",
+    deps = [
+        ":hdmap_roi_filter_config_lib",
+    ],
+)
+
+proto_library(
+    name = "hdmap_roi_filter_config_lib",
+    srcs = [
+        "hdmap_roi_filter_config.proto",
+    ],
+)
