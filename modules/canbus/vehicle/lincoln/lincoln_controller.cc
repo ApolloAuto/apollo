@@ -207,7 +207,8 @@ Chassis LincolnController::chassis() {
   // 11
   if (chassis_detail.has_eps() && chassis_detail.eps().has_steering_angle()) {
     chassis_.set_steering_percentage(chassis_detail.eps().steering_angle() *
-                                     100.0 / params_.max_steer_angle());
+                                     100.0 / vehicle_params_.max_steer_angle() /
+                                     M_PI * 180);
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -496,7 +497,8 @@ void LincolnController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle = params_.max_steer_angle() * angle / 100.0;
+  const double real_angle =
+      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   // reverse sign
   steering_64_->set_steering_angle(real_angle)->set_steering_angle_speed(200);
 }
@@ -510,11 +512,13 @@ void LincolnController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle = params_.max_steer_angle() * angle / 100.0;
+  const double real_angle =
+      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   const double real_angle_spd =
       ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
-          params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
-          params_.max_steer_angle_spd() * angle_spd / 100.0);
+          vehicle_params_.min_steer_angle_rate() / M_PI * 180,
+          vehicle_params_.max_steer_angle_rate() / M_PI * 180,
+          vehicle_params_.max_steer_angle_rate() * angle_spd / 100.0);
   steering_64_->set_steering_angle(real_angle)
       ->set_steering_angle_speed(real_angle_spd);
 }
