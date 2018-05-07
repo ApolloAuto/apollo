@@ -46,21 +46,11 @@ class Bitmap2D {
     return static_cast<DirectionMajor>(dir_major ^ 1);
   }
 
-  const Eigen::Vector2d& get_min_p() const {
-    return min_p_;
-  }
-  const Eigen::Vector2d& get_max_p() const {
-    return max_p_;
-  }
-  const Eigen::Vector2d& get_grid_size() const {
-    return grid_size_;
-  }
-  const DirectionMajor get_dir_major() const {
-    return dir_major_;
-  }
-  const DirectionMajor get_op_dir_major() const {
-    return op_dir_major_;
-  }
+  const Eigen::Vector2d& get_min_p() const { return min_p_; }
+  const Eigen::Vector2d& get_max_p() const { return max_p_; }
+  const Eigen::Vector2d& get_grid_size() const { return grid_size_; }
+  const DirectionMajor get_dir_major() const { return dir_major_; }
+  const DirectionMajor get_op_dir_major() const { return op_dir_major_; }
 
   /**
    * @brief: Roughly check whether the point is in bitmap.
