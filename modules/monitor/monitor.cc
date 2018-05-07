@@ -36,7 +36,7 @@ namespace monitor {
 
 using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::util::make_unique;
+using std::make_unique;
 
 Monitor::Monitor() : monitor_thread_(FLAGS_monitor_running_interval) {
 }
