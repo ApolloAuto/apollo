@@ -100,6 +100,20 @@ cc_library(
     ],
     deps = [
         "@eigen",
+        "//modules/common:log",
+    ],
+)
+
+
+cc_test(
+    name = "matrix_operations_test",
+    size = "small",
+    srcs = [
+        "matrix_operations_test.cc",
+    ],
+    deps = [
+        ":matrix_operations",
+        "@gtest//:main",
     ],
 )
 
