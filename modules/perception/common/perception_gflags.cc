@@ -172,3 +172,6 @@ DEFINE_string(
 DEFINE_string(cnn_segmentation_config,
               "modules/perception/model/cnn_segmentation_config.pb.txt",
               "cnn segmentation config filename.");
+DEFINE_string(hdmap_roi_filter_config,
+              "modules/perception/model/hdmap_roi_filter_config.pb.txt",
+              "hdmap ROI filter config filename.");

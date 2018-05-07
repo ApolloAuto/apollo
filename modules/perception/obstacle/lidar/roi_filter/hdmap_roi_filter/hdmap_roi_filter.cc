@@ -13,8 +13,12 @@
  *****************************************************************************/
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 
+#include "modules/common/util/file.h"
+
 namespace apollo {
 namespace perception {
+
+using apollo::common::util::GetProtoFromFile;
 
 bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
                             const ROIFilterOptions& roi_filter_options,
@@ -148,27 +152,14 @@ void HdmapROIFilter::MergeHdmapStructToPolygons(
 }
 
 bool HdmapROIFilter::Init() {
-  // load model config
-  std::string model_name = name();
-  const ModelConfig* model_config =
-      ConfigManager::instance()->GetModelConfig(model_name);
-  if (model_config == nullptr) {
-    AERROR << "Failed to get model: " << model_name;
+  if (!GetProtoFromFile(FLAGS_hdmap_roi_filter_config, &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_hdmap_roi_filter_config;
     return false;
-  } else {
-    if (!model_config->GetValue("range", &range_)) {
-      AERROR << "Can not find range in model: " << model_name;
-      return false;
-    }
-    if (!model_config->GetValue("cell_size", &cell_size_)) {
-      AERROR << "Can not find cell_size in model: " << model_name;
-      return false;
-    }
-    if (!model_config->GetValue("extend_dist", &extend_dist_)) {
-      AERROR << "Can not find extend_dist_ in model: " << model_name;
-      return false;
-    }
   }
+  range_ = config_.range();
+  cell_size_ = config_.cell_size();
+  extend_dist_ = config_.extend_dist();
   return true;
 }
 
