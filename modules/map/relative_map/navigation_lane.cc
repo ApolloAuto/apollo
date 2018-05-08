@@ -201,15 +201,19 @@ bool NavigationLane::UpdateProjectionIndex(const common::Path &path) {
   // cyclic/circular navigation lines where the distance between their starting
   // and end points is very small, it is tedious and unnecessary to re-send
   // navigation lines every time.
-  const double kLoopEpsilon = 10.0;
-  if (DistanceXY(path.path_point(0), path.path_point(path_size - 1)) <
-          kLoopEpsilon &&
-      last_project_index_ >= path_size - 2) {
-    const double d = DistanceXY(original_pose_.position(), path.path_point(0));
-    if (d < FLAGS_max_distance_to_navigation_line) {
-      last_project_index_ = 0;
-      return true;
-    }
+  // Because the starting point and the end point cannot be completely
+  // consistent in a cyclic/circular navigaton line. The vehicle's end point is
+  // usually beyond the starting point a little when making a cyclic/circular
+  // navigation line. Therefore, the "last_project_index_" is reset to 0 if it
+  // is greater than 95% size of the navigaton line and the vehicle's current
+  // position is near the starting point of the navigatoin line.
+  if (last_project_index_ > static_cast<int>(path_size * 0.95) &&
+      DistanceXY(path.path_point(0), path.path_point(last_project_index_)) <
+          FLAGS_max_distance_to_navigation_line &&
+      DistanceXY(original_pose_.position(), path.path_point(0)) <
+          FLAGS_max_distance_to_navigation_line) {
+    last_project_index_ = 0;
+    return true;
   }
 
   for (int i = last_project_index_; i + 1 < path_size; ++i) {
