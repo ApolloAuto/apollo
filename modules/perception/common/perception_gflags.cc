@@ -175,3 +175,6 @@ DEFINE_string(cnn_segmentation_config,
 DEFINE_string(hdmap_roi_filter_config,
               "modules/perception/model/hdmap_roi_filter_config.pb.txt",
               "hdmap ROI filter config filename.");
+DEFINE_string(low_object_filter_config,
+              "modules/perception/model/low_object_filter_config.pb.txt",
+              "low object filter config filename.");
