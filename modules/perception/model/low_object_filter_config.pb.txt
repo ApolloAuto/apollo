@@ -1,0 +1,4 @@
+name: "LowObjectFilter"
+version: "1.0.0"
+object_height_threshold: 0.10
+object_position_height_threshold: -1.6

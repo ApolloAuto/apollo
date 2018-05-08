@@ -160,3 +160,17 @@ proto_library(
         "hdmap_roi_filter_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "low_object_filter_config_lib_proto",
+    deps = [
+        ":low_object_filter_config_lib",
+    ],
+)
+
+proto_library(
+    name = "low_object_filter_config_lib",
+    srcs = [
+        "low_object_filter_config.proto",
+    ],
+)

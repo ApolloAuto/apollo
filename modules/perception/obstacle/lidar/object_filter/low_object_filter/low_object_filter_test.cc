@@ -51,13 +51,13 @@ TEST(LowObjectFilterTest, test_object_filter) {
   LowObjectFilter filter;
 
   ObjectFilterOptions object_filter_options;
-  std::vector<std::shared_ptr<Object> >* objects
-      = new std::vector<std::shared_ptr<Object> >();
+  std::vector<std::shared_ptr<Object> >* objects =
+      new std::vector<std::shared_ptr<Object> >();
   ConstructObject(objects);
 
   EXPECT_EQ(10, objects->size());
 
-  filter.Init();
+  EXPECT_TRUE(filter.Init());
   filter.Filter(object_filter_options, objects);
 
   EXPECT_EQ(8, objects->size());
