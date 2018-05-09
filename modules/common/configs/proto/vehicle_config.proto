@@ -25,34 +25,40 @@ message Extrinsics {
 // By default, all are measured with the SI units (meters, meters per second,
 // etc.).
 message VehicleParam {
+enum VehicleBrand {
+  LINCOLN_MKZ = 0;
+  GEM = 1;
+}
+
+  optional VehicleBrand brand = 1;
   // Car center point is car reference point, i.e., center of rear axle.
-  optional double front_edge_to_center = 1;
-  optional double back_edge_to_center = 2;
-  optional double left_edge_to_center = 3;
-  optional double right_edge_to_center = 4;
+  optional double front_edge_to_center = 2;
+  optional double back_edge_to_center = 3;
+  optional double left_edge_to_center = 4;
+  optional double right_edge_to_center = 5;
 
-  optional double length = 5;
-  optional double width = 6;
-  optional double height = 7;
+  optional double length = 6;
+  optional double width = 7;
+  optional double height = 8;
 
-  optional double min_turn_radius = 8;
-  optional double max_acceleration = 9;
-  optional double max_deceleration = 10;
+  optional double min_turn_radius = 9;
+  optional double max_acceleration = 10;
+  optional double max_deceleration = 11;
 
   // The following items are used to compute trajectory constraints in planning/control/canbus,
   // vehicle max steer angle
-  optional double max_steer_angle = 11;
+  optional double max_steer_angle = 12;
   // vehicle max steer rate; how fast can the steering wheel turn.
-  optional double max_steer_angle_rate = 12;
+  optional double max_steer_angle_rate = 13;
   // vehicle min steer rate;
-  optional double min_steer_angle_rate = 13;
+  optional double min_steer_angle_rate = 14;
   // ratio between the turn of steering wheel and the turn of wheels
-  optional double steer_ratio = 14;
+  optional double steer_ratio = 15;
   // the distance between the front and back wheels
-  optional double wheel_base = 15;
+  optional double wheel_base = 16;
   // Tire effective rolling radius (vertical distance between the wheel center
   // and the ground).
-  optional double wheel_rolling_radius = 16;
+  optional double wheel_rolling_radius = 17;
 }
 
 message VehicleConfig {
