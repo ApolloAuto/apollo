@@ -55,3 +55,6 @@ DEFINE_bool(enable_gain_scheduler, false,
 DEFINE_bool(set_steer_limit, false, "Set steer limit");
 
 DEFINE_bool(enable_slope_offset, false, "Enable slope offset compensation");
+
+DEFINE_double(lock_steer_speed, 0.081,
+              "Minimum speed to lock the steer, in m/s");

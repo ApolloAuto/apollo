@@ -229,6 +229,8 @@ class LatController : public Controller {
   const std::string name_;
 
   double query_relative_time_;
+
+  double pre_steer_angle_ = 0.0;
 };
 
 }  // namespace control
