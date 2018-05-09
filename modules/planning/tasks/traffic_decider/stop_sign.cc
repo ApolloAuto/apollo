@@ -32,7 +32,6 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/tasks/traffic_decider/util.h"
 
@@ -128,7 +127,7 @@ void StopSign::MakeDecisions(Frame* frame,
     double stop_deceleration = util::GetADCStopDeceleration(
         reference_line_info, next_stop_sign_overlap_->start_s,
         config_.stop_sign().min_pass_s_distance());
-    if (stop_deceleration < FLAGS_max_stop_deceleration) {
+    if (stop_deceleration < config_.stop_sign().max_stop_deceleration()) {
       BuildStopDecision(frame, reference_line_info,
                         const_cast<PathOverlap*>(next_stop_sign_overlap_),
                         config_.stop_sign().stop_distance());

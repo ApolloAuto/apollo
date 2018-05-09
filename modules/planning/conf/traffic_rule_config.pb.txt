@@ -23,6 +23,7 @@ config: {
   enabled: true
   crosswalk {
     stop_distance: 1.0
+    max_stop_deceleration: 6.0
     min_pass_s_distance: 1.0
     expand_s_distance: 2.0
     stop_strick_l_distance: 4.0
@@ -73,6 +74,9 @@ config: {
 config: {
   rule_id: REROUTING
   enabled: true
+  rerouting {
+    prepare_rerouting_time: 2.0
+  }
 }
 
 config: {
@@ -80,8 +84,10 @@ config: {
   enabled: true
   signal_light {
     stop_distance: 1.0
+    max_stop_deceleration: 6.0
     min_pass_s_distance: 4.0
     max_stop_deacceleration_yellow_light: 3.0
+    signal_expire_time_sec: 5.0
     righ_turn_creep {
       enabled: false
       min_boundary_t: 6.0
@@ -96,6 +102,7 @@ config: {
   enabled: true
   stop_sign {
     stop_distance: 1.0
+    max_stop_deceleration: 6.0
     min_pass_s_distance: 3.0
     max_stop_speed: 0.3
     max_valid_stop_distance: 3.0
