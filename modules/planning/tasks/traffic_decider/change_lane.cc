@@ -23,7 +23,6 @@
 #include <algorithm>
 
 #include "modules/common/util/util.h"
-#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
