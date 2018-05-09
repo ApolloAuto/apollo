@@ -24,4 +24,25 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "multi_camera_projection_test",
+    size = "small",
+    srcs = [
+        "multi_camera_projection_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+        "//modules/perception:perception_model",
+        "//modules/perception/conf:perception_config",
+    ],
+    deps = [
+        "perception_traffic_light_projection",
+        "//modules/common:log",
+        "//modules/perception/common",
+        "//modules/perception/lib/base",
+        "//modules/perception/obstacle/base",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
