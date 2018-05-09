@@ -52,8 +52,10 @@ config: {
 
 config: {
   rule_id: KEEP_CLEAR
-  enabled: false
+  enabled: true
   keep_clear {
+    enable_keep_clear_zone: true
+    enable_junction: false
     min_pass_s_distance: 2.0
   }
 }

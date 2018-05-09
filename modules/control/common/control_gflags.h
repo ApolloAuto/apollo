@@ -49,4 +49,6 @@ DECLARE_bool(enable_gain_scheduler);
 DECLARE_bool(set_steer_limit);
 DECLARE_bool(enable_slope_offset);
 
+DECLARE_double(lock_steer_speed);
+
 #endif  // MODULES_CONTROL_COMMON_CONTROL_GFLAGS_H_
