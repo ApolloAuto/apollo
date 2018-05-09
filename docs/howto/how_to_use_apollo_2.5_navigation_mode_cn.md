@@ -17,7 +17,7 @@
 
 ## 一、Apollo 2.5版的构建
 
-首先从[GitHub网站](https://github.com/ApolloAuto/apollo)下载`Apollo2.5`版源代码，可以使用`git`命令下载，也可以直接通过网页下载压缩包。源代码下载完成并放置到合适的目录后，可以使用两种方法构建：1.在`Visual Studio Code`中构建（推荐）；2.使用命令行构建。当然，两种方法都有一个前提，就是在你的机器上已经顺利安装了`Docker`。`Apollo`之前版本提供了一个`install_docker.sh`脚本文件，因为很多开发者反映可能出错，`Apollo`项目组已将该文件移除。现在要安装`Docker`就只能参考[Docker官方网站](https://www.docker.com/)的帮助文档了。
+首先从[GitHub网站](https://github.com/ApolloAuto/apollo)下载`Apollo2.5`版源代码，可以使用`git`命令下载，也可以直接通过网页下载压缩包。源代码下载完成并放置到合适的目录后，可以使用两种方法构建：1.在`Visual Studio Code`中构建（推荐）；2.使用命令行构建。当然，两种方法都有一个前提，就是在你的机器上已经顺利安装了`Docker`。你可以使用`Apollo`提供的脚本文件[`install_docker.sh`](https://github.com/ApolloAuto/apollo/blob/master/docker/scripts/install_docker.sh)安装`Docker`。
 
 ### 1.1 在Visual Studio Code中构建
 
