@@ -18,6 +18,24 @@
 
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
+# Setup core dump format.
 if [ -e /proc/sys/kernel ]; then
-  echo "${APOLLO_ROOT_DIR}/data/core/core_%e.%p" > /proc/sys/kernel/core_pattern
+  echo "${APOLLO_ROOT_DIR}/data/core/core_%e.%p" | \
+      sudo tee /proc/sys/kernel/core_pattern
+fi
+
+# Setup ntpdate to run once per second. Log at /var/log/syslog.
+grep -q ntpdate /etc/crontab
+if [ $? -ne 0 ]; then
+  echo "*/1 * * * * root ntpdate -v -u us.pool.ntp.org" | \
+      sudo tee -a /etc/crontab
+fi
+
+# Add udev rules.
+sudo cp -r ${APOLLO_ROOT_DIR}/docker/setup_host/etc/* /etc/
+
+# Add uvcvideo clock config.
+grep -q uvcvideo /etc/modules
+if [ $? -ne 0 ]; then
+  echo "uvcvideo clock=realtime" | sudo tee -a /etc/modules
 fi
