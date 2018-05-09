@@ -27,6 +27,7 @@ apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 \
 
 apt-get update -y && apt-get install -y \
     libbz2-dev \
+    libceres-dev \
     libconsole-bridge-dev \
     libeigen3-dev \
     libgstreamer-plugins-base0.10-dev \
