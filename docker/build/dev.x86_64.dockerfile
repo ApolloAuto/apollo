@@ -7,8 +7,6 @@ COPY installers /tmp/installers
 RUN bash /tmp/installers/pre_install.sh
 RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_bazel_packages.sh
-# TODO(xiaoxq): This installer just doesn't work on Ubuntu 14.04.
-# RUN bash /tmp/installers/install_ceres_solver.sh
 RUN bash /tmp/installers/install_gflags_glog.sh
 RUN bash /tmp/installers/install_glew.sh
 RUN bash /tmp/installers/install_glusterfs.sh
