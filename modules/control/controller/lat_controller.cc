@@ -326,12 +326,20 @@ Status LatController::ComputeControlCommand(
     double steer_angle_limited =
         common::math::Clamp(steer_angle, -steer_limit, steer_limit);
     steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
-    cmd->set_steering_target(steer_angle_limited);
+    steer_angle = steer_angle_limited;
     debug->set_steer_angle_limited(steer_angle_limited);
   } else {
     steer_angle = digital_filter_.Filter(steer_angle);
-    cmd->set_steering_target(steer_angle);
   }
+
+  if (VehicleStateProvider::instance()->linear_velocity() <
+          FLAGS_lock_steer_speed &&
+      VehicleStateProvider::instance()->gear() == canbus::Chassis::GEAR_DRIVE &&
+      chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+    steer_angle = pre_steer_angle_;
+  }
+  pre_steer_angle_ = steer_angle;
+  cmd->set_steering_target(steer_angle);
 
   cmd->set_steering_rate(FLAGS_steer_angle_rate);
   // compute extra information for logging and debugging
