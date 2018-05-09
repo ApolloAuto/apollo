@@ -11,13 +11,10 @@ message VehicleParameter {
   }
 
   optional VehicleBrand brand = 1;
-  optional double max_steer_angle = 2;
-  optional double max_steer_angle_spd = 3;
-  optional double min_steer_angle_spd = 4;
-  optional double max_acc = 5;
-  optional double min_acc = 6;
-  optional double max_brake_pressure = 7;
-  optional double max_engine_pedal = 8;
-  optional int32 max_enable_fail_attempt = 9;
-  optional Chassis.DrivingMode driving_mode = 10;
+  optional double max_acc = 2;
+  optional double min_acc = 3;
+  optional double max_brake_pressure = 4;
+  optional double max_engine_pedal = 5;
+  optional int32 max_enable_fail_attempt = 6;
+  optional Chassis.DrivingMode driving_mode = 7;
 }
