@@ -39,33 +39,39 @@ bool KeepClear::ApplyRule(Frame* const frame,
   CHECK_NOTNULL(reference_line_info);
 
   // keep_clear zone
-  const std::vector<PathOverlap>& keep_clear_overlaps =
-      reference_line_info->reference_line().map_path().clear_area_overlaps();
-  for (const auto& keep_clear_overlap : keep_clear_overlaps) {
-    const auto obstacle_id =
-        KEEP_CLEAR_VO_ID_PREFIX + keep_clear_overlap.object_id;
-    if (BuildKeepClearObstacle(frame, reference_line_info,
-                               const_cast<PathOverlap*>(&keep_clear_overlap),
-                               obstacle_id)) {
-      ADEBUG << "KEEP_CLAER for keep_clear_zone["
-             << keep_clear_overlap.object_id << "] s["
-             << keep_clear_overlap.start_s << ", " << keep_clear_overlap.end_s
-             << "] BUILD";
+  if (config_.keep_clear().enable_keep_clear_zone()) {
+    const std::vector<PathOverlap>& keep_clear_overlaps =
+        reference_line_info->reference_line().map_path().clear_area_overlaps();
+    for (const auto& keep_clear_overlap : keep_clear_overlaps) {
+      const auto obstacle_id =
+          KEEP_CLEAR_VO_ID_PREFIX + keep_clear_overlap.object_id;
+
+      if (BuildKeepClearObstacle(frame, reference_line_info,
+                                 const_cast<PathOverlap*>(&keep_clear_overlap),
+                                 obstacle_id)) {
+        ADEBUG << "KEEP_CLAER for keep_clear_zone["
+            << keep_clear_overlap.object_id << "] s["
+            << keep_clear_overlap.start_s << ", " << keep_clear_overlap.end_s
+            << "] BUILD";
+      }
     }
   }
 
   // junction
-  const std::vector<PathOverlap>& junction_overlaps =
-      reference_line_info->reference_line().map_path().junction_overlaps();
-  for (const auto& junction_overlap : junction_overlaps) {
-    const auto obstacle_id =
-        KEEP_CLEAR_JUNCTION_VO_ID_PREFIX + junction_overlap.object_id;
-    if (BuildKeepClearObstacle(frame, reference_line_info,
-                               const_cast<PathOverlap*>(&junction_overlap),
-                               obstacle_id)) {
-      ADEBUG << "KEEP_CLAER for junction[" << junction_overlap.object_id
-             << "] s[" << junction_overlap.start_s << ", "
-             << junction_overlap.end_s << "] BUILD";
+  if (config_.keep_clear().enable_junction()) {
+    const std::vector<PathOverlap>& junction_overlaps =
+        reference_line_info->reference_line().map_path().junction_overlaps();
+    for (const auto& junction_overlap : junction_overlaps) {
+      const auto obstacle_id =
+          KEEP_CLEAR_JUNCTION_VO_ID_PREFIX + junction_overlap.object_id;
+
+      if (BuildKeepClearObstacle(frame, reference_line_info,
+                                 const_cast<PathOverlap*>(&junction_overlap),
+                                 obstacle_id)) {
+        ADEBUG << "KEEP_CLAER for junction[" << junction_overlap.object_id
+            << "] s[" << junction_overlap.start_s << ", "
+            << junction_overlap.end_s << "] BUILD";
+      }
     }
   }
 
