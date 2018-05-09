@@ -196,24 +196,29 @@ bool NavigationLane::UpdateProjectionIndex(const common::Path &path) {
   double min_d = std::numeric_limits<double>::max();
   const int path_size = path.path_point_size();
 
-  // We create a condition here that sets the "last_project_index_" to 0,
-  // should the vehicle reach the end point of a cyclic/circular route. For
-  // cyclic/circular navigation lines where the distance between their starting
-  // and end points is very small, it is tedious and unnecessary to re-send
-  // navigation lines every time.
-  // Because the starting point and the end point cannot be completely
-  // consistent in a cyclic/circular navigaton line. The vehicle's end point is
-  // usually beyond the starting point a little when making a cyclic/circular
-  // navigation line. Therefore, the "last_project_index_" is reset to 0 if it
-  // is greater than 95% size of the navigaton line and the vehicle's current
-  // position is near the starting point of the navigatoin line.
-  if (last_project_index_ > static_cast<int>(path_size * 0.95) &&
-      DistanceXY(path.path_point(0), path.path_point(last_project_index_)) <
-          FLAGS_max_distance_to_navigation_line &&
-      DistanceXY(original_pose_.position(), path.path_point(0)) <
-          FLAGS_max_distance_to_navigation_line) {
-    last_project_index_ = 0;
-    return true;
+  if (FLAGS_enable_cyclic_rerouting) {
+    // We create a condition here that sets the "last_project_index_" to 0,
+    // should the vehicle reach the end point of a cyclic/circular route. For
+    // cyclic/circular navigation lines where the distance between their
+    // starting and end points is very small, it is tedious and unnecessary to
+    // re-send navigation lines every time. Because the starting point and the
+    // end point cannot be completely consistent in a cyclic/circular navigaton
+    // line. The vehicle's end point is usually beyond the starting point a
+    // little when making a cyclic/circular navigation line. Therefore, the
+    // "last_project_index_" is reset to 0 if it is greater than 95% size of the
+    // navigaton line and the vehicle's current position is near the starting
+    // point of the navigatoin line.
+    const int near_end_size = static_cast<int>(path_size * 0.95);
+    if (last_project_index_ > near_end_size &&
+        last_project_index_ < path_size) {
+      if (DistanceXY(path.path_point(0), path.path_point(last_project_index_)) <
+              FLAGS_max_distance_to_navigation_line &&
+          DistanceXY(original_pose_.position(), path.path_point(0)) <
+              FLAGS_max_distance_to_navigation_line) {
+        last_project_index_ = 0;
+        return true;
+      }
+    }
   }
 
   for (int i = last_project_index_; i + 1 < path_size; ++i) {
