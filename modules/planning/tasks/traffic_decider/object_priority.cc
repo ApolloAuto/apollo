@@ -19,7 +19,6 @@
  **/
 
 #include "modules/planning/tasks/traffic_decider/object_priority.h"
-#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
