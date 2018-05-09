@@ -27,6 +27,7 @@ apt-get install -y \
    python-matplotlib \
    python-pip \
    python-scipy \
-   python-software-properties
+   python-software-properties \
+   python3-psutil
 
 pip install -r py27_requirements.txt
