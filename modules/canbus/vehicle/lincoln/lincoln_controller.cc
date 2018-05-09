@@ -207,8 +207,8 @@ Chassis LincolnController::chassis() {
   // 11
   if (chassis_detail.has_eps() && chassis_detail.eps().has_steering_angle()) {
     chassis_.set_steering_percentage(chassis_detail.eps().steering_angle() *
-                                     100.0 / vehicle_params_.max_steer_angle() /
-                                     M_PI * 180);
+                                     100.0 / vehicle_params_.max_steer_angle() *
+                                     M_PI / 180);
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -518,7 +518,8 @@ void LincolnController::Steer(double angle, double angle_spd) {
       ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
           vehicle_params_.min_steer_angle_rate() / M_PI * 180,
           vehicle_params_.max_steer_angle_rate() / M_PI * 180,
-          vehicle_params_.max_steer_angle_rate() * angle_spd / 100.0);
+          vehicle_params_.max_steer_angle_rate() / M_PI * 180 * angle_spd /
+              100.0);
   steering_64_->set_steering_angle(real_angle)
       ->set_steering_angle_speed(real_angle_spd);
 }
