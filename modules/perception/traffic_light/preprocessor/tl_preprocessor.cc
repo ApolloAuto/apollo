@@ -17,6 +17,7 @@
 #include "modules/perception/traffic_light/preprocessor/tl_preprocessor.h"
 
 #include "modules/common/time/time_util.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/onboard/transform_input.h"
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
 #include "modules/perception/traffic_light/base/utils.h"
@@ -26,39 +27,13 @@ namespace perception {
 namespace traffic_light {
 
 using apollo::common::time::TimeUtil;
+using apollo::common::util::GetProtoFromFile;
 
 bool TLPreprocessor::Init() {
-  ConfigManager *config_manager = ConfigManager::instance();
-  const ModelConfig *model_config = config_manager->GetModelConfig(name());
-  if (model_config == nullptr) {
-    AERROR << "not found model: " << name();
-    return false;
-  }
-
   // Read parameters from config file
-  if (!model_config->GetValue("max_cached_lights_size",
-                              &max_cached_lights_size_)) {
-    AERROR << "max_cached_image_lights_array_size not found." << name();
-    return false;
-  }
-  if (!model_config->GetValue("projection_image_cols",
-                              &projection_image_cols_)) {
-    AERROR << "projection_image_cols not found." << name();
-    return false;
-  }
-  if (!model_config->GetValue("projection_image_rows",
-                              &projection_image_rows_)) {
-    AERROR << "projection_image_rows not found." << name();
-    return false;
-  }
-  if (!model_config->GetValue("sync_interval_seconds",
-                              &sync_interval_seconds_)) {
-    AERROR << "sync_interval_seconds not found." << name();
-    return false;
-  }
-  if (!model_config->GetValue("no_signals_interval_seconds",
-                              &no_signals_interval_seconds_)) {
-    AERROR << "no_signals_interval_seconds not found." << name();
+  if (!GetProtoFromFile(FLAGS_traffic_light_preprocessor_config, &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_traffic_light_preprocessor_config;
     return false;
   }
 
@@ -67,7 +42,6 @@ bool TLPreprocessor::Init() {
     AERROR << "TLPreprocessor init projection failed.";
     return false;
   }
-  AINFO << kCountCameraId;
   return true;
 }
 
@@ -81,7 +55,8 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
         << " lights projections cached.";
 
   // pop front if cached array'size > FLAGS_max_cached_image_lights_array_size
-  while (cached_lights_.size() > static_cast<size_t>(max_cached_lights_size_)) {
+  while (cached_lights_.size() >
+         static_cast<size_t>(config_.max_cached_lights_size())) {
     cached_lights_.erase(cached_lights_.begin());
   }
 
@@ -165,7 +140,7 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
   auto cached_lights_ptr = cached_lights_.rbegin();
   for (; cached_lights_ptr != cached_lights_.rend(); ++cached_lights_ptr) {
     double light_ts = (*cached_lights_ptr)->timestamp;
-    if (fabs(light_ts - image_ts) < sync_interval_seconds_) {
+    if (fabs(light_ts - image_ts) < config_.sync_interval_seconds()) {
       find_loc = true;
       auto proj_cam_id = static_cast<int>((*cached_lights_ptr)->camera_id);
       auto image_cam_id = static_cast<int>(camera_id);
@@ -214,7 +189,8 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
     double diff_image_pose_ts = 0.0;
     double diff_image_sys_ts = 0.0;
     bool no_signal = false;
-    if (fabs(image_ts - last_no_signals_ts_) < no_signals_interval_seconds_) {
+    if (fabs(image_ts - last_no_signals_ts_) <
+        config_.no_signals_interval_seconds()) {
       AINFO << "TLPreprocessor " << cached_array_str
             << " sync failed, image ts: " << GLOG_TIMESTAMP(image_ts)
             << " last_no_signals_ts: " << GLOG_TIMESTAMP(last_no_signals_ts_)
@@ -294,7 +270,7 @@ CameraId TLPreprocessor::last_pub_camera_id() const {
 }
 
 int TLPreprocessor::max_cached_lights_size() const {
-  return max_cached_lights_size_;
+  return config_.max_cached_lights_size();
 }
 
 void TLPreprocessor::SelectImage(const CarPose &pose,
@@ -312,7 +288,8 @@ void TLPreprocessor::SelectImage(const CarPose &pose,
     // find the short focus camera without range check
     if (cam_id != kShortFocusIdx) {
       for (const LightPtr &light : *(lights_on_image_array[cam_id])) {
-        if (IsOnBorder(cv::Size(projection_image_cols_, projection_image_rows_),
+        if (IsOnBorder(cv::Size(config_.projection_image_cols(),
+                                config_.projection_image_rows()),
                        light->region.projection_roi,
                        image_border_size[cam_id])) {
           ok = false;
