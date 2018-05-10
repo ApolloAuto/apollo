@@ -20,7 +20,7 @@ message SidePassStatus {
   // driving -> wait -> sidepass -> driving
   enum Status {
     UNKNOWN = 0;
-    DRIVING = 1;
+    DRIVE = 1;
     WAIT = 2;
     SIDEPASS = 3;
   }
