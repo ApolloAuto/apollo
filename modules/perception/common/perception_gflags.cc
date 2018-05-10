@@ -182,3 +182,7 @@ DEFINE_string(traffic_light_multi_camera_projection_config,
               "modules/perception/model/traffic_light/"
               "multi_camera_projection_config.pb.txt",
               "traffic light multi camera projection config filename.");
+DEFINE_string(traffic_light_recognizer_config,
+              "modules/perception/model/traffic_light/"
+              "recognizer_config.pb.txt",
+              "traffic light recognizer config filename.");
