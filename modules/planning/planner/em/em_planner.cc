@@ -245,7 +245,11 @@ Status EMPlanner::PlanOnReferenceLine(
   }
 
   if (FLAGS_enable_trajectory_check) {
-    ConstraintChecker::ValidTrajectory(trajectory);
+    if (!ConstraintChecker::ValidTrajectory(trajectory)) {
+      std::string msg("Failed to validate current planning trajectory.");
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
   }
 
   reference_line_info->SetTrajectory(trajectory);
