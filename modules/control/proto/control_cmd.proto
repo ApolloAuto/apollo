@@ -37,7 +37,7 @@ message ControlCommand {
   // parking brake engage. true: engaged
   optional bool parking_brake = 8;
 
-  // target speed, in km/h
+  // target speed, in m/s
   optional double speed = 9;
 
   // target acceleration in m`s^-2

@@ -76,20 +76,20 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
     AERROR << "[MPCController] control_conf == nullptr";
     return false;
   }
-  const auto &vehicle_param =
+  const auto &vehicle_param_ =
       VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->mpc_controller_conf().ts();
   CHECK_GT(ts_, 0.0) << "[MPCController] Invalid control update interval.";
   cf_ = control_conf->mpc_controller_conf().cf();
   cr_ = control_conf->mpc_controller_conf().cr();
-  wheelbase_ = vehicle_param.wheel_base();
-  steer_transmission_ratio_ = vehicle_param.steer_ratio();
+  wheelbase_ = vehicle_param_.wheel_base();
+  steer_transmission_ratio_ = vehicle_param_.steer_ratio();
   steer_single_direction_max_degree_ =
-      vehicle_param.max_steer_angle() / steer_transmission_ratio_ / 180 * M_PI;
+      vehicle_param_.max_steer_angle() / steer_transmission_ratio_ / 180 * M_PI;
   max_lat_acc_ = control_conf->mpc_controller_conf().max_lateral_acceleration();
-  max_acceleration_ = vehicle_param.max_acceleration();
-  max_deceleration_ = vehicle_param.max_deceleration();
+  max_acceleration_ = vehicle_param_.max_acceleration();
+  max_deceleration_ = vehicle_param_.max_deceleration();
 
   const double mass_fl = control_conf->mpc_controller_conf().mass_fl();
   const double mass_fr = control_conf->mpc_controller_conf().mass_fr();
@@ -107,6 +107,8 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   mpc_max_iteration_ = control_conf->mpc_controller_conf().max_iteration();
   throttle_deadzone_ = control_conf->mpc_controller_conf().throttle_deadzone();
   brake_deadzone_ = control_conf->mpc_controller_conf().brake_deadzone();
+
+  minimum_speed_protection_ = control_conf->minimum_speed_protection();
 
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
   AINFO << "MPC conf loaded";
@@ -269,9 +271,7 @@ Status MPCController::ComputeControlCommand(
     const canbus::Chassis *chassis,
     const planning::ADCTrajectory *planning_published_trajectory,
     ControlCommand *cmd) {
-  constexpr float kMinSpeedProtection = 0.1f;
-  VehicleStateProvider::instance()->set_linear_velocity(
-      std::max(chassis->speed_mps(), kMinSpeedProtection));
+  VehicleStateProvider::instance()->set_linear_velocity(chassis->speed_mps());
 
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(planning_published_trajectory));
@@ -389,7 +389,8 @@ Status MPCController::ComputeControlCommand(
   debug->set_is_full_stop(false);
   if (std::fabs(debug->acceleration_reference()) <=
           FLAGS_max_acceleration_when_stopped &&
-      std::fabs(debug->speed_reference()) <= FLAGS_max_abs_speed_when_stopped) {
+      std::fabs(debug->speed_reference()) <=
+          vehicle_param_.max_abs_speed_when_stopped()) {
     acceleration_cmd = standstill_acceleration_;
     AINFO << "Stop location reached";
     debug->set_is_full_stop(true);
@@ -432,7 +433,7 @@ Status MPCController::ComputeControlCommand(
   debug->set_steering_position(chassis->steering_percentage());
 
   if (std::fabs(VehicleStateProvider::instance()->linear_velocity()) <=
-          FLAGS_max_abs_speed_when_stopped ||
+          vehicle_param_.max_abs_speed_when_stopped() ||
       chassis->gear_location() == planning_published_trajectory->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
     cmd->set_gear_location(planning_published_trajectory->gear());
@@ -485,7 +486,8 @@ void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
 }
 
 void MPCController::UpdateMatrix(SimpleMPCDebug *debug) {
-  const double v = VehicleStateProvider::instance()->linear_velocity();
+  const double v = std::max(VehicleStateProvider::instance()->linear_velocity(),
+                            minimum_speed_protection_);
   matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
   matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
   matrix_a_(3, 1) = matrix_a_coeff_(3, 1) / v;
