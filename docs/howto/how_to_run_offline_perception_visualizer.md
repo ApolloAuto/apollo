@@ -8,10 +8,10 @@ Before running the visualizer, we need to prepare necessary PCD and Pose data wh
 
 1.1 Launch the PCD exporter (see details in [Velodyne driver doc](https://github.com/ApolloAuto/apollo/tree/master/modules/drivers/velodyne))
 ```
-roslaunch velodyne export_pcd.launch
+roslaunch velodyne export_pcd_offline.launch
 ```
 
-1.2 Play ROS bag   
+1.2 Play ROS bag
 The default directory of ROS bag is `/apollo/data/bag`. Assume the file name of ROS bag is `example.bag`.
 ```
 cd /apollo/data/bag
@@ -25,7 +25,7 @@ We provide a Python script `gen_pose_file.py` to generate the Pose files from `p
 cd /apollo/modules/perception/tool
 python gen_pose_file.py /apollo/data/pcd
 ```
-The names of the generated Pose files correspond to their frame numbers as the PCD files. It means that the names of PCD and Pose files for a frame is the same but have different extension names (i.e., .pcd and .pose respectively).  
+The names of the generated Pose files correspond to their frame numbers as the PCD files. It means that the names of PCD and Pose files for a frame is the same but have different extension names (i.e., .pcd and .pose respectively).
 
 ### 2. Build The Offline Perception Visualizer
 We use Bazel to build the offline perception visualizer.
@@ -41,7 +41,7 @@ bazel build -c opt --cxxopt=-DUSE_CAFFE_GPU //modules/perception/tool/offline_vi
 
 ### 3. Run The Visualizer With Offline Perception Simulation
 Before running the visualizer, you may setup the data directories and the algorithm module settings in the configuration file `/apollo/modules/perception/tool/offline_visualizer_tool/conf/offline_lidar_perception_test.flag`. The detailed parameter settings for each algorithm module can be set according to the corresponding configuration files in `/apollo/modules/perception/tool/offline_visualizer_tool/conf/config_manager.config`. Then you may run the visualizer with offline perception simulation by the command below:
-```  
+```
 /apollo/bazel-bin/modules/perception/tool/offline_visualizer_tool/offline_lidar_visualizer_tool
 ```
 Now you will see a pop-up window showing the perception result with point cloud frame-by-frame. The obstacles are shown with purple rectangle bounding boxes. There are three modes to visualize the point cloud with/without ROI area: (1) showing all the point cloud with grey color; (2) showing the point cloud of ROI area only with green color; (3) showing the point cloud of ROI area with green color and that of other area with grey color. You may press the `S` key on keyboard to switch the modes in turn.
