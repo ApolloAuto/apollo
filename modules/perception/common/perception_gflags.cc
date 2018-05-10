@@ -178,3 +178,7 @@ DEFINE_string(hdmap_roi_filter_config,
 DEFINE_string(low_object_filter_config,
               "modules/perception/model/low_object_filter_config.pb.txt",
               "low object filter config filename.");
+DEFINE_string(traffic_light_multi_camera_projection_config,
+              "modules/perception/model/traffic_light/"
+              "multi_camera_projection_config.pb.txt",
+              "traffic light multi camera projection config filename.");

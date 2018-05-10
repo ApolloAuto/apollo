@@ -124,5 +124,6 @@ DECLARE_string(geometry_camera_converter_config);
 DECLARE_string(cnn_segmentation_config);
 DECLARE_string(hdmap_roi_filter_config);
 DECLARE_string(low_object_filter_config);
+DECLARE_string(traffic_light_multi_camera_projection_config);
 
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
