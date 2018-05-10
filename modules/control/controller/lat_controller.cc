@@ -124,6 +124,8 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 
   query_relative_time_ = control_conf->query_relative_time();
 
+  minimum_speed_protection_ = control_conf->minimum_speed_protection();
+
   return true;
 }
 
@@ -436,8 +438,8 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
 }
 
 void LatController::UpdateMatrix() {
-  const double v =
-      std::max(VehicleStateProvider::instance()->linear_velocity(), 0.2);
+  const double v = std::max(VehicleStateProvider::instance()->linear_velocity(),
+                            minimum_speed_protection_);
   matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
   matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
   matrix_a_(3, 1) = matrix_a_coeff_(3, 1) / v;
