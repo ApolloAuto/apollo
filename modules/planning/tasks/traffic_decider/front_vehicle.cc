@@ -377,7 +377,15 @@ void FrontVehicle::MakeStopDecision(
 
       ObjectDecisionType stop;
       auto stop_decision = stop.mutable_stop();
-      stop_decision->set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
+      if (obstacle_type == PerceptionObstacle::UNKNOWN_MOVABLE ||
+          obstacle_type == PerceptionObstacle::BICYCLE ||
+          obstacle_type == PerceptionObstacle::VEHICLE) {
+        stop_decision->set_reason_code(
+            StopReasonCode::STOP_REASON_HEAD_VEHICLE);
+      } else {
+        stop_decision->set_reason_code(
+            StopReasonCode::STOP_REASON_OBSTACLE);
+      }
       stop_decision->set_distance_s(-stop_distance);
       stop_decision->set_stop_heading(stop_heading);
       stop_decision->mutable_stop_point()->set_x(stop_point.x());
