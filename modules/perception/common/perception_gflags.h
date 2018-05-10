@@ -126,5 +126,6 @@ DECLARE_string(hdmap_roi_filter_config);
 DECLARE_string(low_object_filter_config);
 DECLARE_string(traffic_light_multi_camera_projection_config);
 DECLARE_string(traffic_light_recognizer_config);
+DECLARE_string(traffic_light_preprocessor_config);
 
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_

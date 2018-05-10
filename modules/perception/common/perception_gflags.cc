@@ -186,3 +186,7 @@ DEFINE_string(traffic_light_recognizer_config,
               "modules/perception/model/traffic_light/"
               "recognizer_config.pb.txt",
               "traffic light recognizer config filename.");
+DEFINE_string(traffic_light_preprocessor_config,
+              "modules/perception/model/traffic_light/"
+              "preprocessor_config.pb.txt",
+              "traffic light preprocessor config filename.");

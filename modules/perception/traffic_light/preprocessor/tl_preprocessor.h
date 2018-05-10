@@ -22,9 +22,10 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/lib/base/mutex.h"
+#include "modules/perception/proto/traffic_light/preprocessor_config.pb.h"
+
 #include "modules/common/time/timer.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/traffic_light/base/image.h"
 #include "modules/perception/traffic_light/base/image_lights.h"
 #include "modules/perception/traffic_light/interface/base_preprocessor.h"
@@ -45,8 +46,8 @@ typedef std::vector<std::shared_ptr<LightPtrs>> LightsArray;
  */
 class TLPreprocessor : public BasePreprocessor {
  public:
-  TLPreprocessor() {}
-  ~TLPreprocessor() = default;
+  TLPreprocessor() = default;
+  virtual ~TLPreprocessor() = default;
 
   virtual bool Init();
 
@@ -129,12 +130,7 @@ class TLPreprocessor : public BasePreprocessor {
 
   Mutex mutex_;
 
-  // some parameters from config file
-  int max_cached_lights_size_ = 100;
-  int projection_image_cols_ = 1920;
-  int projection_image_rows_ = 1080;
-  float sync_interval_seconds_ = 0.1;
-  float no_signals_interval_seconds_ = 0.5;
+  traffic_light::preprocessor_config::ModelConfigs config_;
 
   DISALLOW_COPY_AND_ASSIGN(TLPreprocessor);
 };
