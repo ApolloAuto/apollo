@@ -13,3 +13,17 @@ proto_library(
         "multi_camera_projection_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "recognizer_config_lib_proto",
+    deps = [
+        ":recognizer_config_lib",
+    ],
+)
+
+proto_library(
+    name = "recognizer_config_lib",
+    srcs = [
+        "recognizer_config.proto",
+    ],
+)

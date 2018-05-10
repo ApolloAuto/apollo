@@ -59,6 +59,9 @@ enum VehicleBrand {
   // Tire effective rolling radius (vertical distance between the wheel center
   // and the ground).
   optional double wheel_rolling_radius = 17;
+
+  // minimum differentiable vehicle speed, in m/s
+  optional float max_abs_speed_when_stopped = 18;
 }
 
 message VehicleConfig {

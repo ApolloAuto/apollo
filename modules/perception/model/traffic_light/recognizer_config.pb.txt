@@ -1,0 +1,19 @@
+recognizer_config {
+  name: "UnityRecognize"
+  version: "1.0.0"
+  classify_model: "modules/perception/model/traffic_light/rcg_all/2017-11-17/vertical/baidu_iter_250000.caffemodel"
+  classify_net: "modules/perception/model/traffic_light/rcg_all/2017-11-17/vertical/deploy.prototxt"
+  classify_threshold: 0.5
+  classify_resize_width: 32
+  classify_resize_height: 96
+}
+
+recognizer_config {
+  name: "UnityRecognizeNight"
+  version: "1.0.0"
+  classify_model: "modules/perception/model/traffic_light/rcg_all/2017-09-15/quadrate/baidu_iter_200000.caffemodel"
+  classify_net: "modules/perception/model/traffic_light/rcg_all/2017-09-15/quadrate/deploy.prototxt"
+  classify_threshold: 0.5
+  classify_resize_width: 64
+  classify_resize_height: 64
+}
