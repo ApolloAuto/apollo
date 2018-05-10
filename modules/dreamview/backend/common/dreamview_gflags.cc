@@ -79,7 +79,7 @@ DEFINE_string(
     request_timeout_ms, "2000",
     "Timeout for network read and network write operations, in milliseconds.");
 
-DEFINE_double(voxel_filter_size, 1.0, "VoxelGrid pointcloud filter leaf size");
+DEFINE_double(voxel_filter_size, 0.3, "VoxelGrid pointcloud filter leaf size");
 
 DEFINE_double(voxel_filter_height, 0.2,
               "VoxelGrid pointcloud filter leaf height");

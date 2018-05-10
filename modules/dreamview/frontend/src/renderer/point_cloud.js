@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const MAX_POINTS = 10000;
+const MAX_POINTS = 100000;
 const HEIGHT_COLOR_MAPPING = {
     0.5: 0xFF0000,
     1.0: 0xFF7F00,
