@@ -27,3 +27,17 @@ proto_library(
         "recognizer_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "preprocessor_config_lib_proto",
+    deps = [
+        ":preprocessor_config_lib",
+    ],
+)
+
+proto_library(
+    name = "preprocessor_config_lib",
+    srcs = [
+        "preprocessor_config.proto",
+    ],
+)
