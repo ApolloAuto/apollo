@@ -195,26 +195,31 @@ class Recorder(object):
             print('Another data recorder is running, skip.')
             return
 
+        task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         large_topics_disk = self.disk_manager.disk_for_large_topics()
         small_topics_disk = self.disk_manager.disk_for_small_topics()
         if large_topics_disk == small_topics_disk:
-            self.record_task(large_topics_disk,
-                             LARGE_TOPICS + SMALL_TOPICS, 'all')
+            self.record_task(large_topics_disk, LARGE_TOPICS + SMALL_TOPICS,
+                             task_id, 'all')
         else:
             if large_topics_disk:
-                self.record_task(large_topics_disk, LARGE_TOPICS, 'large')
-            self.record_task(small_topics_disk, SMALL_TOPICS, 'small')
+                self.record_task(large_topics_disk, LARGE_TOPICS,
+                                 task_id, 'large')
+            self.record_task(small_topics_disk, SMALL_TOPICS, task_id, 'small')
 
     def stop(self):
         """Stop recording."""
         shell_cmd('kill -INT $(pgrep -f "rosbag/record" | grep -v pgrep)')
 
-    def record_task(self, disk, topics, task_type):
+    def record_task(self, disk, topics, task_id, task_type):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
-        print('Recording {} topics to {}'.format(task_type, disk))
-
-        task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         task_dir = os.path.join(disk, 'data/bag', task_id)
+        # As we are using the same task_id, LARGE_TOPICS will goes to subfolder
+        # to avoid conflict when merging.
+        if task_type == 'large':
+            task_dir = os.path.join(task_dir, task_type)
+        print('Recording {} topics to {}'.format(task_type, task_dir))
+
         log_file = '/apollo/data/log/apollo_record_{}.out'.format(task_type)
         topics_str = ' '.join(topics)
 
