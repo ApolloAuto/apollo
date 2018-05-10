@@ -849,7 +849,7 @@ trajectory_point {
 decision {
   main_decision {
     stop {
-      reason_code: STOP_REASON_OBSTACLE
+      reason_code: STOP_REASON_HEAD_VEHICLE
       reason: "stop by 6211"
       stop_point {
         x: 586575.19098307879
@@ -865,7 +865,7 @@ decision {
       perception_id: 6211
       object_decision {
         stop {
-          reason_code: STOP_REASON_OBSTACLE
+          reason_code: STOP_REASON_HEAD_VEHICLE
           distance_s: -6
           stop_point {
             x: 586575.19098307879
