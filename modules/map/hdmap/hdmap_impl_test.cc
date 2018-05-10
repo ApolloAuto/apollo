@@ -39,6 +39,12 @@ class HDMapImplTestSuite : public ::testing::Test {
   HDMapImpl hdmap_impl_;
 };
 
+TEST_F(HDMapImplTestSuite, GetVersion) {
+    std::string map_version = "0.6.1.4";
+    std::string version = hdmap_impl_.GetVersion();
+    EXPECT_STREQ(map_version.c_str(), version.c_str());
+}
+
 TEST_F(HDMapImplTestSuite, GetLaneById) {
   Id lane_id;
   lane_id.set_id("1");

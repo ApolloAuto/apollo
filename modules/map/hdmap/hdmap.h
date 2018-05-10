@@ -64,6 +64,12 @@ class HDMap {
    */
   int LoadMapFromProto(const Map& map_proto);
 
+  /**
+   * @brief get map version
+   * @return map version string
+   */
+  std::string GetVersion() const;
+
   LaneInfoConstPtr GetLaneById(const Id& id) const;
   JunctionInfoConstPtr GetJunctionById(const Id& id) const;
   SignalInfoConstPtr GetSignalById(const Id& id) const;
