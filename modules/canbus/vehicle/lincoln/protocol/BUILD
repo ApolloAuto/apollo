@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -14,16 +16,18 @@ cc_library(
         "gps_6e.cc",
         "gps_6f.cc",
         "gyro_6c.cc",
+        "license_7e.cc",
         "misc_69.cc",
         "steering_64.cc",
         "steering_65.cc",
+        "surround_73.cc",
         "throttle_62.cc",
         "throttle_63.cc",
         "throttleinfo_75.cc",
         "tirepressure_71.cc",
         "turnsignal_68.cc",
         "version_7f.cc",
-        "wheelspeed_6a.cc"
+        "wheelspeed_6a.cc",
     ],
     hdrs = [
         "accel_6b.h",
@@ -37,21 +41,23 @@ cc_library(
         "gps_6e.h",
         "gps_6f.h",
         "gyro_6c.h",
+        "license_7e.h",
         "misc_69.h",
         "steering_64.h",
         "steering_65.h",
+        "surround_73.h",
         "throttle_62.h",
         "throttle_63.h",
         "throttleinfo_75.h",
         "tirepressure_71.h",
         "turnsignal_68.h",
         "version_7f.h",
-        "wheelspeed_6a.h"
+        "wheelspeed_6a.h",
     ],
     deps = [
-        "//modules/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/canbus/vehicle:message_manager_base",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -200,10 +206,34 @@ cc_test(
 )
 
 cc_test(
+    name = "steering_64_test",
+    size = "small",
+    srcs = [
+        "steering_64_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "steering_65_test",
     size = "small",
     srcs = [
         "steering_65_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "throttle_62_test",
+    size = "small",
+    srcs = [
+        "throttle_62_test.cc",
     ],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
@@ -282,3 +312,17 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
+cc_test(
+    name = "surround_73_test",
+    size = "small",
+    srcs = [
+        "surround_73_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cpplint()

@@ -22,8 +22,9 @@
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
-#include "modules/control/common/base_types.h"
 
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::common::time::Clock;
 
 namespace apollo {
@@ -34,36 +35,36 @@ class TrajectoryAnalyzerTest : public ::testing::Test {
   virtual void SetUp() {}
 };
 
-void SetTrajectory(const std::vector<double>& xs, const std::vector<double>& ys,
-                   planning::ADCTrajectory* adc_trajectory) {
+void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,
+                   planning::ADCTrajectory *adc_trajectory) {
   for (size_t i = 0; i < xs.size(); ++i) {
-    auto* point = adc_trajectory->add_adc_trajectory_point();
-    point->set_x(xs[i]);
-    point->set_y(ys[i]);
+    auto *point = adc_trajectory->add_trajectory_point();
+    point->mutable_path_point()->set_x(xs[i]);
+    point->mutable_path_point()->set_y(ys[i]);
   }
   adc_trajectory->mutable_header()->set_sequence_num(123);
 }
 
-void SetTrajectoryWithTime(const std::vector<double>& xs,
-                           const std::vector<double>& ys,
-                           const std::vector<double>& ts,
-                           planning::ADCTrajectory* adc_trajectory) {
+void SetTrajectoryWithTime(const std::vector<double> &xs,
+                           const std::vector<double> &ys,
+                           const std::vector<double> &ts,
+                           planning::ADCTrajectory *adc_trajectory) {
   for (size_t i = 0; i < xs.size(); ++i) {
-    auto* point = adc_trajectory->add_adc_trajectory_point();
-    point->set_x(xs[i]);
-    point->set_y(ys[i]);
+    auto *point = adc_trajectory->add_trajectory_point();
+    point->mutable_path_point()->set_x(xs[i]);
+    point->mutable_path_point()->set_y(ys[i]);
     point->set_relative_time(ts[i]);
   }
 }
 
-void SetTrajectory(const std::vector<double>& xs, const std::vector<double>& ys,
-                   const std::vector<double>& ss,
-                   planning::ADCTrajectory* adc_trajectory) {
+void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,
+                   const std::vector<double> &ss,
+                   planning::ADCTrajectory *adc_trajectory) {
   for (size_t i = 0; i < xs.size(); ++i) {
-    auto* point = adc_trajectory->add_adc_trajectory_point();
-    point->set_x(xs[i]);
-    point->set_y(ys[i]);
-    point->set_accumulated_s(ss[i]);
+    auto *point = adc_trajectory->add_trajectory_point();
+    point->mutable_path_point()->set_x(xs[i]);
+    point->mutable_path_point()->set_y(ys[i]);
+    point->mutable_path_point()->set_s(ss[i]);
   }
 }
 
@@ -72,11 +73,11 @@ TEST_F(TrajectoryAnalyzerTest, SetADCTrajectory) {
   std::vector<double> xs = {1.0, 1.1, 1.2, 1.3, 1.4};
   std::vector<double> ys = {1.0, 1.1, 1.2, 1.3, 1.4};
   SetTrajectory(xs, ys, &adc_trajectory);
-  int traj_size = adc_trajectory.adc_trajectory_point_size();
+  int traj_size = adc_trajectory.trajectory_point_size();
   EXPECT_EQ(traj_size, 5);
   for (int i = 0; i < traj_size; ++i) {
-    EXPECT_EQ(adc_trajectory.adc_trajectory_point(i).x(), xs[i]);
-    EXPECT_EQ(adc_trajectory.adc_trajectory_point(i).y(), ys[i]);
+    EXPECT_EQ(adc_trajectory.trajectory_point(i).path_point().x(), xs[i]);
+    EXPECT_EQ(adc_trajectory.trajectory_point(i).path_point().y(), ys[i]);
   }
 }
 
@@ -89,9 +90,9 @@ TEST_F(TrajectoryAnalyzerTest, Constructor) {
   TrajectoryAnalyzer trajectory_analyzer(&adc_trajectory);
   EXPECT_EQ(trajectory_analyzer.trajectory_points().size(), 5);
   int i = 0;
-  for (auto& point : trajectory_analyzer.trajectory_points()) {
-    EXPECT_EQ(xs[i], point.x);
-    EXPECT_EQ(ys[i], point.y);
+  for (auto &point : trajectory_analyzer.trajectory_points()) {
+    EXPECT_EQ(xs[i], point.path_point().x());
+    EXPECT_EQ(ys[i], point.path_point().y());
     ++i;
   }
   EXPECT_EQ(trajectory_analyzer.seq_num(), 123);
@@ -106,12 +107,12 @@ TEST_F(TrajectoryAnalyzerTest, QueryMatchedPathPoint) {
   TrajectoryAnalyzer trajectory_analyzer(&adc_trajectory);
 
   PathPoint point = trajectory_analyzer.QueryMatchedPathPoint(1.21, 1.21);
-  EXPECT_NEAR(point.x, 1.21, 1e-3);
-  EXPECT_NEAR(point.y, 1.21, 1e-3);
+  EXPECT_NEAR(point.x(), 1.21, 1e-3);
+  EXPECT_NEAR(point.y(), 1.21, 1e-3);
 
   point = trajectory_analyzer.QueryMatchedPathPoint(1.56, 1.50);
-  EXPECT_NEAR(point.x, 1.53, 1e-3);
-  EXPECT_NEAR(point.y, 1.53, 1e-3);
+  EXPECT_NEAR(point.x(), 1.53, 1e-3);
+  EXPECT_NEAR(point.y(), 1.53, 1e-3);
 }
 
 TEST_F(TrajectoryAnalyzerTest, ToTrajectoryFrame) {
@@ -126,10 +127,10 @@ TEST_F(TrajectoryAnalyzerTest, ToTrajectoryFrame) {
   double theta = M_PI / 4.0;
   double v = 1.0;
   PathPoint ref_point;
-  ref_point.x = 1.0;
-  ref_point.y = 0.0;
-  ref_point.theta = 0.0;
-  ref_point.s = 1.0;
+  ref_point.set_x(1.0);
+  ref_point.set_y(0.0);
+  ref_point.set_theta(0.0);
+  ref_point.set_s(1.0);
 
   double s = 0.0;
   double s_dot = 0.0;
@@ -150,25 +151,24 @@ TEST_F(TrajectoryAnalyzerTest, QueryNearestPointByAbsoluteTimeInterpolation) {
   std::vector<double> ts = {0.0, 0.1, 0.2, 0.3, 0.4};
   SetTrajectoryWithTime(xs, ys, ts, &adc_trajectory);
 
-  double timestamp_ = apollo::common::time::ToSecond(Clock::Now()) - 2.0;
+  double timestamp_ = Clock::NowInSeconds() - 2.0;
   adc_trajectory.mutable_header()->set_timestamp_sec(timestamp_);
   TrajectoryAnalyzer trajectory_analyzer(&adc_trajectory);
 
-  double current_time = apollo::common::time::ToSecond(Clock::Now());
-  current_time = apollo::common::time::ToSecond(Clock::Now()) - 20.0;
+  double current_time = Clock::NowInSeconds() - 20.0;
   TrajectoryPoint point_2 =
       trajectory_analyzer.QueryNearestPointByAbsoluteTime(current_time);
-  EXPECT_NEAR(point_2.x, 1.0, 1e-6);
+  EXPECT_NEAR(point_2.path_point().x(), 1.0, 1e-6);
 
   current_time = timestamp_ + 50.0;
   TrajectoryPoint point_4 =
       trajectory_analyzer.QueryNearestPointByAbsoluteTime(current_time);
-  EXPECT_NEAR(point_4.x, 1.4, 1e-6);
+  EXPECT_NEAR(point_4.path_point().x(), 1.4, 1e-6);
 
   current_time = timestamp_ + 0.03;
   TrajectoryPoint point_6 =
       trajectory_analyzer.QueryNearestPointByAbsoluteTime(current_time);
-  EXPECT_NEAR(point_6.x, 1.0, 1e-6);
+  EXPECT_NEAR(point_6.path_point().x(), 1.0, 1e-6);
 }
 
 }  // namespace control

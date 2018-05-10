@@ -19,13 +19,15 @@
 This module provide function to plot the speed control info from log csv file
 """
 
-import sys
 import math
+import sys
+
 import numpy as np
 import tkFileDialog
+
+from process import get_start_index
 from process import preprocess
 from process import process
-from process import get_start_index
 
 
 class Plotter(object):

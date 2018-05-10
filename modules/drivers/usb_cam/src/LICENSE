@@ -1,0 +1,14 @@
+Video for Linux Two API Specification
+Revision 0.24
+Michael H Schimek  <mschimek@gmx.at>
+Bill Dirks
+Hans Verkuil
+Martin Rubli
+
+Copyright © 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Bill Dirks, Michael H. Schimek, Hans Verkuil, Martin Rubli
+
+This document is copyrighted © 1999-2008 by Bill Dirks, Michael H. Schimek, Hans Verkuil and Martin Rubli.
+
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.1 or any later version published by the Free Software Foundation; with no Invariant Sections, with no Front-Cover Texts, and with no Back-Cover Texts. A copy of the license is included in the appendix entitled "GNU Free Documentation License".
+
+Programming examples can be used and distributed without restrictions.

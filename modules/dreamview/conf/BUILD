@@ -6,3 +6,10 @@ filegroup(
         "adapter.conf",
     ],
 )
+
+filegroup(
+    name = "hmi_config",
+    srcs = [
+        "hmi.conf",
+    ],
+)

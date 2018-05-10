@@ -1,0 +1,22 @@
+engine_started: true
+engine_rpm: 0
+speed_mps: 11.25
+odometer_m: 0
+fuel_range_m: 0
+throttle_percentage: 15.007248
+brake_percentage: 14.517433
+steering_percentage: 1.0638298
+steering_torque_nm: 0.8125
+parking_brake: false
+driving_mode: EMERGENCY_MODE
+error_code: NO_ERROR
+gear_location: GEAR_DRIVE
+header {
+  timestamp_sec: 1509472155.5446076
+  module_name: "chassis"
+  sequence_num: 43656
+}
+signal {
+  turn_signal: TURN_NONE
+  horn: false
+}

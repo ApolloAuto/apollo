@@ -23,14 +23,19 @@
 #define MODULES_CONTROL_CONTROLLER_LAT_CONTROLLER_H_
 
 #include <fstream>
+#include <memory>
 #include <string>
 
-#include "modules/control/common/definitions.h"
+#include "Eigen/Core"
+
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+
+#include "modules/common/filters/digital_filter.h"
+#include "modules/common/filters/digital_filter_coefficients.h"
+#include "modules/common/filters/mean_filter.h"
+#include "modules/control/common/interpolation_1d.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
-#include "modules/control/filters/digital_filter.h"
-#include "modules/control/filters/digital_filter_coefficients.h"
-#include "modules/control/filters/mean_filter.h"
 
 /**
  * @namespace apollo::control
@@ -42,7 +47,9 @@ namespace control {
 /**
  * @class LatController
  *
- * @brief Lateral controller, to compute steering target.
+ * @brief LQR-Based lateral controller, to compute steering target.
+ * For more details, please refer to "Vehicle dynamics and control."
+ * Rajamani, Rajesh. Springer Science & Business Media, 2011.
  */
 class LatController : public Controller {
  public:
@@ -61,7 +68,7 @@ class LatController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  Status Init(const ControlConf* control_conf) override;
+  common::Status Init(const ControlConf *control_conf) override;
 
   /**
    * @brief compute steering target based on current vehicle status
@@ -72,16 +79,16 @@ class LatController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Status ComputeControlCommand(
-      const localization::LocalizationEstimate* localization,
-      const canbus::Chassis* chassis, const planning::ADCTrajectory* trajectory,
-      ControlCommand* cmd) override;
+  common::Status ComputeControlCommand(
+      const localization::LocalizationEstimate *localization,
+      const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
+      ControlCommand *cmd) override;
 
   /**
    * @brief reset Lateral Controller
    * @return Status reset status
    */
-  Status Reset() override;
+  common::Status Reset() override;
 
   /**
    * @brief stop Lateral controller
@@ -95,9 +102,7 @@ class LatController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateState(SimpleLateralDebug* debug);
-
-  void UpdateStateAnalyticalMatching(SimpleLateralDebug* debug);
+  void UpdateStateAnalyticalMatching(SimpleLateralDebug *debug);
 
   void UpdateMatrix();
 
@@ -105,23 +110,25 @@ class LatController : public Controller {
 
   double ComputeFeedForward(double ref_curvature) const;
 
-  double GetLateralError(const Eigen::Vector2d& point,
-                         TrajectoryPoint* trajectory_point) const;
+  double GetLateralError(
+      const common::math::Vec2d &point,
+      apollo::common::TrajectoryPoint *trajectory_point) const;
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
-                            const TrajectoryAnalyzer& trajectory_analyzer,
-                            SimpleLateralDebug* debug) const;
-  bool LoadControlConf(const ControlConf* control_conf);
-  void InitializeFilters(const ControlConf* control_conf);
+                            const TrajectoryAnalyzer &trajectory_analyzer,
+                            SimpleLateralDebug *debug);
+  bool LoadControlConf(const ControlConf *control_conf);
+  void InitializeFilters(const ControlConf *control_conf);
+  void LoadLatGainScheduler(const LatControllerConf &lat_controller_conf);
   void LogInitParameters();
-  void ProcessLogs(const SimpleLateralDebug* debug,
-                   const canbus::Chassis* chassis);
+  void ProcessLogs(const SimpleLateralDebug *debug,
+                   const canbus::Chassis *chassis);
 
   void CloseLogFile();
 
-  // a proxy to access vehicle movement state
-  ::apollo::common::vehicle_state::VehicleState vehicle_state_;
+  // vehicle parameter
+  common::VehicleParam vehicle_param_;
 
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;
@@ -148,6 +155,9 @@ class LatController : public Controller {
   // the maximum turn of steer
   double steer_single_direction_max_degree_ = 0.0;
 
+  // limit steering to maximum theoretical lateral acceleration
+  double max_lat_acc_ = 0.0;
+
   // number of control cycles look ahead (preview controller)
   int preview_window_ = 0;
   // number of states without previews, includes
@@ -171,6 +181,8 @@ class LatController : public Controller {
   Eigen::MatrixXd matrix_r_;
   // state weighting matrix
   Eigen::MatrixXd matrix_q_;
+  // updated state weighting matrix
+  Eigen::MatrixXd matrix_q_updated_;
   // vehicle state matrix coefficients
   Eigen::MatrixXd matrix_a_coeff_;
   // 4 by 1 matrix; state matrix
@@ -201,15 +213,24 @@ class LatController : public Controller {
   // parameters for lqr solver; threshold for computation
   double lqr_eps_ = 0.0;
 
-  DigitalFilter digital_filter_;
+  common::DigitalFilter digital_filter_;
+
+  std::unique_ptr<Interpolation1D> lat_err_interpolation_;
+
+  std::unique_ptr<Interpolation1D> heading_err_interpolation_;
 
   // MeanFilter heading_rate_filter_;
-  MeanFilter lateral_error_filter_;
+  common::MeanFilter lateral_error_filter_;
+  common::MeanFilter heading_error_filter_;
 
   // for logging purpose
   std::ofstream steer_log_file_;
 
   const std::string name_;
+
+  double query_relative_time_;
+
+  double pre_steer_angle_ = 0.0;
 };
 
 }  // namespace control

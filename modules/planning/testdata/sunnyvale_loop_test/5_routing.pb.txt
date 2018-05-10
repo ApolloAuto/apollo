@@ -1,0 +1,168 @@
+header {
+  timestamp_sec: 1505348717.2942326
+  module_name: "routing"
+}
+road {
+  id: "21-84-22-88-171-696-161-38-58-153-37-6-12-39-829-694-1-751-753-752-7-23-151-9-133-13"
+  passage {
+    can_exit: true
+    segment {
+      id: "161_1_-3"
+      start_s: 44.726891628538034
+      end_s: 215.789
+    }
+    segment {
+      id: "39_1_-3"
+      start_s: 0
+      end_s: 33.111
+    }
+    segment {
+      id: "37_1_-4"
+      start_s: 0
+      end_s: 27.8634
+    }
+    segment {
+      id: "38_1_-4"
+      start_s: 0
+      end_s: 1.58202
+    }
+    segment {
+      id: "84_1_-1"
+      start_s: 0
+      end_s: 21.0601
+    }
+    segment {
+      id: "58_1_-2"
+      start_s: 0
+      end_s: 165.26
+    }
+    segment {
+      id: "694_1_-2"
+      start_s: 0
+      end_s: 43.3058
+    }
+    segment {
+      id: "829_1_-2"
+      start_s: 0
+      end_s: 147.032
+    }
+    segment {
+      id: "696_1_-2"
+      start_s: 0
+      end_s: 299.712
+    }
+    segment {
+      id: "171_1_-1"
+      start_s: 0
+      end_s: 42.8949
+    }
+    segment {
+      id: "153_1_-4"
+      start_s: 0
+      end_s: 22.1195
+    }
+    segment {
+      id: "751_1_-1"
+      start_s: 0
+      end_s: 12.6363
+    }
+    segment {
+      id: "752_1_-1"
+      start_s: 0
+      end_s: 20.1963
+    }
+    segment {
+      id: "753_1_-1"
+      start_s: 0
+      end_s: 21.6437
+    }
+    segment {
+      id: "6_1_-2"
+      start_s: 0
+      end_s: 194.692
+    }
+    segment {
+      id: "7_1_-2"
+      start_s: 0
+      end_s: 32.89
+    }
+    segment {
+      id: "1_1_-3"
+      start_s: 0
+      end_s: 65.2454
+    }
+    segment {
+      id: "151_1_-2"
+      start_s: 0
+      end_s: 43.8648
+    }
+    segment {
+      id: "9_1_-2"
+      start_s: 0
+      end_s: 161.962
+    }
+    segment {
+      id: "13_1_-2"
+      start_s: 0
+      end_s: 35.3398
+    }
+    segment {
+      id: "12_1_-3"
+      start_s: 0
+      end_s: 122.494
+    }
+    segment {
+      id: "133_1_-3"
+      start_s: 0
+      end_s: 3.63182
+    }
+    segment {
+      id: "88_1_-1"
+      start_s: 0
+      end_s: 19.7333
+    }
+    segment {
+      id: "21_1_-1"
+      start_s: 0
+      end_s: 128.73
+    }
+    segment {
+      id: "22_1_-1"
+      start_s: 0
+      end_s: 31.9409
+    }
+    segment {
+      id: "23_1_-1"
+      start_s: 0
+      end_s: 0
+    }
+  }
+}
+
+measurement {
+  distance: 1870.0031483714622
+}
+routing_request {
+  header {
+    timestamp_sec: 1505348717.292217
+    module_name: "dreamview"
+    sequence_num: 8
+  }
+  waypoint {
+    id: "161_1_-3"
+    s: 44.726891628538034
+    pose {
+      x: 587476.563563349
+      y: 4141499.84318949
+    }
+  }
+  waypoint {
+    id: "23_1_-1"
+    s: 0
+    pose {
+      x: 586948.74012
+      y: 4141171.118641
+    }
+  }
+}
+map_version: "1.400000"

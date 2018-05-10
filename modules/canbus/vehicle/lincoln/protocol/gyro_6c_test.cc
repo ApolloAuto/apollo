@@ -23,15 +23,17 @@ namespace canbus {
 namespace lincoln {
 
 TEST(Gyro6cTest, General) {
-  uint8_t data = 0x01;
+  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   int32_t length = 8;
   ChassisDetail cd;
   Gyro6c gyro;
-  gyro.Parse(&data, length, &cd);
+  gyro.Parse(data, length, &cd);
 
   EXPECT_TRUE(cd.vehicle_spd().is_yaw_rate_valid());
+  EXPECT_DOUBLE_EQ(cd.vehicle_spd().yaw_rate(), 5.1398);
+  EXPECT_DOUBLE_EQ(cd.vehicle_spd().roll_rate(), 5.0382);
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

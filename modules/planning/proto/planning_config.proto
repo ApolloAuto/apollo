@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/proto/dp_poly_path_config.proto";
+import "modules/planning/proto/dp_st_speed_config.proto";
+import "modules/planning/proto/qp_spline_path_config.proto";
+import "modules/planning/proto/qp_st_speed_config.proto";
+import "modules/planning/proto/poly_st_speed_config.proto";
+
+enum TaskType {
+  DP_POLY_PATH_OPTIMIZER = 0;
+  DP_ST_SPEED_OPTIMIZER = 1;
+  QP_SPLINE_PATH_OPTIMIZER = 2;
+  QP_SPLINE_ST_SPEED_OPTIMIZER = 3;
+  PATH_DECIDER = 4;
+  SPEED_DECIDER = 5;
+  POLY_ST_SPEED_OPTIMIZER = 6;
+};
+
+message EMPlannerConfig {
+  repeated TaskType task = 1;
+  optional apollo.planning.DpPolyPathConfig dp_poly_path_config = 2;
+  optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
+  optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
+  optional apollo.planning.QpStSpeedConfig qp_st_speed_config = 5;
+  optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
+}
+
+message PlanningConfig {
+  enum PlannerType {
+    RTK = 0;
+    EM = 1;  // expectation maximization
+    LATTICE = 2;
+  };
+  optional PlannerType planner_type = 1 [default = EM];
+
+  optional EMPlannerConfig em_planner_config = 2;
+}

@@ -1,0 +1,195 @@
+modules {
+  name: "GPS"
+  process_conf {
+    process_cmd_keywords: "gnss_nodelet_manager"
+  }
+}
+modules {
+  name: "camera"
+  process_conf {
+    process_cmd_keywords: "camera_nodelet_manager"
+  }
+}
+modules {
+  name: "canbus"
+  process_conf {
+    process_cmd_keywords: "modules/canbus/canbus"
+  }
+}
+modules {
+  name: "control"
+  process_conf {
+    process_cmd_keywords: "modules/control/control"
+  }
+  topic_conf {
+    type: CONTROL_COMMAND
+  }
+}
+modules {
+  name: "navigation_camera"
+  process_conf {
+    process_cmd_keywords: "camera_nodelet_manager"
+  }
+}
+modules {
+  name: "navigation_control"
+  process_conf {
+    process_cmd_keywords: "modules/control/control"
+  }
+  topic_conf {
+    type: CONTROL_COMMAND
+  }
+}
+modules {
+  name: "localization"
+  process_conf {
+    process_cmd_keywords: "modules/localization/localization"
+  }
+  topic_conf {
+    type: LOCALIZATION
+  }
+}
+modules {
+  name: "navigation_localization"
+  process_conf {
+    process_cmd_keywords: "modules/localization/localization"
+  }
+  topic_conf {
+    type: LOCALIZATION
+  }
+}
+modules {
+  name: "navigation_routing"
+  process_conf {
+    process_cmd_keywords: "modules/tools/navigation/routing/navigation_routing.py"
+  }
+}
+modules {
+  name: "perception"
+  process_conf {
+    process_cmd_keywords: "modules/perception/perception"
+  }
+  topic_conf {
+    type: PERCEPTION_OBSTACLES
+  }
+}
+modules {
+  name: "navigation_perception"
+  process_conf {
+    process_cmd_keywords: "modules/perception/perception"
+  }
+  topic_conf {
+    type: PERCEPTION_OBSTACLES
+  }
+}
+modules {
+  name: "planning"
+  process_conf {
+    process_cmd_keywords: "modules/planning/planning"
+  }
+  topic_conf {
+    type: PLANNING_TRAJECTORY
+  }
+}
+modules {
+  name: "navigation_planning"
+  process_conf {
+    process_cmd_keywords: "modules/planning/planning"
+  }
+  topic_conf {
+    type: PLANNING_TRAJECTORY
+  }
+}
+modules {
+  name: "prediction"
+  process_conf {
+    process_cmd_keywords: "modules/prediction/prediction"
+  }
+  topic_conf {
+    type: PREDICTION
+  }
+}
+modules {
+  name: "mobileye"
+  process_conf {
+    process_cmd_keywords: "modules/drivers/mobileye/mobileye"
+  }
+}
+modules {
+  name: "navigation_prediction"
+  process_conf {
+    process_cmd_keywords: "modules/prediction/prediction"
+  }
+  topic_conf {
+    type: PREDICTION
+  }
+}
+modules {
+  name: "radar"
+  process_conf {
+    process_cmd_keywords: "modules/drivers/radar/conti_radar/conti_radar"
+  }
+  topic_conf {
+    type: CONTI_RADAR
+  }
+}
+modules {
+  name: "record_bag"
+  process_conf {
+    process_cmd_keywords: "rosbag/record"
+  }
+}
+modules {
+  name: "relative_map"
+  process_conf {
+    process_cmd_keywords: "modules/map/relative_map/relative_map"
+  }
+  topic_conf {
+    type: RELATIVE_MAP
+  }
+}
+modules {
+  name: "routing"
+  process_conf {
+    process_cmd_keywords: "modules/routing/routing"
+  }
+}
+modules {
+  name: "third_party_perception"
+  process_conf {
+    process_cmd_keywords: "modules/third_party_perception/third_party_perception"
+  }
+  topic_conf {
+    type: PERCEPTION_OBSTACLES
+  }
+}
+modules {
+  name: "velodyne"
+  process_conf {
+    process_cmd_keywords: "sensor_velodyne64_driver"
+  }
+}
+modules {
+  name: "velodyne_16"
+  process_conf {
+    process_cmd_keywords: "sensor_velodyne16_driver"
+  }
+}
+hardware {
+  name: "velodyne"
+  topic_conf {
+    type: POINT_CLOUD
+  }
+}
+hardware {
+  name: "camera_long"
+  topic_conf {
+    type: IMAGE_LONG
+  }
+}
+hardware {
+  name: "camera_short"
+  topic_conf {
+    type: IMAGE_SHORT
+  }
+}

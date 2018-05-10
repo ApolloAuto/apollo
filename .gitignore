@@ -1,0 +1,90 @@
+# Bazel
+bazel-apollo
+bazel-apollo_dev
+bazel-bin
+bazel-genfiles
+bazel-out
+bazel-testlogs
+/Debug/
+*.pyc
+*genrule.log
+WORKSPACE
+# temporary files
+*.swp
+*.swo
+# generated files
+generated_data_warehouse.conf
+modules/common/data/ssl_keys
+modules/perception/cuda_util/cmake_build
+
+# Eclipse IDE files
+.project
+.cproject
+.settings
+.classpath
+
+# IntelliJ files
+.idea
+
+# Vscode files
+.vscode
+
+# atom.io files
+*.gch
+
+# Logs.
+*.stdout
+*.stderr
+nohup.out
+*.bak
+*.csv.result
+
+# Editor configs
+.ycm_extra_conf.py
+
+# ROS
+ros_param_server.pid
+.master_snapshot
+
+# third_party
+third_party/ros
+third_party/ros_aarch64/
+third_party/ros_x86_64/
+modules/ros/third_party/fast-rtps
+
+# Data
+data/prediction
+data/log
+data/core
+data/bag
+data/cov
+data/kv_db
+data/pcd
+data/nfs
+data/map_visual
+modules/data/conf/task_info_template.pb.txt
+modules/tools/ota/update.ini
+modules/tools/ota/vehicle_info.pb.txt
+
+# Doxygen
+docs/doxygen
+
+# Esd can lib
+third_party/can_card_library/esd_can/include
+third_party/can_card_library/esd_can/lib
+
+# Map data files
+modules/map/data
+
+# python proto
+py_proto
+
+# gnss conf files
+modules/drivers/gnss/conf/conf_beijing
+modules/drivers/gnss/conf/conf_us
+
+# calibration files
+modules/calibration/data/mkz056
+
+# Data bag
+docs/demo_guide/*.bag

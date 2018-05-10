@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * @brief hysteresis filter
  */
 
 #ifndef MODULES_CONTROL_COMMON_HYSTERESIS_FILTER_H_

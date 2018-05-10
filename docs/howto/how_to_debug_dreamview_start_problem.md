@@ -32,3 +32,20 @@ $ sudo fuser -k 8888/tcp
 # restart dreamview again
 $ bash scripts/dreamview.sh
 ```
+
+### Debug dreamview with gdb
+
+If you get nothing in dreamview startup logs, you can try to debug dreamview with gdb, use the following commands:
+
+```
+$ gdb --args /apollo/bazel-bin/modules/dreamview/dreamview --flagfile=/apollo/modules/dreamview/conf/dreamview.conf
+# or
+$ source scripts/apollo_base.sh;
+$ start_gdb dreamview
+```
+
+Once gdb is launched, press `r` and `enter` key to run,  if dreamview is crashed, then get the backtrace with `bt`.
+
+If you see an error `Illegal instruction` and something related with libpcl_sample_consensus.so.1.7 in gdb backtrace, then you probably need to rebuild pcl lib from source by yourself and replace the one in the docker.
+
+This is usually happed when you're trying to run Apollo/dreamview on a machine that the CPU does not support FMA/FMA3 instructions, it will fail because the prebuilt pcl lib shipped with docker image is compiled with FMA/FMA3 support.

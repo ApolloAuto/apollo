@@ -16,18 +16,9 @@
 # limitations under the License.
 ###############################################################################
 
-
 xhost +local:root 1>/dev/null 2>&1
-grep "source /apollo/scripts/apollo_base.sh" ~/.bashrc 1>/dev/null 2>&1
-if [ $? -ne 0 ]; then
-    echo 'if [ -e "/apollo/scripts/apollo_base.sh" ]; then source /apollo/scripts/apollo_base.sh; fi' >> ~/.bashrc
-fi
 docker exec \
     -u $USER \
     -it apollo_release \
     /bin/bash
 xhost -local:root 1>/dev/null 2>&1
-grep "source /apollo/scripts/apollo_base.sh" ~/.bashrc 1>/dev/null 2>&1
-if [ $? -eq 0 ]; then
-    sed -i '$d' ~/.bashrc
-fi

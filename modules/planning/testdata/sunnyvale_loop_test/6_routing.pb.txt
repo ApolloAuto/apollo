@@ -1,0 +1,103 @@
+header {
+  timestamp_sec: 1505426824.2902567
+  module_name: "routing"
+}
+road {
+  id: "23-21-144-140-747-141-12-22-906-88-13-9-133"
+  passage {
+    can_exit: true
+    segment {
+      id: "144_1_-1"
+      start_s: 6.6810589573790908
+      end_s: 46.5655
+    }
+    segment {
+      id: "140_1_-1"
+      start_s: 0
+      end_s: 146.337
+    }
+    segment {
+      id: "747_1_-1"
+      start_s: 0
+      end_s: 15.6326
+    }
+    segment {
+      id: "141_1_-2"
+      start_s: 0
+      end_s: 41.6019
+    }
+    segment {
+      id: "906_1_-1"
+      start_s: 0
+      end_s: 27.921
+    }
+    segment {
+      id: "9_1_-2"
+      start_s: 0
+      end_s: 161.962
+    }
+    segment {
+      id: "13_1_-2"
+      start_s: 0
+      end_s: 35.3398
+    }
+    segment {
+      id: "12_1_-3"
+      start_s: 0
+      end_s: 122.494
+    }
+    segment {
+      id: "133_1_-3"
+      start_s: 0
+      end_s: 3.63182
+    }
+    segment {
+      id: "88_1_-1"
+      start_s: 0
+      end_s: 19.7333
+    }
+    segment {
+      id: "21_1_-1"
+      start_s: 0
+      end_s: 128.73
+    }
+    segment {
+      id: "22_1_-1"
+      start_s: 0
+      end_s: 31.9409
+    }
+    segment {
+      id: "23_1_-1"
+      start_s: 0
+      end_s: 0
+    }
+  }
+}
+
+measurement {
+  distance: 775.20876104262084
+}
+routing_request {
+  header {
+    timestamp_sec: 1505426824.2442551
+    module_name: "dreamview"
+    sequence_num: 1
+  }
+  waypoint {
+    id: "144_1_-1"
+    s: 6.6810589573790908
+    pose {
+      x: 587316.814700983
+      y: 4141172.35367818
+    }
+  }
+  waypoint {
+    id: "23_1_-1"
+    s: 0
+    pose {
+      x: 586948.74012
+      y: 4141171.118641
+    }
+  }
+}
+map_version: "1.400000"

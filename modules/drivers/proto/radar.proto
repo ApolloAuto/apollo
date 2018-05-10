@@ -1,0 +1,49 @@
+syntax = "proto2";
+
+package apollo.drivers;
+
+import "modules/common/proto/error_code.proto";
+import "modules/common/proto/header.proto";
+import "modules/common/proto/geometry.proto";
+
+message RadarObstacle {
+
+enum Status {
+       NO_TARGET = 0;
+       NEW_TARGET = 1;
+       NEW_UPDATED_TARGET = 2;
+       UPDATED_TARGET = 3;
+       COASTED_TARGET = 4;
+       MERGED_TARGET = 5;
+       INVALID_COASTED_TARGET = 6;
+       NEW_COASTED_TARGET = 7;
+   }
+
+   enum MovingStatus {
+       STATIONARY = 0;
+       NEARING = 1;
+       AWAYING = 2;
+       NONE = 3;
+   }
+
+  optional int32 id = 1;  // obstacle ID.
+  optional apollo.common.Point2D relative_position = 2;  // obstacle position in the sl coordinate system.
+  optional apollo.common.Point2D relative_velocity = 3;  // obstacle relative velocity.
+  optional double rcs = 4;  // radar signal intensity.
+  optional MovingStatus moving_status = 5;  // whether this obstacle is able to move.
+  optional double width = 6;
+  optional double length = 7;
+  optional double height = 8;
+  optional double theta = 9;
+  optional apollo.common.Point2D absolute_position = 10;  // obstacle position in map coordinate system
+  optional apollo.common.Point2D absolute_velocity = 11;  // obstacle position in map coordinate system
+  optional int32 count = 12;
+  optional int32 moving_frames_count = 13;
+  optional Status status = 14;
+}
+
+message RadarObstacles {
+  map<int32, RadarObstacle> radar_obstacle = 1;  // An array of obstacles
+  optional apollo.common.Header header = 2;  // Header
+  optional apollo.common.ErrorCode error_code = 3 [default = OK];
+}

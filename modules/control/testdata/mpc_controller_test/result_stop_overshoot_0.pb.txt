@@ -1,0 +1,62 @@
+header {
+}
+throttle: 0
+brake: 21.097875173121142
+steering_rate: 100
+steering_target: -0.04477780151593274
+gear_location: GEAR_DRIVE
+debug {
+  input_debug {
+    localization_header {
+      timestamp_sec: 1178408221.7
+      module_name: "localization"
+      sequence_num: 717699
+    }
+    canbus_header {
+      timestamp_sec: 1494373003.7010145
+      module_name: "chassis"
+      sequence_num: 718141
+    }
+    trajectory_header {
+      timestamp_sec: 1494373003.683531
+      module_name: "planning"
+      sequence_num: 1
+    }
+  }
+  simple_mpc_debug {
+    lateral_error: 1.2680373029720233
+    ref_heading: -1.81618315245
+    heading: -1.8481479021129825
+    heading_error: -0.031964749662982683
+    heading_error_rate: 0.0025642062766740824
+    lateral_error_rate: -0.0031959307112255381
+    curvature: -0.00118652218167
+    steer_angle: -0.04477780151593274
+    steer_angle_feedforward: -0.65837352449246256
+    steer_angle_feedback: -0.04166918860526074
+    steering_position: 1.021276593208313
+    station_reference: 32.38002780204
+    station_error: 32.200656484188684
+    speed_reference: 3.669444561
+    speed_error: 3.5698170837185437
+    acceleration_reference: -0.0417450219111
+    is_full_stop: false
+    station_feedback: 0.17937131785131138
+    speed_feedback: 0.10000000149011612
+    acceleration_cmd_closeloop: 0
+    acceleration_cmd: -0.0417450219111
+    calibration_value: -21.097875173121142
+    matrix_q_updated: 0.05
+    matrix_q_updated: 0
+    matrix_q_updated: 1
+    matrix_q_updated: 0
+    matrix_r_updated: 1
+    matrix_r_updated: 1
+  }
+}
+latency_stats {
+  controller_time_ms: 3.6137104034423828
+}
+engage_advice {
+  advice: READY_TO_ENGAGE
+}

@@ -1,0 +1,7 @@
+hardware_configs: "modules/localization/msf/params/gnss_params/ant_imu_leverarm.yaml"
+hardware_configs: "modules/perception/data/params/long_camera_extrinsics.yaml"
+hardware_configs: "modules/perception/data/params/short_camera_extrinsics.yaml"
+hardware_configs: "<ros>/share/velodyne_pointcloud/params/velodyne64_novatel_extrinsics_example.yaml"
+hardware_configs: "<ros>/share/velodyne_pointcloud/params/64E_S3_calibration_example.yaml"
+hardware_configs: "<ros>/share/velodyne_pointcloud/params/velodyne16_novatel_extrinsics_example.yaml"
+hardware_configs: "<ros>/share/velodyne_pointcloud/params/VLP16_calibration.yaml"

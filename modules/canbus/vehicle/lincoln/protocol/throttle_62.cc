@@ -16,11 +16,13 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/throttle_62.h"
 
-#include "modules/canbus/common/byte.h"
+#include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
+
+using ::apollo::drivers::canbus::Byte;
 
 // public
 
@@ -31,7 +33,7 @@ uint32_t Throttle62::GetPeriod() const {
   return PERIOD;
 }
 
-void Throttle62::UpdateData(uint8_t* data) {
+void Throttle62::UpdateData(uint8_t *data) {
   set_pedal_p(data, pedal_cmd_);
   set_enable_p(data, pedal_enable_);
   set_clear_driver_override_flag_p(data, clear_driver_override_flag_);
@@ -47,24 +49,24 @@ void Throttle62::Reset() {
   watchdog_counter_ = 0;
 }
 
-Throttle62* Throttle62::set_pedal(double pedal) {
+Throttle62 *Throttle62::set_pedal(double pedal) {
   pedal_cmd_ = pedal;
   return this;
 }
 
-Throttle62* Throttle62::set_enable() {
+Throttle62 *Throttle62::set_enable() {
   pedal_enable_ = true;
   return this;
 }
 
-Throttle62* Throttle62::set_disable() {
+Throttle62 *Throttle62::set_disable() {
   pedal_enable_ = false;
   return this;
 }
 
 // private
 
-void Throttle62::set_pedal_p(uint8_t* data, double pedal) {
+void Throttle62::set_pedal_p(uint8_t *data, double pedal) {
   // change from [0-100] to [0.00-1.00]
   // and a rough mapping
   pedal /= 100.0;
@@ -82,7 +84,7 @@ void Throttle62::set_pedal_p(uint8_t* data, double pedal) {
   frame_high.set_value(t, 0, 8);
 }
 
-void Throttle62::set_enable_p(uint8_t* bytes, bool enable) {
+void Throttle62::set_enable_p(uint8_t *bytes, bool enable) {
   Byte frame(bytes + 3);
   if (enable) {
     frame.set_bit_1(0);
@@ -91,7 +93,7 @@ void Throttle62::set_enable_p(uint8_t* bytes, bool enable) {
   }
 }
 
-void Throttle62::set_clear_driver_override_flag_p(uint8_t* bytes, bool clear) {
+void Throttle62::set_clear_driver_override_flag_p(uint8_t *bytes, bool clear) {
   Byte frame(bytes + 3);
   if (clear) {
     frame.set_bit_1(1);
@@ -100,7 +102,7 @@ void Throttle62::set_clear_driver_override_flag_p(uint8_t* bytes, bool clear) {
   }
 }
 
-void Throttle62::set_ignore_driver_override_p(uint8_t* bytes, bool ignore) {
+void Throttle62::set_ignore_driver_override_p(uint8_t *bytes, bool ignore) {
   Byte frame(bytes + 3);
   if (ignore) {
     frame.set_bit_1(2);
@@ -109,7 +111,7 @@ void Throttle62::set_ignore_driver_override_p(uint8_t* bytes, bool ignore) {
   }
 }
 
-void Throttle62::set_watchdog_counter_p(uint8_t* data, int32_t count) {
+void Throttle62::set_watchdog_counter_p(uint8_t *data, int32_t count) {
   count = ProtocolData::BoundedValue(0, 255, count);
   Byte frame(data + 7);
   frame.set_value(count, 0, 8);

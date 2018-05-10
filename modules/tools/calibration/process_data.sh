@@ -18,8 +18,6 @@
 
 #! /bin/bash
 
-# set -x
-
 rm result.csv
 for f in `ls ${1}/*_recorded.csv`
 do

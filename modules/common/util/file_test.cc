@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
-#include "modules/common/util/testing/simple.pb.h"
+#include "modules/common/util/testdata/simple.pb.h"
 
 namespace apollo {
 namespace common {
@@ -54,6 +54,27 @@ TEST_F(FileTest, GetSetASCIIFile) {
   EXPECT_EQ(message.text(), read_message.text());
 }
 
+TEST_F(FileTest, GetSetBinaryFile) {
+  const std::string path = FilePath("output.pb.bin");
+
+  test::SimpleMessage message;
+  message.set_integer(17);
+  message.set_text("This is some piece of text.");
+
+  EXPECT_TRUE(SetProtoToBinaryFile(message, path));
+
+  test::SimpleMessage read_message;
+  EXPECT_TRUE(GetProtoFromBinaryFile(path, &read_message));
+
+  EXPECT_EQ(message.integer(), read_message.integer());
+  EXPECT_EQ(message.text(), read_message.text());
+}
+
+TEST_F(FileTest, PathExists) {
+  EXPECT_TRUE(PathExists("/root"));
+  EXPECT_FALSE(PathExists("/something_impossible"));
+}
+
 TEST_F(FileTest, EnsureAndRemoveDirectory) {
   const std::string directory_path = FilePath("my_directory/haha/hehe");
   EXPECT_FALSE(DirectoryExists(directory_path));
@@ -77,6 +98,39 @@ TEST_F(FileTest, RemoveAllFiles) {
   EXPECT_FALSE(GetProtoFromASCIIFile(path2, &message));
 }
 
-}  // namespace file
+TEST_F(FileTest, ListSubDirectories) {
+  // Expect {'modules/common/util/testdata'}
+  const auto root_subdirs = ListSubDirectories("/");
+
+  // Some common root subdirs should exist.
+  EXPECT_NE(root_subdirs.end(),
+            std::find(root_subdirs.begin(), root_subdirs.end(), "home"));
+  EXPECT_NE(root_subdirs.end(),
+            std::find(root_subdirs.begin(), root_subdirs.end(), "root"));
+  // Something shouldn't exist.
+  EXPECT_EQ(root_subdirs.end(),
+            std::find(root_subdirs.begin(), root_subdirs.end(), "impossible"));
+}
+
+TEST_F(FileTest, GetAbsolutePath) {
+  EXPECT_EQ("./xx.txt", GetAbsolutePath("", "./xx.txt"));
+  EXPECT_EQ("/abc", GetAbsolutePath("/abc", ""));
+  EXPECT_EQ("/home/work/xx.txt", GetAbsolutePath("/home/work", "xx.txt"));
+  EXPECT_EQ("/home/work/xx.txt", GetAbsolutePath("/home/work/", "xx.txt"));
+  EXPECT_EQ("/xx.txt", GetAbsolutePath("/home/work", "/xx.txt"));
+  EXPECT_EQ("/home/work/./xx.txt", GetAbsolutePath("/home/work", "./xx.txt"));
+}
+
+TEST_F(FileTest, GetFileNamesInFolderById) {
+  std::string data_path = "modules/perception/data/hm_tracker_test/";
+  std::vector<std::string> seg_filenames;
+  GetFileNamesInFolderById(data_path, ".seg", &seg_filenames);
+  std::vector<std::string> pose_filenames;
+  GetFileNamesInFolderById(data_path, ".pose", &pose_filenames);
+  EXPECT_EQ(seg_filenames.size(), 8);
+  EXPECT_EQ(pose_filenames.size(), 8);
+}
+
+}  // namespace util
 }  // namespace common
 }  // namespace apollo

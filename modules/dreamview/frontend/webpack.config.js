@@ -5,6 +5,8 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const FaviconsWebpackPlugin = require("favicons-webpack-plugin");
 const ProgressBarPlugin = require("progress-bar-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
     context: path.join(__dirname, "src"),
@@ -26,7 +28,7 @@ module.exports = {
         // without the extension.
         //
         // Needs ".json" and ".scss" for Grommet.
-        extensions: [".wepack.js", ".web.js",
+        extensions: [".webpack.js", ".web.js",
                      ".jsx", ".js",
                      ".json",
                      ".scss", ".css",
@@ -38,6 +40,7 @@ module.exports = {
             utils: path.resolve(__dirname, "src/utils"),
             renderer: path.resolve(__dirname, "src/renderer"),
             assets: path.resolve(__dirname, "assets"),
+            proto_bundle: path.resolve(__dirname, "proto_bundle"),
         }
     },
 
@@ -81,11 +84,17 @@ module.exports = {
                 test: require.resolve("three/examples/js/loaders/MTLLoader.js"),
                 use: "imports-loader?THREE=three"
             }, {
+                test: require.resolve("three/examples/js/loaders/OBJLoader.js"),
+                use: "imports-loader?THREE=three"
+            }, {
+                test: require.resolve("three/examples/js/controls/OrbitControls.js"),
+                use: "imports-loader?THREE=three"
+            }, {
                 // Load the images. They goes through image-webpack-loader
                 // first, and then file-loader.
                 //
                 // Now you can import images just like js.
-                test: /\.(png|jpe?g|svg)$/i,
+                test: /\.(png|jpe?g|svg|mp4|mov|gif)$/i,
                 use: [
                     {
                         loader: "file-loader",
@@ -95,10 +104,12 @@ module.exports = {
                     }, {
                         loader: "image-webpack-loader",
                         options: {
-                            progressive: true,
                             pngquant: {
                                 quality: "65-90",
                                 speed: 4,
+                            },
+                            mozjpeg: {
+                                progressive: true,
                             }
                         }
                     }
@@ -137,7 +148,22 @@ module.exports = {
                 // For font-awesome (ttf)
                 test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: "file-loader",
-            }
+            }, {
+                test: /webworker\.js$/,
+                use: [
+                {
+                    loader: 'worker-loader',
+                    options: {
+                        name: 'worker.bundle.js'
+                    },
+                },
+                {
+                    loader: "babel-loader",
+                    options: {
+                        presets: ["es2015"],
+                    }
+                }]
+            },
         ]
     },
 
@@ -151,7 +177,26 @@ module.exports = {
             // Include only the app. Do not include the service worker.
             chunks: ["app"]
         }),
-        new FaviconsWebpackPlugin("./favicon.png")
+        new FaviconsWebpackPlugin("./favicon.png"),
+        new CopyWebpackPlugin([
+            {
+                from: '../node_modules/three/examples/fonts',
+                to: 'fonts',
+            }
+        ]),
+        // As of moment 2.18, all locales are bundled together with the core library
+        // use the IgnorePlugin to stop any locale being bundled with moment:
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+
+        new webpack.DefinePlugin({
+            OFFLINE_PLAYBACK: JSON.stringify(false),
+        }),
+
+        // Uncomment me to analyze bundles
+        // new BundleAnalyzerPlugin({
+        //     analyzerMode: 'server',
+        //     analyzerPort: '7777'
+        // }),
     ],
 
     devServer: {

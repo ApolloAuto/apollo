@@ -16,11 +16,13 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/gear_66.h"
 
-#include "modules/canbus/common/byte.h"
+#include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
+
+using ::apollo::drivers::canbus::Byte;
 
 // public
 const int32_t Gear66::ID = 0x66;
@@ -31,60 +33,53 @@ uint32_t Gear66::GetPeriod() const {
   return PERIOD;
 }
 
-void Gear66::UpdateData(uint8_t* data) {
+void Gear66::UpdateData(uint8_t *data) {
   set_gear_p(data, gear_);
-  set_clear_driver_override_flag_p(data, clear_driver_override_flag_);
+  set_clear_driver_override_flag_p(data);
 }
 
-void Gear66::Reset() {
-  gear_ = 0;
-  clear_driver_override_flag_ = false;
-}
+void Gear66::Reset() { gear_ = 0; }
 
-Gear66* Gear66::set_gear_none() {
+Gear66 *Gear66::set_gear_none() {
   gear_ = 0x00;
   return this;
 }
 
-Gear66* Gear66::set_gear_park() {
+Gear66 *Gear66::set_gear_park() {
   gear_ = 0x01;
   return this;
 }
 
-Gear66* Gear66::set_gear_reverse() {
+Gear66 *Gear66::set_gear_reverse() {
   gear_ = 0x02;
   return this;
 }
 
-Gear66* Gear66::set_gear_neutral() {
+Gear66 *Gear66::set_gear_neutral() {
   gear_ = 0x03;
   return this;
 }
 
-Gear66* Gear66::set_gear_drive() {
+Gear66 *Gear66::set_gear_drive() {
   gear_ = 0x04;
   return this;
 }
 
-Gear66* Gear66::set_gear_low() {
+Gear66 *Gear66::set_gear_low() {
   gear_ = 0x05;
   return this;
 }
 
 // private
-void Gear66::set_gear_p(uint8_t* data, int32_t gear) {
+void Gear66::set_gear_p(uint8_t *data, int32_t gear) {
   gear = ProtocolData::BoundedValue(0, 5, gear);
-  Byte frame(data + 0);
+  Byte frame(data);
   frame.set_value(gear, 0, 3);
 }
 
-void Gear66::set_clear_driver_override_flag_p(uint8_t* bytes, bool clear) {
-  Byte frame(bytes + 0);
-  if (clear) {
-    frame.set_bit_1(7);
-  } else {
-    frame.set_bit_0(7);
-  }
+void Gear66::set_clear_driver_override_flag_p(uint8_t *bytes) {
+  Byte frame(bytes);
+  frame.set_bit_0(7);
 }
 
 }  // namespace lincoln

@@ -1,0 +1,10 @@
+
+<launch>
+    <node pkg="nodelet" type="nodelet" name="gnss_nodelet_manager"
+        args="manager" output="screen">
+    </node>
+
+    <node pkg="nodelet" type="nodelet" name="rtcm_parser_nodelet"
+        args="load gnss_driver/RtcmParserNodelet gnss_nodelet_manager" output="screen">
+    </node>
+</launch>

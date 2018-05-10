@@ -1,0 +1,52 @@
+syntax = "proto2";
+
+package apollo.perception.obstacle.yolo;
+
+enum ModelType{
+    Caffe = 0;
+}
+message YoloParam {
+    required ModelParam model_param = 1;
+    required NetworkParam net_param = 2;
+    optional NMSParam nms_param = 3;
+}
+
+message ModelParam {
+    required string model_name = 1 [default = "yolo-2d"];
+    optional string proto_file = 2 [default = "deploy.pt"];
+    optional string weight_file = 3 [default = "deploy.md"];
+    optional string anchors_file = 4 [default = "anchors.txt"];
+    optional string types_file = 5 [default = "types.txt"];
+    optional string feature_file = 6 [default = "feature.pt"];
+
+    optional float offset_ratio = 7   [default = 0.288889];
+    optional float cropped_ratio = 13 [default = 0.711111];
+    optional int32 resized_width = 14 [default = 1440];
+    optional int32 aligned_pixel = 15 [default = 32];
+    optional float confidence_threshold = 8 [default = 0.1];
+    optional float min_2d_height = 9 [default = 0.0];
+    optional float min_3d_height = 10 [default = 0.0];
+    optional string calibratetable_root = 11 [default = "./"];
+    optional ModelType model_type = 12 [default = Caffe];
+
+}
+
+message NetworkParam {
+    optional string loc_blob = 1 [default = "loc_pred"];
+    optional string obj_blob = 2 [default = "obj_pred"];
+    optional string cls_blob = 3 [default = "cls_pred"];
+    optional string ori_blob = 4 [default = "ori_pred"];
+    optional string dim_blob = 5 [default = "dim_pred"];
+    optional string lof_blob = 6 [default = "lof_pred"];
+    optional string lor_blob = 7 [default = "lor_pred"];
+    optional string seg_blob = 8 [default = "seg_pred"];
+    optional string input_blob = 10 [default = "data"];
+}
+
+message NMSParam {
+    optional string type = 1 [default = "NormalNMS"];
+    optional float threshold = 2 [default = 0.4];
+    optional float sigma = 3 [default = 0.4];
+    optional float inter_cls_nms_thresh = 4 [default = 1.0];
+    optional float cross_class_merge_thresh = 5 [default = 0.8];
+}

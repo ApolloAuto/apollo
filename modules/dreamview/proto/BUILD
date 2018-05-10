@@ -1,24 +1,71 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cc_proto_library")
-load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_compile")
-
 cc_proto_library(
     name = "simulation_world_proto",
-    protos = ["simulation_world.proto"],
     deps = [
-        "//modules/common/monitor/proto:monitor_proto",
-        "//modules/decision/proto:decision_proto",
-        "//modules/planning/proto:planning_proto",
+        ":simulation_world_proto_lib",
     ],
 )
 
-py_proto_compile(
-    name = "simulation_world_proto_pylib",
-    protos = ["simulation_world.proto"],
+proto_library(
+    name = "simulation_world_proto_lib",
+    srcs = ["simulation_world.proto"],
     deps = [
-        "//modules/common/monitor/proto:monitor_proto_pylib",
-        "//modules/decision/proto:decision_proto_pylib",
-        "//modules/planning/proto:planning_proto_pylib",
+        "//modules/common/monitor_log/proto:monitor_log_proto_lib",
+        "//modules/common/proto:pnc_point_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
+        "//modules/planning/proto:planning_internal_proto_lib",
+        "//modules/routing/proto:routing_proto_lib",
     ],
+)
+
+cc_proto_library(
+    name = "point_cloud_proto",
+    deps = [
+        ":point_cloud_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "point_cloud_proto_lib",
+    srcs = ["point_cloud.proto"],
+)
+
+cc_proto_library(
+    name = "hmi_config_proto",
+    deps = [
+        ":hmi_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "hmi_config_proto_lib",
+    srcs = ["hmi_config.proto"],
+)
+
+cc_proto_library(
+    name = "hmi_status_proto",
+    deps = [
+        ":hmi_status_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "hmi_status_proto_lib",
+    srcs = ["hmi_status.proto"],
+    deps = [
+        "//modules/monitor/proto:system_status_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "voice_detection_proto",
+    deps = [
+        ":voice_detection_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "voice_detection_proto_lib",
+    srcs = ["voice_detection.proto"],
 )

@@ -2,54 +2,87 @@ syntax = "proto2";
 
 package apollo.perception;
 
+import "modules/common/proto/error_code.proto";
 import "modules/common/proto/header.proto";
+import "modules/map/proto/map_lane.proto";
 
-// FIXME: To be merged with common::ErrorCode
-enum PerceptionErrorCode {
-    ERROR_NONE = 0;
-    ERROR_TF = 1;
-    ERROR_PROCESS = 2;
-    ERROR_UNKNOWN = 3;
-}
-
+// TODO(all) change to Point3D
 message Point {
-    optional double x = 1;  // in meters.
-    optional double y = 2;  // in meters.
-    optional double z = 3;  // height in meters.
+  optional double x = 1;  // in meters.
+  optional double y = 2;  // in meters.
+  optional double z = 3;  // height in meters.
 }
 
 message PerceptionObstacle {
-    optional int32 id = 1;  // obstacle ID.
-    optional Point position = 2;  // obstacle position in the world coordinate system.
-    optional double theta = 3;  // heading in the world coordinate system.
-    optional Point velocity = 4;  // obstacle velocity.
+  optional int32 id = 1;  // obstacle ID.
+  optional Point position = 2;  // obstacle position in the world coordinate
+                                // system.
+  optional double theta = 3;  // heading in the world coordinate system.
+  optional Point velocity = 4;  // obstacle velocity.
 
-    // Size of obstacle bounding box.
-    optional double length = 5;  // obstacle length.
-    optional double width = 6;  // obstacle width.
-    optional double height = 7;  // obstacle height.
+  // Size of obstacle bounding box.
+  optional double length = 5;  // obstacle length.
+  optional double width = 6;  // obstacle width.
+  optional double height = 7;  // obstacle height.
 
-    repeated Point polygon_point = 8;  // obstacle corner points.
-    optional double tracking_time = 9;  // duration of an obstacle since detection in s.
+  repeated Point polygon_point = 8;  // obstacle corner points.
+  // duration of an obstacle since detection in s.
+  optional double tracking_time = 9;
 
-    enum Type {
-        UNKNOWN = 0;
-        UNKNOWN_MOVABLE = 1;
-        UNKNOWN_UNMOVABLE = 2;
-        PEDESTRIAN = 3;  // Pedestrian, usually determined by moving behaviour.
-        BICYCLE = 4;  // bike, motor bike
-        VEHICLE = 5;  // Passenger car or truck.
-    };
-    optional Type type = 10;  // obstacle type
-    optional double timestamp = 11;  // GPS time in seconds.
+  enum Type {
+    UNKNOWN = 0;
+    UNKNOWN_MOVABLE = 1;
+    UNKNOWN_UNMOVABLE = 2;
+    PEDESTRIAN = 3;  // Pedestrian, usually determined by moving behaviour.
+    BICYCLE = 4;  // bike, motor bike
+    VEHICLE = 5;  // Passenger car or truck.
+  };
+  optional Type type = 10;  // obstacle type
+  optional double timestamp = 11;  // GPS time in seconds.
 
-    // Just for offline debuging, onboard will not fill this field.
-    // Format like : [x0, y0, z0, x1, y1, z1...]
-    repeated double point_cloud = 12 [packed = true];
+  // Just for offline debuging, onboard will not fill this field.
+  // Format like : [x0, y0, z0, x1, y1, z1...]
+  repeated double point_cloud = 12 [packed = true];
+
+  optional double confidence = 13 [default = 1.0];
+  enum ConfidenceType {
+      CONFIDENCE_UNKNOWN = 0;
+      CONFIDENCE_CNN = 1;
+      CONFIDENCE_RADAR = 2;
+  };
+  optional ConfidenceType confidence_type = 14 [default = CONFIDENCE_CNN];
+}
+
+message CIPVInfo {
+  optional int32 cipv_id = 1;
+  repeated int32 potential_cipv_id = 2;
+}
+
+message LaneMarker {
+  optional apollo.hdmap.LaneBoundaryType.Type lane_type = 1;
+  optional double quality = 2; // range = [0,1]; 1 = the best quality
+  optional int32 model_degree = 3;
+  // equation X = c3 * Z^3 + c2 * Z^2 + c1 * Z + c0
+  optional double c0_position = 4;
+  optional double c1_heading_angle = 5;
+  optional double c2_curvature = 6;
+  optional double c3_curvature_derivative = 7;
+  optional double view_range = 8;
+  optional double longitude_start = 9;
+  optional double longitude_end = 10;
+}
+
+message LaneMarkers {
+  optional LaneMarker left_lane_marker = 1;
+  optional LaneMarker right_lane_marker = 2;
+  repeated LaneMarker next_left_lane_marker = 3;
+  repeated LaneMarker next_right_lane_marker = 4;
 }
 
 message PerceptionObstacles {
-    repeated PerceptionObstacle perception_obstacle = 1;  // An array of obstacles
-    optional apollo.common.Header header = 2;  // Header
-    optional PerceptionErrorCode error_code = 3 [default = ERROR_NONE];
+  repeated PerceptionObstacle perception_obstacle = 1;  // An array of obstacles
+  optional apollo.common.Header header = 2;  // Header
+  optional apollo.common.ErrorCode error_code = 3 [default = OK];
+  optional LaneMarkers lane_marker = 4;
+  optional CIPVInfo cipv_info = 5; // closest in path vehicle
 }

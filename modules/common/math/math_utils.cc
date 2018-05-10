@@ -16,6 +16,7 @@
 
 #include "modules/common/math/math_utils.h"
 
+#include <cmath>
 #include <utility>
 
 #include "glog/logging.h"
@@ -23,6 +24,8 @@
 namespace apollo {
 namespace common {
 namespace math {
+
+double Sqr(const double x) { return x * x; }
 
 double CrossProd(const Vec2d& start_point, const Vec2d& end_point_1,
                  const Vec2d& end_point_2) {
@@ -50,8 +53,15 @@ double WrapAngle(const double angle) {
 }
 
 double NormalizeAngle(const double angle) {
-  const double new_angle = std::fmod(angle + M_PI, M_PI * 2.0);
-  return (new_angle < 0 ? new_angle + M_PI * 2.0 : new_angle) - M_PI;
+  double a = std::fmod(angle + M_PI, 2.0 * M_PI);
+  if (a < 0.0) {
+    a += (2.0 * M_PI);
+  }
+  return a - M_PI;
+}
+
+double AngleDiff(const double from, const double to) {
+  return NormalizeAngle(to - from);
 }
 
 int RandomInt(const int s, const int t, unsigned int rand_seed) {
@@ -65,17 +75,24 @@ double RandomDouble(const double s, const double t, unsigned int rand_seed) {
   return s + (t - s) / 16383.0 * (rand_r(&rand_seed) & 16383);
 }
 
-int double_compare(const double d1, const double d2, const double epsilon) {
-  DCHECK(!std::isnan(d1));
-  DCHECK(!std::isnan(d2));
+// Gaussian
+double Gaussian(const double u, const double std, const double x) {
+  return (1.0 / std::sqrt(2 * M_PI * std * std)) *
+         std::exp(-(x - u) * (x - u) / (2 * std * std));
+}
 
-  if ((d1 - d2) > std::fmax(std::fabs(d1), std::fabs(d2)) * epsilon) {
-    return 1;
-  } else if ((d2 - d1) > std::fmax(std::fabs(d1), std::fabs(d2)) * epsilon) {
-    return -1;
-  } else {
-    return 0;
-  }
+// Sigmoid
+double Sigmoid(const double x) { return 1.0 / (1.0 + std::exp(-x)); }
+
+void RotateAxis(const double theta, const double x0, const double y0,
+                double* x1, double* y1) {
+  CHECK_NOTNULL(x1);
+  CHECK_NOTNULL(y1);
+
+  const double cos_theta = std::cos(theta);
+  const double sin_theta = std::sin(theta);
+  *x1 = x0 * cos_theta + y0 * sin_theta;
+  *y1 = -x0 * sin_theta + y0 * cos_theta;
 }
 
 }  // namespace math

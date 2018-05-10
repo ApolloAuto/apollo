@@ -31,6 +31,7 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
 #include "modules/canbus/vehicle/lincoln/protocol/gear_66.h"
@@ -60,9 +61,11 @@ class LincolnController final : public VehicleController {
    * @brief initialize the lincoln vehicle controller.
    * @return init error_code
    */
-  ::apollo::common::ErrorCode Init(
-      const VehicleParameter& params, CanSender* const can_sender,
-      MessageManager* const message_manager) override;
+  common::ErrorCode Init(
+      const VehicleParameter &params,
+      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
+      MessageManager<::apollo::canbus::ChassisDetail> *const message_manager)
+      override;
 
   /**
    * @brief start the vehicle controller.
@@ -88,10 +91,10 @@ class LincolnController final : public VehicleController {
  private:
   // main logical function for operation the car enter or exit the auto driving
   void Emergency() override;
-  ::apollo::common::ErrorCode EnableAutoMode() override;
-  ::apollo::common::ErrorCode DisableAutoMode() override;
-  ::apollo::common::ErrorCode EnableSteeringOnlyMode() override;
-  ::apollo::common::ErrorCode EnableSpeedOnlyMode() override;
+  common::ErrorCode EnableAutoMode() override;
+  common::ErrorCode DisableAutoMode() override;
+  common::ErrorCode EnableSteeringOnlyMode() override;
+  common::ErrorCode EnableSpeedOnlyMode() override;
 
   // NEUTRAL, REVERSE, DRIVE
   void Gear(Chassis::GearPosition state) override;
@@ -115,11 +118,10 @@ class LincolnController final : public VehicleController {
   void Steer(double angle, double angle_spd) override;
 
   // set Electrical Park Brake
-  void SetEpbBreak(const ::apollo::control::ControlCommand& command) override;
-  void SetBeam(const ::apollo::control::ControlCommand& command) override;
-  void SetHorn(const ::apollo::control::ControlCommand& command) override;
-  void SetTurningSignal(
-      const ::apollo::control::ControlCommand& command) override;
+  void SetEpbBreak(const control::ControlCommand &command) override;
+  void SetBeam(const control::ControlCommand &command) override;
+  void SetHorn(const control::ControlCommand &command) override;
+  void SetTurningSignal(const control::ControlCommand &command) override;
 
   void ResetProtocol();
   bool CheckChassisError();
@@ -130,17 +132,16 @@ class LincolnController final : public VehicleController {
   void set_chassis_error_mask(const int32_t mask);
   int32_t chassis_error_mask();
   Chassis::ErrorCode chassis_error_code();
-  void set_chassis_error_code(const Chassis::ErrorCode& error_code);
+  void set_chassis_error_code(const Chassis::ErrorCode &error_code);
 
  private:
   // control protocol
-  Brake60* brake_60_ = nullptr;
-  Throttle62* throttle_62_ = nullptr;
-  Steering64* steering_64_ = nullptr;
-  Gear66* gear_66_ = nullptr;
-  Turnsignal68* turnsignal_68_ = nullptr;
+  Brake60 *brake_60_ = nullptr;
+  Throttle62 *throttle_62_ = nullptr;
+  Steering64 *steering_64_ = nullptr;
+  Gear66 *gear_66_ = nullptr;
+  Turnsignal68 *turnsignal_68_ = nullptr;
 
-  CanSender* can_sender_;
   Chassis chassis_;
   std::unique_ptr<std::thread> thread_;
   bool is_chassis_error_ = false;
@@ -150,6 +151,8 @@ class LincolnController final : public VehicleController {
 
   std::mutex chassis_mask_mutex_;
   int32_t chassis_error_mask_ = 0;
+
+  bool received_vin_ = false;
 };
 
 }  // namespace lincoln

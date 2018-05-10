@@ -29,10 +29,11 @@
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
-#include "modules/canbus/can_comm/can_sender.h"
-#include "modules/canbus/vehicle/message_manager.h"
-#include "modules/canbus/vehicle/protocol_data.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/error_code.pb.h"
+#include "modules/drivers/canbus/can_comm/can_sender.h"
+#include "modules/drivers/canbus/can_comm/message_manager.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
  * @namespace apollo::canbus
@@ -40,6 +41,9 @@
  */
 namespace apollo {
 namespace canbus {
+
+using ::apollo::drivers::canbus::CanSender;
+using ::apollo::drivers::canbus::MessageManager;
 
 /**
  * @class VehicleController
@@ -57,9 +61,11 @@ class VehicleController {
    * @param message_manager a pointer to the message_manager.
    * @return error_code
    */
-  virtual ::apollo::common::ErrorCode Init(
-      const VehicleParameter& params, CanSender* const can_sender,
-      MessageManager* const message_manager) = 0;
+  virtual common::ErrorCode Init(
+      const VehicleParameter &params,
+      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
+      MessageManager<::apollo::canbus::ChassisDetail>
+          *const message_manager) = 0;
 
   /**
    * @brief start the vehicle controller.
@@ -83,16 +89,15 @@ class VehicleController {
    * @param command the control command
    * @return error_code
    */
-  virtual ::apollo::common::ErrorCode Update(
-      const ::apollo::control::ControlCommand& command);
+  virtual common::ErrorCode Update(const control::ControlCommand &command);
 
   /**
-    * @brief set vehicle to appointed driving mode.
-    * @param driving mode to be appointed.
-    * @return error_code
-    */
-  virtual ::apollo::common::ErrorCode SetDrivingMode(
-      const Chassis::DrivingMode& driving_mode);
+   * @brief set vehicle to appointed driving mode.
+   * @param driving mode to be appointed.
+   * @return error_code
+   */
+  virtual common::ErrorCode SetDrivingMode(
+      const Chassis::DrivingMode &driving_mode);
 
  private:
   /*
@@ -101,10 +106,10 @@ class VehicleController {
    */
   virtual void Emergency() = 0;
 
-  virtual ::apollo::common::ErrorCode EnableAutoMode() = 0;
-  virtual ::apollo::common::ErrorCode DisableAutoMode() = 0;
-  virtual ::apollo::common::ErrorCode EnableSteeringOnlyMode() = 0;
-  virtual ::apollo::common::ErrorCode EnableSpeedOnlyMode() = 0;
+  virtual common::ErrorCode EnableAutoMode() = 0;
+  virtual common::ErrorCode DisableAutoMode() = 0;
+  virtual common::ErrorCode EnableSteeringOnlyMode() = 0;
+  virtual common::ErrorCode EnableSpeedOnlyMode() = 0;
 
   /*
    * @brief NEUTRAL, REVERSE, DRIVE
@@ -137,21 +142,20 @@ class VehicleController {
   /*
    * @brief set Electrical Park Brake
    */
-  virtual void SetEpbBreak(
-      const ::apollo::control::ControlCommand& command) = 0;
-  virtual void SetBeam(const ::apollo::control::ControlCommand& command) = 0;
-  virtual void SetHorn(const ::apollo::control::ControlCommand& command) = 0;
-  virtual void SetTurningSignal(
-      const ::apollo::control::ControlCommand& command) = 0;
+  virtual void SetEpbBreak(const control::ControlCommand &command) = 0;
+  virtual void SetBeam(const control::ControlCommand &command) = 0;
+  virtual void SetHorn(const control::ControlCommand &command) = 0;
+  virtual void SetTurningSignal(const control::ControlCommand &command) = 0;
 
  protected:
   virtual Chassis::DrivingMode driving_mode();
-  virtual void set_driving_mode(const Chassis::DrivingMode& driving_mode);
+  virtual void set_driving_mode(const Chassis::DrivingMode &driving_mode);
 
  protected:
-  ::apollo::canbus::VehicleParameter params_;
-  CanSender* can_sender_ = nullptr;
-  MessageManager* message_manager_ = nullptr;
+  canbus::VehicleParameter params_;
+  common::VehicleParam vehicle_params_;
+  CanSender<::apollo::canbus::ChassisDetail> *can_sender_ = nullptr;
+  MessageManager<::apollo::canbus::ChassisDetail> *message_manager_ = nullptr;
   bool is_initialized_ = false;  // own by derviative concrete controller
   Chassis::DrivingMode driving_mode_ = Chassis::COMPLETE_MANUAL;
   bool is_reset_ = false;  // reset command from control command

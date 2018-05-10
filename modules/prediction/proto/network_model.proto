@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+import "modules/prediction/proto/network_layers.proto";
+
+message VerificationSample {
+  //data used to vertify the network model
+  repeated TensorParameter features = 1;    //input to the network
+  optional float probability = 2;           //ouput probability of the network
+  optional float distance = 3;          //output acceleration of the network
+}
+
+message Performance {
+  repeated float accuracy = 1;
+  repeated float recall = 2;
+  repeated float precision = 3;
+}
+
+message NetParameter {
+  optional int32 id = 1;
+  optional string name = 2;
+  repeated LayerParameter layers = 3;
+
+  repeated VerificationSample verification_samples = 4;
+  optional Performance performance = 5;  // performance of the model in test dataset
+  optional float time_dumped = 6;        //time [s] of dumped the model
+}

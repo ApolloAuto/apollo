@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package apollo.drivers.canbus;
+
+message CANCardParameter {
+  enum CANCardBrand {
+    FAKE_CAN = 0;
+    ESD_CAN = 1;
+    SOCKET_CAN_RAW = 2;
+  }
+
+  enum CANCardType {
+    PCI_CARD = 0;
+    USB_CARD = 1;
+  }
+
+  enum CANChannelId {
+    CHANNEL_ID_ZERO = 0;
+    CHANNEL_ID_ONE = 1;
+    CHANNEL_ID_TWO = 2;
+    CHANNEL_ID_THREE = 3;
+  }
+
+  optional CANCardBrand brand = 1;
+  optional CANCardType type = 2;
+  optional CANChannelId channel_id = 3;
+}

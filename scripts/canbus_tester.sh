@@ -22,4 +22,4 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "${DIR}/.."
 
 ./bazel-bin/modules/canbus/tools/canbus_tester \
- 	--canbus_test_file=data/canbus/canbus_test.pb.txt
+ 	--canbus_test_file=modules/canbus/testdata/canbus_test.pb.txt

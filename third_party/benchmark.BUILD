@@ -6,8 +6,8 @@ cc_library(
     name = "benchmark",
     srcs = [
         "src/arraysize.h",
-        "src/benchmark_api_internal.h",
         "src/benchmark.cc",
+        "src/benchmark_api_internal.h",
         "src/benchmark_register.cc",
         "src/check.h",
         "src/colorprint.cc",
@@ -41,8 +41,8 @@ cc_library(
         "include/benchmark/macros.h",
         "include/benchmark/reporter.h",
     ],
-    visibility = ["//visibility:public"],
     defines = ["HAVE_POSIX_REGEX"],
     includes = ["include"],
     linkopts = ["-pthread"],
+    visibility = ["//visibility:public"],
 )

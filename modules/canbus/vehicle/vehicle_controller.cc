@@ -21,8 +21,8 @@
 namespace apollo {
 namespace canbus {
 
-using ::apollo::common::ErrorCode;
-using ::apollo::control::ControlCommand;
+using common::ErrorCode;
+using control::ControlCommand;
 
 Chassis::DrivingMode VehicleController::driving_mode() {
   std::lock_guard<std::mutex> lock(mode_mutex_);
@@ -30,13 +30,13 @@ Chassis::DrivingMode VehicleController::driving_mode() {
 }
 
 void VehicleController::set_driving_mode(
-    const Chassis::DrivingMode& driving_mode) {
+    const Chassis::DrivingMode &driving_mode) {
   std::lock_guard<std::mutex> lock(mode_mutex_);
   driving_mode_ = driving_mode;
 }
 
 ErrorCode VehicleController::SetDrivingMode(
-    const Chassis::DrivingMode& driving_mode) {
+    const Chassis::DrivingMode &driving_mode) {
   if (driving_mode == Chassis::EMERGENCY_MODE) {
     AINFO << "Can't set vehicle to EMERGENCY_MODE driving mode.";
     return ErrorCode::CANBUS_ERROR;
@@ -91,7 +91,7 @@ ErrorCode VehicleController::SetDrivingMode(
   return ErrorCode::OK;
 }
 
-ErrorCode VehicleController::Update(const ControlCommand& command) {
+ErrorCode VehicleController::Update(const ControlCommand &command) {
   if (!is_initialized_) {
     AERROR << "Controller not initialized.";
     return ErrorCode::CANBUS_ERROR;
@@ -106,12 +106,12 @@ ErrorCode VehicleController::Update(const ControlCommand& command) {
           << control_command.pad_msg().ShortDebugString();
     Chassis::DrivingMode mode = Chassis::COMPLETE_MANUAL;
     switch (control_command.pad_msg().action()) {
-      case ::apollo::control::DrivingAction::START: {
-        mode = params_.driving_mode();
+      case control::DrivingAction::START: {
+        mode = Chassis::COMPLETE_AUTO_DRIVE;
         break;
       }
-      case ::apollo::control::DrivingAction::STOP:
-      case ::apollo::control::DrivingAction::RESET: {
+      case control::DrivingAction::STOP:
+      case control::DrivingAction::RESET: {
         mode = Chassis::COMPLETE_MANUAL;
         break;
       }

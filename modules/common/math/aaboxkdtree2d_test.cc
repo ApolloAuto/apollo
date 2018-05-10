@@ -36,11 +36,11 @@ class Object {
       : aabox_({x1, y1}, {x2, y2}),
         line_segment_({x1, y1}, {x2, y2}),
         id_(id) {}
-  const AABox2d& aabox() const { return aabox_; }
-  double DistanceTo(const Vec2d& point) const {
+  const AABox2d &aabox() const { return aabox_; }
+  double DistanceTo(const Vec2d &point) const {
     return line_segment_.DistanceTo(point);
   }
-  double DistanceSquareTo(const Vec2d& point) const {
+  double DistanceSquareTo(const Vec2d &point) const {
     return line_segment_.DistanceSquareTo(point);
   }
   int id() const { return id_; }
@@ -80,12 +80,12 @@ TEST(AABoxKDTree2dNode, OverallTests) {
       const Vec2d point(RandomDouble(-kSize * 1.5, kSize * 1.5),
                         RandomDouble(-kSize * 1.5, kSize * 1.5));
       double expected_distance = std::numeric_limits<double>::infinity();
-      for (const auto& object : objects) {
+      for (const auto &object : objects) {
         expected_distance =
             std::min(expected_distance, object.DistanceTo(point));
       }
       for (int k = 0; k < kNumTrees; ++k) {
-        const Object* nearest_object = kdtrees[k]->GetNearestObject(point);
+        const Object *nearest_object = kdtrees[k]->GetNearestObject(point);
         const double actual_distance = nearest_object->DistanceTo(point);
         EXPECT_NEAR(actual_distance, expected_distance, 1e-3);
       }
@@ -95,14 +95,14 @@ TEST(AABoxKDTree2dNode, OverallTests) {
                         RandomDouble(-kSize * 1.5, kSize * 1.5));
       const double distance = RandomDouble(0, kSize * 2.0);
       for (int k = 0; k < kNumTrees; ++k) {
-        std::vector<const Object*> result_objects =
+        std::vector<const Object *> result_objects =
             kdtrees[k]->GetObjects(point, distance);
         std::set<int> result_ids;
-        for (const Object* object : result_objects) {
+        for (const Object *object : result_objects) {
           result_ids.insert(object->id());
         }
         EXPECT_EQ(result_objects.size(), result_ids.size());
-        for (const auto& object : objects) {
+        for (const auto &object : objects) {
           const double d = object.DistanceTo(point);
           if (std::abs(d - distance) <= 1e-3) {
             continue;

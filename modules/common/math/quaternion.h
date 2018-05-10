@@ -71,7 +71,7 @@ inline double QuaternionToHeading(const double qw, const double qx,
  * @return Heading encoded by given quaternion
  */
 template <typename T>
-inline double QuaternionToHeading(const Eigen::Quaternion<T> &q) {
+inline T QuaternionToHeading(const Eigen::Quaternion<T> &q) {
   return QuaternionToHeading(q.w(), q.x(), q.y(), q.z());
 }
 
@@ -86,7 +86,7 @@ inline double QuaternionToHeading(const Eigen::Quaternion<T> &q) {
  * @return Quaternion encoding rotation by given heading
  */
 template <typename T>
-inline Eigen::Quaternion<T> HeadingToQuaternion(const double heading) {
+inline Eigen::Quaternion<T> HeadingToQuaternion(T heading) {
   // Note that heading is zero at East and yaw is zero at North.
   EulerAnglesZXY<T> euler_angles(heading - M_PI_2);
   return euler_angles.ToQuaternion();
@@ -106,6 +106,13 @@ inline Eigen::Vector3d QuaternionRotate(const Quaternion &orientation,
   Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                        orientation.qy(), orientation.qz());
   return quaternion.toRotationMatrix() * original;
+}
+
+inline Eigen::Vector3d InverseQuaternionRotate(const Quaternion &orientation,
+                                               const Eigen::Vector3d &rotated) {
+  Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
+                                       orientation.qy(), orientation.qz());
+  return quaternion.toRotationMatrix().inverse() * rotated;
 }
 
 }  // namespace math

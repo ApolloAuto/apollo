@@ -22,7 +22,8 @@
 #ifndef MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_BRAKE_60_H_
 #define MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_BRAKE_60_H_
 
-#include "modules/canbus/vehicle/protocol_data.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -37,56 +38,57 @@ namespace lincoln {
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Brake60 : public ProtocolData {
+class Brake60 : public ::apollo::drivers::canbus::ProtocolData<
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   /**
    * @brief get the data period
    * @return the value of data period
    */
-  virtual uint32_t GetPeriod() const override;
+  uint32_t GetPeriod() const override;
 
   /**
    * @brief update the data
    * @param data a pointer to the data to be updated
    */
-  virtual void UpdateData(uint8_t* data) override;
+  void UpdateData(uint8_t *data) override;
 
   /**
    * @brief reset the private variables
    */
-  virtual void Reset() override;
+  void Reset() override;
 
   /**
    * @brief set pedal based on pedal command
    * @return a this pointer to the instance itself
    */
-  Brake60* set_pedal(double pcmd);
+  Brake60 *set_pedal(double pcmd);
 
   /**
    * @brief set pedal_enable_ to true
    * @return a this pointer to the instance itself
    */
-  Brake60* set_enable();
+  Brake60 *set_enable();
 
   /**
    * @brief set pedal_enable_ to false
    * @return a this pointer to the instance itself
    */
-  Brake60* set_disable();
+  Brake60 *set_disable();
 
  private:
   /**
    * @brief enable boo command
    * @return a this pointer to the instance itself
    */
-  Brake60* enable_boo_cmd();
+  Brake60 *enable_boo_cmd();
 
   /**
    * @brief disable boo command
    * @return a this pointer to the instance itself
    */
-  Brake60* disable_boo_cmd();
+  Brake60 *disable_boo_cmd();
 
   /**
    * config detail: {'name': 'pcmd', 'offset': 0.0, 'precision':
@@ -94,42 +96,42 @@ class Brake60 : public ProtocolData {
    * 'physical_range': '[0|1]', 'bit': 0, 'type': 'double', 'order': 'intel',
    * 'physical_unit': '"%"'}
    */
-  void set_pedal_p(uint8_t* data, double pedal);
+  void set_pedal_p(uint8_t *data, double pedal);
 
   /**
    * config detail: {'name': 'bcmd', 'offset': 0.0, 'precision': 1.0, 'len': 1,
    * 'f_type': 'valid', 'is_signed_var': False, 'physical_range': '[0|0]',
    * 'bit': 16, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
    */
-  void set_boo_cmd_p(uint8_t* bytes, bool boo_cmd);
+  void set_boo_cmd_p(uint8_t *bytes, bool boo_cmd);
 
   /**
    * config detail: {'name': 'en', 'offset': 0.0, 'precision': 1.0, 'len': 1,
    * 'f_type': 'valid', 'is_signed_var': False, 'physical_range': '[0|0]',
    * 'bit': 24, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
    */
-  void set_enable_p(uint8_t* bytes, bool en);
+  void set_enable_p(uint8_t *bytes, bool en);
 
   /**
    * config detail: {'name': 'clear', 'offset': 0.0, 'precision': 1.0, 'len': 1,
    * 'f_type': 'valid', 'is_signed_var': False, 'physical_range': '[0|0]',
    * 'bit': 25, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
    */
-  void set_clear_driver_override_flag_p(uint8_t* bytes, bool clear);
+  void set_clear_driver_override_flag_p(uint8_t *bytes, bool clear);
 
   /**
    * config detail: {'name': 'ignore', 'offset': 0.0, 'precision': 1.0, 'len':
    * 1, 'f_type': 'valid', 'is_signed_var': False, 'physical_range': '[0|0]',
    * 'bit': 26, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
    */
-  void set_ignore_driver_override_p(uint8_t* bytes, bool ignore);
+  void set_ignore_driver_override_p(uint8_t *bytes, bool ignore);
 
   /*
    * config detail: {'name': 'count', 'offset': 0.0, 'precision': 1.0, 'len': 8,
    * 'f_type': 'value', 'is_signed_var': False, 'physical_range': '[0|255]',
    * 'bit': 56, 'type': 'int', 'order': 'intel', 'physical_unit': '""'}
    */
-  void set_watchdog_counter_p(uint8_t* data, int32_t count);
+  void set_watchdog_counter_p(uint8_t *data, int32_t count);
 
  private:
   double pedal_cmd_ = 0.0;

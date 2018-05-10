@@ -18,8 +18,8 @@
  * @file
  */
 
-#ifndef MODULES_APOLLO_APP_H_
-#define MODULES_APOLLO_APP_H_
+#ifndef MODULES_COMMON_APOLLO_APP_H_
+#define MODULES_COMMON_APOLLO_APP_H_
 
 #include <csignal>
 #include <string>
@@ -27,9 +27,8 @@
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/status/status.h"
-#include "modules/hmi/utils/hmi_status_helper.h"
 
-#include "third_party/ros/include/ros/ros.h"
+#include "ros/include/ros/ros.h"
 
 /**
  * @namespace apollo::common
@@ -65,6 +64,12 @@ class ApolloApp {
    */
   virtual ~ApolloApp() = default;
 
+  /**
+   * @brief set the number of threads to handle ros message callbacks.
+   * The default thread number is 1
+   */
+  void SetCallbackThreadNumber(uint32_t callback_thread_num);
+
  protected:
   /**
    * @brief The module initialization function. This is the first function being
@@ -92,14 +97,15 @@ class ApolloApp {
    */
   virtual void Stop() = 0;
 
-  /**
-   * @brief report module status to HMI
-   * @param status HMI status
+  /** The callback thread number
    */
-  virtual void ReportModuleStatus(
-      const apollo::hmi::ModuleStatus::Status status);
+  uint32_t callback_thread_num_ = 1;
 
-  apollo::hmi::ModuleStatus status_;
+ private:
+  /**
+   * @brief Export flag values to <FLAGS_log_dir>/<name>.flags.
+   */
+  void ExportFlags() const;
 };
 
 void apollo_app_sigint_handler(int signal_num);
@@ -118,4 +124,4 @@ void apollo_app_sigint_handler(int signal_num);
     return 0;                                                  \
   }
 
-#endif  // MODULES_APOLLO_APP_H_
+#endif  // MODULES_COMMON_APOLLO_APP_H_

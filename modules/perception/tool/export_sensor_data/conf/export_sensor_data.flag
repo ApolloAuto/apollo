@@ -1,0 +1,40 @@
+
+--work_root=modules/perception
+--config_manager_path=conf/config_manager.config
+
+####################################################################
+# Flags from tool/export_sensor_data/export_sensor_data.cc
+# pcd path
+# type: string
+# default: /apollo/data/lidar/
+--lidar_path=/apollo/data/lidar/
+
+# radar path
+# type: string
+# default: /apollo/data/radar/
+--radar_path=/apollo/data/radar/
+
+# child frame id when querying localization pose in ros tf
+# type: string
+# default: localization
+--localization_tf2_child_frame_id=novatel
+
+# ros TF2 query frame id. tf2_buffer.lookupTransform.
+# type: string
+# default: world
+--lidar_tf2_frame_id=novatel
+
+# ros TF2 query child frame id. tf2_buffer.lookupTransform.
+# type: string
+# default: velodyne64
+--lidar_tf2_child_frame_id=velodyne64
+
+# radar tf2 frame_id
+# type: string
+# default: novatel
+--radar_tf2_frame_id=novatel
+
+# radar tf2 child frame id
+# type: string
+# default: radar
+--radar_tf2_child_frame_id=radar

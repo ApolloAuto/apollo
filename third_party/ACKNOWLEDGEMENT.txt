@@ -55,6 +55,9 @@
 * JSON
     MIT License
     https://github.com/nlohmann/json/blob/develop/LICENSE.MIT
+* KCFcpp
+    BSD 3-Clause "New" or "Revised" License
+    https://github.com/joaofaro/KCFcpp/blob/master/LICENSE
 * PaddlePaddle
     Apache License 2.0
     https://github.com/PaddlePaddle/Paddle/blob/develop/LICENSE
@@ -75,5 +78,3 @@
 * socketio
     MIT License
     https://github.com/socketio/socket.io-client/blob/master/LICENSE
-* websocketpp
-    https://github.com/zaphoyd/websocketpp/blob/master/COPYING

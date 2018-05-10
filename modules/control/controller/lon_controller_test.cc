@@ -23,15 +23,15 @@
 #include "gmock/gmock.h"
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
-#include "modules/common/log.h"
 
-#include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
-#include "modules/common/vehicle_state/vehicle_state.h"
-#include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
+#include "modules/common/log.h"
+#include "modules/common/time/time.h"
+#include "modules/common/util/file.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/control/common/control_gflags.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
@@ -41,7 +41,7 @@ using apollo::common::time::Clock;
 using LocalizationPb = localization::LocalizationEstimate;
 using ChassisPb = canbus::Chassis;
 using TrajectoryPb = planning::ADCTrajectory;
-using VehicleState = common::vehicle_state::VehicleState;
+using apollo::common::VehicleStateProvider;
 
 const char data_path[] =
     "modules/control/testdata/longitudinal_controller_test/";
@@ -56,47 +56,44 @@ class LonControllerTest : public ::testing::Test, LonController {
         "modules/control/testdata/conf/lincoln.pb.txt";
 
     CHECK(apollo::common::util::GetProtoFromFile(control_conf_file,
-                                                       &control_conf));
+                                                 &control_conf));
     longitudinal_conf_ = control_conf.lon_controller_conf();
 
-    timestamp_ = apollo::common::time::ToSecond(Clock::Now());
+    timestamp_ = Clock::NowInSeconds();
 
     controller_.reset(new LonController());
   }
 
-  void ComputeLongitudinalErrors(
-      const ::apollo::common::vehicle_state::VehicleState &vehicle_state,
-      const TrajectoryAnalyzer *trajectory, const double preview_time,
-      SimpleLongitudinalDebug *debug) {
-    LonController::ComputeLongitudinalErrors(vehicle_state, trajectory,
-                                             preview_time, debug);
+  void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
+                                 const double preview_time,
+                                 SimpleLongitudinalDebug *debug) {
+    LonController::ComputeLongitudinalErrors(trajectory, preview_time, debug);
   }
 
-  Status Init(const ControlConf *control_conf) {
+  common::Status Init(const ControlConf *control_conf) {
     return LonController::Init(control_conf);
   }
 
  protected:
-  LocalizationPb LoadLocalizationPb(const std::string& filename) {
+  LocalizationPb LoadLocalizationPb(const std::string &filename) {
     LocalizationPb localization;
     CHECK(apollo::common::util::GetProtoFromFile(filename, &localization))
         << "Failed to open file " << filename;
     localization.mutable_header()->set_timestamp_sec(timestamp_);
-    return std::move(localization);
+    return localization;
   }
 
-  ChassisPb LoadChassisPb(const std::string& filename) {
+  ChassisPb LoadChassisPb(const std::string &filename) {
     ChassisPb chassis_pb;
     CHECK(apollo::common::util::GetProtoFromFile(filename, &chassis_pb))
         << "Failed to open file " << filename;
     chassis_pb.mutable_header()->set_timestamp_sec(timestamp_);
-    return std::move(chassis_pb);
+    return chassis_pb;
   }
 
-  TrajectoryPb LoadPlanningTrajectoryPb(const std::string& filename) {
+  TrajectoryPb LoadPlanningTrajectoryPb(const std::string &filename) {
     TrajectoryPb trajectory_pb;
-    CHECK(
-        apollo::common::util::GetProtoFromFile(filename, &trajectory_pb))
+    CHECK(apollo::common::util::GetProtoFromFile(filename, &trajectory_pb))
         << "Failed to open file " << filename;
 
     trajectory_pb.mutable_header()->set_timestamp_sec(timestamp_);
@@ -117,18 +114,18 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   auto trajectory_pb =
       LoadPlanningTrajectoryPb(std::string(data_path) + "1_planning.pb.txt");
 
-  double time_now = apollo::common::time::ToSecond(Clock::Now());
+  double time_now = Clock::NowInSeconds();
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
-  VehicleState vehicle_state(&localization_pb, &chassis_pb);
+  auto *vehicle_state = VehicleStateProvider::instance();
+  vehicle_state->Update(localization_pb, chassis_pb);
   TrajectoryAnalyzer trajectory_analyzer(&trajectory_pb);
 
   double ts = longitudinal_conf_.ts();
   double preview_time = longitudinal_conf_.preview_window() * ts;
 
   SimpleLongitudinalDebug debug;
-  ComputeLongitudinalErrors(vehicle_state, &trajectory_analyzer,
-                                         preview_time, &debug);
+  ComputeLongitudinalErrors(&trajectory_analyzer, preview_time, &debug);
 
   double station_reference_expected = 0.16716666937000002;
   double speed_reference_expected = 1.70833337307;
@@ -155,8 +152,8 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
 }
 
 TEST_F(LonControllerTest, Init) {
-  Status status = Init(nullptr);
-  EXPECT_EQ(status.code() == ErrorCode::CONTROL_INIT_ERROR, true);
+  common::Status status = Init(nullptr);
+  EXPECT_EQ(status.code() == common::ErrorCode::CONTROL_INIT_ERROR, true);
 }
 
 }  // namespace control

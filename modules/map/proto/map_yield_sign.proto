@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/map/proto/map_id.proto";
+import "modules/map/proto/map_geometry.proto";
+
+// A yield indicates that each driver must prepare to stop if necessary to let a driver on another approach proceed.
+// A driver who stops or slows down to let another vehicle through has yielded the right of way to that vehicle.
+message YieldSign {
+  optional Id id = 1;
+
+  repeated Curve stop_line = 2;
+
+  repeated Id overlap_id = 3;
+}

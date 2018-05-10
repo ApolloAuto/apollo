@@ -1,0 +1,22 @@
+engine_started: true
+engine_rpm: 0
+speed_mps: 1.7111111
+odometer_m: 0
+fuel_range_m: 0
+throttle_percentage: 15.410087
+brake_percentage: 21.004044
+steering_percentage: 1.7872341
+steering_torque_nm: 0.0625
+parking_brake: false
+driving_mode: COMPLETE_AUTO_DRIVE
+error_code: NO_ERROR
+gear_location: GEAR_DRIVE
+header {
+  timestamp_sec: 1505249218.2989933
+  module_name: "chassis"
+  sequence_num: 67811
+}
+signal {
+  turn_signal: TURN_NONE
+  horn: false
+}

@@ -1,0 +1,53 @@
+syntax = "proto2";
+
+package apollo.perception;
+
+message DAGConfig {
+    enum SubnodeType {
+        SUBNODE_IN = 1; 
+        SUBNODE_OUT = 2;
+        SUBNODE_NORMAL = 3;
+    };
+
+    // Subnode instance.
+    message Subnode {
+        required int32 id = 1;
+        required string name = 2;
+        // node private data.
+        optional string reserve = 3;
+        optional SubnodeType type = 4 [default = SUBNODE_NORMAL];
+    };
+
+    message SubnodeConfig {
+        repeated Subnode subnodes = 1;
+    };
+
+    message Event {
+        required int32 id = 1;
+        optional string name = 2;
+    };
+
+    message Edge {
+        required int32 id = 1;
+        required int32 from_node = 2;
+        required int32 to_node = 3;
+        repeated Event events = 4;
+    };
+
+    message EdgeConfig {
+        repeated Edge edges = 1;
+    }
+
+    message SharedData {
+        required int32 id = 1;
+        required string name = 2;
+    };
+
+    message SharedDataConfig {
+        repeated SharedData datas = 1;
+    }
+
+    required SubnodeConfig subnode_config = 1;
+    required EdgeConfig edge_config = 2;
+    required SharedDataConfig data_config = 3;
+};

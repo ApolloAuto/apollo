@@ -18,9 +18,9 @@
 
 #include <algorithm>
 #include <cmath>
-#include <sstream>
 
 #include "modules/common/log.h"
+#include "modules/common/util/string_util.h"
 
 #include "modules/common/math/math_utils.h"
 
@@ -28,7 +28,7 @@ namespace apollo {
 namespace common {
 namespace math {
 
-AABox2d::AABox2d(const Vec2d& center, const double length, const double width)
+AABox2d::AABox2d(const Vec2d &center, const double length, const double width)
     : center_(center),
       length_(length),
       width_(width),
@@ -38,18 +38,18 @@ AABox2d::AABox2d(const Vec2d& center, const double length, const double width)
   CHECK_GT(width_, -kMathEpsilon);
 }
 
-AABox2d::AABox2d(const Vec2d& one_corner, const Vec2d& opposite_corner)
+AABox2d::AABox2d(const Vec2d &one_corner, const Vec2d &opposite_corner)
     : AABox2d((one_corner + opposite_corner) / 2.0,
               std::abs(one_corner.x() - opposite_corner.x()),
               std::abs(one_corner.y() - opposite_corner.y())) {}
 
-AABox2d::AABox2d(const std::vector<Vec2d>& points) {
+AABox2d::AABox2d(const std::vector<Vec2d> &points) {
   CHECK(!points.empty());
   double min_x = points[0].x();
   double max_x = points[0].x();
   double min_y = points[0].y();
   double max_y = points[0].y();
-  for (const auto& point : points) {
+  for (const auto &point : points) {
     min_x = std::min(min_x, point.x());
     max_x = std::max(max_x, point.x());
     min_y = std::min(min_y, point.y());
@@ -63,7 +63,7 @@ AABox2d::AABox2d(const std::vector<Vec2d>& points) {
   half_width_ = width_ / 2.0;
 }
 
-void AABox2d::GetAllCorners(std::vector<Vec2d>* const corners) const {
+void AABox2d::GetAllCorners(std::vector<Vec2d> *const corners) const {
   CHECK_NOTNULL(corners)->clear();
   corners->reserve(4);
   corners->emplace_back(center_.x() + half_length_, center_.y() - half_width_);
@@ -72,12 +72,12 @@ void AABox2d::GetAllCorners(std::vector<Vec2d>* const corners) const {
   corners->emplace_back(center_.x() - half_length_, center_.y() - half_width_);
 }
 
-bool AABox2d::IsPointIn(const Vec2d& point) const {
+bool AABox2d::IsPointIn(const Vec2d &point) const {
   return std::abs(point.x() - center_.x()) <= half_length_ + kMathEpsilon &&
          std::abs(point.y() - center_.y()) <= half_width_ + kMathEpsilon;
 }
 
-bool AABox2d::IsPointOnBoundary(const Vec2d& point) const {
+bool AABox2d::IsPointOnBoundary(const Vec2d &point) const {
   const double dx = std::abs(point.x() - center_.x());
   const double dy = std::abs(point.y() - center_.y());
   return (std::abs(dx - half_length_) <= kMathEpsilon &&
@@ -86,7 +86,7 @@ bool AABox2d::IsPointOnBoundary(const Vec2d& point) const {
           dx <= half_length_ + kMathEpsilon);
 }
 
-double AABox2d::DistanceTo(const Vec2d& point) const {
+double AABox2d::DistanceTo(const Vec2d &point) const {
   const double dx = std::abs(point.x() - center_.x()) - half_length_;
   const double dy = std::abs(point.y() - center_.y()) - half_width_;
   if (dx <= 0.0) {
@@ -98,7 +98,7 @@ double AABox2d::DistanceTo(const Vec2d& point) const {
   return hypot(dx, dy);
 }
 
-double AABox2d::DistanceTo(const AABox2d& box) const {
+double AABox2d::DistanceTo(const AABox2d &box) const {
   const double dx =
       std::abs(box.center_x() - center_.x()) - box.half_length() - half_length_;
   const double dy =
@@ -112,16 +112,16 @@ double AABox2d::DistanceTo(const AABox2d& box) const {
   return hypot(dx, dy);
 }
 
-bool AABox2d::HasOverlap(const AABox2d& box) const {
+bool AABox2d::HasOverlap(const AABox2d &box) const {
   return std::abs(box.center_x() - center_.x()) <=
              box.half_length() + half_length_ &&
          std::abs(box.center_y() - center_.y()) <=
              box.half_width() + half_width_;
 }
 
-void AABox2d::Shift(const Vec2d& shift_vec) { center_ += shift_vec; }
+void AABox2d::Shift(const Vec2d &shift_vec) { center_ += shift_vec; }
 
-void AABox2d::MergeFrom(const AABox2d& other_box) {
+void AABox2d::MergeFrom(const AABox2d &other_box) {
   const double x1 = std::min(min_x(), other_box.min_x());
   const double x2 = std::max(max_x(), other_box.max_x());
   const double y1 = std::min(min_y(), other_box.min_y());
@@ -133,7 +133,7 @@ void AABox2d::MergeFrom(const AABox2d& other_box) {
   half_width_ = width_ / 2.0;
 }
 
-void AABox2d::MergeFrom(const Vec2d& other_point) {
+void AABox2d::MergeFrom(const Vec2d &other_point) {
   const double x1 = std::min(min_x(), other_point.x());
   const double x2 = std::max(max_x(), other_point.x());
   const double y1 = std::min(min_y(), other_point.y());
@@ -146,11 +146,9 @@ void AABox2d::MergeFrom(const Vec2d& other_point) {
 }
 
 std::string AABox2d::DebugString() const {
-  std::ostringstream sout;
-  sout << "aabox2d ( center = " << center_.DebugString()
-       << "  length = " << length_ << "  width = " << width_ << " )";
-  sout.flush();
-  return sout.str();
+  return util::StrCat(
+      "aabox2d ( center = ", center_.DebugString(),
+      "  length = ", length_, "  width = ", width_, " )");
 }
 
 }  // namespace math

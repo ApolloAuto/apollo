@@ -16,33 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-if [ -e "$DIR/../../scripts/apollo_base.sh" ]; then
-    # run from source
-    APOLLO_ROOT_DIR=$(cd "${DIR}/../.." && pwd)
-else
-    # run from script only
-    APOLLO_ROOT_DIR=~
-fi
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}")/../.." && pwd )"
+# the machine type, currently support x86_64, aarch64
+MACHINE_ARCH=$(uname -m)
 
 source $APOLLO_ROOT_DIR/scripts/apollo_base.sh
 
-export APOLLO_ROOT_DIR
+echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 
-if [ ! -e "${APOLLO_ROOT_DIR}/data/log" ]; then
-    mkdir -p "${APOLLO_ROOT_DIR}/data/log"
-fi
-if [ ! -e "${APOLLO_ROOT_DIR}/data/bag" ]; then
-    mkdir -p "${APOLLO_ROOT_DIR}/data/bag"
-fi
-if [ ! -e "${APOLLO_ROOT_DIR}/data/core" ]; then
-    mkdir -p "${APOLLO_ROOT_DIR}/data/core"
-fi
-
-echo "APOLLO_ROOT_DIR=$APOLLO_ROOT_DIR"
-
-VERSION=release-latest
+VERSION="release-${MACHINE_ARCH}-v2.0.1"
 if [[ $# == 1 ]];then
     VERSION=$1
 fi
@@ -51,40 +34,38 @@ if [ -z "${DOCKER_REPO}" ]; then
 fi
 IMG=${DOCKER_REPO}:$VERSION
 
+DATA_DIR="${HOME}/data"
+if [ ! -e "${DATA_DIR}/log" ]; then
+  mkdir -p "${DATA_DIR}/log"
+fi
 
-function find_device() {
-    # ${1} = device pattern
-    local device_list=$(find /dev -name "${1}")
-    if [ -z "${device_list}" ]; then
-        warning "Failed to find device with pattern \"${1}\" ..."
-    else
-        local devices=""
-        for device in $(find /dev -name "${1}"); do
-            ok "Found device: ${device}."
-            devices="${devices} --device ${device}:${device}"
-        done
-        echo "${devices}"
-    fi
-}
+if [ ! -e "${DATA_DIR}/bag" ]; then
+  mkdir -p "${DATA_DIR}/bag"
+fi
+
+if [ ! -e "${DATA_DIR}/core" ]; then
+  mkdir -p "${DATA_DIR}/core"
+fi
 
 function main() {
-    docker pull "$IMG"
+    echo "Type 'y' or 'Y' to pull docker image from China mirror or any other key from US mirror."
+    read -t 10 -n 1 INCHINA
+    if [ "$INCHINA" == "y" ] || [ "$INCHINA" == "Y" ]; then
+        docker pull "registry.docker-cn.com/${IMG}"
+    else
+        docker pull $IMG
+    fi
 
-    docker stop apollo_release
-    docker rm -f apollo_release
+    docker ps -a --format "{{.Names}}" | grep 'apollo_release' 1>/dev/null
+    if [ $? == 0 ]; then
+        docker stop apollo_release 1>/dev/null
+        docker rm -f apollo_release 1>/dev/null
+    fi
 
-    # setup CAN device
-    sudo mknod --mode=a+rw /dev/can0 c 52 0
+    setup_device
 
-    # enable coredump
-    echo "${APOLLO_ROOT_DIR}/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
+    local devices=" -v /dev:/dev"
 
-    local devices=""
-    devices="${devices} $(find_device ttyUSB*)"
-    devices="${devices} $(find_device ttyS*)"
-    devices="${devices} $(find_device can*)"
-    devices="${devices} $(find_device ram*)"
-    devices="${devices} $(find_device loop*)"
     local display=""
     if [[ -z ${DISPLAY} ]];then
         display=":0"
@@ -92,32 +73,64 @@ function main() {
         display="${DISPLAY}"
     fi
     USER_ID=$(id -u)
+    GRP=$(id -g -n)
+    GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
+    DOCKER_HOME="/home/$USER"
+    if [ "$USER" == "root" ];then
+        DOCKER_HOME="/root"
+    fi
+    if [ ! -d "$HOME/.cache" ];then
+        mkdir "$HOME/.cache"
+    fi
     docker run -it \
         -d --privileged \
         --name apollo_release \
         --net host \
         -v /media:/media \
-        -v ${APOLLO_ROOT_DIR}/data:/apollo/data \
-        -v $HOME:/home/$USER \
+        -v ${HOME}/data:/apollo/data \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v /etc/localtime:/etc/localtime:ro \
+        -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -w /apollo \
         -e DISPLAY=${display} \
         -e RELEASE_DOCKER=1 \
         -e DOCKER_USER=$USER \
         -e USER=$USER \
         -e DOCKER_USER_ID=$USER_ID \
+        -e DOCKER_GRP=$GRP \
+        -e DOCKER_GRP_ID=$GRP_ID \
+        -e DOCKER_IMG=$IMG \
         -e PYTHONPATH=/apollo/lib:/apollo/ros/lib/python2.7/dist-packages \
         ${devices} \
         --add-host in_release_docker:127.0.0.1 \
         --add-host ${LOCAL_HOST}:127.0.0.1 \
         --hostname in_release_docker \
-        --shm-size 512M \
+        --shm-size 2G \
         $IMG
-    docker exec apollo_release /apollo/scripts/docker_adduser.sh
-    docker exec apollo_release bash -c "chown -R ${USER}:${USER} /apollo"
-    docker exec -u ${USER} apollo_release "/apollo/scripts/hmi.sh"
+    if [ "${USER}" != "root" ]; then
+      docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
+      docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo/data"
+      docker exec apollo_release bash -c "chmod a+w /apollo"
+
+      DATA_DIRS=("/apollo/modules/common/data"
+                 "/apollo/modules/control/conf"
+                 "/apollo/modules/localization/msf/params/gnss_params"
+                 "/apollo/modules/localization/msf/params/velodyne_params"
+                 "/apollo/modules/perception/data/params"
+                 "/apollo/modules/tools/ota"
+                 "/apollo/ros/share/gnss_driver/conf"
+                 "/apollo/ros/share/gnss_driver/launch"
+                 "/apollo/ros/share/velodyne/launch"
+                 "/apollo/ros/share/velodyne_driver/launch"
+                 "/apollo/ros/share/velodyne_pointcloud/launch"
+                 "/apollo/ros/share/velodyne_pointcloud/params")
+      for DATA_DIR in "${DATA_DIRS[@]}"; do
+        docker exec apollo_release bash -c \
+            "mkdir -p '${DATA_DIR}'; chmod a+rw -R '${DATA_DIR}'"
+      done
+    fi
+    docker exec -u ${USER} -it apollo_release "/apollo/scripts/bootstrap.sh"
 }
 
 main

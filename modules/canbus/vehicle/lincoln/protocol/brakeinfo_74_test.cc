@@ -29,28 +29,28 @@ class Brakeinfo74Test : public ::testing::Test {
 
 TEST_F(Brakeinfo74Test, simple) {
   Brakeinfo74 brakeinfo;
-  uint8_t data = 0x64U;
+  uint8_t data[8] = {0x64U, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
   int32_t length = 8;
   ChassisDetail cd;
-  brakeinfo.Parse(&data, length, &cd);
+  brakeinfo.Parse(data, length, &cd);
 
-  EXPECT_FALSE(cd.esp().is_abs_active());
+  EXPECT_TRUE(cd.esp().is_abs_active());
   EXPECT_FALSE(cd.esp().is_abs_enabled());
-  EXPECT_FALSE(cd.esp().is_stab_active());
+  EXPECT_TRUE(cd.esp().is_stab_active());
   EXPECT_FALSE(cd.esp().is_stab_enabled());
   EXPECT_FALSE(cd.esp().is_trac_active());
   EXPECT_FALSE(cd.esp().is_trac_enabled());
 
   EXPECT_EQ(cd.epb().parking_brake_status(), Epb::PBRAKE_OFF);
-  EXPECT_EQ(cd.brake().brake_torque_req(), 8592);
+  EXPECT_DOUBLE_EQ(cd.brake().brake_torque_req(), 2448.0);
   EXPECT_EQ(cd.brake().hsa_status(), Brake::HSA_INACTIVE);
-  EXPECT_EQ(cd.brake().brake_torque_act(), 0);
+  EXPECT_DOUBLE_EQ(cd.brake().brake_torque_act(), 4108.0);
   EXPECT_EQ(cd.brake().hsa_status(), Brake::HSA_OFF);
-  EXPECT_EQ(cd.brake().wheel_torque_act(), 8192);
+  EXPECT_DOUBLE_EQ(cd.brake().wheel_torque_act(), 18500.0);
   EXPECT_FALSE(cd.vehicle_spd().is_vehicle_standstill());
-  EXPECT_DOUBLE_EQ(cd.vehicle_spd().acc_est(), 0.0);
+  EXPECT_DOUBLE_EQ(cd.vehicle_spd().acc_est(), 0.665);
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

@@ -16,13 +16,14 @@
 # limitations under the License.
 ###############################################################################
 
-import rospy
-import rosbag
-from std_msgs.msg import String
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import numpy as np
 import sys
+
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+import numpy as np
+import rosbag
+import rospy
+from std_msgs.msg import String
 
 from modules.canbus.proto import chassis_pb2
 from modules.localization.proto import localization_pb2

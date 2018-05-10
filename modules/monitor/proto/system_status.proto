@@ -1,0 +1,64 @@
+syntax = "proto2";
+
+package apollo.monitor;
+
+import "modules/common/proto/header.proto";
+import "modules/monitor/proto/monitor_conf.proto";
+
+// Status summary. The value order is important, because when we summarize,
+// larger value will overwrite smaller value:
+//    FATAL > ERROR > WARN > OK > UNKNOWN
+enum Summary {
+  UNKNOWN = 0;
+  OK = 1;
+  WARN = 2;
+  ERROR = 3;
+  FATAL = 4;
+}
+
+message HardwareStatus {
+  // Overall status summary.
+  optional Summary summary = 1 [default = UNKNOWN];
+  // Additional message for current status.
+  optional string msg = 2;
+
+  // Detailed status.
+  enum Status {
+    OK = 0;
+    // HW device is present and in working order, but not ready for service
+    // (e.g., no GPS lock).
+    NOT_READY = 1;
+    // HW is not present.
+    NOT_PRESENT = 2;
+    // HW error, can't be used.
+    ERR = 3;
+    // GPS positioning is unstable.
+    GPS_UNSTABLE_WARNING = 4;
+    GPS_UNSTABLE_ERROR = 5;
+
+    UNDEF = -1;
+  }
+  optional Status status = 3 [default = UNDEF];
+  optional string detailed_msg = 6;
+
+  optional double gps_unstable_start_time = 4;
+
+  optional TopicStatus topic_status = 5;
+}
+
+message ModuleStatus {
+  // Overall status summary.
+  optional Summary summary = 1 [default = UNKNOWN];
+  // Additional message for current status.
+  optional string msg = 2;
+
+  // Detailed status.
+  optional ProcessStatus process_status = 3;
+  optional TopicStatus topic_status = 4;
+}
+
+message SystemStatus {
+  optional apollo.common.Header header = 1;
+  map<string, ModuleStatus> modules = 2;
+  map<string, HardwareStatus> hardware = 3;
+}

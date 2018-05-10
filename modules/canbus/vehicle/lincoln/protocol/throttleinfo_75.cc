@@ -16,24 +16,26 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/throttleinfo_75.h"
 
-#include "modules/canbus/common/byte.h"
+#include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::drivers::canbus::Byte;
+
 const int32_t Throttleinfo75::ID = 0x75;
 
-void Throttleinfo75::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* car_status) const {
-  car_status->mutable_ems()->set_engine_rpm(engine_rpm(bytes, length));
-  car_status->mutable_gas()->set_accelerator_pedal(
+void Throttleinfo75::Parse(const std::uint8_t *bytes, int32_t length,
+                           ChassisDetail *chassis_detail) const {
+  chassis_detail->mutable_ems()->set_engine_rpm(engine_rpm(bytes, length));
+  chassis_detail->mutable_gas()->set_accelerator_pedal(
       acc_pedal_percent(bytes, length));
-  car_status->mutable_gas()->set_accelerator_pedal_rate(
+  chassis_detail->mutable_gas()->set_accelerator_pedal_rate(
       acc_pedal_rate(bytes, length));
 }
 
-double Throttleinfo75::engine_rpm(const std::uint8_t* bytes,
+double Throttleinfo75::engine_rpm(const std::uint8_t *bytes,
                                   int32_t length) const {
   Byte frame_high(bytes + 1);
   int32_t high = frame_high.get_byte(0, 8);
@@ -43,7 +45,7 @@ double Throttleinfo75::engine_rpm(const std::uint8_t* bytes,
   return value * 0.25;
 }
 
-double Throttleinfo75::acc_pedal_percent(const std::uint8_t* bytes,
+double Throttleinfo75::acc_pedal_percent(const std::uint8_t *bytes,
                                          int32_t length) const {
   Byte frame_high(bytes + 3);
   int32_t high = frame_high.get_byte(0, 2);
@@ -53,7 +55,7 @@ double Throttleinfo75::acc_pedal_percent(const std::uint8_t* bytes,
   return value * 0.1;
 }
 
-double Throttleinfo75::acc_pedal_rate(const std::uint8_t* bytes,
+double Throttleinfo75::acc_pedal_rate(const std::uint8_t *bytes,
                                       int32_t length) const {
   Byte frame(bytes + 4);
   int32_t x = frame.get_byte(0, 8);

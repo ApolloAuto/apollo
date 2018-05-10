@@ -1,0 +1,56 @@
+syntax = "proto2";
+
+package apollo.localization;
+
+import "modules/drivers/gnss/proto/gnss_raw_observation.proto";
+
+//Define a rover' direction cosine to an observed satellite under WGS-84
+message SatDirCosine {
+  optional uint32 sat_prn = 1;
+  optional uint32 sat_sys = 2;
+  optional double cosine_x = 3;
+  optional double cosine_y = 4;
+  optional double cosine_z = 5;
+}
+enum PntType {
+  PNT_INVALID = 0;
+  PNT_SPP = 1;
+  PNT_PHASE_TD = 2;
+  PNT_CODE_DIFF = 3;
+  PNT_RTK_FLOAT = 4;
+  PNT_RTK_FIXED = 5;
+}
+//Define the position result of a rover, 
+//and pnt stands for Positioning, Navigating and Timing
+message GnssPntResult {
+  optional uint32 receiver_id = 1;
+  optional apollo.drivers.gnss.GnssTimeType time_type = 2 [default = GPS_TIME];
+  optional uint32 gnss_week = 3;
+  optional double gnss_second_s = 4;
+  //Solution type
+  optional PntType pnt_type = 5 [default = PNT_INVALID];;
+  //Position and its standard deviation in Cartesian (X/Y/Z) under ECEF-WGS84 coordinate
+  optional double pos_x_m = 6;
+  optional double pos_y_m = 7;
+  optional double pos_z_m = 8;
+  optional double std_pos_x_m = 9;
+  optional double std_pos_y_m = 10;
+  optional double std_pos_z_m = 11;
+  //Velocity and its standard deviation in Cartesian (X/Y/Z) under ECEF-WGS84 coordinate
+  optional double vel_x_m = 12;
+  optional double vel_y_m = 13;
+  optional double vel_z_m = 14;
+  optional double std_vel_x_m = 15;
+  optional double std_vel_y_m = 16;
+  optional double std_vel_z_m = 17;
+  //Number of satellites involved in solution
+  optional uint32 sovled_sat_num = 18;
+  //Group of observed satellites' directio cosine
+  repeated SatDirCosine  sat_dir_cosine = 19;
+  //position dilution of precision
+  optional double pdop = 20;
+  //horizontal dilution of precision
+  optional double hdop = 21;
+  //vertical dilution of precision
+  optional double vdop = 22;
+}

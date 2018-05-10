@@ -1,0 +1,22 @@
+engine_started: true
+engine_rpm: 1137.5
+speed_mps: 0.0
+odometer_m: 0.0
+fuel_range_m: 0
+throttle_percentage: 15.0438699722
+brake_percentage: 17.9583435059
+steering_percentage: -0.617021262646
+steering_torque_nm: 0.0
+parking_brake: false
+driving_mode: EMERGENCY_MODE
+error_code: NO_ERROR
+gear_location: GEAR_REVERSE
+header {
+  timestamp_sec: 1504387654.53
+  module_name: "chassis"
+  sequence_num: 69777
+}
+signal {
+  turn_signal: TURN_NONE
+  horn: false
+}

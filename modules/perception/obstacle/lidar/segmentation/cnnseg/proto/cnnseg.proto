@@ -1,0 +1,36 @@
+syntax = "proto2";
+
+package apollo.perception.cnnseg;
+
+message CNNSegParam {
+    required NetworkParam network_param = 1;
+    required FeatureParam feature_param = 2;
+
+    optional float objectness_thresh = 11 [default = 0.5];
+    optional bool use_all_grids_for_clustering = 12 [default = false];
+    optional float confidence_thresh = 13 [default = 0.1];
+    optional float height_thresh = 14 [default = 0.5];
+    optional uint32 min_pts_num = 15 [default = 3];
+
+    optional bool use_full_cloud = 31 [default = false];
+
+    optional uint32 gpu_id = 41 [default = 0];
+}
+
+message NetworkParam {
+    optional string instance_pt_blob = 1 [default = "instance_pt"];
+    optional string category_pt_blob = 2 [default = "category_score"];
+    optional string confidence_pt_blob = 3 [default = "confidence_score"];
+    optional string height_pt_blob = 4 [default = "height_pt"];
+    optional string feature_blob = 5 [default = "data"];
+    optional string class_pt_blob = 6 [default = "class_score"];
+}
+
+message FeatureParam {
+    optional uint32 point_cloud_range = 26 [default = 60];
+    optional uint32 width = 27 [default = 640];
+    optional uint32 height = 28 [default = 640];
+
+    optional float min_height = 31 [default = -5.0];
+    optional float max_height = 32 [default = 5.0];
+}

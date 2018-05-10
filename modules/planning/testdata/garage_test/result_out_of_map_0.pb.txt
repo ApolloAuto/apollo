@@ -1,0 +1,20 @@
+header {
+  module_name: "planning"
+  status {
+    error_code: PLANNING_ERROR
+    msg: "init frame failed"
+  }
+}
+gear: GEAR_DRIVE
+decision {
+  main_decision {
+    not_ready {
+      reason: "Failed to init frame"
+    }
+  }
+}
+routing_header {
+  timestamp_sec: 1234.5
+  module_name: "routing"
+  sequence_num: 1
+}

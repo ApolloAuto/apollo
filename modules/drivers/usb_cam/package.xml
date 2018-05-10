@@ -1,0 +1,41 @@
+<package>
+  <name>usb_cam</name>
+  <version>0.3.4</version>
+  <description>A ROS Driver for V4L USB Cameras</description>
+
+  <maintainer email="rctoris@wpi.edu">Russell Toris</maintainer>
+  <author email="benjamin.pitzer@bosch.com">Benjamin Pitzer</author>
+
+  <license>BSD</license>
+
+  <url type="website">http://wiki.ros.org/usb_cam</url>
+  <url type="bugtracker">https://github.com/bosch-ros-pkg/usb_cam/issues</url>
+  <url type="repository">https://github.com/bosch-ros-pkg/usb_cam</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>image_transport</build_depend> 
+  <build_depend>roscpp</build_depend> 
+  <build_depend>std_msgs</build_depend> 
+  <build_depend>std_srvs</build_depend> 
+  <build_depend>sensor_msgs</build_depend> 
+  <build_depend>ffmpeg</build_depend>
+  <build_depend>camera_info_manager</build_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>pluginlib</build_depend>
+
+  <run_depend>image_transport</run_depend> 
+  <run_depend>roscpp</run_depend> 
+  <run_depend>std_msgs</run_depend> 
+  <run_depend>std_srvs</run_depend> 
+  <run_depend>sensor_msgs</run_depend> 
+  <run_depend>ffmpeg</run_depend>
+  <run_depend>camera_info_manager</run_depend>
+  <run_depend>v4l-utils</run_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>pluginlib</run_depend>
+  
+  <export>
+    <nodelet plugin="${prefix}/nodelets.xml"/>
+  </export>
+</package>

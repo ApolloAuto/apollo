@@ -1,0 +1,25 @@
+header {
+  timestamp_sec: 1501183430.161906
+  module_name: "perception"
+  sequence_num: 15839
+}
+perception_obstacle {
+  id: 15
+  position {
+    x: -438.614,
+    y: -173.366,
+    z: 0.0
+  }
+  theta: -0.349
+  velocity {
+    x: 6.839
+    y: 18.794
+    z: 0
+  }
+  length: 4
+  width: 2
+  height: 1
+  tracking_time: 1
+  type: VEHICLE
+  timestamp: 1501183430.1619561
+}

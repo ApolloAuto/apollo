@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.routing;
+
+import "modules/routing/proto/routing.proto";
+
+message Landmark {
+  optional string name = 1;
+  repeated LaneWaypoint waypoint = 2;
+}
+
+message POI {
+  repeated Landmark landmark = 1;
+}

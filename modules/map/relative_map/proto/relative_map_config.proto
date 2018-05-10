@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.relative_map;
+
+message MapGenerationParam {
+  optional double default_left_width = 1 [default=1.75];
+  optional double default_right_width = 2 [default=1.75];
+  optional double default_speed_limit = 3 [default=29.0576]; // default is 65mph
+}
+
+message NavigationLaneConfig {
+    optional double min_lane_marker_quality = 1 [default=0.5];
+    enum LaneSource {
+      PERCEPTION = 1;
+      OFFLINE_GENERATED = 2;
+    }
+    optional LaneSource lane_source = 2;
+}
+
+message RelativeMapConfig {
+    optional MapGenerationParam map_param = 1;
+    optional NavigationLaneConfig navigation_lane = 2;
+}

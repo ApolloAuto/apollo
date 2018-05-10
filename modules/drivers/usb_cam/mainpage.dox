@@ -1,0 +1,5 @@
+/**
+\mainpage
+
+\b usb_cam is a ROS driver for V4L USB cameras.
+*/

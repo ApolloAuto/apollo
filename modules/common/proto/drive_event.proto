@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.common;
+
+import "modules/common/proto/header.proto";
+import "modules/localization/proto/pose.proto";
+
+message DriveEvent {
+  optional apollo.common.Header header = 1;
+  optional string event = 2;
+  optional apollo.localization.Pose location = 3;
+}

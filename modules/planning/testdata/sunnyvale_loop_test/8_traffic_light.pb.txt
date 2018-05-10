@@ -1,0 +1,17 @@
+traffic_light {
+  color: RED
+  id: "1083"
+  confidence: 1.0
+  tracking_time: 1.0
+}
+traffic_light {
+  color: RED
+  id: "1084"
+  confidence: 1.0
+  tracking_time: 1.0
+}
+header {
+  timestamp_sec: 1510780361.78
+  module_name: "traffic_light_detection"
+  sequence_num: 2254
+}

@@ -1,0 +1,38 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+import "modules/perception/proto/perception_obstacle.proto";
+
+message ObstacleConf {
+   enum ObstacleStatus {
+    ON_LANE = 0;
+    OFF_LANE = 1;
+    STATIONARY = 3;
+    MOVING = 4;
+  }
+
+  enum EvaluatorType {
+    MLP_EVALUATOR = 0;
+    RNN_EVALUATOR = 1;
+    COST_EVALUATOR = 2;    // navi mode can only support this evaluator
+  }
+
+  enum PredictorType {
+    LANE_SEQUENCE_PREDICTOR = 0;
+    FREE_MOVE_PREDICTOR = 1;
+    REGIONAL_PREDICTOR = 2;
+    MOVE_SEQUENCE_PREDICTOR = 3;
+    EMPTY_PREDICTOR = 4;
+    SINGLE_LANE_PREDICTOR = 5;
+  }
+
+  optional apollo.perception.PerceptionObstacle.Type obstacle_type = 1;
+  optional ObstacleStatus obstacle_status = 2;
+  optional EvaluatorType evaluator_type = 3;
+  optional PredictorType predictor_type = 4;
+}
+
+message PredictionConf {
+  repeated ObstacleConf obstacle_conf = 1; 
+}

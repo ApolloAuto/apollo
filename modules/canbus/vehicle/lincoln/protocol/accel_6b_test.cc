@@ -31,13 +31,20 @@ TEST_F(Accel6bTest, Parse) {
   Accel6b acc;
   int32_t length = 8;
   ChassisDetail chassis_detail;
-  for (uint8_t bytes = 0; bytes < 0xFFU; ++bytes) {
-    acc.Parse(&bytes, length, &chassis_detail);
-    EXPECT_GE(chassis_detail.vehicle_spd().lat_acc(), 0.0);
-    EXPECT_GE(chassis_detail.vehicle_spd().vert_acc(), 0.0);
-  }
+  uint8_t bytes[8] = {0, 0};
+
+  bytes[0] = 0b11111100;
+  bytes[1] = 0b11111110;
+  bytes[2] = 0b11111110;
+  bytes[3] = 0b11111110;
+  bytes[4] = 0b11111110;
+  bytes[5] = 0b11111110;
+  acc.Parse(bytes, length, &chassis_detail);
+  EXPECT_DOUBLE_EQ(chassis_detail.vehicle_spd().lat_acc(), -2.6);
+  EXPECT_DOUBLE_EQ(chassis_detail.vehicle_spd().long_acc(), -2.58);
+  EXPECT_DOUBLE_EQ(chassis_detail.vehicle_spd().vert_acc(), -2.58);
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CONTROL_CONTROL_H_
-#define CONTROL_CONTROL_H_
+#ifndef MODULES_CONTROL_CONTROL_H_
+#define MODULES_CONTROL_CONTROL_H_
 
 #include <cstdio>
 #include <memory>
@@ -23,16 +23,15 @@
 #include <string>
 
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/apollo_app.h"
-#include "modules/common/monitor/monitor.h"
-#include "modules/common/monitor/proto/monitor.pb.h"
-#include "modules/common/util/util.h"
-#include "modules/control/controller/controller_agent.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "std_msgs/String.h"
+
+#include "modules/common/apollo_app.h"
+#include "modules/common/util/util.h"
+#include "modules/control/controller/controller_agent.h"
 
 /**
  * @namespace apollo::control
@@ -51,7 +50,8 @@ class Control : public apollo::common::ApolloApp {
   friend class ControlTestBase;
 
  public:
-  Control() : monitor_(apollo::common::monitor::MonitorMessageItem::CONTROL) {}
+  Control()
+      : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CONTROL) {}
 
   /**
    * @brief module name
@@ -82,28 +82,29 @@ class Control : public apollo::common::ApolloApp {
 
  private:
   // Upon receiving pad message
-  void OnPad(const apollo::control::PadMessage& pad);
+  void OnPad(const apollo::control::PadMessage &pad);
 
   // Upon receiving monitor message
   void OnMonitor(
-      const apollo::common::monitor::MonitorMessage& monitor_message);
+      const apollo::common::monitor::MonitorMessage &monitor_message);
 
   // Watch dog timer
-  void OnTimer(const ros::TimerEvent&);
+  void OnTimer(const ros::TimerEvent &);
 
-  Status ProduceControlCommand(ControlCommand* control_command);
-  Status CheckInput();
-  Status CheckTimestamp();
-  Status CheckPad();
+  common::Status ProduceControlCommand(ControlCommand *control_command);
+  common::Status CheckInput();
+  common::Status CheckTimestamp();
+  common::Status CheckPad();
 
-  void Alert();
-  void SendCmd(ControlCommand* control_command);
+  void SendCmd(ControlCommand *control_command);
 
  private:
-  ::apollo::localization::LocalizationEstimate localization_;
-  ::apollo::canbus::Chassis chassis_;
-  ::apollo::planning::ADCTrajectory trajectory_;
-  ::apollo::control::PadMessage pad_msg_;
+  double init_time_ = 0.0;
+
+  localization::LocalizationEstimate localization_;
+  canbus::Chassis chassis_;
+  planning::ADCTrajectory trajectory_;
+  PadMessage pad_msg_;
 
   ControllerAgent controller_agent_;
 
@@ -115,15 +116,13 @@ class Control : public apollo::common::ApolloApp {
   unsigned int total_status_lost_ = 0;
   unsigned int total_status_sanity_check_failed_ = 0;
 
-  double last_alert_timestamp_ = 0.0;
-
   ControlConf control_conf_;
 
-  apollo::common::monitor::Monitor monitor_;
+  apollo::common::monitor::MonitorLogger monitor_logger_;
   ros::Timer timer_;
 };
 
 }  // namespace control
 }  // namespace apollo
 
-#endif  // CONTROL_CONTROL_H_
+#endif  // MODULES_CONTROL_CONTROL_H_

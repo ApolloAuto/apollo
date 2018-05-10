@@ -1,0 +1,16 @@
+config {
+  type: PERCEPTION_OBSTACLES 
+  mode: RECEIVE_ONLY
+  message_history_limit: 1
+}
+config {
+  type: LOCALIZATION
+  mode: RECEIVE_ONLY
+  message_history_limit: 10
+}
+config {
+  type: PREDICTION
+  mode: PUBLISH_ONLY
+  message_history_limit: 10
+}
+is_ros: true

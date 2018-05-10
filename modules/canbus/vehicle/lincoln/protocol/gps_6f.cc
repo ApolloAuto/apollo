@@ -16,41 +16,44 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/gps_6f.h"
 
-#include "modules/canbus/common/byte.h"
+#include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::drivers::canbus::Byte;
+
 const int32_t Gps6f::ID = 0x6F;
 
-void Gps6f::Parse(const std::uint8_t* bytes, int32_t length,
-                  ChassisDetail* car_status) const {
-  car_status->mutable_basic()->set_altitude(altitude(bytes, length));
-  car_status->mutable_basic()->set_heading(heading(bytes, length));
+void Gps6f::Parse(const std::uint8_t *bytes, int32_t length,
+                  ChassisDetail *chassis_detail) const {
+  chassis_detail->mutable_basic()->set_altitude(altitude(bytes, length));
+  chassis_detail->mutable_basic()->set_heading(heading(bytes, length));
   // speed mph -> mps
-  car_status->mutable_basic()->set_gps_speed(speed(bytes, length) * 0.44704);
-  car_status->mutable_basic()->set_hdop(hdop(bytes, length));
-  car_status->mutable_basic()->set_vdop(vdop(bytes, length));
+  chassis_detail->mutable_basic()->set_gps_speed(speed(bytes, length) *
+                                                 0.44704);
+  chassis_detail->mutable_basic()->set_hdop(hdop(bytes, length));
+  chassis_detail->mutable_basic()->set_vdop(vdop(bytes, length));
   switch (fix_quality(bytes, length)) {
     case 0:
-      car_status->mutable_basic()->set_quality(BasicInfo::FIX_NO);
+      chassis_detail->mutable_basic()->set_quality(FIX_NO);
       break;
     case 1:
-      car_status->mutable_basic()->set_quality(BasicInfo::FIX_2D);
+      chassis_detail->mutable_basic()->set_quality(FIX_2D);
       break;
     case 2:
-      car_status->mutable_basic()->set_quality(BasicInfo::FIX_3D);
+      chassis_detail->mutable_basic()->set_quality(FIX_3D);
       break;
     default:
-      car_status->mutable_basic()->set_quality(BasicInfo::FIX_INVALID);
+      chassis_detail->mutable_basic()->set_quality(FIX_INVALID);
       break;
   }
-  car_status->mutable_basic()->set_num_satellites(
+  chassis_detail->mutable_basic()->set_num_satellites(
       num_satellites(bytes, length));
 }
 
-double Gps6f::altitude(const std::uint8_t* bytes, int32_t length) const {
+double Gps6f::altitude(const std::uint8_t *bytes, int32_t length) const {
   Byte high_frame(bytes + 1);
   int32_t high = high_frame.get_byte(0, 8);
   Byte low_frame(bytes + 0);
@@ -62,7 +65,7 @@ double Gps6f::altitude(const std::uint8_t* bytes, int32_t length) const {
   return value * 0.250000;
 }
 
-double Gps6f::heading(const std::uint8_t* bytes, int32_t length) const {
+double Gps6f::heading(const std::uint8_t *bytes, int32_t length) const {
   Byte high_frame(bytes + 3);
   int32_t high = high_frame.get_byte(0, 8);
   Byte low_frame(bytes + 2);
@@ -71,31 +74,31 @@ double Gps6f::heading(const std::uint8_t* bytes, int32_t length) const {
   return value * 0.010000;
 }
 
-int32_t Gps6f::speed(const std::uint8_t* bytes, int32_t length) const {
+int32_t Gps6f::speed(const std::uint8_t *bytes, int32_t length) const {
   Byte frame(bytes + 4);
   int32_t x = frame.get_byte(0, 8);
   return x;
 }
 
-double Gps6f::hdop(const std::uint8_t* bytes, int32_t length) const {
+double Gps6f::hdop(const std::uint8_t *bytes, int32_t length) const {
   Byte frame(bytes + 5);
   int32_t x = frame.get_byte(0, 5);
   return x * 0.200000;
 }
 
-double Gps6f::vdop(const std::uint8_t* bytes, int32_t length) const {
+double Gps6f::vdop(const std::uint8_t *bytes, int32_t length) const {
   Byte frame(bytes + 6);
   int32_t x = frame.get_byte(0, 5);
   return x * 0.200000;
 }
 
-int32_t Gps6f::fix_quality(const std::uint8_t* bytes, int32_t length) const {
+int32_t Gps6f::fix_quality(const std::uint8_t *bytes, int32_t length) const {
   Byte frame(bytes + 7);
   int32_t x = frame.get_byte(0, 3);
   return x;
 }
 
-int32_t Gps6f::num_satellites(const std::uint8_t* bytes, int32_t length) const {
+int32_t Gps6f::num_satellites(const std::uint8_t *bytes, int32_t length) const {
   Byte frame(bytes + 7);
   int32_t x = frame.get_byte(3, 5);
   return x;

@@ -16,24 +16,26 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/fuellevel_72.h"
 
-#include "modules/canbus/common/byte.h"
+#include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::drivers::canbus::Byte;
+
 const int32_t Fuellevel72::ID = 0x72;
 
-void Fuellevel72::Parse(const std::uint8_t* bytes, int32_t length,
-                        ChassisDetail* car_status) const {
-  car_status->mutable_battery()->set_fuel_level(fuel_level(bytes, length));
+void Fuellevel72::Parse(const std::uint8_t *bytes, int32_t length,
+                        ChassisDetail *chassis_detail) const {
+  chassis_detail->mutable_battery()->set_fuel_level(fuel_level(bytes, length));
 }
 
-double Fuellevel72::fuel_level(const std::uint8_t* bytes,
+double Fuellevel72::fuel_level(const std::uint8_t *bytes,
                                int32_t length) const {
   Byte high_frame(bytes + 1);
   int32_t high = high_frame.get_byte(0, 8);
-  Byte low_frame(bytes + 0);
+  Byte low_frame(bytes);
   int32_t low = low_frame.get_byte(0, 8);
   int32_t value = (high << 8) | low;
   if (value > 0x7FFF) {
@@ -42,7 +44,8 @@ double Fuellevel72::fuel_level(const std::uint8_t* bytes,
   // should be in range of
   // [0x0000, 0x0398]
   // or [0xfc68, 0xffff]
-  return value * 0.108696;
+  const double fuel_level_coeff = 0.108696;
+  return value * fuel_level_coeff;
 }
 
 }  // namespace lincoln

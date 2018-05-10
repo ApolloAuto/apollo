@@ -1,0 +1,241 @@
+header {
+  timestamp_sec: 1504201419.0536358
+  module_name: "routing"
+}
+road {
+  id: "r0"
+  passage {
+    can_exit: true
+    segment {
+      id: "27_1_-1"
+      start_s: 0
+      end_s: 14.3635
+    }
+  }
+}
+road {
+  id: "r1"
+  passage {
+    can_exit: true
+    segment {
+      id: "81_1_-1"
+      start_s: 0
+      end_s: 17.986
+    }
+  }
+}
+road {
+  id: "r2"
+  passage {
+    can_exit: true
+    segment {
+      id: "160_1_-3"
+      start_s: 0
+      end_s: 251.678
+    }
+  }
+}
+road {
+  id: "r3"
+  passage {
+    can_exit: true
+    segment {
+      id: "822_1_-3"
+      start_s: 0
+      end_s: 58.4734
+    }
+  }
+}
+road {
+  id: "r4"
+  passage {
+    can_exit: true
+    segment {
+      id: "165_1_-1"
+      start_s: 0
+      end_s: 37.7612
+    }
+  }
+}
+road {
+  id: "r5"
+  passage {
+    can_exit: true
+    segment {
+      id: "138_1_-1"
+      start_s: 0
+      end_s: 308.143
+    }
+  }
+}
+road {
+  id: "r6"
+  passage {
+    can_exit: true
+    segment {
+      id: "144_1_-1"
+      start_s: 0
+      end_s: 46.5655
+    }
+  }
+}
+road {
+  id: "r7"
+  passage {
+    can_exit: true
+    segment {
+      id: "140_1_-1"
+      start_s: 0
+      end_s: 146.337
+    }
+  }
+}
+road {
+  id: "r8"
+  passage {
+    can_exit: true
+    segment {
+      id: "747_1_-1"
+      start_s: 0
+      end_s: 15.6326
+    }
+  }
+}
+road {
+  id: "r9"
+  passage {
+    can_exit: true
+    segment {
+      id: "141_1_-2"
+      start_s: 0
+      end_s: 41.6019
+    }
+  }
+}
+road {
+  id: "r10"
+  passage {
+    can_exit: true
+    segment {
+      id: "906_1_-1"
+      start_s: 0
+      end_s: 27.921
+    }
+  }
+}
+road {
+  id: "r11"
+  passage {
+    can_exit: true
+    segment {
+      id: "9_1_-2"
+      start_s: 0
+      end_s: 161.962
+    }
+  }
+}
+road {
+  id: "r12"
+  passage {
+    can_exit: true
+    segment {
+      id: "13_1_-2"
+      start_s: 0
+      end_s: 35.3398
+    }
+  }
+}
+road {
+  id: "r13"
+  passage {
+    can_exit: true
+    segment {
+      id: "12_1_-3"
+      start_s: 0
+      end_s: 122.494
+    }
+  }
+}
+road {
+  id: "r14"
+  passage {
+    can_exit: true
+    segment {
+      id: "133_1_-3"
+      start_s: 0
+      end_s: 3.63182
+    }
+  }
+}
+road {
+  id: "r15"
+  passage {
+    can_exit: true
+    segment {
+      id: "88_1_-1"
+      start_s: 0
+      end_s: 19.7333
+    }
+  }
+}
+road {
+  id: "r16"
+  passage {
+    can_exit: true
+    segment {
+      id: "21_1_-1"
+      start_s: 0
+      end_s: 128.73
+    }
+  }
+}
+road {
+  id: "r17"
+  passage {
+    can_exit: true
+    segment {
+      id: "22_1_-1"
+      start_s: 0
+      end_s: 31.9409
+    }
+  }
+}
+road {
+  id: "r18"
+  passage {
+    can_exit: true
+    segment {
+      id: "23_1_-1"
+      start_s: 0
+      end_s: 49.0576
+    }
+  }
+}
+measurement {
+  distance: 1519.3525200000001
+}
+routing_request {
+  header {
+    timestamp_sec: 1504201419.052084
+    module_name: "hmi_ros_bridge"
+    sequence_num: 34
+  }
+  waypoint {
+    id: "27_1_-1"
+    s: 1.8700738747954115
+    pose {
+      x: 587045.54288088426
+      y: 4141548.7253392646
+      z: -31.29764156229794
+    }
+  }
+  waypoint {
+    id: "23_1_-1"
+    s: 0
+    pose {
+      x: 586948.74012
+      y: 4141171.118641
+    }
+  }
+}
+map_version: "1.400000"

@@ -44,7 +44,8 @@ class StringTokenizer {
    * @param s String to be split
    * @param delims Delimiters where the string should be split
    */
-  StringTokenizer(const std::string& s, const std::string& delims = " ");
+  explicit StringTokenizer(const std::string &s,
+                           const std::string &delims = " ");
 
   /**
    * Destructor
@@ -59,8 +60,8 @@ class StringTokenizer {
    * @return A vector of tokens, each a substring of str
    * surrounded by delimiters.
    */
-  static std::vector<std::string> Split(const std::string& str,
-                                        const std::string& delims);
+  static std::vector<std::string> Split(const std::string &str,
+                                        const std::string &delims);
 
   /**
    * @brief The i-th time Next() is called, it returns the i-th token obtained

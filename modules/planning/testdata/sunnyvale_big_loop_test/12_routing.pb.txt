@@ -1,0 +1,156 @@
+header {
+  timestamp_sec: 1522099346.638303
+  module_name: "routing"
+  sequence_num: 769
+}
+road {
+  id: "450"
+  passage {
+    segment {
+      id: "450_1_-1"
+      start_s: 56.474076585888355
+      end_s: 80.2345
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "1523"
+  passage {
+    segment {
+      id: "1523_1_-1"
+      start_s: 0
+      end_s: 16.6733
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "1522"
+  passage {
+    segment {
+      id: "1522_1_-1"
+      start_s: 0
+      end_s: 44.5102
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "828"
+  passage {
+    segment {
+      id: "828_1_-1"
+      start_s: 0
+      end_s: 188.836
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "459"
+  passage {
+    segment {
+      id: "459_1_-1"
+      start_s: 0
+      end_s: 13.4416
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10779"
+  passage {
+    segment {
+      id: "10779_1_-1"
+      start_s: 0
+      end_s: 13.6541
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10778"
+  passage {
+    segment {
+      id: "10778_1_-1"
+      start_s: 0
+      end_s: 34.2779
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "867"
+  passage {
+    segment {
+      id: "867_1_-1"
+      start_s: 0
+      end_s: 36.5162
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "446"
+  passage {
+    segment {
+      id: "446_1_-1"
+      start_s: 0
+      end_s: 50.5431
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "447"
+  passage {
+    segment {
+      id: "447_1_-1"
+      start_s: 0
+      end_s: 3.6517563282449692
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+measurement {
+  distance: 425.86457974235651
+}
+routing_request {
+  header {
+    timestamp_sec: 1522099346.6367197
+    module_name: "routing"
+    sequence_num: 2
+  }
+  waypoint {
+    id: "450_1_-1"
+    s: 56.474076585888355
+    pose {
+      x: 587003.99614786182
+      y: 4140303.8185741571
+    }
+  }
+  waypoint {
+    id: "447_1_-1"
+    s: 3.6517563282449692
+    pose {
+      x: 586595.79334274319
+      y: 4140182.6612401241
+    }
+  }
+}
+map_version: "1.500000"
+status {
+  error_code: OK
+  msg: "Success!"
+}

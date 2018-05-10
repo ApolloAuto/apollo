@@ -1,0 +1,327 @@
+slGraph:
+    title: 'QP Path - sl graph'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                min: 0
+                max: 200
+                labelString: 's - ref_line (m)'
+            y:
+                min: -5
+                max: 5
+                labelString: 'l (m)'
+    properties:
+        lines:
+            aggregatedBoundaryLow:
+                color: 'rgba(48, 165, 255, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+            aggregatedBoundaryHigh:
+                color: 'rgba(48, 165, 255, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                lineTension: 0
+                fill: false
+                showLine: true
+            pathLine:
+                color: 'rgba(225, 225, 225, 0.7)' # white
+                borderWidth: 2
+                pointRadius: 0.5
+                fill: false
+                showLine: false
+            mapLowerBound:
+                color: 'rgba(54, 162, 235, 0.4)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: 'start'
+                showLine: true
+            mapUpperBound:
+                color: 'rgba(54, 162, 235, 0.4)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: 'end'
+                showLine: true
+            staticObstacleLowerBound:
+                color: 'rgba(255, 0, 0, 0.8)' # red
+                borderWidth: 2
+                pointRadius: 0
+                fill: 'start'
+                showLine: true
+            staticObstacleUpperBound:
+                color: 'rgba(255, 0, 0, 0.8)' # red
+                borderWidth: 2
+                pointRadius: 0
+                fill: 'end'
+                showLine: true
+            dynamicObstacleLowerBound:
+                color: 'rgba(255, 206, 86, 0.2)' # yellow
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+            dynamicObstacleUpperBound:
+                color: 'rgba(255, 206, 86, 0.2)' # yellow
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+stGraph:
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                min: -2
+                max: 10
+                labelString: 't (second)'
+            y:
+                min: -10
+                max: 220
+                labelString: 's (m)'
+    properties:
+        box:
+            color: 'rgba(255, 0, 0, 0.8)' # red
+            borderWidth: 2
+            pointRadius: 0
+            fill: false
+            showLine: true
+            showText: true
+            cubicInterpolationMode: 'monotone'
+            lineTension: 0
+        lines:
+            curveLine:
+                color: 'rgba(225, 225, 225, 0.5)' # white
+                borderWidth: 2
+                pointRadius: 1
+                fill: false
+                showLine: false
+            kernelCruise:
+                color: 'rgba(27, 249, 105, 0.5)' # green
+                borderWidth: 2
+                pointRadius: 1
+                fill: false
+                showLine: false
+            kernelFollow:
+                color: 'rgba(255, 206, 86, 0.5)' # yellow
+                borderWidth: 2
+                pointRadius: 1
+                fill: false
+                showLine: false
+stSpeedGraph:
+    title: 'QP Speed - sv graph'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                min: -10
+                max: 220
+                labelString: 's - qp_path(m)'
+            y:
+                min: -1
+                max: 40
+                labelString: 'v (m/s)'
+    properties:
+        lines:
+            upperConstraint:
+                color: 'rgba(54, 162, 235, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+            lowerConstraint:
+                color: 'rgba(54, 162, 235, 1)' # blue
+                borderWidth: 4
+                pointRadius: 0
+                fill: false
+                showLine: true
+            planned:
+                color: 'rgba(225, 225, 225, 0.5)' # white
+                borderWidth: 4
+                pointRadius: 0
+                fill: false
+                showLine: true
+            limit:
+                color: 'rgba(255, 0, 0, 0.5)' # red
+                borderWidth: 4
+                pointRadius: 0
+                fill: false
+                showLine: true
+speedGraph:
+    title: 'Planning Speed'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                min: -2
+                max: 10
+                labelString: 't (second)'
+            y:
+                min: -1
+                max: 40
+                labelString: 'speed (m/s)'
+    properties:
+        lines:
+            finalSpeed:
+                color: 'rgba(255, 0, 0, 0.8)' # red
+                borderWidth: 1
+                pointRadius: 1
+                fill: false
+                showLine: false
+            DpStSpeedOptimizer:
+                color: 'rgba(27, 249, 105, 0.5)' # green
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+            QpSplineStSpeedOptimizer:
+                color: 'rgba(54, 162, 235, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: ture
+accelerationGraph:
+    title: 'Planning Acceleration'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                min: -2
+                max: 10
+                labelString: 't (second)'
+            y:
+                min: -4.0
+                max: 3.5
+                labelString: 'acceleration (m/s^2)'
+    properties:
+        lines:
+            acceleration:
+                color: 'rgba(255, 0, 0, 0.8)' # red
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: ture
+kappaGraph:
+    title: 'Planning Kappa'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 's (m)'
+            y:
+                min: -0.2
+                max: 0.2
+                labelString: 'kappa'
+    properties:
+        lines:
+            ReferenceLine:
+                color: 'rgba(255, 0, 0, 0.8)' # red
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+            DpPolyPathOptimizer:
+                color: 'rgba(27, 249, 105, 0.5)' # green
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+            QpSplinePathOptimizer:
+                color: 'rgba(54, 162, 235, 1)' # blue
+                borderWidth: 5
+                pointRadius: 0
+                fill: false
+                showLine: true
+dkappaGraph:
+    title: 'Planning Dkappa'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 's (m)'
+            y:
+                min: -0.02
+                max: 0.02
+                labelString: 'dkappa'
+    properties:
+        lines:
+            ReferenceLine:
+                color: 'rgba(255, 0, 0, 0.8)' # red
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+            QpSplinePathOptimizer:
+                color: 'rgba(54, 162, 235, 1)' # blue
+                borderWidth: 5
+                pointRadius: 0
+                fill: false
+                showLine: true
+thetaGraph:
+    title: 'Planning theta'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 's (m)'
+            y:
+                labelString: 'theta'
+    properties:
+        lines:
+            ReferenceLine:
+                color: 'rgba(255, 0, 0, 0.8)' # red
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+dpPolyGraph:
+    title: 'DP Path'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                labelString: 's (m)'
+            y:
+                labelString: 'l (m)'
+    properties:
+        lines:
+            minCostPoint:
+                color: 'rgba(255, 0, 0, 0.8)' # red
+                borderWidth: 2
+                pointRadius: 2
+                fill: false
+                showLine: true
+            sampleLayer:
+                color: 'rgba(225, 225, 225, 0.5)' # white
+                borderWidth: 0
+                pointRadius: 4
+                fill: false
+                showLine: false
+latencyGraph:
+    title: 'Latency'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                labelString: 'timestampe (sec)'
+            y:
+                labelString: 'latency (ms)'
+    properties:
+        lines:
+            planning:
+                color: 'rgba(27, 249, 105, 0.5)' # green
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true

@@ -15,7 +15,6 @@ lat_controller_conf {
   preview_window: 0
   cf: 155494.663
   cr: 155494.663
-  wheelbase: 2.85
   mass_fl: 520
   mass_fr: 520
   mass_rl: 520
@@ -27,9 +26,53 @@ lat_controller_conf {
   matrix_q: 0.0
   cutoff_freq: 10
   mean_filter_window_size: 10
-  steer_transmission_ratio: 16
-  steer_single_direction_max_degree: 470
   max_iteration: 100
+  max_lateral_acceleration: 5.0
+  lat_err_gain_scheduler {
+    scheduler {
+      speed: 4.0
+      ratio: 1.0
+    }
+    scheduler {
+      speed: 8.0
+      ratio: 0.6
+    }
+    scheduler {
+      speed: 12.0
+      ratio: 0.4
+    }
+    scheduler {
+      speed: 20.0
+      ratio: 0.3
+    }
+    scheduler {
+      speed: 25.0
+      ratio: 0.2
+    }
+  }
+  heading_err_gain_scheduler {
+    scheduler {
+      speed: 4.0
+      ratio: 1.0
+    }
+    scheduler {
+      speed: 8.0
+      ratio: 0.6
+    }
+    scheduler {
+      speed: 12.0
+      ratio: 0.6
+    }
+    scheduler {
+      speed: 20.0
+      ratio: 0.4
+    }
+    scheduler {
+      speed: 25.0
+      ratio: 0.4
+    }
+  }
+
 }
 lon_controller_conf {
   ts: 0.01
@@ -42,6 +85,7 @@ lon_controller_conf {
   station_pid_conf {
     integrator_enable: false
     integrator_saturation_level: 0.1
+    output_saturation_level: 3.0
     kp: 0.1
     ki: 0.0
     kd: 0.0
@@ -49,24 +93,21 @@ lon_controller_conf {
   low_speed_pid_conf {
     integrator_enable: true
     integrator_saturation_level: 0.3
+    output_saturation_level: 3.0
     kp: 1.5
     ki: 0.5
     kd: 0.0
+    kaw: 1.0
   }
   high_speed_pid_conf {
     integrator_enable: true
     integrator_saturation_level: 0.3
+    output_saturation_level: 3.0
     kp: 1.5
     ki: 0.5
     kd: 0.0
   }
-  throttle_filter_conf {
-    cutoff_freq: 10
-  }
-  brake_filter_conf {
-    cutoff_freq: 10
-  }
-  acceleration_filter_conf {
+  pitch_angle_filter_conf {
     cutoff_freq: 5
   }
   calibration_table {

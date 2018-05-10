@@ -1,0 +1,68 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+import "modules/prediction/proto/lane_graph.proto";
+import "modules/common/proto/geometry.proto";
+import "modules/perception/proto/perception_obstacle.proto";
+
+message Lane {
+    // Features of all possible current lanes
+    repeated LaneFeature current_lane_feature = 1;
+
+    // Features of the most possible current lane
+    optional LaneFeature lane_feature = 2;
+
+    // Features of all nearby lanes
+    repeated LaneFeature nearby_lane_feature = 3;
+
+    // Lane graph
+    optional LaneGraph lane_graph = 4;
+
+    // For modeling
+    optional double label_update_time_delta = 26;
+}
+
+message LaneFeature {
+    optional string lane_id = 1;
+    optional uint32 lane_turn_type = 2;
+    optional double lane_s = 3;
+    optional double lane_l = 4;
+    optional double angle_diff = 5;
+    optional double dist_to_left_boundary = 6;
+    optional double dist_to_right_boundary = 7;
+}
+
+message Feature {
+    // Obstacle ID
+    optional int32 id = 1;
+
+    // Obstacle features
+    optional apollo.common.Point3D position = 2;
+    optional apollo.common.Point3D velocity = 3;
+    optional apollo.common.Point3D acceleration = 4;
+    optional double velocity_heading = 5;
+    optional double speed = 6;
+    optional double acc = 7;
+    optional double theta = 8;
+    optional double length = 9;
+    optional double width = 10;
+    optional double height = 11;
+    optional double tracking_time = 12;
+    optional double timestamp = 13;    
+
+    // Obstacle type-specific features
+    optional Lane lane = 14;
+
+    // Obstacle tracked features
+    optional apollo.common.Point3D t_position = 16;
+    optional apollo.common.Point3D t_velocity = 17 [deprecated = true];
+    optional double t_velocity_heading = 18 [deprecated = true];
+    optional double t_speed = 19 [deprecated = true];
+    optional apollo.common.Point3D t_acceleration = 20 [deprecated = true];
+    optional double t_acc = 21 [deprecated = true];
+
+    optional bool is_still = 22 [default = false];
+    optional apollo.perception.PerceptionObstacle.Type type = 23;
+    optional double label_update_time_delta = 24;
+}

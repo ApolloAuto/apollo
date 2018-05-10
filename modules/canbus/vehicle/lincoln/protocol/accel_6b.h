@@ -22,7 +22,8 @@
 #ifndef MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_ACCEL_6B_H_
 #define MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_ACCEL_6B_H_
 
-#include "modules/canbus/vehicle/protocol_data.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -37,7 +38,8 @@ namespace lincoln {
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Accel6b : public ProtocolData {
+class Accel6b : public ::apollo::drivers::canbus::ProtocolData<
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -45,10 +47,10 @@ class Accel6b : public ProtocolData {
    * @brief parse received data
    * @param bytes a pointer to the input bytes
    * @param length the length of the input bytes
-   * @param car_status the parsed car_status
+   * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* car_status) const;
+  virtual void Parse(const std::uint8_t *bytes, int32_t length,
+                     ChassisDetail *chassis_detail) const;
 
  private:
   /**
@@ -57,10 +59,10 @@ class Accel6b : public ProtocolData {
    * 'f_type': 'value', 'is_signed_var': True, 'physical_range': '[0|0]', 'bit':
    * 0, 'type': 'double', 'order': 'intel', 'physical_unit': '"m/s^2"'}
    * @param bytes a pointer to the byte array
-   * @param length the length of the byte array
    * @return the value of lateral acceleration
    */
-  double lateral_acceleration(const std::uint8_t* bytes, int32_t length) const;
+  double lateral_acceleration(const std::uint8_t *bytes,
+                              const int32_t length) const;
 
   /**
    * @brief calculate longitudinal_acceleration based on byte array.
@@ -71,8 +73,8 @@ class Accel6b : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of longitudinal acceleration
    */
-  double longitudinal_acceleration(const std::uint8_t* bytes,
-                                   int32_t length) const;
+  double longitudinal_acceleration(const std::uint8_t *bytes,
+                                   const int32_t length) const;
   /**
    * @brief calculate vertical_acceleration based on byte array.
    * Config detail: {'name': 'vert', 'offset': 0.0, 'precision': 0.01, 'len':
@@ -82,7 +84,11 @@ class Accel6b : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of vertical acceleration
    */
-  double vertical_acceleration(const std::uint8_t* bytes, int32_t length) const;
+  double vertical_acceleration(const std::uint8_t *bytes,
+                               const int32_t length) const;
+
+  double parse_two_frames(const std::uint8_t low_byte,
+                          const std::uint8_t high_byte) const;
 };
 
 }  // namespace lincoln

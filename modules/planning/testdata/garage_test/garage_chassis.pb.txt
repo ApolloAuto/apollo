@@ -1,0 +1,22 @@
+engine_started: true
+engine_rpm: 0.0
+speed_mps: 0.0
+odometer_m: 0.0
+fuel_range_m: 0
+throttle_percentage: 15.2391853333
+brake_percentage: 13.6079959869
+steering_percentage: 5.65957450867
+steering_torque_nm: -0.3125
+parking_brake: false
+driving_mode: COMPLETE_MANUAL
+error_code: NO_ERROR
+gear_location: GEAR_NEUTRAL
+header {
+  timestamp_sec: 1498682801.33
+  module_name: "chassis"
+  sequence_num: 169202
+}
+signal {
+  turn_signal: TURN_NONE
+  horn: false
+}

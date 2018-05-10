@@ -24,16 +24,18 @@
 namespace apollo {
 namespace localization {
 
+using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::adapter::ImuAdapter;
+using apollo::common::monitor::MonitorMessageItem;
+using apollo::common::time::Clock;
 using ::Eigen::Vector3d;
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::adapter::ImuAdapter;
-using ::apollo::common::monitor::MonitorMessageItem;
-using ::apollo::common::Status;
-using ::apollo::common::time::Clock;
 
 RTKLocalization::RTKLocalization()
-    : monitor_(MonitorMessageItem::LOCALIZATION),
+    : monitor_logger_(MonitorMessageItem::LOCALIZATION),
       map_offset_{FLAGS_map_offset_x, FLAGS_map_offset_y, FLAGS_map_offset_z} {}
+
+RTKLocalization::~RTKLocalization() {}
 
 Status RTKLocalization::Start() {
   AdapterManager::Init(FLAGS_rtk_adapter_config_file);
@@ -42,18 +44,21 @@ Status RTKLocalization::Start() {
   const double duration = 1.0 / FLAGS_localization_publish_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
                                        &RTKLocalization::OnTimer, this);
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   if (!AdapterManager::GetGps()) {
     buffer.ERROR() << "GPS input not initialized. Check file "
                    << FLAGS_rtk_adapter_config_file;
     buffer.PrintLog();
-    return Status(apollo::common::LOCALIZATION_ERROR, "no GPS adapter");
+    return Status(common::LOCALIZATION_ERROR, "no GPS adapter");
   }
   if (!AdapterManager::GetImu()) {
     buffer.ERROR("IMU input not initialized. Check your adapter.conf file!");
     buffer.PrintLog();
-    return Status(apollo::common::LOCALIZATION_ERROR, "no IMU adapter");
+    return Status(common::LOCALIZATION_ERROR, "no IMU adapter");
   }
+
+  tf2_broadcaster_.reset(new tf2_ros::TransformBroadcaster);
+
   return Status::OK();
 }
 
@@ -63,9 +68,9 @@ Status RTKLocalization::Stop() {
 }
 
 void RTKLocalization::OnTimer(const ros::TimerEvent &event) {
-  double time_delay = apollo::common::time::ToSecond(Clock::Now()) -
-                      last_received_timestamp_sec_;
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  double time_delay =
+      common::time::ToSecond(Clock::Now()) - last_received_timestamp_sec_;
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
   if (FLAGS_enable_gps_timestamp &&
       time_delay > FLAGS_gps_time_delay_tolerance) {
     buffer.ERROR() << "GPS message time delay: " << time_delay;
@@ -97,7 +102,7 @@ void RTKLocalization::OnTimer(const ros::TimerEvent &event) {
   // watch dog
   RunWatchDog();
 
-  last_received_timestamp_sec_ = apollo::common::time::ToSecond(Clock::Now());
+  last_received_timestamp_sec_ = common::time::ToSecond(Clock::Now());
 }
 
 template <class T>
@@ -119,14 +124,16 @@ T RTKLocalization::InterpolateXYZ(const T &p1, const T &p2,
 
 bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
                                       Imu *imu_msg) {
-  bool success = false;
-
+  if (imu_msg == nullptr) {
+    AERROR << "imu_msg should NOT be nullptr.";
+    return false;
+  }
   auto *imu_adapter = AdapterManager::GetImu();
   if (imu_adapter->Empty()) {
-    AERROR << "[FindMatchingIMU]: Cannot find Matching IMU. "
+    AERROR << "Cannot find Matching IMU. "
            << "IMU message Queue is empty! GPS timestamp[" << gps_timestamp_sec
            << "]";
-    return success;
+    return false;
   }
 
   // scan imu buffer, find first imu message that is newer than the given
@@ -139,11 +146,9 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
     }
   }
 
-  success = true;
-
   if (imu_it != imu_adapter->end()) {  // found one
     if (imu_it == imu_adapter->begin()) {
-      AERROR << "[FindMatchingIMU]: IMU queue too short or request too old. "
+      AERROR << "IMU queue too short or request too old. "
              << "Oldest timestamp["
              << imu_adapter->GetOldestObserved().header().timestamp_sec()
              << "], Newest timestamp["
@@ -154,28 +159,49 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
       // here is the normal case
       auto imu_it_1 = imu_it;
       imu_it_1--;
-      InterpolateIMU(**imu_it_1, **imu_it, gps_timestamp_sec, imu_msg);
+      if (!(*imu_it)->has_header() || !(*imu_it_1)->has_header()) {
+        AERROR << "imu1 and imu_it_1 must both have header.";
+        return false;
+      }
+      if (!InterpolateIMU(**imu_it_1, **imu_it, gps_timestamp_sec, imu_msg)) {
+        AERROR << "failed to interpolate IMU";
+        return false;
+      }
     }
   } else {
     // give the newest imu, without extrapolation
     *imu_msg = imu_adapter->GetLatestObserved();
+    if (imu_msg == nullptr) {
+      AERROR << "Fail to get latest observed imu_msg.";
+      return false;
+    }
+
+    if (!imu_msg->has_header()) {
+      AERROR << "imu_msg must have header.";
+      return false;
+    }
 
     if (fabs(imu_msg->header().timestamp_sec() - gps_timestamp_sec) >
         FLAGS_report_gps_imu_time_diff_threshold) {
       // 20ms threshold to report error
-      AERROR << "[FindMatchingIMU]: Cannot find Matching IMU. "
+      AERROR << "Cannot find Matching IMU. "
              << "IMU messages too old"
              << "Newest timestamp["
              << imu_adapter->GetLatestObserved().header().timestamp_sec()
              << "], GPS timestamp[" << gps_timestamp_sec << "]";
     }
   }
-
-  return success;
+  return true;
 }
 
-void RTKLocalization::InterpolateIMU(const Imu &imu1, const Imu &imu2,
+bool RTKLocalization::InterpolateIMU(const Imu &imu1, const Imu &imu2,
                                      const double timestamp_sec, Imu *imu_msg) {
+  DCHECK_NOTNULL(imu_msg);
+  if (!(imu1.has_header() && imu1.header().has_timestamp_sec() &&
+        imu2.has_header() && imu2.header().has_timestamp_sec())) {
+    AERROR << "imu1 and imu2 has no header or no timestamp_sec in header";
+    return false;
+  }
   if (timestamp_sec - imu1.header().timestamp_sec() <
       FLAGS_timestamp_sec_tolerance) {
     AERROR << "[InterpolateIMU]: the given time stamp[" << timestamp_sec
@@ -192,30 +218,35 @@ void RTKLocalization::InterpolateIMU(const Imu &imu1, const Imu &imu2,
     *imu_msg = imu1;
     imu_msg->mutable_header()->set_timestamp_sec(timestamp_sec);
 
-    if (imu1.has_header() && imu1.header().has_timestamp_sec() &&
-        imu2.has_header() && imu2.header().has_timestamp_sec()) {
-      double time_diff =
-          imu2.header().timestamp_sec() - imu1.header().timestamp_sec();
-      if (fabs(time_diff) >= 0.001) {
-        double frac1 =
-            (timestamp_sec - imu1.header().timestamp_sec()) / time_diff;
+    double time_diff =
+        imu2.header().timestamp_sec() - imu1.header().timestamp_sec();
+    if (fabs(time_diff) >= 0.001) {
+      double frac1 =
+          (timestamp_sec - imu1.header().timestamp_sec()) / time_diff;
 
-        if (imu1.has_imu() && imu1.imu().has_angular_velocity() &&
-            imu2.has_imu() && imu2.imu().has_angular_velocity()) {
-          auto val = InterpolateXYZ(imu1.imu().angular_velocity(),
-                                    imu2.imu().angular_velocity(), frac1);
-          imu_msg->mutable_imu()->mutable_angular_velocity()->CopyFrom(val);
-        }
+      if (imu1.has_imu() && imu1.imu().has_angular_velocity() &&
+          imu2.has_imu() && imu2.imu().has_angular_velocity()) {
+        auto val = InterpolateXYZ(imu1.imu().angular_velocity(),
+                                  imu2.imu().angular_velocity(), frac1);
+        imu_msg->mutable_imu()->mutable_angular_velocity()->CopyFrom(val);
+      }
 
-        if (imu1.has_imu() && imu1.imu().has_linear_acceleration() &&
-            imu2.has_imu() && imu2.imu().has_linear_acceleration()) {
-          auto val = InterpolateXYZ(imu1.imu().linear_acceleration(),
-                                    imu2.imu().linear_acceleration(), frac1);
-          imu_msg->mutable_imu()->mutable_linear_acceleration()->CopyFrom(val);
-        }
+      if (imu1.has_imu() && imu1.imu().has_linear_acceleration() &&
+          imu2.has_imu() && imu2.imu().has_linear_acceleration()) {
+        auto val = InterpolateXYZ(imu1.imu().linear_acceleration(),
+                                  imu2.imu().linear_acceleration(), frac1);
+        imu_msg->mutable_imu()->mutable_linear_acceleration()->CopyFrom(val);
+      }
+
+      if (imu1.has_imu() && imu1.imu().has_euler_angles() && imu2.has_imu() &&
+          imu2.imu().has_euler_angles()) {
+        auto val = InterpolateXYZ(imu1.imu().euler_angles(),
+                                  imu2.imu().euler_angles(), frac1);
+        imu_msg->mutable_imu()->mutable_euler_angles()->CopyFrom(val);
       }
     }
   }
+  return true;
 }
 
 void RTKLocalization::PrepareLocalizationMsg(
@@ -235,8 +266,9 @@ void RTKLocalization::PrepareLocalizationMsg(
   }
 
   if (imu_valid &&
-      fabs(gps_msg.header().timestamp_sec() - imu_msg.header().timestamp_sec() >
-           FLAGS_gps_imu_timestamp_sec_diff_tolerance)) {
+      fabs(gps_msg.header().timestamp_sec() -
+           imu_msg.header().timestamp_sec()) >
+          FLAGS_gps_imu_timestamp_sec_diff_tolerance) {
     // not the same time stamp, 20ms threshold
     AERROR << "[PrepareLocalizationMsg]: time stamp of GPS["
            << gps_msg.header().timestamp_sec()
@@ -248,19 +280,20 @@ void RTKLocalization::PrepareLocalizationMsg(
 }
 
 void RTKLocalization::ComposeLocalizationMsg(
-    const ::apollo::localization::Gps &gps_msg,
-    const ::apollo::localization::Imu &imu_msg,
+    const localization::Gps &gps_msg, const localization::Imu &imu_msg,
     LocalizationEstimate *localization) {
   localization->Clear();
 
   // header
   AdapterManager::FillLocalizationHeader(FLAGS_localization_module_name,
-                                         localization->mutable_header());
+                                         localization);
   if (FLAGS_enable_gps_timestamp) {
     // copy time stamp, do NOT use Clock::Now()
     localization->mutable_header()->set_timestamp_sec(
         gps_msg.header().timestamp_sec());
   }
+
+  localization->set_measurement_time(gps_msg.header().timestamp_sec());
 
   // combine gps and imu
   auto mutable_pose = localization->mutable_pose();
@@ -281,7 +314,7 @@ void RTKLocalization::ComposeLocalizationMsg(
     // orientation
     if (pose.has_orientation()) {
       mutable_pose->mutable_orientation()->CopyFrom(pose.orientation());
-      double heading = ::apollo::common::math::QuaternionToHeading(
+      double heading = common::math::QuaternionToHeading(
           pose.orientation().qw(), pose.orientation().qx(),
           pose.orientation().qy(), pose.orientation().qz());
       mutable_pose->set_heading(heading);
@@ -303,7 +336,7 @@ void RTKLocalization::ComposeLocalizationMsg(
           Vector3d orig(imu.linear_acceleration().x(),
                         imu.linear_acceleration().y(),
                         imu.linear_acceleration().z());
-          Vector3d vec = ::apollo::common::math::QuaternionRotate(
+          Vector3d vec = common::math::QuaternionRotate(
               localization->pose().orientation(), orig);
           mutable_pose->mutable_linear_acceleration()->set_x(vec[0]);
           mutable_pose->mutable_linear_acceleration()->set_y(vec[1]);
@@ -331,7 +364,7 @@ void RTKLocalization::ComposeLocalizationMsg(
           // convert from vehicle reference to map reference
           Vector3d orig(imu.angular_velocity().x(), imu.angular_velocity().y(),
                         imu.angular_velocity().z());
-          Vector3d vec = ::apollo::common::math::QuaternionRotate(
+          Vector3d vec = common::math::QuaternionRotate(
               localization->pose().orientation(), orig);
           mutable_pose->mutable_angular_velocity()->set_x(vec[0]);
           mutable_pose->mutable_angular_velocity()->set_y(vec[1]);
@@ -349,6 +382,11 @@ void RTKLocalization::ComposeLocalizationMsg(
             imu.angular_velocity());
       }
     }
+
+    // euler angle
+    if (imu.has_euler_angles()) {
+      mutable_pose->mutable_euler_angles()->CopyFrom(imu.euler_angles());
+    }
   }
 }
 
@@ -358,7 +396,8 @@ void RTKLocalization::PublishLocalization() {
 
   // publish localization messages
   AdapterManager::PublishLocalization(localization);
-  AINFO << "[OnTimer]: Localization message publish success!";
+  PublishPoseBroadcastTF(localization);
+  ADEBUG << "[OnTimer]: Localization message publish success!";
 }
 
 void RTKLocalization::RunWatchDog() {
@@ -366,16 +405,16 @@ void RTKLocalization::RunWatchDog() {
     return;
   }
 
-  bool msg_lost = false;
-
-  apollo::common::monitor::MonitorBuffer buffer(&monitor_);
+  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
 
   // check GPS time stamp against ROS timer
   double gps_delay_sec =
-      apollo::common::time::ToSecond(Clock::Now()) -
+      common::time::ToSecond(Clock::Now()) -
       AdapterManager::GetGps()->GetLatestObserved().header().timestamp_sec();
   int64_t gps_delay_cycle_cnt =
       static_cast<int64_t>(gps_delay_sec * FLAGS_localization_publish_freq);
+
+  bool msg_lost = false;
   if (FLAGS_enable_gps_timestamp &&
       (gps_delay_cycle_cnt > FLAGS_report_threshold_err_num)) {
     msg_lost = true;
@@ -388,7 +427,7 @@ void RTKLocalization::RunWatchDog() {
 
   // check IMU time stamp against ROS timer
   double imu_delay_sec =
-      apollo::common::time::ToSecond(Clock::Now()) -
+      common::time::ToSecond(Clock::Now()) -
       AdapterManager::GetImu()->GetLatestObserved().header().timestamp_sec();
   int64_t imu_delay_cycle_cnt =
       static_cast<int64_t>(imu_delay_sec * FLAGS_localization_publish_freq);
@@ -404,10 +443,10 @@ void RTKLocalization::RunWatchDog() {
 
   // to prevent it from beeping continuously
   if (msg_lost && (last_reported_timestamp_sec_ < 1. ||
-                   apollo::common::time::ToSecond(Clock::Now()) >
+                   common::time::ToSecond(Clock::Now()) >
                        last_reported_timestamp_sec_ + 1.)) {
     AERROR << "gps/imu frame lost!";
-    last_reported_timestamp_sec_ = apollo::common::time::ToSecond(Clock::Now());
+    last_reported_timestamp_sec_ = common::time::ToSecond(Clock::Now());
   }
 }
 

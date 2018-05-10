@@ -32,7 +32,7 @@ class Interpolation2DTest : public ::testing::Test {
   virtual void SetUp() {
     std::string control_conf_file =
         "modules/control/testdata/conf/lincoln.pb.txt";
-    CHECK(::apollo::common::util::GetProtoFromFile(control_conf_file,
+    CHECK(common::util::GetProtoFromFile(control_conf_file,
                                                    &control_conf_));
   }
 
@@ -72,25 +72,24 @@ TEST_F(Interpolation2DTest, normal) {
 }
 
 TEST_F(Interpolation2DTest, calibration_table) {
-  const auto& calibration_table =
+  const auto &calibration_table =
       control_conf_.lon_controller_conf().calibration_table();
   AINFO << "Throttle calibration table:" << calibration_table.DebugString();
 
   Interpolation2D::DataType xyz;
 
-  for (int i = 0; i < calibration_table.calibration_size(); ++i) {
-    xyz.push_back(
-        std::make_tuple(calibration_table.calibration(i).speed(),
-                        calibration_table.calibration(i).acceleration(),
-                        calibration_table.calibration(i).command()));
+  for (const auto &calibration : calibration_table.calibration()) {
+    xyz.push_back(std::make_tuple(calibration.speed(),
+                                  calibration.acceleration(),
+                                  calibration.command()));
   }
   Interpolation2D estimator;
   EXPECT_TRUE(estimator.Init(xyz));
 
-  for (unsigned i = 0; i < xyz.size(); i++) {
-    EXPECT_DOUBLE_EQ(std::get<2>(xyz[i]),
-                     estimator.Interpolate(std::make_pair(
-                         std::get<0>(xyz[i]), std::get<1>(xyz[i]))));
+  for (const auto &elem : xyz) {
+    EXPECT_DOUBLE_EQ(std::get<2>(elem),
+                     estimator.Interpolate(
+                         std::make_pair(std::get<0>(elem), std::get<1>(elem))));
   }
 }
 

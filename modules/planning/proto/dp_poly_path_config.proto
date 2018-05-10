@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message DpPolyPathConfig {
+  optional uint32 sample_points_num_each_level = 1 [default = 9];
+  optional double step_length_max = 2 [default = 15.0];
+  optional double step_length_min = 3 [default = 8.0];
+  optional double lateral_sample_offset = 4 [default = 0.5];
+  optional double lateral_adjust_coeff = 5 [default = 0.5];
+  // Trajectory Cost Config
+  optional double eval_time_interval = 6 [default = 0.1];
+  optional double path_resolution = 7 [default = 0.1];
+  optional double obstacle_ignore_distance = 8 [default = 20.0];
+  optional double obstacle_collision_distance = 9 [default = 0.2];
+  optional double obstacle_risk_distance = 10 [default = 2.0];
+  optional double obstacle_collision_cost = 11 [default = 1e3];
+  optional double path_l_cost = 12;
+  optional double path_dl_cost = 13;
+  optional double path_ddl_cost = 14;
+  optional double path_l_cost_param_l0 = 15;
+  optional double path_l_cost_param_b = 16;
+  optional double path_l_cost_param_k = 17;
+  optional double path_out_lane_cost = 18;
+  optional double path_end_l_cost = 19;
+  optional double sidepass_distance = 20;
+  optional uint32 navigator_sample_num_each_level = 21;
+}

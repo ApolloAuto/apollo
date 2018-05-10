@@ -21,16 +21,17 @@
 #ifndef MODULES_CONFIGS_VEHICLE_CONFIG_H_
 #define MODULES_CONFIGS_VEHICLE_CONFIG_H_
 
+#include <string>
+
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/macro.h"
 
 /**
- * @namespace apollo::common::config
- * @brief apollo::common::config
+ * @namespace apollo::common
+ * @brief apollo::common
  */
 namespace apollo {
 namespace common {
-namespace config {
 
 /**
  * @class VehicleConfigHelper
@@ -54,7 +55,7 @@ class VehicleConfigHelper {
    * @param config A VehicleConfig class instance. The VehicleConfig class is
    * defined by modules/common/configs/proto/vehicle_config.proto.
    */
-  static void Init(const VehicleConfig& config);
+  static void Init(const VehicleConfig &config);
 
   /**
    * @brief Initialize vehicle configurations with \p config_file.
@@ -64,20 +65,54 @@ class VehicleConfigHelper {
    * defined by protobuf file
    * modules/common/configs/proto/vehicle_config.proto.
    */
-  static void Init(const std::string& config_file);
+  static void Init(const std::string &config_file);
 
   /**
    * @brief Get the current vehicle configuration.
    * @return the current VehicleConfig instance reference.
    */
-  static const VehicleConfig& GetConfig();
+  static const VehicleConfig &GetConfig();
+
+  /**
+   * @brief Get the safe turnning radius when the vehicle is turning with
+   * maximum steering angle.
+   *
+   * The calculation is described by the following figure.
+   *  <pre>
+   *
+   *
+   *    front of car
+   * A +----------+ B
+   *   |          |
+   *   /          / turn with maximum steering angle
+   *   |          |
+   *   |          |
+   *   |          |
+   *   |    X     |                                       O
+   *   |<-->.<----|-------------------------------------->* (turn center)
+   *   |          |   VehicleParam.min_turn_radius()
+   *   |          |
+   * D +----------+ C
+   *    back of car
+   *
+   *  </pre>
+   *
+   *  In the above figure, The four corner points of the vehicle is A, B, C, and
+   * D. XO is VehicleParam.min_turn_radius(), X to AD is left_edge_to_center,
+   * X to AB is VehicleParam.front_edge_to_center(). Then
+   *     AO = sqrt((XO +  left_edge_to_center) ^2 + front_edge_to_center^2).
+   * @return AO in the above figure, which is the maximum turn radius when the
+   * vehicle turns with maximum steering angle
+   */
+
+  static double MinSafeTurnRadius();
 
  private:
   static VehicleConfig vehicle_config_;
+  static bool is_init_;
   DECLARE_SINGLETON(VehicleConfigHelper);
 };
 
-}  // namespace config
 }  // namespace common
 }  // namespace apollo
 

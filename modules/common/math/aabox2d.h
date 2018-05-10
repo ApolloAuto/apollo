@@ -48,32 +48,32 @@ class AABox2d {
    */
   AABox2d() = default;
   /**
-   * @brief Parametrized constructor.
+   * @brief Parameterized constructor.
    * Creates an axes-aligned box with given center, length, and width.
    * @param center The center of the box
    * @param length The size of the box along the x-axis
    * @param width The size of the box along the y-axis
    */
-  AABox2d(const Vec2d& center, const double length, const double width);
+  AABox2d(const Vec2d &center, const double length, const double width);
   /**
-   * @brief Parametrized constructor.
+   * @brief Parameterized constructor.
    * Creates an axes-aligned box from two opposite corners.
    * @param one_corner One corner of the box
    * @param opposite_corner The opposite corner to the first one
    */
-  AABox2d(const Vec2d& one_corner, const Vec2d& opposite_corner);
+  AABox2d(const Vec2d &one_corner, const Vec2d &opposite_corner);
   /**
-   * @brief Parametrized constructor.
+   * @brief Parameterized constructor.
    * Creates an axes-aligned box containing all points in a given vector.
    * @param points Vector of points to be included inside the box.
    */
-  explicit AABox2d(const std::vector<Vec2d>& points);
+  explicit AABox2d(const std::vector<Vec2d> &points);
 
   /**
    * @brief Getter of center_
    * @return Center of the box
    */
-  const Vec2d& center() const { return center_; }
+  const Vec2d &center() const { return center_; }
 
   /**
   * @brief Getter of x-component of center_
@@ -150,63 +150,63 @@ class AABox2d {
   *
   * @param corners Output where the corners are written
   */
-  void GetAllCorners(std::vector<Vec2d>* const corners) const;
+  void GetAllCorners(std::vector<Vec2d> *const corners) const;
 
   /**
   * @brief Determines whether a given point is in the box.
   *
   * @param point The point we wish to test for containment in the box
   */
-  bool IsPointIn(const Vec2d& point) const;
+  bool IsPointIn(const Vec2d &point) const;
 
   /**
   * @brief Determines whether a given point is on the boundary of the box.
   *
   * @param point The point we wish to test for boundary membership
   */
-  bool IsPointOnBoundary(const Vec2d& point) const;
+  bool IsPointOnBoundary(const Vec2d &point) const;
 
   /**
   * @brief Determines the distance between a point and the box.
   *
   * @param point The point whose distance to the box we wish to determine.
   */
-  double DistanceTo(const Vec2d& point) const;
+  double DistanceTo(const Vec2d &point) const;
 
   /**
   * @brief Determines the distance between two boxes.
   *
   * @param box Another box.
   */
-  double DistanceTo(const AABox2d& box) const;
+  double DistanceTo(const AABox2d &box) const;
 
   /**
   * @brief Determines whether two boxes overlap.
   *
   * @param box Another box
   */
-  bool HasOverlap(const AABox2d& box) const;
+  bool HasOverlap(const AABox2d &box) const;
 
   /**
   * @brief Shift the center of AABox by the input vector.
   *
   * @param shift_vec The vector by which we wish to shift the box
   */
-  void Shift(const Vec2d& shift_vec);
+  void Shift(const Vec2d &shift_vec);
 
   /**
   * @brief Changes box to include another given box, as well as the current one.
   *
   * @param other_box Another box
   */
-  void MergeFrom(const AABox2d& other_box);
+  void MergeFrom(const AABox2d &other_box);
 
   /**
   * @brief Changes box to include a given point, as well as the current box.
   *
   * @param other_point Another point
   */
-  void MergeFrom(const Vec2d& other_point);
+  void MergeFrom(const Vec2d &other_point);
 
   /**
   * @brief Gets a human-readable debug string

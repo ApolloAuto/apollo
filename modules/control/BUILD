@@ -10,7 +10,7 @@ cc_library(
 )
 
 cc_library(
-    name = "lib_control",
+    name = "control_lib",
     srcs = [
         "control.cc",
     ],
@@ -22,18 +22,17 @@ cc_library(
         "//modules/common",
         "//modules/common:apollo_app",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/monitor",
+        "//modules/common/monitor_log",
         "//modules/common/time",
         "//modules/common/util",
         "//modules/control/common",
         "//modules/control/controller",
         "//modules/control/proto:control_proto",
-        "//modules/decision/proto:decision_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
-        "//third_party/ros:ros_common",
+        "@ros//:ros_common",
     ],
 )
 
@@ -41,7 +40,7 @@ cc_binary(
     name = "control",
     srcs = ["main.cc"],
     deps = [
-        ":lib_control",
+        ":control_lib",
         "//external:gflags",
         "//modules/control/common",
     ],
@@ -55,8 +54,7 @@ cc_test(
     ],
     data = ["//modules/control:control_testdata"],
     deps = [
-        ":lib_control",
-        "//modules/common/adapters:adapter_manager",
+        ":control_lib",
         "@gtest//:main",
     ],
 )

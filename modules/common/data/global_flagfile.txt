@@ -1,0 +1,16 @@
+# 1. Flags in this file should be defined in common/configs/config_gflags.h
+# 2. To use it, add the following line into your command line arguments or
+#    already-in-use flagfile:
+#        --flagfile=modules/common/data/global_flagfile.txt
+# 3. To override the flag values, you must set it after this file, as all Flags
+#    are evaluated strictly in order.
+
+--vehicle_config_path=/apollo/modules/common/data/mkz_config.pb.txt
+
+--map_dir=/apollo/modules/map/data/sunnyvale_big_loop
+
+--log_dir=/apollo/data/log
+
+--use_navigation_mode=false
+
+--map_dir=/apollo/modules/map/data/sunnyvale_big_loop

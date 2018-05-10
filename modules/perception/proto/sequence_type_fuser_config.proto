@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.perception.sequence_type_fuser_config;
+
+message ModelConfigs {
+  optional string name = 1 [ default = "SequenceTypeFuser" ];
+  optional string version = 2 [ default = "1.1.0" ];
+  optional float temporal_window = 3 [ default = 20.0 ];
+  optional string classifiers_property_file_path = 4 [ default = "modules/perception/model/sequence_type_fuser/classifiers.property" ];
+  optional string transition_property_file_path = 5 [ default = "modules/perception/model/sequence_type_fuser/transition.property" ];
+}

@@ -19,18 +19,18 @@
 Record GPS and IMU data
 """
 
+import atexit
+import logging
 import math
 import os
-import rospy
 import sys
-import tf
-from std_msgs.msg import String
+
+import rospy
 from gflags import FLAGS
-import logging
-import atexit
+
 from logger import Logger
-from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
+from modules.localization.proto import localization_pb2
 
 
 class RtkRecord(object):
@@ -53,7 +53,7 @@ class RtkRecord(object):
             self.file_handler = open(record_file, 'w')
         except:
             self.logger.error("open file %s failed" % (record_file))
-            self.file_handler.close();
+            self.file_handler.close()
             sys.exit()
 
         self.write("x,y,z,speed,acceleration,curvature,"\
@@ -117,7 +117,7 @@ class RtkRecord(object):
         carspeed = self.chassis.speed_mps
         caracceleration = self.localization.pose.linear_acceleration_vrf.y
 
-        speed_epsilon = 1e-9;
+        speed_epsilon = 1e-9
         if abs(self.prev_carspeed) < speed_epsilon \
             and abs(carspeed) < speed_epsilon:
             caracceleration = 0.0
@@ -143,10 +143,9 @@ class RtkRecord(object):
             self.cars = self.cars + carspeed * 0.01
             self.write(
                 "%s, %s, %s, %s, %s, %s, %s, %.4f, %s, %s, %s, %s, %s, %s\n" %
-                (carx, cary, carz, carspeed, caracceleration,
-                 self.carcurvature, carcurvature_change_rate, cartime,
-                 cartheta, cargear, self.cars,
-                 self.chassis.throttle_percentage,
+                (carx, cary, carz, carspeed, caracceleration, self.carcurvature,
+                 carcurvature_change_rate, cartime, cartheta, cargear,
+                 self.cars, self.chassis.throttle_percentage,
                  self.chassis.brake_percentage,
                  self.chassis.steering_percentage))
             self.logger.debug(
@@ -174,8 +173,7 @@ def main(argv):
     rospy.init_node('rtk_recorder', anonymous=True)
 
     argv = FLAGS(argv)
-    log_dir = os.path.dirname(
-        os.path.abspath(__file__)) + "/../../../data/log/"
+    log_dir = os.path.dirname(os.path.abspath(__file__)) + "/../../../data/log/"
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     Logger.config(

@@ -96,7 +96,7 @@ class EulerAnglesZXY {
    * @param qw Quaternion w-coordinate
    * @param qx Quaternion x-coordinate
    * @param qy Quaternion y-coordinate
-   * @param qzQuaternion z-coordinate
+   * @param qz Quaternion z-coordinate
    */
   EulerAnglesZXY(T qw, T qx, T qy, T qz)
       : roll_(std::atan2(2.0 * (qw * qy - qx * qz),
@@ -109,7 +109,7 @@ class EulerAnglesZXY {
    * @brief Constructs a rotation from quaternion.
    * @param q Quaternion
    */
-  explicit EulerAnglesZXY(const Eigen::Quaternion<T>& q)
+  explicit EulerAnglesZXY(const Eigen::Quaternion<T> &q)
       : EulerAnglesZXY(q.w(), q.x(), q.y(), q.z()) {}
 
   /**

@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message SpiralCurveConfig {
+  optional int32 simpson_size = 1 [default = 9];
+  optional double newton_raphson_tol = 2 [default = 0.01];
+  optional int32 newton_raphson_max_iter = 3 [ default = 20];
+}

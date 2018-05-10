@@ -53,6 +53,7 @@ TEST(MathUtilsTest, WrapAngle) {
 
 TEST(MathUtilsTest, NormalizeAngle) {
   EXPECT_DOUBLE_EQ(1.5, NormalizeAngle(1.5));
+  EXPECT_DOUBLE_EQ(1.5 - M_PI, NormalizeAngle(1.5 + M_PI));
   EXPECT_DOUBLE_EQ(1.5, NormalizeAngle(1.5 + M_PI * 2));
   EXPECT_DOUBLE_EQ(1.5, NormalizeAngle(1.5 - M_PI * 2));
   EXPECT_DOUBLE_EQ(-1.5, NormalizeAngle(-1.5));
@@ -70,19 +71,6 @@ TEST(MathUtilsTest, Square) {
   EXPECT_EQ(169, Square(-13));
   EXPECT_EQ(2147395600, Square(46340));
   EXPECT_EQ(-2147479015, Square(46341));  // Overflow!
-}
-
-TEST(MathUtilsTest, Double) {
-  EXPECT_EQ(double_compare(234.32, 93.9), 1);
-  EXPECT_EQ(double_compare({234.32}, {93.9}), 1);
-  EXPECT_EQ(double_compare(234.32, 93.9, 1e-5), 1);
-  EXPECT_EQ(double_compare({234.32}, {93.9}, 1e-5), 1);
-
-  EXPECT_EQ(double_compare(23.32, 93.9), -1);
-  EXPECT_EQ(double_compare(4.32, 4.32), 0);
-  EXPECT_EQ(double_compare(2.1, 2.0009, 1e-5), 1);
-  EXPECT_EQ(double_compare(1.1, 2.0009, 1e-5), -1);
-  EXPECT_EQ(double_compare(2.1, 2.0009, 1), 0);
 }
 
 }  // namespace math

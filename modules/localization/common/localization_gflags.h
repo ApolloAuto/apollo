@@ -19,8 +19,8 @@
  * @brief The gflags used by localization module
  */
 
-#ifndef MODEULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
-#define MODEULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
+#ifndef MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
+#define MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
 
 #include "gflags/gflags.h"
 
@@ -30,16 +30,14 @@ DECLARE_double(localization_publish_freq);
 
 DECLARE_string(localization_config_file);
 DECLARE_string(rtk_adapter_config_file);
-DECLARE_string(camera_adapter_config_file);
-DECLARE_string(camera_parameter_config_file);
+DECLARE_string(msf_adapter_config_file);
+DECLARE_string(msf_visual_adapter_config_file);
 
 DECLARE_bool(enable_gps_imu_interprolate);
 DECLARE_bool(enable_map_reference_unify);
 DECLARE_bool(enable_watchdog);
 
 DECLARE_double(gps_time_delay_tolerance);
-DECLARE_double(imu_time_delay_tolerance);
-DECLARE_double(camera_time_delay_tolerance);
 DECLARE_double(gps_imu_timestamp_sec_diff_tolerance);
 DECLARE_double(timestamp_sec_tolerance);
 
@@ -47,12 +45,65 @@ DECLARE_double(map_offset_x);
 DECLARE_double(map_offset_y);
 DECLARE_double(map_offset_z);
 
-DECLARE_int32(monitor_level);
-
 DECLARE_int32(report_threshold_err_num);
 DECLARE_double(report_gps_imu_time_diff_threshold);
 
 DECLARE_bool(enable_gps_timestamp);
-DECLARE_bool(enable_camera_timestamp);
 
-#endif  // MODEULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
+// lidar module
+DECLARE_string(local_map_name);
+DECLARE_string(lidar_extrinsics_file);
+DECLARE_string(lidar_height_file);
+DECLARE_double(lidar_height_default);
+DECLARE_int32(lidar_localization_mode);
+DECLARE_int32(lidar_yaw_align_mode);
+DECLARE_int32(lidar_filter_size);
+DECLARE_double(lidar_imu_max_delay_time);
+DECLARE_double(lidar_map_coverage_theshold);
+DECLARE_bool(lidar_debug_log_flag);
+DECLARE_int32(point_cloud_step);
+
+// integ module
+DECLARE_bool(integ_ins_can_self_align);
+DECLARE_bool(integ_sins_align_with_vel);
+DECLARE_bool(integ_sins_state_check);
+DECLARE_double(integ_sins_state_span_time);
+DECLARE_double(integ_sins_state_pos_std);
+
+DECLARE_double(vel_threshold_get_yaw);
+DECLARE_bool(integ_debug_log_flag);
+
+// gnss module
+DECLARE_bool(enable_ins_aid_rtk);
+DECLARE_string(eph_buffer_path);
+DECLARE_string(ant_imu_leverarm_file);
+DECLARE_bool(gnss_debug_log_flag);
+DECLARE_bool(if_imuant_from_file);
+DECLARE_double(imu_to_ant_offset_x);
+DECLARE_double(imu_to_ant_offset_y);
+DECLARE_double(imu_to_ant_offset_z);
+DECLARE_double(imu_to_ant_offset_ux);
+DECLARE_double(imu_to_ant_offset_uy);
+DECLARE_double(imu_to_ant_offset_uz);
+
+// common
+DECLARE_double(imu_rate);
+DECLARE_bool(if_utm_zone_id_from_folder);
+DECLARE_bool(trans_gpstime_to_utctime);
+DECLARE_int32(gnss_mode);
+DECLARE_bool(imu_coord_rfu);
+DECLARE_bool(gnss_only_init);
+DECLARE_bool(enable_lidar_localization);
+
+// imu vehicle extrinsic
+DECLARE_string(vehicle_imu_file);
+DECLARE_bool(if_vehicle_imu_from_file);
+DECLARE_double(imu_vehicle_qx);
+DECLARE_double(imu_vehicle_qy);
+DECLARE_double(imu_vehicle_qz);
+DECLARE_double(imu_vehicle_qw);
+
+// visualization
+DECLARE_string(map_visual_dir);
+
+#endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_

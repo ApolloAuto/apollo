@@ -14,21 +14,25 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/proto/vehicle_parameter.pb.h"
-#include "modules/canbus/vehicle/lincoln_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_factory.h"
+#include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/canbus/vehicle/gem/gem_vehicle_factory.h"
+#include "modules/canbus/vehicle/lincoln/lincoln_vehicle_factory.h"
 
 namespace apollo {
 namespace canbus {
 
 void VehicleFactory::RegisterVehicleFactory() {
-  Register(VehicleParameter::LINCOLN_MKZ, []() -> AbstractVehicleFactory* {
+  Register(VehicleParameter::LINCOLN_MKZ, []() -> AbstractVehicleFactory * {
     return new LincolnVehicleFactory();
+  });
+  Register(VehicleParameter::GEM, []() -> AbstractVehicleFactory * {
+    return new GemVehicleFactory();
   });
 }
 
 std::unique_ptr<AbstractVehicleFactory> VehicleFactory::CreateVehicle(
-    const VehicleParameter& vehicle_parameter) {
+    const VehicleParameter &vehicle_parameter) {
   auto abstract_factory = CreateObject(vehicle_parameter.brand());
   if (!abstract_factory) {
     AERROR << "failed to create vehicle factory with "

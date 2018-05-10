@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
@@ -14,3 +16,5 @@ cc_binary(
         "//modules/dreamview/backend",
     ],
 )
+
+cpplint()

@@ -3,7 +3,9 @@ package apollo.control;
 
 import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/header.proto";
+import "modules/common/proto/vehicle_signal.proto";
 import "modules/control/proto/pad_msg.proto";
+import "modules/common/proto/drive_state.proto";
 
 enum TurnSignal {
   TURN_NONE = 0;
@@ -14,8 +16,10 @@ enum TurnSignal {
 message LatencyStats {
   optional double total_time_ms = 1;
   repeated double controller_time_ms = 2;
+  optional bool total_time_exceeded = 3;
 }
 
+// next id : 27
 message ControlCommand {
   optional apollo.common.Header header = 1;
   // target throttle in percentage [0, 100]
@@ -24,10 +28,10 @@ message ControlCommand {
   // target brake in percentage [0, 100]
   optional double brake = 4;
 
-  // target steering rate, in percentage of full scale per second [-100, 100]
+  // target non-directional steering rate, in percentage of full scale per second [0, 100]
   optional double steering_rate = 6;
 
-  // target steerig angle, in percentage of full scalce [-100, 100]
+  // target steering angle, in percentage of full scale [-100, 100]
   optional double steering_target = 7;
 
   // parking brake engage. true: engaged
@@ -49,9 +53,10 @@ message ControlCommand {
   optional apollo.canbus.Chassis.GearPosition gear_location = 20;
 
   optional Debug debug = 22;
-  optional apollo.canbus.Signal signal = 23;
+  optional apollo.common.VehicleSignal signal = 23;
   optional LatencyStats latency_stats = 24;
   optional PadMessage pad_msg = 25;
+  optional apollo.common.EngageAdvice engage_advice = 26;
 
   // deprecated fields
   optional bool left_turn = 13 [deprecated = true];
@@ -81,6 +86,7 @@ message SimpleLongitudinalDebug {
   optional double throttle_cmd = 16;
   optional double brake_cmd = 17;
   optional bool is_full_stop = 18;
+  optional double slope_offset_compensation = 19;
 }
 
 message SimpleLateralDebug {
@@ -100,6 +106,42 @@ message SimpleLateralDebug {
   optional double steer_angle_feedback = 14;
   optional double steering_position = 15;
   optional double ref_speed = 16;
+  optional double steer_angle_limited = 17;
+}
+
+message SimpleMPCDebug {
+  optional double lateral_error = 1;
+  optional double ref_heading = 2;
+  optional double heading = 3;
+  optional double heading_error = 4;
+  optional double heading_error_rate = 5;
+  optional double lateral_error_rate = 6;
+  optional double curvature = 7;
+  optional double steer_angle = 8;
+  optional double steer_angle_feedforward = 9;
+  optional double steer_angle_lateral_contribution = 10;
+  optional double steer_angle_lateral_rate_contribution = 11;
+  optional double steer_angle_heading_contribution = 12;
+  optional double steer_angle_heading_rate_contribution = 13;
+  optional double steer_angle_feedback = 14;
+  optional double steering_position = 15;
+  optional double ref_speed = 16;
+  optional double steer_angle_limited = 17;
+  optional double station_reference = 18;
+  optional double station_error = 19;
+  optional double speed_reference = 20;
+  optional double speed_error = 21;
+  optional double acceleration_reference = 22;
+  optional bool is_full_stop = 23;
+  optional double station_feedback = 24;
+  optional double speed_feedback = 25;
+  optional double acceleration_cmd_closeloop = 26;
+  optional double acceleration_cmd = 27;
+  optional double acceleration_lookup = 28;
+  optional double speed_lookup = 29;
+  optional double calibration_value = 30;
+  repeated double matrix_q_updated = 31;     // matrix_q_updated_ size = 6
+  repeated double matrix_r_updated = 32;    // matrix_r_updated_ size = 2
 }
 
 message InputDebug {
@@ -112,4 +154,5 @@ message Debug {
   optional SimpleLongitudinalDebug simple_lon_debug = 1;
   optional SimpleLateralDebug simple_lat_debug = 2;
   optional InputDebug input_debug = 3;
+  optional SimpleMPCDebug simple_mpc_debug = 4;
 }

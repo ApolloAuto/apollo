@@ -15,29 +15,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 """
 Control Planning Analyzer
 """
+import argparse
+import math
 import sys
-import rospy
-import rosbag
+import threading
+import time
+
 import matplotlib
-from std_msgs.msg import String
 import matplotlib.pyplot as plt
+import numpy
+import rosbag
+import rospy
+import tf
+import tkFileDialog
 from matplotlib import patches
 from matplotlib import lines
-import numpy
+from std_msgs.msg import String
+
 from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.planning.proto import planning_pb2
 from modules.control.proto import control_cmd_pb2
-import time
-import tf
-import math
-import argparse
-import threading
-import tkFileDialog
 
 
 class ControlInfo(object):
@@ -164,10 +165,8 @@ class ControlInfo(object):
             entity.debug.simple_lon_debug.preview_acceleration_reference)
         self.acc_close.append(
             entity.debug.simple_lon_debug.acceleration_cmd_closeloop)
-        self.station_error.append(
-            entity.debug.simple_lon_debug.station_error)
-        self.speed_error.append(
-            entity.debug.simple_lon_debug.speed_error)
+        self.station_error.append(entity.debug.simple_lon_debug.station_error)
+        self.speed_error.append(entity.debug.simple_lon_debug.speed_error)
 
         self.curvature.append(entity.debug.simple_lat_debug.curvature)
         self.heading_error.append(entity.debug.simple_lat_debug.heading_error)
@@ -193,11 +192,10 @@ class ControlInfo(object):
                                  self.pointtheta))
                 self.target_time.append(entity.header.timestamp_sec)
 
-    def long(self):
+    def longitudinal(self):
         """
-        
+        Showing Longitudinal
         """
-        print "Showing Longitudinal"
         for loc, ax in numpy.ndenumerate(self.ax):
             ax.clear()
         self.ax[0, 0].plot(
@@ -240,13 +238,9 @@ class ControlInfo(object):
         self.ax[1, 1].plot(self.controltime, self.acc_open, label='Acc Open')
         self.ax[1, 1].plot(self.controltime, self.acc_close, label='Acc Close')
         self.ax[1, 1].plot(
-            self.controltime,
-            self.station_error,
-            label='station_error')
+            self.controltime, self.station_error, label='station_error')
         self.ax[1, 1].plot(
-            self.controltime,
-            self.speed_error,
-            label='speed_error')
+            self.controltime, self.speed_error, label='speed_error')
         self.ax[1, 1].legend(fontsize='medium')
         self.ax[1, 1].grid(True)
         self.ax[1, 1].set_title('IMU Info')
@@ -263,7 +257,7 @@ class ControlInfo(object):
                 self.mode_time[i], self.mode_time[i + 1], fc='0.1', alpha=0.1)
         plt.draw()
 
-    def lat(self):
+    def lateral(self):
         """
         Plot everything in time domain
         """
@@ -327,18 +321,15 @@ class ControlInfo(object):
         if event.key == 'q' or event.key == 'Q':
             plt.close('all')
         if event.key == 'a' or event.key == 'A':
-            self.long()
+            self.longitutidinal()
         if event.key == 'z' or event.key == 'Z':
-            self.lat()
+            self.lateral()
 
 
-def main():
-    """
-    Main function
-    """
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Process and analyze control and planning data')
-    parser.add_argument('--bag', help='Use Rosbag? (t/F)', default='F')
+    parser.add_argument('--bag', type=str, help='use Rosbag')
     args = parser.parse_args()
 
     rospy.init_node('control_info', anonymous=True)
@@ -382,9 +373,6 @@ def main():
         canbussub = rospy.Subscriber('/apollo/canbus/chassis',
                                      chassis_pb2.Chassis,
                                      controlinfo.callback_canbus)
-        controlinfo.update_subs(planningsub, localizationsub, controlsub,
-                                canbussub, axarr)
-
         raw_input("Press Enter To Stop")
 
         planningsub.unregister()
@@ -395,11 +383,6 @@ def main():
         rospy.sleep(0.5)
 
     mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
-    controlinfo.long()
+    controlinfo.longitudinal()
     fig.canvas.mpl_connect('key_press_event', controlinfo.press)
     plt.show()
-
-
-if __name__ == '__main__':
-    main()

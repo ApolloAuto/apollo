@@ -12,6 +12,7 @@ licenses([
     "reciprocal",  # MPL2
     "notice",  # Portions BSD
 ])
+
 exports_files(["COPYING.MPL2"])
 
 cc_library(

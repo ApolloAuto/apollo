@@ -64,7 +64,7 @@ TEST(Status, EqualsDifferentCode) {
 
 TEST(Status, EqualsDifferentMessage) {
   const Status a(ErrorCode::CONTROL_ERROR, "Error message1");
-  const Status b(ErrorCode::CONTROL_ERROR, "Error message2");
+  const Status b(ErrorCode::CONTROL_COMPUTE_ERROR, "Error message2");
   EXPECT_NE(a, b);
 }
 

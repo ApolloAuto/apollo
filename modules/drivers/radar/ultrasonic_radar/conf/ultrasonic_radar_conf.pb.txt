@@ -1,0 +1,12 @@
+can_conf {
+  can_card_parameter {
+    brand:ESD_CAN
+    type: PCI_CARD
+    channel_id: CHANNEL_ID_THREE
+  }
+
+  enable_debug_mode: false
+  enable_receiver_log: false
+}
+
+entrance_num: 12

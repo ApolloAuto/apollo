@@ -52,4 +52,4 @@ void SolveLQRProblem(const Eigen::MatrixXd &A, const Eigen::MatrixXd &B,
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_MATH_LINEAR_QUADRATIC_REGULATOR_H_ */
+#endif  // MODULES_COMMON_MATH_LINEAR_QUADRATIC_REGULATOR_H_

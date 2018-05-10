@@ -23,12 +23,17 @@ namespace canbus {
 namespace lincoln {
 
 TEST(Tirepressure71Test, General) {
-  Tirepressure71 tire_pressure;
-  uint8_t data = 0x00;
+  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   int32_t length = 8;
+
+  Tirepressure71 tire_pressure;
   ChassisDetail cd;
-  tire_pressure.Parse(&data, length, &cd);
-  EXPECT_EQ(tire_pressure.front_left_tire(&data, length), 2048);
+  tire_pressure.Parse(data, length, &cd);
+
+  EXPECT_EQ(cd.safety().front_left_tire_press(), 25191);
+  EXPECT_EQ(cd.safety().front_right_tire_press(), 25699);
+  EXPECT_EQ(cd.safety().rear_left_tire_press(), 21073);
+  EXPECT_EQ(cd.safety().rear_right_tire_press(), 21587);
 }
 
 }  // namespace lincoln

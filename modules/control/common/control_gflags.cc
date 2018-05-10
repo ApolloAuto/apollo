@@ -16,19 +16,21 @@
 
 #include "modules/control/common/control_gflags.h"
 
-DEFINE_double(min_alert_interval, 1.,
-              "minimum alert interval to prevent alerting too frequently.");
 DEFINE_string(control_conf_file, "modules/control/conf/lincoln.pb.txt",
               "default control conf data file");
+
+DEFINE_string(control_adapter_config_filename,
+              "modules/control/conf/adapter.conf", "The adapter config file");
+
 DEFINE_bool(enable_csv_debug, false, "True to write out csv debug file.");
-DEFINE_bool(use_state_exact_match, false,
-            "whether use state exact match in lateral controller");
 DEFINE_bool(enable_speed_station_preview, true, "enable speed/station preview");
-DEFINE_bool(enable_control_watchdog, true, "True to enable control watchdog");
-DEFINE_string(node_name, "control", "The control node name in proto");
+DEFINE_string(control_node_name, "control", "The control node name in proto");
 DEFINE_bool(is_control_test_mode, false, "True to run control in test mode");
+DEFINE_double(control_test_duration, -1.0,
+              "Control testing duration in seconds. This number is will not "
+              "take effect if negative");
 DEFINE_bool(use_preview_speed_for_table, false,
-        "True to use preview speed for table lookup");
+            "True to use preview speed for table lookup");
 
 DEFINE_bool(enable_input_timestamp_check, true,
             "True to enable input timestamp delay check");
@@ -42,7 +44,17 @@ DEFINE_int32(max_planning_miss_num, 20,
 
 DEFINE_double(max_acceleration_when_stopped, 0.01,
               "max acceleration can be observed when vehicle is stopped");
-DEFINE_double(max_abs_speed_when_stopped, 0.01,
-              "max absolute speed can be observed when vehicle is stopped");
+DEFINE_double(
+    max_abs_speed_when_stopped, 0.25,
+    "max absolute speed can be observed when vehicle is stopped, will reconfig "
+    "it in different vehicles since this is chassis minimum speed feedback");
 DEFINE_double(steer_angle_rate, 100.0,
               "Steer angle change rate in percentage.");
+DEFINE_bool(enable_gain_scheduler, false,
+            "Enable gain scheduler for higher vechile speed");
+DEFINE_bool(set_steer_limit, false, "Set steer limit");
+
+DEFINE_bool(enable_slope_offset, false, "Enable slope offset compensation");
+
+DEFINE_double(lock_steer_speed, 0.081,
+              "Minimum speed to lock the steer, in m/s");

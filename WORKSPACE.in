@@ -1,0 +1,191 @@
+workspace(name = "apollo")
+
+# googletest (GTest and GMock)
+new_http_archive(
+    name = "gtest",
+    build_file = "third_party/gtest.BUILD",
+    sha256 = "58a6f4277ca2bc8565222b3bbd58a177609e9c488e8a72649359ba51450db7d8",
+    strip_prefix = "googletest-release-1.8.0",
+    url = "file:///home/tmp/googletest-release-1.8.0.tar.gz",
+)
+
+# gflags
+http_archive(
+    name = "com_github_gflags_gflags",
+    sha256 = "466c36c6508a451734e4f4d76825cf9cd9b8716d2b70ef36479ae40f08271f88",
+    strip_prefix = "gflags-2.2.0",
+    url = "file:///home/tmp/gflags-2.2.0.tar.gz",
+)
+
+bind(
+    name = "gflags",
+    actual = "@com_github_gflags_gflags//:gflags",
+)
+
+# glog
+new_http_archive(
+    name = "glog",
+    build_file = "third_party/glog.BUILD",
+    sha256 = "7580e408a2c0b5a89ca214739978ce6ff480b5e7d8d7698a2aa92fadc484d1e0",
+    strip_prefix = "glog-0.3.5",
+    url = "file:///home/tmp/glog-0.3.5.tar.gz",
+)
+
+# Google Benchmark
+new_http_archive(
+    name = "benchmark",
+    build_file = "third_party/benchmark.BUILD",
+    sha256 = "e7334dd254434c6668e33a54c8f839194c7c61840d52f4b6258eee28e9f3b20e",
+    strip_prefix = "benchmark-1.1.0",
+    url = "file:///home/tmp/benchmark-1.1.0.tar.gz",
+)
+
+# cpplint from google style guide
+new_git_repository(
+    name = "google_styleguide",
+    build_file = "third_party/google_styleguide.BUILD",
+    commit = "159b4c81bbca97a9ca00f1195a37174388398a67",
+    remote = "https://github.com/google/styleguide.git",
+)
+
+# eigen
+new_http_archive(
+    name = "eigen",
+    build_file = "third_party/eigen.BUILD",
+    sha256 = "04f8a4fa4afedaae721c1a1c756afeea20d3cdef0ce3293982cf1c518f178502",
+    strip_prefix = "eigen-eigen-b9cd8366d4e8",
+    url = "file:///home/tmp/eigen-3.2.10.tar.gz",
+)
+
+# CivetWeb (web server)
+new_http_archive(
+    name = "civetweb",
+    build_file = "third_party/civetweb.BUILD",
+    sha256 = "e6958f005aa01b02645bd3ff9760dd085e83d30530cdd97b584632419195bea5",
+    strip_prefix = "civetweb-1.10",
+    url = "file:///home/tmp/civetweb-1.10.tar.gz",
+)
+
+# curlpp
+new_http_archive(
+    name = "curlpp",
+    build_file = "third_party/curlpp.BUILD",
+    sha256 = "97e3819bdcffc3e4047b6ac57ca14e04af85380bd93afe314bee9dd5c7f46a0a",
+    strip_prefix = "curlpp-0.8.1",
+    url = "file:///home/tmp/curlpp-0.8.1.tar.gz",
+)
+
+#ros
+new_local_repository(
+    name = "ros",
+    build_file = "third_party/ros.BUILD",
+    path = "/home/tmp/ros",
+)
+
+# OpenCV 2.4.13.2
+new_http_archive(
+    name = "opencv2",
+    build_file = "third_party/opencv2.BUILD",
+    strip_prefix = "opencv-2.4.13.2",
+    url = "file:///home/tmp/opencv-2.4.13.2.zip",
+)
+
+# PCL 1.7
+# =======
+# This requires libpcl-dev to be installed in your Ubuntu/Debian.
+new_local_repository(
+    name = "pcl",
+    build_file = "third_party/pcl.BUILD",
+    path = "/usr/local/include/pcl-1.7",
+)
+
+new_local_repository(
+    name = "glew",
+    build_file = "third_party/glew.BUILD",
+    path = "/usr/include",
+)
+
+new_local_repository(
+    name = "opengl",
+    build_file = "third_party/opengl.BUILD",
+    path = "/usr/include",
+)
+
+new_local_repository(
+    name = "glfw",
+    build_file = "third_party/glfw.BUILD",
+    path = "/usr/include",
+)
+
+new_local_repository(
+    name = "vtk",
+    build_file = "third_party/vtk.BUILD",
+    path = "/usr/include/vtk-VTK_VERSION",
+)
+
+# Caffe
+new_local_repository(
+    name = "caffe",
+    build_file = "third_party/caffe.BUILD",
+    path = "/usr/include/caffe",
+)
+
+# YAML-CPP
+new_http_archive(
+    name = "yaml_cpp",
+    build_file = "third_party/yaml_cpp.BUILD",
+    strip_prefix = "yaml-cpp-yaml-cpp-0.5.3",
+    url = "file:///home/tmp/yaml-cpp-0.5.3.zip",
+)
+
+new_http_archive(
+    name = "qpOASES",
+    build_file = "third_party/qpOASES.BUILD",
+    sha256 = "e70b49586b58b8f5fd348e951f3c3094ed0ad371a96097a499f343a7aeec7dbe",
+    strip_prefix = "qp-oases-3.2.1-1",
+    url = "file:///home/tmp/qp-oases-3.2.1-1.zip",
+)
+
+# IpOpt
+new_local_repository(
+    name = "ipopt",
+    build_file = "third_party/ipopt.BUILD",
+    path = "/usr/local/ipopt/include/coin",
+)
+
+# Cuda
+new_local_repository(
+    name = "cuda",
+    build_file = "third_party/cuda.BUILD",
+    path = "/usr/local/cuda/include",
+)
+
+# Local-integ
+new_local_repository(
+    name = "local_integ",
+    build_file = "third_party/local_integ.BUILD",
+    path = "/usr/local/apollo/local_integ",
+)
+
+# Proj.4
+new_http_archive(
+    name = "proj4",
+    build_file = "third_party/proj4.BUILD",
+    strip_prefix = "proj.4-4.9.3",
+    url = "file:///home/tmp/proj.4-4.9.3.zip",
+)
+
+# tinyxml2
+new_http_archive(
+    name = "tinyxml2",
+    build_file = "third_party/tinyxml2.BUILD",
+    strip_prefix = "tinyxml2-5.0.1",
+    url = "file:///home/tmp/tinyxml2-5.0.1.zip",
+)
+
+#protobuf 3.3
+http_archive(
+    name = "com_google_protobuf",
+    strip_prefix = "protobuf-3.3.0",
+    url = "file:///home/tmp/protobuf-3.3.0.tar.gz",
+)

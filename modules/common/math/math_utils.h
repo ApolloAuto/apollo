@@ -23,6 +23,7 @@
 #define MODULES_COMMON_MATH_MATH_UTILS_H_
 
 #include <limits>
+#include <utility>
 
 #include "modules/common/math/vec2d.h"
 
@@ -34,6 +35,8 @@ namespace apollo {
 namespace common {
 namespace math {
 
+double Sqr(const double x);
+
 /**
  * @brief Cross product between two 2-D vectors from the common start point,
  *        and end at two other points.
@@ -43,8 +46,8 @@ namespace math {
  *
  * @return The cross product result.
  */
-double CrossProd(const Vec2d& start_point, const Vec2d& end_point_1,
-                 const Vec2d& end_point_2);
+double CrossProd(const Vec2d &start_point, const Vec2d &end_point_1,
+                 const Vec2d &end_point_2);
 
 /**
  * @brief Inner product between two 2-D vectors from the common start point,
@@ -55,8 +58,8 @@ double CrossProd(const Vec2d& start_point, const Vec2d& end_point_1,
  *
  * @return The inner product result.
  */
-double InnerProd(const Vec2d& start_point, const Vec2d& end_point_1,
-                 const Vec2d& end_point_2);
+double InnerProd(const Vec2d &start_point, const Vec2d &end_point_1,
+                 const Vec2d &end_point_2);
 
 /**
  * @brief Cross product between two vectors.
@@ -99,6 +102,14 @@ double WrapAngle(const double angle);
  * @return The normalized value of the angle.
  */
 double NormalizeAngle(const double angle);
+
+/**
+ * @brief Calculate the difference between angle from and to
+ * @param from the start angle
+ * @param from the end angle
+ * @return The difference between from and to. The range is between [0, PI).
+ */
+double AngleDiff(const double from, const double to);
 
 /**
  * @brief Get a random integer between two integer values by a random seed.
@@ -151,12 +162,50 @@ T Clamp(const T value, T bound1, T bound2) {
   return value;
 }
 
-int double_compare(
-    const double d1, const double d2,
-    const double epsilon = std::numeric_limits<double>::epsilon());
+// Gaussian
+double Gaussian(const double u, const double std, const double x);
+
+// Sigmoid
+double Sigmoid(const double x);
+
+// Rotate Axis (2D):
+// convert a point (x0, y0) in axis1 to a point (x1, y1) in axis2 where the
+// angle from axis1 to axis2 is theta (counter clockwise)
+void RotateAxis(const double theta, const double x0, const double y0,
+                double *x1, double *y1);
+
+inline std::pair<double, double> RFUToFLU(const double x, const double y) {
+  return std::make_pair(y, -x);
+}
+
+inline std::pair<double, double> FLUToRFU(const double x, const double y) {
+  return std::make_pair(-y, x);
+}
+
+inline void L2Norm(int feat_dim, float *feat_data) {
+  if (feat_dim == 0) {
+    return;
+  }
+  // feature normalization
+  float l2norm = 0.0;
+  for (int i = 0; i < feat_dim; ++i) {
+    l2norm += feat_data[i] * feat_data[i];
+  }
+  if (l2norm == 0) {
+    float val = 1.0 / std::sqrt(feat_dim);
+    for (int i = 0; i < feat_dim; ++i) {
+      feat_data[i] = val;
+    }
+  } else {
+    l2norm = std::sqrt(l2norm);
+    for (int i = 0; i < feat_dim; ++i) {
+      feat_data[i] /= l2norm;
+    }
+  }
+}
 
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_MATH_UTILS_H_ */
+#endif  // MODULES_COMMON_MATH_UTILS_H_

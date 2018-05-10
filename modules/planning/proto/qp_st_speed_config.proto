@@ -1,0 +1,47 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/proto/st_boundary_config.proto";
+
+message QpSplineConfig {
+  optional uint32 number_of_discrete_graph_t = 1;
+  optional uint32 spline_order = 2;
+  optional double speed_kernel_weight = 3;
+  optional double accel_kernel_weight = 4;
+  optional double jerk_kernel_weight = 5;
+  optional double follow_weight = 6;
+  optional double stop_weight = 7;
+  optional double cruise_weight = 8;
+  optional double regularization_weight = 9 [ default = 0.1 ];
+  optional double follow_drag_distance = 10;
+  optional double dp_st_reference_weight = 11;
+  optional double init_jerk_kernel_weight = 12;
+  optional double yield_weight = 13;
+  optional double yield_drag_distance = 14;
+}
+
+message QpPiecewiseConfig {
+  optional uint32 number_of_evaluated_graph_t = 1;
+  optional double accel_kernel_weight = 2;
+  optional double jerk_kernel_weight = 3;
+  optional double follow_weight = 4;
+  optional double stop_weight = 5;
+  optional double cruise_weight = 6;
+  optional double regularization_weight = 7 [ default = 0.1 ];
+  optional double follow_drag_distance = 8;
+}
+
+// next ID: 11
+message QpStSpeedConfig {
+  optional double total_path_length = 1 [ default = 200.0 ];
+  optional double total_time = 2 [ default = 6.0 ];
+  optional double preferred_max_acceleration = 4 [ default = 1.2 ];
+  optional double preferred_min_deceleration = 5 [ default = -1.8 ];
+  optional double max_acceleration = 6 [ default = 2.0 ];
+  optional double min_deceleration = 7 [ default = -4.5 ];
+
+  optional QpSplineConfig qp_spline_config = 8;
+  optional QpPiecewiseConfig qp_piecewise_config = 9;
+  optional apollo.planning.StBoundaryConfig st_boundary_config = 10;
+}

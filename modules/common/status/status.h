@@ -54,7 +54,13 @@ class Status {
    * @param code the error code.
    * @param msg the message associated with the error.
    */
-  Status(ErrorCode code, const std::string& msg) : code_(code), msg_(msg) {}
+  Status(ErrorCode code, const std::string &msg) : code_(code), msg_(msg) {}
+
+  /**
+   * @brief Create a status with the specified error code and empty msg
+   * @param code the error code.
+   */
+  explicit Status(ErrorCode code) : code_(code), msg_("") {}
 
   /**
    * @brief generate a success status.
@@ -78,21 +84,20 @@ class Status {
   /**
    * @brief defines the logic of testing if two Status are equal
    */
-  bool operator==(const Status& rh) const {
+  bool operator==(const Status &rh) const {
     return (this->code_ == rh.code_) && (this->msg_ == rh.msg_);
   }
 
   /**
    * @brief defines the logic of testing if two Status are unequal
    */
-  bool operator!=(const Status& rh) const { return !(*this == rh); }
+  bool operator!=(const Status &rh) const { return !(*this == rh); }
 
   /**
-   * @brief returns the error message of the status, empty if the status is
-   * OK.
+   * @brief returns the error message of the status, empty if the status is OK.
    * @returns the error message
    */
-  const std::string& error_message() const { return msg_; }
+  const std::string &error_message() const { return msg_; }
 
   /**
    * @brief returns a string representation in a readable format.
@@ -110,7 +115,7 @@ class Status {
    * @brief save the error_code and error message to protobuf
    * @param the Status protobuf that will store the message.
    */
-  void Save(StatusPb* status_pb) {
+  void Save(StatusPb *status_pb) {
     if (!status_pb) {
       return;
     }
@@ -125,7 +130,7 @@ class Status {
   std::string msg_;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Status& s) {
+inline std::ostream &operator<<(std::ostream &os, const Status &s) {
   os << s.ToString();
   return os;
 }

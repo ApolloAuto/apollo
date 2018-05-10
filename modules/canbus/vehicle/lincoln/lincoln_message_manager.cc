@@ -27,9 +27,11 @@
 #include "modules/canbus/vehicle/lincoln/protocol/gps_6e.h"
 #include "modules/canbus/vehicle/lincoln/protocol/gps_6f.h"
 #include "modules/canbus/vehicle/lincoln/protocol/gyro_6c.h"
+#include "modules/canbus/vehicle/lincoln/protocol/license_7e.h"
 #include "modules/canbus/vehicle/lincoln/protocol/misc_69.h"
 #include "modules/canbus/vehicle/lincoln/protocol/steering_64.h"
 #include "modules/canbus/vehicle/lincoln/protocol/steering_65.h"
+#include "modules/canbus/vehicle/lincoln/protocol/surround_73.h"
 #include "modules/canbus/vehicle/lincoln/protocol/throttle_62.h"
 #include "modules/canbus/vehicle/lincoln/protocol/throttle_63.h"
 #include "modules/canbus/vehicle/lincoln/protocol/throttleinfo_75.h"
@@ -43,7 +45,7 @@ namespace canbus {
 namespace lincoln {
 
 LincolnMessageManager::LincolnMessageManager() {
-  // TODO: verify which one is recv/sent
+  // TODO(Authors): verify which one is recv/sent
   AddSendProtocolData<Brake60, true>();
   AddSendProtocolData<Throttle62, true>();
   AddSendProtocolData<Steering64, true>();
@@ -63,9 +65,11 @@ LincolnMessageManager::LincolnMessageManager() {
   AddRecvProtocolData<Gps6f, true>();
   AddRecvProtocolData<Tirepressure71, true>();
   AddRecvProtocolData<Fuellevel72, true>();
+  AddRecvProtocolData<Surround73, true>();
   AddRecvProtocolData<Brakeinfo74, true>();
   AddRecvProtocolData<Throttleinfo75, true>();
   AddRecvProtocolData<Version7f, true>();
+  AddRecvProtocolData<License7e, true>();
 }
 
 LincolnMessageManager::~LincolnMessageManager() {}

@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message StBoundaryConfig {
+  optional double boundary_buffer = 1 [ default = 0.1 ];
+  optional double high_speed_centric_acceleration_limit = 2 [ default = 1.2 ];
+  optional double low_speed_centric_acceleration_limit = 3 [ default = 1.4 ];
+  optional double high_speed_threshold = 4 [ default =  20.0 ];
+  optional double low_speed_threshold = 5 [ default = 7.0 ];
+  optional double minimal_kappa = 6 [ default = 0.00001 ];
+  optional double point_extension = 7 [ default = 1.0 ];
+  optional double lowest_speed = 8 [ default = 2.5 ];
+  optional uint32 num_points_to_avg_kappa = 9 [ default = 4 ];
+  optional double static_obs_nudge_speed_ratio = 10;
+  optional double dynamic_obs_nudge_speed_ratio = 11;
+  optional double centri_jerk_speed_coeff = 12;
+}

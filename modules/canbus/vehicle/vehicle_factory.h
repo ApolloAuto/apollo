@@ -21,6 +21,8 @@
 #ifndef MODULES_CANBUS_VEHICLE_VEHICLE_FACTORY_H_
 #define MODULES_CANBUS_VEHICLE_VEHICLE_FACTORY_H_
 
+#include <memory>
+
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/common/util/factory.h"
 
@@ -38,8 +40,8 @@ namespace canbus {
  * vehicle factories based on the vehicle brand.
  */
 class VehicleFactory
-    : public ::apollo::common::util::Factory<VehicleParameter::VehicleBrand,
-                                             AbstractVehicleFactory> {
+    : public common::util::Factory<VehicleParameter::VehicleBrand,
+                                   AbstractVehicleFactory> {
  public:
   /**
   * @brief register supported vehicle factories.
@@ -51,7 +53,7 @@ class VehicleFactory
    * @param vehicle_parameter is defined in vehicle_parameter.proto
    */
   std::unique_ptr<AbstractVehicleFactory> CreateVehicle(
-      const VehicleParameter& vehicle_parameter);
+      const VehicleParameter &vehicle_parameter);
 };
 
 }  // namespace canbus

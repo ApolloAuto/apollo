@@ -1,0 +1,125 @@
+header {
+  timestamp_sec: 1501183430.161906
+  module_name: "perception"
+  sequence_num: 15839
+}
+perception_obstacle {
+  id: 0
+  position {
+    x: -449.952,
+    y: -161.917,
+    z: 0.0
+  }
+  theta: -0.349
+  velocity {
+    x: 18.794
+    y: -6.839
+    z: 0
+  }
+  length: 4
+  width: 2
+  height: 1
+  tracking_time: 1
+  type: VEHICLE
+  timestamp: 1501183430.1619561
+}
+perception_obstacle {
+  id: 1
+  position {
+    x: -458.941,
+    y: -159.240,
+    z: 0.0
+  }
+  theta: -0.349
+  velocity {
+    x: 18.794
+    y: -6.839
+    z: 0
+  }
+  length: 4
+  width: 2
+  height: 1
+  tracking_time: 1
+  type: VEHICLE
+  timestamp: 1501183430.1619561
+}
+perception_obstacle {
+  id: 2
+  position {
+    x: -469.239,
+    y: -156.665,
+    z: 0.0
+  }
+  theta: -0.349
+  velocity {
+    x: 18.794
+    y: -6.839
+    z: 0
+  }
+  length: 4
+  width: 2
+  height: 1
+  tracking_time: 1
+  type: VEHICLE
+  timestamp: 1501183430.1619561
+}
+perception_obstacle {
+  id: 3
+  position {
+    x: -461.000,
+    y: -155.018,
+    z: 0.0
+  }
+  theta: -0.349
+  velocity {
+    x: 18.794
+    y: -6.839
+    z: 0
+  }
+  length: 4
+  width: 2
+  height: 1
+  tracking_time: 1
+  type: VEHICLE
+  timestamp: 1501183430.1619561
+}
+perception_obstacle {
+  id: 101
+  position {
+    x: -438.879,
+    y: -161.931,
+    z: 0.0
+  }
+  theta: 1.222
+  velocity {
+    x: 1.710
+    y: 4.699
+    z: 0
+  }
+  length: 0.5
+  width: 0.5
+  height: 1.8
+  tracking_time: 1
+  type: PEDESTRIAN
+  timestamp: 1501183430.161906
+}
+perception_obstacle {
+  id: 102
+  position {
+    x: -411.557,
+    y: -182.382,
+    z: 0.0
+  }
+  theta: -0.200
+  velocity {
+    x: 0.001
+    y: 0.001
+    z: 0
+  }
+  length: 0.5
+  width: 0.5
+  height: 1.6
+  tracking_time: 1
+  type: PEDESTRIAN
+  timestamp: 1501183430.161906
+}

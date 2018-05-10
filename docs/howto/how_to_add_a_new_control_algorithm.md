@@ -7,7 +7,7 @@ A new control algorithm does not have to follow the default pattern, e.g., one l
 Complete the following tasks sequence to add a new control algorithm:
 
 * Create a controller.
-* Add a new controller configuration into the `control_fig` file.
+* Add a new controller configuration into the `control_config` file.
 * Register the new controller.
 
 

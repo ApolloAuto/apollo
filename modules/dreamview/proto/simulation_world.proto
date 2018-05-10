@@ -2,9 +2,11 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
-import "modules/common/monitor/proto/monitor.proto";
-import "modules/decision/proto/decision.proto";
-import "modules/planning/proto/planning.proto";
+import "modules/common/monitor_log/proto/monitor_log.proto";
+import "modules/planning/proto/planning_internal.proto";
+import "modules/perception/proto/perception_obstacle.proto";
+import "modules/common/proto/pnc_point.proto";
+import "modules/routing/proto/routing.proto";
 
 // Next-id: 4
 message PolygonPoint {
@@ -19,7 +21,7 @@ message Prediction {
   repeated PolygonPoint predicted_trajectory = 2;
 }
 
-// Next-id: 12
+// Next-id: 13
 message Decision {
   enum Type {
     IGNORE = 0; // Ignore the object
@@ -28,9 +30,9 @@ message Decision {
     YIELD = 3; // Go after the object
     OVERTAKE = 4; // Go before the object
     FOLLOW = 5; // Follow the object in the same lane
-    SIDEPASS = 6; // Pass the object in neighbouring lane
+    SIDEPASS = 6; // Pass the object in neighboring lane
   }
-  required Type type = 1 [default = IGNORE];
+  optional Type type = 1 [default = IGNORE];
 
   // Shape Info
   // Can be used for corners of nudge region
@@ -61,6 +63,7 @@ message Decision {
     STOP_REASON_NOT_READY = 106;
   }
   optional StopReasonCode stopReason = 11;
+  optional apollo.routing.ChangeLaneType change_lane_type = 12;
 }
 
 // Next-id: 32
@@ -89,76 +92,102 @@ message Object {
   optional double spin = 14;
   optional double spin_acceleration = 15;
   optional double spin_jerk = 16;
-  optional double speed_heading = 30;
+  optional double speed_heading = 17;
+  optional double kappa = 18;
 
   // Signal Info
-  // For objects with signals set and current signal such as Traffic Light and Stop Sign.
-  repeated string signal_set = 17;
-  optional string current_signal = 18;
+  // For objects with signals set and current signal such as Traffic Light,
+  // Stop Sign, and Vehicle Signal.
+  repeated string signal_set = 19;
+  optional string current_signal = 20;
 
   // Time Info
-  optional double timestamp_sec = 19;
+  optional double timestamp_sec = 21;
 
   // Decision Info
-  repeated Decision decision = 20;
-  // ADC decision results
-  optional .apollo.decision.DecisionResult adc_decision_result = 29;
-  // ADC planning trajectory
-  optional .apollo.planning.ADCTrajectory adc_trajectory = 31;
+  repeated Decision decision = 22;
 
   // Chassis Info
   // For ADC
-  optional double throttle_percentage = 21;
-  optional double brake_percentage = 22;
-  optional double steering_angle = 23;
+  optional double throttle_percentage = 23;
+  optional double brake_percentage = 24;
+  optional double steering_percentage = 25;
+  optional double steering_angle = 26;
+  optional double steering_ratio = 27;
   enum DisengageType {
     DISENGAGE_NONE = 0;
     DISENGAGE_UNKNOWN = 1;
     DISENGAGE_MANUAL = 2;
+    DISENGAGE_EMERGENCY = 3;
+    DISENGAGE_AUTO_STEER_ONLY = 4;
+    DISENGAGE_AUTO_SPEED_ONLY = 5;
+    DISENGAGE_CHASSIS_ERROR = 6;
   };
 
-  optional DisengageType disengage_type = 24;
+  optional DisengageType disengage_type = 28;
 
   enum Type {
     UNKNOWN = 0;
     UNKNOWN_MOVABLE = 1;
     UNKNOWN_UNMOVABLE = 2;
-    PEDESTRIAN = 3;  // pedestrian, usually determined by moving behaviour.
+    PEDESTRIAN = 3;  // pedestrian, usually determined by moving behavior.
     BICYCLE = 4;  // bike, motor bike.
     VEHICLE = 5;  // passenger car or truck.
     VIRTUAL = 6; // virtual object created by decision module.
+    CIPV = 7; // closest in-path vehicle determined by perception module.
   };
 
-  optional Type type = 25;  // obstacle type
-  repeated Prediction prediction = 26;
+  optional Type type = 29;  // obstacle type
+  repeated Prediction prediction = 30;
+
+  // perception confidence level. Range: [0,1]
+  optional double confidence = 31 [default = 1];
 }
 
-message DelayItem {
-    optional uint32 delay = 1;
-    optional uint32 last_delay = 2;
+message DelaysInMs {
+  optional double chassis = 1;
+  optional double localization = 3;
+  optional double perception_obstacle = 4;
+  optional double planning = 5;
+  optional double prediction= 7;
+  optional double traffic_light = 8;
+  optional double control = 9;
 }
 
-message Delay {
-    optional DelayItem adc_status = 1;
-    optional DelayItem decision = 2;
-    optional DelayItem localization = 3;
-    optional DelayItem localization_pcl = 4;
-    optional DelayItem perception_obstacle = 5;
-    optional DelayItem perception_radar = 6;
-    optional DelayItem planning_trajectory = 7;
-    optional DelayItem prediction= 8;
-    optional DelayItem traffic_light = 10;
+message RoutePath {
+  repeated PolygonPoint point = 1;
 }
 
-// Next-id: 2
-message Debug {
-    optional string novatel_position_type = 1;
+message Latency { // ms
+  optional double planning = 1;
 }
 
-// Next-id: 30
-message SimulationWorld {
-  // Time
+message MapElementIds {
+  repeated string lane = 1;
+  repeated string crosswalk = 2;
+  repeated string junction = 3;
+  repeated string signal = 4;
+  repeated string stop_sign = 5;
+  repeated string yield = 6;
+  repeated string overlap = 7;
+  repeated string road = 8;
+  repeated string clear_area = 9;
+}
+
+message ControlData {
   optional double timestamp_sec = 1;
+  optional double station_error = 2;
+  optional double lateral_error = 3;
+  optional double heading_error = 4;
+}
+
+// Next-id: 24
+message SimulationWorld {
+  // Timestamp in milliseconds
+  optional double timestamp = 1;
+
+  // Sequence number
+  optional uint32 sequence_num = 2;
 
   // Objects in the world and the associated predictions/decisions
   repeated Object object = 3;
@@ -167,31 +196,51 @@ message SimulationWorld {
   optional Object auto_driving_car = 4;
 
   // Traffic light status
-  optional Object traffic_signal = 6;
+  optional Object traffic_signal = 5;
 
-  // Routing path
-  repeated PolygonPoint route = 7;
+  // Routing paths
+  repeated RoutePath route_path = 6;
+  // Timestamp of latest routing
+  optional double routing_time = 7;
 
   // Planned trajectory
   repeated Object planning_trajectory = 8;
 
-  // Main stop
-  optional Object main_stop = 9;
+  // Main decision
+  optional Object main_stop = 9 [deprecated=true];
+  optional Object main_decision = 24;
 
   // Speed limit
   optional double speed_limit = 10;
 
-  // Map Hashcode
-  optional string map_md5 = 11;
+  // Module delays
+  optional DelaysInMs delay = 11;
 
-  optional Delay delay = 17;
+  optional apollo.common.monitor.MonitorMessage monitor = 12;
 
-  // Relative time w.r.t. the begin time of rosbag
-  optional double relative_time_sec = 18;
+  // Engage advice from planning
+  optional string engage_advice = 13;
 
-  optional string decision_task_name = 19;
+  // Module latency
+  optional Latency latency = 14;
 
-  optional Debug debug_log = 26;
+  optional MapElementIds map_element_ids = 15;
+  optional uint64 map_hash = 16;
+  optional double map_radius = 17;
 
-  optional .apollo.common.monitor.MonitorMessage monitor = 29;
+  // Planning data
+  optional double planning_time = 18;
+  optional apollo.planning_internal.PlanningData planning_data = 19;
+
+  // GPS
+  optional Object gps = 20;
+
+  // Lane Markers from perception
+  optional apollo.perception.LaneMarkers lane_marker = 21;
+
+  // Control data
+  optional ControlData control_data = 22;
+
+  // Relative Map
+  repeated apollo.common.Path navigation_path = 23;
 }

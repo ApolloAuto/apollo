@@ -1,0 +1,24 @@
+<package>
+
+  <name>velodyne_msgs</name>
+  <version>1.2.0</version>
+  <description>
+    ROS message definitions for Velodyne 3D LIDARs.
+  </description>
+  <maintainer email="jack.oquin@gmail.com">Jack O'Quin</maintainer>
+  <author>Jack O'Quin</author>
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/velodyne_msgs</url>
+  <url type="repository">https://github.com/ros-drivers/velodyne</url>
+  <url type="bugtracker">https://github.com/ros-drivers/velodyne/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>message_generation</build_depend>
+  <build_depend>std_msgs</build_depend>
+
+  <run_depend>message_runtime</run_depend>
+  <run_depend>std_msgs</run_depend>
+
+</package>

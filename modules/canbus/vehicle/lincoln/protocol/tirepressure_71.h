@@ -22,7 +22,8 @@
 #ifndef MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_TIREPRESSURE_71_H_
 #define MODULES_CANBUS_VEHICL_LINCOLN_PROTOCOL_TIREPRESSURE_71_H_
 
-#include "modules/canbus/vehicle/protocol_data.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -37,7 +38,8 @@ namespace lincoln {
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Tirepressure71 : public ProtocolData {
+class Tirepressure71 : public ::apollo::drivers::canbus::ProtocolData<
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -45,11 +47,12 @@ class Tirepressure71 : public ProtocolData {
    * @brief parse received data
    * @param bytes a pointer to the input bytes
    * @param length the length of the input bytes
-   * @param car_status the parsed car_status
+   * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* car_status) const;
+  virtual void Parse(const std::uint8_t *bytes, int32_t length,
+                     ChassisDetail *chassis_detail) const;
 
+ private:
   /**
    * @brief calculate front left tire based on byte array.
    * config detail: {'name': 'fl', 'offset': 0.0, 'precision': 1.0, 'len': 16,
@@ -59,7 +62,7 @@ class Tirepressure71 : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of front left tire
    */
-  int32_t front_left_tire(const std::uint8_t* bytes, int32_t length) const;
+  int32_t front_left_tire(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief calculate front right tire based on byte array.
@@ -70,7 +73,7 @@ class Tirepressure71 : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of front right tire
    */
-  int32_t front_right_tire(const std::uint8_t* bytes, int32_t length) const;
+  int32_t front_right_tire(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief calculate rear left tire based on byte array.
@@ -81,7 +84,7 @@ class Tirepressure71 : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of rear left tire
    */
-  int32_t rear_left_tire(const std::uint8_t* bytes, int32_t length) const;
+  int32_t rear_left_tire(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief calculate rear right tire based on byte array.
@@ -92,7 +95,7 @@ class Tirepressure71 : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of rear right tire
    */
-  int32_t rear_right_tire(const std::uint8_t* bytes, int32_t length) const;
+  int32_t rear_right_tire(const std::uint8_t *bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

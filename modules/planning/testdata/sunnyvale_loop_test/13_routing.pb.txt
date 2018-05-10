@@ -1,0 +1,267 @@
+header {
+  timestamp_sec: 1511824051.8381293
+  module_name: "routing"
+  sequence_num: 3
+}
+road {
+  id: "1415-1799-1807-1416-1804-1806-1805-1808-1809-1811-28-53a-1993-1800-2455-18-1992-745-732-1771-136-1990-27-14-1981-1991-10-16-139-1422-24-2021-729-2020-1982-2-1953-39a-17a-145-117"
+  passage {
+    segment {
+      id: "2020_1_-2"
+      start_s: 2.4187114701863321
+      end_s: 16.5848
+    }
+    segment {
+      id: "2021_1_-2"
+      start_s: 0
+      end_s: 2.02678
+    }
+    segment {
+      id: "16_1_-2"
+      start_s: 0
+      end_s: 35.2516
+    }
+    segment {
+      id: "14_1_-3"
+      start_s: 0
+      end_s: 55.3461
+    }
+    segment {
+      id: "136_1_-2"
+      start_s: 0
+      end_s: 45.3891
+    }
+    segment {
+      id: "10_1_-2"
+      start_s: 0
+      end_s: 10.7483
+    }
+    segment {
+      id: "2455_1_-2"
+      start_s: 0
+      end_s: 27.793
+    }
+    segment {
+      id: "1992_1_-2"
+      start_s: 0
+      end_s: 9.69664
+    }
+    segment {
+      id: "1993_1_-2"
+      start_s: 0
+      end_s: 71.1782
+    }
+    segment {
+      id: "1990_1_-2"
+      start_s: 0
+      end_s: 35.6905
+    }
+    segment {
+      id: "1991_1_-2"
+      start_s: 0
+      end_s: 37.9158
+    }
+    change_lane_type: LEFT
+  }
+  passage {
+    segment {
+      id: "1993_1_-1"
+      start_s: 0
+      end_s: 71.1583
+    }
+    segment {
+      id: "1990_1_-1"
+      start_s: 0
+      end_s: 35.8082
+    }
+    segment {
+      id: "1991_1_-1"
+      start_s: 0
+      end_s: 37.7742
+    }
+    segment {
+      id: "1981_1_-1"
+      start_s: 0
+      end_s: 24.1691
+    }
+    segment {
+      id: "1982_1_-1"
+      start_s: 0
+      end_s: 1.79116
+    }
+    segment {
+      id: "745_1_-1"
+      start_s: 0
+      end_s: 38.5631
+    }
+    segment {
+      id: "2_1_-1"
+      start_s: 0
+      end_s: 61.8112
+    }
+    segment {
+      id: "39a_1_-1"
+      start_s: 0
+      end_s: 41.7809
+    }
+    segment {
+      id: "139_1_-1"
+      start_s: 0
+      end_s: 9.84107
+    }
+    segment {
+      id: "1953_1_-1"
+      start_s: 0
+      end_s: 204.158
+    }
+    segment {
+      id: "145_1_-1"
+      start_s: 0
+      end_s: 41.9885
+    }
+    segment {
+      id: "729_1_-1"
+      start_s: 0
+      end_s: 20.1903
+    }
+    segment {
+      id: "117_1_-1"
+      start_s: 0
+      end_s: 269.787
+    }
+    segment {
+      id: "732_1_-1"
+      start_s: 0
+      end_s: 24.9813
+    }
+    segment {
+      id: "53a_1_-1"
+      start_s: 0
+      end_s: 32.1404
+    }
+    segment {
+      id: "18_1_-1"
+      start_s: 0
+      end_s: 6.89126
+    }
+    segment {
+      id: "1811_1_-1"
+      start_s: 0
+      end_s: 27.56
+    }
+    segment {
+      id: "1809_1_-1"
+      start_s: 0
+      end_s: 12.6153
+    }
+    segment {
+      id: "1808_1_-1"
+      start_s: 0
+      end_s: 55.1465
+    }
+    segment {
+      id: "1805_1_-1"
+      start_s: 0
+      end_s: 8.20578
+    }
+    segment {
+      id: "1804_1_-1"
+      start_s: 0
+      end_s: 7.58001
+    }
+    segment {
+      id: "1806_1_-1"
+      start_s: 0
+      end_s: 5.95314
+    }
+    segment {
+      id: "1807_1_-1"
+      start_s: 0
+      end_s: 55.2747
+    }
+    segment {
+      id: "1800_1_-1"
+      start_s: 0
+      end_s: 29.7005
+    }
+    segment {
+      id: "1799_1_-1"
+      start_s: 0
+      end_s: 38.1329
+    }
+    segment {
+      id: "24_1_-1"
+      start_s: 0
+      end_s: 14.5287
+    }
+    segment {
+      id: "28_1_-1"
+      start_s: 0
+      end_s: 28.0991
+    }
+    segment {
+      id: "27_1_-1"
+      start_s: 0
+      end_s: 14.2573
+    }
+    segment {
+      id: "17a_1_-1"
+      start_s: 0
+      end_s: 21.6154
+    }
+    segment {
+      id: "1771_1_-3"
+      start_s: 0
+      end_s: 45.6789
+    }
+    segment {
+      id: "1415_1_-3"
+      start_s: 0
+      end_s: 12.6094
+    }
+    segment {
+      id: "1416_1_-3"
+      start_s: 0
+      end_s: 37.297
+    }
+    segment {
+      id: "1422_1_-3"
+      start_s: 0
+      end_s: 4.999999716535763
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+measurement {
+  distance: 1542.550028246349
+}
+routing_request {
+  header {
+    timestamp_sec: 1511824051.8375659
+    module_name: "planning"
+    sequence_num: 1
+  }
+  waypoint {
+    id: "2020_1_-2"
+    s: 2.4187114701863321
+    pose {
+      x: 586771.87833860237
+      y: 4141014.0198460147
+      z: -29.969215057790279
+    }
+  }
+  waypoint {
+    id: "1422_1_-3"
+    s: 4.999999716535763
+    pose {
+      x: 587169.10245
+      y: 4141539.780228
+    }
+  }
+}
+map_version: "1.400000"
+status {
+  error_code: OK
+  msg: "Success!"
+}

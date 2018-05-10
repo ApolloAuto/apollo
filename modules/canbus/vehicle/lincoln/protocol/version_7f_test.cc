@@ -23,13 +23,39 @@ namespace canbus {
 namespace lincoln {
 
 TEST(Version7fTest, General) {
-  Version7f version;
-  uint8_t data = 0x03;
   int32_t length = 8;
   ChassisDetail cd;
-  version.Parse(&data, length, &cd);
-  
-  EXPECT_EQ(cd.eps().major_version(), 0);
+  Version7f version;
+
+  uint8_t data[8] = {0x01, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  version.Parse(data, length, &cd);
+  EXPECT_TRUE(cd.has_brake());
+  EXPECT_FALSE(cd.has_gas());
+  EXPECT_FALSE(cd.has_eps());
+
+  EXPECT_EQ(cd.brake().major_version(), 25699);
+  EXPECT_EQ(cd.brake().minor_version(), 21073);
+  EXPECT_EQ(cd.brake().build_number(), 21587);
+
+  data[0] = 0x02;
+  cd.Clear();
+  version.Parse(data, length, &cd);
+  EXPECT_FALSE(cd.has_brake());
+  EXPECT_TRUE(cd.has_gas());
+  EXPECT_FALSE(cd.has_eps());
+  EXPECT_EQ(cd.gas().major_version(), 25699);
+  EXPECT_EQ(cd.gas().minor_version(), 21073);
+  EXPECT_EQ(cd.gas().build_number(), 21587);
+
+  data[0] = 0x03;
+  cd.Clear();
+  version.Parse(data, length, &cd);
+  EXPECT_FALSE(cd.has_brake());
+  EXPECT_FALSE(cd.has_gas());
+  EXPECT_TRUE(cd.has_eps());
+  EXPECT_EQ(cd.eps().major_version(), 25699);
+  EXPECT_EQ(cd.eps().minor_version(), 21073);
+  EXPECT_EQ(cd.eps().build_number(), 21587);
 }
 
 }  // namespace lincoln

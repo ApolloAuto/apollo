@@ -21,15 +21,18 @@
  * currently our assumption is that every timestamp will be of a
  * precision at 1us.
  */
-#ifndef MODULES_COMMON_TIME_TIME_H_
-#define MODULES_COMMON_TIME_TIME_H_
+#ifndef MODULES_COMMON_TIME_CLOCK_H_
+#define MODULES_COMMON_TIME_CLOCK_H_
 
 #include <atomic>
 #include <chrono>
 #include <stdexcept>
 #include <type_traits>
 
+#include "modules/common/configs/config_gflags.h"
+#include "modules/common/log.h"
 #include "modules/common/macro.h"
+#include "ros/include/ros/ros.h"
 
 /**
  * @namespace apollo::common::time
@@ -41,8 +44,7 @@ namespace time {
 
 /**
  * @class Duration
- * @brief the default Duration is of precision nanoseconds (1e-9
- * seconds).
+ * @brief the default Duration is of precision nanoseconds (1e-9 seconds).
  */
 using Duration = std::chrono::nanoseconds;
 
@@ -53,8 +55,9 @@ using Duration = std::chrono::nanoseconds;
  */
 using Timestamp = std::chrono::time_point<std::chrono::system_clock, Duration>;
 
-static_assert(std::is_same<int64_t, Duration::rep>::value,
-              "The underlying type of the microseconds should be int64.");
+static_assert(
+    sizeof(std::chrono::nanoseconds) >= sizeof(int64_t),
+    "The underlying type of the nanoseconds should be at least 64 bits.");
 
 using nanos = std::chrono::nanoseconds;
 using micros = std::chrono::microseconds;
@@ -66,8 +69,7 @@ using hours = std::chrono::hours;
 /**
  * @brief converts the input duration (nanos) to a 64 bit integer, with
  * the unit specified by PrecisionDuration.
- * @param duration the input duration that needs to be converted to
- * integer.
+ * @param duration the input duration that needs to be converted to integer.
  * @return an integer representing the duration in the specified unit.
  */
 template <typename PrecisionDuration>
@@ -78,8 +80,7 @@ int64_t AsInt64(const Duration &duration) {
 /**
  * @brief converts the input timestamp (nanos) to a 64 bit integer, with
  * the unit specified by PrecisionDuration.
- * @param timestamp the input timestamp that needs to be converted to
- * integer.
+ * @param timestamp the input timestamp that needs to be converted to integer.
  * @return an integer representing the timestamp in the specified unit.
  */
 template <typename PrecisionDuration>
@@ -109,8 +110,7 @@ inline double ToSecond(const Timestamp &timestamp) {
 }
 
 /**
- * @brief converts the integer-represented timestamp to \class
- * Timestamp.
+ * @brief converts the integer-represented timestamp to \class Timestamp.
  * @return a Timestamp object.
  */
 template <typename PrecisionDuration>
@@ -124,7 +124,6 @@ inline Timestamp FromInt64(int64_t timestamp_value) {
  * a unit of seconds.
  * @return a Timestamp object.
 */
-
 inline Timestamp From(double timestamp_value) {
   int64_t nanos_value = static_cast<int64_t>(timestamp_value * 1e9);
   return FromInt64<nanos>(nanos_value);
@@ -148,30 +147,49 @@ class Clock {
                 "The precision of the system clock should be at least 1 "
                 "microsecond.");
 
+  // The clock mode can either be a system clock time, a user mocked time (for
+  // test only) or read from ROS.
+  enum ClockMode {
+    SYSTEM = 0,
+    MOCK = 1,
+    ROS = 2,
+  };
+
   /**
    * @brief gets the current timestamp.
    * @return a Timestamp object representing the current time.
    */
   static Timestamp Now() {
-    return instance()->is_system_clock_ ? SystemNow()
-                                               : instance()->mock_now_;
+    switch (mode()) {
+      case ClockMode::SYSTEM:
+        return SystemNow();
+      case ClockMode::MOCK:
+        return instance()->mock_now_;
+      case ClockMode::ROS:
+        return From(ros::Time::now().toSec());
+      default:
+        AFATAL << "Unsupported clock mode: " << mode();
+    }
+    return From(ros::Time::now().toSec());
   }
+
+  /**
+   * @brief gets the current time in second.
+   * @return the current time in second.
+   */
+  static double NowInSeconds() { return ToSecond(Clock::Now()); }
 
   /**
    * @brief Set the behavior of the \class Clock.
-   * @param is_system_clock if provided with value TRUE, further call
-   * to Now() will return timestamp based on the system clock. If
-   * provided with FALSE, it will use the mock clock instead.
+   * @param The new clock mode to be set.
    */
-  static void UseSystemClock(bool is_system_clock) {
-    instance()->is_system_clock_ = is_system_clock;
-  }
+  static void SetMode(ClockMode mode) { instance()->mode_ = mode; }
 
   /**
-   * @brief Check whether the \class Clock instance is using system clock.
-   * @return TRUE if it is using system clock, and FALSE otherwise.
+   * @brief Gets the current clock mode.
+   * @return The current clock mode.
    */
-  static bool IsSystemClock() { return instance()->is_system_clock_; }
+  static ClockMode mode() { return instance()->mode_; }
 
   /**
    * @brief This is for mock clock mode only. It will set the timestamp
@@ -179,8 +197,8 @@ class Clock {
    */
   static void SetNow(const Duration &duration) {
     Clock *clock = instance();
-    if (clock->is_system_clock_) {
-      throw std::runtime_error("Cannot set now when using system clock!");
+    if (clock->mode_ != ClockMode::MOCK) {
+      AFATAL << "Cannot set now when clock mode is not MOCK!";
     }
     clock->mock_now_ = Timestamp(duration);
   }
@@ -188,10 +206,11 @@ class Clock {
  private:
   /**
    * @brief constructs the \class Clock instance
-   * @param is_system_clock See UseSystemClock.
+   * @param mode the desired clock mode
    */
-  Clock(bool is_system_clock)
-      : is_system_clock_(is_system_clock), mock_now_(Timestamp()) {}
+  explicit Clock(ClockMode mode) : mode_(mode), mock_now_(Timestamp()) {
+    ros::Time::init();
+  }
 
   /**
    * @brief Returns the current timestamp based on the system clock.
@@ -202,13 +221,13 @@ class Clock {
         std::chrono::system_clock::now());
   }
 
-  /// NOTE: Unless is_system_clock_ and mock_now_ are guarded by a
+  /// NOTE: Unless mode_ and mock_now_ are guarded by a
   /// lock or become atomic, having multiple threads calling mock
   /// clock related functions are STRICTLY PROHIBITED.
 
   /// Indicates whether it is in the system clock mode or the mock
-  /// clock mode.
-  bool is_system_clock_;
+  /// clock mode or the ROS time mode.
+  ClockMode mode_;
 
   /// Stores the currently set timestamp, which serves mock clock
   /// queries.
@@ -218,10 +237,38 @@ class Clock {
   DECLARE_SINGLETON(Clock);
 };
 
-inline Clock::Clock() : Clock(true) {}
+inline Clock::Clock()
+    : Clock(FLAGS_use_ros_time ? ClockMode::ROS : ClockMode::SYSTEM) {}
 
+// Measure run time of a code block, mostly for debugging puprpose.
+// Example usage:
+// PERF_BLOCK("Function Foo took: ") {
+//  Foo();
+// }
+// You can optionally pass in a time threshold (in second) so that the log will
+// only be spit out when the elapsed time of running the code block is greater
+// than it.
+#define GET_MACRO(_1, _2, NAME, ...) NAME
+#define PERF_BLOCK(...)                                                      \
+  GET_MACRO(__VA_ARGS__, PERF_BLOCK_WITH_THRESHOLD, PERF_BLOCK_NO_THRESHOLD) \
+  (__VA_ARGS__)
+
+#define PERF_BLOCK_NO_THRESHOLD(message) PERF_BLOCK_WITH_THRESHOLD(message, 0)
+
+#define PERF_BLOCK_WITH_THRESHOLD(message, threshold)                         \
+  using apollo::common::time::Clock;                                          \
+  for (double block_start_time = 0;                                           \
+       (block_start_time == 0 ? (block_start_time = Clock::NowInSeconds())    \
+                              : false);                                       \
+       [&]() {                                                                \
+         double now = Clock::NowInSeconds();                                  \
+         if (now - block_start_time > (threshold)) {                          \
+           AINFO << std::fixed << (message) << ": " << now - block_start_time \
+                 << "s.";                                                     \
+         }                                                                    \
+       }())
 }  // namespace time
 }  // namespace common
 }  // namespace apollo
 
-#endif  // MODULES_COMMON_TIME_TIME_H_
+#endif  // MODULES_COMMON_TIME_CLOCK_H_

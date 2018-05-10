@@ -22,7 +22,8 @@
 #ifndef MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_GEAR_67_H_
 #define MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_GEAR_67_H_
 
-#include "modules/canbus/vehicle/protocol_data.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -37,7 +38,8 @@ namespace lincoln {
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Gear67 : public ProtocolData {
+class Gear67 : public ::apollo::drivers::canbus::ProtocolData<
+                    ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -46,10 +48,10 @@ class Gear67 : public ProtocolData {
    * @param bytes a pointer to the input bytes
    * @param length the length of the input bytes
    * @param timestamp the timestamp of input data
-   * @param car_status the parsed car_status
+   * @param chassis_detail the parsed chassis_detail
    */
-  virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* car_status) const;
+  virtual void Parse(const std::uint8_t *bytes, int32_t length,
+                     ChassisDetail *chassis_detail) const;
 
   /**
    * @brief get the gear state from byte array
@@ -60,7 +62,7 @@ class Gear67 : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of the gear state
    */
-  int32_t gear_state(const std::uint8_t* bytes, int32_t length) const;
+  int32_t gear_state(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief check canbus fault from byte array
@@ -71,7 +73,7 @@ class Gear67 : public ProtocolData {
    * @param length the length of the byte array
    * @return the boolean value of canbus fault
    */
-  bool is_canbus_fault(const std::uint8_t* bytes, int32_t length) const;
+  bool is_canbus_fault(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief check driver override from byte array
@@ -82,7 +84,7 @@ class Gear67 : public ProtocolData {
    * @param length the length of the byte array
    * @return the boolean value of driver override
    */
-  bool is_driver_override(const std::uint8_t* bytes, int32_t length) const;
+  bool is_driver_override(const std::uint8_t *bytes, int32_t length) const;
 
   /**
    * @brief get reported gear command from byte array
@@ -93,7 +95,7 @@ class Gear67 : public ProtocolData {
    * @param length the length of the byte array
    * @return the value of reported gear command
    */
-  int32_t reported_gear_cmd(const std::uint8_t* bytes, int32_t length) const;
+  int32_t reported_gear_cmd(const std::uint8_t *bytes, int32_t length) const;
 };
 
 }  // namespace lincoln

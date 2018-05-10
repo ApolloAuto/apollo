@@ -23,22 +23,26 @@ namespace canbus {
 namespace lincoln {
 
 TEST(Gps6fTest, General) {
-  uint8_t data = 0x01;
+  uint8_t data[8] = {0x56, 0x52, 0x53, 0x54, 0xF1, 0xF2, 0xF3, 0xF4};
   int32_t length = 8;
   ChassisDetail cd;
   Gps6f gps;
-  gps.Parse(&data, length, &cd);
+  gps.Parse(data, length, &cd);
 
   EXPECT_TRUE(cd.has_basic());
   EXPECT_TRUE(cd.basic().has_altitude());
   EXPECT_TRUE(cd.basic().has_heading());
   EXPECT_TRUE(cd.basic().has_gps_speed());
 
-  EXPECT_NEAR(cd.basic().altitude(), 512.25, 1e-3);
-  EXPECT_NEAR(cd.basic().heading(), 0.0, 1e-3);
-  EXPECT_NEAR(cd.basic().gps_speed(), 0.0, 1e-3);
+  EXPECT_DOUBLE_EQ(cd.basic().altitude(), 5269.5);
+  EXPECT_DOUBLE_EQ(cd.basic().heading(), 215.87);
+
+  EXPECT_DOUBLE_EQ(cd.basic().hdop(), 3.6);
+  EXPECT_DOUBLE_EQ(cd.basic().vdop(), 3.8);
+  EXPECT_DOUBLE_EQ(cd.basic().quality(), FIX_INVALID);
+  EXPECT_DOUBLE_EQ(cd.basic().gps_speed(), 107.73664);
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

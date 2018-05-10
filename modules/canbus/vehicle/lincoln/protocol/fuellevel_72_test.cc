@@ -29,13 +29,21 @@ class Accel6bTest : public ::testing::Test {
 
 TEST_F(Accel6bTest, Parse) {
   Fuellevel72 fuel;
-  uint8_t data = 0x12U;
+  uint8_t data[8] = {0x61, 0x62, 0x63, 0x64, 0xF1, 0xF2, 0xF3, 0xF4};
   int32_t length = 8;
   ChassisDetail chassis_detail;
-  fuel.Parse(&data, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.battery().fuel_level(), 224.565936);
+  fuel.Parse(data, length, &chassis_detail);
+  EXPECT_DOUBLE_EQ(chassis_detail.battery().fuel_level(), 2737.50876);
+  EXPECT_EQ(data[0], 0x61);
+  EXPECT_EQ(data[1], 0x62);
+  EXPECT_EQ(data[2], 0x63);
+  EXPECT_EQ(data[3], 0x64);
+  EXPECT_EQ(data[4], 0xF1);
+  EXPECT_EQ(data[5], 0xF2);
+  EXPECT_EQ(data[6], 0xF3);
+  EXPECT_EQ(data[7], 0xF4);
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

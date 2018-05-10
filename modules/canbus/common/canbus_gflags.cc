@@ -17,17 +17,23 @@
 #include "modules/canbus/common/canbus_gflags.h"
 
 // System gflags
-DEFINE_string(node_namespace, "/apollo/canbus", "Global node namespace");
-DEFINE_string(node_name, "chassis", "The chassis module name in proto");
-DEFINE_string(hmi_name, "canbus", "Module name in HMI");
+DEFINE_string(canbus_node_name, "chassis", "The chassis module name in proto");
+DEFINE_string(canbus_module_name, "canbus", "Module name");
+
+DEFINE_string(canbus_adapter_config_filename,
+              "modules/canbus/conf/adapter.conf", "The adapter config file");
 
 // data file
-DEFINE_string(canbus_conf_file, "modules/canbus/conf/canbus_conf_dev.pb.txt",
+DEFINE_string(canbus_conf_file, "modules/canbus/conf/canbus_conf.pb.txt",
               "Default canbus conf file");
 
 // Canbus gflags
 DEFINE_double(chassis_freq, 100, "Chassis feedback timer frequency.");
-DEFINE_int64(min_cmd_interval, 5, "Minimum control command interval in us.");
+DEFINE_int64(min_cmd_interval, 5, "Minimum control command interval in ms.");
 
 // chassis_detail message publish
 DEFINE_bool(enable_chassis_detail_pub, false, "Chassis Detail message publish");
+
+// canbus test files
+DEFINE_string(canbus_test_file, "modules/canbus/testdata/canbus_test.pb.txt",
+              "canbus tester input test file, in ControlCommand pb format.");

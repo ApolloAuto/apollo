@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/proto/st_boundary_config.proto";
+
+// next ID: 11
+message PolyStSpeedConfig {
+  optional double total_path_length = 1;
+  optional double total_time = 2;
+  optional double preferred_accel = 3;
+  optional double preferred_decel = 4;
+  optional double max_accel = 5;
+  optional double min_decel = 6;
+  optional double speed_limit_buffer = 7;
+  optional double speed_weight = 8;
+  optional double jerk_weight = 9;
+  optional double obstacle_weight = 10;
+  optional double unblocking_obstacle_cost = 11;
+  optional apollo.planning.StBoundaryConfig st_boundary_config = 12;
+}

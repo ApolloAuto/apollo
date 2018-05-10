@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -26,10 +28,11 @@ cc_library(
         ":message_adapters",
         "//modules/common",
         "//modules/common/adapters/proto:adapter_config_proto",
-        "//modules/common/monitor/proto:monitor_proto",
+        "//modules/common/monitor_log/proto:monitor_log_proto",
+        "//modules/common/transform_listener",
         "//modules/common/util",
-        "//third_party/ros:ros_common",
-        "@glog//:glog",
+        "@glog",
+        "@ros//:ros_common",
     ],
 )
 
@@ -43,8 +46,9 @@ cc_library(
         "//modules/common/proto:common_proto",
         "//modules/common/time",
         "//modules/common/util",
-        "@com_github_google_protobuf//:protobuf",
-        "@glog//:glog",
+        "@com_google_protobuf//:protobuf",
+        "@glog",
+        "@ros//:ros_common",
     ],
 )
 
@@ -62,6 +66,7 @@ cc_test(
         ":adapter_gflags",
         "//modules/localization/proto:localization_proto",
         "@gtest//:main",
+        "@ros//:ros_common",
     ],
 )
 
@@ -72,17 +77,31 @@ cc_library(
     ],
     deps = [
         ":adapter",
+        "//modules/calibration/republish_msg/proto:relative_odometry_proto",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common/monitor/proto:monitor_proto",
+        "//modules/common/monitor_log/proto:monitor_log_proto",
+        "//modules/common/proto:drive_event_proto",
         "//modules/control/proto:control_proto",
-        "//modules/decision/proto:decision_proto",
-        "//modules/localization/proto:camera_proto",
+        "//modules/data/proto:static_info_proto",
+        "//modules/dreamview/proto:voice_detection_proto",
+        "//modules/drivers/gnss/proto:gnss_best_pose_proto",
+        "//modules/drivers/gnss/proto:gnss_raw_observation_proto",
+        "//modules/drivers/gnss/proto:gnss_status_proto",
+        "//modules/drivers/gnss/proto:imu_proto",
+        "//modules/drivers/gnss/proto:ins_proto",
+        "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
         "//modules/localization/proto:localization_proto",
+        "//modules/localization/proto:sins_pva_proto",
+        "//modules/map/relative_map/proto:navigation_proto",
+        "//modules/monitor/proto:system_status_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
-        "@glog//:glog",
+        "//modules/routing/proto:routing_proto",
+        "@glog",
     ],
 )
+
+cpplint()

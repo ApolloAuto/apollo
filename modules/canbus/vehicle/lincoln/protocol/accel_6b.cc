@@ -16,16 +16,21 @@
 
 #include "modules/canbus/vehicle/lincoln/protocol/accel_6b.h"
 
-#include "modules/canbus/common/byte.h"
+#include "glog/logging.h"
+
+#include "modules/drivers/canbus/common/byte.h"
+#include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::drivers::canbus::Byte;
+
 const int32_t Accel6b::ID = 0x6B;
 
-void Accel6b::Parse(const std::uint8_t* bytes, int32_t length,
-                    ChassisDetail* chassis_detail) const {
+void Accel6b::Parse(const std::uint8_t *bytes, int32_t length,
+                    ChassisDetail *chassis_detail) const {
   chassis_detail->mutable_vehicle_spd()->set_lat_acc(
       lateral_acceleration(bytes, length));
   chassis_detail->mutable_vehicle_spd()->set_long_acc(
@@ -34,37 +39,29 @@ void Accel6b::Parse(const std::uint8_t* bytes, int32_t length,
       vertical_acceleration(bytes, length));
 }
 
-double Accel6b::lateral_acceleration(const std::uint8_t* bytes,
-                                     int32_t length) const {
-  Byte high_frame(bytes + 1);
-  int32_t high = high_frame.get_byte(0, 8);
-  Byte low_frame(bytes + 0);
-  int32_t low = low_frame.get_byte(0, 8);
-  int32_t value = (high << 8) | low;
-  if (value > 0x7FFF) {
-    value -= 0x10000;
-  }
-  return value * 0.010000;
+double Accel6b::lateral_acceleration(const std::uint8_t *bytes,
+                                     const int32_t length) const {
+  DCHECK_GE(length, 2);
+  return parse_two_frames(bytes[0], bytes[1]);
 }
 
-double Accel6b::longitudinal_acceleration(const std::uint8_t* bytes,
-                                          int32_t length) const {
-  Byte high_frame(bytes + 3);
-  int32_t high = high_frame.get_byte(0, 8);
-  Byte low_frame(bytes + 2);
-  int32_t low = low_frame.get_byte(0, 8);
-  int32_t value = (high << 8) | low;
-  if (value > 0x7FFF) {
-    value -= 0x10000;
-  }
-  return value * 0.010000;
+double Accel6b::longitudinal_acceleration(const std::uint8_t *bytes,
+                                          const int32_t length) const {
+  DCHECK_GE(length, 4);
+  return parse_two_frames(bytes[2], bytes[3]);
 }
 
-double Accel6b::vertical_acceleration(const std::uint8_t* bytes,
-                                      int32_t length) const {
-  Byte high_frame(bytes + 5);
+double Accel6b::vertical_acceleration(const std::uint8_t *bytes,
+                                      const int32_t length) const {
+  DCHECK_GE(length, 6);
+  return parse_two_frames(bytes[4], bytes[5]);
+}
+
+double Accel6b::parse_two_frames(const std::uint8_t low_byte,
+                                 const std::uint8_t high_byte) const {
+  Byte high_frame(&high_byte);
   int32_t high = high_frame.get_byte(0, 8);
-  Byte low_frame(bytes + 4);
+  Byte low_frame(&low_byte);
   int32_t low = low_frame.get_byte(0, 8);
   int32_t value = (high << 8) | low;
   if (value > 0x7FFF) {

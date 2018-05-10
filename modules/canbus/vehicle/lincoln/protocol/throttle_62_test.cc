@@ -21,16 +21,22 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
-TEST(Throttle63Test, General) {
-  uint8_t data = 0x01;
-  int32_t length = 8;
-  ChassisDetail cd;
+TEST(Throttle62Test, General) {
+  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   Throttle62 throttle;
-  throttle.Parse(&data, length, &cd);
+  EXPECT_EQ(throttle.GetPeriod(), 20 * 1000);
+  throttle.UpdateData(data);
 
-  EXPECT_FALSE(cd.gas().throttle_enabled());
+  EXPECT_EQ(data[0], 0b00000000);
+  EXPECT_EQ(data[1], 0b00000000);
+  EXPECT_EQ(data[2], 0b01100011);
+  EXPECT_EQ(data[3], 0b01100000);
+  EXPECT_EQ(data[4], 0b01010001);
+  EXPECT_EQ(data[5], 0b01010010);
+  EXPECT_EQ(data[6], 0b01010011);
+  EXPECT_EQ(data[7], 0b00000000);
 }
 
 }  // namespace lincoln
-}  // namespace apollo
 }  // namespace canbus
+}  // namespace apollo

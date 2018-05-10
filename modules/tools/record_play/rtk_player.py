@@ -20,28 +20,24 @@ Generate Planning Path
 """
 
 import argparse
-import os
-import rospy
-import sys
-from numpy import genfromtxt
-import scipy.signal as signal
 import atexit
 import logging
+import os
+import sys
+
+import rospy
+import scipy.signal as signal
 from logger import Logger
+from numpy import genfromtxt
 
 from modules.canbus.proto import chassis_pb2
+from modules.common.proto import pnc_point_pb2
+from modules.common.proto import drive_state_pb2
 from modules.control.proto import pad_msg_pb2
-from modules.hmi.proto import runtime_status_pb2
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
 
-# Import hmi_status_helper
 APOLLO_ROOT = os.path.join(os.path.dirname(__file__), '../../../')
-hmi_utils_path = os.path.join(APOLLO_ROOT, 'modules/hmi/utils')
-if hmi_utils_path not in sys.path:
-    sys.path.append(hmi_utils_path)
-import hmi_status_helper
-
 SEARCH_INTERVAL = 1000
 
 
@@ -49,7 +45,6 @@ class RtkPlayer(object):
     """
     rtk player class
     """
-
 
     def __init__(self, record_file, speedmultiplier, completepath, replan):
         """Init player."""
@@ -81,7 +76,7 @@ class RtkPlayer(object):
 
         b, a = signal.butter(6, 0.05, 'low')
         self.data['acceleration'] = signal.filtfilt(b, a,
-            self.data['acceleration'])
+                                                    self.data['acceleration'])
 
         self.start = 0
         self.end = 0
@@ -92,12 +87,6 @@ class RtkPlayer(object):
         self.completepath = (completepath == 't')
 
         self.estop = False
-
-        # Report status to HMI.
-        status_pb = runtime_status_pb2.RuntimeStatus()
-        status_pb.tools.planning_ready = True
-        hmi_status_helper.HMIStatusHelper.report_status(status_pb)
-
         self.logger.info("Planning Ready")
 
     def localization_callback(self, data):
@@ -130,22 +119,42 @@ class RtkPlayer(object):
         self.padmsg.CopyFrom(data)
 
     def restart(self):
-        shortest_dist_sqr = float('inf')
         self.logger.info("before replan self.start=%s, self.closestpoint=%s" %
                          (self.start, self.closestpoint))
+
+        self.closestpoint = self.closest_dist()
+        self.start = max(self.closestpoint - 100, 0)
+        self.starttime = rospy.get_time()
+        self.end = min(self.start + 1000, len(self.data) - 1)
+        self.logger.info("finish replan at time %s, self.closestpoint=%s" %
+                         (self.starttime, self.closestpoint))
+
+    def closest_dist(self):
+        shortest_dist_sqr = float('inf')
+        self.logger.info("before closest self.start=%s" % (self.start))
         search_start = max(self.start - SEARCH_INTERVAL / 2, 0)
         search_end = min(self.start + SEARCH_INTERVAL / 2, len(self.data))
+        start = self.start
         for i in range(search_start, search_end):
             dist_sqr = (self.carx - self.data['x'][i]) ** 2 + \
                    (self.cary - self.data['y'][i]) ** 2
             if dist_sqr <= shortest_dist_sqr:
-                self.start = i
+                start = i
                 shortest_dist_sqr = dist_sqr
+        return start
 
-        self.closestpoint = self.start
-        self.starttime = rospy.get_time()
-        self.logger.info("finish replan at time %s, self.closestpoint=%s" %
-                         (self.starttime, self.closestpoint))
+    def closest_time(self):
+        time_elapsed = rospy.get_time() - self.starttime
+        closest_time = self.start
+        time_diff = self.data['time'][closest_time] - \
+           self.data['time'][self.closestpoint]
+
+        while time_diff < time_elapsed and closest_time < (len(self.data) - 1):
+            closest_time = closest_time + 1
+            time_diff = self.data['time'][closest_time] - \
+                self.data['time'][self.closestpoint]
+
+        return closest_time
 
     def publish_planningmsg(self):
         """
@@ -172,42 +181,34 @@ class RtkPlayer(object):
                 % (self.replan, self.sequence_num, self.automode))
             self.restart()
         else:
-            time_elapsed = now - self.starttime
-            time_diff = self.data['time'][self.start] - \
-                self.data['time'][self.closestpoint]
-            while time_diff < time_elapsed and self.start < (
-                    len(self.data) - 1):
-                self.start = self.start + 1
-                time_diff = self.data['time'][self.start] - \
-                    self.data['time'][self.closestpoint]
+            timepoint = self.closest_time()
+            distpoint = self.closest_dist()
+            self.start = max(min(timepoint, distpoint) - 100, 0)
+            self.end = min(max(timepoint, distpoint) + 900, len(self.data) - 1)
 
-        xdiff_sqr = (self.data['x'][self.start] - self.carx)**2
-        ydiff_sqr = (self.data['y'][self.start] - self.cary)**2
-        if xdiff_sqr + ydiff_sqr > 4.0:
-            self.logger.info("trigger replan: distance larger than 2.0")
-            self.restart()
+            xdiff_sqr = (self.data['x'][timepoint] - self.carx)**2
+            ydiff_sqr = (self.data['y'][timepoint] - self.cary)**2
+            if xdiff_sqr + ydiff_sqr > 4.0:
+                self.logger.info("trigger replan: distance larger than 2.0")
+                self.restart()
 
         if self.completepath:
             self.start = 0
             self.end = len(self.data) - 1
-        else:
-            self.start = max(self.start - 100, 0)
-            self.end = min(self.start + 1000, len(self.data) - 1)
 
         self.logger.debug(
             "publish_planningmsg: after adjust start: self.start = %s, self.end=%s"
             % (self.start, self.end))
+
         for i in range(self.start, self.end):
-            adc_point = planning_pb2.ADCTrajectoryPoint()
-            adc_point.x = self.data['x'][i]
-            adc_point.y = self.data['y'][i]
-            adc_point.z = self.data['z'][i]
-            adc_point.speed = self.data['speed'][i] * self.speedmultiplier
-            adc_point.acceleration_s = self.data['acceleration'][
-                i] * self.speedmultiplier
-            adc_point.curvature = self.data['curvature'][i]
-            adc_point.curvature_change_rate = self.data[
-                'curvature_change_rate'][i]
+            adc_point = pnc_point_pb2.TrajectoryPoint()
+            adc_point.path_point.x = self.data['x'][i]
+            adc_point.path_point.y = self.data['y'][i]
+            adc_point.path_point.z = self.data['z'][i]
+            adc_point.v = self.data['speed'][i] * self.speedmultiplier
+            adc_point.a = self.data['acceleration'][i] * self.speedmultiplier
+            adc_point.path_point.kappa = self.data['curvature'][i]
+            adc_point.path_point.dkappa = self.data['curvature_change_rate'][i]
 
             time_diff = self.data['time'][i] - \
                 self.data['time'][self.closestpoint]
@@ -215,10 +216,10 @@ class RtkPlayer(object):
             adc_point.relative_time = time_diff / self.speedmultiplier - (
                 now - self.starttime)
 
-            adc_point.theta = self.data['theta'][i]
-            adc_point.accumulated_s = self.data['s'][i]
+            adc_point.path_point.theta = self.data['theta'][i]
+            adc_point.path_point.s = self.data['s'][i]
 
-            planningdata.adc_trajectory_point.extend([adc_point])
+            planningdata.trajectory_point.extend([adc_point])
 
         planningdata.estop.is_estop = self.estop
 
@@ -226,7 +227,9 @@ class RtkPlayer(object):
             self.data['s'][self.start]
         planningdata.total_path_time = self.data['time'][self.end] - \
             self.data['time'][self.start]
-        planningdata.gear = int(self.data['gear'][self.start])
+        planningdata.gear = int(self.data['gear'][self.closest_time()])
+        planningdata.engage_advice.advice = \
+            drive_state_pb2.EngageAdvice.READY_TO_ENGAGE
 
         self.planning_pub.publish(planningdata)
         self.logger.debug("Generated Planning Sequence: " +

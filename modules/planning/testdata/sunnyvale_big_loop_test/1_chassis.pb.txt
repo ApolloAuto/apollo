@@ -1,0 +1,47 @@
+engine_started: true
+engine_rpm: 0
+speed_mps: 8.9833336
+odometer_m: 0
+fuel_range_m: 0
+throttle_percentage: 14.995041
+brake_percentage: 23.024338
+steering_percentage: 2.7446809
+steering_torque_nm: 0
+parking_brake: false
+driving_mode: EMERGENCY_MODE
+error_code: NO_ERROR
+gear_location: GEAR_DRIVE
+header {
+  timestamp_sec: 1515787931.3517847
+  module_name: "chassis"
+  sequence_num: 180703
+}
+signal {
+  turn_signal: TURN_LEFT
+  horn: false
+}
+chassis_gps {
+  latitude: 37.404450666666662
+  longitude: -122.02379733333332
+  gps_valid: true
+  year: 18
+  month: 1
+  day: 12
+  hours: 20
+  minutes: 12
+  seconds: 11
+  compass_direction: 180
+  pdop: 1
+  is_gps_fault: false
+  is_inferred: false
+  altitude: -42.5
+  heading: 183.46
+  hdop: 0.60000000000000009
+  vdop: 0.8
+  quality: FIX_3D
+  num_satellites: 18
+  gps_speed: 9.83488
+}
+engage_advice {
+  advice: READY_TO_ENGAGE
+}

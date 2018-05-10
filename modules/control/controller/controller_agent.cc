@@ -20,21 +20,41 @@
 
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/control/common/control_gflags.h"
 #include "modules/control/controller/lat_controller.h"
 #include "modules/control/controller/lon_controller.h"
+#include "modules/control/controller/mpc_controller.h"
 
 namespace apollo {
 namespace control {
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::time::Clock;
 
-void ControllerAgent::RegisterControllers() {
-  controller_factory_.Register(
-      ControlConf::LAT_CONTROLLER,
-      []() -> Controller * { return new LatController(); });
-  controller_factory_.Register(
-      ControlConf::LON_CONTROLLER,
-      []() -> Controller * { return new LonController(); });
+void ControllerAgent::RegisterControllers(const ControlConf *control_conf) {
+  AINFO << "Only support MPC controller or Lat + Lon controllers as of now";
+  for (auto active_controller : control_conf->active_controllers()) {
+    switch (active_controller) {
+      case ControlConf::MPC_CONTROLLER:
+        controller_factory_.Register(
+            ControlConf::MPC_CONTROLLER,
+            []() -> Controller * { return new MPCController(); });
+        break;
+      case ControlConf::LAT_CONTROLLER:
+        controller_factory_.Register(
+            ControlConf::LAT_CONTROLLER,
+            []() -> Controller * { return new LatController(); });
+        break;
+      case ControlConf::LON_CONTROLLER:
+        controller_factory_.Register(
+            ControlConf::LON_CONTROLLER,
+            []() -> Controller * { return new LonController(); });
+        break;
+      default:
+        AERROR << "Unknown active controller type:" << active_controller;
+    }
+  }
 }
 
 Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {
@@ -43,7 +63,6 @@ Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {
     return Status(ErrorCode::CONTROL_INIT_ERROR, "Failed to load config");
   }
   control_conf_ = control_conf;
-  AINFO << control_conf_->DebugString();
   for (auto controller_type : control_conf_->active_controllers()) {
     auto controller = controller_factory_.CreateObject(
         static_cast<ControlConf::ControllerType>(controller_type));
@@ -59,7 +78,7 @@ Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {
 }
 
 Status ControllerAgent::Init(const ControlConf *control_conf) {
-  RegisterControllers();
+  RegisterControllers(control_conf);
   CHECK(InitializeConf(control_conf).ok()) << "Fail to initialize config.";
   for (auto &controller : controller_list_) {
     if (controller == NULL || !controller->Init(control_conf_).ok()) {
@@ -78,19 +97,19 @@ Status ControllerAgent::Init(const ControlConf *control_conf) {
 }
 
 Status ControllerAgent::ComputeControlCommand(
-    const ::apollo::localization::LocalizationEstimate *localization,
-    const ::apollo::canbus::Chassis *chassis,
-    const ::apollo::planning::ADCTrajectory *trajectory,
-    ::apollo::control::ControlCommand *cmd) {
+    const localization::LocalizationEstimate *localization,
+    const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
+    control::ControlCommand *cmd) {
   for (auto &controller : controller_list_) {
     ADEBUG << "controller:" << controller->Name() << " processing ...";
-    double start_timestamp = apollo::common::time::ToSecond(Clock::Now());
+    double start_timestamp = Clock::NowInSeconds();
     controller->ComputeControlCommand(localization, chassis, trajectory, cmd);
-    double end_timestamp = apollo::common::time::ToSecond(Clock::Now());
-    AINFO << "controller: " << controller->Name() << " calculation time is: "
-          << (end_timestamp - start_timestamp) * 1000 << " ms.";
-    cmd->mutable_latency_stats()->add_controller_time_ms(
-        (end_timestamp - start_timestamp) * 1000);
+    double end_timestamp = Clock::NowInSeconds();
+    const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+
+    ADEBUG << "controller: " << controller->Name()
+           << " calculation time is: " << time_diff_ms << " ms.";
+    cmd->mutable_latency_stats()->add_controller_time_ms(time_diff_ms);
   }
   return Status::OK();
 }
