@@ -124,10 +124,10 @@ bool FrontVehicle::ProcessSidePass(
 
   switch (status) {
     case SidePassStatus::UNKNOWN: {
-      sidepass_status->set_status(SidePassStatus::DRIVING);
+      sidepass_status->set_status(SidePassStatus::DRIVE);
       break;
     }
-    case SidePassStatus::DRIVING: {
+    case SidePassStatus::DRIVE: {
       constexpr double kAdcStopSpeedThreshold = 0.1;  // unit: m/s
       const auto& adc_planning_point = reference_line_info->AdcPlanningPoint();
       if (!passable_obstacle_id.empty() &&
@@ -142,7 +142,7 @@ bool FrontVehicle::ProcessSidePass(
       const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
 
       if (passable_obstacle_id.empty()) {
-        sidepass_status->set_status(SidePassStatus::DRIVING);
+        sidepass_status->set_status(SidePassStatus::DRIVE);
         sidepass_status->clear_wait_start_time();
       } else {
         double wait_start_time = sidepass_status->wait_start_time();
@@ -166,7 +166,7 @@ bool FrontVehicle::ProcessSidePass(
           if (lanes.size() >= 2) {
             // currently do not sidepass when lanes > 2 (usually at junctions).
           } else {
-            sidepass_status->set_status(SidePassStatus::DRIVING);
+            sidepass_status->set_status(SidePassStatus::DRIVE);
             sidepass_status->clear_wait_start_time();
 
             auto& lane = lanes.front()->lane();
@@ -212,7 +212,7 @@ bool FrontVehicle::ProcessSidePass(
     }
     case SidePassStatus::SIDEPASS: {
       if (passable_obstacle_id.empty()) {
-        sidepass_status->set_status(SidePassStatus::DRIVING);
+        sidepass_status->set_status(SidePassStatus::DRIVE);
       }
       break;
     }
