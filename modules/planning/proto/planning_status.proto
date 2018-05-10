@@ -33,10 +33,11 @@ message SidePassStatus {
 message StopSignStatus {
   enum Status {
     UNKNOWN = 0;
-    TO_STOP = 1;
-    STOPPING = 2;
-    CREEPING = 3;
-    STOP_DONE = 4;
+    DRIVE = 1;
+    STOP = 2;
+    WAIT = 3;
+    CREEP = 4;
+    STOP_DONE = 5;
   }
   message LaneWatchVehicles {
     required string lane_id = 1;
