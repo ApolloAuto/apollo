@@ -34,6 +34,10 @@ constexpr double ImageHandler::kImageScale;
 
 template <>
 void ImageHandler::OnImage(const sensor_msgs::Image &image) {
+  if (requests_ == 0) {
+    return;
+  }
+
   if (image.encoding != "yuyv") {
     AERROR_EVERY(100) << "Image format not support: " << image.encoding;
     return;
@@ -43,6 +47,7 @@ void ImageHandler::OnImage(const sensor_msgs::Image &image) {
   auto mat = cv::Mat(image.height, image.width, CV_8UC3);
   apollo::perception::traffic_light::Yuyv2rgb(yuv, mat.data,
                                               image.height * image.width);
+
   cv::cvtColor(mat, mat, CV_RGB2BGR);
 
   cv::resize(mat, mat, cv::Size(image.width * ImageHandler::kImageScale,
@@ -56,6 +61,10 @@ void ImageHandler::OnImage(const sensor_msgs::Image &image) {
 
 template <>
 void ImageHandler::OnImage(const sensor_msgs::CompressedImage &image) {
+  if (requests_ == 0) {
+    return;
+  }
+
   try {
     std::unique_lock<std::mutex> lock(mutex_);
     auto current_image = cv_bridge::toCvCopy(image);
@@ -68,7 +77,7 @@ void ImageHandler::OnImage(const sensor_msgs::CompressedImage &image) {
   }
 }
 
-ImageHandler::ImageHandler() {
+ImageHandler::ImageHandler() : requests_(0) {
   if (FLAGS_use_navigation_mode) {
     AdapterManager::AddCompressedImageCallback(&ImageHandler::OnImage, this);
   } else {
@@ -77,9 +86,7 @@ ImageHandler::ImageHandler() {
 }
 
 bool ImageHandler::handleGet(CivetServer *server, struct mg_connection *conn) {
-  if (send_buffer_.empty()) {
-    return true;
-  }
+  requests_++;
 
   mg_printf(conn,
             "HTTP/1.1 200 OK\r\n"
@@ -92,27 +99,34 @@ bool ImageHandler::handleGet(CivetServer *server, struct mg_connection *conn) {
             "boundary=--BoundaryString\r\n"
             "\r\n");
 
+  std::vector<uchar> to_send;
   while (true) {
-    std::vector<uchar> to_send;
     {
       std::unique_lock<std::mutex> lock(mutex_);
       to_send = send_buffer_;
     }
-    // Sends the image data
-    mg_printf(conn,
-              "--BoundaryString\r\n"
-              "Content-type: image/jpeg\r\n"
-              "Content-Length: %zu\r\n"
-              "\r\n",
-              to_send.size());
-    if (mg_write(conn, &to_send[0], to_send.size()) <= 0) {
-      return false;
+
+    if (!to_send.empty()) {
+      // Sends the image data
+      mg_printf(conn,
+                "--BoundaryString\r\n"
+                "Content-type: image/jpeg\r\n"
+                "Content-Length: %zu\r\n"
+                "\r\n",
+                to_send.size());
+
+      if (mg_write(conn, &to_send[0], to_send.size()) <= 0) {
+        requests_--;
+        return false;
+      }
+      mg_printf(conn, "\r\n\r\n");
     }
-    mg_printf(conn, "\r\n\r\n");
 
     std::unique_lock<std::mutex> lock(mutex_);
     cvar_.wait(lock);
   }
+
+  requests_--;
   return true;
 }
 
