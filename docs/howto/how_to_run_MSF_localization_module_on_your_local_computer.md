@@ -13,6 +13,11 @@ cp DATA_PATH/params/ant_imu_leverarm.yaml /apollo/modules/localization/msf/param
 cp DATA_PATH/params/velodyne64_novatel_extrinsics_example.yaml /apollo/modules/localization/msf/params/velodyne_params/
 cp DATA_PATH/params/velodyne64_height.yaml /apollo/modules/localization/msf/params/velodyne_params/
 ```
+The meaning of each file
+ - ant_imu_leverarm.yaml:  Lever arm value
+ - velodyne64_novatel_extrinsics_example.yaml: Transform from Imu coord to Lidar coord
+ - velodyne64_height.yaml: Height of the Lidar relative to the ground
+
 ### 2.2 Configure Map Path
 Add config of map path in /apollo/modules/localization/conf/localization.conf
 ```
@@ -77,10 +82,11 @@ If you record localization result in step 5, you will also need to end the recor
 ```
 
 ## 7. Verify the localization result (optional)
-Assume the folder stored recording bag in step 5 is OUTPUT_PATH.
+
 ```
-./scripts/msf_local_evaluation.sh OUTPUT_PATH
+./scripts/msf_local_evaluation.sh OUTPUT_PATH ANT_IMU_PATH
 ```
+OUTPUT_PATH is the folder stored recording bag in step 5, and ANT_IMU_PATH is the file stored lever arm value.
 
 This script compares the localization results of MSF mode to RTK mode.
 
@@ -90,7 +96,7 @@ And we can get the statistical results like this
 
 ![2](images/msf_localization/localization_result.png)
 
-The first table is the statistical data of SINS. The output frequency of SINS is 200hz. The second table is the statistc result of Lidar localization. The output frequency of Lidar localization is 5hz.
+The first table is the statistical data of Fusion localization. The second table is the statistical result of Lidar localization. The third table is the statistical result of GNSS localization.
 
 The meaning of each row in the table
  - error：  the plane error, unit is meter
