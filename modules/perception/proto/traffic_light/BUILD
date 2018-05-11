@@ -41,3 +41,45 @@ proto_library(
         "preprocessor_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "rectifier_config_lib_proto",
+    deps = [
+        ":rectifier_config_lib",
+    ],
+)
+
+proto_library(
+    name = "rectifier_config_lib",
+    srcs = [
+        "rectifier_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "reviser_config_lib_proto",
+    deps = [
+        ":reviser_config_lib",
+    ],
+)
+
+proto_library(
+    name = "reviser_config_lib",
+    srcs = [
+        "reviser_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "subnode_config_lib_proto",
+    deps = [
+        ":subnode_config_lib",
+    ],
+)
+
+proto_library(
+    name = "subnode_config_lib",
+    srcs = [
+        "subnode_config.proto",
+    ],
+)
