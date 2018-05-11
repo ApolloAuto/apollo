@@ -160,8 +160,7 @@ void HMI::RegisterMessageHandlers() {
           << "Failed to load new simulation map: " << new_map;
       // And then broadcast new HMIStatus to all clients.
       BroadcastHMIStatus();
-    }
-  );
+    });
   websocket_->RegisterMessageHandler(
       "ChangeMap",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -181,8 +180,7 @@ void HMI::RegisterMessageHandlers() {
       // Broadcast new HMIStatus and VehicleParam.
       BroadcastHMIStatus();
       SendVehicleParam();
-    }
-  );
+    });
   websocket_->RegisterMessageHandler(
       "ChangeVehicle",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -201,8 +199,7 @@ void HMI::RegisterMessageHandlers() {
     [this](const std::string& new_mode) {
       // Broadcast new HMIStatus.
       BroadcastHMIStatus();
-    }
-  );
+    });
   websocket_->RegisterMessageHandler(
       "ChangeMode",
       [this](const Json &json, WebSocketHandler::Connection *conn) {

@@ -18,6 +18,7 @@
 #define MODULES_DREAMVIEW_BACKEND_HMI_HMI_WORKER_H_
 
 #include <string>
+#include <vector>
 
 #include "boost/thread/locks.hpp"
 #include "boost/thread/shared_mutex.hpp"
