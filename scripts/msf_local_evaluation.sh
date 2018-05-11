@@ -1,7 +1,16 @@
 #! /bin/bash
 if [ $# -lt 1 ]; then
-    echo "Usage: msf_monitor_data_exporter.sh [bags folder]"
+    echo "Usage:"
+    echo "$0 [bags folder]                   evaluate fusion and lidar localization result"
+    echo "$0 [bags folder] [ant arm file]    evaluate fusion, lidar and gnss localization result"
     exit 1;
+fi
+
+IN_FOLDER=$1
+if [ $# -eq 2 ]; then
+  ANT_IMU_FILE=$2
+else
+  ANT_IMU_FILE=""
 fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -19,8 +28,6 @@ GNSS_LOC_FILE="gnss_loc.txt"
 LIDAR_LOC_FILE="lidar_loc.txt"
 FUSION_LOC_FILE="fusion_loc.txt"
 ODOMETRY_LOC_FILE="odometry_loc.txt"
-
-IN_FOLDER=$1
 
 function data_exporter() {
   local BAG_FILE=$1
@@ -41,6 +48,7 @@ function compare_poses() {
     --in_folder $IN_FOLDER \
     --loc_file_a $GNSS_LOC_FILE \
     --loc_file_b $ODOMETRY_LOC_FILE \
+    --imu_to_ant_offset_file "$ANT_IMU_FILE" \
     --compare_file "compare_gnss_odometry.txt"
 
   $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/compare_poses \
@@ -60,29 +68,46 @@ cd $IN_FOLDER
 for item in $(ls -l *.bag | awk '{print $9}')
 do
   DIR_NAME=$(echo $item | cut -d . -f 1)
-  mkdir $DIR_NAME
+  if [ -d "${DIR_NAME}" ]; then
+    rm -r ${DIR_NAME}
+  fi
+  mkdir ${DIR_NAME}
   data_exporter "${item}" "${DIR_NAME}"
   compare_poses "${DIR_NAME}/pcd"
 done
 
+rm -rf compare_fusion_odometry_all.txt
 touch compare_fusion_odometry_all.txt
 for item in  $(find . -name "compare_fusion_odometry.txt")
 do 
   cat $item >> compare_fusion_odometry_all.txt
 done
 
+rm -rf compare_lidar_odometry_all.txt
 touch compare_lidar_odometry_all.txt
 for item in  $(find . -name "compare_lidar_odometry.txt")
 do 
   cat $item >> compare_lidar_odometry_all.txt
 done
 
+rm -rf compare_gnss_odometry_all.txt
 touch compare_gnss_odometry_all.txt
 for item in  $(find . -name "compare_gnss_odometry.txt")
 do 
   cat $item >> compare_gnss_odometry_all.txt
 done
 
+echo ""
+echo "Fusion localization result:"
 python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py compare_fusion_odometry_all.txt
+
+echo ""
+echo "Lidar localization result:"
 python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py compare_lidar_odometry_all.txt
-# python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py compare_gnss_odometry_all.txt
+
+if [ $# -eq 2 ]; then
+  echo ""
+  echo "GNSS localization result:"
+  python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py\
+    compare_gnss_odometry_all.txt distance_only
+fi
