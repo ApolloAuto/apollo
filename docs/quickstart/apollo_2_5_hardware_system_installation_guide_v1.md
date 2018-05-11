@@ -202,9 +202,11 @@ For more information about the NovAtel SPAN ProPak6 and the IMU-IGM-A1, see:
 
 ## The GPS Receiver/Antenna
 
-The GPS Receiver/Antenna used with the GPS-IMU component is the **NovAtel GPS-703-GGG-HV**.
+The GPS Receiver/Antenna used with the GPS-IMU component is:
 
-**NOTE: **The GPS NovAtelGPS-703-GGG-HV works with either model of the two GPS-IMU options that are described in the previous section, Global Positioning System (GPS) and Inertial Measurement Unit (IMU).
+### Option 1: The **NovAtel GPS-703-GGG-HV**.
+
+**NOTE:**The GPS NovAtelGPS-703-GGG-HV works with either model of the two GPS-IMU options that are described in the previous section, Global Positioning System (GPS) and Inertial Measurement Unit (IMU).
 
 ![gps_receiver](images/gps_receiver.png)
 
@@ -213,6 +215,19 @@ For more information about the NovAtel GPS-703-GGG-HV, see:
   ![online](images/online_icon.png) NovAtel GPS-703-GGG-HV Product Page:
 
 [https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/](https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/)
+
+### Option 2: **Dual NovAtel GNSS-502** 
+
+**NOTE:**The GPS NovAtel GNSS-502 works with either model of the two GPS-IMU options that are described in the previous section, Global Positioning System (GPS) and Inertial Measurement Unit (IMU).  Dual antenna receivers, such as the ProPak6 can take advantage of better quality heading information, by using 2 antennas.
+
+![gps_receiver](images/novatel_gnss-502.png)
+
+For more information about the NovAtel GNSS-502, see:
+
+  ![online](images/online_icon.png) NovAtel GNSS-502 Product Page:
+
+[https://www.novatel.com/products/gnss-antennas/vexxis-series-antennas/vexxis-gnss-500-series-antennas/](https://www.novatel.com/products/gnss-antennas/vexxis-series-antennas/vexxis-gnss-500-series-antennas/)
+
 
 ## Light Detection and Ranging System (LiDAR)
 The 64 line LiDAR system **HDL-64E S3** is available from Velodyne LiDAR, Inc.
