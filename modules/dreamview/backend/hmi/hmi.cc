@@ -153,6 +153,15 @@ void HMI::RegisterMessageHandlers() {
       });
 
   // HMI client asks for changing map.
+  HMIWorker::instance()->RegisterChangeMapHandler(
+    [this](const std::string& new_map) {
+      // Reload simulation map after changing map.
+      CHECK(map_service_->ReloadMap(true))
+          << "Failed to load new simulation map: " << new_map;
+      // And then broadcast new HMIStatus to all clients.
+      BroadcastHMIStatus();
+    }
+  );
   websocket_->RegisterMessageHandler(
       "ChangeMap",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -160,14 +169,20 @@ void HMI::RegisterMessageHandlers() {
         // MapName should be a key of config_.available_maps.
         std::string new_map;
         if (JsonUtil::GetStringFromJson(json, "new_map", &new_map)) {
-          HMIWorker::instance()->ChangeToMap(new_map, map_service_);
-          BroadcastHMIStatus();
+          HMIWorker::instance()->ChangeToMap(new_map);
         } else {
           AERROR << "Truncated ChangeMap request.";
         }
       });
 
   // HMI client asks for changing vehicle.
+  HMIWorker::instance()->RegisterChangeVehicleHandler(
+    [this](const std::string& new_vehicle) {
+      // Broadcast new HMIStatus and VehicleParam.
+      BroadcastHMIStatus();
+      SendVehicleParam();
+    }
+  );
   websocket_->RegisterMessageHandler(
       "ChangeVehicle",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -176,15 +191,18 @@ void HMI::RegisterMessageHandlers() {
         std::string new_vehicle;
         if (JsonUtil::GetStringFromJson(json, "new_vehicle", &new_vehicle)) {
           HMIWorker::instance()->ChangeToVehicle(new_vehicle);
-          BroadcastHMIStatus();
-          // Broadcast new VehicleParam.
-          SendVehicleParam();
         } else {
           AERROR << "Truncated ChangeVehicle request.";
         }
       });
 
   // HMI client asks for changing mode.
+  HMIWorker::instance()->RegisterChangeModeHandler(
+    [this](const std::string& new_mode) {
+      // Broadcast new HMIStatus.
+      BroadcastHMIStatus();
+    }
+  );
   websocket_->RegisterMessageHandler(
       "ChangeMode",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -193,7 +211,6 @@ void HMI::RegisterMessageHandlers() {
         std::string new_mode;
         if (JsonUtil::GetStringFromJson(json, "new_mode", &new_mode)) {
           HMIWorker::instance()->ChangeToMode(new_mode);
-          BroadcastHMIStatus();
         } else {
           AERROR << "Truncated ChangeMode request.";
         }
