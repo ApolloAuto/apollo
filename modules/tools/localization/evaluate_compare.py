@@ -131,7 +131,7 @@ def get_angle_stat_from_data(data):
     return stat
 
 
-def parse_file(filename):
+def parse_file(filename, type):
     file = open(filename, "r")
     lines = file.readlines()
     print "%d frames" % len(lines)
@@ -158,7 +158,18 @@ def parse_file(filename):
             error.append(math.sqrt(x * x + y * y))
             #print "%f %f %f" % (error[-1], error_lon[-1], error_lat[-1])
     file.close()
+    if type == "all":
+        print_distance_error(error, error_lon, error_lat, error_alt)
+        print_angle_error(error_roll, error_pitch, error_yaw)
+    elif type == "distance_only":
+        print_distance_error(error, error_lon, error_lat, error_alt)
+    elif type == "angle_only":
+        print_angle_error(error_roll, error_pitch, error_yaw)
+    else:
+        print_distance_error(error, error_lon, error_lat, error_alt)
+        print_angle_error(error_roll, error_pitch, error_yaw)
     
+def print_distance_error(error, error_lon, error_lat, error_alt):
     print "criteria : mean     std      max      < 30cm   < 20cm   < 10cm  con_frames(>30cm)"
     result = get_stat_from_data(error)
     res = get_stat2_from_data(error)
@@ -177,6 +188,7 @@ def parse_file(filename):
     print "error alt: %06f %06f %06f %06f %06f %06f %06d" % \
     (result[0], result[1], result[2], result[3], result[4], result[5], res[2]) 
 
+def print_angle_error(error_roll, error_pitch, error_yaw):
     print "criteria : mean     std      max      < 1.0d   < 0.6d   < 0.3d  con_frames(>1.0d)"
     result = get_angle_stat_from_data(error_roll)
     res = get_angle_stat2_from_data(error_roll)
@@ -194,9 +206,10 @@ def parse_file(filename):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print "python evaluation.py [evaluation file]"
+        print "python evaluation.py [evaluation file] [evaluation type]"
     elif not os.path.isfile(sys.argv[1]):
         print "file not exist"
+    elif len(sys.argv) < 3:
+        parse_file(sys.argv[1], "all")
     else:
-        parse_file(sys.argv[1])
-
+        parse_file(sys.argv[1], sys.argv[2])
