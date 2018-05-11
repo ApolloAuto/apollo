@@ -262,8 +262,7 @@ void HMIWorker::RunModeCommand(const std::string &command_name) {
   }
 }
 
-void HMIWorker::ChangeToMap(const std::string &map_name,
-                            MapService *map_service) {
+void HMIWorker::ChangeToMap(const std::string &map_name) {
   const auto *map_dir = FindOrNull(config_.available_maps(), map_name);
   if (map_dir == nullptr) {
     AERROR << "Unknown map " << map_name;
@@ -281,9 +280,12 @@ void HMIWorker::ChangeToMap(const std::string &map_name,
   apollo::common::KVDB::Put("apollo:dreamview:map", map_name);
 
   SetGlobalFlag("map_dir", *map_dir, &FLAGS_map_dir);
-  // Also reload simulation map.
-  CHECK(map_service->ReloadMap(true)) << "Failed to load map from " << *map_dir;
   RunModeCommand("stop");
+
+  // Trigger registered change map handlers.
+  for (const auto handler : change_map_handlers_) {
+    handler(map_name);
+  }
 }
 
 void HMIWorker::ChangeToVehicle(const std::string &vehicle_name) {
@@ -305,6 +307,11 @@ void HMIWorker::ChangeToVehicle(const std::string &vehicle_name) {
 
   CHECK(VehicleManager::instance()->UseVehicle(*vehicle));
   RunModeCommand("stop");
+
+  // Trigger registered change vehicle handlers.
+  for (const auto handler : change_vehicle_handlers_) {
+    handler(vehicle_name);
+  }
 }
 
 void HMIWorker::ChangeToMode(const std::string &mode_name) {
@@ -332,6 +339,11 @@ void HMIWorker::ChangeToMode(const std::string &mode_name) {
   // Now stop all old modules.
   for (const auto &module : old_modules) {
     RunModuleCommand(module, "stop");
+  }
+
+  // Trigger registered change mode handlers.
+  for (const auto handler : change_mode_handlers_) {
+    handler(mode_name);
   }
 }
 
