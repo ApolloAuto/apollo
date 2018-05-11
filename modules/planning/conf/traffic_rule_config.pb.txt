@@ -105,7 +105,7 @@ config: {
     max_stop_deceleration: 6.0
     min_pass_s_distance: 3.0
     max_stop_speed: 0.3
-    max_valid_stop_distance: 3.0
+    max_valid_stop_distance: 3.5
     stop_duration : 1.0
     watch_vehicle_max_valid_stop_speed: 0.5
     watch_vehicle_max_valid_stop_distance: 5.0

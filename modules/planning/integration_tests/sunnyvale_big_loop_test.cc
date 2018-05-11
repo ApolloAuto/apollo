@@ -233,6 +233,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
 
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  stop_sign_status->set_status(StopSignStatus::STOP);
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
@@ -256,6 +257,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   // previously watch vehicles are gone
 
   // set PlanningStatus
+  stop_sign_status->set_status(StopSignStatus::STOP);
   stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 

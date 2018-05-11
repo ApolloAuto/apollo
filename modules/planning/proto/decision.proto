@@ -41,6 +41,7 @@ message ObjectStop {
   optional apollo.common.PointENU stop_point =3;
   // When stopped, the heading of the vehicle should be stop_heading.
   optional double stop_heading = 4;
+  repeated string wait_for_obstacle = 5;
 }
 
 // dodge the obstacle in lateral direction when driving
@@ -88,9 +89,6 @@ message ObjectSidePass {
 message ObjectAvoid {
 }
 
-message ObjectWait {
-}
-
 message ObjectDecisionType {
   oneof object_tag {
     ObjectIgnore ignore = 1;
@@ -101,7 +99,6 @@ message ObjectDecisionType {
     ObjectNudge nudge = 6;
     ObjectSidePass sidepass = 7;
     ObjectAvoid avoid = 8;
-    ObjectWait wait = 9;
   }
 }
 
