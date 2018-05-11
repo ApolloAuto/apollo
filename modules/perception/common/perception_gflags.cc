@@ -190,3 +190,15 @@ DEFINE_string(traffic_light_preprocessor_config,
               "modules/perception/model/traffic_light/"
               "preprocessor_config.pb.txt",
               "traffic light preprocessor config filename.");
+DEFINE_string(traffic_light_rectifier_config,
+              "modules/perception/model/traffic_light/"
+              "rectifier_config.pb.txt",
+              "traffic light rectifier config filename.");
+DEFINE_string(traffic_light_reviser_config,
+              "modules/perception/model/traffic_light/"
+              "reviser_config.pb.txt",
+              "traffic light reviser config filename.");
+DEFINE_string(traffic_light_subnode_config,
+              "modules/perception/model/traffic_light/"
+              "subnode_config.pb.txt",
+              "traffic light subnode config filename.");
