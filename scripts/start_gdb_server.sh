@@ -50,7 +50,7 @@ shift 2
 # If there is a gdbserver process running, stop it first. 
 GDBSERVER_NUMS=$(pgrep -c -x "gdbserver")
 if [ ${GDBSERVER_NUMS} -ne 0 ]; then
-  sudo pkill -f "gdbserver"
+  sudo pkill -SIGKILL -f "gdbserver"
 fi
 
 # Because the "grep ${MODULE_NAME}" always generates a process with the name of 

@@ -20,8 +20,6 @@
 
 #include "modules/planning/tasks/traffic_decider/backside_vehicle.h"
 
-#include "modules/planning/common/planning_gflags.h"
-
 namespace apollo {
 namespace planning {
 

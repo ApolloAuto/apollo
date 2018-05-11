@@ -112,8 +112,9 @@ Status Planning::Init() {
   if (!FLAGS_use_navigation_mode) {
     hdmap_ = HDMapUtil::BaseMapPtr();
     CHECK(hdmap_) << "Failed to load map";
-    reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
-        new ReferenceLineProvider(hdmap_));
+    // Prefer "std::make_unique" to direct use of "new".
+    // Reference "https://herbsutter.com/gotw/_102/" for details.
+    reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
   }
 
   RegisterPlanners();
@@ -141,7 +142,11 @@ bool Planning::IsVehicleStateValid(const VehicleState& vehicle_state) {
 Status Planning::Start() {
   timer_ = AdapterManager::CreateTimer(
       ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
-  reference_line_provider_->Start();
+  // The "reference_line_provider_" may not be created yet in navigation mode.
+  // It is necessary to check its existence.
+  if (reference_line_provider_) {
+    reference_line_provider_->Start();
+  }
   start_time_ = Clock::NowInSeconds();
   AINFO << "Planning started";
   return Status::OK();
@@ -216,8 +221,9 @@ void Planning::RunOnce() {
   if (FLAGS_use_navigation_mode) {
     // recreate reference line provider in every cycle
     hdmap_ = HDMapUtil::BaseMapPtr();
-    reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
-        new ReferenceLineProvider(hdmap_));
+    // Prefer "std::make_unique" to direct use of "new".
+    // Reference "https://herbsutter.com/gotw/_102/" for details.
+    reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
   }
 
   // localization

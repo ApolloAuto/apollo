@@ -22,9 +22,12 @@
 #ifndef MODULES_COMMON_MATH_MATRIX_OPERATIONS_H_
 #define MODULES_COMMON_MATH_MATRIX_OPERATIONS_H_
 
+#include <cmath>
 #include <utility>
 #include "Eigen/Dense"
 #include "Eigen/SVD"
+
+#include "modules/common/log.h"
 
 /**
  * @namespace apollo::common::math
@@ -66,29 +69,58 @@ Eigen::Matrix<T, N, N> PseudoInverse(const Eigen::Matrix<T, N, N> &m,
  * @return Moore-Penrose pseudo-inverse of the given matrix.
  */
 template <typename T, unsigned int M, unsigned int N>
-Eigen::Matrix<T, N, M> PseudoInverse(const Eigen::Matrix<T, M, N>& m,
-        const double epsilon = 1.0e-6) {
-    Eigen::Matrix<T, M, M> t = m * m.transpose();
-    return m.transpose() * PseudoInverse<T, M>(t);
+Eigen::Matrix<T, N, M> PseudoInverse(const Eigen::Matrix<T, M, N> &m,
+                                     const double epsilon = 1.0e-6) {
+  Eigen::Matrix<T, M, M> t = m * m.transpose();
+  return m.transpose() * PseudoInverse<T, M>(t);
 }
 
 /**
- * @brief Implements Tustin's method for converting transfer functions from
- * continuous to discrete time domains.
- * https://en.wikipedia.org/wiki/Bilinear_transform
- *
- * @param m_c Matrix
- * @param ts Time interval
- *
- * @return Matrix
+* @brief Computes bilinear transformation of the continuous to discrete form for
+state space representation
+*
+* @param m_a, m_b, m_c, m_d are the state space matrix control matrix
+*
+* @return true or false.
+
  */
-template <typename T, unsigned int N>
-Eigen::Matrix<T, N, N> ContinuousToDiscrete(const Eigen::Matrix<T, N, N> &m_c,
-                                            const double ts) {
-  Eigen::Matrix<T, N, N> m_identity = Eigen::Matrix<T, N, N>::Identity();
-  Eigen::Matrix<T, N, N> m_d = (m_identity + ts * 0.5 * m_c) *
-                               PseudoInverse<T, N>(m_identity - ts * 0.5 * m_c);
-  return m_d;
+
+template <typename T, unsigned int L, unsigned int M, unsigned int N,
+          unsigned int O>
+bool ContinuousToDiscrete(const Eigen::Matrix<T, L, L> &m_a,
+                          const Eigen::Matrix<T, L, N> &m_b,
+                          const Eigen::Matrix<T, O, M> &m_c,
+                          const Eigen::Matrix<T, O, N> &m_d, const double ts,
+                          Eigen::Matrix<T, L, L> *ptr_a_d,
+                          Eigen::Matrix<T, L, N> *ptr_b_d,
+                          Eigen::Matrix<T, O, M> *ptr_c_d,
+                          Eigen::Matrix<T, O, N> *ptr_d_d) {
+  if (ts <= 0.0) {
+    AERROR << "ContinuousToDiscrete : ts is less than or equal to zero";
+    return false;
+  }
+
+  // Only matrix_a is mandatory to be non-zeros in matrix
+  // conversion.
+  if (m_a.rows() == 0) {
+    AERROR << "ContinuousToDiscrete: matrix_a size 0 ";
+    return false;
+  }
+
+  Eigen::Matrix<T, L, L> m_identity = Eigen::Matrix<T, L, L>::Identity();
+  *ptr_a_d = PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a) *
+             (m_identity + ts * 0.5 * m_a);
+
+  *ptr_b_d =
+      std::sqrt(ts) * PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a) * m_b;
+
+  *ptr_c_d =
+      std::sqrt(ts) * m_c * PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a);
+
+  *ptr_d_d =
+      0.5 * m_c * PseudoInverse<T, L>(m_identity - ts * 0.5 * m_a) * m_b + m_d;
+
+  return true;
 }
 
 }  // namespace math

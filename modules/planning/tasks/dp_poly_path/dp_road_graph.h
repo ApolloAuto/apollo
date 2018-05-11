@@ -88,8 +88,8 @@ class DPRoadGraph {
     common::SLPoint sl_point;
     const DPRoadGraphNode *min_cost_prev_node = nullptr;
     ComparableCost min_cost = {true, true, true,
-                               std::numeric_limits<double>::infinity(),
-                               std::numeric_limits<double>::infinity()};
+                               std::numeric_limits<float>::infinity(),
+                               std::numeric_limits<float>::infinity()};
     QuinticPolynomialCurve1d min_cost_curve;
   };
 
@@ -107,8 +107,8 @@ class DPRoadGraph {
   bool IsValidCurve(const QuinticPolynomialCurve1d &curve) const;
 
   void GetCurveCost(TrajectoryCost trajectory_cost,
-                    const QuinticPolynomialCurve1d &curve, const double start_s,
-                    const double end_s, const uint32_t curr_level,
+                    const QuinticPolynomialCurve1d &curve, const float start_s,
+                    const float end_s, const uint32_t curr_level,
                     const uint32_t total_level, ComparableCost *cost);
 
   void UpdateNode(const std::list<DPRoadGraphNode> &prev_nodes,

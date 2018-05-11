@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.perception.cnn_segmentation_config;
+
+message ModelConfigs {
+  optional string name = 1 [ default = "CNNSegmentation" ];
+  optional string version = 2 [ default = "1.0.0" ];
+  optional string config_file = 3 [ default = "modules/perception/model/cnn_segmentation/cnnseg.conf" ];
+  optional string proto_file = 4 [ default = "modules/perception/model/cnn_segmentation/deploy.prototxt" ];
+  optional string weight_file = 5 [ default = "modules/perception/model/cnn_segmentation/deploy.caffemodel" ];
+}

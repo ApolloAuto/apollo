@@ -18,26 +18,24 @@
 
 #include "modules/perception/obstacle/camera/converter/geometry_camera_converter.h"
 
+#include "modules/common/util/file.h"
+#include "modules/perception/common/perception_gflags.h"
+
 namespace apollo {
 namespace perception {
 
+using apollo::common::util::GetProtoFromFile;
+
 bool GeometryCameraConverter::Init() {
-  ConfigManager *config_manager = ConfigManager::instance();
-
-  const ModelConfig *model_config = config_manager->GetModelConfig(Name());
-  if (model_config == nullptr) {
-    AERROR << "Model config: " << Name() << " not found";
+  if (!GetProtoFromFile(FLAGS_geometry_camera_converter_config, &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_geometry_camera_converter_config;
     return false;
   }
 
-  std::string intrinsic_file_path = "";
-  if (!model_config->GetValue("camera_intrinsic_file", &intrinsic_file_path)) {
-    AERROR << "Failed to get camera intrinsics file path: " << Name();
-    return false;
-  }
-
-  if (!LoadCameraIntrinsics(intrinsic_file_path)) {
-    AERROR << "Failed to get camera intrinsics: " << intrinsic_file_path;
+  if (!LoadCameraIntrinsics(config_.camera_intrinsic_file())) {
+    AERROR << "Failed to get camera intrinsics: "
+           << config_.camera_intrinsic_file();
     return false;
   }
 
@@ -187,8 +185,8 @@ bool GeometryCameraConverter::ConvertSingle(
   mass_center_v = MakeUnit(mass_center_v);
 
   // Distance search
-  *distance = SearchDistance(pixel_length, use_width, mass_center_v,
-                             0.1f, 150.0f);
+  *distance =
+      SearchDistance(pixel_length, use_width, mass_center_v, 0.1f, 150.0f);
   for (size_t i = 0; i < 1; ++i) {
     // Mass center search
     SearchCenterDirection(box_center_pixel, *distance, &mass_center_v,
@@ -222,8 +220,8 @@ void GeometryCameraConverter::Rotate(
 
 float GeometryCameraConverter::SearchDistance(
     const int &pixel_length, const bool &use_width,
-    const Eigen::Matrix<float, 3, 1> &mass_center_v,
-    float close_d, float far_d) {
+    const Eigen::Matrix<float, 3, 1> &mass_center_v, float close_d,
+    float far_d) {
   float curr_d = 0.0f;
   int depth = 0;
   while (close_d <= far_d && depth < kMaxDistanceSearchDepth_) {

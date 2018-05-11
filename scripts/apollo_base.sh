@@ -333,7 +333,7 @@ function stop_customized_path() {
   MODULE_PATH=$1
   MODULE=$2
 
-  pkill -f "modules/${MODULE_PATH}/${MODULE}"
+  pkill -SIGKILL -f "modules/${MODULE_PATH}/${MODULE}"
   if [ $? -eq 0 ]; then
     echo "Successfully stopped module ${MODULE}."
   else
@@ -346,16 +346,20 @@ function stop() {
   stop_customized_path $MODULE $MODULE
 }
 
+# Note: This 'help' function here will overwrite the bash builtin command 'help'.
+# TODO: add a command to query known modules.
 function help() {
-  echo "Usage:
-  ./$0 [COMMAND]"
-  echo "COMMAND:
-  help: this help message
-  start: start the module in background
-  start_fe: start the module without putting in background
+cat <<EOF
+Invoke ". scripts/apollo_base.sh" within docker to add the following commands to the environment:
+Usage: COMMAND [<module_name>]
+
+COMMANDS:
+  help:      show this help message
+  start:     start the module in background
+  start_fe:  start the module without putting in background
   start_gdb: start the module with gdb
-  stop: stop the module
-  "
+  stop:      stop the module
+EOF
 }
 
 function run_customized_path() {
@@ -388,6 +392,19 @@ function run_customized_path() {
   esac
 }
 
+#write log to a file about the env when record a bag.
+function record_bag_env_log() {
+  TASK_ID=$(date +%Y-%m-%d-%H-%M)
+  commit=$(git log -1)
+  echo -e "Date:$(date)\n" >> Bag_Env_$TASK_ID.log
+  git branch | awk '/\*/ { print "current branch: " $2; }'  >> Bag_Env_$TASK_ID.log
+  echo -e "\nNewest commit:\n$commit"  >> Bag_Env_$TASK_ID.log
+  echo -e "\ngit diff:" >> Bag_Env_$TASK_ID.log
+  git diff >> Bag_Env_$TASK_ID.log
+  echo -e "\n\n\n\n" >> Bag_Env_$TASK_ID.log
+  echo -e "git diff --staged:" >> Bag_Env_$TASK_ID.log
+  git diff --staged >> Bag_Env_$TASK_ID.log
+}
 # run command_name module_name
 function run() {
   local module=$1

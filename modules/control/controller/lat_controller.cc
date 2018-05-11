@@ -124,6 +124,8 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 
   query_relative_time_ = control_conf->query_relative_time();
 
+  minimum_speed_protection_ = control_conf->minimum_speed_protection();
+
   return true;
 }
 
@@ -326,12 +328,20 @@ Status LatController::ComputeControlCommand(
     double steer_angle_limited =
         common::math::Clamp(steer_angle, -steer_limit, steer_limit);
     steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
-    cmd->set_steering_target(steer_angle_limited);
+    steer_angle = steer_angle_limited;
     debug->set_steer_angle_limited(steer_angle_limited);
   } else {
     steer_angle = digital_filter_.Filter(steer_angle);
-    cmd->set_steering_target(steer_angle);
   }
+
+  if (VehicleStateProvider::instance()->linear_velocity() <
+          FLAGS_lock_steer_speed &&
+      VehicleStateProvider::instance()->gear() == canbus::Chassis::GEAR_DRIVE &&
+      chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+    steer_angle = pre_steer_angle_;
+  }
+  pre_steer_angle_ = steer_angle;
+  cmd->set_steering_target(steer_angle);
 
   cmd->set_steering_rate(FLAGS_steer_angle_rate);
   // compute extra information for logging and debugging
@@ -428,15 +438,15 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
 }
 
 void LatController::UpdateMatrix() {
-  const double v =
-      std::max(VehicleStateProvider::instance()->linear_velocity(), 0.2);
+  const double v = std::max(VehicleStateProvider::instance()->linear_velocity(),
+                            minimum_speed_protection_);
   matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
   matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
   matrix_a_(3, 1) = matrix_a_coeff_(3, 1) / v;
   matrix_a_(3, 3) = matrix_a_coeff_(3, 3) / v;
   Matrix matrix_i = Matrix::Identity(matrix_a_.cols(), matrix_a_.cols());
-  matrix_ad_ = (matrix_i + ts_ * 0.5 * matrix_a_) *
-               (matrix_i - ts_ * 0.5 * matrix_a_).inverse();
+  matrix_ad_ = (matrix_i - ts_ * 0.5 * matrix_a_).inverse() *
+               (matrix_i + ts_ * 0.5 * matrix_a_);
 }
 
 void LatController::UpdateMatrixCompound() {

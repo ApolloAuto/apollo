@@ -76,3 +76,101 @@ proto_library(
         "modest_radar_detector_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "tracker_config_lib_proto",
+    deps = [
+        ":tracker_config_lib",
+    ],
+)
+
+proto_library(
+    name = "tracker_config_lib",
+    srcs = [
+        "tracker_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "sequence_type_fuser_config_lib_proto",
+    deps = [
+        ":sequence_type_fuser_config_lib",
+    ],
+)
+
+proto_library(
+    name = "sequence_type_fuser_config_lib",
+    srcs = [
+        "sequence_type_fuser_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "async_fusion_config_lib_proto",
+    deps = [
+        ":async_fusion_config_lib",
+    ],
+)
+
+proto_library(
+    name = "async_fusion_config_lib",
+    srcs = [
+        "async_fusion_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "geometry_camera_converter_config_lib_proto",
+    deps = [
+        ":geometry_camera_converter_config_lib",
+    ],
+)
+
+proto_library(
+    name = "geometry_camera_converter_config_lib",
+    srcs = [
+        "geometry_camera_converter_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "cnn_segmentation_config_lib_proto",
+    deps = [
+        ":cnn_segmentation_config_lib",
+    ],
+)
+
+proto_library(
+    name = "cnn_segmentation_config_lib",
+    srcs = [
+        "cnn_segmentation_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "hdmap_roi_filter_config_lib_proto",
+    deps = [
+        ":hdmap_roi_filter_config_lib",
+    ],
+)
+
+proto_library(
+    name = "hdmap_roi_filter_config_lib",
+    srcs = [
+        "hdmap_roi_filter_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "low_object_filter_config_lib_proto",
+    deps = [
+        ":low_object_filter_config_lib",
+    ],
+)
+
+proto_library(
+    name = "low_object_filter_config_lib",
+    srcs = [
+        "low_object_filter_config.proto",
+    ],
+)

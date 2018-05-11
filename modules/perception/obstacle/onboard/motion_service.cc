@@ -19,10 +19,10 @@
 #include <string>
 #include <unordered_map>
 
+#include "modules/common/time/time_util.h"
 #include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
-#include "modules/common/time/time_util.h"
 
 namespace apollo {
 namespace perception {
@@ -56,10 +56,10 @@ bool MotionService::InitInternal() {
   AINFO << "init MotionService success.";
   return true;
 }
-void MotionService::ImageCallback(const sensor_msgs::Image &message) {
+void MotionService::ImageCallback(const sensor_msgs::Image& message) {
   double curr_timestamp = message.header.stamp.toSec();
   ADEBUG << "motion received image : " << GLOG_TIMESTAMP(curr_timestamp)
-        << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
+         << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
 
   if (FLAGS_skip_camera_frame && camera_timestamp_ > 0.0) {
     if ((curr_timestamp - camera_timestamp_) < (1.0 / FLAGS_camera_hz) &&
@@ -82,7 +82,9 @@ void MotionService::OnLocalization(
   double vely = velocity.y();
   double velz = velocity.z();
   vehicle_status.velocity = sqrt(velx * velx + vely * vely + velz * velz);
-
+  vehicle_status.velocity_x = velx;
+  vehicle_status.velocity_y = vely;
+  vehicle_status.velocity_z = velz;
   double timestamp_diff = 0;
   if (!start_flag_) {
     start_flag_ = true;
@@ -92,6 +94,8 @@ void MotionService::OnLocalization(
     vehicle_status.time_ts = 0;
 
   } else {
+    vehicle_status.roll_rate = localization.pose().angular_velocity_vrf().x();
+    vehicle_status.pitch_rate = localization.pose().angular_velocity_vrf().y();
     vehicle_status.yaw_rate = localization.pose().angular_velocity_vrf().z();
     timestamp_diff = localization.measurement_time() - pre_timestamp_;
     vehicle_status.time_d = timestamp_diff;
@@ -115,8 +119,8 @@ void MotionService::OnLocalization(
   // double camera_timestamp = camera_shared_data_->GetLatestTimestamp();
   double camera_timestamp = 0;
   {
-     MutexLock lock(&image_mutex_);
-     camera_timestamp = camera_timestamp_;
+    MutexLock lock(&image_mutex_);
+    camera_timestamp = camera_timestamp_;
   }
   AINFO << "motion timestamp: " << std::to_string(camera_timestamp);
 
@@ -125,19 +129,19 @@ void MotionService::OnLocalization(
         std::numeric_limits<double>::epsilon()) {
       ADEBUG << "Motion_status: accum";
       vehicle_planemotion_->add_new_motion(
-          &vehicle_status, pre_camera_timestamp_, camera_timestamp,
-          PlaneMotion::ACCUM_MOTION);
+          pre_camera_timestamp_, camera_timestamp, PlaneMotion::ACCUM_MOTION,
+          &vehicle_status);
     } else if (camera_timestamp > pre_camera_timestamp_) {
       ADEBUG << "Motion_status: accum_push";
       vehicle_planemotion_->add_new_motion(
-          &vehicle_status, pre_camera_timestamp_, camera_timestamp,
-          PlaneMotion::ACCUM_PUSH_MOTION);
+          pre_camera_timestamp_, camera_timestamp,
+          PlaneMotion::ACCUM_PUSH_MOTION, &vehicle_status);
       PublishEvent(camera_timestamp);
     } else {
       ADEBUG << "Motion_status: pop";
-      vehicle_planemotion_->add_new_motion(
-          &vehicle_status, pre_camera_timestamp_, camera_timestamp,
-          PlaneMotion::RESET);
+      vehicle_planemotion_->add_new_motion(pre_camera_timestamp_,
+                                           camera_timestamp, PlaneMotion::RESET,
+                                           &vehicle_status);
     }
   }
 
@@ -203,7 +207,7 @@ double MotionService::GetLatestTimestamp() {
   return rst;
 }
 
-bool MotionService::GetMotionInformation(double timestamp, VehicleStatus *vs) {
+bool MotionService::GetMotionInformation(double timestamp, VehicleStatus* vs) {
   return vehicle_planemotion_->find_motion_with_timestamp(timestamp, vs);
 }
 }  // namespace perception

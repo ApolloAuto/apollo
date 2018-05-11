@@ -88,6 +88,9 @@ message ObjectSidePass {
 message ObjectAvoid {
 }
 
+message ObjectWait {
+}
+
 message ObjectDecisionType {
   oneof object_tag {
     ObjectIgnore ignore = 1;
@@ -98,6 +101,7 @@ message ObjectDecisionType {
     ObjectNudge nudge = 6;
     ObjectSidePass sidepass = 7;
     ObjectAvoid avoid = 8;
+    ObjectWait wait = 9;
   }
 }
 

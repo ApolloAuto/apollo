@@ -19,16 +19,11 @@ config: {
 }
 
 config: {
-  rule_id: FRONT_VEHICLE
-  enabled: true
-  front_vehicle {
-  }
-}
-config: {
   rule_id: CROSSWALK
   enabled: true
   crosswalk {
     stop_distance: 1.0
+    max_stop_deceleration: 6.0
     min_pass_s_distance: 1.0
     expand_s_distance: 2.0
     stop_strick_l_distance: 4.0
@@ -45,9 +40,23 @@ config: {
 }
 
 config: {
+  rule_id: FRONT_VEHICLE
+  enabled: true
+  front_vehicle {
+    enable_side_pass: true
+    side_pass_s_threshold: 15.0
+    side_pass_l_threshold: 1.0
+    side_pass_wait_time: 30.0
+    nudge_l_buffer: 0.5
+  }
+}
+
+config: {
   rule_id: KEEP_CLEAR
-  enabled: false
+  enabled: true
   keep_clear {
+    enable_keep_clear_zone: true
+    enable_junction: false
     min_pass_s_distance: 2.0
   }
 }
@@ -65,13 +74,8 @@ config: {
 config: {
   rule_id: REROUTING
   enabled: true
-}
-
-config: {
-  rule_id: SIDE_PASS_VEHICLE
-  enabled: true
-  side_pass_vehicle {
-    wait_time: 30.0
+  rerouting {
+    prepare_rerouting_time: 2.0
   }
 }
 
@@ -80,8 +84,10 @@ config: {
   enabled: true
   signal_light {
     stop_distance: 1.0
+    max_stop_deceleration: 6.0
     min_pass_s_distance: 4.0
     max_stop_deacceleration_yellow_light: 3.0
+    signal_expire_time_sec: 5.0
     righ_turn_creep {
       enabled: false
       min_boundary_t: 6.0
@@ -96,6 +102,7 @@ config: {
   enabled: true
   stop_sign {
     stop_distance: 1.0
+    max_stop_deceleration: 6.0
     min_pass_s_distance: 3.0
     max_stop_speed: 0.3
     max_valid_stop_distance: 3.0

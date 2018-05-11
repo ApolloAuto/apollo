@@ -38,7 +38,6 @@ DECLARE_bool(enable_reference_line_stitching);
 DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
 DECLARE_double(reference_line_lateral_buffer);
-DECLARE_double(prepare_rerouting_time);
 
 DECLARE_bool(enable_smooth_reference_line);
 
@@ -111,9 +110,7 @@ DECLARE_double(follow_time_buffer);
 DECLARE_double(follow_min_time_sec);
 DECLARE_double(stop_line_stop_distance);
 DECLARE_double(max_stop_speed);
-DECLARE_double(max_stop_deceleration);
 DECLARE_double(signal_light_min_pass_s_distance);
-DECLARE_double(signal_expire_time_sec);
 
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(destination_check_distance);

@@ -22,6 +22,8 @@
 #include <utility>
 #include <vector>
 
+#include "modules/perception/proto/tracker_config.pb.h"
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
@@ -35,34 +37,12 @@ namespace perception {
 
 class HmObjectTracker : public BaseTracker {
  public:
-  HmObjectTracker();
+  HmObjectTracker() = default;
   virtual ~HmObjectTracker() = default;
 
   // @brief initialize tracker's configs
   // @return true if initialize successfully, otherwise return false
   bool Init();
-
-  // @brief set matcher method
-  // @params[IN] matcher_method_name: name of mathcer method
-  // @return true if set successfully, otherwise return fasle
-  bool SetMatcherMethod(const std::string& matcher_method_name);
-
-  // @brief set collect consecutive invisible maximum
-  // @params[IN] collect_consecutive_invisible_maximum: collect consecutive
-  // invisible maximum
-  // @return true if set successfully, otherwise return fasle
-  bool SetCollectConsecutiveInvisibleMaximum(
-      const int& collect_consecutive_invisible_maximum);
-
-  // @brief set collect age minimum
-  // @params[IN] collect_age_minimum: collect age minimum
-  // @return true if set successfully, otherwise return fasle
-  bool SetCollectAgeMinimum(const int& collect_age_minimum);
-
-  // @brief set histogram bin size
-  // @params[IN] histogram_bin_size: histogram bin size
-  // @return true if set successfully, otherwise return fasle
-  bool SetHistogramBinSize(const int& histogram_bin_size);
 
   // @brief track detected objects over consecutive frames
   // @params[IN] objects: recently detected objects
@@ -87,9 +67,9 @@ class HmObjectTracker : public BaseTracker {
   // @params[IN] options: tracker options with necessary information
   // @params[OUT] tracked_objects: tracked objects with tracking information
   // @return true if initialize successfully, otherwise return false
-  bool Initialize(const std::vector<std::shared_ptr<Object>>& objects,
-                  const double& timestamp, const TrackerOptions& options,
-                  std::vector<std::shared_ptr<Object>>* tracked_objects);
+  bool InitializeTrack(const std::vector<std::shared_ptr<Object>>& objects,
+                       const double& timestamp, const TrackerOptions& options,
+                       std::vector<std::shared_ptr<Object>>* tracked_objects);
 
   // @brief transform v2world pose to v2local pose intend to avoid huge value
   // float computing
@@ -176,12 +156,7 @@ class HmObjectTracker : public BaseTracker {
 
  private:
   // algorithm setup
-  MatcherType matcher_method_;
-  FilterType filter_method_;
-  int collect_consecutive_invisible_maximum_ = 0;
-  int collect_age_minimum_ = 0;
   bool use_histogram_for_match_ = false;
-  int histogram_bin_size_ = 10;
 
   // matcher
   std::unique_ptr<BaseMatcher> matcher_;
@@ -193,6 +168,8 @@ class HmObjectTracker : public BaseTracker {
   Eigen::Vector3d global_to_local_offset_;
   double time_stamp_ = 0.0;
   bool valid_ = false;
+
+  tracker_config::ModelConfigs config_;
 
   DISALLOW_COPY_AND_ASSIGN(HmObjectTracker);
 };  // class HmObjectTracker

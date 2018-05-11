@@ -20,69 +20,40 @@
 #include "Eigen/Core"
 #include "Eigen/Dense"
 
+#include "modules/common/util/file.h"
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
 
+using apollo::common::util::GetProtoFromFile;
+
 bool MultiCamerasProjection::Init() {
-  ConfigManager *config_manager = ConfigManager::instance();
-  std::string model_name = "MultiCamerasProjection";
-  const ModelConfig *model_config = config_manager->GetModelConfig(model_name);
-  if (model_config == nullptr) {
-    AERROR << "not found model: " << model_name;
+  if (!GetProtoFromFile(FLAGS_traffic_light_multi_camera_projection_config,
+                        &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_traffic_light_multi_camera_projection_config;
     return false;
   }
-
   // Read camera names from config file
-  std::vector<std::string> camera_names;
-  std::string single_projection_name;
-  if (!model_config->GetValue("camera_names", &camera_names)) {
-    AERROR << "camera_names not found." << name();
-    return false;
-  }
-  if (!model_config->GetValue("SingleProjection", &single_projection_name)) {
-    AERROR << "SingleProjection not found." << name();
-    return false;
-  }
-
-  AINFO << "number of camera_names: " << camera_names.size();
-  AINFO << "SingleProjection name: " << single_projection_name;
+  const std::string &single_projection_name =
+      config_.multi_camera_projection_config().single_projection();
 
   // Read each camera's config
-  std::string camera_extrinsic_file;
-  std::string camera_intrinsic_file;
   std::unordered_map<std::string, CameraCoeffient> camera_coeffients;
-  for (size_t i = 0; i < camera_names.size(); ++i) {
-    const auto &camera_model_name = camera_names[i];
-    const ModelConfig *camera_model_config =
-        config_manager->GetModelConfig(camera_model_name);
-    if (camera_model_config == nullptr) {
-      AERROR << "not found camera model: " << camera_model_name;
-      return false;
-    }
-
-    if (!camera_model_config->GetValue("camera_extrinsic_file",
-                                       &camera_extrinsic_file)) {
-      AERROR << "camera_extrinsic_file not found." << name();
-      return false;
-    }
-    if (!camera_model_config->GetValue("camera_intrinsic_file",
-                                       &camera_intrinsic_file)) {
-      AERROR << "camera_intrinsic_file not found." << name();
-      return false;
-    }
-
+  for (const auto &camera_focus_config :
+       config_.multi_camera_projection_config().camera_focus_config()) {
+    const auto &camera_model_name = camera_focus_config.name();
     CameraCoeffient camera_coeffient;
-    if (!camera_coeffient.init(camera_model_name, camera_extrinsic_file,
-                               camera_intrinsic_file)) {
+    if (!camera_coeffient.init(camera_model_name,
+                               camera_focus_config.camera_extrinsic_file(),
+                               camera_focus_config.camera_intrinsic_file())) {
       AERROR << camera_model_name << " Projection init failed.";
       return false;
     }
-    AINFO << "init " << camera_names[i] << " coeffient succeeded.";
-    camera_coeffients[camera_names[i]] = camera_coeffient;
-    camera_names_.push_back(camera_names[i]);
+    camera_coeffients[camera_model_name] = camera_coeffient;
+    camera_names_.push_back(camera_model_name);
   }
 
   projection_.reset(

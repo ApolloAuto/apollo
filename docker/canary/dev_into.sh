@@ -16,7 +16,6 @@
 # limitations under the License.
 ###############################################################################
 
-# Fail on first error.
-set -e
-
-apt-get install -y libceres-dev
+xhost +local:root 1>/dev/null 2>&1
+docker exec -it apollo_dev /bin/bash
+xhost -local:root 1>/dev/null 2>&1

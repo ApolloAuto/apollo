@@ -218,9 +218,6 @@ void DrawDetection(const PointCloudPtr &pc_ptr, const PointIndices &valid_idx,
 }
 
 TEST_F(CNNSegmentationTest, test_cnnseg_det) {
-  FLAGS_work_root = "modules/perception";
-  FLAGS_config_manager_path = "./conf/config_manager.config";
-
   // generate input point cloud data
   const string in_pcd_file = FLAGS_test_dir + FLAGS_pcd_name + ".pcd";
   AINFO << "pcd file: " << in_pcd_file;

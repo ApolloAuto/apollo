@@ -137,6 +137,9 @@ class GLFWFusionViewer {
 
   void render();
 
+  void project_point(const Eigen::VectorXf &in, Eigen::Vector2f *out,
+      const MotionType &motion_matrix);
+
  protected:
   vec3 get_velocity_src_position(const std::shared_ptr<Object> &object);
 
@@ -225,16 +228,22 @@ class GLFWFusionViewer {
   FrameContent *frame_content_;
   unsigned char *rgba_buffer_;
 
-  double vao_trans_x_;
-  double vao_trans_y_;
-  double vao_trans_z_;
-  double _Rotate_x;
-  double _Rotate_y;
-  double _Rotate_z;
+  float vao_trans_x_;
+  float vao_trans_y_;
+  float vao_trans_z_;
+  float _Rotate_x;
+  float _Rotate_y;
+  float _Rotate_z;
+  float _Scale_x;
+  float _Scale_y;
+  float _Scale_z;
   bool show_box;
   bool show_velocity;
   bool show_polygon;
   bool show_text;
+  bool show_help_text;
+  std::string help_str;
+
 
   void get_class_color(int cls, float rgb[3]);
 
@@ -262,16 +271,15 @@ class GLFWFusionViewer {
   GLuint image_to_gl_texture(const cv::Mat &mat, GLenum min_filter,
                              GLenum mag_filter, GLenum wrap_filter);
 
-  void draw_camera_frame(FrameContent *content);
-
   // @brief, draw 2d camera frame, show 2d or 3d classification
-  void draw_camera_frame(FrameContent *content, bool show_3d_class);
+  void draw_camera_frame(FrameContent *content, cv::Mat *image_mat,
+                         bool show_3d_class = false);
 
   // @brief: draw lane objects in ego-car ground (vehicle) space
   void draw_lane_objects_ground();
 
   // @brief: draw lane objects in image space
-  bool draw_lane_objects_image();
+  bool draw_lane_objects_image(cv::Mat *image_mat);
 
   bool use_class_color_ = true;
 
@@ -301,17 +309,22 @@ class GLFWFusionViewer {
 
   LaneObjectsPtr lane_objects_;
   float lane_map_threshold_;
+  int lane_start_y_pos_;
+  float lane_map_scale_;
 
   LaneObjectsPtr lane_history_;
   //  std::vector<LaneObjects> Lane_history_buffer_;
   const std::size_t lane_history_buffer_size_ = 400;
   const std::size_t object_history_size_ = 5;
-  Eigen::Matrix3f motion_matrix_;
+  MotionType motion_matrix_;
   // pin-hole camera model with distortion
   std::shared_ptr<CameraDistort<double>> distort_camera_intrinsic_;
 
   // frame count
   int frame_count_;
+  // alpha_blending factor for visualization
+  float alpha_blending = 0.5;  // [0..1]
+  float one_minus_alpha = 1.0 - alpha_blending;
   // object_trajectories
   std::map<int, std::vector<std::pair<float, float>>> object_trackjectories_;
   std::map<int, std::vector<double>> object_timestamps_;

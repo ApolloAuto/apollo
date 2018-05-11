@@ -21,11 +21,11 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_HANDLERS_IMAGE_HANDLER_H_
 #define MODULES_DREAMVIEW_BACKEND_HANDLERS_IMAGE_HANDLER_H_
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <string>
 #include <vector>
-
 #include "cv_bridge/cv_bridge.h"
 
 #include "CivetServer.h"
@@ -57,6 +57,7 @@ class ImageHandler : public CivetHandler {
   void OnImage(const SensorMsgsImage &image);
 
   std::vector<uchar> send_buffer_;
+  std::atomic<int> requests_;
 
   // mutex lock and condition variable to protect the received image
   std::mutex mutex_;

@@ -33,7 +33,6 @@
 #include "modules/planning/tasks/traffic_decider/keep_clear.h"
 #include "modules/planning/tasks/traffic_decider/reference_line_end.h"
 #include "modules/planning/tasks/traffic_decider/rerouting.h"
-#include "modules/planning/tasks/traffic_decider/side_pass_vehicle.h"
 #include "modules/planning/tasks/traffic_decider/signal_light.h"
 #include "modules/planning/tasks/traffic_decider/stop_sign.h"
 
@@ -51,45 +50,42 @@ void TrafficDecider::RegisterRules() {
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new BacksideVehicle(config);
                           });
-  s_rule_factory.Register(TrafficRuleConfig::REROUTING,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new Rerouting(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::REFERENCE_LINE_END,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new ReferenceLineEnd(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::DESTINATION,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new Destination(config);
-                          });
   s_rule_factory.Register(TrafficRuleConfig::CHANGE_LANE,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new ChangeLane(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::SIGNAL_LIGHT,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new SignalLight(config);
                           });
   s_rule_factory.Register(TrafficRuleConfig::CROSSWALK,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new Crosswalk(config);
                           });
-  s_rule_factory.Register(TrafficRuleConfig::STOP_SIGN,
+
+  s_rule_factory.Register(TrafficRuleConfig::DESTINATION,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new StopSign(config);
+                            return new Destination(config);
                           });
-  s_rule_factory.Register(TrafficRuleConfig::SIDE_PASS_VEHICLE,
+  s_rule_factory.Register(TrafficRuleConfig::FRONT_VEHICLE,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new SidePassVehicle(config);
+                            return new FrontVehicle(config);
                           });
   s_rule_factory.Register(TrafficRuleConfig::KEEP_CLEAR,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new KeepClear(config);
                           });
-  s_rule_factory.Register(TrafficRuleConfig::FRONT_VEHICLE,
+  s_rule_factory.Register(TrafficRuleConfig::REFERENCE_LINE_END,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new FrontVehicle(config);
+                            return new ReferenceLineEnd(config);
+                          });
+  s_rule_factory.Register(TrafficRuleConfig::REROUTING,
+                          [](const TrafficRuleConfig &config) -> TrafficRule * {
+                            return new Rerouting(config);
+                          });
+  s_rule_factory.Register(TrafficRuleConfig::SIGNAL_LIGHT,
+                          [](const TrafficRuleConfig &config) -> TrafficRule * {
+                            return new SignalLight(config);
+                          });
+  s_rule_factory.Register(TrafficRuleConfig::STOP_SIGN,
+                          [](const TrafficRuleConfig &config) -> TrafficRule * {
+                            return new StopSign(config);
                           });
 }
 

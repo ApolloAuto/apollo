@@ -157,3 +157,36 @@ DEFINE_string(
 DEFINE_string(modest_radar_detector_config,
               "modules/perception/model/modest_radar_detector_config.pb.txt",
               "modest radar detector config filename.");
+DEFINE_string(tracker_config, "modules/perception/model/tracker_config.pb.txt",
+              "tracker config filename.");
+DEFINE_string(sequence_type_fuser_config,
+              "modules/perception/model/sequence_type_fuser_config.pb.txt",
+              "sequence_type_fuser config filename.");
+DEFINE_string(async_fusion_config,
+              "modules/perception/model/async_fusion_config.pb.txt",
+              "async_fuser config filename.");
+DEFINE_string(
+    geometry_camera_converter_config,
+    "modules/perception/model/camera/geometry_camera_converter_config.pb.txt",
+    "geometry_camera_converter config filename.");
+DEFINE_string(cnn_segmentation_config,
+              "modules/perception/model/cnn_segmentation_config.pb.txt",
+              "cnn segmentation config filename.");
+DEFINE_string(hdmap_roi_filter_config,
+              "modules/perception/model/hdmap_roi_filter_config.pb.txt",
+              "hdmap ROI filter config filename.");
+DEFINE_string(low_object_filter_config,
+              "modules/perception/model/low_object_filter_config.pb.txt",
+              "low object filter config filename.");
+DEFINE_string(traffic_light_multi_camera_projection_config,
+              "modules/perception/model/traffic_light/"
+              "multi_camera_projection_config.pb.txt",
+              "traffic light multi camera projection config filename.");
+DEFINE_string(traffic_light_recognizer_config,
+              "modules/perception/model/traffic_light/"
+              "recognizer_config.pb.txt",
+              "traffic light recognizer config filename.");
+DEFINE_string(traffic_light_preprocessor_config,
+              "modules/perception/model/traffic_light/"
+              "preprocessor_config.pb.txt",
+              "traffic light preprocessor config filename.");

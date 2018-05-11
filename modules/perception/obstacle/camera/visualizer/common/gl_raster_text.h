@@ -41,7 +41,9 @@ class GLRasterText {
 
   void init();
 
-  void print_string(const char *s);
+  void print_string(const std::string s);
+  void print_multiline(const std::string s, int top_left_x, int top_left_y);
+
 
  private:
   void make_raster_font();

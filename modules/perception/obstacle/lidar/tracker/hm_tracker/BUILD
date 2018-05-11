@@ -33,6 +33,7 @@ cc_library(
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/lidar/interface",
         "//modules/perception/obstacle/onboard:hdmapinput",
+        "//modules/perception/proto:tracker_config_lib_proto",
         "@eigen",
         "@pcl",
     ],
