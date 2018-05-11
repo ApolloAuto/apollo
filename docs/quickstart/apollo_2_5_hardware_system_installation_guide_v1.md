@@ -218,7 +218,7 @@ For more information about the NovAtel GPS-703-GGG-HV, see:
 
 ### Option 2: **Dual NovAtel GNSS-502** 
 
-**NOTE:**The GPS NovAtel GNSS-502 works with either model of the two GPS-IMU options that are described in the previous section, Global Positioning System (GPS) and Inertial Measurement Unit (IMU).  Dual antenna receivers, such as the ProPak6 can take advantage of better quality heading information, by using 2 antennas.
+**NOTE:**The NovAtel GNSS-502 works with either model of the two GPS-IMU options that are described in the previous section, Global Positioning System (GPS) and Inertial Measurement Unit (IMU).  Dual antenna receivers, such as the ProPak6 can take advantage of better quality heading information, by using 2 antennas.
 
 ![gps_receiver](images/novatel_gnss-502.png)
 
