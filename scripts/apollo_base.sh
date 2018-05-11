@@ -392,6 +392,19 @@ function run_customized_path() {
   esac
 }
 
+#write log to a file about the env when record a bag.
+function record_bag_env_log() {
+  TASK_ID=$(date +%Y-%m-%d-%H-%M)
+  commit=$(git log -1)
+  echo -e "Date:$(date)\n" >> Bag_Env_$TASK_ID.log
+  git branch | awk '/\*/ { print "current branch: " $2; }'  >> Bag_Env_$TASK_ID.log
+  echo -e "\nNewest commit:\n$commit"  >> Bag_Env_$TASK_ID.log
+  echo -e "\ngit diff:" >> Bag_Env_$TASK_ID.log
+  git diff >> Bag_Env_$TASK_ID.log
+  echo -e "\n\n\n\n" >> Bag_Env_$TASK_ID.log
+  echo -e "git diff --staged:" >> Bag_Env_$TASK_ID.log
+  git diff --staged >> Bag_Env_$TASK_ID.log
+}
 # run command_name module_name
 function run() {
   local module=$1

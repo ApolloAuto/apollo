@@ -26,6 +26,7 @@ function start() {
   cd "${TASK_DIR}"
 
   # Start recording.
+  record_bag_env_log
   LOG="/tmp/apollo_record.out"
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
