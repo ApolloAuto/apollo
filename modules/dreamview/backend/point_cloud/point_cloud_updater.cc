@@ -37,15 +37,11 @@ using sensor_msgs::PointCloud2;
 using Json = nlohmann::json;
 
 PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
-    : websocket_(websocket) {
+    : websocket_(websocket), point_cloud_str_(""), future_ready_(true) {
   RegisterMessageHandlers();
-  point_cloud_str_ = "";
-  future_ready_ = true;
 }
 
-PointCloudUpdater::~PointCloudUpdater() {
-  Stop();
-}
+PointCloudUpdater::~PointCloudUpdater() { Stop(); }
 
 void PointCloudUpdater::RegisterMessageHandlers() {
   // Send current point_cloud status to the new client.
@@ -119,18 +115,19 @@ void PointCloudUpdater::UpdatePointCloud(const PointCloud2 &point_cloud) {
     pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr(
         new pcl::PointCloud<pcl::PointXYZ>);
     pcl::fromROSMsg(point_cloud, *pcl_ptr);
-    std::future<void> f = std::async(
-        std::launch::async, &PointCloudUpdater::FilterPointCloud, this,
-        pcl_ptr);
+    std::future<void> f =
+        std::async(std::launch::async, &PointCloudUpdater::FilterPointCloud,
+                   this, pcl_ptr);
     async_future_ = std::move(f);
   }
 }
 
 void PointCloudUpdater::FilterPointCloud(
     const pcl::PointCloud<pcl::PointXYZ>::Ptr &pcl_ptr) {
-  pcl::VoxelGrid < pcl::PointXYZ > voxel_grid;
+  pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
   voxel_grid.setInputCloud(pcl_ptr);
-  voxel_grid.setLeafSize(1.0f, 1.0f, 0.2f);
+  voxel_grid.setLeafSize(FLAGS_voxel_filter_size, FLAGS_voxel_filter_size,
+                         FLAGS_voxel_filter_height);
   voxel_grid.filter(*pcl_ptr);
   AINFO << "filtered point cloud data size: " << pcl_ptr->size();
 
