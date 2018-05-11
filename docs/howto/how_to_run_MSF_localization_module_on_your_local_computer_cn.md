@@ -20,6 +20,10 @@
   cp DATA_PATH/params/velodyne64_novatel_extrinsics_example.yaml /apollo/modules/localization/msf/params/velodyne_params/
   cp DATA_PATH/params/velodyne64_height.yaml /apollo/modules/localization/msf/params/velodyne_params/
 ```
+各个外参的意义
+ - ant_imu_leverarm.yaml： 杆臂值参数，GNSS天线相对Imu的距离
+ - velodyne64_novatel_extrinsics_example.yaml： Lidar相对Imu的外参
+ - velodyne64_height.yaml： Lidar相对地面的高度
 
 ### 2.2 配置地图路径
 在/apollo/modules/localization/conf/localization.conf中添加关于地图路径的配置
@@ -61,6 +65,9 @@ rosbag play *.bag
 该脚本会在后台运行录包程序，并将存放路径输出到终端上。
 
 ### 可视化定位结果
+
+运行可视化工具
+
 ```
 ./scripts/localization_online_visualizer.sh
 ```
@@ -76,6 +83,15 @@ rosbag play *.bag
 可视化效果如下
 ![1](images/msf_localization/online_visualizer.png)
 
+如果发现可视化工具运行时卡顿，可使用如下命令重新编译可视化工具
+
+```
+cd /apollo
+bazel build -c opt //modules/localization/msf/local_tool/local_visualization/online_visual:online_local_visualizer
+```
+
+编译选项-c opt优化程序性能，从而使可视化工具可以实时运行。
+
 ## 6. 结束运行定位模块
 
 ```
@@ -90,11 +106,11 @@ rosbag play *.bag
 
 ## 7. 验证定位结果（可选）
 
-假设步骤5中录取的数据存放路径为OUTPUT_PATH
+假设步骤5中录取的数据存放路径为OUTPUT_PATH，杆臂值外参的路径为ANT_IMU_PATH
 
 运行脚本
 ```
-./scripts/msf_local_evaluation.sh OUTPUT_PATH
+./scripts/msf_local_evaluation.sh OUTPUT_PATH ANT_IMU_PATH
 ```
 该脚本会以RTK定位模式为基准，将多传感器融合模式的定位结果进行对比。
 
@@ -104,7 +120,7 @@ rosbag play *.bag
 
 ![2](images/msf_localization/localization_result.png)
 
-可以看到两组统计结果，第一组是组合导航(输出频率200hz)的统计结果，第二组是点云定位(输出频率5hz)的统计结果。
+可以看到两组统计结果，第一组是组合导航(输出频率200hz)的统计结果，第二组是点云定位(输出频率5hz)的统计结果，第三组是GNSS定位(输出频率约1hz)的统计结果。
 
 表格中各项的意义， 
  - error：  平面误差，单位为米
