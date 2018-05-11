@@ -48,6 +48,7 @@ class StopSign : public TrafficRule {
                      ReferenceLineInfo* const reference_line_info);
   bool FindNextStopSign(ReferenceLineInfo* const reference_line_info);
   int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
+  bool CheckCreep(const hdmap::StopSignInfo& stop_sign_info);
   int ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
                         const hdmap::StopSignInfo& stop_sign_info,
                         StopSignLaneVehicles* watch_vehicles);
@@ -62,11 +63,11 @@ class StopSign : public TrafficRule {
                          StopSignLaneVehicles* watch_vehicles);
   int ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
                         StopSignLaneVehicles* watch_vehicles);
-  bool BuildStopDecision(Frame* const frame,
-                         ReferenceLineInfo* const reference_line_info,
-                         hdmap::PathOverlap* const overlap,
-                         const double stop_distance);
-  bool CheckCreep(const hdmap::StopSignInfo& stop_sign_info);
+  int BuildStopDecision(Frame* const frame,
+                        ReferenceLineInfo* const reference_line_info,
+                        hdmap::PathOverlap* const overlap,
+                        const double stop_distance,
+                        StopSignLaneVehicles* watch_vehicles);
 
  private:
   static constexpr char const* const STOP_SIGN_VO_ID_PREFIX = "SS_";

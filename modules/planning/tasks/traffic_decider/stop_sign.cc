@@ -122,7 +122,8 @@ void StopSign::MakeDecisions(Frame* frame,
             reference_line_info->AdcSlBoundary().end_s());
     BuildStopDecision(frame, reference_line_info,
                       const_cast<PathOverlap*>(next_overlap),
-                      config_.stop_sign().creep().stop_distance());
+                      config_.stop_sign().creep().stop_distance(),
+                      nullptr);
   } else {
     // stop decision
     double stop_deceleration = util::GetADCStopDeceleration(
@@ -131,13 +132,10 @@ void StopSign::MakeDecisions(Frame* frame,
     if (stop_deceleration < config_.stop_sign().max_stop_deceleration()) {
       BuildStopDecision(frame, reference_line_info,
                         const_cast<PathOverlap*>(next_stop_sign_overlap_),
-                        config_.stop_sign().stop_distance());
+                        config_.stop_sign().stop_distance(),
+                        &watch_vehicles);
     }
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] STOP";
-
-    if (stop_status_ == StopSignStatus::WAIT) {
-      // wait decision(s)
-    }
   }
 }
 
@@ -226,6 +224,18 @@ int StopSign::GetAssociatedLanes(const StopSignInfo& stop_sign_info) {
   }
 
   return 0;
+}
+
+/**
+ * @brief: check if next step of CREEP or not
+ */
+bool StopSign::CheckCreep(const hdmap::StopSignInfo& stop_sign_info) {
+  if (config_.stop_sign().creep().enabled() &&
+      (stop_sign_info.stop_sign().type() == hdmap::StopSign::ONE_WAY ||
+       stop_sign_info.stop_sign().type() == hdmap::StopSign::TWO_WAY)) {
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -480,7 +490,7 @@ int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
   auto over_lap_info = assoc_lane_it->second.get()->GetObjectOverlapInfo(
       obstacle_lane.get()->id());
   if (over_lap_info == nullptr) {
-    ADEBUG << "can't find over_lap_info for id: " << obstable_lane_id;
+    AERROR << "can't find over_lap_info for id: " << obstable_lane_id;
     return -1;
   }
   double stop_line_s = over_lap_info->lane_overlap_info().start_s();
@@ -632,8 +642,9 @@ int StopSign::RemoveWatchVehicle(
   return 0;
 }
 
-int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
-                                StopSignLaneVehicles* watch_vehicles) {
+int StopSign::ClearWatchVehicle(
+    ReferenceLineInfo* const reference_line_info,
+    StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(reference_line_info);
   CHECK_NOTNULL(watch_vehicles);
 
@@ -686,10 +697,15 @@ int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
   return 0;
 }
 
-bool StopSign::BuildStopDecision(Frame* frame,
-                                 ReferenceLineInfo* const reference_line_info,
-                                 PathOverlap* const overlap,
-                                 const double stop_distance) {
+/**
+ * @brief: build stop decision
+ */
+int StopSign::BuildStopDecision(
+    Frame* frame,
+    ReferenceLineInfo* const reference_line_info,
+    PathOverlap* const overlap,
+    const double stop_distance,
+    StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
   CHECK_NOTNULL(overlap);
@@ -698,7 +714,7 @@ bool StopSign::BuildStopDecision(Frame* frame,
   const auto& reference_line = reference_line_info->reference_line();
   if (!WithinBound(0.0, reference_line.Length(), overlap->start_s)) {
     ADEBUG << "stop_sign " << overlap->object_id << " is not on reference line";
-    return true;
+    return 0;
   }
 
   // create virtual stop wall
@@ -707,12 +723,12 @@ bool StopSign::BuildStopDecision(Frame* frame,
       reference_line_info, virtual_obstacle_id, overlap->start_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
-    return false;
+    return -1;
   }
   PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
     AERROR << "Failed to create path_obstacle for: " << virtual_obstacle_id;
-    return false;
+    return -1;
   }
 
   // build stop decision
@@ -729,20 +745,23 @@ bool StopSign::BuildStopDecision(Frame* frame,
   stop_decision->mutable_stop_point()->set_y(stop_point.y());
   stop_decision->mutable_stop_point()->set_z(0.0);
 
+  if (stop_status_ == StopSignStatus::WAIT) {
+    if (watch_vehicles != nullptr && !watch_vehicles->empty()) {
+      for (auto it = watch_vehicles->begin();
+          it != watch_vehicles->end(); ++it) {
+        for (size_t i = 0; i < it->second.size(); ++i) {
+          std::string obstacle_id = it->second[i];
+          stop_decision->add_wait_for_obstacle(obstacle_id);
+        }
+      }
+    }
+  }
+
   auto* path_decision = reference_line_info->path_decision();
   path_decision->AddLongitudinalDecision(
       TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 
-  return true;
-}
-
-bool StopSign::CheckCreep(const hdmap::StopSignInfo& stop_sign_info) {
-  if (config_.stop_sign().creep().enabled() &&
-      (stop_sign_info.stop_sign().type() == hdmap::StopSign::ONE_WAY ||
-       stop_sign_info.stop_sign().type() == hdmap::StopSign::TWO_WAY)) {
-    return true;
-  }
-  return false;
+  return 0;
 }
 
 }  // namespace planning
