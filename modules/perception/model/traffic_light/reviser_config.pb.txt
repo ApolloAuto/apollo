@@ -1,0 +1,12 @@
+hmm_reviser_config {
+  name: "HMMReviser"
+  version: "1.0.0"
+  param_file: "data/models/reviser/reviser.prototxt"
+}
+
+color_reviser_config {
+  name: "ColorReviser"
+  version: "1.0.0"
+  enable: 1
+  blink_time: 1.5
+}
