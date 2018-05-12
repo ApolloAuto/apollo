@@ -137,7 +137,7 @@ class GLFWFusionViewer {
 
   void render();
 
-  void project_point(const Eigen::VectorXf &in, Eigen::Vector2f *out,
+  float project_point(const Eigen::VectorXf &in, Eigen::Vector2f *out,
       const MotionType &motion_matrix);
 
  protected:
@@ -149,7 +149,7 @@ class GLFWFusionViewer {
   void draw_car_trajectory(FrameContent *content);
   void draw_trajectories(FrameContent *content);
 
-  void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius);
+  void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius, GLfloat z = 0);
 
   // for drawing camera 2d results
  protected:
@@ -313,8 +313,9 @@ class GLFWFusionViewer {
   float lane_map_scale_;
 
   LaneObjectsPtr lane_history_;
+  std::vector<std::vector<float>> z_history_;
   //  std::vector<LaneObjects> Lane_history_buffer_;
-  const std::size_t lane_history_buffer_size_ = 400;
+  const std::size_t lane_history_buffer_size_ = 40000;
   const std::size_t object_history_size_ = 5;
   MotionType motion_matrix_;
   // pin-hole camera model with distortion

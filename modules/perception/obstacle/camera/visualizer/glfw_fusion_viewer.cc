@@ -585,6 +585,11 @@ void GLFWFusionViewer::render() {
       lane_objects_ =
           std::make_shared<LaneObjects>(frame_content_->get_lane_objects());
       if (draw_lane_objects_) {
+        const MotionBuffer& motion_buffer = frame_content_->get_motion_buffer();
+        int n = motion_buffer.size();
+        if (n > 0) {
+          motion_matrix_ = motion_buffer[n-1].motion;
+        }
         draw_lane_objects_ground();
       }
     }
@@ -1023,6 +1028,7 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
     //    }
     while (lane_history_->size() < lane_objects_->size()) {
       lane_history_->push_back(LaneObject());
+      z_history_.push_back(std::vector<float>());
     }
   }
   for (size_t k = 0; k < lane_objects_->size(); ++k) {
@@ -1033,19 +1039,24 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
 
     if (FLAGS_show_motion_track) {
       auto& lane_history_pos = lane_history_->at(k).pos;
+      auto& lane_z_history = z_history_.at(k);
       // update lane history by projecting motion
-      for (auto& p : lane_history_pos) {
+//      for (auto& p : lane_history_pos) {
+      for (int i = 0; i < lane_history_pos.size(); i++) {
+        auto &p = lane_history_pos[i];
+        auto &z = lane_z_history[i];
         Eigen::VectorXf point_h =
           Eigen::VectorXf::Zero(motion_matrix_.cols());
         point_h[0] = p[0];
         point_h[1] = p[1];
+        point_h[2] = z;
         point_h[motion_matrix_.cols()-1] = 1.0;
 
         Eigen::Vector2f proj_h;
-        project_point(point_h, &proj_h, motion_matrix_);
-        p[0] = proj_h[0];
-        p[1] = proj_h[1];
+        z = project_point(point_h, &proj_h, motion_matrix_);
+        p = proj_h;
       }
+      AINFO << "lane_history_pos.size(): " << lane_history_pos.size();
       // add new point
       for (auto p = lane_objects_->at(k).pos.begin();
            p != lane_objects_->at(k).pos.end(); ++p) {
@@ -1053,17 +1064,22 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
         point_poly[1] = GetPolyValue(a, b, c, d, point_poly[0]);
 
         lane_history_pos.push_back(point_poly);
+        lane_z_history.push_back(0);
         if (lane_history_pos.size() > lane_history_buffer_size_) {
           lane_history_pos.erase(lane_history_pos.begin());
+          lane_z_history.erase(lane_z_history.begin());
         }
       }
 
-      glColor3f(1.0f, 0.0f, 0.0f);  // red
+//      glColor3f(1.0f, 0.0f, 0.0f);  // red
       glLineWidth(1);
       glBegin(GL_LINE_STRIP);
-      for (auto p : lane_history_pos) {
+      for (int i = 0; i < lane_history_pos.size(); i++) {
+        auto &p = lane_history_pos[i];
+        auto &z = lane_z_history[i];
         //          glVertex2f(p[0], p[1]);
-        drawHollowCircle(p[0], p[1], 0.2);
+        drawHollowCircle(p[0], p[1], 0.2, z);
+//        AINFO << "("<<p[0] << ", "<< p[1] << "), ";
       }
       glEnd();
       glFlush();
@@ -1855,7 +1871,8 @@ void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
 }
 */
 
-void GLFWFusionViewer::drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
+void GLFWFusionViewer::drawHollowCircle(GLfloat x,
+        GLfloat y, GLfloat radius, GLfloat z) {
   // number of triangles used to draw circle
   GLfloat lineAmount = 100.0f;
 
@@ -1863,19 +1880,21 @@ void GLFWFusionViewer::drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
 
   glBegin(GL_LINE_LOOP);
   for (GLfloat i = 0.0f; i <= lineAmount; i++) {
-    glVertex2f(x + (radius * cos(i * twicePi / lineAmount)),
-               y + (radius * sin(i * twicePi / lineAmount)));
+    glVertex3f(x + (radius * cos(i * twicePi / lineAmount)),
+               y + (radius * sin(i * twicePi / lineAmount)),
+               z);
   }
   glEnd();
 }
 
-void GLFWFusionViewer::project_point(const Eigen::VectorXf &in,
+float GLFWFusionViewer::project_point(const Eigen::VectorXf &in,
                                     Eigen::Vector2f *out,
                                     const MotionType &motion_matrix) {
   CHECK(in.rows() == motion_matrix.cols());
   CHECK_GT(in.rows(), 2);
   Eigen::VectorXf proj = motion_matrix * in;
   *out << proj[0], proj[1];
+  return proj[2];
 }
 
 void GLFWFusionViewer::draw_car_trajectory(FrameContent* content) {
@@ -1890,8 +1909,9 @@ void GLFWFusionViewer::draw_car_trajectory(FrameContent* content) {
     //  Eigen::Matrix3f tmp = motion_buffer[i].motion;
     //  point = tmp * center;
     Eigen::Vector2f point;
-    project_point(center, &point,  motion_buffer[i].motion);
-    drawHollowCircle(point(0), point(1), 0.2);
+    float z = project_point(center, &point,  motion_buffer[i].motion);
+    drawHollowCircle(point(0), point(1), 0.2, z*10);
+//    AINFO << "Z value is: "<< z;
     glFlush();
   }
 }
