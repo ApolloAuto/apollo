@@ -1749,6 +1749,7 @@ decision {
             z: 0
           }
           stop_heading: -1.7956440493244505
+          wait_for_obstacle: "11720"
         }
       }
     }

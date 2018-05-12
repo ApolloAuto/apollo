@@ -24,6 +24,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/common",
         "//modules/perception/proto:perception_proto",
+        "//modules/perception/proto/traffic_light:rectifier_config_lib_proto",
         "//modules/perception/traffic_light/base",
         "//modules/perception/traffic_light/interface",
     ],
@@ -35,6 +36,7 @@ cc_test(
     srcs = [
         "crop_test.cc",
         "select_test.cc",
+        "unity_rectify_test.cc",
     ],
     data = [
         "//modules/perception:perception_data",

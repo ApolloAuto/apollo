@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.perception.traffic_light.preprocessor_config;
+
+message ModelConfigs {
+  optional string name = 1 [ default = "TLPreprocessor" ];
+  optional string version = 2 [ default = "1.0.0" ];
+  optional int32 max_cached_lights_size = 3 [ default = 100 ];
+  optional int32 projection_image_cols = 4 [ default = 1920 ];
+  optional int32  projection_image_rows = 5 [ default = 1080 ];
+  optional float sync_interval_seconds = 6 [ default = 0.1 ];
+  optional float no_signals_interval_seconds = 7 [ default = 0.5 ];
+}

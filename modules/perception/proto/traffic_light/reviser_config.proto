@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package apollo.perception.traffic_light.reviser_config;
+
+message HMMReviserConfig {
+  optional string name = 1;
+  optional string version = 2;
+  optional string param_file = 3;
+}
+
+message ColorReviserConfig {
+  optional string name = 1;
+  optional string version = 2;
+  optional int32 enable = 3;
+  optional float blink_time = 4;
+}
+
+message ModelConfigs {
+  optional HMMReviserConfig hmm_reviser_config = 1;
+  optional ColorReviserConfig color_reviser_config = 2;
+}
