@@ -94,8 +94,8 @@ void MotionService::OnLocalization(
     vehicle_status.time_ts = 0;
 
   } else {
-    vehicle_status.roll_rate = localization.pose().angular_velocity_vrf().x();
-    vehicle_status.pitch_rate = localization.pose().angular_velocity_vrf().y();
+    vehicle_status.roll_rate = localization.pose().angular_velocity_vrf().y();
+    vehicle_status.pitch_rate = -localization.pose().angular_velocity_vrf().x();
     vehicle_status.yaw_rate = localization.pose().angular_velocity_vrf().z();
     timestamp_diff = localization.measurement_time() - pre_timestamp_;
     vehicle_status.time_d = timestamp_diff;
