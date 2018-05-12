@@ -40,9 +40,9 @@ class HDMapImplTestSuite : public ::testing::Test {
 };
 
 TEST_F(HDMapImplTestSuite, GetVersion) {
-    std::string map_version = "0.6.1.4";
-    std::string version = hdmap_impl_.GetVersion();
-    EXPECT_STREQ(map_version.c_str(), version.c_str());
+  std::string map_version = "0.6.1.4";
+  std::string version = hdmap_impl_.GetVersion();
+  EXPECT_STREQ(map_version.c_str(), version.c_str());
 }
 
 TEST_F(HDMapImplTestSuite, GetLaneById) {
