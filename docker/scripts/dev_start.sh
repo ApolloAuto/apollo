@@ -253,6 +253,7 @@ function main(){
         --add-host ${LOCAL_HOST}:127.0.0.1 \
         --hostname in_dev_docker \
         --shm-size 2G \
+        --pid=host \
         $IMG \
         /bin/bash
 
