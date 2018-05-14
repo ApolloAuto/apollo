@@ -78,12 +78,34 @@ class DiscretizedTrajectory : public Trajectory {
   uint32_t NumOfPoints() const;
 
   const std::vector<common::TrajectoryPoint>& trajectory_points() const;
+  std::vector<common::TrajectoryPoint>& trajectory_points();
 
   virtual void Clear();
 
  protected:
   std::vector<common::TrajectoryPoint> trajectory_points_;
 };
+
+inline std::uint32_t DiscretizedTrajectory::NumOfPoints() const {
+  return trajectory_points_.size();
+}
+
+inline const std::vector<common::TrajectoryPoint>&
+DiscretizedTrajectory::trajectory_points() const {
+  return trajectory_points_;
+}
+
+inline std::vector<common::TrajectoryPoint>&
+DiscretizedTrajectory::trajectory_points() {
+  return trajectory_points_;
+}
+
+inline void DiscretizedTrajectory::SetTrajectoryPoints(
+    const std::vector<common::TrajectoryPoint>& trajectory_points) {
+  trajectory_points_ = trajectory_points;
+}
+
+inline void DiscretizedTrajectory::Clear() { trajectory_points_.clear(); }
 
 }  // namespace planning
 }  // namespace apollo
