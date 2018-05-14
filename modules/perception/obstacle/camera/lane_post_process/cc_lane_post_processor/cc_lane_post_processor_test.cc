@@ -26,7 +26,6 @@
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 
 namespace apollo {
