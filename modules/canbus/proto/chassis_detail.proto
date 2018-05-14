@@ -156,12 +156,6 @@ message Eps {
 }
 
 message VehicleSpd {
-  enum Type {
-    FORWARD = 0;
-    BACKWARD = 1;
-    STANDSTILL = 2;
-    INVALID = 3;
-  }
   // esp 277
   optional bool is_vehicle_standstill = 1;
 
@@ -170,16 +164,16 @@ message VehicleSpd {
   optional double vehicle_spd = 3 [default = 0];  // unit:m/s
   // esp 208
   optional bool is_wheel_spd_rr_valid = 4;
-  optional Type wheel_direction_rr = 5;
+  optional WheelSpeed.WheelSpeedType wheel_direction_rr = 5;
   optional double wheel_spd_rr = 6;
   optional bool is_wheel_spd_rl_valid = 7;
-  optional Type wheel_direction_rl = 8;
+  optional WheelSpeed.WheelSpeedType wheel_direction_rl = 8;
   optional double wheel_spd_rl = 9;
   optional bool is_wheel_spd_fr_valid = 10;
-  optional Type wheel_direction_fr = 11;
+  optional WheelSpeed.WheelSpeedType wheel_direction_fr = 11;
   optional double wheel_spd_fr = 12;
   optional bool is_wheel_spd_fl_valid = 13;
-  optional Type wheel_direction_fl = 14;
+  optional WheelSpeed.WheelSpeedType wheel_direction_fl = 14;
   optional double wheel_spd_fl = 15;
 
   // byd esp 222

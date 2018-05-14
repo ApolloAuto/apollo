@@ -171,6 +171,34 @@ Chassis LincolnController::chassis() {
   if (chassis_detail.has_vehicle_spd() &&
       chassis_detail.vehicle_spd().has_vehicle_spd()) {
     chassis_.set_speed_mps(chassis_detail.vehicle_spd().vehicle_spd());
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(
+        chassis_detail.vehicle_spd().is_wheel_spd_rr_valid());
+    chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
+        chassis_detail.vehicle_spd().wheel_direction_rr());
+    chassis_.mutable_wheel_speed()->set_wheel_spd_rr(
+        chassis_detail.vehicle_spd().wheel_spd_rr());
+
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_rl_valid(
+        chassis_detail.vehicle_spd().is_wheel_spd_rl_valid());
+    chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
+        chassis_detail.vehicle_spd().wheel_direction_rl());
+    chassis_.mutable_wheel_speed()->set_wheel_spd_rl(
+        chassis_detail.vehicle_spd().wheel_spd_rl());
+
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_fr_valid(
+        chassis_detail.vehicle_spd().is_wheel_spd_fr_valid());
+    chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
+        chassis_detail.vehicle_spd().wheel_direction_fr());
+    chassis_.mutable_wheel_speed()->set_wheel_spd_fr(
+        chassis_detail.vehicle_spd().wheel_spd_fr());
+
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_fl_valid(
+        chassis_detail.vehicle_spd().is_wheel_spd_fl_valid());
+    chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
+        chassis_detail.vehicle_spd().wheel_direction_fl());
+    chassis_.mutable_wheel_speed()->set_wheel_spd_fl(
+        chassis_detail.vehicle_spd().wheel_spd_fl());
+
   } else {
     chassis_.set_speed_mps(0);
   }
