@@ -301,7 +301,8 @@ bool DPRoadGraph::SamplePathWaypoints(
                                   : config_.sample_points_num_each_level();
 
     float kDefaultUnitL = 1.2 / (num_sample_per_level - 1);
-    if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
+    if (reference_line_info_.IsChangeLanePath() &&
+        !reference_line_info_.IsSafeToChangeLane()) {
       kDefaultUnitL = 1.0;
     }
     const float sample_l_range = kDefaultUnitL * (num_sample_per_level - 1);
@@ -325,7 +326,8 @@ bool DPRoadGraph::SamplePathWaypoints(
     }
 
     std::vector<float> sample_l;
-    if (reference_line_info_.IsChangeLanePath() && !IsSafeForLaneChange()) {
+    if (reference_line_info_.IsChangeLanePath() &&
+        !reference_line_info_.IsSafeToChangeLane()) {
       sample_l.push_back(reference_line_info_.OffsetToOtherReferenceLine());
     } else {
       common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
@@ -376,47 +378,6 @@ bool DPRoadGraph::SamplePathWaypoints(
           ->add_sample_layer()
           ->CopyFrom(sample_layer_debug);
       points->emplace_back(level_points);
-    }
-  }
-  return true;
-}
-
-bool DPRoadGraph::IsSafeForLaneChange() {
-  if (!reference_line_info_.IsChangeLanePath()) {
-    AERROR << "Not a change lane path.";
-    return false;
-  }
-
-  for (const auto *path_obstacle :
-       reference_line_info_.path_decision().path_obstacles().Items()) {
-    const auto &sl_boundary = path_obstacle->PerceptionSLBoundary();
-    const auto &adc_sl_boundary = reference_line_info_.AdcSlBoundary();
-
-    constexpr float kLateralShift = 2.5;
-    if (sl_boundary.start_l() < -kLateralShift ||
-        sl_boundary.end_l() > kLateralShift) {
-      continue;
-    }
-
-    constexpr float kSafeTime = 3.0;
-    constexpr float kForwardMinSafeDistance = 6.0;
-    constexpr float kBackwardMinSafeDistance = 8.0;
-
-    const float kForwardSafeDistance =
-        std::max(kForwardMinSafeDistance,
-                 static_cast<float>(
-                     (init_point_.v() - path_obstacle->obstacle()->Speed()) *
-                     kSafeTime));
-    const float kBackwardSafeDistance =
-        std::max(kBackwardMinSafeDistance,
-                 static_cast<float>(
-                     (path_obstacle->obstacle()->Speed() - init_point_.v()) *
-                     kSafeTime));
-    if (sl_boundary.end_s() >
-            adc_sl_boundary.start_s() - kBackwardSafeDistance &&
-        sl_boundary.start_s() <
-            adc_sl_boundary.end_s() + kForwardSafeDistance) {
-      return false;
     }
   }
   return true;
