@@ -6,7 +6,7 @@ import "modules/common/proto/header.proto";
 import "modules/common/proto/vehicle_signal.proto";
 import "modules/common/proto/drive_state.proto";
 
-// next id :30
+// next id :31
 message Chassis {
   enum DrivingMode {
     COMPLETE_MANUAL = 0;  // human drive
@@ -94,6 +94,8 @@ message Chassis {
   optional ChassisGPS chassis_gps = 28;
 
   optional apollo.common.EngageAdvice engage_advice = 29;
+
+  optional WheelSpeed wheel_speed = 30;
 }
 
 message ChassisGPS {
@@ -126,4 +128,25 @@ enum GpsQuality {
   FIX_2D = 1;
   FIX_3D = 2;
   FIX_INVALID = 3;
+}
+
+message WheelSpeed {
+enum WheelSpeedType {
+  FORWARD = 0;
+  BACKWARD = 1;
+  STANDSTILL = 2;
+  INVALID = 3;
+}
+  optional bool is_wheel_spd_rr_valid = 1 [default = false];
+  optional WheelSpeedType wheel_direction_rr = 2 [default = INVALID];
+  optional double wheel_spd_rr = 3 [default = 0.0];
+  optional bool is_wheel_spd_rl_valid = 4 [default = false];
+  optional WheelSpeedType wheel_direction_rl = 5 [default = INVALID];
+  optional double wheel_spd_rl = 6 [default = 0.0];
+  optional bool is_wheel_spd_fr_valid = 7 [default = false];
+  optional WheelSpeedType wheel_direction_fr = 8 [default = INVALID];
+  optional double wheel_spd_fr = 9 [default = 0.0];
+  optional bool is_wheel_spd_fl_valid = 10 [default = false];
+  optional WheelSpeedType wheel_direction_fl = 11 [default = INVALID];
+  optional double wheel_spd_fl = 12 [default = 0.0];
 }
