@@ -27,7 +27,6 @@
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sequence_type_fuser/sequence_type_fuser.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
@@ -48,17 +47,21 @@ using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
 
 bool LidarProcess::Init() {
+  AERROR << "I";
   if (inited_) {
+    AERROR << "Init() function has been called.";
     return true;
   }
 
   RegistAllAlgorithm();
 
+  AERROR << "II";
   if (!InitFrameDependence()) {
     AERROR << "failed to Init frame dependence.";
     return false;
   }
 
+  AERROR << "III";
   if (!InitAlgorithmPlugin()) {
     AERROR << "failed to Init algorithm plugin.";
     return false;
@@ -214,15 +217,6 @@ void LidarProcess::RegistAllAlgorithm() {
 }
 
 bool LidarProcess::InitFrameDependence() {
-  /// init config manager
-  ConfigManager* config_manager = ConfigManager::instance();
-  if (!config_manager->Init()) {
-    AERROR << "failed to Init ConfigManager";
-    return false;
-  }
-  AINFO << "Init config manager successfully, work_root: "
-        << config_manager->WorkRoot();
-
   /// init hdmap
   if (FLAGS_enable_hdmap_input) {
     hdmap_input_ = HDMapInput::instance();
