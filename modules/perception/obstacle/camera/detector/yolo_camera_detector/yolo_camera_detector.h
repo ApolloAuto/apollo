@@ -30,7 +30,6 @@
 #include "modules/perception/cuda_util/network.h"
 #include "modules/perception/cuda_util/region_output.h"
 #include "modules/perception/cuda_util/util.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/common/cnn_adapter.h"
 #include "modules/perception/obstacle/camera/detector/common/feature_extractor.h"
