@@ -63,31 +63,39 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
     return;
   }
   const double time_diff = current_time - prev_trajectory->header_time();
-  auto matched_point = prev_trajectory->Evaluate(time_diff);
+  const auto& matched_point = prev_trajectory->Evaluate(time_diff);
   if (!matched_point.has_path_point()) {
     return;
   }
-  const double cos_theta = std::cos(-matched_point.path_point().theta());
-  const double sin_theta = std::sin(-matched_point.path_point().theta());
-  std::vector<TrajectoryPoint> transformed_points;
-  for (const auto& old_point : prev_trajectory->trajectory_points()) {
-    TrajectoryPoint point = old_point;
-    Eigen::Vector3d before_rotate(
-        old_point.path_point().x() - matched_point.path_point().x(),
-        old_point.path_point().y() - matched_point.path_point().y(),
-        old_point.path_point().z() - matched_point.path_point().z());
-    const double after_rotate_x =
-        before_rotate.x() * cos_theta - before_rotate.y() * sin_theta;
-    const double after_rotate_y =
-        before_rotate.x() * sin_theta + before_rotate.y() * cos_theta;
-    point.mutable_path_point()->set_x(after_rotate_x);
-    point.mutable_path_point()->set_y(after_rotate_y);
-    point.mutable_path_point()->set_z(before_rotate.z());
-    point.mutable_path_point()->set_theta(common::math::WrapAngle(
-        old_point.path_point().theta() - matched_point.path_point().theta()));
-    transformed_points.emplace_back(point);
-  }
-  prev_trajectory->SetTrajectoryPoints(transformed_points);
+
+  const double cos_theta = std::cos(matched_point.path_point().theta());
+  const double sin_theta = std::sin(matched_point.path_point().theta());
+  const double x_shift = matched_point.path_point().x();
+  const double y_shift = matched_point.path_point().y();
+  const double z_shift = matched_point.path_point().z();
+
+  auto& points = prev_trajectory->trajectory_points();
+  // x_new = (x_old - x_shift) * cos(theta) + (y_old - y_shift) * sin(theta)
+  // y_new = (y_old - y_shift) * cos(theta) - (x_old - x_shift) * sin(theta)
+  std::transform(
+      std::begin(points), std::end(points), std::begin(points),
+      [&](const TrajectoryPoint& old_point) {
+        const double x_new =
+            (old_point.path_point().x() - x_shift) * cos_theta +
+            (old_point.path_point().y() - y_shift) * sin_theta;
+        const double y_new =
+            (old_point.path_point().y() - y_shift) * cos_theta -
+            (old_point.path_point().x() - x_shift) * sin_theta;
+        const double z_new = old_point.path_point().z() - z_shift;
+        TrajectoryPoint new_point = old_point;
+        new_point.mutable_path_point()->set_x(x_new);
+        new_point.mutable_path_point()->set_y(y_new);
+        new_point.mutable_path_point()->set_z(z_new);
+        new_point.mutable_path_point()->set_theta(
+            common::math::WrapAngle(old_point.path_point().theta() -
+                                    matched_point.path_point().theta()));
+        return new_point;
+      });
 }
 
 // only used in navigation mode
