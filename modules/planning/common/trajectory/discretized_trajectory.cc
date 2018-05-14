@@ -132,21 +132,5 @@ double DiscretizedTrajectory::GetSpatialLength() const {
          trajectory_points_.front().path_point().s();
 }
 
-std::uint32_t DiscretizedTrajectory::NumOfPoints() const {
-  return trajectory_points_.size();
-}
-
-const std::vector<TrajectoryPoint>& DiscretizedTrajectory::trajectory_points()
-    const {
-  return trajectory_points_;
-}
-
-void DiscretizedTrajectory::SetTrajectoryPoints(
-    const std::vector<common::TrajectoryPoint>& trajectory_points) {
-  trajectory_points_ = trajectory_points;
-}
-
-void DiscretizedTrajectory::Clear() { trajectory_points_.clear(); }
-
 }  // namespace planning
 }  // namespace apollo
