@@ -58,11 +58,11 @@ TrajectoryCost::TrajectoryCost(
   num_of_time_stamps_ = static_cast<uint32_t>(
       std::floor(total_time / config.eval_time_interval()));
 
-  for (const auto ptr_path_obstacle : obstacles) {
+  for (const auto *ptr_path_obstacle : obstacles) {
     if (ptr_path_obstacle->IsIgnore()) {
       continue;
     }
-    auto sl_boundary = ptr_path_obstacle->PerceptionSLBoundary();
+    const auto &sl_boundary = ptr_path_obstacle->PerceptionSLBoundary();
 
     const float adc_left_l =
         init_sl_point_.l() + vehicle_param_.left_edge_to_center();
@@ -74,7 +74,7 @@ TrajectoryCost::TrajectoryCost(
       continue;
     }
 
-    const auto ptr_obstacle = ptr_path_obstacle->obstacle();
+    const auto *ptr_obstacle = ptr_path_obstacle->obstacle();
     bool is_bycycle_or_pedestrian =
         (ptr_obstacle->Perception().type() ==
              perception::PerceptionObstacle::BICYCLE ||
