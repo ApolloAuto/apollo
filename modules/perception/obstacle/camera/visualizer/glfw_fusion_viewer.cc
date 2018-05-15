@@ -2049,6 +2049,60 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
 void GLFWFusionViewer::draw_camera_box(
     const std::vector<std::shared_ptr<Object>>& objects, Eigen::Matrix4d v2c,
     int offset_x, int offset_y, int image_width, int image_height) {
+  // Generate pitch angle adjustment
+  static double pitch_angle = 0.0;
+  static double direction = 0.5;
+  pitch_angle += direction;
+  if (pitch_angle > 2.99) direction *= -1.0;
+  if (pitch_angle < -2.99) direction *= -1.0;
+
+  // Create adjusted v2c
+  Eigen::Matrix4d adjusted_v2c = v2c;
+  Eigen::Matrix3d rotate(Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ())
+  * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY())
+  * Eigen::AngleAxisd(pitch_angle / 180.0 * M_PI, Eigen::Vector3d::UnitX()));
+  Eigen::Matrix4d trans;
+  trans.setIdentity();
+  trans.block<3, 3>(0, 0) = rotate;
+  adjusted_v2c = trans * adjusted_v2c;
+  v2c = adjusted_v2c;
+
+  // Draw grid plane of ego car space,
+  // based on the given vehicle to camera extrinsics
+  int color_grid[3] = {255, 255, 255};
+  for (double y = -10.0; y < 10.0; y += 1.0) {
+    Eigen::Vector2d prev_pt2d;
+    for (double x = 0.0; x < 100.0; x += 2.0) {
+      Eigen::Vector3d pt3d(x, y, 0.0);
+      Eigen::Vector2d pt2d;
+      get_project_point(adjusted_v2c, pt3d, &pt2d);
+
+      if (x > 5.0) {
+        draw_line2d(prev_pt2d, pt2d, 2, color_grid[0],
+                    color_grid[1], color_grid[2],
+                    offset_x, offset_y, image_width, image_height);
+      }
+
+      prev_pt2d = pt2d;
+    }
+  }
+  // Draw vanishing point cross of ego car space,
+  // based on the given vehicle to camera extrinsics
+  int color_cross[3] = {255, 0, 0};
+  Eigen::Vector3d pt3d(1000.0, 0.0, 0.0);
+  Eigen::Vector2d pt2d;
+  get_project_point(adjusted_v2c, pt3d, &pt2d);
+  Eigen::Vector2d tmp1 = pt2d + Eigen::Vector2d(30.0, 0.0);
+  Eigen::Vector2d tmp2 = pt2d + Eigen::Vector2d(-30.0, 0.0);
+  draw_line2d(tmp1, tmp2, 2, color_cross[0],
+              color_cross[1], color_cross[2],
+              offset_x, offset_y, image_width, image_height);
+  tmp1 = pt2d + Eigen::Vector2d(0.0, 30.0);
+  tmp2 = pt2d + Eigen::Vector2d(0.0, -30.0);
+  draw_line2d(tmp1, tmp2, 2, color_cross[0],
+              color_cross[1], color_cross[2],
+              offset_x, offset_y, image_width, image_height);
+
   for (auto obj : objects) {
     Eigen::Vector3d center = obj->center;
     Eigen::Vector2d center2d;
