@@ -127,19 +127,6 @@ bool DPRoadGraph::GenerateMinCostPath(
   }
   path_waypoints.insert(path_waypoints.begin(),
                         std::vector<common::SLPoint>{init_sl_point_});
-  if (path_waypoints.size() < 2) {
-    AERROR << "Too few path_waypoints.";
-    return false;
-  }
-
-  for (uint32_t i = 0; i < path_waypoints.size(); ++i) {
-    const auto &level_waypoints = path_waypoints.at(i);
-    for (uint32_t j = 0; j < level_waypoints.size(); ++j) {
-      ADEBUG << "level[" << i << "], "
-             << level_waypoints.at(j).ShortDebugString();
-    }
-  }
-
   const auto &vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
 
@@ -264,6 +251,14 @@ bool DPRoadGraph::SamplePathWaypoints(
   const float total_length = std::fmin(
       init_sl_point_.s() + std::fmax(init_point.v() * 8.0, kMinSampleDistance),
       reference_line_.Length());
+  const auto &vehicle_config =
+      common::VehicleConfigHelper::instance()->GetConfig();
+  const float half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
+  const size_t num_sample_per_level =
+      FLAGS_use_navigation_mode ? config_.navigator_sample_num_each_level()
+                                : config_.sample_points_num_each_level();
+
+  const bool has_sidepass = HasSidepass();
 
   constexpr float kSamplePointLookForwardTime = 4.0;
   const float step_length =
@@ -290,15 +285,8 @@ bool DPRoadGraph::SamplePathWaypoints(
     reference_line_.GetLaneWidth(s, &left_width, &right_width);
 
     constexpr float kBoundaryBuff = 0.20;
-    const auto &vehicle_config =
-        common::VehicleConfigHelper::instance()->GetConfig();
-    const float half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
     const float eff_right_width = right_width - half_adc_width - kBoundaryBuff;
     const float eff_left_width = left_width - half_adc_width - kBoundaryBuff;
-
-    const size_t num_sample_per_level =
-        FLAGS_use_navigation_mode ? config_.navigator_sample_num_each_level()
-                                  : config_.sample_points_num_each_level();
 
     float kDefaultUnitL = 1.2 / (num_sample_per_level - 1);
     if (reference_line_info_.IsChangeLanePath() &&
@@ -329,47 +317,36 @@ bool DPRoadGraph::SamplePathWaypoints(
     if (reference_line_info_.IsChangeLanePath() &&
         !reference_line_info_.IsSafeToChangeLane()) {
       sample_l.push_back(reference_line_info_.OffsetToOtherReferenceLine());
+    } else if (has_sidepass) {
+      // currently only left nudge is supported. Need road hard boundary for
+      // both sides
+      switch (sidepass_.type()) {
+        case ObjectSidePass::LEFT: {
+          sample_l.push_back(eff_left_width + config_.sidepass_distance());
+          break;
+        }
+        case ObjectSidePass::RIGHT: {
+          sample_l.push_back(-eff_right_width - config_.sidepass_distance());
+          break;
+        }
+        default:
+          break;
+      }
     } else {
       common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
                                   num_sample_per_level - 1, &sample_l);
-      if (HasSidepass()) {
-        // currently only left nudge is supported. Need road hard boundary for
-        // both sides
-        sample_l.clear();
-        switch (sidepass_.type()) {
-          case ObjectSidePass::LEFT: {
-            sample_l.push_back(eff_left_width + config_.sidepass_distance());
-            break;
-          }
-          case ObjectSidePass::RIGHT: {
-            sample_l.push_back(-eff_right_width - config_.sidepass_distance());
-            break;
-          }
-          default:
-            break;
-        }
-      }
     }
     std::vector<common::SLPoint> level_points;
     planning_internal::SampleLayerDebug sample_layer_debug;
     for (size_t j = 0; j < sample_l.size(); ++j) {
-      const float l = sample_l[j];
-      constexpr float kResonateDistance = 1e-3;
-      common::SLPoint sl;
-      if (j % 2 == 0 ||
-          total_length - accumulated_s < 2.0 * kResonateDistance) {
-        sl = common::util::MakeSLPoint(s, l);
-      } else {
-        sl = common::util::MakeSLPoint(
-            std::fmin(total_length, s + kResonateDistance), l);
-      }
+      common::SLPoint sl = common::util::MakeSLPoint(s, sample_l[j]);
       sample_layer_debug.add_sl_point()->CopyFrom(sl);
       level_points.push_back(std::move(sl));
     }
-    if (!reference_line_info_.IsChangeLanePath() && !HasSidepass()) {
+    if (!reference_line_info_.IsChangeLanePath() && has_sidepass) {
       auto sl_zero = common::util::MakeSLPoint(s, 0.0);
       sample_layer_debug.add_sl_point()->CopyFrom(sl_zero);
-      level_points.push_back(sl_zero);
+      level_points.push_back(std::move(sl_zero));
     }
 
     if (!level_points.empty()) {
