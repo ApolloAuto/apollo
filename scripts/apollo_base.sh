@@ -180,26 +180,18 @@ function setup_device() {
 }
 
 function decide_task_dir() {
-  DISK=""
-  if [ "$1" = "--portable-disk" ]; then
-    # Try to find largest NVMe drive.
-    DISK="$(df | grep "^/dev/nvme" | sort -nr -k 4 | \
+  # Try to find largest NVMe drive.
+  DISK="$(df | grep "^/dev/nvme" | sort -nr -k 4 | \
+      awk '{print substr($0, index($0, $6))}')"
+
+  # Try to find largest external drive.
+  if [ -z "${DISK}" ]; then
+    DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 | \
         awk '{print substr($0, index($0, $6))}')"
-
-    # Try to find largest external drive.
-    if [ -z "${DISK}" ]; then
-      DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 | \
-          awk '{print substr($0, index($0, $6))}')"
-    fi
-
-    if [ -z "${DISK}" ]; then
-      echo "Cannot find portable disk."
-      echo "Please make sure your container was started AFTER inserting the disk."
-    fi
   fi
 
-  # Default disk.
   if [ -z "${DISK}" ]; then
+    echo "Cannot find portable disk. Fallback to apollo data dir."
     DISK="/apollo"
   fi
 
