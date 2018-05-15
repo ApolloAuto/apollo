@@ -34,7 +34,6 @@
 #include "yaml-cpp/yaml.h"
 
 #include "modules/common/math/kalman_filter_1d.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_filter.h"
 
