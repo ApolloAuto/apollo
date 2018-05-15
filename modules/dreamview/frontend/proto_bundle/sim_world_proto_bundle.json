@@ -1609,6 +1609,9 @@
             "ObjectAvoid": {
               "fields": {}
             },
+            "ObjectWait": {
+              "fields": {}
+            },
             "ObjectDecisionType": {
               "oneofs": {
                 "objectTag": {
@@ -1620,7 +1623,8 @@
                     "overtake",
                     "nudge",
                     "sidepass",
-                    "avoid"
+                    "avoid",
+                    "wait"
                   ]
                 }
               },
@@ -1656,6 +1660,10 @@
                 "avoid": {
                   "type": "ObjectAvoid",
                   "id": 8
+                },
+                "wait": {
+                  "type": "ObjectWait",
+                  "id": 9
                 }
               }
             },
@@ -3464,6 +3472,40 @@
                 }
               }
             },
+            "ParkingSpace": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "polygon": {
+                  "type": "Polygon",
+                  "id": 2
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
+                }
+              }
+            },
+            "ParkingLot": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "polygon": {
+                  "type": "Polygon",
+                  "id": 2
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
+                }
+              }
+            },
             "BoundaryEdge": {
               "fields": {
                 "curve": {
@@ -3809,6 +3851,18 @@
                   "id": 1,
                   "options": {
                     "default": 0.5
+                  }
+                },
+                "laneSource": {
+                  "type": "LaneSource",
+                  "id": 2
+                }
+              },
+              "nested": {
+                "LaneSource": {
+                  "values": {
+                    "PERCEPTION": 1,
+                    "OFFLINE_GENERATED": 2
                   }
                 }
               }

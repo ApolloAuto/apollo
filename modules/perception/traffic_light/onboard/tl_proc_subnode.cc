@@ -169,24 +169,12 @@ bool TLProcSubnode::InitInternal() {
   }
 
   // init image_border
-  std::string model_name("TLProcSubnode");
-  ConfigManager *config_manager = ConfigManager::instance();
-  const ModelConfig *model_config = config_manager->GetModelConfig(model_name);
-  if (model_config == nullptr) {
-    AERROR << "TLProcSubnode not found model: " << model_name;
+  if (!common::util::GetProtoFromFile(FLAGS_traffic_light_subnode_config,
+                                      &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_traffic_light_subnode_config;
     return false;
   }
-  if (!model_config->GetValue("image_border", &image_border_)) {
-    AERROR << "TLProcSubnode Failed to find Conf: "
-           << "image_border.";
-    return false;
-  }
-  if (!model_config->GetValue("valid_ts_interval", &valid_ts_interval_)) {
-    AERROR << "TLProcSubnode Failed to find Conf: "
-           << "valid_ts_interval.";
-    return false;
-  }
-  AINFO << "TLProcSubnode init successfully. ";
   return true;
 }
 
@@ -218,7 +206,8 @@ bool TLProcSubnode::ProcEvent(const Event &event) {
   double enter_proc_latency = (proc_subnode_handle_event_start_ts -
                                image_lights->preprocess_send_timestamp);
 
-  if (TimeUtil::GetCurrentTime() - event.local_timestamp > valid_ts_interval_) {
+  if (TimeUtil::GetCurrentTime() - event.local_timestamp >
+      config_.tl_proc_subnode_config().valid_ts_interval()) {
     AERROR << "TLProcSubnode failed to process image"
            << "Because images are too old"
            << ",current time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime())

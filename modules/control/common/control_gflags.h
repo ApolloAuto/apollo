@@ -42,7 +42,6 @@ DECLARE_int32(max_chassis_miss_num);
 DECLARE_int32(max_planning_miss_num);
 
 DECLARE_double(max_acceleration_when_stopped);
-DECLARE_double(max_abs_speed_when_stopped);
 
 DECLARE_double(steer_angle_rate);
 DECLARE_bool(enable_gain_scheduler);

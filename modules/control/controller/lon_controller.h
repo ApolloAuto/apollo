@@ -27,6 +27,7 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/filters/digital_filter_coefficients.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -131,6 +132,9 @@ class LonController : public Controller {
   common::DigitalFilter digital_filter_pitch_angle_;
 
   const ControlConf *control_conf_ = nullptr;
+
+  // vehicle parameter
+  common::VehicleParam vehicle_param_;
 };
 }  // namespace control
 }  // namespace apollo

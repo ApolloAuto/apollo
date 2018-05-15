@@ -21,20 +21,19 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
-#include "modules/perception/obstacle/fusion/async_fusion/async_fusion.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time_util.h"
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/obstacle/fusion/async_fusion/async_fusion.h"
+#include "modules/perception/obstacle/fusion/interface/base_fusion.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 #include "modules/perception/obstacle/onboard/lane_shared_data.h"
-#include "modules/perception/obstacle/fusion/interface/base_fusion.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"

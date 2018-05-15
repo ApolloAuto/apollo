@@ -143,9 +143,16 @@ export default class RosWebSocketEndpoint {
     checkMessage(world) {
         const now = new Date().getTime();
         const duration = now - this.simWorldLastUpdateTimestamp;
-        if (this.simWorldLastUpdateTimestamp !== 0 && duration > 250) {
-            console.log("Last sim_world_update took " + duration + "ms");
+        if (this.simWorldLastUpdateTimestamp !== 0 && duration > 200) {
+            console.warn("Last sim_world_update took " + duration + "ms");
         }
+        if (this.secondLastSeqNum === world.sequenceNum) {
+            // Receiving multiple duplicated simulation_world messages
+            // indicates a backend lag.
+            console.warn("Received duplicate simulation_world:", this.lastSeqNum);
+        }
+        this.secondLastSeqNum = this.lastSeqNum;
+        this.lastSeqNum = world.sequenceNum;
         this.simWorldLastUpdateTimestamp = now;
     }
 

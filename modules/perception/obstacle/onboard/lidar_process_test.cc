@@ -62,28 +62,9 @@ TEST_F(LidarProcessTest, test_Init) {
   EXPECT_TRUE(lidar_process_.Init());
   lidar_process_.inited_ = false;
 
-  FLAGS_work_root = "modules/perception/data";
-  FLAGS_enable_hdmap_input = false;
-  EXPECT_FALSE(lidar_process_.InitFrameDependence());
-  EXPECT_FALSE(lidar_process_.Init());
-  FLAGS_config_manager_path = "./config_manager_test/config_manager.config";
   FLAGS_enable_hdmap_input = false;
   EXPECT_TRUE(lidar_process_.InitFrameDependence());
-
-  FLAGS_onboard_roi_filter = "not_exit_algo";
-  FLAGS_onboard_segmentor = "not_exit_algo";
-  FLAGS_onboard_object_builder = "not_exit_algo";
-  FLAGS_onboard_tracker = "not_exit_algo";
-  EXPECT_FALSE(lidar_process_.InitAlgorithmPlugin());
-  FLAGS_onboard_roi_filter = "DummyROIFilter";
-  EXPECT_FALSE(lidar_process_.InitAlgorithmPlugin());
-
-  FLAGS_onboard_segmentor = "DummySegmentation";
-  EXPECT_FALSE(lidar_process_.InitAlgorithmPlugin());
-
-  FLAGS_onboard_object_builder = "DummyObjectBuilder";
-  EXPECT_FALSE(lidar_process_.InitAlgorithmPlugin());
-  EXPECT_FALSE(lidar_process_.Init());
+  EXPECT_TRUE(lidar_process_.Init());
 
   FLAGS_onboard_tracker = "DummyTracker";
   EXPECT_TRUE(lidar_process_.InitAlgorithmPlugin());

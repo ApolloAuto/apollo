@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <utility>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
@@ -85,13 +86,9 @@ void LonController::CloseLogFile() {
     }
   }
 }
-void LonController::Stop() {
-  CloseLogFile();
-}
+void LonController::Stop() { CloseLogFile(); }
 
-LonController::~LonController() {
-  CloseLogFile();
-}
+LonController::~LonController() { CloseLogFile(); }
 
 Status LonController::Init(const ControlConf *control_conf) {
   control_conf_ = control_conf;
@@ -106,6 +103,9 @@ Status LonController::Init(const ControlConf *control_conf) {
 
   station_pid_controller_.Init(lon_controller_conf.station_pid_conf());
   speed_pid_controller_.Init(lon_controller_conf.low_speed_pid_conf());
+
+  vehicle_param_.CopyFrom(
+      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param());
 
   SetDigitalFilterPitchAngle(lon_controller_conf);
 
@@ -229,7 +229,7 @@ Status LonController::ComputeControlCommand(
   if (std::fabs(debug->preview_acceleration_reference()) <=
           FLAGS_max_acceleration_when_stopped &&
       std::fabs(debug->preview_speed_reference()) <=
-          FLAGS_max_abs_speed_when_stopped) {
+          vehicle_param_.max_abs_speed_when_stopped()) {
     acceleration_cmd = lon_controller_conf.standstill_acceleration();
     AINFO << "Stop location reached";
     debug->set_is_full_stop(true);
@@ -285,7 +285,7 @@ Status LonController::ComputeControlCommand(
   cmd->set_brake(brake_cmd);
 
   if (std::fabs(VehicleStateProvider::instance()->linear_velocity()) <=
-          FLAGS_max_abs_speed_when_stopped ||
+          vehicle_param_.max_abs_speed_when_stopped() ||
       chassis->gear_location() == trajectory_message_->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
     cmd->set_gear_location(trajectory_message_->gear());
@@ -302,9 +302,7 @@ Status LonController::Reset() {
   return Status::OK();
 }
 
-std::string LonController::Name() const {
-  return name_;
-}
+std::string LonController::Name() const { return name_; }
 
 void LonController::ComputeLongitudinalErrors(
     const TrajectoryAnalyzer *trajectory_analyzer, const double preview_time,

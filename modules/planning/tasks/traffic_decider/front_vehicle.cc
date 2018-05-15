@@ -124,10 +124,10 @@ bool FrontVehicle::ProcessSidePass(
 
   switch (status) {
     case SidePassStatus::UNKNOWN: {
-      sidepass_status->set_status(SidePassStatus::DRIVING);
+      sidepass_status->set_status(SidePassStatus::DRIVE);
       break;
     }
-    case SidePassStatus::DRIVING: {
+    case SidePassStatus::DRIVE: {
       constexpr double kAdcStopSpeedThreshold = 0.1;  // unit: m/s
       const auto& adc_planning_point = reference_line_info->AdcPlanningPoint();
       if (!passable_obstacle_id.empty() &&
@@ -142,7 +142,7 @@ bool FrontVehicle::ProcessSidePass(
       const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
 
       if (passable_obstacle_id.empty()) {
-        sidepass_status->set_status(SidePassStatus::DRIVING);
+        sidepass_status->set_status(SidePassStatus::DRIVE);
         sidepass_status->clear_wait_start_time();
       } else {
         double wait_start_time = sidepass_status->wait_start_time();
@@ -166,7 +166,7 @@ bool FrontVehicle::ProcessSidePass(
           if (lanes.size() >= 2) {
             // currently do not sidepass when lanes > 2 (usually at junctions).
           } else {
-            sidepass_status->set_status(SidePassStatus::DRIVING);
+            sidepass_status->set_status(SidePassStatus::DRIVE);
             sidepass_status->clear_wait_start_time();
 
             auto& lane = lanes.front()->lane();
@@ -212,7 +212,7 @@ bool FrontVehicle::ProcessSidePass(
     }
     case SidePassStatus::SIDEPASS: {
       if (passable_obstacle_id.empty()) {
-        sidepass_status->set_status(SidePassStatus::DRIVING);
+        sidepass_status->set_status(SidePassStatus::DRIVE);
       }
       break;
     }
@@ -377,7 +377,15 @@ void FrontVehicle::MakeStopDecision(
 
       ObjectDecisionType stop;
       auto stop_decision = stop.mutable_stop();
-      stop_decision->set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
+      if (obstacle_type == PerceptionObstacle::UNKNOWN_MOVABLE ||
+          obstacle_type == PerceptionObstacle::BICYCLE ||
+          obstacle_type == PerceptionObstacle::VEHICLE) {
+        stop_decision->set_reason_code(
+            StopReasonCode::STOP_REASON_HEAD_VEHICLE);
+      } else {
+        stop_decision->set_reason_code(
+            StopReasonCode::STOP_REASON_OBSTACLE);
+      }
       stop_decision->set_distance_s(-stop_distance);
       stop_decision->set_stop_heading(stop_heading);
       stop_decision->mutable_stop_point()->set_x(stop_point.x());
