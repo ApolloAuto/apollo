@@ -61,6 +61,8 @@ TrajectoryCost::TrajectoryCost(
   for (const auto *ptr_path_obstacle : obstacles) {
     if (ptr_path_obstacle->IsIgnore()) {
       continue;
+    } else if (ptr_path_obstacle->LongitudinalDecision().has_stop()) {
+      continue;
     }
     const auto &sl_boundary = ptr_path_obstacle->PerceptionSLBoundary();
 
@@ -233,7 +235,7 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
 
   // if obstacle is behind ADC, ignore its cost contribution.
   if (adc_front_s > obs_sl_boundary.end_s()) {
-      return obstacle_cost;
+    return obstacle_cost;
   }
 
   const float delta_l = std::fabs(
