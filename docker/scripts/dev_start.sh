@@ -59,8 +59,27 @@ OPTIONS:
     -h, --help             Display this help and exit.
     -t, --tag <version>    Specify which version of a docker image to pull.
     -l, --local            Use local docker image.
+    stop                   Stop all running Apollo containers.
 EOF
 exit 0
+}
+
+function stop_containers()
+{
+running_containers=$(docker ps --format "{{.Names}}")
+
+for i in ${running_containers[*]}
+do
+  if [[ "$i" =~ apollo_* ]];then
+    printf %-*s 70 "stopping container: $i ..."
+    docker stop $i > /dev/null
+    if [ $? -eq 0 ];then
+      printf "\033[32m[DONE]\033[0m\n"
+    else
+      printf "\033[31m[FAILED]\033[0m\n"
+    fi
+  fi
+done
 }
 
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
@@ -118,7 +137,11 @@ do
         shift
         source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh \
             "${map_name}" "${VOLUME_VERSION}"
-    ;;
+        ;;
+    stop)
+	stop_containers
+	exit 0
+	;;
     *)
         echo -e "\033[93mWarning\033[0m: Unknown option: $1"
         exit 2
