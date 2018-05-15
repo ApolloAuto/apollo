@@ -231,6 +231,11 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
     obstacle_cost.cost_items[ComparableCost::HAS_COLLISION] = true;
   }
 
+  // if obstacle is behind ADC, ignore its cost contribution.
+  if (adc_front_s > obs_sl_boundary.end_s()) {
+      return obstacle_cost;
+  }
+
   const float delta_l = std::fabs(
       adc_l - (obs_sl_boundary.start_l() + obs_sl_boundary.end_l()) / 2.0);
 
