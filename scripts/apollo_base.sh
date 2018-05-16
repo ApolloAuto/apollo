@@ -202,6 +202,7 @@ function decide_task_dir() {
   mkdir -p "${TASK_DIR}"
 
   echo "Record bag to ${TASK_DIR}..."
+  export TASK_ID="${TASK_ID}"
   export TASK_DIR="${TASK_DIR}"
 }
 
@@ -384,9 +385,19 @@ function run_customized_path() {
   esac
 }
 
-#write log to a file about the env when record a bag.
+# Write log to a file about the env when record a bag.
 function record_bag_env_log() {
-  TASK_ID=$(date +%Y-%m-%d-%H-%M)
+  if [ -z "${TASK_ID}" ]; then
+    TASK_ID=$(date +%Y-%m-%d-%H-%M)
+  fi
+
+  git status >/dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "Not in Git repo, maybe because you are in release container."
+    echo "Skip log environment."
+    return
+  fi
+
   commit=$(git log -1)
   echo -e "Date:$(date)\n" >> Bag_Env_$TASK_ID.log
   git branch | awk '/\*/ { print "current branch: " $2; }'  >> Bag_Env_$TASK_ID.log
@@ -397,6 +408,7 @@ function record_bag_env_log() {
   echo -e "git diff --staged:" >> Bag_Env_$TASK_ID.log
   git diff --staged >> Bag_Env_$TASK_ID.log
 }
+
 # run command_name module_name
 function run() {
   local module=$1
