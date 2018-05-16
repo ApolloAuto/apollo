@@ -236,7 +236,7 @@ class VelodyneParser {
    */
   void compute_coords(const union RawDistance &raw_distance,
                       const LaserCorrection &corrections,
-                      const uint16_t &rotation, VPoint &point);
+                      const uint16_t rotation, VPoint &point);
 
   bool is_scan_valid(int rotation, float distance);
 
@@ -274,7 +274,7 @@ class Velodyne64Parser : public VelodyneParser {
   void unpack(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
   void init_offsets();
   int intensity_compensate(const LaserCorrection &corrections,
-                           const uint16_t &raw_distance, int intensity);
+                           const uint16_t raw_distance, int intensity);
   // Previous Velodyne packet time stamp. (offset to the top hour)
   double previous_packet_stamp_[4];
   uint64_t gps_base_usec_[4];  // full time

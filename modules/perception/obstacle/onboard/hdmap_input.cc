@@ -56,7 +56,7 @@ bool HDMapInput::Init() {
   return HDMapUtil::ReloadMaps();
 }
 
-bool HDMapInput::GetROI(const PointD& pointd, const double& map_radius,
+bool HDMapInput::GetROI(const PointD& pointd, const double map_radius,
                         HdmapStructPtr* mapptr) {
   auto* hdmap = HDMapUtil::BaseMapPtr();
   if (hdmap == nullptr) {

@@ -20,7 +20,7 @@ namespace apollo {
 namespace common {
 namespace math {
 
-bool KalmanFilter1D::Init(const float& x) {
+bool KalmanFilter1D::Init(const float x) {
   x_ << x, 0.0f;
   F_ << 1.0f, 0.033f, 0.0f, 1.0f;
   H_ << 1.0f, 0.0f;
@@ -38,7 +38,7 @@ bool KalmanFilter1D::Init(const float& x) {
   return true;
 }
 
-bool KalmanFilter1D::Predict(const float& time_diff) {
+bool KalmanFilter1D::Predict(const float time_diff) {
   F_(0, 1) = time_diff;
 
   x_ = F_ * x_;
@@ -48,7 +48,7 @@ bool KalmanFilter1D::Predict(const float& time_diff) {
   return true;
 }
 
-bool KalmanFilter1D::Update(const float& z) {
+bool KalmanFilter1D::Update(const float z) {
   z_.x() = z;
 
   y_ = z_ - H_ * x_;

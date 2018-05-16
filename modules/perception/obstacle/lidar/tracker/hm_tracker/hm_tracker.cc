@@ -233,7 +233,7 @@ bool HmObjectTracker::Track(
 
 bool HmObjectTracker::InitializeTrack(
     const std::vector<std::shared_ptr<Object>>& objects,
-    const double& timestamp, const TrackerOptions& options,
+    const double timestamp, const TrackerOptions& options,
     std::vector<std::shared_ptr<Object>>* tracked_objects) {
   // A. track setup
   Eigen::Matrix4d velo2world_pose = Eigen::Matrix4d::Identity();
@@ -352,7 +352,7 @@ void HmObjectTracker::TransformObject(std::shared_ptr<Object>* obj,
 }
 
 void HmObjectTracker::ComputeTracksPredict(
-    std::vector<Eigen::VectorXf>* tracks_predict, const double& time_diff) {
+    std::vector<Eigen::VectorXf>* tracks_predict, const double time_diff) {
   // Compute tracks' predicted states
   int no_track = object_tracks_.Size();
   tracks_predict->resize(no_track);
@@ -366,7 +366,7 @@ void HmObjectTracker::UpdateAssignedTracks(
     std::vector<Eigen::VectorXf>* tracks_predict,
     std::vector<std::shared_ptr<TrackedObject>>* new_objects,
     const std::vector<std::pair<int, int>>& assignments,
-    const double& time_diff) {
+    const double time_diff) {
   // Update assigned tracks
   std::vector<ObjectTrackPtr>& tracks = object_tracks_.GetTracks();
   for (size_t i = 0; i < assignments.size(); ++i) {
@@ -378,7 +378,7 @@ void HmObjectTracker::UpdateAssignedTracks(
 
 void HmObjectTracker::UpdateUnassignedTracks(
     const std::vector<Eigen::VectorXf>& tracks_predict,
-    const std::vector<int>& unassigned_tracks, const double& time_diff) {
+    const std::vector<int>& unassigned_tracks, const double time_diff) {
   // Update tracks without matched objects
   std::vector<ObjectTrackPtr>& tracks = object_tracks_.GetTracks();
   for (size_t i = 0; i < unassigned_tracks.size(); ++i) {

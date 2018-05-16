@@ -28,7 +28,7 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-bool Image::Init(const double &ts, const CameraId &device_id,
+bool Image::Init(const double ts, const CameraId &device_id,
                  const cv::Mat &mat) {
   contain_mat_ = true;
   contain_image_ = true;
@@ -36,7 +36,7 @@ bool Image::Init(const double &ts, const CameraId &device_id,
   ADEBUG << *this << " init.";
   return true;
 }
-bool Image::Init(const double &ts, const CameraId &device_id,
+bool Image::Init(const double ts, const CameraId &device_id,
                  boost::shared_ptr<const sensor_msgs::Image> image_data) {
   contain_mat_ = false;
   contain_image_ = true;

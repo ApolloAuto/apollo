@@ -255,7 +255,7 @@ GetGaussLegendrePoints<10>() {
  * integration.
  * The target function must be a smooth function.
  * Example:
- * target function: auto func = [](const double& x) {return x * x;};
+ * target function: auto func = [](const double x) {return x * x;};
  *                  double integral = gauss_legendre(func, -2, 3);
  * This gives you the approximated integral of function x^2 in bound [-2, 3]
  *

@@ -190,7 +190,7 @@ bool CIPVSubnode::GetSharedData(const Event &event,
 }
 
 void CIPVSubnode::PublishDataAndEvent(
-    const float &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
+    const float timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
     CIPVObjectData *cipv_object_data) {
   std::string key = "";
   SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);

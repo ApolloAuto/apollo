@@ -196,8 +196,8 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
 }
 
 bool SequencePredictor::LaneSequenceWithMaxProb(const LaneChangeType& type,
-                                                const double& probability,
-                                                const double& max_prob) {
+                                                const double probability,
+                                                const double max_prob) {
   if (probability > max_prob) {
     return true;
   } else {
@@ -211,8 +211,8 @@ bool SequencePredictor::LaneSequenceWithMaxProb(const LaneChangeType& type,
 }
 
 bool SequencePredictor::LaneChangeWithMaxProb(const LaneChangeType& type,
-                                              const double& probability,
-                                              const double& max_prob) {
+                                              const double probability,
+                                              const double max_prob) {
   if (type == LaneChangeType::LEFT || type == LaneChangeType::RIGHT) {
     if (probability > max_prob) {
       return true;

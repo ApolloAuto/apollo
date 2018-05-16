@@ -46,7 +46,7 @@ class Compensator {
   * @brief get pose affine from tf2 by gps timestamp
   *   novatel-preprocess broadcast the tf2 transfrom.
   */
-  bool query_pose_affine_from_tf2(const double& timestamp,
+  bool query_pose_affine_from_tf2(const double timestamp,
                                   Eigen::Affine3d& pose);
   /**
   * @brief check if message is valid, check width, height, timesatmp.
