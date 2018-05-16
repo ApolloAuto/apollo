@@ -2056,12 +2056,13 @@ void GLFWFusionViewer::draw_camera_box(
   if (pitch_angle > 2.99) direction *= -1.0;
   if (pitch_angle < -2.99) direction *= -1.0;
 
+  std::vector<std::vector<Eigen::Vector2d>> best_reprojected;
   double min_diff = std::numeric_limits<double>::max();
   double best_pitch_adjustment = 0.0;
   Eigen::Matrix4d best_v2c = v2c;
   Eigen::Matrix4d trans;
   trans.setIdentity();
-  for (double p = -3.0; p < 3.0; p += 0.5) {
+  for (double p = -3.0; p < 3.0; p += 0.2) {
     // Create adjusted v2c
     Eigen::Matrix3d rotate(Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ())
     * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY())
@@ -2072,23 +2073,58 @@ void GLFWFusionViewer::draw_camera_box(
     double diff = 0.0;
     // Accumulate 2D pixel height difference for < 40 m close objects in center
     // Project 3D object with this extrinsics and compare to detection
+    std::vector<std::vector<Eigen::Vector2d>> reprojected;
     for (auto obj : objects) {
+      double dist = std::sqrt(obj->center[0] * obj->center[0]
+                              + obj->center[1] * obj->center[1]
+                              + obj->center[2] * obj->center[2]);
+      double azimuth = std::atan2(obj->center[1], obj->center[0])
+                       * 180.0 / M_PI;
+      // High confidence in obj. Close and centered
+      if (20.0 < dist && dist < 50.0 && -60.0 < azimuth && azimuth < 60.0) {
+        double y_det = obj->camera_supplement->lower_right.y();
 
+        // Project 3D object back into image with this extrinsics
+        Eigen::Vector4d ctr(obj->center[0], obj->center[1], obj->center[2], 1.0);
+        Eigen::Vector3d tc = (a_v2c * ctr).head(3);
+        std::vector<Eigen::Vector2d> points(8);
+        get_boundingbox(tc, a_v2c, obj->width, obj->height, obj->length,
+                        obj->direction, obj->theta, &points);
+        reprojected.emplace_back(points);
+
+        double max_y = std::numeric_limits<double>::min();
+        for (auto p: points) {
+          max_y = std::max(max_y, p.y());
+        }
+
+        diff += std::abs(y_det - max_y);
+      }
     }
 
     // Get best pitch angle adjustment
-    if (1.0 < diff && diff < min_diff) {
+    if (0.05 < diff && diff < min_diff) {
       min_diff = diff;
       best_pitch_adjustment = p;
       best_v2c = a_v2c;
+      best_reprojected = reprojected;
     }
+  }
+
+  // Best Reprojection
+  int color[3] = {0, 255, 0};
+  for (auto points: best_reprojected) {
+    draw_8pts_box(points, Eigen::Vector3f(color[0], color[1], color[2]),
+                  offset_x, offset_y, image_width, image_height);
   }
 
   // Create adjusted v2c
   Eigen::Matrix4d adjusted_v2c = v2c;
   Eigen::Matrix3d rotate(Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ())
   * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY())
-  * Eigen::AngleAxisd(pitch_angle / 180.0 * M_PI, Eigen::Vector3d::UnitX()));
+  * Eigen::AngleAxisd(best_pitch_adjustment / 180.0 * M_PI, Eigen::Vector3d::UnitX()));
+  // Eigen::Matrix3d rotate(Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ())
+  // * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY())
+  // * Eigen::AngleAxisd(pitch_angle / 180.0 * M_PI, Eigen::Vector3d::UnitX()));
   trans.block<3, 3>(0, 0) = rotate;
   adjusted_v2c = trans * adjusted_v2c;
   v2c = adjusted_v2c;
