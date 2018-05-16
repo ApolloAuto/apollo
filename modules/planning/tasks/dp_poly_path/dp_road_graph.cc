@@ -353,16 +353,7 @@ bool DPRoadGraph::SamplePathWaypoints(
     std::vector<common::SLPoint> level_points;
     planning_internal::SampleLayerDebug sample_layer_debug;
     for (size_t j = 0; j < sample_l.size(); ++j) {
-      const float l = sample_l[j];
-      constexpr float kResonateDistance = 1e-3;
-      common::SLPoint sl;
-      if (j % 2 == 0 ||
-          total_length - accumulated_s < 2.0 * kResonateDistance) {
-        sl = common::util::MakeSLPoint(s, l);
-      } else {
-        sl = common::util::MakeSLPoint(
-            std::fmin(total_length, s + kResonateDistance), l);
-      }
+      common::SLPoint sl = common::util::MakeSLPoint(s, sample_l[j]);
       sample_layer_debug.add_sl_point()->CopyFrom(sl);
       level_points.push_back(std::move(sl));
     }
