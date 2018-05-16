@@ -64,7 +64,7 @@ class RadarTrackManager {
   // @brief update tracking state of unassigned tracking state
   // @param [IN]: indexs of unassigend tracking state
   // @return nothing
-  void UpdateUnassignedTrack(const double &timestamp,
+  void UpdateUnassignedTrack(const double timestamp,
                              const std::vector<int> &unassigned_track);
 
   // @brief delete stale tracking states

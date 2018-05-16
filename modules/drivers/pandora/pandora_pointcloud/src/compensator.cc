@@ -156,7 +156,7 @@ inline bool Compensator::check_message(
   return true;
 }
 
-bool Compensator::query_pose_affine_from_tf2(const double& timestamp,
+bool Compensator::query_pose_affine_from_tf2(const double timestamp,
                                              Eigen::Affine3d* pose) {
   ros::Time query_time(timestamp);
   std::string err_string;

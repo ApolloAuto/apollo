@@ -168,7 +168,7 @@ Status AsyncFusionSubnode::ProcEvents() {
 }
 
 void AsyncFusionSubnode::PublishDataAndEvent(
-    const double &timestamp, const std::string &device_id,
+    const double timestamp, const std::string &device_id,
     const SharedDataPtr<FusionItem> &data) {
   CommonSharedDataKey key(timestamp, device_id);
   bool fusion_succ = fusion_data_->Add(key, data);

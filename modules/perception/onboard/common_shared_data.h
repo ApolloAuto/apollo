@@ -47,7 +47,7 @@ DECLARE_int32(stamp_enlarge_factor);
 
 struct CommonSharedDataKey {
   CommonSharedDataKey() = default;
-  CommonSharedDataKey(const double &ts, const std::string &id)
+  CommonSharedDataKey(const double ts, const std::string &id)
       : timestamp(ts), device_id(id) {}
   virtual std::string ToString() const {
     return device_id +

@@ -235,7 +235,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   return Status::OK();
 }
 
-void FusionSubnode::PublishDataAndEvent(const double &timestamp,
+void FusionSubnode::PublishDataAndEvent(const double timestamp,
                                         const std::string &device_id,
                                         const SharedDataPtr<FusionItem> &data) {
   CommonSharedDataKey key(timestamp, device_id);

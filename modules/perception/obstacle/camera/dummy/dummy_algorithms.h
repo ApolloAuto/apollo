@@ -87,7 +87,7 @@ class DummyCameraTracker : public BaseCameraTracker {
   }
   */
 
-  bool Associate(const cv::Mat& img, const double& timestamp,
+  bool Associate(const cv::Mat& img, const double timestamp,
                  std::vector<std::shared_ptr<VisualObject>>* objects) override {
     return true;
   }
