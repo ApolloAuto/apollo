@@ -2056,13 +2056,39 @@ void GLFWFusionViewer::draw_camera_box(
   if (pitch_angle > 2.99) direction *= -1.0;
   if (pitch_angle < -2.99) direction *= -1.0;
 
+  double min_diff = std::numeric_limits<double>::max();
+  double best_pitch_adjustment = 0.0;
+  Eigen::Matrix4d best_v2c = v2c;
+  Eigen::Matrix4d trans;
+  trans.setIdentity();
+  for (double p = -3.0; p < 3.0; p += 0.5) {
+    // Create adjusted v2c
+    Eigen::Matrix3d rotate(Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ())
+    * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY())
+    * Eigen::AngleAxisd(p / 180.0 * M_PI, Eigen::Vector3d::UnitX()));
+    trans.block<3, 3>(0, 0) = rotate;
+    Eigen::Matrix4d a_v2c = trans * v2c;
+
+    double diff = 0.0;
+    // Accumulate 2D pixel height difference for < 40 m close objects in center
+    // Project 3D object with this extrinsics and compare to detection
+    for (auto obj : objects) {
+
+    }
+
+    // Get best pitch angle adjustment
+    if (1.0 < diff && diff < min_diff) {
+      min_diff = diff;
+      best_pitch_adjustment = p;
+      best_v2c = a_v2c;
+    }
+  }
+
   // Create adjusted v2c
   Eigen::Matrix4d adjusted_v2c = v2c;
   Eigen::Matrix3d rotate(Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ())
   * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY())
   * Eigen::AngleAxisd(pitch_angle / 180.0 * M_PI, Eigen::Vector3d::UnitX()));
-  Eigen::Matrix4d trans;
-  trans.setIdentity();
   trans.block<3, 3>(0, 0) = rotate;
   adjusted_v2c = trans * adjusted_v2c;
   v2c = adjusted_v2c;
