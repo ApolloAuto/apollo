@@ -87,9 +87,7 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
 
     common::math::LineSegment2d speed_line(curr_st, next_st);
     if (st_boundary.HasOverlap(speed_line)) {
-      const std::string msg =
-          "dp_st_graph failed: speed profile cross st_boundaries.";
-      AERROR << msg;
+      ADEBUG << "speed profile cross st_boundaries.";
       st_position = CROSS;
       return st_position;
     }
@@ -102,7 +100,6 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
       } else {
         st_position = BELOW;
       }
-      break;
     }
   }
   return st_position;
