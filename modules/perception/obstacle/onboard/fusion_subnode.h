@@ -69,7 +69,7 @@ class FusionSubnode : public Subnode {
 
   void OnChassis(const apollo::canbus::Chassis &message);
 
-  void PublishDataAndEvent(const double &timestamp,
+  void PublishDataAndEvent(const double timestamp,
                            const std::string &device_id,
                            const SharedDataPtr<FusionItem> &data);
   double timestamp_;

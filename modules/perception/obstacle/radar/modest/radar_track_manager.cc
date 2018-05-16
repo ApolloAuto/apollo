@@ -98,7 +98,7 @@ void RadarTrackManager::UpdateAssignedTrack(
 }
 
 void RadarTrackManager::UpdateUnassignedTrack(
-    const double &timestamp, const std::vector<int> &unassigned_track) {
+    const double timestamp, const std::vector<int> &unassigned_track) {
   double time_stamp = timestamp;
   for (size_t i = 0; i < unassigned_track.size(); i++) {
     if (obs_tracks_[unassigned_track[i]].GetObsRadar() != nullptr) {

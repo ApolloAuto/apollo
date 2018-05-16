@@ -95,7 +95,7 @@ bool SequenceTypeFuser::FuseType(
         object->type = ObjectType::UNKNOWN_UNMOVABLE;
         continue;
       }
-      const int& track_id = object->track_id;
+      const int track_id = object->track_id;
       sequence_.GetTrackInTemporalWindow(track_id, &tracked_objects,
                                          config_.temporal_window());
       if (tracked_objects.size() == 0) {

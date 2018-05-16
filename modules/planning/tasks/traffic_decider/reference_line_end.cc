@@ -40,7 +40,7 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
   // check
   double remain_s =
       reference_line.Length() - reference_line_info->AdcSlBoundary().end_s();
-  const double& velocity = frame->vehicle_state().linear_velocity();
+  const double velocity = frame->vehicle_state().linear_velocity();
   const double stop_acc =
       std::fabs(common::VehicleConfigHelper::GetConfig()
                     .vehicle_param()

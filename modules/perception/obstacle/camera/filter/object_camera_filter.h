@@ -48,7 +48,7 @@ class ObjectCameraFilter : public BaseCameraFilter {
 
   bool Init() override;
 
-  bool Filter(const double &timestamp,
+  bool Filter(const double timestamp,
               std::vector<std::shared_ptr<VisualObject>> *objects) override;
 
   std::string Name() const override;
@@ -69,18 +69,18 @@ class ObjectCameraFilter : public BaseCameraFilter {
   const int kMaxKeptFrameCnt = 5;
 
   // @brief Create filters for new track ids
-  void Create(const int &track_id, const double &timestamp,
+  void Create(const int track_id, const double timestamp,
               const std::shared_ptr<VisualObject> &obj_ptr);
 
   // @brief Predict step
-  void Predict(const int &track_id, const double &timestamp);
+  void Predict(const int track_id, const double timestamp);
 
   // @brief Update step
-  void Update(const int &track_id,
+  void Update(const int track_id,
               const std::shared_ptr<VisualObject> &obj_ptr);
 
   // @brief Get output of estimated state
-  void GetState(const int &track_id, std::shared_ptr<VisualObject> obj_ptr);
+  void GetState(const int track_id, std::shared_ptr<VisualObject> obj_ptr);
 
   // @brief Destroy old filters
   void Destroy();

@@ -68,7 +68,7 @@ class HmObjectTracker : public BaseTracker {
   // @params[OUT] tracked_objects: tracked objects with tracking information
   // @return true if initialize successfully, otherwise return false
   bool InitializeTrack(const std::vector<std::shared_ptr<Object>>& objects,
-                       const double& timestamp, const TrackerOptions& options,
+                       const double timestamp, const TrackerOptions& options,
                        std::vector<std::shared_ptr<Object>>* tracked_objects);
 
   // @brief transform v2world pose to v2local pose intend to avoid huge value
@@ -113,7 +113,7 @@ class HmObjectTracker : public BaseTracker {
   // @params[IN] time_diff: time interval for predicting
   // @return nothing
   void ComputeTracksPredict(std::vector<Eigen::VectorXf>* tracks_predict,
-                            const double& time_diff);
+                            const double time_diff);
 
   // @brief update assigned tracks
   // @params[IN] tracks_predict: predicted states of maintained tracks
@@ -125,7 +125,7 @@ class HmObjectTracker : public BaseTracker {
       std::vector<Eigen::VectorXf>* tracks_predict,
       std::vector<std::shared_ptr<TrackedObject>>* new_objects,
       const std::vector<std::pair<int, int>>& assignments,
-      const double& time_diff);
+      const double time_diff);
 
   // @brief update tracks without matched objects
   // @params[IN] tracks_predict: predicted states of maintained tracks
@@ -134,7 +134,7 @@ class HmObjectTracker : public BaseTracker {
   // @return nothing
   void UpdateUnassignedTracks(
       const std::vector<Eigen::VectorXf>& tracks_predict,
-      const std::vector<int>& unassigned_tracks, const double& time_diff);
+      const std::vector<int>& unassigned_tracks, const double time_diff);
 
   // @brief create new tracks for objects without matched track
   // @params[IN] new_objects: recently detected objects

@@ -226,7 +226,7 @@ void CameraProcessSubnode::VisualObjToSensorObj(
 }
 
 void CameraProcessSubnode::PublishDataAndEvent(
-    const double &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
+    const double timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
     const SharedDataPtr<CameraItem> &camera_item) {
   CommonSharedDataKey key(timestamp, device_id_);
   cam_obj_data_->Add(key, sensor_objects);

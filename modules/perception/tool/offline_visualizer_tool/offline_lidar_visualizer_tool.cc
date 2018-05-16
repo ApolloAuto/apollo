@@ -137,7 +137,7 @@ class OfflineLidarPerceptionTool {
 
   void SaveTrackingInformation(std::vector<std::shared_ptr<Object>>* objects,
                                const Eigen::Matrix4d& pose_v2w,
-                               const int& frame_id,
+                               const int frame_id,
                                const pcl_util::PointCloudPtr& cloud,
                                const std::string& filename) {
     std::ofstream fout(filename.c_str(), std::ios::out);

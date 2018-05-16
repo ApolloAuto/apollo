@@ -58,7 +58,7 @@ class Image {
    * @param [in] camera id
    * @param [in] mat image
    */
-  bool Init(const double &ts, const CameraId &device_id, const cv::Mat &mat);
+  bool Init(const double ts, const CameraId &device_id, const cv::Mat &mat);
 
   /**
    * @brief init
@@ -66,7 +66,7 @@ class Image {
    * @param [in] camera id
    * @param [in] raw ros image data
    */
-  bool Init(const double &ts, const CameraId &device_id,
+  bool Init(const double ts, const CameraId &device_id,
             boost::shared_ptr<const sensor_msgs::Image> image_data);
 
   /**
