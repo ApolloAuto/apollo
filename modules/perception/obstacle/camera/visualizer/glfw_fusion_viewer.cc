@@ -2081,7 +2081,7 @@ void GLFWFusionViewer::draw_camera_box(
       double azimuth = std::atan2(obj->center[1], obj->center[0])
                        * 180.0 / M_PI;
       // High confidence in obj. Close and centered
-      if (20.0 < dist && dist < 50.0 && -60.0 < azimuth && azimuth < 60.0) {
+      if (15.0 < dist && dist < 40.0 && -30.0 < azimuth && azimuth < 30.0) {
         double y_det = obj->camera_supplement->lower_right.y();
 
         // Project 3D object back into image with this extrinsics
@@ -2127,14 +2127,14 @@ void GLFWFusionViewer::draw_camera_box(
   // * Eigen::AngleAxisd(pitch_angle / 180.0 * M_PI, Eigen::Vector3d::UnitX()));
   trans.block<3, 3>(0, 0) = rotate;
   adjusted_v2c = trans * adjusted_v2c;
-  v2c = adjusted_v2c;
+  // v2c = adjusted_v2c;
 
   // Draw grid plane of ego car space,
   // based on the given vehicle to camera extrinsics
   int color_grid[3] = {255, 255, 255};
   for (double y = -10.0; y < 10.0; y += 1.0) {
     Eigen::Vector2d prev_pt2d;
-    for (double x = 0.0; x < 100.0; x += 2.0) {
+    for (double x = 0.0; x < 100.0; x += 5.0) {
       Eigen::Vector3d pt3d(x, y, 0.0);
       Eigen::Vector2d pt2d;
       get_project_point(adjusted_v2c, pt3d, &pt2d);
@@ -2164,6 +2164,37 @@ void GLFWFusionViewer::draw_camera_box(
   draw_line2d(tmp1, tmp2, 2, color_cross[0],
               color_cross[1], color_cross[2],
               offset_x, offset_y, image_width, image_height);
+
+  // Draw static vanishing point without pitch adjustment
+  int color_black[3] = {0, 0, 0};
+  get_project_point(v2c, pt3d, &pt2d);
+  tmp1 = pt2d + Eigen::Vector2d(0.0, 30.0);
+  tmp2 = pt2d + Eigen::Vector2d(0.0, -30.0);
+  draw_line2d(tmp1, tmp2, 2, color_black[0],
+              color_black[1], color_black[2],
+              offset_x, offset_y, image_width, image_height);
+  tmp1 = pt2d + Eigen::Vector2d(30.0, 0.0);
+  tmp2 = pt2d + Eigen::Vector2d(-30.0, 0.0);
+  draw_line2d(tmp1, tmp2, 2, color_black[0],
+              color_black[1], color_black[2],
+              offset_x, offset_y, image_width, image_height);
+  // Draw static grid plane
+  for (double y = -10.0; y < 10.0; y += 2.0) {
+    Eigen::Vector2d prev_pt2d;
+    for (double x = 0.0; x < 100.0; x += 5.0) {
+      Eigen::Vector3d pt3d(x, y, 0.0);
+      Eigen::Vector2d pt2d;
+      get_project_point(v2c, pt3d, &pt2d);
+
+      if (x > 5.0) {
+        draw_line2d(prev_pt2d, pt2d, 2, color_black[0],
+                    color_black[1], color_black[2],
+                    offset_x, offset_y, image_width, image_height);
+      }
+
+      prev_pt2d = pt2d;
+    }
+  }
 
   for (auto obj : objects) {
     Eigen::Vector3d center = obj->center;
