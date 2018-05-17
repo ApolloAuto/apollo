@@ -21,18 +21,11 @@
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
-
-TEST(HDMapInputTest, test_Init) {
-  auto* hdmap_input = HDMapInput::instance();
-  EXPECT_TRUE(hdmap_input->Init());
-
-  FLAGS_base_map_filename = "not_exit_dir";
-  EXPECT_FALSE(hdmap_input->Init());
-}
 
 TEST(HDMapInputTest, test_GetROI) {
   HdmapStructPtr hdmap;
@@ -43,7 +36,7 @@ TEST(HDMapInputTest, test_GetROI) {
       hdmap_input->GetROI(velodyne_pose_world, FLAGS_map_radius, &hdmap));
   FLAGS_map_dir = "modules/map/data/sunnyvale_loop";
   FLAGS_base_map_filename = "base_map.bin";
-  EXPECT_TRUE(hdmap_input->Init());
+  hdmap::HDMapUtil::ReloadMaps();
   EXPECT_TRUE(
       hdmap_input->GetROI(velodyne_pose_world, FLAGS_map_radius, &hdmap));
   EXPECT_TRUE(hdmap != nullptr);
