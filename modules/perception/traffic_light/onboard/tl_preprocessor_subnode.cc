@@ -30,8 +30,8 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-using common::adapter::AdapterManager;
 using apollo::common::util::GetProtoFromFile;
+using common::adapter::AdapterManager;
 
 bool TLPreprocessorSubnode::InitInternal() {
   RegisterFactoryBoundaryProjection();
@@ -97,10 +97,6 @@ bool TLPreprocessorSubnode::InitHdmap() {
   hd_map_ = HDMapInput::instance();
   if (hd_map_ == nullptr) {
     AERROR << "TLPreprocessorSubnode get hdmap failed.";
-    return false;
-  }
-  if (!hd_map_->Init()) {
-    AERROR << "TLPreprocessorSubnode init hd-map failed.";
     return false;
   }
   return true;
