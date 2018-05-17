@@ -71,6 +71,8 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
   if (st_boundary.IsEmpty()) {
     return st_position;
   }
+
+  bool st_position_set = false;
   const double start_t = st_boundary.min_t();
   const double end_t = st_boundary.max_t();
   for (size_t i = 0; i + 1 < speed_profile.speed_vector().size(); ++i) {
@@ -89,16 +91,17 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
     if (st_boundary.HasOverlap(speed_line)) {
       ADEBUG << "speed profile cross st_boundaries.";
       st_position = CROSS;
-      return st_position;
+      break;
     }
 
-    if (start_t < next_st.t() && curr_st.t() < end_t) {
-      STPoint bd_point_front = st_boundary.upper_points().front();
-      double side = common::math::CrossProd(bd_point_front, curr_st, next_st);
-      if (side < 0.0) {
-        st_position = ABOVE;
-      } else {
-        st_position = BELOW;
+    // note: st_position can be calculated by checking two st points once
+    //       but we need iterate all st points to make sure there is no CROSS
+    if (!st_position_set) {
+      if (start_t < next_st.t() && curr_st.t() < end_t) {
+        STPoint bd_point_front = st_boundary.upper_points().front();
+        double side = common::math::CrossProd(bd_point_front, curr_st, next_st);
+        st_position = side < 0.0 ? ABOVE : BELOW;
+        st_position_set = true;
       }
     }
   }
