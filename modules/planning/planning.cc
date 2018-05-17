@@ -28,6 +28,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_thread_pool.h"
+#include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
 #include "modules/planning/planner/em/em_planner.h"
 #include "modules/planning/planner/lattice/lattice_planner.h"
@@ -95,6 +96,9 @@ Status Planning::Init() {
 
   // initialize planning thread pool
   PlanningThreadPool::instance()->Init();
+
+  // clear planning status
+  util::GetPlanningStatus()->Clear();
 
   if (!AdapterManager::Initialized()) {
     AdapterManager::Init(FLAGS_planning_adapter_config_filename);
