@@ -70,6 +70,8 @@ class PlanningTestBase : public ::testing::Test {
 
   virtual void SetUp();
 
+  void UpdateData();
+
   /**
    * Execute the planning code.
    * @return true if planning is success. The ADCTrajectory will be used to
