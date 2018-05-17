@@ -340,25 +340,6 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
   RUN_GOLDEN_TEST(0);
 }
 
-/*
- * kee_clear: not blocking, KEEP_CLEAR static obstacle built
- * bag: 2018-01-29-17-22-46/2018-01-29-17-22-47_0.bag
- * decision: CRUISE
- */
-/*
-TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
-  std::string seq_num = "9";
-  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
-  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
-  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
-  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
-  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST(0);
-}
-*/
-
 TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   std::string seq_num = "10";
   FLAGS_enable_prediction = false;
@@ -403,6 +384,39 @@ TEST_F(SunnyvaleBigLoopTest, bypass_parked_bus) {
   FLAGS_longitudinal_acceleration_lower_bound = acc_lower_bound;
 }
 
+/*
+ * kee_clear: keep clear zone clear
+ * bag: 2018-05-15-10-33-12/2018-05-15-10-33-12_39.bag
+ * decision: not stopped by KEEP_CLEAR
+ */
+TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
+  std::string seq_num = "101";
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(0);
+}
+
+/*
+ * kee_clear: vehicle inside KEEP Clear zone, with speed and not blocking
+ * bag: 2018-05-15-10-24-12/2018-05-15-10-24-12_30.bag
+ * decision: CRUISE
+ */
+TEST_F(SunnyvaleBigLoopTest, keep_clear_02) {
+  std::string seq_num = "102";
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+  RUN_GOLDEN_TEST(0);
+}
 }  // namespace planning
 }  // namespace apollo
 
