@@ -61,6 +61,4 @@ if [ "$RELEASE_DOCKER" != "1" ];then
   ROS="/home/tmp/ros"
   chmod a+w "${ROS}/share/velodyne/launch/start_velodyne.launch"
   chmod a+w -R "${ROS}/share/velodyne_pointcloud/params"
-  chmod a+w "${ROS}/share/gnss_driver/launch/gnss_driver.launch"
-  chmod a+w "${ROS}/share/gnss_driver/conf/gnss_conf_mkz.txt"
 fi

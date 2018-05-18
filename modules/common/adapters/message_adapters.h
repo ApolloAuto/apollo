@@ -30,12 +30,13 @@
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
+#include "modules/drivers/gnss/proto/heading.pb.h"
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
-#include "modules/drivers/proto/ultrasonic_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
+#include "modules/drivers/proto/ultrasonic_radar.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -50,6 +51,7 @@
 #include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/Image.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "std_msgs/String.h"
 
 /**
  * @file message_adapters.h
@@ -65,7 +67,7 @@ using ChassisAdapter = Adapter<::apollo::canbus::Chassis>;
 using ChassisDetailAdapter = Adapter<::apollo::canbus::ChassisDetail>;
 using ControlCommandAdapter = Adapter<control::ControlCommand>;
 using GpsAdapter = Adapter<apollo::localization::Gps>;
-using ImuAdapter = Adapter<localization::Imu>;
+using ImuAdapter = Adapter<localization::CorrectedImu>;
 using RawImuAdapter = Adapter<apollo::drivers::gnss::Imu>;
 using LocalizationAdapter = Adapter<apollo::localization::LocalizationEstimate>;
 using MonitorAdapter = Adapter<apollo::common::monitor::MonitorMessage>;
@@ -117,6 +119,10 @@ using PandoraCameraRightGrayAdapter = Adapter<::sensor_msgs::Image>;
 using PandoraCameraLeftGrayAdapter = Adapter<::sensor_msgs::Image>;
 using PandoraCameraFrontGrayAdapter = Adapter<::sensor_msgs::Image>;
 using PandoraCameraBackGrayAdapter = Adapter<::sensor_msgs::Image>;
+using GnssRawDataAdapter = Adapter<std_msgs::String>;
+using StreamStatusAdapter = Adapter<drivers::gnss_status::StreamStatus>;
+using GnssHeadingAdapter = Adapter<drivers::gnss::Heading>;
+using RtcmDataAdapter = Adapter<std_msgs::String>;
 
 }  // namespace adapter
 }  // namespace common
