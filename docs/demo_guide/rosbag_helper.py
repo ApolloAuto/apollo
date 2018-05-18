@@ -16,7 +16,6 @@
 # limitations under the License.
 ###############################################################################
 
-DEMO_BAG_URL = "https://github.com/ApolloAuto/apollo/releases/download/v2.5.0/demo_2.5.bag"
 
 import urllib
 import os
