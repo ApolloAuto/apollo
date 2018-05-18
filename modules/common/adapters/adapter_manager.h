@@ -295,6 +295,10 @@ class AdapterManager {
   REGISTER_ADAPTER(PerceptionLaneMask)
 
   REGISTER_ADAPTER(Guardian)
+  REGISTER_ADAPTER(GnssRawData);
+  REGISTER_ADAPTER(StreamStatus);
+  REGISTER_ADAPTER(GnssHeading);
+  REGISTER_ADAPTER(RtcmData);
 
   DECLARE_SINGLETON(AdapterManager);
 };
