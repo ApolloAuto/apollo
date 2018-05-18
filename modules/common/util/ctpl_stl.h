@@ -1,22 +1,22 @@
 /*********************************************************
-*
-*  Copyright (C) 2014 by Vitaliy Vitsentiy
-*
-*  Modifications Copyright 2017 The Apollo Authors. All Rights Reserved.
-*
-*  Licensed under the Apache License, Version 2.0 (the "License");
-*  you may not use this file except in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-*  Unless required by applicable law or agreed to in writing, software
-*  distributed under the License is distributed on an "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*  See the License for the specific language governing permissions and
-*  limitations under the License.
-*
-*********************************************************/
+ *
+ *  Copyright (C) 2014 by Vitaliy Vitsentiy
+ *
+ *  Modifications Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *********************************************************/
 
 // This file is a modification of
 // https://github.com/vit-vit/CTPL/blob/master/ctpl_stl.h
@@ -51,14 +51,19 @@ namespace detail {
 template <typename T>
 class Queue {
  public:
-  bool push(T const &value) {
-    std::unique_lock<std::mutex> lock(mutex_);
+  bool push(const T &value) {
+    std::lock_guard<std::mutex> lock(mutex_);
     q_.push(value);
+    return true;
+  }
+  bool push(T &&value) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    q_.emplace(std::move(value));
     return true;
   }
   // deletes the retrieved element, do not use for non integral types
   bool pop(T &v) {  // NOLINT
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     if (q_.empty()) {
       return false;
     }
@@ -66,8 +71,9 @@ class Queue {
     q_.pop();
     return true;
   }
+
   bool empty() {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return q_.empty();
   }
 
@@ -79,31 +85,21 @@ class Queue {
 
 class ThreadPool {
  public:
-  ThreadPool() {
-    Init();
-  }
+  ThreadPool() { Init(); }
   explicit ThreadPool(int n_threads) {
     Init();
     Resize(n_threads);
   }
 
   // the destructor waits for all the functions in the queue to be finished
-  ~ThreadPool() {
-    Stop(true);
-  }
+  ~ThreadPool() { Stop(true); }
 
   // get the number of running threads in the pool
-  int size() {
-    return static_cast<int>(threads_.size());
-  }
+  int size() { return static_cast<int>(threads_.size()); }
 
   // number of idle threads
-  int NumIdle() {
-    return n_waiting_;
-  }
-  std::thread &GetThread(const int i) {
-    return *(threads_[i]);
-  }
+  int NumIdle() { return n_waiting_; }
+  std::thread &GetThread(const int i) { return *(threads_[i]); }
 
   // change the number of threads in the pool
   // should be called from one thread, otherwise be careful to not interleave,
@@ -126,11 +122,10 @@ class ThreadPool {
           *(flags_[i]) = true;  // this thread will finish
           threads_[i]->detach();
         }
-        {
-          // stop the detached threads that were waiting
-          std::unique_lock<std::mutex> lock(mutex_);
-          cv_.notify_all();
-        }
+
+        // stop the detached threads that were waiting
+        cv_.notify_all();
+
         // safe to delete because the threads are detached
         threads_.resize(n_threads);
 
@@ -144,21 +139,17 @@ class ThreadPool {
 
   // empty the queue
   void ClearQueue() {
-    std::function<void(int id)> *_f;
+    std::shared_ptr<std::function<void(int id)>> f;
     // empty the queue
-    while (q_.pop(_f)) {
-      delete _f;
+    while (q_.pop(f)) {
+      // do nothing
     }
   }
 
   // pops a functional wrapper to the original function
-  std::function<void(int)> Pop() {
-    std::function<void(int id)> *_f = nullptr;
-    q_.pop(_f);
-    std::unique_ptr<std::function<void(int id)>> func(
-        _f);  // at return, delete the function even if an exception occurred
-    std::function<void(int)> f;
-    if (_f) f = *_f;
+  std::shared_ptr<std::function<void(int id)>> Pop() {
+    std::shared_ptr<std::function<void(int id)>> f;
+    q_.pop(f);
     return f;
   }
 
@@ -180,10 +171,9 @@ class ThreadPool {
       if (is_done_ || is_stop_) return;
       is_done_ = true;  // give the waiting threads a command to finish
     }
-    {
-      std::unique_lock<std::mutex> lock(mutex_);
-      cv_.notify_all();  // stop all waiting threads
-    }
+
+    cv_.notify_all();  // stop all waiting threads
+
     for (int i = 0; i < static_cast<int>(threads_.size());
          ++i) {  // wait for the computing threads to finish
       if (threads_[i]->joinable()) {
@@ -204,10 +194,12 @@ class ThreadPool {
         std::make_shared<std::packaged_task<decltype(f(0, rest...))(int)>>(
             std::bind(std::forward<F>(f), std::placeholders::_1,
                       std::forward<Rest>(rest)...));
-    auto _f = new std::function<void(int id)>([pck](int id) { (*pck)(id); });
-    q_.push(_f);
-    std::unique_lock<std::mutex> lock(mutex_);
+    auto _f = std::make_shared<std::function<void(int id)>>(
+        [pck](int id) { (*pck)(id); });
+    // It is not necessary to lock q_ because it is locked in the Queue class.
+    q_.push(std::move(_f));
     cv_.notify_one();
+
     return pck->get_future();
   }
 
@@ -219,10 +211,12 @@ class ThreadPool {
   auto Push(F &&f) -> std::future<decltype(f(0))> {
     auto pck = std::make_shared<std::packaged_task<decltype(f(0))(int)>>(
         std::forward<F>(f));
-    auto _f = new std::function<void(int id)>([pck](int id) { (*pck)(id); });
-    q_.push(_f);
-    std::unique_lock<std::mutex> lock(mutex_);
+    auto _f = std::make_shared<std::function<void(int id)>>(
+        [pck](int id) { (*pck)(id); });
+    // It is not necessary to lock q_ because it is locked in the Queue class.
+    q_.push(std::move(_f));
     cv_.notify_one();
+
     return pck->get_future();
   }
 
@@ -238,13 +232,10 @@ class ThreadPool {
         flags_[i]);  // a copy of the shared ptr to the flag
     auto f = [this, i, flag /* a copy of the shared ptr to the flag */]() {
       std::atomic<bool> &_flag = *flag;
-      std::function<void(int id)> *_f;
+      std::shared_ptr<std::function<void(int id)>> _f;
       bool is_pop_ = q_.pop(_f);
       while (true) {
         while (is_pop_) {  // if there is anything in the queue
-          std::unique_ptr<std::function<void(int id)>> func(
-              _f);  // at return, delete the function even if an exception
-                    // occurred
           (*_f)(i);
           if (_flag) {
             // the thread is wanted to stop, return even if the queue is not
@@ -255,17 +246,19 @@ class ThreadPool {
           }
         }
         // the queue is empty here, wait for the next command
-        std::unique_lock<std::mutex> lock(mutex_);
-        ++n_waiting_;
-        cv_.wait(lock, [this, &_f, &is_pop_, &_flag]() {
-          is_pop_ = q_.pop(_f);
-          return is_pop_ || is_done_ || _flag;
-        });
-        --n_waiting_;
-        if (!is_pop_) {
-          // if the queue is empty and is_done_ == true or *flag
-          // then return
-          return;
+        {
+          std::unique_lock<std::mutex> lock(mutex_);
+          ++n_waiting_;
+          cv_.wait(lock, [this, &_f, &is_pop_, &_flag]() {
+            is_pop_ = q_.pop(_f);
+            return is_pop_ || is_done_ || _flag;
+          });
+          --n_waiting_;
+          if (!is_pop_) {
+            // if the queue is empty and is_done_ == true or *flag
+            // then return
+            return;
+          }
         }
       }
     };
@@ -281,7 +274,7 @@ class ThreadPool {
 
   std::vector<std::unique_ptr<std::thread>> threads_;
   std::vector<std::shared_ptr<std::atomic<bool>>> flags_;
-  detail::Queue<std::function<void(int id)> *> q_;
+  detail::Queue<std::shared_ptr<std::function<void(int id)>>> q_;
   std::atomic<bool> is_done_;
   std::atomic<bool> is_stop_;
   std::atomic<int> n_waiting_;  // how many threads are waiting
