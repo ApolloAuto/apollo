@@ -56,6 +56,10 @@ message AdapterConfig {
     PANDORA_CAMERA_LEFT_GRAY = 49;
     PANDORA_CAMERA_FRONT_GRAY = 50;
     PANDORA_CAMERA_BACK_GRAY = 51;
+    GNSS_RAW_DATA = 52;
+    STREAM_STATUS = 53;
+    GNSS_HEADING = 54;
+    RTCM_DATA = 55;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

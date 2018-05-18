@@ -291,6 +291,10 @@ class AdapterManager {
   REGISTER_ADAPTER(PandoraCameraLeftGray);
   REGISTER_ADAPTER(PandoraCameraFrontGray);
   REGISTER_ADAPTER(PandoraCameraBackGray);
+  REGISTER_ADAPTER(GnssRawData);
+  REGISTER_ADAPTER(StreamStatus);
+  REGISTER_ADAPTER(GnssHeading);
+  REGISTER_ADAPTER(RtcmData);
 
   DECLARE_SINGLETON(AdapterManager);
 };
