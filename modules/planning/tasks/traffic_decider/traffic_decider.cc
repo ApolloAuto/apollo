@@ -159,7 +159,8 @@ Status TrafficDecider::Execute(Frame *frame,
            << TrafficRuleConfig::RuleId_Name(rule_config.rule_id());
   }
 
-  Creeper::instance()->Run(frame, reference_line_info);
+  // Creeper::instance()->Run(frame, reference_line_info);
+
   BuildPlanningTarget(reference_line_info);
   return Status::OK();
 }
