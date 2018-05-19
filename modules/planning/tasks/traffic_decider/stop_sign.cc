@@ -85,45 +85,66 @@ void StopSign::MakeDecisions(Frame* frame,
   ProcessStopStatus(reference_line_info, *next_stop_sign_, &watch_vehicles);
 
   // monitor vehicles at associated stop signs
-  auto* path_decision = reference_line_info->path_decision();
-  if (stop_status_ == StopSignStatus::DRIVE) {
-    for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-      // add to watch_vehicles if adc is still proceeding to stop sign
-      AddWatchVehicle(*path_obstacle, &watch_vehicles);
-    }
-  } else if (!watch_vehicles.empty() &&
-             (stop_status_ == StopSignStatus::STOP ||
-              stop_status_ == StopSignStatus::WAIT)) {
-    // get all vehicles currently watched
-    std::vector<std::string> watch_vehicle_ids;
-    for (StopSignLaneVehicles::iterator it = watch_vehicles.begin();
-         it != watch_vehicles.end(); ++it) {
-      std::copy(it->second.begin(), it->second.end(),
-                std::back_inserter(watch_vehicle_ids));
+  if (stop_status_ == StopSignStatus::DRIVE ||
+      stop_status_ == StopSignStatus::STOP ||
+      stop_status_ == StopSignStatus::WAIT) {
+    auto* path_decision = reference_line_info->path_decision();
+    if (stop_status_ == StopSignStatus::DRIVE) {
+      for (const auto* path_obstacle :
+          path_decision->path_obstacles().Items()) {
+        // add to watch_vehicles if adc is still proceeding to stop sign
+        AddWatchVehicle(*path_obstacle, &watch_vehicles);
+      }
+    } else if (!watch_vehicles.empty() &&
+        (stop_status_ == StopSignStatus::STOP ||
+        stop_status_ == StopSignStatus::WAIT)) {
+      // get all vehicles currently watched
+      std::vector<std::string> watch_vehicle_ids;
+      for (StopSignLaneVehicles::iterator it = watch_vehicles.begin();
+          it != watch_vehicles.end(); ++it) {
+        std::copy(it->second.begin(), it->second.end(),
+                  std::back_inserter(watch_vehicle_ids));
+      }
+
+      for (const auto* path_obstacle :
+          path_decision->path_obstacles().Items()) {
+        // remove from watch_vehicles if adc is stopping/waiting at stop sign
+        RemoveWatchVehicle(*path_obstacle, watch_vehicle_ids, &watch_vehicles);
+      }
     }
 
-    for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-      // remove from watch_vehicles if adc is stopping/waiting at stop sign
-      RemoveWatchVehicle(*path_obstacle, watch_vehicle_ids, &watch_vehicles);
-    }
+    ClearWatchVehicle(reference_line_info, &watch_vehicles);
+
+    UpdateWatchVehicles(&watch_vehicles);
   }
-
-  ClearWatchVehicle(reference_line_info, &watch_vehicles);
-
-  UpdateWatchVehicles(&watch_vehicles);
 
   std::string stop_sign_id = next_stop_sign_->id().id();
   if (stop_status_ == StopSignStatus::STOP_DONE) {
-    // stop done and no vehicles to wait for
+    // stop done: clear stop_status
+    double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+    StopSignStatus stop_sign_status = GetPlanningStatus()->stop_sign();
+    const std::vector<PathOverlap>& stop_sign_overlaps =
+        reference_line_info->reference_line().map_path().stop_sign_overlaps();
+    for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
+      if (stop_sign_status.stop_sign_id() == stop_sign_overlap.object_id) {
+        if (adc_front_edge_s - stop_sign_overlap.end_s >
+            config_.stop_sign().min_pass_s_distance()) {
+          GetPlanningStatus()->clear_stop_sign();
+        }
+        break;
+      }
+    }
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] DONE";
   } else if (stop_status_ == StopSignStatus::CREEP) {
-    auto* next_overlap =
-        reference_line_info->reference_line().map_path().NextLaneOverlap(
-            reference_line_info->AdcSlBoundary().end_s());
+    // creep: stop decition
+    double creep_stop_s = next_stop_sign_overlap_->end_s +
+          config_.stop_sign().creep().creep_distance_to_stop_line();
     BuildStopDecision(frame, reference_line_info,
-                      const_cast<PathOverlap*>(next_overlap),
+                      "CREEP" + stop_sign_id ,
+                      creep_stop_s,
                       config_.stop_sign().creep().stop_distance(),
                       nullptr);
+    ADEBUG << "stop_sign_id[" << stop_sign_id << "] CREEP";
   } else {
     // stop decision
     double stop_deceleration = util::GetADCStopDeceleration(
@@ -146,14 +167,24 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(reference_line_info);
 
   next_stop_sign_overlap_ = nullptr;
+
+  StopSignStatus stop_sign_status = GetPlanningStatus()->stop_sign();
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info->reference_line().map_path().stop_sign_overlaps();
-
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   double min_start_s = std::numeric_limits<double>::max();
   for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
+    if (stop_sign_status.stop_sign_id() == stop_sign_overlap.object_id) {
+      if (stop_sign_status.has_status() &&
+          (stop_sign_status.status() == StopSignStatus::CREEP ||
+          stop_sign_status.status() == StopSignStatus::STOP_DONE)) {
+        next_stop_sign_overlap_ = const_cast<PathOverlap*>(&stop_sign_overlap);
+        break;
+      }
+    }
+
     if (adc_front_edge_s - stop_sign_overlap.end_s <=
-            config_.stop_sign().min_pass_s_distance() &&
+        config_.stop_sign().min_pass_s_distance() &&
         stop_sign_overlap.start_s < min_start_s) {
       min_start_s = stop_sign_overlap.start_s;
       next_stop_sign_overlap_ = const_cast<PathOverlap*>(&stop_sign_overlap);
@@ -161,7 +192,6 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
   }
 
   if (next_stop_sign_overlap_ == nullptr) {
-    GetPlanningStatus()->clear_stop_sign();
     return false;
   }
 
@@ -170,18 +200,19 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
   next_stop_sign_ =
       std::move(const_cast<StopSignInfo*>(next_stop_sign_ptr.get()));
 
-  // clear status for unrelavant stop signs
-  if (GetPlanningStatus()->has_stop_sign()) {
-    auto stop_sign_status = GetPlanningStatus()->stop_sign();
-    if (stop_sign_status.stop_sign_id() != next_stop_sign_->id().id()) {
-      GetPlanningStatus()->clear_stop_sign();
-      GetPlanningStatus()->mutable_stop_sign()->set_stop_sign_id(
-          next_stop_sign_->id().id());
-    }
+  // update stop sign status
+  if (stop_sign_status.stop_sign_id() != next_stop_sign_->id().id()) {
+    GetPlanningStatus()->clear_stop_sign();
+    GetPlanningStatus()->mutable_stop_sign()->set_stop_sign_id(
+        next_stop_sign_->id().id());
   }
 
-  // find all the lanes associated/guarded by the stop sign
-  GetAssociatedLanes(*next_stop_sign_);
+  if (!(stop_sign_status.has_status() &&
+      (stop_sign_status.status() == StopSignStatus::CREEP ||
+      stop_sign_status.status() == StopSignStatus::STOP_DONE))) {
+    // find all the lanes associated/guarded by the stop sign
+    GetAssociatedLanes(*next_stop_sign_);
+  }
 
   return true;
 }
@@ -230,10 +261,16 @@ int StopSign::GetAssociatedLanes(const StopSignInfo& stop_sign_info) {
  * @brief: check if next step of CREEP or not
  */
 bool StopSign::CheckCreep(const hdmap::StopSignInfo& stop_sign_info) {
-  if (config_.stop_sign().creep().enabled() &&
-      (stop_sign_info.stop_sign().type() == hdmap::StopSign::ONE_WAY ||
-       stop_sign_info.stop_sign().type() == hdmap::StopSign::TWO_WAY)) {
-    return true;
+  if (config_.stop_sign().creep().enabled()) {
+    if (stop_sign_info.stop_sign().type() == hdmap::StopSign::ONE_WAY ||
+        stop_sign_info.stop_sign().type() == hdmap::StopSign::TWO_WAY) {
+      return true;
+    }
+    // TODO(all): temp work around
+    //            to be removed once MAP fix on stop_sign type is in
+    if (associated_lanes_.size() <=1) {
+      return true;
+    }
   }
   return false;
 }
@@ -306,19 +343,19 @@ int StopSign::ProcessStopStatus(
       }
       break;
     case StopSignStatus::CREEP: {
-      constexpr double kDeltaS = 0.5;
-      auto* path_overlap =
-          reference_line_info->reference_line().map_path().NextLaneOverlap(
-              reference_line_info->AdcSlBoundary().end_s());
-      if (path_overlap != nullptr &&
-          path_overlap->start_s - reference_line_info->AdcSlBoundary().end_s() >
-              kDeltaS) {
-        // keep in CREEP status
-      } else {
+      double creep_stop_s = next_stop_sign_overlap_->end_s +
+          config_.stop_sign().creep().creep_distance_to_stop_line();
+      const double distance = creep_stop_s -
+          reference_line_info->AdcSlBoundary().end_s();
+      if (distance < config_.stop_sign().creep().max_valid_stop_distance()) {
         bool all_far_away = true;
-        for (auto* obstacle :
-             reference_line_info->path_decision()->path_obstacles().Items()) {
-          if (obstacle->reference_line_st_boundary().min_t() <
+        for (auto* path_obstacle :
+            reference_line_info->path_decision()->path_obstacles().Items()) {
+          if (path_obstacle->obstacle()->IsVirtual() ||
+              !path_obstacle->obstacle()->IsStatic()) {
+            continue;
+          }
+          if (path_obstacle->reference_line_st_boundary().min_t() <
               config_.stop_sign().creep().min_boundary_t()) {
             all_far_away = false;
             break;
@@ -715,17 +752,35 @@ int StopSign::BuildStopDecision(
   CHECK_NOTNULL(reference_line_info);
   CHECK_NOTNULL(overlap);
 
+  return BuildStopDecision(
+      frame, reference_line_info, overlap->object_id,
+      overlap->start_s, stop_distance, watch_vehicles);
+}
+
+/**
+ * @brief: build stop decision
+ */
+int StopSign::BuildStopDecision(
+    Frame* frame,
+    ReferenceLineInfo* const reference_line_info,
+    const std::string stop_wall_id,
+    const double stop_line_s,
+    const double stop_distance,
+    StopSignLaneVehicles* watch_vehicles) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
   // check
   const auto& reference_line = reference_line_info->reference_line();
-  if (!WithinBound(0.0, reference_line.Length(), overlap->start_s)) {
-    ADEBUG << "stop_sign " << overlap->object_id << " is not on reference line";
+  if (!WithinBound(0.0, reference_line.Length(), stop_line_s)) {
+    AERROR << "stop_line_s[" << stop_line_s << "] is not on reference line";
     return 0;
   }
 
   // create virtual stop wall
-  std::string virtual_obstacle_id = STOP_SIGN_VO_ID_PREFIX + overlap->object_id;
+  std::string virtual_obstacle_id = STOP_SIGN_VO_ID_PREFIX + stop_wall_id;
   auto* obstacle = frame->CreateStopObstacle(
-      reference_line_info, virtual_obstacle_id, overlap->start_s);
+      reference_line_info, virtual_obstacle_id, stop_line_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
     return -1;
@@ -737,7 +792,7 @@ int StopSign::BuildStopDecision(
   }
 
   // build stop decision
-  const double stop_s = overlap->start_s - stop_distance;
+  const double stop_s = stop_line_s - stop_distance;
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
