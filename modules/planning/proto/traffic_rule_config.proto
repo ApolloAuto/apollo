@@ -18,12 +18,16 @@ message ChangeLaneConfig {
 message CreepConfig {
   optional bool enabled = 1;
   // stop distance(m) to the stop line of next lane overlap while creeping
-  optional double stop_distance = 2 [ default=0.5 ]; // meter
-  optional double speed_limit = 3 [ default=1.0 ]; // m/s
+  optional double creep_distance_to_stop_line = 2 [ default=1.0 ]; // meter
+  // stop distance(m) to the stop line of next lane overlap while creeping
+  optional double stop_distance = 3 [ default=0.5 ]; // meter
+  optional double speed_limit = 4 [ default=1.0 ]; // m/s
+  // max distance(m) to the stop line to be considered as a valid stop for creap
+  optional double max_valid_stop_distance = 5 [ default=1.0 ]; // meter
   // min boundary t to ignore obstacles while creeping
-  optional double min_boundary_t = 4 [ default=6.0 ]; // second
+  optional double min_boundary_t = 6 [ default=6.0 ]; // second
   // min boundary s to ignore obstacles while creeping
-  optional double min_boundary_s = 5 [ default=3.0 ]; // meter
+  optional double min_boundary_s = 7 [ default=3.0 ]; // meter
 }
 
 message CrosswalkConfig {
