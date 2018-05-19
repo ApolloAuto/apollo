@@ -265,8 +265,7 @@ ComparableCost TrajectoryCost::GetCostBetweenObsBoxes(
 
   obstacle_cost.safety_cost +=
       config_.obstacle_collision_cost() *
-      Sigmoid(config_.obstacle_collision_cost() - distance);
-  Sigmoid(config_.obstacle_collision_distance() - distance);
+      Sigmoid(config_.obstacle_collision_distance() - distance);
   obstacle_cost.safety_cost +=
       20.0 * Sigmoid(config_.obstacle_risk_distance() - distance);
   return obstacle_cost;
