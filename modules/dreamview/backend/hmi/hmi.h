@@ -17,6 +17,9 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
 #define MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
 
+#include <memory>
+#include <mutex>
+
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
@@ -34,7 +37,9 @@ class HMI {
 
  private:
   // Broadcast HMIStatus to all clients.
-  void BroadcastHMIStatus();
+  void StartBroadcastHMIStatusThread();
+  void DeferredBroadcastHMIStatus();
+
   // Send VehicleParam to the given conn, or broadcast if conn is null.
   void SendVehicleParam(WebSocketHandler::Connection *conn = nullptr);
 
@@ -43,6 +48,11 @@ class HMI {
   // No ownership.
   WebSocketHandler *websocket_;
   MapService *map_service_;
+
+  // For HMIStatus broadcasting.
+  std::unique_ptr<std::thread> broadcast_hmi_status_thread_;
+  bool need_broadcast_ = false;
+  std::mutex need_broadcast_mutex_;
 
   apollo::common::monitor::MonitorLogger logger_;
 };
