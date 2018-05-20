@@ -51,6 +51,7 @@ HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
   // Register websocket message handlers.
   if (websocket_) {
     RegisterMessageHandlers();
+    StartBroadcastHMIStatusThread();
   }
 }
 
@@ -159,7 +160,7 @@ void HMI::RegisterMessageHandlers() {
       CHECK(map_service_->ReloadMap(true))
           << "Failed to load new simulation map: " << new_map;
       // And then broadcast new HMIStatus to all clients.
-      BroadcastHMIStatus();
+      DeferredBroadcastHMIStatus();
     });
   websocket_->RegisterMessageHandler(
       "ChangeMap",
@@ -178,7 +179,7 @@ void HMI::RegisterMessageHandlers() {
   HMIWorker::instance()->RegisterChangeVehicleHandler(
     [this](const std::string& new_vehicle) {
       // Broadcast new HMIStatus and VehicleParam.
-      BroadcastHMIStatus();
+      DeferredBroadcastHMIStatus();
       SendVehicleParam();
     });
   websocket_->RegisterMessageHandler(
@@ -198,7 +199,7 @@ void HMI::RegisterMessageHandlers() {
   HMIWorker::instance()->RegisterChangeModeHandler(
     [this](const std::string& new_mode) {
       // Broadcast new HMIStatus.
-      BroadcastHMIStatus();
+      DeferredBroadcastHMIStatus();
     });
   websocket_->RegisterMessageHandler(
       "ChangeMode",
@@ -238,7 +239,7 @@ void HMI::RegisterMessageHandlers() {
         if (Clock::NowInSeconds() - system_status.header().timestamp_sec() <
             FLAGS_system_status_lifetime_seconds) {
           HMIWorker::instance()->UpdateSystemStatus(system_status);
-          BroadcastHMIStatus();
+          DeferredBroadcastHMIStatus();
         }
       });
 
@@ -252,23 +253,42 @@ void HMI::RegisterMessageHandlers() {
       });
 }
 
-void HMI::BroadcastHMIStatus() {
-  // In unit tests, we may leave websocket_ as NULL and skip broadcasting.
-  RLock rlock(HMIWorker::instance()->GetStatusMutex());
-  const auto &status = HMIWorker::instance()->GetStatus();
-  if (websocket_) {
-    websocket_->BroadcastData(
-        JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
-  }
+void HMI::StartBroadcastHMIStatusThread() {
+  constexpr int kMinBroadcastIntervalMs = 200;
+  broadcast_hmi_status_thread_.reset(new std::thread([this]() {
+    while (true) {
+      std::this_thread::sleep_for(
+          std::chrono::milliseconds(kMinBroadcastIntervalMs));
 
-  // Broadcast messages.
-  apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
-  if (status.current_map().empty()) {
-    log_buffer.WARN("You haven't select map yet!");
-  }
-  if (status.current_vehicle().empty()) {
-    log_buffer.WARN("You haven't select vehicle yet!");
-  }
+      {
+        std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
+        if (!need_broadcast_) {
+          continue;
+        }
+        // Reset to false.
+        need_broadcast_ = false;
+      }
+
+      RLock rlock(HMIWorker::instance()->GetStatusMutex());
+      const auto &status = HMIWorker::instance()->GetStatus();
+      websocket_->BroadcastData(
+          JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
+
+      // Broadcast messages.
+      apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
+      if (status.current_map().empty()) {
+        log_buffer.WARN("You haven't select map yet!");
+      }
+      if (status.current_vehicle().empty()) {
+        log_buffer.WARN("You haven't select vehicle yet!");
+      }
+    }
+  }));
+}
+
+void HMI::DeferredBroadcastHMIStatus() {
+  std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
+  need_broadcast_ = true;
 }
 
 void HMI::SendVehicleParam(WebSocketHandler::Connection *conn) {
