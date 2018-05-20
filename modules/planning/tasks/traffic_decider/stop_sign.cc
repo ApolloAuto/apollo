@@ -395,8 +395,8 @@ int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
       s = s.empty() ? vehicle : s + "," + vehicle;
       (*watch_vehicles)[associated_lane_id].push_back(vehicle);
     }
-    ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
-           << s << "]";
+    ADEBUG << "GetWatchVehicles watch_vehicles: lane_id["
+        << associated_lane_id << "] vehicle[" << s << "]";
   }
 
   return 0;
@@ -414,9 +414,14 @@ int StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
   for (auto it = watch_vehicles->begin(); it != watch_vehicles->end(); ++it) {
     auto* lane_watch_vehicles = stop_sign_status->add_lane_watch_vehicles();
     lane_watch_vehicles->set_lane_id(it->first);
+    std::string s;
     for (size_t i = 0; i < it->second.size(); ++i) {
-      lane_watch_vehicles->add_watch_vehicles(it->second[i]);
+      std::string vehicle = it->second[i];
+      s = s.empty() ? vehicle : s + "," + vehicle;
+      lane_watch_vehicles->add_watch_vehicles(vehicle);
     }
+    ADEBUG << "UpdateWatchVehicles watch_vehicles: lane_id["
+        << it->first << "] vehicle[" << s << "]";
   }
 
   return 0;

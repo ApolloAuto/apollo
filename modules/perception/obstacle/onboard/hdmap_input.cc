@@ -31,16 +31,16 @@ namespace perception {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::math::Vec2d;
 using apollo::common::math::Polygon2d;
-using apollo::hdmap::LineSegment;
+using apollo::common::math::Vec2d;
 using apollo::hdmap::BoundaryEdge;
-using apollo::hdmap::RoadROIBoundaryPtr;
-using apollo::hdmap::JunctionInfoConstPtr;
-using apollo::hdmap::JunctionBoundaryPtr;
 using apollo::hdmap::BoundaryEdge_Type_LEFT_BOUNDARY;
 using apollo::hdmap::BoundaryEdge_Type_RIGHT_BOUNDARY;
 using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::JunctionBoundaryPtr;
+using apollo::hdmap::JunctionInfoConstPtr;
+using apollo::hdmap::LineSegment;
+using apollo::hdmap::RoadROIBoundaryPtr;
 using pcl_util::PointD;
 using pcl_util::PointDCloud;
 using pcl_util::PointDCloudPtr;
@@ -52,17 +52,12 @@ constexpr double kRadianToDegree = 180.0 / M_PI;
 // HDMapInput
 HDMapInput::HDMapInput() {}
 
-bool HDMapInput::Init() {
-  return HDMapUtil::ReloadMaps();
-}
-
 bool HDMapInput::GetROI(const PointD& pointd, const double map_radius,
                         HdmapStructPtr* mapptr) {
   auto* hdmap = HDMapUtil::BaseMapPtr();
   if (hdmap == nullptr) {
     return false;
   }
-  std::unique_lock<std::mutex> lock(mutex_);
   if (mapptr != NULL && *mapptr == nullptr) {
     (*mapptr).reset(new HdmapStruct);
   }

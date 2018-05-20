@@ -108,6 +108,57 @@ void PlanningTestBase::SetUp() {
     if (iter != rule_enabled_.end()) {
       config.set_enabled(iter->second);
     }
+
+    // init traffic rule config files
+    switch (config.rule_id()) {
+      case TrafficRuleConfig::BACKSIDE_VEHICLE:
+        backside_vehicle_config_ = &config;
+        break;
+      case TrafficRuleConfig::CHANGE_LANE:
+        change_lane_config_ = &config;
+        break;
+      case TrafficRuleConfig::CROSSWALK:
+        crosswalk_config_ = &config;
+        break;
+      case TrafficRuleConfig::DESTINATION:
+        destination_config_ = &config;
+        break;
+      case TrafficRuleConfig::FRONT_VEHICLE:
+        front_vehicle_config_ = &config;
+        break;
+      case TrafficRuleConfig::KEEP_CLEAR:
+        keep_clear_config_ = &config;
+        break;
+      case TrafficRuleConfig::REFERENCE_LINE_END:
+        referrence_line_end_config_ = &config;
+        break;
+      case TrafficRuleConfig::REROUTING:
+        rerouting_config_ = &config;
+        break;
+      case TrafficRuleConfig::SIGNAL_LIGHT:
+        signal_light_config_ = &config;
+        break;
+      case TrafficRuleConfig::STOP_SIGN:
+        stop_sign_config_ = &config;
+        break;
+    }
+  }
+}
+
+void PlanningTestBase::UpdateData() {
+  CHECK(SetUpAdapters()) << "Failed to setup adapters";
+  if (!FLAGS_test_previous_planning_file.empty()) {
+    const auto prev_planning_file =
+        FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
+    ADCTrajectory prev_planning;
+    CHECK(common::util::GetProtoFromFile(prev_planning_file, &prev_planning));
+    planning_.SetLastPublishableTrajectory(prev_planning);
+  }
+  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+    auto iter = rule_enabled_.find(config.rule_id());
+    if (iter != rule_enabled_.end()) {
+      config.set_enabled(iter->second);
+    }
   }
 }
 
