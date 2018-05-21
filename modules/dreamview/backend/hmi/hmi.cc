@@ -38,9 +38,7 @@ using apollo::canbus::Chassis;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
-using apollo::common::util::FindLinkedPtrOrNull;
 using apollo::common::util::JsonUtil;
-using std::make_unique;
 using Json = WebSocketHandler::Json;
 using RLock = boost::shared_lock<boost::shared_mutex>;
 
