@@ -62,6 +62,7 @@ bool StopSign::ApplyRule(Frame* const frame,
   CHECK_NOTNULL(reference_line_info);
 
   if (!FindNextStopSign(reference_line_info)) {
+    GetPlanningStatus()->clear_stop_sign();
     return true;
   }
 
@@ -173,6 +174,7 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
       reference_line_info->reference_line().map_path().stop_sign_overlaps();
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   double min_start_s = std::numeric_limits<double>::max();
+
   for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
     if (stop_sign_status.stop_sign_id() == stop_sign_overlap.object_id) {
       if (stop_sign_status.has_status() &&
