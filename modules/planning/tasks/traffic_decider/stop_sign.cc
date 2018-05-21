@@ -122,13 +122,13 @@ void StopSign::MakeDecisions(Frame* frame,
   std::string stop_sign_id = next_stop_sign_->id().id();
   if (stop_status_ == StopSignStatus::STOP_DONE) {
     // stop done: clear stop_status
-    double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+    double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
     StopSignStatus stop_sign_status = GetPlanningStatus()->stop_sign();
     const std::vector<PathOverlap>& stop_sign_overlaps =
         reference_line_info->reference_line().map_path().stop_sign_overlaps();
     for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
       if (stop_sign_status.stop_sign_id() == stop_sign_overlap.object_id) {
-        if (adc_front_edge_s - stop_sign_overlap.end_s >
+        if (adc_back_edge_s - stop_sign_overlap.end_s >
             config_.stop_sign().min_pass_s_distance()) {
           GetPlanningStatus()->clear_stop_sign();
         }
@@ -148,15 +148,10 @@ void StopSign::MakeDecisions(Frame* frame,
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] CREEP";
   } else {
     // stop decision
-    double stop_deceleration = util::GetADCStopDeceleration(
-        reference_line_info, next_stop_sign_overlap_->start_s,
-        config_.stop_sign().min_pass_s_distance());
-    if (stop_deceleration < config_.stop_sign().max_stop_deceleration()) {
-      BuildStopDecision(frame, reference_line_info,
-                        const_cast<PathOverlap*>(next_stop_sign_overlap_),
-                        config_.stop_sign().stop_distance(),
-                        &watch_vehicles);
-    }
+    BuildStopDecision(frame, reference_line_info,
+                      const_cast<PathOverlap*>(next_stop_sign_overlap_),
+                      config_.stop_sign().stop_distance(),
+                      &watch_vehicles);
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] STOP";
   }
 }
