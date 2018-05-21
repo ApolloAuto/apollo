@@ -334,7 +334,6 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
  *   come back to the same stop sign 2nd time
  *   adc decision: STOP
  */
-/* TODO(all): fix the test
 TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
@@ -352,13 +351,18 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
 
   RUN_GOLDEN_TEST(0);
 
-  // TODO(all) fix test case
-  // check PlanningStatus value to make sure they are set
-  // const auto& stop_sign_status = GetPlanningStatus()->stop_sign();
-  // EXPECT_EQ("9762", stop_sign_status.stop_sign_id());
-  // EXPECT_TRUE(stop_sign_status.has_status() &&
-  //            stop_sign_status.status() == StopSignStatus::DRIVE);
-  // EXPECT_FALSE(stop_sign_status.has_stop_start_time());
+  // check PlanningStatus value
+  auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  EXPECT_EQ("9762", stop_sign_status->stop_sign_id());
+  EXPECT_TRUE(stop_sign_status->has_status() &&
+              stop_sign_status->status() == StopSignStatus::DRIVE);
+  EXPECT_FALSE(stop_sign_status->has_stop_start_time());
+  // waiting for vehicle 4059 on lane 868_1_-1
+  EXPECT_EQ(1, stop_sign_status->lane_watch_vehicles_size());
+  auto lane_watch_vehicles = stop_sign_status->lane_watch_vehicles(0);
+  EXPECT_EQ("1706a_1_-1", lane_watch_vehicles.lane_id());
+  EXPECT_TRUE(lane_watch_vehicles.watch_vehicles_size() == 1 &&
+  lane_watch_vehicles.watch_vehicles(0) == "12257");
 
   // step 2: pass stop sign
   seq_num = "13";
@@ -374,14 +378,15 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   EXPECT_FALSE(GetPlanningStatus()->has_stop_sign());
 
   // step 3: 2nd round
+
   seq_num = "12";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  PlanningTestBase::UpdateData();
+  PlanningTestBase::SetUp();
+
   RUN_GOLDEN_TEST(2);
 }
-*/
 
 /*
  * crosswalk: pedestrian on crosswalk
