@@ -293,16 +293,7 @@ int StopSign::ProcessStopStatus(
   }
   stop_status_ = stop_sign_status->status();
 
-  // get stop start time from PlanningStatus
-  double stop_start_time = Clock::NowInSeconds() + 1;
-  if (stop_sign_status->has_stop_start_time()) {
-    stop_start_time = stop_sign_status->stop_start_time();
-  }
-  double wait_time = Clock::NowInSeconds() - stop_start_time;
-  ADEBUG << "stop_start_time: " << stop_start_time
-         << "; wait_time: " << wait_time;
-
-  // adjust status. this may happen if there's bad data
+  // adjust status
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   double stop_line_start_s = next_stop_sign_overlap_->start_s;
   if (stop_line_start_s - adc_front_edge_s >
@@ -311,6 +302,15 @@ int StopSign::ProcessStopStatus(
            << stop_line_start_s - adc_front_edge_s << "]";
     stop_status_ = StopSignStatus::DRIVE;
   }
+
+  // get stop start time from PlanningStatus
+  double stop_start_time = Clock::NowInSeconds() + 1;
+  if (stop_sign_status->has_stop_start_time()) {
+    stop_start_time = stop_sign_status->stop_start_time();
+  }
+  double wait_time = Clock::NowInSeconds() - stop_start_time;
+  ADEBUG << "stop_start_time: " << stop_start_time
+         << "; wait_time: " << wait_time;
 
   // check & update stop status
   switch (stop_status_) {
