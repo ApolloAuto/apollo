@@ -62,6 +62,11 @@ cc_library(
 )
 
 cc_library(
+    name = "threadpool",
+    hdrs = ["threadpool.h"],
+)
+
+cc_library(
     name = "ctpl_stl",
     hdrs = ["ctpl_stl.h"],
 )
