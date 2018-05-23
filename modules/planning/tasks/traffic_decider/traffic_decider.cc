@@ -31,6 +31,7 @@
 #include "modules/planning/tasks/traffic_decider/destination.h"
 #include "modules/planning/tasks/traffic_decider/front_vehicle.h"
 #include "modules/planning/tasks/traffic_decider/keep_clear.h"
+#include "modules/planning/tasks/traffic_decider/pull_over.h"
 #include "modules/planning/tasks/traffic_decider/reference_line_end.h"
 #include "modules/planning/tasks/traffic_decider/rerouting.h"
 #include "modules/planning/tasks/traffic_decider/signal_light.h"
@@ -86,6 +87,10 @@ void TrafficDecider::RegisterRules() {
   s_rule_factory.Register(TrafficRuleConfig::STOP_SIGN,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new StopSign(config);
+                          });
+  s_rule_factory.Register(TrafficRuleConfig::PULL_OVER,
+                          [](const TrafficRuleConfig &config) -> TrafficRule * {
+                            return new PullOver(config);
                           });
 }
 
