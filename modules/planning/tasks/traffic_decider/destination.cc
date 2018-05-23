@@ -28,20 +28,21 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::hdmap::HDMapUtil;
 
 Destination::Destination(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
-bool Destination::ApplyRule(Frame* frame,
-                            ReferenceLineInfo* const reference_line_info) {
+Status Destination::ApplyRule(Frame* frame,
+                              ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
   MakeDecisions(frame, reference_line_info);
 
-  return true;
+  return Status::OK();
 }
 
 /**

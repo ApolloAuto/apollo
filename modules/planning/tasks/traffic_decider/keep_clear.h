@@ -36,7 +36,7 @@ class KeepClear : public TrafficRule {
   explicit KeepClear(const TrafficRuleConfig& config);
   virtual ~KeepClear() = default;
 
-  bool ApplyRule(Frame* const frame,
+  common::Status ApplyRule(Frame* const frame,
                  ReferenceLineInfo* const reference_line_info);
 
  private:

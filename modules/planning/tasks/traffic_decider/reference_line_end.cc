@@ -28,14 +28,15 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 
 ReferenceLineEnd::ReferenceLineEnd(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
-bool ReferenceLineEnd::ApplyRule(Frame* frame,
-                                 ReferenceLineInfo* const reference_line_info) {
+Status ReferenceLineEnd::ApplyRule(
+    Frame* frame, ReferenceLineInfo* const reference_line_info) {
   const auto& reference_line = reference_line_info->reference_line();
   // check
   double remain_s =
@@ -53,7 +54,7 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
       remain_s >
           config_.reference_line_end().min_reference_line_remain_length()) {
     ADEBUG << "have enough reference line to drive on";
-    return true;
+    return Status::OK();
   }
 
   // create avirtual stop wall at the end of reference line to stop the adc
@@ -64,13 +65,14 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
   auto* obstacle = frame->CreateStopObstacle(
       reference_line_info, virtual_obstacle_id, obstacle_start_s);
   if (!obstacle) {
-    AERROR << "Failed to create obstacle[" << virtual_obstacle_id << "]";
-    return false;
+    return Status(common::PLANNING_ERROR,
+                  "Failed to create reference line end obstacle");
   }
   PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for: " << virtual_obstacle_id;
-    return false;
+    return Status(
+        common::PLANNING_ERROR,
+        "Failed to create path obstacle for reference line end obstacle");
   }
 
   // build stop decision
@@ -91,7 +93,7 @@ bool ReferenceLineEnd::ApplyRule(Frame* frame,
   path_decision->AddLongitudinalDecision(
       TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 
-  return true;
+  return Status::OK();
 }
 
 }  // namespace planning
