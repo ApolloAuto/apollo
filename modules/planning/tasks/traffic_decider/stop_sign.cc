@@ -140,15 +140,20 @@ void StopSign::MakeDecisions(Frame* frame,
     // creep: stop decition
     double creep_stop_s = next_stop_sign_overlap_->end_s +
           config_.stop_sign().creep().creep_distance_to_stop_line();
+    const std::string stop_wall_id =
+        STOP_SIGN_CREEP_VO_ID_PREFIX + stop_sign_id;
     BuildStopDecision(frame, reference_line_info,
-                      "CREEP" + stop_sign_id ,
+                      stop_wall_id,
                       creep_stop_s,
                       config_.stop_sign().creep().stop_distance(),
                       nullptr);
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] CREEP";
   } else {
     // stop decision
+    const std::string stop_wall_id =
+        STOP_SIGN_VO_ID_PREFIX + next_stop_sign_overlap_->object_id;
     BuildStopDecision(frame, reference_line_info,
+                      stop_wall_id,
                       const_cast<PathOverlap*>(next_stop_sign_overlap_),
                       config_.stop_sign().stop_distance(),
                       &watch_vehicles);
@@ -742,6 +747,7 @@ int StopSign::ClearWatchVehicle(
 int StopSign::BuildStopDecision(
     Frame* frame,
     ReferenceLineInfo* const reference_line_info,
+    const std::string stop_wall_id,
     PathOverlap* const overlap,
     const double stop_distance,
     StopSignLaneVehicles* watch_vehicles) {
@@ -750,7 +756,7 @@ int StopSign::BuildStopDecision(
   CHECK_NOTNULL(overlap);
 
   return BuildStopDecision(
-      frame, reference_line_info, overlap->object_id,
+      frame, reference_line_info, stop_wall_id,
       overlap->start_s, stop_distance, watch_vehicles);
 }
 
@@ -775,7 +781,7 @@ int StopSign::BuildStopDecision(
   }
 
   // create virtual stop wall
-  std::string virtual_obstacle_id = STOP_SIGN_VO_ID_PREFIX + stop_wall_id;
+  std::string virtual_obstacle_id = stop_wall_id;
   auto* obstacle = frame->CreateStopObstacle(
       reference_line_info, virtual_obstacle_id, stop_line_s);
   if (!obstacle) {
