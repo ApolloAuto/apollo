@@ -31,6 +31,7 @@ enum StopReasonCode {
   STOP_REASON_CREEPER = 105;
   STOP_REASON_REFERENCE_END = 106; // end of the reference_line
   STOP_REASON_YELLOW_SIGNAL = 107; // yellow signal
+  STOP_REASON_PULL_OVER = 108; // pull over
 
 }
 
