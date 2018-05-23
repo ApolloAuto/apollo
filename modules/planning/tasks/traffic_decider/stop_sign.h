@@ -65,6 +65,7 @@ class StopSign : public TrafficRule {
                         StopSignLaneVehicles* watch_vehicles);
   int BuildStopDecision(Frame* const frame,
                         ReferenceLineInfo* const reference_line_info,
+                        const std::string stop_wall_id,
                         hdmap::PathOverlap* const overlap,
                         const double stop_distance,
                         StopSignLaneVehicles* watch_vehicles);
@@ -77,6 +78,8 @@ class StopSign : public TrafficRule {
 
  private:
   static constexpr char const* const STOP_SIGN_VO_ID_PREFIX = "SS_";
+  static constexpr char const* const STOP_SIGN_CREEP_VO_ID_PREFIX =
+      "SS_CREEP_";
   hdmap::PathOverlap* next_stop_sign_overlap_ = nullptr;
   hdmap::StopSignInfo* next_stop_sign_ = nullptr;
   StopSignStatus::Status stop_status_;
