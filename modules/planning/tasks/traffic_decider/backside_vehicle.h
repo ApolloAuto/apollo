@@ -33,7 +33,7 @@ class BacksideVehicle : public TrafficRule {
   explicit BacksideVehicle(const TrafficRuleConfig& config);
   virtual ~BacksideVehicle() = default;
 
-  bool ApplyRule(Frame* const frame,
+  common::Status ApplyRule(Frame* const frame,
                  ReferenceLineInfo* const reference_line_info);
 
  private:

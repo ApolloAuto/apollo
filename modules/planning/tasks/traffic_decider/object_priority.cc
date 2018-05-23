@@ -23,12 +23,14 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
+
 ObjectPriority::ObjectPriority(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
-bool ObjectPriority::ApplyRule(Frame* const frame,
-                               ReferenceLineInfo* const reference_line_info) {
-  return true;
+Status ObjectPriority::ApplyRule(Frame* const frame,
+                                 ReferenceLineInfo* const reference_line_info) {
+  return Status::OK();
 }
 
 }  // namespace planning
