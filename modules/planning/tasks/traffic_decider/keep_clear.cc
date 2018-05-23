@@ -29,12 +29,13 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
 
 KeepClear::KeepClear(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
-bool KeepClear::ApplyRule(Frame* const frame,
-                          ReferenceLineInfo* const reference_line_info) {
+Status KeepClear::ApplyRule(Frame* const frame,
+                            ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -50,9 +51,9 @@ bool KeepClear::ApplyRule(Frame* const frame,
                                  const_cast<PathOverlap*>(&keep_clear_overlap),
                                  obstacle_id)) {
         ADEBUG << "KEEP_CLAER for keep_clear_zone["
-            << keep_clear_overlap.object_id << "] s["
-            << keep_clear_overlap.start_s << ", " << keep_clear_overlap.end_s
-            << "] BUILD";
+               << keep_clear_overlap.object_id << "] s["
+               << keep_clear_overlap.start_s << ", " << keep_clear_overlap.end_s
+               << "] BUILD";
       }
     }
   }
@@ -69,13 +70,13 @@ bool KeepClear::ApplyRule(Frame* const frame,
                                  const_cast<PathOverlap*>(&junction_overlap),
                                  obstacle_id)) {
         ADEBUG << "KEEP_CLAER for junction[" << junction_overlap.object_id
-            << "] s[" << junction_overlap.start_s << ", "
-            << junction_overlap.end_s << "] BUILD";
+               << "] s[" << junction_overlap.start_s << ", "
+               << junction_overlap.end_s << "] BUILD";
       }
     }
   }
 
-  return true;
+  return Status::OK();
 }
 
 bool KeepClear::BuildKeepClearObstacle(

@@ -26,8 +26,8 @@
 
 namespace apollo {
 namespace planning {
-
 using apollo::common::SLPoint;
+using apollo::common::Status;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
@@ -134,17 +134,16 @@ bool ChangeLane::CreateGuardObstacle(
   return true;
 }
 
-bool ChangeLane::ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info) {
+Status ChangeLane::ApplyRule(Frame* const frame,
+                             ReferenceLineInfo* const reference_line_info) {
   // The reference line is not a change lane reference line, skip
   if (reference_line_info->Lanes().IsOnSegment()) {
-    return true;
+    return Status::OK();
   }
   guard_obstacles_.clear();
   overtake_obstacles_.clear();
   if (!FilterObstacles(reference_line_info)) {
-    AERROR << "Failed to filter obstacles";
-    return false;
+    return Status(common::PLANNING_ERROR, "Failed to filter obstacles");
   }
   if (config_.change_lane().enable_guard_obstacle() &&
       !guard_obstacles_.empty()) {
@@ -166,7 +165,7 @@ bool ChangeLane::ApplyRule(Frame* const frame,
           TrafficRuleConfig::RuleId_Name(Id()), path_obstacle->Id(), overtake);
     }
   }
-  return true;
+  return Status::OK();
 }
 
 ObjectDecisionType ChangeLane::CreateOvertakeDecision(
