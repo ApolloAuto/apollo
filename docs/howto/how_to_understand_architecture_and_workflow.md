@@ -21,7 +21,7 @@ In Baidu ApolloAuto, three stages of development have already been described
    - Planning: compute the fine-tuned path, car dynamic controlling info for path segments from route service
    - Routine: local implementation of finding path segments through `Navigator` interface; Using A\*star algorithm. 
 3. HD Maps. One of the key differences from L2 level AV development. L4 AV machine needs Hdmap. Since a robot \(an autonomous vehicle \) needs to rebuild 
-3d world \(please check OpenCV [SLAM]() chapter\) in its microcomputer, reference object coordinates play a great role in relocating VA both in the map and the real world.
+3d world \(please check OpenCV [SLAM]() chapter\) in its microcomputer, reference object coordinates play a great role in relocating AV both in the map and the real world.
 4. Cloud-based Online Simulation Drive Scenario Engine and Data Center. 
    - As a partner of Baidu, you will be granted docker credentials to commit new images and replay the algorithm you developed on the cloud.
    - Create and manage complex scenarios to simulate real-world driving experiences
