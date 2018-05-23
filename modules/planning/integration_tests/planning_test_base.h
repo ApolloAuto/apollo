@@ -87,17 +87,6 @@ class PlanningTestBase : public ::testing::Test {
   Planning planning_;
   std::map<TrafficRuleConfig::RuleId, bool> rule_enabled_;
   ADCTrajectory adc_trajectory_;
-
-  TrafficRuleConfig* backside_vehicle_config_ = nullptr;
-  TrafficRuleConfig* change_lane_config_ = nullptr;
-  TrafficRuleConfig* crosswalk_config_ = nullptr;
-  TrafficRuleConfig* destination_config_ = nullptr;
-  TrafficRuleConfig* front_vehicle_config_ = nullptr;
-  TrafficRuleConfig* keep_clear_config_ = nullptr;
-  TrafficRuleConfig* referrence_line_end_config_ = nullptr;
-  TrafficRuleConfig* rerouting_config_ = nullptr;
-  TrafficRuleConfig* signal_light_config_ = nullptr;
-  TrafficRuleConfig* stop_sign_config_ = nullptr;
 };
 
 }  // namespace planning
