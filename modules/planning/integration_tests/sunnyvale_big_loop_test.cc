@@ -141,7 +141,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::STOP);
-  double stop_duration = 1;
+  auto* stop_sign_config = GetStopSignConfig();
+  double stop_duration = stop_sign_config->stop_sign().stop_duration();
   double wait_time = stop_duration - 0.5;
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
@@ -176,7 +177,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::STOP);
-  double stop_duration = 1;
+  double stop_duration = stop_sign_config->stop_sign().stop_duration();
   double wait_time = stop_duration + 0.5;
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
@@ -225,7 +226,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
 
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
-  double stop_duration = 1;
+  double stop_duration = stop_sign_config->stop_sign().stop_duration();
   double wait_time = stop_duration + 1;
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
@@ -237,6 +238,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
  * stop_sign:
  * bag: 2018-01-24-11-36-55/2018-01-24-11-36-57_0.bag
  * step 1:
+ *   adc status: DRIVE
  *   adc decision: STOP
  * step 2:
  *   wait_time > STOP_DURATION,
@@ -252,7 +254,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
  *   adc status: WAIT => STOP_DONE
  *   decision: CRUISE
  */
-TEST_F(SunnyvaleBigLoopTest, DISABLED_stop_sign_06) {
+TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
   std::string seq_num = "5";
@@ -264,7 +266,6 @@ TEST_F(SunnyvaleBigLoopTest, DISABLED_stop_sign_06) {
 
   // set config
   auto* stop_sign_config = GetStopSignConfig();
-  stop_sign_config->mutable_stop_sign()->set_max_valid_stop_distance(5);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST(0);
@@ -282,7 +283,7 @@ TEST_F(SunnyvaleBigLoopTest, DISABLED_stop_sign_06) {
   // set PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_status(StopSignStatus::STOP);
-  double stop_duration = 1;
+  double stop_duration = stop_sign_config->stop_sign().stop_duration();
   double wait_time = stop_duration + 0.5;
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
