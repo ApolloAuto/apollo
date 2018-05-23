@@ -23,6 +23,8 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
+
 BacksideVehicle::BacksideVehicle(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
@@ -71,15 +73,15 @@ void BacksideVehicle::MakeLaneKeepingObstacleDecision(
   }
 }
 
-bool BacksideVehicle::ApplyRule(Frame* const,
-                                ReferenceLineInfo* const reference_line_info) {
+Status BacksideVehicle::ApplyRule(
+    Frame* const, ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   if (reference_line_info->Lanes()
           .IsOnSegment()) {  // The lane keeping reference line.
     MakeLaneKeepingObstacleDecision(adc_sl_boundary, path_decision);
   }
-  return true;
+  return Status::OK();
 }
 
 }  // namespace planning

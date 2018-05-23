@@ -40,7 +40,7 @@ class StopSign : public TrafficRule {
   explicit StopSign(const TrafficRuleConfig& config);
   virtual ~StopSign() = default;
 
-  bool ApplyRule(Frame* const frame,
+  common::Status ApplyRule(Frame* const frame,
                  ReferenceLineInfo* const reference_line_info);
 
  private:
