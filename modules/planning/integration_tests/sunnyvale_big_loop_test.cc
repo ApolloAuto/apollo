@@ -438,6 +438,12 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
+  // set config
+  stop_sign_config->mutable_stop_sign()->mutable_creep()
+      ->set_creep_distance_to_stop_line(1.0);
+  stop_sign_config->mutable_stop_sign()->mutable_creep()
+      ->set_max_valid_stop_distance(1.0);
+
   RUN_GOLDEN_TEST_DECISION(1);
 
   // check PlanningStatus value: CREEP
