@@ -86,6 +86,22 @@ double QuinticPolynomialCurve1d::Evaluate(const uint32_t order,
   }
 }
 
+// Evaluate the integral of the squared third-order derivative
+double QuinticPolynomialCurve1d::Evaluate3DerSqrInt(double lower,
+                                                    double upper) const {
+  // f_3d = 60 * c5 * p^2 + 24 * c4 * p + 6 * c3
+  // Integral of squared (f_3d) = 12 * (60 * c5 * (c5 * p^5 + c4 * p^4)
+  //  + (16 * c4 * c4 + 20 * c5 * c3) * p^3 + 12 * c4 * c3 * p * p +
+  //  3 * c3 * c3 * p)
+  auto func = [this](double p) {
+    return 12.0 *
+           (((60.0 * coef_[5] * (coef_[5] * p + coef_[4]) * p +
+           (16.0 * coef_[4] * coef_[4] + 20.0 * coef_[5] * coef_[3])) * p +
+           12.0 * coef_[4] * coef_[3]) * p + 3.0 * coef_[3] * coef_[3]) * p;
+  };
+  return (func(upper) - func(lower));
+}
+
 void QuinticPolynomialCurve1d::ComputeCoefficients(
     const double x0, const double dx0, const double ddx0, const double x1,
     const double dx1, const double ddx1, const double p) {

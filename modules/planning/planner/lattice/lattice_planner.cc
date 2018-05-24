@@ -51,8 +51,8 @@ using apollo::common::PathPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::math::PathMatcher;
 using apollo::common::math::CartesianFrenetConverter;
+using apollo::common::math::PathMatcher;
 using apollo::common::time::Clock;
 
 namespace {
@@ -91,6 +91,17 @@ void ComputeInitFrenetState(const PathPoint& matched_point,
       cartesian_state.v(), cartesian_state.a(),
       cartesian_state.path_point().theta(),
       cartesian_state.path_point().kappa(), ptr_s, ptr_d);
+
+  // If the speed exceeds the specified threshold, we need to change the initial
+  // conditions of the lateral trajectory component in order to generate more
+  // appropriate trajectory bundles.
+  if (ptr_s->at(1) > FLAGS_speed_to_change_lateral_trajectory) {
+    double init_d_dot = ptr_s->at(0) * ptr_d->at(1);
+    double init_d_dotdot = ptr_d->at(2) * ptr_s->at(1) * ptr_s->at(1) +
+                           ptr_d->at(1) * ptr_s->at(2);
+    ptr_d->at(1) = init_d_dot;
+    ptr_d->at(2) = init_d_dotdot;
+  }
 }
 
 }  // namespace

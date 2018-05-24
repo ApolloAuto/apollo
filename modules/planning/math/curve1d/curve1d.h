@@ -37,6 +37,13 @@ class Curve1d {
   virtual double Evaluate(const std::uint32_t order,
                           const double param) const = 0;
 
+  // Evaluate the integral of the squared third-order derivative.
+  // It is only used in some derived classes and therefore cannot be defined as
+  // a pure virtual function.
+  virtual double Evaluate3DerSqrInt(double lower, double upper) const {
+    return 0.0;
+  }
+
   virtual double ParamLength() const = 0;
 
   virtual std::string ToString() const = 0;

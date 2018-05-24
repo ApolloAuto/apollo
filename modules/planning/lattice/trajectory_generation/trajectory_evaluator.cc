@@ -36,10 +36,10 @@ namespace apollo {
 namespace planning {
 
 using Trajectory1d = Curve1d;
-using apollo::common::math::PathMatcher;
 using apollo::common::FrenetFramePoint;
 using apollo::common::PathPoint;
 using apollo::common::SpeedPoint;
+using apollo::common::math::PathMatcher;
 using Trajectory1dPair =
     std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>;
 using CostComponentsPair = std::pair<std::vector<double>, double>;
@@ -47,8 +47,7 @@ using CostComponentsPair = std::pair<std::vector<double>, double>;
 using PtrTrajectory1d = std::shared_ptr<Trajectory1d>;
 
 TrajectoryEvaluator::TrajectoryEvaluator(
-    const std::array<double, 3>& init_s,
-    const PlanningTarget& planning_target,
+    const std::array<double, 3>& init_s, const PlanningTarget& planning_target,
     const std::vector<PtrTrajectory1d>& lon_trajectories,
     const std::vector<PtrTrajectory1d>& lat_trajectories,
     std::shared_ptr<PathTimeGraph> path_time_graph,
@@ -238,6 +237,13 @@ double TrajectoryEvaluator::EvaluateDiscreteTrajectory(
 double TrajectoryEvaluator::LatOffsetCost(
     const PtrTrajectory1d& lat_trajectory,
     const std::vector<double>& s_values) const {
+  double end_time = lat_trajectory->ParamLength();
+  if (end_time < FLAGS_trajectory_time_length + 1.0) {
+    double end_d = lat_trajectory->Evaluate(0, end_time);
+    double cost = end_time + end_d * end_d;
+    return cost;
+  }
+
   double lat_offset_start = lat_trajectory->Evaluate(0, 0.0);
   double cost_sqr_sum = 0.0;
   double cost_abs_sum = 0.0;
@@ -280,18 +286,14 @@ double TrajectoryEvaluator::LatOffsetCost(
 double TrajectoryEvaluator::LatComfortCost(
     const PtrTrajectory1d& lon_trajectory,
     const PtrTrajectory1d& lat_trajectory) const {
-  double max_cost = 0.0;
-  for (double t = 0.0; t < FLAGS_trajectory_time_length;
-       t += FLAGS_trajectory_time_resolution) {
-    double s = lon_trajectory->Evaluate(0, t);
-    double s_dot = lon_trajectory->Evaluate(1, t);
-    double s_dotdot = lon_trajectory->Evaluate(2, t);
-    double l_prime = lat_trajectory->Evaluate(1, s);
-    double l_primeprime = lat_trajectory->Evaluate(2, s);
-    double cost = l_primeprime * s_dot * s_dot + l_prime * s_dotdot;
-    max_cost = std::max(max_cost, std::fabs(cost));
+  double end_time = lat_trajectory->ParamLength();
+  if (end_time < FLAGS_trajectory_time_length + 1.0) {
+    return lat_trajectory->Evaluate3DerSqrInt(0.0, end_time);
   }
-  return max_cost;
+
+  double lower_s = lon_trajectory->Evaluate(0, 0.0);
+  double upper_s = lon_trajectory->Evaluate(0, FLAGS_trajectory_time_length);
+  return lat_trajectory->Evaluate3DerSqrInt(lower_s, upper_s);
 }
 
 double TrajectoryEvaluator::LatComfortCost(
@@ -316,16 +318,7 @@ double TrajectoryEvaluator::LatComfortCost(
 
 double TrajectoryEvaluator::LonComfortCost(
     const PtrTrajectory1d& lon_trajectory) const {
-  double cost_sqr_sum = 0.0;
-  double cost_abs_sum = 0.0;
-  for (double t = 0.0; t < FLAGS_trajectory_time_length;
-       t += FLAGS_trajectory_time_resolution) {
-    double jerk = lon_trajectory->Evaluate(3, t);
-    double cost = jerk / FLAGS_longitudinal_jerk_upper_bound;
-    cost_sqr_sum += cost * cost;
-    cost_abs_sum += std::fabs(cost);
-  }
-  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
+  return lon_trajectory->Evaluate3DerSqrInt(0, FLAGS_trajectory_time_length);
 }
 
 double TrajectoryEvaluator::LonComfortCost(
@@ -476,7 +469,6 @@ double TrajectoryEvaluator::LonCollisionCost(
 
 double TrajectoryEvaluator::CentripetalAccelerationCost(
     const PtrTrajectory1d& lon_trajectory) const {
-
   // Assumes the vehicle is not obviously deviate from the reference line.
   double centripetal_acc_sum = 0.0;
   double centripetal_acc_sqr_sum = 0.0;

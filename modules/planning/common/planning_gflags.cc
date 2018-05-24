@@ -299,11 +299,13 @@ DEFINE_double(lon_collision_buffer, 1.0,
 DEFINE_double(lat_collision_buffer, 0.2,
               "The lateral buffer to keep distance to other vehicles");
 DEFINE_uint32(num_sample_follow_per_timestamp, 3,
-             "The number of sample points for each timestamp to follow");
+              "The number of sample points for each timestamp to follow");
+DEFINE_double(speed_to_change_lateral_trajectory, 10.0,
+              "A speed threshold to change the generation method for lateral "
+              "trajectories.");
 
 // Lattice Evaluate Parameters
-DEFINE_double(weight_lon_objective, 10.0,
-              "Weight of longitudinal travel cost");
+DEFINE_double(weight_lon_objective, 10.0, "Weight of longitudinal travel cost");
 DEFINE_double(weight_lon_jerk, 1.0, "Weight of longitudinal jerk cost");
 DEFINE_double(weight_lon_collision, 2.0,
               "Weight of logitudinal collision cost");
