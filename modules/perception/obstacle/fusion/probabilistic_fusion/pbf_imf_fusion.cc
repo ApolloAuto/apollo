@@ -66,6 +66,7 @@ void PbfIMFFusion::Initialize(
          << " " << posteriori_state_(1) << " " << posteriori_state_(2) << " "
          << posteriori_state_(3)
          << " for object info: " << new_object->object->ToString();
+  std::cerr << "next track\n" << std::endl;
   std::cerr << "PBFIMF pbf imf initial uncertainty set "
             << new_object->object->state_uncertainty << std::endl;
   CacheSensorObjects(new_object);
@@ -109,9 +110,21 @@ void PbfIMFFusion::UpdateWithObject(
   a_matrix_(0, 2) = time_diff;
   a_matrix_(1, 3) = time_diff;
   q_matrix_.setIdentity();
-  q_matrix_ = q_matrix_ / 10;
-  q_matrix_ = q_matrix_ * time_diff;
+  q_matrix_(0, 0) *= 1;
+  q_matrix_(1, 1) *= 0.2;
+  q_matrix_(2, 2) *= 0.5;
+  q_matrix_(3, 3) *= 0.2;
+  // q_matrix_ = q_matrix_ / 10;
+  // q_matrix_ = q_matrix_ * time_diff;
   priori_state_ = a_matrix_ * posteriori_state_;
+  std::cerr << "PBFIMF: Fusion Start : Posterior state \n"
+            << posteriori_state_ << std::endl;
+  // std::cerr << "PBFIMF: Fusion Start : Omega is\n " << omega_matrix_ <<
+  // std::endl;
+  // std::cerr << "PBFIMF: Fusion Start : xi_ is\n " << xi_ << std::endl;
+
+  // std::cerr << "PBFIMF: Priori state\n " << priori_state_ << std::endl;
+
   omega_matrix_ =
       (a_matrix_ * omega_matrix_.inverse() * a_matrix_.transpose() + q_matrix_);
   omega_matrix_ = omega_matrix_.inverse().eval();
@@ -119,12 +132,15 @@ void PbfIMFFusion::UpdateWithObject(
          << priori_state_(1) << " " << priori_state_(2) << " "
          << priori_state_(3);
   xi_ = omega_matrix_ * priori_state_;
+  std::cerr << "PBFIMF: Fusion Start : time diff is\n " << time_diff
+            << std::endl;
 
   // sensor level processor noise matrix and trans matrix
   const Eigen::Matrix4d* sensor_processor_noise;
   const Eigen::Matrix4d* sensor_transition_matrix;
 
   if (new_object->sensor_type == SensorType::CAMERA) {
+    std::cerr << "senser type : CAMERA\n" << std::endl;
     belief_anchor_point_ = new_object->object->center;
     belief_velocity_ = new_object->object->velocity;
     if (!CameraFrameSupplement::state_vars.initialized_) {
@@ -135,6 +151,7 @@ void PbfIMFFusion::UpdateWithObject(
     sensor_transition_matrix =
         &(CameraFrameSupplement::state_vars.trans_matrix);
   } else if (new_object->sensor_type == SensorType::RADAR) {
+    std::cerr << "senser type : RADAR\n" << std::endl;
     belief_anchor_point_ = new_object->object->center;
     belief_velocity_ = new_object->object->velocity;
 
@@ -196,20 +213,34 @@ void PbfIMFFusion::UpdateWithObject(
     omega_matrix_ =
         omega_matrix_ + (cov_sensor_inverse - cov_sensor_prev_inverse);
 
-    std::cerr << "PBFIMF: information prediction" << xi_ << std::endl;
-    std::cerr << "PBFIMF: information delta "
+    /* if ((omega_matrix_(2,2) > -0.005) && (omega_matrix_(2,2)<0)){
+         omega_matrix_(2,2) = -0.005;
+         std::cerr << "omega element is too close to zero!" << std::endl;
+     }
+
+     if ((omega_matrix_(2,2) < 0.005) && (omega_matrix_(2,2)>0)){
+         omega_matrix_(2,2) = 0.005;
+         std::cerr << "omega element is too close to zero!" << std::endl;
+     }*/
+
+    std::cerr << "PBFIMF: information prediction\n" << xi_ << std::endl;
+    std::cerr << "PBFIMF: information delta\n "
               << (cov_sensor_inverse * state_sensor -
                   cov_sensor_prev_inverse * state_sensor_prev)
               << std::endl;
 
     xi_ = xi_ + (cov_sensor_inverse * state_sensor -
                  cov_sensor_prev_inverse * state_sensor_prev);
+    std::cerr << "PBFIMF: information updated\n" << xi_ << std::endl;
+    std::cerr << "PBFIMF: omega matrix updated\n" << omega_matrix_ << std::endl;
+
   } else {
     // this case is weird, might lead to unexpected situation
     Eigen::Matrix4d cov_sensor = Eigen::Matrix4d::Identity();
     Eigen::Vector4d state_sensor = Eigen::Vector4d::Zero();
     double timestamp_sensor = new_object->timestamp;
 
+    std::cerr << "3333" << std::endl;
     if (!ObtainSensorPrediction(
             new_object->object, timestamp_sensor, *sensor_processor_noise,
             *sensor_transition_matrix, &state_sensor, &cov_sensor)) {
@@ -222,6 +253,7 @@ void PbfIMFFusion::UpdateWithObject(
     xi_ = 0.5 * xi_ + 0.5 * cov_sensor.inverse() * state_sensor;
   }
   posteriori_state_ = omega_matrix_.inverse() * xi_;
+  std::cerr << "PBFIMF:posterior state \n" << posteriori_state_ << std::endl;
   belief_anchor_point_(0) = posteriori_state_(0);
   belief_anchor_point_(1) = posteriori_state_(1);
   belief_velocity_(0) = posteriori_state_(2);
@@ -258,14 +290,22 @@ bool PbfIMFFusion::ObtainSensorPrediction(std::shared_ptr<Object> object,
   state(3) = object->velocity(1);
 
   double time_diff = fuse_timestamp - sensor_timestamp;
-  Eigen::Matrix4d process_noise_time = process_noise * time_diff;
+  // std::cerr.setf(std::ios_base::fixed);
+  // std::cerr << "fuse_timestamp" << fuse_timestamp << std::endl;
+  // std::cerr << "sensor_timestamp" << sensor_timestamp << std::endl;
+  // Eigen::Matrix4d process_noise_time = process_noise * time_diff;
+  Eigen::Matrix4d process_noise_time = process_noise;
+  process_noise_time(0, 0) *= 0.4;
+  process_noise_time(1, 1) *= 0.1;
+  process_noise_time(2, 2) *= 0.5;
+  process_noise_time(3, 3) *= 0.1;
 
   std::cerr << "PBFIMF: OBTAIN PREDICT: cov is\n " << cov << std::endl;
   std::cerr << "PBFIMF: OBTAIN PREDICT: state is\n " << state << std::endl;
   std::cerr << "PBFIMF: OBTAIN PREDICT: time diff is\n " << time_diff
             << std::endl;
-  std::cerr << "PBFIMF: OBTAIN PREDICT: process noise is\n " << process_noise
-            << std::endl;
+  std::cerr << "PBFIMF: OBTAIN PREDICT: process noise is\n "
+            << process_noise_time << std::endl;
 
   // trans_matrix is F matrix for state transition
   // p_pre is sensor level covariance prediction P(ki|ki-1)
@@ -274,10 +314,13 @@ bool PbfIMFFusion::ObtainSensorPrediction(std::shared_ptr<Object> object,
   trans_matrix_time(0, 2) = time_diff;
   trans_matrix_time(1, 3) = time_diff;
   (*state_pre) = trans_matrix_time * state;
-  std::cerr << "PBFIMF: OBTAIN PREDICT: trans matrix time is\n "
-            << trans_matrix_time << std::endl;
+  // std::cerr << "PBFIMF: OBTAIN PREDICT: trans matrix time is\n "
+  //         << trans_matrix_time << std::endl;
+  std::cerr << "PBFIMF: OBTAIN PREDICT: state pre is\n " << *state_pre
+            << std::endl;
   (*cov_pre) = trans_matrix_time * cov * trans_matrix_time.transpose() +
                process_noise_time;
+  std::cerr << "PBFIMF: OBTAIN PREDICT: cov pre is\n " << *cov_pre << std::endl;
   return true;
 }
 
@@ -358,6 +401,5 @@ void PbfIMFFusion::SetState(const Eigen::Vector3d& anchor_point,
   belief_anchor_point_ = anchor_point;
   belief_velocity_ = velocity;
 }
-
 }  // namespace perception
 }  // namespace apollo

@@ -97,6 +97,13 @@ struct alignas(16) Object {
 
   // CIPV
   bool b_cipv = false;
+  // local lidar track id
+  int local_lidar_track_id = -1;
+  // local radar track id
+  int local_radar_track_id = -1;
+  // local camera track id
+  int local_camera_track_id = -1;
+
   // sensor particular suplplements, default nullptr
   RadarSupplementPtr radar_supplement = nullptr;
   CameraSupplementPtr camera_supplement = nullptr;
