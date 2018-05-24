@@ -273,6 +273,32 @@ bool StopSign::CheckCreep(const hdmap::StopSignInfo& stop_sign_info) {
   return false;
 }
 
+bool StopSign::CheckCreepDone(ReferenceLineInfo* const reference_line_info) {
+  bool creep_done = false;
+  double creep_stop_s =
+      next_stop_sign_overlap_.end_s +
+      config_.stop_sign().creep().creep_distance_to_stop_line();
+  const double distance =
+      creep_stop_s - reference_line_info->AdcSlBoundary().end_s();
+  if (distance < config_.stop_sign().creep().max_valid_stop_distance()) {
+    bool all_far_away = true;
+    for (auto* path_obstacle :
+        reference_line_info->path_decision()->path_obstacles().Items()) {
+      if (path_obstacle->obstacle()->IsVirtual() ||
+          !path_obstacle->obstacle()->IsStatic()) {
+        continue;
+      }
+      if (path_obstacle->reference_line_st_boundary().min_t() <
+          config_.stop_sign().creep().min_boundary_t()) {
+        all_far_away = false;
+        break;
+      }
+    }
+    creep_done = all_far_away;
+  }
+  return creep_done;
+}
+
 /**
  * @brief: process & update stop status
  *         UNKNOWN/DRIVE -> STOP -> WAIT -> CREEP -> DONE
@@ -340,32 +366,11 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
             StopSignStatus::CREEP : StopSignStatus::STOP_DONE;
       }
       break;
-    case StopSignStatus::CREEP: {
-      double creep_stop_s =
-          next_stop_sign_overlap_.end_s +
-          config_.stop_sign().creep().creep_distance_to_stop_line();
-      const double distance =
-          creep_stop_s - reference_line_info->AdcSlBoundary().end_s();
-      if (distance < config_.stop_sign().creep().max_valid_stop_distance()) {
-        bool all_far_away = true;
-        for (auto* path_obstacle :
-             reference_line_info->path_decision()->path_obstacles().Items()) {
-          if (path_obstacle->obstacle()->IsVirtual() ||
-              !path_obstacle->obstacle()->IsStatic()) {
-            continue;
-          }
-          if (path_obstacle->reference_line_st_boundary().min_t() <
-              config_.stop_sign().creep().min_boundary_t()) {
-            all_far_away = false;
-            break;
-          }
-        }
-        if (all_far_away) {
-          stop_status_ = StopSignStatus::STOP_DONE;
-        }
+    case StopSignStatus::CREEP:
+      if (CheckCreepDone(reference_line_info)) {
+        stop_status_ = StopSignStatus::STOP_DONE;
       }
       break;
-    }
     case StopSignStatus::STOP_DONE:
       break;
     default:
