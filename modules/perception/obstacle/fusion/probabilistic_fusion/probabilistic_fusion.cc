@@ -211,6 +211,19 @@ void ProbabilisticFusion::CollectFusedObjects(
       std::shared_ptr<Object> obj(new Object());
       obj->clone(*(fused_object->object));
       obj->track_id = tracks[i]->GetTrackId();
+      std::shared_ptr<PbfSensorObject> pobj =
+          tracks[i]->GetLidarObject("lidar");
+      if (pobj != nullptr) {
+        obj->local_lidar_track_id = pobj->object->track_id;
+      }
+      pobj = tracks[i]->GetCameraObject("camera");
+      if (pobj != nullptr) {
+        obj->local_camera_track_id = pobj->object->track_id;
+      }
+      pobj = tracks[i]->GetRadarObject("radar");
+      if (pobj != nullptr) {
+        obj->local_radar_track_id = pobj->object->track_id;
+      }
       obj->latest_tracked_time = timestamp;
       obj->tracking_time = tracks[i]->GetTrackingPeriod();
       fused_objects->push_back(obj);
