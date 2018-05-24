@@ -1799,9 +1799,31 @@ void GLFWFusionViewer::draw_objects(
 
       glRasterPos2i(tc[0], tc[1]);
       raster_text_->print_string(std::to_string(objects[i]->track_id));
+      int offset = 2;
+
+      if (objects[i]->local_lidar_track_id != -1) {
+          glRasterPos2i(tc[0] + offset, tc[1]);
+          raster_text_->print_string(std::string("v:") +
+            std::to_string(objects[i]->local_camera_track_id));
+          offset +=2;
+      }
+
+      if (objects[i]->local_camera_track_id != -1) {
+          glRasterPos2i(tc[0] + offset, tc[1]);
+          raster_text_->print_string(std::string("c:") +
+            std::to_string(objects[i]->local_camera_track_id));
+          offset +=2;
+      }
+
+      if (objects[i]->local_radar_track_id != -1) {
+          glRasterPos2i(tc[0] + offset, tc[1]);
+          raster_text_->print_string(std::string("r:") +
+            std::to_string(objects[i]->local_camera_track_id));
+          offset +=2;
+      }
 
       if (objects[i]->b_cipv) {
-        glRasterPos2i(tc[0] + 3, tc[1]);
+        glRasterPos2i(tc[0] + offset, tc[1]);
         raster_text_->print_string(std::string("cipv"));
       }
       ADEBUG << objects[i]->ToString();
