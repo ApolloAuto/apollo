@@ -342,16 +342,19 @@ Chassis LincolnController::chassis() {
   }
 
   // give engage_advice based on error_code and canbus feedback
-  if (!chassis_error_mask_ && !chassis_.parking_brake() &&
-      (chassis_.throttle_percentage() != 0.0) &&
-      (chassis_.brake_percentage() != 0.0)) {
+  if (chassis_error_mask_ || (chassis_.throttle_percentage() == 0.0) ||
+      (chassis_.brake_percentage() == 0.0)) {
     chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::READY_TO_ENGAGE);
-  } else {
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason("Chassis error!");
+  } else if (chassis_.parking_brake() || !CheckSafetyError(chassis_detail)) {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
-        "CANBUS not ready, firmware error or emergency button pressed!");
+        "Vehicle is not in a safe state to engage!");
+  } else {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::READY_TO_ENGAGE);
   }
   return chassis_;
 }
@@ -853,6 +856,21 @@ void LincolnController::set_chassis_error_code(
     const Chassis::ErrorCode &error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
+}
+
+bool LincolnController::CheckSafetyError(
+    const ::apollo::canbus::ChassisDetail &chassis_detail) {
+  bool safety_error =
+      chassis_detail.safety().is_passenger_door_open() ||
+      chassis_detail.safety().is_rearleft_door_open() ||
+      chassis_detail.safety().is_rearright_door_open() ||
+      chassis_detail.safety().is_hood_open() ||
+      chassis_detail.safety().is_trunk_open() ||
+      (chassis_detail.safety().is_passenger_detected() &&
+       (!chassis_detail.safety().is_passenger_airbag_enabled() ||
+        !chassis_detail.safety().is_passenger_buckled()));
+
+  return safety_error;
 }
 
 }  // namespace lincoln
