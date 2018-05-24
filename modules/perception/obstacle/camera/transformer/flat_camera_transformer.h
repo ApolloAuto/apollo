@@ -30,6 +30,7 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "Eigen/Geometry"
@@ -59,7 +60,7 @@ class FlatCameraTransformer : public BaseCameraTransformer {
 
   // @brief Get Adjusted camera-to-car extrinsics
   // Return false if no valid objects in scene
-  bool GetAdjustedExtrinsics(Eigen::Matrix<double, 4, 4> &extrinsics) override;
+  bool GetAdjustedExtrinsics(Eigen::Matrix<double, 4, 4>* extrinsics) override;
 
   std::string Name() const override;
 

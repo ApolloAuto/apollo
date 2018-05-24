@@ -76,8 +76,8 @@ bool FlatCameraTransformer::SetExtrinsics(
 }
 
 bool FlatCameraTransformer::GetAdjustedExtrinsics(
-  Eigen::Matrix<double, 4, 4> &extrinsics) {
-  extrinsics = camera2car_adj_.cast<double>();
+  Eigen::Matrix<double, 4, 4>* extrinsics) {
+  *extrinsics = camera2car_adj_.cast<double>();
   return true;
 }
 
@@ -132,7 +132,7 @@ void FlatCameraTransformer::GetDynamicExtrinsics(
       Eigen::Matrix4f camera2car_r = rot * camera2car_;
 
       float diff = 0.0;
-      for (auto center_p: centers) {
+      for (auto center_p : centers) {
         auto c_cam = center_p.first;
         auto c_car_t = center_p.second;
 

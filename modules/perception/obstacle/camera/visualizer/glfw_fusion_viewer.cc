@@ -978,8 +978,8 @@ void GLFWFusionViewer::draw_camera_frame(FrameContent* content,
 
   // -----------------------------
   Eigen::Matrix4d camera_to_world_pose = content->get_camera_to_world_pose();
-  Eigen::Matrix4d camera_to_world_pose_static
-   = content->get_camera_to_world_pose_static();
+  Eigen::Matrix4d camera_to_world_pose_static =
+  content->get_camera_to_world_pose_static();
   Eigen::Matrix4d v2c = camera_to_world_pose.inverse();
   Eigen::Matrix4d v2c_static = camera_to_world_pose_static.inverse();
   int offset_x = 0;  // scene_width_;
@@ -2114,7 +2114,7 @@ void GLFWFusionViewer::draw_camera_box(
       Eigen::Matrix4d a_v2c = trans * v2c;
 
       double diff = 0.0;
-      // Accumulate 2D pixel height difference for < 40 m close objects in center
+      // Accumulate 2D pixel height difference for < 40 m in center
       // Project 3D object with this extrinsics and compare to detection
       std::vector<std::vector<Eigen::Vector2d>> reprojected;
       for (auto obj : objects) {
@@ -2128,7 +2128,8 @@ void GLFWFusionViewer::draw_camera_box(
           double y_det = obj->camera_supplement->lower_right.y();
 
           // Project 3D object back into image with this extrinsics
-          Eigen::Vector4d ctr(obj->center[0], obj->center[1], obj->center[2], 1.0);
+          Eigen::Vector4d ctr(obj->center[0], obj->center[1],
+            obj->center[2], 1.0);
           Eigen::Vector3d tc = (a_v2c * ctr).head(3);
           std::vector<Eigen::Vector2d> points(8);
           get_boundingbox(tc, a_v2c, obj->width, obj->height, obj->length,
@@ -2136,7 +2137,7 @@ void GLFWFusionViewer::draw_camera_box(
           // reprojected.emplace_back(points);
 
           double max_y = std::numeric_limits<double>::min();
-          for (auto p: points) {
+          for (auto p : points) {
             max_y = std::max(max_y, p.y());
           }
 
@@ -2164,10 +2165,8 @@ void GLFWFusionViewer::draw_camera_box(
     Eigen::Matrix4d adjusted_v2c = v2c;
     Eigen::Matrix3d rotate(Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ())
     * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY())
-    * Eigen::AngleAxisd(best_pitch_adjustment / 180.0 * M_PI, Eigen::Vector3d::UnitX()));
-    // Eigen::Matrix3d rotate(Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ())
-    // * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY())
-    // * Eigen::AngleAxisd(pitch_angle / 180.0 * M_PI, Eigen::Vector3d::UnitX()));
+    * Eigen::AngleAxisd(best_pitch_adjustment / 180.0 * M_PI,
+      Eigen::Vector3d::UnitX()));
     trans.block<3, 3>(0, 0) = rotate;
     adjusted_v2c = trans * adjusted_v2c;
     // v2c = adjusted_v2c;

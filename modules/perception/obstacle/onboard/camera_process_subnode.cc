@@ -132,7 +132,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   PERF_BLOCK_END("CameraProcessSubnode_converter_");
 
   transformer_->Transform(&objects);
-  transformer_->GetAdjustedExtrinsics(camera_to_car_adj_);
+  transformer_->GetAdjustedExtrinsics(&camera_to_car_adj_);
   PERF_BLOCK_END("CameraProcessSubnode_transformer_");
 
   tracker_->Associate(img, timestamp, &objects);

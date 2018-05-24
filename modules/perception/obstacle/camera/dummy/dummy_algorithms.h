@@ -113,7 +113,7 @@ class DummyCameraTransformer : public BaseCameraTransformer {
     return true;
   }
 
-  bool GetAdjustedExtrinsics(Eigen::Matrix<double, 4, 4> &extrinsics) override {
+  bool GetAdjustedExtrinsics(Eigen::Matrix<double, 4, 4>* extrinsics) override {
     return true;
   }
 
