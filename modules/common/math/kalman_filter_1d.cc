@@ -21,52 +21,60 @@ namespace common {
 namespace math {
 
 bool KalmanFilter1D::Init(const float& x) {
-  x_ << x, 0.0f;
-  F_ << 1.0f, 0.033f, 0.0f, 1.0f;
-  H_ << 1.0f, 0.0f;
+  Eigen::Matrix<float, 2, 1> state_x;
+  state_x << x, 0.0f;
 
-  // TODO(later) tune and put in config
-  P_.setIdentity();
-  P_ *= 20.0f;
+  Eigen::Matrix<float, 2, 2> p;
+  p.setIdentity();
+  p *= 20.0f;
 
-  Q_.setIdentity();
-  Q_ *= 2.0f;
+  SetStateEstimate(state_x, p);
 
-  R_.setIdentity();
-  R_ *= 20.0f;
+  Eigen::Matrix<float, 2, 2> f;
+  f << 1.0f, 0.033f, 0.0f, 1.0f;
+  SetTransitionMatrix(f);
+
+  Eigen::Matrix<float, 1, 2> h;
+  h << 1.0f, 0.0f;
+  SetObservationMatrix(h);
+
+  Eigen::Matrix<float, 2, 2> q;
+  q.setIdentity();
+  q *= 2.0f;
+  SetTransitionNoise(q);
+
+  Eigen::Matrix<float, 1, 1> r;
+  r.setIdentity();
+  r *= 20.0f;
+  SetObservationNoise(r);
+
+  Eigen::Matrix<float, 2, 1> b;
+  b.setZero();
+  SetControlMatrix(b);
 
   return true;
 }
 
 bool KalmanFilter1D::Predict(const float& time_diff) {
-  F_(0, 1) = time_diff;
-
-  x_ = F_ * x_;
-
-  P_ = F_ * P_ * F_.transpose() + Q_;
+  Eigen::Matrix<float, 2, 2> f =
+      KalmanFilter<float, 2, 1, 1>::GetTransitionMatrix();
+  f(0, 1) = time_diff;
+  SetTransitionMatrix(f);
+  KalmanFilter<float, 2, 1, 1>::Predict();
 
   return true;
 }
 
 bool KalmanFilter1D::Update(const float& z) {
-  z_.x() = z;
-
-  y_ = z_ - H_ * x_;
-
-  S_ = H_ * P_ * H_.transpose() + R_;
-
-  K_ = P_ * H_.transpose() * S_.inverse();
-
-  x_ = x_ + K_ * y_;
-
-  P_ = P_ - K_ * H_ * P_;
-
+  Eigen::Matrix<float, 1, 1> state_z;
+  state_z << z;
+  Correct(state_z);
   return true;
 }
 
-Eigen::Vector2f KalmanFilter1D::GetState() { return x_; }
+Eigen::Vector2f KalmanFilter1D::GetState() { return GetStateEstimate(); }
 
-Eigen::Matrix2f KalmanFilter1D::GetCov() { return P_; }
+Eigen::Matrix2f KalmanFilter1D::GetCov() { return GetStateCovariance(); }
 
 }  // namespace math
 }  // namespace common
