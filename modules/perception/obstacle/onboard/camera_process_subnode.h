@@ -110,6 +110,7 @@ class CameraProcessSubnode : public Subnode {
   int32_t image_height_ = 1080;
   int32_t image_width_ = 1920;
   Eigen::Matrix4d camera_to_car_;
+  Eigen::Matrix4d camera_to_car_adj_;
   Eigen::Matrix<double, 3, 4> intrinsics_;
 
   // Modules

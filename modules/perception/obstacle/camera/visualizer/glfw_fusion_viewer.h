@@ -202,7 +202,8 @@ class GLFWFusionViewer {
 
   void draw_3d_classifications(FrameContent *content, bool show_fusion);
   void draw_camera_box(const std::vector<std::shared_ptr<Object>> &objects,
-                       Eigen::Matrix4d w2c, int offset_x, int offset_y,
+                       Eigen::Matrix4d w2c, Eigen::Matrix4d w2c_static,
+                       int offset_x, int offset_y,
                        int image_width, int image_height);
 
   void draw_objects2d(const std::vector<std::shared_ptr<Object>> &objects,

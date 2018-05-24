@@ -132,6 +132,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   PERF_BLOCK_END("CameraProcessSubnode_converter_");
 
   transformer_->Transform(&objects);
+  transformer_->GetAdjustedExtrinsics(camera_to_car_adj_);
   PERF_BLOCK_END("CameraProcessSubnode_transformer_");
 
   tracker_->Associate(img, timestamp, &objects);
@@ -181,7 +182,10 @@ void CameraProcessSubnode::VisualObjToSensorObj(
   (*sensor_objects)->sensor_type = SensorType::CAMERA;
   (*sensor_objects)->sensor_id = device_id_;
   (*sensor_objects)->seq_num = seq_num_;
-  (*sensor_objects)->sensor2world_pose = camera_to_car_;
+
+  (*sensor_objects)->sensor2world_pose_static = camera_to_car_;
+  (*sensor_objects)->sensor2world_pose = camera_to_car_adj_;
+
   ((*sensor_objects)->camera_frame_supplement).reset(new CameraFrameSupplement);
 
   if (!CameraFrameSupplement::state_vars.initialized_) {
