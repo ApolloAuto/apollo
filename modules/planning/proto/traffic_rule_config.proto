@@ -23,7 +23,7 @@ message CreepConfig {
   optional double stop_distance = 3 [ default=0.5 ]; // meter
   optional double speed_limit = 4 [ default=1.0 ]; // m/s
   // max distance(m) to the stop line to be considered as a valid stop for creap
-  optional double max_valid_stop_distance = 5 [ default=1.0 ]; // meter
+  optional double max_valid_stop_distance = 5 [ default=0.3 ]; // meter
   // min boundary t to ignore obstacles while creeping
   optional double min_boundary_t = 6 [ default=6.0 ]; // second
   // min boundary s to ignore obstacles while creeping

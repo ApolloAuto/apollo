@@ -110,10 +110,10 @@ config: {
     watch_vehicle_max_valid_stop_distance: 5.0
     creep {
       enabled: true
-      creep_distance_to_stop_line: 1.0
+      creep_distance_to_stop_line: 1.5
       stop_distance: 0.5
       speed_limit: 1.0
-      max_valid_stop_distance: 1.0
+      max_valid_stop_distance: 0.3
       min_boundary_t: 6.0
     }
   }
