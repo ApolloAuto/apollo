@@ -44,7 +44,7 @@ using apollo::planning::util::GetPlanningStatus;
  *   200 - 299: crosswalk
  *   300 - 399: signal light
  *   400 - 499: change lane
- *   500 -
+ *   500 - 599: front vehicle
  */
 
 class SunnyvaleBigLoopTest : public PlanningTestBase {
@@ -89,7 +89,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
 
   RUN_GOLDEN_TEST(0);
 
-  // check PlanningStatus value
+  // check PlanningStatus value: DRIVE
   auto stop_sign_status = GetPlanningStatus()->stop_sign();
   EXPECT_TRUE(stop_sign_status.has_status() &&
               stop_sign_status.status() == StopSignStatus::DRIVE);
@@ -117,7 +117,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 
   RUN_GOLDEN_TEST(0);
 
-  // check PlanningStatus value
+  // check PlanningStatus value: STOP
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::STOP);
 }
@@ -149,7 +149,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 
   RUN_GOLDEN_TEST(0);
 
-  // check PlanningStatus value
+  // check PlanningStatus value: STOP
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::STOP);
 }
@@ -184,7 +184,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
 
   RUN_GOLDEN_TEST(0);
 
-  // check PlanningStatus value
+  // check PlanningStatus value: STOP_DONE
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::STOP_DONE);
 }
@@ -290,7 +290,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
 
   RUN_GOLDEN_TEST(1);
 
-  // check PlanningStatus value
+  // check PlanningStatus value: WAIT
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::WAIT);
   // check PlanningStatus value on watch vehicles
@@ -318,7 +318,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
 
   RUN_GOLDEN_TEST(2);
 
-  // check PlanningStatus value
+  // check PlanningStatus value: WAIT
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::WAIT);
   // check PlanningStatus value on watch vehicles
@@ -328,7 +328,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   // WAIT(watched vehicle is empty) => STOP_DONE
 
   RUN_GOLDEN_TEST(3);
-  // check PlanningStatus value
+  // check PlanningStatus value: STOP_DONE
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::STOP_DONE);
 }
@@ -362,7 +362,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
 
   RUN_GOLDEN_TEST(0);
 
-  // check PlanningStatus value
+  // check PlanningStatus value: DRIVE
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   EXPECT_EQ("9762", stop_sign_status->stop_sign_id());
   EXPECT_TRUE(stop_sign_status->has_status() &&
@@ -384,7 +384,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
 
   RUN_GOLDEN_TEST(1);
 
-  // check PlanningStatus value
+  // check PlanningStatus value: clear
   // to make sure everything is cleared for that stop sign
   EXPECT_FALSE(GetPlanningStatus()->has_stop_sign());
 
@@ -397,6 +397,64 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST(2);
+}
+
+/*
+ * stop_sign:
+ * bag: 2018-05-16-10-00-32/2018-05-16-10-00-32_10.bag
+ * step 1:
+ *   adc status: STOP
+ *   adc decision: STOP
+ * step 2:
+ *   wait_time > STOP_DURATION,
+ *   adc status: STOP => CREEP
+ *   decision: STOP
+ */
+TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
+
+  std::string seq_num = "14";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  PlanningTestBase::SetUp();
+
+  // set config
+  auto* stop_sign_config = GetStopSignConfig();
+  stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(true);
+
+  RUN_GOLDEN_TEST_DECISION(0);
+
+  // step 2:
+  // wait time is enough
+  // but vehicles are still there (use the same data as previous test)
+
+  // set PlanningStatus
+  auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
+  stop_sign_status->set_status(StopSignStatus::STOP);
+  double stop_duration = stop_sign_config->stop_sign().stop_duration();
+  double wait_time = stop_duration + 0.5;
+  double stop_start_time = Clock::NowInSeconds() - wait_time;
+  stop_sign_status->set_stop_start_time(stop_start_time);
+
+  RUN_GOLDEN_TEST_DECISION(1);
+
+  // check PlanningStatus value: CREEP
+  EXPECT_TRUE(stop_sign_status->has_status() &&
+              stop_sign_status->status() == StopSignStatus::CREEP);
+
+  // step 3: STOP_DONE
+
+  // set config: to make it s valid stop for the same data file
+  stop_sign_config->mutable_stop_sign()->mutable_creep()
+      ->set_max_valid_stop_distance(4.0);
+
+  RUN_GOLDEN_TEST_DECISION(2);
+
+  // check PlanningStatus value
+  EXPECT_TRUE(stop_sign_status->has_status() &&
+              stop_sign_status->status() == StopSignStatus::STOP_DONE);
 }
 
 /*
@@ -503,7 +561,7 @@ TEST_F(SunnyvaleBigLoopTest, bypass_parked_bus) {
 
   double acc_lower_bound = FLAGS_longitudinal_acceleration_lower_bound;
   FLAGS_longitudinal_acceleration_lower_bound = -5.0;
-  std::string seq_num = "14";
+  std::string seq_num = "500";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
