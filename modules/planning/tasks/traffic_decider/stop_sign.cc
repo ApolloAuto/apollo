@@ -328,15 +328,16 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
         if (watch_vehicles != nullptr && !watch_vehicles->empty()) {
           stop_status_ = StopSignStatus::WAIT;
         } else {
-          stop_status_ = CheckCreep(stop_sign_info) ? StopSignStatus::CREEP
-                                                    : StopSignStatus::STOP_DONE;
+          stop_status_ = CheckCreep(stop_sign_info) ?
+              StopSignStatus::CREEP : StopSignStatus::STOP_DONE;
         }
       }
       break;
     case StopSignStatus::WAIT:
-      if (watch_vehicles == nullptr || watch_vehicles->empty()) {
-        stop_status_ = CheckCreep(stop_sign_info) ? StopSignStatus::CREEP
-                                                  : StopSignStatus::STOP_DONE;
+      if (wait_time > config_.stop_sign().wait_timeout() ||
+          (watch_vehicles == nullptr || watch_vehicles->empty())) {
+        stop_status_ = CheckCreep(stop_sign_info) ?
+            StopSignStatus::CREEP : StopSignStatus::STOP_DONE;
       }
       break;
     case StopSignStatus::CREEP: {
