@@ -87,7 +87,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value: DRIVE
   auto stop_sign_status = GetPlanningStatus()->stop_sign();
@@ -115,7 +115,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::DRIVE);
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value: STOP
   EXPECT_TRUE(stop_sign_status->has_status() &&
@@ -147,7 +147,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value: STOP
   EXPECT_TRUE(stop_sign_status->has_status() &&
@@ -182,7 +182,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value: STOP_DONE
   EXPECT_TRUE(stop_sign_status->has_status() &&
@@ -214,7 +214,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
   auto* stop_sign_config = GetStopSignConfig();
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 
   // step 2
 
@@ -231,7 +231,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
-  RUN_GOLDEN_TEST(1);
+  RUN_GOLDEN_TEST_DECISION(1);
 }
 
 /*
@@ -268,7 +268,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   auto* stop_sign_config = GetStopSignConfig();
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 
   // step 2:
   // wait time is enough
@@ -288,7 +288,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   double stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
-  RUN_GOLDEN_TEST(1);
+  RUN_GOLDEN_TEST_DECISION(1);
 
   // check PlanningStatus value: WAIT
   EXPECT_TRUE(stop_sign_status->has_status() &&
@@ -316,7 +316,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   stop_start_time = Clock::NowInSeconds() - wait_time;
   stop_sign_status->set_stop_start_time(stop_start_time);
 
-  RUN_GOLDEN_TEST(2);
+  RUN_GOLDEN_TEST_DECISION(2);
 
   // check PlanningStatus value: WAIT
   EXPECT_TRUE(stop_sign_status->has_status() &&
@@ -327,7 +327,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   // step 4:
   // WAIT(watched vehicle is empty) => STOP_DONE
 
-  RUN_GOLDEN_TEST(3);
+  RUN_GOLDEN_TEST_DECISION(3);
   // check PlanningStatus value: STOP_DONE
   EXPECT_TRUE(stop_sign_status->has_status() &&
               stop_sign_status->status() == StopSignStatus::STOP_DONE);
@@ -360,7 +360,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   auto* stop_sign_config = GetStopSignConfig();
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value: DRIVE
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
@@ -382,7 +382,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::UpdateData();
 
-  RUN_GOLDEN_TEST(1);
+  RUN_GOLDEN_TEST_DECISION(1);
 
   // check PlanningStatus value: clear
   // to make sure everything is cleared for that stop sign
@@ -396,7 +396,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
-  RUN_GOLDEN_TEST(2);
+  RUN_GOLDEN_TEST_DECISION(2);
 }
 
 /*
@@ -475,7 +475,7 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 }
 
 /*
@@ -496,7 +496,7 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_02) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 }
 
 /*
@@ -517,7 +517,7 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 }
 
 TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
@@ -534,7 +534,7 @@ TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   FLAGS_test_traffic_light_file = seq_num + "_traffic_light.pb.txt";
   PlanningTestBase::SetUp();
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 }
 
 TEST_F(SunnyvaleBigLoopTest, change_lane_abort_for_fast_back_vehicle) {
@@ -550,7 +550,7 @@ TEST_F(SunnyvaleBigLoopTest, change_lane_abort_for_fast_back_vehicle) {
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   PlanningTestBase::SetUp();
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 }
 
 /*
