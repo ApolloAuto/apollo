@@ -33,11 +33,11 @@ namespace math {
 
 class KalmanFilter1D {
  public:
-  bool Init(const float x);
+  bool Init(const float& x);
 
-  bool Predict(const float time_diff);
+  bool Predict(const float& time_diff);
 
-  bool Update(const float z);
+  bool Update(const float& z);
 
   Eigen::Vector2f GetState();
 

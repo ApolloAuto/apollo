@@ -50,6 +50,7 @@ class StopSign : public TrafficRule {
   bool FindNextStopSign(ReferenceLineInfo* const reference_line_info);
   int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
   bool CheckCreep(const hdmap::StopSignInfo& stop_sign_info);
+  bool CheckCreepDone(ReferenceLineInfo* const reference_line_info);
   int ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
                         const hdmap::StopSignInfo& stop_sign_info,
                         StopSignLaneVehicles* watch_vehicles);
