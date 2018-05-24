@@ -37,8 +37,8 @@ class SignalLight : public TrafficRule {
 
   virtual ~SignalLight() = default;
 
-  bool ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame,
+                           ReferenceLineInfo* const reference_line_info);
 
  private:
   void ReadSignals();

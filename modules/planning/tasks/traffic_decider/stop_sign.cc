@@ -38,6 +38,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
@@ -56,19 +57,19 @@ using apollo::planning::util::GetPlanningStatus;
 
 StopSign::StopSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
-bool StopSign::ApplyRule(Frame* const frame,
-                         ReferenceLineInfo* const reference_line_info) {
+Status StopSign::ApplyRule(Frame* const frame,
+                           ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
   if (!FindNextStopSign(reference_line_info)) {
     GetPlanningStatus()->clear_stop_sign();
-    return true;
+    return Status::OK();
   }
 
   MakeDecisions(frame, reference_line_info);
 
-  return true;
+  return Status::OK();
 }
 
 /**
@@ -92,23 +93,23 @@ void StopSign::MakeDecisions(Frame* frame,
     auto* path_decision = reference_line_info->path_decision();
     if (stop_status_ == StopSignStatus::DRIVE) {
       for (const auto* path_obstacle :
-          path_decision->path_obstacles().Items()) {
+           path_decision->path_obstacles().Items()) {
         // add to watch_vehicles if adc is still proceeding to stop sign
         AddWatchVehicle(*path_obstacle, &watch_vehicles);
       }
     } else if (!watch_vehicles.empty() &&
-        (stop_status_ == StopSignStatus::STOP ||
-        stop_status_ == StopSignStatus::WAIT)) {
+               (stop_status_ == StopSignStatus::STOP ||
+                stop_status_ == StopSignStatus::WAIT)) {
       // get all vehicles currently watched
       std::vector<std::string> watch_vehicle_ids;
       for (StopSignLaneVehicles::iterator it = watch_vehicles.begin();
-          it != watch_vehicles.end(); ++it) {
+           it != watch_vehicles.end(); ++it) {
         std::copy(it->second.begin(), it->second.end(),
                   std::back_inserter(watch_vehicle_ids));
       }
 
       for (const auto* path_obstacle :
-          path_decision->path_obstacles().Items()) {
+           path_decision->path_obstacles().Items()) {
         // remove from watch_vehicles if adc is stopping/waiting at stop sign
         RemoveWatchVehicle(*path_obstacle, watch_vehicle_ids, &watch_vehicles);
       }
@@ -138,25 +139,21 @@ void StopSign::MakeDecisions(Frame* frame,
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] DONE";
   } else if (stop_status_ == StopSignStatus::CREEP) {
     // creep: stop decition
-    double creep_stop_s = next_stop_sign_overlap_->end_s +
-          config_.stop_sign().creep().creep_distance_to_stop_line();
+    double creep_stop_s =
+        next_stop_sign_overlap_->end_s +
+        config_.stop_sign().creep().creep_distance_to_stop_line();
     const std::string stop_wall_id =
         STOP_SIGN_CREEP_VO_ID_PREFIX + stop_sign_id;
-    BuildStopDecision(frame, reference_line_info,
-                      stop_wall_id,
-                      creep_stop_s,
-                      config_.stop_sign().creep().stop_distance(),
-                      nullptr);
+    BuildStopDecision(frame, reference_line_info, stop_wall_id, creep_stop_s,
+                      config_.stop_sign().creep().stop_distance(), nullptr);
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] CREEP";
   } else {
     // stop decision
     const std::string stop_wall_id =
         STOP_SIGN_VO_ID_PREFIX + next_stop_sign_overlap_->object_id;
-    BuildStopDecision(frame, reference_line_info,
-                      stop_wall_id,
+    BuildStopDecision(frame, reference_line_info, stop_wall_id,
                       const_cast<PathOverlap*>(next_stop_sign_overlap_),
-                      config_.stop_sign().stop_distance(),
-                      &watch_vehicles);
+                      config_.stop_sign().stop_distance(), &watch_vehicles);
     ADEBUG << "stop_sign_id[" << stop_sign_id << "] STOP";
   }
 }
@@ -179,14 +176,14 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
     if (stop_sign_status.stop_sign_id() == stop_sign_overlap.object_id) {
       if (stop_sign_status.has_status() &&
           (stop_sign_status.status() == StopSignStatus::CREEP ||
-          stop_sign_status.status() == StopSignStatus::STOP_DONE)) {
+           stop_sign_status.status() == StopSignStatus::STOP_DONE)) {
         next_stop_sign_overlap_ = const_cast<PathOverlap*>(&stop_sign_overlap);
         break;
       }
     }
 
     if (adc_front_edge_s - stop_sign_overlap.end_s <=
-        config_.stop_sign().min_pass_s_distance() &&
+            config_.stop_sign().min_pass_s_distance() &&
         stop_sign_overlap.start_s < min_start_s) {
       min_start_s = stop_sign_overlap.start_s;
       next_stop_sign_overlap_ = const_cast<PathOverlap*>(&stop_sign_overlap);
@@ -210,8 +207,8 @@ bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
   }
 
   if (!(stop_sign_status.has_status() &&
-      (stop_sign_status.status() == StopSignStatus::CREEP ||
-      stop_sign_status.status() == StopSignStatus::STOP_DONE))) {
+        (stop_sign_status.status() == StopSignStatus::CREEP ||
+         stop_sign_status.status() == StopSignStatus::STOP_DONE))) {
     // find all the lanes associated/guarded by the stop sign
     GetAssociatedLanes(*next_stop_sign_);
   }
@@ -270,7 +267,7 @@ bool StopSign::CheckCreep(const hdmap::StopSignInfo& stop_sign_info) {
     }
     // TODO(all): temp work around
     //            to be removed once MAP fix on stop_sign type is in
-    if (associated_lanes_.size() <=1) {
+    if (associated_lanes_.size() <= 1) {
       return true;
     }
   }
@@ -282,10 +279,9 @@ bool StopSign::CheckCreep(const hdmap::StopSignInfo& stop_sign_info) {
  *         UNKNOWN/DRIVE -> STOP -> WAIT -> CREEP -> DONE
  *         note: only update state machine here, no operation
  */
-int StopSign::ProcessStopStatus(
-    ReferenceLineInfo* const reference_line_info,
-    const StopSignInfo& stop_sign_info,
-    StopSignLaneVehicles* watch_vehicles) {
+int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
+                                const StopSignInfo& stop_sign_info,
+                                StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(reference_line_info);
 
   // get stop status from PlanningStatus
@@ -333,26 +329,27 @@ int StopSign::ProcessStopStatus(
         if (watch_vehicles != nullptr && !watch_vehicles->empty()) {
           stop_status_ = StopSignStatus::WAIT;
         } else {
-          stop_status_ = CheckCreep(stop_sign_info) ?
-              StopSignStatus::CREEP : StopSignStatus::STOP_DONE;
+          stop_status_ = CheckCreep(stop_sign_info) ? StopSignStatus::CREEP
+                                                    : StopSignStatus::STOP_DONE;
         }
       }
       break;
     case StopSignStatus::WAIT:
       if (watch_vehicles == nullptr || watch_vehicles->empty()) {
-        stop_status_ = CheckCreep(stop_sign_info) ?
-            StopSignStatus::CREEP : StopSignStatus::STOP_DONE;
+        stop_status_ = CheckCreep(stop_sign_info) ? StopSignStatus::CREEP
+                                                  : StopSignStatus::STOP_DONE;
       }
       break;
     case StopSignStatus::CREEP: {
-      double creep_stop_s = next_stop_sign_overlap_->end_s +
+      double creep_stop_s =
+          next_stop_sign_overlap_->end_s +
           config_.stop_sign().creep().creep_distance_to_stop_line();
-      const double distance = creep_stop_s -
-          reference_line_info->AdcSlBoundary().end_s();
+      const double distance =
+          creep_stop_s - reference_line_info->AdcSlBoundary().end_s();
       if (distance < config_.stop_sign().creep().max_valid_stop_distance()) {
         bool all_far_away = true;
         for (auto* path_obstacle :
-            reference_line_info->path_decision()->path_obstacles().Items()) {
+             reference_line_info->path_decision()->path_obstacles().Items()) {
           if (path_obstacle->obstacle()->IsVirtual() ||
               !path_obstacle->obstacle()->IsStatic()) {
             continue;
@@ -434,8 +431,8 @@ int StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
       s = s.empty() ? vehicle : s + "," + vehicle;
       (*watch_vehicles)[associated_lane_id].push_back(vehicle);
     }
-    ADEBUG << "GetWatchVehicles watch_vehicles: lane_id["
-        << associated_lane_id << "] vehicle[" << s << "]";
+    ADEBUG << "GetWatchVehicles watch_vehicles: lane_id[" << associated_lane_id
+           << "] vehicle[" << s << "]";
   }
 
   return 0;
@@ -459,8 +456,8 @@ int StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
       s = s.empty() ? vehicle : s + "," + vehicle;
       lane_watch_vehicles->add_watch_vehicles(vehicle);
     }
-    ADEBUG << "UpdateWatchVehicles watch_vehicles: lane_id["
-        << it->first << "] vehicle[" << s << "]";
+    ADEBUG << "UpdateWatchVehicles watch_vehicles: lane_id[" << it->first
+           << "] vehicle[" << s << "]";
   }
 
   return 0;
@@ -686,9 +683,8 @@ int StopSign::RemoveWatchVehicle(
   return 0;
 }
 
-int StopSign::ClearWatchVehicle(
-    ReferenceLineInfo* const reference_line_info,
-    StopSignLaneVehicles* watch_vehicles) {
+int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
+                                StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(reference_line_info);
   CHECK_NOTNULL(watch_vehicles);
 
@@ -744,32 +740,29 @@ int StopSign::ClearWatchVehicle(
 /**
  * @brief: build stop decision
  */
-int StopSign::BuildStopDecision(
-    Frame* frame,
-    ReferenceLineInfo* const reference_line_info,
-    const std::string stop_wall_id,
-    PathOverlap* const overlap,
-    const double stop_distance,
-    StopSignLaneVehicles* watch_vehicles) {
+int StopSign::BuildStopDecision(Frame* frame,
+                                ReferenceLineInfo* const reference_line_info,
+                                const std::string stop_wall_id,
+                                PathOverlap* const overlap,
+                                const double stop_distance,
+                                StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
   CHECK_NOTNULL(overlap);
 
-  return BuildStopDecision(
-      frame, reference_line_info, stop_wall_id,
-      overlap->start_s, stop_distance, watch_vehicles);
+  return BuildStopDecision(frame, reference_line_info, stop_wall_id,
+                           overlap->start_s, stop_distance, watch_vehicles);
 }
 
 /**
  * @brief: build stop decision
  */
-int StopSign::BuildStopDecision(
-    Frame* frame,
-    ReferenceLineInfo* const reference_line_info,
-    const std::string stop_wall_id,
-    const double stop_line_s,
-    const double stop_distance,
-    StopSignLaneVehicles* watch_vehicles) {
+int StopSign::BuildStopDecision(Frame* frame,
+                                ReferenceLineInfo* const reference_line_info,
+                                const std::string stop_wall_id,
+                                const double stop_line_s,
+                                const double stop_distance,
+                                StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -782,8 +775,8 @@ int StopSign::BuildStopDecision(
 
   // create virtual stop wall
   std::string virtual_obstacle_id = stop_wall_id;
-  auto* obstacle = frame->CreateStopObstacle(
-      reference_line_info, virtual_obstacle_id, stop_line_s);
+  auto* obstacle = frame->CreateStopObstacle(reference_line_info,
+                                             virtual_obstacle_id, stop_line_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
     return -1;
@@ -810,8 +803,8 @@ int StopSign::BuildStopDecision(
 
   if (stop_status_ == StopSignStatus::WAIT) {
     if (watch_vehicles != nullptr && !watch_vehicles->empty()) {
-      for (auto it = watch_vehicles->begin();
-          it != watch_vehicles->end(); ++it) {
+      for (auto it = watch_vehicles->begin(); it != watch_vehicles->end();
+           ++it) {
         for (size_t i = 0; i < it->second.size(); ++i) {
           std::string obstacle_id = it->second[i];
           stop_decision->add_wait_for_obstacle(obstacle_id);
