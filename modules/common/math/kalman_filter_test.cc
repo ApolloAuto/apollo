@@ -24,7 +24,7 @@ namespace math {
 
 class KalmanFilterTest : public ::testing::Test {
  public:
-  KalmanFilterTest() : kf() {}
+  KalmanFilterTest() : kf_() {}
 
   virtual void SetUp() {
     // Initial state
@@ -64,22 +64,22 @@ class KalmanFilterTest : public ::testing::Test {
     B[0] = 0.5 * 1.0 * 1.0;
     B[1] = 1.0;
 
-    kf.SetStateEstimate(x, P);
-    kf.SetTransitionMatrix(F);
-    kf.SetTransitionNoise(Q);
-    kf.SetObservationMatrix(H);
-    kf.SetObservationNoise(R);
-    kf.SetControlMatrix(B);
+    kf_.SetStateEstimate(x, P);
+    kf_.SetTransitionMatrix(F);
+    kf_.SetTransitionNoise(Q);
+    kf_.SetObservationMatrix(H);
+    kf_.SetObservationNoise(R);
+    kf_.SetControlMatrix(B);
   }
 
  protected:
-  KalmanFilter<double, 2, 1, 1> kf;
+  KalmanFilter<double, 2, 1, 1> kf_;
 };
 
 TEST_F(KalmanFilterTest, SyntheticTrackingTest) {
-  kf.Predict();
-  Eigen::Matrix<double, 2, 1> state = kf.GetStateEstimate();
-  Eigen::Matrix<double, 2, 2> state_cov = kf.GetStateCovariance();
+  kf_.Predict();
+  Eigen::Matrix<double, 2, 1> state = kf_.GetStateEstimate();
+  Eigen::Matrix<double, 2, 2> state_cov = kf_.GetStateCovariance();
   EXPECT_DOUBLE_EQ(1.0, state(0, 0));
   EXPECT_DOUBLE_EQ(1.0, state(1, 0));
   EXPECT_NEAR(0.21, state_cov(0, 0), 0.001);
@@ -89,9 +89,9 @@ TEST_F(KalmanFilterTest, SyntheticTrackingTest) {
 
   Eigen::Matrix<double, 1, 1> z;
   z(0, 0) = 1.0;
-  kf.Correct(z);
-  state = kf.GetStateEstimate();
-  state_cov = kf.GetStateCovariance();
+  kf_.Correct(z);
+  state = kf_.GetStateEstimate();
+  state_cov = kf_.GetStateCovariance();
 
   EXPECT_DOUBLE_EQ(1.0, state(0, 0));
   EXPECT_DOUBLE_EQ(1.0, state(1, 0));
