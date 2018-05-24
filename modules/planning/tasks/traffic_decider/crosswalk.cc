@@ -73,8 +73,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
   for (auto crosswalk_overlap : crosswalk_overlaps_) {
     auto crosswalk_ptr = HDMapUtil::BaseMap().GetCrosswalkById(
         hdmap::MakeMapId(crosswalk_overlap->object_id));
-    auto crosswalk_info = crosswalk_ptr.get();
-    std::string crosswalk_id = crosswalk_info->id().id();
+    std::string crosswalk_id = crosswalk_ptr->id().id();
 
     // skip crosswalk if master vehicle body already passes the stop line
     double stop_line_end_s = crosswalk_overlap->end_s;
@@ -109,7 +108,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
       // note: crosswalk expanded area will include sideway area
       Vec2d point(perception_obstacle.position().x(),
                   perception_obstacle.position().y());
-      const Polygon2d crosswalk_poly = crosswalk_info->polygon();
+      const Polygon2d crosswalk_poly = crosswalk_ptr->polygon();
       bool in_crosswalk = crosswalk_poly.IsPointIn(point);
       const Polygon2d crosswalk_exp_poly = crosswalk_poly.ExpandByDistance(
           config_.crosswalk().expand_s_distance());
