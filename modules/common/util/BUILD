@@ -66,6 +66,18 @@ cc_library(
     hdrs = ["threadpool.h"],
 )
 
+cc_test(
+    name = "threadpool_test",
+    size = "small",
+    srcs = [
+        "threadpool_test.cc",
+    ],
+    deps = [
+        ":threadpool",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "ctpl_stl",
     hdrs = ["ctpl_stl.h"],
