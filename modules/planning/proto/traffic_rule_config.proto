@@ -114,7 +114,9 @@ message StopSignConfig {
   // max stop distance for watch vehicles to be considered as
   // a valid stop.(this check is looser than adc)
   optional double watch_vehicle_max_valid_stop_distance = 7 [ default=5.0 ]; // meter
-  optional CreepConfig creep = 8;
+  // timeout threshold while monitoring/waiting for other obstacles
+  optional double wait_timeout = 8 [ default=8.0 ]; // sec
+  optional CreepConfig creep = 9;
 }
 
 // TODO(all) migrate all other traffic rules to pb config
