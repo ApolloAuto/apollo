@@ -657,7 +657,7 @@ bool Cipv::DetermineCipv(const LaneObjectsPtr lane_objects,
   }
 
   float yaw_rate = options.yaw_rate;
-  float velocity = options.yaw_rate;
+  float velocity = options.velocity;
   int32_t cipv_index = -1;
   //    int32_t old_cipv_track_id = sensor_objects.cipv_track_id;
   int32_t cipv_track_id = -1;
