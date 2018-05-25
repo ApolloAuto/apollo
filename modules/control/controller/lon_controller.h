@@ -103,6 +103,8 @@ class LonController : public Controller {
                                  const double preview_time,
                                  SimpleLongitudinalDebug *debug);
 
+  void GetPathRemain(SimpleLongitudinalDebug *debug);
+
  private:
   void SetDigitalFilterPitchAngle(const LonControllerConf &lon_controller_conf);
 
