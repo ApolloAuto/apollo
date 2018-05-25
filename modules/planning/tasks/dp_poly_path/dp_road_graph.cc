@@ -224,21 +224,21 @@ void DPRoadGraph::UpdateNode(const std::list<DPRoadGraphNode> &prev_nodes,
         prev_dp_node.min_cost;
 
     cur_node->UpdateCost(&prev_dp_node, curve, cost);
+  }
 
-    // try to connect the current point with the first point directly
-    if (level >= 2) {
-      init_dl = init_frenet_frame_point_.dl();
-      init_ddl = init_frenet_frame_point_.ddl();
-      QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
-                                     cur_point.l(), 0.0, 0.0,
-                                     cur_point.s() - init_sl_point_.s());
-      if (!IsValidCurve(curve)) {
-        continue;
-      }
-      const auto cost = trajectory_cost->Calculate(
-          curve, init_sl_point_.s(), cur_point.s(), level, total_level);
-      cur_node->UpdateCost(front, curve, cost);
+  // try to connect the current point with the first point directly
+  if (level >= 2) {
+    const float init_dl = init_frenet_frame_point_.dl();
+    const float init_ddl = init_frenet_frame_point_.ddl();
+    QuinticPolynomialCurve1d curve(init_sl_point_.l(), init_dl, init_ddl,
+                                   cur_node->sl_point.l(), 0.0, 0.0,
+                                   cur_node->sl_point.s() - init_sl_point_.s());
+    if (!IsValidCurve(curve)) {
+      return;
     }
+    const auto cost = trajectory_cost->Calculate(
+        curve, init_sl_point_.s(), cur_node->sl_point.s(), level, total_level);
+    cur_node->UpdateCost(front, curve, cost);
   }
 }
 
