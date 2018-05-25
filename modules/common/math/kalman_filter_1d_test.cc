@@ -14,40 +14,31 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- * @brief Defines a KalmanFilter1D class.
- */
+#include "modules/common/math/kalman_filter_1d.h"
 
-#ifndef MODULES_COMMON_MATH_KALMAN_FILTER_1D_H_
-#define MODULES_COMMON_MATH_KALMAN_FILTER_1D_H_
-
-// 1 dimensional constant velocity kalman filter
-#include "Eigen/Core"
-#include "Eigen/Dense"
-
-#include "modules/common/math/kalman_filter.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace common {
 namespace math {
 
-class KalmanFilter1D
-    : public ::apollo::common::math::KalmanFilter<float, 2, 1, 1> {
+class KalmanFilter1DTest : public ::testing::Test {
  public:
-  bool Init(const float& x);
+  KalmanFilter1DTest() : kf_() {}
 
-  bool Predict(const float& time_diff);
-
-  bool Update(const float& z);
-
-  Eigen::Vector2f GetState();
-
-  Eigen::Matrix2f GetCov();
+ protected:
+  KalmanFilter1D kf_;
 };
+
+TEST_F(KalmanFilter1DTest, SyntheticTrackingTest) {
+  EXPECT_TRUE(kf_.Init(0.0));
+  EXPECT_TRUE(kf_.Predict(1.0));
+  EXPECT_TRUE(kf_.Update(1.0));
+
+  EXPECT_DOUBLE_EQ(0.67741930484771729, kf_.GetState()(0, 0));
+  EXPECT_DOUBLE_EQ(13.548389434814453, kf_.GetCov()(0, 0));
+}
 
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
-
-#endif  // MODULES_COMMON_MATH_KALMAN_FILTER_1D_H_
