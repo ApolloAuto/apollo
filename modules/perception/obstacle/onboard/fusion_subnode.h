@@ -29,6 +29,7 @@
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/obstacle/camera/cipv/cipv.h"
 #include "modules/perception/obstacle/fusion/async_fusion/async_fusion.h"
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
@@ -82,6 +83,9 @@ class FusionSubnode : public Subnode {
   FusionSharedData *fusion_data_ = nullptr;
   LaneSharedData *lane_shared_data_ = nullptr;
   std::shared_ptr<LaneObjects> lane_objects_;
+  // CIPV related variables
+  CIPVObjectData* cipv_object_data_ = nullptr;
+  Cipv cipv_;
   // lidar perception subnode event controls the publishing behavior
   EventID pub_driven_event_id_;
   EventID lidar_event_id_;
@@ -91,6 +95,7 @@ class FusionSubnode : public Subnode {
   std::mutex fusion_subnode_mutex_;
   apollo::canbus::Chassis chassis_;
   volatile float chassis_speed_mps_;
+
   DISALLOW_COPY_AND_ASSIGN(FusionSubnode);
 };
 

@@ -149,7 +149,7 @@ void GLFWFusionViewer::get_class_color(int cls, float rgb[3]) {
     case 7:
       rgb[0] = 1;
       rgb[1] = 0;
-      rgb[2] = 0;  // red
+      rgb[2] = 1;  // purple
       break;
   }
 }
@@ -986,6 +986,7 @@ void GLFWFusionViewer::draw_camera_frame(FrameContent* content,
 
   std::vector<std::shared_ptr<Object>> camera_objects;
   camera_objects = content->get_camera_objects();
+
   // show 2d detection and classification
   if (show_3d_class) {
     // show 3d class
@@ -1597,6 +1598,12 @@ void GLFWFusionViewer::draw_camera_box3d(
       for (size_t i = 0; i < 3; ++i) {
         box3d_color[i] = static_cast<int>(255 * rgb[i]);
       }
+      if (fused_obj->b_cipv) {
+        ADEBUG << "cipv fused_obj->track_id: " << fused_obj->track_id;
+        box3d_color[0] = 255;
+        box3d_color[1] = 0;
+        box3d_color[2] = 0;
+      }
 
       if (show_camera_box3d_) {
         draw_8pts_box(points, Eigen::Vector3f(box3d_color[0], box3d_color[1],
@@ -1774,17 +1781,19 @@ void GLFWFusionViewer::draw_objects(
         rgb[0] = tmp_color[0];
         rgb[1] = tmp_color[1];
         rgb[2] = tmp_color[2];
-      }
 
-      if (use_class_color) {
+      } else if (use_class_color) {
         get_class_color(static_cast<unsigned>(objects[i]->type), rgb);
-      }
 
-      if (objects[i]->b_cipv) {
-        ADEBUG << "cipv objects[i]->track_id: " << objects[i]->track_id;
-        rgb[0] = 1;
-        rgb[1] = 0;
-        rgb[2] = 0;
+      } else if (objects[i]->b_cipv) {
+        AINFO << "cipv objects[i]->track_id: " << objects[i]->track_id;
+        rgb[0] = 1.0f;
+        rgb[1] = 0.0f;
+        rgb[2] = 0.0f;
+      } else {
+        rgb[0] = color[0];
+        rgb[1] = color[1];
+        rgb[2] = color[2];
       }
 
       glColor3f((GLfloat)rgb[0], (GLfloat)rgb[1], (GLfloat)rgb[2]);
@@ -1827,6 +1836,8 @@ void GLFWFusionViewer::draw_objects(
         raster_text_->print_string(std::string("cipv"));
       }
       ADEBUG << objects[i]->ToString();
+      glColor3f(static_cast<GLfloat>(1.0f), static_cast<GLfloat>(1.0f),
+                static_cast<GLfloat>(1.0f));  // reset to white color
     }
   }
 
@@ -1835,19 +1846,19 @@ void GLFWFusionViewer::draw_objects(
     int i = 0;
     vec3 velocity_src;
     vec3 velocity_dst;
-    float rgb[3] = {1, 1, 0};
+    float rgb[3] = {1.0f, 1.0f, 1.0f};
     for (i = 0; i < static_cast<int>(objects.size()); i++) {
       velocity_src = get_velocity_src_position(objects[i]);
       velocity_dst.x = velocity_src.x + objects[i]->velocity[0];
       velocity_dst.y = velocity_src.y + objects[i]->velocity[1];
       velocity_dst.z = -1.0f;
 
-      // draw same color with 2d camera bbox
-      auto tmp_color =
-          s_color_table[objects[i]->track_id % s_color_table.size()];
-      rgb[0] = tmp_color[0];
-      rgb[1] = tmp_color[1];
-      rgb[2] = tmp_color[2];
+      // // draw same color with 2d camera bbox
+      // auto tmp_color =
+      //     s_color_table[objects[i]->track_id % s_color_table.size()];
+      // rgb[0] = tmp_color[0];
+      // rgb[1] = tmp_color[1];
+      // rgb[2] = tmp_color[2];
 
       if (use_class_color) {
         get_class_color(static_cast<unsigned>(objects[i]->type), rgb);
@@ -1994,8 +2005,8 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
   Eigen::Matrix4d c2v = content->get_camera_to_world_pose();
 
   if (show_camera_bdv_) {
-    draw_objects(content->get_camera_objects(), c2v, true, true,
-                 Eigen::Vector3f(1, 1, 0), use_class_color_);
+      draw_objects(content->get_camera_objects(), c2v, true, true,
+                   Eigen::Vector3f(1, 1, 0), use_class_color_);
   }
 
   if (show_fusion_) {
