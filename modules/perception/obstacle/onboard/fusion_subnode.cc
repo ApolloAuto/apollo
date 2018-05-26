@@ -82,10 +82,22 @@ bool FusionSubnode::InitInternal() {
 
   lane_objects_.reset(new LaneObjects());
 
+  // // CIPV data
+  // cipv_object_data_ = dynamic_cast<CIPVObjectData *>(
+  //     shared_data_manager_->GetSharedData("CIPVObjectData"));
+  // if (cipv_object_data_ == nullptr) {
+  //   AERROR << "Failed to get CIPVObjectData";
+  //   return false;
+  // }
+
+
   if (!InitOutputStream()) {
     AERROR << "Failed to init output stream.";
     return false;
   }
+
+  // init Cipv
+  cipv_.Init();
 
   AINFO << "Init FusionSubnode succ. Using fusion:" << fusion_->name();
   return true;
@@ -215,12 +227,42 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     PERF_BLOCK_END("fusion_camera");
   }
 
+  // Process CIPV
+  CipvOptions cipv_options;
+  // // Retrieve motion manager information and pass them to cipv_options
+  // MotionService *motion_service = dynamic_cast<MotionService *>(
+  //     DAGStreaming::GetSubnodeByName("MotionService"));
+  // VehicleInformation vehicle_information;
+  // motion_service->GetVehicleInformation(event.timestamp,
+  //                                       &vehicle_information);
+  // cipv_options.velocity = vehicle_information.velocity;
+  // cipv_options.yaw_rate = vehicle_information.yaw_rate;
+  // cipv_options.yaw_angle =
+  //     vehicle_information.yaw_rate * vehicle_information.time_diff;
+  cipv_options.yaw_angle = 0.0f;  // ***** fill in the value *****
+  cipv_options.velocity = 5.0f;  // ***** fill in the value *****
+  cipv_options.yaw_rate = 0.0f;  // ***** fill in the value *****
+  AINFO << "[CIPVSubnode] velocity " << cipv_options.velocity
+        << ", yaw rate: " << cipv_options.yaw_rate
+        << ", yaw angle: " << cipv_options.yaw_angle;
+  for (auto &obj : sensor_objs) {
+      if (obj.sensor_type == SensorType::CAMERA) {
+        AINFO << "Before DetermineCipv";
+//        cipv_.DetermineCipv(obj, cipv_options, &objects_);
+        cipv_.DetermineCipv(lane_objects_, cipv_options, &objects_);
+        AINFO << "After DetermineCipv";
+      }
+  }
+
   if (objects_.size() > 0 && FLAGS_publish_fusion_event) {
     SharedDataPtr<FusionItem> fusion_item_ptr(new FusionItem);
     fusion_item_ptr->timestamp = objects_[0]->latest_tracked_time;
     const std::string &device_id = events[0].reserve;
     for (auto obj : objects_) {
       std::shared_ptr<Object> objclone(new Object());
+      if (obj->b_cipv == true) {
+        AINFO << "CIPV ID: " << obj->track_id;
+      }
       objclone->clone(*obj);
       fusion_item_ptr->obstacles.push_back(objclone);
     }
