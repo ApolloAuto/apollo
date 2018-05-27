@@ -37,6 +37,9 @@ class LatticeTrajectory1d : public Curve1d {
 
   virtual double Evaluate(const std::uint32_t order, const double param) const;
 
+  // Evaluate the integral of the squared third-order derivative.
+  double Evaluate3DerSqrInt(double lower, double upper) const override;
+
   virtual double ParamLength() const;
 
   virtual std::string ToString() const;

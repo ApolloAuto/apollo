@@ -77,6 +77,19 @@ double QuarticPolynomialCurve1d::Evaluate(const std::uint32_t order,
   }
 }
 
+// Evaluate the integral of the squared third-order derivative
+double QuarticPolynomialCurve1d::Evaluate3DerSqrInt(double lower,
+                                                    double upper) const {
+  // f_3d = 24 * c4 * p + 6 * c3
+  // Integral of squared (f_3d) = 12 * (4 * c4 * (4 * c4 * p^3 + 3 * c3 * p * p)
+  //  + 3 * c3 * c3 * p)
+  auto func = [this](double p) {
+    return 12.0 * (4.0 * coef_[4] * (4.0 * coef_[4] * p + 3.0 * coef_[3]) *
+           p + 3.0 * coef_[3] * coef_[3]) * p;
+  };
+  return (func(upper) - func(lower));
+}
+
 void QuarticPolynomialCurve1d::ComputeCoefficients(
     const double x0, const double dx0, const double ddx0, const double dx1,
     const double ddx1, const double p) {

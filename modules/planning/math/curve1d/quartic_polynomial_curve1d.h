@@ -48,6 +48,9 @@ class QuarticPolynomialCurve1d : public PolynomialCurve1d {
 
   double Evaluate(const std::uint32_t order, const double p) const override;
 
+  // Evaluate the integral of the squared third-order derivative.
+  double Evaluate3DerSqrInt(double lower, double upper) const override;
+
   double ParamLength() const override { return param_; }
   std::string ToString() const override;
 

@@ -45,12 +45,28 @@ EndConditionSampler::EndConditionSampler(
 std::vector<Condition> EndConditionSampler::SampleLatEndConditions() const {
   std::vector<Condition> end_d_conditions;
   std::array<double, 3> end_d_candidates = {0.0, -0.5, 0.5};
-  std::array<double, 4> end_s_candidates = {10.0, 20.0, 40.0, 80.0};
 
-  for (const auto& s : end_s_candidates) {
+  if (init_s_[1] < FLAGS_speed_to_change_lateral_trajectory) {
+    std::array<double, 4> end_s_candidates = {10.0, 20.0, 40.0, 80.0};
+
+    for (const auto& s : end_s_candidates) {
+      for (const auto& d : end_d_candidates) {
+        State end_d_state = {d, 0.0, 0.0};
+        end_d_conditions.emplace_back(end_d_state, s);
+      }
+    }
+    return end_d_conditions;
+  }
+
+  // If the speed exceeds the specified threshold, we need to change the end
+  // conditions of the lateral trajectory component in order to generate more
+  // appropriate trajectory bundles.
+  const double dt = 1.0;
+  for (double time = dt;
+       time < FLAGS_trajectory_time_length + dt; time += dt) {
     for (const auto& d : end_d_candidates) {
       State end_d_state = {d, 0.0, 0.0};
-      end_d_conditions.emplace_back(end_d_state, s);
+      end_d_conditions.emplace_back(end_d_state, time);
     }
   }
   return end_d_conditions;
@@ -150,8 +166,7 @@ EndConditionSampler::QueryPathTimeObstacleSamplePoints() const {
 }
 
 void EndConditionSampler::QueryFollowPathTimePoints(
-    const common::VehicleConfig& vehicle_config,
-    const std::string& obstacle_id,
+    const common::VehicleConfig& vehicle_config, const std::string& obstacle_id,
     std::vector<SamplePoint>* const sample_points) const {
   std::vector<PathTimePoint> follow_path_time_points =
       ptr_path_time_graph_->GetObstacleSurroundingPoints(
@@ -165,8 +180,9 @@ void EndConditionSampler::QueryFollowPathTimePoints(
                      vehicle_config.vehicle_param().front_edge_to_center();
     double s_lower = s_upper - FLAGS_default_lon_buffer;
     CHECK_GE(FLAGS_num_sample_follow_per_timestamp, 2);
-    double s_gap = FLAGS_default_lon_buffer
-        / static_cast<double>(FLAGS_num_sample_follow_per_timestamp - 1);
+    double s_gap =
+        FLAGS_default_lon_buffer /
+        static_cast<double>(FLAGS_num_sample_follow_per_timestamp - 1);
     for (std::size_t i = 0; i < FLAGS_num_sample_follow_per_timestamp; ++i) {
       double s = s_lower + s_gap * static_cast<double>(i);
       SamplePoint sample_point;
@@ -179,8 +195,7 @@ void EndConditionSampler::QueryFollowPathTimePoints(
 }
 
 void EndConditionSampler::QueryOvertakePathTimePoints(
-    const common::VehicleConfig& vehicle_config,
-    const std::string& obstacle_id,
+    const common::VehicleConfig& vehicle_config, const std::string& obstacle_id,
     std::vector<SamplePoint>* sample_points) const {
   std::vector<PathTimePoint> overtake_path_time_points =
       ptr_path_time_graph_->GetObstacleSurroundingPoints(

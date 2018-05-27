@@ -57,6 +57,12 @@ double LatticeTrajectory1d::Evaluate(const std::uint32_t order,
   }
 }
 
+// Evaluate the integral of the squared third-order derivative.
+double LatticeTrajectory1d::Evaluate3DerSqrInt(double lower,
+                                               double upper) const {
+  return ptr_trajectory1d_->Evaluate3DerSqrInt(lower, upper);
+}
+
 double LatticeTrajectory1d::ParamLength() const {
   return ptr_trajectory1d_->ParamLength();
 }

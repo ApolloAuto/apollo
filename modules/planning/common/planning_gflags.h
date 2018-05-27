@@ -160,6 +160,7 @@ DECLARE_double(min_velocity_sample_gap);
 DECLARE_double(lon_collision_buffer);
 DECLARE_double(lat_collision_buffer);
 DECLARE_uint32(num_sample_follow_per_timestamp);
+DECLARE_double(speed_to_change_lateral_trajectory);
 
 // Lattice Evaluate Parameters
 DECLARE_double(weight_lon_objective);

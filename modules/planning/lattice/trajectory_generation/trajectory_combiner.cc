@@ -25,10 +25,10 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::CartesianFrenetConverter;
-using apollo::common::math::PathMatcher;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
+using apollo::common::math::CartesianFrenetConverter;
+using apollo::common::math::PathMatcher;
 
 DiscretizedTrajectory TrajectoryCombiner::Combine(
     const std::vector<PathPoint>& reference_line, const Curve1d& lon_trajectory,
@@ -58,12 +58,25 @@ DiscretizedTrajectory TrajectoryCombiner::Combine(
       break;
     }
 
+  double d, d_prime, d_pprime;
+  double param_len = lat_trajectory.ParamLength();
+  if (param_len > FLAGS_trajectory_time_length) {
     double s_param = s - s0;
     // linear extrapolation is handled internally in LatticeTrajectory1d;
     // no worry about s_param > lat_trajectory.ParamLength() situation
-    double d = lat_trajectory.Evaluate(0, s_param);
-    double d_prime = lat_trajectory.Evaluate(1, s_param);
-    double d_pprime = lat_trajectory.Evaluate(2, s_param);
+    d = lat_trajectory.Evaluate(0, s_param);
+    d_prime = lat_trajectory.Evaluate(1, s_param);
+    d_pprime = lat_trajectory.Evaluate(2, s_param);
+  } else {
+    // If the speed exceeds the specified threshold, we only get the d's
+    // final steady state.
+    d = lat_trajectory.Evaluate(0, param_len);
+    double d_dot = lat_trajectory.Evaluate(1, param_len);
+    double d_ddot = lat_trajectory.Evaluate(2, param_len);
+    d_prime = d_dot / (s_dot + FLAGS_lattice_epsilon);
+    d_pprime =
+        (d_ddot - d_prime * s_ddot) / (s_dot * s_dot + FLAGS_lattice_epsilon);
+  }
 
     PathPoint matched_ref_point = PathMatcher::MatchToPath(reference_line, s);
 
