@@ -37,7 +37,14 @@ bash docker/scripts/dev_into.sh
 bash apollo.sh build
 ```
 
+如果编译很卡,可以在后面附加参数限制CPU
+
+```
+bash apollo.sh build --local_resources 2048,1.0,1.0
+```
+
 ## 运行Apollo
+
 请按照如下步骤启动Apollo。
 
 ### 启动Apollo
