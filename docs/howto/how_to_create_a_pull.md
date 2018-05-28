@@ -14,13 +14,15 @@ git config user.email "XXX@[XXX.com]"
 - Clone your fork (Please replace "USERNAME" with your GitHub user name.)
 
 ```
-git clone git@github.com:USERNAME/apollo.git
+(Use SSH) git clone git@github.com:USERNAME/apollo.git
+(Use HTTPS) git clone https://github.com/USERNAME/apollo.git
 ```
 
 - Add Apollo repository as upstream
 
 ```
-git remote add upstream git@github.com:ApolloAuto/apollo.git
+(Use SSH) git remote add upstream git@github.com:ApolloAuto/apollo.git
+(Use HTTPS) git remote add upstream https://github.com/ApolloAuto/apollo.git
 ```
 
 - Create a new branch, make changes and commit.
