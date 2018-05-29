@@ -11,8 +11,32 @@ import "modules/common/proto/geometry.proto";
   It will not be refreshed in each planning cycle.
 */
 
+message ChangeLaneStatus {
+   enum Status {
+       IN_CHANGE_LANE = 1; // during change lane state
+       CHANGE_LANE_FAILED = 2; // change lane failed
+       CHANGE_LANE_SUCCESS = 3; // change lane failed
+   }
+   optional Status status = 1;
+   // the id of the route segment that the vehicle is driving on
+   optional string path_id = 2;
+   // the time stamp when the state started.
+   optional double timestamp = 3;
+}
+
+message PullOverStatus {
+    optional bool in_pull_over = 1 [default=false];
+    optional apollo.common.PointENU stop_point = 2;
+    optional double stop_heading = 3;
+}
+
 message ReroutingStatus {
   optional double last_rerouting_time = 1;
+}
+
+message RightOfWayStatus {
+    // whether the vehicle has right of way in junction
+    map<string, bool> junction = 1;
 }
 
 message SidePassStatus {
@@ -50,37 +74,13 @@ message StopSignStatus {
   repeated LaneWatchVehicles lane_watch_vehicles = 4;
 }
 
-message ChangeLaneStatus {
-   enum Status {
-       IN_CHANGE_LANE = 1; // during change lane state
-       CHANGE_LANE_FAILED = 2; // change lane failed
-       CHANGE_LANE_SUCCESS = 3; // change lane failed
-   }
-   optional Status status = 1;
-   // the id of the route segment that the vehicle is driving on
-   optional string path_id = 2;
-   // the time stamp when the state started.
-   optional double timestamp = 3;
-}
-
-message RightOfWayStatus {
-    // whether the vehicle has right of way in junction
-    map<string, bool> junction = 1;
-}
-
-message PullOverStatus {
-    optional bool in_pull_over = 1 [default=false];
-    optional apollo.common.PointENU stop_point = 2;
-    optional double stop_heading = 3;
-}
-
 message PlanningStatus {
-  optional ReroutingStatus rerouting = 1;
-  optional SidePassStatus side_pass = 2;
-  optional StopSignStatus stop_sign = 3;
-  optional ChangeLaneStatus change_lane = 4;
+  optional ChangeLaneStatus change_lane = 1;
+  optional apollo.common.EngageAdvice engage_advice = 2;
+  optional PullOverStatus pull_over = 3;
+  optional ReroutingStatus rerouting = 4;
   optional RightOfWayStatus right_of_way = 5;
-  optional apollo.common.EngageAdvice engage_advice = 6;
-  optional PullOverStatus pull_over = 7;
+  optional SidePassStatus side_pass = 6;
+  optional StopSignStatus stop_sign = 7;
 }
 

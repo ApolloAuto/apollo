@@ -52,9 +52,10 @@ using apollo::hdmap::PathOverlap;
 using apollo::hdmap::StopSignInfo;
 using apollo::hdmap::StopSignInfoConstPtr;
 using apollo::perception::PerceptionObstacle;
+using apollo::planning::util::GetPlanningStatus;
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
-using apollo::planning::util::GetPlanningStatus;
+
 
 StopSign::StopSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
