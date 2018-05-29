@@ -46,8 +46,12 @@ message CrosswalkConfig {
 }
 
 message DestinationConfig {
+  // flag to enable pullover upon arriving destination
+  optional bool enable_pull_over = 1 [ default=false ];
+  // distance to stop point, to start pull over
+  optional double star_distance_to_sp = 2 [ default=20.0 ]; // meter
   // stop distance from destination line
-  optional double stop_distance = 1 [ default=0.5 ]; // meter
+  optional double stop_distance = 3 [ default=0.5 ]; // meter
 }
 
 message FrontVehicleConfig {
