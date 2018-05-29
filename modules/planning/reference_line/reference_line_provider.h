@@ -163,6 +163,11 @@ class ReferenceLineProvider {
   std::list<ReferenceLine> reference_lines_;
   std::list<hdmap::RouteSegments> route_segments_;
   double last_calculation_time_ = 0.0;
+
+  std::mutex notify_mutex_;
+  std::condition_variable cv_;
+  bool pending_ = false;
+  bool processed_ = false;
 };
 
 }  // namespace planning
