@@ -119,6 +119,11 @@ message StopSignConfig {
   optional CreepConfig creep = 9;
 }
 
+message PullOverConfig {
+    optional double max_stop_deceleration = 1 [default=-2.0];
+    optional double stop_distance = 2 [default=-0.5];
+}
+
 // TODO(all) migrate all other traffic rules to pb config
 message TrafficRuleConfig {
   enum RuleId {
@@ -132,6 +137,7 @@ message TrafficRuleConfig {
     REROUTING = 8;
     SIGNAL_LIGHT = 9;
     STOP_SIGN = 10;
+    PULL_OVER = 11;
   }
   optional RuleId rule_id = 1;
   optional bool enabled = 2;
@@ -146,6 +152,7 @@ message TrafficRuleConfig {
     ReroutingConfig rerouting = 10;
     SignalLightConfig signal_light = 11;
     StopSignConfig stop_sign = 12;
+    PullOverConfig pull_over = 13;
   }
 }
 
