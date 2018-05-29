@@ -65,6 +65,12 @@ specify either `dbg` for debug mode or `opt` for optimized code
 If you make modifications to the Dreamview frontend, then you must run `./apollo.sh build_fe`  before you run the
 full build.
 
+If the computer is very slow, you can enter the following command to limit the CPU.
+
+```
+bash apollo.sh build --local_resources 2048,1.0,1.0
+```
+
 
 ## Run Apollo
 
