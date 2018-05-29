@@ -35,6 +35,8 @@ config: {
   rule_id: DESTINATION
   enabled: true
   destination {
+    enable_pull_over: false
+    star_distance_to_sp: 20.0
     stop_distance: 0.5
   }
 }
