@@ -4,6 +4,7 @@ export default class BaiduMapAdapter {
     constructor() {
         this.map = null;
         this.controls = [];
+        this.initializedCenter = false;
     }
 
     isInitialized() {
@@ -12,7 +13,7 @@ export default class BaiduMapAdapter {
 
     loadMap(initPoint, divElementName) {
         this.map = new BMap.Map(divElementName, { enableMapClick: false });
-        this.map.centerAndZoom(initPoint, 19);
+
         this.map.enableScrollWheelZoom();
         this.map.addControl(
             new BMap.MapTypeControl({
@@ -30,7 +31,12 @@ export default class BaiduMapAdapter {
     }
 
     setCenter(point) {
-        this.map.setCenter(point);
+        if (this.initializedCenter) {
+            this.map.setCenter(point);
+        } else {
+            this.map.centerAndZoom(point, 19);
+            this.initializedCenter = true;
+        }
     }
 
     setZoom(zoom) {
