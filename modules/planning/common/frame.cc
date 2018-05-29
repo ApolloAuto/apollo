@@ -205,7 +205,8 @@ bool Frame::CreateReferenceLineInfo() {
  */
 const Obstacle *Frame::CreateStopObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id, const double obstacle_s) {
+    const std::string &obstacle_id,
+    const double obstacle_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
     return nullptr;
@@ -257,7 +258,8 @@ const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
  */
 const Obstacle *Frame::CreateStaticObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id, const double obstacle_start_s,
+    const std::string &obstacle_id,
+    const double obstacle_start_s,
     const double obstacle_end_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
