@@ -17,9 +17,13 @@
 /* Transform objects in 3D camera space into 3D ego-car space
  *
  * Two assumptions are used for this module
- * 1. The ego-car space is a flat ground. 3D objects are on the ground place
+ *
+ *  1. The ego-car space is on flat ground. 3D objects touches the ground
+ * (Z direction of this local space is always vertical to ground plane,
+ * regardless of ego car pose)
+ *
  * 2. The input 3D distances for objects, from camera origin to object center,
- *    is accurate, and unit is meter
+ *    is accurate and in unit meter
  */
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRANSFORMER_FLAT_H_
