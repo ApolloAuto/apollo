@@ -98,6 +98,9 @@ int Destination::BuildStopDecision(
   return 0;
 }
 
+/**
+ * @brief: build on-lane stop decision upon arriving at destination
+ */
 int Destination::Stop(Frame* const frame,
                       ReferenceLineInfo* const reference_line_info,
                       const std::string lane_id,
@@ -147,6 +150,9 @@ int Destination::Stop(Frame* const frame,
   return 0;
 }
 
+/**
+ * @brief: check if adc will pull-over upon arriving destination
+ */
 bool Destination::CheckPullOver(
     ReferenceLineInfo* const reference_line_info,
     const std::string lane_id,
@@ -187,8 +193,16 @@ bool Destination::CheckPullOver(
   return false;
 }
 
+/**
+ * @brief: build pull-over decision upon arriving at destination
+ */
 int Destination::PullOver() {
-  GetPlanningStatus()->mutable_pull_over()->set_in_pull_over(true);
+  if (!GetPlanningStatus()->has_pull_over() ||
+      !GetPlanningStatus()->pull_over().in_pull_over()) {
+    GetPlanningStatus()->clear_pull_over();
+    GetPlanningStatus()->mutable_pull_over()->set_in_pull_over(true);
+  }
+
   return 0;
 }
 
