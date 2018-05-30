@@ -88,7 +88,7 @@ void SequencePredictor::FilterLaneSequences(
     double distance = GetLaneChangeDistanceWithADC(sequence);
     ADEBUG << "Distance to ADC " << std::fixed << std::setprecision(6)
            << distance;
-    if (distance < FLAGS_lane_change_dist) {
+    if (distance > 0.0 && distance < FLAGS_lane_change_dist) {
       (*enable_lane_sequence)[i] = false;
       ADEBUG << "Filter trajectory [" << ToString(sequence)
              << "] due to small distance " << distance << ".";
@@ -187,7 +187,7 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
                                      PredictionMap::LaneById(obstacle_lane_id),
                                      &lane_s, &lane_l)) {
       ADEBUG << "Distance with ADC is " << std::fabs(lane_s - obstacle_lane_s);
-      return std::fabs(lane_s - obstacle_lane_s);
+      return obstacle_lane_s - lane_s;
     }
   }
 
