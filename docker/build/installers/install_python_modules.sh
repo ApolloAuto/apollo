@@ -26,6 +26,7 @@ apt-get install -y \
    libleveldb-dev \
    python-matplotlib \
    python-pip \
+   python-psutil \
    python-scipy \
    python-software-properties \
    python3-psutil
