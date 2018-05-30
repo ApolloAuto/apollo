@@ -43,11 +43,6 @@ using apollo::planning::util::GetPlanningStatus;
 
 PullOver::PullOver(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
-bool PullOver::IsPullOver() const {
-  const auto& pull_over_status = GetPlanningStatus()->pull_over();
-  return pull_over_status.in_pull_over();
-}
-
 Status PullOver::ApplyRule(Frame* const frame,
                            ReferenceLineInfo* const reference_line_info) {
   frame_ = frame;
@@ -69,8 +64,9 @@ Status PullOver::ApplyRule(Frame* const frame,
   return Status::OK();
 }
 
-void PullOver::SetPullOver(bool enable_pull_over) {
-  GetPlanningStatus()->mutable_pull_over()->set_in_pull_over(enable_pull_over);
+bool PullOver::IsPullOver() const {
+  const auto& pull_over_status = GetPlanningStatus()->pull_over();
+  return pull_over_status.in_pull_over();
 }
 
 bool PullOver::IsValidStop(const PointENU& stop_point,
