@@ -21,24 +21,21 @@
 #include "modules/planning/tasks/traffic_decider/pull_over.h"
 
 #include <iomanip>
-#include <limits>
 #include <vector>
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/util/map_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_util.h"
-#include "modules/planning/proto/planning_internal.pb.h"
-#include "modules/planning/tasks/traffic_decider/util.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::PointENU;
 using apollo::common::Status;
-using apollo::common::util::WithinBound;
+using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::LaneSegment;
 using apollo::planning::util::GetPlanningStatus;
 
 PullOver::PullOver(const TrafficRuleConfig& config) : TrafficRule(config) {}
@@ -94,8 +91,61 @@ bool PullOver::GetPullOverStop(PointENU* stop_point, double* stop_heading) {
 }
 
 bool PullOver::SearchPullOverStop(PointENU* stop_point, double* stop_heading) {
-  // TODO(all) implement this function
+  if (CheckPullOver()) {
+    return false;
+  }
+
   return false;
+}
+
+/**
+ * @brief: check if adc will pull-over upon arriving destination
+ */
+bool PullOver::CheckPullOver() {
+  const auto& reference_line = reference_line_info_->reference_line();
+  double adc_front_edge_s = reference_line_info_->AdcSlBoundary().end_s();
+
+  // check all the lanes through pull-over plan_distance
+  const double plan_distance = config_.pull_over().plan_distance();
+  const std::vector<LaneSegment>& lane_segments =
+      reference_line.map_path().lane_segments();
+  for (auto& lane_segment : lane_segments) {
+    // check plan distance
+    if (lane_segment.end_s <  adc_front_edge_s ||
+        lane_segment.start_s >plan_distance) {
+      continue;
+    }
+
+    // check turn type: NO_TURN/LEFT_TURN/RIGHT_TURN/U_TURN
+    const auto& turn = lane_segment.lane->lane().turn();
+    if (turn != hdmap::Lane::NO_TURN) {
+      ADEBUG << "path lane[" << lane_segment.lane->lane().id().id()
+          << "] turn[" << Lane_LaneTurn_Name(turn) << "] can't pull over";
+      return false;
+    }
+
+    // check rightmost driving lane:
+    //   NONE/CITY_DRIVING/BIKING/SIDEWALK/PARKING
+    for (auto& neighbor_lane_id :
+        lane_segment.lane->lane().right_neighbor_forward_lane_id()) {
+      const auto neighbor_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+          neighbor_lane_id);
+      if (!neighbor_lane) {
+        AERROR << "Failed to find lane[" << neighbor_lane_id.id() << "]";
+        continue;
+      }
+      const auto& lane_type = neighbor_lane->lane().type();
+      if (lane_type == hdmap::Lane::CITY_DRIVING) {
+        ADEBUG << "path lane[" << lane_segment.lane->lane().id().id()
+            << "]'s right neighbor forward lane["
+            << neighbor_lane_id.id() << "] type["
+            << Lane_LaneType_Name(lane_type) << "] can't pull over";
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 bool PullOver::BuildPullOverStop(const PointENU& stop_point,
@@ -145,6 +195,14 @@ bool PullOver::BuildPullOverStop(const PointENU& stop_point,
 
   path_decision->AddLongitudinalDecision(
       TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+
+  // record in PlanningStatus
+  auto* pull_over_status = GetPlanningStatus()->
+      mutable_planning_state()->mutable_pull_over();
+  pull_over_status->mutable_stop_point()->set_x(stop_point.x());
+  pull_over_status->mutable_stop_point()->set_y(stop_point.y());
+  pull_over_status->mutable_stop_point()->set_z(0.0);
+  pull_over_status->set_stop_heading(stop_heading);
 
   return true;
 }
