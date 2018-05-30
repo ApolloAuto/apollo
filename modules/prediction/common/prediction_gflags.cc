@@ -64,7 +64,9 @@ DEFINE_double(p_var, 0.1, "Error covariance");
 DEFINE_double(go_approach_rate, 0.995,
               "The rate to approach to the reference line of going straight");
 
-DEFINE_int32(still_obstacle_history_length, 10,
+DEFINE_int32(min_still_obstacle_history_length, 4,
+             "Min # historical frames for still obstacles");
+DEFINE_int32(max_still_obstacle_history_length, 10,
              "Min # historical frames for still obstacles");
 DEFINE_double(still_obstacle_speed_threshold, 2.0,
               "Speed threshold for still obstacles");
