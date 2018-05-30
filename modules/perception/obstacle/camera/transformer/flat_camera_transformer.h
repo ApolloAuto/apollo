@@ -74,7 +74,7 @@ class FlatCameraTransformer : public BaseCameraTransformer {
   Eigen::Matrix<float, 3, 1> camera2car_flat_offset_;
 
   // Pitch-angle Adjusted Extrinsics
-  bool adjust_pitch_ = true;
+  bool adjust_pitch_ = false;
   Eigen::Matrix<float, 4, 4> camera2car_adj_;
   float pitch_diff_ = 0.0f;  // degree
 

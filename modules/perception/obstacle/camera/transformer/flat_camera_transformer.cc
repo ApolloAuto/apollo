@@ -62,7 +62,7 @@ bool FlatCameraTransformer::Transform(
     }
   }
 
-  if (adjust_pitch_) GetDynamicExtrinsics(centers);
+  GetDynamicExtrinsics(centers);
   return true;
 }
 
@@ -77,8 +77,10 @@ bool FlatCameraTransformer::SetExtrinsics(
 
 bool FlatCameraTransformer::GetAdjustedExtrinsics(
   Eigen::Matrix<double, 4, 4>* extrinsics) {
-  *extrinsics = camera2car_adj_.cast<double>();
-  return true;
+  // Return static results if no object to use in the scene
+  if (!adjust_pitch_) *extrinsics = camera2car_.cast<double>();
+  if (adjust_pitch_) *extrinsics = camera2car_adj_.cast<double>();
+  return adjust_pitch_;
 }
 
 std::string FlatCameraTransformer::Name() const {
@@ -112,6 +114,7 @@ bool FlatCameraTransformer::HaveHighConfidence(
 void FlatCameraTransformer::GetDynamicExtrinsics(
   const std::vector<std::pair<Eigen::Vector3f, Eigen::Vector3f>> &centers) {
     if (centers.empty()) {
+      adjust_pitch_ = false;
       camera2car_adj_ = camera2car_;
       pitch_diff_ = 0.0f;
       return;
@@ -154,6 +157,7 @@ void FlatCameraTransformer::GetDynamicExtrinsics(
     }
 
     // Output extrinsics as result
+    adjust_pitch_ = true;
     camera2car_adj_ = best_camera2car;
     pitch_diff_ = best_pitch_adjustment;
 }

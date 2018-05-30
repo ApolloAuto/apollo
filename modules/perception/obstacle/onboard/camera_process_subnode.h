@@ -110,8 +110,12 @@ class CameraProcessSubnode : public Subnode {
   int32_t image_height_ = 1080;
   int32_t image_width_ = 1920;
   Eigen::Matrix4d camera_to_car_;
-  Eigen::Matrix4d camera_to_car_adj_;
   Eigen::Matrix<double, 3, 4> intrinsics_;
+
+  // Dynamic calibration
+  bool adjusted_extrinsics_ = false;
+  Eigen::Matrix4d camera_to_car_adj_;
+  // always available, but retreat to static one if above is false
 
   // Modules
   std::unique_ptr<BaseCameraDetector> detector_;

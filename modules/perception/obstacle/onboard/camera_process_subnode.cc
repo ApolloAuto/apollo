@@ -132,6 +132,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   PERF_BLOCK_END("CameraProcessSubnode_converter_");
 
   transformer_->Transform(&objects);
+  adjusted_extrinsics_ =
   transformer_->GetAdjustedExtrinsics(&camera_to_car_adj_);
   PERF_BLOCK_END("CameraProcessSubnode_transformer_");
 
@@ -140,6 +141,11 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   filter_->Filter(timestamp, &objects);
   PERF_BLOCK_END("CameraProcessSubnode_filter_");
+
+  auto ccm = Singleton<CalibrationConfigManager>::get();
+  auto calibrator = ccm->get_camera_calibration();
+  calibrator->SetCar2CameraExtrinsicsAdj(camera_to_car_adj_,
+                                         adjusted_extrinsics_);
 
   std::shared_ptr<SensorObjects> out_objs(new SensorObjects);
   out_objs->timestamp = timestamp;
