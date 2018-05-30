@@ -7,7 +7,7 @@ Please follow the
 we also provide a bash script to install docker-ce
 
 ```bash
-bash docker/scripts/install_docker.sh
+bash docker/setup_host/install_docker.sh
 ```
 
 Don't forget the
