@@ -65,8 +65,9 @@ Status PullOver::ApplyRule(Frame* const frame,
 }
 
 bool PullOver::IsPullOver() const {
-  const auto& pull_over_status = GetPlanningStatus()->pull_over();
-  return pull_over_status.in_pull_over();
+  auto* planning_state = GetPlanningStatus()->mutable_planning_state();
+  return (planning_state->has_pull_over() &&
+      planning_state->pull_over().in_pull_over());
 }
 
 bool PullOver::IsValidStop(const PointENU& stop_point,
@@ -76,7 +77,8 @@ bool PullOver::IsValidStop(const PointENU& stop_point,
 }
 
 bool PullOver::GetPullOverStop(PointENU* stop_point, double* stop_heading) {
-  auto* pull_over_status = GetPlanningStatus()->mutable_pull_over();
+  auto* pull_over_status = GetPlanningStatus()->
+      mutable_planning_state()->mutable_pull_over();
   // reuse existing stop point
   if (pull_over_status->has_stop_point() &&
       pull_over_status->has_stop_heading()) {

@@ -238,10 +238,11 @@ bool Destination::CheckPullOver(
  * @brief: build pull-over decision upon arriving at destination
  */
 int Destination::PullOver() {
-  if (!GetPlanningStatus()->has_pull_over() ||
-      !GetPlanningStatus()->pull_over().in_pull_over()) {
-    GetPlanningStatus()->clear_pull_over();
-    GetPlanningStatus()->mutable_pull_over()->set_in_pull_over(true);
+  auto* planning_state = GetPlanningStatus()->mutable_planning_state();
+  if (!planning_state->has_pull_over() ||
+      !planning_state->pull_over().in_pull_over()) {
+    planning_state->clear_pull_over();
+    planning_state->mutable_pull_over()->set_in_pull_over(true);
   }
 
   return 0;
