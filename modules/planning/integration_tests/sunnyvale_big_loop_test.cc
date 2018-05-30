@@ -57,6 +57,7 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     FLAGS_planning_upper_speed_limit = 12.5;
 
     ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
+    ENABLE_RULE(TrafficRuleConfig::DESTINATION, false);
     ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
     ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
     ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);

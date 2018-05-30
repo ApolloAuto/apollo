@@ -18,22 +18,6 @@ decision {
   }
   object_decision {
     decision {
-      id: "DEST"
-      perception_id: -2075886388
-      object_decision {
-        stop {
-          reason_code: STOP_REASON_DESTINATION
-          distance_s: -0.5
-          stop_point {
-            x: 587000.26494878647
-            y: 4141375.9643171281
-            z: 0
-          }
-          stop_heading: 1.3089842957712094
-        }
-      }
-    }
-    decision {
       id: "SS_2203"
       perception_id: -1178283030
       object_decision {

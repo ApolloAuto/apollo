@@ -5,34 +5,11 @@ is_replan: false
 gear: GEAR_DRIVE
 decision {
   main_decision {
-    stop {
-      reason_code: STOP_REASON_DESTINATION
-      reason: "stop by DEST"
-      stop_point {
-        x: 587000.19450120465
-        y: 4141375.9995070333
-      }
-      stop_heading: 1.3182290314750071
+    cruise {
       change_lane_type: FORWARD
     }
   }
   object_decision {
-    decision {
-      id: "DEST"
-      perception_id: -2075886388
-      object_decision {
-        stop {
-          reason_code: STOP_REASON_DESTINATION
-          distance_s: -0.5
-          stop_point {
-            x: 587000.19450120465
-            y: 4141375.9995070333
-            z: 0
-          }
-          stop_heading: 1.3182290314750071
-        }
-      }
-    }
   }
   vehicle_signal {
     turn_signal: TURN_RIGHT

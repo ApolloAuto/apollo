@@ -5,14 +5,7 @@ is_replan: true
 gear: GEAR_DRIVE
 decision {
   main_decision {
-    stop {
-      reason_code: STOP_REASON_DESTINATION
-      reason: "stop by DEST"
-      stop_point {
-        x: 586448.64555477619
-        y: 4140774.2647916786
-      }
-      stop_heading: 1.3244850756777471
+    cruise {
       change_lane_type: FORWARD
     }
   }
@@ -24,22 +17,6 @@ decision {
         nudge {
           type: LEFT_NUDGE
           distance_l: 0.5
-        }
-      }
-    }
-    decision {
-      id: "DEST"
-      perception_id: -2075886388
-      object_decision {
-        stop {
-          reason_code: STOP_REASON_DESTINATION
-          distance_s: -0.5
-          stop_point {
-            x: 586448.64555477619
-            y: 4140774.2647916786
-            z: 0
-          }
-          stop_heading: 1.3244850756777471
         }
       }
     }
