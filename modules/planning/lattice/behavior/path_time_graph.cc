@@ -99,79 +99,26 @@ void PathTimeGraph::SetupObstacles(
     }
     if (!obstacle->HasTrajectory()) {
       SetStaticObstacle(obstacle, discretized_ref_points);
-      continue;
-    }
-
-    double relative_time = time_range_.first;
-    while (relative_time < time_range_.second) {
-      TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
-      Box2d box = obstacle->GetBoundingBox(point);
-      SLBoundary sl_boundary =
-          ComputeObstacleBoundary(box, discretized_ref_points);
-
-      // the obstacle is not shown on the region to be considered.
-      if (sl_boundary.end_s() < path_range_.first ||
-          sl_boundary.start_s() > path_range_.second ||
-          (sl_boundary.start_l() > half_path_width_ &&
-           sl_boundary.end_l() < -half_path_width_)) {
-        if (path_time_obstacle_map_.find(obstacle->Id()) !=
-            path_time_obstacle_map_.end()) {
-          break;
-        } else {
-          relative_time += FLAGS_trajectory_time_resolution;
-          continue;
-        }
-      }
-
-      if (path_time_obstacle_map_.find(obstacle->Id()) ==
-          path_time_obstacle_map_.end()) {
-        path_time_obstacle_map_[obstacle->Id()].set_obstacle_id(obstacle->Id());
-
-        path_time_obstacle_map_[obstacle->Id()].mutable_bottom_left()->CopyFrom(
-            SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(),
-                             relative_time));
-
-        path_time_obstacle_map_[obstacle->Id()].mutable_upper_left()->CopyFrom(
-            SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(),
-                             relative_time));
-      }
-
-      path_time_obstacle_map_[obstacle->Id()].mutable_bottom_right()->CopyFrom(
-          SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(),
-                           relative_time));
-
-      path_time_obstacle_map_[obstacle->Id()].mutable_upper_right()->CopyFrom(
-          SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(), relative_time));
-
-      relative_time += FLAGS_trajectory_time_resolution;
+    } else {
+      SetDynamicObstacle(obstacle, discretized_ref_points);
     }
   }
 
   for (auto& path_time_obstacle : path_time_obstacle_map_) {
     double s_upper = std::max(path_time_obstacle.second.bottom_right().s(),
                               path_time_obstacle.second.upper_right().s());
-
     double s_lower = std::min(path_time_obstacle.second.bottom_left().s(),
                               path_time_obstacle.second.upper_left().s());
-
     path_time_obstacle.second.set_path_lower(s_lower);
-
     path_time_obstacle.second.set_path_upper(s_upper);
 
     double t_upper = std::max(path_time_obstacle.second.bottom_right().t(),
                               path_time_obstacle.second.upper_right().t());
-
     double t_lower = std::min(path_time_obstacle.second.bottom_left().t(),
                               path_time_obstacle.second.upper_left().t());
-
     path_time_obstacle.second.set_time_lower(t_lower);
-
     path_time_obstacle.second.set_time_upper(t_upper);
-  }
-
-  // store the path_time_obstacles for later access.
-  for (const auto& path_time_obstacle_element : path_time_obstacle_map_) {
-    path_time_obstacles_.push_back(path_time_obstacle_element.second);
+    path_time_obstacles_.push_back(path_time_obstacle.second);
   }
 }
 
@@ -195,6 +142,51 @@ void PathTimeGraph::SetStaticObstacle(
   path_time_obstacle_map_[obstacle_id].mutable_upper_right()->CopyFrom(
       SetPathTimePoint(obstacle_id, sl_boundary.end_s(),
                        FLAGS_trajectory_time_length));
+  static_obs_sl_boundaries_.push_back(std::move(sl_boundary));
+}
+
+void PathTimeGraph::SetDynamicObstacle(
+    const Obstacle* obstacle,
+    const std::vector<PathPoint>& discretized_ref_points) {
+  double relative_time = time_range_.first;
+  while (relative_time < time_range_.second) {
+    TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
+    Box2d box = obstacle->GetBoundingBox(point);
+    SLBoundary sl_boundary =
+        ComputeObstacleBoundary(box, discretized_ref_points);
+
+    // the obstacle is not shown on the region to be considered.
+    if (sl_boundary.end_s() < path_range_.first ||
+        sl_boundary.start_s() > path_range_.second ||
+        (sl_boundary.start_l() > half_path_width_ &&
+         sl_boundary.end_l() < -half_path_width_)) {
+      if (path_time_obstacle_map_.find(obstacle->Id()) !=
+          path_time_obstacle_map_.end()) {
+        break;
+      } else {
+        relative_time += FLAGS_trajectory_time_resolution;
+        continue;
+      }
+    }
+
+    if (path_time_obstacle_map_.find(obstacle->Id()) ==
+        path_time_obstacle_map_.end()) {
+      path_time_obstacle_map_[obstacle->Id()].set_obstacle_id(obstacle->Id());
+
+      path_time_obstacle_map_[obstacle->Id()].mutable_bottom_left()->CopyFrom(
+          SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(),
+                           relative_time));
+      path_time_obstacle_map_[obstacle->Id()].mutable_upper_left()->CopyFrom(
+          SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(),
+                           relative_time));
+    }
+
+    path_time_obstacle_map_[obstacle->Id()].mutable_bottom_right()->CopyFrom(
+        SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(), relative_time));
+    path_time_obstacle_map_[obstacle->Id()].mutable_upper_right()->CopyFrom(
+        SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(), relative_time));
+    relative_time += FLAGS_trajectory_time_resolution;
+  }
 }
 
 PathTimePoint PathTimeGraph::SetPathTimePoint(const std::string& obstacle_id,
