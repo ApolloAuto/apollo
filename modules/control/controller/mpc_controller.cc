@@ -109,6 +109,8 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   brake_deadzone_ = control_conf->mpc_controller_conf().brake_deadzone();
 
   minimum_speed_protection_ = control_conf->minimum_speed_protection();
+  standstill_acceleration_ =
+      control_conf->mpc_controller_conf().standstill_acceleration();
 
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
   AINFO << "MPC conf loaded";
