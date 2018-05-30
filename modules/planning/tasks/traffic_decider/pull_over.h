@@ -43,7 +43,6 @@ namespace planning {
 class PullOver : public TrafficRule {
  public:
   explicit PullOver(const TrafficRuleConfig& config);
-
   virtual ~PullOver() = default;
 
   common::Status ApplyRule(Frame* const frame,
@@ -72,6 +71,8 @@ class PullOver : public TrafficRule {
    */
   bool IsValidStop(const common::PointENU& stop_point,
                    double stop_heading) const;
+
+  bool CheckPullOver();
 
   bool BuildPullOverStop(const common::PointENU& stop_point,
                          double stop_heading);
