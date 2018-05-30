@@ -49,8 +49,6 @@ class PullOver : public TrafficRule {
   common::Status ApplyRule(Frame* const frame,
                            ReferenceLineInfo* const reference_line_info);
 
-  void SetPullOver(bool enable_pull_over);
-
  private:
   /**
    * Check if the planning status is in pull over mode
