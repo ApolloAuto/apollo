@@ -39,11 +39,12 @@ namespace planning {
 using apollo::common::PointENU;
 using apollo::common::Status;
 using apollo::common::util::WithinBound;
+using apollo::planning::util::GetPlanningStatus;
 
 PullOver::PullOver(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool PullOver::IsPullOver() const {
-  const auto& pull_over_status = util::GetPlanningStatus()->pull_over();
+  const auto& pull_over_status = GetPlanningStatus()->pull_over();
   return pull_over_status.in_pull_over();
 }
 
@@ -68,6 +69,10 @@ Status PullOver::ApplyRule(Frame* const frame,
   return Status::OK();
 }
 
+void PullOver::SetPullOver(bool enable_pull_over) {
+  GetPlanningStatus()->mutable_pull_over()->set_in_pull_over(enable_pull_over);
+}
+
 bool PullOver::IsValidStop(const PointENU& stop_point,
                            double stop_heading) const {
   // TODO(all) implement this function
@@ -75,7 +80,7 @@ bool PullOver::IsValidStop(const PointENU& stop_point,
 }
 
 bool PullOver::GetPullOverStop(PointENU* stop_point, double* stop_heading) {
-  auto* pull_over_status = util::GetPlanningStatus()->mutable_pull_over();
+  auto* pull_over_status = GetPlanningStatus()->mutable_pull_over();
   // reuse existing stop point
   if (pull_over_status->has_stop_point() &&
       pull_over_status->has_stop_heading()) {
