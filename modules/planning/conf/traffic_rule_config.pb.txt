@@ -36,7 +36,7 @@ config: {
   enabled: true
   destination {
     enable_pull_over: false
-    star_distance_to_sp: 20.0
+    pull_over_plan_distance: 20.0
     stop_distance: 0.5
   }
 }
