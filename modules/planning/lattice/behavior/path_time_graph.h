@@ -79,6 +79,10 @@ class PathTimeGraph {
       const Obstacle* obstacle,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
+  void SetDynamicObstacle(
+      const Obstacle* obstacle,
+      const std::vector<common::PathPoint>& discretized_ref_points);
+
  private:
   std::pair<double, double> time_range_;
 
@@ -87,6 +91,8 @@ class PathTimeGraph {
   std::unordered_map<std::string, PathTimeObstacle> path_time_obstacle_map_;
 
   std::vector<PathTimeObstacle> path_time_obstacles_;
+
+  std::vector<SLBoundary> static_obs_sl_boundaries_;
 
   double half_path_width_;
 };
