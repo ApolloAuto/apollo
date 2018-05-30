@@ -74,10 +74,16 @@ message StopSignStatus {
   repeated LaneWatchVehicles lane_watch_vehicles = 4;
 }
 
+message PlanningState {
+  oneof object_tag {
+    PullOverStatus pull_over = 1;
+  }
+}
+
 message PlanningStatus {
-  optional ChangeLaneStatus change_lane = 1;
-  optional apollo.common.EngageAdvice engage_advice = 2;
-  optional PullOverStatus pull_over = 3;
+  optional PlanningState planning_state = 1;
+  optional ChangeLaneStatus change_lane = 2;
+  optional apollo.common.EngageAdvice engage_advice = 3;
   optional ReroutingStatus rerouting = 4;
   optional RightOfWayStatus right_of_way = 5;
   optional SidePassStatus side_pass = 6;
