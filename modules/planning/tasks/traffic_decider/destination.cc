@@ -23,8 +23,6 @@
 #include "modules/planning/tasks/traffic_decider/destination.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/map/hdmap/hdmap_common.h"
-#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -177,6 +175,7 @@ bool Destination::CheckPullOver(
 
   const auto& reference_line = reference_line_info->reference_line();
 
+  // check dest OnRoad
   double dest_lane_s = std::max(
       0.0, lane_s - FLAGS_virtual_stop_wall_length -
       config_.destination().stop_distance());
@@ -185,6 +184,7 @@ bool Destination::CheckPullOver(
     return false;
   }
 
+  // check dest within pull_over_plan_distance
   common::SLPoint dest_sl;
   if (!reference_line.XYToSL({dest_point.x(), dest_point.y()}, &dest_sl)) {
     AERROR << "failed to project the dest point to the other reference line";
@@ -192,30 +192,30 @@ bool Destination::CheckPullOver(
   }
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   double distance_to_dest = dest_sl.s() - adc_front_edge_s;
-  if (distance_to_dest > config_.destination().star_distance_to_sp()) {
+  if (distance_to_dest > config_.destination().pull_over_plan_distance()) {
     return false;
   }
 
-  // check type of all the lanes through destination
+  // check all the lanes through pull_over_plan_distance
   const std::vector<LaneSegment>& lane_segments =
-      reference_line_info->reference_line().map_path().lane_segments();
-  for (auto& neighbor_lane_segment : lane_segments) {
-    if (neighbor_lane_segment.end_s <  adc_front_edge_s) {
+      reference_line.map_path().lane_segments();
+  for (auto& lane_segment : lane_segments) {
+    if (lane_segment.end_s <  adc_front_edge_s) {
       continue;
     }
 
     // check turn type: NO_TURN/LEFT_TURN/RIGHT_TURN/U_TURN
-    const auto& turn = neighbor_lane_segment.lane->lane().turn();
+    const auto& turn = lane_segment.lane->lane().turn();
     if (turn != hdmap::Lane::NO_TURN) {
-      ADEBUG << "current lane[" << lane_id << "] turn["
-          << Lane_LaneTurn_Name(turn) << "] can't pull over";
+      ADEBUG << "path lane[" << lane_segment.lane->lane().id().id()
+          << "] turn[" << Lane_LaneTurn_Name(turn) << "] can't pull over";
       return false;
     }
 
     // check rightmost driving lane:
     //   NONE/CITY_DRIVING/BIKING/SIDEWALK/PARKING
     for (auto& neighbor_lane_id :
-        neighbor_lane_segment.lane->lane().right_neighbor_forward_lane_id()) {
+        lane_segment.lane->lane().right_neighbor_forward_lane_id()) {
       const auto neighbor_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
           neighbor_lane_id);
       if (!neighbor_lane) {
@@ -224,7 +224,9 @@ bool Destination::CheckPullOver(
       }
       const auto& lane_type = neighbor_lane->lane().type();
       if (lane_type == hdmap::Lane::CITY_DRIVING) {
-        ADEBUG << "current lane[" << lane_id << "] type["
+        ADEBUG << "path lane[" << lane_segment.lane->lane().id().id()
+            << "]'s right neighbor forward lane["
+            << neighbor_lane_id.id() << "] type["
             << Lane_LaneType_Name(lane_type) << "] can't pull over";
         return false;
       }
