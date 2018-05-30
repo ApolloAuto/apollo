@@ -469,10 +469,7 @@ const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
   double min_cost = std::numeric_limits<double>::infinity();
   drive_reference_line_info_ = nullptr;
   for (const auto &reference_line_info : reference_line_info_) {
-    if (reference_line_info.ReachedDestination()) {
-      drive_reference_line_info_ = &reference_line_info;
-      return drive_reference_line_info_;
-    } else if (reference_line_info.IsDrivable() &&
+    if (reference_line_info.IsDrivable() &&
                reference_line_info.Cost() < min_cost) {
       drive_reference_line_info_ = &reference_line_info;
       min_cost = reference_line_info.Cost();
