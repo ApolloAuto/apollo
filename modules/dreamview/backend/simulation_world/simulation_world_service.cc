@@ -730,6 +730,16 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
             AWARN << "No decision marker position found for object id=" << id;
             continue;
           }
+          if (decision.has_stop()) {
+            // flag yielded obstacles
+            for (auto obstacle_id : decision.stop().wait_for_obstacle()) {
+              std::vector<std::string> id_segments;
+              apollo::common::util::split(obstacle_id, '_', &id_segments);
+              if (id_segments.size() > 0) {
+                obj_map_[id_segments[0]].set_yielded_obstacle(true);
+              }
+            }
+          }
         } else if (decision.has_nudge()) {
           if (world_obj.polygon_point_size() == 0) {
             if (world_obj.type() == Object_Type_VIRTUAL) {

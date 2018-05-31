@@ -66,7 +66,7 @@ message Decision {
   optional apollo.routing.ChangeLaneType change_lane_type = 12;
 }
 
-// Next-id: 32
+// Next-id: 33
 message Object {
   // ID
   optional string id = 1;  // primary identifier for each object
@@ -106,6 +106,7 @@ message Object {
 
   // Decision Info
   repeated Decision decision = 22;
+  optional bool yielded_obstacle = 32 [default = false];
 
   // Chassis Info
   // For ADC
