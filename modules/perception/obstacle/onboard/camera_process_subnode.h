@@ -28,6 +28,7 @@
 #include "Eigen/Dense"
 #include "cv_bridge/cv_bridge.h"
 #include "sensor_msgs/Image.h"
+#include "sensor_msgs/fill_image.h"
 #include "yaml-cpp/yaml.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
@@ -81,6 +82,8 @@ class CameraProcessSubnode : public Subnode {
   void ChassisCallback(const apollo::canbus::Chassis& message);
 
   bool MessageToMat(const sensor_msgs::Image& msg, cv::Mat* img);
+
+  bool MatToMessage(const cv::Mat& img, sensor_msgs::Image *msg);
 
   void VisualObjToSensorObj(
       const std::vector<std::shared_ptr<VisualObject>>& objects,
