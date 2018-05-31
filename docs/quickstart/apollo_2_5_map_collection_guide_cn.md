@@ -13,7 +13,7 @@
 
 4、NVMe SSD硬盘。为了解决由于IO瓶颈导致可能的数据丢帧问题，建议工控机中安装NVME SSD硬盘。
 
-5、卫星基站。为了得到精确的制图结果，需要搭建卫星基站，并且保证整个采集过程中采集车的RTK可以正常工作。
+5、GPS信号。为了得到精确的制图结果，需保证整个采集过程中GPS信号良好，且RTK可以正常工作。
 
 ## 数据采集流程
 
@@ -36,7 +36,7 @@ Apollo环境启动参见[Apollo 2.5快速上手指南](https://github.com/Apollo
 采集过程中需要保证双向车道全覆盖采集五圈以上，车速60KM/h以下，尽量每圈走不同的车道，覆盖完全。在路口区域无需刻意停留，慢速通过即可。
 数据采集完成后，需要8字绕行五分钟，然后再静止五分钟。
 
-3、所有采集完成后，关闭[Record Bag]开关结束采集，然后关闭[GPS]、[Camera]、[Velodyne]、[Velodyne16]开关。
+4、所有采集完成后，关闭[Record Bag]开关结束采集，然后关闭[GPS]、[Camera]、[Velodyne]、[Velodyne16]开关。
 
 ![](images/map_collection_sensor_stop_record.png)
 
@@ -60,4 +60,5 @@ Apollo环境启动参见[Apollo 2.5快速上手指南](https://github.com/Apollo
 
 当任务状态是[数据已发布]时，点击[数据已发布]进行地图数据下载。
 
-![](images/map_collection_data_finish_ch.png)
+采集的数据放置在/apollo/data/bag/(采集开始时间,例如2018-04-14-21-20-24)目录，把该目录下的数据打包为tar.gz压缩文件，到[Apollo数据官网](http://data.apollo.auto/hd_map_intro/?locale=zh-cn)进行数据上传。
+
