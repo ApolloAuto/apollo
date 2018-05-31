@@ -57,12 +57,12 @@ class PullOver : public TrafficRule {
   /**
    * get a pull over stop point
    */
-  bool GetPullOverStop(common::PointENU* stop_point, double* stop_heading);
+  int GetPullOverStop(common::PointENU* stop_point, double* stop_heading);
 
   /**
    * Find a safe place to pull over based on the vehicle's current state.
    */
-  bool SearchPullOverStop(common::PointENU* stop_point, double* stop_heading);
+  int SearchPullOverStop(common::PointENU* stop_point, double* stop_heading);
 
   /**
    * Check if a stop point is valid based on current vehicle status
@@ -74,7 +74,7 @@ class PullOver : public TrafficRule {
 
   bool CheckPullOver();
 
-  bool BuildPullOverStop(const common::PointENU& stop_point,
+  int BuildPullOverStop(const common::PointENU& stop_point,
                          double stop_heading);
 
  private:

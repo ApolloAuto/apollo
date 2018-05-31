@@ -19,6 +19,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/configs/config_gflags.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
@@ -28,6 +29,7 @@ namespace apollo {
 namespace planning {
 
 using common::adapter::AdapterManager;
+using apollo::common::PointENU;
 using apollo::planning::util::GetPlanningStatus;
 
 DECLARE_string(test_routing_response_file);
@@ -87,6 +89,8 @@ TEST_F(GarageTest, follow) {
  * test destination stop
  */
 TEST_F(GarageTest, dest_stop_01) {
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+
   FLAGS_test_prediction_file = "stop_dest_prediction.pb.txt";
   FLAGS_test_localization_file = "stop_dest_localization.pb.txt";
   FLAGS_test_chassis_file = "stop_dest_chassis.pb.txt";
@@ -103,6 +107,8 @@ TEST_F(GarageTest, dest_stop_01) {
  * test destination pull over
  */
 TEST_F(GarageTest, dest_pull_over_01) {
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+
   FLAGS_test_prediction_file = "stop_dest_prediction.pb.txt";
   FLAGS_test_localization_file = "stop_dest_localization.pb.txt";
   FLAGS_test_chassis_file = "stop_dest_chassis.pb.txt";
@@ -112,12 +118,32 @@ TEST_F(GarageTest, dest_pull_over_01) {
   auto* destination_config = GetDestinationConfig();
   destination_config->mutable_destination()->set_enable_pull_over(true);
 
-  RUN_GOLDEN_TEST(0);
+  RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value: PULL OVER
   auto* planning_state = GetPlanningStatus()->mutable_planning_state();
   EXPECT_TRUE(planning_state->has_pull_over() &&
               planning_state->pull_over().in_pull_over());
+  EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
+
+  PointENU stop_point_1;
+  stop_point_1.set_x(planning_state->pull_over().stop_point().x());
+  stop_point_1.set_y(planning_state->pull_over().stop_point().y());
+  double stop_heading_1 = planning_state->pull_over().stop_heading();
+
+  // check PULL OVER decision
+  RUN_GOLDEN_TEST_DECISION(1);
+
+  EXPECT_TRUE(planning_state->has_pull_over() &&
+              planning_state->pull_over().in_pull_over());
+  EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
+
+  PointENU stop_point_2;
+  stop_point_2.set_x(planning_state->pull_over().stop_point().x());
+  stop_point_2.set_y(planning_state->pull_over().stop_point().y());
+  double stop_heading_2 = planning_state->pull_over().stop_heading();
+
+  EXPECT_EQ(stop_heading_1, stop_heading_2);
 }
 
 /*

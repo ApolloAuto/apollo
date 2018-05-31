@@ -72,6 +72,12 @@ message KeepClearConfig {
   optional double min_pass_s_distance = 3 [ default=2.0 ]; // meter
 }
 
+message PullOverConfig {
+    optional double max_stop_deceleration = 1 [default=-2.0];
+    optional double stop_distance = 2 [default=0.5];
+    optional double plan_distance = 3 [default=20];
+}
+
 message ReferenceLineEndConfig {
   // stop distance from refrence line end
   optional double stop_distance = 1 [ default=0.5 ]; // meter
@@ -123,12 +129,6 @@ message StopSignConfig {
   optional CreepConfig creep = 9;
 }
 
-message PullOverConfig {
-    optional double max_stop_deceleration = 1 [default=-2.0];
-    optional double stop_distance = 2 [default=0.5];
-    optional double plan_distance = 3 [default=20];
-}
-
 // TODO(all) migrate all other traffic rules to pb config
 message TrafficRuleConfig {
   enum RuleId {
@@ -138,11 +138,11 @@ message TrafficRuleConfig {
     DESTINATION = 4;
     FRONT_VEHICLE = 5;
     KEEP_CLEAR = 6;
-    REFERENCE_LINE_END = 7;
-    REROUTING = 8;
-    SIGNAL_LIGHT = 9;
-    STOP_SIGN = 10;
-    PULL_OVER = 11;
+    PULL_OVER = 7;
+    REFERENCE_LINE_END = 8;
+    REROUTING = 9;
+    SIGNAL_LIGHT = 10;
+    STOP_SIGN = 11;
   }
   optional RuleId rule_id = 1;
   optional bool enabled = 2;
@@ -153,11 +153,11 @@ message TrafficRuleConfig {
     DestinationConfig destination = 6;
     FrontVehicleConfig front_vehicle = 7;
     KeepClearConfig keep_clear = 8;
-    ReferenceLineEndConfig reference_line_end = 9;
-    ReroutingConfig rerouting = 10;
-    SignalLightConfig signal_light = 11;
-    StopSignConfig stop_sign = 12;
-    PullOverConfig pull_over = 13;
+    PullOverConfig pull_over = 9;
+    ReferenceLineEndConfig reference_line_end = 10;
+    ReroutingConfig rerouting = 11;
+    SignalLightConfig signal_light = 12;
+    StopSignConfig stop_sign = 13;
   }
 }
 
