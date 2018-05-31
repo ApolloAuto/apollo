@@ -72,7 +72,7 @@ TEST(PseudoInverseTest, PseudoInverseII) {
   EXPECT_FLOAT_EQ(D(0, 4), 0);
 }
 
-TEST(ContinuousToDiscreteTest, c2d) {
+TEST(ContinuousToDiscreteTest, c2d_fixed_size) {
   double ts = 0.0;
 
   Eigen::Matrix<float, 2, 2> m_a = Eigen::MatrixXf::Identity(2, 2);
@@ -91,15 +91,15 @@ TEST(ContinuousToDiscreteTest, c2d) {
 
   Eigen::Matrix<float, 1, 1> prt_d_d;
 
-  bool res = ContinuousToDiscrete<float, 2, 2, 1, 1>(
+  bool res = ContinuousToDiscrete<float, 2, 1, 1>(
       m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
 
   EXPECT_FALSE(res);
 
   ts = 1;
 
-  res = ContinuousToDiscrete<float, 2, 2, 1, 1>(
-      m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d,
+                                             &prt_b_d, &prt_c_d, &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -118,8 +118,8 @@ TEST(ContinuousToDiscreteTest, c2d) {
 
   ts = 0.1;
 
-  res = ContinuousToDiscrete<float, 2, 2, 1, 1>(
-      m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d,
+                                             &prt_b_d, &prt_c_d, &prt_d_d);
 
   EXPECT_TRUE(res);
 
@@ -138,8 +138,93 @@ TEST(ContinuousToDiscreteTest, c2d) {
 
   ts = 0.01;
 
-  res = ContinuousToDiscrete<float, 2, 2, 1, 1>(
-      m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d, &prt_c_d, &prt_d_d);
+  res = ContinuousToDiscrete<float, 2, 1, 1>(m_a, m_b, m_c, m_d, ts, &prt_a_d,
+                                             &prt_b_d, &prt_c_d, &prt_d_d);
+
+  EXPECT_TRUE(res);
+
+  EXPECT_FLOAT_EQ(prt_a_d(0, 0), 1.0100503);
+  EXPECT_FLOAT_EQ(prt_a_d(0, 1), 0);
+  EXPECT_FLOAT_EQ(prt_a_d(1, 0), 0);
+  EXPECT_FLOAT_EQ(prt_a_d(1, 1), 1.0100503);
+
+  EXPECT_FLOAT_EQ(prt_b_d(0, 0), 0.10050251);
+  EXPECT_FLOAT_EQ(prt_b_d(1, 0), 0.10050251);
+
+  EXPECT_FLOAT_EQ(prt_c_d(0, 0), 0.10050251);
+  EXPECT_FLOAT_EQ(prt_c_d(0, 1), 0.10050251);
+
+  EXPECT_FLOAT_EQ(prt_d_d(0, 0), 2.0050251);
+}
+
+TEST(ContinuousToDiscreteTest, c2d_dynamic_size) {
+  double ts = 0.0;
+
+  Eigen::MatrixXd m_a = Eigen::MatrixXd::Identity(2, 2);
+
+  Eigen::MatrixXd m_b = Eigen::MatrixXd::Ones(2, 1);
+
+  Eigen::MatrixXd m_c = Eigen::MatrixXd::Ones(1, 2);
+
+  Eigen::MatrixXd m_d = Eigen::MatrixXd::Identity(1, 1);
+
+  Eigen::MatrixXd prt_a_d;
+
+  Eigen::MatrixXd prt_b_d;
+
+  Eigen::MatrixXd prt_c_d;
+
+  Eigen::MatrixXd prt_d_d;
+
+  bool res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
+                                  &prt_c_d, &prt_d_d);
+
+  EXPECT_FALSE(res);
+
+  ts = 1;
+
+  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
+                             &prt_c_d, &prt_d_d);
+
+  EXPECT_TRUE(res);
+
+  EXPECT_FLOAT_EQ(prt_a_d(0, 0), 3);
+  EXPECT_FLOAT_EQ(prt_a_d(0, 1), 0);
+  EXPECT_FLOAT_EQ(prt_a_d(1, 0), 0);
+  EXPECT_FLOAT_EQ(prt_a_d(1, 1), 3);
+
+  EXPECT_FLOAT_EQ(prt_b_d(0, 0), 2);
+  EXPECT_FLOAT_EQ(prt_b_d(1, 0), 2);
+
+  EXPECT_FLOAT_EQ(prt_c_d(0, 0), 2);
+  EXPECT_FLOAT_EQ(prt_c_d(0, 1), 2);
+
+  EXPECT_FLOAT_EQ(prt_d_d(0, 0), 3);
+
+  ts = 0.1;
+
+  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
+                             &prt_c_d, &prt_d_d);
+
+  EXPECT_TRUE(res);
+
+  EXPECT_FLOAT_EQ(prt_a_d(0, 0), 1.1052631);
+  EXPECT_FLOAT_EQ(prt_a_d(0, 1), 0);
+  EXPECT_FLOAT_EQ(prt_a_d(1, 0), 0);
+  EXPECT_FLOAT_EQ(prt_a_d(1, 1), 1.1052631);
+
+  EXPECT_FLOAT_EQ(prt_b_d(0, 0), 0.33287135);
+  EXPECT_FLOAT_EQ(prt_b_d(1, 0), 0.33287135);
+
+  EXPECT_FLOAT_EQ(prt_c_d(0, 0), 0.33287135);
+  EXPECT_FLOAT_EQ(prt_c_d(0, 1), 0.33287135);
+
+  EXPECT_FLOAT_EQ(prt_d_d(0, 0), 2.0526316);
+
+  ts = 0.01;
+
+  res = ContinuousToDiscrete(m_a, m_b, m_c, m_d, ts, &prt_a_d, &prt_b_d,
+                             &prt_c_d, &prt_d_d);
 
   EXPECT_TRUE(res);
 

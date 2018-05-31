@@ -96,6 +96,9 @@ cc_library(
 
 cc_library(
     name = "matrix_operations",
+    srcs = [
+        "matrix_operations.cc",
+    ],
     hdrs = [
         "matrix_operations.h",
     ],
