@@ -1,35 +1,35 @@
 header {
   module_name: "planning"
 }
-is_replan: true
+is_replan: false
 gear: GEAR_DRIVE
 decision {
   main_decision {
     stop {
       reason_code: STOP_REASON_PULL_OVER
-      reason: "stop by PO_5.8637e+05_4.1408e+06"
+      reason: "stop by PO_DESTINATION"
       stop_point {
-        x: 586369.24766126089
-        y: 4140784.357681138
+        x: 587093.72710389516
+        y: 4141215.7319903965
       }
-      stop_heading: 1.3047204545436937
+      stop_heading: 2.8993230046048497
       change_lane_type: FORWARD
     }
   }
   object_decision {
     decision {
-      id: "PO_5.8637e+05_4.1408e+06"
-      perception_id: -1072150050
+      id: "PO_DESTINATION"
+      perception_id: -1274803422
       object_decision {
         stop {
           reason_code: STOP_REASON_PULL_OVER
           distance_s: -0.5
           stop_point {
-            x: 586369.24766126089
-            y: 4140784.357681138
+            x: 587093.72710389516
+            y: 4141215.7319903965
             z: 0
           }
-          stop_heading: 1.3047204545436937
+          stop_heading: 2.8993230046048497
         }
       }
     }
@@ -39,13 +39,34 @@ decision {
   }
 }
 routing_header {
-  timestamp_sec: 1234.5
+  timestamp_sec: 1527801499.9811609
   module_name: "routing"
-  sequence_num: 1
+  sequence_num: 5
 }
 right_of_way_status: UNPROTECTED
 lane_id {
-  id: "1_-1"
+  id: "2693_1_-1"
+}
+lane_id {
+  id: "2691_1_-1"
+}
+lane_id {
+  id: "2690_1_-1"
+}
+lane_id {
+  id: "2688_1_-1"
+}
+lane_id {
+  id: "2687_1_-1"
+}
+lane_id {
+  id: "732_1_-1"
+}
+lane_id {
+  id: "141_1_-1"
+}
+lane_id {
+  id: "11105a_1_-1"
 }
 engage_advice {
   advice: KEEP_ENGAGED
