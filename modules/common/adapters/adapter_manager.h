@@ -291,6 +291,8 @@ class AdapterManager {
   REGISTER_ADAPTER(PandoraCameraLeftGray);
   REGISTER_ADAPTER(PandoraCameraFrontGray);
   REGISTER_ADAPTER(PandoraCameraBackGray);
+  // for lane mask
+  REGISTER_ADAPTER(PerceptionLaneMask)
 
   DECLARE_SINGLETON(AdapterManager);
 };

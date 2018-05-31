@@ -44,6 +44,9 @@ DEFINE_string(drive_event_topic, "/apollo/drive_event",
               "drive event topic name");
 DEFINE_string(traffic_light_detection_topic, "/apollo/perception/traffic_light",
               "traffic light detection topic name");
+DEFINE_string(perception_lane_mask_segmentation_topic,
+              "/apollo/perception/lane_mask",
+              "lane mask segmentation topic name");
 DEFINE_string(routing_request_topic, "/apollo/routing_request",
               "routing request topic name");
 DEFINE_string(routing_response_topic, "/apollo/routing_response",
