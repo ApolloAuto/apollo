@@ -1,7 +1,7 @@
 <package>
 
   <name>lslidar_c16_msgs</name>
-  <version>2.0</version>
+  <version>2.0.0</version>
   <description>
     ROS message definitions for Leishen C16 LIDARs.
   </description>
