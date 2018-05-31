@@ -283,6 +283,11 @@ class GLFWFusionViewer {
   // @brief: draw lane objects in image space
   bool draw_lane_objects_image(cv::Mat *image_mat);
 
+  // @brief draw vanishing point and ground plane on image
+  // stat: static or not. decide colors
+  void draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat, int offset_x,
+                      int offset_y, int image_width, int image_height);
+
   bool use_class_color_ = true;
 
   bool capture_screen_ = false;
@@ -304,6 +309,7 @@ class GLFWFusionViewer {
                                // bbox
   bool show_type_id_label_;
   bool show_lane_;
+  bool show_vp_grid_ = true;  // show vanishing point and ground plane grid
   bool draw_lane_objects_;
 
   static std::vector<std::vector<int>> s_color_table;

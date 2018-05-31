@@ -821,6 +821,9 @@ void GLFWFusionViewer::keyboard(int key) {
     case GLFW_KEY_H:  // H
       show_help_text = !show_help_text;
       break;
+    case GLFW_KEY_G:  // G
+      show_vp_grid_ = !show_vp_grid_;
+      break;
     default:
       break;
   }
@@ -854,6 +857,8 @@ void GLFWFusionViewer::keyboard(int key) {
     if (show_camera_box3d_) help_str += " (ON)";
     help_str += "\n0: show associate color";
     if (show_associate_color_) help_str += " (ON)";
+    help_str += "\nG: show vanishing point and ground plane grid";
+    if (show_vp_grid_) help_str += " (ON)";
   }
 }
 
@@ -1340,6 +1345,49 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
   raster_text_->print_string(frame_id_str);
 
   return true;
+}
+
+void GLFWFusionViewer::draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat,
+                                      int offset_x, int offset_y,
+                                      int image_width, int image_height) {
+  std::vector<int> color_v;
+  std::vector<int> color_g;
+  if (stat) {
+    color_v = std::vector<int>{0, 0, 0};
+    color_g = std::vector<int>{0, 0, 0};
+  } else {
+    color_v = std::vector<int>{255, 0, 0};
+    color_g = std::vector<int>{255, 255, 255};
+  }
+
+  // Draw vanishing point
+  Eigen::Vector3d pt3d(1000.0, 0.0, 0.0);
+  Eigen::Vector2d pt2d;
+  get_project_point(v2c, pt3d, &pt2d);
+  Eigen::Vector2d tmp1 = pt2d + Eigen::Vector2d(0.0, 30.0);
+  Eigen::Vector2d tmp2 = pt2d + Eigen::Vector2d(0.0, -30.0);
+  draw_line2d(tmp1, tmp2, 2, color_v[0], color_v[1], color_v[2],
+              offset_x, offset_y, image_width, image_height);
+  tmp1 = pt2d + Eigen::Vector2d(30.0, 0.0);
+  tmp2 = pt2d + Eigen::Vector2d(-30.0, 0.0);
+  draw_line2d(tmp1, tmp2, 2, color_v[0], color_v[1], color_v[2],
+              offset_x, offset_y, image_width, image_height);
+
+  // Draw grid plane
+  for (double y = -10.0; y <= 10.0; y += 2.0) {
+    Eigen::Vector2d prev_pt2d;
+    for (double x = 0.0; x < 100.0; x += 5.0) {
+      Eigen::Vector3d pt3d(x, y, 0.0);
+      Eigen::Vector2d pt2d;
+      get_project_point(v2c, pt3d, &pt2d);
+
+      if (x > 5.0) {
+        draw_line2d(prev_pt2d, pt2d, 2, color_g[0], color_g[1], color_g[2],
+                    offset_x, offset_y, image_width, image_height);
+      }
+      prev_pt2d = pt2d;
+    }
+  }
 }
 
 bool GLFWFusionViewer::project_point_undistort(Eigen::Matrix4d v2c,
@@ -2052,196 +2100,10 @@ void GLFWFusionViewer::draw_camera_box(
     const std::vector<std::shared_ptr<Object>>& objects,
     Eigen::Matrix4d v2c, Eigen::Matrix4d v2c_static,
     int offset_x, int offset_y, int image_width, int image_height) {
-  bool draw_static_grid_vanishing = true;
-  if (draw_static_grid_vanishing) {
-    Eigen::Vector3d pt3d(1000.0, 0.0, 0.0);
-    Eigen::Vector2d pt2d;
-
-    // Draw static vanishing point without pitch adjustment
-    int color_black[3] = {0, 0, 0};
-    get_project_point(v2c_static, pt3d, &pt2d);
-    Eigen::Vector2d tmp1 = pt2d + Eigen::Vector2d(0.0, 30.0);
-    Eigen::Vector2d tmp2 = pt2d + Eigen::Vector2d(0.0, -30.0);
-    draw_line2d(tmp1, tmp2, 2, color_black[0],
-                color_black[1], color_black[2],
-                offset_x, offset_y, image_width, image_height);
-    tmp1 = pt2d + Eigen::Vector2d(30.0, 0.0);
-    tmp2 = pt2d + Eigen::Vector2d(-30.0, 0.0);
-    draw_line2d(tmp1, tmp2, 2, color_black[0],
-                color_black[1], color_black[2],
-                offset_x, offset_y, image_width, image_height);
-    // Draw static grid plane
-    for (double y = -10.0; y < 10.0; y += 2.0) {
-      Eigen::Vector2d prev_pt2d;
-      for (double x = 0.0; x < 100.0; x += 5.0) {
-        Eigen::Vector3d pt3d(x, y, 0.0);
-        Eigen::Vector2d pt2d;
-        get_project_point(v2c_static, pt3d, &pt2d);
-
-        if (x > 5.0) {
-          draw_line2d(prev_pt2d, pt2d, 2, color_black[0],
-                      color_black[1], color_black[2],
-                      offset_x, offset_y, image_width, image_height);
-        }
-
-        prev_pt2d = pt2d;
-      }
-    }
-  }
-
-  // bool use_dynamic_reprojection_in_visualization = true;
-  bool use_dynamic_reprojection_in_visualization = false;
-  if (use_dynamic_reprojection_in_visualization) {
-    // Generate pitch angle adjustment
-    static double pitch_angle = 0.0;
-    static double direction = 0.5;
-    pitch_angle += direction;
-    if (pitch_angle > 2.99) direction *= -1.0;
-    if (pitch_angle < -2.99) direction *= -1.0;
-
-    std::vector<std::vector<Eigen::Vector2d>> best_reprojected;
-    double min_diff = std::numeric_limits<double>::max();
-    double best_pitch_adjustment = 0.0;
-    Eigen::Matrix4d best_v2c = v2c;
-    Eigen::Matrix4d trans;
-    trans.setIdentity();
-    for (double p = -3.0; p < 3.0; p += 0.2) {
-      // Create adjusted v2c
-      Eigen::Matrix3d rotate(Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ())
-      * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY())
-      * Eigen::AngleAxisd(p / 180.0 * M_PI, Eigen::Vector3d::UnitX()));
-      trans.block<3, 3>(0, 0) = rotate;
-      Eigen::Matrix4d a_v2c = trans * v2c;
-
-      double diff = 0.0;
-      // Accumulate 2D pixel height difference for < 40 m in center
-      // Project 3D object with this extrinsics and compare to detection
-      std::vector<std::vector<Eigen::Vector2d>> reprojected;
-      for (auto obj : objects) {
-        double dist = std::sqrt(obj->center[0] * obj->center[0]
-                                + obj->center[1] * obj->center[1]
-                                + obj->center[2] * obj->center[2]);
-        double azimuth = std::atan2(obj->center[1], obj->center[0])
-                         * 180.0 / M_PI;
-        // High confidence in obj. Close and centered
-        if (15.0 < dist && dist < 40.0 && -30.0 < azimuth && azimuth < 30.0) {
-          double y_det = obj->camera_supplement->lower_right.y();
-
-          // Project 3D object back into image with this extrinsics
-          Eigen::Vector4d ctr(obj->center[0], obj->center[1],
-            obj->center[2], 1.0);
-          Eigen::Vector3d tc = (a_v2c * ctr).head(3);
-          std::vector<Eigen::Vector2d> points(8);
-          get_boundingbox(tc, a_v2c, obj->width, obj->height, obj->length,
-                          obj->direction, obj->theta, &points);
-          // reprojected.emplace_back(points);
-
-          double max_y = std::numeric_limits<double>::min();
-          for (auto p : points) {
-            max_y = std::max(max_y, p.y());
-          }
-
-          diff += std::abs(y_det - max_y);
-        }
-      }
-
-      // Get best pitch angle adjustment
-      if (0.05 < diff && diff < min_diff) {
-        min_diff = diff;
-        best_pitch_adjustment = p;
-        best_v2c = a_v2c;
-        // best_reprojected = reprojected;
-      }
-    }
-
-    // // Best Reprojection
-    // int color[3] = {0, 255, 0};
-    // for (auto points: best_reprojected) {
-    //   draw_8pts_box(points, Eigen::Vector3f(color[0], color[1], color[2]),
-    //                 offset_x, offset_y, image_width, image_height);
-    // }
-
-    // Create adjusted v2c
-    Eigen::Matrix4d adjusted_v2c = v2c;
-    Eigen::Matrix3d rotate(Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ())
-    * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY())
-    * Eigen::AngleAxisd(best_pitch_adjustment / 180.0 * M_PI,
-      Eigen::Vector3d::UnitX()));
-    trans.block<3, 3>(0, 0) = rotate;
-    adjusted_v2c = trans * adjusted_v2c;
-    // v2c = adjusted_v2c;
-
-    // Draw grid plane of ego car space,
-    // based on the given vehicle to camera extrinsics
-    int color_grid[3] = {255, 255, 255};
-    for (double y = -10.0; y < 10.0; y += 2.0) {
-      Eigen::Vector2d prev_pt2d;
-      for (double x = 0.0; x < 100.0; x += 5.0) {
-        Eigen::Vector3d pt3d(x, y, 0.0);
-        Eigen::Vector2d pt2d;
-        get_project_point(adjusted_v2c, pt3d, &pt2d);
-
-        if (x > 5.0) {
-          draw_line2d(prev_pt2d, pt2d, 2, color_grid[0],
-                      color_grid[1], color_grid[2],
-                      offset_x, offset_y, image_width, image_height);
-        }
-
-        prev_pt2d = pt2d;
-      }
-    }
-    // Draw vanishing point cross of ego car space,
-    // based on the given vehicle to camera extrinsics
-    int color_cross[3] = {255, 0, 0};
-    Eigen::Vector3d pt3d(1000.0, 0.0, 0.0);
-    Eigen::Vector2d pt2d;
-    get_project_point(adjusted_v2c, pt3d, &pt2d);
-    Eigen::Vector2d tmp1 = pt2d + Eigen::Vector2d(30.0, 0.0);
-    Eigen::Vector2d tmp2 = pt2d + Eigen::Vector2d(-30.0, 0.0);
-    draw_line2d(tmp1, tmp2, 2, color_cross[0],
-                color_cross[1], color_cross[2],
-                offset_x, offset_y, image_width, image_height);
-    tmp1 = pt2d + Eigen::Vector2d(0.0, 30.0);
-    tmp2 = pt2d + Eigen::Vector2d(0.0, -30.0);
-    draw_line2d(tmp1, tmp2, 2, color_cross[0],
-                color_cross[1], color_cross[2],
-                offset_x, offset_y, image_width, image_height);
-  } else {
-    // Draw grid plane of ego car space,
-    // based on the given vehicle to camera extrinsics
-    int color_grid[3] = {255, 255, 255};
-    for (double y = -10.0; y < 10.0; y += 2.0) {
-      Eigen::Vector2d prev_pt2d;
-      for (double x = 0.0; x < 100.0; x += 5.0) {
-        Eigen::Vector3d pt3d(x, y, 0.0);
-        Eigen::Vector2d pt2d;
-        get_project_point(v2c, pt3d, &pt2d);
-
-        if (x > 5.0) {
-          draw_line2d(prev_pt2d, pt2d, 2, color_grid[0],
-                      color_grid[1], color_grid[2],
-                      offset_x, offset_y, image_width, image_height);
-        }
-
-        prev_pt2d = pt2d;
-      }
-    }
-    // Draw vanishing point cross of ego car space,
-    // based on the given vehicle to camera extrinsics
-    int color_cross[3] = {255, 0, 0};
-    Eigen::Vector3d pt3d(1000.0, 0.0, 0.0);
-    Eigen::Vector2d pt2d;
-    get_project_point(v2c, pt3d, &pt2d);
-    Eigen::Vector2d tmp1 = pt2d + Eigen::Vector2d(30.0, 0.0);
-    Eigen::Vector2d tmp2 = pt2d + Eigen::Vector2d(-30.0, 0.0);
-    draw_line2d(tmp1, tmp2, 2, color_cross[0],
-                color_cross[1], color_cross[2],
-                offset_x, offset_y, image_width, image_height);
-    tmp1 = pt2d + Eigen::Vector2d(0.0, 30.0);
-    tmp2 = pt2d + Eigen::Vector2d(0.0, -30.0);
-    draw_line2d(tmp1, tmp2, 2, color_cross[0],
-                color_cross[1], color_cross[2],
-                offset_x, offset_y, image_width, image_height);
+  if (show_vp_grid_) {
+    draw_vp_ground(v2c_static, true, offset_x, offset_y,
+                   image_width, image_height);
+    draw_vp_ground(v2c, false, offset_x, offset_y, image_width, image_height);
   }
 
   for (auto obj : objects) {
