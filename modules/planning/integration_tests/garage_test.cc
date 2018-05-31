@@ -126,10 +126,11 @@ TEST_F(GarageTest, dest_pull_over_01) {
               planning_state->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
 
-  PointENU stop_point_1;
-  stop_point_1.set_x(planning_state->pull_over().stop_point().x());
-  stop_point_1.set_y(planning_state->pull_over().stop_point().y());
-  double stop_heading_1 = planning_state->pull_over().stop_heading();
+  PointENU stop_point_0;
+  stop_point_0.set_x(planning_state->pull_over().stop_point().x());
+  stop_point_0.set_y(planning_state->pull_over().stop_point().y());
+  double stop_heading_0 = planning_state->pull_over().stop_heading();
+  double start_time_0 = planning_state->pull_over().start_time();
 
   // check PULL OVER decision
   RUN_GOLDEN_TEST_DECISION(1);
@@ -138,12 +139,16 @@ TEST_F(GarageTest, dest_pull_over_01) {
               planning_state->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
 
-  PointENU stop_point_2;
-  stop_point_2.set_x(planning_state->pull_over().stop_point().x());
-  stop_point_2.set_y(planning_state->pull_over().stop_point().y());
-  double stop_heading_2 = planning_state->pull_over().stop_heading();
+  PointENU stop_point_1;
+  stop_point_1.set_x(planning_state->pull_over().stop_point().x());
+  stop_point_1.set_y(planning_state->pull_over().stop_point().y());
+  double stop_heading_1 = planning_state->pull_over().stop_heading();
+  double start_time_1 = planning_state->pull_over().start_time();
 
-  EXPECT_EQ(stop_heading_1, stop_heading_2);
+  EXPECT_EQ(stop_point_0.x(), stop_point_1.x());
+  EXPECT_EQ(stop_point_0.y(), stop_point_1.y());
+  EXPECT_EQ(stop_heading_0, stop_heading_1);
+  EXPECT_EQ(start_time_0, start_time_1);
 }
 
 /*
