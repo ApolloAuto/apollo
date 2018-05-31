@@ -22,6 +22,7 @@
 namespace apollo {
 namespace perception {
 
+const float lane_mask_confidence_thresh = 0.5;
 using apollo::common::adapter::AdapterManager;
 
 bool CameraProcessSubnode::InitInternal() {
@@ -127,7 +128,15 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
   PERF_BLOCK_END("CameraProcessSubnode_detector_");
-
+  if (publish_) {
+    sensor_msgs::Image lane_mask_msg;
+    lane_mask_msg.header = message.header;
+    lane_mask_msg.header.frame_id = "lane_mask";
+    if (!MatToMessage(mask, &lane_mask_msg)) {
+      AERROR << "unable to publish lane mask topic message";
+    }
+    common::adapter::AdapterManager::PublishPerceptionLaneMask(lane_mask_msg);
+  }
   converter_->Convert(&objects);
   PERF_BLOCK_END("CameraProcessSubnode_converter_");
 
@@ -180,6 +189,41 @@ bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
   }
 
   return true;
+}
+
+bool CameraProcessSubnode::MatToMessage(const cv::Mat& img,
+                                          sensor_msgs::Image *msg) {
+  if (img.type() == CV_8UC1) {
+    sensor_msgs::fillImage(*msg,
+                            sensor_msgs::image_encodings::MONO8,
+                            img.rows,  // height
+                            img.cols,  // width
+                            static_cast<unsigned int>(img.step),  // stepSize
+                            img.data);
+    return true;
+  } else if (img.type() == CV_32FC1) {
+    // confidence heatmap
+    ADEBUG << "confidence threshold = " << lane_mask_confidence_thresh;
+    cv::Mat uc_img(img.rows, img.cols, CV_8UC1);
+    uc_img.setTo(cv::Scalar(0));
+    for (int h = 0; h < uc_img.rows; ++h) {
+      for (int w = 0; w < uc_img.cols; ++w) {
+        if (img.at<float>(h, w) >= lane_mask_confidence_thresh) {
+          uc_img.at<unsigned char>(h, w) = 1;
+        }
+      }
+    }
+    sensor_msgs::fillImage(*msg,
+                            sensor_msgs::image_encodings::MONO8,
+                            uc_img.rows,  // height
+                            uc_img.cols,  // width
+                            static_cast<unsigned int>(uc_img.step),  // stepSize
+                            uc_img.data);
+    return true;
+  } else {
+    AERROR << "invalid input Mat type: " << img.type();
+    return false;
+  }
 }
 
 void CameraProcessSubnode::VisualObjToSensorObj(

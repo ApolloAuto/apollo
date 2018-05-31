@@ -79,6 +79,7 @@ using ImageLongAdapter = Adapter<::sensor_msgs::Image>;
 using PredictionAdapter = Adapter<prediction::PredictionObstacles>;
 using DriveEventAdapter = Adapter<DriveEvent>;
 using TrafficLightDetectionAdapter = Adapter<perception::TrafficLightDetection>;
+using PerceptionLaneMaskAdapter = Adapter<::sensor_msgs::Image>;
 using RoutingRequestAdapter = Adapter<routing::RoutingRequest>;
 using RoutingResponseAdapter = Adapter<routing::RoutingResponse>;
 using RelativeOdometryAdapter =
