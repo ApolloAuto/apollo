@@ -78,8 +78,8 @@ Status Planning::InitFrame(const uint32_t sequence_num,
                          vehicle_state, reference_line_provider_.get()));
   auto status = frame_->Init();
   if (!status.ok()) {
-    AERROR << "failed to init frame";
-    return Status(ErrorCode::PLANNING_ERROR, "init frame failed");
+    AERROR << "failed to init frame:" << status.ToString();
+    return status;
   }
   return Status::OK();
 }
@@ -341,8 +341,7 @@ void Planning::RunOnce() {
   trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
   if (!status.ok()) {
-    std::string msg("Failed to init frame");
-    AERROR << msg;
+    AERROR << status.ToString();
     if (FLAGS_publish_estop) {
       // Because the function "Control::ProduceControlCommand()" checks the
       // "estop" signal with the following line (Line 170 in control.cc):
@@ -358,7 +357,7 @@ void Planning::RunOnce() {
       trajectory_pb->mutable_decision()
           ->mutable_main_decision()
           ->mutable_not_ready()
-          ->set_reason(msg);
+          ->set_reason(status.ToString());
       status.Save(trajectory_pb->mutable_header()->mutable_status());
       PublishPlanningPb(trajectory_pb, start_timestamp);
     }
