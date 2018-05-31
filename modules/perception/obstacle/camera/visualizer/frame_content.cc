@@ -43,6 +43,7 @@ void FrameContent::set_image_content(double timestamp, cv::Mat image) {
 
 void FrameContent::set_camera_content(
     double timestamp, Eigen::Matrix4d pose_c2w,
+    Eigen::Matrix4d pose_c2w_static,
     const std::vector<std::shared_ptr<Object>>& objects,
     const CameraFrameSupplement& supplement) {
   auto key = DoubleToMapKey(timestamp);
@@ -51,6 +52,7 @@ void FrameContent::set_camera_content(
   CameraContent content;
   content.timestamp_ = timestamp;
   content._pose_c2w = pose_c2w;
+  content._pose_c2w_static = pose_c2w_static;
   content.camera_objects_.resize(objects.size());
   for (size_t i = 0; i < objects.size(); ++i) {
     content.camera_objects_[i].reset(new Object);
@@ -291,6 +293,15 @@ Eigen::Matrix4d FrameContent::get_camera_to_world_pose() {
   }
   CameraContent content = it->second;
   return content._pose_c2w;
+}
+
+Eigen::Matrix4d FrameContent::get_camera_to_world_pose_static() {
+  auto it = camera_caches_.find(DoubleToMapKey(current_camera_timestamp_));
+  if (it == camera_caches_.end()) {
+    return Eigen::Matrix4d::Identity();
+  }
+  CameraContent content = it->second;
+  return content._pose_c2w_static;
 }
 
 cv::Mat FrameContent::get_camera_image() {

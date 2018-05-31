@@ -821,6 +821,9 @@ void GLFWFusionViewer::keyboard(int key) {
     case GLFW_KEY_H:  // H
       show_help_text = !show_help_text;
       break;
+    case GLFW_KEY_G:  // G
+      show_vp_grid_ = !show_vp_grid_;
+      break;
     default:
       break;
   }
@@ -854,6 +857,8 @@ void GLFWFusionViewer::keyboard(int key) {
     if (show_camera_box3d_) help_str += " (ON)";
     help_str += "\n0: show associate color";
     if (show_associate_color_) help_str += " (ON)";
+    help_str += "\nG: show vanishing point and ground plane grid";
+    if (show_vp_grid_) help_str += " (ON)";
   }
 }
 
@@ -978,9 +983,10 @@ void GLFWFusionViewer::draw_camera_frame(FrameContent* content,
 
   // -----------------------------
   Eigen::Matrix4d camera_to_world_pose = content->get_camera_to_world_pose();
-
+  Eigen::Matrix4d camera_to_world_pose_static =
+  content->get_camera_to_world_pose_static();
   Eigen::Matrix4d v2c = camera_to_world_pose.inverse();
-
+  Eigen::Matrix4d v2c_static = camera_to_world_pose_static.inverse();
   int offset_x = 0;  // scene_width_;
   int offset_y = 0;
 
@@ -998,7 +1004,8 @@ void GLFWFusionViewer::draw_camera_frame(FrameContent* content,
     } else {
       std::vector<std::shared_ptr<Object>> camera_objects;
       camera_objects = content->get_camera_objects();
-      draw_camera_box(camera_objects, v2c, offset_x, offset_y, image_width,
+      draw_camera_box(camera_objects, v2c, v2c_static,
+                      offset_x, offset_y, image_width,
                       image_height);
     }
   } else {
@@ -1338,6 +1345,49 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
   raster_text_->print_string(frame_id_str);
 
   return true;
+}
+
+void GLFWFusionViewer::draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat,
+                                      int offset_x, int offset_y,
+                                      int image_width, int image_height) {
+  std::vector<int> color_v;
+  std::vector<int> color_g;
+  if (stat) {
+    color_v = std::vector<int>{0, 0, 0};
+    color_g = std::vector<int>{0, 0, 0};
+  } else {
+    color_v = std::vector<int>{255, 0, 0};
+    color_g = std::vector<int>{255, 255, 255};
+  }
+
+  // Draw vanishing point
+  Eigen::Vector3d pt3d(1000.0, 0.0, 0.0);
+  Eigen::Vector2d pt2d;
+  get_project_point(v2c, pt3d, &pt2d);
+  Eigen::Vector2d tmp1 = pt2d + Eigen::Vector2d(0.0, 30.0);
+  Eigen::Vector2d tmp2 = pt2d + Eigen::Vector2d(0.0, -30.0);
+  draw_line2d(tmp1, tmp2, 2, color_v[0], color_v[1], color_v[2],
+              offset_x, offset_y, image_width, image_height);
+  tmp1 = pt2d + Eigen::Vector2d(30.0, 0.0);
+  tmp2 = pt2d + Eigen::Vector2d(-30.0, 0.0);
+  draw_line2d(tmp1, tmp2, 2, color_v[0], color_v[1], color_v[2],
+              offset_x, offset_y, image_width, image_height);
+
+  // Draw grid plane
+  for (double y = -10.0; y <= 10.0; y += 2.0) {
+    Eigen::Vector2d prev_pt2d;
+    for (double x = 0.0; x < 100.0; x += 5.0) {
+      Eigen::Vector3d pt3d(x, y, 0.0);
+      Eigen::Vector2d pt2d;
+      get_project_point(v2c, pt3d, &pt2d);
+
+      if (x > 5.0) {
+        draw_line2d(prev_pt2d, pt2d, 2, color_g[0], color_g[1], color_g[2],
+                    offset_x, offset_y, image_width, image_height);
+      }
+      prev_pt2d = pt2d;
+    }
+  }
 }
 
 bool GLFWFusionViewer::project_point_undistort(Eigen::Matrix4d v2c,
@@ -2047,8 +2097,15 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
 }
 
 void GLFWFusionViewer::draw_camera_box(
-    const std::vector<std::shared_ptr<Object>>& objects, Eigen::Matrix4d v2c,
+    const std::vector<std::shared_ptr<Object>>& objects,
+    Eigen::Matrix4d v2c, Eigen::Matrix4d v2c_static,
     int offset_x, int offset_y, int image_width, int image_height) {
+  if (show_vp_grid_) {
+    draw_vp_ground(v2c_static, true, offset_x, offset_y,
+                   image_width, image_height);
+    draw_vp_ground(v2c, false, offset_x, offset_y, image_width, image_height);
+  }
+
   for (auto obj : objects) {
     Eigen::Vector3d center = obj->center;
     Eigen::Vector2d center2d;

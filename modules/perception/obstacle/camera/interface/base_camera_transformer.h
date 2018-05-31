@@ -49,6 +49,9 @@ class BaseCameraTransformer {
 
   virtual bool SetExtrinsics(const Eigen::Matrix<double, 4, 4>& extrinsics) = 0;
 
+  virtual bool GetAdjustedExtrinsics(
+    Eigen::Matrix<double, 4, 4>* extrinsics) = 0;
+
   virtual std::string Name() const = 0;
 
  private:
