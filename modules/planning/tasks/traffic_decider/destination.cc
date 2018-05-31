@@ -23,6 +23,7 @@
 #include "modules/planning/tasks/traffic_decider/destination.h"
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/time/time.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -30,8 +31,9 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
+using apollo::common::Status;
+using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneSegment;
 using apollo::planning::util::GetPlanningStatus;
@@ -257,6 +259,7 @@ int Destination::PullOver() {
     planning_state->mutable_pull_over()->clear_stop_heading();
     planning_state->mutable_pull_over()->set_reason(
         PullOverStatus::DESTINATION);
+    planning_state->mutable_pull_over()->set_start_time(Clock::NowInSeconds());
   }
 
   return 0;
