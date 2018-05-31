@@ -214,7 +214,8 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // Get instance of collision checker and constraint checker
   CollisionChecker collision_checker(frame->obstacles(), init_s[0], init_d[0],
-                                     *ptr_reference_line);
+                                     *ptr_reference_line, reference_line_info,
+                                     ptr_path_time_graph);
 
   // 7. always get the best pair of trajectories to combine; return the first
   // collision-free trajectory.
