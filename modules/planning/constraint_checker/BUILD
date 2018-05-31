@@ -53,6 +53,7 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/prediction/proto:prediction_proto",
     ],
 )
