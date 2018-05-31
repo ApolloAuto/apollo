@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "modules/common/proto/geometry.pb.h"
+#include "modules/common/math/polygon2d.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
@@ -76,6 +77,10 @@ class PathTimeGraph {
       const common::math::Box2d& box,
       const std::vector<common::PathPoint>& discretized_ref_points) const;
 
+  SLBoundary ComputeObstacleBoundary(
+      const common::math::Polygon2d& polygon,
+      const std::vector<common::PathPoint>& discretized_ref_points) const;
+
   PathTimePoint SetPathTimePoint(const std::string& obstacle_id, const double s,
                                  const double t) const;
 
@@ -86,6 +91,8 @@ class PathTimeGraph {
   void SetDynamicObstacle(
       const Obstacle* obstacle,
       const std::vector<common::PathPoint>& discretized_ref_points);
+
+  void SortStaticObstacles();
 
  private:
   std::pair<double, double> time_range_;
