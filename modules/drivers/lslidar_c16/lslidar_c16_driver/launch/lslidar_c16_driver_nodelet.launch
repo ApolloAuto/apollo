@@ -1,0 +1,16 @@
+<launch>
+
+  <!-- start nodelet manager and load driver nodelet -->
+  <node pkg="nodelet" type="nodelet"
+    name="lslidar_c16_nodelet_manager"
+    args="manager" output="screen"/>
+
+  <node pkg="nodelet" type="nodelet"
+    name="lslidar_c16_driver_nodelet"
+    args="load lslidar_c16_driver/LslidarC16DriverNodelet
+    lslidar_c16_nodelet_manager" >
+    <param name="frame_id" value="lslidar"/>
+    <param name="device_ip" value="192.168.1.200"/>
+  </node>
+
+</launch>
