@@ -1,7 +1,7 @@
 header {
   module_name: "planning"
 }
-is_replan: true
+is_replan: false
 gear: GEAR_DRIVE
 decision {
   main_decision {

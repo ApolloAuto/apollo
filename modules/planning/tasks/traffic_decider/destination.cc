@@ -78,10 +78,18 @@ int Destination::BuildStopDecision(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
+  auto* planning_state = GetPlanningStatus()->mutable_planning_state();
+  if (planning_state->has_pull_over() &&
+      planning_state->pull_over().in_pull_over()) {
+    PullOver();
+    ADEBUG << "destination: continue PULL OVER";
+    return 0;
+  }
+
   const auto& routing =
       AdapterManager::GetRoutingResponse()->GetLatestObserved();
   if (routing.routing_request().waypoint_size() < 2) {
-    ADEBUG << "routing_request has no end";
+    AERROR << "routing_request has no end";
     return -1;
   }
 
@@ -169,7 +177,7 @@ bool Destination::CheckPullOver(
   const auto dest_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
       hdmap::MakeMapId(lane_id));
   if (!dest_lane) {
-    AERROR << "Failed to find lane[" << lane_id << "]";
+    ADEBUG << "Failed to find lane[" << lane_id << "]";
     return false;
   }
 
@@ -187,7 +195,7 @@ bool Destination::CheckPullOver(
   // check dest within pull_over_plan_distance
   common::SLPoint dest_sl;
   if (!reference_line.XYToSL({dest_point.x(), dest_point.y()}, &dest_sl)) {
-    AERROR << "failed to project the dest point to the other reference line";
+    ADEBUG << "failed to project the dest point to the other reference line";
     return false;
   }
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
@@ -219,7 +227,7 @@ bool Destination::CheckPullOver(
       const auto neighbor_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
           neighbor_lane_id);
       if (!neighbor_lane) {
-        AERROR << "Failed to find lane[" << neighbor_lane_id.id() << "]";
+        ADEBUG << "Failed to find lane[" << neighbor_lane_id.id() << "]";
         continue;
       }
       const auto& lane_type = neighbor_lane->lane().type();
@@ -245,6 +253,10 @@ int Destination::PullOver() {
       !planning_state->pull_over().in_pull_over()) {
     planning_state->clear_pull_over();
     planning_state->mutable_pull_over()->set_in_pull_over(true);
+    planning_state->mutable_pull_over()->clear_stop_point();
+    planning_state->mutable_pull_over()->clear_stop_heading();
+    planning_state->mutable_pull_over()->set_reason(
+        PullOverStatus::DESTINATION);
   }
 
   return 0;

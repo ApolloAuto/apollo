@@ -64,6 +64,16 @@ config: {
 }
 
 config: {
+  rule_id: PULL_OVER
+  enabled: true
+  pull_over {
+    max_stop_deceleration: 2.0
+    stop_distance: 0.5
+    plan_distance: 20.0
+  }
+}
+
+config: {
   rule_id: REFERENCE_LINE_END
   enabled: true
   reference_line_end {
