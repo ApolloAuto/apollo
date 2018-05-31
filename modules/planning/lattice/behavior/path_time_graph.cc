@@ -44,20 +44,17 @@ using apollo::perception::PerceptionObstacle;
 
 PathTimeGraph::PathTimeGraph(
     const std::vector<const Obstacle*>& obstacles,
-    const std::vector<PathPoint>& discretized_ref_points, const double s_start,
-    const double s_end, const double t_start, const double t_end,
-    const double path_width) {
+    const std::vector<PathPoint>& discretized_ref_points,
+    const ReferenceLineInfo* ptr_reference_line_info,
+    const double s_start, const double s_end,
+    const double t_start, const double t_end) {
   CHECK(s_start < s_end);
   CHECK(t_start < t_end);
-  CHECK(path_width > 0.0);
-
   path_range_.first = s_start;
   path_range_.second = s_end;
-
   time_range_.first = t_start;
   time_range_.second = t_end;
-
-  half_path_width_ = path_width * 0.5;
+  ptr_reference_line_info_ = ptr_reference_line_info;
 
   SetupObstacles(obstacles, discretized_ref_points);
 }
@@ -131,6 +128,18 @@ void PathTimeGraph::SetStaticObstacle(
   std::string obstacle_id = obstacle->Id();
   SLBoundary sl_boundary = ComputeObstacleBoundary(box, discretized_ref_points);
 
+  double left_width = FLAGS_default_reference_line_width * 0.5;
+  double right_width = FLAGS_default_reference_line_width * 0.5;
+  ptr_reference_line_info_->reference_line().GetLaneWidth(
+      sl_boundary.start_s(), &left_width, &right_width);
+  if (sl_boundary.start_s() > path_range_.second ||
+      sl_boundary.end_s() < path_range_.first ||
+      sl_boundary.start_l() >left_width ||
+      sl_boundary.end_l() < -right_width) {
+    ADEBUG << "Obstacle [" << obstacle_id << "] is out of range.";
+    return;
+  }
+
   path_time_obstacle_map_[obstacle_id].set_obstacle_id(obstacle_id);
   path_time_obstacle_map_[obstacle_id].mutable_bottom_left()->CopyFrom(
       SetPathTimePoint(obstacle_id, sl_boundary.start_s(), 0.0));
@@ -143,6 +152,11 @@ void PathTimeGraph::SetStaticObstacle(
       SetPathTimePoint(obstacle_id, sl_boundary.end_s(),
                        FLAGS_trajectory_time_length));
   static_obs_sl_boundaries_.push_back(std::move(sl_boundary));
+  ADEBUG << "ST-Graph mapping static obstacle: " << obstacle_id
+         << ", start_s : " << sl_boundary.start_s()
+         << ", end_s : " << sl_boundary.end_s()
+         << ", start_l : " << sl_boundary.start_l()
+         << ", end_l : " << sl_boundary.end_l();
 }
 
 void PathTimeGraph::SetDynamicObstacle(
@@ -155,11 +169,16 @@ void PathTimeGraph::SetDynamicObstacle(
     SLBoundary sl_boundary =
         ComputeObstacleBoundary(box, discretized_ref_points);
 
+    double left_width = FLAGS_default_reference_line_width * 0.5;
+    double right_width = FLAGS_default_reference_line_width * 0.5;
+    ptr_reference_line_info_->reference_line().GetLaneWidth(
+        sl_boundary.start_s(), &left_width, &right_width);
+
     // the obstacle is not shown on the region to be considered.
-    if (sl_boundary.end_s() < path_range_.first ||
-        sl_boundary.start_s() > path_range_.second ||
-        (sl_boundary.start_l() > half_path_width_ &&
-         sl_boundary.end_l() < -half_path_width_)) {
+    if (sl_boundary.start_s() > path_range_.second ||
+        sl_boundary.end_s() < path_range_.first ||
+        sl_boundary.start_l() > left_width ||
+        sl_boundary.end_l() < -right_width) {
       if (path_time_obstacle_map_.find(obstacle->Id()) !=
           path_time_obstacle_map_.end()) {
         break;
@@ -304,6 +323,11 @@ std::vector<PathTimePoint> PathTimeGraph::GetObstacleSurroundingPoints(
   }
 
   return pt_pairs;
+}
+
+bool PathTimeGraph::IsObstacleInGraph(const std::string& obstacle_id) {
+  return path_time_obstacle_map_.find(obstacle_id) !=
+         path_time_obstacle_map_.end();
 }
 
 }  // namespace planning
