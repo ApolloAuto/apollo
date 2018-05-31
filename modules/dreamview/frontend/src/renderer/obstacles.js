@@ -5,8 +5,9 @@ import STORE from "store";
 import Text3D from "renderer/text3d";
 import { copyProperty, hideArrayObjects, calculateLaneMarkerPoints } from "utils/misc";
 import { drawSegmentsFromPoints, drawDashedLineFromPoints,
-         drawBox, drawDashedBox, drawArrow } from "utils/draw";
+         drawBox, drawDashedBox, drawArrow, drawImage } from "utils/draw";
 
+import iconObjectYield from "assets/images/decision/object-yield.png";
 
 const DEFAULT_HEIGHT = 1.5;
 export const DEFAULT_COLOR = 0xFF00FC;
@@ -29,6 +30,7 @@ export default class PerceptionObstacles {
         this.extrusionSolidFaces = []; // for obstacles with polygon points
         this.extrusionDashedFaces = []; // for obstacles with polygon points
         this.laneMarkers = []; // for lane markers
+        this.icons = [];
     }
 
     update(world, coordinates, scene) {
@@ -56,6 +58,7 @@ export default class PerceptionObstacles {
             hideArrayObjects(this.dashedCubes);
             hideArrayObjects(this.extrusionSolidFaces);
             hideArrayObjects(this.extrusionDashedFaces);
+            hideArrayObjects(this.icons);
             return;
         }
 
@@ -66,6 +69,7 @@ export default class PerceptionObstacles {
         let arrowIdx = 0;
         let cubeIdx = 0;
         let extrusionFaceIdx = 0;
+        let iconIdx = 0;
         for (let i = 0; i < objects.length; i++) {
             const obstacle = objects[i];
             if (!STORE.options['showObstacles' + _.upperFirst(_.camelCase(obstacle.type))]
@@ -112,12 +116,24 @@ export default class PerceptionObstacles {
                 this.updateCube(obstacle.length, obstacle.width, obstacle.height, position,
                         obstacle.heading, color, confidence, cubeIdx++, scene);
             }
+
+            // draw a yield sign to indicate ADC is yielding to this obstacle
+            if (obstacle.yieldedObstacle) {
+                const iconPosition = {
+                    x: position.x,
+                    y: position.y,
+                    z: position.z + obstacle.height + 0.3,
+                };
+                this.updateIcon(iconPosition, world.autoDrivingCar.heading, iconIdx, scene);
+                iconIdx++;
+            }
         }
         hideArrayObjects(this.arrows, arrowIdx);
         hideArrayObjects(this.solidCubes, cubeIdx);
         hideArrayObjects(this.dashedCubes, cubeIdx);
         hideArrayObjects(this.extrusionSolidFaces, extrusionFaceIdx);
         hideArrayObjects(this.extrusionDashedFaces, extrusionFaceIdx);
+        hideArrayObjects(this.icons, iconIdx);
     }
 
     updateArrow(position, heading, color, arrowIdx, scene) {
@@ -203,6 +219,13 @@ export default class PerceptionObstacles {
         }
     }
 
+    updateIcon(position, heading, iconIdx, scene) {
+        const icon = this.getIcon(iconIdx, scene);
+        copyProperty(icon.position, position);
+        icon.rotation.set(Math.PI / 2, heading - Math.PI / 2, 0);
+        icon.visible = true;
+    }
+
     getArrow(index, scene) {
         if (index < this.arrows.length) {
             return this.arrows[index];
@@ -249,6 +272,18 @@ export default class PerceptionObstacles {
         cubes.push(cubeMesh);
         scene.add(cubeMesh);
         return cubeMesh;
+    }
+
+    getIcon(index, scene) {
+        if (index < this.icons.length) {
+            return this.icons[index];
+        }
+        const icon = drawImage(iconObjectYield, 1, 1, 3, 3.6, 0);
+        icon.rotation.set(0, 0, -Math.PI / 2);
+        icon.visible = false;
+        this.icons.push(icon);
+        scene.add(icon);
+        return icon;
     }
 
     updateLaneMarkers(world, coordinates, scene) {
