@@ -72,6 +72,10 @@ void TrafficDecider::RegisterRules() {
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new KeepClear(config);
                           });
+  s_rule_factory.Register(TrafficRuleConfig::PULL_OVER,
+                          [](const TrafficRuleConfig &config) -> TrafficRule * {
+                            return new PullOver(config);
+                          });
   s_rule_factory.Register(TrafficRuleConfig::REFERENCE_LINE_END,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new ReferenceLineEnd(config);
@@ -87,10 +91,6 @@ void TrafficDecider::RegisterRules() {
   s_rule_factory.Register(TrafficRuleConfig::STOP_SIGN,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new StopSign(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::PULL_OVER,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new PullOver(config);
                           });
 }
 

@@ -12,22 +12,26 @@ import "modules/common/proto/geometry.proto";
 */
 
 message ChangeLaneStatus {
-   enum Status {
-       IN_CHANGE_LANE = 1; // during change lane state
-       CHANGE_LANE_FAILED = 2; // change lane failed
-       CHANGE_LANE_SUCCESS = 3; // change lane failed
-   }
-   optional Status status = 1;
-   // the id of the route segment that the vehicle is driving on
-   optional string path_id = 2;
-   // the time stamp when the state started.
-   optional double timestamp = 3;
+  enum Status {
+    IN_CHANGE_LANE = 1; // during change lane state
+    CHANGE_LANE_FAILED = 2; // change lane failed
+    CHANGE_LANE_SUCCESS = 3; // change lane failed
+  }
+  optional Status status = 1;
+  // the id of the route segment that the vehicle is driving on
+  optional string path_id = 2;
+  // the time stamp when the state started.
+  optional double timestamp = 3;
 }
 
 message PullOverStatus {
-    optional bool in_pull_over = 1 [default=false];
-    optional apollo.common.PointENU stop_point = 2;
-    optional double stop_heading = 3;
+  enum Reason {
+    DESTINATION = 1; // upon arriving destination
+  }
+  optional bool in_pull_over = 1 [default=false];
+  optional apollo.common.PointENU stop_point = 2;
+  optional double stop_heading = 3;
+  optional Reason reason = 4;
 }
 
 message ReroutingStatus {
@@ -35,8 +39,8 @@ message ReroutingStatus {
 }
 
 message RightOfWayStatus {
-    // whether the vehicle has right of way in junction
-    map<string, bool> junction = 1;
+  // whether the vehicle has right of way in junction
+  map<string, bool> junction = 1;
 }
 
 message SidePassStatus {
