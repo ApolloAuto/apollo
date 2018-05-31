@@ -80,6 +80,10 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::PERCEPTION_OBSTACLES:
         EnablePerceptionObstacles(FLAGS_perception_obstacle_topic, config);
         break;
+      case AdapterConfig::PERCEPTION_LANE_MASK:
+        EnablePerceptionLaneMask(FLAGS_perception_lane_mask_segmentation_topic,
+                                    config);
+        break;
       case AdapterConfig::TRAFFIC_LIGHT_DETECTION:
         EnableTrafficLightDetection(FLAGS_traffic_light_detection_topic,
                                     config);
