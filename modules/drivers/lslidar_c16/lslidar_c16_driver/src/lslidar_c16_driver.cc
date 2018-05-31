@@ -307,7 +307,7 @@ void LslidarC16Driver::getFPGA_GPSTimeStamp(lslidar_c16_msgs::LslidarC16PacketPt
         us = total_us % 1000;
         ms = total_us / 1000;
 	if(ms >= 1000)
-		ROS_INFO("ms:%ju",ms);
+		// ROS_INFO("ms:%ju",ms);
 
         if(ms > 1000)
         {
