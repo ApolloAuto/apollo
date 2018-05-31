@@ -231,6 +231,13 @@
                   "type": "Decision",
                   "id": 22
                 },
+                "yieldedObstacle": {
+                  "type": "bool",
+                  "id": 32,
+                  "options": {
+                    "default": false
+                  }
+                },
                 "throttlePercentage": {
                   "type": "double",
                   "id": 23
