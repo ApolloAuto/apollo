@@ -111,7 +111,10 @@ struct alignas(16) Object {
 
 // Sensor single frame objects.
 struct SensorObjects {
-  SensorObjects() { sensor2world_pose = Eigen::Matrix4d::Zero(); }
+  SensorObjects() {
+    sensor2world_pose = Eigen::Matrix4d::Zero();
+    sensor2world_pose_static = Eigen::Matrix4d::Zero();
+  }
 
   std::string ToString() const;
 
@@ -124,6 +127,7 @@ struct SensorObjects {
   SeqId seq_num = 0;
   std::vector<std::shared_ptr<Object>> objects;
   Eigen::Matrix4d sensor2world_pose;
+  Eigen::Matrix4d sensor2world_pose_static;
   LaneObjectsPtr lane_objects;
 
   uint32_t cipv_index = -1;

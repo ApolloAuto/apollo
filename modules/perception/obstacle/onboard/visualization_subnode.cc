@@ -243,6 +243,7 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
       return;
     }
     content->set_camera_content(timestamp, objs->sensor2world_pose,
+                                objs->sensor2world_pose_static,
                                 objs->objects,
                                 (*(objs->camera_frame_supplement)));
   } else if (event.event_id == motion_event_id_) {
