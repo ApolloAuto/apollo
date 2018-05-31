@@ -76,8 +76,14 @@ Eigen::Matrix<T, N, M> PseudoInverse(const Eigen::Matrix<T, M, N> &m,
 }
 
 /**
-* @brief Computes bilinear transformation of the continuous to discrete form for
-state space representation
+* @brief Computes bilinear transformation of the continuous to discrete form
+for state space representation
+* This assumes equation format of
+*
+*           dot_x = Ax + Bu
+*           y = Cx + Du
+*
+*
 *
 * @param m_a, m_b, m_c, m_d are the state space matrix control matrix
 *
@@ -85,15 +91,14 @@ state space representation
 
  */
 
-template <typename T, unsigned int L, unsigned int M, unsigned int N,
-          unsigned int O>
+template <typename T, unsigned int L, unsigned int N, unsigned int O>
 bool ContinuousToDiscrete(const Eigen::Matrix<T, L, L> &m_a,
                           const Eigen::Matrix<T, L, N> &m_b,
-                          const Eigen::Matrix<T, O, M> &m_c,
+                          const Eigen::Matrix<T, O, L> &m_c,
                           const Eigen::Matrix<T, O, N> &m_d, const double ts,
                           Eigen::Matrix<T, L, L> *ptr_a_d,
                           Eigen::Matrix<T, L, N> *ptr_b_d,
-                          Eigen::Matrix<T, O, M> *ptr_c_d,
+                          Eigen::Matrix<T, O, L> *ptr_c_d,
                           Eigen::Matrix<T, O, N> *ptr_d_d) {
   if (ts <= 0.0) {
     AERROR << "ContinuousToDiscrete : ts is less than or equal to zero";
@@ -122,6 +127,13 @@ bool ContinuousToDiscrete(const Eigen::Matrix<T, L, L> &m_a,
 
   return true;
 }
+
+bool ContinuousToDiscrete(const Eigen::MatrixXd &m_a,
+                          const Eigen::MatrixXd &m_b,
+                          const Eigen::MatrixXd &m_c,
+                          const Eigen::MatrixXd &m_d, const double ts,
+                          Eigen::MatrixXd *ptr_a_d, Eigen::MatrixXd *ptr_b_d,
+                          Eigen::MatrixXd *ptr_c_d, Eigen::MatrixXd *ptr_d_d);
 
 }  // namespace math
 }  // namespace common
