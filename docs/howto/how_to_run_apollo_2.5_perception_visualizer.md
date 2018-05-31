@@ -10,7 +10,7 @@ We use Bazel to build the offline perception visualizer.
 cd /apollo
 ./apollo.sh build_opt_gpu
 ```
-In order to invoke visualizer subnode, we need to change the pointing of dag streaming config by modifying perception_lowcost.conf with either of the following two gflag config.
+In order to invoke visualizer subnode, we need to change the pointing of dag streaming config by modifying /modules/perception/conf/perception_lowcost.conf with either of the following two gflag config.
 (The default ones are defined in perception scripts already)
 
 This config is image only:
