@@ -19,6 +19,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/configs/config_gflags.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -31,6 +32,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::time::Clock;
+using apollo::common::PointENU;
 using apollo::planning::StopSign;
 using apollo::planning::util::GetPlanningStatus;
 
@@ -45,6 +47,7 @@ using apollo::planning::util::GetPlanningStatus;
  *   300 - 399: signal light
  *   400 - 499: change lane
  *   500 - 599: front vehicle
+ *   600 - 699: destination
  */
 
 class SunnyvaleBigLoopTest : public PlanningTestBase {
@@ -59,6 +62,7 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
     ENABLE_RULE(TrafficRuleConfig::DESTINATION, false);
     ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
+    ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
     ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
     ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
   }
@@ -66,6 +70,15 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
   TrafficRuleConfig* GetStopSignConfig() {
     for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
       if (config.rule_id() == TrafficRuleConfig::STOP_SIGN) {
+        return &config;
+      }
+    }
+    return nullptr;
+  }
+
+  TrafficRuleConfig* GetDestinationConfig() {
+    for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+      if (config.rule_id() == TrafficRuleConfig::DESTINATION) {
         return &config;
       }
     }
@@ -558,6 +571,80 @@ TEST_F(SunnyvaleBigLoopTest, change_lane_abort_for_fast_back_vehicle) {
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
+}
+
+TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
+  ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
+  ENABLE_RULE(TrafficRuleConfig::DESTINATION, true);
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
+  ENABLE_RULE(TrafficRuleConfig::PULL_OVER, true);
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+
+  std::string seq_num = "600";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  PlanningTestBase::SetUp();
+
+  // set config
+  auto* destination_config = GetDestinationConfig();
+  destination_config->mutable_destination()->set_enable_pull_over(false);
+
+  RUN_GOLDEN_TEST_DECISION(0);
+}
+
+TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
+  ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
+  ENABLE_RULE(TrafficRuleConfig::DESTINATION, true);
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
+  ENABLE_RULE(TrafficRuleConfig::PULL_OVER, true);
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+
+  std::string seq_num = "601";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  PlanningTestBase::SetUp();
+
+  // set config
+  auto* destination_config = GetDestinationConfig();
+  destination_config->mutable_destination()->set_enable_pull_over(true);
+
+  RUN_GOLDEN_TEST_DECISION(0);
+
+  // check PlanningStatus value: PULL OVER
+  auto* planning_state = GetPlanningStatus()->mutable_planning_state();
+  EXPECT_TRUE(planning_state->has_pull_over() &&
+              planning_state->pull_over().in_pull_over());
+  EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
+
+  PointENU stop_point_0;
+  stop_point_0.set_x(planning_state->pull_over().stop_point().x());
+  stop_point_0.set_y(planning_state->pull_over().stop_point().y());
+  double stop_heading_0 = planning_state->pull_over().stop_heading();
+  double start_time_0 = planning_state->pull_over().start_time();
+
+  // check PULL OVER decision
+  RUN_GOLDEN_TEST_DECISION(1);
+
+  EXPECT_TRUE(planning_state->has_pull_over() &&
+              planning_state->pull_over().in_pull_over());
+  EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
+
+  PointENU stop_point_1;
+  stop_point_1.set_x(planning_state->pull_over().stop_point().x());
+  stop_point_1.set_y(planning_state->pull_over().stop_point().y());
+  double stop_heading_1 = planning_state->pull_over().stop_heading();
+  double start_time_1 = planning_state->pull_over().start_time();
+
+  EXPECT_EQ(stop_point_0.x(), stop_point_1.x());
+  EXPECT_EQ(stop_point_0.y(), stop_point_1.y());
+  EXPECT_EQ(stop_heading_0, stop_heading_1);
+  EXPECT_EQ(start_time_0, start_time_1);
 }
 
 /*
