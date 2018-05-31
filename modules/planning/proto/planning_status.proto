@@ -32,6 +32,7 @@ message PullOverStatus {
   optional apollo.common.PointENU stop_point = 2;
   optional double stop_heading = 3;
   optional Reason reason = 4;
+  optional double start_time = 5;
 }
 
 message ReroutingStatus {
