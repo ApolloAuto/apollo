@@ -15,9 +15,9 @@ for steps to install system software.
 [Apollo Sensor Calibration Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/multiple_lidar_gnss_calibration_guide.md)
 for Sensor Calibration.
 
-4. NVMe SSD. In order to avoid the possible data loss caused by IO bottleneck, it is recommended to install NVME SSD hard disk in IPC.
+4. NVMe SSD. In order to avoid the possible data loss problem caused by IO bottleneck, it is recommended to install NVME SSD hard disk in IPC.
 
-5. Satelliate Base Station. In order to get accurate mapping results, satellite base stations need to be set up to ensure the RTK can work properly.
+5. GPS signal. In order to get accurate mapping results, we need to ensure that the GPS signal is good and RTK can work normally in the whole acquisition process.
 
 ## Data Collection Steps
 1.Enter Into Map Collection Mode.
@@ -67,4 +67,4 @@ Users can create mapping task,upload collection data,manage mapping task, track 
 
 When the status is [Published], click the [Published] to download maps.
 
-![](images/map_collection_data_finish_en.png)
+The collected map data is placed in the /apollo/data/bag/(start time of collection, e.g.,2018-04-14-21-20-24) directory by default, package them as tar.gz compressed file and upload them to the [Apollo Data Official Website](http://data.apollo.auto/hd_map_intro/?locale=en-us).
