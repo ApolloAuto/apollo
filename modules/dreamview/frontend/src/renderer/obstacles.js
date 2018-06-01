@@ -96,12 +96,8 @@ export default class PerceptionObstacles {
                 arrowMesh.scale.set(1, 1, 1);
                 arrowMesh.visible = true;
             }
-            if (STORE.options.showObstaclesId) {
-                this.updateIdAndDistance(obstacle.id,
-                        new THREE.Vector3(position.x, position.y, obstacle.height),
-                        adc.distanceTo(position).toFixed(1),
-                        scene);
-            }
+
+            this.updateTexts(adc, obstacle, position, scene);
 
             // get the confidence and validate its range
             let confidence = obstacle.confidence;
@@ -144,21 +140,24 @@ export default class PerceptionObstacles {
         return arrowMesh;
     }
 
-    updateIdAndDistance(id, position, distance, scene) {
-        const text = this.textRender.composeText(`${id} D:${distance}`);
-        if (text === null) {
-            return;
+    updateTexts(adc, obstacle, obstaclePosition, scene) {
+        const textPosition = {
+            x: obstaclePosition.x,
+            y: obstaclePosition.y,
+            z: obstacle.height || 3
+        };
+        let lineCount = 0;
+
+        if (STORE.options.showObstaclesInfo) {
+            const distance = adc.distanceTo(obstaclePosition).toFixed(1);
+            const speed = obstacle.speed.toFixed(1);
+            this.drawTexts(`(${distance}m, ${speed}m/s)`, textPosition, scene);
+            lineCount ++;
         }
-        text.position.set(position.x, position.y + 0.5, position.z || 3);
-        const camera = scene.getObjectByName("camera");
-        if (camera !== undefined) {
-            text.quaternion.copy(camera.quaternion);
+        if (STORE.options.showObstaclesId) {
+            textPosition.z += (lineCount * 0.7);
+            this.drawTexts(obstacle.id, textPosition, scene);
         }
-        text.children.forEach(c => c.visible = true);
-        text.visible = true;
-        text.name = "id_" + id;
-        this.ids.push(text);
-        scene.add(text);
     }
 
     updatePolygon(points, height, color, coordinates, confidence, extrusionFaceIdx, scene) {
@@ -284,6 +283,23 @@ export default class PerceptionObstacles {
         this.icons.push(icon);
         scene.add(icon);
         return icon;
+    }
+
+    drawTexts(content, position, scene) {
+        const text = this.textRender.composeText(content);
+        if (text === null) {
+            return;
+        }
+
+        text.position.set(position.x, position.y, position.z );
+        const camera = scene.getObjectByName("camera");
+        if (camera !== undefined) {
+            text.quaternion.copy(camera.quaternion);
+        }
+        text.children.forEach(c => c.visible = true);
+        text.visible = true;
+        this.ids.push(text);
+        scene.add(text);
     }
 
     updateLaneMarkers(world, coordinates, scene) {
