@@ -221,11 +221,10 @@ int Destination::PullOver() {
       !planning_state->pull_over().in_pull_over()) {
     planning_state->clear_pull_over();
     planning_state->mutable_pull_over()->set_in_pull_over(true);
-    planning_state->mutable_pull_over()->clear_stop_point();
-    planning_state->mutable_pull_over()->clear_stop_heading();
     planning_state->mutable_pull_over()->set_reason(
         PullOverStatus::DESTINATION);
-    planning_state->mutable_pull_over()->set_start_time(Clock::NowInSeconds());
+    planning_state->mutable_pull_over()->set_status_set_time(
+        Clock::NowInSeconds());
   }
 
   return 0;
