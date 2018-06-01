@@ -54,12 +54,14 @@ class PullOver : public TrafficRule {
    */
   bool IsPullOver() const;
 
+  bool PullOverCompleted();
+
   /**
    * get a pull over stop point
    */
-  int GetPullOverStop(common::PointENU* start_point,
-                      common::PointENU* stop_point,
-                      double* stop_heading);
+  int GetPullOverStop(double* stop_point_s,
+                      double* stop_point_l,
+                      double* start_point_s);
 
   bool OnOverlap(const double s);
 
@@ -67,22 +69,20 @@ class PullOver : public TrafficRule {
    * Find a safe place to pull over based on the vehicle's current state.
    */
   int FindPullOverStop(double* stop_point_s);
-  int FindPullOverStop(common::PointENU* start_point,
-                       common::PointENU* stop_point,
-                       double* stop_heading);
+  int FindPullOverStop(double* stop_point_s,
+                       double* stop_point_l,
+                       double* start_point_s);
 
   /**
    * Check if a stop point is valid based on current vehicle status
    * The stop point could be invalid if it is occupied by other obstacles;
    * The stop point could be invalid if the vehicle has passed this point
    */
-  bool IsValidStop(const common::PointENU& start_point,
-                   const common::PointENU& stop_point,
-                   double stop_heading) const;
+  bool IsValidStop() const;
 
-  int BuildPullOverStop(const common::PointENU& start_point,
-                        const common::PointENU& stop_point,
-                        double stop_heading);
+  int BuildPullOverStop(const double stop_point_s,
+                        const double stop_point_l,
+                        const double start_point_s);
 
  private:
   static constexpr char const* const PULL_OVER_VO_ID_PREFIX = "PO_";
