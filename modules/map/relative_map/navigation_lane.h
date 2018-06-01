@@ -37,9 +37,9 @@ namespace relative_map {
 typedef std::pair<int, std::shared_ptr<NavigationPath>> NaviPathPair;
 
 // A projection index pair.
-// pair.first: projection index of the vehicle in the current lane.
+// pair.first: projection index of the vehicle in the current navigation line.
 // pair.second: the distance between the vehicle's initial position and the
-// projection position in the current lane.
+// projection position in the current navigation line.
 typedef std::pair<int, double> ProjIndexPair;
 
 class NavigationLane {
@@ -64,7 +64,12 @@ class NavigationLane {
     current_navi_path_ = nullptr;
   }
 
-  const NavigationPath& Path() { return *current_navi_path_; }
+  const NavigationPath& Path() {
+    if (current_navi_path_) {
+      return *current_navi_path_;
+    }
+    return NavigationPath();
+  }
 
   bool CreateMap(const MapGenerationParam& map_config, MapMsg* map_msg) const;
 
@@ -97,13 +102,13 @@ class NavigationLane {
   // received from topic: /apollo/navigation
   NavigationInfo navigation_info_;
 
-  // navigation_path_list_ is a list of navigation paths. The internal path is
-  // arranged from left to right based on the vehicle's driving direction.
+  // navigation_path_list_ is a list of navigation paths. The internal paths
+  // are arranged from left to right based on the vehicle's driving direction.
   // A navigation path is the combined results from perception and navigation.
   std::list<NaviPathPair> navigation_path_list_;
 
   // the navigation path which the vehicle is currently on.
-  std::shared_ptr<NavigationPath> current_navi_path_;
+  std::shared_ptr<NavigationPath> current_navi_path_ = nullptr;
 
   // when invalid, left_width_ < 0
   double left_width_ = -1.0;
