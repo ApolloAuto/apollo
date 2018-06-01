@@ -49,6 +49,8 @@ export default class Options {
         PARAMETERS.options.defaults.showObstaclesHeading;
     @observable showObstaclesId =
         PARAMETERS.options.defaults.showObstaclesId;
+    @observable showObstaclesInfo =
+        PARAMETERS.options.defaults.showObstaclesInfo;
     @observable showPointCloud = PARAMETERS.options.defaults.showPointCloud;
     @observable showPositionGps = PARAMETERS.options.defaults.showPositionGps;
     @observable showPositionLocalization = PARAMETERS.options.defaults.showPositionLocalization;
