@@ -74,11 +74,7 @@ class PathTimeGraph {
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   SLBoundary ComputeObstacleBoundary(
-      const common::math::Box2d& box,
-      const std::vector<common::PathPoint>& discretized_ref_points) const;
-
-  SLBoundary ComputeObstacleBoundary(
-      const common::math::Polygon2d& polygon,
+      const std::vector<common::math::Vec2d>& vertices,
       const std::vector<common::PathPoint>& discretized_ref_points) const;
 
   PathTimePoint SetPathTimePoint(const std::string& obstacle_id, const double s,
@@ -91,8 +87,6 @@ class PathTimeGraph {
   void SetDynamicObstacle(
       const Obstacle* obstacle,
       const std::vector<common::PathPoint>& discretized_ref_points);
-
-  void SortStaticObstacles();
 
  private:
   std::pair<double, double> time_range_;

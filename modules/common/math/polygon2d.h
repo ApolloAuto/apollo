@@ -220,6 +220,11 @@ class Polygon2d {
   void GetAllVertices(std::vector<Vec2d> *const vertices) const;
 
   /**
+   * @brief Get all vertices of the polygon
+   */
+  std::vector<Vec2d> GetAllVertices() const;
+
+  /**
    * @brief Get all overlapped line segments of a line segment and this polygon.
    *        There are possibly multiple overlapped line segments if this
    *        polygon is not convex.

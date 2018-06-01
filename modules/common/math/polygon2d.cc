@@ -405,6 +405,10 @@ void Polygon2d::GetAllVertices(std::vector<Vec2d> *const vertices) const {
   *vertices = points_;
 }
 
+std::vector<Vec2d> Polygon2d::GetAllVertices() const {
+  return points_;
+}
+
 std::vector<LineSegment2d> Polygon2d::GetAllOverlaps(
     const LineSegment2d &line_segment) const {
   CHECK_GE(points_.size(), 3);
