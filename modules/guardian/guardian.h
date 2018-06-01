@@ -29,7 +29,8 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
-#include "modules/monitor/proto/monitor.pb.h"
+#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/monitor/proto/system_status.pb.h"
 #include "ros/include/ros/ros.h"
 
 /**
@@ -49,10 +50,12 @@ class Guardian : public apollo::common::ApolloApp {
  private:
   void OnTimer(const ros::TimerEvent&);
   void OnChassis(const apollo::canbus::Chassis& message);
-  void OnMonitor(const apollo::monitor::Monitor& message);
+  void OnControl(const apollo::control::ControlCommand& message);
+  void OnSystemStatus(const apollo::monitor::SystemStatus& message);
 
   apollo::canbus::Chassis chassis_;
-  apollo::monitor::Monitor monitor_;
+  apollo::monitor::SystemStatus system_status_;
+  apollo::control::ControlCommand control_cmd_;
   std::mutex mutex_;
 
   ros::Timer timer_;
