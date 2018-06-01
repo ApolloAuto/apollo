@@ -48,10 +48,12 @@ class CameraContent : public BaseContent {
  public:
   CameraContent()
       : camera_frame_supplement_(new CameraFrameSupplement),
-        _pose_c2w(Eigen::Matrix4d::Identity()) {}
+        _pose_c2w(Eigen::Matrix4d::Identity()),
+        _pose_c2w_static(Eigen::Matrix4d::Identity()) {}
   std::vector<std::shared_ptr<Object>> camera_objects_;
   CameraFrameSupplementPtr camera_frame_supplement_;
   Eigen::Matrix4d _pose_c2w;
+  Eigen::Matrix4d _pose_c2w_static;
 };
 
 class ImageContent : public BaseContent {
@@ -119,6 +121,7 @@ class FrameContent {
   void update_timestamp(double ref);
   void set_image_content(double timestamp, cv::Mat image);
   void set_camera_content(double timestamp, Eigen::Matrix4d pose_c2w,
+                          Eigen::Matrix4d pose_c2w_static,
                           const std::vector<std::shared_ptr<Object>>& objects,
                           const CameraFrameSupplement& supplement);
   void set_camera_content(double timestamp, Eigen::Matrix4d pose_c2w,
@@ -138,6 +141,7 @@ class FrameContent {
   void set_motion_content(double timestamp, MotionBufferPtr motion_buffer);
   Eigen::Matrix4d get_opengl_camera_system_pose();
   Eigen::Matrix4d get_camera_to_world_pose();
+  Eigen::Matrix4d get_camera_to_world_pose_static();
   Eigen::Matrix4d get_pose_v2w();
   cv::Mat get_camera_image();
 

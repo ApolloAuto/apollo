@@ -146,6 +146,17 @@ class CameraCalibration {
     return *_car2camera_pose;
   }
 
+  void SetCar2CameraExtrinsicsAdj(Eigen::Matrix<double, 4, 4> matrix,
+                                  bool adjusted) {
+    camera2car_adj_ = matrix;
+    adjusted_extrinsic_ = adjusted;
+  }
+
+  bool GetCar2CameraExtrinsicsAdj(Eigen::Matrix<double, 4, 4>* matrix) {
+    *matrix = camera2car_adj_;
+    return adjusted_extrinsic_;
+  }
+
   inline CameraUndistortionPtr get_camera_undistort_handler() {
     return undistort_handler_;
   }
@@ -176,10 +187,17 @@ class CameraCalibration {
   void init_camera_model();
 
   Eigen::Matrix<double, 3, 4> camera_intrinsic_;  // camera intrinsic
+
   std::shared_ptr<Eigen::Matrix<double, 4, 4>>
       _camera2car_pose;  // camera to ego car pose
   std::shared_ptr<Eigen::Matrix<double, 4, 4>>
       _car2camera_pose;  // car to camera pose
+
+  // Pitch angle adjusted extrinsics to ego car space on the ground
+  bool adjusted_extrinsic_ = false;
+  Eigen::Matrix<double, 4, 4> camera2car_adj_;
+  // always available, but retreat to static one if above is false
+
   Eigen::Matrix<double, 3, 4> camera_projection_mat_;
   Eigen::Matrix<double, 3, 3>
       homography_mat_;  // homography mat from camera 2 car
@@ -187,10 +205,13 @@ class CameraCalibration {
       homography_mat_inverse_;  // homography mat from car 2 camera
   volatile std::shared_ptr<Eigen::Matrix<double, 3, 3>>
       camera_homography_;  // final homography based on online calibration
+
   CameraUndistortionPtr undistort_handler_;
   CameraDistortPtr camera_model_;
+
   size_t image_height_;
   size_t image_width_;
+
   Eigen::Quaterniond extrinsic_quat_;
   CameraCoeffient camera_coefficient_;
 };

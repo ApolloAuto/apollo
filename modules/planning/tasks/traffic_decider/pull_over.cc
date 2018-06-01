@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <vector>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/proto/map_lane.pb.h"
@@ -34,6 +35,7 @@ namespace planning {
 
 using apollo::common::PointENU;
 using apollo::common::Status;
+using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneSegment;
 using apollo::planning::util::GetPlanningStatus;
@@ -49,14 +51,15 @@ Status PullOver::ApplyRule(Frame* const frame,
     return Status::OK();
   }
 
+  PointENU start_point;
   PointENU stop_point;
   double stop_heading = 0.0;
-  if (GetPullOverStop(&stop_point, &stop_heading) < 0) {
-    AERROR << "Could not find a safe pull over point";
+  if (GetPullOverStop(&start_point, &stop_point, &stop_heading) != 0) {
+    ADEBUG << "Could not find a safe pull over point";
     return Status::OK();
   }
 
-  BuildPullOverStop(stop_point, stop_heading);
+  BuildPullOverStop(start_point, stop_point, stop_heading);
 
   return Status::OK();
 }
@@ -67,20 +70,26 @@ bool PullOver::IsPullOver() const {
       planning_state->pull_over().in_pull_over());
 }
 
-bool PullOver::IsValidStop(const PointENU& stop_point,
+bool PullOver::IsValidStop(const PointENU& start_point,
+                           const PointENU& stop_point,
                            double stop_heading) const {
   // TODO(all) implement this function
   return true;
 }
 
-int PullOver::GetPullOverStop(PointENU* stop_point, double* stop_heading) {
+int PullOver::GetPullOverStop(PointENU* start_point,
+                              PointENU* stop_point,
+                              double* stop_heading) {
   auto&  pull_over_status = GetPlanningStatus()->
       mutable_planning_state()->pull_over();
   // reuse existing stop point
-  if (pull_over_status.has_stop_point() &&
+  if (pull_over_status.has_start_point() &&
+      pull_over_status.has_stop_point() &&
       pull_over_status.has_stop_heading()) {
-    if (IsValidStop(pull_over_status.stop_point(),
+    if (IsValidStop(pull_over_status.start_point(),
+                    pull_over_status.stop_point(),
                     pull_over_status.stop_heading())) {
+      *start_point = pull_over_status.start_point();
       *stop_point = pull_over_status.stop_point();
       *stop_heading = pull_over_status.stop_heading();
       return 0;
@@ -88,27 +97,36 @@ int PullOver::GetPullOverStop(PointENU* stop_point, double* stop_heading) {
   }
 
   // calculate new stop point if don't have a pull over stop
-  return SearchPullOverStop(stop_point, stop_heading);
+  return SearchPullOverStop(start_point, stop_point, stop_heading);
 }
 
-int PullOver::SearchPullOverStop(PointENU* stop_point, double* stop_heading) {
-  if (!CheckPullOver()) {
+int PullOver::SearchPullOverStop(PointENU* start_point,
+                                 PointENU* stop_point,
+                                 double* stop_heading) {
+  double stop_point_s;
+  if (SearchPullOverStop(&stop_point_s) != 0) {
     return -1;
   }
 
-  // TODO(all): temparily set stop point at lane_boarder
-  common::SLPoint stop_point_sl;
-  const double adc_front_edge_s =
-      reference_line_info_->AdcSlBoundary().end_s();
-  const double stop_s = adc_front_edge_s + config_.pull_over().plan_distance();
-  stop_point_sl.set_s(stop_s);
-
   const auto& reference_line = reference_line_info_->reference_line();
-  double heading = reference_line.GetReferencePoint(stop_s).heading();
+  if (stop_point_s > reference_line.Length()) {
+    return -1;
+  }
+
+  const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
+  const double adc_width = vehicle_param.width();
+
+  // TODO(all): temporarily set stop point by lane_boarder
+  common::SLPoint stop_point_sl;
+  stop_point_sl.set_s(stop_point_s);
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
-  reference_line.GetLaneWidth(stop_s, &lane_left_width, &lane_right_width);
-  stop_point_sl.set_l(-lane_right_width);
+  reference_line.GetLaneWidth(stop_point_s,
+                              &lane_left_width, &lane_right_width);
+  double stop_point_l = -(lane_right_width - adc_width / 2 -
+      config_.pull_over().pull_over_l_buffer());
+  stop_point_sl.set_l(stop_point_l);
+  double heading = reference_line.GetReferencePoint(stop_point_s).heading();
 
   common::math::Vec2d point;
   reference_line.SLToXY(stop_point_sl, &point);
@@ -117,27 +135,56 @@ int PullOver::SearchPullOverStop(PointENU* stop_point, double* stop_heading) {
   stop_point->set_y(point.y());
   *stop_heading = heading;
 
+  common::SLPoint start_point_sl;
+  start_point_sl.set_s(stop_point_s - config_.pull_over().plan_distance());
+  start_point_sl.set_l(0.0);
+  reference_line.SLToXY(start_point_sl, &point);
+  start_point->set_x(point.x());
+  start_point->set_y(point.y());
+
   ADEBUG << "stop_point(" << stop_point->x() << ", " << stop_point->y()
       << ") heading[" << *stop_heading << "]";
   return 0;
 }
 
-/**
- * @brief: check if adc will pull-over upon arriving destination
- */
-bool PullOver::CheckPullOver() {
+int PullOver::SearchPullOverStop(double* stop_point_s) {
+  const double adc_front_edge_s = reference_line_info_->AdcSlBoundary().end_s();
+  *stop_point_s = adc_front_edge_s + config_.pull_over().plan_distance();
+
+  return 0;
+
+  // TODO(all): blocked by LaneSegment issue.
+  //             comment out now. to be added later
+  /*
   const auto& reference_line = reference_line_info_->reference_line();
   const double adc_front_edge_s = reference_line_info_->AdcSlBoundary().end_s();
+  const double adc_end_edge_s = reference_line_info_->AdcSlBoundary().start_s();
 
-  // check all the lanes through pull-over plan_distance
-  const double plan_distance = config_.pull_over().plan_distance();
+  double pull_over_length = 0.0;
+  double total_check_s_distance = 0.0;
+
+  // check lanes along reference line until find enough pull_over_length
   const std::vector<LaneSegment>& lane_segments =
       reference_line.map_path().lane_segments();
   for (auto& lane_segment : lane_segments) {
-    // check plan distance
-    if (lane_segment.end_s <  adc_front_edge_s ||
-        lane_segment.start_s >plan_distance) {
+    ADEBUG << "check lane_seg[" << lane_segment.lane->id().id()
+        << "] length[" << lane_segment.Length()
+        << "] s(" << lane_segment.start_s << ", " << lane_segment.end_s
+        << ") adc_s(" << adc_end_edge_s << ", " << adc_front_edge_s << ")";
+    if (lane_segment.end_s <  adc_front_edge_s) {
       continue;
+    }
+
+    // check check_distance
+    if (total_check_s_distance > config_.pull_over().max_check_distance()) {
+      ADEBUG << "fail to find pull over point within max_check_distance";
+      return -1;
+    }
+    if (adc_front_edge_s > lane_segment.start_s &&
+        adc_end_edge_s < lane_segment.end_s) {
+      total_check_s_distance = lane_segment.end_s - adc_front_edge_s;
+    } else {
+      total_check_s_distance += lane_segment.Length();
     }
 
     // check turn type: NO_TURN/LEFT_TURN/RIGHT_TURN/U_TURN
@@ -145,11 +192,13 @@ bool PullOver::CheckPullOver() {
     if (turn != hdmap::Lane::NO_TURN) {
       ADEBUG << "path lane[" << lane_segment.lane->lane().id().id()
           << "] turn[" << Lane_LaneTurn_Name(turn) << "] can't pull over";
-      return false;
+      pull_over_length = 0.0;
+      continue;
     }
 
     // check rightmost driving lane:
     //   NONE/CITY_DRIVING/BIKING/SIDEWALK/PARKING
+    bool rightmost_driving_lane = true;
     for (auto& neighbor_lane_id :
         lane_segment.lane->lane().right_neighbor_forward_lane_id()) {
       const auto neighbor_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
@@ -164,16 +213,46 @@ bool PullOver::CheckPullOver() {
             << "]'s right neighbor forward lane["
             << neighbor_lane_id.id() << "] type["
             << Lane_LaneType_Name(lane_type) << "] can't pull over";
-        return false;
+        rightmost_driving_lane = false;
+        break;
       }
+    }
+
+    if (!rightmost_driving_lane) {
+      pull_over_length = 0.0;
+      continue;
+    }
+
+    if (adc_front_edge_s > lane_segment.start_s &&
+        adc_end_edge_s < lane_segment.end_s) {
+      pull_over_length = lane_segment.end_s - adc_front_edge_s;
+    } else {
+      pull_over_length += lane_segment.Length();
+    }
+    ADEBUG << "pull_over_length[" << pull_over_length << "]";
+    const double plan_distance = config_.pull_over().plan_distance();
+    if (pull_over_length > plan_distance) {
+      double const lane_s = lane_segment.Length() -
+          (pull_over_length - plan_distance);
+      apollo::common::PointENU stop_point =
+          lane_segment.lane->GetSmoothPoint(lane_s);
+      common::SLPoint stop_point_sl;
+      reference_line.XYToSL(stop_point, &stop_point_sl);
+      *stop_point_s = stop_point_sl.s();
+      ADEBUG << "stop point: lane[" << lane_segment.lane->id().id()
+          << "] lane_s[" << lane_s
+          << "] stop_point_s[" << *stop_point_s << "]";
+      return 0;
     }
   }
 
-  return true;
+  return -1;
+  */
 }
 
-int PullOver::BuildPullOverStop(const PointENU& stop_point,
-                                 double stop_heading) {
+int PullOver::BuildPullOverStop(const PointENU& start_point,
+                                const PointENU& stop_point,
+                                double stop_heading) {
   // check
   const auto& reference_line = reference_line_info_->reference_line();
   common::SLPoint sl;
@@ -183,10 +262,10 @@ int PullOver::BuildPullOverStop(const PointENU& stop_point,
   }
 
   // create virtual stop wall
-  std::stringstream ss;
-  ss << PULL_OVER_VO_ID_PREFIX << std::setprecision(5) << stop_point.x() << "_"
-     << stop_point.y();
-  const std::string virtual_obstacle_id = ss.str();
+  auto pull_over_reason = GetPlanningStatus()->
+      planning_state().pull_over().reason();
+  std::string virtual_obstacle_id = PULL_OVER_VO_ID_PREFIX +
+      PullOverStatus_Reason_Name(pull_over_reason);
   auto* obstacle = frame_->CreateStopObstacle(reference_line_info_,
                                               virtual_obstacle_id, sl.s());
   if (!obstacle) {
@@ -227,8 +306,10 @@ int PullOver::BuildPullOverStop(const PointENU& stop_point,
   pull_over_status->mutable_stop_point()->set_y(stop_point.y());
   pull_over_status->mutable_stop_point()->set_z(0.0);
   pull_over_status->set_stop_heading(stop_heading);
+  pull_over_status->mutable_start_point()->set_x(start_point.x());
+  pull_over_status->mutable_start_point()->set_y(start_point.y());
+  pull_over_status->mutable_start_point()->set_z(0.0);
 
-  ADEBUG << "BuildPullOverStop:" << pull_over_status->DebugString();
   return 0;
 }
 
