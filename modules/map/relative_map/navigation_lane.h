@@ -64,7 +64,7 @@ class NavigationLane {
     current_navi_path_ = nullptr;
   }
 
-  const NavigationPath& Path() {
+  const NavigationPath Path() {
     if (current_navi_path_) {
       return *current_navi_path_;
     }
