@@ -115,4 +115,6 @@ message Config {
   optional ImuType imu_type = 10;
   optional string proj4_text = 11;
   optional TF tf = 12;
+  // If given, the driver will send velocity info to novatel with command stream
+  optional string wheel_parameters = 13;
 }
