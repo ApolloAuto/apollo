@@ -238,10 +238,8 @@ bool ReferenceLineProvider::GetReferenceLines(
       std::unique_lock<std::mutex> lock(notify_mutex_);
       if (!cv_.wait_for(lock, std::chrono::milliseconds(10),
                         [this]() { return processed_; })) {
-        AERROR << "Failed to update the current reference line whin 10ms. ";
-        return false;
+        AWARN << "Failed to update the current reference line whin 10ms. ";
       }
-      // cv_.wait(lock, [this]() { return processed_; });
     }
 
     if (!reference_lines_.empty()) {
