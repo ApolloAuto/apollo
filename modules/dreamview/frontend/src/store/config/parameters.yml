@@ -74,6 +74,7 @@ options:
     showObstaclesVelocity: true
     showObstaclesHeading: true
     showObstaclesId: true
+    showObstaclesInfo: true
     showPointCloud: false
     showPositionGps: false
     showPositionLocalization: true
