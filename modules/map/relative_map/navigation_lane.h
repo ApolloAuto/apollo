@@ -65,10 +65,7 @@ class NavigationLane {
   }
 
   const NavigationPath& Path() {
-    if (current_navi_path_) {
       return *current_navi_path_;
-    }
-    return NavigationPath();
   }
 
   bool CreateMap(const MapGenerationParam& map_config, MapMsg* map_msg) const;
