@@ -30,6 +30,8 @@ using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
+using apollo::control::ControlCommand;
+using apollo::monitor::SystemStatus;
 
 std::string Guardian::Name() const { return FLAGS_module_name; }
 
@@ -37,8 +39,11 @@ Status Guardian::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
   CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
   AdapterManager::AddChassisCallback(&Guardian::OnChassis, this);
-  CHECK(AdapterManager::GetMonitor()) << "Monitor is not initialized.";
-  AdapterManager::AddMonitorCallback(&Guardian::OnChassis, this);
+  CHECK(AdapterManager::GetSystemStatus())
+      << "SystemStatus is not initialized.";
+  AdapterManager::AddSystemStatusCallback(&Guardian::OnSystemStatus, this);
+  CHECK(AdapterManager::GetControlCommand()) << "Control is not initialized.";
+  AdapterManager::AddControlCommandCallback(&Guardian::OnControl, this);
   return Status::OK();
 }
 
@@ -62,10 +67,16 @@ void Guardian::OnChassis(const Chassis& message) {
   chassis_.CopyFrom(message);
 }
 
-void Guardian::OnMonitor(const Chassis& message) {
-  ADEBUG << "Received chassis data: run chassis callback.";
+void Guardian::OnSystemStatus(const SystemStatus& message) {
+  ADEBUG << "Received monitor data: run monitor callback.";
   std::lock_guard<std::mutex> lock(mutex_);
-  monitor.CopyFrom(message);
+  system_status_.CopyFrom(message);
+}
+
+void Guardian::OnControl(const ControlCommand& message) {
+  ADEBUG << "Received control data: run control command callback.";
+  std::lock_guard<std::mutex> lock(mutex_);
+  control_cmd_.CopyFrom(message);
 }
 
 }  // namespace guardian

@@ -12,7 +12,8 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/guardian/common:guardian_gflags",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/monitor/proto:monitor_proto",
+        "//modules/control/proto:control_proto",
+        "//modules/monitor/proto:system_status_proto",
     ],
 )
 
