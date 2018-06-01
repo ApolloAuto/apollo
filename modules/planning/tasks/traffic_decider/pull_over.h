@@ -61,13 +61,15 @@ class PullOver : public TrafficRule {
                       common::PointENU* stop_point,
                       double* stop_heading);
 
+  bool OnOverlap(const double s);
+
   /**
    * Find a safe place to pull over based on the vehicle's current state.
    */
-  int SearchPullOverStop(double* stop_point_s);
-  int SearchPullOverStop(common::PointENU* start_point,
-                         common::PointENU* stop_point,
-                         double* stop_heading);
+  int FindPullOverStop(double* stop_point_s);
+  int FindPullOverStop(common::PointENU* start_point,
+                       common::PointENU* stop_point,
+                       double* stop_heading);
 
   /**
    * Check if a stop point is valid based on current vehicle status

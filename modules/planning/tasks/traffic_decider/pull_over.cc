@@ -38,6 +38,7 @@ using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneSegment;
+using apollo::hdmap::PathOverlap;
 using apollo::planning::util::GetPlanningStatus;
 
 PullOver::PullOver(const TrafficRuleConfig& config) : TrafficRule(config) {}
@@ -64,6 +65,9 @@ Status PullOver::ApplyRule(Frame* const frame,
   return Status::OK();
 }
 
+/**
+ * @brief: check if in pull_over state
+ */
 bool PullOver::IsPullOver() const {
   auto* planning_state = GetPlanningStatus()->mutable_planning_state();
   return (planning_state->has_pull_over() &&
@@ -77,6 +81,9 @@ bool PullOver::IsValidStop(const PointENU& start_point,
   return true;
 }
 
+/**
+ * @brief:get pull_over points(start & stop)
+ */
 int PullOver::GetPullOverStop(PointENU* start_point,
                               PointENU* stop_point,
                               double* stop_heading) {
@@ -97,14 +104,62 @@ int PullOver::GetPullOverStop(PointENU* start_point,
   }
 
   // calculate new stop point if don't have a pull over stop
-  return SearchPullOverStop(start_point, stop_point, stop_heading);
+  return FindPullOverStop(start_point, stop_point, stop_heading);
 }
 
-int PullOver::SearchPullOverStop(PointENU* start_point,
-                                 PointENU* stop_point,
-                                 double* stop_heading) {
+/**
+ * @brief: check if s is on overlaps
+ */
+bool PullOver::OnOverlap(const double s) {
+  const auto& reference_line = reference_line_info_->reference_line();
+
+  // crosswalk
+  const std::vector<PathOverlap>& crosswalk_overlaps =
+      reference_line.map_path().crosswalk_overlaps();
+  for (const auto& crosswalk_overlap : crosswalk_overlaps) {
+    if (s >= crosswalk_overlap.start_s && s <= crosswalk_overlap.end_s) {
+      return true;
+    }
+  }
+
+  // junction
+  const std::vector<PathOverlap>& junction_overlaps =
+      reference_line.map_path().junction_overlaps();
+  for (const auto& junction_overlap : junction_overlaps) {
+    if (s >= junction_overlap.start_s && s <= junction_overlap.end_s) {
+      return true;
+    }
+  }
+
+  // clear_area
+  const std::vector<PathOverlap>& clear_area_overlaps =
+      reference_line.map_path().clear_area_overlaps();
+  for (const auto& clear_area_overlap : clear_area_overlaps) {
+    if (s >= clear_area_overlap.start_s && s <= clear_area_overlap.end_s) {
+      return true;
+    }
+  }
+
+  // speed_bump
+  const std::vector<PathOverlap>& speed_bump_overlaps =
+      reference_line.map_path().speed_bump_overlaps();
+  for (const auto& speed_bump_overlap : speed_bump_overlaps) {
+    if (s >= speed_bump_overlap.start_s && s <= speed_bump_overlap.end_s) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * @brief: find pull over location(start & stop
+ */
+int PullOver::FindPullOverStop(PointENU* start_point,
+                               PointENU* stop_point,
+                               double* stop_heading) {
   double stop_point_s;
-  if (SearchPullOverStop(&stop_point_s) != 0) {
+  if (FindPullOverStop(&stop_point_s) != 0) {
     return -1;
   }
 
@@ -147,7 +202,7 @@ int PullOver::SearchPullOverStop(PointENU* start_point,
   return 0;
 }
 
-int PullOver::SearchPullOverStop(double* stop_point_s) {
+int PullOver::FindPullOverStop(double* stop_point_s) {
   const auto& reference_line = reference_line_info_->reference_line();
   const double adc_front_edge_s = reference_line_info_->AdcSlBoundary().end_s();
 
@@ -157,6 +212,7 @@ int PullOver::SearchPullOverStop(double* stop_point_s) {
 
   constexpr double kDistanceUnit = 5.0;
   while (total_check_length < config_.pull_over().max_check_distance()) {
+    check_s += kDistanceUnit;
     total_check_length += kDistanceUnit;
 
     // find next_lane to check
@@ -210,16 +266,21 @@ int PullOver::SearchPullOverStop(double* stop_point_s) {
       continue;
     }
 
+    // check if on overlaps
+    if (OnOverlap(check_s)) {
+      check_length = 0.0;
+      continue;
+    }
+
+    // all the checks passed
     check_length += kDistanceUnit;
-    if (check_length > config_.pull_over().plan_distance()) {
+    if (check_length >= config_.pull_over().plan_distance()) {
       *stop_point_s = check_s;
       ADEBUG << "stop point: lane[" << lane->id().id()
           << "] stop_point_s[" << *stop_point_s
           << "] adc_front_edge_s[" << adc_front_edge_s << "]";
       return 0;
     }
-
-    check_s += kDistanceUnit;
   }
 
   return -1;
