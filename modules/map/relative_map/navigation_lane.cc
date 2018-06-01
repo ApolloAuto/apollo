@@ -17,6 +17,7 @@
 #include "modules/map/relative_map/navigation_lane.h"
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 
 #include "modules/map/proto/map_lane.pb.h"
@@ -47,23 +48,78 @@ void NavigationLane::SetConfig(const NavigationLaneConfig &config) {
 }
 
 bool NavigationLane::GeneratePath() {
+  navigation_path_list_.clear();
+  current_navi_path_ = nullptr;
+
   // original_pose is in world coordination: ENU
   original_pose_ = VehicleStateProvider::instance()->original_pose();
 
-  navigation_path_.Clear();
-  auto *path = navigation_path_.mutable_path();
+  int navigation_line_num = navigation_info_.navigation_path_size();
   const auto &lane_marker = perception_obstacles_.lane_marker();
+
+  auto genrate_path_on_percetion = [this, &lane_marker]() {
+    current_navi_path_ = std::make_shared<NavigationPath>();
+    auto *path = current_navi_path_->mutable_path();
+    ConvertLaneMarkerToPath(lane_marker, path);
+  };
 
   // priority: merge > navigation line > perception lane marker
   if (config_.lane_source() == NavigationLaneConfig::OFFLINE_GENERATED &&
-      navigation_info_.navigation_path_size() > 0) {
-    ConvertNavigationLineToPath(path);
-    if (path->path_point().size() == 0) {
-      ConvertLaneMarkerToPath(lane_marker, path);
+      navigation_line_num > 0) {
+    // Generate multiple navigation paths based on navigation lines.
+    // Don't worry about efficiency because the total number of navigation lines
+    // will not exceed 10 at most.
+    for (int i = 0; i < navigation_line_num; ++i) {
+      auto current_navi_path = std::make_shared<NavigationPath>();
+      auto *path = current_navi_path->mutable_path();
+      if (ConvertNavigationLineToPath(path, i)) {
+        navigation_path_list_.emplace_back(i, current_navi_path);
+      }
     }
-  } else {
-    ConvertLaneMarkerToPath(lane_marker, path);
+
+    // If no navigation path is generated based on navigation lines, we generate
+    // one where the vehicle is located based on perceived lane markers.
+    if (navigation_path_list_.empty()) {
+      genrate_path_on_percetion();
+      return true;
+    }
+
+    // Sort navigation paths from left to right according to the vehicle's
+    // direction.
+    // In the FLU vehicle coordinate system, the y-coordinate on the left side
+    // of the vehicle is positive, and the y-coordinate on the right side of the
+    // vehicle is negative. The navigation paths can be sorted from left to
+    // right according to the y-coordinate.
+    navigation_path_list_.sort(
+        [this](const NaviPathPair &left, const NaviPathPair &right) {
+          double left_y = left.second->path().path_point(0).y();
+          double right_y = right.second->path().path_point(0).y();
+          return left_y > right_y;
+        });
+
+    // Get which navigation path the vehicle is currently on.
+    int current_line_index = 0;
+    double min_d = std::numeric_limits<double>::max();
+    for (const auto &navi_path_pair : navigation_path_list_) {
+      AINFO << "Current navigation path index is: " << navi_path_pair.first;
+      double current_d = last_project_index_map_[navi_path_pair.first].second;
+      if (current_d < min_d) {
+        min_d = current_d;
+        current_line_index = navi_path_pair.first;
+        current_navi_path_ = navi_path_pair.second;
+      }
+    }
+
+    // Merge current navigation path where the vehicle is located with perceived
+    // lane markers.
+    auto *path = current_navi_path_->mutable_path();
+    MergeNavigationLineAndLaneMarker(path, current_line_index);
+    return true;
   }
+
+  // Generate a navigation path where the vehicle is located based on perceived
+  // lane markers.
+  genrate_path_on_percetion();
   return true;
 }
 
@@ -73,11 +129,12 @@ double NavigationLane::EvaluateCubicPolynomial(const double c0, const double c1,
   return ((c3 * z + c2) * z + c1) * z + c0;
 }
 
-void NavigationLane::MergeNavigationLineAndLaneMarker(common::Path *path) {
+void NavigationLane::MergeNavigationLineAndLaneMarker(common::Path *path,
+                                                      int line_index) {
   CHECK_NOTNULL(path);
 
   common::Path navigation_path;
-  ConvertNavigationLineToPath(&navigation_path);
+  ConvertNavigationLineToPath(&navigation_path, line_index);
 
   common::Path lane_marker_path;
   ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(),
@@ -127,40 +184,43 @@ common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
   return p;
 }
 
-void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
+bool NavigationLane::ConvertNavigationLineToPath(common::Path *path,
+                                                 int line_index) {
   CHECK_NOTNULL(path);
-  if (navigation_info_.navigation_path_size() == 0 ||
-      !navigation_info_.navigation_path(0).has_path() ||
-      navigation_info_.navigation_path(0).path().path_point_size() == 0) {
+  if (!navigation_info_.navigation_path(line_index).has_path() ||
+      navigation_info_.navigation_path(line_index).path().path_point_size() ==
+          0) {
     // path is empty
-    return;
+    return false;
   }
-  path->set_name("Path from navigation.");
-  const auto &navigation_path = navigation_info_.navigation_path(0).path();
-  if (!UpdateProjectionIndex(navigation_path)) {
-    return;
-  }
-
-  // TODO(All): support multiple navigation path
-  // currently, only 1 navigation path is supported
-  int curr_project_index = last_project_index_;
-  if (curr_project_index < 0 ||
-      curr_project_index >= navigation_path.path_point_size()) {
-    AERROR << "Invalid projection index " << curr_project_index;
-    return;
+  path->set_name("Path from navigation line index " +
+                 std::to_string(line_index));
+  const auto &navigation_path =
+      navigation_info_.navigation_path(line_index).path();
+  auto proj_index_pair = UpdateProjectionIndex(navigation_path, line_index);
+  // Can't find a proper projection index in the "line_index" lane according to
+  // current vehicle position.
+  int current_project_index = proj_index_pair.first;
+  if (current_project_index < 0 ||
+      current_project_index >= navigation_path.path_point_size()) {
+    AINFO << "Invalid projection index " << current_project_index << " in line "
+          << line_index;
+    return false;
+  } else {
+    last_project_index_map_[line_index] = proj_index_pair;
   }
 
   double dist = navigation_path.path_point().rbegin()->s() -
-                navigation_path.path_point(curr_project_index).s();
+                navigation_path.path_point(current_project_index).s();
   if (dist < 20) {
-    return;
+    return false;
   }
 
   // offset between the current vehicle state and navigation line
   const double dx = -original_pose_.position().x();
   const double dy = -original_pose_.position().y();
-  const double ref_s = navigation_path.path_point(curr_project_index).s();
-  for (int i = std::max(0, curr_project_index - 3);
+  const double ref_s = navigation_path.path_point(current_project_index).s();
+  for (int i = std::max(0, current_project_index - 3);
        i < navigation_path.path_point_size(); ++i) {
     auto *point = path->add_path_point();
     point->CopyFrom(navigation_path.path_point(i));
@@ -186,18 +246,24 @@ void NavigationLane::ConvertNavigationLineToPath(common::Path *path) {
       break;
     }
   }
+
+  return true;
 }
 
 // project adc_state_ onto path
-bool NavigationLane::UpdateProjectionIndex(const common::Path &path) {
-  // TODO(All): support multiple navigation path
-  // currently, only 1 navigation path is supported
+ProjIndexPair NavigationLane::UpdateProjectionIndex(const common::Path &path,
+                                                    int line_index) {
   int index = 0;
   double min_d = std::numeric_limits<double>::max();
   const int path_size = path.path_point_size();
+  int current_project_index = 0;
+  auto item_iter = last_project_index_map_.find(line_index);
+  if (item_iter != last_project_index_map_.end()) {
+    current_project_index = std::max(0, item_iter->second.first);
+  }
 
   if (FLAGS_enable_cyclic_rerouting) {
-    // We create a condition here that sets the "last_project_index_" to 0,
+    // We create a condition here that sets the "current_project_index" to 0,
     // should the vehicle reach the end point of a cyclic/circular route. For
     // cyclic/circular navigation lines where the distance between their
     // starting and end points is very small, it is tedious and unnecessary to
@@ -205,38 +271,39 @@ bool NavigationLane::UpdateProjectionIndex(const common::Path &path) {
     // end point cannot be completely consistent in a cyclic/circular navigaton
     // line. The vehicle's end point is usually beyond the starting point a
     // little when making a cyclic/circular navigation line. Therefore, the
-    // "last_project_index_" is reset to 0 if it is greater than 95% size of the
-    // navigaton line and the vehicle's current position is near the starting
-    // point of the navigatoin line.
+    // "current_project_index" is reset to 0 if it is larger than 95% size of
+    // the navigaton line and the vehicle's current position is near the
+    // starting point of the navigatoin line.
     const int near_end_size = static_cast<int>(path_size * 0.95);
-    if (last_project_index_ > near_end_size &&
-        last_project_index_ < path_size) {
-      if (DistanceXY(path.path_point(0), path.path_point(last_project_index_)) <
-              FLAGS_max_distance_to_navigation_line &&
-          DistanceXY(original_pose_.position(), path.path_point(0)) <
-              FLAGS_max_distance_to_navigation_line) {
-        last_project_index_ = 0;
-        return true;
+    if (current_project_index > near_end_size &&
+        current_project_index < path_size) {
+      if (DistanceXY(path.path_point(0),
+                     path.path_point(current_project_index)) <
+          FLAGS_max_distance_to_navigation_line) {
+        min_d = DistanceXY(original_pose_.position(), path.path_point(0));
+        if (min_d < FLAGS_max_distance_to_navigation_line) {
+          return std::make_pair(0, min_d);
+        }
       }
     }
   }
 
-  for (int i = last_project_index_; i + 1 < path_size; ++i) {
+  for (int i = current_project_index; i + 1 < path_size; ++i) {
     const double d = DistanceXY(original_pose_.position(), path.path_point(i));
     if (d < min_d) {
       min_d = d;
       index = i;
     }
     const double kMaxDistance = 50.0;
-    if (last_project_index_ != 0 && d > kMaxDistance) {
+    if (current_project_index != 0 && d > kMaxDistance) {
       break;
     }
   }
+
   if (min_d > FLAGS_max_distance_to_navigation_line) {
-    return false;
+    return std::make_pair(-1, std::numeric_limits<double>::max());
   }
-  last_project_index_ = index;
-  return true;
+  return std::make_pair(index, min_d);
 }
 
 double NavigationLane::GetKappa(const double c1, const double c2,
@@ -322,75 +389,106 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
   auto *hdmap = map_msg->mutable_hdmap();
   auto *lane_marker = map_msg->mutable_lane_marker();
 
+  // A lambda expression for creating map.
+  auto create_map_func = [&](const std::shared_ptr<NavigationPath> &navi_path) {
+    const auto &path = navi_path->path();
+    if (path.path_point_size() < 2) {
+      AERROR << "The path length of line index is invalid";
+      return false;
+    }
+    auto *lane = hdmap->add_lane();
+    lane->mutable_id()->set_id(std::to_string(navi_path->path_priority()) +
+                               "_" + path.name());
+    (*navigation_info)[lane->id().id()] = *navi_path;
+    // lane types
+    lane->set_type(Lane::CITY_DRIVING);
+    lane->set_turn(Lane::NO_TURN);
+
+    // speed limit
+    lane->set_speed_limit(map_config.default_speed_limit());
+
+    // center line
+    auto *curve_segment = lane->mutable_central_curve()->add_segment();
+    curve_segment->set_heading(path.path_point(0).theta());
+    auto *line_segment = curve_segment->mutable_line_segment();
+    // left boundary
+    auto *left_boundary = lane->mutable_left_boundary();
+    auto *left_boundary_type = left_boundary->add_boundary_type();
+    left_boundary->set_virtual_(false);
+    left_boundary_type->set_s(0.0);
+    left_boundary_type->add_types(
+        perception_obstacles_.lane_marker().left_lane_marker().lane_type());
+    auto *left_segment =
+        left_boundary->mutable_curve()->add_segment()->mutable_line_segment();
+    // right boundary
+    auto *right_boundary = lane->mutable_right_boundary();
+    auto *right_boundary_type = right_boundary->add_boundary_type();
+    right_boundary->set_virtual_(false);
+    right_boundary_type->set_s(0.0);
+    right_boundary_type->add_types(
+        perception_obstacles_.lane_marker().right_lane_marker().lane_type());
+    auto *right_segment =
+        right_boundary->mutable_curve()->add_segment()->mutable_line_segment();
+
+    const double lane_left_width =
+        left_width_ <= 0.0
+            ? map_config.default_left_width()
+            : common::math::Clamp(left_width_, FLAGS_min_lane_half_width,
+                                  FLAGS_max_lane_half_width);
+    const double lane_right_width =
+        right_width_ <= 0.0
+            ? map_config.default_right_width()
+            : common::math::Clamp(right_width_, FLAGS_min_lane_half_width,
+                                  FLAGS_max_lane_half_width);
+
+    for (const auto &path_point : path.path_point()) {
+      auto *point = line_segment->add_point();
+      point->set_x(path_point.x());
+      point->set_y(path_point.y());
+      point->set_z(path_point.z());
+      auto *left_sample = lane->add_left_sample();
+      left_sample->set_s(path_point.s());
+      left_sample->set_width(lane_left_width);
+      left_segment->add_point()->CopyFrom(
+          *point + lane_left_width *
+                       Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
+
+      auto *right_sample = lane->add_right_sample();
+      right_sample->set_s(path_point.s());
+      right_sample->set_width(lane_right_width);
+      right_segment->add_point()->CopyFrom(
+          *point + lane_right_width *
+                       Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
+    }
+    return true;
+  };
+
   lane_marker->CopyFrom(perception_obstacles_.lane_marker());
 
-  const auto &path = navigation_path_.path();
-  if (path.path_point_size() < 2) {
-    AERROR << "The path length is invalid";
-    return false;
+  // If no navigation path is generated based on navigation lines, we try to
+  // create map with "current_navi_path_" which is generated based on perceived
+  // lane markers.
+  if (navigation_path_list_.empty()) {
+    if (current_navi_path_) {
+      return create_map_func(current_navi_path_);
+    } else {
+      return false;
+    }
   }
-  auto *lane = hdmap->add_lane();
-  lane->mutable_id()->set_id(std::to_string(navigation_path_.path_priority()) +
-                             "_" + path.name());
-  (*navigation_info)[lane->id().id()] = navigation_path_;
-  // lane types
-  lane->set_type(Lane::CITY_DRIVING);
-  lane->set_turn(Lane::NO_TURN);
 
-  // speed limit
-  lane->set_speed_limit(map_config.default_speed_limit());
+  for (auto iter = navigation_path_list_.cbegin();
+       iter != navigation_path_list_.cend(); ++iter) {
+    if (!create_map_func(iter->second)) {
+      return false;
+    }
 
-  // center line
-  auto *curve_segment = lane->mutable_central_curve()->add_segment();
-  curve_segment->set_heading(path.path_point(0).theta());
-  auto *line_segment = curve_segment->mutable_line_segment();
-  // left boundary
-  auto *left_boundary = lane->mutable_left_boundary();
-  auto *left_boundary_type = left_boundary->add_boundary_type();
-  left_boundary->set_virtual_(false);
-  left_boundary_type->set_s(0.0);
-  left_boundary_type->add_types(
-      perception_obstacles_.lane_marker().left_lane_marker().lane_type());
-  auto *left_segment =
-      left_boundary->mutable_curve()->add_segment()->mutable_line_segment();
-  // right boundary
-  auto *right_boundary = lane->mutable_right_boundary();
-  auto *right_boundary_type = right_boundary->add_boundary_type();
-  right_boundary->set_virtual_(false);
-  right_boundary_type->set_s(0.0);
-  right_boundary_type->add_types(
-      perception_obstacles_.lane_marker().right_lane_marker().lane_type());
-  auto *right_segment =
-      right_boundary->mutable_curve()->add_segment()->mutable_line_segment();
-
-  const double lane_left_width =
-      left_width_ <= 0.0
-          ? map_config.default_left_width()
-          : common::math::Clamp(left_width_, FLAGS_min_lane_half_width,
-                                FLAGS_max_lane_half_width);
-  const double lane_right_width =
-      right_width_ <= 0.0
-          ? map_config.default_right_width()
-          : common::math::Clamp(right_width_, FLAGS_min_lane_half_width,
-                                FLAGS_max_lane_half_width);
-
-  for (const auto &path_point : path.path_point()) {
-    auto *point = line_segment->add_point();
-    point->set_x(path_point.x());
-    point->set_y(path_point.y());
-    point->set_z(path_point.z());
-    auto *left_sample = lane->add_left_sample();
-    left_sample->set_s(path_point.s());
-    left_sample->set_width(lane_left_width);
-    left_segment->add_point()->CopyFrom(
-        *point +
-        lane_left_width * Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
-    auto *right_sample = lane->add_right_sample();
-    right_sample->set_s(path_point.s());
-    right_sample->set_width(lane_right_width);
-    right_segment->add_point()->CopyFrom(
-        *point +
-        lane_right_width * Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
+    // The left border of the middle lane uses the right border of the left
+    // lane.
+    std::size_t index = std::distance(navigation_path_list_.cbegin(), iter);
+    if (index > 0) {
+      auto *left_sample = hdmap->mutable_lane(index)->mutable_left_sample();
+      left_sample->CopyFrom(hdmap->lane(index - 1).right_sample());
+    }
   }
 
   return true;
