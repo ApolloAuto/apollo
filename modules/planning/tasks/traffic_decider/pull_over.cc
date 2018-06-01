@@ -51,14 +51,15 @@ Status PullOver::ApplyRule(Frame* const frame,
     return Status::OK();
   }
 
+  PointENU start_point;
   PointENU stop_point;
   double stop_heading = 0.0;
-  if (GetPullOverStop(&stop_point, &stop_heading) != 0) {
+  if (GetPullOverStop(&start_point, &stop_point, &stop_heading) != 0) {
     ADEBUG << "Could not find a safe pull over point";
     return Status::OK();
   }
 
-  BuildPullOverStop(stop_point, stop_heading);
+  BuildPullOverStop(start_point, stop_point, stop_heading);
 
   return Status::OK();
 }
@@ -69,20 +70,26 @@ bool PullOver::IsPullOver() const {
       planning_state->pull_over().in_pull_over());
 }
 
-bool PullOver::IsValidStop(const PointENU& stop_point,
+bool PullOver::IsValidStop(const PointENU& start_point,
+                           const PointENU& stop_point,
                            double stop_heading) const {
   // TODO(all) implement this function
   return true;
 }
 
-int PullOver::GetPullOverStop(PointENU* stop_point, double* stop_heading) {
+int PullOver::GetPullOverStop(PointENU* start_point,
+                              PointENU* stop_point,
+                              double* stop_heading) {
   auto&  pull_over_status = GetPlanningStatus()->
       mutable_planning_state()->pull_over();
   // reuse existing stop point
-  if (pull_over_status.has_stop_point() &&
+  if (pull_over_status.has_start_point() &&
+      pull_over_status.has_stop_point() &&
       pull_over_status.has_stop_heading()) {
-    if (IsValidStop(pull_over_status.stop_point(),
+    if (IsValidStop(pull_over_status.start_point(),
+                    pull_over_status.stop_point(),
                     pull_over_status.stop_heading())) {
+      *start_point = pull_over_status.start_point();
       *stop_point = pull_over_status.stop_point();
       *stop_heading = pull_over_status.stop_heading();
       return 0;
@@ -90,10 +97,12 @@ int PullOver::GetPullOverStop(PointENU* stop_point, double* stop_heading) {
   }
 
   // calculate new stop point if don't have a pull over stop
-  return SearchPullOverStop(stop_point, stop_heading);
+  return SearchPullOverStop(start_point, stop_point, stop_heading);
 }
 
-int PullOver::SearchPullOverStop(PointENU* stop_point, double* stop_heading) {
+int PullOver::SearchPullOverStop(PointENU* start_point,
+                                 PointENU* stop_point,
+                                 double* stop_heading) {
   double stop_point_s;
   if (SearchPullOverStop(&stop_point_s) != 0) {
     return -1;
@@ -125,6 +134,13 @@ int PullOver::SearchPullOverStop(PointENU* stop_point, double* stop_heading) {
   stop_point->set_x(point.x());
   stop_point->set_y(point.y());
   *stop_heading = heading;
+
+  common::SLPoint start_point_sl;
+  start_point_sl.set_s(stop_point_s - config_.pull_over().plan_distance());
+  start_point_sl.set_l(0.0);
+  reference_line.SLToXY(start_point_sl, &point);
+  start_point->set_x(point.x());
+  start_point->set_y(point.y());
 
   ADEBUG << "stop_point(" << stop_point->x() << ", " << stop_point->y()
       << ") heading[" << *stop_heading << "]";
@@ -234,8 +250,9 @@ int PullOver::SearchPullOverStop(double* stop_point_s) {
   */
 }
 
-int PullOver::BuildPullOverStop(const PointENU& stop_point,
-                                 double stop_heading) {
+int PullOver::BuildPullOverStop(const PointENU& start_point,
+                                const PointENU& stop_point,
+                                double stop_heading) {
   // check
   const auto& reference_line = reference_line_info_->reference_line();
   common::SLPoint sl;
@@ -289,6 +306,9 @@ int PullOver::BuildPullOverStop(const PointENU& stop_point,
   pull_over_status->mutable_stop_point()->set_y(stop_point.y());
   pull_over_status->mutable_stop_point()->set_z(0.0);
   pull_over_status->set_stop_heading(stop_heading);
+  pull_over_status->mutable_start_point()->set_x(start_point.x());
+  pull_over_status->mutable_start_point()->set_y(start_point.y());
+  pull_over_status->mutable_start_point()->set_z(0.0);
 
   return 0;
 }
