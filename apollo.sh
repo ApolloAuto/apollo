@@ -133,6 +133,11 @@ function build() {
     fail 'Build failed!'
   fi
 
+  # build drivers
+  build_gnss
+  build_velodyne
+  build_usbcam
+
   # Build python proto
   build_py_proto
 
