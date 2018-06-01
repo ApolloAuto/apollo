@@ -276,8 +276,10 @@ bool RawStream::Init() {
 void RawStream::Start() {
   data_thread_ptr_.reset(new std::thread(&RawStream::DataSpin, this));
   rtk_thread_ptr_.reset(new std::thread(&RawStream::RtkSpin, this));
-  wheel_velocity_timer_ = AdapterManager::CreateTimer(
+  if (config_.has_wheel_parameters()) {
+    wheel_velocity_timer_ = AdapterManager::CreateTimer(
       ros::Duration(1), &RawStream::OnWheelVelocityTimer, this);
+  }
 }
 
 void RawStream::OnWheelVelocityTimer(const ros::TimerEvent&) {
@@ -287,14 +289,13 @@ void RawStream::OnWheelVelocityTimer(const ros::TimerEvent&) {
     return;
   }
   auto chassis = AdapterManager::GetChassis()->GetLatestObservedPtr();
-  auto cmd_setwheelparameters = "SETWHEELPARAMETERS 100 1 1\r\n";
   auto latency_sec =
       ros::Time::now().toSec() - chassis->header().timestamp_sec();
   auto latency_ms = std::to_string(std::lround(latency_sec * 1000));
   auto speed_cmps = std::to_string(std::lround(chassis->speed_mps() * 100));
   auto cmd_wheelvelocity = "WHEELVELOCITY " + latency_ms
-                           + " 100 0 0 0 0 " + speed_cmps + "\r\n";
-  command_stream_->write(cmd_setwheelparameters);
+                           + " 100 0 0 0 0 0 " + speed_cmps + "\r\n";
+  AINFO << "Write command: " << cmd_wheelvelocity;
   command_stream_->write(cmd_wheelvelocity);
 }
 
@@ -389,19 +390,25 @@ bool RawStream::Disconnect() {
 bool RawStream::Login() {
   std::vector<std::string> login_data;
   for (const auto &login_command : config_.login_commands()) {
-    command_stream_->write(login_command);
+    data_stream_->write(login_command);
     login_data.emplace_back(login_command);
     AINFO << "Login command: " << login_command;
     // sleep a little to avoid overun of the slow serial interface.
     ros::Duration(0.5).sleep();
   }
-  command_stream_->RegisterLoginData(login_data);
+  data_stream_->RegisterLoginData(login_data);
+
+  if (config_.has_wheel_parameters()) {
+    AINFO << "Write command: " << config_.wheel_parameters();
+    command_stream_->write(config_.wheel_parameters());
+  }
+
   return true;
 }
 
 bool RawStream::Logout() {
   for (const auto &logout_command : config_.logout_commands()) {
-    command_stream_->write(logout_command);
+    data_stream_->write(logout_command);
     AINFO << "Logout command: " << logout_command;
   }
   return true;
