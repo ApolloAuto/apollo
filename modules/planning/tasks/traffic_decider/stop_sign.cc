@@ -29,7 +29,6 @@
 
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/frame.h"

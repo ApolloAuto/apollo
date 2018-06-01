@@ -31,8 +31,9 @@ message PullOverStatus {
   optional bool in_pull_over = 1 [default=false];
   optional apollo.common.PointENU stop_point = 2;
   optional double stop_heading = 3;
-  optional Reason reason = 4;
-  optional double start_time = 5;
+  optional apollo.common.PointENU start_point = 4;
+  optional Reason reason = 5;
+  optional double start_time = 6;
 }
 
 message ReroutingStatus {
