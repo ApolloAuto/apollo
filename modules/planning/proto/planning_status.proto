@@ -5,7 +5,6 @@ package apollo.planning;
 import "modules/planning/proto/decision.proto";
 import "modules/common/proto/drive_state.proto";
 import "modules/common/proto/geometry.proto";
-import "modules/common/proto/pnc_point.proto";
 
 /*
   This file defines the data types that represents the internal state of the planning module.
@@ -30,8 +29,8 @@ message PullOverStatus {
     DESTINATION = 1; // upon arriving destination
   }
   optional bool in_pull_over = 1 [default=false];
-  optional apollo.common.SLPoint start_point_sl = 2;
-  optional apollo.common.SLPoint stop_point_sl = 3;
+  optional apollo.common.PointENU start_point = 2;
+  optional apollo.common.PointENU stop_point = 3;
   optional double stop_point_heading = 4;
   optional Reason reason = 5;
   optional double status_set_time = 6;
