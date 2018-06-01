@@ -75,9 +75,10 @@ message KeepClearConfig {
 message PullOverConfig {
     optional double max_stop_deceleration = 1 [default=-2.0];
     optional double stop_distance = 2 [default=0.5];
-    optional double pull_over_l_buffer = 3 [default=0.];
-    optional double plan_distance = 4 [default=20.0];
-    optional double max_check_distance = 5 [ default=60.0];
+    optional double max_stop_speed = 3 [ default=0.2 ]; // m/s
+    optional double pull_over_l_buffer = 4 [default=0.];
+    optional double plan_distance = 5 [default=20.0];
+    optional double max_check_distance = 6 [ default=60.0];
 }
 
 message ReferenceLineEndConfig {
