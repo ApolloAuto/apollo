@@ -95,11 +95,12 @@ int PullOver::GetPullOverStop(common::SLPoint* stop_point_sl) {
   auto&  pull_over_status = GetPlanningStatus()->
       mutable_planning_state()->pull_over();
   // reuse existing stop point
-  if (pull_over_status.has_start_point_sl() &&
-      pull_over_status.has_stop_point_sl()) {
+  if (pull_over_status.has_start_point() &&
+      pull_over_status.has_stop_point()) {
     if (IsValidStop()) {
-      stop_point_sl->set_s(pull_over_status.stop_point_sl().s());
-      stop_point_sl->set_l(pull_over_status.stop_point_sl().l());
+      const auto& reference_line = reference_line_info_->reference_line();
+      reference_line.XYToSL({pull_over_status.stop_point().x(),
+        pull_over_status.stop_point().y()}, stop_point_sl);
       return 0;
     }
   }
@@ -295,7 +296,8 @@ int PullOver::BuildPullOverStop(const common::SLPoint stop_point_sl) {
   }
 
   // build stop decision
-  auto stop_point = reference_line.GetReferencePoint(stop_point_sl.s());
+  common::math::Vec2d stop_point;
+  reference_line.SLToXY(stop_point_sl, &stop_point);
   double stop_point_heading =
       reference_line.GetReferencePoint(stop_point_sl.s()).heading();
 
@@ -322,11 +324,18 @@ int PullOver::BuildPullOverStop(const common::SLPoint stop_point_sl) {
   // record in PlanningStatus
   auto* pull_over_status = GetPlanningStatus()->
       mutable_planning_state()->mutable_pull_over();
-  pull_over_status->mutable_start_point_sl()->set_s(
+
+  common::SLPoint start_point_sl;
+  start_point_sl.set_s(
       stop_point_sl.s() - config_.pull_over().plan_distance());
-  pull_over_status->mutable_start_point_sl()->set_l(0.0);
-  pull_over_status->mutable_stop_point_sl()->set_s(stop_point_sl.s());
-  pull_over_status->mutable_stop_point_sl()->set_l(stop_point_sl.l());
+  start_point_sl.set_l(0.0);
+  common::math::Vec2d start_point;
+  reference_line.SLToXY(start_point_sl, &start_point);
+  pull_over_status->mutable_start_point()->set_x(start_point.x());
+  pull_over_status->mutable_start_point()->set_y(start_point.y());
+
+  pull_over_status->mutable_stop_point()->set_x(stop_point.x());
+  pull_over_status->mutable_stop_point()->set_y(stop_point.y());
   pull_over_status->set_stop_point_heading(stop_point_heading);
 
   return 0;
