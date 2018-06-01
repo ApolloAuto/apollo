@@ -98,14 +98,12 @@ bool NavigationLane::GeneratePath() {
         });
 
     // Get which navigation path the vehicle is currently on.
-    int current_line_index = 0;
     double min_d = std::numeric_limits<double>::max();
     for (const auto &navi_path_pair : navigation_path_list_) {
       AINFO << "Current navigation path index is: " << navi_path_pair.first;
       double current_d = last_project_index_map_[navi_path_pair.first].second;
       if (current_d < min_d) {
         min_d = current_d;
-        current_line_index = navi_path_pair.first;
         current_navi_path_ = navi_path_pair.second;
       }
     }
@@ -471,15 +469,17 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
       left_sample->set_s(path_point.s());
       left_sample->set_width(lane_left_width);
       left_segment->add_point()->CopyFrom(
-          *point + lane_left_width *
-                       Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
+          *point +
+          lane_left_width *
+              Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
 
       auto *right_sample = lane->add_right_sample();
       right_sample->set_s(path_point.s());
       right_sample->set_width(lane_right_width);
       right_segment->add_point()->CopyFrom(
-          *point + lane_right_width *
-                       Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
+          *point +
+          lane_right_width *
+              Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
     }
     return true;
   };
