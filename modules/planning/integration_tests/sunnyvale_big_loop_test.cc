@@ -622,11 +622,11 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
               planning_state->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
 
-  double stop_point_s_0 = planning_state->pull_over().stop_point_s();
-  double stop_point_l_0 = planning_state->pull_over().stop_point_l();
+  common::SLPoint start_point_sl_0 =
+      planning_state->pull_over().start_point_sl();
+  common::SLPoint stop_point_sl_0 = planning_state->pull_over().stop_point_sl();
   double stop_point_heading_0 =
       planning_state->pull_over().stop_point_heading();
-  double start_point_s_0 = planning_state->pull_over().start_point_s();
   double status_set_time_0 = planning_state->pull_over().status_set_time();
 
   // check PULL OVER decision
@@ -636,17 +636,18 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
               planning_state->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
 
-  double stop_point_s_1 = planning_state->pull_over().stop_point_s();
-  double stop_point_l_1 = planning_state->pull_over().stop_point_l();
+  common::SLPoint start_point_sl_1 =
+      planning_state->pull_over().start_point_sl();
+  common::SLPoint stop_point_sl_1 = planning_state->pull_over().stop_point_sl();
   double stop_point_heading_1 =
       planning_state->pull_over().stop_point_heading();
-  double start_point_s_1 = planning_state->pull_over().start_point_s();
   double status_set_time_1 = planning_state->pull_over().status_set_time();
 
-  EXPECT_EQ(stop_point_s_0, stop_point_s_1);
-  EXPECT_EQ(stop_point_l_0, stop_point_l_1);
+  EXPECT_EQ(start_point_sl_0.s(), start_point_sl_1.s());
+  EXPECT_EQ(start_point_sl_0.l(), start_point_sl_1.l());
+  EXPECT_EQ(stop_point_sl_0.s(), stop_point_sl_1.s());
+  EXPECT_EQ(stop_point_sl_0.l(), stop_point_sl_1.l());
   EXPECT_EQ(stop_point_heading_0, stop_point_heading_1);
-  EXPECT_EQ(start_point_s_0, start_point_s_1);
   EXPECT_EQ(status_set_time_0, status_set_time_1);
 }
 
