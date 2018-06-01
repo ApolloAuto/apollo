@@ -11,6 +11,8 @@ cc_library(
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/guardian/common:guardian_gflags",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/monitor/proto:monitor_proto",
     ],
 )
 
