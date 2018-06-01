@@ -112,8 +112,9 @@ bool NavigationLane::GeneratePath() {
 
     // Merge current navigation path where the vehicle is located with perceived
     // lane markers.
-    auto *path = current_navi_path_->mutable_path();
-    MergeNavigationLineAndLaneMarker(path, current_line_index);
+    // Incorrect, don't use it temporarily.
+    // auto *path = current_navi_path_->mutable_path();
+    // MergeNavigationLineAndLaneMarker(path, current_line_index);
     return true;
   }
 
@@ -132,13 +133,33 @@ double NavigationLane::EvaluateCubicPolynomial(const double c0, const double c1,
 void NavigationLane::MergeNavigationLineAndLaneMarker(common::Path *path,
                                                       int line_index) {
   CHECK_NOTNULL(path);
+  common::Path local_navi_path;
+  common::Path &navigation_path = local_navi_path;
 
-  common::Path navigation_path;
-  ConvertNavigationLineToPath(&navigation_path, line_index);
+  // If "path" is non-empty, it indicates that a navigation path has been
+  // generated based on a navigation line and does not need to be generated
+  // again.
+  if (path->path_point_size() > 0) {
+    navigation_path = *path;
+  } else {
+    ConvertNavigationLineToPath(&navigation_path, line_index);
+  }
+  // If the size of current navigation path points is smaller than 2, just
+  // generate a navigation path based on perceived lane markers.
+  if (navigation_path.path_point_size() < 2) {
+    ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
+    return;
+  }
 
   common::Path lane_marker_path;
   ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(),
                           &lane_marker_path);
+
+  // If the size of lane marker path points is smaller than 2, merging is not
+  // required.
+  if (lane_marker_path.path_point_size() < 2) {
+    return;
+  }
 
   const double len = std::fmin(
       navigation_path.path_point(navigation_path.path_point_size() - 1).s(),
@@ -486,6 +507,8 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
     // lane.
     std::size_t index = std::distance(navigation_path_list_.cbegin(), iter);
     if (index > 0) {
+      auto *left_boundary = hdmap->mutable_lane(index)->mutable_left_boundary();
+      left_boundary->CopyFrom(hdmap->lane(index - 1).right_boundary());
       auto *left_sample = hdmap->mutable_lane(index)->mutable_left_sample();
       left_sample->CopyFrom(hdmap->lane(index - 1).right_sample());
     }
