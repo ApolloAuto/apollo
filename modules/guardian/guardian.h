@@ -29,6 +29,7 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
+#include "modules/monitor/proto/monitor.pb.h"
 #include "ros/include/ros/ros.h"
 
 /**
@@ -47,6 +48,12 @@ class Guardian : public apollo::common::ApolloApp {
 
  private:
   void OnTimer(const ros::TimerEvent&);
+  void OnChassis(const apollo::canbus::Chassis& message);
+  void OnMonitor(const apollo::monitor::Monitor& message);
+
+  apollo::canbus::Chassis chassis_;
+  apollo::monitor::Monitor monitor_;
+  std::mutex mutex_;
 
   ros::Timer timer_;
 };

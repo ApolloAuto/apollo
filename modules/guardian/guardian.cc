@@ -35,6 +35,10 @@ std::string Guardian::Name() const { return FLAGS_module_name; }
 
 Status Guardian::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
+  CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
+  AdapterManager::AddChassisCallback(&Guardian::OnChassis, this);
+  CHECK(AdapterManager::GetMonitor()) << "Monitor is not initialized.";
+  AdapterManager::AddMonitorCallback(&Guardian::OnChassis, this);
   return Status::OK();
 }
 
@@ -50,6 +54,18 @@ void Guardian::Stop() { timer_.stop(); }
 
 void Guardian::OnTimer(const ros::TimerEvent&) {
   ADEBUG << "Timer is triggered: publish Guardian result";
+}
+
+void Guardian::OnChassis(const Chassis& message) {
+  ADEBUG << "Received chassis data: run chassis callback.";
+  std::lock_guard<std::mutex> lock(mutex_);
+  chassis_.CopyFrom(message);
+}
+
+void Guardian::OnMonitor(const Chassis& message) {
+  ADEBUG << "Received chassis data: run chassis callback.";
+  std::lock_guard<std::mutex> lock(mutex_);
+  monitor.CopyFrom(message);
 }
 
 }  // namespace guardian
