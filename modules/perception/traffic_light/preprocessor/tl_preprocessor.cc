@@ -63,7 +63,7 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
   // lights projection info. to be added in cached array
   std::shared_ptr<ImageLights> image_lights(new ImageLights);
   // default select long focus camera
-  image_lights->camera_id = LONG_FOCUS;
+  image_lights->camera_id = SHORT_FOCUS;
   image_lights->timestamp = timestamp;
   image_lights->pose = pose;
   image_lights->is_pose_valid = true;
@@ -94,6 +94,7 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
                << " image failed, "
                << "ts: " << GLOG_TIMESTAMP(timestamp) << ", camera_id: "
                << kCameraIdToStr.at(static_cast<CameraId>(cam_id));
+        cached_lights_.push_back(image_lights);
         return false;
       }
     }
@@ -240,18 +241,6 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
             << cached_array_str << ".back() ts: "
             << GLOG_TIMESTAMP(cached_lights_.back()->timestamp)
             << ", camera_id: " << kCameraIdToStr.at(camera_id);
-    }
-    if (image->camera_id() == LONG_FOCUS &&
-        (no_signal || last_pub_camera_id_ == LONG_FOCUS)) {
-      *should_pub = true;
-      (*image_lights).reset(new ImageLights);
-      (*image_lights)->image = image;
-      (*image_lights)->camera_id = image->camera_id();
-      (*image_lights)->timestamp = image_ts;
-      (*image_lights)->diff_image_sys_ts = diff_image_sys_ts;
-      (*image_lights)->diff_image_pose_ts = diff_image_pose_ts;
-      (*image_lights)->is_pose_valid = no_signal;
-      (*image_lights)->num_signals = 0;
     }
   }
   // sync fail may because:
