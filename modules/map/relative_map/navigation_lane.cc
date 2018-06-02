@@ -57,7 +57,7 @@ bool NavigationLane::GeneratePath() {
   int navigation_line_num = navigation_info_.navigation_path_size();
   const auto &lane_marker = perception_obstacles_.lane_marker();
 
-  auto genrate_path_on_percetion = [this, &lane_marker]() {
+  auto generate_path_on_perception = [this, &lane_marker]() {
     current_navi_path_ = std::make_shared<NavigationPath>();
     auto *path = current_navi_path_->mutable_path();
     ConvertLaneMarkerToPath(lane_marker, path);
@@ -80,7 +80,7 @@ bool NavigationLane::GeneratePath() {
     // If no navigation path is generated based on navigation lines, we generate
     // one where the vehicle is located based on perceived lane markers.
     if (navigation_path_list_.empty()) {
-      genrate_path_on_percetion();
+      generate_path_on_perception();
       return true;
     }
 
@@ -118,7 +118,7 @@ bool NavigationLane::GeneratePath() {
 
   // Generate a navigation path where the vehicle is located based on perceived
   // lane markers.
-  genrate_path_on_percetion();
+  generate_path_on_perception();
   return true;
 }
 
