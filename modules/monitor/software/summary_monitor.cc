@@ -30,6 +30,11 @@ DEFINE_string(summary_monitor_name, "SummaryMonitor",
 DEFINE_double(broadcast_max_interval, 8,
               "Max interval of broadcasting runtime status.");
 
+// TODO(xiaoxq): Change default to true when it's well tested.
+DEFINE_bool(enable_safety_mode, false,
+            "Whether to enable safety mode which may take over the vehicle on "
+            "system failures.");
+
 namespace apollo {
 namespace monitor {
 namespace {
@@ -92,11 +97,17 @@ SummaryMonitor::SummaryMonitor()
     : RecurrentRunner(FLAGS_summary_monitor_name, 0) {
   CHECK(AdapterManager::GetSystemStatus())
       << "SystemStatusAdapter is not initialized.";
+  if (FLAGS_enable_safety_mode) {
+    safety_manager_.reset(new SafetyManager());
+  }
 }
 
 void SummaryMonitor::RunOnce(const double current_time) {
   SummarizeModules();
   SummarizeHardware();
+  if (safety_manager_ != nullptr) {
+    safety_manager_->CheckSafety(current_time);
+  }
   // Get fingerprint of current status.
   // Don't use DebugString() which has known bug on Map field. The string
   // doesn't change though the value has changed.
