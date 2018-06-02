@@ -84,7 +84,7 @@ class PlaneMotion {
   void add_new_motion(double pre_image_timestamp, double image_timestamp,
                       int motion_operation_flag, VehicleStatus *vehicledata);
 
-  MotionBufferPtr get_buffer() { return mot_buffer_; }
+  MotionBuffer get_buffer();
   bool find_motion_with_timestamp(double timestamp, VehicleStatus *vs);
   bool is_3d_motion() const { return is_3d_motion_; }
 };

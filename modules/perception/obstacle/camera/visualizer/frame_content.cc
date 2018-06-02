@@ -153,9 +153,9 @@ void FrameContent::set_gt_content(
 }
 
 void FrameContent::set_motion_content(double timestamp,
-                                      MotionBufferPtr motion_buffer) {
+                                      const MotionBuffer &motion_buffer) {
   MotionContent motion_content;
-  motion_content.motion_frame_content_ = *motion_buffer;
+  motion_content.motion_frame_content_ = motion_buffer;
   motion_caches_[DoubleToMapKey(timestamp)] = motion_content;
   AINFO << "Motion_caches size: " << motion_caches_.size();
 }
