@@ -48,7 +48,7 @@ class MotionService : public Subnode {
   void GetVehicleInformation(float timestamp,
                              VehicleInformation *vehicle_information);
   bool GetMotionInformation(double timestamp, VehicleStatus *vs);
-  MotionBufferPtr GetMotionBuffer();
+  MotionBuffer GetMotionBuffer();
   double GetLatestTimestamp();
 
  protected:
@@ -68,6 +68,7 @@ class MotionService : public Subnode {
   const int motion_buffer_size_ = 60;
   Mutex mutex_;
   Mutex image_mutex_;
+  Mutex motion_mutex_;
   std::list<VehicleInformation> vehicle_information_buffer_;
   CameraSharedData *camera_shared_data_ = nullptr;
   DISALLOW_COPY_AND_ASSIGN(MotionService);

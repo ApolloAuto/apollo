@@ -125,6 +125,7 @@ void MotionService::OnLocalization(
   AINFO << "motion timestamp: " << std::to_string(camera_timestamp);
 
   if (start_flag_) {
+    MutexLock lock(&motion_mutex_);
     if (std::abs(camera_timestamp - pre_camera_timestamp_) <
         std::numeric_limits<double>::epsilon()) {
       ADEBUG << "Motion_status: accum";
@@ -197,7 +198,8 @@ void MotionService::PublishEvent(const double timestamp) {
     //      << device_id_ ;
   }
 }
-MotionBufferPtr MotionService::GetMotionBuffer() {
+MotionBuffer MotionService::GetMotionBuffer() {
+  MutexLock lock(&motion_mutex_);
   return vehicle_planemotion_->get_buffer();
 }
 
