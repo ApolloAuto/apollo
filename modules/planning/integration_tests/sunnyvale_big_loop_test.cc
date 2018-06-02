@@ -621,13 +621,11 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
               planning_state->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
 
-  /*
   common::PointENU start_point_0 = planning_state->pull_over().start_point();
   common::PointENU stop_point_0 = planning_state->pull_over().stop_point();
   double stop_point_heading_0 =
       planning_state->pull_over().stop_point_heading();
   double status_set_time_0 = planning_state->pull_over().status_set_time();
-  */
 
   // check PULL OVER decision
   RUN_GOLDEN_TEST_DECISION(1);
@@ -636,20 +634,18 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
               planning_state->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
 
-  /*
   common::PointENU start_point_1 = planning_state->pull_over().start_point();
   common::PointENU stop_point_1 = planning_state->pull_over().stop_point();
   double stop_point_heading_1 =
       planning_state->pull_over().stop_point_heading();
   double status_set_time_1 = planning_state->pull_over().status_set_time();
 
-  EXPECT_EQ(start_point_0.x(), start_point_1.x());
-  EXPECT_EQ(start_point_0.y(), start_point_1.y());
-  EXPECT_EQ(stop_point_0.x(), stop_point_1.x());
-  EXPECT_EQ(stop_point_0.y(), stop_point_1.y());
-  EXPECT_EQ(stop_point_heading_0, stop_point_heading_1);
-  EXPECT_EQ(status_set_time_0, status_set_time_1);
-  */
+  EXPECT_DOUBLE_EQ(start_point_0.x(), start_point_1.x());
+  EXPECT_DOUBLE_EQ(start_point_0.y(), start_point_1.y());
+  EXPECT_DOUBLE_EQ(stop_point_0.x(), stop_point_1.x());
+  EXPECT_DOUBLE_EQ(stop_point_0.y(), stop_point_1.y());
+  EXPECT_DOUBLE_EQ(stop_point_heading_0, stop_point_heading_1);
+  EXPECT_DOUBLE_EQ(status_set_time_0, status_set_time_1);
 }
 
 /*
