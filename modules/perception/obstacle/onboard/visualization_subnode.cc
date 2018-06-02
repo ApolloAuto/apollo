@@ -249,8 +249,8 @@ void VisualizationSubnode::SetFrameContent(const Event& event,
   } else if (event.event_id == motion_event_id_) {
 //    AINFO << "Vis_subnode: motion_event_id_" << motion_event_id_;
     // TODO(gchen-apollo): add lock to read motion_buffer
-    MotionBufferPtr motion_buffer = motion_service_->GetMotionBuffer();
-    if (motion_buffer == nullptr) {
+    MotionBuffer motion_buffer = motion_service_->GetMotionBuffer();
+    if (motion_buffer.empty()) {
       AINFO << "motion_buffer is null";
     } else {
       content->set_motion_content(timestamp, motion_buffer);
