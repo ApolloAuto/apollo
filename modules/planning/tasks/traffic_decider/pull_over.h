@@ -59,7 +59,7 @@ class PullOver : public TrafficRule {
   /**
    * get a pull over stop point
    */
-  int GetPullOverStop(common::SLPoint* stop_point_sl);
+  int GetPullOverStop(common::PointENU* stop_point);
 
   bool OnOverlap(const double s);
 
@@ -76,7 +76,7 @@ class PullOver : public TrafficRule {
    */
   bool IsValidStop() const;
 
-  int BuildPullOverStop(const common::SLPoint stop_point_sl);
+  int BuildPullOverStop(const common::PointENU stop_point);
 
  private:
   static constexpr char const* const PULL_OVER_VO_ID_PREFIX = "PO_";
