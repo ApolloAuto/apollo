@@ -52,13 +52,13 @@ Status PullOver::ApplyRule(Frame* const frame,
     return Status::OK();
   }
 
-  common::SLPoint stop_point_sl;
-  if (GetPullOverStop(&stop_point_sl) != 0) {
+  common::PointENU stop_point;
+  if (GetPullOverStop(&stop_point) != 0) {
     ADEBUG << "Could not find a safe pull over point";
     return Status::OK();
   }
 
-  BuildPullOverStop(stop_point_sl);
+  BuildPullOverStop(stop_point);
 
   return Status::OK();
 }
@@ -91,22 +91,31 @@ bool PullOver::IsValidStop() const {
 /**
  * @brief:get pull_over points(start & stop)
  */
-int PullOver::GetPullOverStop(common::SLPoint* stop_point_sl) {
+int PullOver::GetPullOverStop(common::PointENU* stop_point) {
   auto&  pull_over_status = GetPlanningStatus()->
       mutable_planning_state()->pull_over();
   // reuse existing stop point
   if (pull_over_status.has_start_point() &&
       pull_over_status.has_stop_point()) {
     if (IsValidStop()) {
-      const auto& reference_line = reference_line_info_->reference_line();
-      reference_line.XYToSL({pull_over_status.stop_point().x(),
-        pull_over_status.stop_point().y()}, stop_point_sl);
+      stop_point->set_x(pull_over_status.stop_point().x());
+      stop_point->set_y(pull_over_status.stop_point().y());
       return 0;
     }
   }
 
   // calculate new stop point if don't have a pull over stop
-  return FindPullOverStop(stop_point_sl);
+  common::SLPoint stop_point_sl;
+  if (FindPullOverStop(&stop_point_sl) == 0) {
+    const auto& reference_line = reference_line_info_->reference_line();
+    common::math::Vec2d point;
+    reference_line.SLToXY(stop_point_sl, &point);
+    stop_point->set_x(point.x());
+    stop_point->set_y(point.y());
+    return 0;
+  }
+
+  return -1;
 }
 
 /**
@@ -269,10 +278,12 @@ int PullOver::FindPullOverStop(double* stop_point_s) {
   return -1;
 }
 
-int PullOver::BuildPullOverStop(const common::SLPoint stop_point_sl) {
+int PullOver::BuildPullOverStop(const common::PointENU stop_point) {
   const auto& reference_line = reference_line_info_->reference_line();
 
   // check
+  common::SLPoint stop_point_sl;
+  reference_line.XYToSL(stop_point, &stop_point_sl);
   if (stop_point_sl.s() < 0 || stop_point_sl.s() > reference_line.Length()) {
     return -1;
   }
@@ -296,8 +307,6 @@ int PullOver::BuildPullOverStop(const common::SLPoint stop_point_sl) {
   }
 
   // build stop decision
-  common::math::Vec2d stop_point;
-  reference_line.SLToXY(stop_point_sl, &stop_point);
   double stop_point_heading =
       reference_line.GetReferencePoint(stop_point_sl.s()).heading();
 
