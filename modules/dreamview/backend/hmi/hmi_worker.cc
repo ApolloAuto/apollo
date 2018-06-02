@@ -148,6 +148,7 @@ HMIWorker::HMIWorker() {
     // If the default mode is unavailable, select the first one.
     status_.set_current_mode(modes.begin()->first);
   }
+  apollo::common::KVDB::Put("apollo:dreamview:mode", status_.current_mode());
 
   // If the FLAGS_map_dir is set, set it in HMIStatus.
   if (!FLAGS_map_dir.empty()) {
