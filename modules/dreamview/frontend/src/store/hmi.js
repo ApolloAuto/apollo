@@ -29,6 +29,7 @@ export default class HMI {
 
     displayName = {};
     utmZoneId = 10;
+    utterance = window.speechSynthesis ? new SpeechSynthesisUtterance() : null;
 
     @observable dockerImage = 'unknown';
 
@@ -83,6 +84,28 @@ export default class HMI {
                     this.hardwareStatus.set(key, newStatus.systemStatus.hardware[key].summary);
                 }
             }
+            if (this.utterance &&
+                typeof newStatus.passengerMsg === "string" &&
+                newStatus.passengerMsg !== this.utterance.text) {
+                this.utterance.text = newStatus.passengerMsg;
+                this.speakPassengerMessage();
+            }
+        }
+    }
+
+    speakPassengerMessage() {
+        if (this.utterance.text) {
+            // if speaking, don't interrupt
+            if (!window.speechSynthesis.speaking) {
+                window.speechSynthesis.speak(this.utterance);
+            }
+
+            // repeat this message until a new one is given
+            this.utterance.onend = () => {
+                window.speechSynthesis.speak(this.utterance);
+            };
+        } else {
+            this.utterance.onend = null;
         }
     }
 
