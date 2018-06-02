@@ -140,6 +140,10 @@ bool PlaneMotion::find_motion_with_timestamp(double timestamp,
   }
   return false;
 }
+MotionBuffer PlaneMotion::get_buffer() {
+  MutexLock lock(&mutex_);
+  return *mot_buffer_;
+}
 
 void PlaneMotion::add_new_motion(double pre_image_timestamp,
                                  double image_timestamp,
