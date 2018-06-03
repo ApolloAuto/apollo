@@ -409,7 +409,8 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
   auto *lane_marker = map_msg->mutable_lane_marker();
 
   // A lambda expression for creating map.
-  auto create_map_func = [&](const std::shared_ptr<NavigationPath> &navi_path) {
+  auto create_map_func = [&](const std::shared_ptr<NavigationPath> &navi_path,
+                             bool generate_left_boundray = true) {
     const auto &path = navi_path->path();
     if (path.path_point_size() < 2) {
       AERROR << "The path length of line index is invalid";
@@ -430,15 +431,20 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
     auto *curve_segment = lane->mutable_central_curve()->add_segment();
     curve_segment->set_heading(path.path_point(0).theta());
     auto *line_segment = curve_segment->mutable_line_segment();
+
     // left boundary
-    auto *left_boundary = lane->mutable_left_boundary();
-    auto *left_boundary_type = left_boundary->add_boundary_type();
-    left_boundary->set_virtual_(false);
-    left_boundary_type->set_s(0.0);
-    left_boundary_type->add_types(
-        perception_obstacles_.lane_marker().left_lane_marker().lane_type());
-    auto *left_segment =
-        left_boundary->mutable_curve()->add_segment()->mutable_line_segment();
+    hdmap::LineSegment *left_segment = nullptr;
+    if (generate_left_boundray) {
+      auto *left_boundary = lane->mutable_left_boundary();
+      auto *left_boundary_type = left_boundary->add_boundary_type();
+      left_boundary->set_virtual_(false);
+      left_boundary_type->set_s(0.0);
+      left_boundary_type->add_types(
+          perception_obstacles_.lane_marker().left_lane_marker().lane_type());
+      left_segment =
+          left_boundary->mutable_curve()->add_segment()->mutable_line_segment();
+    }
+
     // right boundary
     auto *right_boundary = lane->mutable_right_boundary();
     auto *right_boundary_type = right_boundary->add_boundary_type();
@@ -465,21 +471,21 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
       point->set_x(path_point.x());
       point->set_y(path_point.y());
       point->set_z(path_point.z());
-      auto *left_sample = lane->add_left_sample();
-      left_sample->set_s(path_point.s());
-      left_sample->set_width(lane_left_width);
-      left_segment->add_point()->CopyFrom(
-          *point +
-          lane_left_width *
-              Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
+      if (generate_left_boundray) {
+        auto *left_sample = lane->add_left_sample();
+        left_sample->set_s(path_point.s());
+        left_sample->set_width(lane_left_width);
+        left_segment->add_point()->CopyFrom(
+            *point + lane_left_width *
+                         Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
+      }
 
       auto *right_sample = lane->add_right_sample();
       right_sample->set_s(path_point.s());
       right_sample->set_width(lane_right_width);
       right_segment->add_point()->CopyFrom(
-          *point +
-          lane_right_width *
-              Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
+          *point + lane_right_width *
+                       Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
     }
     return true;
   };
@@ -497,20 +503,45 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
     }
   }
 
+  bool need_generate_left_boundray = true;
+  int fail_num = 0;
   for (auto iter = navigation_path_list_.cbegin();
        iter != navigation_path_list_.cend(); ++iter) {
-    if (!create_map_func(iter->second)) {
-      return false;
+    std::size_t index = std::distance(navigation_path_list_.cbegin(), iter);
+    if (!create_map_func(iter->second, need_generate_left_boundray)) {
+      AWARN << "Failed to generate lane: " << index;
+      need_generate_left_boundray = true;
+      fail_num++;
+      continue;
     }
+    need_generate_left_boundray = (iter == navigation_path_list_.cbegin());
 
     // The left border of the middle lane uses the right border of the left
     // lane.
-    std::size_t index = std::distance(navigation_path_list_.cbegin(), iter);
-    if (index > 0) {
-      auto *left_boundary = hdmap->mutable_lane(index)->mutable_left_boundary();
-      left_boundary->CopyFrom(hdmap->lane(index - 1).right_boundary());
-      auto *left_sample = hdmap->mutable_lane(index)->mutable_left_sample();
-      left_sample->CopyFrom(hdmap->lane(index - 1).right_sample());
+    int lane_index = index - fail_num;
+    if (lane_index > 0) {
+      auto *left_boundary =
+          hdmap->mutable_lane(lane_index)->mutable_left_boundary();
+      left_boundary->CopyFrom(hdmap->lane(lane_index - 1).right_boundary());
+      auto *left_sample =
+          hdmap->mutable_lane(lane_index)->mutable_left_sample();
+      left_sample->CopyFrom(hdmap->lane(lane_index - 1).right_sample());
+    }
+  }
+
+  // Set neighbor information for each lane
+  int lane_num = hdmap->lane_size();
+  if (lane_num < 2) {
+    return true;
+  }
+  for (int i = 0; i < lane_num; ++i) {
+    for (int j = i; j < lane_num - 1; ++j) {
+      hdmap->mutable_lane(i)->add_right_neighbor_forward_lane_id()->CopyFrom(
+          hdmap->lane(j + 1).id());
+    }
+    for (int k = i; k > 0; --k) {
+      hdmap->mutable_lane(i)->add_left_neighbor_forward_lane_id()->CopyFrom(
+          hdmap->lane(k - 1).id());
     }
   }
 
