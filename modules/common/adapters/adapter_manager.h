@@ -294,6 +294,8 @@ class AdapterManager {
   // for lane mask
   REGISTER_ADAPTER(PerceptionLaneMask)
 
+  REGISTER_ADAPTER(Guardian)
+
   DECLARE_SINGLETON(AdapterManager);
 };
 
