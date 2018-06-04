@@ -73,7 +73,7 @@ bool NavigationLane::GeneratePath() {
     for (int i = 0; i < navigation_line_num; ++i) {
       auto current_navi_path = std::make_shared<NavigationPath>();
       auto *path = current_navi_path->mutable_path();
-      if (ConvertNavigationLineToPath(path, i)) {
+      if (ConvertNavigationLineToPath(i, path)) {
         current_navi_path->set_path_priority(
             navigation_info_.navigation_path(i).path_priority());
         navigation_path_list_.emplace_back(i, current_navi_path);
@@ -116,7 +116,7 @@ bool NavigationLane::GeneratePath() {
     // Merge current navigation path where the vehicle is located with perceived
     // lane markers.
     auto *path = current_navi_path_->mutable_path();
-    MergeNavigationLineAndLaneMarker(path, current_line_index);
+    MergeNavigationLineAndLaneMarker(current_line_index, path);
     return true;
   }
 
@@ -132,11 +132,10 @@ double NavigationLane::EvaluateCubicPolynomial(const double c0, const double c1,
   return ((c3 * z + c2) * z + c1) * z + c0;
 }
 
-void NavigationLane::MergeNavigationLineAndLaneMarker(common::Path *path,
-                                                      int line_index) {
+void NavigationLane::MergeNavigationLineAndLaneMarker(const int line_index,
+                                                      common::Path *path) {
   CHECK_NOTNULL(path);
-  common::Path local_navi_path;
-  common::Path &navigation_path = local_navi_path;
+  common::Path navigation_path;
 
   // If "path" is non-empty, it indicates that a navigation path has been
   // generated based on a navigation line and does not need to be generated
@@ -144,7 +143,7 @@ void NavigationLane::MergeNavigationLineAndLaneMarker(common::Path *path,
   if (path->path_point_size() > 0) {
     navigation_path = *path;
   } else {
-    ConvertNavigationLineToPath(&navigation_path, line_index);
+    ConvertNavigationLineToPath(line_index, &navigation_path);
   }
   // If the size of current navigation path points is smaller than 2, just
   // generate a navigation path based on perceived lane markers.
@@ -173,6 +172,7 @@ void NavigationLane::MergeNavigationLineAndLaneMarker(common::Path *path,
   int navigation_index = 0;
   int lane_marker_index = 0;
   common::Path temp_path;
+  path->mutable_path_point()->Clear();
   for (double s = start_s; s < len; s += ds) {
     auto p1 = GetPathPointByS(navigation_path, navigation_index, s,
                               &navigation_index);
@@ -211,8 +211,8 @@ common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
   return p;
 }
 
-bool NavigationLane::ConvertNavigationLineToPath(common::Path *path,
-                                                 int line_index) {
+bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
+                                                 common::Path *path) {
   CHECK_NOTNULL(path);
   if (!navigation_info_.navigation_path(line_index).has_path() ||
       navigation_info_.navigation_path(line_index).path().path_point_size() ==
@@ -417,8 +417,7 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
   auto *lane_marker = map_msg->mutable_lane_marker();
 
   // A lambda expression for creating map.
-  auto create_map_func = [&](const std::shared_ptr<NavigationPath> &navi_path,
-                             bool generate_left_boundray = true) {
+  auto create_map_func = [&](const std::shared_ptr<NavigationPath> &navi_path) {
     const auto &path = navi_path->path();
     if (path.path_point_size() < 2) {
       AERROR << "The path length of line index is invalid";
@@ -442,7 +441,7 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
 
     // left boundary
     hdmap::LineSegment *left_segment = nullptr;
-    if (generate_left_boundray) {
+    if (FLAGS_relative_map_generate_left_boundray) {
       auto *left_boundary = lane->mutable_left_boundary();
       auto *left_boundary_type = left_boundary->add_boundary_type();
       left_boundary->set_virtual_(false);
@@ -479,21 +478,23 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
       point->set_x(path_point.x());
       point->set_y(path_point.y());
       point->set_z(path_point.z());
-      if (generate_left_boundray) {
+      if (FLAGS_relative_map_generate_left_boundray) {
         auto *left_sample = lane->add_left_sample();
         left_sample->set_s(path_point.s());
         left_sample->set_width(lane_left_width);
         left_segment->add_point()->CopyFrom(
-            *point + lane_left_width *
-                         Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
+            *point +
+            lane_left_width *
+                Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
       }
 
       auto *right_sample = lane->add_right_sample();
       right_sample->set_s(path_point.s());
       right_sample->set_width(lane_right_width);
       right_segment->add_point()->CopyFrom(
-          *point + lane_right_width *
-                       Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
+          *point +
+          lane_right_width *
+              Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
     }
     return true;
   };
@@ -511,18 +512,17 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
     }
   }
 
-  bool need_generate_left_boundray = true;
   int fail_num = 0;
   for (auto iter = navigation_path_list_.cbegin();
        iter != navigation_path_list_.cend(); ++iter) {
     std::size_t index = std::distance(navigation_path_list_.cbegin(), iter);
-    if (!create_map_func(iter->second, need_generate_left_boundray)) {
+    if (!create_map_func(iter->second)) {
       AWARN << "Failed to generate lane: " << index;
-      need_generate_left_boundray = true;
-      fail_num++;
+      ++fail_num;
       continue;
     }
-    need_generate_left_boundray = (iter == navigation_path_list_.cbegin());
+    FLAGS_relative_map_generate_left_boundray =
+        (iter == navigation_path_list_.cbegin());
 
     // The left border of the middle lane uses the right border of the left
     // lane.

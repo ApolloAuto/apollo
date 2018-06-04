@@ -48,3 +48,6 @@ DEFINE_double(max_lane_half_width, 2.0, "max lane half width in meters");
 
 DEFINE_bool(enable_cyclic_rerouting, false,
             "Enable auto rerouting in a in a cyclic/circular navigaton line.");
+
+DEFINE_bool(relative_map_generate_left_boundray, true,
+            "Generate left boundary for detected lanes.");
