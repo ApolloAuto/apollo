@@ -32,7 +32,7 @@ class SafetyManager {
   void CheckSafety(const double current_time);
 
  private:
-  bool ShouldTriggerSafeMode();
+  bool ShouldTriggerSafeMode(const double current_time);
 
   apollo::dreamview::HMIConfig hmi_config_;
 };
