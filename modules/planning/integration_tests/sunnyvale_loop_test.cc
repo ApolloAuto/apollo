@@ -44,7 +44,17 @@ class SunnyvaleLoopTest : public PlanningTestBase {
     FLAGS_planning_upper_speed_limit = 12.5;
     FLAGS_use_multi_thread_to_add_obstacles = false;
     ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
+    ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
     ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+  }
+
+  TrafficRuleConfig* GetDestinationConfig() {
+    for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+      if (config.rule_id() == TrafficRuleConfig::DESTINATION) {
+        return &config;
+      }
+    }
+    return nullptr;
   }
 };
 
@@ -195,12 +205,19 @@ TEST_F(SunnyvaleLoopTest, change_lane) {
  * test mission complete
  */
 TEST_F(SunnyvaleLoopTest, mission_complete) {
+  ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
+
   std::string seq_num = "10";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_enable_prediction = false;
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
+
+  // set config
+  auto* destination_config = GetDestinationConfig();
+  destination_config->mutable_destination()->set_enable_pull_over(false);
+
   RUN_GOLDEN_TEST(0);
 }
 
