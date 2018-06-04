@@ -187,7 +187,7 @@ int PullOver::FindPullOverStop(common::SLPoint* stop_point_sl) {
                               &lane_left_width, &lane_right_width);
   stop_point_sl->set_s(stop_point_s);
   stop_point_sl->set_l(-(lane_right_width - adc_width / 2 -
-      config_.pull_over().pull_over_l_buffer()));
+      config_.pull_over().buffer_to_boundary()));
 
   ADEBUG << "stop_point(" << stop_point_sl->s()
       << ", " << stop_point_sl->l() << ")";
@@ -336,7 +336,7 @@ int PullOver::BuildPullOverStop(const common::PointENU stop_point) {
 
   common::SLPoint start_point_sl;
   start_point_sl.set_s(
-      stop_point_sl.s() - config_.pull_over().plan_distance());
+      stop_point_sl.s() - config_.pull_over().operation_length());
   start_point_sl.set_l(0.0);
   common::math::Vec2d start_point;
   reference_line.SLToXY(start_point_sl, &start_point);
