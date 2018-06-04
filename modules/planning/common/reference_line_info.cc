@@ -151,7 +151,7 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
 
 bool ReferenceLineInfo::CheckChangeLane() const {
   if (!IsChangeLanePath()) {
-    AERROR << "Not a change lane path.";
+    ADEBUG << "Not a change lane path.";
     return false;
   }
 
