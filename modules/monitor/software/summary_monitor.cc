@@ -30,8 +30,7 @@ DEFINE_string(summary_monitor_name, "SummaryMonitor",
 DEFINE_double(broadcast_max_interval, 8,
               "Max interval of broadcasting runtime status.");
 
-// TODO(xiaoxq): Change default to true when it's well tested.
-DEFINE_bool(enable_safety_mode, false,
+DEFINE_bool(enable_safety_mode, true,
             "Whether to enable safety mode which may take over the vehicle on "
             "system failures.");
 

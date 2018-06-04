@@ -108,8 +108,8 @@ message ADCTrajectory {
   repeated ADCTrajectoryPoint adc_trajectory_point = 4 [deprecated=true];
   optional apollo.common.VehicleSignal signal = 11 [deprecated=true];
   enum RightOfWayStatus {
-        UNPROTECTED = 0;
-        PROTECTED = 1;
+    UNPROTECTED = 0;
+    PROTECTED = 1;
   }
   optional RightOfWayStatus right_of_way_status = 17;
 
