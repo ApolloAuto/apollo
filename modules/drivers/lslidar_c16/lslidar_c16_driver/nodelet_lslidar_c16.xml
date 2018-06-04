@@ -1,9 +1,0 @@
-<library path="lib/liblslidar_c16_driver_nodelet">
-  <class name="lslidar_c16_driver/LslidarC16DriverNodelet"
-         type="apollo::drivers::lslidar_c16_driver::LslidarC16DriverNodelet"
-         base_class_type="nodelet::Nodelet">
-    <description>
-      Publish one lslidar raw data packet each time.
-    </description>
-  </class>
-</library>
