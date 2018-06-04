@@ -20,6 +20,7 @@
 #include <array>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "Eigen/Dense"
 #include "Eigen/Eigen"
@@ -56,8 +57,9 @@ class Cipv {
   virtual std::string Name() const;
 
   // Determine CIPV among multiple objects
-  bool DetermineCipv(std::shared_ptr<SensorObjects> sensor_objects,
-                     CipvOptions *options);  // override;
+  bool DetermineCipv(const LaneObjectsPtr lane_objects,
+                     const CipvOptions &options,
+                     std::vector<std::shared_ptr<Object>> *objects);
 
  private:
   // Distance from a point to a line segment

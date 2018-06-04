@@ -73,9 +73,6 @@ DEFINE_double(reference_line_stitch_overlap_distance, 20,
 DEFINE_double(reference_line_lateral_buffer, 0.5,
               "When creating reference line, the minimum distance with road "
               "curb for a vehicle driving on this line.");
-DEFINE_double(prepare_rerouting_time, 2.0,
-              "If there are this amount of seconds left to finish driving on "
-              "current route, and there is no routing, do rerouting");
 
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
@@ -204,13 +201,9 @@ DEFINE_double(
     "min following time in st region before considering a valid follow");
 DEFINE_double(stop_line_stop_distance, 1.0, "stop distance from stop line");
 DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
-DEFINE_double(max_stop_deceleration, 6.0, "max deceleration");
 DEFINE_double(signal_light_min_pass_s_distance, 4.0,
               "min s_distance for adc to be considered "
               "have passed signal_light (stop_line_end_s)");
-DEFINE_double(signal_expire_time_sec, 5.0,
-              "consider the signal msg is expired if its timestamp over "
-              "this threshold (second)");
 
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
@@ -303,6 +296,8 @@ DEFINE_double(min_velocity_sample_gap, 1.0,
               "Minimal sampling gap for velocity");
 DEFINE_double(lon_collision_buffer, 1.0,
               "The longitudinal buffer to keep distance to other vehicles");
+DEFINE_double(lat_collision_buffer, 0.2,
+              "The lateral buffer to keep distance to other vehicles");
 DEFINE_uint32(num_sample_follow_per_timestamp, 3,
              "The number of sample points for each timestamp to follow");
 
@@ -316,8 +311,8 @@ DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
 DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");
 DEFINE_double(weight_centripetal_acceleration, 1.5,
               "Weight of centripetal acceleration");
-DEFINE_double(priority_cost_gap, 5.0,
-              "Gap to increase the priority cost of reference line.");
+DEFINE_double(cost_non_priority_reference_line, 5.0,
+              "The cost of planning on non-priority reference line.");
 DEFINE_double(weight_same_side_offset, 1.0,
               "Weight of same side lateral offset cost");
 DEFINE_double(weight_opposite_side_offset, 10.0,

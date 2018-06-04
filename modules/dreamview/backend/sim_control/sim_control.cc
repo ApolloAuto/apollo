@@ -18,6 +18,7 @@
 
 #include <cmath>
 
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
@@ -52,7 +53,7 @@ void TransformToVRF(const Point3D& point_mrf, const Quaternion& orientation,
   point_vrf->set_z(v_vrf.z());
 }
 
-bool CompareHeader(const Header& lhs, const Header& rhs) {
+bool IsSameHeader(const Header& lhs, const Header& rhs) {
   return lhs.sequence_num() == rhs.sequence_num() &&
          lhs.timestamp_sec() == rhs.timestamp_sec();
 }
@@ -60,14 +61,7 @@ bool CompareHeader(const Header& lhs, const Header& rhs) {
 }  // namespace
 
 SimControl::SimControl(const MapService* map_service)
-    : map_service_(map_service),
-      prev_point_index_(0),
-      next_point_index_(0),
-      received_planning_(false),
-      planning_count_(-1),
-      re_routing_triggered_(false),
-      enabled_(false),
-      inited_(false) {}
+    : map_service_(map_service) {}
 
 void SimControl::Init(bool set_start_point, double start_velocity,
                       double start_acceleration) {
@@ -88,7 +82,13 @@ void SimControl::Init(bool set_start_point, double start_velocity,
       AWARN << "Failed to get a dummy start point from map!";
       return;
     }
-    SetStartPoint(start_point.x(), start_point.y());
+    TrajectoryPoint point;
+    point.mutable_path_point()->set_x(start_point.x());
+    point.mutable_path_point()->set_y(start_point.y());
+    point.mutable_path_point()->set_z(start_point.z());
+    point.set_v(start_velocity);
+    point.set_a(start_acceleration);
+    SetStartPoint(point);
   }
 
   start_velocity_ = start_velocity;
@@ -106,25 +106,8 @@ void SimControl::OnReceiveNavigationInfo(
   }
 }
 
-void SimControl::SetStartPoint(const double x, const double y) {
-  next_point_.set_v(start_velocity_);
-  next_point_.set_a(start_acceleration_);
-
-  auto* next_point = next_point_.mutable_path_point();
-  next_point->set_x(x);
-  next_point->set_y(y);
-  next_point->set_z(0.0);
-
-  double theta = 0.0;
-  double s = 0.0;
-  if (!map_service_->GetPoseWithRegardToLane(next_point->x(), next_point->y(),
-                                             &theta, &s)) {
-    AERROR << "Failed to get heading from map! Treat theta and s as 0.0!";
-  }
-  next_point->set_theta(theta);
-  next_point->set_s(s);
-  next_point->set_kappa(0.0);
-
+void SimControl::SetStartPoint(const TrajectoryPoint& start_point) {
+  next_point_ = start_point;
   prev_point_index_ = next_point_index_ = 0;
   received_planning_ = false;
 }
@@ -148,7 +131,8 @@ void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
     return;
   }
 
-  CHECK_LE(2, routing.routing_request().waypoint_size());
+  CHECK_GE(routing.routing_request().waypoint_size(), 2)
+      << "routing should have at least two waypoints";
   const auto& start_pose = routing.routing_request().waypoint(0).pose();
 
   current_routing_header_ = routing.header();
@@ -158,7 +142,17 @@ void SimControl::OnRoutingResponse(const RoutingResponse& routing) {
       routing.routing_request().header().module_name() == "planning";
   if (!re_routing_triggered_) {
     ClearPlanning();
-    SetStartPoint(start_pose.x(), start_pose.y());
+    TrajectoryPoint point;
+    point.mutable_path_point()->set_x(start_pose.x());
+    point.mutable_path_point()->set_y(start_pose.y());
+    point.set_a(0.0);
+    point.set_v(0.0);
+    double theta = 0.0;
+    double s = 0.0;
+    map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
+                                          &theta, &s);
+    point.mutable_path_point()->set_theta(theta);
+    SetStartPoint(point);
   }
 }
 
@@ -189,7 +183,7 @@ void SimControl::OnPlanning(const apollo::planning::ADCTrajectory& trajectory) {
   // Reset current trajectory and the indices upon receiving a new trajectory.
   // The routing SimControl owns must match with the one Planning has.
   if (re_routing_triggered_ ||
-      CompareHeader(trajectory.routing_header(), current_routing_header_)) {
+      IsSameHeader(trajectory.routing_header(), current_routing_header_)) {
     // Hold a few cycles until the position information is fully refreshed on
     // planning side. Don't wait for the very first planning received.
     ++planning_count_;
@@ -211,70 +205,60 @@ void SimControl::Freeze() {
   prev_point_ = next_point_;
 }
 
-double SimControl::AbsoluteTimeOfNextPoint() {
-  return current_trajectory_.header().timestamp_sec() +
-         current_trajectory_.trajectory_point(next_point_index_)
-             .relative_time();
-}
-
-bool SimControl::NextPointWithinRange() {
-  return next_point_index_ < current_trajectory_.trajectory_point_size() - 1;
-}
-
-void SimControl::TimerCallback(const ros::TimerEvent& event) {
-  RunOnce();
-}
+void SimControl::TimerCallback(const ros::TimerEvent& event) { RunOnce(); }
 
 void SimControl::RunOnce() {
+  TrajectoryPoint trajectory_point;
+  if (!PerfectControlModel(&trajectory_point)) {
+    AERROR << "Failed to calculate next point with perfect control model";
+    return;
+  }
+  PublishChassis(trajectory_point.v());
+  PublishLocalization(trajectory_point);
+}
+
+bool SimControl::PerfectControlModel(TrajectoryPoint* point) {
   // Result of the interpolation.
-  double lambda = 0.0;
-  auto current_time = Clock::NowInSeconds();
+  auto relative_time =
+      Clock::NowInSeconds() - current_trajectory_.header().timestamp_sec();
+  const auto& trajectory = current_trajectory_.trajectory_point();
 
   if (!received_planning_) {
     prev_point_ = next_point_;
   } else {
-    if (current_trajectory_.estop().is_estop() || !NextPointWithinRange()) {
+    if (current_trajectory_.estop().is_estop() ||
+        next_point_index_ >= trajectory.size()) {
       // Freeze the car when there's an estop or the current trajectory has
       // been exhausted.
       Freeze();
     } else {
       // Determine the status of the car based on received planning message.
-      double timestamp = current_trajectory_.header().timestamp_sec();
-
-      while (NextPointWithinRange() &&
-             current_time > AbsoluteTimeOfNextPoint()) {
+      while (next_point_index_ < trajectory.size() &&
+             relative_time >
+                 trajectory.Get(next_point_index_).relative_time()) {
         ++next_point_index_;
       }
 
       if (next_point_index_ == 0) {
         AERROR << "First trajectory point is a future point!";
-        return;
+        return false;
       }
 
-      if (current_time > AbsoluteTimeOfNextPoint()) {
-        prev_point_index_ = next_point_index_;
-      } else {
-        prev_point_index_ = next_point_index_ - 1;
+      if (next_point_index_ >= trajectory.size()) {
+        next_point_index_ = trajectory.size() - 1;
       }
+      prev_point_index_ = next_point_index_ - 1;
 
-      next_point_ = current_trajectory_.trajectory_point(next_point_index_);
-      prev_point_ = current_trajectory_.trajectory_point(prev_point_index_);
-
-      // Calculate the ratio based on the position of current time in
-      // between the previous point and the next point, where lambda =
-      // (current_point - prev_point) / (next_point - prev_point).
-      if (next_point_index_ != prev_point_index_) {
-        lambda = (current_time - timestamp - prev_point_.relative_time()) /
-                 (next_point_.relative_time() - prev_point_.relative_time());
-      }
+      next_point_ = trajectory.Get(next_point_index_);
+      prev_point_ = trajectory.Get(prev_point_index_);
     }
   }
-
-  PublishChassis(lambda);
-  PublishLocalization(lambda);
+  *point = apollo::common::math::InterpolateUsingLinearApproximation(
+      prev_point_, next_point_, relative_time);
+  return true;
 }
 
-void SimControl::PublishChassis(double lambda) {
+void SimControl::PublishChassis(double cur_speed) {
   Chassis chassis;
   AdapterManager::FillChassisHeader("SimControl", &chassis);
 
@@ -282,7 +266,6 @@ void SimControl::PublishChassis(double lambda) {
   chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   chassis.set_gear_location(Chassis::GEAR_DRIVE);
 
-  double cur_speed = Interpolate(prev_point_.v(), next_point_.v(), lambda);
   chassis.set_speed_mps(cur_speed);
   chassis.set_throttle_percentage(0.0);
   chassis.set_brake_percentage(0.0);
@@ -290,7 +273,7 @@ void SimControl::PublishChassis(double lambda) {
   AdapterManager::PublishChassis(chassis);
 }
 
-void SimControl::PublishLocalization(double lambda) {
+void SimControl::PublishLocalization(const TrajectoryPoint& point) {
   LocalizationEstimate localization;
   AdapterManager::FillLocalizationHeader("SimControl", &localization);
 
@@ -299,19 +282,15 @@ void SimControl::PublishLocalization(double lambda) {
   auto next = next_point_.path_point();
 
   // Set position
-  double cur_x = Interpolate(prev.x(), next.x(), lambda);
-  pose->mutable_position()->set_x(cur_x);
-  double cur_y = Interpolate(prev.y(), next.y(), lambda);
-  pose->mutable_position()->set_y(cur_y);
-  double cur_z = Interpolate(prev.z(), next.z(), lambda);
-  pose->mutable_position()->set_z(cur_z);
+  pose->mutable_position()->set_x(point.path_point().x());
+  pose->mutable_position()->set_y(point.path_point().y());
+  pose->mutable_position()->set_z(point.path_point().z());
   // Set orientation and heading
-  double cur_theta = NormalizeAngle(
-      prev.theta() + lambda * NormalizeAngle(next.theta() - prev.theta()));
+  double cur_theta = point.path_point().theta();
 
   if (FLAGS_use_navigation_mode) {
-    double flu_x = cur_x;
-    double flu_y = cur_y;
+    double flu_x = point.path_point().x();
+    double flu_y = point.path_point().y();
     double enu_x = 0.0;
     double enu_y = 0.0;
     common::math::RotateAxis(-cur_theta, flu_x, flu_y, &enu_x, &enu_y);
@@ -330,28 +309,25 @@ void SimControl::PublishLocalization(double lambda) {
   pose->set_heading(cur_theta);
 
   // Set linear_velocity
-  double cur_speed = Interpolate(prev_point_.v(), next_point_.v(), lambda);
-  pose->mutable_linear_velocity()->set_x(std::cos(cur_theta) * cur_speed);
-  pose->mutable_linear_velocity()->set_y(std::sin(cur_theta) * cur_speed);
+  pose->mutable_linear_velocity()->set_x(std::cos(cur_theta) * point.v());
+  pose->mutable_linear_velocity()->set_y(std::sin(cur_theta) * point.v());
   pose->mutable_linear_velocity()->set_z(0);
 
   // Set angular_velocity in both map reference frame and vehicle reference
   // frame
-  double cur_curvature = Interpolate(prev.kappa(), next.kappa(), lambda);
   pose->mutable_angular_velocity()->set_x(0);
   pose->mutable_angular_velocity()->set_y(0);
-  pose->mutable_angular_velocity()->set_z(cur_speed * cur_curvature);
+  pose->mutable_angular_velocity()->set_z(point.v() *
+                                          point.path_point().kappa());
 
   TransformToVRF(pose->angular_velocity(), pose->orientation(),
                  pose->mutable_angular_velocity_vrf());
 
   // Set linear_acceleration in both map reference frame and vehicle reference
   // frame
-  double cur_acceleration_s =
-      Interpolate(prev_point_.a(), next_point_.a(), lambda);
   auto* linear_acceleration = pose->mutable_linear_acceleration();
-  linear_acceleration->set_x(std::cos(cur_theta) * cur_acceleration_s);
-  linear_acceleration->set_y(std::sin(cur_theta) * cur_acceleration_s);
+  linear_acceleration->set_x(std::cos(cur_theta) * point.a());
+  linear_acceleration->set_y(std::sin(cur_theta) * point.a());
   linear_acceleration->set_z(0);
 
   TransformToVRF(pose->linear_acceleration(), pose->orientation(),

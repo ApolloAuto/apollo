@@ -26,7 +26,9 @@ apt-get install -y \
    libleveldb-dev \
    python-matplotlib \
    python-pip \
+   python-psutil \
    python-scipy \
-   python-software-properties
+   python-software-properties \
+   python3-psutil
 
 pip install -r py27_requirements.txt

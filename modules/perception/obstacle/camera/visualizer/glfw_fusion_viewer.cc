@@ -32,7 +32,6 @@
 #include "gflags/gflags.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object_supplement.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 #include "modules/perception/obstacle/camera/visualizer/common/bmp.h"
@@ -75,15 +74,19 @@ GLFWFusionViewer::GLFWFusionViewer()
       mouse_prev_y_(0),
       frame_content_(nullptr),
       rgba_buffer_(nullptr),
-      vao_trans_x_(0.0),
-      vao_trans_y_(0.0),
-      vao_trans_z_(0.0),
-      _Rotate_x(0.0),
-      _Rotate_y(0.0),
-      _Rotate_z(0.0),
+      vao_trans_x_(-30.0f),
+      vao_trans_y_(0.0f),
+      vao_trans_z_(0.0f),
+      _Rotate_x(0.0f),
+      _Rotate_y(0.0f),
+      _Rotate_z(90.0f),
+      _Scale_x(1.0f),
+      _Scale_y(2.0f),
+      _Scale_z(1.0f),
       show_box(1),
       show_velocity(1),
       show_text(0),
+      show_help_text(0),
       capture_screen_(false),
       capture_video_(FLAGS_capture_screen),
       scene_width_(1280),
@@ -146,7 +149,7 @@ void GLFWFusionViewer::get_class_color(int cls, float rgb[3]) {
     case 7:
       rgb[0] = 1;
       rgb[1] = 0;
-      rgb[2] = 0;  // red
+      rgb[2] = 1;  // purple
       break;
   }
 }
@@ -172,12 +175,13 @@ bool GLFWFusionViewer::initialize() {
     AERROR << " Failed to initialize opengl !" << std::endl;
     return false;
   }
+  help_str = "H: show help";
 
   // for camera visualization
   show_camera_box2d_ = true;
   show_camera_box3d_ = true;
   show_camera_bdv_ = true;
-  show_radar_pc_ = false;
+  show_radar_pc_ = true;
   show_fusion_ = false;
   show_associate_color_ = false;
   show_type_id_label_ = true;
@@ -195,6 +199,8 @@ bool GLFWFusionViewer::initialize() {
     lane_post_process_config::ModelConfigs config;
     CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file, &config));
     lane_map_threshold_ = config.lane_map_confidence_thresh();
+    lane_start_y_pos_ = config.start_y_pos();
+    lane_map_scale_ = 1.0f / config.lane_map_scale();
     AINFO << "onboard lane post-processor: "
           << FLAGS_onboard_lane_post_processor;
     AINFO << "lane map confidence threshold = " << lane_map_threshold_;
@@ -554,65 +560,53 @@ void GLFWFusionViewer::render() {
 
   frame_count_++;
 
-  AINFO << "GLFWFusionViewer::render()";
-  // 1. Bottom left, draw 3d detection and classification results (lidar tracked
+  FLAGS_show_motion_track = true;
+  ADEBUG << "GLFWFusionViewer::render()";
+  // 1. Top right, draw 3d detection and classification results (lidar tracked
   // objects), and lanes in ego-car ground space
-  glViewport(0, 0, image_width_, image_height_);
+  glViewport(scene_width_, 0, image_width_, image_height_ * 2);
   {
     pre_draw();
     glPushMatrix();
+    glScalef(_Scale_y, _Scale_x, _Scale_z);
     glTranslatef(vao_trans_y_, vao_trans_x_, vao_trans_z_);
     glRotatef(_Rotate_x, 1, 0, 0);
     glRotatef(_Rotate_y, 0, 1, 0);
+    glRotatef(_Rotate_z, 0, 0, 1);
     bool show_fusion = true;
     draw_3d_classifications(frame_content_, show_fusion);
     draw_car_forward_dir();
-    //    if (FLAGS_show_motion_track &&
-    //        frame_content_->get_motion_buffer().size() > 0) {
-    //      draw_car_trajectory(frame_content_);
-    //    }
+    if (FLAGS_show_motion_track &&
+        frame_content_->get_motion_buffer().size() > 0) {
+      draw_car_trajectory(frame_content_);
+    }
+    if (show_lane_) {
+      lane_objects_ =
+          std::make_shared<LaneObjects>(frame_content_->get_lane_objects());
+      if (draw_lane_objects_) {
+        const MotionBuffer& motion_buffer = frame_content_->get_motion_buffer();
+        int n = motion_buffer.size();
+        if (n > 0) {
+          motion_matrix_ = motion_buffer[n - 1].motion;
+        }
+        draw_lane_objects_ground();
+      }
+    }
     glPopMatrix();
   }
 
-  if (FLAGS_show_motion_track &&
-      frame_content_->get_motion_buffer().size() > 0) {
-    motion_matrix_ = frame_content_->get_motion_buffer().back().motion;
-    //      AINFO <<motion_matrix_;
-  }
+  cv::Mat image_mat = frame_content_->get_camera_image().clone();
+  // 3. Bottom left, draw 2d camera detection and classification results
   glViewport(0, 0, image_width_, image_height_);
-  glPushMatrix();
-  glTranslatef(vao_trans_y_, vao_trans_x_, vao_trans_z_);
-  glRotatef(_Rotate_x, 1, 0, 0);
-  glRotatef(_Rotate_y, 0, 1, 0);
+  draw_camera_frame(frame_content_, &image_mat, true);
 
-  if (show_lane_) {
-    lane_objects_ =
-        std::make_shared<LaneObjects>(frame_content_->get_lane_objects());
-    if (draw_lane_objects_) {
-      draw_lane_objects_ground();
-    }
-  }
-  glPopMatrix();
-
-  // 2. Bottom right
-  glViewport(scene_width_, 0, image_width_, image_height_);
-  glPushMatrix();
-  glTranslatef(vao_trans_y_, vao_trans_x_, vao_trans_z_);
-  glRotatef(_Rotate_x, 1, 0, 0);
-  glRotatef(_Rotate_y, 0, 1, 0);
-
-  if (show_lane_) {
-    draw_lane_objects_image();
-  }
-  glPopMatrix();
-
-  // 3. Top left, draw 2d camera detection and classification results
+  // 4. Top left, draw 2d detection and 3d classification results
   glViewport(0, scene_height_, image_width_, image_height_);
-  draw_camera_frame(frame_content_, false);
-
-  // 4. Top right, draw 2d detection and 3d classification results
-  glViewport(scene_width_, scene_height_, image_width_, image_height_);
-  draw_camera_frame(frame_content_);
+  cv::Mat image_mat2 = frame_content_->get_camera_image().clone();
+  if (show_lane_) {
+    draw_lane_objects_image(&image_mat2);
+  }
+  draw_camera_frame(frame_content_, &image_mat2, false);
 
   static int no_frame = 0;
   if (capture_video_ || capture_screen_) {
@@ -625,6 +619,17 @@ void GLFWFusionViewer::render() {
       capture_screen_ = false;
     }
   }
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0, scene_width_ + image_width_, scene_height_ + image_height_, 0.0,
+          0.0, 100.0);
+  glViewport(0, 0, scene_width_ + image_width_, scene_height_ + image_height_);
+  glColor4f(1.0f, 1.0f, 1.0f, 0.7f);
+  int text_startx = 10;
+  int text_starty = 40;
+  glRasterPos2i(text_startx, text_starty);
+  raster_text_->print_multiline(help_str, text_startx, text_starty);
 
   no_frame++;
 }
@@ -661,7 +666,7 @@ void GLFWFusionViewer::key_callback(GLFWwindow* window, int key, int scancode,
   }
   if (action == GLFW_PRESS) {
     GLFWFusionViewer* vis = static_cast<GLFWFusionViewer*>(user_data);
-    AINFO << "key_value: " << key;
+    ADEBUG << "key_value: " << key;
     vis->keyboard(key);
   }
 }
@@ -812,8 +817,48 @@ void GLFWFusionViewer::keyboard(int key) {
       break;
     case GLFW_KEY_0:  // 3
       show_associate_color_ = !show_associate_color_;
+      break;
+    case GLFW_KEY_H:  // H
+      show_help_text = !show_help_text;
+      break;
+    case GLFW_KEY_G:  // G
+      show_vp_grid_ = !show_vp_grid_;
+      break;
     default:
       break;
+  }
+
+  help_str = "H: show help";
+  if (show_help_text) {
+    help_str += " (ON)";
+    help_str += "\nR: reset matrxi\nB: show box";
+    if (show_box) help_str += "(ON)";
+    help_str += "\nV: show velocity";
+    if (show_velocity) help_str += " (ON)";
+    help_str += "\nC: use class color";
+    if (use_class_color_) help_str += " (ON)";
+    help_str += "\nS: capture screen";
+    help_str += "\nA: capture video";
+    help_str += "\nI: show type id label";
+    if (show_type_id_label_) help_str += " (ON)";
+    help_str += "\nQ: show lane";
+    if (show_lane_) help_str += " (ON)";
+    help_str += "\nE: draw lane objects";
+    if (draw_lane_objects_) help_str += " (ON)";
+    help_str += "\nF: show fusion";
+    if (show_fusion_) help_str += " (ON)";
+    help_str += "\nD: show radar pc";
+    if (show_radar_pc_) help_str += " (ON)";
+    help_str += "\nO: show camera bdv";
+    if (show_camera_bdv_) help_str += " (ON)";
+    help_str += "\n2: show camera box2d";
+    if (show_camera_box2d_) help_str += " (ON)";
+    help_str += "\n3: show camera box3d";
+    if (show_camera_box3d_) help_str += " (ON)";
+    help_str += "\n0: show associate color";
+    if (show_associate_color_) help_str += " (ON)";
+    help_str += "\nG: show vanishing point and ground plane grid";
+    if (show_vp_grid_) help_str += " (ON)";
   }
 }
 
@@ -899,38 +944,38 @@ GLuint GLFWFusionViewer::image_to_gl_texture(const cv::Mat& mat,
   return texture_id;
 }
 
-void GLFWFusionViewer::draw_camera_frame(FrameContent* content) {
-  AINFO << "GLFWFusionViewer::draw_camera_frame";
-  cv::Mat image_mat_src = content->get_camera_image().clone();
-  if (image_mat_src.empty()) {
-    AWARN << "GLFWFusionViewer::draw_camera_frame : No image found";
+void GLFWFusionViewer::draw_camera_frame(FrameContent* content,
+                                         cv::Mat* image_mat,
+                                         bool show_3d_class) {
+  if (image_mat->empty()) {
     return;
   }
-  int image_width = image_mat_src.cols;
-  int image_height = image_mat_src.rows;
+  int image_width = image_mat->cols;
+  int image_height = image_mat->rows;
 
   glMatrixMode(GL_PROJECTION);  // Operate on projection matrix
   glLoadIdentity();
-  glOrtho(scene_width_, scene_width_ + image_width_, image_height_, 0.0, 0.0,
-          100.0);
+  // glOrtho(scene_width_, scene_width_ + image_width_, image_height_, 0.0, 0.0,
+  //         100.0);
+  glOrtho(0, image_width_, image_height_, 0.0, 0.0, 100.0);
 
   glMatrixMode(GL_MODELVIEW);  // Operate on model-view matrix
   glLoadIdentity();
 
   glEnable(GL_TEXTURE_2D);
-  GLuint image_tex = image_to_gl_texture(image_mat_src, GL_LINEAR_MIPMAP_LINEAR,
+  GLuint image_tex = image_to_gl_texture(*image_mat, GL_LINEAR_MIPMAP_LINEAR,
                                          GL_LINEAR, GL_CLAMP);
 
   /* Draw a quad */
   glBegin(GL_QUADS);
   glTexCoord2i(0, 0);
-  glVertex2i(scene_width_, 0);
+  glVertex2i(0, 0);
   glTexCoord2i(0, 1);
-  glVertex2i(scene_width_, image_height_);
+  glVertex2i(0, image_height_);
   glTexCoord2i(1, 1);
-  glVertex2i(scene_width_ + image_width_, image_height_);
+  glVertex2i(0 + image_width_, image_height_);
   glTexCoord2i(1, 0);
-  glVertex2i(scene_width_ + image_width_, 0);
+  glVertex2i(0 + image_width_, 0);
   glEnd();
 
   glDeleteTextures(1, &image_tex);
@@ -938,81 +983,41 @@ void GLFWFusionViewer::draw_camera_frame(FrameContent* content) {
 
   // -----------------------------
   Eigen::Matrix4d camera_to_world_pose = content->get_camera_to_world_pose();
-
+  Eigen::Matrix4d camera_to_world_pose_static =
+  content->get_camera_to_world_pose_static();
   Eigen::Matrix4d v2c = camera_to_world_pose.inverse();
-
-  int offset_x = scene_width_;
+  Eigen::Matrix4d v2c_static = camera_to_world_pose_static.inverse();
+  int offset_x = 0;  // scene_width_;
   int offset_y = 0;
-  if (show_camera_box2d_ || show_camera_box3d_) {
-    std::vector<std::shared_ptr<Object>> camera_objects;
-    camera_objects = content->get_camera_objects();
-    draw_camera_box(camera_objects, v2c, offset_x, offset_y, image_width,
-                    image_height);
-  }
 
+  std::vector<std::shared_ptr<Object>> camera_objects;
+  camera_objects = content->get_camera_objects();
+
+  // show 2d detection and classification
+  if (show_3d_class) {
+    // show 3d class
+    if (show_fusion_) {
+      std::vector<std::shared_ptr<Object>> fused_objects;
+      fused_objects = content->get_fused_objects();
+      draw_camera_box3d(camera_objects, fused_objects, v2c, offset_x, offset_y,
+                        image_width, image_height);
+    } else {
+      std::vector<std::shared_ptr<Object>> camera_objects;
+      camera_objects = content->get_camera_objects();
+      draw_camera_box(camera_objects, v2c, v2c_static,
+                      offset_x, offset_y, image_width,
+                      image_height);
+    }
+  } else {
+    // show 2d bbox
+    draw_camera_box2d(camera_objects, v2c, offset_x, offset_y, image_width,
+                      image_height);
+  }
   if (show_radar_pc_) {
     std::vector<std::shared_ptr<Object>> objects;
     objects = content->get_radar_objects();
     draw_objects2d(objects, v2c, "radar", offset_x, offset_y, image_width,
                    image_height);
-  }
-}
-
-void GLFWFusionViewer::draw_camera_frame(FrameContent* content,
-                                         bool show_3d_class) {
-  cv::Mat image_mat_src = content->get_camera_image().clone();
-  if (image_mat_src.empty()) {
-    return;
-  }
-  int image_width = image_mat_src.cols;
-  int image_height = image_mat_src.rows;
-
-  glMatrixMode(GL_PROJECTION);  // Operate on projection matrix
-  glLoadIdentity();
-  glOrtho(scene_width_, scene_width_ + image_width_, image_height_, 0.0, 0.0,
-          100.0);
-
-  glMatrixMode(GL_MODELVIEW);  // Operate on model-view matrix
-  glLoadIdentity();
-
-  glEnable(GL_TEXTURE_2D);
-  GLuint image_tex = image_to_gl_texture(image_mat_src, GL_LINEAR_MIPMAP_LINEAR,
-                                         GL_LINEAR, GL_CLAMP);
-
-  /* Draw a quad */
-  glBegin(GL_QUADS);
-  glTexCoord2i(0, 0);
-  glVertex2i(scene_width_, 0);
-  glTexCoord2i(0, 1);
-  glVertex2i(scene_width_, image_height_);
-  glTexCoord2i(1, 1);
-  glVertex2i(scene_width_ + image_width_, image_height_);
-  glTexCoord2i(1, 0);
-  glVertex2i(scene_width_ + image_width_, 0);
-  glEnd();
-
-  glDeleteTextures(1, &image_tex);
-  glDisable(GL_TEXTURE_2D);
-
-  // -----------------------------
-  Eigen::Matrix4d camera_to_world_pose = content->get_camera_to_world_pose();
-
-  Eigen::Matrix4d v2c = camera_to_world_pose.inverse();
-
-  int offset_x = scene_width_;
-  int offset_y = 0;
-
-  std::vector<std::shared_ptr<Object>> camera_objects;
-  camera_objects = content->get_camera_objects();
-  // show 2d detection and classification
-  if (!show_3d_class) {
-    draw_camera_box2d(camera_objects, v2c, offset_x, offset_y, image_width,
-                      image_height);
-  } else {  // show 3d class
-    std::vector<std::shared_ptr<Object>> fused_objects;
-    fused_objects = content->get_fused_objects();
-    draw_camera_box3d(camera_objects, fused_objects, v2c, offset_x, offset_y,
-                      image_width, image_height);
   }
 }
 
@@ -1027,6 +1032,7 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
     //    }
     while (lane_history_->size() < lane_objects_->size()) {
       lane_history_->push_back(LaneObject());
+      z_history_.push_back(std::vector<float>());
     }
   }
   for (size_t k = 0; k < lane_objects_->size(); ++k) {
@@ -1037,14 +1043,23 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
 
     if (FLAGS_show_motion_track) {
       auto& lane_history_pos = lane_history_->at(k).pos;
+      auto& lane_z_history = z_history_.at(k);
       // update lane history by projecting motion
-      for (auto& p : lane_history_pos) {
-        Eigen::Vector3f point_h;
-        point_h << p[0], p[1], 1;
-        point_h = motion_matrix_ * point_h;
-        p[0] = point_h[0];
-        p[1] = point_h[1];
+      //      for (auto& p : lane_history_pos) {
+      for (size_t i = 0; i < lane_history_pos.size(); ++i) {
+        auto& p = lane_history_pos[i];
+        auto& z = lane_z_history[i];
+        Eigen::VectorXf point_h = Eigen::VectorXf::Zero(motion_matrix_.cols());
+        point_h[0] = p[0];
+        point_h[1] = p[1];
+        point_h[2] = z;
+        point_h[motion_matrix_.cols() - 1] = 1.0;
+
+        Eigen::Vector2f proj_h;
+        z = project_point(point_h, &proj_h, motion_matrix_);
+        p = proj_h;
       }
+      AINFO << "lane_history_pos.size(): " << lane_history_pos.size();
       // add new point
       for (auto p = lane_objects_->at(k).pos.begin();
            p != lane_objects_->at(k).pos.end(); ++p) {
@@ -1052,17 +1067,22 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
         point_poly[1] = GetPolyValue(a, b, c, d, point_poly[0]);
 
         lane_history_pos.push_back(point_poly);
+        lane_z_history.push_back(0);
         if (lane_history_pos.size() > lane_history_buffer_size_) {
           lane_history_pos.erase(lane_history_pos.begin());
+          lane_z_history.erase(lane_z_history.begin());
         }
       }
 
-      glColor3f(1.0f, 0.0f, 0.0f);  // red
+      //      glColor3f(1.0f, 0.0f, 0.0f);  // red
       glLineWidth(1);
       glBegin(GL_LINE_STRIP);
-      for (auto p : lane_history_pos) {
+      for (size_t i = 0; i < lane_history_pos.size(); ++i) {
+        auto& p = lane_history_pos[i];
+        auto& z = lane_z_history[i];
         //          glVertex2f(p[0], p[1]);
-        drawHollowCircle(p[0], p[1], 0.2);
+        drawHollowCircle(p[0], p[1], 0.2, z);
+        //        AINFO << "("<<p[0] << ", "<< p[1] << "), ";
       }
       glEnd();
       glFlush();
@@ -1100,9 +1120,9 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
                << static_cast<int>(lane_objects_->at(k).spatial);
       }
     }
-    if (FLAGS_show_motion_track) {
-      glColor3f(1.0f, 0.0f, 0.0f);  // red
-    }
+    // if (FLAGS_show_motion_track) {
+    //   glColor3f(1.0f, 0.0f, 0.0f);  // red
+    // }
     for (auto p = lane_objects_->at(k).pos.begin();
          p != lane_objects_->at(k).pos.end(); ++p) {
       drawHollowCircle(static_cast<GLfloat>(p->x()),
@@ -1184,9 +1204,8 @@ void GLFWFusionViewer::draw_lane_objects_ground() {
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);  // reset the color to white
 }
 
-bool GLFWFusionViewer::draw_lane_objects_image() {
-  cv::Mat show_mat = frame_content_->get_camera_image().clone();
-  if (show_mat.empty()) {
+bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
+  if (image_mat->empty()) {
     AERROR << "Get nullptr original image from camera frame supplement.";
     return false;
   }
@@ -1198,47 +1217,27 @@ bool GLFWFusionViewer::draw_lane_objects_image() {
     AERROR << "Get nullptr lane_map from camera frame supplement.";
     return false;
   }
-  cv::Mat lane_mask;
-  if (lane_map.type() == CV_8UC1) {
-    // binary label map
-    lane_mask = lane_map;
-  } else if (lane_map.type() == CV_32FC1) {
-    // heatmap
-    lane_mask.create(lane_map.rows, lane_map.cols, CV_8UC1);
-    lane_mask.setTo(cv::Scalar(0));
-    ADEBUG << "confidence threshold of lane map = " << lane_map_threshold_;
-    for (int h = 0; h < lane_mask.rows; ++h) {
-      for (int w = 0; w < lane_mask.cols; ++w) {
-        if (lane_map.at<float>(h, w) >= lane_map_threshold_) {
-          lane_mask.at<unsigned char>(h, w) = 1;
-        }
-      }
-    }
-  } else {
-    AERROR << "invalid type of input lane map: " << lane_map.type();
-    return false;
-  }
-
-  if (lane_mask.size() != show_mat.size()) {
-    AERROR << "lane mask size should be equal to original image size.";
-    return false;
-  }
 
   // draw lane pixels
-  cv::Scalar lane_mask_color(0, 255, 255);  // yellow
-  int x0 = 0;
-  int y0 = 0;
-  int x1 = show_mat.cols - 1;
-  int y1 = show_mat.rows - 1;
+  cv::Scalar lane_map_color(0, 255, 255);  // yellow for lane line mark
+  int x_offset = 0;
+  int y_offset = lane_start_y_pos_;
+  int x0 = x_offset;
+  int y0 = y_offset;
+  int x1 = image_mat->cols - 1;
+  int y1 = image_mat->rows - 1;
+
   for (int h = y0; h <= y1; ++h) {
     for (int w = x0; w <= x1; ++w) {
-      if (lane_mask.at<unsigned char>(h, w) > 0) {
-        show_mat.at<cv::Vec3b>(h, w)[0] =
-            static_cast<unsigned char>(lane_mask_color[0]);
-        show_mat.at<cv::Vec3b>(h, w)[1] =
-            static_cast<unsigned char>(lane_mask_color[1]);
-        show_mat.at<cv::Vec3b>(h, w)[2] =
-            static_cast<unsigned char>(lane_mask_color[2]);
+      int x = static_cast<int>(w * lane_map_scale_);
+      int y = static_cast<int>((h - y_offset) * lane_map_scale_);
+      if (x >= 0 && x < lane_map.cols && y >= 0 && y < lane_map.rows &&
+          lane_map.at<float>(y, x) >= lane_map_threshold_) {
+        for (uint16_t c = 0; c < 3; c++) {
+          image_mat->at<cv::Vec3b>(h, w)[c] = static_cast<unsigned char>(
+              image_mat->at<cv::Vec3b>(h, w)[c] * alpha_blending +
+              lane_map_color[c] * one_minus_alpha);
+        }
       }
     }
   }
@@ -1285,7 +1284,7 @@ bool GLFWFusionViewer::draw_lane_objects_image() {
     // Besides the fitted polynomial curves we draw lane markers as well
     for (auto p = lane_objects_->at(k).image_pos.begin();
          p != lane_objects_->at(k).image_pos.end(); ++p) {
-      cv::circle(show_mat,
+      cv::circle(*image_mat,
                  cv::Point(static_cast<int>(p->x()), static_cast<int>(p->y())),
                  4, lane_object_color, -1);
     }
@@ -1302,7 +1301,7 @@ bool GLFWFusionViewer::draw_lane_objects_image() {
     float d = lane_objects_->at(k).img_curve.d;
 
     for (float l = start; l <= end; l++) {
-      cv::circle(show_mat,
+      cv::circle(*image_mat,
                  cv::Point(static_cast<int>(GetPolyValue(a, b, c, d, l)),
                            static_cast<int>(l)),
                  2, lane_object_color, -1);
@@ -1320,7 +1319,7 @@ bool GLFWFusionViewer::draw_lane_objects_image() {
   glLoadIdentity();
 
   glEnable(GL_TEXTURE_2D);
-  GLuint image_tex = image_to_gl_texture(show_mat, GL_LINEAR_MIPMAP_LINEAR,
+  GLuint image_tex = image_to_gl_texture(*image_mat, GL_LINEAR_MIPMAP_LINEAR,
                                          GL_LINEAR, GL_CLAMP);
 
   /* Draw a quad */
@@ -1343,9 +1342,52 @@ bool GLFWFusionViewer::draw_lane_objects_image() {
 
   std::string frame_id_str = "frame: " + std::to_string(frame_count_);
   glRasterPos2i(scene_width_ + 10, image_height_ - 200);
-  raster_text_->print_string(frame_id_str.c_str());
+  raster_text_->print_string(frame_id_str);
 
   return true;
+}
+
+void GLFWFusionViewer::draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat,
+                                      int offset_x, int offset_y,
+                                      int image_width, int image_height) {
+  std::vector<int> color_v;
+  std::vector<int> color_g;
+  if (stat) {
+    color_v = std::vector<int>{0, 0, 0};
+    color_g = std::vector<int>{0, 0, 0};
+  } else {
+    color_v = std::vector<int>{255, 0, 0};
+    color_g = std::vector<int>{255, 255, 255};
+  }
+
+  // Draw vanishing point
+  Eigen::Vector3d pt3d(1000.0, 0.0, 0.0);
+  Eigen::Vector2d pt2d;
+  get_project_point(v2c, pt3d, &pt2d);
+  Eigen::Vector2d tmp1 = pt2d + Eigen::Vector2d(0.0, 30.0);
+  Eigen::Vector2d tmp2 = pt2d + Eigen::Vector2d(0.0, -30.0);
+  draw_line2d(tmp1, tmp2, 2, color_v[0], color_v[1], color_v[2],
+              offset_x, offset_y, image_width, image_height);
+  tmp1 = pt2d + Eigen::Vector2d(30.0, 0.0);
+  tmp2 = pt2d + Eigen::Vector2d(-30.0, 0.0);
+  draw_line2d(tmp1, tmp2, 2, color_v[0], color_v[1], color_v[2],
+              offset_x, offset_y, image_width, image_height);
+
+  // Draw grid plane
+  for (double y = -10.0; y <= 10.0; y += 2.0) {
+    Eigen::Vector2d prev_pt2d;
+    for (double x = 0.0; x < 100.0; x += 5.0) {
+      Eigen::Vector3d pt3d(x, y, 0.0);
+      Eigen::Vector2d pt2d;
+      get_project_point(v2c, pt3d, &pt2d);
+
+      if (x > 5.0) {
+        draw_line2d(prev_pt2d, pt2d, 2, color_g[0], color_g[1], color_g[2],
+                    offset_x, offset_y, image_width, image_height);
+      }
+      prev_pt2d = pt2d;
+    }
+  }
 }
 
 bool GLFWFusionViewer::project_point_undistort(Eigen::Matrix4d v2c,
@@ -1493,8 +1535,8 @@ void GLFWFusionViewer::draw_camera_box2d(
           box2d_color[i] = static_cast<int>(255 * rgb[i]);
         }
         if (obj->b_cipv) {
-          AINFO << "draw_camera_box2d This is CIPV, obj->track_id: "
-                << obj->track_id;
+          ADEBUG << "draw_camera_box2d This is CIPV, obj->track_id: "
+                 << obj->track_id;
           box2d_color[0] = 255;
           box2d_color[1] = 0;
           box2d_color[2] = 0;
@@ -1523,7 +1565,7 @@ void GLFWFusionViewer::draw_camera_box2d(
           int yi_txt = offset_y + y_txt * image_height_ / image_height;
 
           glRasterPos2i(xi_txt, yi_txt);
-          raster_text_->print_string(c.c_str());
+          raster_text_->print_string(c);
           glColor4f(1.0f, 1.0f, 1.0f, 1.0f);  // reset the color to white
 
           // type
@@ -1550,7 +1592,7 @@ void GLFWFusionViewer::draw_camera_box2d(
           int yi_type = offset_y + y_type * image_height_ / image_height;
 
           glRasterPos2i(xi_type, yi_type);
-          raster_text_->print_string(obj_type_str.c_str());
+          raster_text_->print_string(obj_type_str);
         }
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);  // reset the color to white
       }
@@ -1583,8 +1625,8 @@ void GLFWFusionViewer::draw_camera_box3d(
       Eigen::Vector3d center = obj->center;
       Eigen::Vector2d center2d;
       get_project_point(v2c, center, &center2d);
-      AINFO << "camera obj " << obj->track_id << " center: " << center2d[0]
-            << " " << center2d[1];
+      ADEBUG << "draw_camera_box3d camera obj " << obj->track_id
+             << " center: " << center2d[0] << " " << center2d[1];
 
       float theta = obj->theta;
       float width = obj->width;
@@ -1605,6 +1647,12 @@ void GLFWFusionViewer::draw_camera_box3d(
       int box3d_color[3];
       for (size_t i = 0; i < 3; ++i) {
         box3d_color[i] = static_cast<int>(255 * rgb[i]);
+      }
+      if (fused_obj->b_cipv) {
+        ADEBUG << "cipv fused_obj->track_id: " << fused_obj->track_id;
+        box3d_color[0] = 255;
+        box3d_color[1] = 0;
+        box3d_color[2] = 0;
       }
 
       if (show_camera_box3d_) {
@@ -1783,17 +1831,19 @@ void GLFWFusionViewer::draw_objects(
         rgb[0] = tmp_color[0];
         rgb[1] = tmp_color[1];
         rgb[2] = tmp_color[2];
-      }
 
-      if (use_class_color) {
+      } else if (use_class_color) {
         get_class_color(static_cast<unsigned>(objects[i]->type), rgb);
-      }
 
-      if (objects[i]->b_cipv) {
+      } else if (objects[i]->b_cipv) {
         AINFO << "cipv objects[i]->track_id: " << objects[i]->track_id;
-        rgb[0] = 1;
-        rgb[1] = 0;
-        rgb[2] = 0;
+        rgb[0] = 1.0f;
+        rgb[1] = 0.0f;
+        rgb[2] = 0.0f;
+      } else {
+        rgb[0] = color[0];
+        rgb[1] = color[1];
+        rgb[2] = color[2];
       }
 
       glColor3f((GLfloat)rgb[0], (GLfloat)rgb[1], (GLfloat)rgb[2]);
@@ -1807,13 +1857,37 @@ void GLFWFusionViewer::draw_objects(
       glFlush();
 
       glRasterPos2i(tc[0], tc[1]);
-      raster_text_->print_string(std::to_string(objects[i]->track_id).c_str());
+      raster_text_->print_string(std::to_string(objects[i]->track_id));
+      int offset = 2;
+
+      if (objects[i]->local_lidar_track_id != -1) {
+          glRasterPos2i(tc[0] + offset, tc[1]);
+          raster_text_->print_string(std::string("v:") +
+            std::to_string(objects[i]->local_camera_track_id));
+          offset +=2;
+      }
+
+      if (objects[i]->local_camera_track_id != -1) {
+          glRasterPos2i(tc[0] + offset, tc[1]);
+          raster_text_->print_string(std::string("c:") +
+            std::to_string(objects[i]->local_camera_track_id));
+          offset +=2;
+      }
+
+      if (objects[i]->local_radar_track_id != -1) {
+          glRasterPos2i(tc[0] + offset, tc[1]);
+          raster_text_->print_string(std::string("r:") +
+            std::to_string(objects[i]->local_camera_track_id));
+          offset +=2;
+      }
 
       if (objects[i]->b_cipv) {
-        glRasterPos2i(tc[0] + 3, tc[1]);
-        raster_text_->print_string(std::string("cipv").c_str());
+        glRasterPos2i(tc[0] + offset, tc[1]);
+        raster_text_->print_string(std::string("cipv"));
       }
-      AINFO << objects[i]->ToString();
+      ADEBUG << objects[i]->ToString();
+      glColor3f(static_cast<GLfloat>(1.0f), static_cast<GLfloat>(1.0f),
+                static_cast<GLfloat>(1.0f));  // reset to white color
     }
   }
 
@@ -1822,19 +1896,19 @@ void GLFWFusionViewer::draw_objects(
     int i = 0;
     vec3 velocity_src;
     vec3 velocity_dst;
-    float rgb[3] = {1, 1, 0};
+    float rgb[3] = {1.0f, 1.0f, 1.0f};
     for (i = 0; i < static_cast<int>(objects.size()); i++) {
       velocity_src = get_velocity_src_position(objects[i]);
       velocity_dst.x = velocity_src.x + objects[i]->velocity[0];
       velocity_dst.y = velocity_src.y + objects[i]->velocity[1];
       velocity_dst.z = -1.0f;
 
-      // draw same color with 2d camera bbox
-      auto tmp_color =
-          s_color_table[objects[i]->track_id % s_color_table.size()];
-      rgb[0] = tmp_color[0];
-      rgb[1] = tmp_color[1];
-      rgb[2] = tmp_color[2];
+      // // draw same color with 2d camera bbox
+      // auto tmp_color =
+      //     s_color_table[objects[i]->track_id % s_color_table.size()];
+      // rgb[0] = tmp_color[0];
+      // rgb[1] = tmp_color[1];
+      // rgb[2] = tmp_color[2];
 
       if (use_class_color) {
         get_class_color(static_cast<unsigned>(objects[i]->type), rgb);
@@ -1872,7 +1946,8 @@ void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
 }
 */
 
-void GLFWFusionViewer::drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
+void GLFWFusionViewer::drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius,
+                                        GLfloat z) {
   // number of triangles used to draw circle
   GLfloat lineAmount = 100.0f;
 
@@ -1880,22 +1955,37 @@ void GLFWFusionViewer::drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius) {
 
   glBegin(GL_LINE_LOOP);
   for (GLfloat i = 0.0f; i <= lineAmount; i++) {
-    glVertex2f(x + (radius * cos(i * twicePi / lineAmount)),
-               y + (radius * sin(i * twicePi / lineAmount)));
+    glVertex3f(x + (radius * cos(i * twicePi / lineAmount)),
+               y + (radius * sin(i * twicePi / lineAmount)), z);
   }
   glEnd();
 }
 
+float GLFWFusionViewer::project_point(const Eigen::VectorXf& in,
+                                      Eigen::Vector2f* out,
+                                      const MotionType& motion_matrix) {
+  CHECK(in.rows() == motion_matrix.cols());
+  CHECK_GT(in.rows(), 2);
+  Eigen::VectorXf proj = motion_matrix * in;
+  *out << proj[0], proj[1];
+  return proj[2];
+}
+
 void GLFWFusionViewer::draw_car_trajectory(FrameContent* content) {
   const MotionBuffer& motion_buffer = content->get_motion_buffer();
-  Eigen::Vector3f center;
-  center << 0, 0, 1.0;
+  Eigen::VectorXf center;
+  if (motion_buffer.size() > 0) {
+    center = Eigen::VectorXf::Zero(motion_buffer[0].motion.cols());
+    center[motion_buffer[0].motion.cols() - 1] = 1.0;
+  }
 
-  Eigen::Vector3f point = center;
   for (int i = motion_buffer.size() - 1; i >= 0; i--) {
-    Eigen::Matrix3f tmp = motion_buffer[i].motion;
-    point = tmp * center;
-    drawHollowCircle(point(0), point(1), 0.2);
+    //  Eigen::Matrix3f tmp = motion_buffer[i].motion;
+    //  point = tmp * center;
+    Eigen::Vector2f point;
+    float z = project_point(center, &point, motion_buffer[i].motion);
+    drawHollowCircle(point(0), point(1), 0.2, z * 10);
+    //    AINFO << "Z value is: "<< z;
     glFlush();
   }
 }
@@ -1937,16 +2027,20 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
             break;
           }
 
-          Eigen::Vector3f pt, proj_pt;
-          pt << trackjectory.second[it].first, trackjectory.second[it].second,
-              1.0;
+          Eigen::VectorXf pt =
+              Eigen::VectorXf::Zero(motion_buffer[0].motion.cols());
+          pt[0] = trackjectory.second[it].first;
+          pt[1] = trackjectory.second[it].second;
+          pt[motion_buffer[0].motion.cols() - 1] = 1.0;
+
           if (it == trackjectory.second.size() - 1) {
-            proj_pt = pt;
+            glVertex2f(pt[0], pt[1]);
           } else {
-            auto& motion_mat = motion_buffer[motion_size - count].motion;
-            proj_pt = motion_mat * pt;
+            Eigen::Vector2f proj_pt;
+            project_point(pt, &proj_pt,
+                          motion_buffer[motion_size - count].motion);
+            glVertex2f(proj_pt[0], proj_pt[1]);
           }
-          glVertex2f(proj_pt[0], proj_pt[1]);
         }
         glEnd();
         glLineWidth(1);
@@ -1961,8 +2055,8 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
   Eigen::Matrix4d c2v = content->get_camera_to_world_pose();
 
   if (show_camera_bdv_) {
-    draw_objects(content->get_camera_objects(), c2v, true, true,
-                 Eigen::Vector3f(1, 1, 0), use_class_color_);
+      draw_objects(content->get_camera_objects(), c2v, true, true,
+                   Eigen::Vector3f(1, 1, 0), use_class_color_);
   }
 
   if (show_fusion_) {
@@ -1970,15 +2064,15 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
     bool draw_cube = true;
     bool draw_velocity = true;
     std::vector<std::shared_ptr<Object>> objects = content->get_fused_objects();
-    AINFO << "fused object size in glfw viewer is " << objects.size();
+    ADEBUG << "fused object size in glfw viewer is " << objects.size();
     for (auto obj : objects) {
-      AINFO << "object in fuse: " << obj->ToString();
+      ADEBUG << "object in fuse: " << obj->ToString();
     }
     std::vector<std::shared_ptr<Object>> objects_cam =
         content->get_camera_objects();
-    AINFO << " camera object size is " << objects_cam.size();
+    ADEBUG << " camera object size is " << objects_cam.size();
     for (auto obj : objects_cam) {
-      AINFO << "object in cam: " << obj->ToString();
+      ADEBUG << "object in cam: " << obj->ToString();
     }
     draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color, false,
                  false);
@@ -2003,14 +2097,21 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
 }
 
 void GLFWFusionViewer::draw_camera_box(
-    const std::vector<std::shared_ptr<Object>>& objects, Eigen::Matrix4d v2c,
+    const std::vector<std::shared_ptr<Object>>& objects,
+    Eigen::Matrix4d v2c, Eigen::Matrix4d v2c_static,
     int offset_x, int offset_y, int image_width, int image_height) {
+  if (show_vp_grid_) {
+    draw_vp_ground(v2c_static, true, offset_x, offset_y,
+                   image_width, image_height);
+    draw_vp_ground(v2c, false, offset_x, offset_y, image_width, image_height);
+  }
+
   for (auto obj : objects) {
     Eigen::Vector3d center = obj->center;
     Eigen::Vector2d center2d;
     get_project_point(v2c, center, &center2d);
-    AINFO << "camera obj " << obj->track_id << " center: " << center[0] << " "
-          << center[1];
+    ADEBUG << "draw_camera_box camera obj " << obj->track_id
+           << " center: " << center[0] << " " << center[1];
 
     std::vector<Eigen::Vector2d> points;
     points.resize(8);
@@ -2023,8 +2124,8 @@ void GLFWFusionViewer::draw_camera_box(
 
     auto box3d_color = s_color_table[0];
     if (obj->b_cipv) {
-      AINFO << "draw_camera_box2d This is CIPV, obj->track_id: "
-            << obj->track_id;
+      ADEBUG << "draw_camera_box This is CIPV, obj->track_id: "
+             << obj->track_id;
       box3d_color[0] = 255;
       box3d_color[1] = 0;
       box3d_color[2] = 0;
@@ -2033,6 +2134,7 @@ void GLFWFusionViewer::draw_camera_box(
     }
 
     if (show_camera_box3d_) {
+      ADEBUG << "draw_8pts_box";
       draw_8pts_box(points, Eigen::Vector3f(box3d_color[0], box3d_color[1],
                                             box3d_color[2]),
                     offset_x, offset_y, image_width, image_height);
@@ -2120,8 +2222,8 @@ void GLFWFusionViewer::draw_objects2d(
       float y2 = y + radius;
 
       if (obj->b_cipv) {
-        AINFO << "radar draw_objects2d This is CIPV, obj->track_id: "
-              << obj->track_id;
+        ADEBUG << "radar draw_objects2d This is CIPV, obj->track_id: "
+               << obj->track_id;
         glColor3ub(255, 0, 0);
       } else {
         glColor3ub(0, 0, 0);

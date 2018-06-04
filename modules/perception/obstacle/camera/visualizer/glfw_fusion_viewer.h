@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GLFW_FUSION_VIEWER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GLFW_FUSION_VIEWER_H_
 
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
@@ -137,6 +138,9 @@ class GLFWFusionViewer {
 
   void render();
 
+  float project_point(const Eigen::VectorXf &in, Eigen::Vector2f *out,
+      const MotionType &motion_matrix);
+
  protected:
   vec3 get_velocity_src_position(const std::shared_ptr<Object> &object);
 
@@ -146,7 +150,7 @@ class GLFWFusionViewer {
   void draw_car_trajectory(FrameContent *content);
   void draw_trajectories(FrameContent *content);
 
-  void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius);
+  void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius, GLfloat z = 0);
 
   // for drawing camera 2d results
  protected:
@@ -199,7 +203,8 @@ class GLFWFusionViewer {
 
   void draw_3d_classifications(FrameContent *content, bool show_fusion);
   void draw_camera_box(const std::vector<std::shared_ptr<Object>> &objects,
-                       Eigen::Matrix4d w2c, int offset_x, int offset_y,
+                       Eigen::Matrix4d w2c, Eigen::Matrix4d w2c_static,
+                       int offset_x, int offset_y,
                        int image_width, int image_height);
 
   void draw_objects2d(const std::vector<std::shared_ptr<Object>> &objects,
@@ -225,16 +230,22 @@ class GLFWFusionViewer {
   FrameContent *frame_content_;
   unsigned char *rgba_buffer_;
 
-  double vao_trans_x_;
-  double vao_trans_y_;
-  double vao_trans_z_;
-  double _Rotate_x;
-  double _Rotate_y;
-  double _Rotate_z;
+  float vao_trans_x_;
+  float vao_trans_y_;
+  float vao_trans_z_;
+  float _Rotate_x;
+  float _Rotate_y;
+  float _Rotate_z;
+  float _Scale_x;
+  float _Scale_y;
+  float _Scale_z;
   bool show_box;
   bool show_velocity;
   bool show_polygon;
   bool show_text;
+  bool show_help_text;
+  std::string help_str;
+
 
   void get_class_color(int cls, float rgb[3]);
 
@@ -262,16 +273,20 @@ class GLFWFusionViewer {
   GLuint image_to_gl_texture(const cv::Mat &mat, GLenum min_filter,
                              GLenum mag_filter, GLenum wrap_filter);
 
-  void draw_camera_frame(FrameContent *content);
-
   // @brief, draw 2d camera frame, show 2d or 3d classification
-  void draw_camera_frame(FrameContent *content, bool show_3d_class);
+  void draw_camera_frame(FrameContent *content, cv::Mat *image_mat,
+                         bool show_3d_class = false);
 
   // @brief: draw lane objects in ego-car ground (vehicle) space
   void draw_lane_objects_ground();
 
   // @brief: draw lane objects in image space
-  bool draw_lane_objects_image();
+  bool draw_lane_objects_image(cv::Mat *image_mat);
+
+  // @brief draw vanishing point and ground plane on image
+  // stat: static or not. decide colors
+  void draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat, int offset_x,
+                      int offset_y, int image_width, int image_height);
 
   bool use_class_color_ = true;
 
@@ -294,6 +309,7 @@ class GLFWFusionViewer {
                                // bbox
   bool show_type_id_label_;
   bool show_lane_;
+  bool show_vp_grid_ = true;  // show vanishing point and ground plane grid
   bool draw_lane_objects_;
 
   static std::vector<std::vector<int>> s_color_table;
@@ -301,17 +317,23 @@ class GLFWFusionViewer {
 
   LaneObjectsPtr lane_objects_;
   float lane_map_threshold_;
+  int lane_start_y_pos_;
+  float lane_map_scale_;
 
   LaneObjectsPtr lane_history_;
+  std::vector<std::vector<float>> z_history_;
   //  std::vector<LaneObjects> Lane_history_buffer_;
-  const std::size_t lane_history_buffer_size_ = 400;
+  const std::size_t lane_history_buffer_size_ = 40000;
   const std::size_t object_history_size_ = 5;
-  Eigen::Matrix3f motion_matrix_;
+  MotionType motion_matrix_;
   // pin-hole camera model with distortion
   std::shared_ptr<CameraDistort<double>> distort_camera_intrinsic_;
 
   // frame count
   int frame_count_;
+  // alpha_blending factor for visualization
+  float alpha_blending = 0.5;  // [0..1]
+  float one_minus_alpha = 1.0 - alpha_blending;
   // object_trajectories
   std::map<int, std::vector<std::pair<float, float>>> object_trackjectories_;
   std::map<int, std::vector<double>> object_timestamps_;

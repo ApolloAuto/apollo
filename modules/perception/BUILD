@@ -23,6 +23,7 @@ cc_library(
         "//modules/perception/obstacle/onboard:radar_subnode",
         "//modules/perception/obstacle/onboard:visualization_subnode",
         "//modules/perception/onboard",
+        "//modules/perception/proto:cnn_segmentation_config_lib_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/perception/traffic_light/onboard",
         "@com_google_protobuf//:protobuf",

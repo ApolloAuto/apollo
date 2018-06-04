@@ -40,7 +40,7 @@ void KalmanFilter::SetUseAdaptive(const bool& use_adaptive) {
 }
 
 bool KalmanFilter::SetAssociationScoreMaximum(
-    const double& association_score_maximum) {
+    const double association_score_maximum) {
   if (association_score_maximum > 0) {
     s_association_score_maximum_ = association_score_maximum;
     AINFO << "association score maximum of KalmanFilter is "
@@ -52,7 +52,7 @@ bool KalmanFilter::SetAssociationScoreMaximum(
 }
 
 bool KalmanFilter::SetBreakdownThresholdMaximum(
-    const double& breakdown_threshold_maximum) {
+    const double breakdown_threshold_maximum) {
   if (breakdown_threshold_maximum > 0) {
     s_breakdown_threshold_maximum_ = breakdown_threshold_maximum;
     AINFO << "breakdown threshold maximum of KalmanFilter is "
@@ -63,10 +63,10 @@ bool KalmanFilter::SetBreakdownThresholdMaximum(
   return false;
 }
 
-bool KalmanFilter::InitParams(const double& measurement_noise,
-                              const double& initial_velocity_noise,
-                              const double& xy_propagation_noise,
-                              const double& z_propagation_noise) {
+bool KalmanFilter::InitParams(const double measurement_noise,
+                              const double initial_velocity_noise,
+                              const double xy_propagation_noise,
+                              const double z_propagation_noise) {
   if (measurement_noise < 0) {
     AERROR << "invalid measurement noise of KalmanFilter!";
     return false;
@@ -121,7 +121,7 @@ void KalmanFilter::Initialize(const Eigen::Vector3f& anchor_point,
   belief_acceleration_ = Eigen::Vector3d::Zero();
 }
 
-Eigen::VectorXf KalmanFilter::Predict(const double& time_diff) {
+Eigen::VectorXf KalmanFilter::Predict(const double time_diff) {
   // Compute predict states
   Eigen::VectorXf predicted_state;
   predicted_state.resize(6);
@@ -141,7 +141,7 @@ Eigen::VectorXf KalmanFilter::Predict(const double& time_diff) {
 
 void KalmanFilter::UpdateWithObject(
     const std::shared_ptr<TrackedObject>& new_object,
-    const std::shared_ptr<TrackedObject>& old_object, const double& time_diff) {
+    const std::shared_ptr<TrackedObject>& old_object, const double time_diff) {
   if (time_diff <= DBL_EPSILON) {
     AWARN << "Time diff is too limited to updating KalmanFilter!";
     return;
@@ -179,7 +179,7 @@ void KalmanFilter::UpdateWithObject(
   age_ += 1;
 }
 
-void KalmanFilter::UpdateWithoutObject(const double& time_diff) {
+void KalmanFilter::UpdateWithoutObject(const double time_diff) {
   // Only update belief anchor point
   belief_anchor_point_ += belief_velocity_ * time_diff;
   age_ += 1;
@@ -203,7 +203,7 @@ void KalmanFilter::GetAccelerationGain(Eigen::Vector3f* acceleration_gain) {
   (*acceleration_gain) = belief_acceleration_gain_.cast<float>();
 }
 
-void KalmanFilter::Propagate(const double& time_diff) {
+void KalmanFilter::Propagate(const double time_diff) {
   // Only propagate tracked motion
   if (age_ <= 0) {
     return;
@@ -213,7 +213,7 @@ void KalmanFilter::Propagate(const double& time_diff) {
 
 Eigen::VectorXf KalmanFilter::ComputeMeasuredVelocity(
     const std::shared_ptr<TrackedObject>& new_object,
-    const std::shared_ptr<TrackedObject>& old_object, const double& time_diff) {
+    const std::shared_ptr<TrackedObject>& old_object, const double time_diff) {
   // Compute 2D velocity measurment for filtering
   // Obtain robust measurment via observation redundency
 
@@ -238,7 +238,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredVelocity(
 
 Eigen::VectorXf KalmanFilter::ComputeMeasuredAnchorPointVelocity(
     const std::shared_ptr<TrackedObject>& new_object,
-    const std::shared_ptr<TrackedObject>& old_object, const double& time_diff) {
+    const std::shared_ptr<TrackedObject>& old_object, const double time_diff) {
   // Compute 2D anchor point velocity measurment
   Eigen::Vector3f measured_anchor_point_velocity =
       new_object->anchor_point - old_object->anchor_point;
@@ -249,7 +249,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredAnchorPointVelocity(
 
 Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCenterVelocity(
     const std::shared_ptr<TrackedObject>& new_object,
-    const std::shared_ptr<TrackedObject>& old_object, const double& time_diff) {
+    const std::shared_ptr<TrackedObject>& old_object, const double time_diff) {
   // Compute 2D bbox center velocity measurment
   Eigen::Vector3d old_dir = old_object->direction.cast<double>();
   Eigen::Vector3d old_size = old_object->size.cast<double>();
@@ -274,7 +274,7 @@ Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCenterVelocity(
 
 Eigen::VectorXf KalmanFilter::ComputeMeasuredBboxCornerVelocity(
     const std::shared_ptr<TrackedObject>& new_object,
-    const std::shared_ptr<TrackedObject>& old_object, const double& time_diff) {
+    const std::shared_ptr<TrackedObject>& old_object, const double time_diff) {
   // Compute 2D bbox corner velocity measurment
   Eigen::Vector3f project_dir =
       new_object->anchor_point - old_object->anchor_point;
@@ -379,7 +379,7 @@ Eigen::Vector3f KalmanFilter::SelectMeasuredVelocityAccordingMotionConsistency(
 
 void KalmanFilter::UpdateVelocity(const Eigen::VectorXf& measured_anchor_point,
                                   const Eigen::VectorXf& measured_velocity,
-                                  const double& time_diff) {
+                                  const double time_diff) {
   // Compute kalman gain
   Eigen::Matrix3d mat_c = Eigen::Matrix3d::Identity();
   Eigen::Matrix3d mat_q = s_measurement_noise_ * Eigen::Matrix3d::Identity();
@@ -477,7 +477,7 @@ void KalmanFilter::ComputeBreakdownThreshold() {
 }
 
 Eigen::Vector3f KalmanFilter::ComputeMeasuredAcceleration(
-    const Eigen::Vector3f& measured_velocity, const double& time_diff) {
+    const Eigen::Vector3f& measured_velocity, const double time_diff) {
   if (history_measured_velocity_.size() < 3) {
     return Eigen::Vector3f::Zero();
   }

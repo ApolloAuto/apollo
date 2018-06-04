@@ -24,7 +24,7 @@ before you proceed.
 ## Hardware and Software Installation
 
 Please refer to
-[Apollo 2.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_hardware_system_installation_guide%20v1.md)
+[Apollo 2.5 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_hardware_system_installation_guide_v1.md)
 for the steps to install the hardware components and the system software, as well as
 [Apollo Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide.md).
 
@@ -37,18 +37,18 @@ For questions regarding Dreamview icons refer to the
 
 1. Plug-in an external hard-drive to any available USB port in the host machine. 
 
-1. Turn on the vehicle, and then the host machine.
+2. Turn on the vehicle, and then the host machine.
 
-1. Launch Docker Release Container.
+3. Launch Docker Release Container.
 
-1. Launch DreamView.
+4. Launch DreamView.
 
    Note\: Use your favorite browser to access Dreamview web service in your host
    machine browser with URL http://localhost:8888.
 
    ![](images/dreamview_2_5.png)
 
-1. Select Mode, Vehicle and Map.
+5. Select Mode, Vehicle and Map.
 
    ![](images/dreamview_2_5_setup_profile.png)
 
@@ -61,7 +61,7 @@ For questions regarding Dreamview icons refer to the
    HMI, but just remember to click "Reset All" on the top-right corner to
    restart the system.
 
-1. Start Modules.
+6. Start Modules.
 
    Click the "Setup" button.
 
@@ -74,14 +74,14 @@ For questions regarding Dreamview icons refer to the
 
    ![](images/dreamview_2_5_module_controller.png)
 
-1. Under Default Routing select your desired route.
+7. Under Default Routing select your desired route.
 
-1. Under Tasks click Start Auto. (Note: Be cautious when starting autonomous
+8. Under Tasks click Start Auto. (Note: Be cautious when starting autonomous
    driving, you should now be in autonomous mode.)
 
    ![](images/dreamview_2_5_start_auto.png)
 
-1. After autonomous testing is complete, under Tasks click Reset All, close all
+9. After autonomous testing is complete, under Tasks click Reset All, close all
    windows and shutdown the machine. 
 
-1. Remove the hard drive.
+10. Remove the hard drive.

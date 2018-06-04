@@ -2,14 +2,14 @@ header {
   module_name: "planning"
   status {
     error_code: PLANNING_ERROR
-    msg: "init frame failed"
+    msg: "failed to init reference line info"
   }
 }
 gear: GEAR_DRIVE
 decision {
   main_decision {
     not_ready {
-      reason: "Failed to init frame"
+      reason: "PLANNING_ERROR: failed to init reference line info"
     }
   }
 }

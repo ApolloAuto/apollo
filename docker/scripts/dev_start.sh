@@ -20,9 +20,35 @@ INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20180413_2000"
+VERSION_X86_64="dev-x86_64-20180530_1312"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
+
+# Check whether user has agreed license agreement
+function check_agreement() {
+  agreement_record="${HOME}/.apollo_agreement.txt"
+  if [ -e "$agreement_record" ]; then
+    return
+  fi
+
+  AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
+  if [ ! -e "$AGREEMENT_FILE" ]; then
+    error "AGREEMENT $AGREEMENT_FILE does not exist."
+    exit 1
+  fi
+
+  cat $AGREEMENT_FILE
+  tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
+  echo $tip
+  read -n 1 user_agreed
+  if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
+    cp $AGREEMENT_FILE $agreement_record
+    echo "$tip" >> $agreement_record
+    echo "$user_agreed" >> $agreement_record
+  else
+    exit 1
+  fi
+}
 
 function show_usage()
 {
@@ -33,8 +59,27 @@ OPTIONS:
     -h, --help             Display this help and exit.
     -t, --tag <version>    Specify which version of a docker image to pull.
     -l, --local            Use local docker image.
+    stop                   Stop all running Apollo containers.
 EOF
 exit 0
+}
+
+function stop_containers()
+{
+running_containers=$(docker ps --format "{{.Names}}")
+
+for i in ${running_containers[*]}
+do
+  if [[ "$i" =~ apollo_* ]];then
+    printf %-*s 70 "stopping container: $i ..."
+    docker stop $i > /dev/null
+    if [ $? -eq 0 ];then
+      printf "\033[32m[DONE]\033[0m\n"
+    else
+      printf "\033[31m[FAILED]\033[0m\n"
+    fi
+  fi
+done
 }
 
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
@@ -48,6 +93,7 @@ if [ -e /proc/sys/kernel ]; then
 fi
 
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
+check_agreement
 
 VOLUME_VERSION="latest"
 DEFAULT_MAPS=(
@@ -91,7 +137,11 @@ do
         shift
         source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh \
             "${map_name}" "${VOLUME_VERSION}"
-    ;;
+        ;;
+    stop)
+	stop_containers
+	exit 0
+	;;
     *)
         echo -e "\033[93mWarning\033[0m: Unknown option: $1"
         exit 2
@@ -226,6 +276,7 @@ function main(){
         --add-host ${LOCAL_HOST}:127.0.0.1 \
         --hostname in_dev_docker \
         --shm-size 2G \
+        --pid=host \
         $IMG \
         /bin/bash
 

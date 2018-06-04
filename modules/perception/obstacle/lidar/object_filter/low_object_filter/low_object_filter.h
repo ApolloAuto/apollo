@@ -21,18 +21,14 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/proto/low_object_filter_config.pb.h"
+
 #include "modules/perception/obstacle/lidar/interface/base_object_filter.h"
 
 namespace apollo {
 namespace perception {
 
 class LowObjectFilter : public BaseObjectFilter {
- private:
-  // config params
-  double object_height_threshold_ = 0.10;
-  double object_position_height_threshold_ = -1.6;
-
  public:
   LowObjectFilter() : BaseObjectFilter() {}
   virtual ~LowObjectFilter() {}
@@ -47,6 +43,9 @@ class LowObjectFilter : public BaseObjectFilter {
  protected:
   void FilterLowObject(const ObjectFilterOptions& obj_filter_options,
                        std::vector<std::shared_ptr<Object>>* objects);
+
+ private:
+  low_object_filter_config::ModelConfigs config_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(LowObjectFilter);

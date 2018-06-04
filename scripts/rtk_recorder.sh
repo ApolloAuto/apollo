@@ -43,7 +43,7 @@ function start() {
 }
 
 function stop() {
-  pkill -f rtk_recorder.py
+  pkill -SIGKILL -f rtk_recorder.py
 }
 
 case $1 in

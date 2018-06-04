@@ -22,6 +22,7 @@
 namespace apollo {
 namespace perception {
 
+const float lane_mask_confidence_thresh = 0.5;
 using apollo::common::adapter::AdapterManager;
 
 bool CameraProcessSubnode::InitInternal() {
@@ -127,11 +128,21 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
   PERF_BLOCK_END("CameraProcessSubnode_detector_");
-
+  if (publish_) {
+    sensor_msgs::Image lane_mask_msg;
+    lane_mask_msg.header = message.header;
+    lane_mask_msg.header.frame_id = "lane_mask";
+    if (!MatToMessage(mask, &lane_mask_msg)) {
+      AERROR << "unable to publish lane mask topic message";
+    }
+    common::adapter::AdapterManager::PublishPerceptionLaneMask(lane_mask_msg);
+  }
   converter_->Convert(&objects);
   PERF_BLOCK_END("CameraProcessSubnode_converter_");
 
   transformer_->Transform(&objects);
+  adjusted_extrinsics_ =
+  transformer_->GetAdjustedExtrinsics(&camera_to_car_adj_);
   PERF_BLOCK_END("CameraProcessSubnode_transformer_");
 
   tracker_->Associate(img, timestamp, &objects);
@@ -139,6 +150,11 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   filter_->Filter(timestamp, &objects);
   PERF_BLOCK_END("CameraProcessSubnode_filter_");
+
+  auto ccm = Singleton<CalibrationConfigManager>::get();
+  auto calibrator = ccm->get_camera_calibration();
+  calibrator->SetCar2CameraExtrinsicsAdj(camera_to_car_adj_,
+                                         adjusted_extrinsics_);
 
   std::shared_ptr<SensorObjects> out_objs(new SensorObjects);
   out_objs->timestamp = timestamp;
@@ -175,13 +191,51 @@ bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
   return true;
 }
 
+bool CameraProcessSubnode::MatToMessage(const cv::Mat& img,
+                                          sensor_msgs::Image *msg) {
+  if (img.type() == CV_8UC1) {
+    sensor_msgs::fillImage(*msg,
+                            sensor_msgs::image_encodings::MONO8,
+                            img.rows,  // height
+                            img.cols,  // width
+                            static_cast<unsigned int>(img.step),  // stepSize
+                            img.data);
+    return true;
+  } else if (img.type() == CV_32FC1) {
+    // confidence heatmap
+    ADEBUG << "confidence threshold = " << lane_mask_confidence_thresh;
+    cv::Mat uc_img(img.rows, img.cols, CV_8UC1);
+    uc_img.setTo(cv::Scalar(0));
+    for (int h = 0; h < uc_img.rows; ++h) {
+      for (int w = 0; w < uc_img.cols; ++w) {
+        if (img.at<float>(h, w) >= lane_mask_confidence_thresh) {
+          uc_img.at<unsigned char>(h, w) = 1;
+        }
+      }
+    }
+    sensor_msgs::fillImage(*msg,
+                            sensor_msgs::image_encodings::MONO8,
+                            uc_img.rows,  // height
+                            uc_img.cols,  // width
+                            static_cast<unsigned int>(uc_img.step),  // stepSize
+                            uc_img.data);
+    return true;
+  } else {
+    AERROR << "invalid input Mat type: " << img.type();
+    return false;
+  }
+}
+
 void CameraProcessSubnode::VisualObjToSensorObj(
     const std::vector<std::shared_ptr<VisualObject>> &objects,
     SharedDataPtr<SensorObjects> *sensor_objects) {
   (*sensor_objects)->sensor_type = SensorType::CAMERA;
   (*sensor_objects)->sensor_id = device_id_;
   (*sensor_objects)->seq_num = seq_num_;
-  (*sensor_objects)->sensor2world_pose = camera_to_car_;
+
+  (*sensor_objects)->sensor2world_pose_static = camera_to_car_;
+  (*sensor_objects)->sensor2world_pose = camera_to_car_adj_;
+
   ((*sensor_objects)->camera_frame_supplement).reset(new CameraFrameSupplement);
 
   if (!CameraFrameSupplement::state_vars.initialized_) {
@@ -226,7 +280,7 @@ void CameraProcessSubnode::VisualObjToSensorObj(
 }
 
 void CameraProcessSubnode::PublishDataAndEvent(
-    const double &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
+    const double timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
     const SharedDataPtr<CameraItem> &camera_item) {
   CommonSharedDataKey key(timestamp, device_id_);
   cam_obj_data_->Add(key, sensor_objects);

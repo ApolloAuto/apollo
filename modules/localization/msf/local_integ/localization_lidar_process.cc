@@ -20,14 +20,15 @@
 
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/common/time/timer.h"
 #include "modules/common/util/file.h"
-#include "modules/localization/msf/common/util/timer.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
 using apollo::common::Status;
+using apollo::common::time::Timer;
 
 LocalizationLidarProcess::LocalizationLidarProcess()
     : locator_(new LocalizationLidar()),

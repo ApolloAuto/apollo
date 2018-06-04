@@ -28,6 +28,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_thread_pool.h"
+#include "modules/planning/common/planning_util.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
 #include "modules/planning/planner/em/em_planner.h"
 #include "modules/planning/planner/lattice/lattice_planner.h"
@@ -46,6 +47,8 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
+
+Planning::~Planning() { Stop(); }
 
 std::string Planning::Name() const { return "planning"; }
 
@@ -75,8 +78,8 @@ Status Planning::InitFrame(const uint32_t sequence_num,
                          vehicle_state, reference_line_provider_.get()));
   auto status = frame_->Init();
   if (!status.ok()) {
-    AERROR << "failed to init frame";
-    return Status(ErrorCode::PLANNING_ERROR, "init frame failed");
+    AERROR << "failed to init frame:" << status.ToString();
+    return status;
   }
   return Status::OK();
 }
@@ -94,6 +97,9 @@ Status Planning::Init() {
   // initialize planning thread pool
   PlanningThreadPool::instance()->Init();
 
+  // clear planning status
+  util::GetPlanningStatus()->Clear();
+
   if (!AdapterManager::Initialized()) {
     AdapterManager::Init(FLAGS_planning_adapter_config_filename);
   }
@@ -110,8 +116,9 @@ Status Planning::Init() {
   if (!FLAGS_use_navigation_mode) {
     hdmap_ = HDMapUtil::BaseMapPtr();
     CHECK(hdmap_) << "Failed to load map";
-    reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
-        new ReferenceLineProvider(hdmap_));
+    // Prefer "std::make_unique" to direct use of "new".
+    // Reference "https://herbsutter.com/gotw/_102/" for details.
+    reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
   }
 
   RegisterPlanners();
@@ -139,7 +146,11 @@ bool Planning::IsVehicleStateValid(const VehicleState& vehicle_state) {
 Status Planning::Start() {
   timer_ = AdapterManager::CreateTimer(
       ros::Duration(1.0 / FLAGS_planning_loop_rate), &Planning::OnTimer, this);
-  reference_line_provider_->Start();
+  // The "reference_line_provider_" may not be created yet in navigation mode.
+  // It is necessary to check its existence.
+  if (reference_line_provider_) {
+    reference_line_provider_->Start();
+  }
   start_time_ = Clock::NowInSeconds();
   AINFO << "Planning started";
   return Status::OK();
@@ -214,8 +225,9 @@ void Planning::RunOnce() {
   if (FLAGS_use_navigation_mode) {
     // recreate reference line provider in every cycle
     hdmap_ = HDMapUtil::BaseMapPtr();
-    reference_line_provider_ = std::unique_ptr<ReferenceLineProvider>(
-        new ReferenceLineProvider(hdmap_));
+    // Prefer "std::make_unique" to direct use of "new".
+    // Reference "https://herbsutter.com/gotw/_102/" for details.
+    reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
   }
 
   // localization
@@ -329,8 +341,7 @@ void Planning::RunOnce() {
   trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
   if (!status.ok()) {
-    std::string msg("Failed to init frame");
-    AERROR << msg;
+    AERROR << status.ToString();
     if (FLAGS_publish_estop) {
       // Because the function "Control::ProduceControlCommand()" checks the
       // "estop" signal with the following line (Line 170 in control.cc):
@@ -346,7 +357,7 @@ void Planning::RunOnce() {
       trajectory_pb->mutable_decision()
           ->mutable_main_decision()
           ->mutable_not_ready()
-          ->set_reason(msg);
+          ->set_reason(status.ToString());
       status.Save(trajectory_pb->mutable_header()->mutable_status());
       PublishPlanningPb(trajectory_pb, start_timestamp);
     }
@@ -433,6 +444,7 @@ void Planning::Stop() {
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
+  FrameHistory::instance()->Clear();
 }
 
 void Planning::SetLastPublishableTrajectory(

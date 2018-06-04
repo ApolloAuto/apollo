@@ -97,17 +97,9 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
     }
   }
 
-  if (FLAGS_use_navigation_mode &&
-      !AdapterManager::GetPerceptionObstacles()->Empty()) {
-    const auto& cipv_info = AdapterManager::GetPerceptionObstacles()
-                                ->GetLatestObserved()
-                                .cipv_info();
-    path_decision_.SetCIPVInfo(cipv_info);
-  }
   // set lattice planning target speed limit;
-  double cruise_speed = std::min(FLAGS_speed_upper_bound,
-      reference_line().GetSpeedLimitFromS(adc_sl_boundary_.end_s()));
-  SetCruiseSpeed(std::min(FLAGS_default_cruise_speed, cruise_speed));
+  SetCruiseSpeed(FLAGS_default_cruise_speed);
+  is_safe_to_change_lane_ = CheckChangeLane();
   is_inited_ = true;
   return true;
 }
@@ -155,6 +147,45 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
     }
   }
   return ADCTrajectory::UNPROTECTED;
+}
+
+bool ReferenceLineInfo::CheckChangeLane() const {
+  if (!IsChangeLanePath()) {
+    AERROR << "Not a change lane path.";
+    return false;
+  }
+
+  for (const auto* path_obstacle : path_decision_.path_obstacles().Items()) {
+    const auto& sl_boundary = path_obstacle->PerceptionSLBoundary();
+
+    constexpr float kLateralShift = 2.5;
+    if (sl_boundary.start_l() < -kLateralShift ||
+        sl_boundary.end_l() > kLateralShift) {
+      continue;
+    }
+
+    constexpr float kSafeTime = 3.0;
+    constexpr float kForwardMinSafeDistance = 6.0;
+    constexpr float kBackwardMinSafeDistance = 8.0;
+
+    const float kForwardSafeDistance =
+        std::max(kForwardMinSafeDistance,
+                 static_cast<float>((adc_planning_point_.v() -
+                                     path_obstacle->obstacle()->Speed()) *
+                                    kSafeTime));
+    const float kBackwardSafeDistance =
+        std::max(kBackwardMinSafeDistance,
+                 static_cast<float>((path_obstacle->obstacle()->Speed() -
+                                     adc_planning_point_.v()) *
+                                    kSafeTime));
+    if (sl_boundary.end_s() >
+            adc_sl_boundary_.start_s() - kBackwardSafeDistance &&
+        sl_boundary.start_s() <
+            adc_sl_boundary_.end_s() + kForwardSafeDistance) {
+      return false;
+    }
+  }
+  return true;
 }
 
 const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }

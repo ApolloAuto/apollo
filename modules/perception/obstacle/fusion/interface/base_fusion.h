@@ -64,10 +64,11 @@
 
 namespace apollo {
 namespace perception {
+
 class BaseFusion {
  public:
-  BaseFusion() {}
-  virtual ~BaseFusion() {}
+  BaseFusion() = default;
+  virtual ~BaseFusion() = default;
   virtual bool Init() = 0;
 
   // @brief: fuse objects from multi sensors(64-lidar, 16-lidar, radar...)
@@ -81,8 +82,12 @@ class BaseFusion {
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseFusion);
 };
+
 REGISTER_REGISTERER(BaseFusion);
+
 #define REGISTER_FUSION(name) REGISTER_CLASS(BaseFusion, name)
+
 }  // namespace perception
 }  // namespace apollo
+
 #endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_INTERFACE_BASE_FUSION_H_

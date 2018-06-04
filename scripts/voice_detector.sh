@@ -31,7 +31,7 @@ function start() {
 }
 
 function stop() {
-    pkill -f modules/tools/voice_detection/snowboy_detector.py
+    pkill -SIGKILL -f modules/tools/voice_detection/snowboy_detector.py
     echo "voice_detector: stopped"
 }
 

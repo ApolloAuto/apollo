@@ -27,6 +27,7 @@ apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 \
 
 apt-get update -y && apt-get install -y \
     libbz2-dev \
+    libceres-dev \
     libconsole-bridge-dev \
     libeigen3-dev \
     libgstreamer-plugins-base0.10-dev \
@@ -46,13 +47,19 @@ apt-get update -y && apt-get install -y \
 echo 'ROSCONSOLE_FORMAT=${file}:${line} ${function}() [${severity}] [${time}]: ${message}' >> /etc/profile
 
 # Download apollo-ros.
-VERSION=2.1.1
+VERSION=2.1.2
 FILENAME=ros-indigo-apollo-${VERSION}-x86_64.tar.gz
 
 mkdir -p /home/tmp
 cd /home/tmp
 wget https://github.com/ApolloAuto/apollo-platform/releases/download/${VERSION}/${FILENAME}
 tar xzf ${FILENAME}
+
+ROS="/home/tmp/ros"
+chmod a+w "${ROS}/share/velodyne/launch/start_velodyne.launch"
+chmod a+w -R "${ROS}/share/velodyne_pointcloud/params"
+chmod a+w "${ROS}/share/gnss_driver/launch/gnss_driver.launch"
+chmod a+w "${ROS}/share/gnss_driver/conf/gnss_conf_mkz.txt"
 
 # Clean up.
 rm -fr ${FILENAME} /etc/apt/sources.list.d/ros-latest.list

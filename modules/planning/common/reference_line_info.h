@@ -125,6 +125,8 @@ class ReferenceLineInfo {
 
   void ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
 
+  bool IsSafeToChangeLane() const { return is_safe_to_change_lane_; }
+
   const hdmap::RouteSegments& Lanes() const;
   const std::list<hdmap::Id> TargetLaneId() const;
 
@@ -146,6 +148,8 @@ class ReferenceLineInfo {
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
 
  private:
+  bool CheckChangeLane() const;
+
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
   bool IsUnrelaventObstacle(PathObstacle* path_obstacle);
@@ -184,6 +188,8 @@ class ReferenceLineInfo {
   hdmap::RouteSegments lanes_;
 
   bool is_on_reference_line_ = false;
+
+  bool is_safe_to_change_lane_ = false;
 
   ADCTrajectory::RightOfWayStatus status_ = ADCTrajectory::UNPROTECTED;
 

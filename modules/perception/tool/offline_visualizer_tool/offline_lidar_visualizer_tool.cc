@@ -26,7 +26,6 @@
 #include "modules/common/util/file.h"
 #include "modules/perception/common/pcl_types.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
@@ -48,11 +47,6 @@ DEFINE_int32(start_frame, 1, "start frame");
 class OfflineLidarPerceptionTool {
  public:
   bool Init(bool use_visualization = false) {
-    if (!ConfigManager::instance()->Init()) {
-      AERROR << "failed to Init ConfigManager";
-      return false;
-    }
-
     lidar_process_.reset(new LidarProcess());
     if (!lidar_process_->Init()) {
       AERROR << "failed to Init lidar_process.";
@@ -143,7 +137,7 @@ class OfflineLidarPerceptionTool {
 
   void SaveTrackingInformation(std::vector<std::shared_ptr<Object>>* objects,
                                const Eigen::Matrix4d& pose_v2w,
-                               const int& frame_id,
+                               const int frame_id,
                                const pcl_util::PointCloudPtr& cloud,
                                const std::string& filename) {
     std::ofstream fout(filename.c_str(), std::ios::out);

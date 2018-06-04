@@ -82,7 +82,7 @@ class RTKLocalization : public LocalizationBase {
   bool InterpolateIMU(const Imu &imu1, const Imu &imu2,
                       const double timestamp_sec, Imu *msgbuf);
   template <class T>
-  T InterpolateXYZ(const T &p1, const T &p2, const double &frac1);
+  T InterpolateXYZ(const T &p1, const T &p2, const double frac1);
 
  private:
   ros::Timer timer_;

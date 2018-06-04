@@ -12,6 +12,7 @@ cc_library(
         ":geometry",
         ":integral",
         ":kalman_filter",
+        ":kalman_filter_1d",
         ":linear_interpolation",
         ":lqr",
         ":mpc",
@@ -95,11 +96,28 @@ cc_library(
 
 cc_library(
     name = "matrix_operations",
+    srcs = [
+        "matrix_operations.cc",
+    ],
     hdrs = [
         "matrix_operations.h",
     ],
     deps = [
         "@eigen",
+        "//modules/common:log",
+    ],
+)
+
+
+cc_test(
+    name = "matrix_operations_test",
+    size = "small",
+    srcs = [
+        "matrix_operations_test.cc",
+    ],
+    deps = [
+        ":matrix_operations",
+        "@gtest//:main",
     ],
 )
 
@@ -118,8 +136,12 @@ cc_library(
 cc_library(
     name = "kalman_filter_1d",
     srcs = ["kalman_filter_1d.cc"],
-    hdrs = ["kalman_filter_1d.h"],
+    hdrs = [
+        "kalman_filter_1d.h",
+        "kalman_filter.h",
+    ],
     deps = [
+        ":kalman_filter",
         "@eigen",
         "@yaml_cpp//:yaml",
     ],
@@ -187,6 +209,22 @@ cc_library(
 )
 
 cc_library(
+    name = "nonlinear_interpolation",
+    srcs = [
+        "nonlinear_interpolation.cc",
+    ],
+    hdrs = [
+        "nonlinear_interpolation.h",
+    ],
+    deps = [
+        ":geometry",
+        ":hermite_spline",
+        ":integral",
+        "//modules/common/proto:pnc_point_proto",
+    ],
+)
+
+cc_library(
     name = "integral",
     srcs = [
         "integral.cc",
@@ -241,6 +279,16 @@ cc_library(
         ":geometry",
         "//modules/common:log",
         "@eigen",
+    ],
+)
+
+cc_library(
+    name = "hermite_spline",
+    hdrs = [
+        "hermite_spline.h",
+    ],
+    deps = [
+        "//modules/common:log",
     ],
 )
 
@@ -412,6 +460,18 @@ cc_test(
     ],
     deps = [
         ":kalman_filter",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "kalman_filter_1d_test",
+    size = "small",
+    srcs = [
+        "kalman_filter_1d_test.cc",
+    ],
+    deps = [
+        ":kalman_filter_1d",
         "@gtest//:main",
     ],
 )

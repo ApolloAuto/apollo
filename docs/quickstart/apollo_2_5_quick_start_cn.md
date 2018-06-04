@@ -14,7 +14,7 @@
 
 1. 启动DreamView
 
-   打开浏览器（譬如Chrome）然后在地址栏输入**localhost:8887**来启动Apollo Dreamview。
+   打开浏览器（譬如Chrome）然后在地址栏输入**http://localhost:8888**来启动Apollo Dreamview。
 
    ![](images/dreamview_2_5.png)
 

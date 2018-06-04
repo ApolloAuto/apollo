@@ -79,6 +79,7 @@ using ImageLongAdapter = Adapter<::sensor_msgs::Image>;
 using PredictionAdapter = Adapter<prediction::PredictionObstacles>;
 using DriveEventAdapter = Adapter<DriveEvent>;
 using TrafficLightDetectionAdapter = Adapter<perception::TrafficLightDetection>;
+using PerceptionLaneMaskAdapter = Adapter<::sensor_msgs::Image>;
 using RoutingRequestAdapter = Adapter<routing::RoutingRequest>;
 using RoutingResponseAdapter = Adapter<routing::RoutingResponse>;
 using RelativeOdometryAdapter =
@@ -110,6 +111,13 @@ using VoiceDetectionRequestAdapter =
     Adapter<apollo::dreamview::VoiceDetectionRequest>;
 using VoiceDetectionResponseAdapter =
     Adapter<apollo::dreamview::VoiceDetectionResponse>;
+// for pandora
+using PandoraPointCloudAdapter = Adapter<::sensor_msgs::PointCloud2>;
+using PandoraCameraFrontColorAdapter = Adapter<::sensor_msgs::Image>;
+using PandoraCameraRightGrayAdapter = Adapter<::sensor_msgs::Image>;
+using PandoraCameraLeftGrayAdapter = Adapter<::sensor_msgs::Image>;
+using PandoraCameraFrontGrayAdapter = Adapter<::sensor_msgs::Image>;
+using PandoraCameraBackGrayAdapter = Adapter<::sensor_msgs::Image>;
 
 }  // namespace adapter
 }  // namespace common

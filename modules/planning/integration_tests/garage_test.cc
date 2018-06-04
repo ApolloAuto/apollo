@@ -18,8 +18,8 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/common/configs/config_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_util.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
 #include "modules/planning/planning.h"
 
@@ -27,6 +27,7 @@ namespace apollo {
 namespace planning {
 
 using common::adapter::AdapterManager;
+using apollo::planning::util::GetPlanningStatus;
 
 DECLARE_string(test_routing_response_file);
 DECLARE_string(test_localization_file);
@@ -47,6 +48,15 @@ class GarageTest : public PlanningTestBase {
     FLAGS_planning_upper_speed_limit = 12.5;
     FLAGS_test_routing_response_file = "garage_routing.pb.txt";
     FLAGS_enable_lag_prediction = false;
+  }
+
+  TrafficRuleConfig* GetDestinationConfig() {
+    for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+      if (config.rule_id() == TrafficRuleConfig::DESTINATION) {
+        return &config;
+      }
+    }
+    return nullptr;
   }
 };
 
@@ -73,13 +83,20 @@ TEST_F(GarageTest, follow) {
 }
 
 /*
- * test stop for destination
+ * test destination stop
  */
-TEST_F(GarageTest, stop_dest) {
+TEST_F(GarageTest, dest_stop_01) {
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+
   FLAGS_test_prediction_file = "stop_dest_prediction.pb.txt";
   FLAGS_test_localization_file = "stop_dest_localization.pb.txt";
   FLAGS_test_chassis_file = "stop_dest_chassis.pb.txt";
   PlanningTestBase::SetUp();
+
+  // set config
+  auto* destination_config = GetDestinationConfig();
+  destination_config->mutable_destination()->set_enable_pull_over(false);
+
   RUN_GOLDEN_TEST(0);
 }
 

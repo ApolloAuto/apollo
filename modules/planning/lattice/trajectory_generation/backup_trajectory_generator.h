@@ -48,16 +48,12 @@ class BackupTrajectoryGenerator {
       const double init_relative_time,
       const Trajectory1dGenerator* trajectory1d_generator);
 
-  bool HasMoreBackupTrajectories() const;
-
   DiscretizedTrajectory GenerateTrajectory(
       const std::vector<common::PathPoint>& discretized_ref_points);
 
  private:
   void GenerateTrajectory1dPairs(const std::array<double, 3>& init_s,
                                  const std::array<double, 3>& init_d);
-
-  void SetLonTrajectories();
 
   double init_relative_time_;
 

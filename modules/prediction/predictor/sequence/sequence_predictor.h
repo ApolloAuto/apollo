@@ -110,8 +110,8 @@ class SequencePredictor : public Predictor {
    * @return Boolean if the lane sequence is enabled
    */
   bool LaneSequenceWithMaxProb(const LaneChangeType& type,
-                               const double& probability,
-                               const double& max_prob);
+                               const double probability,
+                               const double max_prob);
 
   /**
    * @brief Pick the lane change sequence with highest probability
@@ -122,7 +122,7 @@ class SequencePredictor : public Predictor {
    * @return Boolean if the lane sequence is enabled
    */
   bool LaneChangeWithMaxProb(const LaneChangeType& type,
-                             const double& probability, const double& max_prob);
+                             const double probability, const double max_prob);
 };
 
 }  // namespace prediction

@@ -17,7 +17,7 @@
 #include "modules/perception/traffic_light/rectify/unity_rectify.h"
 
 #include "modules/common/util/file.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/traffic_light/base/utils.h"
 #include "modules/perception/traffic_light/rectify/cropbox.h"
 #include "modules/perception/traffic_light/rectify/detection.h"
@@ -27,92 +27,42 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-using apollo::common::util::GetAbsolutePath;
+using apollo::common::util::GetProtoFromFile;
 
 bool UnityRectify::Init() {
-  ConfigManager *config_manager = ConfigManager::instance();
-  if (config_manager == nullptr) {
-    AERROR << "failed to get ConfigManager instance.";
+  if (!GetProtoFromFile(FLAGS_traffic_light_rectifier_config, &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_traffic_light_rectifier_config;
     return false;
   }
 
-  const ModelConfig *model_config = config_manager->GetModelConfig(name());
-  if (model_config == nullptr) {
-    AERROR << "not found model config: " << name();
-    return false;
+  switch (config_.crop_method()) {
+    default:
+    case 0:
+      crop_ = std::make_shared<CropBox>(config_.crop_scale(),
+                                        config_.crop_min_size());
+      break;
+    case 1:
+      crop_ = std::make_shared<CropBoxWholeImage>();
+      break;
+  }
+  switch (config_.detect_method()) {
+    default:
+    case 0:
+      detect_ = std::make_shared<Detection>(config_.crop_min_size(),
+                                            config_.detection_net(),
+                                            config_.detection_model());
+      break;
+    case 1:
+      detect_ = std::make_shared<DummyRefine>();
+      break;
   }
 
-  InitDetection(config_manager, model_config, &detect_, &crop_);
-
-  select_.reset(new GaussianSelect);
+  select_ = std::make_shared<GaussianSelect>();
 
   return true;
 }
 
-bool UnityRectify::InitDetection(const ConfigManager *config_manager,
-                                 const ModelConfig *model_config,
-                                 std::shared_ptr<IRefine> *detection,
-                                 std::shared_ptr<IGetBox> *crop) {
-  float crop_scale = 0.0;
-  int crop_min_size = 0;
-  int crop_method = 0;
-  std::string detection_model;
-  std::string detection_net;
-
-  if (!model_config->GetValue("crop_scale", &crop_scale)) {
-    AERROR << "crop_scale not found." << model_config->name();
-    return false;
-  }
-
-  if (!model_config->GetValue("crop_min_size", &crop_min_size)) {
-    AERROR << "crop_min_size not found." << model_config->name();
-    return false;
-  }
-
-  if (!model_config->GetValue("crop_method", &crop_method)) {
-    AERROR << "crop_method not found." << model_config->name();
-    return false;
-  }
-
-  if (!model_config->GetValue("detection_model", &detection_model)) {
-    AERROR << "detection_model not found." << model_config->name();
-    return false;
-  }
-  detection_model =
-      GetAbsolutePath(config_manager->WorkRoot(), detection_model);
-  if (!model_config->GetValue("detection_net", &detection_net)) {
-    AERROR << "detection_net not found." << model_config->name();
-    return false;
-  }
-  detection_net = GetAbsolutePath(config_manager->WorkRoot(), detection_net);
-
-  switch (crop_method) {
-    default:
-    case 0:
-      crop->reset(new CropBox(crop_scale, crop_min_size));
-      break;
-    case 1:
-      crop->reset(new CropBoxWholeImage());
-      break;
-  }
-  int detect_method = 0;
-  if (!model_config->GetValue("detect_method", &detect_method)) {
-    AERROR << "detect_method not found." << model_config->name();
-    return false;
-  }
-  switch (detect_method) {
-    default:
-    case 0:
-      detection->reset(
-          new Detection(crop_min_size, detection_net, detection_model));
-      break;
-    case 1:
-      detection->reset(new DummyRefine());
-      break;
-  }
-
-  return true;
-}
 bool UnityRectify::Rectify(const Image &image, const RectifyOption &option,
                            std::vector<LightPtr> *lights) {
   cv::Mat ros_image = image.mat();

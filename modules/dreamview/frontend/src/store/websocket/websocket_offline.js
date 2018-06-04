@@ -14,7 +14,7 @@ export default class OfflinePlaybackWebSocketEndpoint {
 
     initialize(params) {
         if (params && params.id && params.map) {
-            STORE.playback.setJobId(params.id);
+            STORE.playback.setRecordId(params.id);
             STORE.playback.setMapId(params.map);
         } else {
             console.error("ERROR: missing required parameter(s)");
@@ -43,12 +43,12 @@ export default class OfflinePlaybackWebSocketEndpoint {
             switch (message.type) {
                 case "GroundMetadata":
                     RENDERER.updateGroundMetadata(this.serverUrl, message.data);
-                    this.requstFrameCount(STORE.playback.jobId);
+                    this.requestFrameCount(STORE.playback.recordId);
                     break;
                 case "FrameCount":
                     STORE.playback.setNumFrames(message.data);
                     if (STORE.playback.hasNext()) {
-                        this.requestSimulationWorld(STORE.playback.jobId, STORE.playback.next());
+                        this.requestSimulationWorld(STORE.playback.recordId, STORE.playback.next());
                     }
                     break;
                 case "SimWorldUpdate":
@@ -93,7 +93,7 @@ export default class OfflinePlaybackWebSocketEndpoint {
         clearInterval(this.requestTimer);
         this.requestTimer = setInterval(() => {
             if (this.websocket.readyState === this.websocket.OPEN && STORE.playback.initialized()) {
-                this.requestSimulationWorld(STORE.playback.jobId, STORE.playback.next());
+                this.requestSimulationWorld(STORE.playback.recordId, STORE.playback.next());
 
                 if (!STORE.playback.hasNext()) {
                     clearInterval(this.requestTimer);
@@ -144,18 +144,19 @@ export default class OfflinePlaybackWebSocketEndpoint {
             STORE.trafficSignal.update(world);
         }
     }
-    requstFrameCount(jobId) {
+
+    requestFrameCount(recordId) {
         this.websocket.send(JSON.stringify({
             type: 'RetrieveFrameCount',
-            jobId: jobId,
+            recordId: recordId,
         }));
     }
 
-    requestSimulationWorld(jobId, frameId) {
+    requestSimulationWorld(recordId, frameId) {
         if (!(frameId in this.frameData)) {
             this.websocket.send(JSON.stringify({
                 type : "RequestSimulationWorld",
-                jobId: jobId,
+                recordId: recordId,
                 frameId: frameId,
             }));
         } else if (STORE.playback.isSeeking) {

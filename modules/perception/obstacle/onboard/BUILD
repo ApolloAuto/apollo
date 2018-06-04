@@ -150,6 +150,7 @@ cc_library(
         "//modules/common/configs:config_gflags",
         "//modules/common/time",
         "//modules/perception/lib/config_manager",
+        "//modules/perception/obstacle/camera/cipv:camera_cipv",
         "//modules/perception/obstacle/fusion/async_fusion",
         "//modules/perception/obstacle/fusion/probabilistic_fusion",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",

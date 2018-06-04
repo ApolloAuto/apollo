@@ -183,7 +183,7 @@ struct index_functor : public thrust::unary_function<int, int> {
         : div_(div), mul_(mul), offset_(offset) {}
 
     __host__ __device__
-    int operator()(const int &index) {
+    int operator()(const int index) {
         return (index / div_) * mul_ + offset_;
     }
 };
@@ -192,9 +192,9 @@ struct yuv2bgr_functor {
     template <typename Tuple>
     __host__ __device__
     void operator()(Tuple t) {
-        const uint8_t &y = thrust::get<0>(t);
-        const uint8_t &u = thrust::get<1>(t);
-        const uint8_t &v = thrust::get<2>(t);
+        const uint8_t y = thrust::get<0>(t);
+        const uint8_t u = thrust::get<1>(t);
+        const uint8_t v = thrust::get<2>(t);
         uint8_t &b = thrust::get<3>(t);
         uint8_t &g = thrust::get<4>(t);
         uint8_t &r = thrust::get<5>(t);

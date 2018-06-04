@@ -107,7 +107,7 @@ void RTKLocalization::OnTimer(const ros::TimerEvent &event) {
 
 template <class T>
 T RTKLocalization::InterpolateXYZ(const T &p1, const T &p2,
-                                  const double &frac1) {
+                                  const double frac1) {
   T p;
   double frac2 = 1.0 - frac1;
   if (p1.has_x() && !std::isnan(p1.x()) && p2.has_x() && !std::isnan(p2.x())) {

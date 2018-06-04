@@ -26,10 +26,10 @@
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
@@ -93,8 +93,6 @@ Obstacle::Obstacle(const std::string& id,
         common::util::DistanceXY(prev.path_point(), cur.path_point());
     trajectory_points[i].mutable_path_point()->set_s(cumulative_s);
   }
-  speed_ = std::hypot(perception_obstacle.velocity().x(),
-                      perception_obstacle.velocity().y());
 }
 
 double Obstacle::Speed() const { return speed_; }
@@ -155,7 +153,8 @@ common::TrajectoryPoint Obstacle::GetPointAtTime(
     } else if (it_lower == points.end()) {
       return *points.rbegin();
     }
-    return util::Interpolate(*(it_lower - 1), *it_lower, relative_time);
+    return common::math::InterpolateUsingLinearApproximation(
+        *(it_lower - 1), *it_lower, relative_time);
   }
 }
 

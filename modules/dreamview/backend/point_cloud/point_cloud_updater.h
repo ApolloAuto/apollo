@@ -21,6 +21,8 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_POINT_CLOUD_POINT_CLOUD_UPDATER_H_
 #define MODULES_DREAMVIEW_BACKEND_POINT_CLOUD_POINT_CLOUD_UPDATER_H_
 
+#include <atomic>
+#include <future>
 #include <string>
 
 #include "boost/thread/locks.hpp"
@@ -29,8 +31,9 @@
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
-#include "modules/dreamview/proto/point_cloud.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "pcl/point_cloud.h"
+#include "pcl/point_types.h"
 #include "sensor_msgs/PointCloud2.h"
 
 /**
@@ -53,16 +56,20 @@ class PointCloudUpdater {
    * the server.
    */
   explicit PointCloudUpdater(WebSocketHandler *websocket);
+  ~PointCloudUpdater();
 
   /**
    * @brief Starts to push PointCloud to frontend.
    */
   void Start();
+  void Stop();
 
  private:
   void RegisterMessageHandlers();
 
   void UpdatePointCloud(const sensor_msgs::PointCloud2 &point_cloud);
+
+  void FilterPointCloud(const pcl::PointCloud<pcl::PointXYZ>::Ptr &pcl_ptr);
 
   void UpdateLocalizationTime(
       const apollo::localization::LocalizationEstimate &localization);
@@ -73,11 +80,12 @@ class PointCloudUpdater {
 
   // The PointCloud to be pushed to frontend.
   std::string point_cloud_str_;
-  PointCloud point_cloud_;
 
   // Mutex to protect concurrent access to point_cloud_str_.
   // NOTE: Use boost until we have std version of rwlock support.
   boost::shared_mutex mutex_;
+  std::future<void> async_future_;
+  std::atomic<bool> future_ready_;
 
   double last_point_cloud_time_ = 0.0;
   double last_localization_time_ = 0.0;

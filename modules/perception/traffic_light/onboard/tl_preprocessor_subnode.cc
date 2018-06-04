@@ -30,6 +30,7 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
+using apollo::common::util::GetProtoFromFile;
 using common::adapter::AdapterManager;
 
 bool TLPreprocessorSubnode::InitInternal() {
@@ -39,28 +40,12 @@ bool TLPreprocessorSubnode::InitInternal() {
     return false;
   }
 
-  ConfigManager *config_manager = ConfigManager::instance();
-  std::string model_name("TLPreprocessorSubnode");
-  const ModelConfig *model_config = config_manager->GetModelConfig(model_name);
-  if (model_config == nullptr) {
-    AERROR << "TLPreprocessorSubnode not found model: " << model_name;
+  if (!GetProtoFromFile(FLAGS_traffic_light_subnode_config, &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_traffic_light_subnode_config;
     return false;
   }
-  float max_process_image_fps_;
-  if (!model_config->GetValue("max_process_image_fps",
-                              &max_process_image_fps_)) {
-    AERROR << "TLPreprocessorSubnode Failed to find Conf: "
-           << "max_process_image_fps.";
-    return false;
-  }
-  proc_interval_seconds_ = 1.0f / max_process_image_fps_;
 
-  if (!model_config->GetValue("query_tf_inverval_seconds",
-                              &query_tf_inverval_seconds_)) {
-    AERROR << "TLPreprocessorSubnode Failed to find Conf: "
-           << "query_tf_inverval_seconds.";
-    return false;
-  }
   // init preprocessor
   if (!InitPreprocessor()) {
     AERROR << "TLPreprocessorSubnode init failed.";
@@ -112,10 +97,6 @@ bool TLPreprocessorSubnode::InitHdmap() {
   hd_map_ = HDMapInput::instance();
   if (hd_map_ == nullptr) {
     AERROR << "TLPreprocessorSubnode get hdmap failed.";
-    return false;
-  }
-  if (!hd_map_->Init()) {
-    AERROR << "TLPreprocessorSubnode init hd-map failed.";
     return false;
   }
   return true;
@@ -192,6 +173,10 @@ void TLPreprocessorSubnode::SubCameraImage(
         << " , last_proc_image_ts_: " << GLOG_TIMESTAMP(last_proc_image_ts_)
         << " , diff: "
         << GLOG_TIMESTAMP(sub_camera_image_start_ts - last_proc_image_ts_);
+
+  const float proc_interval_seconds_ =
+      1.0f / config_.tl_preprocessor_subnode_config().max_process_image_fps();
+
   if (last_proc_image_ts_ > 0.0 &&
       sub_camera_image_start_ts - last_proc_image_ts_ <
           proc_interval_seconds_) {
@@ -335,7 +320,8 @@ void TLPreprocessorSubnode::CameraSelection(double ts) {
         << " , last_query_tf_ts: " << GLOG_TIMESTAMP(last_query_tf_ts_)
         << " , diff: " << GLOG_TIMESTAMP(current_ts - last_query_tf_ts_);
   if (last_query_tf_ts_ > 0.0 &&
-      current_ts - last_query_tf_ts_ < query_tf_inverval_seconds_) {
+      current_ts - last_query_tf_ts_ < config_.tl_preprocessor_subnode_config()
+                                           .query_tf_inverval_seconds()) {
     AINFO << "skip current tf msg, img_ts: " << GLOG_TIMESTAMP(ts);
     return;
   }

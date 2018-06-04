@@ -37,7 +37,7 @@ class TrafficRule {
   virtual ~TrafficRule() = default;
   virtual TrafficRuleConfig::RuleId Id() const { return config_.rule_id(); }
   const TrafficRuleConfig& GetConfig() const { return config_; }
-  virtual bool ApplyRule(Frame* const frame,
+  virtual common::Status ApplyRule(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info) = 0;
 
  protected:

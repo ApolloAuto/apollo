@@ -27,7 +27,6 @@
 #include "modules/common/util/file.h"
 #include "modules/perception/common/pcl_types.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 
@@ -40,12 +39,6 @@ class HmObjectTrackerTest : public testing::Test {
   virtual ~HmObjectTrackerTest() {}
   void SetUp() {
     RegisterFactoryHmObjectTracker();
-    FLAGS_work_root = "modules/perception";
-    FLAGS_config_manager_path = "conf/config_manager.config";
-    if (!ConfigManager::instance()->Init()) {
-      AERROR << "failed to Init ConfigManager";
-      return;
-    }
     hm_tracker_ = new HmObjectTracker();
     object_builder_ = new MinBoxObjectBuilder();
     object_builder_->Init();

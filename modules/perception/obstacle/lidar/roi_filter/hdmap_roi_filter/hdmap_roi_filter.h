@@ -21,11 +21,11 @@
 #include <vector>
 
 #include "Eigen/Core"
-#include "gflags/gflags.h"
+
+#include "modules/perception/proto/hdmap_roi_filter_config.pb.h"
 
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/bitmap2d.h"
@@ -52,9 +52,7 @@ class HdmapROIFilter : public BaseROIFilter {
   ~HdmapROIFilter() {}
 
   bool Init() override;
-  std::string name() const override {
-    return "HdmapROIFilter";
-  }
+  std::string name() const override { return "HdmapROIFilter"; }
 
   /**
    * @params[In] cloud: All the cloud points with local coordinates
@@ -125,6 +123,8 @@ class HdmapROIFilter : public BaseROIFilter {
 
   // The distance extended away from the ROI boundary
   double extend_dist_ = 0.0;
+
+  hdmap_roi_filter_config::ModelConfigs config_;
 };
 
 REGISTER_ROIFILTER(HdmapROIFilter);

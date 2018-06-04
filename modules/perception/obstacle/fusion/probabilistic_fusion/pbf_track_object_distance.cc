@@ -145,6 +145,7 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
   static float speed_diff = 5.0f;
   static float epislon = 0.1f;
   static float angle_tolerance = 10.0f;
+  static float distance_tolerance = 3.0f;
 
   const std::shared_ptr<Object> &fobj = fused_object->object;
   const std::shared_ptr<Object> &sobj = sensor_object->object;
@@ -156,6 +157,13 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
 
   Eigen::Vector3d &fcenter = fobj->center;
   Eigen::Vector3d &scenter = sobj->center;
+
+  float euclid_dist = static_cast<float>(((fcenter - scenter).norm()));
+
+  if (euclid_dist > distance_tolerance) {
+     return std::numeric_limits<float>::max();
+  }
+
   float range_distance_ratio = std::numeric_limits<float>::max();
   float angle_distance_diff = 0.0f;
 

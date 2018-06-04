@@ -55,12 +55,12 @@ void GpsMonitor::RunOnce(const double current_time) {
   gnss_status_adapter->Observe();
   if (gnss_status_adapter->Empty()) {
     status->set_status(HardwareStatus::ERR);
-    status->set_msg("No GNSS status message.");
+    status->set_detailed_msg("No GNSS status message.");
     return;
   }
   if (!gnss_status_adapter->GetLatestObserved().solution_completed()) {
     status->set_status(HardwareStatus::ERR);
-    status->set_msg("GNSS solution uncompleted.");
+    status->set_detailed_msg("GNSS solution uncompleted.");
     return;
   }
 
@@ -69,20 +69,20 @@ void GpsMonitor::RunOnce(const double current_time) {
   ins_status_adapter->Observe();
   if (ins_status_adapter->Empty()) {
     status->set_status(HardwareStatus::ERR);
-    status->set_msg("No INS status message.");
+    status->set_detailed_msg("No INS status message.");
     return;
   }
   switch (ins_status_adapter->GetLatestObserved().type()) {
     case InsStatus::CONVERGING:
       status->set_status(HardwareStatus::NOT_READY);
-      status->set_msg("INS ALIGNING");
+      status->set_detailed_msg("INS ALIGNING");
       return;
     case InsStatus::GOOD:
       break;
     case InsStatus::INVALID:
     default:
       status->set_status(HardwareStatus::ERR);
-      status->set_msg("INS status invalid.");
+      status->set_detailed_msg("INS status invalid.");
       return;
   }
 
@@ -91,7 +91,7 @@ void GpsMonitor::RunOnce(const double current_time) {
   best_pose_adapter->Observe();
   if (best_pose_adapter->Empty()) {
     status->set_status(HardwareStatus::ERR);
-    status->set_msg("No Gnss BestPose message.");
+    status->set_detailed_msg("No Gnss BestPose message.");
     return;
   }
   const auto &best_pose = best_pose_adapter->GetLatestObserved();
@@ -100,7 +100,7 @@ void GpsMonitor::RunOnce(const double current_time) {
                                            best_pose.height_std_dev()});
   if (largest_std_dev > FLAGS_acceptable_gnss_best_pose_std_dev) {
     status->set_status(HardwareStatus::GPS_UNSTABLE_WARNING);
-    status->set_msg("GPS BestPose is unstable.");
+    status->set_detailed_msg("GPS BestPose is unstable.");
     if (status->has_gps_unstable_start_time()) {
       const double duration = current_time - status->gps_unstable_start_time();
       if (duration > FLAGS_acceptable_gnss_best_pose_unstable_duration) {
@@ -119,7 +119,7 @@ void GpsMonitor::RunOnce(const double current_time) {
 
   // All check passed.
   status->set_status(HardwareStatus::OK);
-  status->set_msg("OK");
+  status->set_detailed_msg("OK");
 }
 
 }  // namespace monitor

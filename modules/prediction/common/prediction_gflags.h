@@ -53,7 +53,8 @@ DECLARE_double(r_var);
 DECLARE_double(p_var);
 DECLARE_double(go_approach_rate);
 
-DECLARE_int32(still_obstacle_history_length);
+DECLARE_int32(min_still_obstacle_history_length);
+DECLARE_int32(max_still_obstacle_history_length);
 DECLARE_double(still_obstacle_speed_threshold);
 DECLARE_double(still_pedestrian_speed_threshold);
 DECLARE_double(still_obstacle_position_std);
@@ -82,6 +83,7 @@ DECLARE_double(rnn_min_lane_relatice_s);
 DECLARE_bool(adjust_velocity_by_obstacle_heading);
 DECLARE_bool(adjust_velocity_by_position_shift);
 DECLARE_double(heading_filter_param);
+DECLARE_uint32(max_num_lane_point);
 
 // Validation checker
 DECLARE_double(centripetal_acc_coeff);

@@ -98,7 +98,7 @@ class KCFComponents {
   cv::Mat ComplexDivision(const cv::Mat &x1, const cv::Mat &x2);
 
   // init only: Create Gaussian Peak as regression target
-  cv::Mat CreateGaussianPeak(const int &sizey, const int &sizex);
+  cv::Mat CreateGaussianPeak(const int sizey, const int sizex);
 
   // init only: Discrete Fast Fourier Transform
   cv::Mat FFTD(cv::Mat img);

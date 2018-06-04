@@ -44,6 +44,9 @@ DEFINE_string(drive_event_topic, "/apollo/drive_event",
               "drive event topic name");
 DEFINE_string(traffic_light_detection_topic, "/apollo/perception/traffic_light",
               "traffic light detection topic name");
+DEFINE_string(perception_lane_mask_segmentation_topic,
+              "/apollo/perception/lane_mask",
+              "lane mask segmentation topic name");
 DEFINE_string(routing_request_topic, "/apollo/routing_request",
               "routing request topic name");
 DEFINE_string(routing_response_topic, "/apollo/routing_response",
@@ -64,7 +67,7 @@ DEFINE_string(mobileye_topic, "/apollo/sensor/mobileye", "mobileye topic name");
 DEFINE_string(delphi_esr_topic, "/apollo/sensor/delphi_esr",
               "delphi esr radar topic name");
 DEFINE_string(conti_radar_topic, "/apollo/sensor/conti_radar",
-              "delphi esr radar topic name");
+              "continental radar topic name");
 DEFINE_string(ultrasonic_radar_topic, "/apollo/sensor/ultrasonic_radar",
               "ultrasonic esr radar topic name");
 // TODO(Authors): Change the topic name
@@ -98,3 +101,22 @@ DEFINE_string(voice_detection_request_topic,
 DEFINE_string(voice_detection_response_topic,
               "/apollo/hmi/voice_detection_response",
               "Voice detetection response topic name.");
+// For pandora.
+DEFINE_string(pandora_pointcloud_topic,
+              "/apollo/sensor/pandora/hesai40/PointCloud2",
+              "pandora pointcloud topic name");
+DEFINE_string(pandora_camera_front_color_topic,
+              "/apollo/sensor/pandora/camera/front_color",
+              "pandora front color camera topic name");
+DEFINE_string(pandora_camera_right_gray_topic,
+              "/apollo/sensor/pandora/camera/right_gray",
+              "pandora right gray camera topic name");
+DEFINE_string(pandora_camera_left_gray_topic,
+              "/apollo/sensor/pandora/camera/left_gray",
+              "pandora left gray camera topic name");
+DEFINE_string(pandora_camera_front_gray_topic,
+              "/apollo/sensor/pandora/camera/front_gray",
+              "pandora front gray camera topic name");
+DEFINE_string(pandora_camera_back_gray_topic,
+              "/apollo/sensor/pandora/camera/back_gray",
+              "pandora back gray camera topic name");

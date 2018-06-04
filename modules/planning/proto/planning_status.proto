@@ -4,15 +4,45 @@ package apollo.planning;
 
 import "modules/planning/proto/decision.proto";
 import "modules/common/proto/drive_state.proto";
-import "modules/planning/proto/planning.proto";
+import "modules/common/proto/geometry.proto";
 
 /*
   This file defines the data types that represents the internal state of the planning module.
   It will not be refreshed in each planning cycle.
 */
 
+message ChangeLaneStatus {
+  enum Status {
+    IN_CHANGE_LANE = 1; // during change lane state
+    CHANGE_LANE_FAILED = 2; // change lane failed
+    CHANGE_LANE_SUCCESS = 3; // change lane failed
+  }
+  optional Status status = 1;
+  // the id of the route segment that the vehicle is driving on
+  optional string path_id = 2;
+  // the time stamp when the state started.
+  optional double timestamp = 3;
+}
+
+message PullOverStatus {
+  enum Reason {
+    DESTINATION = 1; // upon arriving destination
+  }
+  optional bool in_pull_over = 1 [default=false];
+  optional apollo.common.PointENU start_point = 2;
+  optional apollo.common.PointENU stop_point = 3;
+  optional double stop_point_heading = 4;
+  optional Reason reason = 5;
+  optional double status_set_time = 6;
+}
+
 message ReroutingStatus {
   optional double last_rerouting_time = 1;
+}
+
+message RightOfWayStatus {
+  // whether the vehicle has right of way in junction
+  map<string, bool> junction = 1;
 }
 
 message SidePassStatus {
@@ -20,7 +50,7 @@ message SidePassStatus {
   // driving -> wait -> sidepass -> driving
   enum Status {
     UNKNOWN = 0;
-    DRIVING = 1;
+    DRIVE = 1;
     WAIT = 2;
     SIDEPASS = 3;
   }
@@ -33,10 +63,11 @@ message SidePassStatus {
 message StopSignStatus {
   enum Status {
     UNKNOWN = 0;
-    TO_STOP = 1;
-    STOPPING = 2;
-    CREEPING = 3;
-    STOP_DONE = 4;
+    DRIVE = 1;
+    STOP = 2;
+    WAIT = 3;
+    CREEP = 4;
+    STOP_DONE = 5;
   }
   message LaneWatchVehicles {
     required string lane_id = 1;
@@ -49,36 +80,19 @@ message StopSignStatus {
   repeated LaneWatchVehicles lane_watch_vehicles = 4;
 }
 
-message ChangeLaneStatus {
-   enum Status {
-       IN_CHANGE_LANE = 1; // during change lane state
-       CHANGE_LANE_FAILED = 2; // change lane failed
-       CHANGE_LANE_SUCCESS = 3; // change lane failed
-   }
-   optional Status status = 1;
-   // the id of the route segment that the vehicle is driving on
-   optional string path_id = 2;
-   // the time stamp when the state started.
-   optional double timestamp = 3;
-}
-
-message RightOfWayStatus {
-    // whether the vehicle has right of way in junction
-    map<string, bool> junction = 1;
+message PlanningState {
+  oneof object_tag {
+    PullOverStatus pull_over = 1;
+  }
 }
 
 message PlanningStatus {
-  optional ReroutingStatus rerouting = 1;
-  optional SidePassStatus side_pass = 2;
-  optional StopSignStatus stop_sign = 3;
-  optional ChangeLaneStatus change_lane = 4;
+  optional PlanningState planning_state = 1;
+  optional ChangeLaneStatus change_lane = 2;
+  optional apollo.common.EngageAdvice engage_advice = 3;
+  optional ReroutingStatus rerouting = 4;
   optional RightOfWayStatus right_of_way = 5;
-  optional apollo.common.EngageAdvice engage_advice = 6;
-  optional SpecialStatus special_status = 7;
+  optional SidePassStatus side_pass = 6;
+  optional StopSignStatus stop_sign = 7;
 }
 
-message SpecialStatus {
-    // special status for test purpose
-  optional int32 trajectory_index = 1;
-  repeated apollo.planning.ADCTrajectory trajectory = 2;
-}

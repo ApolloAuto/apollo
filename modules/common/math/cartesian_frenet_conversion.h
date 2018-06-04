@@ -26,7 +26,8 @@
 #include "modules/common/math/vec2d.h"
 
 namespace apollo {
-namespace planning {
+namespace common {
+namespace math {
 
 // Notations:
 // s_condition = [s, s_dot, s_ddot]
@@ -84,8 +85,8 @@ class CartesianFrenetConverter {
                                const double l, const double dl,
                                const double ddl);
 
-  static common::math::Vec2d CalculateCartesianPoint(
-      const double rtheta, const common::math::Vec2d& rpoint, const double l);
+  static Vec2d CalculateCartesianPoint(const double rtheta, const Vec2d& rpoint,
+                                       const double l);
   /**
    * @brief: given sl, theta, and road's theta, kappa, extract derivative l,
    *second order derivative l:
@@ -100,7 +101,8 @@ class CartesianFrenetConverter {
       const double kappa, const double dkappa_ref, const double l);
 };
 
-}  // namespace planning
+}  // namespace math
+}  // namespace common
 }  // namespace apollo
 
 #endif  // MODULES_COMMON_MATH_CARTESIAN_FRENET_CONVERSION_H_

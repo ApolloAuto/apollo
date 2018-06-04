@@ -243,15 +243,7 @@ bool PbfHmTrackObjectMatcher::HmAssign(
 void PbfHmTrackObjectMatcher::MinimizeAssignment(
     const std::vector<std::vector<double>> &association_mat,
     std::vector<int> *ref_idx, std::vector<int> *new_idx) {
-  std::vector<std::vector<double>> cost(association_mat.size());
-  for (size_t i = 0; i < association_mat.size(); ++i) {
-    cost[i].resize(association_mat[i].size());
-    for (size_t j = 0; j < association_mat[0].size(); ++j) {
-      cost[i][j] = association_mat[i][j];
-    }
-  }
-
-  HungarianOptimizer hungarian_optimizer(cost);
+  HungarianOptimizer hungarian_optimizer(association_mat);
   hungarian_optimizer.minimize(ref_idx, new_idx);
 }
 

@@ -18,26 +18,24 @@
 
 #include "modules/perception/obstacle/camera/converter/geometry_camera_converter.h"
 
+#include "modules/common/util/file.h"
+#include "modules/perception/common/perception_gflags.h"
+
 namespace apollo {
 namespace perception {
 
+using apollo::common::util::GetProtoFromFile;
+
 bool GeometryCameraConverter::Init() {
-  ConfigManager *config_manager = ConfigManager::instance();
-
-  const ModelConfig *model_config = config_manager->GetModelConfig(Name());
-  if (model_config == nullptr) {
-    AERROR << "Model config: " << Name() << " not found";
+  if (!GetProtoFromFile(FLAGS_geometry_camera_converter_config, &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_geometry_camera_converter_config;
     return false;
   }
 
-  std::string intrinsic_file_path = "";
-  if (!model_config->GetValue("camera_intrinsic_file", &intrinsic_file_path)) {
-    AERROR << "Failed to get camera intrinsics file path: " << Name();
-    return false;
-  }
-
-  if (!LoadCameraIntrinsics(intrinsic_file_path)) {
-    AERROR << "Failed to get camera intrinsics: " << intrinsic_file_path;
+  if (!LoadCameraIntrinsics(config_.camera_intrinsic_file())) {
+    AERROR << "Failed to get camera intrinsics: "
+           << config_.camera_intrinsic_file();
     return false;
   }
 
@@ -122,7 +120,7 @@ bool GeometryCameraConverter::LoadCameraIntrinsics(
 }
 
 bool GeometryCameraConverter::ConvertSingle(
-    const float &h, const float &w, const float &l, const float &alpha_deg,
+    const float h, const float w, const float l, const float alpha_deg,
     const Eigen::Vector2f &upper_left, const Eigen::Vector2f &lower_right,
     bool use_width, float *distance, Eigen::Vector2f *mass_center_pixel) {
   // Target Goals: Projection target
@@ -187,8 +185,8 @@ bool GeometryCameraConverter::ConvertSingle(
   mass_center_v = MakeUnit(mass_center_v);
 
   // Distance search
-  *distance = SearchDistance(pixel_length, use_width, mass_center_v,
-                             0.1f, 150.0f);
+  *distance =
+      SearchDistance(pixel_length, use_width, mass_center_v, 0.1f, 150.0f);
   for (size_t i = 0; i < 1; ++i) {
     // Mass center search
     SearchCenterDirection(box_center_pixel, *distance, &mass_center_v,
@@ -202,7 +200,7 @@ bool GeometryCameraConverter::ConvertSingle(
 }
 
 void GeometryCameraConverter::Rotate(
-    const float &alpha_deg, std::vector<Eigen::Vector3f> *corners) const {
+    const float alpha_deg, std::vector<Eigen::Vector3f> *corners) const {
   Eigen::AngleAxisf yaw(alpha_deg / 180.0f * M_PI, Eigen::Vector3f::UnitY());
   Eigen::AngleAxisf pitch(0.0, Eigen::Vector3f::UnitX());
   Eigen::AngleAxisf roll(0.0, Eigen::Vector3f::UnitZ());
@@ -221,9 +219,9 @@ void GeometryCameraConverter::Rotate(
 }
 
 float GeometryCameraConverter::SearchDistance(
-    const int &pixel_length, const bool &use_width,
-    const Eigen::Matrix<float, 3, 1> &mass_center_v,
-    float close_d, float far_d) {
+    const int pixel_length, const bool &use_width,
+    const Eigen::Matrix<float, 3, 1> &mass_center_v, float close_d,
+    float far_d) {
   float curr_d = 0.0f;
   int depth = 0;
   while (close_d <= far_d && depth < kMaxDistanceSearchDepth_) {
@@ -275,7 +273,7 @@ float GeometryCameraConverter::SearchDistance(
 }
 
 void GeometryCameraConverter::SearchCenterDirection(
-    const Eigen::Matrix<float, 2, 1> &box_center_pixel, const float &curr_d,
+    const Eigen::Matrix<float, 2, 1> &box_center_pixel, const float curr_d,
     Eigen::Matrix<float, 3, 1> *mass_center_v,
     Eigen::Matrix<float, 2, 1> *mass_center_pixel) const {
   int depth = 0;
@@ -373,7 +371,7 @@ void GeometryCameraConverter::CheckTruncation(
 }
 
 float GeometryCameraConverter::DecideDistance(
-    const float &distance_h, const float &distance_w,
+    const float distance_h, const float distance_w,
     std::shared_ptr<VisualObject> obj) const {
   float distance = distance_h;
   return distance;

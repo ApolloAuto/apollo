@@ -27,7 +27,6 @@
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sequence_type_fuser/sequence_type_fuser.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 #include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
@@ -283,10 +282,6 @@ bool LidarProcessSubnode::InitFrameDependence() {
     hdmap_input_ = HDMapInput::instance();
     if (!hdmap_input_) {
       AERROR << "failed to get HDMapInput instance.";
-      return false;
-    }
-    if (!hdmap_input_->Init()) {
-      AERROR << "failed to Init HDMapInput";
       return false;
     }
     AINFO << "get and Init hdmap_input succ.";

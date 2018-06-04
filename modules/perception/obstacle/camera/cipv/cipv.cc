@@ -67,7 +67,7 @@ bool Cipv::DistanceFromPointToLineSegment(const Point2Df &point,
   return true;
 }
 
-// Determine CIPV among multiple objects
+// Select CIPV among multiple objects
 bool Cipv::GetEgoLane(const LaneObjectsPtr lane_objects, EgoLane *egolane_image,
                       EgoLane *egolane_ground, bool *b_left_valid,
                       bool *b_right_valid) {
@@ -122,7 +122,7 @@ bool Cipv::GetEgoLane(const LaneObjectsPtr lane_objects, EgoLane *egolane_image,
 bool Cipv::MakeVirtualLane(const LaneLine &ref_lane_line, const float yaw_rate,
                            const float offset_distance,
                            LaneLine *virtual_lane_line) {
-  // TODO(All): Use union of lane line and yaw_rate path to determine the
+  // TODO(All): Use union of lane line and yaw_rate path to define the
   // virtual lane
   virtual_lane_line->line_point.clear();
   if (b_image_based_cipv_ == false) {
@@ -167,7 +167,7 @@ bool Cipv::MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
                                          const float offset_distance,
                                          LaneLine *left_lane_line,
                                          LaneLine *right_lane_line) {
-  // ** to do *** Use union of lane line and yaw_rate path to determine the
+  // ** to do *** Use union of lane line and yaw_rate path to decide the
   // virtual lane
   float x = 0.0f;
   float y = 0.0f;
@@ -312,7 +312,7 @@ bool Cipv::FindClosestEdgeOfObjectImage(const std::shared_ptr<Object> &object,
 }
 // Get closest edge of an object in ground cooridnate
 // *** TO DO *** This funcion should be changed to find min-y and max-y edges
-// to determine CIPV.
+// to decide CIPV.
 bool Cipv::FindClosestEdgeOfObjectGround(const std::shared_ptr<Object> &object,
                                          const EgoLane &egolane_ground,
                                          LineSegment2Df *closted_object_edge) {
@@ -646,75 +646,77 @@ bool Cipv::IsObjectInTheLane(const std::shared_ptr<Object> &object,
 }
 
 // =====================================================================
-// Determine CIPV among multiple objects
-bool Cipv::DetermineCipv(std::shared_ptr<SensorObjects> sensor_objects,
-                         CipvOptions *options) {
+// Decide CIPV among multiple objects
+bool Cipv::DetermineCipv(const LaneObjectsPtr lane_objects,
+                         const CipvOptions &options,
+                         std::vector<std::shared_ptr<Object>> *objects) {
   if (debug_level_ >= 3) {
-    AINFO << "Cipv Got SensorObjects size " << sensor_objects->objects.size();
+    AINFO << "Cipv Got SensorObjects size " << objects->size();
     AINFO << "Cipv Got lane object size "
-          << sensor_objects->lane_objects->size();
+          << lane_objects->size();
   }
-  float yaw_rate = options->yaw_rate;
-  float velocity = options->yaw_rate;
-  int32_t old_cipv_index = sensor_objects->cipv_index;
+
+  float yaw_rate = options.yaw_rate;
+  float velocity = options.velocity;
   int32_t cipv_index = -1;
-  //    int32_t old_cipv_track_id = sensor_objects->cipv_track_id;
+  //    int32_t old_cipv_track_id = sensor_objects.cipv_track_id;
   int32_t cipv_track_id = -1;
-  // AINFO<<"static_cast<int32_t>(sensor_objects->objects.size(): "
-  //           << static_cast<int32_t>(sensor_objects->objects.size());
+  // AINFO<<"static_cast<int32_t>(objects.size(): "
+  //           << static_cast<int32_t>(objects.size());
   bool b_left_valid = false;
   bool b_right_valid = false;
+  static int32_t old_cipv_index = -2;  // need to be changed
   EgoLane egolane_image;
   EgoLane egolane_ground;
 
   // Get ego lanes (in both image and ground coordinate)
-  GetEgoLane(sensor_objects->lane_objects, &egolane_image, &egolane_ground,
+  GetEgoLane(lane_objects, &egolane_image, &egolane_ground,
              &b_left_valid, &b_right_valid);
-  ElongateEgoLane(sensor_objects->lane_objects, b_left_valid, b_right_valid,
+  ElongateEgoLane(lane_objects, b_left_valid, b_right_valid,
                   yaw_rate, velocity, &egolane_image, &egolane_ground);
 
-  for (int32_t i = 0; i < static_cast<int32_t>(sensor_objects->objects.size());
-       ++i) {
-    if (debug_level_ >= 2) {
-      AINFO << "sensor_objects->objects[i]->track_id: "
-            << sensor_objects->objects[i]->track_id;
-    }
-    if (IsObjectInTheLane(sensor_objects->objects[i], egolane_image,
-                          egolane_ground) == true) {
-      if (cipv_index < 0 ||
-          sensor_objects->objects[i]->center[0] <
-              sensor_objects->objects[cipv_index]->center[0]) {
-        // cipv_index is not set or if objects[i] is closer than
-        // objects[cipv_index] in ego-x coordinate
-
-        // AINFO << "sensor_objects->objects[i]->center[0]: "
-        //            << sensor_objects->objects[i]->center[0];
-        // AINFO << "sensor_objects->objects[cipv_index]->center[0]: "
-        //            << sensor_objects->objects[cipv_index]->center[0];
+  for (int32_t i = 0; i < static_cast<int32_t>(objects->size());
+        ++i) {
+     if (debug_level_ >= 2) {
+      AINFO << "objects[i]->track_id: " << (*objects)[i]->track_id;
+     }
+    if (IsObjectInTheLane((*objects)[i], egolane_image,
+                           egolane_ground) == true) {
+       if (cipv_index < 0 ||
+          (*objects)[i]->center[0] <
+              (*objects)[cipv_index]->center[0]) {
+         // cipv_index is not set or if objects[i] is closer than
+         // objects[cipv_index] in ego-x coordinate
+        // AINFO << "objects[i]->center[0]: "
+        //            << objects[i]->center[0];
+        // AINFO << "objects[cipv_index]->center[0]: "
+        //            << objects[cipv_index]->center[0];
         cipv_index = i;
-        cipv_track_id = sensor_objects->objects[i]->track_id;
-      }
+        cipv_track_id = (*objects)[i]->track_id;
+       }
+
       if (debug_level_ >= 2) {
         AINFO << "current cipv_index: " << cipv_index;
       }
     }
   }
-  // AINFO << "old_cipv_index: " << old_cipv_index;
-  if (old_cipv_index != cipv_index && cipv_index >= 0) {
-    // AINFO << "sensor_objects->objects[cipv_index]->b_cipv: "
-    //            << sensor_objects->objects[cipv_index]->b_cipv;
-    // AINFO << "sensor_objects->cipv_index: "
-    //            << sensor_objects->cipv_index;
-    // AINFO << "sensor_objects->cipv_track_id: "
-    //            << sensor_objects->cipv_track_id;
-    if (old_cipv_index >= 0) {
-      // AINFO << "sensor_objects->objects[old_cipv_index]->b_cipv: "
-      //            << sensor_objects->objects[old_cipv_index]->b_cipv;
-      sensor_objects->objects[old_cipv_index]->b_cipv = false;
+  AINFO << "old_cipv_index: " << old_cipv_index;
+  if (cipv_index >= 0) {
+//  if (old_cipv_index != cipv_index && cipv_index >= 0) {
+    // AINFO << "(*objects)[cipv_index]->b_cipv: "
+    //             << (*objects)[cipv_index]->b_cipv;
+    // AINFO << "sensor_objects.cipv_index: "
+    //            << sensor_objects.cipv_index;
+    // AINFO << "sensor_objects.cipv_track_id: "
+    //            << sensor_objects.cipv_track_id;
+    if (old_cipv_index >= 0 && old_cipv_index != cipv_index) {
+      // AINFO << "(*objects)[old_cipv_index]->b_cipv: "
+      //             << (*objects)[old_cipv_index]->b_cipv;
+      (*objects)[old_cipv_index]->b_cipv = false;
     }
-    sensor_objects->objects[cipv_index]->b_cipv = true;
-    sensor_objects->cipv_index = cipv_index;
-    sensor_objects->cipv_track_id = cipv_track_id;
+    (*objects)[cipv_index]->b_cipv = true;
+    // sensor_objects.cipv_index = cipv_index;
+    // sensor_objects.cipv_track_id = cipv_track_id;
     if (debug_level_ >= 1) {
       AINFO << "final cipv_index: " << cipv_index;
       AINFO << "final cipv_track_id: " << cipv_track_id;
@@ -730,6 +732,7 @@ bool Cipv::DetermineCipv(std::shared_ptr<SensorObjects> sensor_objects,
       AINFO << "No cipv";
     }
   }
+  old_cipv_index = cipv_index;
 
   return true;
 }

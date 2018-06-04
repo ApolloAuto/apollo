@@ -47,7 +47,7 @@ DECLARE_int32(stamp_enlarge_factor);
 
 struct CommonSharedDataKey {
   CommonSharedDataKey() = default;
-  CommonSharedDataKey(const double &ts, const std::string &id)
+  CommonSharedDataKey(const double ts, const std::string &id)
       : timestamp(ts), device_id(id) {}
   virtual std::string ToString() const {
     return device_id +
@@ -202,8 +202,7 @@ template <class M>
 bool CommonSharedData<M>::Add(const CommonSharedDataKey &key,
                               const SharedDataPtr<M> &data) {
   // update latest_timestamp for SharedData
-  latest_timestamp_ = std::max(latest_timestamp_, key.timestamp);
-  // latest_timestamp_ = key.timestamp;
+  latest_timestamp_ = key.timestamp;
   return Add(key.ToString(), data);
 }
 

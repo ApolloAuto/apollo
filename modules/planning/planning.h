@@ -51,6 +51,8 @@ namespace planning {
  */
 class Planning : public apollo::common::ApolloApp {
  public:
+  Planning() = default;
+  virtual ~Planning();
   /**
    * @brief module name
    * @return module name

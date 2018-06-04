@@ -63,10 +63,8 @@ float get_jaccard_overlap(const NormalizedBBox &bbox1,
                           const NormalizedBBox &bbox2) {
   NormalizedBBox intersect_bbox;
   get_intersect_bbox(bbox1, bbox2, &intersect_bbox);
-  float intersect_width = 0.f;
-  float intersect_height = 0.f;
-  intersect_width = intersect_bbox.xmax - intersect_bbox.xmin;
-  intersect_height = intersect_bbox.ymax - intersect_bbox.ymin;
+  float intersect_width = intersect_bbox.xmax - intersect_bbox.xmin;
+  float intersect_height = intersect_bbox.ymax - intersect_bbox.ymin;
 
   if (intersect_width > 0 && intersect_height > 0) {
     float intersect_size = intersect_width * intersect_height;
@@ -154,7 +152,7 @@ void cross_class_merge(std::vector<int> *indices_ref,
           bbox_target.ymax <= bbox_ref.ymax) {
         it = indices_target->erase(it);
       } else {
-        it++;
+        ++it;
       }
     }
   }

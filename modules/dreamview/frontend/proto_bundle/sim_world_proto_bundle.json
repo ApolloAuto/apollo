@@ -231,6 +231,13 @@
                   "type": "Decision",
                   "id": 22
                 },
+                "yieldedObstacle": {
+                  "type": "bool",
+                  "id": 32,
+                  "options": {
+                    "default": false
+                  }
+                },
                 "throttlePercentage": {
                   "type": "double",
                   "id": 23
@@ -1302,6 +1309,10 @@
                 "engageAdvice": {
                   "type": "apollo.common.EngageAdvice",
                   "id": 29
+                },
+                "wheelSpeed": {
+                  "type": "WheelSpeed",
+                  "id": 30
                 }
               },
               "nested": {
@@ -1428,6 +1439,104 @@
                 "FIX_3D": 2,
                 "FIX_INVALID": 3
               }
+            },
+            "WheelSpeed": {
+              "fields": {
+                "isWheelSpdRrValid": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "wheelDirectionRr": {
+                  "type": "WheelSpeedType",
+                  "id": 2,
+                  "options": {
+                    "default": "INVALID"
+                  }
+                },
+                "wheelSpdRr": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "isWheelSpdRlValid": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "wheelDirectionRl": {
+                  "type": "WheelSpeedType",
+                  "id": 5,
+                  "options": {
+                    "default": "INVALID"
+                  }
+                },
+                "wheelSpdRl": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "isWheelSpdFrValid": {
+                  "type": "bool",
+                  "id": 7,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "wheelDirectionFr": {
+                  "type": "WheelSpeedType",
+                  "id": 8,
+                  "options": {
+                    "default": "INVALID"
+                  }
+                },
+                "wheelSpdFr": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "isWheelSpdFlValid": {
+                  "type": "bool",
+                  "id": 10,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "wheelDirectionFl": {
+                  "type": "WheelSpeedType",
+                  "id": 11,
+                  "options": {
+                    "default": "INVALID"
+                  }
+                },
+                "wheelSpdFl": {
+                  "type": "double",
+                  "id": 12,
+                  "options": {
+                    "default": 0
+                  }
+                }
+              },
+              "nested": {
+                "WheelSpeedType": {
+                  "values": {
+                    "FORWARD": 0,
+                    "BACKWARD": 1,
+                    "STANDSTILL": 2,
+                    "INVALID": 3
+                  }
+                }
+              }
             }
           }
         },
@@ -1490,7 +1599,8 @@
                 "STOP_REASON_CROSSWALK": 104,
                 "STOP_REASON_CREEPER": 105,
                 "STOP_REASON_REFERENCE_END": 106,
-                "STOP_REASON_YELLOW_SIGNAL": 107
+                "STOP_REASON_YELLOW_SIGNAL": 107,
+                "STOP_REASON_PULL_OVER": 108
               }
             },
             "ObjectStop": {
@@ -1510,6 +1620,11 @@
                 "stopHeading": {
                   "type": "double",
                   "id": 4
+                },
+                "waitForObstacle": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 5
                 }
               }
             },
@@ -3464,6 +3579,40 @@
                 }
               }
             },
+            "ParkingSpace": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "polygon": {
+                  "type": "Polygon",
+                  "id": 2
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
+                }
+              }
+            },
+            "ParkingLot": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "polygon": {
+                  "type": "Polygon",
+                  "id": 2
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
+                }
+              }
+            },
             "BoundaryEdge": {
               "fields": {
                 "curve": {
@@ -3809,6 +3958,18 @@
                   "id": 1,
                   "options": {
                     "default": 0.5
+                  }
+                },
+                "laneSource": {
+                  "type": "LaneSource",
+                  "id": 2
+                }
+              },
+              "nested": {
+                "LaneSource": {
+                  "values": {
+                    "PERCEPTION": 1,
+                    "OFFLINE_GENERATED": 2
                   }
                 }
               }

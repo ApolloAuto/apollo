@@ -29,8 +29,7 @@ function source_apollo_base() {
 
 function apollo_check_system_config() {
   # check docker environment
-  if [ ${MACHINE_ARCH} == "x86_64" ] && [ $(hostname) != "in_dev_docker" ] &&
-       [ $(hostname) != "in_release_docker" ]; then
+  if [ ${MACHINE_ARCH} == "x86_64" ] && [ ${APOLLO_IN_DOCKER} != "true" ]; then
     echo -e "${RED}Must run $0 in dev docker or release docker${NO_COLOR}"
     exit 0
   fi
@@ -133,6 +132,11 @@ function build() {
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
   fi
+
+  # build drivers
+  build_gnss
+  build_velodyne
+  build_usbcam
 
   # Build python proto
   build_py_proto

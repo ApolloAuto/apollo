@@ -37,7 +37,7 @@ DEFINE_double(max_len_for_navigation_lane, 250.0,
 DEFINE_double(ratio_navigation_lane_len_to_speed, 8.0,
               "navigation lane length to adv speed ratio");
 
-DEFINE_double(max_distance_to_navigation_line, 6.0,
+DEFINE_double(max_distance_to_navigation_line, 10.0,
               "max distance to navigation line in navigation mode");
 
 DEFINE_double(min_view_range_to_use_lane_marker, 0.5,
@@ -45,3 +45,6 @@ DEFINE_double(min_view_range_to_use_lane_marker, 0.5,
 
 DEFINE_double(min_lane_half_width, 1.5, "min lane half width in meters");
 DEFINE_double(max_lane_half_width, 2.0, "max lane half width in meters");
+
+DEFINE_bool(enable_cyclic_rerouting, false,
+            "Enable auto rerouting in a in a cyclic/circular navigaton line.");

@@ -81,8 +81,10 @@ class SmootherUtil {
         s += segment.length();
       }
       ReferenceLine init_ref(ref_points);
-      std::unique_ptr<ReferenceLineSmoother> smoother_ptr(
-          new QpSplineReferenceLineSmoother(config_));
+      // Prefer "std::make_unique" to direct use of "new".
+      // Reference "https://herbsutter.com/gotw/_102/" for details.
+      auto smoother_ptr =
+          std::make_unique<QpSplineReferenceLineSmoother>(config_);
       auto anchors =
           CreateAnchorPoints(init_ref.reference_points().front(), init_ref);
       smoother_ptr->SetAnchorPoints(anchors);
@@ -121,8 +123,10 @@ class SmootherUtil {
       i = j;
       ReferenceLine local_ref(ref_points);
       auto anchors = CreateAnchorPoints(ref_points.front(), local_ref);
-      std::unique_ptr<ReferenceLineSmoother> smoother_ptr(
-          new QpSplineReferenceLineSmoother(config_));
+      // Prefer "std::make_unique" to direct use of "new".
+      // Reference "https://herbsutter.com/gotw/_102/" for details.
+      auto smoother_ptr =
+          std::make_unique<QpSplineReferenceLineSmoother>(config_);
       smoother_ptr->SetAnchorPoints(anchors);
       ReferenceLine smoothed_local_ref;
       if (!smoother_ptr->Smooth(local_ref, &smoothed_local_ref)) {

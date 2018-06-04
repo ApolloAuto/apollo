@@ -17,10 +17,10 @@
 // @brief: lane_post_processing_subnode source file
 #include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
 
-#include <chrono>
-#include <thread>
 #include <algorithm>
 #include <cfloat>
+#include <chrono>
+#include <thread>
 #include <unordered_map>
 
 #include "Eigen/Dense"
@@ -31,7 +31,6 @@
 #include "modules/common/time/time_util.h"
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/cc_lane_post_processor.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
@@ -48,6 +47,7 @@ using std::shared_ptr;
 using std::string;
 using std::unordered_map;
 
+const int MAX_MOTION_SERVICE_DELAY = 5;
 bool LanePostProcessingSubnode::InitInternal() {
   // get Subnode config in DAG streaming
   unordered_map<string, string> fields;
@@ -138,21 +138,6 @@ bool LanePostProcessingSubnode::InitAlgorithmPlugin() {
   return true;
 }
 
-bool LanePostProcessingSubnode::InitWorkRoot() {
-  ConfigManager *config_manager = ConfigManager::instance();
-  if (config_manager == NULL) {
-    AERROR << "failed to get ConfigManager instance.";
-    return false;
-  }
-
-  if (!config_manager->Init()) {
-    AERROR << "failed to init ConfigManager";
-    return false;
-  }
-
-  return true;
-}
-
 bool LanePostProcessingSubnode::GetSharedData(const Event &event,
                                               shared_ptr<SensorObjects> *objs) {
   double timestamp = event.timestamp;
@@ -234,17 +219,45 @@ Status LanePostProcessingSubnode::ProcEvents() {
       }
     }
 
-    // TODO(gchen-apollo): add lock to read motion_buffer
-    while (options_.vehicle_status.time_ts != event.timestamp) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    mutex_.lock();
-    options_.SetMotion(motion_service_->GetMotionBuffer()->back());
-    mutex_.unlock();
+    double motion_timestamp = motion_service_->GetLatestTimestamp();
+    ADEBUG << "object ts : motion ts   " << std::to_string(event.timestamp)
+           << "  " << std::to_string(motion_timestamp);
+
+    if (motion_timestamp > event.timestamp) {
+      if (!motion_service_->GetMotionInformation(event.timestamp,
+                                                 &(options_.vehicle_status))) {
+        AWARN << "cannot find desired motion in motion buffer at: "
+              << std::to_string(event.timestamp);
+        options_.vehicle_status.time_ts = 0.0;  // signal to reset history
+        // return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
+      }
+    } else if (motion_timestamp < event.timestamp) {
+      int count = 0;
+      while (motion_timestamp < event.timestamp) {
+        count++;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        ADEBUG << "delay in motion: " << count;
+        ADEBUG << "object ts : motion ts  " << std::to_string(event.timestamp)
+               << "  " << std::to_string(motion_timestamp);
+        motion_timestamp = motion_service_->GetLatestTimestamp();
+        // exceed max waiting time
+        if (motion_timestamp > 0 && count > MAX_MOTION_SERVICE_DELAY) {
+          break;
+        }
+      }
+      mutex_.lock();
+      options_.SetMotion(motion_service_->GetMotionBuffer().back());
+      mutex_.unlock();
+      if (event.timestamp - options_.vehicle_status.time_ts > 0.2) {
+        options_.vehicle_status.time_ts = 0.0;  // signal to reset history
+      }
+    } else {
+      mutex_.lock();
+      options_.SetMotion(motion_service_->GetMotionBuffer().back());
+      mutex_.unlock();
     }
-    AINFO << "object ts : motion ts   " << std::to_string(event.timestamp)
-          << "  " << std::to_string(options_.vehicle_status.time_ts);
-    AINFO << "options_.vehicle_status.motion:  "
-          << options_.vehicle_status.motion;
+    ADEBUG << "options_.vehicle_status.motion:  "
+           << options_.vehicle_status.motion;
   }
   lane_post_processor_->Process(lane_map, options_, &lane_objects);
   for (size_t i = 0; i < lane_objects->size(); ++i) {

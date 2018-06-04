@@ -28,6 +28,7 @@
 #include "Eigen/Dense"
 #include "cv_bridge/cv_bridge.h"
 #include "sensor_msgs/Image.h"
+#include "sensor_msgs/fill_image.h"
 #include "yaml-cpp/yaml.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
@@ -82,11 +83,13 @@ class CameraProcessSubnode : public Subnode {
 
   bool MessageToMat(const sensor_msgs::Image& msg, cv::Mat* img);
 
+  bool MatToMessage(const cv::Mat& img, sensor_msgs::Image *msg);
+
   void VisualObjToSensorObj(
       const std::vector<std::shared_ptr<VisualObject>>& objects,
       SharedDataPtr<SensorObjects>* sensor_objects);
 
-  void PublishDataAndEvent(const double& timestamp,
+  void PublishDataAndEvent(const double timestamp,
                            const SharedDataPtr<SensorObjects>& sensor_objects,
                            const SharedDataPtr<CameraItem>& camera_item);
 
@@ -111,6 +114,11 @@ class CameraProcessSubnode : public Subnode {
   int32_t image_width_ = 1920;
   Eigen::Matrix4d camera_to_car_;
   Eigen::Matrix<double, 3, 4> intrinsics_;
+
+  // Dynamic calibration
+  bool adjusted_extrinsics_ = false;
+  Eigen::Matrix4d camera_to_car_adj_;
+  // always available, but retreat to static one if above is false
 
   // Modules
   std::unique_ptr<BaseCameraDetector> detector_;

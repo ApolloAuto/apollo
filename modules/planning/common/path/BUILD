@@ -44,6 +44,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "frenet_frame_path_test",
+    size = "small",
+    srcs = [
+        "frenet_frame_path_test.cc",
+    ],
+    deps = [
+        ":frenet_frame_path",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "path_data",
     srcs = [

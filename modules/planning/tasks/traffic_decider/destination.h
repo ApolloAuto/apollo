@@ -37,14 +37,22 @@ class Destination : public TrafficRule {
   explicit Destination(const TrafficRuleConfig& config);
   virtual ~Destination() = default;
 
-  bool ApplyRule(Frame* const frame,
+  common::Status ApplyRule(Frame* const frame,
                  ReferenceLineInfo* const reference_line_info);
 
  private:
   void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
-  bool BuildStopDecision(Frame* const frame,
+  int BuildStopDecision(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info);
+  int Stop(Frame* const frame,
+           ReferenceLineInfo* const reference_line_info,
+           const std::string lane_id,
+           const double lane_s);
+  bool CheckPullOver(ReferenceLineInfo* const reference_line_info,
+                     const std::string lane_id,
+                     const double lane_s);
+  int PullOver();
 };
 
 }  // namespace planning

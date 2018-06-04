@@ -22,7 +22,7 @@ namespace perception {
 bool ObjectCameraFilter::Init() { return true; }
 
 bool ObjectCameraFilter::Filter(
-    const double &timestamp,
+    const double timestamp,
     std::vector<std::shared_ptr<VisualObject>> *objects) {
   if (!objects) return false;
 
@@ -49,7 +49,7 @@ bool ObjectCameraFilter::Filter(
 
 std::string ObjectCameraFilter::Name() const { return "ObjectCameraFilter"; }
 
-void ObjectCameraFilter::Create(const int &track_id, const double &timestamp,
+void ObjectCameraFilter::Create(const int track_id, const double timestamp,
                                 const std::shared_ptr<VisualObject> &obj_ptr) {
   tracked_filters_[track_id] = ObjectFilter();
   tracked_filters_[track_id].track_id_ = track_id;
@@ -59,7 +59,7 @@ void ObjectCameraFilter::Create(const int &track_id, const double &timestamp,
   tracked_filters_[track_id].theta_.Init(obj_ptr->theta);
 }
 
-void ObjectCameraFilter::Predict(const int &track_id, const double &timestamp) {
+void ObjectCameraFilter::Predict(const int track_id, const double timestamp) {
   double time_diff = timestamp - tracked_filters_[track_id].last_timestamp_;
   float diff = static_cast<float>(time_diff);
 
@@ -71,14 +71,14 @@ void ObjectCameraFilter::Predict(const int &track_id, const double &timestamp) {
   tracked_filters_[track_id].last_timestamp_ = timestamp;
 }
 
-void ObjectCameraFilter::Update(const int &track_id,
+void ObjectCameraFilter::Update(const int track_id,
                                 const std::shared_ptr<VisualObject> &obj_ptr) {
   tracked_filters_[track_id].x_.Update(obj_ptr->center.x());
   tracked_filters_[track_id].y_.Update(obj_ptr->center.y());
   tracked_filters_[track_id].theta_.Update(obj_ptr->theta);
 }
 
-void ObjectCameraFilter::GetState(const int &track_id,
+void ObjectCameraFilter::GetState(const int track_id,
                                   std::shared_ptr<VisualObject> obj_ptr) {
   auto x_state = tracked_filters_[track_id].x_.GetState();
   auto y_state = tracked_filters_[track_id].y_.GetState();

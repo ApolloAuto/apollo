@@ -21,20 +21,20 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
-#include "modules/perception/obstacle/fusion/async_fusion/async_fusion.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time_util.h"
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/obstacle/camera/cipv/cipv.h"
+#include "modules/perception/obstacle/fusion/async_fusion/async_fusion.h"
+#include "modules/perception/obstacle/fusion/interface/base_fusion.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 #include "modules/perception/obstacle/onboard/lane_shared_data.h"
-#include "modules/perception/obstacle/fusion/interface/base_fusion.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
@@ -70,7 +70,7 @@ class FusionSubnode : public Subnode {
 
   void OnChassis(const apollo::canbus::Chassis &message);
 
-  void PublishDataAndEvent(const double &timestamp,
+  void PublishDataAndEvent(const double timestamp,
                            const std::string &device_id,
                            const SharedDataPtr<FusionItem> &data);
   double timestamp_;
@@ -83,6 +83,9 @@ class FusionSubnode : public Subnode {
   FusionSharedData *fusion_data_ = nullptr;
   LaneSharedData *lane_shared_data_ = nullptr;
   std::shared_ptr<LaneObjects> lane_objects_;
+  // CIPV related variables
+  CIPVObjectData* cipv_object_data_ = nullptr;
+  Cipv cipv_;
   // lidar perception subnode event controls the publishing behavior
   EventID pub_driven_event_id_;
   EventID lidar_event_id_;
@@ -92,6 +95,7 @@ class FusionSubnode : public Subnode {
   std::mutex fusion_subnode_mutex_;
   apollo::canbus::Chassis chassis_;
   volatile float chassis_speed_mps_;
+
   DISALLOW_COPY_AND_ASSIGN(FusionSubnode);
 };
 

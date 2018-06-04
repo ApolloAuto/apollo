@@ -272,14 +272,16 @@ void SimulationWorldService::Update() {
   UpdateWithLatestObserved("PerceptionObstacles",
                            AdapterManager::GetPerceptionObstacles());
   UpdateWithLatestObserved("PerceptionTrafficLight",
-                           AdapterManager::GetTrafficLightDetection());
+                           AdapterManager::GetTrafficLightDetection(), false);
   UpdateWithLatestObserved("PredictionObstacles",
                            AdapterManager::GetPrediction());
   UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
   UpdateWithLatestObserved("ControlCommand",
                            AdapterManager::GetControlCommand());
-  UpdateWithLatestObserved("Navigation", AdapterManager::GetNavigation());
-  UpdateWithLatestObserved("RelativeMap", AdapterManager::GetRelativeMap());
+  UpdateWithLatestObserved("Navigation", AdapterManager::GetNavigation(),
+                           FLAGS_use_navigation_mode);
+  UpdateWithLatestObserved("RelativeMap", AdapterManager::GetRelativeMap(),
+                           FLAGS_use_navigation_mode);
 
   for (const auto &kv : obj_map_) {
     *world_.add_object() = kv.second;
@@ -727,6 +729,16 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
           if (!LocateMarker(decision, world_decision)) {
             AWARN << "No decision marker position found for object id=" << id;
             continue;
+          }
+          if (decision.has_stop()) {
+            // flag yielded obstacles
+            for (auto obstacle_id : decision.stop().wait_for_obstacle()) {
+              std::vector<std::string> id_segments;
+              apollo::common::util::split(obstacle_id, '_', &id_segments);
+              if (id_segments.size() > 0) {
+                obj_map_[id_segments[0]].set_yielded_obstacle(true);
+              }
+            }
           }
         } else if (decision.has_nudge()) {
           if (world_obj.polygon_point_size() == 0) {

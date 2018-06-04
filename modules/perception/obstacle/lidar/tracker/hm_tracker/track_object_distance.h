@@ -35,33 +35,33 @@ class TrackObjectDistance {
   // objects
   // @params[IN] location_distance_weight: weight of location dist
   // @return true if set successfully, otherwise return false
-  static bool SetLocationDistanceWeight(const float& location_distance_weight);
+  static bool SetLocationDistanceWeight(const float location_distance_weight);
 
   // @brief set weight of direction dist for all the track object distance
   // objects
   // @params[IN] direction_distance_weight: weight of direction dist
   // @return true if set successfully, otherwise return false
   static bool SetDirectionDistanceWeight(
-      const float& direction_distance_weight);
+      const float direction_distance_weight);
 
   // @brief set weight of bbox size dist for all the track object distance
   // objects
   // @params[IN] bbox_size_distance_weight: weight of bbox size dist
   // @return true if set successfully, otherwise return false
-  static bool SetBboxSizeDistanceWeight(const float& bbox_size_distance_weight);
+  static bool SetBboxSizeDistanceWeight(const float bbox_size_distance_weight);
 
   // @brief set weight of point num dist for all the track object distance
   // objects
   // @params[IN] point_num_distance_weight: weight of point num dist
   // @return true if set successfully, otherwise return false
-  static bool SetPointNumDistanceWeight(const float& point_num_distance_weight);
+  static bool SetPointNumDistanceWeight(const float point_num_distance_weight);
 
   // @brief set weight of histogram dist for all the track object distance
   // objects
   // @params[IN] weight_histogram_dist: weight of histogram dist
   // @return true if set successfully, otherwise return false
   static bool SetHistogramDistanceWeight(
-      const float& histogram_distance_weight);
+      const float histogram_distance_weight);
 
   // @brief compute distance for given track & object
   // @params[IN] track: track for <track, object> distance computing

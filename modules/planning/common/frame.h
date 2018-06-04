@@ -85,7 +85,8 @@ class Frame {
 
   const Obstacle *CreateStopObstacle(
       ReferenceLineInfo *const reference_line_info,
-      const std::string &obstacle_id, const double obstacle_s);
+      const std::string &obstacle_id,
+      const double obstacle_s);
 
   const Obstacle *CreateStopObstacle(const std::string &obstacle_id,
                                      const std::string &lane_id,
@@ -146,7 +147,6 @@ class Frame {
 
   prediction::PredictionObstacles prediction_;
   ThreadSafeIndexedObstacles obstacles_;
-  perception::CIPVInfo cipv_info_;
   ChangeLaneDecider change_lane_decider_;
   ADCTrajectory trajectory_;  // last published trajectory
   std::unique_ptr<LagPrediction> lag_predictor_;

@@ -28,7 +28,14 @@ bash docker/scripts/dev_into.sh
 ```bash
 bash apollo.sh build
 ```
+If the computer is very slow, you can enter the following command to limit the CPU.
+
+```
+bash apollo.sh build --local_resources 2048,1.0,1.0
+```
+
 ### Release binaries
+
 ```bash
 bash apollo.sh release
 ```

@@ -74,6 +74,17 @@ class Velodyne64Driver : public VelodyneDriver {
  private:
 };
 
+class Velodyne32Driver : public VelodyneDriver {
+public:
+    explicit Velodyne32Driver(const Config &config);
+    virtual ~Velodyne32Driver() {}
+    void init(ros::NodeHandle &node);
+    bool poll(void);
+    void poll_positioning_packet();
+private:
+  std::shared_ptr<Input> positioning_input_;
+};
+
 class Velodyne16Driver : public VelodyneDriver {
  public:
   explicit Velodyne16Driver(const Config &config);
@@ -84,7 +95,7 @@ class Velodyne16Driver : public VelodyneDriver {
   void poll_positioning_packet();
 
  private:
-  boost::shared_ptr<Input> positioning_input_;
+  std::shared_ptr<Input> positioning_input_;
 };
 
 class VelodyneDriverFactory {

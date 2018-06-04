@@ -816,11 +816,10 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 
 void Obstacle::SetLaneGraphFeature(Feature* feature) {
   double speed = feature->speed();
-  double acc = feature->acc();
-  double road_graph_distance =
+  double road_graph_distance = std::max(
       speed * FLAGS_prediction_duration +
-      0.5 * acc * FLAGS_prediction_duration * FLAGS_prediction_duration +
-      FLAGS_min_prediction_length;
+      0.5 * FLAGS_max_acc * FLAGS_prediction_duration *
+      FLAGS_prediction_duration, FLAGS_min_prediction_length);
 
   int seq_id = 0;
   int curr_lane_count = 0;
@@ -900,7 +899,9 @@ void Obstacle::SetLanePoints(Feature* feature) {
     double start_s = lane_sequence->lane_segment(lane_index).start_s();
     double total_s = 0.0;
     double lane_seg_s = start_s;
-    while (lane_index < lane_sequence->lane_segment_size()) {
+    std::size_t count_point = 0;
+    while (lane_index < lane_sequence->lane_segment_size() &&
+           count_point < FLAGS_max_num_lane_point) {
       if (lane_seg_s > lane_segment->end_s()) {
         start_s = lane_seg_s - lane_segment->end_s();
         lane_seg_s = start_s;
@@ -938,6 +939,7 @@ void Obstacle::SetLanePoints(Feature* feature) {
         lane_point.set_angle_diff(lane_point_angle_diff);
         lane_segment->set_lane_turn_type(PredictionMap::LaneTurnType(lane_id));
         lane_segment->add_lane_point()->CopyFrom(lane_point);
+        ++count_point;
         total_s += FLAGS_target_lane_gap;
         lane_seg_s += FLAGS_target_lane_gap;
       }
@@ -993,7 +995,8 @@ void Obstacle::SetMotionStatus() {
   double start_y = 0.0;
   double avg_drift_x = 0.0;
   double avg_drift_y = 0.0;
-  int len = std::min(history_size, FLAGS_still_obstacle_history_length);
+  int len = std::min(history_size, FLAGS_max_still_obstacle_history_length);
+  len = std::max(len, FLAGS_min_still_obstacle_history_length);
   CHECK_GT(len, 1);
 
   auto feature_riter = feature_history_.rbegin();

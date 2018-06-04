@@ -22,9 +22,10 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::PathPoint;
+using State = std::array<double, 3>;
 
 BackupTrajectoryGenerator::BackupTrajectoryGenerator(
-    const std::array<double, 3>& init_s, const std::array<double, 3>& init_d,
+    const State& init_s, const State& init_d,
     const double init_relative_time,
     const Trajectory1dGenerator* trajectory1d_generator)
     : init_relative_time_(init_relative_time),
@@ -33,7 +34,7 @@ BackupTrajectoryGenerator::BackupTrajectoryGenerator(
 }
 
 void BackupTrajectoryGenerator::GenerateTrajectory1dPairs(
-    const std::array<double, 3>& init_s, const std::array<double, 3>& init_d) {
+    const State& init_s, const State& init_d) {
   std::vector<std::shared_ptr<Curve1d>> lon_trajectories;
   std::array<double, 5> dds_condidates = {-0.1, -1.0, -2.0, -3.0, -4.0};
   for (const auto dds : dds_condidates) {
@@ -45,9 +46,9 @@ void BackupTrajectoryGenerator::GenerateTrajectory1dPairs(
   ptr_trajectory1d_generator_->GenerateLateralTrajectoryBundle(
       &lat_trajectories);
 
-  for (auto lon : lon_trajectories) {
-    for (auto lat : lat_trajectories) {
-      trajectory_pair_pqueue_.push(Trajectory1dPair(lon, lat));
+  for (auto& lon : lon_trajectories) {
+    for (auto& lat : lat_trajectories) {
+      trajectory_pair_pqueue_.emplace(lon, lat);
     }
   }
 }
