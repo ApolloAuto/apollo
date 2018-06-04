@@ -31,6 +31,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::control::ControlCommand;
+using apollo::guardian::GuardianCommand;
 using apollo::monitor::SystemStatus;
 
 std::string Guardian::Name() const { return FLAGS_module_name; }
@@ -48,7 +49,7 @@ Status Guardian::Init() {
 }
 
 Status Guardian::Start() {
-  const double duration = 1.0 / FLAGS_guardian_freq;
+  const double duration = 1.0 / FLAGS_guardian_cmd_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
                                        &Guardian::OnTimer, this);
 
@@ -59,6 +60,16 @@ void Guardian::Stop() { timer_.stop(); }
 
 void Guardian::OnTimer(const ros::TimerEvent&) {
   ADEBUG << "Timer is triggered: publish Guardian result";
+  std::lock_guard<std::mutex> lock(mutex_);
+  if (!system_status_.has_safety_mode_trigger_time()) {
+    ADEBUG << "Safety mode not triggerd, bypass control command";
+    ByPassControlCommand();
+  } else {
+    ADEBUG << "Safety mode triggerd, enable safty mode";
+    TriggerSafetyMode();
+  }
+  AdapterManager::FillGuardianHeader(FLAGS_node_name, &guardian_cmd_);
+  AdapterManager::PublishGuardian(guardian_cmd_);
 }
 
 void Guardian::OnChassis(const Chassis& message) {
@@ -77,6 +88,21 @@ void Guardian::OnControl(const ControlCommand& message) {
   ADEBUG << "Received control data: run control command callback.";
   std::lock_guard<std::mutex> lock(mutex_);
   control_cmd_.CopyFrom(message);
+}
+
+void Guardian::ByPassControlCommand() {
+  std::lock_guard<std::mutex> lock(mutex_);
+  guardian_cmd_.CopyFrom(control_cmd_);
+}
+
+void Guardian::TriggerSafetyMode() {
+  ADEBUG << "Received chassis data: run chassis callback.";
+  std::lock_guard<std::mutex> lock(mutex_);
+  guardian_cmd_.set_throttle(0.0);
+  guardian_cmd_.set_brake(FLAGS_guardian_cmd_soft_stop_percentage);
+  guardian_cmd_.set_steering_target(0.0);
+  guardian_cmd_.set_steering_rate(0.0);
+  guardian_cmd_.set_is_in_safe_mode(true);
 }
 
 }  // namespace guardian
