@@ -176,4 +176,5 @@ message Surround {
   optional double sonar11 = 20;
   optional bool sonar_enabled = 21;
   optional bool sonar_fault = 22;
+  repeated double sonar_range = 23;
 }
