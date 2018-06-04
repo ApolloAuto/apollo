@@ -33,8 +33,8 @@ namespace velodyne {
 
 class Compensator {
  public:
-  Compensator(ros::NodeHandle node, ros::NodeHandle private_nh);
-  virtual ~Compensator() {}
+  Compensator(ros::NodeHandle& node, ros::NodeHandle& private_nh);
+  virtual ~Compensator() = default;
 
  private:
   /**
