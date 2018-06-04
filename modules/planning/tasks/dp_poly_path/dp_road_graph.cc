@@ -26,6 +26,7 @@
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/planning/proto/planning_status.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
@@ -35,6 +36,7 @@
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_thread_pool.h"
+#include "modules/planning/common/planning_util.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 
 namespace apollo {
@@ -42,7 +44,9 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::SLPoint;
 using apollo::common::math::CartesianFrenetConverter;
+using apollo::common::util::MakeSLPoint;
 
 DPRoadGraph::DPRoadGraph(const DpPolyPathConfig &config,
                          const ReferenceLineInfo &reference_line_info,
@@ -268,6 +272,36 @@ bool DPRoadGraph::SamplePathWaypoints(
       (init_point.v() > FLAGS_max_stop_speed) ? step_length : step_length / 2.0;
   float accumulated_s = init_sl_point_.s();
   float prev_s = accumulated_s;
+
+  auto *status = util::GetPlanningStatus();
+  if (status == nullptr) {
+    AERROR << "Fail to  get planning status.";
+    return false;
+  }
+  if (status->planning_state().has_pull_over() &&
+      status->planning_state().pull_over().in_pull_over()) {
+    const auto &start_point =
+        status->planning_state().pull_over().start_point();
+    SLPoint start_point_sl;
+    if (!reference_line_.XYToSL(start_point, &start_point_sl)) {
+      AERROR << "Fail to change xy to sl.";
+      return false;
+    }
+
+    if (init_sl_point_.s() > start_point_sl.s()) {
+      const auto &stop_point =
+          status->planning_state().pull_over().stop_point();
+      SLPoint stop_point_sl;
+      if (!reference_line_.XYToSL(stop_point, &stop_point_sl)) {
+        AERROR << "Fail to change xy to sl.";
+        return false;
+      }
+      std::vector<common::SLPoint> level_points(1, stop_point_sl);
+      points->emplace_back(level_points);
+      return true;
+    }
+  }
+
   for (std::size_t i = 0; accumulated_s < total_length; ++i) {
     accumulated_s += level_distance;
     if (accumulated_s + level_distance / 2.0 > total_length) {
