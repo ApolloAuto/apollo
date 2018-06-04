@@ -19,7 +19,6 @@
 
 #include <algorithm>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -35,7 +34,9 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/time/timer.h"
+#include "modules/common/time/time_util.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/cuda_util/util.h"
 #include "modules/perception/lib/base/singleton.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
@@ -72,17 +73,13 @@ class CameraProcessSubnode : public Subnode {
 
  private:
   bool InitInternal() override;
-
   bool InitCalibration();
-
   bool InitModules();
 
   void ImgCallback(const sensor_msgs::Image& message);
-
   void ChassisCallback(const apollo::canbus::Chassis& message);
 
   bool MessageToMat(const sensor_msgs::Image& msg, cv::Mat* img);
-
   bool MatToMessage(const cv::Mat& img, sensor_msgs::Image *msg);
 
   void VisualObjToSensorObj(
@@ -93,17 +90,15 @@ class CameraProcessSubnode : public Subnode {
                            const SharedDataPtr<SensorObjects>& sensor_objects,
                            const SharedDataPtr<CameraItem>& camera_item);
 
-  void PublishPerceptionPb(const SharedDataPtr<SensorObjects>& sensor_objects);
+  void PublishPerceptionPbObj(const SharedDataPtr<SensorObjects>&
+                              sensor_objects);
+  void PublishPerceptionPbLnMsk(const cv::Mat& mask,
+                                const sensor_msgs::Image &message);
 
   // General
   std::string device_id_ = "camera";
   SeqId seq_num_ = 0;
   double timestamp_ns_ = 0.0;
-
-  // Publish Peception Pb
-  std::mutex camera_mutex_;
-  bool publish_ = false;
-  apollo::canbus::Chassis chassis_;
 
   // Shared Data
   CameraObjectData* cam_obj_data_;
@@ -115,10 +110,16 @@ class CameraProcessSubnode : public Subnode {
   Eigen::Matrix4d camera_to_car_;
   Eigen::Matrix<double, 3, 4> intrinsics_;
 
-  // Dynamic calibration
+  // Dynamic calibration based on objects
+  // Always available, but retreat to static one if flag is false
   bool adjusted_extrinsics_ = false;
   Eigen::Matrix4d camera_to_car_adj_;
-  // always available, but retreat to static one if above is false
+
+  // Publish to Peception Protobuf and ROS topic
+  bool pb_obj_ = false;  // Objects
+  apollo::canbus::Chassis chassis_;
+  bool pb_ln_msk_ = false;  // Lane marking mask
+  const float ln_msk_threshold_ = 0.5f;
 
   // Modules
   std::unique_ptr<BaseCameraDetector> detector_;
