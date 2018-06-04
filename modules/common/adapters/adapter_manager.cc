@@ -82,7 +82,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::PERCEPTION_LANE_MASK:
         EnablePerceptionLaneMask(FLAGS_perception_lane_mask_segmentation_topic,
-                                    config);
+                                 config);
         break;
       case AdapterConfig::TRAFFIC_LIGHT_DETECTION:
         EnableTrafficLightDetection(FLAGS_traffic_light_detection_topic,
@@ -215,6 +215,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::PANDORA_CAMERA_BACK_GRAY:
         EnablePandoraCameraBackGray(FLAGS_pandora_camera_back_gray_topic,
                                     config);
+        break;
+      case AdapterConfig::GUARDIAN:
+        EnablePandoraCameraBackGray(FLAGS_guardian_topic, config);
         break;
       default:
         AERROR << "Unknown adapter config type!";

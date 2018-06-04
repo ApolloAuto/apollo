@@ -120,3 +120,4 @@ DEFINE_string(pandora_camera_front_gray_topic,
 DEFINE_string(pandora_camera_back_gray_topic,
               "/apollo/sensor/pandora/camera/back_gray",
               "pandora back gray camera topic name");
+DEFINE_string(guardian_topic, "/apollo/guardian", "Guardian topic.");
