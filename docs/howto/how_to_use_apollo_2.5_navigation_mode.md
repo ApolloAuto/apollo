@@ -63,6 +63,13 @@ To (we are using the UTM area ID of Changsha area, for UTM sub-areas in China, p
 ```
 **Note:** If the coordinates were not changed before recording data, they must not be changed when playing back data during offline testing. Changing the ID after recording will disturb navigation line locating! 
 
+### 1.4 Configuring your UTM area ID for Dreamview
+
+Open` [your_apollo_root_dir]/modules/common/data/global_flagfile.txt`, add this line at the bottom (we are using the UTM area ID of Changsha area, for UTM sub-areas in China, please go to [this page](http://www.360doc.com/content/14/0729/10/3046928_397828751.shtml)): 
+```
+--local_utm_zone_id=49
+```
+
 ## 2. Collect navigation line raw data
 
 Import the pre-specified Apollo file into the in-car IPC, enter Docker (follow steps in 1.2), and execute the following command to launch Dreamview: 
@@ -115,9 +122,9 @@ The first argument `./path_2018-04-01-09-58-00.bag.txt` is raw data, the second 
 
 ## 4. Dreamview frontend compilation and configuration
 
-Dreamview frontend uses Baidu Map by default. It can be changed to Google Maps by re-compiling frontend and configuring UTM area accordingly, following these steps (Note: if the map setting does not need to be reset, please ignore steps 4.1-4.2, jump to step 4.3 instead): 
+Dreamview frontend uses Baidu Map by default. It can be changed to Google Maps by re-compiling frontend, following these steps (Note: if the map setting does not need to be reset, please ignore this section): 
 
-### 4.1 Change Navigation Map Settings
+### 4.1 Change navigation map settings
 
 Open the file`[your_apollo_root_dir]/modules/dreamview/frontend/src/store/config/ parameters.yml`, change map settings to meet your needs: 
 
@@ -157,15 +164,10 @@ yarn install
 cd /apollo
 bash apollo.sh build_fe
 ```
-### 4.3 Configuring your UTM area ID
 
-Open` [your_apollo_root_dir]/modules/common/data/global_flagfile.txt`, add this line at the bottom (we are using the UTM area ID of Changsha area, for UTM sub-areas in China, please go to [this page](http://www.360doc.com/content/14/0729/10/3046928_397828751.shtml)): 
-```
---local_utm_zone_id=49
-```
 ## 5. Usage of navigation mode
 
-### 5.1.  Open Dreamview and Enter Navigation Mode
+### 5.1. Open Dreamview and switch to navigation mode
 
 Enter Docker, open Dreamview and execute the following command:
 ``` bash
@@ -186,7 +188,7 @@ Open this website[ http://localhost:8888] ( http://localhost:8888) in the browse
 
 ![img](images/navigation_mode/enable_navigation_mode.png) 
 
-### 5.2 Open Dreamview Navigation Mode
+### 5.2 Enable relevant modules in the navigation mode
 
 Click on `Module Controller` button in the toolbar on the left side of the Dreamview interface and enter the module controller page. For offline mock tests, select `Relative Map`, `Navi Planning`, and other modules as needed as shown in the screenshot below (the module that shows blank text is the Mobileye module, which will be visible only if the related hardware is installed and configured):
 
@@ -196,7 +198,7 @@ For real vehicle commissioning, all modules except `Record Bag`, `Mobileye`(if M
 
 ![img](images/navigation_mode/drive_car_in_navigation_mode.png) 
 
-### 5.3 Send the Navigation Line Data
+### 5.3 Send the navigation line data
 
 In Docker, execute the following command to send the navigation line data made in step 3:
 ``` bash
