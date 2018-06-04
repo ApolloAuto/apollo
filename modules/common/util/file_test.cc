@@ -16,6 +16,7 @@
 
 #include "modules/common/util/file.h"
 
+#include "boost/filesystem.hpp"
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
 #include "modules/common/util/testdata/simple.pb.h"
@@ -27,8 +28,9 @@ namespace util {
 class FileTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    system("exec rm -rf ${TEST_TMPDIR}/*");
     temp_dir = std::getenv("TEST_TMPDIR");
+    boost::filesystem::remove_all(temp_dir);
+    boost::filesystem::create_directory(temp_dir);
   }
 
   std::string FilePath(const std::string &file_name) {
