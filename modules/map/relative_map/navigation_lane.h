@@ -81,7 +81,8 @@ class NavigationLane {
   double GetKappa(const double c1, const double c2, const double c3,
                   const double x);
 
-  void MergeNavigationLineAndLaneMarker(common::Path* path, int line_index);
+  void MergeNavigationLineAndLaneMarker(const int line_index,
+                                        common::Path* path);
 
   common::PathPoint GetPathPointByS(const common::Path& path,
                                     const int start_index, const double s,
@@ -90,7 +91,7 @@ class NavigationLane {
   void ConvertLaneMarkerToPath(const perception::LaneMarkers& lane_marker,
                                common::Path* path);
 
-  bool ConvertNavigationLineToPath(common::Path* path, int line_index);
+  bool ConvertNavigationLineToPath(const int line_index, common::Path* path);
 
   ProjIndexPair UpdateProjectionIndex(const common::Path& path, int line_index);
 
