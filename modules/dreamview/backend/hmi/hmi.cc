@@ -25,11 +25,9 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 #include "modules/monitor/proto/system_status.pb.h"
-
-DEFINE_double(system_status_lifetime_seconds, 30,
-              "Lifetime of a valid SystemStatus message.");
 
 namespace apollo {
 namespace dreamview {
