@@ -61,6 +61,7 @@ bool NavigationLane::GeneratePath() {
     current_navi_path_ = std::make_shared<NavigationPath>();
     auto *path = current_navi_path_->mutable_path();
     ConvertLaneMarkerToPath(lane_marker, path);
+    current_navi_path_->set_path_priority(0);
   };
 
   // priority: merge > navigation line > perception lane marker
@@ -73,6 +74,8 @@ bool NavigationLane::GeneratePath() {
       auto current_navi_path = std::make_shared<NavigationPath>();
       auto *path = current_navi_path->mutable_path();
       if (ConvertNavigationLineToPath(path, i)) {
+        current_navi_path->set_path_priority(
+            navigation_info_.navigation_path(i).path_priority());
         navigation_path_list_.emplace_back(i, current_navi_path);
       }
     }
@@ -99,20 +102,21 @@ bool NavigationLane::GeneratePath() {
 
     // Get which navigation path the vehicle is currently on.
     double min_d = std::numeric_limits<double>::max();
+    int current_line_index = 0;
     for (const auto &navi_path_pair : navigation_path_list_) {
       AINFO << "Current navigation path index is: " << navi_path_pair.first;
       double current_d = last_project_index_map_[navi_path_pair.first].second;
       if (current_d < min_d) {
         min_d = current_d;
+        current_line_index = navi_path_pair.first;
         current_navi_path_ = navi_path_pair.second;
       }
     }
 
     // Merge current navigation path where the vehicle is located with perceived
     // lane markers.
-    // Incorrect, don't use it temporarily.
-    // auto *path = current_navi_path_->mutable_path();
-    // MergeNavigationLineAndLaneMarker(path, current_line_index);
+    auto *path = current_navi_path_->mutable_path();
+    MergeNavigationLineAndLaneMarker(path, current_line_index);
     return true;
   }
 
@@ -162,20 +166,24 @@ void NavigationLane::MergeNavigationLineAndLaneMarker(common::Path *path,
   const double len = std::fmin(
       navigation_path.path_point(navigation_path.path_point_size() - 1).s(),
       lane_marker_path.path_point(lane_marker_path.path_point_size() - 1).s());
+  const double start_s = std::fmax(navigation_path.path_point(0).s(),
+                                   lane_marker_path.path_point(0).s());
 
   const double ds = 1.0;
   int navigation_index = 0;
   int lane_marker_index = 0;
-  for (double s = 0.0; s < len; s += ds) {
+  common::Path temp_path;
+  for (double s = start_s; s < len; s += ds) {
     auto p1 = GetPathPointByS(navigation_path, navigation_index, s,
                               &navigation_index);
     auto p2 = GetPathPointByS(lane_marker_path, lane_marker_index, s,
                               &lane_marker_index);
-    auto *p = path->add_path_point();
+    auto *p = temp_path.add_path_point();
     const double kWeight = 0.9;
     *p = common::util::GetWeightedAverageOfTwoPathPoints(p1, p2, kWeight,
                                                          1 - kWeight);
   }
+  path->mutable_path_point()->CopyFrom(temp_path.path_point());
 }
 
 common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
