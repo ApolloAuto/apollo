@@ -187,9 +187,6 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
           << "no valid pose, ts: " << GLOG_TIMESTAMP(image_ts)
           << " camera_id: " << kCameraIdToStr.at(camera_id);
     std::string cached_array_str = "cached lights";
-    double diff_image_pose_ts = 0.0;
-    double diff_image_sys_ts = 0.0;
-    bool no_signal = false;
     if (fabs(image_ts - last_no_signals_ts_) <
         config_.no_signals_interval_seconds()) {
       AINFO << "TLPreprocessor " << cached_array_str
@@ -199,7 +196,6 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
             << GLOG_TIMESTAMP(image_ts - last_no_signals_ts_)
             << " query /tf in low frequence because no signals forward "
             << " camera_id: " << kCameraIdToStr.at(camera_id);
-      no_signal = true;
     } else if (image_ts < cached_lights_.front()->timestamp) {
       double pose_ts = cached_lights_.front()->timestamp;
       double system_ts = TimeUtil::GetCurrentTime();
@@ -213,9 +209,6 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
             << ", diff between image and system ts: "
             << GLOG_TIMESTAMP(image_ts - system_ts)
             << ", camera_id: " << kCameraIdToStr.at(camera_id);
-      // difference between image and pose timestamps
-      diff_image_pose_ts = image_ts - pose_ts;
-      diff_image_sys_ts = image_ts - system_ts;
     } else if (image_ts > cached_lights_.back()->timestamp) {
       double pose_ts = cached_lights_.back()->timestamp;
       double system_ts = TimeUtil::GetCurrentTime();
@@ -229,8 +222,6 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
             << ", diff between image and system ts: "
             << GLOG_TIMESTAMP(image_ts - system_ts)
             << ", camera_id: " << kCameraIdToStr.at(camera_id);
-      diff_image_pose_ts = image_ts - pose_ts;
-      diff_image_sys_ts = image_ts - system_ts;
     } else if (!find_loc) {
       // if no pose found, log warning msg
       AWARN << "TLPreprocessor " << cached_array_str
