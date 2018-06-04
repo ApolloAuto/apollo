@@ -179,5 +179,13 @@ def Main():
         print('Bad input')
         sys.exit(1)
 
+    # TODO(xiaoxq): We always try to make data structurized, such as putting
+    # them into rosbag, instead of copying raw files around.
+    other_data_dirs = {'/apollo/data/gpsbin': 'data/gpsbin'}
+    for src, dst in other_data_dirs.iteritems():
+        if os.path.exists(src):
+            print('Copying ', src)
+            shutil.copytree(src, os.path.join(copy_to, dst)
+
 if __name__ == '__main__':
     Main()
