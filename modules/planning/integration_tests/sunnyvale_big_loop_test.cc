@@ -83,6 +83,15 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     }
     return nullptr;
   }
+
+  TrafficRuleConfig* GetPullConfig() {
+    for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+      if (config.rule_id() == TrafficRuleConfig::PULL_OVER) {
+        return &config;
+      }
+    }
+    return nullptr;
+  }
 };
 
 /*
@@ -572,6 +581,11 @@ TEST_F(SunnyvaleBigLoopTest, change_lane_abort_for_fast_back_vehicle) {
   RUN_GOLDEN_TEST_DECISION(0);
 }
 
+/*
+ * destination: stop on arriving destination when pull-over is disabled
+ * bag: 2018-05-16-10-00-32/2018-05-16-10-00-32_10.bag
+ * decision: STOP
+ */
 TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::DESTINATION, true);
@@ -594,6 +608,11 @@ TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
   RUN_GOLDEN_TEST_DECISION(0);
 }
 
+/*
+ * destination: pull-over on arriving destination
+ * bag: 2018-05-16-10-00-32/2018-05-16-10-00-32_10.bag
+ * decision: STOP
+ */
 TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::DESTINATION, true);
@@ -612,6 +631,10 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   // set config
   auto* destination_config = GetDestinationConfig();
   destination_config->mutable_destination()->set_enable_pull_over(true);
+
+  auto* pull_over_config = GetPullConfig();
+  pull_over_config->mutable_pull_over()->set_plan_distance(20.0);
+  pull_over_config->mutable_pull_over()->set_operation_length(15.0);
 
   RUN_GOLDEN_TEST_DECISION(0);
 

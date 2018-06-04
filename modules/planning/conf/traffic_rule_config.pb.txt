@@ -36,7 +36,6 @@ config: {
   enabled: true
   destination {
     enable_pull_over: false
-    pull_over_plan_distance: 20.0
     stop_distance: 0.5
   }
 }
@@ -67,11 +66,11 @@ config: {
   rule_id: PULL_OVER
   enabled: true
   pull_over {
-    max_stop_deceleration: 2.0
     stop_distance: 0.5
     max_stop_speed: 0.2
-    pull_over_l_buffer: 0.3
-    plan_distance: 20.0
+    buffer_to_boundary: 0.3
+    plan_distance: 25.0
+    operation_length: 20.0
     max_check_distance: 60.0
   }
 }
