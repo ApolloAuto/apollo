@@ -63,6 +63,13 @@ bash apollo.sh build
 ```
 **注意：**如果录制数据时未修改上述内容，则线下模拟测试回放数据包时只能将错就错，千万不能再修改该值，否则地图上的参考线定位会出错！有一次我采集数据时，忘了修改该值，回放数据时又进行修改，结果导致参考线定位到了美国西海岸！我取消修改，按`F5`键刷新浏览器后显示就恢复正常了。
 
+### 1.4 配置Dreamview使用的UTM区域ID
+
+打开文件`[apollo项目根目录]/modules/common/data/global_flagfile.txt`，在最后一行添加如下语句（这是长沙地区的UTM区域ID，中国UTM分区可参考[该网页](http://www.360doc.com/content/14/0729/10/3046928_397828751.shtml)）：
+```
+--local_utm_zone_id=49
+```
+
 ## 二、参考线原始数据的采集
 
 将构建好的`Apollo`项目文件导入车内工控机，并按照**步骤1.2**的方法进入`Docker`，再执行如下命令，启动`Dreamview`服务端程序：
@@ -122,9 +129,9 @@ python viewer_smooth.py ./path_2018-04-01-09-58-00.bag.txt ./path_2018-04-01-09-
 
 ![img](images/navigation_mode/view_smoothing_results.png) 
 
-## 四、Dreamview前端的编译及配置
+## 四、Dreamview前端的编译
 
-`Dreamview`前端默认使用`Baidu`地图，也可修改为`Google`地图，但需重新编译`Dreamview`前端，并正确设置UTM区域，具体方法如下（**注意**：如不需修改地图设置，可忽略**4.1-4.2**步，直接执行**4.3**步）：
+`Dreamview`前端默认使用`Baidu`地图，也可修改为`Google`地图，但需重新编译`Dreamview`前端，具体方法如下（**注意**：如不需修改地图设置，可忽略该节内容）：
 
 ### 4.1 更改导航地图
 
@@ -166,12 +173,6 @@ yarn install
 cd /apollo
 bash apollo.sh build_fe
 ```
-### 4.3 配置UTM区域ID
-
-打开文件`[apollo项目根目录]/modules/common/data/global_flagfile.txt`，在最后一行添加如下语句（这是长沙地区的UTM区域ID，中国UTM分区可参考[该网页](http://www.360doc.com/content/14/0729/10/3046928_397828751.shtml)）：
-```
---local_utm_zone_id=49
-```
 ## 五、导航模式的使用
 
 ### 5.1. 打开Dreamview并开启导航模式
@@ -195,7 +196,7 @@ rosbag play -l /apollo/data/bag/2018-04-01-09-58-00.bag
 
 ![img](images/navigation_mode/enable_navigation_mode.png) 
 
-### 5.2 打开Dreamview导航模式选项
+### 5.2 启用导航模式下的相关功能模块
 
 点击`Dreamview`界面左侧工具栏中的`Module Controller`按钮，进入模块控制页面。**若是线下模拟测试**，选中`Relative Map`、`Navi Planning`选项，其他模块根据需要开启，如下图所示（图中显示空白文本的模块是`Mobileye`模块，需安装配置好相关硬件后才可见））：
 
