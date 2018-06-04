@@ -44,7 +44,7 @@ SafetyManager::SafetyManager() {
 void SafetyManager::CheckSafety(const double current_time) {
   auto *system_status = MonitorManager::GetStatus();
   // Everything looks good or has been handled properly.
-  if (!ShouldTriggerSafeMode()) {
+  if (!ShouldTriggerSafeMode(current_time)) {
     system_status->clear_passenger_msg();
     system_status->clear_safety_mode_trigger_time();
     system_status->clear_require_emergency_stop();
@@ -78,7 +78,7 @@ void SafetyManager::CheckSafety(const double current_time) {
   }
 }
 
-bool SafetyManager::ShouldTriggerSafeMode() {
+bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
   // We only check safety mode in self driving mode.
   auto* adapter = AdapterManager::GetChassis();
   adapter->Observe();
@@ -86,8 +86,14 @@ bool SafetyManager::ShouldTriggerSafeMode() {
     return false;
   }
 
-  const auto driving_mode = adapter->GetLatestObserved().driving_mode();
-  if (driving_mode != Chassis::COMPLETE_AUTO_DRIVE) {
+  const auto& chassis = adapter->GetLatestObserved();
+  if (chassis.header().timestamp_sec() + FLAGS_system_status_lifetime_seconds <
+      current_time) {
+    // Ignore old messages which should be from replaying.
+    return false;
+  }
+
+  if (chassis.driving_mode() != Chassis::COMPLETE_AUTO_DRIVE) {
     return false;
   }
 

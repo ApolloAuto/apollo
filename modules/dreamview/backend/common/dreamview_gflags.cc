@@ -83,3 +83,8 @@ DEFINE_double(voxel_filter_size, 0.3, "VoxelGrid pointcloud filter leaf size");
 
 DEFINE_double(voxel_filter_height, 0.2,
               "VoxelGrid pointcloud filter leaf height");
+
+DEFINE_double(system_status_lifetime_seconds, 30,
+              "Lifetime of a valid SystemStatus message. It's more like a "
+              "replay message if the timestamp is old, where we should ignore "
+              "the status change.");
