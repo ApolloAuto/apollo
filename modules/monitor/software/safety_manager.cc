@@ -47,6 +47,11 @@ void SafetyManager::CheckSafety(const double current_time) {
   if (!ShouldTriggerSafeMode()) {
     system_status->clear_passenger_msg();
     system_status->clear_safety_mode_trigger_time();
+    system_status->clear_require_emergency_stop();
+    return;
+  }
+  if (system_status->require_emergency_stop()) {
+    // EStop has already been triggered.
     return;
   }
 
@@ -59,6 +64,7 @@ void SafetyManager::CheckSafety(const double current_time) {
     return;
   }
 
+  // Count down from 10 seconds, and trigger EStop if no action was taken.
   const int estop_count_down = static_cast<int>(
       system_status->safety_mode_trigger_time() +
       FLAGS_safety_mode_seconds_before_estop - current_time);
@@ -67,17 +73,8 @@ void SafetyManager::CheckSafety(const double current_time) {
     system_status->set_passenger_msg(std::to_string(estop_count_down));
   } else {
     // Trigger EStop.
-    system_status->set_passenger_msg("Emergency stop triggered.");
-
-    // TODO(all): Prefer a static "Planning::SendEStop()" helper function for
-    // all use cases.
-    apollo::planning::ADCTrajectory estop_trajectory;
-    auto *estop = estop_trajectory.mutable_estop();
-    estop->set_is_estop(true);
-    estop->set_reason("No proper action was taken for safety mode.");
-
-    AdapterManager::FillPlanningHeader("Monitor", &estop_trajectory);
-    AdapterManager::PublishPlanning(estop_trajectory);
+    system_status->set_passenger_msg("Emergency stop.");
+    system_status->set_require_emergency_stop(true);
   }
 }
 

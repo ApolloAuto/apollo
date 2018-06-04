@@ -71,4 +71,5 @@ message SystemStatus {
   // action was taken in a specified period of time (such as 10 seconds), EStop
   // will be sent to bring the vehicle into emergency full stop.
   optional double safety_mode_trigger_time = 5;
+  optional bool require_emergency_stop = 6;
 }
