@@ -73,16 +73,14 @@ message KeepClearConfig {
 message PullOverConfig {
   // stop distance from stop line
   optional double stop_distance = 1 [default=0.5];
-  // max speed(m/s) to be considered as a valid stop
-  optional double max_stop_speed = 2 [ default=0.2 ]; // m/s
   // l-distance buffer to road/lane boundary
-  optional double buffer_to_boundary = 3 [default=0.5];
+  optional double buffer_to_boundary = 2 [default=0.5];
   // distance to stop point to start planning pull over
-  optional double plan_distance = 4 [default=25.0];
+  optional double plan_distance = 3 [default=25.0];
   // s_distance to beteeen start and stop points
-  optional double operation_length = 5 [ default=20.0 ]; // meter
+  optional double operation_length = 4 [ default=20.0 ]; // meter
   // max s_distance to check ahead while planning pull over
-  optional double max_check_distance = 6 [ default=60.0]; // meter
+  optional double max_check_distance = 5 [ default=60.0]; // meter
 }
 
 message ReferenceLineEndConfig {

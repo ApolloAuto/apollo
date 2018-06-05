@@ -663,6 +663,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
       planning_state->pull_over().stop_point_heading();
   double status_set_time_1 = planning_state->pull_over().status_set_time();
 
+  // start_point/stop_point/etc shall be the same among cycles
   EXPECT_DOUBLE_EQ(start_point_0.x(), start_point_1.x());
   EXPECT_DOUBLE_EQ(start_point_0.y(), start_point_1.y());
   EXPECT_DOUBLE_EQ(stop_point_0.x(), stop_point_1.x());
