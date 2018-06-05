@@ -74,9 +74,9 @@ class PullOver : public TrafficRule {
    * The stop point could be invalid if it is occupied by other obstacles;
    * The stop point could be invalid if the vehicle has passed this point
    */
-  bool IsValidStop() const;
+  bool IsValidStop(const common::PointENU& stop_point) const;
 
-  int BuildPullOverStop(const common::PointENU stop_point);
+  int BuildPullOverStop(const common::PointENU& stop_point);
 
  private:
   static constexpr char const* const PULL_OVER_VO_ID_PREFIX = "PO_";

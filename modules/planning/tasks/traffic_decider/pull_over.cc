@@ -28,8 +28,10 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/proto/map_lane.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_util.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -40,6 +42,7 @@ using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneSegment;
 using apollo::hdmap::PathOverlap;
+using apollo::perception::PerceptionObstacle;
 using apollo::planning::util::GetPlanningStatus;
 
 PullOver::PullOver(const TrafficRuleConfig& config) : TrafficRule(config) {}
@@ -84,8 +87,66 @@ bool PullOver::PullOverCompleted() {
   return true;
 }
 
-bool PullOver::IsValidStop() const {
-  // TODO(all) implement this function
+bool PullOver::IsValidStop(const common::PointENU& stop_point) const {
+  const auto& reference_line = reference_line_info_->reference_line();
+
+  common::SLPoint stop_point_sl;
+  reference_line.XYToSL(stop_point, &stop_point_sl);
+  if (stop_point_sl.s() < 0 || stop_point_sl.s() > reference_line.Length()) {
+    return false;
+  }
+
+  const double adc_front_edge_s = reference_line_info_->AdcSlBoundary().end_s();
+  if (stop_point_sl.s() - adc_front_edge_s >
+      config_.pull_over().operation_length()) {
+    return false;
+  }
+
+  // parking spot boundary
+  const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
+  const double adc_width = vehicle_param.width();
+  const double adc_length = vehicle_param.length();
+
+  SLBoundary parking_spot_boundary;
+  parking_spot_boundary.set_start_s(stop_point_sl.s() - adc_length -
+                                    PARKING_SPOT_LONGITUDINAL_BUFFER);
+  parking_spot_boundary.set_end_s(stop_point_sl.s() +
+                                  PARKING_SPOT_LONGITUDINAL_BUFFER);
+  parking_spot_boundary.set_start_l(stop_point_sl.l() - adc_width / 2 -
+                                    config_.pull_over().buffer_to_boundary());
+  parking_spot_boundary.set_end_l(stop_point_sl.l() + adc_width / 2);
+  ADEBUG << "parking_spot_boundary: " << parking_spot_boundary.DebugString();
+
+  // check obstacles
+  auto* path_decision = reference_line_info_->path_decision();
+  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
+    const PerceptionObstacle& perception_obstacle =
+        path_obstacle->obstacle()->Perception();
+    const std::string& obstacle_id = std::to_string(perception_obstacle.id());
+    PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
+    std::string obstacle_type_name =
+        PerceptionObstacle_Type_Name(obstacle_type);
+
+    if (path_obstacle->obstacle()->IsVirtual() ||
+        !path_obstacle->obstacle()->IsStatic()) {
+      ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+             << "] VIRTUAL or NOT STATIC. SKIP";
+      continue;
+    }
+
+    const auto& obstacle_sl = path_obstacle->PerceptionSLBoundary();
+    if (!(parking_spot_boundary.start_s() > obstacle_sl.end_s() ||
+        obstacle_sl.start_s() > parking_spot_boundary.end_s() ||
+        parking_spot_boundary.start_l() > obstacle_sl.end_l() ||
+        obstacle_sl.start_l() > parking_spot_boundary.end_l())) {
+      // overlap
+      ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+             << "] overlap with parking spot: " << obstacle_sl.DebugString();
+
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -98,7 +159,7 @@ int PullOver::GetPullOverStop(common::PointENU* stop_point) {
   // reuse existing stop point
   if (pull_over_status.has_start_point() &&
       pull_over_status.has_stop_point()) {
-    if (IsValidStop()) {
+    if (IsValidStop(*stop_point)) {
       stop_point->set_x(pull_over_status.stop_point().x());
       stop_point->set_y(pull_over_status.stop_point().y());
       return 0;
@@ -300,7 +361,7 @@ int PullOver::FindPullOverStop(double* stop_point_s) {
   return -1;
 }
 
-int PullOver::BuildPullOverStop(const common::PointENU stop_point) {
+int PullOver::BuildPullOverStop(const common::PointENU& stop_point) {
   const auto& reference_line = reference_line_info_->reference_line();
 
   // check
