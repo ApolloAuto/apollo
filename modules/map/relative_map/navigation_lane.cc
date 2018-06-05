@@ -49,7 +49,7 @@ void NavigationLane::SetConfig(const NavigationLaneConfig &config) {
 
 bool NavigationLane::GeneratePath() {
   navigation_path_list_.clear();
-  current_navi_path_ = nullptr;
+  current_navi_path_tuple_ = std::make_tuple(-1, -1.0, -1.0, nullptr);
 
   // original_pose is in world coordination: ENU
   original_pose_ = VehicleStateProvider::instance()->original_pose();
@@ -58,10 +58,16 @@ bool NavigationLane::GeneratePath() {
   const auto &lane_marker = perception_obstacles_.lane_marker();
 
   auto generate_path_on_perception = [this, &lane_marker]() {
-    current_navi_path_ = std::make_shared<NavigationPath>();
-    auto *path = current_navi_path_->mutable_path();
+    auto current_navi_path = std::make_shared<NavigationPath>();
+    auto *path = current_navi_path->mutable_path();
     ConvertLaneMarkerToPath(lane_marker, path);
-    current_navi_path_->set_path_priority(0);
+    current_navi_path->set_path_priority(0);
+    double left_width = perceived_left_width_ > 0.0 ? perceived_left_width_
+                                                    : default_left_width_;
+    double right_width = perceived_right_width_ > 0.0 ? perceived_right_width_
+                                                      : default_right_width_;
+    current_navi_path_tuple_ =
+        std::make_tuple(0, left_width, right_width, current_navi_path);
   };
 
   // priority: merge > navigation line > perception lane marker
@@ -76,7 +82,8 @@ bool NavigationLane::GeneratePath() {
       if (ConvertNavigationLineToPath(i, path)) {
         current_navi_path->set_path_priority(
             navigation_info_.navigation_path(i).path_priority());
-        navigation_path_list_.emplace_back(i, current_navi_path);
+        navigation_path_list_.emplace_back(
+            i, default_left_width_, default_right_width_, current_navi_path);
       }
     }
 
@@ -90,33 +97,103 @@ bool NavigationLane::GeneratePath() {
     // Sort navigation paths from left to right according to the vehicle's
     // direction.
     // In the FLU vehicle coordinate system, the y-coordinate on the left side
-    // of the vehicle is positive, and the y-coordinate on the right side of the
-    // vehicle is negative. The navigation paths can be sorted from left to
-    // right according to the y-coordinate.
+    // of the vehicle is positive, and the right value is negative. Therefore,
+    // the navigation paths can be sorted from left to right according to its
+    // y-coordinate.
     navigation_path_list_.sort(
-        [this](const NaviPathPair &left, const NaviPathPair &right) {
-          double left_y = left.second->path().path_point(0).y();
-          double right_y = right.second->path().path_point(0).y();
+        [this](const NaviPathTuple &left, const NaviPathTuple &right) {
+          double left_y = std::get<3>(left)->path().path_point(0).y();
+          double right_y = std::get<3>(right)->path().path_point(0).y();
           return left_y > right_y;
         });
 
     // Get which navigation path the vehicle is currently on.
     double min_d = std::numeric_limits<double>::max();
-    int current_line_index = 0;
-    for (const auto &navi_path_pair : navigation_path_list_) {
-      AINFO << "Current navigation path index is: " << navi_path_pair.first;
-      double current_d = last_project_index_map_[navi_path_pair.first].second;
+    for (const auto &navi_path_tuple : navigation_path_list_) {
+      int current_line_index = std::get<0>(navi_path_tuple);
+      // AINFO << "Current navigation path index is: " << current_line_index;
+      double current_d = last_project_index_map_[current_line_index].second;
       if (current_d < min_d) {
         min_d = current_d;
-        current_line_index = navi_path_pair.first;
-        current_navi_path_ = navi_path_pair.second;
+        current_navi_path_tuple_ = navi_path_tuple;
       }
     }
 
     // Merge current navigation path where the vehicle is located with perceived
     // lane markers.
-    auto *path = current_navi_path_->mutable_path();
-    MergeNavigationLineAndLaneMarker(current_line_index, path);
+    auto *path = std::get<3>(current_navi_path_tuple_)->mutable_path();
+    MergeNavigationLineAndLaneMarker(std::get<0>(current_navi_path_tuple_),
+                                     path);
+
+    // Set the width between each navigation path and its adjacent path.
+    // If current navigation path is the path which the vehicle is currently
+    // on, and the perceived width is valid, the current lane width uses the
+    // perceived width.
+    // The reason for using average of multiple points is to prevent too much
+    // interference from a singularity.
+    int average_point_size = 10;
+    for (auto iter = navigation_path_list_.begin();
+         iter != navigation_path_list_.end(); ++iter) {
+      const auto &curr_path = std::get<3>(*iter)->path();
+
+      // Left neighbor
+      auto prev_iter = std::prev(iter);
+      if (prev_iter != navigation_path_list_.end()) {
+        const auto &prev_path = std::get<3>(*prev_iter)->path();
+        average_point_size = std::min(
+            average_point_size,
+            std::min(curr_path.path_point_size(), prev_path.path_point_size()));
+        double lateral_distance_sum = 0.0;
+        for (int i = 0; i < average_point_size; ++i) {
+          lateral_distance_sum +=
+              fabs(curr_path.path_point(i).y() - prev_path.path_point(i).y());
+        }
+        double width = lateral_distance_sum /
+                       static_cast<double>(average_point_size) / 2.0;
+        width = common::math::Clamp(width, FLAGS_min_lane_half_width,
+                                    FLAGS_max_lane_half_width);
+
+        auto &left_width = std::get<1>(*iter);
+        auto &right_width = std::get<2>(*prev_iter);
+        if (std::get<0>(*iter) == std::get<0>(current_navi_path_tuple_)) {
+          left_width =
+              perceived_left_width_ > 0.0 ? perceived_left_width_ : width;
+          right_width = 2.0 * width - left_width;
+        } else {
+          left_width = width;
+          right_width = width;
+        }
+      }
+      // Right neighbor
+      auto next_iter = std::next(iter);
+      if (next_iter != navigation_path_list_.end()) {
+        const auto &next_path = std::get<3>(*next_iter)->path();
+        average_point_size = std::min(
+            average_point_size,
+            std::min(curr_path.path_point_size(), next_path.path_point_size()));
+        double lateral_distance_sum = 0.0;
+        for (int i = 0; i < average_point_size; ++i) {
+          lateral_distance_sum +=
+              fabs(curr_path.path_point(i).y() - next_path.path_point(i).y());
+        }
+        double width = lateral_distance_sum /
+                       static_cast<double>(average_point_size) / 2.0;
+        width = common::math::Clamp(width, FLAGS_min_lane_half_width,
+                                    FLAGS_max_lane_half_width);
+
+        auto &right_width = std::get<1>(*iter);
+        auto &left_width = std::get<2>(*next_iter);
+        if (std::get<0>(*iter) == std::get<0>(current_navi_path_tuple_)) {
+          right_width =
+              perceived_right_width_ > 0.0 ? perceived_right_width_ : width;
+          left_width = 2.0 * width - right_width;
+        } else {
+          left_width = width;
+          right_width = width;
+        }
+      }
+    }
+
     return true;
   }
 
@@ -135,19 +212,18 @@ double NavigationLane::EvaluateCubicPolynomial(const double c0, const double c1,
 void NavigationLane::MergeNavigationLineAndLaneMarker(const int line_index,
                                                       common::Path *path) {
   CHECK_NOTNULL(path);
-  common::Path navigation_path;
 
-  // If "path" is non-empty, it indicates that a navigation path has been
-  // generated based on a navigation line and does not need to be generated
-  // again.
-  if (path->path_point_size() > 0) {
-    navigation_path = *path;
-  } else {
-    ConvertNavigationLineToPath(line_index, &navigation_path);
+  // If the size of "path" points is smaller than 2, it indicates that a
+  // navigation path needs to be generated firstly.
+  if (path->path_point_size() < 2) {
+    path->Clear();
+    ConvertNavigationLineToPath(line_index, path);
   }
-  // If the size of current navigation path points is smaller than 2, just
-  // generate a navigation path based on perceived lane markers.
-  if (navigation_path.path_point_size() < 2) {
+
+  // If the size of "path" points is still smaller than 2, just generate a
+  // navigation path based on perceived lane markers.
+  if (path->path_point_size() < 2) {
+    path->Clear();
     ConvertLaneMarkerToPath(perception_obstacles_.lane_marker(), path);
     return;
   }
@@ -162,28 +238,25 @@ void NavigationLane::MergeNavigationLineAndLaneMarker(const int line_index,
     return;
   }
 
-  const double len = std::fmin(
-      navigation_path.path_point(navigation_path.path_point_size() - 1).s(),
-      lane_marker_path.path_point(lane_marker_path.path_point_size() - 1).s());
-  const double start_s = std::fmax(navigation_path.path_point(0).s(),
-                                   lane_marker_path.path_point(0).s());
-
-  const double ds = 1.0;
-  int navigation_index = 0;
   int lane_marker_index = 0;
-  common::Path temp_path;
-  path->mutable_path_point()->Clear();
-  for (double s = start_s; s < len; s += ds) {
-    auto p1 = GetPathPointByS(navigation_path, navigation_index, s,
-                              &navigation_index);
-    auto p2 = GetPathPointByS(lane_marker_path, lane_marker_index, s,
-                              &lane_marker_index);
-    auto *p = temp_path.add_path_point();
-    const double kWeight = 0.9;
-    *p = common::util::GetWeightedAverageOfTwoPathPoints(p1, p2, kWeight,
-                                                         1 - kWeight);
+  const double kWeight = 0.9;
+  for (int i = 0; i < path->path_point_size(); ++i) {
+    auto *point = path->mutable_path_point(i);
+    double s = point->s();
+    auto lane_maker_point = GetPathPointByS(lane_marker_path, lane_marker_index,
+                                            s, &lane_marker_index);
+    // For the beginning and ending portions of a navigation path beyond the
+    // perceived path, only the y-coordinates in the FLU coordinate system are
+    // used for merging.
+    const int marker_size = lane_marker_path.path_point_size();
+    if (lane_marker_index < 0 || lane_marker_index > (marker_size - 1)) {
+      point->set_y(kWeight * point->y() + (1 - kWeight) * lane_maker_point.y());
+      lane_marker_index = 0;
+      continue;
+    }
+    *point = common::util::GetWeightedAverageOfTwoPathPoints(
+        *point, lane_maker_point, kWeight, 1 - kWeight);
   }
-  path->mutable_path_point()->CopyFrom(temp_path.path_point());
 }
 
 common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
@@ -191,6 +264,17 @@ common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
                                                   const double s,
                                                   int *matched_index) {
   CHECK_NOTNULL(matched_index);
+  const int size = path.path_point_size();
+
+  if (s < path.path_point(start_index).s() || start_index < 0) {
+    *matched_index = -1;
+    return path.path_point(0);
+  }
+
+  if (s > path.path_point(size - 1).s() || start_index > (size - 1)) {
+    *matched_index = size;
+    return path.path_point(size - 1);
+  }
 
   constexpr double kEpsilon = 1e-9;
   if (std::fabs(path.path_point(start_index).s() - s) < kEpsilon) {
@@ -198,7 +282,7 @@ common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
     return path.path_point(start_index);
   }
   int i = start_index;
-  while (i + 1 < path.path_point_size() && path.path_point(i + 1).s() < s) {
+  while (i + 1 < size && path.path_point(i + 1).s() < s) {
     ++i;
   }
   *matched_index = i;
@@ -307,8 +391,30 @@ ProjIndexPair NavigationLane::UpdateProjectionIndex(const common::Path &path,
       if (DistanceXY(path.path_point(0),
                      path.path_point(current_project_index)) <
           FLAGS_max_distance_to_navigation_line) {
-        min_d = DistanceXY(original_pose_.position(), path.path_point(0));
-        if (min_d < FLAGS_max_distance_to_navigation_line) {
+        // Convert the starting point of the current navigation line from the
+        // ENU coordinates to the FLU coordinates. Considering the multi-lane
+        // situation, when judging the distance between the current position of
+        // the vehicle and the starting point of the navigation line, the
+        // distance in the Y-axis direction can be appropriately enlarged, but
+        // the distance in the X-axis direction should be small.
+
+        // flu_x = (enu_x - x_shift) * cos(angle) + (enu_y - y_shift) *
+        //  sin(angle)
+        // flu_y = (enu_y - y_shift) * cos(angle) - (enu_x - x_shift) *
+        //  sin(angle)
+        double enu_x = path.path_point(0).x();
+        double enu_y = path.path_point(0).y();
+        double x_shift = original_pose_.position().x();
+        double y_shift = original_pose_.position().y();
+        double cos_angle = std::cos(original_pose_.heading());
+        double sin_angle = std::sin(original_pose_.heading());
+        double flu_x =
+            (enu_x - x_shift) * cos_angle + (enu_y - y_shift) * sin_angle;
+        double flu_y =
+            (enu_y - y_shift) * cos_angle - (enu_x - x_shift) * sin_angle;
+        if (std::fabs(flu_x) < FLAGS_max_distance_to_navigation_line / 2.0 &&
+            std::fabs(flu_y) < FLAGS_max_distance_to_navigation_line) {
+          min_d = DistanceXY(original_pose_.position(), path.path_point(0));
           return std::make_pair(0, min_d);
         }
       }
@@ -404,10 +510,13 @@ void NavigationLane::ConvertLaneMarkerToPath(
     point->set_dkappa((k2 - k1) / 0.0002);
   }
 
-  left_width_ = (std::fabs(left_lane.c0_position()) +
-                 std::fabs(right_lane.c0_position())) /
-                2.0;
-  right_width_ = left_width_;
+  perceived_left_width_ = (std::fabs(left_lane.c0_position()) +
+                           std::fabs(right_lane.c0_position())) /
+                          2.0;
+  perceived_left_width_ =
+      common::math::Clamp(perceived_left_width_, FLAGS_min_lane_half_width,
+                          FLAGS_max_lane_half_width);
+  perceived_right_width_ = perceived_left_width_;
 }
 
 bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
@@ -417,7 +526,8 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
   auto *lane_marker = map_msg->mutable_lane_marker();
 
   // A lambda expression for creating map.
-  auto create_map_func = [&](const std::shared_ptr<NavigationPath> &navi_path) {
+  auto create_map_func = [&](const NaviPathTuple &navi_path_tuple) {
+    const auto &navi_path = std::get<3>(navi_path_tuple);
     const auto &path = navi_path->path();
     if (path.path_point_size() < 2) {
       AERROR << "The path length of line index is invalid";
@@ -462,16 +572,8 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
     auto *right_segment =
         right_boundary->mutable_curve()->add_segment()->mutable_line_segment();
 
-    const double lane_left_width =
-        left_width_ <= 0.0
-            ? map_config.default_left_width()
-            : common::math::Clamp(left_width_, FLAGS_min_lane_half_width,
-                                  FLAGS_max_lane_half_width);
-    const double lane_right_width =
-        right_width_ <= 0.0
-            ? map_config.default_right_width()
-            : common::math::Clamp(right_width_, FLAGS_min_lane_half_width,
-                                  FLAGS_max_lane_half_width);
+    const double lane_left_width = std::get<1>(navi_path_tuple);
+    const double lane_right_width = std::get<2>(navi_path_tuple);
 
     for (const auto &path_point : path.path_point()) {
       auto *point = line_segment->add_point();
@@ -483,18 +585,16 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
         left_sample->set_s(path_point.s());
         left_sample->set_width(lane_left_width);
         left_segment->add_point()->CopyFrom(
-            *point +
-            lane_left_width *
-                Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
+            *point + lane_left_width *
+                         Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
       }
 
       auto *right_sample = lane->add_right_sample();
       right_sample->set_s(path_point.s());
       right_sample->set_width(lane_right_width);
       right_segment->add_point()->CopyFrom(
-          *point +
-          lane_right_width *
-              Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
+          *point + lane_right_width *
+                       Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
     }
     return true;
   };
@@ -502,11 +602,11 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
   lane_marker->CopyFrom(perception_obstacles_.lane_marker());
 
   // If no navigation path is generated based on navigation lines, we try to
-  // create map with "current_navi_path_" which is generated based on perceived
-  // lane markers.
+  // create map with "current_navi_path_tuple_" which is generated based on
+  // perceived lane markers.
   if (navigation_path_list_.empty()) {
-    if (current_navi_path_) {
-      return create_map_func(current_navi_path_);
+    if (std::get<3>(current_navi_path_tuple_) != nullptr) {
+      return create_map_func(current_navi_path_tuple_);
     } else {
       return false;
     }
@@ -516,7 +616,7 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
   for (auto iter = navigation_path_list_.cbegin();
        iter != navigation_path_list_.cend(); ++iter) {
     std::size_t index = std::distance(navigation_path_list_.cbegin(), iter);
-    if (!create_map_func(iter->second)) {
+    if (!create_map_func(*iter)) {
       AWARN << "Failed to generate lane: " << index;
       ++fail_num;
       continue;
