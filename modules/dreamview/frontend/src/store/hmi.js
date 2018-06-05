@@ -85,9 +85,9 @@ export default class HMI {
                 }
             }
             if (this.utterance &&
-                typeof newStatus.passengerMsg === "string" &&
-                newStatus.passengerMsg !== this.utterance.text) {
-                this.utterance.text = newStatus.passengerMsg;
+                typeof newStatus.systemStatus.passengerMsg === "string" &&
+                newStatus.systemStatus.passengerMsg !== this.utterance.text) {
+                    this.utterance.text = newStatus.systemStatus.passengerMsg;
                 this.speakPassengerMessage();
             }
         }
