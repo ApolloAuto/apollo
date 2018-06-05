@@ -54,6 +54,19 @@ TEST(Surround73Test, General) {
 
   EXPECT_FALSE(cd.surround().sonar_enabled());
   EXPECT_FALSE(cd.surround().sonar_fault());
+
+  EXPECT_DOUBLE_EQ(cd.surround().sonar_range(0), 0.44499999999999995);
+  EXPECT_DOUBLE_EQ(cd.surround().sonar_range(1), 1.0249999999999999);
+  EXPECT_DOUBLE_EQ(cd.surround().sonar_range(2), 0.58999999999999997);
+  EXPECT_DOUBLE_EQ(cd.surround().sonar_range(3), 1.0249999999999999);
+  EXPECT_DOUBLE_EQ(cd.surround().sonar_range(4), 0.73499999999999988);
+  EXPECT_DOUBLE_EQ(cd.surround().sonar_range(5), 1.0249999999999999);
+  EXPECT_DOUBLE_EQ(cd.surround().sonar_range(6), 0.29999999999999999);
+  EXPECT_DOUBLE_EQ(cd.surround().sonar_range(7), 0.87999999999999989);
+  EXPECT_DOUBLE_EQ(cd.surround().sonar_range(8), 100);
+  EXPECT_DOUBLE_EQ(cd.surround().sonar_range(9), 100);
+  EXPECT_DOUBLE_EQ(cd.surround().sonar_range(10), 0.58999999999999997);
+  EXPECT_DOUBLE_EQ(cd.surround().sonar_range(11), 0.87999999999999989);
 }
 
 }  // namespace lincoln
