@@ -180,13 +180,13 @@ int PullOver::FindPullOverStop(common::SLPoint* stop_point_sl) {
   const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
   const double adc_width = vehicle_param.width();
 
-  // TODO(all): temporarily set stop point by lane_boarder
-  double lane_left_width = 0.0;
-  double lane_right_width = 0.0;
-  reference_line.GetLaneWidth(stop_point_s,
-                              &lane_left_width, &lane_right_width);
+  double road_left_width = 0.0;
+  double road_right_width = 0.0;
+  reference_line.GetRoadWidth(stop_point_s,
+                              &road_left_width, &road_right_width);
+
   stop_point_sl->set_s(stop_point_s);
-  stop_point_sl->set_l(-(lane_right_width - adc_width / 2 -
+  stop_point_sl->set_l(-(road_right_width - adc_width / 2 -
       config_.pull_over().buffer_to_boundary()));
 
   ADEBUG << "stop_point(" << stop_point_sl->s()
