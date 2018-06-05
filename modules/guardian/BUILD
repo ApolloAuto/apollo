@@ -14,6 +14,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/control/proto:control_proto",
         "//modules/monitor/proto:system_status_proto",
+        "//modules/guardian/proto:guardian_proto",
     ],
 )
 

@@ -21,4 +21,6 @@ DEFINE_string(module_name, "guardian", "Module name");
 
 DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
 
-DEFINE_double(guardian_freq, 10, "timer frequency.");
+DEFINE_double(guardian_cmd_freq, 10, "timer frequency.");
+
+DEFINE_double(guardian_cmd_soft_stop_percentage, 30, "");
