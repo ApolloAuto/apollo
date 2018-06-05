@@ -72,4 +72,7 @@ DECLARE_string(pandora_camera_left_gray_topic);
 DECLARE_string(pandora_camera_front_gray_topic);
 DECLARE_string(pandora_camera_back_gray_topic);
 
+// Gardian topic
+DECLARE_string(guardian_topic);
+
 #endif  // MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_

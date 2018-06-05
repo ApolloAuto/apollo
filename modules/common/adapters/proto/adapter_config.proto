@@ -57,6 +57,7 @@ message AdapterConfig {
     PANDORA_CAMERA_FRONT_GRAY = 50;
     PANDORA_CAMERA_BACK_GRAY = 51;
     PERCEPTION_LANE_MASK = 52;
+    GUARDIAN = 53;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
