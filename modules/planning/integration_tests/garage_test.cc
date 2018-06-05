@@ -49,15 +49,6 @@ class GarageTest : public PlanningTestBase {
     FLAGS_test_routing_response_file = "garage_routing.pb.txt";
     FLAGS_enable_lag_prediction = false;
   }
-
-  TrafficRuleConfig* GetDestinationConfig() {
-    for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
-      if (config.rule_id() == TrafficRuleConfig::DESTINATION) {
-        return &config;
-      }
-    }
-    return nullptr;
-  }
 };
 
 /*
@@ -94,7 +85,7 @@ TEST_F(GarageTest, dest_stop_01) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetDestinationConfig();
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST(0);
