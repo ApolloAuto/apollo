@@ -65,33 +65,6 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
     ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
   }
-
-  TrafficRuleConfig* GetStopSignConfig() {
-    for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
-      if (config.rule_id() == TrafficRuleConfig::STOP_SIGN) {
-        return &config;
-      }
-    }
-    return nullptr;
-  }
-
-  TrafficRuleConfig* GetDestinationConfig() {
-    for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
-      if (config.rule_id() == TrafficRuleConfig::DESTINATION) {
-        return &config;
-      }
-    }
-    return nullptr;
-  }
-
-  TrafficRuleConfig* GetPullConfig() {
-    for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
-      if (config.rule_id() == TrafficRuleConfig::PULL_OVER) {
-        return &config;
-      }
-    }
-    return nullptr;
-  }
 };
 
 /*
@@ -163,7 +136,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::STOP);
-  auto* stop_sign_config = GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetStopSignConfig();
   double stop_duration = stop_sign_config->stop_sign().stop_duration();
   double wait_time = stop_duration - 0.5;
   double stop_start_time = Clock::NowInSeconds() - wait_time;
@@ -192,7 +165,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetStopSignConfig();
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   // set PlanningStatus: wait time > STOP_DURATION
@@ -233,7 +206,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
   PlanningTestBase::SetUp();
 
   // set configs
-  auto* stop_sign_config = GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetStopSignConfig();
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -287,7 +260,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetStopSignConfig();
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -379,7 +352,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetStopSignConfig();
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -443,7 +416,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetStopSignConfig();
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(true);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -602,7 +575,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetDestinationConfig();
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -629,10 +602,10 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetDestinationConfig();
   destination_config->mutable_destination()->set_enable_pull_over(true);
 
-  auto* pull_over_config = GetPullConfig();
+  auto* pull_over_config = PlanningTestBase::GetPullOverConfig();
   pull_over_config->mutable_pull_over()->set_plan_distance(20.0);
   pull_over_config->mutable_pull_over()->set_operation_length(15.0);
 
