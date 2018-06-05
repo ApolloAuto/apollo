@@ -44,8 +44,20 @@ Apollo环境启动参见[Apollo 2.5快速上手指南](https://github.com/Apollo
 
 采集的数据放置在/apollo/data/bag/(采集开始时间,例如2018-04-14-21-20-24)目录，把该目录下的数据打包为tar.gz压缩文件，到[Apollo数据官网](http://data.apollo.auto/hd_map_intro/?locale=zh-cn)进行数据上传。
 
-5、地图数据的管理和下载
+## 地图数据生产服务
 
-用户可以在[Apollo数据官网](http://data.apollo.auto/hd_map_intro/?locale=zh-cn)进行地图数据的管理、制图进度的跟踪和地图数据的下载。
+1、数据权限申请
 
+首先需要注册一个百度账号，登陆百度账号，申请地图制作服务使用权限(仅需申请一次),如果已经申请过，跳过此步。
+![](images/map_collection_data_request_ch.png)
+
+2、数据管理
+
+用户可以在数据管理页面进行制图任务的创建、采集数据上传、地图数据的管理、制图进度的跟踪等。
 ![](images/map_collection_data_manage_ch.png)
+
+3、数据下载
+
+当任务状态是[数据已发布]时，点击[数据已发布]进行地图数据下载。
+
+![](images/map_collection_data_finish_ch.png)
