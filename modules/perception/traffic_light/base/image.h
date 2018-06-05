@@ -88,7 +88,7 @@ class Image {
   /**
    * @brief return image as cv::Mat
    */
-  cv::Mat mat() const;
+  const cv::Mat &mat() const;
 
   /**
    * @brief return image's size
