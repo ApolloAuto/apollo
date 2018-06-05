@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/traffic_decider/pull_over.h"
 
+#include <algorithm>
 #include <iomanip>
 #include <vector>
 
@@ -177,13 +178,34 @@ int PullOver::FindPullOverStop(common::SLPoint* stop_point_sl) {
     return -1;
   }
 
+  // find road_right_width
   const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
   const double adc_width = vehicle_param.width();
+  const double adc_length = vehicle_param.length();
 
   double road_left_width = 0.0;
   double road_right_width = 0.0;
-  reference_line.GetRoadWidth(stop_point_s,
+
+  const double parking_spot_end_s = stop_point_s +
+      PARKING_SPOT_LONGITUDINAL_BUFFER;
+  reference_line.GetRoadWidth(parking_spot_end_s,
                               &road_left_width, &road_right_width);
+  const double parking_spot_end_s_road_right_width = road_right_width;
+
+  const double adc_center_s = stop_point_s - adc_length / 2;
+  reference_line.GetRoadWidth(adc_center_s,
+                              &road_left_width, &road_right_width);
+  const double adc_center_s_road_right_width = road_right_width;
+
+  const double parking_spot_start_s = stop_point_s - adc_length -
+      PARKING_SPOT_LONGITUDINAL_BUFFER;
+  reference_line.GetRoadWidth(parking_spot_start_s,
+                              &road_left_width, &road_right_width);
+  const double parking_spot_start_s_road_right_width = road_right_width;
+
+  road_right_width =  std::min(std::min(parking_spot_end_s_road_right_width,
+                              adc_center_s_road_right_width),
+                              parking_spot_start_s_road_right_width);
 
   stop_point_sl->set_s(stop_point_s);
   stop_point_sl->set_l(-(road_right_width - adc_width / 2 -
