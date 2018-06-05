@@ -437,7 +437,7 @@ void Planning::SetFallbackCruiseTrajectory(ADCTrajectory* cruise_trajectory) {
 
 void Planning::Stop() {
   AERROR << "Planning Stop is called";
-  PlanningThreadPool::instance()->Stop();
+  // PlanningThreadPool::instance()->Stop();
   if (reference_line_provider_) {
     reference_line_provider_->Stop();
   }

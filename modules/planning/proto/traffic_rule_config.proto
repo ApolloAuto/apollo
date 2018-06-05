@@ -76,7 +76,7 @@ message PullOverConfig {
   // max speed(m/s) to be considered as a valid stop
   optional double max_stop_speed = 2 [ default=0.2 ]; // m/s
   // l-distance buffer to road/lane boundary
-  optional double buffer_to_boundary = 3 [default=0.];
+  optional double buffer_to_boundary = 3 [default=0.5];
   // distance to stop point to start planning pull over
   optional double plan_distance = 4 [default=25.0];
   // s_distance to beteeen start and stop points
