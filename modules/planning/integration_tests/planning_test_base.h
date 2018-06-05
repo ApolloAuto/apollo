@@ -92,6 +92,10 @@ class PlanningTestBase : public ::testing::Test {
   bool RunPlanning(const std::string& test_case_name, int case_num,
                    bool no_trajectory_point);
 
+  TrafficRuleConfig* GetStopSignConfig();
+  TrafficRuleConfig* GetPullOverConfig();
+  TrafficRuleConfig* GetDestinationConfig();
+
  protected:
   void TrimPlanning(ADCTrajectory* origin, bool no_trajectory_point);
   bool SetUpAdapters();
