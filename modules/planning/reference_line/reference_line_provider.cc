@@ -19,6 +19,8 @@
  * @brief Implementation of the class ReferenceLineProvider.
  */
 
+#include "modules/planning/reference_line/reference_line_provider.h"
+
 #include <algorithm>
 #include <chrono>
 #include <limits>
@@ -31,7 +33,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/reference_line/reference_line_provider.h"
+#include "modules/planning/common/planning_util.h"
 #include "modules/routing/common/routing_gflags.h"
 
 /**
@@ -140,28 +142,38 @@ void ReferenceLineProvider::UpdateReferenceLine(
   if (reference_lines_.size() != reference_lines.size()) {
     reference_lines_ = reference_lines;
     route_segments_ = route_segments;
-    return;
-  }
-  auto segment_iter = route_segments.begin();
-  auto internal_iter = reference_lines_.begin();
-  auto internal_segment_iter = route_segments_.begin();
-  for (auto iter = reference_lines.begin(); iter != reference_lines.end();
-       ++iter, ++segment_iter, ++internal_iter, ++internal_segment_iter) {
-    if (iter->reference_points().empty()) {
+
+  } else {
+    auto segment_iter = route_segments.begin();
+    auto internal_iter = reference_lines_.begin();
+    auto internal_segment_iter = route_segments_.begin();
+    for (auto iter = reference_lines.begin(); iter != reference_lines.end();
+         ++iter, ++segment_iter, ++internal_iter, ++internal_segment_iter) {
+      if (iter->reference_points().empty()) {
+        *internal_iter = *iter;
+        *internal_segment_iter = *segment_iter;
+        continue;
+      }
+      if (common::util::SamePointXY(
+              iter->reference_points().front(),
+              internal_iter->reference_points().front()) &&
+          common::util::SamePointXY(iter->reference_points().back(),
+                                    internal_iter->reference_points().back()) &&
+          std::fabs(iter->Length() - internal_iter->Length()) <
+              common::math::kMathEpsilon) {
+        continue;
+      }
       *internal_iter = *iter;
       *internal_segment_iter = *segment_iter;
-      continue;
     }
-    if (common::util::SamePointXY(iter->reference_points().front(),
-                                  internal_iter->reference_points().front()) &&
-        common::util::SamePointXY(iter->reference_points().back(),
-                                  internal_iter->reference_points().back()) &&
-        std::fabs(iter->Length() - internal_iter->Length()) <
-            common::math::kMathEpsilon) {
-      continue;
-    }
-    *internal_iter = *iter;
-    *internal_segment_iter = *segment_iter;
+  }
+  // update history
+  reference_line_history_.push(reference_lines_);
+  route_segments_history_.push(route_segments_);
+  constexpr int kMaxHistoryNum = 3;
+  if (reference_line_history_.size() > kMaxHistoryNum) {
+    reference_line_history_.pop();
+    route_segments_history_.pop();
   }
 }
 
@@ -232,8 +244,6 @@ bool ReferenceLineProvider::GetReferenceLines(
   if (FLAGS_enable_reference_line_provider_thread) {
     // Wait the worker thread function GenerateThread() changes the flag of
     // "processed_" to "true".
-    // See "http://en.cppreference.com/w/cpp/thread/condition_variable" for
-    // datails.
     {
       std::unique_lock<std::mutex> lock(notify_mutex_);
       if (!cv_.wait_for(lock, std::chrono::milliseconds(10),
@@ -241,14 +251,19 @@ bool ReferenceLineProvider::GetReferenceLines(
         AWARN << "Failed to update the current reference line whin 10ms. ";
       }
     }
-
     if (!reference_lines_.empty()) {
       reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
       segments->assign(route_segments_.begin(), route_segments_.end());
       return true;
     } else {
       AWARN << "Reference line is NOT ready.";
-      return false;
+      if (reference_line_history_.empty()) {
+        return false;
+      }
+      reference_lines->assign(reference_line_history_.back().begin(),
+                              reference_line_history_.back().end());
+      segments->assign(route_segments_history_.back().begin(),
+                       route_segments_history_.back().end());
     }
   } else {
     double start_time = Clock::NowInSeconds();
@@ -259,8 +274,8 @@ bool ReferenceLineProvider::GetReferenceLines(
     UpdateReferenceLine(*reference_lines, *segments);
     double end_time = Clock::NowInSeconds();
     last_calculation_time_ = end_time - start_time;
-    return true;
   }
+  return true;
 }
 
 void ReferenceLineProvider::PrioritzeChangeLane(
