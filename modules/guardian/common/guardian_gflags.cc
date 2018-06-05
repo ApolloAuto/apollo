@@ -28,3 +28,6 @@ DEFINE_double(guardian_cmd_soft_stop_percentage, 30,
 
 DEFINE_double(guardian_cmd_emergency_stop_percentage, 100,
               "Emergency stop perceptage when safe mode triggered");
+
+DEFINE_bool(guardian_enabled, false,
+            "Enable guardian, safe mode activation enabled");
