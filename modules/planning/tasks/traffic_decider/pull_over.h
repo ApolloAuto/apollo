@@ -54,8 +54,6 @@ class PullOver : public TrafficRule {
    */
   bool IsPullOver() const;
 
-  bool PullOverCompleted();
-
   /**
    * get a pull over stop point
    */
@@ -66,8 +64,9 @@ class PullOver : public TrafficRule {
   /**
    * Find a safe place to pull over based on the vehicle's current state.
    */
-  int FindPullOverStop(double* stop_point_s);
-  int FindPullOverStop(common::SLPoint* stop_point_sl);
+  int FindPullOverStop(const double stop_point_s,
+                       common::PointENU* stop_point);
+  int FindPullOverStop(common::PointENU* stop_point);
 
   /**
    * Check if a stop point is valid based on current vehicle status
@@ -75,6 +74,7 @@ class PullOver : public TrafficRule {
    * The stop point could be invalid if the vehicle has passed this point
    */
   bool IsValidStop(const common::PointENU& stop_point) const;
+  bool IsValidStop(const common::SLPoint& stop_point_sl) const;
 
   int BuildPullOverStop(const common::PointENU& stop_point);
 
