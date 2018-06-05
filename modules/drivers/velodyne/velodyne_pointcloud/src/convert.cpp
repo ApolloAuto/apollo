@@ -24,9 +24,6 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-// void disconnected(const ros::SingleSubscriberPublisher&) {}
-// void connected(const ros::SingleSubscriberPublisher&) {}
-
 void Convert::init(ros::NodeHandle& node, ros::NodeHandle& private_nh) {
   private_nh.param("max_range", config_.max_range, 130.0);
   private_nh.param("min_range", config_.min_range, 0.9);
@@ -41,8 +38,8 @@ void Convert::init(ros::NodeHandle& node, ros::NodeHandle& private_nh) {
   // we use beijing time by default
   private_nh.param("queue_size", queue_size_, 10);
 
-  parser_ = VelodyneParserFactory::create_parser(config_);
-  if (parser_ == nullptr) {
+  parser_.reset(VelodyneParserFactory::create_parser(config_));
+  if (parser_.get() == nullptr) {
     ROS_BREAK();
   }
   parser_->setup();
@@ -63,12 +60,6 @@ void Convert::init(ros::NodeHandle& node, ros::NodeHandle& private_nh) {
   velodyne_scan_ = node.subscribe(
       topic_packets_, queue_size_, &Convert::convert_packets_to_pointcloud,
       (Convert*)this, ros::TransportHints().tcpNoDelay(true));
-}
-
-Convert::~Convert() {
-  if (parser_ != nullptr) {
-    delete parser_;
-  }
 }
 
 /** @brief Callback for raw scan messages. */
