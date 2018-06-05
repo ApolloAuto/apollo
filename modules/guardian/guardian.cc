@@ -98,11 +98,40 @@ void Guardian::ByPassControlCommand() {
 void Guardian::TriggerSafetyMode() {
   ADEBUG << "Received chassis data: run chassis callback.";
   std::lock_guard<std::mutex> lock(mutex_);
+  bool sensor_malfunction = false, obstacle_detected = false;
+  if (!chassis_.surround().sonar_enabled() ||
+      chassis_.surround().sonar_fault()) {
+    AINFO
+        << "Ultrasonic sensor not enabled for faulted, will do emergency stop!";
+    sensor_malfunction = true;
+  } else {
+    // TODO(QiL) : Load for config
+    for (int i = 0; i < chassis_.surround().sonar_range_size(); ++i) {
+      if ((chassis_.surround().sonar_range(i) > 0.0 &&
+           chassis_.surround().sonar_range(i) < 2.5) ||
+          chassis_.surround().sonar_range(i) > 30) {
+        AINFO << "Object detected or ultrasonic sensor fault output, will do "
+                 "emergency stop!";
+        obstacle_detected = true;
+      }
+    }
+  }
+
   guardian_cmd_.set_throttle(0.0);
-  guardian_cmd_.set_brake(FLAGS_guardian_cmd_soft_stop_percentage);
   guardian_cmd_.set_steering_target(0.0);
   guardian_cmd_.set_steering_rate(0.0);
   guardian_cmd_.set_is_in_safe_mode(true);
+
+  if (system_status_.require_emergency_stop() || sensor_malfunction ||
+      obstacle_detected) {
+    AINFO << "Emergency stop triggered! with system status from monitor as : "
+          << system_status_.require_emergency_stop();
+    guardian_cmd_.set_brake(FLAGS_guardian_cmd_emergency_stop_percentage);
+  } else {
+    AINFO << "Soft stop triggered! with system status from monitor as : "
+          << system_status_.require_emergency_stop();
+    guardian_cmd_.set_brake(FLAGS_guardian_cmd_soft_stop_percentage);
+  }
 }
 
 }  // namespace guardian
