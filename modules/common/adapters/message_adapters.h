@@ -33,9 +33,10 @@
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
-#include "modules/drivers/proto/ultrasonic_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
+#include "modules/drivers/proto/ultrasonic_radar.pb.h"
+#include "modules/guardian/proto/guardian.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -118,6 +119,7 @@ using PandoraCameraRightGrayAdapter = Adapter<::sensor_msgs::Image>;
 using PandoraCameraLeftGrayAdapter = Adapter<::sensor_msgs::Image>;
 using PandoraCameraFrontGrayAdapter = Adapter<::sensor_msgs::Image>;
 using PandoraCameraBackGrayAdapter = Adapter<::sensor_msgs::Image>;
+using GuardianAdapter = Adapter<apollo::guardian::GuardianCommand>;
 
 }  // namespace adapter
 }  // namespace common
