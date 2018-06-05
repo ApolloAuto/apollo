@@ -110,7 +110,10 @@ cc_library(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util:factory",
         "//modules/map/pnc_map",
+        "//modules/planning/common:indexed_queue",
+        "//modules/planning/common:planning_util",
         "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_status_proto",
     ],
 )
 
