@@ -16,5 +16,9 @@ proto_library(
         "//modules/common/proto:common_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
+        "//modules/common/proto:drive_state_proto_lib",
+        "//modules/common/proto:vehicle_signal_proto_lib",
+        "//modules/canbus/proto:canbus_proto_lib",
+        "//modules/control/proto:control_proto_lib"
     ],
 )
