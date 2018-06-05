@@ -48,6 +48,7 @@
 #include <Eigen/Geometry>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <typeinfo>
@@ -148,11 +149,13 @@ class CameraCalibration {
 
   void SetCar2CameraExtrinsicsAdj(Eigen::Matrix<double, 4, 4> matrix,
                                   bool adjusted) {
+    std::lock_guard<std::mutex> lock(adj_mtx_);
     camera2car_adj_ = matrix;
     adjusted_extrinsic_ = adjusted;
   }
 
   bool GetCar2CameraExtrinsicsAdj(Eigen::Matrix<double, 4, 4>* matrix) {
+    std::lock_guard<std::mutex> lock(adj_mtx_);
     *matrix = camera2car_adj_;
     return adjusted_extrinsic_;
   }
@@ -194,9 +197,11 @@ class CameraCalibration {
       _car2camera_pose;  // car to camera pose
 
   // Pitch angle adjusted extrinsics to ego car space on the ground
+  // always available, but retreat to static one if above is false
+  std::mutex adj_mtx_;
   bool adjusted_extrinsic_ = false;
   Eigen::Matrix<double, 4, 4> camera2car_adj_;
-  // always available, but retreat to static one if above is false
+
 
   Eigen::Matrix<double, 3, 4> camera_projection_mat_;
   Eigen::Matrix<double, 3, 3>
