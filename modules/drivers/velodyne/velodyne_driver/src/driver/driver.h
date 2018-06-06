@@ -58,13 +58,11 @@ class VelodyneDriver {
 
   uint64_t basetime_;
   uint32_t last_gps_time_;
-  int poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr &scan);
-  bool set_base_time();
-  void set_base_time_from_nmea_time(NMEATimePtr nmea_time,
-                                    uint64_t &basetime);
-  void update_gps_top_hour(unsigned int current_time);
 
-  bool check_angle(velodyne_msgs::VelodynePacket &packet);
+  virtual int poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr &scan);
+  bool set_base_time();
+  void set_base_time_from_nmea_time(NMEATimePtr nmea_time, uint64_t &basetime);
+  void update_gps_top_hour(unsigned int current_time);
 };
 
 class Velodyne64Driver : public VelodyneDriver {
@@ -76,6 +74,8 @@ class Velodyne64Driver : public VelodyneDriver {
   bool poll(void);
 
  private:
+  bool check_angle(velodyne_msgs::VelodynePacket &packet);
+  int poll_standard_sync(velodyne_msgs::VelodyneScanUnifiedPtr &scan);
 };
 
 class Velodyne32Driver : public VelodyneDriver {
