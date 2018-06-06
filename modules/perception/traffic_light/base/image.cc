@@ -75,7 +75,8 @@ bool Image::GenerateMat() {
   }
   return true;
 }
-cv::Mat Image::mat() const { return mat_; }
+const cv::Mat &Image::mat() const { return mat_; }
+
 cv::Size Image::size() const {
   if (contain_mat_) {
     return mat_.size();
