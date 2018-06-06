@@ -71,6 +71,7 @@ config: {
     plan_distance: 25.0
     operation_length: 20.0
     max_check_distance: 60.0
+    max_failure_count: 10
   }
 }
 
