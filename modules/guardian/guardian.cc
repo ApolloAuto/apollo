@@ -60,14 +60,22 @@ void Guardian::Stop() { timer_.stop(); }
 
 void Guardian::OnTimer(const ros::TimerEvent&) {
   ADEBUG << "Timer is triggered: publish Guardian result";
-  std::lock_guard<std::mutex> lock(mutex_);
-  if (system_status_.has_safety_mode_trigger_time() && FLAGS_guardian_enabled) {
+  bool safety_mode_triggered = false;
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (system_status_.has_safety_mode_trigger_time()) {
+      safety_mode_triggered = true;
+    }
+  }
+
+  if (safety_mode_triggered && FLAGS_guardian_enabled) {
     ADEBUG << "Safety mode triggerd, enable safty mode";
     TriggerSafetyMode();
   } else {
     ADEBUG << "Safety mode not triggerd, bypass control command";
     ByPassControlCommand();
   }
+
   AdapterManager::FillGuardianHeader(FLAGS_node_name, &guardian_cmd_);
   AdapterManager::PublishGuardian(guardian_cmd_);
 }
@@ -101,8 +109,8 @@ void Guardian::TriggerSafetyMode() {
   bool sensor_malfunction = false, obstacle_detected = false;
   if (!chassis_.surround().sonar_enabled() ||
       chassis_.surround().sonar_fault()) {
-    AINFO
-        << "Ultrasonic sensor not enabled for faulted, will do emergency stop!";
+    AINFO << "Ultrasonic sensor not enabled for faulted, will do emergency "
+             "stop!";
     sensor_malfunction = true;
   } else {
     // TODO(QiL) : Load for config

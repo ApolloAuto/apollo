@@ -58,7 +58,7 @@ class LanePostProcessingSubnode : public Subnode {
   bool GetSharedData(const Event& event, std::shared_ptr<SensorObjects>* objs);
   void PublishDataAndEvent(const double timestamp,
                            const SharedDataPtr<LaneObjects>& lane_objects);
-  void PublishPerceptionPb(const LaneObjectsPtr& lane_objects);
+  void PublishPerceptionPb(LaneObjectsPtr lane_objects);
 
   std::string device_id_ = "camera";
   uint64_t seq_num_ = 0;
