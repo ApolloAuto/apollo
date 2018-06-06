@@ -92,7 +92,7 @@ void Guardian::OnControl(const ControlCommand& message) {
 
 void Guardian::ByPassControlCommand() {
   std::lock_guard<std::mutex> lock(mutex_);
-  guardian_cmd_.CopyFrom(control_cmd_);
+  guardian_cmd_.mutable_control_command()->CopyFrom(control_cmd_);
 }
 
 void Guardian::TriggerSafetyMode() {
@@ -117,20 +117,22 @@ void Guardian::TriggerSafetyMode() {
     }
   }
 
-  guardian_cmd_.set_throttle(0.0);
-  guardian_cmd_.set_steering_target(0.0);
-  guardian_cmd_.set_steering_rate(0.0);
-  guardian_cmd_.set_is_in_safe_mode(true);
+  guardian_cmd_.mutable_control_command()->set_throttle(0.0);
+  guardian_cmd_.mutable_control_command()->set_steering_target(0.0);
+  guardian_cmd_.mutable_control_command()->set_steering_rate(0.0);
+  guardian_cmd_.mutable_control_command()->set_is_in_safe_mode(true);
 
   if (system_status_.require_emergency_stop() || sensor_malfunction ||
       obstacle_detected) {
     AINFO << "Emergency stop triggered! with system status from monitor as : "
           << system_status_.require_emergency_stop();
-    guardian_cmd_.set_brake(FLAGS_guardian_cmd_emergency_stop_percentage);
+    guardian_cmd_.mutable_control_command()->set_brake(
+        FLAGS_guardian_cmd_emergency_stop_percentage);
   } else {
     AINFO << "Soft stop triggered! with system status from monitor as : "
           << system_status_.require_emergency_stop();
-    guardian_cmd_.set_brake(FLAGS_guardian_cmd_soft_stop_percentage);
+    guardian_cmd_.mutable_control_command()->set_brake(
+        FLAGS_guardian_cmd_soft_stop_percentage);
   }
 }
 
