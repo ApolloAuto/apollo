@@ -40,7 +40,7 @@ imu_type: ADIS16488
 proj4_text: "+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
 
 tf {
-    frame_id： “world"
+    frame_id: "world"
     child_frame_id: "novatel"
 }
 
