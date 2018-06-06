@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,16 +39,16 @@ std::string Guardian::Name() const { return FLAGS_module_name; }
 Status Guardian::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
   CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
-  AdapterManager::AddChassisCallback(&Guardian::OnChassis, this);
   CHECK(AdapterManager::GetSystemStatus())
       << "SystemStatus is not initialized.";
-  AdapterManager::AddSystemStatusCallback(&Guardian::OnSystemStatus, this);
   CHECK(AdapterManager::GetControlCommand()) << "Control is not initialized.";
-  AdapterManager::AddControlCommandCallback(&Guardian::OnControl, this);
   return Status::OK();
 }
 
 Status Guardian::Start() {
+  AdapterManager::AddChassisCallback(&Guardian::OnChassis, this);
+  AdapterManager::AddSystemStatusCallback(&Guardian::OnSystemStatus, this);
+  AdapterManager::AddControlCommandCallback(&Guardian::OnControl, this);
   const double duration = 1.0 / FLAGS_guardian_cmd_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
                                        &Guardian::OnTimer, this);
@@ -61,14 +61,12 @@ void Guardian::Stop() { timer_.stop(); }
 void Guardian::OnTimer(const ros::TimerEvent&) {
   ADEBUG << "Timer is triggered: publish Guardian result";
   bool safety_mode_triggered = false;
-  {
+  if (FLAGS_guardian_enabled) {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (system_status_.has_safety_mode_trigger_time()) {
-      safety_mode_triggered = true;
-    }
+    safety_mode_triggered = system_status_.has_safety_mode_trigger_time();
   }
 
-  if (safety_mode_triggered && FLAGS_guardian_enabled) {
+  if (safety_mode_triggered) {
     ADEBUG << "Safety mode triggerd, enable safty mode";
     TriggerSafetyMode();
   } else {
