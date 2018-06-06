@@ -58,7 +58,7 @@ class VelodyneDriver {
   uint32_t last_gps_time_;
   int poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr &scan);
   bool set_base_time();
-  void set_base_time_from_nmea_time(const NMEATimePtr &nmea_time,
+  void set_base_time_from_nmea_time(NMEATimePtr nmea_time,
                                     uint64_t &basetime);
   void update_gps_top_hour(unsigned int current_time);
 };
