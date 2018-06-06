@@ -92,7 +92,7 @@ bool TrackObjectDistance::SetHistogramDistanceWeight(
 }
 
 float TrackObjectDistance::ComputeDistance(
-    const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+    ObjectTrackPtr track, const Eigen::VectorXf& track_predict,
     const std::shared_ptr<TrackedObject>& new_object) {
   // Compute distance for given trakc & object
   float location_distance =
@@ -112,7 +112,7 @@ float TrackObjectDistance::ComputeDistance(
 }
 
 float TrackObjectDistance::ComputeLocationDistance(
-    const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+    ObjectTrackPtr track, const Eigen::VectorXf& track_predict,
     const std::shared_ptr<TrackedObject>& new_object) {
   // Compute locatin distance for given track & object
   // range from 0 to positive infinity
@@ -146,7 +146,7 @@ float TrackObjectDistance::ComputeLocationDistance(
 }
 
 float TrackObjectDistance::ComputeDirectionDistance(
-    const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+    ObjectTrackPtr track, const Eigen::VectorXf& track_predict,
     const std::shared_ptr<TrackedObject>& new_object) {
   // Compute direction distance for given track & object
   // range from 0 to 2
@@ -168,7 +168,7 @@ float TrackObjectDistance::ComputeDirectionDistance(
 }
 
 float TrackObjectDistance::ComputeBboxSizeDistance(
-    const ObjectTrackPtr& track,
+    ObjectTrackPtr track,
     const std::shared_ptr<TrackedObject>& new_object) {
   // Compute bbox size distance for given track & object
   // range from 0 to 1
@@ -202,7 +202,7 @@ float TrackObjectDistance::ComputeBboxSizeDistance(
 }
 
 float TrackObjectDistance::ComputePointNumDistance(
-    const ObjectTrackPtr& track,
+    ObjectTrackPtr track,
     const std::shared_ptr<TrackedObject>& new_object) {
   // Compute point num distance for given track & object
   // range from 0 and 1
@@ -216,7 +216,7 @@ float TrackObjectDistance::ComputePointNumDistance(
 }
 
 float TrackObjectDistance::ComputeHistogramDistance(
-    const ObjectTrackPtr& track,
+    ObjectTrackPtr track,
     const std::shared_ptr<TrackedObject>& new_object) {
   // Compute histogram distance for given track & object
   // range from 0 to 3

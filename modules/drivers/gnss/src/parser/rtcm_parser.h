@@ -37,7 +37,7 @@ class RtcmParser {
   bool init();
 
  private:
-  void rtcm_data_callback(const std_msgs::String::ConstPtr &msg);
+  void rtcm_data_callback(std_msgs::String::ConstPtr msg);
   void dispatch_message(Parser::MessageType type, MessagePtr message);
   void publish_ephemeris(const MessagePtr message);
   void publish_observation(const MessagePtr message);

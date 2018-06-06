@@ -36,7 +36,7 @@ class PbfTrackObjectDistance {
   PbfTrackObjectDistance() = default;
   virtual ~PbfTrackObjectDistance() = default;
 
-  float Compute(const PbfTrackPtr &fused_track,
+  float Compute(PbfTrackPtr fused_track,
                 const std::shared_ptr<PbfSensorObject> &sensor_object,
                 const TrackObjectDistanceOptions &options);
 

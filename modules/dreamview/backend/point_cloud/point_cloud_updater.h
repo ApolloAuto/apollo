@@ -69,7 +69,7 @@ class PointCloudUpdater {
 
   void UpdatePointCloud(const sensor_msgs::PointCloud2 &point_cloud);
 
-  void FilterPointCloud(const pcl::PointCloud<pcl::PointXYZ>::Ptr &pcl_ptr);
+  void FilterPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr);
 
   void UpdateLocalizationTime(
       const apollo::localization::LocalizationEstimate &localization);

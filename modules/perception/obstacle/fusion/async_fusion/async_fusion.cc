@@ -110,7 +110,7 @@ bool AsyncFusion::Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
 
 std::string AsyncFusion::name() const { return "AsyncFusion"; }
 
-void AsyncFusion::FuseFrame(const PbfSensorFramePtr &frame) {
+void AsyncFusion::FuseFrame(PbfSensorFramePtr frame) {
   AINFO << "Fusing frame: " << frame->sensor_id << ","
         << "object_number: " << frame->objects.size() << ","
         << "timestamp: " << std::fixed << std::setprecision(12)

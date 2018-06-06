@@ -53,7 +53,7 @@ class ProbabilisticFusion : public BaseFusion {
   virtual std::string name() const;
 
  protected:
-  void FuseFrame(const PbfSensorFramePtr &frame);
+  void FuseFrame(PbfSensorFramePtr frame);
 
   /**@brief create new tracks for objects not assigned to current tracks*/
   void CreateNewTracks(
