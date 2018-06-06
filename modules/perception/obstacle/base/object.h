@@ -94,7 +94,8 @@ struct alignas(16) Object {
 
   // modeling uncertainty from sensor level tracker
   Eigen::Matrix4d state_uncertainty = Eigen::Matrix4d::Identity();
-
+  // Tailgating (trajectory of objects)
+  std::vector<Eigen::Vector3d> drops;
   // CIPV
   bool b_cipv = false;
   // local lidar track id
