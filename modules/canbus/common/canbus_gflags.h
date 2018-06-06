@@ -37,4 +37,7 @@ DECLARE_bool(enable_chassis_detail_pub);
 
 // canbus test files
 DECLARE_string(canbus_test_file);
+
+// canbus test files
+DECLARE_bool(receive_guardian);
 #endif
