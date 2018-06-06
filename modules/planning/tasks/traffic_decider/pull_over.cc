@@ -45,6 +45,8 @@ using apollo::hdmap::PathOverlap;
 using apollo::perception::PerceptionObstacle;
 using apollo::planning::util::GetPlanningStatus;
 
+uint32_t PullOver::failure_count_ = 0;
+
 PullOver::PullOver(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 Status PullOver::ApplyRule(Frame* const frame,
@@ -57,11 +59,12 @@ Status PullOver::ApplyRule(Frame* const frame,
   }
 
   common::PointENU stop_point;
-  if (GetPullOverStop(&stop_point) == 0) {
-    BuildPullOverStop(stop_point);
-  } else {
+  if (GetPullOverStop(&stop_point) != 0 &&
+      failure_count_ >= config_.pull_over().max_failure_count()) {
     BuildInLaneStop(stop_point);
-    ADEBUG << "Could not find a safe pull over point";
+    ADEBUG << "Could not find a safe pull over point. STOP in-lane";
+  } else {
+    BuildPullOverStop(stop_point);
   }
 
   return Status::OK();
@@ -158,15 +161,19 @@ int PullOver::GetPullOverStop(common::PointENU* stop_point) {
     if (IsValidStop(*stop_point)) {
       stop_point->set_x(pull_over_status.stop_point().x());
       stop_point->set_y(pull_over_status.stop_point().y());
+
+      failure_count_ = 0;
       return 0;
     }
   }
 
   // calculate new stop point if don't have a pull over stop
   if (FindPullOverStop(stop_point) == 0) {
+    failure_count_ = 0;
     return 0;
   }
 
+  failure_count_++;
   return -1;
 }
 
@@ -368,10 +375,11 @@ int PullOver::BuildPullOverStop(const common::PointENU& stop_point) {
   common::SLPoint stop_point_sl;
   reference_line.XYToSL(stop_point, &stop_point_sl);
 
+  double stop_line_s = stop_point_sl.s() + config_.pull_over().stop_distance();
   double stop_point_heading =
       reference_line.GetReferencePoint(stop_point_sl.s()).heading();
 
-  BuildStopDecision(stop_point_sl.s(), stop_point, stop_point_heading);
+  BuildStopDecision(stop_line_s, stop_point, stop_point_heading);
 
   // record in PlanningStatus
   auto* pull_over_status =
@@ -396,14 +404,25 @@ int PullOver::BuildPullOverStop(const common::PointENU& stop_point) {
 
 int PullOver::BuildInLaneStop(const common::PointENU& pull_over_stop_point) {
   const auto& reference_line = reference_line_info_->reference_line();
-  common::SLPoint stop_point_sl;
-  reference_line.XYToSL(pull_over_stop_point, &stop_point_sl);
-  auto point = reference_line.GetReferencePoint(stop_point_sl.s());
-  common::PointENU stop_point;
-  stop_point.set_x(point.x());
-  stop_point.set_y(point.y());
 
-  double stop_line_s = stop_point_sl.s() - config_.pull_over().stop_distance();
+  common::SLPoint stop_point_sl;
+  common::PointENU stop_point;
+  auto pull_over = GetPlanningStatus()->planning_state().pull_over();
+  if (pull_over.has_inlane_dest_point()) {
+    // in-lane stop point already set
+    stop_point.set_x(pull_over.inlane_dest_point().x());
+    stop_point.set_x(pull_over.inlane_dest_point().y());
+    reference_line.XYToSL(stop_point, &stop_point_sl);
+  } else {
+    // in-lane stop point already NOT set,
+    // use a point corresponding to pull_over_stop_point
+    reference_line.XYToSL(pull_over_stop_point, &stop_point_sl);
+    auto inlane_point = reference_line.GetReferencePoint(stop_point_sl.s());
+    stop_point.set_x(inlane_point.x());
+    stop_point.set_y(inlane_point.y());
+  }
+
+  double stop_line_s = stop_point_sl.s() + config_.pull_over().stop_distance();
   double stop_point_heading =
       reference_line.GetReferencePoint(stop_point_sl.s()).heading();
 

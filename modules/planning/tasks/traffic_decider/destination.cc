@@ -83,7 +83,7 @@ int Destination::BuildStopDecision(
   auto* planning_state = GetPlanningStatus()->mutable_planning_state();
   if (planning_state->has_pull_over() &&
       planning_state->pull_over().in_pull_over()) {
-    PullOver();
+    PullOver(nullptr);
     ADEBUG << "destination: continue PULL OVER";
     return 0;
   }
@@ -100,8 +100,10 @@ int Destination::BuildStopDecision(
       0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
       config_.destination().stop_distance());
 
-  if (CheckPullOver(reference_line_info, routing_end.id(), dest_lane_s)) {
-    PullOver();
+  common::PointENU dest_point;
+  if (CheckPullOver(reference_line_info, routing_end.id(),
+                    dest_lane_s, &dest_point)) {
+    PullOver(&dest_point);
     ADEBUG << "destination: PULL OVER";
   } else {
     Stop(frame, reference_line_info, routing_end.id(), dest_lane_s);
@@ -169,7 +171,8 @@ int Destination::Stop(Frame* const frame,
 bool Destination::CheckPullOver(
     ReferenceLineInfo* const reference_line_info,
     const std::string lane_id,
-    const double lane_s) {
+    const double lane_s,
+    common::PointENU* dest_point) {
   CHECK_NOTNULL(reference_line_info);
 
   if (!config_.destination().enable_pull_over()) {
@@ -189,14 +192,14 @@ bool Destination::CheckPullOver(
   double dest_lane_s = std::max(
       0.0, lane_s - FLAGS_virtual_stop_wall_length -
       config_.destination().stop_distance());
-  auto dest_point = dest_lane->GetSmoothPoint(dest_lane_s);
-  if (!reference_line.IsOnRoad(dest_point)) {
+  *dest_point = dest_lane->GetSmoothPoint(dest_lane_s);
+  if (!reference_line.IsOnRoad(*dest_point)) {
     return false;
   }
 
   // check dest within pull_over_plan_distance
   common::SLPoint dest_sl;
-  if (!reference_line.XYToSL({dest_point.x(), dest_point.y()}, &dest_sl)) {
+  if (!reference_line.XYToSL({dest_point->x(), dest_point->y()}, &dest_sl)) {
     ADEBUG << "failed to project the dest point to the other reference line";
     return false;
   }
@@ -215,16 +218,20 @@ bool Destination::CheckPullOver(
 /**
  * @brief: build pull-over decision upon arriving at destination
  */
-int Destination::PullOver() {
+int Destination::PullOver(common::PointENU* const dest_point) {
   auto* planning_state = GetPlanningStatus()->mutable_planning_state();
   if (!planning_state->has_pull_over() ||
       !planning_state->pull_over().in_pull_over()) {
     planning_state->clear_pull_over();
-    planning_state->mutable_pull_over()->set_in_pull_over(true);
-    planning_state->mutable_pull_over()->set_reason(
-        PullOverStatus::DESTINATION);
-    planning_state->mutable_pull_over()->set_status_set_time(
-        Clock::NowInSeconds());
+    auto pull_over = planning_state->mutable_pull_over();
+    pull_over->set_in_pull_over(true);
+    pull_over->set_reason(PullOverStatus::DESTINATION);
+    pull_over->set_status_set_time(Clock::NowInSeconds());
+
+    if (dest_point) {
+      pull_over->mutable_inlane_dest_point()->set_x(dest_point->x());
+      pull_over->mutable_inlane_dest_point()->set_y(dest_point->y());
+    }
   }
 
   return 0;
