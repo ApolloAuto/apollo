@@ -77,6 +77,10 @@ class PullOver : public TrafficRule {
   bool IsValidStop(const common::SLPoint& stop_point_sl) const;
 
   int BuildPullOverStop(const common::PointENU& stop_point);
+  int BuildInLaneStop(const common::PointENU& pull_over_stop_point);
+  int BuildStopDecision(const double stop_line_s,
+                        const common::PointENU& stop_point,
+                        const double stop_point_heading);
 
  private:
   static constexpr char const* const PULL_OVER_VO_ID_PREFIX = "PO_";
