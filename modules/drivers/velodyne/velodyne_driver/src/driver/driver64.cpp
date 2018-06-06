@@ -16,10 +16,11 @@
 
 #include "driver.h"
 
-#include <ros/ros.h>
 #include <time.h>
 #include <cmath>
 #include <string>
+
+#include <ros/ros.h>
 
 namespace apollo {
 namespace drivers {
@@ -77,6 +78,56 @@ bool Velodyne64Driver::poll(void) {
   output_.publish(scan);
 
   return true;
+}
+
+bool Velodyne64Driver::check_angle(velodyne_msgs::VelodynePacket& packet) {
+  // check the angle in every packet
+  // for each model of velodyne 64 the data struct is same , so we don't need to
+  // check the lidar model
+  const unsigned char* raw_ptr = (const unsigned char*)&packet.data[0];
+  for (int i = 0; i < BLOCKS_PER_PACKET; ++i) {
+    uint16_t angle =
+        raw_ptr[i * BLOCK_SIZE + 3] * 256 + raw_ptr[i * BLOCK_SIZE + 2];
+    // for the velodyne64 angle resolution is 0.17~0.2 , so take the angle diff
+    // at 0.2~0.3 should be a good choice
+    if (angle > config_.prefix_angle &&
+        std::abs(angle - config_.prefix_angle) < 30) {
+      return true;
+    }
+  }
+  return false;
+}
+
+int Velodyne64Driver::poll_standard_sync(
+    velodyne_msgs::VelodyneScanUnifiedPtr& scan) {
+  // Since the velodyne delivers data at a very high rate, keep
+  // reading and publishing scans as fast as possible.
+  while (true) {
+    while (true) {
+      // keep reading until full packet received
+      velodyne_msgs::VelodynePacket packet;
+      int rc = input_->get_firing_data_packet(&packet);
+
+      if (rc == 0) {
+        scan->packets.emplace_back(packet);
+        // check the angle for every packet if a packet  has a angle
+        if (check_angle(packet) == true &&
+            (scan->packets.size() > 0.5 * config_.npackets)) {
+          return 0;
+        } else
+          break;  // got a full packet?
+      }
+      if (rc < 0) {
+        return rc;
+      }
+    }
+    // if the only  UDP packet lost then recv 1.5*config_.npackets  packets at
+    // most
+    if (scan->packets.size() > 1.5 * config_.npackets) {
+      return 0;
+    }
+  }
+  return 0;
 }
 
 }  // namespace velodyne
