@@ -62,14 +62,14 @@ class HdmapROIFilter : public BaseROIFilter {
    * @params[Out] roi_indices: The indices of points within ROI
    * @return true if filter points successfully, otherwise return false
    */
-  bool Filter(const pcl_util::PointCloudPtr& cloud,
+  bool Filter(pcl_util::PointCloudPtr cloud,
               const ROIFilterOptions& roi_filter_options,
               pcl_util::PointIndices* roi_indices) override;
 
   /**
    * @brief: Merge junction polygons and road boundaries in a vector.
    */
-  void MergeHdmapStructToPolygons(const HdmapStructConstPtr& hdmap_struct_ptr,
+  void MergeHdmapStructToPolygons(HdmapStructConstPtr hdmap_struct_ptr,
                                   std::vector<PolygonDType>* polygons);
 
  protected:
@@ -77,7 +77,7 @@ class HdmapROIFilter : public BaseROIFilter {
    * @brief: Draw polygons into grids in bitmap and check each point whether
    * is in the grids within ROI.
    */
-  bool FilterWithPolygonMask(const pcl_util::PointCloudPtr& cloud,
+  bool FilterWithPolygonMask(pcl_util::PointCloudPtr cloud,
                              const std::vector<PolygonType>& map_polygons,
                              pcl_util::PointIndices* roi_indices);
 
@@ -85,7 +85,7 @@ class HdmapROIFilter : public BaseROIFilter {
    * @brief: Transform polygon points and cloud points from world coordinates
    * system to local.
    */
-  void TransformFrame(const pcl_util::PointCloudConstPtr& cloud,
+  void TransformFrame(pcl_util::PointCloudConstPtr cloud,
                       const Eigen::Affine3d& vel_pose,
                       const std::vector<PolygonDType>& polygons_world,
                       std::vector<PolygonType>* polygons_local,

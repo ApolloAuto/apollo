@@ -64,7 +64,7 @@ void Convert::init(ros::NodeHandle& node, ros::NodeHandle& private_nh) {
 
 /** @brief Callback for raw scan messages. */
 void Convert::convert_packets_to_pointcloud(
-    const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msg) {
+    velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg) {
   ROS_INFO_ONCE("********************************************************");
   ROS_INFO_ONCE("Start convert velodyne packets to pointcloud");
   ROS_INFO_ONCE("********************************************************");

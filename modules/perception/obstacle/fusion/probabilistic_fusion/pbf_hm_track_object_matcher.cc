@@ -136,7 +136,7 @@ void PbfHmTrackObjectMatcher::ComputeAssociationMat(
   for (size_t i = 0; i < unassigned_fusion_tracks.size(); ++i) {
     int fusion_idx = unassigned_fusion_tracks[i];
     (*association_mat)[i].resize(unassigned_sensor_objects.size());
-    const PbfTrackPtr &fusion_track = fusion_tracks[fusion_idx];
+    PbfTrackPtr fusion_track = fusion_tracks[fusion_idx];
     for (size_t j = 0; j < unassigned_sensor_objects.size(); ++j) {
       int sensor_idx = unassigned_sensor_objects[j];
       const std::shared_ptr<PbfSensorObject> &sensor_object =

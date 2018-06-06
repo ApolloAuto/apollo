@@ -463,7 +463,7 @@ class Adapter : public AdapterBase {
    * message is received.
    * @param message the newly received message.
    */
-  void RosCallback(const DataPtr& message) {
+  void RosCallback(DataPtr message) {
     last_receive_time_ = apollo::common::time::Clock::NowInSeconds();
     EnqueueData(message);
     FireCallbacks(*message);
@@ -484,7 +484,7 @@ class Adapter : public AdapterBase {
    * @brief push the shared-pointer-guarded data to the data queue of
    * the adapter.
    */
-  void EnqueueData(const DataPtr& data) {
+  void EnqueueData(DataPtr data) {
     if (enable_dump_) {
       DumpMessage<D>(*data);
     }

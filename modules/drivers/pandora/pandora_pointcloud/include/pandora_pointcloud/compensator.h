@@ -40,7 +40,7 @@ class Compensator {
   * @brief get pointcloud2 msg, compensate it,publish pointcloud2 after
   * compensator
   */
-  void pointcloud_callback(const sensor_msgs::PointCloud2ConstPtr& msg);
+  void pointcloud_callback(sensor_msgs::PointCloud2ConstPtr msg);
   /**
   * @brief get pose affine from tf2 by gps timestamp
   *   novatel-preprocess broadcast the tf2 transfrom.
@@ -51,12 +51,12 @@ class Compensator {
   * @brief check if message is valid, check width, height, timesatmp.
   *   set timestamp_offset and point data type
   */
-  bool check_message(const sensor_msgs::PointCloud2ConstPtr& msg);
+  bool check_message(sensor_msgs::PointCloud2ConstPtr msg);
   /**
   * @brief motion compensation for point cloud
   */
   template <typename Scalar>
-  void motion_compensation(const sensor_msgs::PointCloud2::Ptr& msg,
+  void motion_compensation(sensor_msgs::PointCloud2::Ptr msg,
                            const double timestamp_min,
                            const double timestamp_max,
                            const Eigen::Affine3d& pose_min_time,
@@ -65,7 +65,7 @@ class Compensator {
   * @brief get min timestamp and max timestamp from points in pointcloud2
   */
   inline void get_timestamp_interval(
-      const sensor_msgs::PointCloud2ConstPtr& msg, double* timestamp_min,
+      sensor_msgs::PointCloud2ConstPtr msg, double* timestamp_min,
       double* timestamp_max);
   /**
   * @brief get point field size by sensor_msgs::datatype
