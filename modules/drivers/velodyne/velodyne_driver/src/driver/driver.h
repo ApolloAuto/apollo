@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef VELODYNE_DRIVER_H
-#define VELODYNE_DRIVER_H
+#ifndef VELODYNE_DRIVER_H_
+#define VELODYNE_DRIVER_H_
 
 #include <ros/ros.h>
 #include <string>
@@ -27,17 +27,19 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
+constexpr int BLOCKS_PER_PACKET = 12;
+constexpr int BLOCK_SIZE = 100;
+
 // configuration parameters
 struct Config {
-  Config()
-      : npackets(0), rpm(0.0), firing_data_port(0), positioning_data_port(0) {}
   std::string frame_id;  ///< tf frame ID
   std::string model;     ///< device model name
   std::string topic;
-  int npackets;  ///< number of packets to collect
-  double rpm;    ///< device rotation rate (RPMs)
-  int firing_data_port;
-  int positioning_data_port;
+  int npackets = 0;  ///< number of packets to collect
+  double rpm = 0.0;  ///< device rotation rate (RPMs)
+  int firing_data_port = 0;
+  int positioning_data_port = 0;
+  int prefix_angle = 0;  // prefix angle to recv
 };
 
 class VelodyneDriver {
@@ -61,6 +63,8 @@ class VelodyneDriver {
   void set_base_time_from_nmea_time(NMEATimePtr nmea_time,
                                     uint64_t &basetime);
   void update_gps_top_hour(unsigned int current_time);
+
+  bool check_angle(velodyne_msgs::VelodynePacket &packet);
 };
 
 class Velodyne64Driver : public VelodyneDriver {
@@ -75,13 +79,14 @@ class Velodyne64Driver : public VelodyneDriver {
 };
 
 class Velodyne32Driver : public VelodyneDriver {
-public:
-    explicit Velodyne32Driver(const Config &config);
-    virtual ~Velodyne32Driver() {}
-    void init(ros::NodeHandle &node);
-    bool poll(void);
-    void poll_positioning_packet();
-private:
+ public:
+  explicit Velodyne32Driver(const Config &config);
+  virtual ~Velodyne32Driver() {}
+  void init(ros::NodeHandle &node);
+  bool poll(void);
+  void poll_positioning_packet();
+
+ private:
   std::shared_ptr<Input> positioning_input_;
 };
 
@@ -107,4 +112,4 @@ class VelodyneDriverFactory {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // VELODYNE_DRIVER_H__
+#endif  // VELODYNE_DRIVER_H_
