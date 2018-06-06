@@ -1,7 +1,7 @@
 # build the driver node
-add_executable(driver_node 
-  driver_node.cpp 
-  driver.cpp 
+add_executable(driver_node
+  driver_node.cpp
+  driver.cpp
   driver16.cpp
   driver32.cpp
   driver64.cpp
@@ -12,14 +12,16 @@ target_link_libraries(driver_node
 )
 
 # build the nodelet version
-add_library(driver_nodelet 
+add_library(
+  driver_nodelet
   driver_nodelet.cpp
-  driver.cpp 
+  driver.cpp
   driver16.cpp
   driver32.cpp
   driver64.cpp
 )
-target_link_libraries(driver_nodelet
+target_link_libraries(
+  driver_nodelet
   velodyne_input
   ${catkin_LIBRARIES}
 )
