@@ -31,7 +31,7 @@ Velodyne32Parser::Velodyne32Parser(Config config)
 }
 
 void Velodyne32Parser::generate_pointcloud(
-    const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msg,
+    velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
     VPointCloud::Ptr& out_msg) {
   // allocate a point cloud with same time and frame ID as raw data
   out_msg->header.frame_id = scan_msg->header.frame_id;

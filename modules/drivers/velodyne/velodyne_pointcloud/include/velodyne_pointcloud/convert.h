@@ -43,7 +43,7 @@ class Convert {
  private:
   // convert velodyne data to pointcloudn and public
   void convert_packets_to_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msg);
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg);
 
   // RawData class for converting data to point cloud
   std::unique_ptr<VelodyneParser> parser_;

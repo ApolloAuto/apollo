@@ -46,7 +46,7 @@ bool RtcmParser::init() {
   return true;
 }
 
-void RtcmParser::rtcm_data_callback(const std_msgs::String::ConstPtr &msg) {
+void RtcmParser::rtcm_data_callback(std_msgs::String::ConstPtr msg) {
   if (!_inited_flag) {
     return;
   }
