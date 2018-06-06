@@ -20,7 +20,7 @@ namespace perception {
 
 using apollo::common::util::GetProtoFromFile;
 
-bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
+bool HdmapROIFilter::Filter(pcl_util::PointCloudPtr cloud,
                             const ROIFilterOptions& roi_filter_options,
                             pcl_util::PointIndices* roi_indices) {
   if (roi_filter_options.hdmap == nullptr ||
@@ -46,7 +46,7 @@ bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
 }
 
 bool HdmapROIFilter::FilterWithPolygonMask(
-    const pcl_util::PointCloudPtr& cloud,
+    pcl_util::PointCloudPtr cloud,
     const std::vector<PolygonType>& map_polygons,
     pcl_util::PointIndices* roi_indices) {
   // 2. Get Major Direction as X direction and convert map_polygons to raw
@@ -136,7 +136,7 @@ void HdmapROIFilter::MergeRoadBoundariesToPolygons(
 }
 
 void HdmapROIFilter::MergeHdmapStructToPolygons(
-    const HdmapStructConstPtr& hdmap_struct_ptr,
+    HdmapStructConstPtr hdmap_struct_ptr,
     std::vector<PolygonDType>* polygons) {
   std::vector<PolygonDType> road_polygons;
   MergeRoadBoundariesToPolygons(hdmap_struct_ptr->road_boundary,
@@ -164,7 +164,7 @@ bool HdmapROIFilter::Init() {
 }
 
 void HdmapROIFilter::TransformFrame(
-    const pcl_util::PointCloudConstPtr& cloud, const Eigen::Affine3d& vel_pose,
+    pcl_util::PointCloudConstPtr cloud, const Eigen::Affine3d& vel_pose,
     const std::vector<PolygonDType>& polygons_world,
     std::vector<PolygonType>* polygons_local,
     pcl_util::PointCloudPtr cloud_local) {

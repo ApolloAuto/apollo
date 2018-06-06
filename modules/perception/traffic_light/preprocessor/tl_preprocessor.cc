@@ -114,7 +114,7 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
   return true;
 }
 
-bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
+bool TLPreprocessor::SyncImage(ImageSharedPtr image,
                                ImageLightsPtr *image_lights, bool *should_pub) {
   MutexLock lock(&mutex_);
   PERF_FUNCTION();
@@ -267,7 +267,7 @@ void TLPreprocessor::SelectImage(const CarPose &pose,
     bool ok = true;
     // find the short focus camera without range check
     if (cam_id != kShortFocusIdx) {
-      for (const LightPtr &light : *(lights_on_image_array[cam_id])) {
+      for (LightPtr light : *(lights_on_image_array[cam_id])) {
         if (IsOnBorder(cv::Size(config_.projection_image_cols(),
                                 config_.projection_image_rows()),
                        light->region.projection_roi,

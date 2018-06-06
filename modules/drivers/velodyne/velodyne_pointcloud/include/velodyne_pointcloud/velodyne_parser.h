@@ -205,7 +205,7 @@ class VelodyneParser {
    *           errno value for failure
    */
   virtual void generate_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
       VPointCloud::Ptr &out_msg) = 0;
   virtual void setup();
   // order point cloud fod IDL by velodyne model
@@ -261,7 +261,7 @@ class Velodyne64Parser : public VelodyneParser {
   ~Velodyne64Parser() {}
 
   void generate_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
       VPointCloud::Ptr &out_msg);
   void order(VPointCloud::Ptr &cloud);
   void setup() override;
@@ -291,7 +291,7 @@ class Velodyne32Parser : public VelodyneParser {
   ~Velodyne32Parser() {}
 
   void generate_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
       VPointCloud::Ptr &out_msg);
   void order(VPointCloud::Ptr &cloud);
 
@@ -311,7 +311,7 @@ class Velodyne16Parser : public VelodyneParser {
   ~Velodyne16Parser() {}
 
   void generate_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
       VPointCloud::Ptr &out_msg);
   void order(VPointCloud::Ptr &cloud);
 

@@ -57,7 +57,7 @@ void PCDExporter::CompensatedPcdCallback(
 }
 
 void PCDExporter::WritePcdFile(const std::string &filename,
-                               const sensor_msgs::PointCloud2::ConstPtr &msg) {
+                               sensor_msgs::PointCloud2::ConstPtr msg) {
   pcl::PCLPointCloud2 pcl_cloud;
   pcl_conversions::toPCL(*msg, pcl_cloud);
   pcl::PCDWriter writer;

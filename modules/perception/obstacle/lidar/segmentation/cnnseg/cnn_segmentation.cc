@@ -134,7 +134,7 @@ bool CNNSegmentation::Init() {
   return true;
 }
 
-bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
+bool CNNSegmentation::Segment(pcl_util::PointCloudPtr pc_ptr,
                               const pcl_util::PointIndices& valid_indices,
                               const SegmentationOptions& options,
                               std::vector<std::shared_ptr<Object>>* objects) {
