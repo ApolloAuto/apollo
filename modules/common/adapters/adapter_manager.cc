@@ -217,7 +217,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
                                     config);
         break;
       case AdapterConfig::GUARDIAN:
-        EnablePandoraCameraBackGray(FLAGS_guardian_topic, config);
+        EnableGuardian(FLAGS_guardian_topic, config);
         break;
       default:
         AERROR << "Unknown adapter config type!";
