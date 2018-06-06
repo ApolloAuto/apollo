@@ -35,6 +35,7 @@
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 #include "modules/perception/obstacle/onboard/lane_shared_data.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
@@ -86,15 +87,24 @@ class FusionSubnode : public Subnode {
   // CIPV related variables
   CIPVObjectData* cipv_object_data_ = nullptr;
   Cipv cipv_;
+  MotionService* motion_service_ = nullptr;
+  MotionBuffer motion_buffer_;
+
   // lidar perception subnode event controls the publishing behavior
   EventID pub_driven_event_id_;
   EventID lidar_event_id_;
   EventID radar_event_id_;
   EventID camera_event_id_;
   EventID lane_event_id_;
+  EventID motion_event_id_;
   std::mutex fusion_subnode_mutex_;
   apollo::canbus::Chassis chassis_;
   volatile float chassis_speed_mps_;
+
+  uint64_t min_processing_time_ = UINT64_MAX;
+  uint64_t max_processing_time_ = 0;
+  uint64_t tot_processing_time_ = 0;
+  uint64_t seq_num_ = 0;
 
   DISALLOW_COPY_AND_ASSIGN(FusionSubnode);
 };

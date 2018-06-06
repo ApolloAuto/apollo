@@ -65,7 +65,7 @@ class MotionService : public Subnode {
   double pre_camera_timestamp_ = 0;
   double camera_timestamp_ = 0;
   bool start_flag_ = false;
-  const int motion_buffer_size_ = 60;
+  const int motion_buffer_size_ = 100;
   Mutex mutex_;
   Mutex image_mutex_;
   Mutex motion_mutex_;
