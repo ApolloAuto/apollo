@@ -83,7 +83,7 @@ class Cluster2D {
 
   void Cluster(const caffe::Blob<float>& category_pt_blob,
                const caffe::Blob<float>& instance_pt_blob,
-               const apollo::perception::pcl_util::PointCloudPtr& pc_ptr,
+               apollo::perception::pcl_util::PointCloudPtr pc_ptr,
                const apollo::perception::pcl_util::PointIndices& valid_indices,
                float objectness_thresh, bool use_all_grids_for_clustering) {
     const float* category_pt_data = category_pt_blob.cpu_data();

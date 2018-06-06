@@ -50,7 +50,7 @@ Compensator::Compensator(ros::NodeHandle node, ros::NodeHandle private_nh)
 }
 
 void Compensator::pointcloud_callback(
-    const sensor_msgs::PointCloud2ConstPtr& msg) {
+    sensor_msgs::PointCloud2ConstPtr msg) {
   if (!check_message(msg)) {
     ROS_FATAL("MotionCompensation : Input point cloud data field is invalid");
     return;
@@ -77,7 +77,7 @@ void Compensator::pointcloud_callback(
 }
 
 inline void Compensator::get_timestamp_interval(
-    const sensor_msgs::PointCloud2ConstPtr& msg, double* timestamp_min,
+    sensor_msgs::PointCloud2ConstPtr msg, double* timestamp_min,
     double* timestamp_max) {
   *timestamp_max = 0.0;
   *timestamp_min = std::numeric_limits<double>::max();
@@ -100,7 +100,7 @@ inline void Compensator::get_timestamp_interval(
 
 // TODO(a): if point type is always float, and timestamp is always double?
 inline bool Compensator::check_message(
-    const sensor_msgs::PointCloud2ConstPtr& msg) {
+    sensor_msgs::PointCloud2ConstPtr msg) {
   // check msg width and height
   if (msg->width == 0 || msg->height == 0) {
     return false;
@@ -211,7 +211,7 @@ inline uint Compensator::get_field_size(const int datatype) {
 }
 
 template <typename Scalar>
-void Compensator::motion_compensation(const sensor_msgs::PointCloud2::Ptr& msg,
+void Compensator::motion_compensation(sensor_msgs::PointCloud2::Ptr msg,
                                       const double timestamp_min,
                                       const double timestamp_max,
                                       const Eigen::Affine3d& pose_min_time,

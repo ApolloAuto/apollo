@@ -365,7 +365,7 @@ double TLProcSubnode::GetMeanDistance(const double ts,
   }
 
   double distance = 0.0;
-  for (const LightPtr &light : lights) {
+  for (LightPtr light : lights) {
     auto light_distance = Distance2Stopline(car_pose, light->info.stop_line());
     if (light_distance < 0) {
       AWARN << "get_mean_distance failed. lights stop line data is illegal, "

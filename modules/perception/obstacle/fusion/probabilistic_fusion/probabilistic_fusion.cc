@@ -144,7 +144,7 @@ bool ProbabilisticFusion::Fuse(
 
 std::string ProbabilisticFusion::name() const { return "ProbabilisticFusion"; }
 
-void ProbabilisticFusion::FuseFrame(const PbfSensorFramePtr &frame) {
+void ProbabilisticFusion::FuseFrame(PbfSensorFramePtr frame) {
   AINFO << "Fusing frame: " << frame->sensor_id << ","
         << "object_number: " << frame->objects.size() << ","
         << "timestamp: " << std::fixed << std::setprecision(12)
