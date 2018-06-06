@@ -230,5 +230,32 @@ bool PlanningTestBase::IsValidTrajectory(const ADCTrajectory& trajectory) {
   return true;
 }
 
+TrafficRuleConfig* PlanningTestBase::GetStopSignConfig() {
+  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+    if (config.rule_id() == TrafficRuleConfig::STOP_SIGN) {
+      return &config;
+    }
+  }
+  return nullptr;
+}
+
+TrafficRuleConfig* PlanningTestBase::GetDestinationConfig() {
+  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+    if (config.rule_id() == TrafficRuleConfig::DESTINATION) {
+      return &config;
+    }
+  }
+  return nullptr;
+}
+
+TrafficRuleConfig* PlanningTestBase::GetPullOverConfig() {
+  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+    if (config.rule_id() == TrafficRuleConfig::PULL_OVER) {
+      return &config;
+    }
+  }
+  return nullptr;
+}
+
 }  // namespace planning
 }  // namespace apollo
