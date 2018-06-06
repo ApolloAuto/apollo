@@ -155,6 +155,7 @@ cc_library(
         "//modules/perception/obstacle/fusion/probabilistic_fusion",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
+        "//modules/perception/obstacle/onboard:motion_subnode",
         "//modules/perception/onboard",
         "@ros//:ros_common",
     ],
