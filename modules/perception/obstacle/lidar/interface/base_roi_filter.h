@@ -28,7 +28,7 @@
 //     }
 //
 //     virtual bool filter(
-//              const pcl_util::PointCloudPtr& cloud,
+//              pcl_util::PointCloudPtr cloud,
 //              const ROIFilterOptions &roi_filter_options,
 //              pcl_util::PointCloudPtr* roi_cloud) override {
 //
@@ -85,7 +85,7 @@ class BaseROIFilter {
 
   virtual bool Init() = 0;
 
-  virtual bool Filter(const pcl_util::PointCloudPtr &cloud,
+  virtual bool Filter(pcl_util::PointCloudPtr cloud,
                       const ROIFilterOptions &roi_filter_options,
                       pcl_util::PointIndices *roi_indices) = 0;
 

@@ -150,7 +150,7 @@ bool DataParser::init(const std::string &cfg_file) {
   return true;
 }
 
-void DataParser::raw_data_callback(const std_msgs::String::ConstPtr &msg) {
+void DataParser::raw_data_callback(std_msgs::String::ConstPtr msg) {
   if (!_inited_flag) {
     return;
   }

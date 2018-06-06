@@ -71,7 +71,7 @@ class TLPreprocessor : public BasePreprocessor {
    * @param should_pub tells whether publish this image to proc
    * @return success?
    */
-  bool SyncImage(const ImageSharedPtr &image, ImageLightsPtr *image_lights,
+  bool SyncImage(ImageSharedPtr image, ImageLightsPtr *image_lights,
                  bool *should_pub);
 
   void set_last_pub_camera_id(CameraId camera_id);

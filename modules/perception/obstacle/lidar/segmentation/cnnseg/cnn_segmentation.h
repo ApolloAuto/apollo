@@ -44,7 +44,7 @@ class CNNSegmentation : public BaseSegmentation {
 
   bool Init() override;
 
-  bool Segment(const pcl_util::PointCloudPtr& pc_ptr,
+  bool Segment(pcl_util::PointCloudPtr pc_ptr,
                const pcl_util::PointIndices& valid_indices,
                const SegmentationOptions& options,
                std::vector<std::shared_ptr<Object>>* objects) override;

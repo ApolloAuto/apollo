@@ -42,7 +42,7 @@ class PCDExporter {
   /**
    * @brief write pc data to pcd/pcd_pos/stamp file when recieve a msg
    */
-  void pcd_writer_callback(const sensor_msgs::PointCloud2::ConstPtr &msg);
+  void pcd_writer_callback(sensor_msgs::PointCloud2::ConstPtr msg);
 
  private:
   // An exist folder to save pcd files
@@ -78,12 +78,12 @@ class PCDExporter {
    */
   bool get_pose(const ros::Time &time, Eigen::Matrix4d &pose);
 
-  void write_pcd_file(const sensor_msgs::PointCloud2::ConstPtr &msg,
+  void write_pcd_file(sensor_msgs::PointCloud2::ConstPtr msg,
                       const std::string &filename);
   /**
    * @brief Write pose info with the index of message to a file
    */
-  int write_pcd_pose_file(const sensor_msgs::PointCloud2::ConstPtr &msg,
+  int write_pcd_pose_file(sensor_msgs::PointCloud2::ConstPtr msg,
                           int index);
 };
 

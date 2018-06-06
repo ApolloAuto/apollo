@@ -146,7 +146,7 @@ void Velodyne64Parser::init_offsets() {
 }
 
 void Velodyne64Parser::generate_pointcloud(
-    const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msg,
+    velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
     VPointCloud::Ptr& pointcloud) {
   if (config_.calibration_online && !calibration_.initialized_) {
     if (online_calibration_.decode(scan_msg) == -1) {
