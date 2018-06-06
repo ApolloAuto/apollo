@@ -148,6 +148,10 @@ void TLPreprocessorSubnode::SubShortFocusCamera(const sensor_msgs::Image &msg) {
 
 void TLPreprocessorSubnode::SubCameraImage(
     boost::shared_ptr<const sensor_msgs::Image> msg, CameraId camera_id) {
+  // Only one image could be used in a while.
+  // Ohters will be discarded
+  // The pipeline turn to a single thread
+  MutexLock lock(&mutex_);
   const double sub_camera_image_start_ts = TimeUtil::GetCurrentTime();
   std::shared_ptr<Image> image(new Image);
   cv::Mat cv_mat;

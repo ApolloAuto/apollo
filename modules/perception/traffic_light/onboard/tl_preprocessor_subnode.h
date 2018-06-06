@@ -32,6 +32,7 @@
 #include "modules/perception/proto/traffic_light/subnode_config.pb.h"
 
 #include "modules/common/time/timer.h"
+#include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/traffic_light/base/image.h"
@@ -97,6 +98,7 @@ class TLPreprocessorSubnode : public Subnode {
   TLPreprocessingData *preprocessing_data_ = nullptr;
 
   HDMapInput *hd_map_ = nullptr;
+  Mutex mutex_;
 
   // signals
   float last_signals_ts_ = -1.0;
