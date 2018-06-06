@@ -198,6 +198,10 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
 }
 
 void DownsampleCurve(Curve *curve) {
+  if (curve->segment_size() == 0) {
+    return;
+  }
+
   auto *line_segment = curve->mutable_segment(0)->mutable_line_segment();
   std::vector<PointENU> points(line_segment->point().begin(),
                                line_segment->point().end());
