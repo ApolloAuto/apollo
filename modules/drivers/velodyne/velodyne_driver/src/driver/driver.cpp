@@ -27,7 +27,7 @@ namespace velodyne {
 
 VelodyneDriver::VelodyneDriver() : basetime_(0), last_gps_time_(0) {}
 
-void VelodyneDriver::set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
+void VelodyneDriver::set_base_time_from_nmea_time(NMEATimePtr nmea_time,
                                                   uint64_t& basetime) {
   tm time;
   time.tm_year = nmea_time->year + (2000 - 1900);
@@ -49,7 +49,7 @@ void VelodyneDriver::set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
 bool VelodyneDriver::set_base_time() {
   NMEATimePtr nmea_time(new NMEATime);
   while (true) {
-    int rc = input_->get_positioning_data_packtet(nmea_time);
+    int rc = input_->get_positioning_data_packet(nmea_time);
     if (rc == 0) {
       break;  // got a full packet
     }
