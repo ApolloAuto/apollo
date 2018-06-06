@@ -61,12 +61,12 @@ void Guardian::Stop() { timer_.stop(); }
 void Guardian::OnTimer(const ros::TimerEvent&) {
   ADEBUG << "Timer is triggered: publish Guardian result";
   std::lock_guard<std::mutex> lock(mutex_);
-  if (!system_status_.has_safety_mode_trigger_time()) {
-    ADEBUG << "Safety mode not triggerd, bypass control command";
-    ByPassControlCommand();
-  } else {
+  if (system_status_.has_safety_mode_trigger_time() && FLAGS_guardian_enabled) {
     ADEBUG << "Safety mode triggerd, enable safty mode";
     TriggerSafetyMode();
+  } else {
+    ADEBUG << "Safety mode not triggerd, bypass control command";
+    ByPassControlCommand();
   }
   AdapterManager::FillGuardianHeader(FLAGS_node_name, &guardian_cmd_);
   AdapterManager::PublishGuardian(guardian_cmd_);
