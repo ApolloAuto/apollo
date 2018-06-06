@@ -107,24 +107,6 @@ void VelodyneDriver::update_gps_top_hour(uint32_t current_time) {
   last_gps_time_ = current_time;
 }
 
-bool VelodyneDriver::check_angle(velodyne_msgs::VelodynePacket& packet) {
-  // check the angel in every packet
-  // for each model of velodyne 64 the data struct is same ,
-  // so we don't need to check the lidar model
-  const unsigned char* raw_ptr = (const unsigned char*)&packet.data[0];
-  for (int i = 0; i < BLOCKS_PER_PACKET; ++i) {
-    uint16_t angle =
-        raw_ptr[i * BLOCK_SIZE + 3] * 256 + raw_ptr[i * BLOCK_SIZE + 2];
-    // for the velodyne64 angle resolution is 0.17~0.2 , so take the angle diff
-    // at 0.2~0.3 should be a good choice
-    if (angle > config_.prefix_angle &&
-        std::abs(angle - config_.prefix_angle) < 30) {
-      return true;
-    }
-  }
-  return false;
-}
-
 VelodyneDriver* VelodyneDriverFactory::create_driver(
     ros::NodeHandle private_nh) {
   Config config;
