@@ -702,6 +702,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   destination_config->mutable_destination()->set_pull_over_plan_distance(10.0);
   pull_over_config->mutable_pull_over()->set_plan_distance(10.0);
   pull_over_config->mutable_pull_over()->set_max_check_distance(30.0);
+  pull_over_config->mutable_pull_over()->set_max_failure_count(1);
 
   // check PULL OVER decision
   RUN_GOLDEN_TEST_DECISION(1);
