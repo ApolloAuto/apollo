@@ -91,18 +91,9 @@ bool FusionSubnode::InitInternal() {
     motion_service_ = dynamic_cast<MotionService*>(
         DAGStreaming::GetSubnodeByName("MotionService"));
     if (motion_service_ == nullptr) {
-      AERROR << "motion service not inited";
-      return false;
+      AWARN << "motion service not inited";
     }
   }
-  // // CIPV data
-  // cipv_object_data_ = dynamic_cast<CIPVObjectData *>(
-  //     shared_data_manager_->GetSharedData("CIPVObjectData"));
-  // if (cipv_object_data_ == nullptr) {
-  //   AERROR << "Failed to get CIPVObjectData";
-  //   return false;
-  // }
-
 
   if (!InitOutputStream()) {
     AERROR << "Failed to init output stream.";
@@ -251,46 +242,50 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     }
     PERF_BLOCK_END("fusion_camera");
   } else if (event_meta.event_id == motion_event_id_) {
-    motion_buffer_ = motion_service_->GetMotionBuffer();
+    if (motion_service_ != nullptr) {
+      motion_buffer_ = motion_service_->GetMotionBuffer();
+    }
   }
 
   // Process CIPV
-  motion_buffer_ = motion_service_->GetMotionBuffer();
-  if (motion_buffer_.size() == 0) {
-    AINFO << "motion_buffer_ is empty";
-    cipv_options.velocity = 5.0f;
-    cipv_options.yaw_rate = 0.0f;
-  } else {
-    cipv_options.velocity = motion_buffer_[0].velocity;
-    cipv_options.yaw_rate = motion_buffer_[0].yaw_rate;
-  }
-  AINFO << "[CIPVSubnode] velocity " << cipv_options.velocity
-        << ", yaw rate: " << cipv_options.yaw_rate;
-  for (auto &obj : sensor_objs) {
-      if (obj.sensor_type == SensorType::CAMERA) {
-        cipv_.DetermineCipv(lane_objects_, cipv_options, &objects_);
-      }
-  }
+  if (motion_service_ != nullptr) {
+    motion_buffer_ = motion_service_->GetMotionBuffer();
+    if (motion_buffer_.size() == 0) {
+      AWARN << "motion_buffer_ is empty";
+      cipv_options.velocity = 5.0f;
+      cipv_options.yaw_rate = 0.0f;
+    } else {
+      cipv_options.velocity = motion_buffer_[0].velocity;
+      cipv_options.yaw_rate = motion_buffer_[0].yaw_rate;
+    }
+    ADEBUG << "[CIPVSubnode] velocity " << cipv_options.velocity
+          << ", yaw rate: " << cipv_options.yaw_rate;
+    for (auto &obj : sensor_objs) {
+        if (obj.sensor_type == SensorType::CAMERA) {
+          cipv_.DetermineCipv(lane_objects_, cipv_options, &objects_);
+        }
+    }
 
-  apollo::common::time::Timer timer;
-  timer.Start();
-  // Get Drop points
-//  motion_buffer_ = motion_service_->GetMotionBuffer();
-  if (motion_buffer_.size() > 0) {
-    cipv_.CollectDrops(motion_buffer_, &objects_);
-  } else {
-    AINFO << "motion_buffer is null";
-  }
+    apollo::common::time::Timer timer;
+    timer.Start();
+    // Get Drop points
+  //  motion_buffer_ = motion_service_->GetMotionBuffer();
+    if (motion_buffer_.size() > 0) {
+      cipv_.CollectDrops(motion_buffer_, &objects_);
+    } else {
+      AWARN << "motion_buffer is empty";
+    }
 
-  ++seq_num_;
-  uint64_t t = timer.End("CollectDrops");
-  min_processing_time_ = std::min(min_processing_time_, t);
-  max_processing_time_ = std::max(max_processing_time_, t);
-  tot_processing_time_ += t;
-  ADEBUG << "CollectDrops Runtime: "
-         << "MIN (" << min_processing_time_ << " ms), "
-         << "MAX (" << max_processing_time_ << " ms), "
-         << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";
+    ++seq_num_;
+    uint64_t t = timer.End("CollectDrops");
+    min_processing_time_ = std::min(min_processing_time_, t);
+    max_processing_time_ = std::max(max_processing_time_, t);
+    tot_processing_time_ += t;
+    ADEBUG << "CollectDrops Runtime: "
+           << "MIN (" << min_processing_time_ << " ms), "
+           << "MAX (" << max_processing_time_ << " ms), "
+           << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";
+  }
 
   if (objects_.size() > 0 && FLAGS_publish_fusion_event) {
     SharedDataPtr<FusionItem> fusion_item_ptr(new FusionItem);

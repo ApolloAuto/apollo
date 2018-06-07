@@ -109,15 +109,15 @@ PullOver::ValidateStopPointCode PullOver::IsValidStop(
     }
   }
 
-  const double adc_front_edge_s = reference_line_info_->AdcSlBoundary().end_s();
-  if (stop_point_sl.s() <= adc_front_edge_s) {
+  const double adc_end_edge_s = reference_line_info_->AdcSlBoundary().start_s();
+  if (stop_point_sl.s() <= adc_end_edge_s) {
     return BEHIND_ADC;
   }
 
-  if (stop_point_sl.s() - adc_front_edge_s <
-      config_.pull_over().operation_length()) {
-    return PLAN_DISTANCE_NOT_ENOUGH;
-  }
+  // if (stop_point_sl.s() - adc_front_edge_s <
+  //    config_.pull_over().operation_length()) {
+  //  return PLAN_DISTANCE_NOT_ENOUGH;
+  // }
 
   // parking spot boundary
   const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
