@@ -206,7 +206,8 @@ TEST_F(SunnyvaleLoopTest, mission_complete) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST(0);
