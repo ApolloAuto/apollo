@@ -17,6 +17,8 @@
 #include "modules/perception/obstacle/onboard/ultrasonic_obstacle_subnode.h"
 
 #include "modules/common/log.h"
+#include "modules/common/time/timer.h"
+#include "modules/perception/onboard/subnode_helper.h"
 
 namespace apollo {
 namespace perception {
@@ -24,6 +26,7 @@ namespace perception {
 void UltrasonicObstacleSubnode::OnUltrasonic(
     const apollo::canbus::Chassis& message) {
   ++seq_num_;
+  PERF_BLOCK_START();
   std::shared_ptr<SensorObjects> sensor_objects(new SensorObjects);
   double timestamp = message.header().timestamp_sec();
   sensor_objects->timestamp = timestamp;
@@ -38,11 +41,21 @@ void UltrasonicObstacleSubnode::OnUltrasonic(
     sensor_objects->error_code = apollo::common::PERCEPTION_ERROR_PROCESS;
     return;
   }
+  ADEBUG << "ultrasonic object size: " << sensor_objects->objects.size();
+  PERF_BLOCK_END("ultrasonic_detect");
 }
 
 bool UltrasonicObstacleSubnode::PublishDataAndEvent(
     const double timestamp, const SharedDataPtr<SensorObjects>& data) {
-  // TODO(all) implement
+  std::string key;
+  if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key)) {
+    AERROR << "Failed to produce shared key. time: "
+           << GLOG_TIMESTAMP(timestamp) << ", device_id: " << device_id_;
+    return false;
+  }
+
+  // TODO(all) pub events
+
   return true;
 }
 
