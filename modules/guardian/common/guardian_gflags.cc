@@ -23,10 +23,10 @@ DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
 
 DEFINE_double(guardian_cmd_freq, 10, "timer frequency.");
 
-DEFINE_double(guardian_cmd_soft_stop_percentage, 30,
+DEFINE_double(guardian_cmd_soft_stop_percentage, 25,
               "Soft stop perceptage when safe mode triggered");
 
-DEFINE_double(guardian_cmd_emergency_stop_percentage, 100,
+DEFINE_double(guardian_cmd_emergency_stop_percentage, 50,
               "Emergency stop perceptage when safe mode triggered");
 
 DEFINE_bool(guardian_enabled, false,
