@@ -84,6 +84,24 @@ Status Planning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
+void Planning::ResetPullOver(const routing::RoutingResponse& response) {
+  auto* pull_over =
+      util::GetPlanningStatus()->mutable_planning_state()->mutable_pull_over();
+  if (!last_routing_.has_header()) {
+    last_routing_ = response;
+    pull_over->Clear();
+    return;
+  }
+  if (!pull_over->in_pull_over()) {
+    return;
+  }
+  if (hdmap::PncMap::IsNewRouting(last_routing_, response)) {
+    pull_over->Clear();
+    last_routing_ = response;
+    AINFO << "Cleared Pull Over Status after received new routing";
+  }
+}
+
 Status Planning::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
@@ -282,9 +300,10 @@ void Planning::RunOnce() {
     AWARN_EVERY(100) << "prediction is enabled but no prediction provided";
   }
 
-  // Update reference line provider
+  // Update reference line provider and reset pull over if necessary
   if (!FLAGS_use_navigation_mode) {
     reference_line_provider_->UpdateVehicleState(vehicle_state);
+    ResetPullOver(AdapterManager::GetRoutingResponse()->GetLatestObserved());
   }
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;

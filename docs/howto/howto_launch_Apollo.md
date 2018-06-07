@@ -47,12 +47,12 @@ bash scripts/bootstrap.sh
 Access Dreamview by opening your favorite browser, e.g. Chrome, go to http://localhost:8888 and you should see this screen
 However, there will be nothing running in the system.
 
-![Access Dreamview](docs/demo_guide/images/apollo_bootstrap_screen.png)
+![Access Dreamview](images/apollo_bootstrap_screen.png)
 
 ### Select Drive Mode
 From the dropdown box selet "Navigation" mode.
 
-![Navigation Mode](docs/demo_guide/images/dreamview_2_5_setup_profile.png)
+![Navigation Mode](images/dreamview_2_5_setup_profile.png)
 
 
 ### Replay demo rosbag
@@ -69,4 +69,4 @@ rosbag play -l demo_2.5.bag
 
 Dreamview should show a running vehicle now. (The following image might be different due to changes in frontend.)
 
-![Dreamview with Trajectory](docs/demo_guide/images/dv_trajectory_2.5.png)
+![Dreamview with Trajectory](images/dv_trajectory_2.5.png)
