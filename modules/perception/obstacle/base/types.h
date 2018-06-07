@@ -49,6 +49,7 @@ enum class SensorType {
   VELODYNE_16 = 1,
   RADAR = 2,
   CAMERA = 3,
+  ULTRASONIC = 4,
   UNKNOWN_SENSOR_TYPE = 10,
 };
 
