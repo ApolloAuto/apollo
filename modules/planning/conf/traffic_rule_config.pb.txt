@@ -68,8 +68,8 @@ config: {
   pull_over {
     stop_distance: 0.5
     buffer_to_boundary: 0.5
-    plan_distance: 25.0
-    operation_length: 20.0
+    plan_distance: 30.0
+    operation_length: 25.0
     max_check_distance: 60.0
     max_failure_count: 10
   }
