@@ -31,6 +31,7 @@
 
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/camera/cipv/cipv.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
 #include "modules/perception/obstacle/camera/visualizer/common/camera.h"
@@ -311,6 +312,7 @@ class GLFWFusionViewer {
   bool show_lane_;
   bool show_vp_grid_ = true;  // show vanishing point and ground plane grid
   bool draw_lane_objects_;
+  bool show_trajectory_;
 
   static std::vector<std::vector<int>> s_color_table;
   std::shared_ptr<GLRasterText> raster_text_;
@@ -323,8 +325,8 @@ class GLFWFusionViewer {
   LaneObjectsPtr lane_history_;
   std::vector<std::vector<float>> z_history_;
   //  std::vector<LaneObjects> Lane_history_buffer_;
-  const std::size_t lane_history_buffer_size_ = 40000;
-  const std::size_t object_history_size_ = 5;
+  const std::size_t lane_history_buffer_size_ = 300;
+  const std::size_t object_history_size_ = 100;
   MotionType motion_matrix_;
   // pin-hole camera model with distortion
   std::shared_ptr<CameraDistort<double>> distort_camera_intrinsic_;
@@ -335,7 +337,10 @@ class GLFWFusionViewer {
   float alpha_blending = 0.5;  // [0..1]
   float one_minus_alpha = 1.0 - alpha_blending;
   // object_trajectories
-  std::map<int, std::vector<std::pair<float, float>>> object_trackjectories_;
+
+  std::map<int, size_t> object_id_skip_count_;
+  std::map<int, boost::circular_buffer<std::pair<float, float>>>
+    object_trackjectories_;
   std::map<int, std::vector<double>> object_timestamps_;
 };
 
