@@ -97,6 +97,7 @@ class PullOver : public TrafficRule {
   static constexpr char const* const INLANE_STOP_VO_ID_PREFIX = "_INLANE";
   static constexpr double PARKING_SPOT_LONGITUDINAL_BUFFER = 1.0;
   static uint32_t failure_count_;
+  static common::PointENU stop_point_;
   Frame* frame_ = nullptr;
   ReferenceLineInfo* reference_line_info_ = nullptr;
 };
