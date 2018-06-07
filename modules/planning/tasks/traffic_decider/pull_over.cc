@@ -114,10 +114,10 @@ PullOver::ValidateStopPointCode PullOver::IsValidStop(
     return BEHIND_ADC;
   }
 
-  if (stop_point_sl.s() - adc_front_edge_s <
-      config_.pull_over().operation_length()) {
-    return PLAN_DISTANCE_NOT_ENOUGH;
-  }
+  // if (stop_point_sl.s() - adc_front_edge_s <
+  //    config_.pull_over().operation_length()) {
+  //  return PLAN_DISTANCE_NOT_ENOUGH;
+  // }
 
   // parking spot boundary
   const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
