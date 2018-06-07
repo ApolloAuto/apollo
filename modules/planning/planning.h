@@ -122,6 +122,11 @@ class Planning : public apollo::common::ApolloApp {
 
   void SetFallbackCruiseTrajectory(ADCTrajectory* cruise_trajectory);
 
+  /**
+   * Reset pull over mode whenever received new routing
+   */
+  void ResetPullOver(const routing::RoutingResponse& response);
+
   double start_time_ = 0.0;
 
   apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
@@ -142,6 +147,8 @@ class Planning : public apollo::common::ApolloApp {
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
 
   ros::Timer timer_;
+
+  routing::RoutingResponse last_routing_;
 };
 
 }  // namespace planning

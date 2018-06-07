@@ -30,8 +30,8 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::time::Clock;
 using apollo::common::PointENU;
+using apollo::common::time::Clock;
 using apollo::planning::StopSign;
 using apollo::planning::util::GetPlanningStatus;
 
@@ -441,9 +441,11 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   stop_sign_status->set_stop_start_time(stop_start_time);
 
   // set config
-  stop_sign_config->mutable_stop_sign()->mutable_creep()
+  stop_sign_config->mutable_stop_sign()
+      ->mutable_creep()
       ->set_creep_distance_to_stop_line(1.0);
-  stop_sign_config->mutable_stop_sign()->mutable_creep()
+  stop_sign_config->mutable_stop_sign()
+      ->mutable_creep()
       ->set_max_valid_stop_distance(1.0);
 
   RUN_GOLDEN_TEST_DECISION(1);
@@ -455,7 +457,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   // step 3: STOP_DONE
 
   // set config: to make it s valid stop for the same data file
-  stop_sign_config->mutable_stop_sign()->mutable_creep()
+  stop_sign_config->mutable_stop_sign()
+      ->mutable_creep()
       ->set_max_valid_stop_distance(4.0);
 
   RUN_GOLDEN_TEST_DECISION(2);
