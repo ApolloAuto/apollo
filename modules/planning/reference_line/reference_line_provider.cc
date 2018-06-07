@@ -334,17 +334,32 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
       adc_navigation_path->second.path_priority();
   // get adc left neighbor lanes
   std::vector<std::string> left_neighbor_lane_ids;
-  std::vector<std::string> right_neighbor_lane_ids;
-  for (const auto &left_lane_id :
-       adc_lane_way_point.lane->lane().left_neighbor_forward_lane_id()) {
-    left_neighbor_lane_ids.push_back(left_lane_id.id());
+  for (auto lane_ptr = adc_lane_way_point.lane;
+       lane_ptr != nullptr &&
+       lane_ptr->lane().left_neighbor_forward_lane_id_size() > 0;) {
+    auto neighbor_lane_id = lane_ptr->lane().left_neighbor_forward_lane_id(0);
+    left_neighbor_lane_ids.emplace_back(neighbor_lane_id.id());
+    lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
+  }
+  ADEBUG << adc_lane_id
+         << "left neighbor size : " << left_neighbor_lane_ids.size();
+  for (const auto &neighbor : left_neighbor_lane_ids) {
+    ADEBUG << adc_lane_id << " left neighbor : " << neighbor;
   }
   // get adc right neighbor lanes
-  for (const auto &right_lane_id :
-       adc_lane_way_point.lane->lane().right_neighbor_forward_lane_id()) {
-    right_neighbor_lane_ids.push_back(right_lane_id.id());
+  std::vector<std::string> right_neighbor_lane_ids;
+  for (auto lane_ptr = adc_lane_way_point.lane;
+       lane_ptr != nullptr &&
+       lane_ptr->lane().right_neighbor_forward_lane_id_size() > 0;) {
+    auto neighbor_lane_id = lane_ptr->lane().right_neighbor_forward_lane_id(0);
+    right_neighbor_lane_ids.emplace_back(neighbor_lane_id.id());
+    lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
   }
-
+  ADEBUG << adc_lane_id
+         << "right neighbor size : " << right_neighbor_lane_ids.size();
+  for (const auto &neighbor : right_neighbor_lane_ids) {
+    ADEBUG << adc_lane_id << " right neighbor : " << neighbor;
+  }
   // 2.get the higher priority lane info list which priority higher
   // than current lane and get the highest one as the target lane
   using LaneIdPair = std::pair<std::string, uint32_t>;
@@ -354,19 +369,18 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
   for (const auto &path_pair : relative_map.navigation_path()) {
     const auto lane_id = path_pair.first;
     const uint32_t priority = path_pair.second.path_priority();
-    ADEBUG << "lane_id = " << lane_id;
-    ADEBUG << "priority = " << priority;
+    ADEBUG << "lane_id = " << lane_id << " priority = " << priority
+           << " adc_lane_id = " << adc_lane_id
+           << " adc_lane_priority = " << adc_lane_priority;
     // the smaller the number, the higher the priority
     if (adc_lane_id != lane_id && priority < adc_lane_priority) {
-      // high_priority_lane_pairs.emplace_back(lane_id, priority);
+      high_priority_lane_pairs.emplace_back(lane_id, priority);
     }
   }
   // get the target lane
   bool is_lane_change_needed = false;
   LaneIdPair target_lane_pair;
   if (!high_priority_lane_pairs.empty()) {
-    // std::sort(high_priority_lane_pairs.begin(),
-    // high_priority_lane_pairs.end())；
     std::sort(high_priority_lane_pairs.begin(), high_priority_lane_pairs.end(),
               [](const LaneIdPair &left, const LaneIdPair &right) {
                 return left.second < right.second;
@@ -387,17 +401,25 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
                   target_lane_pair.first)) {
       auto lane_ptr =
           hdmap->GetLaneById(hdmap::MakeMapId(target_lane_pair.first));
-      while (!lane_ptr &&
-             lane_ptr->lane().right_neighbor_forward_lane_id_size() > 0 &&
-             lane_ptr->lane().right_neighbor_forward_lane_id(0).id() !=
-                 adc_lane_id) {
-        lane_ptr = hdmap->GetLaneById(
-            lane_ptr->lane().right_neighbor_forward_lane_id(0));
+      for (; lane_ptr != nullptr &&
+             lane_ptr->lane().right_neighbor_forward_lane_id_size() > 0;) {
+        ADEBUG << "target : " << lane_ptr->lane().id().id()
+               << " right neihbor size : "
+               << lane_ptr->lane().right_neighbor_forward_lane_id_size()
+               << "right neihbor id : "
+               << lane_ptr->lane().right_neighbor_forward_lane_id(0).id();
+        auto neighbor_lane_id =
+            lane_ptr->lane().left_neighbor_forward_lane_id(0);
+        if (adc_lane_id == neighbor_lane_id.id()) {
+          break;
+        }
+        lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
       }
-      if (lane_ptr->lane().right_neighbor_forward_lane_id(0).id() ==
-          adc_lane_id) {
-        neareast_neighbor_lane_id =
-            lane_ptr->lane().right_neighbor_forward_lane_id(0).id();
+      if (lane_ptr != nullptr &&
+          lane_ptr->lane().right_neighbor_forward_lane_id_size() > 0 &&
+          lane_ptr->lane().right_neighbor_forward_lane_id(0).id() ==
+              adc_lane_id) {
+        neareast_neighbor_lane_id = lane_ptr->lane().id().id();
         lane_change_type = routing::LEFT;
       }
       // target lane on the right of adc
@@ -407,17 +429,25 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
                          target_lane_pair.first)) {
       auto lane_ptr =
           hdmap->GetLaneById(hdmap::MakeMapId(target_lane_pair.first));
-      while (!lane_ptr &&
-             lane_ptr->lane().left_neighbor_forward_lane_id_size() > 0 &&
-             lane_ptr->lane().left_neighbor_forward_lane_id(0).id() !=
-                 adc_lane_id) {
-        lane_ptr = hdmap->GetLaneById(
-            lane_ptr->lane().left_neighbor_forward_lane_id(0));
+      for (; lane_ptr != nullptr &&
+             lane_ptr->lane().left_neighbor_forward_lane_id_size() > 0;) {
+        ADEBUG << "target : " << lane_ptr->lane().id().id()
+               << " left neihbor size : "
+               << lane_ptr->lane().left_neighbor_forward_lane_id_size()
+               << "left neihbor id : "
+               << lane_ptr->lane().left_neighbor_forward_lane_id(0).id();
+        auto neighbor_lane_id =
+            lane_ptr->lane().left_neighbor_forward_lane_id(0);
+        if (adc_lane_id == neighbor_lane_id.id()) {
+          break;
+        }
+        lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
       }
-      if (lane_ptr->lane().left_neighbor_forward_lane_id(0).id() ==
-          adc_lane_id) {
-        neareast_neighbor_lane_id =
-            lane_ptr->lane().left_neighbor_forward_lane_id(0).id();
+      if (lane_ptr != nullptr &&
+          lane_ptr->lane().left_neighbor_forward_lane_id_size() > 0 &&
+          lane_ptr->lane().left_neighbor_forward_lane_id(0).id() ==
+              adc_lane_id) {
+        neareast_neighbor_lane_id = lane_ptr->lane().id().id();
         lane_change_type = routing::RIGHT;
       }
     }
@@ -431,7 +461,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     segment.emplace_back(lane_ptr, 0.0, lane_ptr->total_length());
     segment.SetCanExit(true);
     segment.SetId(lane_id);
-    segment.SetNextAction(lane_change_type);
+    segment.SetNextAction(routing::FORWARD);
     segment.SetIsOnSegment(true);
     segment.SetStopForDestination(false);
     segment.SetPreviousAction(routing::FORWARD);
@@ -442,6 +472,8 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
                << " neareast_neighbor_lane_id = " << lane_id;
         segment.SetIsOnSegment(false);
         segment.SetPreviousAction(lane_change_type);
+      } else if (lane_id == adc_lane_id) {
+        segment.SetNextAction(lane_change_type);
       }
     }
     segments->emplace_back(segment);
