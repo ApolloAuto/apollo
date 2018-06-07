@@ -109,8 +109,8 @@ PullOver::ValidateStopPointCode PullOver::IsValidStop(
     }
   }
 
-  const double adc_front_edge_s = reference_line_info_->AdcSlBoundary().end_s();
-  if (stop_point_sl.s() <= adc_front_edge_s) {
+  const double adc_end_edge_s = reference_line_info_->AdcSlBoundary().start_s();
+  if (stop_point_sl.s() <= adc_end_edge_s) {
     return BEHIND_ADC;
   }
 
