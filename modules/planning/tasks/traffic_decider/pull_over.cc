@@ -46,6 +46,7 @@ using apollo::perception::PerceptionObstacle;
 using apollo::planning::util::GetPlanningStatus;
 
 uint32_t PullOver::failure_count_ = 0;
+PointENU PullOver::stop_point_;
 
 PullOver::PullOver(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
@@ -80,7 +81,7 @@ bool PullOver::IsPullOver() const {
 }
 
 PullOver::ValidateStopPointCode PullOver::IsValidStop(
-    const common::PointENU& stop_point) const {
+    const PointENU& stop_point) const {
   const auto& reference_line = reference_line_info_->reference_line();
 
   common::SLPoint stop_point_sl;
@@ -169,32 +170,51 @@ PullOver::ValidateStopPointCode PullOver::IsValidStop(
 /**
  * @brief:get pull_over points(start & stop)
  */
-int PullOver::GetPullOverStop(common::PointENU* stop_point) {
+int PullOver::GetPullOverStop(PointENU* stop_point) {
   auto& pull_over_status =
       GetPlanningStatus()->mutable_planning_state()->pull_over();
-  // reuse existing/previously-set stop point
+
+  bool found = false;
+  bool retry = true;
   if (pull_over_status.has_start_point() && pull_over_status.has_stop_point()) {
+    // reuse existing/previously-set stop point
     stop_point->set_x(pull_over_status.stop_point().x());
     stop_point->set_y(pull_over_status.stop_point().y());
 
     ValidateStopPointCode ret = IsValidStop(*stop_point);
     if (ret == OK) {
-      failure_count_ = 0;
-      return 0;
-    } else if (ret == PASS_DEST_POINT_TOO_FAR) {
-      // fail with no re-try
-      failure_count_++;
-      return -1;
+      found = true;
+    } else {
+      retry = (ret == PASS_DEST_POINT_TOO_FAR) ? false : true;
     }
   }
 
-  // calculate new stop point
-  if (FindPullOverStop(stop_point) == 0) {
+  if (!found && retry) {
+    // finding pull_over_stop_point
+    if (FindPullOverStop(stop_point) == 0) {
+      found = true;
+    }
+  }
+
+  // found valid pull_over_stop_point
+  if (found) {
     failure_count_ = 0;
+    stop_point_.set_x(stop_point->x());
+    stop_point_.set_x(stop_point->y());
     return 0;
   }
 
+  // when fail, use previous invalid stop_point for smoothness
   failure_count_++;
+  if (stop_point_.has_x() && stop_point_.has_y() &&
+      failure_count_ < config_.pull_over().max_failure_count()) {
+    stop_point->set_x(stop_point_.x());
+    stop_point->set_x(stop_point_.y());
+    return 0;
+  }
+
+  // fail to find valid pull_over_stop_point
+  stop_point_.Clear();
   return -1;
 }
 
@@ -255,7 +275,7 @@ bool PullOver::OnOverlap(const double s) {
  * @brief: find pull over location(start & stop
  */
 int PullOver::FindPullOverStop(const double stop_point_s,
-                               common::PointENU* stop_point) {
+                               PointENU* stop_point) {
   const auto& reference_line = reference_line_info_->reference_line();
   if (stop_point_s < 0 || stop_point_s > reference_line.Length()) {
     return -1;
@@ -307,7 +327,7 @@ int PullOver::FindPullOverStop(const double stop_point_s,
   return -1;
 }
 
-int PullOver::FindPullOverStop(common::PointENU* stop_point) {
+int PullOver::FindPullOverStop(PointENU* stop_point) {
   const auto& reference_line = reference_line_info_->reference_line();
   const double adc_front_edge_s = reference_line_info_->AdcSlBoundary().end_s();
 
@@ -385,7 +405,7 @@ int PullOver::FindPullOverStop(common::PointENU* stop_point) {
     ADEBUG << "check_length: " << check_length << "; plan_distance:" <<
         config_.pull_over().plan_distance();
     if (check_length >= config_.pull_over().plan_distance()) {
-      common::PointENU point;
+      PointENU point;
       // check corresponding parking_spot
       if (FindPullOverStop(check_s, &point) != 0) {
         // parking_spot not valid/available
@@ -405,7 +425,7 @@ int PullOver::FindPullOverStop(common::PointENU* stop_point) {
   return -1;
 }
 
-int PullOver::BuildPullOverStop(const common::PointENU& stop_point) {
+int PullOver::BuildPullOverStop(const PointENU& stop_point) {
   const auto& reference_line = reference_line_info_->reference_line();
   common::SLPoint stop_point_sl;
   reference_line.XYToSL(stop_point, &stop_point_sl);
@@ -437,7 +457,7 @@ int PullOver::BuildPullOverStop(const common::PointENU& stop_point) {
   return 0;
 }
 
-int PullOver::BuildInLaneStop(const common::PointENU& pull_over_stop_point) {
+int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
   const auto& reference_line = reference_line_info_->reference_line();
 
   const double adc_front_edge_s =
@@ -486,7 +506,7 @@ int PullOver::BuildInLaneStop(const common::PointENU& pull_over_stop_point) {
         << "] l[0.0] adc_front_edge_s[" << adc_front_edge_s;
   }
 
-  common::PointENU stop_point;
+  PointENU stop_point;
   auto inlane_point = reference_line.GetReferencePoint(stop_point_sl.s());
   stop_point.set_x(inlane_point.x());
   stop_point.set_y(inlane_point.y());
@@ -507,7 +527,7 @@ int PullOver::BuildInLaneStop(const common::PointENU& pull_over_stop_point) {
 
 int PullOver::BuildStopDecision(const std::string& vistual_obstacle_id_postfix,
                                 const double stop_line_s,
-                                const common::PointENU& stop_point,
+                                const PointENU& stop_point,
                                 const double stop_point_heading) {
   const auto& reference_line = reference_line_info_->reference_line();
   if (stop_line_s < 0 || stop_line_s > reference_line.Length()) {
