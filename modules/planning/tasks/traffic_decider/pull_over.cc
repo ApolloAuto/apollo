@@ -47,6 +47,7 @@ using apollo::planning::util::GetPlanningStatus;
 
 uint32_t PullOver::failure_count_ = 0;
 PointENU PullOver::stop_point_;
+PointENU PullOver::inlane_adc_potiion_stop_point_;
 
 PullOver::PullOver(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
@@ -61,7 +62,6 @@ Status PullOver::ApplyRule(Frame* const frame,
 
   common::PointENU stop_point;
   if (GetPullOverStop(&stop_point) != 0) {
-     //&& failure_count_ >= config_.pull_over().max_failure_count()) {
     BuildInLaneStop(stop_point);
     ADEBUG << "Could not find a safe pull over point. STOP in-lane";
   } else {
@@ -185,7 +185,11 @@ int PullOver::GetPullOverStop(PointENU* stop_point) {
     if (ret == OK) {
       found = true;
     } else {
-      retry = (ret == PASS_DEST_POINT_TOO_FAR) ? false : true;
+      if (ret == PASS_DEST_POINT_TOO_FAR) {
+        retry = false;
+      } else if (failure_count_ < config_.pull_over().max_failure_count()) {
+        retry = false;
+      }
     }
   }
 
@@ -200,7 +204,7 @@ int PullOver::GetPullOverStop(PointENU* stop_point) {
   if (found) {
     failure_count_ = 0;
     stop_point_.set_x(stop_point->x());
-    stop_point_.set_x(stop_point->y());
+    stop_point_.set_y(stop_point->y());
     return 0;
   }
 
@@ -209,7 +213,7 @@ int PullOver::GetPullOverStop(PointENU* stop_point) {
   if (stop_point_.has_x() && stop_point_.has_y() &&
       failure_count_ < config_.pull_over().max_failure_count()) {
     stop_point->set_x(stop_point_.x());
-    stop_point->set_x(stop_point_.y());
+    stop_point->set_y(stop_point_.y());
     return 0;
   }
 
@@ -472,13 +476,13 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
     reference_line.XYToSL({pull_over.inlane_dest_point().x(),
                           pull_over.inlane_dest_point().y()},
                           &stop_point_sl);
-    ADEBUG << "BuildInLaneStop using inlane_dest_point: s["
-        << stop_point_sl.s() << "] dist["
-        << stop_point_sl.s() - adc_front_edge_s
-        << "] POINT:" << pull_over.inlane_dest_point().DebugString();
     if (stop_point_sl.s() - adc_front_edge_s >
         config_.pull_over().plan_distance()) {
       inlane_stop_point_set = true;
+      ADEBUG << "BuildInLaneStop using inlane_dest_point: s["
+          << stop_point_sl.s() << "] dist["
+          << stop_point_sl.s() - adc_front_edge_s
+          << "] POINT:" << pull_over.inlane_dest_point().DebugString();
     }
   }
 
@@ -488,20 +492,39 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
       reference_line.XYToSL({pull_over_stop_point.x(),
                             pull_over_stop_point.y()},
                             &stop_point_sl);
-      ADEBUG << "BuildInLaneStop using pull_over_stop_point: s["
-          << stop_point_sl.s() << "] dist["
-          << stop_point_sl.s() - adc_front_edge_s
-          << "] POINT:" << pull_over_stop_point.DebugString();
       if (stop_point_sl.s() - adc_front_edge_s >
           config_.pull_over().plan_distance()) {
         inlane_stop_point_set = true;
+        ADEBUG << "BuildInLaneStop using pull_over_stop_point: s["
+            << stop_point_sl.s() << "] dist["
+            << stop_point_sl.s() - adc_front_edge_s
+            << "] POINT:" << pull_over_stop_point.DebugString();
       }
     }
   }
 
+  // inlane stop_point (ahead of adc) already set, use existing one
+  if (!inlane_stop_point_set) {
+    if (inlane_adc_potiion_stop_point_.has_x() &&
+        inlane_adc_potiion_stop_point_.has_y()) {
+      reference_line.XYToSL(inlane_adc_potiion_stop_point_, &stop_point_sl);
+      if (stop_point_sl.s() - adc_front_edge_s >
+          config_.pull_over().plan_distance()) {
+        inlane_stop_point_set = true;
+        ADEBUG << "BuildInLaneStop using adc_position exsiting stop_point: s["
+            << stop_point_sl.s() << "] dist["
+            << stop_point_sl.s() - adc_front_edge_s
+            << "] POINT:" << pull_over_stop_point.DebugString();
+      }
+    }
+  }
+
+  // use adc + plan_distance for new inlane_stop_point
+  bool  inlane_adc_potiion_stop_point = false;
   if (!inlane_stop_point_set) {
     stop_point_sl.set_s(
         adc_front_edge_s + config_.pull_over().plan_distance());
+    inlane_adc_potiion_stop_point = true;
     ADEBUG << "BuildInLaneStop: adc: s[" << stop_point_sl.s()
         << "] l[0.0] adc_front_edge_s[" << adc_front_edge_s;
   }
@@ -510,6 +533,11 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
   auto inlane_point = reference_line.GetReferencePoint(stop_point_sl.s());
   stop_point.set_x(inlane_point.x());
   stop_point.set_y(inlane_point.y());
+
+  if (inlane_adc_potiion_stop_point) {
+    inlane_adc_potiion_stop_point_.set_x(stop_point.x());
+    inlane_adc_potiion_stop_point_.set_y(stop_point.y());
+  }
 
   double stop_line_s = stop_point_sl.s() + config_.pull_over().stop_distance();
   double stop_point_heading =
