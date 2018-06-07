@@ -29,4 +29,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "cone",
+    srcs = [
+        "cone.cc",
+    ],
+    hdrs = [
+        "cone.h",
+    ],
+    deps = [
+        "@eigen//:eigen",
+        ":ultrasonic_kalman_filter",
+        ":extrin_ident",
+    ],
+)
+
 cpplint()

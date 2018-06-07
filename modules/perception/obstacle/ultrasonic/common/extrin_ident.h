@@ -39,6 +39,10 @@ class ExtrinIdent {
 
   void operator = (const ExtrinIdent &second);
 
+  const std::vector<Eigen::Vector3d>& upoint_arc();
+
+  const Eigen::Transform<double, 3, Eigen::Isometry>& transform();
+
  private:
   int  ultrasonic_id_;
   float cone_fov_;

@@ -62,5 +62,13 @@ void ExtrinIdent::operator = (const ExtrinIdent& second) {
   fov_margin_ = second.fov_margin_;
 }
 
+const std::vector<Eigen::Vector3d>& ExtrinIdent::upoint_arc() {
+  return upoint_arc_;
+}
+
+const Eigen::Transform<double, 3, Eigen::Isometry>& ExtrinIdent::transform() {
+  return transform_;
+}
+
 }  // namespace perception
 }  // namespace apollo
