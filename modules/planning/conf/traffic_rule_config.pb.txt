@@ -68,6 +68,8 @@ config: {
   enabled: true
   pull_over {
     stop_distance: 0.5
+    max_stop_speed: 0.2
+    max_valid_stop_distance: 3.0
     buffer_to_boundary: 0.5
     plan_distance: 35.0
     operation_length: 30.0
