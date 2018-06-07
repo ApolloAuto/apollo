@@ -125,6 +125,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
+
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
@@ -136,7 +137,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::STOP);
-  auto* stop_sign_config = PlanningTestBase::GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::STOP_SIGN);
   double stop_duration = stop_sign_config->stop_sign().stop_duration();
   double wait_time = stop_duration - 0.5;
   double stop_start_time = Clock::NowInSeconds() - wait_time;
@@ -165,7 +167,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = PlanningTestBase::GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   // set PlanningStatus: wait time > STOP_DURATION
@@ -206,7 +209,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
   PlanningTestBase::SetUp();
 
   // set configs
-  auto* stop_sign_config = PlanningTestBase::GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -260,7 +264,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = PlanningTestBase::GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -352,7 +357,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = PlanningTestBase::GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -416,7 +422,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = PlanningTestBase::GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(true);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -575,7 +582,8 @@ TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -602,10 +610,13 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(true);
+  destination_config->mutable_destination()->set_pull_over_plan_distance(35.0);
 
-  auto* pull_over_config = PlanningTestBase::GetPullOverConfig();
+  auto* pull_over_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::PULL_OVER);
   pull_over_config->mutable_pull_over()->set_plan_distance(35.0);
   pull_over_config->mutable_pull_over()->set_operation_length(10.0);
 
@@ -666,10 +677,13 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(true);
+  destination_config->mutable_destination()->set_pull_over_plan_distance(35.0);
 
-  auto* pull_over_config = PlanningTestBase::GetPullOverConfig();
+  auto* pull_over_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::PULL_OVER);
   pull_over_config->mutable_pull_over()->set_plan_distance(35.0);
   pull_over_config->mutable_pull_over()->set_operation_length(10.0);
 
@@ -685,6 +699,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   // step 2: pull over failed, stop inlane
 
   // set config
+  destination_config->mutable_destination()->set_pull_over_plan_distance(10.0);
   pull_over_config->mutable_pull_over()->set_plan_distance(10.0);
   pull_over_config->mutable_pull_over()->set_max_check_distance(30.0);
 
