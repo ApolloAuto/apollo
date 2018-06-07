@@ -54,7 +54,16 @@ bool UltrasonicObstacleSubnode::PublishDataAndEvent(
     return false;
   }
 
-  // TODO(all) pub events
+  // TODO(all) processing_data_->Add(key, data);
+
+  for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
+    const EventMeta& event_meta = pub_meta_events_[idx];
+    Event event;
+    event.event_id = event_meta.event_id;
+    event.timestamp = timestamp;
+    event.reserve = device_id_;
+    event_manager_->Publish(event);
+  }
 
   return true;
 }
