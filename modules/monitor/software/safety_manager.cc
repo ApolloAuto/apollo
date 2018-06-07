@@ -88,13 +88,12 @@ bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
     return false;
   }
 
-  static const std::string kApolloModeKey = "apollo:dreamview:mode";
-  if (!KVDB::Has(kApolloModeKey)) {
+  const std::string mode_name = KVDB::Get("apollo:dreamview:mode");
+  if (mode_name.empty()) {
     AERROR << "Cannot get apollo mode";
     return true;
   }
 
-  const std::string mode_name = KVDB::Get(kApolloModeKey);
   const apollo::dreamview::Mode *mode_conf =
       FindOrNull(hmi_config_.modes(), mode_name);
   if (mode_conf == nullptr) {
