@@ -1,69 +1,8 @@
 header {
-  timestamp_sec: 1526490049.1214654
+  timestamp_sec: 1526490046.8165913
   module_name: "prediction"
-  sequence_num: 13402
-}
-prediction_obstacle {
-  perception_obstacle {
-    id: 23356
-    position {
-      x: 587113.68156633922
-      y: 4141208.7606054628
-      z: -31.086343342572469
-    }
-    theta: 2.8914395694880479
-    velocity {
-      x: 0
-      y: 0
-      z: 0
-    }
-    length: 0.0673581138253212
-    width: 0.16771174967288971
-    height: 0.031169414520263672
-    polygon_point {
-      x: 587113.71157760418
-      y: 4141208.7417112114
-      z: -31.084230970406594
-    }
-    polygon_point {
-      x: 587113.70847213571
-      y: 4141208.7342735059
-      z: -31.084031179790642
-    }
-    polygon_point {
-      x: 587113.65140635089
-      y: 4141208.6904069497
-      z: -31.082708801688288
-    }
-    polygon_point {
-      x: 587113.6378496089
-      y: 4141208.685240231
-      z: -31.082527640257307
-    }
-    polygon_point {
-      x: 587113.66567570239
-      y: 4141208.8344609523
-      z: -31.086407825717075
-    }
-    polygon_point {
-      x: 587113.67249890207
-      y: 4141208.8494320572
-      z: -31.086812104817085
-    }
-    polygon_point {
-      x: 587113.71295406355
-      y: 4141208.7496049372
-      z: -31.084435875792117
-    }
-    tracking_time: 0.10005712509155273
-    type: UNKNOWN
-    timestamp: 1526490049.0176256
-    confidence: 0.12561498582363129
-    confidence_type: CONFIDENCE_CNN
-  }
-  timestamp: 1526490049.0176256
-  predicted_period: 5
+  sequence_num: 13379
 }
 perception_error_code: OK
-start_timestamp: 1526490049.1209192
-end_timestamp: 1526490049.1214647
+start_timestamp: 1526490046.8162825
+end_timestamp: 1526490046.8165908

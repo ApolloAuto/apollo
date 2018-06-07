@@ -3,14 +3,17 @@
 本文档主要用来说明如何在Apollo2.5中使用地图数据采集的功能.重点介绍了数据采集所需的软硬件环境,数据采集的流程和注意事项.
 
 ## 软硬件环境准备
-硬件安装方法参见[Apollo 2.5硬件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_hardware_system_installation_guide_v1.md)
+1、硬件安装方法参见[Apollo 2.5硬件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_hardware_system_installation_guide_v1.md)
 
 
-软件安装方法参见[Apollo 软件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide_cn.md)
+2、软件安装方法参见[Apollo 软件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide_cn.md)
 
 
-传感器标定方法参见[Apollo 传感器标定方法使用指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/multiple_lidar_gnss_calibration_guide.md)
+3、传感器标定方法参见[Apollo 传感器标定方法使用指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/multiple_lidar_gnss_calibration_guide.md)
 
+4、NVMe SSD硬盘。为了解决由于IO瓶颈导致可能的数据丢帧问题，建议工控机中安装NVME SSD硬盘。
+
+5、卫星基站。为了得到精确的制图结果，需要搭建卫星基站，并且保证整个采集过程中采集车的RTK可以正常工作。
 
 ## 数据采集流程
 
@@ -21,7 +24,7 @@ Apollo环境启动参见[Apollo 2.5快速上手指南](https://github.com/Apollo
 
 ![](images/map_collection_sensor_open.png)
 
-确认各个传感器状态是否OK.
+确认各个传感器状态是否OK。
 
 ![](images/map_collection_sensor_check.png)
 
@@ -29,12 +32,32 @@ Apollo环境启动参见[Apollo 2.5快速上手指南](https://github.com/Apollo
 
 ![](images/map_collection_sensor_start_record.png)
 
+正式采集数据之前，需要车辆静止5分钟，8字绕行5分钟。
 采集过程中需要保证双向车道全覆盖采集五圈以上，车速60KM/h以下，尽量每圈走不同的车道，覆盖完全。在路口区域无需刻意停留，慢速通过即可。
+数据采集完成后，需要8字绕行五分钟，然后再静止五分钟。
 
-4、数据采集完成后，关闭[Record Bag]开关结束采集，然后关闭[GPS]、[Camera]、[Velodyne]、[Velodyne16]开关。
+3、所有采集完成后，关闭[Record Bag]开关结束采集，然后关闭[GPS]、[Camera]、[Velodyne]、[Velodyne16]开关。
 
 ![](images/map_collection_sensor_stop_record.png)
 
-5、数据上传
+4、数据上传
 
-采集的数据放置在/apollo/data/bag/(采集开始时间,例如2018-04-14-21-20-24)目录，把该目录下的数据打包为tar.gz压缩文件，到[Apollo数据官网](http://data.apollo.auto/hd_map_intro)进行数据上传。
+采集的数据放置在/apollo/data/bag/(采集开始时间,例如2018-04-14-21-20-24)目录，把该目录下的数据打包为tar.gz压缩文件，到[Apollo数据官网](http://data.apollo.auto/hd_map_intro/?locale=zh-cn)进行数据上传。
+
+## 地图数据生产服务
+
+1、数据权限申请
+
+首先需要注册一个百度账号，登陆百度账号，申请地图制作服务使用权限(仅需申请一次),如果已经申请过，跳过此步。
+![](images/map_collection_data_request_ch.png)
+
+2、数据管理
+
+用户可以在数据管理页面进行制图任务的创建、采集数据上传、地图数据的管理、制图进度的跟踪等。
+![](images/map_collection_data_manage_ch.png)
+
+3、数据下载
+
+当任务状态是[数据已发布]时，点击[数据已发布]进行地图数据下载。
+
+![](images/map_collection_data_finish_ch.png)

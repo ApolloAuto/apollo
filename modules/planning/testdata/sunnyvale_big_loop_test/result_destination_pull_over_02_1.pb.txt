@@ -7,29 +7,29 @@ decision {
   main_decision {
     stop {
       reason_code: STOP_REASON_PULL_OVER
-      reason: "stop by PO_DESTINATION"
+      reason: "stop by PO_DESTINATION_INLANE"
       stop_point {
-        x: 587079.10948603891
-        y: 4141219.2106658942
+        x: 587109.97119684669
+        y: 4141209.5546708424
       }
-      stop_heading: 2.8985984162210214
+      stop_heading: 2.8977181954722679
       change_lane_type: FORWARD
     }
   }
   object_decision {
     decision {
-      id: "PO_DESTINATION"
-      perception_id: -1274803422
+      id: "PO_DESTINATION_INLANE"
+      perception_id: -2054579289
       object_decision {
         stop {
           reason_code: STOP_REASON_PULL_OVER
           distance_s: -0.5
           stop_point {
-            x: 587079.10948603891
-            y: 4141219.2106658942
+            x: 587109.97119684669
+            y: 4141209.5546708424
             z: 0
           }
-          stop_heading: 2.8985984162210214
+          stop_heading: 2.8977181954722679
         }
       }
     }
