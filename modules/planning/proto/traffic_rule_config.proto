@@ -81,6 +81,8 @@ message PullOverConfig {
   optional double operation_length = 4 [ default=20.0 ]; // meter
   // max s_distance to check ahead while planning pull over
   optional double max_check_distance = 5 [ default=60.0]; // meter
+  // max failure count before changing to stop in-lane
+  optional uint32 max_failure_count = 6 [ default=10];
 }
 
 message ReferenceLineEndConfig {

@@ -85,6 +85,7 @@ class PullOver : public TrafficRule {
  private:
   static constexpr char const* const PULL_OVER_VO_ID_PREFIX = "PO_";
   static constexpr double PARKING_SPOT_LONGITUDINAL_BUFFER = 1.0;
+  static uint32_t failure_count_;
   Frame* frame_ = nullptr;
   ReferenceLineInfo* reference_line_info_ = nullptr;
 };
