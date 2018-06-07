@@ -1730,6 +1730,22 @@ decision {
         }
       }
     }
+    decision {
+      id: "REF_END_0_0"
+      perception_id: -37126752
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_DESTINATION
+          distance_s: -0.5
+          stop_point {
+            x: 586367.53017175966
+            y: 4140785.4716124814
+            z: 0
+          }
+          stop_heading: 1.3047204462302024
+        }
+      }
+    }
   }
   vehicle_signal {
     turn_signal: TURN_NONE

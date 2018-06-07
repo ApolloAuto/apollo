@@ -894,6 +894,22 @@ decision {
       }
     }
     decision {
+      id: "REF_END_0_0"
+      perception_id: -37126752
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_DESTINATION
+          distance_s: -0.5
+          stop_point {
+            x: 586367.5589102247
+            y: 4140785.5787322749
+            z: 0
+          }
+          stop_heading: 1.3040989533597316
+        }
+      }
+    }
+    decision {
       id: "SS_2"
       perception_id: -1262210198
       object_decision {
