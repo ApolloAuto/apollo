@@ -81,8 +81,7 @@ config: {
   enabled: true
   reference_line_end {
     stop_distance: 0.5
-    stop_acc_to_max_deceleration_ratio: 3.0
-    min_reference_line_remain_length: 10.0
+    min_reference_line_remain_length: 50.0
   }
 }
 
