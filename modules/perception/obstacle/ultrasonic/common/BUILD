@@ -16,4 +16,17 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "extrin_ident",
+    srcs = [
+        "extrin_ident.cc",
+    ],
+    hdrs = [
+        "extrin_ident.h",
+    ],
+    deps = [
+        "@eigen//:eigen",
+    ],
+)
+
 cpplint()
