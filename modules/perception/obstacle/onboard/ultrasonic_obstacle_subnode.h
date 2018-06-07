@@ -27,6 +27,8 @@
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/perception/proto/perception_ultrasonic.pb.h"
+#include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/onboard/common_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 
 namespace apollo {
@@ -44,6 +46,9 @@ class UltrasonicObstacleSubnode : public Subnode {
 
  private:
   void OnUltrasonic(const apollo::canbus::Chassis& message);
+
+  bool PublishDataAndEvent(
+    const double timestamp, const SharedDataPtr<SensorObjects>& data);
 
   bool InitInternal() override;
 
