@@ -1,7 +1,7 @@
 modules {
   name: "GPS"
   process_conf {
-    process_cmd_keywords: "gnss_nodelet_manager"
+    process_cmd_keywords: "modules/drivers/gnss/gnss"
   }
 }
 modules {

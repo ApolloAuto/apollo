@@ -9,7 +9,7 @@ PERCEPTION      perception_obstacle_pb2.PerceptionObstacles() /apollo/perception
 PREDICTION      prediction_obstacle_pb2.PredictionObstacles() /apollo/prediction            200
 PAD             pad_msg_pb2.PadMessage()                /apollo/control/pad                 500
 ODOMETRY        gps_pb2.Gps()                           /apollo/sensor/gnss/odometry        10
-IMU             imu_pb2.Imu()                           /apollo/sensor/gnss/corrected_imu   10
+IMU             imu_pb2.CorrectedImu()                  /apollo/sensor/gnss/corrected_imu   10
 ROUTING_RES     routing_pb2.RoutingResponse()           /apollo/routing_response            1
 ROUTING_REQ     routing_pb2.RoutingRequest()            /apollo/routing_request             1
 MOBILEYE        mobileye_pb2.Mobileye()                 /apollo/sensor/mobileye             100
