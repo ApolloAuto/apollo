@@ -5,6 +5,7 @@ package apollo.canbus;
 import "modules/common/proto/header.proto";
 import "modules/common/proto/vehicle_signal.proto";
 import "modules/common/proto/drive_state.proto";
+import "modules/common/proto/geometry.proto";
 
 // next id :31
 message Chassis {
@@ -153,6 +154,12 @@ enum WheelSpeedType {
   optional double wheel_spd_fl = 12 [default = 0.0];
 }
 
+message Sonar {
+  optional double range = 1;  // Meter
+  optional apollo.common.Point3D translation = 2;  // Meter
+  optional apollo.common.Quaternion rotation = 3;
+}
+
 message Surround {
   optional bool cross_traffic_alert_left = 1;
   optional bool cross_traffic_alert_left_enabled = 2;
@@ -177,4 +184,5 @@ message Surround {
   optional bool sonar_enabled = 21;
   optional bool sonar_fault = 22;
   repeated double sonar_range = 23;
+  repeated Sonar sonar = 24;
 }
