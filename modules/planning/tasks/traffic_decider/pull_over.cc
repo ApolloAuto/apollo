@@ -60,6 +60,12 @@ Status PullOver::ApplyRule(Frame* const frame,
     return Status::OK();
   }
 
+  if (IsPullOverComplete()) {
+    auto* planning_state = GetPlanningStatus()->mutable_planning_state();
+    planning_state->mutable_pull_over()->set_status(PullOverStatus::DONE);
+    return Status::OK();
+  }
+
   common::PointENU stop_point;
   if (GetPullOverStop(&stop_point) != 0) {
     BuildInLaneStop(stop_point);
@@ -98,11 +104,11 @@ PullOver::ValidateStopPointCode PullOver::IsValidStop(
   }
 
   // note: this check has to be done first
-  auto pull_over = GetPlanningStatus()->planning_state().pull_over();
-  if (pull_over.has_inlane_dest_point()) {
+  auto pull_over_status = GetPlanningStatus()->planning_state().pull_over();
+  if (pull_over_status.has_inlane_dest_point()) {
     common::SLPoint dest_point_sl;
-    reference_line.XYToSL({pull_over.inlane_dest_point().x(),
-      pull_over.inlane_dest_point().y()}, &dest_point_sl);
+    reference_line.XYToSL({pull_over_status.inlane_dest_point().x(),
+      pull_over_status.inlane_dest_point().y()}, &dest_point_sl);
     if (stop_point_sl.s() - dest_point_sl.s() >
         config_.pull_over().max_check_distance()) {
       return PASS_DEST_POINT_TOO_FAR;
@@ -114,10 +120,14 @@ PullOver::ValidateStopPointCode PullOver::IsValidStop(
     return BEHIND_ADC;
   }
 
-  // if (stop_point_sl.s() - adc_front_edge_s <
-  //    config_.pull_over().operation_length()) {
-  //  return PLAN_DISTANCE_NOT_ENOUGH;
-  // }
+  if (pull_over_status.status() != PullOverStatus::IN_OPERATION) {
+    const double adc_front_edge_s =
+        reference_line_info_->AdcSlBoundary().end_s();
+    if (stop_point_sl.s() - adc_front_edge_s <
+        config_.pull_over().operation_length()) {
+      return PLAN_DISTANCE_NOT_ENOUGH;
+    }
+  }
 
   // parking spot boundary
   const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
@@ -429,6 +439,37 @@ int PullOver::FindPullOverStop(PointENU* stop_point) {
   return -1;
 }
 
+bool PullOver::IsPullOverComplete() {
+  double adc_speed = reference_line_info_->AdcPlanningPoint().v();
+  if (adc_speed > config_.pull_over().max_stop_speed()) {
+    ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
+    return false;
+  }
+
+  auto pull_over_status = GetPlanningStatus()->planning_state().pull_over();
+  if (!pull_over_status.has_stop_point()) {
+    return false;
+  }
+
+  PointENU stop_point;
+  stop_point.set_x(pull_over_status.stop_point().x());
+  stop_point.set_y(pull_over_status.stop_point().y());
+
+  common::SLPoint stop_point_sl;
+  const auto& reference_line = reference_line_info_->reference_line();
+  reference_line.XYToSL(stop_point, &stop_point_sl);
+
+  // check stop close enough to stop line of the stop_sign
+  double adc_front_edge_s = reference_line_info_->AdcSlBoundary().end_s();
+  if (stop_point_sl.s() - adc_front_edge_s >
+      config_.pull_over().max_valid_stop_distance()) {
+    ADEBUG << "not a valid stop. too far from stop line.";
+    return false;
+  }
+
+  return true;
+}
+
 int PullOver::BuildPullOverStop(const PointENU& stop_point) {
   const auto& reference_line = reference_line_info_->reference_line();
   common::SLPoint stop_point_sl;
@@ -471,10 +512,10 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
   bool inlane_stop_point_set = false;
 
   // use inlane_dest_point if already set
-  auto pull_over = GetPlanningStatus()->planning_state().pull_over();
-  if (pull_over.has_inlane_dest_point()) {
-    reference_line.XYToSL({pull_over.inlane_dest_point().x(),
-                          pull_over.inlane_dest_point().y()},
+  auto pull_over_status = GetPlanningStatus()->planning_state().pull_over();
+  if (pull_over_status.has_inlane_dest_point()) {
+    reference_line.XYToSL({pull_over_status.inlane_dest_point().x(),
+      pull_over_status.inlane_dest_point().y()},
                           &stop_point_sl);
     if (stop_point_sl.s() - adc_front_edge_s >
         config_.pull_over().plan_distance()) {
@@ -482,7 +523,7 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
       ADEBUG << "BuildInLaneStop using inlane_dest_point: s["
           << stop_point_sl.s() << "] dist["
           << stop_point_sl.s() - adc_front_edge_s
-          << "] POINT:" << pull_over.inlane_dest_point().DebugString();
+          << "] POINT:" << pull_over_status.inlane_dest_point().DebugString();
     }
   }
 

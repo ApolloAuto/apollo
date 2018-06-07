@@ -85,6 +85,8 @@ class PullOver : public TrafficRule {
   ValidateStopPointCode IsValidStop(const common::PointENU& stop_point) const;
   ValidateStopPointCode IsValidStop(const common::SLPoint& stop_point_sl) const;
 
+  bool IsPullOverComplete();
+
   int BuildPullOverStop(const common::PointENU& stop_point);
   int BuildInLaneStop(const common::PointENU& pull_over_stop_point);
   int BuildStopDecision(const std::string& vistual_obstacle_id_postfix,
