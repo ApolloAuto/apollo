@@ -102,7 +102,8 @@ void Guardian::ByPassControlCommand() {
 }
 
 void Guardian::TriggerSafetyMode() {
-  ADEBUG << "Received chassis data: run chassis callback.";
+  AINFO << "Safety state triggered, with system safety mode trigger time : "
+        << system_status_.safety_mode_trigger_time();
   std::lock_guard<std::mutex> lock(mutex_);
   bool sensor_malfunction = false, obstacle_detected = false;
   if (!chassis_.surround().sonar_enabled() ||
@@ -127,6 +128,12 @@ void Guardian::TriggerSafetyMode() {
   guardian_cmd_.mutable_control_command()->set_steering_target(0.0);
   guardian_cmd_.mutable_control_command()->set_steering_rate(0.0);
   guardian_cmd_.mutable_control_command()->set_is_in_safe_mode(true);
+
+  // TODO(QiL) : Remove this one once hardware re-alignment is done.
+  sensor_malfunction = false;
+  obstacle_detected = false;
+  AINFO << "Temperarily ignore the ultrasonic sensor output during hardware "
+           "re-alignment!";
 
   if (system_status_.require_emergency_stop() || sensor_malfunction ||
       obstacle_detected) {

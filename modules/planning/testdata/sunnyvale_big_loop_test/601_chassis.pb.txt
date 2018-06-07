@@ -1,45 +1,45 @@
 engine_started: true
 engine_rpm: 0
-speed_mps: 11.025
+speed_mps: 10.897223
 odometer_m: 0
 fuel_range_m: 0
-throttle_percentage: 21.693752
+throttle_percentage: 22.560463
 brake_percentage: 13.891813
-steering_percentage: 0.17021276
-steering_torque_nm: -0.1875
+steering_percentage: -0.19148937
+steering_torque_nm: -0.0625
 parking_brake: false
 driving_mode: COMPLETE_AUTO_DRIVE
 error_code: NO_ERROR
 gear_location: GEAR_DRIVE
 header {
-  timestamp_sec: 1526490049.1234806
+  timestamp_sec: 1526490046.8840959
   module_name: "chassis"
-  sequence_num: 136344
+  sequence_num: 136120
 }
 signal {
   turn_signal: TURN_NONE
   horn: false
 }
 chassis_gps {
-  latitude: 37.413602666666662
-  longitude: -122.01550933333333
+  latitude: 37.413551999999996
+  longitude: -122.01526399999999
   gps_valid: true
   year: 18
   month: 5
   day: 16
   hours: 17
   minutes: 0
-  seconds: 48
+  seconds: 46
   compass_direction: 270
   pdop: 1
   is_gps_fault: false
   is_inferred: false
   altitude: -42.5
-  heading: 285.06
+  heading: 284.67
   hdop: 0.60000000000000009
   vdop: 0.8
   quality: FIX_3D
-  num_satellites: 19
+  num_satellites: 18
   gps_speed: 10.72896
 }
 engage_advice {
@@ -48,14 +48,14 @@ engage_advice {
 wheel_speed {
   is_wheel_spd_rr_valid: true
   wheel_direction_rr: FORWARD
-  wheel_spd_rr: 33.480000000000004
+  wheel_spd_rr: 33.08
   is_wheel_spd_rl_valid: true
   wheel_direction_rl: FORWARD
-  wheel_spd_rl: 33.44
+  wheel_spd_rl: 33.160000000000004
   is_wheel_spd_fr_valid: true
   wheel_direction_fr: FORWARD
-  wheel_spd_fr: 33.6
+  wheel_spd_fr: 33.08
   is_wheel_spd_fl_valid: true
   wheel_direction_fl: FORWARD
-  wheel_spd_fl: 33.68
+  wheel_spd_fl: 33.160000000000004
 }
