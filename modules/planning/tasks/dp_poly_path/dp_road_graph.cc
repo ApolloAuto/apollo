@@ -280,6 +280,8 @@ bool DPRoadGraph::SamplePathWaypoints(
   }
   if (status->planning_state().has_pull_over() &&
       status->planning_state().pull_over().in_pull_over()) {
+    status->mutable_planning_state()->mutable_pull_over()->set_status(
+        PullOverStatus::IN_OPERATION);
     const auto &start_point =
         status->planning_state().pull_over().start_point();
     SLPoint start_point_sl;
