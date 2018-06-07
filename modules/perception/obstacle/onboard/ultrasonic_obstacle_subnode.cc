@@ -30,7 +30,7 @@ void UltrasonicObstacleSubnode::OnUltrasonic(
   std::shared_ptr<SensorObjects> sensor_objects(new SensorObjects);
   double timestamp = message.header().timestamp_sec();
   sensor_objects->timestamp = timestamp;
-  // TODO(all) set sensor_objects->sensor_type
+  sensor_objects->sensor_type = SensorType::ULTRASONIC;
   sensor_objects->sensor_id = device_id_;
   sensor_objects->seq_num = seq_num_;
 
