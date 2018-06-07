@@ -23,7 +23,7 @@
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/monitor/common/monitor_manager.h"
 
-DEFINE_double(safety_mode_seconds_before_estop, 15.0,
+DEFINE_double(safety_mode_seconds_before_estop, 10.0,
               "Interval before sending estop after we found critical errors.");
 
 namespace apollo {
@@ -56,24 +56,15 @@ void SafetyManager::CheckSafety(const double current_time) {
   }
 
   // Newly entered safety mode.
+  system_status->set_passenger_msg("Error! Please disengage.");
   if (!system_status->has_safety_mode_trigger_time()) {
-    static const std::string kWarningMessageOnSafetyMode =
-        "Please disengage! Please disengage!";
-    system_status->set_passenger_msg(kWarningMessageOnSafetyMode);
     system_status->set_safety_mode_trigger_time(current_time);
     return;
   }
 
-  // Count down from 10 seconds, and trigger EStop if no action was taken.
-  const int estop_count_down = static_cast<int>(
-      system_status->safety_mode_trigger_time() +
-      FLAGS_safety_mode_seconds_before_estop - current_time);
-  if (estop_count_down > 0) {
-    // Send counting down.
-    system_status->set_passenger_msg(std::to_string(estop_count_down));
-  } else {
-    // Trigger EStop.
-    system_status->set_passenger_msg("Emergency stop. Please disengage!");
+  // Trigger EStop if no action was taken in time.
+  if (system_status->safety_mode_trigger_time() +
+      FLAGS_safety_mode_seconds_before_estop > current_time) {
     system_status->set_require_emergency_stop(true);
   }
 }
