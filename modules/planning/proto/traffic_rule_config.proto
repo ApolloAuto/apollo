@@ -52,7 +52,7 @@ message DestinationConfig {
   optional double stop_distance = 2 [ default=0.5 ]; // meter
   // distance to stop point to start planning pull over
   // TODO(all): must be in sync with the same config in PULL_OVER will remove
-  optional double pull_over_plan_distance = 3 [default=25.0];
+  optional double pull_over_plan_distance = 3 [default=35.0];
 }
 
 message FrontVehicleConfig {
@@ -79,9 +79,9 @@ message PullOverConfig {
   // l-distance buffer to road/lane boundary
   optional double buffer_to_boundary = 2 [default=0.5];
   // distance to stop point to start planning pull over
-  optional double plan_distance = 3 [default=25.0];
+  optional double plan_distance = 3 [default=35.0];
   // s_distance to beteeen start and stop points
-  optional double operation_length = 4 [ default=20.0 ]; // meter
+  optional double operation_length = 4 [ default=30.0 ]; // meter
   // max s_distance to check ahead while planning pull over
   optional double max_check_distance = 5 [ default=60.0]; // meter
   // max failure count before changing to stop in-lane
