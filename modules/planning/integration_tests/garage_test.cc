@@ -61,7 +61,8 @@ TEST_F(GarageTest, stop_obstacle) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST(0);
@@ -74,10 +75,12 @@ TEST_F(GarageTest, follow) {
   FLAGS_test_prediction_file = "follow_prediction.pb.txt";
   FLAGS_test_localization_file = "follow_localization.pb.txt";
   FLAGS_test_chassis_file = "follow_chassis.pb.txt";
+
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST(0);
@@ -96,7 +99,8 @@ TEST_F(GarageTest, dest_stop_01) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST(0);
@@ -125,7 +129,8 @@ TEST_F(GarageTest, stop_over_line) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = PlanningTestBase::GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST(0);
