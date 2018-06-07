@@ -114,6 +114,7 @@ cc_library(
         "//modules/planning/common:planning_util",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_status_proto",
+        "//modules/common/vehicle_state:vehicle_state_provider",
     ],
 )
 

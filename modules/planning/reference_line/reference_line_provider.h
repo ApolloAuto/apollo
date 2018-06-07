@@ -32,6 +32,7 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
+#include <unordered_set>
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
@@ -142,6 +143,15 @@ class ReferenceLineProvider {
       const relative_map::MapMsg& relative_map,
       std::list<ReferenceLine>* reference_line,
       std::list<hdmap::RouteSegments>* segments);
+
+  /**
+   * @brief This function get adc lane info from navigation path and map
+   * by vehicle state.
+   */
+  bool GetNearestWayPointFromNavigationPath(
+       const common::VehicleState &state,
+       const std::unordered_set<std::string> &navigation_lane_ids,
+       hdmap::LaneWaypoint *waypoint);
 
  private:
   bool is_initialized_ = false;
