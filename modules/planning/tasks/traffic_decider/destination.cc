@@ -208,9 +208,12 @@ bool Destination::CheckPullOver(
   ADEBUG << "adc_front_edge_s[" << adc_front_edge_s
       << "] distance_to_dest[" << distance_to_dest
       << "] dest_lane[" << lane_id << "] dest_lane_s[" << dest_lane_s << "]";
+
   if (distance_to_dest > config_.pull_over().plan_distance()) {
+    // to far, not sending pull-over yet
     return false;
   }
+
 
   return true;
 }

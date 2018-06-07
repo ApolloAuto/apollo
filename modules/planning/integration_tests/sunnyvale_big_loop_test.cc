@@ -606,8 +606,8 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   destination_config->mutable_destination()->set_enable_pull_over(true);
 
   auto* pull_over_config = PlanningTestBase::GetPullOverConfig();
-  pull_over_config->mutable_pull_over()->set_plan_distance(20.0);
-  pull_over_config->mutable_pull_over()->set_operation_length(15.0);
+  pull_over_config->mutable_pull_over()->set_plan_distance(35.0);
+  pull_over_config->mutable_pull_over()->set_operation_length(10.0);
 
   RUN_GOLDEN_TEST_DECISION(0);
 
@@ -643,6 +643,56 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   EXPECT_DOUBLE_EQ(stop_point_0.y(), stop_point_1.y());
   EXPECT_DOUBLE_EQ(stop_point_heading_0, stop_point_heading_1);
   EXPECT_DOUBLE_EQ(status_set_time_0, status_set_time_1);
+}
+
+/*
+ * destination: stop inlane while pull over fails
+ * bag: 2018-05-16-10-00-32/2018-05-16-10-00-32_10.bag
+ * decision: STOP
+ */
+TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
+  ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
+  ENABLE_RULE(TrafficRuleConfig::DESTINATION, true);
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
+  ENABLE_RULE(TrafficRuleConfig::PULL_OVER, true);
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+
+  std::string seq_num = "601";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  PlanningTestBase::SetUp();
+
+  // set config
+  auto* destination_config = PlanningTestBase::GetDestinationConfig();
+  destination_config->mutable_destination()->set_enable_pull_over(true);
+
+  auto* pull_over_config = PlanningTestBase::GetPullOverConfig();
+  pull_over_config->mutable_pull_over()->set_plan_distance(35.0);
+  pull_over_config->mutable_pull_over()->set_operation_length(10.0);
+
+  // step 1: pull over
+  RUN_GOLDEN_TEST_DECISION(0);
+
+  // check PlanningStatus value: PULL OVER
+  auto* planning_state = GetPlanningStatus()->mutable_planning_state();
+  EXPECT_TRUE(planning_state->has_pull_over() &&
+              planning_state->pull_over().in_pull_over());
+  EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
+
+  // step 2: pull over failed, stop inlane
+
+  // set config
+  pull_over_config->mutable_pull_over()->set_plan_distance(10.0);
+  pull_over_config->mutable_pull_over()->set_max_check_distance(30.0);
+
+  // check PULL OVER decision
+  RUN_GOLDEN_TEST_DECISION(1);
+
+  // check PlanningStatus value: PULL OVER  cleared
+  EXPECT_FALSE(planning_state->has_pull_over());
 }
 
 /*
