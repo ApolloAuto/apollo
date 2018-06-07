@@ -2004,13 +2004,13 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
   glColor3f(1.0, 0.5, 0.17);
   for (auto obj : objects) {
     glBegin(GL_LINE_STRIP);
-    AINFO << "obj->track_id: " << obj->track_id;
-    AINFO << "obj->drops.size(): " << obj->drops.size();
+    // AINFO << "obj->track_id: " << obj->track_id;
+    // AINFO << "obj->drops.size(): " << obj->drops.size();
     for (auto drop : obj->drops) {
-      AINFO << "drop: (" << drop[0]
-            << ", " << drop[1]
-            << ", " << drop[2]
-            << ")";
+      // AINFO << "drop: (" << drop[0]
+      //       << ", " << drop[1]
+      //       << ", " << drop[2]
+      //       << ")";
       glVertex3f(drop[0], drop[1], drop[2]);
     }
     glEnd();
