@@ -26,6 +26,12 @@ modules {
   }
 }
 modules {
+  name: "guardian"
+  process_conf {
+    process_cmd_keywords: "modules/guardian/guardian"
+  }
+}
+modules {
   name: "navigation_camera"
   process_conf {
     process_cmd_keywords: "camera_nodelet_manager"
