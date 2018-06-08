@@ -59,12 +59,12 @@ class UltrasonicObstacleSubnode : public Subnode {
   bool set_ultrasonic_type(const std::string& type);
 
   void BuildSingleObject(
-    const apollo::canbus::Sonar& sonar_message,
-    std::shared_ptr<Object> object);
+      const apollo::canbus::Sonar& sonar_message,
+      std::shared_ptr<Object> object_ptr);
 
   void BuildAllObjects(
-    const apollo::canbus::Surround& surround,
-    std::shared_ptr<SensorObjects> sensor_objects);
+      const apollo::canbus::Surround& surround,
+      std::shared_ptr<SensorObjects> sensor_objects);
 
  private:
   uint32_t seq_num_;
