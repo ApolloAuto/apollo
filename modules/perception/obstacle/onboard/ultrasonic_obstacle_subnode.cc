@@ -16,15 +16,20 @@
 
 #include "modules/perception/obstacle/onboard/ultrasonic_obstacle_subnode.h"
 
+#include <cmath>
 #include <utility>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
+#include "modules/common/math/quaternion.h"
 #include "modules/common/time/timer.h"
-#include "modules/perception/onboard/subnode_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/perception/onboard/subnode_helper.h"
 
 namespace apollo {
 namespace perception {
+
+using apollo::common::VehicleStateProvider;
 
 void UltrasonicObstacleSubnode::OnUltrasonic(
     const apollo::canbus::Chassis& message) {
@@ -57,8 +62,6 @@ bool UltrasonicObstacleSubnode::PublishDataAndEvent(
     return false;
   }
 
-  // TODO(all) processing_data_->Add(key, data);
-
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
     const EventMeta& event_meta = pub_meta_events_[idx];
     Event event;
@@ -72,9 +75,68 @@ bool UltrasonicObstacleSubnode::PublishDataAndEvent(
 }
 
 void UltrasonicObstacleSubnode::BuildSingleObject(
-    const apollo::canbus::Sonar& sonar_message,
-    std::shared_ptr<Object> object) {
-  // TODO(kechxu) implement
+    const apollo::canbus::Sonar& sonar,
+    std::shared_ptr<Object> object_ptr) {
+  object_ptr->track_id = 0;
+  object_ptr->type = ObjectType::UNKNOWN;
+  object_ptr->velocity = {0.0, 0.0, 0.0};
+  double vehicle_x = VehicleStateProvider::instance()->x();
+  double vehicle_y = VehicleStateProvider::instance()->y();
+  double vehicle_z = VehicleStateProvider::instance()->z();
+  double vehicle_heading = VehicleStateProvider::instance()->heading();
+  double sonar_x = vehicle_x + sonar.translation().x();
+  double sonar_y = vehicle_y + sonar.translation().y();
+  double sonar_z = vehicle_z + sonar.translation().z();
+  double sonar_relative_heading = apollo::common::math::QuaternionToHeading(
+      sonar.rotation().qw(), sonar.rotation().qx(),
+      sonar.rotation().qy(), sonar.rotation().qz());
+  double sonar_heading = vehicle_heading + sonar_relative_heading;
+  double sonar_obs_x = sonar_x + sonar.range() * std::cos(sonar_heading);
+  double sonar_obs_y = sonar_y + sonar.range() * std::cos(sonar_heading);
+  double half_width = 0.2;  // TODO(kechxu) refactor
+  double length = 0.2;  // TODO(kechxu) refactor
+  double alpha = sonar_heading - M_PI / 2.0;
+  std::vector<std::pair<double, double>> vertices;
+  double near_left_x = sonar_obs_x - half_width * half_width * std::cos(alpha);
+  double near_left_y = sonar_obs_y - half_width * half_width * std::sin(alpha);
+  double near_right_x = sonar_obs_x + half_width * half_width * std::cos(alpha);
+  double near_right_y = sonar_obs_y + half_width * half_width * std::sin(alpha);
+  vertices.emplace_back(near_left_x, near_left_y);
+  vertices.emplace_back(near_right_x, near_right_y);
+  vertices.emplace_back(
+      near_right_x + length * std::cos(sonar_heading),
+      near_right_y + length * std::sin(sonar_heading));
+  vertices.emplace_back(
+      near_left_x + length * std::cos(sonar_heading),
+      near_left_y + length * std::sin(sonar_heading));
+
+  auto& polygon = object_ptr->polygon;
+  polygon.resize(vertices.size());
+  for (std::size_t i = 0; i < vertices.size(); ++i) {
+    polygon.points[i].x = vertices[i].first;
+    polygon.points[i].y = vertices[i].second;
+    polygon.points[i].z = sonar_z;
+  }
+  CHECK_GT(polygon.points.size(), 0);
+  object_ptr->theta = sonar_heading;
+  Eigen::Vector3d direction(std::cos(sonar_heading),
+                            std::sin(sonar_heading), 0.0);
+  object_ptr->direction = direction;
+  object_ptr->length = length;
+  object_ptr->width = 2.0 * half_width;
+  object_ptr->height = sonar_z;
+  double anchor_x = 0.0;
+  double anchor_y = 0.0;
+  for (size_t i = 0; i < polygon.points.size(); ++i) {
+    anchor_x += polygon.points[i].x;
+    anchor_y += polygon.points[i].y;
+  }
+  anchor_x /= static_cast<double>(polygon.points.size());
+  anchor_y /= static_cast<double>(polygon.points.size());
+  double anchor_z = 0.5 * sonar_z;
+  Eigen::Vector3d anchor_point(anchor_x, anchor_y, anchor_z);
+  object_ptr->anchor_point = anchor_point;
+  // TODO(kechxu) object_ptr->score_type
 }
 
 void UltrasonicObstacleSubnode::BuildAllObjects(
