@@ -306,6 +306,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/configs:config_gflags",
         "//modules/common/adapters:adapter_manager",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
