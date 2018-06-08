@@ -119,6 +119,17 @@ VelodyneDriver* VelodyneDriverFactory::create_driver(
   private_nh.param("positioning_data_port", config.positioning_data_port,
                    POSITIONING_DATA_PORT);
   private_nh.param("rpm", config.rpm, 600.0);
+  private_nh.param("prefix_angle", config.prefix_angle, 18000);
+
+  if (config.prefix_angle > 35900 || config.prefix_angle < 100) {
+    ROS_WARN_STREAM(
+        "invalid prefix angle, prefix_angle must be between 100 and 35900");
+    if (config.prefix_angle > 35900) {
+      config.prefix_angle = 35900;
+    } else if (config.prefix_angle < 100) {
+      config.prefix_angle = 100;
+    }
+  }
 
   if (config.model == "64E_S2" || config.model == "64E_S3S" ||
       config.model == "64E_S3D_STRONGEST" || config.model == "64E_S3D_LAST" ||
