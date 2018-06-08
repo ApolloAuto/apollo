@@ -16,9 +16,12 @@
 
 #include "modules/perception/obstacle/onboard/ultrasonic_obstacle_subnode.h"
 
+#include <utility>
+
 #include "modules/common/log.h"
 #include "modules/common/time/timer.h"
 #include "modules/perception/onboard/subnode_helper.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 namespace apollo {
 namespace perception {
@@ -34,7 +37,7 @@ void UltrasonicObstacleSubnode::OnUltrasonic(
   sensor_objects->sensor_id = device_id_;
   sensor_objects->seq_num = seq_num_;
 
-  // TODO(all) transform message to object and insert into sensor_objects
+  BuildAllObjects(message.surround(), sensor_objects);
 
   if (!PublishDataAndEvent(timestamp, sensor_objects)) {
     AERROR << "Failed to publish data.";
@@ -66,6 +69,22 @@ bool UltrasonicObstacleSubnode::PublishDataAndEvent(
   }
 
   return true;
+}
+
+void UltrasonicObstacleSubnode::BuildSingleObject(
+    const apollo::canbus::Sonar& sonar_message,
+    std::shared_ptr<Object> object) {
+  // TODO(kechxu) implement
+}
+
+void UltrasonicObstacleSubnode::BuildAllObjects(
+    const apollo::canbus::Surround& surround,
+    std::shared_ptr<SensorObjects> sensor_objects) {
+  for (const auto& sonar : surround.sonar()) {
+    std::shared_ptr<Object> object_ptr(new Object);
+    BuildSingleObject(sonar, object_ptr);
+    sensor_objects->objects.push_back(std::move(object_ptr));
+  }
 }
 
 }  // namespace perception
