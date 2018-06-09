@@ -58,7 +58,7 @@ class Queue {
   }
   bool push(T &&value) {
     std::lock_guard<std::mutex> lock(mutex_);
-    q_.emplace(std::move(value));
+    q_.emplace_back(std::move(value));
     return true;
   }
   // deletes the retrieved element, do not use for non integral types
@@ -197,7 +197,7 @@ class ThreadPool {
     auto _f = std::make_shared<std::function<void(int id)>>(
         [pck](int id) { (*pck)(id); });
     // It is not necessary to lock q_ because it is locked in the Queue class.
-    q_.push(std::move(_f));
+    q_.push(_f);
     cv_.notify_one();
 
     return pck->get_future();
@@ -214,7 +214,7 @@ class ThreadPool {
     auto _f = std::make_shared<std::function<void(int id)>>(
         [pck](int id) { (*pck)(id); });
     // It is not necessary to lock q_ because it is locked in the Queue class.
-    q_.push(std::move(_f));
+    q_.push(_f);
     cv_.notify_one();
 
     return pck->get_future();
