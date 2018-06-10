@@ -16,13 +16,9 @@
 
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
 
-#include "modules/common/time/time_util.h"
-#include "modules/perception/cuda_util/util.h"
-
 namespace apollo {
 namespace perception {
 
-const float lane_mask_confidence_thresh = 0.5;
 using apollo::common::adapter::AdapterManager;
 
 bool CameraProcessSubnode::InitInternal() {
@@ -31,7 +27,8 @@ bool CameraProcessSubnode::InitInternal() {
   SubnodeHelper::ParseReserveField(reserve_, &fields);
 
   if (fields.count("device_id")) device_id_ = fields["device_id"];
-  if (fields.count("publish") && stoi(fields["publish"])) publish_ = true;
+  if (fields.count("pb_obj") && stoi(fields["pb_obj"])) pb_obj_ = true;
+  if (fields.count("pb_ln_msk") && stoi(fields["pb_ln_msk"])) pb_ln_msk_ = true;
 
   // Shared Data
   cam_obj_data_ = static_cast<CameraObjectData *>(
@@ -45,11 +42,10 @@ bool CameraProcessSubnode::InitInternal() {
 
   AdapterManager::AddImageFrontCallback(&CameraProcessSubnode::ImgCallback,
                                         this);
-  if (publish_) {
+  if (pb_obj_) {
     AdapterManager::AddChassisCallback(&CameraProcessSubnode::ChassisCallback,
                                        this);
   }
-
   return true;
 }
 
@@ -128,15 +124,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
 
   detector_->Multitask(img, CameraDetectorOptions(), &objects, &mask);
   PERF_BLOCK_END("CameraProcessSubnode_detector_");
-  if (publish_) {
-    sensor_msgs::Image lane_mask_msg;
-    lane_mask_msg.header = message.header;
-    lane_mask_msg.header.frame_id = "lane_mask";
-    if (!MatToMessage(mask, &lane_mask_msg)) {
-      AERROR << "unable to publish lane mask topic message";
-    }
-    common::adapter::AdapterManager::PublishPerceptionLaneMask(lane_mask_msg);
-  }
+
   converter_->Convert(&objects);
   PERF_BLOCK_END("CameraProcessSubnode_converter_");
 
@@ -166,12 +154,12 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
   PublishDataAndEvent(timestamp, out_objs, camera_item_ptr);
   PERF_BLOCK_END("CameraProcessSubnode publish in DAG");
 
-  if (publish_) PublishPerceptionPb(out_objs);
+  if (pb_obj_) PublishPerceptionPbObj(out_objs);
+  if (pb_ln_msk_) PublishPerceptionPbLnMsk(mask, message);
 }
 
 void CameraProcessSubnode::ChassisCallback(
     const apollo::canbus::Chassis &message) {
-  std::lock_guard<std::mutex> lock(camera_mutex_);
   chassis_.CopyFrom(message);
 }
 
@@ -192,33 +180,26 @@ bool CameraProcessSubnode::MessageToMat(const sensor_msgs::Image &msg,
 }
 
 bool CameraProcessSubnode::MatToMessage(const cv::Mat& img,
-                                          sensor_msgs::Image *msg) {
+                                        sensor_msgs::Image *msg) {
   if (img.type() == CV_8UC1) {
-    sensor_msgs::fillImage(*msg,
-                            sensor_msgs::image_encodings::MONO8,
-                            img.rows,  // height
-                            img.cols,  // width
-                            static_cast<unsigned int>(img.step),  // stepSize
-                            img.data);
+    sensor_msgs::fillImage(*msg, sensor_msgs::image_encodings::MONO8,
+                           img.rows, img.cols,
+                           static_cast<unsigned int>(img.step), img.data);
     return true;
   } else if (img.type() == CV_32FC1) {
-    // confidence heatmap
-    ADEBUG << "confidence threshold = " << lane_mask_confidence_thresh;
     cv::Mat uc_img(img.rows, img.cols, CV_8UC1);
     uc_img.setTo(cv::Scalar(0));
     for (int h = 0; h < uc_img.rows; ++h) {
       for (int w = 0; w < uc_img.cols; ++w) {
-        if (img.at<float>(h, w) >= lane_mask_confidence_thresh) {
+        if (img.at<float>(h, w) >= ln_msk_threshold_) {
           uc_img.at<unsigned char>(h, w) = 1;
         }
       }
     }
-    sensor_msgs::fillImage(*msg,
-                            sensor_msgs::image_encodings::MONO8,
-                            uc_img.rows,  // height
-                            uc_img.cols,  // width
-                            static_cast<unsigned int>(uc_img.step),  // stepSize
-                            uc_img.data);
+
+    sensor_msgs::fillImage(*msg, sensor_msgs::image_encodings::MONO8,
+                           uc_img.rows, uc_img.cols,
+                           static_cast<unsigned int>(uc_img.step), uc_img.data);
     return true;
   } else {
     AERROR << "invalid input Mat type: " << img.type();
@@ -296,14 +277,12 @@ void CameraProcessSubnode::PublishDataAndEvent(
   }
 }
 
-void CameraProcessSubnode::PublishPerceptionPb(
+void CameraProcessSubnode::PublishPerceptionPbObj(
     const SharedDataPtr<SensorObjects> &sensor_objects) {
-  ADEBUG << "Camera publish perception pb data";
-  std::lock_guard<std::mutex> lock(camera_mutex_);
   PerceptionObstacles obstacles;
 
   // Header
-  common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
+  AdapterManager::FillPerceptionObstaclesHeader(
       "perception_obstacle", &obstacles);
   common::Header *header = obstacles.mutable_header();
   header->set_lidar_timestamp(0);
@@ -323,8 +302,19 @@ void CameraProcessSubnode::PublishPerceptionPb(
                                        chassis_.speed_mps());
   }
 
-  common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
-  ADEBUG << "Camera Obstacles: " << obstacles.ShortDebugString();
+  AdapterManager::PublishPerceptionObstacles(obstacles);
+  ADEBUG << "PublishPerceptionObstacles: " << obstacles.ShortDebugString();
+}
+
+void CameraProcessSubnode::PublishPerceptionPbLnMsk(
+  const cv::Mat& mask, const sensor_msgs::Image &message) {
+  sensor_msgs::Image lane_mask_msg;
+  lane_mask_msg.header = message.header;
+  lane_mask_msg.header.frame_id = "lane_mask";
+  MatToMessage(mask, &lane_mask_msg);
+
+  AdapterManager::PublishPerceptionLaneMask(lane_mask_msg);
+  ADEBUG << "PublishPerceptionLaneMask";
 }
 
 }  // namespace perception

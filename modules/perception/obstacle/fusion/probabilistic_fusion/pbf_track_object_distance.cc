@@ -38,7 +38,7 @@ namespace apollo {
 namespace perception {
 
 float PbfTrackObjectDistance::Compute(
-    const PbfTrackPtr &fused_track,
+    PbfTrackPtr fused_track,
     const std::shared_ptr<PbfSensorObject> &sensor_object,
     const TrackObjectDistanceOptions &options) {
   const SensorType &sensor_type = sensor_object->sensor_type;

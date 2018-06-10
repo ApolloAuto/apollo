@@ -174,3 +174,22 @@ proto_library(
         "low_object_filter_config.proto",
     ],
 )
+
+cc_proto_library(
+    name = "perception_ultrasonic_proto",
+    deps = [
+        ":perception_ultrasonic_lib",
+    ],
+)
+
+proto_library(
+    name = "perception_ultrasonic_lib",
+    srcs = [
+        "perception_ultrasonic.proto",
+    ],
+    deps = [
+        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:error_code_proto_lib",
+        "//modules/common/proto:header_proto_lib",
+    ],
+)

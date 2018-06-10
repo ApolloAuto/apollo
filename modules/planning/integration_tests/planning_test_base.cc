@@ -230,5 +230,15 @@ bool PlanningTestBase::IsValidTrajectory(const ADCTrajectory& trajectory) {
   return true;
 }
 
+TrafficRuleConfig* PlanningTestBase::GetTrafficRuleConfig(
+    const TrafficRuleConfig::RuleId& rule_id) {
+  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+    if (config.rule_id() == rule_id) {
+      return &config;
+    }
+  }
+  return nullptr;
+}
+
 }  // namespace planning
 }  // namespace apollo

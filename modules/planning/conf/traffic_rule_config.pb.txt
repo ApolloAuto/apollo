@@ -36,8 +36,8 @@ config: {
   enabled: true
   destination {
     enable_pull_over: false
-    pull_over_plan_distance: 20.0
     stop_distance: 0.5
+    pull_over_plan_distance: 35.00
   }
 }
 
@@ -67,12 +67,14 @@ config: {
   rule_id: PULL_OVER
   enabled: true
   pull_over {
-    max_stop_deceleration: 2.0
     stop_distance: 0.5
     max_stop_speed: 0.2
-    pull_over_l_buffer: 0.3
-    plan_distance: 20.0
+    max_valid_stop_distance: 3.0
+    buffer_to_boundary: 0.5
+    plan_distance: 35.0
+    operation_length: 30.0
     max_check_distance: 60.0
+    max_failure_count: 10
   }
 }
 
@@ -81,8 +83,7 @@ config: {
   enabled: true
   reference_line_end {
     stop_distance: 0.5
-    stop_acc_to_max_deceleration_ratio: 3.0
-    min_reference_line_remain_length: 10.0
+    min_reference_line_remain_length: 50.0
   }
 }
 

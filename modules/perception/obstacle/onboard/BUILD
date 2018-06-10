@@ -155,6 +155,7 @@ cc_library(
         "//modules/perception/obstacle/fusion/probabilistic_fusion",
         "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
         "//modules/perception/obstacle/lidar/visualizer/opengl_visualizer",
+        "//modules/perception/obstacle/onboard:motion_subnode",
         "//modules/perception/onboard",
         "@ros//:ros_common",
     ],
@@ -288,6 +289,31 @@ cc_library(
         "//modules/perception/obstacle/onboard:motion_subnode",
         "//modules/perception/onboard",
     ],
+)
+
+cc_library(
+    name = "ultrasonic_obstacle_subnode",
+    srcs = [
+        "ultrasonic_obstacle_subnode.cc",
+    ],
+    hdrs = [
+        "ultrasonic_obstacle_subnode.h",
+        "object_shared_data.h",
+    ],
+    deps = [
+        "//modules/perception/proto:perception_ultrasonic_proto",
+        "//modules/common",
+        "//modules/common:log",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/perception/lib/base",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter",
+        "//modules/perception/onboard:onboard",
+        "@eigen//:eigen",
+        "@gtest//:gtest",
+        "@ros//:ros_common",
+    ]
 )
 
 cc_test(

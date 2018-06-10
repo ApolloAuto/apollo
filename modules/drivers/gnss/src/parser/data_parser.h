@@ -50,7 +50,7 @@ class DataParser {
   bool init(const std::string &cfg_file);
 
  private:
-  void raw_data_callback(const std_msgs::String::ConstPtr &msg);
+  void raw_data_callback(std_msgs::String::ConstPtr msg);
   void dispatch_message(Parser::MessageType type, MessagePtr message);
   void publish_ins_stat(const MessagePtr message);
   void publish_odometry_message(const MessagePtr message);

@@ -44,44 +44,32 @@ SafetyManager::SafetyManager() {
 void SafetyManager::CheckSafety(const double current_time) {
   auto *system_status = MonitorManager::GetStatus();
   // Everything looks good or has been handled properly.
-  if (!ShouldTriggerSafeMode()) {
+  if (!ShouldTriggerSafeMode(current_time)) {
     system_status->clear_passenger_msg();
     system_status->clear_safety_mode_trigger_time();
+    system_status->clear_require_emergency_stop();
+    return;
+  }
+  if (system_status->require_emergency_stop()) {
+    // EStop has already been triggered.
     return;
   }
 
   // Newly entered safety mode.
+  system_status->set_passenger_msg("Error! Please disengage.");
   if (!system_status->has_safety_mode_trigger_time()) {
-    static const std::string kWarningMessageOnSafetyMode =
-        "Please disengage! Please disengage! Please disengage!";
-    system_status->set_passenger_msg(kWarningMessageOnSafetyMode);
     system_status->set_safety_mode_trigger_time(current_time);
     return;
   }
 
-  const int estop_count_down = static_cast<int>(
-      system_status->safety_mode_trigger_time() +
-      FLAGS_safety_mode_seconds_before_estop - current_time);
-  if (estop_count_down > 0) {
-    // Send counting down.
-    system_status->set_passenger_msg(std::to_string(estop_count_down));
-  } else {
-    // Trigger EStop.
-    system_status->set_passenger_msg("Emergency stop triggered.");
-
-    // TODO(all): Prefer a static "Planning::SendEStop()" helper function for
-    // all use cases.
-    apollo::planning::ADCTrajectory estop_trajectory;
-    auto *estop = estop_trajectory.mutable_estop();
-    estop->set_is_estop(true);
-    estop->set_reason("No proper action was taken for safety mode.");
-
-    AdapterManager::FillPlanningHeader("Monitor", &estop_trajectory);
-    AdapterManager::PublishPlanning(estop_trajectory);
+  // Trigger EStop if no action was taken in time.
+  if (system_status->safety_mode_trigger_time() +
+      FLAGS_safety_mode_seconds_before_estop > current_time) {
+    system_status->set_require_emergency_stop(true);
   }
 }
 
-bool SafetyManager::ShouldTriggerSafeMode() {
+bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
   // We only check safety mode in self driving mode.
   auto* adapter = AdapterManager::GetChassis();
   adapter->Observe();
@@ -89,18 +77,23 @@ bool SafetyManager::ShouldTriggerSafeMode() {
     return false;
   }
 
-  const auto driving_mode = adapter->GetLatestObserved().driving_mode();
-  if (driving_mode != Chassis::COMPLETE_AUTO_DRIVE) {
+  const auto& chassis = adapter->GetLatestObserved();
+  if (chassis.header().timestamp_sec() + FLAGS_system_status_lifetime_seconds <
+      current_time) {
+    // Ignore old messages which should be from replaying.
     return false;
   }
 
-  static const std::string kApolloModeKey = "apollo:dreamview:mode";
-  if (!KVDB::Has(kApolloModeKey)) {
+  if (chassis.driving_mode() != Chassis::COMPLETE_AUTO_DRIVE) {
+    return false;
+  }
+
+  const std::string mode_name = KVDB::Get("apollo:dreamview:mode");
+  if (mode_name.empty()) {
     AERROR << "Cannot get apollo mode";
     return true;
   }
 
-  const std::string mode_name = KVDB::Get(kApolloModeKey);
   const apollo::dreamview::Mode *mode_conf =
       FindOrNull(hmi_config_.modes(), mode_name);
   if (mode_conf == nullptr) {
