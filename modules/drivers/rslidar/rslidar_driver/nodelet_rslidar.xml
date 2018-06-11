@@ -3,7 +3,7 @@
          type="apollo::drivers::rslidar::DriverNodelet"
          base_class_type="nodelet::Nodelet">
     <description> 
-      Publish raw Velodyne data packets.
+      Publish raw rslidar data packets.
     </description>
   </class>
 </library>

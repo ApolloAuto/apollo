@@ -124,7 +124,7 @@ namespace rslidar {
 	static const int TEMPERATURE_MIN = 31;
 	
 	
-	static calibration_parse* calibration__;
+	static calibration_parse* calibration_;
 	typedef struct raw_block {
 		uint16_t header;		///< UPPER_BANK or LOWER_BANK
 		uint8_t rotation_1;

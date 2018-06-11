@@ -30,14 +30,14 @@ namespace rslidar {
 // configuration parameters
 struct Config {
   Config()
-      : npackets(0), rpm(0.0), msop_data_port(0), positioning_data_port(0) {}
+      : npackets(0), rpm(0.0), msop_data_port(0), difop_data_port(0) {}
   std::string frame_id;  ///< tf frame ID
   std::string model;     ///< device model name
   std::string topic;
   int npackets;  ///< number of packets to collect
   double rpm;    ///< device rotation rate (RPMs)
   int msop_data_port;
-  int positioning_data_port;
+  int difop_data_port;
 };
 
 class RslidarDriver {

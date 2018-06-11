@@ -88,3 +88,6 @@ modules/calibration/data/mkz056
 
 # Data bag
 docs/demo_guide/*.bag
+
+# temporary file
+*~
