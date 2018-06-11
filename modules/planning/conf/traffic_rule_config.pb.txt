@@ -37,7 +37,7 @@ config: {
   destination {
     enable_pull_over: false
     stop_distance: 0.5
-    pull_over_plan_distance: 35.00
+    pull_over_plan_distance: 55.00
   }
 }
 
@@ -71,8 +71,8 @@ config: {
     max_stop_speed: 0.2
     max_valid_stop_distance: 3.0
     buffer_to_boundary: 0.5
-    plan_distance: 35.0
-    operation_length: 30.0
+    plan_distance: 55.0
+    operation_length: 50.0
     max_check_distance: 60.0
     max_failure_count: 10
   }
