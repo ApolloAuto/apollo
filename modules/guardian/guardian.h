@@ -53,7 +53,7 @@ class Guardian : public apollo::common::ApolloApp {
   void OnChassis(const apollo::canbus::Chassis& message);
   void OnControl(const apollo::control::ControlCommand& message);
   void OnSystemStatus(const apollo::monitor::SystemStatus& message);
-  void ByPassControlCommand();
+  void PassThroughControlCommand();
   void TriggerSafetyMode();
 
   apollo::canbus::Chassis chassis_;
