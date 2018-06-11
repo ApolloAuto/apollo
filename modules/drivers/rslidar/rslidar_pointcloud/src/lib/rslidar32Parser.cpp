@@ -183,7 +183,7 @@ void rslidar32Parser::unpack(const rslidar_msgs::rslidarPacket &pkt, pcl::PointC
 		{
 			tempPacketNum++;
 		} else {
-			temper = calibration__->computeTemperature(pkt.data[38], pkt.data[39]);
+			temper = calibration_->computeTemperature(pkt.data[38], pkt.data[39]);
 			//ROS_INFO_STREAM("Temp is: " << temper);
 			tempPacketNum = 1;
 		}
@@ -217,7 +217,7 @@ void rslidar32Parser::unpack(const rslidar_msgs::rslidarPacket &pkt, pcl::PointC
 		union two_bytes tmp_flag;
 		tmp_flag.bytes[1] = raw->blocks[block].data[0];
 		tmp_flag.bytes[0] = raw->blocks[block].data[1];
-		int ABflag = calibration__->isABPacket(tmp_flag.uint);
+		int ABflag = calibration_->isABPacket(tmp_flag.uint);
 
 		int k = 0;
 		int index;
@@ -242,14 +242,14 @@ void rslidar32Parser::unpack(const rslidar_msgs::rslidarPacket &pkt, pcl::PointC
 			union two_bytes tmp;
 			tmp.bytes[1] = raw->blocks[block].data[index];
 			tmp.bytes[0] = raw->blocks[block].data[index + 1];
-			int ab_flag_in_block = calibration__->isABPacket(tmp.uint);
+			int ab_flag_in_block = calibration_->isABPacket(tmp.uint);
 			int distance = tmp.uint - ab_flag_in_block * 32768;
 
 			// read intensity
 			intensity = (float) raw->blocks[block].data[index + 2];
-			intensity = calibration__->calibrateIntensity(intensity, dsr, distance);
+			intensity = calibration_->calibrateIntensity(intensity, dsr, distance);
 
-			float distance2 = calibration__->pixelToDistance(distance, dsr);
+			float distance2 = calibration_->pixelToDistance(distance, dsr);
 			distance2 = distance2 * DISTANCE_RESOLUTION;
 
 			pic.distance[point_count] = distance2;

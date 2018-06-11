@@ -41,7 +41,7 @@ void Rslidar32Driver::init(ros::NodeHandle &node) {
   input_.reset(new SocketInput());
   input_->init(config_.msop_data_port);
 
-   output_ = node.advertise<rslidar_msgs::rslidarScan>("rslidar_packets", 10);
+   output_ = node.advertise<rslidar_msgs::rslidarScan>(config_.topic, 10);
   
 }
 
