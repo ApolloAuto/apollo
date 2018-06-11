@@ -79,6 +79,7 @@ cc_library(
         "//modules/common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/constraint_checker:collision_checker",
         "//modules/planning/lattice/trajectory1d:constant_deceleration_trajectory1d",
         "//modules/planning/lattice/trajectory_generation:trajectory1d_generator",
         "//modules/planning/lattice/trajectory_generation:trajectory_combiner",

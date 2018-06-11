@@ -377,6 +377,7 @@ Status LatticePlanner::PlanOnReferenceLine(
       AERROR << "Use backup trajectory";
       BackupTrajectoryGenerator backup_trajectory_generator(
           init_s, init_d, planning_init_point.relative_time(),
+          std::make_shared<CollisionChecker>(collision_checker),
           &trajectory1d_generator);
       DiscretizedTrajectory trajectory =
           backup_trajectory_generator.GenerateTrajectory(*ptr_reference_line);
