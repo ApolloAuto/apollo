@@ -30,7 +30,6 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -297,6 +296,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     std::list<ReferenceLine> *reference_line,
     std::list<hdmap::RouteSegments> *segments) {
   if (relative_map.navigation_path_size() <= 0) {
+    AERROR << "relative_map.navigation_path_size() <= 0";
     return false;
   }
 
@@ -317,8 +317,9 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     return false;
   }
   // get curent adc lane info by vehicle state
-  common::VehicleState vehicle_state =
-      common::VehicleStateProvider::instance()->vehicle_state();
+  // since the relative map is based on the coordinate system of the car itself,
+  // the vehicle is the origin of the coordinate system
+  common::VehicleState vehicle_state;
   hdmap::LaneWaypoint adc_lane_way_point;
   if (!GetNearestWayPointFromNavigationPath(vehicle_state, navigation_lane_ids,
                                             &adc_lane_way_point)) {
@@ -342,7 +343,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
   }
   ADEBUG << adc_lane_id
-         << "left neighbor size : " << left_neighbor_lane_ids.size();
+         << " left neighbor size : " << left_neighbor_lane_ids.size();
   for (const auto &neighbor : left_neighbor_lane_ids) {
     ADEBUG << adc_lane_id << " left neighbor : " << neighbor;
   }
@@ -356,7 +357,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
   }
   ADEBUG << adc_lane_id
-         << "right neighbor size : " << right_neighbor_lane_ids.size();
+         << " right neighbor size : " << right_neighbor_lane_ids.size();
   for (const auto &neighbor : right_neighbor_lane_ids) {
     ADEBUG << adc_lane_id << " right neighbor : " << neighbor;
   }
@@ -406,10 +407,10 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
         ADEBUG << "target : " << lane_ptr->lane().id().id()
                << " right neihbor size : "
                << lane_ptr->lane().right_neighbor_forward_lane_id_size()
-               << "right neihbor id : "
+               << " right neihbor id : "
                << lane_ptr->lane().right_neighbor_forward_lane_id(0).id();
         auto neighbor_lane_id =
-            lane_ptr->lane().left_neighbor_forward_lane_id(0);
+            lane_ptr->lane().right_neighbor_forward_lane_id(0);
         if (adc_lane_id == neighbor_lane_id.id()) {
           break;
         }
@@ -434,7 +435,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
         ADEBUG << "target : " << lane_ptr->lane().id().id()
                << " left neihbor size : "
                << lane_ptr->lane().left_neighbor_forward_lane_id_size()
-               << "left neihbor id : "
+               << " left neihbor id : "
                << lane_ptr->lane().left_neighbor_forward_lane_id(0).id();
         auto neighbor_lane_id =
             lane_ptr->lane().left_neighbor_forward_lane_id(0);
@@ -465,7 +466,9 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     segment.SetIsOnSegment(true);
     segment.SetStopForDestination(false);
     segment.SetPreviousAction(routing::FORWARD);
-    // need change line
+    // need change lane, only provide the navigation line where the vehicle is
+    // currently located and the navigation line where the vehicle is about to
+    // change lanes
     if (is_lane_change_needed) {
       if (lane_id == neareast_neighbor_lane_id) {
         ADEBUG << "adc lane_id = " << adc_lane_id
@@ -474,6 +477,14 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
         segment.SetPreviousAction(lane_change_type);
       } else if (lane_id == adc_lane_id) {
         segment.SetNextAction(lane_change_type);
+      } else {
+        continue;
+      }
+    } else {
+      // can not need change lane,Only provide the navigation line where the
+      // vehicle is currently located
+      if (lane_id != adc_lane_id) {
+        continue;
       }
     }
     segments->emplace_back(segment);
