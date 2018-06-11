@@ -71,7 +71,7 @@ void Guardian::OnTimer(const ros::TimerEvent&) {
     TriggerSafetyMode();
   } else {
     ADEBUG << "Safety mode not triggerd, bypass control command";
-    ByPassControlCommand();
+    PassThroughControlCommand();
   }
 
   AdapterManager::FillGuardianHeader(FLAGS_node_name, &guardian_cmd_);
@@ -96,7 +96,7 @@ void Guardian::OnControl(const ControlCommand& message) {
   control_cmd_.CopyFrom(message);
 }
 
-void Guardian::ByPassControlCommand() {
+void Guardian::PassThroughControlCommand() {
   std::lock_guard<std::mutex> lock(mutex_);
   guardian_cmd_.mutable_control_command()->CopyFrom(control_cmd_);
 }
