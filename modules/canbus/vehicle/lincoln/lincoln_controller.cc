@@ -347,7 +347,7 @@ Chassis LincolnController::chassis() {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason("Chassis error!");
-  } else if (chassis_.parking_brake() || !CheckSafetyError(chassis_detail)) {
+  } else if (chassis_.parking_brake() || CheckSafetyError(chassis_detail)) {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
@@ -869,7 +869,7 @@ bool LincolnController::CheckSafetyError(
       (chassis_detail.safety().is_passenger_detected() &&
        (!chassis_detail.safety().is_passenger_airbag_enabled() ||
         !chassis_detail.safety().is_passenger_buckled()));
-
+  ADEBUG << "Vehicle safety error status is : " << safety_error;
   return safety_error;
 }
 
