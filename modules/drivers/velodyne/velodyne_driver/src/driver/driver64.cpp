@@ -16,11 +16,11 @@
 
 #include "driver.h"
 
-#include <time.h>
 #include <cmath>
+#include <ctime>
 #include <string>
 
-#include <ros/ros.h>
+#include "ros/ros.h"
 
 namespace apollo {
 namespace drivers {
@@ -35,7 +35,7 @@ void Velodyne64Driver::init(ros::NodeHandle& node) {
   } else {                  // 64E_S3D etc.
     packet_rate = 5789;
   }
-  double frequency = config_.rpm / 60.0;  // expected Hz rate
+  const double frequency = config_.rpm / 60.0;  // expected Hz rate
 
   // default number of packets for each scan is a single revolution
   // (fractions rounded up)
@@ -59,7 +59,8 @@ bool Velodyne64Driver::poll(void) {
   velodyne_msgs::VelodyneScanUnifiedPtr scan(
       new velodyne_msgs::VelodyneScanUnified());
 
-  int poll_result = poll_standard(scan);
+  int poll_result =
+      config_.use_sensor_sync ? poll_standard_sync(scan) : poll_standard(scan);
 
   if (poll_result == SOCKET_TIMEOUT || poll_result == RECIEVE_FAIL) {
     return true;  // poll again
@@ -110,7 +111,7 @@ int Velodyne64Driver::poll_standard_sync(
 
       if (rc == 0) {
         scan->packets.emplace_back(packet);
-        // check the angle for every packet if a packet  has a angle
+        // check the angle for every packet if a packet has a angle
         if (check_angle(packet) == true &&
             (scan->packets.size() > 0.5 * config_.npackets)) {
           return 0;

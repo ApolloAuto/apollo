@@ -9,6 +9,7 @@
     <arg name="max_range_64" default="70.0" />
     <arg name="rpm" default="600"/>
     <arg name="prefix_angle" default="18000"/>
+    <arg name="use_sensor_sync" default="false"/>
     <!-- 64E_S3D_STRONGEST | 64E_S3D_LATEST | 64E_S3D_DUAL -->
     <arg name="model" default="64E_S3D_STRONGEST" />
     <!-- 100ms -->
@@ -26,6 +27,7 @@
     <arg name="model" value="$(arg model)"/>
     <arg name="rpm" value="$(arg rpm)"/>
     <arg name="prefix_angle" value="$(arg prefix_angle)"/>
+    <arg name="use_sensor_sync" default="false"/>
     <arg name="frame_id" value="$(arg velodyne64_frame_id)"/>
     <arg name="topic" value="/apollo/sensor/velodyne64/VelodyneScanUnified"/>
   </include>
