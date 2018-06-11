@@ -136,9 +136,9 @@ class FrameContent {
 
   void set_gt_content(double timestamp,
                       const std::vector<std::shared_ptr<Object>>& objects);
-  void set_camera2car_pose(Eigen::Matrix4d pose_cam2velo);
+  void set_camera2car_pose(const Eigen::Matrix4d& pose_cam2velo);
 
-  void set_motion_content(double timestamp, const MotionBuffer &motion_buffer);
+  void set_motion_content(double timestamp, const MotionBuffer& motion_buffer);
   Eigen::Matrix4d get_opengl_camera_system_pose();
   Eigen::Matrix4d get_camera_to_world_pose();
   Eigen::Matrix4d get_camera_to_world_pose_static();
@@ -169,7 +169,7 @@ class FrameContent {
   // lane objects
   apollo::perception::LaneObjects get_lane_objects();
 
-  const MotionBuffer get_motion_buffer();
+  MotionBuffer get_motion_buffer();
 
  protected:
   // coordinate transform utilities

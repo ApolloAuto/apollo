@@ -35,7 +35,7 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 * A machine with a 4-core processor and 6GB memory minimum
 
-* Ubuntu 14.0.4
+* Ubuntu 14.04
 
 * Working knowledge of Docker
 
