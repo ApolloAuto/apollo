@@ -26,20 +26,20 @@ namespace rslidar {
 	
 
  void Convert::init(ros::NodeHandle& node, ros::NodeHandle& private_nh) {
-  	Config_p config__switch;
-  	private_nh.param("queue_size", queue_size_, 10);
+  	Config_p config_switch_;
+	private_nh.param("max_range", config_switch_.max_range, 150.0);
+	private_nh.param("min_range", config_switch_.min_range, 0.2);
+	private_nh.param("queue_size", queue_size_, 10);
+  	private_nh.param("model", config_switch_.model, std::string("RS16"));
+	private_nh.param("topic_packets", topic_packets_, std::string("rslidar_packets"));
+	private_nh.param("topic_pointcloud", topic_pointcloud_, std::string("rslidar_points"));
 
-  	private_nh.param("model", config__switch.model, std::string("RS16"));
+   	data_ = RslidarParserFactory::create_parser(config_switch_);
 
-	ROS_INFO_STREAM("model is "<<config__switch.model);
-
-   	data_ = RslidarParserFactory::create_parser(config__switch);
-
-	calibration__ = new calibration_parse();
-	if (config__switch.model  == "RS16") {
-		numOfLasers = 16;
-	} else if (config__switch.model  == "RS32") {
-		numOfLasers = 32;
+	calibration_ = new calibration_parse();
+	if (config_switch_.model  == "RS16") {
+		TEMPERATURE_RANGE = 40;
+	} else if (config_switch_.model  == "RS32") {
 		TEMPERATURE_RANGE = 50;
 	}
 	
@@ -47,11 +47,11 @@ namespace rslidar {
   	data_->init_setup();
   
   	pointcloud_pub_ =
-      node.advertise<sensor_msgs::PointCloud2>("rslidar_points", queue_size_);
+      node.advertise<sensor_msgs::PointCloud2>(topic_pointcloud_, queue_size_);
 
   	// subscribe to rslidarScan packets
   	rslidar_scan_ = node.subscribe(
-      "rslidar_packets", queue_size_, &Convert::convert_packets_to_pointcloud,
+		topic_packets_, queue_size_, &Convert::convert_packets_to_pointcloud,
       (Convert*)this, ros::TransportHints().tcpNoDelay(true));
  
 }
@@ -91,10 +91,6 @@ void Convert::convert_packets_to_pointcloud(
 	ROS_INFO_ONCE("pointcloud->empty()");
     return;
   }
-
-  sensor_msgs::PointCloud2 outMsg;
-  pcl::toROSMsg(*pointcloud, outMsg);
-  ROS_INFO_ONCE("publish");
 
   // publish the accumulated cloud message
   pointcloud_pub_.publish(pointcloud);

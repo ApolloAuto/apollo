@@ -496,6 +496,30 @@ function build_lslidar() {
   rm -rf modules/devel_isolated/
 }
 
+function build_rslidar() {
+  CURRENT_PATH=$(pwd)
+  if [ -d "${ROS_ROOT}" ]; then
+    ROS_PATH="${ROS_ROOT}/../.."
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
+
+  source "${ROS_PATH}/setup.bash"
+
+  cd modules
+  catkin_make_isolated --install --source drivers/rslidar \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
+
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
+}
+
+
 function build_usbcam() {
   CURRENT_PATH=$(pwd)
   if [ -d "${ROS_ROOT}" ]; then
@@ -537,6 +561,7 @@ function print_usage() {
   ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_velodyne${NONE}: build velodyne driver
+  ${BLUE}build_rslidar${NONE}: build rslidar driver
   ${BLUE}build_usbcam${NONE}: build usb camera driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
@@ -625,6 +650,9 @@ function main() {
       ;;
     build_velodyne)
       build_velodyne
+      ;;
+    build_rslidar)
+      build_rslidar
       ;;
     build_usbcam)
       build_usbcam

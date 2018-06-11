@@ -142,135 +142,135 @@ namespace rslidar {
 	 *	@param pkt raw packet to unpack
 	 *	@param pc shared pointer to point cloud (points are appended)
 	 */
-		void rslidar16Parser::unpack(const rslidar_msgs::rslidarPacket &pkt, pcl::PointCloud<pcl::PointXYZI>::Ptr pointcloud,
-							 bool finish_packets_parse) {
-			
-			float azimuth;	//0.01 dgree
-			float intensity;
-			float azimuth_diff;
-			float azimuth_corrected_f;
-			int azimuth_corrected;
-	
-			const raw_packet_t *raw = (const raw_packet_t *) &pkt.data[42];
-	
-			for (int block = 0; block < BLOCKS_PER_PACKET; block++) //1 packet:12 data blocks
-			{
-	
-				if (UPPER_BANK != raw->blocks[block].header) {
-					ROS_INFO_STREAM_THROTTLE(180, "skipping RSLIDAR DIFOP packet");
-					break;
-				}
-	
-				if (tempPacketNum < 20000 && tempPacketNum > 0)//update temperature information per 20000 packets
-				{
-					tempPacketNum++;
-				} else {
-					temper = calibration__->computeTemperature(pkt.data[38], pkt.data[39]);
-					//ROS_INFO_STREAM("Temp is: " << temper);
-					tempPacketNum = 1;
-				}
-	
-				azimuth = (float) (256 * raw->blocks[block].rotation_1 + raw->blocks[block].rotation_2);
-	
-				if (block < (BLOCKS_PER_PACKET - 1))//12
-				{
-					int azi1, azi2;
-					azi1 = 256 * raw->blocks[block + 1].rotation_1 + raw->blocks[block + 1].rotation_2;
-					azi2 = 256 * raw->blocks[block].rotation_1 + raw->blocks[block].rotation_2;
-					azimuth_diff = (float) ((36000 + azi1 - azi2) % 36000);
-	
-					//Ingnore the block if the azimuth change abnormal
-					if (azimuth_diff <= 0.0 || azimuth_diff > 75.0) {
-						continue;
-					}
-	
-				} else {
-					int azi1, azi2;
-					azi1 = 256 * raw->blocks[block].rotation_1 + raw->blocks[block].rotation_2;
-					azi2 = 256 * raw->blocks[block - 1].rotation_1 + raw->blocks[block - 1].rotation_2;
-					azimuth_diff = (float) ((36000 + azi1 - azi2) % 36000);
-	
-					//Ingnore the block if the azimuth change abnormal
-					if (azimuth_diff <= 0.0 || azimuth_diff > 75.0) {
-						continue;
-					}
-	
-				}
-	
-				for (int firing = 0, k = 0; firing < RS16_FIRINGS_PER_BLOCK; firing++)//2
-				{
-					for (int dsr = 0; dsr < RS16_SCANS_PER_FIRING; dsr++, k += RAW_SCAN_SIZE)//16	3
-					{
-						int point_count = pic.col * SCANS_PER_BLOCK + dsr + RS16_SCANS_PER_FIRING * firing;
-						azimuth_corrected_f =
-								azimuth + (azimuth_diff * ((dsr * RS16_DSR_TOFFSET) + (firing * RS16_FIRING_TOFFSET)) /
-										   RS16_BLOCK_TDURATION);
-						azimuth_corrected = ((int) round(azimuth_corrected_f)) % 36000;//convert to integral value...
-						pic.azimuthforeachP[point_count] = azimuth_corrected;
-	
-						union two_bytes tmp;
-						tmp.bytes[1] = raw->blocks[block].data[k];
-						tmp.bytes[0] = raw->blocks[block].data[k + 1];
-						int distance = tmp.uint;
-	
-						// read intensity
-						intensity = raw->blocks[block].data[k + 2];
-						intensity = calibration__->calibrateIntensity(intensity, dsr, distance);
-	
-						float distance2 = calibration__->pixelToDistance(distance, dsr);
-						distance2 = distance2 * DISTANCE_RESOLUTION;
-	
-						pic.distance[point_count] = distance2;
-						pic.intensity[point_count] = intensity;
-					}
-				}
-				//pic.azimuth[pic.col] = azimuth;
-				pic.col++;
+	void rslidar16Parser::unpack(const rslidar_msgs::rslidarPacket &pkt, pcl::PointCloud<pcl::PointXYZI>::Ptr pointcloud,
+							bool finish_packets_parse) {
+
+		float azimuth;    //0.01 dgree
+		float intensity;
+		float azimuth_diff;
+		float azimuth_corrected_f;
+		int azimuth_corrected;
+
+		const raw_packet_t *raw = (const raw_packet_t *) &pkt.data[42];
+
+		for (int block = 0; block < BLOCKS_PER_PACKET; block++) //1 packet:12 data blocks
+		{
+
+			if (UPPER_BANK != raw->blocks[block].header) {
+				ROS_INFO_STREAM_THROTTLE(180, "skipping RSLIDAR DIFOP packet");
+				break;
 			}
-	
-			if (finish_packets_parse) {
-				// ROS_INFO_STREAM("***************: "<<pic.col);
-				pointcloud->clear();
-				pointcloud->height = RS16_SCANS_PER_FIRING;
-				pointcloud->width = 2 * pic.col;
-				pointcloud->is_dense = false;
-				pointcloud->resize(pointcloud->height * pointcloud->width);
-				for (int block_num = 0; block_num < pic.col; block_num++) {
-	
-					for (int firing = 0; firing < RS16_FIRINGS_PER_BLOCK; firing++) {
-						for (int dsr = 0; dsr < RS16_SCANS_PER_FIRING; dsr++) {
-							int point_count = block_num * SCANS_PER_BLOCK + dsr + RS16_SCANS_PER_FIRING * firing;
-							float dis = pic.distance[point_count];
-							float arg_horiz = pic.azimuthforeachP[point_count] / 18000 * M_PI;
-							float arg_vert = VERT_ANGLE[dsr];
-							pcl::PointXYZI point;
-							if (dis > DISTANCE_MAX || dis < DISTANCE_MIN)  //invalid data
-							{
-								point.x = NAN;
-								point.y = NAN;
-								point.z = NAN;
-								point.intensity = 0;
-								pointcloud->at(2 * block_num + firing, dsr) = point;
-							} else {
-								//If you want to fix the rslidar Y aixs to the front side of the cable, please use the two line below
-								//point.x = dis * cos(arg_vert) * sin(arg_horiz);
-								//point.y = dis * cos(arg_vert) * cos(arg_horiz);
-	
-								//If you want to fix the rslidar X aixs to the front side of the cable, please use the two line below
-								point.y = -dis * cos(arg_vert) * sin(arg_horiz);
-								point.x = dis * cos(arg_vert) * cos(arg_horiz);
-								point.z = dis * sin(arg_vert);
-								point.intensity = pic.intensity[point_count];
-								pointcloud->at(2 * block_num + firing, dsr) = point;
-	
-							}
+
+			if (tempPacketNum < 20000 && tempPacketNum > 0)//update temperature information per 20000 packets
+			{
+				tempPacketNum++;
+			} else {
+				temper = calibration_->computeTemperature(pkt.data[38], pkt.data[39]);
+				//ROS_INFO_STREAM("Temp is: " << temper);
+				tempPacketNum = 1;
+			}
+
+			azimuth = (float) (256 * raw->blocks[block].rotation_1 + raw->blocks[block].rotation_2);
+
+			if (block < (BLOCKS_PER_PACKET - 1))//12
+			{
+				int azi1, azi2;
+				azi1 = 256 * raw->blocks[block + 1].rotation_1 + raw->blocks[block + 1].rotation_2;
+				azi2 = 256 * raw->blocks[block].rotation_1 + raw->blocks[block].rotation_2;
+				azimuth_diff = (float) ((36000 + azi1 - azi2) % 36000);
+
+				//Ingnore the block if the azimuth change abnormal
+				if (azimuth_diff <= 0.0 || azimuth_diff > 75.0) {
+					continue;
+				}
+
+			} else {
+				int azi1, azi2;
+				azi1 = 256 * raw->blocks[block].rotation_1 + raw->blocks[block].rotation_2;
+				azi2 = 256 * raw->blocks[block - 1].rotation_1 + raw->blocks[block - 1].rotation_2;
+				azimuth_diff = (float) ((36000 + azi1 - azi2) % 36000);
+
+				//Ingnore the block if the azimuth change abnormal
+				if (azimuth_diff <= 0.0 || azimuth_diff > 75.0) {
+					continue;
+				}
+
+			}
+
+			for (int firing = 0, k = 0; firing < RS16_FIRINGS_PER_BLOCK; firing++)//2
+			{
+				for (int dsr = 0; dsr < RS16_SCANS_PER_FIRING; dsr++, k += RAW_SCAN_SIZE)//16	3
+				{
+					int point_count = pic.col * SCANS_PER_BLOCK + dsr + RS16_SCANS_PER_FIRING * firing;
+					azimuth_corrected_f =
+							azimuth + (azimuth_diff * ((dsr * RS16_DSR_TOFFSET) + (firing * RS16_FIRING_TOFFSET)) /
+									   RS16_BLOCK_TDURATION);
+					azimuth_corrected = ((int) round(azimuth_corrected_f)) % 36000;//convert to integral value...
+					pic.azimuthforeachP[point_count] = azimuth_corrected;
+
+					union two_bytes tmp;
+					tmp.bytes[1] = raw->blocks[block].data[k];
+					tmp.bytes[0] = raw->blocks[block].data[k + 1];
+					int distance = tmp.uint;
+
+					// read intensity
+					intensity = raw->blocks[block].data[k + 2];
+					intensity = calibration_->calibrateIntensity(intensity, dsr, distance);
+
+					float distance2 = calibration_->pixelToDistance(distance, dsr);
+					distance2 = distance2 * DISTANCE_RESOLUTION;
+
+					pic.distance[point_count] = distance2;
+					pic.intensity[point_count] = intensity;
+				}
+			}
+			//pic.azimuth[pic.col] = azimuth;
+			pic.col++;
+		}
+
+		if (finish_packets_parse) {
+			// ROS_INFO_STREAM("***************: "<<pic.col);
+			pointcloud->clear();
+			pointcloud->height = RS16_SCANS_PER_FIRING;
+			pointcloud->width = 2 * pic.col;
+			pointcloud->is_dense = false;
+			pointcloud->resize(pointcloud->height * pointcloud->width);
+			for (int block_num = 0; block_num < pic.col; block_num++) {
+
+				for (int firing = 0; firing < RS16_FIRINGS_PER_BLOCK; firing++) {
+					for (int dsr = 0; dsr < RS16_SCANS_PER_FIRING; dsr++) {
+						int point_count = block_num * SCANS_PER_BLOCK + dsr + RS16_SCANS_PER_FIRING * firing;
+						float dis = pic.distance[point_count];
+						float arg_horiz = pic.azimuthforeachP[point_count] / 18000 * M_PI;
+						float arg_vert = VERT_ANGLE[dsr];
+						pcl::PointXYZI point;
+						if (dis > DISTANCE_MAX || dis < DISTANCE_MIN)  //invalid data
+						{
+							point.x = NAN;
+							point.y = NAN;
+							point.z = NAN;
+							point.intensity = 0;
+							pointcloud->at(2 * block_num + firing, dsr) = point;
+						} else {
+							//If you want to fix the rslidar Y aixs to the front side of the cable, please use the two line below
+							//point.x = dis * cos(arg_vert) * sin(arg_horiz);
+							//point.y = dis * cos(arg_vert) * cos(arg_horiz);
+
+							//If you want to fix the rslidar X aixs to the front side of the cable, please use the two line below
+							point.y = -dis * cos(arg_vert) * sin(arg_horiz);
+							point.x = dis * cos(arg_vert) * cos(arg_horiz);
+							point.z = dis * sin(arg_vert);
+							point.intensity = pic.intensity[point_count];
+							pointcloud->at(2 * block_num + firing, dsr) = point;
+
 						}
 					}
 				}
-				init_setup();
-				pic.header.stamp = pkt.stamp;
 			}
+			init_setup();
+			pic.header.stamp = pkt.stamp;
 		}
+	}
 	
 }  // namespace rslidar
 }  // namespace drivers
