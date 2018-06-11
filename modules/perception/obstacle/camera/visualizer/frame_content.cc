@@ -42,8 +42,7 @@ void FrameContent::set_image_content(double timestamp, cv::Mat image) {
 }
 
 void FrameContent::set_camera_content(
-    double timestamp, Eigen::Matrix4d pose_c2w,
-    Eigen::Matrix4d pose_c2w_static,
+    double timestamp, Eigen::Matrix4d pose_c2w, Eigen::Matrix4d pose_c2w_static,
     const std::vector<std::shared_ptr<Object>>& objects,
     const CameraFrameSupplement& supplement) {
   auto key = DoubleToMapKey(timestamp);
@@ -153,10 +152,9 @@ void FrameContent::set_gt_content(
 }
 
 void FrameContent::set_motion_content(double timestamp,
-                                      const MotionBuffer &motion_buffer) {
-  MotionContent motion_content;
-  motion_content.motion_frame_content_ = motion_buffer;
-  motion_caches_[DoubleToMapKey(timestamp)] = motion_content;
+                                      const MotionBuffer& motion_buffer) {
+  motion_caches_[DoubleToMapKey(timestamp)].motion_frame_content_ =
+      motion_buffer;
   AINFO << "Motion_caches size: " << motion_caches_.size();
 }
 
@@ -291,7 +289,7 @@ Eigen::Matrix4d FrameContent::get_camera_to_world_pose() {
   if (it == camera_caches_.end()) {
     return Eigen::Matrix4d::Identity();
   }
-  CameraContent content = it->second;
+  const auto& content = it->second;
   return content._pose_c2w;
 }
 
@@ -300,7 +298,7 @@ Eigen::Matrix4d FrameContent::get_camera_to_world_pose_static() {
   if (it == camera_caches_.end()) {
     return Eigen::Matrix4d::Identity();
   }
-  CameraContent content = it->second;
+  const auto& content = it->second;
   return content._pose_c2w_static;
 }
 
@@ -326,7 +324,7 @@ std::vector<std::shared_ptr<Object>> FrameContent::get_camera_objects() {
   }
 }
 
-const MotionBuffer FrameContent::get_motion_buffer() {
+MotionBuffer FrameContent::get_motion_buffer() {
   auto it = motion_caches_.find(DoubleToMapKey(current_motion_timestamp_));
   if (it == motion_caches_.end()) {
     //    AINFO << "no motion available: " << motion_caches_.size();
@@ -337,21 +335,20 @@ const MotionBuffer FrameContent::get_motion_buffer() {
     //      AINFO << "motion_caches data: " << iter.first;
     return MotionBuffer(0);
   }
-  MotionContent content = it->second;
+  const auto& content = it->second;
   return content.motion_frame_content_;
 }
 
-void FrameContent::set_camera2car_pose(Eigen::Matrix4d pose_velo2cam) {
+void FrameContent::set_camera2car_pose(const Eigen::Matrix4d& pose_velo2cam) {
   _pose_camera2velo = pose_velo2cam.inverse();
 }
 
 Eigen::Matrix4d FrameContent::get_opengl_camera_system_pose() {
-  Eigen::Matrix4d pose = Eigen::Matrix4d::Identity();
-
   if (continuous_type_ == IMAGE_CONTINUOUS) {
-    pose = get_camera_to_world_pose() * _pose_camera2velo;
+    return get_camera_to_world_pose() * _pose_camera2velo;
+  } else {
+    return Eigen::Matrix4d::Identity();
   }
-  return pose;
 }
 
 std::vector<std::shared_ptr<Object>> FrameContent::get_radar_objects() {
@@ -359,27 +356,26 @@ std::vector<std::shared_ptr<Object>> FrameContent::get_radar_objects() {
   if (it == radar_caches_.end()) {
     return std::vector<std::shared_ptr<Object>>();
   }
-  RadarContent content = it->second;
+  const auto& content = it->second;
   return content.radar_objects_;
 }
 
 CameraFrameSupplementPtr FrameContent::get_camera_frame_supplement() {
   auto it = camera_caches_.find(DoubleToMapKey(current_camera_timestamp_));
   if (it == camera_caches_.end()) {
-    CameraFrameSupplementPtr supplement_ptr;
-    supplement_ptr.reset(new CameraFrameSupplement);
+    CameraFrameSupplementPtr supplement_ptr(new CameraFrameSupplement);
     return supplement_ptr;
   }
-  CameraContent content = it->second;
+  const auto& content = it->second;
   return content.camera_frame_supplement_;
 }
 
 double FrameContent::get_visualization_timestamp() {
-  double timestamp = 0;
   if (continuous_type_ == IMAGE_CONTINUOUS) {
-    timestamp = current_image_timestamp_;
+    return current_image_timestamp_;
+  } else {
+    return 0.0;
   }
-  return timestamp;
 }
 
 std::vector<std::shared_ptr<Object>> FrameContent::get_fused_objects() {
@@ -387,7 +383,7 @@ std::vector<std::shared_ptr<Object>> FrameContent::get_fused_objects() {
   if (it == fusion_caches_.end()) {
     return std::vector<std::shared_ptr<Object>>();
   }
-  FusionContent content = it->second;
+  const auto& content = it->second;
   return content.fused_objects_;
 }
 
@@ -396,7 +392,7 @@ std::vector<std::shared_ptr<Object>> FrameContent::get_gt_objects() {
   if (it == gt_caches_.end()) {
     return std::vector<std::shared_ptr<Object>>();
   }
-  GroundTruthContent content = it->second;
+  const auto& content = it->second;
   return content.gt_objects_;
 }
 
@@ -405,7 +401,7 @@ LaneObjects FrameContent::get_lane_objects() {
   if (it == lane_caches_.end()) {
     return LaneObjects();
   }
-  LaneContent content = it->second;
+  const auto& content = it->second;
   return content.lane_objects_;
 }
 

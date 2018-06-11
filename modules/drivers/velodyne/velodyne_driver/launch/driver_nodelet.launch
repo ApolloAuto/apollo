@@ -10,16 +10,18 @@
   <arg name="topic" default="/apollo/sensor/velodyne64/VelodyneScanUnified" />
   <arg name="node_name" default="driver_nodelet"/>
   <arg name="nodelet_manager_name" default="velodyne_nodelet_manager" />
+  <arg name="prefix_angle" default="18000" />
 
   <node pkg="nodelet" type="nodelet" name="$(arg node_name)"
         args="load velodyne_driver/DriverNodelet $(arg nodelet_manager_name)" output="screen" >
     <param name="model" value="$(arg model)"/>
     <param name="rpm" value="$(arg rpm)"/>
     <param name="frame_id" value="$(arg frame_id)"/>
-    <param name="topic" value="$(arg topic)"/>    
+    <param name="topic" value="$(arg topic)"/>
     <param name="ip" value="$(arg ip)"/>
     <param name="firing_data_port" value="$(arg firing_data_port)"/>
     <param name="positioning_data_port" value="$(arg positioning_data_port)"/>
-  </node>    
+    <param name="prefix_angle" value="$(arg prefix_angle)"/>
+  </node>
 
 </launch>
