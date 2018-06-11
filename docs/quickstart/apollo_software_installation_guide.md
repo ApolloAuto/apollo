@@ -68,15 +68,15 @@ Don't forget the
     bash docker/scripts/release_into.sh
     ```
 
-3. (Skip this if you only want to do the offline simulation in release docker container) Set up the zone number for the Global Navigation Satellite System (GNSS) Driver by modifying the following line in file `./ros/share/gnss_driver/launch/gnss_driver.launch`.
+3. (Skip this if you only want to do the offline simulation in release docker container) Set up the zone number for the Global Navigation Satellite System (GNSS) Driver by modifying the following line in file `./modules/drivers/gnss/conf/gnss_conf.pb.txt`.
 
     ```
-    <arg name="proj4_text" default="+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs " />
+    proj4_text: "+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
     ```
 
     You only have to modify the value `+zone=10` in the above line. Please refer to the [Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) to find your local zone number. For example, if you are in Beijing, China, you have to set `+zone=50`.
 
-4. (Skip this if you only want to do the offline simulation in release docker container) Set up the Real Time Kinematic (RTK) Base Station for the GNSS Driver by modifying the file: `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
+4. (Skip this if you only want to do the offline simulation in release docker container) Set up the Real Time Kinematic (RTK) Base Station for the GNSS Driver by modifying the file: `./modules/drivers/gnss/conf/gnss_conf.pb.txt`
 
     Refer to the following example for a typical RTK setup:
 
@@ -118,3 +118,8 @@ Don't forget the
     ```
 
 7. Start your favorite browser (i.e. Chrome) and with URL: http://localhost:8888
+
+## Run Apollo 2.5 in Ubuntu 16
+
+Please refer to
+[How to run Apollo 2.5 with Ubuntu 16](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_apollo_2.5_with_ubuntu16.md)

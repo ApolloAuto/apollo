@@ -576,15 +576,14 @@ void GLFWFusionViewer::render() {
     bool show_fusion = true;
     draw_3d_classifications(frame_content_, show_fusion);
     draw_car_forward_dir();
-    if (show_trajectory_ &&
-        frame_content_->get_motion_buffer().size() > 0) {
+    if (show_trajectory_ && frame_content_->get_motion_buffer().size() > 0) {
       draw_car_trajectory(frame_content_);
     }
     if (show_lane_) {
       lane_objects_ =
           std::make_shared<LaneObjects>(frame_content_->get_lane_objects());
       if (draw_lane_objects_) {
-        const MotionBuffer& motion_buffer = frame_content_->get_motion_buffer();
+        const auto motion_buffer = frame_content_->get_motion_buffer();
         int n = motion_buffer.size();
         if (n > 0) {
           motion_matrix_ = motion_buffer[n - 1].motion;
@@ -989,7 +988,7 @@ void GLFWFusionViewer::draw_camera_frame(FrameContent* content,
   // -----------------------------
   Eigen::Matrix4d camera_to_world_pose = content->get_camera_to_world_pose();
   Eigen::Matrix4d camera_to_world_pose_static =
-  content->get_camera_to_world_pose_static();
+      content->get_camera_to_world_pose_static();
   Eigen::Matrix4d v2c = camera_to_world_pose.inverse();
   Eigen::Matrix4d v2c_static = camera_to_world_pose_static.inverse();
   int offset_x = 0;  // scene_width_;
@@ -1009,9 +1008,8 @@ void GLFWFusionViewer::draw_camera_frame(FrameContent* content,
     } else {
       std::vector<std::shared_ptr<Object>> camera_objects;
       camera_objects = content->get_camera_objects();
-      draw_camera_box(camera_objects, v2c, v2c_static,
-                      offset_x, offset_y, image_width,
-                      image_height);
+      draw_camera_box(camera_objects, v2c, v2c_static, offset_x, offset_y,
+                      image_width, image_height);
     }
   } else {
     // show 2d bbox
@@ -1019,8 +1017,7 @@ void GLFWFusionViewer::draw_camera_frame(FrameContent* content,
                       image_height);
   }
   if (show_radar_pc_) {
-    std::vector<std::shared_ptr<Object>> objects;
-    objects = content->get_radar_objects();
+    std::vector<std::shared_ptr<Object>> objects = content->get_radar_objects();
     draw_objects2d(objects, v2c, "radar", offset_x, offset_y, image_width,
                    image_height);
   }
@@ -1371,12 +1368,12 @@ void GLFWFusionViewer::draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat,
   get_project_point(v2c, pt3d, &pt2d);
   Eigen::Vector2d tmp1 = pt2d + Eigen::Vector2d(0.0, 30.0);
   Eigen::Vector2d tmp2 = pt2d + Eigen::Vector2d(0.0, -30.0);
-  draw_line2d(tmp1, tmp2, 2, color_v[0], color_v[1], color_v[2],
-              offset_x, offset_y, image_width, image_height);
+  draw_line2d(tmp1, tmp2, 2, color_v[0], color_v[1], color_v[2], offset_x,
+              offset_y, image_width, image_height);
   tmp1 = pt2d + Eigen::Vector2d(30.0, 0.0);
   tmp2 = pt2d + Eigen::Vector2d(-30.0, 0.0);
-  draw_line2d(tmp1, tmp2, 2, color_v[0], color_v[1], color_v[2],
-              offset_x, offset_y, image_width, image_height);
+  draw_line2d(tmp1, tmp2, 2, color_v[0], color_v[1], color_v[2], offset_x,
+              offset_y, image_width, image_height);
 
   // Draw grid plane
   for (double y = -10.0; y <= 10.0; y += 2.0) {
@@ -1666,9 +1663,10 @@ void GLFWFusionViewer::draw_camera_box3d(
       }
 
       if (show_camera_box3d_) {
-        draw_8pts_box(points, Eigen::Vector3f(box3d_color[0], box3d_color[1],
-                                              box3d_color[2]),
-                      offset_x, offset_y, image_width, image_height);
+        draw_8pts_box(
+            points,
+            Eigen::Vector3f(box3d_color[0], box3d_color[1], box3d_color[2]),
+            offset_x, offset_y, image_width, image_height);
       }
     }
   }
@@ -1871,24 +1869,27 @@ void GLFWFusionViewer::draw_objects(
       int offset = 2;
 
       if (objects[i]->local_lidar_track_id != -1) {
-          glRasterPos2i(tc[0] + offset, tc[1]);
-          raster_text_->print_string(std::string("v:") +
+        glRasterPos2i(tc[0] + offset, tc[1]);
+        raster_text_->print_string(
+            std::string("v:") +
             std::to_string(objects[i]->local_lidar_track_id));
-          offset +=2;
+        offset += 2;
       }
 
       if (objects[i]->local_camera_track_id != -1) {
-          glRasterPos2i(tc[0] + offset, tc[1]);
-          raster_text_->print_string(std::string("c:") +
+        glRasterPos2i(tc[0] + offset, tc[1]);
+        raster_text_->print_string(
+            std::string("c:") +
             std::to_string(objects[i]->local_camera_track_id));
-          offset +=2;
+        offset += 2;
       }
 
       if (objects[i]->local_radar_track_id != -1) {
-          glRasterPos2i(tc[0] + offset, tc[1]);
-          raster_text_->print_string(std::string("r:") +
+        glRasterPos2i(tc[0] + offset, tc[1]);
+        raster_text_->print_string(
+            std::string("r:") +
             std::to_string(objects[i]->local_radar_track_id));
-          offset +=2;
+        offset += 2;
       }
 
       if (objects[i]->b_cipv) {
@@ -2019,14 +2020,13 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
   glColor4f(1.0, 1.0, 1.0, 1.0);
 }
 
-
 void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
                                                bool show_fusion) {
-  Eigen::Matrix4d c2v = content->get_camera_to_world_pose();
+  const auto& c2v = content->get_camera_to_world_pose();
 
   if (show_camera_bdv_) {
-      draw_objects(content->get_camera_objects(), c2v, true, true,
-                   Eigen::Vector3f(1, 1, 0), use_class_color_);
+    draw_objects(content->get_camera_objects(), c2v, true, true,
+                 Eigen::Vector3f(1, 1, 0), use_class_color_);
   }
 
   if (show_fusion_) {
@@ -2067,17 +2067,17 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
 }
 
 void GLFWFusionViewer::draw_camera_box(
-    const std::vector<std::shared_ptr<Object>>& objects,
-    Eigen::Matrix4d v2c, Eigen::Matrix4d v2c_static,
-    int offset_x, int offset_y, int image_width, int image_height) {
+    const std::vector<std::shared_ptr<Object>>& objects, Eigen::Matrix4d v2c,
+    Eigen::Matrix4d v2c_static, int offset_x, int offset_y, int image_width,
+    int image_height) {
   if (show_vp_grid_) {
-    draw_vp_ground(v2c_static, true, offset_x, offset_y,
-                   image_width, image_height);
+    draw_vp_ground(v2c_static, true, offset_x, offset_y, image_width,
+                   image_height);
     draw_vp_ground(v2c, false, offset_x, offset_y, image_width, image_height);
   }
 
   for (auto obj : objects) {
-    Eigen::Vector3d center = obj->center;
+    const Eigen::Vector3d& center = obj->center;
     Eigen::Vector2d center2d;
     get_project_point(v2c, center, &center2d);
     ADEBUG << "draw_camera_box camera obj " << obj->track_id
@@ -2105,9 +2105,10 @@ void GLFWFusionViewer::draw_camera_box(
 
     if (show_camera_box3d_) {
       ADEBUG << "draw_8pts_box";
-      draw_8pts_box(points, Eigen::Vector3f(box3d_color[0], box3d_color[1],
-                                            box3d_color[2]),
-                    offset_x, offset_y, image_width, image_height);
+      draw_8pts_box(
+          points,
+          Eigen::Vector3f(box3d_color[0], box3d_color[1], box3d_color[2]),
+          offset_x, offset_y, image_width, image_height);
     }
 
     // TODO(All) fix the code after continue
@@ -2176,7 +2177,7 @@ void GLFWFusionViewer::draw_objects2d(
   if (name == "radar") {
     // LOG(INFO)<<objects.size();
     for (auto obj : objects) {
-      Eigen::Vector3d center = obj->center;
+      const auto& center = obj->center;
       Eigen::Vector2d center2d;
       get_project_point(v2c, center, &center2d);
       if ((center2d[0] > image_width) || (center2d[1] > image_height) ||
