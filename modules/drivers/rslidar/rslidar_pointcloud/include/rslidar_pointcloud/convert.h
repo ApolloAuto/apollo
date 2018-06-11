@@ -52,8 +52,6 @@ class Convert {
 
   std::string topic_packets_;
   std::string topic_pointcloud_;
-
-  std::string modell;
  
   int queue_size_;
 };

@@ -50,7 +50,7 @@ class DriverNodelet : public nodelet::Nodelet {
 };
 
 void DriverNodelet::onInit() {
-  ROS_INFO("Velodyne driver nodelet init");
+  ROS_INFO("rslidar driver nodelet init");
   // start the driver
   RslidarDriver *driver =
       RslidarDriverFactory::create_driver(getPrivateNodeHandle());

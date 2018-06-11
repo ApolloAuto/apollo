@@ -111,10 +111,10 @@ RslidarDriver* RslidarDriverFactory::create_driver(
   private_nh.param("frame_id", config.frame_id, std::string("rslidar"));
   private_nh.param("model", config.model, std::string("RS16"));
 
-  private_nh.param("topic", config.topic, std::string("topic_packets"));
+  private_nh.param("topic", config.topic, std::string("rslidar_packets"));
   private_nh.param("msop_data_port", config.msop_data_port,
                    MSOP_DATA_PORT);
-  private_nh.param("positioning_data_port", config.positioning_data_port,
+  private_nh.param("difop_data_port", config.difop_data_port,
                    DIFOP_DATA_PORT);
   
   private_nh.param("rpm", config.rpm, 600.0);
