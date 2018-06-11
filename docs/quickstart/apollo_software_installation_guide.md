@@ -118,3 +118,8 @@ Don't forget the
     ```
 
 7. Start your favorite browser (i.e. Chrome) and with URL: http://localhost:8888
+
+## Run Apollo 2.5 in Ubuntu 16
+
+Please refer to
+[How to run Apollo 2.5 with Ubuntu 16](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_apollo_2.5_with_ubuntu16.md)
