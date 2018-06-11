@@ -35,7 +35,7 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 * A machine with a 4-core processor and 6GB memory minimum
 
-* Ubuntu 14.0.4
+* Ubuntu 14.04
 
 * Working knowledge of Docker
 
@@ -208,7 +208,11 @@ Please refer the Disclaimer of Apollo in [Apollo's official website](http://apol
 * [Have suggestions for our GitHub page?](https://github.com/ApolloAuto/apollo/issues)
 * [Twitter](https://twitter.com/apolloplatform)
 * [YouTube](https://www.youtube.com/channel/UC8wR_NX_NShUTSSqIaEUY9Q)
+<<<<<<< HEAD
 * [Blog](https://www.medium.com/apollo-auto)
+=======
+* [Blog](https://medium.com/apollo-auto)
+>>>>>>> Readme with improvements
 * [Newsletter](http://eepurl.com/c-mLSz)
 
 
