@@ -71,6 +71,10 @@ DECLARE_string(pandora_camera_right_gray_topic);
 DECLARE_string(pandora_camera_left_gray_topic);
 DECLARE_string(pandora_camera_front_gray_topic);
 DECLARE_string(pandora_camera_back_gray_topic);
+DECLARE_string(gnss_raw_data_topic);
+DECLARE_string(stream_status_topic);
+DECLARE_string(heading_topic);
+DECLARE_string(rtcm_data_topic);
 
 // Gardian topic
 DECLARE_string(guardian_topic);

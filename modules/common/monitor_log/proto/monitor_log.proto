@@ -19,6 +19,7 @@ message MonitorMessageItem {
     MONITOR = 11;
     HMI = 12;
     RELATIVE_MAP=13;
+    GNSS = 14;
   }
 
   optional MessageSource source = 1 [ default = UNKNOWN ];

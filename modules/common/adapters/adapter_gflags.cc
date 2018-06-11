@@ -121,3 +121,11 @@ DEFINE_string(pandora_camera_back_gray_topic,
               "/apollo/sensor/pandora/camera/back_gray",
               "pandora back gray camera topic name");
 DEFINE_string(guardian_topic, "/apollo/guardian", "Guardian topic.");
+DEFINE_string(gnss_raw_data_topic, "/apollo/sensor/gnss/raw_data",
+              "gnss raw data topic name");
+DEFINE_string(stream_status_topic, "/apollo/sensor/gnss/stream_status",
+              "gnss stream status topic name");
+DEFINE_string(heading_topic, "/apollo/sensor/gnss/heading",
+              "gnss heading topic name");
+DEFINE_string(rtcm_data_topic, "/apollo/sensor/gnss/rtcm_data",
+              "gnss rtcm data topic name");
