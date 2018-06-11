@@ -186,7 +186,7 @@ and we want to ensure Apollo 2.5 was integrated correctly with your vehicle befo
 
 ## Documents
 
-* [HowTo](https://github.com/ApolloAuto/apollo/tree/master/docs/howto): A Brief technical solutions to common problems developers face during the installation and use of Apollo platform 
+* [HowTo](https://github.com/ApolloAuto/apollo/tree/master/docs/howto): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform 
 
 * [Specs](https://github.com/ApolloAuto/apollo/tree/master/docs/specs): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo) 
 
@@ -208,11 +208,7 @@ Please refer the Disclaimer of Apollo in [Apollo's official website](http://apol
 * [Have suggestions for our GitHub page?](https://github.com/ApolloAuto/apollo/issues)
 * [Twitter](https://twitter.com/apolloplatform)
 * [YouTube](https://www.youtube.com/channel/UC8wR_NX_NShUTSSqIaEUY9Q)
-<<<<<<< HEAD
 * [Blog](https://www.medium.com/apollo-auto)
-=======
-* [Blog](https://medium.com/apollo-auto)
->>>>>>> Readme with improvements
 * [Newsletter](http://eepurl.com/c-mLSz)
 
 
