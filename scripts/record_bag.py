@@ -26,13 +26,10 @@ It lists all available disks mounted under /media, and prioritize them in order:
    - Disk#y. Smaller Non-NVME disk
    - ...
 
-1. If we have two or more disks, LARGE_TOPICS will be recorded to Disk#1, and
-   SMALL_TOPICS goes to Disk#2.
-2. If we have only one NVME disk, it will be used for both LARGE and SMALL
-   topics.
-3. If we have only one Non-NVME disk, it will only record SMALL_TOPICS. But if
-   you specify '--all', both LARGE and SMALL topics will be recorded.
-4. If no external disks are available, we will take '/apollo' as a
+1. If we have NVME disk, it will be used to record all data.
+2. If we have Non-NVME disk, it will only record SMALL_TOPICS, unless '--all' is
+   specified.
+3. If no external disks are available, we will take '/apollo' as a
    'Non-NVME disk' and follow the rule above.
 
 Run with '--help' to see more options.
@@ -47,12 +44,6 @@ import sys
 import psutil
 
 
-LARGE_TOPICS = [
-    '/apollo/sensor/camera/obstacle/front_6mm',
-    '/apollo/sensor/camera/traffic/image_long',
-    '/apollo/sensor/camera/traffic/image_short',
-    '/apollo/sensor/velodyne64/compensator/PointCloud2',
-]
 SMALL_TOPICS = [
     '/apollo/canbus/chassis',
     '/apollo/canbus/chassis_detail',
@@ -134,10 +125,8 @@ class ArgManager(object):
 class DiskManager(object):
     """Disk manager."""
 
-    def __init__(self, args):
+    def __init__(self):
         """Manage disks."""
-        self.args = args
-
         disks = []
         for disk in psutil.disk_partitions():
             if not disk.mountpoint.startswith('/media/'):
@@ -152,29 +141,6 @@ class DiskManager(object):
             disks, reverse=True,
             key=lambda disk: (disk['is_nvme'], disk['available_size']))
 
-    def disk_for_large_topics(self):
-        """Return a disk for recording large topics."""
-        # We have a NVME disk, return it for large topics.
-        if len(self.disks) > 0 and self.disks[0]['is_nvme']:
-            return self.disks[0]['mountpoint']
-        # If we are requested to record all topics, return the largest portable
-        # disk, or fall back to the Apollo home directory.
-        if self.args.all:
-            if len(self.disks) > 0:
-                return self.disks[0]['mountpoint']
-            else:
-                return '/apollo'
-        return None
-
-    def disk_for_small_topics(self):
-        """Return a disk for recording small topics."""
-        # If we have multiple disks, use the second-best one for small topics.
-        if len(self.disks) > 1:
-            return self.disks[1]['mountpoint']
-        # If we have only one portable disk, use it for small topics. Or else
-        # fall back to the Apollo home directory.
-        return self.disks[0]['mountpoint'] if len(self.disks) > 0 else '/apollo'
-
     @staticmethod
     def disk_avail_size(disk_path):
         """Get disk available size."""
@@ -187,7 +153,7 @@ class Recorder(object):
 
     def __init__(self, args):
         self.args = args
-        self.disk_manager = DiskManager(args)
+        self.disk_manager = DiskManager()
 
     def start(self):
         """Start recording."""
@@ -195,33 +161,27 @@ class Recorder(object):
             print('Another data recorder is running, skip.')
             return
 
-        task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        large_topics_disk = self.disk_manager.disk_for_large_topics()
-        small_topics_disk = self.disk_manager.disk_for_small_topics()
-        if large_topics_disk == small_topics_disk:
-            self.record_task(large_topics_disk, LARGE_TOPICS + SMALL_TOPICS,
-                             task_id, 'all')
-        else:
-            if large_topics_disk:
-                self.record_task(large_topics_disk, LARGE_TOPICS,
-                                 task_id, 'large')
-            self.record_task(small_topics_disk, SMALL_TOPICS, task_id, 'small')
+        disks = self.disk_manager.disks
+        # To record all topics if
+        # 1. User requested with '--all' argument.
+        # 2. Or we have a NVME disk.
+        record_all = self.args.all or (len(disks) > 0 and disks[0]['is_nvme'])
+        # Use the best disk, or fallback '/apollo' if none available.
+        disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else '/apollo'
+        self.record_task(disk_to_use, 'all' if record_all else SMALL_TOPICS)
 
     def stop(self):
         """Stop recording."""
         shell_cmd('kill -INT $(pgrep -f "rosbag/record" | grep -v pgrep)')
 
-    def record_task(self, disk, topics, task_id, task_type):
+    def record_task(self, disk, topics='all'):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
+        task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         task_dir = os.path.join(disk, 'data/bag', task_id)
-        # As we are using the same task_id, LARGE_TOPICS will goes to subfolder
-        # to avoid conflict when merging.
-        if task_type == 'large':
-            task_dir = os.path.join(task_dir, task_type)
-        print('Recording {} topics to {}'.format(task_type, task_dir))
+        print('Recording bag to {}'.format(task_dir))
 
-        log_file = '/apollo/data/log/apollo_record_{}.out'.format(task_type)
-        topics_str = ' '.join(topics)
+        log_file = '/apollo/data/log/apollo_record.out'
+        topics_str = '-a' if topics == 'all' else ' '.join(topics)
 
         os.makedirs(task_dir)
         cmd = '''

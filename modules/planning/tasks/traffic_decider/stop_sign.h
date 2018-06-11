@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/planning/proto/planning_status.pb.h"
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
@@ -40,8 +41,8 @@ class StopSign : public TrafficRule {
   explicit StopSign(const TrafficRuleConfig& config);
   virtual ~StopSign() = default;
 
-  bool ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame,
+                           ReferenceLineInfo* const reference_line_info);
 
  private:
   void MakeDecisions(Frame* const frame,
@@ -49,6 +50,7 @@ class StopSign : public TrafficRule {
   bool FindNextStopSign(ReferenceLineInfo* const reference_line_info);
   int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
   bool CheckCreep(const hdmap::StopSignInfo& stop_sign_info);
+  bool CheckCreepDone(ReferenceLineInfo* const reference_line_info);
   int ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
                         const hdmap::StopSignInfo& stop_sign_info,
                         StopSignLaneVehicles* watch_vehicles);
@@ -65,14 +67,16 @@ class StopSign : public TrafficRule {
                         StopSignLaneVehicles* watch_vehicles);
   int BuildStopDecision(Frame* const frame,
                         ReferenceLineInfo* const reference_line_info,
-                        hdmap::PathOverlap* const overlap,
-                        const double stop_distance,
+                        const std::string& stop_wall_id,
+                        const double stop_line_s, const double stop_distance,
                         StopSignLaneVehicles* watch_vehicles);
 
  private:
-  static constexpr char const* const STOP_SIGN_VO_ID_PREFIX = "SS_";
-  hdmap::PathOverlap* next_stop_sign_overlap_ = nullptr;
-  hdmap::StopSignInfo* next_stop_sign_ = nullptr;
+  static constexpr const char* STOP_SIGN_VO_ID_PREFIX = "SS_";
+  static constexpr const char* STOP_SIGN_CREEP_VO_ID_PREFIX = "SS_CREEP_";
+
+  hdmap::PathOverlap next_stop_sign_overlap_;
+  hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;
   StopSignStatus::Status stop_status_;
   std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
       associated_lanes_;

@@ -34,6 +34,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::util::WithinBound;
 using apollo::perception::TrafficLight;
@@ -42,14 +43,14 @@ using apollo::perception::TrafficLightDetection;
 SignalLight::SignalLight(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
-bool SignalLight::ApplyRule(Frame* const frame,
-                            ReferenceLineInfo* const reference_line_info) {
+Status SignalLight::ApplyRule(Frame* const frame,
+                              ReferenceLineInfo* const reference_line_info) {
   if (!FindValidSignalLight(reference_line_info)) {
-    return true;
+    return Status::OK();
   }
   ReadSignals();
   MakeDecisions(frame, reference_line_info);
-  return true;
+  return Status::OK();
 }
 
 void SignalLight::ReadSignals() {

@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GLFW_FUSION_VIEWER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_VISUALIZER_GLFW_FUSION_VIEWER_H_
 
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
@@ -30,6 +31,7 @@
 
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/camera/cipv/cipv.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
 #include "modules/perception/obstacle/camera/visualizer/common/camera.h"
@@ -202,7 +204,8 @@ class GLFWFusionViewer {
 
   void draw_3d_classifications(FrameContent *content, bool show_fusion);
   void draw_camera_box(const std::vector<std::shared_ptr<Object>> &objects,
-                       Eigen::Matrix4d w2c, int offset_x, int offset_y,
+                       Eigen::Matrix4d w2c, Eigen::Matrix4d w2c_static,
+                       int offset_x, int offset_y,
                        int image_width, int image_height);
 
   void draw_objects2d(const std::vector<std::shared_ptr<Object>> &objects,
@@ -281,6 +284,11 @@ class GLFWFusionViewer {
   // @brief: draw lane objects in image space
   bool draw_lane_objects_image(cv::Mat *image_mat);
 
+  // @brief draw vanishing point and ground plane on image
+  // stat: static or not. decide colors
+  void draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat, int offset_x,
+                      int offset_y, int image_width, int image_height);
+
   bool use_class_color_ = true;
 
   bool capture_screen_ = false;
@@ -302,7 +310,9 @@ class GLFWFusionViewer {
                                // bbox
   bool show_type_id_label_;
   bool show_lane_;
+  bool show_vp_grid_ = true;  // show vanishing point and ground plane grid
   bool draw_lane_objects_;
+  bool show_trajectory_;
 
   static std::vector<std::vector<int>> s_color_table;
   std::shared_ptr<GLRasterText> raster_text_;
@@ -315,8 +325,8 @@ class GLFWFusionViewer {
   LaneObjectsPtr lane_history_;
   std::vector<std::vector<float>> z_history_;
   //  std::vector<LaneObjects> Lane_history_buffer_;
-  const std::size_t lane_history_buffer_size_ = 40000;
-  const std::size_t object_history_size_ = 5;
+  const std::size_t lane_history_buffer_size_ = 300;
+  const std::size_t object_history_size_ = 100;
   MotionType motion_matrix_;
   // pin-hole camera model with distortion
   std::shared_ptr<CameraDistort<double>> distort_camera_intrinsic_;
@@ -327,7 +337,10 @@ class GLFWFusionViewer {
   float alpha_blending = 0.5;  // [0..1]
   float one_minus_alpha = 1.0 - alpha_blending;
   // object_trajectories
-  std::map<int, std::vector<std::pair<float, float>>> object_trackjectories_;
+
+  std::map<int, size_t> object_id_skip_count_;
+  std::map<int, boost::circular_buffer<std::pair<float, float>>>
+    object_trackjectories_;
   std::map<int, std::vector<double>> object_timestamps_;
 };
 

@@ -43,13 +43,13 @@ class Projector {
 
   bool UvToXy(const T &u, const T &v, Eigen::Matrix<T, 2, 1> *p) const;
 
-  bool UvToXy(const int &u, const int &v, Eigen::Matrix<T, 2, 1> *p) const {
+  bool UvToXy(const int u, const int v, Eigen::Matrix<T, 2, 1> *p) const {
     return UvToXy(static_cast<T>(u), static_cast<T>(v), p);
   }
 
   bool is_init() const { return is_init_; }
 
-  bool IsValidUv(const int &x, const int &y) const {
+  bool IsValidUv(const int x, const int y) const {
     return IsValidUv(static_cast<T>(x), static_cast<T>(y));
   }
 
@@ -83,7 +83,7 @@ class Projector {
 
   bool UvToXyImagePoint(const T &u, const T &v, cv::Point *p) const;
 
-  bool UvToXyImagePoint(const int &u, const int &v, cv::Point *p) const {
+  bool UvToXyImagePoint(const int u, const int v, cv::Point *p) const {
     return UvToXyImagePoint(static_cast<T>(u), static_cast<T>(v), p);
   }
 

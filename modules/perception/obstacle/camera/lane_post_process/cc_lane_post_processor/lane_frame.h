@@ -111,7 +111,7 @@ class LaneFrame {
 
   Bbox bbox(int i) const { return boxes_.at(i); }
 
-  bool FitPolyCurve(const int& graph_id, const ScalarType& graph_siz,
+  bool FitPolyCurve(const int graph_id, const ScalarType& graph_siz,
                     PolyModel* poly_coef, ScalarType* lateral_distance) const;
 
  protected:
@@ -125,8 +125,8 @@ class LaneFrame {
   int AddGroupIntoGraph(const Group& group, Graph* graph,
                         std::unordered_set<int>* hash_marker_idx);
 
-  int AddGroupIntoGraph(const Group& group, const int& start_marker_ascend_id,
-                        const int& end_marker_descend_id, Graph* graph,
+  int AddGroupIntoGraph(const Group& group, const int start_marker_ascend_id,
+                        const int end_marker_descend_id, Graph* graph,
                         std::unordered_set<int>* hash_marker_idx);
 
   void ComputeBbox();

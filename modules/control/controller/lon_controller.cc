@@ -226,10 +226,13 @@ Status LonController::ComputeControlCommand(
       acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
       FLAGS_enable_slope_offset * debug->slope_offset_compensation();
   debug->set_is_full_stop(false);
-  if (std::fabs(debug->preview_acceleration_reference()) <=
-          FLAGS_max_acceleration_when_stopped &&
-      std::fabs(debug->preview_speed_reference()) <=
-          vehicle_param_.max_abs_speed_when_stopped()) {
+  GetPathRemain(debug);
+
+  if ((std::fabs(debug->preview_acceleration_reference()) <=
+           FLAGS_max_acceleration_when_stopped &&
+       std::fabs(debug->preview_speed_reference()) <=
+           vehicle_param_.max_abs_speed_when_stopped()) ||
+      (debug->path_remain() < 0.3)) {
     acceleration_cmd = lon_controller_conf.standstill_acceleration();
     AINFO << "Stop location reached";
     debug->set_is_full_stop(true);
@@ -350,6 +353,7 @@ void LonController::ComputeLongitudinalErrors(
   debug->set_preview_speed_error(preview_point.v() - s_dot_matched);
   debug->set_preview_speed_reference(preview_point.v());
   debug->set_preview_acceleration_reference(preview_point.a());
+  debug->set_current_station(s_matched);
 }
 
 void LonController::SetDigitalFilter(double ts, double cutoff_freq,
@@ -358,6 +362,31 @@ void LonController::SetDigitalFilter(double ts, double cutoff_freq,
   std::vector<double> numerators;
   common::LpfCoefficients(ts, cutoff_freq, &denominators, &numerators);
   digital_filter->set_coefficients(denominators, numerators);
+}
+
+void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
+  int stop_index = 0;
+  while (stop_index < trajectory_message_->trajectory_point_size()) {
+    if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
+        trajectory_message_->trajectory_point(stop_index).a() > -0.01 &&
+        trajectory_message_->trajectory_point(stop_index).a() < 0.0) {
+      break;
+    } else {
+      ++stop_index;
+    }
+  }
+  if (stop_index == trajectory_message_->trajectory_point_size()) {
+    --stop_index;
+    if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 0.1) {
+      AINFO << "the last point is selected as parking point";
+    } else {
+      AINFO << "the last point found in path and speed > speed_deadzone";
+      debug->set_path_remain(10000);
+    }
+  }
+  debug->set_path_remain(
+      trajectory_message_->trajectory_point(stop_index).path_point().s() -
+      debug->current_station());
 }
 
 }  // namespace control

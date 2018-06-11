@@ -224,10 +224,6 @@ bool LidarProcess::InitFrameDependence() {
       AERROR << "failed to get HDMapInput instance.";
       return false;
     }
-    if (!hdmap_input_->Init()) {
-      AERROR << "failed to Init HDMapInput";
-      return false;
-    }
     AINFO << "get and Init hdmap_input succ.";
   }
 

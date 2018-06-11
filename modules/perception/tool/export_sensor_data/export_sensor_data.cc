@@ -110,7 +110,7 @@ void ExportSensorData::WritePose(const std::string& file_pre,
 }
 
 void ExportSensorData::WriteVelocityInfo(const std::string& file_pre,
-                                         const double& timestamp,
+                                         const double timestamp,
                                          const int seq_num,
                                          const Eigen::Vector3f& velocity) {
   std::string filename = file_pre + ".velocity";

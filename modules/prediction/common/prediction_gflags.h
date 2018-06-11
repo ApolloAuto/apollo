@@ -53,7 +53,8 @@ DECLARE_double(r_var);
 DECLARE_double(p_var);
 DECLARE_double(go_approach_rate);
 
-DECLARE_int32(still_obstacle_history_length);
+DECLARE_int32(min_still_obstacle_history_length);
+DECLARE_int32(max_still_obstacle_history_length);
 DECLARE_double(still_obstacle_speed_threshold);
 DECLARE_double(still_pedestrian_speed_threshold);
 DECLARE_double(still_obstacle_position_std);

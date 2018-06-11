@@ -120,7 +120,7 @@ bool GetPointCloudFromFile(const string &pcd_file, PointCloudPtr cloud) {
   return true;
 }
 
-void DrawDetection(const PointCloudPtr &pc_ptr, const PointIndices &valid_idx,
+void DrawDetection(PointCloudPtr pc_ptr, const PointIndices &valid_idx,
                    int rows, int cols, float range,
                    const vector<std::shared_ptr<Object>> &objects,
                    const string &result_file) {

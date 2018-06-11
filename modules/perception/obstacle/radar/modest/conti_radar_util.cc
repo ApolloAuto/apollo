@@ -24,11 +24,11 @@ bool ContiRadarUtil::IsFp(const ContiRadarObs &contiobs,
                           const int tracking_times) {
   int cls = contiobs.obstacle_class();
   if (tracking_times < delay_frames * 2) {
-    const double &lo_vel_rms = contiobs.longitude_vel_rms();
-    const double &la_vel_rms = contiobs.lateral_vel_rms();
-    const double &lo_dist_rms = contiobs.longitude_dist_rms();
-    const double &la_dist_rms = contiobs.lateral_dist_rms();
-    const double &probexist = contiobs.probexist();
+    const double lo_vel_rms = contiobs.longitude_vel_rms();
+    const double la_vel_rms = contiobs.lateral_vel_rms();
+    const double lo_dist_rms = contiobs.longitude_dist_rms();
+    const double la_dist_rms = contiobs.lateral_dist_rms();
+    const double probexist = contiobs.probexist();
     if (cls == static_cast<int>(ContiObjectType::CONTI_CAR) ||
         cls == static_cast<int>(ContiObjectType::CONTI_TRUCK)) {
       if (probexist < params.probexist_vehicle) {

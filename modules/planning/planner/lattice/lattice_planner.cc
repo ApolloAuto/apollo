@@ -168,9 +168,11 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // 4. parse the decision and get the planning target.
   auto ptr_path_time_graph = std::make_shared<PathTimeGraph>(
-      ptr_prediction_querier->GetObstacles(), *ptr_reference_line, init_s[0],
-      init_s[0] + FLAGS_decision_horizon, 0.0, FLAGS_trajectory_time_length,
-      FLAGS_default_reference_line_width);
+      ptr_prediction_querier->GetObstacles(),
+      *ptr_reference_line,
+      reference_line_info,
+      init_s[0], init_s[0] + FLAGS_decision_horizon,
+      0.0, FLAGS_trajectory_time_length);
 
   PlanningTarget planning_target = reference_line_info->planning_target();
   if (planning_target.has_stop_point()) {
@@ -212,7 +214,8 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // Get instance of collision checker and constraint checker
   CollisionChecker collision_checker(frame->obstacles(), init_s[0], init_d[0],
-                                     *ptr_reference_line);
+                                     *ptr_reference_line, reference_line_info,
+                                     ptr_path_time_graph);
 
   // 7. always get the best pair of trajectories to combine; return the first
   // collision-free trajectory.

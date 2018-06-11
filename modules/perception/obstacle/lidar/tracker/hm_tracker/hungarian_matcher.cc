@@ -28,7 +28,7 @@ namespace perception {
 float HungarianMatcher::s_match_distance_maximum_ = 4.0f;
 
 bool HungarianMatcher::SetMatchDistanceMaximum(
-    const float& match_distance_maximum) {
+    const float match_distance_maximum) {
   if (match_distance_maximum >= 0) {
     s_match_distance_maximum_ = match_distance_maximum;
     AINFO << "match distance maximum of HungarianMatcher is "
@@ -178,7 +178,7 @@ void HungarianMatcher::ComputeAssociateMatrix(
 }
 
 void HungarianMatcher::ComputeConnectedComponents(
-    const Eigen::MatrixXf& association_mat, const float& connected_threshold,
+    const Eigen::MatrixXf& association_mat, const float connected_threshold,
     std::vector<std::vector<int>>* track_components,
     std::vector<std::vector<int>>* object_components) {
   // Compute connected components within given threshold
@@ -216,7 +216,7 @@ void HungarianMatcher::ComputeConnectedComponents(
 
 void HungarianMatcher::AssignObjectsToTracks(
     const Eigen::MatrixXf& association_mat,
-    const double& assign_distance_maximum,
+    const double assign_distance_maximum,
     std::vector<std::pair<int, int>>* assignments,
     std::vector<int>* unassigned_tracks, std::vector<int>* unassigned_objects) {
   // Assign objects to tracks with null tracks setup

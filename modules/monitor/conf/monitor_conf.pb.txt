@@ -1,7 +1,7 @@
 modules {
   name: "GPS"
   process_conf {
-    process_cmd_keywords: "gnss_nodelet_manager"
+    process_cmd_keywords: "modules/drivers/gnss/gnss"
   }
 }
 modules {
@@ -23,6 +23,12 @@ modules {
   }
   topic_conf {
     type: CONTROL_COMMAND
+  }
+}
+modules {
+  name: "guardian"
+  process_conf {
+    process_cmd_keywords: "modules/guardian/guardian"
   }
 }
 modules {
@@ -86,9 +92,6 @@ modules {
   name: "planning"
   process_conf {
     process_cmd_keywords: "modules/planning/planning"
-  }
-  topic_conf {
-    type: PLANNING_TRAJECTORY
   }
 }
 modules {

@@ -44,7 +44,7 @@ class BaseFilter {
   // @brief predict the state of filter
   // @params[IN] time_diff: time interval for predicting
   // @return predicted states of filtering
-  virtual Eigen::VectorXf Predict(const double& time_diff) = 0;
+  virtual Eigen::VectorXf Predict(const double time_diff) = 0;
 
   // @brief update filter with object
   // @params[IN] new_object: recently detected object for current updating
@@ -54,12 +54,12 @@ class BaseFilter {
   virtual void UpdateWithObject(
       const std::shared_ptr<TrackedObject>& new_object,
       const std::shared_ptr<TrackedObject>& old_object,
-      const double& time_diff) = 0;
+      const double time_diff) = 0;
 
   // @brief update filter without object
   // @params[IN] time_diff: time interval from last updating
   // @return nothing
-  virtual void UpdateWithoutObject(const double& time_diff) = 0;
+  virtual void UpdateWithoutObject(const double time_diff) = 0;
 
   // @brief get state of filter
   // @params[OUT] anchor_point: anchor point of current state

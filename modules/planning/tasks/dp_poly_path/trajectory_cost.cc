@@ -58,11 +58,13 @@ TrajectoryCost::TrajectoryCost(
   num_of_time_stamps_ = static_cast<uint32_t>(
       std::floor(total_time / config.eval_time_interval()));
 
-  for (const auto ptr_path_obstacle : obstacles) {
+  for (const auto *ptr_path_obstacle : obstacles) {
     if (ptr_path_obstacle->IsIgnore()) {
       continue;
+    } else if (ptr_path_obstacle->LongitudinalDecision().has_stop()) {
+      continue;
     }
-    auto sl_boundary = ptr_path_obstacle->PerceptionSLBoundary();
+    const auto &sl_boundary = ptr_path_obstacle->PerceptionSLBoundary();
 
     const float adc_left_l =
         init_sl_point_.l() + vehicle_param_.left_edge_to_center();
@@ -74,7 +76,7 @@ TrajectoryCost::TrajectoryCost(
       continue;
     }
 
-    const auto ptr_obstacle = ptr_path_obstacle->obstacle();
+    const auto *ptr_obstacle = ptr_path_obstacle->obstacle();
     bool is_bycycle_or_pedestrian =
         (ptr_obstacle->Perception().type() ==
              perception::PerceptionObstacle::BICYCLE ||
@@ -231,6 +233,11 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
     obstacle_cost.cost_items[ComparableCost::HAS_COLLISION] = true;
   }
 
+  // if obstacle is behind ADC, ignore its cost contribution.
+  if (adc_front_s > obs_sl_boundary.end_s()) {
+    return obstacle_cost;
+  }
+
   const float delta_l = std::fabs(
       adc_l - (obs_sl_boundary.start_l() + obs_sl_boundary.end_l()) / 2.0);
 
@@ -258,8 +265,7 @@ ComparableCost TrajectoryCost::GetCostBetweenObsBoxes(
 
   obstacle_cost.safety_cost +=
       config_.obstacle_collision_cost() *
-      Sigmoid(config_.obstacle_collision_cost() - distance);
-  Sigmoid(config_.obstacle_collision_distance() - distance);
+      Sigmoid(config_.obstacle_collision_distance() - distance);
   obstacle_cost.safety_cost +=
       20.0 * Sigmoid(config_.obstacle_risk_distance() - distance);
   return obstacle_cost;

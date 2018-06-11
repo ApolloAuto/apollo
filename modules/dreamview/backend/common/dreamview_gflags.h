@@ -57,4 +57,6 @@ DECLARE_double(voxel_filter_size);
 
 DECLARE_double(voxel_filter_height);
 
+DECLARE_double(system_status_lifetime_seconds);
+
 #endif  // MODULES_DREAMVIEW_BACKEND_COMMON_DREAMVIEW_GFLAGS_H_

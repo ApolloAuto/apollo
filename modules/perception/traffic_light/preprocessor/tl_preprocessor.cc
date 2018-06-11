@@ -63,7 +63,7 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
   // lights projection info. to be added in cached array
   std::shared_ptr<ImageLights> image_lights(new ImageLights);
   // default select long focus camera
-  image_lights->camera_id = LONG_FOCUS;
+  image_lights->camera_id = SHORT_FOCUS;
   image_lights->timestamp = timestamp;
   image_lights->pose = pose;
   image_lights->is_pose_valid = true;
@@ -94,6 +94,7 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
                << " image failed, "
                << "ts: " << GLOG_TIMESTAMP(timestamp) << ", camera_id: "
                << kCameraIdToStr.at(static_cast<CameraId>(cam_id));
+        cached_lights_.push_back(image_lights);
         return false;
       }
     }
@@ -113,7 +114,7 @@ bool TLPreprocessor::CacheLightsProjections(const CarPose &pose,
   return true;
 }
 
-bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
+bool TLPreprocessor::SyncImage(ImageSharedPtr image,
                                ImageLightsPtr *image_lights, bool *should_pub) {
   MutexLock lock(&mutex_);
   PERF_FUNCTION();
@@ -186,9 +187,6 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
           << "no valid pose, ts: " << GLOG_TIMESTAMP(image_ts)
           << " camera_id: " << kCameraIdToStr.at(camera_id);
     std::string cached_array_str = "cached lights";
-    double diff_image_pose_ts = 0.0;
-    double diff_image_sys_ts = 0.0;
-    bool no_signal = false;
     if (fabs(image_ts - last_no_signals_ts_) <
         config_.no_signals_interval_seconds()) {
       AINFO << "TLPreprocessor " << cached_array_str
@@ -198,7 +196,6 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
             << GLOG_TIMESTAMP(image_ts - last_no_signals_ts_)
             << " query /tf in low frequence because no signals forward "
             << " camera_id: " << kCameraIdToStr.at(camera_id);
-      no_signal = true;
     } else if (image_ts < cached_lights_.front()->timestamp) {
       double pose_ts = cached_lights_.front()->timestamp;
       double system_ts = TimeUtil::GetCurrentTime();
@@ -212,9 +209,6 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
             << ", diff between image and system ts: "
             << GLOG_TIMESTAMP(image_ts - system_ts)
             << ", camera_id: " << kCameraIdToStr.at(camera_id);
-      // difference between image and pose timestamps
-      diff_image_pose_ts = image_ts - pose_ts;
-      diff_image_sys_ts = image_ts - system_ts;
     } else if (image_ts > cached_lights_.back()->timestamp) {
       double pose_ts = cached_lights_.back()->timestamp;
       double system_ts = TimeUtil::GetCurrentTime();
@@ -228,8 +222,6 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
             << ", diff between image and system ts: "
             << GLOG_TIMESTAMP(image_ts - system_ts)
             << ", camera_id: " << kCameraIdToStr.at(camera_id);
-      diff_image_pose_ts = image_ts - pose_ts;
-      diff_image_sys_ts = image_ts - system_ts;
     } else if (!find_loc) {
       // if no pose found, log warning msg
       AWARN << "TLPreprocessor " << cached_array_str
@@ -240,18 +232,6 @@ bool TLPreprocessor::SyncImage(const ImageSharedPtr &image,
             << cached_array_str << ".back() ts: "
             << GLOG_TIMESTAMP(cached_lights_.back()->timestamp)
             << ", camera_id: " << kCameraIdToStr.at(camera_id);
-    }
-    if (image->camera_id() == LONG_FOCUS &&
-        (no_signal || last_pub_camera_id_ == LONG_FOCUS)) {
-      *should_pub = true;
-      (*image_lights).reset(new ImageLights);
-      (*image_lights)->image = image;
-      (*image_lights)->camera_id = image->camera_id();
-      (*image_lights)->timestamp = image_ts;
-      (*image_lights)->diff_image_sys_ts = diff_image_sys_ts;
-      (*image_lights)->diff_image_pose_ts = diff_image_pose_ts;
-      (*image_lights)->is_pose_valid = no_signal;
-      (*image_lights)->num_signals = 0;
     }
   }
   // sync fail may because:
@@ -287,7 +267,7 @@ void TLPreprocessor::SelectImage(const CarPose &pose,
     bool ok = true;
     // find the short focus camera without range check
     if (cam_id != kShortFocusIdx) {
-      for (const LightPtr &light : *(lights_on_image_array[cam_id])) {
+      for (LightPtr light : *(lights_on_image_array[cam_id])) {
         if (IsOnBorder(cv::Size(config_.projection_image_cols(),
                                 config_.projection_image_rows()),
                        light->region.projection_roi,

@@ -995,7 +995,8 @@ void Obstacle::SetMotionStatus() {
   double start_y = 0.0;
   double avg_drift_x = 0.0;
   double avg_drift_y = 0.0;
-  int len = std::min(history_size, FLAGS_still_obstacle_history_length);
+  int len = std::min(history_size, FLAGS_max_still_obstacle_history_length);
+  len = std::max(len, FLAGS_min_still_obstacle_history_length);
   CHECK_GT(len, 1);
 
   auto feature_riter = feature_history_.rbegin();

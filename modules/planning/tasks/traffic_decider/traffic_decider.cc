@@ -31,6 +31,7 @@
 #include "modules/planning/tasks/traffic_decider/destination.h"
 #include "modules/planning/tasks/traffic_decider/front_vehicle.h"
 #include "modules/planning/tasks/traffic_decider/keep_clear.h"
+#include "modules/planning/tasks/traffic_decider/pull_over.h"
 #include "modules/planning/tasks/traffic_decider/reference_line_end.h"
 #include "modules/planning/tasks/traffic_decider/rerouting.h"
 #include "modules/planning/tasks/traffic_decider/signal_light.h"
@@ -70,6 +71,10 @@ void TrafficDecider::RegisterRules() {
   s_rule_factory.Register(TrafficRuleConfig::KEEP_CLEAR,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new KeepClear(config);
+                          });
+  s_rule_factory.Register(TrafficRuleConfig::PULL_OVER,
+                          [](const TrafficRuleConfig &config) -> TrafficRule * {
+                            return new PullOver(config);
                           });
   s_rule_factory.Register(TrafficRuleConfig::REFERENCE_LINE_END,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
@@ -159,7 +164,8 @@ Status TrafficDecider::Execute(Frame *frame,
            << TrafficRuleConfig::RuleId_Name(rule_config.rule_id());
   }
 
-  Creeper::instance()->Run(frame, reference_line_info);
+  // Creeper::instance()->Run(frame, reference_line_info);
+
   BuildPlanningTarget(reference_line_info);
   return Status::OK();
 }

@@ -37,7 +37,7 @@ double ObjectTrack::s_acceleration_noise_maximum_ = 5;
 double ObjectTrack::s_speed_noise_maximum_ = 0.4;
 
 bool ObjectTrack::SetTrackCachedHistorySizeMaximum(
-    const int& track_cached_history_size_maximum) {
+    const int track_cached_history_size_maximum) {
   if (track_cached_history_size_maximum > 0) {
     s_track_cached_history_size_maximum_ = track_cached_history_size_maximum;
     AINFO << "track cached history size maximum of object track is "
@@ -48,7 +48,7 @@ bool ObjectTrack::SetTrackCachedHistorySizeMaximum(
   return false;
 }
 
-bool ObjectTrack::SetSpeedNoiseMaximum(const double& speed_noise_maximum) {
+bool ObjectTrack::SetSpeedNoiseMaximum(const double speed_noise_maximum) {
   if (speed_noise_maximum > 0) {
     s_speed_noise_maximum_ = speed_noise_maximum;
     AINFO << "speed noise maximum of object track is "
@@ -60,7 +60,7 @@ bool ObjectTrack::SetSpeedNoiseMaximum(const double& speed_noise_maximum) {
 }
 
 bool ObjectTrack::SetAccelerationNoiseMaximum(
-    const double& acceleration_noise_maximum) {
+    const double acceleration_noise_maximum) {
   if (acceleration_noise_maximum > 0) {
     s_acceleration_noise_maximum_ = acceleration_noise_maximum;
     AINFO << "acceleration noise maximum of object track is "
@@ -127,7 +127,7 @@ ObjectTrack::~ObjectTrack() {
   }
 }
 
-Eigen::VectorXf ObjectTrack::Predict(const double& time_diff) {
+Eigen::VectorXf ObjectTrack::Predict(const double time_diff) {
   // Get the predict of filter
   Eigen::VectorXf filter_predict = filter_->Predict(time_diff);
   // Get the predict of track
@@ -142,7 +142,7 @@ Eigen::VectorXf ObjectTrack::Predict(const double& time_diff) {
 }
 
 void ObjectTrack::UpdateWithObject(std::shared_ptr<TrackedObject>* new_object,
-                                   const double& time_diff) {
+                                   const double time_diff) {
   ACHECK(new_object != nullptr) << "Update object with nullptr object";
   // A. update object track
   // A.1 update filter
@@ -178,7 +178,7 @@ void ObjectTrack::UpdateWithObject(std::shared_ptr<TrackedObject>* new_object,
   SmoothTrackOrientation();
 }
 
-void ObjectTrack::UpdateWithoutObject(const double& time_diff) {
+void ObjectTrack::UpdateWithoutObject(const double time_diff) {
   // A. update object of track
   std::shared_ptr<TrackedObject> new_obj(new TrackedObject());
   new_obj->clone(*current_object_);
@@ -227,7 +227,7 @@ void ObjectTrack::UpdateWithoutObject(const double& time_diff) {
 }
 
 void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
-                                      const double& time_diff) {
+                                      const double time_diff) {
   // A. update object of track
   std::shared_ptr<TrackedObject> new_obj(new TrackedObject());
   new_obj->clone(*current_object_);
@@ -276,7 +276,7 @@ void ObjectTrack::UpdateWithoutObject(const Eigen::VectorXf& predict_state,
 }
 
 void ObjectTrack::SmoothTrackVelocity(
-    const std::shared_ptr<TrackedObject>& new_object, const double& time_diff) {
+    const std::shared_ptr<TrackedObject>& new_object, const double time_diff) {
   // A. keep motion if accelaration of filter is greater than a threshold
   Eigen::Vector3f filter_acceleration_gain = Eigen::Vector3f::Zero();
   filter_->GetAccelerationGain(&filter_acceleration_gain);
@@ -331,7 +331,7 @@ void ObjectTrack::SmoothTrackOrientation() {
 }
 
 bool ObjectTrack::CheckTrackStaticHypothesis(
-    const std::shared_ptr<Object>& new_object, const double& time_diff) {
+    const std::shared_ptr<Object>& new_object, const double time_diff) {
   // A. check whether track velocity angle changed obviously
   bool is_velocity_angle_change =
       CheckTrackStaticHypothesisByVelocityAngleChange(new_object, time_diff);
@@ -354,7 +354,7 @@ bool ObjectTrack::CheckTrackStaticHypothesis(
 }
 
 bool ObjectTrack::CheckTrackStaticHypothesisByVelocityAngleChange(
-    const std::shared_ptr<Object>& new_object, const double& time_diff) {
+    const std::shared_ptr<Object>& new_object, const double time_diff) {
   Eigen::Vector3f previous_velocity =
       history_objects_[history_objects_.size() - 1]->velocity;
   Eigen::Vector3f current_velocity = current_object_->velocity;
@@ -372,7 +372,7 @@ ObjectTrackSet::ObjectTrackSet() { tracks_.reserve(1000); }
 ObjectTrackSet::~ObjectTrackSet() { Clear(); }
 
 bool ObjectTrackSet::SetTrackConsecutiveInvisibleMaximum(
-    const int& track_consecutive_invisible_maximum) {
+    const int track_consecutive_invisible_maximum) {
   if (track_consecutive_invisible_maximum >= 0) {
     s_track_consecutive_invisible_maximum_ =
         track_consecutive_invisible_maximum;
@@ -385,7 +385,7 @@ bool ObjectTrackSet::SetTrackConsecutiveInvisibleMaximum(
 }
 
 bool ObjectTrackSet::SetTrackVisibleRatioMinimum(
-    const float& track_visible_ratio_minimum) {
+    const float track_visible_ratio_minimum) {
   if (track_visible_ratio_minimum >= 0 && track_visible_ratio_minimum <= 1) {
     s_track_visible_ratio_minimum_ = track_visible_ratio_minimum;
     AINFO << "track visible ratio minimum of object track set is "

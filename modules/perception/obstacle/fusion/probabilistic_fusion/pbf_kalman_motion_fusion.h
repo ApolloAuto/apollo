@@ -85,12 +85,12 @@ class PbfKalmanMotionFusion : public PbfBaseMotionFusion {
 
   int GetLidarHistoryLength();
 
-  int GetLidarHistoryIndex(const int &history_seq);
+  int GetLidarHistoryIndex(const int history_seq);
 
-  int GetRadarHistoryIndex(const int &history_seq);
+  int GetRadarHistoryIndex(const int history_seq);
 
-  double GetHistoryTimediff(const int &history_index,
-                            const double &current_timestamp);
+  double GetHistoryTimediff(const int history_index,
+                            const double current_timestamp);
 
   void UpdateAcceleration(const Eigen::VectorXd &measured_acceleration);
 

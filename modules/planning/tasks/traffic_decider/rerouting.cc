@@ -30,6 +30,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::perception::TrafficLight;
@@ -107,15 +108,15 @@ bool Rerouting::ChangeLaneFailRerouting() {
   return true;
 }
 
-bool Rerouting::ApplyRule(Frame* const frame,
-                          ReferenceLineInfo* const reference_line_info) {
+Status Rerouting::ApplyRule(Frame* const frame,
+                            ReferenceLineInfo* const reference_line_info) {
   frame_ = frame;
   reference_line_info_ = reference_line_info;
   if (!ChangeLaneFailRerouting()) {
-    AERROR << "In un-successful lane change case, rerouting failed";
-    return false;
+    return Status(common::PLANNING_ERROR,
+                  "In un-successful lane change case, rerouting failed");
   }
-  return true;
+  return Status::OK();
 }
 
 }  // namespace planning

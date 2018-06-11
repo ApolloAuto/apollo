@@ -31,5 +31,6 @@ DECLARE_double(min_view_range_to_use_lane_marker);
 DECLARE_double(min_lane_half_width);
 DECLARE_double(max_lane_half_width);
 DECLARE_bool(enable_cyclic_rerouting);
+DECLARE_bool(relative_map_generate_left_boundray);
 
 #endif  // MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_GFLAGS_H_

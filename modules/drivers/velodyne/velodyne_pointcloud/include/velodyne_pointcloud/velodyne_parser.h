@@ -205,7 +205,7 @@ class VelodyneParser {
    *           errno value for failure
    */
   virtual void generate_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
       VPointCloud::Ptr &out_msg) = 0;
   virtual void setup();
   // order point cloud fod IDL by velodyne model
@@ -236,7 +236,7 @@ class VelodyneParser {
    */
   void compute_coords(const union RawDistance &raw_distance,
                       const LaserCorrection &corrections,
-                      const uint16_t &rotation, VPoint &point);
+                      const uint16_t rotation, VPoint &point);
 
   bool is_scan_valid(int rotation, float distance);
 
@@ -261,7 +261,7 @@ class Velodyne64Parser : public VelodyneParser {
   ~Velodyne64Parser() {}
 
   void generate_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
       VPointCloud::Ptr &out_msg);
   void order(VPointCloud::Ptr &cloud);
   void setup() override;
@@ -274,7 +274,7 @@ class Velodyne64Parser : public VelodyneParser {
   void unpack(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
   void init_offsets();
   int intensity_compensate(const LaserCorrection &corrections,
-                           const uint16_t &raw_distance, int intensity);
+                           const uint16_t raw_distance, int intensity);
   // Previous Velodyne packet time stamp. (offset to the top hour)
   double previous_packet_stamp_[4];
   uint64_t gps_base_usec_[4];  // full time
@@ -291,7 +291,7 @@ class Velodyne32Parser : public VelodyneParser {
   ~Velodyne32Parser() {}
 
   void generate_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
       VPointCloud::Ptr &out_msg);
   void order(VPointCloud::Ptr &cloud);
 
@@ -311,7 +311,7 @@ class Velodyne16Parser : public VelodyneParser {
   ~Velodyne16Parser() {}
 
   void generate_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
       VPointCloud::Ptr &out_msg);
   void order(VPointCloud::Ptr &cloud);
 

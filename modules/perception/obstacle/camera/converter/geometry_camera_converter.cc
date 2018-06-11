@@ -120,7 +120,7 @@ bool GeometryCameraConverter::LoadCameraIntrinsics(
 }
 
 bool GeometryCameraConverter::ConvertSingle(
-    const float &h, const float &w, const float &l, const float &alpha_deg,
+    const float h, const float w, const float l, const float alpha_deg,
     const Eigen::Vector2f &upper_left, const Eigen::Vector2f &lower_right,
     bool use_width, float *distance, Eigen::Vector2f *mass_center_pixel) {
   // Target Goals: Projection target
@@ -200,7 +200,7 @@ bool GeometryCameraConverter::ConvertSingle(
 }
 
 void GeometryCameraConverter::Rotate(
-    const float &alpha_deg, std::vector<Eigen::Vector3f> *corners) const {
+    const float alpha_deg, std::vector<Eigen::Vector3f> *corners) const {
   Eigen::AngleAxisf yaw(alpha_deg / 180.0f * M_PI, Eigen::Vector3f::UnitY());
   Eigen::AngleAxisf pitch(0.0, Eigen::Vector3f::UnitX());
   Eigen::AngleAxisf roll(0.0, Eigen::Vector3f::UnitZ());
@@ -219,7 +219,7 @@ void GeometryCameraConverter::Rotate(
 }
 
 float GeometryCameraConverter::SearchDistance(
-    const int &pixel_length, const bool &use_width,
+    const int pixel_length, const bool &use_width,
     const Eigen::Matrix<float, 3, 1> &mass_center_v, float close_d,
     float far_d) {
   float curr_d = 0.0f;
@@ -273,7 +273,7 @@ float GeometryCameraConverter::SearchDistance(
 }
 
 void GeometryCameraConverter::SearchCenterDirection(
-    const Eigen::Matrix<float, 2, 1> &box_center_pixel, const float &curr_d,
+    const Eigen::Matrix<float, 2, 1> &box_center_pixel, const float curr_d,
     Eigen::Matrix<float, 3, 1> *mass_center_v,
     Eigen::Matrix<float, 2, 1> *mass_center_pixel) const {
   int depth = 0;
@@ -371,7 +371,7 @@ void GeometryCameraConverter::CheckTruncation(
 }
 
 float GeometryCameraConverter::DecideDistance(
-    const float &distance_h, const float &distance_w,
+    const float distance_h, const float distance_w,
     std::shared_ptr<VisualObject> obj) const {
   float distance = distance_h;
   return distance;

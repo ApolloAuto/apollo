@@ -23,15 +23,17 @@
 #define MODULES_COMMON_MATH_KALMAN_FILTER_1D_H_
 
 // 1 dimensional constant velocity kalman filter
-
 #include "Eigen/Core"
 #include "Eigen/Dense"
+
+#include "modules/common/math/kalman_filter.h"
 
 namespace apollo {
 namespace common {
 namespace math {
 
-class KalmanFilter1D {
+class KalmanFilter1D
+    : public ::apollo::common::math::KalmanFilter<float, 2, 1, 1> {
  public:
   bool Init(const float& x);
 
@@ -42,18 +44,6 @@ class KalmanFilter1D {
   Eigen::Vector2f GetState();
 
   Eigen::Matrix2f GetCov();
-
- private:
-  Eigen::Matrix<float, 2, 1> x_;
-  Eigen::Matrix<float, 2, 2> P_;
-  Eigen::Matrix<float, 2, 2> F_;
-  Eigen::Matrix<float, 2, 2> Q_;
-  Eigen::Matrix<float, 1, 2> H_;
-  Eigen::Matrix<float, 1, 1> R_;
-  Eigen::Matrix<float, 1, 1> y_;
-  Eigen::Matrix<float, 1, 1> z_;
-  Eigen::Matrix<float, 1, 1> S_;
-  Eigen::Matrix<float, 2, 1> K_;
 };
 
 }  // namespace math

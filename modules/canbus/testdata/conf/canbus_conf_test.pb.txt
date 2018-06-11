@@ -1,8 +1,5 @@
 vehicle_parameter {
   brand: LINCOLN_MKZ
-  max_acc: 5.0
-  min_acc: -5.0
-  max_brake_pressure: 7.0
   max_enable_fail_attempt: 5
   driving_mode: COMPLETE_AUTO_DRIVE
 }

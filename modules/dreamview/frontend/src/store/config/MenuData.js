@@ -27,6 +27,7 @@ export default [
             perceptionVelocity: 'Velocity',
             perceptionHeading: 'Heading',
             perceptionId: 'Id',
+            perceptionObstacleInfo: 'Distance and Speed',
             perceptionLaneMarker: 'Lane Marker',
         },
         supportInOfflineView: true,

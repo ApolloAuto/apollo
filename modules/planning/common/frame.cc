@@ -205,7 +205,8 @@ bool Frame::CreateReferenceLineInfo() {
  */
 const Obstacle *Frame::CreateStopObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id, const double obstacle_s) {
+    const std::string &obstacle_id,
+    const double obstacle_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
     return nullptr;
@@ -257,7 +258,8 @@ const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
  */
 const Obstacle *Frame::CreateStaticObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id, const double obstacle_start_s,
+    const std::string &obstacle_id,
+    const double obstacle_start_s,
     const double obstacle_end_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
@@ -467,10 +469,7 @@ const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
   double min_cost = std::numeric_limits<double>::infinity();
   drive_reference_line_info_ = nullptr;
   for (const auto &reference_line_info : reference_line_info_) {
-    if (reference_line_info.ReachedDestination()) {
-      drive_reference_line_info_ = &reference_line_info;
-      return drive_reference_line_info_;
-    } else if (reference_line_info.IsDrivable() &&
+    if (reference_line_info.IsDrivable() &&
                reference_line_info.Cost() < min_cost) {
       drive_reference_line_info_ = &reference_line_info;
       min_cost = reference_line_info.Cost();

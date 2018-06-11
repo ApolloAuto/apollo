@@ -304,10 +304,6 @@ bool RadarProcessSubnode::InitFrameDependence() {
       AERROR << "Failed to get HDMapInput instance.";
       return false;
     }
-    if (!hdmap_input_->Init()) {
-      AERROR << "Failed to Init HDMapInput";
-      return false;
-    }
     AINFO << "Get and Init hdmap_input succ.";
   }
 

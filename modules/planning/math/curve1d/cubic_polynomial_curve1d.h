@@ -34,7 +34,7 @@ class CubicPolynomialCurve1d : public PolynomialCurve1d {
   CubicPolynomialCurve1d() = default;
   virtual ~CubicPolynomialCurve1d() = default;
 
-  CubicPolynomialCurve1d(const std::array<double, 3>& start, const double& end,
+  CubicPolynomialCurve1d(const std::array<double, 3>& start, const double end,
                          const double param);
 
   CubicPolynomialCurve1d(const double x0, const double dx0, const double ddx0,

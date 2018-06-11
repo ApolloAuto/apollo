@@ -36,7 +36,7 @@ namespace apollo {
 namespace perception {
 
 void GetDetectedFromVO(
-    const cv::Size &sz, const float &scale,
+    const cv::Size &sz, const float scale,
     const std::vector<std::shared_ptr<VisualObject>> &objects,
     std::vector<Detected> *detected);
 
@@ -55,8 +55,8 @@ void MatrixMatching(const std::vector<std::vector<float>> &affinity_matrix,
 void ManageTrackerAndID(
     const std::unordered_map<int, int> &local_matching,
     const std::unordered_set<int> &local_matched_detected,
-    const std::vector<Detected> &detected, const int &frame_idx,
-    const double &timestamp, std::vector<Tracked> *tracked,
+    const std::vector<Detected> &detected, const int frame_idx,
+    const double timestamp, std::vector<Tracked> *tracked,
     int *next_tracked_id,
     std::unordered_map<int, std::pair<int, double>> *id_mapping);
 
@@ -64,7 +64,7 @@ void PrintAffinityMatrix(const std::vector<std::vector<float>> &affinity_matrix,
                          const std::vector<Tracked> &tracked,
                          const std::vector<Detected> &detected);
 
-cv::Rect EnlargeBox(const cv::Size &img_size, const float &scale,
+cv::Rect EnlargeBox(const cv::Size &img_size, const float scale,
                     const cv::Rect &box);
 
 }  // namespace perception

@@ -16,11 +16,13 @@
 #ifndef MODULES_MONITOR_SOFTWARE_SUMMARY_MONITOR_H_
 #define MODULES_MONITOR_SOFTWARE_SUMMARY_MONITOR_H_
 
+#include <memory>
 #include <string>
 
 #include "modules/common/adapters/adapter.h"
 #include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/monitor_conf.pb.h"
+#include "modules/monitor/software/safety_manager.h"
 
 namespace apollo {
 namespace monitor {
@@ -46,6 +48,7 @@ class SummaryMonitor : public RecurrentRunner {
 
   size_t system_status_fp_ = 0;
   double last_broadcast_ = 0;
+  std::unique_ptr<SafetyManager> safety_manager_;
 };
 
 }  // namespace monitor
