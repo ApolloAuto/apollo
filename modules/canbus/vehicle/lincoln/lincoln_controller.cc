@@ -869,7 +869,7 @@ bool LincolnController::CheckSafetyError(
       (chassis_detail.safety().is_passenger_detected() &&
        (!chassis_detail.safety().is_passenger_airbag_enabled() ||
         !chassis_detail.safety().is_passenger_buckled()));
-  AINFO << "Vehicle safety error status is : " << safety_error << endl;
+  ADEBUG << "Vehicle safety error status is : " << safety_error;
   return safety_error;
 }
 
