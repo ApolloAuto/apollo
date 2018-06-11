@@ -218,6 +218,17 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::GUARDIAN:
         EnableGuardian(FLAGS_guardian_topic, config);
+      case AdapterConfig::GNSS_RAW_DATA:
+        EnableGnssRawData(FLAGS_gnss_raw_data_topic, config);
+        break;
+      case AdapterConfig::STREAM_STATUS:
+        EnableStreamStatus(FLAGS_stream_status_topic, config);
+        break;
+      case AdapterConfig::GNSS_HEADING:
+        EnableGnssHeading(FLAGS_heading_topic, config);
+        break;
+      case AdapterConfig::RTCM_DATA:
+        EnableRtcmData(FLAGS_rtcm_data_topic, config);
         break;
       default:
         AERROR << "Unknown adapter config type!";
