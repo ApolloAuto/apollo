@@ -246,16 +246,18 @@ Status LanePostProcessingSubnode::ProcEvents() {
         }
       }
       mutex_.lock();
-      if (!motion_service_->GetMotionBuffer()->empty())
+      if (!motion_service_->GetMotionBuffer()->empty()) {
         options_.SetMotion(motion_service_->GetMotionBuffer()->back());
+      }
       mutex_.unlock();
       if (event.timestamp - options_.vehicle_status.time_ts > 0.2) {
         options_.vehicle_status.time_ts = 0.0;  // signal to reset history
       }
     } else {
       mutex_.lock();
-      if (!motion_service_->GetMotionBuffer()->empty())
+      if (!motion_service_->GetMotionBuffer()->empty()) {
         options_.SetMotion(motion_service_->GetMotionBuffer()->back());
+      }
       mutex_.unlock();
     }
     ADEBUG << "options_.vehicle_status.motion:  "
