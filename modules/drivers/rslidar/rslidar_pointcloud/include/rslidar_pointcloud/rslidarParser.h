@@ -26,11 +26,11 @@
 
 /** \file
  *
- *  Velodyne HDL-64E 3D LIDAR data accessors
+ *  Robosense 3D LIDAR data accessors
  *
  *  \ingroup rslidar
  *
- *  These classes unpack raw Velodyne LIDAR packets into several
+ *  These classes unpack raw Robosense LIDAR packets into several
  *  useful formats.
  *
  *     rslidar::Data -- virtual base class for unpacking data into
@@ -48,8 +48,8 @@
  *  \author Jack O'Quin
  */
 
-#ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_RSLIDAR_PARSER_H_
-#define MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_RSLIDAR_PARSER_H_
+#ifndef MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_RSLIDAR_PARSER_H_
+#define MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_RSLIDAR_PARSER_H_
 
 #include <errno.h>
 #include <math.h>
