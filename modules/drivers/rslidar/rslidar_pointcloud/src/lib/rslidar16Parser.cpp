@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace rslidar {
 		private_nh.param("angle_path", anglePath, std::string(""));
 		private_nh.param("channel_path", channelPath, std::string(""));
 	
-		/// 读参数文件 2017-02-27
+		/// 读参数文件 2018-02-27
 		FILE *f_inten = fopen(curvesPath.c_str(), "r");
 		int loopi = 0;
 		int loopj = 0;
