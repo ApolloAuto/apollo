@@ -185,6 +185,7 @@ bool GLFWFusionViewer::initialize() {
   show_fusion_ = false;
   show_associate_color_ = false;
   show_type_id_label_ = true;
+  show_verbose_ = false;
   show_lane_ = true;
   show_trajectory_ = true;
   draw_lane_objects_ = true;
@@ -826,6 +827,9 @@ void GLFWFusionViewer::keyboard(int key) {
     case GLFW_KEY_G:  // G
       show_vp_grid_ = !show_vp_grid_;
       break;
+    case GLFW_KEY_L:  // V
+      show_verbose_ = !show_verbose_;
+      break;
     default:
       break;
   }
@@ -863,6 +867,8 @@ void GLFWFusionViewer::keyboard(int key) {
     if (show_associate_color_) help_str += " (ON)";
     help_str += "\nG: show vanishing point and ground plane grid";
     if (show_vp_grid_) help_str += " (ON)";
+    help_str += "\nT: show verbose";
+    if (show_verbose_) help_str += " (ON)";
   }
 }
 
@@ -1754,7 +1760,7 @@ bool GLFWFusionViewer::draw_car_forward_dir() {
 }
 
 void GLFWFusionViewer::draw_objects(
-    const std::vector<std::shared_ptr<Object>>& objects,
+    double timestamp, const std::vector<std::shared_ptr<Object>>& objects,
     const Eigen::Matrix4d& c2w, bool draw_cube, bool draw_velocity,
     const Eigen::Vector3f& color, bool use_class_color, bool use_track_color) {
   if (show_associate_color_) {
@@ -1868,27 +1874,19 @@ void GLFWFusionViewer::draw_objects(
       raster_text_->print_string(std::to_string(objects[i]->track_id));
       int offset = 2;
 
-      if (objects[i]->local_lidar_track_id != -1) {
-        glRasterPos2i(tc[0] + offset, tc[1]);
-        raster_text_->print_string(
-            std::string("v:") +
-            std::to_string(objects[i]->local_lidar_track_id));
-        offset += 2;
-      }
+      if (show_verbose_) {
+        if (objects[i]->local_camera_track_id != -1) {
+          glRasterPos2i(tc[0] + offset, tc[1]);
+          raster_text_->print_string(
+              std::string("c:") +
+              std::to_string(objects[i]->local_camera_track_id) + "|" +
+              std::to_string(objects[i]->local_camera_track_ts));
+          offset += 2;
+        }
 
-      if (objects[i]->local_camera_track_id != -1) {
         glRasterPos2i(tc[0] + offset, tc[1]);
-        raster_text_->print_string(
-            std::string("c:") +
-            std::to_string(objects[i]->local_camera_track_id));
-        offset += 2;
-      }
-
-      if (objects[i]->local_radar_track_id != -1) {
-        glRasterPos2i(tc[0] + offset, tc[1]);
-        raster_text_->print_string(
-            std::string("r:") +
-            std::to_string(objects[i]->local_radar_track_id));
+        raster_text_->print_string(std::string("t:") +
+                                   std::to_string(timestamp));
         offset += 2;
       }
 
@@ -2022,18 +2020,21 @@ void GLFWFusionViewer::draw_trajectories(FrameContent* content) {
 
 void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
                                                bool show_fusion) {
-  const auto& c2v = content->get_camera_to_world_pose();
-
+  Eigen::Matrix4d c2v = content->get_camera_to_world_pose();
+  double ts = 0.0f;
   if (show_camera_bdv_) {
-    draw_objects(content->get_camera_objects(), c2v, true, true,
-                 Eigen::Vector3f(1, 1, 0), use_class_color_);
+    std::vector<std::shared_ptr<Object>> objs =
+        content->get_camera_objects(&ts);
+    draw_objects(ts, objs, c2v, true, true, Eigen::Vector3f(1, 1, 0),
+                 use_class_color_);
   }
 
   if (show_fusion_) {
     Eigen::Vector3f fused_color(1, 1, 0);
     bool draw_cube = true;
     bool draw_velocity = true;
-    std::vector<std::shared_ptr<Object>> objects = content->get_fused_objects();
+    std::vector<std::shared_ptr<Object>> objects =
+        content->get_fused_objects(&ts);
     ADEBUG << "fused object size in glfw viewer is " << objects.size();
     for (auto obj : objects) {
       ADEBUG << "object in fuse: " << obj->ToString();
@@ -2044,7 +2045,7 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
     for (auto obj : objects_cam) {
       ADEBUG << "object in cam: " << obj->ToString();
     }
-    draw_objects(objects, c2v, draw_cube, draw_velocity, fused_color, false,
+    draw_objects(ts, objects, c2v, draw_cube, draw_velocity, fused_color, false,
                  false);
 
     if (FLAGS_show_fusion_association) {
@@ -2060,8 +2061,9 @@ void GLFWFusionViewer::draw_3d_classifications(FrameContent* content,
     Eigen::Vector3f radar_color(1, 1, 1);
     bool draw_cube = true;
     bool draw_velocity = true;
-    std::vector<std::shared_ptr<Object>> objects = content->get_radar_objects();
-    draw_objects(objects, c2v, draw_cube, draw_velocity, radar_color, false,
+    std::vector<std::shared_ptr<Object>> objects =
+        content->get_radar_objects(&ts);
+    draw_objects(ts, objects, c2v, draw_cube, draw_velocity, radar_color, false,
                  false);
   }
 }
