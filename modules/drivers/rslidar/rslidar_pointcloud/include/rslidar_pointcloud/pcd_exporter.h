@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_RSLIDAR_POINTCLOUD_PCD_EXPORTER_H_
-#define MODULES_DRIVERS_VELODYNE_RSLIDAR_POINTCLOUD_PCD_EXPORTER_H_
+#ifndef MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_PCD_EXPORTER_H_
+#define MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_PCD_EXPORTER_H_
 
 #include <pcl/common/time.h>
 #include <boost/filesystem.hpp>

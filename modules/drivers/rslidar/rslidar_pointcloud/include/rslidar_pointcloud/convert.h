@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_CONVERT_H_
-#define MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_CONVERT_H_
+#ifndef MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_CONVERT_H_
+#define MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_CONVERT_H_
 
 #include <nav_msgs/Odometry.h>
 #include <ros/ros.h>

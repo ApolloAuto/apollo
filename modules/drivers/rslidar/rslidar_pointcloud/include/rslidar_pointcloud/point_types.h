@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_POINT_TYPES_H_
-#define MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_POINT_TYPES_H_
+#ifndef MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_POINT_TYPES_H_
+#define MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_POINT_TYPES_H_
 
 #include <pcl/point_types.h>
 
@@ -39,4 +39,4 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::drivers::rslidar::PointXYZIT,
                                   (float, x, x)(float, y, y)(float, z, z)(
                                       uint8_t, intensity,
                                       intensity)(double, timestamp, timestamp))
-#endif  // MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_POINT_TYPES_H_
+#endif  // MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_POINT_TYPES_H_
