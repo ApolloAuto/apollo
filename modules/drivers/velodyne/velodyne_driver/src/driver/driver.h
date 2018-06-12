@@ -17,7 +17,6 @@
 #ifndef VELODYNE_DRIVER_H_
 #define VELODYNE_DRIVER_H_
 
-#include <ros/ros.h>
 #include <string>
 
 #include "velodyne_driver/socket_input.h"
@@ -40,6 +39,7 @@ struct Config {
   int firing_data_port = 0;
   int positioning_data_port = 0;
   int prefix_angle = 0;  // prefix angle to recv
+  bool use_sensor_sync = false;
 };
 
 class VelodyneDriver {
