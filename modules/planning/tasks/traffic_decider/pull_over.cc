@@ -584,7 +584,7 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
   double stop_point_heading =
       reference_line.GetReferencePoint(stop_point_sl.s()).heading();
 
-  BuildStopDecision(INLANE_STOP_VO_ID_PREFIX,
+  BuildStopDecision(INLANE_STOP_VO_ID_POSTFIX,
                     stop_line_s, stop_point, stop_point_heading);
 
   // record in PlanningStatus
