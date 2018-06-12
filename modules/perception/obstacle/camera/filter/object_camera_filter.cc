@@ -57,6 +57,16 @@ void ObjectCameraFilter::Create(const int track_id, const double timestamp,
   tracked_filters_[track_id].x_.Init(obj_ptr->center.x());
   tracked_filters_[track_id].y_.Init(obj_ptr->center.y());
   tracked_filters_[track_id].theta_.Init(obj_ptr->theta);
+  auto x_state_cov = tracked_filters_[track_id].x_.GetCov();
+  auto y_state_cov = tracked_filters_[track_id].y_.GetCov();
+  obj_ptr->state_uncertainty.block(0, 0, 2, 2) << x_state_cov(0, 0), 0, 0,
+      y_state_cov(0, 0);
+  obj_ptr->state_uncertainty.block(2, 2, 2, 2) << x_state_cov(1, 1), 0, 0,
+      y_state_cov(1, 1);
+  obj_ptr->state_uncertainty.block(0, 2, 2, 2) << x_state_cov(0, 1), 0, 0,
+      y_state_cov(0, 1);
+  obj_ptr->state_uncertainty.block(2, 0, 2, 2) << x_state_cov(1, 0), 0, 0,
+      y_state_cov(1, 0);
 }
 
 void ObjectCameraFilter::Predict(const int track_id, const double timestamp) {

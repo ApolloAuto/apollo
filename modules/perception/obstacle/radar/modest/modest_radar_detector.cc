@@ -113,6 +113,21 @@ bool ModestRadarDetector::Detect(
   ADEBUG << "After process, object size: " << radar_objects.objects.size();
   CollectRadarResult(objects);
   ADEBUG << "radar object size: " << objects->size();
+
+  if (!RadarFrameSupplement::state_vars.initialized_) {
+    RadarFrameSupplement::state_vars.process_noise(1, 1) *= 10;
+    RadarFrameSupplement::state_vars.process_noise(2, 2) *= 10;
+    RadarFrameSupplement::state_vars.process_noise(3, 3) *= 10;
+    RadarFrameSupplement::state_vars.process_noise(3, 3) *= 10;
+
+    RadarFrameSupplement::state_vars.trans_matrix.block(0, 0, 1, 4) << 1.0f,
+        0.0f, 0.33f, 0.0f;
+    RadarFrameSupplement::state_vars.trans_matrix.block(1, 0, 1, 4) << 0.0f,
+        1.0f, 0.0f, 0.33f;
+    ADEBUG << "state trans matrix in RadarFrameSupplement is \n"
+           << RadarFrameSupplement::state_vars.trans_matrix << std::endl;
+    RadarFrameSupplement::state_vars.initialized_ = true;
+  }
   return true;
 }
 

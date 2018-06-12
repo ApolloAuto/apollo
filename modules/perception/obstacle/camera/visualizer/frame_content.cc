@@ -313,9 +313,13 @@ cv::Mat FrameContent::get_camera_image() {
   }
 }
 
-std::vector<std::shared_ptr<Object>> FrameContent::get_camera_objects() {
+std::vector<std::shared_ptr<Object>> FrameContent::get_camera_objects(
+    double* ts) {
   if (!camera_caches_.empty()) {
     auto it = camera_caches_.begin();
+    if (ts != nullptr) {
+      *ts = it->second.timestamp_;
+    }
     return it->second.camera_objects_;
   } else {
     AWARN << "FrameContent::get_camera_objects() : No Objects found";
@@ -351,12 +355,16 @@ Eigen::Matrix4d FrameContent::get_opengl_camera_system_pose() {
   }
 }
 
-std::vector<std::shared_ptr<Object>> FrameContent::get_radar_objects() {
+std::vector<std::shared_ptr<Object>> FrameContent::get_radar_objects(
+    double* ts) {
   auto it = radar_caches_.find(DoubleToMapKey(current_radar_timestamp_));
   if (it == radar_caches_.end()) {
     return std::vector<std::shared_ptr<Object>>();
   }
-  const auto& content = it->second;
+  RadarContent content = it->second;
+  if (ts != nullptr) {
+    *ts = content.timestamp_;
+  }
   return content.radar_objects_;
 }
 
@@ -378,12 +386,17 @@ double FrameContent::get_visualization_timestamp() {
   }
 }
 
-std::vector<std::shared_ptr<Object>> FrameContent::get_fused_objects() {
+std::vector<std::shared_ptr<Object>> FrameContent::get_fused_objects(
+    double* ts) {
   auto it = fusion_caches_.find(DoubleToMapKey(current_fusion_timestamp_));
   if (it == fusion_caches_.end()) {
     return std::vector<std::shared_ptr<Object>>();
   }
-  const auto& content = it->second;
+
+  FusionContent content = it->second;
+  if (ts != nullptr) {
+    *ts = content.timestamp_;
+  }
   return content.fused_objects_;
 }
 
