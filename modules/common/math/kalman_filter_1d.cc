@@ -40,7 +40,7 @@ bool KalmanFilter1D::Init(const float& x) {
 
   Eigen::Matrix<float, 2, 2> q;
   q.setIdentity();
-  q *= 2.0f;
+  q *= 10.0f;
   SetTransitionNoise(q);
 
   Eigen::Matrix<float, 1, 1> r;

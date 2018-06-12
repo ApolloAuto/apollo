@@ -140,7 +140,7 @@ class GLFWFusionViewer {
   void render();
 
   float project_point(const Eigen::VectorXf &in, Eigen::Vector2f *out,
-      const MotionType &motion_matrix);
+                      const MotionType &motion_matrix);
 
  protected:
   vec3 get_velocity_src_position(const std::shared_ptr<Object> &object);
@@ -197,7 +197,8 @@ class GLFWFusionViewer {
                      int image_width, int image_height);
 
   bool draw_car_forward_dir();
-  void draw_objects(const std::vector<std::shared_ptr<Object>> &objects,
+  void draw_objects(double timestamp,
+                    const std::vector<std::shared_ptr<Object>> &objects,
                     const Eigen::Matrix4d &w2c, bool draw_cube,
                     bool draw_velocity, const Eigen::Vector3f &color,
                     bool use_class_color, bool use_track_color = true);
@@ -246,7 +247,6 @@ class GLFWFusionViewer {
   bool show_text;
   bool show_help_text;
   std::string help_str;
-
 
   void get_class_color(int cls, float rgb[3]);
 
@@ -308,6 +308,7 @@ class GLFWFusionViewer {
   bool show_camera_bdv_;
   bool show_associate_color_;  // show same color for both 3d pc bbox and camera
                                // bbox
+  bool show_verbose_;
   bool show_type_id_label_;
   bool show_lane_;
   bool show_vp_grid_ = true;  // show vanishing point and ground plane grid

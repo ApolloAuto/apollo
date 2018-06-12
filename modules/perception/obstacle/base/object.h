@@ -84,6 +84,7 @@ struct alignas(16) Object {
   // age of the tracked object
   double tracking_time = 0.0;
   double latest_tracked_time = 0.0;
+  double timestamp = 0.0;
 
   // stable anchor_point during time, e.g., barycenter
   Eigen::Vector3d anchor_point;
@@ -104,6 +105,13 @@ struct alignas(16) Object {
   int local_radar_track_id = -1;
   // local camera track id
   int local_camera_track_id = -1;
+
+  // local lidar track ts
+  double local_lidar_track_ts = -1;
+  // local radar track ts
+  double local_radar_track_ts = -1;
+  // local camera track ts
+  double local_camera_track_ts = -1;
 
   // sensor particular suplplements, default nullptr
   RadarSupplementPtr radar_supplement = nullptr;
