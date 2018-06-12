@@ -60,9 +60,7 @@ Status PullOver::ApplyRule(Frame* const frame,
     return Status::OK();
   }
 
-  if (IsPullOverComplete()) {
-    auto* planning_state = GetPlanningStatus()->mutable_planning_state();
-    planning_state->mutable_pull_over()->set_status(PullOverStatus::DONE);
+  if (CheckPullOverComplete()) {
     return Status::OK();
   }
 
@@ -439,7 +437,7 @@ int PullOver::FindPullOverStop(PointENU* stop_point) {
   return -1;
 }
 
-bool PullOver::IsPullOverComplete() {
+bool PullOver::CheckPullOverComplete() {
   double adc_speed = reference_line_info_->AdcPlanningPoint().v();
   if (adc_speed > config_.pull_over().max_stop_speed()) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
@@ -467,6 +465,17 @@ bool PullOver::IsPullOverComplete() {
     return false;
   }
 
+  // no stop fence if ADC fully pass stop line
+  double adc_end_edge_s = reference_line_info_->AdcSlBoundary().start_s();
+  if (adc_end_edge_s > stop_point_sl.s()) {
+    auto* planning_state = GetPlanningStatus()->mutable_planning_state();
+    planning_state->mutable_pull_over()->set_status(PullOverStatus::DONE);
+
+    return true;
+  }
+
+  // ADC keep stopping at stop fence
+  BuildPullOverStop(stop_point);
   return true;
 }
 
