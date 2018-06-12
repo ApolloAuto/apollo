@@ -149,8 +149,8 @@ class FrameContent {
 
   void set_pose_type(int type) { continuous_type_ = type; }
 
-  std::vector<std::shared_ptr<Object>> get_camera_objects();
-  std::vector<std::shared_ptr<Object>> get_radar_objects();
+  std::vector<std::shared_ptr<Object>> get_camera_objects(double* ts = nullptr);
+  std::vector<std::shared_ptr<Object>> get_radar_objects(double* ts = nullptr);
   double get_visualization_timestamp();
 
   inline bool has_radar_data() { return radar_caches_.size(); }
@@ -163,7 +163,7 @@ class FrameContent {
      }*/
 
   // fused output
-  std::vector<std::shared_ptr<Object>> get_fused_objects();
+  std::vector<std::shared_ptr<Object>> get_fused_objects(double* ts = nullptr);
   // gt
   std::vector<std::shared_ptr<Object>> get_gt_objects();
   // lane objects

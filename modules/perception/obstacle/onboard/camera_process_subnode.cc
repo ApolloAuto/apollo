@@ -220,7 +220,11 @@ void CameraProcessSubnode::VisualObjToSensorObj(
   ((*sensor_objects)->camera_frame_supplement).reset(new CameraFrameSupplement);
 
   if (!CameraFrameSupplement::state_vars.initialized_) {
-    CameraFrameSupplement::state_vars.process_noise *= 10;
+    CameraFrameSupplement::state_vars.process_noise(1, 1) *= 10;
+    CameraFrameSupplement::state_vars.process_noise(2, 2) *= 10;
+    CameraFrameSupplement::state_vars.process_noise(3, 3) *= 10;
+    CameraFrameSupplement::state_vars.process_noise(3, 3) *= 10;
+
     CameraFrameSupplement::state_vars.trans_matrix.block(0, 0, 1, 4) << 1.0f,
         0.0f, 0.33f, 0.0f;
     CameraFrameSupplement::state_vars.trans_matrix.block(1, 0, 1, 4) << 0.0f,

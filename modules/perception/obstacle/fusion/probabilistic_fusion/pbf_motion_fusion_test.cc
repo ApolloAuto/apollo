@@ -234,6 +234,7 @@ TEST_F(PbfMotionFusionTest, test_update_with_measurement_imf_seq) {
       AINFO << "filtered value:" << location(0) << " " << velocity(0);
     }
   }
+  EXPECT_TRUE(false);
 }
 
 TEST_F(PbfMotionFusionTest, test_update_without_measurement) {
