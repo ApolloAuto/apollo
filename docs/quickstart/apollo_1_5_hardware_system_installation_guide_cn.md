@@ -342,7 +342,7 @@ wget http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_
 
 2. 开始安装
 ```
-sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-x-check -a -s
+sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-x-check -a -s --no-kernel-module
 ```
 
 ##### 可选项: 测试ESD CAN硬件节点
@@ -555,7 +555,7 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
       [http://www.compuphase.com/software_termite.htm](http://www.compuphase.com/software_termite.htm)
 
    5. HDL-64E S3和笔记本电脑之间的COM端口连接
-      ![Serial cable connected to laptop.png](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Serial cable connected to laptop.png)
+      ![Serial cable connected to laptop.png](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Serial_cable_connected_to_laptop.png)
 
    6. 在笔记本运行 **Termite 3.2**
 

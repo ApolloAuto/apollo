@@ -51,7 +51,7 @@ cc_library(
         "//modules/planning/math/smoothing_spline:spline_2d_solver",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:reference_line_smoother_config_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -73,8 +73,8 @@ cc_library(
         "//modules/planning/math/curve1d:quintic_spiral_path",
         "//modules/planning/math/smoothing_spline:spline_2d_solver",
         "//modules/planning/proto:planning_proto",
-        "@eigen//:eigen",
-        "@ipopt//:ipopt",
+        "@eigen",
+        "@ipopt",
     ],
 )
 
@@ -110,6 +110,23 @@ cc_library(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util:factory",
         "//modules/map/pnc_map",
+        "//modules/planning/common:indexed_queue",
+        "//modules/planning/common:planning_util",
+        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_status_proto",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+    ],
+)
+
+cc_binary(
+    name = "smoother_util",
+    srcs = [
+        "smoother_util.cc",
+    ],
+    deps = [
+        ":qp_spline_reference_line_smoother",
+        ":reference_line",
+        ":spiral_reference_line_smoother",
         "//modules/planning/proto:planning_config_proto",
     ],
 )

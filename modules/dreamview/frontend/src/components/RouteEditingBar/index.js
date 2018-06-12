@@ -48,7 +48,7 @@ export default class RouteEditingMenu extends React.Component {
                     <RouteEditingButton label="Send Routing Request"
                                       icon={sendRouteIcon}
                                       onClick={() => {
-                                          if (routeEditingManager.sendRoutingRequest()) {
+                                          if (routeEditingManager.sendRoutingRequest(false)) {
                                               options.showRouteEditingBar = false;
                                           }
                                         }}/>

@@ -21,12 +21,20 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/onboard/async_fusion_subnode.h"
+#include "modules/perception/obstacle/onboard/camera_process_subnode.h"
+#include "modules/perception/obstacle/onboard/camera_shared_data.h"
+#include "modules/perception/obstacle/onboard/cipv_subnode.h"
+#include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 #include "modules/perception/obstacle/onboard/fusion_subnode.h"
+#include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
+#include "modules/perception/obstacle/onboard/lane_shared_data.h"
 #include "modules/perception/obstacle/onboard/lidar_process_subnode.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/obstacle/onboard/radar_process_subnode.h"
+#include "modules/perception/obstacle/onboard/visualization_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_preprocessor_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_proc_subnode.h"
 
@@ -43,15 +51,6 @@ Status Perception::Init() {
   AdapterManager::Init(FLAGS_perception_adapter_config_filename);
 
   RegistAllOnboardClass();
-  /// init config manager
-  ConfigManager* config_manager = ConfigManager::instance();
-  if (!config_manager->Init()) {
-    AERROR << "failed to Init ConfigManager";
-    return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init ConfigManager.");
-  }
-  AINFO << "Init config manager successfully, work_root: "
-        << config_manager->work_root();
-
   const std::string dag_config_path = apollo::common::util::GetAbsolutePath(
       FLAGS_work_root, FLAGS_dag_config_path);
 
@@ -69,11 +68,24 @@ void Perception::RegistAllOnboardClass() {
   /// regist sharedata
   RegisterFactoryLidarObjectData();
   RegisterFactoryRadarObjectData();
+  RegisterFactoryCameraObjectData();
+  RegisterFactoryCameraSharedData();
+  RegisterFactoryCIPVObjectData();
+  RegisterFactoryLaneSharedData();
+  RegisterFactoryFusionSharedData();
   traffic_light::RegisterFactoryTLPreprocessingData();
+
   /// regist subnode
-  RegisterFactoryLidarProcessSubnode();
+  RegisterFactoryLidar64ProcessSubnode();
+  RegisterFactoryLidar16ProcessSubnode();
   RegisterFactoryRadarProcessSubnode();
+  RegisterFactoryCameraProcessSubnode();
+  RegisterFactoryCIPVSubnode();
+  RegisterFactoryLanePostProcessingSubnode();
+  RegisterFactoryAsyncFusionSubnode();
   RegisterFactoryFusionSubnode();
+  RegisterFactoryMotionService();
+  lowcostvisualizer::RegisterFactoryVisualizationSubnode();
   traffic_light::RegisterFactoryTLPreprocessorSubnode();
   traffic_light::RegisterFactoryTLProcSubnode();
 }

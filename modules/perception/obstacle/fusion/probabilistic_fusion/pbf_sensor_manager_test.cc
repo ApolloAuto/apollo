@@ -23,25 +23,26 @@ namespace apollo {
 namespace perception {
 
 TEST(PbfSensorManagerTest, pbf_sensor_frame_manage_test) {
-  PbfSensorManager *sensor_manager = PbfSensorManager::Instance();
+  PbfSensorManager *sensor_manager = PbfSensorManager::instance();
   EXPECT_TRUE(sensor_manager != nullptr);
   SensorObjects lidar_frame;
   lidar_frame.timestamp = 1234567891.01;
-  lidar_frame.sensor_type = VELODYNE_64;
+  lidar_frame.sensor_type = SensorType::VELODYNE_64;
   std::string lidar_name = GetSensorType(lidar_frame.sensor_type);
-  ObjectPtr obj(new Object());
+  std::shared_ptr<Object> obj(new Object());
   lidar_frame.objects.push_back(obj);
   SensorObjects radar_frame;
   radar_frame.timestamp = 1234567891.11;
-  radar_frame.sensor_type = RADAR;
+  radar_frame.sensor_type = SensorType::RADAR;
   std::string radar_name = GetSensorType(radar_frame.sensor_type);
-  ObjectPtr radar_obj(new Object());
+  std::shared_ptr<Object> radar_obj(new Object());
   radar_frame.objects.push_back(radar_obj);
   sensor_manager->AddSensorMeasurements(lidar_frame);
   EXPECT_TRUE(sensor_manager->GetSensor(lidar_name) != nullptr);
   Eigen::Matrix4d pose;
-  EXPECT_TRUE(
-      sensor_manager->GetPose(lidar_name, lidar_frame.timestamp, &pose));
+  const double kEpsilon = 1e-3;
+  EXPECT_TRUE(sensor_manager->GetPose(lidar_name, lidar_frame.timestamp,
+                                      kEpsilon, &pose));
   sensor_manager->AddSensorMeasurements(radar_frame);
   std::vector<PbfSensorFramePtr> frames;
   sensor_manager->GetLatestFrames(radar_frame.timestamp, &frames);

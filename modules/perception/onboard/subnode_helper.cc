@@ -27,12 +27,12 @@ DEFINE_bool(enable_frame_ratio_control, true, "enable frame ratio control");
 using boost::algorithm::is_any_of;
 using boost::algorithm::split;
 using boost::algorithm::trim;
-using std::map;
+using std::unordered_map;
 using std::string;
 using std::vector;
 
-bool SubnodeHelper::ParseReserveField(const string &reserve,
-                                      map<string, string> *result_map) {
+bool SubnodeHelper::ParseReserveField(
+    const string &reserve, unordered_map<string, string> *result_map) {
   int str_len = static_cast<int>(reserve.size());
   if (str_len == 0) {
     AERROR << "reserve is empty";

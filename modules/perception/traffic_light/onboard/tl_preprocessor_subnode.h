@@ -29,7 +29,10 @@
 #include "tf/transform_listener.h"
 #include "tf2_ros/transform_listener.h"
 
-#include "modules/perception/lib/base/timer.h"
+#include "modules/perception/proto/traffic_light/subnode_config.pb.h"
+
+#include "modules/common/time/timer.h"
+#include "modules/perception/lib/base/mutex.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
 #include "modules/perception/traffic_light/base/image.h"
@@ -95,6 +98,7 @@ class TLPreprocessorSubnode : public Subnode {
   TLPreprocessingData *preprocessing_data_ = nullptr;
 
   HDMapInput *hd_map_ = nullptr;
+  Mutex mutex_;
 
   // signals
   float last_signals_ts_ = -1.0;
@@ -103,11 +107,11 @@ class TLPreprocessorSubnode : public Subnode {
 
   // tf
   double last_query_tf_ts_ = 0.0;
-  float query_tf_inverval_seconds_ = 0.0;
 
   // process
   double last_proc_image_ts_ = 0.0;
-  float proc_interval_seconds_ = 0.0;
+
+  traffic_light::subnode_config::SubnodeConfig config_;
 
   DISALLOW_COPY_AND_ASSIGN(TLPreprocessorSubnode);
 };

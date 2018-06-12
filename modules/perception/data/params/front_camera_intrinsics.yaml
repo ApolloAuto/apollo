@@ -1,0 +1,21 @@
+header: 
+    seq: 0
+    stamp: 
+        secs: 0
+        nsecs:                 0
+    frame_id: white_mkz_onsemi_obstacle
+height: 1080
+width: 1920
+distortion_model: plumb_bob
+D: [-0.50578, 0.10144, -0.00745, 0.00664, 0.0]
+K: [2012.47, 0.0, 988, 0.0, 2011.89, 659.86, 0.0, 0.0, 1.0]
+R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+P: [1729.4515380859375, 0.0, 997.0791139046996, 0.0, 0.0, 1926.0577392578125, 571.4609883012963, 0.0, 0.0, 0.0, 1.0, 0.0]
+binning_x: 0
+binning_y: 0
+roi: 
+  x_offset: 0
+  y_offset: 0
+  height: 0
+  width: 0
+  do_rectify: False

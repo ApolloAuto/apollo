@@ -28,13 +28,14 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
+#include "modules/perception/common/sequence_type_fuser/base_type_fuser.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_builder.h"
+#include "modules/perception/obstacle/lidar/interface/base_object_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
-#include "modules/perception/obstacle/lidar/interface/base_type_fuser.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
@@ -52,6 +53,9 @@ class LidarProcessSubnode : public Subnode {
   apollo::common::Status ProcEvents() override {
     return apollo::common::Status::OK();
   }
+
+ protected:
+  virtual SensorType GetSensorType() const = 0;
 
  private:
   bool InitInternal() override;
@@ -80,13 +84,37 @@ class LidarProcessSubnode : public Subnode {
   HDMapInput* hdmap_input_ = nullptr;
   std::unique_ptr<BaseROIFilter> roi_filter_;
   std::unique_ptr<BaseSegmentation> segmentor_;
+  std::unique_ptr<BaseObjectFilter> object_filter_;
   std::unique_ptr<BaseObjectBuilder> object_builder_;
   std::unique_ptr<BaseTracker> tracker_;
   std::unique_ptr<BaseTypeFuser> type_fuser_;
   pcl_util::PointIndicesPtr roi_indices_;
 };
 
-REGISTER_SUBNODE(LidarProcessSubnode);
+class Lidar64ProcessSubnode : public LidarProcessSubnode {
+ protected:
+  SensorType GetSensorType() const override;
+};
+
+class Lidar16ProcessSubnode : public LidarProcessSubnode {
+ protected:
+  SensorType GetSensorType() const override;
+};
+
+REGISTER_SUBNODE(Lidar64ProcessSubnode);
+
+// To use 16-beam Lidar, you need to
+// 1. Point to proper model by setting --cnn_segmentation_config, which is
+//    defined in modules/perception/common/perception_gflags.cc. The model is
+//    generally located at modules/perception/model.
+// 2. Define subnode config in modules/perception/conf/dag_streaming.config:
+//    subnodes {
+//      id: 1
+//      name: "Lidar16ProcessSubnode"
+//      reserve: "device_id:velodyne16;"
+//      type: SUBNODE_IN
+//    }
+REGISTER_SUBNODE(Lidar16ProcessSubnode);
 
 }  // namespace perception
 }  // namespace apollo

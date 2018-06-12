@@ -71,19 +71,19 @@ void PiecewiseTrajectory1d::AppendSegment(
     double a0 = last_trajectory->Evaluate(2, last_param_length);
     double j0 = last_trajectory->Evaluate(3, last_param_length);
 
-    if (std::abs(s0 - s1) > 1.0e-4) {
+    if (std::fabs(s0 - s1) > 1.0e-4) {
       AWARN << "The appended segment is not smooth in order 0";
     }
 
-    if (std::abs(v0 - v1) > 1.0e-4) {
+    if (std::fabs(v0 - v1) > 1.0e-4) {
       AWARN << "The appended segment is not smooth in order 1";
     }
 
-    if (std::abs(a0 - a1) > 1.0e-4) {
+    if (std::fabs(a0 - a1) > 1.0e-4) {
       AWARN << "The appended segment is not smooth in order 2";
     }
 
-    if (std::abs(j0 - j1) > 1.0e-4) {
+    if (std::fabs(j0 - j1) > 1.0e-4) {
       AWARN << "The appended segment is not smooth in order 3";
     }
     trajectory_segments_.push_back(trajectory);

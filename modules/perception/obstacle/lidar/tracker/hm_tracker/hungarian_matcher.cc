@@ -14,14 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <utility>
-#include <vector>
+#include "modules/perception/obstacle/lidar/tracker/hm_tracker/hungarian_matcher.h"
 
 #include "modules/common/log.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
-#include "modules/perception/obstacle/common/graph_util.h"
+#include "modules/perception/common/geometry_util.h"
+#include "modules/perception/common/graph_util.h"
 #include "modules/perception/obstacle/common/hungarian_bigraph_matcher.h"
-#include "modules/perception/obstacle/lidar/tracker/hm_tracker/hungarian_matcher.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/track_object_distance.h"
 
 namespace apollo {
@@ -30,7 +28,7 @@ namespace perception {
 float HungarianMatcher::s_match_distance_maximum_ = 4.0f;
 
 bool HungarianMatcher::SetMatchDistanceMaximum(
-    const float& match_distance_maximum) {
+    const float match_distance_maximum) {
   if (match_distance_maximum >= 0) {
     s_match_distance_maximum_ = match_distance_maximum;
     AINFO << "match distance maximum of HungarianMatcher is "
@@ -41,12 +39,12 @@ bool HungarianMatcher::SetMatchDistanceMaximum(
   return false;
 }
 
-void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
-                             const std::vector<ObjectTrackPtr>& tracks,
-                             const std::vector<Eigen::VectorXf>& tracks_predict,
-                             std::vector<TrackObjectPair>* assignments,
-                             std::vector<int>* unassigned_tracks,
-                             std::vector<int>* unassigned_objects) {
+void HungarianMatcher::Match(
+    std::vector<std::shared_ptr<TrackedObject>>* objects,
+    const std::vector<ObjectTrackPtr>& tracks,
+    const std::vector<Eigen::VectorXf>& tracks_predict,
+    std::vector<std::pair<int, int>>* assignments,
+    std::vector<int>* unassigned_tracks, std::vector<int>* unassigned_objects) {
   // A. computing association matrix
   Eigen::MatrixXf association_mat(tracks.size(), objects->size());
   ComputeAssociateMatrix(tracks, tracks_predict, (*objects), &association_mat);
@@ -64,7 +62,7 @@ void HungarianMatcher::Match(std::vector<TrackedObjectPtr>* objects,
   unassigned_tracks->clear();
   unassigned_objects->clear();
   for (size_t i = 0; i < track_components.size(); i++) {
-    std::vector<TrackObjectPair> sub_assignments;
+    std::vector<std::pair<int, int>> sub_assignments;
     std::vector<int> sub_unassigned_tracks;
     std::vector<int> sub_unassigned_objects;
     MatchInComponents(association_mat, track_components[i],
@@ -90,7 +88,7 @@ void HungarianMatcher::MatchInComponents(
     const Eigen::MatrixXf& association_mat,
     const std::vector<int>& track_component,
     const std::vector<int>& object_component,
-    std::vector<TrackObjectPair>* sub_assignments,
+    std::vector<std::pair<int, int>>* sub_assignments,
     std::vector<int>* sub_unassigned_tracks,
     std::vector<int>* sub_unassigned_objects) {
   sub_assignments->clear();
@@ -123,7 +121,7 @@ void HungarianMatcher::MatchInComponents(
   // C. multi object track match
   std::vector<int> track_local2global;
   std::vector<int> object_local2global;
-  std::vector<TrackObjectPair> local_assignments;
+  std::vector<std::pair<int, int>> local_assignments;
   std::vector<int> local_unassigned_tracks;
   std::vector<int> local_unassigned_objects;
   Eigen::MatrixXf local_association_mat(track_component.size(),
@@ -168,7 +166,7 @@ void HungarianMatcher::MatchInComponents(
 void HungarianMatcher::ComputeAssociateMatrix(
     const std::vector<ObjectTrackPtr>& tracks,
     const std::vector<Eigen::VectorXf>& tracks_predict,
-    const std::vector<TrackedObjectPtr>& new_objects,
+    const std::vector<std::shared_ptr<TrackedObject>>& new_objects,
     Eigen::MatrixXf* association_mat) {
   // Compute matrix of association distance
   for (size_t i = 0; i < tracks.size(); ++i) {
@@ -180,7 +178,7 @@ void HungarianMatcher::ComputeAssociateMatrix(
 }
 
 void HungarianMatcher::ComputeConnectedComponents(
-    const Eigen::MatrixXf& association_mat, const float& connected_threshold,
+    const Eigen::MatrixXf& association_mat, const float connected_threshold,
     std::vector<std::vector<int>>* track_components,
     std::vector<std::vector<int>>* object_components) {
   // Compute connected components within given threshold
@@ -218,8 +216,8 @@ void HungarianMatcher::ComputeConnectedComponents(
 
 void HungarianMatcher::AssignObjectsToTracks(
     const Eigen::MatrixXf& association_mat,
-    const double& assign_distance_maximum,
-    std::vector<TrackObjectPair>* assignments,
+    const double assign_distance_maximum,
+    std::vector<std::pair<int, int>>* assignments,
     std::vector<int>* unassigned_tracks, std::vector<int>* unassigned_objects) {
   // Assign objects to tracks with null tracks setup
   std::vector<int> tracks_idx;

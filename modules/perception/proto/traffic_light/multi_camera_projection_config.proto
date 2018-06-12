@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package apollo.perception.traffic_light.multi_camera_projection_config;
+
+message CameraFocusConfig {
+  optional string name = 1;
+  optional string camera_extrinsic_file = 2;
+  optional string camera_intrinsic_file = 3;
+}
+
+message MultiCamerasProjectionConfig {
+  optional string name = 1 [ default = "MultiCamerasProjection" ];
+  optional string version = 2 [ default = "1.0.0" ];
+  optional string single_projection = 3 [ default = "BoundaryProjection" ];
+  repeated string camera_names = 4;
+  repeated CameraFocusConfig camera_focus_config = 5;
+}
+
+message ModelConfigs {
+  optional MultiCamerasProjectionConfig multi_camera_projection_config = 1;
+}

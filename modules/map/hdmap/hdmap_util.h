@@ -58,8 +58,13 @@ std::string RoutingMapFile();
  * @return end way point file path
  */
 inline std::string EndWayPointFile() {
-  return apollo::common::util::StrCat(FLAGS_map_dir, "/",
-                                      FLAGS_end_way_point_filename);
+  if (FLAGS_use_navigation_mode) {
+    return apollo::common::util::StrCat(
+        FLAGS_navigation_mode_end_way_point_file);
+  } else {
+    return apollo::common::util::StrCat(FLAGS_map_dir, "/",
+                                        FLAGS_end_way_point_filename);
+  }
 }
 
 inline std::string SpeedControlFile() {

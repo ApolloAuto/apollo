@@ -79,9 +79,7 @@ class Factory {
     return producers_.erase(id) == 1;
   }
 
-  bool Empty() const {
-    return producers_.empty();
-  }
+  bool Empty() const { return producers_.empty(); }
 
   /**
    * @brief Creates and transfers membership of an object of type matching id.
@@ -92,7 +90,7 @@ class Factory {
    */
   template <typename... Args>
   std::unique_ptr<AbstractProduct> CreateObjectOrNull(const IdentifierType &id,
-                                                      Args... args) {
+                                                      Args &&... args) {
     auto id_iter = producers_.find(id);
     if (id_iter != producers_.end()) {
       return std::unique_ptr<AbstractProduct>(
@@ -109,8 +107,8 @@ class Factory {
    */
   template <typename... Args>
   std::unique_ptr<AbstractProduct> CreateObject(const IdentifierType &id,
-                                                Args... args) {
-    auto result = CreateObjectOrNull(id, args...);
+                                                Args &&... args) {
+    auto result = CreateObjectOrNull(id, std::forward<Args>(args)...);
     AERROR_IF(!result) << "Factory could not create Object of type : " << id;
     return result;
   }

@@ -65,13 +65,13 @@ class BaseMapNodePool {
   /**@brief new a map node. */
   virtual BaseMapNode* AllocNewMapNode() = 0;
   /**@brief init a map node. */
-  virtual void InitNewMapNode(BaseMapNode* node);
+  void InitNewMapNode(BaseMapNode* node);
   /**@brief Finalize a map node, before reset or delloc the map node. */
-  virtual void FinalizeMapNode(BaseMapNode* node);
+  void FinalizeMapNode(BaseMapNode* node);
   /**@brief delloc a map node. */
-  virtual void DellocMapNode(BaseMapNode* node);
+  void DellocMapNode(BaseMapNode* node);
   /**@brief reset a map node. */
-  virtual void ResetMapNode(BaseMapNode* node);
+  void ResetMapNode(BaseMapNode* node);
 
  protected:
   /**@brief The flag of pool auto expand. */

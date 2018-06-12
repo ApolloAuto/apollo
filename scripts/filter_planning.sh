@@ -25,6 +25,7 @@ function print_help() {
    echo "  -np filter for planning dependencies, produces *.np.bag"
    echo "  -wp filter for planning and its dependencies, produces *.wp.bag"
    echo "  -pn filter out planning and prediction, produces *.npp.bag"
+   echo "  -co filter out perception, prediction and planning, produces *.co.bag"
 }
 
 routing_topic="topic == '/apollo/routing_response'"
@@ -40,7 +41,9 @@ perfect_control_topic="$perception_topic  \
 
 planning_deps="$perfect_control_topic \
     or topic == '/apollo/canbus/chassis' \
-    or topic == '/apollo/localization/pose'"
+    or topic == '/apollo/localization/pose' \
+    or topic == '/apollo/navigation' \
+    or topic == '/apollo/relative_map'"
 
 planning_topic="topic == '/apollo/planning'"
 prediction_topic="topic == '/apollo/prediction'"
@@ -49,6 +52,9 @@ planning_all="topic == '/apollo/planning' \
     or topic == '/apollo/drive_event' \
     or $planning_deps"
 
+camera_only="topic != '/apollo/perception/obstacles' \
+    and topic != '/apollo/prediction' \
+    and topic != '/apollo/planning'"
 
 #Three different filter mode
 #create perfect control mode bag
@@ -63,6 +69,9 @@ is_perception=false;
 
 #no prediction and no planning
 is_no_prediction_planning=false;
+
+#no perception, no prediction and no planning, with only camera topic
+is_camera_only=false;
 
 work_mode_num=0
 
@@ -95,6 +104,11 @@ case $key in
     ;;
     -wp|--withplanning)
     is_with_planning=true
+    work_mode_num=$((work_mode_num+1))
+    shift # past value
+    ;;
+    -co|--cameraonly)
+    is_camera_only=true
     work_mode_num=$((work_mode_num+1))
     shift # past value
     ;;
@@ -150,6 +164,11 @@ function filter() {
     if $is_with_planning; then
         target="$2/${name%.*}.wp.bag"
         rosbag filter $1 "$target" "$planning_all"
+    fi
+    
+    if $is_camera_only; then
+	target="$2/${name%.*}.co.bag"
+	rosbag filter $1 "$target" "$camera_only"
     fi
     echo "filtered ${bag} to $target"
 }

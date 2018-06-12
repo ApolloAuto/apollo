@@ -1,6 +1,7 @@
 import { observable, action } from "mobx";
 
 import RENDERER from "renderer";
+import MAP_NAVIGATOR from "components/Navigation/MapNavigator";
 
 export default class RouteEditingManager {
 
@@ -21,7 +22,7 @@ export default class RouteEditingManager {
         }
     }
 
-    @action addDefaultEndPoint(poiName) {
+    @action addDefaultEndPoint(poiName, inNavigationMode) {
         if (_.isEmpty(this.defaultRoutingEndPoint)) {
             alert("Failed to get default routing end point, make sure there's " +
                   "a default end point file under the map data directory.");
@@ -33,7 +34,12 @@ export default class RouteEditingManager {
             return;
         }
         this.currentPOI = poiName;
-        RENDERER.addDefaultEndPoint(this.defaultRoutingEndPoint[poiName]);
+
+        if (inNavigationMode) {
+            MAP_NAVIGATOR.addDefaultEndPoint(this.defaultRoutingEndPoint[poiName]);
+        } else {
+            RENDERER.addDefaultEndPoint(this.defaultRoutingEndPoint[poiName]);
+        }
     }
 
     enableRouteEditing() {
@@ -52,11 +58,15 @@ export default class RouteEditingManager {
         RENDERER.removeAllRoutingPoints();
     }
 
-    sendRoutingRequest() {
-        const success = RENDERER.sendRoutingRequest();
-        if (success) {
-            this.disableRouteEditing();
+    sendRoutingRequest(inNavigationMode) {
+        if (!inNavigationMode) {
+            const success = RENDERER.sendRoutingRequest();
+            if (success) {
+                this.disableRouteEditing();
+            }
+            return success;
+        } else {
+            return MAP_NAVIGATOR.sendRoutingRequest();
         }
-        return success;
     }
 }

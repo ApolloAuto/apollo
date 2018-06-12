@@ -9,6 +9,7 @@ cc_library(
         "trajectory_cost.cc",
     ],
     hdrs = [
+        "comparable_cost.h",
         "dp_road_graph.h",
         "trajectory_cost.h",
     ],
@@ -17,18 +18,18 @@ cc_library(
         "//modules/common/math",
         "//modules/common/status",
         "//modules/map/proto:map_proto",
-        "//modules/planning/common:planning_thread_pool",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:path_decision",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:planning_thread_pool",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/math/curve1d:polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/proto:dp_poly_path_config_proto",
         "//modules/planning/reference_line",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -47,6 +48,18 @@ cc_library(
 )
 
 cc_test(
+    name = "comparable_cost_test",
+    size = "small",
+    srcs = [
+        "comparable_cost_test.cc",
+    ],
+    deps = [
+        ":dp_poly_path",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "trajectory_cost_test",
     size = "small",
     srcs = [
@@ -57,4 +70,5 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
 cpplint()

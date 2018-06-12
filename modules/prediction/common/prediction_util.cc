@@ -21,6 +21,7 @@
 #include <string>
 
 #include "modules/common/log.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 
@@ -57,6 +58,84 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
   roots->first = (0.0 - b + std::sqrt(delta)) / (2.0 * a);
   roots->second = (0.0 - b - std::sqrt(delta)) / (2.0 * a);
   return 0;
+}
+
+double EvaluateQuinticPolynomial(
+    const std::array<double, 6>& coeffs,
+    const double t, const uint32_t order,
+    const double end_t, const double end_value) {
+  if (t >= end_t) {
+    switch (order) {
+      case 0: {
+        return end_value;
+      }
+      default: {
+        return 0.0;
+      }
+    }
+  }
+  switch (order) {
+    case 0: {
+      return ((((coeffs[5] * t + coeffs[4]) * t + coeffs[3]) * t +
+               coeffs[2]) * t + coeffs[1]) * t + coeffs[0];
+    }
+    case 1: {
+      return (((5.0 * coeffs[5] * t + 4.0 * coeffs[4]) * t +
+               3.0 * coeffs[3]) * t + 2.0 * coeffs[2]) * t + coeffs[1];
+    }
+    case 2: {
+      return (((20.0 * coeffs[5] * t + 12.0 * coeffs[4]) * t) +
+              6.0 * coeffs[3]) * t + 2.0 * coeffs[2];
+    }
+    case 3: {
+      return (60.0 * coeffs[5] * t + 24.0 * coeffs[4]) * t + 6.0 * coeffs[3];
+    }
+    case 4: {
+      return 120.0 * coeffs[5] * t + 24.0 * coeffs[4];
+    }
+    case 5: {
+      return 120.0 * coeffs[5];
+    }
+    default:
+      return 0.0;
+  }
+}
+
+double EvaluateQuarticPolynomial(
+    const std::array<double, 5>& coeffs,
+    const double t, const uint32_t order,
+    const double end_t, const double end_value) {
+  if (t >= end_t) {
+    switch (order) {
+      case 0: {
+        return end_value;
+      }
+      default: {
+        return 0.0;
+      }
+    }
+  }
+  switch (order) {
+    case 0: {
+      return (((coeffs[4] * t + coeffs[3]) * t + coeffs[2]) * t +
+              coeffs[1]) * t + coeffs[0];
+    }
+    case 1: {
+      return ((4.0 * coeffs[4] * t + 3.0 * coeffs[3]) * t +
+              2.0 * coeffs[2]) * t + coeffs[1];
+    }
+    case 2: {
+      return (12.0 * coeffs[4] * t + 6.0 * coeffs[3]) * t + 2.0 * coeffs[2];
+    }
+    case 3: {
+      return 24.0 * coeffs[4] * t + 6.0 * coeffs[3];
+    }
+    case 4: {
+      return 24.0 * coeffs[4];
+    }
+    default:
+      return 0.0;
+  }
 }
 
 }  // namespace math_util
@@ -154,77 +233,18 @@ void GenerateFreeMoveTrajectoryPoints(
   }
 }
 
-void GenerateLaneSequenceTrajectoryPoints(
-    Eigen::Matrix<double, 4, 1>* state, Eigen::Matrix<double, 4, 4>* transition,
-    const LaneSequence& sequence, const size_t num, const double period,
-    std::vector<TrajectoryPoint>* points) {
-  double lane_s = (*state)(0, 0);
-  double lane_l = (*state)(1, 0);
-  double lane_speed = (*state)(2, 0);
-  double lane_acc = (*state)(3, 0);
-
-  int lane_segment_index = 0;
-  std::string lane_id = sequence.lane_segment(lane_segment_index).lane_id();
-  for (size_t i = 0; i < num; ++i) {
-    Eigen::Vector2d point;
-    double theta = M_PI;
-    if (!PredictionMap::SmoothPointFromLane(lane_id, lane_s, lane_l, &point,
-                                            &theta)) {
-      AERROR << "Unable to get smooth point from lane [" << lane_id
-             << "] with s [" << lane_s << "] and l [" << lane_l << "]";
-      break;
-    }
-
-    // update state
-    if (lane_speed <= 0.0) {
-      ADEBUG << "Non-positive lane_speed tacked : " << lane_speed;
-      lane_speed = 0.0;
-      lane_acc = 0.0;
-      (*transition)(1, 1) = 1.0;
-    } else if (lane_speed >= FLAGS_max_speed) {
-      lane_speed = FLAGS_max_speed;
-      lane_acc = 0.0;
-    }
-
-    // add trajectory point
-    TrajectoryPoint trajectory_point;
-    PathPoint path_point;
-    path_point.set_x(point.x());
-    path_point.set_y(point.y());
-    path_point.set_z(0.0);
-    path_point.set_theta(theta);
-    path_point.set_lane_id(lane_id);
-    trajectory_point.mutable_path_point()->CopyFrom(path_point);
-    trajectory_point.set_v(lane_speed);
-    trajectory_point.set_a(lane_acc);
-    trajectory_point.set_relative_time(static_cast<double>(i) * period);
-    points->emplace_back(std::move(trajectory_point));
-
-    (*state)(2, 0) = lane_speed;
-    (*state)(3, 0) = lane_acc;
-
-    (*state) = (*transition) * (*state);
-    if (lane_s >= (*state)(0, 0)) {
-      (*state)(0, 0) = lane_s;
-      (*state)(1, 0) = lane_l;
-      (*state)(2, 0) = 0.0;
-      (*state)(3, 0) = 0.0;
-      (*transition)(1, 1) = 1.0;
-    }
-    lane_s = (*state)(0, 0);
-    lane_l = (*state)(1, 0);
-    lane_speed = (*state)(2, 0);
-    lane_acc = (*state)(3, 0);
-
-    // find next lane id
-    while (lane_s > PredictionMap::LaneById(lane_id)->total_length() &&
-           lane_segment_index + 1 < sequence.lane_segment_size()) {
-      lane_segment_index += 1;
-      lane_s = lane_s - PredictionMap::LaneById(lane_id)->total_length();
-      (*state)(0, 0) = lane_s;
-      lane_id = sequence.lane_segment(lane_segment_index).lane_id();
-    }
+double AdjustSpeedByCurvature(const double speed, const double curvature) {
+  if (std::abs(curvature) < FLAGS_turning_curvature_lower_bound) {
+    return speed;
   }
+  if (std::abs(curvature) > FLAGS_turning_curvature_upper_bound) {
+    return 3.0;
+  }
+  return apollo::common::math::lerp(FLAGS_speed_at_lower_curvature,
+                                    FLAGS_turning_curvature_lower_bound,
+                                    FLAGS_speed_at_upper_curvature,
+                                    FLAGS_turning_curvature_upper_bound,
+                                    curvature);
 }
 
 }  // namespace predictor_util

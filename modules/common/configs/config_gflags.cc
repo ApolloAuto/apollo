@@ -18,6 +18,7 @@
 
 DEFINE_string(map_dir, "modules/map/data/demo",
               "Directory which contains a group of related maps.");
+DEFINE_int32(local_utm_zone_id, 10, "UTM zone id.");
 
 DEFINE_string(test_base_map_filename, "",
               "If not empty, use this test base map files.");
@@ -46,3 +47,7 @@ DEFINE_string(localization_tf2_child_frame_id, "localization",
 
 DEFINE_bool(use_navigation_mode, false,
             "Use relative position in navigation mode");
+DEFINE_string(
+    navigation_mode_end_way_point_file,
+    "modules/dreamview/conf/navigation_mode_default_end_way_point.txt",
+    "end_way_point file used if navigation mode is set.");

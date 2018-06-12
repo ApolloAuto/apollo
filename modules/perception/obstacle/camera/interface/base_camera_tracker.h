@@ -19,11 +19,12 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_TRACKER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_INTERFACE_BASE_CAMERA_TRACKER_H_
 
-#include <Eigen/Core>
-#include <opencv2/opencv.hpp>
-
+#include <memory>
 #include <string>
 #include <vector>
+
+#include "Eigen/Core"
+#include "opencv2/opencv.hpp"
 
 #include "modules/common/macro.h"
 #include "modules/perception/lib/base/registerer.h"
@@ -41,8 +42,9 @@ class BaseCameraTracker {
 
   // @brief: Assign global track id for camera objects (ID association)
   // @param [in/out]: object lists, added tracking related information
-  virtual bool Associate(const float& timestamp,
-                         std::vector<VisualObjectPtr>* objects) = 0;
+  virtual bool Associate(
+      const cv::Mat& img, const double timestamp,
+      std::vector<std::shared_ptr<VisualObject>>* objects) = 0;
 
   virtual std::string Name() const = 0;
 

@@ -193,7 +193,7 @@ TEST(Obstacle, CreateStaticVirtualObstacle) {
   std::unique_ptr<Obstacle> obstacle =
       Obstacle::CreateStaticVirtualObstacles("abc", box);
   EXPECT_EQ("abc", obstacle->Id());
-  EXPECT_EQ(-1990122780, obstacle->PerceptionId());
+  EXPECT_EQ(-314721735, obstacle->PerceptionId());
   EXPECT_TRUE(Obstacle::IsStaticObstacle(obstacle->Perception()));
   EXPECT_TRUE(Obstacle::IsVirtualObstacle(obstacle->Perception()));
   auto& perception_box = obstacle->PerceptionBoundingBox();

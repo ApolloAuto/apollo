@@ -9,7 +9,7 @@ const CAR_PROPERTIES = {
         menuOptionName: 'showPositionLocalization',
         carMaterial: carMaterial,
     },
-    'plannigAdc': {
+    'planningAdc': {
         menuOptionName: 'showPlanningCar',
         carMaterial: null,
     },
@@ -38,7 +38,7 @@ export default class AutoDrivingCar {
     }
 
     update(coordinates, pose) {
-        if (!this.mesh || !pose || !pose.positionX || !pose.positionY) {
+        if (!this.mesh || !pose || !_.isNumber(pose.positionX) || !_.isNumber(pose.positionY)) {
             return;
         }
 

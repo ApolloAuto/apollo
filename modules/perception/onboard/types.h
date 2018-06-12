@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,15 @@
 #include <sstream>
 #include <string>
 
+#include "modules/common/time/time_util.h"
 #include "modules/perception/lib/base/concurrent_queue.h"
-#include "modules/perception/lib/base/time_util.h"
 
 namespace apollo {
 namespace perception {
 
 using EventID = int;
 using SubnodeID = int;
+using apollo::common::time::TimeUtil;
 
 struct Event {
   EventID event_id = 0;

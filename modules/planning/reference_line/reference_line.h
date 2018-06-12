@@ -79,7 +79,15 @@ class ReferenceLine {
   const std::vector<ReferencePoint>& reference_points() const;
 
   ReferencePoint GetReferencePoint(const double s) const;
-  ReferencePoint GetNearestReferencepoint(const double s) const;
+  std::vector<ReferencePoint> GetReferencePoints(double start_s,
+                                                 double end_s) const;
+
+  std::size_t GetNearestReferenceIndex(const double s) const;
+
+  ReferencePoint GetNearestReferencePoint(const common::math::Vec2d& xy) const;
+
+  ReferencePoint GetNearestReferencePoint(const double s) const;
+
   ReferencePoint GetReferencePoint(const double x, const double y) const;
 
   bool GetApproximateSLBoundary(const common::math::Box2d& box,
@@ -99,8 +107,11 @@ class ReferenceLine {
     return XYToSL(common::math::Vec2d(xy.x(), xy.y()), sl_point);
   }
 
-  bool GetLaneWidth(const double s, double* const left_width,
-                    double* const right_width) const;
+  bool GetLaneWidth(const double s, double* const lane_left_width,
+                    double* const lane_right_width) const;
+  bool GetRoadWidth(const double s, double* const road_left_width,
+                    double* const road_right_width) const;
+
   void GetLaneFromS(const double s,
                     std::vector<hdmap::LaneInfoConstPtr>* lanes) const;
 

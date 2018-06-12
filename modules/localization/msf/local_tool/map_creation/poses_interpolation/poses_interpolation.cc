@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_tool/map_creation/poses_interpolation/poses_interpolation.h"
 #include <fstream>
 #include <iomanip>
 #include "modules/localization/msf/common/io/velodyne_utility.h"
+#include "modules/localization/msf/local_tool/map_creation/poses_interpolation/poses_interpolation.h"
 
 namespace apollo {
 namespace localization {
@@ -79,10 +79,10 @@ void PosesInterpolation::LoadPCDTimestamp() {
 void PosesInterpolation::WritePCDPoses() {
   std::ofstream fout;
   fout.open(out_poses_path_.c_str(), std::ofstream::out);
-  fout.setf(std::ios::fixed, std::ios::floatfield);
-  fout.precision(6);
 
   if (fout.is_open()) {
+    fout.setf(std::ios::fixed, std::ios::floatfield);
+    fout.precision(6);
     for (size_t i = 0; i < out_poses_.size(); i++) {
       double timestamp = out_timestamps_[i];
 
@@ -98,6 +98,7 @@ void PosesInterpolation::WritePCDPoses() {
            << transd.y() << " " << transd.z() << " " << qx << " " << qy << " "
            << qz << " " << qr << "\n";
     }
+
     fout.close();
   } else {
     std::cerr << "Can't open file to write: " << out_poses_path_ << std::endl;
@@ -120,8 +121,8 @@ void PosesInterpolation::PoseInterpolationByTime(
     double ref_timestamp = ref_timestamps[i];
     unsigned int ref_index = ref_indexes[i];
 
-    while (in_timestamps[index] < ref_timestamp &&
-           index < in_timestamps.size()) {
+    while (index < in_timestamps.size() &&
+           in_timestamps.at(index) < ref_timestamp) {
       ++index;
     }
 

@@ -2,10 +2,7 @@
 BasedOnStyle: Google
 ---
 Language:                               Cpp
-PointerAlignment:                       Right
-BreakBeforeBraces:                      Attach
-AllowShortBlocksOnASingleLine:          false
-AllowShortFunctionsOnASingleLine:       Empty
 Cpp11BracedListStyle:                   true
 Standard:                               Cpp11
+CommentPragmas: '^ NOLINT'
 ---

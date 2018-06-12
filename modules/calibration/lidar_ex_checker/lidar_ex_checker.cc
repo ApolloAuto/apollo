@@ -14,16 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/calibration/lidar_ex_checker/lidar_ex_checker.h"
+
 #include "eigen_conversions/eigen_msg.h"
 #include "pcl/io/pcd_io.h"
 #include "pcl/visualization/cloud_viewer.h"
 #include "pcl_conversions/pcl_conversions.h"
-#include "ros/include/ros/ros.h"
-#include "sensor_msgs/PointCloud2.h"
 #include "tf2_ros/transform_listener.h"
 
 #include "modules/calibration/lidar_ex_checker/common/lidar_ex_checker_gflags.h"
-#include "modules/calibration/lidar_ex_checker/lidar_ex_checker.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 

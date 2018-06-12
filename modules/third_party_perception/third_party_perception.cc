@@ -30,6 +30,7 @@
 namespace apollo {
 namespace third_party_perception {
 
+using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
@@ -42,9 +43,7 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::perception::Point;
 
-std::string ThirdPartyPerception::Name() const {
-  return FLAGS_module_name;
-}
+std::string ThirdPartyPerception::Name() const { return FLAGS_module_name; }
 
 Status ThirdPartyPerception::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
@@ -55,6 +54,8 @@ Status ThirdPartyPerception::Init() {
       << "Localization is not initialized.";
   AdapterManager::AddLocalizationCallback(&ThirdPartyPerception::OnLocalization,
                                           this);
+  CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
+  AdapterManager::AddChassisCallback(&ThirdPartyPerception::OnChassis, this);
 
   // TODO(all) : need to merge the delphi/conti_radar before adaptor manager
   // level. This is just temperary change.
@@ -79,21 +80,25 @@ Status ThirdPartyPerception::Start() {
   return Status::OK();
 }
 
-void ThirdPartyPerception::Stop() {
-  timer_.stop();
-}
+void ThirdPartyPerception::Stop() { timer_.stop(); }
 
 void ThirdPartyPerception::OnMobileye(const Mobileye& message) {
-  AINFO << "Received mobileye data: run mobileye callback.";
+  ADEBUG << "Received mobileye data: run mobileye callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   if (FLAGS_enable_mobileye) {
-    mobileye_obstacles_ =
-        conversion::MobileyeToPerceptionObstacles(message, localization_);
+    mobileye_obstacles_ = conversion::MobileyeToPerceptionObstacles(
+        message, localization_, chassis_);
   }
 }
 
+void ThirdPartyPerception::OnChassis(const Chassis& message) {
+  ADEBUG << "Received chassis data: run chassis callback.";
+  std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
+  chassis_.CopyFrom(message);
+}
+
 void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
-  AINFO << "Received delphi esr data: run delphi esr callback.";
+  ADEBUG << "Received delphi esr data: run delphi esr callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
   current_radar_obstacles_ = conversion::DelphiToRadarObstacles(
@@ -107,11 +112,11 @@ void ThirdPartyPerception::OnDelphiESR(const DelphiESR& message) {
 }
 
 void ThirdPartyPerception::OnContiRadar(const ContiRadar& message) {
-  AINFO << "Received delphi esr data: run continental radar callback.";
+  ADEBUG << "Received delphi esr data: run continental radar callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   last_radar_obstacles_.CopyFrom(current_radar_obstacles_);
   current_radar_obstacles_ = conversion::ContiToRadarObstacles(
-      message, localization_, last_radar_obstacles_);
+      message, localization_, last_radar_obstacles_, chassis_);
   RadarObstacles filtered_radar_obstacles =
       filter::FilterRadarObstacles(current_radar_obstacles_);
   if (FLAGS_enable_radar) {
@@ -121,13 +126,13 @@ void ThirdPartyPerception::OnContiRadar(const ContiRadar& message) {
 }
 
 void ThirdPartyPerception::OnLocalization(const LocalizationEstimate& message) {
-  AINFO << "Received localization data: run localization callback.";
+  ADEBUG << "Received localization data: run localization callback.";
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
   localization_.CopyFrom(message);
 }
 
 void ThirdPartyPerception::OnTimer(const ros::TimerEvent&) {
-  AINFO << "Timer is triggered: publish PerceptionObstacles";
+  ADEBUG << "Timer is triggered: publish PerceptionObstacles";
 
   std::lock_guard<std::mutex> lock(third_party_perception_mutex_);
 

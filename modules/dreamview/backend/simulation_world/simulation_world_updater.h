@@ -28,7 +28,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
-#include "modules/dreamview/backend/handlers/websocket.h"
+#include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
@@ -135,6 +135,9 @@ class SimulationWorldUpdater {
   // updated by timer.
   std::string simulation_world_;
   std::string simulation_world_with_planning_data_;
+
+  // Received relative map data in wire format.
+  std::string relative_map_string_;
 
   // Mutex to protect concurrent access to simulation_world_json_.
   // NOTE: Use boost until we have std version of rwlock support.

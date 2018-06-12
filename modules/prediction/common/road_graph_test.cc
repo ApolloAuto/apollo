@@ -22,7 +22,6 @@
 
 #include "modules/prediction/proto/lane_graph.pb.h"
 
-#include "modules/common/configs/config_gflags.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"

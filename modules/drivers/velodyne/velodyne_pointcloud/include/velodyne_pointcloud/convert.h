@@ -17,6 +17,8 @@
 #ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_CONVERT_H_
 #define MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_CONVERT_H_
 
+#include <memory>
+
 #include <nav_msgs/Odometry.h>
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
@@ -32,8 +34,8 @@ namespace velodyne {
 // convert velodyne data to pointcloud and republish
 class Convert {
  public:
-  Convert() {}
-  ~Convert();
+  Convert() = default;
+  virtual ~Convert() = default;
 
   // init velodyne config struct from private_nh
   void init(ros::NodeHandle& node, ros::NodeHandle& private_nh);
@@ -41,10 +43,10 @@ class Convert {
  private:
   // convert velodyne data to pointcloudn and public
   void convert_packets_to_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msg);
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg);
 
   // RawData class for converting data to point cloud
-  VelodyneParser* parser_;
+  std::unique_ptr<VelodyneParser> parser_;
 
   ros::Subscriber velodyne_scan_;
   ros::Publisher pointcloud_pub_;

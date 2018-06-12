@@ -289,4 +289,4 @@ inline std::string KalmanFilter<T, XN, ZN, UN>::DebugString() const {
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_MATH_KALMAN_FILTER_H_ */
+#endif  // MODULES_COMMON_MATH_KALMAN_FILTER_H_

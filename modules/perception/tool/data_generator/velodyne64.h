@@ -35,7 +35,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/tool/data_generator/common/data_generator_gflags.h"
 #include "modules/perception/tool/data_generator/sensor.h"
 

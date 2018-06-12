@@ -28,7 +28,7 @@
 //     }
 //
 //     virtual bool filter(
-//              const pcl_util::PointCloudPtr& cloud,
+//              pcl_util::PointCloudPtr cloud,
 //              const ROIFilterOptions &roi_filter_options,
 //              pcl_util::PointCloudPtr* roi_cloud) override {
 //
@@ -59,8 +59,8 @@
 #include "Eigen/Core"
 
 #include "modules/common/macro.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/lib/base/registerer.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -85,7 +85,7 @@ class BaseROIFilter {
 
   virtual bool Init() = 0;
 
-  virtual bool Filter(const pcl_util::PointCloudPtr &cloud,
+  virtual bool Filter(pcl_util::PointCloudPtr cloud,
                       const ROIFilterOptions &roi_filter_options,
                       pcl_util::PointIndices *roi_indices) = 0;
 

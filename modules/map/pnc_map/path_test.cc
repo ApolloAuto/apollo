@@ -268,25 +268,25 @@ TEST(TestSuite, hdmap_line_path) {
   EXPECT_NEAR(lateral, 0.0, 1e-6);
   EXPECT_NEAR(distance, 0.5, 1e-6);
 
-  EXPECT_NEAR(path.GetLeftWidth(-0.5), 4.0, 1e-6);
-  EXPECT_NEAR(path.GetLeftWidth(0.0), 4.0, 1e-6);
-  EXPECT_NEAR(path.GetLeftWidth(0.5), 4.5, 1e-6);
-  EXPECT_NEAR(path.GetLeftWidth(1.0), 5.0, 1e-6);
-  EXPECT_NEAR(path.GetLeftWidth(1.5), 5.25, 1e-6);
-  EXPECT_NEAR(path.GetLeftWidth(2.0), 5.5, 1e-6);
-  EXPECT_NEAR(path.GetLeftWidth(2.5), 5.75, 1e-6);
-  EXPECT_NEAR(path.GetLeftWidth(3.0), 6.0, 1e-6);
-  EXPECT_NEAR(path.GetLeftWidth(3.5), 6.0, 1e-6);
+  EXPECT_NEAR(path.GetLaneLeftWidth(-0.5), 4.0, 1e-6);
+  EXPECT_NEAR(path.GetLaneLeftWidth(0.0), 4.0, 1e-6);
+  EXPECT_NEAR(path.GetLaneLeftWidth(0.5), 4.5, 1e-6);
+  EXPECT_NEAR(path.GetLaneLeftWidth(1.0), 5.0, 1e-6);
+  EXPECT_NEAR(path.GetLaneLeftWidth(1.5), 5.25, 1e-6);
+  EXPECT_NEAR(path.GetLaneLeftWidth(2.0), 5.5, 1e-6);
+  EXPECT_NEAR(path.GetLaneLeftWidth(2.5), 5.75, 1e-6);
+  EXPECT_NEAR(path.GetLaneLeftWidth(3.0), 6.0, 1e-6);
+  EXPECT_NEAR(path.GetLaneLeftWidth(3.5), 6.0, 1e-6);
 
-  EXPECT_NEAR(path.GetRightWidth(-0.5), 7.0, 1e-6);
-  EXPECT_NEAR(path.GetRightWidth(0.0), 7.0, 1e-6);
-  EXPECT_NEAR(path.GetRightWidth(0.5), 7.25, 1e-6);
-  EXPECT_NEAR(path.GetRightWidth(1.0), 7.5, 1e-6);
-  EXPECT_NEAR(path.GetRightWidth(1.5), 7.75, 1e-6);
-  EXPECT_NEAR(path.GetRightWidth(2.0), 8.0, 1e-6);
-  EXPECT_NEAR(path.GetRightWidth(2.5), 6.5, 1e-6);
-  EXPECT_NEAR(path.GetRightWidth(3.0), 5.0, 1e-6);
-  EXPECT_NEAR(path.GetRightWidth(3.5), 5.0, 1e-6);
+  EXPECT_NEAR(path.GetLaneRightWidth(-0.5), 7.0, 1e-6);
+  EXPECT_NEAR(path.GetLaneRightWidth(0.0), 7.0, 1e-6);
+  EXPECT_NEAR(path.GetLaneRightWidth(0.5), 7.25, 1e-6);
+  EXPECT_NEAR(path.GetLaneRightWidth(1.0), 7.5, 1e-6);
+  EXPECT_NEAR(path.GetLaneRightWidth(1.5), 7.75, 1e-6);
+  EXPECT_NEAR(path.GetLaneRightWidth(2.0), 8.0, 1e-6);
+  EXPECT_NEAR(path.GetLaneRightWidth(2.5), 6.5, 1e-6);
+  EXPECT_NEAR(path.GetLaneRightWidth(3.0), 5.0, 1e-6);
+  EXPECT_NEAR(path.GetLaneRightWidth(3.5), 5.0, 1e-6);
 }
 
 TEST(TestSuite, hdmap_curvy_path) {
@@ -497,15 +497,15 @@ TEST(TestSuite, hdmap_circle_path) {
     EXPECT_NEAR(expected_point.y(), point.y(), 1e-6);
   }
 
-  // Test get_width, GetLeftWidth, GetRightWidth
+  // Test get_width, GetLaneLeftWidth, GetLaneRightWidth
   double delta_s = 0.1;
   double cur_s = 0.0;
   while (cur_s < path.accumulated_s().back()) {
-    double left_width = 0.0;
-    double right_width = 0.0;
-    EXPECT_TRUE(path.GetWidth(cur_s, &left_width, &right_width));
-    EXPECT_NEAR(left_width, path.GetLeftWidth(cur_s), 1e-6);
-    EXPECT_NEAR(right_width, path.GetRightWidth(cur_s), 1e-6);
+    double lane_left_width = 0.0;
+    double lane_right_width = 0.0;
+    EXPECT_TRUE(path.GetLaneWidth(cur_s, &lane_left_width, &lane_right_width));
+    EXPECT_NEAR(lane_left_width, path.GetLaneLeftWidth(cur_s), 1e-6);
+    EXPECT_NEAR(lane_right_width, path.GetLaneRightWidth(cur_s), 1e-6);
     cur_s += delta_s;
   }
 }

@@ -1,9 +1,0 @@
-<launch>
-    <node pkg="nodelet" type="nodelet" name="gnss_nodelet_manager"
-        args="manager" output="screen">
-    </node>
-
-    <node pkg="nodelet" type="nodelet" name="tf_broadcaster_nodelet"
-        args="load gnss_driver/TFBroadcasterNodelet gnss_nodelet_manager" output="screen">
-    </node>
-</launch>

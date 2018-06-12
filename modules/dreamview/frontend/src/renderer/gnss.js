@@ -24,12 +24,13 @@ export default class GNSS {
     }
 
     if (!this.base) {
+      const config = STORE.hmi.vehicleParam;
       this.base = drawSegmentsFromPoints(
-        [ new THREE.Vector3(3.89, -1.05, 0),
-          new THREE.Vector3(3.89, 1.06, 0),
-          new THREE.Vector3(-1.04, 1.06, 0),
-          new THREE.Vector3(-1.04, -1.05, 0),
-          new THREE.Vector3(3.89, -1.05, 0)],
+        [ new THREE.Vector3(config.frontEdgeToCenter, -config.leftEdgeToCenter, 0),
+          new THREE.Vector3(config.frontEdgeToCenter, config.rightEdgeToCenter, 0),
+          new THREE.Vector3(-config.backEdgeToCenter, config.rightEdgeToCenter, 0),
+          new THREE.Vector3(-config.backEdgeToCenter, -config.leftEdgeToCenter, 0),
+          new THREE.Vector3(config.frontEdgeToCenter, -config.leftEdgeToCenter, 0)],
         0x006aff,
         2,
         5

@@ -127,6 +127,10 @@ void Box2d::GetAllCorners(std::vector<Vec2d> *const corners) const {
   *corners = corners_;
 }
 
+std::vector<Vec2d> Box2d::GetAllCorners() const {
+  return corners_;
+}
+
 bool Box2d::IsPointIn(const Vec2d &point) const {
   const double x0 = point.x() - center_.x();
   const double y0 = point.y() - center_.y();
@@ -326,6 +330,18 @@ void Box2d::RotateFromCenter(const double rotate_angle) {
 
 void Box2d::Shift(const Vec2d &shift_vec) {
   center_ += shift_vec;
+  InitCorners();
+}
+
+void Box2d::LongitudinalExtend(const double extension_length) {
+  length_ += extension_length;
+  half_length_ += extension_length / 2.0;
+  InitCorners();
+}
+
+void Box2d::LateralExtend(const double extension_length) {
+  width_ += extension_length;
+  half_width_ += extension_length / 2.0;
   InitCorners();
 }
 

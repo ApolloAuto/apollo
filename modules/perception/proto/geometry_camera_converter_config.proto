@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.perception.geometry_camera_converter_config;
+
+message ModelConfigs {
+  optional string name = 1 [ default = "GeometryCameraConverter" ];
+  optional string version = 2 [ default = "1.0.0" ];
+  optional string camera_intrinsic_file = 3 [ default = "modules/perception/data/params/front_camera_intrinsics.yaml" ];
+}

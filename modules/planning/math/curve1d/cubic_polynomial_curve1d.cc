@@ -27,7 +27,7 @@ namespace apollo {
 namespace planning {
 
 CubicPolynomialCurve1d::CubicPolynomialCurve1d(
-    const std::array<double, 3>& start, const double& end, const double param)
+    const std::array<double, 3>& start, const double end, const double param)
     : CubicPolynomialCurve1d(start[0], start[1], start[2], end, param) {}
 
 CubicPolynomialCurve1d::CubicPolynomialCurve1d(const double x0,

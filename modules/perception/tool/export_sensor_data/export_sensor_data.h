@@ -30,7 +30,7 @@
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/radar/modest/conti_radar_id_expansion.h"
 #include "modules/perception/onboard/dag_streaming.h"
 
@@ -55,7 +55,7 @@ class ExportSensorData {
   void WriteRadar(const std::string &file_pre, const ContiRadar &radar_obs);
   void WritePose(const std::string &file_pre, const double timestamp,
                  const int seq_num, const Eigen::Matrix4d &pose);
-  void WriteVelocityInfo(const std::string &file_pre, const double &timestamp,
+  void WriteVelocityInfo(const std::string &file_pre, const double timestamp,
                          const int seq_num, const Eigen::Vector3f &velocity);
   void WritePCD(const std::string &file_pre,
                 const sensor_msgs::PointCloud2 &in_msg);
@@ -64,7 +64,7 @@ class ExportSensorData {
   typedef std::pair<double, apollo::localization::LocalizationEstimate>
       LocalizationPair;
   boost::circular_buffer<LocalizationPair> localization_buffer_;
-  ContiRadarIDExpansion _conti_id_expansion;
+  ContiRadarIDExpansion conti_id_expansion_;
   Mutex mutex_;
   Eigen::Matrix4d radar2velodyne_extrinsic_;
 };

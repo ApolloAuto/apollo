@@ -29,7 +29,8 @@ namespace planning {
 namespace util {
 
 double GetADCStopDeceleration(ReferenceLineInfo* const reference_line_info,
-                              const double stop_line_s) {
+                              const double stop_line_s,
+                              const double min_pass_s_distance) {
   double adc_speed =
       common::VehicleStateProvider::instance()->linear_velocity();
   if (adc_speed < FLAGS_max_stop_speed) {
@@ -42,8 +43,7 @@ double GetADCStopDeceleration(ReferenceLineInfo* const reference_line_info,
   if (stop_line_s > adc_front_edge_s) {
     stop_distance = stop_line_s - adc_front_edge_s;
   } else {
-    stop_distance =
-        stop_line_s + FLAGS_max_stop_distance_buffer - adc_front_edge_s;
+    stop_distance = stop_line_s + min_pass_s_distance - adc_front_edge_s;
   }
   if (stop_distance < 1e-5) {
     return std::numeric_limits<double>::max();

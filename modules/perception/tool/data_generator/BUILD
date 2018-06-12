@@ -22,7 +22,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/common/util:factory",
         "//modules/common/vehicle_state:vehicle_state_provider",
-        "//modules/perception/lib/pcl_util",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/tool/data_generator/common:data_generator_gflags",
         "//modules/perception/tool/data_generator/proto:config_proto",
     ],

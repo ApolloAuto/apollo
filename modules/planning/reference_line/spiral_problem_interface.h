@@ -47,6 +47,14 @@ class SpiralProblemInterface : public Ipopt::TNLP {
 
   void set_end_point_position(const double x, const double y);
 
+  void set_element_weight_curve_length(const double weight_curve_length);
+
+  void set_element_weight_kappa(const double weight_kappa);
+
+  void set_element_weight_dkappa(const double weight_dkappa);
+
+  void set_element_weight_d2kappa(const double weight_d2kappa);
+
   void get_optimization_results(std::vector<double>* ptr_theta,
                                 std::vector<double>* ptr_kappa,
                                 std::vector<double>* ptr_dkappa,
@@ -162,6 +170,14 @@ class SpiralProblemInterface : public Ipopt::TNLP {
   double end_dkappa_ = 0.0;
 
   bool has_fixed_end_point_position_ = false;
+
+  double weight_curve_length_ = 1.0;
+
+  double weight_kappa_ = 1.0;
+
+  double weight_dkappa_ = 1.0;
+
+  double weight_d2kappa_ = 1.0;
 };
 
 }  // namespace planning

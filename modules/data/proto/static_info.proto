@@ -6,6 +6,7 @@ import "modules/canbus/proto/canbus_conf.proto";
 import "modules/canbus/proto/chassis_detail.proto";
 import "modules/common/configs/proto/vehicle_config.proto";
 import "modules/control/proto/control_conf.proto";
+import "modules/routing/proto/routing.proto";
 
 message VehicleInfo {
   optional string name = 1;
@@ -41,6 +42,7 @@ message SoftwareInfo {
   optional string mode = 3;
   // Entries of software config file path and its content.
   map<string, string> configs = 4;
+  optional apollo.routing.RoutingRequest latest_routing_request = 5;
 }
 
 message UserInfo {

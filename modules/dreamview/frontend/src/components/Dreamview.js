@@ -7,6 +7,7 @@ import MainView from "components/Layouts/MainView";
 import ToolView from "components/Layouts/ToolView";
 import PNCMonitor from "components/PNCMonitor";
 import SideBar from "components/SideBar";
+import VoiceCommand from "components/VoiceCommand";
 import WS, {MAP_WS, POINT_CLOUD_WS} from "store/websocket";
 
 
@@ -60,6 +61,9 @@ export default class Dreamview extends React.Component {
                             {options.showPNCMonitor && <PNCMonitor />}
                         </div>
                     </SplitPane>
+                </div>
+                <div className="hidden">
+                    {options.enableVoiceCommand && <VoiceCommand />}
                 </div>
             </div>
         );

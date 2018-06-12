@@ -254,6 +254,7 @@ class AdapterManager {
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(PointCloud);
+  REGISTER_ADAPTER(ImageFront);
   REGISTER_ADAPTER(ImageShort);
   REGISTER_ADAPTER(ImageLong);
   REGISTER_ADAPTER(Prediction);
@@ -269,6 +270,7 @@ class AdapterManager {
   REGISTER_ADAPTER(Mobileye);
   REGISTER_ADAPTER(DelphiESR);
   REGISTER_ADAPTER(ContiRadar);
+  REGISTER_ADAPTER(Ultrasonic);
   REGISTER_ADAPTER(CompressedImage);
   REGISTER_ADAPTER(GnssRtkObs);
   REGISTER_ADAPTER(GnssRtkEph);
@@ -280,6 +282,23 @@ class AdapterManager {
   REGISTER_ADAPTER(DriveEvent);
   REGISTER_ADAPTER(RelativeMap);
   REGISTER_ADAPTER(Navigation);
+  REGISTER_ADAPTER(VoiceDetectionRequest);
+  REGISTER_ADAPTER(VoiceDetectionResponse);
+  // for pandora
+  REGISTER_ADAPTER(PandoraPointCloud);
+  REGISTER_ADAPTER(PandoraCameraFrontColor);
+  REGISTER_ADAPTER(PandoraCameraRightGray);
+  REGISTER_ADAPTER(PandoraCameraLeftGray);
+  REGISTER_ADAPTER(PandoraCameraFrontGray);
+  REGISTER_ADAPTER(PandoraCameraBackGray);
+  // for lane mask
+  REGISTER_ADAPTER(PerceptionLaneMask)
+
+  REGISTER_ADAPTER(Guardian)
+  REGISTER_ADAPTER(GnssRawData);
+  REGISTER_ADAPTER(StreamStatus);
+  REGISTER_ADAPTER(GnssHeading);
+  REGISTER_ADAPTER(RtcmData);
 
   DECLARE_SINGLETON(AdapterManager);
 };

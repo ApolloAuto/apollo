@@ -6,8 +6,8 @@ cc_binary(
     name = "routing_tester",
     srcs = ["routing_tester.cc"],
     deps = [
-        "//modules/routing:routing_lib",
         "//modules/common",
+        "//modules/routing:routing_lib",
         "@ros//:ros_common",
     ],
 )

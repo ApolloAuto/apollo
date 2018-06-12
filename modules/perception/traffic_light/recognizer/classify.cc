@@ -24,23 +24,23 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-ClassifyBySimple::ClassifyBySimple(const std::string &_class_net,
-                                   const std::string &_class_model,
+ClassifyBySimple::ClassifyBySimple(const std::string &class_net_,
+                                   const std::string &class_model_,
                                    float threshold, unsigned int resize_width,
                                    unsigned int resize_height) {
-  Init(_class_net, _class_model, threshold, resize_width, resize_height);
+  Init(class_net_, class_model_, threshold, resize_width, resize_height);
 }
 
 void ClassifyBySimple::SetCropBox(const cv::Rect &box) { crop_box_ = box; }
-void ClassifyBySimple::Init(const std::string &_class_net,
-                            const std::string &_class_model, float threshold,
+void ClassifyBySimple::Init(const std::string &class_net_,
+                            const std::string &class_model_, float threshold,
                             unsigned int resize_width,
                             unsigned int resize_height) {
   AINFO << "Creating testing net...";
-  classify_net_ptr_.reset(new caffe::Net<float>(_class_net, caffe::TEST));
+  classify_net_ptr_.reset(new caffe::Net<float>(class_net_, caffe::TEST));
 
   AINFO << "restore parameters...";
-  classify_net_ptr_->CopyTrainedLayersFrom(_class_model);
+  classify_net_ptr_->CopyTrainedLayersFrom(class_model_);
 
   resize_height_ = resize_height;
   resize_width_ = resize_width;

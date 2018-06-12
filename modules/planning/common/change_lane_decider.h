@@ -22,9 +22,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/planning/proto/planning_status.pb.h"
 
-#include "modules/common/util/dropbox.h"
 #include "modules/map/pnc_map/route_segments.h"
 #include "modules/planning/common/reference_line_info.h"
 
@@ -37,24 +36,20 @@ namespace planning {
 
 class ChangeLaneDecider {
  public:
-  ChangeLaneDecider();
+  ChangeLaneDecider() = default;
   bool Apply(std::list<ReferenceLineInfo>* reference_line_info);
 
  private:
-  void UpdateState(planning_internal::ChangeLaneState::State state_code,
-                   const std::string& path_id);
-  void UpdateState(double timestamp,
-                   planning_internal::ChangeLaneState::State state_code,
-                   const std::string& path_id);
+  void UpdateStatus(ChangeLaneStatus::Status status_code,
+                    const std::string& path_id);
+  void UpdateStatus(double timestamp, ChangeLaneStatus::Status status_code,
+                    const std::string& path_id);
 
   void PrioritizeChangeLane(
       std::list<ReferenceLineInfo>* reference_line_info) const;
 
   void RemoveChangeLane(
       std::list<ReferenceLineInfo>* reference_line_info) const;
-
-  const std::string state_key_;
-  common::util::Dropbox<planning_internal::ChangeLaneState>* dropbox_ = nullptr;
 };
 
 }  // namespace planning

@@ -146,7 +146,7 @@ void Velodyne64Parser::init_offsets() {
 }
 
 void Velodyne64Parser::generate_pointcloud(
-    const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msg,
+    velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
     VPointCloud::Ptr& pointcloud) {
   if (config_.calibration_online && !calibration_.initialized_) {
     if (online_calibration_.decode(scan_msg) == -1) {
@@ -213,7 +213,7 @@ double Velodyne64Parser::get_timestamp(double base_time, float time_offset,
 }
 
 int Velodyne64Parser::intensity_compensate(const LaserCorrection& corrections,
-                                           const uint16_t& raw_distance,
+                                           const uint16_t raw_distance,
                                            int intensity) {
   float tmp = 1 - static_cast<float>(raw_distance) / 65535;
   intensity += corrections.focal_slope *

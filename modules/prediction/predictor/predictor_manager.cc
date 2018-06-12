@@ -25,7 +25,9 @@
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 #include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
 #include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
+#include "modules/prediction/predictor/single_lane/single_lane_predictor.h"
 #include "modules/prediction/predictor/regional/regional_predictor.h"
+#include "modules/prediction/predictor/empty/empty_predictor.h"
 
 namespace apollo {
 namespace prediction {
@@ -40,8 +42,10 @@ PredictorManager::PredictorManager() { RegisterPredictors(); }
 void PredictorManager::RegisterPredictors() {
   RegisterPredictor(ObstacleConf::LANE_SEQUENCE_PREDICTOR);
   RegisterPredictor(ObstacleConf::MOVE_SEQUENCE_PREDICTOR);
+  RegisterPredictor(ObstacleConf::SINGLE_LANE_PREDICTOR);
   RegisterPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
   RegisterPredictor(ObstacleConf::REGIONAL_PREDICTOR);
+  RegisterPredictor(ObstacleConf::EMPTY_PREDICTOR);
 }
 
 void PredictorManager::Init(const PredictionConf& config) {
@@ -153,34 +157,38 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
     prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
     if (obstacle != nullptr) {
-      switch (perception_obstacle.type()) {
-        case PerceptionObstacle::VEHICLE: {
-          if (obstacle->IsOnLane()) {
-            predictor = GetPredictor(vehicle_on_lane_predictor_);
-          } else {
-            predictor = GetPredictor(vehicle_off_lane_predictor_);
+      if (obstacle->IsStill()) {
+        predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
+      } else {
+        switch (perception_obstacle.type()) {
+          case PerceptionObstacle::VEHICLE: {
+            if (obstacle->IsOnLane()) {
+              predictor = GetPredictor(vehicle_on_lane_predictor_);
+            } else {
+              predictor = GetPredictor(vehicle_off_lane_predictor_);
+            }
+            break;
           }
-          break;
-        }
-        case PerceptionObstacle::PEDESTRIAN: {
-          predictor = GetPredictor(pedestrian_predictor_);
-          break;
-        }
-        case PerceptionObstacle::BICYCLE: {
-          if (obstacle->IsOnLane() && !obstacle->IsNearJunction()) {
-            predictor = GetPredictor(cyclist_on_lane_predictor_);
-          } else {
-            predictor = GetPredictor(cyclist_off_lane_predictor_);
+          case PerceptionObstacle::PEDESTRIAN: {
+            predictor = GetPredictor(pedestrian_predictor_);
+            break;
           }
-          break;
-        }
-        default: {
-          if (obstacle->IsOnLane()) {
-            predictor = GetPredictor(default_on_lane_predictor_);
-          } else {
-            predictor = GetPredictor(default_off_lane_predictor_);
+          case PerceptionObstacle::BICYCLE: {
+            if (obstacle->IsOnLane() && !obstacle->IsNearJunction()) {
+              predictor = GetPredictor(cyclist_on_lane_predictor_);
+            } else {
+              predictor = GetPredictor(cyclist_off_lane_predictor_);
+            }
+            break;
           }
-          break;
+          default: {
+            if (obstacle->IsOnLane()) {
+              predictor = GetPredictor(default_on_lane_predictor_);
+            } else {
+              predictor = GetPredictor(default_off_lane_predictor_);
+            }
+            break;
+          }
         }
       }
 
@@ -218,6 +226,10 @@ std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
     }
     case ObstacleConf::MOVE_SEQUENCE_PREDICTOR: {
       predictor_ptr.reset(new MoveSequencePredictor());
+      break;
+    }
+    case ObstacleConf::SINGLE_LANE_PREDICTOR: {
+      predictor_ptr.reset(new SingleLanePredictor());
       break;
     }
     case ObstacleConf::FREE_MOVE_PREDICTOR: {

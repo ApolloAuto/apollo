@@ -240,6 +240,36 @@ double LaneInfo::Heading(const double s) const {
   }
 }
 
+double LaneInfo::Curvature(const double s) const {
+  if (points_.size() < 2) {
+    AERROR << "Not enough points to compute curvature.";
+    return 0.0;
+  }
+  const double kEpsilon = 0.001;
+  if (s + kEpsilon < accumulated_s_.front()) {
+    AERROR << "s:" << s << " should be >= " << accumulated_s_.front();
+    return 0.0;
+  }
+  if (s > accumulated_s_.back() + kEpsilon) {
+    AERROR << "s:" << s << " should be <= " << accumulated_s_.back();
+    return 0.0;
+  }
+
+  auto iter = std::lower_bound(accumulated_s_.begin(), accumulated_s_.end(), s);
+  if (iter == accumulated_s_.end()) {
+    ADEBUG << "Reach the end of lane.";
+    return 0.0;
+  }
+  int index = std::distance(accumulated_s_.begin(), iter);
+  if (index == 0) {
+    ADEBUG << "Reach the beginning of lane";
+    return 0.0;
+  } else {
+    return (headings_[index] - headings_[index - 1]) /
+           (accumulated_s_[index] - accumulated_s_[index - 1] + kEpsilon);
+  }
+}
+
 double LaneInfo::GetWidth(const double s) const {
   double left_width = 0.0;
   double right_width = 0.0;

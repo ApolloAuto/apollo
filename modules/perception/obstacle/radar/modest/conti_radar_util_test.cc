@@ -51,43 +51,47 @@ TEST(ContiRadarUtilTest, conti_radar_util_test) {
   conti_params.la_vel_rms_unknown = la_vel_rms;
   conti_params.lo_dist_rms_unknown = lo_dist_rms;
   conti_params.la_dist_rms_unknown = la_dist_rms;
-  contiobs.set_meas_state(CONTI_NEW);
+  contiobs.set_meas_state(static_cast<int>(ContiMeasState::CONTI_NEW));
   contiobs.set_probexist(probexist - min_value);
   contiobs.set_longitude_vel_rms(lo_vel_rms + min_value);
   contiobs.set_lateral_vel_rms(la_vel_rms - min_value);
   contiobs.set_longitude_dist_rms(lo_dist_rms - min_value);
   contiobs.set_lateral_dist_rms(la_dist_rms - min_value);
   bool state = false;
-  contiobs.set_obstacle_class(CONTI_CAR);
+  contiobs.set_obstacle_class(static_cast<int>(ContiObjectType::CONTI_CAR));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, true);
-  contiobs.set_obstacle_class(CONTI_PEDESTRIAN);
+  contiobs.set_obstacle_class(
+      static_cast<int>(ContiObjectType::CONTI_PEDESTRIAN));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, true);
-  contiobs.set_obstacle_class(CONTI_MOTOCYCLE);
+  contiobs.set_obstacle_class(
+      static_cast<int>(ContiObjectType::CONTI_MOTOCYCLE));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, true);
-  contiobs.set_obstacle_class(CONTI_POINT);
+  contiobs.set_obstacle_class(static_cast<int>(ContiObjectType::CONTI_POINT));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, true);
   contiobs.set_probexist(probexist + min_value);
-  contiobs.set_obstacle_class(CONTI_CAR);
+  contiobs.set_obstacle_class(static_cast<int>(ContiObjectType::CONTI_CAR));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, true);
-  contiobs.set_obstacle_class(CONTI_PEDESTRIAN);
+  contiobs.set_obstacle_class(
+      static_cast<int>(ContiObjectType::CONTI_PEDESTRIAN));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, true);
-  contiobs.set_obstacle_class(CONTI_MOTOCYCLE);
+  contiobs.set_obstacle_class(
+      static_cast<int>(ContiObjectType::CONTI_MOTOCYCLE));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, true);
-  contiobs.set_obstacle_class(CONTI_POINT);
+  contiobs.set_obstacle_class(static_cast<int>(ContiObjectType::CONTI_POINT));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, true);
@@ -95,42 +99,46 @@ TEST(ContiRadarUtilTest, conti_radar_util_test) {
   contiobs.set_lateral_vel_rms(la_vel_rms - min_value);
   contiobs.set_longitude_dist_rms(lo_dist_rms - min_value);
   contiobs.set_lateral_dist_rms(la_dist_rms - min_value);
-  contiobs.set_obstacle_class(CONTI_CAR);
+  contiobs.set_obstacle_class(static_cast<int>(ContiObjectType::CONTI_CAR));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, true);
-  contiobs.set_obstacle_class(CONTI_PEDESTRIAN);
+  contiobs.set_obstacle_class(
+      static_cast<int>(ContiObjectType::CONTI_PEDESTRIAN));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, false);
-  contiobs.set_obstacle_class(CONTI_MOTOCYCLE);
+  contiobs.set_obstacle_class(
+      static_cast<int>(ContiObjectType::CONTI_MOTOCYCLE));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, false);
-  contiobs.set_obstacle_class(CONTI_POINT);
+  contiobs.set_obstacle_class(static_cast<int>(ContiObjectType::CONTI_POINT));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, true);
 
   tracking_times = delay_frames * 2 + 1;
-  contiobs.set_obstacle_class(CONTI_CAR);
+  contiobs.set_obstacle_class(static_cast<int>(ContiObjectType::CONTI_CAR));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, false);
-  contiobs.set_obstacle_class(CONTI_PEDESTRIAN);
+  contiobs.set_obstacle_class(
+      static_cast<int>(ContiObjectType::CONTI_PEDESTRIAN));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, false);
-  contiobs.set_obstacle_class(CONTI_MOTOCYCLE);
+  contiobs.set_obstacle_class(
+      static_cast<int>(ContiObjectType::CONTI_MOTOCYCLE));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, false);
-  contiobs.set_obstacle_class(CONTI_POINT);
+  contiobs.set_obstacle_class(static_cast<int>(ContiObjectType::CONTI_POINT));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, false);
 
-  contiobs.set_meas_state(CONTI_DELETED);
+  contiobs.set_meas_state(static_cast<int>(ContiMeasState::CONTI_DELETED));
   state = ContiRadarUtil::IsFp(contiobs, conti_params, delay_frames,
                                tracking_times);
   EXPECT_EQ(state, true);

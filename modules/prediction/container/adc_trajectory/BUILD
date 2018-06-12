@@ -8,13 +8,12 @@ cc_library(
     hdrs = ["adc_trajectory_container.h"],
     deps = [
         "//modules/common:log",
-        "//modules/common/math:line_segment2d",
-        "//modules/common/math:polygon2d",
+        "//modules/common/math:geometry",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
+        "//modules/prediction/container",
         "//modules/prediction/proto:lane_graph_proto",
-        "//modules/prediction/container:container",
     ],
 )
 

@@ -35,7 +35,8 @@ void ContiRadarIDExpansion::ExpandIds(ContiRadar *radar_obs) {
     ContiRadarObs &contiobs = *(radar_obs->mutable_contiobs(i));
     int id = contiobs.obstacle_id();
     int meas_state = contiobs.meas_state();
-    if (/*_need_restart || */ need_inner_restart_ || meas_state == CONTI_NEW) {
+    if (/*need_restart_ || */ need_inner_restart_ ||
+        meas_state == static_cast<int>(ContiMeasState::CONTI_NEW)) {
       int next_id = GetNextId();
       local2global_[id] = next_id;
     } else {
@@ -75,7 +76,7 @@ void ContiRadarIDExpansion::SetNeedRestart(const bool need_restart) {
   need_restart_ = need_restart;
 }
 
-void ContiRadarIDExpansion::UpdateTimestamp(const double &timestamp) {
+void ContiRadarIDExpansion::UpdateTimestamp(const double timestamp) {
   need_restart_ = false;
   if (timestamp - timestamp_ > 0.1) {
     need_restart_ = true;

@@ -22,14 +22,6 @@
 #include "modules/common/log.h"
 #include "modules/perception/traffic_light/base/utils.h"
 
-DEFINE_double(width_margin_ratio, 0.5,
-              "When the light center is near the width margin ratio * Radius, "
-              "we will regard the light as outside the image.");
-
-DEFINE_double(height_margin_ratio, 2.5,
-              "When the light center is near the height margin ratio * Radius, "
-              "we will regard the light as outside the image.");
-
 DEFINE_double(light_height_adjust, 0, " adjust height without chaning code");
 
 namespace apollo {

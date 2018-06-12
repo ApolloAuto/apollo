@@ -20,9 +20,35 @@ INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20180130_1338"
+VERSION_X86_64="dev-x86_64-20180530_1312"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
+
+# Check whether user has agreed license agreement
+function check_agreement() {
+  agreement_record="${HOME}/.apollo_agreement.txt"
+  if [ -e "$agreement_record" ]; then
+    return
+  fi
+
+  AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
+  if [ ! -e "$AGREEMENT_FILE" ]; then
+    error "AGREEMENT $AGREEMENT_FILE does not exist."
+    exit 1
+  fi
+
+  cat $AGREEMENT_FILE
+  tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
+  echo $tip
+  read -n 1 user_agreed
+  if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
+    cp $AGREEMENT_FILE $agreement_record
+    echo "$tip" >> $agreement_record
+    echo "$user_agreed" >> $agreement_record
+  else
+    exit 1
+  fi
+}
 
 function show_usage()
 {
@@ -33,9 +59,48 @@ OPTIONS:
     -h, --help             Display this help and exit.
     -t, --tag <version>    Specify which version of a docker image to pull.
     -l, --local            Use local docker image.
+    stop                   Stop all running Apollo containers.
 EOF
 exit 0
 }
+
+function stop_containers()
+{
+running_containers=$(docker ps --format "{{.Names}}")
+
+for i in ${running_containers[*]}
+do
+  if [[ "$i" =~ apollo_* ]];then
+    printf %-*s 70 "stopping container: $i ..."
+    docker stop $i > /dev/null
+    if [ $? -eq 0 ];then
+      printf "\033[32m[DONE]\033[0m\n"
+    else
+      printf "\033[31m[FAILED]\033[0m\n"
+    fi
+  fi
+done
+}
+
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+
+if [ ! -e /apollo ]; then
+    sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
+fi
+
+if [ -e /proc/sys/kernel ]; then
+    echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
+fi
+
+source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
+check_agreement
+
+VOLUME_VERSION="latest"
+DEFAULT_MAPS=(
+  sunnyvale_big_loop
+  sunnyvale_loop
+)
+MAP_VOLUME_CONF=""
 
 while [ $# -gt 0 ]
 do
@@ -67,6 +132,16 @@ do
     -l|--local)
         LOCAL_IMAGE="yes"
         ;;
+    --map)
+        map_name=$2
+        shift
+        source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh \
+            "${map_name}" "${VOLUME_VERSION}"
+        ;;
+    stop)
+	stop_containers
+	exit 0
+	;;
     *)
         echo -e "\033[93mWarning\033[0m: Unknown option: $1"
         exit 2
@@ -94,16 +169,37 @@ if [ "$INCHINA" == "yes" ]; then
     DOCKER_REPO=registry.docker-cn.com/apolloauto/apollo
 fi
 
-IMG=${DOCKER_REPO}:$VERSION
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
-
-if [ ! -e /apollo ]; then
-    sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
+if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
+    VERSION="local_dev"
 fi
 
-echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
+# Included default maps.
+for map_name in ${DEFAULT_MAPS[@]}; do
+    source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+done
 
-source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
+IMG=${DOCKER_REPO}:$VERSION
+
+function local_volumes() {
+    # Apollo root and bazel cache dirs are required.
+    volumes="-v $APOLLO_ROOT_DIR:/apollo \
+             -v $HOME/.cache:${DOCKER_HOME}/.cache"
+    case "$(uname -s)" in
+        Linux)
+            volumes="${volumes} -v /dev:/dev \
+                                -v /media:/media \
+                                -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+                                -v /etc/localtime:/etc/localtime:ro \
+                                -v /usr/src:/usr/src \
+                                -v /lib/modules:/lib/modules"
+            ;;
+        Darwin)
+            # MacOS has strict limitations on mapping volumes.
+            chmod -R a+wr ~/.cache/bazel
+            ;;
+    esac
+    echo "${volumes}"
+}
 
 function main(){
 
@@ -132,8 +228,6 @@ function main(){
 
     setup_device
 
-    local devices=" -v /dev:/dev"
-
     USER_ID=$(id -u)
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
@@ -149,37 +243,40 @@ function main(){
     LOCALIZATION_VOLUME=apollo_localization_volume
     docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
 
-    LOCALIZATION_VOLUME_IMAGE=apolloauto/apollo:localization_volume-${ARCH}-latest
+    LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
     docker pull ${LOCALIZATION_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
+
+    YOLO3D_VOLUME=apollo_yolo3d_volume
+    docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
+
+    YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
+    docker pull ${YOLO3D_VOLUME_IMAGE}
+    docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
 
     info "Starting docker container \"apollo_dev\" ..."
     docker run -it \
         -d \
         --privileged \
         --name apollo_dev \
+        ${MAP_VOLUME_CONF} \
         --volumes-from ${LOCALIZATION_VOLUME} \
+        --volumes-from ${YOLO3D_VOLUME} \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
         -e USER=$USER \
         -e DOCKER_USER_ID=$USER_ID \
-        -e DOCKER_GRP=$GRP \
+        -e DOCKER_GRP="$GRP" \
         -e DOCKER_GRP_ID=$GRP_ID \
         -e DOCKER_IMG=$IMG \
-        -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-        -v $APOLLO_ROOT_DIR:/apollo \
-        -v /media:/media \
-        -v $HOME/.cache:${DOCKER_HOME}/.cache \
-        -v /etc/localtime:/etc/localtime:ro \
-        -v /usr/src:/usr/src \
-        -v /lib/modules:/lib/modules \
+        $(local_volumes) \
         --net host \
         -w /apollo \
-        ${devices} \
         --add-host in_dev_docker:127.0.0.1 \
         --add-host ${LOCAL_HOST}:127.0.0.1 \
         --hostname in_dev_docker \
         --shm-size 2G \
+        --pid=host \
         $IMG \
         /bin/bash
 

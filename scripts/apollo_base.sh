@@ -68,34 +68,9 @@ function fail() {
   exit -1
 }
 
-# Check whether user has agreed license agreement
-function check_agreement() {
-  agreement_record="$HOME/.cache/.apollo_agreement.txt"
-  if [ ! -e "$agreement_record" ]; then
-    AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
-    if [ ! -e "$AGREEMENT_FILE" ]; then
-      error "AGREEMENT $AGREEMENT_FILE does not exist."
-      exit 0
-    fi
-    cat $AGREEMENT_FILE
-    tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
-    echo $tip
-    read -n 1 user_agreed
-    if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
-      rm -rf $agreement_record
-      cat $AGREEMENT_FILE >> $agreement_record
-      echo "$tip" >> $agreement_record
-      echo "$user_agreed" >> $agreement_record
-    else
-      exit 0
-    fi
-  fi
-}
-
 function check_in_docker() {
   if [ -f /.dockerenv ]; then
     APOLLO_IN_DOCKER=true
-    check_agreement
   else
     APOLLO_IN_DOCKER=false
   fi
@@ -109,8 +84,6 @@ function set_lib_path() {
     PY_LIB_PATH=/apollo/lib
     PY_TOOLS_PATH=/apollo/modules/tools
   else
-    local MD5=`echo -n $APOLLO_ROOT_DIR | md5sum | cut -d' ' -f1`
-    #local ROS_SETUP="${HOME}/.cache/bazel/_bazel_${USER}/${MD5}/external/ros/setup.bash"
     local ROS_SETUP="/home/tmp/ros/setup.bash"
     if [ -e "${ROS_SETUP}" ]; then
       source "${ROS_SETUP}"
@@ -119,6 +92,7 @@ function set_lib_path() {
     PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/apollo/bazel-genfiles/external/caffe/lib:/home/caros/secure_upgrade/depend_lib
   fi
+  PY_LIB_PATH=${PY_LIB_PATH}:/usr/local/apollo/snowboy/Python
   export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
   if [ -e /usr/local/cuda-8.0/ ];then
     export PATH=/usr/local/cuda-8.0/bin:$PATH
@@ -135,17 +109,10 @@ function create_data_dir() {
   else
     DATA_DIR="${HOME}/data"
   fi
-  if [ ! -e "${DATA_DIR}/log" ]; then
-    mkdir -p "${DATA_DIR}/log"
-  fi
 
-  if [ ! -e "${DATA_DIR}/bag" ]; then
-    mkdir -p "${DATA_DIR}/bag"
-  fi
-
-  if [ ! -e "${DATA_DIR}/core" ]; then
-    mkdir -p "${DATA_DIR}/core"
-  fi
+  mkdir -p "${DATA_DIR}/log"
+  mkdir -p "${DATA_DIR}/bag"
+  mkdir -p "${DATA_DIR}/core"
 }
 
 function determine_bin_prefix() {
@@ -172,12 +139,17 @@ function find_device() {
 }
 
 function setup_device() {
+  if [ $(uname -s) != "Linux" ]; then
+    echo "Not on Linux, skip mapping devices."
+    return
+  fi
+
   # setup CAN device
   for INDEX in `seq 0 3`
   do
-      if [ ! -e /dev/can${INDEX} ]; then
-          sudo mknod --mode=a+rw /dev/can${INDEX} c 52 $INDEX
-      fi
+    if [ ! -e /dev/can${INDEX} ]; then
+      sudo mknod --mode=a+rw /dev/can${INDEX} c 52 $INDEX
+    fi
   done
 
   MACHINE_ARCH=$(uname -m)
@@ -205,6 +177,33 @@ function setup_device() {
   if [ ! -e /dev/nvidia-uvm-tools ];then
     sudo mknod -m 666 /dev/nvidia-uvm-tools c 243 1
   fi
+}
+
+function decide_task_dir() {
+  # Try to find largest NVMe drive.
+  DISK="$(df | grep "^/dev/nvme" | sort -nr -k 4 | \
+      awk '{print substr($0, index($0, $6))}')"
+
+  # Try to find largest external drive.
+  if [ -z "${DISK}" ]; then
+    DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 | \
+        awk '{print substr($0, index($0, $6))}')"
+  fi
+
+  if [ -z "${DISK}" ]; then
+    echo "Cannot find portable disk. Fallback to apollo data dir."
+    DISK="/apollo"
+  fi
+
+  # Create task dir.
+  BAG_PATH="${DISK}/data/bag"
+  TASK_ID=$(date +%Y-%m-%d-%H-%M-%S)
+  TASK_DIR="${BAG_PATH}/${TASK_ID}"
+  mkdir -p "${TASK_DIR}"
+
+  echo "Record bag to ${TASK_DIR}..."
+  export TASK_ID="${TASK_ID}"
+  export TASK_DIR="${TASK_DIR}"
 }
 
 function is_stopped_customized_path() {
@@ -296,7 +295,7 @@ function start_fe_customized_path() {
 
   eval "${APOLLO_BIN_PREFIX}/modules/${MODULE_PATH}/${MODULE} \
       --flagfile=modules/${MODULE_PATH}/conf/${MODULE}.conf \
-      --log_dir=${APOLLO_ROOT_DIR}/data/log $@"
+      --alsologtostderr --log_dir=${APOLLO_ROOT_DIR}/data/log $@"
 }
 
 function start_fe() {
@@ -327,7 +326,7 @@ function stop_customized_path() {
   MODULE_PATH=$1
   MODULE=$2
 
-  pkill -SIGINT -f "modules/${MODULE_PATH}/${MODULE}"
+  pkill -SIGKILL -f "modules/${MODULE_PATH}/${MODULE}"
   if [ $? -eq 0 ]; then
     echo "Successfully stopped module ${MODULE}."
   else
@@ -340,16 +339,20 @@ function stop() {
   stop_customized_path $MODULE $MODULE
 }
 
+# Note: This 'help' function here will overwrite the bash builtin command 'help'.
+# TODO: add a command to query known modules.
 function help() {
-  echo "Usage:
-  ./$0 [COMMAND]"
-  echo "COMMAND:
-  help: this help message
-  start: start the module in background
-  start_fe: start the module without putting in background
+cat <<EOF
+Invoke ". scripts/apollo_base.sh" within docker to add the following commands to the environment:
+Usage: COMMAND [<module_name>]
+
+COMMANDS:
+  help:      show this help message
+  start:     start the module in background
+  start_fe:  start the module without putting in background
   start_gdb: start the module with gdb
-  stop: stop the module
-  "
+  stop:      stop the module
+EOF
 }
 
 function run_customized_path() {
@@ -382,6 +385,30 @@ function run_customized_path() {
   esac
 }
 
+# Write log to a file about the env when record a bag.
+function record_bag_env_log() {
+  if [ -z "${TASK_ID}" ]; then
+    TASK_ID=$(date +%Y-%m-%d-%H-%M)
+  fi
+
+  git status >/dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "Not in Git repo, maybe because you are in release container."
+    echo "Skip log environment."
+    return
+  fi
+
+  commit=$(git log -1)
+  echo -e "Date:$(date)\n" >> Bag_Env_$TASK_ID.log
+  git branch | awk '/\*/ { print "current branch: " $2; }'  >> Bag_Env_$TASK_ID.log
+  echo -e "\nNewest commit:\n$commit"  >> Bag_Env_$TASK_ID.log
+  echo -e "\ngit diff:" >> Bag_Env_$TASK_ID.log
+  git diff >> Bag_Env_$TASK_ID.log
+  echo -e "\n\n\n\n" >> Bag_Env_$TASK_ID.log
+  echo -e "git diff --staged:" >> Bag_Env_$TASK_ID.log
+  git diff --staged >> Bag_Env_$TASK_ID.log
+}
+
 # run command_name module_name
 function run() {
   local module=$1
@@ -389,9 +416,10 @@ function run() {
   run_customized_path $module $module "$@"
 }
 
+check_in_docker
+create_data_dir
+
 if [ -z $APOLLO_BASE_SOURCED ]; then
-  check_in_docker
-  create_data_dir
   set_lib_path
   determine_bin_prefix
   export APOLLO_BASE_SOURCED=1

@@ -20,6 +20,7 @@ cc_library(
         "misc_69.cc",
         "steering_64.cc",
         "steering_65.cc",
+        "surround_73.cc",
         "throttle_62.cc",
         "throttle_63.cc",
         "throttleinfo_75.cc",
@@ -27,7 +28,6 @@ cc_library(
         "turnsignal_68.cc",
         "version_7f.cc",
         "wheelspeed_6a.cc",
-        "surround_73.cc",
     ],
     hdrs = [
         "accel_6b.h",
@@ -45,6 +45,7 @@ cc_library(
         "misc_69.h",
         "steering_64.h",
         "steering_65.h",
+        "surround_73.h",
         "throttle_62.h",
         "throttle_63.h",
         "throttleinfo_75.h",
@@ -52,7 +53,6 @@ cc_library(
         "turnsignal_68.h",
         "version_7f.h",
         "wheelspeed_6a.h",
-        "surround_73.h",
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",

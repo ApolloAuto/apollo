@@ -24,7 +24,7 @@ export default class DelayTable extends React.Component {
     render() {
         const { moduleDelay } = this.props.store;
 
-        const items = moduleDelay.keys()
+        const items = moduleDelay.keys().sort()
             .map(key => {
                 const module = moduleDelay.get(key);
                 const warning = module.delay > 2000 && module.name !== "TrafficLight";

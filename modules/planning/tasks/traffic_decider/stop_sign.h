@@ -26,6 +26,8 @@
 #include <utility>
 #include <vector>
 
+#include "modules/map/hdmap/hdmap.h"
+#include "modules/planning/proto/planning_status.pb.h"
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
 namespace apollo {
@@ -36,26 +38,22 @@ class StopSign : public TrafficRule {
       StopSignLaneVehicles;
 
  public:
-  explicit StopSign(const RuleConfig& config);
+  explicit StopSign(const TrafficRuleConfig& config);
   virtual ~StopSign() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
-
-  enum class StopSignStopStatus {
-    UNKNOWN = 0,
-    TO_STOP = 1,
-    STOPPING = 2,
-    CREEPING = 3,
-    STOP_DONE = 4,
-  };
+  common::Status ApplyRule(Frame* const frame,
+                           ReferenceLineInfo* const reference_line_info);
 
  private:
   void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
   bool FindNextStopSign(ReferenceLineInfo* const reference_line_info);
   int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
+  bool CheckCreep(const hdmap::StopSignInfo& stop_sign_info);
+  bool CheckCreepDone(ReferenceLineInfo* const reference_line_info);
   int ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
-                        const hdmap::StopSignInfo& stop_sign_info);
+                        const hdmap::StopSignInfo& stop_sign_info,
+                        StopSignLaneVehicles* watch_vehicles);
   bool CheckADCkStop(ReferenceLineInfo* const reference_line_info);
   int GetWatchVehicles(const hdmap::StopSignInfo& stop_sign_info,
                        StopSignLaneVehicles* watch_vehicles);
@@ -67,27 +65,19 @@ class StopSign : public TrafficRule {
                          StopSignLaneVehicles* watch_vehicles);
   int ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
                         StopSignLaneVehicles* watch_vehicles);
-  bool BuildStopDecision(Frame* const frame,
-                         ReferenceLineInfo* const reference_line_info,
-                         hdmap::PathOverlap* const overlap,
-                         const double stop_buffer);
-  void ClearOtherStopSignDropbox(ReferenceLineInfo* const reference_line_info);
-  void ClearDropbox(const std::string& stop_sign_id);
-  void ClearDropboxWatchvehicles(const std::string& stop_sign_id);
+  int BuildStopDecision(Frame* const frame,
+                        ReferenceLineInfo* const reference_line_info,
+                        const std::string& stop_wall_id,
+                        const double stop_line_s, const double stop_distance,
+                        StopSignLaneVehicles* watch_vehicles);
 
  private:
-  constexpr static char const* const db_key_stop_sign_stop_status_prefix_ =
-      "kStopSignStopStatus_";
-  constexpr static char const* const db_key_stop_sign_stop_starttime_prefix_ =
-      "kStopSignStopStarttime_";
-  constexpr static char const* const db_key_stop_sign_watch_vehicle_prefix_ =
-      "kStopSignWatchVehicle_";
-  constexpr static char const* const db_key_stop_sign_associated_lanes_prefix_ =
-      "kStopSignAssociateLane_";
+  static constexpr const char* STOP_SIGN_VO_ID_PREFIX = "SS_";
+  static constexpr const char* STOP_SIGN_CREEP_VO_ID_PREFIX = "SS_CREEP_";
 
-  hdmap::PathOverlap* next_stop_sign_overlap_ = nullptr;
-  hdmap::StopSignInfo* next_stop_sign_ = nullptr;
-  StopSignStopStatus stop_status_;
+  hdmap::PathOverlap next_stop_sign_overlap_;
+  hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;
+  StopSignStatus::Status stop_status_;
   std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
       associated_lanes_;
 };

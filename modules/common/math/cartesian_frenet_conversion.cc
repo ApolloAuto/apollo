@@ -22,9 +22,8 @@
 #include "modules/common/math/math_utils.h"
 
 namespace apollo {
-namespace planning {
-
-using apollo::common::math::Vec2d;
+namespace common {
+namespace math {
 
 void CartesianFrenetConverter::cartesian_to_frenet(
     const double rs, const double rx, const double ry, const double rtheta,
@@ -108,7 +107,7 @@ void CartesianFrenetConverter::frenet_to_cartesian(
   const double delta_theta = std::atan2(d_condition[1], one_minus_kappa_r_d);
   const double cos_delta_theta = std::cos(delta_theta);
 
-  *ptr_theta = common::math::NormalizeAngle(delta_theta + rtheta);
+  *ptr_theta = NormalizeAngle(delta_theta + rtheta);
 
   const double kappa_r_d_prime =
       rdkappa * d_condition[0] + rkappa * d_condition[1];
@@ -135,7 +134,7 @@ double CartesianFrenetConverter::CalculateTheta(const double rtheta,
                                                 const double rkappa,
                                                 const double l,
                                                 const double dl) {
-  return common::math::NormalizeAngle(rtheta + std::atan2(dl, 1 - l * rkappa));
+  return NormalizeAngle(rtheta + std::atan2(dl, 1 - l * rkappa));
 }
 
 double CartesianFrenetConverter::CalculateKappa(const double rkappa,
@@ -186,5 +185,6 @@ double CartesianFrenetConverter::CalculateSecondOrderLateralDerivative(
   return res;
 }
 
-}  // namespace planning
+}  // namespace math
+}  // namespace common
 }  // namespace apollo

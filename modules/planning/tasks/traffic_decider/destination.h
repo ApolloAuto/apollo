@@ -23,6 +23,7 @@
 
 #include <string>
 
+#include "modules/common/proto/geometry.pb.h"
 #include "modules/planning/tasks/traffic_decider/traffic_rule.h"
 
 namespace apollo {
@@ -34,10 +35,26 @@ namespace planning {
  */
 class Destination : public TrafficRule {
  public:
-  explicit Destination(const RuleConfig& config);
+  explicit Destination(const TrafficRuleConfig& config);
   virtual ~Destination() = default;
 
-  bool ApplyRule(Frame* const, ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
+
+ private:
+  void MakeDecisions(Frame* const frame,
+                     ReferenceLineInfo* const reference_line_info);
+  int BuildStopDecision(Frame* const frame,
+                         ReferenceLineInfo* const reference_line_info);
+  int Stop(Frame* const frame,
+           ReferenceLineInfo* const reference_line_info,
+           const std::string lane_id,
+           const double lane_s);
+  bool CheckPullOver(ReferenceLineInfo* const reference_line_info,
+                     const std::string lane_id,
+                     const double lane_s,
+                     common::PointENU* dest_point);
+  int PullOver(common::PointENU* const dest_point);
 };
 
 }  // namespace planning

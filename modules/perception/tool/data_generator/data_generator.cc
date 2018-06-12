@@ -42,9 +42,7 @@ using apollo::perception::pcl_util::PointXYZIT;
 using Eigen::Affine3d;
 using Eigen::Matrix4d;
 
-std::string DataGenerator::Name() const {
-  return "data_generator";
-}
+std::string DataGenerator::Name() const { return "data_generator"; }
 
 Status DataGenerator::Init() {
   RegisterSensors();
@@ -75,9 +73,7 @@ void DataGenerator::RegisterSensors() {
                            });
 }
 
-void DataGenerator::OnTimer(const ros::TimerEvent&) {
-  RunOnce();
-}
+void DataGenerator::OnTimer(const ros::TimerEvent&) { RunOnce(); }
 
 void DataGenerator::RunOnce() {
   AdapterManager::Observe();

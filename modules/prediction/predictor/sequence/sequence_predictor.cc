@@ -61,8 +61,12 @@ std::string SequencePredictor::ToString(const LaneSequence& sequence) {
 }
 
 void SequencePredictor::FilterLaneSequences(
-    const LaneGraph& lane_graph, const std::string& lane_id,
+    const Feature& feature, const std::string& lane_id,
     std::vector<bool>* enable_lane_sequence) {
+  if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
+    return;
+  }
+  const LaneGraph& lane_graph = feature.lane().lane_graph();
   int num_lane_sequence = lane_graph.lane_sequence_size();
   std::vector<LaneChangeType> lane_change_type(num_lane_sequence,
                                                LaneChangeType::INVALID);
@@ -84,7 +88,7 @@ void SequencePredictor::FilterLaneSequences(
     double distance = GetLaneChangeDistanceWithADC(sequence);
     ADEBUG << "Distance to ADC " << std::fixed << std::setprecision(6)
            << distance;
-    if (distance < FLAGS_lane_change_dist) {
+    if (distance > 0.0 && distance < FLAGS_lane_change_dist) {
       (*enable_lane_sequence)[i] = false;
       ADEBUG << "Filter trajectory [" << ToString(sequence)
              << "] due to small distance " << distance << ".";
@@ -183,7 +187,7 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
                                      PredictionMap::LaneById(obstacle_lane_id),
                                      &lane_s, &lane_l)) {
       ADEBUG << "Distance with ADC is " << std::fabs(lane_s - obstacle_lane_s);
-      return std::fabs(lane_s - obstacle_lane_s);
+      return obstacle_lane_s - lane_s;
     }
   }
 
@@ -192,8 +196,8 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
 }
 
 bool SequencePredictor::LaneSequenceWithMaxProb(const LaneChangeType& type,
-                                                const double& probability,
-                                                const double& max_prob) {
+                                                const double probability,
+                                                const double max_prob) {
   if (probability > max_prob) {
     return true;
   } else {
@@ -207,8 +211,8 @@ bool SequencePredictor::LaneSequenceWithMaxProb(const LaneChangeType& type,
 }
 
 bool SequencePredictor::LaneChangeWithMaxProb(const LaneChangeType& type,
-                                              const double& probability,
-                                              const double& max_prob) {
+                                              const double probability,
+                                              const double max_prob) {
   if (type == LaneChangeType::LEFT || type == LaneChangeType::RIGHT) {
     if (probability > max_prob) {
       return true;

@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_traffic_light_interface",
+    name = "interface",
     srcs = [
         "base_projection.cc",
     ],
@@ -22,8 +22,7 @@ cc_library(
         "//modules/map/proto:map_proto",
         "//modules/perception/lib/config_manager",
         "//modules/perception/proto:perception_proto",
-        "//modules/perception/traffic_light/base:perception_traffic_light_base",
-        "@yaml_cpp//:yaml",
+        "//modules/perception/traffic_light/base",
     ],
 )
 

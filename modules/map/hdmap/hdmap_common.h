@@ -115,6 +115,7 @@ class LaneInfo {
     return unit_directions_;
   }
   double Heading(const double s) const;
+  double Curvature(const double s) const;
   const std::vector<double> &headings() const { return headings_; }
   const std::vector<apollo::common::math::LineSegment2d> &segments() const {
     return segments_;

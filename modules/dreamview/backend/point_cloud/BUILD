@@ -17,7 +17,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/dreamview/backend/common:dreamview_gflags",
-        "//modules/dreamview/backend/handlers:websocket",
+        "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/proto:point_cloud_proto",
         "//modules/localization/proto:localization_proto",
         "//third_party/json",

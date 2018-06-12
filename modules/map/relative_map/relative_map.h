@@ -18,6 +18,7 @@
 #define MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_H_
 
 #include <memory>
+#include <mutex>
 #include <string>
 
 #include "modules/map/relative_map/proto/navigation.pb.h"
@@ -64,34 +65,25 @@ class RelativeMap : public RelativeMapInterface {
   virtual ~RelativeMap() = default;
 
   /**
-   * @brief Data callback upon receiving a perception obstacle message.
-   * This function is the main logic of the class.
-   * @param perception_obstacles received message.
+   * @brief main logic of the relative_map module, runs periodically triggered
+   * by timer.
    */
-  void RunOnce(
-      const perception::PerceptionObstacles& perception_obstacles) override;
+  void RunOnce() override;
 
-  /**
-   * @brief Data callback upon receiving a navigation message.
-   * This function is used to update the navigation path.
-   * @param navigation_info received message.
-   */
-  void RunOnce(const NavigationInfo& navigation_info);
+  void OnTimer(const ros::TimerEvent&);
 
  private:
-  void CreateMapFromPerception(
-      const apollo::perception::PerceptionObstacles& perception_obstacles,
-      MapMsg* map_msg);
+  bool CreateMapFromNavigationLane(MapMsg* map_msg);
 
-  bool CreateMapMsgFromNavigationPath(const NavigationPath& navigation_path,
-                                      double left_width, double right_width,
-                                      relative_map::MapMsg* map_msg);
+  void OnReceiveNavigationInfo(const NavigationInfo& navigation_info);
 
   common::adapter::AdapterManagerConfig adapter_conf_;
   RelativeMapConfig config_;
   apollo::common::monitor::MonitorLogger monitor_logger_;
 
   NavigationLane navigation_lane_;
+  std::mutex navigation_lane_mutex_;
+  ros::Timer timer_;
 };
 
 }  // namespace relative_map

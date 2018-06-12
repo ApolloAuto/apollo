@@ -20,26 +20,27 @@
 #include "modules/planning/common/path/frenet_frame_path.h"
 
 #include <algorithm>
+#include <limits>
 #include <utility>
 
 #include "modules/common/log.h"
 #include "modules/common/math/linear_interpolation.h"
-#include "modules/common/proto/pnc_point.pb.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::FrenetFramePoint;
+
 FrenetFramePath::FrenetFramePath(
-    const std::vector<common::FrenetFramePoint>& sl_points) {
+    const std::vector<FrenetFramePoint>& sl_points) {
   points_ = sl_points;
 }
 
-void FrenetFramePath::set_points(
-    const std::vector<common::FrenetFramePoint>& points) {
+void FrenetFramePath::set_points(const std::vector<FrenetFramePoint>& points) {
   points_ = points;
 }
 
-const std::vector<common::FrenetFramePoint>& FrenetFramePath::points() const {
+const std::vector<FrenetFramePoint>& FrenetFramePath::points() const {
   return points_;
 }
 
@@ -52,20 +53,46 @@ double FrenetFramePath::Length() const {
 
 std::uint32_t FrenetFramePath::NumOfPoints() const { return points_.size(); }
 
-const common::FrenetFramePoint& FrenetFramePath::PointAt(
+const FrenetFramePoint& FrenetFramePath::PointAt(
     const std::uint32_t index) const {
   CHECK_LT(index, points_.size());
   return points_[index];
 }
 
-common::FrenetFramePoint FrenetFramePath::EvaluateByS(const double s) const {
-  CHECK_GT(points_.size(), 1);
-  CHECK(s < points_.back().s() + 1.0e-6 && s > points_.front().s() - 1.0e-6);
-  auto func = [](const common::FrenetFramePoint& p, const double s) {
-    return p.s() < s;
-  };
+FrenetFramePoint FrenetFramePath::GetNearestPoint(const SLBoundary& sl) const {
+  auto it_lower = std::lower_bound(points_.begin(), points_.end(), sl.start_s(),
+                                   LowerBoundComparator);
+  if (it_lower == points_.end()) {
+    return points_.back();
+  }
+  auto it_upper = std::upper_bound(it_lower, points_.end(), sl.end_s(),
+                                   UpperBoundComparator);
+  double min_dist = std::numeric_limits<double>::max();
+  auto min_it = it_upper;
+  for (auto it = it_lower; it != it_upper; ++it) {
+    if (it->l() >= sl.start_l() && it->l() <= sl.end_l()) {
+      return *it;
+    } else if (it->l() > sl.end_l()) {
+      double diff = it->l() - sl.end_l();
+      if (diff < min_dist) {
+        min_dist = diff;
+        min_it = it;
+      }
+    } else {
+      double diff = sl.start_l() - it->l();
+      if (diff < min_dist) {
+        min_dist = diff;
+        min_it = it;
+      }
+    }
+  }
+  return *min_it;
+}
 
-  auto it_lower = std::lower_bound(points_.begin(), points_.end(), s, func);
+FrenetFramePoint FrenetFramePath::EvaluateByS(const double s) const {
+  CHECK_GT(points_.size(), 1);
+  auto it_lower =
+      std::lower_bound(points_.begin(), points_.end(), s, LowerBoundComparator);
   if (it_lower == points_.begin()) {
     return points_.front();
   } else if (it_lower == points_.end()) {
@@ -76,7 +103,7 @@ common::FrenetFramePoint FrenetFramePath::EvaluateByS(const double s) const {
   const auto& p1 = *it_lower;
   const auto s1 = p1.s();
 
-  common::FrenetFramePoint p;
+  FrenetFramePoint p;
   p.set_s(s);
   p.set_l(common::math::lerp(p0.l(), s0, p1.l(), s1, s));
   p.set_dl(common::math::lerp(p0.dl(), s0, p1.dl(), s1, s));

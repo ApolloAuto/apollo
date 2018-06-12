@@ -17,14 +17,12 @@
 #ifndef MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
 #define MODULES_DREAMVIEW_BACKEND_HMI_HMI_H_
 
-#include <string>
+#include <memory>
+#include <mutex>
 
-#include "gtest/gtest_prod.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/dreamview/backend/handlers/websocket.h"
+#include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
-#include "modules/dreamview/proto/hmi_config.pb.h"
-#include "modules/dreamview/proto/hmi_status.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -39,42 +37,24 @@ class HMI {
 
  private:
   // Broadcast HMIStatus to all clients.
-  void BroadcastHMIStatus();
+  void StartBroadcastHMIStatusThread();
+  void DeferredBroadcastHMIStatus();
+
   // Send VehicleParam to the given conn, or broadcast if conn is null.
   void SendVehicleParam(WebSocketHandler::Connection *conn = nullptr);
 
   void RegisterMessageHandlers();
 
-  // Run a supported command of some component, return the ret code.
-  static int RunComponentCommand(
-      const google::protobuf::Map<std::string, Component> &components,
-      const std::string &component_name, const std::string &command_name);
-
-  // Run a supported command of current mode.
-  void RunModeCommand(const std::string &command_name);
-  // Run a supported command of the given mode.
-  void RunModeCommand(const std::string &mode, const std::string &command_name);
-
-  static void ChangeDrivingModeTo(const std::string &new_mode);
-  void ChangeMapTo(const std::string &map_name);
-  void ChangeVehicleTo(const std::string &vehicle_name);
-  void ChangeModeTo(const std::string &mode_name);
-
-  // Check if there is available updates.
-  void CheckOTAUpdates();
-  void SubmitDriveEvent(const uint64_t event_time_ms,
-                        const std::string &event_msg) const;
-
-  HMIConfig config_;
-  HMIStatus status_;
-
   // No ownership.
   WebSocketHandler *websocket_;
   MapService *map_service_;
 
-  apollo::common::monitor::MonitorLogger logger_;
+  // For HMIStatus broadcasting.
+  std::unique_ptr<std::thread> broadcast_hmi_status_thread_;
+  bool need_broadcast_ = false;
+  std::mutex need_broadcast_mutex_;
 
-  FRIEND_TEST(HMITest, RunComponentCommand);
+  apollo::common::monitor::MonitorLogger logger_;
 };
 
 }  // namespace dreamview

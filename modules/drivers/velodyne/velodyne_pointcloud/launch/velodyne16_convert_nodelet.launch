@@ -7,9 +7,10 @@
   <arg name="topic_pointcloud" default="/apollo/sensor/velodyne64/PointCloud2"/>
   <arg name="topic_packets" default="/apollo/sensor/velodyne64/VelodyneScanUnified"/>
   <arg name="node_name" default="convert_nodelet"/>
+  <arg name="nodelet_manager_name" default="velodyne_nodelet_manager" />
 
   <node pkg="nodelet" type="nodelet" name="$(arg node_name)"
-        args="load velodyne_pointcloud/ConvertNodelet velodyne_nodelet_manager" output="screen">
+        args="load velodyne_pointcloud/ConvertNodelet $(arg nodelet_manager_name)" output="screen">
     <param name="calibration_online" value="$(arg calibration_online)"/>
     <param name="calibration" value="$(arg calibration)"/>
     <param name="min_range" value="$(arg min_range)"/>

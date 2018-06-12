@@ -11,9 +11,9 @@ cc_library(
         "*.h",
     ]),
     deps = [
-        "//modules/canbus/common:canbus_common",
+        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/canbus/vehicle:message_manager_base",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
     ],
 )
 

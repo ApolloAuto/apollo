@@ -33,7 +33,6 @@
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/proto/feature.pb.h"
 
 #include "modules/common/math/kalman_filter.h"
@@ -68,8 +67,7 @@ class Obstacle {
    * @param timestamp The timestamp when the perception obstacle was detected.
    */
   void Insert(const perception::PerceptionObstacle& perception_obstacle,
-              const double timestamp,
-              ObstacleClusters* const obstacle_clusters);
+              const double timestamp);
 
   /**
    * @brief Get the type of perception obstacle's type.
@@ -122,14 +120,6 @@ class Obstacle {
   size_t history_size() const;
 
   /**
-   * @brief Get the lane Kalman filter by lane ID.
-   * @param lane_id The lane ID.
-   * @return The lane Kalman filter.
-   */
-  const common::math::KalmanFilter<double, 4, 2, 0>& kf_lane_tracker(
-      const std::string& lane_id);
-
-  /**
    * @brief Get the motion Kalman filter.
    * @return The motion Kalman filter.
    */
@@ -141,6 +131,12 @@ class Obstacle {
    */
   const common::math::KalmanFilter<double, 2, 2, 4>& kf_pedestrian_tracker()
       const;
+
+  /**
+   * @brief Check if the obstacle is still.
+   * @return If the obstacle is still.
+   */
+  bool IsStill();
 
   /**
    * @brief Check if the obstacle is on any lane.
@@ -217,31 +213,25 @@ class Obstacle {
 
   void UpdateKFMotionTracker(const Feature& feature);
 
-  void InitKFLaneTracker(const std::string& lane_id, const double beta);
-
-  void UpdateKFLaneTrackers(Feature* feature);
-
-  void UpdateKFLaneTracker(const std::string& lane_id, const double lane_s,
-                           const double lane_l, const double lane_speed,
-                           const double lane_acc, const double timestamp,
-                           const double beta);
-
   void UpdateLaneBelief(Feature* feature);
 
   void SetCurrentLanes(Feature* feature);
 
   void SetNearbyLanes(Feature* feature);
 
-  void SetLaneGraphFeature(Feature* feature,
-                           ObstacleClusters* const obstacle_clusters);
+  void SetLaneGraphFeature(Feature* feature);
 
   void SetLanePoints(Feature* feature);
+
+  void SetLaneSequencePath(LaneGraph* const lane_graph);
 
   void InitKFPedestrianTracker(const Feature& feature);
 
   void UpdateKFPedestrianTracker(const Feature& feature);
 
   void SetMotionStatus();
+
+  void SetMotionStatusBySpeed();
 
   void InsertFeatureToHistory(const Feature& feature);
 
@@ -255,8 +245,6 @@ class Obstacle {
   common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
   common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
   common::DigitalFilter heading_filter_;
-  std::unordered_map<std::string, common::math::KalmanFilter<double, 4, 2, 0>>
-      kf_lane_trackers_;
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
   std::vector<Eigen::MatrixXf> rnn_states_;
   bool rnn_enabled_ = false;

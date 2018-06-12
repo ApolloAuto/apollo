@@ -6,7 +6,13 @@ We have only tested on Ubuntu which means it's the only operating system we curr
 
 ## I’m having difficulty connecting to localhost:8888 (Dreamview).
 
-Before running the Dreamview page, you need to build the system within the docker container using 'bash apollo.sh build'. Once built, if you are not accessing the Dreamview page through the host machine, you should use <apollo_host_ip>:8888 for Dreamview, instead of localhost:8888.
+The Dreamview web server is provided by the dreamview node(A node is an executable in ROS concept). Before accessing the Dreamview page, you need to build the system(included dreamview node) within the docker container following the [guide](https://github.com/ApolloAuto/apollo/blob/master/README.md). Once built, dreamview node will be started after the step `bash scripts/bootstrap.sh`.
+
+So if you can not access Dreamview, please check:
+
+* Make sure you have dreamview process running correctly. In the latest version, `bash scripts/bootstrap.sh` will report `dreamview: ERROR (spawn error)` if dreamview fails to start. For early version, please check with command: `supervisorctl status dreamview` or `ps aux | grep dreamview`. If dreamview is not running, please refer to [How to Debug a Dreamview Start Problem](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_debug_dreamview_start_problem.md).
+* Make sure the address and port are not blocked by the firewall.
+* Make sure you're using <apollo_host_ip>:8888 instead of localhost:8888 if you are not accessing the Dreamview page through the host machine.
 
 ## How can I perform step-by-step debugging?
 

@@ -35,9 +35,6 @@ using apollo::common::util::operator+;
 using apollo::common::math::Vec2d;
 using apollo::common::monitor::MonitorLogBuffer;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::hdmap::Lane;
-// using apollo::common::util::operator+;
-using apollo::hdmap::LaneBoundaryType;
 using apollo::perception::PerceptionObstacles;
 
 RelativeMap::RelativeMap()
@@ -70,6 +67,9 @@ Status RelativeMap::Init() {
   }
 
   navigation_lane_.SetConfig(config_.navigation_lane());
+  const auto& map_param = config_.map_param();
+  navigation_lane_.SetDefaultWidth(map_param.default_left_width(),
+                                   map_param.default_right_width());
 
   AdapterManager::Init(adapter_conf_);
   if (!AdapterManager::GetPerceptionObstacles()) {
@@ -105,12 +105,22 @@ Status RelativeMap::Init() {
   return Status::OK();
 }
 
+void LogErrorStatus(MapMsg* map_msg, const std::string& error_msg) {
+  auto* status = map_msg->mutable_header()->mutable_status();
+  status->set_msg(error_msg);
+  status->set_error_code(ErrorCode::RELATIVE_MAP_ERROR);
+}
+
 apollo::common::Status RelativeMap::Start() {
   MonitorLogBuffer buffer(&monitor_logger_);
   buffer.INFO("RelativeMap started");
 
-  AdapterManager::AddPerceptionObstaclesCallback(&RelativeMap::RunOnce, this);
-  AdapterManager::AddNavigationCallback(&RelativeMap::RunOnce, this);
+  timer_ = AdapterManager::CreateTimer(
+      ros::Duration(1.0 / FLAGS_relative_map_loop_rate), &RelativeMap::OnTimer,
+      this);
+
+  AdapterManager::AddNavigationCallback(&RelativeMap::OnReceiveNavigationInfo,
+                                        this);
 
   if (AdapterManager::GetPerceptionObstacles()->Empty()) {
     AWARN << "Perception is not ready.";
@@ -119,26 +129,39 @@ apollo::common::Status RelativeMap::Start() {
   return Status::OK();
 }
 
-void RelativeMap::RunOnce(const PerceptionObstacles& perception_obstacles) {
+void RelativeMap::OnTimer(const ros::TimerEvent&) { RunOnce(); }
+
+void RelativeMap::RunOnce() {
   AdapterManager::Observe();
 
-  ADEBUG << "PerceptionObstacles received by RelativeMap:\n"
-         << perception_obstacles.DebugString();
-
   MapMsg map_msg;
-  CreateMapFromPerception(perception_obstacles, &map_msg);
-  if (map_msg.has_hdmap()) {
-    Publish(&map_msg);
+  {
+    std::lock_guard<std::mutex> lock(navigation_lane_mutex_);
+    CreateMapFromNavigationLane(&map_msg);
+  }
+  Publish(&map_msg);
+}
+
+void RelativeMap::OnReceiveNavigationInfo(
+    const NavigationInfo& navigation_info) {
+  {
+    std::lock_guard<std::mutex> lock(navigation_lane_mutex_);
+    navigation_lane_.UpdateNavigationInfo(navigation_info);
   }
 }
 
-void RelativeMap::RunOnce(const NavigationInfo& navigation_info) {
-  AdapterManager::Observe();
-  navigation_lane_.UpdateNavigationInfo(navigation_info);
-}
+bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
+  CHECK_NOTNULL(map_msg);
 
-void RelativeMap::CreateMapFromPerception(
-    const PerceptionObstacles& perception_obstacles, MapMsg* map_msg) {
+  if (AdapterManager::GetLocalization()->Empty()) {
+    LogErrorStatus(map_msg, "localization is not ready");
+    return false;
+  }
+  if (AdapterManager::GetChassis()->Empty()) {
+    LogErrorStatus(map_msg, "chassis is not ready");
+    return false;
+  }
+
   // update vehicle state from localization and chassis
   const auto& localization =
       AdapterManager::GetLocalization()->GetLatestObserved();
@@ -146,84 +169,32 @@ void RelativeMap::CreateMapFromPerception(
   const auto& chassis = AdapterManager::GetChassis()->GetLatestObserved();
   ADEBUG << "Get chassis:" << chassis.DebugString();
   VehicleStateProvider::instance()->Update(localization, chassis);
+  map_msg->mutable_localization()->CopyFrom(localization);
 
   // update navigation_lane from perception_obstacles (lane marker)
-  navigation_lane_.Update(perception_obstacles);
-
-  // create map proto from navigation_path
-  if (!CreateMapMsgFromNavigationPath(
-          navigation_lane_.Path(), navigation_lane_.left_width(),
-          navigation_lane_.right_width(), map_msg)) {
-    map_msg->clear_hdmap();
-    AERROR << "Failed to create map from navigation path";
+  if (!AdapterManager::GetPerceptionObstacles()->Empty()) {
+    const auto& perception =
+        AdapterManager::GetPerceptionObstacles()->GetLatestObserved();
+    navigation_lane_.UpdatePerception(perception);
+    map_msg->mutable_lane_marker()->CopyFrom(perception.lane_marker());
   }
-}
 
-bool RelativeMap::CreateMapMsgFromNavigationPath(
-    const NavigationPath& navigation_path, double left_width,
-    double right_width, MapMsg* map_msg) {
-  auto* navigation_info = map_msg->mutable_navigation_path();
-  auto* hdmap = map_msg->mutable_hdmap();
-  const auto& path = navigation_path.path();
-  if (path.path_point_size() < 2) {
-    AERROR << "The path length is invalid";
+  if (!navigation_lane_.GeneratePath()) {
+    LogErrorStatus(map_msg, "navigation lane fails to generate path");
     return false;
   }
-  const auto& map_config = config_.map_param();
-  auto* lane = hdmap->add_lane();
-  lane->mutable_id()->set_id(std::to_string(navigation_path.path_priority()) +
-                             "_" + path.name());
-  (*navigation_info)[lane->id().id()] = navigation_path;
-  // lane types
-  lane->set_type(Lane::CITY_DRIVING);
-  lane->set_turn(Lane::NO_TURN);
 
-  // speed limit
-  lane->set_speed_limit(map_config.default_speed_limit());
-
-  // center line
-  auto* curve_segment = lane->mutable_central_curve()->add_segment();
-  curve_segment->set_heading(path.path_point(0).theta());
-  auto* line_segment = curve_segment->mutable_line_segment();
-  // left boundary
-  auto* left_boundary = lane->mutable_left_boundary();
-  auto* left_boundary_type = left_boundary->add_boundary_type();
-  left_boundary->set_virtual_(false);
-  left_boundary_type->set_s(0.0);
-  left_boundary_type->add_types(LaneBoundaryType::SOLID_YELLOW);
-  auto* left_segment =
-      left_boundary->mutable_curve()->add_segment()->mutable_line_segment();
-  // right boundary
-  auto* right_boundary = lane->mutable_right_boundary();
-  auto* right_boundary_type = right_boundary->add_boundary_type();
-  right_boundary->set_virtual_(false);
-  right_boundary_type->set_s(0.0);
-  right_boundary_type->add_types(LaneBoundaryType::SOLID_YELLOW);
-  auto* right_segment =
-      right_boundary->mutable_curve()->add_segment()->mutable_line_segment();
-  const double lane_left_width =
-      left_width > 0 ? left_width : map_config.default_left_width();
-  const double lane_right_width =
-      right_width > 0 ? right_width : map_config.default_right_width();
-  for (const auto& path_point : path.path_point()) {
-    auto* point = line_segment->add_point();
-    point->set_x(path_point.x());
-    point->set_y(path_point.y());
-    point->set_z(path_point.z());
-    auto* left_sample = lane->add_left_sample();
-    left_sample->set_s(path_point.s());
-    left_sample->set_width(lane_left_width);
-    left_segment->add_point()->CopyFrom(
-        *point +
-        lane_left_width * Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
-    auto* right_sample = lane->add_right_sample();
-    right_sample->set_s(path_point.s());
-    right_sample->set_width(lane_right_width);
-    right_segment->add_point()->CopyFrom(
-        *point +
-        lane_right_width * Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
+  if (navigation_lane_.Path().path().path_point_size() == 0) {
+    LogErrorStatus(map_msg, "navigation lane has no path points");
+    return false;
   }
 
+  // create map proto from navigation_path
+  if (!navigation_lane_.CreateMap(config_.map_param(), map_msg)) {
+    LogErrorStatus(map_msg, "Failed to create map from navigation path");
+    AERROR << "Failed to create map from navigation path";
+    return false;
+  }
   return true;
 }
 

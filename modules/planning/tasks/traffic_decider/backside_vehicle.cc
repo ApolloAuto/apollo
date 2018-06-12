@@ -20,12 +20,12 @@
 
 #include "modules/planning/tasks/traffic_decider/backside_vehicle.h"
 
-#include "modules/planning/common/planning_gflags.h"
-
 namespace apollo {
 namespace planning {
 
-BacksideVehicle::BacksideVehicle(const RuleConfig& config)
+using apollo::common::Status;
+
+BacksideVehicle::BacksideVehicle(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
 void BacksideVehicle::MakeLaneKeepingObstacleDecision(
@@ -56,12 +56,12 @@ void BacksideVehicle::MakeLaneKeepingObstacleDecision(
       continue;
     }
 
+    const double lane_boundary =
+        config_.backside_vehicle().backside_lane_width();
     if (path_obstacle->PerceptionSLBoundary().start_s() <
         adc_sl_boundary.end_s()) {
-      if (path_obstacle->PerceptionSLBoundary().start_l() >
-              FLAGS_within_lane_bound ||
-          path_obstacle->PerceptionSLBoundary().end_l() <
-              -FLAGS_within_lane_bound) {
+      if (path_obstacle->PerceptionSLBoundary().start_l() > lane_boundary ||
+          path_obstacle->PerceptionSLBoundary().end_l() < -lane_boundary) {
         continue;
       }
       path_decision->AddLongitudinalDecision("backside_vehicle/sl < adc.end_s",
@@ -73,15 +73,15 @@ void BacksideVehicle::MakeLaneKeepingObstacleDecision(
   }
 }
 
-bool BacksideVehicle::ApplyRule(Frame* const,
-                                ReferenceLineInfo* const reference_line_info) {
+Status BacksideVehicle::ApplyRule(
+    Frame* const, ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   if (reference_line_info->Lanes()
           .IsOnSegment()) {  // The lane keeping reference line.
     MakeLaneKeepingObstacleDecision(adc_sl_boundary, path_decision);
   }
-  return true;
+  return Status::OK();
 }
 
 }  // namespace planning

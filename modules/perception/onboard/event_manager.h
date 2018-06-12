@@ -23,8 +23,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "modules/common/macro.h"
 #include "modules/perception/onboard/proto/dag_config.pb.h"
+
+#include "modules/common/macro.h"
 #include "modules/perception/onboard/types.h"
 
 namespace apollo {
@@ -76,7 +77,7 @@ class EventManager {
   using EventMetaMapIterator = EventMetaMap::iterator;
   using EventMetaMapConstIterator = EventMetaMap::const_iterator;
 
-  bool GetEventQueue(EventID event_id, EventQueue **queue);
+  EventQueue *GetEventQueue(const EventID &event_id);
 
   EventQueueMap event_queue_map_;
   // for debug.

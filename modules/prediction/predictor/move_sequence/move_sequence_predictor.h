@@ -25,6 +25,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <utility>
 #include "Eigen/Dense"
 
 #include "modules/common/math/kalman_filter.h"
@@ -59,35 +60,22 @@ class MoveSequencePredictor : public SequencePredictor {
       const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
-  void DrawManeuverTrajectoryPoints(
+  void GetLongitudinalPolynomial(
       const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const double total_time, const double period,
-      std::vector<apollo::common::TrajectoryPoint>* points);
-
-  void GetLongitudinalPolynomial(const Obstacle& obstacle,
-                                 const LaneSequence& lane_sequence,
-                                 const double time_to_lane_center,
-                                 std::array<double, 5>* coefficients);
+      std::pair<double, double>* lon_end_state,
+      std::array<double, 5>* coefficients);
 
   void GetLateralPolynomial(const Obstacle& obstacle,
                             const LaneSequence& lane_sequence,
-                            const double time_to_lane_center,
+                            const double time_to_end_state,
                             std::array<double, 6>* coefficients);
 
-  double EvaluateLateralPolynomial(const std::array<double, 6>& coeffs,
-                                   const double t, const uint32_t order);
+  double ComputeTimeToLatEndConditionByVelocity(
+      const Obstacle& obstacle, const LaneSequence& lane_sequence);
 
-  double EvaluateLongitudinalPolynomial(const std::array<double, 5>& coeffs,
-                                        const double t, const uint32_t order);
-
-  double ComputeTimeToLaneCenterBySampling(const Obstacle& obstacle,
-                                           const LaneSequence& lane_sequence);
-
-  double ComputeTimeToLaneCenterByVelocity(const Obstacle& obstacle,
-                                           const LaneSequence& lane_sequence);
-
-  double Cost(const double t, const std::array<double, 6>& lateral_coeffs,
-              const std::array<double, 5>& longitudinal_coeffs);
+  std::pair<double, double> ComputeLonEndState(
+      const std::array<double, 3>& init_s,
+      const LaneSequence& lane_sequence);
 
   void GenerateCandidateTimes(std::vector<double>* candidate_times);
 };

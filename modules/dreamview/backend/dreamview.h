@@ -24,8 +24,8 @@
 
 #include "modules/common/apollo_app.h"
 
-#include "modules/dreamview/backend/handlers/image.h"
-#include "modules/dreamview/backend/handlers/websocket.h"
+#include "modules/dreamview/backend/handlers/image_handler.h"
+#include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/hmi/hmi.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
@@ -49,6 +49,8 @@ class Dreamview : public apollo::common::ApolloApp {
 
  private:
   void TerminateProfilingMode(const ros::TimerEvent& event);
+  void CheckAdapters();
+
   ros::Timer exit_timer_;
 
   std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;

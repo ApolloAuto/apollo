@@ -68,33 +68,40 @@ apollo::common::Status SpeedDecider::Execute(
 SpeedDecider::StPosition SpeedDecider::GetStPosition(
     const SpeedData& speed_profile, const StBoundary& st_boundary) const {
   StPosition st_position = BELOW;
+  if (st_boundary.IsEmpty()) {
+    return st_position;
+  }
+
+  bool st_position_set = false;
   const double start_t = st_boundary.min_t();
   const double end_t = st_boundary.max_t();
-  for (const auto& speed_point : speed_profile.speed_vector()) {
-    if (speed_point.t() < start_t) {
+  for (size_t i = 0; i + 1 < speed_profile.speed_vector().size(); ++i) {
+    const STPoint curr_st(speed_profile.speed_vector()[i].s(),
+                          speed_profile.speed_vector()[i].t());
+    const STPoint next_st(speed_profile.speed_vector()[i + 1].s(),
+                          speed_profile.speed_vector()[i + 1].t());
+    if (curr_st.t() < start_t && next_st.t() < start_t) {
       continue;
     }
-    if (speed_point.t() > end_t) {
+    if (curr_st.t() > end_t) {
       break;
     }
 
-    STPoint st_point(speed_point.s(), speed_point.t());
-    if (st_boundary.IsPointInBoundary(st_point)) {
-      const std::string msg =
-          "dp_st_graph failed: speed profile cross st_boundaries.";
-      AERROR << msg;
+    common::math::LineSegment2d speed_line(curr_st, next_st);
+    if (st_boundary.HasOverlap(speed_line)) {
+      ADEBUG << "speed profile cross st_boundaries.";
       st_position = CROSS;
-      return st_position;
+      break;
     }
 
-    double s_upper = reference_line_info_->reference_line().Length() -
-                     reference_line_info_->AdcSlBoundary().end_s();
-    double s_lower = 0.0;
-    if (st_boundary.GetBoundarySRange(speed_point.t(), &s_upper, &s_lower)) {
-      if (s_lower > speed_point.s()) {
-        st_position = BELOW;
-      } else if (s_upper < speed_point.s()) {
-        st_position = ABOVE;
+    // note: st_position can be calculated by checking two st points once
+    //       but we need iterate all st points to make sure there is no CROSS
+    if (!st_position_set) {
+      if (start_t < next_st.t() && curr_st.t() < end_t) {
+        STPoint bd_point_front = st_boundary.upper_points().front();
+        double side = common::math::CrossProd(bd_point_front, curr_st, next_st);
+        st_position = side < 0.0 ? ABOVE : BELOW;
+        st_position_set = true;
       }
     }
   }
@@ -149,7 +156,7 @@ Status SpeedDecider::MakeObjectDecision(
         if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
           ObjectDecisionType stop_decision;
           if (CreateStopDecision(*path_obstacle, &stop_decision,
-                                 -FLAGS_traffic_light_stop_distance)) {
+                                 -FLAGS_stop_line_stop_distance)) {
             path_obstacle->AddLongitudinalDecision("dp_st_graph/keep_clear",
                                                    stop_decision);
           }

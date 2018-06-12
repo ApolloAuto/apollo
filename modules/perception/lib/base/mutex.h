@@ -26,15 +26,25 @@ namespace perception {
 
 class Mutex {
  public:
-  Mutex() { pthread_mutex_init(&mu_, nullptr); }
+  Mutex() {
+    pthread_mutex_init(&mu_, nullptr);
+  }
 
-  ~Mutex() { pthread_mutex_destroy(&mu_); }
+  ~Mutex() {
+    pthread_mutex_destroy(&mu_);
+  }
 
-  inline void Lock() { pthread_mutex_lock(&mu_); }
+  inline void Lock() {
+    pthread_mutex_lock(&mu_);
+  }
 
-  inline void Unlock() { pthread_mutex_unlock(&mu_); }
+  inline void Unlock() {
+    pthread_mutex_unlock(&mu_);
+  }
 
-  inline bool TryLock() { return pthread_mutex_trylock(&mu_) == 0; }
+  inline bool TryLock() {
+    return pthread_mutex_trylock(&mu_) == 0;
+  }
 
  private:
   friend class CondVar;
@@ -46,8 +56,12 @@ class Mutex {
 
 class MutexLock {
  public:
-  explicit MutexLock(Mutex *mu) : mu_(mu) { mu_->Lock(); }
-  ~MutexLock() { mu_->Unlock(); }
+  explicit MutexLock(Mutex *mu) : mu_(mu) {
+    mu_->Lock();
+  }
+  ~MutexLock() {
+    mu_->Unlock();
+  }
 
  private:
   Mutex *const mu_;
@@ -57,15 +71,25 @@ class MutexLock {
 // Wrapper for pthread_cond_t
 class CondVar {
  public:
-  CondVar() { pthread_cond_init(&cv_, nullptr); }
+  CondVar() {
+    pthread_cond_init(&cv_, nullptr);
+  }
 
-  ~CondVar() { pthread_cond_destroy(&cv_); }
+  ~CondVar() {
+    pthread_cond_destroy(&cv_);
+  }
 
-  void Wait(Mutex *mu) { pthread_cond_wait(&cv_, &mu->mu_); }
+  void Wait(Mutex *mu) {
+    pthread_cond_wait(&cv_, &mu->mu_);
+  }
 
-  void Signal() { pthread_cond_signal(&cv_); }
+  void Signal() {
+    pthread_cond_signal(&cv_);
+  }
 
-  void Signalall() { pthread_cond_broadcast(&cv_); }
+  void Signalall() {
+    pthread_cond_broadcast(&cv_);
+  }
 
  private:
   pthread_cond_t cv_;
@@ -109,13 +133,23 @@ class BlockingCounter {
 
 class RwMutex {
  public:
-  RwMutex() { pthread_rwlock_init(&mu_, nullptr); }
-  ~RwMutex() { pthread_rwlock_destroy(&mu_); }
+  RwMutex() {
+    pthread_rwlock_init(&mu_, nullptr);
+  }
+  ~RwMutex() {
+    pthread_rwlock_destroy(&mu_);
+  }
 
-  inline void ReaderLock() { pthread_rwlock_rdlock(&mu_); }
-  inline void WriterLock() { pthread_rwlock_wrlock(&mu_); }
+  inline void ReaderLock() {
+    pthread_rwlock_rdlock(&mu_);
+  }
+  inline void WriterLock() {
+    pthread_rwlock_wrlock(&mu_);
+  }
 
-  inline void Unlock() { pthread_rwlock_unlock(&mu_); }
+  inline void Unlock() {
+    pthread_rwlock_unlock(&mu_);
+  }
 
  private:
   pthread_rwlock_t mu_;
@@ -124,8 +158,12 @@ class RwMutex {
 
 class ReaderMutexLock {
  public:
-  explicit ReaderMutexLock(RwMutex *mu) : mu_(mu) { mu_->ReaderLock(); }
-  ~ReaderMutexLock() { mu_->Unlock(); }
+  explicit ReaderMutexLock(RwMutex *mu) : mu_(mu) {
+    mu_->ReaderLock();
+  }
+  ~ReaderMutexLock() {
+    mu_->Unlock();
+  }
 
  private:
   RwMutex *mu_ = nullptr;
@@ -134,8 +172,12 @@ class ReaderMutexLock {
 
 class WriterMutexLock {
  public:
-  explicit WriterMutexLock(RwMutex *mu) : mu_(mu) { mu_->WriterLock(); }
-  ~WriterMutexLock() { mu_->Unlock(); }
+  explicit WriterMutexLock(RwMutex *mu) : mu_(mu) {
+    mu_->WriterLock();
+  }
+  ~WriterMutexLock() {
+    mu_->Unlock();
+  }
 
  private:
   RwMutex *mu_ = nullptr;

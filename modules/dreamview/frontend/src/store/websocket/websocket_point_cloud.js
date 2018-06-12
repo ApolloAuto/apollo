@@ -1,7 +1,6 @@
 import STORE from "store";
 import RENDERER from "renderer";
-
-const Worker = require('utils/webworker.js');
+import Worker from 'utils/webworker.js';
 
 export default class PointCloudWebSocketEndpoint {
     constructor(serverAddr) {
@@ -50,7 +49,7 @@ export default class PointCloudWebSocketEndpoint {
                     type : "RequestPointCloud"
                 }));
             }
-        }, 100);
+        }, 200);
     }
 
     togglePointCloud(enable) {

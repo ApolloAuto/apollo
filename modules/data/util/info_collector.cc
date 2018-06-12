@@ -21,6 +21,7 @@
 #include <string>
 
 #include "gflags/gflags.h"
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/file.h"
 
@@ -36,6 +37,7 @@ namespace data {
 namespace {
 
 using apollo::common::KVDB;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::util::GetProtoFromASCIIFile;
 using apollo::common::util::SetProtoToASCIIFile;
 using google::protobuf::Map;
@@ -60,6 +62,14 @@ Map<std::string, std::string> LoadFiles(
 
 InfoCollector::InfoCollector() {
   CHECK(GetProtoFromASCIIFile(FLAGS_static_info_conf_file, &config_));
+
+  // Translate file paths if they contain placeholder such as "<ros>".
+  for (auto& conf_file : *config_.mutable_hardware_configs()) {
+    conf_file = apollo::common::util::TranslatePath(conf_file);
+  }
+  for (auto& conf_file : *config_.mutable_software_configs()) {
+    conf_file = apollo::common::util::TranslatePath(conf_file);
+  }
 }
 
 const StaticInfo &InfoCollector::GetStaticInfo() {
@@ -121,6 +131,19 @@ const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
 
   *software->mutable_configs() =
       LoadFiles(instance()->config_.software_configs());
+
+  // Store latest routing request.
+  auto* routing_request_adapter = AdapterManager::GetRoutingRequest();
+  if (routing_request_adapter) {
+    routing_request_adapter->Observe();
+    if (!routing_request_adapter->Empty()) {
+      *software->mutable_latest_routing_request() =
+          routing_request_adapter->GetLatestObserved();
+    }
+  } else {
+    AERROR << "RoutingRequest is not registered in AdapterManager config.";
+  }
+
   return *software;
 }
 

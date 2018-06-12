@@ -36,7 +36,7 @@ class ConstantAccelerationTrajectory1d : public Curve1d {
 
   virtual ~ConstantAccelerationTrajectory1d() = default;
 
-  void AppendSgment(const double a, const double t_duration);
+  void AppendSegment(const double a, const double t_duration);
 
   void PopSegment();
 

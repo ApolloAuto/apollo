@@ -35,6 +35,8 @@ export default class ControlMonitor extends React.Component {
                 {this.generateScatterGraph('accelerationGraph', data.accelerationGraph)}
                 {this.generateScatterGraph('curvatureGraph', data.curvatureGraph)}
                 {this.generateScatterGraph('stationErrorGraph', data.stationErrorGraph)}
+                {this.generateScatterGraph('lateralErrorGraph', data.lateralErrorGraph)}
+                {this.generateScatterGraph('headingErrorGraph', data.headingErrorGraph)}
             </div>
         );
     }

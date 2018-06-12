@@ -8,7 +8,7 @@ import LayerMenuIcon from "assets/images/sidebar/layer_menu.png";
 import RouteEditingIcon from "assets/images/sidebar/route_editing.png";
 import DataRecorderIcon from "assets/images/sidebar/data_recorder.png";
 
-class SideBarButton extends React.Component {
+class SideBarButton extends React.PureComponent {
     render() {
         const { disabled, onClick, active, label, extraClasses, iconSrc } = this.props;
         return (
@@ -25,9 +25,9 @@ class SideBarButton extends React.Component {
     }
 }
 
-export default class ButtonPanel extends React.Component {
+export default class ButtonPanel extends React.PureComponent {
     render() {
-        const { enableHMIButtonsOnly,
+        const { enableHMIButtonsOnly, inNavigationMode,
                 onTasks, showTasks,
                 onModuleController, showModuleController,
                 onMenu, showMenu,
@@ -52,7 +52,7 @@ export default class ButtonPanel extends React.Component {
                                onClick={onMenu}
                                active={showMenu} />
                 <SideBarButton label="Route Editing"
-                               disabled={enableHMIButtonsOnly}
+                               disabled={enableHMIButtonsOnly || inNavigationMode}
                                iconSrc={RouteEditingIcon}
                                onClick={onRouteEditingBar}
                                active={showRouteEditingBar} />

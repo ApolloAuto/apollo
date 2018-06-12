@@ -7,15 +7,14 @@ cc_library(
     srcs = [
         "registerer.cc",
         "thread.cc",
-        "timer.cc",
     ],
     hdrs = [
         "concurrent_queue.h",
         "mutex.h",
+        "noncopyable.h",
         "registerer.h",
+        "singleton.h",
         "thread.h",
-        "time_util.h",
-        "timer.h",
     ],
     linkopts = [
         "-lboost_filesystem",
@@ -33,7 +32,6 @@ cc_test(
     size = "small",
     srcs = [
         "registerer_test.cc",
-        "timer_test.cc",
     ],
     data = ["//modules/perception:perception_data"],
     deps = [

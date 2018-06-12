@@ -1,0 +1,143 @@
+header {
+  timestamp_sec: 1520381229.531209
+  module_name: "mobileye"
+  sequence_num: 641
+}
+aftermarket_669 {
+  lane_conf_left: -1
+  ldw_availability_left: false
+  lane_type_left: 0
+  distance_to_lane_l: -1.78
+  lane_conf_right: -1
+  ldw_availability_right: false
+  lane_type_right: 1
+  distance_to_lane_r: 1.3
+}
+details_737 {
+  lane_curvature: 0.000192
+  lane_heading: -0.0135
+  ca_construction_area: false
+  right_ldw_availability: true
+  left_ldw_availability: true
+  reserved_1: false
+  yaw_angle: 31.9990234375
+  pitch_angle: 0.05572484544
+}
+details_738 {
+  num_obstacles: 1
+  timestamp: 28
+  application_version: 0
+  active_version_number_section: 2
+  left_close_rang_cut_in: false
+  right_close_rang_cut_in: false
+  go: 15
+  protocol_version: 3
+  close_car: false
+  failsafe: 0
+  reserved_10: 0
+}
+details_739 {
+  obstacle_id: 5
+  obstacle_pos_x: 67.125
+  reseved_2: 0
+  obstacle_pos_y: 9.125
+  blinker_info: 0
+  cut_in_and_out: 0
+  obstacle_rel_vel_x: -1.625
+  obstacle_type: 0
+  reserved_3: false
+  obstacle_status: 3
+  obstacle_brake_lights: false
+  reserved_4: 0
+  obstacle_valid: 2
+}
+details_73a {
+  obstacle_length: 31.5
+  obstacle_width: 1.35
+  obstacle_age: 61
+  obstacle_lane: 2
+  cipv_flag: false
+  reserved_5: false
+  radar_pos_x: 255.9375
+  radar_vel_x: -128
+  radar_match_confidence: 0
+  reserved_6: false
+  matched_radar_id: 127
+  reserved_7: false
+}
+details_73b {
+  obstacle_angle_rate: -19.41
+  obstacle_scale_change: -0.0182
+  object_accel_x: -0.57
+  reserved_8: 0
+  obstacle_replaced: false
+  reserved_9: 0
+  obstacle_angle: -7.78
+}
+lka_766 {
+  lane_type: 0
+  quality: 3
+  model_degree: 3
+  position: -1.77734375
+  curvature: -0.0001855468755000006
+  curvature_derivative: -7.0370733729170024e-06
+  width_left_marking: 0.1
+}
+lka_767 {
+  heading_angle: 0.013671875
+  view_range: 30.4453125
+  view_range_availability: true
+}
+lka_768 {
+  lane_type: 1
+  quality: 3
+  model_degree: 3
+  position: 1.30859375
+  curvature: -0.0001855468755000006
+  curvature_derivative: -7.0370733729170024e-06
+  width_right_marking: 0.13
+}
+lka_769 {
+  heading_angle: 0.013671875
+  view_range: 46.1015625
+  view_range_availability: true
+}
+reference_76a {
+  ref_point_1_position: -0.0081919999999939819
+  ref_point_1_distance: 0
+  ref_point_1_validity: false
+  ref_point_2_position: -127.996094
+  ref_point_2_distance: 0
+  ref_point_2_validity: false
+}
+num_76b {
+  num_of_next_lane_mark_reported: 2
+}
+next_76c {
+  lane_type: 1
+  quality: 0
+  model_degree: 3
+  position: -4.40625
+  curvature: -4.9999587803384316e-13
+  curvature_derivative: 9.4949005255418051e-16
+  lane_mark_width: 0
+}
+next_76c {
+  lane_type: 1
+  quality: 0
+  model_degree: 3
+  position: 2.55078125
+  curvature: -4.9999587803384316e-13
+  curvature_derivative: 9.4949005255418051e-16
+  lane_mark_width: 0
+}
+next_76d {
+  heading_angle: -0.001953125
+  view_range: 0
+  view_range_availability: true
+}
+next_76d {
+  heading_angle: 0.009765625
+  view_range: 0
+  view_range_availability: true
+}

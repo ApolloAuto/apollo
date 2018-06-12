@@ -4,6 +4,7 @@
   <arg name="model" default="64E_S3D_STRONGEST" />
   <arg name="ip" default=""/>
   <arg name="firing_data_port" default=""/>
+  <arg name="positioning_data_port" default=""/>
   <arg name="rpm" default="600.0" />
   <arg name="frame_id" default="velodyne64" />
   <arg name="topic" default="/apollo/sensor/velodyne64/VelodyneScanUnified" />
@@ -19,6 +20,7 @@
     <param name="topic" value="$(arg topic)"/>    
     <param name="ip" value="$(arg ip)"/>
     <param name="firing_data_port" value="$(arg firing_data_port)"/>
+    <param name="positioning_data_port" value="$(arg positioning_data_port)"/>
   </node>    
 
 </launch>

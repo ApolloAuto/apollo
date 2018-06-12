@@ -1,95 +1,83 @@
 import React from "react";
-import { inject, observer } from "mobx-react";
+
+import STORE from "store";
 
 import WS from "store/websocket";
 
-class DriveEventEditor extends React.Component {
+export default class DriveEventEditor extends React.Component {
     constructor(props) {
         super(props);
+
         this.state = {
-            event_msg: '',
+            eventTime: new Date(),
+            eventMessage: "",
         };
 
-        this.handleChange = this.handleChange.bind(this);
+        this.handleMessageChange = this.handleMessageChange.bind(this);
+        this.handleTimestampUpdate = this.handleTimestampUpdate.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleChange(event) {
-        this.setState({event_msg: event.target.value});
+    handleMessageChange(event) {
+        this.setState({ eventMessage: event.target.value });
+    }
+
+    handleTimestampUpdate() {
+        this.setState({ eventTime: new Date() });
     }
 
     handleSubmit() {
-        const {event_time_ms, hide_func} = this.props;
-        WS.submitDriveEvent(event_time_ms, this.state.event_msg);
-        hide_func();
-    }
-
-    render() {
-        const {event_time_ms, hide_func} = this.props;
-
-        return (
-            <div className="card drive-event-card">
-                <div className="card-header"><span>Adding New DriveEvent</span></div>
-                <div className="card-content-column">
-                    <table><tbody>
-                        <tr><td>Event time</td><td>{event_time_ms}</td></tr>
-                        <tr>
-                            <td>Message</td>
-                            <td>
-                                <input type="text" className="drive-event-msg"
-                                     value={this.state.event_msg}
-                                     onChange={this.handleChange} />
-                            </td>
-                        </tr>
-                    </tbody></table>
-                    <table className="toolbar"><tbody><tr>
-                        <td><button onClick={hide_func}>Cancel</button></td>
-                        <td><button onClick={this.handleSubmit}>Submit</button></td>
-                    </tr></tbody></table>
-                </div>
-            </div>);
-    }
-}
-
-
-@inject("store") @observer
-export default class DataRecorder extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            newDriveEventTimeMs: 0,
-            showDriveEvent: false,
-        };
-        this.handleNewDriveEvent = this.handleNewDriveEvent.bind(this);
-        this.hideDriveEventEditor = this.hideDriveEventEditor.bind(this);
-    }
-
-    handleNewDriveEvent() {
-        this.setState({
-            newDriveEventTimeMs: new Date().getTime(),
-            showDriveEvent: true,
-        });
-    }
-
-    hideDriveEventEditor() {
-        this.setState({
-            showDriveEvent: false,
-        });
+        if (this.state.eventMessage) {
+            WS.submitDriveEvent(this.state.eventTime.getTime(), this.state.eventMessage);
+            STORE.handleOptionToggle('showDataRecorder');
+        } else {
+            alert("Please provide a drive event message.");
+        }
     }
 
     render() {
         return (
-            <div className="data-recorder">
-              <div className="card">
-                <div className="card-header"><span>Operations</span></div>
-                <div className="card-content-column">
-                  <button onClick={this.handleNewDriveEvent}>New DriveEvent</button>
+            <div className="card data-recorder">
+                <div className="card-header">
+                    <span>Add Drive Event</span>
                 </div>
-              </div>
-              {this.state.showDriveEvent &&
-                <DriveEventEditor
-                     event_time_ms={this.state.newDriveEventTimeMs}
-                     hide_func={this.hideDriveEventEditor}/>}
-            </div>);
+                <div className="card-content-column">
+                    <table>
+                        <tbody>
+                            <tr className="drive-event-time-row">
+                                <td>Event Time</td>
+                                <td>
+                                    <span>
+                                        {this.state.eventTime.toString()}
+                                        <button
+                                            className="timestamp-button"
+                                            onClick={this.handleTimestampUpdate} >
+                                            Update Time
+                                        </button>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr className="drive-event-msg-row">
+                                <td>Message</td>
+                                <td>
+                                    <textarea
+                                        placeholder="please enter a message..."
+                                        value={this.state.eventMessage}
+                                        onChange={this.handleMessageChange} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td />
+                                <td>
+                                    <button className="submit-button" onClick={this.handleSubmit}>
+                                        Submit
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
     }
 }

@@ -9,5 +9,4 @@ message HMIStatus {
   optional string current_map = 2;
   optional string current_vehicle = 3;
   optional string current_mode = 4 [default = "Standard"];
-  optional string ota_update = 5;
 }

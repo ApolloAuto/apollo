@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,9 +40,13 @@ namespace perception {
 
 OBJECT_SHARED_DATA(LidarObjectData);
 OBJECT_SHARED_DATA(RadarObjectData);
+OBJECT_SHARED_DATA(CameraObjectData);
+OBJECT_SHARED_DATA(CIPVObjectData);
 
 REGISTER_SHAREDDATA(LidarObjectData);
 REGISTER_SHAREDDATA(RadarObjectData);
+REGISTER_SHAREDDATA(CameraObjectData);
+REGISTER_SHAREDDATA(CIPVObjectData);
 
 }  // namespace perception
 }  // namespace apollo

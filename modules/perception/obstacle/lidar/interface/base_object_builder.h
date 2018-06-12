@@ -30,7 +30,7 @@
 //
 //     virtual bool build(
 //              ObjectBuilderOptions options,
-//              std::vector<ObjectPtr>* objects) override {
+//              std::vector<std::shared_ptr<Object>>* objects) override {
 //          // Do something.
 //          return true;
 //      }
@@ -51,14 +51,15 @@
 // using object_builder to do somethings.
 // ////////////////////////////////////////////////////
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "modules/common/macro.h"
+#include "modules/perception/common/geometry_util.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/lib/base/registerer.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
 
 namespace apollo {
 namespace perception {
@@ -78,12 +79,13 @@ class BaseObjectBuilder {
   // @param [in]: options.
   // @param [in/out]: object list.
   virtual bool Build(const ObjectBuilderOptions& options,
-                     std::vector<ObjectPtr>* objects) = 0;
+                     std::vector<std::shared_ptr<Object>>* objects) = 0;
 
   virtual std::string name() const = 0;
 
  protected:
-  virtual void SetDefaultValue(pcl_util::PointCloudPtr cloud, ObjectPtr obj,
+  virtual void SetDefaultValue(pcl_util::PointCloudPtr cloud,
+                               std::shared_ptr<Object> obj,
                                Eigen::Vector4f* min_pt,
                                Eigen::Vector4f* max_pt) {
     GetCloudMinMax3D<pcl_util::Point>(cloud, min_pt, max_pt);

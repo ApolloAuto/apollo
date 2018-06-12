@@ -81,8 +81,12 @@ void DownsampleCurve(Curve* curve) {
 void DownsampleMap(Map* map_pb) {
   for (int i = 0; i < map_pb->lane_size(); ++i) {
     auto* lane = map_pb->mutable_lane(i);
-    AINFO << "Downsampling lane " << lane->id().id();
+    lane->clear_left_sample();
+    lane->clear_right_sample();
+    lane->clear_left_road_sample();
+    lane->clear_right_road_sample();
 
+    AINFO << "Downsampling lane " << lane->id().id();
     DownsampleCurve(lane->mutable_central_curve());
     DownsampleCurve(lane->mutable_left_boundary()->mutable_curve());
     DownsampleCurve(lane->mutable_right_boundary()->mutable_curve());

@@ -16,6 +16,7 @@ cc_library(
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "//modules/common/configs:vehicle_config_helper",
     ],
 )
 
@@ -45,6 +46,7 @@ cc_library(
     ],
     deps = [
         "//modules/canbus/vehicle/lincoln:lincoln_vehicle_factory",
+        "//modules/canbus/vehicle/gem:gem_vehicle_factory",
         "//modules/common/util:factory",
     ],
 )
