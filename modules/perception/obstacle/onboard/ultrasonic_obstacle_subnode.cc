@@ -18,7 +18,9 @@
 
 #include <cmath>
 #include <utility>
+#include <unordered_map>
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/quaternion.h"
@@ -29,7 +31,31 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::adapter::AdapterManager;
 using apollo::common::VehicleStateProvider;
+
+bool UltrasonicObstacleSubnode::InitInternal() {
+  // parse reserve fileds
+  std::unordered_map<std::string, std::string> reserve_field_map;
+  if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
+    AERROR << "Failed to parse reserve filed: " << reserve_;
+    return false;
+  }
+
+  if (reserve_field_map.find("device_id") == reserve_field_map.end()) {
+    AERROR << "Failed to find field device_id, reserve: " << reserve_;
+    return false;
+  }
+  device_id_ = reserve_field_map["device_id"];
+
+  CHECK(AdapterManager::GetChassis()) << "Failed to get Ultrasonic adapter";
+  AdapterManager::AddChassisCallback(
+      &UltrasonicObstacleSubnode::OnUltrasonic, this);
+
+  ADEBUG << "Succeed to finish ultrasonic detector initialization!";
+
+  return true;
+}
 
 void UltrasonicObstacleSubnode::OnUltrasonic(
     const apollo::canbus::Chassis& message) {
