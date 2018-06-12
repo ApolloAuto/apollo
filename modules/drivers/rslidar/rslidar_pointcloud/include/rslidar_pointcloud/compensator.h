@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_COMPENSATOR_H_
-#define MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_COMPENSATOR_H_
+#ifndef MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_COMPENSATOR_H_
+#define MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_COMPENSATOR_H_
 
 //#include "rslidar_pointcloud/const_variables.h"
 
@@ -104,4 +104,4 @@ class Compensator {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_COMPENSATOR_H_
+#endif  // MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_COMPENSATOR_H_

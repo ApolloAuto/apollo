@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_pointcloud_dump_H_
-#define MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_pointcloud_dump_H_
+#ifndef MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_pointcloud_dump_H_
+#define MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_pointcloud_dump_H_
 
 #include <pcl_ros/point_cloud.h>
 #include <ros/ros.h>
@@ -50,4 +50,4 @@ class PointCloudDump {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_pointcloud_dump_H_
+#endif  // MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_pointcloud_dump_H_

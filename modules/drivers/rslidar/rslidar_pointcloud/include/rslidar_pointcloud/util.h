@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_UTIL_H_
-#define MODULES_DRIVERS_VELODYNE_VELODYNE_POINTCLOUD_UTIL_H_
+#ifndef MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_UTIL_H_
+#define MODULES_DRIVERS_ROBOSENSE_RSLIDAR_POINTCLOUD_UTIL_H_
 
 #include <angles/angles.h>
 #include <ros/ros.h>

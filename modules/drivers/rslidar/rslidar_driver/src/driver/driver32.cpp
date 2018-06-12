@@ -31,8 +31,8 @@ Rslidar32Driver::Rslidar32Driver(const Config &config) {
 }
 
 void Rslidar32Driver::init(ros::NodeHandle &node) {
-  double packet_rate = 840;                 // packet frequency (Hz)
-  double frequency = (config_.rpm / 60.0);  // expected Hz rate
+  const double packet_rate = 840;                 // packet frequency (Hz)
+  const double frequency = (config_.rpm / 60.0);  // expected Hz rate
 
   config_.npackets = (int)ceil(packet_rate / frequency);
   ROS_INFO_STREAM("publishing " << config_.npackets << " packets per scan");
