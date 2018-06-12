@@ -171,7 +171,7 @@ and we want to ensure Apollo 2.5 was integrated correctly with your vehicle befo
 
 * [Build and Release using Docker](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md) - This step is required
 
-* [Launch and Run Apollo](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/howto_launch_Apollo.md)
+* [Launch and Run Apollo](https://github.com/natashadsouza/apollo/blob/master/docs/howto/how_to_launch_Apollo.md)
 * [Apollo 1.0 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md)
 
 * [Apollo 1.5 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start.md)
