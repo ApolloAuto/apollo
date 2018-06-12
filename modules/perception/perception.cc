@@ -76,7 +76,8 @@ void Perception::RegistAllOnboardClass() {
   traffic_light::RegisterFactoryTLPreprocessingData();
 
   /// regist subnode
-  RegisterFactoryLidarProcessSubnode();
+  RegisterFactoryLidar64ProcessSubnode();
+  RegisterFactoryLidar16ProcessSubnode();
   RegisterFactoryRadarProcessSubnode();
   RegisterFactoryCameraProcessSubnode();
   RegisterFactoryCIPVSubnode();
