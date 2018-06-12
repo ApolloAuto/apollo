@@ -146,6 +146,8 @@ void AsyncFusion::UpdateAssignedTracks(
   for (size_t i = 0; i < assignments.size(); ++i) {
     int local_track_index = assignments[i].first;
     int local_obj_index = assignments[i].second;
+    AINFO << "local track index " << local_track_index << "local object index "
+          << local_obj_index;
     tracks->at(local_track_index)
         ->UpdateWithSensorObject(sensor_objects[local_obj_index],
                                  track_object_dist[local_track_index]);
@@ -180,6 +182,22 @@ void AsyncFusion::CollectFusedObjects(
     std::shared_ptr<Object> obj(new Object());
     obj->clone(*(fused_object->object));
     obj->track_id = tracks[i]->GetTrackId();
+    std::shared_ptr<PbfSensorObject> pobj = tracks[i]->GetLidarObject("lidar");
+
+    if (pobj != nullptr) {
+      obj->local_lidar_track_id = pobj->object->track_id;
+      obj->local_lidar_track_ts = pobj->timestamp;
+    }
+    pobj = tracks[i]->GetCameraObject("camera");
+    if (pobj != nullptr) {
+      obj->local_camera_track_id = pobj->object->track_id;
+      obj->local_camera_track_ts = pobj->timestamp;
+    }
+    pobj = tracks[i]->GetRadarObject("radar");
+    if (pobj != nullptr) {
+      obj->local_radar_track_id = pobj->object->track_id;
+      obj->local_camera_track_ts = pobj->timestamp;
+    }
     obj->latest_tracked_time = timestamp;
     obj->tracking_time = tracks[i]->GetTrackingPeriod();
     fused_objects->push_back(obj);

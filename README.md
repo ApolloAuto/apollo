@@ -35,7 +35,7 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 * A machine with a 4-core processor and 6GB memory minimum
 
-* Ubuntu 14.0.4
+* Ubuntu 14.04
 
 * Working knowledge of Docker
 
@@ -171,7 +171,7 @@ and we want to ensure Apollo 2.5 was integrated correctly with your vehicle befo
 
 * [Build and Release using Docker](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md) - This step is required
 
-* [Launch and Run Apollo](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/howto_launch_Apollo.md)
+* [Launch and Run Apollo](https://github.com/natashadsouza/apollo/blob/master/docs/howto/how_to_launch_Apollo.md)
 * [Apollo 1.0 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md)
 
 * [Apollo 1.5 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start.md)
@@ -186,7 +186,7 @@ and we want to ensure Apollo 2.5 was integrated correctly with your vehicle befo
 
 ## Documents
 
-* [HowTo](https://github.com/ApolloAuto/apollo/tree/master/docs/howto): A Brief technical solutions to common problems developers face during the installation and use of Apollo platform 
+* [HowTo](https://github.com/ApolloAuto/apollo/tree/master/docs/howto): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform 
 
 * [Specs](https://github.com/ApolloAuto/apollo/tree/master/docs/specs): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo) 
 

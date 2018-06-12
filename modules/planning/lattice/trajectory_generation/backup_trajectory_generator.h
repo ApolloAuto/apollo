@@ -32,6 +32,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
+#include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {
@@ -46,6 +47,7 @@ class BackupTrajectoryGenerator {
   BackupTrajectoryGenerator(
       const std::array<double, 3>& init_s, const std::array<double, 3>& init_d,
       const double init_relative_time,
+      const std::shared_ptr<CollisionChecker>& ptr_collision_checker,
       const Trajectory1dGenerator* trajectory1d_generator);
 
   DiscretizedTrajectory GenerateTrajectory(
@@ -56,6 +58,8 @@ class BackupTrajectoryGenerator {
                                  const std::array<double, 3>& init_d);
 
   double init_relative_time_;
+
+  std::shared_ptr<CollisionChecker> ptr_collision_checker_;
 
   const Trajectory1dGenerator* ptr_trajectory1d_generator_;
 
