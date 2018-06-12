@@ -29,7 +29,8 @@ function source_apollo_base() {
 
 function apollo_check_system_config() {
   # check docker environment
-  if [ ${MACHINE_ARCH} == "x86_64" ] && [ ${APOLLO_IN_DOCKER} != "true" ]; then
+  if [ ${MACHINE_ARCH} == "x86_64" ] && [ $(hostname) != "in_dev_docker" ] &&
+       [ $(hostname) != "in_release_docker" ]; then
     echo -e "${RED}Must run $0 in dev docker or release docker${NO_COLOR}"
     exit 0
   fi
@@ -191,6 +192,7 @@ function build_py_proto() {
   PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
   find modules/ -name "*.proto" \
       | grep -v node_modules \
+      | grep -v modules/drivers/gnss \
       | xargs ${PROTOC} --python_out=py_proto
   find py_proto/* -type d -exec touch "{}/__init__.py" \;
 }
@@ -397,7 +399,7 @@ function run_lint() {
   START_TIME=$(get_now)
 
   # Add cpplint rule to BUILD files that do not contain it.
-  for file in $(find modules -name BUILD |  grep -v gnss/third_party | \
+  for file in $(find modules -name BUILD | \
     xargs grep -l -E 'cc_library|cc_test|cc_binary' | xargs grep -L 'cpplint()')
   do
     sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' $file
@@ -447,6 +449,54 @@ function version() {
   date=$(git log -1 --pretty=%cd)
   echo "Commit: ${commit}"
   echo "Date: ${date}"
+}
+
+function build_gnss() {
+  CURRENT_PATH=$(pwd)
+  if [ -d "${ROS_ROOT}" ]; then
+    ROS_PATH="${ROS_ROOT}/../.."
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
+
+  source "${ROS_PATH}/setup.bash"
+
+  protoc modules/common/proto/error_code.proto --cpp_out=./
+  protoc modules/common/proto/header.proto --cpp_out=./
+  protoc modules/common/proto/geometry.proto --cpp_out=./
+
+  protoc modules/localization/proto/imu.proto --cpp_out=./
+  protoc modules/localization/proto/gps.proto --cpp_out=./
+  protoc modules/localization/proto/pose.proto --cpp_out=./
+
+  protoc modules/drivers/gnss/proto/gnss.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/imu.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/ins.proto --cpp_out=./ --python_out=./
+  protoc modules/drivers/gnss/proto/config.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/gnss_status.proto --cpp_out=./ --python_out=./
+  protoc modules/drivers/gnss/proto/gpgga.proto --cpp_out=./
+  protoc modules/drivers/gnss/proto/gnss_raw_observation.proto --cpp_out=./ --python_out=./
+  protoc modules/drivers/gnss/proto/gnss_best_pose.proto --cpp_out=./ --python_out=./
+
+  cd modules
+  catkin_make_isolated --install --source drivers/gnss \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
+
+  rm -rf modules/common/proto/*.pb.cc
+  rm -rf modules/common/proto/*.pb.h
+  rm -rf modules/drivers/gnss/proto/*.pb.cc
+  rm -rf modules/drivers/gnss/proto/*.pb.h
+  rm -rf modules/drivers/gnss/proto/*_pb2.py
+  rm -rf modules/localization/proto/*.pb.cc
+  rm -rf modules/localization/proto/*.pb.h
+
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
 }
 
 function build_velodyne() {
@@ -536,6 +586,7 @@ function print_usage() {
   ${BLUE}build${NONE}: run build only
   ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
+  ${BLUE}build_gnss${NONE}: build gnss driver
   ${BLUE}build_velodyne${NONE}: build velodyne driver
   ${BLUE}build_usbcam${NONE}: build usb camera driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
