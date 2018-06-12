@@ -20,6 +20,7 @@
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/common/log.h"
 #include "modules/common/util/map_util.h"
+#include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/monitor/common/monitor_manager.h"
 
@@ -35,6 +36,7 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::util::ContainsKey;
 using apollo::common::util::GetProtoFromFile;
 using apollo::common::util::FindOrNull;
+using apollo::common::util::StrCat;
 
 SafetyManager::SafetyManager() {
   CHECK(GetProtoFromFile(FLAGS_hmi_config_filename, &hmi_config_))
@@ -89,15 +91,16 @@ bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
   }
 
   const std::string mode_name = KVDB::Get("apollo:dreamview:mode");
+  auto& log = MonitorManager::LogBuffer();
   if (mode_name.empty()) {
-    AERROR << "Cannot get apollo mode";
+    log.ERROR("Cannot get apollo mode");
     return true;
   }
 
   const apollo::dreamview::Mode *mode_conf =
       FindOrNull(hmi_config_.modes(), mode_name);
   if (mode_conf == nullptr) {
-    AERROR << "Cannot find configuration for apollo mode: " << mode_name;
+    log.ERROR(StrCat("Cannot find configuration for apollo mode: ", mode_name));
     return true;
   }
 
@@ -105,13 +108,13 @@ bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
   for (const auto &hardware : mode_conf->live_hardware()) {
     const auto *status = FindOrNull(hardware_status, hardware);
     if (status == nullptr) {
-      AERROR << "Cannot get status of hardware: " << hardware;
+      log.ERROR(StrCat("Cannot get status of hardware: ", hardware));
       return true;
     }
     if (status->summary() == Summary::ERROR ||
         status->summary() == Summary::FATAL) {
-      AERROR << "Hardware " << hardware << " triggers safety mode: "
-             << status->msg();
+      log.ERROR(StrCat(
+          "Hardware ", hardware, " triggers safety mode: ", status->msg()));
       return true;
     }
   }
@@ -120,13 +123,13 @@ bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
   for (const auto &module : mode_conf->live_modules()) {
     const auto *status = FindOrNull(modules_status, module);
     if (status == nullptr) {
-      AERROR << "Cannot get status of module: " << module;
+      log.ERROR(StrCat("Cannot get status of module: ", module));
       return true;
     }
     if (status->summary() == Summary::ERROR ||
         status->summary() == Summary::FATAL) {
-      AERROR << "Module " << module << " triggers safety mode: "
-             << status->msg();
+      log.ERROR(StrCat(
+          "Module ", module, " triggers safety mode: ", status->msg()));
       return true;
     }
   }
