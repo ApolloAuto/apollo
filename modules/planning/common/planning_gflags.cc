@@ -288,13 +288,13 @@ DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
 DEFINE_uint32(num_velocity_sample, 6,
               "The number of velocity samples in end condition sampler.");
-DEFINE_bool(enable_backup_trajectory, false,
+DEFINE_bool(enable_backup_trajectory, true,
             "If generate backup trajectory when planning fail");
 DEFINE_double(backup_trajectory_cost, 1000.0,
               "Default cost of backup trajectory");
 DEFINE_double(min_velocity_sample_gap, 1.0,
               "Minimal sampling gap for velocity");
-DEFINE_double(lon_collision_buffer, 1.0,
+DEFINE_double(lon_collision_buffer, 2.0,
               "The longitudinal buffer to keep distance to other vehicles");
 DEFINE_double(lat_collision_buffer, 0.2,
               "The lateral buffer to keep distance to other vehicles");
@@ -305,7 +305,7 @@ DEFINE_uint32(num_sample_follow_per_timestamp, 3,
 DEFINE_double(weight_lon_objective, 10.0,
               "Weight of longitudinal travel cost");
 DEFINE_double(weight_lon_jerk, 1.0, "Weight of longitudinal jerk cost");
-DEFINE_double(weight_lon_collision, 2.0,
+DEFINE_double(weight_lon_collision, 5.0,
               "Weight of logitudinal collision cost");
 DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
 DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");
