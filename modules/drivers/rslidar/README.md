@@ -37,8 +37,7 @@ The output will overwrite the rslidar driver in `/home/tmp/ros/`.
 ### Start RS-LiDAR Driver
 **Please change the parameters in the launch file for cars when you start**
 ```bash
-prefix=/apollo/modules/drivers/rslidar/rslidar/launch
-roslaunch velodyne {prefix}/start_rslidar.launch
+roslaunch rslidar start_rslidar.launch
 # or
 bash /apollo/scripts/start_rslidar.sh # this file has no effect in reality
 ```
