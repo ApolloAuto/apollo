@@ -66,7 +66,7 @@ void SafetyManager::CheckSafety(const double current_time) {
 
   // Trigger EStop if no action was taken in time.
   if (system_status->safety_mode_trigger_time() +
-      FLAGS_safety_mode_seconds_before_estop > current_time) {
+      FLAGS_safety_mode_seconds_before_estop < current_time) {
     system_status->set_require_emergency_stop(true);
   }
 }
