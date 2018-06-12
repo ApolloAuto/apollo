@@ -31,6 +31,10 @@ int HDMap::LoadMapFromProto(const Map& map_proto) {
   return impl_.LoadMapFromProto(map_proto);
 }
 
+std::string HDMap::GetVersion() const {
+  return impl_.GetVersion();
+}
+
 LaneInfoConstPtr HDMap::GetLaneById(const Id& id) const {
   return impl_.GetLaneById(id);
 }

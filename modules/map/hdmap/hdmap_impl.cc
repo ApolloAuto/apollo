@@ -19,6 +19,7 @@ limitations under the License.
 #include <iostream>
 #include <limits>
 #include <unordered_set>
+#include <sstream>
 
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
@@ -64,6 +65,7 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
     Clear();
     map_ = map_proto;
   }
+  header_ = map_.header();
   for (const auto& lane : map_.lane()) {
     lane_table_[lane.id().id()].reset(new LaneInfo(lane));
   }
@@ -134,6 +136,16 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
   BuildSpeedBumpSegmentKDTree();
 
   return 0;
+}
+
+std::string HDMapImpl::GetVersion() const {
+  std::string major = header_.rev_major();
+  std::string minor = header_.rev_minor();
+  std::string version = header_.version();
+  std::stringstream ss;
+  ss << major << '.' << minor << '.' 
+     << version[0] << version[1] << version[2];
+  return ss.str();
 }
 
 LaneInfoConstPtr HDMapImpl::GetLaneById(const Id& id) const {
@@ -898,6 +910,7 @@ int HDMapImpl::SearchObjects(const Vec2d& center, const double radius,
 
 void HDMapImpl::Clear() {
   map_.Clear();
+  header_.Clear();
   lane_table_.clear();
   junction_table_.clear();
   signal_table_.clear();

@@ -87,6 +87,12 @@ class HDMapImpl {
    */
   int LoadMapFromProto(const Map& map_proto);
 
+  /**
+   * @brief get map version
+   * @return map version string
+   */
+  std::string GetVersion() const;
+
   LaneInfoConstPtr GetLaneById(const Id& id) const;
   JunctionInfoConstPtr GetJunctionById(const Id& id) const;
   SignalInfoConstPtr GetSignalById(const Id& id) const;
@@ -325,6 +331,7 @@ class HDMapImpl {
 
  private:
   Map map_;
+  Header header_;
   LaneTable lane_table_;
   JunctionTable junction_table_;
   CrosswalkTable crosswalk_table_;
