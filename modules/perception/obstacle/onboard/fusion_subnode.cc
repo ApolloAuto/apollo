@@ -220,6 +220,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   }
   PERF_BLOCK_START();
   objects_.clear();
+  double latest_fused_ts = sensor_objs.back().timestamp;
   if (!fusion_->Fuse(sensor_objs, &objects_)) {
     AWARN << "Failed to call fusion plugin."
           << " event_meta: [" << event_meta.to_string()
@@ -290,7 +291,9 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   if (objects_.size() > 0 && FLAGS_publish_fusion_event) {
     SharedDataPtr<FusionItem> fusion_item_ptr(new FusionItem);
     fusion_item_ptr->timestamp = objects_[0]->latest_tracked_time;
+    fusion_item_ptr->fused_sensor_ts = latest_fused_ts;
     const std::string &device_id = events[0].reserve;
+    fusion_item_ptr->fused_sensor_device_id = device_id;
     for (auto obj : objects_) {
       std::shared_ptr<Object> objclone(new Object());
       if (obj->b_cipv == true) {
