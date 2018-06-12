@@ -100,7 +100,7 @@ void LidarProcessSubnode::OnPointCloud(
 
   std::shared_ptr<SensorObjects> out_sensor_objects(new SensorObjects);
   out_sensor_objects->timestamp = timestamp_;
-  out_sensor_objects->sensor_type = SensorType::VELODYNE_64;
+  out_sensor_objects->sensor_type = GetSensorType();
   out_sensor_objects->sensor_id = device_id_;
   out_sensor_objects->seq_num = seq_num_;
 
@@ -426,6 +426,14 @@ void LidarProcessSubnode::PublishDataAndEvent(
     event.reserve = device_id_;
     event_manager_->Publish(event);
   }
+}
+
+SensorType Lidar64ProcessSubnode::GetSensorType() const {
+  return SensorType::VELODYNE_64;
+}
+
+SensorType Lidar16ProcessSubnode::GetSensorType() const {
+  return SensorType::VELODYNE_16;
 }
 
 }  // namespace perception
