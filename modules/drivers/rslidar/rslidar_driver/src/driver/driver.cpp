@@ -72,9 +72,7 @@ int RslidarDriver::poll_standard(rslidar_msgs::rslidarScanPtr& scan) {
 
       if (rc == 0) {
         break;  // got a full packet?
-      }
-
-      if (rc < 0) {
+      }else if (rc < 0) {
         return rc;
       }
     }

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_VELODYNE_VELODYNE_DRIVER_SOCKET_INPUT_H_
-#define MODULES_DRIVERS_VELODYNE_VELODYNE_DRIVER_SOCKET_INPUT_H_
+#ifndef MODULES_DRIVERS_ROBOSENSE_RSLIDAR_DRIVER_SOCKET_INPUT_H_
+#define MODULES_DRIVERS_ROBOSENSE_RSLIDAR_DRIVER_SOCKET_INPUT_H_
 
 #include <ros/ros.h>
 #include <stdio.h>
