@@ -154,6 +154,7 @@ DEFINE_string(
     yolo_camera_detector_config,
     "modules/perception/model/camera/yolo_camera_detector_config.pb.txt",
     "Yolo camera detector config filename.");
+DEFINE_bool(use_whole_lane_line, false, "");
 DEFINE_string(modest_radar_detector_config,
               "modules/perception/model/modest_radar_detector_config.pb.txt",
               "modest radar detector config filename.");

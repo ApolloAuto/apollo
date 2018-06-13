@@ -304,9 +304,13 @@ bool CCLanePostProcessor::AddInstanceIntoLaneObject(
            << " order polynomial curve.";
   }
   // Option 1: Use C0 for lateral distance
-  lane_object->lateral_distance = lane_object->model(0);
+  // lane_object->lateral_distance = lane_object->model(0);
+
   // Option 2: Use y-value of closest point.
   // lane_object->lateral_distance = lane_object->pos[0].y();
+  
+  // Option 3: Use value at x=3
+  lane_object->lateral_distance = PolyEval(float(3.0), lane_object->order, lane_object->model);
 
   return true;
 }
@@ -415,9 +419,12 @@ bool CCLanePostProcessor::AddInstanceIntoLaneObjectImage(
   }
 
   // Option 1: Use C0 for lateral distance
-  lane_object->lateral_distance = lane_object->model(0);
+  // lane_object->lateral_distance = lane_object->model(0);
   // Option 2: Use y-value of closest point.
   // lane_object->lateral_distance = lane_object->pos[0].y();
+
+  // Option 3: Use value at x=3
+  lane_object->lateral_distance = PolyEval(float(3.0), lane_object->order, lane_object->model);
 
   return true;
 }
