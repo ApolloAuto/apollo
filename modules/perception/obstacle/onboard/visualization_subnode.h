@@ -62,6 +62,8 @@ class VisualizationSubnode : public Subnode {
                         double timestamp);
   void SetRadarContent(const std::string& data_key, FrameContent* content,
                        double timestamp);
+  void SetLaneContent(const std::string& data_key, FrameContent* content,
+                      double timestamp);
 
   RadarObjectData* radar_object_data_ = nullptr;
   CameraObjectData* camera_object_data_ = nullptr;
