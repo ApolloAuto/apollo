@@ -4,13 +4,15 @@
 
 - [Apollo 2.5 quick start](apollo_2_5_quick_start.md)
 - [Apollo 2.5 quick start cn](apollo_2_5_quick_start_cn.md)
+- [Apollo 2.5 hardware system installation guide](apollo_2_5_hardware_system_installation_guide_v1.md)
 - [Apollo 2.5 map collection guide](apollo_2_5_map_collection_guide.md)
 - [Apollo 2.5 map collection guide cn](apollo_2_5_map_collection_guide_cn.md)
 
 ## Apollo 2.0
 
 - [Apollo 2.0 quick start](apollo_2_0_quick_start.md)
-- [Apollo 2.0 hardware system installation guide v1](apollo_2_0_hardware_system_installation_guide_v1.md)
+- [Apollo 2.0 quick start cn](apollo_2_0_quick_start_cn.md)
+- [Apollo 2.0 hardware system installation guide](apollo_2_0_hardware_system_installation_guide_v1.md)
 - [Apollo 2.0 sensor calibration guide](apollo_2_0_sensor_calibration_guide.md)
 - [Apollo 2.0 sensor calibration guide cn](apollo_2_0_sensor_calibration_guide_cn.md)
 
