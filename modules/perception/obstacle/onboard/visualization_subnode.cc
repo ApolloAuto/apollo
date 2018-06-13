@@ -107,16 +107,14 @@ bool VisualizationSubnode::InitInternal() {
     }
   }
 
-  if (lane_event_id_ != -1) {
-    lane_shared_data_ = dynamic_cast<LaneSharedData*>(
-        shared_data_manager_->GetSharedData("LaneSharedData"));
-    if (lane_shared_data_ == nullptr) {
-      AERROR << "Failed to get LaneSharedData.";
-      return false;
-    }
-    AINFO << "Init shared data successfully, data: "
-          << lane_shared_data_->name();
+  lane_shared_data_ = dynamic_cast<LaneSharedData*>(
+      shared_data_manager_->GetSharedData("LaneSharedData"));
+  if (lane_shared_data_ == nullptr) {
+    AERROR << "Failed to get LaneSharedData.";
+    return false;
   }
+
+  AINFO << "Init shared data successfully, data: " << lane_shared_data_->name();
 
   // init frame_visualizer
   RegisterFactoryGLFusionVisualizer();
