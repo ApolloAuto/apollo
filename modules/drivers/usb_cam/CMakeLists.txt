@@ -14,7 +14,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(avcodec libavcodec REQUIRED)
 pkg_check_modules(swscale libswscale REQUIRED)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 -O2 -fopenmp -mavx2")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 -O2 -fopenmp -mavx2 -fPIC")
 
 ###################################################
 ## Declare things to be passed to other projects ##
@@ -33,6 +33,10 @@ catkin_package(
 ## Build ##
 ###########
 
+link_directories(lib
+  ${catkin_LIB_DIRS}
+)
+
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${avcodec_INCLUDE_DIRS}
@@ -43,6 +47,9 @@ include_directories(include
 add_library(${PROJECT_NAME} src/usb_cam.cpp)
 target_link_libraries(${PROJECT_NAME}
     yaml-cpp
+    libadv_trigger_ctl.a
+    libjsoncpp.so
+    libadv_plat_common.a
     ${avcodec_LIBRARIES}
     ${swscale_LIBRARIES}
     ${catkin_LIBRARIES}
@@ -52,6 +59,9 @@ target_link_libraries(${PROJECT_NAME}
 add_library(${PROJECT_NAME}_nodelet nodes/usb_cam_nodelet.cpp nodes/usb_cam_wrapper.cpp)
 target_link_libraries(${PROJECT_NAME}_nodelet
     ${PROJECT_NAME}
+    libadv_trigger_ctl.a
+    libjsoncpp.so
+    libadv_plat_common.a
   ${avcodec_LIBRARIES}
   ${swscale_LIBRARIES}
   ${catkin_LIBRARIES}
@@ -61,6 +71,9 @@ target_link_libraries(${PROJECT_NAME}_nodelet
 add_executable(${PROJECT_NAME}_node nodes/usb_cam_node.cpp nodes/usb_cam_wrapper.cpp)
 target_link_libraries(${PROJECT_NAME}_node
   ${PROJECT_NAME}
+  libadv_trigger_ctl.a
+  libjsoncpp.so
+  libadv_plat_common.a
   ${avcodec_LIBRARIES}
   ${swscale_LIBRARIES}
   ${catkin_LIBRARIES}
