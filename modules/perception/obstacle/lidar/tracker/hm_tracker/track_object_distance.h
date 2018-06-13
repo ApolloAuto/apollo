@@ -69,7 +69,7 @@ class TrackObjectDistance {
   // @params[IN] new_object: recently detected object
   // @return computed <track, object> distance
   static float ComputeDistance(
-      const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+      ObjectTrackPtr track, const Eigen::VectorXf& track_predict,
       const std::shared_ptr<TrackedObject>& new_object);
 
   std::string Name() const { return "TrackObjectDistance"; }
@@ -81,7 +81,7 @@ class TrackObjectDistance {
   // @params[IN] new_object: recently detected object
   // @return location distacne of given <track, object>
   static float ComputeLocationDistance(
-      const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+      ObjectTrackPtr track, const Eigen::VectorXf& track_predict,
       const std::shared_ptr<TrackedObject>& new_object);
 
   // @brief compute direction distance for given track & object
@@ -90,7 +90,7 @@ class TrackObjectDistance {
   // @params[IN] new_object: recently detected object
   // @return direction distance of given <track, object>
   static float ComputeDirectionDistance(
-      const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+      ObjectTrackPtr track, const Eigen::VectorXf& track_predict,
       const std::shared_ptr<TrackedObject>& new_object);
 
   // @brief compute bbox size distance for given track & object
@@ -98,7 +98,7 @@ class TrackObjectDistance {
   // @params[IN] new_object: recently detected object
   // @return bbox size distance of given <track, object>
   static float ComputeBboxSizeDistance(
-      const ObjectTrackPtr& track,
+      ObjectTrackPtr track,
       const std::shared_ptr<TrackedObject>& new_object);
 
   // @brief compute point num distance for given track & object
@@ -106,7 +106,7 @@ class TrackObjectDistance {
   // @params[IN] new_object: recently detected object
   // @return point num distance of given <track, object>
   static float ComputePointNumDistance(
-      const ObjectTrackPtr& track,
+      ObjectTrackPtr track,
       const std::shared_ptr<TrackedObject>& new_object);
 
   // @brief compute histogram distance for given track & object
@@ -114,7 +114,7 @@ class TrackObjectDistance {
   // @params[IN] new_object: recently detected object
   // @return histogram distance of given <track, object>
   static float ComputeHistogramDistance(
-      const ObjectTrackPtr& track,
+      ObjectTrackPtr track,
       const std::shared_ptr<TrackedObject>& new_object);
 
  protected:

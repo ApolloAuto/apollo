@@ -67,6 +67,9 @@ Status RelativeMap::Init() {
   }
 
   navigation_lane_.SetConfig(config_.navigation_lane());
+  const auto& map_param = config_.map_param();
+  navigation_lane_.SetDefaultWidth(map_param.default_left_width(),
+                                   map_param.default_right_width());
 
   AdapterManager::Init(adapter_conf_);
   if (!AdapterManager::GetPerceptionObstacles()) {

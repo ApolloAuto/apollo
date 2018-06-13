@@ -102,7 +102,7 @@ void Velodyne16Driver::poll_positioning_packet(void) {
     NMEATimePtr nmea_time(new NMEATime);
     bool ret = true;
     while (true) {
-      int rc = positioning_input_->get_positioning_data_packtet(nmea_time);
+      int rc = positioning_input_->get_positioning_data_packet(nmea_time);
       if (rc == 0) {
         break;  // got a full packet
       }

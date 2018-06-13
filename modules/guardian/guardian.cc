@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,16 +39,16 @@ std::string Guardian::Name() const { return FLAGS_module_name; }
 Status Guardian::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);
   CHECK(AdapterManager::GetChassis()) << "Chassis is not initialized.";
-  AdapterManager::AddChassisCallback(&Guardian::OnChassis, this);
   CHECK(AdapterManager::GetSystemStatus())
       << "SystemStatus is not initialized.";
-  AdapterManager::AddSystemStatusCallback(&Guardian::OnSystemStatus, this);
   CHECK(AdapterManager::GetControlCommand()) << "Control is not initialized.";
-  AdapterManager::AddControlCommandCallback(&Guardian::OnControl, this);
   return Status::OK();
 }
 
 Status Guardian::Start() {
+  AdapterManager::AddChassisCallback(&Guardian::OnChassis, this);
+  AdapterManager::AddSystemStatusCallback(&Guardian::OnSystemStatus, this);
+  AdapterManager::AddControlCommandCallback(&Guardian::OnControl, this);
   const double duration = 1.0 / FLAGS_guardian_cmd_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
                                        &Guardian::OnTimer, this);
@@ -60,14 +60,20 @@ void Guardian::Stop() { timer_.stop(); }
 
 void Guardian::OnTimer(const ros::TimerEvent&) {
   ADEBUG << "Timer is triggered: publish Guardian result";
-  std::lock_guard<std::mutex> lock(mutex_);
-  if (!system_status_.has_safety_mode_trigger_time()) {
-    ADEBUG << "Safety mode not triggerd, bypass control command";
-    ByPassControlCommand();
-  } else {
+  bool safety_mode_triggered = false;
+  if (FLAGS_guardian_enabled) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    safety_mode_triggered = system_status_.has_safety_mode_trigger_time();
+  }
+
+  if (safety_mode_triggered) {
     ADEBUG << "Safety mode triggerd, enable safty mode";
     TriggerSafetyMode();
+  } else {
+    ADEBUG << "Safety mode not triggerd, bypass control command";
+    PassThroughControlCommand();
   }
+
   AdapterManager::FillGuardianHeader(FLAGS_node_name, &guardian_cmd_);
   AdapterManager::PublishGuardian(guardian_cmd_);
 }
@@ -90,19 +96,57 @@ void Guardian::OnControl(const ControlCommand& message) {
   control_cmd_.CopyFrom(message);
 }
 
-void Guardian::ByPassControlCommand() {
+void Guardian::PassThroughControlCommand() {
   std::lock_guard<std::mutex> lock(mutex_);
-  guardian_cmd_.CopyFrom(control_cmd_);
+  guardian_cmd_.mutable_control_command()->CopyFrom(control_cmd_);
 }
 
 void Guardian::TriggerSafetyMode() {
-  ADEBUG << "Received chassis data: run chassis callback.";
+  AINFO << "Safety state triggered, with system safety mode trigger time : "
+        << system_status_.safety_mode_trigger_time();
   std::lock_guard<std::mutex> lock(mutex_);
-  guardian_cmd_.set_throttle(0.0);
-  guardian_cmd_.set_brake(FLAGS_guardian_cmd_soft_stop_percentage);
-  guardian_cmd_.set_steering_target(0.0);
-  guardian_cmd_.set_steering_rate(0.0);
-  guardian_cmd_.set_is_in_safe_mode(true);
+  bool sensor_malfunction = false, obstacle_detected = false;
+  if (!chassis_.surround().sonar_enabled() ||
+      chassis_.surround().sonar_fault()) {
+    AINFO << "Ultrasonic sensor not enabled for faulted, will do emergency "
+             "stop!";
+    sensor_malfunction = true;
+  } else {
+    // TODO(QiL) : Load for config
+    for (int i = 0; i < chassis_.surround().sonar_range_size(); ++i) {
+      if ((chassis_.surround().sonar_range(i) > 0.0 &&
+           chassis_.surround().sonar_range(i) < 2.5) ||
+          chassis_.surround().sonar_range(i) > 30) {
+        AINFO << "Object detected or ultrasonic sensor fault output, will do "
+                 "emergency stop!";
+        obstacle_detected = true;
+      }
+    }
+  }
+
+  guardian_cmd_.mutable_control_command()->set_throttle(0.0);
+  guardian_cmd_.mutable_control_command()->set_steering_target(0.0);
+  guardian_cmd_.mutable_control_command()->set_steering_rate(0.0);
+  guardian_cmd_.mutable_control_command()->set_is_in_safe_mode(true);
+
+  // TODO(QiL) : Remove this one once hardware re-alignment is done.
+  sensor_malfunction = false;
+  obstacle_detected = false;
+  AINFO << "Temperarily ignore the ultrasonic sensor output during hardware "
+           "re-alignment!";
+
+  if (system_status_.require_emergency_stop() || sensor_malfunction ||
+      obstacle_detected) {
+    AINFO << "Emergency stop triggered! with system status from monitor as : "
+          << system_status_.require_emergency_stop();
+    guardian_cmd_.mutable_control_command()->set_brake(
+        FLAGS_guardian_cmd_emergency_stop_percentage);
+  } else {
+    AINFO << "Soft stop triggered! with system status from monitor as : "
+          << system_status_.require_emergency_stop();
+    guardian_cmd_.mutable_control_command()->set_brake(
+        FLAGS_guardian_cmd_soft_stop_percentage);
+  }
 }
 
 }  // namespace guardian

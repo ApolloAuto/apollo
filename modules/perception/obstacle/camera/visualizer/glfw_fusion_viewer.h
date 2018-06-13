@@ -31,6 +31,7 @@
 
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/camera/cipv/cipv.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
 #include "modules/perception/obstacle/camera/visualizer/common/camera.h"
@@ -139,7 +140,7 @@ class GLFWFusionViewer {
   void render();
 
   float project_point(const Eigen::VectorXf &in, Eigen::Vector2f *out,
-      const MotionType &motion_matrix);
+                      const MotionType &motion_matrix);
 
  protected:
   vec3 get_velocity_src_position(const std::shared_ptr<Object> &object);
@@ -196,7 +197,8 @@ class GLFWFusionViewer {
                      int image_width, int image_height);
 
   bool draw_car_forward_dir();
-  void draw_objects(const std::vector<std::shared_ptr<Object>> &objects,
+  void draw_objects(double timestamp,
+                    const std::vector<std::shared_ptr<Object>> &objects,
                     const Eigen::Matrix4d &w2c, bool draw_cube,
                     bool draw_velocity, const Eigen::Vector3f &color,
                     bool use_class_color, bool use_track_color = true);
@@ -245,7 +247,6 @@ class GLFWFusionViewer {
   bool show_text;
   bool show_help_text;
   std::string help_str;
-
 
   void get_class_color(int cls, float rgb[3]);
 
@@ -307,10 +308,12 @@ class GLFWFusionViewer {
   bool show_camera_bdv_;
   bool show_associate_color_;  // show same color for both 3d pc bbox and camera
                                // bbox
+  bool show_verbose_;
   bool show_type_id_label_;
   bool show_lane_;
   bool show_vp_grid_ = true;  // show vanishing point and ground plane grid
   bool draw_lane_objects_;
+  bool show_trajectory_;
 
   static std::vector<std::vector<int>> s_color_table;
   std::shared_ptr<GLRasterText> raster_text_;
@@ -323,8 +326,8 @@ class GLFWFusionViewer {
   LaneObjectsPtr lane_history_;
   std::vector<std::vector<float>> z_history_;
   //  std::vector<LaneObjects> Lane_history_buffer_;
-  const std::size_t lane_history_buffer_size_ = 40000;
-  const std::size_t object_history_size_ = 5;
+  const std::size_t lane_history_buffer_size_ = 300;
+  const std::size_t object_history_size_ = 100;
   MotionType motion_matrix_;
   // pin-hole camera model with distortion
   std::shared_ptr<CameraDistort<double>> distort_camera_intrinsic_;
@@ -335,7 +338,10 @@ class GLFWFusionViewer {
   float alpha_blending = 0.5;  // [0..1]
   float one_minus_alpha = 1.0 - alpha_blending;
   // object_trajectories
-  std::map<int, std::vector<std::pair<float, float>>> object_trackjectories_;
+
+  std::map<int, size_t> object_id_skip_count_;
+  std::map<int, boost::circular_buffer<std::pair<float, float>>>
+    object_trackjectories_;
   std::map<int, std::vector<double>> object_timestamps_;
 };
 

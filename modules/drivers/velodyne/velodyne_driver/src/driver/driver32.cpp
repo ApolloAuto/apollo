@@ -15,26 +15,23 @@
  *****************************************************************************/
 #include "driver.h"
 
-#include <ros/ros.h>
-#include <tf/transform_listener.h>
 #include <time.h>
 #include <unistd.h>
 #include <cmath>
 #include <string>
 #include <thread>
 
+#include <ros/ros.h>
+#include <tf/transform_listener.h>
+
 namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-Velodyne32Driver::Velodyne32Driver(const Config& config) { 
-  config_ = config; 
-}
+Velodyne32Driver::Velodyne32Driver(const Config& config) { config_ = config; }
 
 void Velodyne32Driver::init(ros::NodeHandle& node) {
-  double packet_rate = 0.0;  // packet frequency (Hz)
-  packet_rate = 1808.0;
-
+  double packet_rate = 1808.0;              // packet frequency (Hz)
   double frequency = (config_.rpm / 60.0);  // expected Hz rate
 
   // default number of packets for each scan is a single revolution
@@ -103,7 +100,7 @@ void Velodyne32Driver::poll_positioning_packet(void) {
     NMEATimePtr nmea_time(new NMEATime);
     bool ret = true;
     while (true) {
-      int rc = positioning_input_->get_positioning_data_packtet(nmea_time);
+      int rc = positioning_input_->get_positioning_data_packet(nmea_time);
       if (rc == 0) {
         break;  // got a full packet
       }

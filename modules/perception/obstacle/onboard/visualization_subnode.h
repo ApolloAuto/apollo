@@ -26,10 +26,10 @@
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 #include "modules/perception/obstacle/onboard/lane_shared_data.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
-#include "modules/perception/obstacle/onboard/motion_service.h"
 
 namespace apollo {
 namespace perception {
@@ -56,6 +56,12 @@ class VisualizationSubnode : public Subnode {
   void SetFrameContent(const Event& event, const std::string& device_id,
                        const std::string& data_key, const double timestamp,
                        FrameContent* content);
+  void SetFusionContent(const std::string& data_key, FrameContent* content,
+                        double timestamp);
+  void SetCameraContent(const std::string& data_key, FrameContent* content,
+                        double timestamp);
+  void SetRadarContent(const std::string& data_key, FrameContent* content,
+                       double timestamp);
 
   RadarObjectData* radar_object_data_ = nullptr;
   CameraObjectData* camera_object_data_ = nullptr;

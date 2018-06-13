@@ -198,7 +198,7 @@ bool Cipv::ElongateEgoLane(const LaneObjectsPtr lane_objects,
   // When left lane line is available
   if (b_left_valid && b_right_valid) {
     // elongate both lanes or do nothing
-    AINFO << "Both lanes are fine";
+    ADEBUG << "Both lanes are fine";
     // When only left lane line is avaiable
   } else if (!b_left_valid && b_right_valid) {
     // Generate virtual left lane based on right lane
@@ -206,7 +206,7 @@ bool Cipv::ElongateEgoLane(const LaneObjectsPtr lane_objects,
                         EGO_CAR_HALF_VIRTUAL_LANE);
     MakeVirtualLane(egolane_ground->right_line, yaw_rate, offset_distance,
                     &egolane_ground->left_line);
-    AINFO << "Made left lane";
+    ADEBUG << "Made left lane";
 
     // When only right lane line is avaiable
   } else if (b_left_valid && !b_right_valid) {
@@ -215,7 +215,7 @@ bool Cipv::ElongateEgoLane(const LaneObjectsPtr lane_objects,
                        EGO_CAR_HALF_VIRTUAL_LANE);
     MakeVirtualLane(egolane_ground->left_line, yaw_rate, offset_distance,
                     &egolane_ground->right_line);
-    AINFO << "Made right lane";
+    ADEBUG << "Made right lane";
 
     // When there is no lane lines available
   } else {  // if (!b_left_valid && !b_right_valid)
@@ -223,7 +223,7 @@ bool Cipv::ElongateEgoLane(const LaneObjectsPtr lane_objects,
     MakeVirtualEgoLaneFromYawRate(yaw_rate, velocity, offset_distance,
                                   &egolane_ground->left_line,
                                   &egolane_ground->right_line);
-    AINFO << "Made both lane_objects";
+    ADEBUG << "Made both lane_objects";
   }
 
   return true;
@@ -737,6 +737,123 @@ bool Cipv::DetermineCipv(const LaneObjectsPtr lane_objects,
   return true;
 }
 
+
+bool Cipv::TranformPoint(const Eigen::VectorXf& in,
+                         const MotionType& motion_matrix,
+                         Eigen::Vector3d* out) {
+  CHECK(in.rows() == motion_matrix.cols());
+  Eigen::VectorXf trans_pt = motion_matrix * in;
+  if (fabs(trans_pt[3]) < EPSILON) {
+    return false;
+  } else {
+    trans_pt /= trans_pt[3];
+  }
+  *out << trans_pt[0], trans_pt[1], trans_pt[2];
+  return true;
+}
+
+bool Cipv::CollectDrops(const MotionBuffer &motion_buffer,
+                        std::vector<std::shared_ptr<Object>>* objects) {
+  int motion_size = motion_buffer.size();
+  if (debug_level_ >= 2) {
+    AINFO << " motion_size: " << motion_size;
+  }
+  if (motion_size <= 0) {
+    ADEBUG << " motion_size: " << motion_size;
+    return false;
+  }
+  // std::map<int, std::vector<std::pair<float, float>>>
+  //     tmp_object_trackjectories;
+  // std::swap(object_trackjectories_, tmp_object_trackjectories);
+
+  if (debug_level_ >= 2) {
+    AINFO << "object_trackjectories_.size(): " << object_trackjectories_.size();
+  }
+  for (auto obj : *objects) {
+    int cur_id = obj->track_id;
+    if (debug_level_ >= 2) {
+      AINFO << "target ID: " << cur_id;
+    }
+    // for (auto point : tmp_object_trackjectories[cur_id]) {
+    //   object_trackjectories_[cur_id].push_back(point);
+    // }
+
+    // If it is the first object, set capacity.
+    if (object_trackjectories_[cur_id].size() == 0) {
+      object_trackjectories_[cur_id].set_capacity(DROPS_HISTORY_SIZE);
+    }
+
+    object_id_skip_count_[cur_id] = 0;
+
+
+    object_trackjectories_[cur_id].push_back(
+        std::make_pair(obj->center[0], obj->center[1]));
+
+    if (debug_level_ >= 2) {
+      AINFO << "object_trackjectories_[" << cur_id << " ].size(): "
+            << object_trackjectories_[cur_id].size();
+    }
+
+    obj->drops.clear();
+    // Add drops
+    for (std::size_t it = object_trackjectories_[cur_id].size() - 1, count = 0;
+         it > 0; it--, count++) {
+      if (count >= DROPS_HISTORY_SIZE || count > motion_buffer.size()) {
+        break;
+      }
+      Eigen::VectorXf pt =
+          Eigen::VectorXf::Zero(motion_buffer[0].motion.cols());
+      pt[0] = object_trackjectories_[cur_id][it].first;
+      pt[1] = object_trackjectories_[cur_id][it].second;
+      pt[2] = 0.0f;
+      pt[3] = 1.0f;
+
+      Eigen::Vector3d transformed_pt;
+      TranformPoint(pt,
+                    motion_buffer[motion_size - count - 1].motion,
+                    &transformed_pt);
+      obj->drops.push_back(transformed_pt);
+    }
+  }
+
+  // Currently remove trajectory if they do not exist in the current frame
+  // TO DO: need to wait several frames
+  for (const auto& each_object : object_trackjectories_) {
+    int obj_id = each_object.first;
+    bool b_found_id = false;
+    for (auto obj : *objects) {
+      int cur_id = obj->track_id;
+      if (obj_id == cur_id) {
+        b_found_id = true;
+        break;
+      }
+    }
+    // If object ID was not found erase it from map
+    if (b_found_id == false && object_trackjectories_[obj_id].size() > 0) {
+//      object_id_skip_count_[obj_id].second++;
+      object_id_skip_count_[obj_id]++;
+      if (debug_level_ >= 2) {
+        AINFO << "object_id_skip_count_[" << obj_id <<" ]: "
+              << object_id_skip_count_[obj_id];
+      }
+      if (object_id_skip_count_[obj_id] >= MAX_ALLOWED_SKIP_OBJECT) {
+        if (debug_level_ >= 2) {
+          AINFO << "Removed obsolte object " << obj_id;
+        }
+        object_trackjectories_.erase(obj_id);
+        object_id_skip_count_.erase(obj_id);
+      }
+    }
+  }
+  if (debug_level_ >= 2) {
+    for (auto obj : *objects) {
+      int cur_id = obj->track_id;
+      AINFO << "obj->track_id: " << cur_id;
+      AINFO << "obj->drops.size(): " << obj->drops.size();
+    }
+  }
+  return true;
+}
 std::string Cipv::Name() const { return "Cipv"; }
 
 // Register plugin.

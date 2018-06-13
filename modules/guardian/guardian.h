@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ class Guardian : public apollo::common::ApolloApp {
   void OnChassis(const apollo::canbus::Chassis& message);
   void OnControl(const apollo::control::ControlCommand& message);
   void OnSystemStatus(const apollo::monitor::SystemStatus& message);
-  void ByPassControlCommand();
+  void PassThroughControlCommand();
   void TriggerSafetyMode();
 
   apollo::canbus::Chassis chassis_;

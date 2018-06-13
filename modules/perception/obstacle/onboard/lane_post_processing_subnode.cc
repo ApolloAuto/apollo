@@ -287,7 +287,7 @@ Status LanePostProcessingSubnode::ProcEvents() {
 }
 
 void LanePostProcessingSubnode::PublishPerceptionPb(
-    const LaneObjectsPtr &lane_objects) {
+    LaneObjectsPtr lane_objects) {
   ADEBUG << "Lane post-processor publish lane object pb data";
 
   PerceptionObstacles obstacles;

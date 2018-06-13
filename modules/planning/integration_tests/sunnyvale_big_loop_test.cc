@@ -30,8 +30,8 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::time::Clock;
 using apollo::common::PointENU;
+using apollo::common::time::Clock;
 using apollo::planning::StopSign;
 using apollo::planning::util::GetPlanningStatus;
 
@@ -64,33 +64,6 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
     ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
     ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
-  }
-
-  TrafficRuleConfig* GetStopSignConfig() {
-    for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
-      if (config.rule_id() == TrafficRuleConfig::STOP_SIGN) {
-        return &config;
-      }
-    }
-    return nullptr;
-  }
-
-  TrafficRuleConfig* GetDestinationConfig() {
-    for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
-      if (config.rule_id() == TrafficRuleConfig::DESTINATION) {
-        return &config;
-      }
-    }
-    return nullptr;
-  }
-
-  TrafficRuleConfig* GetPullConfig() {
-    for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
-      if (config.rule_id() == TrafficRuleConfig::PULL_OVER) {
-        return &config;
-      }
-    }
-    return nullptr;
   }
 };
 
@@ -152,6 +125,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
 
+
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
@@ -163,7 +137,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::STOP);
-  auto* stop_sign_config = GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::STOP_SIGN);
   double stop_duration = stop_sign_config->stop_sign().stop_duration();
   double wait_time = stop_duration - 0.5;
   double stop_start_time = Clock::NowInSeconds() - wait_time;
@@ -192,7 +167,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   // set PlanningStatus: wait time > STOP_DURATION
@@ -233,7 +209,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
   PlanningTestBase::SetUp();
 
   // set configs
-  auto* stop_sign_config = GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -287,7 +264,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -379,7 +357,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -443,7 +422,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* stop_sign_config = GetStopSignConfig();
+  auto* stop_sign_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::STOP_SIGN);
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(true);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -461,9 +441,11 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   stop_sign_status->set_stop_start_time(stop_start_time);
 
   // set config
-  stop_sign_config->mutable_stop_sign()->mutable_creep()
+  stop_sign_config->mutable_stop_sign()
+      ->mutable_creep()
       ->set_creep_distance_to_stop_line(1.0);
-  stop_sign_config->mutable_stop_sign()->mutable_creep()
+  stop_sign_config->mutable_stop_sign()
+      ->mutable_creep()
       ->set_max_valid_stop_distance(1.0);
 
   RUN_GOLDEN_TEST_DECISION(1);
@@ -475,7 +457,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   // step 3: STOP_DONE
 
   // set config: to make it s valid stop for the same data file
-  stop_sign_config->mutable_stop_sign()->mutable_creep()
+  stop_sign_config->mutable_stop_sign()
+      ->mutable_creep()
       ->set_max_valid_stop_distance(4.0);
 
   RUN_GOLDEN_TEST_DECISION(2);
@@ -602,7 +585,8 @@ TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(false);
 
   RUN_GOLDEN_TEST_DECISION(0);
@@ -629,12 +613,15 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   PlanningTestBase::SetUp();
 
   // set config
-  auto* destination_config = GetDestinationConfig();
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(true);
+  destination_config->mutable_destination()->set_pull_over_plan_distance(35.0);
 
-  auto* pull_over_config = GetPullConfig();
-  pull_over_config->mutable_pull_over()->set_plan_distance(20.0);
-  pull_over_config->mutable_pull_over()->set_operation_length(15.0);
+  auto* pull_over_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::PULL_OVER);
+  pull_over_config->mutable_pull_over()->set_plan_distance(35.0);
+  pull_over_config->mutable_pull_over()->set_operation_length(10.0);
 
   RUN_GOLDEN_TEST_DECISION(0);
 
@@ -663,12 +650,68 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
       planning_state->pull_over().stop_point_heading();
   double status_set_time_1 = planning_state->pull_over().status_set_time();
 
+  // start_point/stop_point/etc shall be the same among cycles
   EXPECT_DOUBLE_EQ(start_point_0.x(), start_point_1.x());
   EXPECT_DOUBLE_EQ(start_point_0.y(), start_point_1.y());
   EXPECT_DOUBLE_EQ(stop_point_0.x(), stop_point_1.x());
   EXPECT_DOUBLE_EQ(stop_point_0.y(), stop_point_1.y());
   EXPECT_DOUBLE_EQ(stop_point_heading_0, stop_point_heading_1);
   EXPECT_DOUBLE_EQ(status_set_time_0, status_set_time_1);
+}
+
+/*
+ * destination: stop inlane while pull over fails
+ * bag: 2018-05-16-10-00-32/2018-05-16-10-00-32_10.bag
+ * decision: STOP
+ */
+TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
+  ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
+  ENABLE_RULE(TrafficRuleConfig::DESTINATION, true);
+  ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
+  ENABLE_RULE(TrafficRuleConfig::PULL_OVER, true);
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+
+  std::string seq_num = "601";
+  FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
+  FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
+  FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
+  FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
+  PlanningTestBase::SetUp();
+
+  // set config
+  auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::DESTINATION);
+  destination_config->mutable_destination()->set_enable_pull_over(true);
+  destination_config->mutable_destination()->set_pull_over_plan_distance(35.0);
+
+  auto* pull_over_config = PlanningTestBase::GetTrafficRuleConfig(
+      TrafficRuleConfig::PULL_OVER);
+  pull_over_config->mutable_pull_over()->set_plan_distance(35.0);
+  pull_over_config->mutable_pull_over()->set_operation_length(10.0);
+
+  // step 1: pull over
+  RUN_GOLDEN_TEST_DECISION(0);
+
+  // check PlanningStatus value: PULL OVER
+  auto* planning_state = GetPlanningStatus()->mutable_planning_state();
+  EXPECT_TRUE(planning_state->has_pull_over() &&
+              planning_state->pull_over().in_pull_over());
+  EXPECT_EQ(PullOverStatus::DESTINATION, planning_state->pull_over().reason());
+
+  // step 2: pull over failed, stop inlane
+
+  // set config
+  destination_config->mutable_destination()->set_pull_over_plan_distance(10.0);
+  pull_over_config->mutable_pull_over()->set_plan_distance(10.0);
+  pull_over_config->mutable_pull_over()->set_max_check_distance(30.0);
+  pull_over_config->mutable_pull_over()->set_max_failure_count(1);
+
+  // check PULL OVER decision
+  RUN_GOLDEN_TEST_DECISION(1);
+
+  // check PlanningStatus value: PULL OVER  cleared
+  EXPECT_FALSE(planning_state->has_pull_over());
 }
 
 /*

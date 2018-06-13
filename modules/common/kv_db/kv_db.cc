@@ -53,50 +53,76 @@ leveldb::Options DBOptions() {
 }  // namespace
 
 std::unique_ptr<leveldb::DB> KVDB::GetDB() {
+  if (!apollo::common::util::EnsureDirectory(FLAGS_kv_db_path)) {
+    AERROR << "Cannot create KV DB directory: " << FLAGS_kv_db_path;
+    return nullptr;
+  }
+
   static const auto options = DBOptions();
   leveldb::DB *db = nullptr;
-  CHECK(apollo::common::util::EnsureDirectory(FLAGS_kv_db_path));
   const auto status = leveldb::DB::Open(options, FLAGS_kv_db_path, &db);
-  CHECK(status.ok()) << "Unable to open DB path " << FLAGS_kv_db_path
-                     << "\n" << status.ToString();
+  if (!status.ok()) {
+    AERROR << "Unable to open DB path " << FLAGS_kv_db_path << ": "
+           << status.ToString();
+    return nullptr;
+  }
+
   return std::unique_ptr<leveldb::DB>(db);
 }
 
 bool KVDB::Put(const std::string &key, const std::string &value,
                const bool sync) {
+  auto db = GetDB();
+  if (db == nullptr) {
+    return false;
+  }
+
   leveldb::WriteOptions options;
   options.sync = sync;
-
-  const auto status = GetDB()->Put(options, key, value);
+  const auto status = db->Put(options, key, value);
   AERROR_IF(!status.ok()) << status.ToString();
   return status.ok();
 }
 
 bool KVDB::Delete(const std::string &key, const bool sync) {
+  auto db = GetDB();
+  if (db == nullptr) {
+    return false;
+  }
+
   leveldb::WriteOptions options;
   options.sync = sync;
-
-  const auto status = GetDB()->Delete(options, key);
+  const auto status = db->Delete(options, key);
   AERROR_IF(!status.ok()) << status.ToString();
   return status.ok();
 }
 
 bool KVDB::Has(const std::string &key) {
-  static leveldb::ReadOptions options;
+  auto db = GetDB();
+  if (db == nullptr) {
+    return false;
+  }
 
+  static leveldb::ReadOptions options;
   std::string value;
-  const auto status = GetDB()->Get(options, key, &value);
-  CHECK(status.ok() || status.IsNotFound()) << status.ToString();
+  const auto status = db->Get(options, key, &value);
+  // Log error except IsNotFound.
+  AERROR_IF(!status.ok() && !status.IsNotFound()) << status.ToString();
   return status.ok();
 }
 
 std::string KVDB::Get(const std::string &key,
                       const std::string &default_value) {
-  static leveldb::ReadOptions options;
+  auto db = GetDB();
+  if (db == nullptr) {
+    return default_value;
+  }
 
+  static leveldb::ReadOptions options;
   std::string value;
-  const auto status = GetDB()->Get(options, key, &value);
-  CHECK(status.ok() || status.IsNotFound()) << status.ToString();
+  const auto status = db->Get(options, key, &value);
+  // Log error except IsNotFound.
+  AERROR_IF(!status.ok() && !status.IsNotFound()) << status.ToString();
   return status.ok() ? value : default_value;
 }
 
