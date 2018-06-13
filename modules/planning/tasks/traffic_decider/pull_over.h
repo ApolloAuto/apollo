@@ -54,7 +54,7 @@ class PullOver : public TrafficRule {
     OUT_OF_REFERENCE_LINE = 1,
     PASS_DEST_POINT_TOO_FAR = 2,
     BEHIND_ADC = 3,
-    PLAN_DISTANCE_NOT_ENOUGH = 4,
+    OPERATION_LENGTH_NOT_ENOUGH = 4,
     PARKING_SPOT_NOT_AVAIL = 5,
   };
 
@@ -68,7 +68,10 @@ class PullOver : public TrafficRule {
    */
   int GetPullOverStop(common::PointENU* stop_point);
 
-  bool OnOverlap(const double s);
+  /**
+   * check if on a crosswalk/junction/clear_area/speedbumper/etc overlap
+   */
+  bool OnOverlap(const double start_s, const double end_s);
 
   /**
    * Find a safe place to pull over based on the vehicle's current state.
@@ -85,8 +88,14 @@ class PullOver : public TrafficRule {
   ValidateStopPointCode IsValidStop(const common::PointENU& stop_point) const;
   ValidateStopPointCode IsValidStop(const common::SLPoint& stop_point_sl) const;
 
+  /**
+   * handle when pull-over is completed
+   */
   bool CheckPullOverComplete();
 
+  /**
+   * build stop decision
+   */
   int BuildPullOverStop(const common::PointENU& stop_point);
   int BuildInLaneStop(const common::PointENU& pull_over_stop_point);
   int BuildStopDecision(const std::string& vistual_obstacle_id_postfix,
