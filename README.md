@@ -18,6 +18,17 @@ Welcome to Apollo's GitHub page!
 
 For business and partnership, please visit [our website](http://apollo.auto).
 
+## Table of Contents
+1. [Getting Started](#getting-started)
+2. [Prerequisites](#prerequisites)
+    - [Basic Requirements](#basic-requirements)
+    - [Individual Version Requirements](#individual-version-requirements)
+3. [Architecture](#architecture)
+4. [Installation](#installation)
+5. [Documents](#documents)
+
+
+
 ## Getting Started
 
 **The Apollo Team now proudly presents to you the latest [version 2.5](https://github.com/ApolloAuto/apollo/releases/tag/v2.5.0).**
@@ -35,19 +46,19 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 * A machine with a 4-core processor and 6GB memory minimum
 
-* Ubuntu 14.0.4
+* Ubuntu 14.04
 
 * Working knowledge of Docker
 
-~~~ 
+
  - Please note, it is recommended that you install the versions of Apollo in the following order: 
- 1.0 > 1.5 > 2.0 > 2.5
+ **1.0 > 1.5 > 2.0 > 2.5**.
  The reason behind this recommendation is that you need to confirm whether individual hardware components 
  and modules are functioning correctly and clear various version test cases,
  before progressing to a higher more capable version for your safety and the safety of those around you.
 
- - Please note, if you do not have a vehicle, proceed to the Installation - without hardware 
-~~~
+ - Please note, if you do not have a vehicle, proceed to the [Installation - Without Hardware](#without-hardware) 
+
 
 #### Individual Version Requirements:
 
@@ -171,7 +182,8 @@ and we want to ensure Apollo 2.5 was integrated correctly with your vehicle befo
 
 * [Build and Release using Docker](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md) - This step is required
 
-* [Launch and Run Apollo](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/howto_launch_Apollo.md)
+* [Launch and Run Apollo](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_launch_Apollo.md)
+
 * [Apollo 1.0 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md)
 
 * [Apollo 1.5 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start.md)
@@ -186,7 +198,7 @@ and we want to ensure Apollo 2.5 was integrated correctly with your vehicle befo
 
 ## Documents
 
-* [HowTo](https://github.com/ApolloAuto/apollo/tree/master/docs/howto): A Brief technical solutions to common problems developers face during the installation and use of Apollo platform 
+* [HowTo](https://github.com/ApolloAuto/apollo/tree/master/docs/howto): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform 
 
 * [Specs](https://github.com/ApolloAuto/apollo/tree/master/docs/specs): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo) 
 
@@ -208,7 +220,7 @@ Please refer the Disclaimer of Apollo in [Apollo's official website](http://apol
 * [Have suggestions for our GitHub page?](https://github.com/ApolloAuto/apollo/issues)
 * [Twitter](https://twitter.com/apolloplatform)
 * [YouTube](https://www.youtube.com/channel/UC8wR_NX_NShUTSSqIaEUY9Q)
-* [Blog](www.medium.com/apollo-auto)
+* [Blog](https://www.medium.com/apollo-auto)
 * [Newsletter](http://eepurl.com/c-mLSz)
 
 

@@ -35,6 +35,7 @@
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/obstacle/onboard/radar_process_subnode.h"
 #include "modules/perception/obstacle/onboard/visualization_subnode.h"
+#include "modules/perception/obstacle/onboard/ultrasonic_obstacle_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_preprocessor_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_proc_subnode.h"
 
@@ -76,7 +77,8 @@ void Perception::RegistAllOnboardClass() {
   traffic_light::RegisterFactoryTLPreprocessingData();
 
   /// regist subnode
-  RegisterFactoryLidarProcessSubnode();
+  RegisterFactoryLidar64ProcessSubnode();
+  RegisterFactoryLidar16ProcessSubnode();
   RegisterFactoryRadarProcessSubnode();
   RegisterFactoryCameraProcessSubnode();
   RegisterFactoryCIPVSubnode();
@@ -84,6 +86,7 @@ void Perception::RegistAllOnboardClass() {
   RegisterFactoryAsyncFusionSubnode();
   RegisterFactoryFusionSubnode();
   RegisterFactoryMotionService();
+  RegisterFactoryUltrasonicObstacleSubnode();
   lowcostvisualizer::RegisterFactoryVisualizationSubnode();
   traffic_light::RegisterFactoryTLPreprocessorSubnode();
   traffic_light::RegisterFactoryTLProcSubnode();

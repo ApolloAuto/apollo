@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_  // NOLINT
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_  // NOLINT
 
+#include <Eigen/Eigenvalues>
 #include <map>
 #include <memory>
 #include <queue>
@@ -105,6 +106,7 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
                               const Eigen::Matrix4d& trans_matrix,
                               Eigen::Vector4d* state_pre,
                               Eigen::Matrix4d* cov_pre);
+  bool AdjustCovMatrix();
   // global
   Eigen::Vector3d belief_anchor_point_;
   Eigen::Vector3d belief_velocity_;
@@ -116,6 +118,8 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
 
   // the omega matrix
   Eigen::Matrix<double, 4, 4> omega_matrix_;
+  // the omega matrix inverse which is equal to covariance matrix
+  Eigen::Matrix<double, 4, 4> cov_matrix_;
   // the state vector is information matrix: cov.inverse() * state
   Eigen::Matrix<double, 4, 1> xi_;
   // the state-transition matrix
@@ -124,6 +128,10 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   Eigen::Matrix<double, 4, 4> c_matrix_;
   // the covariance of the process noise
   Eigen::Matrix<double, 4, 4> q_matrix_;
+  // eigen value solver
+  Eigen::SelfAdjointEigenSolver<Eigen::Matrix4d> es_;
+  // min cov eigen threshold
+  double cov_eigen_thresh_ = 1.0f;
 };
 
 }  // namespace perception
