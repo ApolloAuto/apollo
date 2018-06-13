@@ -1,0 +1,41 @@
+<launch>
+  <arg name="child_frame_id" default="lslidar"/>
+  <arg name="nodelet_manager_name" value="lslidar_nodelet_manager" />
+  <arg name="device_ip" value="192.168.1.200"/>
+  <arg name="firing_port" value="2368"/>
+  <arg name="topic_packet" default="/apollo/sensor/lslidar/LslidarPacket"/>
+  <arg name="topic_pointcloud" default="/apollo/sensor/lslidar/PointCloud2"/>
+  
+    <!-- nodelet manager -->
+  <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager_name)" output="screen"
+        args="manager" />
+
+    <!-- nodelet driver for lslidar -->
+  <node pkg="nodelet" type="nodelet"
+    name="lslidar_driver_nodelet"
+    args="load lslidar_driver/LslidarDriverNodelet
+    $(arg nodelet_manager_name)" >
+    <param name="frame_id" value="lslidar"/>
+    <param name="device_ip" value="$(arg device_ip)"/>
+    <param name="device_port" value="$(arg firing_port)"/>
+    <remap from="lslidar_packet" to="$(arg topic_packet)"/>
+  </node>
+  
+
+  <node pkg="nodelet" type="nodelet" name="lslidar_decoder_nodelet"
+    args="load lslidar_decoder/LslidarDecoderNodelet
+    $(arg nodelet_manager_name)"
+    output="screen">
+    <param name="child_frame_id" value="$(arg child_frame_id)"/>
+    <param name="min_range" value="0.3"/>
+    <param name="max_range" value="100.0"/>
+    <param name="frequency" value="10.0"/>
+    <param name="publish_point_cloud" value="true"/>
+    <param name="publish_channels" value="false"/>
+    <remap from="lslidar_packet" to="$(arg topic_packet)"/>
+    <remap from="lslidar_point_cloud" to="$(arg topic_pointcloud)"/>
+  </node>
+  
+ <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find lslidar_decoder)/launch/lslidar.rviz" output="screen"/>
+-->
+</launch>

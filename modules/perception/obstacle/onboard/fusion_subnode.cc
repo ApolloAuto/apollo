@@ -426,6 +426,18 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
 
   for (const auto &obj : objects_) {
     PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
+    // add CIPV
+    if (obj->b_cipv == true) {
+      CIPVInfo *cipv = obstacles->mutable_cipv_info();
+      cipv->set_cipv_id(obj->track_id);
+    }
+    // add drops
+    for (size_t i = 0; i < obj->drops.size(); i++) {
+      Point *drops = obstacle->add_drops();
+      drops->set_x(obj->drops[i][0]);
+      drops->set_y(obj->drops[i][1]);
+      drops->set_z(obj->drops[i][2]);
+    }
     obj->Serialize(obstacle);
   }
 
