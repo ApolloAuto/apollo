@@ -67,7 +67,8 @@ class BaseCameraDetector {
                          cv::Mat* mask) {
     return true;
   }
-
+  
+  virtual bool Lanetask(const cv::Mat &frame, cv::Mat *mask) { return true; }
   // @brief: Extract deep learning ROI features for each object
   // @param [in/out]: detected objects, with 2D bbox and its features
   virtual bool Extract(std::vector<std::shared_ptr<VisualObject>>* objects) = 0;
