@@ -117,7 +117,8 @@ bool VisualizationSubnode::InitInternal() {
       AERROR << "Failed to get LaneSharedData.";
       return false;
     }
-    AINFO << "Init shared data successfully, data: " << lane_shared_data_->name();
+    AINFO << "Init shared data successfully, data: "
+          << lane_shared_data_->name();
   }
 
   // init frame_visualizer
