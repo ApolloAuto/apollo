@@ -152,6 +152,16 @@ class CameraCalibration {
     std::lock_guard<std::mutex> lock(adj_mtx_);
     camera2car_adj_ = matrix;
     adjusted_extrinsic_ = adjusted;
+
+    auto camera_intrinsic_inverse = camera_intrinsic_.block(0, 0, 3, 3).inverse();
+    auto car2camera_3_4 = (camera2car_adj_.inverse()).block(0, 0, 3, 4);
+    Eigen::Matrix3d camera_2car_stripped;
+    camera_2car_stripped.col(0) = car2camera_3_4.col(0);
+    camera_2car_stripped.col(1) = car2camera_3_4.col(1);
+    camera_2car_stripped.col(2) = car2camera_3_4.col(3);
+
+    homography_camera2car_adj_ =
+     camera_2car_stripped.inverse() * camera_intrinsic_inverse;
   }
 
   bool GetCar2CameraExtrinsicsAdj(Eigen::Matrix<double, 4, 4>* matrix) {
@@ -166,8 +176,9 @@ class CameraCalibration {
 
   inline CameraDistortPtr get_camera_model() { return camera_model_; }
 
-  //
   Eigen::Matrix<double, 3, 3> get_camera2car_homography_mat() {
+    std::lock_guard<std::mutex> lock(adj_mtx_);
+    if (adjusted_extrinsic_) return homography_camera2car_adj_;
     return homography_mat_;
   }
 
@@ -201,7 +212,7 @@ class CameraCalibration {
   std::mutex adj_mtx_;
   bool adjusted_extrinsic_ = false;
   Eigen::Matrix<double, 4, 4> camera2car_adj_;
-
+  Eigen::Matrix<double, 3, 3> homography_camera2car_adj_;
 
   Eigen::Matrix<double, 3, 4> camera_projection_mat_;
   Eigen::Matrix<double, 3, 3>
