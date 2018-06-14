@@ -47,23 +47,25 @@ bool VisualizationSubnode::InitInternal() {
   }
 
   // init camera object data
-  camera_object_data_ = dynamic_cast<CameraObjectData*>(
-      shared_data_manager_->GetSharedData("CameraObjectData"));
-  if (camera_object_data_ == nullptr) {
-    AERROR << "Failed to get CameraObjectData.";
-    return false;
-  }
-  AINFO << "Init shared datas successfully, data: "
-        << camera_object_data_->name();
+  if (camera_event_id_ != -1 || fusion_event_id_ != -1) {
+    camera_object_data_ = dynamic_cast<CameraObjectData*>(
+        shared_data_manager_->GetSharedData("CameraObjectData"));
+    if (camera_object_data_ == nullptr) {
+      AERROR << "Failed to get CameraObjectData.";
+      return false;
+    }
+    AINFO << "Init shared datas successfully, data: "
+          << camera_object_data_->name();
 
-  camera_shared_data_ = dynamic_cast<CameraSharedData*>(
-      shared_data_manager_->GetSharedData("CameraSharedData"));
-  if (camera_shared_data_ == nullptr) {
-    AERROR << "Failed to get CameraSharedData.";
-    return false;
+    camera_shared_data_ = dynamic_cast<CameraSharedData*>(
+        shared_data_manager_->GetSharedData("CameraSharedData"));
+    if (camera_shared_data_ == nullptr) {
+      AERROR << "Failed to get CameraSharedData.";
+      return false;
+    }
+    AINFO << "Init shared datas successfully, data: "
+          << camera_shared_data_->name();
   }
-  AINFO << "Init shared datas successfully, data: "
-        << camera_shared_data_->name();
 
   // init cipv object data
   if (cipv_event_id_ != -1) {
@@ -78,7 +80,7 @@ bool VisualizationSubnode::InitInternal() {
   }
 
   //  init radar object data
-  if (radar_event_id_!= -1) {
+  if (radar_event_id_ != -1 || fusion_event_id_ != -1) {
     radar_object_data_ = dynamic_cast<RadarObjectData*>(
         shared_data_manager_->GetSharedData("RadarObjectData"));
     if (radar_object_data_ == nullptr) {
@@ -110,7 +112,7 @@ bool VisualizationSubnode::InitInternal() {
     }
   }
 
-  if (lane_event_id_ != -1) {
+  if (lane_event_id_ != -1 || fusion_event_id_ != -1) {
     lane_shared_data_ = dynamic_cast<LaneSharedData*>(
         shared_data_manager_->GetSharedData("LaneSharedData"));
     if (lane_shared_data_ == nullptr) {
