@@ -115,12 +115,17 @@ void ObjectCameraFilter::Predict(const int track_id, const double timestamp) {
   Eigen::Matrix<float, 2, 2> fx =
       tracked_filters_[track_id].x_.GetTransitionMatrix();
   fx(0, 1) = diff;
+  tracked_filters_[track_id].x_.SetTransitionMatrix(fx);
+
   Eigen::Matrix<float, 2, 2> fy =
       tracked_filters_[track_id].y_.GetTransitionMatrix();
   fy(0, 1) = diff;
+  tracked_filters_[track_id].y_.SetTransitionMatrix(fy);
+
   Eigen::Matrix<float, 2, 2> ft =
       tracked_filters_[track_id].theta_.GetTransitionMatrix();
   ft(0, 1) = diff;
+  tracked_filters_[track_id].theta_.SetTransitionMatrix(ft);
 
   tracked_filters_[track_id].x_.Predict();
   tracked_filters_[track_id].y_.Predict();
