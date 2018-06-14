@@ -310,8 +310,8 @@ bool YoloCameraDetector::init_cnn_lane(const string &yolo_root) {
   }
 
   // init feature
-  if (!cnnadapter_lane_->init(input_names, output_names, proto_file, weight_file,
-                         FLAGS_obs_camera_detector_gpu, model_root)) {
+  if (!cnnadapter_lane_->init(input_names, output_names, proto_file,
+            weight_file, FLAGS_obs_camera_detector_gpu, model_root)) {
     return false;
   }
 
@@ -367,22 +367,21 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame, cv::Mat *mask) {
   int roi_h = frame.rows - offset_y_;
   cv::Rect roi(0, offset_y_, roi_w, roi_h);
   cv::Mat img(frame, roi);
-  // AINFO << "***** input size: " << lane_output_height_lane_ << " " <<  lane_output_width_lane_;
-  cv::resize(img, img, cv::Size(lane_output_height_lane_, lane_output_width_lane_), 0, 0);
-  auto input_blob =
-      cnnadapter_lane_->get_blob_by_name(lane_param_.net_param().input_blob());
-  
-  // TODO: how to resize?
+  cv::resize(img, img, cv::Size(lane_output_height_lane_,
+                        lane_output_width_lane_), 0, 0);
+  auto input_blob = cnnadapter_lane_->
+          get_blob_by_name(lane_param_.net_param().input_blob());
+
   resize(img, input_blob.get(), image_data_lane_, 0);
-  
   pre_time.Stop();
+
   AINFO << "Pre-processing: " << pre_time.MilliSeconds() << " ms";
 
   caffe::Timer det_time;
   det_time.Start();
   cnnadapter_lane_->forward();
   AINFO << "Running detection lane: " << det_time.MilliSeconds() << " ms";
-  
+
   caffe::Timer post_time;
   post_time.Start();
 
@@ -396,17 +395,17 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame, cv::Mat *mask) {
 
   *mask = cv::Mat(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
   cv::Mat tmp(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
-  memcpy(tmp.data,
-         seg_blob->cpu_data() + lane_output_width_lane_ * lane_output_height_lane_,
+  memcpy(tmp.data, seg_blob->cpu_data() +
+        lane_output_width_lane_ * lane_output_height_lane_,
          lane_output_width_lane_ * lane_output_height_lane_ * sizeof(float));
-  
+
   cv::resize(tmp, tmp, cv::Size(960, 384), 0, 0);
   // cv::threshold( tmp, tmp, confidence_threshold_lane_, 1, 0 );
   // select a region of interest
   // AINFO << "***** ignored_height = " << ignored_height_;
   cv::Mat tRoi = tmp(cv::Rect(330, 0, 300, ignored_height_));
   tRoi.setTo(0);
-  
+
   *mask = tmp;
   // AINFO << "Post detection lane: " << post_time.MilliSeconds() << " ms";
   // store image
