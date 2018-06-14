@@ -19,6 +19,7 @@ Welcome to Apollo's GitHub page!
 For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Table of Contents
+
 1. [Getting Started](#getting-started)
 2. [Prerequisites](#prerequisites)
     - [Basic Requirements](#basic-requirements)

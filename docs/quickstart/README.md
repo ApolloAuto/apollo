@@ -2,8 +2,10 @@
 
 ## Apollo 2.5
 
-- [apollo 2.5 quick start](apollo_2_5_quick_start.md)
-- [apollo 2.5 quick start cn](apollo_2_5_quick_start_cn.md)
+- [Apollo 2.5 quick start](apollo_2_5_quick_start.md)
+- [Apollo 2.5 quick start cn](apollo_2_5_quick_start_cn.md)
+- [Apollo 2.5 map collection guide](apollo_2_5_map_collection_guide.md)
+- [Apollo 2.5 map collection guide cn](apollo_2_5_map_collection_guide_cn.md)
 
 ## Apollo 2.0
 
