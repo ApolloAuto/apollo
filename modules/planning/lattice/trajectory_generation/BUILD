@@ -105,4 +105,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "piecewise_braking_trajectory_generator",
+    srcs = [
+        "piecewise_braking_trajectory_generator.cc",
+    ],
+    hdrs = [
+        "piecewise_braking_trajectory_generator.h",
+    ],
+    deps = [
+        "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
+        "//modules/common",
+        "//modules/planning/math/curve1d",
+    ],
+)
+
 cpplint()
