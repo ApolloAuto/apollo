@@ -159,10 +159,10 @@ enum zynq_baudrate_val {
 /* GPS update ioctl cmds */
 #define	ZYNQ_GPS_VAL_SZ			12
 #define	ZYNQ_IOC_GPS_GET		\
-  _IOR(ZYNQ_IOC_MAGIC, IOC_GPS_GET,  unsigned char *)
+    _IOR(ZYNQ_IOC_MAGIC, IOC_GPS_GET,  unsigned char *)
 #define ZYNQ_GPS_GPRMC_VAL_SZ		68
 #define	ZYNQ_IOC_GPS_GPRMC_GET		\
-		_IOR(ZYNQ_IOC_MAGIC, IOC_GPS_GPRMC_GET, unsigned char *)
+    _IOR(ZYNQ_IOC_MAGIC, IOC_GPS_GPRMC_GET, unsigned char *)
 
 /* Trigger ioctl cmds */
 #define	ZYNQ_IOC_TRIGGER_DISABLE	\
@@ -420,12 +420,12 @@ typedef struct zynq_video_ext_meta_data {
     unsigned int usec:20;
     unsigned int :12;
     unsigned int sec;
-	} time_stamp;
+  } time_stamp;
   unsigned char rsv1[4];
   struct {
     unsigned short us_cnt:12;
     unsigned short sec:4;
-	} debug_ts;
+  } debug_ts;
   unsigned char rsv2[13];
   unsigned char error;
 } zynq_video_ext_meta_data_t;
