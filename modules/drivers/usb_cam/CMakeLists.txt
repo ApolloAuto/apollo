@@ -101,7 +101,7 @@ install(DIRECTORY launch/
 ## Copy libjsoncpp.so 
 install(DIRECTORY ../../../third_party/jsoncpp/lib/
   DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  FILES_MATCHING PATTERN "*.so"
+  FILES_MATCHING PATTERN "*.so*"
 )
 
 install(DIRECTORY params/
