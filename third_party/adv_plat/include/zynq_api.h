@@ -49,117 +49,117 @@
  * ioctl argument defintion for CAN send/recv
  */
 typedef struct ioc_bcan_msg {
-	bcan_msg_t	*ioc_msgs;
-	unsigned int	ioc_msg_num;
-	unsigned int	ioc_msg_num_done;
-	int		ioc_msg_err;
-	int		ioc_msg_rx_clear;
+  bcan_msg_t *ioc_msgs;
+  unsigned int ioc_msg_num;
+  unsigned int ioc_msg_num_done;
+  int ioc_msg_err;
+  int ioc_msg_rx_clear;
 } ioc_bcan_msg_t;
 
 /*
  * CAN error and status
  */
 typedef struct ioc_bcan_status_err {
-	unsigned int	bcan_status;
-	unsigned int	bcan_err_status;
-	unsigned int	bcan_err_count;
-	int		bcan_ioc_err;
+  unsigned int bcan_status;
+  unsigned int bcan_err_status;
+  unsigned int bcan_err_count;
+  int bcan_ioc_err;
 } ioc_bcan_status_err_t;
 
 /* ioctl command list */
 #define	ZYNQ_IOC_MAGIC	('z' << 12 | 'y' << 8 | 'n' << 4 | 'q')
 enum ZYNQ_IOC_GPS_CMD {
-	IOC_GPS_GET = 1,
-	IOC_GPS_GPRMC_GET,
-	IOC_GPS_CMD_MAX
+  IOC_GPS_GET = 1,
+  IOC_GPS_GPRMC_GET,
+  IOC_GPS_CMD_MAX
 };
 
 enum ZYNQ_IOC_TRIGGER_CMD {
-	IOC_TRIGGER_DISABLE = IOC_GPS_CMD_MAX,
-	IOC_TRIGGER_ENABLE_GPS,
-	IOC_TRIGGER_ENABLE_NOGPS,
-	IOC_TRIGGER_ENABLE_ONE_GPS,
-	IOC_TRIGGER_ENABLE_ONE_NOGPS,
-	IOC_TRIGGER_TIMESTAMP,
-	IOC_TRIGGER_STATUS,
-	IOC_TRIGGER_STATUS_GPS,
-	IOC_TRIGGER_STATUS_PPS,
-	IOC_TRIGGER_FPS_SET,
-	IOC_TRIGGER_FPS_GET,
-	IOC_TRIGGER_CMD_MAX
+  IOC_TRIGGER_DISABLE = IOC_GPS_CMD_MAX,
+  IOC_TRIGGER_ENABLE_GPS,
+  IOC_TRIGGER_ENABLE_NOGPS,
+  IOC_TRIGGER_ENABLE_ONE_GPS,
+  IOC_TRIGGER_ENABLE_ONE_NOGPS,
+  IOC_TRIGGER_TIMESTAMP,
+  IOC_TRIGGER_STATUS,
+  IOC_TRIGGER_STATUS_GPS,
+  IOC_TRIGGER_STATUS_PPS,
+  IOC_TRIGGER_FPS_SET,
+  IOC_TRIGGER_FPS_GET,
+  IOC_TRIGGER_CMD_MAX
 };
 
 enum ZYNQ_IOC_FW_CMD {
-	IOC_FW_IMAGE_UPLOAD_START = IOC_TRIGGER_CMD_MAX,
-	IOC_FW_IMAGE_UPLOAD,
-	IOC_FW_PL_UPDATE, /* PL FPGA FW image update */
-	IOC_FW_PS_UPDATE, /* PS OS image update */
-	IOC_FW_GET_VER, /* get the image version */
-	IOC_FW_CMD_MAX
+  IOC_FW_IMAGE_UPLOAD_START = IOC_TRIGGER_CMD_MAX,
+  IOC_FW_IMAGE_UPLOAD,
+  IOC_FW_PL_UPDATE, /* PL FPGA FW image update */
+  IOC_FW_PS_UPDATE, /* PS OS image update */
+  IOC_FW_GET_VER, /* get the image version */
+  IOC_FW_CMD_MAX
 };
 
 enum ZYNQ_IOC_CAN_CMD {
-	IOC_CAN_TX_TIMEOUT_SET = IOC_FW_CMD_MAX, /* in milli-seconds */
-	IOC_CAN_RX_TIMEOUT_SET,	/* in milli-seconds */
-	IOC_CAN_DEV_START,
-	IOC_CAN_DEV_STOP,
-	IOC_CAN_DEV_RESET,
-	IOC_CAN_ID_ADD,
-	IOC_CAN_ID_DEL,
-	IOC_CAN_BAUDRATE_SET,
-	IOC_CAN_BAUDRATE_GET,
-	IOC_CAN_LOOPBACK_SET,
-	IOC_CAN_LOOPBACK_UNSET,
-	IOC_CAN_RECV,
-	IOC_CAN_SEND,
-	IOC_CAN_SEND_HIPRI,
-	IOC_CAN_GET_STATUS_ERR,
-	IOC_CAN_CMD_MAX
+  IOC_CAN_TX_TIMEOUT_SET = IOC_FW_CMD_MAX, /* in milli-seconds */
+  IOC_CAN_RX_TIMEOUT_SET,	/* in milli-seconds */
+  IOC_CAN_DEV_START,
+  IOC_CAN_DEV_STOP,
+  IOC_CAN_DEV_RESET,
+  IOC_CAN_ID_ADD,
+  IOC_CAN_ID_DEL,
+  IOC_CAN_BAUDRATE_SET,
+  IOC_CAN_BAUDRATE_GET,
+  IOC_CAN_LOOPBACK_SET,
+  IOC_CAN_LOOPBACK_UNSET,
+  IOC_CAN_RECV,
+  IOC_CAN_SEND,
+  IOC_CAN_SEND_HIPRI,
+  IOC_CAN_GET_STATUS_ERR,
+  IOC_CAN_CMD_MAX
 };
 
 enum ZYNQ_IOC_REG_CMD {
-	IOC_REG_READ = IOC_CAN_CMD_MAX,
-	IOC_REG_WRITE,
-	IOC_REG_I2C_READ,
-	IOC_REG_I2C_WRITE,
-	IOC_REG_GPSPPS_EVENT_WAIT,
-	IOC_REG_CMD_MAX
+  IOC_REG_READ = IOC_CAN_CMD_MAX,
+  IOC_REG_WRITE,
+  IOC_REG_I2C_READ,
+  IOC_REG_I2C_WRITE,
+  IOC_REG_GPSPPS_EVENT_WAIT,
+  IOC_REG_CMD_MAX
 };
 
 enum ZYNQ_IOC_TRIGGER_EXT_CMD {
-	IOC_TRIGGER_INIT_USB = IOC_REG_CMD_MAX,
-	IOC_TRIGGER_ENABLE_ONE,
-	IOC_TRIGGER_DISABLE_ONE,
-	IOC_TRIGGER_ENABLE,
-	IOC_TRIGGER_DELAY_SET,
-	IOC_TRIGGER_DELAY_GET,
-	IOC_TRIGGER_DEV_NAME,
-	IOC_TRIGGER_EXT_MAX
+  IOC_TRIGGER_INIT_USB = IOC_REG_CMD_MAX,
+  IOC_TRIGGER_ENABLE_ONE,
+  IOC_TRIGGER_DISABLE_ONE,
+  IOC_TRIGGER_ENABLE,
+  IOC_TRIGGER_DELAY_SET,
+  IOC_TRIGGER_DELAY_GET,
+  IOC_TRIGGER_DEV_NAME,
+  IOC_TRIGGER_EXT_MAX
 };
 
 enum ZYNQ_IOC_CAM_CMD {
-	IOC_CAM_REG_READ = IOC_TRIGGER_EXT_MAX,
-	IOC_CAM_REG_WRITE,
-	IOC_CAM_FLASH_INIT,
-	IOC_CAM_FLASH_FINI,
-	IOC_CAM_FLASH_READ,
-	IOC_CAM_FLASH_WRITE,
-	IOC_CAM_CAPS,
-	IOC_CAM_RESET
+  IOC_CAM_REG_READ = IOC_TRIGGER_EXT_MAX,
+  IOC_CAM_REG_WRITE,
+  IOC_CAM_FLASH_INIT,
+  IOC_CAM_FLASH_FINI,
+  IOC_CAM_FLASH_READ,
+  IOC_CAM_FLASH_WRITE,
+  IOC_CAM_CAPS,
+  IOC_CAM_RESET
 };
 
 enum zynq_baudrate_val {
-	ZYNQ_BAUDRATE_1M,
-	ZYNQ_BAUDRATE_500K,
-	ZYNQ_BAUDRATE_250K,
-	ZYNQ_BAUDRATE_150K,
-	ZYNQ_BAUDRATE_NUM
+  ZYNQ_BAUDRATE_1M,
+  ZYNQ_BAUDRATE_500K,
+  ZYNQ_BAUDRATE_250K,
+  ZYNQ_BAUDRATE_150K,
+  ZYNQ_BAUDRATE_NUM
 };
 
 /* GPS update ioctl cmds */
 #define	ZYNQ_GPS_VAL_SZ			12
 #define	ZYNQ_IOC_GPS_GET		\
-		_IOR(ZYNQ_IOC_MAGIC, IOC_GPS_GET,  unsigned char *)
+  _IOR(ZYNQ_IOC_MAGIC, IOC_GPS_GET,  unsigned char *)
 #define ZYNQ_GPS_GPRMC_VAL_SZ		68
 #define	ZYNQ_IOC_GPS_GPRMC_GET		\
 		_IOR(ZYNQ_IOC_MAGIC, IOC_GPS_GPRMC_GET, unsigned char *)
@@ -223,9 +223,9 @@ enum zynq_baudrate_val {
 #define	ZYNQ_CAM_FW_BLOCK_SIZE	250
 
 typedef struct zynq_cam_fw {
-	unsigned char	*data;
-	unsigned int	size;
-	unsigned int	address;
+  unsigned char	*data;
+  unsigned int	size;
+  unsigned int	address;
 } zynq_cam_fw_t;
 
 #define	ZYNQ_TRIGGER_DEV_NUM	4
@@ -272,25 +272,25 @@ typedef struct zynq_cam_fw {
  *  ...
  */
 typedef struct zynq_trigger {
-	unsigned char	id;		/* Trigger id */
-	unsigned char	fps;		/* Frame-Per-Second */
-	unsigned char	internal;	/* 1: Internal PPS; 0: GPS PPS */
-	unsigned char	enabled;	/* 1: Enabled; 0: Disabled */
-	unsigned int	trigger_delay;
-	unsigned int	exposure_time;
-	/* Video number, e.g. 0 for /dev/video0 */
-	int		vnum;
+  unsigned char	id;		/* Trigger id */
+  unsigned char	fps;		/* Frame-Per-Second */
+  unsigned char	internal;	/* 1: Internal PPS; 0: GPS PPS */
+  unsigned char	enabled;	/* 1: Enabled; 0: Disabled */
+  unsigned int	trigger_delay;
+  unsigned int	exposure_time;
+  /* Video number, e.g. 0 for /dev/video0 */
+  int		vnum;
 	/* Camera name, e.g. AR023ZWDR(Rev663) */
-	char		name[ZYNQ_VDEV_NAME_LEN];
+  char		name[ZYNQ_VDEV_NAME_LEN];
 } zynq_trigger_t;
 
 /*
  * Camera trigger delay, currently used by sensor_sync
  */
 typedef struct zynq_trigger_delay {
-	int vnum;
-	unsigned int trigger_delay;
-	unsigned int exposure_time;
+  int vnum;
+  unsigned int trigger_delay;
+  unsigned int exposure_time;
 } zynq_trigger_delay_t;
 
 /* FW update ioctl cmds */
@@ -301,10 +301,10 @@ typedef struct ioc_zynq_fw_upload {
 	 * image data size must be multiple of 4 as each polling transfer is in
 	 * 16-byte, so padding the data if needed.
 	 */
-	unsigned int	*ioc_zynq_fw_data;
-	unsigned int	ioc_zynq_fw_num;
-	unsigned int	ioc_zynq_fw_done;
-	int		ioc_zynq_fw_err;
+  unsigned int	*ioc_zynq_fw_data;
+  unsigned int	ioc_zynq_fw_num;
+  unsigned int	ioc_zynq_fw_done;
+  int		ioc_zynq_fw_err;
 } ioc_zynq_fw_upload_t;
 
 #define	ZYNQ_IOC_FW_IMAGE_UPLOAD_START	\
@@ -367,9 +367,9 @@ typedef struct ioc_zynq_fw_upload {
 
 /* register read/write ioctl cmds */
 typedef struct ioc_zynq_reg_acc {
-	unsigned int	reg_bar;
-	unsigned int	reg_offset;
-	unsigned int	reg_data;
+  unsigned int	reg_bar;
+  unsigned int	reg_offset;
+  unsigned int	reg_data;
 } ioc_zynq_reg_acc_t;
 
 /* I2C ID definitions */
@@ -377,18 +377,18 @@ typedef struct ioc_zynq_reg_acc {
 #define	ZYNQ_I2C_ID_MAX		0x7f /* 7-bit */
 
 typedef struct ioc_zynq_i2c_acc {
-	unsigned char	i2c_id; /* 7-bit */
-	unsigned char	i2c_addr_hi;
-	unsigned char	i2c_addr;
-	unsigned char	i2c_data;
-	unsigned char	i2c_addr_16;
-	unsigned char	i2c_bus;
+  unsigned char	i2c_id; /* 7-bit */
+  unsigned char	i2c_addr_hi;
+  unsigned char	i2c_addr;
+  unsigned char	i2c_data;
+  unsigned char	i2c_addr_16;
+  unsigned char	i2c_bus;
 } ioc_zynq_i2c_acc_t;
 
 typedef struct zynq_cam_acc {
-	unsigned short	addr;
-	unsigned short	data_sz;
-	unsigned int	data;
+  unsigned short	addr;
+  unsigned short	data_sz;
+  unsigned int	data;
 } zynq_cam_acc_t;
 
 #define	ZYNQ_IOC_REG_READ		\
@@ -415,19 +415,19 @@ typedef struct zynq_cam_acc {
 	(ext->error & ~(unsigned char)ZVIDEO_EXT_ERR_ALL))
 
 typedef struct zynq_video_ext_meta_data {
-	unsigned int trigger_cnt;
-	struct {
-		unsigned int usec:20;
-		unsigned int :12;
-		unsigned int sec;
+  unsigned int trigger_cnt;
+  struct {
+    unsigned int usec:20;
+    unsigned int :12;
+    unsigned int sec;
 	} time_stamp;
-	unsigned char rsv1[4];
-	struct {
-		unsigned short us_cnt:12;
-		unsigned short sec:4;
+  unsigned char rsv1[4];
+  struct {
+    unsigned short us_cnt:12;
+    unsigned short sec:4;
 	} debug_ts;
-	unsigned char rsv2[13];
-	unsigned char error;
+  unsigned char rsv2[13];
+  unsigned char error;
 } zynq_video_ext_meta_data_t;
 
 /* Trigger mode */
@@ -448,15 +448,15 @@ typedef struct zynq_video_ext_meta_data {
 
 /* Camera capabilities */
 typedef struct zynq_camera_capabilities {
-	char		name[ZYNQ_VDEV_NAME_LEN];
-	char		trigger_mode;
-	char		embedded_data;
-	unsigned char	link_up;
-	unsigned char	interface_type;
-	unsigned char	timestamp_type;
-	unsigned short	frame_len_lines;
-	unsigned short	line_len_pck;
-	unsigned int	pixel_clock;
+  char		name[ZYNQ_VDEV_NAME_LEN];
+  char		trigger_mode;
+  char		embedded_data;
+  unsigned char	link_up;
+  unsigned char	interface_type;
+  unsigned char	timestamp_type;
+  unsigned short	frame_len_lines;
+  unsigned short	line_len_pck;
+  unsigned int	pixel_clock;
 } zynq_cam_caps_t;
 
 /* Fixed embedded data header: 00 0A 00 AA 00 30 00 A5 00 00 00 5A */
