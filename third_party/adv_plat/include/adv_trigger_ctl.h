@@ -61,10 +61,10 @@ extern "C" {
  *  non-0: there is an error.
  */
 int adv_trigger_enable(const char *video_path,
-	unsigned char fps, unsigned char internal);
+    unsigned char fps, unsigned char internal);
 int adv_trigger_disable(const char *video_path);
 int adv_trigger_delay_ctl(const char *video_path, int action,
-	unsigned int *trigger_delay, unsigned int *exp_time);
+    unsigned int *trigger_delay, unsigned int *exp_time);
 
 #define	FLAG_GPS_VALID		(1 << 0)
 #define	FLAG_PPS_VALID		(1 << 1)
@@ -73,10 +73,10 @@ int adv_trigger_delay_ctl(const char *video_path, int action,
 struct adv_zynq_status {
   struct {
     int flags;
-		char zdev_name[ZYNQ_DEV_NAME_LEN];
-		zynq_trigger_t fpd_triggers[ZYNQ_FPD_TRIG_NUM];
-		zynq_trigger_t usb_triggers[ZYNQ_USB_TRIG_NUM];
-	} status[ZYNQ_TRIGGER_DEV_NUM];
+    char zdev_name[ZYNQ_DEV_NAME_LEN];
+    zynq_trigger_t fpd_triggers[ZYNQ_FPD_TRIG_NUM];
+    zynq_trigger_t usb_triggers[ZYNQ_USB_TRIG_NUM];
+  } status[ZYNQ_TRIGGER_DEV_NUM];
 };
 
 /*
