@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-#include "linux/zynq_api.h"
+#include "zynq_api.h"
 
 #define	LIB_NAME	"adv_trigger"
 
