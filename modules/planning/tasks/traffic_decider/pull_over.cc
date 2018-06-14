@@ -40,7 +40,6 @@ using apollo::common::PointENU;
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::HDMapUtil;
-using apollo::hdmap::LaneSegment;
 using apollo::hdmap::PathOverlap;
 using apollo::perception::PerceptionObstacle;
 using apollo::planning::util::GetPlanningStatus;
@@ -123,7 +122,7 @@ PullOver::ValidateStopPointCode PullOver::IsValidStop(
         reference_line_info_->AdcSlBoundary().end_s();
     if (stop_point_sl.s() - adc_front_edge_s <
         config_.pull_over().operation_length()) {
-      return PLAN_DISTANCE_NOT_ENOUGH;
+      return OPERATION_LENGTH_NOT_ENOUGH;
     }
   }
 
@@ -233,16 +232,19 @@ int PullOver::GetPullOverStop(PointENU* stop_point) {
 /**
  * @brief: check if s is on overlaps
  */
-bool PullOver::OnOverlap(const double s) {
+bool PullOver::OnOverlap(const double start_s, const double end_s) {
   const auto& reference_line = reference_line_info_->reference_line();
 
   // crosswalk
   const std::vector<PathOverlap>& crosswalk_overlaps =
       reference_line.map_path().crosswalk_overlaps();
   for (const auto& crosswalk_overlap : crosswalk_overlaps) {
-    if (s >= crosswalk_overlap.start_s && s <= crosswalk_overlap.end_s) {
-      ADEBUG << "s[" << s << "] on crosswalk_overlap["
-          << crosswalk_overlap.object_id << "]";
+    if (start_s <= crosswalk_overlap.end_s &&
+        end_s >= crosswalk_overlap.start_s) {
+      ADEBUG << "s[" << start_s << ", " << end_s << "] on crosswalk_overlap["
+          << crosswalk_overlap.object_id << "] s["
+          << crosswalk_overlap.start_s
+          << ", " << crosswalk_overlap.end_s << "]";
       return true;
     }
   }
@@ -251,9 +253,12 @@ bool PullOver::OnOverlap(const double s) {
   const std::vector<PathOverlap>& junction_overlaps =
       reference_line.map_path().junction_overlaps();
   for (const auto& junction_overlap : junction_overlaps) {
-    if (s >= junction_overlap.start_s && s <= junction_overlap.end_s) {
-      ADEBUG << "s[" << s << "] on junction_overlap["
-          << junction_overlap.object_id << "]";
+    if (start_s <= junction_overlap.end_s &&
+        end_s >= junction_overlap.start_s) {
+      ADEBUG << "s[" << start_s << ", " << end_s << "] on junction_overlap["
+          << junction_overlap.object_id << "] s["
+          << junction_overlap.start_s
+          << ", " << junction_overlap.end_s << "]";
       return true;
     }
   }
@@ -262,9 +267,12 @@ bool PullOver::OnOverlap(const double s) {
   const std::vector<PathOverlap>& clear_area_overlaps =
       reference_line.map_path().clear_area_overlaps();
   for (const auto& clear_area_overlap : clear_area_overlaps) {
-    if (s >= clear_area_overlap.start_s && s <= clear_area_overlap.end_s) {
-      ADEBUG << "s[" << s << "] on clear_area_overlap["
-          << clear_area_overlap.object_id << "]";
+    if (start_s <= clear_area_overlap.end_s &&
+        end_s >= clear_area_overlap.start_s) {
+      ADEBUG << "s[" << start_s << ", " << end_s << "] on clear_area_overlap["
+          << clear_area_overlap.object_id << "] s["
+          << clear_area_overlap.start_s
+          << ", " << clear_area_overlap.end_s << "]";
       return true;
     }
   }
@@ -273,9 +281,12 @@ bool PullOver::OnOverlap(const double s) {
   const std::vector<PathOverlap>& speed_bump_overlaps =
       reference_line.map_path().speed_bump_overlaps();
   for (const auto& speed_bump_overlap : speed_bump_overlaps) {
-    if (s >= speed_bump_overlap.start_s && s <= speed_bump_overlap.end_s) {
-      ADEBUG << "s[" << s << "] on speed_bump_overlap["
-          << speed_bump_overlap.object_id << "]";
+    if (start_s <= speed_bump_overlap.end_s &&
+        end_s >= speed_bump_overlap.start_s) {
+      ADEBUG << "s[" << start_s << ", " << end_s << "] on speed_bump_overlap["
+          << speed_bump_overlap.object_id << "] s["
+          << speed_bump_overlap.start_s
+          << ", " << speed_bump_overlap.end_s << "]";
       return true;
     }
   }
@@ -368,8 +379,7 @@ int PullOver::FindPullOverStop(PointENU* stop_point) {
     }
 
     std::string lane_id = lane->lane().id().id();
-    ADEBUG << "check_s[" << check_s << "] lane[" << lane_id
-        << "] reference_line.Length[" << reference_line.Length() << "]";
+    ADEBUG << "check_s[" << check_s << "] lane[" << lane_id << "]";
 
     // check turn type: NO_TURN/LEFT_TURN/RIGHT_TURN/U_TURN
     const auto& turn = lane->lane().turn();
@@ -406,7 +416,14 @@ int PullOver::FindPullOverStop(PointENU* stop_point) {
     }
 
     // check if on overlaps
-    if (OnOverlap(check_s)) {
+    const auto& vehicle_param =
+        VehicleConfigHelper::GetConfig().vehicle_param();
+    const double adc_length = vehicle_param.length();
+    const double parking_spot_start_s = check_s - adc_length -
+        PARKING_SPOT_LONGITUDINAL_BUFFER;
+    const double parking_spot_end_s = check_s +
+        PARKING_SPOT_LONGITUDINAL_BUFFER;
+    if (OnOverlap(parking_spot_start_s, parking_spot_end_s)) {
       ADEBUG << "lane[" << lane_id << "] on overlap.  can't pull over";
       check_length = 0.0;
       continue;
@@ -527,7 +544,7 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
       pull_over_status.inlane_dest_point().y()},
                           &stop_point_sl);
     if (stop_point_sl.s() - adc_front_edge_s >
-        config_.pull_over().plan_distance()) {
+        config_.pull_over().operation_length()) {
       inlane_stop_point_set = true;
       ADEBUG << "BuildInLaneStop using inlane_dest_point: s["
           << stop_point_sl.s() << "] dist["
@@ -543,7 +560,7 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
                             pull_over_stop_point.y()},
                             &stop_point_sl);
       if (stop_point_sl.s() - adc_front_edge_s >
-          config_.pull_over().plan_distance()) {
+          config_.pull_over().operation_length()) {
         inlane_stop_point_set = true;
         ADEBUG << "BuildInLaneStop using pull_over_stop_point: s["
             << stop_point_sl.s() << "] dist["
@@ -559,7 +576,7 @@ int PullOver::BuildInLaneStop(const PointENU& pull_over_stop_point) {
         inlane_adc_potiion_stop_point_.has_y()) {
       reference_line.XYToSL(inlane_adc_potiion_stop_point_, &stop_point_sl);
       if (stop_point_sl.s() - adc_front_edge_s >
-          config_.pull_over().plan_distance()) {
+          config_.pull_over().operation_length()) {
         inlane_stop_point_set = true;
         ADEBUG << "BuildInLaneStop using adc_position exsiting stop_point: s["
             << stop_point_sl.s() << "] dist["
