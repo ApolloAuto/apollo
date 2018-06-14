@@ -153,7 +153,7 @@ class CameraCalibration {
     camera2car_adj_ = matrix;
     adjusted_extrinsic_ = adjusted;
 
-    auto camera_intrinsic_inverse = camera_intrinsic_.block(0, 0, 3, 3).inverse();
+    auto c_int_inv = camera_intrinsic_.block(0, 0, 3, 3).inverse();
     auto car2camera_3_4 = (camera2car_adj_.inverse()).block(0, 0, 3, 4);
     Eigen::Matrix3d camera_2car_stripped;
     camera_2car_stripped.col(0) = car2camera_3_4.col(0);
@@ -161,7 +161,7 @@ class CameraCalibration {
     camera_2car_stripped.col(2) = car2camera_3_4.col(3);
 
     homography_camera2car_adj_ =
-     camera_2car_stripped.inverse() * camera_intrinsic_inverse;
+     camera_2car_stripped.inverse() * c_int_inv;
   }
 
   bool GetCar2CameraExtrinsicsAdj(Eigen::Matrix<double, 4, 4>* matrix) {
