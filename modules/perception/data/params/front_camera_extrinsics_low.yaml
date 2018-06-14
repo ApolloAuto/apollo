@@ -7,10 +7,6 @@ header:
 child_frame_id: onsemi_obstacle
 transform:
     rotation:
-        # x: -0.5107885 
-        # y: 0.5107885 
-        # z: -0.4889736 
-        # w: 0.488973
         x: 0.5213338
         y: -0.5213338
         z: 0.4777144
@@ -19,4 +15,3 @@ transform:
         x: -0.804
         y: 0.005
         z: 1.227
-#        z: 1.476  # when Z=0 is the rear wheel axle
