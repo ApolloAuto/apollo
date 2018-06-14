@@ -35,6 +35,7 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::math::HeadingToQuaternion;
 using apollo::common::math::InverseQuaternionRotate;
+using apollo::common::math::InterpolateUsingLinearApproximation;
 using apollo::common::math::NormalizeAngle;
 using apollo::common::math::QuaternionToHeading;
 using apollo::common::time::Clock;
@@ -253,8 +254,14 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point) {
       prev_point_ = trajectory.Get(prev_point_index_);
     }
   }
-  *point = apollo::common::math::InterpolateUsingLinearApproximation(
-      prev_point_, next_point_, relative_time);
+
+  if (relative_time > next_point_.relative_time()) {
+    // Don't try to extrapolate if relative_time passes last point
+    *point = next_point_;
+  } else {
+    *point = InterpolateUsingLinearApproximation(prev_point_, next_point_,
+                                                 relative_time);
+  }
   return true;
 }
 
