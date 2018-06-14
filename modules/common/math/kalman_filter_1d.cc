@@ -61,7 +61,6 @@ bool KalmanFilter1D::Predict(const float& time_diff) {
   f(0, 1) = time_diff;
   SetTransitionMatrix(f);
   KalmanFilter<float, 2, 1, 1>::Predict();
-
   return true;
 }
 
@@ -71,10 +70,6 @@ bool KalmanFilter1D::Update(const float& z) {
   Correct(state_z);
   return true;
 }
-
-Eigen::Vector2f KalmanFilter1D::GetState() { return GetStateEstimate(); }
-
-Eigen::Matrix2f KalmanFilter1D::GetCov() { return GetStateCovariance(); }
 
 }  // namespace math
 }  // namespace common
