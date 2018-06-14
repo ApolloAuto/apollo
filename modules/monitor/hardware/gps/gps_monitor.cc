@@ -30,7 +30,7 @@ DEFINE_double(acceptable_gnss_best_pose_std_dev, 0.5,
               "Acceptable Gnss BestPose standard deviation on latitude, "
               "longitude and height.");
 
-DEFINE_double(acceptable_gnss_best_pose_unstable_duration, 5,
+DEFINE_double(acceptable_gnss_best_pose_unstable_duration, 30,
               "Acceptable Gnss BestPose unstable duration in seconds.");
 
 namespace apollo {
