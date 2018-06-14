@@ -29,6 +29,7 @@
 #include "modules/perception/proto/perception_ultrasonic.pb.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/onboard/common_shared_data.h"
+#include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 
 namespace apollo {
@@ -54,7 +55,7 @@ class UltrasonicObstacleSubnode : public Subnode {
 
   void RegistAllAlgorithm();
 
-  bool init_algorithm_plugin();
+  bool InitAlgorithmPlugin();
 
   bool set_ultrasonic_type(const std::string& type);
 
@@ -70,6 +71,8 @@ class UltrasonicObstacleSubnode : public Subnode {
   uint32_t seq_num_;
 
   std::string device_id_;
+
+  UltrasonicObjectData* processing_data_ = nullptr;
 
   DISALLOW_COPY_AND_ASSIGN(UltrasonicObstacleSubnode);
 };
