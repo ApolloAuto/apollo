@@ -260,7 +260,7 @@ typedef struct zynq_trigger {
   unsigned int	exposure_time;
   /* Video number, e.g. 0 for /dev/video0 */
   int		vnum;
-	/* Camera name, e.g. AR023ZWDR(Rev663) */
+  /* Camera name, e.g. AR023ZWDR(Rev663) */
   char		name[ZYNQ_VDEV_NAME_LEN];
 } zynq_trigger_t;
 
@@ -277,10 +277,10 @@ typedef struct zynq_trigger_delay {
 #define	ZYNQ_FW_PADDING		0x00000000
 #define	ZYNQ_FW_MSG_SZ		16
 typedef struct ioc_zynq_fw_upload {
-	/*
-	 * image data size must be multiple of 4 as each polling transfer is in
-	 * 16-byte, so padding the data if needed.
-	 */
+  /*
+   * image data size must be multiple of 4 as each polling transfer is int
+   * 16-byte, so padding the data if needed.
+   */
   unsigned int	*ioc_zynq_fw_data;
   unsigned int	ioc_zynq_fw_num;
   unsigned int	ioc_zynq_fw_done;
