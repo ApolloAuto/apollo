@@ -16,34 +16,27 @@
 
 /**
  * @file
- * @brief Defines a KalmanFilter1D class.
+ * @brief This file provides several unit tests for the class "NaviPathDecider".
  */
 
-#ifndef MODULES_COMMON_MATH_KALMAN_FILTER_1D_H_
-#define MODULES_COMMON_MATH_KALMAN_FILTER_1D_H_
+#include "modules/planning/navi/decider/navi_path_decider.h"
 
-// 1 dimensional constant velocity kalman filter
-#include "Eigen/Core"
-#include "Eigen/Dense"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
-#include "modules/common/math/kalman_filter.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/localization/common/localization_gflags.h"
+#include "modules/planning/common/planning_gflags.h"
+
+using apollo::common::TrajectoryPoint;
 
 namespace apollo {
-namespace common {
-namespace math {
+namespace planning {
+// TODO(all): Add your unit test code here according to the Google Unit Testing
+// Specification.
+TEST(NaviPathDeciderTest, ComputeTrajectory) {}
 
-class KalmanFilter1D
-    : public ::apollo::common::math::KalmanFilter<float, 2, 1, 1> {
- public:
-  bool Init(const float& x);
+TEST(NaviPathDeciderTest, ErrorTest) {}
 
-  bool Predict(const float& time_diff);
-
-  bool Update(const float& z);
-};
-
-}  // namespace math
-}  // namespace common
+}  // namespace planning
 }  // namespace apollo
-
-#endif  // MODULES_COMMON_MATH_KALMAN_FILTER_1D_H_
