@@ -461,8 +461,8 @@ void ConnectedComponent::SplitContourVertical(int len_split, bool is_clockwise,
   //                     : x_r*0.25 + x_l*0.75;
   //   vertices_->push_back(Vertex(x, end_pos));
   //   (is_clockwise ? clockwise_edges_ : anticlockwise_edges_)
-  //       ->push_back(
-  //           MakeEdge(start_vertex_id, static_cast<int>(vertices_->size()) - 1));
+  //       ->push_back(MakeEdge(start_vertex_id,
+  //        static_cast<int>(vertices_->size()) - 1));
   //   start_pos = end_pos - 1;
   //   x_r = bbox_.right_contour->at(start_pos - this->y_min());
   //   x_l = bbox_.left_contour->at(start_pos - this->y_min());
