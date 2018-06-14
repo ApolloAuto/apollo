@@ -33,7 +33,7 @@ catkin_package(
 ## Build ##
 ###########
 
-link_directories(../../../third_party/jsoncpp/lib/lib
+link_directories(../../../third_party/jsoncpp/lib
   ../../../third_party/adv_plat/lib
   ${catkin_LIB_DIRS}
 )
