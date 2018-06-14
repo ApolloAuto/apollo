@@ -400,28 +400,10 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame, cv::Mat *mask) {
          lane_output_width_lane_ * lane_output_height_lane_ * sizeof(float));
 
   cv::resize(tmp, tmp, cv::Size(960, 384), 0, 0);
-  // cv::threshold( tmp, tmp, confidence_threshold_lane_, 1, 0 );
   // select a region of interest
-  // AINFO << "***** ignored_height = " << ignored_height_;
   cv::Mat tRoi = tmp(cv::Rect(330, 0, 300, ignored_height_));
   tRoi.setTo(0);
-
   *mask = tmp;
-  // AINFO << "Post detection lane: " << post_time.MilliSeconds() << " ms";
-  // store image
-  /*cv::Mat mask3;
-  std::vector<cv::Mat> merge_lane;
-  merge_lane.push_back(tmp*255);
-  merge_lane.push_back(tmp*255);
-  merge_lane.push_back(tmp*0);
-  cv::merge(merge_lane, mask3);
-  mask3.convertTo(mask3, 16);
- 
-  cv::resize(img, img, cv::Size(960, 384), 0, 0);
-  cv::addWeighted( img, 0.65, mask3, 0.35, 0.0, mask3);
-  
-  cv::imwrite("tmp/" + std::to_string(time(0)) + ".jpg", mask3);
-*/
   return true;
 }
 
