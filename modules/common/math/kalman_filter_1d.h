@@ -40,10 +40,6 @@ class KalmanFilter1D
   bool Predict(const float& time_diff);
 
   bool Update(const float& z);
-
-  Eigen::Vector2f GetState();
-
-  Eigen::Matrix2f GetCov();
 };
 
 }  // namespace math

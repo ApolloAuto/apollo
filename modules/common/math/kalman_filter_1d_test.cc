@@ -35,8 +35,8 @@ TEST_F(KalmanFilter1DTest, SyntheticTrackingTest) {
   EXPECT_TRUE(kf_.Predict(1.0));
   EXPECT_TRUE(kf_.Update(1.0));
 
-  EXPECT_DOUBLE_EQ(0.67741930484771729, kf_.GetState()(0, 0));
-  EXPECT_DOUBLE_EQ(13.548389434814453, kf_.GetCov()(0, 0));
+  EXPECT_DOUBLE_EQ(0.71428573131561279, kf_.GetStateEstimate()(0, 0));
+  EXPECT_DOUBLE_EQ(14.285713195800781, kf_.GetStateCovariance()(0, 0));
 }
 
 }  // namespace math
