@@ -441,39 +441,6 @@ void ConnectedComponent::SplitContourVertical(int len_split, bool is_clockwise,
   vector<int> lens = GetSplitRanges(height, len_split);
 
   // create start and end vertice
-  // int x_r = bbox_.right_contour->at(start_pos - this->y_min());
-  // int x_l = bbox_.left_contour->at(start_pos - this->y_min());
-  // vertices_->push_back(Vertex((x_r + x_l)/2, start_pos));
-  // int start_vertex_id = static_cast<int>(vertices_->size()) - 1;
-
-  // x_r = bbox_.right_contour->at(end_pos - this->y_min());
-  // x_l = bbox_.left_contour->at(end_pos - this->y_min());
-  // int x = is_clockwise ? x_r*0.75 + x_l*0.25
-  //                     : x_r*0.25 + x_l*0.75;
-  // vertices_->push_back(Vertex(x, end_pos));
-  // int end_vertex_id = static_cast<int>(vertices_->size()) - 1;
-
-  // for (int k = 0; k < static_cast<int>(lens.size()) - 1; ++k) {
-  //   end_pos = start_pos - lens[k] + 1;
-  //   x_r = bbox_.right_contour->at(end_pos - this->y_min());
-  //   x_l = bbox_.left_contour->at(end_pos - this->y_min());
-  //   x = is_clockwise ? x_r*0.75 + x_l*0.25
-  //                     : x_r*0.25 + x_l*0.75;
-  //   vertices_->push_back(Vertex(x, end_pos));
-  //   (is_clockwise ? clockwise_edges_ : anticlockwise_edges_)
-  //       ->push_back(MakeEdge(start_vertex_id,
-  //        static_cast<int>(vertices_->size()) - 1));
-  //   start_pos = end_pos - 1;
-  //   x_r = bbox_.right_contour->at(start_pos - this->y_min());
-  //   x_l = bbox_.left_contour->at(start_pos - this->y_min());
-  //   x = is_clockwise ? x_r*0.75 + x_l*0.25
-  //                     : x_r*0.25 + x_l*0.75;
-  //   vertices_->push_back(Vertex(x, start_pos));
-  //   start_vertex_id = static_cast<int>(vertices_->size()) - 1;
-  // }
-  // (is_clockwise ? clockwise_edges_ : anticlockwise_edges_)
-  //     ->push_back(MakeEdge(start_vertex_id, end_vertex_id));
-
   int x = is_clockwise ? bbox_.right_contour->at(start_pos - this->y_min())
                        : bbox_.left_contour->at(start_pos - this->y_min());
   vertices_->push_back(Vertex(x, start_pos));
