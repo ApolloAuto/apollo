@@ -308,9 +308,10 @@ bool CCLanePostProcessor::AddInstanceIntoLaneObject(
 
   // Option 2: Use y-value of closest point.
   // lane_object->lateral_distance = lane_object->pos[0].y();
-  
+
   // Option 3: Use value at x=3
-  lane_object->lateral_distance = PolyEval(float(3.0), lane_object->order, lane_object->model);
+  lane_object->lateral_distance = PolyEval(static_cast<float>(3.0),
+              lane_object->order, lane_object->model);
 
   return true;
 }
@@ -424,7 +425,8 @@ bool CCLanePostProcessor::AddInstanceIntoLaneObjectImage(
   // lane_object->lateral_distance = lane_object->pos[0].y();
 
   // Option 3: Use value at x=3
-  lane_object->lateral_distance = PolyEval(float(3.0), lane_object->order, lane_object->model);
+  lane_object->lateral_distance = PolyEval(static_cast<float>(3.0),
+                            lane_object->order, lane_object->model);
 
   return true;
 }
