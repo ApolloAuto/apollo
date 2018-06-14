@@ -62,6 +62,7 @@ cc_library(
         "//modules/planning/constraint_checker:constraint_checker1d",
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
+        "//modules/planning/lattice/trajectory_generation:piecewise_braking_trajectory_generator",
         "//modules/planning/math/curve1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
     ],
