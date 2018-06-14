@@ -16,6 +16,9 @@ enum TaskType {
   PATH_DECIDER = 4;
   SPEED_DECIDER = 5;
   POLY_ST_SPEED_OPTIMIZER = 6;
+  NAVI_PATH_DECIDER = 7;
+  NAVI_SPEED_DECIDER = 8;
+  NAVI_OBSTACLE_DECIDER = 9;
 };
 
 message EMPlannerConfig {
@@ -27,13 +30,20 @@ message EMPlannerConfig {
   optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
 }
 
+message NaviPlannerConfig {
+  repeated TaskType task = 1;
+}
+
 message PlanningConfig {
   enum PlannerType {
     RTK = 0;
     EM = 1;  // expectation maximization
     LATTICE = 2;
+    NAVI = 3; // navigation planner
   };
   optional PlannerType planner_type = 1 [default = EM];
 
   optional EMPlannerConfig em_planner_config = 2;
+
+  optional NaviPlannerConfig navi_planner_config = 3;
 }
