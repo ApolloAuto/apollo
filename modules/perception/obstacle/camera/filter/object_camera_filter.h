@@ -33,7 +33,7 @@
 #include "opencv2/opencv.hpp"
 #include "yaml-cpp/yaml.h"
 
-#include "modules/common/math/kalman_filter_1d.h"
+#include "modules/common/math/kalman_filter.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
 #include "modules/perception/obstacle/camera/interface/base_camera_filter.h"
 
@@ -60,10 +60,13 @@ class ObjectCameraFilter : public BaseCameraFilter {
     int lost_frame_cnt_ = 0;
     double last_timestamp_ = 0.0f;
 
-    common::math::KalmanFilter1D x_;
-    common::math::KalmanFilter1D y_;
-    common::math::KalmanFilter1D theta_;
+    common::math::KalmanFilter<float, 2, 1, 1> x_;
+    common::math::KalmanFilter<float, 2, 1, 1> y_;
+    common::math::KalmanFilter<float, 2, 1, 1> theta_;
   };
+
+  void InitFilter(const float x,
+                  common::math::KalmanFilter<float, 2, 1, 1> *filter);
 
   std::unordered_map<int, ObjectFilter> tracked_filters_;
   const int kMaxKeptFrameCnt = 5;
@@ -76,8 +79,7 @@ class ObjectCameraFilter : public BaseCameraFilter {
   void Predict(const int track_id, const double timestamp);
 
   // @brief Update step
-  void Update(const int track_id,
-              const std::shared_ptr<VisualObject> &obj_ptr);
+  void Update(const int track_id, const std::shared_ptr<VisualObject> &obj_ptr);
 
   // @brief Get output of estimated state
   void GetState(const int track_id, std::shared_ptr<VisualObject> obj_ptr);
