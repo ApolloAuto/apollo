@@ -7,7 +7,6 @@ cc_library(
     srcs = ["object_camera_filter.cc"],
     hdrs = ["object_camera_filter.h"],
     deps = [
-        "//modules/common/math:kalman_filter_1d",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/common",

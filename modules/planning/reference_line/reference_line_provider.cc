@@ -296,7 +296,12 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     const relative_map::MapMsg &relative_map,
     std::list<ReferenceLine> *reference_line,
     std::list<hdmap::RouteSegments> *segments) {
-  if (relative_map.navigation_path_size() <= 0) {
+  DCHECK_GE(relative_map.navigation_path_size(), 0);
+  DCHECK_NOTNULL(reference_line);
+  DCHECK_NOTNULL(segments);
+
+  if (relative_map.navigation_path().empty()) {
+    AERROR << "There isn't any navigation path in current relative map.";
     return false;
   }
 
@@ -811,9 +816,7 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   double shifted_left_width = total_width / 2.0;
 
   // shift to left (or right) on wide lanes
-  if (!(waypoint.lane->lane().left_boundary().virtual_() ||
-        waypoint.lane->lane().right_boundary().virtual_()) &&
-      total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
+  if (total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
     if (smoother_config_.driving_side() == ReferenceLineSmootherConfig::RIGHT) {
       shifted_left_width =
           adc_half_width +

@@ -4,8 +4,8 @@ lateral_boundary_bound : 0.25
 num_of_total_points : 500
 curb_shift : 0.2
 driving_side : RIGHT
-wide_lane_threshold_factor : 2.0
-wide_lane_shift_remain_factor : 0.5
+wide_lane_threshold_factor : 1.2
+wide_lane_shift_remain_factor : 0.3
 
 qp_spline {
   spline_order: 5
