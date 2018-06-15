@@ -296,7 +296,12 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     const relative_map::MapMsg &relative_map,
     std::list<ReferenceLine> *reference_line,
     std::list<hdmap::RouteSegments> *segments) {
-  if (relative_map.navigation_path_size() <= 0) {
+  DCHECK_GE(relative_map.navigation_path_size(), 0);
+  DCHECK_NOTNULL(reference_line);
+  DCHECK_NOTNULL(segments);
+
+  if (relative_map.navigation_path().empty()) {
+    AERROR << "There isn't any navigation path in current relative map.";
     return false;
   }
 
