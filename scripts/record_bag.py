@@ -172,7 +172,7 @@ class Recorder(object):
 
     def stop(self):
         """Stop recording."""
-        shell_cmd('kill -INT $(pgrep -f "rosbag/record" | grep -v pgrep)')
+        shell_cmd('kill -TERM $(pgrep -f "rosbag/record" | grep -v pgrep)')
 
     def record_task(self, disk, topics='all'):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
