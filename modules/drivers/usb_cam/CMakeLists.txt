@@ -33,13 +33,14 @@ catkin_package(
 ## Build ##
 ###########
 
-link_directories(../../../third_party/jsoncpp/lib
-  ../../../third_party/adv_plat/lib
+link_directories(
+  /usr/local/jsoncpp/lib
+  /usr/local/adv_plat/lib
   ${catkin_LIB_DIRS}
 )
 
 include_directories(include
-  ../../../third_party/adv_plat/include
+  /usr/local/adv_plat
   ${catkin_INCLUDE_DIRS}
   ${avcodec_INCLUDE_DIRS}
   ${swscale_INCLUDE_DIRS}
@@ -98,9 +99,10 @@ install(DIRECTORY launch/
   FILES_MATCHING PATTERN "*.launch"
 )
 
-## Copy libjsoncpp.so 
-install(DIRECTORY ../../../third_party/jsoncpp/lib/
-  DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+# Copy libjsoncpp.so 
+install(
+  DIRECTORY /usr/local/jsoncpp/lib
+  DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/..
   FILES_MATCHING PATTERN "*.so*"
 )
 

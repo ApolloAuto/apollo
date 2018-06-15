@@ -55,7 +55,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <usb_cam/usb_cam.h>
-#include <adv_trigger_ctl.h>
+#include "include/adv_trigger_ctl.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
