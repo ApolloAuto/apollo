@@ -90,7 +90,8 @@ bool Velodyne64Driver::check_angle(velodyne_msgs::VelodynePacket& packet) {
     uint16_t angle =
         raw_ptr[i * BLOCK_SIZE + 3] * 256 + raw_ptr[i * BLOCK_SIZE + 2];
     // for the velodyne64 angle resolution is 0.17~0.2 , so take the angle diff
-    // at 0.2~0.3 should be a good choice
+    // at 0.3 degree should be a good choice
+    // prefix_angle default = 18000
     if (angle > config_.prefix_angle &&
         std::abs(angle - config_.prefix_angle) < 30) {
       return true;
