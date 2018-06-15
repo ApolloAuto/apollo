@@ -6,6 +6,7 @@ package apollo.common.adapter;
 message AdapterConfig {
   enum MessageType {
     POINT_CLOUD = 1;
+    VLP16_POINT_CLOUD = 58;
     GPS = 2;
     IMU = 3;
     CHASSIS = 4;

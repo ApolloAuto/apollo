@@ -32,6 +32,7 @@ DECLARE_string(monitor_topic);
 DECLARE_string(pad_topic);
 DECLARE_string(control_command_topic);
 DECLARE_string(pointcloud_topic);
+DECLARE_string(vlp16_pointcloud_topic);
 DECLARE_string(prediction_topic);
 DECLARE_string(perception_obstacle_topic);
 DECLARE_string(drive_event_topic);
