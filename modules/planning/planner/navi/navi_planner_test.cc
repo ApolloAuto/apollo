@@ -14,31 +14,29 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/math/kalman_filter_1d.h"
+/**
+ * @file
+ * @brief This file provides several unit tests for the class "NaviPlanner".
+ */
 
+#include "modules/planning/planner/navi/navi_planner.h"
+
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/localization/common/localization_gflags.h"
+#include "modules/planning/common/planning_gflags.h"
+
+using apollo::common::TrajectoryPoint;
+
 namespace apollo {
-namespace common {
-namespace math {
+namespace planning {
+// TODO(all): Add your unit test code here according to the Google Unit Testing
+// Specification.
+TEST(NaviPlannerTest, ComputeTrajectory) {}
 
-class KalmanFilter1DTest : public ::testing::Test {
- public:
-  KalmanFilter1DTest() : kf_() {}
+TEST(NaviPlannerTest, ErrorTest) {}
 
- protected:
-  KalmanFilter1D kf_;
-};
-
-TEST_F(KalmanFilter1DTest, SyntheticTrackingTest) {
-  EXPECT_TRUE(kf_.Init(0.0));
-  EXPECT_TRUE(kf_.Predict(1.0));
-  EXPECT_TRUE(kf_.Update(1.0));
-
-  EXPECT_DOUBLE_EQ(0.67741930484771729, kf_.GetState()(0, 0));
-  EXPECT_DOUBLE_EQ(13.548389434814453, kf_.GetCov()(0, 0));
-}
-
-}  // namespace math
-}  // namespace common
+}  // namespace planning
 }  // namespace apollo

@@ -31,6 +31,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker1d.h"
 #include "modules/planning/lattice/trajectory1d/piecewise_acceleration_trajectory1d.h"
+#include "modules/planning/lattice/trajectory_generation/piecewise_braking_trajectory_generator.h"
 
 namespace apollo {
 namespace planning {
@@ -517,9 +518,6 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
     const PlanningTarget& planning_target) const {
   std::vector<double> reference_s_dot;
 
-  double brake_a = FLAGS_longitudinal_acceleration_lower_bound *
-                   FLAGS_comfort_acceleration_factor;
-
   double cruise_v = planning_target.cruise_speed();
 
   if (!planning_target.has_stop_point()) {
@@ -543,38 +541,20 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
       return reference_s_dot;
     }
 
-    double brake_s = -cruise_v * cruise_v * 0.5 / brake_a;
-    // need more distance to brake
-    if (brake_s > dist_s) {
-      double desired_v = std::sqrt(-2.0 * brake_a * dist_s);
-      double brake_t = -desired_v / brake_a;
-      ConstantAccelerationTrajectory1d lon_traj(init_s_[0], desired_v);
-      lon_traj.AppendSegment(brake_a, brake_t);
+    double a_comfort = FLAGS_longitudinal_acceleration_upper_bound *
+                       FLAGS_comfort_acceleration_factor;
+    double d_comfort = -FLAGS_longitudinal_acceleration_lower_bound *
+                       FLAGS_comfort_acceleration_factor;
 
-      if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
-        lon_traj.AppendSegment(
-            0.0, FLAGS_trajectory_time_length - lon_traj.ParamLength());
-      }
-      for (double t = 0.0; t < FLAGS_trajectory_time_length;
-           t += FLAGS_trajectory_time_resolution) {
-        reference_s_dot.emplace_back(lon_traj.Evaluate(1, t));
-      }
-    } else {
-      double brake_t = -cruise_v / brake_a;
-      double cruise_s = dist_s - brake_s;
-      double cruise_t = cruise_s / cruise_v;
+    std::shared_ptr<Trajectory1d> lon_ref_trajectory =
+        PiecewiseBrakingTrajectoryGenerator::Generate(
+            planning_target.stop_point().s(), init_s_[0],
+            planning_target.cruise_speed(),
+            init_s_[1], a_comfort, d_comfort);
 
-      ConstantAccelerationTrajectory1d lon_traj(init_s_[0], cruise_v);
-      lon_traj.AppendSegment(0.0, cruise_t);
-      lon_traj.AppendSegment(brake_a, brake_t);
-      if (lon_traj.ParamLength() < FLAGS_trajectory_time_length) {
-        lon_traj.AppendSegment(
-            0.0, FLAGS_trajectory_time_length - lon_traj.ParamLength());
-      }
-      for (double t = 0.0; t < FLAGS_trajectory_time_length;
-           t += FLAGS_trajectory_time_resolution) {
-        reference_s_dot.emplace_back(lon_traj.Evaluate(1, t));
-      }
+    for (double t = 0.0; t < FLAGS_trajectory_time_length;
+         t += FLAGS_trajectory_time_resolution) {
+      reference_s_dot.emplace_back(lon_ref_trajectory->Evaluate(1, t));
     }
   }
   return reference_s_dot;
