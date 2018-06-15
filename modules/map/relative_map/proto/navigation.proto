@@ -10,7 +10,7 @@ import "modules/perception/proto/perception_obstacle.proto";
 
 message NavigationPath {
   optional apollo.common.Path path = 1;
- // highest = 0 which can directly reach destination; change lane indicator
+  // highest = 0 which can directly reach destination; change lane indicator
   optional uint32 path_priority = 2;
 }
 
@@ -38,4 +38,7 @@ message MapMsg {
 
   // localization
   optional apollo.localization.LocalizationEstimate localization = 5;
+
+  // the lane id of the navigation path which the vehicle is currently on
+  optional string vechicle_lane_id = 6;
 }

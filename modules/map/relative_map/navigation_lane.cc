@@ -548,6 +548,7 @@ void NavigationLane::ConvertLaneMarkerToPath(
 
 bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
                                MapMsg *map_msg) const {
+  CHECK_NOTNULL(map_msg);
   auto *navigation_info = map_msg->mutable_navigation_path();
   auto *hdmap = map_msg->mutable_hdmap();
   auto *lane_marker = map_msg->mutable_lane_marker();
@@ -564,6 +565,12 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
     lane->mutable_id()->set_id(std::to_string(navi_path->path_priority()) +
                                "_" + path.name());
     (*navigation_info)[lane->id().id()] = *navi_path;
+
+    // Set the lane id of the navigation path which the vehicle is currently on.
+    if (std::get<0>(navi_path_tuple) == std::get<0>(current_navi_path_tuple_)) {
+      map_msg->set_vechicle_lane_id(lane->id().id());
+    }
+
     // lane types
     lane->set_type(Lane::CITY_DRIVING);
     lane->set_turn(Lane::NO_TURN);
