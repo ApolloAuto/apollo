@@ -17,6 +17,8 @@
 #ifndef MODULES_DRIVERS_LIDAR_VELODYN_LIDAR_VELODYNE_H_
 #define MODULES_DRIVERS_LIDAR_VELODYN_LIDAR_VELODYNE_H_
 
+#include <string>
+
 #include "modules/common/apollo_app.h"
 
 /**
@@ -45,8 +47,8 @@ class LidarVelodyne : public apollo::common::ApolloApp {
  private:
 };
 
-}  // namespace velodyne
-}  // namespace lidar_drivers
+}  // namespace lidar_velodyne
+}  // namespace drivers
 }  // namespace apollo
 
 #endif  // MODULES_DRIVERS_LIDAR_VELODYN_LIDAR_VELODYNE_H_
