@@ -147,7 +147,7 @@ void ObjectCameraFilter::Update(const int track_id,
 
   Eigen::Matrix<float, 1, 1> z_theta;
   z_theta << obj_ptr->theta;
-  tracked_filters_[track_id].y_.Correct(z_theta);
+  tracked_filters_[track_id].theta_.Correct(z_theta);
 }
 
 void ObjectCameraFilter::GetState(const int track_id,
