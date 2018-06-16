@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_LIDAR_VELODYNE_DRIVER_INPUT_H_
-#define MODULES_DRIVERS_LIDAR_VELODYNE_DRIVER_INPUT_H_
+#ifndef MODULES_DRIVERS_LIDAR_LIDAR_VELODYNE_DRIVER_INPUT_H_
+#define MODULES_DRIVERS_LIDAR_LIDAR_VELODYNE_DRIVER_INPUT_H_
 
 #include <stdio.h>
 #include <unistd.h>
@@ -61,7 +61,7 @@ class Input {
   virtual int get_firing_data_packet(velodyne_msgs::VelodynePacket* pkt) = 0;
   virtual int get_positioning_data_packet(NMEATimePtr nmea_time) = 0;
   virtual void init() {}
-  virtual void init(int& port) {}
+  virtual void init(int& port) {}  // NOLINT
 
  protected:
   bool exract_nmea_time_from_packet(NMEATimePtr nmea_time,
@@ -72,4 +72,4 @@ class Input {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_LIDAR_VELODYNE_DRIVER_INPUT_H_
+#endif  // MODULES_DRIVERS_LIDAR_LIDAR_VELODYNE_DRIVER_INPUT_H_

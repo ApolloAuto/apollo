@@ -16,8 +16,6 @@
 
 #include "modules/drivers/lidar_velodyne/lidar_velodyne.h"
 
-#include <string>
-
 #include "modules/common/status/status.h"
 
 namespace apollo {
@@ -40,6 +38,6 @@ Status LidarVelodyne::Start() {
 
 void LidarVelodyne::Stop() { AINFO << "Lidar velodyne Stopping ..."; }
 
-}  // namespace velodyne
+}  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
