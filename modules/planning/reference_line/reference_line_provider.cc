@@ -816,7 +816,9 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   double shifted_left_width = total_width / 2.0;
 
   // shift to left (or right) on wide lanes
-  if (total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
+  if (!(waypoint.lane->lane().left_boundary().virtual_() ||
+        waypoint.lane->lane().right_boundary().virtual_()) &&
+      total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
     if (smoother_config_.driving_side() == ReferenceLineSmootherConfig::RIGHT) {
       shifted_left_width =
           adc_half_width +
