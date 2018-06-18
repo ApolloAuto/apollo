@@ -156,6 +156,7 @@ export default class PerceptionObstacles {
         }
         if (STORE.options.showObstaclesId) {
             textPosition.z += (lineCount * 0.7);
+            textPosition.y += (lineCount * 0.7);
             this.drawTexts(obstacle.id, textPosition, scene);
         }
     }

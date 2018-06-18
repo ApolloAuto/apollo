@@ -608,7 +608,8 @@
                 "HTTP_LOGIC_ERROR": 10000,
                 "HTTP_RUNTIME_ERROR": 10001,
                 "RELATIVE_MAP_ERROR": 11000,
-                "RELATIVE_MAP_NOT_READY": 11001
+                "RELATIVE_MAP_NOT_READY": 11001,
+                "DRIVER_ERROR_GNSS": 12000
               }
             },
             "StatusPb": {
@@ -999,7 +1000,8 @@
                         "ROUTING": 10,
                         "MONITOR": 11,
                         "HMI": 12,
-                        "RELATIVE_MAP": 13
+                        "RELATIVE_MAP": 13,
+                        "GNSS": 14
                       }
                     },
                     "LogLevel": {
@@ -1313,6 +1315,10 @@
                 "wheelSpeed": {
                   "type": "WheelSpeed",
                   "id": 30
+                },
+                "surround": {
+                  "type": "Surround",
+                  "id": 31
                 }
               },
               "nested": {
@@ -1535,6 +1541,127 @@
                     "STANDSTILL": 2,
                     "INVALID": 3
                   }
+                }
+              }
+            },
+            "Sonar": {
+              "fields": {
+                "range": {
+                  "type": "double",
+                  "id": 1
+                },
+                "translation": {
+                  "type": "apollo.common.Point3D",
+                  "id": 2
+                },
+                "rotation": {
+                  "type": "apollo.common.Quaternion",
+                  "id": 3
+                }
+              }
+            },
+            "Surround": {
+              "fields": {
+                "crossTrafficAlertLeft": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "crossTrafficAlertLeftEnabled": {
+                  "type": "bool",
+                  "id": 2
+                },
+                "blindSpotLeftAlert": {
+                  "type": "bool",
+                  "id": 3
+                },
+                "blindSpotLeftAlertEnabled": {
+                  "type": "bool",
+                  "id": 4
+                },
+                "crossTrafficAlertRight": {
+                  "type": "bool",
+                  "id": 5
+                },
+                "crossTrafficAlertRightEnabled": {
+                  "type": "bool",
+                  "id": 6
+                },
+                "blindSpotRightAlert": {
+                  "type": "bool",
+                  "id": 7
+                },
+                "blindSpotRightAlertEnabled": {
+                  "type": "bool",
+                  "id": 8
+                },
+                "sonar00": {
+                  "type": "double",
+                  "id": 9
+                },
+                "sonar01": {
+                  "type": "double",
+                  "id": 10
+                },
+                "sonar02": {
+                  "type": "double",
+                  "id": 11
+                },
+                "sonar03": {
+                  "type": "double",
+                  "id": 12
+                },
+                "sonar04": {
+                  "type": "double",
+                  "id": 13
+                },
+                "sonar05": {
+                  "type": "double",
+                  "id": 14
+                },
+                "sonar06": {
+                  "type": "double",
+                  "id": 15
+                },
+                "sonar07": {
+                  "type": "double",
+                  "id": 16
+                },
+                "sonar08": {
+                  "type": "double",
+                  "id": 17
+                },
+                "sonar09": {
+                  "type": "double",
+                  "id": 18
+                },
+                "sonar10": {
+                  "type": "double",
+                  "id": 19
+                },
+                "sonar11": {
+                  "type": "double",
+                  "id": 20
+                },
+                "sonarEnabled": {
+                  "type": "bool",
+                  "id": 21
+                },
+                "sonarFault": {
+                  "type": "bool",
+                  "id": 22
+                },
+                "sonarRange": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 23,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "sonar": {
+                  "rule": "repeated",
+                  "type": "Sonar",
+                  "id": 24
                 }
               }
             }
@@ -2766,6 +2893,11 @@
                   "options": {
                     "default": "CONFIDENCE_CNN"
                   }
+                },
+                "drops": {
+                  "rule": "repeated",
+                  "type": "Point",
+                  "id": 15
                 }
               },
               "nested": {
