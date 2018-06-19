@@ -22,13 +22,16 @@
 #ifndef MODULES_PLANNING_NAVI_NAVI_OBSTACLE_DECIDER_H_
 #define MODULES_PLANNING_NAVI_NAVI_OBSTACLE_DECIDER_H_
 
+#include <map>
 #include <string>
+#include <vector>
 
+#include "modules/common/math/vec2d.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/common/frame.h"
+#include "modules/planning/common/obstacle.h"
+#include "modules/planning/navi/common/local_path.h"
 
-#include "modules/common/status/status.h"
-#include "modules/planning/reference_line/reference_line.h"
-#include "modules/planning/tasks/task.h"
 
 /**
  * @namespace apollo::planning
@@ -45,23 +48,59 @@ namespace planning {
  * navigation mode by setting "FLAGS_use_navigation_mode" to "true") and do not
  * use it in standard mode.
  */
-class NaviObstacleDecider : public Task {
+class NaviObstacleDecider {
  public:
-  NaviObstacleDecider();
+  NaviObstacleDecider() = default;
+
   virtual ~NaviObstacleDecider() = default;
+
   /**
-   * @brief Overrided implementation of the virtual function "Execute" in the
-   * base class "Task".
-   * @param frame Current planning frame.
-   * @param reference_line_info Currently available reference line information.
-   * @return Status::OK() if a suitable path is created; error otherwise.
+   * @brief update mobileye's info
    */
-  apollo::common::Status Execute(
-      Frame *frame, ReferenceLineInfo *reference_line_info) override;
+  inline void update() { path_obstacle_processed = false; }
+
+  /**
+   * @brief process local path's obstacles info
+   */
+  void ProcessPathObstacle(const std::vector<const Obstacle*>& obstacles,
+                           LocalPath* fpath);
+
+  /**
+   * @brief get this local path's nudgable distance
+   * @return left nudgable distance and right nudgable distance
+   */
+  void GetLeftRightNudgableDistance(LocalPath* fpath, float* left_nudgable,
+                                    float* right_nudgable);
+
+  /**
+   * @brief get the actual nudgable distance according to the
+   * position of the obstacle
+   * @return actual nudgable distance
+   */
+  float GetNudgeDistance(const float left_nudgable, const float right_nudgable);
+
+  /**
+   * @brief Get projection point based on distance
+   * @return projection point
+   */
+  // static Vec2d Interpolate(const float dist, const vector<Vec2d>& path);
+
+  /**
+   * @brief
+   * @return obstacle's width and distance.
+   */
+  inline std::map<double, double>& MutableObstacleLatDistance() {
+    return obstacle_lat_dist;
+  }
 
  private:
-  apollo::common::Status Process();
-  void RecordDebugInfo(const PathData &path_data);
+  float front_edge_to_center = 3.89;
+  float back_edge_to_center = 1.043;
+  float left_edge_to_center = 1.055;
+  float right_edge_to_center = 1.055;
+  float default_lane_width = 3.3;
+  bool path_obstacle_processed = false;
+  std::map<double, double> obstacle_lat_dist;
 
   // TODO(all): Add your member functions and variables.
 };
