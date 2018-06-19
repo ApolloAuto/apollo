@@ -52,4 +52,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "gem_controller_test",
+    size = "small",
+    data = ["//modules/canbus:canbus_testdata"],
+    srcs = [
+        "gem_controller_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem:gem_controller",
+        "//modules/common/util:util",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
