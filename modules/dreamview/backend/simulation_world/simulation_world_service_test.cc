@@ -62,6 +62,11 @@ class SimulationWorldServiceTest : public ::testing::Test {
       sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
       sub_config->set_type(AdapterConfig::ROUTING_RESPONSE);
     }
+    {
+      auto* sub_config = config.add_config();
+      sub_config->set_mode(AdapterConfig::DUPLEX);
+      sub_config->set_type(AdapterConfig::DRIVE_EVENT);
+    }
     AdapterManager::Reset();
     AdapterManager::Init(config);
 
