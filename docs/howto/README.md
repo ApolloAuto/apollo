@@ -28,6 +28,8 @@
 - [How to run Offline Perception Visualizer for Apollo 2.5](how_to_run_apollo_2.5_perception_visualizer)
 - [How to Run MSF Localization Module On Your Local Computer](how_to_run_MSF_localization_module_on_your_local_computer.md)
 - [How to train Prediction's MLP model](how_to_train_prediction_mlp_model.md)
+- [How to use the navigation mode of Apollo 2.5](how_to_use_apollo_2.5_navigation_mode.md)
+- [How to use the navigation mode of Apollo 2.5 cn](how_to_use_apollo_2.5_navigation_mode_cn.md)
 
 ## Preparing the environment and porting to other distros
 - [How to set up a network](how_to_set_up_a_network.md)
