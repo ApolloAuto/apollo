@@ -84,6 +84,20 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "navi_path_decider_config_proto",
+    deps = [
+        ":navi_path_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "navi_path_decider_config_proto_lib",
+    srcs = [
+        "navi_path_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
     name = "planning_config_proto",
     deps = [
         ":planning_config_proto_lib",
@@ -102,6 +116,7 @@ proto_library(
         ":qp_spline_path_config_proto_lib",
         ":qp_st_speed_config_proto_lib",
         ":reference_line_smoother_config_proto_lib",
+        ":navi_path_decider_config_proto_lib",
     ],
 )
 
