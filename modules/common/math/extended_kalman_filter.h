@@ -101,14 +101,14 @@ class ExtendedKalmanFilter {
    *
    * @param F New transition matrix
    */
-  void SetTransitionModel(
-      std::function<
-          Eigen::Matrix<T, XN, 1>(const Eigen::Matrix<T, XN, 1>&,
-              const Eigen::Matrix<T, UN, 1>&)> f,
-      const Eigen::Matrix<T, XN, XN> &F) {
-    f_ = std::move(f);
-    F_ = F;
-  }
+    void SetTransitionModel(
+        std::function<
+            Eigen::Matrix<T, XN, 1>(const Eigen::Matrix<T, XN, 1>&,
+                const Eigen::Matrix<T, UN, 1>&)> f,
+        const Eigen::Matrix<T, XN, XN> &F) {
+      f_ = std::move(f);
+      F_ = F;
+    }
 
   /**
    * @brief Changes the covariance matrix of the transition noise.
