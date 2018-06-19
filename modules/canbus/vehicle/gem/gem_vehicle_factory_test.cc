@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln/lincoln_vehicle_factory.h"
+#include "modules/canbus/vehicle/gem/gem_vehicle_factory.h"
 
 #include "gtest/gtest.h"
 
@@ -23,25 +23,25 @@
 namespace apollo {
 namespace canbus {
 
-class LincolnVehicleFactoryTest : public ::testing::Test {
+class GemVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     VehicleParameter parameter;
-    parameter.set_brand(VehicleParameter::LINCOLN_MKZ);
-    lincoln_factory_.SetVehicleParameter(parameter);
+    parameter.set_brand(VehicleParameter::GEM);
+    gem_factory_.SetVehicleParameter(parameter);
   }
   virtual void TearDown() {}
 
  protected:
-  LincolnVehicleFactory lincoln_factory_;
+  GemVehicleFactory gem_factory_;
 };
 
-TEST_F(LincolnVehicleFactoryTest, InitVehicleController) {
-  EXPECT_TRUE(lincoln_factory_.CreateVehicleController() != nullptr);
+TEST_F(GemVehicleFactoryTest, InitVehicleController) {
+  EXPECT_TRUE(gem_factory_.CreateVehicleController() != nullptr);
 }
 
-TEST_F(LincolnVehicleFactoryTest, InitMessageManager) {
-  EXPECT_TRUE(lincoln_factory_.CreateMessageManager() != nullptr);
+TEST_F(GemVehicleFactoryTest, InitMessageManager) {
+  EXPECT_TRUE(gem_factory_.CreateMessageManager() != nullptr);
 }
 
 }  // namespace canbus
