@@ -34,9 +34,17 @@ namespace apollo {
 namespace planning {
 // TODO(all): Add your unit test code here according to the Google Unit Testing
 // Specification.
-TEST(NaviPathDeciderTest, ComputeTrajectory) {}
+TEST(NaviPathDeciderTest, Init) {
+    NaviPathDecider navi_path_decider;
+    PlanningConfig config;
+    EXPECT_TRUE(navi_path_decider.Init(config));
+}
 
-TEST(NaviPathDeciderTest, ErrorTest) {}
+TEST(NaviPathDeciderTest, Execute) {
+    NaviPathDecider navi_path_decider;
+    PlanningConfig config;
+    navi_path_decider.Init(config);
+}
 
 }  // namespace planning
 }  // namespace apollo

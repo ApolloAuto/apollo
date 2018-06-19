@@ -75,6 +75,14 @@ void NaviPlanner::RegisterTasks() {
 }
 
 Status NaviPlanner::Init(const PlanningConfig& config) {
+  // NaviPlanner is only used in navigation mode based on the real-time relative
+  // map.
+  if (!FLAGS_use_navigation_mode) {
+    std::string msg = "NaviPlanner is only used in navigation mode.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   AINFO << "In NaviPlanner::Init()";
   RegisterTasks();
   for (const auto task : config.navi_planner_config().task()) {
@@ -95,6 +103,14 @@ Status NaviPlanner::Init(const PlanningConfig& config) {
 
 Status NaviPlanner::Plan(const TrajectoryPoint& planning_init_point,
                          Frame* frame) {
+  // NaviPlanner is only used in navigation mode based on the real-time relative
+  // map.
+  if (!FLAGS_use_navigation_mode) {
+    std::string msg = "NaviPlanner is only used in navigation mode.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   std::size_t success_line_count = 0;
   std::size_t index = 0;
   for (auto& reference_line_info : frame->reference_line_info()) {
@@ -391,7 +407,7 @@ void NaviPlanner::GenerateFallbackSpeedProfile(
 }
 
 SpeedData NaviPlanner::GenerateStopProfile(const double init_speed,
-                                         const double init_acc) const {
+                                           const double init_acc) const {
   AERROR << "Slowing down the car.";
   SpeedData speed_data;
 
