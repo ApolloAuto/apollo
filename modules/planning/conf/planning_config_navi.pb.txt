@@ -183,6 +183,4 @@ navi_planner_config {
     task : NAVI_PATH_DECIDER
 
     task : NAVI_SPEED_DECIDER
-
-    task : NAVI_OBSTACLE_DECIDER
 }
