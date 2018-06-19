@@ -77,7 +77,7 @@ DECLARE_string(stream_status_topic);
 DECLARE_string(heading_topic);
 DECLARE_string(rtcm_data_topic);
 
-// Gardian topic
+// Guardian topic
 DECLARE_string(guardian_topic);
 
 #endif  // MODULES_COMMON_ADAPTERS_ADAPTER_GFLAGS_H_
