@@ -197,7 +197,7 @@ class Adapter : public AdapterBase {
    * @brief Data callback when receiving a message. Under the hood it calls
    * the callback ROS would invoke, useful when trying to emulate the callback
    * behavior when there's not a ROS.
-   * @param data the input data.
+   * @param message the input data.
    */
   void OnReceive(const D& message) {
     RosCallback(boost::make_shared<D const>(message));
@@ -231,9 +231,9 @@ class Adapter : public AdapterBase {
   /**
    * @brief returns the most recent message in the observing queue.
    *
-   * /note
+   * \note
    * Please call Empty() to make sure that there is data in the
-   * queue before calling GetOldestObserved().
+   * queue before calling GetLatestObserved().
    */
   const D& GetLatestObserved() const {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -329,7 +329,7 @@ class Adapter : public AdapterBase {
     latest_published_data_.reset(new D(data));
   }
 
-  const D* GetLatestPublished() { return latest_published_data_.get(); }
+  const D* GetLatestPublished() const { return latest_published_data_.get(); }
 
   /**
    * @brief Gets message delay.
