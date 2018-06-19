@@ -73,7 +73,6 @@ apollo::common::Status NaviPathDecider::Process(
   // get LocalPath
   // LocalPath local_path = GetLocalPath(reference_line);
   LocalPath local_path = GetLocalPath(reference_line);
-  int range = local_path.GetRange();
   if (local_path.GetRange() < static_cast<int>(path_len)) {
     AERROR << "Planning path strength is too short.";
     return Status(apollo::common::ErrorCode::PLANNING_ERROR,
