@@ -350,14 +350,6 @@ function run_test() {
     return 1
   fi
 
-  if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
-      cd /apollo-simulator && bash build.sh test
-      if [ $? -ne 0 ]; then
-        fail 'Test failed!'
-        return 1
-      fi
-  fi
-
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
