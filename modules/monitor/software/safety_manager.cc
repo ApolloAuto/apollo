@@ -16,9 +16,9 @@
 
 #include "modules/monitor/software/safety_manager.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
@@ -30,9 +30,7 @@ DEFINE_double(safety_mode_seconds_before_estop, 10.0,
 namespace apollo {
 namespace monitor {
 
-using apollo::canbus::Chassis;
 using apollo::common::KVDB;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::util::ContainsKey;
 using apollo::common::util::GetProtoFromFile;
 using apollo::common::util::FindOrNull;
@@ -73,20 +71,7 @@ void SafetyManager::CheckSafety(const double current_time) {
 
 bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
   // We only check safety mode in self driving mode.
-  auto* adapter = AdapterManager::GetChassis();
-  adapter->Observe();
-  if (adapter->Empty()) {
-    return false;
-  }
-
-  const auto& chassis = adapter->GetLatestObserved();
-  if (chassis.header().timestamp_sec() + FLAGS_system_status_lifetime_seconds <
-      current_time) {
-    // Ignore old messages which should be from replaying.
-    return false;
-  }
-
-  if (chassis.driving_mode() != Chassis::COMPLETE_AUTO_DRIVE) {
+  if (!MonitorManager::IsInAutonomousDriving()) {
     return false;
   }
 
