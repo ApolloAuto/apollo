@@ -17,8 +17,7 @@ With this, the `perception_lowcost_vis` should work on your machine without a se
 The issue comes from a behavior changes in the latest nvidia driver and a glfw bug. You can find information about the bug [here](http://www.glfw.org/docs/latest/window_guide.html#window_hints_ctx). To summarize the behaviour,
 
 ```
-“On some Linux systems, creating contexts via both the native and EGL APIs in a single process 
-will cause the application to segfault. Stick to one API or the other on Linux for now.”
+“On some Linux systems, creating contexts via both the native and EGL APIs in a single process will cause the application to segfault. Stick to one API or the other on Linux for now.”
 ```
 
 So, with the driver (on Ubuntu 16), glfw_fusion_viewer needs to be set up to use EGL_CONTEXT_API instead of the default NATIVE_CONTEXT_API to evade the segfault.
