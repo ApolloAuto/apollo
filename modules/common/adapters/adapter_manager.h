@@ -167,7 +167,7 @@ namespace adapter {
 class AdapterManager {
  public:
   /**
-   * @brief Initialize the /class AdapterManager singleton with the
+   * @brief Initialize the \class AdapterManager singleton with the
    * provided configuration. The configuration is specified by the
    * file path.
    * @param adapter_config_filename the path to the proto file that
@@ -176,14 +176,14 @@ class AdapterManager {
   static void Init(const std::string &adapter_config_filename);
 
   /**
-   * @brief Initialize the /class AdapterManager singleton with the
+   * @brief Initialize the \class AdapterManager singleton with the
    * provided configuration.
    * @param configs the adapter manager configuration proto.
    */
   static void Init(const AdapterManagerConfig &configs);
 
   /**
-   * @brief Resets the /class AdapterManager so that it could be
+   * @brief Resets the \class AdapterManager so that it could be
    * re-initiailized.
    */
   static void Reset();
@@ -231,7 +231,7 @@ class AdapterManager {
   }
 
  private:
-  /// The node handler of ROS, owned by the /class AdapterManager
+  /// The node handler of ROS, owned by the \class AdapterManager
   /// singleton.
   std::unique_ptr<ros::NodeHandle> node_handle_;
 
