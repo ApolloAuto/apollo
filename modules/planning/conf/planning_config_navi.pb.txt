@@ -183,4 +183,10 @@ navi_planner_config {
     task : NAVI_PATH_DECIDER
 
     task : NAVI_SPEED_DECIDER
+    
+    navi_path_decider_config {
+        min_path_length: 5
+        min_look_forward_time: 2
+        max_smooth_init_y: 0.2
+    }
 }

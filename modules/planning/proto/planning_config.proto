@@ -7,6 +7,7 @@ import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/qp_spline_path_config.proto";
 import "modules/planning/proto/qp_st_speed_config.proto";
 import "modules/planning/proto/poly_st_speed_config.proto";
+import "modules/planning/proto/navi_path_decider_config.proto";
 
 enum TaskType {
   DP_POLY_PATH_OPTIMIZER = 0;
@@ -32,6 +33,7 @@ message EMPlannerConfig {
 
 message NaviPlannerConfig {
   repeated TaskType task = 1;
+  optional apollo.planning.NaviPathDeciderConfig  navi_path_decider_config = 2;
 }
 
 message PlanningConfig {
