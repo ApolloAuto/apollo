@@ -21,6 +21,7 @@ cc_library(
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks:task",
+        "//modules/planning/navi/common:local_path",
         "@glog",
     ],
 )

@@ -40,6 +40,8 @@ namespace planning {
  */
 class LocalPath {
  public:
+  LocalPath() = default;
+
   explicit LocalPath(const std::vector<common::PathPoint> &path_points);
 
   virtual ~LocalPath() = default;
@@ -91,6 +93,8 @@ class LocalPath {
    * @return void.
    */
   void Merge(const common::Path &local_path, const double weight);
+
+  const std::vector<common::PathPoint> &GetPathPoints() { return path_points_; }
 
  private:
   std::vector<common::PathPoint> path_points_;
