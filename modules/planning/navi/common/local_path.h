@@ -25,9 +25,8 @@
 #include <memory>
 #include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
-
 #include "modules/common/math/vec2d.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -67,6 +66,7 @@ class LocalPath {
    * the PathPoints vector.
    */
   const std::vector<common::PathPoint> &GetPathPoints();
+
   /**
    * @brief get points range.
    * @return int the valid points range.
@@ -101,8 +101,6 @@ class LocalPath {
    */
   void Merge(const common::Path &local_path, const double weight);
 
-  const std::vector<common::PathPoint> &GetPathPoints() { return path_points_; }
-
  private:
   std::vector<common::PathPoint> path_points_;
   std::vector<common::math::Vec2d> points_;
@@ -115,6 +113,7 @@ inline const std::vector<common::math::Vec2d> &LocalPath::GetXYPoints() {
 inline const std::vector<common::PathPoint> &LocalPath::GetPathPoints() {
   return path_points_;
 }
+
 inline int LocalPath::GetRange() {
   return static_cast<int>(path_points_.size() - 1);
 }
