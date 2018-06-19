@@ -112,7 +112,7 @@ class Pandar40P_Internal {
    *        type       				The device type
    */
   Pandar40P_Internal(
-      std::string device_ip, uint16_t lidar_port, uint16_t gps_port,
+      const std::string &device_ip, uint16_t lidar_port, uint16_t gps_port,
       boost::function<void(boost::shared_ptr<PPointCloud>, double)>
           pcl_callback,
       boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
@@ -122,10 +122,10 @@ class Pandar40P_Internal {
    * @brief load the correction file
    * @param correction The path of correction file
    */
-  int LoadCorrectionFile(std::string correction);
+  int LoadCorrectionFile(const std::string &correction);
 
   /**
-   * @brief load the correction file
+   * @brief reset the start angle.
    * @param angle The start angle
    */
   void ResetStartAngle(uint16_t start_angle);
