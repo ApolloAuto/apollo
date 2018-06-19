@@ -70,8 +70,9 @@ void NaviPlanner::RegisterTasks() {
                          []() -> Task* { return new NaviPathDecider(); });
   task_factory_.Register(NAVI_SPEED_DECIDER,
                          []() -> Task* { return new NaviSpeedDecider(); });
-  task_factory_.Register(NAVI_OBSTACLE_DECIDER,
-                         []() -> Task* { return new NaviObstacleDecider(); });
+  // task_factory_.Register(NAVI_OBSTACLE_DECIDER,
+  //                        []() -> Task* { return new NaviObstacleDecider();
+  //                        });
 }
 
 Status NaviPlanner::Init(const PlanningConfig& config) {
