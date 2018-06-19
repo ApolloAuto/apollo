@@ -222,20 +222,42 @@ std::string PathOverlap::DebugString() const {
   return common::util::StrCat(object_id, " ", start_s, " ", end_s);
 }
 
-Path::Path(std::vector<MapPathPoint> path_points)
+Path::Path(const std::vector<MapPathPoint>& path_points)
+    : path_points_(path_points) {
+  Init();
+}
+
+Path::Path(std::vector<MapPathPoint>&& path_points)
     : path_points_(std::move(path_points)) {
   Init();
 }
 
-Path::Path(std::vector<MapPathPoint> path_points,
-           std::vector<LaneSegment> lane_segments)
+Path::Path(const std::vector<MapPathPoint>& path_points,
+           const std::vector<LaneSegment>& lane_segments)
+    : path_points_(path_points), lane_segments_(lane_segments) {
+  Init();
+}
+
+Path::Path(std::vector<MapPathPoint>&& path_points,
+           std::vector<LaneSegment>&& lane_segments)
     : path_points_(std::move(path_points)),
       lane_segments_(std::move(lane_segments)) {
   Init();
 }
 
-Path::Path(std::vector<MapPathPoint> path_points,
-           std::vector<LaneSegment> lane_segments,
+Path::Path(const std::vector<MapPathPoint>& path_points,
+           const std::vector<LaneSegment>& lane_segments,
+           const double max_approximation_error)
+    : path_points_(path_points), lane_segments_(lane_segments) {
+  Init();
+  if (max_approximation_error > 0.0) {
+    use_path_approximation_ = true;
+    approximation_ = PathApproximation(*this, max_approximation_error);
+  }
+}
+
+Path::Path(std::vector<MapPathPoint>&& path_points,
+           std::vector<LaneSegment>&& lane_segments,
            const double max_approximation_error)
     : path_points_(std::move(path_points)),
       lane_segments_(std::move(lane_segments)) {
@@ -342,15 +364,14 @@ void Path::InitWidth() {
 
       double lane_left_width = 0.0;
       double lane_right_width = 0.0;
-      waypoint.lane->GetWidth(waypoint.s,
-                              &lane_left_width, &lane_right_width);
+      waypoint.lane->GetWidth(waypoint.s, &lane_left_width, &lane_right_width);
       lane_left_width_.push_back(lane_left_width - waypoint.l);
       lane_right_width_.push_back(lane_right_width + waypoint.l);
 
       double road_left_width = 0.0;
       double road_right_width = 0.0;
-      waypoint.lane->GetRoadWidth(waypoint.s,
-                                  &road_left_width, &road_right_width);
+      waypoint.lane->GetRoadWidth(waypoint.s, &road_left_width,
+                                  &road_right_width);
       road_left_width_.push_back(road_left_width - waypoint.l);
       road_right_width_.push_back(road_right_width + waypoint.l);
     }
@@ -692,7 +713,7 @@ double Path::GetLaneRightWidth(const double s) const {
 }
 
 bool Path::GetLaneWidth(const double s, double* lane_left_width,
-                    double* lane_right_width) const {
+                        double* lane_right_width) const {
   CHECK_NOTNULL(lane_left_width);
   CHECK_NOTNULL(lane_right_width);
 
