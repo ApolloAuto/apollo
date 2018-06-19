@@ -92,7 +92,7 @@ int64_t AsInt64(const Timestamp &timestamp) {
  * @brief converts the input duration (nanos) to a double in seconds.
  * The original precision will be preserved.
  * @param duration the input duration that needs to be converted.
- * @return a doule in seconds.
+ * @return a double in seconds.
  */
 inline double ToSecond(const Duration &duration) {
   return static_cast<double>(AsInt64<nanos>(duration)) * 1e-9;
@@ -102,7 +102,7 @@ inline double ToSecond(const Duration &duration) {
  * @brief converts the input timestamp (nanos) to a double in seconds.
  * The original precision will be preserved.
  * @param timestamp the input timestamp that needs to be converted.
- * @return a doule representing the same timestamp in seconds.
+ * @return a double representing the same timestamp in seconds.
  */
 inline double ToSecond(const Timestamp &timestamp) {
   return static_cast<double>(AsInt64<nanos>(timestamp.time_since_epoch())) *
@@ -131,7 +131,7 @@ inline Timestamp From(double timestamp_value) {
 
 /**
  * @class Clock
- * @brief a singleton clock that can be used to get the current current
+ * @brief a singleton clock that can be used to get the current
  * timestamp. The source can be either system clock or a mock clock.
  * Mock clock is for testing purpose mainly. The mock clock related
  * methods are not thread-safe.
@@ -240,7 +240,7 @@ class Clock {
 inline Clock::Clock()
     : Clock(FLAGS_use_ros_time ? ClockMode::ROS : ClockMode::SYSTEM) {}
 
-// Measure run time of a code block, mostly for debugging puprpose.
+// Measure run time of a code block, mostly for debugging purpose.
 // Example usage:
 // PERF_BLOCK("Function Foo took: ") {
 //  Foo();
