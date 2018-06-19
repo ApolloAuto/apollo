@@ -5,10 +5,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "common",
         srcs = [
-        "common/local_path.cc",
+        "local_path.cc",
     ],
     hdrs = [
-        "common/local_path.h",
+        "local_path.h",
     ],
  deps = [
         "//modules/common/configs:vehicle_config_helper",
