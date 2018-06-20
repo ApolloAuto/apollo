@@ -21,9 +21,6 @@
 #include "modules/common/util/string_util.h"
 #include "modules/monitor/common/monitor_manager.h"
 
-DEFINE_string(summary_cleaner_name, "SummaryCleaner",
-              "Name of the summary cleaner.");
-
 DEFINE_string(summary_monitor_name, "SummaryMonitor",
               "Name of the summary monitor.");
 
@@ -74,22 +71,6 @@ void SummarizeOnTopicStatus(const TopicStatus &topic_status, Status *status) {
 }
 
 }  // namespace
-
-// Set interval to 0, so it runs every time when ticking.
-SummaryCleaner::SummaryCleaner()
-    : RecurrentRunner(FLAGS_summary_cleaner_name, 0) {
-}
-
-void SummaryCleaner::RunOnce(const double current_time) {
-  for (auto &module : *MonitorManager::GetStatus()->mutable_modules()) {
-    module.second.set_summary(Summary::UNKNOWN);
-    module.second.clear_msg();
-  }
-  for (auto &hardware : *MonitorManager::GetStatus()->mutable_hardware()) {
-    hardware.second.set_summary(Summary::UNKNOWN);
-    hardware.second.clear_msg();
-  }
-}
 
 // Set interval to 0, so it runs every time when ticking.
 SummaryMonitor::SummaryMonitor()
