@@ -23,7 +23,7 @@
 #include <sys/types.h>
 
 /* bcan_msg_t and bcan_err_code definitions. */
-//#include "linux/bcan_defs.h"
+// #include "linux/bcan_defs.h"
 #include "modules/drivers/canbus/can_client/hermes_can/bcan_defs.h"
 
 #ifdef __cplusplus
