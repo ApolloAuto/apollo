@@ -40,7 +40,7 @@ namespace apollo {
 namespace planning {
 
 TEST(NaviObstacleDeciderTest, ComputeObstacleDist) {
-  std::vector<const Obstacle*> vec_obstack;
+  std::vector<const Obstacle*> vec_obstacle;
   std::vector<common::PathPoint> vec_points;
 
   PerceptionObstacle perception_obstacle;
@@ -53,12 +53,12 @@ TEST(NaviObstacleDeciderTest, ComputeObstacleDist) {
   PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   PathPoint p2 = MakePathPoint(0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-  vec_points.push_back(p1);
-  vec_points.push_back(p2);
+  vec_points.emplace_back(p1);
+  vec_points.emplace_back(p2);
   LocalPath fpath(vec_points);
-  vec_obstack.push_back(&b1);
+  vec_obstacle.emplace_back(&b1);
   NaviObstacleDecider navi_obstacle;
-  navi_obstacle.ProcessPathObstacle(vec_obstack, &fpath);
+  navi_obstacle.ProcessPathObstacle(vec_obstacle, &fpath);
 
   auto& obstacle_lat_dist = navi_obstacle.MutableObstacleLatDistance();
   std::map<double, double>::iterator iter = obstacle_lat_dist.begin();
@@ -67,56 +67,56 @@ TEST(NaviObstacleDeciderTest, ComputeObstacleDist) {
 }
 
 TEST(NaviObstacleDeciderTest, ComputeLeftandrightNudgableDist1) {
-  float left_nudgable = 0.0;
-  float right_nudgable = 0.0;
-  NaviObstacleDecider get_path_nudge_distance;
+  double left_nudgable = 0.0;
+  double right_nudgable = 0.0;
+  NaviObstacleDecider navi_obstacle_decider;
 
   PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   std::vector<common::PathPoint> path_point;
-  path_point.push_back(p1);
+  path_point.emplace_back(p1);
   LocalPath fpath(path_point);
 
-  get_path_nudge_distance.GetLeftRightNudgableDistance(&fpath, &left_nudgable,
-                                                       &right_nudgable);
+  navi_obstacle_decider.GetLeftRightNudgableDistance(
+      3.3, &fpath, &left_nudgable, &right_nudgable);
 
   EXPECT_FLOAT_EQ(left_nudgable, 0.595);
   EXPECT_FLOAT_EQ(right_nudgable, 0.595);
 }
 
 TEST(NaviObstacleDeciderTest, ComputeLeftandrightNudgableDist2) {
-  float left_nudgable = 0.0;
-  float right_nudgable = 0.0;
-  NaviObstacleDecider get_path_nudge_distance;
+  double left_nudgable = 0.0;
+  double right_nudgable = 0.0;
+  NaviObstacleDecider navi_obstacle_decider;
 
   PathPoint p2 = MakePathPoint(1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   std::vector<common::PathPoint> path_point;
-  path_point.push_back(p2);
+  path_point.emplace_back(p2);
   LocalPath fpath(path_point);
 
-  get_path_nudge_distance.GetLeftRightNudgableDistance(&fpath, &left_nudgable,
-                                                       &right_nudgable);
+  navi_obstacle_decider.GetLeftRightNudgableDistance(
+      3.3, &fpath, &left_nudgable, &right_nudgable);
 
   EXPECT_FLOAT_EQ(left_nudgable, 1.595);
   EXPECT_FLOAT_EQ(right_nudgable, -0.405);
 }
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist) {
-  NaviObstacleDecider obstacledecider;
-  auto& obstacle_lat_dist = obstacledecider.MutableObstacleLatDistance();
+  NaviObstacleDecider obstacle_decider;
+  auto& obstacle_lat_dist = obstacle_decider.MutableObstacleLatDistance();
 
-  obstacle_lat_dist.insert(std::pair<double, float>(2.0, 2.5));
-  float nudge_dist = 0;
-  nudge_dist = obstacledecider.GetNudgeDistance(1.0, -0.5);
+  obstacle_lat_dist.emplace(std::pair<double, double>(2.0, 2.5));
+  double nudge_dist = 0;
+  nudge_dist = obstacle_decider.GetNudgeDistance(1.0, -0.5);
   EXPECT_FLOAT_EQ(nudge_dist, -0.455);
 }
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
-  NaviObstacleDecider obstacledecider;
-  auto& obstacle_lat_dist = obstacledecider.MutableObstacleLatDistance();
+  NaviObstacleDecider obstacle_decider;
+  auto& obstacle_lat_dist = obstacle_decider.MutableObstacleLatDistance();
 
-  obstacle_lat_dist.insert(std::pair<double, float>(2.0, -2.5));
-  float nudge_dist = 0.0;
-  nudge_dist = obstacledecider.GetNudgeDistance(1.0, 0.0);
+  obstacle_lat_dist.emplace(std::pair<double, double>(2.0, -2.5));
+  double nudge_dist = 0.0;
+  nudge_dist = obstacle_decider.GetNudgeDistance(1.0, 0.0);
   EXPECT_FLOAT_EQ(nudge_dist, 0.455);
 }
 
