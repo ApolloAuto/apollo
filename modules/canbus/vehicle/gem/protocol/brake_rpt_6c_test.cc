@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/accel_rpt_68.h"
+#include "modules/canbus/vehicle/gem/protocol/brake_rpt_6c.h"
 
 #include "gtest/gtest.h"
 
@@ -22,22 +22,19 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
-class Accelrpt68Test : public ::testing::Test {
- public:
-  virtual void SetUp() {}
-};
-
-TEST_F(Accelrpt68Test, reset) {
-  Accelrpt68 acc;
+TEST(Brake61Test, General) {
   int32_t length = 8;
   ChassisDetail chassis_detail;
   uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
 
-  acc.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().accel_rpt_68().manual_input(), 0.258);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().accel_rpt_68().commanded_value(),
-                   0.772);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().accel_rpt_68().output_value(), 4.37);
+  Brakerpt6c brake;
+  brake.Parse(bytes, length, &chassis_detail);
+
+  auto &brakerpt = chassis_detail.gem().brake_rpt_6c();
+  EXPECT_DOUBLE_EQ(brakerpt.manual_input(), 0.258);
+  EXPECT_DOUBLE_EQ(brakerpt.commanded_value(), 0.772);
+  EXPECT_DOUBLE_EQ(brakerpt.output_value(), 4.37);
+  EXPECT_EQ(brakerpt.brake_on_off(), Brake_rpt_6c::BRAKE_ON_OFF_ON);
 }
 
 }  // namespace gem
