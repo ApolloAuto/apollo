@@ -48,7 +48,7 @@ using apollo::hdmap::InterpolatedIndex;
 ReferenceLine::ReferenceLine(
     const std::vector<ReferencePoint>& reference_points)
     : reference_points_(reference_points),
-      map_path_(MapPath(std::vector<hdmap::MapPathPoint>(
+      map_path_(std::move(std::vector<hdmap::MapPathPoint>(
           reference_points.begin(), reference_points.end()))) {
   CHECK_EQ(map_path_.num_points(), reference_points_.size());
 }
@@ -118,8 +118,8 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
     reference_points_.insert(reference_points_.end(),
                              other_points.begin() + end_i, other_points.end());
   }
-  map_path_ = MapPath(std::vector<hdmap::MapPathPoint>(
-      reference_points_.begin(), reference_points_.end()));
+  map_path_ = MapPath(std::move(std::vector<hdmap::MapPathPoint>(
+      reference_points_.begin(), reference_points_.end())));
   return true;
 }
 
@@ -167,8 +167,8 @@ bool ReferenceLine::Shrink(const common::math::Vec2d& point,
     AERROR << "Too few reference points after shrinking.";
     return false;
   }
-  map_path_ = MapPath(std::vector<hdmap::MapPathPoint>(
-      reference_points_.begin(), reference_points_.end()));
+  map_path_ = MapPath(std::move(std::vector<hdmap::MapPathPoint>(
+      reference_points_.begin(), reference_points_.end())));
   return true;
 }
 
@@ -416,7 +416,7 @@ bool ReferenceLine::GetLaneWidth(const double s, double* const lane_left_width,
 }
 
 bool ReferenceLine::GetRoadWidth(const double s, double* const road_left_width,
-                  double* const road_right_width) const {
+                                 double* const road_right_width) const {
   if (map_path_.path_points().empty()) {
     return false;
   }
