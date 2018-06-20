@@ -299,11 +299,10 @@ DEFINE_double(lon_collision_buffer, 2.0,
 DEFINE_double(lat_collision_buffer, 0.2,
               "The lateral buffer to keep distance to other vehicles");
 DEFINE_uint32(num_sample_follow_per_timestamp, 3,
-             "The number of sample points for each timestamp to follow");
+              "The number of sample points for each timestamp to follow");
 
 // Lattice Evaluate Parameters
-DEFINE_double(weight_lon_objective, 10.0,
-              "Weight of longitudinal travel cost");
+DEFINE_double(weight_lon_objective, 10.0, "Weight of longitudinal travel cost");
 DEFINE_double(weight_lon_jerk, 1.0, "Weight of longitudinal jerk cost");
 DEFINE_double(weight_lon_collision, 5.0,
               "Weight of logitudinal collision cost");
@@ -336,6 +335,7 @@ DEFINE_double(polynomial_minimal_param, 0.01,
               "Minimal time parameter in polynomials.");
 DEFINE_double(lattice_stop_buffer, 0.02,
               "The bufffer before the stop s to check trajectories.");
+DEFINE_double(weight_change_lane, 100.0, "Weight of change lane cost");
 
 // navigation mode
 DEFINE_double(navigation_fallback_cruise_time, 8.0,

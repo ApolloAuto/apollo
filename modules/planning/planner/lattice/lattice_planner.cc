@@ -51,8 +51,8 @@ using apollo::common::PathPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::math::PathMatcher;
 using apollo::common::math::CartesianFrenetConverter;
+using apollo::common::math::PathMatcher;
 using apollo::common::time::Clock;
 
 namespace {
@@ -99,6 +99,12 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
                             Frame* frame) {
   std::size_t success_line_count = 0;
   std::size_t index = 0;
+  bool is_change_lane = false;
+  for (auto& reference_line_info : frame->reference_line_info()) {
+    if (reference_line_info.IsChangeLanePath()) {
+      is_change_lane = true;
+    }
+  }
   for (auto& reference_line_info : frame->reference_line_info()) {
     if (index != 0) {
       reference_line_info.SetPriorityCost(
@@ -108,6 +114,15 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
     }
     auto status =
         PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
+    // set the 1st reference_line_info from frame as the start line
+    // set the 2nd reference_line_info from frame as the end line
+    // addcost weight_change_lane when index is 0
+    // don't add anything when index is not 0
+    // plan a smooth line from start line to end line slowly if it
+    // runs on the start line
+    if (is_change_lane && index == 0) {
+      reference_line_info.AddCost(FLAGS_weight_change_lane);
+    }
 
     if (status != Status::OK()) {
       if (reference_line_info.IsChangeLanePath()) {
@@ -168,11 +183,9 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // 4. parse the decision and get the planning target.
   auto ptr_path_time_graph = std::make_shared<PathTimeGraph>(
-      ptr_prediction_querier->GetObstacles(),
-      *ptr_reference_line,
-      reference_line_info,
-      init_s[0], init_s[0] + FLAGS_decision_horizon,
-      0.0, FLAGS_trajectory_time_length);
+      ptr_prediction_querier->GetObstacles(), *ptr_reference_line,
+      reference_line_info, init_s[0], init_s[0] + FLAGS_decision_horizon, 0.0,
+      FLAGS_trajectory_time_length);
 
   PlanningTarget planning_target = reference_line_info->planning_target();
   if (planning_target.has_stop_point()) {
