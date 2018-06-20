@@ -34,6 +34,7 @@ TEST(HermesCanClient, init) {
   //      EXPECT_EQ(hermes_can.Start(), ErrorCode::OK);
 }
 
+/*
 TEST(HermesCanClient, send) {
   CANCardParameter param;
   param.set_brand(CANCardParameter::HERMES_CAN);
@@ -77,7 +78,7 @@ TEST(HermesCanClient, receiver) {
   EXPECT_EQ(hermes_can.Start(), ErrorCode::OK);
   EXPECT_EQ(hermes_can.Receive(&frames, &num), ErrorCode::OK);
 }
-
+*/
 }  // namespace can
 }  // namespace canbus
 }  // namespace drivers
