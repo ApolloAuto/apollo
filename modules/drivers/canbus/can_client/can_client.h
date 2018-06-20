@@ -78,12 +78,12 @@ struct CanFrame {
   }
 };
 
- const int CAN_RESULT_SUCC = 0;
- const int CAN_ERROR_BASE = 2000;
- const int CAN_ERROR_OPEN_DEVICE_FAILED = CAN_ERROR_BASE + 1;
- const int CAN_ERROR_FRAME_NUM = CAN_ERROR_BASE + 2;
- const int CAN_ERROR_SEND_FAILED = CAN_ERROR_BASE + 3;
- const int CAN_ERROR_RECV_FAILED = CAN_ERROR_BASE + 4;
+const int CAN_RESULT_SUCC = 0;
+const int CAN_ERROR_BASE = 2000;
+const int CAN_ERROR_OPEN_DEVICE_FAILED = CAN_ERROR_BASE + 1;
+const int CAN_ERROR_FRAME_NUM = CAN_ERROR_BASE + 2;
+const int CAN_ERROR_SEND_FAILED = CAN_ERROR_BASE + 3;
+const int CAN_ERROR_RECV_FAILED = CAN_ERROR_BASE + 4;
 
 /**
  * @class CanClient

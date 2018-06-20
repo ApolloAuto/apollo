@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <vector>
 
 #include <iostream>
 
@@ -134,8 +135,7 @@ apollo::common::ErrorCode HermesCanClient::Send(
     int ret_send_error = bcan_get_status(_dev_handler);
     AERROR << "send message failed, error code: " << ret
            << ", send error: " << ret_send_error;
-    return ErrorCode::
-        CAN_CLIENT_ERROR_SEND_FAILED;  /////////////////////////////////////////////////
+    return ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED;
   }
   *frame_num = ret;
   return ErrorCode::OK;
@@ -165,8 +165,7 @@ apollo::common::ErrorCode HermesCanClient::Receive(
     int ret_rece_error = bcan_get_status(_dev_handler);
     AERROR << "receive message failed, error code:" << ret
            << "receive error:" << ret_rece_error;
-    return ErrorCode::
-        CAN_CLIENT_ERROR_RECV_FAILED;  ///////////////////////////////////////
+    return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
   }
   *frame_num = ret;
 

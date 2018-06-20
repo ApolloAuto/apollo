@@ -18,6 +18,7 @@
 #define MODULES_DRIVERS_CANBUS_CAN_CLIENT_CLIENT_HERMES_CAN_CLIENT_H
 
 #include <string>
+#include <vector>
 
 #include "gflags/gflags.h"
 #include "modules/common/proto/error_code.pb.h"
