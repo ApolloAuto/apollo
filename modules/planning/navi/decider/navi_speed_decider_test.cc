@@ -55,8 +55,8 @@ TEST(NaviSpeedDeciderTest, CreateSpeedData) {
   perception_obstacle.mutable_velocity()->set_y(0.0);
   perception_obstacle.set_length(3.0);
   perception_obstacle.set_width(3.0);
-  obstacle_buf.push_back(Obstacle("1", perception_obstacle));
-  obstacles.push_back(&obstacle_buf.back());
+  obstacle_buf.emplace_back("1", perception_obstacle);
+  obstacles.emplace_back(&obstacle_buf.back());
 
   // obstacle2
   perception_obstacle.mutable_position()->set_x(25.0);
@@ -65,8 +65,8 @@ TEST(NaviSpeedDeciderTest, CreateSpeedData) {
   perception_obstacle.mutable_velocity()->set_y(0.0);
   perception_obstacle.set_length(3.0);
   perception_obstacle.set_width(3.0);
-  obstacle_buf.push_back(Obstacle("2", perception_obstacle));
-  obstacles.push_back(&obstacle_buf.back());
+  obstacle_buf.emplace_back("2", perception_obstacle);
+  obstacles.emplace_back(&obstacle_buf.back());
 
   // obstacle3
   perception_obstacle.mutable_position()->set_x(10.0);
@@ -75,8 +75,8 @@ TEST(NaviSpeedDeciderTest, CreateSpeedData) {
   perception_obstacle.mutable_velocity()->set_y(0.0);
   perception_obstacle.set_length(3.0);
   perception_obstacle.set_width(3.0);
-  obstacle_buf.push_back(Obstacle("3", perception_obstacle));
-  obstacles.push_back(&obstacle_buf.back());
+  obstacle_buf.emplace_back("3", perception_obstacle);
+  obstacles.emplace_back(&obstacle_buf.back());
 
   SpeedData speed_data;
   NaviSpeedDecider speed_decider;
