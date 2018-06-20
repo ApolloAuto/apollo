@@ -80,7 +80,20 @@ cc_test(
     name = "accel_rpt_68_test",
     size = "small",
     srcs = [
-        "accel_rpt_68.cc",
+        "accel_rpt_68_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
+
+cc_test(
+    name = "brake_rpt_6c_test",
+    size = "small",
+    srcs = [
+        "brake_rpt_6c_test.cc",
     ],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
