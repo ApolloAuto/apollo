@@ -43,6 +43,8 @@ planning_deps="$perfect_control_topic \
     or topic == '/apollo/canbus/chassis' \
     or topic == '/apollo/localization/pose' \
     or topic == '/apollo/navigation' \
+    or topic == '/apollo/guardian' \
+    or topic == '/apollo/monitor/system_status' \
     or topic == '/apollo/relative_map'"
 
 planning_topic="topic == '/apollo/planning'"
@@ -165,7 +167,7 @@ function filter() {
         target="$2/${name%.*}.wp.bag"
         rosbag filter $1 "$target" "$planning_all"
     fi
-    
+
     if $is_camera_only; then
 	target="$2/${name%.*}.co.bag"
 	rosbag filter $1 "$target" "$camera_only"
