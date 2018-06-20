@@ -148,7 +148,7 @@ Pandar40P_Internal::~Pandar40P_Internal() {
  * @brief load the correction file
  * @param file The path of correction file
  */
-int Pandar40P_Internal::LoadCorrectionFile(const std::string &correction_content) {
+int Pandar40P_Internal::LoadCorrectionFile(const std::string &correction_content) {  // NOLINT
   std::istringstream ifs(correction_content);
 
   std::string line;
