@@ -44,7 +44,7 @@ class ReferenceLine {
   template <typename Iterator>
   explicit ReferenceLine(const Iterator begin, const Iterator end)
       : reference_points_(begin, end),
-        map_path_(hdmap::Path(std::vector<hdmap::MapPathPoint>(begin, end))) {}
+        map_path_(std::move(std::vector<hdmap::MapPathPoint>(begin, end))) {}
   explicit ReferenceLine(const std::vector<ReferencePoint>& reference_points);
   explicit ReferenceLine(const hdmap::Path& hdmap_path);
 
