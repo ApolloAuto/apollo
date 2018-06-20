@@ -23,7 +23,6 @@
 #include <memory>
 #include <vector>
 
-#include "modules/common/log.h"
 namespace apollo {
 namespace planning {
 
@@ -37,7 +36,7 @@ LocalPath::LocalPath(const std::vector<common::PathPoint> &path_points)
 }
 
 bool LocalPath::GetInitY(double *y_val) {
-  DCHECK_NOTNULL(y_val);
+  // DCHECK_NOTNULL(y_val);
   if (points_.empty()) {
     return false;
   }
@@ -54,12 +53,10 @@ void LocalPath::Shift(const double dist) {
 }
 
 void LocalPath::Cut(const double dist) {
-  // TODO(all) :not realized now and will be perfected in the future
   return;
 }
 
 void LocalPath::Resample() {
-  // TODO(all) :not realized now and will be perfected in the future
   return;
 }
 

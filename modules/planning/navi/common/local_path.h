@@ -25,9 +25,9 @@
 #include <memory>
 #include <vector>
 
+#include "modules/common/math/vec2d.h"
 #include "modules/common/proto/pnc_point.pb.h"
 
-#include "modules/common/math/vec2d.h"
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
@@ -40,6 +40,8 @@ namespace planning {
  */
 class LocalPath {
  public:
+  LocalPath() = default;
+
   explicit LocalPath(const std::vector<common::PathPoint> &path_points);
 
   virtual ~LocalPath() = default;
@@ -57,6 +59,13 @@ class LocalPath {
    * the (x,y) coordinates vector.
    */
   const std::vector<common::math::Vec2d> &GetXYPoints();
+
+  /**
+   * @brief get the PathPoints vector.
+   * @return const std::vector<common::math::PathPoint>& constant reference of
+   * the PathPoints vector.
+   */
+  const std::vector<common::PathPoint> &GetPathPoints();
 
   /**
    * @brief get points range.
@@ -99,6 +108,10 @@ class LocalPath {
 
 inline const std::vector<common::math::Vec2d> &LocalPath::GetXYPoints() {
   return points_;
+}
+
+inline const std::vector<common::PathPoint> &LocalPath::GetPathPoints() {
+  return path_points_;
 }
 
 inline int LocalPath::GetRange() {

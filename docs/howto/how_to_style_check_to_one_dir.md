@@ -1,13 +1,13 @@
-## how to add c++ style check to one directory?
-1. in BUILD file, at the top, add the following line
+## How to add C++ style check to one directory?
+1. In the BUILD file, at the top, add the following line
     ```
     load("//tools:cpplint.bzl", "cpplint")
     ```
-2. in BUILD file, at the bottom, add the following line
+2. In the BUILD file, at the bottom, add the following line
     ```
     cpplint()
     ```
-3. run `apollo.sh check` to verify if the directory passes style check.
+3. Run `apollo.sh check` to verify if the directory passes style check.
 
 ### Please use the [BUILD](https://github.com/ApolloAuto/apollo/blob/master/modules/canbus/BUILD) file of canbus module as an example.
 ```
