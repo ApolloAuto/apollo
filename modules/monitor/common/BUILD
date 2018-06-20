@@ -7,6 +7,7 @@ cc_library(
     srcs = ["recurrent_runner.cc"],
     hdrs = ["recurrent_runner.h"],
     deps = [
+        ":monitor_manager",
         "//modules/common:log",
         "//modules/common/time",
     ],
@@ -20,6 +21,7 @@ cc_library(
         "//modules/common/monitor_log",
         "//modules/common/util",
         "//modules/common/util:map_util",
+        "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/monitor/proto:monitor_conf_proto",
         "//modules/monitor/proto:system_status_proto",
     ],

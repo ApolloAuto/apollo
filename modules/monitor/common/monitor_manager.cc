@@ -17,8 +17,11 @@
 #include "modules/monitor/common/monitor_manager.h"
 
 #include "gflags/gflags.h"
+#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/map_util.h"
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 DEFINE_string(monitor_conf_path, "modules/monitor/conf/monitor_conf.pb.txt",
               "Path of the monitor config file.");
@@ -26,6 +29,8 @@ DEFINE_string(monitor_conf_path, "modules/monitor/conf/monitor_conf.pb.txt",
 namespace apollo {
 namespace monitor {
 
+using apollo::canbus::Chassis;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::util::LookupOrInsert;
 
 MonitorManager::MonitorManager() :
@@ -43,6 +48,31 @@ const MonitorConf &MonitorManager::GetConfig() {
   return instance()->config_;
 }
 
+void MonitorManager::InitFrame(const double current_time) {
+  // Clear old summaries.
+  for (auto &module : *GetStatus()->mutable_modules()) {
+    module.second.set_summary(Summary::UNKNOWN);
+    module.second.clear_msg();
+  }
+  for (auto &hardware : *GetStatus()->mutable_hardware()) {
+    hardware.second.set_summary(Summary::UNKNOWN);
+    hardware.second.clear_msg();
+  }
+
+  // Get current DrivingMode, which will affect how we monitor modules.
+  instance()->in_autonomous_driving_ = false;
+  auto* adapter = CHECK_NOTNULL(AdapterManager::GetChassis());
+  adapter->Observe();
+  if (!adapter->Empty()) {
+    const auto& chassis = adapter->GetLatestObserved();
+    // Ignore old messages which is likely from replaying.
+    instance()->in_autonomous_driving_ =
+        chassis.driving_mode() == Chassis::COMPLETE_AUTO_DRIVE &&
+        chassis.header().timestamp_sec() + FLAGS_system_status_lifetime_seconds
+            >= current_time;
+  }
+}
+
 SystemStatus *MonitorManager::GetStatus() {
   return &instance()->status_;
 }
@@ -54,6 +84,10 @@ HardwareStatus *MonitorManager::GetHardwareStatus(
 
 ModuleStatus *MonitorManager::GetModuleStatus(const std::string &module_name) {
   return &LookupOrInsert(GetStatus()->mutable_modules(), module_name, {});
+}
+
+bool MonitorManager::IsInAutonomousDriving() {
+  return instance()->in_autonomous_driving_;
 }
 
 }  // namespace monitor

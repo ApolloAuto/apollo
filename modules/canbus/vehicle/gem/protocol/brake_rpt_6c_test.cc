@@ -14,15 +14,29 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/math/qp_solver/qp_solver_gflags.h"
+#include "modules/canbus/vehicle/gem/protocol/brake_rpt_6c.h"
 
-// math : active set solver
-DEFINE_double(default_active_set_eps_num, -1e-7,
-              "qpOases wrapper error control numerator");
-DEFINE_double(default_active_set_eps_den, 1e-7,
-              "qpOases wrapper error control denominator");
-DEFINE_double(default_active_set_eps_iter_ref, 1e-7,
-              "qpOases wrapper early termination tolerance for iterative refinement");  // NOLINT
-DEFINE_bool(default_enable_active_set_debug_info, false,
-            "Enable print information");
-DEFINE_int32(default_qp_iteration_num, 1000, "Default qp oases iteration time");
+#include "gtest/gtest.h"
+
+namespace apollo {
+namespace canbus {
+namespace gem {
+
+TEST(Brake61Test, General) {
+  int32_t length = 8;
+  ChassisDetail chassis_detail;
+  uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
+
+  Brakerpt6c brake;
+  brake.Parse(bytes, length, &chassis_detail);
+
+  auto &brakerpt = chassis_detail.gem().brake_rpt_6c();
+  EXPECT_DOUBLE_EQ(brakerpt.manual_input(), 0.258);
+  EXPECT_DOUBLE_EQ(brakerpt.commanded_value(), 0.772);
+  EXPECT_DOUBLE_EQ(brakerpt.output_value(), 4.37);
+  EXPECT_EQ(brakerpt.brake_on_off(), Brake_rpt_6c::BRAKE_ON_OFF_ON);
+}
+
+}  // namespace gem
+}  // namespace canbus
+}  // namespace apollo
