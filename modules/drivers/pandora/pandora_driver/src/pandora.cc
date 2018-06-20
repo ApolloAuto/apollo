@@ -45,7 +45,7 @@ class Pandora_Internal {
   int GetCameraCalibration(CameraCalibration calibs[5]);
   int ResetCameraClibration();
   void GetCalibrationFromDevice();
-  int ParseCameraCalibration(const std::string contents,
+  int ParseCameraCalibration(const std::string& contents,
                              CameraCalibration calibs[5]);
   int GenerateCameraCalibration(const CameraCalibration calibs[5],
                                 std::string *contents);
@@ -260,7 +260,7 @@ void Pandora_Internal::GetCalibrationFromDevice() {
   }
 }
 
-int Pandora_Internal::ParseCameraCalibration(const std::string contents,
+int Pandora_Internal::ParseCameraCalibration(const std::string& contents,
                                              CameraCalibration calibs[5]) {
   std::cout << "Parse Camera Calibration..." << std::endl;
   if (contents.empty()) {
