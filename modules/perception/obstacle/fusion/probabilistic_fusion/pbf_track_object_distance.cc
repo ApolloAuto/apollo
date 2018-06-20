@@ -144,7 +144,7 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
   static float weight_y = 0.2f;
   static float speed_diff = 5.0f;
   static float epislon = 0.1f;
-  static float angle_tolerance = 3.0f;
+  static float angle_tolerance = 1.0f;
   static float distance_tolerance_max = 5.0f;
   static float distance_tolerance_min = 2.0f;
 
@@ -170,6 +170,7 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
 
   if (fcenter(0) > epislon && std::abs(fcenter(1)) > epislon) {
     float x_ratio = std::abs(fcenter(0) - scenter(0)) / fcenter(0);
+    assert(x_ratio >=0);
     float y_ratio = std::abs(fcenter(1) - scenter(1)) / std::abs(fcenter(1));
 
     if (x_ratio < FLAGS_pbf_fusion_assoc_distance_percent &&
@@ -200,7 +201,7 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
     if (svelocity > 0.0 && fvelocity > 0.0) {
       float cos_distance =
           sobj->velocity.dot(fobj->velocity) / (svelocity * fvelocity);
-      if (cos_distance > FLAGS_pbf_distance_speed_cos_diff) {
+      if (cos_distance < FLAGS_pbf_distance_speed_cos_diff) {
         ADEBUG << "ignore radar data for fusing" << cos_distance;
         distance = std::numeric_limits<float>::max();
       }
