@@ -28,22 +28,16 @@ class Accelrpt68Test : public ::testing::Test {
 };
 
 TEST_F(Accelrpt68Test, reset) {
-  Accelcmd67 acc;
+  Accelrpt68 acc;
   int32_t length = 8;
   ChassisDetail chassis_detail;
-  uint8_t bytes[8] = {0, 0};
+  uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
 
-  bytes[0] = 0b11111100;
-  bytes[1] = 0b11111110;
-  bytes[2] = 0b11111110;
-  bytes[3] = 0b11111110;
-  bytes[4] = 0b11111110;
-  bytes[5] = 0b11111110;
   acc.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().accel_rpt_68().manual_input(), -2.6);
+  EXPECT_DOUBLE_EQ(chassis_detail.gem().accel_rpt_68().manual_input(), 0.258);
   EXPECT_DOUBLE_EQ(chassis_detail.gem().accel_rpt_68().commanded_value(),
-                   -2.58);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().accel_rpt_68().output_value(), -2.58);
+                   0.772);
+  EXPECT_DOUBLE_EQ(chassis_detail.gem().accel_rpt_68().output_value(), 4.37);
 }
 
 }  // namespace gem

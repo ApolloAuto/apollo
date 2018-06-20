@@ -14,35 +14,29 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln/lincoln_vehicle_factory.h"
+#include "modules/canbus/vehicle/gem/protocol/brake_rpt_6c.h"
 
 #include "gtest/gtest.h"
 
-#include "modules/canbus/proto/vehicle_parameter.pb.h"
-
 namespace apollo {
 namespace canbus {
+namespace gem {
 
-class LincolnVehicleFactoryTest : public ::testing::Test {
- public:
-  virtual void SetUp() {
-    VehicleParameter parameter;
-    parameter.set_brand(VehicleParameter::LINCOLN_MKZ);
-    lincoln_factory_.SetVehicleParameter(parameter);
-  }
-  virtual void TearDown() {}
+TEST(Brake61Test, General) {
+  int32_t length = 8;
+  ChassisDetail chassis_detail;
+  uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
 
- protected:
-  LincolnVehicleFactory lincoln_factory_;
-};
+  Brakerpt6c brake;
+  brake.Parse(bytes, length, &chassis_detail);
 
-TEST_F(LincolnVehicleFactoryTest, InitVehicleController) {
-  EXPECT_TRUE(lincoln_factory_.CreateVehicleController() != nullptr);
+  auto &brakerpt = chassis_detail.gem().brake_rpt_6c();
+  EXPECT_DOUBLE_EQ(brakerpt.manual_input(), 0.258);
+  EXPECT_DOUBLE_EQ(brakerpt.commanded_value(), 0.772);
+  EXPECT_DOUBLE_EQ(brakerpt.output_value(), 4.37);
+  EXPECT_EQ(brakerpt.brake_on_off(), Brake_rpt_6c::BRAKE_ON_OFF_ON);
 }
 
-TEST_F(LincolnVehicleFactoryTest, InitMessageManager) {
-  EXPECT_TRUE(lincoln_factory_.CreateMessageManager() != nullptr);
-}
-
+}  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
