@@ -29,7 +29,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::Vec2d;
 using apollo::common::Status;
 using apollo::common::VehicleState;
 
@@ -62,16 +61,16 @@ Status NaviSpeedDecider::MakeSpeedDecision(
     const VehicleState& vehicle_state,
     const std::vector<const Obstacle*>& obstacles,
     SpeedData* const speed_data) {
-  CHECK_NOTNULL(speed_data);
+  DCHECK_NOTNULL(speed_data);
 
   auto obstacle_closest_lon = kObstacleMaxLon;
   bool has_obstacle_speed = false;
   double obstacle_speed = 0.0;
 
-  CHECK(vehicle_state.has_linear_velocity());
-  CHECK(vehicle_state.has_linear_acceleration());
-  auto vehicle_speed = vehicle_state.linear_velocity();
-  auto vehicle_acceleration = vehicle_state.linear_acceleration();
+  auto vehicle_speed = vehicle_state.has_linear_velocity() ?
+      vehicle_state.linear_velocity() : 0.0;
+  auto vehicle_acceleration = vehicle_state.has_linear_acceleration() ?
+      vehicle_state.linear_acceleration() : 0.0;
 
   const auto& vehicle_config =
       common::VehicleConfigHelper::instance()->GetConfig();
@@ -79,17 +78,19 @@ Status NaviSpeedDecider::MakeSpeedDecision(
       vehicle_config.vehicle_param().front_edge_to_center();
 
   for (const auto* obstacle : obstacles) {
-    auto perception_obstacle = obstacle->Perception();
-    CHECK(perception_obstacle.has_velocity());
-    auto rel_speed = perception_obstacle.velocity().x();
-
     // using FLU
     const auto obstacle_aa_box = obstacle->PerceptionBoundingBox().GetAABox();
-    // TODO(all): if distence < 0 ?
-    auto distence = obstacle_aa_box.min_x() - front_edge_to_center;
-    if (distence < obstacle_closest_lon) {
-      obstacle_closest_lon = distence;
+    // TODO(all): if distance < 0 ?
+    auto distance = obstacle_aa_box.min_x() - front_edge_to_center;
+    // get the obstacle with minimum distance
+    if (distance < obstacle_closest_lon) {
+      obstacle_closest_lon = distance;
       has_obstacle_speed = true;
+
+      double rel_speed = 0.0;
+      if (obstacle->Perception().has_velocity() &&
+          obstacle->Perception().velocity().has_x())
+        rel_speed = obstacle->Perception().velocity().x();
       // TODO(all): if obstacle_speed < 0 ?
       obstacle_speed = rel_speed + vehicle_speed;
     }
@@ -97,8 +98,8 @@ Status NaviSpeedDecider::MakeSpeedDecision(
 
   // decide speed
   auto speed =
-    has_obstacle_speed && (obstacle_speed < FLAGS_default_cruise_speed) ?
-    obstacle_speed : FLAGS_default_cruise_speed;
+      has_obstacle_speed && (obstacle_speed < FLAGS_default_cruise_speed) ?
+      obstacle_speed : FLAGS_default_cruise_speed;
 
   // create speed-points
   speed_data->Clear();

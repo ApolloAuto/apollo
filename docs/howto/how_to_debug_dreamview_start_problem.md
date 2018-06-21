@@ -1,6 +1,6 @@
-## How to Debug a Dreamview Start Problem
+## How to Debug the Dreamview Start Problem
 
-### Steps to start Dreamview
+### Steps to Start Dreamview
 
 If you encounter problems when starting Dreamview in the `docker/scripts/dev` sequence, first check if you are using the correct commands as shown below.
 
@@ -44,8 +44,8 @@ $ source scripts/apollo_base.sh;
 $ start_gdb dreamview
 ```
 
-Once gdb is launched, press `r` and `enter` key to run,  if dreamview is crashed, then get the backtrace with `bt`.
+Once gdb is launched, press `r` and `enter` key to run,  if dreamview crashes, then get the backtrace with `bt`.
 
-If you see an error `Illegal instruction` and something related with libpcl_sample_consensus.so.1.7 in gdb backtrace, then you probably need to rebuild pcl lib from source by yourself and replace the one in the docker.
+If you see an error `Illegal instruction` and something related with **libpcl_sample_consensus.so.1.7** in gdb backtrace, then you probably need to rebuild pcl lib from source by yourself and replace the one in the docker.
 
-This is usually happed when you're trying to run Apollo/dreamview on a machine that the CPU does not support FMA/FMA3 instructions, it will fail because the prebuilt pcl lib shipped with docker image is compiled with FMA/FMA3 support.
+This usually happens when you're trying to run Apollo/dreamview on a machine that the CPU does not support FMA/FMA3 instructions, it will fail because the prebuilt pcl lib shipped with docker image is compiled with FMA/FMA3 support.
