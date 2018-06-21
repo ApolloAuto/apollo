@@ -189,4 +189,11 @@ navi_planner_config {
         min_look_forward_time: 2
         max_smooth_init_y: 0.2
     }
+
+    navi_speed_decider_config {
+        preferred_accel: 2.0
+        preferred_decel: 2.0
+        max_accel: 4.0
+        max_decel: 5.0
+    }
 }

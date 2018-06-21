@@ -36,20 +36,19 @@ using apollo::perception::PerceptionObstacle;
 namespace apollo {
 namespace planning {
 
-TEST(NaviSpeedDeciderTest, CreateSpeedData) {
+TEST(NaviSpeedDeciderTest, CreateSpeedData1) {
   VehicleState vehicle_state;
-  vehicle_state.set_linear_velocity(30.0);
-  vehicle_state.set_linear_acceleration(1.0);
+  vehicle_state.set_linear_velocity(0.0);
 
   PerceptionObstacle perception_obstacle;
   std::list<Obstacle> obstacle_buf;
   std::vector<const Obstacle*> obstacles;
 
   // set cruise speed
-  FLAGS_default_cruise_speed = 60.0;
+  FLAGS_default_cruise_speed = 10.0;
 
   // obstacle1
-  perception_obstacle.mutable_position()->set_x(41.0);
+  perception_obstacle.mutable_position()->set_x(41000.0);
   perception_obstacle.mutable_position()->set_y(1.0);
   perception_obstacle.mutable_velocity()->set_x(10.0);
   perception_obstacle.mutable_velocity()->set_y(0.0);
@@ -59,7 +58,7 @@ TEST(NaviSpeedDeciderTest, CreateSpeedData) {
   obstacles.emplace_back(&obstacle_buf.back());
 
   // obstacle2
-  perception_obstacle.mutable_position()->set_x(25.0);
+  perception_obstacle.mutable_position()->set_x(25000.0);
   perception_obstacle.mutable_position()->set_y(0.0);
   perception_obstacle.mutable_velocity()->set_x(0.0);
   perception_obstacle.mutable_velocity()->set_y(0.0);
@@ -69,7 +68,7 @@ TEST(NaviSpeedDeciderTest, CreateSpeedData) {
   obstacles.emplace_back(&obstacle_buf.back());
 
   // obstacle3
-  perception_obstacle.mutable_position()->set_x(10.0);
+  perception_obstacle.mutable_position()->set_x(10000.0);
   perception_obstacle.mutable_position()->set_y(-1.0);
   perception_obstacle.mutable_velocity()->set_x(-12.0);
   perception_obstacle.mutable_velocity()->set_y(0.0);
@@ -80,17 +79,134 @@ TEST(NaviSpeedDeciderTest, CreateSpeedData) {
 
   SpeedData speed_data;
   NaviSpeedDecider speed_decider;
+  speed_decider.UpdateAccelSettings(2.0, 2.0, 4.0, 5.0);
+
+  EXPECT_EQ(Status::OK(),
+      speed_decider.MakeSpeedDecision(vehicle_state, obstacles, &speed_data));
+  EXPECT_EQ(3, speed_data.speed_vector().size());
+
+  const auto& first_point = speed_data.speed_vector()[0];
+  const auto& second_point = speed_data.speed_vector()[1];
+  const auto& third_point = speed_data.speed_vector()[2];
+
+  EXPECT_NEAR(0.0, first_point.s(), 0.01);
+  EXPECT_NEAR(0.0, first_point.t(), 0.01);
+  EXPECT_NEAR(0.0, first_point.v(), 0.01);
+  EXPECT_NEAR(2.0, first_point.a(), 0.01);
+  EXPECT_NEAR(25.0, second_point.s(), 0.01);
+  EXPECT_NEAR(5.0, second_point.t(), 0.01);
+  EXPECT_NEAR(10.0, second_point.v(), 0.01);
+  EXPECT_NEAR(0.0, second_point.a(), 0.01);
+  EXPECT_NEAR(999.0, third_point.s(), 0.01);
+  EXPECT_NEAR(102.4, third_point.t(), 0.01);
+  EXPECT_NEAR(10.0, third_point.v(), 0.01);
+  EXPECT_NEAR(0.0, third_point.a(), 0.01);
+}
+
+TEST(NaviSpeedDeciderTest, CreateSpeedData2) {
+  VehicleState vehicle_state;
+  vehicle_state.set_linear_velocity(10.0);
+
+  PerceptionObstacle perception_obstacle;
+  std::list<Obstacle> obstacle_buf;
+  std::vector<const Obstacle*> obstacles;
+
+  // set cruise speed
+  FLAGS_default_cruise_speed = 10.0;
+
+  SpeedData speed_data;
+  NaviSpeedDecider speed_decider;
+  speed_decider.UpdateAccelSettings(2.0, 2.0, 4.0, 5.0);
+
   EXPECT_EQ(Status::OK(),
       speed_decider.MakeSpeedDecision(vehicle_state, obstacles, &speed_data));
   EXPECT_EQ(2, speed_data.speed_vector().size());
-  EXPECT_DOUBLE_EQ(0.0, speed_data.speed_vector().front().s());
-  EXPECT_DOUBLE_EQ(0.0, speed_data.speed_vector().front().t());
-  EXPECT_DOUBLE_EQ(18.0, speed_data.speed_vector().front().v());
-  EXPECT_DOUBLE_EQ(1.0, speed_data.speed_vector().front().a());
-  EXPECT_NEAR(4.61, speed_data.speed_vector().back().s(), 0.01);
-  EXPECT_NEAR(0.256, speed_data.speed_vector().back().t(), 0.001);
-  EXPECT_DOUBLE_EQ(18.0, speed_data.speed_vector().back().v());
-  EXPECT_DOUBLE_EQ(0.0, speed_data.speed_vector().back().a());
+
+  const auto& first_point = speed_data.speed_vector()[0];
+  const auto& second_point = speed_data.speed_vector()[1];
+
+  EXPECT_NEAR(0.0, first_point.s(), 0.01);
+  EXPECT_NEAR(0.0, first_point.t(), 0.01);
+  EXPECT_NEAR(10.0, first_point.v(), 0.01);
+  EXPECT_NEAR(0.0, first_point.a(), 0.01);
+  EXPECT_NEAR(999.0, second_point.s(), 0.01);
+  EXPECT_NEAR(99.9, second_point.t(), 0.01);
+  EXPECT_NEAR(10.0, second_point.v(), 0.01);
+  EXPECT_NEAR(0.0, second_point.a(), 0.01);
+}
+
+TEST(NaviSpeedDeciderTest, CreateSpeedData3) {
+  VehicleState vehicle_state;
+  vehicle_state.set_linear_velocity(5.0);
+
+  PerceptionObstacle perception_obstacle;
+  std::list<Obstacle> obstacle_buf;
+  std::vector<const Obstacle*> obstacles;
+
+  // set cruise speed
+  FLAGS_default_cruise_speed = 10.0;
+
+  SpeedData speed_data;
+  NaviSpeedDecider speed_decider;
+  speed_decider.UpdateAccelSettings(2.0, 2.0, 4.0, 5.0);
+
+  EXPECT_EQ(Status::OK(),
+      speed_decider.MakeSpeedDecision(vehicle_state, obstacles, &speed_data));
+  EXPECT_EQ(3, speed_data.speed_vector().size());
+
+  const auto& first_point = speed_data.speed_vector()[0];
+  const auto& second_point = speed_data.speed_vector()[1];
+  const auto& third_point = speed_data.speed_vector()[2];
+
+  EXPECT_NEAR(0.0, first_point.s(), 0.01);
+  EXPECT_NEAR(0.0, first_point.t(), 0.01);
+  EXPECT_NEAR(5.0, first_point.v(), 0.01);
+  EXPECT_NEAR(2.0, first_point.a(), 0.01);
+  EXPECT_NEAR(18.75, second_point.s(), 0.01);
+  EXPECT_NEAR(2.5, second_point.t(), 0.01);
+  EXPECT_NEAR(10.0, second_point.v(), 0.01);
+  EXPECT_NEAR(0.0, second_point.a(), 0.01);
+  EXPECT_NEAR(999.0, third_point.s(), 0.01);
+  EXPECT_NEAR(100.525, third_point.t(), 0.01);
+  EXPECT_NEAR(10.0, third_point.v(), 0.01);
+  EXPECT_NEAR(0.0, third_point.a(), 0.01);
+}
+
+TEST(NaviSpeedDeciderTest, CreateSpeedData4) {
+  VehicleState vehicle_state;
+  vehicle_state.set_linear_velocity(20.0);
+
+  PerceptionObstacle perception_obstacle;
+  std::list<Obstacle> obstacle_buf;
+  std::vector<const Obstacle*> obstacles;
+
+  // set cruise speed
+  FLAGS_default_cruise_speed = 10.0;
+
+  SpeedData speed_data;
+  NaviSpeedDecider speed_decider;
+  speed_decider.UpdateAccelSettings(2.0, 2.0, 4.0, 5.0);
+
+  EXPECT_EQ(Status::OK(),
+      speed_decider.MakeSpeedDecision(vehicle_state, obstacles, &speed_data));
+  EXPECT_EQ(3, speed_data.speed_vector().size());
+
+  const auto& first_point = speed_data.speed_vector()[0];
+  const auto& second_point = speed_data.speed_vector()[1];
+  const auto& third_point = speed_data.speed_vector()[2];
+
+  EXPECT_NEAR(0.0, first_point.s(), 0.01);
+  EXPECT_NEAR(0.0, first_point.t(), 0.01);
+  EXPECT_NEAR(20.0, first_point.v(), 0.01);
+  EXPECT_NEAR(-2.0, first_point.a(), 0.01);
+  EXPECT_NEAR(75.0, second_point.s(), 0.01);
+  EXPECT_NEAR(5.0, second_point.t(), 0.01);
+  EXPECT_NEAR(10.0, second_point.v(), 0.01);
+  EXPECT_NEAR(0.0, second_point.a(), 0.01);
+  EXPECT_NEAR(999.0, third_point.s(), 0.01);
+  EXPECT_NEAR(97.4, third_point.t(), 0.01);
+  EXPECT_NEAR(10.0, third_point.v(), 0.01);
+  EXPECT_NEAR(0.0, third_point.a(), 0.01);
 }
 
 TEST(NaviSpeedDeciderTest, ErrorTest) {
