@@ -68,7 +68,7 @@ std::string TitleCase(const std::string &origin,
 // List subdirs and return a dict of {subdir_title: subdir_path}.
 Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
   Map<std::string, std::string> result;
-  const auto subdirs = apollo::common::util::ListSubDirectories(dir);
+  const auto subdirs = apollo::common::util::ListSubPaths(dir);
   for (const auto &subdir : subdirs) {
     const auto subdir_title = TitleCase(subdir);
     const auto subdir_path = apollo::common::util::StrCat(dir, "/", subdir);

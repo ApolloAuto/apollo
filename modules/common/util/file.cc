@@ -16,7 +16,6 @@
 
 #include "modules/common/util/file.h"
 
-#include <dirent.h>
 #include <errno.h>
 #include <limits.h>
 #include <algorithm>
@@ -212,7 +211,8 @@ bool RemoveAllFiles(const std::string &directory_path) {
   return true;
 }
 
-std::vector<std::string> ListSubDirectories(const std::string &directory_path) {
+std::vector<std::string> ListSubPaths(const std::string &directory_path,
+                                      const unsigned char d_type) {
   std::vector<std::string> result;
   DIR *directory = opendir(directory_path.c_str());
   if (directory == nullptr) {
@@ -222,12 +222,9 @@ std::vector<std::string> ListSubDirectories(const std::string &directory_path) {
 
   struct dirent *entry;
   while ((entry = readdir(directory)) != nullptr) {
-    // skip directory_path/. and directory_path/..
-    if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) {
-      continue;
-    }
-
-    if (entry->d_type == DT_DIR) {
+    // Skip "." and "..".
+    if (entry->d_type == d_type &&
+        strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
       result.emplace_back(entry->d_name);
     }
   }
