@@ -194,12 +194,12 @@ http_archive(
 new_local_repository(
     name = "jsoncpp",
     build_file = "third_party/jsoncpp.BUILD",
-    path = "/usr/local/lib"
+    path = "/usr/local/apollo/jsoncpp/"
 )
 
 #adv_plat
 new_local_repository(
     name = "adv_plat",
     build_file = "third_party/adv_plat.BUILD",
-    path = "/usr/local/adv_plat"
+    path = "/usr/local/apollo/adv_plat"
 )

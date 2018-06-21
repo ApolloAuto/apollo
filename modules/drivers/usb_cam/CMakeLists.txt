@@ -34,13 +34,13 @@ catkin_package(
 ###########
 
 link_directories(
-  /usr/local/jsoncpp/lib
-  /usr/local/adv_plat/lib
+  /usr/local/apollo/jsoncpp/lib
+  /usr/local/apollo/adv_plat/lib
   ${catkin_LIB_DIRS}
 )
 
 include_directories(include
-  /usr/local/adv_plat
+  /usr/local/apollo/adv_plat
   ${catkin_INCLUDE_DIRS}
   ${avcodec_INCLUDE_DIRS}
   ${swscale_INCLUDE_DIRS}
@@ -101,7 +101,7 @@ install(DIRECTORY launch/
 
 # Copy libjsoncpp.so 
 install(
-  DIRECTORY /usr/local/jsoncpp/lib
+  DIRECTORY /usr/local/apollo/jsoncpp/lib
   DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/..
   FILES_MATCHING PATTERN "*.so*"
 )
