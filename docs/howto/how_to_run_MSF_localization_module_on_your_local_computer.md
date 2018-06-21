@@ -7,7 +7,7 @@
 
 ## 2. Configuring Parameters
 Assume that the path to download localization data from is DATA_PATH.
-### 2.1 Configure Sensor Extrinsics
+### 2.1. Configure Sensor Extrinsics
 ```
 cp DATA_PATH/params/ant_imu_leverarm.yaml /apollo/modules/localization/msf/params/gnss_params/
 cp DATA_PATH/params/velodyne64_novatel_extrinsics_example.yaml /apollo/modules/localization/msf/params/velodyne_params/
@@ -18,7 +18,7 @@ The meaning of each file
  - **velodyne64_novatel_extrinsics_example.yaml**: Transform from IMU coord to LiDAR coord
  - **velodyne64_height.yaml**: Height of the LiDAR relative to the ground
 
-### 2.2 Configure Map Path
+### 2.2. Configure Map Path
 Add config of map path in /apollo/modules/localization/conf/localization.conf
 ```
 # Redefine the map_dir in global_flagfile.txt
