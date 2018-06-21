@@ -16,6 +16,9 @@ $ bash scripts/dreamview.sh
 If Dreamview fails to start, use the script below to check the Dreamview startup log and restart Dreamview.
 
 ```bash
+# Start Dreamview in foreground to see any error message it prints out during startup
+$ bash scripts/dreamview.sh start_fe
+
 # check dreamview startup log
 $ cat data/log/dreamview.out
 terminate called after throwing an instance of 'CivetException'
