@@ -84,8 +84,14 @@ void ProcessMonitor::UpdateModule(
 
   if (status->process_status().running()) {
     // The process stopped. Send monitor log.
-    MonitorManager::LogBuffer().ERROR(
-        apollo::common::util::StrCat(module_name, " process stopped!"));
+    const std::string msg = apollo::common::util::StrCat(
+        module_name, " process stopped!");
+    // In autonomous driving mode, it's a critical error. Or else just warn.
+    if (MonitorManager::IsInAutonomousDriving()) {
+      MonitorManager::LogBuffer().ERROR(msg);
+    } else {
+      MonitorManager::LogBuffer().WARN(msg);
+    }
   }
 
   status->mutable_process_status()->set_running(false);
