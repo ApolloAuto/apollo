@@ -24,7 +24,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 -O2 -fopenmp -mavx2 -fPIC")
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  CATKIN_DEPENDS 
+  CATKIN_DEPENDS
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
 )
@@ -58,7 +58,7 @@ target_link_libraries(${PROJECT_NAME}
     ${catkin_LIBRARIES}
     )
 
-## Builde the USB camera nodelet
+## Build the USB camera nodelet
 add_library(${PROJECT_NAME}_nodelet nodes/usb_cam_nodelet.cpp nodes/usb_cam_wrapper.cpp)
 target_link_libraries(${PROJECT_NAME}_nodelet
     ${PROJECT_NAME}

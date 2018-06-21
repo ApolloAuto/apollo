@@ -1,6 +1,6 @@
-# Apollo 2.0 Software Architecture 
+# Apollo 2.0 Software Architecture
 
- 
+
 
 Core software modules running on the Apollo 2.0 powered autonomous vehicle include:
 
@@ -45,17 +45,17 @@ The other localization method is the Multiple Sensor Fusion (MSF) method, where 
 
 ## Routing
 
-The routing module needs to know the routing start point and routing end point, to compute the passage lanes and roads. Usually the routing start point is the autnomous vehicle location. The important data interface is an event triggered function called `OnRoutingRequest`, in which `RoutingResponse` is computed and published as shown below.
+The routing module needs to know the routing start point and routing end point, to compute the passage lanes and roads. Usually the routing start point is the autonomous vehicle location. The important data interface is an event triggered function called `OnRoutingRequest`, in which `RoutingResponse` is computed and published as shown below.
 
 ![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/routing.png)
 
 ## Planning
 
-Apollo 2.0 uses several information sources to plan a safe and collision free trajectory, so the planning module interacts with almost every other module, 
+Apollo 2.0 uses several information sources to plan a safe and collision free trajectory, so the planning module interacts with almost every other module.
 
-Initially, the planning module takes the prediction output. Because the prediction output wraps the original perceived obstacle, the planning module  subscribes to the traffic light detection output rather than the perception obstacles output. 
+Initially, the planning module takes the prediction output. Because the prediction output wraps the original perceived obstacle, the planning module subscribes to the traffic light detection output rather than the perception obstacles output.
 
-Then, the planning module takes the routing output. Under certain scenarios, the planning module might also trigger a new routing computation by sending a routing request if the current route cannot be faithfully followed. 
+Then, the planning module takes the routing output. Under certain scenarios, the planning module might also trigger a new routing computation by sending a routing request if the current route cannot be faithfully followed.
 
 Finally, the planning module needs to know the location (Localization: where I am) as well as the current autonomous vehicle information (Chassis: what is my status).  The planning module is also triggered by a fixed frequency, and the main data interface is the `OnTimer` callback function that invokes the `RunOnce` function.
 
@@ -65,7 +65,7 @@ The data dependencies such as chassis, localization, traffic light, and predicti
 
 ## Control
 
-As  described in the planning module, control takes the planned trajectory as input, and generates the control command to pass to CanBus.  It has three main data interfaces: OnPad, OnMonitor, and OnTimer.
+As described in the planning module, control takes the planned trajectory as input, and generates the control command to pass to CanBus.  It has three main data interfaces: OnPad, OnMonitor, and OnTimer.
 
 ![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/control_1.png)
 
@@ -79,7 +79,7 @@ The CanBus has two data interfaces as shown below.
 
 ![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/canbus_1.png)
 
-The first data interface is a timer-based publisher with the callback function `OnTimer`. This data interface periodically publishes the chassis information as well as chassis details, if enabled. 
+The first data interface is a timer-based publisher with the callback function `OnTimer`. This data interface periodically publishes the chassis information as well as chassis details, if enabled.
 
 ![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/canbus_2.png)
 

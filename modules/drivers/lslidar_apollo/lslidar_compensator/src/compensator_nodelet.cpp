@@ -44,5 +44,5 @@ void CompensatorNodelet::onInit() {
 }
 
 PLUGINLIB_DECLARE_CLASS(lslidar_compensator, CompensatorNodelet,
-    apollo::drivers::lslidar_compensator::CompensatorNodelet, 
+    apollo::drivers::lslidar_compensator::CompensatorNodelet,
     nodelet::Nodelet);
