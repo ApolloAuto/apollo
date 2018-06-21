@@ -29,7 +29,8 @@ namespace hesai {
 class Pandora_Internal {
  public:
   Pandora_Internal(
-      std::string device_ip, const uint16_t lidar_port, const uint16_t gps_port,
+      const std::string &device_ip,
+      const uint16_t lidar_port, const uint16_t gps_port,
       boost::function<void(boost::shared_ptr<PPointCloud>, double)>
           pcl_callback,
       boost::function<void(double)> gps_callback, uint16_t start_angle,
@@ -39,13 +40,13 @@ class Pandora_Internal {
           cameraCallback,
       bool enable_camera, int tz, std::string frame_id);
   ~Pandora_Internal();
-  int LoadLidarCorrectionFile(std::string correction_content);
+  int LoadLidarCorrectionFile(const std::string &correction_content);
   void ResetLidarStartAngle(uint16_t start_angle);
   int UploadCameraCalibrationFile(const CameraCalibration calibs[5]);
   int GetCameraCalibration(CameraCalibration calibs[5]);
   int ResetCameraClibration();
   void GetCalibrationFromDevice();
-  int ParseCameraCalibration(const std::string& contents,
+  int ParseCameraCalibration(const std::string &contents,
                              CameraCalibration calibs[5]);
   int GenerateCameraCalibration(const CameraCalibration calibs[5],
                                 std::string *contents);
@@ -68,7 +69,8 @@ class Pandora_Internal {
 };
 
 Pandora_Internal::Pandora_Internal(
-    std::string device_ip, const uint16_t lidar_port, const uint16_t gps_port,
+    const std::string &device_ip,
+    const uint16_t lidar_port, const uint16_t gps_port,
     boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
     boost::function<void(double)> gps_callback, uint16_t start_angle,
     const uint16_t pandoraCameraPort,
@@ -115,7 +117,7 @@ Pandora_Internal::~Pandora_Internal() {
  * @brief load the correction file
  * @param file The path of correction file
  */
-int Pandora_Internal::LoadLidarCorrectionFile(std::string correction_content) {
+int Pandora_Internal::LoadLidarCorrectionFile(const std::string &correction_content) {  // NOLINT
   return pandar40p_->LoadCorrectionFile(correction_content);
 }
 
@@ -260,7 +262,7 @@ void Pandora_Internal::GetCalibrationFromDevice() {
   }
 }
 
-int Pandora_Internal::ParseCameraCalibration(const std::string& contents,
+int Pandora_Internal::ParseCameraCalibration(const std::string &contents,
                                              CameraCalibration calibs[5]) {
   std::cout << "Parse Camera Calibration..." << std::endl;
   if (contents.empty()) {
@@ -390,7 +392,8 @@ Pandora Part
  *        cameraCallback    the call back for camera data
  */
 Pandora::Pandora(
-    std::string device_ip, const uint16_t lidar_port, const uint16_t gps_port,
+    const std::string &device_ip,
+    const uint16_t lidar_port, const uint16_t gps_port,
     boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
     boost::function<void(double)> gps_callback, uint16_t start_angle,
     const uint16_t pandoraCameraPort,
@@ -404,7 +407,7 @@ Pandora::Pandora(
 }
 
 /**
- * @brief deconstructor
+ * @brief destructor
  */
 Pandora::~Pandora() { delete internal_; }
 
@@ -412,7 +415,7 @@ Pandora::~Pandora() { delete internal_; }
  * @brief load the lidar correction file
  * @param contents The correction contents of lidar correction
  */
-int Pandora::LoadLidarCorrectionFile(std::string correction_content) {
+int Pandora::LoadLidarCorrectionFile(const std::string &correction_content) {
   internal_->LoadLidarCorrectionFile(correction_content);
 }
 
