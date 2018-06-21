@@ -1,5 +1,4 @@
-HOW TO PREPARE CENTOS(7) BASED GPU ENABLED IMAGE FOR PERCETION RESEARCH
-=======================================================================
+## How to Prepare CENTOS(7) based GPU enabled image for the Perception Module
 
 ## Setup docker image in CentOS based system
 
