@@ -1,4 +1,4 @@
-# How to add a new predictor in prediction module
+# How to add a new Predictor in Prediction module
 
 ## Introduction
 The Predictor generates the predicted trajectory for each obstacle. Here, let's assume we want to add a new predictor to our vehicle, for other types of obstacles, the procedure is very as follows:
