@@ -1,4 +1,4 @@
-### Setting up the Network
+### How to Set up the Network
 
 ### Helpful hints before you begin:
 
