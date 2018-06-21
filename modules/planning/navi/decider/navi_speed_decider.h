@@ -26,6 +26,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/speed/speed_data.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
 /**
@@ -48,6 +49,8 @@ class NaviSpeedDecider : public Task {
   NaviSpeedDecider();
   virtual ~NaviSpeedDecider() = default;
 
+  bool Init(const PlanningConfig& config) override;
+
   /**
    * @brief Overrided implementation of the virtual function "Execute" in the
    * base class "Task".
@@ -57,6 +60,19 @@ class NaviSpeedDecider : public Task {
    */
   apollo::common::Status Execute(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
+
+  /**
+   * @brief Update acceleration settings.
+   * @param preferred_accel Preferred acceleration.
+   * @param preferred_decel Preferred deacceleration.
+   * @param max_accel Max acceleration.
+   * @param max_decel Max deacceleration.
+   */
+  void UpdateAccelSettings(
+      double preferred_accel,
+      double preferred_decel,
+      double max_accel,
+      double max_decel);
 
   /**
    * @brief Create speed-data, used for unit test.
@@ -72,7 +88,13 @@ class NaviSpeedDecider : public Task {
 
  private:
   void RecordDebugInfo(const SpeedData& speed_data);
-  // TODO(all): Add your member functions and variables.
+
+ private:
+  PlanningConfig config_;
+  double preferred_accel_;
+  double preferred_decel_;
+  double max_accel_;
+  double max_decel_;
 };
 
 }  // namespace planning
