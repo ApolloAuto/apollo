@@ -1,13 +1,18 @@
 # How to add a new predictor in prediction module
 
 ## Introduction
-Predictor generates the predicted trajectory for each obstacle. Here assume we want to add a new predictor for vehicle, for other types of obstacles, the procedure is very similar.
+The Predictor generates the predicted trajectory for each obstacle. Here, let's assume we want to add a new predictor to our vehicle, for other types of obstacles, the procedure is very as follows:
+1. Define a class that inherits `Predictor`
+2. Implement the class `NewPredictor`
+3. Add a new predictor type in proto `prediction_conf.proto`
+4. Update prediction_conf
+5. Upate the Predictor manager
 
 ## Steps to add a new predictor
-Please follow the steps to add a new predictor named `NewPredictor`.
+The following steps will add a Predictor `NewPredictor`.
 
-### Step 1: Define a class that inherits `Predictor`
-Create a new file named `new_predictor.h` in the folder  `modules/prediction/predictor/vehicle`. And define it like this:
+### Define a class that inherits `Predictor`
+Create a new file named `new_predictor.h` in the folder  `modules/prediction/predictor/vehicle` and define it as follows:
 ```cpp
 
 #include "modules/prediction/predictor/predictor.h"
@@ -25,7 +30,7 @@ class NewPredictor : public Predictor {
 }  // namespace apollo
 ```
 
-### Step 2 Implement the class `NewPredictor`
+### Implement the class `NewPredictor`
 Create a new file named `new_predictor.cc` in the same folder of `new_predictor.h`. Implement it like this:
 ```cpp
 #include "modules/prediction/predictor/vehicle/new_predictor.h"
@@ -45,7 +50,7 @@ NewPredictor::Predict(Obstacle* obstacle)() {
 
 ```
 
-### Step 3: Add a new predictor type in proto `prediction_conf.proto`
+### Add a new predictor type in proto `prediction_conf.proto`
 ```
   enum PredictorType {
     LANE_SEQUENCE_PREDICTOR = 0;
@@ -56,7 +61,7 @@ NewPredictor::Predict(Obstacle* obstacle)() {
   }
 ```
 
-### Step 4: Update prediction conf
+### Update prediction_conf
 In the file `modules/prediction/conf/prediction_conf.pb.txt`, update the field `predictor_type` like this:
 ```
 obstacle_conf {
@@ -67,7 +72,7 @@ obstacle_conf {
 }
 ```
 
-### Step 5: Upate predictor manager
+### Upate Predictor manager
 Update `CreateEvluator( ... )` like this:
 ```cpp
   case ObstacleConf::NEW_PREDICTOR: {
@@ -79,4 +84,5 @@ Update `RegisterPredictors()` like this:
 ```cpp
   RegisterPredictor(ObstacleConf::NEW_PREDICTOR);
 ```
-After this procedure, the new predictor will be created.
+
+After completing the steps above, you would have created a new Predictor.
