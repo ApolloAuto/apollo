@@ -66,7 +66,7 @@ void SummarizeOnTopicStatus(const TopicStatus &topic_status, Status *status) {
   if (topic_status.message_delay() < 0) {
     UpdateStatusSummary(Summary::ERROR, "No message", status);
   } else {
-    UpdateStatusSummary(Summary::WARN, "Notable delay", status);
+    UpdateStatusSummary(Summary::ERROR, "Notable delay", status);
   }
 }
 
