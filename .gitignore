@@ -7,14 +7,15 @@ bazel-out
 bazel-testlogs
 /Debug/
 *.pyc
+*genrule.log
 WORKSPACE
 # temporary files
 *.swp
-
+*.swo
 # generated files
 generated_data_warehouse.conf
 modules/common/data/ssl_keys
-modules/perception/cuda_util/build
+modules/perception/cuda_util/cmake_build
 
 # Eclipse IDE files
 .project

@@ -3,7 +3,7 @@
 ## Introduction
 The Controller Area Network (CAN) is a network used intensively in many microcontrollers and devices to transfer data between devices without the assistance of a host computer.
 
-The default CAN card used in Apollo is the ESD CAN-PIC card. You can add a new CAN card using the steps below.
+The default CAN card used in Apollo is the ESD CAN-PCIe card. You can add a new CAN card using the steps below.
 
 ## Add a New CAN Card
 Complete the following required task sequence to add a new CAN card:

@@ -21,7 +21,8 @@
 namespace apollo {
 namespace perception {
 
-TrackedObject::TrackedObject(ObjectPtr obj_ptr) : object_ptr(obj_ptr) {
+TrackedObject::TrackedObject(std::shared_ptr<Object> obj_ptr)
+    : object_ptr(obj_ptr) {
   if (object_ptr != nullptr) {
     barycenter = GetCloudBarycenter<apollo::perception::pcl_util::Point>(
                      object_ptr->cloud)

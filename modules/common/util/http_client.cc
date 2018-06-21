@@ -22,6 +22,7 @@
 #include <curlpp/cURLpp.hpp>
 
 #include "modules/common/log.h"
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace common {
@@ -62,10 +63,18 @@ Status HttpClient::Post(const std::string &url, const Json &json,
 
 Status HttpClient::Post(const std::string &url, const Json &json,
                         Json *result) {
+  if (!StartWith(url, "https://")) {
+    return Status(ErrorCode::HTTP_LOGIC_ERROR, "Use HTTPS to post data!");
+  }
   std::string response;
   const auto status = Post(url, json, &response);
   if (status.ok()) {
-    *result = Json::parse(response.begin(), response.end());
+    try {
+      *result = Json::parse(response.begin(), response.end());
+    } catch (...) {
+      return Status(ErrorCode::HTTP_RUNTIME_ERROR,
+                    "Cannot parse response as json.");
+    }
   }
   return status;
 }

@@ -29,7 +29,8 @@
 //     }
 //
 //     virtual bool FuseType(const TypeFuserOptions& options,
-//                           std::vector<ObjectPtr>* objects) override {
+//                           std::vector<std::shared_ptr<Object>>* objects)
+//                           override {
 //          // Do something.
 //          return true;
 //     }
@@ -49,6 +50,7 @@
 //          BaseTypeFuserRegisterer::GetInstanceByName("MyTypeFuser");
 // using type_fuser to do something.
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -88,7 +90,7 @@ class BaseTypeFuser {
    * @return True if fuse type successfully, false otherwise
    */
   virtual bool FuseType(const TypeFuserOptions& options,
-                        std::vector<ObjectPtr>* objects) = 0;
+                        std::vector<std::shared_ptr<Object>>* objects) = 0;
 
   /**
    * @brief Get module name

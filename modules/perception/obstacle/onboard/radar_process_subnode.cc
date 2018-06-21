@@ -30,7 +30,6 @@
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/radar/dummy/dummy_algorithms.h"
 #include "modules/perception/onboard/subnode_helper.h"
@@ -184,15 +183,14 @@ void RadarProcessSubnode::OnRadar(const ContiRadar &radar_obs) {
     if (roi_filter_ != nullptr) {
       roi_filter_->MergeHdmapStructToPolygons(hdmap, &map_polygons);
     }
-  }
 
-  // 3. get car car_linear_speed
-  if (!GetCarLinearSpeed(timestamp, &(options.car_linear_speed))) {
-    AERROR << "Failed to call get_car_linear_speed. [timestamp: "
-           << GLOG_TIMESTAMP(timestamp);
-    return;
+    // 3. get car car_linear_speed
+    if (!GetCarLinearSpeed(timestamp, &(options.car_linear_speed))) {
+      AERROR << "Failed to call get_car_linear_speed. [timestamp: "
+             << GLOG_TIMESTAMP(timestamp);
+      return;
+    }
   }
-
   // 4. Call RadarDetector::detect.
   PERF_BLOCK_START();
   if (!FLAGS_use_navigation_mode) {
@@ -304,10 +302,6 @@ bool RadarProcessSubnode::InitFrameDependence() {
     hdmap_input_ = HDMapInput::instance();
     if (!hdmap_input_) {
       AERROR << "Failed to get HDMapInput instance.";
-      return false;
-    }
-    if (!hdmap_input_->Init()) {
-      AERROR << "Failed to Init HDMapInput";
       return false;
     }
     AINFO << "Get and Init hdmap_input succ.";

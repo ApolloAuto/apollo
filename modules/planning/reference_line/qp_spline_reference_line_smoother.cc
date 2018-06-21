@@ -39,7 +39,8 @@ namespace planning {
 QpSplineReferenceLineSmoother::QpSplineReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
     : ReferenceLineSmoother(config) {
-  spline_solver_.reset(new Spline2dSolver(t_knots_, config.spline_order()));
+  spline_solver_.reset(
+      new Spline2dSolver(t_knots_, config.qp_spline().spline_order()));
 }
 
 void QpSplineReferenceLineSmoother::Clear() { t_knots_.clear(); }
@@ -54,7 +55,7 @@ bool QpSplineReferenceLineSmoother::Smooth(
     return false;
   }
 
-  spline_solver_->Reset(t_knots_, config_.spline_order());
+  spline_solver_->Reset(t_knots_, config_.qp_spline().spline_order());
 
   if (!AddConstraint()) {
     AERROR << "Add constraint for spline smoother failed";
@@ -126,8 +127,9 @@ bool QpSplineReferenceLineSmoother::Smooth(
 bool QpSplineReferenceLineSmoother::Sampling() {
   const double length = anchor_points_.back().path_point.s() -
                         anchor_points_.front().path_point.s();
-  uint32_t num_spline = std::max(
-      1u, static_cast<uint32_t>(length / config_.max_spline_length() + 0.5));
+  uint32_t num_spline =
+      std::max(1u, static_cast<uint32_t>(
+                       length / config_.qp_spline().max_spline_length() + 0.5));
   for (std::uint32_t i = 0; i <= num_spline; ++i) {
     t_knots_.push_back(i * 1.0);
   }
@@ -187,14 +189,16 @@ bool QpSplineReferenceLineSmoother::AddKernel() {
   Spline2dKernel* kernel = spline_solver_->mutable_kernel();
 
   // add spline kernel
-  if (config_.second_derivative_weight() > 0.0) {
-    kernel->AddSecondOrderDerivativeMatrix(config_.second_derivative_weight());
+  if (config_.qp_spline().second_derivative_weight() > 0.0) {
+    kernel->AddSecondOrderDerivativeMatrix(
+        config_.qp_spline().second_derivative_weight());
   }
-  if (config_.third_derivative_weight() > 0.0) {
-    kernel->AddThirdOrderDerivativeMatrix(config_.third_derivative_weight());
+  if (config_.qp_spline().third_derivative_weight() > 0.0) {
+    kernel->AddThirdOrderDerivativeMatrix(
+        config_.qp_spline().third_derivative_weight());
   }
 
-  kernel->AddRegularization(config_.regularization_weight());
+  kernel->AddRegularization(config_.qp_spline().regularization_weight());
   return true;
 }
 

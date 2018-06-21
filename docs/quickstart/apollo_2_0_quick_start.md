@@ -19,7 +19,7 @@ For vehicle onboard testing make sure you have calibrated all sensors. For senso
 
 ## Hardware and Software Installation
 
-Please refer to [Apollo 2.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_hardware_system_installation_guide%20v1.md)
+Please refer to [Apollo 2.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_hardware_system_installation_guide_v1.md)
 for the steps to install the hardware components and the system software, as well as [Apollo Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide.md).
 
 ## Dreamview Usage Table

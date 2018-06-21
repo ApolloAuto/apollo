@@ -62,6 +62,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::POINT_CLOUD:
         EnablePointCloud(FLAGS_pointcloud_topic, config);
         break;
+      case AdapterConfig::VLP16_POINT_CLOUD:
+        EnableVLP16PointCloud(FLAGS_vlp16_pointcloud_topic, config);
+        break;
       case AdapterConfig::GPS:
         EnableGps(FLAGS_gps_topic, config);
         break;
@@ -79,6 +82,10 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::PERCEPTION_OBSTACLES:
         EnablePerceptionObstacles(FLAGS_perception_obstacle_topic, config);
+        break;
+      case AdapterConfig::PERCEPTION_LANE_MASK:
+        EnablePerceptionLaneMask(FLAGS_perception_lane_mask_segmentation_topic,
+                                 config);
         break;
       case AdapterConfig::TRAFFIC_LIGHT_DETECTION:
         EnableTrafficLightDetection(FLAGS_traffic_light_detection_topic,
@@ -187,6 +194,44 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::VOICE_DETECTION_RESPONSE:
         EnableVoiceDetectionResponse(FLAGS_voice_detection_response_topic,
                                      config);
+        break;
+      // For pandora.
+      case AdapterConfig::PANDORA_POINT_CLOUD:
+        EnablePandoraPointCloud(FLAGS_pandora_pointcloud_topic, config);
+        break;
+      case AdapterConfig::PANDORA_CAMERA_FRONT_COLOR:
+        EnablePandoraCameraFrontColor(FLAGS_pandora_camera_front_color_topic,
+                                      config);
+        break;
+      case AdapterConfig::PANDORA_CAMERA_RIGHT_GRAY:
+        EnablePandoraCameraRightGray(FLAGS_pandora_camera_right_gray_topic,
+                                     config);
+        break;
+      case AdapterConfig::PANDORA_CAMERA_LEFT_GRAY:
+        EnablePandoraCameraLeftGray(FLAGS_pandora_camera_left_gray_topic,
+                                    config);
+        break;
+      case AdapterConfig::PANDORA_CAMERA_FRONT_GRAY:
+        EnablePandoraCameraFrontGray(FLAGS_pandora_camera_front_gray_topic,
+                                     config);
+        break;
+      case AdapterConfig::PANDORA_CAMERA_BACK_GRAY:
+        EnablePandoraCameraBackGray(FLAGS_pandora_camera_back_gray_topic,
+                                    config);
+        break;
+      case AdapterConfig::GUARDIAN:
+        EnableGuardian(FLAGS_guardian_topic, config);
+      case AdapterConfig::GNSS_RAW_DATA:
+        EnableGnssRawData(FLAGS_gnss_raw_data_topic, config);
+        break;
+      case AdapterConfig::STREAM_STATUS:
+        EnableStreamStatus(FLAGS_stream_status_topic, config);
+        break;
+      case AdapterConfig::GNSS_HEADING:
+        EnableGnssHeading(FLAGS_heading_topic, config);
+        break;
+      case AdapterConfig::RTCM_DATA:
+        EnableRtcmData(FLAGS_rtcm_data_topic, config);
         break;
       default:
         AERROR << "Unknown adapter config type!";

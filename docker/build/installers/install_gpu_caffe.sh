@@ -40,4 +40,6 @@ wget https://apollocache.blob.core.windows.net/apollo-docker/caffe_x86.tar.gz
 tar xzf caffe_x86.tar.gz
 mv caffe_x86/output-GPU/include/caffe /usr/include/
 mv caffe_x86/output-GPU/lib/* /usr/lib/x86_64-linux-gnu/
-ldconfig
+
+# Clean up.
+rm -fr caffe_x86.tar.gz caffe_x86

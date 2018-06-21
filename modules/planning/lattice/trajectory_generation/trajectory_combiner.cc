@@ -25,6 +25,8 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::math::CartesianFrenetConverter;
+using apollo::common::math::PathMatcher;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 
@@ -38,11 +40,17 @@ DiscretizedTrajectory TrajectoryCombiner::Combine(
   double accumulated_trajectory_s = 0.0;
   PathPoint prev_trajectory_point;
 
+  double last_s = -FLAGS_lattice_epsilon;
   double t_param = 0.0;
   while (t_param < FLAGS_trajectory_time_length) {
     // linear extrapolation is handled internally in LatticeTrajectory1d;
     // no worry about t_param > lon_trajectory.ParamLength() situation
     double s = lon_trajectory.Evaluate(0, t_param);
+    if (last_s > 0.0) {
+      s = std::max(last_s, s);
+    }
+    last_s = s;
+
     double s_dot =
         std::max(FLAGS_lattice_epsilon, lon_trajectory.Evaluate(1, t_param));
     double s_ddot = lon_trajectory.Evaluate(2, t_param);
@@ -57,8 +65,7 @@ DiscretizedTrajectory TrajectoryCombiner::Combine(
     double d_prime = lat_trajectory.Evaluate(1, s_param);
     double d_pprime = lat_trajectory.Evaluate(2, s_param);
 
-    PathPoint matched_ref_point =
-        PathMatcher::MatchToPath(reference_line, s);
+    PathPoint matched_ref_point = PathMatcher::MatchToPath(reference_line, s);
 
     double x = 0.0;
     double y = 0.0;

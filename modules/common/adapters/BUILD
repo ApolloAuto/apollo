@@ -92,6 +92,8 @@ cc_library(
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
+        "//modules/drivers/gnss/proto:heading_proto",
+        "//modules/drivers/gnss/proto:gnss_proto", 
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:sins_pva_proto",
         "//modules/map/relative_map/proto:navigation_proto",
@@ -100,6 +102,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
         "//modules/routing/proto:routing_proto",
+        "//modules/guardian/proto:guardian_proto",
         "@glog",
     ],
 )

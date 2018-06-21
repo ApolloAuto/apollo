@@ -92,6 +92,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "Binary",
       [this](const std::string &data, WebSocketHandler::Connection *conn) {
+        // Navigation info in binary format
         apollo::relative_map::NavigationInfo navigation_info;
         if (navigation_info.ParseFromString(data)) {
           AdapterManager::FillNavigationHeader(FLAGS_dreamview_module_name,

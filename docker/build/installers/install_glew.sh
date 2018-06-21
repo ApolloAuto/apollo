@@ -32,8 +32,13 @@ apt-get install -y --force-yes libglfw3 libglfw3-dev freeglut3-dev
 # Install GLEW
 wget https://github.com/nigels-com/glew/releases/download/glew-2.0.0/glew-2.0.0.zip
 unzip glew-2.0.0.zip
-cd glew-2.0.0
-make && make install
+pushd glew-2.0.0
+make -j8
+make install
+popd
 
 ln -s /usr/lib64/libGLEW.so /usr/lib/libGLEW.so
 ln -s /usr/lib64/libGLEW.so.2.0 /usr/lib/libGLEW.so.2.0
+
+# Clean up.
+rm -fr glew-2.0.0.zip glew-2.0.0 /etc/apt/sources.list.d/fillwave_ext.list

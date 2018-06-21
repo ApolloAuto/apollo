@@ -47,8 +47,7 @@ double DiscretizedPath::Length() const {
   return path_points_.back().s() - path_points_.front().s();
 }
 
-common::PathPoint DiscretizedPath::EvaluateUsingLinearApproximation(
-    const double path_s) const {
+common::PathPoint DiscretizedPath::Evaluate(const double path_s) const {
   CHECK(!path_points_.empty());
   auto it_lower = QueryLowerBound(path_s);
   if (it_lower == path_points_.begin()) {

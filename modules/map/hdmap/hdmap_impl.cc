@@ -104,8 +104,13 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
     for (const auto& road_section : road_ptr_pair.second->sections()) {
       const auto& section_id = road_section.id();
       for (const auto& lane_id : road_section.lane_id()) {
-        lane_table_[lane_id.id()]->set_road_id(road_id);
-        lane_table_[lane_id.id()]->set_section_id(section_id);
+        auto iter = lane_table_.find(lane_id.id());
+        if (iter != lane_table_.end()) {
+          iter->second->set_road_id(road_id);
+          iter->second->set_section_id(section_id);
+        } else {
+          AFATAL << "Unknown lane id: " << lane_id.id();
+        }
       }
     }
   }

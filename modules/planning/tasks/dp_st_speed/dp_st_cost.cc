@@ -29,7 +29,7 @@
 namespace apollo {
 namespace planning {
 namespace {
-constexpr double kInf = std::numeric_limits<double>::infinity();
+constexpr float kInf = std::numeric_limits<float>::infinity();
 }
 
 DpStCost::DpStCost(const DpStSpeedConfig& config,
@@ -65,15 +65,15 @@ void DpStCost::AddToKeepClearRange(
       continue;
     }
 
-    double start_s = obstacle->st_boundary().min_s();
-    double end_s = obstacle->st_boundary().max_s();
+    float start_s = obstacle->st_boundary().min_s();
+    float end_s = obstacle->st_boundary().max_s();
     keep_clear_range_.emplace_back(start_s, end_s);
   }
   SortAndMergeRange(&keep_clear_range_);
 }
 
 void DpStCost::SortAndMergeRange(
-    std::vector<std::pair<double, double>>* keep_clear_range) {
+    std::vector<std::pair<float, float>>* keep_clear_range) {
   if (!keep_clear_range || keep_clear_range->empty()) {
     return;
   }
@@ -93,7 +93,7 @@ void DpStCost::SortAndMergeRange(
   keep_clear_range->resize(i + 1);
 }
 
-bool DpStCost::InKeepClearRange(double s) const {
+bool DpStCost::InKeepClearRange(float s) const {
   if (keep_clear_range_.empty()) {
     return false;
   }
@@ -105,18 +105,18 @@ bool DpStCost::InKeepClearRange(double s) const {
   return false;
 }
 
-double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
-  const double s = st_graph_point.point().s();
-  const double t = st_graph_point.point().t();
+float DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
+  const float s = st_graph_point.point().s();
+  const float t = st_graph_point.point().t();
 
-  double cost = 0.0;
+  float cost = 0.0;
   for (const auto* obstacle : obstacles_) {
     if (!obstacle->IsBlockingObstacle()) {
       continue;
     }
 
     auto boundary = obstacle->st_boundary();
-    const double kIgnoreDistance = 200.0;
+    const float kIgnoreDistance = 200.0;
     if (boundary.min_s() > kIgnoreDistance) {
       continue;
     }
@@ -140,8 +140,8 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
       s_lower = boundary_cost_[boundary_index][st_graph_point.index_t()].second;
     }
     if (s < s_lower) {
-      constexpr double kSafeTimeBuffer = 3.0;
-      const double len = obstacle->obstacle()->Speed() * kSafeTimeBuffer;
+      constexpr float kSafeTimeBuffer = 3.0;
+      const float len = obstacle->obstacle()->Speed() * kSafeTimeBuffer;
       if (s + len < s_lower) {
         continue;
       } else {
@@ -149,7 +149,7 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
                 std::pow((len - s_lower + s), 2);
       }
     } else if (s > s_upper) {
-      const double kSafeDistance = 20.0;  // or calculated from velocity
+      const float kSafeDistance = 20.0;  // or calculated from velocity
       if (s > s_upper + kSafeDistance) {
         continue;
       } else {
@@ -161,16 +161,16 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
   return cost * unit_t_;
 }
 
-double DpStCost::GetReferenceCost(const STPoint& point,
-                                  const STPoint& reference_point) const {
+float DpStCost::GetReferenceCost(const STPoint& point,
+                                 const STPoint& reference_point) const {
   return config_.reference_weight() * (point.s() - reference_point.s()) *
          (point.s() - reference_point.s()) * unit_t_;
 }
 
-double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
-                              const double speed_limit) const {
-  double cost = 0.0;
-  const double speed = (second.s() - first.s()) / unit_t_;
+float DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
+                             const float speed_limit) const {
+  float cost = 0.0;
+  const float speed = (second.s() - first.s()) / unit_t_;
   if (speed < 0) {
     return kInf;
   }
@@ -181,7 +181,7 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
             config_.default_speed_cost();
   }
 
-  double det_speed = (speed - speed_limit) / speed_limit;
+  float det_speed = (speed - speed_limit) / speed_limit;
   if (det_speed > 0) {
     cost += config_.exceed_speed_penalty() * config_.default_speed_cost() *
             fabs(speed * speed) * unit_t_;
@@ -192,9 +192,9 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
   return cost;
 }
 
-double DpStCost::GetAccelCost(const double accel) {
-  double cost = 0.0;
-  constexpr double kEpsilon = 0.1;
+float DpStCost::GetAccelCost(const float accel) {
+  float cost = 0.0;
+  constexpr float kEpsilon = 0.1;
   constexpr size_t kShift = 100;
   const size_t accel_key = static_cast<size_t>(accel / kEpsilon + 0.5 + kShift);
   DCHECK_LT(accel_key, accel_cost_.size());
@@ -203,11 +203,11 @@ double DpStCost::GetAccelCost(const double accel) {
   }
 
   if (accel_cost_.at(accel_key) < 0.0) {
-    const double accel_sq = accel * accel;
-    double max_acc = config_.max_acceleration();
-    double max_dec = config_.max_deceleration();
-    double accel_penalty = config_.accel_penalty();
-    double decel_penalty = config_.decel_penalty();
+    const float accel_sq = accel * accel;
+    float max_acc = config_.max_acceleration();
+    float max_dec = config_.max_deceleration();
+    float accel_penalty = config_.accel_penalty();
+    float decel_penalty = config_.decel_penalty();
 
     if (accel > 0.0) {
       cost = accel_penalty * accel_sq;
@@ -225,24 +225,24 @@ double DpStCost::GetAccelCost(const double accel) {
   return cost * unit_t_;
 }
 
-double DpStCost::GetAccelCostByThreePoints(const STPoint& first,
-                                           const STPoint& second,
-                                           const STPoint& third) {
-  double accel = (first.s() + third.s() - 2 * second.s()) / (unit_t_ * unit_t_);
+float DpStCost::GetAccelCostByThreePoints(const STPoint& first,
+                                          const STPoint& second,
+                                          const STPoint& third) {
+  float accel = (first.s() + third.s() - 2 * second.s()) / (unit_t_ * unit_t_);
   return GetAccelCost(accel);
 }
 
-double DpStCost::GetAccelCostByTwoPoints(const double pre_speed,
-                                         const STPoint& pre_point,
-                                         const STPoint& curr_point) {
-  double current_speed = (curr_point.s() - pre_point.s()) / unit_t_;
-  double accel = (current_speed - pre_speed) / unit_t_;
+float DpStCost::GetAccelCostByTwoPoints(const float pre_speed,
+                                        const STPoint& pre_point,
+                                        const STPoint& curr_point) {
+  float current_speed = (curr_point.s() - pre_point.s()) / unit_t_;
+  float accel = (current_speed - pre_speed) / unit_t_;
   return GetAccelCost(accel);
 }
 
-double DpStCost::JerkCost(const double jerk) {
-  double cost = 0.0;
-  constexpr double kEpsilon = 0.1;
+float DpStCost::JerkCost(const float jerk) {
+  float cost = 0.0;
+  constexpr float kEpsilon = 0.1;
   constexpr size_t kShift = 200;
   const size_t jerk_key = static_cast<size_t>(jerk / kEpsilon + 0.5 + kShift);
   if (jerk_key >= jerk_cost_.size()) {
@@ -250,7 +250,7 @@ double DpStCost::JerkCost(const double jerk) {
   }
 
   if (jerk_cost_.at(jerk_key) < 0.0) {
-    double jerk_sq = jerk * jerk;
+    float jerk_sq = jerk * jerk;
     if (jerk > 0) {
       cost = config_.positive_jerk_coeff() * jerk_sq * unit_t_;
     } else {
@@ -265,34 +265,34 @@ double DpStCost::JerkCost(const double jerk) {
   return cost;
 }
 
-double DpStCost::GetJerkCostByFourPoints(const STPoint& first,
+float DpStCost::GetJerkCostByFourPoints(const STPoint& first,
+                                        const STPoint& second,
+                                        const STPoint& third,
+                                        const STPoint& fourth) {
+  float jerk = (fourth.s() - 3 * third.s() + 3 * second.s() - first.s()) /
+               (unit_t_ * unit_t_ * unit_t_);
+  return JerkCost(jerk);
+}
+
+float DpStCost::GetJerkCostByTwoPoints(const float pre_speed,
+                                       const float pre_acc,
+                                       const STPoint& pre_point,
+                                       const STPoint& curr_point) {
+  const float curr_speed = (curr_point.s() - pre_point.s()) / unit_t_;
+  const float curr_accel = (curr_speed - pre_speed) / unit_t_;
+  const float jerk = (curr_accel - pre_acc) / unit_t_;
+  return JerkCost(jerk);
+}
+
+float DpStCost::GetJerkCostByThreePoints(const float first_speed,
+                                         const STPoint& first,
                                          const STPoint& second,
-                                         const STPoint& third,
-                                         const STPoint& fourth) {
-  double jerk = (fourth.s() - 3 * third.s() + 3 * second.s() - first.s()) /
-                (unit_t_ * unit_t_ * unit_t_);
-  return JerkCost(jerk);
-}
-
-double DpStCost::GetJerkCostByTwoPoints(const double pre_speed,
-                                        const double pre_acc,
-                                        const STPoint& pre_point,
-                                        const STPoint& curr_point) {
-  const double curr_speed = (curr_point.s() - pre_point.s()) / unit_t_;
-  const double curr_accel = (curr_speed - pre_speed) / unit_t_;
-  const double jerk = (curr_accel - pre_acc) / unit_t_;
-  return JerkCost(jerk);
-}
-
-double DpStCost::GetJerkCostByThreePoints(const double first_speed,
-                                          const STPoint& first,
-                                          const STPoint& second,
-                                          const STPoint& third) {
-  const double pre_speed = (second.s() - first.s()) / unit_t_;
-  const double pre_acc = (pre_speed - first_speed) / unit_t_;
-  const double curr_speed = (third.s() - second.s()) / unit_t_;
-  const double curr_acc = (curr_speed - pre_speed) / unit_t_;
-  const double jerk = (curr_acc - pre_acc) / unit_t_;
+                                         const STPoint& third) {
+  const float pre_speed = (second.s() - first.s()) / unit_t_;
+  const float pre_acc = (pre_speed - first_speed) / unit_t_;
+  const float curr_speed = (third.s() - second.s()) / unit_t_;
+  const float curr_acc = (curr_speed - pre_speed) / unit_t_;
+  const float jerk = (curr_acc - pre_acc) / unit_t_;
   return JerkCost(jerk);
 }
 

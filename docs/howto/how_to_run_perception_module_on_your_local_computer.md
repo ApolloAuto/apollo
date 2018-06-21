@@ -60,4 +60,4 @@ or
 ./apollo.sh build_opt_gpu
 ```
 
-Now the perception module can be running in GPU mode with command `./scripts/perception.sh start`. Please note that the Nvidia driver should be installed appropriately as shown above even if the perception module is running in Caffe CPU_ONLY mode (i.e., using `./apollo.sh build` or `./apollo.sh build_opt` to build the perception module). Please see the detailed instruction of perception module in [the perception README](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/README.md).
+Now the perception module can be running in GPU mode with command `./scripts/perception.sh start`. (Note for Apollo 2.5, the command is `./scripts/perception_lowcost.sh start`) Please note that the Nvidia driver should be installed appropriately as shown above even if the perception module is running in Caffe CPU_ONLY mode (i.e., using `./apollo.sh build` or `./apollo.sh build_opt` to build the perception module). Please see the detailed instruction of perception module in [the perception README](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/README.md).

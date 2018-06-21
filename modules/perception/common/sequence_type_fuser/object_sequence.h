@@ -18,6 +18,7 @@
 #define MODULES_PERCEPTION_COMMON_SEQUENCE_TYPE_FUSER_OBJECT_SEQUENCE_H_
 
 #include <map>
+#include <memory>
 #include <mutex>
 #include <vector>
 
@@ -28,8 +29,6 @@ namespace perception {
 
 class ObjectSequence {
  public:
-  typedef std::map<int64_t, ObjectPtr> TrackedObjects;
-
   /**
    * @brief Construct
    */
@@ -46,8 +45,8 @@ class ObjectSequence {
    * @param timestamp The frame timestamp
    * @return True if add successfully, false otherwise
    */
-  bool AddTrackedFrameObjects(const std::vector<ObjectPtr>& objects,
-                              double timestamp);
+  bool AddTrackedFrameObjects(
+      const std::vector<std::shared_ptr<Object>>& objects, double timestamp);
 
   /**
    * @brief Get tracked objects in a time window
@@ -56,8 +55,9 @@ class ObjectSequence {
    * @param window_time The time interval
    * @return True if get track successfully, false otherwise
    */
-  bool GetTrackInTemporalWindow(int track_id, TrackedObjects* track,
-                                double window_time);
+  bool GetTrackInTemporalWindow(
+      int track_id, std::map<int64_t, std::shared_ptr<Object>>* track,
+      double window_time);
 
  protected:
   /**
@@ -74,7 +74,7 @@ class ObjectSequence {
   double MapKeyToDouble(const int64_t key) { return key * kEps; }
 
   double current_;
-  std::map<int, TrackedObjects> sequence_;
+  std::map<int, std::map<int64_t, std::shared_ptr<Object>>> sequence_;
   std::mutex mutex_;
   static constexpr double s_max_time_out_ = 5.0;  // 5 seconds
 };

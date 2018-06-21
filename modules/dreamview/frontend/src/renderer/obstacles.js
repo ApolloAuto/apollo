@@ -5,8 +5,9 @@ import STORE from "store";
 import Text3D from "renderer/text3d";
 import { copyProperty, hideArrayObjects, calculateLaneMarkerPoints } from "utils/misc";
 import { drawSegmentsFromPoints, drawDashedLineFromPoints,
-         drawBox, drawDashedBox, drawArrow } from "utils/draw";
+         drawBox, drawDashedBox, drawArrow, drawImage } from "utils/draw";
 
+import iconObjectYield from "assets/images/decision/object-yield.png";
 
 const DEFAULT_HEIGHT = 1.5;
 export const DEFAULT_COLOR = 0xFF00FC;
@@ -29,6 +30,7 @@ export default class PerceptionObstacles {
         this.extrusionSolidFaces = []; // for obstacles with polygon points
         this.extrusionDashedFaces = []; // for obstacles with polygon points
         this.laneMarkers = []; // for lane markers
+        this.icons = [];
     }
 
     update(world, coordinates, scene) {
@@ -56,6 +58,7 @@ export default class PerceptionObstacles {
             hideArrayObjects(this.dashedCubes);
             hideArrayObjects(this.extrusionSolidFaces);
             hideArrayObjects(this.extrusionDashedFaces);
+            hideArrayObjects(this.icons);
             return;
         }
 
@@ -66,6 +69,7 @@ export default class PerceptionObstacles {
         let arrowIdx = 0;
         let cubeIdx = 0;
         let extrusionFaceIdx = 0;
+        let iconIdx = 0;
         for (let i = 0; i < objects.length; i++) {
             const obstacle = objects[i];
             if (!STORE.options['showObstacles' + _.upperFirst(_.camelCase(obstacle.type))]
@@ -92,12 +96,8 @@ export default class PerceptionObstacles {
                 arrowMesh.scale.set(1, 1, 1);
                 arrowMesh.visible = true;
             }
-            if (STORE.options.showObstaclesId) {
-                this.updateIdAndDistance(obstacle.id,
-                        new THREE.Vector3(position.x, position.y, obstacle.height),
-                        adc.distanceTo(position).toFixed(1),
-                        scene);
-            }
+
+            this.updateTexts(adc, obstacle, position, scene);
 
             // get the confidence and validate its range
             let confidence = obstacle.confidence;
@@ -112,12 +112,24 @@ export default class PerceptionObstacles {
                 this.updateCube(obstacle.length, obstacle.width, obstacle.height, position,
                         obstacle.heading, color, confidence, cubeIdx++, scene);
             }
+
+            // draw a yield sign to indicate ADC is yielding to this obstacle
+            if (obstacle.yieldedObstacle) {
+                const iconPosition = {
+                    x: position.x,
+                    y: position.y,
+                    z: position.z + obstacle.height + 0.3,
+                };
+                this.updateIcon(iconPosition, world.autoDrivingCar.heading, iconIdx, scene);
+                iconIdx++;
+            }
         }
         hideArrayObjects(this.arrows, arrowIdx);
         hideArrayObjects(this.solidCubes, cubeIdx);
         hideArrayObjects(this.dashedCubes, cubeIdx);
         hideArrayObjects(this.extrusionSolidFaces, extrusionFaceIdx);
         hideArrayObjects(this.extrusionDashedFaces, extrusionFaceIdx);
+        hideArrayObjects(this.icons, iconIdx);
     }
 
     updateArrow(position, heading, color, arrowIdx, scene) {
@@ -128,21 +140,25 @@ export default class PerceptionObstacles {
         return arrowMesh;
     }
 
-    updateIdAndDistance(id, position, distance, scene) {
-        const text = this.textRender.composeText(`${id} D:${distance}`);
-        if (text === null) {
-            return;
+    updateTexts(adc, obstacle, obstaclePosition, scene) {
+        const textPosition = {
+            x: obstaclePosition.x,
+            y: obstaclePosition.y,
+            z: obstacle.height || 3
+        };
+        let lineCount = 0;
+
+        if (STORE.options.showObstaclesInfo) {
+            const distance = adc.distanceTo(obstaclePosition).toFixed(1);
+            const speed = obstacle.speed.toFixed(1);
+            this.drawTexts(`(${distance}m, ${speed}m/s)`, textPosition, scene);
+            lineCount ++;
         }
-        text.position.set(position.x, position.y + 0.5, position.z || 3);
-        const camera = scene.getObjectByName("camera");
-        if (camera !== undefined) {
-            text.quaternion.copy(camera.quaternion);
+        if (STORE.options.showObstaclesId) {
+            textPosition.z += (lineCount * 0.7);
+            textPosition.y += (lineCount * 0.7);
+            this.drawTexts(obstacle.id, textPosition, scene);
         }
-        text.children.forEach(c => c.visible = true);
-        text.visible = true;
-        text.name = "id_" + id;
-        this.ids.push(text);
-        scene.add(text);
     }
 
     updatePolygon(points, height, color, coordinates, confidence, extrusionFaceIdx, scene) {
@@ -203,6 +219,13 @@ export default class PerceptionObstacles {
         }
     }
 
+    updateIcon(position, heading, iconIdx, scene) {
+        const icon = this.getIcon(iconIdx, scene);
+        copyProperty(icon.position, position);
+        icon.rotation.set(Math.PI / 2, heading - Math.PI / 2, 0);
+        icon.visible = true;
+    }
+
     getArrow(index, scene) {
         if (index < this.arrows.length) {
             return this.arrows[index];
@@ -249,6 +272,35 @@ export default class PerceptionObstacles {
         cubes.push(cubeMesh);
         scene.add(cubeMesh);
         return cubeMesh;
+    }
+
+    getIcon(index, scene) {
+        if (index < this.icons.length) {
+            return this.icons[index];
+        }
+        const icon = drawImage(iconObjectYield, 1, 1, 3, 3.6, 0);
+        icon.rotation.set(0, 0, -Math.PI / 2);
+        icon.visible = false;
+        this.icons.push(icon);
+        scene.add(icon);
+        return icon;
+    }
+
+    drawTexts(content, position, scene) {
+        const text = this.textRender.composeText(content);
+        if (text === null) {
+            return;
+        }
+
+        text.position.set(position.x, position.y, position.z );
+        const camera = scene.getObjectByName("camera");
+        if (camera !== undefined) {
+            text.quaternion.copy(camera.quaternion);
+        }
+        text.children.forEach(c => c.visible = true);
+        text.visible = true;
+        this.ids.push(text);
+        scene.add(text);
     }
 
     updateLaneMarkers(world, coordinates, scene) {

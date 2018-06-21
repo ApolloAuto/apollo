@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_OBJECT_BUILDER_MIN_BOX_H
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_OBJECT_BUILDER_MIN_BOX_H
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -31,28 +32,28 @@ class MinBoxObjectBuilder : public BaseObjectBuilder {
   MinBoxObjectBuilder() : BaseObjectBuilder() {}
   virtual ~MinBoxObjectBuilder() {}
 
-  bool Init() override {
-    return true;
-  }
+  bool Init() override { return true; }
 
   bool Build(const ObjectBuilderOptions& options,
-             std::vector<ObjectPtr>* objects) override;
-  std::string name() const override {
-    return "MinBoxObjectBuilder";
-  }
+             std::vector<std::shared_ptr<Object>>* objects) override;
+  std::string name() const override { return "MinBoxObjectBuilder"; }
 
  protected:
-  void BuildObject(ObjectBuilderOptions options, ObjectPtr object);
+  void BuildObject(ObjectBuilderOptions options,
+                   std::shared_ptr<Object> object);
 
-  void ComputePolygon2dxy(ObjectPtr obj);
+  void ComputePolygon2dxy(std::shared_ptr<Object> obj);
 
-  double ComputeAreaAlongOneEdge(ObjectPtr obj, size_t first_in_point,
-                                 Eigen::Vector3d* center, double* lenth,
-                                 double* width, Eigen::Vector3d* dir);
+  double ComputeAreaAlongOneEdge(std::shared_ptr<Object> obj,
+                                 size_t first_in_point, Eigen::Vector3d* center,
+                                 double* lenth, double* width,
+                                 Eigen::Vector3d* dir);
 
-  void ReconstructPolygon(const Eigen::Vector3d& ref_ct, ObjectPtr obj);
+  void ReconstructPolygon(const Eigen::Vector3d& ref_ct,
+                          std::shared_ptr<Object> obj);
 
-  void ComputeGeometricFeature(const Eigen::Vector3d& ref_ct, ObjectPtr obj);
+  void ComputeGeometricFeature(const Eigen::Vector3d& ref_ct,
+                               std::shared_ptr<Object> obj);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(MinBoxObjectBuilder);

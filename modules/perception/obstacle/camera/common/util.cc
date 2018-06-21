@@ -46,12 +46,13 @@ std::vector<cv::Scalar> color_table = {
     cv::Scalar(255, 255, 255),
 };
 
-bool LoadVisualObjectFromFile(const std::string &file_name,
-                              std::vector<VisualObjectPtr> *visual_objects) {
+bool LoadVisualObjectFromFile(
+    const std::string &file_name,
+    std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
   std::fstream fs(file_name, std::fstream::out);
 
   while (!fs.eof()) {
-    VisualObjectPtr obj(new VisualObject());
+    std::shared_ptr<VisualObject> obj(new VisualObject());
     std::fill(
         obj->type_probs.begin(),
         obj->type_probs.begin() + static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
@@ -84,8 +85,9 @@ bool LoadVisualObjectFromFile(const std::string &file_name,
   return true;
 }
 
-bool WriteVisualObjectToFile(const std::string &file_name,
-                             std::vector<VisualObjectPtr> *visual_objects) {
+bool WriteVisualObjectToFile(
+    const std::string &file_name,
+    std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
   FILE *fp = fopen(file_name.c_str(), "w");
   if (!fp) {
     AERROR << "write file: " << file_name << " error!";
@@ -108,8 +110,9 @@ bool WriteVisualObjectToFile(const std::string &file_name,
   return true;
 }
 
-bool LoadGTfromFile(const std::string &gt_path,
-                    std::vector<VisualObjectPtr> *visual_objects) {
+bool LoadGTfromFile(
+    const std::string &gt_path,
+    std::vector<std::shared_ptr<VisualObject>> *visual_objects) {
   std::ifstream gt_file(gt_path);
 
   std::string line;
@@ -124,7 +127,7 @@ bool LoadGTfromFile(const std::string &gt_path,
     // TODO(All) Decide where to Eliminate -99 2D only cases, since they don't
     // have 3d (2409 test)
     if (tokens.size() == 16 && tokens[3].compare("-99") != 0) {
-      VisualObjectPtr obj(new VisualObject());
+      std::shared_ptr<VisualObject> obj(new VisualObject());
 
       // TODO(All) Why the 2409 test data ground truth has exchanged alpha and
       // theta
@@ -173,8 +176,9 @@ bool LoadGTfromFile(const std::string &gt_path,
   return true;
 }
 
-void DrawVisualObejcts(const std::vector<VisualObjectPtr> &visual_objects,
-                       cv::Mat *img) {
+void DrawVisualObejcts(
+    const std::vector<std::shared_ptr<VisualObject>> &visual_objects,
+    cv::Mat *img) {
   for (const auto &obj : visual_objects) {
 // 3D BBox
 #if 0
@@ -245,8 +249,9 @@ void DrawVisualObejcts(const std::vector<VisualObjectPtr> &visual_objects,
   }
 }
 
-void DrawGTObjectsText(const std::vector<VisualObjectPtr> &visual_objects,
-                       cv::Mat *img) {
+void DrawGTObjectsText(
+    const std::vector<std::shared_ptr<VisualObject>> &visual_objects,
+    cv::Mat *img) {
   for (const auto &obj : visual_objects) {
     // 2D BBox
     int x1 = static_cast<int>(obj->upper_left[0]);

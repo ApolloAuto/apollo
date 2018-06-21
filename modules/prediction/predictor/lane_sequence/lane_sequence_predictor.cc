@@ -53,8 +53,7 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   }
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
   std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
-  FilterLaneSequences(feature.lane().lane_graph(), lane_id,
-                      &enable_lane_sequence);
+  FilterLaneSequences(feature, lane_id, &enable_lane_sequence);
 
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = feature.lane().lane_graph().lane_sequence(i);

@@ -1,0 +1,7 @@
+name: "TLPreprocessor"
+version: "1.0.0"
+max_cached_lights_size: 100
+projection_image_cols: 1920
+projection_image_rows: 1080
+sync_interval_seconds: 0.1
+no_signals_interval_seconds: 0.5

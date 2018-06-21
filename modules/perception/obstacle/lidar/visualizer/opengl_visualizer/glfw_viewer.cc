@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/glfw_viewer.h"
+
 #include <cmath>
 #include <fstream>
 #include <iomanip>
@@ -25,7 +27,6 @@
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/arc_ball.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
-#include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/glfw_viewer.h"
 
 namespace apollo {
 namespace perception {
@@ -419,9 +420,9 @@ void GLFWViewer::DrawCarForwardDir() {
   glLineWidth(1);
 }
 
-void GLFWViewer::DrawObstacle(const ObjectPtr obj, bool show_cloud,
-                              bool show_polygon, bool show_velocity,
-                              bool show_direction) {
+void GLFWViewer::DrawObstacle(const std::shared_ptr<Object> obj,
+                              bool show_cloud, bool show_polygon,
+                              bool show_velocity, bool show_direction) {
   float type_color[3] = {0, 0, 0};
   // TODO(All): modify GetClassColor params
   GetClassColor(static_cast<int>(obj->type), type_color);
@@ -496,7 +497,8 @@ void GLFWViewer::DrawObstacle(const ObjectPtr obj, bool show_cloud,
 }
 
 void GLFWViewer::DrawObstacles() {
-  std::vector<ObjectPtr> tracked_objects = frame_content_.GetTrackedObjects();
+  std::vector<std::shared_ptr<Object>> tracked_objects =
+      frame_content_.GetTrackedObjects();
   for (std::size_t i = 0; i < tracked_objects.size(); i++) {
     DrawObstacle(tracked_objects[i], true, show_polygon_, show_velocity_,
                  show_direction_);

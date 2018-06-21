@@ -287,7 +287,7 @@ class SequentialPerceptionTest {
       AERROR << "SensorRawFrame is nullptr";
       return;
     }
-    std::vector<ObjectPtr> fused_objs;
+    std::vector<std::shared_ptr<Object>> fused_objs;
     obstacle_perception_.Process(frame, &fused_objs);
   }
 

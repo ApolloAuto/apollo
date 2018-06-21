@@ -6,6 +6,7 @@ package apollo.common.adapter;
 message AdapterConfig {
   enum MessageType {
     POINT_CLOUD = 1;
+    VLP16_POINT_CLOUD = 58;
     GPS = 2;
     IMU = 3;
     CHASSIS = 4;
@@ -50,6 +51,18 @@ message AdapterConfig {
     VOICE_DETECTION_REQUEST = 43;
     VOICE_DETECTION_RESPONSE = 44;
     IMAGE_FRONT = 45;
+    PANDORA_POINT_CLOUD = 46;
+    PANDORA_CAMERA_FRONT_COLOR = 47;
+    PANDORA_CAMERA_RIGHT_GRAY = 48;
+    PANDORA_CAMERA_LEFT_GRAY = 49;
+    PANDORA_CAMERA_FRONT_GRAY = 50;
+    PANDORA_CAMERA_BACK_GRAY = 51;
+    PERCEPTION_LANE_MASK = 52;
+    GUARDIAN = 53;
+    GNSS_RAW_DATA = 54;
+    STREAM_STATUS = 55;
+    GNSS_HEADING = 56;
+    RTCM_DATA = 57;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

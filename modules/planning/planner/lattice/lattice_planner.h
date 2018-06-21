@@ -26,8 +26,6 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/lattice/behavior/behavior_decider.h"
-#include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -69,7 +67,7 @@ class LatticePlanner : public Planner {
 
   bool MapFutureTrajectoryToSL(
       const DiscretizedTrajectory& future_trajectory,
-      const std::vector<apollo::common::PathPoint>& discretized_reference_line,
+      const std::vector<common::PathPoint>& discretized_reference_line,
       std::vector<common::SpeedPoint>* st_points,
       std::vector<common::FrenetFramePoint>* sl_points);
 };

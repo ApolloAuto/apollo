@@ -100,7 +100,7 @@ void compute_overlapped_by_idx_gpu(const int nthreads,
 void apply_nms_gpu(const float *bbox_data, const float *conf_data,
                    const int num_bboxes, const float confidence_threshold,
                    const int top_k, const float nms_threshold, std::vector<int> *indices,
-                   std::shared_ptr <SyncedMemory> overlapped, std::shared_ptr <SyncedMemory> idx_sm) {
+                   std::shared_ptr <caffe::SyncedMemory> overlapped, std::shared_ptr <caffe::SyncedMemory> idx_sm) {
     // Keep part of detections whose scores are higher than confidence threshold.
     cudaDeviceSynchronize();
     std::vector<int> idx;

@@ -26,7 +26,8 @@ PbfSensorObject::PbfSensorObject()
   object.reset(new Object());
 }
 
-PbfSensorObject::PbfSensorObject(ObjectPtr obj3d, SensorType type, double time)
+PbfSensorObject::PbfSensorObject(std::shared_ptr<Object> obj3d, SensorType type,
+                                 double time)
     : sensor_type(type),
       timestamp(time),
       object(obj3d),

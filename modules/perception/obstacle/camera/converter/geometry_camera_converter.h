@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -29,8 +30,9 @@
 #include "opencv2/opencv.hpp"
 #include "yaml-cpp/yaml.h"
 
+#include "modules/perception/proto/geometry_camera_converter_config.pb.h"
+
 #include "modules/common/log.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/common/visual_object.h"
@@ -50,26 +52,27 @@ class GeometryCameraConverter : public BaseCameraConverter {
   // @brief: Convert 2D detected objects into physical 3D objects
   // @param [in/out] objects : detected object lists, added 3D position and
   // orientation
-  bool Convert(std::vector<VisualObjectPtr> *objects) override;
+  bool Convert(std::vector<std::shared_ptr<VisualObject>> *objects) override;
 
   std::string Name() const override;
 
  private:
   bool LoadCameraIntrinsics(const std::string &file_path);
 
-  bool ConvertSingle(const float &h, const float &w, const float &l,
-                     const float &alpha_deg, const Eigen::Vector2f &upper_left,
-                     const Eigen::Vector2f &lower_right, float *distance_w,
-                     float *distance_h, Eigen::Vector2f *mass_center_pixel);
+  bool ConvertSingle(const float h, const float w, const float l,
+                     const float alpha_deg, const Eigen::Vector2f &upper_left,
+                     const Eigen::Vector2f &lower_right, bool use_width,
+                     float *distance, Eigen::Vector2f *mass_center_pixel);
 
-  void Rotate(const float &alpha_deg,
+  void Rotate(const float alpha_deg,
               std::vector<Eigen::Vector3f> *corners) const;
 
-  float SearchDistance(const int &pixel_length, const bool &use_width,
-                       const Eigen::Matrix<float, 3, 1> &mass_center_v);
+  float SearchDistance(const int pixel_length, const bool &use_width,
+                       const Eigen::Matrix<float, 3, 1> &mass_center_v,
+                       float close_d, float far_d);
 
   void SearchCenterDirection(
-      const Eigen::Matrix<float, 2, 1> &box_center_pixel, const float &curr_d,
+      const Eigen::Matrix<float, 2, 1> &box_center_pixel, const float curr_d,
       Eigen::Matrix<float, 3, 1> *mass_center_v,
       Eigen::Matrix<float, 2, 1> *mass_center_pixel) const;
 
@@ -77,26 +80,28 @@ class GeometryCameraConverter : public BaseCameraConverter {
       const Eigen::Matrix<float, 3, 1> &v) const;
 
   // Physical Size sanity check based on type
-  void CheckSizeSanity(VisualObjectPtr obj) const;
+  void CheckSizeSanity(std::shared_ptr<VisualObject> obj) const;
 
   // Check truncation based on 2D box position
-  void CheckTruncation(VisualObjectPtr obj,
+  void CheckTruncation(std::shared_ptr<VisualObject> obj,
                        Eigen::Matrix<float, 2, 1> *trunc_center_pixel) const;
 
   // Choose distance based on 2D box width or height
-  float DecideDistance(const float &distance_h, const float &distance_w,
-                       VisualObjectPtr obj) const;
+  float DecideDistance(const float distance_h, const float distance_w,
+                       std::shared_ptr<VisualObject> obj) const;
 
   void DecideAngle(const Eigen::Vector3f &camera_ray,
-                   VisualObjectPtr obj) const;
+                   std::shared_ptr<VisualObject> obj) const;
 
-  void SetBoxProjection(VisualObjectPtr obj) const;
+  void SetBoxProjection(std::shared_ptr<VisualObject> obj) const;
 
   CameraDistort<float> camera_model_;
   std::vector<Eigen::Vector3f> corners_;
   std::vector<Eigen::Vector2f> pixel_corners_;
-  static const int kMaxDistanceSearchDepth_ = 20;
-  static const int kMaxCenterDirectionSearchDepth_ = 10;
+  static const int kMaxDistanceSearchDepth_ = 10;
+  static const int kMaxCenterDirectionSearchDepth_ = 5;
+
+  geometry_camera_converter_config::ModelConfigs config_;
 
   DISALLOW_COPY_AND_ASSIGN(GeometryCameraConverter);
 };

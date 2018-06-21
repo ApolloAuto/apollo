@@ -55,8 +55,6 @@ build --spawn_strategy=standalone
 # Specify protobuf cc toolchain
 build --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 
-build --dynamic_mode=fully
-
 # build with profiling
 build:cpu_prof --linkopt=-lprofiler
 

@@ -97,10 +97,11 @@ class MapService {
   static const char kMetaFileName[];
 
   const bool use_sim_map_;
-  const hdmap::HDMap *hdmap_ = nullptr;
+  const hdmap::HDMap *HDMap() const;
   // A downsampled map for dreamview frontend display.
-  const hdmap::HDMap *sim_map_ = nullptr;
-  bool pending_ = true;
+  const hdmap::HDMap *SimMap() const;
+  bool MapReady() const;
+
   double x_offset_ = 0.0;
   double y_offset_ = 0.0;
 

@@ -48,7 +48,8 @@ ErrorCode GemController::Init(
     AINFO << "GemController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
   }
-
+  vehicle_params_.CopyFrom(
+      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -221,7 +222,7 @@ Chassis GemController::chassis() {
       chassis_detail.gem().steering_rpt_1_6e().has_output_value()) {
     chassis_.set_steering_percentage(
         chassis_detail.gem().steering_rpt_1_6e().output_value() * 100.0 /
-        params_.max_steer_angle() / M_PI * 180);
+        vehicle_params_.max_steer_angle());
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -407,10 +408,8 @@ void GemController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  // convert to radians
-  const double real_angle =
-      params_.max_steer_angle() * angle / 100.0 * M_PI / 180.0;
-  // reverse sign
+
+  const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
 
   steering_cmd_6d_->set_position_value(real_angle)->set_speed_limit(9.0);
 }
@@ -424,14 +423,13 @@ void GemController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      params_.max_steer_angle() * angle / 100.0 * M_PI / 180.0;
+  const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
 
   const double real_angle_spd =
-      M_PI / 180.0 *
       ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
-          params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
-          params_.max_steer_angle_spd() * angle_spd / 100.0);
+          vehicle_params_.min_steer_angle_rate(),
+          vehicle_params_.max_steer_angle_rate(),
+          vehicle_params_.max_steer_angle_rate() * angle_spd / 100.0);
   steering_cmd_6d_->set_position_value(real_angle)
       ->set_speed_limit(real_angle_spd);
 }

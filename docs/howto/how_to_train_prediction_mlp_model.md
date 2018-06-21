@@ -24,13 +24,13 @@ The following is the precedure to train the MLP model using the released demo da
 
 5. In docker, under `/apollo/`, run `bash apollo.sh build` to compile.
 
-6. In docker, under `/apollo/`, download the demo rosbag by `bash docs/demo_guide/rosbag_helper.sh download`
+6. In docker, under `/apollo/`, download the demo rosbag by `python docs/demo_guide/rosbag_helper.py demo_2.0.bag`
 
 7. In docker, under `/apollo/`, run prediction module by `bash scripts/prediction.sh start_fe`
 
 8. Open a new terminal window, enter the apollo dev docker by Step 4.
 
-9. In the new terminal window, under `/apollo/`, play the demo rosbag by `rosbag play ./docs/demo_guide/demo_2.0.bag`
+9. In the new terminal window, under `/apollo/`, play the demo rosbag by `rosbag play demo_2.0.bag`
 
 10. After the demo rosbag running is finished in the new terminal window, go to the old terminal window and stop the prediction module by pressing `Ctrl + C`.
 

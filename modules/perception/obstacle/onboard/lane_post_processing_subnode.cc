@@ -15,22 +15,22 @@
  *****************************************************************************/
 
 // @brief: lane_post_processing_subnode source file
-
 #include "modules/perception/obstacle/onboard/lane_post_processing_subnode.h"
 
-#include <unordered_map>
-#include <cfloat>
 #include <algorithm>
+#include <cfloat>
+#include <chrono>
+#include <thread>
+#include <unordered_map>
 
 #include "Eigen/Dense"
 #include "opencv2/opencv.hpp"
 #include "yaml-cpp/yaml.h"
 
 #include "modules/common/log.h"
-#include "modules/common/time/timer.h"
 #include "modules/common/time/time_util.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/lane_post_process/cc_lane_post_processor/cc_lane_post_processor.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
@@ -40,13 +40,14 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::time::Timer;
+using std::shared_ptr;
 using std::string;
 using std::unordered_map;
-using std::shared_ptr;
-using apollo::common::Status;
-using apollo::common::ErrorCode;
-using apollo::common::time::Timer;
 
+const int MAX_MOTION_SERVICE_DELAY = 5;
 bool LanePostProcessingSubnode::InitInternal() {
   // get Subnode config in DAG streaming
   unordered_map<string, string> fields;
@@ -61,13 +62,13 @@ bool LanePostProcessingSubnode::InitInternal() {
     AWARN << "Unable to project lane history information";
   } else {
     motion_event_id_ = static_cast<EventID>(atoi((iter->second).c_str()));
-    motion_service_ = dynamic_cast<MotionService*>(
-          DAGStreaming::GetSubnodeByName("MotionService"));
+    motion_service_ = dynamic_cast<MotionService *>(
+        DAGStreaming::GetSubnodeByName("MotionService"));
     if (motion_service_ == nullptr) {
       AWARN << "motion service should initialize before LanePostProcessing";
     }
     options_.use_lane_history = true;
-//    options_.ConfigLaneHistory(FLAGS_lane_history_size);
+    AINFO << "options_.use_lane_history: " << options_.use_lane_history;
   }
   // init shared data
   if (!InitSharedData()) {
@@ -134,21 +135,6 @@ bool LanePostProcessingSubnode::InitAlgorithmPlugin() {
 
   AINFO << "init alg pulgins successfully\n"
         << " lane post-processer:     " << FLAGS_onboard_lane_post_processor;
-  return true;
-}
-
-bool LanePostProcessingSubnode::InitWorkRoot() {
-  ConfigManager *config_manager = ConfigManager::instance();
-  if (config_manager == NULL) {
-    AERROR << "failed to get ConfigManager instance.";
-    return false;
-  }
-
-  if (!config_manager->Init()) {
-    AERROR << "failed to init ConfigManager";
-    return false;
-  }
-
   return true;
 }
 
@@ -221,12 +207,11 @@ Status LanePostProcessingSubnode::ProcEvents() {
   }
 
   LaneObjectsPtr lane_objects(new LaneObjects());
-  CameraLanePostProcessOptions options;
-  options.timestamp = event.timestamp;
+  options_.timestamp = event.timestamp;
   timestamp_ns_ = event.timestamp * 1e9;
   if (motion_event_id_ != -1) {
     if (motion_service_ == nullptr) {
-      motion_service_ = dynamic_cast<MotionService*>(
+      motion_service_ = dynamic_cast<MotionService *>(
           DAGStreaming::GetSubnodeByName("MotionService"));
       if (motion_service_ == nullptr) {
         AERROR << "motion service must initialize before LanePostProcessing";
@@ -234,25 +219,62 @@ Status LanePostProcessingSubnode::ProcEvents() {
       }
     }
 
-    // TODO(gchen-apollo): add lock to read motion_buffer
-    options_.SetMotion(motion_service_->GetMotionBuffer()->back());
+    double motion_timestamp = motion_service_->GetLatestTimestamp();
+    ADEBUG << "object ts : motion ts   " << std::to_string(event.timestamp)
+           << "  " << std::to_string(motion_timestamp);
+
+    if (motion_timestamp > event.timestamp) {
+      if (!motion_service_->GetMotionInformation(event.timestamp,
+                                                 &(options_.vehicle_status))) {
+        AWARN << "cannot find desired motion in motion buffer at: "
+              << std::to_string(event.timestamp);
+        options_.vehicle_status.time_ts = 0.0;  // signal to reset history
+        // return Status(ErrorCode::PERCEPTION_ERROR, "Failed to proc events.");
+      }
+    } else if (motion_timestamp < event.timestamp) {
+      int count = 0;
+      while (motion_timestamp < event.timestamp) {
+        count++;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        ADEBUG << "delay in motion: " << count;
+        ADEBUG << "object ts : motion ts  " << std::to_string(event.timestamp)
+               << "  " << std::to_string(motion_timestamp);
+        motion_timestamp = motion_service_->GetLatestTimestamp();
+        // exceed max waiting time
+        if (motion_timestamp > 0 && count > MAX_MOTION_SERVICE_DELAY) {
+          break;
+        }
+      }
+      mutex_.lock();
+      options_.SetMotion(motion_service_->GetMotionBuffer().back());
+      mutex_.unlock();
+      if (event.timestamp - options_.vehicle_status.time_ts > 0.2) {
+        options_.vehicle_status.time_ts = 0.0;  // signal to reset history
+      }
+    } else {
+      mutex_.lock();
+      options_.SetMotion(motion_service_->GetMotionBuffer().back());
+      mutex_.unlock();
+    }
+    ADEBUG << "options_.vehicle_status.motion:  "
+           << options_.vehicle_status.motion;
   }
-  lane_post_processor_->Process(lane_map, options, &lane_objects);
+  lane_post_processor_->Process(lane_map, options_, &lane_objects);
   for (size_t i = 0; i < lane_objects->size(); ++i) {
     (*lane_objects)[i].timestamp = event.timestamp;
     (*lane_objects)[i].seq_num = seq_num_;
   }
   ADEBUG << "Before publish lane objects, objects num: "
-        << lane_objects->size();
+         << lane_objects->size();
 
   uint64_t t = timer.End("lane post-processing");
   min_processing_time_ = std::min(min_processing_time_, t);
   max_processing_time_ = std::max(max_processing_time_, t);
   tot_processing_time_ += t;
   ADEBUG << "Lane Post Processing Runtime: "
-        << "MIN (" << min_processing_time_ << " ms), "
-        << "MAX (" << max_processing_time_ << " ms), "
-        << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";
+         << "MIN (" << min_processing_time_ << " ms), "
+         << "MAX (" << max_processing_time_ << " ms), "
+         << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";
 
   PublishDataAndEvent(event.timestamp, lane_objects);
 
@@ -265,7 +287,7 @@ Status LanePostProcessingSubnode::ProcEvents() {
 }
 
 void LanePostProcessingSubnode::PublishPerceptionPb(
-    const LaneObjectsPtr &lane_objects) {
+    LaneObjectsPtr lane_objects) {
   ADEBUG << "Lane post-processor publish lane object pb data";
 
   PerceptionObstacles obstacles;
@@ -279,7 +301,7 @@ void LanePostProcessingSubnode::PublishPerceptionPb(
   header->set_radar_timestamp(0);
 
   // generate lane marker protobuf messages
-  LaneMarkers* lane_markers = obstacles.mutable_lane_marker();
+  LaneMarkers *lane_markers = obstacles.mutable_lane_marker();
   LaneObjectsToLaneMarkerProto(*lane_objects, lane_markers);
 
   common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);

@@ -178,5 +178,3 @@ em_planner_config {
         }
     }
 }
-
-smoother_type: QP_SPLINE_SMOOTHER

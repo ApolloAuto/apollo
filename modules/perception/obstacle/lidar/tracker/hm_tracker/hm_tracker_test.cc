@@ -27,7 +27,6 @@
 #include "modules/common/util/file.h"
 #include "modules/perception/common/pcl_types.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 
@@ -40,12 +39,6 @@ class HmObjectTrackerTest : public testing::Test {
   virtual ~HmObjectTrackerTest() {}
   void SetUp() {
     RegisterFactoryHmObjectTracker();
-    FLAGS_work_root = "modules/perception";
-    FLAGS_config_manager_path = "conf/config_manager.config";
-    if (!ConfigManager::instance()->Init()) {
-      AERROR << "failed to Init ConfigManager";
-      return;
-    }
     hm_tracker_ = new HmObjectTracker();
     object_builder_ = new MinBoxObjectBuilder();
     object_builder_->Init();
@@ -68,7 +61,7 @@ class HmObjectTrackerTest : public testing::Test {
 };
 
 bool ConstructObjects(const std::string& filename,
-                      std::vector<ObjectPtr>* objects) {
+                      std::vector<std::shared_ptr<Object>>* objects) {
   std::ifstream ifs(filename);
   if (!ifs.is_open()) {
     AERROR << "failed to open file" << filename;
@@ -79,7 +72,7 @@ bool ConstructObjects(const std::string& filename,
   float tmp = 0;
   while (ifs >> type) {
     ifs >> tmp >> tmp >> tmp >> no_point;
-    ObjectPtr obj(new Object());
+    std::shared_ptr<Object> obj(new Object());
     obj->cloud->resize(no_point);
     for (int j = 0; j < no_point; ++j) {
       ifs >> obj->cloud->points[j].x >> obj->cloud->points[j].y >>
@@ -121,7 +114,7 @@ TEST_F(HmObjectTrackerTest, Track) {
     pose(1, 3) -= global_offset(1);
     pose(2, 3) -= global_offset(2);
     // read segments
-    std::vector<ObjectPtr> objects;
+    std::vector<std::shared_ptr<Object>> objects;
     if (!ConstructObjects(data_path + seg_filenames[i], &objects)) {
       AERROR << "failed to read segments";
       return;
@@ -130,7 +123,7 @@ TEST_F(HmObjectTrackerTest, Track) {
     object_builder_->Build(object_builder_options_, &objects);
     // test tracking
     *(tracker_options_.velodyne_trans) = pose;
-    std::vector<ObjectPtr> result_objects;
+    std::vector<std::shared_ptr<Object>> result_objects;
     // assert tracking successfully
     EXPECT_TRUE(hm_tracker_->Track(objects, time_stamp, tracker_options_,
                                    &result_objects));

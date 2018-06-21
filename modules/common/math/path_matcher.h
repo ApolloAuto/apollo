@@ -27,30 +27,30 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 namespace apollo {
-namespace planning {
+namespace common {
+namespace math {
 
 class PathMatcher {
  public:
   PathMatcher() = delete;
 
-  static common::PathPoint MatchToPath(
-      const std::vector<common::PathPoint>& reference_line, const double x,
-      const double y);
+  static PathPoint MatchToPath(const std::vector<PathPoint>& reference_line,
+                               const double x, const double y);
 
   static std::pair<double, double> GetPathFrenetCoordinate(
-      const std::vector<common::PathPoint>& reference_line, const double x,
+      const std::vector<PathPoint>& reference_line, const double x,
       const double y);
 
-  static common::PathPoint MatchToPath(
-      const std::vector<common::PathPoint>& reference_line, const double s);
+  static PathPoint MatchToPath(const std::vector<PathPoint>& reference_line,
+                               const double s);
 
  private:
-  static common::PathPoint FindProjectionPoint(const common::PathPoint& p0,
-                                               const common::PathPoint& p1,
-                                               const double x, const double y);
+  static PathPoint FindProjectionPoint(const PathPoint& p0, const PathPoint& p1,
+                                       const double x, const double y);
 };
 
-}  // namespace planning
+}  // namespace math
+}  // namespace common
 }  // namespace apollo
 
 #endif  // MODULES_COMMON_MATH_PATH_MATCHER_H_

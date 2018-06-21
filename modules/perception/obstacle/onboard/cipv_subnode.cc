@@ -122,7 +122,8 @@ apollo::common::Status CIPVSubnode::ProcEvents() {
         << ", yaw angle: " << cipv_options.yaw_angle;
 
   // call cipv module
-  if (cipv_.DetermineCipv(sensor_objs, &cipv_options)) {
+  if (cipv_.DetermineCipv(sensor_objs->lane_objects, cipv_options,
+                          &sensor_objs->objects)) {
     PublishDataAndEvent(event.timestamp, sensor_objs, cipv_object_data_);
   }
   return Status::OK();
@@ -190,7 +191,7 @@ bool CIPVSubnode::GetSharedData(const Event &event,
 }
 
 void CIPVSubnode::PublishDataAndEvent(
-    const float &timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
+    const float timestamp, const SharedDataPtr<SensorObjects> &sensor_objects,
     CIPVObjectData *cipv_object_data) {
   std::string key = "";
   SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key);

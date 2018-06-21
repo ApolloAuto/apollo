@@ -28,14 +28,11 @@
 #include "modules/common/math/linear_interpolation.h"
 
 namespace apollo {
-namespace planning {
+namespace common {
+namespace math {
 
-using apollo::common::PathPoint;
-using apollo::common::math::InterpolateUsingLinearApproximation;
-
-PathPoint PathMatcher::MatchToPath(
-    const std::vector<PathPoint>& reference_line, const double x,
-    const double y) {
+PathPoint PathMatcher::MatchToPath(const std::vector<PathPoint>& reference_line,
+                                   const double x, const double y) {
   CHECK_GT(reference_line.size(), 0);
 
   auto func_distance_square = [](const PathPoint& point, const double x,
@@ -85,8 +82,8 @@ std::pair<double, double> PathMatcher::GetPathFrenetCoordinate(
   return relative_coordinate;
 }
 
-PathPoint PathMatcher::MatchToPath(
-    const std::vector<PathPoint>& reference_line, const double s) {
+PathPoint PathMatcher::MatchToPath(const std::vector<PathPoint>& reference_line,
+                                   const double s) {
   auto comp = [](const PathPoint& point, const double s) {
     return point.s() < s;
   };
@@ -105,8 +102,7 @@ PathPoint PathMatcher::MatchToPath(
 }
 
 PathPoint PathMatcher::FindProjectionPoint(const PathPoint& p0,
-                                           const PathPoint& p1,
-                                           const double x,
+                                           const PathPoint& p1, const double x,
                                            const double y) {
   double v0x = x - p0.x();
   double v0y = y - p0.y();
@@ -121,5 +117,6 @@ PathPoint PathMatcher::FindProjectionPoint(const PathPoint& p0,
   return InterpolateUsingLinearApproximation(p0, p1, p0.s() + delta_s);
 }
 
-}  // namespace planning
+}  // namespace math
+}  // namespace common
 }  // namespace apollo

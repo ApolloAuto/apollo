@@ -27,9 +27,9 @@
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sequence_type_fuser/sequence_type_fuser.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
+#include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
@@ -77,10 +77,8 @@ bool LidarProcessSubnode::InitInternal() {
     return false;
   }
   device_id_ = reserve_field_map["device_id"];
+  AddMessageCallback();
 
-  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
-  AdapterManager::AddPointCloudCallback(&LidarProcessSubnode::OnPointCloud,
-                                        this);
   inited_ = true;
 
   return true;
@@ -100,7 +98,7 @@ void LidarProcessSubnode::OnPointCloud(
 
   std::shared_ptr<SensorObjects> out_sensor_objects(new SensorObjects);
   out_sensor_objects->timestamp = timestamp_;
-  out_sensor_objects->sensor_type = SensorType::VELODYNE_64;
+  out_sensor_objects->sensor_type = GetSensorType();
   out_sensor_objects->sensor_id = device_id_;
   out_sensor_objects->seq_num = seq_num_;
 
@@ -160,7 +158,7 @@ void LidarProcessSubnode::OnPointCloud(
   PERF_BLOCK_END("lidar_roi_filter");
 
   /// call segmentor
-  std::vector<ObjectPtr> objects;
+  std::vector<std::shared_ptr<Object>> objects;
   if (segmentor_ != nullptr) {
     SegmentationOptions segmentation_options;
     segmentation_options.origin_cloud = point_cloud;
@@ -180,6 +178,24 @@ void LidarProcessSubnode::OnPointCloud(
   }
   ADEBUG << "call segmentation succ. The num of objects is: " << objects.size();
   PERF_BLOCK_END("lidar_segmentation");
+
+  /// call object filter
+  if (object_filter_ != nullptr) {
+    ObjectFilterOptions object_filter_options;
+    object_filter_options.velodyne_trans.reset(new Eigen::Matrix4d);
+    object_filter_options.velodyne_trans = velodyne_trans;
+    // object_filter_options.hdmap_struct_ptr = hdmap;
+
+    if (!object_filter_->Filter(object_filter_options, &objects)) {
+      AERROR << "failed to call object filter.";
+      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
+      PublishDataAndEvent(timestamp_, out_sensor_objects);
+      return;
+    }
+  }
+  ADEBUG << "call object filter succ. The num of objects is: "
+         << objects.size();
+  PERF_BLOCK_END("lidar_object_filter");
 
   /// call object builder
   if (object_builder_ != nullptr) {
@@ -238,6 +254,7 @@ void LidarProcessSubnode::RegistAllAlgorithm() {
   RegisterFactoryDummyTypeFuser();
 
   RegisterFactoryHdmapROIFilter();
+  RegisterFactoryLowObjectFilter();
   RegisterFactoryCNNSegmentation();
   RegisterFactoryMinBoxObjectBuilder();
   RegisterFactoryHmObjectTracker();
@@ -263,10 +280,6 @@ bool LidarProcessSubnode::InitFrameDependence() {
     hdmap_input_ = HDMapInput::instance();
     if (!hdmap_input_) {
       AERROR << "failed to get HDMapInput instance.";
-      return false;
-    }
-    if (!hdmap_input_->Init()) {
-      AERROR << "failed to Init HDMapInput";
       return false;
     }
     AINFO << "get and Init hdmap_input succ.";
@@ -317,6 +330,20 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
   }
   AINFO << "Init algorithm plugin successfully, object builder: "
         << object_builder_->name();
+
+  /// init pre object filter
+  object_filter_.reset(
+      BaseObjectFilterRegisterer::GetInstanceByName("LowObjectFilter"));
+  if (!object_filter_) {
+    AERROR << "Failed to get instance: ExtHdmapObjectFilter";
+    return false;
+  }
+  if (!object_filter_->Init()) {
+    AERROR << "Failed to Init object filter: " << object_filter_->name();
+    return false;
+  }
+  AINFO << "Init algorithm plugin successfully, object filter: "
+        << object_filter_->name();
 
   /// init tracker
   tracker_.reset(
@@ -397,6 +424,27 @@ void LidarProcessSubnode::PublishDataAndEvent(
     event.reserve = device_id_;
     event_manager_->Publish(event);
   }
+}
+
+SensorType Lidar64ProcessSubnode::GetSensorType() const {
+  return SensorType::VELODYNE_64;
+}
+
+void Lidar64ProcessSubnode::AddMessageCallback() {
+  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
+  AdapterManager::AddPointCloudCallback<LidarProcessSubnode>(
+      &LidarProcessSubnode::OnPointCloud, this);
+}
+
+SensorType Lidar16ProcessSubnode::GetSensorType() const {
+  return SensorType::VELODYNE_16;
+}
+
+void Lidar16ProcessSubnode::AddMessageCallback() {
+  CHECK(AdapterManager::GetVLP16PointCloud())
+      << "VLP16 PointCloud is not initialized.";
+  AdapterManager::AddVLP16PointCloudCallback<LidarProcessSubnode>(
+      &LidarProcessSubnode::OnPointCloud, this);
 }
 
 }  // namespace perception

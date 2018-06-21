@@ -28,6 +28,12 @@ function source_apollo_base() {
 }
 
 function apollo_check_system_config() {
+  # check docker environment
+  if [ ${MACHINE_ARCH} == "x86_64" ] && [ ${APOLLO_IN_DOCKER} != "true" ]; then
+    echo -e "${RED}Must run $0 in dev docker or release docker${NO_COLOR}"
+    exit 0
+  fi
+
   # check operating system
   OP_SYSTEM=$(uname -s)
   case $OP_SYSTEM in
@@ -112,6 +118,7 @@ function generate_build_targets() {
 function build() {
   START_TIME=$(get_now)
 
+
   info "Start building, please wait ..."
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
@@ -184,7 +191,6 @@ function build_py_proto() {
   PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
   find modules/ -name "*.proto" \
       | grep -v node_modules \
-      | grep -v modules/drivers/gnss \
       | xargs ${PROTOC} --python_out=py_proto
   find py_proto/* -type d -exec touch "{}/__init__.py" \;
 }
@@ -276,7 +282,7 @@ function release() {
   fi
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
-  cp ./modules/perception/cuda_util/build/libcuda_util.so $LIB_DIR
+  cp /apollo/modules/perception/cuda_util/cmake_build/libcuda_util.so $LIB_DIR
 
   # doc
   cp -r docs "${APOLLO_RELEASE_DIR}"
@@ -344,14 +350,6 @@ function run_test() {
     return 1
   fi
 
-  if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
-      cd /apollo-simulator && bash build.sh test
-      if [ $? -ne 0 ]; then
-        fail 'Test failed!'
-        return 1
-      fi
-  fi
-
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
@@ -391,7 +389,7 @@ function run_lint() {
   START_TIME=$(get_now)
 
   # Add cpplint rule to BUILD files that do not contain it.
-  for file in $(find modules -name BUILD | \
+  for file in $(find modules -name BUILD |  grep -v gnss/third_party | \
     xargs grep -l -E 'cc_library|cc_test|cc_binary' | xargs grep -L 'cpplint()')
   do
     sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' $file
@@ -443,54 +441,6 @@ function version() {
   echo "Date: ${date}"
 }
 
-function build_gnss() {
-  CURRENT_PATH=$(pwd)
-  if [ -d "${ROS_ROOT}" ]; then
-    ROS_PATH="${ROS_ROOT}/../.."
-  else
-    warning "ROS not found. Run apolllo.sh build first."
-    exit 1
-  fi
-
-  source "${ROS_PATH}/setup.bash"
-
-  protoc modules/common/proto/error_code.proto --cpp_out=./
-  protoc modules/common/proto/header.proto --cpp_out=./
-  protoc modules/common/proto/geometry.proto --cpp_out=./
-
-  protoc modules/localization/proto/imu.proto --cpp_out=./
-  protoc modules/localization/proto/gps.proto --cpp_out=./
-  protoc modules/localization/proto/pose.proto --cpp_out=./
-
-  protoc modules/drivers/gnss/proto/gnss.proto --cpp_out=./
-  protoc modules/drivers/gnss/proto/imu.proto --cpp_out=./
-  protoc modules/drivers/gnss/proto/ins.proto --cpp_out=./ --python_out=./
-  protoc modules/drivers/gnss/proto/config.proto --cpp_out=./
-  protoc modules/drivers/gnss/proto/gnss_status.proto --cpp_out=./ --python_out=./
-  protoc modules/drivers/gnss/proto/gpgga.proto --cpp_out=./
-  protoc modules/drivers/gnss/proto/gnss_raw_observation.proto --cpp_out=./ --python_out=./
-  protoc modules/drivers/gnss/proto/gnss_best_pose.proto --cpp_out=./ --python_out=./
-
-  cd modules
-  catkin_make_isolated --install --source drivers/gnss \
-    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
-    --cmake-args --no-warn-unused-cli
-  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
-  cd -
-
-  rm -rf modules/common/proto/*.pb.cc
-  rm -rf modules/common/proto/*.pb.h
-  rm -rf modules/drivers/gnss/proto/*.pb.cc
-  rm -rf modules/drivers/gnss/proto/*.pb.h
-  rm -rf modules/drivers/gnss/proto/*_pb2.py
-  rm -rf modules/localization/proto/*.pb.cc
-  rm -rf modules/localization/proto/*.pb.h
-
-  rm -rf modules/.catkin_workspace
-  rm -rf modules/build_isolated/
-  rm -rf modules/devel_isolated/
-}
-
 function build_velodyne() {
   CURRENT_PATH=$(pwd)
   if [ -d "${ROS_ROOT}" ]; then
@@ -513,6 +463,54 @@ function build_velodyne() {
   rm -rf modules/build_isolated/
   rm -rf modules/devel_isolated/
 }
+
+
+function build_lslidar() {
+  CURRENT_PATH=$(pwd)
+  if [ -d "${ROS_ROOT}" ]; then
+    ROS_PATH="${ROS_ROOT}/../.."
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
+
+  source "${ROS_PATH}/setup.bash"
+
+  cd modules
+  catkin_make_isolated --install --source drivers/lslidar_apollo \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
+
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
+}
+
+function build_rslidar() {
+  CURRENT_PATH=$(pwd)
+  if [ -d "${ROS_ROOT}" ]; then
+    ROS_PATH="${ROS_ROOT}/../.."
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
+
+  source "${ROS_PATH}/setup.bash"
+
+  cd modules
+  catkin_make_isolated --install --source drivers/rslidar \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
+
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
+}
+
 
 function build_usbcam() {
   CURRENT_PATH=$(pwd)
@@ -554,8 +552,8 @@ function print_usage() {
   ${BLUE}build${NONE}: run build only
   ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
-  ${BLUE}build_gnss${NONE}: build gnss driver
   ${BLUE}build_velodyne${NONE}: build velodyne driver
+  ${BLUE}build_rslidar${NONE}: build rslidar driver
   ${BLUE}build_usbcam${NONE}: build usb camera driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
@@ -577,8 +575,8 @@ function print_usage() {
 
 function main() {
   source_apollo_base
-  apollo_check_system_config
   check_machine_arch
+  apollo_check_system_config
   check_esd_files
 
   DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
@@ -644,6 +642,9 @@ function main() {
       ;;
     build_velodyne)
       build_velodyne
+      ;;
+    build_rslidar)
+      build_rslidar
       ;;
     build_usbcam)
       build_usbcam

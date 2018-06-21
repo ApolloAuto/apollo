@@ -34,7 +34,7 @@ ConstantDecelerationTrajectory1d::ConstantDecelerationTrajectory1d(
   if (init_v_ < -FLAGS_lattice_epsilon) {
     AERROR << "negative init v = " << init_v_;
   }
-  init_v_ = std::abs(init_v_);
+  init_v_ = std::fabs(init_v_);
   CHECK(deceleration_ > 0.0);
   end_t_ = init_v_ / deceleration_;
   end_s_ = init_v_ * init_v_ / (2.0 * deceleration_) + init_s_;

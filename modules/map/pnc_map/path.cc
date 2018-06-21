@@ -222,20 +222,42 @@ std::string PathOverlap::DebugString() const {
   return common::util::StrCat(object_id, " ", start_s, " ", end_s);
 }
 
-Path::Path(std::vector<MapPathPoint> path_points)
+Path::Path(const std::vector<MapPathPoint>& path_points)
+    : path_points_(path_points) {
+  Init();
+}
+
+Path::Path(std::vector<MapPathPoint>&& path_points)
     : path_points_(std::move(path_points)) {
   Init();
 }
 
-Path::Path(std::vector<MapPathPoint> path_points,
-           std::vector<LaneSegment> lane_segments)
+Path::Path(const std::vector<MapPathPoint>& path_points,
+           const std::vector<LaneSegment>& lane_segments)
+    : path_points_(path_points), lane_segments_(lane_segments) {
+  Init();
+}
+
+Path::Path(std::vector<MapPathPoint>&& path_points,
+           std::vector<LaneSegment>&& lane_segments)
     : path_points_(std::move(path_points)),
       lane_segments_(std::move(lane_segments)) {
   Init();
 }
 
-Path::Path(std::vector<MapPathPoint> path_points,
-           std::vector<LaneSegment> lane_segments,
+Path::Path(const std::vector<MapPathPoint>& path_points,
+           const std::vector<LaneSegment>& lane_segments,
+           const double max_approximation_error)
+    : path_points_(path_points), lane_segments_(lane_segments) {
+  Init();
+  if (max_approximation_error > 0.0) {
+    use_path_approximation_ = true;
+    approximation_ = PathApproximation(*this, max_approximation_error);
+  }
+}
+
+Path::Path(std::vector<MapPathPoint>&& path_points,
+           std::vector<LaneSegment>&& lane_segments,
            const double max_approximation_error)
     : path_points_(std::move(path_points)),
       lane_segments_(std::move(lane_segments)) {
@@ -316,31 +338,50 @@ void Path::InitLaneSegments() {
 }
 
 void Path::InitWidth() {
-  left_width_.clear();
-  left_width_.reserve(num_sample_points_);
-  right_width_.clear();
-  right_width_.reserve(num_sample_points_);
+  lane_left_width_.clear();
+  lane_left_width_.reserve(num_sample_points_);
+  lane_right_width_.clear();
+  lane_right_width_.reserve(num_sample_points_);
+
+  road_left_width_.clear();
+  road_left_width_.reserve(num_sample_points_);
+  road_right_width_.clear();
+  road_right_width_.reserve(num_sample_points_);
 
   double s = 0;
   for (int i = 0; i < num_sample_points_; ++i) {
     const MapPathPoint point = GetSmoothPoint(s);
     if (point.lane_waypoints().empty()) {
-      left_width_.push_back(FLAGS_default_lane_width / 2.0);
-      right_width_.push_back(FLAGS_default_lane_width / 2.0);
+      lane_left_width_.push_back(FLAGS_default_lane_width / 2.0);
+      lane_right_width_.push_back(FLAGS_default_lane_width / 2.0);
+
+      road_left_width_.push_back(FLAGS_default_lane_width / 2.0);
+      road_right_width_.push_back(FLAGS_default_lane_width / 2.0);
       AWARN << "path point:" << point.DebugString() << " has invalid width.";
     } else {
       const LaneWaypoint waypoint = point.lane_waypoints()[0];
       CHECK_NOTNULL(waypoint.lane);
-      double left_width = 0.0;
-      double right_width = 0.0;
-      waypoint.lane->GetWidth(waypoint.s, &left_width, &right_width);
-      left_width_.push_back(left_width - waypoint.l);
-      right_width_.push_back(right_width + waypoint.l);
+
+      double lane_left_width = 0.0;
+      double lane_right_width = 0.0;
+      waypoint.lane->GetWidth(waypoint.s, &lane_left_width, &lane_right_width);
+      lane_left_width_.push_back(lane_left_width - waypoint.l);
+      lane_right_width_.push_back(lane_right_width + waypoint.l);
+
+      double road_left_width = 0.0;
+      double road_right_width = 0.0;
+      waypoint.lane->GetRoadWidth(waypoint.s, &road_left_width,
+                                  &road_right_width);
+      road_left_width_.push_back(road_left_width - waypoint.l);
+      road_right_width_.push_back(road_right_width + waypoint.l);
     }
     s += kSampleDistance;
   }
-  CHECK_EQ(left_width_.size(), num_sample_points_);
-  CHECK_EQ(right_width_.size(), num_sample_points_);
+  CHECK_EQ(lane_left_width_.size(), num_sample_points_);
+  CHECK_EQ(lane_right_width_.size(), num_sample_points_);
+
+  CHECK_EQ(road_left_width_.size(), num_sample_points_);
+  CHECK_EQ(road_right_width_.size(), num_sample_points_);
 }
 
 void Path::InitPointIndex() {
@@ -663,24 +704,46 @@ bool Path::GetHeadingAlongPath(const Vec2d& point, double* heading) const {
   return false;
 }
 
-double Path::GetLeftWidth(const double s) const {
-  return GetSample(left_width_, s);
+double Path::GetLaneLeftWidth(const double s) const {
+  return GetSample(lane_left_width_, s);
 }
 
-double Path::GetRightWidth(const double s) const {
-  return GetSample(right_width_, s);
+double Path::GetLaneRightWidth(const double s) const {
+  return GetSample(lane_right_width_, s);
 }
 
-bool Path::GetWidth(const double s, double* left_width,
-                    double* right_width) const {
-  CHECK_NOTNULL(left_width);
-  CHECK_NOTNULL(right_width);
+bool Path::GetLaneWidth(const double s, double* lane_left_width,
+                        double* lane_right_width) const {
+  CHECK_NOTNULL(lane_left_width);
+  CHECK_NOTNULL(lane_right_width);
 
   if (s < 0.0 || s > length_) {
     return false;
   }
-  *left_width = GetSample(left_width_, s);
-  *right_width = GetSample(right_width_, s);
+  *lane_left_width = GetSample(lane_left_width_, s);
+  *lane_right_width = GetSample(lane_right_width_, s);
+  return true;
+}
+
+double Path::GetRoadLeftWidth(const double s) const {
+  return GetSample(road_left_width_, s);
+}
+
+double Path::GetRoadRightWidth(const double s) const {
+  return GetSample(road_right_width_, s);
+}
+
+bool Path::GetRoadWidth(const double s, double* road_left_width,
+                        double* road_right_width) const {
+  CHECK_NOTNULL(road_left_width);
+  CHECK_NOTNULL(road_right_width);
+
+  if (s < 0.0 || s > length_) {
+    return false;
+  }
+
+  *road_left_width = GetSample(road_left_width_, s);
+  *road_right_width = GetSample(road_right_width_, s);
   return true;
 }
 
@@ -706,12 +769,12 @@ bool Path::IsOnPath(const Vec2d& point) const {
   if (!GetProjection(point, &accumulate_s, &lateral)) {
     return false;
   }
-  double left_width = 0.0;
-  double right_width = 0.0;
-  if (!GetWidth(accumulate_s, &left_width, &right_width)) {
+  double lane_left_width = 0.0;
+  double lane_right_width = 0.0;
+  if (!GetLaneWidth(accumulate_s, &lane_left_width, &lane_right_width)) {
     return false;
   }
-  if (lateral < left_width && lateral > -right_width) {
+  if (lateral < lane_left_width && lateral > -lane_right_width) {
     return true;
   }
   return false;

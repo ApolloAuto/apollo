@@ -33,7 +33,7 @@
 //              const RadarRawObstacles& raw_obstacles,
 //              const std::vector<PolygonType>& map_polygons,
 //              const RadarDetectorOptions& options,
-//              std::vector<ObjectPtr>* objects) override {
+//              std::vector<std::shared_ptr<Object>>* objects) override {
 //          // Do something.
 //          return true;
 //      }
@@ -54,11 +54,12 @@
 // using radar_detector to do somethings.
 // ////////////////////////////////////////////////////
 
-#include <Eigen/Core>
+#include <memory>
 #include <string>
 #include <vector>
 
-// defined in apollo/common
+#include "Eigen/Core"
+
 #include "modules/common/macro.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/perception/common/pcl_types.h"
@@ -132,7 +133,7 @@ class BaseRadarDetector {
   virtual bool Detect(const ContiRadar &raw_obstacles,
                       const std::vector<PolygonDType> &map_polygons,
                       const RadarDetectorOptions &options,
-                      std::vector<ObjectPtr> *objects) = 0;
+                      std::vector<std::shared_ptr<Object>> *objects) = 0;
   virtual std::string name() const = 0;
 
  private:

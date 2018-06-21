@@ -1,0 +1,5 @@
+name: "SequenceTypeFuser"
+version: "1.1.0"
+temporal_window: 20.0
+classifiers_property_file_path: "modules/perception/model/sequence_type_fuser/classifiers.property"
+transition_property_file_path: "modules/perception/model/sequence_type_fuser/transition.property"

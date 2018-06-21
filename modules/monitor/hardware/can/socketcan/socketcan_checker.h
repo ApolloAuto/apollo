@@ -54,7 +54,7 @@ class SocketCanChecker : public HwCheckerInterface {
   }
 
   // Returns the can id
-  const int &get_id() const {
+  const int get_id() const {
     return can_id_;
   }
 

@@ -106,6 +106,9 @@ class Surround73 : public ::apollo::drivers::canbus::ProtocolData<
   bool sonar_fault(const std::uint8_t *bytes, int32_t length) const;
 
   double sonar_range(const std::int32_t x) const;
+
+  double sonars(const std::uint8_t *bytes, std::uint8_t sonar_number,
+                int32_t length) const;
 };
 
 }  // namespace lincoln

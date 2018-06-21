@@ -4,6 +4,10 @@
 - [Class Architecture Planning](Class_Architecture_Planning.md)
 
 ##
+- [Perception Apollo 2.5](perception_apollo_2.5.md)
+- [Guideline Sensor Installation Apollo 2.5](Guideline_sensor_Installation_apollo_2.5.md)
+
+##
 - [apollo secure upgrade user guide EN](apollo_secure_upgrade_user_guide-EN.md)
 - [dreamview usage table](dreamview_usage_table.md)
 

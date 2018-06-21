@@ -17,11 +17,14 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_  // NOLINT
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_  // NOLINT
 
+#include <Eigen/Eigenvalues>
 #include <map>
+#include <memory>
 #include <queue>
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
@@ -45,7 +48,7 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   // @brief initialize state of the filter
   // @params[IN] new_object: initial object for filtering
   // @return nothing
-  virtual void Initialize(const PbfSensorObjectPtr new_object);
+  virtual void Initialize(const std::shared_ptr<PbfSensorObject> new_object);
 
   // @brief predict the state of filter
   // @params[OUT] anchor_point:  predicted anchor point for filtering
@@ -59,8 +62,9 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   // @params[IN] new_object: new object for current update
   // @params[IN] time_diff: time interval from last update;
   // @return nothing
-  virtual void UpdateWithObject(const PbfSensorObjectPtr new_object,
-                                const double time_diff);
+  virtual void UpdateWithObject(
+      const std::shared_ptr<PbfSensorObject> new_object,
+      const double time_diff);
 
   // @brief update without measurements
   // @params[IN] time_diff: time interval from last update
@@ -81,7 +85,7 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   // @brief cache sensor objects in history
   // @param[IN] new object: new object for current update
   // @return nothing
-  void CacheSensorObjects(const PbfSensorObjectPtr new_object);
+  void CacheSensorObjects(const std::shared_ptr<PbfSensorObject> new_object);
 
   // @brief remove outdated sensor objects from cache
   // @param[IN] timestamp: current sensor timestamp
@@ -91,38 +95,48 @@ class PbfIMFFusion : public PbfBaseMotionFusion {
   // @brief get latest sensor cache
   // @param[IN] type: requested sensor type
   // @return latest sensor object
-  PbfSensorObjectPtr GetSensorLatestCache(const SensorType type);
+  std::shared_ptr<PbfSensorObject> GetSensorLatestCache(const SensorType type);
 
   void GetUncertainty(Eigen::Matrix3d* position_uncertainty,
                       Eigen::Matrix3d* velocity_uncertainty);
 
-  bool ObtainSensorPrediction(ObjectPtr obj, double sensor_timestamp,
+  bool ObtainSensorPrediction(std::shared_ptr<Object> obj,
+                              double sensor_timestamp,
                               const Eigen::Matrix4d& process_noise,
                               const Eigen::Matrix4d& trans_matrix,
                               Eigen::Vector4d* state_pre,
                               Eigen::Matrix4d* cov_pre);
+  bool AdjustCovMatrix();
   // global
-  Eigen::Vector3d _belief_anchor_point;
-  Eigen::Vector3d _belief_velocity;
-  Eigen::Vector3d _belief_acceleration;
-  Eigen::Matrix<double, 4, 1> _priori_state;
-  Eigen::Matrix<double, 4, 1> _posteriori_state;
-  std::map<SensorType, std::queue<PbfSensorObjectPtr>> _cached_sensor_objects;
+  Eigen::Vector3d belief_anchor_point_;
+  Eigen::Vector3d belief_velocity_;
+  Eigen::Vector3d belief_acceleration_;
+  Eigen::Matrix<double, 4, 1> priori_state_;
+  Eigen::Matrix<double, 4, 1> posteriori_state_;
+  std::map<SensorType, std::queue<std::shared_ptr<PbfSensorObject>>>
+      cached_sensor_objects_;
 
   // the omega matrix
-  Eigen::Matrix<double, 4, 4> _omega_matrix;
+  Eigen::Matrix<double, 4, 4> omega_matrix_;
+  // the omega matrix inverse which is equal to covariance matrix
+  Eigen::Matrix<double, 4, 4> cov_matrix_;
   // the state vector is information matrix: cov.inverse() * state
-  Eigen::Matrix<double, 4, 1> _xi;
+  Eigen::Matrix<double, 4, 1> xi_;
   // the state-transition matrix
-  Eigen::Matrix<double, 4, 4> _a_matrix;
+  Eigen::Matrix<double, 4, 4> a_matrix_;
   // the observation mode
-  Eigen::Matrix<double, 4, 4> _c_matrix;
+  Eigen::Matrix<double, 4, 4> c_matrix_;
   // the covariance of the process noise
-  Eigen::Matrix<double, 4, 4> _q_matrix;
+  Eigen::Matrix<double, 4, 4> q_matrix_;
+  // eigen value solver
+  Eigen::SelfAdjointEigenSolver<Eigen::Matrix4d> es_;
+  // min cov eigen threshold
+  double cov_eigen_thresh_ = 1.0f;
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_
-        // // NOLINT
+// clang-format off
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_IMF_FUSION_H_ // NOLINT
+// clang-format on

@@ -11,7 +11,7 @@ em_planner_config {
     task : QP_SPLINE_ST_SPEED_OPTIMIZER
 
     dp_poly_path_config {
-        sample_points_num_each_level: 7
+        sample_points_num_each_level: 1
         step_length_max: 40.0
         step_length_min: 20.0
         lateral_sample_offset: 0.5
@@ -179,4 +179,21 @@ em_planner_config {
     }
 }
 
-smoother_type: QP_SPLINE_SMOOTHER
+navi_planner_config {
+    task : NAVI_PATH_DECIDER
+
+    task : NAVI_SPEED_DECIDER
+    
+    navi_path_decider_config {
+        min_path_length: 5
+        min_look_forward_time: 2
+        max_smooth_init_y: 0.2
+    }
+
+    navi_speed_decider_config {
+        preferred_accel: 2.0
+        preferred_decel: 2.0
+        max_accel: 4.0
+        max_decel: 5.0
+    }
+}

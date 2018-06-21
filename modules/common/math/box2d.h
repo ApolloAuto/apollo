@@ -166,6 +166,12 @@ class Box2d {
   void GetAllCorners(std::vector<Vec2d> *const corners) const;
 
   /**
+   * @brief Getter of the corners of the box
+   * @param corners The vector where the corners are listed
+   */
+  std::vector<Vec2d> GetAllCorners() const;
+
+  /**
    * @brief Tests points for membership in the box
    * @param point A point that we wish to test for membership in the box
    * @return True iff the point is contained in the box
@@ -231,6 +237,14 @@ class Box2d {
    * @param shift_vec The vector determining the shift
    */
   void Shift(const Vec2d &shift_vec);
+
+  /**
+   * @brief Extend the box longitudinally
+   * @param extension_length the length to extend
+   */
+  void LongitudinalExtend(const double extension_length);
+
+  void LateralExtend(const double extension_length);
 
   /**
    * @brief Gets a human-readable description of the box

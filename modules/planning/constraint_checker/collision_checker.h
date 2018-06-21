@@ -22,11 +22,14 @@
 #define MODULES_PLANNING_CONSTRAINT_CHECKER_COLLISION_CHECKER_H_
 
 #include <array>
+#include <memory>
 #include <vector>
 
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/lattice/behavior/path_time_graph.h"
 
 namespace apollo {
 namespace planning {
@@ -37,7 +40,9 @@ class CollisionChecker {
       const std::vector<const Obstacle*>& obstacles,
       const double ego_vehicle_s,
       const double ego_vehicle_d,
-      const std::vector<common::PathPoint>& discretized_reference_line);
+      const std::vector<common::PathPoint>& discretized_reference_line,
+      const ReferenceLineInfo* ptr_reference_line_info,
+      const std::shared_ptr<PathTimeGraph>& ptr_path_time_graph);
 
   bool InCollision(const DiscretizedTrajectory& discretized_trajectory);
 
@@ -48,12 +53,16 @@ class CollisionChecker {
       const double ego_vehicle_d,
       const std::vector<common::PathPoint>& discretized_reference_line);
 
-  bool IsEgoVehicleInLane(const double ego_vehicle_d);
+  bool IsEgoVehicleInLane(const double ego_vehicle_s,
+                          const double ego_vehicle_d);
 
-  bool ShouldIgnore(
+  bool IsObstacleBehindEgoVehicle(
       const Obstacle* obstacle, const double ego_vehicle_s,
       const std::vector<apollo::common::PathPoint>& discretized_reference_line);
 
+ private:
+  const ReferenceLineInfo* ptr_reference_line_info_;
+  std::shared_ptr<PathTimeGraph> ptr_path_time_graph_;
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
 };
 

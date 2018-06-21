@@ -27,4 +27,6 @@ mkdir -p /usr/local/include/pcl-1.7
 mv pcl-1.7_x86/include/pcl /usr/local/include/pcl-1.7/
 mv pcl-1.7_x86/lib/* /usr/local/lib/
 mv pcl-1.7_x86/share/pcl-1.7 /usr/local/share/
-ldconfig
+
+# Clean up.
+rm -fr pcl-1.7_x86.tar.gz pcl-1.7_x86

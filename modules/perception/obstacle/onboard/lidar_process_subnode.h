@@ -32,6 +32,7 @@
 #include "modules/perception/common/sequence_type_fuser/base_type_fuser.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_builder.h"
+#include "modules/perception/obstacle/lidar/interface/base_object_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
@@ -53,10 +54,14 @@ class LidarProcessSubnode : public Subnode {
     return apollo::common::Status::OK();
   }
 
+  void OnPointCloud(const sensor_msgs::PointCloud2& message);
+
+ protected:
+  virtual SensorType GetSensorType() const = 0;
+  virtual void AddMessageCallback() = 0;
+
  private:
   bool InitInternal() override;
-
-  void OnPointCloud(const sensor_msgs::PointCloud2& message);
 
   pcl_util::PointIndicesPtr GetROIIndices() { return roi_indices_; }
 
@@ -80,13 +85,39 @@ class LidarProcessSubnode : public Subnode {
   HDMapInput* hdmap_input_ = nullptr;
   std::unique_ptr<BaseROIFilter> roi_filter_;
   std::unique_ptr<BaseSegmentation> segmentor_;
+  std::unique_ptr<BaseObjectFilter> object_filter_;
   std::unique_ptr<BaseObjectBuilder> object_builder_;
   std::unique_ptr<BaseTracker> tracker_;
   std::unique_ptr<BaseTypeFuser> type_fuser_;
   pcl_util::PointIndicesPtr roi_indices_;
 };
 
-REGISTER_SUBNODE(LidarProcessSubnode);
+class Lidar64ProcessSubnode : public LidarProcessSubnode {
+ protected:
+  SensorType GetSensorType() const override;
+  void AddMessageCallback() override;
+};
+
+class Lidar16ProcessSubnode : public LidarProcessSubnode {
+ protected:
+  SensorType GetSensorType() const override;
+  void AddMessageCallback() override;
+};
+
+REGISTER_SUBNODE(Lidar64ProcessSubnode);
+
+// To use 16-beam Lidar, you need to
+// 1. Point to proper model by setting --cnn_segmentation_config, which is
+//    defined in modules/perception/common/perception_gflags.cc. The model is
+//    generally located at modules/perception/model.
+// 2. Define subnode config in modules/perception/conf/dag_streaming.config:
+//    subnodes {
+//      id: 1
+//      name: "Lidar16ProcessSubnode"
+//      reserve: "device_id:velodyne16;"
+//      type: SUBNODE_IN
+//    }
+REGISTER_SUBNODE(Lidar16ProcessSubnode);
 
 }  // namespace perception
 }  // namespace apollo

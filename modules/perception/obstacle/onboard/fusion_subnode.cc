@@ -16,12 +16,16 @@
 
 #include "modules/perception/obstacle/onboard/fusion_subnode.h"
 
+#include <algorithm>
 #include <unordered_map>
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
+#include "modules/common/time/time_util.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/onboard/dag_streaming.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/subnode_helper.h"
@@ -82,10 +86,22 @@ bool FusionSubnode::InitInternal() {
 
   lane_objects_.reset(new LaneObjects());
 
+  // init motion service
+  if (motion_event_id_ != -1) {
+    motion_service_ = dynamic_cast<MotionService*>(
+        DAGStreaming::GetSubnodeByName("MotionService"));
+    if (motion_service_ == nullptr) {
+      AWARN << "motion service not inited";
+    }
+  }
+
   if (!InitOutputStream()) {
     AERROR << "Failed to init output stream.";
     return false;
   }
+
+  // init Cipv
+  cipv_.Init();
 
   AINFO << "Init FusionSubnode succ. Using fusion:" << fusion_->name();
   return true;
@@ -145,6 +161,17 @@ bool FusionSubnode::InitOutputStream() {
     lane_event_id_ = static_cast<EventID>(atoi((lane_iter->second).c_str()));
   }
 
+
+  auto motion_iter = reserve_field_map.find("motion_event_id");
+  if (motion_iter == reserve_field_map.end()) {
+    AWARN << "Failed to find motion_event_id:" << reserve_;
+    AINFO << "motion_event_id will be set -1";
+    motion_event_id_ = -1;
+  } else {
+    motion_event_id_ =
+      static_cast<EventID>(atoi((motion_iter->second).c_str()));
+  }
+
   return true;
 }
 
@@ -184,6 +211,7 @@ Status FusionSubnode::ProcEvents() {
 
 Status FusionSubnode::Process(const EventMeta &event_meta,
                               const std::vector<Event> &events) {
+  CipvOptions cipv_options;
   std::vector<SensorObjects> sensor_objs;
   if (!BuildSensorObjs(events, &sensor_objs)) {
     AERROR << "Failed to build_sensor_objs";
@@ -192,6 +220,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   }
   PERF_BLOCK_START();
   objects_.clear();
+  double latest_fused_ts = sensor_objs.back().timestamp;
   if (!fusion_->Fuse(sensor_objs, &objects_)) {
     AWARN << "Failed to call fusion plugin."
           << " event_meta: [" << event_meta.to_string()
@@ -205,15 +234,71 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   } else if (event_meta.event_id == radar_event_id_) {
     PERF_BLOCK_END("fusion_radar");
   } else if (event_meta.event_id == camera_event_id_) {
+    for (auto &obj : sensor_objs) {
+      if (obj.sensor_type == SensorType::CAMERA) {
+        AINFO << "fusion received image : " << GLOG_TIMESTAMP(obj.timestamp)
+              << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
+        break;
+      }
+    }
     PERF_BLOCK_END("fusion_camera");
+  } else if (event_meta.event_id == motion_event_id_) {
+    if (motion_service_ != nullptr) {
+      motion_buffer_ = motion_service_->GetMotionBuffer();
+    }
+  }
+
+  // Process CIPV
+  if (motion_service_ != nullptr) {
+    motion_buffer_ = motion_service_->GetMotionBuffer();
+    if (motion_buffer_.size() == 0) {
+      AWARN << "motion_buffer_ is empty";
+      cipv_options.velocity = 5.0f;
+      cipv_options.yaw_rate = 0.0f;
+    } else {
+      cipv_options.velocity = motion_buffer_[0].velocity;
+      cipv_options.yaw_rate = motion_buffer_[0].yaw_rate;
+    }
+    ADEBUG << "[CIPVSubnode] velocity " << cipv_options.velocity
+          << ", yaw rate: " << cipv_options.yaw_rate;
+    for (auto &obj : sensor_objs) {
+        if (obj.sensor_type == SensorType::CAMERA) {
+          cipv_.DetermineCipv(lane_objects_, cipv_options, &objects_);
+        }
+    }
+
+    apollo::common::time::Timer timer;
+    timer.Start();
+    // Get Drop points
+  //  motion_buffer_ = motion_service_->GetMotionBuffer();
+    if (motion_buffer_.size() > 0) {
+      cipv_.CollectDrops(motion_buffer_, &objects_);
+    } else {
+      AWARN << "motion_buffer is empty";
+    }
+
+    ++seq_num_;
+    uint64_t t = timer.End("CollectDrops");
+    min_processing_time_ = std::min(min_processing_time_, t);
+    max_processing_time_ = std::max(max_processing_time_, t);
+    tot_processing_time_ += t;
+    ADEBUG << "CollectDrops Runtime: "
+           << "MIN (" << min_processing_time_ << " ms), "
+           << "MAX (" << max_processing_time_ << " ms), "
+           << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";
   }
 
   if (objects_.size() > 0 && FLAGS_publish_fusion_event) {
     SharedDataPtr<FusionItem> fusion_item_ptr(new FusionItem);
     fusion_item_ptr->timestamp = objects_[0]->latest_tracked_time;
+    fusion_item_ptr->fused_sensor_ts = latest_fused_ts;
     const std::string &device_id = events[0].reserve;
+    fusion_item_ptr->fused_sensor_device_id = device_id;
     for (auto obj : objects_) {
-      ObjectPtr objclone(new Object());
+      std::shared_ptr<Object> objclone(new Object());
+      if (obj->b_cipv == true) {
+        AINFO << "CIPV ID: " << obj->track_id;
+      }
       objclone->clone(*obj);
       fusion_item_ptr->obstacles.push_back(objclone);
     }
@@ -228,7 +313,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   return Status::OK();
 }
 
-void FusionSubnode::PublishDataAndEvent(const double &timestamp,
+void FusionSubnode::PublishDataAndEvent(const double timestamp,
                                         const std::string &device_id,
                                         const SharedDataPtr<FusionItem> &data) {
   CommonSharedDataKey key(timestamp, device_id);
@@ -341,6 +426,18 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
 
   for (const auto &obj : objects_) {
     PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
+    // add CIPV
+    if (obj->b_cipv == true) {
+      CIPVInfo *cipv = obstacles->mutable_cipv_info();
+      cipv->set_cipv_id(obj->track_id);
+    }
+    // add drops
+    for (size_t i = 0; i < obj->drops.size(); i++) {
+      Point *drops = obstacle->add_drops();
+      drops->set_x(obj->drops[i][0]);
+      drops->set_y(obj->drops[i][1]);
+      drops->set_z(obj->drops[i][2]);
+    }
     obj->Serialize(obstacle);
   }
 
@@ -370,6 +467,7 @@ void FusionSubnode::RegistAllAlgorithm() {
 void FusionSubnode::OnChassis(const Chassis &chassis) {
   ADEBUG << "Received chassis data: run chassis callback.";
   chassis_.CopyFrom(chassis);
+  ADEBUG << "Received chassis information " << chassis_.ShortDebugString();
   chassis_speed_mps_ = chassis_.speed_mps();
 }
 

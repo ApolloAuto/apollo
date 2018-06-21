@@ -16,9 +16,12 @@
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_  // NOLINT
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_  // NOLINT
+
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_object.h"
 
@@ -27,8 +30,8 @@ namespace perception {
 
 class PbfBaseMotionFusion {
  public:
-  PbfBaseMotionFusion() : name_("PbfBaseMotionFusion"), initialized_(false) {}
-  virtual ~PbfBaseMotionFusion() {}
+  PbfBaseMotionFusion() : name_("PbfBaseMotionFusion") {}
+  virtual ~PbfBaseMotionFusion() = default;
 
   // @brief initialize the state of filter
   // @params[IN] anchor_point: initial anchor point for filtering
@@ -37,10 +40,11 @@ class PbfBaseMotionFusion {
   virtual void Initialize(const Eigen::Vector3d& anchor_point,
                           const Eigen::Vector3d& velocity) = 0;
 
-  // @brief initialize state of the filter
+  // @brief initialize the state of the filter
   // @params[IN] new_object: initial object for filtering
   // @return nothing
-  virtual void Initialize(const PbfSensorObjectPtr new_object) = 0;
+  virtual void Initialize(
+      const std::shared_ptr<PbfSensorObject> new_object) = 0;
 
   // @brief predict the state of filter
   // @params[OUT] anchor_point:  predicted anchor point for filtering
@@ -54,8 +58,9 @@ class PbfBaseMotionFusion {
   // @params[IN] new_object: new object for current update
   // @params[IN] time_diff: time interval from last update;
   // @return nothing
-  virtual void UpdateWithObject(const PbfSensorObjectPtr new_object,
-                                const double time_diff) = 0;
+  virtual void UpdateWithObject(
+      const std::shared_ptr<PbfSensorObject> new_object,
+      const double time_diff) = 0;
 
   // @brief update without measurements
   // @params[IN] time_diff: time interval from last update
@@ -76,9 +81,9 @@ class PbfBaseMotionFusion {
   virtual void SetState(const Eigen::Vector3d& anchor_point,
                         const Eigen::Vector3d& velocity) = 0;
 
-  void setCurrentFuseTS(double ts) { fuse_timestamp = ts; }
+  void setCurrentFuseTS(const double ts) { fuse_timestamp = ts; }
 
-  void setLastFuseTS(double ts) { last_fuse_timestamp = ts; }
+  void setLastFuseTS(const double ts) { last_fuse_timestamp = ts; }
 
   double getLastFuseTS() { return last_fuse_timestamp; }
 
@@ -94,14 +99,16 @@ class PbfBaseMotionFusion {
 
  protected:
   std::string name_;
-  bool initialized_;
+  bool initialized_ = false;
 
   // last fusion time
-  double last_fuse_timestamp = 0;
-  double fuse_timestamp = 0;
+  double last_fuse_timestamp = 0.0;
+  double fuse_timestamp = 0.0;
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_  // NOLINT
+/* clang-format off */
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_BASE_MOTION_FUSION_H_ // NOLINT
+/* clang-format on */

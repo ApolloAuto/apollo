@@ -25,11 +25,11 @@
 namespace apollo {
 namespace perception {
 
-using Eigen::Vector3d;
+using apollo::common::math::Box2d;
+using apollo::common::math::Vec2d;
 using apollo::common::util::Print;
 using apollo::common::util::StrCat;
-using apollo::common::math::Vec2d;
-using apollo::common::math::Box2d;
+using Eigen::Vector3d;
 
 Object::Object() {
   cloud.reset(new pcl_util::PointCloud);

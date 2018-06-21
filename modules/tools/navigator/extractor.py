@@ -28,6 +28,7 @@ if __name__ == '__main__':
     f = open("path_" + fbag.split('/')[-1] + ".txt", 'w')
 
     for fbag in fbags:
+        print fbag
         bag = rosbag.Bag(fbag)
         for topic, localization_pb, t in bag.read_messages(
                 topics=['/apollo/localization/pose']):

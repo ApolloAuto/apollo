@@ -253,7 +253,7 @@ class ThreadPoolImpl : public std::enable_shared_from_this<ThreadPoolImpl> {
     self->task_or_terminate_workers_event_.notify_all();
 
     if (wait) {
-      while (active_worker_count_ > 0) {
+      while (worker_count_ > 0) {
         self->worker_idle_or_terminated_event_.wait(lock);
       }
 

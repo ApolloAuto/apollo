@@ -45,6 +45,7 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::canbus::Chassis;
+using apollo::common::DriveEvent;
 using apollo::common::PathPoint;
 using apollo::common::Point3D;
 using apollo::common::PointENU;
@@ -198,6 +199,10 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
 }
 
 void DownsampleCurve(Curve *curve) {
+  if (curve->segment_size() == 0) {
+    return;
+  }
+
   auto *line_segment = curve->mutable_segment(0)->mutable_line_segment();
   std::vector<PointENU> points(line_segment->point().begin(),
                                line_segment->point().end());
@@ -272,14 +277,16 @@ void SimulationWorldService::Update() {
   UpdateWithLatestObserved("PerceptionObstacles",
                            AdapterManager::GetPerceptionObstacles());
   UpdateWithLatestObserved("PerceptionTrafficLight",
-                           AdapterManager::GetTrafficLightDetection());
+                           AdapterManager::GetTrafficLightDetection(), false);
   UpdateWithLatestObserved("PredictionObstacles",
                            AdapterManager::GetPrediction());
   UpdateWithLatestObserved("Planning", AdapterManager::GetPlanning());
   UpdateWithLatestObserved("ControlCommand",
                            AdapterManager::GetControlCommand());
-  UpdateWithLatestObserved("Navigation", AdapterManager::GetNavigation());
-  UpdateWithLatestObserved("RelativeMap", AdapterManager::GetRelativeMap());
+  UpdateWithLatestObserved("Navigation", AdapterManager::GetNavigation(),
+                           FLAGS_use_navigation_mode);
+  UpdateWithLatestObserved("RelativeMap", AdapterManager::GetRelativeMap(),
+                           FLAGS_use_navigation_mode);
 
   for (const auto &kv : obj_map_) {
     *world_.add_object() = kv.second;
@@ -728,6 +735,16 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
             AWARN << "No decision marker position found for object id=" << id;
             continue;
           }
+          if (decision.has_stop()) {
+            // flag yielded obstacles
+            for (auto obstacle_id : decision.stop().wait_for_obstacle()) {
+              std::vector<std::string> id_segments;
+              apollo::common::util::split(obstacle_id, '_', &id_segments);
+              if (id_segments.size() > 0) {
+                obj_map_[id_segments[0]].set_yielded_obstacle(true);
+              }
+            }
+          }
         } else if (decision.has_nudge()) {
           if (world_obj.polygon_point_size() == 0) {
             if (world_obj.type() == Object_Type_VIRTUAL) {
@@ -944,6 +961,12 @@ void SimulationWorldService::UpdateSimulationWorld(
   }
 }
 
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const DriveEvent &drive_event) {
+  PublishMonitorMessage(MonitorMessageItem::WARN, drive_event.event());
+}
+
 Json SimulationWorldService::GetRoutePathAsJson() const {
   Json response;
   response["routingTime"] = world_.routing_time();
@@ -978,6 +1001,8 @@ void SimulationWorldService::ReadRoutingFromFile(
 }
 
 void SimulationWorldService::RegisterMessageCallbacks() {
+  AdapterManager::AddDriveEventCallback(
+      &SimulationWorldService::UpdateSimulationWorld, this);
   AdapterManager::AddMonitorCallback(
       &SimulationWorldService::UpdateSimulationWorld, this);
   AdapterManager::AddRoutingResponseCallback(

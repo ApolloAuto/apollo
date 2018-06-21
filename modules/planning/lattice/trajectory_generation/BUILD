@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/behavior:feasible_region",
         "//modules/planning/lattice/behavior:path_time_graph",
@@ -61,6 +62,7 @@ cc_library(
         "//modules/planning/constraint_checker:constraint_checker1d",
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
+        "//modules/planning/lattice/trajectory_generation:piecewise_braking_trajectory_generator",
         "//modules/planning/math/curve1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
     ],
@@ -78,6 +80,7 @@ cc_library(
         "//modules/common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/constraint_checker:collision_checker",
         "//modules/planning/lattice/trajectory1d:constant_deceleration_trajectory1d",
         "//modules/planning/lattice/trajectory_generation:trajectory1d_generator",
         "//modules/planning/lattice/trajectory_generation:trajectory_combiner",
@@ -99,6 +102,21 @@ cc_library(
         "//modules/common/math:path_matcher",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/math/curve1d",
+    ],
+)
+
+cc_library(
+    name = "piecewise_braking_trajectory_generator",
+    srcs = [
+        "piecewise_braking_trajectory_generator.cc",
+    ],
+    hdrs = [
+        "piecewise_braking_trajectory_generator.h",
+    ],
+    deps = [
+        "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
+        "//modules/common",
         "//modules/planning/math/curve1d",
     ],
 )

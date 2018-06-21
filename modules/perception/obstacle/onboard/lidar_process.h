@@ -54,7 +54,7 @@ class LidarProcess {
 
   void GeneratePbMsg(PerceptionObstacles* obstacles);
 
-  std::vector<ObjectPtr> GetObjects() { return objects_; }
+  std::vector<std::shared_ptr<Object>> GetObjects() { return objects_; }
 
   pcl_util::PointIndicesPtr GetROIIndices() { return roi_indices_; }
 
@@ -70,7 +70,7 @@ class LidarProcess {
   bool inited_ = false;
   double timestamp_ = 0.0;
   common::ErrorCode error_code_ = common::OK;
-  std::vector<ObjectPtr> objects_;
+  std::vector<std::shared_ptr<Object>> objects_;
   HDMapInput* hdmap_input_ = nullptr;
   std::unique_ptr<BaseROIFilter> roi_filter_;
   std::unique_ptr<BaseSegmentation> segmentor_;

@@ -179,7 +179,7 @@ cv::Mat KCFComponents::ComplexDivision(const cv::Mat &x1, const cv::Mat &x2) {
   return result;
 }
 
-cv::Mat KCFComponents::CreateGaussianPeak(const int &sizey, const int &sizex) {
+cv::Mat KCFComponents::CreateGaussianPeak(const int sizey, const int sizex) {
   cv::Mat_<float> res(sizey, sizex);
 
   int syh = (sizey) / 2;

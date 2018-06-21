@@ -53,7 +53,7 @@ class MockClient {
 };
 std::vector<std::string> MockClient::received_messages_;
 
-static WebSocketHandler handler;
+static WebSocketHandler handler("Test");
 
 TEST(WebSocketTest, IntegrationTest) {
   // NOTE: Here a magic number is picked up as the port, which is not ideal but

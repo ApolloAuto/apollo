@@ -116,7 +116,9 @@ void ADCTrajectoryContainer::SetJunctionPolygon() {
 void ADCTrajectoryContainer::SetLaneSequence() {
   for (const auto& lane : adc_trajectory_.lane_id()) {
     if (!lane.id().empty()) {
-      adc_lane_seq_.emplace_back(lane.id());
+      if (adc_lane_seq_.empty() || lane.id() != adc_lane_seq_.back()) {
+        adc_lane_seq_.emplace_back(lane.id());
+      }
     }
   }
   adc_lane_ids_.clear();

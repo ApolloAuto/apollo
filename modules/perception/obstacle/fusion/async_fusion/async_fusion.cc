@@ -17,12 +17,11 @@
 #include "modules/perception/obstacle/fusion/async_fusion/async_fusion.h"
 
 #include <iomanip>
-#include <string>
-#include <vector>
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/common/util/file.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_hm_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
@@ -30,48 +29,33 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::util::GetProtoFromFile;
+
 bool AsyncFusion::Init() {
   track_manager_ = PbfTrackManager::instance();
   CHECK_NOTNULL(track_manager_);
-  const ModelConfig *model_config =
-      ConfigManager::instance()->GetModelConfig(name());
-  if (model_config == nullptr) {
-    AERROR << "not found model config: " << name();
+
+  if (!GetProtoFromFile(FLAGS_async_fusion_config, &config_)) {
+    AERROR << "Cannot get config proto from file: " << FLAGS_tracker_config;
     return false;
   }
+
   /* matching parameters */
   // TODO(All): match_method is set to hm_matcher, so that line 56 - 65 is
   // redundant. We should either make match_method configurable or remove those
   // redundant code.
-  std::string match_method = "hm_matcher";
-  if (!model_config->GetValue("match_method", &match_method)) {
-    AERROR << "match_method not found";
-  }
-  if (match_method == "hm_matcher") {
-    matcher_.reset(new PbfHmTrackObjectMatcher());
-    if (matcher_->Init()) {
-      AINFO << "Initialize " << matcher_->name() << " successfully!";
-    } else {
-      AERROR << "Failed to initialize " << matcher_->name();
-      return false;
-    }
-  } else {
+  std::string match_method = config_.match_method();
+  if (match_method != "hm_matcher") {
     AERROR << "undefined match_method " << match_method
            << " and use default hm_matcher";
-    matcher_.reset(new PbfHmTrackObjectMatcher());
-    if (matcher_->Init()) {
-      AINFO << "Initialize " << matcher_->name() << " successfully!";
-    } else {
-      AERROR << "Failed to initialize " << matcher_->name();
-      return false;
-    }
+  }
+  matcher_.reset(new PbfHmTrackObjectMatcher());
+  if (!matcher_->Init()) {
+    AERROR << "Failed to initialize " << matcher_->name();
+    return false;
   }
 
-  float max_match_distance = 4.0;
-  if (!model_config->GetValue("max_match_distance", &max_match_distance)) {
-    AERROR << "max_match_distance not found";
-  }
-  AINFO << "async_fusion max_match_distance: " << max_match_distance;
+  float max_match_distance = config_.max_match_distance();
   PbfBaseTrackObjectMatcher::SetMaxMatchDistance(max_match_distance);
   PbfTrack::SetMotionFusionMethod("PbfIMFFusion");
   return true;
@@ -87,7 +71,7 @@ PbfSensorFramePtr AsyncFusion::ConstructFrame(const SensorObjects &frame) {
 
   pbf_frame->objects.resize(frame.objects.size());
   for (size_t i = 0; i < frame.objects.size(); i++) {
-    PbfSensorObjectPtr obj(new PbfSensorObject());
+    std::shared_ptr<PbfSensorObject> obj(new PbfSensorObject());
     obj->timestamp = frame.timestamp;
     obj->sensor_type = frame.sensor_type;
     obj->object->clone(*(frame.objects[i]));
@@ -98,7 +82,7 @@ PbfSensorFramePtr AsyncFusion::ConstructFrame(const SensorObjects &frame) {
 }
 
 bool AsyncFusion::Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                       std::vector<ObjectPtr> *fused_objects) {
+                       std::vector<std::shared_ptr<Object>> *fused_objects) {
   ACHECK(fused_objects != nullptr) << "parameter fused_objects is nullptr";
 
   AINFO << "number of sensor objects in async fusion is "
@@ -126,14 +110,14 @@ bool AsyncFusion::Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
 
 std::string AsyncFusion::name() const { return "AsyncFusion"; }
 
-void AsyncFusion::FuseFrame(const PbfSensorFramePtr &frame) {
+void AsyncFusion::FuseFrame(PbfSensorFramePtr frame) {
   AINFO << "Fusing frame: " << frame->sensor_id << ","
         << "object_number: " << frame->objects.size() << ","
         << "timestamp: " << std::fixed << std::setprecision(12)
         << frame->timestamp;
-  std::vector<PbfSensorObjectPtr> &objects = frame->objects;
-  std::vector<PbfSensorObjectPtr> background_objects;
-  std::vector<PbfSensorObjectPtr> foreground_objects;
+  std::vector<std::shared_ptr<PbfSensorObject>> &objects = frame->objects;
+  std::vector<std::shared_ptr<PbfSensorObject>> background_objects;
+  std::vector<std::shared_ptr<PbfSensorObject>> foreground_objects;
   DecomposeFrameObjects(objects, &foreground_objects, &background_objects);
   AINFO << "There are " << foreground_objects.size() << " foreground objects "
         << "\n " << background_objects.size() << " background objects";
@@ -145,7 +129,7 @@ void AsyncFusion::FuseFrame(const PbfSensorFramePtr &frame) {
 }
 
 void AsyncFusion::CreateNewTracks(
-    const std::vector<PbfSensorObjectPtr> &sensor_objects,
+    const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
     const std::vector<int> &unassigned_ids) {
   for (size_t i = 0; i < unassigned_ids.size(); ++i) {
     int id = unassigned_ids[i];
@@ -155,13 +139,15 @@ void AsyncFusion::CreateNewTracks(
 }
 
 void AsyncFusion::UpdateAssignedTracks(
-    const std::vector<PbfSensorObjectPtr> &sensor_objects,
-    const std::vector<TrackObjectPair> &assignments,
+    const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
+    const std::vector<std::pair<int, int>> &assignments,
     const std::vector<double> &track_object_dist,
     std::vector<PbfTrackPtr> const *tracks) {
   for (size_t i = 0; i < assignments.size(); ++i) {
     int local_track_index = assignments[i].first;
     int local_obj_index = assignments[i].second;
+    AINFO << "local track index " << local_track_index << "local object index "
+          << local_obj_index;
     tracks->at(local_track_index)
         ->UpdateWithSensorObject(sensor_objects[local_obj_index],
                                  track_object_dist[local_track_index]);
@@ -182,8 +168,8 @@ void AsyncFusion::UpdateUnassignedTracks(
   }
 }
 
-void AsyncFusion::CollectFusedObjects(double timestamp,
-                                      std::vector<ObjectPtr> *fused_objects) {
+void AsyncFusion::CollectFusedObjects(
+    double timestamp, std::vector<std::shared_ptr<Object>> *fused_objects) {
   if (fused_objects == nullptr) {
     return;
   }
@@ -192,10 +178,26 @@ void AsyncFusion::CollectFusedObjects(double timestamp,
   int fg_obj_num = 0;
   std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
   for (size_t i = 0; i < tracks.size(); i++) {
-    PbfSensorObjectPtr fused_object = tracks[i]->GetFusedObject();
-    ObjectPtr obj(new Object());
+    std::shared_ptr<PbfSensorObject> fused_object = tracks[i]->GetFusedObject();
+    std::shared_ptr<Object> obj(new Object());
     obj->clone(*(fused_object->object));
     obj->track_id = tracks[i]->GetTrackId();
+    std::shared_ptr<PbfSensorObject> pobj = tracks[i]->GetLidarObject("lidar");
+
+    if (pobj != nullptr) {
+      obj->local_lidar_track_id = pobj->object->track_id;
+      obj->local_lidar_track_ts = pobj->timestamp;
+    }
+    pobj = tracks[i]->GetCameraObject("camera");
+    if (pobj != nullptr) {
+      obj->local_camera_track_id = pobj->object->track_id;
+      obj->local_camera_track_ts = pobj->timestamp;
+    }
+    pobj = tracks[i]->GetRadarObject("radar");
+    if (pobj != nullptr) {
+      obj->local_radar_track_id = pobj->object->track_id;
+      obj->local_camera_track_ts = pobj->timestamp;
+    }
     obj->latest_tracked_time = timestamp;
     obj->tracking_time = tracks[i]->GetTrackingPeriod();
     fused_objects->push_back(obj);
@@ -207,9 +209,9 @@ void AsyncFusion::CollectFusedObjects(double timestamp,
 }
 
 void AsyncFusion::DecomposeFrameObjects(
-    const std::vector<PbfSensorObjectPtr> &frame_objects,
-    std::vector<PbfSensorObjectPtr> *foreground_objects,
-    std::vector<PbfSensorObjectPtr> *background_objects) {
+    const std::vector<std::shared_ptr<PbfSensorObject>> &frame_objects,
+    std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
+    std::vector<std::shared_ptr<PbfSensorObject>> *background_objects) {
   foreground_objects->clear();
   background_objects->clear();
   for (size_t i = 0; i < frame_objects.size(); i++) {
@@ -224,10 +226,10 @@ void AsyncFusion::DecomposeFrameObjects(
 void AsyncFusion::FuseForegroundObjects(
     const Eigen::Vector3d &ref_point, const SensorType &sensor_type,
     const std::string &sensor_id, const double timestamp,
-    std::vector<PbfSensorObjectPtr> *foreground_objects) {
+    std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects) {
   std::vector<int> unassigned_tracks;
   std::vector<int> unassigned_objects;
-  std::vector<TrackObjectPair> assignments;
+  std::vector<std::pair<int, int>> assignments;
 
   std::vector<PbfTrackPtr> &tracks = track_manager_->GetTracks();
 

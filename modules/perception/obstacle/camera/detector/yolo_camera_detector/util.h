@@ -18,7 +18,7 @@
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_DETECTOR_YOLO_DETECTOR_UTIL_H_
 
 #include <cmath>
-
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -33,11 +33,9 @@ bool load_types(const std::string &path, std::vector<ObjectType> *types);
 bool load_anchors(const std::string &path, std::vector<float> *anchors);
 
 void recover_bbox(int roi_w, int roi_h, int offset_y,
-                  std::vector<VisualObjectPtr> *objects);
+                  std::vector<std::shared_ptr<VisualObject>> *objects);
 
-inline float sigmoid(float x) {
-  return 1.0f / (1.0f + std::exp(-x));
-}
+inline float sigmoid(float x) { return 1.0f / (1.0f + std::exp(-x)); }
 
 }  // namespace yolo
 }  // namespace perception

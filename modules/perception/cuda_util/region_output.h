@@ -112,8 +112,8 @@ void apply_nms_gpu(const float *bbox_data, const float *conf_data,
                    const int num_bboxes, const float confidence_threshold,
                    const int top_k, const float nms_threshold,
                    std::vector<int> *indices,
-                   std::shared_ptr<SyncedMemory> overlappe,
-                   std::shared_ptr<SyncedMemory> idx_sm);
+                   std::shared_ptr<caffe::SyncedMemory> overlappe,
+                   std::shared_ptr<caffe::SyncedMemory> idx_sm);
 void compute_overlapped_by_idx_gpu(const int nthreads, const float *bbox_data,
                                    const float overlap_threshold,
                                    const int *idx, const int num_idx,

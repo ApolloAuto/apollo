@@ -53,7 +53,8 @@ DECLARE_double(r_var);
 DECLARE_double(p_var);
 DECLARE_double(go_approach_rate);
 
-DECLARE_int32(still_obstacle_history_length);
+DECLARE_int32(min_still_obstacle_history_length);
+DECLARE_int32(max_still_obstacle_history_length);
 DECLARE_double(still_obstacle_speed_threshold);
 DECLARE_double(still_pedestrian_speed_threshold);
 DECLARE_double(still_obstacle_position_std);
@@ -82,8 +83,10 @@ DECLARE_double(rnn_min_lane_relatice_s);
 DECLARE_bool(adjust_velocity_by_obstacle_heading);
 DECLARE_bool(adjust_velocity_by_position_shift);
 DECLARE_double(heading_filter_param);
+DECLARE_uint32(max_num_lane_point);
 
-// Cost evaluator
+// Validation checker
+DECLARE_double(centripetal_acc_coeff);
 
 // Obstacle trajectory
 DECLARE_double(lane_sequence_threshold);
@@ -102,6 +105,10 @@ DECLARE_double(time_upper_bound_to_lane_center);
 DECLARE_double(time_lower_bound_to_lane_center);
 DECLARE_double(sample_time_gap);
 DECLARE_double(cost_alpha);
-DECLARE_double(default_time_to_lane_center);
+DECLARE_double(default_time_to_lat_end_state);
+DECLARE_double(turning_curvature_lower_bound);
+DECLARE_double(turning_curvature_upper_bound);
+DECLARE_double(speed_at_lower_curvature);
+DECLARE_double(speed_at_upper_curvature);
 
 #endif  // MODULES_PREDICTION_COMMON_PREDICTION_GFLAGS_H_

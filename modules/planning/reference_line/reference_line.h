@@ -44,7 +44,7 @@ class ReferenceLine {
   template <typename Iterator>
   explicit ReferenceLine(const Iterator begin, const Iterator end)
       : reference_points_(begin, end),
-        map_path_(hdmap::Path(std::vector<hdmap::MapPathPoint>(begin, end))) {}
+        map_path_(std::move(std::vector<hdmap::MapPathPoint>(begin, end))) {}
   explicit ReferenceLine(const std::vector<ReferencePoint>& reference_points);
   explicit ReferenceLine(const hdmap::Path& hdmap_path);
 
@@ -107,8 +107,11 @@ class ReferenceLine {
     return XYToSL(common::math::Vec2d(xy.x(), xy.y()), sl_point);
   }
 
-  bool GetLaneWidth(const double s, double* const left_width,
-                    double* const right_width) const;
+  bool GetLaneWidth(const double s, double* const lane_left_width,
+                    double* const lane_right_width) const;
+  bool GetRoadWidth(const double s, double* const road_left_width,
+                    double* const road_right_width) const;
+
   void GetLaneFromS(const double s,
                     std::vector<hdmap::LaneInfoConstPtr>* lanes) const;
 

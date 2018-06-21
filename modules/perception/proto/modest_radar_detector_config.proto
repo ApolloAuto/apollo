@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package apollo.perception.modest_radar_detector_config;
+
+message ModelConfigs {
+  optional string name = 1 [ default = "ModestRadarDetector" ];
+  optional string version = 2 [ default = "1.0.0" ];
+  optional bool use_had_map = 3 [ default = true ];
+  optional double max_theta = 4 [ default = 30.0 ];
+  optional int32 delay_frames = 5 [ default = 4 ];
+  optional bool use_fp_filter = 6 [ default = true ];
+  optional double probexist_vehicle = 7 [ default = 0.9 ];
+  optional double probexist_pedestrian = 8 [ default = 0.25 ];
+  optional double probexist_bicycle = 9 [ default = 0.25 ];
+  optional double probexist_unknown = 10 [ default = 0.99 ];
+  optional double lo_vel_rms_vehicle = 11 [ default = 0.2 ];
+  optional double la_vel_rms_vehicle = 12 [ default = 0.3 ];
+  optional double lo_dist_rms_vehicle = 13 [ default = 0.15 ];
+  optional double la_dist_rms_vehicle = 14 [ default = 0.2 ];
+  optional double lo_vel_rms_pedestrian = 15 [ default = 0.5 ];
+  optional double la_vel_rms_pedestrian = 16 [ default = 0.8 ];
+  optional double lo_dist_rms_pedestrian = 17 [ default = 0.5 ];
+  optional double la_dist_rms_pedestrian = 18 [ default = 0.8 ];
+  optional double lo_vel_rms_bicycle = 19 [ default = 0.5 ];
+  optional double la_vel_rms_bicycle = 20 [ default = 0.8 ];
+  optional double lo_dist_rms_bicycle = 21 [ default = 0.5 ];
+  optional double la_dist_rms_bicycle = 22 [ default = 0.8 ];
+  optional double lo_vel_rms_unknown = 23 [ default = 0.2 ];
+  optional double la_vel_rms_unknown = 24 [ default = 0.3 ];
+  optional double lo_dist_rms_unknown = 25 [ default = 0.2 ];
+  optional double la_dist_rms_unknown = 26 [ default = 0.3 ];
+}

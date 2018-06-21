@@ -69,7 +69,7 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   map_polygons[0].points[2].y = 20;
   map_polygons[0].points[3].x = 20;
   map_polygons[0].points[3].y = -20;
-  std::vector<ObjectPtr> objects;
+  std::vector<std::shared_ptr<Object>> objects;
   radar_detector->Detect(raw_obstacles, map_polygons, options, &objects);
   EXPECT_EQ(objects.size(), 1);
   EXPECT_TRUE(fabs(objects[0]->center(0) - 0.0) < 1e-5);

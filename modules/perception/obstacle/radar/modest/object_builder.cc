@@ -34,7 +34,7 @@ bool ObjectBuilder::Build(const ContiRadar &raw_obstacles,
   std::unordered_map<int, int> current_con_ids;
   auto objects = &(radar_objects->objects);
   for (int i = 0; i < raw_obstacles.contiobs_size(); ++i) {
-    ObjectPtr object_ptr = ObjectPtr(new Object());
+    std::shared_ptr<Object> object_ptr = std::shared_ptr<Object>(new Object());
     const int obstacle_id = raw_obstacles.contiobs(i).obstacle_id();
     auto continuous_id_it = continuous_ids_.find(obstacle_id);
     if (continuous_id_it != continuous_ids_.end()) {
