@@ -99,7 +99,7 @@ message EpochObservation
 }
 
 //This message defines main six keppler orbit parameters and perturbations,
-//designed for gps, beidou, (also supporting qnss, galileo)
+//designed for gps, beidou, (also supporting gnss, galileo)
 message KepplerOrbit
 {
     optional GnssType gnss_type = 1 [default = GPS_SYS];
@@ -112,7 +112,7 @@ message KepplerOrbit
     optional uint32 hour = 7;
     optional uint32 minute = 8;
     optional double second_s = 9;
-    //GNSSS week number
+    //GNSS week number
     optional uint32 week_num = 10;
     optional double reserved = 11;
     optional double af0 = 12;               //clock correction(sec)
