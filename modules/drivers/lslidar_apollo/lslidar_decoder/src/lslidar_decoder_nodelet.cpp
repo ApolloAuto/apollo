@@ -34,5 +34,5 @@ void LslidarDecoderNodelet::onInit() {
 }
 }
 PLUGINLIB_DECLARE_CLASS(lslidar_decoder, LslidarNodelet,
-    apollo::drivers::lslidar_decoder::LslidarDecoderNodelet, 
+    apollo::drivers::lslidar_decoder::LslidarDecoderNodelet,
     nodelet::Nodelet);

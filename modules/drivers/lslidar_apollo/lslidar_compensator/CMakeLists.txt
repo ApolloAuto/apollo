@@ -53,7 +53,7 @@ add_dependencies(lslidar_compensator_node
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
-target_link_libraries(lslidar_compensator_node 
+target_link_libraries(lslidar_compensator_node
 	${catkin_LIBRARIES}
     ${PCL_LIBRARIES})
 

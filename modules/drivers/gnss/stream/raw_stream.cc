@@ -393,7 +393,7 @@ bool RawStream::Login() {
     data_stream_->write(login_command);
     login_data.emplace_back(login_command);
     AINFO << "Login command: " << login_command;
-    // sleep a little to avoid overun of the slow serial interface.
+    // sleep a little to avoid overrun of the slow serial interface.
     ros::Duration(0.5).sleep();
   }
   data_stream_->RegisterLoginData(login_data);

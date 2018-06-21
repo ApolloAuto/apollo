@@ -186,12 +186,12 @@ enum class DatumId : uint32_t {
 struct BDS_Ephemeris {
   uint32_t satellite_id;  // ID/ranging code
   uint32_t week;          // week number
-  double ura;             // user range accurancy(metres).
+  double ura;             // user range accuracy(meters).
                           // This is the evaluated URAI/URA lookup-table value
   uint32_t health1;       // Autonomous satellite health flag.
                           // 0 means broadcasting satellite is good, 1 means not
   double tdg1;  // Equipment group delay differential for the B1 signal(seconds)
-  double tdg2;  // Equipment froup delay defferential for the B2 signal(seconds)
+  double tdg2;  // Equipment group delay differential for the B2 signal(seconds)
   uint32_t aodc;  // Age of data, clock
   uint32_t toc;   // Reference time of clock parameters
   double a0;      // Constant term of clock correction polynomial(seconds)
@@ -200,8 +200,8 @@ struct BDS_Ephemeris {
               // (second/seconds^2)
   uint32_t aode;     // Age of data, ephemeris
   uint32_t toe;      // Reference time of ephemeris parameters
-  double rootA;      // Square root of semi-major axis (sqrt(metres))
-  double ecc;        // Eccentricity (sqrt(metres))
+  double rootA;      // Square root of semi-major axis (sqrt(meters))
+  double ecc;        // Eccentricity (sqrt(meters))
   double omega;      // Argument of perigee
   double delta_N;    // Mean motion difference from computed value
                      // (radians/second)
@@ -216,9 +216,9 @@ struct BDS_Ephemeris {
   double cus;  // Amplitude of sine harmonic correction term to the argument
                // of latitude(radians)
   double crc;  // Amplitude of cosine harmonic correction term to
-               // the orbit radius(metres)
+               // the orbit radius(meters)
   double crs;  // Amplitude of sine harmonic correction term to
-               // the orbit radius(metres)
+               // the orbit radius(meters)
   double cic;  // Amplitude of cosine harmonic correction term to the angle of
                // inclination(radians)
   double cis;  // Amplitude of sine harmonic correction term to the angle of
@@ -251,11 +251,11 @@ struct GLO_Ephemeris {
                  // in meters
   double pos_z;  // Z coordinate for satellite at reference time (PZ-90.02),
                  // in meters
-  double vel_x;  // X corrdinate for satellite velocity at reference
+  double vel_x;  // X coordinate for satellite velocity at reference
                  // time(PZ-90.02), in meters/s
-  double vel_y;  // Y corrdinate for satellite velocity at reference
+  double vel_y;  // Y coordinate for satellite velocity at reference
                  // time(PZ-90.02), in meters/s
-  double vel_z;  // Z corrdinate for satellite velocity at reference
+  double vel_z;  // Z coordinate for satellite velocity at reference
                  // time(PZ-90.02), in meters/s
   double acc_x;  // X coordinate for lunisolar acceleration at reference
                  // time(PZ-90.02), in meters/s/s
@@ -289,9 +289,9 @@ struct GPS_Ephemeris {
   uint32_t z_week;   // Z count week number
   double toe;        // reference time for ephemeris, seconds
   double A;          // semi-major axis, metres
-  double delta_A;    // Mean motion defference, radians/second
+  double delta_A;    // Mean motion difference, radians/second
   double M_0;        // Mean anomaly of reference time, radians
-  double ecc;        // Eccentricity. dimensionless-quantiry defined for
+  double ecc;        // Eccentricity. dimensionless-quantity defined for
                      // a conic section where e=0 is a circle, e=1 is a parabola
                      // 0<e<1 os an ellipse and e>1 is a hyperbola
   double omega;      // Argument of perigee, radians -measurement along the
@@ -312,7 +312,7 @@ struct GPS_Ephemeris {
   double toc;        // SV clock correction term, seconds
   double tgd;        // Estimated group delay difference seconds
   double af0;        // Clock aging parameter. seconds
-  double af1;        // Clock aging paraneter
+  double af1;        // Clock aging parameter
   double af2;        // Clock aging parameter
   uint32_t AS;       // Anti-spoofing on : 0=false, 1=true
   double N;          // Corrected mean motion, radians/second
