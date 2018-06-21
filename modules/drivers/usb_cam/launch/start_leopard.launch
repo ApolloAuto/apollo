@@ -4,7 +4,7 @@
   <arg name="perception_obstacle" default="/apollo/perception/obstacle/camera" />
   <arg name="frame_rate" default="30"/>
   <arg name="trigger_internal" default="0" />
-  <arg name="trigger_fps", default="20" />
+  <arg name="trigger_fps" default="20" />
 
   <group ns="camera_long">
     <node pkg="nodelet" type="nodelet" name="camera_nodelet_manager" args="manager" respawn="true" />
