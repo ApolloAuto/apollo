@@ -5,6 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Run installers.
 COPY installers /tmp/installers
 RUN bash /tmp/installers/pre_install.sh
+RUN bash /tmp/installers/install_adv_plat.sh
 RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_bazel_packages.sh
 RUN bash /tmp/installers/install_gflags_glog.sh

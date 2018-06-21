@@ -80,4 +80,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "quintic_polynomial_curve1d_test",
+    size = "small",
+    srcs = [
+        "quintic_polynomial_curve1d_test.cc",
+    ],
+    deps = [
+        ":quintic_polynomial_curve1d",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

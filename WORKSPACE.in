@@ -189,3 +189,17 @@ http_archive(
     strip_prefix = "protobuf-3.3.0",
     url = "file:///home/tmp/protobuf-3.3.0.tar.gz",
 )
+
+#jsoncpp .so for adv_plat
+new_local_repository(
+    name = "jsoncpp",
+    build_file = "third_party/jsoncpp.BUILD",
+    path = "/usr/local/apollo/jsoncpp/"
+)
+
+#adv_plat
+new_local_repository(
+    name = "adv_plat",
+    build_file = "third_party/adv_plat.BUILD",
+    path = "/usr/local/apollo/adv_plat"
+)
