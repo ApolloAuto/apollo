@@ -100,9 +100,9 @@ TEST_F(FileTest, RemoveAllFiles) {
   EXPECT_FALSE(GetProtoFromASCIIFile(path2, &message));
 }
 
-TEST_F(FileTest, ListSubDirectories) {
+TEST_F(FileTest, ListSubPaths) {
   // Expect {'modules/common/util/testdata'}
-  const auto root_subdirs = ListSubDirectories("/");
+  const auto root_subdirs = ListSubPaths("/");
 
   // Some common root subdirs should exist.
   EXPECT_NE(root_subdirs.end(),
