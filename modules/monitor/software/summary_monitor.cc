@@ -142,13 +142,19 @@ void SummaryMonitor::SummarizeHardware() {
           UpdateStatusSummary(Summary::FATAL, status->detailed_msg(), status);
           break;
         case HardwareStatus::NOT_READY:  // Fall through.
-        case HardwareStatus::GPS_UNSTABLE_WARNING:
+        case HardwareStatus::GPS_UNSTABLE_WARNING:  // Fall through.
+        case HardwareStatus::GPS_UNSTABLE_ERROR:
+          // GPS instability could be a fatal error if it's the only
+          // localization source. As currently we have other sources like
+          // PointCloud, we take it as a warning.
+          //
+          // TODO(xiaoxq & Localization team): Add stability metric in final
+          // localization pose and trigger WARN or ERROR accordingly.
           UpdateStatusSummary(Summary::WARN, status->detailed_msg(), status);
           break;
         case HardwareStatus::OK:
           UpdateStatusSummary(Summary::OK, status->detailed_msg(), status);
           break;
-        case HardwareStatus::GPS_UNSTABLE_ERROR:  // Fall through.
         default:
           UpdateStatusSummary(Summary::ERROR, status->detailed_msg(), status);
           break;
