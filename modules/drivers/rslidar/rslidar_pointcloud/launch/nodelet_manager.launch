@@ -1,0 +1,5 @@
+<launch>
+  <arg name="nodelet_manager_name" default="rslidar_nodelet_manager" />
+  <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager_name)" output="screen"
+        args="manager" />
+</launch>

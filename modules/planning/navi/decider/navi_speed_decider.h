@@ -22,7 +22,7 @@
 #ifndef MODULES_PLANNING_NAVI_NAVI_SPEED_DECIDER_H_
 #define MODULES_PLANNING_NAVI_NAVI_SPEED_DECIDER_H_
 
-#include <string>
+#include <vector>
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/speed/speed_data.h"
@@ -47,6 +47,7 @@ class NaviSpeedDecider : public Task {
  public:
   NaviSpeedDecider();
   virtual ~NaviSpeedDecider() = default;
+
   /**
    * @brief Overrided implementation of the virtual function "Execute" in the
    * base class "Task".
@@ -57,8 +58,19 @@ class NaviSpeedDecider : public Task {
   apollo::common::Status Execute(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
+  /**
+   * @brief Create speed-data, used for unit test.
+   * @param vehicle_state Current vehicle state.
+   * @param obstacles Current obstacles.
+   * @param speed_data Data to output.
+   * @return Status::OK() if a suitable speed-data is created; error otherwise.
+   */
+  apollo::common::Status MakeSpeedDecision(
+      const common::VehicleState& vehicle_state,
+      const std::vector<const Obstacle*>& obstacles,
+      SpeedData* const speed_data);
+
  private:
-  apollo::common::Status Process();
   void RecordDebugInfo(const SpeedData& speed_data);
   // TODO(all): Add your member functions and variables.
 };

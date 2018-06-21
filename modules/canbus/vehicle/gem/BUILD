@@ -17,6 +17,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "gem_vehicle_factory_test",
+    size = "small",
+    srcs = ["gem_vehicle_factory_test.cc"],
+    deps = [
+        ":gem_vehicle_factory",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "gem_message_manager",
     srcs = [
@@ -30,6 +40,18 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+    ],
+)
+
+cc_test(
+    name = "gem_message_manager_test",
+    size = "small",
+    srcs = [
+        "gem_message_manager_test.cc",
+    ],
+    deps = [
+        ":gem_message_manager",
+        "@gtest//:main",
     ],
 )
 
@@ -49,6 +71,20 @@ cc_library(
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+    ],
+)
+
+cc_test(
+    name = "gem_controller_test",
+    size = "small",
+    data = ["//modules/canbus:canbus_testdata"],
+    srcs = [
+        "gem_controller_test.cc",
+    ],
+    deps = [
+        ":gem_controller",
+        "//modules/common/util:util",
+        "@gtest//:main",
     ],
 )
 

@@ -82,6 +82,9 @@ SMALL_TOPICS = [
     '/tf_static',
 ]
 
+MIN_DISK_SIZE = 2**35  # 32GB
+
+
 def shell_cmd(cmd, alert_on_failure=True):
     """Execute shell command and return (ret-code, stdout, stderr)."""
     print('SHELL > {}'.format(cmd))
@@ -167,12 +170,22 @@ class Recorder(object):
         # 2. Or we have a NVME disk.
         record_all = self.args.all or (len(disks) > 0 and disks[0]['is_nvme'])
         # Use the best disk, or fallback '/apollo' if none available.
-        disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else '/apollo'
+        disk_to_use = '/apollo'
+        available_size = 0
+        if len(disks) > 0:
+            disk_to_use = disks[0]['mountpoint']
+            available_size = disks[0]['available_size']
+        else:
+            available_size = DiskManager.disk_avail_size(disk_to_use)
+        if available_size < MIN_DISK_SIZE:
+            print('Insufficient disk space, stop recording: {} with {}'.format(
+                disk_to_use, available_size))
+            return
         self.record_task(disk_to_use, 'all' if record_all else SMALL_TOPICS)
 
     def stop(self):
         """Stop recording."""
-        shell_cmd('kill -INT $(pgrep -f "rosbag/record" | grep -v pgrep)')
+        shell_cmd('kill -TERM $(pgrep -f "rosbag/record" | grep -v pgrep)')
 
     def record_task(self, disk, topics='all'):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
