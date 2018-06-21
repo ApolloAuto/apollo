@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-python replay_perception.py -f garage_*.json
+python replay_perception.py garage_*.json
