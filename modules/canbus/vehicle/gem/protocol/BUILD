@@ -39,7 +39,6 @@ cc_library(
     ],
     hdrs = [
       "accel_cmd_67.h",
-
       "accel_rpt_68.h",
       "brake_cmd_6b.h",
       "brake_motor_rpt_1_70.h",
@@ -101,6 +100,7 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
 cc_test(
     name = "wheel_speed_rpt_7a_test",
     size = "small",
