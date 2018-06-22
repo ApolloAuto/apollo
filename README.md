@@ -139,7 +139,7 @@ Apollo 2.0 supports vehicles autonomously driving on simple urban roads. Vehicle
 
 [**Apollo 2.5:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_hardware_system_installation_guide_v1.md)
 
-Apollo 2.5 allows the vehicle to autonomously run on geo-fenced highways with a camera for obstacle detection. Vehicles are able maintain lane control, cruise and avoid collisions with vehicles ahead of them. 
+Apollo 2.5 allows the vehicle to autonomously run on geo-fenced highways with a camera for obstacle detection. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them. 
 
 ```
 Please note, if you need to test Apollo 2.5; for safety purposes, please seek the help of the
