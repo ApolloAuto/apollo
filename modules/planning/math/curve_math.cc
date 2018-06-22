@@ -15,8 +15,9 @@
  *****************************************************************************/
 
 /**
- * @file curvature.cc
+ * @file curve_math.cc
  **/
+
 #include "modules/planning/math/curve_math.h"
 
 #include <cmath>

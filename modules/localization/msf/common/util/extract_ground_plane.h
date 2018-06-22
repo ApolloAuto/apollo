@@ -17,13 +17,16 @@
 #ifndef MODULES_LOCALIZATION_MSF_EXTRACT_GROUND_PLANE_H_
 #define MODULES_LOCALIZATION_MSF_EXTRACT_GROUND_PLANE_H_
 
-#include <pcl/sample_consensus/ransac.h>
-#include <pcl/sample_consensus/sac_model_plane.h>
-#include <pcl/sample_consensus/impl/ransac.hpp>
-#include <pcl/sample_consensus/impl/sac_model_plane.hpp>
 #include <cmath>
 #include <map>
+#include <unordered_map>
 #include <vector>
+
+#include "pcl/sample_consensus/impl/ransac.hpp"
+#include "pcl/sample_consensus/impl/sac_model_plane.hpp"
+#include "pcl/sample_consensus/ransac.h"
+#include "pcl/sample_consensus/sac_model_plane.h"
+
 #include "modules/localization/msf/common/util/voxel_grid_covariance_hdmap.h"
 
 namespace apollo {
@@ -47,29 +50,17 @@ class FeatureXYPlane {
     non_xy_plane_cloud_ = PointCloudPtrT(new PointCloudT);
   }
 
-  void SetMinGridSize(double d) {
-    min_grid_size_ = d;
-  }
+  void SetMinGridSize(double d) { min_grid_size_ = d; }
 
-  void SetMaxGridSize(double d) {
-    max_grid_size_ = d;
-  }
+  void SetMaxGridSize(double d) { max_grid_size_ = d; }
 
-  void SetPlaneInlierDistance(double d) {
-    plane_inlier_distance_ = d;
-  }
+  void SetPlaneInlierDistance(double d) { plane_inlier_distance_ = d; }
 
-  void SetMinPlanepointsNumber(double d) {
-    min_planepoints_number_ = d;
-  }
+  void SetMinPlanepointsNumber(double d) { min_planepoints_number_ = d; }
 
-  void SetPlaneTypeDegree(double d) {
-    plane_type_degree_ = d;
-  }
+  void SetPlaneTypeDegree(double d) { plane_type_degree_ = d; }
 
-  void SetBelowLidarHeight(double d) {
-    below_lidar_height_ = d;
-  }
+  void SetBelowLidarHeight(double d) { below_lidar_height_ = d; }
 
   float CalculateDegree(const Eigen::Vector3f& tmp0,
                         const Eigen::Vector3f& tmp1) {
@@ -77,13 +68,9 @@ class FeatureXYPlane {
     return std::acos(cos_theta) * 180.0 / M_PI;
   }
 
-  PointCloudPtrT& GetXYPlaneCloud() {
-    return xy_plane_cloud_;
-  }
+  PointCloudPtrT& GetXYPlaneCloud() { return xy_plane_cloud_; }
 
-  PointCloudPtrT& GetNonXYPlaneCloud() {
-    return non_xy_plane_cloud_;
-  }
+  PointCloudPtrT& GetNonXYPlaneCloud() { return non_xy_plane_cloud_; }
 
   void ExtractXYPlane(const PointCloudPtrT& cloud) {
     xy_plane_cloud_.reset(new PointCloudT);
@@ -96,8 +83,10 @@ class FeatureXYPlane {
     std::clock_t plane_time;
     plane_time = std::clock();
     int total_plane_num = 0;
+    double power2 = 0.5;  // 2^-1
     for (int iter = 0; iter <= iter_num; ++iter) {
-      double grid_size = max_grid_size_ / Power2(iter);
+      power2 *= 2;
+      double grid_size = max_grid_size_ / power2;
       VoxelGridCovariance<PointT> vgc;
       vgc.setInputCloud(pointcloud_ptr);
       vgc.SetMinPointPerVoxel(min_planepoints_number_);
@@ -193,19 +182,10 @@ class FeatureXYPlane {
     return true;
   }
 
-  double Power2(int x) {
-    double result = 1.0;
-    for (int i = 0; i < x; ++i) {
-      result *= 2.0;
-    }
-    return result;
-  }
-
  private:
   // parameters
   double min_grid_size_;
   double max_grid_size_;
-  double plane_inlier_percent_;
   double plane_inlier_distance_;
   int min_planepoints_number_;
   double plane_type_degree_;

@@ -23,33 +23,34 @@
 #include <limits>
 #include <vector>
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/map_util.h"
-#include "modules/planning/proto/planning_internal.pb.h"
-
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/planning/tasks/traffic_decider/util.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
+using apollo::common::util::WithinBound;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
-using apollo::common::util::WithinBound;
 
-SignalLight::SignalLight(const RuleConfig& config) : TrafficRule(config) {}
+SignalLight::SignalLight(const TrafficRuleConfig& config)
+    : TrafficRule(config) {}
 
-bool SignalLight::ApplyRule(Frame* frame,
-                            ReferenceLineInfo* const reference_line_info) {
+Status SignalLight::ApplyRule(Frame* const frame,
+                              ReferenceLineInfo* const reference_line_info) {
   if (!FindValidSignalLight(reference_line_info)) {
-    return true;
+    return Status::OK();
   }
   ReadSignals();
   MakeDecisions(frame, reference_line_info);
-  return true;
+  return Status::OK();
 }
 
 void SignalLight::ReadSignals() {
@@ -58,7 +59,7 @@ void SignalLight::ReadSignals() {
     return;
   }
   if (AdapterManager::GetTrafficLightDetection()->GetDelaySec() >
-      FLAGS_signal_expire_time_sec) {
+      config_.signal_light().signal_expire_time_sec()) {
     ADEBUG << "traffic signals msg is expired: "
            << AdapterManager::GetTrafficLightDetection()->GetDelaySec();
     return;
@@ -81,7 +82,7 @@ bool SignalLight::FindValidSignalLight(
   }
   signal_lights_from_path_.clear();
   for (const hdmap::PathOverlap& signal_light : signal_lights) {
-    if (signal_light.start_s + FLAGS_stop_max_distance_buffer >
+    if (signal_light.start_s + config_.signal_light().min_pass_s_distance() >
         reference_line_info->AdcSlBoundary().end_s()) {
       signal_lights_from_path_.push_back(signal_light);
     }
@@ -89,7 +90,7 @@ bool SignalLight::FindValidSignalLight(
   return signal_lights_from_path_.size() > 0;
 }
 
-void SignalLight::MakeDecisions(Frame* frame,
+void SignalLight::MakeDecisions(Frame* const frame,
                                 ReferenceLineInfo* const reference_line_info) {
   planning_internal::SignalLightDebug* signal_light_debug =
       reference_line_info->mutable_debug()
@@ -103,8 +104,9 @@ void SignalLight::MakeDecisions(Frame* frame,
   bool has_stop = false;
   for (auto& signal_light : signal_lights_from_path_) {
     const TrafficLight signal = GetSignal(signal_light.object_id);
-    double stop_deceleration =
-        GetStopDeceleration(reference_line_info, &signal_light);
+    double stop_deceleration = util::GetADCStopDeceleration(
+        reference_line_info, signal_light.start_s,
+        config_.signal_light().min_pass_s_distance());
 
     planning_internal::SignalLightDebug::SignalDebug* signal_debug =
         signal_light_debug->add_signal();
@@ -114,16 +116,17 @@ void SignalLight::MakeDecisions(Frame* frame,
     signal_debug->set_light_stop_s(signal_light.start_s);
 
     if ((signal.color() == TrafficLight::RED &&
-         stop_deceleration < FLAGS_stop_max_deceleration) ||
+         stop_deceleration < config_.signal_light().max_stop_deceleration()) ||
         (signal.color() == TrafficLight::UNKNOWN &&
-         stop_deceleration < FLAGS_stop_max_deceleration) ||
+         stop_deceleration < config_.signal_light().max_stop_deceleration()) ||
         (signal.color() == TrafficLight::YELLOW &&
-         stop_deceleration < FLAGS_max_deacceleration_for_yellow_light_stop)) {
-      if (FLAGS_right_turn_creep_forward &&
+         stop_deceleration <
+             config_.signal_light().max_stop_deacceleration_yellow_light())) {
+      if (config_.signal_light().righ_turn_creep().enabled() &&
           reference_line_info->IsRightTurnPath()) {
         SetCreepForwardSignalDecision(reference_line_info, &signal_light);
       }
-      if (CreateStopObstacle(frame, reference_line_info, &signal_light)) {
+      if (BuildStopDecision(frame, reference_line_info, &signal_light)) {
         has_stop = true;
         signal_debug->set_is_stop_wall_created(true);
       }
@@ -139,30 +142,32 @@ void SignalLight::MakeDecisions(Frame* frame,
 }
 
 void SignalLight::SetCreepForwardSignalDecision(
-    const ReferenceLineInfo* reference_line_info,
+    ReferenceLineInfo* const reference_line_info,
     hdmap::PathOverlap* const signal_light) const {
   CHECK_NOTNULL(signal_light);
 
-  constexpr double kMaxCreepSpeed = 1.0;
-  if (reference_line_info->AdcPlanningPoint().v() > kMaxCreepSpeed) {
+  if (reference_line_info->AdcPlanningPoint().v() >
+      config_.signal_light().righ_turn_creep().speed_limit()) {
     ADEBUG << "Do not creep forward due to large speed.";
     return;
   }
 
-  constexpr double kCreepBuff = 3.0;
+  const double creep_s_buffer =
+      config_.signal_light().righ_turn_creep().min_boundary_s();
   const auto& path_decision = reference_line_info->path_decision();
-  for (const auto& path_obstacle : path_decision.path_obstacles().Items()) {
-    const auto& st_boundary = path_obstacle->st_boundary();
+  for (const auto& path_obstacle : path_decision->path_obstacles().Items()) {
+    const auto& st_boundary = path_obstacle->reference_line_st_boundary();
     const double stop_s =
-        signal_light->start_s - FLAGS_stop_distance_traffic_light;
+        signal_light->start_s - config_.signal_light().stop_distance();
     if (reference_line_info->AdcSlBoundary().end_s() + st_boundary.min_s() <
-        stop_s + kCreepBuff) {
+        stop_s + creep_s_buffer) {
       AERROR << "Do not creep forward because obstacles are close.";
       return;
     }
   }
   signal_light->start_s = reference_line_info->AdcSlBoundary().end_s() +
-                          FLAGS_stop_distance_traffic_light + kCreepBuff;
+                          config_.signal_light().stop_distance() +
+                          creep_s_buffer;
   ADEBUG << "Creep forward s = " << signal_light->start_s;
 }
 
@@ -180,77 +185,64 @@ TrafficLight SignalLight::GetSignal(const std::string& signal_id) {
   return *result;
 }
 
-double SignalLight::GetStopDeceleration(
-    ReferenceLineInfo* const reference_line_info,
-    const hdmap::PathOverlap* signal_light) {
-  double adc_speed =
-      common::VehicleStateProvider::instance()->linear_velocity();
-  if (adc_speed < FLAGS_stop_min_speed) {
-    return 0.0;
-  }
-  double stop_distance = 0;
-  double adc_front_s = reference_line_info->AdcSlBoundary().end_s();
-  double stop_line_s = signal_light->start_s;
-
-  if (stop_line_s > adc_front_s) {
-    stop_distance = stop_line_s - adc_front_s;
-  } else {
-    stop_distance = stop_line_s + FLAGS_stop_max_distance_buffer - adc_front_s;
-  }
-  if (stop_distance < 1e-5) {
-    return std::numeric_limits<double>::max();
-  }
-  return (adc_speed * adc_speed) / (2 * stop_distance);
-}
-
-bool SignalLight::CreateStopObstacle(
-    Frame* frame, ReferenceLineInfo* const reference_line_info,
-    const hdmap::PathOverlap* signal_light) {
+bool SignalLight::BuildStopDecision(
+    Frame* const frame, ReferenceLineInfo* const reference_line_info,
+    hdmap::PathOverlap* const signal_light) {
+  // check
   const auto& reference_line = reference_line_info->reference_line();
-  const double stop_s =
-      signal_light->start_s - FLAGS_stop_distance_traffic_light;
-  const double box_center_s =
-      signal_light->start_s + FLAGS_virtual_stop_wall_length / 2.0;
-  if (!WithinBound(0.0, reference_line.Length(), stop_s) ||
-      !WithinBound(0.0, reference_line.Length(), box_center_s)) {
-    ADEBUG << "signal " << signal_light->object_id
+  if (!WithinBound(0.0, reference_line.Length(), signal_light->start_s)) {
+    ADEBUG << "signal_light " << signal_light->object_id
            << " is not on reference line";
+    return true;
+  }
+
+  // create virtual stop wall
+  std::string virtual_obstacle_id =
+      SIGNAL_LIGHT_VO_ID_PREFIX + signal_light->object_id;
+  auto* obstacle = frame->CreateStopObstacle(
+      reference_line_info, virtual_obstacle_id, signal_light->start_s);
+  if (!obstacle) {
+    AERROR << "Failed to create obstacle[" << virtual_obstacle_id << "]";
     return false;
   }
-  double heading = reference_line.GetReferencePoint(stop_s).heading();
-  double left_lane_width = 0.0;
-  double right_lane_width = 0.0;
-  reference_line.GetLaneWidth(signal_light->start_s, &left_lane_width,
-                              &right_lane_width);
+  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  if (!stop_wall) {
+    AERROR << "Failed to create path_obstacle for " << virtual_obstacle_id;
+    return false;
+  }
 
-  auto box_center = reference_line.GetReferencePoint(box_center_s);
-  common::math::Box2d stop_box{box_center, heading,
-                               FLAGS_virtual_stop_wall_length,
-                               left_lane_width + right_lane_width};
-
-  PathObstacle* stop_wall =
-      reference_line_info->AddObstacle(frame->AddStaticVirtualObstacle(
-          FLAGS_signal_light_virtual_object_id_prefix + signal_light->object_id,
-          stop_box));
-  auto* path_decision = reference_line_info->path_decision();
+  // build stop decision
+  const double stop_s =
+      signal_light->start_s - config_.signal_light().stop_distance();
   auto stop_point = reference_line.GetReferencePoint(stop_s);
-  ObjectDecisionType stop;
-  stop.mutable_stop();
-  stop.mutable_stop()->set_distance_s(-FLAGS_stop_distance_traffic_light);
-  stop.mutable_stop()->set_stop_heading(heading);
-  stop.mutable_stop()->mutable_stop_point()->set_x(stop_point.x());
-  stop.mutable_stop()->mutable_stop_point()->set_y(stop_point.y());
-  stop.mutable_stop()->mutable_stop_point()->set_z(0.0);
+  double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
+  ObjectDecisionType stop;
+  auto stop_decision = stop.mutable_stop();
+  auto signal_color = GetSignal(signal_light->object_id).color();
+  if (signal_color == TrafficLight::YELLOW) {
+    stop_decision->set_reason_code(StopReasonCode::STOP_REASON_YELLOW_SIGNAL);
+  } else {
+    stop_decision->set_reason_code(StopReasonCode::STOP_REASON_SIGNAL);
+  }
+  stop_decision->set_distance_s(-config_.signal_light().stop_distance());
+  stop_decision->set_stop_heading(stop_heading);
+  stop_decision->mutable_stop_point()->set_x(stop_point.x());
+  stop_decision->mutable_stop_point()->set_y(stop_point.y());
+  stop_decision->mutable_stop_point()->set_z(0.0);
+
+  auto* path_decision = reference_line_info->path_decision();
   if (!path_decision->MergeWithMainStop(stop.stop(), stop_wall->Id(),
                                         reference_line_info->reference_line(),
                                         reference_line_info->AdcSlBoundary())) {
     ADEBUG << "signal " << signal_light->object_id
-           << " is not the cloest stop.";
+           << " is not the closest stop.";
     return false;
   }
+
   path_decision->AddLongitudinalDecision(
-      RuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+
   return true;
 }
 

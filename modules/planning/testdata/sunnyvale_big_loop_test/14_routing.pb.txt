@@ -1,0 +1,264 @@
+header {
+  timestamp_sec: 1526665914.2124095
+  module_name: "routing"
+  sequence_num: 2
+}
+road {
+  id: "729"
+  passage {
+    segment {
+      id: "729_1_-1"
+      start_s: 7.4689206411576441
+      end_s: 8.79026
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "2716"
+  passage {
+    segment {
+      id: "2716_1_-1"
+      start_s: 0
+      end_s: 22.4733
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "137"
+  passage {
+    segment {
+      id: "137_1_-1"
+      start_s: 0
+      end_s: 28.9054
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "2694"
+  passage {
+    segment {
+      id: "2694_1_-1"
+      start_s: 0
+      end_s: 27.4374
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "2693"
+  passage {
+    segment {
+      id: "2693_1_-1"
+      start_s: 0
+      end_s: 102.407
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "2691"
+  passage {
+    segment {
+      id: "2691_1_-1"
+      start_s: 0
+      end_s: 6.12478
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "2690"
+  passage {
+    segment {
+      id: "2690_1_-1"
+      start_s: 0
+      end_s: 53.6969
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "2688"
+  passage {
+    segment {
+      id: "2688_1_-1"
+      start_s: 0
+      end_s: 24.4291
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "2687"
+  passage {
+    segment {
+      id: "2687_1_-1"
+      start_s: 0
+      end_s: 26.7826
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "732"
+  passage {
+    segment {
+      id: "732_1_-1"
+      start_s: 0
+      end_s: 25.0187
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "141"
+  passage {
+    segment {
+      id: "141_1_-1"
+      start_s: 0
+      end_s: 7.77504
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "11108a"
+  passage {
+    segment {
+      id: "11108a_1_-1"
+      start_s: 0
+      end_s: 20.793
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "11107"
+  passage {
+    segment {
+      id: "11107_1_-1"
+      start_s: 0
+      end_s: 6.85327
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "18"
+  passage {
+    segment {
+      id: "18_1_-1"
+      start_s: 0
+      end_s: 6.91541
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "1811"
+  passage {
+    segment {
+      id: "1811_1_-1"
+      start_s: 0
+      end_s: 27.5812
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "1809"
+  passage {
+    segment {
+      id: "1809_1_-1"
+      start_s: 0
+      end_s: 12.6206
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "1808"
+  passage {
+    segment {
+      id: "1808_1_-1"
+      start_s: 0
+      end_s: 55.0962
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "1805"
+  passage {
+    segment {
+      id: "1805_1_-1"
+      start_s: 0
+      end_s: 8.20578
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "1804"
+  passage {
+    segment {
+      id: "1804_1_-1"
+      start_s: 0
+      end_s: 3.3307818120836443
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+measurement {
+  distance: 467.76780117092608
+}
+routing_request {
+  header {
+    timestamp_sec: 1526665914.1546195
+    module_name: "dreamview"
+    sequence_num: 2
+  }
+  waypoint {
+    id: "729_1_-1"
+    s: 7.4689206411576441
+    pose {
+      x: 587295.12403107667
+      y: 4141162.70160819
+    }
+  }
+  waypoint {
+    id: "1804_1_-1"
+    s: 3.3307818120836443
+    pose {
+      x: 587000.7893311996
+      y: 4141377.0479595978
+    }
+  }
+}
+map_version: "1.500000"
+status {
+  error_code: OK
+  msg: "Success!"
+}

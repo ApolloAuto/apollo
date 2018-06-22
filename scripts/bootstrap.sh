@@ -23,9 +23,7 @@ cd "${DIR}/.."
 source "${DIR}/apollo_base.sh"
 
 function start() {
-    echo "Start roscore..."
-    ROSCORELOG="${APOLLO_ROOT_DIR}/data/log/roscore.out"
-    nohup roscore </dev/null >"${ROSCORELOG}" 2>&1 &
+    # Setup supervisord.
     if [ "$HOSTNAME" == "in_release_docker" ]; then
         supervisord -c /apollo/modules/tools/supervisord/release.conf >& /tmp/supervisord.start.log
         echo "Started supervisord with release conf"
@@ -33,15 +31,26 @@ function start() {
         supervisord -c /apollo/modules/tools/supervisord/dev.conf >& /tmp/supervisord.start.log
         echo "Started supervisord with dev conf"
     fi
+
+    # Start roscore.
+    bash scripts/roscore.sh start
+    # Start monitor.
     supervisorctl start monitor > /dev/null
-    supervisorctl start dreamview > /dev/null
-    echo "Dreamview is running at http://localhost:8888"
+    # Start dreamview.
+    bash scripts/voice_detector.sh start
+    supervisorctl start dreamview
+    supervisorctl status dreamview | grep RUNNING > /dev/null
+    if [ $? -eq 0 ]; then
+        echo "Dreamview is running at http://localhost:8888"
+    fi
 }
 
 function stop() {
+    # Stop modules in reverse order of the starting procedure.
     supervisorctl stop dreamview
+    bash scripts/voice_detector.sh stop
     supervisorctl stop monitor
-    pkill -f roscore
+    source scripts/roscore.sh stop
 }
 
 case $1 in

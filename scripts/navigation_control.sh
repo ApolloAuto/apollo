@@ -24,4 +24,4 @@ source "${DIR}/apollo_base.sh"
 # run function from apollo_base.sh
 # run command_name module_name
 run control  "$@"  --control_conf_file=modules/control/conf/navigation_lincoln.pb.txt \
- --use_relative_position=true
+ --use_navigation_mode=true

@@ -41,6 +41,12 @@ bool SocketCanClientRaw::Init(const CANCardParameter &parameter) {
   return true;
 }
 
+SocketCanClientRaw::~SocketCanClientRaw() {
+  if (dev_handler_) {
+    Stop();
+  }
+}
+
 ErrorCode SocketCanClientRaw::Start() {
   if (is_started_) {
     return ErrorCode::OK;
@@ -89,8 +95,8 @@ ErrorCode SocketCanClientRaw::Start() {
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
 
-  // strcpy(ifr.ifr_name, "can0");
-  std::strncpy(ifr.ifr_name, "can0", IFNAMSIZ);
+  std::string can_name("can" + std::to_string(port_));
+  std::strncpy(ifr.ifr_name, can_name.c_str(), IFNAMSIZ);
   if (ioctl(dev_handler_, SIOCGIFINDEX, &ifr) < 0) {
     AERROR << "ioctl error";
     return ErrorCode::CAN_CLIENT_ERROR_BASE;

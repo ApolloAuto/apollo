@@ -61,6 +61,12 @@ class KalmanFilter {
     H_.setIdentity();
     R_.setZero();
     B_.setZero();
+
+    x_.setZero();
+    P_.setZero();
+    y_.setZero();
+    S_.setZero();
+    K_.setZero();
   }
 
   /**
@@ -289,4 +295,4 @@ inline std::string KalmanFilter<T, XN, ZN, UN>::DebugString() const {
 }  // namespace common
 }  // namespace apollo
 
-#endif /* MODULES_COMMON_MATH_KALMAN_FILTER_H_ */
+#endif  // MODULES_COMMON_MATH_KALMAN_FILTER_H_

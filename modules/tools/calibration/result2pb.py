@@ -101,10 +101,10 @@ def get_calibration_table_pb(speed_table):
             item.command = cmd
     return calibration_table_pb
 
-
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print "usage: python plot_results.py old_control_conf.pb.txt result.csv"
+    if len(sys.argv) != 3:
+        print("Usage: python plot_results.py old_control_conf.pb.txt result.csv")
+        sys.exit(0)
 
     ctl_conf_pb = proto_utils.get_pb_from_text_file(sys.argv[1], ControlConf())
     speed_table_dict = load_calibration_raw_data(sys.argv[2])
@@ -112,6 +112,5 @@ if __name__ == "__main__":
     ctl_conf_pb.lon_controller_conf.calibration_table.CopyFrom(
         calibration_table_pb)
 
-    f = open('control_conf.pb.txt', 'w')
-    f.write(str(ctl_conf_pb))
-    f.close()
+    with open('control_conf.pb.txt', 'w') as f:
+        f.write(str(ctl_conf_pb))

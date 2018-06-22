@@ -23,6 +23,8 @@
 #include "google/protobuf/message.h"
 #include "third_party/json/json.hpp"
 
+#include "modules/common/log.h"
+
 namespace apollo {
 namespace common {
 namespace util {
@@ -42,6 +44,26 @@ class JsonUtil {
    */
   static bool GetStringFromJson(const nlohmann::json &json,
                                 const std::string &key, std::string *value);
+
+  /**
+   * @brief Get a number value from the given json[key].
+   * @return Whether the field exists and is a valid number.
+   */
+  template <class T>
+  static bool GetNumberFromJson(const nlohmann::json &json,
+                                const std::string &key, T *value) {
+    const auto iter = json.find(key);
+    if (iter == json.end()) {
+      AERROR << "The json has no such key: " << key;
+      return false;
+    }
+    if (!iter->is_number()) {
+      AERROR << "The value of json[" << key << "] is not a number";
+      return false;
+    }
+    *value = *iter;
+    return true;
+  }
 
   /**
    * @brief Get a string vector from the given json[key].

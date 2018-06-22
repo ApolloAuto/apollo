@@ -21,17 +21,18 @@
 #include <vector>
 
 #include "Eigen/Core"
+#include "gtest/gtest_prod.h"
 #include "sensor_msgs/PointCloud2.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
+#include "modules/perception/common/sequence_type_fuser/base_type_fuser.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_builder.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
-#include "modules/perception/obstacle/lidar/interface/base_type_fuser.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
@@ -53,7 +54,7 @@ class LidarProcess {
 
   void GeneratePbMsg(PerceptionObstacles* obstacles);
 
-  std::vector<ObjectPtr> GetObjects() { return objects_; }
+  std::vector<std::shared_ptr<Object>> GetObjects() { return objects_; }
 
   pcl_util::PointIndicesPtr GetROIIndices() { return roi_indices_; }
 
@@ -69,7 +70,7 @@ class LidarProcess {
   bool inited_ = false;
   double timestamp_ = 0.0;
   common::ErrorCode error_code_ = common::OK;
-  std::vector<ObjectPtr> objects_;
+  std::vector<std::shared_ptr<Object>> objects_;
   HDMapInput* hdmap_input_ = nullptr;
   std::unique_ptr<BaseROIFilter> roi_filter_;
   std::unique_ptr<BaseSegmentation> segmentor_;

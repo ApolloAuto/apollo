@@ -1,6 +1,6 @@
 # Apollo 2.0 传感器标定方法使用指南
 
-欢迎使用Apollo传感器标定服务。本文档提供在Apollo 2.0中新增的3项传感器标定程序的使用流程说明，分别为：相机到相机的标定，相机到64线激光雷达的标定，以及毫米波雷达到相机的标定。
+欢迎使用Apollo传感器标定服务。本文档提供在Apollo 2.0中新增的3项传感器标定程序的使用流程说明，分别为：相机到相机的标定，相机到多线激光雷达的标定，以及毫米波雷达到相机的标定。
 
 ## 文档概览
 
@@ -12,11 +12,13 @@
 
 ## 概述
 
-在Apollo 2.0中，我们新增了3项标定功能：相机到相机的标定，相机到64线激光雷达的标定，以及毫米波雷达到相机的标定。与之前在Apollo 1.5开放的64线激光雷达到IMU的标定不同，所有新增的标定方法均以车载可执行程序的方式提供。用户仅需要启动相应的标定程序，即可实时完成标定工作并进行结果验证。标定结果以 `.yaml` 文件形式返回。
+在Apollo 2.0中，我们新增了3项标定功能：相机到相机的标定，相机到多线激光雷达的标定，以及毫米波雷达到相机的标定。对于多线激光雷达到组合惯导的标定，请参考多线激光雷达-组合惯导标定说明。Velodyne HDL64用户还可以使用Apollo 1.5提供的标定服务平台。标定工具均以车载可执行程序的方式提供。用户仅需要启动相应的标定程序，即可实时完成标定工作并进行结果验证。标定结果以 `.yaml` 文件形式返回。
 
 ## 准备工作
 
-1. 相机内参文件
+1. 下载[标定工具](https://github.com/ApolloAuto/apollo/releases/download/v2.0.0/calibration.tar.gz)，并解压缩到`$APOLLO_HOME/modules/calibration`目录下。（APOLLO_HOME是apollo代码的根目录）
+
+2. 相机内参文件
 
 	内参包含相机的焦距、主点和畸变系数等信息，可以通过一些成熟的相机标定工具来获得，例如 [ROS Camera Calibration Tools](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration) 和 [Camera Calibration Toolbox for Matlab](http://www.vision.caltech.edu/bouguetj/calib_doc/)。内参标定完成后，需将结果转换为 `.yaml` 格式的文件。下面是一个正确的内参文件样例：
 
@@ -46,7 +48,7 @@
 
 	我们建议每一只相机都需要单独进行内参标定，而不是使用统一的内参结果。这样可以提高外参标定的准确性。
 
-2. 初始外参文件
+3. 初始外参文件
 
 	本工具需要用户提供初始的外参值作为参考。一个良好的初始值可以帮助算法得到更精确的结果。下面是一个正确的相机到激光雷达的初始外参文件样例，其中translation为相机相对激光雷达的平移距离关系，rotation为旋转矩阵的四元数表达形式：
 
@@ -72,14 +74,14 @@
 
 	注意：相机到激光雷达的标定方法比较依赖于初始外参值的选取，一个偏差较大的外参，有可能导致标定失败。所以，请在条件允许的情况下，尽可能提供更加精准的初始外参值。
 
-3. 标定场地
+4. 标定场地
 
 	我们的标定方法是基于自然场景的，所以一个理想的标定场地可以显著地提高标定结果的准确度。我们建议选取一个纹理丰富的场地，如有树木，电线杆，路灯，交通标志牌，静止的物体和清晰车道线。图1是一个较好的标定环境示例：
 
 	![](images/calibration/sensor_calibration/calibration_place.png)
 	<p align="center"> 图1 一个良好的标定场地 </p>
 
-4. 所需Topics
+5. 所需Topics
 	
 	确认程序所需传感器数据的topics均有输出。如何查看传感器有数据输出？
 
@@ -99,7 +101,7 @@
 	| 传感器       | Topic名称                                 |Topic发送频率（Hz）|
 	| ------------ | ----------------------------------------- | ----------------- |
 	| Short_Camera | /apollo/sensor/camera/traffic/image_short | 9                 |
-	| Velodyne HDL64  | /apollo/sensor/velodyne64/compensator/PointCloud2  | 10                |
+	| LiDAR  | /apollo/sensor/velodyne64/compensator/PointCloud2  | 10                |
 	| INS          | /apollo/sensor/gnss/odometry              | 100               |
 	| INS          | /apollo/sensor/gnss/ins_stat              | 2                 |
 	
@@ -115,9 +117,9 @@
 
 所有标定程序需要用到车辆的定位结果。请确认车辆定位状态为56，否则标定程序不会开始采集数据。输入以下命令可查询车辆定位状态：
 
-	```bash
+```bash
 	rostopic echo /apollo/sensor/gnss/ins_stat
-	```
+    ```
 
 ### 相机到相机
 
@@ -161,7 +163,7 @@
 	* 外参文件： 长焦相机到广角相机的外参文件。
 	* 验证参考图片：包括一张长焦相机图像、一张广角相机图像及一张长焦相机依据标定后的外参投影到广角相机的去畸变融合图像。
 
-### 相机到64线激光雷达
+### 相机到多线激光雷达
 
 1. 运行方法
 
@@ -184,7 +186,7 @@
 	/apollo/modules/calibration/lidar_camera_calibrator/conf/lidar_camera_calibrtor.conf
 	```
 
-	表5. 相机到64线激光雷达标定程序配置项说明
+	表5. 相机到多线激光雷达标定程序配置项说明
 	
 	配置项 | 说明
 	--- | ---
@@ -200,7 +202,7 @@
 
 4. 输出内容
 	
-	* 外参文件：相机到64线激光雷达的外参文件。
+	* 外参文件：相机到多线激光雷达的外参文件。
 	* 验证参考图片：两张激光雷达点云利用标定结果外参投影到相机图像上的融合图像，分别是依据点云深度渲染的融合图像，和依据点云反射值渲染的融合图像。
 
 ### 毫米波雷达到相机
@@ -272,17 +274,17 @@
 ![](images/calibration/sensor_calibration/cam_cam_error.png)
 <p align="center"> 图3 错误的相机到相机标定结果 </p>
 
-### 相机到64线激光雷达标定
+### 相机到多线激光雷达标定
 
 * 基本方法：在产生的点云投影图像内，可寻找其中具有明显边缘的物体和标志物，查看其边缘轮廓对齐情况。如果50米以内的目标，点云边缘和图像边缘能够重合，则可以证明标定结果的精度很高。反之，若出现错位现象，则说明标定结果存在误差。当误差大于一定范围时（范围依据实际使用情况而定），该外参不可用。
 
 * 结果示例：如下图所示，图4为准确外参的点云投影效果，图5为有偏差外参的点云投影效果
 
 ![](images/calibration/sensor_calibration/cam_lidar_good.png)
-<p align="center"> 图4 良好的相机到64线激光雷达标定结果 </p>
+<p align="center"> 图4 良好的相机到多线激光雷达标定结果 </p>
 
 ![](images/calibration/sensor_calibration/cam_lidar_error.png)
-<p align="center"> 图5 错误的相机到64线激光雷达标定结果 </p>
+<p align="center"> 图5 错误的相机到多线激光雷达标定结果 </p>
 
 ### 毫米波雷达到相机
 	

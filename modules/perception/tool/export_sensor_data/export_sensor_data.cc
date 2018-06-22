@@ -16,56 +16,73 @@
 
 #include "modules/perception/tool/export_sensor_data/export_sensor_data.h"
 
-#include <pcl/io/pcd_io.h>
-#include <pcl_conversions/pcl_conversions.h>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-#include "Eigen/Core"
-#include "modules/common/adapters/adapter_manager.h"
+#include "pcl/io/pcd_io.h"
+#include "pcl_conversions/pcl_conversions.h"
+
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
-#include "ros/include/ros/ros.h"
-#include "sensor_msgs/PointCloud2.h"
+#include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/onboard/transform_input.h"
 
-DEFINE_string(lidar_path,
-  "modules/perception/tool/export_sensor_data/lidar/", "lidar path");
-DEFINE_string(radar_path,
-  "modules/perception/tool/export_sensor_data/radar/", "radar path");
+DEFINE_string(lidar_path, "modules/perception/tool/export_sensor_data/lidar/",
+              "lidar path");
+DEFINE_string(radar_path, "modules/perception/tool/export_sensor_data/radar/",
+              "radar path");
 
 namespace apollo {
 namespace perception {
 
-using apollo::common::adapter::AdapterManager;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
 using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
 
-std::string ExportSensorData::Name() const {
-  return "ExportSensorData";
-}
+std::string ExportSensorData::Name() const { return "ExportSensorData"; }
 
 Status ExportSensorData::Init() {
   AdapterManager::Init(FLAGS_perception_adapter_config_filename);
   CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
-  AdapterManager::AddPointCloudCallback(&ExportSensorData::OnPointCloud,
-                                        this);
+  AdapterManager::AddPointCloudCallback(&ExportSensorData::OnPointCloud, this);
   CHECK(AdapterManager::GetContiRadar()) << "Radar is not initialized.";
   AdapterManager::AddContiRadarCallback(&ExportSensorData::OnRadar, this);
   CHECK(AdapterManager::GetLocalization())
-    << "Localization is not initialized.";
-  AdapterManager::AddLocalizationCallback(
-    &ExportSensorData::OnLocalization, this);
+      << "Localization is not initialized.";
+  AdapterManager::AddLocalizationCallback(&ExportSensorData::OnLocalization,
+                                          this);
   localization_buffer_.set_capacity(FLAGS_localization_buffer_size);
+
+  /// load radar-camera extrinsic
+  std::string radar_extrinsic_path = FLAGS_radar_extrinsic_file;
+  Eigen::Affine3d radar_extrinsic;
+  if (!LoadExtrinsic(radar_extrinsic_path, &radar_extrinsic)) {
+    AERROR << "Failed to load extrinsic from file " << radar_extrinsic_path;
+    return Status(ErrorCode::PERCEPTION_ERROR_TF, "Failed to load extrinsic");
+  }
+  AINFO << "get radar extrinsic succ. pose: \n" << radar_extrinsic.matrix();
+  /// load camera-velodyne extrinsic
+  std::string short_camera_extrinsic_path = FLAGS_short_camera_extrinsic_file;
+  Eigen::Affine3d short_camera_extrinsic;
+  if (!LoadExtrinsic(short_camera_extrinsic_path, &short_camera_extrinsic)) {
+    AERROR << "Failed to load extrinsic from file "
+           << short_camera_extrinsic_path;
+    return Status(ErrorCode::PERCEPTION_ERROR_TF, "Failed to load extrinsic");
+  }
+  AINFO << "get short camera  extrinsic succ. pose: \n"
+        << short_camera_extrinsic.matrix();
+  /// get radar-velodyne extrinsic
+  radar2velodyne_extrinsic_ =
+      short_camera_extrinsic.matrix() * radar_extrinsic.matrix();
+
   return Status::OK();
 }
 
-void ExportSensorData::WriteRadar(const std::string &file_pre,
-  const ContiRadar &radar_obs) {
+void ExportSensorData::WriteRadar(const std::string& file_pre,
+                                  const ContiRadar& radar_obs) {
   std::string filename = file_pre + ".radar";
   std::fstream fout(filename.c_str(), std::ios::out | std::ios::binary);
   if (!radar_obs.SerializeToOstream(&fout)) {
@@ -75,9 +92,9 @@ void ExportSensorData::WriteRadar(const std::string &file_pre,
   fout.close();
 }
 
-void ExportSensorData::WritePose(const std::string &file_pre,
-  const double timestamp, const int seq_num,
-  const Eigen::Matrix4d& pose) {
+void ExportSensorData::WritePose(const std::string& file_pre,
+                                 const double timestamp, const int seq_num,
+                                 const Eigen::Matrix4d& pose) {
   std::string filename = file_pre + ".pose";
   std::fstream fout(filename.c_str(), std::ios::out | std::ios::binary);
   if (!fout.is_open()) {
@@ -87,14 +104,15 @@ void ExportSensorData::WritePose(const std::string &file_pre,
   Eigen::Quaternionf quaternion(mat3f);
   fout << std::setprecision(16) << seq_num << " " << timestamp << " "
        << pose(0, 3) << " " << pose(1, 3) << " " << pose(2, 3) << " "
-       << quaternion.x() << " " << quaternion.y() << " "
-       << quaternion.z() << " " << quaternion.w() << std::endl;
+       << quaternion.x() << " " << quaternion.y() << " " << quaternion.z()
+       << " " << quaternion.w() << std::endl;
   fout.close();
 }
 
-void ExportSensorData::WriteVelocityInfo(const std::string &file_pre,
-  const double& timestamp, const int seq_num,
-  const Eigen::Vector3f& velocity) {
+void ExportSensorData::WriteVelocityInfo(const std::string& file_pre,
+                                         const double timestamp,
+                                         const int seq_num,
+                                         const Eigen::Vector3f& velocity) {
   std::string filename = file_pre + ".velocity";
   std::fstream fout(filename.c_str(), std::ios::out | std::ios::binary);
   if (!fout.is_open()) {
@@ -105,8 +123,8 @@ void ExportSensorData::WriteVelocityInfo(const std::string &file_pre,
   fout.close();
 }
 
-void ExportSensorData::WritePCD(const std::string &file_pre,
-   const sensor_msgs::PointCloud2& in_msg) {
+void ExportSensorData::WritePCD(const std::string& file_pre,
+                                const sensor_msgs::PointCloud2& in_msg) {
   pcl_util::PointCloudPtr cloud(new pcl_util::PointCloud);
   TransPointCloudToPCL(in_msg, &cloud);
   std::string filename = file_pre + ".pcd";
@@ -136,7 +154,8 @@ void ExportSensorData::TransPointCloudToPCL(
   size_t points_num = 0;
   for (size_t idx = 0; idx < in_cloud.size(); ++idx) {
     pcl_util::PointXYZIT& pt = in_cloud.points[idx];
-    if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z) && !isnan(pt.intensity)) {
+    if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z) &&
+        !std::isnan(pt.intensity)) {
       cloud->points[points_num].x = pt.x;
       cloud->points[points_num].y = pt.y;
       cloud->points[points_num].z = pt.z;
@@ -147,8 +166,7 @@ void ExportSensorData::TransPointCloudToPCL(
   cloud->points.resize(points_num);
 }
 
-void ExportSensorData::OnPointCloud(
-    const sensor_msgs::PointCloud2& message) {
+void ExportSensorData::OnPointCloud(const sensor_msgs::PointCloud2& message) {
   static int seq_num = 0;
   ++seq_num;
   AINFO << "process OnPointCloud.";
@@ -156,7 +174,7 @@ void ExportSensorData::OnPointCloud(
 
   /// get velodyne2world transfrom
   std::shared_ptr<Eigen::Matrix4d> velodyne_trans =
-    std::make_shared<Eigen::Matrix4d>();
+      std::make_shared<Eigen::Matrix4d>();
   if (!GetVelodyneTrans(kTimeStamp, velodyne_trans.get())) {
     AERROR << "failed to get velodyne trans at timestamp: "
            << GLOG_TIMESTAMP(kTimeStamp);
@@ -171,7 +189,7 @@ void ExportSensorData::OnPointCloud(
   WritePose(file_pre, kTimeStamp, seq_num, *velodyne_trans);
 }
 
-void ExportSensorData::OnRadar(const ContiRadar &radar_obs) {
+void ExportSensorData::OnRadar(const ContiRadar& radar_obs) {
   AINFO << "process radar.";
   static int seq_num = 0;
   ++seq_num;
@@ -185,12 +203,12 @@ void ExportSensorData::OnRadar(const ContiRadar &radar_obs) {
         << start_latency << "]";
   // 0. correct radar timestamp
   timestamp -= 0.07;
-  auto *header = radar_obs_proto.mutable_header();
+  auto* header = radar_obs_proto.mutable_header();
   header->set_timestamp_sec(timestamp);
   header->set_radar_timestamp(timestamp * 1e9);
 
-  _conti_id_expansion.UpdateTimestamp(timestamp);
-  _conti_id_expansion.ExpandIds(&radar_obs_proto);
+  conti_id_expansion_.UpdateTimestamp(timestamp);
+  conti_id_expansion_.ExpandIds(&radar_obs_proto);
 
   if (fabs(timestamp - 0.0) < 10e-6) {
     AERROR << "Error timestamp: " << GLOG_TIMESTAMP(timestamp);
@@ -199,13 +217,16 @@ void ExportSensorData::OnRadar(const ContiRadar &radar_obs) {
   ADEBUG << "recv radar msg: [timestamp: " << GLOG_TIMESTAMP(timestamp)
          << " num_raw_obstacles: " << radar_obs_proto.contiobs_size() << "]";
 
-  std::shared_ptr<Eigen::Matrix4d> radar2world_pose =
-    std::make_shared<Eigen::Matrix4d>();
-  if (!GetRadarTrans(timestamp, radar2world_pose.get())) {
+  std::shared_ptr<Eigen::Matrix4d> velo2world_pose =
+      std::make_shared<Eigen::Matrix4d>();
+  if (!GetVelodyneTrans(timestamp, velo2world_pose.get())) {
     AERROR << "Failed to get radar trans at timestamp: "
            << GLOG_TIMESTAMP(timestamp);
     return;
   }
+  std::shared_ptr<Eigen::Matrix4d> radar2world_pose =
+      std::make_shared<Eigen::Matrix4d>();
+  *radar2world_pose = *velo2world_pose * radar2velodyne_extrinsic_;
   AINFO << "get radar trans pose succ. pose: \n" << *radar2world_pose;
 
   Eigen::Vector3f car_linear_speed;
@@ -226,7 +247,7 @@ void ExportSensorData::OnRadar(const ContiRadar &radar_obs) {
 }
 
 void ExportSensorData::OnLocalization(
-  const apollo::localization::LocalizationEstimate &localization) {
+    const apollo::localization::LocalizationEstimate& localization) {
   double timestamp = localization.header().timestamp_sec();
   AINFO << "localization timestamp:" << GLOG_TIMESTAMP(timestamp);
   LocalizationPair localization_pair;
@@ -236,7 +257,7 @@ void ExportSensorData::OnLocalization(
 }
 
 bool ExportSensorData::GetCarLinearSpeed(double timestamp,
-                                            Eigen::Vector3f *car_linear_speed) {
+                                         Eigen::Vector3f* car_linear_speed) {
   MutexLock lock(&mutex_);
   if (car_linear_speed == nullptr) {
     AERROR << "Param car_linear_speed NULL error.";
@@ -268,7 +289,7 @@ bool ExportSensorData::GetCarLinearSpeed(double timestamp,
     }
     distance = temp_distance;
   }
-  const auto &velocity =
+  const auto& velocity =
       localization_buffer_[idx].second.pose().linear_velocity();
   (*car_linear_speed)[0] = velocity.x();
   (*car_linear_speed)[1] = velocity.y();

@@ -15,12 +15,13 @@ cc_library(
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:header_proto",
         "//modules/map/proto:map_proto",
-        "//modules/perception/lib/config_manager",
         "//modules/perception/proto:perception_proto",
-        "//modules/perception/traffic_light/base:perception_traffic_light_base",
-        "//modules/perception/traffic_light/interface:perception_traffic_light_interface",
+        "//modules/perception/proto/traffic_light:reviser_config_lib_proto",
+        "//modules/perception/traffic_light/base",
+        "//modules/perception/traffic_light/interface",
     ],
 )
+
 cc_test(
     name = "perception_traffic_light_reviser_test",
     size = "small",
@@ -35,11 +36,12 @@ cc_test(
     deps = [
         "perception_traffic_light_reviser",
         "//modules/common:log",
-        "//modules/perception/common:perception_common",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
+        "//modules/perception/common",
+        "//modules/perception/obstacle/base",
         "@caffe//:lib",
         "@gtest//:main",
         "@opencv2//:core",
     ],
 )
+
 cpplint()

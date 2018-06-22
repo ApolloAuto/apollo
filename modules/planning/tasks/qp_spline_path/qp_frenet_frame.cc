@@ -28,6 +28,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/macro.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
@@ -41,7 +42,7 @@ namespace {
 
 constexpr double kEpsilonTol = 1e-6;
 const auto inf = std::numeric_limits<double>::infinity();
-}
+}  // namespace
 
 QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
                              const SpeedData& speed_data,
@@ -283,7 +284,7 @@ bool QpFrenetFrame::MapNudgeLine(
 
   DCHECK_GT(constraint->size(), impact_index.second);
   for (uint32_t i = impact_index.first; i <= impact_index.second; ++i) {
-    double weight = std::abs((evaluated_s_[i] - near_point.s())) / distance;
+    double weight = std::fabs((evaluated_s_[i] - near_point.s())) / distance;
     weight = std::min(1.0, std::max(weight, 0.0));
     double boundary =
         near_point.l() * (1 - weight) + further_point.l() * weight;
@@ -339,8 +340,10 @@ std::pair<double, double> QpFrenetFrame::MapLateralConstraint(
     weight_front = (s_front - start.s()) / (end.s() - start.s());
   }
 
-  common::SLPoint front = util::interpolate(start, end, weight_front);
-  common::SLPoint back = util::interpolate(start, end, weight_back);
+  common::SLPoint front = common::math::InterpolateUsingLinearApproximation(
+      start, end, weight_front);
+  common::SLPoint back = common::math::InterpolateUsingLinearApproximation(
+      start, end, weight_back);
 
   if (nudge_type == ObjectNudge::RIGHT_NUDGE) {
     result.second = std::min(front.l(), back.l());

@@ -61,9 +61,9 @@ class FreeMovePredictor : public Predictor {
    */
   void DrawFreeMoveTrajectoryPoints(
       const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
-      const Eigen::Vector2d& acc, double theta,
-      const common::math::KalmanFilter<double, 6, 2, 0>& kf, double total_time,
-      double period, std::vector<common::TrajectoryPoint>* points);
+      const Eigen::Vector2d& acc, const double theta,
+      const double total_time, const double period,
+      std::vector<apollo::common::TrajectoryPoint>* points);
 };
 
 }  // namespace prediction

@@ -6,16 +6,15 @@ cc_library(
     name = "base",
     srcs = [
         "registerer.cc",
-        "timer.cc",
         "thread.cc",
     ],
     hdrs = [
-        "registerer.h",
-        "timer.h",
-        "time_util.h",
-        "mutex.h",
-        "thread.h",
         "concurrent_queue.h",
+        "mutex.h",
+        "noncopyable.h",
+        "registerer.h",
+        "singleton.h",
+        "thread.h",
     ],
     linkopts = [
         "-lboost_filesystem",
@@ -24,7 +23,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:log",
-        "@gtest//:gtest",
+        "@gtest",
     ],
 )
 
@@ -33,7 +32,6 @@ cc_test(
     size = "small",
     srcs = [
         "registerer_test.cc",
-        "timer_test.cc",
     ],
     data = ["//modules/perception:perception_data"],
     deps = [

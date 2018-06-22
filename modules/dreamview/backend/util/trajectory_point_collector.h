@@ -25,8 +25,6 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 
-#include "modules/common/configs/vehicle_config_helper.h"
-
 /**
  * @namespace apollo::dreamview::util
  * @brief apollo::dreamview::util
@@ -61,8 +59,9 @@ class TrajectoryPointCollector {
    * @brief The Collect method creates a trajectory segment between the input
    * point and the previous point.
    * @param point The trajectory point to be added.
+   * @param base_time The timestampe of the first trajectory point
    */
-  void Collect(const common::TrajectoryPoint &point);
+  void Collect(const common::TrajectoryPoint &point, const double base_time);
 
  private:
   // Does not own the SimulationWorld instance. This is stored as the

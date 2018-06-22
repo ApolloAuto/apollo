@@ -17,9 +17,10 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_MATRIX_H
 #define MODULES_LOCALIZATION_MSF_LOCAL_MAP_BASE_MAP_BASE_MAP_MATRIX_H
 
-#include <assert.h>
-#include <opencv2/opencv.hpp>
 #include <vector>
+
+#include "opencv2/opencv.hpp"
+
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 
 namespace apollo {

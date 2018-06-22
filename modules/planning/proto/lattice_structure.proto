@@ -1,0 +1,40 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message PathTimePoint {
+  optional double t = 1;
+  optional double s = 2;
+  optional string obstacle_id = 4;
+}
+
+message SamplePoint {
+  optional PathTimePoint path_time_point = 1;
+  optional double ref_v = 2;
+}
+
+message PathTimeObstacle {
+  optional string obstacle_id = 1;
+  optional PathTimePoint bottom_left = 2;
+  optional PathTimePoint upper_left = 3;
+  optional PathTimePoint upper_right = 4;
+  optional PathTimePoint bottom_right = 5;
+  optional double time_lower = 6;
+  optional double time_upper = 7;
+  optional double path_lower = 8;
+  optional double path_upper = 9;
+}
+
+message StopPoint {
+  required double s = 1;
+  enum Type {
+    HARD = 0;
+    SOFT = 1;
+  }
+  required Type type = 2 [default = HARD]; 
+}
+
+message PlanningTarget {
+  optional StopPoint stop_point = 1;
+  optional double cruise_speed = 2;
+}

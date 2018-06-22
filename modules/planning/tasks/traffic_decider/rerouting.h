@@ -34,16 +34,17 @@ namespace planning {
  */
 class Rerouting : public TrafficRule {
  public:
-  explicit Rerouting(const RuleConfig& config);
+  explicit Rerouting(const TrafficRuleConfig& config);
   virtual ~Rerouting() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 
  private:
   bool ChangeLaneFailRerouting();
 
-  ReferenceLineInfo* reference_line_info_;
-  Frame* frame_;
+  ReferenceLineInfo* reference_line_info_ = nullptr;
+  Frame* frame_ = nullptr;
 };
 
 }  // namespace planning

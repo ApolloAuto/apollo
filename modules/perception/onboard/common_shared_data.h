@@ -14,17 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
-#define MODEULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
+#define MODULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
 
-#include <boost/format.hpp>
-#include <map>
+#include <algorithm>
+#include <limits>
 #include <memory>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
+#include "boost/format.hpp"
 #include "gflags/gflags.h"
 
 #include "modules/perception/lib/base/mutex.h"
@@ -45,12 +47,12 @@ DECLARE_int32(stamp_enlarge_factor);
 
 struct CommonSharedDataKey {
   CommonSharedDataKey() = default;
-  CommonSharedDataKey(const double &ts, const std::string &id)
+  CommonSharedDataKey(const double ts, const std::string &id)
       : timestamp(ts), device_id(id) {}
   virtual std::string ToString() const {
     return device_id +
-           (boost::format("%d") %
-            static_cast<int>(timestamp * FLAGS_stamp_enlarge_factor))
+           (boost::format("%ld") %
+            static_cast<int64_t>(timestamp * FLAGS_stamp_enlarge_factor))
                .str();
   }
   double timestamp = 0.0;
@@ -78,6 +80,7 @@ class CommonSharedData : public SharedData {
   virtual ~CommonSharedData() {}
 
   bool Init() override {
+    latest_timestamp_ = std::numeric_limits<double>::min();
     return true;
   }
   // @brief: you must impl your own name func
@@ -105,6 +108,7 @@ class CommonSharedData : public SharedData {
 
   bool Get(const CommonSharedDataKey &key, SharedDataPtr<M> *data);
 
+  double GetLatestTimestamp() const;
   // @brief: remove shared data with the given key
   // @param [in]: key
   // @return : true or false
@@ -122,18 +126,14 @@ class CommonSharedData : public SharedData {
 
   // @brief: num of data stored in shared data
   // @return: num of data
-  unsigned Size() const {
-    return data_map_.size();
-  }
+  unsigned Size() const { return data_map_.size(); }
 
-  CommonSharedDataStat GetStat() const {
-    return stat_;
-  }
+  CommonSharedDataStat GetStat() const { return stat_; }
 
  private:
-  typedef std::map<std::string, SharedDataPtr<M>> SharedDataMap;
+  typedef std::unordered_map<std::string, SharedDataPtr<M>> SharedDataMap;
   typedef std::pair<std::string, SharedDataPtr<M>> SharedDataPair;
-  typedef std::map<std::string, uint64_t>
+  typedef std::unordered_map<std::string, uint64_t>
       DataAddedTimeMap;  // precision in second
   typedef std::pair<std::string, uint64_t> DataKeyTimestampPair;
 
@@ -141,6 +141,7 @@ class CommonSharedData : public SharedData {
   Mutex mutex_;
   CommonSharedDataStat stat_;
   DataAddedTimeMap data_added_time_map_;
+  double latest_timestamp_ = std::numeric_limits<double>::min();
 
   DISALLOW_COPY_AND_ASSIGN(CommonSharedData);
 };
@@ -151,6 +152,7 @@ void CommonSharedData<M>::Reset() {
   AINFO << "Reset " << name() << ", map size: " << data_map_.size();
   data_map_.clear();
   data_added_time_map_.clear();
+  latest_timestamp_ = std::numeric_limits<double>::min();
 }
 
 template <class M>
@@ -160,10 +162,11 @@ void CommonSharedData<M>::RemoveStaleData() {
   bool has_change = false;
   for (auto iter = data_added_time_map_.begin();
        iter != data_added_time_map_.end();) {
-    if (now - iter->second > FLAGS_shared_data_stale_time) {
+    if (now - iter->second >
+        static_cast<uint64_t>(FLAGS_shared_data_stale_time)) {
       const size_t erase_cnt = data_map_.erase(iter->first);
       if (erase_cnt != 1u) {
-        AWARN << "_data_map erase cnt:" << erase_cnt << " key:" << iter->first;
+        AWARN << "data_map_ erase cnt:" << erase_cnt << " key:" << iter->first;
         return;
       }
       iter = data_added_time_map_.erase(iter);
@@ -191,7 +194,6 @@ bool CommonSharedData<M>::Add(const std::string &key,
 
   const uint64_t timestamp = ::time(NULL);
   data_added_time_map_.emplace(DataKeyTimestampPair(key, timestamp));
-
   ++stat_.add_cnt;
   return true;
 }
@@ -199,6 +201,8 @@ bool CommonSharedData<M>::Add(const std::string &key,
 template <class M>
 bool CommonSharedData<M>::Add(const CommonSharedDataKey &key,
                               const SharedDataPtr<M> &data) {
+  // update latest_timestamp for SharedData
+  latest_timestamp_ = key.timestamp;
   return Add(key.ToString(), data);
 }
 
@@ -222,6 +226,11 @@ bool CommonSharedData<M>::Get(const CommonSharedDataKey &key,
 }
 
 template <class M>
+double CommonSharedData<M>::GetLatestTimestamp() const {
+  return latest_timestamp_;
+}
+
+template <class M>
 bool CommonSharedData<M>::Remove(const std::string &key) {
   MutexLock lock(&mutex_);
   const size_t num = data_map_.erase(key);
@@ -233,7 +242,7 @@ bool CommonSharedData<M>::Remove(const std::string &key) {
 
   const size_t erase_cnt = data_added_time_map_.erase(key);
   if (erase_cnt != 1u) {
-    AWARN << "_data_added_time_map erase cnt:" << erase_cnt << " key:" << key;
+    AWARN << "data_added_time_map_ erase cnt:" << erase_cnt << " key:" << key;
     return false;
   }
   ++stat_.remove_cnt;
@@ -262,7 +271,7 @@ bool CommonSharedData<M>::Pop(const std::string &key, SharedDataPtr<M> *data) {
   }
   const size_t erase_cnt = data_added_time_map_.erase(key);
   if (erase_cnt != 1u) {
-    AWARN << "_data_added_time_map erase cnt:" << erase_cnt << " key:" << key;
+    AWARN << "data_added_time_map_ erase cnt:" << erase_cnt << " key:" << key;
     return false;
   }
   ++stat_.get_cnt;
@@ -279,4 +288,4 @@ bool CommonSharedData<M>::Pop(const CommonSharedDataKey &key,
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_COMMON_SHARED_DATA_H_

@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <yaml-cpp/yaml.h>
-
 #include "modules/perception/obstacle/common/pose_util.h"
 
+#include "yaml-cpp/yaml.h"
+
 #include "modules/common/log.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace perception {
+
+using apollo::common::util::QuaternionToRotationMatrix;
 
 bool ReadPoseFile(const std::string &filename, Eigen::Matrix4d *pose,
                   int *frame_id, double *time_stamp) {
@@ -68,8 +71,8 @@ bool ReadPoseFileMat12(const std::string &filename, Eigen::Matrix4d *pose,
     return false;
   }
   ifs >> *frame_id >> *time_stamp;
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 4; j++) {
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 4; ++j) {
       ifs >> (*pose)(i, j);
     }
   }

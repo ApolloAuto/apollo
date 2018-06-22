@@ -23,6 +23,8 @@
 
 #include <string>
 
+#include "modules/planning/proto/traffic_rule_config.pb.h"
+
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 
@@ -31,14 +33,15 @@ namespace planning {
 
 class TrafficRule {
  public:
-  explicit TrafficRule(const RuleConfig& config) : config_(config) {}
+  explicit TrafficRule(const TrafficRuleConfig& config) : config_(config) {}
   virtual ~TrafficRule() = default;
-  virtual RuleConfig::RuleId Id() const { return config_.rule_id(); }
-  virtual bool ApplyRule(Frame* frame,
+  virtual TrafficRuleConfig::RuleId Id() const { return config_.rule_id(); }
+  const TrafficRuleConfig& GetConfig() const { return config_; }
+  virtual common::Status ApplyRule(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info) = 0;
 
  protected:
-  RuleConfig config_;
+  TrafficRuleConfig config_;
 };
 
 }  // namespace planning

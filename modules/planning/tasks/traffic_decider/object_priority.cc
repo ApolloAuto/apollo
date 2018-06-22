@@ -19,17 +19,18 @@
  **/
 
 #include "modules/planning/tasks/traffic_decider/object_priority.h"
-#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-ObjectPriority::ObjectPriority(const RuleConfig& config)
+using apollo::common::Status;
+
+ObjectPriority::ObjectPriority(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
-bool ObjectPriority::ApplyRule(Frame* frame,
-                                ReferenceLineInfo* const reference_line_info) {
-  return true;
+Status ObjectPriority::ApplyRule(Frame* const frame,
+                                 ReferenceLineInfo* const reference_line_info) {
+  return Status::OK();
 }
 
 }  // namespace planning

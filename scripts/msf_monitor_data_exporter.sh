@@ -35,54 +35,10 @@ function data_exporter() {
     --odometry_loc_topic $ODOMETRY_LOC_TOPIC
 }
 
-function compare_poses() {
-  local IN_FOLDER=$1
-  $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/compare_poses \
-    --in_folder $IN_FOLDER \
-    --loc_file_a $GNSS_LOC_FILE \
-    --loc_file_b $ODOMETRY_LOC_FILE \
-    --compare_file "compare_gnss_odometry.txt"
-
-  $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/compare_poses \
-    --in_folder $IN_FOLDER \
-    --loc_file_a $LIDAR_LOC_FILE \
-    --loc_file_b $ODOMETRY_LOC_FILE \
-    --compare_file "compare_lidar_odometry.txt"
-
-  $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/compare_poses \
-    --in_folder $IN_FOLDER \
-    --loc_file_a $FUSION_LOC_FILE \
-    --loc_file_b $ODOMETRY_LOC_FILE \
-    --compare_file "compare_fusion_odometry.txt"
-}
-
 cd $IN_FOLDER
 for item in $(ls -l *.bag | awk '{print $9}')
 do
   DIR_NAME=$(echo $item | cut -d . -f 1)
   mkdir $DIR_NAME
   data_exporter "${item}" "${DIR_NAME}"
-  compare_poses "${DIR_NAME}/pcd"
 done
-
-touch compare_fusion_odometry_all.txt
-for item in  $(find . -name "compare_fusion_odometry.txt")
-do 
-  cat $item >> compare_fusion_odometry_all.txt
-done
-
-touch compare_lidar_odometry_all.txt
-for item in  $(find . -name "compare_lidar_odometry.txt")
-do 
-  cat $item >> compare_lidar_odometry_all.txt
-done
-
-touch compare_gnss_odometry_all.txt
-for item in  $(find . -name "compare_gnss_odometry.txt")
-do 
-  cat $item >> compare_gnss_odometry_all.txt
-done
-
-python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py compare_fusion_odometry_all.txt
-python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py compare_lidar_odometry_all.txt
-python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py compare_gnss_odometry_all.txt

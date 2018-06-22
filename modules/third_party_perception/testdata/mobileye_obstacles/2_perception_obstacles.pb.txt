@@ -1,0 +1,60 @@
+perception_obstacle {
+  id: 41
+  position {
+    x: 14.375
+    y: -0.0625
+  }
+  theta: 0.34
+  velocity {
+    x: -4.75
+    y: 0
+  }
+  length: 5
+  width: 1.75
+  height: 3
+  polygon_point {
+    x: 17.398687869444078
+    y: -0.05369260198526693
+  }
+  polygon_point {
+    x: 16.815085458197654
+    y: 1.5961280626893388
+  }
+  polygon_point {
+    x: 12.101312130555922
+    y: -0.07130739801473307
+  }
+  polygon_point {
+    x: 12.684914541802346
+    y: -1.7211280626893388
+  }
+  type: VEHICLE
+  confidence: 0.5
+}
+header {
+  timestamp_sec: 1520575862.9623015
+  module_name: "third_party_perception"
+  sequence_num: 2928
+}
+lane_marker {
+  left_lane_marker {
+    lane_type: UNKNOWN
+    quality: 0
+    model_degree: 3
+    c0_position: 1.875
+    c1_heading_angle: -0
+    c2_curvature: 4.9999587803384316e-13
+    c3_curvature_derivative: -9.4949005255418051e-16
+    view_range: 0
+  }
+  right_lane_marker {
+    lane_type: UNKNOWN
+    quality: 0
+    model_degree: 3
+    c0_position: -1.875
+    c1_heading_angle: -0
+    c2_curvature: 4.9999587803384316e-13
+    c3_curvature_derivative: -9.4949005255418051e-16
+    view_range: 0
+  }
+}

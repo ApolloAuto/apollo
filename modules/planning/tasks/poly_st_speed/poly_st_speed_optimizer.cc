@@ -32,6 +32,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/poly_st_speed/poly_st_graph.h"
+#include "modules/planning/tasks/st_graph/speed_limit_decider.h"
 #include "modules/planning/tasks/st_graph/st_graph_data.h"
 
 namespace apollo {
@@ -87,7 +88,6 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     DCHECK(path_obstacle->HasLongitudinalDecision());
   }
   // step 1 get boundaries
-  auto path_decision_copy = *path_decision;
   path_decision->EraseStBoundaries();
   if (boundary_mapper.CreateStBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
@@ -102,14 +102,16 @@ Status PolyStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     if (!obstacle->st_boundary().IsEmpty()) {
       mutable_obstacle->SetBlockingObstacle(true);
     } else {
-      path_decision->SetStBoundary(id,
-                                   path_decision_copy.Find(id)->st_boundary());
+      path_decision->SetStBoundary(
+          id, path_decision->Find(id)->reference_line_st_boundary());
     }
   }
 
+  SpeedLimitDecider speed_limit_decider(adc_sl_boundary, st_boundary_config_,
+                                        reference_line, path_data);
   SpeedLimit speed_limits;
-  if (boundary_mapper.GetSpeedLimits(path_decision->path_obstacles(),
-                                     &speed_limits) != Status::OK()) {
+  if (speed_limit_decider.GetSpeedLimits(path_decision->path_obstacles(),
+                                         &speed_limits) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "GetSpeedLimits for qp st speed optimizer failed!");
   }

@@ -15,19 +15,17 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
+
 #include <sstream>
 #include <string>
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-MapNodeIndex::MapNodeIndex() {
-  resolution_id_ = 0;
-  zone_id_ = 50;
-  m_ = 0;
-  n_ = 0;
-}
+MapNodeIndex::MapNodeIndex() {}
 
 bool MapNodeIndex::operator<(const MapNodeIndex& index) const {
   if (resolution_id_ < index.resolution_id_) {
@@ -84,7 +82,7 @@ MapNodeIndex MapNodeIndex::GetMapNodeIndex(const BaseMapConfig& option,
                                            const Eigen::Vector2d& coordinate,
                                            unsigned int resolution_id,
                                            int zone_id) {
-  assert(resolution_id < option.map_resolutions_.size());
+  DCHECK_LT(resolution_id, option.map_resolutions_.size());
   MapNodeIndex index;
   index.resolution_id_ = resolution_id;
   index.zone_id_ = zone_id;
@@ -100,7 +98,7 @@ MapNodeIndex MapNodeIndex::GetMapNodeIndex(const BaseMapConfig& option,
     index.m_ = m;
     index.n_ = n;
   } else {
-    assert(0 == 1);  // should never reach here
+    DCHECK(false);  // should never reach here
   }
   return index;
 }

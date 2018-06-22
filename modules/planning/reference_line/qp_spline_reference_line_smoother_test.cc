@@ -21,7 +21,7 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/planning/proto/qp_spline_reference_line_smoother_config.pb.h"
+#include "modules/planning/proto/reference_line_smoother_config.pb.h"
 
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
@@ -36,6 +36,8 @@ namespace planning {
 class QpSplineReferenceLineSmootherTest : public ::testing::Test {
  public:
   virtual void SetUp() {
+    config_.mutable_qp_spline()->set_spline_order(5);
+    smoother_.reset(new QpSplineReferenceLineSmoother(config_));
     hdmap_.LoadMapFromFile(map_file);
     const std::string lane_id = "1_-1";
     lane_info_ptr = hdmap_.GetLaneById(hdmap::MakeMapId(lane_id));
@@ -51,7 +53,7 @@ class QpSplineReferenceLineSmootherTest : public ::testing::Test {
       std::vector<hdmap::LaneWaypoint> waypoint;
       waypoint.emplace_back(lane_info_ptr, accumulate_s[i]);
       hdmap::MapPathPoint map_path_point(points[i], headings[i], waypoint);
-      ref_points.emplace_back(map_path_point, 0.0, 0.0, -2.0, 2.0);
+      ref_points.emplace_back(map_path_point, 0.0, 0.0);
     }
     reference_line_.reset(new ReferenceLine(ref_points));
     vehicle_position_ = points[0];
@@ -62,10 +64,8 @@ class QpSplineReferenceLineSmootherTest : public ::testing::Test {
 
   hdmap::HDMap hdmap_;
   common::math::Vec2d vehicle_position_;
-  std::vector<double> t_knots_;
-  Spline2dSolver spline_solver_{t_knots_, 5};
-  QpSplineReferenceLineSmootherConfig config_;
-  QpSplineReferenceLineSmoother smoother_{config_, &spline_solver_};
+  ReferenceLineSmootherConfig config_;
+  std::unique_ptr<ReferenceLineSmoother> smoother_;
   std::unique_ptr<ReferenceLine> reference_line_;
   hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
 };
@@ -94,8 +94,8 @@ TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
   anchor_points.front().lateral_bound = 1e-6;
   anchor_points.back().longitudinal_bound = 1e-6;
   anchor_points.back().lateral_bound = 1e-6;
-  smoother_.SetAnchorPoints(anchor_points);
-  EXPECT_TRUE(smoother_.Smooth(*reference_line_, &smoothed_reference_line));
+  smoother_->SetAnchorPoints(anchor_points);
+  EXPECT_TRUE(smoother_->Smooth(*reference_line_, &smoothed_reference_line));
   EXPECT_FLOAT_EQ(152.54079, smoothed_reference_line.Length());
 }
 

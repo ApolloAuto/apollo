@@ -34,6 +34,12 @@ namespace prediction {
 class PredictionMap {
  public:
   /**
+   * @brief Check if map is ready
+   * @return True if map is ready
+   */
+  static bool Ready();
+
+  /**
    * @brief Get the position of a point on a specific distance along a lane.
    * @param lane_info The lane to get a position.
    * @param s The distance along the lane.
@@ -50,6 +56,14 @@ class PredictionMap {
    */
   static double HeadingOnLane(std::shared_ptr<const hdmap::LaneInfo> lane_info,
                               const double s);
+
+  /**
+   * @brief Get the curvature of a point on a specific distance along a lane.
+   * @param lane_iid The id of the lane to get a curvature.
+   * @param s The distance along the lane.
+   * @return The curvature of the point.
+   */
+  static double CurvatureOnLane(const std::string& lane_id, const double s);
 
   /**
    * @brief Get the width on a specified distance on a lane.
@@ -112,10 +126,11 @@ class PredictionMap {
    * @param on_lane If the position is on lane.
    * @param lanes The searched lanes.
    */
-  void OnLane(
+  static void OnLane(
       const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& prev_lanes,
       const Eigen::Vector2d& point, const double heading, const double radius,
-      const bool on_lane,
+      const bool on_lane, const int max_num_lane,
+      const double max_lane_angle_diff,
       std::vector<std::shared_ptr<const hdmap::LaneInfo>>* lanes);
 
   /**
@@ -127,14 +142,22 @@ class PredictionMap {
    */
   static bool NearJunction(const Eigen::Vector2d& point, const double radius);
 
+   /**
+   * @brief Check if the obstacle is in a junction.
+   * @param point position
+   * @param radius the radius to search candidate junctions
+   * @return If the obstacle is in a junction.
+   */
+  static bool InJunction(const Eigen::Vector2d& point, const double radius);
+
   /**
    * @brief Get a list of junctions given a point and a search radius
    * @param Point
    * @param Search radius
    * @return A list of junctions
    */
-  std::vector<std::shared_ptr<const apollo::hdmap::JunctionInfo>> GetJunctions(
-      const Eigen::Vector2d& point, const double radius);
+  static std::vector<std::shared_ptr<const apollo::hdmap::JunctionInfo>>
+  GetJunctions(const Eigen::Vector2d& point, const double radius);
 
   /**
    * @brief Get the lane heading on a point.
@@ -154,9 +177,9 @@ class PredictionMap {
    * @param heading The lane heading on the point.
    * @return If the process is successful.
    */
-  bool SmoothPointFromLane(const std::string& id, const double s,
-                           const double l, Eigen::Vector2d* point,
-                           double* heading);
+  static bool SmoothPointFromLane(const std::string& id, const double s,
+                                  const double l, Eigen::Vector2d* point,
+                                  double* heading);
 
   /**
    * @brief Get nearby lanes by a position and current lanes.
@@ -166,9 +189,10 @@ class PredictionMap {
    * @param lanes The current lanes.
    * @param nearby_lanes The searched nearby lanes.
    */
-  void NearbyLanesByCurrentLanes(
+  static void NearbyLanesByCurrentLanes(
       const Eigen::Vector2d& point, const double heading, const double radius,
       const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes,
+      const int max_num_lane,
       std::vector<std::shared_ptr<const hdmap::LaneInfo>>* nearby_lanes);
 
   /**
@@ -177,8 +201,8 @@ class PredictionMap {
    * @param radius The searching radius.
    * @return A vector of nearby lane IDs.
    */
-  std::vector<std::string> NearbyLaneIds(const Eigen::Vector2d& point,
-                                         const double radius);
+  static std::vector<std::string> NearbyLaneIds(const Eigen::Vector2d& point,
+                                                const double radius);
 
   /**
    * @brief Check if a lane is a left neighbor of another lane.
@@ -286,7 +310,7 @@ class PredictionMap {
   static int LaneTurnType(const std::string& lane_id);
 
  private:
-  DECLARE_SINGLETON(PredictionMap);
+  PredictionMap() = delete;
 };
 
 }  // namespace prediction

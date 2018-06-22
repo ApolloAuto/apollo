@@ -28,6 +28,7 @@
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/planning/tasks/speed_optimizer.h"
+#include "modules/planning/tasks/st_graph/speed_limit_decider.h"
 #include "modules/planning/tasks/st_graph/st_boundary_mapper.h"
 
 namespace apollo {
@@ -53,11 +54,8 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
                                  PathDecision* const path_decision,
                                  SpeedData* const speed_data) override;
 
-  bool CreateStBoundaryWithHistoryDecision(
-      const StBoundaryMapper& boundary_mapper, const PathData& path_data,
-      SpeedData* speed_data, PathDecision* path_decision);
-
   bool SearchStGraph(const StBoundaryMapper& boundary_mapper,
+                     const SpeedLimitDecider& speed_limit_decider,
                      const PathData& path_data, SpeedData* speed_data,
                      PathDecision* path_decision,
                      planning_internal::STGraphDebug* debug) const;
@@ -68,8 +66,6 @@ class DpStSpeedOptimizer : public SpeedOptimizer {
   SLBoundary adc_sl_boundary_;
   DpStSpeedConfig dp_st_speed_config_;
   StBoundaryConfig st_boundary_config_;
-
-  PathDecision path_decision_;
 };
 
 }  // namespace planning

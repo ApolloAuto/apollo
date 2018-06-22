@@ -1,46 +1,34 @@
 # Apollo 1.5 Quick Start Guide
 
-This quick start focuses on Apollo 1.5 new features. For general Apollo concepts, please refer to [Apollo 1.0 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md). 
+This quick start focuses on Apollo 1.5 new features. For general Apollo concepts, please refer to [Apollo 1.0 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md) and [Apollo Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide.md).
 
-Before doing the following steps, make sure you have calibrated the extrinsic parameters between the LiDAR and the GNSS/INS. For sensor calibration, please refer to [Apollo 1.5 LiDAR calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_lidar_calibration_guide.md).
+# Onboard Test
 
-## Launch release env Docker Image
+1. For vehicle onboard test, make sure you have calibrated the extrinsic parameters between the LiDAR and the GNSS/INS. For sensor calibration, please refer to [Apollo 1.5 LiDAR calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_lidar_calibration_guide.md) before you proceed.
 
-Run the following commands:
+2. Launch Docker Release Container
 
-```bash
-cd $APOLLO_HOME
-bash docker/scripts/release_start.sh
-```
+3. Launch HMI
 
-When Docker starts, it creates a port mapping, which maps the Docker internal port 8887 to the host port 8887. You can then visit the HMI web service in your host machine browser:
+    Use your favorite browser to access HMI web service in your host machine browser with URL http://localhost:8887
 
-Open the Chrome browser and start the Apollo HMI by going to **localhost:8887**.
- ![](images/hmi_setup_profile.png)
-You'll be required to setup profile before doing anything else. Click the
-dropdown menu to select your HDMap and vehicle in use. The list are defined in
-[HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/hmi/conf/config.pb.txt).
+4. Select Vehicle and Map
+    
+    You'll be required to setup profile before doing anything else. Click the dropdown menu to select your HDMap and vehicle in use. The list are defined in [HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/hmi/conf/config.pb.txt).
 
-Then your HMI comes to live!
+    *Note: It's also possible to change profile on the right panel of HMI, but just remember to click "Reset All" on the top-right corner to restart the system.*
 
-*Note: It's also possible to change profile on the right panel of HMI, but just
-remember to click "Reset All" on the top-right corner to restart the system.*
+    ![](images/start_hmi.png)
 
- ![](images/start_hmi.png)
+5. Start Modules
 
-## (*New!*) Start Auto
+    Set up the system by clicking the "Setup" button on left panel.
 
-In Apollo 1.5, we released the new feature, auto following the traffic until destination.
+    ![](images/hmi_setup_1.5.png)
 
-1. To make it work,  you need setup the system by clicking the "Setup"
-   button on left panel.
+6. (*New!*) Be Cautious When Starting Autonomous Driving
 
- ![](images/hmi_setup_1.5.png)
+    Make sure all modules are on and hardware is ready, and the vehicle is in a good state which is safe to enter auto mode to follow the traffic to destination.
 
-2. Make sure all modules are on and hardware is ready, and the vehicle is in a
-
-good state which is safe to enter auto mode to follow the traffic to destination.
-
-Click the "Start Auto" button, then it will drive you there!
-
- ![](images/hmi_start_auto_following.png)
+    Click the "Start Auto" button, then it will drive you there!
+    ![](images/hmi_start_auto_following.png)

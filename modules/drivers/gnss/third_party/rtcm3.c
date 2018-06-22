@@ -1397,10 +1397,10 @@ static int decode_ssr3(rtcm_t *rtcm, int sys)
     switch (sys) {
         case SYS_GPS: np=6; offp=  0; codes=codes_gps; ncode=16; break;
         case SYS_GLO: np=5; offp=  0; codes=codes_glo; ncode= 3; break;
-        case SYS_GAL: np=6; offp=  0; codes=codes_gal; ncode=19; break;
+        case SYS_GAL: np=6; offp=  0; codes=codes_gal; ncode=18; break;
         case SYS_QZS: np=4; offp=192; codes=codes_qzs; ncode=12; break;
-        case SYS_CMP: np=6; offp=  1; codes=codes_bds; ncode= 9; break;
-        case SYS_SBS: np=6; offp=120; codes=codes_sbs; ncode= 4; break;
+        case SYS_CMP: np=6; offp=  1; codes=codes_bds; ncode= 8; break;
+        case SYS_SBS: np=6; offp=120; codes=codes_sbs; ncode= 3; break;
         default: return sync?0:10;
     }
     for (j=0;j<nsat&&i+5+np<=rtcm->len*8;j++) {

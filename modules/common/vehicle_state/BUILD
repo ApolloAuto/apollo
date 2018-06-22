@@ -13,12 +13,13 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common:macro",
-        "//modules/common/math:box2d",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/math:geometry",
         "//modules/common/math:quaternion",
-        "//modules/common/proto:vehicle_state_proto",
         "//modules/common/status",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/localization/common:localization_common",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

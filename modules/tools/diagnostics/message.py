@@ -43,6 +43,9 @@ from modules.routing.proto import routing_pb2
 from modules.drivers.proto import mobileye_pb2
 from modules.drivers.proto import delphi_esr_pb2
 from modules.drivers.proto import conti_radar_pb2
+from modules.monitor.proto import system_status_pb2
+from modules.map.relative_map.proto import navigation_pb2
+from modules.guardian.proto import guardian_pb2
 
 Refreshrate = 16
 
@@ -91,9 +94,9 @@ class Message(object):
             time = 0
             sequence_num = 0
 
-        if self.msg_received == True:
+        if self.msg_received:
             seq_diff = sequence_num - self.sequence_num
-            if seq_diff is not 0:
+            if seq_diff != 0:
                 self.msg_interval = (time - self.msg_time) * 1000 / seq_diff
             else:
                 self.msg_interval = (time - self.msg_time) * 1000
@@ -233,10 +236,14 @@ class Field(object):
         if self.descriptor.containing_type is not None and \
             self.descriptor.label == self.descriptor.LABEL_REPEATED:
             if self.index is not None:
+                if 'keys' in dir(self.item):
+                    # For map field.
+                    key = sorted(self.item.keys())[self.index]
+                else:
+                    key = self.index
                 self.window.addstr(
-                    0, 0, self.descriptor.name + ": " + str(self.index),
-                    curses.A_BOLD)
-                self.print_out(self.item[self.index], self.descriptor, 1, 2)
+                    0, 0, self.descriptor.name + ": " + str(key), curses.A_BOLD)
+                self.print_out(self.item[key], self.descriptor, 1, 2)
             else:
                 self.window.addstr(0, 0, self.descriptor.name + ": Empty",
                                    curses.A_BOLD)
@@ -258,7 +265,7 @@ class Field(object):
                     if col >= (self.windowx / 3) * 2:
                         return row, col
                     row = 0
-                    col = col + self.windowx / 3
+                    col += self.windowx / 3
                 if descript.label == descript.LABEL_REPEATED:
                     printstring = descript.name + ": " + str(
                         len(item)) + "[Repeated Item]"
@@ -270,11 +277,11 @@ class Field(object):
                 elif descript.type == descript.TYPE_MESSAGE:
                     self.window.addstr(row, col, descript.name + ": ")
                     row, col = self.print_out(item, descript, row + 1, col + 2)
-                    row = row - 1
-                    col = col - 2
+                    row -= 1
+                    col -= 2
                 else:
                     self.print_out(item, descript, row, col)
-                row = row + 1
+                row += 1
             return row, col
         elif descriptor.type == descriptor.TYPE_ENUM:
             enum_type = descriptor.enum_type.values_by_number[entity].name
@@ -302,4 +309,4 @@ class Field(object):
                 self.window.addstr(item[1], item[0], item[2], curses.A_REVERSE)
             else:
                 self.window.addstr(item[1], item[0], item[2], curses.A_BOLD)
-            indx = indx + 1
+            indx += 1

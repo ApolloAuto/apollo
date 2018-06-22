@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 
@@ -40,7 +40,7 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   radar_obs->set_lateral_vel(4.0);
   radar_obs->set_oritation_angle(0);
   radar_obs->set_obstacle_id(1);
-  radar_obs->set_obstacle_class(CONTI_CAR);
+  radar_obs->set_obstacle_class(static_cast<int>(ContiObjectType::CONTI_CAR));
   radar_obs->set_longitude_dist_rms(0.1);
   radar_obs->set_lateral_dist_rms(0.1);
   radar_obs->set_longitude_vel_rms(0.1);
@@ -48,7 +48,7 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   radar_obs->set_length(1.0);
   radar_obs->set_width(1.0);
   radar_obs->set_probexist(1.0);
-  radar_obs->set_meas_state(CONTI_NEW);
+  radar_obs->set_meas_state(static_cast<int>(ContiMeasState::CONTI_NEW));
   RadarDetectorOptions options;
   Eigen::Matrix4d radar2world_pose;
   radar2world_pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
@@ -69,32 +69,26 @@ TEST(ModestRadarDetectorTest, modest_radar_detector_test) {
   map_polygons[0].points[2].y = 20;
   map_polygons[0].points[3].x = 20;
   map_polygons[0].points[3].y = -20;
-  std::vector<ObjectPtr> objects;
-  radar_detector->Detect(raw_obstacles,
-                         map_polygons,
-                         options,
-                         &objects);
+  std::vector<std::shared_ptr<Object>> objects;
+  radar_detector->Detect(raw_obstacles, map_polygons, options, &objects);
   EXPECT_EQ(objects.size(), 1);
   EXPECT_TRUE(fabs(objects[0]->center(0) - 0.0) < 1e-5);
   EXPECT_TRUE(fabs(objects[0]->center(1) - 0.0) < 1e-5);
   EXPECT_TRUE(fabs(objects[0]->velocity(0) - 3.3) < 1e-5);
   EXPECT_TRUE(fabs(objects[0]->velocity(1) - 4.4) < 1e-5);
-  EXPECT_TRUE(objects[0]->type == UNKNOWN);
+  EXPECT_TRUE(objects[0]->type == ObjectType::UNKNOWN);
   objects.resize(0);
   header->set_timestamp_sec(123456789.074);
   Eigen::Vector2d location(3.0 * time_diff, 4.0 * time_diff);
   radar_obs->set_longitude_dist(location(0));
   radar_obs->set_lateral_dist(location(1));
-  radar_detector->Detect(raw_obstacles,
-                         map_polygons,
-                         options,
-                         &objects);
+  radar_detector->Detect(raw_obstacles, map_polygons, options, &objects);
   EXPECT_EQ(objects.size(), 1);
   EXPECT_TRUE(fabs(objects[0]->center(0) - location(0)) < 1e-2);
   EXPECT_TRUE(fabs(objects[0]->center(1) - location(1)) < 1e-2);
   EXPECT_TRUE(fabs(objects[0]->velocity(0) - 3.3) < 1e-2);
   EXPECT_TRUE(fabs(objects[0]->velocity(1) - 4.4) < 1e-2);
-  EXPECT_TRUE(objects[0]->type == UNKNOWN);
+  EXPECT_TRUE(objects[0]->type == ObjectType::UNKNOWN);
   delete radar_detector;
 }
 

@@ -17,9 +17,9 @@
 #ifndef MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H_
 #define MODULES_PERCEPTION_TRAFFIC_LIGHT_BASE_IMAGE_H_
 
-#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "gflags/gflags.h"
 #include "opencv2/opencv.hpp"
@@ -37,7 +37,7 @@ enum CameraId {
   CAMERA_ID_COUNT = 2
 };
 
-const std::map<int, std::string> kCameraIdToStr = {
+const std::unordered_map<int, std::string> kCameraIdToStr = {
     {static_cast<int>(LONG_FOCUS), "long_focus_camera_25mm"},
     {static_cast<int>(SHORT_FOCUS), "short_focus_camera_6mm"}};
 
@@ -58,7 +58,7 @@ class Image {
    * @param [in] camera id
    * @param [in] mat image
    */
-  bool Init(const double &ts, const CameraId &device_id, const cv::Mat &mat);
+  bool Init(const double ts, const CameraId &device_id, const cv::Mat &mat);
 
   /**
    * @brief init
@@ -66,8 +66,8 @@ class Image {
    * @param [in] camera id
    * @param [in] raw ros image data
    */
-  bool Init(const double &ts, const CameraId &device_id,
-            std::shared_ptr<const sensor_msgs::Image> image_data);
+  bool Init(const double ts, const CameraId &device_id,
+            boost::shared_ptr<const sensor_msgs::Image> image_data);
 
   /**
    * @brief return image's timestamp
@@ -88,7 +88,7 @@ class Image {
   /**
    * @brief return image as cv::Mat
    */
-  cv::Mat mat() const;
+  const cv::Mat &mat() const;
 
   /**
    * @brief return image's size
@@ -124,7 +124,7 @@ class Image {
   double timestamp_ = 0.0;                  // Image's timestamp
   CameraId camera_id_ = CameraId::UNKNOWN;  // camera's id
   cv::Mat mat_;                             // Image's data
-  std::shared_ptr<const sensor_msgs::Image> image_data_;
+  boost::shared_ptr<const sensor_msgs::Image> image_data_;
   friend std::ostream &operator<<(std::ostream &os, const Image &image);
 };
 

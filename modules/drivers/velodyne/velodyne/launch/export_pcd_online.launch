@@ -13,13 +13,16 @@
     <!-- 100ms -->
     <arg name="tf_query_timeout" default="0.1"/>
     <arg name="pcd_folder" value="/apollo/data/pcd" />
+    <arg name="nodelet_manager_name" value="velodyne_nodelet_manager"/>
 
   <include file="$(find velodyne_pointcloud)/launch/nodelet_manager.launch">
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
   </include>
     <!--  HDL64E -->
     <!--  driver nodelets -->
   <include file="$(find velodyne_driver)/launch/driver_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne64_driver"/>
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
     <arg name="model" value="$(arg model)"/>
     <arg name="rpm" value="$(arg rpm)"/>
     <arg name="frame_id" value="$(arg velodyne64_frame_id)"/>
@@ -29,6 +32,7 @@
   <!-- start convert nodelet -->
   <include file="$(find velodyne_pointcloud)/launch/convert_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne64_convert"/>
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
     <arg name="model" value="$(arg model)"/>
     <arg name="calibration_online" value="$(arg velodyne64_calibration_online)" />
     <arg name="calibration" value="$(arg velodyne64_calibration_file)" />
@@ -42,6 +46,7 @@
    <!-- start compensator nodelet -->
   <include file="$(find velodyne_pointcloud)/launch/compensator_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne64_compensator"/>
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
     <arg name="child_frame_id" value="$(arg velodyne64_frame_id)"/>
     <arg name="tf_query_timeout" value="$(arg tf_query_timeout)"/>
     <arg name="topic_pointcloud" value="/apollo/sensor/velodyne64/PointCloud2"/>
@@ -49,6 +54,7 @@
   </include>
 
   <include file="$(find velodyne_pointcloud)/launch/pcd_exporter_nodelet.launch">
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
     <arg name="pcd_folder" value="$(arg pcd_folder)"/>
     <arg name="skip_static_frames" default="false"/>
     <arg name="child_frame_id" default="velodyne64"/>

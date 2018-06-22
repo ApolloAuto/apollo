@@ -30,7 +30,7 @@
  *
  *     virtual bool Fuse(
  *              const std::vector<SensorObjects>& multi_sensor_objects,
- *              std::vector<ObjectPtr>* fused_objects) override {
+ *              std::vector<std::shared_ptr<Object>>* fused_objects) override {
  *
  *          // Do something.
  *          return true;
@@ -52,21 +52,23 @@
  * using fusion to do somethings.
  * </pre>
  **/
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "modules/common/macro.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/lib/base/registerer.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
 namespace perception {
+
 class BaseFusion {
  public:
-  BaseFusion() {}
-  virtual ~BaseFusion() {}
+  BaseFusion() = default;
+  virtual ~BaseFusion() = default;
   virtual bool Init() = 0;
 
   // @brief: fuse objects from multi sensors(64-lidar, 16-lidar, radar...)
@@ -74,14 +76,18 @@ class BaseFusion {
   // @param [out]: fused objects.
   // @return true if fuse successfully, otherwise return false
   virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                    std::vector<ObjectPtr> *fused_objects) = 0;
+                    std::vector<std::shared_ptr<Object>> *fused_objects) = 0;
   virtual std::string name() const = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseFusion);
 };
+
 REGISTER_REGISTERER(BaseFusion);
+
 #define REGISTER_FUSION(name) REGISTER_CLASS(BaseFusion, name)
+
 }  // namespace perception
 }  // namespace apollo
+
 #endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_INTERFACE_BASE_FUSION_H_

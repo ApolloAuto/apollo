@@ -5,12 +5,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "monitor_log",
     srcs = [
-        "monitor_logger.cc",
         "monitor_log_buffer.cc",
+        "monitor_logger.cc",
     ],
     hdrs = [
-        "monitor_logger.h",
         "monitor_log_buffer.h",
+        "monitor_logger.h",
     ],
     deps = [
         "//modules/common:log",

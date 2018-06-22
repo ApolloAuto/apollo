@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_traffic_light_base",
+    name = "base",
     srcs = [
         "image.cc",
         "light.cc",
@@ -23,13 +23,14 @@ cc_library(
         "//modules/common:log",
         "//modules/map/proto:map_proto",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/onboard:perception_onboard",
+        "//modules/perception/onboard",
         "//modules/perception/proto:perception_proto",
-        "//modules/perception/traffic_light/util:perception_traffic_light_util",
+        "//modules/perception/traffic_light/util",
     ],
 )
+
 cc_test(
-    name = "perception_traffic_light_base_test",
+    name = "base_test",
     size = "small",
     srcs = [
         "image_test.cc",
@@ -41,11 +42,10 @@ cc_test(
         "//modules/map/proto:map_proto",
         "//modules/perception/lib/config_manager",
         "//modules/perception/proto:perception_proto",
-        "//modules/perception/traffic_light/base:perception_traffic_light_base",
-        "//modules/perception/traffic_light/util:perception_traffic_light_util",
+        "//modules/perception/traffic_light/base",
+        "//modules/perception/traffic_light/util",
         "@gtest//:main",
         "@opencv2//:core",
-
     ],
 )
 

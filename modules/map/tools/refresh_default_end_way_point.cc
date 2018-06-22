@@ -63,12 +63,12 @@ double XYZDistance(const apollo::common::PointENU& p1,
 
 void RefreshDefaultEndPoint() {
   apollo::routing::POI old_poi;
-  CHECK(apollo::common::util::GetProtoFromASCIIFile(EndWayPointFile(),
-                                                    &old_poi));
+  CHECK(
+      apollo::common::util::GetProtoFromASCIIFile(EndWayPointFile(), &old_poi));
 
   apollo::routing::POI new_poi;
   for (const auto& old_landmark : old_poi.landmark()) {
-    apollo::routing::Landmark *new_landmark = new_poi.add_landmark();
+    apollo::routing::Landmark* new_landmark = new_poi.add_landmark();
     new_landmark->set_name(old_landmark.name());
     AINFO << "Refreshed point of interest: " << old_landmark.name();
     // Read xyz from old point.
@@ -98,14 +98,13 @@ void RefreshDefaultEndPoint() {
       *new_landmark->add_waypoint() = new_end_point;
 
       AINFO << "\n ============ from ============ \n"
-      << old_end_point.DebugString()
-      << "\n ============ to ============ \n"
-      << new_end_point.DebugString()
-      << "XYZ distance is " << XYZDistance(old_xyz, new_xyz);
+            << old_end_point.DebugString()
+            << "\n ============ to ============ \n"
+            << new_end_point.DebugString() << "XYZ distance is "
+            << XYZDistance(old_xyz, new_xyz);
     }
   }
-  CHECK(apollo::common::util::SetProtoToASCIIFile(new_poi,
-                                                  EndWayPointFile()));
+  CHECK(apollo::common::util::SetProtoToASCIIFile(new_poi, EndWayPointFile()));
 }
 
 }  // namespace hdmap

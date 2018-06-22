@@ -16,29 +16,27 @@
 #include "modules/perception/obstacle/radar/modest/object_builder.h"
 
 #include <cmath>
-#include <map>
-#include "modules/common/log.h"
+// #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/radar/modest/conti_radar_util.h"
 #include "modules/perception/obstacle/radar/modest/radar_util.h"
 
 namespace apollo {
 namespace perception {
 
-void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
+bool ObjectBuilder::Build(const ContiRadar &raw_obstacles,
                           const Eigen::Matrix4d &radar_pose,
                           const Eigen::Vector2d &main_velocity,
                           SensorObjects *radar_objects) {
   if (radar_objects == nullptr) {
     AERROR << "radar objects is nullptr.";
-    return;
+    return false;
   }
-  std::map<int, int> current_con_ids;
+  std::unordered_map<int, int> current_con_ids;
   auto objects = &(radar_objects->objects);
-  for (int i = 0; i < raw_obstacles.contiobs_size(); i++) {
-    ObjectPtr object_ptr = ObjectPtr(new Object());
-    int obstacle_id = raw_obstacles.contiobs(i).obstacle_id();
-    std::map<int, int>::iterator continuous_id_it =
-        continuous_ids_.find(obstacle_id);
+  for (int i = 0; i < raw_obstacles.contiobs_size(); ++i) {
+    std::shared_ptr<Object> object_ptr = std::shared_ptr<Object>(new Object());
+    const int obstacle_id = raw_obstacles.contiobs(i).obstacle_id();
+    auto continuous_id_it = continuous_ids_.find(obstacle_id);
     if (continuous_id_it != continuous_ids_.end()) {
       current_con_ids[obstacle_id] = continuous_id_it->second + 1;
     } else {
@@ -66,8 +64,7 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     Eigen::Matrix<double, 3, 1> velocity_r;
     Eigen::Matrix<double, 3, 1> velocity_w;
     velocity_r << raw_obstacles.contiobs(i).longitude_vel(),
-                  raw_obstacles.contiobs(i).lateral_vel(),
-                  0.0;
+        raw_obstacles.contiobs(i).lateral_vel(), 0.0;
     velocity_w = radar_pose.topLeftCorner(3, 3) * velocity_r;
 
     //  calculate the absolute velodity
@@ -77,17 +74,17 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
 
     Eigen::Vector3f ref_velocity(main_velocity(0), main_velocity(1), 0.0);
     if (ContiRadarUtil::IsConflict(ref_velocity,
-        object_ptr->velocity.cast<float>())) {
-        object_ptr->is_background = true;
+                                   object_ptr->velocity.cast<float>())) {
+      object_ptr->is_background = true;
     }
 
     object_ptr->length = 1.0;
     object_ptr->width = 1.0;
     object_ptr->height = 1.0;
-    object_ptr->type = UNKNOWN;
-    object_ptr->score_type = SCORE_RADAR;
-    object_ptr->score = static_cast<float>(
-        raw_obstacles.contiobs(i).probexist());
+    object_ptr->type = ObjectType::UNKNOWN;
+    object_ptr->score_type = ScoreType::SCORE_RADAR;
+    object_ptr->score =
+        static_cast<float>(raw_obstacles.contiobs(i).probexist());
 
     Eigen::Matrix3d dist_rms;
     Eigen::Matrix3d vel_rms;
@@ -128,6 +125,7 @@ void ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     objects->push_back(object_ptr);
   }
   continuous_ids_ = current_con_ids;
+  return true;
 }
 
 }  // namespace perception

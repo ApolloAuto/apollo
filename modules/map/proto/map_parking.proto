@@ -1,0 +1,24 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/map/proto/map_geometry.proto";
+import "modules/map/proto/map_id.proto";
+
+// ParkingSpace is a place designated to park a car.
+message ParkingSpace {
+  optional Id id = 1;
+
+  optional Polygon polygon = 2;
+
+  repeated Id overlap_id = 3;
+}
+
+// ParkingLot is a place for parking cars.
+message ParkingLot {
+  optional Id id = 1;
+
+  optional Polygon polygon = 2;
+
+  repeated Id overlap_id = 3;
+}

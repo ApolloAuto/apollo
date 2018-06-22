@@ -26,9 +26,9 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_stats.pb.h"
 
+using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::AdapterManagerConfig;
-using apollo::common::adapter::AdapterConfig;
 using apollo::planning::ADCTrajectory;
 using apollo::planning::PlanningStats;
 using apollo::planning::StatsGroup;

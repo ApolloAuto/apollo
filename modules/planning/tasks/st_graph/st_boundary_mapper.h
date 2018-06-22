@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 /**
-*   @file
-**/
+ *   @file
+ **/
 
 #ifndef MODULES_PLANNING_TASKS_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
 #define MODULES_PLANNING_TASKS_ST_GRAPH_ST_BOUNDARY_MAPPER_H_
@@ -57,10 +57,6 @@ class StBoundaryMapper {
       PathObstacle* path_obstacle,
       const ObjectDecisionType& external_decision) const;
 
-  virtual apollo::common::Status GetSpeedLimits(
-      const IndexedList<std::string, PathObstacle>& path_obstacles,
-      SpeedLimit* const speed_limit_data) const;
-
  private:
   FRIEND_TEST(StBoundaryMapperTest, check_overlap_test);
   bool CheckOverlap(const apollo::common::PathPoint& path_point,
@@ -84,12 +80,6 @@ class StBoundaryMapper {
 
   apollo::common::Status MapWithDecision(
       PathObstacle* path_obstacle, const ObjectDecisionType& decision) const;
-
-  FRIEND_TEST(StBoundaryMapperTest, get_centric_acc_limit);
-  double GetCentricAccLimit(const double kappa) const;
-
-  void GetAvgKappa(const std::vector<common::PathPoint>& path_points,
-                   std::vector<double>* kappa) const;
 
  private:
   const SLBoundary& adc_sl_boundary_;

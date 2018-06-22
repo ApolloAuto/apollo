@@ -21,9 +21,11 @@
 #include "modules/planning/reference_line/reference_point.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "modules/common/util/string_util.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -34,28 +36,16 @@ using apollo::common::util::StrCat;
 namespace {
 // Minimum distance to remove duplicated points.
 const double kDuplicatedPointsEpsilon = 1e-7;
-}
+}  // namespace
 
 ReferencePoint::ReferencePoint(const MapPathPoint& map_path_point,
-                               const double kappa, const double dkappa,
-                               const double lower_bound,
-                               const double upper_bound)
-    : hdmap::MapPathPoint(map_path_point),
-      kappa_(kappa),
-      dkappa_(dkappa),
-      lower_bound_(lower_bound),
-      upper_bound_(upper_bound) {}
+                               const double kappa, const double dkappa)
+    : hdmap::MapPathPoint(map_path_point), kappa_(kappa), dkappa_(dkappa) {}
 
 common::PathPoint ReferencePoint::ToPathPoint(double s) const {
-  common::PathPoint path_point;
-  path_point.set_x(x());
-  path_point.set_y(y());
-  path_point.set_z(0.0);
-  path_point.set_theta(heading());
+  common::PathPoint path_point = common::util::MakePathPoint(
+      x(), y(), 0.0, heading(), kappa_, dkappa_, 0.0);
   path_point.set_s(s);
-  path_point.set_kappa(kappa_);
-  path_point.set_dkappa(dkappa_);
-  path_point.set_ddkappa(0.0);
   return path_point;
 }
 
@@ -63,20 +53,10 @@ double ReferencePoint::kappa() const { return kappa_; }
 
 double ReferencePoint::dkappa() const { return dkappa_; }
 
-double ReferencePoint::lower_bound() const { return lower_bound_; }
-
-double ReferencePoint::upper_bound() const { return upper_bound_; }
-
 std::string ReferencePoint::DebugString() const {
-  // StrCat supports 9 arguments at most.
-  return StrCat(
-      StrCat("{x: ", x(), ", "
-             "y: ", y(), ", "
-             "theta: ", heading(), ", "
-             "kappa: ", kappa(), ", "),
-      StrCat("dkappa: ", dkappa(), ", "
-             "upper_bound: ", upper_bound(), ", "
-             "lower_bound: ", lower_bound(), "}"));
+  // StrCat only support 9 parameters
+  return StrCat("{x: ", x(), ", y: ", y(), ", theta: ", heading()) +
+         StrCat(", kappa: ", kappa(), ", dkappa: ", dkappa(), "}");
 }
 
 void ReferencePoint::RemoveDuplicates(std::vector<ReferencePoint>* points) {

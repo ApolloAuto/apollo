@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file qp_spline_st_speed_optimizer.cc
+ * @file
  **/
 
 #include "modules/planning/tasks/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
@@ -84,7 +84,6 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     DCHECK(path_obstacle->HasLongitudinalDecision());
   }
   // step 1 get boundaries
-  auto path_decision_copy = *path_decision;
   path_decision->EraseStBoundaries();
   if (boundary_mapper.CreateStBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
@@ -104,10 +103,11 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
       if (obstacle->obstacle()->IsVirtual()) {
         continue;
       }
-      if (path_decision_copy.Find(id)->st_boundary().IsEmpty()) {
+      if (path_decision->Find(id)->reference_line_st_boundary().IsEmpty()) {
         continue;
       }
-      auto st_boundary_copy = path_decision_copy.Find(id)->st_boundary();
+      auto st_boundary_copy =
+          path_decision->Find(id)->reference_line_st_boundary();
       auto st_boundary = st_boundary_copy.CutOffByT(3.5);
       if (!st_boundary.IsEmpty()) {
         auto decision = obstacle->LongitudinalDecision();
@@ -135,9 +135,11 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     }
   }
 
+  SpeedLimitDecider speed_limit_decider(adc_sl_boundary, st_boundary_config_,
+                                        reference_line, path_data);
   SpeedLimit speed_limits;
-  if (boundary_mapper.GetSpeedLimits(path_decision->path_obstacles(),
-                                     &speed_limits) != Status::OK()) {
+  if (speed_limit_decider.GetSpeedLimits(path_decision->path_obstacles(),
+                                         &speed_limits) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "GetSpeedLimits for qp st speed optimizer failed!");
   }

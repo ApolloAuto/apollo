@@ -32,6 +32,7 @@ from shapely.geometry import LineString, Point
 from numpy.polynomial.polynomial import polyval
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
+from modules.map.relative_map.proto import navigation_pb2
 from modules.drivers.proto import mobileye_pb2
 
 # pip install -U flask-cors
@@ -48,6 +49,7 @@ planning_pb = None
 heading = None
 line_ew = None
 line_we = None
+line_revloop = None
 
 projector = pyproj.Proj(proj='utm', zone=10, ellps='WGS84')
 
@@ -55,8 +57,45 @@ projector = pyproj.Proj(proj='utm', zone=10, ellps='WGS84')
 def add_listener():
     global routing_pub
     rospy.init_node("navigation_map_routing", anonymous=True)
-    routing_pub = rospy.Publisher('/apollo/navigation/routing',
-                                  String, queue_size=1)
+    routing_pub = rospy.Publisher('/apollo/navigation',
+                                  navigation_pb2.NavigationInfo, queue_size=1)
+
+
+@app.route('/routing', methods=["POST", "GET"])
+def navigation():
+    request_json = request.json
+    if "start_lat" not in request_json:
+        return jsonify([])
+    if "start_lon" not in request_json:
+        return jsonify([])
+    if "end_lat" not in request_json:
+        return jsonify([])
+    if "end_lon" not in request_json:
+        return jsonify([])
+    start_latlon = str(request_json["start_lat"]) + "," + \
+                   str(request_json["start_lon"])
+    end_latlon = str(request_json["end_lat"]) + "," + \
+                 str(request_json["end_lon"])
+    url = "http://navi-env.axty8vi3ic.us-west-2." \
+          "elasticbeanstalk.com/dreamview/navigation?origin=" + \
+          start_latlon + "&destination=" + end_latlon + "&heading=0"
+
+    res = requests.get(url)
+    if res.status_code != 200:
+        return jsonify([])
+    # send to ros
+    navigation_info = navigation_pb2.NavigationInfo()
+    navigation_info.ParseFromString(res.content)
+    routing_pub.publish(navigation_info)
+    # send to browser
+    latlon_path = []
+    for path in navigation_info.navigation_path:
+        for point in path.path.path_point:
+            lons, lats = projector(point.x, point.y, inverse=True)
+            latlon_path.append({'lat': lats, 'lng': lons})
+    if len(latlon_path) > 0:
+        latlon_path[0]['human'] = True
+    return jsonify(latlon_path)
 
 
 def request_routing(request_json):
@@ -87,20 +126,6 @@ def request_routing(request_json):
     return steps
 
 
-@app.route('/routing', methods=["POST", "GET"])
-def routing():
-    request_json = request.json
-    steps = request_routing(request_json)
-    if steps is None:
-        routing_pub.publish(json.dumps([]))
-        return jsonify([])
-
-    latlon_path, utm_steps = get_latlon_and_utm_path(steps)
-
-    routing_pub.publish(json.dumps(utm_steps))
-    return jsonify(latlon_path)
-
-
 def get_latlon_and_utm_path(steps):
     latlon_path = []
 
@@ -109,7 +134,7 @@ def get_latlon_and_utm_path(steps):
             loc = steps[0]['start_location']
             x, y = projector(loc['lng'], loc['lat'])
             p_start = (x, y)
-            loc = steps[0]['end_location']
+            loc = steps[-1]['end_location']
             x, y = projector(loc['lng'], loc['lat'])
             p_end = (x, y)
             line = match_drive_data(p_start, p_end)
@@ -176,10 +201,12 @@ def decode_polyline(polyline_str):
 
 
 def load_drive_data():
-    global line_ew, line_we
+    global line_ew, line_we, line_revloop
     dir_path = os.path.dirname(os.path.realpath(__file__))
     hanada_ew_file = dir_path + "/" + "hanada_ew"
     hanada_we_file = dir_path + "/" + "hanada_we"
+    rev_loop_file = dir_path + "/" + "rev_loop"
+
     ew = []
     try:
         f = open(hanada_ew_file, 'r')
@@ -210,6 +237,21 @@ def load_drive_data():
     except:
         line_ew = None
 
+    revloop = []
+    try:
+        f = open(rev_loop_file, 'r')
+        for line in f:
+            line = line.replace('\n', '')
+            vals = line.split(',')
+            if len(vals) != 2:
+                continue
+            x = float(vals[0])
+            y = float(vals[1])
+            revloop.append((x, y))
+        line_revloop = LineString(revloop)
+    except:
+        line_revloop = None
+
 
 def match_drive_data(p_start, p_end):
     ps = Point(p_start)
@@ -231,7 +273,40 @@ def match_drive_data(p_start, p_end):
         if ds < 4 and de < 50:
             if ss < se:
                 return line_ew
+
+    if line_revloop is not None:
+        ds = line_revloop.distance(ps)
+        de = line_revloop.distance(pe)
+        ss = line_revloop.project(ps)
+        se = line_revloop.project(pe)
+        if ds < 6 and de < 50:
+            if ss < se:
+                return line_revloop
+
     return None
+
+
+@app.route('/routing/deprecated', methods=["POST", "GET"])
+def routing():
+    request_json = request.json
+    if "start_lat" not in request_json:
+        return jsonify([])
+    if "start_lon" not in request_json:
+        return jsonify([])
+    if "end_lat" not in request_json:
+        return jsonify([])
+    if "end_lon" not in request_json:
+        return jsonify([])
+
+    steps = request_routing(request_json)
+    if steps is None:
+        routing_pub.publish(json.dumps([]))
+        return jsonify([])
+
+    latlon_path, utm_steps = get_latlon_and_utm_path(steps)
+
+    routing_pub.publish(json.dumps(utm_steps))
+    return jsonify(latlon_path)
 
 
 def run_flask():

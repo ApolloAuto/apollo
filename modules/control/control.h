@@ -50,8 +50,8 @@ class Control : public apollo::common::ApolloApp {
   friend class ControlTestBase;
 
  public:
-  Control() :
-      monitor_logger_(apollo::common::monitor::MonitorMessageItem::CONTROL) {}
+  Control()
+      : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CONTROL) {}
 
   /**
    * @brief module name
@@ -99,6 +99,8 @@ class Control : public apollo::common::ApolloApp {
   void SendCmd(ControlCommand *control_command);
 
  private:
+  double init_time_ = 0.0;
+
   localization::LocalizationEstimate localization_;
   canbus::Chassis chassis_;
   planning::ADCTrajectory trajectory_;

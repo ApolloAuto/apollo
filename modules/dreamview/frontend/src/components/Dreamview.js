@@ -7,7 +7,8 @@ import MainView from "components/Layouts/MainView";
 import ToolView from "components/Layouts/ToolView";
 import PNCMonitor from "components/PNCMonitor";
 import SideBar from "components/SideBar";
-import WS from "store/websocket";
+import VoiceCommand from "components/VoiceCommand";
+import WS, {MAP_WS, POINT_CLOUD_WS} from "store/websocket";
 
 
 @inject("store") @observer
@@ -31,6 +32,8 @@ export default class Dreamview extends React.Component {
 
     componentDidMount() {
         WS.initialize();
+        MAP_WS.initialize();
+        POINT_CLOUD_WS.initialize();
         window.addEventListener("resize", () => {
             this.props.store.updateDimension();
         });
@@ -58,6 +61,9 @@ export default class Dreamview extends React.Component {
                             {options.showPNCMonitor && <PNCMonitor />}
                         </div>
                     </SplitPane>
+                </div>
+                <div className="hidden">
+                    {options.enableVoiceCommand && <VoiceCommand />}
                 </div>
             </div>
         );

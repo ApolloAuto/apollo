@@ -20,10 +20,13 @@ limitations under the License.
 #include <mutex>
 #include <string>
 
+#include "modules/map/proto/map_id.pb.h"
+#include "modules/map/proto/map_speed_control.pb.h"
+
 #include "modules/common/configs/config_gflags.h"
+#include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/map/proto/map_id.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -55,9 +58,21 @@ std::string RoutingMapFile();
  * @return end way point file path
  */
 inline std::string EndWayPointFile() {
-  return apollo::common::util::StrCat(FLAGS_map_dir, "/",
-                                      FLAGS_end_way_point_filename);
+  if (FLAGS_use_navigation_mode) {
+    return apollo::common::util::StrCat(
+        FLAGS_navigation_mode_end_way_point_file);
+  } else {
+    return apollo::common::util::StrCat(FLAGS_map_dir, "/",
+                                        FLAGS_end_way_point_filename);
+  }
 }
+
+inline std::string SpeedControlFile() {
+  return apollo::common::util::StrCat(FLAGS_map_dir, "/",
+                                      FLAGS_speed_control_filename);
+}
+
+const SpeedControls* GetSpeedControls();
 
 /**
  * @brief create a Map ID given a string.
@@ -94,6 +109,7 @@ class HDMapUtil {
   HDMapUtil() = delete;
 
   static std::unique_ptr<HDMap> base_map_;
+  static uint64_t base_map_seq_;
   static std::mutex base_map_mutex_;
 
   static std::unique_ptr<HDMap> sim_map_;

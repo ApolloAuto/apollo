@@ -19,7 +19,7 @@
 #include "gflags/gflags.h"
 #include "modules/common/log.h"
 
-DEFINE_string(vehicle_data_path, "modules/calibration/data/mkz8",
+DEFINE_string(vehicle_data_path, "modules/calibration/data/mkz_example",
               "Vehicle data path.");
 
 int main(int argc, char **argv) {

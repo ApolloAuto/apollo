@@ -85,6 +85,11 @@ struct LaneSegment {
   double end_s = 0.0;
   double Length() const { return end_s - start_s; }
 
+  /**
+   * Join neighboring lane segments if they have the same lane id
+   */
+  static void Join(std::vector<LaneSegment>* segments);
+
   std::string DebugString() const;
 };
 
@@ -206,12 +211,19 @@ class InterpolatedIndex {
 class Path {
  public:
   Path() = default;
-  explicit Path(std::vector<MapPathPoint> path_points);
+  explicit Path(const std::vector<MapPathPoint>& path_points);
+  explicit Path(std::vector<MapPathPoint>&& path_points);
 
-  Path(std::vector<MapPathPoint> path_points,
-       std::vector<LaneSegment> lane_segments);
-  Path(std::vector<MapPathPoint> path_points,
-       std::vector<LaneSegment> lane_segments,
+  Path(const std::vector<MapPathPoint>& path_points,
+       const std::vector<LaneSegment>& lane_segments);
+  Path(std::vector<MapPathPoint>&& path_points,
+       std::vector<LaneSegment>&& lane_segments);
+
+  Path(const std::vector<MapPathPoint>& path_points,
+       const std::vector<LaneSegment>& lane_segments,
+       const double max_approximation_error);
+  Path(std::vector<MapPathPoint>&& path_points,
+       std::vector<LaneSegment>&& lane_segments,
        const double max_approximation_error);
 
   // Return smooth coordinate by interpolated index or accumulate_s.
@@ -259,6 +271,8 @@ class Path {
   const PathApproximation* approximation() const { return &approximation_; }
   double length() const { return length_; }
 
+  const PathOverlap* NextLaneOverlap(double s) const;
+
   const std::vector<PathOverlap>& lane_overlaps() const {
     return lane_overlaps_;
   }
@@ -287,9 +301,15 @@ class Path {
     return speed_bump_overlaps_;
   }
 
-  double GetLeftWidth(const double s) const;
-  double GetRightWidth(const double s) const;
-  bool GetWidth(const double s, double* left_width, double* right_width) const;
+  double GetLaneLeftWidth(const double s) const;
+  double GetLaneRightWidth(const double s) const;
+  bool GetLaneWidth(const double s, double* lane_left_width,
+                    double* lane_right_width) const;
+
+  double GetRoadLeftWidth(const double s) const;
+  double GetRoadRightWidth(const double s) const;
+  bool GetRoadWidth(const double s, double* road_left_width,
+                    double* road_ight_width) const;
 
   bool IsOnPath(const common::math::Vec2d& point) const;
   bool OverlapWith(const common::math::Box2d& box, double width) const;
@@ -308,7 +328,7 @@ class Path {
 
   using GetOverlapFromLaneFunc =
       std::function<const std::vector<OverlapInfoConstPtr>&(const LaneInfo&)>;
-  void GetAllOverlaps(GetOverlapFromLaneFunc get_overlaps_from_lane,
+  void GetAllOverlaps(GetOverlapFromLaneFunc GetOverlaps_from_lane,
                       std::vector<PathOverlap>* const overlaps) const;
 
  protected:
@@ -326,8 +346,10 @@ class Path {
 
   // Sampled every fixed length.
   int num_sample_points_ = 0;
-  std::vector<double> left_width_;
-  std::vector<double> right_width_;
+  std::vector<double> lane_left_width_;
+  std::vector<double> lane_right_width_;
+  std::vector<double> road_left_width_;
+  std::vector<double> road_right_width_;
   std::vector<int> last_point_index_;
 
   std::vector<PathOverlap> lane_overlaps_;

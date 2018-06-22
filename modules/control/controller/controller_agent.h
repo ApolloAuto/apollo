@@ -82,7 +82,7 @@ class ControllerAgent {
    * Register new controllers. If you need to add a new type of controller,
    * You should first register your controller in this function.
    */
-  void RegisterControllers();
+  void RegisterControllers(const ControlConf *control_conf);
 
   common::Status InitializeConf(const ControlConf *control_conf);
 

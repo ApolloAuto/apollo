@@ -32,10 +32,54 @@
 
 #include "google/protobuf/util/message_differencer.h"
 
-#include "modules/common/math/vec2d.h"
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+
+#include "modules/common/math/vec2d.h"
+
+// The helper function "std::make_unique()" is defined since C++14.
+// The definition of "std::make_unique()" borrowed from C++14 is given here
+// so that it can be used in C++11.
+#if __cplusplus == 201103L
+namespace std {
+
+template <typename _Tp>
+struct _MakeUniq {
+  typedef unique_ptr<_Tp> __single_object;
+};
+
+template <typename _Tp>
+struct _MakeUniq<_Tp[]> {
+  typedef unique_ptr<_Tp[]> __array;
+};
+
+template <typename _Tp, size_t _Bound>
+struct _MakeUniq<_Tp[_Bound]> {
+  struct __invalid_type {};
+};
+
+// std::make_unique for single objects
+template <typename _Tp, typename... _Args>
+inline typename _MakeUniq<_Tp>::__single_object make_unique(_Args&&... __args) {
+  return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+}
+
+// Alias template for remove_extent
+template <typename _Tp>
+using remove_extent_t = typename remove_extent<_Tp>::type;
+
+// std::make_unique for arrays of unknown bound
+template <typename _Tp>
+inline typename _MakeUniq<_Tp>::__array make_unique(size_t __num) {
+  return unique_ptr<_Tp>(new remove_extent_t<_Tp>[__num]());
+}
+
+// Disable std::make_unique for arrays of known bound
+template <typename _Tp, typename... _Args>
+inline typename _MakeUniq<_Tp>::__invalid_type make_unique(_Args&&...) = delete;
+}  // namespace std
+#endif
 
 /**
  * @namespace apollo::common::util
@@ -44,12 +88,6 @@
 namespace apollo {
 namespace common {
 namespace util {
-
-template <typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args) {
-  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
 template <typename ProtoA, typename ProtoB>
 bool IsProtoEqual(const ProtoA& a, const ProtoB& b) {
   return google::protobuf::util::MessageDifferencer::Equals(a, b);
@@ -82,6 +120,8 @@ common::math::Vec2d MakeVec2d(const T& t) {
 
 PointENU MakePointENU(const double x, const double y, const double z);
 
+PointENU operator+(const PointENU enu, const math::Vec2d& xy);
+
 PointENU MakePointENU(const math::Vec2d& xy);
 
 apollo::perception::Point MakePerceptionPoint(const double x, const double y,
@@ -99,8 +139,20 @@ PathPoint MakePathPoint(const double x, const double y, const double z,
  * the result sliced will contain the n + 1 points that slices the provided
  * segment. `start` and `end` will be the first and last element in `sliced`.
  */
-void uniform_slice(double start, double end, uint32_t num,
-                   std::vector<double>* sliced);
+template <typename T>
+void uniform_slice(const T start, const T end, uint32_t num,
+                   std::vector<T>* sliced) {
+  if (!sliced || num == 0) {
+    return;
+  }
+  const T delta = (end - start) / num;
+  sliced->resize(num + 1);
+  T s = start;
+  for (uint32_t i = 0; i < num; ++i, s += delta) {
+    sliced->at(i) = s;
+  }
+  sliced->at(num) = end;
+}
 
 template <typename Container>
 typename Container::value_type MaxElement(const Container& elements) {
@@ -153,6 +205,52 @@ bool SamePointXY(const U& u, const V& v) {
   constexpr double kMathEpsilonSqr = 1e-8 * 1e-8;
   return (u.x() - v.x()) * (u.x() - v.x()) < kMathEpsilonSqr &&
          (u.y() - v.y()) * (u.y() - v.y()) < kMathEpsilonSqr;
+}
+
+PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,
+                                            const PathPoint& p2,
+                                            const double w1, const double w2);
+
+// a wrapper template function for remove_if (notice that remove_if cannot
+// change the Container size)
+template <class Container, class F>
+void erase_where(Container& c, F&& f) {  // NOLINT
+  c.erase(std::remove_if(c.begin(), c.end(), std::forward<F>(f)), c.end());
+}
+
+// a wrapper template function for remove_if on associative containers
+template <class Container, class F>
+void erase_map_where(Container& c, F&& f) {  // NOLINT
+  for (auto it = c.begin(); it != c.end();) {
+    if (f(*it)) {
+      it = c.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
+template <typename T>
+void QuaternionToRotationMatrix(const T* quat, T* R) {
+  T x2 = quat[0] * quat[0];
+  T xy = quat[0] * quat[1];
+  T rx = quat[3] * quat[0];
+  T y2 = quat[1] * quat[1];
+  T yz = quat[1] * quat[2];
+  T ry = quat[3] * quat[1];
+  T z2 = quat[2] * quat[2];
+  T zx = quat[2] * quat[0];
+  T rz = quat[3] * quat[2];
+  T r2 = quat[3] * quat[3];
+  R[0] = r2 + x2 - y2 - z2;  // fill diagonal terms
+  R[4] = r2 - x2 + y2 - z2;
+  R[8] = r2 - x2 - y2 + z2;
+  R[3] = 2 * (xy + rz);  // fill off diagonal terms
+  R[6] = 2 * (zx - ry);
+  R[7] = 2 * (yz + rx);
+  R[1] = 2 * (xy - rz);
+  R[2] = 2 * (zx + ry);
+  R[5] = 2 * (yz - rx);
 }
 
 }  // namespace util

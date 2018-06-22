@@ -1,0 +1,13 @@
+<launch>
+  <arg name="topic_pointcloud" default="/apollo/sensor/pandora/hesai40/PointCloud2"/>
+  <arg name="topic_compensated_pointcloud" default="/apollo/sensor/pandora/hesai40/compensator/PointCloud2"/>
+  <arg name="child_frame_id" default="hesai40"/>
+  <arg name="tf_query_timeout" default="0.1"/>
+
+  <node pkg="pandora_pointcloud" name="pandora_pointcloud" type="compensator_node" output="screen" >
+    <param name="topic_pointcloud" value="$(arg topic_pointcloud)"/>
+    <param name="topic_compensated_pointcloud" value="$(arg topic_compensated_pointcloud)"/>
+    <param name="child_frame_id" value="$(arg child_frame_id)"/>
+    <param name="tf_query_timeout" value="$(arg tf_query_timeout)"/>
+  </node>
+</launch>

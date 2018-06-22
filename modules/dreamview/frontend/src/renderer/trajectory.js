@@ -11,7 +11,7 @@ const PLANNING_PROPERTIES = {
         zOffset: 7
     },
     DpPolyPathOptimizer: {
-        optionName: 'showPlaningDpOptimizer',
+        optionName: 'showPlanningDpOptimizer',
         width: 0.4,
         color: 0x8DFCB4,
         opacity: 0.8,

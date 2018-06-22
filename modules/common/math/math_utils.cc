@@ -16,6 +16,7 @@
 
 #include "modules/common/math/math_utils.h"
 
+#include <cmath>
 #include <utility>
 
 #include "glog/logging.h"
@@ -82,6 +83,17 @@ double Gaussian(const double u, const double std, const double x) {
 
 // Sigmoid
 double Sigmoid(const double x) { return 1.0 / (1.0 + std::exp(-x)); }
+
+void RotateAxis(const double theta, const double x0, const double y0,
+                double* x1, double* y1) {
+  CHECK_NOTNULL(x1);
+  CHECK_NOTNULL(y1);
+
+  const double cos_theta = std::cos(theta);
+  const double sin_theta = std::sin(theta);
+  *x1 = x0 * cos_theta + y0 * sin_theta;
+  *y1 = -x0 * sin_theta + y0 * cos_theta;
+}
 
 }  // namespace math
 }  // namespace common

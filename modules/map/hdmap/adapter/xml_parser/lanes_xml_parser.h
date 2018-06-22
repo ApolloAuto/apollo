@@ -51,6 +51,8 @@ class LanesXmlParser {
   static Status ParseSpeed(const tinyxml2::XMLElement& xml_node, PbLane* lane);
   static Status ParseSampleAssociates(const tinyxml2::XMLElement& xml_node,
                                       PbLane* lane);
+  static Status ParseRoadSampleAssociates(const tinyxml2::XMLElement& xml_node,
+                                      PbLane* lane);
   static Status ParseObjectOverlapGroup(
       const tinyxml2::XMLElement& xml_node,
       std::vector<OverlapWithLane>* object_overlaps);

@@ -27,6 +27,7 @@
 #include "boost/thread/locks.hpp"
 #include "boost/thread/shared_mutex.hpp"
 
+#include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "third_party/json/json.hpp"
 
@@ -37,41 +38,19 @@
 namespace apollo {
 namespace dreamview {
 
-struct MapElementIds {
-  std::vector<std::string> lane;
-  std::vector<std::string> crosswalk;
-  std::vector<std::string> junction;
-  std::vector<std::string> signal;
-  std::vector<std::string> stop_sign;
-  std::vector<std::string> yield;
-  std::vector<std::string> overlap;
-
-  MapElementIds() = default;
-  explicit MapElementIds(const nlohmann::json &json_object);
-
-  void LogDebugInfo() const {
-    AINFO << "Lanes: " << lane.size();
-    AINFO << "Crosswalks: " << crosswalk.size();
-    AINFO << "Junctions: " << junction.size();
-    AINFO << "Signals: " << signal.size();
-    AINFO << "StopSigns: " << stop_sign.size();
-    AINFO << "YieldSigns: " << yield.size();
-    AINFO << "Overlaps: " << overlap.size();
-  }
-
-  size_t Hash() const;
-  nlohmann::json Json() const;
-};
-
 class MapService {
  public:
   explicit MapService(bool use_sim_map = true);
 
-  inline double GetXOffset() const { return x_offset_; }
-  inline double GetYOffset() const { return y_offset_; }
+  inline double GetXOffset() const {
+    return x_offset_;
+  }
+  inline double GetYOffset() const {
+    return y_offset_;
+  }
 
-  MapElementIds CollectMapElementIds(const apollo::common::PointENU &point,
-                                     double raidus) const;
+  void CollectMapElementIds(const apollo::common::PointENU &point,
+                            double raidus, MapElementIds *ids) const;
 
   bool GetPathsFromRouting(const apollo::routing::RoutingResponse &routing,
                            std::vector<apollo::hdmap::Path> *paths) const;
@@ -101,6 +80,8 @@ class MapService {
   // Reload map from current FLAGS_map_dir.
   bool ReloadMap(bool force_reload);
 
+  size_t CalculateMapHash(const MapElementIds &ids) const;
+
  private:
   void UpdateOffsets();
   bool GetNearestLane(const double x, const double y,
@@ -113,12 +94,14 @@ class MapService {
   bool AddPathFromPassageRegion(const routing::Passage &passage_region,
                                 std::vector<apollo::hdmap::Path> *paths) const;
 
+  static const char kMetaFileName[];
+
   const bool use_sim_map_;
-  const hdmap::HDMap *hdmap_ = nullptr;
+  const hdmap::HDMap *HDMap() const;
   // A downsampled map for dreamview frontend display.
-  const hdmap::HDMap *sim_map_ = nullptr;
-  bool pending_ = true;
-  const std::string meta_filename_ = "/metaInfo.json";
+  const hdmap::HDMap *SimMap() const;
+  bool MapReady() const;
+
   double x_offset_ = 0.0;
   double y_offset_ = 0.0;
 

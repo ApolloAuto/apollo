@@ -1,7 +1,5 @@
 planner_type : EM
 em_planner_config {
-    task : TRAFFIC_DECIDER
-
     task : DP_POLY_PATH_OPTIMIZER
 
     task : PATH_DECIDER
@@ -13,13 +11,13 @@ em_planner_config {
     task : QP_SPLINE_ST_SPEED_OPTIMIZER
 
     dp_poly_path_config {
-        sample_points_num_each_level: 5
+        sample_points_num_each_level: 7
         step_length_max: 40.0
         step_length_min: 20.0
         lateral_sample_offset: 0.5
         lateral_adjust_coeff: 0.5
         eval_time_interval: 0.1
-        path_resolution: 2.0
+        path_resolution: 1.0
         obstacle_ignore_distance: 20.0
         obstacle_collision_distance: 0.5
         obstacle_risk_distance: 2.0
@@ -32,10 +30,12 @@ em_planner_config {
         path_l_cost_param_k: 1.5
         path_out_lane_cost: 1e8
         path_end_l_cost: 1.0e4
+        sidepass_distance: 2.8
+        navigator_sample_num_each_level: 3
     }
     dp_st_speed_config {
-        total_path_length: 150
-        total_time: 8.0
+        total_path_length: 149
+        total_time: 7.0
         matrix_dimension_s: 150
         matrix_dimension_t: 8
 
@@ -52,6 +52,7 @@ em_planner_config {
         default_speed_cost: 1.0e3
         exceed_speed_penalty: 10.0
         low_speed_penalty: 10.0
+        keep_clear_low_speed_penalty: 10.0
 
         accel_penalty: 1.0
         decel_penalty: 1.0
@@ -65,7 +66,7 @@ em_planner_config {
         st_boundary_config {
             boundary_buffer: 0.1
             high_speed_centric_acceleration_limit: 0.8
-            low_speed_centric_acceleration_limit: 1.5
+            low_speed_centric_acceleration_limit: 1.2
             high_speed_threshold: 12.58
             low_speed_threshold: 7.5
             minimal_kappa: 0.00001
@@ -74,6 +75,7 @@ em_planner_config {
             num_points_to_avg_kappa: 2
             static_obs_nudge_speed_ratio: 0.6
             dynamic_obs_nudge_speed_ratio: 0.8
+            centri_jerk_speed_coeff: 1.0
         }
     }
     qp_spline_path_config {
@@ -110,7 +112,7 @@ em_planner_config {
             speed_kernel_weight: 0.0
             accel_kernel_weight: 1000.0
             jerk_kernel_weight: 1000.0
-            follow_weight: 8.0
+            follow_weight: 5.0
             stop_weight: 0.2
             cruise_weight: 0.3
             regularization_weight: 0.1
@@ -124,7 +126,7 @@ em_planner_config {
             number_of_evaluated_graph_t: 40
             accel_kernel_weight: 1000.0
             jerk_kernel_weight: 100.0
-            follow_weight: 8.0
+            follow_weight: 5.0
             stop_weight: 0.2
             cruise_weight: 0.5
             regularization_weight: 0.1
@@ -133,7 +135,7 @@ em_planner_config {
         st_boundary_config {
             boundary_buffer: 0.1
             high_speed_centric_acceleration_limit: 0.8
-            low_speed_centric_acceleration_limit: 1.5
+            low_speed_centric_acceleration_limit: 1.2
             high_speed_threshold: 12.58
             low_speed_threshold: 7.5
             minimal_kappa: 0.00001
@@ -142,6 +144,7 @@ em_planner_config {
             num_points_to_avg_kappa: 2
             static_obs_nudge_speed_ratio: 0.6
             dynamic_obs_nudge_speed_ratio: 0.8
+            centri_jerk_speed_coeff: 1.0
         }
     }
     poly_st_speed_config {
@@ -174,32 +177,4 @@ em_planner_config {
             dynamic_obs_nudge_speed_ratio: 0.8
         }
     }
-}
-
-qp_spline_reference_line_smoother_config {
-    spline_order: 5
-    max_spline_length: 25.0
-    max_constraint_interval : 5.0
-    longitudinal_boundary_bound: 2.0
-    lateral_boundary_bound: 0.25
-    second_derivative_weight: 200.0
-    third_derivative_weight: 1000.0
-    num_of_total_points: 500
-    regularization_weight: 1.0e-5
-}
-
-rule_config : {
-    rule_id: BACKSIDE_VEHICLE
-}
-rule_config : {
-    rule_id: SIGNAL_LIGHT
-}
-rule_config : {
-    rule_id: REFERENCE_LINE_END
-}
-rule_config : {
-    rule_id: DESTINATION
-}
-rule_config : {
-    rule_id: CHANGE_LANE
 }

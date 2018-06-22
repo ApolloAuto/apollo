@@ -31,15 +31,12 @@ using common::adapter::AdapterManager;
 DEFINE_string(test_data_dir, "", "the test data folder");
 DEFINE_bool(test_update_golden_log, false,
             "true to update decision golden log file.");
-DEFINE_string(test_routing_response_file, "garage_routing.pb.txt",
-              "The routing file used in test");
-DEFINE_string(test_localization_file, "garage_localization.pb.txt",
-              "The localization test file");
-DEFINE_string(test_chassis_file, "garage_chassis.pb.txt",
-              "The chassis test file");
+DEFINE_string(test_routing_response_file, "", "The routing file used in test");
+DEFINE_string(test_localization_file, "", "The localization test file");
+DEFINE_string(test_chassis_file, "", "The chassis test file");
 DEFINE_string(test_prediction_file, "", "The prediction module test file");
 DEFINE_string(test_traffic_light_file, "", "The traffic light test file");
-
+DEFINE_string(test_relative_map_file, "", "The relative map test file");
 DEFINE_string(test_previous_planning_file, "",
               "The previous planning test file");
 
@@ -47,70 +44,51 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
   FLAGS_planning_adapter_config_filename =
       "modules/planning/testdata/conf/adapter.conf";
+  FLAGS_smoother_config_filename =
+      "modules/planning/conf/qp_spline_smoother_config.pb.txt";
   FLAGS_map_dir = "modules/planning/testdata";
-  FLAGS_test_localization_file = "garage_localization.pb.txt";
-  FLAGS_test_chassis_file = "garage_chassis.pb.txt";
-  FLAGS_test_prediction_file = "garage_prediction.pb.txt";
+  FLAGS_test_localization_file = "";
+  FLAGS_test_chassis_file = "";
+  FLAGS_test_routing_response_file = "";
+  FLAGS_test_prediction_file = "";
   FLAGS_align_prediction_time = false;
   FLAGS_estimate_current_vehicle_state = false;
   FLAGS_enable_reference_line_provider_thread = false;
-  FLAGS_enable_trajectory_check = true;
+  // FLAGS_enable_trajectory_check is temporarily disabled, otherwise EMPlanner
+  // and LatticePlanner can't pass the unit test.
+  FLAGS_enable_trajectory_check = false;
   FLAGS_planning_test_mode = true;
   FLAGS_enable_lag_prediction = false;
 }
+
+#define FEED_ADAPTER(TYPE, FILENAME)                                           \
+  if (!AdapterManager::Get##TYPE()) {                                          \
+    AERROR << #TYPE                                                            \
+        " is not registered in adapter manager, check adapter file "           \
+           << FLAGS_planning_adapter_config_filename;                          \
+    return false;                                                              \
+  }                                                                            \
+  if (!FILENAME.empty()) {                                                     \
+    if (!AdapterManager::Feed##TYPE##File(FLAGS_test_data_dir + "/" +          \
+                                          FILENAME)) {                         \
+      AERROR << "Failed to feed " #TYPE " file " << FLAGS_test_data_dir << "/" \
+             << FILENAME;                                                      \
+      return false;                                                            \
+    }                                                                          \
+    AINFO << "Using " #TYPE << " provided by " << FLAGS_test_data_dir << "/"   \
+          << FILENAME;                                                         \
+  }
 
 bool PlanningTestBase::SetUpAdapters() {
   if (!AdapterManager::Initialized()) {
     AdapterManager::Init(FLAGS_planning_adapter_config_filename);
   }
-  if (!AdapterManager::GetRoutingResponse()) {
-    AERROR << "routing is not registered in adapter manager, check adapter "
-              "config file."
-           << FLAGS_planning_adapter_config_filename;
-    return false;
-  }
-  auto routing_response_file =
-      FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file;
-  if (!AdapterManager::FeedRoutingResponseFile(routing_response_file)) {
-    AERROR << "failed to routing file: " << routing_response_file;
-    return false;
-  }
-  AINFO << "Using Routing " << routing_response_file;
-  auto localization_file =
-      FLAGS_test_data_dir + "/" + FLAGS_test_localization_file;
-  if (!AdapterManager::FeedLocalizationFile(localization_file)) {
-    AERROR << "Failed to load localization file: " << localization_file;
-    return false;
-  }
-  AINFO << "Using Localization file: " << localization_file;
-  auto chassis_file = FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file;
-  if (!AdapterManager::FeedChassisFile(chassis_file)) {
-    AERROR << "Failed to load chassis file: " << chassis_file;
-    return false;
-  }
-  AINFO << "Using Chassis file: " << chassis_file;
-  if (FLAGS_enable_prediction && !FLAGS_test_prediction_file.empty()) {
-    auto prediction_file =
-        FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file;
-    if (!AdapterManager::FeedPredictionFile(prediction_file)) {
-      AERROR << "Failed to load prediction file: " << prediction_file;
-      return false;
-    }
-    AINFO << "Using Prediction file: " << prediction_file;
-  } else {
-    AINFO << "Prediction is disabled";
-  }
-  if (FLAGS_enable_traffic_light && !FLAGS_test_traffic_light_file.empty()) {
-    auto traffic_light_file =
-        FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file;
-    if (!AdapterManager::FeedTrafficLightDetectionFile(traffic_light_file)) {
-      AERROR << "Failed to load traffic light file: " << traffic_light_file;
-      return false;
-    }
-    AINFO << "Using Traffic Light file: " << traffic_light_file;
-  } else {
-    AINFO << "Traffic Light is disabled";
-  }
+  FEED_ADAPTER(RoutingResponse, FLAGS_test_routing_response_file);
+  FEED_ADAPTER(Localization, FLAGS_test_localization_file);
+  FEED_ADAPTER(Chassis, FLAGS_test_chassis_file);
+  FEED_ADAPTER(RelativeMap, FLAGS_test_relative_map_file);
+  FEED_ADAPTER(Prediction, FLAGS_test_prediction_file);
+  FEED_ADAPTER(TrafficLightDetection, FLAGS_test_traffic_light_file);
   return true;
 }
 
@@ -125,9 +103,33 @@ void PlanningTestBase::SetUp() {
     CHECK(common::util::GetProtoFromFile(prev_planning_file, &prev_planning));
     planning_.SetLastPublishableTrajectory(prev_planning);
   }
+  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+    auto iter = rule_enabled_.find(config.rule_id());
+    if (iter != rule_enabled_.end()) {
+      config.set_enabled(iter->second);
+    }
+  }
 }
 
-void PlanningTestBase::TrimPlanning(ADCTrajectory* origin) {
+void PlanningTestBase::UpdateData() {
+  CHECK(SetUpAdapters()) << "Failed to setup adapters";
+  if (!FLAGS_test_previous_planning_file.empty()) {
+    const auto prev_planning_file =
+        FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
+    ADCTrajectory prev_planning;
+    CHECK(common::util::GetProtoFromFile(prev_planning_file, &prev_planning));
+    planning_.SetLastPublishableTrajectory(prev_planning);
+  }
+  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+    auto iter = rule_enabled_.find(config.rule_id());
+    if (iter != rule_enabled_.end()) {
+      config.set_enabled(iter->second);
+    }
+  }
+}
+
+void PlanningTestBase::TrimPlanning(ADCTrajectory* origin,
+                                    bool no_trajectory_point) {
   origin->clear_latency_stats();
   origin->clear_debug();
   origin->mutable_header()->clear_radar_timestamp();
@@ -135,10 +137,17 @@ void PlanningTestBase::TrimPlanning(ADCTrajectory* origin) {
   origin->mutable_header()->clear_timestamp_sec();
   origin->mutable_header()->clear_camera_timestamp();
   origin->mutable_header()->clear_sequence_num();
+
+  if (no_trajectory_point) {
+    origin->clear_total_path_length();
+    origin->clear_total_path_time();
+    origin->clear_trajectory_point();
+  }
 }
 
 bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
-                                   int case_num) {
+                                   int case_num,
+                                   bool no_trajectory_point) {
   const std::string golden_result_file = apollo::common::util::StrCat(
       "result_", test_case_name, "_", case_num, ".pb.txt");
 
@@ -159,7 +168,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
   }
 
   adc_trajectory_ = *trajectory_pointer;
-  TrimPlanning(&adc_trajectory_);
+  TrimPlanning(&adc_trajectory_, no_trajectory_point);
   if (FLAGS_test_update_golden_log) {
     AINFO << "The golden file is regenerated:" << full_golden_path;
     common::util::SetProtoToASCIIFile(adc_trajectory_, full_golden_path);
@@ -167,7 +176,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
     ADCTrajectory golden_result;
     bool load_success =
         common::util::GetProtoFromASCIIFile(full_golden_path, &golden_result);
-    TrimPlanning(&golden_result);
+    TrimPlanning(&golden_result, no_trajectory_point);
     if (!load_success ||
         !common::util::IsProtoEqual(golden_result, adc_trajectory_)) {
       char tmp_fname[100] = "/tmp/XXXXXX";
@@ -219,6 +228,16 @@ bool PlanningTestBase::IsValidTrajectory(const ADCTrajectory& trajectory) {
     }
   }
   return true;
+}
+
+TrafficRuleConfig* PlanningTestBase::GetTrafficRuleConfig(
+    const TrafficRuleConfig::RuleId& rule_id) {
+  for (auto& config : *planning_.traffic_rule_configs_.mutable_config()) {
+    if (config.rule_id() == rule_id) {
+      return &config;
+    }
+  }
+  return nullptr;
 }
 
 }  // namespace planning

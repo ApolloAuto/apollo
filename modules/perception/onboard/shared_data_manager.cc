@@ -16,10 +16,7 @@
 
 #include "modules/perception/onboard/shared_data_manager.h"
 
-#include <string>
-
 #include "modules/common/log.h"
-#include "modules/perception/onboard/shared_data.h"
 
 namespace apollo {
 namespace perception {
@@ -34,7 +31,7 @@ bool SharedDataManager::Init(const DAGConfig::SharedDataConfig &data_config) {
     SharedData *shared_data =
         SharedDataRegisterer::GetInstanceByName(proto.name());
 
-    if (shared_data == NULL) {
+    if (shared_data == nullptr) {
       AERROR << "failed to get SharedData instance: " << proto.name();
       return false;
     }
@@ -62,7 +59,7 @@ bool SharedDataManager::Init(const DAGConfig::SharedDataConfig &data_config) {
 SharedData *SharedDataManager::GetSharedData(const std::string &name) const {
   auto citer = shared_data_map_.find(name);
   if (citer == shared_data_map_.end()) {
-    return NULL;
+    return nullptr;
   }
   return citer->second.get();
 }

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef apollo_PERCEPTION_LIB_BASE_CONCURRENT_QUEUE_H
-#define apollo_PERCEPTION_LIB_BASE_CONCURRENT_QUEUE_H
+#ifndef MODULES_PERCEPTION_LIB_BASE_CONCURRENT_QUEUE_H_
+#define MODULES_PERCEPTION_LIB_BASE_CONCURRENT_QUEUE_H_
 
 #include <queue>
 
@@ -31,54 +31,54 @@ class ConcurrentQueue {
   virtual ~ConcurrentQueue() {}
 
   virtual void push(const Data& data) {
-    MutexLock lock(&_mutex);
-    _queue.push(data);
-    _condition_variable.Signal();
+    MutexLock lock(&mutex_);
+    queue_.push(data);
+    condition_variable_.Signal();
   }
 
   virtual void pop(Data* data) {
-    MutexLock lock(&_mutex);
+    MutexLock lock(&mutex_);
 
-    while (_queue.empty()) {
-      _condition_variable.Wait(&_mutex);
+    while (queue_.empty()) {
+      condition_variable_.Wait(&mutex_);
     }
-    *data = _queue.front();
-    _queue.pop();
+    *data = queue_.front();
+    queue_.pop();
   }
 
   bool try_pop(Data* data) {
-    MutexLock lock(&_mutex);
+    MutexLock lock(&mutex_);
 
-    if (_queue.empty()) {
+    if (queue_.empty()) {
       return false;
     }
 
-    *data = _queue.front();
-    _queue.pop();
+    *data = queue_.front();
+    queue_.pop();
     return true;
   }
 
   bool empty() {
-    MutexLock lock(&_mutex);
-    return _queue.empty();
+    MutexLock lock(&mutex_);
+    return queue_.empty();
   }
 
   int size() {
-    MutexLock lock(&_mutex);
-    return _queue.size();
+    MutexLock lock(&mutex_);
+    return queue_.size();
   }
 
   void clear() {
-    MutexLock lock(&_mutex);
-    while (!_queue.empty()) {
-      _queue.pop();
+    MutexLock lock(&mutex_);
+    while (!queue_.empty()) {
+      queue_.pop();
     }
   }
 
  protected:
-  std::queue<Data> _queue;
-  Mutex _mutex;
-  CondVar _condition_variable;
+  std::queue<Data> queue_;
+  Mutex mutex_;
+  CondVar condition_variable_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(ConcurrentQueue);
@@ -88,64 +88,64 @@ template <typename Data>
 class FixedSizeConQueue : public ConcurrentQueue<Data> {
  public:
   explicit FixedSizeConQueue(size_t max_count)
-      : ConcurrentQueue<Data>(), _max_count(max_count) {}
+      : ConcurrentQueue<Data>(), max_count_(max_count) {}
 
   virtual ~FixedSizeConQueue() {}
 
   virtual void push(const Data& data) {
-    MutexLock lock(&this->_mutex);
-    while (this->_queue.size() >= _max_count) {
-      _condition_full.Wait(&this->_mutex);
+    MutexLock lock(&this->mutex_);
+    while (this->queue_.size() >= max_count_) {
+      condition_full_.Wait(&this->mutex_);
     }
-    this->_queue.push(data);
-    this->_condition_variable.Signal();
+    this->queue_.push(data);
+    this->condition_variable_.Signal();
   }
 
   virtual bool try_push(const Data& data) {
-    MutexLock lock(&this->_mutex);
-    if (this->_queue.size() >= _max_count) {
+    MutexLock lock(&this->mutex_);
+    if (this->queue_.size() >= max_count_) {
       return false;
     }
-    this->_queue.push(data);
-    this->_condition_variable.Signal();
+    this->queue_.push(data);
+    this->condition_variable_.Signal();
     return true;
   }
 
   virtual void pop(Data* data) {
-    MutexLock lock(&this->_mutex);
+    MutexLock lock(&this->mutex_);
 
-    while (this->_queue.empty()) {
-      this->_condition_variable.Wait(&this->_mutex);
+    while (this->queue_.empty()) {
+      this->condition_variable_.Wait(&this->mutex_);
     }
-    *data = this->_queue.front();
-    this->_queue.pop();
-    _condition_full.Signal();
+    *data = this->queue_.front();
+    this->queue_.pop();
+    condition_full_.Signal();
   }
 
   virtual bool try_pop(Data* data) {
-    MutexLock lock(&this->_mutex);
+    MutexLock lock(&this->mutex_);
 
-    if (this->_queue.empty()) {
+    if (this->queue_.empty()) {
       return false;
     }
 
-    *data = this->_queue.front();
-    this->_queue.pop();
-    _condition_full.Signal();
+    *data = this->queue_.front();
+    this->queue_.pop();
+    condition_full_.Signal();
     return true;
   }
 
   bool full() const {
-    return this->_queue.size() >= _max_count;
+    return this->queue_.size() >= max_count_;
   }
 
  private:
-  CondVar _condition_full;
-  const size_t _max_count;
+  CondVar condition_full_;
+  const size_t max_count_;
   DISALLOW_COPY_AND_ASSIGN(FixedSizeConQueue);
 };
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // apollo_PERCEPTION_LIB_BASE_CONCURRENT_QUEUE_H
+#endif  // MODULES_PERCEPTION_LIB_BASE_CONCURRENT_QUEUE_H_

@@ -1,7 +1,5 @@
-import devConfig from "store/config/dev.yml";
 import STORE from "store";
 import RENDERER from "renderer";
-
 
 export default class OfflinePlaybackWebSocketEndpoint {
     constructor(serverAddr) {
@@ -15,13 +13,16 @@ export default class OfflinePlaybackWebSocketEndpoint {
     }
 
     initialize(params) {
-        if (params && params.url && params.id && params.map) {
-            this.serverUrl = `${location.protocol}//${params.url}`;
-            STORE.playback.setJobId(params.id);
+        if (params && params.id && params.map) {
+            STORE.playback.setRecordId(params.id);
             STORE.playback.setMapId(params.map);
         } else {
             console.error("ERROR: missing required parameter(s)");
             return;
+        }
+
+        if (params.url) {
+            this.serverUrl = `${location.protocol}//${params.url}`;
         }
 
         try {
@@ -42,22 +43,26 @@ export default class OfflinePlaybackWebSocketEndpoint {
             switch (message.type) {
                 case "GroundMetadata":
                     RENDERER.updateGroundMetadata(this.serverUrl, message.data);
-                    this.requstFrameCount(STORE.playback.jobId);
+                    this.requestFrameCount(STORE.playback.recordId);
                     break;
                 case "FrameCount":
                     STORE.playback.setNumFrames(message.data);
-                    this.requestSimulationWorld(STORE.playback.jobId, STORE.playback.next());
+                    if (STORE.playback.hasNext()) {
+                        this.requestSimulationWorld(STORE.playback.recordId, STORE.playback.next());
+                    }
                     break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
                     STORE.setInitializationStatus(true);
 
+                    const world = (typeof message.world) === "string"
+                        ? JSON.parse(message.world): message.world;
                     if (STORE.playback.isSeeking) {
-                        this.processSimWorld(message);
+                        this.processSimWorld(world);
                     }
 
-                    if (message.timestamp && !(message.timestamp in this.frameData)) {
-                        this.frameData[message.timestamp] = message;
+                    if (world.sequenceNum && !(world.sequenceNum in this.frameData)) {
+                        this.frameData[world.sequenceNum] = world;
                     }
 
                     break;
@@ -88,7 +93,7 @@ export default class OfflinePlaybackWebSocketEndpoint {
         clearInterval(this.requestTimer);
         this.requestTimer = setInterval(() => {
             if (this.websocket.readyState === this.websocket.OPEN && STORE.playback.initialized()) {
-                this.requestSimulationWorld(STORE.playback.jobId, STORE.playback.next());
+                this.requestSimulationWorld(STORE.playback.recordId, STORE.playback.next());
 
                 if (!STORE.playback.hasNext()) {
                     clearInterval(this.requestTimer);
@@ -100,9 +105,9 @@ export default class OfflinePlaybackWebSocketEndpoint {
         clearInterval(this.processTimer);
         this.processTimer = setInterval(() => {
             if (STORE.playback.initialized()) {
-                const timestamp = STORE.playback.seekingFrame * 100;
-                if (timestamp in this.frameData) {
-                    this.processSimWorld(this.frameData[timestamp]);
+                const frameId = STORE.playback.seekingFrame;
+                if (frameId in this.frameData) {
+                    this.processSimWorld(this.frameData[frameId]);
                 }
 
                 if (STORE.playback.replayComplete) {
@@ -127,36 +132,35 @@ export default class OfflinePlaybackWebSocketEndpoint {
         }));
     }
 
-    processSimWorld(message) {
-        if (STORE.playback.shouldProcessFrame(message.world)) {
-            STORE.updateTimestamp(message.timestamp);
-            STORE.updateWorldTimestamp(message.world.timestampSec);
+    processSimWorld(world) {
+        if (STORE.playback.shouldProcessFrame(world)) {
+            STORE.updateTimestamp(world.timestamp);
             RENDERER.maybeInitializeOffest(
-                message.world.autoDrivingCar.positionX,
-                message.world.autoDrivingCar.positionY);
-            RENDERER.updateWorld(message.world, message.planningData);
-            STORE.meters.update(message.world);
-            STORE.monitor.update(message.world);
-            STORE.trafficSignal.update(message.world);
+                world.autoDrivingCar.positionX,
+                world.autoDrivingCar.positionY);
+            RENDERER.updateWorld(world);
+            STORE.meters.update(world);
+            STORE.monitor.update(world);
+            STORE.trafficSignal.update(world);
         }
     }
-    requstFrameCount(jobId) {
+
+    requestFrameCount(recordId) {
         this.websocket.send(JSON.stringify({
             type: 'RetrieveFrameCount',
-            jobId: jobId,
+            recordId: recordId,
         }));
     }
 
-    requestSimulationWorld(jobId, frameId) {
-        const timestamp = frameId * 100;
-        if (!(timestamp in this.frameData)) {
+    requestSimulationWorld(recordId, frameId) {
+        if (!(frameId in this.frameData)) {
             this.websocket.send(JSON.stringify({
                 type : "RequestSimulationWorld",
-                jobId: jobId,
+                recordId: recordId,
                 frameId: frameId,
             }));
         } else if (STORE.playback.isSeeking) {
-            this.processSimWorld(this.frameData[timestamp]);
+            this.processSimWorld(this.frameData[frameId]);
         }
     }
 }

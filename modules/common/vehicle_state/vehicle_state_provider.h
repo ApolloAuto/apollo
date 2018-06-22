@@ -25,7 +25,7 @@
 #include <string>
 
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 
 #include "modules/common/macro.h"
@@ -67,6 +67,7 @@ class VehicleStateProvider {
   double timestamp() const;
 
   const localization::Pose& pose() const;
+  const localization::Pose& original_pose() const;
 
   /**
    * @brief Default destructor.
@@ -176,6 +177,7 @@ class VehicleStateProvider {
       const localization::LocalizationEstimate& localization);
 
   common::VehicleState vehicle_state_;
+  localization::LocalizationEstimate original_localization_;
 
   DECLARE_SINGLETON(VehicleStateProvider);
 };

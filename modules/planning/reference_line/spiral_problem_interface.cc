@@ -32,8 +32,8 @@ namespace planning {
 constexpr std::size_t N = 10;
 
 SpiralProblemInterface::SpiralProblemInterface(
-    std::vector<Eigen::Vector2d> points) {
-  init_points_ = std::move(points);
+    std::vector<Eigen::Vector2d> points)
+    : init_points_(std::move(points)) {
   num_of_points_ = init_points_.size();
   CHECK_GT(num_of_points_, 1);
 
@@ -142,13 +142,24 @@ bool SpiralProblemInterface::get_bounds_info(int n, double* x_l, double* x_u,
       x_upper = end_x_;
       y_lower = end_y_;
       y_upper = end_y_;
-    } else {
-      theta_lower = relative_theta_[i] - M_PI * 0.5;
-      theta_upper = relative_theta_[i] + M_PI * 0.5;
+    } else if (i + 1 == num_of_points_ && has_fixed_end_point_position_) {
+      theta_lower = relative_theta_[i] - M_PI * 0.2;
+      theta_upper = relative_theta_[i] + M_PI * 0.2;
       kappa_lower = -0.25;
       kappa_upper = 0.25;
-      dkappa_lower = -0.25;
-      dkappa_upper = 0.25;
+      dkappa_lower = -0.02;
+      dkappa_upper = 0.02;
+      x_lower = end_x_;
+      x_upper = end_x_;
+      y_lower = end_y_;
+      y_upper = end_y_;
+    } else {
+      theta_lower = relative_theta_[i] - M_PI * 0.2;
+      theta_upper = relative_theta_[i] + M_PI * 0.2;
+      kappa_lower = -0.25;
+      kappa_upper = 0.25;
+      dkappa_lower = -0.02;
+      dkappa_upper = 0.02;
       x_lower = init_points_[i].x() - default_max_point_deviation_;
       x_upper = init_points_[i].x() + default_max_point_deviation_;
       y_lower = init_points_[i].y() - default_max_point_deviation_;
@@ -255,11 +266,18 @@ bool SpiralProblemInterface::eval_f(int n, const double* x, bool new_x,
   for (std::size_t i = 0; i + 1 < num_of_points_; ++i) {
     const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
     double delta_s = spiral_curve.ParamLength();
-    double s_segment = delta_s / num_of_internal_points_;
 
     for (std::size_t j = 0; j < num_of_internal_points_; ++j) {
-      double dkappa = spiral_curve.Evaluate(2, s_segment * j);
-      obj_value += dkappa * dkappa;
+      double ratio = static_cast<double>(j) / num_of_internal_points_;
+      double s = ratio * delta_s;
+      double kappa = spiral_curve.Evaluate(1, s);
+      obj_value += kappa * kappa * weight_kappa_;
+
+      double dkappa = spiral_curve.Evaluate(2, s);
+      obj_value += dkappa * dkappa * weight_dkappa_;
+
+      double d2kappa = spiral_curve.Evaluate(3, s);
+      obj_value += d2kappa * d2kappa * weight_d2kappa_;
     }
   }
   return true;
@@ -281,35 +299,94 @@ bool SpiralProblemInterface::eval_grad_f(int n, const double* x, bool new_x,
 
     const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
     double delta_s = spiral_curve.ParamLength();
-    double s_segment = delta_s / num_of_internal_points_;
 
     for (std::size_t j = 0; j < num_of_internal_points_; ++j) {
       double ratio = static_cast<double>(j) / num_of_internal_points_;
 
-      double dkappa = spiral_curve.Evaluate(2, s_segment * j);
+      double kappa = spiral_curve.Evaluate(1, ratio * delta_s);
       grad_f[index0] +=
-          2.0 * dkappa *
+          weight_kappa_ * 2.0 * kappa *
           spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::THETA0, ratio);
       grad_f[index0 + 1] +=
-          2.0 * dkappa *
+          weight_kappa_ * 2.0 * kappa *
           spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::KAPPA0, ratio);
       grad_f[index0 + 2] +=
-          2.0 * dkappa *
+          weight_kappa_ * 2.0 * kappa *
           spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::DKAPPA0, ratio);
 
       grad_f[index1] +=
-          2.0 * dkappa *
+          weight_kappa_ * 2.0 * kappa *
           spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::THETA1, ratio);
       grad_f[index1 + 1] +=
-          2.0 * dkappa *
+          weight_kappa_ * 2.0 * kappa *
           spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::KAPPA1, ratio);
       grad_f[index1 + 2] +=
-          2.0 * dkappa *
+          weight_kappa_ * 2.0 * kappa *
           spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::DKAPPA1, ratio);
 
       grad_f[variable_offset + i] +=
-          2.0 * dkappa *
+          weight_kappa_ * 2.0 * kappa *
           spiral_curve.DeriveKappaDerivative(QuinticSpiralPath::DELTA_S, ratio);
+
+      double dkappa = spiral_curve.Evaluate(2, ratio * delta_s);
+      grad_f[index0] +=
+          weight_dkappa_ * 2.0 * dkappa *
+          spiral_curve.DeriveDKappaDerivative(QuinticSpiralPath::THETA0, ratio);
+      grad_f[index0 + 1] +=
+          weight_dkappa_ * 2.0 * dkappa *
+          spiral_curve.DeriveDKappaDerivative(QuinticSpiralPath::KAPPA0, ratio);
+      grad_f[index0 + 2] +=
+          weight_dkappa_ * 2.0 * dkappa *
+          spiral_curve.DeriveDKappaDerivative(
+              QuinticSpiralPath::DKAPPA0, ratio);
+
+      grad_f[index1] +=
+          weight_dkappa_ * 2.0 * dkappa *
+          spiral_curve.DeriveDKappaDerivative(QuinticSpiralPath::THETA1, ratio);
+      grad_f[index1 + 1] +=
+          weight_dkappa_ * 2.0 * dkappa *
+          spiral_curve.DeriveDKappaDerivative(QuinticSpiralPath::KAPPA1, ratio);
+      grad_f[index1 + 2] +=
+          weight_dkappa_ * 2.0 * dkappa *
+          spiral_curve.DeriveDKappaDerivative(
+              QuinticSpiralPath::DKAPPA1, ratio);
+
+      grad_f[variable_offset + i] +=
+          weight_dkappa_ * 2.0 * dkappa *
+          spiral_curve.DeriveDKappaDerivative(
+              QuinticSpiralPath::DELTA_S, ratio);
+
+      double d2kappa = spiral_curve.Evaluate(3, ratio * delta_s);
+      grad_f[index0] +=
+          weight_d2kappa_ * 2.0 * d2kappa *
+          spiral_curve.DeriveD2KappaDerivative(
+              QuinticSpiralPath::THETA0, ratio);
+      grad_f[index0 + 1] +=
+          weight_d2kappa_ * 2.0 * d2kappa *
+          spiral_curve.DeriveD2KappaDerivative(
+              QuinticSpiralPath::KAPPA0, ratio);
+      grad_f[index0 + 2] +=
+          weight_d2kappa_ * 2.0 * d2kappa *
+          spiral_curve.DeriveD2KappaDerivative(
+              QuinticSpiralPath::DKAPPA0, ratio);
+
+      grad_f[index1] +=
+          weight_d2kappa_ * 2.0 * d2kappa *
+          spiral_curve.DeriveD2KappaDerivative(
+              QuinticSpiralPath::THETA1, ratio);
+      grad_f[index1 + 1] +=
+          weight_d2kappa_ * 2.0 * d2kappa *
+          spiral_curve.DeriveD2KappaDerivative(
+              QuinticSpiralPath::KAPPA1, ratio);
+      grad_f[index1 + 2] +=
+          weight_d2kappa_ * 2.0 * d2kappa *
+          spiral_curve.DeriveD2KappaDerivative(
+              QuinticSpiralPath::DKAPPA1, ratio);
+
+      grad_f[variable_offset + i] +=
+          weight_d2kappa_ * 2.0 * d2kappa *
+          spiral_curve.DeriveD2KappaDerivative(
+              QuinticSpiralPath::DELTA_S, ratio);
     }
   }
   return true;
@@ -778,6 +855,33 @@ void SpiralProblemInterface::set_end_point(const double x, const double y,
   end_theta_ = theta;
   end_kappa_ = kappa;
   end_dkappa_ = dkappa;
+}
+
+void SpiralProblemInterface::set_end_point_position(const double x,
+                                                    const double y) {
+  has_fixed_end_point_position_ = true;
+  end_x_ = x;
+  end_y_ = y;
+}
+
+void SpiralProblemInterface::set_element_weight_curve_length(
+    const double weight_curve_length) {
+  weight_curve_length_ = weight_curve_length;
+}
+
+void SpiralProblemInterface::set_element_weight_kappa(
+    const double weight_kappa) {
+  weight_kappa_ = weight_kappa;
+}
+
+void SpiralProblemInterface::set_element_weight_dkappa(
+    const double weight_dkappa) {
+  weight_dkappa_ = weight_dkappa;
+}
+
+void SpiralProblemInterface::set_element_weight_d2kappa(
+    const double weight_d2kappa) {
+  weight_d2kappa_ = weight_d2kappa;
 }
 
 }  // namespace planning

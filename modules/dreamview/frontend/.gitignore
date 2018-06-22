@@ -1,4 +1,3 @@
 node_modules/
 yarn-error.log
-!*bundle.js
 dist_offline/

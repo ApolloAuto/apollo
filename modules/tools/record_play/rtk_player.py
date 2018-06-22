@@ -32,6 +32,7 @@ from numpy import genfromtxt
 
 from modules.canbus.proto import chassis_pb2
 from modules.common.proto import pnc_point_pb2
+from modules.common.proto import drive_state_pb2
 from modules.control.proto import pad_msg_pb2
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
@@ -227,6 +228,8 @@ class RtkPlayer(object):
         planningdata.total_path_time = self.data['time'][self.end] - \
             self.data['time'][self.start]
         planningdata.gear = int(self.data['gear'][self.closest_time()])
+        planningdata.engage_advice.advice = \
+            drive_state_pb2.EngageAdvice.READY_TO_ENGAGE
 
         self.planning_pub.publish(planningdata)
         self.logger.debug("Generated Planning Sequence: " +

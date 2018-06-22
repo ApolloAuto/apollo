@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/glfw_viewer.h"
 
 namespace apollo {
@@ -35,9 +35,7 @@ class OpenglVisualizer {
 
   virtual bool Init();
 
-  virtual std::string Name() const {
-    return name_;
-  }
+  virtual std::string Name() const { return name_; }
 
   void UpdateCameraSystem(FrameContent *content);
 
@@ -65,7 +63,6 @@ class OpenglVisualizer {
 
   boost::shared_ptr<GLFWViewer> opengl_vs_;
   std::string name_;
-  bool init_ = false;
 };
 
 }  // namespace perception

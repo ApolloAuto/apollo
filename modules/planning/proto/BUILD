@@ -19,6 +19,7 @@ proto_library(
         ":planning_internal_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:drive_state_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
@@ -83,6 +84,34 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "navi_path_decider_config_proto",
+    deps = [
+        ":navi_path_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "navi_path_decider_config_proto_lib",
+    srcs = [
+        "navi_path_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "navi_speed_decider_config_proto",
+    deps = [
+        ":navi_speed_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "navi_speed_decider_config_proto_lib",
+    srcs = [
+        "navi_speed_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
     name = "planning_config_proto",
     deps = [
         ":planning_config_proto_lib",
@@ -99,8 +128,10 @@ proto_library(
         ":dp_st_speed_config_proto_lib",
         ":poly_st_speed_config_proto_lib",
         ":qp_spline_path_config_proto_lib",
-        ":qp_spline_reference_line_smoother_config_proto_lib",
         ":qp_st_speed_config_proto_lib",
+        ":reference_line_smoother_config_proto_lib",
+        ":navi_path_decider_config_proto_lib",
+        ":navi_speed_decider_config_proto_lib",
     ],
 )
 
@@ -116,7 +147,9 @@ proto_library(
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/localization/proto:localization_proto_lib",
+        "//modules/map/relative_map/proto:navigation_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
+        "//modules/prediction/proto:prediction_proto_lib",
         "//modules/routing/proto:routing_proto_lib",
     ],
 )
@@ -143,16 +176,16 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "qp_spline_reference_line_smoother_config_proto",
+    name = "reference_line_smoother_config_proto",
     deps = [
-        ":qp_spline_reference_line_smoother_config_proto_lib",
+        ":reference_line_smoother_config_proto_lib",
     ],
 )
 
 proto_library(
-    name = "qp_spline_reference_line_smoother_config_proto_lib",
+    name = "reference_line_smoother_config_proto_lib",
     srcs = [
-        "qp_spline_reference_line_smoother_config.proto",
+        "reference_line_smoother_config.proto",
     ],
 )
 
@@ -198,6 +231,20 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "traffic_rule_config_proto",
+    deps = [
+        ":traffic_rule_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "traffic_rule_config_proto_lib",
+    srcs = [
+        "traffic_rule_config.proto",
+    ],
+)
+
+cc_proto_library(
     name = "spiral_curve_config_proto",
     deps = [
         ":spiral_curve_config_proto_lib",
@@ -222,6 +269,61 @@ proto_library(
     name = "st_boundary_config_proto_lib",
     srcs = [
         "st_boundary_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "planning_status_proto",
+    deps = [
+        ":planning_status_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "planning_status_proto_lib",
+    srcs = [
+        "planning_status.proto",
+    ],
+    deps = [
+        ":decision_proto_lib",
+        ":planning_proto_lib",
+        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:drive_state_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "lattice_sampling_config_proto",
+    deps = [
+        ":lattice_sampling_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "lattice_sampling_config_proto_lib",
+    srcs = [
+        "lattice_sampling_config.proto",
+    ],
+    deps = [
+        "//modules/common/proto:pnc_point_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "lattice_structure_proto",
+    deps = [
+        ":lattice_structure_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "lattice_structure_proto_lib",
+    srcs = [
+        "lattice_structure.proto",
+    ],
+    deps = [
+        ":lattice_sampling_config_proto_lib",
+        "//modules/common/proto:pnc_point_proto_lib",
     ],
 )
 

@@ -22,48 +22,16 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${DIR}/apollo_base.sh"
 
 function start() {
-  BAG_DIR="${APOLLO_ROOT_DIR}/data/bag"
-
-  # Record bag to the largest portable-disk.
-  if [ "$1" = "--portable-disk" ]; then
-    LARGEST_DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 | \
-        awk '{print substr($0, index($0, $6))}')"
-    if [ ! -z "${LARGEST_DISK}" ]; then
-      REAL_BAG_DIR="${LARGEST_DISK}/data/bag"
-      if [ ! -d "${REAL_BAG_DIR}" ]; then
-        mkdir -p "${REAL_BAG_DIR}"
-      fi
-      BAG_DIR="${APOLLO_ROOT_DIR}/data/bag/portable"
-      rm -fr "${BAG_DIR}"
-      ln -s "${REAL_BAG_DIR}" "${BAG_DIR}"
-    else
-      echo "Cannot find portable disk."
-      echo "Please make sure your container was started AFTER inserting the disk."
-    fi
-  fi
-
-  # Create and enter into bag dir.
-  if [ ! -e "${BAG_DIR}" ]; then
-    mkdir -p "${BAG_DIR}"
-  fi
-  cd "${BAG_DIR}"
-  echo "Recording bag to: $(pwd)"
-
-  # record some meta info into bag
-  if [ -e /apollo/meta.ini ]; then
-      META_STR=`cat /apollo/meta.ini | tr '[]:\n' ' '`
-      nohup rostopic pub -l /apollo/meta std_msgs/String "$META_STR" < /dev/null &
-  else
-      META_STR=`git rev-parse HEAD`
-      META_STR="git commit $META_STR"
-      nohup rostopic pub -l /apollo/meta std_msgs/String "$META_STR" < /dev/null &
-  fi
+  decide_task_dir $@
+  cd "${TASK_DIR}"
 
   # Start recording.
+  record_bag_env_log
   LOG="/tmp/apollo_record.out"
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     nohup rosbag record --split --duration=1m -b 2048  \
+        /apollo/sensor/camera/obstacle/front_6mm \
         /apollo/sensor/conti_radar \
         /apollo/sensor/delphi_esr \
         /apollo/sensor/gnss/best_pose \
@@ -72,6 +40,7 @@ function start() {
         /apollo/sensor/gnss/imu \
         /apollo/sensor/gnss/ins_stat \
         /apollo/sensor/gnss/odometry \
+        /apollo/sensor/gnss/raw_data \
         /apollo/sensor/gnss/rtk_eph \
         /apollo/sensor/gnss/rtk_obs \
         /apollo/sensor/mobileye \
@@ -79,7 +48,6 @@ function start() {
         /apollo/canbus/chassis_detail \
         /apollo/control \
         /apollo/control/pad \
-        /apollo/meta \
         /apollo/perception/obstacles \
         /apollo/perception/traffic_light \
         /apollo/planning \
@@ -90,23 +58,24 @@ function start() {
         /apollo/localization/msf_gnss \
         /apollo/localization/msf_lidar \
         /apollo/localization/msf_status \
+        /apollo/navigation \
+        /apollo/relative_map \
         /apollo/drive_event \
         /tf \
         /tf_static \
         /apollo/monitor \
+        /apollo/monitor/system_status \
         /apollo/monitor/static_info </dev/null >"${LOG}" 2>&1 &
     fi
 }
 
 function stop() {
   pkill -SIGINT -f record
-  pkill -SIGINT -f "rostopic pub"
 }
 
 function help() {
   echo "Usage:"
   echo "$0 [start]                     Record bag to data/bag."
-  echo "$0 [start] --portable-disk     Record bag to the largest portable disk."
   echo "$0 stop                        Stop recording."
   echo "$0 help                        Show this help message."
 }

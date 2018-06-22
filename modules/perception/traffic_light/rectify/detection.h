@@ -40,7 +40,7 @@ class Detection : public IRefine {
   Detection(int min_crop_size, const std::string &refine_net,
             const std::string &refine_model);
 
-  void Init(const int &resize_len, const std::string &refine_net,
+  void Init(const int resize_len, const std::string &refine_net,
             const std::string &refine_model);
 
   virtual void Perform(const cv::Mat &ros_image, std::vector<LightPtr> *lights);

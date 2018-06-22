@@ -60,7 +60,7 @@ class PolyStGraph {
    public:
     PolyStGraphNode() = default;
 
-    PolyStGraphNode(const STPoint point_st, const double speed,
+    PolyStGraphNode(const STPoint &point_st, const double speed,
                     const double accel)
         : st_point(point_st), speed(speed), accel(accel) {}
 

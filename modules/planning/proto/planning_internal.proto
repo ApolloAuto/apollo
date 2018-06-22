@@ -6,6 +6,7 @@ import "modules/common/proto/header.proto";
 import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/localization/proto/localization.proto";
+import "modules/map/relative_map/proto/navigation.proto";
 import "modules/routing/proto/routing.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
 import "modules/planning/proto/sl_boundary.proto";
@@ -106,19 +107,6 @@ message ReferenceLineDebug {
   optional bool is_protected = 6;
 }
 
-message ChangeLaneState {
-   enum State {
-       IN_CHANGE_LANE = 1; // during change lane state
-       CHANGE_LANE_FAILED = 2; // change lane failed
-       CHANGE_LANE_SUCCESS = 3; // change lane failed
-   }
-   optional State state = 1;
-   // the id of the route segment that the vehicle is driving on
-   optional string path_id = 2;
-   // the time stamp when the state started.
-   optional double timestamp = 3;
-}
-
 message SampleLayerDebug {
   repeated apollo.common.SLPoint sl_point = 1;
 }
@@ -128,7 +116,7 @@ message DpPolyGraphDebug {
   repeated apollo.common.SLPoint min_cost_point = 2;
 }
 
-// next id: 21
+// next id: 22
 message PlanningData {
   // input
   optional apollo.localization.LocalizationEstimate adc_position = 7;
@@ -147,4 +135,48 @@ message PlanningData {
   repeated ObstacleDebug obstacle = 18;
   repeated ReferenceLineDebug reference_line = 19;
   optional DpPolyGraphDebug dp_poly_graph = 20;
+  optional LatticeStTraining lattice_st_image = 21;
+  optional apollo.relative_map.MapMsg relative_map = 22;
+  optional AutoTuningTrainingData auto_tuning_training_data = 23;
 }
+
+message LatticeStPixel {
+  optional int32 s = 1;
+  optional int32 t = 2;
+  optional uint32 r = 3;
+  optional uint32 g = 4;
+  optional uint32 b = 5;
+}
+
+message LatticeStTraining {
+  repeated LatticeStPixel pixel = 1;
+  optional double timestamp = 2;
+  optional string annotation = 3;
+  optional uint32 num_s_grids = 4;
+  optional uint32 num_t_grids = 5;
+  optional double s_resolution = 6;
+  optional double t_resolution = 7;
+}
+
+message CostComponents {
+  repeated double cost_component = 1;
+}
+
+message AutoTuningTrainingData {
+  optional CostComponents teacher_component = 1;
+  optional CostComponents student_component = 2;
+}
+
+message CloudReferenceLineRequest {
+  repeated apollo.routing.LaneSegment lane_segment = 1;
+}
+
+message CloudReferenceLineRoutingRequest {
+  optional apollo.routing.RoutingResponse routing = 1;
+}
+
+message CloudReferenceLineResponse {
+  repeated apollo.common.Path segment = 1;
+}
+
+

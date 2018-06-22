@@ -16,6 +16,7 @@
 
 #include "modules/common/util/file.h"
 
+#include "boost/filesystem.hpp"
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
 #include "modules/common/util/testdata/simple.pb.h"
@@ -27,8 +28,9 @@ namespace util {
 class FileTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    system("exec rm -rf ${TEST_TMPDIR}/*");
     temp_dir = std::getenv("TEST_TMPDIR");
+    boost::filesystem::remove_all(temp_dir);
+    boost::filesystem::create_directory(temp_dir);
   }
 
   std::string FilePath(const std::string &file_name) {
@@ -98,9 +100,9 @@ TEST_F(FileTest, RemoveAllFiles) {
   EXPECT_FALSE(GetProtoFromASCIIFile(path2, &message));
 }
 
-TEST_F(FileTest, ListSubDirectories) {
+TEST_F(FileTest, ListSubPaths) {
   // Expect {'modules/common/util/testdata'}
-  const auto root_subdirs = ListSubDirectories("/");
+  const auto root_subdirs = ListSubPaths("/");
 
   // Some common root subdirs should exist.
   EXPECT_NE(root_subdirs.end(),
@@ -119,6 +121,16 @@ TEST_F(FileTest, GetAbsolutePath) {
   EXPECT_EQ("/home/work/xx.txt", GetAbsolutePath("/home/work/", "xx.txt"));
   EXPECT_EQ("/xx.txt", GetAbsolutePath("/home/work", "/xx.txt"));
   EXPECT_EQ("/home/work/./xx.txt", GetAbsolutePath("/home/work", "./xx.txt"));
+}
+
+TEST_F(FileTest, GetFileNamesInFolderById) {
+  std::string data_path = "modules/perception/data/hm_tracker_test/";
+  std::vector<std::string> seg_filenames;
+  GetFileNamesInFolderById(data_path, ".seg", &seg_filenames);
+  std::vector<std::string> pose_filenames;
+  GetFileNamesInFolderById(data_path, ".pose", &pose_filenames);
+  EXPECT_EQ(seg_filenames.size(), 8);
+  EXPECT_EQ(pose_filenames.size(), 8);
 }
 
 }  // namespace util

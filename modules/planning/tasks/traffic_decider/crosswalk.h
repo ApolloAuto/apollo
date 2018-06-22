@@ -31,23 +31,23 @@ namespace planning {
 
 class Crosswalk : public TrafficRule {
  public:
-  explicit Crosswalk(const RuleConfig& config);
+  explicit Crosswalk(const TrafficRuleConfig& config);
   virtual ~Crosswalk() = default;
 
-  bool ApplyRule(Frame* frame,
+  common::Status ApplyRule(Frame* const frame,
                  ReferenceLineInfo* const reference_line_info);
 
  private:
-  void MakeDecisions(Frame* frame,
+  void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
   bool FindCrosswalks(ReferenceLineInfo* const reference_line_info);
-  double GetStopDeceleration(ReferenceLineInfo* const reference_line_info,
-                             const hdmap::PathOverlap* crosswalk_overlap);
-  void CreateStopObstacle(Frame* frame,
-                          ReferenceLineInfo* const reference_line_info,
-                          const hdmap::PathOverlap* crosswalk_overlap);
+  int BuildStopDecision(Frame* frame,
+                        ReferenceLineInfo* const reference_line_info,
+                        hdmap::PathOverlap* const crosswalk_overlap,
+                        std::vector<std::string> pedestrians);
 
  private:
+  static constexpr char const* const CROSSWALK_VO_ID_PREFIX = "CW_";
   std::vector<const hdmap::PathOverlap*> crosswalk_overlaps_;
 };
 

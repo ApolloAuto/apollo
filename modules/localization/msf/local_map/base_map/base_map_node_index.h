@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <string>
+
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 
@@ -77,14 +78,14 @@ class MapNodeIndex {
 
   /**@brief The ID of the resolution.
    * Should be less than BaseMapConfig::map_resolutions_.size(). */
-  unsigned int resolution_id_;
+  unsigned int resolution_id_ = 0;
   /**@brief The zone ID. 1 - 60 and -1 - -60.
    * The positive value is the zone at the north hemisphere. */
-  int zone_id_;
+  int zone_id_ = 50;
   /**@brief The map node ID at the northing direction. */
-  unsigned int m_;
+  unsigned int m_ = 0;
   /**@brief The map node ID at the easting direction. */
-  unsigned int n_;
+  unsigned int n_ = 0;
 };
 
 }  // namespace msf

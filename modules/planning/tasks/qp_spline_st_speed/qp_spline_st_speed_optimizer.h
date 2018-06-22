@@ -32,6 +32,7 @@
 
 #include "modules/planning/math/smoothing_spline/spline_1d_generator.h"
 #include "modules/planning/tasks/speed_optimizer.h"
+#include "modules/planning/tasks/st_graph/speed_limit_decider.h"
 #include "modules/planning/tasks/st_graph/st_boundary_mapper.h"
 
 namespace apollo {

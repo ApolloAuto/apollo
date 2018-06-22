@@ -21,8 +21,14 @@ namespace apollo {
 namespace hdmap {
 
 int HDMap::LoadMapFromFile(const std::string& map_filename) {
-  AINFO << "Loading HDMap: " << map_filename << "...";
+  AINFO << "Loading HDMap: " << map_filename << " ...";
   return impl_.LoadMapFromFile(map_filename);
+}
+
+int HDMap::LoadMapFromProto(const Map& map_proto) {
+  ADEBUG << "Loading HDMap with header: "
+         << map_proto.header().ShortDebugString();
+  return impl_.LoadMapFromProto(map_proto);
 }
 
 LaneInfoConstPtr HDMap::GetLaneById(const Id& id) const {
@@ -148,10 +154,19 @@ int HDMap::GetRoadBoundaries(
 }
 
 int HDMap::GetForwardNearestSignalsOnLane(
-            const apollo::common::PointENU& point,
-            const double distance,
-            std::vector<SignalInfoConstPtr>* signals) const {
+    const apollo::common::PointENU& point, const double distance,
+    std::vector<SignalInfoConstPtr>* signals) const {
   return impl_.GetForwardNearestSignalsOnLane(point, distance, signals);
+}
+
+int HDMap::GetStopSignAssociatedStopSigns(
+    const Id& id, std::vector<StopSignInfoConstPtr>* stop_signs) const {
+  return impl_.GetStopSignAssociatedStopSigns(id, stop_signs);
+}
+
+int HDMap::GetStopSignAssociatedLanes(
+    const Id& id, std::vector<LaneInfoConstPtr>* lanes) const {
+  return impl_.GetStopSignAssociatedLanes(id, lanes);
 }
 
 }  // namespace hdmap

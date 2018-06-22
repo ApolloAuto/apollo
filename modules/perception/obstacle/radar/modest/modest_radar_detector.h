@@ -17,8 +17,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_MODEST_RADAR_DETECTOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_MODEST_RADAR_DETECTOR_H_
 
+#include <memory>
 #include <string>
 #include <vector>
+
+#include "modules/perception/proto/modest_radar_detector_config.pb.h"
 
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
 #include "modules/perception/obstacle/radar/modest/object_builder.h"
@@ -43,32 +46,29 @@ class ModestRadarDetector : public BaseRadarDetector {
   bool Detect(const ContiRadar &raw_obstacles,
               const std::vector<PolygonDType> &map_polygons,
               const RadarDetectorOptions &options,
-              std::vector<ObjectPtr> *objects) override;
+              std::vector<std::shared_ptr<Object>> *objects) override;
 
   // @brief: collect radar result
   // @param [out]: radar objects
   // @return collection state
-  bool CollectRadarResult(std::vector<ObjectPtr> *objects);
+  bool CollectRadarResult(std::vector<std::shared_ptr<Object>> *objects);
 
-  std::string name() const override {
-    return "ModestRadarDetector";
-  }
+  std::string name() const override { return "ModestRadarDetector"; }
 
  private:
   void RoiFilter(const std::vector<PolygonDType> &map_polygons,
-                 std::vector<ObjectPtr>* filter_objects);
+                 std::vector<std::shared_ptr<Object>> *filter_objects);
 
   // for unit test
   bool result_init_ = true;
   bool result_detect_ = true;
 
-  bool use_had_map_;
-  double max_theta_;
-  bool use_fp_filter_;
-  int delay_frames_;
   ContiParams conti_params_;
   ObjectBuilder object_builder_;
   boost::shared_ptr<RadarTrackManager> radar_tracker_;
+
+  modest_radar_detector_config::ModelConfigs config_;
+
   FRIEND_TEST(ModestRadarDetectorTest, modest_radar_detector_test);
   DISALLOW_COPY_AND_ASSIGN(ModestRadarDetector);
 };

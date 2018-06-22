@@ -26,6 +26,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/decision.pb.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
@@ -83,6 +84,8 @@ class PathObstacle {
 
   const SLBoundary& PerceptionSLBoundary() const;
 
+  const StBoundary& reference_line_st_boundary() const;
+
   const StBoundary& st_boundary() const;
 
   const std::vector<std::string>& decider_tags() const;
@@ -102,9 +105,21 @@ class PathObstacle {
 
   void EraseStBoundary();
 
+  void SetReferenceLineStBoundary(const StBoundary& boundary);
+
+  void SetReferenceLineStBoundaryType(const StBoundary::BoundaryType type);
+
+  void EraseReferenceLineStBoundary();
+
   bool HasLongitudinalDecision() const;
 
   bool HasNonIgnoreDecision() const;
+
+  /**
+   * @brief Calculate stop distance with the obstacle using the ADC's minimum
+   * turning radius
+   */
+  double MinRadiusStopDistance(const common::VehicleParam& vehicle_param) const;
 
   /**
    * @brief Check if this object can be safely ignored.
@@ -116,8 +131,8 @@ class PathObstacle {
   bool IsLongitudinalIgnore() const;
   bool IsLateralIgnore() const;
 
-  void BuildStBoundary(const ReferenceLine& reference_line,
-                       const double adc_start_s);
+  void BuildReferenceLineStBoundary(const ReferenceLine& reference_line,
+                                    const double adc_start_s);
 
   void SetPerceptionSlBoundary(const SLBoundary& sl_boundary);
 
@@ -153,12 +168,15 @@ class PathObstacle {
   std::vector<std::string> decider_tags_;
   SLBoundary perception_sl_boundary_;
 
+  StBoundary reference_line_st_boundary_;
   StBoundary st_boundary_;
 
   ObjectDecisionType lateral_decision_;
   ObjectDecisionType longitudinal_decision_;
 
   bool is_blocking_obstacle_ = false;
+
+  double min_radius_stop_distance_ = -1.0;
 
   struct ObjectTagCaseHash {
     std::size_t operator()(

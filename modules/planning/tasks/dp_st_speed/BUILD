@@ -52,6 +52,7 @@ cc_library(
         "//modules/common/status",
         "//modules/planning/common:path_decision",
         "//modules/planning/common:path_obstacle",
+        "//modules/planning/common:planning_thread_pool",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
@@ -79,6 +80,22 @@ cc_library(
         "//modules/planning/tasks:speed_optimizer",
         "//modules/planning/tasks/st_graph:st_boundary_mapper",
         "//modules/planning/tasks/st_graph:st_graph_data",
+    ],
+)
+
+cc_test(
+    name = "dp_st_graph_test",
+    size = "small",
+    srcs = [
+        "dp_st_graph_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":dp_st_graph",
+        "//modules/planning/proto:planning_config_proto",
+        "@gtest//:main",
     ],
 )
 

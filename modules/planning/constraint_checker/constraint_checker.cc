@@ -31,11 +31,11 @@ template <typename T>
 bool WithinRange(const T v, const T lower, const T upper) {
   return lower <= v && v <= upper;
 }
-}
+}  // namespace
 
 bool ConstraintChecker::ValidTrajectory(
     const DiscretizedTrajectory& trajectory) {
-  const double kMaxCheckRelativeTime = 2.0;
+  const double kMaxCheckRelativeTime = FLAGS_trajectory_time_length;
   for (const auto& p : trajectory.trajectory_points()) {
     double t = p.relative_time();
     if (t > kMaxCheckRelativeTime) {
@@ -43,7 +43,7 @@ bool ConstraintChecker::ValidTrajectory(
     }
     double lon_v = p.v();
     if (!WithinRange(lon_v, FLAGS_speed_lower_bound, FLAGS_speed_upper_bound)) {
-      AERROR << "Velocity at relative time " << t
+      ADEBUG << "Velocity at relative time " << t
              << " exceeds bound, value: " << lon_v << ", bound ["
              << FLAGS_speed_lower_bound << ", " << FLAGS_speed_upper_bound
              << "].";
@@ -53,7 +53,7 @@ bool ConstraintChecker::ValidTrajectory(
     double lon_a = p.a();
     if (!WithinRange(lon_a, FLAGS_longitudinal_acceleration_lower_bound,
                      FLAGS_longitudinal_acceleration_upper_bound)) {
-      AERROR << "Longitudinal acceleration at relative time " << t
+      ADEBUG << "Longitudinal acceleration at relative time " << t
              << " exceeds bound, value: " << lon_a << ", bound ["
              << FLAGS_longitudinal_acceleration_lower_bound << ", "
              << FLAGS_longitudinal_acceleration_upper_bound << "].";
@@ -62,7 +62,7 @@ bool ConstraintChecker::ValidTrajectory(
 
     double kappa = p.path_point().kappa();
     if (!WithinRange(kappa, -FLAGS_kappa_bound, FLAGS_kappa_bound)) {
-      AERROR << "Kappa at relative time " << t
+      ADEBUG << "Kappa at relative time " << t
              << " exceeds bound, value: " << kappa << ", bound ["
              << -FLAGS_kappa_bound << ", " << FLAGS_kappa_bound << "].";
       return false;
@@ -84,19 +84,30 @@ bool ConstraintChecker::ValidTrajectory(
     double lon_jerk = d_lon_a / dt;
     if (!WithinRange(lon_jerk, FLAGS_longitudinal_jerk_lower_bound,
                      FLAGS_longitudinal_jerk_upper_bound)) {
-      AERROR << "Longitudinal jerk at relative time " << t
+      ADEBUG << "Longitudinal jerk at relative time " << t
              << " exceeds bound, value: " << lon_jerk << ", bound ["
              << FLAGS_longitudinal_jerk_lower_bound << ", "
              << FLAGS_longitudinal_jerk_upper_bound << "].";
       return false;
     }
 
+    double lat_a = p1.v() * p1.v() * p1.path_point().kappa();
+    if (!WithinRange(lat_a, -FLAGS_lateral_acceleration_bound,
+                     FLAGS_lateral_acceleration_bound)) {
+      ADEBUG << "Lateral acceleration at relative time " << t
+             << " exceeds bound, value: " << lat_a << ", bound ["
+             << -FLAGS_lateral_acceleration_bound << ", "
+             << FLAGS_lateral_acceleration_bound << "].";
+      return false;
+    }
+
     double d_lat_a = p1.v() * p1.v() * p1.path_point().kappa() -
                      p0.v() * p0.v() * p0.path_point().kappa();
+
     double lat_jerk = d_lat_a / dt;
     if (!WithinRange(lat_jerk, -FLAGS_lateral_jerk_bound,
                      FLAGS_lateral_jerk_bound)) {
-      AERROR << "Lateral jerk at relative time " << t
+      ADEBUG << "Lateral jerk at relative time " << t
              << " exceeds bound, value: " << lat_jerk << ", bound ["
              << -FLAGS_lateral_jerk_bound << ", " << FLAGS_lateral_jerk_bound
              << "].";

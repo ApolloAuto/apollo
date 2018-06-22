@@ -80,12 +80,10 @@ class Prediction : public PredictionInterface {
 
   void OnLocalization(const localization::LocalizationEstimate &localization);
 
-  void OnPlanning(const planning::ADCTrajectory& adc_trajectory);
-
-  bool IsValidTrajectoryPoint(
-      const ::apollo::common::TrajectoryPoint &trajectory_point);
+  void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
 
  private:
+  double start_time_ = 0.0;
   PredictionConf prediction_conf_;
   common::adapter::AdapterManagerConfig adapter_conf_;
 };

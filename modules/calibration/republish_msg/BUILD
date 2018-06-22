@@ -24,7 +24,6 @@ cc_binary(
         "//modules/calibration/republish_msg/conf:republish_msg_adapter_manager_config",
         "//modules/calibration/republish_msg/conf:republish_msg_config",
     ],
-    linkstatic = 0,
     deps = [
         ":republish_msg_lib",
         "//external:gflags",

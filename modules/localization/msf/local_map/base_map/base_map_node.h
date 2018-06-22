@@ -58,46 +58,26 @@ class BaseMapNode {
   // /**@brief Set compression strategy. */
   // void SetCompressionStrategy(compression::CompressionStrategy* strategy);
   /**@brief Get map cell matrix. */
-  inline const BaseMapMatrix& GetMapCellMatrix() const {
-    return *map_matrix_;
-  }
+  inline const BaseMapMatrix& GetMapCellMatrix() const { return *map_matrix_; }
 
-  inline BaseMapMatrix& GetMapCellMatrix() {
-    return *map_matrix_;
-  }
+  inline BaseMapMatrix& GetMapCellMatrix() { return *map_matrix_; }
 
   /**@brief Get the map settings. */
-  inline const BaseMapConfig& GetMapConfig() const {
-    return *map_config_;
-  }
+  inline const BaseMapConfig& GetMapConfig() const { return *map_config_; }
   /**@brief Set the map node index. */
-  inline void SetMapNodeIndex(const MapNodeIndex& index) {
-    index_ = index;
-  }
+  inline void SetMapNodeIndex(const MapNodeIndex& index) { index_ = index; }
   /**@brief Get the map node index. */
-  inline const MapNodeIndex& GetMapNodeIndex() const {
-    return index_;
-  }
+  inline const MapNodeIndex& GetMapNodeIndex() const { return index_; }
   /**@brief Set if the map node is reserved. */
-  inline void SetIsReserved(bool is_reserved) {
-    is_reserved_ = is_reserved;
-  }
+  inline void SetIsReserved(bool is_reserved) { is_reserved_ = is_reserved; }
   /**@brief Get if the map node is reserved. */
-  inline bool GetIsReserved() const {
-    return is_reserved_;
-  }
+  inline bool GetIsReserved() const { return is_reserved_; }
   /**@brief Get if the map data has changed. */
-  inline bool GetIsChanged() const {
-    return is_changed_;
-  }
+  inline bool GetIsChanged() const { return is_changed_; }
   /**@brief Set if the map node data has changed. */
-  inline void SetIsChanged(bool is) {
-    is_changed_ = is;
-  }
+  inline void SetIsChanged(bool is) { is_changed_ = is; }
   /**@brief Get if the map node data is ready*/
-  inline bool GetIsReady() const {
-    return data_is_ready_;
-  }
+  inline bool GetIsReady() const { return data_is_ready_; }
   /**@brief Get the left top corner of the map node. */
   // inline const idl::car::core::numerical::Vector2D& GetLeftTopCorner()
   // const {
@@ -196,18 +176,18 @@ class BaseMapNode {
   /**@brief The data structure of the map datas, which is a matrix. */
   BaseMapMatrix* map_matrix_;
   /**@brief If the node is reserved in map. */
-  bool is_reserved_;
+  bool is_reserved_ = false;
   /**@brief Has the map node been changed. */
-  bool is_changed_;
+  bool is_changed_ = false;
   /* *@brief Indicate map node data is ready*/
-  bool data_is_ready_;
+  bool data_is_ready_ = false;
   /**@brief The body binary size in file. It's useful when reading and writing
    * files. */
   mutable unsigned int file_body_binary_size_ = 0;
   /**@bried The compression strategy. */
-  CompressionStrategy* compression_strategy_;
+  CompressionStrategy* compression_strategy_ = nullptr;
   /**@brief The min altitude of point cloud in the node. */
-  float min_altitude_;
+  float min_altitude_ = 1e6;
 };
 
 }  // namespace msf

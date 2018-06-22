@@ -15,23 +15,20 @@
  *****************************************************************************/
 
 /**
- * @file speed_optimizer.cc
+ * @file
  **/
+
+#include "modules/planning/tasks/speed_optimizer.h"
 
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_limit.h"
-#include "modules/planning/tasks/speed_optimizer.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
-using apollo::common::Status;
-
-namespace {
-constexpr double kSpeedOptimizationFallbackClost = 2e4;
-}
 
 SpeedOptimizer::SpeedOptimizer(const std::string& name) : Task(name) {}
 
@@ -46,104 +43,8 @@ apollo::common::Status SpeedOptimizer::Execute(
       reference_line_info->path_decision(),
       reference_line_info->mutable_speed_data());
 
-  if (!ret.ok() && FLAGS_enable_slowdown_profile_generator) {
-    SpeedData speed_data = GenerateStopProfileFromPolynomial(
-        frame->PlanningStartPoint().v(), frame->PlanningStartPoint().a());
-    if (speed_data.Empty()) {
-      speed_data = GenerateStopProfile(frame->PlanningStartPoint().v(),
-                                       frame->PlanningStartPoint().a());
-    }
-    *reference_line_info->mutable_speed_data() = speed_data;
-    reference_line_info->AddCost(kSpeedOptimizationFallbackClost);
-    ret = Status::OK();
-  }
   RecordDebugInfo(reference_line_info->speed_data());
   return ret;
-}
-
-SpeedData SpeedOptimizer::GenerateStopProfile(const double init_speed,
-                                              const double init_acc) const {
-  AERROR << "Slowing down the car.";
-  SpeedData speed_data;
-
-  const double kFixedJerk = -1.0;
-  const double first_point_acc = std::fmin(0.0, init_acc);
-
-  const double max_t = 3.0;
-  const double unit_t = 0.02;
-
-  double pre_s = 0.0;
-  const double t_mid =
-      (FLAGS_slowdown_profile_deceleration - first_point_acc) / kFixedJerk;
-  const double s_mid = init_speed * t_mid +
-                       0.5 * first_point_acc * t_mid * t_mid +
-                       1.0 / 6.0 * kFixedJerk * t_mid * t_mid * t_mid;
-  const double v_mid =
-      init_speed + first_point_acc * t_mid + 0.5 * kFixedJerk * t_mid * t_mid;
-
-  for (double t = 0.0; t < max_t; t += unit_t) {
-    double s = 0.0;
-    double v = 0.0;
-    if (t <= t_mid) {
-      s = std::fmax(pre_s, init_speed * t + 0.5 * first_point_acc * t * t +
-                               1.0 / 6.0 * kFixedJerk * t * t * t);
-      v = std::fmax(
-          0.0, init_speed + first_point_acc * t + 0.5 * kFixedJerk * t * t);
-      const double a = first_point_acc + kFixedJerk * t;
-      speed_data.AppendSpeedPoint(s, t, v, a, 0.0);
-      pre_s = s;
-    } else {
-      s = std::fmax(pre_s, s_mid + v_mid * (t - t_mid) +
-                               0.5 * FLAGS_slowdown_profile_deceleration *
-                                   (t - t_mid) * (t - t_mid));
-      v = std::fmax(0.0,
-                    v_mid + (t - t_mid) * FLAGS_slowdown_profile_deceleration);
-      speed_data.AppendSpeedPoint(s, t, v, FLAGS_slowdown_profile_deceleration,
-                                  0.0);
-    }
-    pre_s = s;
-  }
-  return speed_data;
-}
-
-SpeedData SpeedOptimizer::GenerateStopProfileFromPolynomial(
-    const double init_speed, const double init_acc) const {
-  AERROR << "Slowing down the car with polynomial.";
-  constexpr double kMaxT = 4.0;
-  for (double t = 2.0; t <= kMaxT; t += 0.5) {
-    for (double s = 0.0; s < 50.0; s += 1.0) {
-      QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, s, 0.0, 0.0, t);
-      if (!IsValidProfile(curve)) {
-        continue;
-      }
-      constexpr double kUnitT = 0.02;
-      SpeedData speed_data;
-      for (double curve_t = 0.0; curve_t <= t; curve_t += kUnitT) {
-        const double curve_s = curve.Evaluate(0, curve_t);
-        const double curve_v = curve.Evaluate(1, curve_t);
-        const double curve_a = curve.Evaluate(2, curve_t);
-        const double curve_da = curve.Evaluate(3, curve_t);
-        speed_data.AppendSpeedPoint(curve_s, curve_t, curve_v, curve_a,
-                                    curve_da);
-      }
-      return speed_data;
-    }
-  }
-  return SpeedData();
-}
-
-bool SpeedOptimizer::IsValidProfile(
-    const QuinticPolynomialCurve1d& curve) const {
-  for (double evaluate_t = 0.1; evaluate_t <= curve.ParamLength();
-       evaluate_t += 0.2) {
-    const double v = curve.Evaluate(1, evaluate_t);
-    const double a = curve.Evaluate(2, evaluate_t);
-    constexpr double kEpsilon = 1e-3;
-    if (v < -kEpsilon || a < -5.0) {
-      return false;
-    }
-  }
-  return true;
 }
 
 void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {

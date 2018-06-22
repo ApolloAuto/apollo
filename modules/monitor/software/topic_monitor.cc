@@ -55,6 +55,8 @@ AdapterBase *GetAdapterByMessageType(const AdapterConfig::MessageType type) {
       return CHECK_NOTNULL(AdapterManager::GetControlCommand());
     case AdapterConfig::CONTI_RADAR:
       return CHECK_NOTNULL(AdapterManager::GetContiRadar());
+    case AdapterConfig::RELATIVE_MAP:
+      return CHECK_NOTNULL(AdapterManager::GetRelativeMap());
     default:
       break;
   }

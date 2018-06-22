@@ -1,10 +1,11 @@
 import { observable, computed, action, autorun } from "mobx";
 
 import HMI from "store/hmi";
+import ControlData from "store/control_data";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
 import Options from "store/options";
-import Planning from "store/planning";
+import PlanningData from "store/planning_data";
 import Playback from "store/playback";
 import RouteEditingManager from "store/route_editing_manager";
 import TrafficSignal from "store/traffic_signal";
@@ -31,7 +32,9 @@ class DreamviewStore {
 
     @observable hmi = new HMI();
 
-    @observable planning = new Planning();
+    @observable planningData = new PlanningData();
+
+    @observable controlData = new ControlData();
 
     @observable playback = OFFLINE_PLAYBACK ? new Playback() : null;
 
@@ -50,15 +53,11 @@ class DreamviewStore {
     @observable moduleDelay = observable.map();
 
     @computed get enableHMIButtonsOnly() {
-        return !this.isInitialized || this.hmi.showNavigationMap;
+        return !this.isInitialized;
     }
 
     @action updateTimestamp(newTimestamp) {
         this.timestamp = newTimestamp;
-    }
-
-    @action updateWorldTimestamp(newTimestamp) {
-        this.worldTimestamp = newTimestamp;
     }
 
     @action updateWidthInPercentage(newRatio) {
@@ -80,14 +79,15 @@ class DreamviewStore {
     @action enablePNCMonitor() {
         this.updateWidthInPercentage(0.7);
         this.options.showPlanningReference = true;
-        this.options.showPlaningDpOptimizer = true;
+        this.options.showPlanningDpOptimizer = true;
         this.options.showPlanningQpOptimizer = true;
     }
 
     @action disablePNCMonitor() {
         this.updateWidthInPercentage(1.0);
+        this.options.showPlanningCar = false;
         this.options.showPlanningReference = false;
-        this.options.showPlaningDpOptimizer = false;
+        this.options.showPlanningDpOptimizer = false;
         this.options.showPlanningQpOptimizer = false;
     }
 
@@ -108,11 +108,11 @@ class DreamviewStore {
         }
     }
 
-    handleSideBarClick(option) {
+    handleOptionToggle(option) {
         const oldShowPNCMonitor = this.options.showPNCMonitor;
         const oldShowRouteEditingBar = this.options.showRouteEditingBar;
 
-        this.options.toggleSideBar(option);
+        this.options.toggle(option);
 
         // disable tools turned off after toggling
         if (oldShowPNCMonitor && !this.options.showPNCMonitor) {
@@ -134,6 +134,10 @@ class DreamviewStore {
                     break;
             }
         }
+    }
+
+    setOptionStatus(option, enabled) {
+        this.options[option] = (enabled || false);
     }
 
     // This function is triggerred automatically whenever a observable changes

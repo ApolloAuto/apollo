@@ -7,7 +7,6 @@ import Console from "components/Tasks/Console";
 
 export default class Tasks extends React.Component {
     render() {
-
         return (
             <div className="tasks">
                 <QuickStart />

@@ -160,14 +160,13 @@ std::string GraphCreator::GetEdgeID(const std::string& from_id,
 void GraphCreator::AddEdge(const Node& from_node,
                            const RepeatedPtrField<Id>& to_node_vec,
                            const Edge::DirectionType& type) {
-  std::string edge_id = "";
   for (const auto& to_id : to_node_vec) {
     if (forbidden_lane_id_set_.find(to_id.id()) !=
         forbidden_lane_id_set_.end()) {
       ADEBUG << "Ignored lane [id = " << to_id.id();
       continue;
     }
-    edge_id = GetEdgeID(from_node.lane_id(), to_id.id());
+    const std::string edge_id = GetEdgeID(from_node.lane_id(), to_id.id());
     if (showed_edge_id_set_.count(edge_id) != 0) {
       continue;
     }

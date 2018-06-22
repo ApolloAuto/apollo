@@ -1,32 +1,47 @@
-import devConfig from "store/config/dev.yml";
 import PARAMETERS from "store/config/parameters.yml";
 
 import OfflinePlaybackWebSocketEndpoint from "store/websocket/websocket_offline";
-import RealtimeWebSocketEndpoint from "store/websocket/websocket_ros";
-
+import RealtimeWebSocketEndpoint from "store/websocket/websocket_realtime";
+import MapDataWebSocketEndpoint from "store/websocket/websocket_map";
+import PointCloudWebSocketEndpoint from "store/websocket/websocket_point_cloud";
 
 // Returns the websocket server address based on the web server address.
-// Follows the convention that the websocket is served on the same host
-// as the web server, the port number of websocket is the port number of
-// the webserver plus one.
-function deduceWebsocketServerAddr() {
+// Follows the convention that the websocket is served on the same host/port
+// as the web server.
+function deduceWebsocketServerAddr(type) {
     const server = window.location.origin;
     const link = document.createElement("a");
     link.href = server;
     const protocol = location.protocol === "https:" ? "wss" : "ws";
-	const path = OFFLINE_PLAYBACK ? 'RosPlayBack' : 'websocket';
-    return `${protocol}://${link.hostname}:${window.location.port}/${path}`;
+    const port =
+        process.env.NODE_ENV === "production" ? window.location.port : PARAMETERS.server.port;
+
+    let path = "";
+    switch (type) {
+        case "map":
+            path = "map";
+            break;
+        case "point_cloud":
+            path = "pointcloud";
+            break;
+        case "sim_world":
+            path = OFFLINE_PLAYBACK ? "RosPlayBack" : "websocket";
+            break;
+    }
+    return `${protocol}://${link.hostname}:${port}/${path}`;
 }
 
 // NOTE: process.env.NODE_ENV will be set to "production" by webpack when
 // invoked in production mode ("-p"). We rely on this to determine which
 // websocket server to use.
-const serverAddr = process.env.NODE_ENV === "production" ?
-                   deduceWebsocketServerAddr() : `ws://${devConfig.websocketServer}`;
-
+const simWorldServerAddr = deduceWebsocketServerAddr("sim_world");
 const WS = OFFLINE_PLAYBACK
-            ? new OfflinePlaybackWebSocketEndpoint(serverAddr)
-            : new RealtimeWebSocketEndpoint(serverAddr);
-
+    ? new OfflinePlaybackWebSocketEndpoint(simWorldServerAddr)
+    : new RealtimeWebSocketEndpoint(simWorldServerAddr);
 export default WS;
 
+const mapServerAddr = deduceWebsocketServerAddr("map");
+export const MAP_WS = new MapDataWebSocketEndpoint(mapServerAddr);
+
+const pointCloudServerAddr = deduceWebsocketServerAddr("point_cloud");
+export const POINT_CLOUD_WS = new PointCloudWebSocketEndpoint(pointCloudServerAddr);

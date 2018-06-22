@@ -28,17 +28,38 @@ limitations under the License.
 namespace apollo {
 namespace hdmap {
 namespace {
-using apollo::common::math::Vec2d;
 using apollo::common::PointENU;
+using apollo::common::math::Vec2d;
 
 // Minimum error in lane segmentation.
-const double kSegmentationEpsilon = 0.2;
+// const double kSegmentationEpsilon = 0.2;
 
 // Minimum distance to remove duplicated points.
 const double kDuplicatedPointsEpsilon = 1e-7;
 
-// margin for comparation
+// Margin for comparation
 const double kEpsilon = 0.1;
+
+// Maximum x-coordinate of utm
+// const double kMaxXCoordinate = 834000;
+// Minimum x-coordinate of utm
+const double kMinXCoordinate = 166000;
+// Maximum y-coordinate of utm
+const double kMaxYCoordinate = 10000000;
+// Minimum y-coordinate of utm
+const double kMinYCoordinate = 0;
+
+bool IsPointValid(const PointENU &point) {
+  /* if (point.x() > kMaxXCoordinate || point.x() < kMinXCoordinate) {
+    return false;
+  }
+
+  if (point.y() > kMaxYCoordinate || point.y() < kMinYCoordinate) {
+    return false;
+  } */
+
+  return true;
+}
 
 void RemoveDuplicates(std::vector<Vec2d> *points) {
   RETURN_IF_NULL(points);
@@ -60,6 +81,8 @@ void PointsFromCurve(const Curve &input_curve, std::vector<Vec2d> *points) {
   for (const auto &curve : input_curve.segment()) {
     if (curve.has_line_segment()) {
       for (const auto &point : curve.line_segment().point()) {
+        CHECK(IsPointValid(point))
+            << "invalid map point: " << point.DebugString();
         points->emplace_back(point.x(), point.y());
       }
     } else {
@@ -73,12 +96,12 @@ apollo::common::math::Polygon2d ConvertToPolygon2d(const Polygon &polygon) {
   std::vector<Vec2d> points;
   points.reserve(polygon.point_size());
   for (const auto &point : polygon.point()) {
+    CHECK(IsPointValid(point)) << "invalid map point:" << point.DebugString();
     points.emplace_back(point.x(), point.y());
   }
   RemoveDuplicates(&points);
-  while (points.size() >= 2 &&
-         points[0].DistanceTo(points.back()) <=
-             apollo::common::math::kMathEpsilon) {
+  while (points.size() >= 2 && points[0].DistanceTo(points.back()) <=
+                                   apollo::common::math::kMathEpsilon) {
     points.pop_back();
   }
   return apollo::common::math::Polygon2d(points);
@@ -103,11 +126,11 @@ PointENU PointFromVec2d(const Vec2d &point) {
   return pt;
 }
 
-Vec2d Vec2dFromPoint(const PointENU &point) { return {point.x(), point.y()}; }
-
 }  // namespace
 
-LaneInfo::LaneInfo(const Lane &lane) : lane_(lane) { Init(); }
+LaneInfo::LaneInfo(const Lane &lane) : lane_(lane) {
+  Init();
+}
 
 void LaneInfo::Init() {
   PointsFromCurve(lane_.central_curve(), &points_);
@@ -174,6 +197,15 @@ void LaneInfo::Init() {
     AERROR << "lane_[id = " << lane_.id().DebugString() << "has NO type.";
   }
 
+  sampled_left_road_width_.clear();
+  sampled_right_road_width_.clear();
+  for (const auto &sample : lane_.left_road_sample()) {
+    sampled_left_road_width_.emplace_back(sample.s(), sample.width());
+  }
+  for (const auto &sample : lane_.right_road_sample()) {
+    sampled_right_road_width_.emplace_back(sample.s(), sample.width());
+  }
+
   CreateKDTree();
 }
 
@@ -208,6 +240,36 @@ double LaneInfo::Heading(const double s) const {
   }
 }
 
+double LaneInfo::Curvature(const double s) const {
+  if (points_.size() < 2) {
+    AERROR << "Not enough points to compute curvature.";
+    return 0.0;
+  }
+  const double kEpsilon = 0.001;
+  if (s + kEpsilon < accumulated_s_.front()) {
+    AERROR << "s:" << s << " should be >= " << accumulated_s_.front();
+    return 0.0;
+  }
+  if (s > accumulated_s_.back() + kEpsilon) {
+    AERROR << "s:" << s << " should be <= " << accumulated_s_.back();
+    return 0.0;
+  }
+
+  auto iter = std::lower_bound(accumulated_s_.begin(), accumulated_s_.end(), s);
+  if (iter == accumulated_s_.end()) {
+    ADEBUG << "Reach the end of lane.";
+    return 0.0;
+  }
+  int index = std::distance(accumulated_s_.begin(), iter);
+  if (index == 0) {
+    ADEBUG << "Reach the beginning of lane";
+    return 0.0;
+  } else {
+    return (headings_[index] - headings_[index - 1]) /
+           (accumulated_s_[index] - accumulated_s_[index - 1] + kEpsilon);
+  }
+}
+
 double LaneInfo::GetWidth(const double s) const {
   double left_width = 0.0;
   double right_width = 0.0;
@@ -220,6 +282,23 @@ double LaneInfo::GetEffectiveWidth(const double s) const {
   double right_width = 0.0;
   GetWidth(s, &left_width, &right_width);
   return 2 * std::min(left_width, right_width);
+}
+
+void LaneInfo::GetRoadWidth(const double s, double *left_width,
+                            double *right_width) const {
+  if (left_width != nullptr) {
+    *left_width = GetWidthFromSample(sampled_left_road_width_, s);
+  }
+  if (right_width != nullptr) {
+    *right_width = GetWidthFromSample(sampled_right_road_width_, s);
+  }
+}
+
+double LaneInfo::GetRoadWidth(const double s) const {
+  double left_width = 0.0;
+  double right_width = 0.0;
+  GetRoadWidth(s, &left_width, &right_width);
+  return left_width + right_width;
 }
 
 double LaneInfo::GetWidthFromSample(
@@ -257,7 +336,7 @@ bool LaneInfo::IsOnLane(const Vec2d &point) const {
   }
 
   if (accumulate_s > (total_length() + kEpsilon) ||
-              (accumulate_s + kEpsilon) < 0.0) {
+      (accumulate_s + kEpsilon) < 0.0) {
     return false;
   }
 
@@ -466,9 +545,39 @@ JunctionInfo::JunctionInfo(const Junction &junction) : junction_(junction) {
 void JunctionInfo::Init() {
   polygon_ = ConvertToPolygon2d(junction_.polygon());
   CHECK_GT(polygon_.num_points(), 2);
+
+  for (const auto &overlap_id : junction_.overlap_id()) {
+    overlap_ids_.emplace_back(overlap_id);
+  }
 }
 
-SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) { Init(); }
+void JunctionInfo::PostProcess(const HDMapImpl &map_instance) {
+  UpdateOverlaps(map_instance);
+}
+
+void JunctionInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
+  for (const auto &overlap_id : overlap_ids_) {
+    const auto &overlap_ptr = map_instance.GetOverlapById(overlap_id);
+    if (overlap_ptr == nullptr) {
+      continue;
+    }
+
+    for (const auto &object : overlap_ptr->overlap().object()) {
+      const auto &object_id = object.id().id();
+      if (object_id == id().id()) {
+        continue;
+      }
+
+      if (object.has_stop_sign_overlap_info()) {
+        overlap_stop_sign_ids_.push_back(object.id());
+      }
+    }
+  }
+}
+
+SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) {
+  Init();
+}
 
 void SignalInfo::Init() {
   for (const auto &stop_line : signal_.stop_line()) {
@@ -502,6 +611,39 @@ void StopSignInfo::init() {
     SegmentsFromCurve(stop_line, &segments_);
   }
   CHECK(!segments_.empty());
+
+  for (const auto &overlap_id : stop_sign_.overlap_id()) {
+    overlap_ids_.emplace_back(overlap_id);
+  }
+}
+
+void StopSignInfo::PostProcess(const HDMapImpl &map_instance) {
+  UpdateOverlaps(map_instance);
+}
+
+void StopSignInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
+  for (const auto &overlap_id : overlap_ids_) {
+    const auto &overlap_ptr = map_instance.GetOverlapById(overlap_id);
+    if (overlap_ptr == nullptr) {
+      continue;
+    }
+
+    for (const auto &object : overlap_ptr->overlap().object()) {
+      const auto &object_id = object.id().id();
+      if (object_id == id().id()) {
+        continue;
+      }
+
+      if (object.has_junction_overlap_info()) {
+        overlap_junction_ids_.push_back(object.id());
+      } else if (object.has_lane_overlap_info()) {
+        overlap_lane_ids_.push_back(object.id());
+      }
+    }
+  }
+  if (overlap_junction_ids_.size() <= 0) {
+    AWARN << "stop sign " << id().id() << "has no overlap with any junction.";
+  }
 }
 
 YieldSignInfo::YieldSignInfo(const YieldSign &yield_sign)
@@ -541,8 +683,7 @@ void SpeedBumpInfo::Init() {
 
 OverlapInfo::OverlapInfo(const Overlap &overlap) : overlap_(overlap) {}
 
-const ObjectOverlapInfo *OverlapInfo::get_object_overlap_info(
-    const Id &id) const {
+const ObjectOverlapInfo *OverlapInfo::GetObjectOverlapInfo(const Id &id) const {
   for (const auto &object : overlap_.object()) {
     if (object.id().id() == id.id()) {
       return &object;

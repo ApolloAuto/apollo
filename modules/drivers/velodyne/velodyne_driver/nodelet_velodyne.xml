@@ -2,7 +2,7 @@
   <class name="velodyne_driver/DriverNodelet"
          type="apollo::drivers::velodyne::DriverNodelet"
          base_class_type="nodelet::Nodelet">
-    <description> 
+    <description>
       Publish raw Velodyne data packets.
     </description>
   </class>

@@ -15,12 +15,15 @@
  *****************************************************************************/
 
 /**
- * @file dp_st_cost.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_TASKS_DP_ST_SPEED_DP_ST_COST_H_
 #define MODULES_PLANNING_TASKS_DP_ST_SPEED_DP_ST_COST_H_
 
+#include <string>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -40,41 +43,52 @@ class DpStCost {
                     const std::vector<const PathObstacle*>& obstacles,
                     const common::TrajectoryPoint& init_point);
 
-  double GetObstacleCost(const StGraphPoint& point) const;
+  float GetObstacleCost(const StGraphPoint& point);
 
-  double GetReferenceCost(const STPoint& point,
+  float GetReferenceCost(const STPoint& point,
                           const STPoint& reference_point) const;
 
-  double GetSpeedCost(const STPoint& first, const STPoint& second,
-                      const double speed_limit) const;
+  float GetSpeedCost(const STPoint& first, const STPoint& second,
+                      const float speed_limit) const;
 
-  double GetAccelCostByTwoPoints(const double pre_speed, const STPoint& first,
-                                 const STPoint& second) const;
-  double GetAccelCostByThreePoints(const STPoint& first, const STPoint& second,
-                                   const STPoint& third) const;
+  float GetAccelCostByTwoPoints(const float pre_speed, const STPoint& first,
+                                 const STPoint& second);
+  float GetAccelCostByThreePoints(const STPoint& first, const STPoint& second,
+                                   const STPoint& third);
 
-  double GetJerkCostByTwoPoints(const double pre_speed, const double pre_acc,
+  float GetJerkCostByTwoPoints(const float pre_speed, const float pre_acc,
                                 const STPoint& pre_point,
-                                const STPoint& curr_point) const;
-  double GetJerkCostByThreePoints(const double first_speed,
+                                const STPoint& curr_point);
+  float GetJerkCostByThreePoints(const float first_speed,
                                   const STPoint& first_point,
                                   const STPoint& second_point,
-                                  const STPoint& third_point) const;
+                                  const STPoint& third_point);
 
-  double GetJerkCostByFourPoints(const STPoint& first, const STPoint& second,
-                                 const STPoint& third,
-                                 const STPoint& fourth) const;
+  float GetJerkCostByFourPoints(const STPoint& first, const STPoint& second,
+                                 const STPoint& third, const STPoint& fourth);
 
  private:
-  double GetAccelCost(const double accel) const;
-  double JerkCost(const double jerk) const;
+  float GetAccelCost(const float accel);
+  float JerkCost(const float jerk);
+
+  void AddToKeepClearRange(const std::vector<const PathObstacle*>& obstacles);
+  static void SortAndMergeRange(
+      std::vector<std::pair<float, float>>* keep_clear_range_);
+  bool InKeepClearRange(float s) const;
 
   const DpStSpeedConfig& config_;
   const std::vector<const PathObstacle*>& obstacles_;
   const common::TrajectoryPoint& init_point_;
-  double unit_s_ = 0.0;
-  double unit_t_ = 0.0;
-  double unit_v_ = 0.0;
+
+  float unit_t_ = 0.0;
+
+  std::unordered_map<std::string, int> boundary_map_;
+  std::vector<std::vector<std::pair<float, float>>> boundary_cost_;
+
+  std::vector<std::pair<float, float>> keep_clear_range_;
+
+  std::array<float, 200> accel_cost_;
+  std::array<float, 400> jerk_cost_;
 };
 
 }  // namespace planning

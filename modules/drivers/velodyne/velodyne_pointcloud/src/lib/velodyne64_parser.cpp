@@ -146,7 +146,7 @@ void Velodyne64Parser::init_offsets() {
 }
 
 void Velodyne64Parser::generate_pointcloud(
-    const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msg,
+    velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
     VPointCloud::Ptr& pointcloud) {
   if (config_.calibration_online && !calibration_.initialized_) {
     if (online_calibration_.decode(scan_msg) == -1) {
@@ -213,7 +213,7 @@ double Velodyne64Parser::get_timestamp(double base_time, float time_offset,
 }
 
 int Velodyne64Parser::intensity_compensate(const LaserCorrection& corrections,
-                                           const uint16_t& raw_distance,
+                                           const uint16_t raw_distance,
                                            int intensity) {
   float tmp = 1 - static_cast<float>(raw_distance) / 65535;
   intensity += corrections.focal_slope *
@@ -249,7 +249,7 @@ void Velodyne64Parser::unpack(const velodyne_msgs::VelodynePacket& pkt,
     for (int j = 0, k = 0; j < SCANS_PER_BLOCK;
          ++j, k += RAW_SCAN_SIZE) {  // 32, 3
       // One point
-      uint8_t laser_number = j + bank_origin;  // hardware larse number
+      uint8_t laser_number = j + bank_origin;  // hardware laser number
       LaserCorrection& corrections =
           calibration_.laser_corrections_[laser_number];
 
@@ -270,7 +270,7 @@ void Velodyne64Parser::unpack(const velodyne_msgs::VelodynePacket& pkt,
 
       if (raw_distance.raw_distance == 0 ||
           !is_scan_valid(raw->blocks[i].rotation, distance)) {
-        // if orgnized append a nan point to the cloud
+        // if organized append a nan point to the cloud
         if (config_.organized) {
           pc.points.emplace_back(get_nan_point(timestamp));
         }

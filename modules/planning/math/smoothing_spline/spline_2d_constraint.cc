@@ -56,9 +56,9 @@ bool Spline2dConstraint::AddEqualityConstraint(
 
 // preset method
 /**
-*   @brief: inequality boundary constraints
-*   if no boundary, do specify either by std::infinity or let vector.size() = 0
-**/
+ *   @brief: inequality boundary constraints
+ *   if no boundary, do specify either by std::infinity or let vector.size() = 0
+ **/
 bool Spline2dConstraint::Add2dBoundary(
     const std::vector<double>& t_coord, const std::vector<double>& angle,
     const std::vector<Vec2d>& ref_point,
@@ -234,18 +234,42 @@ bool Spline2dConstraint::Add2dThirdDerivativeBoundary(
 
 bool Spline2dConstraint::AddPointConstraint(const double t, const double x,
                                             const double y) {
-  const uint32_t num_params = spline_order_ + 1;
   const uint32_t index = FindIndex(t);
-  const uint32_t index_offset = index * 2 * num_params;
   const double rel_t = t - t_knots_[index];
+  std::vector<double> coef = PolyCoef(rel_t);
+  return AddPointKthOrderDerivativeConstraint(t, x, y, coef);
+}
 
+bool Spline2dConstraint::AddPointSecondDerivativeConstraint(const double t,
+                                                            const double ddx,
+                                                            const double ddy) {
+  const std::size_t index = FindIndex(t);
+  const double rel_t = t - t_knots_[index];
+  std::vector<double> coef = SecondDerivativeCoef(rel_t);
+  return AddPointKthOrderDerivativeConstraint(t, ddx, ddy, coef);
+}
+
+bool Spline2dConstraint::AddPointThirdDerivativeConstraint(const double t,
+                                                           const double dddx,
+                                                           const double dddy) {
+  const std::size_t index = FindIndex(t);
+  const double rel_t = t - t_knots_[index];
+  std::vector<double> coef = ThirdDerivativeCoef(rel_t);
+  return AddPointKthOrderDerivativeConstraint(t, dddx, dddy, coef);
+}
+
+bool Spline2dConstraint::AddPointKthOrderDerivativeConstraint(
+    const double t, const double x_kth_derivative,
+    const double y_kth_derivative, const std::vector<double>& coef) {
+  const uint32_t num_params = spline_order_ + 1;
   Eigen::MatrixXd affine_equality = Eigen::MatrixXd::Zero(2, total_param_);
   Eigen::MatrixXd affine_boundary = Eigen::MatrixXd::Zero(2, 1);
-  affine_boundary << x, y;
-  std::vector<double> power_t = PolyCoef(rel_t);
-  for (uint32_t i = 0; i < num_params; ++i) {
-    affine_equality(0, i + index_offset) = power_t[i];
-    affine_equality(1, i + num_params + index_offset) = power_t[i];
+  affine_boundary << x_kth_derivative, y_kth_derivative;
+  const std::size_t index = FindIndex(t);
+  const std::size_t index_offset = index * 2 * num_params;
+  for (std::size_t i = 0; i < num_params; ++i) {
+    affine_equality(0, i + index_offset) = coef[i];
+    affine_equality(1, i + num_params + index_offset) = coef[i];
   }
   return AddEqualityConstraint(affine_equality, affine_boundary);
 }
@@ -267,7 +291,8 @@ bool Spline2dConstraint::AddPointAngleConstraint(const double t,
 
   // add inequality constraint
   Eigen::MatrixXd affine_inequality = Eigen::MatrixXd::Zero(2, total_param_);
-  Eigen::MatrixXd affine_inequality_boundary = Eigen::MatrixXd::Zero(2, 1);
+  const Eigen::MatrixXd affine_inequality_boundary =
+      Eigen::MatrixXd::Zero(2, 1);
   std::vector<double> t_coef = DerivativeCoef(rel_t);
   int x_sign = 1;
   int y_sign = 1;
@@ -275,14 +300,13 @@ bool Spline2dConstraint::AddPointAngleConstraint(const double t,
   if (normalized_angle < 0) {
     normalized_angle += M_PI * 2;
   }
+
   if (normalized_angle > (M_PI / 2) && normalized_angle < (M_PI * 1.5)) {
     x_sign = -1;
-    affine_inequality_boundary(0, 0) *= -1;
   }
 
   if (normalized_angle >= M_PI) {
     y_sign = -1;
-    affine_inequality_boundary(1, 0) *= -1;
   }
 
   for (uint32_t i = 0; i < t_coef.size(); ++i) {
@@ -432,8 +456,8 @@ bool Spline2dConstraint::AddThirdDerivativeSmoothConstraint() {
 }
 
 /**
-*   @brief: output interface inequality constraint
-**/
+ *   @brief: output interface inequality constraint
+ **/
 const AffineConstraint& Spline2dConstraint::inequality_constraint() const {
   return inequality_constraint_;
 }

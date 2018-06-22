@@ -25,6 +25,9 @@
 #include "modules/common/log.h"
 #include "modules/routing/proto/routing.pb.h"
 
+DEFINE_bool(enable_remove_lane_id, true,
+            "True to remove lane id in routing request");
+
 DEFINE_string(routing_test_file,
               "modules/routing/testdata/routing_tester/routing_test.pb.txt",
               "Used for sending routing request to routing node.");
@@ -55,6 +58,13 @@ int main(int argc, char** argv) {
                                               &routing_request)) {
     AERROR << "failed to load file: " << FLAGS_routing_test_file;
     return -1;
+  }
+
+  if (FLAGS_enable_remove_lane_id) {
+    for (int i = 0; i < routing_request.waypoint_size(); ++i) {
+      routing_request.mutable_waypoint(i)->clear_id();
+      routing_request.mutable_waypoint(i)->clear_s();
+    }
   }
 
   ros::Rate loop_rate(0.3);  // frequency

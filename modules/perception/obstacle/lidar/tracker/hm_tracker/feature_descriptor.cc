@@ -35,9 +35,9 @@ void FeatureDescriptor::ComputeHistogram(const int bin_size,
   int pt_num = cloud_->points.size();
   for (int i = 0; i < pt_num; ++i) {
     pcl_util::Point& pt = cloud_->points[i];
-    stat_feat[static_cast<int>((pt.x - min_pt_.x) / xsize)]++;
-    stat_feat[static_cast<int>(xstep + (pt.y - min_pt_.y) / ysize)]++;
-    stat_feat[static_cast<int>(xstep + ystep + (pt.z - min_pt_.z) / zsize)]++;
+    stat_feat[floor((pt.x - min_pt_.x) / xsize)]++;
+    stat_feat[xstep + floor((pt.y - min_pt_.y) / ysize)]++;
+    stat_feat[xstep + ystep + floor((pt.z - min_pt_.z) / zsize)]++;
   }
   // update feature
   (*feature).resize(stat_len);

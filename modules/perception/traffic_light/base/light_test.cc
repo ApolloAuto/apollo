@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+#include "modules/perception/traffic_light/base/light.h"
+
 #include <sstream>
 
-#include "modules/perception/traffic_light/base/light.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -46,7 +47,7 @@ TEST(LightTest, test_light) {
     std::ostringstream oss;
     oss << "Status: [color:"
         << "green"
-        << " confidence:" << 0.0  << "]";
+        << " confidence:" << 0.0 << "]";
     EXPECT_EQ(oss.str(), light_status.to_string());
   }
 

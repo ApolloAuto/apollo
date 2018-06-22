@@ -62,8 +62,7 @@ cc_library(
     deps = [
         ":indexed_list",
         ":planning_gflags",
-        "//modules/common/math:box2d",
-        "//modules/common/math:polygon2d",
+        "//modules/common/math:geometry",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_util",
@@ -138,10 +137,8 @@ cc_library(
     deps = [
         ":planning_gflags",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/math",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/math:hermite_spline",
         "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_status_proto",
     ],
 )
 
@@ -186,16 +183,17 @@ cc_library(
         ":planning_gflags",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/common/util:dropbox",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/pnc_map",
         "//modules/map/proto:map_proto",
+        "//modules/planning/common:planning_thread_pool",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
+        "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/reference_line",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -225,7 +223,6 @@ cc_library(
     deps = [
         ":planning_gflags",
         ":reference_line_info",
-        "//modules/common/util:dropbox",
         "//modules/map/pnc_map:route_segments",
         "//modules/planning/proto:planning_proto",
     ],
@@ -311,7 +308,22 @@ cc_library(
         "//modules/common:log",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
-        "@eigen//:eigen",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "planning_thread_pool",
+    srcs = [
+        "planning_thread_pool.cc",
+    ],
+    hdrs = [
+        "planning_thread_pool.h",
+    ],
+    deps = [
+        ":planning_gflags",
+        "//modules/common:macro",
+        "//modules/common/util:ctpl_stl",
     ],
 )
 

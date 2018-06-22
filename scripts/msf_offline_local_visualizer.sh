@@ -1,6 +1,6 @@
 #! /bin/bash
 if [ $# -lt 1 ]; then
-    echo "[data path]"
+    echo "Usage: msf_offline_local_visualizer.sh [data path]"
     exit 1;
 fi
 

@@ -214,6 +214,17 @@ class Polygon2d {
                   Vec2d *const last) const;
 
   /**
+   * @brief Get all vertices of the polygon
+   * @param All vertices of the polygon
+   */
+  void GetAllVertices(std::vector<Vec2d> *const vertices) const;
+
+  /**
+   * @brief Get all vertices of the polygon
+   */
+  std::vector<Vec2d> GetAllVertices() const;
+
+  /**
    * @brief Get all overlapped line segments of a line segment and this polygon.
    *        There are possibly multiple overlapped line segments if this
    *        polygon is not convex.
@@ -288,6 +299,11 @@ class Polygon2d {
    * @return Essential information about the polygon for debugging purpose.
    */
   std::string DebugString() const;
+
+  double min_x() const { return min_x_; }
+  double max_x() const { return max_x_; }
+  double min_y() const { return min_y_; }
+  double max_y() const { return max_y_; }
 
  protected:
   void BuildFromPoints();

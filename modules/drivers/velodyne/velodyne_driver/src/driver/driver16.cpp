@@ -26,7 +26,9 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-Velodyne16Driver::Velodyne16Driver(Config config) : config_(config) {}
+Velodyne16Driver::Velodyne16Driver(const Config &config) {
+  config_ = config;
+}
 
 void Velodyne16Driver::init(ros::NodeHandle &node) {
   double packet_rate = 754;                 // packet frequency (Hz)
@@ -80,7 +82,7 @@ bool Velodyne16Driver::poll(void) {
   ROS_DEBUG("Publishing a full Velodyne scan.");
   scan->header.stamp = ros::Time().now();
   scan->header.frame_id = config_.frame_id;
-  // we use fisrt packet gps time update gps base hour
+  // we use first packet gps time update gps base hour
   // in cloud nodelet, will update base time packet by packet
   uint32_t current_secs =
       *((uint32_t *)(&scan->packets.front().data[0] + 1200));
@@ -100,7 +102,7 @@ void Velodyne16Driver::poll_positioning_packet(void) {
     NMEATimePtr nmea_time(new NMEATime);
     bool ret = true;
     while (true) {
-      int rc = positioning_input_->get_positioning_data_packtet(nmea_time);
+      int rc = positioning_input_->get_positioning_data_packet(nmea_time);
       if (rc == 0) {
         break;  // got a full packet
       }

@@ -28,9 +28,7 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::ErrorCode;
 
-std::string Routing::Name() const {
-  return FLAGS_routing_node_name;
-}
+std::string Routing::Name() const { return FLAGS_routing_node_name; }
 
 Routing::Routing()
     : monitor_logger_(apollo::common::monitor::MonitorMessageItem::ROUTING) {}
@@ -66,7 +64,7 @@ apollo::common::Status Routing::Start() {
 }
 
 RoutingRequest Routing::FillLaneInfoIfMissing(
-    const RoutingRequest &routing_request) {
+    const RoutingRequest& routing_request) {
   RoutingRequest fixed_request(routing_request);
   for (int i = 0; i < routing_request.waypoint_size(); ++i) {
     const auto& lane_waypoint = routing_request.waypoint(i);
@@ -95,8 +93,7 @@ RoutingRequest Routing::FillLaneInfoIfMissing(
   return fixed_request;
 }
 
-void Routing::OnRoutingRequest(
-    const RoutingRequest &routing_request) {
+void Routing::OnRoutingRequest(const RoutingRequest& routing_request) {
   AINFO << "Get new routing request:" << routing_request.DebugString();
   RoutingResponse routing_response;
   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);

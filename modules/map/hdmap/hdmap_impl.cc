@@ -15,10 +15,10 @@ limitations under the License.
 
 #include "modules/map/hdmap/hdmap_impl.h"
 
-#include <iostream>
 #include <algorithm>
-#include <unordered_set>
+#include <iostream>
 #include <limits>
+#include <unordered_set>
 
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
@@ -28,9 +28,9 @@ namespace apollo {
 namespace hdmap {
 namespace {
 
+using apollo::common::PointENU;
 using apollo::common::math::AABoxKDTreeParams;
 using apollo::common::math::Vec2d;
-using apollo::common::PointENU;
 
 Id CreateHDMapId(const std::string& string_id) {
   Id id;
@@ -47,7 +47,8 @@ constexpr int kBackwardDistance = 4;
 
 int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   Clear();
-
+  // TODO(startcode) seems map_ can be changed to a local variable of this
+  // function, but test will fail if I do so. if so.
   if (apollo::common::util::EndWith(map_filename, ".xml")) {
     if (!adapter::OpendriveAdapter::LoadData(map_filename, &map_)) {
       return -1;
@@ -55,8 +56,14 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   } else if (!apollo::common::util::GetProtoFromFile(map_filename, &map_)) {
     return -1;
   }
+  return LoadMapFromProto(map_);
+}
 
-
+int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
+  if (&map_proto != &map_) {  // avoid an unnecessary copy
+    Clear();
+    map_ = map_proto;
+  }
   for (const auto& lane : map_.lane()) {
     lane_table_[lane.id().id()].reset(new LaneInfo(lane));
   }
@@ -97,13 +104,24 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
     for (const auto& road_section : road_ptr_pair.second->sections()) {
       const auto& section_id = road_section.id();
       for (const auto& lane_id : road_section.lane_id()) {
-        lane_table_[lane_id.id()]->set_road_id(road_id);
-        lane_table_[lane_id.id()]->set_section_id(section_id);
+        auto iter = lane_table_.find(lane_id.id());
+        if (iter != lane_table_.end()) {
+          iter->second->set_road_id(road_id);
+          iter->second->set_section_id(section_id);
+        } else {
+          AFATAL << "Unknown lane id: " << lane_id.id();
+        }
       }
     }
   }
   for (const auto& lane_ptr_pair : lane_table_) {
     lane_ptr_pair.second->PostProcess(*this);
+  }
+  for (const auto& junction_ptr_pair : junction_table_) {
+    junction_ptr_pair.second->PostProcess(*this);
+  }
+  for (const auto& stop_sign_ptr_pair : stop_sign_table_) {
+    stop_sign_ptr_pair.second->PostProcess(*this);
   }
 
   BuildLaneSegmentKDTree();
@@ -206,7 +224,9 @@ int HDMapImpl::GetRoads(const Vec2d& point, double distance,
   }
   std::unordered_set<std::string> road_ids;
   for (auto& lane : lanes) {
-    road_ids.insert(lane->road_id().id());
+    if (!lane->road_id().id().empty()) {
+      road_ids.insert(lane->road_id().id());
+    }
   }
 
   for (auto& road_id : road_ids) {
@@ -570,8 +590,7 @@ int HDMapImpl::GetRoadBoundaries(
 }
 
 int HDMapImpl::GetForwardNearestSignalsOnLane(
-    const apollo::common::PointENU& point,
-    const double distance,
+    const apollo::common::PointENU& point, const double distance,
     std::vector<SignalInfoConstPtr>* signals) const {
   CHECK_NOTNULL(signals);
 
@@ -602,16 +621,16 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
   }
   for (const auto& lane : surrounding_lanes) {
     if (!lane->signals().empty()) {
-        lane_ptr = lane;
-        nearest_l = lane_ptr->DistanceTo(car_point, &map_point,
-                                          &nearest_s, &s_index);
-        break;
+      lane_ptr = lane;
+      nearest_l =
+          lane_ptr->DistanceTo(car_point, &map_point, &nearest_s, &s_index);
+      break;
     }
   }
   if (lane_ptr == nullptr) {
     GetNearestLane(point, &lane_ptr, &nearest_s, &nearest_l);
     if (lane_ptr == nullptr) {
-        return -1;
+      return -1;
     }
   }
 
@@ -639,8 +658,8 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
       for (int i = 0; i < overlap_ptr->overlap().object_size(); ++i) {
         if (overlap_ptr->overlap().object(i).id().id() == lane_ptr->id().id()) {
           lane_overlap_offset_s =
-              overlap_ptr->overlap().object(i).lane_overlap_info().start_s()
-              - s_start;
+              overlap_ptr->overlap().object(i).lane_overlap_info().start_s() -
+              s_start;
           continue;
         }
         signal_ptr = GetSignalById(overlap_ptr->overlap().object(i).id());
@@ -657,8 +676,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
         }
       }
     }
-    if (!min_dist_signal_ptr.empty() &&
-        unused_distance >= signal_min_dist) {
+    if (!min_dist_signal_ptr.empty() && unused_distance >= signal_min_dist) {
       *signals = min_dist_signal_ptr;
       break;
     }
@@ -676,6 +694,90 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
     lane_ptr = tmp_lane_ptr;
     s_start = 0;
   }
+  return 0;
+}
+
+int HDMapImpl::GetStopSignAssociatedStopSigns(
+    const Id& id, std::vector<StopSignInfoConstPtr>* stop_signs) const {
+  CHECK_NOTNULL(stop_signs);
+
+  const auto& stop_sign = GetStopSignById(id);
+  if (stop_sign == nullptr) {
+    return -1;
+  }
+
+  std::vector<Id> associate_stop_sign_ids;
+  const auto junction_ids = stop_sign->OverlapJunctionIds();
+  for (const auto& junction_id : junction_ids) {
+    const auto& junction = GetJunctionById(junction_id);
+    if (junction == nullptr) {
+      continue;
+    }
+    const auto stop_sign_ids = junction->OverlapStopSignIds();
+    std::copy(stop_sign_ids.begin(), stop_sign_ids.end(),
+              std::back_inserter(associate_stop_sign_ids));
+  }
+
+  std::vector<Id> associate_lane_ids;
+  for (const auto& stop_sign_id : associate_stop_sign_ids) {
+    if (stop_sign_id.id() == id.id()) {
+      // exclude current stop sign
+      continue;
+    }
+    const auto& stop_sign = GetStopSignById(stop_sign_id);
+    if (stop_sign == nullptr) {
+      continue;
+    }
+    stop_signs->push_back(stop_sign);
+  }
+
+  return 0;
+}
+
+int HDMapImpl::GetStopSignAssociatedLanes(
+    const Id& id, std::vector<LaneInfoConstPtr>* lanes) const {
+  CHECK_NOTNULL(lanes);
+
+  const auto& stop_sign = GetStopSignById(id);
+  if (stop_sign == nullptr) {
+    return -1;
+  }
+
+  std::vector<Id> associate_stop_sign_ids;
+  const auto junction_ids = stop_sign->OverlapJunctionIds();
+  for (const auto& junction_id : junction_ids) {
+    const auto& junction = GetJunctionById(junction_id);
+    if (junction == nullptr) {
+      continue;
+    }
+    const auto stop_sign_ids = junction->OverlapStopSignIds();
+    std::copy(stop_sign_ids.begin(), stop_sign_ids.end(),
+              std::back_inserter(associate_stop_sign_ids));
+  }
+
+  std::vector<Id> associate_lane_ids;
+  for (const auto& stop_sign_id : associate_stop_sign_ids) {
+    if (stop_sign_id.id() == id.id()) {
+      // exclude current stop sign
+      continue;
+    }
+    const auto& stop_sign = GetStopSignById(stop_sign_id);
+    if (stop_sign == nullptr) {
+      continue;
+    }
+    const auto lane_ids = stop_sign->OverlapLaneIds();
+    std::copy(lane_ids.begin(), lane_ids.end(),
+              std::back_inserter(associate_lane_ids));
+  }
+
+  for (const auto lane_id : associate_lane_ids) {
+    const auto& lane = GetLaneById(lane_id);
+    if (lane == nullptr) {
+      continue;
+    }
+    lanes->push_back(lane);
+  }
+
   return 0;
 }
 
@@ -784,9 +886,12 @@ int HDMapImpl::SearchObjects(const Vec2d& center, const double radius,
   }
   auto objects = kdtree.GetObjects(center, radius);
   std::unordered_set<std::string> result_ids;
+  result_ids.reserve(objects.size());
   for (const auto* object_ptr : objects) {
     result_ids.insert(object_ptr->object()->id().id());
   }
+
+  results->reserve(result_ids.size());
   results->assign(result_ids.begin(), result_ids.end());
   return 0;
 }

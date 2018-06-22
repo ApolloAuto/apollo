@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
-#include <assert.h>
 
 namespace apollo {
 namespace localization {
@@ -27,18 +26,14 @@ BaseMapMatrix::~BaseMapMatrix() {}
 
 BaseMapMatrix::BaseMapMatrix(const BaseMapMatrix& cells) {}
 
-unsigned int BaseMapMatrix::LoadBinary(unsigned char* buf) {
-  return 0;
-}
+unsigned int BaseMapMatrix::LoadBinary(unsigned char* buf) { return 0; }
 
 unsigned int BaseMapMatrix::CreateBinary(unsigned char* buf,
                                          unsigned int buf_size) const {
   return 0;
 }
 
-unsigned int BaseMapMatrix::GetBinarySize() const {
-  return 0;
-}
+unsigned int BaseMapMatrix::GetBinarySize() const { return 0; }
 
 }  // namespace msf
 }  // namespace localization

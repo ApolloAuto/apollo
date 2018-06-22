@@ -16,31 +16,28 @@
 
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 
-DEFINE_string(node_namespace, "/apollo/third_party_perception",
-              "Global node namespace");
 DEFINE_string(node_name, "third_party_perception",
               "The chassis module name in proto");
 DEFINE_string(module_name, "third_party_perception", "Module name");
 
 DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
 
-DEFINE_double(third_party_perception_freq, 100,
+DEFINE_double(third_party_perception_freq, 10,
               "third party perception timer frequency.");
 DEFINE_bool(enable_mobileye, true, "switch to turn on/off mobileye obstacles");
-DEFINE_bool(enable_delphi_esr, true,
-            "switch to turn on/off delphi_esr obstacles");
+DEFINE_bool(enable_radar, true, "switch to turn on/off radar obstacles");
 
 // flags to calibrate mobileye, radar and localization
 DEFINE_double(mobileye_pos_adjust, 3.0,
               "adjust mobileye objects's position due to distance between "
               "mobileye and gps.");
 DEFINE_double(
-    delphi_esr_pos_adjust, 3.0,
+    radar_pos_adjust, 3.0,
     "adjust radar objects's position due to distance between radar and gps.");
 
 // object id offset
 DEFINE_int32(mobileye_id_offset, 0, "id offset for mobileye");
-DEFINE_int32(delphi_esr_id_offset, 1000, "id offset for delphi_esr");
+DEFINE_int32(radar_id_offset, 1000, "id offset for radar");
 
 // flags to create fake bounding box
 DEFINE_double(default_car_length, 5.0, "default car length for bounding box.");
@@ -76,4 +73,17 @@ DEFINE_int32(
     movable_frames_count_threshold, 5,
     "a radar object is considered as a movable "
     "if it is moving for consecutive movable_frames_count_threshold frames");
-DEFINE_int32(keep_delphi_esr_frames, 5, "number of delphi esr frames to keep");
+DEFINE_int32(keep_radar_frames, 5, "number of delphi esr frames to keep");
+
+// TODO(QiL) : remove this temperary gflags
+DEFINE_bool(use_conti_radar, true,
+            "use conti or delphi radar, true is conti, false is delphi");
+
+DEFINE_double(max_mobileye_obstacle_length, 31.2,
+              "maximum mobileye obstacle length");
+
+DEFINE_double(max_mobileye_obstacle_width, 12.7,
+              "maximum mobileye obstacle length");
+
+DEFINE_bool(overwrite_mobileye_theta, true,
+            "overrite mobileye raw theta output");

@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.perception.traffic_light.rectifier_config;
+
+message ModelConfigs {
+  optional string name = 1;
+  optional string version = 2;
+  optional float crop_scale = 3;
+  optional int32 crop_min_size = 4;
+  optional string detection_model = 5;
+  optional string detection_net = 6;
+  optional int32 crop_method = 7;
+  optional int32 detect_method = 8;
+}

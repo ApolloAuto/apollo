@@ -31,8 +31,7 @@ namespace apollo {
 namespace planning {
 
 Spline1dKernel::Spline1dKernel(const Spline1d& spline1d)
-    : Spline1dKernel(spline1d.x_knots(), spline1d.spline_order()) {
-}
+    : Spline1dKernel(spline1d.x_knots(), spline1d.spline_order()) {}
 
 Spline1dKernel::Spline1dKernel(const std::vector<double>& x_knots,
                                const uint32_t spline_order)

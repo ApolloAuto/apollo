@@ -39,7 +39,7 @@ double VelodyneParser::get_gps_stamp(double current_packet_stamp,
                       << ". current:" << current_packet_stamp
                       << ", last time:" << previous_packet_stamp);
     } else {
-      ROS_WARN_STREAM("Currrnt stamp:" << std::fixed << current_packet_stamp
+      ROS_WARN_STREAM("Current stamp:" << std::fixed << current_packet_stamp
                                        << " less than previous stamp:"
                                        << previous_packet_stamp
                                        << ". GPS time stamp maybe incorrect!");
@@ -83,7 +83,7 @@ void VelodyneParser::init_angle_params(double view_direction,
   tmp_max_angle = fmod(fmod(tmp_max_angle, 2 * M_PI) + 2 * M_PI, 2 * M_PI);
 
   // converting into the hardware velodyne ref (negative yaml and degrees)
-  // adding 0.5 perfomrs a centered double to int conversion
+  // adding 0.5 performs a centered double to int conversion
   config_.min_angle = 100 * (2 * M_PI - tmp_min_angle) * 180 / M_PI + 0.5;
   config_.max_angle = 100 * (2 * M_PI - tmp_max_angle) * 180 / M_PI + 0.5;
   if (config_.min_angle == config_.max_angle) {
@@ -131,7 +131,7 @@ bool VelodyneParser::is_scan_valid(int rotation, float range) {
 
 void VelodyneParser::compute_coords(const union RawDistance &raw_distance,
                                     const LaserCorrection &corrections,
-                                    const uint16_t &rotation, VPoint &point) {
+                                    const uint16_t rotation, VPoint &point) {
   ROS_ASSERT_MSG(rotation < 36000, "rotation must between 0 and 35999");
   double x = 0.0;
   double y = 0.0;
@@ -149,7 +149,7 @@ void VelodyneParser::compute_coords(const union RawDistance &raw_distance,
       sin_rot_table_[rotation] * corrections.cos_rot_correction -
       cos_rot_table_[rotation] * corrections.sin_rot_correction;
 
-  double vert_offset = corrections.vert_offset_correction;
+  // double vert_offset = corrections.vert_offset_correction;
 
   // Compute the distance in the xy plane (w/o accounting for rotation)
   double xy_distance = distance * corrections.cos_vert_correction;
@@ -210,13 +210,17 @@ VelodyneParser *VelodyneParserFactory::create_parser(Config config) {
   if (config.model == "VLP16") {
     config.calibration_online = false;
     return new Velodyne16Parser(config);
+  } else if (config.model == "HDL32E") {
+    config.calibration_online = false;
+    return new Velodyne32Parser(config);
   } else if (config.model == "64E_S2" || config.model == "64E_S3S" ||
              config.model == "64E_S3D_STRONGEST" ||
              config.model == "64E_S3D_LAST" || config.model == "64E_S3D_DUAL") {
     return new Velodyne64Parser(config);
   } else {
-    ROS_ERROR_STREAM("invalid model, must be 64E_S2|64E_S3S"
-                     << "|64E_S3D_STRONGEST|64E_S3D_LAST|64E_S3D_DUAL");
+    ROS_ERROR_STREAM(
+        "invalid model, must be 64E_S2|64E_S3S"
+        << "|64E_S3D_STRONGEST|64E_S3D_LAST|64E_S3D_DUAL|HDL32E|VLP16");
     return nullptr;
   }
 }

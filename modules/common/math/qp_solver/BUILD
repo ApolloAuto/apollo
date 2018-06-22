@@ -24,7 +24,7 @@ cc_library(
         "qp_solver.h",
     ],
     deps = [
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -36,14 +36,13 @@ cc_library(
     hdrs = [
         "active_set_qp_solver.h",
     ],
-    linkopts = [
-        "-lqp_oases",
-    ],
+    linkstatic = False,
     deps = [
         ":qp_solver",
         "//modules/common:log",
         "//modules/common/math/qp_solver:qp_solver_gflags",
-        "@eigen//:eigen",
+        "@eigen",
+        "@qpOASES",
     ],
 )
 

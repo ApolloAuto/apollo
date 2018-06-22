@@ -29,7 +29,7 @@ namespace planning {
 namespace {
 constexpr auto kInfCost = std::numeric_limits<double>::infinity();
 constexpr double kEpsilon = 1e-6;
-}
+}  // namespace
 
 using apollo::common::TrajectoryPoint;
 

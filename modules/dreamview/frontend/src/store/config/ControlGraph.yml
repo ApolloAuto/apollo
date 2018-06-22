@@ -1,0 +1,209 @@
+trajectoryGraph:
+    title: 'Trajectory'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 'x (m)'
+            y:
+                labelString: 'y (m)'
+    properties:
+        lines:
+            pose:
+                color: 'rgba(0, 255, 0, 1)' # green
+                borderWidth: 0
+                pointRadius: 0
+                specialMarker: 'car'
+            real:
+                color: 'rgba(0, 106, 255, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: ture
+            steerCurve:
+                color: 'rgba(255, 206, 86, 1)' # yellow
+                borderWidth: 1
+                pointRadius: 0
+                fill: false
+                showLine: true
+            plan:
+                color: 'rgba(1, 209, 193, 0.65)' # green
+                borderWidth: 3
+                pointRadius: 0
+                fill: false
+                showLine: true
+            target:
+                color: 'rgba(180, 255, 180, 0.7)' # light green
+                borderWidth: 3
+                pointRadius: 0
+                fill: false
+                showLine: true
+            autoModeZone:
+                color: 'rgba(224, 224, 224, 0.15)' # white
+                borderWidth: 0
+                pointRadius: 4
+                fill: false
+                showLine: true
+speedGraph:
+    title: 'Speed'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 't (second)'
+            y:
+                labelString: 'speed (m/s)'
+    properties:
+        lines:
+            real:
+                color: 'rgba(0, 106, 255, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: ture
+            plan:
+                color: 'rgba(1, 209, 193, 0.65)' # green
+                borderWidth: 3
+                pointRadius: 0
+                fill: false
+                showLine: true
+            target:
+                color: 'rgba(180, 255, 180, 0.7)' # light green
+                borderWidth: 3
+                pointRadius: 0
+                fill: false
+                showLine: true
+            autoModeZone:
+                color: 'rgba(224, 224, 224, 0.15)' # white
+                borderWidth: 0
+                pointRadius: 4
+                fill: false
+                showLine: true
+curvatureGraph:
+    title: 'Curvature'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 't (second)'
+            y:
+                labelString: 'Curvature (m-1)'
+    properties:
+        lines:
+            real:
+                color: 'rgba(0, 106, 255, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: ture
+            plan:
+                color: 'rgba(1, 209, 193, 0.65)' # green
+                borderWidth: 3
+                pointRadius: 0
+                fill: false
+                showLine: true
+            target:
+                color: 'rgba(180, 255, 180, 0.7)' # light green
+                borderWidth: 3
+                pointRadius: 0
+                fill: false
+                showLine: true
+            autoModeZone:
+                color: 'rgba(224, 224, 224, 0.15)' # white
+                borderWidth: 0
+                pointRadius: 4
+                fill: false
+                showLine: true
+accelerationGraph:
+    title: 'Acceleration'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 't (second)'
+            y:
+                labelString: 'acceleration (m/s^2)'
+    properties:
+        lines:
+            real:
+                color: 'rgba(0, 106, 255, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: ture
+            plan:
+                color: 'rgba(1, 209, 193, 0.65)' # green
+                borderWidth: 3
+                pointRadius: 0
+                fill: false
+                showLine: true
+            target:
+                color: 'rgba(180, 255, 180, 0.7)' # light green
+                borderWidth: 3
+                pointRadius: 0
+                fill: false
+                showLine: true
+            autoModeZone:
+                color: 'rgba(224, 224, 224, 0.15)' # white
+                borderWidth: 0
+                pointRadius: 4
+                fill: false
+                showLine: true
+stationErrorGraph:
+    title: 'Station Error'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                labelString: 't (second)'
+            y:
+                labelString: 'error (m)'
+    properties:
+        lines:
+            error:
+                color: 'rgba(0, 106, 255, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: ture
+lateralErrorGraph:
+    title: 'Lateral Error'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                labelString: 't (second)'
+            y:
+                labelString: 'error (m)'
+    properties:
+        lines:
+            error:
+                color: 'rgba(0, 106, 255, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: ture
+headingErrorGraph:
+    title: 'Heading Error'
+    options:
+        legend:
+            display: false
+        axes:
+            x:
+                labelString: 't (second)'
+            y:
+                labelString: 'error (rad)'
+    properties:
+        lines:
+            error:
+                color: 'rgba(0, 106, 255, 1)' # blue
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: ture

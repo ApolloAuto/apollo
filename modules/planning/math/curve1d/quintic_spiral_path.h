@@ -41,13 +41,12 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
   QuinticSpiralPath() = default;
 
   QuinticSpiralPath(const std::array<double, 3>& start,
-                            const std::array<double, 3>& end,
-                            const double delta_s);
+                    const std::array<double, 3>& end, const double delta_s);
 
   QuinticSpiralPath(const double theta0, const double kappa0,
-                            const double dkappa0, const double theta1,
-                            const double kappa1, const double dkappa1,
-                            const double delta_s);
+                    const double dkappa0, const double theta1,
+                    const double kappa1, const double dkappa1,
+                    const double delta_s);
 
   template <std::size_t N>
   double ComputeCartesianDeviationX(const double s) const {
@@ -82,8 +81,7 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
 
       cartesian_deviation.first +=
           w[i] * (-std::sin(curr_theta)) * derived_theta;
-      cartesian_deviation.second +=
-          w[i] * std::cos(curr_theta) * derived_theta;
+      cartesian_deviation.second += w[i] * std::cos(curr_theta) * derived_theta;
     }
 
     cartesian_deviation.first *= param_ * 0.5;
@@ -94,10 +92,8 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
         double r = 0.5 * x[i] + 0.5;
         auto theta_angle = Evaluate(0, r * param_);
 
-        cartesian_deviation.first +=
-            0.5 * w[i] * std::cos(theta_angle);
-        cartesian_deviation.second +=
-            0.5 * w[i] * std::sin(theta_angle);
+        cartesian_deviation.first += 0.5 * w[i] * std::cos(theta_angle);
+        cartesian_deviation.second += 0.5 * w[i] * std::sin(theta_angle);
       }
     }
     return cartesian_deviation;
@@ -105,6 +101,12 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
 
   double DeriveKappaDerivative(const std::size_t param_index,
                                const double ratio) const;
+
+  double DeriveDKappaDerivative(const std::size_t param_index,
+                                const double ratio) const;
+
+  double DeriveD2KappaDerivative(const std::size_t param_index,
+                                 const double r) const;
 
   static const std::size_t THETA0 = 0;
   static const std::size_t KAPPA0 = 1;

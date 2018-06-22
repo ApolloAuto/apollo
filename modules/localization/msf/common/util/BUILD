@@ -7,26 +7,26 @@ cc_library(
     srcs = [
         "compression.cc",
         "system_utility.cc",
-        "timer.cc",
+        "frame_transform.cc",
     ],
     hdrs = [
         "compression.h",
+        "extract_ground_plane.h",
         "rect2d.h",
         "system_utility.h",
-        "timer.h",
-        "time_conversion.h",
-        "extract_ground_plane.h",
+        "threadpool.h",
         "voxel_grid_covariance_hdmap.h",
-        "threadpool.h"
+        "frame_transform.h",
     ],
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",
     ],
     deps = [
-        "//modules/common:macro",
         "//modules/common:log",
+        "//modules/common:macro",
         "@eigen//:eigen",
+        "@gtest//:gtest",
     ],
 )
 

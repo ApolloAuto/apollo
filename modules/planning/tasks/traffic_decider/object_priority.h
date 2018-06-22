@@ -30,10 +30,11 @@ namespace planning {
 
 class ObjectPriority : public TrafficRule {
  public:
-  explicit ObjectPriority(const RuleConfig& config);
+  explicit ObjectPriority(const TrafficRuleConfig& config);
   virtual ~ObjectPriority() = default;
 
-  bool ApplyRule(Frame* frame, ReferenceLineInfo* const reference_line_info);
+  common::Status ApplyRule(Frame* const frame,
+                 ReferenceLineInfo* const reference_line_info);
 };
 
 }  // namespace planning

@@ -3,18 +3,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_obstacle_lidar_object_builder_min_box",
+    name = "min_box",
     srcs = ["min_box.cc"],
     hdrs = ["min_box.h"],
     deps = [
         "//modules/common",
         "//modules/common:log",
-        "//modules/perception/common:perception_common",
+        "//modules/perception/common",
+        "//modules/perception/common:convex_hullxy",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
-        "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/common:perception_obstacle_common",
-        "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
-        "@eigen//:eigen",
+        "//modules/perception/obstacle/common",
+        "//modules/perception/obstacle/lidar/interface",
+        "@eigen",
     ],
 )
 
@@ -29,10 +30,10 @@ cc_test(
         "-lqhull",
     ],
     deps = [
-        ":perception_obstacle_lidar_object_builder_min_box",
-        "//modules/perception/common:perception_common",
-        "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/common:perception_obstacle_common",
+        ":min_box",
+        "//modules/perception/common",
+        "//modules/perception/common:pcl_util",
+        "//modules/perception/obstacle/common",
         "@gtest//:main",
     ],
 )

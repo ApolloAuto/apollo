@@ -16,13 +16,17 @@ limitations under the License.
 #ifndef MODULES_CANBUS_VEHICLE_%(car_type_up)s_%(car_type_up)s_MESSAGE_MANAGER_H_
 #define MODULES_CANBUS_VEHICLE_%(car_type_up)s_%(car_type_up)s_MESSAGE_MANAGER_H_
 
-#include "modules/canbus/vehicle/message_manager.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/message_manager.h"
 
 namespace apollo {
 namespace canbus {
 namespace %(car_type_namespace)s {
 
-class %(car_type_cap)sMessageManager : public MessageManager {
+using ::apollo::drivers::canbus::MessageManager;
+
+class %(car_type_cap)sMessageManager
+	: public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   %(car_type_cap)sMessageManager();
   virtual ~%(car_type_cap)sMessageManager();

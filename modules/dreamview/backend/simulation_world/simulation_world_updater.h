@@ -28,7 +28,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/util/string_util.h"
-#include "modules/dreamview/backend/handlers/websocket.h"
+#include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
@@ -58,8 +58,8 @@ class SimulationWorldUpdater {
    * of hdmap.
    * @param routing_from_file whether to read initial routing from file.
    */
-  SimulationWorldUpdater(WebSocketHandler *websocket, SimControl *sim_control,
-                         const MapService *map_service,
+  SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
+                         SimControl *sim_control, const MapService *map_service,
                          bool routing_from_file = false);
 
   /**
@@ -119,18 +119,25 @@ class SimulationWorldUpdater {
     }
   }
 
+  void RegisterMessageHandlers();
+
   ros::Timer timer_;
   SimulationWorldService sim_world_service_;
-  const MapService *map_service_;
-  WebSocketHandler *websocket_;
-  SimControl *sim_control_;
+  const MapService *map_service_ = nullptr;
+  WebSocketHandler *websocket_ = nullptr;
+  WebSocketHandler *map_ws_ = nullptr;
+  SimControl *sim_control_ = nullptr;
 
   // End point for requesting default route
   apollo::routing::POI poi_;
 
-  // The json string to be pushed to frontend, which is updated by timer.
-  std::string simulation_world_json_;
-  std::string simulation_world_with_planning_json_;
+  // The simulation_world in wire format to be pushed to frontend, which is
+  // updated by timer.
+  std::string simulation_world_;
+  std::string simulation_world_with_planning_data_;
+
+  // Received relative map data in wire format.
+  std::string relative_map_string_;
 
   // Mutex to protect concurrent access to simulation_world_json_.
   // NOTE: Use boost until we have std version of rwlock support.

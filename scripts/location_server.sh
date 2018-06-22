@@ -20,5 +20,5 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "${DIR}/apollo_base.sh"
 
-python modules/tools/mobileye_viewer/location_server.py
+python ${DIR}/../modules/tools/mobileye_viewer/location_server.py
 

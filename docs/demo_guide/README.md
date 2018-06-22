@@ -23,13 +23,11 @@ Setup steps:
     bash docker/scripts/release_into.sh
     ```
 
-3. Now you can play the rosbag in `docs/demo_guide/demo.bag` using the command:
+3. Now you can play the rosbag:
 
     ```
-    rosbag play docs/demo_guide/demo.bag --loop
-    # or 
-    sudo bash docs/demo_guide/rosbag_helper.sh download #download rosbag
-    rosbag play docs/demo_guide/demo_2.0.bag --loop
+    sudo python docs/demo_guide/rosbag_helper.py demo_2.0.bag #download rosbag
+    rosbag play demo_2.0.bag --loop
     ```
 
     The `--loop` option enables rosbag to keep playing the bag in a loop

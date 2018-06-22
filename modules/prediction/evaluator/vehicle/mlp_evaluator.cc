@@ -23,8 +23,10 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/file.h"
 #include "modules/map/proto/map_lane.pb.h"
+#include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/common/validation_checker.h"
 
 namespace apollo {
 namespace prediction {
@@ -52,6 +54,7 @@ void MLPEvaluator::Clear() { obstacle_feature_values_map_.clear(); }
 void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
+  CHECK_LE(LANE_FEATURE_SIZE, 4 * FLAGS_max_num_lane_point);
 
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
@@ -67,6 +70,8 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
+  double speed = latest_feature_ptr->speed();
+
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
   CHECK_NOTNULL(lane_graph_ptr);
@@ -81,7 +86,16 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     std::vector<double> feature_values;
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
     double probability = ComputeProbability(feature_values);
+
+    double centripetal_acc_probability =
+        ValidationChecker::ProbabilityByCentripedalAcceleration(
+            *lane_sequence_ptr, speed);
+    probability *= centripetal_acc_probability;
     lane_sequence_ptr->set_probability(probability);
+  }
+
+  if (FLAGS_prediction_offline_mode) {
+    FeatureOutput::Insert(*latest_feature_ptr);
   }
 }
 
@@ -119,6 +133,17 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
                          obstacle_feature_values.end());
   feature_values->insert(feature_values->end(), lane_feature_values.begin(),
                          lane_feature_values.end());
+
+  if (FLAGS_prediction_offline_mode) {
+    SaveOfflineFeatures(lane_sequence_ptr, *feature_values);
+  }
+}
+
+void MLPEvaluator::SaveOfflineFeatures(
+    LaneSequence* sequence, const std::vector<double>& feature_values) {
+  for (double feature_value : feature_values) {
+    sequence->mutable_features()->add_mlp_features(feature_value);
+  }
 }
 
 void MLPEvaluator::SetObstacleFeatureValues(
@@ -152,11 +177,7 @@ void MLPEvaluator::SetObstacleFeatureValues(
           feature.lane().lane_feature().dist_to_right_boundary());
       lane_types.push_back(feature.lane().lane_feature().lane_turn_type());
       timestamps.push_back(feature.timestamp());
-      if (FLAGS_enable_kf_tracking) {
-        speeds.push_back(feature.t_speed());
-      } else {
-        speeds.push_back(feature.speed());
-      }
+      speeds.push_back(feature.speed());
       ++count;
     }
   }
@@ -271,8 +292,7 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
     return;
   }
 
-  double heading =
-      FLAGS_enable_kf_tracking ? feature.t_velocity_heading() : feature.theta();
+  double heading = feature.velocity_heading();
   for (int i = 0; i < lane_sequence_ptr->lane_segment_size(); ++i) {
     if (feature_values->size() >= LANE_FEATURE_SIZE) {
       break;

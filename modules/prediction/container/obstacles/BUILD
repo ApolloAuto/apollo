@@ -7,11 +7,13 @@ cc_library(
     srcs = ["obstacles_container.cc"],
     hdrs = ["obstacles_container.h"],
     deps = [
-        "//modules/common/math:math_utils",
+        "//modules/common/math:geometry",
         "//modules/common/util:lru_cache",
+        "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle",
+        "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/container/pose:pose_container",
     ],
 )
@@ -22,8 +24,10 @@ cc_library(
     hdrs = ["obstacle.h"],
     deps = [
         "//modules/common:log",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/filters:digital_filter",
+        "//modules/common/math:geometry",
         "//modules/common/math:kalman_filter",
-        "//modules/common/math:math_utils",
         "//modules/common/proto:error_code_proto",
         "//modules/common/util:map_util",
         "//modules/map/hdmap",
@@ -31,9 +35,10 @@ cc_library(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/common:road_graph",
+        "//modules/prediction/container/obstacles:obstacle_clusters",
+        "//modules/prediction/network/rnn_model",
         "//modules/prediction/proto:feature_proto",
-        "//modules/prediction/network/rnn_model:rnn_model",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -48,7 +53,6 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",
@@ -69,12 +73,45 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacles_container",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "obstacle_clusters",
+    srcs = [
+        "obstacle_clusters.cc",
+    ],
+    hdrs = [
+        "obstacle_clusters.h",
+    ],
+    deps = [
+        "//modules/common:macro",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/prediction/common:road_graph",
+        "//modules/prediction/proto:lane_graph_proto",
+    ],
+)
+
+cc_test(
+    name = "obstacle_clusters_test",
+    size = "small",
+    srcs = [
+        "obstacle_clusters_test.cc",
+    ],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/common:prediction_map",
+        "//modules/prediction/container/obstacles:obstacle_clusters",
         "@gtest//:main",
     ],
 )

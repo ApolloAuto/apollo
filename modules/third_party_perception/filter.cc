@@ -41,7 +41,7 @@ bool IsPreserved(const RadarObstacle& radar_obstacle) {
   if (std::abs(nearest_l) > FLAGS_filter_y_distance) {
     return false;
   }
-  if (radar_obstacle.count() < FLAGS_keep_delphi_esr_frames) {
+  if (radar_obstacle.count() < FLAGS_keep_radar_frames) {
     return false;
   }
   return true;

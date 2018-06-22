@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.prediction;
 
 import "modules/common/proto/geometry.proto";
+import "modules/common/proto/pnc_point.proto";
 
 message LanePoint {
     optional apollo.common.Point3D position = 1;
@@ -19,6 +20,7 @@ message LaneSegment {
     optional double end_s = 3 [default = 0.0];
     optional uint32 lane_turn_type = 4 [default = 0];
     repeated LanePoint lane_point = 5;
+    optional double total_length = 6 [default = 0.0];
 }
 
 message NearbyObstacle {
@@ -30,10 +32,16 @@ message LaneSequence {
     optional int32 lane_sequence_id = 1;
     repeated LaneSegment lane_segment = 2;
     repeated NearbyObstacle nearby_obstacle = 3;
-    repeated double features = 4;
+
+    message Features {
+        repeated double mlp_features = 1;
+    }
+
+    optional Features features = 4;
     optional int32 label = 5 [default = 0];
     optional double probability = 6 [default = 0.0];
     optional double acceleration = 7 [default = 0.0];
+    repeated apollo.common.PathPoint path_point = 8;
 }
 
 message LaneGraph {

@@ -23,4 +23,6 @@ message DpPolyPathConfig {
   optional double path_l_cost_param_k = 17;
   optional double path_out_lane_cost = 18;
   optional double path_end_l_cost = 19;
+  optional double sidepass_distance = 20;
+  optional uint32 navigator_sample_num_each_level = 21;
 }

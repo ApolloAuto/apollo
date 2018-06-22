@@ -16,11 +16,9 @@
 
 #include "modules/perception/onboard/event_manager.h"
 
-#include <gflags/gflags.h>
 #include <algorithm>
-#include <string>
-#include <vector>
 
+#include "gflags/gflags.h"
 #include "modules/common/log.h"
 
 namespace apollo {
@@ -41,7 +39,6 @@ bool EventManager::Init(const DAGConfig::EdgeConfig &edge_config) {
     for (const DAGConfig::Event event_pb : edge.events()) {
       if (event_queue_map_.find(event_pb.id()) != event_queue_map_.end()) {
         AERROR << "duplicate event id in config. id: " << event_pb.id();
-
         return false;
       }
 
@@ -63,8 +60,9 @@ bool EventManager::Init(const DAGConfig::EdgeConfig &edge_config) {
 }
 
 bool EventManager::Publish(const Event &event) {
-  EventQueue *queue = NULL;
-  if (!GetEventQueue(event.event_id, &queue)) {
+  EventQueue *queue = GetEventQueue(event.event_id);
+  if (queue == nullptr) {
+    AERROR << "Fail to get event with id: " << event.event_id;
     return false;
   }
 
@@ -79,13 +77,13 @@ bool EventManager::Publish(const Event &event) {
     // try second time.
     queue->try_push(event);
   }
-
   return true;
 }
 
 bool EventManager::Subscribe(EventID event_id, Event *event, bool nonblocking) {
-  EventQueue *queue = NULL;
-  if (!GetEventQueue(event_id, &queue)) {
+  EventQueue *queue = GetEventQueue(event_id);
+  if (queue == nullptr) {
+    AERROR << "Fail to get event with id: " << event_id;
     return false;
   }
 
@@ -102,16 +100,13 @@ bool EventManager::Subscribe(EventID event_id, Event *event) {
   return Subscribe(event_id, event, false);
 }
 
-bool EventManager::GetEventQueue(EventID event_id, EventQueue **queue) {
+EventManager::EventQueue *EventManager::GetEventQueue(const EventID &event_id) {
   EventQueueMapIterator iter = event_queue_map_.find(event_id);
   if (iter == event_queue_map_.end()) {
     AERROR << "event: " << event_id << " not exist in EventQueueMap.";
-    return false;
+    return nullptr;
   }
-
-  *queue = iter->second.get();
-  CHECK(queue != NULL) << " event_id: " << event_id;
-  return true;
+  return iter->second.get();
 }
 
 bool EventManager::GetEventMeta(EventID event_id, EventMeta *event_meta) const {

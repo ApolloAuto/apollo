@@ -2,6 +2,7 @@ import * as THREE from "three";
 
 export default class Coordinates {
     constructor() {
+        this.systemName = "ENU";
         this.offset = null;
     }
 
@@ -14,6 +15,11 @@ export default class Coordinates {
             x: x,
             y: y
         };
+        console.log("Offset is set to x:" + x + ", y:" + y);
+    }
+
+    setSystem(newSystem) {
+        this.systemName = newSystem;
     }
 
     applyOffset(point, reverse = false) {

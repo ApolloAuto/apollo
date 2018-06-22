@@ -79,11 +79,10 @@ DEFINE_double(lidar_height_default, 1.80,
 DEFINE_int32(
     lidar_localization_mode, 2,
     "Localization mode, 0 for intensity, 1 for altitude, 2 for fusion.");
-DEFINE_int32(lidar_yaw_align_mode, 1,
-    "image yaw align mode, 0 for intensity, "
-    "1 for fusion, 2 for fusion with multithread.");
+DEFINE_int32(lidar_yaw_align_mode, 2,
+             "image yaw align mode, 0 for align off, "
+             "1 for fusion, 2 for fusion with multithread.");
 DEFINE_int32(lidar_filter_size, 11, "Lidar filter size");
-DEFINE_int32(lidar_thread_num, 2, "Lidar thread number");
 DEFINE_double(lidar_imu_max_delay_time, 0.4,
               "Lidar msg and imu msg max delay time");
 DEFINE_double(lidar_map_coverage_theshold, 0.9,
@@ -102,7 +101,6 @@ DEFINE_bool(integ_debug_log_flag, false, "");
 
 // gnss module
 DEFINE_bool(enable_ins_aid_rtk, false, "");
-DEFINE_bool(enable_auto_save_eph_file, true, "");
 DEFINE_string(eph_buffer_path, "", "");
 DEFINE_string(
     ant_imu_leverarm_file,
@@ -119,7 +117,8 @@ DEFINE_double(imu_to_ant_offset_uz, 0.0, "Imu ant offset z uncertainty");
 
 // common
 DEFINE_double(imu_rate, 1.0, "");
-DEFINE_int32(local_utm_zone_id, 50, "UTM zone id");
+DEFINE_bool(if_utm_zone_id_from_folder, true,
+            "load utm zone id from local map folder");
 DEFINE_bool(trans_gpstime_to_utctime, true, "");
 DEFINE_int32(gnss_mode, 0, "GNSS Mode, 0 for bestgnss pose, 1 for self gnss.");
 DEFINE_bool(imu_coord_rfu, true, "Right/forward/up");
@@ -128,8 +127,17 @@ DEFINE_bool(gnss_only_init, false,
 DEFINE_bool(enable_lidar_localization, true,
             "Enable lidar-based localization.");
 
-// debug
-DEFINE_bool(use_visualize, false, "");
+// imu vehicle extrinsic
+DEFINE_string(vehicle_imu_file,
+              "modules/localization/msf/params"
+              "/vehicle_params/vehicle_imu_extrinsics.yaml",
+              "Vehicle coord to imu coord.");
+DEFINE_bool(if_vehicle_imu_from_file, true,
+            "Whether load vehicle imu extrinsic from yaml file");
+DEFINE_double(imu_vehicle_qx, 0.0, "Vehicle imu quaternion qx");
+DEFINE_double(imu_vehicle_qy, 0.0, "Vehicle imu quaternion qy");
+DEFINE_double(imu_vehicle_qz, 0.0, "Vehicle imu quaternion qz");
+DEFINE_double(imu_vehicle_qw, 1.0, "Vehicle imu quaternion qw");
 
 // visualization
 DEFINE_string(map_visual_dir, "data/map_visual",

@@ -16,15 +16,15 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 
-#include <map>
-#include <string>
+#include <numeric>
+#include <unordered_map>
 
 namespace apollo {
 namespace perception {
 
 double PbfBaseTrackObjectMatcher::s_max_match_distance_ = 4.0;
 
-void PbfBaseTrackObjectMatcher::SetMaxMatchDistance(double dist) {
+void PbfBaseTrackObjectMatcher::SetMaxMatchDistance(const double dist) {
   s_max_match_distance_ = dist;
 }
 
@@ -34,10 +34,14 @@ double PbfBaseTrackObjectMatcher::GetMaxMatchDistance() {
 
 void PbfBaseTrackObjectMatcher::IdAssign(
     const std::vector<PbfTrackPtr> &fusion_tracks,
-    const std::vector<PbfSensorObjectPtr> &sensor_objects,
-    std::vector<TrackObjectPair> *assignments,
+    const std::vector<std::shared_ptr<PbfSensorObject>> &sensor_objects,
+    std::vector<std::pair<int, int>> *assignments,
     std::vector<int> *unassigned_fusion_tracks,
     std::vector<int> *unassigned_sensor_objects) {
+  CHECK_NOTNULL(assignments);
+  CHECK_NOTNULL(unassigned_fusion_tracks);
+  CHECK_NOTNULL(unassigned_sensor_objects);
+
   size_t num_track = fusion_tracks.size();
   size_t num_obj = sensor_objects.size();
 
@@ -45,8 +49,7 @@ void PbfBaseTrackObjectMatcher::IdAssign(
     unassigned_fusion_tracks->resize(num_track);
     unassigned_sensor_objects->resize(num_obj);
     std::iota(unassigned_fusion_tracks->begin(),
-      unassigned_fusion_tracks->end(),
-      0);
+              unassigned_fusion_tracks->end(), 0);
     std::iota(unassigned_sensor_objects->begin(),
               unassigned_sensor_objects->end(), 0);
     return;
@@ -55,25 +58,25 @@ void PbfBaseTrackObjectMatcher::IdAssign(
   const SensorType &sensor_type = sensor_objects[0]->sensor_type;
   const std::string &sensor_id = sensor_objects[0]->sensor_id;
 
-  std::map<int, int> sensor_id_2_track_ind;
-  for (size_t i = 0; i < num_track; i++) {
-    PbfSensorObjectPtr obj =
+  std::unordered_map<int, int> track_id_2_sensor_id;
+  for (size_t i = 0; i < num_track; ++i) {
+    std::shared_ptr<PbfSensorObject> obj =
         fusion_tracks[i]->GetSensorObject(sensor_type, sensor_id);
     if (obj == nullptr) {
       continue;
     }
-    sensor_id_2_track_ind[obj->object->track_id] = i;
+    track_id_2_sensor_id[obj->object->track_id] = i;
   }
 
   std::vector<bool> fusion_used(num_track, false);
   std::vector<bool> sensor_used(num_obj, false);
-  for (size_t i = 0; i < num_obj; i++) {
+  for (size_t i = 0; i < num_obj; ++i) {
     int track_id = sensor_objects[i]->object->track_id;
-    auto it = sensor_id_2_track_ind.find(track_id);
-    if (it != sensor_id_2_track_ind.end()) {
+    auto it = track_id_2_sensor_id.find(track_id);
+    if (it != track_id_2_sensor_id.end()) {
       sensor_used[i] = true;
       fusion_used[it->second] = true;
-      assignments->push_back(std::make_pair(it->second, i));
+      assignments->emplace_back(it->second, i);
     }
   }
 

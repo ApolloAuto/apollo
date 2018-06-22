@@ -103,9 +103,7 @@ unsigned int LosslessMapSingleCell::GetBinarySize() const {
 }
 
 // ======================LosslessMapCell===========================
-LosslessMapCell::LosslessMapCell() {
-  layer_num = 1;
-}
+LosslessMapCell::LosslessMapCell() { layer_num = 1; }
 
 void LosslessMapCell::Reset() {
   for (unsigned int i = 0; i < IDL_CAR_NUM_RESERVED_MAP_LAYER; ++i) {
@@ -116,10 +114,10 @@ void LosslessMapCell::Reset() {
 
 void LosslessMapCell::SetValueLayer(double altitude, unsigned char intensity,
                                     double altitude_thres) {
-  assert(layer_num <= IDL_CAR_NUM_RESERVED_MAP_LAYER);
+  DCHECK_LE(layer_num, IDL_CAR_NUM_RESERVED_MAP_LAYER);
 
   unsigned int best_layer_id = GetLayerId(altitude);
-  assert(best_layer_id < layer_num);
+  DCHECK_LT(best_layer_id, layer_num);
   if (best_layer_id == 0) {
     if (layer_num < IDL_CAR_NUM_RESERVED_MAP_LAYER) {
       // No layer yet, create a new one
@@ -157,7 +155,7 @@ void LosslessMapCell::SetValueLayer(double altitude, unsigned char intensity,
 }
 
 void LosslessMapCell::SetValue(double altitude, unsigned char intensity) {
-  assert(layer_num <= IDL_CAR_NUM_RESERVED_MAP_LAYER);
+  DCHECK_LE(layer_num, IDL_CAR_NUM_RESERVED_MAP_LAYER);
   LosslessMapSingleCell& cell = map_cells[0];
   cell.AddSample(static_cast<float>(altitude), static_cast<float>(intensity));
 }
@@ -188,7 +186,7 @@ unsigned int LosslessMapCell::CreateBinary(unsigned char* buf,
     for (size_t i = 0; i < layer_num; ++i) {
       const LosslessMapSingleCell& cell = map_cells[i];
       unsigned int processed_size = cell.CreateBinary(pp, buf_size);
-      assert(buf_size >= processed_size);
+      DCHECK_GE(buf_size, processed_size);
       buf_size -= processed_size;
       pp += processed_size;
     }
@@ -351,7 +349,7 @@ unsigned int LosslessMapMatrix::CreateBinary(unsigned char* buf,
       for (unsigned int x = 0; x < cols_; ++x) {
         const LosslessMapCell& cell = GetMapCell(y, x);
         unsigned int processed_size = cell.CreateBinary(pp, buf_size);
-        assert(buf_size >= processed_size);
+        DCHECK_GE(buf_size, processed_size);
         buf_size -= processed_size;
         pp += processed_size;
       }

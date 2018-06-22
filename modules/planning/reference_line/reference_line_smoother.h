@@ -15,13 +15,15 @@
  *****************************************************************************/
 
 /**
- * @file qp_spline_reference_line_smoother.h
+ * @file
  **/
 
 #ifndef MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_SMOOTHER_H_
 #define MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_SMOOTHER_H_
 
 #include <vector>
+
+#include "modules/planning/proto/reference_line_smoother_config.pb.h"
 
 #include "modules/planning/reference_line/reference_line.h"
 
@@ -38,14 +40,24 @@ struct AnchorPoint {
 
 class ReferenceLineSmoother {
  public:
-  ReferenceLineSmoother() = default;
+  explicit ReferenceLineSmoother(const ReferenceLineSmootherConfig& config)
+      : config_(config) {}
 
-  virtual ~ReferenceLineSmoother() = default;
-
+  /**
+   * Smoothing constraints
+   */
   virtual void SetAnchorPoints(
       const std::vector<AnchorPoint>& achor_points) = 0;
 
+  /**
+   * Smooth a given reference line
+   */
   virtual bool Smooth(const ReferenceLine&, ReferenceLine* const) = 0;
+
+  virtual ~ReferenceLineSmoother() = default;
+
+ protected:
+  ReferenceLineSmootherConfig config_;
 };
 
 }  // namespace planning

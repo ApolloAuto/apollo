@@ -14,18 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
+#include "modules/perception/onboard/subnode.h"
 
-#include <google/protobuf/text_format.h>
+#include "google/protobuf/text_format.h"
+#include "gtest/gtest.h"
+
+#include "modules/perception/onboard/proto/dag_config.pb.h"
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/onboard/event_manager.h"
-#include "modules/perception/onboard/proto/dag_config.pb.h"
 #include "modules/perception/onboard/shared_data.h"
 #include "modules/perception/onboard/shared_data_manager.h"
-#include "modules/perception/onboard/subnode.h"
 
 namespace apollo {
 namespace perception {
@@ -67,9 +68,10 @@ TEST(SubnodeTest, test_init) {
   pub_events.push_back(1004);
 
   SharedDataManager shared_data_manager;
+
   EXPECT_TRUE(my_subnode.Init(dag_config.subnode_config().subnodes(0),
-                              &event_manager, &shared_data_manager, sub_events,
-                              pub_events));
+                              sub_events, pub_events, &event_manager,
+                              &shared_data_manager));
 
   AINFO << my_subnode.DebugString();
 

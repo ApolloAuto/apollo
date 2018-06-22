@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_onboard",
+    name = "onboard",
     srcs = [
         "common_shared_data.cc",
         "dag_streaming.cc",
@@ -11,7 +11,7 @@ cc_library(
         "shared_data_manager.cc",
         "subnode.cc",
         "subnode_helper.cc",
-        "transform_input.cc"
+        "transform_input.cc",
     ],
     hdrs = [
         "common_shared_data.h",
@@ -27,13 +27,14 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/common:log",
+        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
         "//modules/common/status",
+        "//modules/common/time",
+        "//modules/perception/common",
         "//modules/perception/lib/base",
         "//modules/perception/onboard/proto:dag_proto",
-        "//modules/perception/common:perception_common",
-        "//modules/common/adapters:adapter_manager",
-        "@eigen//:eigen",
+        "@eigen",
         "@ros//:ros_common",
     ],
 )
@@ -50,11 +51,11 @@ cc_test(
         "//modules/perception/conf:perception_config",
     ],
     deps = [
+        ":onboard",
         "//external:gflags",
         "//modules/common:log",
-        "//modules/perception/lib/pcl_util",
-        "//modules/perception/onboard:perception_onboard",
-        "@gtest//:gtest",
+        "//modules/perception/common:pcl_util",
+        "@gtest",
         "@gtest//:main",
     ],
 )

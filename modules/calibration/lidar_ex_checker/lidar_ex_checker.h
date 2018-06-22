@@ -23,18 +23,19 @@
 
 #include <map>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "Eigen/Eigen"
+#include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
+
+#include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/localization/proto/gps.pb.h"
 
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
-#include "modules/drivers/gnss/proto/ins.pb.h"
-#include "modules/localization/proto/gps.pb.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
-#include "ros/include/ros/ros.h"
+#include "modules/perception/common/pcl_types.h"
 
 /**
  * @namespace apollo::calibration

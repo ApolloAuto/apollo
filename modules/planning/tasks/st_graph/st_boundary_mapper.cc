@@ -55,7 +55,7 @@ using apollo::common::util::StrCat;
 namespace {
 constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
-}
+}  // namespace
 
 StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
                                    const StBoundaryConfig& config,
@@ -75,6 +75,7 @@ StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
 
 Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
   const auto& path_obstacles = path_decision->path_obstacles();
+
   if (planning_time_ < 0.0) {
     const std::string msg = "Fail to get params since planning_time_ < 0.";
     AERROR << msg;
@@ -189,6 +190,7 @@ Status StBoundaryMapper::CreateStBoundaryWithHistory(
     } else {
       decision = iter->second;
     }
+
     if (!path_obstacle->HasLongitudinalDecision()) {
       if (!MapWithoutDecision(path_obstacle).ok()) {
         std::string msg = StrCat("Fail to map obstacle ", path_obstacle->Id(),
@@ -250,7 +252,8 @@ bool StBoundaryMapper::MapStopDecision(
     const ObjectDecisionType& stop_decision) const {
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
 
-  if (stop_obstacle->PerceptionSLBoundary().start_s() > planning_distance_) {
+  if (stop_obstacle->PerceptionSLBoundary().start_s() >
+      adc_sl_boundary_.end_s() + planning_distance_) {
     return true;
   }
 
@@ -309,9 +312,14 @@ Status StBoundaryMapper::MapWithoutDecision(PathObstacle* path_obstacle) const {
                       .ExpandByT(boundary_t_buffer);
   boundary.SetId(path_obstacle->Id());
   const auto& prev_st_boundary = path_obstacle->st_boundary();
+  const auto& ref_line_st_boundary =
+      path_obstacle->reference_line_st_boundary();
   if (!prev_st_boundary.IsEmpty()) {
     boundary.SetBoundaryType(prev_st_boundary.boundary_type());
+  } else if (!ref_line_st_boundary.IsEmpty()) {
+    boundary.SetBoundaryType(ref_line_st_boundary.boundary_type());
   }
+
   path_obstacle->SetStBoundary(boundary);
   return Status::OK();
 }
@@ -346,10 +354,18 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
 
       if (CheckOverlap(curr_point_on_path, obs_box,
                        st_boundary_config_.boundary_buffer())) {
-        lower_points->emplace_back(curr_point_on_path.s(), 0.0);
-        lower_points->emplace_back(curr_point_on_path.s(), planning_time_);
-        upper_points->emplace_back(planning_distance_, 0.0);
-        upper_points->emplace_back(planning_distance_, planning_time_);
+        const double backward_distance = -vehicle_param_.front_edge_to_center();
+        const double forward_distance = vehicle_param_.length() +
+                                        vehicle_param_.width() +
+                                        obs_box.length() + obs_box.width();
+        double low_s =
+            std::fmax(0.0, curr_point_on_path.s() + backward_distance);
+        double high_s = std::fmin(planning_distance_,
+                                  curr_point_on_path.s() + forward_distance);
+        lower_points->emplace_back(low_s, 0.0);
+        lower_points->emplace_back(low_s, planning_time_);
+        upper_points->emplace_back(high_s, 0.0);
+        upper_points->emplace_back(high_s, planning_time_);
         break;
       }
     }
@@ -381,9 +397,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       const double step_length = vehicle_param_.front_edge_to_center();
       for (double path_s = 0.0; path_s < discretized_path.Length();
            path_s += step_length) {
-        const auto curr_adc_path_point =
-            discretized_path.EvaluateUsingLinearApproximation(
-                path_s + discretized_path.StartPoint().s());
+        const auto curr_adc_path_point = discretized_path.Evaluate(
+            path_s + discretized_path.StartPoint().s());
         if (CheckOverlap(curr_adc_path_point, obs_box,
                          st_boundary_config_.boundary_buffer())) {
           // found overlap, start searching with higher resolution
@@ -406,9 +421,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
               break;
             }
             if (!find_low) {
-              const auto& point_low =
-                  discretized_path.EvaluateUsingLinearApproximation(
-                      low_s + discretized_path.StartPoint().s());
+              const auto& point_low = discretized_path.Evaluate(
+                  low_s + discretized_path.StartPoint().s());
               if (!CheckOverlap(point_low, obs_box,
                                 st_boundary_config_.boundary_buffer())) {
                 low_s += fine_tuning_step_length;
@@ -417,9 +431,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
               }
             }
             if (!find_high) {
-              const auto& point_high =
-                  discretized_path.EvaluateUsingLinearApproximation(
-                      high_s + discretized_path.StartPoint().s());
+              const auto& point_high = discretized_path.Evaluate(
+                  high_s + discretized_path.StartPoint().s());
               if (!CheckOverlap(point_high, obs_box,
                                 st_boundary_config_.boundary_buffer())) {
                 high_s -= fine_tuning_step_length;
@@ -500,6 +513,7 @@ Status StBoundaryMapper::MapWithDecision(
   boundary.SetId(path_obstacle->obstacle()->Id());
   boundary.SetCharacteristicLength(characteristic_length);
   path_obstacle->SetStBoundary(boundary);
+
   return Status::OK();
 }
 
@@ -531,166 +545,6 @@ bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
       Box2d(center, path_point.theta(), vehicle_param_.length() + 2 * buffer,
             vehicle_param_.width() + 2 * buffer);
   return obs_box.HasOverlap(adc_box);
-}
-
-void StBoundaryMapper::GetAvgKappa(
-    const std::vector<common::PathPoint>& path_points,
-    std::vector<double>* kappa) const {
-  CHECK_NOTNULL(kappa);
-  const int kHalfNumPoints = st_boundary_config_.num_points_to_avg_kappa() / 2;
-  CHECK_GT(kHalfNumPoints, 0);
-  kappa->clear();
-  kappa->resize(path_points.size());
-  double sum = 0.0;
-  int start = 0;
-  int end = 0;
-  while (end < static_cast<int>(path_points.size()) &&
-         end - start < kHalfNumPoints + 1) {
-    sum += path_points[end].kappa();
-    ++end;
-  }
-
-  int iter = 0;
-  while (iter < static_cast<int>(path_points.size())) {
-    kappa->at(iter) = sum / (end - start);
-    if (start < iter - kHalfNumPoints) {
-      sum -= path_points[start].kappa();
-      ++start;
-    }
-    if (end < static_cast<int>(path_points.size())) {
-      sum += path_points[end].kappa();
-      ++end;
-    }
-    ++iter;
-  }
-}
-
-Status StBoundaryMapper::GetSpeedLimits(
-    const IndexedList<std::string, PathObstacle>& path_obstacles,
-    SpeedLimit* const speed_limit_data) const {
-  CHECK_NOTNULL(speed_limit_data);
-
-  std::vector<double> avg_kappa;
-  GetAvgKappa(path_data_.discretized_path().path_points(), &avg_kappa);
-  const auto& discretized_path_points =
-      path_data_.discretized_path().path_points();
-  const auto& frenet_path_points = path_data_.frenet_frame_path().points();
-  for (uint32_t i = 0; i < discretized_path_points.size(); ++i) {
-    const double path_s = discretized_path_points.at(i).s();
-    const auto& frenet_point_s = frenet_path_points.at(i).s();
-    if (frenet_point_s > reference_line_.Length()) {
-      AWARN << "path length [" << frenet_point_s
-            << "] is LARGER than reference_line_ length ["
-            << reference_line_.Length() << "]. Please debug before proceeding.";
-      break;
-    }
-
-    // speed limit from map
-    double speed_limit_on_reference_line =
-        reference_line_.GetSpeedLimitFromS(frenet_point_s);
-
-    // speed limit from path curvature
-    const double centric_acc_speed_limit =
-        std::sqrt(GetCentricAccLimit(std::fabs(avg_kappa[i])) /
-                  std::fmax(std::fabs(avg_kappa[i]),
-                            st_boundary_config_.minimal_kappa()));
-
-    // speed limit from nudge obstacles
-    double nudge_obstacle_speed_limit = std::numeric_limits<double>::max();
-    for (const auto* const_path_obstacle : path_obstacles.Items()) {
-      if (const_path_obstacle->obstacle()->IsVirtual()) {
-        continue;
-      }
-      if (!const_path_obstacle->LateralDecision().has_nudge()) {
-        continue;
-      }
-      if (path_s < const_path_obstacle->PerceptionSLBoundary().start_s() ||
-          path_s > const_path_obstacle->PerceptionSLBoundary().end_s()) {
-        continue;
-      }
-      constexpr double kRange = 1.0;  // meters
-      const auto& nudge = const_path_obstacle->LateralDecision().nudge();
-      bool is_close_on_left =
-          (nudge.type() == ObjectNudge::LEFT_NUDGE) &&
-          (const_path_obstacle->PerceptionSLBoundary().end_l() > -kRange);
-      bool is_close_on_right =
-          (nudge.type() == ObjectNudge::RIGHT_NUDGE) &&
-          (const_path_obstacle->PerceptionSLBoundary().start_l() < kRange);
-      if (is_close_on_left || is_close_on_right) {
-        double nudge_speed_ratio = 1.0;
-        if (const_path_obstacle->obstacle()->IsStatic()) {
-          nudge_speed_ratio =
-              st_boundary_config_.static_obs_nudge_speed_ratio();
-        } else {
-          nudge_speed_ratio =
-              st_boundary_config_.dynamic_obs_nudge_speed_ratio();
-        }
-        nudge_obstacle_speed_limit =
-            nudge_speed_ratio * speed_limit_on_reference_line;
-        break;
-      }
-    }
-
-    double curr_speed_limit = 0.0;
-    if (FLAGS_enable_nudge_slowdown) {
-      curr_speed_limit =
-          std::fmax(st_boundary_config_.lowest_speed(),
-                    common::util::MinElement(std::vector<double>{
-                        centric_acc_speed_limit, speed_limit_on_reference_line,
-                        nudge_obstacle_speed_limit}));
-    } else {
-      curr_speed_limit = std::fmax(
-          st_boundary_config_.lowest_speed(),
-          common::util::MinElement(std::vector<double>{
-              centric_acc_speed_limit, speed_limit_on_reference_line}));
-    }
-
-    speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
-  }
-  return Status::OK();
-}
-
-double StBoundaryMapper::GetCentricAccLimit(const double kappa) const {
-  // this function uses a linear model with upper and lower bound to determine
-  // centric acceleration limit
-
-  // suppose acc = k1 * v + k2
-  // consider acc = v ^ 2 * kappa
-  // we determine acc by the two functions above, with uppper and lower speed
-  // bounds
-  const double v_high = st_boundary_config_.high_speed_threshold();
-  const double v_low = st_boundary_config_.low_speed_threshold();
-
-  const double h_v_acc =
-      st_boundary_config_.high_speed_centric_acceleration_limit();
-  const double l_v_acc =
-      st_boundary_config_.low_speed_centric_acceleration_limit();
-
-  if (std::fabs(v_high - v_low) < 1.0) {
-    AERROR << "High speed and low speed threshold are too close to each other. "
-              "Please check config file."
-           << " Current high speed threshold = " << v_high
-           << ", current low speed threshold = " << v_low;
-    return h_v_acc;
-  }
-  const double kMinKappaEpsilon = 1e-9;
-  if (kappa < kMinKappaEpsilon) {
-    return h_v_acc;
-  }
-
-  const double k1 = (h_v_acc - l_v_acc) / (v_high - v_low);
-  const double k2 = h_v_acc - v_high * k1;
-
-  const double v = (k1 + std::sqrt(k1 * k1 + 4.0 * kappa * k2)) / (2.0 * kappa);
-  ADEBUG << "v = " << v;
-
-  if (v > v_high) {
-    return h_v_acc;
-  } else if (v < v_low) {
-    return l_v_acc;
-  } else {
-    return v * k1 + k2;
-  }
 }
 
 }  // namespace planning

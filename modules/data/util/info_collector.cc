@@ -16,9 +16,12 @@
 
 #include "modules/data/util/info_collector.h"
 
+#include <yaml-cpp/yaml.h>
+
 #include <string>
 
 #include "gflags/gflags.h"
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/file.h"
 
@@ -26,11 +29,15 @@ DEFINE_string(static_info_conf_file,
               "modules/data/conf/static_info_conf.pb.txt",
               "Path of the StaticInfo config file.");
 
+DEFINE_string(container_meta_ini, "/apollo/meta.ini",
+              "Container meta info file.");
+
 namespace apollo {
 namespace data {
 namespace {
 
 using apollo::common::KVDB;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::util::GetProtoFromASCIIFile;
 using apollo::common::util::SetProtoToASCIIFile;
 using google::protobuf::Map;
@@ -55,6 +62,14 @@ Map<std::string, std::string> LoadFiles(
 
 InfoCollector::InfoCollector() {
   CHECK(GetProtoFromASCIIFile(FLAGS_static_info_conf_file, &config_));
+
+  // Translate file paths if they contain placeholder such as "<ros>".
+  for (auto& conf_file : *config_.mutable_hardware_configs()) {
+    conf_file = apollo::common::util::TranslatePath(conf_file);
+  }
+  for (auto& conf_file : *config_.mutable_software_configs()) {
+    conf_file = apollo::common::util::TranslatePath(conf_file);
+  }
 }
 
 const StaticInfo &InfoCollector::GetStaticInfo() {
@@ -102,9 +117,7 @@ const HardwareInfo &InfoCollector::GetHardwareInfo() {
 
 const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
   SoftwareInfo *software = instance()->static_info_.mutable_software();
-  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
-    software->set_docker_image(docker_image);
-  }
+  software->set_docker_image(GetDockerImage());
 
   const std::string commit_id = KVDB::Get("apollo:data:commit_id");
   if (!commit_id.empty()) {
@@ -118,11 +131,38 @@ const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
 
   *software->mutable_configs() =
       LoadFiles(instance()->config_.software_configs());
+
+  // Store latest routing request.
+  auto* routing_request_adapter = AdapterManager::GetRoutingRequest();
+  if (routing_request_adapter) {
+    routing_request_adapter->Observe();
+    if (!routing_request_adapter->Empty()) {
+      *software->mutable_latest_routing_request() =
+          routing_request_adapter->GetLatestObserved();
+    }
+  } else {
+    AERROR << "RoutingRequest is not registered in AdapterManager config.";
+  }
+
   return *software;
 }
 
 const UserInfo &InfoCollector::GetUserInfo() {
   return instance()->static_info_.user();
+}
+
+std::string InfoCollector::GetDockerImage() {
+  // In release docker container, the actual image name is in meta.ini.
+  if (apollo::common::util::PathExists(FLAGS_container_meta_ini)) {
+    YAML::Node meta = YAML::LoadFile(FLAGS_container_meta_ini);
+    if (meta["tag"]) {
+      return meta["tag"].as<std::string>();
+    }
+  }
+  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
+    return docker_image;
+  }
+  return "";
 }
 
 }  // namespace data

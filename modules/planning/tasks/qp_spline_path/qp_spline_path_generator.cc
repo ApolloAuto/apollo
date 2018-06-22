@@ -29,14 +29,15 @@
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
+#include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
-#include "modules/planning/math/frame_conversion/cartesian_frenet_conversion.h"
 
 namespace apollo {
 namespace planning {
+
 namespace {
 double GetLaneChangeLateralShift(const double v) {
   const double l0 = 2.0;       // shift at v = 0 m/s
@@ -46,9 +47,10 @@ double GetLaneChangeLateralShift(const double v) {
   const double a = (l_ref - b) / v_ref;
   return a * v + b;
 }
-}
+}  // namespace
 
-using Vec2d = apollo::common::math::Vec2d;
+using apollo::common::math::CartesianFrenetConverter;
+using apollo::common::math::Vec2d;
 
 QpSplinePathGenerator::QpSplinePathGenerator(
     Spline1dGenerator* spline_generator, const ReferenceLine& reference_line,

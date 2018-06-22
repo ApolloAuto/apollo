@@ -22,6 +22,12 @@
 #ifndef MODULES_LOCALIZATION_LOCALIZATION_BASE_H_
 #define MODULES_LOCALIZATION_LOCALIZATION_BASE_H_
 
+#include <memory>
+
+#include "tf2_ros/transform_broadcaster.h"
+
+#include "modules/localization/proto/localization.pb.h"
+
 #include "modules/common/status/status.h"
 
 /**
@@ -51,6 +57,11 @@ class LocalizationBase {
    * @return stop status
    */
   virtual apollo::common::Status Stop() = 0;
+
+  void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
+
+ protected:
+  std::unique_ptr<tf2_ros::TransformBroadcaster> tf2_broadcaster_;
 };
 
 }  // namespace localization

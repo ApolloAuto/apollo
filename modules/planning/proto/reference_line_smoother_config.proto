@@ -1,0 +1,71 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message QpSplineSmootherConfig {
+  optional uint32 spline_order = 1 [default = 5];
+  optional double max_spline_length = 2 [default = 25];
+  optional double regularization_weight = 3 [default = 0.1];
+  optional double second_derivative_weight = 4 [default = 0.0];
+  optional double third_derivative_weight = 5 [default = 100];
+}
+
+message SpiralSmootherConfig {
+  // The max deviation of spiral reference line smoother.
+  optional double max_deviation = 1 [default = 0.1];
+
+  // The piecewise length of spiral smoother.
+  optional double piecewise_length = 2 [default = 10.0];
+
+  // The iteration num of spiral reference line smoother.");
+  optional int32 max_iteration = 3 [default = 1000];
+
+  // The desired convergence tol for spiral opt;
+  optional double opt_tol = 4 [default = 1.0e-8];
+
+  // The acceptable convergence tol for spiral opt
+  optional double opt_acceptable_tol = 5 [default = 1e-6];
+
+  // The number of acceptable iters before termination for spiral opt;
+  optional int32 opt_acceptable_iteration = 6 [default = 15];
+
+  // The weight of curve length term in objective function
+  optional double opt_weight_curve_length = 7 [default = 0.0];
+
+  // The weight of kappa term in objective function
+  optional double opt_weight_kappa = 8 [default = 1.5];
+
+  // The weight of dkappa term in objective function
+  optional double opt_weight_dkappa = 9 [default = 1.0];
+
+  // The weight of d2kappa term in objective function
+  optional double opt_weight_d2kappa = 10 [default = 0.0];
+}
+
+
+message ReferenceLineSmootherConfig {
+  enum DrivingSide {
+    LEFT = 1;   // left hand driving country like UK and JP
+    RIGHT = 2;  // right hand driving country like CN and US
+  }
+  optional double max_constraint_interval = 1 [default = 5];
+  optional double longitudinal_boundary_bound = 2 [default = 1.0];
+  optional double lateral_boundary_bound = 3 [default = 0.1];
+  optional uint32 num_of_total_points = 4 [default = 500];
+  optional double curb_shift = 5 [default = 0.2];
+  optional DrivingSide driving_side = 6 [default = RIGHT];
+  // If a lane width larger than this value times adc width, this lane is
+  // considered as a wide lane
+  optional double wide_lane_threshold_factor = 7 [default = 2.0];
+  // In a wide lane case, leave the left side (or right side on a left-handed
+  // driving map) this amount times adc width
+  optional double wide_lane_shift_remain_factor = 8 [default = 0.5];
+
+  // The output resolution for reference line.
+  optional double resolution = 9 [default = 0.02];
+
+  oneof SmootherConfig {
+    QpSplineSmootherConfig qp_spline = 20;
+    SpiralSmootherConfig spiral = 21;
+  }
+}

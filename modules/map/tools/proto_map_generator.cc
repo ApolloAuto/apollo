@@ -35,16 +35,19 @@ int main(int argc, char **argv) {
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  const auto map_filename = FLAGS_map_dir + "/base_map.xml";;
+  const auto map_filename = FLAGS_map_dir + "/base_map.xml";
   apollo::hdmap::Map pb_map;
-  CHECK(apollo::hdmap::adapter::OpendriveAdapter::LoadData(
-      map_filename, &pb_map)) << "fail to load data";
+  CHECK(
+      apollo::hdmap::adapter::OpendriveAdapter::LoadData(map_filename, &pb_map))
+      << "fail to load data from : " << map_filename;
 
   const std::string output_ascii_file = FLAGS_output_dir + "/base_map.txt";
-  CHECK(apollo::common::util::SetProtoToASCIIFile(pb_map, output_ascii_file));
+  CHECK(apollo::common::util::SetProtoToASCIIFile(pb_map, output_ascii_file))
+      << "failed to outpupt ASCII format base map";
 
   const std::string output_bin_file = FLAGS_output_dir + "/base_map.bin";
-  CHECK(apollo::common::util::SetProtoToBinaryFile(pb_map, output_bin_file));
+  CHECK(apollo::common::util::SetProtoToBinaryFile(pb_map, output_bin_file))
+      << "failed to outpupt binary format base map";
 
   pb_map.Clear();
   CHECK(apollo::common::util::GetProtoFromFile(output_bin_file, &pb_map))

@@ -33,7 +33,7 @@
 //              const RadarRawObstacles& raw_obstacles,
 //              const std::vector<PolygonType>& map_polygons,
 //              const RadarDetectorOptions& options,
-//              std::vector<ObjectPtr>* objects) override {
+//              std::vector<std::shared_ptr<Object>>* objects) override {
 //          // Do something.
 //          return true;
 //      }
@@ -54,30 +54,31 @@
 // using radar_detector to do somethings.
 // ////////////////////////////////////////////////////
 
-#include <Eigen/Core>
+#include <memory>
 #include <string>
 #include <vector>
 
-// defined in apollo/common
+#include "Eigen/Core"
+
 #include "modules/common/macro.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/lib/base/registerer.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
 namespace perception {
 
-using ::apollo::common::Header;
-using ::apollo::drivers::ContiRadarObs;
-using ::apollo::drivers::ContiRadar;
+using apollo::common::Header;
+using apollo::drivers::ContiRadarObs;
+using apollo::drivers::ContiRadar;
 
 struct RadarDetectorOptions {
   Eigen::Matrix4d *radar2world_pose = nullptr;
   Eigen::Vector3f car_linear_speed = Eigen::Vector3f::Zero();
 };
-enum ContiObjectType {
+enum class ContiObjectType {
   CONTI_POINT = 0,
   CONTI_CAR = 1,
   CONTI_TRUCK = 2,
@@ -88,7 +89,7 @@ enum ContiObjectType {
   CONTI_UNKNOWN = 7,
   CONTI_MAX_OBJECT_TYPE = 8,
 };
-enum ContiMeasState {
+enum class ContiMeasState {
   CONTI_DELETED = 0,
   CONTI_NEW = 1,
   CONTI_MEASURED = 2,
@@ -132,7 +133,7 @@ class BaseRadarDetector {
   virtual bool Detect(const ContiRadar &raw_obstacles,
                       const std::vector<PolygonDType> &map_polygons,
                       const RadarDetectorOptions &options,
-                      std::vector<ObjectPtr> *objects) = 0;
+                      std::vector<std::shared_ptr<Object>> *objects) = 0;
   virtual std::string name() const = 0;
 
  private:

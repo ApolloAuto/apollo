@@ -1,18 +1,18 @@
 # Localization
 
 ## Introduction
-  This module provides localization service. I has provided two methods for localization. One is RTK based method which incorporates GPS and IMU information. Another is multi-sensor fusion method which incorporates GPS, IMU, and LiDAR information.
+  This module provides localization service. There are two methods provided by default. One is RTK(Real Time Kinematic) based method which incorporates GPS and IMU information, the other is multi-sensor fusion method which incorporates GPS, IMU, and LiDAR information.
 
 ## Input
   In the provided RTK localization method, there are two inputs:
-  * GPS The Global Position System.
-  * IMU Inertial Measurement Unit.
+  * GPS - The Global Position System.
+  * IMU - Inertial Measurement Unit.
   
   In the provided multi-sensor fusion localization method, there are three inputs:
-  * GPS The Global Position System.
-  * IMU Inertial Measurement Unit.
-  * LiDAR Light Detection And Ranging Sensor.
-  For more information, refer to [multi-sensor fusion localizaiton] (https://github.com/ApolloAuto/apollo/tree/master/modules/localization/msf/README.md).
+  * GPS - The Global Position System.
+  * IMU - Inertial Measurement Unit.
+  * LiDAR - Light Detection And Ranging Sensor.
+  For more information, refer to [multi-sensor fusion localizaiton](https://github.com/ApolloAuto/apollo/tree/master/modules/localization/msf/README.md).
 
 ## Output
   * An object instance defined by Protobuf message `LocalizationEstimate`, which can be found in file `localization/proto/localization.proto`.

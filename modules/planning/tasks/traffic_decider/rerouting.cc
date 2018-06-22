@@ -24,20 +24,20 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/dropbox.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::util::Dropbox;
 using apollo::common::time::Clock;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
+using apollo::planning::util::GetPlanningStatus;
 
-Rerouting::Rerouting(const RuleConfig& config) : TrafficRule(config) {}
+Rerouting::Rerouting(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool Rerouting::ChangeLaneFailRerouting() {
   const auto& segments = reference_line_info_->Lanes();
@@ -77,20 +77,24 @@ bool Rerouting::ChangeLaneFailRerouting() {
   double adc_s = reference_line_info_->AdcSlBoundary().end_s();
   const auto* vehicle_state = common::VehicleStateProvider::instance();
   double speed = vehicle_state->linear_velocity();
-  const double prepare_distance = speed * FLAGS_prepare_rerouting_time;
+  const double prepare_rerouting_time =
+      config_.rerouting().prepare_rerouting_time();
+  const double prepare_distance = speed * prepare_rerouting_time;
   if (sl_point.s() > adc_s + prepare_distance) {
     ADEBUG << "No need rerouting now because still can drive for time: "
-           << FLAGS_prepare_rerouting_time << " seconds";
+           << prepare_rerouting_time << " seconds";
     return true;
   }
   // 6. Check if we have done rerouting before
-  const std::string last_rerouting_time_key =
-      "kLastReroutingTime_" + segments.Id();
-  double* last_routing_time =
-      common::util::Dropbox<double>::Open()->Get(last_rerouting_time_key);
+  auto* rerouting = GetPlanningStatus()->mutable_rerouting();
+  if (rerouting == nullptr) {
+    AERROR << "rerouting is nullptr.";
+    return false;
+  }
   double current_time = Clock::NowInSeconds();
-  if (last_routing_time != nullptr &&
-      current_time - *last_routing_time < FLAGS_rerouting_cooldown_time) {
+  if (rerouting->has_last_rerouting_time() &&
+      (current_time - rerouting->last_rerouting_time() <
+       config_.rerouting().cooldown_time())) {
     ADEBUG << "Skip rerouting and wait for previous rerouting result";
     return true;
   }
@@ -100,20 +104,19 @@ bool Rerouting::ChangeLaneFailRerouting() {
   }
 
   // store last rerouting time.
-  common::util::Dropbox<double>::Open()->Set(last_rerouting_time_key,
-                                             current_time);
+  rerouting->set_last_rerouting_time(current_time);
   return true;
 }
 
-bool Rerouting::ApplyRule(Frame* frame,
-                          ReferenceLineInfo* const reference_line_info) {
+Status Rerouting::ApplyRule(Frame* const frame,
+                            ReferenceLineInfo* const reference_line_info) {
   frame_ = frame;
   reference_line_info_ = reference_line_info;
   if (!ChangeLaneFailRerouting()) {
-    AERROR << "In un-successful lane change case, rerouting failed";
-    return false;
+    return Status(common::PLANNING_ERROR,
+                  "In un-successful lane change case, rerouting failed");
   }
-  return true;
+  return Status::OK();
 }
 
 }  // namespace planning

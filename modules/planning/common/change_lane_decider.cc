@@ -22,31 +22,25 @@
 
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
 
-using common::util::Dropbox;
-using planning_internal::ChangeLaneState;
 using common::time::Clock;
 
-ChangeLaneDecider::ChangeLaneDecider() : state_key_("kChangeLaneStatus") {
-  dropbox_ = Dropbox<ChangeLaneState>::Open();
+void ChangeLaneDecider::UpdateStatus(ChangeLaneStatus::Status status_code,
+                                     const std::string& path_id) {
+  UpdateStatus(Clock::NowInSeconds(), status_code, path_id);
 }
 
-void ChangeLaneDecider::UpdateState(ChangeLaneState::State state_code,
-                                    const std::string& path_id) {
-  UpdateState(Clock::NowInSeconds(), state_code, path_id);
-}
-
-void ChangeLaneDecider::UpdateState(double timestamp,
-                                    ChangeLaneState::State state_code,
-                                    const std::string& path_id) {
-  ChangeLaneState state;
-  state.set_timestamp(timestamp);
-  state.set_path_id(path_id);
-  state.set_state(state_code);
-  dropbox_->Set(state_key_, state);
+void ChangeLaneDecider::UpdateStatus(double timestamp,
+                                     ChangeLaneStatus::Status status_code,
+                                     const std::string& path_id) {
+  auto* change_lane_status = util::GetPlanningStatus()->mutable_change_lane();
+  change_lane_status->set_timestamp(timestamp);
+  change_lane_status->set_path_id(path_id);
+  change_lane_status->set_status(status_code);
 }
 
 void ChangeLaneDecider::PrioritizeChangeLane(
@@ -100,24 +94,24 @@ bool ChangeLaneDecider::Apply(
     return true;
   }
 
-  auto* prev_state = dropbox_->Get(state_key_);
+  auto* prev_status = util::GetPlanningStatus()->mutable_change_lane();
   double now = Clock::NowInSeconds();
 
-  if (!prev_state) {
-    UpdateState(now, ChangeLaneState::CHANGE_LANE_SUCCESS,
-                GetCurrentPathId(*reference_line_info));
+  if (!prev_status->has_status()) {
+    UpdateStatus(now, ChangeLaneStatus::CHANGE_LANE_SUCCESS,
+                 GetCurrentPathId(*reference_line_info));
     return true;
   }
 
   bool has_change_lane = reference_line_info->size() > 1;
   if (!has_change_lane) {
     const auto& path_id = reference_line_info->front().Lanes().Id();
-    if (prev_state->state() == ChangeLaneState::CHANGE_LANE_SUCCESS) {
-    } else if (prev_state->state() == ChangeLaneState::IN_CHANGE_LANE) {
-      UpdateState(now, ChangeLaneState::CHANGE_LANE_SUCCESS, path_id);
-    } else if (prev_state->state() == ChangeLaneState::CHANGE_LANE_FAILED) {
+    if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_SUCCESS) {
+    } else if (prev_status->status() == ChangeLaneStatus::IN_CHANGE_LANE) {
+      UpdateStatus(now, ChangeLaneStatus::CHANGE_LANE_SUCCESS, path_id);
+    } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_FAILED) {
     } else {
-      AERROR << "Unknown state: " << prev_state->ShortDebugString();
+      AERROR << "Unknown state: " << prev_status->ShortDebugString();
       return false;
     }
     return true;
@@ -127,31 +121,32 @@ bool ChangeLaneDecider::Apply(
       AERROR << "The vehicle is not on any reference line";
       return false;
     }
-    if (prev_state->state() == ChangeLaneState::IN_CHANGE_LANE) {
-      if (prev_state->path_id() == current_path_id) {
+    if (prev_status->status() == ChangeLaneStatus::IN_CHANGE_LANE) {
+      if (prev_status->path_id() == current_path_id) {
         PrioritizeChangeLane(reference_line_info);
       } else {
         RemoveChangeLane(reference_line_info);
-        UpdateState(now, ChangeLaneState::CHANGE_LANE_SUCCESS, current_path_id);
+        UpdateStatus(now, ChangeLaneStatus::CHANGE_LANE_SUCCESS,
+                     current_path_id);
       }
       return true;
-    } else if (prev_state->state() == ChangeLaneState::CHANGE_LANE_FAILED) {
-      if (now - prev_state->timestamp() < FLAGS_change_lane_fail_freeze_time) {
+    } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_FAILED) {
+      if (now - prev_status->timestamp() < FLAGS_change_lane_fail_freeze_time) {
         RemoveChangeLane(reference_line_info);
       } else {
-        UpdateState(now, ChangeLaneState::IN_CHANGE_LANE, current_path_id);
+        UpdateStatus(now, ChangeLaneStatus::IN_CHANGE_LANE, current_path_id);
       }
       return true;
-    } else if (prev_state->state() == ChangeLaneState::CHANGE_LANE_SUCCESS) {
-      if (now - prev_state->timestamp() <
+    } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_SUCCESS) {
+      if (now - prev_status->timestamp() <
           FLAGS_change_lane_success_freeze_time) {
         RemoveChangeLane(reference_line_info);
       } else {
         PrioritizeChangeLane(reference_line_info);
-        UpdateState(now, ChangeLaneState::IN_CHANGE_LANE, current_path_id);
+        UpdateStatus(now, ChangeLaneStatus::IN_CHANGE_LANE, current_path_id);
       }
     } else {
-      AERROR << "Unknown state: " << prev_state->ShortDebugString();
+      AERROR << "Unknown state: " << prev_status->ShortDebugString();
       return false;
     }
   }

@@ -16,11 +16,6 @@
 # limitations under the License.
 ###############################################################################
 
+# e.g. replay.sh 1_chassis.pb.txt
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-cd "${DIR}/.."
-
-source "${DIR}/apollo_base.sh"
-
-python modules/tools/replay/replay_file.py $@
+python /apollo/modules/tools/replay/replay_file.py $@

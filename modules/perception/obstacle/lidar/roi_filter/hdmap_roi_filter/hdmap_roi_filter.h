@@ -21,11 +21,11 @@
 #include <vector>
 
 #include "Eigen/Core"
-#include "gflags/gflags.h"
+
+#include "modules/perception/proto/hdmap_roi_filter_config.pb.h"
 
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/bitmap2d.h"
@@ -52,9 +52,7 @@ class HdmapROIFilter : public BaseROIFilter {
   ~HdmapROIFilter() {}
 
   bool Init() override;
-  std::string name() const {
-    return "HdmapROIFilter";
-  }
+  std::string name() const override { return "HdmapROIFilter"; }
 
   /**
    * @params[In] cloud: All the cloud points with local coordinates
@@ -64,14 +62,14 @@ class HdmapROIFilter : public BaseROIFilter {
    * @params[Out] roi_indices: The indices of points within ROI
    * @return true if filter points successfully, otherwise return false
    */
-  bool Filter(const pcl_util::PointCloudPtr& cloud,
+  bool Filter(pcl_util::PointCloudPtr cloud,
               const ROIFilterOptions& roi_filter_options,
               pcl_util::PointIndices* roi_indices) override;
 
   /**
    * @brief: Merge junction polygons and road boundaries in a vector.
    */
-  void MergeHdmapStructToPolygons(const HdmapStructConstPtr& hdmap_struct_ptr,
+  void MergeHdmapStructToPolygons(HdmapStructConstPtr hdmap_struct_ptr,
                                   std::vector<PolygonDType>* polygons);
 
  protected:
@@ -79,7 +77,7 @@ class HdmapROIFilter : public BaseROIFilter {
    * @brief: Draw polygons into grids in bitmap and check each point whether
    * is in the grids within ROI.
    */
-  bool FilterWithPolygonMask(const pcl_util::PointCloudPtr& cloud,
+  bool FilterWithPolygonMask(pcl_util::PointCloudPtr cloud,
                              const std::vector<PolygonType>& map_polygons,
                              pcl_util::PointIndices* roi_indices);
 
@@ -87,7 +85,7 @@ class HdmapROIFilter : public BaseROIFilter {
    * @brief: Transform polygon points and cloud points from world coordinates
    * system to local.
    */
-  void TransformFrame(const pcl_util::PointCloudConstPtr& cloud,
+  void TransformFrame(pcl_util::PointCloudConstPtr cloud,
                       const Eigen::Affine3d& vel_pose,
                       const std::vector<PolygonDType>& polygons_world,
                       std::vector<PolygonType>* polygons_local,
@@ -118,13 +116,15 @@ class HdmapROIFilter : public BaseROIFilter {
 
   // We only filter point with local coordinates x, y in [-range, range] in
   // meters
-  double range_;
+  double range_ = 0.0;
 
   // Hight and width of grid in bitmap
-  double cell_size_;
+  double cell_size_ = 0.0;
 
   // The distance extended away from the ROI boundary
-  double extend_dist_;
+  double extend_dist_ = 0.0;
+
+  hdmap_roi_filter_config::ModelConfigs config_;
 };
 
 REGISTER_ROIFILTER(HdmapROIFilter);

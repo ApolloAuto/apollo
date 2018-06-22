@@ -1,0 +1,14 @@
+tl_preprocessor_subnode_config {
+  name: "TLPreprocessorSubnode"
+  version: "1.0.0"
+  max_ahead_seconds: 0.3
+  max_process_image_fps: 8.0
+  query_tf_inverval_seconds: 0.2
+}
+
+tl_proc_subnode_config {
+  name: "TLProcSubnode"
+  version: "1.0.0"
+  image_border: 100
+  valid_ts_interval: 0.5
+}

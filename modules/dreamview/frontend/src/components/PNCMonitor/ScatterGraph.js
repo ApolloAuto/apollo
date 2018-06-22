@@ -1,17 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Chart from "chart.js";
-import ChartZoom from "chartjs-plugin-zoom";
 
 Chart.plugins.register({
     afterDatasetsDraw: function(chart, easing) {
+        const fontSize = 15;
+        const fontStyle = 'normal';
+        const fontFamily = 'Helvetica Neue';
         chart.config.data.datasets.forEach((dataset, index) => {
             if (dataset.showText) {
                 const meta = chart.getDatasetMeta(index);
                 const element = meta.data[Math.floor(meta.data.length / 2)];
-                const fontSize = 15;
-                const fontStyle = 'normal';
-                const fontFamily = 'Helvetica Neue';
                 chart.ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
                 chart.ctx.fillStyle = dataset.borderColor;
                 chart.ctx.textAlign = 'center';
@@ -21,6 +20,32 @@ Chart.plugins.register({
                 const position = element.tooltipPosition();
                 chart.ctx.fillText(dataset.text,
                     position.x, position.y - (fontSize / 2) - padding);
+            } else if (dataset.specialMarker === 'car') {
+                chart.ctx.save();
+
+                const meta = chart.getDatasetMeta(index);
+                const rotation = chart.data.datasets[index].data[0].rotation || 0;
+
+                const xAxis = chart.scales['x-axis-0'];
+                const yAxis = chart.scales['y-axis-0'];
+                const pixelPerUnit = {
+                    x: xAxis.width / (xAxis.max - xAxis.min),
+                    y: yAxis.height / (yAxis.max - yAxis.min),
+                };
+                const dx = Math.cos(rotation) > 0 ? 1 : -1;
+                const dy = Math.tan(rotation) * dx;
+                const xInPixels = dx * pixelPerUnit.x;
+                const yInPixels = dy * pixelPerUnit.y;
+                const rotationInPixels = Math.atan2(yInPixels, xInPixels);
+
+                const element = meta.data[0];
+                const position = element.tooltipPosition();
+                chart.ctx.font = Chart.helpers.fontString(20, fontStyle, fontFamily);
+                chart.ctx.translate(position.x, position.y);
+                chart.ctx.rotate(-rotationInPixels); // ChartJS's rotation is clockwise
+                chart.ctx.fillText("►", 0, 0);
+
+                chart.ctx.restore();
             }
         });
     }
@@ -39,19 +64,11 @@ export default class ScatterGraph extends React.Component {
             legend: {
                 display: options.legend.display,
             },
-            pan: {
-                enabled: true,
-                mode: 'xy'
-            },
-            zoom: {
-                enabled: false,
-                mode: 'xy',
-            },
             tooltips: {
                 enable: true,
                 mode: "nearest",
                 intersect: false,
-            }
+            },
         };
 
         if (options.axes) {
@@ -64,7 +81,10 @@ export default class ScatterGraph extends React.Component {
                 const axisOptions = {
                     id: `${axis}-axis-0`,
                     scaleLabel: { display: true, labelString: setting.labelString },
-                    ticks: { min: setting.min, max: setting.max },
+                    ticks: {
+                        min: setting.min,
+                        max: setting.max,
+                    },
                     gridLines: {
                         color: 'rgba(153, 153, 153, 0.5)',
                         zeroLineColor: 'rgba(153, 153, 153, 0.7)',
@@ -108,33 +128,24 @@ export default class ScatterGraph extends React.Component {
         }
     }
 
-    componentDidMount() {
-        const { title, options } = this.props;
-        this.initializeCanvas(title, options);
-    }
-
-    componentWillUnmount() {
-        this.chart.destroy();
-    }
-
-    componentWillReceiveProps(nextProps) {
+    updateChart(props) {
         // Draw lines
-        for (const name in nextProps.properties.lines) {
+        for (const name in props.properties.lines) {
             if (this.name2idx[name] === undefined) {
                 this.name2idx[name] = this.chart.data.datasets.length;
             }
             const idx = this.name2idx[name];
-            const properties = nextProps.properties.lines[name];
-            const data = nextProps.data ? nextProps.data[name] : [];
+            const properties = props.properties.lines[name];
+            const data = props.data ? props.data[name] : [];
             this.updateData(idx, name, properties, data);
         };
 
         // Draw boxes
         let idx = Object.keys(this.name2idx).length;
-        if (nextProps.boxes) {
-            for (const name in nextProps.boxes) {
-                const data = nextProps.boxes[name];
-                this.updateData(idx, name, nextProps.properties.box, data);
+        if (props.boxes) {
+            for (const name in props.boxes) {
+                const data = props.boxes[name];
+                this.updateData(idx, name, props.properties.box, data);
                 idx++;
             }
         }
@@ -146,10 +157,22 @@ export default class ScatterGraph extends React.Component {
         this.chart.update(0);
     }
 
+    componentDidMount() {
+        const { title, options } = this.props;
+        this.initializeCanvas(title, options);
+        this.updateChart(this.props);
+    }
+
+    componentWillUnmount() {
+        this.chart.destroy();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.updateChart(nextProps);
+    }
 
     render() {
         const { data, properties, options, boxes } = this.props;
-
         return (
             <div className="scatter-graph">
                 <canvas ref = {(input) => {

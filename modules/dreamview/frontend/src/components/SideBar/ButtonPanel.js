@@ -6,8 +6,9 @@ import TasksIcon from "assets/images/sidebar/tasks.png";
 import ModuleControllerIcon from "assets/images/sidebar/module_controller.png";
 import LayerMenuIcon from "assets/images/sidebar/layer_menu.png";
 import RouteEditingIcon from "assets/images/sidebar/route_editing.png";
+import DataRecorderIcon from "assets/images/sidebar/data_recorder.png";
 
-class SideBarButton extends React.Component {
+class SideBarButton extends React.PureComponent {
     render() {
         const { disabled, onClick, active, label, extraClasses, iconSrc } = this.props;
         return (
@@ -24,13 +25,14 @@ class SideBarButton extends React.Component {
     }
 }
 
-export default class ButtonPanel extends React.Component {
+export default class ButtonPanel extends React.PureComponent {
     render() {
-        const { enableHMIButtonsOnly,
+        const { enableHMIButtonsOnly, inNavigationMode,
                 onTasks, showTasks,
                 onModuleController, showModuleController,
                 onMenu, showMenu,
-                onRouteEditingBar, showRouteEditingBar } = this.props;
+                onRouteEditingBar, showRouteEditingBar,
+                onDataRecorder, showDataRecorder } = this.props;
 
         return (
             <div className="main-panel">
@@ -50,10 +52,15 @@ export default class ButtonPanel extends React.Component {
                                onClick={onMenu}
                                active={showMenu} />
                 <SideBarButton label="Route Editing"
-                               disabled={enableHMIButtonsOnly}
+                               disabled={enableHMIButtonsOnly || inNavigationMode}
                                iconSrc={RouteEditingIcon}
                                onClick={onRouteEditingBar}
                                active={showRouteEditingBar} />
+                <SideBarButton label="Data Recorder"
+                               disabled={enableHMIButtonsOnly}
+                               iconSrc={DataRecorderIcon}
+                               onClick={onDataRecorder}
+                               active={showDataRecorder} />
             </div>
         );
     }

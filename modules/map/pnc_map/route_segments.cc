@@ -54,6 +54,13 @@ bool RouteSegments::WithinLaneSegment(const LaneSegment &lane_segment,
          lane_segment.end_s + kSegmentationEpsilon >= waypoint.s;
 }
 
+bool RouteSegments::WithinLaneSegment(const LaneSegment &lane_segment,
+                                      const routing::LaneWaypoint &waypoint) {
+  return lane_segment.lane && lane_segment.lane->id().id() == waypoint.id() &&
+         lane_segment.start_s - kSegmentationEpsilon <= waypoint.s() &&
+         lane_segment.end_s + kSegmentationEpsilon >= waypoint.s();
+}
+
 bool RouteSegments::WithinLaneSegment(const routing::LaneSegment &lane_segment,
                                       const LaneWaypoint &waypoint) {
   return waypoint.lane && lane_segment.id() == waypoint.lane->id().id() &&

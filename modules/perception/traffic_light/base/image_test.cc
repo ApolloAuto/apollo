@@ -27,16 +27,12 @@ class ImageTest : public ::testing::Test {
   virtual ~ImageTest() {}
 
  protected:
-  void SetUp() override {
-    _image = new Image();
-  }
+  void SetUp() override { image_ = new Image(); }
 
-  void TearDown() override {
-    delete _image;
-  }
+  void TearDown() override { delete image_; }
 
  protected:
-  Image *_image;
+  Image *image_;
 };
 
 TEST_F(ImageTest, test_all) {
@@ -45,24 +41,24 @@ TEST_F(ImageTest, test_all) {
   double timestamp = 0.0;
   {
     std::stringstream ss;
-    ss << *_image;
+    ss << *image_;
     EXPECT_EQ("Image not inited.", ss.str());
   }
 
-  ASSERT_TRUE(_image->Init(timestamp, cam_id, img));
+  ASSERT_TRUE(image_->Init(timestamp, cam_id, img));
   {
     std::stringstream ss;
-    ss << *_image;
+    ss << *image_;
     ASSERT_NE("Image not inited.", ss.str());
   }
 
-  EXPECT_EQ(CameraId::LONG_FOCUS, _image->camera_id());
-  EXPECT_DOUBLE_EQ(0.0, _image->ts());
-  EXPECT_EQ("long_focus_camera_25mm", _image->camera_id_str());
+  EXPECT_EQ(CameraId::LONG_FOCUS, image_->camera_id());
+  EXPECT_DOUBLE_EQ(0.0, image_->ts());
+  EXPECT_EQ("long_focus_camera_25mm", image_->camera_id_str());
 
   cam_id = CameraId::UNKNOWN;
-  ASSERT_TRUE(_image->Init(timestamp, cam_id, img));
-  EXPECT_EQ("unkown camera", _image->camera_id_str());
+  ASSERT_TRUE(image_->Init(timestamp, cam_id, img));
+  EXPECT_EQ("unkown camera", image_->camera_id_str());
 }
 }  // namespace traffic_light
 }  // namespace perception

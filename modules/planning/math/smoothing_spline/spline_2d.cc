@@ -109,8 +109,8 @@ double Spline2d::ThirdDerivativeY(const double t) const {
   return splines_[index].ThirdDerivativeY(t - t_knots_[index]);
 }
 /**
-*   @brief: set splines
-**/
+ *   @brief: set splines
+ **/
 bool Spline2d::set_splines(const Eigen::MatrixXd& params,
                            const uint32_t order) {
   const uint32_t num_params = order + 1;

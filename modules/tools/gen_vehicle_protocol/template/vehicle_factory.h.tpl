@@ -25,8 +25,8 @@
 
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
-#include "modules/canbus/vehicle/message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/drivers/canbus/can_comm/message_manager.h"
 
 /**
  * @namespace apollo::canbus
@@ -58,7 +58,8 @@ class %(car_type_cap)sVehicleFactory : public AbstractVehicleFactory {
    * @brief create %(car_type_lower)s message manager
    * @returns a unique_ptr that points to the created message manager
    */
-  std::unique_ptr<MessageManager> CreateMessageManager() override;
+  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>> 
+  CreateMessageManager() override;
 };
 
 }  // namespace canbus

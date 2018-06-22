@@ -78,6 +78,13 @@ struct CanFrame {
   }
 };
 
+const int CAN_RESULT_SUCC = 0;
+const int CAN_ERROR_BASE = 2000;
+const int CAN_ERROR_OPEN_DEVICE_FAILED = CAN_ERROR_BASE + 1;
+const int CAN_ERROR_FRAME_NUM = CAN_ERROR_BASE + 2;
+const int CAN_ERROR_SEND_FAILED = CAN_ERROR_BASE + 3;
+const int CAN_ERROR_RECV_FAILED = CAN_ERROR_BASE + 4;
+
 /**
  * @class CanClient
  * @brief The class which defines the CAN client to send and receive message.
@@ -131,7 +138,8 @@ class CanClient {
    */
   virtual apollo::common::ErrorCode SendSingleFrame(
       const std::vector<CanFrame> &frames) {
-    CHECK_EQ(frames.size(), 1);
+    CHECK_EQ(frames.size(), 1)
+        << "frames size not equal to 1, actual frame size :" << frames.size();
     int32_t n = 1;
     return Send(frames, &n);
   }

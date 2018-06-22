@@ -19,7 +19,6 @@
 #include <cmath>
 
 #include "gtest/gtest.h"
-#include "modules/common/configs/vehicle_config_helper.h"
 
 using apollo::common::TrajectoryPoint;
 
@@ -27,20 +26,17 @@ namespace apollo {
 namespace dreamview {
 namespace util {
 
-class TrajectoryPointCollectorTest : public ::testing::Test {
- public:
-  virtual void SetUp() { apollo::common::VehicleConfigHelper::Init(); }
-};
-
-TEST_F(TrajectoryPointCollectorTest, ThreePoints) {
+TEST(TrajectoryPointCollectorTest, ThreePoints) {
   SimulationWorld world;
   TrajectoryPointCollector collector(&world);
 
+  const double base_time = 1000.0;
   for (int i = 0; i < 4; ++i) {
     TrajectoryPoint point;
     point.mutable_path_point()->set_x(i * 100.0);
     point.mutable_path_point()->set_y(i * 100.0 + 100.0);
-    collector.Collect(point);
+    point.set_relative_time(i * 1000.0);
+    collector.Collect(point, base_time);
   }
 
   EXPECT_EQ(world.planning_trajectory_size(), 3);
@@ -49,6 +45,7 @@ TEST_F(TrajectoryPointCollectorTest, ThreePoints) {
     const Object &point = world.planning_trajectory(0);
     EXPECT_DOUBLE_EQ(0.0, point.position_x());
     EXPECT_DOUBLE_EQ(100.0, point.position_y());
+    EXPECT_DOUBLE_EQ(1000.0, point.timestamp_sec());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
   }
 
@@ -56,6 +53,7 @@ TEST_F(TrajectoryPointCollectorTest, ThreePoints) {
     const Object &point = world.planning_trajectory(1);
     EXPECT_DOUBLE_EQ(100.0, point.position_x());
     EXPECT_DOUBLE_EQ(200.0, point.position_y());
+    EXPECT_DOUBLE_EQ(2000.0, point.timestamp_sec());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
   }
 
@@ -63,6 +61,7 @@ TEST_F(TrajectoryPointCollectorTest, ThreePoints) {
     const Object &point = world.planning_trajectory(2);
     EXPECT_DOUBLE_EQ(200.0, point.position_x());
     EXPECT_DOUBLE_EQ(300.0, point.position_y());
+    EXPECT_DOUBLE_EQ(3000.0, point.timestamp_sec());
     EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
   }
 }

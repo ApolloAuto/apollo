@@ -54,13 +54,23 @@ class RTKReplayPlanner : public Planner {
   apollo::common::Status Init(const PlanningConfig& config) override;
 
   /**
-   * @brief Overrode function Plan in parent class Planner.
+   * @brief Override function Plan in parent class Planner.
+   * @param planning_init_point The trajectory point where planning starts.
+   * @param frame Current planning frame.
+   * @return OK if planning succeeds; error otherwise.
+   */
+  apollo::common::Status Plan(
+      const common::TrajectoryPoint& planning_init_point,
+      Frame* frame) override;
+
+  /**
+   * @brief Override function Plan in parent class Planner.
    * @param planning_init_point The trajectory point where planning starts.
    * @param frame Current planning frame.
    * @param reference_line_info The computed reference line.
    * @return OK if planning succeeds; error otherwise.
    */
-  apollo::common::Status Plan(
+  apollo::common::Status PlanOnReferenceLine(
       const common::TrajectoryPoint& planning_init_point, Frame* frame,
       ReferenceLineInfo* reference_line_info) override;
   /**

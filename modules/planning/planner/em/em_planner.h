@@ -28,6 +28,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/reference_line_info.h"
+#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -60,15 +61,25 @@ class EMPlanner : public Planner {
   common::Status Init(const PlanningConfig& config) override;
 
   /**
-   * @brief Overrode function Plan in parent class Planner.
+   * @brief Override function Plan in parent class Planner.
+   * @param planning_init_point The trajectory point where planning starts.
+   * @param frame Current planning frame.
+   * @return OK if planning succeeds; error otherwise.
+   */
+  apollo::common::Status Plan(
+      const common::TrajectoryPoint& planning_init_point,
+      Frame* frame) override;
+
+  /**
+   * @brief Override function Plan in parent class Planner.
    * @param planning_init_point The trajectory point where planning starts.
    * @param frame Current planning frame.
    * @param reference_line_info The computed reference line.
    * @return OK if planning succeeds; error otherwise.
    */
-  common::Status Plan(const common::TrajectoryPoint& planning_init_point,
-                      Frame* frame,
-                      ReferenceLineInfo* reference_line_info) override;
+  common::Status PlanOnReferenceLine(
+      const common::TrajectoryPoint& planning_init_point, Frame* frame,
+      ReferenceLineInfo* reference_line_info) override;
 
  private:
   void RegisterTasks();
@@ -82,6 +93,20 @@ class EMPlanner : public Planner {
 
   std::vector<common::SpeedPoint> GenerateSpeedHotStart(
       const common::TrajectoryPoint& planning_init_point);
+
+  void GenerateFallbackPathProfile(const ReferenceLineInfo* reference_line_info,
+                                   PathData* path_data);
+
+  void GenerateFallbackSpeedProfile(
+      const ReferenceLineInfo* reference_line_info, SpeedData* speed_data);
+
+  SpeedData GenerateStopProfile(const double init_speed,
+                                const double init_acc) const;
+
+  SpeedData GenerateStopProfileFromPolynomial(const double init_speed,
+                                              const double init_acc) const;
+
+  bool IsValidProfile(const QuinticPolynomialCurve1d& curve) const;
 
   void RecordObstacleDebugInfo(ReferenceLineInfo* reference_line_info);
 

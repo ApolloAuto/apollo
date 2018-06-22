@@ -24,6 +24,7 @@
 #include <utility>
 
 #include "modules/common/log.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/planning/common/planning_util.h"
 
 namespace apollo {
@@ -39,19 +40,6 @@ void DiscretizedPath::set_path_points(
   path_points_ = path_points;
 }
 
-common::PathPoint DiscretizedPath::Evaluate(const double path_s) const {
-  CHECK_GT(path_points_.size(), 1);
-  CHECK(path_points_.front().s() <= path_s &&
-        path_points_.back().s() <= path_s);
-
-  auto it_lower = QueryLowerBound(path_s);
-  if (it_lower == path_points_.begin()) {
-    return path_points_.front();
-  }
-
-  return util::interpolate(*(it_lower - 1), *it_lower, path_s);
-}
-
 double DiscretizedPath::Length() const {
   if (path_points_.empty()) {
     return 0.0;
@@ -59,8 +47,7 @@ double DiscretizedPath::Length() const {
   return path_points_.back().s() - path_points_.front().s();
 }
 
-common::PathPoint DiscretizedPath::EvaluateUsingLinearApproximation(
-    const double path_s) const {
+common::PathPoint DiscretizedPath::Evaluate(const double path_s) const {
   CHECK(!path_points_.empty());
   auto it_lower = QueryLowerBound(path_s);
   if (it_lower == path_points_.begin()) {
@@ -69,8 +56,8 @@ common::PathPoint DiscretizedPath::EvaluateUsingLinearApproximation(
   if (it_lower == path_points_.end()) {
     return path_points_.back();
   }
-  return util::InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower,
-                                                   path_s);
+  return common::math::InterpolateUsingLinearApproximation(*(it_lower - 1),
+                                                           *it_lower, path_s);
 }
 
 const std::vector<common::PathPoint> &DiscretizedPath::path_points() const {

@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/qp_spline_reference_line_smoother_config.pb.h"
+#include "modules/planning/proto/reference_line_smoother_config.pb.h"
 
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -38,9 +38,9 @@ namespace planning {
 
 class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
  public:
-  QpSplineReferenceLineSmoother(
-      const QpSplineReferenceLineSmootherConfig& config,
-      Spline2dSolver* const spline_solver);
+  explicit QpSplineReferenceLineSmoother(
+      const ReferenceLineSmootherConfig& config);
+
   virtual ~QpSplineReferenceLineSmoother() = default;
 
   bool Smooth(const ReferenceLine& raw_reference_line,
@@ -68,10 +68,9 @@ class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
   std::uint32_t FindIndex(const double t) const;
 
  private:
-  QpSplineReferenceLineSmootherConfig smoother_config_;
   std::vector<double> t_knots_;
   std::vector<AnchorPoint> anchor_points_;
-  Spline2dSolver* spline_solver_ = nullptr;
+  std::unique_ptr<Spline2dSolver> spline_solver_;
 
   double ref_x_ = 0.0;
   double ref_y_ = 0.0;

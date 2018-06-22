@@ -80,7 +80,7 @@ bool Predictor::TrimTrajectory(
   }
   const Feature& feature = obstacle->latest_feature();
   double length = feature.length();
-  double heading = feature.theta();
+  double heading = feature.velocity_heading();
   double forward_length =
       std::max(length / 2.0 - FLAGS_distance_beyond_junction, 0.0);
 
@@ -94,8 +94,7 @@ bool Predictor::TrimTrajectory(
   bool front_in_junction =
       adc_trajectory_container->IsPointInJunction(front_point);
 
-  const PathPoint& start_point =
-      trajectory->trajectory_point(0).path_point();
+  const PathPoint& start_point = trajectory->trajectory_point(0).path_point();
   bool start_in_junction =
       adc_trajectory_container->IsPointInJunction(start_point);
 

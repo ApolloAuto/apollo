@@ -25,9 +25,10 @@
 namespace apollo {
 namespace planning {
 
-QuinticSpiralPath::QuinticSpiralPath(
-    const double x0, const double dx0, const double ddx0, const double x1,
-    const double dx1, const double ddx1, const double p)
+QuinticSpiralPath::QuinticSpiralPath(const double x0, const double dx0,
+                                     const double ddx0, const double x1,
+                                     const double dx1, const double ddx1,
+                                     const double p)
     : QuinticPolynomialCurve1d(x0, dx0, ddx0, x1, dx1, ddx1, p) {
   CHECK(p > 0.0);
 
@@ -140,14 +141,14 @@ QuinticSpiralPath::QuinticSpiralPath(
   coef_deriv_[0][6] = 0.0;
 }
 
-QuinticSpiralPath::QuinticSpiralPath(
-    const std::array<double, 3>& start, const std::array<double, 3>& end,
-    const double delta_s)
-    : QuinticSpiralPath(start[0], start[1], start[2], end[0], end[1],
-                                  end[2], delta_s) {}
+QuinticSpiralPath::QuinticSpiralPath(const std::array<double, 3>& start,
+                                     const std::array<double, 3>& end,
+                                     const double delta_s)
+    : QuinticSpiralPath(start[0], start[1], start[2], end[0], end[1], end[2],
+                        delta_s) {}
 
 double QuinticSpiralPath::DeriveTheta(const std::size_t param_index,
-                                                const double r) const {
+                                      const double r) const {
   double s = param_ * r;
   double s2 = s * s;
   double s3 = s2 * s;
@@ -172,6 +173,29 @@ double QuinticSpiralPath::DeriveKappaDerivative(
   double s = param_ * r;
   double s2 = s * s;
   double s3 = s2 * s;
+  double s4 = s2 * s2;
+
+  double derivative =
+      5.0 * coef_deriv_[5][param_index] * s4 +
+      4.0 * coef_deriv_[4][param_index] * s3 +
+      3.0 * coef_deriv_[3][param_index] * s2 +
+      2.0 * coef_deriv_[2][param_index] * s +
+      coef_deriv_[1][param_index];
+
+  if (param_index == DELTA_S) {
+    derivative += 5.0 * coef_[5] * 4.0 * s3 * r +
+                  4.0 * coef_[4] * 3.0 * s2 * r +
+                  3.0 * coef_[3] * 2.0 * s * r +
+                  2.0 * coef_[2] * r;
+  }
+  return derivative;
+}
+
+double QuinticSpiralPath::DeriveDKappaDerivative(const std::size_t param_index,
+                                                 const double r) const {
+  double s = param_ * r;
+  double s2 = s * s;
+  double s3 = s2 * s;
 
   double derivative = 20.0 * coef_deriv_[5][param_index] * s3 +
                       12.0 * coef_deriv_[4][param_index] * s2 +
@@ -181,6 +205,22 @@ double QuinticSpiralPath::DeriveKappaDerivative(
   if (param_index == DELTA_S) {
     derivative += 20.0 * coef_[5] * 3.0 * s2 * r +
                   12.0 * coef_[4] * 2.0 * s * r + 6.0 * coef_[3] * r;
+  }
+  return derivative;
+}
+
+double QuinticSpiralPath::DeriveD2KappaDerivative(const std::size_t param_index,
+                                                 const double r) const {
+  double s = param_ * r;
+  double s2 = s * s;
+
+  double derivative = 60.0 * coef_deriv_[5][param_index] * s2 +
+                      24.0 * coef_deriv_[4][param_index] * s +
+                      6.0 * coef_deriv_[3][param_index];
+
+  if (param_index == DELTA_S) {
+    derivative += 60.0 * coef_[5] * 2.0 * s * r +
+                  24.0 * coef_[4] * r;
   }
   return derivative;
 }

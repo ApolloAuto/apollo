@@ -62,10 +62,26 @@ TEST_F(FreeMovePredictorTest, General) {
   predictor.Predict(obstacle_ptr);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();
   EXPECT_EQ(trajectories.size(), 1);
+  EXPECT_EQ(trajectories[0].trajectory_point_size(), 50);
   EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().x(), -432.459,
               0.001);
   EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().y(), -156.451,
               0.001);
+}
+
+TEST_F(FreeMovePredictorTest, Pedestrian) {
+  perception_obstacles_.mutable_perception_obstacle(0)->set_type(
+      ::apollo::perception::PerceptionObstacle::PEDESTRIAN);
+  apollo::perception::PerceptionObstacle perception_obstacle =
+      perception_obstacles_.perception_obstacle(0);
+  ObstaclesContainer container;
+  container.Insert(perception_obstacles_);
+  Obstacle* obstacle_ptr = container.GetObstacle(15);
+  FreeMovePredictor predictor;
+  predictor.Predict(obstacle_ptr);
+  const std::vector<Trajectory>& trajectories = predictor.trajectories();
+  EXPECT_EQ(trajectories.size(), 1);
+  EXPECT_EQ(trajectories[0].trajectory_point_size(), 100);
 }
 
 }  // namespace prediction

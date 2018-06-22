@@ -17,7 +17,6 @@
 #include "modules/common/util/json_util.h"
 
 #include "google/protobuf/util/json_util.h"
-#include "modules/common/log.h"
 
 namespace apollo {
 namespace common {

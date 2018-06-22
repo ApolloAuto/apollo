@@ -9,18 +9,39 @@ export default class HMI {
 
     vehicles = [];
     @observable currentVehicle = 'none';
+    vehicleParam = {
+        frontEdgeToCenter: 3.89,
+        backEdgeToCenter: 1.04,
+        leftEdgeToCenter: 1.055,
+        rightEdgeToCenter: 1.055,
+        height: 1.48,
+        width: 2.11,
+        length: 4.933,
+        steerRatio: 16,
+    };
 
     maps = [];
     @observable currentMap = 'none';
 
     @observable moduleStatus = observable.map();
     @observable hardwareStatus = observable.map();
+    @observable enableStartAuto = false;
 
     displayName = {};
+    utmZoneId = 10;
+    utterance = window.speechSynthesis ? new SpeechSynthesisUtterance() : null;
+
+    @observable dockerImage = 'unknown';
 
     @action initialize(config) {
+        if (config.dockerImage) {
+            this.dockerImage = config.dockerImage;
+        }
         if (config.modes) {
             this.modes = config.modes;
+        }
+        if (config.utmZoneId) {
+            this.utmZoneId = config.utmZoneId;
         }
         this.vehicles = Object.keys(config.availableVehicles).sort()
             .map(name => {
@@ -63,7 +84,37 @@ export default class HMI {
                     this.hardwareStatus.set(key, newStatus.systemStatus.hardware[key].summary);
                 }
             }
+            if (this.utterance &&
+                typeof newStatus.systemStatus.passengerMsg === "string" &&
+                newStatus.systemStatus.passengerMsg !== this.utterance.text) {
+                    this.utterance.text = newStatus.systemStatus.passengerMsg;
+                this.speakPassengerMessage();
+            }
         }
+    }
+
+    speakPassengerMessage() {
+        if (this.utterance.text) {
+            // if speaking, don't interrupt
+            if (!window.speechSynthesis.speaking) {
+                window.speechSynthesis.speak(this.utterance);
+            }
+
+            // repeat this message until a new one is given
+            this.utterance.onend = () => {
+                window.speechSynthesis.speak(this.utterance);
+            };
+        } else {
+            this.utterance.onend = null;
+        }
+    }
+
+    @action update(world) {
+        this.enableStartAuto = world.engageAdvice === "READY_TO_ENGAGE";
+    }
+
+    updateVehicleParam(vehicleParam) {
+        this.vehicleParam = vehicleParam;
     }
 
     @action toggleModule(id) {
@@ -76,7 +127,7 @@ export default class HMI {
         return this.currentMode === "RTK Record / Replay";
     }
 
-    @computed get showNavigationMap() {
+    @computed get inNavigationMode() {
         return this.currentMode === "Navigation";
     }
 }

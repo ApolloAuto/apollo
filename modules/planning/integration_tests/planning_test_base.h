@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -21,12 +22,15 @@
 
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
+#include "modules/planning/proto/traffic_rule_config.pb.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
+
+#define private public
 #include "modules/planning/planning.h"
 
 namespace apollo {
@@ -34,12 +38,24 @@ namespace planning {
 
 using common::adapter::AdapterManager;
 
-#define RUN_GOLDEN_TEST                                            \
-  {                                                                \
-    const ::testing::TestInfo* const test_info =                   \
-        ::testing::UnitTest::GetInstance()->current_test_info();   \
-    bool run_planning_success = RunPlanning(test_info->name(), 0); \
-    EXPECT_TRUE(run_planning_success);                             \
+#define RUN_GOLDEN_TEST(sub_case_num)                                        \
+  {                                                                          \
+    const ::testing::TestInfo* const test_info =                             \
+        ::testing::UnitTest::GetInstance()->current_test_info();             \
+    bool no_trajectory_point = false;                                        \
+    bool run_planning_success = RunPlanning(test_info->name(), sub_case_num, \
+                                            no_trajectory_point);            \
+    EXPECT_TRUE(run_planning_success);                                       \
+  }
+
+#define RUN_GOLDEN_TEST_DECISION(sub_case_num)                               \
+  {                                                                          \
+    const ::testing::TestInfo* const test_info =                             \
+        ::testing::UnitTest::GetInstance()->current_test_info();             \
+    bool no_trajectory_point = true;                                         \
+    bool run_planning_success = RunPlanning(test_info->name(), sub_case_num, \
+                                            no_trajectory_point);            \
+    EXPECT_TRUE(run_planning_success);                                       \
   }
 
 #define TMAIN                                            \
@@ -49,12 +65,15 @@ using common::adapter::AdapterManager;
     return RUN_ALL_TESTS();                              \
   }
 
+#define ENABLE_RULE(RULE_ID, ENABLED) this->rule_enabled_[RULE_ID] = ENABLED
+
 DECLARE_string(test_routing_response_file);
 DECLARE_string(test_localization_file);
 DECLARE_string(test_chassis_file);
 DECLARE_string(test_data_dir);
 DECLARE_string(test_prediction_file);
 DECLARE_string(test_traffic_light_file);
+DECLARE_string(test_relative_map_file);
 DECLARE_string(test_previous_planning_file);
 
 class PlanningTestBase : public ::testing::Test {
@@ -63,19 +82,26 @@ class PlanningTestBase : public ::testing::Test {
 
   virtual void SetUp();
 
+  void UpdateData();
+
   /**
    * Execute the planning code.
    * @return true if planning is success. The ADCTrajectory will be used to
    * store the planing results.  Otherwise false.
    */
-  bool RunPlanning(const std::string& test_case_name, int case_num);
+  bool RunPlanning(const std::string& test_case_name, int case_num,
+                   bool no_trajectory_point);
+
+  TrafficRuleConfig* GetTrafficRuleConfig(
+      const TrafficRuleConfig::RuleId& rule_id);
 
  protected:
-  void TrimPlanning(ADCTrajectory* origin);
+  void TrimPlanning(ADCTrajectory* origin, bool no_trajectory_point);
   bool SetUpAdapters();
   bool IsValidTrajectory(const ADCTrajectory& trajectory);
 
   Planning planning_;
+  std::map<TrafficRuleConfig::RuleId, bool> rule_enabled_;
   ADCTrajectory adc_trajectory_;
 };
 
