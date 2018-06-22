@@ -12,6 +12,7 @@ import "modules/map/proto/map_speed_bump.proto";
 import "modules/map/proto/map_stop_sign.proto";
 import "modules/map/proto/map_yield_sign.proto";
 import "modules/map/proto/map_road.proto";
+import "modules/map/proto/map_parking_space.proto";
 
 // This message defines how we project the ellipsoidal Earth surface to a plane.
 message Projection {
@@ -48,4 +49,5 @@ message Map {
   repeated ClearArea clear_area = 9;
   repeated SpeedBump speed_bump = 10;
   repeated Road road = 11;
+  repeated ParkingSpace parking_space = 12;
 }

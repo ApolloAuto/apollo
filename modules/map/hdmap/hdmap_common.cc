@@ -703,5 +703,15 @@ const std::vector<RoadBoundary> &RoadInfo::GetBoundaries() const {
   return road_boundaries_;
 }
 
+ParkingSpaceInfo::ParkingSpaceInfo(const ParkingSpace &parking_space)
+    : parking_space_(parking_space) {
+  Init();
+}
+
+void ParkingSpaceInfo::Init() {
+  polygon_ = ConvertToPolygon2d(parking_space_.polygon());
+  CHECK_GT(polygon_.num_points(), 2);
+}
+
 }  // namespace hdmap
 }  // namespace apollo
