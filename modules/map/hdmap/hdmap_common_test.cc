@@ -34,6 +34,7 @@ class HDMapCommonTestSuite : public ::testing::Test {
   void InitClearAreaObj(ClearArea* clear_area);
   void InitSpeedBumpObj(SpeedBump* speed_bump);
   void InitRoadObj(Road* road);
+  void InitParkingSpaceObj(ParkingSpace* parking_space);
 };
 
 void HDMapCommonTestSuite::InitLaneObj(Lane* lane) {
@@ -280,6 +281,26 @@ void HDMapCommonTestSuite::InitSpeedBumpObj(SpeedBump* speed_bump) {
   pt = line_segment->add_point();
   pt->set_x(170002.0);
   pt->set_y(0.0);
+  pt->set_z(0.0);
+}
+void HDMapCommonTestSuite::InitParkingSpaceObj(ParkingSpace* parking_space) {
+  parking_space->mutable_id()->set_id("parking_space_1");
+  Polygon* polygon = parking_space->mutable_polygon();
+  apollo::common::PointENU* pt = polygon->add_point();
+  pt->set_x(170000.0);
+  pt->set_y(170000.0);
+  pt->set_z(0.0);
+  pt = polygon->add_point();
+  pt->set_x(170003.0);
+  pt->set_y(170000.0);
+  pt->set_z(0.0);
+  pt = polygon->add_point();
+  pt->set_x(170003.0);
+  pt->set_y(170003.0);
+  pt->set_z(0.0);
+  pt = polygon->add_point();
+  pt->set_x(170000.0);
+  pt->set_y(170003.0);
   pt->set_z(0.0);
 }
 
@@ -590,6 +611,22 @@ TEST_F(HDMapCommonTestSuite, TestRoadInfo) {
   EXPECT_EQ(section1.id().id(), "section_2");
   EXPECT_EQ(section1.lane_id_size(), 1);
   EXPECT_EQ(section1.lane_id(0).id(), "section_2_1");
+}
+
+TEST_F(HDMapCommonTestSuite, TestParkingSpaceInfo) {
+  ParkingSpace parking_space;
+  InitParkingSpaceObj(&parking_space);
+  ParkingSpaceInfo parking_space_info(parking_sapce);
+  EXPECT_EQ(parking_space.id().id(), parking_space_info.id().id());
+  EXPECT_EQ(4, parking_space_info.parking_space().polygon().point_size());
+  EXPECT_NEAR(170000.0, parking_space_info.polygon().points()[0].x(), 1E-3);
+  EXPECT_NEAR(170000.0, parking_space_info.polygon().points()[0].y(), 1E-3);
+  EXPECT_NEAR(170003.0, parking_space_info.polygon().points()[1].x(), 1E-3);
+  EXPECT_NEAR(170000.0, parking_space_info.polygon().points()[1].y(), 1E-3);
+  EXPECT_NEAR(170003.0, parking_space_info.polygon().points()[2].x(), 1E-3);
+  EXPECT_NEAR(170003.0, parking_space_info.polygon().points()[2].y(), 1E-3);
+  EXPECT_NEAR(170000.0, parking_space_info.polygon().points()[3].x(), 1E-3);
+  EXPECT_NEAR(170003.0, parking_space_info.polygon().points()[3].y(), 1E-3);
 }
 
 }  // namespace hdmap
