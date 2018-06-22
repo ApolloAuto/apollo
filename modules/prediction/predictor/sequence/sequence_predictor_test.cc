@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
+#include "modules/prediction/predictor/sequence/sequence_predictor.h"
 
 #include <string>
 #include <vector>
@@ -33,7 +33,7 @@
 namespace apollo {
 namespace prediction {
 
-class LaneSequencePredictorTest : public KMLMapBasedTest {
+class SequencePredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
     std::string file =
@@ -45,7 +45,7 @@ class LaneSequencePredictorTest : public KMLMapBasedTest {
   apollo::perception::PerceptionObstacles perception_obstacles_;
 };
 
-TEST_F(LaneSequencePredictorTest, OnLaneCase) {
+TEST_F(SequencePredictorTest, General) {
   EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
                    1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
@@ -57,9 +57,29 @@ TEST_F(LaneSequencePredictorTest, OnLaneCase) {
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr != nullptr);
   mlp_evaluator.Evaluate(obstacle_ptr);
-  LaneSequencePredictor predictor;
+  SequencePredictor predictor;
   predictor.Predict(obstacle_ptr);
-  EXPECT_EQ(predictor.NumOfTrajectories(), 1);
+  EXPECT_EQ(predictor.NumOfTrajectories(), 0);
+  LaneSequence* lane_seq = obstacle_ptr->mutable_latest_feature()
+                                       ->mutable_lane()
+                                       ->mutable_lane_graph()
+                                       ->mutable_lane_sequence(0);
+  std::string sequence_str = predictor.ToString(*lane_seq);
+  EXPECT_GT(sequence_str.size(), 0);
+  SequencePredictor::LaneChangeType lane_change_type =
+      predictor.GetLaneChangeType(lane_seq->mutable_lane_segment(0)->lane_id(),
+                                  *lane_seq);
+  EXPECT_EQ(lane_change_type, SequencePredictor::LaneChangeType::STRAIGHT);
+
+  EXPECT_TRUE(predictor.LaneSequenceWithMaxProb(lane_change_type, 0.5, 0.5));
+  EXPECT_FALSE(predictor.LaneChangeWithMaxProb(lane_change_type, 0.5, 0.5));
+
+  std::vector<bool> enable_lane_sequence(3, true);
+  predictor.FilterLaneSequences(*obstacle_ptr->mutable_latest_feature(),
+                                lane_seq->mutable_lane_segment(0)->lane_id(),
+                                &enable_lane_sequence);
+  EXPECT_TRUE(enable_lane_sequence[0]);
+
   predictor.Clear();
 }
 
