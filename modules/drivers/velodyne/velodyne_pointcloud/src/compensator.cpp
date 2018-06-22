@@ -62,7 +62,7 @@ void Compensator::pointcloud_callback(
   // compensate point cloud, remove nan point
   if (query_pose_affine_from_tf2(timestamp_min, pose_min_time) &&
       query_pose_affine_from_tf2(timestamp_max, pose_max_time)) {
-    // we change message after motion compesation
+    // we change message after motion compensation
     sensor_msgs::PointCloud2::Ptr q_msg(new sensor_msgs::PointCloud2());
     *q_msg = *msg;
     motion_compensation<float>(q_msg, timestamp_min, timestamp_max,

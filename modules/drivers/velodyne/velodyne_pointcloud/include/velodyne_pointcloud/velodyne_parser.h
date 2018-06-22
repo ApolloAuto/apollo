@@ -88,7 +88,7 @@ static const int BLOCK_DATA_SIZE = (SCANS_PER_BLOCK * RAW_SCAN_SIZE);
 static const float ROTATION_RESOLUTION = 0.01f; /**< degrees */
 // static const uint16_t ROTATION_MAX_UNITS = 36000; [>*< hundredths of degrees
 // <]
-// because angle_rang is [0, 36000], so thie size is 36001
+// because angle_rang is [0, 36000], so the size is 36001
 static const uint16_t ROTATION_MAX_UNITS = 36001; /**< hundredths of degrees */
 
 /** According to Bruce Hall DISTANCE_MAX is 65.0, but we noticed
@@ -168,7 +168,7 @@ struct RawPacket {
 };
 
 // Convert related config, get value from private_nh param server, used by
-// velodyne rawdata
+// velodyne raw data
 struct Config {
   double max_range;  ///< maximum range to publish
   double min_range;  ///< minimum range to publish
@@ -231,7 +231,7 @@ class VelodyneParser {
   /**
    * \brief Compute coords with the data in block
    *
-   * @param tmp A two bytes union store the value of laser distance infomation
+   * @param tmp A two bytes union store the value of laser distance information
    * @param index The index of block
    */
   void compute_coords(const union RawDistance &raw_distance,

@@ -52,7 +52,7 @@ ProcessMonitor::ProcessMonitor()
 void ProcessMonitor::RunOnce(const double current_time) {
   // Get running processes.
   std::map<std::string, std::string> running_processes;
-  const auto procs = common::util::ListSubDirectories("/proc");
+  const auto procs = common::util::ListSubPaths("/proc");
   for (const auto &proc : procs) {
     // Get process command string.
     std::string cmd_string;

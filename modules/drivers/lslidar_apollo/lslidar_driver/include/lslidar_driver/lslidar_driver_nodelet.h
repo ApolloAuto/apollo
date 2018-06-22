@@ -44,6 +44,6 @@ private:
   LslidarDriverPtr lslidar_driver; ///< driver implementation class
 };
 
-} // namespace lslidar_driver
-}
-}
+}  // namespace lslidar_driver
+}  // namespace drivers
+}  // namespace apollo

@@ -296,7 +296,7 @@ void PandoraClientTask(void* handle) {
         continue;
       }
 
-      // check the desired frame postion packet.
+      // check the desired frame position packet.
       if (pic->header.position != client->position[pic->header.pic_id]) {
         client->position[pic->header.pic_id] = 0;
         free(pic->yuv);
