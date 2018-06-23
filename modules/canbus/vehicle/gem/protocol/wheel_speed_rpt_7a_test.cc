@@ -46,4 +46,3 @@ TEST_F(Wheelspeedrpt7aTest, reset) {
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-
