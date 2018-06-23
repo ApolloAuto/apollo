@@ -361,7 +361,7 @@ bool RawStream::Disconnect() {
 
   if (command_stream_) {
     if (command_stream_->get_status() == Stream::Status::CONNECTED) {
-      if (!data_stream_->Disconnect()) {
+      if (!command_stream_->Disconnect()) {
         AERROR << "command stream disconnect failed.";
         return false;
       }
