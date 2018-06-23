@@ -278,7 +278,7 @@ common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
   CHECK_NOTNULL(matched_index);
   const int size = path.path_point_size();
 
-  if (s < path.path_point(start_index).s() || start_index < 0) {
+  if (start_index < 0 || s < path.path_point(start_index).s()) {
     *matched_index = -1;
     return path.path_point(0);
   }

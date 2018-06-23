@@ -131,6 +131,7 @@ void SerialStream::open(void) {
   }
 
   if (!configure_port(fd)) {
+    ::close(fd);
     return;
   }
 

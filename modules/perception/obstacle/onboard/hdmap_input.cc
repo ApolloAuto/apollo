@@ -54,11 +54,14 @@ HDMapInput::HDMapInput() {}
 
 bool HDMapInput::GetROI(const PointD& pointd, const double map_radius,
                         HdmapStructPtr* mapptr) {
+  if (mapptr == nullptr) {
+    return false;
+  }
   auto* hdmap = HDMapUtil::BaseMapPtr();
   if (hdmap == nullptr) {
     return false;
   }
-  if (mapptr != NULL && *mapptr == nullptr) {
+  if (*mapptr == nullptr) {
     (*mapptr).reset(new HdmapStruct);
   }
   common::PointENU point;
