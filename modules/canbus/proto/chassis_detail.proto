@@ -55,7 +55,7 @@ message Light {
     TURN_RIGHT_ON = 2;
     TURN_LIGHT_ON = 3;
   }
-  enum LampType {
+  enum BeamLampType {
     BEAM_OFF = 0;
     HIGH_BEAM_ON = 1;
     LOW_BEAM_ON = 2;
@@ -95,7 +95,7 @@ message Light {
   }
 
   optional TurnLightType turn_light_type = 1;
-  optional LampType lamp_type = 2;
+  optional BeamLampType beam_lamp_type = 2;
   optional bool is_brake_lamp_on = 3;
   // byd switch 133
   optional bool is_auto_light = 4;
