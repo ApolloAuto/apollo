@@ -31,13 +31,16 @@ TEST_F(Wheelspeedrpt7aTest, reset) {
   Wheelspeedrpt7a wheelspeed;
   int32_t length = 8;
   ChassisDetail chassis_detail;
-  uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};  
-
+  uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
   wheelspeed.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().wheel_speed_rpt_7a().wheel_spd_rear_right(), 4884);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().wheel_speed_rpt_7a().wheel_spd_rear_left(), 4370);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().wheel_speed_rpt_7a().wheel_spd_front_right(), 772);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().wheel_speed_rpt_7a().wheel_spd_front_left(), 258);
+  EXPECT_DOUBLE_EQ(chassis_detail.gem().wheel_speed_rpt_7a()\
+.wheel_spd_rear_right(), 4884);
+  EXPECT_DOUBLE_EQ(chassis_detail.gem().wheel_speed_rpt_7a()\
+.wheel_spd_rear_left(), 4370);
+  EXPECT_DOUBLE_EQ(chassis_detail.gem().wheel_speed_rpt_7a()\
+.wheel_spd_front_right(), 772);
+  EXPECT_DOUBLE_EQ(chassis_detail.gem().wheel_speed_rpt_7a()\
+.wheel_spd_front_left(), 258);
 }
 
 }  // namespace gem
