@@ -239,6 +239,19 @@ void HMI::RegisterMessageHandlers() {
         }
       });
 
+  // Received Chassis, trigger action if there is high beam signal.
+  AdapterManager::AddChassisCallback(
+      [this](const Chassis &chassis) {
+        if (Clock::NowInSeconds() - chassis.header().timestamp_sec() <
+            FLAGS_system_status_lifetime_seconds) {
+          if (chassis.signal().high_beam()) {
+            const bool ret = HMIWorker::instance()->Trigger(
+                HMIWorker::instance()->GetConfig().chassis_high_beam_action());
+            AERROR_IF(!ret) << "Failed to execute high_beam action.";
+          }
+        }
+      });
+
   // Received VoiceDetection response.
   AdapterManager::AddVoiceDetectionResponseCallback(
       [this](const VoiceDetectionResponse &response) {
