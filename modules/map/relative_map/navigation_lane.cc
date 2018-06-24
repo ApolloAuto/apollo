@@ -101,7 +101,7 @@ bool NavigationLane::GeneratePath() {
     // the navigation paths can be sorted from left to right according to its
     // y-coordinate.
     navigation_path_list_.sort(
-        [this](const NaviPathTuple &left, const NaviPathTuple &right) {
+        [](const NaviPathTuple &left, const NaviPathTuple &right) {
           double left_y = std::get<3>(left)->path().path_point(0).y();
           double right_y = std::get<3>(right)->path().path_point(0).y();
           return left_y > right_y;
@@ -111,7 +111,7 @@ bool NavigationLane::GeneratePath() {
     double min_d = std::numeric_limits<double>::max();
     for (const auto &navi_path_tuple : navigation_path_list_) {
       int current_line_index = std::get<0>(navi_path_tuple);
-      // AINFO << "Current navigation path index is: " << current_line_index;
+      ADEBUG << "Current navigation path index is: " << current_line_index;
       double current_d = last_project_index_map_[current_line_index].second;
       if (current_d < min_d) {
         min_d = current_d;
@@ -326,8 +326,9 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
   int current_project_index = proj_index_pair.first;
   if (current_project_index < 0 ||
       current_project_index >= navigation_path.path_point_size()) {
-    AINFO << "Invalid projection index " << current_project_index << " in line "
-          << line_index;
+    AERROR << "Invalid projection index " << current_project_index
+           << " in line " << line_index;
+    last_project_index_map_.erase(line_index);
     return false;
   } else {
     last_project_index_map_[line_index] = proj_index_pair;
@@ -379,7 +380,7 @@ ProjIndexPair NavigationLane::UpdateProjectionIndex(const common::Path &path,
   if (path.path_point_size() < 2) {
     return std::make_pair(-1, std::numeric_limits<double>::max());
   }
-  int index = 0;
+
   double min_d = std::numeric_limits<double>::max();
   const int path_size = path.path_point_size();
   int current_project_index = 0;
@@ -448,6 +449,7 @@ ProjIndexPair NavigationLane::UpdateProjectionIndex(const common::Path &path,
     }
   }
 
+  int index = 0;
   for (int i = current_project_index; i + 1 < path_size; ++i) {
     const double d = DistanceXY(original_pose_.position(), path.path_point(i));
     if (d < min_d) {
@@ -470,7 +472,7 @@ double NavigationLane::GetKappa(const double c1, const double c2,
                                 const double c3, const double x) {
   const double dy = 3 * c3 * x * x + 2 * c2 * x + c1;
   const double d2y = 6 * c3 * x + 2 * c2;
-  return std::fabs(d2y) / std::pow((1 + dy * dy), 1.5);
+  return d2y / std::pow((1 + dy * dy), 1.5);
 }
 
 void NavigationLane::ConvertLaneMarkerToPath(
