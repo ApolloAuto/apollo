@@ -14,7 +14,7 @@ spiral {
   opt_tol : 1.0e-8
   opt_acceptable_tol : 1e-6
   opt_acceptable_iteration : 15
-  opt_weight_curve_length : 0.0
+  opt_weight_curve_length : 1.0
   opt_weight_kappa : 1.5
   opt_weight_dkappa : 1.0
   opt_weight_d2kappa : 0.0
