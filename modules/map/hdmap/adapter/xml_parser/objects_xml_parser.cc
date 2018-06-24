@@ -170,6 +170,48 @@ Status ObjectsXmlParser::ParseStopLines(
   return Status::OK();
 }
 
+Status ObjectsXmlParser::ParseParkingSpaces(
+        const tinyxml2::XMLElement& xml_node,
+        std::vector<PbParkingSpace>* parking_spaces) {
+  CHECK_NOTNULL(parking_spaces);
+  const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("object");
+  while (sub_node) {
+    std::string object_type;
+    std::string object_id;
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*sub_node, "type", &object_type);
+    checker += UtilXmlParser::QueryStringAttribute(*sub_node, "id", &object_id);
+    if (checker != tinyxml2::XML_SUCCESS) {
+      std::string err_msg = "Error parse object type.";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+
+    if (object_type == "parkingSpace") {
+      PbParkingSpace parking_space;
+      parking_space.mutable_id()->set_id(object_id);
+
+      double heading = 0.0;
+      checker = sub_node->QueryDoubleAttribute("heading", &heading);
+      if (checker != tinyxml2::XML_SUCCESS) {
+        std::string err_msg = "Error parse parking space heading.";
+        return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+      }
+      parking_space.set_heading(heading);
+
+      PbPolygon* polygon = parking_space.mutable_polygon();
+      const auto* outline_node = sub_node->FirstChildElement("outline");
+      if (outline_node == nullptr) {
+        std::string err_msg = "Error parse parking space outline";
+        return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+      }
+      RETURN_IF_ERROR(UtilXmlParser::ParseOutline(*outline_node, polygon));
+      parking_spaces->emplace_back(parking_space);
+    }
+    sub_node = sub_node->NextSiblingElement("object");
+  }
+  return Status::OK();
+}
+
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo

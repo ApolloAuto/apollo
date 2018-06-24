@@ -616,7 +616,7 @@ TEST_F(HDMapCommonTestSuite, TestRoadInfo) {
 TEST_F(HDMapCommonTestSuite, TestParkingSpaceInfo) {
   ParkingSpace parking_space;
   InitParkingSpaceObj(&parking_space);
-  ParkingSpaceInfo parking_space_info(parking_sapce);
+  ParkingSpaceInfo parking_space_info(parking_space);
   EXPECT_EQ(parking_space.id().id(), parking_space_info.id().id());
   EXPECT_EQ(4, parking_space_info.parking_space().polygon().point_size());
   EXPECT_NEAR(170000.0, parking_space_info.polygon().points()[0].x(), 1E-3);
