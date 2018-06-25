@@ -113,4 +113,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "yaw_rate_rpt_81_test",
+    size = "small",
+    srcs = [
+        "yaw_rate_rpt_81_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
