@@ -119,7 +119,7 @@ class EventCollector {
  private:
   // Event time and message.
   std::vector<std::tuple<double, std::string>> events_;
-  Chassis::DrivingMode current_driving_mode_;
+  Chassis::DrivingMode last_driving_mode_;
 
   void OnDriveEvent(const apollo::common::DriveEvent& event) {
     // The header time is the real event time.
@@ -129,11 +129,11 @@ class EventCollector {
   void OnChassis(const Chassis& chassis) {
     // Save event when driving_mode changes from COMPLETE_AUTO_DRIVE to
     // EMERGENCY_MODE which is taken as a disengagement.
-    if (current_driving_mode_ == Chassis::COMPLETE_AUTO_DRIVE &&
+    if (last_driving_mode_ == Chassis::COMPLETE_AUTO_DRIVE &&
         chassis.driving_mode() == Chassis::EMERGENCY_MODE) {
       SaveEvent(chassis.header().timestamp_sec(), "Disengagement");
     }
-    current_driving_mode_ = chassis.driving_mode();
+    last_driving_mode_ = chassis.driving_mode();
   }
 
   void OnMonitorMessage(
