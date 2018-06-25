@@ -494,10 +494,6 @@ message BasicInfo {
   optional double gps_speed = 39;
 }
 
-message License {
-  optional string vin = 1;
-}
-
 // Gem vehicle starts from here
 // TODO(QiL) : Re-factor needed here
 
