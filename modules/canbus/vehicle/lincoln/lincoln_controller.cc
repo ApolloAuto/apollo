@@ -342,10 +342,13 @@ Chassis LincolnController::chassis() {
   }
 
   // vin number will be written into KVDB once.
-  if (chassis_detail.license().has_vin() && !received_vin_) {
-    apollo::common::KVDB::Put("apollo:canbus:vin",
-                              chassis_detail.license().vin());
-    received_vin_ = true;
+  if (chassis_detail.license().has_vin()) {
+    chassis_.mutable_license()->set_vin(chassis_detail.license().vin());
+    if (!received_vin_) {
+      apollo::common::KVDB::Put("apollo:canbus:vin",
+                                chassis_detail.license().vin());
+      received_vin_ = true;
+    }
   }
 
   // give engage_advice based on error_code and canbus feedback
