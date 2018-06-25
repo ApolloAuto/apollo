@@ -166,6 +166,8 @@ HMIWorker::HMIWorker() {
 bool HMIWorker::Trigger(const HMIAction action) {
   AINFO << "HMIAction " << HMIAction_Name(action) << " was triggered!";
   switch (action) {
+    case HMIAction::NONE:
+      break;
     case HMIAction::SETUP:
       RunModeCommand("start");
       break;

@@ -12,6 +12,8 @@ message ParkingSpace {
   optional Polygon polygon = 2;
 
   repeated Id overlap_id = 3;
+
+  optional double heading = 4;
 }
 
 // ParkingLot is a place for parking cars.
