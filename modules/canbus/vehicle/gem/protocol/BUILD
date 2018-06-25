@@ -101,4 +101,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "wheel_speed_rpt_7a_test",
+    size = "small",
+    srcs = [
+        "wheel_speed_rpt_7a_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

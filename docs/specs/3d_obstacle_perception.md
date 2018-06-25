@@ -79,7 +79,7 @@ The table below describes the usage of parameters for HDMap ROI Filter.
 Convolutional Neural Networks (CNN) Segmentation
 ------------------------------------------------
 
-After identifing the surrounding environment using the HDMap ROI filter, Apollo obtains the filtered point cloud that includes *only* the points inside the ROI (i.e., the drivable road and junction areas). Most of the background obstacles, such as buildings and trees around the road region, have been removed, and the point cloud inside the ROI is fed into the segmentation module. This process detects and segments out foreground obstacles, e.g., cars, trucks, bicycles, and pedestrians.
+After identifying the surrounding environment using the HDMap ROI filter, Apollo obtains the filtered point cloud that includes *only* the points inside the ROI (i.e., the drivable road and junction areas). Most of the background obstacles, such as buildings and trees around the road region, have been removed, and the point cloud inside the ROI is fed into the segmentation module. This process detects and segments out foreground obstacles, e.g., cars, trucks, bicycles, and pedestrians.
 
 | Input                                    | Output                                   |
 | ---------------------------------------- | ---------------------------------------- |
@@ -165,10 +165,10 @@ Given this graph, Apollo adopts a compressed Union Find algorithm to efficiently
 
 <div align=center>Figure 3 Illustration of obstacle clustering</div>
 
-- The red arrow represents the object center offset prediction for each cell. 
+- The red arrow represents the object center offset prediction for each cell.
 - The blue mask corresponds to the object cells for which  the objectness probability is no less than 0.5.
 - The cells within the solid red polygon compose a candidate object cluster.
-- The red filled five-pointed stars indicate the root nodes (cells) of sub-graphs that correspond to the connected components. 
+- The red filled five-pointed stars indicate the root nodes (cells) of sub-graphs that correspond to the connected components.
 
 One candidate object cluster can be composed of multiple neighboring connected components whose root nodes are adjacent to each other.
 
@@ -178,7 +178,7 @@ The class probabilities are summed up over the nodes (cells) within the object c
 
 After clustering, Apollo obtains a set of candidate object clusters each of which includes several cells. In the post-processing step, Apollo first computes the detection confidence score and object height for each candidate cluster by averaging the positiveness and object height values of its involved cells respectively. Then, Apollo removes the points that are too high with respect to the predicted object height and collects the points of valid cells for each candidate cluster. Finally, Apollo removes the candidate clusters that have either a very low confidence score or a small number of points, to output the final obstacle clusters/segments.
 
-Set the user-defined parameters in the configuration file `modules/perception/model/cnn\_segmentation/cnnseg.conf`. 
+Set the user-defined parameters in the configuration file `modules/perception/model/cnn\_segmentation/cnnseg.conf`.
 
 The table below explains the parameter usage and default values for CNN Segmentation.
 
@@ -278,31 +278,31 @@ To smooth the obstacle type and reduce the type switch over the entire trajector
 
 where the unary term acts on each single node, while the binary one acts on each edge. 
 
-The probability in the unary term is the class probability output by the CNN-based prediction, and the state transition probability in the binary term is modeled by the obstacle type transition from time *t-1* to time *t*, which is statistically learned from large amounts of obstacle trajectories. Specifically, Apollo also uses a learned confusion matrix to indicate the probability of changing from the predicted type to ground truth type to optimize the original CNN-based class probability. 
+The probability in the unary term is the class probability output by the CNN-based prediction, and the state transition probability in the binary term is modeled by the obstacle type transition from time *t-1* to time *t*, which is statistically learned from large amounts of obstacle trajectories. Specifically, Apollo also uses a learned confusion matrix to indicate the probability of changing from the predicted type to ground truth type to optimize the original CNN-based class probability.
 
-Using the Viterbi algorithm, the sequential obstacle type is optimized by solving the following problem: 
+Using the Viterbi algorithm, the sequential obstacle type is optimized by solving the following problem:
 
 ![CRF_eq3](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/3d_obstacle_perception/CRF_eq3.png)
 
 ## Radar Detector
 
-Given the radar data from the sensor, follow a basic process such as the one described below. 
+Given the radar data from the sensor, follow a basic process such as the one described below.
 
-First, the track ID should be extended, because Apollo needs a global track ID for ID association. The original radar sensor provides an ID with only 8 bits, so it is difficult to determine if two objects with the same ID in two adjacent frames denote a single object in the tracking history, especially if there is a frame dropping problem. Apollo uses the measurement state provided by the radar sensor to handle this problem. Meanwhile, Apollo assigns a new track ID to the object that is far away from the object with the same track ID as in the previous frame. 
+First, the track ID should be extended, because Apollo needs a global track ID for ID association. The original radar sensor provides an ID with only 8 bits, so it is difficult to determine if two objects with the same ID in two adjacent frames denote a single object in the tracking history, especially if there is a frame dropping problem. Apollo uses the measurement state provided by the radar sensor to handle this problem. Meanwhile, Apollo assigns a new track ID to the object that is far away from the object with the same track ID as in the previous frame.
 
-Second, use a false positive filter to remove noise. Apollo sets some threshold via radar data to filter results that could be noise. Then, objects are built according the radar data as a unified object format. Apollo translates the objects into world coordinates via calibration results. The original radar sensor provides the relative velocity of the object, so Apollo uses the host car velocity from localization. Apollo adds these two velocities to denote the absolute velocity of the detected object. 
+Second, use a false positive filter to remove noise. Apollo sets some threshold via radar data to filter results that could be noise. Then, objects are built according the radar data as a unified object format. Apollo translates the objects into world coordinates via calibration results. The original radar sensor provides the relative velocity of the object, so Apollo uses the host car velocity from localization. Apollo adds these two velocities to denote the absolute velocity of the detected object.
 
 Finally, the HDMap ROI filter is used to obtain the interested objects. Only objects inside the ROI are used by the sensor fusion algorithm.
 
 ## Obstacle Results Fusion
 
-The sensor fusion module is designed to fuse LiDAR tracking results and radar detection results.  Apollo first matches the sensor results with the fusion items by tracking their IDs. Then it computes the association matrix for unmatched sensor results and unmatched fusion items to get an optimal matching result. 
+The sensor fusion module is designed to fuse LiDAR tracking results and radar detection results.  Apollo first matches the sensor results with the fusion items by tracking their IDs. Then it computes the association matrix for unmatched sensor results and unmatched fusion items to get an optimal matching result.
 
-For the matched sensor result, update the corresponding fusion item using the Adaptive Kalman Filter. For the unmatched sensor result, create a new fusion item. Remove any stale unmatched fusion items. 
+For the matched sensor result, update the corresponding fusion item using the Adaptive Kalman Filter. For the unmatched sensor result, create a new fusion item. Remove any stale unmatched fusion items.
 
 ### Fusion Items Management
 
-Apollo has the concept of publish-sensor. The given radar results are cached.  The given LiDAR results trigger the fusion action. The frequency of sensor fusion output is the same as the frequency of publish sensor. Apollo's publish-sensor is LiDAR. The sensor results feed the fusion pipeline sorted by the sensor time stamp. Apollo keeps all sensor results. The object survival time is set for different sensor objects in Apollo. An object is kept alive if at least one sensor result survives. The Apollo perception module provides fusion results of LiDAR and radar in the short-range area around the car and radar-only results for the long distance.  
+Apollo has the concept of publish-sensor. The given radar results are cached.  The given LiDAR results trigger the fusion action. The frequency of sensor fusion output is the same as the frequency of publish sensor. Apollo's publish-sensor is LiDAR. The sensor results feed the fusion pipeline sorted by the sensor time stamp. Apollo keeps all sensor results. The object survival time is set for different sensor objects in Apollo. An object is kept alive if at least one sensor result survives. The Apollo perception module provides fusion results of LiDAR and radar in the short-range area around the car and radar-only results for the long distance.
 
 ### Sensor Results to Fusion Lists Association
 

@@ -43,22 +43,26 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     std::string err_msg = "xml data missing header";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
   }
-  int rev_major = 0;
-  int rev_minor = 0;
+  std::string rev_major;
+  std::string rev_minor;
   std::string database_name;
-  float version = 0.0;
+  std::string version;
   std::string date;
   double north = 0.0;
   double south = 0.0;
   double west = 0.0;
   double east = 0.0;
   std::string vendor;
-  int checker = header_node->QueryIntAttribute("revMajor", &rev_major);
-  checker += header_node->QueryIntAttribute("revMinor", &rev_minor);
-  checker +=
-      UtilXmlParser::QueryStringAttribute(*header_node, "name", &database_name);
-  checker += header_node->QueryFloatAttribute("version", &version);
-  checker += UtilXmlParser::QueryStringAttribute(*header_node, "date", &date);
+  int checker = UtilXmlParser::QueryStringAttribute(
+                            *header_node, "revMajor", &rev_major);
+  checker += UtilXmlParser::QueryStringAttribute(
+                            *header_node, "revMinor", &rev_minor);
+  checker += UtilXmlParser::QueryStringAttribute(
+                            *header_node, "name", &database_name);
+  checker += UtilXmlParser::QueryStringAttribute(
+                            *header_node, "version", &version);
+  checker += UtilXmlParser::QueryStringAttribute(
+                            *header_node, "date", &date);
   checker += header_node->QueryDoubleAttribute("north", &north);
   checker += header_node->QueryDoubleAttribute("south", &south);
   checker += header_node->QueryDoubleAttribute("east", &east);
@@ -96,12 +100,12 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
   CoordinateConvertTool::GetInstance()->SetConvertParam(from_coordinate,
                                                         to_coordinate);
 
-  header->set_version(std::to_string(version));
+  header->set_version(version);
   header->set_date(date);
   header->mutable_projection()->set_proj(to_coordinate);
   header->set_district(database_name);
-  header->set_rev_major(std::to_string(rev_major));
-  header->set_rev_minor(std::to_string(rev_minor));
+  header->set_rev_major(rev_major);
+  header->set_rev_minor(rev_minor);
   header->set_left(west);
   header->set_right(east);
   header->set_top(north);

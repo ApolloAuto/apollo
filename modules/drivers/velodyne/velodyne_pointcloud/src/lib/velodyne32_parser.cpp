@@ -89,7 +89,7 @@ void Velodyne32Parser::unpack(const velodyne_msgs::VelodynePacket& pkt,
 
       if (raw_distance.raw_distance == 0 ||
           !is_scan_valid(rotation, distance)) {
-        // if orgnized append a nan point to the cloud
+        // if organized append a nan point to the cloud
         if (config_.organized) {
           pc.points.emplace_back(get_nan_point(timestamp));
           ++pc.width;
