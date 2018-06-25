@@ -800,6 +800,7 @@ void GLFWFusionViewer::keyboard(int key) {
       break;
     case GLFW_KEY_E:  // E
       draw_lane_objects_ = !draw_lane_objects_;
+      break;
     case GLFW_KEY_F:  // F
       show_fusion_ = !show_fusion_;
       break;
