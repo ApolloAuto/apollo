@@ -128,9 +128,9 @@ config: {
     creep {
       enabled: true
       creep_distance_to_stop_line: 1.5
-      stop_distance: 0.5
+      stop_distance: 0.3
       speed_limit: 1.0
-      max_valid_stop_distance: 0.3
+      max_valid_stop_distance: 0.4
       min_boundary_t: 6.0
     }
   }
