@@ -9,10 +9,10 @@ decision {
       reason_code: STOP_REASON_PULL_OVER
       reason: "stop by PO_DESTINATION_INLANE"
       stop_point {
-        x: 587109.97119684669
-        y: 4141209.5546708424
+        x: 587163.71529830724
+        y: 4141196.0328452243
       }
-      stop_heading: 2.8977181954722679
+      stop_heading: 2.8932032951164626
       change_lane_type: FORWARD
     }
   }
@@ -25,11 +25,11 @@ decision {
           reason_code: STOP_REASON_PULL_OVER
           distance_s: -0.5
           stop_point {
-            x: 587109.97119684669
-            y: 4141209.5546708424
+            x: 587163.71529830724
+            y: 4141196.0328452243
             z: 0
           }
-          stop_heading: 2.8977181954722679
+          stop_heading: 2.8932032951164626
         }
       }
     }
@@ -39,11 +39,14 @@ decision {
   }
 }
 routing_header {
-  timestamp_sec: 1528332691.6119256
+  timestamp_sec: 1528921075.9262888
   module_name: "routing"
-  sequence_num: 2
+  sequence_num: 3
 }
 right_of_way_status: UNPROTECTED
+lane_id {
+  id: "2694_1_-1"
+}
 lane_id {
   id: "2693_1_-1"
 }
@@ -55,12 +58,6 @@ lane_id {
 }
 lane_id {
   id: "2688_1_-1"
-}
-lane_id {
-  id: "2687_1_-1"
-}
-lane_id {
-  id: "732_1_-1"
 }
 engage_advice {
   advice: KEEP_ENGAGED

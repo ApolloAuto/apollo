@@ -26,8 +26,8 @@
 #include <vector>
 
 #include "modules/common/math/linear_interpolation.h"
-#include "modules/common/math/vec2d.h"
 #include "modules/common/math/polygon2d.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map_id.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -56,8 +56,8 @@ double PredictionMap::HeadingOnLane(std::shared_ptr<const LaneInfo> lane_info,
   return lane_info->Heading(s);
 }
 
-double PredictionMap::CurvatureOnLane(
-    const std::string& lane_id, const double s) {
+double PredictionMap::CurvatureOnLane(const std::string& lane_id,
+                                      const double s) {
   std::shared_ptr<const hdmap::LaneInfo> lane_info = LaneById(lane_id);
   return lane_info->Curvature(s);
 }
@@ -212,16 +212,15 @@ std::vector<std::shared_ptr<const JunctionInfo>> PredictionMap::GetJunctions(
   return junctions;
 }
 
-bool PredictionMap::InJunction(
-    const Eigen::Vector2d& point, const double radius) {
+bool PredictionMap::InJunction(const Eigen::Vector2d& point,
+                               const double radius) {
   auto junction_infos = GetJunctions(point, radius);
   Vec2d vec(point[0], point[1]);
   if (junction_infos.empty()) {
     return false;
   }
   for (const auto junction_info : junction_infos) {
-    if (junction_info == nullptr ||
-        !junction_info->junction().has_polygon()) {
+    if (junction_info == nullptr || !junction_info->junction().has_polygon()) {
       continue;
     }
     std::vector<Vec2d> vertices;
@@ -244,8 +243,11 @@ double PredictionMap::PathHeading(std::shared_ptr<const LaneInfo> lane_info,
   common::math::Vec2d vec_point = {point.x(), point.y()};
   double s = -1.0;
   double l = 0.0;
-  lane_info->GetProjection(vec_point, &s, &l);
-  return HeadingOnLane(lane_info, s);
+  if (lane_info->GetProjection(vec_point, &s, &l)) {
+    return HeadingOnLane(lane_info, s);
+  } else {
+    return M_PI;
+  }
 }
 
 bool PredictionMap::SmoothPointFromLane(const std::string& id, const double s,

@@ -1,14 +1,14 @@
 header {
-  timestamp_sec: 1528332691.6119256
+  timestamp_sec: 1528921075.9262888
   module_name: "routing"
-  sequence_num: 2
+  sequence_num: 3
 }
 road {
   id: "2716"
   passage {
     segment {
       id: "2716_1_-1"
-      start_s: 8.088348859428967
+      start_s: 6.6589912292722762
       end_s: 22.4733
     }
     can_exit: true
@@ -45,59 +45,35 @@ road {
     segment {
       id: "2693_1_-1"
       start_s: 0
-      end_s: 102.407
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2691"
-  passage {
-    segment {
-      id: "2691_1_-1"
-      start_s: 0
-      end_s: 6.12478
-    }
-    can_exit: true
-    change_lane_type: FORWARD
-  }
-}
-road {
-  id: "2690"
-  passage {
-    segment {
-      id: "2690_1_-1"
-      start_s: 0
-      end_s: 3.5088891146299894
+      end_s: 46.623230923366634
     }
     can_exit: true
     change_lane_type: FORWARD
   }
 }
 measurement {
-  distance: 182.76842025520102
+  distance: 118.78033969409435
 }
 routing_request {
   header {
-    timestamp_sec: 1528332691.6105404
+    timestamp_sec: 1528921075.9248776
     module_name: "dreamview"
-    sequence_num: 1
+    sequence_num: 3
   }
   waypoint {
     id: "2716_1_-1"
-    s: 8.088348859428967
+    s: 6.6589912292722762
     pose {
-      x: 587286.02204968582
-      y: 4141165.1134451679
+      x: 587287.414275622
+      y: 4141164.7821810273
     }
   }
   waypoint {
-    id: "2690_1_-1"
-    s: 3.5088891146299894
+    id: "2693_1_-1"
+    s: 46.623230923366634
     pose {
-      x: 587108.84545707039
-      y: 4141210.0079495981
+      x: 587172.21539426257
+      y: 4141193.7495351708
     }
   }
 }

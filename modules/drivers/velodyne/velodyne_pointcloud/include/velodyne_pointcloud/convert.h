@@ -41,7 +41,7 @@ class Convert {
   void init(ros::NodeHandle& node, ros::NodeHandle& private_nh);
 
  private:
-  // convert velodyne data to pointcloudn and public
+  // convert velodyne data to pointcloud and public
   void convert_packets_to_pointcloud(
       velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg);
 

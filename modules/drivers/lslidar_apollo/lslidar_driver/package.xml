@@ -1,0 +1,25 @@
+<package>
+
+  <name>lslidar_driver</name>
+  <version>2.0.0</version>
+  <description>
+    ROS device driver for Leishen C16 lidar.
+  </description>
+  <maintainer email="yutongyan@lslidar.com">yutongyan</maintainer>
+  <author>yutongyan</author>
+  <license>Licensed under the Apache License, Version 2.0 </license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>nodelet</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>lslidar_msgs</build_depend>
+
+  <run_depend>nodelet</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>lslidar_msgs</run_depend>
+
+ <export>
+    <nodelet plugin="${prefix}/nodelet_lslidar.xml"/>
+  </export>
+</package>

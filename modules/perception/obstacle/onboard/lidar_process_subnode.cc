@@ -77,10 +77,8 @@ bool LidarProcessSubnode::InitInternal() {
     return false;
   }
   device_id_ = reserve_field_map["device_id"];
+  AddMessageCallback();
 
-  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
-  AdapterManager::AddPointCloudCallback(&LidarProcessSubnode::OnPointCloud,
-                                        this);
   inited_ = true;
 
   return true;
@@ -432,8 +430,21 @@ SensorType Lidar64ProcessSubnode::GetSensorType() const {
   return SensorType::VELODYNE_64;
 }
 
+void Lidar64ProcessSubnode::AddMessageCallback() {
+  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
+  AdapterManager::AddPointCloudCallback<LidarProcessSubnode>(
+      &LidarProcessSubnode::OnPointCloud, this);
+}
+
 SensorType Lidar16ProcessSubnode::GetSensorType() const {
   return SensorType::VELODYNE_16;
+}
+
+void Lidar16ProcessSubnode::AddMessageCallback() {
+  CHECK(AdapterManager::GetVLP16PointCloud())
+      << "VLP16 PointCloud is not initialized.";
+  AdapterManager::AddVLP16PointCloudCallback<LidarProcessSubnode>(
+      &LidarProcessSubnode::OnPointCloud, this);
 }
 
 }  // namespace perception

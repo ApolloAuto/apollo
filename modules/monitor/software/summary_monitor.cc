@@ -21,9 +21,6 @@
 #include "modules/common/util/string_util.h"
 #include "modules/monitor/common/monitor_manager.h"
 
-DEFINE_string(summary_cleaner_name, "SummaryCleaner",
-              "Name of the summary cleaner.");
-
 DEFINE_string(summary_monitor_name, "SummaryMonitor",
               "Name of the summary monitor.");
 
@@ -69,27 +66,11 @@ void SummarizeOnTopicStatus(const TopicStatus &topic_status, Status *status) {
   if (topic_status.message_delay() < 0) {
     UpdateStatusSummary(Summary::ERROR, "No message", status);
   } else {
-    UpdateStatusSummary(Summary::WARN, "Notable delay", status);
+    UpdateStatusSummary(Summary::ERROR, "Notable delay", status);
   }
 }
 
 }  // namespace
-
-// Set interval to 0, so it runs every time when ticking.
-SummaryCleaner::SummaryCleaner()
-    : RecurrentRunner(FLAGS_summary_cleaner_name, 0) {
-}
-
-void SummaryCleaner::RunOnce(const double current_time) {
-  for (auto &module : *MonitorManager::GetStatus()->mutable_modules()) {
-    module.second.set_summary(Summary::UNKNOWN);
-    module.second.clear_msg();
-  }
-  for (auto &hardware : *MonitorManager::GetStatus()->mutable_hardware()) {
-    hardware.second.set_summary(Summary::UNKNOWN);
-    hardware.second.clear_msg();
-  }
-}
 
 // Set interval to 0, so it runs every time when ticking.
 SummaryMonitor::SummaryMonitor()
@@ -161,13 +142,19 @@ void SummaryMonitor::SummarizeHardware() {
           UpdateStatusSummary(Summary::FATAL, status->detailed_msg(), status);
           break;
         case HardwareStatus::NOT_READY:  // Fall through.
-        case HardwareStatus::GPS_UNSTABLE_WARNING:
+        case HardwareStatus::GPS_UNSTABLE_WARNING:  // Fall through.
+        case HardwareStatus::GPS_UNSTABLE_ERROR:
+          // GPS instability could be a fatal error if it's the only
+          // localization source. As currently we have other sources like
+          // PointCloud, we take it as a warning.
+          //
+          // TODO(xiaoxq & Localization team): Add stability metric in final
+          // localization pose and trigger WARN or ERROR accordingly.
           UpdateStatusSummary(Summary::WARN, status->detailed_msg(), status);
           break;
         case HardwareStatus::OK:
           UpdateStatusSummary(Summary::OK, status->detailed_msg(), status);
           break;
-        case HardwareStatus::GPS_UNSTABLE_ERROR:  // Fall through.
         default:
           UpdateStatusSummary(Summary::ERROR, status->detailed_msg(), status);
           break;

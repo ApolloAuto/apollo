@@ -169,12 +169,12 @@ TEST(TestSuite, hdmap_line_path) {
 
   LaneInfoConstPtr lane_info(new LaneInfo(lane));
 
-  const std::vector<MapPathPoint> points{
+  std::vector<MapPathPoint> points{
       MapPathPoint({0, 0}, M_PI_2, LaneWaypoint(lane_info, 0)),
       MapPathPoint({0, 1}, M_PI_2, LaneWaypoint(lane_info, 1)),
       MapPathPoint({0, 2}, M_PI_2, LaneWaypoint(lane_info, 2)),
       MapPathPoint({0, 3}, M_PI_2, LaneWaypoint(lane_info, 3))};
-  const Path path(points, {}, 2.0);
+  const Path path(std::move(points), {}, 2.0);
   EXPECT_EQ(path.num_points(), 4);
   EXPECT_EQ(path.num_segments(), 3);
   EXPECT_NEAR(path.path_points()[0].x(), 0, 1e-6);
@@ -290,10 +290,10 @@ TEST(TestSuite, hdmap_line_path) {
 }
 
 TEST(TestSuite, hdmap_curvy_path) {
-  const std::vector<MapPathPoint> points{
+  std::vector<MapPathPoint> points{
       MakeMapPathPoint(2, 0), MakeMapPathPoint(2, 1), MakeMapPathPoint(1, 2),
       MakeMapPathPoint(0, 2)};
-  Path path(points, {}, 2.0);
+  Path path(std::move(points), {}, 2.0);
   EXPECT_EQ(path.num_points(), 4);
   EXPECT_EQ(path.num_segments(), 3);
   EXPECT_NEAR(path.path_points()[0].x(), 2, 1e-6);
@@ -792,7 +792,7 @@ TEST(TestSuite, compute_lane_segments_from_points) {
   points[1].add_lane_waypoint(LaneWaypoint(lane_info2, 0.0));
   points[2].add_lane_waypoint(LaneWaypoint(lane_info2, 0.4));
 
-  const Path path(points);
+  const Path path(std::move(points));
   EXPECT_EQ(path.lane_segments().size(), 2);
   EXPECT_EQ(path.lane_segments()[0].lane->id().id(), "id1");
   EXPECT_NEAR(path.lane_segments()[0].start_s, 0.0, 1e-6);

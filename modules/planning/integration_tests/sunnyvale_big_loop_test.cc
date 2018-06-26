@@ -683,12 +683,12 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   auto* destination_config = PlanningTestBase::GetTrafficRuleConfig(
       TrafficRuleConfig::DESTINATION);
   destination_config->mutable_destination()->set_enable_pull_over(true);
-  destination_config->mutable_destination()->set_pull_over_plan_distance(35.0);
+  destination_config->mutable_destination()->set_pull_over_plan_distance(20.0);
 
   auto* pull_over_config = PlanningTestBase::GetTrafficRuleConfig(
       TrafficRuleConfig::PULL_OVER);
-  pull_over_config->mutable_pull_over()->set_plan_distance(35.0);
-  pull_over_config->mutable_pull_over()->set_operation_length(10.0);
+  pull_over_config->mutable_pull_over()->set_plan_distance(20.0);
+  pull_over_config->mutable_pull_over()->set_operation_length(5.0);
 
   // step 1: pull over
   RUN_GOLDEN_TEST_DECISION(0);
@@ -701,10 +701,18 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
 
   // step 2: pull over failed, stop inlane
 
+  // clear PlanningStatus
+  planning_state->mutable_pull_over()->clear_status();
+  // set destination point further to make inlane stop
+  // be able to use this dest point stop fence so that the test result is fixed
+  // instead of using adc's position which may differ for some reason
+  planning_state->mutable_pull_over()->mutable_inlane_dest_point()->set_x(
+        587163.74162973207);
+  planning_state->mutable_pull_over()->mutable_inlane_dest_point()->set_y(
+        4141196.1366618969);
+
   // set config
-  destination_config->mutable_destination()->set_pull_over_plan_distance(10.0);
-  pull_over_config->mutable_pull_over()->set_plan_distance(10.0);
-  pull_over_config->mutable_pull_over()->set_max_check_distance(30.0);
+  pull_over_config->mutable_pull_over()->set_operation_length(21.0);
   pull_over_config->mutable_pull_over()->set_max_failure_count(1);
 
   // check PULL OVER decision

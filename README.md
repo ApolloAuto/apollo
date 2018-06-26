@@ -18,6 +18,18 @@ Welcome to Apollo's GitHub page!
 
 For business and partnership, please visit [our website](http://apollo.auto).
 
+## Table of Contents
+
+1. [Getting Started](#getting-started)
+2. [Prerequisites](#prerequisites)
+    - [Basic Requirements](#basic-requirements)
+    - [Individual Version Requirements](#individual-version-requirements)
+3. [Architecture](#architecture)
+4. [Installation](#installation)
+5. [Documents](#documents)
+
+
+
 ## Getting Started
 
 **The Apollo Team now proudly presents to you the latest [version 2.5](https://github.com/ApolloAuto/apollo/releases/tag/v2.5.0).**
@@ -39,15 +51,15 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 * Working knowledge of Docker
 
-~~~ 
+
  - Please note, it is recommended that you install the versions of Apollo in the following order: 
- 1.0 > 1.5 > 2.0 > 2.5
+ **1.0 > 1.5 > 2.0 > 2.5**.
  The reason behind this recommendation is that you need to confirm whether individual hardware components 
  and modules are functioning correctly and clear various version test cases,
  before progressing to a higher more capable version for your safety and the safety of those around you.
 
- - Please note, if you do not have a vehicle, proceed to the Installation - without hardware 
-~~~
+ - Please note, if you do not have a vehicle, proceed to the [Installation - Without Hardware](#without-hardware) 
+
 
 #### Individual Version Requirements:
 
@@ -127,7 +139,7 @@ Apollo 2.0 supports vehicles autonomously driving on simple urban roads. Vehicle
 
 [**Apollo 2.5:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_hardware_system_installation_guide_v1.md)
 
-Apollo 2.5 allows the vehicle to autonomously run on geo-fenced highways with a camera for obstacle detection. Vehicles are able maintain lane control, cruise and avoid collisions with vehicles ahead of them. 
+Apollo 2.5 allows the vehicle to autonomously run on geo-fenced highways with a camera for obstacle detection. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them. 
 
 ```
 Please note, if you need to test Apollo 2.5; for safety purposes, please seek the help of the
@@ -171,7 +183,8 @@ and we want to ensure Apollo 2.5 was integrated correctly with your vehicle befo
 
 * [Build and Release using Docker](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md) - This step is required
 
-* [Launch and Run Apollo](https://github.com/natashadsouza/apollo/blob/master/docs/howto/how_to_launch_Apollo.md)
+* [Launch and Run Apollo](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_launch_Apollo.md)
+
 * [Apollo 1.0 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md)
 
 * [Apollo 1.5 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start.md)
