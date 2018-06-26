@@ -1013,8 +1013,6 @@ bool NovatelParser::DecodeGnssObservation(const uint8_t* obs_data,
               break;
             }
 
-            double freq = 0;
-            gnss_frequence(baud_id, &freq);
             auto band_obs = sat_obs->add_band_obs();
             if (raw_.obs.data[i].code[i] == CODE_L1C) {
               band_obs->set_pseudo_type(
@@ -1028,7 +1026,6 @@ bool NovatelParser::DecodeGnssObservation(const uint8_t* obs_data,
             }
 
             band_obs->set_band_id(baud_id);
-            band_obs->set_frequency_value(freq);
             band_obs->set_pseudo_range(raw_.obs.data[i].P[j]);
             band_obs->set_carrier_phase(raw_.obs.data[i].L[j]);
             band_obs->set_loss_lock_index(raw_.obs.data[i].SNR[j]);
