@@ -125,4 +125,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "wiper_rpt_91_test",
+    size = "small",
+    srcs = [
+        "wiper_rpt_91_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
