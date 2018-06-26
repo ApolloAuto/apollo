@@ -536,13 +536,13 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
       FLAGS_destination_check_distance) {
     return;
   }
-  if (ReachedDestination()) {
-    return;
-  }
+
   auto mission_complete =
       decision_result->mutable_main_decision()->mutable_mission_complete();
-  mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
-  mission_complete->set_stop_heading(main_stop.stop_heading());
+  if (!ReachedDestination()) {
+    mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
+    mission_complete->set_stop_heading(main_stop.stop_heading());
+  }
 }
 
 int ReferenceLineInfo::MakeMainStopDecision(
