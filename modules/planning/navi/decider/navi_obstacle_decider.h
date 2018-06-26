@@ -31,7 +31,6 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/obstacle.h"
-#include "modules/planning/navi/common/local_path.h"
 #include "modules/planning/tasks/task.h"
 
 /**
@@ -56,62 +55,42 @@ class NaviObstacleDecider : public Task {
   virtual ~NaviObstacleDecider() = default;
 
   /**
-   * @brief update mobileye's info
+   * @brief Get vehicle parameter
+   * @return vehicle parameter
    */
-  inline void Update() { path_obstacle_processed_ = false; }
-
-  /**
-   * @brief process local path's obstacles info
-   */
-  void ProcessPathObstacle(const std::vector<const Obstacle*>& obstacles,
-                           LocalPath* fpath);
-
-  /**
-   * @brief get this local path's nudgable distance
-   * @return left nudgable distance and right nudgable distance
-   */
-  void GetLeftRightNudgableDistance(const double lan_width, LocalPath* fpath,
-                                    double* left_nudgable,
-                                    double* right_nudgable);
+  const ::apollo::common::VehicleParam &VehicleParam();
 
   /**
    * @brief get the actual nudgable distance according to the
    * position of the obstacle
    * @return actual nudgable distance
    */
-  double GetNudgeDistance(const double left_nudgable,
-                          const double right_nudgable);
-
-  /**
-   * @brief Get projection point based on distance
-   * @return projection point
-   */
-  // static Vec2d Interpolate(const float dist, const vector<Vec2d>& path);
-
-  /**
-   * @brief
-   * @return obstacle's width and distance.
-   */
-  inline std::map<double, double>& MutableObstacleLatDistance() {
-    return obstacle_lat_dist_;
-  }
-  /**
-   * @brief Get vehicle parameter
-   * @return vehicle parameter
-   */
-  inline const ::apollo::common::VehicleParam& VehicleParam() {
-    const auto& vehicle_param = apollo::common::VehicleConfigHelper::instance()
-                                    ->GetConfig()
-                                    .vehicle_param();
-    return vehicle_param;
-  }
+  double GetNudgeDistance(
+      const std::vector<const Obstacle *> &obstacles,
+      const std::vector<common::PathPoint> &path_data_points,
+      const double min_lane_width);
 
  private:
-  bool path_obstacle_processed_ = false;
+  /**
+   * @brief process path's obstacles info
+   */
+  void ProcessPathObstacle(
+      const std::vector<const Obstacle *> &obstacles,
+      const std::vector<common::PathPoint> &path_data_points);
+
+ private:
   std::map<double, double> obstacle_lat_dist_;
 
   // TODO(all): Add your member functions and variables.
 };
+
+inline const ::apollo::common::VehicleParam &
+NaviObstacleDecider::VehicleParam() {
+  const auto &vehicle_param = apollo::common::VehicleConfigHelper::instance()
+                                  ->GetConfig()
+                                  .vehicle_param();
+  return vehicle_param;
+}
 
 }  // namespace planning
 }  // namespace apollo
