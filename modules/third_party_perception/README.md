@@ -1,7 +1,7 @@
 # Third Party Perception
 
 ## Introduction
-In Apollo 2.5, the third_party_perception module incorporates third-party sensors like Mobileye and Conti/Delphi Radar output with simple fusion and creates a similar perception output produced as obstacle/lane detection information as defined in [Perception Obstacles Interface](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/proto/perception_obstacle.proto). This module was only intend to serve for the Prediction/Planning/Control algorithm in real vehicle before perception modules fully ready.  
+In Apollo 2.5, the third_party_perception module incorporates third-party sensors like Mobileye and Conti/Delphi Radar output with simple fusion and creates a similar perception output produced as obstacle/lane detection information as defined in [Perception Obstacles Interface](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/proto/perception_obstacle.proto). This module was only intend to serve for the Prediction/Planning/Control algorithm in real vehicle before perception modules fully ready before 2.5. We recommend using 'modules/perception' instead for your own test purpose after Apollo 2.5 officially released.
 
 ## Input
 
