@@ -100,7 +100,7 @@ message ReferenceLineEndConfig {
 
 message ReroutingConfig {
   // should not rerouting more frequent than this number
-  optional double cooldown_time = 1 [ default=0.6 ];  // seconds
+  optional double cooldown_time = 1 [ default=3.0 ];  // seconds
   optional double prepare_rerouting_time = 2 [ default=2.0 ]; // seconds
 }
 
