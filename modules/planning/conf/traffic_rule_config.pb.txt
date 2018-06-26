@@ -92,6 +92,7 @@ config: {
   enabled: true
   rerouting {
     prepare_rerouting_time: 2.0
+    cooldown_time: 3.0
   }
 }
 

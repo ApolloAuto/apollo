@@ -245,6 +245,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/monitor_log",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
