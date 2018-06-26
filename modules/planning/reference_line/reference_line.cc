@@ -543,6 +543,11 @@ bool ReferenceLine::GetSLBoundary(const common::math::Box2d& box,
   return true;
 }
 
+std::vector<hdmap::LaneSegment> ReferenceLine::GetLaneSegments(
+    const double start_s, const double end_s) const {
+  return map_path_.GetLaneSegments(start_s, end_s);
+}
+
 bool ReferenceLine::GetSLBoundary(const hdmap::Polygon& polygon,
                                   SLBoundary* const sl_boundary) const {
   double start_s(std::numeric_limits<double>::max());
