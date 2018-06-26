@@ -49,7 +49,7 @@ class RegionalPredictorTest : public KMLMapBasedTest {
   apollo::perception::PerceptionObstacles perception_obstacles_;
 };
 
-TEST_F(RegionalPredictorTest, MovingPedestrian) {
+TEST_F(RegionalPredictorTest, Predict) {
   EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
                    1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
@@ -61,6 +61,22 @@ TEST_F(RegionalPredictorTest, MovingPedestrian) {
   EXPECT_TRUE(obstacle_ptr != nullptr);
   RegionalPredictor predictor;
   predictor.Predict(obstacle_ptr);
+  const std::vector<Trajectory>& trajectories = predictor.trajectories();
+  EXPECT_EQ(trajectories.size(), 2);
+}
+
+TEST_F(RegionalPredictorTest, MovingPedestrian) {
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
+                   1501183430.161906);
+  apollo::perception::PerceptionObstacle perception_obstacle =
+      perception_obstacles_.perception_obstacle(0);
+  EXPECT_EQ(perception_obstacle.id(), 101);
+  ObstaclesContainer container;
+  container.Insert(perception_obstacles_);
+  Obstacle* obstacle_ptr = container.GetObstacle(101);
+  EXPECT_TRUE(obstacle_ptr != nullptr);
+  RegionalPredictor predictor;
+  predictor.GenerateMovingTrajectory(obstacle_ptr, 1.0);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();
   EXPECT_EQ(trajectories.size(), 2);
   EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().x(), -438.159,
@@ -92,7 +108,7 @@ TEST_F(RegionalPredictorTest, StationaryPedestrian) {
   Obstacle* obstacle_ptr = container.GetObstacle(102);
   EXPECT_TRUE(obstacle_ptr != nullptr);
   RegionalPredictor predictor;
-  predictor.Predict(obstacle_ptr);
+  predictor.GenerateStillTrajectory(obstacle_ptr, 1.0);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();
   EXPECT_EQ(trajectories.size(), 1);
 }
