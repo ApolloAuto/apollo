@@ -323,6 +323,15 @@ void Path::InitLaneSegments() {
     }
   }
   LaneSegment::Join(&lane_segments_);
+  if (lane_segments_.empty()) {
+    return;
+  }
+  lane_accumulated_s_.resize(lane_segments_.size());
+  lane_accumulated_s_[0] = lane_segments_[0].Length();
+  for (std::size_t i = 1; i < lane_segments_.size(); ++i) {
+    lane_accumulated_s_[i] =
+        lane_accumulated_s_[i - 1] + lane_segments_[i].Length();
+  }
 
   lane_segments_to_next_point_.clear();
   lane_segments_to_next_point_.reserve(num_points_);
@@ -561,6 +570,29 @@ InterpolatedIndex Path::GetIndexFromS(double s) const {
     }
   }
   return {low, s - accumulated_s_[low]};
+}
+
+InterpolatedIndex Path::GetLaneIndexFromS(double s) const {
+  if (s <= 0.0) {
+    return {0, 0.0};
+  }
+  CHECK_GT(lane_segments_.size(), 0);
+  if (s >= length_) {
+    return {static_cast<int>(lane_segments_.size() - 1),
+            lane_segments_.back().Length()};
+  }
+  auto iter = std::lower_bound(lane_accumulated_s_.begin(),
+                               lane_accumulated_s_.end(), s);
+  if (iter == lane_accumulated_s_.end()) {
+    return {static_cast<int>(lane_segments_.size() - 1),
+            lane_segments_.back().Length()};
+  }
+  int index = std::distance(lane_accumulated_s_.begin(), iter);
+  if (index == 0) {
+    return {index, s};
+  } else {
+    return {index, s - lane_accumulated_s_[index - 1]};
+  }
 }
 
 bool Path::GetNearestPoint(const Vec2d& point, double* accumulate_s,
