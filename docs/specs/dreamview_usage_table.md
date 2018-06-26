@@ -2,7 +2,7 @@
 
 Dreamview is a web application that 
 1. visualizes the current output of relevant autonomous driving modules, e.g. planning trajectory, car localization, chassis status, etc. 
-2. provides human-machine interface for user to view hardware status, turn on/off of modules, and start the autonomous driving car.
+2. provides human-machine interface for users to view hardware status, turn on/off of modules, and start the autonomous driving car.
 3. provides debugging tools, such as PnC Monitor to efficiently track module issues.
 
 
@@ -13,17 +13,15 @@ The application layout divided into several regions: header, sidebar, main view,
 ### Header
 ![](images/dreamview_usage_table/header.png) 
 
-#### Setup Mode
-
 Depends on the mode chosen from the mode selector, the corresponding modules and commands, defined in [hmi.conf](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/conf/hmi.conf), will be presented in the **Module Controller**, and **Quick Start**, respectively.
 
 Note: navigation mode is for the purpose of low-cost feature introduced in apollo 2.5. Under this mode, Baidu (or Google) Map presents absolute position of the ego-vehicle, while main view has all objects and map elements presented in relative positions to the ego-vehicle. 
 
 ### Sidebar and Tool View
 ![](images/dreamview_usage_table/sidebar.png) 
-Sidebar panel controls what is displayed in the tool view.
+Sidebar panel controls what is displayed in the tool view described below:
 
-### Tasks
+#### Tasks
 
 ![](images/dreamview_usage_table/tasks.png)
 
@@ -37,23 +35,23 @@ Sidebar panel controls what is displayed in the tool view.
 * Others: switches and buttons for tools used frequently
 * Module Delay: the time delay between two messages for each topic.
 * Console: the monitor messages from the Apollo platform.
-### Module Controller
+#### Module Controller
 ![](images/dreamview_usage_table/module_controller.png) 
 A panel to view the hardware status and turn on/off modules.
-### Layer Menu
+#### Layer Menu
 
 ![](images/dreamview_usage_table/layer_menu.png) 
 A  toggle menu for visual elements displays.
-### Route Editing
+#### Route Editing
 
 ![](images/dreamview_usage_table/route_editing.png)
 
-### Data Recorder
+#### Data Recorder
 ![](images/dreamview_usage_table/data_recorder.png) 
 
 A panel to report issues to drive event topic ("/apollo/drive_event") to rosbag. 
 
-### Default Routing
+#### Default Routing
 
 ![](images/dreamview_usage_table/default_routing.png) 
 
@@ -61,7 +59,7 @@ List of predefined routes or single points, known as point of interest (POI).
 
 If route editing is on, routing point(s) can be added visually on the map. 
 
-If route editing is off, clicking a desired POI will send a routing request to the server. If the selected POI contains only a point, the start point of the routing request is current position of the autonomous car; otherwise, the start position is the first point from the desired route.
+If route editing is off, clicking a desired POI will send a routing request to the server. If the selected POI contains only a point, the start point of the routing request is the current position of the autonomous car; otherwise, the start position is the first point from the desired route.
 
 
 To edit POIs, see default_end_way_point.txt file under the directory of the map data. For example, if the map selected from the map selector is "Demo", then [default_end_way_point.txt](https://github.com/ApolloAuto/apollo/blob/master/modules/map/data/demo/default_end_way_point.txt) is located under modules/map/data/demo.
@@ -96,13 +94,13 @@ Main view animated 3D computer graphics in a web browser. Elements in this view 
 | ![](images/dreamview_usage_table/0clip_image016.png) | Unknown  obstacle.                       |
 | ![](images/dreamview_usage_table/0clip_image018.png) | The  velocity arrow shows the direction of the movement with the length  proportional to the magnitude. |
 | ![](images/dreamview_usage_table/0clip_image020.png) | The  white arrow shows the directional heading of the obstacle. |
-| ![](images/dreamview_usage_table/0clip_image022.png) | The  yellow text indicates: <ul><li>The tracking ID of the obstacle.</li><li>The distance from the autonomous car.</li></ul> |
+| ![](images/dreamview_usage_table/0clip_image022.png) | The  yellow text indicates: <ul><li>The tracking ID of the obstacle.</li><li>(distance from the ego-vehicle, speed)</li></ul>|
 | ![](images/dreamview_usage_table/0clip_image024.png) | The  lines show the predicted movement of the obstacle with the same color as the  obstacle. |
 
 #### Planning Decision
 ##### Decision Fence
 
-Decision fences reflect the decisions made by planing module to ego-vehicle (main) and obstacles (objects). Each type of decision are presented in different color and icon as shown below:
+Decision fences reflect decisions made by planning module to ego-vehicle (main) and obstacles (objects). Each type of decision is presented in different color and icon as shown below:
 
 | Visual Element                           | Depiction Explanation                    |
 | ---------------------------------------- | ---------------------------------------- |
@@ -118,6 +116,12 @@ Changing lane is a special decision that instead of having decision fence, a cha
 | ---------------------------------------- | ---------------------------------------- |
 | ![](images/dreamview_usage_table/change-lane-left.png) | change to **Left**  lane. |
 | ![](images/dreamview_usage_table/change-lane-right.png) | change to **Right**  lane. |
+
+When a yield decision is made based on the "Right of Way" laws at a stop-sign intersection, the obstacles to be yielded will have the yield icon on top:
+
+| Visual Element                                       | Depiction Explanation          |
+| ---------------------------------------------------- | ------------------------------ |
+| ![](images/dreamview_usage_table/0clip_image037.png) | Obstacle to yield at stop sign |
 
 ##### Stop reasons
 
