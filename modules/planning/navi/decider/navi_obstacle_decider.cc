@@ -32,6 +32,7 @@
 
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/linear_interpolation.h"
+#include "modules/common/math/path_matcher.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -40,56 +41,58 @@ namespace planning {
 using apollo::common::PathPoint;
 using apollo::common::math::InterpolateUsingLinearApproximation;
 using apollo::common::math::LineSegment2d;
+using apollo::common::math::PathMatcher;
 using apollo::common::math::Vec2d;
+using apollo::common::util::MakePathPoint;
 
 namespace {
 constexpr double kMaxNudgeDistance = 0.9;
 constexpr double kMinNudgeDistance = 0.2;
 }  // namespace
 
-NaviObstacleDecider::NaviObstacleDecider() : Task("NaviObstacleDecider") {
-  // TODO(all): Add your other initialization.
-}
+NaviObstacleDecider::NaviObstacleDecider() : Task("NaviObstacleDecider") {}
 
 void NaviObstacleDecider::ProcessPathObstacle(
-    const std::vector<const Obstacle*>& obstacles, LocalPath* fpath) {
-  if (path_obstacle_processed_) {
-    return;
-  }
-  std::vector<Vec2d> path = fpath->GetXYPoints();
-  const LineSegment2d line(path.front(), path.back());
+    const std::vector<const Obstacle*>& obstacles,
+    const std::vector<common::PathPoint>& path_data_points) {
+  auto func_distance = [](const PathPoint& point, const double x,
+                          const double y) {
+    double dx = point.x() - x;
+    double dy = point.y() - y;
+    return sqrt(dx * dx + dy * dy);
+  };
+  PathPoint projection_point = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  PathPoint point = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   Vec2d p1(0.0, 0.0);
   Vec2d p2(0.0, 0.0);
   for (const auto& current_obstacle : obstacles) {
-    auto current_xypoint = Vec2d(current_obstacle->Perception().position().x(),
-                                 current_obstacle->Perception().position().y());
-    auto dist = line.DistanceTo(current_xypoint);
+    projection_point = PathMatcher::MatchToPath(
+        path_data_points, current_obstacle->Perception().position().x(),
+        current_obstacle->Perception().position().y());
+    auto dist = func_distance(projection_point,
+                              current_obstacle->Perception().position().x(),
+                              current_obstacle->Perception().position().y());
+
     if (dist < (kMaxNudgeDistance + current_obstacle->Perception().width() +
                 VehicleParam().left_edge_to_center())) {
-      auto proj_len = line.ProjectOntoUnit(current_xypoint);
-      if ((proj_len == 0) || (proj_len >= line.length())) {
+      auto proj_len = projection_point.s();
+      if ((proj_len == 0) || (proj_len >= path_data_points.back().s())) {
         continue;
       }
-      PathPoint point = InterpolateUsingLinearApproximation(
-          fpath->GetPathPoints().front(), fpath->GetPathPoints().back(),
-          proj_len);
-      p1.set_x(point.x());
-      p1.set_y(point.y());
-      if ((proj_len + 1) > line.length()) {
-        point = InterpolateUsingLinearApproximation(
-            fpath->GetPathPoints().front(), fpath->GetPathPoints().back(),
-            line.length());
-        p2.set_x(point.x());
-        p2.set_y(point.y());
+      p1.set_x(projection_point.x());
+      p1.set_y(projection_point.y());
+      if ((proj_len + 1) > path_data_points.back().s()) {
+        p2.set_x(path_data_points.back().x());
+        p2.set_y(path_data_points.back().y());
       } else {
-        point = InterpolateUsingLinearApproximation(
-            fpath->GetPathPoints().front(), fpath->GetPathPoints().back(),
-            (proj_len + 1));
+        point = PathMatcher::MatchToPath(path_data_points, (proj_len + 1));
         p2.set_x(point.x());
         p2.set_y(point.y());
       }
-      auto d = ((current_xypoint.x() - p1.x()) * (p2.y() - p1.y())) -
-               ((current_xypoint.y() - p1.y()) * (p2.x() - p1.x()));
+      auto d = ((current_obstacle->Perception().position().x() - p1.x()) *
+                (p2.y() - p1.y())) -
+               ((current_obstacle->Perception().position().y() - p1.y()) *
+                (p2.x() - p1.x()));
       if (d > 0) {
         dist *= -1;
       }
@@ -97,41 +100,35 @@ void NaviObstacleDecider::ProcessPathObstacle(
           current_obstacle->Perception().width(), dist));
     }
   }
-  path_obstacle_processed_ = true;
 }
 
-void NaviObstacleDecider::GetLeftRightNudgableDistance(const double lan_width,
-                                                       LocalPath* fpath,
-                                                       double* left_nudgable,
-                                                       double* right_nudgable) {
-  double routing_y = 0.0;
-  const auto ret = fpath->GetInitY(&routing_y);
-  if (ret == false) {
-    return;
-  }
+double NaviObstacleDecider::GetNudgeDistance(
+    const std::vector<const Obstacle*>& obstacles,
+    const std::vector<common::PathPoint>& path_data_points,
+    const double min_lane_width) {
+  // CHECK_NOTNULL(path_data_points);
 
   // Calculating the left and right nudgeable distance on the lane
+  double left_nudge_lane = 0.0;
+  double right_nedge_lane = 0.0;
+  double routing_y = path_data_points[0].y();
   if (routing_y <= 0.0) {
-    *left_nudgable = lan_width / 2.0 - fabs(routing_y) -
-                     VehicleParam().left_edge_to_center();
-    *right_nudgable = lan_width / 2.0 + fabs(routing_y) -
-                      VehicleParam().right_edge_to_center();
+    left_nudge_lane = min_lane_width / 2.0 - fabs(routing_y) -
+                      VehicleParam().left_edge_to_center();
+    right_nedge_lane = min_lane_width / 2.0 + fabs(routing_y) -
+                       VehicleParam().right_edge_to_center();
   } else {
-    *left_nudgable = lan_width / 2.0 + fabs(routing_y) -
-                     VehicleParam().left_edge_to_center();
-    *right_nudgable = lan_width / 2.0 - fabs(routing_y) -
-                      VehicleParam().right_edge_to_center();
+    left_nudge_lane = min_lane_width / 2.0 + fabs(routing_y) -
+                      VehicleParam().left_edge_to_center();
+    right_nedge_lane = min_lane_width / 2.0 - fabs(routing_y) -
+                       VehicleParam().right_edge_to_center();
   }
-}
-
-double NaviObstacleDecider::GetNudgeDistance(const double left_nudgable,
-                                             const double right_nudgable) {
-  double left_nudge = 0.0;
-  double right_nudge = 0.0;
-
-  // Calculate the distance required to get around obstacles.
-  const auto& obstacle_lat_dist = MutableObstacleLatDistance();
-  for (auto iter = obstacle_lat_dist.begin(); iter != obstacle_lat_dist.end();
+  // Calculating the left and right nudgable distance according to the position
+  // of the obstacle.
+  double left_nudge_obstacle = 0.0;
+  double right_nudge_obstacle = 0.0;
+  ProcessPathObstacle(obstacles, path_data_points);
+  for (auto iter = obstacle_lat_dist_.begin(); iter != obstacle_lat_dist_.end();
        iter++) {
     auto obs_width = iter->first;
     auto lat_dist = iter->second;
@@ -141,35 +138,37 @@ double NaviObstacleDecider::GetNudgeDistance(const double left_nudgable,
         (actual_dist < kMaxNudgeDistance)) {
       auto need_nudge_dist = kMaxNudgeDistance - actual_dist;
       if (lat_dist >= 0.0) {
-        if (0.0 == right_nudge) {
-          right_nudge = -1 * need_nudge_dist;
-        } else if (right_nudge > -1 * need_nudge_dist) {
-          right_nudge = -1 * need_nudge_dist;
+        if (0.0 == right_nudge_obstacle) {
+          right_nudge_obstacle = -1 * need_nudge_dist;
+        } else if (right_nudge_obstacle > -1 * need_nudge_dist) {
+          right_nudge_obstacle = -1 * need_nudge_dist;
         }
       } else {
-        if (0.0 == left_nudge) {
-          left_nudge = need_nudge_dist;
-        } else if (left_nudge < (need_nudge_dist)) {
-          left_nudge = need_nudge_dist;
+        if (0.0 == left_nudge_obstacle) {
+          left_nudge_obstacle = need_nudge_dist;
+        } else if (left_nudge_obstacle < (need_nudge_dist)) {
+          left_nudge_obstacle = need_nudge_dist;
         }
       }
     }
   }
+  // Get the appropriate value of the nudge distance
   double nudge_dist = 0.0;
-  if ((0.0 != left_nudge) && (0.0 == right_nudge)) {
-    if (left_nudgable < left_nudge) {
-      nudge_dist = left_nudgable;
+  if ((0.0 != left_nudge_obstacle) && (0.0 == right_nudge_obstacle)) {
+    if (left_nudge_lane < left_nudge_obstacle) {
+      nudge_dist = left_nudge_lane;
     } else {
-      nudge_dist = left_nudge;
+      nudge_dist = left_nudge_obstacle;
     }
-  } else if ((0.0 == left_nudge) && (0.0 != right_nudge)) {
-    if (right_nudgable > right_nudge) {
-      nudge_dist = right_nudgable;
+  } else if ((0.0 == left_nudge_obstacle) && (0.0 != right_nudge_obstacle)) {
+    if (fabs(right_nedge_lane) > fabs(right_nudge_obstacle)) {
+      nudge_dist = right_nedge_lane;
     } else {
-      nudge_dist = right_nudge;
+      nudge_dist = right_nudge_obstacle;
     }
   }
   return nudge_dist;
 }
+
 }  // namespace planning
 }  // namespace apollo
