@@ -86,6 +86,9 @@ class ReferenceLine {
 
   ReferencePoint GetNearestReferencePoint(const common::math::Vec2d& xy) const;
 
+  std::vector<hdmap::LaneSegment> GetLaneSegments(const double start_s,
+                                                  const double end_s) const;
+
   ReferencePoint GetNearestReferencePoint(const double s) const;
 
   ReferencePoint GetReferencePoint(const double x, const double y) const;
@@ -109,6 +112,7 @@ class ReferenceLine {
 
   bool GetLaneWidth(const double s, double* const lane_left_width,
                     double* const lane_right_width) const;
+
   bool GetRoadWidth(const double s, double* const road_left_width,
                     double* const road_right_width) const;
 

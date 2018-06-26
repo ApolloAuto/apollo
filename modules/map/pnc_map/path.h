@@ -238,6 +238,9 @@ class Path {
   // get the index of the lane from s by accumulate_s
   InterpolatedIndex GetLaneIndexFromS(double s) const;
 
+  std::vector<hdmap::LaneSegment> GetLaneSegments(const double start_s,
+                                                  const double end_s) const;
+
   bool GetNearestPoint(const common::math::Vec2d& point, double* accumulate_s,
                        double* lateral) const;
   bool GetNearestPoint(const common::math::Vec2d& point, double* accumulate_s,
