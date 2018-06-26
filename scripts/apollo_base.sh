@@ -148,7 +148,7 @@ function setup_device() {
   for INDEX in `seq 0 3`
   do
     # soft link if sensorbox exist
-    if [ -e /dev/zynq_can${INDEX}] &&  [ ! -e /dev/can${INDEX} ]; then
+    if [ -e /dev/zynq_can${INDEX} ] &&  [ ! -e /dev/can${INDEX} ]; then
       sudo ln -s /dev/zynq_can${INDEX} /dev/can${INDEX}
     fi
     if [ ! -e /dev/can${INDEX} ]; then
