@@ -329,31 +329,6 @@ void Planning::RunOnce() {
       vehicle_state, start_timestamp, planning_cycle_time,
       last_publishable_trajectory_.get(), &is_replan);
 
-  /**
-  if (FLAGS_use_navigation_mode) {
-    std::list<ReferenceLine> reference_lines;
-    std::list<hdmap::RouteSegments> segments;
-    if (!reference_line_provider_->GetReferenceLines(&reference_lines,
-                                                     &segments) ||
-        reference_lines.empty()) {
-      std::string msg("Reference line is not ready");
-      AERROR << msg;
-      not_ready->set_reason(msg);
-      status.Save(not_ready_pb.mutable_header()->mutable_status());
-      PublishPlanningPb(&not_ready_pb, start_timestamp);
-      return;
-    }
-    const double init_point_v = stitching_trajectory.front().v();
-    const double init_point_a = stitching_trajectory.front().a();
-    stitching_trajectory = TrajectoryStitcher::CalculateInitPoint(
-        vehicle_state, reference_lines.front(), &is_replan);
-    if (!is_replan) {
-      stitching_trajectory.back().set_v(init_point_v);
-      stitching_trajectory.back().set_a(init_point_a);
-    }
-  }
-  **/
-
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
                      vehicle_state);
