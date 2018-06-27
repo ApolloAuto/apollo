@@ -149,4 +149,52 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "brake_motor_rpt_2_71_test",
+    size = "small",
+    srcs = [
+        "brake_motor_rpt_2_71_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "brake_motor_rpt_3_72_test",
+    size = "small",
+    srcs = [
+        "brake_motor_rpt_3_72_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "date_time_rpt_83_test",
+    size = "small",
+    srcs = [
+        "date_time_rpt_83_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "global_rpt_6a_test",
+    size = "small",
+    srcs = [
+        "global_rpt_6a_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

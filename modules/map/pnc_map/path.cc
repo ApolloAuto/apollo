@@ -595,6 +595,34 @@ InterpolatedIndex Path::GetLaneIndexFromS(double s) const {
   }
 }
 
+std::vector<hdmap::LaneSegment> Path::GetLaneSegments(
+    const double start_s, const double end_s) const {
+  std::vector<hdmap::LaneSegment> lanes;
+  if (start_s + kMathEpsilon < end_s) {
+    return lanes;
+  }
+  auto start_index = GetLaneIndexFromS(start_s);
+  if (start_index.offset + kMathEpsilon >=
+      lane_segments_[start_index.id].Length()) {
+    start_index.id += 1;
+    start_index.offset = 0;
+  }
+  const int num_lanes = lane_segments_.size();
+  if (start_index.id >= num_lanes) {
+    return lanes;
+  }
+  lanes.emplace_back(lane_segments_[start_index.id].lane, start_index.offset,
+                     lane_segments_[start_index.id].Length());
+  auto end_index = GetLaneIndexFromS(end_s);
+  for (int i = start_index.id; i < end_index.id && i < num_lanes; ++i) {
+    lanes.emplace_back(lane_segments_[i]);
+  }
+  if (end_index.offset >= kMathEpsilon) {
+    lanes.emplace_back(lane_segments_[end_index.id].lane, 0, end_index.offset);
+  }
+  return lanes;
+}
+
 bool Path::GetNearestPoint(const Vec2d& point, double* accumulate_s,
                            double* lateral) const {
   double distance = 0.0;
