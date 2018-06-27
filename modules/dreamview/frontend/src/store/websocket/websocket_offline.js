@@ -10,6 +10,7 @@ export default class OfflinePlaybackWebSocketEndpoint {
         this.requestTimer = null;
         this.processTimer = null;
         this.frameData = {}; // cache frames
+        this.routingTime2Path = {};
     }
 
     initialize(params) {
@@ -51,12 +52,23 @@ export default class OfflinePlaybackWebSocketEndpoint {
                         this.requestSimulationWorld(STORE.playback.recordId, STORE.playback.next());
                     }
                     break;
+                case "RoutePath":
+                    this.routingTime2Path[message.routingTime] = message.routePath;
+                    break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
                     STORE.setInitializationStatus(true);
 
                     const world = (typeof message.world) === "string"
                         ? JSON.parse(message.world): message.world;
+
+                    if (world.routePath) {
+                        this.routingTime2Path[world.routingTime] = world.routePath;
+                    } else if (!(world.routingTime in this.routingTime2Path)) {
+                        // A new routing needs to be fetched from backend.
+                        this.requestRoutePath(STORE.playback.recordId, world.sequenceNum);
+                    }
+
                     if (STORE.playback.isSeeking) {
                         this.processSimWorld(world);
                     }
@@ -134,6 +146,10 @@ export default class OfflinePlaybackWebSocketEndpoint {
 
     processSimWorld(world) {
         if (STORE.playback.shouldProcessFrame(world)) {
+            if (!world.routePath) {
+                world.routePath = this.routingTime2Path[world.routingTime];
+            }
+
             STORE.updateTimestamp(world.timestamp);
             RENDERER.maybeInitializeOffest(
                 world.autoDrivingCar.positionX,
@@ -162,5 +178,15 @@ export default class OfflinePlaybackWebSocketEndpoint {
         } else if (STORE.playback.isSeeking) {
             this.processSimWorld(this.frameData[frameId]);
         }
+    }
+
+    requestRoutePath(recordId, frameId) {
+        this.websocket.send(
+            JSON.stringify({
+                type: "requestRoutePath",
+                recordId: recordId,
+                frameId: frameId,
+            })
+        );
     }
 }
