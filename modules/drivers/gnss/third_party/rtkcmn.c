@@ -666,9 +666,9 @@ extern int getbits(const unsigned char *buff, int pos, int len)
 *-----------------------------------------------------------------------------*/
 extern void setbitu(unsigned char *buff, int pos, int len, unsigned int data)
 {
+    if (len<=0||32<len) return;
     unsigned int mask=1u<<(len-1);
     int i;
-    if (len<=0||32<len) return;
     for (i=pos;i<pos+len;i++,mask>>=1) {
         if (data&mask) buff[i/8]|=1u<<(7-i%8); else buff[i/8]&=~(1u<<(7-i%8));
     }
@@ -2254,7 +2254,7 @@ extern void readpos(const char *file, const char *rcv, double *pos)
     }
     while (np<2048&&fgets(buff,sizeof(buff),fp)) {
         if (buff[0]=='%'||buff[0]=='#') continue;
-        if (sscanf(buff,"%lf %lf %lf %s",&poss[np][0],&poss[np][1],&poss[np][2],
+        if (sscanf(buff,"%lf %lf %lf %256s",&poss[np][0],&poss[np][1],&poss[np][2],
                    str)<4) continue;
         strncpy(stas[np],str,15); stas[np++][15]='\0';
     }
