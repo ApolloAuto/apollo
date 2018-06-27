@@ -92,9 +92,38 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
         new_point.mutable_path_point()->set_y(y_new);
         new_point.mutable_path_point()->set_z(z_new);
         new_point.mutable_path_point()->set_theta(
-            common::math::WrapAngle(old_point.path_point().theta() -
-                                    matched_point.path_point().theta()));
+            common::math::NormalizeAngle(old_point.path_point().theta() -
+                matched_point.path_point().theta()));
         return new_point;
+      });
+}
+
+void TrajectoryStitcher::TransformLastPublishedTrajectory(const double x_diff,
+    const double y_diff, const double theta_diff,
+    PublishableTrajectory* prev_trajectory) {
+
+  if (!prev_trajectory) {
+    return;
+  }
+
+  auto cos_theta = std::cos(theta_diff);
+  auto sin_theta = std::sin(theta_diff);
+
+  auto trajectory_points = prev_trajectory->trajectory_points();
+  std::for_each(trajectory_points.begin(), trajectory_points.end(),
+      [&cos_theta, &sin_theta, &x_diff, &y_diff, &theta_diff]
+       (common::TrajectoryPoint& p) {
+        auto x = p.path_point().x();
+        auto y = p.path_point().y();
+        auto theta = p.path_point().theta();
+
+        auto x_new = cos_theta * x - sin_theta * y + x_diff;
+        auto y_new = sin_theta * x + cos_theta * y + y_diff;
+        auto theta_new = common::math::WrapAngle(theta + theta_diff);
+
+        p.mutable_path_point()->set_x(x_new);
+        p.mutable_path_point()->set_y(y_new);
+        p.mutable_path_point()->set_theta(theta_new);
       });
 }
 
