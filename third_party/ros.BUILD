@@ -13,6 +13,7 @@ cc_library(
         "lib/libfastrtps.so",
         "lib/liborocos-kdl.so.1.3",
         "lib/librosbag.so",
+        "lib/libimage_transport.so",
         "lib/librosbag_storage.so",
         "lib/librosconsole.so",
         "lib/librosconsole_backend_interface.so",
@@ -26,6 +27,10 @@ cc_library(
         "lib/libtf2_ros.so",
         "lib/libtopic_tools.so",
         "lib/libxmlrpcpp.so",
+        "lib/libmessage_filters.so",
+        "lib/libclass_loader.so",
+        "lib/libroslib.so",
+        "lib/librospack.so",
     ],
     hdrs = glob([
         "include/*/*.h",

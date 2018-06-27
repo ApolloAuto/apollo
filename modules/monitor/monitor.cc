@@ -36,17 +36,13 @@ namespace monitor {
 
 using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::util::make_unique;
+using std::make_unique;
 
 Monitor::Monitor() : monitor_thread_(FLAGS_monitor_running_interval) {
 }
 
 Status Monitor::Init() {
   AdapterManager::Init(FLAGS_monitor_adapter_config_filename);
-
-  // Run SummaryCleaner at the beginning of each round to get a refreshed
-  // result.
-  monitor_thread_.RegisterRunner(make_unique<SummaryCleaner>());
 
   monitor_thread_.RegisterRunner(make_unique<CanMonitor>());
   monitor_thread_.RegisterRunner(make_unique<GpsMonitor>());

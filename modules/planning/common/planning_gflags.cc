@@ -34,7 +34,7 @@ DEFINE_string(traffic_rule_config_filename,
 
 DEFINE_string(smoother_config_filename,
               "modules/planning/conf/qp_spline_smoother_config.pb.txt",
-              "The configuration file for qp sline smoother");
+              "The configuration file for spiral smoother");
 
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
               "Loop rate for planning node");
@@ -73,9 +73,6 @@ DEFINE_double(reference_line_stitch_overlap_distance, 20,
 DEFINE_double(reference_line_lateral_buffer, 0.5,
               "When creating reference line, the minimum distance with road "
               "curb for a vehicle driving on this line.");
-DEFINE_double(prepare_rerouting_time, 2.0,
-              "If there are this amount of seconds left to finish driving on "
-              "current route, and there is no routing, do rerouting");
 
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
@@ -204,13 +201,9 @@ DEFINE_double(
     "min following time in st region before considering a valid follow");
 DEFINE_double(stop_line_stop_distance, 1.0, "stop distance from stop line");
 DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
-DEFINE_double(max_stop_deceleration, 6.0, "max deceleration");
 DEFINE_double(signal_light_min_pass_s_distance, 4.0,
               "min s_distance for adc to be considered "
               "have passed signal_light (stop_line_end_s)");
-DEFINE_double(signal_expire_time_sec, 5.0,
-              "consider the signal msg is expired if its timestamp over "
-              "this threshold (second)");
 
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
@@ -295,13 +288,13 @@ DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
 DEFINE_uint32(num_velocity_sample, 6,
               "The number of velocity samples in end condition sampler.");
-DEFINE_bool(enable_backup_trajectory, false,
+DEFINE_bool(enable_backup_trajectory, true,
             "If generate backup trajectory when planning fail");
 DEFINE_double(backup_trajectory_cost, 1000.0,
               "Default cost of backup trajectory");
 DEFINE_double(min_velocity_sample_gap, 1.0,
               "Minimal sampling gap for velocity");
-DEFINE_double(lon_collision_buffer, 1.0,
+DEFINE_double(lon_collision_buffer, 2.0,
               "The longitudinal buffer to keep distance to other vehicles");
 DEFINE_double(lat_collision_buffer, 0.2,
               "The lateral buffer to keep distance to other vehicles");
@@ -312,7 +305,7 @@ DEFINE_uint32(num_sample_follow_per_timestamp, 3,
 DEFINE_double(weight_lon_objective, 10.0,
               "Weight of longitudinal travel cost");
 DEFINE_double(weight_lon_jerk, 1.0, "Weight of longitudinal jerk cost");
-DEFINE_double(weight_lon_collision, 2.0,
+DEFINE_double(weight_lon_collision, 5.0,
               "Weight of logitudinal collision cost");
 DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
 DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");

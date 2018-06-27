@@ -97,6 +97,7 @@ bool PathDecider::MakeStaticObstacleDecision(
     if (!is_bycycle_or_pedestrain && !obstacle.IsStatic()) {
       continue;
     }
+
     if (path_obstacle->HasLongitudinalDecision() &&
         path_obstacle->LongitudinalDecision().has_ignore() &&
         path_obstacle->HasLateralDecision() &&
@@ -105,6 +106,12 @@ bool PathDecider::MakeStaticObstacleDecision(
     }
     if (path_obstacle->HasLongitudinalDecision() &&
         path_obstacle->LongitudinalDecision().has_stop()) {
+      // STOP decision
+      continue;
+    }
+    if (path_obstacle->HasLateralDecision() &&
+        path_obstacle->LateralDecision().has_sidepass()) {
+      // SIDE_PASS decision
       continue;
     }
 

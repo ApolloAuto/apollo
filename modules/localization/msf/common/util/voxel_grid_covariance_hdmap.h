@@ -76,34 +76,22 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
           evals_(Eigen::Vector3d::Zero()) {}
 
     // Get the voxel covariance.
-    Eigen::Matrix3d GetCov() const {
-      return cov_;
-    }
+    Eigen::Matrix3d GetCov() const { return cov_; }
 
     // Get the inverse of the voxel covariance.
-    Eigen::Matrix3d GetInverseCov() const {
-      return icov_;
-    }
+    Eigen::Matrix3d GetInverseCov() const { return icov_; }
 
     // Get the voxel centroid.
-    Eigen::Vector3d GetMean() const {
-      return mean_;
-    }
+    Eigen::Vector3d GetMean() const { return mean_; }
 
     // Get the eigen vectors of the voxel covariance.
-    Eigen::Matrix3d GetEvecs() const {
-      return evecs_;
-    }
+    Eigen::Matrix3d GetEvecs() const { return evecs_; }
 
     // Get the eigen values of the voxel covariance.
-    Eigen::Vector3d GetEvals() const {
-      return evals_;
-    }
+    Eigen::Vector3d GetEvals() const { return evals_; }
 
     // Get the number of points contained by this voxel.
-    int GetPointCount() const {
-      return nr_points_;
-    }
+    int GetPointCount() const { return nr_points_; }
 
     // Number of points contained by voxel.
     int nr_points_;
@@ -163,9 +151,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
   }
 
   // Get the minimum number of points required for a cell to be used.
-  inline int GetMinPointPerVoxel() {
-    return min_points_per_voxel_;
-  }
+  inline int GetMinPointPerVoxel() { return min_points_per_voxel_; }
 
   // Set the minimum allowable ratio for eigenvalues
   inline void SetCovEigValueInflationRatio(double min_covar_eigvalue_mult) {
@@ -253,9 +239,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
   }
 
   // Get the leaf structure map.
-  inline std::map<size_t, Leaf>& GetLeaves() {
-    return leaves_;
-  }
+  inline std::map<size_t, Leaf>& GetLeaves() { return leaves_; }
 
  private:
   // Filter cloud and initializes voxel structure.
@@ -342,6 +326,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
         PCL_WARN(
             "[pcl::%s::ApplyFilter] Invalid filter field name. Index is %d.\n",
             getClassName().c_str(), distance_idx);
+        return;
       }
       // First pass: go over all points and insert them into the right leaf
       for (size_t cp = 0; cp < input_->points.size(); ++cp) {

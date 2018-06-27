@@ -100,8 +100,8 @@ function start_record() {
 }
 
 function stop_record() {
-  pkill -SIGINT -f republish_msg
-  pkill -SIGINT -f rosbag
+  pkill -SIGKILL -f republish_msg
+  pkill -SIGKILL -f rosbag
 
   sleep 1
   
@@ -133,7 +133,7 @@ function start_check_extrin() {
 }
 
 function stop_check_extrin() {
-  pkill -SIGINT -f lidar_ex_checker
+  pkill -SIGKILL -f lidar_ex_checker
 }
 
 case $1 in

@@ -23,6 +23,8 @@
 
 #include "gflags/gflags.h"
 
+#include "modules/perception/proto/traffic_light/subnode_config.pb.h"
+
 #include "modules/perception/onboard/common_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/traffic_light/interface/base_recognizer.h"
@@ -71,13 +73,14 @@ class TLProcSubnode : public Subnode {
   bool PublishMessage(const std::shared_ptr<ImageLights> &image_lights);
 
  private:
-  int image_border_ = 100;
-  float valid_ts_interval_;
   TLPreprocessingData *preprocessing_data_ = nullptr;  // up-stream data
   std::unique_ptr<BaseRectifier> rectifier_ = nullptr;
   std::unique_ptr<BaseRecognizer> recognizer_ = nullptr;
   std::unique_ptr<BaseReviser> reviser_ = nullptr;
   Mutex mutex_;
+
+  traffic_light::subnode_config::SubnodeConfig config_;
+
   DISALLOW_COPY_AND_ASSIGN(TLProcSubnode);
 };
 

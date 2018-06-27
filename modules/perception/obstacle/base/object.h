@@ -84,6 +84,7 @@ struct alignas(16) Object {
   // age of the tracked object
   double tracking_time = 0.0;
   double latest_tracked_time = 0.0;
+  double timestamp = 0.0;
 
   // stable anchor_point during time, e.g., barycenter
   Eigen::Vector3d anchor_point;
@@ -94,9 +95,24 @@ struct alignas(16) Object {
 
   // modeling uncertainty from sensor level tracker
   Eigen::Matrix4d state_uncertainty = Eigen::Matrix4d::Identity();
-
+  // Tailgating (trajectory of objects)
+  std::vector<Eigen::Vector3d> drops;
   // CIPV
   bool b_cipv = false;
+  // local lidar track id
+  int local_lidar_track_id = -1;
+  // local radar track id
+  int local_radar_track_id = -1;
+  // local camera track id
+  int local_camera_track_id = -1;
+
+  // local lidar track ts
+  double local_lidar_track_ts = -1;
+  // local radar track ts
+  double local_radar_track_ts = -1;
+  // local camera track ts
+  double local_camera_track_ts = -1;
+
   // sensor particular suplplements, default nullptr
   RadarSupplementPtr radar_supplement = nullptr;
   CameraSupplementPtr camera_supplement = nullptr;
@@ -104,7 +120,10 @@ struct alignas(16) Object {
 
 // Sensor single frame objects.
 struct SensorObjects {
-  SensorObjects() { sensor2world_pose = Eigen::Matrix4d::Zero(); }
+  SensorObjects() {
+    sensor2world_pose = Eigen::Matrix4d::Zero();
+    sensor2world_pose_static = Eigen::Matrix4d::Zero();
+  }
 
   std::string ToString() const;
 
@@ -117,6 +136,7 @@ struct SensorObjects {
   SeqId seq_num = 0;
   std::vector<std::shared_ptr<Object>> objects;
   Eigen::Matrix4d sensor2world_pose;
+  Eigen::Matrix4d sensor2world_pose_static;
   LaneObjectsPtr lane_objects;
 
   uint32_t cipv_index = -1;

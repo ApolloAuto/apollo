@@ -30,7 +30,6 @@
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/calibration_config_manager.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/radar/dummy/dummy_algorithms.h"
 #include "modules/perception/onboard/subnode_helper.h"
@@ -303,10 +302,6 @@ bool RadarProcessSubnode::InitFrameDependence() {
     hdmap_input_ = HDMapInput::instance();
     if (!hdmap_input_) {
       AERROR << "Failed to get HDMapInput instance.";
-      return false;
-    }
-    if (!hdmap_input_->Init()) {
-      AERROR << "Failed to Init HDMapInput";
       return false;
     }
     AINFO << "Get and Init hdmap_input succ.";

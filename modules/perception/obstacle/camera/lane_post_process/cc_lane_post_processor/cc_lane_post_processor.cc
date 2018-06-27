@@ -304,9 +304,14 @@ bool CCLanePostProcessor::AddInstanceIntoLaneObject(
            << " order polynomial curve.";
   }
   // Option 1: Use C0 for lateral distance
-  lane_object->lateral_distance = lane_object->model(0);
+  // lane_object->lateral_distance = lane_object->model(0);
+
   // Option 2: Use y-value of closest point.
   // lane_object->lateral_distance = lane_object->pos[0].y();
+
+  // Option 3: Use value at x=3
+  lane_object->lateral_distance = PolyEval(static_cast<float>(3.0),
+              lane_object->order, lane_object->model);
 
   return true;
 }
@@ -415,9 +420,13 @@ bool CCLanePostProcessor::AddInstanceIntoLaneObjectImage(
   }
 
   // Option 1: Use C0 for lateral distance
-  lane_object->lateral_distance = lane_object->model(0);
+  // lane_object->lateral_distance = lane_object->model(0);
   // Option 2: Use y-value of closest point.
   // lane_object->lateral_distance = lane_object->pos[0].y();
+
+  // Option 3: Use value at x=3
+  lane_object->lateral_distance = PolyEval(static_cast<float>(3.0),
+                            lane_object->order, lane_object->model);
 
   return true;
 }
@@ -871,16 +880,20 @@ bool CCLanePostProcessor::CorrectWithLaneHistory(int l,
 
     lane_accum_num++;
     lane.order = std::max(lane.order, lane_history_[i][j].order);
-    Vector3D p;
+
     Vector2D project_p;
     for (auto &pos : lane_history_[i][j].pos) {
-      p << pos.x(), pos.y(), 1.0;
+      int len = motion_buffer_->at(i).motion.cols();
+      Eigen::VectorXf p = Eigen::VectorXf::Zero(len);
+      p[0] = pos.x();
+      p[1] = pos.y();
+      p[len-1] = 1.0;
       p = motion_buffer_->at(i).motion * p;
-      project_p << p.x(), p.y();
-      if (p.x() <= 0) continue;
+      project_p << p[0], p[1];
+      if (project_p.x() <= 0) continue;
 
-      lane.longitude_start = std::min(p.x(), lane.longitude_start);
-      lane.longitude_end = std::max(p.x(), lane.longitude_end);
+      lane.longitude_start = std::min(project_p.x(), lane.longitude_start);
+      lane.longitude_end = std::max(project_p.x(), lane.longitude_end);
       lane.pos.push_back(project_p);
     }
   }
@@ -1006,10 +1019,14 @@ void CCLanePostProcessor::InitLaneHistory() {
 void CCLanePostProcessor::FilterWithLaneHistory(LaneObjectsPtr lane_objects) {
   std::vector<int> erase_idx;
   for (size_t i = 0; i < lane_objects->size(); i++) {
-    Eigen::Vector3f start_pos;
-    start_pos << lane_objects->at(i).pos[0].x(), lane_objects->at(i).pos[0].y(),
-        1.0;
-
+    Eigen::VectorXf start_pos;
+    if (motion_buffer_->size() > 0) {
+      start_pos =
+        Eigen::VectorXf::Zero(motion_buffer_->at(0).motion.cols());
+      start_pos[0] = lane_objects->at(i).pos[0].x();
+      start_pos[1] = lane_objects->at(i).pos[0].y();
+      start_pos[motion_buffer_->at(0).motion.cols()-1] = 1.0;
+    }
     for (size_t j = 0; j < lane_history_.size(); j++) {
       // iter to find corresponding lane
       size_t k;

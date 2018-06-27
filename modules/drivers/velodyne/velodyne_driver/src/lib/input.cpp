@@ -20,7 +20,7 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-bool Input::exract_nmea_time_from_packet(const NMEATimePtr& nmea_time,
+bool Input::exract_nmea_time_from_packet(NMEATimePtr nmea_time,
                                          const uint8_t* bytes) {
   int gprmc_index = 206;
 
@@ -28,7 +28,8 @@ bool Input::exract_nmea_time_from_packet(const NMEATimePtr& nmea_time,
   int time_field_index = 0;
   int validity_field_index = 0;
   int date_field_index = 0;
-  while (bytes[++gprmc_index] != '*' && gprmc_index < POSITIONING_DATA_PACKET_SIZE) {
+  while (bytes[++gprmc_index] != '*' &&
+         gprmc_index < POSITIONING_DATA_PACKET_SIZE) {
     if (bytes[gprmc_index] == ',') {
       ++field_count;
       if (field_count == 1 && time_field_index == 0) {

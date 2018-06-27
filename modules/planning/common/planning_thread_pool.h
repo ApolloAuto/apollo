@@ -47,12 +47,12 @@ class PlanningThreadPool {
   }
   template <typename F, typename... Rest>
   void Push(F &&f, Rest &&... rest) {
-    func_.push_back(std::move(thread_pool_->Push(f, rest...)));
+    futures_.push_back(std::move(thread_pool_->Push(f, rest...)));
   }
 
   template <typename F>
   void Push(F &&f) {
-    func_.push_back(std::move(thread_pool_->Push(f)));
+    futures_.push_back(std::move(thread_pool_->Push(f)));
   }
 
   void Synchronize();
@@ -61,7 +61,7 @@ class PlanningThreadPool {
   std::unique_ptr<common::util::ThreadPool> thread_pool_;
   bool is_initialized = false;
 
-  std::vector<std::future<void>> func_;
+  std::vector<std::future<void>> futures_;
 
   DECLARE_SINGLETON(PlanningThreadPool);
 };

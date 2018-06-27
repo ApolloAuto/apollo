@@ -147,6 +147,10 @@ function setup_device() {
   # setup CAN device
   for INDEX in `seq 0 3`
   do
+    # soft link if sensorbox exist
+    if [ -e /dev/zynq_can${INDEX} ] &&  [ ! -e /dev/can${INDEX} ]; then
+      sudo ln -s /dev/zynq_can${INDEX} /dev/can${INDEX}
+    fi
     if [ ! -e /dev/can${INDEX} ]; then
       sudo mknod --mode=a+rw /dev/can${INDEX} c 52 $INDEX
     fi
@@ -180,26 +184,18 @@ function setup_device() {
 }
 
 function decide_task_dir() {
-  DISK=""
-  if [ "$1" = "--portable-disk" ]; then
-    # Try to find largest NVMe drive.
-    DISK="$(df | grep "^/dev/nvme" | sort -nr -k 4 | \
+  # Try to find largest NVMe drive.
+  DISK="$(df | grep "^/dev/nvme" | sort -nr -k 4 | \
+      awk '{print substr($0, index($0, $6))}')"
+
+  # Try to find largest external drive.
+  if [ -z "${DISK}" ]; then
+    DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 | \
         awk '{print substr($0, index($0, $6))}')"
-
-    # Try to find largest external drive.
-    if [ -z "${DISK}" ]; then
-      DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 | \
-          awk '{print substr($0, index($0, $6))}')"
-    fi
-
-    if [ -z "${DISK}" ]; then
-      echo "Cannot find portable disk."
-      echo "Please make sure your container was started AFTER inserting the disk."
-    fi
   fi
 
-  # Default disk.
   if [ -z "${DISK}" ]; then
+    echo "Cannot find portable disk. Fallback to apollo data dir."
     DISK="/apollo"
   fi
 
@@ -210,6 +206,7 @@ function decide_task_dir() {
   mkdir -p "${TASK_DIR}"
 
   echo "Record bag to ${TASK_DIR}..."
+  export TASK_ID="${TASK_ID}"
   export TASK_DIR="${TASK_DIR}"
 }
 
@@ -333,7 +330,7 @@ function stop_customized_path() {
   MODULE_PATH=$1
   MODULE=$2
 
-  pkill -f "modules/${MODULE_PATH}/${MODULE}"
+  pkill -SIGKILL -f "modules/${MODULE_PATH}/${MODULE}"
   if [ $? -eq 0 ]; then
     echo "Successfully stopped module ${MODULE}."
   else
@@ -346,16 +343,20 @@ function stop() {
   stop_customized_path $MODULE $MODULE
 }
 
+# Note: This 'help' function here will overwrite the bash builtin command 'help'.
+# TODO: add a command to query known modules.
 function help() {
-  echo "Usage:
-  ./$0 [COMMAND]"
-  echo "COMMAND:
-  help: this help message
-  start: start the module in background
-  start_fe: start the module without putting in background
+cat <<EOF
+Invoke ". scripts/apollo_base.sh" within docker to add the following commands to the environment:
+Usage: COMMAND [<module_name>]
+
+COMMANDS:
+  help:      show this help message
+  start:     start the module in background
+  start_fe:  start the module without putting in background
   start_gdb: start the module with gdb
-  stop: stop the module
-  "
+  stop:      stop the module
+EOF
 }
 
 function run_customized_path() {
@@ -388,6 +389,30 @@ function run_customized_path() {
   esac
 }
 
+# Write log to a file about the env when record a bag.
+function record_bag_env_log() {
+  if [ -z "${TASK_ID}" ]; then
+    TASK_ID=$(date +%Y-%m-%d-%H-%M)
+  fi
+
+  git status >/dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "Not in Git repo, maybe because you are in release container."
+    echo "Skip log environment."
+    return
+  fi
+
+  commit=$(git log -1)
+  echo -e "Date:$(date)\n" >> Bag_Env_$TASK_ID.log
+  git branch | awk '/\*/ { print "current branch: " $2; }'  >> Bag_Env_$TASK_ID.log
+  echo -e "\nNewest commit:\n$commit"  >> Bag_Env_$TASK_ID.log
+  echo -e "\ngit diff:" >> Bag_Env_$TASK_ID.log
+  git diff >> Bag_Env_$TASK_ID.log
+  echo -e "\n\n\n\n" >> Bag_Env_$TASK_ID.log
+  echo -e "git diff --staged:" >> Bag_Env_$TASK_ID.log
+  git diff --staged >> Bag_Env_$TASK_ID.log
+}
+
 # run command_name module_name
 function run() {
   local module=$1
@@ -395,9 +420,10 @@ function run() {
   run_customized_path $module $module "$@"
 }
 
+check_in_docker
+create_data_dir
+
 if [ -z $APOLLO_BASE_SOURCED ]; then
-  check_in_docker
-  create_data_dir
   set_lib_path
   determine_bin_prefix
   export APOLLO_BASE_SOURCED=1

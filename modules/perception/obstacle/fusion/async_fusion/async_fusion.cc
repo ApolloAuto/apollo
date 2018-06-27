@@ -20,7 +20,8 @@
 
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/common/util/file.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_hm_track_object_matcher.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
@@ -28,48 +29,33 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::util::GetProtoFromFile;
+
 bool AsyncFusion::Init() {
   track_manager_ = PbfTrackManager::instance();
   CHECK_NOTNULL(track_manager_);
-  const ModelConfig *model_config =
-      ConfigManager::instance()->GetModelConfig(name());
-  if (model_config == nullptr) {
-    AERROR << "not found model config: " << name();
+
+  if (!GetProtoFromFile(FLAGS_async_fusion_config, &config_)) {
+    AERROR << "Cannot get config proto from file: " << FLAGS_tracker_config;
     return false;
   }
+
   /* matching parameters */
   // TODO(All): match_method is set to hm_matcher, so that line 56 - 65 is
   // redundant. We should either make match_method configurable or remove those
   // redundant code.
-  std::string match_method = "hm_matcher";
-  if (!model_config->GetValue("match_method", &match_method)) {
-    AERROR << "match_method not found";
-  }
-  if (match_method == "hm_matcher") {
-    matcher_.reset(new PbfHmTrackObjectMatcher());
-    if (matcher_->Init()) {
-      AINFO << "Initialize " << matcher_->name() << " successfully!";
-    } else {
-      AERROR << "Failed to initialize " << matcher_->name();
-      return false;
-    }
-  } else {
+  std::string match_method = config_.match_method();
+  if (match_method != "hm_matcher") {
     AERROR << "undefined match_method " << match_method
            << " and use default hm_matcher";
-    matcher_.reset(new PbfHmTrackObjectMatcher());
-    if (matcher_->Init()) {
-      AINFO << "Initialize " << matcher_->name() << " successfully!";
-    } else {
-      AERROR << "Failed to initialize " << matcher_->name();
-      return false;
-    }
+  }
+  matcher_.reset(new PbfHmTrackObjectMatcher());
+  if (!matcher_->Init()) {
+    AERROR << "Failed to initialize " << matcher_->name();
+    return false;
   }
 
-  float max_match_distance = 4.0;
-  if (!model_config->GetValue("max_match_distance", &max_match_distance)) {
-    AERROR << "max_match_distance not found";
-  }
-  AINFO << "async_fusion max_match_distance: " << max_match_distance;
+  float max_match_distance = config_.max_match_distance();
   PbfBaseTrackObjectMatcher::SetMaxMatchDistance(max_match_distance);
   PbfTrack::SetMotionFusionMethod("PbfIMFFusion");
   return true;
@@ -124,7 +110,7 @@ bool AsyncFusion::Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
 
 std::string AsyncFusion::name() const { return "AsyncFusion"; }
 
-void AsyncFusion::FuseFrame(const PbfSensorFramePtr &frame) {
+void AsyncFusion::FuseFrame(PbfSensorFramePtr frame) {
   AINFO << "Fusing frame: " << frame->sensor_id << ","
         << "object_number: " << frame->objects.size() << ","
         << "timestamp: " << std::fixed << std::setprecision(12)
@@ -160,6 +146,8 @@ void AsyncFusion::UpdateAssignedTracks(
   for (size_t i = 0; i < assignments.size(); ++i) {
     int local_track_index = assignments[i].first;
     int local_obj_index = assignments[i].second;
+    AINFO << "local track index " << local_track_index << "local object index "
+          << local_obj_index;
     tracks->at(local_track_index)
         ->UpdateWithSensorObject(sensor_objects[local_obj_index],
                                  track_object_dist[local_track_index]);
@@ -194,6 +182,22 @@ void AsyncFusion::CollectFusedObjects(
     std::shared_ptr<Object> obj(new Object());
     obj->clone(*(fused_object->object));
     obj->track_id = tracks[i]->GetTrackId();
+    std::shared_ptr<PbfSensorObject> pobj = tracks[i]->GetLidarObject("lidar");
+
+    if (pobj != nullptr) {
+      obj->local_lidar_track_id = pobj->object->track_id;
+      obj->local_lidar_track_ts = pobj->timestamp;
+    }
+    pobj = tracks[i]->GetCameraObject("camera");
+    if (pobj != nullptr) {
+      obj->local_camera_track_id = pobj->object->track_id;
+      obj->local_camera_track_ts = pobj->timestamp;
+    }
+    pobj = tracks[i]->GetRadarObject("radar");
+    if (pobj != nullptr) {
+      obj->local_radar_track_id = pobj->object->track_id;
+      obj->local_camera_track_ts = pobj->timestamp;
+    }
     obj->latest_tracked_time = timestamp;
     obj->tracking_time = tracks[i]->GetTrackingPeriod();
     fused_objects->push_back(obj);

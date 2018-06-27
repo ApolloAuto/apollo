@@ -1,4 +1,20 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "gnss_proto",
+    deps = [
+        ":ins_proto",
+        ":gnss_raw_observation_proto",
+        ":gnss_best_pose_proto",
+        ":config_proto",
+        ":imu_proto",
+        ":gnss_status_proto",
+        ":gnss_proto_proto",
+    ],
+)
+
 
 cc_proto_library(
     name = "ins_proto",
@@ -102,3 +118,43 @@ proto_library(
         "//modules/common/proto:header_proto_lib",
     ],
 )
+
+cc_proto_library(
+    name = "gnss_proto_proto",
+    deps = [
+        ":gnss_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "gnss_proto_lib",
+    srcs = [
+        "gnss.proto",
+    ],
+    deps = [
+        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:error_code_proto_lib",
+        "//modules/common/proto:header_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "heading_proto",
+    deps = [
+        ":heading_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "heading_proto_lib",
+    srcs = [
+        "heading.proto",
+    ],
+    deps = [
+        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:error_code_proto_lib",
+        "//modules/common/proto:header_proto_lib",
+    ],
+)
+
+cpplint()

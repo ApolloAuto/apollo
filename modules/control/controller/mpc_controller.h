@@ -247,6 +247,8 @@ class MPCController : public Controller {
 
   // MeanFilter lateral_error_filter;
   common::MeanFilter heading_error_filter_;
+
+  double minimum_speed_protection_ = 0.1;
 };
 
 }  // namespace control

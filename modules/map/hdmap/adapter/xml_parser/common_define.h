@@ -33,6 +33,7 @@ using PbJunction = apollo::hdmap::Junction;
 using PbSignal = apollo::hdmap::Signal;
 using PbSubSignal = apollo::hdmap::Subsignal;
 using PbCrosswalk = apollo::hdmap::Crosswalk;
+using PbParkingSpace = apollo::hdmap::ParkingSpace;
 using PbSpeedBump = apollo::hdmap::SpeedBump;
 using PbStopSign = apollo::hdmap::StopSign;
 using PbYieldSign = apollo::hdmap::YieldSign;
@@ -129,6 +130,7 @@ struct RoadInternal {
   std::vector<PbClearArea> clear_areas;
   std::vector<PbSpeedBump> speed_bumps;
   std::vector<StopLineInternal> stop_lines;
+  std::vector<PbParkingSpace> parking_spaces;
 
   RoadInternal() : in_junction(false) { junction_id = ""; }
 };

@@ -51,6 +51,7 @@ cc_library(
     deps = [
         ":controller_interface",
         "//modules/common:log",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/filters:digital_filter",
         "//modules/common/filters:digital_filter_coefficients",
         "//modules/common/status",

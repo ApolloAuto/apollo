@@ -67,6 +67,9 @@ Status RelativeMap::Init() {
   }
 
   navigation_lane_.SetConfig(config_.navigation_lane());
+  const auto& map_param = config_.map_param();
+  navigation_lane_.SetDefaultWidth(map_param.default_left_width(),
+                                   map_param.default_right_width());
 
   AdapterManager::Init(adapter_conf_);
   if (!AdapterManager::GetPerceptionObstacles()) {
@@ -132,13 +135,19 @@ void RelativeMap::RunOnce() {
   AdapterManager::Observe();
 
   MapMsg map_msg;
-  CreateMapFromNavigationLane(&map_msg);
+  {
+    std::lock_guard<std::mutex> lock(navigation_lane_mutex_);
+    CreateMapFromNavigationLane(&map_msg);
+  }
   Publish(&map_msg);
 }
 
 void RelativeMap::OnReceiveNavigationInfo(
     const NavigationInfo& navigation_info) {
-  navigation_lane_.UpdateNavigationInfo(navigation_info);
+  {
+    std::lock_guard<std::mutex> lock(navigation_lane_mutex_);
+    navigation_lane_.UpdateNavigationInfo(navigation_info);
+  }
 }
 
 bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {

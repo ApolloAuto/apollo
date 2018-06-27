@@ -20,6 +20,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/monitor/common/monitor_manager.h"
 
 namespace apollo {
 namespace monitor {
@@ -63,6 +64,7 @@ void RecurrentRunnerThread::Start() {
 
       // Tick runners.
       const double current_time = Clock::NowInSeconds();
+      MonitorManager::InitFrame(current_time);
       for (auto &runner : runners_) {
         runner->Tick(current_time);
       }

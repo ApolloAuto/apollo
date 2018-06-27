@@ -35,7 +35,7 @@
 ### LiDAR Localization Setting
   We provide three modes of LiDAR localization: intensity, altitude, and fusion. You can set the parameter `lidar_localization_mode` in file localization.conf to choose the mode. Considering computing ability of different platforms, we provide `lidar_filter_size`, `lidar_thread_num` and `point_cloud_step` to adjust the computation cost. Futhermore, we provide three yaw optimization methods in LiDAR localization algorithm. You can set the parameter `lidar_yaw_align_mode` in file localization.conf to choose the mode.
 
-## Gnerate Localization Map
+## Generate Localization Map
   Localization map is used for LiDAR-based localization, which is a grid-cell representation of the environment. Each cell stores the statistics of laser reflection intensity and altitude. The map is organized as a group of map nodes. For more information, please refer to `apollo/modules/localization/msf/local_map`.
 
   We provide a script (`apollo/scripts/msf_local_map_creator.sh`) to generate localization map. You need to provide a group of point cloud frames (as .pcd file), corresponding poses file, and UTM zone id. The format of the poses file is `pcd_number timestamp x y z qx qy qz qw`.

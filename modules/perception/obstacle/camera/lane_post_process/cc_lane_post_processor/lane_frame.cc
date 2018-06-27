@@ -850,8 +850,8 @@ int LaneFrame::AddGroupIntoGraph(const Group& group, Graph* graph,
 }
 
 int LaneFrame::AddGroupIntoGraph(const Group& group,
-                                 const int& start_marker_ascend_id,
-                                 const int& end_marker_descend_id, Graph* graph,
+                                 const int start_marker_ascend_id,
+                                 const int end_marker_descend_id, Graph* graph,
                                  unordered_set<int>* hash_marker_idx) {
   int count_markers = 0;
 
@@ -881,7 +881,7 @@ int LaneFrame::AddGroupIntoGraph(const Group& group,
   return count_markers;
 }
 
-bool LaneFrame::FitPolyCurve(const int& graph_id, const ScalarType& graph_siz,
+bool LaneFrame::FitPolyCurve(const int graph_id, const ScalarType& graph_siz,
                              PolyModel* poly_coef,
                              ScalarType* lateral_distance) const {
   if (poly_coef == nullptr) {

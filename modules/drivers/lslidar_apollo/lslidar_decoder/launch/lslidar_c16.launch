@@ -1,0 +1,25 @@
+<launch>
+
+  <node pkg="lslidar_driver" type="lslidar_driver_node" name="lslidar_driver_node" output="screen">
+    <param name="frame_id" value="laser_link"/>
+    <param name="device_ip" value="192.168.1.200"/>
+    <param name="device_port" value="2368"/>
+  </node>
+
+  <node pkg="lslidar_decoder" type="lslidar_decoder_node" name="lslidar_decoder_node" output="screen">
+    <param name="child_frame_id" value="laser_link"/>
+    <param name="point_num" value="2000"/>
+    <param name="channel_num" value="8"/>
+    <param name="angle_disable_min" value="0"/>
+    <param name="angle_disable_max" value="0"/>
+    <param name="min_range" value="0.15"/>
+    <param name="max_range" value="150.0"/>
+    <param name="frequency" value="10.0"/>
+    <param name="publish_point_cloud" value="true"/>
+    <param name="publish_channels" value="true"/>
+  </node>
+  
+
+  <!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find lslidar_decoder)/launch/lslidar.rviz" output="screen"/-->
+
+</launch>

@@ -20,9 +20,9 @@
 #include "ros/ros.h"
 #include "sensor_msgs/Image.h"
 
-using apollo::perception::traffic_light::Image;
-using apollo::perception::traffic_light::CameraId;
 using apollo::perception::TrafficLightDetection;
+using apollo::perception::traffic_light::CameraId;
+using apollo::perception::traffic_light::Image;
 
 std::unordered_map<std::string, cv::Scalar> kColorTable = {
     {std::string("red_light_box"), cv::Scalar(0, 0, 255)},
@@ -38,8 +38,8 @@ std::vector<std::shared_ptr<Image>> cached_images;
 const int kMaxCachedImageNum = 100;
 
 void SubDebugCallback(const TrafficLightDetection &);
-void SubLongFocusCallback(const sensor_msgs::ImagePtr &);
-void SubShortFocusCallback(const sensor_msgs::ImagePtr &);
+void SubLongFocusCallback(sensor_msgs::ImagePtr);
+void SubShortFocusCallback(sensor_msgs::ImagePtr);
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "traffic_light_viz_listener");
@@ -176,9 +176,8 @@ void SubDebugCallback(const TrafficLightDetection &tl_result) {
   pos_y += 50;
   {
     std::string signal_txt =
-        "camera id: " +
-        apollo::perception::traffic_light::kCameraIdToStr.at(
-            tl_debug_msg.camera_id());
+        "camera id: " + apollo::perception::traffic_light::kCameraIdToStr.at(
+                            tl_debug_msg.camera_id());
     cv::putText(img, signal_txt, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN,
                 3.0, CV_RGB(255, 0, 0), 2);
   }
@@ -195,7 +194,7 @@ void SubDebugCallback(const TrafficLightDetection &tl_result) {
   cv::imshow("tl_debug_image", img);
   cv::waitKey(10);
 }
-void SubImage(CameraId camera_id, const sensor_msgs::ImagePtr &msg) {
+void SubImage(CameraId camera_id, sensor_msgs::ImagePtr msg) {
   boost::shared_ptr<sensor_msgs::Image> img(new sensor_msgs::Image);
   *img = *msg;
   boost::shared_ptr<const sensor_msgs::Image> img_msg(img);
@@ -209,10 +208,10 @@ void SubImage(CameraId camera_id, const sensor_msgs::ImagePtr &msg) {
     cached_images.erase(cached_images.begin());
   }
 }
-void SubLongFocusCallback(const sensor_msgs::ImagePtr &msg) {
+void SubLongFocusCallback(sensor_msgs::ImagePtr msg) {
   SubImage(CameraId::LONG_FOCUS, msg);
 }
 
-void SubShortFocusCallback(const sensor_msgs::ImagePtr &msg) {
+void SubShortFocusCallback(sensor_msgs::ImagePtr msg) {
   SubImage(CameraId::SHORT_FOCUS, msg);
 }

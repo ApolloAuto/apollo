@@ -27,7 +27,6 @@
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sequence_type_fuser/sequence_type_fuser.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 #include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
@@ -78,10 +77,8 @@ bool LidarProcessSubnode::InitInternal() {
     return false;
   }
   device_id_ = reserve_field_map["device_id"];
+  AddMessageCallback();
 
-  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
-  AdapterManager::AddPointCloudCallback(&LidarProcessSubnode::OnPointCloud,
-                                        this);
   inited_ = true;
 
   return true;
@@ -101,7 +98,7 @@ void LidarProcessSubnode::OnPointCloud(
 
   std::shared_ptr<SensorObjects> out_sensor_objects(new SensorObjects);
   out_sensor_objects->timestamp = timestamp_;
-  out_sensor_objects->sensor_type = SensorType::VELODYNE_64;
+  out_sensor_objects->sensor_type = GetSensorType();
   out_sensor_objects->sensor_id = device_id_;
   out_sensor_objects->seq_num = seq_num_;
 
@@ -285,10 +282,6 @@ bool LidarProcessSubnode::InitFrameDependence() {
       AERROR << "failed to get HDMapInput instance.";
       return false;
     }
-    if (!hdmap_input_->Init()) {
-      AERROR << "failed to Init HDMapInput";
-      return false;
-    }
     AINFO << "get and Init hdmap_input succ.";
   }
 
@@ -431,6 +424,27 @@ void LidarProcessSubnode::PublishDataAndEvent(
     event.reserve = device_id_;
     event_manager_->Publish(event);
   }
+}
+
+SensorType Lidar64ProcessSubnode::GetSensorType() const {
+  return SensorType::VELODYNE_64;
+}
+
+void Lidar64ProcessSubnode::AddMessageCallback() {
+  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
+  AdapterManager::AddPointCloudCallback<LidarProcessSubnode>(
+      &LidarProcessSubnode::OnPointCloud, this);
+}
+
+SensorType Lidar16ProcessSubnode::GetSensorType() const {
+  return SensorType::VELODYNE_16;
+}
+
+void Lidar16ProcessSubnode::AddMessageCallback() {
+  CHECK(AdapterManager::GetVLP16PointCloud())
+      << "VLP16 PointCloud is not initialized.";
+  AdapterManager::AddVLP16PointCloudCallback<LidarProcessSubnode>(
+      &LidarProcessSubnode::OnPointCloud, this);
 }
 
 }  // namespace perception

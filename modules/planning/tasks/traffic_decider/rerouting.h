@@ -37,7 +37,7 @@ class Rerouting : public TrafficRule {
   explicit Rerouting(const TrafficRuleConfig& config);
   virtual ~Rerouting() = default;
 
-  bool ApplyRule(Frame* const frame,
+  common::Status ApplyRule(Frame* const frame,
                  ReferenceLineInfo* const reference_line_info);
 
  private:

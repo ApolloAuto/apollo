@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package apollo.perception.traffic_light.recognizer_config;
+
+message RecognizerConfig {
+  optional string name = 1;
+  optional string version = 2;
+  optional string classify_model = 3;
+  optional string classify_net = 4;
+  optional float classify_threshold = 5;
+  optional int32 classify_resize_width = 6;
+  optional int32 classify_resize_height = 7;
+}
+
+message ModelConfigs {
+  repeated RecognizerConfig recognizer_config = 1;
+}
+
+

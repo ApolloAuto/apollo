@@ -37,3 +37,8 @@ DEFINE_bool(enable_chassis_detail_pub, false, "Chassis Detail message publish");
 // canbus test files
 DEFINE_string(canbus_test_file, "modules/canbus/testdata/canbus_test.pb.txt",
               "canbus tester input test file, in ControlCommand pb format.");
+
+// enable receiving guardian command
+// TODO(QiL) : depreciate this after test
+DEFINE_bool(receive_guardian, false,
+            "Enable receiving guardian message on canbus side");

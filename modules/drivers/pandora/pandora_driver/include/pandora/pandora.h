@@ -61,7 +61,7 @@ class Pandora {
    *        pandoraCameraPort The port of camera data
    *        cameraCallback    the call back for camera data
    */
-  Pandora(std::string device_ip, const uint16_t lidar_port,
+  Pandora(const std::string &device_ip, const uint16_t lidar_port,
           const uint16_t gps_port,
           boost::function<void(boost::shared_ptr<PPointCloud>, double)>
               pcl_callback,
@@ -73,7 +73,7 @@ class Pandora {
           bool enable_camera = true, int tz = 0,
           std::string frame_id = std::string("hesai40"));
   /**
-   * @brief deconstructor
+   * @brief destructor
    */
   ~Pandora();
 
@@ -81,7 +81,7 @@ class Pandora {
    * @brief load the lidar correction file
    * @param contents The correction contents of lidar correction
    */
-  int LoadLidarCorrectionFile(std::string contents);
+  int LoadLidarCorrectionFile(const std::string &contents);
 
   /**
    * @brief Reset Lidar's start angle.

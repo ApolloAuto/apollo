@@ -55,6 +55,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <usb_cam/usb_cam.h>
+#include "include/adv_trigger_ctl.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
@@ -621,7 +622,7 @@ void UsbCam::init_mmap(void) {
 
   CLEAR(req);
 
-  req.count = 1;
+  req.count = 4;
   req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   req.memory = V4L2_MEMORY_MMAP;
 
@@ -1075,5 +1076,15 @@ UsbCam::pixel_format UsbCam::pixel_format_from_string(const std::string &str) {
     return PIXEL_FORMAT_RGB24;
   else
     return PIXEL_FORMAT_UNKNOWN;
+}
+
+int UsbCam::trigger_enable(unsigned char fps, unsigned char internal) {
+  ROS_INFO("Trigger enable, dev:%s, fps:%d, internal:%d", 
+      camera_dev_.c_str(), fps, internal);
+  return adv_trigger_enable(camera_dev_.c_str(), fps, internal);
+}
+
+int UsbCam::trigger_disable() {
+  return adv_trigger_disable(camera_dev_.c_str());
 }
 }
