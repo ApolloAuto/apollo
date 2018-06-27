@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar_velodyne/commom/input.h"
+#include "modules/drivers/lidar_velodyne/common/input.h"
 
 #include "modules/common/log.h"
 

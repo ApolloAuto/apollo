@@ -6,9 +6,11 @@ cc_library(
     name = "common",
     srcs = [
         "input.cc",
+        "socket_input.cc",
     ],
     hdrs = [
         "input.h",
+        "socket_input.h",
     ],
     deps = [
         "//modules/common",
