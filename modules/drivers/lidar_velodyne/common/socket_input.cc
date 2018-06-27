@@ -75,7 +75,8 @@ bool SocketInput::init(int port) {
   my_addr.sin_addr.s_addr = INADDR_ANY;      // automatically fill in my IP
   //    my_addr.sin_addr.s_addr = inet_addr("192.168.1.100");
 
-  if (bind(sockfd_, (sockaddr *)&my_addr, sizeof(sockaddr)) == -1) {
+  if (bind(sockfd_, reinterpret_cast<sockaddr *>(&my_addr), sizeof(sockaddr)) ==
+      -1) {
     AERROR << "Socket bind failed! Port " << port_;
     return false;
   }
