@@ -36,18 +36,6 @@ class TrajectoryStitcher {
  public:
   TrajectoryStitcher() = delete;
 
-  /**
-   * @brief Stitch to reference line based on location
-   * Find the init location that helps the vehicle approach the reference line.
-   * Only used in navigation mode.
-   */
-  static std::vector<common::TrajectoryPoint> CalculateInitPoint(
-      const common::VehicleState& vehicle_state,
-      const ReferenceLine& reference_line, bool* is_replan);
-
-  static void TransformLastPublishedTrajectory(const double planning_cycle_time,
-      PublishableTrajectory* prev_trajectory);
-
   static void TransformLastPublishedTrajectory(const double x_diff,
       const double y_diff, const double theta_diff,
       PublishableTrajectory* prev_trajectory);
