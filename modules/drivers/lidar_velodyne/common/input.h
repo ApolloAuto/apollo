@@ -60,8 +60,7 @@ class Input {
    */
   virtual int get_firing_data_packet(velodyne_msgs::VelodynePacket* pkt) = 0;
   virtual int get_positioning_data_packet(NMEATimePtr nmea_time) = 0;
-  virtual void init() {}
-  virtual void init(int port) {}
+  virtual bool init(int port) { return true; }
 
  protected:
   bool exract_nmea_time_from_packet(NMEATimePtr nmea_time,
