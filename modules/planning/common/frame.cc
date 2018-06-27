@@ -47,6 +47,7 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+using apollo::common::monitor::MonitorLogBuffer;
 using apollo::prediction::PredictionObstacles;
 
 FrameHistory::FrameHistory()
@@ -60,7 +61,8 @@ Frame::Frame(uint32_t sequence_num,
       planning_start_point_(planning_start_point),
       start_time_(start_time),
       vehicle_state_(vehicle_state),
-      reference_line_provider_(reference_line_provider) {
+      reference_line_provider_(reference_line_provider),
+      monitor_logger_(common::monitor::MonitorMessageItem::PLANNING) {
   if (FLAGS_enable_lag_prediction) {
     lag_predictor_.reset(
         new LagPrediction(FLAGS_lag_prediction_min_appear_num,
@@ -116,6 +118,8 @@ bool Frame::Rerouting() {
     return false;
   }
   AdapterManager::PublishRoutingRequest(request);
+  apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
+  buffer.INFO("Planning send Rerouting request");
   return true;
 }
 
@@ -205,8 +209,7 @@ bool Frame::CreateReferenceLineInfo() {
  */
 const Obstacle *Frame::CreateStopObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id,
-    const double obstacle_s) {
+    const std::string &obstacle_id, const double obstacle_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
     return nullptr;
@@ -258,8 +261,7 @@ const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
  */
 const Obstacle *Frame::CreateStaticObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id,
-    const double obstacle_start_s,
+    const std::string &obstacle_id, const double obstacle_start_s,
     const double obstacle_end_s) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
@@ -470,7 +472,7 @@ const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
   drive_reference_line_info_ = nullptr;
   for (const auto &reference_line_info : reference_line_info_) {
     if (reference_line_info.IsDrivable() &&
-               reference_line_info.Cost() < min_cost) {
+        reference_line_info.Cost() < min_cost) {
       drive_reference_line_info_ = &reference_line_info;
       min_cost = reference_line_info.Cost();
     }

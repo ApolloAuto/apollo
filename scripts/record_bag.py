@@ -153,6 +153,8 @@ class DiskManager(object):
 
 class Recorder(object):
     """Data recorder."""
+    kEventCollector='modules/data/tools/event_collector_main'
+
 
     def __init__(self, args):
         self.args = args
@@ -186,6 +188,8 @@ class Recorder(object):
     def stop(self):
         """Stop recording."""
         shell_cmd('kill -TERM $(pgrep -f "rosbag/record" | grep -v pgrep)')
+        shell_cmd('kill -INT $(pgrep -f "{}" | grep -v pgrep)'.format(
+            Recorder.kEventCollector))
 
     def record_task(self, disk, topics='all'):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
@@ -199,8 +203,11 @@ class Recorder(object):
         os.makedirs(task_dir)
         cmd = '''
             cd "{}"
+            source /apollo/scripts/apollo_base.sh
             nohup rosbag record --split --duration={} -b 2048 {} >{} 2>&1 &
-        '''.format(task_dir, self.args.split_duration, topics_str, log_file)
+            nohup ${{APOLLO_BIN_PREFIX}}/{} >/dev/null 2>&1 &
+        '''.format(task_dir, self.args.split_duration, topics_str, log_file,
+                   Recorder.kEventCollector)
         shell_cmd(cmd)
 
     @staticmethod

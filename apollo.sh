@@ -275,14 +275,11 @@ function release() {
   mkdir "${LIB_DIR}"
   if $USE_ESD_CAN; then
     warn_proprietary_sw
-    for m in esd_can
-    do
-      cp third_party/can_card_library/$m/lib/* $LIB_DIR
-    done
   fi
+  cp -r third_party/can_card_library/*/lib/* $LIB_DIR
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
-  cp /apollo/modules/perception/cuda_util/cmake_build/libcuda_util.so $LIB_DIR
+  cp modules/perception/cuda_util/cmake_build/libcuda_util.so $LIB_DIR
 
   # doc
   cp -r docs "${APOLLO_RELEASE_DIR}"

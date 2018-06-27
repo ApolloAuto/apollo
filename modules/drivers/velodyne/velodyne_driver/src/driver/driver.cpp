@@ -95,8 +95,8 @@ void VelodyneDriver::update_gps_top_hour(uint32_t current_time) {
                       << config_.model << std::fixed << ". current:"
                       << current_time << ", last time:" << last_gps_time_);
     } else {
-      ROS_WARN_STREAM("Currrnt stamp:" << std::fixed << current_time
-                                       << " less than previous statmp:"
+      ROS_WARN_STREAM("Current stamp:" << std::fixed << current_time
+                                       << " less than previous stamp:"
                                        << last_gps_time_
                                        << ". GPS time stamp maybe incorrect!");
     }

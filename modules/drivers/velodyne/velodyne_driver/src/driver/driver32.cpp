@@ -82,7 +82,7 @@ bool Velodyne32Driver::poll(void) {
   ROS_DEBUG("Publishing a full Velodyne scan.");
   scan->header.stamp = ros::Time().now();
   scan->header.frame_id = config_.frame_id;
-  // we use fisrt packet gps time update gps base hour
+  // we use first packet gps time update gps base hour
   // in cloud nodelet, will update base time packet by packet
   uint32_t current_secs = *((uint32_t*)(&scan->packets.front().data[0] + 1200));
   update_gps_top_hour(current_secs);

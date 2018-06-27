@@ -80,7 +80,7 @@ class Stream {
     for (size_t i = 0; i < login_data_.size(); ++i) {
       write(login_data_[i]);
       AINFO << "Login: " << login_data_[i];
-      // sleep a little to avoid overun of the slow serial interface.
+      // sleep a little to avoid overrun of the slow serial interface.
       ros::Duration(0.5).sleep();
     }
   }

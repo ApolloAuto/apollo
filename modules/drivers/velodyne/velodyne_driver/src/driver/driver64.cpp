@@ -123,7 +123,7 @@ int Velodyne64Driver::poll_standard_sync(
         return rc;
       }
     }
-    // if the only  UDP packet lost then recv 1.5*config_.npackets  packets at
+    // if the only UDP packet lost then recv 1.5*config_.npackets  packets at
     // most
     if (scan->packets.size() > 1.5 * config_.npackets) {
       return 0;

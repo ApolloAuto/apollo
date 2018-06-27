@@ -101,4 +101,52 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "wheel_speed_rpt_7a_test",
+    size = "small",
+    srcs = [
+        "wheel_speed_rpt_7a_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "yaw_rate_rpt_81_test",
+    size = "small",
+    srcs = [
+        "yaw_rate_rpt_81_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "wiper_rpt_91_test",
+    size = "small",
+    srcs = [
+        "wiper_rpt_91_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "brake_motor_rpt_1_70_test",
+    size = "small",
+    srcs = [
+        "brake_motor_rpt_1_70_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

@@ -233,6 +233,14 @@ TEST(TestSuite, hdmap_line_path) {
   EXPECT_EQ(path.GetIndexFromS(2.6).id, 2);
   EXPECT_NEAR(path.GetIndexFromS(2.6).offset, 0.6, 1e-6);
 
+  // Test GetLaneIndexFromS
+  EXPECT_EQ(path.GetLaneIndexFromS(-1.0).id, 0);
+  EXPECT_NEAR(path.GetLaneIndexFromS(-1.0).offset, 0.0, 1e-8);
+  EXPECT_EQ(path.GetLaneIndexFromS(1.0).id, 0);
+  EXPECT_NEAR(path.GetLaneIndexFromS(1.0).offset, 1.0, 1e-8);
+  EXPECT_EQ(path.GetLaneIndexFromS(5.0).id, 0);
+  EXPECT_NEAR(path.GetLaneIndexFromS(5.0).offset, 3.0, 1e-8);
+
   double accumulate_s;
   double lateral;
   double distance;

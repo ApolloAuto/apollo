@@ -34,7 +34,7 @@ DEFINE_string(traffic_rule_config_filename,
 
 DEFINE_string(smoother_config_filename,
               "modules/planning/conf/qp_spline_smoother_config.pb.txt",
-              "The configuration file for qp sline smoother");
+              "The configuration file for spiral smoother");
 
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
               "Loop rate for planning node");

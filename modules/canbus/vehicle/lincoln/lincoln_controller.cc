@@ -254,8 +254,15 @@ Chassis LincolnController::chassis() {
   } else {
     chassis_.set_parking_brake(false);
   }
-  // TODO(Authors): lincoln beam
+
   // 14, 15
+  if (chassis_detail.has_light() &&
+      chassis_detail.light().has_lincoln_lamp_type()) {
+    chassis_.mutable_signal()->set_high_beam(
+        chassis_detail.light().lincoln_lamp_type() == Light::BEAM_HIGH);
+  } else {
+    chassis_.mutable_signal()->set_high_beam(false);
+  }
 
   // 16, 17
   if (chassis_detail.has_light() &&
@@ -335,10 +342,13 @@ Chassis LincolnController::chassis() {
   }
 
   // vin number will be written into KVDB once.
-  if (chassis_detail.license().has_vin() && !received_vin_) {
-    apollo::common::KVDB::Put("apollo:canbus:vin",
-                              chassis_detail.license().vin());
-    received_vin_ = true;
+  if (chassis_detail.license().has_vin()) {
+    chassis_.mutable_license()->set_vin(chassis_detail.license().vin());
+    if (!received_vin_) {
+      apollo::common::KVDB::Put("apollo:canbus:vin",
+                                chassis_detail.license().vin());
+      received_vin_ = true;
+    }
   }
 
   // give engage_advice based on error_code and canbus feedback
