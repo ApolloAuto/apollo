@@ -173,4 +173,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "date_time_rpt_83_test",
+    size = "small",
+    srcs = [
+        "date_time_rpt_83_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
