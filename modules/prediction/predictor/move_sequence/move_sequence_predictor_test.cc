@@ -62,5 +62,58 @@ TEST_F(MoveSequencePredictorTest, OnLaneCase) {
   EXPECT_EQ(predictor.NumOfTrajectories(), 1);
 }
 
+TEST_F(MoveSequencePredictorTest, Polynomial) {
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
+                   1501183430.161906);
+  apollo::perception::PerceptionObstacle perception_obstacle =
+      perception_obstacles_.perception_obstacle(0);
+  EXPECT_EQ(perception_obstacle.id(), 1);
+  MLPEvaluator mlp_evaluator;
+  ObstaclesContainer container;
+  container.Insert(perception_obstacles_);
+  Obstacle* obstacle_ptr = container.GetObstacle(1);
+  EXPECT_TRUE(obstacle_ptr != nullptr);
+  mlp_evaluator.Evaluate(obstacle_ptr);
+  MoveSequencePredictor predictor;
+  const Feature& feature = obstacle_ptr->latest_feature();
+  const LaneGraph& lane_graph = feature.lane().lane_graph();
+  for (const auto& lane_sequence : lane_graph.lane_sequence()) {
+    std::pair<double, double> lon_end_state;
+    std::array<double, 5> lon_coefficients;
+    bool ret_lon = predictor.GetLongitudinalPolynomial(
+        *obstacle_ptr, lane_sequence, &lon_end_state, &lon_coefficients);
+    EXPECT_TRUE(ret_lon);
+    std::array<double, 6> lat_coefficients;
+    bool ret_lat = predictor.GetLateralPolynomial(
+        *obstacle_ptr, lane_sequence, 3.0, &lat_coefficients);
+    EXPECT_TRUE(ret_lat);
+  }
+}
+
+TEST_F(MoveSequencePredictorTest, Utils) {
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
+                   1501183430.161906);
+  apollo::perception::PerceptionObstacle perception_obstacle =
+      perception_obstacles_.perception_obstacle(0);
+  EXPECT_EQ(perception_obstacle.id(), 1);
+  MLPEvaluator mlp_evaluator;
+  ObstaclesContainer container;
+  container.Insert(perception_obstacles_);
+  Obstacle* obstacle_ptr = container.GetObstacle(1);
+  EXPECT_TRUE(obstacle_ptr != nullptr);
+  mlp_evaluator.Evaluate(obstacle_ptr);
+  MoveSequencePredictor predictor;
+  const Feature& feature = obstacle_ptr->latest_feature();
+  const LaneGraph& lane_graph = feature.lane().lane_graph();
+  for (const auto& lane_sequence : lane_graph.lane_sequence()) {
+    double speed = predictor.ComputeTimeToLatEndConditionByVelocity(
+        *obstacle_ptr, lane_sequence);
+    EXPECT_GT(speed, 0.0);
+  }
+  std::vector<double> candidate_times;
+  predictor.GenerateCandidateTimes(&candidate_times);
+  EXPECT_GT(candidate_times.size(), 0);
+}
+
 }  // namespace prediction
 }  // namespace apollo

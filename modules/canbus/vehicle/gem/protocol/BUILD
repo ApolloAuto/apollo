@@ -185,4 +185,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "global_rpt_6a_test",
+    size = "small",
+    srcs = [
+        "global_rpt_6a_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
