@@ -149,4 +149,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "brake_motor_rpt_2_71_test",
+    size = "small",
+    srcs = [
+        "brake_motor_rpt_2_71_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
