@@ -788,7 +788,8 @@ void LincolnController::SecurityDogThreadFunc() {
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
-      start += (default_period - elapsed).count();
+      start =
+        common::time::AsInt64<common::time::micros>(common::time::Clock::Now());
     } else {
       AERROR_EVERY(100)
           << "Too much time consumption in LincolnController looping process:"
