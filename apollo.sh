@@ -317,11 +317,11 @@ function gen_coverage() {
     cp "$f" "$target"
   done
 
-  lcov --capture --directory "$COV_DIR/objs" --output-file "$COV_DIR/conv.info"
+  lcov --rc lcov_branch_coverage=1 --capture --directory "$COV_DIR/objs" --output-file "$COV_DIR/conv.info"
   if [ $? -ne 0 ]; then
     fail 'lcov failed!'
   fi
-  lcov --remove "$COV_DIR/conv.info" \
+  lcov --rc lcov_branch_coverage=1 --remove "$COV_DIR/conv.info" \
       "external/*" \
       "/usr/*" \
       "bazel-out/*" \
