@@ -26,7 +26,7 @@
 
 namespace apollo {
 namespace drivers {
-namespace velodyne {
+namespace lidar_velodyne {
 
 static int FIRING_DATA_PORT = 2368;
 static int POSITIONING_DATA_PORT = 8308;
@@ -39,7 +39,7 @@ class SocketInput : public Input {
   virtual ~SocketInput();
   bool init(int port) override;
   int get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt);
-  int get_positioning_data_packet(NMEATimePtr nmea_time);
+  int get_positioning_data_packet(NMEATimePtr nmea_time) override;
 
  private:
   int sockfd_;
@@ -47,7 +47,7 @@ class SocketInput : public Input {
   bool input_available(int timeout);
 };
 
-}  // namespace velodyne
+}  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
 

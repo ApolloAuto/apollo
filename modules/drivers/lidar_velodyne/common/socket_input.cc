@@ -39,7 +39,7 @@
 
 namespace apollo {
 namespace drivers {
-namespace velodyne {
+namespace lidar_velodyne {
 
 // InputSocket class implementation
 
@@ -207,6 +207,6 @@ bool SocketInput::input_available(int timeout) {
   return true;
 }
 
-}  // namespace velodyne
+}  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
