@@ -101,9 +101,13 @@ DEFINE_bool(enable_side_vehicle_st_boundary, false,
 
 DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 
-DEFINE_double(max_collision_distance, 0.0,
+DEFINE_double(max_collision_distance, 0.1,
               "considered as collision if distance (meters) is smaller than or "
               "equal to this (meters)");
+
+DEFINE_bool(ignore_overlapped_obstacle, false,
+            "ingore obstacle that overlapps with ADC. Only enable this flag "
+            "when you found fake obstacle result from poorly lidar");
 
 DEFINE_double(replan_lateral_distance_threshold, 5.0,
               "The distance threshold of replan");
@@ -299,11 +303,10 @@ DEFINE_double(lon_collision_buffer, 2.0,
 DEFINE_double(lat_collision_buffer, 0.2,
               "The lateral buffer to keep distance to other vehicles");
 DEFINE_uint32(num_sample_follow_per_timestamp, 3,
-             "The number of sample points for each timestamp to follow");
+              "The number of sample points for each timestamp to follow");
 
 // Lattice Evaluate Parameters
-DEFINE_double(weight_lon_objective, 10.0,
-              "Weight of longitudinal travel cost");
+DEFINE_double(weight_lon_objective, 10.0, "Weight of longitudinal travel cost");
 DEFINE_double(weight_lon_jerk, 1.0, "Weight of longitudinal jerk cost");
 DEFINE_double(weight_lon_collision, 5.0,
               "Weight of logitudinal collision cost");
