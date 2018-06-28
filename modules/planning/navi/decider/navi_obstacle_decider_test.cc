@@ -88,7 +88,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist2) {
 
   double nudge_dist =
       obstacle_decider.GetNudgeDistance(vec_obstacle, vec_points, 3.3);
-  EXPECT_FLOAT_EQ(nudge_dist, 0.595);
+  EXPECT_FLOAT_EQ(nudge_dist, -0.595);
 }
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
