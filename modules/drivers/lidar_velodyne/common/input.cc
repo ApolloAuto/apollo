@@ -20,7 +20,7 @@
 
 namespace apollo {
 namespace drivers {
-namespace velodyne {
+namespace lidar_velodyne {
 
 bool Input::exract_nmea_time_from_packet(NMEATimePtr nmea_time,
                                          const uint8_t* bytes) {
@@ -75,6 +75,6 @@ bool Input::exract_nmea_time_from_packet(NMEATimePtr nmea_time,
   return true;
 }
 
-}  // namespace velodyne
+}  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
