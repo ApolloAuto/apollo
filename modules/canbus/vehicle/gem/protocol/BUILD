@@ -245,4 +245,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "steering_rpt_1_6e_test",
+    size = "small",
+    srcs = [
+        "steering_rpt_1_6e_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
