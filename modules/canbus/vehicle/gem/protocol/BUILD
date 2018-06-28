@@ -197,4 +197,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "lat_lon_heading_rpt_82_test",
+    size = "small",
+    srcs = [
+        "lat_lon_heading_rpt_82_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
