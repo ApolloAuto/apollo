@@ -13,7 +13,6 @@ The application layout is divided into several regions: header, sidebar, main vi
 The Header has 4 drop-downs that can be set as shown:
 ![](images/dreamview_usage_table/header.png) 
 
-#### Setup Mode
 Depending on the mode chosen from the mode selector, the corresponding modules and commands, defined in [hmi.conf](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/conf/hmi.conf), will be presented in the **Module Controller**, and **Quick Start**, respectively.
 
 Note: navigation mode is for the purpose of the low-cost feature introduced in Apollo 2.5. Under this mode, Baidu (or Google) Map presents the absolute position of the ego-vehicle, while the main view has all objects and map elements presented in relative positions to the ego-vehicle. 
@@ -92,7 +91,7 @@ Elements in the main view are listed in the table below:
 | ![](images/dreamview_usage_table/0clip_image016.png) | <ul><li>Unknown  obstacle </li></ul>                        |
 | ![](images/dreamview_usage_table/0clip_image018.png) | <ul><li>The  velocity arrow shows the direction of the movement with the length  proportional to the magnitude</li></ul>  |
 | ![](images/dreamview_usage_table/0clip_image020.png) | <ul><li>The  white arrow shows the directional heading of the obstacle</li></ul>  |
-| ![](images/dreamview_usage_table/0clip_image022.png) | The  yellow text indicates: <ul><li>The tracking ID of the obstacle.</li><li>The distance from the autonomous car.</li></ul> |
+| ![](images/dreamview_usage_table/0clip_image022.png) | The  yellow text indicates: <ul><li>The tracking ID of the obstacle.</li><li>The distance from the autonomous car and obstacle speed.</li></ul> |
 | ![](images/dreamview_usage_table/0clip_image024.png) | <ul><li>The  lines show the predicted movement of the obstacle with the same color as the  obstacle</li></ul>  |
 
 #### Planning Decision
