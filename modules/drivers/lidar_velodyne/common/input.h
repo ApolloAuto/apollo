@@ -26,7 +26,7 @@
 
 namespace apollo {
 namespace drivers {
-namespace velodyne {
+namespace lidar_velodyne {
 
 static const size_t FIRING_DATA_PACKET_SIZE = 1206;
 static const size_t POSITIONING_DATA_PACKET_SIZE = 512;
@@ -67,7 +67,7 @@ class Input {
                                     const uint8_t* bytes);
 };
 
-}  // namespace velodyne
+}  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
 
