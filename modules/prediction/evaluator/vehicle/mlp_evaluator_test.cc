@@ -21,10 +21,9 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
@@ -62,6 +61,7 @@ TEST_F(MLPEvaluatorTest, OnLaneCase) {
   for (const auto& lane_sequence : lane_graph.lane_sequence()) {
     EXPECT_TRUE(lane_sequence.has_probability());
   }
+  mlp_evaluator.Clear();
 }
 
 }  // namespace prediction

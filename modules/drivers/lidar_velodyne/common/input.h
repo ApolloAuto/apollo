@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_LIDAR_LIDAR_VELODYNE_DRIVER_INPUT_H_
-#define MODULES_DRIVERS_LIDAR_LIDAR_VELODYNE_DRIVER_INPUT_H_
+#ifndef MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_INPUT_H_
+#define MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_INPUT_H_
 
 #include <stdio.h>
 #include <unistd.h>
@@ -47,8 +47,8 @@ typedef boost::shared_ptr<NMEATime> NMEATimePtr;
 /** @brief Pure virtual Velodyne input base class */
 class Input {
  public:
-  Input() = default;
-  virtual ~Input() = default;
+  Input() {}
+  virtual ~Input() {}
 
   /** @brief Read one Velodyne packet.
    *
@@ -60,8 +60,7 @@ class Input {
    */
   virtual int get_firing_data_packet(velodyne_msgs::VelodynePacket* pkt) = 0;
   virtual int get_positioning_data_packet(NMEATimePtr nmea_time) = 0;
-  virtual void init() {}
-  virtual void init(int& port) {}  // NOLINT
+  virtual bool init(int port) { return true; }
 
  protected:
   bool exract_nmea_time_from_packet(NMEATimePtr nmea_time,
@@ -72,4 +71,4 @@ class Input {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_LIDAR_LIDAR_VELODYNE_DRIVER_INPUT_H_
+#endif  // MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_INPUT_H_

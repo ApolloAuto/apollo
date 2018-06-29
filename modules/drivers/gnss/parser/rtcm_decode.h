@@ -181,25 +181,6 @@ static inline bool gnss_time_type(
   return true;
 }
 
-static inline bool gnss_frequence(apollo::drivers::gnss::GnssBandID baud_id,
-                                  double* freq) {
-  (void)freq;
-  switch (baud_id) {
-    case apollo::drivers::gnss::GnssBandID::GPS_L1:
-    case apollo::drivers::gnss::GnssBandID::GPS_L2:
-    case apollo::drivers::gnss::GnssBandID::GPS_L5:
-    case apollo::drivers::gnss::GnssBandID::BDS_B1:
-    case apollo::drivers::gnss::GnssBandID::BDS_B2:
-    case apollo::drivers::gnss::GnssBandID::BDS_B3:
-    case apollo::drivers::gnss::GnssBandID::GLO_G1:
-    case apollo::drivers::gnss::GnssBandID::GLO_G2:
-    default:
-      return false;
-  }
-
-  return true;
-}
-
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo

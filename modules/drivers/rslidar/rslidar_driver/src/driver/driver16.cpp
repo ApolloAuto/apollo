@@ -79,16 +79,6 @@ void Rslidar16Driver::poll_positioning_packet(void) {
   while (true) {
     NMEATimePtr nmea_time(new NMEATime);
     bool ret = true;
-    while (true) {
-      int rc;
-      if (rc == 0) {
-        break;  // got a full packet
-      }
-      if (rc < 0) {
-        ret = false;  // end of file reached
-      }
-    }
-
     if (basetime_ == 0 && ret) {
       set_base_time_from_nmea_time(nmea_time, basetime_);
     }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_DRIVERS_LIDAR_VELODYNE_DRIVER_SOCKET_INPUT_H_
-#define MODULES_DRIVERS_LIDAR_VELODYNE_DRIVER_SOCKET_INPUT_H_
+#ifndef MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_SOCKET_INPUT_H_
+#define MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_SOCKET_INPUT_H_
 
 #include <stdio.h>
 #include <unistd.h>
 
 #include "ros/ros.h"
 
-#include "modules/drivers/lidar_velodyne/driver/input.h"
+#include "modules/drivers/lidar_velodyne/common/input.h"
 
 namespace apollo {
 namespace drivers {
-namespace velodyne {
+namespace lidar_velodyne {
 
 static int FIRING_DATA_PORT = 2368;
 static int POSITIONING_DATA_PORT = 8308;
@@ -37,9 +37,9 @@ class SocketInput : public Input {
  public:
   SocketInput();
   virtual ~SocketInput();
-  void init(int &port);  // NOLINT
+  bool init(int port) override;
   int get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt);
-  int get_positioning_data_packet(NMEATimePtr nmea_time);
+  int get_positioning_data_packet(NMEATimePtr nmea_time) override;
 
  private:
   int sockfd_;
@@ -47,8 +47,8 @@ class SocketInput : public Input {
   bool input_available(int timeout);
 };
 
-}  // namespace velodyne
+}  // namespace lidar_velodyne
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // MODULES_DRIVERS_LIDAR_VELODYNE_DRIVER_SOCKET_INPUT_H_
+#endif  // MODULES_DRIVERS_LIDAR_VELODYNE_COMMON_SOCKET_INPUT_H_
