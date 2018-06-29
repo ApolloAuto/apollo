@@ -312,13 +312,18 @@ void Planning::RunOnce() {
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
   if (FLAGS_use_navigation_mode) {
+    // temp solution for navigation mode
     if (IsVehicleStateValid(last_vehicle_state_)) {
-      auto x_diff = vehicle_state.x() - last_vehicle_state_.x();
-      auto y_diff = vehicle_state.y() - last_vehicle_state_.y();
-      auto theta_diff = vehicle_state.heading() - last_vehicle_state_.heading();
+      auto theta_diff = (vehicle_state.angular_velocity() +
+          last_vehicle_state_.angular_velocity()) * 0.5 * planning_cycle_time;
 
-      TrajectoryStitcher::TransformLastPublishedTrajectory(x_diff, y_diff,
-          theta_diff, last_publishable_trajectory_.get());
+      auto s_diff = (vehicle_state.linear_velocity() +
+          last_vehicle_state_.linear_velocity()) * 0.5 * planning_cycle_time;
+      auto x_diff = s_diff * std::cos(theta_diff);
+      auto y_diff = s_diff * std::sin(theta_diff);
+
+      TrajectoryStitcher::TransformLastPublishedTrajectory(-x_diff, -y_diff,
+          -theta_diff, last_publishable_trajectory_.get());
     }
   }
   last_vehicle_state_ = vehicle_state;
