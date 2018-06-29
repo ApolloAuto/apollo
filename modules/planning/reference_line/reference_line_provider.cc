@@ -439,6 +439,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
       if (lane_id == neareast_neighbor_lane_id) {
         ADEBUG << "adc lane_id = " << adc_lane_id
                << " neareast_neighbor_lane_id = " << lane_id;
+        segment.SetIsNeighborSegment(true);
         segment.SetPreviousAction(lane_change_type);
       } else if (lane_id == adc_lane_id) {
         segment.SetIsOnSegment(true);
@@ -486,11 +487,6 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
     AERROR << "failed to get lane from point " << point.ShortDebugString();
     return false;
   }
-  if (lanes.empty()) {
-    AERROR << "no valid lane found within " << kMaxDistance
-           << " meters with heading " << state.heading();
-    return false;
-  }
 
   // get lanes that exist in both map and navigation paths as vallid lanes
   std::vector<hdmap::LaneInfoConstPtr> valid_lanes;
@@ -498,6 +494,11 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
                [&](hdmap::LaneInfoConstPtr ptr) {
                  return navigation_lane_ids.count(ptr->lane().id().id()) > 0;
                });
+  if (valid_lanes.empty()) {
+    AERROR << "no valid lane found within " << kMaxDistance
+           << " meters with heading " << state.heading();
+    return false;
+  }
 
   // get nearest lane wayponints for current adc position
   double min_distance = std::numeric_limits<double>::infinity();
@@ -513,7 +514,7 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
       continue;
     }
 
-    // get the neareast distance between adc point adn lane
+    // get the neareast distance between adc point and lane
     double distance = 0.0;
     common::PointENU map_point =
         lane->GetNearestPoint({point.x(), point.y()}, &distance);

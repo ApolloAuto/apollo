@@ -187,7 +187,10 @@ navi_planner_config {
     navi_path_decider_config {
         min_path_length: 5
         min_look_forward_time: 2
+        min_smooth_init_y: 0.02
         max_smooth_init_y: 0.2
+        lateral_shift_delta: 0.05
+        max_lateral_distance: 6.0
     }
 
     navi_speed_decider_config {
