@@ -30,6 +30,7 @@ message HardwareStatus {
     NOT_READY = 1;
     // HW is not present.
     NOT_PRESENT = 2;
+    WARN = 6;
     // HW error, can't be used.
     ERR = 3;
     // GPS positioning is unstable.
