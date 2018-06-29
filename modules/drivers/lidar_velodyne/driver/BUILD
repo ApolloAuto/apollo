@@ -6,6 +6,9 @@ cc_library(
     name = "driver",
     srcs = [
         "driver.cc",
+        "driver16.cc",
+        "driver32.cc",
+        "driver64.cc",
     ],
     hdrs = [
         "driver.h",
