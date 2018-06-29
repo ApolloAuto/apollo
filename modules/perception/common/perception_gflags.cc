@@ -40,6 +40,8 @@ DEFINE_string(onboard_roi_filter, "DummyROIFilter", "onboard roi filter");
 DEFINE_string(onboard_segmentor, "DummySegmentation", "onboard segmentation");
 DEFINE_string(onboard_object_builder, "DummyObjectBuilder",
               "onboard object builder");
+DEFINE_string(onboard_object_filter, "DummyObjectFilter",
+              "onboard object filter");
 DEFINE_string(onboard_tracker, "DummyTracker", "onboard tracker");
 DEFINE_string(onboard_type_fuser, "DummyTypeFuser", "onboard type fuser");
 

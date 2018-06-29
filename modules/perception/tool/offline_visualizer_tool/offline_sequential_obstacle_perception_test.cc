@@ -31,6 +31,7 @@
 DECLARE_string(flagfile);
 DEFINE_string(lidar_path, "/apollo/data/lidar/", "lidar path");
 DEFINE_string(radar_path, "/apollo/data/radar/", "radar path");
+DEFINE_int32(start_frame, 0, "start frame");
 
 namespace apollo {
 namespace perception {
@@ -325,7 +326,7 @@ int main(int argc, char** argv) {
   AINFO << "Total sensors files num: " << sensors_files.size();
 
   /// process each sensor file
-  for (size_t i = 0; i < sensors_files.size(); ++i) {
+  for (size_t i = FLAGS_start_frame; i < sensors_files.size(); ++i) {
     AINFO << "Process frame " << sensors_files[i];
     std::shared_ptr<apollo::perception::SensorRawFrame> raw_frame(
         new apollo::perception::SensorRawFrame);
