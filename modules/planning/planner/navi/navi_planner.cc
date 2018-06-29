@@ -113,19 +113,17 @@ Status NaviPlanner::Plan(const TrajectoryPoint& planning_init_point,
   }
 
   std::size_t success_line_count = 0;
-  std::size_t index = 0;
   for (auto& reference_line_info : frame->reference_line_info()) {
-    if (index != 0) {
-      reference_line_info.SetPriorityCost(
-          FLAGS_cost_non_priority_reference_line);
-    } else {
-      reference_line_info.SetPriorityCost(0.0);
+    if (!reference_line_info.IsChangeLanePath() ||
+        !reference_line_info.IsNeighborLanePath()) {
+      reference_line_info.AddCost(10.0);
     }
     auto status =
         PlanOnReferenceLine(planning_init_point, frame, &reference_line_info);
 
     if (status != Status::OK()) {
-      if (reference_line_info.IsChangeLanePath()) {
+      if (reference_line_info.IsChangeLanePath() &&
+          reference_line_info.IsNeighborLanePath()) {
         AERROR << "Planner failed to change lane to "
                << reference_line_info.Lanes().Id();
       } else {
@@ -134,7 +132,6 @@ Status NaviPlanner::Plan(const TrajectoryPoint& planning_init_point,
     } else {
       success_line_count += 1;
     }
-    ++index;
   }
 
   if (success_line_count > 0) {
@@ -391,6 +388,7 @@ void NaviPlanner::GenerateFallbackPathProfile(
 
     path_points.push_back(std::move(path_point));
   }
+  path_data->SetReferenceLine(&(reference_line_info->reference_line()));
   path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));
 }
 
