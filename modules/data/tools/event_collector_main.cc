@@ -149,8 +149,8 @@ class EventCollector {
     }
   }
 
-  void SaveEvent(const double timestamp_sec, const std::string type,
-                 const std::string description = "") {
+  void SaveEvent(const double timestamp_sec, const std::string& type,
+                 const std::string& description = "") {
     const auto msg = apollo::common::util::StrCat(
         timestamp_sec, " [", type, "] ", description);
 
