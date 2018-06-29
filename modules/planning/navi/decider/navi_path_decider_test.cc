@@ -32,18 +32,28 @@ using apollo::common::TrajectoryPoint;
 
 namespace apollo {
 namespace planning {
-// TODO(all): Add your unit test code here according to the Google Unit Testing
-// Specification.
-TEST(NaviPathDeciderTest, Init) {
-    NaviPathDecider navi_path_decider;
-    PlanningConfig config;
-    EXPECT_TRUE(navi_path_decider.Init(config));
+class NaviPathDeciderTest : public ::testing::Test {
+ public:
+  static void SetUpTestCase() {
+    AINFO << "NaviPathDeciderTest : SetUpTestCase";
+  }
+};
+
+TEST_F(NaviPathDeciderTest, Init) {
+  NaviPathDecider navi_path_decider;
+  PlanningConfig config;
+  EXPECT_TRUE(navi_path_decider.Init(config));
 }
 
-TEST(NaviPathDeciderTest, Execute) {
-    NaviPathDecider navi_path_decider;
-    PlanningConfig config;
-    navi_path_decider.Init(config);
+TEST_F(NaviPathDeciderTest, Execute) {
+  NaviPathDecider navi_path_decider;
+  PlanningConfig config;
+}
+
+TEST_F(NaviPathDeciderTest, SmoothInitY) {
+  NaviPathDecider navi_path_decider;
+  double smooth_y = navi_path_decider.SmoothInitY(0.002, 0.001);
+  EXPECT_DOUBLE_EQ(smooth_y, 0);
 }
 
 }  // namespace planning
