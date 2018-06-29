@@ -257,4 +257,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "accel_cmd_67_test",
+    size = "small",
+    srcs = [
+        "accel_cmd_67_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
