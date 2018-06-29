@@ -90,14 +90,12 @@ void VelodyneDriver::update_gps_top_hour(uint32_t current_time) {
   if (last_gps_time_ > current_time) {
     if (std::abs(last_gps_time_ - current_time) > 3599000000) {
       basetime_ += 3600 * 1e6;
-      ROS_INFO_STREAM("Base time plus 3600s. Model: "
-                      << config_.model << std::fixed << ". current:"
-                      << current_time << ", last time:" << last_gps_time_);
+      AINFO << "Base time plus 3600s. Model: " << config_.model << std::fixed
+            << ". current:" << current_time << ", last time:" << last_gps_time_;
     } else {
-      ROS_WARN_STREAM("Current stamp:" << std::fixed << current_time
-                                       << " less than previous stamp:"
-                                       << last_gps_time_
-                                       << ". GPS time stamp maybe incorrect!");
+      AWARN << "Current stamp:" << std::fixed << current_time
+            << " less than previous stamp:" << last_gps_time_
+            << ". GPS time stamp maybe incorrect!";
     }
   }
   last_gps_time_ = current_time;
@@ -118,8 +116,7 @@ VelodyneDriver* VelodyneDriverFactory::create_driver(
   private_nh.param("prefix_angle", config.prefix_angle, 18000);
 
   if (config.prefix_angle > 35900 || config.prefix_angle < 100) {
-    ROS_WARN_STREAM(
-        "invalid prefix angle, prefix_angle must be between 100 and 35900");
+    AWARN << "invalid prefix angle, prefix_angle must be between 100 and 35900";
     if (config.prefix_angle > 35900) {
       config.prefix_angle = 35900;
     } else if (config.prefix_angle < 100) {
@@ -138,9 +135,8 @@ VelodyneDriver* VelodyneDriverFactory::create_driver(
   } else if (config.model == "VLP16") {
     return new Velodyne16Driver(config);
   } else {
-    ROS_ERROR_STREAM(
-        "invalid model, must be 64E_S2|64E_S3S"
-        << "|64E_S3D_STRONGEST|64E_S3D_LAST|64E_S3D_DUAL|VLP16|HDL32E");
+    AERROR << "invalid model, must be 64E_S2|64E_S3S"
+           << "|64E_S3D_STRONGEST|64E_S3D_LAST|64E_S3D_DUAL|VLP16|HDL32E";
     return nullptr;
   }
 }
