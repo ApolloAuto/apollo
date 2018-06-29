@@ -396,6 +396,10 @@ bool ReferenceLineInfo::IsChangeLanePath() const {
   return !Lanes().IsOnSegment();
 }
 
+bool ReferenceLineInfo::IsNeighborLanePath() const {
+     return Lanes().IsNeighborSegment();
+}
+
 std::string ReferenceLineInfo::PathSpeedDebugString() const {
   return apollo::common::util::StrCat("path_data:", path_data_.DebugString(),
                                       "speed_data:", speed_data_.DebugString());
