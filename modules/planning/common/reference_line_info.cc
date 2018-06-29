@@ -133,16 +133,14 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
       if (is_protected) {
         return ADCTrajectory::PROTECTED;
       } else {
-        double junction_s = (overlap.end_s + overlap.start_s) / 2.0;
-        auto ref_point = reference_line_.GetReferencePoint(junction_s);
-        if (ref_point.lane_waypoints().empty()) {
-          return ADCTrajectory::PROTECTED;
-        }
-        for (const auto& waypoint : ref_point.lane_waypoints()) {
-          if (waypoint.lane->lane().turn() == hdmap::Lane::NO_TURN) {
-            return ADCTrajectory::PROTECTED;
+        const auto lane_segments =
+            reference_line_.GetLaneSegments(overlap.start_s, overlap.end_s);
+        for (const auto& segment : lane_segments) {
+          if (segment.lane->lane().turn() != hdmap::Lane::NO_TURN) {
+            return ADCTrajectory::UNPROTECTED;
           }
         }
+        return ADCTrajectory::PROTECTED;
       }
     }
   }
@@ -536,13 +534,13 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
       FLAGS_destination_check_distance) {
     return;
   }
-  if (ReachedDestination()) {
-    return;
-  }
+
   auto mission_complete =
       decision_result->mutable_main_decision()->mutable_mission_complete();
-  mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
-  mission_complete->set_stop_heading(main_stop.stop_heading());
+  if (!ReachedDestination()) {
+    mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
+    mission_complete->set_stop_heading(main_stop.stop_heading());
+  }
 }
 
 int ReferenceLineInfo::MakeMainStopDecision(

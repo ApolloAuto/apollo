@@ -118,7 +118,7 @@ export default class PerceptionObstacles {
                 const iconPosition = {
                     x: position.x,
                     y: position.y,
-                    z: position.z + obstacle.height + 0.3,
+                    z: position.z + obstacle.height + 0.5,
                 };
                 this.updateIcon(iconPosition, world.autoDrivingCar.heading, iconIdx, scene);
                 iconIdx++;
@@ -156,6 +156,7 @@ export default class PerceptionObstacles {
         }
         if (STORE.options.showObstaclesId) {
             textPosition.z += (lineCount * 0.7);
+            textPosition.y += (lineCount * 0.7);
             this.drawTexts(obstacle.id, textPosition, scene);
         }
     }

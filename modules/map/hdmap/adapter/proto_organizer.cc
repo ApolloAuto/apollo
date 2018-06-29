@@ -58,6 +58,10 @@ void ProtoOrganizer::GetRoadElements(std::vector<RoadInternal>* roads) {
     for (auto& crosswalk : road_internal.crosswalks) {
       proto_data_.pb_crosswalks[crosswalk.id().id()] = crosswalk;
     }
+    // parking_spaces
+    for (auto& parking_space : road_internal.parking_spaces) {
+      proto_data_.pb_parking_spaces[parking_space.id().id()] = parking_space;
+    }
     // clear areas
     for (auto& clear_area : road_internal.clear_areas) {
       proto_data_.pb_clear_areas[clear_area.id().id()] = clear_area;
@@ -118,7 +122,8 @@ void ProtoOrganizer::GetLaneObjectOverlapElements(
     std::string object_id = overlap_object.object_id;
     if (proto_data_.pb_crosswalks.count(object_id) <= 0 &&
         proto_data_.pb_clear_areas.count(object_id) <= 0 &&
-        proto_data_.pb_speed_bumps.count(object_id) <= 0) {
+        proto_data_.pb_speed_bumps.count(object_id) <= 0 &&
+        proto_data_.pb_parking_spaces.count(object_id) <= 0) {
       continue;
     }
     PbOverlap overlap;
@@ -145,6 +150,10 @@ void ProtoOrganizer::GetLaneObjectOverlapElements(
     } else if (proto_data_.pb_speed_bumps.count(object_id)) {
       object_overlap->mutable_speed_bump_overlap_info();
       proto_data_.pb_speed_bumps[object_id].add_overlap_id()->set_id(
+          overlap_id);
+    } else if (proto_data_.pb_parking_spaces.count(object_id)) {
+      object_overlap->mutable_parking_space_overlap_info();
+      proto_data_.pb_parking_spaces[object_id].add_overlap_id()->set_id(
           overlap_id);
     } else {
       AERROR << "unknown object, object id:" << object_id;
@@ -353,6 +362,9 @@ void ProtoOrganizer::OutputData(apollo::hdmap::Map* pb_map) {
   for (auto& crosswalk_pair : proto_data_.pb_crosswalks) {
     *(pb_map->add_crosswalk()) = crosswalk_pair.second;
   }
+  for (auto& parking_space_pair : proto_data_.pb_parking_spaces) {
+    *(pb_map->add_parking_space()) = parking_space_pair.second;
+  }
   for (auto& clear_area_pair : proto_data_.pb_clear_areas) {
     *(pb_map->add_clear_area()) = clear_area_pair.second;
   }
@@ -377,7 +389,8 @@ void ProtoOrganizer::OutputData(apollo::hdmap::Map* pb_map) {
 
   AINFO << "hdmap statistics: roads-" << proto_data_.pb_roads.size()
         << ",lanes-" << proto_data_.pb_lanes.size() << ",crosswalks-"
-        << proto_data_.pb_crosswalks.size() << ",clear areas-"
+        << proto_data_.pb_crosswalks.size() << ",parking spaces-"
+        << proto_data_.pb_parking_spaces.size() << ",clear areas-"
         << proto_data_.pb_clear_areas.size() << ",speed bumps-"
         << proto_data_.pb_speed_bumps.size() << ",signals-"
         << proto_data_.pb_signals.size() << ",stop signs-"

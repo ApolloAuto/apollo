@@ -31,12 +31,12 @@ catkin_package()
 #     compensator    #
 ######################
 add_executable(compensator_node src/compensator_node.cc src/compensator.cc)
-target_link_libraries(compensator_node 
+target_link_libraries(compensator_node
 	${catkin_LIBRARIES}
     ${PCL_LIBRARIES})
 
 install(
-    TARGETS 
+    TARGETS
     compensator_node
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
