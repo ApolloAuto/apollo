@@ -1,24 +1,13 @@
-# Perception 3.0
+# Perception 2.5
 
 ## Introduction
-Apollo 3.0 has following new features:
-
-- CIPV detection
-- Tailgating 
-- Whole lane line
-- Online pose estimation
-- Asynchronous sensor fusion
-- Visual localization
-- Ultrasonic sensors
-- 16-beam lidar
-
-The perception module incorporates the capability of using a front camera and a front radar to recognize obstacles and fuse their individual tracks to obtain final track list.  The obstacle submodule detects, classifies and tracks obstacles. The submodule also predicts obstacle motion and position information (e.g., heading and velocity). For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate out lane relative location to the ego-vehicle (L0, L1, R0, R1, etc)
+In Apollo 2.5, the perception module incorporates the capability of using front camera and front radar to recognize obstacles and fuse their individual tracks to obtain final track list.  The obstacle submodule detects, classifies and tracks obstacles. The submodule also predicts obstacle motion and position information (e.g., heading and velocity). For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate out lane relative location to the ego-vehicle (L0, L1, R0, R1, etc)
 
 See Also:
 
- [Perception algorithms in Apollo 3.0](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/perception_apollo_3.0.md).
+ [Perception algorithms in Apollo 2.5](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/perception_apollo_2.5.md).
 
- [Guideline of sensor installation for Apollo 3.0](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Guideline_sensor_Installation_apollo_3.0.md).
+ [Guideline of sensor installation for Apollo 2.5](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Guideline_sensor_Installation_apollo_2.5.md).
 
 ## Input
 
@@ -40,7 +29,7 @@ The perception module outputs are:
 - [ ] 1. Set up the general settings in the configuration file `modules/perception/conf/perception_lowcost.conf`.
 - [ ] 2. Run the command  `./scripts/bootstrap.sh` to launch the web GUI.
 - [ ] 3. Select the vehicle model in the web GUI.
-- [ ] 4. Launch the perception module using the command `./scripts/perception_lowcost_vis.sh start` or by enabling the perception button on the *Module Controller* page of the web GUI. The command for stopping perception is `./scripts/perception_lowcost_vis.sh stop`. Note: please do not try to use GUI to enable perception but use script to stop it, vice versa. 
+- [ ] 4. Launch the perception module using the command `./scripts/perception_lowcost.sh start` or by enabling the perception button on the *Module Controller* page of the web GUI. The command for stopping perception is `./scripts/perception_lowcost.sh stop`. Note: please do not try to use GUI to enable perception but use script to stop it, vice versa. 
 
 - [ ] 5. Download the demo data from the Apollo [Open Data Platform](http://data.apollo.auto).
 
