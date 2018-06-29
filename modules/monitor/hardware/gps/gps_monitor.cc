@@ -59,7 +59,7 @@ void GpsMonitor::RunOnce(const double current_time) {
     return;
   }
   if (!gnss_status_adapter->GetLatestObserved().solution_completed()) {
-    status->set_status(HardwareStatus::ERR);
+    status->set_status(HardwareStatus::WARN);
     status->set_detailed_msg("GNSS solution uncompleted.");
     return;
   }
