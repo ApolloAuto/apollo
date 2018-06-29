@@ -351,6 +351,9 @@ Chassis LincolnController::chassis() {
     }
   }
 
+  if (chassis_detail.has_surround()) {
+    chassis_.mutable_surround()->CopyFrom(chassis_detail.surround());
+  }
   // give engage_advice based on error_code and canbus feedback
   if (chassis_error_mask_ || (chassis_.throttle_percentage() == 0.0) ||
       (chassis_.brake_percentage() == 0.0)) {
@@ -788,8 +791,8 @@ void LincolnController::SecurityDogThreadFunc() {
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
-      start =
-        common::time::AsInt64<common::time::micros>(common::time::Clock::Now());
+      start = common::time::AsInt64<common::time::micros>(
+          common::time::Clock::Now());
     } else {
       AERROR_EVERY(100)
           << "Too much time consumption in LincolnController looping process:"
