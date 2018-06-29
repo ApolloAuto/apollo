@@ -93,7 +93,7 @@ apollo::common::Status NaviPathDecider::Process(
   // y-axis.
   double init_local_path_y = path_points[0].y();
   double max_lateral_distance = config_.max_lateral_distance();
-  if (init_local_path_y > max_lateral_distance) {
+  if (std::fabs(init_local_path_y) > max_lateral_distance) {
     AERROR << "The reference line is too far from the car to plan.";
     return Status(apollo::common::ErrorCode::PLANNING_ERROR,
                   "NaviPathDecider reference is too far from the car");
@@ -275,10 +275,6 @@ double NaviPathDecider::SmoothInitY(const double actual_ref_init_y,
           cur_adc_shift =
               cur_adc_shift > -max_init_y ? cur_adc_shift : -max_init_y;
         }
-
-        if (std::fabs(target_path_init_y - cur_adc_shift) < min_init_y) {
-          cur_adc_shift = target_path_init_y;
-        }
       } else {
         // The direction of the last lateral shift is opposite to the
         // direction that needs to be shifted this time
@@ -288,6 +284,11 @@ double NaviPathDecider::SmoothInitY(const double actual_ref_init_y,
           cur_adc_shift = -min_init_y;
         }
       }
+    }
+
+    // if shift exceeded target
+    if (std::fabs(target_path_init_y) < std::fabs(cur_adc_shift)) {
+      cur_adc_shift = target_path_init_y;
     }
   }
 
