@@ -30,7 +30,7 @@
 namespace apollo {
 namespace planning {
 
-TEST(simple, DiscretizedTrajectory) {
+TEST(basic_test, DiscretizedTrajectory) {
   const std::string path_of_standard_trajectory =
       "modules/planning/testdata/trajectory_data/standard_trajectory.pb.txt";
   ADCTrajectory trajectory;
