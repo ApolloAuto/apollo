@@ -8,7 +8,7 @@
   <arg name="topic_packet" default="/apollo/sensor/lslidar/LslidarPacket"/>
   <arg name="topic_pointcloud" default="/apollo/sensor/lslidar/PointCloud2"/>
   <arg name="topic_compensated_pointcloud" default="/apollo/sensor/lslidar/compensator/PointCloud2"/>
-  
+
     <!-- nodelet manager -->
   <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager_name)" output="screen"
         args="manager" />
@@ -23,7 +23,7 @@
     <param name="device_port" value="$(arg firing_port)"/>
     <remap from="lslidar_packet" to="$(arg topic_packet)"/>
   </node>
-  
+
 
   <node pkg="nodelet" type="nodelet" name="lslidar_decoder_nodelet"
     args="load lslidar_decoder/LslidarDecoderNodelet
@@ -38,7 +38,7 @@
     <remap from="lslidar_packet" to="$(arg topic_packet)"/>
     <remap from="lslidar_point_cloud" to="$(arg topic_pointcloud)"/>
   </node>
-  
+
   <node pkg="nodelet" type="nodelet" name="lslidar_compensator_nodelet"
         args="load lslidar_compensator/CompensatorNodelet $(arg nodelet_manager_name)" output="screen">
     <param name="lslidar_point_cloud" value="$(arg topic_pointcloud)"/>

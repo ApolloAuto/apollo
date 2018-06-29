@@ -63,7 +63,7 @@ function check_machine_arch() {
   # the machine type, currently support x86_64, aarch64
   MACHINE_ARCH=$(uname -m)
 
-  # Generate WORKSPACE file based on marchine architecture
+  # Generate WORKSPACE file based on machine architecture
   if [ "$MACHINE_ARCH" == 'x86_64' ]; then
     sed "s/MACHINE_ARCH/x86_64/g" WORKSPACE.in > WORKSPACE
   elif [ "$MACHINE_ARCH" == 'aarch64' ]; then
@@ -456,7 +456,7 @@ function build_gnss() {
   if [ -d "${ROS_ROOT}" ]; then
     ROS_PATH="${ROS_ROOT}/../.."
   else
-    warning "ROS not found. Run apolllo.sh build first."
+    warning "ROS not found. Run apollo.sh build first."
     exit 1
   fi
 
@@ -504,7 +504,7 @@ function build_velodyne() {
   if [ -d "${ROS_ROOT}" ]; then
     ROS_PATH="${ROS_ROOT}/../.."
   else
-    warning "ROS not found. Run apolllo.sh build first."
+    warning "ROS not found. Run apollo.sh build first."
     exit 1
   fi
 
@@ -528,7 +528,7 @@ function build_lslidar() {
   if [ -d "${ROS_ROOT}" ]; then
     ROS_PATH="${ROS_ROOT}/../.."
   else
-    warning "ROS not found. Run apolllo.sh build first."
+    warning "ROS not found. Run apollo.sh build first."
     exit 1
   fi
 
@@ -551,7 +551,7 @@ function build_usbcam() {
   if [ -d "${ROS_ROOT}" ]; then
     ROS_PATH="${ROS_ROOT}/../.."
   else
-    warning "ROS not found. Run apolllo.sh build first."
+    warning "ROS not found. Run apollo.sh build first."
     exit 1
   fi
 
@@ -591,7 +591,7 @@ function print_usage() {
   ${BLUE}build_usbcam${NONE}: build usb camera driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
-  ${BLUE}build_no_perception [dbg|opt]${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
+  ${BLUE}build_no_perception [dbg|opt]${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisfied, e.g., CUDA, CUDNN, LIDAR, etc.
   ${BLUE}build_prof${NONE}: build for gprof support.
   ${BLUE}buildify${NONE}: fix style of BUILD files
   ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code

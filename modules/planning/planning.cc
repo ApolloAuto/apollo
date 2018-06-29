@@ -32,6 +32,7 @@
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
 #include "modules/planning/planner/em/em_planner.h"
 #include "modules/planning/planner/lattice/lattice_planner.h"
+#include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/tasks/traffic_decider/traffic_decider.h"
@@ -68,6 +69,8 @@ void Planning::RegisterPlanners() {
                             []() -> Planner* { return new EMPlanner(); });
   planner_factory_.Register(PlanningConfig::LATTICE,
                             []() -> Planner* { return new LatticePlanner(); });
+  planner_factory_.Register(PlanningConfig::NAVI,
+                            []() -> Planner* { return new NaviPlanner(); });
 }
 
 Status Planning::InitFrame(const uint32_t sequence_num,
@@ -309,38 +312,27 @@ void Planning::RunOnce() {
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
   if (FLAGS_use_navigation_mode) {
-    TrajectoryStitcher::TransformLastPublishedTrajectory(
-        planning_cycle_time, last_publishable_trajectory_.get());
+    // temp solution for navigation mode
+    if (IsVehicleStateValid(last_vehicle_state_)) {
+      auto theta_diff = (vehicle_state.angular_velocity() +
+          last_vehicle_state_.angular_velocity()) * 0.5 * planning_cycle_time;
+
+      auto s_diff = (vehicle_state.linear_velocity() +
+          last_vehicle_state_.linear_velocity()) * 0.5 * planning_cycle_time;
+      auto x_diff = s_diff * std::cos(theta_diff);
+      auto y_diff = s_diff * std::sin(theta_diff);
+
+      TrajectoryStitcher::TransformLastPublishedTrajectory(-x_diff, -y_diff,
+          -theta_diff, last_publishable_trajectory_.get());
+    }
   }
+  last_vehicle_state_ = vehicle_state;
 
   bool is_replan = false;
   std::vector<TrajectoryPoint> stitching_trajectory;
   stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
       vehicle_state, start_timestamp, planning_cycle_time,
       last_publishable_trajectory_.get(), &is_replan);
-
-  if (FLAGS_use_navigation_mode) {
-    std::list<ReferenceLine> reference_lines;
-    std::list<hdmap::RouteSegments> segments;
-    if (!reference_line_provider_->GetReferenceLines(&reference_lines,
-                                                     &segments) ||
-        reference_lines.empty()) {
-      std::string msg("Reference line is not ready");
-      AERROR << msg;
-      not_ready->set_reason(msg);
-      status.Save(not_ready_pb.mutable_header()->mutable_status());
-      PublishPlanningPb(&not_ready_pb, start_timestamp);
-      return;
-    }
-    const double init_point_v = stitching_trajectory.front().v();
-    const double init_point_a = stitching_trajectory.front().a();
-    stitching_trajectory = TrajectoryStitcher::CalculateInitPoint(
-        vehicle_state, reference_lines.front(), &is_replan);
-    if (!is_replan) {
-      stitching_trajectory.back().set_v(init_point_v);
-      stitching_trajectory.back().set_a(init_point_a);
-    }
-  }
 
   const uint32_t frame_num = AdapterManager::GetPlanning()->GetSeqNum() + 1;
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,

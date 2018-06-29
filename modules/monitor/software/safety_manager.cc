@@ -16,10 +16,11 @@
 
 #include "modules/monitor/software/safety_manager.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/common/util/map_util.h"
+#include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/monitor/common/monitor_manager.h"
 
@@ -29,12 +30,11 @@ DEFINE_double(safety_mode_seconds_before_estop, 10.0,
 namespace apollo {
 namespace monitor {
 
-using apollo::canbus::Chassis;
 using apollo::common::KVDB;
-using apollo::common::adapter::AdapterManager;
 using apollo::common::util::ContainsKey;
 using apollo::common::util::GetProtoFromFile;
 using apollo::common::util::FindOrNull;
+using apollo::common::util::StrCat;
 
 SafetyManager::SafetyManager() {
   CHECK(GetProtoFromFile(FLAGS_hmi_config_filename, &hmi_config_))
@@ -64,40 +64,28 @@ void SafetyManager::CheckSafety(const double current_time) {
 
   // Trigger EStop if no action was taken in time.
   if (system_status->safety_mode_trigger_time() +
-      FLAGS_safety_mode_seconds_before_estop > current_time) {
+      FLAGS_safety_mode_seconds_before_estop < current_time) {
     system_status->set_require_emergency_stop(true);
   }
 }
 
 bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
   // We only check safety mode in self driving mode.
-  auto* adapter = AdapterManager::GetChassis();
-  adapter->Observe();
-  if (adapter->Empty()) {
-    return false;
-  }
-
-  const auto& chassis = adapter->GetLatestObserved();
-  if (chassis.header().timestamp_sec() + FLAGS_system_status_lifetime_seconds <
-      current_time) {
-    // Ignore old messages which should be from replaying.
-    return false;
-  }
-
-  if (chassis.driving_mode() != Chassis::COMPLETE_AUTO_DRIVE) {
+  if (!MonitorManager::IsInAutonomousDriving()) {
     return false;
   }
 
   const std::string mode_name = KVDB::Get("apollo:dreamview:mode");
+  auto& log = MonitorManager::LogBuffer();
   if (mode_name.empty()) {
-    AERROR << "Cannot get apollo mode";
+    log.ERROR("Cannot get apollo mode");
     return true;
   }
 
   const apollo::dreamview::Mode *mode_conf =
       FindOrNull(hmi_config_.modes(), mode_name);
   if (mode_conf == nullptr) {
-    AERROR << "Cannot find configuration for apollo mode: " << mode_name;
+    log.ERROR(StrCat("Cannot find configuration for apollo mode: ", mode_name));
     return true;
   }
 
@@ -105,13 +93,13 @@ bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
   for (const auto &hardware : mode_conf->live_hardware()) {
     const auto *status = FindOrNull(hardware_status, hardware);
     if (status == nullptr) {
-      AERROR << "Cannot get status of hardware: " << hardware;
+      log.ERROR(StrCat("Cannot get status of hardware: ", hardware));
       return true;
     }
     if (status->summary() == Summary::ERROR ||
         status->summary() == Summary::FATAL) {
-      AERROR << "Hardware " << hardware << " triggers safety mode: "
-             << status->msg();
+      log.ERROR(StrCat(
+          "Hardware ", hardware, " triggers safety mode: ", status->msg()));
       return true;
     }
   }
@@ -120,13 +108,13 @@ bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
   for (const auto &module : mode_conf->live_modules()) {
     const auto *status = FindOrNull(modules_status, module);
     if (status == nullptr) {
-      AERROR << "Cannot get status of module: " << module;
+      log.ERROR(StrCat("Cannot get status of module: ", module));
       return true;
     }
     if (status->summary() == Summary::ERROR ||
         status->summary() == Summary::FATAL) {
-      AERROR << "Module " << module << " triggers safety mode: "
-             << status->msg();
+      log.ERROR(StrCat(
+          "Module ", module, " triggers safety mode: ", status->msg()));
       return true;
     }
   }

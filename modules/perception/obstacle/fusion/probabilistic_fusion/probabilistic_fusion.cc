@@ -60,6 +60,7 @@ bool ProbabilisticFusion::Init() {
   // track related parameters
   PbfTrack::SetMaxLidarInvisiblePeriod(config_.max_lidar_invisible_period());
   PbfTrack::SetMaxRadarInvisiblePeriod(config_.max_radar_invisible_period());
+  PbfTrack::SetMaxCameraInvisiblePeriod(config_.max_camera_invisible_period());
   PbfTrack::SetMaxRadarConfidentAngle(config_.max_radar_confident_angle());
   PbfTrack::SetMinRadarConfidentDistance(
       config_.min_radar_confident_distance());

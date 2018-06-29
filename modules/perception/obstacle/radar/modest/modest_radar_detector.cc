@@ -115,9 +115,9 @@ bool ModestRadarDetector::Detect(
   ADEBUG << "radar object size: " << objects->size();
 
   if (!RadarFrameSupplement::state_vars.initialized_) {
+    RadarFrameSupplement::state_vars.process_noise(0, 0) *= 10;
     RadarFrameSupplement::state_vars.process_noise(1, 1) *= 10;
     RadarFrameSupplement::state_vars.process_noise(2, 2) *= 10;
-    RadarFrameSupplement::state_vars.process_noise(3, 3) *= 10;
     RadarFrameSupplement::state_vars.process_noise(3, 3) *= 10;
 
     RadarFrameSupplement::state_vars.trans_matrix.block(0, 0, 1, 4) << 1.0f,

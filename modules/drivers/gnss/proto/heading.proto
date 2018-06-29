@@ -2,11 +2,11 @@ syntax = "proto2";
 
 package apollo.drivers.gnss;
 
-import "modules/common/proto/header.proto";  
+import "modules/common/proto/header.proto";
 
 message Heading {
     optional apollo.common.Header header = 1;
-    optional double measurement_time = 2;    
+    optional double measurement_time = 2;
 
     optional uint32 solution_status = 3;
     optional uint32 position_type = 4;
@@ -14,7 +14,7 @@ message Heading {
     optional float baseline_length = 5;
     optional float heading = 6;
     optional float pitch = 7;
- 
+
     optional float reserved = 8;
     optional float heading_std_dev = 9;
     optional float pitch_std_dev = 10;
@@ -30,4 +30,4 @@ message Heading {
     optional uint32 extended_solution_status = 17;
     optional uint32 galileo_beidou_sig_mask = 18;
     optional uint32 gps_glonass_sig_mask = 19;
-} 
+}

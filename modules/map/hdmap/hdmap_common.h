@@ -37,6 +37,7 @@ limitations under the License.
 #include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
+#include "modules/map/proto/map_parking_space.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -81,6 +82,7 @@ class OverlapInfo;
 class ClearAreaInfo;
 class SpeedBumpInfo;
 class RoadInfo;
+class ParkingSpaceInfo;
 
 class HDMapImpl;
 
@@ -98,6 +100,7 @@ using YieldSignInfoConstPtr = std::shared_ptr<const YieldSignInfo>;
 using ClearAreaInfoConstPtr = std::shared_ptr<const ClearAreaInfo>;
 using SpeedBumpInfoConstPtr = std::shared_ptr<const SpeedBumpInfo>;
 using RoadInfoConstPtr = std::shared_ptr<const RoadInfo>;
+using ParkingSpaceInfoConstPtr = std::shared_ptr<const ParkingSpaceInfo>;
 using RoadROIBoundaryPtr = std::shared_ptr<RoadROIBoundary>;
 
 class LaneInfo {
@@ -420,6 +423,25 @@ class RoadInfo {
   std::vector<RoadSection> sections_;
   std::vector<RoadBoundary> road_boundaries_;
 };
+
+class ParkingSpaceInfo {
+ public:
+  explicit ParkingSpaceInfo(const ParkingSpace &parkingspace);
+  const Id &id() const { return parking_space_.id(); }
+  const ParkingSpace &parking_space() const { return parking_space_; }
+  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
+
+ private:
+  void Init();
+
+ private:
+  const ParkingSpace &parking_space_;
+  apollo::common::math::Polygon2d polygon_;
+};
+using ParkingSpacePolygonBox =
+    ObjectWithAABox<ParkingSpaceInfo, apollo::common::math::Polygon2d>;
+using ParkingSpacePolygonKDTree =
+    apollo::common::math::AABoxKDTree2d<ParkingSpacePolygonBox>;
 
 struct JunctionBoundary {
   JunctionInfoConstPtr junction_info;
