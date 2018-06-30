@@ -32,7 +32,7 @@ Compensator::Compensator(ros::NodeHandle node, ros::NodeHandle private_nh)
                    std::string("lslidar"));
   private_nh.param("world_frame_id", world_frame_id_,
                    std::string("world"));
-                   
+
   private_nh.param("topic_compensated_pointcloud",
                    topic_compensated_pointcloud_, std::string("/apollo/sensor/lslidar/compensator/PointCloud2"));
   private_nh.param("lslidar_point_cloud", topic_pointcloud_, std::string("/apollo/sensor/lslidar/PointCloud2"));
@@ -64,7 +64,7 @@ void Compensator::pointcloud_callback(
   // compensate point cloud, remove nan point
   if (query_pose_affine_from_tf2(timestamp_min, pose_min_time) &&
       query_pose_affine_from_tf2(timestamp_max, pose_max_time)) {
-    // we change message after motion compesation
+    // we change message after motion compensation
     sensor_msgs::PointCloud2::Ptr q_msg(new sensor_msgs::PointCloud2());
     *q_msg = *msg;
     motion_compensation<float>(q_msg, timestamp_min, timestamp_max,
@@ -108,7 +108,7 @@ inline bool Compensator::check_message(
   int y_data_type = 0;
   int z_data_type = 0;
 
-  // TODO: will use a new datastruct with interface to get offset,
+  // TODO: will use a new data structure with interface to get offset,
   // datatype,datasize...
   for (size_t i = 0; i < msg->fields.size(); ++i) {
     const sensor_msgs::PointField& f = msg->fields[i];
@@ -304,5 +304,5 @@ void Compensator::motion_compensation(sensor_msgs::PointCloud2::Ptr& msg,
 }
 
 }  // namespace lslidar
-}
-}
+}  // namespace drivers
+}  // namespace apollo

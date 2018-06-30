@@ -2,23 +2,23 @@
 
 ## 1. Preparation
  - Download source code of Apollo from [GitHub](https://github.com/ApolloAuto/apollo)
- - Follow the [tutorial](https://github.com/ApolloAuto/apollo/blob/master/README.md) to set up docker environment and build Apollo.
- - Download localization data from [Apollo Data Open Platform](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en).（US only）
+ - Follow the tutorial to set up [docker environment](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md) and [build Apollo](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_launch_Apollo.md).
+ - Download localization data from [Apollo Data Open Platform](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)（US only.
 
-## 2. Configure Parameters
-Assume that the path to download localization data is DATA_PATH.
-### 2.1 Configure Sensor Extrinsics
+## 2. Configuring Parameters
+Assume that the path to download localization data from is DATA_PATH.
+### 2.1. Configure Sensor Extrinsics
 ```
 cp DATA_PATH/params/ant_imu_leverarm.yaml /apollo/modules/localization/msf/params/gnss_params/
 cp DATA_PATH/params/velodyne64_novatel_extrinsics_example.yaml /apollo/modules/localization/msf/params/velodyne_params/
 cp DATA_PATH/params/velodyne64_height.yaml /apollo/modules/localization/msf/params/velodyne_params/
 ```
 The meaning of each file
- - ant_imu_leverarm.yaml:  Lever arm value
- - velodyne64_novatel_extrinsics_example.yaml: Transform from Imu coord to Lidar coord
- - velodyne64_height.yaml: Height of the Lidar relative to the ground
+ - **ant_imu_leverarm.yaml**:  Lever arm value
+ - **velodyne64_novatel_extrinsics_example.yaml**: Transform from IMU coord to LiDAR coord
+ - **velodyne64_height.yaml**: Height of the LiDAR relative to the ground
 
-### 2.2 Configure Map Path
+### 2.2. Configure Map Path
 Add config of map path in /apollo/modules/localization/conf/localization.conf
 ```
 # Redefine the map_dir in global_flagfile.txt
@@ -48,7 +48,7 @@ In /apollo/data/log directory, you can see the localization log files.
 cd DATA_PATH/bag
 rosbag play *.bag
 ```
-The localization module will finish initialization and start publish localization result after around 30 seconds.
+The localization module will finish initialization and start publishing localization results after around 30 seconds.
 
 ## 5. Record and Visualize localization result (optional)
 ### Record localization result
@@ -59,7 +59,7 @@ The localization module will finish initialization and start publish localizatio
 ```
 ./scripts/localization_online_visualizer.sh
 ```
-First, the visualization tool will generate a series of cache files from localization map, which will be stored in the apollo/data/map_visual directory.
+First, the visualization tool will generate a series of cache files from the localization map, which will be stored in the apollo/data/map_visual directory.
 
 Then it will receive the topics blew and draw them on screen.
  - /apollo/sensor/velodyne64/compensator/PointCloud2
@@ -99,16 +99,16 @@ And we can get the statistical results like this
 The first table is the statistical data of Fusion localization. The second table is the statistical result of Lidar localization. The third table is the statistical result of GNSS localization.
 
 The meaning of each row in the table
- - error：  the plane error, unit is meter
- - error lon：  the error in the car's heading direction, unit is meter
- - error lat：  the error in the car's lateral direction, unit is meter
- - error roll： the roll angle error, unit is degree
- - error pit：  the pitch angle error, unit is degree
- - error yaw：  the yaw angle error, unit is degree
+ - **error**：  the plane error, unit is meter
+ - **error lon**：  the error in the car's heading direction, unit is meter
+ - **error lat**：  the error in the car's lateral direction, unit is meter
+ - **error roll**： the roll angle error, unit is degree
+ - **error pit**：  the pitch angle error, unit is degree
+ - **error yaw**：  the yaw angle error, unit is degree
 
 The meaning of each col in the table
- - mean： evaluation value of the error
- - std：  the standard deviation of the error
- - max：  the maximum value of the error
- - < xx：  percentage of frames whose error is smaller than the indicated range
- - con_frame()： the maximum number of consecutive frames that satisfy the conditions in parentheses
+ - **mean**： evaluation value of the error
+ - **std**：  the standard deviation of the error
+ - **max**：  the maximum value of the error
+ - **< xx**：  percentage of frames whose error is smaller than the indicated range
+ - **con_frame()**： the maximum number of consecutive frames that satisfy the conditions in parentheses

@@ -12,7 +12,6 @@ cc_library(
         ":geometry",
         ":integral",
         ":kalman_filter",
-        ":kalman_filter_1d",
         ":linear_interpolation",
         ":lqr",
         ":mpc",
@@ -134,16 +133,14 @@ cc_library(
 )
 
 cc_library(
-    name = "kalman_filter_1d",
-    srcs = ["kalman_filter_1d.cc"],
+    name = "extended_kalman_filter",
     hdrs = [
-        "kalman_filter_1d.h",
-        "kalman_filter.h",
+        "extended_kalman_filter.h",
     ],
     deps = [
-        ":kalman_filter",
+        "//modules/common:log",
+        "//modules/common/math:matrix_operations",
         "@eigen",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -460,18 +457,6 @@ cc_test(
     ],
     deps = [
         ":kalman_filter",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "kalman_filter_1d_test",
-    size = "small",
-    srcs = [
-        "kalman_filter_1d_test.cc",
-    ],
-    deps = [
-        ":kalman_filter_1d",
         "@gtest//:main",
     ],
 )

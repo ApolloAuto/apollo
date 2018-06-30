@@ -80,7 +80,7 @@ void Parse(const char* filename, const char* file_type) {
   } else if (type == "bin") {
     ParseBin(filename, parser);
   } else {
-    std::cout << "unkown file type";
+    std::cout << "unknown file type";
   }
   delete parser;
 }

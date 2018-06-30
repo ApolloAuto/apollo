@@ -85,7 +85,7 @@ class Compensator {
   std::string child_frame_id_;
   float tf_timeout_;
 
-  // varibes for point fields value, we get point x,y,z by these offset
+  // variables for point fields value, we get point x,y,z by these offset
   int x_offset_;
   int y_offset_;
   int z_offset_;

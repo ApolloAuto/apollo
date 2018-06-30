@@ -66,12 +66,12 @@ void LagPrediction::GetLaggedPrediction(PredictionObstacles* obstacles) const {
   std::unordered_set<int> protected_obstacles;
   for (const auto& obstacle : latest_prediction->prediction_obstacle()) {
     const auto& perception = obstacle.perception_obstacle();
-    double distance =
-        common::util::DistanceXY(perception.position(), adc_position);
     if (perception.confidence() < FLAGS_perception_confidence_threshold &&
         perception.type() != PerceptionObstacle::VEHICLE) {
       continue;
     }
+    double distance =
+        common::util::DistanceXY(perception.position(), adc_position);
     if (distance < FLAGS_lag_prediction_protection_distance) {
       protected_obstacles.insert(obstacle.perception_obstacle().id());
       // add protected obstacle

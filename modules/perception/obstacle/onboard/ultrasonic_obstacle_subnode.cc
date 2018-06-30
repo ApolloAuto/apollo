@@ -18,7 +18,9 @@
 
 #include <cmath>
 #include <utility>
+#include <unordered_map>
 
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/log.h"
 #include "modules/common/math/quaternion.h"
@@ -29,7 +31,35 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::adapter::AdapterManager;
 using apollo::common::VehicleStateProvider;
+
+bool UltrasonicObstacleSubnode::InitInternal() {
+  if (!InitAlgorithmPlugin()) {
+        AERROR << "Failed to init algorithm plugin.";
+        return false;
+    }
+  // parse reserve fileds
+  std::unordered_map<std::string, std::string> reserve_field_map;
+  if (!SubnodeHelper::ParseReserveField(reserve_, &reserve_field_map)) {
+    AERROR << "Failed to parse reserve filed: " << reserve_;
+    return false;
+  }
+
+  if (reserve_field_map.find("device_id") == reserve_field_map.end()) {
+    AERROR << "Failed to find field device_id, reserve: " << reserve_;
+    return false;
+  }
+  device_id_ = reserve_field_map["device_id"];
+
+  CHECK(AdapterManager::GetChassis()) << "Failed to get Ultrasonic adapter";
+  AdapterManager::AddChassisCallback(
+      &UltrasonicObstacleSubnode::OnUltrasonic, this);
+
+  ADEBUG << "Succeed to finish ultrasonic detector initialization!";
+
+  return true;
+}
 
 void UltrasonicObstacleSubnode::OnUltrasonic(
     const apollo::canbus::Chassis& message) {
@@ -53,6 +83,23 @@ void UltrasonicObstacleSubnode::OnUltrasonic(
   PERF_BLOCK_END("ultrasonic_detect");
 }
 
+bool UltrasonicObstacleSubnode::InitAlgorithmPlugin() {
+    /// init share data
+    CHECK(shared_data_manager_ != nullptr);
+    // init preprocess_data
+    const std::string processing_data_name("UltrasonicObjectData");
+    processing_data_ = dynamic_cast<UltrasonicObjectData*>(
+        shared_data_manager_->GetSharedData(processing_data_name));
+    if (processing_data_ == nullptr) {
+      AERROR << "Failed to get shared data instance "
+             << processing_data_name;
+      return false;
+    }
+    ADEBUG << "Init shared data successfully, data: "
+           << processing_data_->name();
+    return true;
+}
+
 bool UltrasonicObstacleSubnode::PublishDataAndEvent(
     const double timestamp, const SharedDataPtr<SensorObjects>& data) {
   std::string key;
@@ -61,6 +108,8 @@ bool UltrasonicObstacleSubnode::PublishDataAndEvent(
            << GLOG_TIMESTAMP(timestamp) << ", device_id: " << device_id_;
     return false;
   }
+
+  processing_data_->Add(key, data);
 
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
     const EventMeta& event_meta = pub_meta_events_[idx];

@@ -5,7 +5,7 @@ Author: Yutong
 
 ### Ver2.1 Yutong
  - Remove unused code and format code
- - Remove `C16` in namespace, file name, folder name in order to make this driver to adapte other futher lslidar models. This is not completed, put it in the TODO list
+ - Remove `C16` in namespace, file name, folder name in order to make this driver to adapt to other further lslidar models. This is not completed, put it in the TODO list
 
 ### Ver2.0 Yutong
  - Add GPS timestamp to PointCloud2 message
@@ -27,7 +27,7 @@ Example: There is an example script to show you how to obtain each channel data,
 Using rostopic to select the channel you wish to output
 topic name: layer_num
 topic type: std_msgs/Int8
-details: send layer number to topic layer_num 
+details: send layer number to topic layer_num
 Usage: rostopic pub /layer_num std_msgs/Int8 "data: 5"  --> output channel 5 data to topic /scan, message type is sensor_msgs/LaserScan . data number can only from 0 to 15
 
 ## Description
@@ -35,11 +35,11 @@ The `lslidar_c16` package is a linux ROS driver for lslidar c16.
 The package is tested on Ubuntu 14.04 with ROS indigo.
 
 ## Compling
-This is a Catkin package. Make sure the package is on `ROS_PACKAGE_PATH` after cloning the package to your workspace. And the normal procedure for compling a catkin package will work.
+This is a Catkin package. Make sure the package is on `ROS_PACKAGE_PATH` after cloning the package to your workspace. And the normal procedure for compiling a catkin package will work.
 
 ```
 cd your_work_space
-catkin_make 
+catkin_make
 ```
 
 ## Example Usage
@@ -74,7 +74,7 @@ Points outside this range will be removed.
 
 `frequency` (`frequency`, `10.0`)
 
-Note that the driver does not change the frequency of the sensor. 
+Note that the driver does not change the frequency of the sensor.
 
 `publish_point_cloud` (`bool`, `true`)
 

@@ -99,6 +99,9 @@ message Chassis {
   optional WheelSpeed wheel_speed = 30;
 
   optional Surround surround = 31;
+
+  // Vehicle registration information
+  optional License license = 32;  
 }
 
 message ChassisGPS {
@@ -185,4 +188,8 @@ message Surround {
   optional bool sonar_fault = 22;
   repeated double sonar_range = 23;
   repeated Sonar sonar = 24;
+}
+
+message License {
+  optional string vin = 1;
 }

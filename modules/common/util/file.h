@@ -21,6 +21,7 @@
 #ifndef MODULES_COMMON_UTIL_FILE_H_
 #define MODULES_COMMON_UTIL_FILE_H_
 
+#include <dirent.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/stat.h>
@@ -247,11 +248,13 @@ bool EnsureDirectory(const std::string &directory_path);
 bool RemoveAllFiles(const std::string &directory_path);
 
 /**
- * @brief List sub-directories.
+ * @brief List sub-paths.
  * @param directory_path Directory path.
- * @return A vector of sub-directories, without the directory_path prefix.
+ * @param d_type Sub-path type, DT_DIR for directory, or DT_REG for file.
+ * @return A vector of sub-paths, without the directory_path prefix.
  */
-std::vector<std::string> ListSubDirectories(const std::string &directory_path);
+std::vector<std::string> ListSubPaths(const std::string &directory_path,
+                                      const unsigned char d_type = DT_DIR);
 
 std::string GetFileName(const std::string &path);
 

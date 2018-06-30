@@ -45,6 +45,7 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::canbus::Chassis;
+using apollo::common::DriveEvent;
 using apollo::common::PathPoint;
 using apollo::common::Point3D;
 using apollo::common::PointENU;
@@ -960,6 +961,12 @@ void SimulationWorldService::UpdateSimulationWorld(
   }
 }
 
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const DriveEvent &drive_event) {
+  PublishMonitorMessage(MonitorMessageItem::WARN, drive_event.event());
+}
+
 Json SimulationWorldService::GetRoutePathAsJson() const {
   Json response;
   response["routingTime"] = world_.routing_time();
@@ -994,6 +1001,8 @@ void SimulationWorldService::ReadRoutingFromFile(
 }
 
 void SimulationWorldService::RegisterMessageCallbacks() {
+  AdapterManager::AddDriveEventCallback(
+      &SimulationWorldService::UpdateSimulationWorld, this);
   AdapterManager::AddMonitorCallback(
       &SimulationWorldService::UpdateSimulationWorld, this);
   AdapterManager::AddRoutingResponseCallback(

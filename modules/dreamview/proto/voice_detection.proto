@@ -2,12 +2,7 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
-enum HMIAction {
-  NONE = 0;
-  SETUP = 1;
-  AUTO_MODE = 2;
-  DISENGAGE = 3;
-}
+import "modules/dreamview/proto/hmi_config.proto";
 
 message VoiceDetectionConf {
   optional string snowboy_resource = 1
