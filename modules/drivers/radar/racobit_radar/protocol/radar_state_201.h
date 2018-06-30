@@ -28,7 +28,8 @@ using apollo::drivers::RacobitRadar;
 using ::apollo::drivers::racobit_radar::OutputType;
 using ::apollo::drivers::racobit_radar::RcsThreshold;
 
-class RadarState201 : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
+class RadarState201 : public apollo::drivers::canbus::\
+ProtocolData<RacobitRadar> {
  public:
   static const uint32_t ID;
   RadarState201();

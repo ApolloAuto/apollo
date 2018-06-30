@@ -56,7 +56,8 @@ void RacobitRadarMessageManager::set_can_client(
   can_client_ = can_client;
 }
 
-ProtocolData<RacobitRadar> *RacobitRadarMessageManager::GetMutableProtocolDataById(
+ProtocolData<RacobitRadar> *RacobitRadarMessageManager\
+::GetMutableProtocolDataById(
     const uint32_t message_id) {
   uint32_t converted_message_id = message_id;
   if (protocol_data_map_.find(converted_message_id) ==
@@ -94,7 +95,8 @@ void RacobitRadarMessageManager::Parse(const uint32_t message_id,
     }
     sensor_data_.Clear();
     // fill header when recieve the general info message
-    AdapterManager::FillRacobitRadarHeader(FLAGS_sensor_node_name, &sensor_data_);
+    AdapterManager::\
+    FillRacobitRadarHeader(FLAGS_sensor_node_name, &sensor_data_);
   }
 
   sensor_protocol_data->Parse(data, length, &sensor_data_);
