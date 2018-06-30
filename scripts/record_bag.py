@@ -50,6 +50,7 @@ SMALL_TOPICS = [
     '/apollo/control',
     '/apollo/control/pad',
     '/apollo/drive_event',
+    '/apollo/guardian',
     '/apollo/localization/pose',
     '/apollo/localization/msf_gnss',
     '/apollo/localization/msf_lidar',
@@ -81,6 +82,14 @@ SMALL_TOPICS = [
     '/tf',
     '/tf_static',
 ]
+
+LARGE_TOPICS = [
+    '/apollo/sensor/camera/traffic/image_short',
+    '/apollo/sensor/camera/traffic/image_long',
+    '/apollo/sensor/velodyne64/compensator/PointCloud2',
+    '/apollo/sensor/velodyne16/compensator/PointCloud2',
+]
+
 
 MIN_DISK_SIZE = 2**35  # 32GB
 
@@ -183,7 +192,10 @@ class Recorder(object):
             print('Insufficient disk space, stop recording: {} with {}'.format(
                 disk_to_use, available_size))
             return
-        self.record_task(disk_to_use, 'all' if record_all else SMALL_TOPICS)
+        if record_all:
+            self.record_task(disk_to_use, SMALL_TOPICS + LARGE_TOPICS)
+        else:
+            self.record_task(disk_to_use, SMALL_TOPICS)
 
     def stop(self):
         """Stop recording."""
@@ -191,14 +203,14 @@ class Recorder(object):
         shell_cmd('kill -INT $(pgrep -f "{}" | grep -v pgrep)'.format(
             Recorder.kEventCollector))
 
-    def record_task(self, disk, topics='all'):
+    def record_task(self, disk, topics):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
         task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         task_dir = os.path.join(disk, 'data/bag', task_id)
         print('Recording bag to {}'.format(task_dir))
 
         log_file = '/apollo/data/log/apollo_record.out'
-        topics_str = '-a' if topics == 'all' else ' '.join(topics)
+        topics_str = ' '.join(topics)
 
         os.makedirs(task_dir)
         cmd = '''

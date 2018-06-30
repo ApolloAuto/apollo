@@ -37,10 +37,14 @@ class CubicPolynomialCurve1d : public PolynomialCurve1d {
   CubicPolynomialCurve1d(const std::array<double, 3>& start, const double end,
                          const double param);
 
+  /**
+   * x0 is the value when f(x = 0);
+   * dx0 is the value when f'(x = 0);
+   * ddx0 is the value when f''(x = 0);
+   * f(x = param) = x1
+   */
   CubicPolynomialCurve1d(const double x0, const double dx0, const double ddx0,
                          const double x1, const double param);
-
-  CubicPolynomialCurve1d(const CubicPolynomialCurve1d& other);
 
   double Evaluate(const std::uint32_t order, const double p) const override;
 
