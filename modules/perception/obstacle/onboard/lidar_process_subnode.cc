@@ -332,10 +332,10 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
         << object_builder_->name();
 
   /// init pre object filter
-  object_filter_.reset(
-      BaseObjectFilterRegisterer::GetInstanceByName("LowObjectFilter"));
+  object_filter_.reset(BaseObjectFilterRegisterer::GetInstanceByName(
+      FLAGS_onboard_object_filter));
   if (!object_filter_) {
-    AERROR << "Failed to get instance: ExtHdmapObjectFilter";
+    AERROR << "Failed to get instance: " << FLAGS_onboard_object_filter;
     return false;
   }
   if (!object_filter_->Init()) {
