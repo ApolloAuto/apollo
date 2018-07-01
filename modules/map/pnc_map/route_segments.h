@@ -150,6 +150,9 @@ class RouteSegments : public std::vector<LaneSegment> {
   bool IsOnSegment() const;
   void SetIsOnSegment(bool on_segment);
 
+  bool IsNeighborSegment() const;
+  void SetIsNeighborSegment(bool is_neighbor);
+
   void SetId(const std::string &id);
   const std::string &Id() const;
 
@@ -209,6 +212,12 @@ class RouteSegments : public std::vector<LaneSegment> {
    * Indicates whether the vehicle is on current RouteSegment.
    **/
   bool is_on_segment_ = false;
+
+  /**
+   * Indicates whether current routeSegment is the neighbor of vehicle
+   * routeSegment.
+   **/
+  bool is_neighbor_ = false;
 
   routing::ChangeLaneType next_action_ = routing::FORWARD;
 

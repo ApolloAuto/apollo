@@ -25,12 +25,12 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::perception::TrafficLight;
@@ -77,10 +77,12 @@ bool Rerouting::ChangeLaneFailRerouting() {
   double adc_s = reference_line_info_->AdcSlBoundary().end_s();
   const auto* vehicle_state = common::VehicleStateProvider::instance();
   double speed = vehicle_state->linear_velocity();
-  const double prepare_distance = speed * FLAGS_prepare_rerouting_time;
+  const double prepare_rerouting_time =
+      config_.rerouting().prepare_rerouting_time();
+  const double prepare_distance = speed * prepare_rerouting_time;
   if (sl_point.s() > adc_s + prepare_distance) {
     ADEBUG << "No need rerouting now because still can drive for time: "
-           << FLAGS_prepare_rerouting_time << " seconds";
+           << prepare_rerouting_time << " seconds";
     return true;
   }
   // 6. Check if we have done rerouting before
@@ -106,15 +108,15 @@ bool Rerouting::ChangeLaneFailRerouting() {
   return true;
 }
 
-bool Rerouting::ApplyRule(Frame* const frame,
-                          ReferenceLineInfo* const reference_line_info) {
+Status Rerouting::ApplyRule(Frame* const frame,
+                            ReferenceLineInfo* const reference_line_info) {
   frame_ = frame;
   reference_line_info_ = reference_line_info;
   if (!ChangeLaneFailRerouting()) {
-    AERROR << "In un-successful lane change case, rerouting failed";
-    return false;
+    return Status(common::PLANNING_ERROR,
+                  "In un-successful lane change case, rerouting failed");
   }
-  return true;
+  return Status::OK();
 }
 
 }  // namespace planning

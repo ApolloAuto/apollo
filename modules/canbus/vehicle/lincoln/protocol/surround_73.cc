@@ -65,6 +65,13 @@ void Surround73::Parse(const std::uint8_t *bytes, int32_t length,
   chassis_detail->mutable_surround()->set_sonar09(sonar09(bytes, length));
   chassis_detail->mutable_surround()->set_sonar10(sonar10(bytes, length));
   chassis_detail->mutable_surround()->set_sonar11(sonar11(bytes, length));
+
+  // alternative representations.
+  const int8_t kSonarNumbers = 12;
+  for (std::int8_t i = 0; i < kSonarNumbers; ++i) {
+    chassis_detail->mutable_surround()->add_sonar_range(
+        sonars(bytes, i, length / 2));
+  }
 }
 
 bool Surround73::is_cross_traffic_alert_left(const std::uint8_t *bytes,
@@ -203,6 +210,14 @@ double Surround73::sonar_range(const std::int32_t x) const {
     return 100.0;  // If nothing detected, set test range to 100.0m.
   }
   return 0.145 * (x - 0x1) + 0.3;
+}
+
+double Surround73::sonars(const std::uint8_t *bytes, std::uint8_t sonar_number,
+                          int32_t length) const {
+  Byte frame(bytes + sonar_number / 2 + 1);
+  int32_t start = (sonar_number % 2) * length;
+  int32_t x = frame.get_byte(start, start + length);
+  return sonar_range(x);
 }
 
 }  // namespace lincoln

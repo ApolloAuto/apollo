@@ -37,10 +37,10 @@ void PlanningThreadPool::Init() {
 }
 
 void PlanningThreadPool::Synchronize() {
-  for (auto& f : func_) {
-    f.wait();
+  for (auto& future : futures_) {
+    future.wait();
   }
-  func_.clear();
+  futures_.clear();
 }
 
 }  // namespace planning

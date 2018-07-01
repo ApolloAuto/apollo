@@ -17,4 +17,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "adc_trajectory_container_test",
+    size = "small",
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    srcs = ["adc_trajectory_container_test.cc"],
+    deps = [
+        ":adc_trajectory_container",
+        "//modules/prediction/common:kml_map_based_test",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

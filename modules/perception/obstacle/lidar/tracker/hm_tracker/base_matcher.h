@@ -30,10 +30,6 @@
 namespace apollo {
 namespace perception {
 
-enum MatcherType {
-  HUNGARIAN_MATCHER = 0,
-};
-
 class BaseMatcher {
  public:
   BaseMatcher() {}

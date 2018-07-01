@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.perception.low_object_filter_config;
+
+message ModelConfigs {
+  optional string name = 1 [ default = "LowObjectFilter" ];
+  optional string version = 2 [ default = "1.0.0" ];
+  optional double object_height_threshold = 3 [ default = 0.10 ];
+  optional double object_position_height_threshold = 4 [ default = -1.6 ];
+}

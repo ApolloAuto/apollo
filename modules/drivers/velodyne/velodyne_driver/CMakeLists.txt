@@ -40,7 +40,7 @@ if (CATKIN_ENABLE_TESTING)
   # these dependencies are only needed for unit testing
   find_package(roslaunch REQUIRED)
   find_package(rostest REQUIRED)
-    
+
   # parse check all the launch/*.launch files
   roslaunch_add_file_check(launch)
 

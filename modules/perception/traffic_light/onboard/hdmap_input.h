@@ -35,8 +35,6 @@ namespace traffic_light {
  */
 class HDMapInput {
  public:
-  bool Init();
-
   /**
    * @brief: get roi polygon
    *         all points are in the world frame
@@ -45,11 +43,8 @@ class HDMapInput {
                   std::vector<apollo::hdmap::Signal> *signals);
 
  private:
-  std::mutex mutex_;  // multi-thread init safe.
   DECLARE_SINGLETON(HDMapInput);
 };
-
-typedef typename std::shared_ptr<HDMapInput> HDMapInputPtr;
 
 }  // namespace traffic_light
 }  // namespace perception

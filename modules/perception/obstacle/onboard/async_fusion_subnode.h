@@ -27,7 +27,6 @@
 #include "modules/common/time/time_util.h"
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
 #include "modules/perception/obstacle/fusion/async_fusion/async_fusion.h"
@@ -71,7 +70,7 @@ class AsyncFusionSubnode : public Subnode {
 
   void OnChassis(const apollo::canbus::Chassis &message);
 
-  void PublishDataAndEvent(const double &timestamp,
+  void PublishDataAndEvent(const double timestamp,
                            const std::string &device_id,
                            const SharedDataPtr<FusionItem> &data);
 

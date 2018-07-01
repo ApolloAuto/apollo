@@ -30,7 +30,7 @@ using pcl_util::PointD;
 using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
 
-static void extract_pointcloud_indices(const PointCloudPtr &cloud,
+static void extract_pointcloud_indices(PointCloudPtr cloud,
                                        PointIndices *out_indices) {
   const size_t vec_size = cloud->size();
   auto &indices = out_indices->indices;
@@ -39,7 +39,7 @@ static void extract_pointcloud_indices(const PointCloudPtr &cloud,
   std::iota(indices.begin(), indices.end(), 0);
 }
 
-bool DummyROIFilter::Filter(const pcl_util::PointCloudPtr &cloud,
+bool DummyROIFilter::Filter(pcl_util::PointCloudPtr cloud,
                             const ROIFilterOptions &roi_filter_options,
                             pcl_util::PointIndices *roi_indices) {
   extract_pointcloud_indices(cloud, roi_indices);
@@ -53,7 +53,7 @@ bool DummyGroundDetector::Detect(const GroundDetectorOptions &options,
   return result_detect_;
 }
 
-bool DummySegmentation::Segment(const PointCloudPtr &cloud,
+bool DummySegmentation::Segment(PointCloudPtr cloud,
                                 const PointIndices &non_ground_indices,
                                 const SegmentationOptions &options,
                                 std::vector<std::shared_ptr<Object>> *objects) {

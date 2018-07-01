@@ -35,7 +35,7 @@ class HungarianMatcher : public BaseMatcher {
   // @brief set match distance maximum for matcher
   // @params[IN] match_distance_maximum: match distance maximum
   // @return true if set successfuly, otherwise return false
-  static bool SetMatchDistanceMaximum(const float& match_distance_maximum);
+  static bool SetMatchDistanceMaximum(const float match_distance_maximum);
 
   // @brief match detected objects to tracks
   // @params[IN] objects: new detected objects for matching
@@ -89,7 +89,7 @@ class HungarianMatcher : public BaseMatcher {
   // @params[OUT] obj_components: connected tracks of given objects
   // @return nothing
   void ComputeConnectedComponents(
-      const Eigen::MatrixXf& association_mat, const float& connected_threshold,
+      const Eigen::MatrixXf& association_mat, const float connected_threshold,
       std::vector<std::vector<int>>* track_components,
       std::vector<std::vector<int>>* obj_components);
 
@@ -101,7 +101,7 @@ class HungarianMatcher : public BaseMatcher {
   // @params[OUT] unassigned_objects: objects without matched track
   // @return nothing
   void AssignObjectsToTracks(const Eigen::MatrixXf& association_mat,
-                             const double& assign_distance_maximum,
+                             const double assign_distance_maximum,
                              std::vector<std::pair<int, int>>* assignments,
                              std::vector<int>* unassigned_tracks,
                              std::vector<int>* unassigned_objects);

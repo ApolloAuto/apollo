@@ -76,7 +76,7 @@ void ContiRadarIDExpansion::SetNeedRestart(const bool need_restart) {
   need_restart_ = need_restart;
 }
 
-void ContiRadarIDExpansion::UpdateTimestamp(const double &timestamp) {
+void ContiRadarIDExpansion::UpdateTimestamp(const double timestamp) {
   need_restart_ = false;
   if (timestamp - timestamp_ > 0.1) {
     need_restart_ = true;

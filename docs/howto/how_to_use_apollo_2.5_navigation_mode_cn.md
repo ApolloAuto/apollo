@@ -17,7 +17,7 @@
 
 ## 一、Apollo 2.5版的构建
 
-首先从[GitHub网站](https://github.com/ApolloAuto/apollo)下载`Apollo2.5`版源代码，可以使用`git`命令下载，也可以直接通过网页下载压缩包。源代码下载完成并放置到合适的目录后，可以使用两种方法构建：1.在`Visual Studio Code`中构建（推荐）；2.使用命令行构建。当然，两种方法都有一个前提，就是在你的机器上已经顺利安装了`Docker`。`Apollo`之前版本提供了一个`install_docker.sh`脚本文件，因为很多开发者反映可能出错，`Apollo`项目组已将该文件移除。现在要安装`Docker`就只能参考[Docker官方网站](https://www.docker.com/)的帮助文档了。
+首先从[GitHub网站](https://github.com/ApolloAuto/apollo)下载`Apollo2.5`版源代码，可以使用`git`命令下载，也可以直接通过网页下载压缩包。源代码下载完成并放置到合适的目录后，可以使用两种方法构建：1.在`Visual Studio Code`中构建（推荐）；2.使用命令行构建。当然，两种方法都有一个前提，就是在你的机器上已经顺利安装了`Docker`。你可以使用`Apollo`提供的脚本文件[`install_docker.sh`](https://github.com/ApolloAuto/apollo/blob/master/docker/scripts/install_docker.sh)安装`Docker`。
 
 ### 1.1 在Visual Studio Code中构建
 
@@ -62,6 +62,13 @@ bash apollo.sh build
 --local_utm_zone_id=49
 ```
 **注意：**如果录制数据时未修改上述内容，则线下模拟测试回放数据包时只能将错就错，千万不能再修改该值，否则地图上的参考线定位会出错！有一次我采集数据时，忘了修改该值，回放数据时又进行修改，结果导致参考线定位到了美国西海岸！我取消修改，按`F5`键刷新浏览器后显示就恢复正常了。
+
+### 1.4 配置Dreamview使用的UTM区域ID
+
+打开文件`[apollo项目根目录]/modules/common/data/global_flagfile.txt`，在最后一行添加如下语句（这是长沙地区的UTM区域ID，中国UTM分区可参考[该网页](http://www.360doc.com/content/14/0729/10/3046928_397828751.shtml)）：
+```
+--local_utm_zone_id=49
+```
 
 ## 二、参考线原始数据的采集
 
@@ -122,9 +129,9 @@ python viewer_smooth.py ./path_2018-04-01-09-58-00.bag.txt ./path_2018-04-01-09-
 
 ![img](images/navigation_mode/view_smoothing_results.png) 
 
-## 四、Dreamview前端的编译及配置
+## 四、Dreamview前端的编译
 
-`Dreamview`前端默认使用`Baidu`地图，也可修改为`Google`地图，但需重新编译`Dreamview`前端，并正确设置UTM区域，具体方法如下（**注意**：如不需修改地图设置，可忽略**4.1-4.2**步，直接执行**4.3**步）：
+`Dreamview`前端默认使用`Baidu`地图，也可修改为`Google`地图，但需重新编译`Dreamview`前端，具体方法如下（**注意**：如不需修改地图设置，可忽略该节内容）：
 
 ### 4.1 更改导航地图
 
@@ -166,12 +173,6 @@ yarn install
 cd /apollo
 bash apollo.sh build_fe
 ```
-### 4.3 配置UTM区域ID
-
-打开文件`[apollo项目根目录]/modules/common/data/global_flagfile.txt`，在最后一行添加如下语句（这是长沙地区的UTM区域ID，中国UTM分区可参考[该网页](http://www.360doc.com/content/14/0729/10/3046928_397828751.shtml)）：
-```
---local_utm_zone_id=49
-```
 ## 五、导航模式的使用
 
 ### 5.1. 打开Dreamview并开启导航模式
@@ -195,7 +196,7 @@ rosbag play -l /apollo/data/bag/2018-04-01-09-58-00.bag
 
 ![img](images/navigation_mode/enable_navigation_mode.png) 
 
-### 5.2 打开Dreamview导航模式选项
+### 5.2 启用导航模式下的相关功能模块
 
 点击`Dreamview`界面左侧工具栏中的`Module Controller`按钮，进入模块控制页面。**若是线下模拟测试**，选中`Relative Map`、`Navi Planning`选项，其他模块根据需要开启，如下图所示（图中显示空白文本的模块是`Mobileye`模块，需安装配置好相关硬件后才可见））：
 

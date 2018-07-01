@@ -16,4 +16,5 @@ vehicle_param {
   steer_ratio: 23
   wheel_base: 2.565
   wheel_rolling_radius: 0.275
+  max_abs_speed_when_stopped: 0.15
 }

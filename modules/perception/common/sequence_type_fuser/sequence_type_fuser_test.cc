@@ -19,7 +19,6 @@
 #include "gtest/gtest.h"
 
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -30,13 +29,6 @@ class SequenceTypeFuserTest : public testing::Test {
   virtual ~SequenceTypeFuserTest() {}
   void SetUp() {
     RegisterFactorySequenceTypeFuser();
-    FLAGS_work_root = "modules/perception";
-    FLAGS_config_manager_path = "conf/config_manager.config";
-    ConfigManager* config_manager = ConfigManager::instance();
-    if (!config_manager->Init()) {
-      AERROR << "Fail to init config manager.";
-      return;
-    }
     fuser_.reset(new SequenceTypeFuser);
   }
   void TearDown() {}

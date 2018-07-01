@@ -1,0 +1,38 @@
+syntax = "proto2";
+
+package apollo.perception.tracker_config;
+
+message ModelConfigs {
+  optional string name = 1 [ default = "HmObjectTracker" ];
+  optional string version = 2 [ default = "1.1.0" ];
+
+  enum MatcherType {
+    HUNGARIAN_MATCHER = 1;
+  }
+  optional MatcherType matcher_method = 3 [ default = HUNGARIAN_MATCHER ];
+
+  enum FilterType {
+    KALMAN_FILTER = 1;
+  }
+  optional FilterType filter_method = 4 [ default = KALMAN_FILTER ];
+  optional int32 track_cached_history_size_maximum = 5 [ default = 5 ];
+  optional int32 track_consecutive_invisible_maximum = 6 [ default = 1 ];
+  optional float track_visible_ratio_minimum = 7 [ default = 0.6 ];
+  optional int32 collect_age_minimum = 8 [ default = 0 ];
+  optional int32 collect_consecutive_invisible_maximum = 9 [ default = 0 ];
+  optional float acceleration_noise_maximum = 10 [ default = 5 ];
+  optional float speed_noise_maximum = 11 [ default = 0.4 ];
+  optional float match_distance_maximum = 12 [ default = 4.0 ];
+  optional float location_distance_weight = 13 [ default =  0.6 ];
+  optional float direction_distance_weight = 14 [ default = 0.2 ];
+  optional float bbox_size_distance_weight = 15 [ default = 0.1 ];
+  optional float point_num_distance_weight = 16 [ default = 0.1 ];
+  optional float histogram_distance_weight = 17 [ default = 0.5 ];
+  optional int32 histogram_bin_size = 18 [ default = 10 ];
+  optional bool use_adaptive = 19 [ default = true ];
+  optional float measurement_noise = 20 [ default = 0.4 ];
+  optional float initial_velocity_noise = 21 [ default = 5.0];
+  optional float xy_propagation_noise = 22 [ default = 10.0 ];
+  optional float z_propagation_noise = 23 [ default = 10.0 ];
+  optional float breakdown_threshold_maximum = 24 [ default = 10.0 ];
+}

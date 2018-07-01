@@ -43,13 +43,13 @@ class Projector {
 
   bool UvToXy(const T &u, const T &v, Eigen::Matrix<T, 2, 1> *p) const;
 
-  bool UvToXy(const int &u, const int &v, Eigen::Matrix<T, 2, 1> *p) const {
+  bool UvToXy(const int u, const int v, Eigen::Matrix<T, 2, 1> *p) const {
     return UvToXy(static_cast<T>(u), static_cast<T>(v), p);
   }
 
   bool is_init() const { return is_init_; }
 
-  bool IsValidUv(const int &x, const int &y) const {
+  bool IsValidUv(const int x, const int y) const {
     return IsValidUv(static_cast<T>(x), static_cast<T>(y));
   }
 
@@ -83,7 +83,7 @@ class Projector {
 
   bool UvToXyImagePoint(const T &u, const T &v, cv::Point *p) const;
 
-  bool UvToXyImagePoint(const int &u, const int &v, cv::Point *p) const {
+  bool UvToXyImagePoint(const int u, const int v, cv::Point *p) const {
     return UvToXyImagePoint(static_cast<T>(u), static_cast<T>(v), p);
   }
 
@@ -463,8 +463,12 @@ bool Projector<T>::Project(const T &u, const T &v,
     return false;
   }
 
-  Eigen::Matrix<T, 3, 1> uv_point(u, v, static_cast<T>(1));
-  Eigen::Matrix<T, 3, 1> xy_p = trans_mat_ * uv_point;
+  auto trans_mat = Singleton<CalibrationConfigManager>::get()
+  ->get_camera_calibration()
+  ->get_camera2car_homography_mat();
+
+  Eigen::Matrix<double, 3, 1> uv_point(u, v, 1.0);
+  Eigen::Matrix<double, 3, 1> xy_p = trans_mat * uv_point;
 
   T scale = xy_p(2);
   if (std::abs(scale) < 1e-6) {

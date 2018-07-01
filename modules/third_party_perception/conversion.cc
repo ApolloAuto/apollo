@@ -375,7 +375,7 @@ RadarObstacles DelphiToRadarObstacles(
       motionpowers(64);
   for (const auto& esr_trackmotionpower_540 :
        delphi_esr.esr_trackmotionpower_540()) {
-    const int& can_tx_track_can_id_group =
+    const int can_tx_track_can_id_group =
         esr_trackmotionpower_540.can_tx_track_can_id_group();
     for (int index = 0; index < (can_tx_track_can_id_group < 9 ? 7 : 1);
          ++index) {

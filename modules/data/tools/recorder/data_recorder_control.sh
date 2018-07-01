@@ -58,6 +58,17 @@ usage() {
 }
 
 start() {
+  # Get car ID.
+  CARID=$(python modules/tools/common/kv_db.py get "apollo:dreamview:vehicle" \
+      | tr '[a-z]' '[A-Z]')
+  if [ ${CARID} = "NONE" ]; then
+    echo "Please select vehicle first."
+    exit 1
+  fi
+  export CARID=${CARID}
+  sed -i "s/vehicle_id:\(.*\)/vehicle_id: ${CARID}/g" \
+      modules/data/conf/recorder.global.yaml
+
   local task_purpose=$1
   ps -ef | grep 'data_recorder_manager' | grep -v 'data_recorder_control' | \
       grep -v 'grep' &>/dev/null

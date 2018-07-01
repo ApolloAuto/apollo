@@ -21,6 +21,8 @@ UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
   priv_node_.param("image_width", image_width_, 640);
   priv_node_.param("image_height", image_height_, 480);
   priv_node_.param("frame_rate", framerate_, 30);
+  priv_node_.param("trigger_internal", trigger_internal_, 0); //default gps pps
+  priv_node_.param("trigger_fps", trigger_fps_, 30);
   // possible values: yuyv, uyvy, mjpeg, yuvmono10, rgb24
   priv_node_.param("pixel_format", pixel_format_name_, std::string("mjpeg"));
   // enable/disable autofocus
@@ -167,6 +169,15 @@ UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh) :
 
     if (focus_ >= 0)
       cam_.set_v4l_parameter("focus_absolute", focus_);
+  }
+
+  //trigger enable
+  int trigger_ret = cam_.trigger_enable(trigger_fps_, trigger_internal_);
+  if (0 != trigger_ret) 
+  {
+    ROS_WARN("Camera trigger Fail ret '%d'", trigger_ret);
+    // node_.shutdown();
+    // return;
   }
 }
 

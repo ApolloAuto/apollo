@@ -15,7 +15,7 @@ message ProcessStatus {
 // For topic monitor.
 message TopicConf {
   optional apollo.common.adapter.AdapterConfig.MessageType type = 1;
-  optional double acceptable_delay = 2 [default = 1];  // In seconds.
+  optional double acceptable_delay = 2 [default = 3.0];  // In seconds.
 }
 message TopicStatus {
   optional double message_delay = 1;

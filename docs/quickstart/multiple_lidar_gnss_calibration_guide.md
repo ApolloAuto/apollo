@@ -14,7 +14,7 @@ In many autonomous driving tasks such as HDMap production, the scans from multip
 
 ## Preparation
 
-1. Download the [calibration tool](https://apollocache.blob.core.windows.net/apollo-cache/multi_lidar_gnss_calibrator_and_doc.zip), and extract files to `$APOLLO_HOME/modules/calibration`. APOLLO_HOME is the root directory of apollo repository.
+1. Download the [calibration tool](https://github.com/ApolloAuto/apollo/releases/download/v2.5.0/multi_lidar_gnss_calibrator_and_doc.zip), and extract files to `$APOLLO_HOME/modules/calibration`. APOLLO_HOME is the root directory of apollo repository.
 2. Choose a calibration place according to the calibration guide provided in Apollo 1.5.
 3. Make sure the GNSS is in a good status. To verify this, use `rostopic echo /apollo/sensor/gnss/best_pose` and check the number after keywords `latitude_std_dev`, `longitude_std_dev` and `height_std_dev`. The smaller the deviation, the better the calibration quality. *** We strongly recommend calibrating the sensors when deviations are smaller than 0.02.*** 
 
@@ -38,12 +38,12 @@ topics:
         type: PointCloud2                    # vlp16 type
     - /apollo/sensor/velodyne64/PointCloud2: # hdl64 topic name
         type: PointCloud2                    # hdl64 type
-	```
+```
 Other topics of PointCloud2 type also can be exported, if new topics are added to the file in the rule as follow.
 ```bash
     - TOPIC_NAME: # topic name
         type: PointCloud2
-	```
+```
 Till now, we only support `ApolloOdometry` and `PointCloud2`.  
 
 ### Run the Calibration Tool
@@ -99,7 +99,7 @@ calibration:
           fix_target_lidars: true
           fix_z: false
           iteration: 3
-	```
+```
     
 The `data` section tells the tool where to get point clouds and odometry file, and also where to save the results. Note that, the keywords in `lidar` node will be recognized as frame id for the LiDARs. 
 
@@ -113,7 +113,7 @@ The `steps` section specifies the calibration procedure. Each step is defined as
   fix_target_lidars: true # Whether to fix  extrinsics of target LiDARS. Only "true" when align different LiDARs.
   fix_z: false # Whether to fix the z component of translation. Only "false" when align different LiDARs.
   iteration: 3 # Iteration number
-	```
+```
 ## Results and Validation
 
 The calibration tool saves the results to `result` path as follow.
@@ -126,5 +126,5 @@ The calibration tool saves the results to `result` path as follow.
     ├── velodyne64_novatel_extrinsics.yaml
     ├── velodyne64_result.pcd
     └── velodyne64_result_rgb.pcd
-	```
+```
 The two YAML files are extrinsics. To validate the results, use `pcl_viewer *_result.pcd` to check the registration quality. If the sensors are well calibrated, a large amount of details can be identified from the point cloud. For more details, please refer to the calibration guide in Apollo 1.5. 

@@ -16,42 +16,29 @@
 
 #include "modules/perception/traffic_light/reviser/color_decision.h"
 
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/traffic_light/base/tl_shared_data.h"
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
 
+using apollo::common::util::GetProtoFromFile;
+
 std::string ColorReviser::name() const { return "ColorReviser"; }
+
 bool ColorReviser::Init() {
-  ConfigManager *config_manager = ConfigManager::instance();
-  if (config_manager == nullptr) {
-    AERROR << "failed to get ConfigManager instance.";
+  if (!GetProtoFromFile(FLAGS_traffic_light_reviser_config, &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_traffic_light_reviser_config;
     return false;
   }
-
-  const ModelConfig *model_config = config_manager->GetModelConfig(name());
-  if (model_config == nullptr) {
-    AERROR << "not found model config: " << name();
-    return false;
-  }
-
-  if (!model_config->GetValue("enable", &enable_)) {
-    AERROR << "enable not found." << name();
-    return false;
-  }
-
-  if (!model_config->GetValue("blink_time", &blink_time_)) {
-    AERROR << "blink_time not found." << name();
-    return false;
-  }
-
   return true;
 }
+
 bool ColorReviser::Revise(const ReviseOption &option,
                           std::vector<LightPtr> *lights) {
-  if (enable_ == 0) {
+  if (config_.color_reviser_config().enable() == 0) {
     return true;
   }
   std::vector<LightPtr> &lights_ref = *lights;
@@ -64,7 +51,8 @@ bool ColorReviser::Revise(const ReviseOption &option,
       case BLACK:
       case UNKNOWN_COLOR:
         if (color_map_.find(id) != color_map_.end() && option.ts > 0 &&
-            option.ts - time_map_[id] < blink_time_) {
+            option.ts - time_map_[id] <
+                config_.color_reviser_config().blink_time()) {
           AINFO << "Revise " << kColorStr[lights_ref[i]->status.color]
                 << " to color " << kColorStr[color_map_[id]];
           lights_ref[i]->status.color = color_map_[id];

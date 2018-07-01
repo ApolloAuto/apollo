@@ -44,8 +44,7 @@ DEFINE_int32(max_planning_miss_num, 20,
 
 DEFINE_double(max_acceleration_when_stopped, 0.01,
               "max acceleration can be observed when vehicle is stopped");
-DEFINE_double(max_abs_speed_when_stopped, 0.01,
-              "max absolute speed can be observed when vehicle is stopped");
+
 DEFINE_double(steer_angle_rate, 100.0,
               "Steer angle change rate in percentage.");
 DEFINE_bool(enable_gain_scheduler, false,
@@ -53,3 +52,6 @@ DEFINE_bool(enable_gain_scheduler, false,
 DEFINE_bool(set_steer_limit, false, "Set steer limit");
 
 DEFINE_bool(enable_slope_offset, false, "Enable slope offset compensation");
+
+DEFINE_double(lock_steer_speed, 0.081,
+              "Minimum speed to lock the steer, in m/s");
