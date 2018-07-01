@@ -2253,10 +2253,13 @@ extern void readpos(const char *file, const char *rcv, double *pos)
         return;
     }
     while (np<2048&&fgets(buff,sizeof(buff),fp)) {
-        if (buff[0]=='%'||buff[0]=='#') continue;
-        if (sscanf(buff,"%lf %lf %lf %255s",&poss[np][0],&poss[np][1],&poss[np][2],
-                   str)<4) continue;
-        strncpy(stas[np],str,15); stas[np++][15]='\0';
+        if (buff[0] == '%' || buff[0] == '#') continue;
+        if (sscanf(buff, "%lf %lf %lf %255s", &poss[np][0], &poss[np][1],
+                   &poss[np][2], str) < 4) {
+          continue;
+        }
+        strncpy(stas[np], str, 15);
+        stas[np++][15] = '\0';
     }
     fclose(fp);
     len=(int)strlen(rcv);
