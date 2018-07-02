@@ -112,6 +112,12 @@ void RouteSegments::SetIsOnSegment(bool on_segment) {
   is_on_segment_ = on_segment;
 }
 
+bool RouteSegments::IsNeighborSegment() const { return is_neighbor_; }
+
+void RouteSegments::SetIsNeighborSegment(bool is_neighbor) {
+  is_neighbor_ = is_neighbor;
+}
+
 void RouteSegments::SetRouteEndWaypoint(const LaneWaypoint &waypoint) {
   route_end_waypoint_ = waypoint;
 }

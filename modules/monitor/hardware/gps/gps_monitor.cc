@@ -30,7 +30,7 @@ DEFINE_double(acceptable_gnss_best_pose_std_dev, 0.5,
               "Acceptable Gnss BestPose standard deviation on latitude, "
               "longitude and height.");
 
-DEFINE_double(acceptable_gnss_best_pose_unstable_duration, 5,
+DEFINE_double(acceptable_gnss_best_pose_unstable_duration, 120,
               "Acceptable Gnss BestPose unstable duration in seconds.");
 
 namespace apollo {
@@ -59,7 +59,7 @@ void GpsMonitor::RunOnce(const double current_time) {
     return;
   }
   if (!gnss_status_adapter->GetLatestObserved().solution_completed()) {
-    status->set_status(HardwareStatus::ERR);
+    status->set_status(HardwareStatus::WARN);
     status->set_detailed_msg("GNSS solution uncompleted.");
     return;
   }

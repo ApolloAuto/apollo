@@ -26,8 +26,8 @@ config: {
     max_stop_deceleration: 6.0
     min_pass_s_distance: 1.0
     expand_s_distance: 2.0
-    stop_strick_l_distance: 4.0
-    stop_loose_l_distance: 5.0
+    stop_strick_l_distance: 6.0
+    stop_loose_l_distance: 10.0
   }
 }
 
@@ -35,7 +35,7 @@ config: {
   rule_id: DESTINATION
   enabled: true
   destination {
-    enable_pull_over: false
+    enable_pull_over: true
     stop_distance: 0.5
     pull_over_plan_distance: 55.00
   }
@@ -92,6 +92,7 @@ config: {
   enabled: true
   rerouting {
     prepare_rerouting_time: 2.0
+    cooldown_time: 3.0
   }
 }
 
@@ -128,9 +129,9 @@ config: {
     creep {
       enabled: true
       creep_distance_to_stop_line: 1.5
-      stop_distance: 0.5
+      stop_distance: 0.3
       speed_limit: 1.0
-      max_valid_stop_distance: 0.3
+      max_valid_stop_distance: 0.4
       min_boundary_t: 6.0
     }
   }

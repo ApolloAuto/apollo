@@ -47,7 +47,7 @@ public:
     bool initialize();
     bool polling();
 
-    void initTimeStamp(void);    
+    void initTimeStamp(void);
     void getFPGA_GPSTimeStamp(lslidar_msgs::LslidarPacketPtr &packet);
 
     typedef boost::shared_ptr<LslidarDriver> LslidarDriverPtr;
@@ -60,7 +60,7 @@ private:
     bool openUDPPort();
     int getPacket(lslidar_msgs::LslidarPacketPtr& msg);
 
-    // Ethernet relate variables
+    // Ethernet related variables
     std::string device_ip_string;
     in_addr device_ip;
     int UDP_PORT_NUMBER;
@@ -71,7 +71,7 @@ private:
     ros::NodeHandle pnh;
 
     std::string frame_id;
-    ros::Publisher packet_pub;    
+    ros::Publisher packet_pub;
 
     uint64_t pointcloudTimeStamp;
     unsigned char packetTimeStamp[10];

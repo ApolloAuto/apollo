@@ -100,7 +100,7 @@ void TransformListener::CallbackImpl(tf2_msgs::TFMessage::ConstPtr tf,
     try {
       buffer_->setTransform(tf->transforms[i], "tf", is_static);
     } catch (tf2::TransformException& ex) {
-      AERROR << "Failure to set recieved transform from "
+      AERROR << "Failure to set received transform from "
              << tf->transforms[i].child_frame_id << " to "
              << tf->transforms[i].header.frame_id
              << " with error: " << ex.what();

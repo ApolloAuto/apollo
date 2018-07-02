@@ -35,6 +35,7 @@
 #include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
+#include "modules/map/proto/map_parking_space.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -74,6 +75,7 @@ class HDMap {
   SpeedBumpInfoConstPtr GetSpeedBumpById(const Id& id) const;
   OverlapInfoConstPtr GetOverlapById(const Id& id) const;
   RoadInfoConstPtr GetRoadById(const Id& id) const;
+  ParkingSpaceInfoConstPtr GetParkingSpaceById(const Id& id) const;
 
   /**
    * @brief get all lanes in certain range
@@ -156,6 +158,17 @@ class HDMap {
    */
   int GetRoads(const apollo::common::PointENU& point, double distance,
                std::vector<RoadInfoConstPtr>* roads) const;
+  /**
+   * @brief get all parking spaces in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param parking spaces store all clear areas in target range
+   * @return 0:success, otherwise failed
+   */
+  int GetParkingSpaces(const apollo::common::PointENU& point,
+                       double distance,
+                       std::vector<ParkingSpaceInfoConstPtr>*
+                       parking_spaces) const;
   /**
    * @brief get nearest lane from target point,
    * @param point the target point

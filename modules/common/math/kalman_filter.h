@@ -61,6 +61,12 @@ class KalmanFilter {
     H_.setIdentity();
     R_.setZero();
     B_.setZero();
+
+    x_.setZero();
+    P_.setZero();
+    y_.setZero();
+    S_.setZero();
+    K_.setZero();
   }
 
   /**

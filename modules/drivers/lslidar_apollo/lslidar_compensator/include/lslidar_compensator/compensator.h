@@ -42,12 +42,12 @@ class Compensator {
   void pointcloud_callback(const sensor_msgs::PointCloud2ConstPtr& msg);
   /**
   * @brief get pose affine from tf2 by gps timestamp
-  *   novatel-preprocess broadcast the tf2 transfrom.
+  *   novatel-preprocess broadcast the tf2 transform.
   */
   bool query_pose_affine_from_tf2(const double& timestamp,
                                   Eigen::Affine3d& pose);
   /**
-  * @brief check if message is valid, check width, height, timesatmp.
+  * @brief check if message is valid, check width, height, timestamp.
   *   set timestamp_offset and point data type
   */
   bool check_message(const sensor_msgs::PointCloud2ConstPtr& msg);
@@ -71,7 +71,7 @@ class Compensator {
   */
   inline uint get_field_size(const int data_type);
 
-  // subsrcibe velodyne pointcloud2 msg.
+  // subscribe velodyne pointcloud2 msg.
   ros::Subscriber pointcloud_sub_;
   // publish point cloud2 after motion compensation
   ros::Publisher compensation_pub_;
@@ -85,7 +85,7 @@ class Compensator {
   std::string world_frame_id_;
   float tf_timeout_;
 
-  // varibes for point fields value, we get point x,y,z by these offset
+  // variables for point fields value, we get point x,y,z by these offset
   int x_offset_;
   int y_offset_;
   int z_offset_;

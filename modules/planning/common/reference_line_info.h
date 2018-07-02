@@ -116,6 +116,13 @@ class ReferenceLineInfo {
    * ADC's current position is not on this reference line.
    */
   bool IsChangeLanePath() const;
+
+  /**
+   * Check if the current reference line is the neighbor of the vehicle 
+   * current position
+   */
+  bool IsNeighborLanePath() const;
+
   /**
    * Set if the vehicle can drive following this reference line
    * A planner need to set this value to true if the reference line is OK

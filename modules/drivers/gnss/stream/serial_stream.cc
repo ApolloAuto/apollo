@@ -131,6 +131,7 @@ void SerialStream::open(void) {
   }
 
   if (!configure_port(fd)) {
+    ::close(fd);
     return;
   }
 
@@ -175,7 +176,7 @@ bool SerialStream::configure_port(int fd) {
   // setup char len
   options.c_cflag &= (tcflag_t)~CSIZE;
 
-  // eightbits
+  // eight bits
   options.c_cflag |= CS8;
 
   // setup stopbits:stopbits_one

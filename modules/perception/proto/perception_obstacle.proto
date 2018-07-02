@@ -51,6 +51,7 @@ message PerceptionObstacle {
       CONFIDENCE_RADAR = 2;
   };
   optional ConfidenceType confidence_type = 14 [default = CONFIDENCE_CNN];
+  repeated Point drops = 15;  // trajectory of object.
 }
 
 message CIPVInfo {

@@ -20,3 +20,4 @@ DRIVE_EVENT     drive_event_pb2.DriveEvent()            /apollo/drive_event     
 SYSTEM_STATUS   system_status_pb2.SystemStatus()        /apollo/monitor/system_status       500
 NAVIGATION      navigation_pb2.NavigationInfo()         /apollo/navigation                  1
 RELATIVE_MAP    navigation_pb2.MapMsg()                 /apollo/relative_map                200
+GUARDIAN        guardian_pb2.GuardianCommand()          /apollo/guardian                    100

@@ -67,10 +67,10 @@ void Guardian::OnTimer(const ros::TimerEvent&) {
   }
 
   if (safety_mode_triggered) {
-    ADEBUG << "Safety mode triggerd, enable safty mode";
+    ADEBUG << "Safety mode triggered, enable safty mode";
     TriggerSafetyMode();
   } else {
-    ADEBUG << "Safety mode not triggerd, bypass control command";
+    ADEBUG << "Safety mode not triggered, bypass control command";
     PassThroughControlCommand();
   }
 
@@ -132,7 +132,7 @@ void Guardian::TriggerSafetyMode() {
   // TODO(QiL) : Remove this one once hardware re-alignment is done.
   sensor_malfunction = false;
   obstacle_detected = false;
-  AINFO << "Temperarily ignore the ultrasonic sensor output during hardware "
+  AINFO << "Temporarily ignore the ultrasonic sensor output during hardware "
            "re-alignment!";
 
   if (system_status_.require_emergency_stop() || sensor_malfunction ||

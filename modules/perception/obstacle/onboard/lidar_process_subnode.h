@@ -54,13 +54,14 @@ class LidarProcessSubnode : public Subnode {
     return apollo::common::Status::OK();
   }
 
+  void OnPointCloud(const sensor_msgs::PointCloud2& message);
+
  protected:
   virtual SensorType GetSensorType() const = 0;
+  virtual void AddMessageCallback() = 0;
 
  private:
   bool InitInternal() override;
-
-  void OnPointCloud(const sensor_msgs::PointCloud2& message);
 
   pcl_util::PointIndicesPtr GetROIIndices() { return roi_indices_; }
 
@@ -94,11 +95,13 @@ class LidarProcessSubnode : public Subnode {
 class Lidar64ProcessSubnode : public LidarProcessSubnode {
  protected:
   SensorType GetSensorType() const override;
+  void AddMessageCallback() override;
 };
 
 class Lidar16ProcessSubnode : public LidarProcessSubnode {
  protected:
   SensorType GetSensorType() const override;
+  void AddMessageCallback() override;
 };
 
 REGISTER_SUBNODE(Lidar64ProcessSubnode);

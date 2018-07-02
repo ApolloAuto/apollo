@@ -249,7 +249,7 @@ void Velodyne64Parser::unpack(const velodyne_msgs::VelodynePacket& pkt,
     for (int j = 0, k = 0; j < SCANS_PER_BLOCK;
          ++j, k += RAW_SCAN_SIZE) {  // 32, 3
       // One point
-      uint8_t laser_number = j + bank_origin;  // hardware larse number
+      uint8_t laser_number = j + bank_origin;  // hardware laser number
       LaserCorrection& corrections =
           calibration_.laser_corrections_[laser_number];
 
@@ -270,7 +270,7 @@ void Velodyne64Parser::unpack(const velodyne_msgs::VelodynePacket& pkt,
 
       if (raw_distance.raw_distance == 0 ||
           !is_scan_valid(raw->blocks[i].rotation, distance)) {
-        // if orgnized append a nan point to the cloud
+        // if organized append a nan point to the cloud
         if (config_.organized) {
           pc.points.emplace_back(get_nan_point(timestamp));
         }

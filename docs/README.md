@@ -6,7 +6,7 @@ Apollo documents contain the following folders:
 ---
 - **[Demo Guide](demo_guide/README.md)** - A guide to setting up Apollo should you not have the Hardware necessary for Setup.
 
-- 中文版本的Demo Guide, 请点击这里 [Demo Guide]
+- 中文版本的Demo Guide, 请点击这里 [Demo Guide](demo_guide/README_cn.md)
 ---
 - **[Specs](specs/README.md)** - A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo) 
 ---

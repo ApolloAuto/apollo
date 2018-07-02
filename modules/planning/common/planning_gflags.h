@@ -51,6 +51,7 @@ DECLARE_double(change_lane_speed_relax_percentage);
 DECLARE_bool(enable_side_vehicle_st_boundary);
 
 DECLARE_double(max_collision_distance);
+DECLARE_bool(ignore_overlapped_obstacle);
 DECLARE_bool(publish_estop);
 DECLARE_bool(enable_trajectory_stitcher);
 
