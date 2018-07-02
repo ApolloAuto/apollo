@@ -106,8 +106,6 @@ double NaviObstacleDecider::GetNudgeDistance(
     const std::vector<const Obstacle*>& obstacles,
     const std::vector<common::PathPoint>& path_data_points,
     const double min_lane_width) {
-  // CHECK_NOTNULL(path_data_points);
-
   // Calculating the left and right nudgeable distance on the lane
   double left_nudge_lane = 0.0;
   double right_nedge_lane = 0.0;
@@ -115,14 +113,15 @@ double NaviObstacleDecider::GetNudgeDistance(
   if (routing_y <= 0.0) {
     left_nudge_lane = min_lane_width / 2.0 - fabs(routing_y) -
                       VehicleParam().left_edge_to_center();
-    right_nedge_lane = min_lane_width / 2.0 + fabs(routing_y) -
-                       VehicleParam().right_edge_to_center();
+    right_nedge_lane = -1.0 * (min_lane_width / 2.0 + fabs(routing_y) -
+                               VehicleParam().right_edge_to_center());
   } else {
     left_nudge_lane = min_lane_width / 2.0 + fabs(routing_y) -
                       VehicleParam().left_edge_to_center();
-    right_nedge_lane = min_lane_width / 2.0 - fabs(routing_y) -
-                       VehicleParam().right_edge_to_center();
+    right_nedge_lane = -1.0 * (min_lane_width / 2.0 - fabs(routing_y) -
+                               VehicleParam().right_edge_to_center());
   }
+
   // Calculating the left and right nudgable distance according to the position
   // of the obstacle.
   double left_nudge_obstacle = 0.0;
