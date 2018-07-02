@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ using apollo::drivers::RacobitRadar;
 using ::apollo::drivers::racobit_radar::OutputType;
 using ::apollo::drivers::racobit_radar::RcsThreshold;
 
-class RadarState201 : public apollo::drivers::canbus::\
-ProtocolData<RacobitRadar> {
+class RadarState201
+    : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
  public:
   static const uint32_t ID;
   RadarState201();

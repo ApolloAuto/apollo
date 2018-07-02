@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 #include "modules/drivers/radar/racobit_radar/racobit_radar_canbus.h"
-#include "modules/drivers/radar/racobit_radar/racobit_radar_message_manager.h"
 #include "modules/drivers/proto/racobit_radar.pb.h"
+#include "modules/drivers/radar/racobit_radar/racobit_radar_message_manager.h"
 
 /**
  * @namespace apollo::drivers::racobit_radar
@@ -56,8 +56,8 @@ apollo::common::Status RacobitRadarCanbus::Init() {
   }
   AINFO << "Can client is successfully created.";
 
-  sensor_message_manager_ =
-  std::unique_ptr<RacobitRadarMessageManager>(new RacobitRadarMessageManager());
+  sensor_message_manager_ = std::unique_ptr<RacobitRadarMessageManager>(
+      new RacobitRadarMessageManager());
   if (sensor_message_manager_ == nullptr) {
     return OnError("Failed to create message manager.");
   }
@@ -65,8 +65,9 @@ apollo::common::Status RacobitRadarCanbus::Init() {
   sensor_message_manager_->set_can_client(can_client_);
   AINFO << "Sensor message manager is successfully created.";
 
-  if (can_receiver_.Init(can_client_.get(), sensor_message_manager_.get(),
-                      racobit_radar_conf_.can_conf().enable_receiver_log()) !=
+  if (can_receiver_.Init(
+          can_client_.get(), sensor_message_manager_.get(),
+          racobit_radar_conf_.can_conf().enable_receiver_log()) !=
       ErrorCode::OK) {
     return OnError("Failed to init can receiver.");
   }
@@ -116,10 +117,9 @@ void RacobitRadarCanbus::PublishSensorData() {
   sensor_message_manager_->GetSensorData(&racobit_radar);
   ADEBUG << racobit_radar.ShortDebugString();
 
-  AdapterManager::\
-  FillRacobitRadarHeader(FLAGS_sensor_node_name, &racobit_radar);
-  AdapterManager::\
-  PublishRacobitRadar(racobit_radar);
+  AdapterManager::FillRacobitRadarHeader(FLAGS_sensor_node_name,
+                                         &racobit_radar);
+  AdapterManager::PublishRacobitRadar(racobit_radar);
 }
 
 // Send the error to monitor and return it

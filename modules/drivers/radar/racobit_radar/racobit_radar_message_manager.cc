@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ void RacobitRadarMessageManager::Parse(const uint32_t message_id,
     }
     sensor_data_.Clear();
     // fill header when recieve the general info message
-    AdapterManager::\
+    AdapterManager::
     FillRacobitRadarHeader(FLAGS_sensor_node_name, &sensor_data_);
   }
 

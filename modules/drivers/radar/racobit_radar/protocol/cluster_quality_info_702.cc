@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,16 +36,16 @@ void ClusterQualityInfo702::Parse(const std::uint8_t* bytes, int32_t length,
   int id = target_id(bytes, length);
   for (int i = 0; i < racobit_radar->contiobs_size(); ++i) {
     if (racobit_radar->contiobs(i).obstacle_id() == id) {
-      auto conti_obs = racobit_radar->mutable_contiobs(i);
-      conti_obs->set_longitude_dist_rms(
+      auto racobit_obs = racobit_radar->mutable_contiobs(i);
+      racobit_obs->set_longitude_dist_rms(
           LINEAR_RMS[longitude_dist_rms(bytes, length)]);
-      conti_obs->set_lateral_dist_rms(
+      racobit_obs->set_lateral_dist_rms(
           LINEAR_RMS[lateral_dist_rms(bytes, length)]);
-      conti_obs->set_longitude_vel_rms(
+      racobit_obs->set_longitude_vel_rms(
           LINEAR_RMS[longitude_vel_rms(bytes, length)]);
-      conti_obs->set_lateral_vel_rms(
+      racobit_obs->set_lateral_vel_rms(
           LINEAR_RMS[lateral_vel_rms(bytes, length)]);
-      conti_obs->set_probexist(PROBOFEXIST[pdh0(bytes, length)]);
+      racobit_obs->set_probexist(PROBOFEXIST[pdh0(bytes, length)]);
       switch (invalid_state(bytes, length)) {
         case 0x01:
         case 0x02:
@@ -53,7 +53,7 @@ void ClusterQualityInfo702::Parse(const std::uint8_t* bytes, int32_t length,
         case 0x06:
         case 0x07:
         case 0x0E:
-          conti_obs->set_probexist(PROBOFEXIST[0]);
+          racobit_obs->set_probexist(PROBOFEXIST[0]);
         default:
           break;
       }
@@ -61,7 +61,7 @@ void ClusterQualityInfo702::Parse(const std::uint8_t* bytes, int32_t length,
         case 0x00:
         case 0x01:
         case 0x02:
-          conti_obs->set_probexist(PROBOFEXIST[0]);
+          racobit_obs->set_probexist(PROBOFEXIST[0]);
         default:
           break;
       }

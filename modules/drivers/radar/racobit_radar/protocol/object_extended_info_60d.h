@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #ifndef MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_OBJECT_EXTENDED_INFO_60D_H_
-#define MODULES_DRIVERS_RADAR_RACOBIT_PROTOCOL_OBJECT_EXTENDED_INFO_60D_H_
+#define MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_OBJECT_EXTENDED_INFO_60D_H_
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/racobit_radar.pb.h"

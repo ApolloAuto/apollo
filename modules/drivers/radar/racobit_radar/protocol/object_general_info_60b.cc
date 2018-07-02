@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,17 +35,17 @@ const uint32_t ObjectGeneralInfo60B::ID = 0x60B;
 void ObjectGeneralInfo60B::Parse(const std::uint8_t* bytes, int32_t length,
                                  RacobitRadar* racobit_radar) const {
   int obj_id = object_id(bytes, length);
-  auto conti_obs = racobit_radar->add_contiobs();
-  conti_obs->set_clusterortrack(false);
-  conti_obs->set_obstacle_id(obj_id);
-  conti_obs->set_longitude_dist(longitude_dist(bytes, length));
-  conti_obs->set_lateral_dist(lateral_dist(bytes, length));
-  conti_obs->set_longitude_vel(longitude_vel(bytes, length));
-  conti_obs->set_lateral_vel(lateral_vel(bytes, length));
-  conti_obs->set_rcs(rcs(bytes, length));
-  conti_obs->set_dynprop(dynprop(bytes, length));
+  auto racobit_obs = racobit_radar->add_contiobs();
+  racobit_obs->set_clusterortrack(false);
+  racobit_obs->set_obstacle_id(obj_id);
+  racobit_obs->set_longitude_dist(longitude_dist(bytes, length));
+  racobit_obs->set_lateral_dist(lateral_dist(bytes, length));
+  racobit_obs->set_longitude_vel(longitude_vel(bytes, length));
+  racobit_obs->set_lateral_vel(lateral_vel(bytes, length));
+  racobit_obs->set_rcs(rcs(bytes, length));
+  racobit_obs->set_dynprop(dynprop(bytes, length));
   double timestamp = apollo::common::time::Clock::NowInSeconds();
-  auto header = conti_obs->mutable_header();
+  auto header = racobit_obs->mutable_header();
   header->CopyFrom(racobit_radar->header());
   header->set_timestamp_sec(timestamp);
 }
