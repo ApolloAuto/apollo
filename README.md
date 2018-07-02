@@ -177,13 +177,15 @@ and we want to ensure Apollo 2.5 was integrated correctly with your vehicle befo
 
 ## Installation
 
-### With Hardware:
-
 * [Fork and then Clone Apollo's GitHub code](https://github.com/ApolloAuto/apollo) 
 
 * [Build and Release using Docker](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md) - This step is required
 
 * [Launch and Run Apollo](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_launch_Apollo.md)
+
+If at this point, you do not have a Hardware setup, please go to [Without Hardware](#without-hardware). 
+
+### With Hardware:
 
 * [Apollo 1.0 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md)
 

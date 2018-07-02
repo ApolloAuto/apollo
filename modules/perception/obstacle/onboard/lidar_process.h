@@ -30,6 +30,7 @@
 #include "modules/perception/common/sequence_type_fuser/base_type_fuser.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/lidar/interface/base_object_builder.h"
+#include "modules/perception/obstacle/lidar/interface/base_object_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/interface/base_segmentation.h"
 #include "modules/perception/obstacle/lidar/interface/base_tracker.h"
@@ -75,6 +76,7 @@ class LidarProcess {
   std::unique_ptr<BaseROIFilter> roi_filter_;
   std::unique_ptr<BaseSegmentation> segmentor_;
   std::unique_ptr<BaseObjectBuilder> object_builder_;
+  std::unique_ptr<BaseObjectFilter> object_filter_;
   std::unique_ptr<BaseTracker> tracker_;
   std::unique_ptr<BaseTypeFuser> type_fuser_;
   pcl_util::PointIndicesPtr roi_indices_;

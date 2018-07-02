@@ -37,6 +37,7 @@ DECLARE_bool(enable_hdmap_input);
 DECLARE_string(onboard_roi_filter);
 DECLARE_string(onboard_segmentor);
 DECLARE_string(onboard_object_builder);
+DECLARE_string(onboard_object_filter);
 DECLARE_string(onboard_tracker);
 DECLARE_string(onboard_type_fuser);
 DECLARE_int32(tf2_buff_in_ms);

@@ -29,6 +29,7 @@
 #include "modules/perception/common/sequence_type_fuser/sequence_type_fuser.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
+#include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
@@ -158,6 +159,23 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
   ADEBUG << "call segmentation succ. The num of objects is: " << objects.size();
   PERF_BLOCK_END("lidar_segmentation");
 
+  /// call object filter
+  if (object_filter_ != nullptr) {
+    ObjectFilterOptions object_filter_options;
+    object_filter_options.velodyne_trans.reset(new Eigen::Matrix4d);
+    object_filter_options.velodyne_trans = velodyne_trans;
+    // object_filter_options.hdmap_struct_ptr = hdmap;
+
+    if (!object_filter_->Filter(object_filter_options, &objects)) {
+      AERROR << "failed to call object filter.";
+      error_code_ = common::PERCEPTION_ERROR_PROCESS;
+      return false;
+    }
+  }
+  ADEBUG << "call object filter succ. The num of objects is: "
+         << objects.size();
+  PERF_BLOCK_END("lidar_object_filter");
+
   /// call object builder
   if (object_builder_ != nullptr) {
     ObjectBuilderOptions object_builder_options;
@@ -206,12 +224,14 @@ void LidarProcess::RegistAllAlgorithm() {
   RegisterFactoryDummyROIFilter();
   RegisterFactoryDummySegmentation();
   RegisterFactoryDummyObjectBuilder();
+  RegisterFactoryDummyObjectFilter();
   RegisterFactoryDummyTracker();
   RegisterFactoryDummyTypeFuser();
 
   RegisterFactoryHdmapROIFilter();
   RegisterFactoryCNNSegmentation();
   RegisterFactoryMinBoxObjectBuilder();
+  RegisterFactoryLowObjectFilter();
   RegisterFactoryHmObjectTracker();
   RegisterFactorySequenceTypeFuser();
 }
@@ -275,6 +295,20 @@ bool LidarProcess::InitAlgorithmPlugin() {
   }
   AINFO << "Init algorithm plugin successfully, object builder: "
         << object_builder_->name();
+
+  /// init pre object filter
+  object_filter_.reset(BaseObjectFilterRegisterer::GetInstanceByName(
+      FLAGS_onboard_object_filter));
+  if (!object_filter_) {
+    AERROR << "Failed to get instance: " << FLAGS_onboard_object_filter;
+    return false;
+  }
+  if (!object_filter_->Init()) {
+    AERROR << "Failed to Init object filter: " << object_filter_->name();
+    return false;
+  }
+  AINFO << "Init algorithm plugin successfully, object filter: "
+        << object_filter_->name();
 
   /// init tracker
   tracker_.reset(
