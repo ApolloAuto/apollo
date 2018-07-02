@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+
 """
 Sample PNC topics. For each /path/to/a.bag, will generate
 /path/to/pnc_sample/a.bag.
@@ -68,8 +69,8 @@ class SamplePNC(object):
         '/apollo/monitor/static_info',
     ]
 
-    @staticmethod
-    def ProcessBags(bags):
+    @classmethod
+    def process_bags(cls, bags):
         for bag_file in bags:
             output_dir = os.path.join(os.path.dirname(bag_file), 'pnc_sample')
             output_bag = os.path.join(output_dir, os.path.basename(bag_file))
@@ -87,9 +88,9 @@ class SamplePNC(object):
                         bag_out.write(topic, msg, t)
 
 if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        glog.fatal('Wrong arguments!')
+    if len(sys.argv) < 2:
+        print("Usage: %s <bag_path> ..." % sys.argv[0])
         sys.exit(1)
 
     bags = sorted(sum([glob.glob(arg) for arg in sys.argv[1:]], []))
-    SamplePNC.ProcessBags(bags)
+    SamplePNC.process_bags(bags)
