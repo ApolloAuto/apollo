@@ -383,107 +383,42 @@ bool UsbCam::process_image(const void *src, int len,
 }
 
 int UsbCam::read_frame() {
-  struct v4l2_buffer buf;
+  struct v4l2_buffer v4l_buf;
   unsigned int i;
   int len;
   bool result = false;
 
   switch (io_) {
-    case IO_METHOD_READ:
-      len = read(fd_, buffers_[0].start, buffers_[0].length);
-      if (len == -1) {
-        switch (errno) {
-          case EAGAIN:
-            return 0;
-
-          case EIO:
-          /* Could ignore EIO, see spec. */
-
-          /* fall through */
-
-          default:
-            errno_exit("read");
-        }
-      }
-
-      result = process_image(buffers_[0].start, len, image_);
-      if (!result) {
-        return 0;
-      }
-
-      break;
-
     case IO_METHOD_MMAP:
-      CLEAR(buf);
+      CLEAR(v4l_buf);
 
-      buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-      buf.memory = V4L2_MEMORY_MMAP;
+      v4l_buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+      v4l_buf.memory = V4L2_MEMORY_MMAP;
 
-      if (-1 == xioctl(fd_, VIDIOC_DQBUF, &buf)) {
+      if (-1 == xioctl(fd_, VIDIOC_DQBUF, &v4l_buf)) {
         switch (errno) {
           case EAGAIN:
             return 0;
-
           case EIO:
-          /* Could ignore EIO, see spec. */
-
-          /* fall through */
-
+          // Could ignore EIO, see spec.
+          // fall through
           default:
             errno_exit("VIDIOC_DQBUF");
         }
       }
 
-      assert(buf.index < n_buffers_);
-      len = buf.bytesused;
-      image_->tv_sec = buf.timestamp.tv_sec;
-      image_->tv_usec = buf.timestamp.tv_usec;
+      assert(v4l_buf.index < n_buffers_);
+      len = v4l_buf.bytesused;
+      image_->tv_sec = v4l_buf.timestamp.tv_sec;
+      image_->tv_usec = v4l_buf.timestamp.tv_usec;
       ROS_DEBUG("new image timestamp: %d.%d", image_->tv_sec, image_->tv_usec);
 
-      result = process_image(buffers_[buf.index].start, len, image_);
+      result = process_image(buffers_[v4l_buf.index].start, len, image_);
       if (!result) {
         return 0;
       }
 
-      if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) errno_exit("VIDIOC_QBUF");
-
-      break;
-
-    case IO_METHOD_USERPTR:
-      CLEAR(buf);
-
-      buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-      buf.memory = V4L2_MEMORY_USERPTR;
-
-      if (-1 == xioctl(fd_, VIDIOC_DQBUF, &buf)) {
-        switch (errno) {
-          case EAGAIN:
-            return 0;
-
-          case EIO:
-          /* Could ignore EIO, see spec. */
-
-          /* fall through */
-
-          default:
-            errno_exit("VIDIOC_DQBUF");
-        }
-      }
-
-      for (i = 0; i < n_buffers_; ++i)
-        if (buf.m.userptr == (unsigned long)buffers_[i].start &&
-            buf.length == buffers_[i].length)
-          break;
-
-      assert(i < n_buffers_);
-      len = buf.bytesused;
-      result = process_image((void *)buf.m.userptr, len, image_);
-      if (!result) {
-        return 0;
-      }
-
-      if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) errno_exit("VIDIOC_QBUF");
-
+      if (-1 == xioctl(fd_, VIDIOC_QBUF, &v4l_buf)) errno_exit("VIDIOC_QBUF");
       break;
   }
 
@@ -500,18 +435,13 @@ void UsbCam::stop_capturing(void) {
   }
 
   is_capturing_ = false;
-  enum v4l2_buf_type type;
+  enum v4l2_buf_type v4l_type;
 
   switch (io_) {
-    case IO_METHOD_READ:
-      /* Nothing to do. */
-      break;
-
     case IO_METHOD_MMAP:
-    case IO_METHOD_USERPTR:
-      type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+      v4l_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-      if (-1 == xioctl(fd_, VIDIOC_STREAMOFF, &type))
+      if (-1 == xioctl(fd_, VIDIOC_STREAMOFF, &v4l_type))
         errno_exit("VIDIOC_STREAMOFF");
 
       break;
@@ -524,51 +454,25 @@ void UsbCam::start_capturing(void) {
   }
 
   unsigned int i = 0;
-  enum v4l2_buf_type type;
+  enum v4l2_buf_type v4l_type;
 
   switch (io_) {
-    case IO_METHOD_READ:
-      /* Nothing to do. */
-      break;
-
     case IO_METHOD_MMAP:
       for (i = 0; i < n_buffers_; ++i) {
-        struct v4l2_buffer buf;
+        struct v4l2_buffer tmp_buf;
 
-        CLEAR(buf);
+        CLEAR(tmp_buf);
 
-        buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        buf.memory = V4L2_MEMORY_MMAP;
-        buf.index = i;
+        tmp_buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        tmp_buf.memory = V4L2_MEMORY_MMAP;
+        tmp_buf.index = i;
 
-        if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) errno_exit("VIDIOC_QBUF");
+        if (-1 == xioctl(fd_, VIDIOC_QBUF, &tmp_buf)) errno_exit("VIDIOC_QBUF");
       }
 
-      type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+      v4l_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-      if (-1 == xioctl(fd_, VIDIOC_STREAMON, &type))
-        errno_exit("VIDIOC_STREAMON");
-
-      break;
-
-    case IO_METHOD_USERPTR:
-      for (i = 0; i < n_buffers_; ++i) {
-        struct v4l2_buffer buf;
-
-        CLEAR(buf);
-
-        buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        buf.memory = V4L2_MEMORY_USERPTR;
-        buf.index = i;
-        buf.m.userptr = (unsigned long)buffers_[i].start;
-        buf.length = buffers_[i].length;
-
-        if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) errno_exit("VIDIOC_QBUF");
-      }
-
-      type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
-      if (-1 == xioctl(fd_, VIDIOC_STREAMON, &type))
+      if (-1 == xioctl(fd_, VIDIOC_STREAMON, &v4l_type))
         errno_exit("VIDIOC_STREAMON");
 
       break;
@@ -580,137 +484,70 @@ void UsbCam::uninit_device(void) {
   unsigned int i;
 
   switch (io_) {
-    case IO_METHOD_READ:
-      if (buffers_[0].start) {
-        delete[](unsigned char *) buffers_[0].start;
-        buffers_[0].start = NULL;
-      }
-      break;
-
     case IO_METHOD_MMAP:
       for (i = 0; i < n_buffers_; ++i)
         if (-1 == munmap(buffers_[i].start, buffers_[i].length))
           errno_exit("munmap");
       break;
-
-    case IO_METHOD_USERPTR:
-      for (i = 0; i < n_buffers_; ++i) {
-        if (buffers_[i].start) {
-          free(buffers_[i].start);
-          buffers_[i].start = NULL;
-        }
-      }
-      break;
   }
 }
 
 void UsbCam::init_read(unsigned int buffer_size) {
-  // buffers_ = (buffer*)calloc(1, sizeof(*buffers_));
-  buffers_.resize(1);
-
-  buffers_[0].length = buffer_size;
-  buffers_[0].start = (void *)new unsigned char[buffer_size];
-
-  if (!buffers_[0].start) {
-    ROS_ERROR("Out of memory");
-    exit(EXIT_FAILURE);
-  }
+  // return;
 }
 
 void UsbCam::init_mmap(void) {
-  struct v4l2_requestbuffers req;
+  struct v4l2_requestbuffers v4l_req;
 
-  CLEAR(req);
+  CLEAR(v4l_req);
 
-  req.count = 4;
-  req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  req.memory = V4L2_MEMORY_MMAP;
+  v4l_req.count = 4;
+  v4l_req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  v4l_req.memory = V4L2_MEMORY_MMAP;
 
-  if (-1 == xioctl(fd_, VIDIOC_REQBUFS, &req)) {
+  if (-1 == xioctl(fd_, VIDIOC_REQBUFS, &v4l_req)) {
     if (EINVAL == errno) {
-      ROS_ERROR_STREAM(camera_dev_ << " does not support memory mapping");
+      ROS_ERROR_STREAM(camera_dev_ << " don't support mmap");
       exit(EXIT_FAILURE);
     } else {
       errno_exit("VIDIOC_REQBUFS");
     }
   }
 
-  // if (req.count < 2)
-  // {
-  //    ROS_ERROR_STREAM("Insufficient buffer memory on " << camera_dev_);
-  //    exit(EXIT_FAILURE);
-  // }
+  buffers_.resize(v4l_req.count);
 
-  // buffers_ = (buffer*)calloc(req.count, sizeof(*buffers_));
-  buffers_.resize(req.count);
+  for (n_buffers_ = 0; n_buffers_ < v4l_req.count; ++n_buffers_) {
+    struct v4l2_buffer tmp_buf;
 
-  for (n_buffers_ = 0; n_buffers_ < req.count; ++n_buffers_) {
-    struct v4l2_buffer buf;
+    CLEAR(tmp_buf);
 
-    CLEAR(buf);
+    tmp_buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    tmp_buf.memory = V4L2_MEMORY_MMAP;
+    tmp_buf.index = n_buffers_;
 
-    buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    buf.memory = V4L2_MEMORY_MMAP;
-    buf.index = n_buffers_;
+    if (-1 == xioctl(fd_, VIDIOC_QUERYBUF, &tmp_buf)) errno_exit("VIDIOC_QUERYBUF");
 
-    if (-1 == xioctl(fd_, VIDIOC_QUERYBUF, &buf)) errno_exit("VIDIOC_QUERYBUF");
-
-    buffers_[n_buffers_].length = buf.length;
+    buffers_[n_buffers_].length = tmp_buf.length;
     buffers_[n_buffers_].start =
-        mmap(NULL /* start anywhere */, buf.length,
-             PROT_READ | PROT_WRITE /* required */,
-             MAP_SHARED /* recommended */, fd_, buf.m.offset);
+        mmap(NULL, tmp_buf.length, PROT_READ | PROT_WRITE, MAP_SHARED, fd_,
+             tmp_buf.m.offset);
 
     if (MAP_FAILED == buffers_[n_buffers_].start) errno_exit("mmap");
   }
 }
 
 void UsbCam::init_userp(unsigned int buffer_size) {
-  struct v4l2_requestbuffers req;
-  unsigned int page_size;
-
-  page_size = getpagesize();
-  buffer_size = (buffer_size + page_size - 1) & ~(page_size - 1);
-
-  CLEAR(req);
-
-  req.count = 4;
-  req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  req.memory = V4L2_MEMORY_USERPTR;
-
-  if (-1 == xioctl(fd_, VIDIOC_REQBUFS, &req)) {
-    if (EINVAL == errno) {
-      ROS_ERROR_STREAM(camera_dev_ << " does not support "
-                                      "user pointer i/o");
-      exit(EXIT_FAILURE);
-    } else {
-      errno_exit("VIDIOC_REQBUFS");
-    }
-  }
-
-  // buffers_ = (buffer*)calloc(4, sizeof(*buffers_));
-  buffers_.resize(4);
-
-  for (n_buffers_ = 0; n_buffers_ < 4; ++n_buffers_) {
-    buffers_[n_buffers_].length = buffer_size;
-    buffers_[n_buffers_].start =
-        memalign(/* boundary */ page_size, buffer_size);
-
-    if (!buffers_[n_buffers_].start) {
-      ROS_ERROR("Out of memory");
-      exit(EXIT_FAILURE);
-    }
-  }
+  // not support
 }
 
 void UsbCam::init_device(int image_width, int image_height, int framerate) {
-  struct v4l2_capability cap;
-  struct v4l2_cropcap cropcap;
-  struct v4l2_crop crop;
-  struct v4l2_format fmt;
+  struct v4l2_capability v4l_cap;
+  struct v4l2_cropcap v4l_cropcap;
+  struct v4l2_crop v4l_crop;
+  struct v4l2_format v4l_fmt;
   unsigned int min;
 
-  if (-1 == xioctl(fd_, VIDIOC_QUERYCAP, &cap)) {
+  if (-1 == xioctl(fd_, VIDIOC_QUERYCAP, &v4l_cap)) {
     if (EINVAL == errno) {
       ROS_ERROR_STREAM(camera_dev_ << " is no V4L2 device");
       exit(EXIT_FAILURE);
@@ -719,80 +556,59 @@ void UsbCam::init_device(int image_width, int image_height, int framerate) {
     }
   }
 
-  if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
+  if (!(v4l_cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
     ROS_ERROR_STREAM(camera_dev_ << " is no video capture device");
     exit(EXIT_FAILURE);
   }
 
   switch (io_) {
-    case IO_METHOD_READ:
-      if (!(cap.capabilities & V4L2_CAP_READWRITE)) {
-        ROS_ERROR_STREAM(camera_dev_ << " does not support read i/o");
-        exit(EXIT_FAILURE);
-      }
-
-      break;
-
     case IO_METHOD_MMAP:
-    case IO_METHOD_USERPTR:
-      if (!(cap.capabilities & V4L2_CAP_STREAMING)) {
+      if (!(v4l_cap.capabilities & V4L2_CAP_STREAMING)) {
         ROS_ERROR_STREAM(camera_dev_ << " does not support streaming i/o");
         exit(EXIT_FAILURE);
       }
-
       break;
   }
 
-  /* Select video input, video standard and tune here. */
+  CLEAR(v4l_cropcap);
 
-  CLEAR(cropcap);
+  v4l_cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-  cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  if (0 == xioctl(fd_, VIDIOC_CROPCAP, &v4l_cropcap)) {
+    v4l_crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    v4l_crop.c = v4l_cropcap.defrect; /* reset to default */
 
-  if (0 == xioctl(fd_, VIDIOC_CROPCAP, &cropcap)) {
-    crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    crop.c = cropcap.defrect; /* reset to default */
-
-    if (-1 == xioctl(fd_, VIDIOC_S_CROP, &crop)) {
+    if (-1 == xioctl(fd_, VIDIOC_S_CROP, &v4l_crop)) {
       switch (errno) {
         case EINVAL:
-          /* Cropping not supported. */
+          // Cropping not supported.
           break;
         default:
-          /* Errors ignored. */
+          // Errors ignored
           break;
       }
     }
   } else {
-    /* Errors ignored. */
+    /* ignored. */
   }
 
-  CLEAR(fmt);
+  CLEAR(v4l_fmt);
 
-  // fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  // fmt.fmt.pix.width = 640;
-  // fmt.fmt.pix.height = 480;
-  // fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-  // fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
+  v4l_fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  v4l_fmt.fmt.pix.width = image_width;
+  v4l_fmt.fmt.pix.height = image_height;
+  v4l_fmt.fmt.pix.pixelformat = pixelformat_;
+  v4l_fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
 
-  fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  fmt.fmt.pix.width = image_width;
-  fmt.fmt.pix.height = image_height;
-  fmt.fmt.pix.pixelformat = pixelformat_;
-  fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
+  if (-1 == xioctl(fd_, VIDIOC_S_FMT, &v4l_fmt)) errno_exit("VIDIOC_S_FMT");
 
-  if (-1 == xioctl(fd_, VIDIOC_S_FMT, &fmt)) errno_exit("VIDIOC_S_FMT");
+  min = v4l_fmt.fmt.pix.width * 2;
+  if (v4l_fmt.fmt.pix.bytesperline < min) v4l_fmt.fmt.pix.bytesperline = min;
+  min = v4l_fmt.fmt.pix.bytesperline * v4l_fmt.fmt.pix.height;
+  if (v4l_fmt.fmt.pix.sizeimage < min) v4l_fmt.fmt.pix.sizeimage = min;
 
-  /* Note VIDIOC_S_FMT may change width and height. */
-
-  /* Buggy driver paranoia. */
-  min = fmt.fmt.pix.width * 2;
-  if (fmt.fmt.pix.bytesperline < min) fmt.fmt.pix.bytesperline = min;
-  min = fmt.fmt.pix.bytesperline * fmt.fmt.pix.height;
-  if (fmt.fmt.pix.sizeimage < min) fmt.fmt.pix.sizeimage = min;
-
-  image_width = fmt.fmt.pix.width;
-  image_height = fmt.fmt.pix.height;
+  image_width = v4l_fmt.fmt.pix.width;
+  image_height = v4l_fmt.fmt.pix.height;
 
   struct v4l2_streamparm stream_params;
   memset(&stream_params, 0, sizeof(stream_params));
@@ -810,23 +626,14 @@ void UsbCam::init_device(int image_width, int image_height, int framerate) {
     ROS_DEBUG("Set framerate to be %i", framerate);
 
   switch (io_) {
-    case IO_METHOD_READ:
-      init_read(fmt.fmt.pix.sizeimage);
-      break;
-
     case IO_METHOD_MMAP:
       init_mmap();
-      break;
-
-    case IO_METHOD_USERPTR:
-      init_userp(fmt.fmt.pix.sizeimage);
       break;
   }
 }
 
 void UsbCam::close_device(void) {
   if (-1 == close(fd_)) errno_exit("close");
-
   fd_ = -1;
 }
 
@@ -844,7 +651,7 @@ void UsbCam::open_device(void) {
     exit(EXIT_FAILURE);
   }
 
-  fd_ = open(camera_dev_.c_str(), O_RDWR /* required */ | O_NONBLOCK, 0);
+  fd_ = open(camera_dev_.c_str(), O_RDWR | O_NONBLOCK, 0);
 
   if (-1 == fd_) {
     ROS_ERROR_STREAM("Cannot open '" << camera_dev_ << "': " << errno << ", "
@@ -885,7 +692,6 @@ void UsbCam::start(const std::string &dev, io_method io_method,
 
   // instead of malloc with smart pointer
   image_ = boost::make_shared<CameraImage>();
-
   image_->width = image_width;
   image_->height = image_height;
   image_->bytes_per_pixel = 2;  // corrected 11/10/15 (BYTES not BITS per pixel)
@@ -945,17 +751,17 @@ bool UsbCam::grab_image(sensor_msgs::Image *msg, int timeout) {
 
 bool UsbCam::grab_image(int timeout) {
   fd_set fds;
-  struct timeval tv;
+  struct timeval time_val;
   int r = 0;
 
   FD_ZERO(&fds);
   FD_SET(fd_, &fds);
 
-  /* Timeout. */
-  tv.tv_sec = timeout / 1000;
-  tv.tv_usec = 0;
+  // Timeout.
+  time_val.tv_sec = timeout / 1000;
+  time_val.tv_usec = 0;
 
-  r = select(fd_ + 1, &fds, NULL, NULL, &tv);
+  r = select(fd_ + 1, &fds, NULL, NULL, &time_val);
 
   if (-1 == r) {
     if (EINTR == errno) {
@@ -963,7 +769,7 @@ bool UsbCam::grab_image(int timeout) {
       return false;
     }
 
-    errno_exit("select");
+    errno_exit("select error.");
   }
 
   if (0 == r) {
@@ -1055,10 +861,6 @@ void UsbCam::set_v4l_parameter(const std::string &param,
 UsbCam::io_method UsbCam::io_method_from_string(const std::string &str) {
   if (str == "mmap")
     return IO_METHOD_MMAP;
-  else if (str == "read")
-    return IO_METHOD_READ;
-  else if (str == "userptr")
-    return IO_METHOD_USERPTR;
   else
     return IO_METHOD_UNKNOWN;
 }
