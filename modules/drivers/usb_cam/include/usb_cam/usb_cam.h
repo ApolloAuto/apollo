@@ -65,7 +65,7 @@ class UsbCam {
  public:
   typedef enum
   {
-    IO_METHOD_READ, IO_METHOD_MMAP, IO_METHOD_USERPTR, IO_METHOD_UNKNOWN,
+    IO_METHOD_MMAP, IO_METHOD_UNKNOWN,
   } io_method;
 
   typedef enum
