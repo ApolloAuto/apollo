@@ -78,5 +78,5 @@ void LslidarDriverNodelet::devicePoll()
 //
 // parameters are: package, class name, class type, base class type
 PLUGINLIB_DECLARE_CLASS(lslidar_driver, LslidarDriverNodelet,
-                        apollo::drivers::lslidar_driver::LslidarDriverNodelet, 
+                        apollo::drivers::lslidar_driver::LslidarDriverNodelet,
                         nodelet::Nodelet);

@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message NaviPathDeciderConfig {
+  optional uint32 min_path_length = 1 [default = 5];
+  optional uint32 min_look_forward_time = 2 [default = 2];
+  optional double min_smooth_init_y = 3 [default = 0.02];
+  optional double max_smooth_init_y = 4 [default = 0.2];
+  optional double lateral_shift_delta = 5 [default = 0.05];
+  optional double max_lateral_distance = 6 [default = 6.0];
+}

@@ -278,9 +278,6 @@ bool Rtcm3Parser::ProcessObservation() {
         break;
       }
 
-      double freq = 0;
-      gnss_frequence(baud_id, &freq);
-
       auto band_obs = sat_obs->add_band_obs();
       if (rtcm_.obs.data[i].code[i] == CODE_L1C) {
         band_obs->set_pseudo_type(
@@ -293,7 +290,6 @@ bool Rtcm3Parser::ProcessObservation() {
       }
 
       band_obs->set_band_id(baud_id);
-      band_obs->set_frequency_value(freq);
       band_obs->set_pseudo_range(rtcm_.obs.data[i].P[j]);
       band_obs->set_carrier_phase(rtcm_.obs.data[i].L[j]);
       band_obs->set_loss_lock_index(rtcm_.obs.data[i].SNR[j]);

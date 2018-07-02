@@ -50,6 +50,7 @@ SMALL_TOPICS = [
     '/apollo/control',
     '/apollo/control/pad',
     '/apollo/drive_event',
+    '/apollo/guardian',
     '/apollo/localization/pose',
     '/apollo/localization/msf_gnss',
     '/apollo/localization/msf_lidar',
@@ -81,6 +82,17 @@ SMALL_TOPICS = [
     '/tf',
     '/tf_static',
 ]
+
+LARGE_TOPICS = [
+    '/apollo/sensor/camera/traffic/image_short',
+    '/apollo/sensor/camera/traffic/image_long',
+    '/apollo/sensor/velodyne64/compensator/PointCloud2',
+    '/apollo/sensor/velodyne16/compensator/PointCloud2',
+]
+
+
+MIN_DISK_SIZE = 2**35  # 32GB
+
 
 def shell_cmd(cmd, alert_on_failure=True):
     """Execute shell command and return (ret-code, stdout, stderr)."""
@@ -150,6 +162,8 @@ class DiskManager(object):
 
 class Recorder(object):
     """Data recorder."""
+    kEventCollector='modules/data/tools/event_collector_main'
+
 
     def __init__(self, args):
         self.args = args
@@ -167,27 +181,45 @@ class Recorder(object):
         # 2. Or we have a NVME disk.
         record_all = self.args.all or (len(disks) > 0 and disks[0]['is_nvme'])
         # Use the best disk, or fallback '/apollo' if none available.
-        disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else '/apollo'
-        self.record_task(disk_to_use, 'all' if record_all else SMALL_TOPICS)
+        disk_to_use = '/apollo'
+        available_size = 0
+        if len(disks) > 0:
+            disk_to_use = disks[0]['mountpoint']
+            available_size = disks[0]['available_size']
+        else:
+            available_size = DiskManager.disk_avail_size(disk_to_use)
+        if available_size < MIN_DISK_SIZE:
+            print('Insufficient disk space, stop recording: {} with {}'.format(
+                disk_to_use, available_size))
+            return
+        if record_all:
+            self.record_task(disk_to_use, SMALL_TOPICS + LARGE_TOPICS)
+        else:
+            self.record_task(disk_to_use, SMALL_TOPICS)
 
     def stop(self):
         """Stop recording."""
-        shell_cmd('kill -INT $(pgrep -f "rosbag/record" | grep -v pgrep)')
+        shell_cmd('kill -TERM $(pgrep -f "rosbag/record" | grep -v pgrep)')
+        shell_cmd('kill -INT $(pgrep -f "{}" | grep -v pgrep)'.format(
+            Recorder.kEventCollector))
 
-    def record_task(self, disk, topics='all'):
+    def record_task(self, disk, topics):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
         task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         task_dir = os.path.join(disk, 'data/bag', task_id)
         print('Recording bag to {}'.format(task_dir))
 
         log_file = '/apollo/data/log/apollo_record.out'
-        topics_str = '-a' if topics == 'all' else ' '.join(topics)
+        topics_str = ' '.join(topics)
 
         os.makedirs(task_dir)
         cmd = '''
             cd "{}"
+            source /apollo/scripts/apollo_base.sh
             nohup rosbag record --split --duration={} -b 2048 {} >{} 2>&1 &
-        '''.format(task_dir, self.args.split_duration, topics_str, log_file)
+            nohup ${{APOLLO_BIN_PREFIX}}/{} >/dev/null 2>&1 &
+        '''.format(task_dir, self.args.split_duration, topics_str, log_file,
+                   Recorder.kEventCollector)
         shell_cmd(cmd)
 
     @staticmethod

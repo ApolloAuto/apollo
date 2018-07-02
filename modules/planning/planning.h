@@ -144,6 +144,8 @@ class Planning : public apollo::common::ApolloApp {
 
   std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
 
+  common::VehicleState last_vehicle_state_;
+
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
 
   ros::Timer timer_;

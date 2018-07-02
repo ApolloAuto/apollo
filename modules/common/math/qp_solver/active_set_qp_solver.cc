@@ -87,7 +87,7 @@ bool ActiveSetQpSolver::Solve() {
   }
   DCHECK_EQ(index, kernel_matrix_.rows() * kernel_matrix_.cols());
 
-  // search space lower bound and uppper bound
+  // search space lower bound and upper bound
   double lower_bound[num_param_];  // NOLINT
   double upper_bound[num_param_];  // NOLINT
 

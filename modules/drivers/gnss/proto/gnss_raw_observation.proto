@@ -83,7 +83,7 @@ message EpochObservation
     optional GnssTimeType gnss_time_type = 2 [default = GPS_TIME];
     optional uint32 gnss_week = 3;
     optional double gnss_second_s = 4;
-    //Baser observation should be binded with coordinates
+    //Baser observation should be bound with coordinates
     //unit in meter
     optional double position_x = 5;
     //unit in meter
@@ -98,8 +98,8 @@ message EpochObservation
     repeated SatelliteObservation sat_obs = 10;
 }
 
-//This message defines main six keppler orbit parameters and pertubations,
-//designed for gps, beidou, (also supporting qzss, galileo)
+//This message defines main six keppler orbit parameters and perturbations,
+//designed for gps, beidou, (also supporting gnss, galileo)
 message KepplerOrbit
 {
     optional GnssType gnss_type = 1 [default = GPS_SYS];
@@ -112,26 +112,26 @@ message KepplerOrbit
     optional uint32 hour = 7;
     optional uint32 minute = 8;
     optional double second_s = 9;
-    //GNSSS week number
+    //GNSS week number
     optional uint32 week_num = 10;
     optional double reserved = 11;
     optional double af0 = 12;               //clock correction(sec)
     optional double af1 = 13;               //clock correction(sec/sec)
     optional double af2 = 14;               //clock correction(sec/sec2)
     optional double iode = 15;              //Issue Of Data, Ephemeris in subframes 2 and 3
-    optional double deltan = 16;            //mean anomoly correction semi-circles per sec*pi = rads
-    optional double m0 = 17;                //mean anomoly at ref time semi-circles*pi = rads
+    optional double deltan = 16;            //mean anomaly correction semi-circles per sec*pi = rads
+    optional double m0 = 17;                //mean anomaly at ref time semi-circles*pi = rads
     optional double e = 18;                 //eccentricity
-    optional double roota = 19;             //sqr root a ( metres 1/2 )
+    optional double roota = 19;             //sqr root a ( meters 1/2 )
     optional double toe = 20;               //ref time (sec) of ephemeris
     optional double toc = 21;               //ref time (sec) of clock
     optional double cic = 22;               //harmonic correction term(rads)
-    optional double crc = 23;               //harmonic correction term(metres)
+    optional double crc = 23;               //harmonic correction term(meters)
     optional double cis = 24;               //harmonic correction term(rads)
-    optional double crs = 25;               //harmonic correction term(metres)
+    optional double crs = 25;               //harmonic correction term(meters)
     optional double cuc = 26;               //harmonic correction term(rads)
     optional double cus = 27;               //harmonic correction term(rads)
-    optional double omega0 = 28;            //longitude  of asccending node semi-circles*pi = rads
+    optional double omega0 = 28;            //longitude  of ascending node semi-circles*pi = rads
     optional double omega = 29;             //argument of perigee semi-circles*pi
     optional double i0 = 30;                //inclination angle at ref time semi-circles*pi
     optional double omegadot = 31;          //rate of right ascension semi-circles/sec*pi
@@ -140,8 +140,8 @@ message KepplerOrbit
     optional uint32 L2Pdataflag = 34;       //data flag of L2P
     optional uint32 accuracy = 35;          //user range accuracy
     optional uint32 health = 36;            //satellite health: 0=good,1=bad
-    optional double tgd = 37;               //grup delay (s)
-    optional double iodc = 38;              //Issue Of Data, Clock 
+    optional double tgd = 37;               //group delay (s)
+    optional double iodc = 38;              //Issue Of Data, Clock
 }
 
 //This message defines orbit parameters of GLONASS
@@ -152,7 +152,7 @@ message GlonassOrbit
     optional GnssTimeType gnss_time_type = 3 [default = GLO_TIME];
     //refer to GLONASS time and toc == toe
     optional double toe = 4;
-    //must convert toe to UTC(+0) format and fullfil year, month...second_s,etc.
+    //must convert toe to UTC(+0) format and fulfill year, month...second_s,etc.
     optional uint32 year = 5;
     optional uint32 month = 6;
     optional uint32 day = 7;
@@ -161,7 +161,7 @@ message GlonassOrbit
     optional double second_s = 10;
     //unit in meter
     optional int32 frequency_no = 11;
-    //GNSS week number    
+    //GNSS week number
     optional uint32 week_num = 12;
     //GNSS week second in seconds
     optional double week_second_s = 13;
@@ -173,7 +173,7 @@ message GlonassOrbit
     optional double clock_drift = 16;
     //Satellite health : 0=good,1=bad
     optional uint32 health = 17;
-    //unit in meter 
+    //unit in meter
     optional double position_x = 18;
     optional double position_y = 19;
     optional double position_z = 20;

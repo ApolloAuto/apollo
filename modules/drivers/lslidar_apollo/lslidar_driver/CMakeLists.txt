@@ -15,7 +15,7 @@ find_package(Boost REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS
-    roscpp 
+    roscpp
     nodelet
     lslidar_msgs
   DEPENDS
@@ -73,7 +73,7 @@ add_dependencies(lslidar_driver_nodelet
 
 # install options
 install(
-    TARGETS 
+    TARGETS
     lslidar_driver
     lslidar_driver_node
     lslidar_driver_nodelet

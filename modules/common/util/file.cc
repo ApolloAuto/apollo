@@ -16,7 +16,6 @@
 
 #include "modules/common/util/file.h"
 
-#include <dirent.h>
 #include <errno.h>
 #include <limits.h>
 #include <algorithm>
@@ -33,10 +32,14 @@ namespace {
 
 std::string GetRosHome() {
   // Note that ROS_ROOT env points to <ROS_HOME>/share/ros.
-  const std::string known_tail = "/share/ros";
-  const std::string ros_root = CHECK_NOTNULL(std::getenv("ROS_ROOT"));
-  CHECK(EndWith(ros_root, known_tail));
-  return ros_root.substr(0, ros_root.length() - known_tail.length());
+  static const std::string kKnownTail = "/share/ros";
+  const char* ros_root = std::getenv("ROS_ROOT");
+  if (ros_root == nullptr || !EndWith(ros_root, kKnownTail)) {
+    AERROR << "Failed to find ROS root: " << ros_root;
+    // Return dummy path which simply raises error if an operation is called.
+    return "/CANNOT_FIND_ROS_HOME";
+  }
+  return std::string(ros_root, strlen(ros_root) - kKnownTail.length());
 }
 
 }  // namespace
@@ -208,7 +211,8 @@ bool RemoveAllFiles(const std::string &directory_path) {
   return true;
 }
 
-std::vector<std::string> ListSubDirectories(const std::string &directory_path) {
+std::vector<std::string> ListSubPaths(const std::string &directory_path,
+                                      const unsigned char d_type) {
   std::vector<std::string> result;
   DIR *directory = opendir(directory_path.c_str());
   if (directory == nullptr) {
@@ -218,12 +222,9 @@ std::vector<std::string> ListSubDirectories(const std::string &directory_path) {
 
   struct dirent *entry;
   while ((entry = readdir(directory)) != nullptr) {
-    // skip directory_path/. and directory_path/..
-    if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) {
-      continue;
-    }
-
-    if (entry->d_type == DT_DIR) {
+    // Skip "." and "..".
+    if (entry->d_type == d_type &&
+        strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
       result.emplace_back(entry->d_name);
     }
   }

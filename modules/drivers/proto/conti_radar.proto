@@ -45,44 +45,44 @@ message ContiRadarObs {
   required double longitude_dist = 4;
   // lateral distance to the radar; (+) = left; unit = m
   required double lateral_dist = 5;
-  // longitude velocity to the radar; (+) = farword; unit = m/s
+  // longitude velocity to the radar; (+) = forward; unit = m/s
   required double longitude_vel = 6;
   // lateral velocity to the radar; (+) = left; unit = m/s
   required double lateral_vel = 7;
   // obstacle Radar Cross-Section; unit = dBsm
   optional double rcs = 8;
   // 0 = moving, 1 = stationary, 2 = oncoming, 3 = stationary candidate
-  // 4 = unkonwn, 5 = crossing stationary, 6 = crossing moving, 7 = stopped
+  // 4 = unknown, 5 = crossing stationary, 6 = crossing moving, 7 = stopped
   optional int32 dynprop = 9;
   // longitude distance standard deviation to the radar; (+) = forward; unit = m
   optional double longitude_dist_rms = 10;
-  // lateral distance standard deviationto the radar; (+) = left; unit = m
+  // lateral distance standard deviation to the radar; (+) = left; unit = m
   optional double lateral_dist_rms = 11;
-  // longitude velocity standard deviation to the radar; (+) = farword; unit = m/s
+  // longitude velocity standard deviation to the radar; (+) = forward; unit = m/s
   optional double longitude_vel_rms = 12;
   //lateral velocity standard deviation to the radar; (+) = left; unit = m/s
   optional double lateral_vel_rms = 13;
-  // obstacle probablity of existence
+  // obstacle probability of existence
   optional double probexist = 14;
 
   //The following is only valid for the track object message
   // 0 = deleted, 1 = new, 2 = measured, 3 = predicted, 4 = deleted for, 5 = new from merge
   optional int32 meas_state = 15;
-  // longitude acceleration to the radar; (+) = farword; unit = m/s2
+  // longitude acceleration to the radar; (+) = forward; unit = m/s2
   optional double longitude_accel = 16;
   // lateral acceleration to the radar; (+) = left; unit = m/s2
   optional double lateral_accel = 17;
-  // oritation angle to the radar; (+) = conterclockwise; unit = degree
+  // orientation angle to the radar; (+) = counterclockwise; unit = degree
   optional double oritation_angle = 18;
-  // longitude acceleration standard deviation to the radar; (+) = farword; unit = m/s2
+  // longitude acceleration standard deviation to the radar; (+) = forward; unit = m/s2
   optional double longitude_accel_rms = 19;
-  // lateral acclearation standard deviation to the radar; (+) = left; unit = m/s2
+  // lateral acceleration standard deviation to the radar; (+) = left; unit = m/s2
   optional double lateral_accel_rms = 20;
-  // oritation angle standard deviation to the radar; (+) = conterclockwise; unit = degree
+  // orientation angle standard deviation to the radar; (+) = counterclockwise; unit = degree
   optional double oritation_angle_rms = 21;
   optional double length = 22; // obstacle length; unit = m
   optional double width = 23;//obstacle width; unit = m
-  // 0: point; 1: car; 2: truck; 3: pedestrian; 4: motocycle; 5: bicycle; 6: wide; 7: unknown
+  // 0: point; 1: car; 2: truck; 3: pedestrian; 4: motorcycle; 5: bicycle; 6: wide; 7: unknown
   optional int32 obstacle_class = 24;
 }
 

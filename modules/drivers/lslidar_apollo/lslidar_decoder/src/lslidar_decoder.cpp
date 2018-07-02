@@ -59,7 +59,7 @@ bool LslidarDecoder::loadParameters() {
     {
         ROS_WARN("This is apollo interface mode");
     }
-        
+
     return true;
 }
 
@@ -131,7 +131,7 @@ void LslidarDecoder::publishPointCloud() {
         // seems to be corrupted based on the received data.
         // TODO: The two end points should be removed directly
         //    in the scans.
-        
+
         // point_time unit is sec
         double timestamp = point_time;
         point_cloud->header.stamp = static_cast<uint64_t>(timestamp * 1e6);
@@ -302,13 +302,13 @@ void LslidarDecoder::decodePacket(const RawPacket* packet) {
                 azimuth_diff = firings[fir_idx+1].firing_azimuth -
                         firings[fir_idx].firing_azimuth;
             }
-                
+
             else
             {
                 azimuth_diff = firings[fir_idx].firing_azimuth -
                         firings[fir_idx-1].firing_azimuth;
             }
-                
+
             for (size_t scan_fir_idx = 0; scan_fir_idx < SCANS_PER_FIRING; ++scan_fir_idx){
                 size_t byte_idx = RAW_SCAN_SIZE * (
                             SCANS_PER_FIRING*blk_fir_idx + scan_fir_idx);
@@ -360,7 +360,7 @@ void LslidarDecoder::packetCallback(
     if (!checkPacketValidity(raw_packet))
     {
         return;
-    } 
+    }
 
     // Decode the packet
     decodePacket(raw_packet);
@@ -372,7 +372,7 @@ void LslidarDecoder::packetCallback(
     size_t new_sweep_start = 0;
     do {
         //    if (firings[new_sweep_start].firing_azimuth < last_azimuth) break;
-        if (fabs(firings[new_sweep_start].firing_azimuth - last_azimuth) > M_PI) 
+        if (fabs(firings[new_sweep_start].firing_azimuth - last_azimuth) > M_PI)
         {
             break;
         }
@@ -388,12 +388,12 @@ void LslidarDecoder::packetCallback(
     // second sweep in order to find the 0 azimuth angle.
     size_t start_fir_idx = 0;
     size_t end_fir_idx = new_sweep_start;
-    if (is_first_sweep && new_sweep_start == FIRINGS_PER_PACKET) 
+    if (is_first_sweep && new_sweep_start == FIRINGS_PER_PACKET)
     {
         // The first sweep has not ended yet.
         return;
-    } 
-    else 
+    }
+    else
     {
         if (is_first_sweep) {
             is_first_sweep = false;
@@ -404,9 +404,9 @@ void LslidarDecoder::packetCallback(
         }
     }
 
-    for (size_t fir_idx = start_fir_idx; fir_idx < end_fir_idx; ++fir_idx) 
+    for (size_t fir_idx = start_fir_idx; fir_idx < end_fir_idx; ++fir_idx)
     {
-        for (size_t scan_idx = 0; scan_idx < SCANS_PER_FIRING; ++scan_idx) 
+        for (size_t scan_idx = 0; scan_idx < SCANS_PER_FIRING; ++scan_idx)
         {
             // Check if the point is valid.
             if (!isPointInRange(firings[fir_idx].distance[scan_idx])) continue;
@@ -437,7 +437,7 @@ void LslidarDecoder::packetCallback(
             sweep_data->scans[remapped_scan_idx].points.push_back(
                         lslidar_msgs::LslidarPoint());
 
-            lslidar_msgs::LslidarPoint& new_point =		// new_point 为push_back最后一个的引用
+            lslidar_msgs::LslidarPoint& new_point =		// new_point refers to the last element of push_back
                     sweep_data->scans[remapped_scan_idx].points[
                     sweep_data->scans[remapped_scan_idx].points.size()-1];
 
@@ -455,7 +455,7 @@ void LslidarDecoder::packetCallback(
     packet_start_time += FIRING_TOFFSET * (end_fir_idx-start_fir_idx);
 
     // A new sweep begins
-    if (end_fir_idx != FIRINGS_PER_PACKET) 
+    if (end_fir_idx != FIRINGS_PER_PACKET)
     {
         //	ROS_WARN("A new sweep begins");
         // Publish the last revolution
@@ -464,11 +464,11 @@ void LslidarDecoder::packetCallback(
 
         sweep_pub.publish(sweep_data);
 
-        if (publish_point_cloud) 
+        if (publish_point_cloud)
         {
             publishPointCloud();
         }
-        
+
         if (publish_channels)
         {
             publishChannelScan();
@@ -491,12 +491,12 @@ void LslidarDecoder::packetCallback(
         start_fir_idx = end_fir_idx;
         end_fir_idx = FIRINGS_PER_PACKET;
 
-        for (size_t fir_idx = start_fir_idx; fir_idx < end_fir_idx; ++fir_idx) 
+        for (size_t fir_idx = start_fir_idx; fir_idx < end_fir_idx; ++fir_idx)
         {
-            for (size_t scan_idx = 0; scan_idx < SCANS_PER_FIRING; ++scan_idx) 
+            for (size_t scan_idx = 0; scan_idx < SCANS_PER_FIRING; ++scan_idx)
             {
                 // Check if the point is valid.
-                if (!isPointInRange(firings[fir_idx].distance[scan_idx])) 
+                if (!isPointInRange(firings[fir_idx].distance[scan_idx]))
                 {
                     continue;
                 }
