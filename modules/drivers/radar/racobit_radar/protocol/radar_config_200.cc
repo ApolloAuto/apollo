@@ -90,9 +90,7 @@ void RadarConfig200::Reset() {
   radar_conf_.set_rcs_threshold(RCS_THRESHOLD_STANDARD);
 }
 
-RadarConf RadarConfig200::radar_conf() {
-  return radar_conf_;
-}
+RadarConf RadarConfig200::radar_conf() { return radar_conf_; }
 
 RadarConfig200* RadarConfig200::set_radar_conf(RadarConf radar_conf) {
   radar_conf_.CopyFrom(radar_conf);

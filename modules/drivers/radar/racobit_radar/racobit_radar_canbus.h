@@ -44,9 +44,9 @@
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 #include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
-#include "modules/drivers/radar/racobit_radar/racobit_radar_message_manager.h"
-#include "modules/drivers/radar/racobit_radar/protocol/radar_config_200.h"
 #include "modules/drivers/proto/racobit_radar.pb.h"
+#include "modules/drivers/radar/racobit_radar/protocol/radar_config_200.h"
+#include "modules/drivers/radar/racobit_radar/racobit_radar_message_manager.h"
 
 /**
  * @namespace apollo::drivers
@@ -59,7 +59,8 @@ namespace racobit_radar {
 /**
 * @class RacobitRadarCanbus
 *
-* @brief template of canbus-based sensor module main class (e.g., racobit_radar).
+* @brief template of canbus-based sensor module main class (e.g.,
+* racobit_radar).
 */
 
 using apollo::common::adapter::AdapterConfig;

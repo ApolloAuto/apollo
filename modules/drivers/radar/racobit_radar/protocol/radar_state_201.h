@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #ifndef MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_RADAR_STATE_201_H_
-#define MODULES_DRIVERS_RADAR_RACOBIT_PROTOCOL_RADAR_STATE_201_H_
+#define MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_RADAR_STATE_201_H_
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/racobit_radar.pb.h"

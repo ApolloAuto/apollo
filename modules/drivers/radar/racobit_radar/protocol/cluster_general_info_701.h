@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #ifndef MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_CLUSTER_GENERAL_INFO_701_H_
-#define MODULES_DRIVERS_RADAR_RACOBIT_PROTOCOL_CLUSTER_GENERAL_INFO_701_H_
+#define MODULES_DRIVERS_RADAR_RACOBIT_RADAR_PROTOCOL_CLUSTER_GENERAL_INFO_701_H_
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/proto/racobit_radar.pb.h"
@@ -27,8 +27,7 @@ namespace racobit_radar {
 using apollo::drivers::RacobitRadar;
 
 class ClusterGeneralInfo701
-    : public apollo::drivers::canbus::\
-    ProtocolData<RacobitRadar> {
+    : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
  public:
   static const uint32_t ID;
   ClusterGeneralInfo701();
