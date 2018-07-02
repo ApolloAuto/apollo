@@ -13,6 +13,7 @@ RUN bash /tmp/installers/install_glew.sh
 RUN bash /tmp/installers/install_glusterfs.sh
 RUN bash /tmp/installers/install_gpu_caffe.sh
 RUN bash /tmp/installers/install_ipopt.sh
+RUN bash /tmp/installers/install_libjsonrpc-cpp.sh
 RUN bash /tmp/installers/install_nlopt.sh
 RUN bash /tmp/installers/install_node.sh
 RUN bash /tmp/installers/install_ota.sh
