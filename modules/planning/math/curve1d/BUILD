@@ -34,6 +34,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "quartic_polynomial_curve1d_test",
+    size = "small",
+    srcs = [
+        "quartic_polynomial_curve1d_test.cc",
+    ],
+    deps = [
+        ":quartic_polynomial_curve1d",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "quintic_polynomial_curve1d",
     srcs = [
@@ -64,6 +76,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "cubic_polynomial_curve1d_test",
+    size = "small",
+    srcs = [
+        "cubic_polynomial_curve1d_test.cc",
+    ],
+    deps = [
+        ":cubic_polynomial_curve1d",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "quintic_spiral_path",
     srcs = [
@@ -77,6 +101,18 @@ cc_library(
         "//modules/common:log",
         "//modules/common/math",
         "//modules/common/util:string_util",
+    ],
+)
+
+cc_test(
+    name = "quintic_polynomial_curve1d_test",
+    size = "small",
+    srcs = [
+        "quintic_polynomial_curve1d_test.cc",
+    ],
+    deps = [
+        ":quintic_polynomial_curve1d",
+        "@gtest//:main",
     ],
 )
 

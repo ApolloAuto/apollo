@@ -37,7 +37,7 @@ DEFINE_double(
 
 DEFINE_bool(prediction_offline_mode, false, "Prediction offline mode");
 
-DEFINE_double(prediction_duration, 5.0, "Prediction duration (in seconds)");
+DEFINE_double(prediction_duration, 8.0, "Prediction duration (in seconds)");
 DEFINE_double(prediction_period, 0.1, "Prediction period (in seconds");
 DEFINE_double(double_precision, 1e-6, "precision of double");
 DEFINE_double(min_prediction_length, 20.0,

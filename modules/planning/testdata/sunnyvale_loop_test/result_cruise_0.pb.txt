@@ -1367,7 +1367,7 @@ routing_header {
   module_name: "routing"
   sequence_num: 1
 }
-right_of_way_status: UNPROTECTED
+right_of_way_status: PROTECTED
 lane_id {
   id: "752_1_-1"
 }

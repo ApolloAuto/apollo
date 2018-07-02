@@ -27,14 +27,6 @@
 namespace apollo {
 namespace monitor {
 
-// SummaryCleaner runs at the beginning of every round. So we can get refreshed
-// result.
-class SummaryCleaner : public RecurrentRunner {
- public:
-  SummaryCleaner();
-  void RunOnce(const double current_time) override;
-};
-
 // A monitor which summarize other monitors' result and publish the whole status
 // if it has changed.
 class SummaryMonitor : public RecurrentRunner {

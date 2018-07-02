@@ -40,7 +40,7 @@ class PCDExporter {
   ~PCDExporter();
   void init();
   /**
-   * @brief write pc data to pcd/pcd_pos/stamp file when recieve a msg
+   * @brief write pc data to pcd/pcd_pos/stamp file when receive a msg
    */
   void pcd_writer_callback(sensor_msgs::PointCloud2::ConstPtr msg);
 

@@ -31,6 +31,23 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "discretized_trajectory_test",
+    size = "small",
+    srcs = [
+        "discretized_trajectory_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":discretized_trajectory",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
+
 cc_library(
     name = "publishable_trajectory",
     srcs = [

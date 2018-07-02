@@ -116,9 +116,6 @@ function generate_build_targets() {
 #=================================================
 
 function build() {
-  START_TIME=$(get_now)
-
-
   info "Start building, please wait ..."
   generate_build_targets
   info "Building on $MACHINE_ARCH..."
@@ -153,8 +150,6 @@ function build() {
 }
 
 function cibuild() {
-  START_TIME=$(get_now)
-
   echo "Start building, please wait ..."
   generate_build_targets
   echo "Building on $MACHINE_ARCH..."
@@ -196,11 +191,8 @@ function build_py_proto() {
 }
 
 function check() {
-  local check_start_time=$(get_now)
-
   bash $0 build && bash $0 "test" && bash $0 lint
 
-  START_TIME=$check_start_time
   if [ $? -eq 0 ]; then
     success 'Check passed!'
     return 0
@@ -275,14 +267,11 @@ function release() {
   mkdir "${LIB_DIR}"
   if $USE_ESD_CAN; then
     warn_proprietary_sw
-    for m in esd_can
-    do
-      cp third_party/can_card_library/$m/lib/* $LIB_DIR
-    done
   fi
+  cp -r third_party/can_card_library/*/lib/* $LIB_DIR
   cp -r bazel-genfiles/external $LIB_DIR
   cp -r py_proto/modules $LIB_DIR
-  cp /apollo/modules/perception/cuda_util/cmake_build/libcuda_util.so $LIB_DIR
+  cp modules/perception/cuda_util/cmake_build/libcuda_util.so $LIB_DIR
 
   # doc
   cp -r docs "${APOLLO_RELEASE_DIR}"
@@ -320,11 +309,11 @@ function gen_coverage() {
     cp "$f" "$target"
   done
 
-  lcov --capture --directory "$COV_DIR/objs" --output-file "$COV_DIR/conv.info"
+  lcov --rc lcov_branch_coverage=1 --capture --directory "$COV_DIR/objs" --output-file "$COV_DIR/conv.info"
   if [ $? -ne 0 ]; then
     fail 'lcov failed!'
   fi
-  lcov --remove "$COV_DIR/conv.info" \
+  lcov --rc lcov_branch_coverage=1 --remove "$COV_DIR/conv.info" \
       "external/*" \
       "/usr/*" \
       "bazel-out/*" \
@@ -336,8 +325,6 @@ function gen_coverage() {
 }
 
 function run_test() {
-  START_TIME=$(get_now)
-
   generate_build_targets
   if [ "$USE_GPU" == "1" ]; then
     echo -e "${RED}Need GPU to run the tests.${NO_COLOR}"
@@ -350,14 +337,6 @@ function run_test() {
     return 1
   fi
 
-  if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
-      cd /apollo-simulator && bash build.sh test
-      if [ $? -ne 0 ]; then
-        fail 'Test failed!'
-        return 1
-      fi
-  fi
-
   if [ $? -eq 0 ]; then
     success 'Test passed!'
     return 0
@@ -365,7 +344,6 @@ function run_test() {
 }
 
 function citest() {
-  START_TIME=$(get_now)
   BUILD_TARGETS="
   //modules/planning/integration_tests:garage_test
   //modules/planning/integration_tests:sunnyvale_loop_test
@@ -394,8 +372,6 @@ function run_bash_lint() {
 }
 
 function run_lint() {
-  START_TIME=$(get_now)
-
   # Add cpplint rule to BUILD files that do not contain it.
   for file in $(find modules -name BUILD |  grep -v gnss/third_party | \
     xargs grep -l -E 'cc_library|cc_test|cc_binary' | xargs grep -L 'cpplint()')
@@ -418,8 +394,6 @@ function clean() {
 }
 
 function buildify() {
-  START_TIME=$(get_now)
-
   local buildifier_url=https://github.com/bazelbuild/buildtools/releases/download/0.4.5/buildifier
   wget $buildifier_url -O ~/.buildifier
   chmod +x ~/.buildifier
@@ -496,6 +470,30 @@ function build_lslidar() {
   rm -rf modules/devel_isolated/
 }
 
+function build_rslidar() {
+  CURRENT_PATH=$(pwd)
+  if [ -d "${ROS_ROOT}" ]; then
+    ROS_PATH="${ROS_ROOT}/../.."
+  else
+    warning "ROS not found. Run apolllo.sh build first."
+    exit 1
+  fi
+
+  source "${ROS_PATH}/setup.bash"
+
+  cd modules
+  catkin_make_isolated --install --source drivers/rslidar \
+    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
+    --cmake-args --no-warn-unused-cli
+  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
+  cd -
+
+  rm -rf modules/.catkin_workspace
+  rm -rf modules/build_isolated/
+  rm -rf modules/devel_isolated/
+}
+
+
 function build_usbcam() {
   CURRENT_PATH=$(pwd)
   if [ -d "${ROS_ROOT}" ]; then
@@ -537,6 +535,7 @@ function print_usage() {
   ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_velodyne${NONE}: build velodyne driver
+  ${BLUE}build_rslidar${NONE}: build rslidar driver
   ${BLUE}build_usbcam${NONE}: build usb camera driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
@@ -571,6 +570,7 @@ function main() {
   local cmd=$1
   shift
 
+  START_TIME=$(get_now)
   case $cmd in
     check)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
@@ -625,6 +625,9 @@ function main() {
       ;;
     build_velodyne)
       build_velodyne
+      ;;
+    build_rslidar)
+      build_rslidar
       ;;
     build_usbcam)
       build_usbcam

@@ -40,6 +40,8 @@ DEFINE_string(onboard_roi_filter, "DummyROIFilter", "onboard roi filter");
 DEFINE_string(onboard_segmentor, "DummySegmentation", "onboard segmentation");
 DEFINE_string(onboard_object_builder, "DummyObjectBuilder",
               "onboard object builder");
+DEFINE_string(onboard_object_filter, "DummyObjectFilter",
+              "onboard object filter");
 DEFINE_string(onboard_tracker, "DummyTracker", "onboard tracker");
 DEFINE_string(onboard_type_fuser, "DummyTypeFuser", "onboard type fuser");
 
@@ -154,6 +156,8 @@ DEFINE_string(
     yolo_camera_detector_config,
     "modules/perception/model/camera/yolo_camera_detector_config.pb.txt",
     "Yolo camera detector config filename.");
+DEFINE_bool(use_whole_lane_line, false,
+            "Use whole lane line model or not");
 DEFINE_string(modest_radar_detector_config,
               "modules/perception/model/modest_radar_detector_config.pb.txt",
               "modest radar detector config filename.");

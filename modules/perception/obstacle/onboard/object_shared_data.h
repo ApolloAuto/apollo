@@ -42,11 +42,13 @@ OBJECT_SHARED_DATA(LidarObjectData);
 OBJECT_SHARED_DATA(RadarObjectData);
 OBJECT_SHARED_DATA(CameraObjectData);
 OBJECT_SHARED_DATA(CIPVObjectData);
+OBJECT_SHARED_DATA(UltrasonicObjectData);
 
 REGISTER_SHAREDDATA(LidarObjectData);
 REGISTER_SHAREDDATA(RadarObjectData);
 REGISTER_SHAREDDATA(CameraObjectData);
 REGISTER_SHAREDDATA(CIPVObjectData);
+REGISTER_SHAREDDATA(UltrasonicObjectData);
 
 }  // namespace perception
 }  // namespace apollo

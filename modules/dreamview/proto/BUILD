@@ -68,4 +68,7 @@ cc_proto_library(
 proto_library(
     name = "voice_detection_proto_lib",
     srcs = ["voice_detection.proto"],
+    deps = [
+        ":hmi_config_proto_lib",
+    ],
 )

@@ -31,4 +31,4 @@ catkin_make_isolated --install \
     --install-space ${ROS_PATH} -DCMAKE_BUILD_TYPE=Release \
     --cmake-args --no-warn-unused-cli
 
-echo "Build pandora dirver successfully."
+echo "Build pandora driver successfully."

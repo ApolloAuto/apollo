@@ -9,10 +9,10 @@ decision {
       reason_code: STOP_REASON_STOP_SIGN
       reason: "stop by SS_1022"
       stop_point {
-        x: 586703.4241167244
-        y: 4140225.2991095823
+        x: 586704.05428573908
+        y: 4140225.0855636597
       }
-      stop_heading: -2.040619802435979
+      stop_heading: -1.9668832418443414
       change_lane_type: FORWARD
     }
   }
@@ -24,11 +24,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586699.52081985865
-            y: 4140219.7009546966
+            x: 586701.68234785623
+            y: 4140220.8214427494
             z: 0
           }
-          fence_heading: -2.3136452861365631
+          fence_heading: -2.1870726703334271
         }
       }
     }
@@ -40,11 +40,11 @@ decision {
           reason_code: STOP_REASON_STOP_SIGN
           distance_s: -1
           stop_point {
-            x: 586703.4241167244
-            y: 4140225.2991095823
+            x: 586704.05428573908
+            y: 4140225.0855636597
             z: 0
           }
-          stop_heading: -2.040619802435979
+          stop_heading: -1.9668832418443414
         }
       }
     }

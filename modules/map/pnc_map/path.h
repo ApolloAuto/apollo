@@ -211,12 +211,19 @@ class InterpolatedIndex {
 class Path {
  public:
   Path() = default;
-  explicit Path(std::vector<MapPathPoint> path_points);
+  explicit Path(const std::vector<MapPathPoint>& path_points);
+  explicit Path(std::vector<MapPathPoint>&& path_points);
 
-  Path(std::vector<MapPathPoint> path_points,
-       std::vector<LaneSegment> lane_segments);
-  Path(std::vector<MapPathPoint> path_points,
-       std::vector<LaneSegment> lane_segments,
+  Path(const std::vector<MapPathPoint>& path_points,
+       const std::vector<LaneSegment>& lane_segments);
+  Path(std::vector<MapPathPoint>&& path_points,
+       std::vector<LaneSegment>&& lane_segments);
+
+  Path(const std::vector<MapPathPoint>& path_points,
+       const std::vector<LaneSegment>& lane_segments,
+       const double max_approximation_error);
+  Path(std::vector<MapPathPoint>&& path_points,
+       std::vector<LaneSegment>&& lane_segments,
        const double max_approximation_error);
 
   // Return smooth coordinate by interpolated index or accumulate_s.
@@ -227,6 +234,12 @@ class Path {
   double GetSFromIndex(const InterpolatedIndex& index) const;
   // Compute interpolated index by accumulate_s.
   InterpolatedIndex GetIndexFromS(double s) const;
+
+  // get the index of the lane from s by accumulate_s
+  InterpolatedIndex GetLaneIndexFromS(double s) const;
+
+  std::vector<hdmap::LaneSegment> GetLaneSegments(const double start_s,
+                                                  const double end_s) const;
 
   bool GetNearestPoint(const common::math::Vec2d& point, double* accumulate_s,
                        double* lateral) const;
@@ -297,7 +310,7 @@ class Path {
   double GetLaneLeftWidth(const double s) const;
   double GetLaneRightWidth(const double s) const;
   bool GetLaneWidth(const double s, double* lane_left_width,
-                double* lane_right_width) const;
+                    double* lane_right_width) const;
 
   double GetRoadLeftWidth(const double s) const;
   double GetRoadRightWidth(const double s) const;
@@ -329,6 +342,7 @@ class Path {
   int num_segments_ = 0;
   std::vector<MapPathPoint> path_points_;
   std::vector<LaneSegment> lane_segments_;
+  std::vector<double> lane_accumulated_s_;
   std::vector<LaneSegment> lane_segments_to_next_point_;
   std::vector<common::math::Vec2d> unit_directions_;
   double length_ = 0.0;
