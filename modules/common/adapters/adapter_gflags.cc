@@ -71,6 +71,8 @@ DEFINE_string(delphi_esr_topic, "/apollo/sensor/delphi_esr",
               "delphi esr radar topic name");
 DEFINE_string(conti_radar_topic, "/apollo/sensor/conti_radar",
               "continental radar topic name");
+DEFINE_string(racobit_radar_topic, "/apollo/sensor/racobit_radar",
+              "racobit radar topic name");
 DEFINE_string(ultrasonic_radar_topic, "/apollo/sensor/ultrasonic_radar",
               "ultrasonic esr radar topic name");
 // TODO(Authors): Change the topic name
