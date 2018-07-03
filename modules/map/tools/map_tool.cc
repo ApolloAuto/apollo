@@ -30,7 +30,7 @@ DEFINE_string(output_dir, "/tmp/", "output map directory");
 
 using apollo::hdmap::Map;
 
-void ShiftMap(Map* map_pb) {
+static void ShiftMap(Map* map_pb) {
   for (auto& lane : *(map_pb->mutable_lane())) {
     for (auto& segment : *(lane.mutable_central_curve()->mutable_segment())) {
       for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
@@ -65,7 +65,7 @@ void ShiftMap(Map* map_pb) {
   }
 }
 
-void OutputMap(const Map& map_pb) {
+static void OutputMap(const Map& map_pb) {
   const std::string txt_file = FLAGS_output_dir + "/base_map.txt";
   const std::string bin_file = FLAGS_output_dir + "/base_map.bin";
   CHECK(apollo::common::util::SetProtoToASCIIFile(map_pb, txt_file));
