@@ -1,5 +1,10 @@
 # Quick Start Guides
 
+## Apollo 3.0
+
+- [Apollo 3.0 quick start](apollo_3_0_quick_start.md)
+- [Apollo 3.0 hardware system installation guide](apollo_3_0_hardware_system_installation_guide.md)
+
 ## Apollo 2.5
 
 - [Apollo 2.5 quick start](apollo_2_5_quick_start.md)
