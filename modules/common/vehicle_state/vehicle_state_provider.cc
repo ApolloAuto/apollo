@@ -70,11 +70,14 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
     AERROR << "Invalid localization input.";
     return false;
   }
+
+  /**
   // skip localization update when it is in use_navigation_mode.
   if (FLAGS_use_navigation_mode) {
     ADEBUG << "Skip localization update when it is in use_navigation_mode.";
     return true;
   }
+  **/
 
   vehicle_state_.mutable_pose()->CopyFrom(localization.pose());
   if (localization.pose().has_position()) {
@@ -190,6 +193,13 @@ void VehicleStateProvider::set_linear_velocity(const double linear_velocity) {
 
 const VehicleState &VehicleStateProvider::vehicle_state() const {
   return vehicle_state_;
+}
+
+void VehicleStateProvider::set_vehicle_config(const double x, const double y,
+    const double heading) {
+  vehicle_state_.set_x(x);
+  vehicle_state_.set_y(y);
+  vehicle_state_.set_heading(heading);
 }
 
 math::Vec2d VehicleStateProvider::EstimateFuturePosition(const double t) const {
