@@ -93,6 +93,9 @@ modules {
   process_conf {
     process_cmd_keywords: "modules/planning/planning"
   }
+  topic_conf {
+    type: PLANNING_TRAJECTORY
+  }
 }
 modules {
   name: "navigation_planning"
