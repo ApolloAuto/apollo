@@ -61,7 +61,7 @@ class DAGStreaming : public Thread {
 
   size_t CongestionValue() const;
 
-  static Subnode *GetSubnodeByName(std::string name);
+  static Subnode *GetSubnodeByName(const std::string &name);
 
  protected:
   void Run() override;
