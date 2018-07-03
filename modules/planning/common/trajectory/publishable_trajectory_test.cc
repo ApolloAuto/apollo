@@ -18,11 +18,11 @@
  * @file
  **/
 
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/common/trajectory/publishable_trajectory.h"
 
-#include <iostream>
 #include <string>
 
+#include "google/protobuf/util/message_differencer.h"
 #include "gtest/gtest.h"
 
 #include "modules/common/util/file.h"
@@ -37,23 +37,19 @@ TEST(basic_test, DiscretizedTrajectory) {
   EXPECT_TRUE(
       common::util::GetProtoFromFile(path_of_standard_trajectory, &trajectory));
   DiscretizedTrajectory discretized_trajectory(trajectory);
-  EXPECT_DOUBLE_EQ(discretized_trajectory.GetTemporalLength(),
-                   7.9999999999999885);
-  EXPECT_DOUBLE_EQ(discretized_trajectory.GetSpatialLength(),
-                   44.752319202675167);
-  auto p1 = discretized_trajectory.Evaluate(4.0);
-  EXPECT_DOUBLE_EQ(p1.path_point().x(), 587263.01182131236);
-  EXPECT_DOUBLE_EQ(p1.path_point().y(), 4140966.5720794979);
-  EXPECT_DOUBLE_EQ(p1.relative_time(), 4.0);
-  EXPECT_DOUBLE_EQ(p1.v(), 5.4412586837131443);
 
-  int k1 = discretized_trajectory.QueryNearestPoint(2.12);
-  EXPECT_EQ(k1, 62);
+  PublishableTrajectory publishable_trajectory(12349834.26,
+                                               discretized_trajectory);
+  EXPECT_EQ(publishable_trajectory.header_time(), 12349834.26);
 
-  int k2 = discretized_trajectory.QueryNearestPoint({587264.0, 4140966.2});
-  EXPECT_EQ(k2, 80);
+  ADCTrajectory output_trajectory;
+  publishable_trajectory.PopulateTrajectoryProtobuf(&output_trajectory);
 
-  EXPECT_EQ(discretized_trajectory.NumOfPoints(), 121);
+  google::protobuf::util::MessageDifferencer differencer;
+  for (int i = 0; i < output_trajectory.trajectory_point_size(); ++i) {
+    EXPECT_TRUE(differencer.Compare(output_trajectory.trajectory_point(i),
+                                    trajectory.trajectory_point(i)));
+  }
 }
 
 }  // namespace planning
