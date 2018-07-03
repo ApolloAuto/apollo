@@ -230,7 +230,7 @@ void DAGStreamingMonitor::Run() {
   }
 }
 
-Subnode* DAGStreaming::GetSubnodeByName(std::string name) {
+Subnode* DAGStreaming::GetSubnodeByName(const std::string &name) {
   std::map<std::string, SubnodeID>::iterator iter =
       subnode_name_map_.find(name);
   if (iter != subnode_name_map_.end()) {
