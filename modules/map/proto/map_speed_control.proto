@@ -4,7 +4,7 @@ import "modules/map/proto/map_geometry.proto";
 
 package apollo.hdmap;
 
-// This proto defined the format of an auxilary file that helps to
+// This proto defines the format of an auxiliary file that helps to
 // define the speed limit on certain area of road.
 // Apollo can use this file to quickly fix speed problems on maps,
 // instead of waiting for updating map data.
