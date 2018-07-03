@@ -41,22 +41,22 @@ The **Apollo Project** is an initiative that provides an open, complete, and rel
 
 The following set of documentation describes Apollo 3.0:
 
-- ***<u>[Apollo Hardware and System Installation Guide]</u>***  ─ Provides the instructions to install the hardware components and the system software for the vehicle:
+- ***<u>[Apollo Hardware and System Installation Guide]</u>***  ─ Links to the Hardware Development Platform Documentation in Specs
 
     - **Vehicle**:
 
-      - Industrial PC (IPC)
-      - Global Positioning System (GPS)
-      - Inertial Measurement Unit (IMU)
+      - [Industrial PC (IPC)](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/IPC/Nuvo-6108GC_Installation_Guide.md)
+      - [Global Positioning System (GPS)](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Navigation/README.md)
+      - [Inertial Measurement Unit (IMU)](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Navigation/README.md)
       - Controller Area Network (CAN) card
       - GPS Antenna
       - GPS Receiver
-      - Light Detection and Ranging System (LiDAR)
-      - Camera
-      - Radar
-      - Apollo Sensor Unit (ASU)
+      - [Light Detection and Ranging System (LiDAR)](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Lidar/README.md)
+      - [Camera](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Camera/README.md)
+      - [Radar](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Radar/README.md)
+      - [Apollo Sensor Unit (ASU)](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide.md)
 
-    - **Software**:
+    - **Software**: Refer to the [Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Software_and_Kernel_Installation_guide.md) for information on the following:
       - Ubuntu Linux
       - Apollo Linux Kernel
       - NVIDIA GPU Driver
