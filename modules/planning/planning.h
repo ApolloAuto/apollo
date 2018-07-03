@@ -129,7 +129,7 @@ class Planning : public apollo::common::ApolloApp {
 
   double start_time_ = 0.0;
 
-  apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
+  common::util::Factory<PlanningConfig::PlannerType, Planner>
       planner_factory_;
 
   PlanningConfig config_;
@@ -144,7 +144,7 @@ class Planning : public apollo::common::ApolloApp {
 
   std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
 
-  common::VehicleState last_vehicle_state_;
+  common::VehicleState last_vehicle_state_abs_pos_;
 
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
 
