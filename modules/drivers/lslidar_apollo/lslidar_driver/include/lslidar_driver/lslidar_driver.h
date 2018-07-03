@@ -27,7 +27,6 @@ limitations under the License.                                              /
 
 #include <ros/ros.h>
 #include <std_msgs/UInt64.h>
-#include <diagnostic_updater/publisher.h>
 
 #include <lslidar_msgs/LslidarPacket.h>
 
