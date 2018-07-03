@@ -262,6 +262,24 @@ void Planning::RunOnce() {
 
   Status status =
       VehicleStateProvider::instance()->Update(localization, chassis);
+
+  if (FLAGS_use_navigation_mode) {
+    const auto& vehicle_state_abs =
+        VehicleStateProvider::instance()->vehicle_state();
+
+    if (IsVehicleStateValid(last_vehicle_state_abs_pos_)) {
+      auto x_diff = vehicle_state_abs.x() - last_vehicle_state_abs_pos_.x();
+      auto y_diff = vehicle_state_abs.y() - last_vehicle_state_abs_pos_.y();
+      auto theta_diff = vehicle_state_abs.heading()
+          - last_vehicle_state_abs_pos_.heading();
+      TrajectoryStitcher::TransformLastPublishedTrajectory(-x_diff, -y_diff,
+          -theta_diff, last_publishable_trajectory_.get());
+    }
+    last_vehicle_state_abs_pos_ = vehicle_state_abs;
+
+    VehicleStateProvider::instance()->set_vehicle_config(0.0, 0.0, 0.0);
+  }
+
   VehicleState vehicle_state =
       VehicleStateProvider::instance()->vehicle_state();
 
@@ -310,23 +328,6 @@ void Planning::RunOnce() {
   }
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
-
-  if (FLAGS_use_navigation_mode) {
-    // temp solution for navigation mode
-    if (IsVehicleStateValid(last_vehicle_state_)) {
-      auto theta_diff = (vehicle_state.angular_velocity() +
-          last_vehicle_state_.angular_velocity()) * 0.5 * planning_cycle_time;
-
-      auto s_diff = (vehicle_state.linear_velocity() +
-          last_vehicle_state_.linear_velocity()) * 0.5 * planning_cycle_time;
-      auto x_diff = s_diff * std::cos(theta_diff);
-      auto y_diff = s_diff * std::sin(theta_diff);
-
-      TrajectoryStitcher::TransformLastPublishedTrajectory(-x_diff, -y_diff,
-          -theta_diff, last_publishable_trajectory_.get());
-    }
-  }
-  last_vehicle_state_ = vehicle_state;
 
   bool is_replan = false;
   std::vector<TrajectoryPoint> stitching_trajectory;

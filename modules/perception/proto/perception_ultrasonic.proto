@@ -8,7 +8,7 @@ import "modules/common/proto/geometry.proto";
 message ImpendingCollisionEdge {
     optional int32 id = 1;  // edge ID.
     repeated int32 cone_id_list = 2;  // cone ID.
-    repeated apollo.common.Point3D point = 3; 
+    repeated apollo.common.Point3D point = 3;
     optional double tracking_time = 4;  // tracking time since detected in s
 }
 
