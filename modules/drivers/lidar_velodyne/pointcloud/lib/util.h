@@ -18,6 +18,7 @@
 #define MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_LIB_UTIL_H_
 
 #include <fstream>
+#include <string>
 
 #include "angles/angles.h"
 #include "ros/ros.h"
@@ -34,7 +35,7 @@ void dump_msg(const T& msg, const std::string& file_path) {
   boost::shared_array<uint8_t> obuffer(new uint8_t[serial_size]);
   ros::serialization::OStream ostream(obuffer.get(), serial_size);
   ros::serialization::serialize(ostream, msg);
-  ofs.write((char*)obuffer.get(), serial_size);
+  ofs.write(reinterpret_cast<char*>(obuffer.get()), serial_size);
   ofs.close();
 }
 
@@ -49,7 +50,7 @@ void load_msg(const std::string& file_path, T* msg) {
 
   uint32_t file_size = end - begin;
   boost::shared_array<uint8_t> ibuffer(new uint8_t[file_size]);
-  ifs.read((char*)ibuffer.get(), file_size);
+  ifs.read(reinterpret_cast<char*>(ibuffer.get()), file_size);
   ros::serialization::IStream istream(ibuffer.get(), file_size);
   ros::serialization::deserialize(istream, *msg);
   ifs.close();
