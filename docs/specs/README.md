@@ -4,7 +4,10 @@
 - [Apollo 2.0 Software Architecture](Apollo_2.0_Software_Architecture.md)
 - [Class Architecture Planning](Class_Architecture_Planning.md)
 
-## Hardware
+## Apollo Hardware Development Platform
+
+We highly recommend that you read through our [Disclaimer](Disclaimer_Hardware.pdf) before reading through our Hardware platform documents.
+
 - [Apollo Sensor Unit](Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide.md)
 - [Camera](Camera/README.md)
 - [LiDAR](Lidar/README.md)
