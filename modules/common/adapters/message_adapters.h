@@ -34,6 +34,7 @@
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/drivers/proto/racobit_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/drivers/proto/ultrasonic_radar.pb.h"
@@ -96,6 +97,7 @@ using StaticInfoAdapter = Adapter<apollo::data::StaticInfo>;
 using MobileyeAdapter = Adapter<drivers::Mobileye>;
 using DelphiESRAdapter = Adapter<drivers::DelphiESR>;
 using ContiRadarAdapter = Adapter<drivers::ContiRadar>;
+using RacobitRadarAdapter = Adapter<drivers::RacobitRadar>;
 using UltrasonicAdapter = Adapter<drivers::Ultrasonic>;
 using CompressedImageAdapter = Adapter<sensor_msgs::CompressedImage>;
 using GnssRtkObsAdapter = Adapter<apollo::drivers::gnss::EpochObservation>;
