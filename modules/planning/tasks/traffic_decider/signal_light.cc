@@ -28,13 +28,13 @@
 #include "modules/common/util/map_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/tasks/traffic_decider/util.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::util::WithinBound;
 using apollo::perception::TrafficLight;
@@ -43,14 +43,14 @@ using apollo::perception::TrafficLightDetection;
 SignalLight::SignalLight(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
-bool SignalLight::ApplyRule(Frame* const frame,
-                            ReferenceLineInfo* const reference_line_info) {
+Status SignalLight::ApplyRule(Frame* const frame,
+                              ReferenceLineInfo* const reference_line_info) {
   if (!FindValidSignalLight(reference_line_info)) {
-    return true;
+    return Status::OK();
   }
   ReadSignals();
   MakeDecisions(frame, reference_line_info);
-  return true;
+  return Status::OK();
 }
 
 void SignalLight::ReadSignals() {
@@ -59,7 +59,7 @@ void SignalLight::ReadSignals() {
     return;
   }
   if (AdapterManager::GetTrafficLightDetection()->GetDelaySec() >
-      FLAGS_signal_expire_time_sec) {
+      config_.signal_light().signal_expire_time_sec()) {
     ADEBUG << "traffic signals msg is expired: "
            << AdapterManager::GetTrafficLightDetection()->GetDelaySec();
     return;
@@ -116,9 +116,9 @@ void SignalLight::MakeDecisions(Frame* const frame,
     signal_debug->set_light_stop_s(signal_light.start_s);
 
     if ((signal.color() == TrafficLight::RED &&
-         stop_deceleration < FLAGS_max_stop_deceleration) ||
+         stop_deceleration < config_.signal_light().max_stop_deceleration()) ||
         (signal.color() == TrafficLight::UNKNOWN &&
-         stop_deceleration < FLAGS_max_stop_deceleration) ||
+         stop_deceleration < config_.signal_light().max_stop_deceleration()) ||
         (signal.color() == TrafficLight::YELLOW &&
          stop_deceleration <
              config_.signal_light().max_stop_deacceleration_yellow_light())) {

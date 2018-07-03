@@ -38,7 +38,6 @@ DECLARE_bool(enable_reference_line_stitching);
 DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
 DECLARE_double(reference_line_lateral_buffer);
-DECLARE_double(prepare_rerouting_time);
 
 DECLARE_bool(enable_smooth_reference_line);
 
@@ -52,6 +51,7 @@ DECLARE_double(change_lane_speed_relax_percentage);
 DECLARE_bool(enable_side_vehicle_st_boundary);
 
 DECLARE_double(max_collision_distance);
+DECLARE_bool(ignore_overlapped_obstacle);
 DECLARE_bool(publish_estop);
 DECLARE_bool(enable_trajectory_stitcher);
 
@@ -111,9 +111,7 @@ DECLARE_double(follow_time_buffer);
 DECLARE_double(follow_min_time_sec);
 DECLARE_double(stop_line_stop_distance);
 DECLARE_double(max_stop_speed);
-DECLARE_double(max_stop_deceleration);
 DECLARE_double(signal_light_min_pass_s_distance);
-DECLARE_double(signal_expire_time_sec);
 
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(destination_check_distance);
@@ -161,6 +159,7 @@ DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);
 DECLARE_double(min_velocity_sample_gap);
 DECLARE_double(lon_collision_buffer);
+DECLARE_double(lat_collision_buffer);
 DECLARE_uint32(num_sample_follow_per_timestamp);
 
 // Lattice Evaluate Parameters
@@ -170,7 +169,7 @@ DECLARE_double(weight_lon_collision);
 DECLARE_double(weight_lat_offset);
 DECLARE_double(weight_lat_comfort);
 DECLARE_double(weight_centripetal_acceleration);
-DECLARE_double(priority_cost_gap);
+DECLARE_double(cost_non_priority_reference_line);
 DECLARE_double(weight_same_side_offset);
 DECLARE_double(weight_opposite_side_offset);
 DECLARE_double(weight_dist_travelled);

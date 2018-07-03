@@ -38,7 +38,7 @@ namespace apollo {
 namespace perception {
 
 float PbfTrackObjectDistance::Compute(
-    const PbfTrackPtr &fused_track,
+    PbfTrackPtr fused_track,
     const std::shared_ptr<PbfSensorObject> &sensor_object,
     const TrackObjectDistanceOptions &options) {
   const SensorType &sensor_type = sensor_object->sensor_type;
@@ -144,7 +144,9 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
   static float weight_y = 0.2f;
   static float speed_diff = 5.0f;
   static float epislon = 0.1f;
-  static float angle_tolerance = 10.0f;
+  static float angle_tolerance = 1.0f;
+  static float distance_tolerance_max = 5.0f;
+  static float distance_tolerance_min = 2.0f;
 
   const std::shared_ptr<Object> &fobj = fused_object->object;
   const std::shared_ptr<Object> &sobj = sensor_object->object;
@@ -156,11 +158,19 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
 
   Eigen::Vector3d &fcenter = fobj->center;
   Eigen::Vector3d &scenter = sobj->center;
+
+  float euclid_dist = static_cast<float>(((fcenter - scenter).norm()));
+
+  if (euclid_dist > distance_tolerance_max) {
+    return std::numeric_limits<float>::max();
+  }
+
   float range_distance_ratio = std::numeric_limits<float>::max();
   float angle_distance_diff = 0.0f;
 
   if (fcenter(0) > epislon && std::abs(fcenter(1)) > epislon) {
     float x_ratio = std::abs(fcenter(0) - scenter(0)) / fcenter(0);
+    assert(x_ratio >=0);
     float y_ratio = std::abs(fcenter(1) - scenter(1)) / std::abs(fcenter(1));
 
     if (x_ratio < FLAGS_pbf_fusion_assoc_distance_percent &&
@@ -179,20 +189,19 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
       range_distance_ratio = y_ratio;
     }
   }
-
-  float sangle = GetAngle(sobj);
-  float fangle = GetAngle(fobj);
-  angle_distance_diff = (std::abs(sangle - fangle) * 180) / M_PI;
-
   float distance = range_distance_ratio;
 
   if (is_radar(sensor_object->sensor_type)) {
+    float sangle = GetAngle(sobj);
+    float fangle = GetAngle(fobj);
+    angle_distance_diff = (std::abs(sangle - fangle) * 180) / M_PI;
+    float fobject_dist = static_cast<float>(fcenter.norm());
     double svelocity = sobj->velocity.norm();
     double fvelocity = fobj->velocity.norm();
     if (svelocity > 0.0 && fvelocity > 0.0) {
       float cos_distance =
           sobj->velocity.dot(fobj->velocity) / (svelocity * fvelocity);
-      if (cos_distance > FLAGS_pbf_distance_speed_cos_diff) {
+      if (cos_distance < FLAGS_pbf_distance_speed_cos_diff) {
         ADEBUG << "ignore radar data for fusing" << cos_distance;
         distance = std::numeric_limits<float>::max();
       }
@@ -201,6 +210,14 @@ float PbfTrackObjectDistance::ComputeDistanceAngleMatchProb(
     if (std::abs(svelocity - fvelocity) > speed_diff ||
         angle_distance_diff > angle_tolerance) {
       ADEBUG << "ignore radar data for fusing" << speed_diff;
+      distance = std::numeric_limits<float>::max();
+    }
+
+    float distance_allowed =
+        std::max(static_cast<float>(fobject_dist * sin(angle_distance_diff)),
+                 distance_tolerance_min);
+    if (euclid_dist > distance_allowed) {
+      ADEBUG << "ignore radar data for fusing " << distance_allowed;
       distance = std::numeric_limits<float>::max();
     }
   }

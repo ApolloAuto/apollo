@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -42,9 +43,24 @@ class FrenetFramePath {
   const common::FrenetFramePoint &PointAt(const std::uint32_t index) const;
   common::FrenetFramePoint EvaluateByS(const double s) const;
 
+  /**
+   * @brief Get the FrenetFramePoint that is within SLBoundary, or the one with
+   * smallest l() in SLBoundary's s range [start_s(), end_s()]
+   */
+  common::FrenetFramePoint GetNearestPoint(const SLBoundary &sl) const;
+
   virtual void Clear();
 
  private:
+  static bool LowerBoundComparator(const common::FrenetFramePoint &p,
+                                   const double s) {
+    return p.s() < s;
+  }
+  static bool UpperBoundComparator(const double s,
+                                   const common::FrenetFramePoint &p) {
+    return s < p.s();
+  }
+
   std::vector<common::FrenetFramePoint> points_;
 };
 

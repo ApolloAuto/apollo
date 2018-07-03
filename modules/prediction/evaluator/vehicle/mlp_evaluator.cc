@@ -54,6 +54,7 @@ void MLPEvaluator::Clear() { obstacle_feature_values_map_.clear(); }
 void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
+  CHECK_LE(LANE_FEATURE_SIZE, 4 * FLAGS_max_num_lane_point);
 
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {

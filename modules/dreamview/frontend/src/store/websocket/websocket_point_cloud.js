@@ -49,7 +49,7 @@ export default class PointCloudWebSocketEndpoint {
                     type : "RequestPointCloud"
                 }));
             }
-        }, 100);
+        }, 200);
     }
 
     togglePointCloud(enable) {

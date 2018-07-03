@@ -121,12 +121,12 @@ class ObstacleDecider:
         if left_nudge is not None and right_nudge is not None:
             return 0
         if left_nudge is not None:
-            if left_nudgable < left_nudgable:
+            if left_nudgable < left_nudge:
                 return left_nudgable
             else:
                 return left_nudge
         if right_nudge is not None:
-            if right_nudgable > right_nudge:
+            if abs(right_nudgable) > abs(right_nudge):
                 return right_nudgable
             else:
                 return right_nudge

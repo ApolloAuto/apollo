@@ -246,7 +246,7 @@ int PbfKalmanMotionFusion::GetLidarHistoryLength() {
   return history_length;
 }
 
-int PbfKalmanMotionFusion::GetLidarHistoryIndex(const int &history_seq) {
+int PbfKalmanMotionFusion::GetLidarHistoryIndex(const int history_seq) {
   int history_index = 0;
   int history_count = 0;
   for (size_t i = 1; i <= history_velocity_is_radar_.size(); ++i) {
@@ -261,7 +261,7 @@ int PbfKalmanMotionFusion::GetLidarHistoryIndex(const int &history_seq) {
   return history_index;
 }
 
-int PbfKalmanMotionFusion::GetRadarHistoryIndex(const int &history_seq) {
+int PbfKalmanMotionFusion::GetRadarHistoryIndex(const int history_seq) {
   int history_index = 0;
   int history_count = 0;
   for (size_t i = 1; i <= history_velocity_is_radar_.size(); ++i) {
@@ -277,7 +277,7 @@ int PbfKalmanMotionFusion::GetRadarHistoryIndex(const int &history_seq) {
 }
 
 double PbfKalmanMotionFusion::GetHistoryTimediff(
-    const int &history_index, const double &current_timestamp) {
+    const int history_index, const double current_timestamp) {
   double history_timestamp = history_time_diff_[history_index];
   double history_timediff = current_timestamp - history_timestamp;
   return history_timediff;

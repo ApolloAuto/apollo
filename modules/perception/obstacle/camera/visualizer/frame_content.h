@@ -48,10 +48,12 @@ class CameraContent : public BaseContent {
  public:
   CameraContent()
       : camera_frame_supplement_(new CameraFrameSupplement),
-        _pose_c2w(Eigen::Matrix4d::Identity()) {}
+        _pose_c2w(Eigen::Matrix4d::Identity()),
+        _pose_c2w_static(Eigen::Matrix4d::Identity()) {}
   std::vector<std::shared_ptr<Object>> camera_objects_;
   CameraFrameSupplementPtr camera_frame_supplement_;
   Eigen::Matrix4d _pose_c2w;
+  Eigen::Matrix4d _pose_c2w_static;
 };
 
 class ImageContent : public BaseContent {
@@ -119,6 +121,7 @@ class FrameContent {
   void update_timestamp(double ref);
   void set_image_content(double timestamp, cv::Mat image);
   void set_camera_content(double timestamp, Eigen::Matrix4d pose_c2w,
+                          Eigen::Matrix4d pose_c2w_static,
                           const std::vector<std::shared_ptr<Object>>& objects,
                           const CameraFrameSupplement& supplement);
   void set_camera_content(double timestamp, Eigen::Matrix4d pose_c2w,
@@ -133,11 +136,12 @@ class FrameContent {
 
   void set_gt_content(double timestamp,
                       const std::vector<std::shared_ptr<Object>>& objects);
-  void set_camera2car_pose(Eigen::Matrix4d pose_cam2velo);
+  void set_camera2car_pose(const Eigen::Matrix4d& pose_cam2velo);
 
-  void set_motion_content(double timestamp, MotionBufferPtr motion_buffer);
+  void set_motion_content(double timestamp, const MotionBuffer& motion_buffer);
   Eigen::Matrix4d get_opengl_camera_system_pose();
   Eigen::Matrix4d get_camera_to_world_pose();
+  Eigen::Matrix4d get_camera_to_world_pose_static();
   Eigen::Matrix4d get_pose_v2w();
   cv::Mat get_camera_image();
 
@@ -145,8 +149,8 @@ class FrameContent {
 
   void set_pose_type(int type) { continuous_type_ = type; }
 
-  std::vector<std::shared_ptr<Object>> get_camera_objects();
-  std::vector<std::shared_ptr<Object>> get_radar_objects();
+  std::vector<std::shared_ptr<Object>> get_camera_objects(double* ts = nullptr);
+  std::vector<std::shared_ptr<Object>> get_radar_objects(double* ts = nullptr);
   double get_visualization_timestamp();
 
   inline bool has_radar_data() { return radar_caches_.size(); }
@@ -159,13 +163,13 @@ class FrameContent {
      }*/
 
   // fused output
-  std::vector<std::shared_ptr<Object>> get_fused_objects();
+  std::vector<std::shared_ptr<Object>> get_fused_objects(double* ts = nullptr);
   // gt
   std::vector<std::shared_ptr<Object>> get_gt_objects();
   // lane objects
   apollo::perception::LaneObjects get_lane_objects();
 
-  const MotionBuffer get_motion_buffer();
+  MotionBuffer get_motion_buffer();
 
  protected:
   // coordinate transform utilities

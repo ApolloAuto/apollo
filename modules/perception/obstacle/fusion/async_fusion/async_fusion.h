@@ -23,7 +23,8 @@
 #include <utility>
 #include <vector>
 
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/proto/async_fusion_config.pb.h"
+
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_base_track_object_matcher.h"
@@ -50,7 +51,7 @@ class AsyncFusion : public BaseFusion {
   virtual std::string name() const;
 
  protected:
-  void FuseFrame(const PbfSensorFramePtr &frame);
+  void FuseFrame(PbfSensorFramePtr frame);
 
   /**@brief create new tracks for objects not assigned to current tracks*/
   void CreateNewTracks(
@@ -92,6 +93,8 @@ class AsyncFusion : public BaseFusion {
   std::unique_ptr<PbfBaseTrackObjectMatcher> matcher_;
   PbfTrackManager *track_manager_ = nullptr;
   std::mutex fusion_mutex_;
+
+  async_fusion_config::ModelConfigs config_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(AsyncFusion);

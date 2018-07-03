@@ -22,6 +22,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "modules/perception/proto/sequence_type_fuser_config.pb.h"
+
 #include "modules/perception/common/sequence_type_fuser/base_type_fuser.h"
 #include "modules/perception/common/sequence_type_fuser/fuser_util.h"
 #include "modules/perception/common/sequence_type_fuser/object_sequence.h"
@@ -101,8 +103,6 @@ class SequenceTypeFuser : public BaseTypeFuser {
  protected:
   ObjectSequence sequence_;
 
-  double temporal_window_;
-
   Matrixd transition_matrix_;
   Matrixd confidence_smooth_matrix_;
   std::unordered_map<std::string, Matrixd> smooth_matrices_;
@@ -113,6 +113,8 @@ class SequenceTypeFuser : public BaseTypeFuser {
   std::vector<Vectori> state_back_trace_;
 
   static constexpr double s_alpha_ = 1.8;
+
+  sequence_type_fuser_config::ModelConfigs config_;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(SequenceTypeFuser);

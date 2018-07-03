@@ -33,10 +33,9 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::control::ControlCommand;
 using apollo::drivers::canbus::CanClientFactory;
+using apollo::guardian::GuardianCommand;
 
-std::string Canbus::Name() const {
-  return FLAGS_canbus_module_name;
-}
+std::string Canbus::Name() const { return FLAGS_canbus_module_name; }
 
 Status Canbus::Init() {
   AdapterManager::Init(FLAGS_canbus_adapter_config_filename);
@@ -98,6 +97,15 @@ Status Canbus::Init() {
   }
   AINFO << "The vehicle controller is successfully initialized.";
 
+  CHECK(AdapterManager::GetControlCommand()) << "Control is not initialized.";
+  CHECK(AdapterManager::GetGuardian()) << "Guardian is not initialized.";
+  // TODO(QiL) : depreacte this
+  if (!FLAGS_receive_guardian) {
+    AdapterManager::AddControlCommandCallback(&Canbus::OnControlCommand, this);
+  } else {
+    AdapterManager::AddGuardianCallback(&Canbus::OnGuardianCommand, this);
+  }
+
   return Status::OK();
 }
 
@@ -128,7 +136,6 @@ Status Canbus::Start() {
   const double duration = 1.0 / FLAGS_chassis_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
                                        &Canbus::OnTimer, this);
-  AdapterManager::AddControlCommandCallback(&Canbus::OnControlCommand, this);
 
   // last step: publish monitor messages
   apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
@@ -192,6 +199,12 @@ void Canbus::OnControlCommand(const ControlCommand &control_command) {
     return;
   }
   can_sender_.Update();
+}
+
+void Canbus::OnGuardianCommand(const GuardianCommand &guardian_command) {
+  apollo::control::ControlCommand control_command;
+  control_command.CopyFrom(guardian_command.control_command());
+  OnControlCommand(control_command);
 }
 
 // Send the error to monitor and return it

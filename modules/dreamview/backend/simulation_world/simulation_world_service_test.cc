@@ -62,6 +62,11 @@ class SimulationWorldServiceTest : public ::testing::Test {
       sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
       sub_config->set_type(AdapterConfig::ROUTING_RESPONSE);
     }
+    {
+      auto* sub_config = config.add_config();
+      sub_config->set_mode(AdapterConfig::DUPLEX);
+      sub_config->set_type(AdapterConfig::DRIVE_EVENT);
+    }
     AdapterManager::Reset();
     AdapterManager::Init(config);
 
@@ -160,7 +165,7 @@ TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
   // Commit the update.
   sim_world_service_->UpdateSimulationWorld(chassis);
 
-  // Check the update reuslt.
+  // Check the update result.
   const Object& car = sim_world_service_->world_.auto_driving_car();
   EXPECT_DOUBLE_EQ(4.933, car.length());
   EXPECT_DOUBLE_EQ(2.11, car.width());

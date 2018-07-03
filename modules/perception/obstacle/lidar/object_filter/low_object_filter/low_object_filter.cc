@@ -19,8 +19,9 @@
 #include <algorithm>
 #include <limits>
 
+#include "modules/common/util/file.h"
 #include "modules/perception/common/pcl_types.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/types.h"
 
 namespace apollo {
@@ -28,33 +29,17 @@ namespace perception {
 
 using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
+using apollo::common::util::GetProtoFromFile;
 
 bool LowObjectFilter::Init() {
-  ConfigManager* config_manager = ConfigManager::instance();
-  if (!config_manager->Init()) {
-    AERROR << "failed to init ConfigManager.";
+  if (!GetProtoFromFile(FLAGS_low_object_filter_config, &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_low_object_filter_config;
     return false;
   }
-
-  std::string model_name = "LowObjectFilter";
-  const ModelConfig* model_config = config_manager->GetModelConfig(model_name);
-  if (model_config == nullptr) {
-    AERROR << " not found model: " << model_name;
-    return false;
-  }
-
-  if (!model_config->GetValue("object_height_threshold",
-                              &object_height_threshold_)) {
-    AERROR << "object_height_threshold not found.";
-    object_height_threshold_ = 0.10;
-  }
-
-  if (!model_config->GetValue("object_position_height_threshold",
-                              &object_position_height_threshold_)) {
-    AERROR << "object_position_height_threshold not found.";
-    object_position_height_threshold_ = -1.6;
-  }
-
+  object_height_threshold_ = config_.object_height_threshold();
+  object_position_height_threshold_ =
+                    config_.object_position_height_threshold();
   return true;
 }
 
@@ -84,7 +69,8 @@ void LowObjectFilter::FilterLowObject(
     }
 
     // object is low and flat
-    if (max_height - min_height < 0.10 && max_height < -1.6) {
+    if (max_height - min_height < object_height_threshold_
+        && max_height < object_position_height_threshold_) {
       continue;
     }
 

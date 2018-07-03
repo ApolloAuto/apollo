@@ -28,12 +28,9 @@ namespace planning {
 
 namespace {
 
-bool fuzzy_within(const double v, const double lower, const double upper,
-                  const double e = 1.0e-4) {
-  if (v < lower - e || v > upper + e) {
-    return false;
-  }
-  return true;
+inline bool fuzzy_within(const double v, const double lower, const double upper,
+                         const double e = 1.0e-4) {
+  return v > lower - e && v < upper + e;
 }
 }  // namespace
 

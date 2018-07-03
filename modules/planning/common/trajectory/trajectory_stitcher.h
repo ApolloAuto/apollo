@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_STITCHER_H_
 #define MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_STITCHER_H_
 
+#include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -36,17 +37,9 @@ class TrajectoryStitcher {
  public:
   TrajectoryStitcher() = delete;
 
-  /**
-   * @brief Stitch to reference line based on location
-   * Find the init location that helps the vehicle approach the reference line.
-   * Only used in navigation mode.
-   */
-  static std::vector<common::TrajectoryPoint> CalculateInitPoint(
-      const common::VehicleState& vehicle_state,
-      const ReferenceLine& reference_line, bool* is_replan);
-
-  static void TransformLastPublishedTrajectory(
-      const double planning_cycle_time, PublishableTrajectory* prev_trajectory);
+  static void TransformLastPublishedTrajectory(const double x_diff,
+      const double y_diff, const double theta_diff,
+      PublishableTrajectory* prev_trajectory);
 
   static std::vector<common::TrajectoryPoint> ComputeStitchingTrajectory(
       const common::VehicleState& vehicle_state, const double current_timestamp,
@@ -54,6 +47,9 @@ class TrajectoryStitcher {
       const PublishableTrajectory* prev_trajectory, bool* is_replan);
 
  private:
+  static std::pair<double, double> ComputePositionProjection(const double x,
+      const double y, const PublishableTrajectory& prev_trajectory);
+
   static std::vector<common::TrajectoryPoint> ComputeReinitStitchingTrajectory(
       const common::VehicleState& vehicle_state);
 };

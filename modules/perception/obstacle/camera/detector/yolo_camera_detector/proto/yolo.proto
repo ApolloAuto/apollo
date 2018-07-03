@@ -28,6 +28,7 @@ message ModelParam {
     optional float min_3d_height = 10 [default = 0.0];
     optional string calibratetable_root = 11 [default = "./"];
     optional ModelType model_type = 12 [default = Caffe];
+    optional int32 ignored_height = 16 [default = 100];
 
 }
 

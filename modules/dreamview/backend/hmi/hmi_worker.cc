@@ -68,7 +68,7 @@ std::string TitleCase(const std::string &origin,
 // List subdirs and return a dict of {subdir_title: subdir_path}.
 Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
   Map<std::string, std::string> result;
-  const auto subdirs = apollo::common::util::ListSubDirectories(dir);
+  const auto subdirs = apollo::common::util::ListSubPaths(dir);
   for (const auto &subdir : subdirs) {
     const auto subdir_title = TitleCase(subdir);
     const auto subdir_path = apollo::common::util::StrCat(dir, "/", subdir);
@@ -148,6 +148,7 @@ HMIWorker::HMIWorker() {
     // If the default mode is unavailable, select the first one.
     status_.set_current_mode(modes.begin()->first);
   }
+  apollo::common::KVDB::Put("apollo:dreamview:mode", status_.current_mode());
 
   // If the FLAGS_map_dir is set, set it in HMIStatus.
   if (!FLAGS_map_dir.empty()) {
@@ -165,6 +166,8 @@ HMIWorker::HMIWorker() {
 bool HMIWorker::Trigger(const HMIAction action) {
   AINFO << "HMIAction " << HMIAction_Name(action) << " was triggered!";
   switch (action) {
+    case HMIAction::NONE:
+      break;
     case HMIAction::SETUP:
       RunModeCommand("start");
       break;
@@ -262,8 +265,7 @@ void HMIWorker::RunModeCommand(const std::string &command_name) {
   }
 }
 
-void HMIWorker::ChangeToMap(const std::string &map_name,
-                            MapService *map_service) {
+void HMIWorker::ChangeToMap(const std::string &map_name) {
   const auto *map_dir = FindOrNull(config_.available_maps(), map_name);
   if (map_dir == nullptr) {
     AERROR << "Unknown map " << map_name;
@@ -281,9 +283,12 @@ void HMIWorker::ChangeToMap(const std::string &map_name,
   apollo::common::KVDB::Put("apollo:dreamview:map", map_name);
 
   SetGlobalFlag("map_dir", *map_dir, &FLAGS_map_dir);
-  // Also reload simulation map.
-  CHECK(map_service->ReloadMap(true)) << "Failed to load map from " << *map_dir;
   RunModeCommand("stop");
+
+  // Trigger registered change map handlers.
+  for (const auto handler : change_map_handlers_) {
+    handler(map_name);
+  }
 }
 
 void HMIWorker::ChangeToVehicle(const std::string &vehicle_name) {
@@ -305,6 +310,11 @@ void HMIWorker::ChangeToVehicle(const std::string &vehicle_name) {
 
   CHECK(VehicleManager::instance()->UseVehicle(*vehicle));
   RunModeCommand("stop");
+
+  // Trigger registered change vehicle handlers.
+  for (const auto handler : change_vehicle_handlers_) {
+    handler(vehicle_name);
+  }
 }
 
 void HMIWorker::ChangeToMode(const std::string &mode_name) {
@@ -332,6 +342,11 @@ void HMIWorker::ChangeToMode(const std::string &mode_name) {
   // Now stop all old modules.
   for (const auto &module : old_modules) {
     RunModuleCommand(module, "stop");
+  }
+
+  // Trigger registered change mode handlers.
+  for (const auto handler : change_mode_handlers_) {
+    handler(mode_name);
   }
 }
 

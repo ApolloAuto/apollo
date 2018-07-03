@@ -167,7 +167,7 @@ namespace adapter {
 class AdapterManager {
  public:
   /**
-   * @brief Initialize the /class AdapterManager singleton with the
+   * @brief Initialize the \class AdapterManager singleton with the
    * provided configuration. The configuration is specified by the
    * file path.
    * @param adapter_config_filename the path to the proto file that
@@ -176,14 +176,14 @@ class AdapterManager {
   static void Init(const std::string &adapter_config_filename);
 
   /**
-   * @brief Initialize the /class AdapterManager singleton with the
+   * @brief Initialize the \class AdapterManager singleton with the
    * provided configuration.
    * @param configs the adapter manager configuration proto.
    */
   static void Init(const AdapterManagerConfig &configs);
 
   /**
-   * @brief Resets the /class AdapterManager so that it could be
+   * @brief Resets the \class AdapterManager so that it could be
    * re-initiailized.
    */
   static void Reset();
@@ -231,7 +231,7 @@ class AdapterManager {
   }
 
  private:
-  /// The node handler of ROS, owned by the /class AdapterManager
+  /// The node handler of ROS, owned by the \class AdapterManager
   /// singleton.
   std::unique_ptr<ros::NodeHandle> node_handle_;
 
@@ -254,6 +254,7 @@ class AdapterManager {
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(PointCloud);
+  REGISTER_ADAPTER(VLP16PointCloud);
   REGISTER_ADAPTER(ImageFront);
   REGISTER_ADAPTER(ImageShort);
   REGISTER_ADAPTER(ImageLong);
@@ -270,6 +271,7 @@ class AdapterManager {
   REGISTER_ADAPTER(Mobileye);
   REGISTER_ADAPTER(DelphiESR);
   REGISTER_ADAPTER(ContiRadar);
+  REGISTER_ADAPTER(RacobitRadar);
   REGISTER_ADAPTER(Ultrasonic);
   REGISTER_ADAPTER(CompressedImage);
   REGISTER_ADAPTER(GnssRtkObs);
@@ -291,6 +293,14 @@ class AdapterManager {
   REGISTER_ADAPTER(PandoraCameraLeftGray);
   REGISTER_ADAPTER(PandoraCameraFrontGray);
   REGISTER_ADAPTER(PandoraCameraBackGray);
+  // for lane mask
+  REGISTER_ADAPTER(PerceptionLaneMask)
+
+  REGISTER_ADAPTER(Guardian)
+  REGISTER_ADAPTER(GnssRawData);
+  REGISTER_ADAPTER(StreamStatus);
+  REGISTER_ADAPTER(GnssHeading);
+  REGISTER_ADAPTER(RtcmData);
 
   DECLARE_SINGLETON(AdapterManager);
 };

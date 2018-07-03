@@ -19,10 +19,9 @@
 #include <algorithm>
 
 #include "boost/format.hpp"
-
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/macro.h"
-#include "modules/common/time/time_util.h"
+#include "modules/common/time/time.h"
 #include "modules/perception/common/geometry_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -30,10 +29,12 @@
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_imf_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_kalman_motion_fusion.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor_manager.h"
+#include "ros/include/ros/ros.h"
 
 namespace apollo {
 namespace perception {
 
+using apollo::common::time::Clock;
 /*class PbfTrack*/
 int PbfTrack::s_track_idx_ = 0;
 double PbfTrack::s_max_lidar_invisible_period_ = 0.25;
@@ -108,6 +109,7 @@ void PbfTrack::UpdateWithSensorObject(std::shared_ptr<PbfSensorObject> obj,
   const std::string sensor_id = obj->sensor_id;
   if (FLAGS_async_fusion) {
     PerformMotionFusionAsync(obj);
+    std::cerr << "PBFIMF:track id is: " << GetTrackId() << std::endl;
   } else {
     PerformMotionFusion(obj);
   }
@@ -211,24 +213,25 @@ void PbfTrack::PerformMotionFusionAsync(std::shared_ptr<PbfSensorObject> obj) {
     AERROR << "Skip motion fusion becuase motion_fusion_ is nullptr.";
     return;
   }
-  AINFO << "perform motion fusion asynchrounously!";
+  ADEBUG << "perform motion fusion asynchrounously!";
   const SensorType &sensor_type = obj->sensor_type;
 
-  double current_time = TimeUtil::GetCurrentTime();
-  if (FLAGS_bag_mode) {
-    // if running in bag, we can't estimate fusion arrival time correctly
-    current_time =
-        std::max(motion_fusion_->getLastFuseTS(), obj->timestamp) + 0.1;
-    AINFO << "last fuse ts " << std::fixed << std::setprecision(15)
-          << motion_fusion_->getLastFuseTS();
-    AINFO << "obj timestamp " << std::fixed << std::setprecision(15)
-          << obj->timestamp;
-    AINFO << "current fuse ts is " << std::fixed << std::setprecision(15)
-          << current_time;
-  }
+  double current_time = ros::Time::now().toSec();
+  AINFO << "last fuse ts " << std::fixed << std::setprecision(15)
+        << motion_fusion_->getLastFuseTS();
+  AINFO << "obj timestamp " << std::fixed << std::setprecision(15)
+        << obj->timestamp;
+  AINFO << "current fuse ts is " << std::fixed << std::setprecision(15)
+        << current_time;
 
   // for low cost, we only consider radar and camera fusion for now
   if (is_camera(sensor_type) || is_radar(sensor_type)) {
+    if (is_camera(sensor_type)) {
+      AINFO << "camera sensor in async fusion";
+    }
+    if (is_radar(sensor_type)) {
+      AINFO << "radar sensor in async fusion";
+    }
     Eigen::Vector3d velocity = Eigen::Vector3d::Zero();
     motion_fusion_->setCurrentFuseTS(current_time);
     if (motion_fusion_->Initialized()) {
@@ -244,6 +247,10 @@ void PbfTrack::PerformMotionFusionAsync(std::shared_ptr<PbfSensorObject> obj) {
     fused_object_->object->velocity = velocity;
     fused_object_->object->anchor_point = anchor_point;
     fused_object_->object->center = anchor_point;
+    if (is_camera(sensor_type)) {
+      fused_object_->object->theta = obj->object->theta;
+      fused_object_->object->direction = obj->object->direction;
+    }
     // updated by arrival time of sensor object
     fused_object_->timestamp = current_time;
     ADEBUG << "fused object in pbftrack is "

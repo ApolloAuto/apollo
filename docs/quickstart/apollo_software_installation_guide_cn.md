@@ -64,16 +64,16 @@ Docker容器是设置Apollo构建环境的最简单方法。
     bash docker/scripts/release_into.sh
     ```
 
-3. （该步骤只用于车上设置。如果是在docker release container里线下实验，请跳过此布）通过修改文件中的以下行来设置全球导航卫星系统（GNSS）驱动程序的区域编号 `./ros/share/gnss_driver/launch/gnss_driver.launch`.
+3. （该步骤只用于车上设置。如果是在docker release container里线下实验，请跳过此布）通过修改文件中的以下行来设置全球导航卫星系统（GNSS）驱动程序的区域编号 `./modules/drivers/gnss/conf/gnss_conf.pb.txt`.
 
     ```
-    <arg name="proj4_text" default="+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs " />
+    proj4_text: "+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
     ```
 
     你只需修改上面一行的`+zone=10`的值即可。请参考[Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) 找到您当地的区号。例如，如果你在中国北京，你必须设置`+zone=50`。
 
 5. （该步骤只用于车上设置。如果是在docker release container里线下实验，请跳过此步）通过修改以下文件，为GNSS驱动程序设置实时运动（RTK）基站：
-   `./ros/share/gnss_driver/conf/gnss_conf_mkz.txt`
+   `./modules/drivers/gnss/conf/gnss_conf.pb.txt`
 
    有关典型的RTK设置，请参阅以下示例：
 

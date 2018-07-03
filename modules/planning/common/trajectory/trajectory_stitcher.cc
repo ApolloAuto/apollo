@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <list>
+#include <utility>
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
@@ -53,70 +54,34 @@ TrajectoryStitcher::ComputeReinitStitchingTrajectory(
   return std::vector<TrajectoryPoint>(1, init_point);
 }
 
-void TrajectoryStitcher::TransformLastPublishedTrajectory(
-    const double current_time, PublishableTrajectory* prev_trajectory) {
+// only used in navigation mode
+void TrajectoryStitcher::TransformLastPublishedTrajectory(const double x_diff,
+    const double y_diff, const double theta_diff,
+    PublishableTrajectory* prev_trajectory) {
+
   if (!prev_trajectory) {
     return;
   }
-  std::size_t prev_trajectory_size = prev_trajectory->NumOfPoints();
-  if (prev_trajectory_size <= 1) {
-    return;
-  }
-  const double time_diff = current_time - prev_trajectory->header_time();
-  auto matched_point = prev_trajectory->Evaluate(time_diff);
-  if (!matched_point.has_path_point()) {
-    return;
-  }
-  const double cos_theta = std::cos(-matched_point.path_point().theta());
-  const double sin_theta = std::sin(-matched_point.path_point().theta());
-  std::vector<TrajectoryPoint> transformed_points;
-  for (const auto& old_point : prev_trajectory->trajectory_points()) {
-    TrajectoryPoint point = old_point;
-    Eigen::Vector3d before_rotate(
-        old_point.path_point().x() - matched_point.path_point().x(),
-        old_point.path_point().y() - matched_point.path_point().y(),
-        old_point.path_point().z() - matched_point.path_point().z());
-    const double after_rotate_x =
-        before_rotate.x() * cos_theta - before_rotate.y() * sin_theta;
-    const double after_rotate_y =
-        before_rotate.x() * sin_theta + before_rotate.y() * cos_theta;
-    point.mutable_path_point()->set_x(after_rotate_x);
-    point.mutable_path_point()->set_y(after_rotate_y);
-    point.mutable_path_point()->set_z(before_rotate.z());
-    point.mutable_path_point()->set_theta(common::math::WrapAngle(
-        old_point.path_point().theta() - matched_point.path_point().theta()));
-    transformed_points.emplace_back(point);
-  }
-  prev_trajectory->SetTrajectoryPoints(transformed_points);
-}
 
-// only used in navigation mode
-std::vector<TrajectoryPoint> TrajectoryStitcher::CalculateInitPoint(
-    const VehicleState& vehicle_state, const ReferenceLine& reference_line,
-    bool* is_replan) {
-  CHECK_NOTNULL(is_replan);
-  *is_replan = false;
+  auto cos_theta = std::cos(theta_diff);
+  auto sin_theta = std::sin(theta_diff);
 
-  Vec2d adc_pose(vehicle_state.x(), vehicle_state.y());
-  auto ref_point = reference_line.GetNearestReferencePoint(adc_pose);
-  double distance = DistanceXY(ref_point, adc_pose);
-  constexpr double kEpsilon = 0.01;
-  if (distance - kEpsilon > FLAGS_replan_lateral_distance_threshold) {
-    Vec2d shift_direction = adc_pose - ref_point;
-    shift_direction.Normalize();
-    ref_point +=
-        shift_direction * (distance - FLAGS_replan_lateral_distance_threshold);
-    *is_replan = true;
-    AWARN << "Replan is triggered. distance = " << distance;
-  }
-  std::vector<TrajectoryPoint> trajectory_points;
-  trajectory_points.emplace_back();
-  auto& init_point = trajectory_points.back();
-  init_point.mutable_path_point()->CopyFrom(ref_point.ToPathPoint(0.0));
-  init_point.set_v(vehicle_state.linear_velocity());
-  init_point.set_a(vehicle_state.linear_acceleration());
-  init_point.set_relative_time(0.0);
-  return trajectory_points;
+  auto trajectory_points = prev_trajectory->trajectory_points();
+  std::for_each(trajectory_points.begin(), trajectory_points.end(),
+      [&cos_theta, &sin_theta, &x_diff, &y_diff, &theta_diff]
+       (common::TrajectoryPoint& p) {
+        auto x = p.path_point().x();
+        auto y = p.path_point().y();
+        auto theta = p.path_point().theta();
+
+        auto x_new = cos_theta * x - sin_theta * y + x_diff;
+        auto y_new = sin_theta * x + cos_theta * y + y_diff;
+        auto theta_new = common::math::WrapAngle(theta + theta_diff);
+
+        p.mutable_path_point()->set_x(x_new);
+        p.mutable_path_point()->set_y(y_new);
+        p.mutable_path_point()->set_theta(theta_new);
+      });
 }
 
 // Planning from current vehicle state:
@@ -134,6 +99,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   if (!prev_trajectory) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
+
   if (vehicle_state.driving_mode() != canbus::Chassis::COMPLETE_AUTO_DRIVE) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
@@ -167,15 +133,13 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   if (!matched_point.has_path_point()) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
-  auto nearest_point_index = prev_trajectory->QueryNearestPoint(
-      Vec2d(vehicle_state.x(), vehicle_state.y()));
-  auto nearest_point = prev_trajectory->TrajectoryPointAt(nearest_point_index);
 
-  const double lat_diff =
-      std::hypot(nearest_point.path_point().x() - vehicle_state.x(),
-                 nearest_point.path_point().y() - vehicle_state.y());
-  const double lon_diff = std::fabs(nearest_point.path_point().s() -
-                                    matched_point.path_point().s());
+  auto frenet_sd = ComputePositionProjection(
+      vehicle_state.x(), vehicle_state.y(), *prev_trajectory);
+
+  auto lon_diff = std::fabs(frenet_sd.first);
+  auto lat_diff = std::fabs(frenet_sd.second);
+
   ADEBUG << "Control lateral diff: " << lat_diff
          << ", longitudinal diff: " << lon_diff;
 
@@ -212,6 +176,22 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   }
   *is_replan = false;
   return stitching_trajectory;
+}
+
+std::pair<double, double> TrajectoryStitcher::ComputePositionProjection(
+    const double x, const double y,
+    const PublishableTrajectory& prev_trajectory) {
+  auto index = prev_trajectory.QueryNearestPoint({x, y});
+  auto p = prev_trajectory.TrajectoryPointAt(index);
+
+  common::math::Vec2d v(x - p.path_point().x(), y - p.path_point().y());
+  common::math::Vec2d n(std::cos(p.path_point().theta()),
+      std::sin(p.path_point().theta()));
+
+  std::pair<double, double> frenet_sd;
+  frenet_sd.first = v.InnerProd(n) + p.path_point().s();
+  frenet_sd.second = v.CrossProd(n);
+  return frenet_sd;
 }
 
 }  // namespace planning

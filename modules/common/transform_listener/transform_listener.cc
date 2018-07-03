@@ -80,15 +80,15 @@ void TransformListener::InitWithThread() {
   buffer_->setUsingDedicatedThread(true);
 }
 
-void TransformListener::TfCallback(const tf2_msgs::TFMessage::ConstPtr& tf) {
+void TransformListener::TfCallback(tf2_msgs::TFMessage::ConstPtr tf) {
   CallbackImpl(tf, false);
 }
 void TransformListener::TfStaticCallback(
-    const tf2_msgs::TFMessage::ConstPtr& tf_static) {
+    tf2_msgs::TFMessage::ConstPtr tf_static) {
   CallbackImpl(tf_static, true);
 }
 
-void TransformListener::CallbackImpl(const tf2_msgs::TFMessage::ConstPtr& tf,
+void TransformListener::CallbackImpl(tf2_msgs::TFMessage::ConstPtr tf,
                                      bool is_static) {
   double now = Clock::NowInSeconds();
   if (now < last_update_) {
@@ -100,7 +100,7 @@ void TransformListener::CallbackImpl(const tf2_msgs::TFMessage::ConstPtr& tf,
     try {
       buffer_->setTransform(tf->transforms[i], "tf", is_static);
     } catch (tf2::TransformException& ex) {
-      AERROR << "Failure to set recieved transform from "
+      AERROR << "Failure to set received transform from "
              << tf->transforms[i].child_frame_id << " to "
              << tf->transforms[i].header.frame_id
              << " with error: " << ex.what();

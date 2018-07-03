@@ -55,7 +55,7 @@ message Light {
     TURN_RIGHT_ON = 2;
     TURN_LIGHT_ON = 3;
   }
-  enum LampType {
+  enum BeamLampType {
     BEAM_OFF = 0;
     HIGH_BEAM_ON = 1;
     LOW_BEAM_ON = 2;
@@ -95,7 +95,7 @@ message Light {
   }
 
   optional TurnLightType turn_light_type = 1;
-  optional LampType lamp_type = 2;
+  optional BeamLampType beam_lamp_type = 2;
   optional bool is_brake_lamp_on = 3;
   // byd switch 133
   optional bool is_auto_light = 4;
@@ -156,12 +156,6 @@ message Eps {
 }
 
 message VehicleSpd {
-  enum Type {
-    FORWARD = 0;
-    BACKWARD = 1;
-    STANDSTILL = 2;
-    INVALID = 3;
-  }
   // esp 277
   optional bool is_vehicle_standstill = 1;
 
@@ -170,16 +164,16 @@ message VehicleSpd {
   optional double vehicle_spd = 3 [default = 0];  // unit:m/s
   // esp 208
   optional bool is_wheel_spd_rr_valid = 4;
-  optional Type wheel_direction_rr = 5;
+  optional WheelSpeed.WheelSpeedType wheel_direction_rr = 5;
   optional double wheel_spd_rr = 6;
   optional bool is_wheel_spd_rl_valid = 7;
-  optional Type wheel_direction_rl = 8;
+  optional WheelSpeed.WheelSpeedType wheel_direction_rl = 8;
   optional double wheel_spd_rl = 9;
   optional bool is_wheel_spd_fr_valid = 10;
-  optional Type wheel_direction_fr = 11;
+  optional WheelSpeed.WheelSpeedType wheel_direction_fr = 11;
   optional double wheel_spd_fr = 12;
   optional bool is_wheel_spd_fl_valid = 13;
-  optional Type wheel_direction_fl = 14;
+  optional WheelSpeed.WheelSpeedType wheel_direction_fl = 14;
   optional double wheel_spd_fl = 15;
 
   // byd esp 222
@@ -499,36 +493,6 @@ message BasicInfo {
   optional int32 num_satellites = 38;
   optional double gps_speed = 39;
 }
-
-message License {
-  optional string vin = 1;
-}
-
-message Surround {
-  optional bool cross_traffic_alert_left = 1;
-  optional bool cross_traffic_alert_left_enabled = 2;
-  optional bool blind_spot_left_alert = 3;
-  optional bool blind_spot_left_alert_enabled = 4;
-  optional bool cross_traffic_alert_right = 5;
-  optional bool cross_traffic_alert_right_enabled = 6;
-  optional bool blind_spot_right_alert = 7;
-  optional bool blind_spot_right_alert_enabled = 8;
-  optional double sonar00 = 9;
-  optional double sonar01 = 10;
-  optional double sonar02 = 11;
-  optional double sonar03 = 12;
-  optional double sonar04 = 13;
-  optional double sonar05 = 14;
-  optional double sonar06 = 15;
-  optional double sonar07 = 16;
-  optional double sonar08 = 17;
-  optional double sonar09 = 18;
-  optional double sonar10 = 19;
-  optional double sonar11 = 20;
-  optional bool sonar_enabled = 21;
-  optional bool sonar_fault = 22;
-}
-
 
 // Gem vehicle starts from here
 // TODO(QiL) : Re-factor needed here

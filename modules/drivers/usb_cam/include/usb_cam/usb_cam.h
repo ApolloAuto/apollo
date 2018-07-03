@@ -65,7 +65,7 @@ class UsbCam {
  public:
   typedef enum
   {
-    IO_METHOD_READ, IO_METHOD_MMAP, IO_METHOD_USERPTR, IO_METHOD_UNKNOWN,
+    IO_METHOD_MMAP, IO_METHOD_UNKNOWN,
   } io_method;
 
   typedef enum
@@ -91,6 +91,10 @@ class UsbCam {
   // Set video device parameters
   void set_v4l_parameter(const std::string& param, int value);
   void set_v4l_parameter(const std::string& param, const std::string& value);
+
+  //enable video triggers //see libadv_trigger_ctl
+  int trigger_enable(unsigned char fps, unsigned char internal);
+  int trigger_disable();
 
   static io_method io_method_from_string(const std::string& str);
   static pixel_format pixel_format_from_string(const std::string& str);

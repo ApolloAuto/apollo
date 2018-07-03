@@ -36,8 +36,15 @@ cc_test(
     ],
     deps = [
         "//modules/common/util",
-        "//modules/prediction/predictor:predictor_manager",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/perception/proto:perception_proto",
         "//modules/prediction/proto:prediction_conf_proto",
+        "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/evaluator:evaluator_manager",
+        "//modules/prediction/predictor:predictor_manager",
         "@gtest//:main",
     ],
 )

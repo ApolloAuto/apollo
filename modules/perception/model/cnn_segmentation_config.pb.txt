@@ -1,0 +1,5 @@
+name: "CNNSegmentation"
+version: "1.0.0"
+config_file: "modules/perception/model/cnn_segmentation/cnnseg.conf"
+proto_file: "modules/perception/model/cnn_segmentation/deploy.prototxt"
+weight_file: "modules/perception/model/cnn_segmentation/deploy.caffemodel"

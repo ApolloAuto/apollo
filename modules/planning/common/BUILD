@@ -137,9 +137,6 @@ cc_library(
     deps = [
         ":planning_gflags",
         "//modules/common/adapters:adapter_manager",
-        "//modules/common/math",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/math:hermite_spline",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planning_status_proto",
     ],
@@ -248,6 +245,7 @@ cc_library(
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/monitor_log",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",

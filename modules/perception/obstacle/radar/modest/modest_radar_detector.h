@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include "modules/perception/proto/modest_radar_detector_config.pb.h"
+
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
 #include "modules/perception/obstacle/radar/modest/object_builder.h"
 #include "modules/perception/obstacle/radar/modest/radar_track_manager.h"
@@ -61,13 +63,12 @@ class ModestRadarDetector : public BaseRadarDetector {
   bool result_init_ = true;
   bool result_detect_ = true;
 
-  bool use_had_map_;
-  double max_theta_;
-  bool use_fp_filter_;
-  int delay_frames_;
   ContiParams conti_params_;
   ObjectBuilder object_builder_;
   boost::shared_ptr<RadarTrackManager> radar_tracker_;
+
+  modest_radar_detector_config::ModelConfigs config_;
+
   FRIEND_TEST(ModestRadarDetectorTest, modest_radar_detector_test);
   DISALLOW_COPY_AND_ASSIGN(ModestRadarDetector);
 };

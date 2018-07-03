@@ -5,6 +5,7 @@ This guide introduces the Apollo Sensor Calibration Service and describes the th
 - Camera-to-Camera Calibration
 - Camera-to-LiDAR Calibration
 - Radar-to-Camera Calibration
+- IMU-to-Vehicle Calibration
 
 ## About This Guide
 
@@ -277,6 +278,44 @@ bash sensor_calibration.sh radar_camera
   * A validation image that includes the projection result from Radar-to-LiDAR.
     You need to run the `radar_lidar_visualizer` tool to generate the image. 
     See [Radar LiDAR Visualizer Projection Tool](####Radar LiDAR Visualizer Projection Tool) for more information.
+
+## IMU-to-Vehicle Calibration
+1.	Download the [calibration tool](https://apollocache.blob.core.windows.net/apollo-cache/imu_car_calibrator.zip).
+2. Start the vehicle to move before calibration. The vehicle should keep going straight at speed of 3m/s for 10s at least.  There is no need to provide the intrinsic and initial extrinsic.
+3. Required topic: INS /apollo/sensors/gnss/odemetry 100Hz
+
+4. Run the IMU-to-Vehicle Calibration using these commands:
+
+```bash
+cd /apollo
+bash scripts/sensor_calibration.sh imu_vehicle
+```
+4. The result is saved as vehicle_imu_extrinsics.yaml in current path. Here is an example:
+```bash
+    header
+      seq: 0
+      stamp:
+        secs: 1522137131
+        nsecs: 319999933
+      frame_id: imu
+    transform:
+      translation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      rotation:
+        x: -0.008324888458427
+        y: -0.000229845441991
+        z: 0.027597957866274
+        w: 0.999584411705604
+    child_frame_id: vehicle
+
+    #pitch install error: -0.954337
+    #roll install error: 0.000000
+    #yaw install error: 3.163004
+```
+
+
 
 ### (Optional) Run All Calibration Tools
 

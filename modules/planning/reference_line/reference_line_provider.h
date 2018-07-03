@@ -27,18 +27,21 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <string>
 #include <thread>
 #include <unordered_map>
 #include <vector>
+#include <unordered_set>
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/util/factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/pnc_map/pnc_map.h"
-#include "modules/map/relative_map/proto/navigation.pb.h"
+#include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -141,6 +144,15 @@ class ReferenceLineProvider {
       std::list<ReferenceLine>* reference_line,
       std::list<hdmap::RouteSegments>* segments);
 
+  /**
+   * @brief This function get adc lane info from navigation path and map
+   * by vehicle state.
+   */
+  bool GetNearestWayPointFromNavigationPath(
+       const common::VehicleState &state,
+       const std::unordered_set<std::string> &navigation_lane_ids,
+       hdmap::LaneWaypoint *waypoint);
+
  private:
   bool is_initialized_ = false;
   bool is_stop_ = false;
@@ -163,6 +175,14 @@ class ReferenceLineProvider {
   std::list<ReferenceLine> reference_lines_;
   std::list<hdmap::RouteSegments> route_segments_;
   double last_calculation_time_ = 0.0;
+
+  std::mutex notify_mutex_;
+  std::condition_variable cv_;
+  bool pending_ = false;
+  bool processed_ = false;
+
+  std::queue<std::list<ReferenceLine>> reference_line_history_;
+  std::queue<std::list<hdmap::RouteSegments>> route_segments_history_;
 };
 
 }  // namespace planning

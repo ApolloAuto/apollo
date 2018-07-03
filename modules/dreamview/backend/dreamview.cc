@@ -45,21 +45,7 @@ void Dreamview::TerminateProfilingMode(const ros::TimerEvent& event) {
   AWARN << "Profiling timer called shutdown!";
 }
 
-Status Dreamview::Init() {
-  AdapterManager::Init(FLAGS_dreamview_adapter_config_filename);
-  VehicleConfigHelper::Init();
-
-  if (FLAGS_dreamview_profiling_mode &&
-      FLAGS_dreamview_profiling_duration > 0.0) {
-    exit_timer_ = AdapterManager::CreateTimer(
-        ros::Duration(FLAGS_dreamview_profiling_duration),
-        &Dreamview::TerminateProfilingMode, this, true, true);
-    AWARN << "============================================================";
-    AWARN << "| Dreamview running in profiling mode, exit in "
-          << FLAGS_dreamview_profiling_duration << " seconds |";
-    AWARN << "============================================================";
-  }
-
+void Dreamview::CheckAdapters() {
   // Check the expected adapters are initialized.
   CHECK(AdapterManager::GetChassis()) << "ChassisAdapter is not initialized.";
   CHECK(AdapterManager::GetControlCommand())
@@ -90,12 +76,31 @@ Status Dreamview::Init() {
       << "PointCloudAdapter is not initialized.";
   CHECK(AdapterManager::GetRelativeMap())
       << "RelativeMapAdapter is not initialized.";
+}
+
+Status Dreamview::Init() {
+  AdapterManager::Init(FLAGS_dreamview_adapter_config_filename);
+  VehicleConfigHelper::Init();
+
+  if (FLAGS_dreamview_profiling_mode &&
+      FLAGS_dreamview_profiling_duration > 0.0) {
+    exit_timer_ = AdapterManager::CreateTimer(
+        ros::Duration(FLAGS_dreamview_profiling_duration),
+        &Dreamview::TerminateProfilingMode, this, true, true);
+    AWARN << "============================================================";
+    AWARN << "| Dreamview running in profiling mode, exit in "
+          << FLAGS_dreamview_profiling_duration << " seconds |";
+    AWARN << "============================================================";
+  }
+
+  CheckAdapters();
 
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
   std::vector<std::string> options = {
-      "document_root",    FLAGS_static_file_dir,  "listening_ports",
-      FLAGS_server_ports, "websocket_timeout_ms", FLAGS_websocket_timeout_ms};
+      "document_root",      FLAGS_static_file_dir,   "listening_ports",
+      FLAGS_server_ports,   "websocket_timeout_ms",  FLAGS_websocket_timeout_ms,
+      "request_timeout_ms", FLAGS_request_timeout_ms};
   if (PathExists(FLAGS_ssl_certificate)) {
     options.push_back("ssl_certificate");
     options.push_back(FLAGS_ssl_certificate);
@@ -137,6 +142,7 @@ Status Dreamview::Start() {
 void Dreamview::Stop() {
   server_->close();
   sim_control_->Stop();
+  point_cloud_updater_->Stop();
 }
 
 }  // namespace dreamview

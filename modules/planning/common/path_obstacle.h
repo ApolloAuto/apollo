@@ -26,6 +26,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/decision.pb.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
@@ -115,6 +116,12 @@ class PathObstacle {
   bool HasNonIgnoreDecision() const;
 
   /**
+   * @brief Calculate stop distance with the obstacle using the ADC's minimum
+   * turning radius
+   */
+  double MinRadiusStopDistance(const common::VehicleParam& vehicle_param) const;
+
+  /**
    * @brief Check if this object can be safely ignored.
    * The object will be ignored if the lateral decision is ignore and the
    * longitudinal decision is ignore
@@ -168,6 +175,8 @@ class PathObstacle {
   ObjectDecisionType longitudinal_decision_;
 
   bool is_blocking_obstacle_ = false;
+
+  double min_radius_stop_distance_ = -1.0;
 
   struct ObjectTagCaseHash {
     std::size_t operator()(
