@@ -48,7 +48,7 @@ using apollo::hdmap::Curve;
 using apollo::hdmap::Map;
 using apollo::hdmap::adapter::OpendriveAdapter;
 
-void DownsampleCurve(Curve* curve) {
+static void DownsampleCurve(Curve* curve) {
   auto* line_segment = curve->mutable_segment(0)->mutable_line_segment();
   std::vector<PointENU> points(line_segment->point().begin(),
                                line_segment->point().end());
@@ -78,7 +78,7 @@ void DownsampleCurve(Curve* curve) {
         << new_size << " points.";
 }
 
-void DownsampleMap(Map* map_pb) {
+static void DownsampleMap(Map* map_pb) {
   for (int i = 0; i < map_pb->lane_size(); ++i) {
     auto* lane = map_pb->mutable_lane(i);
     lane->clear_left_sample();
@@ -93,7 +93,7 @@ void DownsampleMap(Map* map_pb) {
   }
 }
 
-void OutputMap(const Map& map_pb) {
+static void OutputMap(const Map& map_pb) {
   std::ofstream map_txt_file(FLAGS_output_dir + "/sim_map.txt");
   map_txt_file << map_pb.DebugString();
   map_txt_file.close();
