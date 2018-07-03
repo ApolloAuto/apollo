@@ -172,6 +172,8 @@ class VehicleStateProvider {
 
   const VehicleState& vehicle_state() const;
 
+  void set_vehicle_config(const double x, const double y, const double heading);
+
  private:
   bool ConstructExceptLinearVelocity(
       const localization::LocalizationEstimate& localization);
