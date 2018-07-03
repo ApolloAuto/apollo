@@ -66,7 +66,7 @@ std::vector<std::vector<int>> GLFWFusionViewer::s_color_table = {
 GLFWFusionViewer::GLFWFusionViewer()
     : init_(false),
       window_(nullptr),
-      pers_camera_(nullptr),
+      //  pers_camera_(nullptr),
       bg_color_(0.0, 0.0, 0.0),
       win_width_(2560),
       win_height_(1440),
@@ -100,9 +100,9 @@ GLFWFusionViewer::GLFWFusionViewer()
 
 GLFWFusionViewer::~GLFWFusionViewer() {
   close();
-  if (pers_camera_) {
-    delete pers_camera_;
-  }
+  //  if (pers_camera_) {
+  //    delete pers_camera_;
+  //  }
   if (rgba_buffer_) {
     delete[] rgba_buffer_;
     rgba_buffer_ = nullptr;
@@ -248,16 +248,22 @@ void GLFWFusionViewer::close() { glfwTerminate(); }
 void GLFWFusionViewer::set_camera_para(Eigen::Vector3d i_position,
                                        Eigen::Vector3d i_scn_center,
                                        Eigen::Vector3d i_up_vector) {
-  pers_camera_->set_position(i_position);
-  pers_camera_->setscene_center(i_scn_center);
-  pers_camera_->setup_vector(i_up_vector);
-  pers_camera_->look_at(i_scn_center);
+  //  pers_camera_->set_position(i_position);
+  //  pers_camera_->setscene_center(i_scn_center);
+  //  pers_camera_->setup_vector(i_up_vector);
+  //  pers_camera_->look_at(i_scn_center);
 
-  GLdouble v_mat[16];
-  pers_camera_->get_model_view_matrix(v_mat);
-  view_mat_ << v_mat[0], v_mat[4], v_mat[8], v_mat[12], v_mat[1], v_mat[5],
-      v_mat[9], v_mat[13], v_mat[2], v_mat[6], v_mat[10], v_mat[14], v_mat[3],
-      v_mat[7], v_mat[11], v_mat[15];
+  //  GLdouble v_mat[16];
+  //  pers_camera_->get_model_view_matrix(v_mat);
+  //   view_mat_ << v_mat[0], v_mat[4], v_mat[8], v_mat[12], v_mat[1], v_mat[5],
+  //   v_mat[9], v_mat[13], v_mat[2], v_mat[6], v_mat[10], v_mat[14], v_mat[3],
+  //       v_mat[7], v_mat[11], v_mat[15];
+  //   AINFO << "camera parameter: " << view_mat_;
+  scene_center_ = i_scn_center;
+  view_mat_ <<  1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, -100,
+                0, 0, 0, 1;
 }
 
 bool GLFWFusionViewer::window_init() {
@@ -298,14 +304,14 @@ bool GLFWFusionViewer::window_init() {
 
 bool GLFWFusionViewer::camera_init() {
   // perspective cameras
-  pers_camera_ = new Camera;
-  pers_camera_->set_type(Camera::Type::PERSPECTIVE);
-  pers_camera_->setscene_radius(1000);
-  pers_camera_->set_position(Eigen::Vector3d(0, 0, -30));
-  pers_camera_->setscreen_widthandheight(scene_width_, scene_height_);
-  pers_camera_->look_at(Eigen::Vector3d(0, 0, 0));
-  double fov = 45 * (My_PI / 180.0);
-  pers_camera_->setfield_of_view(fov);
+  //  pers_camera_ = new Camera;
+  //  pers_camera_->set_type(Camera::Type::PERSPECTIVE);
+  //  pers_camera_->setscene_radius(1000);
+  //  pers_camera_->set_position(Eigen::Vector3d(0, 0, -30));
+  //  pers_camera_->setscreen_widthandheight(scene_width_, scene_height_);
+  //  pers_camera_->look_at(Eigen::Vector3d(0, 0, 0));
+  //  double fov = 45 * (My_PI / 180.0);
+  //  pers_camera_->setfield_of_view(fov);
   return true;
 }
 
@@ -436,8 +442,17 @@ bool GLFWFusionViewer::opengl_init() {
 
 void GLFWFusionViewer::pre_draw() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  pers_camera_->load_projection_matrix();
-
+  //  pers_camera_->load_projection_matrix();
+  {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    GLdouble tmp_projection_matrix[16] = { 1.37509, 0, 0, 0,
+                                      0, 2.41421, 0, 0,
+                                      0, 0, -1.0095, -1,
+                                      0, 0, -17.4028, 0
+                                     };
+    glMultMatrixd(tmp_projection_matrix);
+  }
   // column major
   GLdouble mode_mat[16] = {
       mode_mat_(0, 0), mode_mat_(1, 0), mode_mat_(2, 0), mode_mat_(3, 0),
@@ -717,7 +732,7 @@ void GLFWFusionViewer::resize_window(int width, int height) {
   scene_height_ = win_height_ * 0.5;
   image_width_ = scene_width_;
   image_height_ = scene_height_;
-  pers_camera_->setscreen_widthandheight(scene_width_, scene_height_);
+  //  pers_camera_->setscreen_widthandheight(scene_width_, scene_height_);
 }
 
 void GLFWFusionViewer::resize_framebuffer(int width, int height) {
@@ -735,20 +750,24 @@ void GLFWFusionViewer::resize_framebuffer(int width, int height) {
   scene_height_ = win_height_ * 0.5;
   image_width_ = scene_width_;
   image_height_ = scene_height_;
-  pers_camera_->setscreen_widthandheight(scene_width_, scene_height_);
+  //  pers_camera_->setscreen_widthandheight(scene_width_, scene_height_);
 }
 
+
 void GLFWFusionViewer::mouse_move(double xpos, double ypos) {
+/*
   int state_left = glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_LEFT);
   int state_right = glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_RIGHT);
   int x_delta = xpos - mouse_prev_x_;
   int y_delta = ypos - mouse_prev_y_;
   if (state_left == GLFW_PRESS) {
-    Eigen::Quaterniond rot =
-        pers_camera_->get_rotatation_by_mouse_from_qgwidget(
-            mouse_prev_x_, mouse_prev_y_, xpos, ypos);
-    Eigen::Matrix3d rot_mat = rot.inverse().toRotationMatrix();
-    Eigen::Vector3d scn_center = pers_camera_->scene_center();
+    //  Eigen::Quaterniond rot =
+    //      pers_camera_->get_rotatation_by_mouse_from_qgwidget(
+    //          mouse_prev_x_, mouse_prev_y_, xpos, ypos);
+    //  Eigen::Matrix3d rot_mat = rot.inverse().toRotationMatrix();
+    //  AINFO << "camera Quaterniond rot_mat: "  << rot_mat;
+    //  Eigen::Vector3d scn_center = pers_camera_->scene_center();
+    Eigen::Vector3d scn_center = scene_center_;
     Eigen::Vector4d scn_center_(scn_center(0), scn_center(1), scn_center(2), 1);
     scn_center_ = mode_mat_ * view_mat_ * scn_center_;
     scn_center = scn_center_.head(3);
@@ -765,8 +784,9 @@ void GLFWFusionViewer::mouse_move(double xpos, double ypos) {
 
   mouse_prev_x_ = xpos;
   mouse_prev_y_ = ypos;
-}
 
+*/
+}
 void GLFWFusionViewer::mouse_wheel(double delta) { mode_mat_(2, 3) -= delta; }
 
 void GLFWFusionViewer::reset() { mode_mat_ = Eigen::Matrix4d::Identity(); }
@@ -1750,7 +1770,9 @@ bool GLFWFusionViewer::draw_car_forward_dir() {
   glColor3f(1.0, 0.5, 0.17);
   glLineWidth(3);
   glBegin(GL_LINES);
-  Eigen::Vector3d center = pers_camera_->scene_center();
+  //  Eigen::Vector3d center = pers_camera_->scene_center();
+  Eigen::Vector3d center = scene_center_;
+
   Eigen::Vector3d forward_vp = center + forward_dir_ * 5;
   glVertex3f(center(0), center(1), center(2));
   glVertex3f(forward_vp(0), forward_vp(1), forward_vp(2));
