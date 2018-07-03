@@ -23,6 +23,7 @@
 #include "google/protobuf/repeated_field.h"
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -56,7 +57,7 @@ std::string Planning::Name() const { return "planning"; }
 #define CHECK_ADAPTER(NAME)                                              \
   if (AdapterManager::Get##NAME() == nullptr) {                          \
     AERROR << #NAME << " is not registered";                             \
-    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registerd"); \
+    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registered"); \
   }
 
 #define CHECK_ADAPTER_IF(CONDITION, NAME) \
@@ -264,20 +265,16 @@ void Planning::RunOnce() {
       VehicleStateProvider::instance()->Update(localization, chassis);
 
   if (FLAGS_use_navigation_mode) {
-    const auto& vehicle_state_abs =
-        VehicleStateProvider::instance()->vehicle_state();
+    auto vehicle_config = ComputeVehicleConfigFromLocalization(localization);
 
-    if (IsVehicleStateValid(last_vehicle_state_abs_pos_)) {
-      auto x_diff = vehicle_state_abs.x() - last_vehicle_state_abs_pos_.x();
-      auto y_diff = vehicle_state_abs.y() - last_vehicle_state_abs_pos_.y();
-      auto theta_diff = vehicle_state_abs.heading()
-          - last_vehicle_state_abs_pos_.heading();
+    if (last_vehicle_config_.is_valid_ && vehicle_config.is_valid_) {
+      auto x_diff = vehicle_config.x_ - last_vehicle_config_.x_;
+      auto y_diff = vehicle_config.y_ - last_vehicle_config_.y_;
+      auto theta_diff = vehicle_config.theta_ - last_vehicle_config_.theta_;
       TrajectoryStitcher::TransformLastPublishedTrajectory(-x_diff, -y_diff,
           -theta_diff, last_publishable_trajectory_.get());
     }
-    last_vehicle_state_abs_pos_ = vehicle_state_abs;
-
-    VehicleStateProvider::instance()->set_vehicle_config(0.0, 0.0, 0.0);
+    last_vehicle_config_ = vehicle_config;
   }
 
   VehicleState vehicle_state =
@@ -566,6 +563,30 @@ Status Planning::Plan(const double current_time_stamp,
   best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice());
 
   return status;
+}
+
+Planning::VehicleConfig Planning::ComputeVehicleConfigFromLocalization(
+    const localization::LocalizationEstimate& localization) const {
+  Planning::VehicleConfig vehicle_config;
+
+  if (!localization.pose().has_position()) {
+    return vehicle_config;
+  }
+
+  vehicle_config.x_ = localization.pose().position().x();
+  vehicle_config.y_ = localization.pose().position().y();
+
+  const auto &orientation = localization.pose().orientation();
+
+  if (localization.pose().has_heading()) {
+    vehicle_config.theta_ = localization.pose().heading();
+  } else {
+    vehicle_config.theta_ = common::math::QuaternionToHeading(orientation.qw(),
+        orientation.qx(), orientation.qy(), orientation.qz());
+  }
+
+  vehicle_config.is_valid_ = true;
+  return vehicle_config;
 }
 
 }  // namespace planning
