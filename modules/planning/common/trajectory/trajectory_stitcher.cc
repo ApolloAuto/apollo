@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <list>
+#include <utility>
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
@@ -98,6 +99,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   if (!prev_trajectory) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
+
   if (vehicle_state.driving_mode() != canbus::Chassis::COMPLETE_AUTO_DRIVE) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
@@ -131,15 +133,13 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   if (!matched_point.has_path_point()) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
-  auto nearest_point_index = prev_trajectory->QueryNearestPoint(
-      Vec2d(vehicle_state.x(), vehicle_state.y()));
-  auto nearest_point = prev_trajectory->TrajectoryPointAt(nearest_point_index);
 
-  const double lat_diff =
-      std::hypot(nearest_point.path_point().x() - vehicle_state.x(),
-                 nearest_point.path_point().y() - vehicle_state.y());
-  const double lon_diff = std::fabs(nearest_point.path_point().s() -
-                                    matched_point.path_point().s());
+  auto frenet_sd = ComputePositionProjection(
+      vehicle_state.x(), vehicle_state.y(), *prev_trajectory);
+
+  auto lon_diff = std::fabs(frenet_sd.first);
+  auto lat_diff = std::fabs(frenet_sd.second);
+
   ADEBUG << "Control lateral diff: " << lat_diff
          << ", longitudinal diff: " << lon_diff;
 
@@ -176,6 +176,22 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   }
   *is_replan = false;
   return stitching_trajectory;
+}
+
+std::pair<double, double> TrajectoryStitcher::ComputePositionProjection(
+    const double x, const double y,
+    const PublishableTrajectory& prev_trajectory) {
+  auto index = prev_trajectory.QueryNearestPoint({x, y});
+  auto p = prev_trajectory.TrajectoryPointAt(index);
+
+  common::math::Vec2d v(x - p.path_point().x(), y - p.path_point().y());
+  common::math::Vec2d n(std::cos(p.path_point().theta()),
+      std::sin(p.path_point().theta()));
+
+  std::pair<double, double> frenet_sd;
+  frenet_sd.first = v.InnerProd(n) + p.path_point().s();
+  frenet_sd.second = v.CrossProd(n);
+  return frenet_sd;
 }
 
 }  // namespace planning

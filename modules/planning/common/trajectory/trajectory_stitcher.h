@@ -21,6 +21,7 @@
 #ifndef MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_STITCHER_H_
 #define MODULES_PLANNING_COMMON_TRAJECTORY_TRAJECTORY_STITCHER_H_
 
+#include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -46,6 +47,9 @@ class TrajectoryStitcher {
       const PublishableTrajectory* prev_trajectory, bool* is_replan);
 
  private:
+  static std::pair<double, double> ComputePositionProjection(const double x,
+      const double y, const PublishableTrajectory& prev_trajectory);
+
   static std::vector<common::TrajectoryPoint> ComputeReinitStitchingTrajectory(
       const common::VehicleState& vehicle_state);
 };
