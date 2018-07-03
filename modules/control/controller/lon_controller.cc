@@ -220,6 +220,10 @@ Status LonController::ComputeControlCommand(
   double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(VehicleStateProvider::instance()->pitch()));
 
+  if (isnan(slope_offset_compenstaion)) {
+      slope_offset_compenstaion = 0;
+  }
+
   debug->set_slope_offset_compensation(slope_offset_compenstaion);
 
   double acceleration_cmd =
