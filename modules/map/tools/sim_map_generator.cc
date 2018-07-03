@@ -33,7 +33,7 @@
  */
 
 DEFINE_string(output_dir, "/tmp/", "output map directory");
-DEFINE_double(angle_threshold, 1 / 180 * M_PI, /* 1 degree */
+DEFINE_double(angle_threshold, 1. / 180 * M_PI, /* 1 degree */
               "Points are sampled when the accumulated direction change "
               "exceeds the threshold");
 DEFINE_int32(downsample_distance, 5, "downsample rate for a normal path");
