@@ -271,8 +271,9 @@ void Planning::RunOnce() {
       auto x_diff = vehicle_config.x_ - last_vehicle_config_.x_;
       auto y_diff = vehicle_config.y_ - last_vehicle_config_.y_;
       auto theta_diff = vehicle_config.theta_ - last_vehicle_config_.theta_;
-      TrajectoryStitcher::TransformLastPublishedTrajectory(-x_diff, -y_diff,
-          -theta_diff, last_publishable_trajectory_.get());
+
+      TrajectoryStitcher::TransformLastPublishedTrajectory(x_diff, y_diff,
+          theta_diff, last_publishable_trajectory_.get());
     }
     last_vehicle_config_ = vehicle_config;
   }
