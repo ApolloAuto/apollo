@@ -65,7 +65,7 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 The following diagram highlights the scope and features of each Apollo release:
 
-![image alt text](docs/demo_guide/images/Apollo_versions.png)
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/images/apollo_versions_3.png)
 
 [**Apollo 1.0:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md) 
 
@@ -193,7 +193,7 @@ Apollo 3.0's main focus is to provide a platform for developers to build upon in
 
 * **Software Overview - Navigation Mode**
 
-![image alt text](docs/demo_guide/images/Software_Overview.png)
+![image alt text](docs/specs/images/Apollo_3.0_SW.png)
 
 ## Installation
 
