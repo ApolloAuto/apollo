@@ -8,7 +8,7 @@ message ModelConfigs {
   optional string version = 2 [ default = "1.0.0" ];
 
   // @name: range
-  // @brief: create a bitmap mask which represents [-range, range]*[-range, range] 
+  // @brief: create a bitmap mask which represents [-range, range]*[-range, range]
   // square area around the car.
   // @required: range > 0.0 && range - (-range) > cell_size
   optional double range = 3 [ default = 70.0 ];
