@@ -142,7 +142,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   auto frenet_sd = ComputePositionProjection(
       vehicle_state.x(), vehicle_state.y(), *prev_trajectory);
 
-  auto lon_diff = std::fabs(frenet_sd.first);
+  auto lon_diff = std::fabs(matched_point.path_point().s() - frenet_sd.first);
   auto lat_diff = std::fabs(frenet_sd.second);
 
   ADEBUG << "Control lateral diff: " << lat_diff
