@@ -193,7 +193,7 @@ Apollo 3.0's main focus is to provide a platform for developers to build upon in
 
 * **Software Overview - Navigation Mode**
 
-![image alt text](docs/demo_guide/images/Software_Overview.png)
+![image alt text](docs/specs/images/Apollo_3.0_SW.png)
 
 ## Installation
 
