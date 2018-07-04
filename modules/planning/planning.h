@@ -144,7 +144,17 @@ class Planning : public apollo::common::ApolloApp {
 
   std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
 
-  common::VehicleState last_vehicle_state_abs_pos_;
+  class VehicleConfig {
+   public:
+    double x_ = 0.0;
+    double y_ = 0.0;
+    double theta_ = 0.0;
+    bool is_valid_ = false;
+  };
+  VehicleConfig last_vehicle_config_;
+
+  VehicleConfig ComputeVehicleConfigFromLocalization(
+      const localization::LocalizationEstimate& localization) const;
 
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
 

@@ -63,19 +63,24 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(const double x_diff,
     return;
   }
 
+  // R^-1
   auto cos_theta = std::cos(theta_diff);
-  auto sin_theta = std::sin(theta_diff);
+  auto sin_theta = std::sin(-theta_diff);
+
+  // -R^-1 * t
+  auto tx = -(cos_theta * x_diff - sin_theta * y_diff);
+  auto ty = -(sin_theta * x_diff + cos_theta * y_diff);
 
   auto trajectory_points = prev_trajectory->trajectory_points();
   std::for_each(trajectory_points.begin(), trajectory_points.end(),
-      [&cos_theta, &sin_theta, &x_diff, &y_diff, &theta_diff]
+      [&cos_theta, &sin_theta, &tx, &ty, &theta_diff]
        (common::TrajectoryPoint& p) {
         auto x = p.path_point().x();
         auto y = p.path_point().y();
         auto theta = p.path_point().theta();
 
-        auto x_new = cos_theta * x - sin_theta * y + x_diff;
-        auto y_new = sin_theta * x + cos_theta * y + y_diff;
+        auto x_new = cos_theta * x - sin_theta * y + tx;
+        auto y_new = sin_theta * x + cos_theta * y + ty;
         auto theta_new = common::math::WrapAngle(theta + theta_diff);
 
         p.mutable_path_point()->set_x(x_new);
