@@ -49,15 +49,21 @@ Apollo环境启动参见[Apollo 2.5快速上手指南](https://github.com/Apollo
 1、数据权限申请
 
 首先需要注册一个百度账号，登陆百度账号，申请地图制作服务使用权限(仅需申请一次),如果已经申请过，跳过此步。
-![](images/map_collection_data_request_ch.png)
+![](images/map_collection_request_ch.png)
 
-2、数据管理
+2、地图技术服务
 
-用户可以在数据管理页面进行制图任务的创建、采集数据上传、地图数据的管理、制图进度的跟踪等。
-![](images/map_collection_data_manage_ch.png)
+用户可以在该页面进行新建区域、创建制图任务、管理地图数据、跟踪制图进度，下载地图数据。 
+![](images/map_collection_Area_ch.png)
 
-3、数据下载
+3、数据管理
 
-当任务状态是[数据已发布]时，点击[数据已发布]进行地图数据下载。
+用户点击“采集数据管理”后可以进入采集数据管理页面，在该页面可以上传多份采集数据，所有数据上传上传后可以提交采集数据，之后进入制图流程，不能再对数据进行编辑操作。
 
-![](images/map_collection_data_finish_ch.png)
+![](images/map_collection_Management_ch.png)
+
+4、数据下载
+
+当需求状态是"已发布"时，点击“下载地图”可进行地图数据下载。如果需要更新地图，请点击“更新地图数据”发起制图流程，需重新进行数据上传及制图流程。
+
+![](images/map_collection_Download_ch.png)
