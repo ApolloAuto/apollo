@@ -9,6 +9,8 @@ cc_library(
     ],
     hdrs = [
         "util.h",
+        "const_variables.h",
+        "point_types.h",
     ],
     deps = [
         "//modules/common",
@@ -40,16 +42,14 @@ cc_library(
         "velodyne64_parser.cc",
     ],
     hdrs = [
-        "const_variables.h",
-        "point_types.h",
         "velodyne_parser.h",
     ],
     deps = [
         ":calibration",
         ":util",
-        "@ros//:ros_common",
-        "@pcl",
         "@eigen",
+        "@pcl",
+        "@ros//:ros_common",
     ],
 )
 
