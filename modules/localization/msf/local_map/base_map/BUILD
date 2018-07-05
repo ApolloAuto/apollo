@@ -14,6 +14,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/util",
+        "//modules/common/util:threadpool",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "@eigen",
     ],
