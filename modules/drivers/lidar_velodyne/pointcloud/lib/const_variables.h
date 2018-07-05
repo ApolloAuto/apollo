@@ -17,6 +17,8 @@
 #ifndef MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_LIB_CONST_VARIABLES_H_
 #define MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_LIB_CONST_VARIABLES_H_
 
+#include <string>
+
 namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
