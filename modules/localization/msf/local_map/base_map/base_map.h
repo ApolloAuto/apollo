@@ -117,9 +117,9 @@ class BaseMap {
   /**@brief The map node memory pool pointer. */
   BaseMapNodePool* map_node_pool_;
   /**@brief The dynamic map node loading thread pool pointer. */
-  ThreadPool* p_map_load_threads_;
+  common::util::ThreadPool* p_map_load_threads_;
   /**@brief The dynamic map node preloading thread pool pointer. */
-  ThreadPool* p_map_preload_threads_;
+  common::util::ThreadPool* p_map_preload_threads_;
   /**@bried Keep the index of preloading nodes. */
   std::set<MapNodeIndex> map_preloading_task_index_;
   /**@brief The mutex for preload map node. **/
