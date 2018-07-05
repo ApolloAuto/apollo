@@ -67,16 +67,20 @@ class NaviObstacleDecider : public Task {
    */
   double GetNudgeDistance(
       const std::vector<const Obstacle *> &obstacles,
+      const PathDecision &path_decision,
       const std::vector<common::PathPoint> &path_data_points,
-      const double min_lane_width);
+      const double min_lane_width, int *lane_obstacles_num);
 
  private:
   /**
    * @brief process path's obstacles info
+   * @return Number of obstacles in the current lane
    */
-  void ProcessPathObstacle(
+  int ProcessPathObstacle(
       const std::vector<const Obstacle *> &obstacles,
-      const std::vector<common::PathPoint> &path_data_points);
+      const PathDecision &path_decision,
+      const std::vector<common::PathPoint> &path_data_points,
+      const double min_lane_width);
 
  private:
   std::map<double, double> obstacle_lat_dist_;
