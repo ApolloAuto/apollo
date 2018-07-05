@@ -150,8 +150,10 @@ apollo::common::Status NaviPathDecider::Process(
 
       // get nudge latteral position
       NaviObstacleDecider obstacle_decider;
+      int lane_obstacles_num = 0;
       double nudge_distance = obstacle_decider.GetNudgeDistance(
-          obstacles, path_points, min_lane_width);
+          obstacles, *path_decision, path_points, min_lane_width,
+          &lane_obstacles_num);
       // adjust plan start point
       if (std::fabs(nudge_distance) > KNudgeZero) {
         target_start_path_point_y = nudge_distance;
