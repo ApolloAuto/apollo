@@ -14,7 +14,6 @@ cc_library(
         "extract_ground_plane.h",
         "rect2d.h",
         "system_utility.h",
-        "threadpool.h",
         "voxel_grid_covariance_hdmap.h",
         "frame_transform.h",
     ],
