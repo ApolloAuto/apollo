@@ -19,10 +19,11 @@
 
 #include <list>
 #include <set>
+#include <atomic>
 
 #include "boost/thread.hpp"
 
-#include "modules/localization/msf/common/util/threadpool.h"
+#include "modules/common/util/threadpool.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 
 namespace apollo {
@@ -83,7 +84,9 @@ class BaseMapNodePool {
   /**@brief The size of memory pool. */
   unsigned int pool_size_;
   /**@brief The thread pool for release node. */
-  ThreadPool node_reset_workers_;
+  common::util::ThreadPool node_reset_workers_;
+  /**@brief The number of node which is releasing. */
+  std::atomic<int> releasing_node_num_;
   /**@brief The mutex for release thread.*/
   boost::mutex mutex_;
   /**@brief The mutex for release thread.*/
