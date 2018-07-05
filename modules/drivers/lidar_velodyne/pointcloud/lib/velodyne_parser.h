@@ -303,9 +303,9 @@ class Velodyne32Parser : public VelodyneParser {
   void unpack(const velodyne_msgs::VelodynePacket &pkt,  // NOLINT
               VPointCloud &pc);                          // NOLINT
   // Previous Velodyne packet time stamp. (offset to the top hour)
-  double previous_packet_stamp_;
   uint64_t gps_base_usec_;  // full time
-};                          // class Velodyne32Parser
+  double previous_packet_stamp_;
+};  // class Velodyne32Parser
 
 class Velodyne16Parser : public VelodyneParser {
  public:
@@ -323,9 +323,9 @@ class Velodyne16Parser : public VelodyneParser {
   void unpack(const velodyne_msgs::VelodynePacket &pkt,  // NOLINT
               VPointCloud &pc);                          // NOLINT
   // Previous Velodyne packet time stamp. (offset to the top hour)
-  double previous_packet_stamp_;
   uint64_t gps_base_usec_;  // full time
-};                          // class Velodyne16Parser
+  double previous_packet_stamp_;
+};  // class Velodyne16Parser
 
 class VelodyneParserFactory {
  public:
