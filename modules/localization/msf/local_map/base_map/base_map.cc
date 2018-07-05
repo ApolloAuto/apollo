@@ -16,6 +16,8 @@
 
 #include "modules/localization/msf/local_map/base_map/base_map.h"
 
+#include <utility>
+
 #include "modules/common/log.h"
 #include "modules/localization/msf/common/util/system_utility.h"
 
@@ -59,8 +61,8 @@ void BaseMap::InitThreadPool(int load_thread_num, int preload_thread_num) {
     delete p_map_preload_threads_;
     p_map_preload_threads_ = nullptr;
   }
-  p_map_load_threads_ = new ThreadPool(load_thread_num);
-  p_map_preload_threads_ = new ThreadPool(preload_thread_num);
+  p_map_load_threads_ = new common::util::ThreadPool(load_thread_num);
+  p_map_preload_threads_ = new common::util::ThreadPool(preload_thread_num);
   return;
 }
 
@@ -166,15 +168,19 @@ void BaseMap::LoadMapNodes(std::set<MapNodeIndex>* map_ids) {
   lock.unlock();
 
   // load from disk sync
+  std::list<std::future<void>> load_results;
   itr = map_ids->begin();
   while (itr != map_ids->end()) {
-    p_map_load_threads_->schedule(
-        boost::bind(&BaseMap::LoadMapNodeThreadSafety, this, *itr, true));
+    auto result = p_map_load_threads_->enqueue(
+        &BaseMap::LoadMapNodeThreadSafety, this, *itr, true);
+    load_results.emplace_back(std::move(result));
     ++itr;
   }
 
   // std::cout << "before wait" << std::endl;
-  p_map_load_threads_->wait();
+  for (auto &elm : load_results) {
+      elm.get();
+  }
   // std::cout << "after wait" << std::endl;
 
   // check in cacheL2 again
@@ -237,8 +243,8 @@ void BaseMap::PreloadMapNodes(std::set<MapNodeIndex>* map_ids) {
     boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
     map_preloading_task_index_.insert(*itr);
     lock.unlock();
-    p_map_preload_threads_->schedule(
-        boost::bind(&BaseMap::LoadMapNodeThreadSafety, this, *itr, false));
+    p_map_preload_threads_->enqueue(
+        &BaseMap::LoadMapNodeThreadSafety, this, *itr, false);
     ++itr;
   }
 
