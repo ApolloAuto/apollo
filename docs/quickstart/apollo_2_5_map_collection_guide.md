@@ -55,16 +55,23 @@ The collected map data is placed in the /apollo/data/bag/(start time of collecti
 
 First, you need to register a Baidu account, log into the account, and apply for permission to use map production service (only need to apply once， skip this step if you have already applied).
 
-![](images/map_collection_data_request_en.png)
+![](images/map_collection_request_en.png)
 
-2、Data Management
+2. Map technical service
 
-Users can create mapping task,upload collection data,manage mapping task, track progress of map production through Map Production Service.
+Users can create new areas, create mapping tasks, manage map data, track progress of cartography, and download map data on this page. 
 
-![](images/map_collection_data_manage_en.png)
+![](images/map_collection_Area_en.png)
 
-3、Map Download
 
-When the status is [Published], click the [Published] to download maps.
+3, Data management
 
-![](images/map_collection_data_finish_en.png)
+After clicking “Management”, users can open the data management page. On this page, you can view the description of data upload. After all the data is uploaded, the data can be submitted.And then the drawing process is entered, the data can no longer be edited.
+
+![](images/map_collection_Management_en.png)
+
+4, Data download
+
+When the demand status is "Published", click "Download" to download the map data. If you need to update the map, please click "Update Data" to initiate the mapping process, and you need to re-upload the data and the drawing process.
+
+![](images/map_collection_Download_en.png)
