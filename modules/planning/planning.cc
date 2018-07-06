@@ -23,6 +23,7 @@
 #include "google/protobuf/repeated_field.h"
 
 #include "modules/common/adapters/adapter_manager.h"
+#include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -56,7 +57,7 @@ std::string Planning::Name() const { return "planning"; }
 #define CHECK_ADAPTER(NAME)                                              \
   if (AdapterManager::Get##NAME() == nullptr) {                          \
     AERROR << #NAME << " is not registered";                             \
-    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registerd"); \
+    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registered"); \
   }
 
 #define CHECK_ADAPTER_IF(CONDITION, NAME) \
@@ -262,6 +263,21 @@ void Planning::RunOnce() {
 
   Status status =
       VehicleStateProvider::instance()->Update(localization, chassis);
+
+  if (FLAGS_use_navigation_mode) {
+    auto vehicle_config = ComputeVehicleConfigFromLocalization(localization);
+
+    if (last_vehicle_config_.is_valid_ && vehicle_config.is_valid_) {
+      auto x_diff = vehicle_config.x_ - last_vehicle_config_.x_;
+      auto y_diff = vehicle_config.y_ - last_vehicle_config_.y_;
+      auto theta_diff = vehicle_config.theta_ - last_vehicle_config_.theta_;
+
+      TrajectoryStitcher::TransformLastPublishedTrajectory(x_diff, y_diff,
+          theta_diff, last_publishable_trajectory_.get());
+    }
+    last_vehicle_config_ = vehicle_config;
+  }
+
   VehicleState vehicle_state =
       VehicleStateProvider::instance()->vehicle_state();
 
@@ -310,23 +326,6 @@ void Planning::RunOnce() {
   }
 
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
-
-  if (FLAGS_use_navigation_mode) {
-    // temp solution for navigation mode
-    if (IsVehicleStateValid(last_vehicle_state_)) {
-      auto theta_diff = (vehicle_state.angular_velocity() +
-          last_vehicle_state_.angular_velocity()) * 0.5 * planning_cycle_time;
-
-      auto s_diff = (vehicle_state.linear_velocity() +
-          last_vehicle_state_.linear_velocity()) * 0.5 * planning_cycle_time;
-      auto x_diff = s_diff * std::cos(theta_diff);
-      auto y_diff = s_diff * std::sin(theta_diff);
-
-      TrajectoryStitcher::TransformLastPublishedTrajectory(-x_diff, -y_diff,
-          -theta_diff, last_publishable_trajectory_.get());
-    }
-  }
-  last_vehicle_state_ = vehicle_state;
 
   bool is_replan = false;
   std::vector<TrajectoryPoint> stitching_trajectory;
@@ -565,6 +564,30 @@ Status Planning::Plan(const double current_time_stamp,
   best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice());
 
   return status;
+}
+
+Planning::VehicleConfig Planning::ComputeVehicleConfigFromLocalization(
+    const localization::LocalizationEstimate& localization) const {
+  Planning::VehicleConfig vehicle_config;
+
+  if (!localization.pose().has_position()) {
+    return vehicle_config;
+  }
+
+  vehicle_config.x_ = localization.pose().position().x();
+  vehicle_config.y_ = localization.pose().position().y();
+
+  const auto &orientation = localization.pose().orientation();
+
+  if (localization.pose().has_heading()) {
+    vehicle_config.theta_ = localization.pose().heading();
+  } else {
+    vehicle_config.theta_ = common::math::QuaternionToHeading(orientation.qw(),
+        orientation.qx(), orientation.qy(), orientation.qz());
+  }
+
+  vehicle_config.is_valid_ = true;
+  return vehicle_config;
 }
 
 }  // namespace planning

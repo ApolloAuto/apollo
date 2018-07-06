@@ -62,6 +62,22 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "publishable_trajectory_test",
+    size = "small",
+    srcs = [
+        "publishable_trajectory_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":publishable_trajectory",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "trajectory_stitcher",
     srcs = [

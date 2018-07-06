@@ -183,7 +183,7 @@ bool CameraCoeffient::init_camera_intrinsic_matrix_and_distort_params(
       distort_params[i] = config["D"][i].as<double>();
     }
   } else {
-    AERROR << "load camera distortion coeffients failed. file_name:"
+    AERROR << "load camera distortion coefficients failed. file_name:"
            << file_name;
     return false;
   }
@@ -303,7 +303,7 @@ bool CameraCalibration::init_undistortion(const std::string &intrinsics_path) {
       undistort_handler_->init(intrinsics_path, FLAGS_obs_camera_detector_gpu);
 
   if (err != 0) {
-    AERROR << "Undistortion initialization failed wiht error code: " << err;
+    AERROR << "Undistortion initialization failed with error code: " << err;
     return false;
   }
   undistort_handler_->set_device(FLAGS_obs_camera_detector_gpu);

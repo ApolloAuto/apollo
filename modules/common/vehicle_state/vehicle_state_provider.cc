@@ -70,6 +70,7 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
     AERROR << "Invalid localization input.";
     return false;
   }
+
   // skip localization update when it is in use_navigation_mode.
   if (FLAGS_use_navigation_mode) {
     ADEBUG << "Skip localization update when it is in use_navigation_mode.";
