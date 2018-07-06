@@ -16,6 +16,9 @@
 
 #include "modules/drivers/lidar_velodyne/pointcloud/compensator.h"
 
+#include <limits>
+#include <string>
+
 #include "ros/this_node.h"
 
 namespace apollo {
@@ -35,14 +38,14 @@ Compensator::Compensator(ros::NodeHandle& node, ros::NodeHandle& private_nh)
                    topic_compensated_pointcloud_, TOPIC_COMPENSATED_POINTCLOUD);
   private_nh.param("topic_pointcloud", topic_pointcloud_, TOPIC_POINTCLOUD);
   private_nh.param("queue_size", queue_size_, 10);
-  private_nh.param("tf_query_timeout", tf_timeout_, float(0.1));
+  private_nh.param("tf_query_timeout", tf_timeout_, static_cast<float>(0.1));
 
   // advertise output point cloud (before subscribing to input data)
   compensation_pub_ = node.advertise<sensor_msgs::PointCloud2>(
       topic_compensated_pointcloud_, queue_size_);
-  pointcloud_sub_ =
-      node.subscribe(topic_pointcloud_, queue_size_,
-                     &Compensator::pointcloud_callback, (Compensator*)this);
+  pointcloud_sub_ = node.subscribe(topic_pointcloud_, queue_size_,
+                                   &Compensator::pointcloud_callback,
+                                   reinterpret_cast<Compensator*>(this));
 }
 
 void Compensator::pointcloud_callback(sensor_msgs::PointCloud2ConstPtr msg) {
@@ -59,8 +62,8 @@ void Compensator::pointcloud_callback(sensor_msgs::PointCloud2ConstPtr msg) {
   get_timestamp_interval(msg, timestamp_min, timestamp_max);
 
   // compensate point cloud, remove nan point
-  if (query_pose_affine_from_tf2(timestamp_min, pose_min_time) &&
-      query_pose_affine_from_tf2(timestamp_max, pose_max_time)) {
+  if (query_pose_affine_from_tf2(timestamp_min, &pose_min_time) &&
+      query_pose_affine_from_tf2(timestamp_max, &pose_max_time)) {
     // we change message after motion compensation
     sensor_msgs::PointCloud2::Ptr q_msg(new sensor_msgs::PointCloud2());
     *q_msg = *msg;
@@ -93,7 +96,7 @@ inline void Compensator::get_timestamp_interval(
   }
 }
 
-// TODO: if point type is always float, and timestamp is always double?
+// TODO(All): if point type is always float, and timestamp is always double?
 inline bool Compensator::check_message(sensor_msgs::PointCloud2ConstPtr msg) {
   // check msg width and height
   if (msg->width == 0 || msg->height == 0) {
@@ -104,7 +107,7 @@ inline bool Compensator::check_message(sensor_msgs::PointCloud2ConstPtr msg) {
   int y_data_type = 0;
   int z_data_type = 0;
 
-  // TODO: will use a new datastruct with interface to get offset,
+  // TODO(All): will use a new datastruct with interface to get offset,
   // datatype,datasize...
   for (size_t i = 0; i < msg->fields.size(); ++i) {
     const sensor_msgs::PointField& f = msg->fields[i];
@@ -152,7 +155,10 @@ inline bool Compensator::check_message(sensor_msgs::PointCloud2ConstPtr msg) {
 }
 
 bool Compensator::query_pose_affine_from_tf2(const double timestamp,
-                                             Eigen::Affine3d& pose) {
+                                             Eigen::Affine3d* pose) {
+  if (pose == nullptr) {
+    return false;
+  }
   ros::Time query_time(timestamp);
   std::string err_string;
   if (!tf2_buffer_.canTransform("world", child_frame_id_, query_time,
@@ -173,8 +179,7 @@ bool Compensator::query_pose_affine_from_tf2(const double timestamp,
     return false;
   }
 
-  tf::transformMsgToEigen(stamped_transform.transform, pose);
-  // ROS_DEBUG_STREAM("pose matrix : " << pose);
+  tf::transformMsgToEigen(stamped_transform.transform, *pose);
   return true;
 }
 
