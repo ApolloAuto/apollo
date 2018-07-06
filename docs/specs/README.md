@@ -2,6 +2,7 @@
 
 ## Software
 - [Apollo 2.0 Software Architecture](Apollo_2.0_Software_Architecture.md)
+- [Apollo 3.0 Software Architecture](Apollo_3.0_Software_Architecture.md)
 - [Class Architecture Planning](Class_Architecture_Planning.md)
 
 ## Apollo Hardware Development Platform
