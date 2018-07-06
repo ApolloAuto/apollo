@@ -48,10 +48,13 @@ DEFINE_double(max_acceleration_when_stopped, 0.01,
 DEFINE_double(steer_angle_rate, 100.0,
               "Steer angle change rate in percentage.");
 DEFINE_bool(enable_gain_scheduler, false,
-            "Enable gain scheduler for higher vechile speed");
+            "Enable gain scheduler for higher vehicle speed");
 DEFINE_bool(set_steer_limit, false, "Set steer limit");
 
 DEFINE_bool(enable_slope_offset, false, "Enable slope offset compensation");
 
 DEFINE_double(lock_steer_speed, 0.081,
               "Minimum speed to lock the steer, in m/s");
+
+DEFINE_bool(enable_navigation_mode_handlilng, false,
+            "Enable special handling for navigation mode");
