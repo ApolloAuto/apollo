@@ -20,4 +20,24 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "convert",
+    srcs = [
+        "convert.cc",
+        "convert_nodelet.cc",
+    ],
+    hdrs = [
+        "convert.h",
+    ],
+    deps = [
+        "//modules/common",
+        "//modules/drivers/lidar_velodyne/pointcloud/lib:util",
+        "//modules/drivers/lidar_velodyne/pointcloud/lib:velodyne_parser",
+        "@ros//:ros_common",
+        "@eigen",
+        "@pcl",
+    ],
+)
+
+
 cpplint()
