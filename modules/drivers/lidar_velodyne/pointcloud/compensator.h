@@ -17,7 +17,7 @@
 #ifndef MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_COMPENSATOR_H_
 #define MODULES_DRIVERS_LIDAR_VELODYNE_POINTCLOUD_COMPENSATOR_H_
 
-#include "modules/drivers/lidar_velodyne/pointcloud/lib/const_variables.h"
+#include <string>
 
 #include "Eigen/Eigen"
 #include "eigen_conversions/eigen_msg.h"
@@ -27,13 +27,15 @@
 #include "std_msgs/String.h"
 #include "tf2_ros/transform_listener.h"
 
+#include "modules/drivers/lidar_velodyne/pointcloud/lib/const_variables.h"
+
 namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
 class Compensator {
  public:
-  Compensator(ros::NodeHandle& node, ros::NodeHandle& private_nh);
+  Compensator(ros::NodeHandle& node, ros::NodeHandle& private_nh);  // NOLINT
   virtual ~Compensator() = default;
 
  private:
@@ -47,7 +49,7 @@ class Compensator {
   *   novatel-preprocess broadcast the tf2 transfrom.
   */
   bool query_pose_affine_from_tf2(const double timestamp,
-                                  Eigen::Affine3d& pose);
+                                  Eigen::Affine3d* pose);
   /**
   * @brief check if message is valid, check width, height, timestamp.
   *   set timestamp_offset and point data type
@@ -57,7 +59,7 @@ class Compensator {
   * @brief motion compensation for point cloud
   */
   template <typename Scalar>
-  void motion_compensation(sensor_msgs::PointCloud2::Ptr& msg,
+  void motion_compensation(sensor_msgs::PointCloud2::Ptr& msg,  // NOLINT
                            const double timestamp_min,
                            const double timestamp_max,
                            const Eigen::Affine3d& pose_min_time,
@@ -66,8 +68,9 @@ class Compensator {
   * @brief get min timestamp and max timestamp from points in pointcloud2
   */
   inline void get_timestamp_interval(sensor_msgs::PointCloud2ConstPtr msg,
-                                     double& timestamp_min,
-                                     double& timestamp_max);
+                                     double& timestamp_min,   // NOLINT
+                                     double& timestamp_max);  // NOLINT
+
   /**
   * @brief get point field size by sensor_msgs::datatype
   */
