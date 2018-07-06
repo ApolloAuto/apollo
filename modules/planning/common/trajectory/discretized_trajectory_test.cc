@@ -30,7 +30,7 @@
 namespace apollo {
 namespace planning {
 
-TEST(simple, DiscretizedTrajectory) {
+TEST(basic_test, DiscretizedTrajectory) {
   const std::string path_of_standard_trajectory =
       "modules/planning/testdata/trajectory_data/standard_trajectory.pb.txt";
   ADCTrajectory trajectory;
@@ -46,6 +46,14 @@ TEST(simple, DiscretizedTrajectory) {
   EXPECT_DOUBLE_EQ(p1.path_point().y(), 4140966.5720794979);
   EXPECT_DOUBLE_EQ(p1.relative_time(), 4.0);
   EXPECT_DOUBLE_EQ(p1.v(), 5.4412586837131443);
+
+  int k1 = discretized_trajectory.QueryNearestPoint(2.12);
+  EXPECT_EQ(k1, 62);
+
+  int k2 = discretized_trajectory.QueryNearestPoint({587264.0, 4140966.2});
+  EXPECT_EQ(k2, 80);
+
+  EXPECT_EQ(discretized_trajectory.NumOfPoints(), 121);
 }
 
 }  // namespace planning

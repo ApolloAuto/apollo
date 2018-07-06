@@ -1,4 +1,4 @@
-# Overview of Apollo
+# Software Overview of Apollo
 
 Apollo has been initiated to provide an open, comprehensive, and reliable software platform for its partners in the automotive and autonomous-driving industries. Partners can use the Apollo software platform and the reference hardware that Apollo has certified as a template to customize in the development of their own autonomous vehicles.
 
@@ -6,11 +6,12 @@ Apollo has been initiated to provide an open, comprehensive, and reliable softwa
 
 This section includes:
 
-- Download the Apollo Release Package
-- Set up Docker Support
-- Customize Your Release Container
+- [Download the Apollo Release Package](#download-apollo-source)
+- [Set up the Docker environment](#Set-up-the-Docker-environment)
+- [Support a new Vehicle in DreamView](#Support-a-new-Vehicle-in-DreamView)
+- [Run Apollo in Ubuntu 16](#Run-Apollo-in-Ubuntu-16)
 
-Before getting started, please make sure you have installed the Ubuntu Linux 14.04.3 and the Apollo Kernel following the steps in the [Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md#installing-the-software-for-the-ipc).
+Before getting started, please make sure you have installed Ubuntu Linux 14.04.3 and the Apollo Kernel following the steps in the [Apollo core Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md#installing-the-software-for-the-ipc).
 
 ## Download Apollo Source
 
@@ -33,7 +34,7 @@ Before getting started, please make sure you have installed the Ubuntu Linux 14.
 
 ![tip](images/tip_icon.png) In the following sections, it is assumed that the Apollo directory is located in  `$APOLLO_HOME`.
 
-## Set Up Docker Support
+## Set Up the Docker Environment
 
 The Docker container is the simplest way to set up the build environment for Apollo.
 
@@ -53,73 +54,19 @@ Don't forget the
     DOCKER_OPTS = "-s overlay"
     ```
 
-## Use Your Release Container
+We encourage you to continue the Build process using [Build the Dev docker environment](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md#build_release) if you have not already set it up.
 
-1. Download and start the Apollo Release docker image by running the following commands:
+## Support a new Vehicle in DreamView
 
-    ```
-    cd $APOLLO_HOME
-    bash docker/scripts/release_start.sh
-    ```
+In order to support a new vehicle in DreamView, please follow the steps below:
 
-2. (Optional) If you want to customize your release container, login into the Apollo Release docker image by running the following commands:
+1. Create a new folder for your vehicle under `modules/calibration/data`
 
-    ```
-    bash docker/scripts/release_into.sh
-    ```
+2. There is already a sample file in the `modules/calibration/data` folder named `mkz_example`. Refer to this structure and include all necessary configuration files in the same file structure as “mkz_example”. Remember to update the configuration files with your own parameters if needed. 
 
-3. (Skip this if you only want to do the offline simulation in release docker container) Set up the zone number for the Global Navigation Satellite System (GNSS) Driver by modifying the following line in file `./modules/drivers/gnss/conf/gnss_conf.pb.txt`.
+3. Restart DreamView and you will be able to see your new vehicle (name is the same as your newly created folder) in the selected vehicle.
 
-    ```
-    proj4_text: "+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-    ```
-
-    You only have to modify the value `+zone=10` in the above line. Please refer to the [Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) to find your local zone number. For example, if you are in Beijing, China, you have to set `+zone=50`.
-
-4. (Skip this if you only want to do the offline simulation in release docker container) Set up the Real Time Kinematic (RTK) Base Station for the GNSS Driver by modifying the file: `./modules/drivers/gnss/conf/gnss_conf.pb.txt`
-
-    Refer to the following example for a typical RTK setup:
-
-    ```
-    rtk_from {
-	format: RTCM_V3
-		ntrip {
-		    address: <provide your own value>
-		    port: <provide your own value>
-		    mount_point: <provide your own value>
-		    user: <provide your own username>
-		    password: <provide your own password>
-		    timeout_s: <provide your own value, e.g., 5>
-	    }
-    }
-    rtk_to {
-	    format: RTCM_V3
-	    serial {
-		    device: <provide your own value, e.g., "/dev/ttyUSB1">
-		    baud_rate: <provide your own value, e.g., 115200>
-	    }
-    }
-    ```
-
-    The `rtk_from` is  used for RTK base station information. The `rtk_to` is used to send the RTK differential data to the receiver.
-
-5. (Skip this if you only want to do the offline simulation in release docker container) Add ESD CAN Support
-
-    Please refer to [ESD CAN README](https://github.com/ApolloAuto/apollo/blob/master/third_party/can_card_library/esd_can/README.md) to install the ESD CAN library.
-
-6. (Skip this if you have NOT customized your release docker container) Follow these steps to persist your local changes:
-
-    ```
-    # EXIT DOCKER ENV
-    # commit your docker local changes to local docker image.
-    exit # exit from docker environment
-    cd $APOLLO_HOME
-    bash docker/scripts/release_commit.sh
-    ```
-
-7. Start your favorite browser (i.e. Chrome) and with URL: http://localhost:8888
-
-## Run Apollo 2.5 in Ubuntu 16
+## Run Apollo in Ubuntu 16
 
 Please refer to
-[How to run Apollo 2.5 with Ubuntu 16](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_apollo_2.5_with_ubuntu16.md)
+[How to run Apollo with Ubuntu 16](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_apollo_2.5_with_ubuntu16.md)

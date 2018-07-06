@@ -54,8 +54,8 @@ if __name__ == '__main__':
         f.close()
 
     # send navigation info to /apollo/navigation
-    r = rospy.Rate(1)  # 1hz
-    while not rospy.is_shutdown():
-        r.sleep()
+    r = rospy.Rate(0.5)  # 0.5hz
+    while not rospy.is_shutdown():        
         navigation_pub.publish(navigation_info)
+        r.sleep()
         break

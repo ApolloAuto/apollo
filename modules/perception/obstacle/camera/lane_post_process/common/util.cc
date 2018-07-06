@@ -40,7 +40,7 @@ int NonMask::ComputeOrientation(const Vector2D &p1, const Vector2D &p2,
   ScalarType cross = (q.x() - p1.x()) * (p2.y() - p1.y()) -
                      (p2.x() - p1.x()) * (q.y() - p1.y());
   if (std::fabs(cross) < kEpsilon) {
-    return 0;  // coliner
+    return 0;  // colinear
   }
   return cross > 0 ? 1 : -1;  // 1: clockwise, -1: anti-clockwise
 }

@@ -56,7 +56,7 @@ class OfflineLidarPerceptionTool {
     if (use_visualization) {
       visualizer_.reset(new OpenglVisualizer());
       if (!visualizer_->Init()) {
-        AERROR << "Init visialuzer failed" << std::endl;
+        AERROR << "Init visualizer failed" << std::endl;
       }
     }
     return true;
@@ -145,7 +145,7 @@ class OfflineLidarPerceptionTool {
       AERROR << filename << " is not exist!";
       return;
     }
-    // write frame id & number of objects at the beignning
+    // write frame id & number of objects at the beginning
     fout << frame_id << " " << objects->size() << std::endl;
 
     typename pcl::PointCloud<pcl_util::Point>::Ptr trans_cloud(
@@ -172,7 +172,7 @@ class OfflineLidarPerceptionTool {
       double theta = VectorTheta2dXy(coord_dir, dir_velo3);
       std::string type = "unknown";
       if (obj->type == ObjectType::PEDESTRIAN) {
-        type = "pedestrain";
+        type = "pedestrian";
       } else if (obj->type == ObjectType::VEHICLE) {
         type = "smallMot";
       } else if (obj->type == ObjectType::BICYCLE) {
