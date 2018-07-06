@@ -9,6 +9,23 @@ cc_library(
     ],
     hdrs = [
         "util.h",
+        "const_variables.h",
+        "point_types.h",
+    ],
+    deps = [
+        "//modules/common",
+        "@ros//:ros_common",
+    ],
+)
+
+cc_library(
+    name = "calibration",
+    srcs = [
+        "online_calibration.cc",
+    ],
+    hdrs = [
+        "calibration.h",
+        "online_calibration.h",
     ],
     deps = [
         "//modules/common",
@@ -20,19 +37,20 @@ cc_library(
     name = "velodyne_parser",
     srcs = [
         "velodyne_parser.cc",
+        "velodyne16_parser.cc",
+        "velodyne32_parser.cc",
+        "velodyne64_parser.cc",
     ],
     hdrs = [
-        "calibration.h",
-        "const_variables.h",
-        "online_calibration.h",
-        "point_types.h",
         "velodyne_parser.h",
     ],
     deps = [
+        ":calibration",
         ":util",
-        "@ros//:ros_common",
-        "@pcl",
         "@eigen",
+        "@pcl",
+        "@ros//:ros_common",
     ],
 )
+
 cpplint()
