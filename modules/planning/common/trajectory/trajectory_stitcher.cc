@@ -81,7 +81,7 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(const double x_diff,
 
         auto x_new = cos_theta * x - sin_theta * y + tx;
         auto y_new = sin_theta * x + cos_theta * y + ty;
-        auto theta_new = common::math::WrapAngle(theta + theta_diff);
+        auto theta_new = common::math::WrapAngle(theta - theta_diff);
 
         p.mutable_path_point()->set_x(x_new);
         p.mutable_path_point()->set_y(y_new);
@@ -142,7 +142,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   auto frenet_sd = ComputePositionProjection(
       vehicle_state.x(), vehicle_state.y(), *prev_trajectory);
 
-  auto lon_diff = std::fabs(frenet_sd.first);
+  auto lon_diff = std::fabs(matched_point.path_point().s() - frenet_sd.first);
   auto lat_diff = std::fabs(frenet_sd.second);
 
   ADEBUG << "Control lateral diff: " << lat_diff

@@ -16,7 +16,7 @@ So if you can not access Dreamview, please check:
 
 ## How can I perform step-by-step debugging?
 
-The majority of bugs can be found through logging (using AERROR, AINFO, ADEBUG). If step-by-step debugging is needed, we recommend using GDP.
+The majority of bugs can be found through logging (using AERROR, AINFO, ADEBUG). If step-by-step debugging is needed, we recommend using gdb.
 
 ## How do I run the Offline Perception Visualizer?
 
