@@ -1,3 +1,20 @@
+# Release 3.0
+
+Apollo 3.0 enables L4 product level solution that allows vehicles to drive in a closed venue setting at a low speed. Automakers can now leverage this one stop solution for autonomous driving without having to customize on their own.
+
+## Major Features And Improvements
+* New Safety module called Guardian
+* Enhanced Surveillance module - Monitor 
+* Hardware service layer that will now act like a platform and not a product, giving developers the flexibility to integrate their own Hardware
+* Apollo Sensor Unit (ASU)
+* New Gatekeeper - Ultrasonic Sensor
+* Perception module changes:
+  - **CIPV detection/ Tailgating** – moving within a single lane
+  -	Whole lane line support - bold line support for long range accuracy. There are 2 different types on installations for Camera, low and high installation.
+   -	**Online pose estimation** – determines angle change and estimates it when there are bumps or slopes to ensure that the sensors move with the car and the angle/pose changes accordingly
+  -	**Visual localization** – we now use camera for localization. This functionality is currently being tested.
+  -	**Ultrasonic Sensor** – Currently being tested as the final gatekeeper to be used in conjunction with Guardian for Automated Emergency brake and vertical/perpendicular parking.
+
 # Release 2.5
 This release allows the vehicle to autonomously run on geo-fenced highways. Vehicles are able to do lane keeping cruise and avoid collisions with the leading vehicles.
 
