@@ -82,7 +82,7 @@ apollo::common::Status NaviPathDecider::Process(
 
   // intercept path points from reference line
   std::vector<apollo::common::PathPoint> path_points;
-  if (!GetLocalPath(reference_line, init_point, &path_points) ||
+  if (!GetBasicPathData(reference_line, &path_points) ||
       path_points.size() < path_len) {
     AERROR << "Get path points from reference line failed.";
     return Status(apollo::common::ErrorCode::PLANNING_ERROR,
@@ -156,17 +156,33 @@ apollo::common::Status NaviPathDecider::Process(
           &lane_obstacles_num);
       // adjust plan start point
       if (std::fabs(nudge_distance) > KNudgeZero) {
+        ADEBUG << "need latteral nudge distance : " << nudge_distance;
         target_start_path_point_y = nudge_distance;
+        last_plan_has_nudge = true;
+      } else {
+        // no nudge distance but current lane has obstacles ,keepping path in
+        // the last nudge path direction
+        if (last_plan_has_nudge && lane_obstacles_num != 0) {
+          ADEBUG << "keepping last nudge path direction";
+          target_start_path_point_y = 0.0;
+        } else {
+          last_plan_has_nudge = false;
+        }
       }
     }
   }
 
   // caculate the y-coordinate of the actual start path plan point
+  ADEBUG << "in curret plan, adc to reference line distance : "
+         << cur_ref_line_start_y
+         << " adc to target path line distance : " << target_start_path_point_y;
   double start_point_y =
       SmoothInitY(cur_ref_line_start_y, target_start_path_point_y);
 
   // shift trajectory intercepted from the reference line
   double shift_distance_y = start_point_y - init_local_path_y;
+  ADEBUG << "in curret plan, adc latteral shift distance : " << start_point_y
+         << " reference line latteral shift distance : " << shift_distance_y;
   ShiftY(shift_distance_y, &path_points);
 
   // calculate the value of the path trajectory later
@@ -194,38 +210,27 @@ void NaviPathDecider::RecordDebugInfo(const PathData& path_data) {
       {path_points.begin(), path_points.end()});
 }
 
-bool NaviPathDecider::GetLocalPath(
+bool NaviPathDecider::GetBasicPathData(
     const ReferenceLine& reference_line,
-    const common::TrajectoryPoint& init_point,
     std::vector<common::PathPoint>* const path_points) {
   CHECK_NOTNULL(path_points);
-  if (reference_line.reference_points().size() < 10) {
+  constexpr size_t kMinRefPointNum = 10;
+  constexpr double unit_s = 0.5;
+  if (reference_line.reference_points().size() < kMinRefPointNum) {
     AERROR
         << "Reference line points is not enough to generate path trajectory.";
     return false;
   }
 
-  // find the projection reference point of the car on the reference line
-  double start_plan_point_x = init_point.path_point().x();
-  double start_plan_point_y = init_point.path_point().y();
-  auto project_point =
-      reference_line.GetReferencePoint(start_plan_point_x, start_plan_point_y);
-  double reference_line_len = reference_line.Length();
-  auto& lane_way_points = project_point.lane_waypoints();
-  if (lane_way_points.empty()) {
-    AERROR << "Failed to get start plan point lane way points from reference "
-              "line.";
-    return false;
-  }
+  // get the start plan point s on refernce line and get the length of reference
+  // line
+  const double project_point_s = reference_line_info_->AdcSlBoundary().end_s();
+  const double reference_line_len = reference_line.Length();
 
   // get path points form reference_line
-  double project_point_s = lane_way_points[0].s;
-  size_t reference_point_num =
-      static_cast<size_t>(std::floor(reference_line_len - project_point_s)) + 1;
-  for (size_t i = 0; i < reference_point_num; ++i) {
-    double s = i + project_point_s;
-    auto point = reference_line.GetReferencePoint(s);
-    path_points->emplace_back(point.ToPathPoint(s));
+  for (double s = project_point_s; s < reference_line_len; s += unit_s) {
+    const auto& ref_point = reference_line.GetReferencePoint(s);
+    path_points->emplace_back(ref_point.ToPathPoint(s));
   }
 
   return true;
@@ -335,7 +340,7 @@ bool NaviPathDecider::IsSafeChangeLane(const ReferenceLine& reference_line,
         kForwardMinSafeDistance, ((vehicle_state_.linear_velocity() -
                                    path_obstacle->obstacle()->Speed()) *
                                   kSafeTime));
-    const float kBackwardSafeDistance = std::max(
+    const double kBackwardSafeDistance = std::max(
         kBackwardMinSafeDistance, ((path_obstacle->obstacle()->Speed() -
                                     vehicle_state_.linear_velocity()) *
                                    kSafeTime));
