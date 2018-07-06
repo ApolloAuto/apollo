@@ -45,9 +45,9 @@ slide_window_max_point_num: 3
 max_group_prediction_marker_num: 3
 orientation_estimation_skip_marker_num: 1
 lane_interval_distance: 4.0
-min_instance_size_prefiltered: 12.0
+min_instance_size_prefiltered: 5.0
 min_instance_size_prefiltered_image: 50.0
-max_size_to_fit_straight_line: 18.0
+max_size_to_fit_straight_line: 10.0
 max_size_to_fit_straight_line_image: 200.0
 online_pitch_angle: -2.5
 ground_height: 1.6

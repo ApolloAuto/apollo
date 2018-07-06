@@ -45,6 +45,8 @@ To create a release excluding proprietary software (such as ESD CAN library), us
 bash apollo.sh release_noproprietary
 ```
 
+In order to generate and push your images to your own docker repository, please refer to [How to Generate and Push Docker images](how_to_generate_and_push_docker_images.md)
+
 ## <span id="build_in_vscode">Build in Visual Studio Code</span>
 ### Install VSCode
 The easiest way to install for Debian/Ubuntu based distributions is to download from  https://code.visualstudio.com and install the .deb package (64-bit) either through the graphical software center if it's available or through the command line with:

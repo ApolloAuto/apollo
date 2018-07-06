@@ -535,6 +535,7 @@ function print_usage() {
   ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_velodyne${NONE}: build velodyne driver
+  ${BLUE}build_lslidar${NONE}: build lslidar driver
   ${BLUE}build_rslidar${NONE}: build rslidar driver
   ${BLUE}build_usbcam${NONE}: build usb camera driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
@@ -625,6 +626,9 @@ function main() {
       ;;
     build_velodyne)
       build_velodyne
+      ;;
+    build_lslidar)
+      build_lslidar
       ;;
     build_rslidar)
       build_rslidar

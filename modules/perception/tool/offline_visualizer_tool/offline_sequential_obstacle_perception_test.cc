@@ -309,7 +309,7 @@ int main(int argc, char** argv) {
       "offline_sequential_obstacle_perception_test.flag";
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  /// initiaize SequentialPerceptionTest
+  /// initialize SequentialPerceptionTest
   apollo::perception::SequentialPerceptionTest test;
   if (!test.Init()) {
     AERROR << "Failed to init SequentialPerceptionTest.";
