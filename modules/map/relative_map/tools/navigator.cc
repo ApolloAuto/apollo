@@ -88,6 +88,17 @@ int main(int argc, char** argv) {
     AdapterManager::FillNavigationHeader("relative_map", &navigation_info);
     AdapterManager::PublishNavigation(navigation_info);
     ADEBUG << "Sending navigation info:" << navigation_info.DebugString();
+
+    // Wait for the subscriber's callback function to process this topic.
+    // Otherwise, an error message similar to the following will appear:
+    // [ERROR] [1530582989.030754209]: Failed to parse message: boost: mutex
+    // lock failed in pthread_mutex_lock: Invalid argument
+    ros::spinOnce();
+
+    // Sleep for one second to prevent the publishing node from being destroyed
+    // prematurely.
+    ros::Rate r(1);  // 1 hz
+    r.sleep();
   } else {
     AERROR << "ROS status is wrong.";
     return -1;

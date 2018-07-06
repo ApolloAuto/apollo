@@ -34,7 +34,7 @@
 #include "modules/perception/obstacle/camera/cipv/cipv.h"
 #include "modules/perception/obstacle/camera/common/camera.h"
 #include "modules/perception/obstacle/camera/visualizer/base_visualizer.h"
-#include "modules/perception/obstacle/camera/visualizer/common/camera.h"
+//  #include "modules/perception/obstacle/camera/visualizer/common/camera.h"
 #include "modules/perception/obstacle/camera/visualizer/common/gl_raster_text.h"
 #include "modules/perception/obstacle/camera/visualizer/frame_content.h"
 
@@ -217,7 +217,8 @@ class GLFWFusionViewer {
   bool init_;
 
   GLFWwindow *window_;
-  Camera *pers_camera_;
+  //  Camera *pers_camera_;
+  Eigen::Vector3d scene_center_;
   Eigen::Vector3d forward_dir_;
   std::vector<Eigen::Vector3d> main_car_;
 
