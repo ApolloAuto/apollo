@@ -101,3 +101,7 @@ Follow these steps:
 ### References
 
 1. Neousys Nuvo-6108GC [Product Page](http://www.neousys-tech.com/en/product/application/rugged-embedded/nuvo-6108gc-gpu-computing)
+
+## Disclaimer
+
+This device is `Apollo Platform Supported`
