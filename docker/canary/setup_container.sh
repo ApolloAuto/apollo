@@ -37,4 +37,6 @@ if [ -e /dev/camera/trafficlights ]; then
   chmod a+rw /dev/camera/trafficlights
 fi
 
+supervisord -c /apollo/modules/tools/supervisord/dev.conf >& /tmp/supervisord.start.log
+
 bash
