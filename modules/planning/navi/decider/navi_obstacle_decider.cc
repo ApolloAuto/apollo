@@ -194,5 +194,39 @@ double NaviObstacleDecider::GetNudgeDistance(
   return nudge_dist;
 }
 
+void NaviObstacleDecider::GetUnsafeObstaclesID(
+    const std::vector<common::PathPoint>& path_data_points,
+    const std::vector<const Obstacle*>& obstacles) {
+  constexpr double kSafeDistance = 0.2;  // Distance from the edge of the car.
+
+  // Find start point of the reference line.
+  double reference_line_y = path_data_points[0].y();
+
+  // Judging unsafed range according to the position of the reference line.
+  double unsafe_refline_pos_y = 0.0;
+  double unsafe_car_pos_y = 0.0;
+  std::pair<double, double> unsafe_range;
+  if (reference_line_y < 0.0) {
+    unsafe_refline_pos_y = reference_line_y -
+                           VehicleParam().right_edge_to_center() -
+                           kSafeDistance;
+    unsafe_car_pos_y = VehicleParam().right_edge_to_center() + kSafeDistance;
+    unsafe_range = std::make_pair(unsafe_refline_pos_y, unsafe_car_pos_y);
+  } else {
+    unsafe_refline_pos_y =
+        reference_line_y + VehicleParam().left_edge_to_center() + kSafeDistance;
+    unsafe_car_pos_y =
+        -1.0 * (VehicleParam().left_edge_to_center() + kSafeDistance);
+    unsafe_range = std::make_pair(unsafe_car_pos_y, unsafe_refline_pos_y);
+  }
+  // Get obstacles'ID.
+  for (auto iter : obstacles) {
+    double obstacle_y = iter->Perception().position().y();
+    if ((obstacle_y > unsafe_range.first) &&
+        (obstacle_y < unsafe_range.second)) {
+      unsafe_obstacle_ID_.emplace_back(iter->Id());
+    }
+  }
+}
 }  // namespace planning
 }  // namespace apollo
