@@ -104,4 +104,8 @@ By default, the HDL-64E S3 has the network IP address of 192.168.0.1. However, w
 
 For additional information on Velodyne HDL-64E S3, please refer to their 
 [website here](http://velodynelidar.com/hdl-64e.html).
+
+## Disclaimer
+
+This device is `Apollo Platform Supported`
       
