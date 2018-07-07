@@ -158,5 +158,49 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
   EXPECT_FLOAT_EQ(nudge_dist, 0.42657289);
   EXPECT_FLOAT_EQ(lane_obstacles_num, 2);
 }
+
+TEST(NaviObstacleDeciderTest, GetUnsafeObstaclesID) {
+  NaviObstacleDecider obstacle_decider;
+  std::vector<const Obstacle*> vec_obstacle;
+  std::vector<common::PathPoint> vec_points;
+  PerceptionObstacle perception_obstacle;
+
+  // obstacle 1
+  perception_obstacle.set_width(1.0);
+  perception_obstacle.set_length(1.0);
+  perception_obstacle.mutable_position()->set_x(0.0);
+  perception_obstacle.mutable_position()->set_y(3.0);
+  Obstacle b1("5", perception_obstacle);
+
+  // obstacle 2
+  perception_obstacle.set_width(2.6);
+  perception_obstacle.set_length(1.0);
+  perception_obstacle.mutable_position()->set_x(0.0);
+  perception_obstacle.mutable_position()->set_y(-1.0);
+  Obstacle b2("6", perception_obstacle);
+
+  PathPoint p1 = MakePathPoint(0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  p1.set_s(0.0);
+  PathPoint p2 = MakePathPoint(1.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  p2.set_s(p1.s() + 1.0);
+  PathPoint p3 = MakePathPoint(2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  p3.set_s(p2.s() + 1.0);
+  PathPoint p4 = MakePathPoint(3.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  p4.set_s(p3.s() + 1.0);
+  PathPoint p5 = MakePathPoint(4.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  p5.set_s(p4.s() + 1.0);
+  vec_points.emplace_back(p1);
+  vec_points.emplace_back(p2);
+  vec_points.emplace_back(p3);
+  vec_points.emplace_back(p4);
+  vec_points.emplace_back(p5);
+  vec_obstacle.emplace_back(&b1);
+  vec_obstacle.emplace_back(&b2);
+
+  std::vector<std::string> unsafe_obstacle_ID;
+  obstacle_decider.GetUnsafeObstaclesID(vec_points, vec_obstacle);
+  unsafe_obstacle_ID = obstacle_decider.UnsafeObstacles();
+  EXPECT_EQ(unsafe_obstacle_ID.size(), 2);
+}
 }  // namespace planning
 }  // namespace apollo
