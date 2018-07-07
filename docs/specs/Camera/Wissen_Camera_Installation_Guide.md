@@ -8,3 +8,7 @@ We recommend using ```three cameras```, two with **6 mm** lens and one with **25
 
 This camera can be connected to the Apollo Sensor Unit via the FAKRA connector for data transfer, trigger and OTA firmware update.
 
+## Disclaimer
+
+This device is `Apollo Hardware Development Platform Supported`
+

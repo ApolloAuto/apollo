@@ -35,6 +35,10 @@ The following diagram contains the range of the ARS-408-21 Radar:
 
 2. For information on troubleshooting or for the user manual, contact Continental directly
 
+## Disclaimer
+
+This device is `Apollo Platform Supported`
+
     
 
     
