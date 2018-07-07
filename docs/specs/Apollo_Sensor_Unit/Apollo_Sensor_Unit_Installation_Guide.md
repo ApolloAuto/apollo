@@ -130,5 +130,6 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | 12   | GND    | PWR   | Ground          |
 
    
+## Disclaimer
 
-   ​    
+This device is `Apollo Platform Supported`

@@ -717,37 +717,21 @@ bool Path::GetProjection(const Vec2d& point, double* accumulate_s,
   }
   CHECK_GE(num_points_, 2);
   *min_distance = std::numeric_limits<double>::infinity();
-
+  int min_i = 0;
   for (int i = 0; i < num_segments_; ++i) {
-    const auto& segment = segments_[i];
-    const double distance = segment.DistanceTo(point);
+    const double distance = segments_[i].DistanceSquareTo(point);
     if (distance < *min_distance) {
-      const double proj = segment.ProjectOntoUnit(point);
-      if (proj < 0.0 && i > 0) {
-        continue;
-      }
-      if (proj > segment.length() && i + 1 < num_segments_) {
-        const auto& next_segment = segments_[i + 1];
-        if ((point - next_segment.start())
-                .InnerProd(next_segment.unit_direction()) >= 0.0) {
-          continue;
-        }
-      }
+      min_i = i;
       *min_distance = distance;
-      if (i + 1 >= num_segments_) {
-        *accumulate_s = accumulated_s_[i] + proj;
-      } else {
-        *accumulate_s = accumulated_s_[i] + std::min(proj, segment.length());
-      }
-      const double prod = segment.ProductOntoUnit(point);
-      if ((i == 0 && proj < 0.0) ||
-          (i + 1 == num_segments_ && proj > segment.length())) {
-        *lateral = prod;
-      } else {
-        *lateral = (prod > 0.0 ? distance : -distance);
-      }
     }
   }
+  *min_distance = std::sqrt(*min_distance);
+  const auto& nearest_seg = segments_[min_i];
+  const auto prod = nearest_seg.ProductOntoUnit(point);
+  *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+  const auto proj = nearest_seg.ProjectOntoUnit(point);
+  *accumulate_s = accumulated_s_[min_i] +
+                  std::max(0.0, std::min(proj, nearest_seg.length()));
   return true;
 }
 
