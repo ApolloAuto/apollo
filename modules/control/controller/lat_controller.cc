@@ -284,7 +284,7 @@ Status LatController::ComputeControlCommand(
   // Compound discrete matrix with road preview model
   UpdateMatrixCompound();
 
-  // Add gain sheduler for higher speed steering
+  // Add gain scheduler for higher speed steering
   if (FLAGS_enable_gain_scheduler) {
     matrix_q_updated_(0, 0) =
         matrix_q_(0, 0) *
@@ -385,7 +385,7 @@ Status LatController::Reset() {
 }
 
 void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
-  if (FLAGS_use_navigation_mode) {
+  if (FLAGS_enable_navigation_mode_handlilng) {
     ComputeLateralErrors(0.0, 0.0, VehicleStateProvider::instance()->heading(),
                          VehicleStateProvider::instance()->linear_velocity(),
                          VehicleStateProvider::instance()->angular_velocity(),
@@ -506,7 +506,7 @@ void LatController::ComputeLateralErrors(
     SimpleLateralDebug *debug) {
   // TODO(QiL): change this to conf.
   TrajectoryPoint target_point;
-  if (FLAGS_use_navigation_mode) {
+  if (FLAGS_enable_navigation_mode_handlilng) {
     const double current_timestamp = Clock::NowInSeconds();
     target_point = trajectory_analyzer.QueryNearestPointByAbsoluteTime(
         current_timestamp + query_relative_time_);
@@ -528,7 +528,7 @@ void LatController::ComputeLateralErrors(
   // TODO(QiL): Code reformat when done with test
   const double raw_lateral_error =
       cos_matched_theta * dy - sin_matched_theta * dx;
-  if (FLAGS_use_navigation_mode) {
+  if (FLAGS_enable_navigation_mode_handlilng) {
     double filtered_lateral_error =
         lateral_error_filter_.Update(raw_lateral_error);
     debug->set_lateral_error(filtered_lateral_error);
@@ -542,7 +542,7 @@ void LatController::ComputeLateralErrors(
   // theta_error = delta_theta
   // TODO(QiL): Code reformat after test
   debug->set_lateral_error_rate(linear_v * sin_delta_theta);
-  if (FLAGS_use_navigation_mode) {
+  if (FLAGS_enable_navigation_mode_handlilng) {
     debug->set_heading_error(heading_error_filter_.Update(delta_theta));
   } else {
     debug->set_heading_error(delta_theta);
