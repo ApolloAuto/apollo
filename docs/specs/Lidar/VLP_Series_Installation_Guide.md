@@ -63,4 +63,8 @@ For additional information, please refer to:
 
 * HDL - 32E: [http://velodynelidar.com/hdl-32e.html](http://velodynelidar.com/hdl-32e.html)
 
+## Disclaimer
+
+This device is `Apollo Hardware Development Platform Supported`
+
 
