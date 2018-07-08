@@ -7,7 +7,7 @@
 ## 内容
 - [车辆校准指南](#车辆校准指南)
 - [硬件和软件安装](#硬件和软件安装)
-- [DreamView的使用](https://github.com/ApolloAuto/apollo/new/master/docs/quickstart#dreamview%E7%9A%84%E4%BD%BF%E7%94%A8)
+- [DreamView的使用](#硬件和软件安装)
 - [上车测试](#上车测试)
 
 ## 车辆校准指南
