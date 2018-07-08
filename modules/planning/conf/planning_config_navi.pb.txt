@@ -198,5 +198,8 @@ navi_planner_config {
         preferred_decel: 2.0
         max_accel: 4.0
         max_decel: 5.0
+        obstacle_buffer: 0.5
+        safe_distance_base: 2.0
+        safe_distance_ratio: 1.0
     }
 }
