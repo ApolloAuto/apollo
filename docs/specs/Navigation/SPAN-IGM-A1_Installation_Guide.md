@@ -104,7 +104,7 @@ log USB1 vehiclebodyrotationb onchanged
 SAVECONFIG
 ```
 
-**![warning_icon](/Users/hanyang07/apollo/docs/quickstart/images/warning_icon.png) WARNING:** Modify the **<u>SETIMUTOANTOFFSE</u>T** line based on the actual measurement (of the antenna and the SPAN-IGM-A1 offset).
+**![warning_icon](images/warning_icon.png) WARNING:** Modify the **<u>SETIMUTOANTOFFSE</u>T** line based on the actual measurement (of the antenna and the SPAN-IGM-A1 offset).
 
 For example:
 
