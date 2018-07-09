@@ -110,10 +110,6 @@ class LatController : public Controller {
 
   double ComputeFeedForward(double ref_curvature) const;
 
-  double GetLateralError(
-      const common::math::Vec2d &point,
-      apollo::common::TrajectoryPoint *trajectory_point) const;
-
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
                             const TrajectoryAnalyzer &trajectory_analyzer,
