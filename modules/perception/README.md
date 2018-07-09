@@ -3,14 +3,13 @@
 ## Introduction
 Apollo 3.0 has following new features:
 
-- CIPV detection
-- Tailgating 
-- Whole lane line
-- Online pose estimation
-- Asynchronous sensor fusion
-- Visual localization
-- Ultrasonic sensors
-- 16-beam LiDAR support
+ * **CIPV(Closest In-Path Vehicle) detection and Tailgaiting**: The vehicle in front of the ego-car is detected and its trajectory is estimated for more efficient tailgating and lane keeping when lane detection is unreliable.
+  * **Asynchronous sensor fusion**: unlike the previous version, Perception in Apollo 3.0 is capable of consolidating all the information and data points by asynchronously fusing LiDAR, Radar and Camera data. Such conditions allow for more comprehensive data capture and reflect more practical sensor environments.
+  * **Online pose estimation**: This new feature estimates the pose of an ego-vehicle for every single frame. This feature helps to drive through bumps or slopes on the road with more accurate 3D scene understanding.
+  * **Ultrasonic sensors**: Perception in Apollo 3.0 now works with ultrasonic sensors. The output can be used for Automated Emergency Brake (AEB) and vertical/perpendicular parking.
+  * **Whole lane line**: Unlike previous lane line segments, this whole lane line feature will provide more accurate and long range detection of lane lines. 
+  * **Visual localization**: Camera's are currently being tested to aide and enhance localization
+  * **16 beam LiDAR support**
 
 The perception module incorporates the capability of using a front camera and a front radar to recognize obstacles and fuse their individual tracks to obtain a final track list.  The obstacle sub-module detects, classifies and tracks obstacles. This sub-module also predicts obstacle motion and position information (e.g., heading and velocity). For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate the lane relative location to the ego-vehicle (L0, L1, R0, R1, etc)
 
