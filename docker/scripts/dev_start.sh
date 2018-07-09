@@ -289,8 +289,6 @@ function main(){
         docker exec apollo_dev bash -c '/apollo/scripts/docker_adduser.sh'
     fi
 
-    docker exec --user $USER apollo_dev bash -c "supervisord -c /apollo/modules/tools/supervisord/dev.conf >& /tmp/supervisord.start.log"
-
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"
     ok "Enjoy!"
 }
