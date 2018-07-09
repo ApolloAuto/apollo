@@ -18,6 +18,8 @@ Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our 
 - [Software system and Kernel Installation](Software_and_Kernel_Installation_guide.md)
 
 ## Perception
+- [Perception Apollo 3.0](perception_apollo_3.0.md)
+- [Guideline Sensor Installation Apollo 3.0](Guideline_sensor_Installation_apollo_3.0.md)
 - [Perception Apollo 2.5](perception_apollo_2.5.md)
 - [Guideline Sensor Installation Apollo 2.5](Guideline_sensor_Installation_apollo_2.5.md)
 - [Lidar calibration.pdf](lidar_calibration.pdf)
