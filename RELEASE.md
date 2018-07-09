@@ -9,11 +9,13 @@ Apollo 3.0 enables L4 product level solution that allows vehicles to drive in a 
 * Apollo Sensor Unit (ASU)
 * New Gatekeeper - Ultrasonic Sensor
 * Perception module changes:
-  - **CIPV detection/ Tailgating** – moving within a single lane
-  -	Whole lane line support - bold line support for long range accuracy. There are 2 different types on installations for Camera, low and high installation.
-   -	**Online pose estimation** – determines angle change and estimates it when there are bumps or slopes to ensure that the sensors move with the car and the angle/pose changes accordingly
-  -	**Visual localization** – we now use camera for localization. This functionality is currently being tested.
-  -	**Ultrasonic Sensor** – Currently being tested as the final gatekeeper to be used in conjunction with Guardian for Automated Emergency brake and vertical/perpendicular parking.
+  * **CIPV(Closest In-Path Vehicle) detection and Tailgaiting**: The vehicle in front of the ego-car is detected and its trajectory is estimated for more efficient tailgating and lane keeping when lane detection is unreliable.
+  * **Asynchronous sensor fusion**: unlike the previous version, Perception in Apollo 3.0 is capable of consolidating all the information and data points by asynchronously fusing LiDAR, Radar and Camera data. Such conditions allow for more comprehensive data capture and reflect more practical sensor environments.
+  * **Online pose estimation**: This new feature estimates the pose of an ego-vehicle for every single frame. This feature helps to drive through bumps or slopes on the road with more accurate 3D scene understanding.
+  * **Ultrasonic sensors**: Perception in Apollo 3.0 now works with ultrasonic sensors. The output can be used for Automated Emergency Brake (AEB) and vertical/perpendicular parking.
+  * **Whole lane line**: Unlike previous lane line segments, this whole lane line feature will provide more accurate and long range detection of lane lines. 
+  * **Visual localization**: Camera's are currently being tested to aide and enhance localization
+  * **16 beam LiDAR support**
 
 # Release 2.5
 This release allows the vehicle to autonomously run on geo-fenced highways. Vehicles are able to do lane keeping cruise and avoid collisions with the leading vehicles.
