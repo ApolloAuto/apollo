@@ -1,4 +1,4 @@
-#Apollo Navigation
+# Apollo Navigation
 
 You could integrate 2 types of Navigation Hardware with Apollo. Refer to their individual Installation guides for more information. 
 
