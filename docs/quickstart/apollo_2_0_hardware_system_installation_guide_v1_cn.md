@@ -26,7 +26,7 @@
         * [前提条件](#前提条件)
         * [主要部件安装图](#主要部件安装图)
         * [安装GPS的接收器和天线](#安装gps的接收器和天线)
-        * [Installing the Light Detection and Ranging System (LiDAR)](#installing-the-light-detection-and-ranging-system-(lidar))
+        * [安装激光探测及测距系统(LiDAR)](#安装激光探测及测距系统-(lidar))
         * [安装IPC](#安装ipc)
         * [配置GPS和IMU](#配置gps和imu)
 * [配置网络](#配置网络)
@@ -38,19 +38,20 @@
 
 本篇指南提供了所有 **Apollo项目**需要的的安装硬件部分和软件系统教程。系统安装信息包括下载和安装Apollo Linux内核的过程。
 
-## Document Conventions
+## 文档编写规则
 
-The following table lists the conventions that are used in this document:
+下表列出了本文使用的编写规则：
 
-| **Icon**                            | **Description**                          |
+| **图标**                            | **描述**                          |
 | ----------------------------------- | ---------------------------------------- |
-| **Bold**                            | Emphasis                                 |
-| `Mono-space font`                   | Code, typed data                         |
-| _Italic_                            | Titles of documents, sections, and headings Terms used |
-| ![info](images/info_icon.png)       | **Info**  Contains information that might be useful.  Ignoring the Info icon has no negative consequences. |
-| ![tip](images/tip_icon.png)         | **Tip**. Includes helpful hints or a shortcut that might assist you in completing a task. |
-| ![online](images/online_icon.png)   | **Online**. Provides a link to a particular web site where you can get more information. |
-| ![warning](images/warning_icon.png) | **Warning**. Contains information that must **not** be ignored or you risk failure when you perform a certain task or step. |
+| **加粗**                            | 强调。                                 |
+| `Mono-space 字体`                   | 代码, 类型数据。                         |
+| _斜体_                              | 文件、段落和标题中术语的用法。   |
+| ![信息](https://raw.githubusercontent.com/ireeX/apollo/master/docs/quickstart/images/info_icon.png)       | **信息**  提供了可能有用的信息。忽略此信息可能会产生不可预知的后果。 |
+| ![提示](https://github.com/ireeX/apollo/blob/master/docs/quickstart/images/tip_icon.png)         | **提醒** 包含有用的提示或者可以帮助你完成安装的快捷步骤。 |
+| ![在线](https://github.com/ireeX/apollo/blob/master/docs/quickstart/images/online_icon.png)   | **在线** 提供指向特定网站的链接，您可以在其中获取更多信息。 |
+| ![警告](https://raw.githubusercontent.com/ireeX/apollo/master/docs/quickstart/images/warning_icon.png) | **警告** 包含 **不能** 被忽略的内容，如果忽略，当前安装步骤可能会失败。 |
+
 
 # Introduction
 
