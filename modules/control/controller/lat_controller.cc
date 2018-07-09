@@ -478,35 +478,13 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
   return steer_angle_feedforwardterm;
 }
 
-/*
- * SL coordinate system:
- *  left to the ref_line, L is +
- * right to the ref_line, L is -
- */
-double LatController::GetLateralError(const common::math::Vec2d &point,
-                                      TrajectoryPoint *traj_point) const {
-  const auto closest =
-      trajectory_analyzer_.QueryNearestPointByPosition(point.x(), point.y());
-
-  const double point_angle = std::atan2(point.y() - closest.path_point().y(),
-                                        point.x() - closest.path_point().x());
-  const double point2path_angle = point_angle - closest.path_point().theta();
-  if (traj_point != nullptr) {
-    *traj_point = closest;
-  }
-
-  const double dx = closest.path_point().x() - point.x();
-  const double dy = closest.path_point().y() - point.y();
-  return std::sin(point2path_angle) * std::sqrt(dx * dx + dy * dy);
-}
-
 void LatController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
     SimpleLateralDebug *debug) {
   // TODO(QiL): change this to conf.
   TrajectoryPoint target_point;
-  if (FLAGS_enable_navigation_mode_handlilng) {
+  if (FLAGS_use_navigation_mode) {
     const double current_timestamp = Clock::NowInSeconds();
     target_point = trajectory_analyzer.QueryNearestPointByAbsoluteTime(
         current_timestamp + query_relative_time_);
