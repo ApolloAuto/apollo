@@ -39,4 +39,4 @@ NV-GI120将GNSS接收器和MEMS IMU设备集成进一个小型的紧凑装置中
 
 ## 免责声明
 
-This device is `Apollo Platform Supported`
+This device is `Apollo Hardware Development Platform Supported`
