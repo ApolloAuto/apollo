@@ -47,13 +47,13 @@ For additional information, visit Page 3 of [the SPAN-IGM™ Quick Start Guide](
 
 When the SPAN-IGM-A1 and the GPS Antenna are in position, the distance from the SPAN-IGM-A1 to the GPS Antenna must be measured. The distance should be measured as: X offset, Y offset, and Z offset.
 
-The center of the IMU and the center of the antenna are labeled on the exterior of the devices.
+The center of the SPAN-IGM-A1 and the center of the antenna are labeled on the exterior of the devices.
 
 For additional information, visit Page 5 of [the SPAN-IGM™ Quick Start Guide](http://www.novatel.com/assets/Documents/Manuals/GM-14915114.pdf) to view the detailed diagram.
 
 ### Configuring the GPS and IMU
 
-Configure the GPS and IMU as shown below. The setting can be configured by keying in the following command or loading a batch file in Novatel Connect:
+Configure the GPS and SPAN-IGM-A1 as shown below. The setting can be configured by keying in the following command or loading a batch file in Novatel Connect:
 
 ```
 WIFICONFIG STATE OFF
@@ -104,7 +104,7 @@ log USB1 vehiclebodyrotationb onchanged
 SAVECONFIG
 ```
 
-**![warning_icon](/Users/hanyang07/apollo/docs/quickstart/images/warning_icon.png) WARNING:** Modify the **<u>SETIMUTOANTOFFSE</u>T** line based on the actual measurement (of the antenna and the IMU offset).
+**![warning_icon](/Users/hanyang07/apollo/docs/quickstart/images/warning_icon.png) WARNING:** Modify the **<u>SETIMUTOANTOFFSE</u>T** line based on the actual measurement (of the antenna and the SPAN-IGM-A1 offset).
 
 For example:
 
