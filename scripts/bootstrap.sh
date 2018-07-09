@@ -23,15 +23,6 @@ cd "${DIR}/.."
 source "${DIR}/apollo_base.sh"
 
 function start() {
-    # Setup supervisord.
-    if [ "$HOSTNAME" == "in_release_docker" ]; then
-        supervisord -c /apollo/modules/tools/supervisord/release.conf >& /tmp/supervisord.start.log
-        echo "Started supervisord with release conf"
-    else
-        supervisord -c /apollo/modules/tools/supervisord/dev.conf >& /tmp/supervisord.start.log
-        echo "Started supervisord with dev conf"
-    fi
-
     # Start roscore.
     bash scripts/roscore.sh start
     # Start monitor.
