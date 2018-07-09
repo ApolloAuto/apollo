@@ -7,7 +7,7 @@
 
 ## Apollo Hardware Development Platform
 
-We highly recommend that you read through our [Disclaimer](Disclaimer_Hardware.pdf) before reading through our Hardware platform documents.
+Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our supported hardware devices - Apollo Platform Supported devices and Apollo Hardware Development Platform Supported devices. In order to view each device's support type, please look under the  `Disclaimer` section in each device's insallation guide. We highly recommend that you read through our [Disclaimer](Disclaimer_Hardware.pdf) to understand each device type, before reading through our Hardware platform installation documents.
 
 - [Apollo Sensor Unit](Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide.md)
 - [Camera](Camera/README.md)
