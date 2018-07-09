@@ -6,11 +6,11 @@
     * [文档说明](#文档说明)
 * [核心硬件](#核心硬件)
     * [附加组件](#附加组件)
-    * [车载计算机系统-IPC](#车载计算机系统--ipc)
+    * [车载计算机系统-IPC](#车载计算机系统---ipc)
         * [IPC的配置](#ipc的配置)
         * [IPC前后视图](#ipc前后视图)
     * [控制器局域网络（CAN）卡](#控制器局域网络（can）卡)
-    * [全球定位系统(GPS)和惯性测量装置(IMU)](#全球定位系统(gps)和惯性测量装置(imu))
+    * [全球定位系统(GPS)和惯性测量装置(IMU)](#全球定位系统(-gps-)和惯性测量装置(-imu-))
         * [选项1: NovAtel SPAN-IGM-A1](#选项1:nocatel-span--igm--a1)
         * [选项2: NovAtel SPAN ProPak6 和 NovAtel IMU-IGM-A1](#选项2:novatel-span-propak6和imu--igm--a1)
     * [GPS接收器和天线](#gps接收器和天线)
@@ -333,7 +333,7 @@ GPS-IMU组件的GPS接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**。
  - Apollo内核
  - Nvidia GPU 驱动
 
-#### 准备IPC
+#### IPC的准备工作
 有如下步骤：
 
 1. 准备安装CAN卡：在Neousys Nuvo-6108GC中，ASUS®GTX-1080GPU-A8G-GAMING GPU卡预先安装占用了一个PCI插槽，将CAN卡安装到剩余两个PCI插槽其一即可。
