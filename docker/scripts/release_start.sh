@@ -129,7 +129,6 @@ function main() {
             "mkdir -p '${DATA_DIR}'; chmod a+rw -R '${DATA_DIR}'"
       done
     fi
-    docker exec -u ${USER} apollo_release bash -c "supervisord -c /apollo/modules/tools/supervisord/release.conf >& /tmp/supervisord.start.log"
     docker exec -u ${USER} -it apollo_release "/apollo/scripts/bootstrap.sh"
 }
 
