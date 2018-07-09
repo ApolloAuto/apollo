@@ -14,7 +14,7 @@
         * [选项1: NovAtel SPAN-IGM-A1](#选项1:nocatel-span--igm--a1)
         * [选项2: NovAtel SPAN ProPak6 和 NovAtel IMU-IGM-A1](#选项2:novatel-span-propak6和-imu--igm--a1)
     * [GPS接收器和天线](#gps接收器和天线)
-    * [激光探测及测距系统(LiDAR)](#激光探测及测距系统-(lidar)-)
+    * [激光雷达(LiDAR)](#激光雷达-(lidar)-)
         * [选项 1: Velodyne HDL-64E S3](#选项-1-velodyne-hdl-64e-s3)
         * [选项 2: Hesai Pandora](#选项-2-hesai-pandora) 
 * [安装任务概览](#安装任务概览)
@@ -26,7 +26,7 @@
         * [前提条件](#前提条件)
         * [主要部件安装图](#主要部件安装图)
         * [安装GPS的接收器和天线](#安装gps的接收器和天线)
-        * [安装激光探测及测距系统(LiDAR)](#安装激光探测及测距系统-(lidar))
+        * [安装激光雷达(LiDAR)](#安装激光雷达-(lidar))
         * [安装IPC](#安装ipc)
         * [配置GPS和IMU](#配置gps和imu)
 * [配置网络](#配置网络)
@@ -53,183 +53,176 @@
 | ![警告](https://raw.githubusercontent.com/ireeX/apollo/master/docs/quickstart/images/warning_icon.png) | **警告** 包含 **不能** 被忽略的内容，如果忽略，当前安装步骤可能会失败。 |
 
 
-# Introduction
 
-The **Apollo Project** is an initiative that provides an open, complete, and reliable software platform for Apollo partners in the automotive and autonomous driving industries. The aim of this project is to enable these entities to develop their own self-driving systems based on Apollo software stack.
+# 引言
 
-## Documentation
+**Apollo项目**旨在为汽车和自动驾驶行业的合作伙伴提供开放，完整和可靠的软件平台。该项目的目的是使这些企业能够开发基于Apollo软件栈的自动驾驶系统。
 
-The following set of documentation describes Apollo 2.0:
+## 文档说明
 
-- ***<u>[Apollo Hardware and System Installation Guide]</u>***  ─ Provides the instructions to install the hardware components and the system software for the vehicle:
+以下文档适用于Apollo 2.0:
 
-    - **Vehicle**:
+- ***<u>[Apollo Hardware and System Installation Guide]</u>***  ─ 提供用于安装车辆的硬件部件和系统软件的教程:
 
-      - Industrial PC (IPC)
-      - Global Positioning System (GPS)
-      - Inertial Measurement Unit (IMU)
-      - Controller Area Network (CAN) card
-      - GPS Antenna
-      - GPS Receiver
-      - Light Detection and Ranging System (LiDAR)
-      - Camera
-      - Radar
+    - **车辆**:
 
-    - **Software**:
-      - Ubuntu Linux
-      - Apollo Linux Kernel
-      - NVIDIA GPU Driver
+      - 工业用计算机 (IPC)
+      - 全球定位系统 (GPS)
+      - 惯性测量单元 (IMU)
+      - 控制器局域网络 (CAN) 卡
+      - 硬盘
+      - GPS 天线
+      - GPS 接收器
+      - 安装激光雷达 (LiDAR)
+      - 摄像头
+      - 雷达
 
-- ***<u>[Apollo Quick Start Guide]</u>*** ─ A combination tutorial and roadmap that provide the complete set of end-to-end instructions. The Quick Start Guide also provides links to additional documents that describe the conversion of a regular car to an autonomous-driving vehicle.
+    - **软件**:
+      - Ubuntu Linux 操作系统
+      - Apollo Linux 内核
+      - Nvidia GPU 驱动
 
+- ***<u>[Apollo Quick Start Guide]</u>*** ─ 文档和产品蓝图提供了完整的端到端教程。本文还提供了一些其它链接用于将一辆普通汽车改装成一辆自动驾驶车辆。
 
-# Key Hardware Components
+## 关键硬件
 
-The key hardware components to install include:
-
-- Onboard computer system ─ Neousys Nuvo-6108GC
-- Controller Area Network (CAN) Card ─ ESD CAN-PCIe/402-B4
-- General Positioning System (GPS) and Inertial Measurement Unit (IMU) ─
-  You can select one of the following options:
-  - NovAtel SPAN-IGM-A1
-  - NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1
-- Light Detection and Ranging System (LiDAR) ─ You can select one of the following options:
+需要安装的关键的硬件组件包括：
+- 车载计算机系统 ─ Neousys Nuvo-6108GC
+- CAN卡 ─ ESD CAN-PCIe/402-B4
+- 全球定位系统(GPS)和惯性测量装置(IMU) ─ 您可从如下选项中任选其一:
+  - NovAtel SPN-IGM-A1
+  - NovAtel SPAN® ProPak6™ 和 NovAtel IMU-IGM-A1
+- 安装激光雷达 (LiDAR) ─ 您可从如下选项中任选其一:
   - Velodyne HDL-64E S3
   - Hesai Pandora
-- Cameras — Leopard Imaging LI-USB30-AR023ZWDR with USB 3.0 case
-- Radar — Continental ARS408-21
+- 摄像头 — 带 USB 3.0 接口的Leopard Imaging LI-USB30-AR023ZWDR 
+- 雷达 — Continental ARS408-21
 
-## Additional Components Required
+### 附加组件
+- 提供网络接入的4G路由器
+- 提供额外USB接口的USB集线器
+- 供在车辆现场调试使用的显示器，键盘，鼠标
+- 连接线：数字可视接口（DVI）线（可选），用于GPS和LiDAR时间同步的定制线
+- 苹果iPad Pro:9.7寸
 
-You need to provide these additional components for the Additional Tasks Required:
 
-- A 4G router for Internet access
-- A USB hub for extra USB ports
-- A monitor, keyboard, and mouse for debugging at the car onsite
-- Cables:a Digital Visual Interface (DVI) cable (optional), a customized cable for GPS-LiDAR time synchronization
-- Apple iPad Pro: 9.7-inch, Wi-Fi (optional)
+关键硬件组件的特性将在后续部分中介绍。
 
-The features of the key hardware components are presented in the subsequent sections.
+### 车载计算机系统，IPC
+车载计算机系统是用于自动驾驶车辆的工业PC（IPC），并使用由第六代Intel Xeon E3 1275 V5 CPU强力驱动的 **NeousysNuvo-6108GC**。
 
-## Onboard Computer System - IPC
+Neousys Nuvo-6108GC是自动驾驶系统（ADS）的中心单元。
 
-The onboard computer system is an industrial PC (IPC) for the autonomous vehicle and uses the **NeousysNuvo-6108GC** that is powered by a sixth-generation Intel Xeon E3 1275 V5 CPU.
-
-The Neousys Nuvo-6108GC is the central unit of the autonomous driving system (ADS).
-
-### IPC Configuration
-
-Configure the IPC as follows:
+#### IPC的配置
+IPC配置如下：
 
 - ASUS GTX1080 GPU-A8G-Gaming GPU Card
 - 32GB DDR4 RAM
-- PO-280W-OW 280W AC/DC power adapter
-- 2.5" SATA Hard Disk 1TB 7200rpm
+- PO-280W-OW 280W 交流、直流电源适配器
+- 2.5" SATA 硬盘 1TB 7200rpm
 
-### IPC Front and Side Views
+### IPC前后视图
 
-The front and rear views of the IPC are shown with the Graphics Processing Unit (GPU) installed in the following pictures:
+安装了GPU的IPC前后视图如下:
 
-The front view of the Nuvo-6108GC:
+Nuvo-6108GC的前视图:
 
-![ipc_front](images/IPC-6108GC-front-side.jpg)
+![ipc_front]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-front-side.jpg)
 
-The side view of the Nuvo-6108GC:
+Nuvo-6108GC的侧视图:
 
-![ipc_back](images/IPC-6108GC-left-side.jpg)
+![ipc_back]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-left-side.jpg)
 
-For more information about the Nuvo-6108GC, see:
+想要了解更多有关 Nuvo-6108GC的资料, 请参考:
 
-![online](images/online_icon.png)
-Neousys Nuvo-6108GC Product Page:
+![online]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)
+Neousys Nuvo-6108GC 产品页:
 
 [http://www.neousys-tech.com/en/product/application/rugged-embedded/nuvo-6108gc-gpu-computing](http://www.neousys-tech.com/en/product/application/rugged-embedded/nuvo-6108gc-gpu-computing)
 
-![online](images/online_icon.png)
-Neousys Nuvo-6108GC-Manual:
+![online]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)
+Neousys Nuvo-6108GC 手册：还不可用。
 
-**[Link unavailable yet]**
+#### CAN 卡
+IPC中使用的CAN卡型号为 **ESD** **CAN-PCIe/402-B4**.
 
-## Controller Area Network (CAN) Card
+![can_card]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/CAN-B4.png)
 
-The CAN card to use with the IPC is **ESD** **CAN-PCIe/402-B4**.
+想要了解更多有关CAN-PCIe/402-B4的资料, 请参考:
 
-![can_card](images/CAN-B4.png)
-
-For more information about the CAN-PCIe/402-B4, see:
-
-![online](images/online_icon.png)    ESD CAN-PCIe/402 Product Page:
+![online]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)    ESD CAN-PCIe/402 产品主页：
 
 [https://esd.eu/en/products/can-pcie402](https://esd.eu/en/products/can-pcie402)
 
 
 
-## Global Positioning System (GPS) and Inertial Measurement Unit (IMU)
+##全球定位系统(GPS)和惯性测量装置(IMU)
 
-There are **two** GPS-IMU **options** available and the choice depends upon the one that most fits your needs:
+有 **两种** GPS-IMU的 **可选方案**，您只需根据您的需求进行选择:
 
-- **Option 1: NovAtel SPAN-IGM-A1**
-- **Option 2: NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1**
+- 选项1：NovAtel SPAN-IGM-A1
+- 选项2：NovAtel SPAN® ProPak6™ 和 NovAtel IMU-IGM-A1
 
-### Option 1: The NovAtel SPAN-IGM-A1
+###选项1: NovAtel SPAN-IGM-A1
 
-The NovAtel SPAN-IGM-A1 is an integrated, single-box solution that offers tightly coupled Global Navigation Satellite System (GNSS) positioning and inertial navigation featuring the NovAtel OEM615 receiver.
+NovAtel SPAN-IGM-A1 是一个集成的，单盒的解决方案，提供紧密耦合的全球导航卫星系统（GNSS）定位和具有NovAtel OEM615接收机的惯性导航功能。 
 
-![novatel_imu](images/Novatel_imu.png)
+![novatel_imu]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Novatel_imu.png)
 
-For more information about the NovAtel SPAN-IGM-A1, see:
+想要了解更多有关NovAtel SPAN-IGM-A1的资料, 请参考:
 
- ![online](images/online_icon.png) NovAtel SPAN-IGM-A1 Product Page:
+ ![online]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) NovAtel SPAN-IGM-A1 产品页:
 
 [https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/](https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/)
 
-### Option 2: The NovAtel SPAN ProPak6 and NovAtel IMU-IGM-A1
+###选项2: NovAtel SPAN ProPak6和NovAtel IMU-IGM-A1
 
-NovAtel ProPak6 is a standalone GNSS receiver. It works with a separate NovAtel- supported IMU (in this case, the NovAtel IMU-IGM-A1)to provide localization.
+NovAtel ProPak6是独立的GNSS接收机，它与NovAtel提供的独立IMU（本例中为NovAtel IMU-IGM-A1）相融合以提供定位。
 
-The ProPak6 provides the latest and most sophisticated enclosure product manufactured by NovAtel.
+ProPak6提供由NovAtel生产的最新最先进的外壳产品。
 
-The IMU-IGM-A1 is an IMU that pairs with a SPAN-enabled GNSS receiver such as the SPAN ProPak6.
+IMU-IGM-A1是与支持SPAN的GNSS接收器（如SPAN ProPak6）配对的IMU。 
 
-![novatel_pp6](images/Novatel_pp6.png)
+![novatel_pp6]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Novatel_pp6.png)
 
-For more information about the NovAtel SPAN ProPak6 and the IMU-IGM-A1, see:
+想要了解更多有关NovAtel SPAN ProPak6 and the IMU-IGM-A1, 请参考:
 
-  ![online](images/online_icon.png) NovAtel ProPak6 Installation & Operation Manual:
+  ![online]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) NovAtel ProPak6 安装操作手册
 
 [https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf](https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf)
 
-  ![online](images/online_icon.png)NovAtel IMU-IGM-A1 Product Page:
+  ![online]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)NovAtel IMU-IGM-A1 产品页:
 
 [https://www.novatel.com/products/span-gnss-inertial-systems/span-imus/span-mems-imus/imu-igm-a1/#overview](https://www.novatel.com/products/span-gnss-inertial-systems/span-imus/span-mems-imus/imu-igm-a1/#overview)
 
-## The GPS Receiver/Antenna
+## GPS接收器和天线
 
-The GPS Receiver/Antenna used with the GPS-IMU component is the **NovAtel GPS-703-GGG-HV**.
+GPS-IMU组件的GPS接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**。
 
-**NOTE:**The GPS NovAtelGPS-703-GGG-HV works with either model of the two GPS-IMU options that are described in the previous section, Global Positioning System (GPS) and Inertial Measurement Unit (IMU).
+**注意:** GPS NovAtelGPS-703-GGG-HV与上文中提到的两个GPS-IMU选项的任一型号配合使用。 
 
-![gps_receiver](images/gps_receiver.png)
+![gps_receiver](https://github.com/ireeX/apollo/blob/master/docs/quickstart/images/gps_receiver.png)
 
-For more information about the NovAtel GPS-703-GGG-HV, see:
+更多关于 NovAtel GPS-703-GGG-HV的信息，请参考:
 
-  ![online](images/online_icon.png) NovAtel GPS-703-GGG-HV Product Page:
+  ![online](https://raw.githubusercontent.com/ireeX/apollo/master/docs/quickstart/images/online_icon.png) NovAtel GPS-703-GGG-HV 产品页:
 
 [https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/](https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/)
 
-## 激光探测及测距系统(LiDAR)
-There are **two** LiDAR **options** available and the choice depends upon the one that most fits your needs:
+## 激光雷达(LiDAR)
+有 **两种** GPS-IMU的 **可选方案** ，您可根据需求选择最适合您的方案：
 
-- **Option 1: Velodyne HDL-64E S3**
-- **Option 2: Hesai Pandora**
 
-### Option 1: Velodyne HDL-64E S3
+- **选项 1: Velodyne HDL-64E S3**
+- **选项 2: Hesai Pandora**
 
-The 64 line LiDAR system **HDL-64E S3** is available from Velodyne LiDAR, Inc.
+### 选项 1: Velodyne HDL-64E S3
 
-![lidar_image](images/lidar_pic.png)
+使用来自Velodyne激光雷达公司的64线激光雷达系统**HDL-64E S3**。
 
-**Key Features:**
+![lidar_image]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/lidar_pic.png)
+
+**主要特点:**
 
 - 64 Channels
 - 120m range
@@ -242,14 +235,14 @@ The 64 line LiDAR system **HDL-64E S3** is available from Velodyne LiDAR, Inc.
 - User selectable frame rate
 - Rugged Design
 
-![online](images/online_icon.png)Webpage for Velodyne HDL-64E S3:
+![online]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)Webpage for Velodyne HDL-64E S3:
 [http://velodynelidar.com/hdl-64e.html](http://velodynelidar.com/hdl-64e.html)
 
 ### Option 2: Hesai Pandora
 
 The 40 line LiDAR system **Pandora** is available from Hesai Photonics Technology Co., Ltd.
 
-![pandora_image](images/hesai_pandora.png)
+![pandora_image]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/hesai_pandora.png)
 
 **Key Features:**
 
@@ -264,16 +257,16 @@ The 40 line LiDAR system **Pandora** is available from Hesai Photonics Technolog
 - User selectable frame rate
 - 360° surrounding view with 4 mono cameras and long disatance front view with 1 color camera
 
-![online](images/online_icon.png)Webpage for Hesai Pandora:
+![online]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)Webpage for Hesai Pandora:
 [http://www.hesaitech.com/pandora.html](http://www.hesaitech.com/pandora.html)
 
 ## Cameras
 
 The cameras used are LI-USB30-AR023ZWDR with standard USB 3.0 case manufactured by Leopard Imaging Inc. We recommend using two cameras with 6 mm and 25 mm lens respectively to achieve the required performance.
 
-![camera_image](images/LI-camera.png)
+![camera_image]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/LI-camera.png)
 
-![online](images/online_icon.png)You can find more information at Leopard Imaging Inc. website:
+![online]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)You can find more information at Leopard Imaging Inc. website:
 
 [https://www.leopardimaging.com/LI-USB30-AR230WDR.html](https://www.leopardimaging.com/LI-USB30-AR230WDR.html)
 
@@ -282,9 +275,9 @@ The cameras used are LI-USB30-AR023ZWDR with standard USB 3.0 case manufactured 
 
 The Radar used is ARS408-21 manufactured by Continental AG.
 
-![radar_image](images/ARS-408-21.jpg)
+![radar_image]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/ARS-408-21.jpg)
 
-![online](images/online_icon.png)You can find more information can be found on the product page:
+![online]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)You can find more information can be found on the product page:
 
 [https://www.continental-automotive.com/Landing-Pages/Industrial-Sensors/Products/ARS-408-21](https://www.continental-automotive.com/Landing-Pages/Industrial-Sensors/Products/ARS-408-21)
 
@@ -352,39 +345,39 @@ Follow these steps:
 1. Prepare and install the Controller Area Network (CAN) card: 	
   In the Neousys Nuvo-6108GC, ASUS® GTX-1080GPU-A8G-GAMING GPU card is pre-installed into one of the three PCI slots. We still need to install a CAN card into a PCI slot. 
   a. Locate and unscrew the eight screws (shown in the brown squares or	pointed by brown arrows) on the side of computer:
-  ![Positions_of_Screws](images/IPC-6108GC-Screw-Positions_labeled.png)b. Remove the cover from the IPC. 3 PCI slots (one occupied by the	graphic card) locate on the base:
+  ![Positions_of_Screws]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-Screw-Positions_labeled.png)b. Remove the cover from the IPC. 3 PCI slots (one occupied by the	graphic card) locate on the base:
 
-  ![removing the cover](images/Removing_the_cover.JPG)
+  ![removing the cover]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Removing_the_cover.JPG)
 
-  ![Before installing the CAN card](images/Before_installing_the_can_card.png)
+  ![Before installing the CAN card]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Before_installing_the_can_card.png)
 
   c. Set the CAN card termination jumper by removing the red jumper cap (shown in yellow circles) from its default location and placing it at its termination position:
 
-  ![prepare_can_card](images/prepare_can_card2.png)
+  ![prepare_can_card]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/prepare_can_card2.png)
 
-  **![warning](images/warning_icon.png)WARNING**: The CAN card will not work if the termination jumper is not set correctly.
+  **![warning]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png)WARNING**: The CAN card will not work if the termination jumper is not set correctly.
 
   d. Insert the CAN card into the slot in the IPC:
 
-  ![installed CAN](images/After_installing_the_CAN_Card.png)
+  ![installed CAN]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/After_installing_the_CAN_Card.png)
 
    e. Reinstall the cover for the IPC
 
-  ![IPC-6108GC-Screw-Positions.png](images/IPC-6108GC-Screw-Positions.png)
+  ![IPC-6108GC-Screw-Positions.png]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-Screw-Positions.png)
 
 2. Prepare the IPC for powering up:
 
    a. Attach the power cable to the power connector (terminal block) that comes with the IPC:
 
-   ![warning_icon](images/warning_icon.png)**WARNING**: Make sure that the positive(labeled **R**  for red) and the negative(labeled **B** for black) wires of the power cable are inserted into the correct holes on the power terminal block.
+   ![warning_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png)**WARNING**: Make sure that the positive(labeled **R**  for red) and the negative(labeled **B** for black) wires of the power cable are inserted into the correct holes on the power terminal block.
 
-   ![ipc_power_RB](images/ipc_power_RB.png)
+   ![ipc_power_RB]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/ipc_power_RB.png)
 
    b. Connect the monitor, Ethernet cable, keyboard, and mouse to the IPC:
 
-3. ![IPC-6108GC-CableConnected-overexposed.png](images/IPC-6108GC-CableConnected-overexposed.png)
+3. ![IPC-6108GC-CableConnected-overexposed.png]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-CableConnected-overexposed.png)
 
-![warning](images/tip_icon.png)It is recommended to configure the fan speed through BIOS settings, if one or more plugin card is added to the system
+![warning]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)It is recommended to configure the fan speed through BIOS settings, if one or more plugin card is added to the system
 
     - While starting up the computer, press F2 to enter BIOS setup menu.
     - Go to [Advanced] => [Smart Fan Setting]
@@ -392,17 +385,17 @@ Follow these steps:
     - Set [Fan Start Trip Temp] to 20
 
 
-![tip_icon](images/tip_icon.png)It is recommended that you use a Digital Visual Interface (DVI) connector on the graphic card for the monitor. To set the display to the DVI port on the motherboard, following is the setting procedure:
+![tip_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)It is recommended that you use a Digital Visual Interface (DVI) connector on the graphic card for the monitor. To set the display to the DVI port on the motherboard, following is the setting procedure:
 
     - While starting up the computer, press F2 to enter BIOS setup menu.
     - Go to [Advanced]=>[System Agent (SA) Configuration]=>[Graphics Configuration]=>[Primary Display]=> Set to "PEG"
-![tip_icon](images/tip_icon.png)It is recommended to configure the IPC to run at maximum performance mode at all time:
+![tip_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)It is recommended to configure the IPC to run at maximum performance mode at all time:
      - While starting up the computer, press F2 to enter BIOS setup menu.
      - Go to [Power] => [SKU POWER CONFIG] => set to "MAX. TDP"
 
 c. Connect the power: 
 
-![IPC-6108GC-PowerCable.JPG](images/IPC-6108GC-PowerCable.JPG)
+![IPC-6108GC-PowerCable.JPG]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-PowerCable.JPG)
 
 
 ### Installing the Software for the IPC
@@ -413,7 +406,7 @@ This section describes the steps to install:
 - Apollo Kernel
 - Nvidia GPU Driver
 
-![tip_icon](images/tip_icon.png)It is assumed that you have experience working with Linux to successfully perform the software installation.
+![tip_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)It is assumed that you have experience working with Linux to successfully perform the software installation.
 
 #### Installing Ubuntu Linux
 Follow these steps:
@@ -422,13 +415,13 @@ Follow these steps:
 
     Download Ubuntu (or a variant such as Xubuntu) and follow the online instructions to create a bootable USB flash drive.
 
-![tip_icon](images/tip_icon.png)It is recommended that you use **Ubuntu 14.04.3**.
+![tip_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)It is recommended that you use **Ubuntu 14.04.3**.
 
-![tip_icon](images/tip_icon.png)You can type F2 during the system boot process to enter the BIOS settings. It is recommended that you disable Quick Boot and Quiet Boot in the BIOS to make it easier to catch any issues in the boot process.
+![tip_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)You can type F2 during the system boot process to enter the BIOS settings. It is recommended that you disable Quick Boot and Quiet Boot in the BIOS to make it easier to catch any issues in the boot process.
 
-For more information about Ubuntu, see:
+For more information about Ubuntu, 想要了解更多有关:
 
-![online_icon](images/online_icon.png) Ubuntu for Desktop web site:
+![online_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) Ubuntu for Desktop web site:
 
 [https://www.ubuntu.com/desktop](https://www.ubuntu.com/desktop)
 
@@ -449,7 +442,7 @@ For more information about Ubuntu, see:
     sudo apt-get install linux-generic-lts-xenial
     ```
 
-![tip_icon](images/tip_icon.png)The IPC must have Internet access to update and install software. Make sure that the Ethernet cable is connected to a network with Internet access. You might need to configure the network for the IPC if the network that it is connected to is not using the Dynamic Host Configuration Protocol (DHCP).
+![tip_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)The IPC must have Internet access to update and install software. Make sure that the Ethernet cable is connected to a network with Internet access. You might need to configure the network for the IPC if the network that it is connected to is not using the Dynamic Host Configuration Protocol (DHCP).
 
 
 #### Installing the Apollo Kernel
@@ -535,7 +528,7 @@ Perform these tasks:
 
 ### Prerequisites
 
-**![warning_icon](images/warning_icon.png)WARNING**: Prior to mounting the major components (GPS Antenna, IPC, and GPS Receiver) in the vehicle, perform certain modifications as specified in the list of prerequisites. The instructions for making the mandatory changes in the list are outside the scope of this document.
+**![warning_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png)WARNING**: Prior to mounting the major components (GPS Antenna, IPC, and GPS Receiver) in the vehicle, perform certain modifications as specified in the list of prerequisites. The instructions for making the mandatory changes in the list are outside the scope of this document.
 
 The list of prerequisites are as follows:
 
@@ -552,11 +545,11 @@ The following two diagrams indicate the locations of where the three major compo
 
 
 
-![major_component_side_view](images/Car_Sideview.png)
+![major_component_side_view]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Car_Sideview.png)
 
 
 
-![major_component_rear_view](images/Car_Rearview.png)
+![major_component_rear_view]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Car_Rearview.png)
 
 
 
@@ -589,13 +582,13 @@ You must connect two cables:
     - Connects its serial port to the IPC. If the power comes from a vehicle battery, add an auxiliary battery (recommended).
 
 
-![imu_main_cable_connection](images/imu_main_cable_connection.png)
+![imu_main_cable_connection]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/imu_main_cable_connection.png)
 
 Main Cable Connections
 
-For more information, see the *SPAN-IGM™ Quick Start Guide*, page 3, for a detailed diagram:
+For more information, 想要了解更多有关 the *SPAN-IGM™ Quick Start Guide*, page 3, for a detailed diagram:
 
-![online_icon](images/online_icon.png)SPAN-IGM™ Quick Start Guide
+![online_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)SPAN-IGM™ Quick Start Guide
 
 [http://www.novatel.com/assets/Documents/Manuals/GM-14915114.pdf](http://www.novatel.com/assets/Documents/Manuals/GM-14915114.pdf)
 
@@ -603,11 +596,11 @@ For more information, see the *SPAN-IGM™ Quick Start Guide*, page 3, for a det
 
 When the SPAN-IGM-A1 and the GPS Antenna are in position, the distance from the SPAN-IGM-A1 to the GPS Antenna must be measured. The distance should be measured as: X offset, Y offset, and Z offset.
 
-The error of offset must be within one centimeter to achieve high accuracy. For more information, see the *SPAN-IGM™ Quick Start Guide*, page 5, for a detailed diagram.
+The error of offset must be within one centimeter to achieve high accuracy. For more information, 想要了解更多有关 the *SPAN-IGM™ Quick Start Guide*, page 5, for a detailed diagram.
 
-For an additional information about the SPAN-IGM-A1, see:
+For an additional information about the SPAN-IGM-A1, 请参考:
 
-![online_icon](images/online_icon.png)SPAN-IGM™ User Manual:
+![online_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)SPAN-IGM™ User Manual:
 
 [http://www.novatel.com/assets/Documents/Manuals/OM-20000141.pdf](http://www.novatel.com/assets/Documents/Manuals/OM-20000141.pdf)
 
@@ -644,7 +637,7 @@ You can place the two devices, the ProPak6 and the IMU in most places in the veh
 - Place and secure the ProPak6 and the IMU side-by-side inside the trunk with the Y-axis pointing forward.
 - Mount the NovAtel GPS-703-GGG-HV antenna on top of the vehicle or on top of the trunk lid as shown:
 
-![gps_receiver_on_car](images/gps_receiver_on_car.png)
+![gps_receiver_on_car]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/gps_receiver_on_car.png)
 
 - Use a magnetic adapter to tightly attach the antenna to the trunk lid.
 - Install the antenna cable in the trunk by opening the trunk and placing the cable in the space between the trunk lid and the body of the car.
@@ -659,11 +652,11 @@ Follow these steps to connect the ProPak6 GNSS Receiver and the IMU to the Apoll
 4. Connect the GNSS antenna to Propak6.
 5. Connect the Propak6 power cable.
 
-![wiring](images/wiring.png)
+![wiring]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/wiring.png)
 
-For more information about the NovAtel SPAN ProPak6, see:
+想要了解更多有关NovAtel SPAN ProPak6, 请参考:
 
-![online_icon](images/online_icon.png)NovAtel ProPak6 Installation& Operation Manual:
+![online_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)NovAtel ProPak6 Installation& Operation Manual:
 
 [https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf](https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf)
 
@@ -686,19 +679,19 @@ A customized mounting structure is required to successfully mount an HDL64E S3 L
 
 Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power supply, the computer (Ethernet for data transfer, and serial port for LiDAR configuration) and the GPS timesync source. 
 
-![LiDAR_Cable](images/HDL64_Cable_whitened_labeled.png)
+![LiDAR_Cable]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/HDL64_Cable_whitened_labeled.png)
 
 1. Connection to the LiDAR
 
    Connect the power and signal cable to the matching ports on the LiDAR
 
-   ![HDL64_Cabling](images/HDL64_Cabling.JPG)    
+   ![HDL64_Cabling]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/HDL64_Cabling.JPG)    
 
 2. Connection to Power Source
 
    The two AWG 16 wires are used to power HDL-64E S3 LiDAR. It requires about 3A at 12V. To connect the power source, make full contact with the wires and tighten the screws. 
 
-   ![HDL64_Power_Cable](images/HDL64_PowerCable.JPG)
+   ![HDL64_Power_Cable]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/HDL64_PowerCable.JPG)
 
 3. Conection to IPC
 
@@ -712,19 +705,19 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
 
    If you configured the SPAN-IGM-A1 as specified in [Configuring the GPS and IMU](#configuring-the-gps-and-imu), the GPRMC signal is sent from the GPS receiver via the User Port cable from the Main port. The PPS signal is sent through the wire cables labeled as “PPS” and “PPS dgnd” from the Aux port. The dash-line boxes in the figure below show the available connections that come with the HDL64E S3 LiDAR and the SPAN-IGM-A1 GPS receiver. The remaining connections must be made by the user.
 
-   ![Wiring_Schematics_IGM_A1](images/LiDAR_A1_wiring.png)
+   ![Wiring_Schematics_IGM_A1]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/LiDAR_A1_wiring.png)
 
    b. Propak 6 and IMU-IGM-A1
 
    If you configured the Propak 6 as specified in [Configuring the GPS and IMU](#configuring-the-gps-and-imu), the GPRMC signal is sent from the GPS receiver via COM2 port. The PPS signal is sent through the IO port. The dash-line boxes in the figure below are available connections that comes with the HDL-64E S3 LiDAR and the Propak 6 GPS receiver. The remaining connections need to be made by the user. 
 
-   ![Wiring_Schematics_PP6](images/LiDAR_PP6_wiring.png)
+   ![Wiring_Schematics_PP6]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/LiDAR_PP6_wiring.png)
 
 5. Connection through serial port for LiDAR configuration
 
    You can configure some of the low-level parameters through serial port. Within the cable bundle provided by Velodyne LiDAR, Inc., there are two pairs of red/black cables as shown in the pinout table below. The thicker pair (AWG 16) is used to power the LiDAR system. The thinner pair is used for serial connection. Connect the black wire (Serial In) to RX, the red wire to the Ground wire of a serial cable. Connect the serial cable with a USB-serial adapter to your selected computer. 
 
-   ![pinout_table](images/pinout_table.png)
+   ![pinout_table]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/pinout_table.png)
 
 ##### Configuration
 
@@ -752,7 +745,7 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
 
    5. Use the serial cable connection for COM port between the HDL-64E S3 and the laptop:
 
-      ![Serial cable connected to laptop.png](images/Serial_cable_connected_to_laptop.png)
+      ![Serial cable connected to laptop.png]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Serial_cable_connected_to_laptop.png)
 
    6. Launch **Termite 3.2** from laptop 
 
@@ -760,9 +753,9 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
 
    8. The unit must be power cycled to adopt the new IP addresses
 
-      ![Issuing the serial command](images/Issuing_the_serial_command.png)
+      ![Issuing the serial command]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Issuing_the_serial_command.png)
 
-      ![online_icon](images/online_icon.png)HDL-64E S3 Manual can be found on this webpage:
+      ![online_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)HDL-64E S3 Manual can be found on this webpage:
 
       [http://velodynelidar.com/hdl-64e.html](http://velodynelidar.com/hdl-64e.html)
 
@@ -778,20 +771,20 @@ A customized mounting structure is required to successfully mount an Hesai Pando
 
 Each Pandora includes a cable bundle to connect the LiDAR to the power supply, the computer (Ethernet for data transfer) and the GPS timesync source. 
 
-   ![Pandora_cable](images/pandora_cable.png)
+   ![Pandora_cable]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/pandora_cable.png)
 
 1. Connection to the Pandora
 
    Connect the power and signal cable to the matching ports on the Pandora interface box.
 
-   ![Power_Cabling](images/interface_box_connection.jpg) 
+   ![Power_Cabling]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/interface_box_connection.jpg) 
 
 
 2. Connection to Power Source
 
    The Pandora requires about 3A at 12V. To connect the power source, make full contact with the wires and tighten the screws. 
 
-   ![Pandora_Power_Cable](images/Pandora_PowerCable.png)
+   ![Pandora_Power_Cable]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Pandora_PowerCable.png)
 
 3. Conection to IPC
 
@@ -805,18 +798,18 @@ Each Pandora includes a cable bundle to connect the LiDAR to the power supply, t
 
    If you configured the SPAN-IGM-A1 as specified in [Configuring the GPS and IMU](#configuring-the-gps-and-imu), the GPRMC signal is sent from the GPS receiver via the User Port cable from the Main port. The PPS signal is sent through the wire cables labeled as “PPS” and “PPS dgnd” from the Aux port. The dash-line boxes in the figure below show the available connections that come with the Pandora and the SPAN-IGM-A1 GPS receiver. The remaining connections must be made by the user.
 
-   ![Wiring_Schematics_pandora1](images/Pandora_A1_wiring.png)
+   ![Wiring_Schematics_pandora1]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Pandora_A1_wiring.png)
    
    b. Propak 6 and IMU-IGM-A1
 
    If you configured the Propak 6 as specified in [Configuring the GPS and IMU](#configuring-the-gps-and-imu), the GPRMC signal is sent from the GPS receiver via COM2 port. The PPS signal is sent through the IO port. The dash-line boxes in the figure below are available connections that comes with the Pandora and the Propak 6 GPS receiver. The remaining connections need to be made by the user. 
 
-   ![Wiring_Schematics_pandora2](images/Pandora_PP6_wiring.png)
+   ![Wiring_Schematics_pandora2]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Pandora_PP6_wiring.png)
 
    The pinout table for Pandora is shown below.
-   ![Pandora_pin](images/Pandora_pinout_table.png)
+   ![Pandora_pin]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Pandora_pinout_table.png)
 
- ![online_icon](images/online_icon.png)Pandora Manual can be found on this webpage:
+ ![online_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)Pandora Manual can be found on this webpage:
 [http://www.hesaitech.com/pandora.html](http://www.hesaitech.com/pandora.html)
 
 ### Installing the Cameras
@@ -858,28 +851,28 @@ Follow these steps:
 
      As recommended by Neousys, use a 12 VDC to 19 VDC converter with maximal output current of 20 A. 
 
-     ![voltage_regulater_converter](images/voltage_converter2.jpg)
+     ![voltage_regulater_converter]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/voltage_converter2.jpg)
 
      a.  Connect the two 19 VDC output wires to IPC's power connector (Green as shown below).
 
-     ![ipc_power_RB](images/ipc_power_RB.png)
+     ![ipc_power_RB]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/ipc_power_RB.png)
 
      b. Connect the two cables of 12 VDC input to the power panel in the vehicle. If the size of the wire is too thick, the wire should be split to several wires and connect to corresponding ports, respectively.
 
-     ![warning](images/warning_icon.png)This step is required. If the input voltage goes below the required limit, it can cause system failure.
+     ![warning]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png)This step is required. If the input voltage goes below the required limit, it can cause system failure.
 
 
 2.   Place the onboard computer system, the 6108GC, inside the trunk (recommended).
 
-     For example, Apollo 2.0 uses 4x4 self-tapping screws to bolt the 6108GC to the carpeted floor of the trunk. ![IPC-bolt_down-936x720](images/Mount_ipc_on_carpet.JPG)
+     For example, Apollo 2.0 uses 4x4 self-tapping screws to bolt the 6108GC to the carpeted floor of the trunk. ![IPC-bolt_down-936x720]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Mount_ipc_on_carpet.JPG)
 
 3. Mount the IPC so that its front and back sides(where all ports are located) face the right side (passenger) or the left side(driver) of the trunk.
 
 This positioning makes it easier to connect all of the cables.
 
-For more information, see:
+For more information, 请参考:
 
-![online_icon](images/online_icon.png)Neousys Nuvo-6108GC – Manual:
+![online_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)Neousys Nuvo-6108GC – Manual:
 
 **[Link Unavailable]**
 
@@ -901,11 +894,11 @@ a. Connect the power cable to the IPC (as shown):
 b. Connect the other end of the power cable to the vehicle battery (as shown):
 
 
-![IPC-power-cable](images/IPC-power-cable.jpg)
+![IPC-power-cable]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-power-cable.jpg)
 
 c. Connect the DB9 cable to the IPC to talk to the CAN (as shown):
 
-![DB9_cable](images/DB9_cable.png)
+![DB9_cable]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/DB9_cable.png)
 
 d. Connect:
 
@@ -915,7 +908,7 @@ d. Connect:
 
 - (optional) the monitor:
 
-![IPC-power-842x636](images/cable_connected_incar.JPG)
+![IPC-power-842x636]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/cable_connected_incar.JPG)
 
 
 
@@ -928,13 +921,13 @@ Follow these steps:
 
 2.    When the IMU and the GPS Antenna are in position, the distance from the IMU to the GPS Antenna must be measured. The distance should be measured as: X offset, Y offset, and Z offset. The error of offset must be within one centimeter to achieve high accuracy in positioning and localization.
 
-For an additional information, see:
+For an additional information, 请参考:
 
-![online_icon](images/online_icon.png)NovAtel ProPak6 Installation & Operation Manual:
+![online_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)NovAtel ProPak6 Installation & Operation Manual:
 
 [https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf](https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf)
 
-![online_icon](images/online_icon.png)NovAtel SPAN-IGM-A1 Product Page:
+![online_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)NovAtel SPAN-IGM-A1 Product Page:
 
 [https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/](https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/)
 
@@ -1044,7 +1037,7 @@ log vehiclebodyrotationb onchanged
 SAVECONFIG
 ```
 
-**![warning_icon](images/warning_icon.png) WARNING:** Modify the **<u>SETIMUTOANTOFFSE</u>T** line based on the actual measurement (of the antenna and the IMU offset).
+**![warning_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png) WARNING:** Modify the **<u>SETIMUTOANTOFFSE</u>T** line based on the actual measurement (of the antenna and the IMU offset).
 
 For example:
 
@@ -1062,7 +1055,7 @@ The IPC that is running the Apollo software must access the Internet to acquire 
 
 It is recommended that you set up your network according to the following diagram:
 
-![4G_network_setup](images/4G-LTE-setup-6108GC.png)
+![4G_network_setup]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/4G-LTE-setup-6108GC.png)
 
 Follow these steps:
 
@@ -1077,7 +1070,7 @@ Follow these steps:
 
 4.   Configure the AP capability of the LTE router so that the iPad Pro or another mobile device can connect to the router, and, in turn, connect to the IPC.
 
-![tip_icon](images/tip_icon.png)It is recommended that you configure a fixed IP instead of using DHCP on the IPC to make it easier to connect to it from a mobile terminal.
+![tip_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)It is recommended that you configure a fixed IP instead of using DHCP on the IPC to make it easier to connect to it from a mobile terminal.
 
 # Additional Tasks Required
 
@@ -1089,4 +1082,4 @@ Use the components that you were required to provide to perform the following ta
 
 # Next Steps
 
-After you complete the hardware installation in the vehicle, see the [Apollo Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start.md) for the steps to complete the software installation.
+After you complete the hardware installation in the vehicle, 请参考 the [Apollo Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start.md) for the steps to complete the software installation.
