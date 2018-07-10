@@ -432,17 +432,19 @@ c. 连接电源：
     b.  按照屏幕上的说明安装Linux。
 
 3. 执行软件更新与安装:
+
     a.  安装完成，重启进入Linux。
     b.  执行软件更新器（Software Updater）更新最新软件包，或在终端执行以下命令完成更新。
     ```shell
-    sudo apt-get update; sudo apt-get upgrade
+    sudo apt-get update; 
+    sudo apt-get upgrade
     ```
 
     c.  打开终端，输入以下命令，安装Linux 4.4 内核：
 
-```shell
-sudo apt-get install linux-generic-lts-xenial
-```
+    ```shell
+    sudo apt-get install linux-generic-lts-xenial
+    ```
 ![tip_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)IPC必须接入网络以便更新与安装软件，所以请确认网线插入并连接，如果连接网络没有使用动态分配（DHCP），需要更改网络配置。
 
 
