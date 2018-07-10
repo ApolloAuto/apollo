@@ -3,12 +3,12 @@
     - [文档编写规则](#文档编写规则)
 - [引言](#引言)
     - [文档说明](#文档说明)
-    - [核心硬件](#核心硬件)
-        - [附加组件](#附加组件)
-        - [车载计算机系统 - IPC](#车载计算机系统---ipc)
-            - [IPC的配置](#ipc的配置)
+- [核心硬件](#核心硬件)
+    - [附加组件](#附加组件)
+    - [车载计算机系统 - IPC](#车载计算机系统---ipc)
+        - [IPC的配置](#ipc的配置)
         - [IPC前后视图](#ipc前后视图)
-            - [控制器局域网络(CAN)卡](#控制器局域网络can卡)
+    - [控制器局域网络(CAN)卡](#控制器局域网络can卡)
     - [全球定位系统(GPS)和惯性测量装置(IMU)](#全球定位系统gps和惯性测量装置imu)
         - [选项1: NovAtel SPAN-IGM-A1](#选项1-novatel-span-igm-a1)
         - [选项2: NovAtel SPAN ProPak6和NovAtel IMU-IGM-A1](#选项2-novatel-span-propak6和novatel-imu-igm-a1)
@@ -75,7 +75,6 @@
       - 全球定位系统 (GPS)
       - 惯性测量单元 (IMU)
       - 控制器局域网络 (CAN) 卡
-      - 硬盘
       - GPS 天线
       - GPS 接收器
       - 安装激光雷达 (LiDAR)
@@ -89,7 +88,7 @@
 
 - ***<u>[Apollo Quick Start Guide]</u>*** ─ 文档和产品蓝图提供了完整的端到端教程。本文还提供了一些其它链接用于将一辆普通汽车改装成一辆自动驾驶车辆。
 
-## 核心硬件
+# 核心硬件
 
 需要安装的关键的硬件组件包括：
 - 车载计算机系统 ─ Neousys Nuvo-6108GC
@@ -103,7 +102,7 @@
 - 摄像头 — 带 USB 3.0 接口的Leopard Imaging LI-USB30-AR023ZWDR 
 - 雷达 — Continental ARS408-21
 
-### 附加组件
+## 附加组件
 - 提供网络接入的4G路由器
 - 提供额外USB接口的USB集线器
 - 供在车辆现场调试使用的显示器，键盘，鼠标
@@ -113,12 +112,12 @@
 
 关键硬件组件的特性将在后续部分中介绍。
 
-### 车载计算机系统 - IPC
+## 车载计算机系统 - IPC
 车载计算机系统是用于自动驾驶车辆的工业PC（IPC），并使用由第六代Intel Xeon E3 1275 V5 CPU强力驱动的 **NeousysNuvo-6108GC**。
 
 Neousys Nuvo-6108GC是自动驾驶系统（ADS）的中心单元。
 
-#### IPC的配置
+### IPC的配置
 IPC配置如下：
 
 - ASUS GTX1080 GPU-A8G-Gaming GPU Card
@@ -148,7 +147,7 @@ Neousys Nuvo-6108GC 产品页:
 ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)
 Neousys Nuvo-6108GC 手册：还不可用。
 
-#### 控制器局域网络(CAN)卡
+## 控制器局域网络(CAN)卡
 IPC中使用的CAN卡型号为 **ESD** **CAN-PCIe/402-B4**.
 
 ![can_card](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/CAN-B4.png)
