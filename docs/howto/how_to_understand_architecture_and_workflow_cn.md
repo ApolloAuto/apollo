@@ -9,7 +9,7 @@ ApolloAuto使用ROS1作为底层网络，这意味着ApolloAuto从ROS1借用了M
 
 在百度ApolloAuto中，描述了三个开发阶段
 
-1.离线仿真引擎Dreamviewer和ApolloAuto核心软件模块
+1.离线仿真引擎Dreamview和ApolloAuto核心软件模块
     - 帮助用户作初步了解这些算法如何在车上工作
     - 即使没有汽车或者相关硬件，也能立即开始开发
  
