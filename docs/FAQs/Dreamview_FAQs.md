@@ -33,11 +33,6 @@ This way, dreamview can be accessed from http://localhost:<PORT_NUMBER> (http://
 Dreamview uses https://github.com/mrdoob/three.js as graphics library. You can modify the frontend code to draw an arrow using the corresponding API of the library. After that you need to run a `./apollo.sh build_fe` to compile.
 
 ---
-## Creating your own Test Cases in DreamView?
-
-Currently this is not available, but it is definitely on our Radar.
-
----
 ## How can I test planning algorithms offline?
 
 Use dreamview and enable sim_control on dreamview to test your planning algorithm.
