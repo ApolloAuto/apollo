@@ -59,7 +59,7 @@ TEST_F(NaviPathDeciderTest, SmoothInitY) {
   // 2. need to shift
   // 2.1 last shift neareast to 0.0, and target on the left of adc set a
   // positive init shift value
-  navi_path_decider.last_lane_id_to_start_y_.clear();
+  navi_path_decider.last_lane_id_to_adc_project_y_.clear();
   smooth_y = navi_path_decider.SmoothInitY(0.0, 0.03);
   EXPECT_DOUBLE_EQ(smooth_y, config.navi_planner_config()
                                  .navi_path_decider_config()
@@ -74,17 +74,14 @@ TEST_F(NaviPathDeciderTest, SmoothInitY) {
   // 2.3.1 last shift was not arrived at target position,need add delta shift
   // and current shift in range [min_smooth_init_y, max_smooth_init_y] and still
   // can't arrived at the target
-  navi_path_decider.last_lane_id_to_start_y_["last_adc_position_y"] = 2.5;
+  navi_path_decider.last_lane_id_to_adc_project_y_["last_adc_position_y"] = 2.5;
   navi_path_decider.cur_reference_line_lane_id_ = "last_adc_position_y";
   smooth_y = navi_path_decider.SmoothInitY(2.4, 2.4);
-  EXPECT_DOUBLE_EQ(smooth_y, 2.5 - 2.4 +
-                                 config.navi_planner_config()
-                                     .navi_path_decider_config()
-                                     .lateral_shift_delta());
+  EXPECT_DOUBLE_EQ(smooth_y, 0.2);
   // 2.3.2 last shift was not arrived at target position,need add delta shift
   // and current shift exceeded range [min_smooth_init_y, max_smooth_init_y] and
   // still can't arrived at the target
-  navi_path_decider.last_lane_id_to_start_y_["last_adc_position_y"] = 2.5;
+  navi_path_decider.last_lane_id_to_adc_project_y_["last_adc_position_y"] = 2.5;
   navi_path_decider.cur_reference_line_lane_id_ = "last_adc_position_y";
   smooth_y = navi_path_decider.SmoothInitY(2.34, 2.3);
   EXPECT_DOUBLE_EQ(smooth_y, config.navi_planner_config()
@@ -94,7 +91,7 @@ TEST_F(NaviPathDeciderTest, SmoothInitY) {
   // 2.3.4 last shift was not arrived at target position,need add delta shift
   // and current shift exceeded range [min_smooth_init_y, max_smooth_init_y] and
   // still can't arrived at the target
-  navi_path_decider.last_lane_id_to_start_y_["last_adc_position_y"] = 2.5;
+  navi_path_decider.last_lane_id_to_adc_project_y_["last_adc_position_y"] = 2.5;
   navi_path_decider.cur_reference_line_lane_id_ = "last_adc_position_y";
   smooth_y = navi_path_decider.SmoothInitY(2.34, 2.3);
   EXPECT_DOUBLE_EQ(smooth_y, config.navi_planner_config()
@@ -104,7 +101,7 @@ TEST_F(NaviPathDeciderTest, SmoothInitY) {
   // 2.3.4 last shift was not arrived at target position,need add delta shift
   // and current shift exceeded range [min_smooth_init_y, max_smooth_init_y] but
   // exceeded the target
-  navi_path_decider.last_lane_id_to_start_y_["last_adc_position_y"] = 0.5;
+  navi_path_decider.last_lane_id_to_adc_project_y_["last_adc_position_y"] = 0.5;
   navi_path_decider.cur_reference_line_lane_id_ = "last_adc_position_y";
   smooth_y = navi_path_decider.SmoothInitY(0.32, 0.15);
   EXPECT_DOUBLE_EQ(smooth_y, 0.15);

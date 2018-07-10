@@ -90,10 +90,10 @@ apollo::common::Status NaviPathDecider::Process(
   }
   // according to the position of the start plan point and the reference line,
   // the path trajectory intercepted from the reference line is shifted on the
-  // y-axis.
-  double init_local_path_y = path_points[0].y();
+  // y-axis to adc.
+  double init_basic_path_y = path_points[0].y();
   double max_lateral_distance = config_.max_lateral_distance();
-  if (std::fabs(init_local_path_y) > max_lateral_distance) {
+  if (std::fabs(init_basic_path_y) > max_lateral_distance) {
     AERROR << "The reference line is too far from the car to plan.";
     return Status(apollo::common::ErrorCode::PLANNING_ERROR,
                   "NaviPathDecider reference is too far from the car");
@@ -113,10 +113,10 @@ apollo::common::Status NaviPathDecider::Process(
   auto adc_project_path_point =
       reference_line.GetReferencePoint(project_point_s)
           .ToPathPoint(project_point_s);
-  double cur_ref_line_start_y = adc_project_point.y();
+  double adc_project_path_point_y = adc_project_path_point.y();
 
   // get y-coordinate of the target start path plan point
-  double target_start_path_point_y = init_local_path_y;
+  double target_start_path_point_y = init_basic_path_y;
   if (reference_line_info_->IsChangeLanePath() &&
       reference_line_info_->IsNeighborLanePath()) {
     ADEBUG << "change lane path plan";
@@ -158,15 +158,22 @@ apollo::common::Status NaviPathDecider::Process(
       if (std::fabs(nudge_distance) > KNudgeZero) {
         ADEBUG << "need latteral nudge distance : " << nudge_distance;
         target_start_path_point_y = nudge_distance;
-        last_plan_has_nudge = true;
+        last_lane_id_to_nudge_flag_[cur_reference_line_lane_id_] = true;
       } else {
         // no nudge distance but current lane has obstacles ,keepping path in
         // the last nudge path direction
+        bool last_plan_has_nudge = false;
+        if (last_lane_id_to_nudge_flag_.find(cur_reference_line_lane_id_) !=
+            last_lane_id_to_nudge_flag_.end()) {
+          last_plan_has_nudge =
+              last_lane_id_to_nudge_flag_[cur_reference_line_lane_id_];
+        }
+
         if (last_plan_has_nudge && lane_obstacles_num != 0) {
           ADEBUG << "keepping last nudge path direction";
-          target_start_path_point_y = 0.0;
+          target_start_path_point_y = vehicle_state_.y();
         } else {
-          last_plan_has_nudge = false;
+          last_lane_id_to_nudge_flag_[cur_reference_line_lane_id_] = false;
         }
       }
     }
@@ -174,15 +181,18 @@ apollo::common::Status NaviPathDecider::Process(
 
   // caculate the y-coordinate of the actual start path plan point
   ADEBUG << "in curret plan, adc to reference line distance : "
-         << cur_ref_line_start_y
+         << adc_project_path_point_y
          << " adc to target path line distance : " << target_start_path_point_y;
   double start_point_y =
-      SmoothInitY(cur_ref_line_start_y, target_start_path_point_y);
+      SmoothInitY(adc_project_path_point_y, target_start_path_point_y);
+  double cur_start_plan_point = init_point.path_point().y() + start_point_y;
 
   // shift trajectory intercepted from the reference line
-  double shift_distance_y = start_point_y - init_local_path_y;
-  ADEBUG << "in curret plan, adc latteral shift distance : " << start_point_y
-         << " reference line latteral shift distance : " << shift_distance_y;
+  double shift_distance_y = cur_start_plan_point - init_basic_path_y;
+  ADEBUG << "in curret plan, adc latteral to reference shift distance : "
+         << cur_start_plan_point
+         << " reference line latteral to adc shift distance : "
+         << shift_distance_y << " init basic path y :" << init_basic_path_y;
   ShiftY(shift_distance_y, &path_points);
 
   // calculate the value of the path trajectory later
@@ -195,7 +205,8 @@ apollo::common::Status NaviPathDecider::Process(
     return Status(apollo::common::ErrorCode::PLANNING_ERROR,
                   "NaviPathDecider SetDiscretizedPath");
   }
-  last_lane_id_to_start_y_[cur_reference_line_lane_id_] = cur_ref_line_start_y;
+  last_lane_id_to_adc_project_y_[cur_reference_line_lane_id_] =
+      adc_project_path_point_y;
 
   return Status::OK();
 }
@@ -224,11 +235,22 @@ bool NaviPathDecider::GetBasicPathData(
 
   // get the start plan point s on refernce line and get the length of reference
   // line
-  const double project_point_s = reference_line_info_->AdcSlBoundary().end_s();
+  auto start_plan_path_point =
+      reference_line_info_->AdcPlanningPoint().path_point();
+  auto start_plan_point_project = reference_line.GetReferencePoint(
+      start_plan_path_point.x(), start_plan_path_point.y());
+  auto& lane_way_points = start_plan_point_project.lane_waypoints();
+  if (lane_way_points.empty()) {
+    AERROR << "Failed to get start plan point lane way points from reference "
+              "line.";
+    return false;
+  }
+  double start_plan_point_project_s = lane_way_points[0].s;
   const double reference_line_len = reference_line.Length();
 
-  // get path points form reference_line
-  for (double s = project_point_s; s < reference_line_len; s += unit_s) {
+  // get basic path points form reference_line
+  for (double s = start_plan_point_project_s; s < reference_line_len;
+       s += unit_s) {
     const auto& ref_point = reference_line.GetReferencePoint(s);
     path_points->emplace_back(ref_point.ToPathPoint(s));
   }
@@ -250,7 +272,7 @@ void NaviPathDecider::ShiftY(
 
 double NaviPathDecider::SmoothInitY(const double actual_ref_init_y,
                                     const double target_path_init_y) {
-  constexpr double KShiftZero = 1e-6;
+  constexpr double KShiftZero = 1.0e-6;
   const double max_init_y = config_.max_smooth_init_y();
   const double min_init_y = config_.min_smooth_init_y();
   double delta_shift = config_.lateral_shift_delta();
@@ -258,9 +280,12 @@ double NaviPathDecider::SmoothInitY(const double actual_ref_init_y,
 
   // need to adjust in lateral
   if (std::fabs(target_path_init_y) > min_init_y) {
-    double last_adc_lateral_shift =
-        last_lane_id_to_start_y_[cur_reference_line_lane_id_] -
-        actual_ref_init_y;
+    // accurate to centimeters
+    double last_adc_y =
+        last_lane_id_to_adc_project_y_[cur_reference_line_lane_id_];
+    last_adc_y = std::floor(100 * last_adc_y);
+    double cur_adc_y = std::floor(100 * actual_ref_init_y);
+    double last_adc_lateral_shift = last_adc_y - cur_adc_y;
 
     // last shift distacne was zero,initialize a suitable amount of shift
     if (std::fabs(last_adc_lateral_shift) < KShiftZero) {
