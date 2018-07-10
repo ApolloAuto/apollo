@@ -1,39 +1,47 @@
 # Apollo 2.0 Hardware and System Installation Guide
+<!-- TOC -->
 
-* [关于本篇指南](#关于本篇指南)
-    * [文档编写规则](#文档编写规则)
-* [引言](#引言)
-    * [文档说明](#文档说明)
-* [核心硬件](#核心硬件)
-    * [附加组件](#附加组件)
-    * [车载计算机系统-IPC](#车载计算机系统---ipc)
-        * [IPC的配置](#ipc的配置)
-        * [IPC前后视图](#ipc前后视图)
-    * [控制器局域网络（CAN）卡](#控制器局域网络（can）卡)
-    * [全球定位系统(GPS)和惯性测量装置(IMU)](#全球定位系统(-gps-)和惯性测量装置(-imu-))
-        * [选项1: NovAtel SPAN-IGM-A1](#选项1:nocatel-span--igm--a1)
-        * [选项2: NovAtel SPAN ProPak6 和 NovAtel IMU-IGM-A1](#选项2:novatel-span-propak6和imu--igm--a1)
-    * [GPS接收器和天线](#gps接收器和天线)
-    * [激光雷达(LiDAR)](#激光雷达-(lidar)-)
-        * [选项 1: Velodyne HDL-64E S3](#选项-1-velodyne-hdl-64e-s3)
-        * [选项 2: Hesai Pandora](#选项-2-hesai-pandora) 
-* [安装任务概览](#安装任务概览)
-* [安装任务步骤](#安装任务步骤)
-    * [上车前的准备工作](#上车前的准备工作)
-        * [IPC的准备工作](#ipc的准备工作)
-        * [为IPC安装软件](#为ipc安装软件)
-    * [上车安装](#上车安装)
-        * [前提条件](#前提条件)
-        * [主要部件安装图](#主要部件安装图)
-        * [安装GPS的接收器和天线](#安装gps的接收器和天线)
-        * [安装激光雷达(LiDAR)](#安装激光雷达-(lidar))
-        * [安装IPC](#安装ipc)
-        * [配置GPS和IMU](#配置gps和imu)
-* [配置网络](#配置网络)
-    * [一些建议](#一些建议)
-* [其它安装任务](#其它安装任务)
-* [下一步](#下一步)
+- [关于本篇指南](#关于本篇指南)
+    - [文档编写规则](#文档编写规则)
+- [引言](#引言)
+    - [文档说明](#文档说明)
+    - [核心硬件](#核心硬件)
+        - [附加组件](#附加组件)
+        - [车载计算机系统 - IPC](#车载计算机系统---ipc)
+            - [IPC的配置](#ipc的配置)
+        - [IPC前后视图](#ipc前后视图)
+            - [控制器局域网络(CAN)卡](#控制器局域网络can卡)
+    - [全球定位系统(GPS)和惯性测量装置(IMU)](#全球定位系统gps和惯性测量装置imu)
+        - [选项1: NovAtel SPAN-IGM-A1](#选项1-novatel-span-igm-a1)
+        - [选项2: NovAtel SPAN ProPak6和NovAtel IMU-IGM-A1](#选项2-novatel-span-propak6和novatel-imu-igm-a1)
+    - [GPS接收器和天线](#gps接收器和天线)
+    - [激光雷达(LiDAR)](#激光雷达lidar)
+        - [选项 1: Velodyne HDL-64E S3](#选项-1-velodyne-hdl-64e-s3)
+        - [选项 2: Hesai Pandora](#选项-2-hesai-pandora)
+    - [摄像头](#摄像头)
+    - [雷达](#雷达)
+- [安装任务概览](#安装任务概览)
+- [安装任务步骤](#安装任务步骤)
+    - [上车前的准备工作](#上车前的准备工作)
+        - [IPC的准备工作](#ipc的准备工作)
+        - [为IPC安装软件](#为ipc安装软件)
+    - [上车安装](#上车安装)
+        - [前提条件](#前提条件)
+        - [主要部件安装图](#主要部件安装图)
+        - [安装GPS的接收器和天线](#安装gps的接收器和天线)
+            - [选项1：安装NovAtel SPAN-IGM-A1](#选项1安装novatel-span-igm-a1)
+            - [选项2：NovAtel SPAN® ProPak6™ 和 NovAtel IMU-IGM-A1](#选项2novatel-span®-propak6™-和-novatel-imu-igm-a1)
+        - [安装激光雷达(LiDAR) (LiDAR)](#安装激光雷达lidar-lidar)
+            - [选项 1: 安装 Velodyne HDL-64E S3](#选项-1-安装-velodyne-hdl-64e-s3)
+            - [选项 2: 安装 Hesai Pandora](#选项-2-安装-hesai-pandora)
+        - [安装摄像头](#安装摄像头)
+        - [安装雷达](#安装雷达)
+- [建立网络](#建立网络)
+    - [推荐配置](#推荐配置)
+- [额外任务](#额外任务)
+- [下一步](#下一步)
 
+<!-- /TOC -->
 # 关于本篇指南
 
 本篇指南提供了所有 **Apollo项目**需要的的安装硬件部分和软件系统教程。系统安装信息包括下载和安装Apollo Linux内核的过程。
@@ -143,7 +151,7 @@ Neousys Nuvo-6108GC 产品页:
 ![online]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)
 Neousys Nuvo-6108GC 手册：还不可用。
 
-#### 控制器局域网络（CAN）卡
+#### 控制器局域网络(CAN)卡
 IPC中使用的CAN卡型号为 **ESD** **CAN-PCIe/402-B4**.
 
 ![can_card]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/CAN-B4.png)
@@ -156,14 +164,14 @@ IPC中使用的CAN卡型号为 **ESD** **CAN-PCIe/402-B4**.
 
 
 
-##全球定位系统(GPS)和惯性测量装置(IMU)
+## 全球定位系统(GPS)和惯性测量装置(IMU)
 
 有 **两种** GPS-IMU的 **可选方案**，您只需根据您的需求进行选择:
 
 - 选项1：NovAtel SPAN-IGM-A1
 - 选项2：NovAtel SPAN® ProPak6™ 和 NovAtel IMU-IGM-A1
 
-###选项1: NovAtel SPAN-IGM-A1
+### 选项1: NovAtel SPAN-IGM-A1
 
 NovAtel SPAN-IGM-A1 是一个集成的，单盒的解决方案，提供紧密耦合的全球导航卫星系统（GNSS）定位和具有NovAtel OEM615接收机的惯性导航功能。 
 
@@ -175,7 +183,7 @@ NovAtel SPAN-IGM-A1 是一个集成的，单盒的解决方案，提供紧密耦
 
 [https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/](https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/)
 
-###选项2: NovAtel SPAN ProPak6和NovAtel IMU-IGM-A1
+### 选项2: NovAtel SPAN ProPak6和NovAtel IMU-IGM-A1
 
 NovAtel ProPak6是独立的GNSS接收机，它与NovAtel提供的独立IMU（本例中为NovAtel IMU-IGM-A1）相融合以提供定位。
 
@@ -238,7 +246,7 @@ GPS-IMU组件的GPS接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**。
 ![online]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)Webpage for Velodyne HDL-64E S3:
 [http://velodynelidar.com/hdl-64e.html](http://velodynelidar.com/hdl-64e.html)
 
-### Option 2: Hesai Pandora
+### 选项 2: Hesai Pandora
 
 使用来自Hesai Photonics科技有限公司的潘多拉40线激光雷达系统。 
 
@@ -281,7 +289,7 @@ GPS-IMU组件的GPS接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**。
 
 [https://www.continental-automotive.com/Landing-Pages/Industrial-Sensors/Products/ARS-408-21](https://www.continental-automotive.com/Landing-Pages/Industrial-Sensors/Products/ARS-408-21)
 
-## 安装任务概览
+# 安装任务概览
 
 安装硬件和软件组件涉及以下任务：
 **室内：**
@@ -323,7 +331,7 @@ GPS-IMU组件的GPS接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**。
 - 核心硬件和软件的安装
 - 车辆硬件的安装
 
-### 室内
+## 上车前的准备工作
 - 准备IPC：
  - 安装CAN卡
  - 安装或者替换硬盘
@@ -333,7 +341,7 @@ GPS-IMU组件的GPS接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**。
  - Apollo内核
  - Nvidia GPU 驱动
 
-#### IPC的准备工作
+### IPC的准备工作
 有如下步骤：
 
 1. 准备安装CAN卡：在Neousys Nuvo-6108GC中，ASUS®GTX-1080GPU-A8G-GAMING GPU卡预先安装占用了一个PCI插槽，将CAN卡安装到剩余两个PCI插槽其一即可。
@@ -548,7 +556,7 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 车辆与后备箱后视图
 
 
-### 安装GPS的接收器与天线
+### 安装GPS的接收器和天线
 
 以下组件 **二选一**:
 
@@ -766,7 +774,7 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
 LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安装点。激光器的垂直倾斜角度通常在相对于地平线的+7~-16度的范围内。为了充分利用检测角度范围，在林肯MKZ上，我们建议将LiDAR安装在1.7米的最小高度（从地面到LiDAR的底部）。
 
 
-##### Wiring
+##### 接线
 
 每个Pandora包括一个将LiDAR连接到电源的电缆组件，计算机（用于数据传输的以太网）和GPS时间同步源。
 
@@ -1021,11 +1029,11 @@ SAVECONFIG
 SETIMUTOANTOFFSET -0.05 0.5 0.8 0.05 0.05 0.08
 ```
 
-### 建立网络
+# 建立网络
 本节提供了一种建立网络的建议。
 运行Apollo软件的IPC必须访问互联网获取实时运动学（RTK）数据，以便精确定位。移动设备还需要连接到IPC来运行Apollo软件。
 
-#### 推荐配置
+## 推荐配置
 建议您根据下图设置网络：
 
 ![4G_network_setup]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/4G-LTE-setup-6108GC.png)
@@ -1039,11 +1047,11 @@ SETIMUTOANTOFFSET -0.05 0.5 0.8 0.05 0.05 0.08
 
 ![tip_icon]https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)建议您配置一个固定的IP，而不是在IPC上使用DHCP，以使它更容易从移动终端被连接。
 
-### 额外任务
+# 额外任务
 需要使用自己提供的组件来执行以下任务：
 - 使用DVI或HDMI电缆连接显示器，并连接键盘和鼠标，以便在现场的汽车上执行调试任务。
 - 在Apple iPad Pro上建立Wi-Fi连接，以访问HMI并控制IPC上运行的Apollo ADS。
 
-# Next Steps
+# 下一步
 
 完成硬件部分的安装之后，可以参考快速入门的教程 [Apollo Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start.md) 完成软件部分的安装。
