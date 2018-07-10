@@ -30,5 +30,4 @@ Here is a solution to solve this problem:
 * Press 'Ctrl+Alt+F1' and install 'NVIDIA-Linux-x86_64-375.39.run' according to the [link](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_hardware_system_installation_guide_v1.md).
 * Reboot and start computer with the default boot loader with Apollo kernel.
 
-
 **More Software FAQs to follow.**
