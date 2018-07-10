@@ -3,6 +3,7 @@
 - [Calibration FAQs](Calibration_FAQs.md)
 - [Calibration FAQs cn](Calibration_FAQs_cn.md)
 - [Perception FAQs](Perception_FAQs.md)
+- [Dreamview FAQs](Dreamview_FAQs.md)
 - [General FAQs](General_FAQs.md)
 - [General FAQs cn](General_FAQs_cn.md)
 - [Hardware FAQs](Hardware_FAQs.md)
