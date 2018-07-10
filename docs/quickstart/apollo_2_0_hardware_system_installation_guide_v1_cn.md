@@ -107,7 +107,7 @@
 - 提供额外USB接口的USB集线器
 - 供在车辆现场调试使用的显示器，键盘，鼠标
 - 连接线：数字可视接口（DVI）线（可选），用于GPS和LiDAR时间同步的定制线
-- 苹果iPad Pro:9.7寸
+- 苹果iPad Pro:9.7寸, WiFi(可选)
 
 
 关键硬件组件的特性将在后续部分中介绍。
@@ -863,7 +863,7 @@ Apollo参考设计建议使用6毫米和25毫米两个不同焦距的相机。�
 
 2.   将板载计算机系统6108GC放在主干箱内（推荐）。
 
-      例如，阿波罗1.5使用4x4螺钉将6108GC螺栓固定在后备箱的箱板上。 ![IPC-bolt_down-936x720](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Mount_ipc_on_carpet.JPG)
+      例如，阿波罗2.0使用4x4螺钉将6108GC螺栓固定在后备箱的箱板上。 ![IPC-bolt_down-936x720](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Mount_ipc_on_carpet.JPG)
 
 3. 安装IPC，使其前后两侧（所有端口位于）面对右侧（乘客）或左侧（驱动器）的主干。
 这种定位使得连接所有电缆更容易。
