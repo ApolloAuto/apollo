@@ -46,7 +46,7 @@ When a localization update is received, the prediction module updates its intern
 
 ## Localization
 
-The routing module aggregates various data to locate the autonomous vehicle. There are two types of localization modes: OnTimer and Multiple SensorFusion.
+The localization module aggregates various data to locate the autonomous vehicle. There are two types of localization modes: OnTimer and Multiple SensorFusion.
 
 The first localization method is RTK-based, with a timer-based callback function `OnTimer`, as shown below.
 
