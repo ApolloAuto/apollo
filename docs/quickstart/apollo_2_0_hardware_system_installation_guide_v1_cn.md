@@ -912,7 +912,7 @@ d. 连接:
 
 [https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/](https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/)
 
-#### 配置GPS、IMU
+#### 配置GPS和IMU
 GPS 和IMU 配置如下：
 
 ```
