@@ -344,17 +344,17 @@ GPS-IMU组件的GPS接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**。
 
 a. 找到并拧下计算机侧面的八个螺丝（棕色方块所示或棕色箭头指示）:
 
-<img src="(https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-Screw-Positions_labeled.png" width="99%">
+![Positions_of_Screws](images/IPC-6108GC-Screw-Positions_labeled.png)
 
 b. 从IPC上拆下盖子。基座有3个PCI插槽（由显卡占据一个）：
 
-<img src="(https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Removing_the_cover.JPG" width="99%">
+  ![removing the cover](images/Removing_the_cover.JPG)
 
 ![Before installing the CAN card](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Before_installing_the_can_card.png)
 
 c. 通过从其默认位置移除红色跳线帽（以黄色圆圈显示）并将其放置在其终止位置，设置CAN卡端接跳线：
 
-<img src="(https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/prepare_can_card.png" width="99%">
+ ![prepare_can_card](images/prepare_can_card2.png)
 
 **![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png)WARNING**: 如果端接跳线设置不正确，CAN卡将无法正常工作。
 
@@ -364,7 +364,7 @@ d. 将CAN卡插入IPC的插槽:
 
 e. 安装IPC盖子：
 
-<img src="(https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-Screw-Positions.png" width="99%">
+  ![IPC-6108GC-Screw-Positions.png](images/IPC-6108GC-Screw-Positions.png)
 
 2. 准备IPC启动:
 
@@ -407,7 +407,7 @@ c. 连接电源：
 - Apollo 内核
 - Nvidia GPU 驱动
 
-![tip_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)![tip_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)您最好具有使用Linux成功安装软件的经验，如果这是您的第一次安装，有可能会失败。
+![tip_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)您最好具有使用Linux成功安装软件的经验。
 
 
 #### 安装Ubuntu Linux
@@ -825,7 +825,7 @@ Apollo参考设计建议使用6毫米和25毫米两个不同焦距的相机。�
 
 - ![Cameras_lock_screw](./images/LI-Camera-OnVehicle.png)
 
-- 25毫米焦距的照相机应该倾斜大约两度。调整后，25毫米相机应该能够观察到100米外有红路灯的交叉路口的停车线。
+- 25毫米焦距的照相机应该向上倾斜大约两度。调整后，25毫米相机应该能够观察到100米外有红路灯的交叉路口的停车线。
 
 - 新出厂的摄像头的镜片不在最好的聚焦位置。通过调整镜片的焦距来找到正确的位置，找到远处目标物体的清晰图像。一个好的图像目标是交通标志或街道标志内的FOV。调整焦点后，使用锁紧螺丝来固定镜头的位置。
 
@@ -838,7 +838,7 @@ Apollo参考设计建议使用6毫米和25毫米两个不同焦距的相机。�
 
 本部分介绍了Continental雷达的安装过程。
 
-雷达需要一个匹配的机械机架安装在前保险杠上。安装后，要求雷达朝向驱动方向，稍微倾斜不超过2度。 
+雷达需要一个匹配的机械机架安装在前保险杠上。安装后，要求雷达朝向驱动方向，稍微向上倾斜不超过2度。 
 
 ![Radar Installations](./images/Radar_OnVehicle.png)
 
@@ -877,7 +877,7 @@ Apollo参考设计建议使用6毫米和25毫米两个不同焦距的相机。�
 - 电力电缆
 - 控制器局域网（CAN）电缆
 - 从4G路由器到IPC的以太网电缆
--（可选）监视器、键盘、鼠标
+- 监视器、键盘、鼠标（可选）
 a. 将电源线连接到工控机（如图所示）：
 b. 将电源线的另一端连接到车辆电池（如图所示）：
 
@@ -890,8 +890,8 @@ c. 连接DB9电缆工控机和可（如图所示）：
 d. 连接:
 
 - 从4G路由器到IPC的以太网电缆
-- 全球定位系统接收机
--（可选）监视器：
+- IPC的GPS接收器
+- 监视器（可选）：
 
 ![IPC-power-842x636](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/cable_connected_incar.JPG)
 
@@ -901,7 +901,7 @@ d. 连接:
 步骤如下:
 
 1. 在接受测量之前，打开IPC。
-2. 当IMU和GPS天线就位时，必须测量从IMU到GPS天线的距离。距离测量应为：X偏移，yoffset，和Z偏移。偏移误差必须在一厘米以内，以达到定位和定位的高精度。
+2. 当IMU和GPS天线就位时，必须测量从IMU到GPS天线的距离。距离测量应为：X偏移，Y偏移，和Z偏移。偏移误差必须在一厘米以内，以达到定位和定位的高精度。
 更多信息，参见：
 
 ![online_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)NovAtel ProPak6 安装与操作手册:
