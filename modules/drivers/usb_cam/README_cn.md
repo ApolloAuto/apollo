@@ -38,7 +38,7 @@ bash /apollo/docker/setup_host/setup_host.sh
 # in dev docker
 ln -s /dev/video0  /dev/camera/obstacle
 ln -s /dev/video1  /dev/camera/trafficlights
-ln -s /dev/video1  /dev/camera/lanemark
+ln -s /dev/video2  /dev/camera/lanemark
 ```
 
 最后指定每台相机的对应内参文件
