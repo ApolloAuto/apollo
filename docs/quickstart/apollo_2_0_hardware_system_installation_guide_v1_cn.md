@@ -429,11 +429,13 @@ c. 连接电源：
 2. 安装 Ubuntu Linux:
 
     a.  将Ubuntu安装驱动器插入USB端口并启动IPC。
+    
     b.  按照屏幕上的说明安装Linux。
 
 3. 执行软件更新与安装:
 
     a.  安装完成，重启进入Linux。
+    
     b.  执行软件更新器（Software Updater）更新最新软件包，或在终端执行以下命令完成更新。
     ```shell
     sudo apt-get update; 
@@ -460,17 +462,21 @@ c. 连接电源：
 ```
 https://github.com/ApolloAuto/apollo-kernel/releases
 ```
+
 2. 安装内核
-After having the release package downloaded:
+
+下载完release安装包以后:
 ```
 tar zxvf linux-4.4.32-apollo-1.0.0.tar.gz
 cd install
 sudo bash install_kernel.sh
 ```
 3. 使用 `reboot`命令重启系统；
+
 4. 根据[ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md)编译ESD CAN驱动器源代码
 
 ##### 构建你自己的内核
+
 如果内核被改动过，或预编译内核不是你最佳的平台，你可以通过如下方法构建你自己的内核：
 
 1. 从代码仓库克隆代码：
