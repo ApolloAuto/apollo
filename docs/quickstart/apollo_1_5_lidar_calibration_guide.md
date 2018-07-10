@@ -1,17 +1,15 @@
-## Apollo Sensor Calibration Service
+## Apollo LiDAR - IMU Calibration Service
 
 Welcome to the Apollo sensor calibration service. This document describes the process of the extrinsic calibration service between 64-beam Light Detection And Ranging (LiDAR) and Inertial Navigation System (INS).
 
 ## Apollo Sensor Calibration Catalog
 
-- Service overview
-- Preparation
-- Recording calibration data
-- Uploading calibration data and creating task
-- Obtaining calibration results
-- Error description
-
-
+- [Overview](#overview)
+- [Preparation](#preparation)
+- [Recording calibration data](#Recording-Calibration-Data)
+- [Uploading Calibration Data and Creating a Calibration Service Task](#Uploading-Calibration-Data-and-Creating-a-Calibration-Service-Task)
+- [Obtaining calibration results](#Obtaining-Calibration-Results)
+- [Types of Errors encountered](#Types-of-Errors)
 
 ### Overview
 
@@ -158,7 +156,7 @@ mkdir -p modules/calibration/data/[CAR_ID]/
 
 Here, **CAR\_ID** is the vehicle ID for calibrating vehicles. Then, copy the downloaded extrinsic yaml file to the corresponding **CAR\_ID** folder. Finally, after you start HMI, select the correct **CAR\_ID** to load the corresponding calibration yaml file.
 
-### Error Description
+### Types of Errors encountered
 
 1. Data unpacking error: The uploaded data is not a valid `tar.gz` file
 2. MD5 checksum error:  If the MD5 checksum of the uploaded data differs from the MD5 checksum computed by the server side, it could be caused by network transmission problems.
