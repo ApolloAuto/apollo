@@ -43,6 +43,27 @@ Use dreamview and enable sim_control on dreamview to test your planning algorith
 It simulates a SDC's control module, and moves the car based on planning result. This is a really convenient way to visualize and test planning module
 
 ---
-## 
+## How do I turn on Sim Control?
+
+Purpose of sim control: drive the car based on the planning trajectory. Good for debugging planning algorithms.
+
+**Apollo 2.5 or after**: simply turning on the SimControl switch as seen in the image below:
+      
+![](images/sim_control_2.5.png)
+
+**Apollo 2.0 or older**: you would need to enable the sim control manually, which can be performed as follows:
+1. Open `modules/dreamview/conf/dreamview.conf`
+2. Add **“--enable_sim_control=true”** to the second line of the file
+3. Restart apollo using our bootstrap script
+```bash
+    bash scripts/bootstrap.sh stop
+    bash scripts/bootstrap.sh start
+```
+ 
+**Please note**, planning and routing modules (see image below) should be ON while using SimControl. To navigate the ego-car, select either “route editing” or “default routing” from the side bar to define a route.
+
+![](images/sim_control_2.0.png)
+
+
 
 **More DreamView FAQs to follow.**
