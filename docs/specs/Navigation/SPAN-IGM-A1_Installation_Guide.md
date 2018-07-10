@@ -53,7 +53,7 @@ For additional information, visit Page 5 of [the SPAN-IGM™ Quick Start Guide](
 
 ### Configuring the GPS and IMU
 
-Configure the GPS and IMU as shown below. The setting can be configured by keying in the following command or loading a batch file in Novatel Connect:
+Configure the SPAN-IGM-A1 as shown below. The setting can be configured by keying in the following command or loading a batch file in Novatel Connect:
 
 ```
 WIFICONFIG STATE OFF
@@ -104,7 +104,7 @@ log USB1 vehiclebodyrotationb onchanged
 SAVECONFIG
 ```
 
-**![warning_icon](images/warning_icon.png) WARNING:** Modify the **<u>SETIMUTOANTOFFSE</u>T** line based on the actual measurement (of the antenna and the IMU offset).
+**![warning_icon](images/warning_icon.png) WARNING:** Modify the **<u>SETIMUTOANTOFFSET</u>** line based on the actual measurement (of the antenna and the SPAN-IGM-A1 offset).
 
 For example:
 
