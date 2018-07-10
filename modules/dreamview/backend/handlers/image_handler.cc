@@ -78,10 +78,11 @@ void ImageHandler::OnImage(const sensor_msgs::CompressedImage &image) {
 }
 
 ImageHandler::ImageHandler() : requests_(0) {
-  // For Navigation mode
-  AdapterManager::AddImageFrontCallback(&ImageHandler::OnImage, this);
-  // For regular mode
-  AdapterManager::AddImageShortCallback(&ImageHandler::OnImage, this);
+  if (FLAGS_use_navigation_mode) {
+    AdapterManager::AddImageFrontCallback(&ImageHandler::OnImage, this);
+  } else {
+    AdapterManager::AddImageShortCallback(&ImageHandler::OnImage, this);
+  }
 }
 
 bool ImageHandler::handleGet(CivetServer *server, struct mg_connection *conn) {
