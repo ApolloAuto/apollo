@@ -567,7 +567,7 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 
 可以将GPS-IMU NovAtel SPAN-IGM-A1放置在车辆的大部分地方，但建议您遵循以下建议：
 
-- 将NovAtel SPAN-IGM-A1放置并固定在行李箱内，Y轴指向前方。
+- 将NovAtel SPAN-IGM-A1放置并固定在后备箱内，Y轴指向前方。
 - 将NovAtel GPS-703-GGG-HV天线安装在位于车辆顶部的视野范围内。
 
 ##### 接线
@@ -634,12 +634,12 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 你可以将 ProPak6 和 IMU 放置在车辆以下建议的位置：
 
 - 将ProPak6和IMU并排固定在行李箱内，Y轴指向前方。
-- 将NovAtel GPS-703-GGG-HV天线安装在车辆顶部或行李箱盖顶部，如图所示：
+- 将NovAtel GPS-703-GGG-HV天线安装在车辆顶部或后备箱盖顶部，如图所示：
 
 ![gps_receiver_on_car](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/gps_receiver_on_car.png)
 
-- 使用磁性适配器将天线紧固到行李箱盖上。
-- 通过打开主干并将电缆放置在行李箱盖和车身之间的空间中，将天线电缆安装在主干箱中。
+- 使用磁性适配器将天线紧固到后备箱盖上。
+- 通过打开后备箱并将电缆放置在后备箱中，将天线也安装在后备箱中。
 
 ##### 接线
 
@@ -709,7 +709,7 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
 
    a. SPAN-IGM-A1
 
-    如果您配置了[配置GPS和IMU]（＃configuration-the-gps-and-imu）中指定的SPAN-IGM-A1，GPRMC信号将通过用户端口电缆从主端口从GPS接收器发送。 PPS信号通过Aux端口上标有“PPS”和“PPS dgnd”的电缆发送。 下图中的虚线框是HDL64E S3 LiDAR和SPAN-IGM-A1 GPS接收机附带的可用连接。 剩余的连接需要由用户进行。
+    如果您配置了[配置GPS和IMU]（＃配置gps和imu）中指定的SPAN-IGM-A1，GPRMC信号将通过用户端口电缆从主端口从GPS接收器发送。 PPS信号通过Aux端口上标有“PPS”和“PPS dgnd”的电缆发送。 下图中的虚线框是HDL64E S3 LiDAR和SPAN-IGM-A1 GPS接收机附带的可用连接。 剩余的连接需要由用户进行。
 
    ![Wiring_Schematics_IGM_A1](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/LiDAR_A1_wiring.png)
 
@@ -861,11 +861,11 @@ Apollo参考设计建议使用6毫米和25毫米两个不同焦距的相机。�
      ![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png)这一步非常有必要。 如果输入电压低于所需极限。 很可能导致系统故障。
 
 
-2.   将板载计算机系统6108GC放在主干箱内（推荐）。
+2.   将板载计算机系统6108GC放在后备箱内（推荐）。
 
       例如，阿波罗2.0使用4x4螺钉将6108GC螺栓固定在后备箱的箱板上。 ![IPC-bolt_down-936x720](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Mount_ipc_on_carpet.JPG)
 
-3. 安装IPC，使其前后两侧（所有端口位于）面对右侧（乘客）或左侧（驱动器）的主干。
+3. 安装IPC，使其前后两侧（所有端口位于）面对右侧（乘客）或左侧（驱动器）的后备箱中。
 这种定位使得连接所有电缆更容易。
 有关更多信息，请参见：
 
