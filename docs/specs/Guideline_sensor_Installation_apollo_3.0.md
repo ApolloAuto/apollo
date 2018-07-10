@@ -40,7 +40,7 @@ One camera with 6mm-lens should face the front of ego-vehicle. The front-facing 
 After installation of cameras, The physical x, y, z location of camera w.r.t. origin should be saved in the calibration file.  	
 
 #### Verification of camera Setups
-The orientation of all three cameras should be all zeros. When the camera is installed, it is required to record a rosbag by driving a straight highway. By the replay of rosbag, the camera orientation should be re-adjusted to have pitch, yaw, and roll angles to be zero degree. When the camera is correctly installed, the horizon should be at the half of image width and not tilted. The vanishing point should be also at the center of the image. Please see the image below for the ideal camera setup.
+The orientation of all three cameras should be all zeros. When the camera is installed, it is required to record a rosbag by driving a straight highway. By the replay of rosbag, the camera orientation should be re-adjusted to have pitch, yaw, and roll angles to be zero degree. When the camera is correctly installed, the horizon should be at the half of image height and not tilted. The vanishing point should be also at the center of the image. Please see the image below for the ideal camera setup.
 
 ![Image](images/perception_setup_figure4.png)
 
@@ -66,4 +66,4 @@ transform:
         y: -0.235
         z: 1.256 
 ```
-If angles are not zero, they need to be calibrated and represented in quarternion (see above stransformation->rotation).
+If angles are not zero, they need to be calibrated and represented in quaternion (see above transform->rotation).
