@@ -35,6 +35,13 @@ Here is a solution to solve this problem:
 * Reboot and start computer with the default boot loader with Apollo kernel.
 
 ---
+## Could I build Apollo on Ubuntu 18
+
+**We highly recommend that you use Ubuntu 14.04 to build Apollo.**
+
+Yes, you should be able to make Apollo work on Ubuntu 18. Just follow the document to install docker, then `apollo.sh build` and `apollo.sh lint` should work. But `apollo.sh test` might not, because the nvidia-drivers are generally miss-matched between HOST and Docker container, which will raise test failures.
+
+
 ## How do I add a new module
 Apollo currently functions as a single system, therefore before adding a module to it, understand that there would be a lot of additional work to be done to ensure that the module functions perfectly with the other modules of Apollo. Simply add your module to the `modules/` folder. You can use `modules/routing` as an example, which is a relatively simple module. Write the BUILD files properly and apollo.sh will build your module automatically
 
