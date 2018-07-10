@@ -15,3 +15,6 @@ You can find additional information regarding the Leopard Imaging Inc. cameras o
 * [Data Sheet](https://www.leopardimaging.com/LI-USB30-AR023ZWDRB_datasheet.pdf) 
 * [Trigger Cable](https://leopardimaging.com/product/li-usb3-trig_cable/)
 
+## Disclaimer
+This device is `Apollo Platform Supported`
+

@@ -36,4 +36,6 @@ NV-GI120 integrates the GNSS receiver and MEMS IMU device into a compact package
    | Two naked wire | Power （red and blue)                            |
    | 扩展           | Extension                                        |
 
-   
+## Disclaimer
+
+This device is `Apollo Hardware Development Platform Supported`
