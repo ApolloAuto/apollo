@@ -72,7 +72,7 @@ ApolloAuto模块/common/为每一个模块提供了一些基础的宏来控制ro
 
 ##部分模块分析
 
-#### HMI & Dreamviewer
+#### HMI & Dreamview
 
 它是topic参数可视化化的工具。
 
@@ -80,7 +80,7 @@ HMI是一个基于Flask的简单python应用程序。
 它使用Web socket来查询ROS模块应用程序，而不是使用HTTP。 如果您有异步HTTP downloaders的经验，那么很容易理解，HTTP连接只是一个
 socket连接文件描述符，我们已经将HTTP头，方法写入该缓冲区。 一旦hmi flask后端收到命令，它将执行一个子进程执行相应的二进制文件。
 
-相比之下，Dreamweaver的工作方式有点像用React，Webpack和Three Js编写的前端应用程序\(WebGL, see /dreamview/backend/simulation_world, /dreamview/frontend/src/render \)，它订阅来自ROS节点的消息，并一帧一帧的绘制。
+相比之下，Dreamview的工作方式有点像用React，Webpack和Three Js编写的前端应用程序\(WebGL, see /dreamview/backend/simulation_world, /dreamview/frontend/src/render \)，它订阅来自ROS节点的消息，并一帧一帧的绘制。
 
 #### 感知
 
