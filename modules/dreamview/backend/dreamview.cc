@@ -68,7 +68,7 @@ void Dreamview::CheckAdapters() {
       << "RoutingRequestAdapter is not initialized.";
   CHECK(AdapterManager::GetRoutingResponse())
       << "RoutingResponseAdapter is not initialized.";
-  CHECK(AdapterManager::GetCompressedImage())
+  CHECK(AdapterManager::GetImageFront())
       << "CompressedImageAdapter is not initialized.";
   CHECK(AdapterManager::GetImageShort())
       << "ImageShortAdapter is not initialized.";
